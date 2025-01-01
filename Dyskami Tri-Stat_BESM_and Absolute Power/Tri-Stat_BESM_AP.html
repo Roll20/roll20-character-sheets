@@ -5677,36 +5677,15 @@
         }
     }
 
-    function setDefectCharacteristic(debug, timer,attrdb, value, rowID, setObj){
-        const defect = value[`repeating_attr_${rowID}_defect`];
-        const defectid = removeWhiteSpace(defect);
-        const shortcoming = value[`repeating_attr_${rowID}_defectaspect`];
-        const rank = parseInt(value[`repeating_attr_${rowID}_rank`]) || 0;
-        const shortcomingCharacteristics = {
-            "body": `Body -${rank}`,
-            "mind": `Mind -${rank}`,
-            "soul": `Soul -${rank}`,
-            "agi": `Agility -${rank}`,
-            "con": `Constitution -${rank}`,
-            "dex": `Dexterity -${rank}`,
-            "str": `Strength -${rank}`,
-            "cre": `Creativity -${rank}`,
-            "int": `Intellect -${rank}`,
-            "per": `Perception -${rank}`,
-            "rea": `Reasoning -${rank}`,
-            "awa": `Awareness -${rank}`,
-            "cha": `Charisma -${rank}`,
-            "com": `Composure -${rank}`,
-            "wil": `Willpower -${rank}`
-        };
+    async function setDefectCharacteristic(cache, set_values, query) {
         const defectCharacteristics = {
-            "achillesheel":{
+            "achilles heel":{
                 1: "rare attack form",
                 2: "uncommon attack form",
                 3: "common attack form",
                 "default": ""
             },
-            "awkwardsize":{
+            "awkward size":{
                 0: "Medium",
                 1: "Large",
                 2: "Huge",
@@ -5725,13 +5704,13 @@
                 3: "30 damage/round exposed",
                 "default": ""
             },
-            "blindfury":{
+            "blind fury":{
                 1: "difficult initiate; easy revert",
                 2: "moderately difficult initiate/revert",
                 3: "easy initiate; difficult revert",
                 "default": ""
             },
-            "conditionalownership":{
+            "conditional ownership":{
                 1: "mild conditions",
                 2: "strict conditions",
                 3: "severe conditions",
@@ -5755,7 +5734,7 @@
                 3: "Social Combat Value -6",
                 "default": ""
             },
-            "easilydistracted":{
+            "easily distracted":{
                 1: "triggered infrequently",
                 2: "triggered frequently",
                 3: "triggered constantly",
@@ -5773,31 +5752,31 @@
                 3: "severely inconvenient",
                 "default": ""
             },
-            "impairedmanipulation":{
+            "impaired manipulation":{
                 1: "only one usable arm",
                 2: "rudimentary manipulative ability",
                 3: "no usable arms",
                 "default": ""
             },
-            "impairedspeech":{
+            "impaired speech":{
                 1: "severe speech impediment",
                 2: "sounds that carry emotional content",
                 3: "completely mute",
                 "default": ""
             },
-            "ineptattack":{
+            "inept attack":{
                 1: "-1 Attack Combat Value",
                 2: "-2 Attack Combat Value",
                 3: "-3 Attack Combat Value",
                 "default": ""
             },
-            "ineptdefence":{
+            "inept defence":{
                 1: "-1 Defence Combat Value",
                 2: "-2 Defence Combat Value",
                 3: "-3 Defence Combat Value",
                 "default": ""
             },
-            "involuntarychange":{
+            "involuntary change":{
                 1: "Difficult to trigger",
                 2: "Moderately easy to trigger",
                 3: "Easy to trigger",
@@ -5833,7 +5812,7 @@
                 3: "occur constantly",
                 "default": ""
             },
-            "nohealing":{
+            "no healing":{
                 1: "healing/recovery at slight disadvantage",
                 2: "healing/recovery at moderate disadvantage",
                 3: "healing/recovery at severe disadvantage",
@@ -5851,49 +5830,52 @@
                 3: "severe- encountered constantly",
                 "default": ""
             },
-            "physicalimpairment":{
+            "physical impairment":{
                 1: "slight inconvenience",
                 2: "moderate inconvenience",
                 3: "severe inconvenience",
                 "default": ""
             },
-            "redtape":{
+            "red tape":{
                 1: "generally easy to manage",
                 2: "moderately difficult to manage",
                 3: "difficult to manage",
                 "default": ""
             },
-            "reduceddamage":{
+            "reduced damage":{
                 1: "Damage Multiplier -1",
                 2: "Damage Multiplier -2",
                 3: "Damage Multiplier -3",
                 "default": ""
             },
-            "sensoryimpairment":{
+            "sensory impairment":{
                 1: "minor obstacle",
                 2: "major obstacle",
                 3: "loss of sense",
                 "default": ""
             },
-            "significantother":{
+            "significant other":{
                 1: "appears infrequently",
                 2: "appears frequently",
                 3: "appears constantly",
                 "default": ""
             },
-            "skeletoninthecloset":{
+            "shortcoming":{
+                "default": ""
+            },
+            "skeleton in the closet":{
                 1: "difficult to discover",
                 2: "moderately easy to discover",
                 3: "easy to discover",
                 "default": ""
             },
-            "socialfault":{
+            "social fault":{
                 1: "slight disadvantage",
                 2: "moderate disadvantage",
                 3: "severe disadvantage",
                 "default": ""
             },
-            "specialrequirement":{
+            "special requirement":{
                 1: "easy/infrequent",
                 2: "moderately difficult/frequent",
                 3: "difficult/constant",
@@ -5929,20 +5911,47 @@
                 3: "incentive offered is extreme",
                 "default": ""
             },
-            "weakpoint":{
+            "weak point":{
                 1: "difficult to hit",
                 2: "moderately easy to hit",
                 3: "easy to hit",
                 "default": ""
             }
         };
-        const characteristic = defect == 'shortcoming' ?
-            shortcomingCharacteristics[`${shortcoming}`] :
-            defectCharacteristics[`${defectid}`][rank] || 
-            defectCharacteristics[`${defectid}`]["default"];
-        const result = `${capital(defect)}, ${characteristic}`;
-        clog(debug, timer, 'characteristic =', result, 'setDefectCharacteristic()');
-        setObj[`repeating_attr_${rowID}_characteristic`] = result;
+        for (let i = 0; i < query.db.config.length; i++) {
+            if (
+                query.db.config[i].name === 'aspect_name' ||
+                query.db.config[i].name === 'aspect_stat' ||
+                query.db.config[i].name === 'aspect_type'
+            ) { query[`${query.db.config[i].name}`] = query.db.config[i].rank; }
+        }
+        const shortcoming = query.defect === 'shortcoming' ?
+            `${getTranslationByKey(query.aspect_stat)} - ` +
+            `${getTranslationByKey(query.aspect_type)} ${getTranslationByKey("aspect")}` +
+            `${
+                query.aspect_name === query.aspect_stat ? "" :
+                " (" + getTranslationByKey(query.aspect_name.toKebobCase()) + ")"
+            }` : false;
+        const characteristic = shortcoming !== false ? shortcoming :
+            defectCharacteristics[`${query.defect}`][query.level] || 
+            defectCharacteristics[`${query.defect}`]["default"];
+        return characteristic;
+    }
+
+    async function setDefectConfiguration(cache, set_values, query) {
+        const configurations = {};
+        const db = query.next === 'write_newdefect' ? query.config : cache.defectdb[query.defect][query.index].config;
+        const characteristic = await setDefectCharacteristic(cache, set_values, query);
+        const configuration =
+            query.defect === 'shortcoming' ? characteristic :
+            db.map(c =>
+                `${c.name.fromSnakeCase().capitalize()} ` +
+                `(${
+                    c.name === query.defect || c.name === configurations[query.defect] ?
+                    characteristic : isNaN(c.rank) ? c.rank.capitalize() : c.rank
+                })`
+        ).sort().join("\n");
+        return configuration;
     }
 
     async function setConfiguration(cache, set_values, query) {
@@ -6899,6 +6908,7 @@
         cache.statsdb[temp.aspect_stat].shortcoming = temp.rank;
         set_values[`static_character_${temp.aspect_stat}_remaining`] =
             cache.statsdb[temp.aspect_stat].base +
+            (cache.statsdb[temp.aspect_stat].augmented || 0) +
             cache.statsdb[temp.aspect_stat].temp -
             cache.statsdb[temp.aspect_stat].damage -
             int(`${
@@ -10015,34 +10025,24 @@
                     query.last = query.next;
                 break;
                 case 'remove_defect':
+                    const removable_defects = [];
                     query.title = 'Remove';
                     query.options = '';
                     for (let i = 0; i < all_defects.length; i++) {
                         for (let j = 0; j < cache.defectdb[all_defects[i]].length; j++) {
                             const defect = cache.defectdb[all_defects[i]];
                             if (defect[j].group_id === cache.static_group_visible_id) {
-                                query.options +=
-                                `|${defect[j].name}` +
-                                ` [${all_defects[i].capitalize()}],` +
-                                `${all_defects[i]}~${cache.defectdb[all_defects[i]][j].row_id}`;
+                                removable_defects.push(
+                                    `${defect[j].name === '' ? all_defects[i].capitalize() : defect[j].name}` +
+                                    `${defect[j].name === '' ? '' : ' [' + all_defects[i].capitalize() + ']'},` +
+                                    `${all_defects[i]}~${cache.defectdb[all_defects[i]][j].row_id}`
+                                );
                             }
                         }
                     }
-                    query.options += `|${getTranslationByKey("go-back")},select_task`;
+                    query.options = '|' + removable_defects.sort().join("|");
+                    query.options += `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
-                    /*
-                    query.title = 'Remove';
-                    query.options = _.chain(cache.defectdb).keys().map(a => {
-                        const length = cache.defectdb[`${a}`].length;
-                        if (length !== 0) {
-                            for (let i = 0; i < length; i++) {
-                                return `|${cache.defectdb[`${a}`][i].name.capitalize()} [${a.capitalize()}],${a}~${cache.defectdb[`${a}`][i].row_id}`;
-                            }
-                        }
-                    }).flatten().compact().value().sort().join('');
-                    query.options += `|${getTranslationByKey("go-back")},select_task`;
-                    query.last = query.next;
-                    */
                 break;
                 case 'remove_group':
                     query.title = '';
@@ -10315,13 +10315,15 @@
                 case 'static_attribute_group_name':
                 case 'repeating_attribute_attribute':
                 case 'repeating_defect_defect':
-                    const type = 
+                    const type = cache.source_type === 'repeating' ? cache.source_section : 'group';
+                    /*
                         cache.source_type === 'repeating' && cache.source_section === 'attribute' ? 'attribute' : 
                         cache.source_type === 'repeating' && cache.source_section === 'defect' ? 'defect' : 
                         'group';
+                    */
                     query.title = `${getTranslationByKey("rename-" + type)}`;
                     query.options = type === 'group' ? `|${cache.groupdb[cache.static_group_visible_id].name}` :
-                        `|${query.db.name === '' ? query.attribute.capitalize() : query.db.name}`;
+                        `|${query.db.name === '' ? query[cache.source_section].capitalize() : query.db.name}`;
                     query.last = query.next;
                 break;
                 case 'set_group_source':
@@ -10739,7 +10741,7 @@
                     query.title = getTranslationByKey("choose-aspect");
                     query.options = '';
                     const aspects = [];
-                    for (let i = 0, n = shortcomings.length; i < n; i++) {
+                    for (let i = 0; i < shortcomings.length; i++) {
                         const display = 
                             `${getTranslationByKey(shortcomings[i].stat)} - ` +
                             `${getTranslationByKey(shortcomings[i].type)} ${getTranslationByKey("aspect")}` +
@@ -11119,8 +11121,8 @@
 
                 case 'add_defect':
                     query.config = [];
-                    query.name = '';
-                    query.rank = 0;
+                    //query.name = '';
+                    //query.rank = 0;
                     query.defects = cache.rulebook !== 'besm' ?
                         ['no healing'].concat(base_defects) : base_defects;
                     if (cache.rulesdb.rules_optional_sanity_status) {
@@ -11129,15 +11131,16 @@
                     if (cache.rulesdb.rules_optional_society_status) {
                         query.defects = query.defects.concat(['demure']);
                     }
-                    query.defects.sort();
                     query.title = `${getTranslationByKey("add")} ${getTranslationByKey("defect")}`;
-                    query.options = '';
+                    query.options = '|' + query.defects.map(d => `${d.capitalize()},${d}`).sort().join('|');
+                    /*
                     for (let i = 0, n = query.defects.length; i < n; i++) {
                         query.options += `|${query.defects[i].capitalize()},` +
                         `${query.defects[i]}`;
                     }
-                    query.options += `|${getTranslationByKey("go-back")},attribute_menu`;
-                    query.last = 'add_defect';
+                    */
+                    //query.options += `|${getTranslationByKey("go-back")},attribute_menu`;
+                    query.last = query.next;
                 break;
                 
                 /*
@@ -11840,7 +11843,30 @@
                             {name:'aspect_type',rank:query.load[3]},
                         ];
                         set_values[`repeating_defect_${cache.source_id}_configuration`] = query.load[0];
+                        query.points = query.db.level !== 0 ? query.db.level * -1 : 0;
+                        if (query.load[3] === 'all') {
+                            cache.statsdb[query.load[2]].shortcoming = query.db.level;
+                            query.points *= 2;
+                        }
+                        query.db.points = query.points;
+                        set_values[`${cache.source_path}_points`] = query.points;
+                        await setStat(cache, query, set_values);
                         await setDerivedValues(cache, set_values);
+                        if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
+                            setPowerFluxPoolPoints(cache, set_values);
+                        } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
+                            setPowerVariationGroupPoints(cache, set_values);
+                            setPowerVariationPoolPoints(cache, set_values);
+                        } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'dynamic powers') {
+                            setDynamicPowersPoolLevels(cache, set_values);
+                            //setNonStandardGroupPoints(cache, set_values);
+                            setGroupCharacterPoints(cache, set_values);
+                        } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'gear') {
+                            setGearPoolLevels(cache, set_values, query);
+                            setGroupCharacterPoints(cache, set_values);
+                        } else {
+                            setGroupCharacterPoints(cache, set_values);
+                        }
                         query.next = 'exit';
                     break;
                     case 'unaffected':
@@ -12073,8 +12099,9 @@
                     break;
                     case 'add_defect':
                         query.defect = query.selection;
+                        query.task = 'add';
                         query.defect_translation = query.defect.toKebobCase();
-                        query.next = 'defect_menu';
+                        query.next = 'write_newdefect';
                     break;
                     
                     case 'defect_rank':
@@ -12350,89 +12377,57 @@
                         set_values[`repeating_attribute_${query.row_id}_active`] = 1;
                     break;
                     case 'write_newdefect':
-                    //case 'update_defect':
-                        
-                        if (query.task === 'add') {
-                            query.fields.push('configuration');
-                        }
-                        /*
-                        const row_id = query.next === 'update_defect' ?
-                            query.row_id : generateRowID();
-                        */
                         for (let i = 0; i < query.fields.length; i++) {
                             let value = '';
                             switch (query.fields[i]) {
-                                case 'configuration':
-                                    if (query.defect === 'shortcoming') {
-                                        const aspect_fields = ['stat','type'];
-                                        if (query.aspect_type !== 'all') {
-                                            aspect_fields.push('name');
-                                        }
-                                        for (let j = 0; j < aspect_fields.length; j++) {
-                                            query.config.push({
-                                                name: `aspect_${aspect_fields[j]}`,
-                                                rank: query[`aspect_${aspect_fields[j]}`]
-                                            });
-                                        }
-                                    }
-                                    if (query.config.length !== 0) {
-                                        query.config.sort();
-                                        for (let i = 0; i < query.config.length; i++) {
-                                            if (query.defect === 'shortcoming') {
-                                                value += query.aspect_type !== 'all' ?
-                                                    `${query.aspect_stat.capitalize()} ` +
-                                                    `${query.aspect_type.capitalize()} ` +
-                                                    `Aspect: ${query.aspect_name.capitalize()}\n` :
-                                                    `${query.aspect_stat.capitalize()} ` +
-                                                    `Aspect: ${query.aspect_type.capitalize()}\n`;
-                                                    break;
-                                            } else {
-                                                value += `${query.config[i].name.capitalize()}`;
-                                                value += ' (';
-                                                value += `${
-                                                    isNaN(query.config[i].rank) ?
-                                                    query.config[i].rank.capitalize() : 
-                                                    int(query.config[i].rank)
-                                                }`;
-                                                value += query.defect === 'inept defense' && query.enemy !== undefined ?
-                                                    `: ${query.enemy}` : '';
-                                                value += ')';
-                                            }
-                                            if (i !== query.config.length - 1) {
-                                                value += '\n';
-                                            }
-                                        }
-                                    }
-                                    if (query.next === 'write_newdefect') {
-                                        set_values[`repeating_defect_${query.row_id}_active`] = 1;
-                                    }
-                                break;
                                 case 'defect':
-                                    value = getTranslationByKey(query.defect_translation).capitalize();
+                                    value = getTranslationByKey(query.defect.toKebobCase());
                                 break;
                                 case 'name':
-                                    value = query[query.fields[i]].capitalize();
+                                    value = getTranslationByKey(query.defect.toKebobCase());
                                 break;
                                 case 'points':
-                                    value = (defect_costs[query.defect] * query.rank) * -1;
+                                    value = 0;
                                 break;
                                 case 'rank':
-                                    value = query.rank;
+                                    value = 0;
                                 break;
                             }
                             set_values[`repeating_defect_${query.row_id}_${query.fields[i]}`] = value;
                         }
+                        switch (query.defect) {
+                            case 'shortcoming':
+                                query.config.push({
+                                    name: 'aspect_name',
+                                    rank: ''
+                                });
+                                query.config.push({
+                                    name: 'aspect_stat',
+                                    rank: ''
+                                });
+                                query.config.push({
+                                    name: 'aspect_type',
+                                    rank: ''
+                                });
+                            break;
+                            default:
+                                query.config.push({
+                                    name: query.defect,
+                                    rank: ''
+                                });
+                        }
+                        set_values[`repeating_defect_${query.row_id}_configuration`] = await setDefectConfiguration(cache, set_values, query);
+                        set_values[`repeating_defect_${query.row_id}_active`] = 1;
                         const defectdb_entry = {};
                         defectdb_entry.active = true;
                         defectdb_entry.config = query.config;
-                        defectdb_entry.group_id = query.next === 'update_defect' ?
-                            query.group_id : cache.static_group_visible_id;
-                        defectdb_entry.rank = query.rank;
-                        defectdb_entry.name = query.name;
+                        defectdb_entry.group_id = cache.static_group_visible_id;
+                        defectdb_entry.rank = 0;
+                        defectdb_entry.name = '';
                         defectdb_entry.row_id = query.row_id;
-                        defectdb_entry.points = (defect_costs[query.defect] * query.rank) * -1;
-                        defectdb_entry.visibility = query.next === 'update_defect' ?
-                            query.visibility : 1;
+                        defectdb_entry.points = 0;
+                        defectdb_entry.visibility = 1;
+                        /*
                         if (query.defect === 'shortcoming') {
                             if (query.aspect_type === 'all') {
                                 await setShortcomingAspectTypeAll(cache, set_values);
@@ -12445,19 +12440,19 @@
                                     (cache.statsdb[query.aspect_stat].shortcoming || 0);
                                 await setDerivedValues(cache, set_values);
                                 */
-                            }
-                        }
-                        if (query.next === 'write_newdefect') {
-                            const groupdb = cache.groupdb[cache.static_group_visible_id];
-                            groupdb.defect_ids.push(query.row_id);
+                        //    }
+                        //}
+                        //if (query.next === 'write_newdefect') {
+                            //const groupdb = cache.groupdb[cache.static_group_visible_id];
+                            cache.groupdb[cache.static_group_visible_id].defect_ids.push(query.row_id);
                             cache.defectdb[query.defect].push(defectdb_entry);
-                        } else {
-                            for (let i = 1; i < query.fields.length; i++) {
-                                cache.defectdb[query.defect][query.load[1]][`${query.fields[i]}`] = defectdb_entry[`${query.fields[i]}`];
-                            }
-                        }
-                        cache.groupdb[defectdb_entry.group_id].points += defectdb_entry.points;
-                        setGroupCharacterPoints(cache, set_values, defectdb_entry.group_id);
+                        //} else {
+                        //    for (let i = 1; i < query.fields.length; i++) {
+                        //        cache.defectdb[query.defect][query.load[1]][`${query.fields[i]}`] = defectdb_entry[`${query.fields[i]}`];
+                        //    }
+                        //}
+                        //cache.groupdb[defectdb_entry.group_id].points += defectdb_entry.points;
+                        //setGroupCharacterPoints(cache, set_values, defectdb_entry.group_id);
                     break;
                     case 'write_attributename':
                         const db = cache.source_attribute === 'attribute' ? cache.attrdb : cache.defectdb;
@@ -12603,20 +12598,22 @@
                             }
                             query.type_index = query.attribute !== 'skill group' ? 0 :
                                 query.db.config.findIndex(c => c.name === 'skill group');
-                            query.cost = cache.source_section === 'attribute' ?
+                            query.cost_multiplier = 1;
+                            if (query.defect === 'shortcoming') {
+                                query.aspect_index = query.db.config.findIndex(c => c.name === 'aspect_type');
+                                query.cost_multiplier = query.aspect_index !== -1 ?
+                                    query.db.config[query.aspect_index].rank === 'all' ? 2 : 1 : 1;
+                            }
+                            query.cost = (cache.source_section === 'attribute' ?
                                 query.attribute === 'skill group' ?
                                 skill_group_costs[query.db.config[query.type_index].rank] :
                                 attribute_costs[query.attribute] :
-                                defect_costs[query.defect];
-                            query.points = query.cost * query.level;
+                                defect_costs[query.defect]) * query.cost_multiplier;
+                            query.points = (query.cost * query.level) * (cache.source_section === 'attribute' ? 1 : -1);
                             const db = cache.source_section === 'attribute' ? cache.attrdb : cache.defectdb;
-                            db[query[cache.source_section]][query.index].points = query.points * int(`${
-                                cache.source_section === 'attribute' ? 1 : -1
-                            }`);
+                            db[query[cache.source_section]][query.index].points = query.points;
                             db[query[cache.source_section]][query.index].level = query.level;
-                            set_values[`${cache.source_path}_points`] = query.points * int(`${
-                                cache.source_section === 'attribute' ? 1 : -1
-                            }`);
+                            set_values[`${cache.source_path}_points`] = query.points;
                             set_values[`${cache.source_path}_${
                                 cache.source_section === 'attribute' ? 'level' : 'rank'
                             }`] = `${query.level}${
@@ -12629,18 +12626,17 @@
                             ) {
                                 const index = cache.attrdb[query.attribute][query.index].config.findIndex(c => c.name === 'base points');
                                 cache.attrdb[query.attribute][query.index].config[index].rank = query.points;
-                                //set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                             } else if (query.last === 'repeating_defect_rank') {
                                 if (query.defect === 'shortcoming') {
-                                    const aspect_type_index = query.db.config.findIndex(i => i.name === 'aspect_type');
-                                    const aspect_type = query.db.config[aspect_type_index].rank;
-                                    if (aspect_type === 'all') {
+                                    const aspect_type_index = query.db.config.findIndex(c => c.name === 'aspect_type');
+                                    if (query.db.config[aspect_type_index].rank === 'all') {
                                         await setShortcomingAspectTypeAll(cache, set_values, query);
                                     }
                                 }
                             }
-                            //setLevelDependantConfigurations(cache, set_values, query);
-                            set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
+                            set_values[`${cache.source_path}_configuration`] = query.type === 'attribute' ?
+                                await setConfiguration(cache, set_values, query) :
+                                await setDefectConfiguration(cache, set_values, query);
                         }
                         if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
                             setPowerFluxPoolPoints(cache, set_values);
@@ -13375,6 +13371,9 @@
         clog(cache, temp, 'setStat()');
         // Set external values from query to temp.
         Object.assign(temp, query);
+        if (temp.stat === undefined) {
+            temp.stat = query.load[2];
+        }
         // Load values from statsdb to temp.
         for (let i = 0; i < stats.length; i++) {
             temp[stats_points[i]] = int(cache.statsdb[`${temp.stat}`][stats_points[i]]);
@@ -13382,7 +13381,8 @@
         // Adjust Character Points if stat base changes
         temp.answer = int(temp.answer);
         for (let i = 0; i < stats_points.length; i++) {
-            cache.statsdb[cache.source_id][stats_points[i]] =
+            //cache.statsdb[cache.source_id][stats_points[i]] =
+            cache.statsdb[temp.stat][stats_points[i]] =
                 stats_points[i] === cache.source_attribute ?
                 temp.answer : temp[stats_points[i]];
         }
@@ -13488,13 +13488,12 @@
         // Apply attributes to combat values
         await setActiveAttribute(cache, set_values);
         // Record new values
-        cache.elevel = cache.attribute === undefined ? 0 :
+        cache.elevel = cache.attribute === undefined || cache.attribute !== 'swarm' ? 0 :
             cache.attrdb[cache.attribute][cache.attrdb[cache.attribute].findIndex(s => s.row_id.toLowerCase() === cache.source_id)].elevel;
         for (let i = 0; i < derived_values.length; i++) {
             if (derived_values_points.indexOf(derived_values[i]) !== -1) {
                 cache.swarm_multiplier = 1;
                 if (cache.attribute === 'swarm' && derived_values[i] === 'health') {
-                    //cache.elevel = cache.attrdb.swarm[cache.attrdb.swarm.findIndex(s => s.row_id.toLowerCase() === cache.source_id)].elevel || 1;
                     cache.swarm_multiplier = cache.active ? cache.elevel : 1;
                     if (cache.active) {
                         cache.statsdb[derived_values[i]].damage *= cache.elevel;
@@ -13507,7 +13506,9 @@
                 set_values[`static_character_${derived_values[i]}_base`] = cache.statsdb[derived_values[i]].base;
                 const point_max = 
                     cache.statsdb[derived_values[i]].base +
-                    cache.statsdb[derived_values[i]].temp;
+                    (cache.statsdb[derived_values[i]].augmented || 0) +
+                    cache.statsdb[derived_values[i]].temp -
+                    (cache.statsdb[derived_values[i]].shortcoming || 0);
                 const point_loss = 
                     cache.statsdb[derived_values[i]].damage +
                     (cache.statsdb[derived_values[i]].stun || 0);
@@ -14257,6 +14258,33 @@
                                         cache.statsdb[cache.augmented_stat].temp -
                                         cache.statsdb[cache.augmented_stat].damage -
                                         (cache.statsdb[cache.augmented_stat].shortcoming || 0);
+                                } else if (cache.attribute === 'shortcoming') {
+                                    const shortcomings = {
+                                        body:0,
+                                        mind:0,
+                                        soul:0,
+                                    };
+                                    for (let i = 0; i < cache.defectdb.shortcoming.length; i++) {
+                                        const name_index = cache.defectdb.shortcoming[i].config.findIndex(c => c.name === 'aspect_name');
+                                        const stat_index = cache.defectdb.shortcoming[i].config.findIndex(c => c.name === 'aspect_stat');
+                                        const type_index = cache.defectdb.shortcoming[i].config.findIndex(c => c.name === 'aspect_type');
+                                        if (
+                                            cache.defectdb.shortcoming[i].config[type_index].rank === 'all' && 
+                                            cache.defectdb.shortcoming[i].active
+                                        ) {
+                                            shortcomings[cache.defectdb.shortcoming[i].config[stat_index].rank] += 
+                                                cache.defectdb.shortcoming[i].level;
+                                        }
+                                    }
+                                    for (let i = 0; i < all_stats.length; i++) {
+                                        cache.statsdb[all_stats[i]].shortcoming = shortcomings[all_stats[i]];
+                                        set_values[`static_character_${all_stats[i]}_remaining`] = 
+                                        cache.statsdb[all_stats[i]].base +
+                                        (cache.statsdb[all_stats[i]].augmented || 0) +
+                                        cache.statsdb[all_stats[i]].temp -
+                                        cache.statsdb[all_stats[i]].damage -
+                                        cache.statsdb[all_stats[i]].shortcoming;
+                                    }
                                 } else if (cache.attribute === 'swarm') {
                                     const db = cache.attrdb.swarm[cache.attrdb.swarm.findIndex(s => s.row_id.toLowerCase() === cache.source_id)];
                                     if (cache.newValue) {
@@ -14286,6 +14314,7 @@
                                     }
                                 }
                                 await setDerivedValues(cache, set_values);
+                                /*
                                 if (cache.source_attribute === 'active' && cache.source_section === 'defect') {
                                     const index = cache.defectdb.shortcoming.findIndex(s => s.row_id.toLowerCase() === cache.source_id);
                                     const aspect_type = cache.defectdb.shortcoming[index].config.findIndex(s => s.name === 'aspect_type');
@@ -14293,6 +14322,7 @@
                                         await setShortcomingAspectTypeAll(cache, set_values);
                                     }
                                 }
+                                    */
                                 if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
                                     setPowerFluxPoolPoints(cache, set_values);
                                 } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'dynamic powers') {
