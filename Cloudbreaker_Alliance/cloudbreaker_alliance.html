@@ -1,1835 +1,5 @@
 <!DOCTYPE html>
 
-<script type="text/worker">
-    const copper_rank = "copper";
-    const silver_rank = "silver";
-    const gold_rank = "gold";
-    const platinum_rank = "platinum";
-
-    var getSectionIDsOrdered = function (sectionName, callback) {
-        'use strict';
-        getAttrs([`_reporder_${sectionName}`], function (v) {
-            getSectionIDs(sectionName, function (idArray) {
-                let reporderArray = v[`_reporder_${sectionName}`] ? v[`_reporder_${sectionName}`].toLowerCase().split(',') : [],
-                ids = [...new Set(reporderArray.filter(x => idArray.includes(x)).concat(idArray))];
-                callback(ids);
-            });
-        });
-    };
-
-    const tabs = [
-    "character",
-    "combat",
-    "magic",
-    "notes",
-    "options"
-    ];
-    tabs.forEach(tab => {
-        on(`clicked:${tab}`, function() {
-            var output = {};
-
-            output["sheetTab"] = tab;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:character_level", function(eventInfo) {
-        var level = 1;
-        if (eventInfo.newValue != undefined || eventInfo.newValue != "")
-        level = parseInt(eventInfo.newValue);
-        var new_level = level < 1 ? 1 : level;
-        const capped_level = new_level > 12 ? 12 : new_level;
-        const grade_ranked = Math.floor((capped_level) / 4);
-
-        const grade = new_level == 89 ? platinum_rank : new_level > 8 ? gold_rank : new_level > 4 ? silver_rank : copper_rank;
-        const total_attributes = 7 + grade_ranked;
-
-        getAttrs(["downgrade_level"], function(v) {
-            var output = {};
-
-            var downgrade = v["downgrade_level"];
-            var downgraded_rank = grade;
-            var mastery_total = 2 + grade_ranked;
-            if (downgrade == copper_rank) {
-                downgraded_rank = copper_rank;
-                mastery_total = 3;
-            }
-            else if (downgrade == silver_rank && grade != copper_rank) {
-                downgraded_rank = silver_rank;
-                mastery_total = 4;
-            }
-
-            output["character_level"] = new_level;
-            output["adventuring_grade"] = downgraded_rank;
-            output["total_attributes"] = total_attributes;
-            output["mastery_bonus"] = mastery_total;
-
-            setAttrs(output, {silent: false});
-        });
-
-        getAttrs(["armor_hp", "unarmored_toughness", "added_hp", "attunements_total", "added_mp", "added_resolve", "downgrade_level", "armor_type"], function(v) {
-            var output = {};
-
-            const downgrade = v["downgrade_level"];
-            const armor_type = v["armor_type"];
-
-            const armor_hp = parseInt(v["armor_hp"]);
-            const unarmored_toughness = v["unarmored_toughness"];
-            const added_hp = parseInt(v["added_hp"]);
-            const attunements_total = parseInt(v["attunements_total"]);
-            const added_mp = parseInt(v["added_mp"]);
-            const added_resolve = parseInt(v["added_resolve"]);
-
-            var hp_max = 15 + (capped_level - 1) * 2 + armor_hp;
-            if (unarmored_toughness == "on")
-            hp_max = 20 + (capped_level - 1) * 3;
-
-            if (downgrade == copper_rank) {
-                if (armor_type == "light")
-                hp_max = Math.min(hp_max, 30);
-                else if (armor_type == "medium")
-                hp_max = Math.min(hp_max, 40);
-                else if (armor_type == "heavy")
-                hp_max = Math.min(hp_max, 50);
-                else if (armor_type == "none" && unarmored_toughness == "on")
-                hp_max = Math.min(hp_max, 29);
-                else if (armor_type == "none")
-                hp_max = Math.min(hp_max, 21);
-            }
-            else if (downgrade == silver_rank && grade != copper_rank) {
-                if (armor_type == "light")
-                hp_max = Math.min(hp_max, 45);
-                else if (armor_type == "medium")
-                hp_max = Math.min(hp_max, 55);
-                else if (armor_type == "heavy")
-                hp_max = Math.min(hp_max, 70);
-                else if (armor_type == "none" && unarmored_toughness == "on")
-                hp_max = Math.min(hp_max, 41);
-                else if (armor_type == "none")
-                hp_max = Math.min(hp_max, 29);
-            }
-
-            var mp_max = 15 + (capped_level - 1) * 2 + 10 * attunements_total;
-
-            if (downgrade == copper_rank)
-            mp_max = Math.min(mp_max, 50);
-            else if (downgrade == silver_rank && grade != copper_rank)
-            mp_max = Math.min(mp_max, 70);
-
-            const resolve_max = 30 + (capped_level - 1) * 4 + added_resolve;
-
-            output["hp_max"] = hp_max + added_hp;
-            output["mp_max"] = mp_max + added_mp;
-            output["resolve_max"] = resolve_max;
-
-            setAttrs(output, {silent: true});
-        });
-
-
-        getAttrs(["added_quirk", "quirk_total"], function(v) {
-            var output = {};
-            const quirk_total = parseInt(v["quirk_total"]);
-            const quirk_max = 2 + grade_ranked + parseInt(v["added_quirk"]);
-
-            output["quirk_points_label"] = `${quirk_total}/${quirk_max}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:adventuring_grade", function(eventInfo) {
-        const new_grade = eventInfo.newValue;
-        const new_grade_value = new_grade == platinum_rank ? 3 : new_grade == gold_rank ? 3 : new_grade == silver_rank ? 2 : 1;
-
-        getAttrs(["minor_action", "downgrade_level"], function(v) {
-            var output = {};
-
-            const downgrade = v["downgrade_level"];
-
-            var minor_action = new_grade_value;
-
-            if (downgrade == copper_rank)
-            minor_action = Math.min(minor_action, 1);
-            else if (downgrade == silver_rank && new_grade_value != copper_rank)
-            minor_action = Math.min(minor_action, 2);
-
-            output["minor_action"] = minor_action;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:downgrade_level", function(eventInfo) {
-        getAttrs(["character_level"], function(v) {
-            var output = {};
-
-            const downgrade = eventInfo.newValue;
-            const character_level = parseInt(v["character_level"]);
-
-            const capped_level = character_level > 12 ? 12 : character_level;
-
-            const grade = character_level == 89 ? platinum_rank : character_level > 8 ? gold_rank : character_level > 4 ? silver_rank : copper_rank;
-            const grade_ranked = Math.floor((capped_level) / 4);
-
-            var new_grade = grade;
-            if (downgrade == copper_rank)
-            new_grade = copper_rank;
-            else if (downgrade == silver_rank && grade != copper_rank)
-            new_grade = silver_rank;
-
-            var mastery_bonus = 2 + grade_ranked;
-            if (downgrade == copper_rank)
-            mastery_bonus = 3;
-            else if (downgrade == silver_rank && grade != copper_rank)
-            mastery_bonus = 4;
-
-            var minor_action = new_grade == copper_rank ? 1 : new_grade == silver_rank ? 2 : 3;
-
-            output["adventuring_grade"] = new_grade;
-            output["mastery_bonus"] = mastery_bonus;
-            output["minor_action"] = minor_action;
-
-            setAttrs(output, {silent: false});
-
-            getAttrs(["armor_hp", "unarmored_toughness", "added_hp", "armor_type"], function(v) {
-                var output = {};
-
-                const armor_type = v["armor_type"];
-
-                const armor_hp = parseInt(v["armor_hp"]);
-                const unarmored_toughness = v["unarmored_toughness"];
-                const added_hp = parseInt(v["added_hp"]);
-
-                var hp_max = 15 + (capped_level - 1) * 2 + armor_hp;
-                if (unarmored_toughness == "on")
-                hp_max = 20 + (capped_level - 1) * 3;
-
-                if (downgrade == copper_rank) {
-                    if (armor_type == "light")
-                    hp_max = Math.min(hp_max, 30);
-                    else if (armor_type == "medium")
-                    hp_max = Math.min(hp_max, 40);
-                    else if (armor_type == "heavy")
-                    hp_max = Math.min(hp_max, 50);
-                    else if (armor_type == "none" && unarmored_toughness == "on")
-                    hp_max = Math.min(hp_max, 29);
-                    else if (armor_type == "none")
-                    hp_max = Math.min(hp_max, 21);
-                }
-                else if (downgrade == silver_rank && grade != copper_rank) {
-                    if (armor_type == "light")
-                    hp_max = Math.min(hp_max, 45);
-                    else if (armor_type == "medium")
-                    hp_max = Math.min(hp_max, 55);
-                    else if (armor_type == "heavy")
-                    hp_max = Math.min(hp_max, 70);
-                    else if (armor_type == "none" && unarmored_toughness == "on")
-                    hp_max = Math.min(hp_max, 41);
-                    else if (armor_type == "none")
-                    hp_max = Math.min(hp_max, 29);
-                }
-
-                output["hp_max"] = hp_max + added_hp;
-
-                setAttrs(output, {silent: true});
-            });
-
-            getAttrs(["attunements_total", "added_mp"], function(v) {
-                var output = {};
-
-                const attunements_total = parseInt(v["attunements_total"]);
-                const added_mp = parseInt(v["added_mp"]);
-
-                var mp_max = 15 + (capped_level - 1) * 2 + 10 * attunements_total;
-
-                if (downgrade == copper_rank)
-                mp_max = Math.min(mp_max, 50);
-                else if (downgrade == silver_rank && grade != copper_rank)
-                mp_max = Math.min(mp_max, 70);
-
-                output["mp_max"] = mp_max + added_mp;
-
-                setAttrs(output, {silent: true});
-            });
-        });
-    });
-
-    on("change:added_resolve", function(eventInfo) {
-        getAttrs(["added_resolve", "character_level"], function(v) {
-            var output = {};
-
-            const character_level = parseInt(v["character_level"]);
-            const capped_level = character_level > 12 ? 12 : character_level;
-
-            const added_resolve = parseInt(v["added_resolve"]);
-            const resolve_max = 30 + (capped_level - 1) * 4 + added_resolve;
-
-            output["resolve_max"] = resolve_max;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:added_hp change:armor_hp change:unarmored_toughness change:armor_type", function(eventInfo) {
-        getAttrs(["added_hp", "armor_hp", "unarmored_toughness", "character_level", "armor_type", "downgrade_level"], function(v) {
-            var output = {};
-
-            const downgrade = v["downgrade_level"];
-            const armor_type = v["armor_type"];
-
-            const character_level = parseInt(v["character_level"]);
-            const capped_level = character_level > 12 ? 12 : character_level;
-
-            const added_hp = parseInt(v["added_hp"]);
-            const armor_hp = parseInt(v["armor_hp"]);
-            const unarmored_toughness = v["unarmored_toughness"];
-
-            var hp_max = 15 + (capped_level - 1) * 2 + armor_hp;
-            if (unarmored_toughness == "on")
-            hp_max = 20 + (capped_level - 1) * 3;
-
-            if (downgrade == copper_rank) {
-                if (armor_type == "light")
-                hp_max = Math.min(hp_max, 30);
-                else if (armor_type == "medium")
-                hp_max = Math.min(hp_max, 40);
-                else if (armor_type == "heavy")
-                hp_max = Math.min(hp_max, 50);
-                else if (armor_type == "none" && unarmored_toughness == "on")
-                hp_max = Math.min(hp_max, 29);
-                else if (armor_type == "none")
-                hp_max = Math.min(hp_max, 21);
-            }
-            else if (downgrade == silver_rank) {
-                if (armor_type == "light")
-                hp_max = Math.min(hp_max, 45);
-                else if (armor_type == "medium")
-                hp_max = Math.min(hp_max, 55);
-                else if (armor_type == "heavy")
-                hp_max = Math.min(hp_max, 70);
-                else if (armor_type == "none" && unarmored_toughness == "on")
-                hp_max = Math.min(hp_max, 41);
-                else if (armor_type == "none")
-                hp_max = Math.min(hp_max, 29);
-            }
-
-            output["hp_max"] = hp_max + added_hp;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:added_mp change:attunements_total", function(eventInfo) {
-        getAttrs(["added_mp", "attunements_total", "character_level", "downgrade_level"], function(v) {
-            var output = {};
-
-            const downgrade = v["downgrade_level"];
-
-            const character_level = parseInt(v["character_level"]);
-            const capped_level = character_level > 12 ? 12 : character_level;
-
-            const added_mp = parseInt(v["added_mp"]);
-            const attunements_total = parseInt(v["attunements_total"]);
-            var mp_max = 15 + (capped_level - 1) * 2 + 10 * attunements_total;
-
-            if (downgrade == copper_rank)
-            mp_max = Math.min(mp_max, 50);
-            else if (downgrade == silver_rank)
-            mp_max = Math.min(mp_max, 70);
-
-            output["mp_max"] = mp_max + added_mp;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:repeating_quirks remove:repeating_quirks change:_reporder:quirks", function(eventInfo) {
-        getSectionIDsOrdered("repeating_quirks", function(ids) {
-            var attrs_to_get = ids.map(id => `repeating_quirks_${id}_quirk_name`).concat(ids.map(id => `repeating_quirks_${id}_quirk_level`));
-
-            getAttrs(attrs_to_get, function(v) {
-                var output = {};
-                var quirk_value_pair = "";
-                var total_quirk_points = 0;
-
-                ids.forEach(id => {
-                    var quirkName = v[`repeating_quirks_${id}_quirk_name`];
-                    const quirkLevel = v[`repeating_quirks_${id}_quirk_level`];
-                    if (quirkName == undefined || quirkName == "")
-                    quirkName = "Unnamed Quirk";
-                    total_quirk_points += parseInt(quirkLevel);
-                    quirk_value_pair += `${quirkName} (Rank ${quirkLevel})\n`;
-                });
-
-                quirk_value_pair = quirk_value_pair.trimEnd();
-
-                output["quirk_summary"] = quirk_value_pair;
-                if (total_quirk_points == undefined)
-                total_quirk_points = 0;
-                output["quirk_total"] = total_quirk_points;
-                setAttrs(output, {silent: false});
-            });
-        });
-    });
-
-    on("change:quirk_total change:added_quirk", function(eventInfo) {
-        getAttrs(["added_quirk", "character_level", "quirk_total"], function(v) {
-            var output = {};
-
-            const character_level = parseInt(v["character_level"]);
-            const added_quirk = parseInt(v["added_quirk"]);
-            const quirk_total = parseInt(v["quirk_total"]);
-            const capped_level = character_level > 12 ? 12 : character_level;
-            const grade_ranked = Math.floor((capped_level + 1) / 4);
-
-            const quirk_max = 2 + grade_ranked + added_quirk;
-
-            output["quirk_points_label"] = `${eventInfo.newValue}/${quirk_max}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:strength change:mastery_bonus", function(eventInfo) {
-        getAttrs(["strength", "mastery_bonus", "brute", "brute_bns", "endurance", "endurance_bns", "intimidation", "intimidation_bns"], function(v) {
-            var output = {};
-
-            const strength = parseInt(v["strength"]);
-
-            const brute = v["brute"] == "on";
-            const endurance = v["endurance"] == "on";
-            const intimidation = v["intimidation"] == "on";
-
-            const brute_bns = parseInt(v["brute_bns"]);
-            const endurance_bns = parseInt(v["endurance_bns"]);
-            const intimidation_bns = parseInt(v["intimidation_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const brute_total = strength + (brute ? mastery_bonus : 0) + brute_bns;
-            const endurance_total = strength + (endurance ? mastery_bonus : 0) + endurance_bns;
-            const intimidation_total = strength + (intimidation ? mastery_bonus : 0) + intimidation_bns;
-
-            output["brute_mastery"] = brute ? mastery_bonus : 0;
-            output["endurance_mastery"] = endurance ? mastery_bonus : 0;
-            output["intimidation_mastery"] = intimidation ? mastery_bonus : 0;
-
-            output["brute_total_label"] = `+${brute_total}`;
-            output["endurance_total_label"] = `+${endurance_total}`;
-            output["intimidation_total_label"] = `+${intimidation_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:brute change:brute_bns", function(eventInfo) {
-        getAttrs(["strength", "mastery_bonus", "brute", "brute_bns"], function(v) {
-            var output = {};
-
-            const strength = parseInt(v["strength"]);
-
-            const brute = v["brute"] == "on";
-            const brute_bns = parseInt(v["brute_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const brute_total = strength + (brute ? mastery_bonus : 0) + brute_bns;
-
-            output["brute_mastery"] = brute ? mastery_bonus : 0;
-            output["brute_total_label"] = `+${brute_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:endurance change:endurance_bns", function(eventInfo) {
-        getAttrs(["strength", "mastery_bonus", "endurance", "endurance_bns"], function(v) {
-            var output = {};
-
-            const strength = parseInt(v["strength"]);
-
-            const endurance = v["endurance"] == "on";
-            const endurance_bns = parseInt(v["endurance_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const endurance_total = strength + (endurance ? mastery_bonus : 0) + endurance_bns;
-
-            output["endurance_mastery"] = endurance ? mastery_bonus : 0;
-            output["endurance_total_label"] = `+${endurance_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:intimidation change:intimidation_bns", function(eventInfo) {
-        getAttrs(["strength", "mastery_bonus", "intimidation", "intimidation_bns"], function(v) {
-            var output = {};
-
-            const strength = parseInt(v["strength"]);
-
-            const intimidation = v["intimidation"] == "on";
-            const intimidation_bns = parseInt(v["intimidation_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const intimidation_total = strength + (intimidation ? mastery_bonus : 0) + intimidation_bns;
-
-            output["intimidation_mastery"] = intimidation ? mastery_bonus : 0;
-            output["intimidation_total_label"] = `+${intimidation_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:agility change:mastery_bonus", function(eventInfo) {
-        getAttrs(["agility", "mastery_bonus", "sports", "sports_bns", "thievery", "thievery_bns", "deception", "deception_bns"], function(v) {
-            var output = {};
-
-            const agility = parseInt(v["agility"]);
-
-            const sports = v["sports"] == "on";
-            const thievery = v["thievery"] == "on";
-            const deception = v["deception"] == "on";
-
-            const sports_bns = parseInt(v["sports_bns"]);
-            const thievery_bns = parseInt(v["thievery_bns"]);
-            const deception_bns = parseInt(v["deception_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const sports_total = agility + (sports ? mastery_bonus : 0) + sports_bns;
-            const thievery_total = agility + (thievery ? mastery_bonus : 0) + thievery_bns;
-            const deception_total = agility + (deception ? mastery_bonus : 0) + deception_bns;
-
-            output["sports_mastery"] = sports ? mastery_bonus : 0;
-            output["thievery_mastery"] = thievery ? mastery_bonus : 0;
-            output["deception_mastery"] = deception ? mastery_bonus : 0;
-
-            output["sports_total_label"] = `+${sports_total}`;
-            output["thievery_total_label"] = `+${thievery_total}`;
-            output["deception_total_label"] = `+${deception_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:sports change:sports_bns", function(eventInfo) {
-        getAttrs(["agility", "mastery_bonus", "sports", "sports_bns"], function(v) {
-            var output = {};
-
-            const agility = parseInt(v["agility"]);
-
-            const sports = v["sports"] == "on";
-            const sports_bns = parseInt(v["sports_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const sports_total = agility + (sports ? mastery_bonus : 0) + sports_bns;
-
-            output["sports_mastery"] = sports ? mastery_bonus : 0;
-            output["sports_total_label"] = `+${sports_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:thievery change:thievery_bns", function(eventInfo) {
-        getAttrs(["agility", "mastery_bonus", "thievery", "thievery_bns"], function(v) {
-            var output = {};
-
-            const agility = parseInt(v["agility"]);
-
-            const thievery = v["thievery"] == "on";
-            const thievery_bns = parseInt(v["thievery_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const thievery_total = agility + (thievery ? mastery_bonus : 0) + thievery_bns;
-
-            output["thievery_mastery"] = thievery ? mastery_bonus : 0;
-            output["thievery_total_label"] = `+${thievery_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:deception change:deception_bns", function(eventInfo) {
-        getAttrs(["agility", "mastery_bonus", "deception", "deception_bns"], function(v) {
-            var output = {};
-
-            const agility = parseInt(v["agility"]);
-
-            const deception = v["deception"] == "on";
-            const deception_bns = parseInt(v["deception_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const deception_total = agility + (deception ? mastery_bonus : 0) + deception_bns;
-
-            output["deception_mastery"] = deception ? mastery_bonus : 0;
-            output["deception_total_label"] = `+${deception_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:awareness change:mastery_bonus", function(eventInfo) {
-        getAttrs(["awareness", "mastery_bonus", "detect", "detect_bns", "information", "information_bns", "reason", "reason_bns"], function(v) {
-            var output = {};
-
-            const awareness = parseInt(v["awareness"]);
-
-            const detect = v["detect"] == "on";
-            const information = v["information"] == "on";
-            const reason = v["reason"] == "on";
-
-            const detect_bns = parseInt(v["detect_bns"]);
-            const information_bns = parseInt(v["information_bns"]);
-            const reason_bns = parseInt(v["reason_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const detect_total = awareness + (detect ? mastery_bonus : 0) + detect_bns;
-            const information_total = awareness + (information ? mastery_bonus : 0) + information_bns;
-            const reason_total = awareness + (reason ? mastery_bonus : 0) + reason_bns;
-
-            output["detect_mastery"] = detect ? mastery_bonus : 0;
-            output["information_mastery"] = information ? mastery_bonus : 0;
-            output["reason_mastery"] = reason ? mastery_bonus : 0;
-
-            output["detect_total_label"] = `+${detect_total}`;
-            output["information_total_label"] = `+${information_total}`;
-            output["reason_total_label"] = `+${reason_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:detect change:detect_bns", function(eventInfo) {
-        getAttrs(["awareness", "mastery_bonus", "detect", "detect_bns"], function(v) {
-            var output = {};
-
-            const awareness = parseInt(v["awareness"]);
-
-            const detect = v["detect"] == "on";
-            const detect_bns = parseInt(v["detect_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const detect_total = awareness + (detect ? mastery_bonus : 0) + detect_bns;
-
-            output["detect_mastery"] = detect ? mastery_bonus : 0;
-            output["detect_total_label"] = `+${detect_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:information change:information_bns", function(eventInfo) {
-        getAttrs(["awareness", "mastery_bonus", "information", "information_bns"], function(v) {
-            var output = {};
-
-            const awareness = parseInt(v["awareness"]);
-
-            const information = v["information"] == "on";
-            const information_bns = parseInt(v["information_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const information_total = awareness + (information ? mastery_bonus : 0) + information_bns;
-
-            output["information_mastery"] = information ? mastery_bonus : 0;
-            output["information_total_label"] = `+${information_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:reason change:reason_bns", function(eventInfo) {
-        getAttrs(["awareness", "mastery_bonus", "reason", "reason_bns"], function(v) {
-            var output = {};
-
-            const awareness = parseInt(v["awareness"]);
-
-            const reason = v["reason"] == "on";
-            const reason_bns = parseInt(v["reason_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const reason_total = awareness + (reason ? mastery_bonus : 0) + reason_bns;
-
-            output["reason_mastery"] = reason ? mastery_bonus : 0;
-            output["reason_total_label"] = `+${reason_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:empathy change:mastery_bonus", function(eventInfo) {
-        getAttrs(["empathy", "mastery_bonus", "psychology", "psychology_bns", "artistry", "artistry_bns", "appeal", "appeal_bns"], function(v) {
-            var output = {};
-
-            const empathy = parseInt(v["empathy"]);
-
-            const psychology = v["psychology"] == "on";
-            const artistry = v["artistry"] == "on";
-            const appeal = v["appeal"] == "on";
-
-            const psychology_bns = parseInt(v["psychology_bns"]);
-            const artistry_bns = parseInt(v["artistry_bns"]);
-            const appeal_bns = parseInt(v["appeal_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const psychology_total = empathy + (psychology ? mastery_bonus : 0) + psychology_bns;
-            const artistry_total = empathy + (artistry ? mastery_bonus : 0) + artistry_bns;
-            const appeal_total = empathy + (appeal ? mastery_bonus : 0) + appeal_bns;
-
-            output["psychology_mastery"] = psychology ? mastery_bonus : 0;
-            output["artistry_mastery"] = artistry ? mastery_bonus : 0;
-            output["appeal_mastery"] = appeal ? mastery_bonus : 0;
-
-            output["psychology_total_label"] = `+${psychology_total}`;
-            output["artistry_total_label"] = `+${artistry_total}`;
-            output["appeal_total_label"] = `+${appeal_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:psychology change:psychology_bns", function(eventInfo) {
-        getAttrs(["empathy", "mastery_bonus", "psychology", "psychology_bns"], function(v) {
-            var output = {};
-
-            const empathy = parseInt(v["empathy"]);
-
-            const psychology = v["psychology"] == "on";
-            const psychology_bns = parseInt(v["psychology_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const psychology_total = empathy + (psychology ? mastery_bonus : 0) + psychology_bns;
-
-            output["psychology_mastery"] = psychology ? mastery_bonus : 0;
-            output["psychology_total_label"] = `+${psychology_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:artistry change:artistry_bns", function(eventInfo) {
-        getAttrs(["empathy", "mastery_bonus", "artistry", "artistry_bns"], function(v) {
-            var output = {};
-
-            const empathy = parseInt(v["empathy"]);
-
-            const artistry = v["artistry"] == "on";
-            const artistry_bns = parseInt(v["artistry_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const artistry_total = empathy + (artistry ? mastery_bonus : 0) + artistry_bns;
-
-            output["artistry_mastery"] = artistry ? mastery_bonus : 0;
-            output["artistry_total_label"] = `+${artistry_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:appeal change:appeal_bns", function(eventInfo) {
-        getAttrs(["empathy", "mastery_bonus", "appeal", "appeal_bns"], function(v) {
-            var output = {};
-
-            const empathy = parseInt(v["empathy"]);
-
-            const appeal = v["appeal"] == "on";
-            const appeal_bns = parseInt(v["appeal_bns"]);
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const appeal_total = empathy + (appeal ? mastery_bonus : 0) + appeal_bns;
-
-            output["appeal_mastery"] = appeal ? mastery_bonus : 0;
-            output["appeal_total_label"] = `+${appeal_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    /*
-    Arcanist
-    Chemist
-    Climbing
-    Impersonation
-
-    Infiltration
-    Mechanic
-    Navigation
-    Thaumaturgist
-
-    Free Toolkit places
-    */
-    on("change:mastery_bonus", function(eventInfo) {
-        const mastery_bonus = parseInt(eventInfo.newValue);
-        const kit_list = [
-        "arcanist",
-        "chemist",
-        "climbing",
-        "impersonation",
-        "infiltration",
-        "mechanic",
-        "navigation",
-        "thaumaturgist"
-        ];
-        var attrs_to_get = kit_list.map(kit => `${kit}`).concat(kit_list.map(kit => `${kit}_bns`)).concat(kit_list.map(kit => `${kit}_quality`));
-        getAttrs(attrs_to_get, function(v) {
-            var output = {};
-
-            for (let i = 0; i < kit_list.length; i++) {
-                const kit = kit_list[i];
-                const kit_mastered = v[`${kit}`] == "on";
-                if (!kit_mastered)
-                continue;
-                const kit_bns = parseInt(v[`${kit}_bns`]);
-                const kit_quality = parseInt(v[`${kit}_quality`]);
-
-                const kit_total = kit_quality + (kit_mastered ? mastery_bonus : 0) + kit_bns;
-
-                output[`${kit}_mastery`] = kit_mastered ? mastery_bonus : 0;
-                output[`${kit}_total_label`] = `+${kit_total}`;
-            }
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:arcanist change:arcanist_bns change:arcanist_quality", function(eventInfo) {
-        getAttrs(["mastery_bonus", "arcanist", "arcanist_bns", "arcanist_quality"], function(v) {
-            var output = {};
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-            const arcanist = v["arcanist"] == "on";
-            const arcanist_bns = parseInt(v["arcanist_bns"]);
-            const arcanist_quality = parseInt(v["arcanist_quality"]);
-
-            const arcanist_total = arcanist_quality + (arcanist ? mastery_bonus : 0) + arcanist_bns;
-
-            output["arcanist_mastery"] = arcanist ? mastery_bonus : 0;
-            output["arcanist_total_label"] = `+${arcanist_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:chemist change:chemist_bns change:chemist_quality", function(eventInfo) {
-        getAttrs(["mastery_bonus", "chemist", "chemist_bns", "chemist_quality"], function(v) {
-            var output = {};
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-            const chemist = v["chemist"] == "on";
-            const chemist_bns = parseInt(v["chemist_bns"]);
-            const chemist_quality = parseInt(v["chemist_quality"]);
-
-            const chemist_total = chemist_quality + (chemist ? mastery_bonus : 0) + chemist_bns;
-
-            output["chemist_mastery"] = chemist ? mastery_bonus : 0;
-            output["chemist_total_label"] = `+${chemist_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:climbing change:climbing_bns change:climbing_quality", function(eventInfo) {
-        getAttrs(["mastery_bonus", "climbing", "climbing_bns", "climbing_quality"], function(v) {
-            var output = {};
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-            const climbing = v["climbing"] == "on";
-            const climbing_bns = parseInt(v["climbing_bns"]);
-            const climbing_quality = parseInt(v["climbing_quality"]);
-
-            const climbing_total = climbing_quality + (climbing ? mastery_bonus : 0) + climbing_bns;
-
-            output["climbing_mastery"] = climbing ? mastery_bonus : 0;
-            output["climbing_total_label"] = `+${climbing_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:impersonation change:impersonation_bns change:impersonation_quality", function(eventInfo) {
-        getAttrs(["mastery_bonus", "impersonation", "impersonation_bns", "impersonation_quality"], function(v) {
-            var output = {};
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-            const impersonation = v["impersonation"] == "on";
-            const impersonation_bns = parseInt(v["impersonation_bns"]);
-            const impersonation_quality = parseInt(v["impersonation_quality"]);
-
-            const impersonation_total = impersonation_quality + (impersonation ? mastery_bonus : 0) + impersonation_bns;
-
-            output["impersonation_mastery"] = impersonation ? mastery_bonus : 0;
-            output["impersonation_total_label"] = `+${impersonation_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:infiltration change:infiltration_bns change:infiltration_quality", function(eventInfo) {
-        getAttrs(["mastery_bonus", "infiltration", "infiltration_bns", "infiltration_quality"], function(v) {
-            var output = {};
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-            const infiltration = v["infiltration"] == "on";
-            const infiltration_bns = parseInt(v["infiltration_bns"]);
-            const infiltration_quality = parseInt(v["infiltration_quality"]);
-
-            const infiltration_total = infiltration_quality + (infiltration ? mastery_bonus : 0) + infiltration_bns;
-
-            output["infiltration_mastery"] = infiltration ? mastery_bonus : 0;
-            output["infiltration_total_label"] = `+${infiltration_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:mechanic change:mechanic_bns change:mechanic_quality", function(eventInfo) {
-        getAttrs(["mastery_bonus", "mechanic", "mechanic_bns", "mechanic_quality"], function(v) {
-            var output = {};
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-            const mechanic = v["mechanic"] == "on";
-            const mechanic_bns = parseInt(v["mechanic_bns"]);
-            const mechanic_quality = parseInt(v["mechanic_quality"]);
-
-            const mechanic_total = mechanic_quality + (mechanic ? mastery_bonus : 0) + mechanic_bns;
-
-            output["mechanic_mastery"] = mechanic ? mastery_bonus : 0;
-            output["mechanic_total_label"] = `+${mechanic_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:navigation change:navigation_bns change:navigation_quality", function(eventInfo) {
-        getAttrs(["mastery_bonus", "navigation", "navigation_bns", "navigation_quality"], function(v) {
-            var output = {};
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-            const navigation = v["navigation"] == "on";
-            const navigation_bns = parseInt(v["navigation_bns"]);
-            const navigation_quality = parseInt(v["navigation_quality"]);
-
-            const navigation_total = navigation_quality + (navigation ? mastery_bonus : 0) + navigation_bns;
-
-            output["navigation_mastery"] = navigation ? mastery_bonus : 0;
-            output["navigation_total_label"] = `+${navigation_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:thaumaturgist change:thaumaturgist_bns change:thaumaturgist_quality", function(eventInfo) {
-        getAttrs(["mastery_bonus", "thaumaturgist", "thaumaturgist_bns", "thaumaturgist_quality"], function(v) {
-            var output = {};
-
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-            const thaumaturgist = v["thaumaturgist"] == "on";
-            const thaumaturgist_bns = parseInt(v["thaumaturgist_bns"]);
-            const thaumaturgist_quality = parseInt(v["thaumaturgist_quality"]);
-
-            const thaumaturgist_total = thaumaturgist_quality + (thaumaturgist ? mastery_bonus : 0) + thaumaturgist_bns;
-
-            output["thaumaturgist_mastery"] = thaumaturgist ? mastery_bonus : 0;
-            output["thaumaturgist_total_label"] = `+${thaumaturgist_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:mastery_bonus", function(eventInfo) {
-        const mastery_bonus = parseInt(eventInfo.newValue);
-        getSectionIDs("toolkits", function(ids) {
-            var attrs_to_get = ids.map(id => `repeating_toolkits_${id}_toolkit`).concat(ids.map(id => `repeating_toolkits_${id}_toolkit_bns`)).concat(ids.map(id => `repeating_toolkits_${id}_toolkit_quality`));
-            getAttrs(attrs_to_get, function(v) {
-                var output = {};
-
-                for (let id of ids) {
-                    const toolkit = v[`repeating_toolkits_${id}_toolkit`];
-                    const toolkit_mastered = toolkit == "on";
-                    if (!toolkit_mastered)
-                    continue;
-                    const toolkit_bns = parseInt(v[`repeating_toolkits_${id}_toolkit_bns`]);
-                    const toolkit_quality = parseInt(v[`repeating_toolkits_${id}_toolkit_quality`]);
-
-                    const toolkit_mastery_bonus = toolkit_mastered ? mastery_bonus : 0;
-                    const toolkit_total = toolkit_quality + toolkit_mastery_bonus + toolkit_bns;
-
-                    output[`repeating_toolkits_${id}_toolkit_mastery`] = toolkit_mastery_bonus;
-                    output[`repeating_toolkits_${id}_toolkit_total_label`] = `+${toolkit_total}`;
-                }
-
-                setAttrs(output, {silent: true});
-            });
-        });
-    });
-
-    on("change:repeating_toolkits", function(eventInfo) {
-        getAttrs(["repeating_toolkits_toolkit", "repeating_toolkits_toolkit_bns", "repeating_toolkits_toolkit_quality", "mastery_bonus"], function(v) {
-            var output = {};
-
-            const toolkit = v["repeating_toolkits_toolkit"];
-            const toolkit_mastered = toolkit == "on";
-            const toolkit_bns = parseInt(v["repeating_toolkits_toolkit_bns"]);
-            const toolkit_quality = parseInt(v["repeating_toolkits_toolkit_quality"]);
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const toolkit_mastery_bonus = toolkit_mastered ? mastery_bonus : 0;
-            const toolkit_total = toolkit_quality + toolkit_mastery_bonus + toolkit_bns;
-
-            output["repeating_toolkits_toolkit_mastery"] = toolkit_mastery_bonus;
-            output["repeating_toolkits_toolkit_total_label"] = `+${toolkit_total}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:repeating_traits", function(eventInfo) {
-        getAttrs(["repeating_traits_trait_lifeform", "character_lifeform"], function(v) {
-            var output = {};
-
-            const lifeform = v["repeating_traits_trait_lifeform"];
-            const character_lifeform = v["character_lifeform"];
-
-            if (lifeform != "")
-            return;
-
-            output["repeating_traits_trait_lifeform"] = character_lifeform;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:repeating_traits remove:repeating_traits change:_reporder:traits", function(eventInfo) {
-        getSectionIDsOrdered("repeating_traits", function(ids) {
-            var attrs_to_get = ids.map(id => `repeating_traits_${id}_trait_name`).concat(ids.map(id => `repeating_traits_${id}_trait_type`));
-
-            getAttrs(attrs_to_get, function(v) {
-                var output = {};
-                var trait_value_pair = "";
-
-                for (const id of ids) {
-                    const traitName = v[`repeating_traits_${id}_trait_name`];
-                    const traitType = v[`repeating_traits_${id}_trait_type`];
-                    if (traitName == undefined || traitName == "")
-                    continue;
-                    trait_value_pair += `${traitName} (${traitType} trait)\n`;
-                }
-
-                trait_value_pair = trait_value_pair.trimEnd();
-
-                output["trait_summary"] = trait_value_pair;
-
-                setAttrs(output, {silent: false});
-            });
-        });
-    });
-
-    on("change:repeating_features remove:repeating_features change:_reporder:features change:character_primary_class change:character_secondary_class change:adventuring_grade", function(eventInfo) {
-        getAttrs(["character_primary_class", "character_secondary_class", "adventuring_grade"], function(v) {
-            var output = {};
-
-            const adventuring_grade = v["adventuring_grade"];
-
-            const primary_class = v["character_primary_class"].toLowerCase();
-            const secondary_class = v["character_secondary_class"].toLowerCase();
-
-            getSectionIDsOrdered("repeating_features", function(ids) {
-                var attrs_to_get =
-                ids.map(id => `repeating_features_${id}_feature_name`)
-                .concat(ids.map(id => `repeating_features_${id}_feature_level`))
-                .concat(ids.map(id => `repeating_features_${id}_feature_class`))
-                .concat(ids.map(id => `repeating_features_${id}_feature_discipline`));
-
-                getAttrs(attrs_to_get, function(v) {
-                    var output = {};
-                    var primary_features = [];
-                    var secondary_features = [];
-                    var uncategorized_features = [];
-
-                    for (let i = 0; i < ids.length; i++) {
-                        const id = ids[i];
-                        const featureClass = v[`repeating_features_${id}_feature_class`];
-                        const featureDiscipline = v[`repeating_features_${id}_feature_discipline`];
-
-                        const featureName = v[`repeating_features_${id}_feature_name`];
-                        const featureLevel = v[`repeating_features_${id}_feature_level`];
-
-                        if ((primary_class == undefined || primary_class == "") && (secondary_class == undefined || secondary_class == "")) {
-                            uncategorized_features.push({
-                                feature_discipline: featureDiscipline,
-                                feature_class: featureClass,
-                                feature_name: featureName,
-                                feature_level: featureLevel
-                            });
-                            continue;
-                        }
-
-                        if (featureClass != undefined && featureClass != "") {
-                            if (primary_class.includes(featureClass.toLowerCase())) {
-                                primary_features.push({
-                                    feature_discipline: featureDiscipline,
-                                    feature_class: featureClass,
-                                    feature_name: featureName,
-                                    feature_level: featureLevel
-                                });
-                            } else if (secondary_class.includes(featureClass.toLowerCase())) {
-                                secondary_features.push({
-                                    feature_discipline: featureDiscipline,
-                                    feature_class: featureClass,
-                                    feature_name: featureName,
-                                    feature_level: featureLevel
-                                });
-                            }
-                        }
-                        else if (featureDiscipline != undefined && featureDiscipline != "") {
-                            if (primary_class.includes(featureDiscipline.toLowerCase())) {
-                                primary_features.push({
-                                    feature_discipline: featureDiscipline,
-                                    feature_class: featureClass,
-                                    feature_name: featureName,
-                                    feature_level: featureLevel
-                                });
-                            } else if (secondary_class.includes(featureDiscipline.toLowerCase())) {
-                                secondary_features.push({
-                                    feature_discipline: featureDiscipline,
-                                    feature_class: featureClass,
-                                    feature_name: featureName,
-                                    feature_level: featureLevel
-                                });
-                            }
-                        }
-                        else {
-                            uncategorized_features.push({
-                                feature_discipline: featureDiscipline,
-                                feature_class: featureClass,
-                                feature_name: featureName,
-                                feature_level: featureLevel
-                            });
-                        }
-                    }
-
-                    if (primary_features.length == 0 && secondary_features.length == 0 && uncategorized_features.length == 0) {
-                        for (let i = 0; i < ids.length; i++) {
-                            const id = ids[i];
-                            const featureName = v[`repeating_features_${id}_feature_name`];
-                            const featureLevel = v[`repeating_features_${id}_feature_level`];
-
-                            const featureClass = v[`repeating_features_${id}_feature_class`];
-                            const featureDiscipline = v[`repeating_features_${id}_feature_discipline`];
-
-                            uncategorized_features.push({
-                                feature_discipline: featureDiscipline,
-                                feature_class: featureClass,
-                                feature_name: featureName,
-                                feature_level: featureLevel
-                            });
-                        }
-                    }
-
-                    primary_features.sort((a, b) => a.feature_level - b.feature_level);
-                    secondary_features.sort((a, b) => a.feature_level - b.feature_level);
-                    uncategorized_features.sort((a, b) => {
-                        if (a.feature_discipline.toLowerCase() < b.feature_discipline.toLowerCase()) return -1;
-                        if (a.feature_discipline.toLowerCase() > b.feature_discipline.toLowerCase()) return 1;
-                        if (a.feature_class.toLowerCase() < b.feature_class.toLowerCase()) return -1;
-                        if (a.feature_class.toLowerCase() > b.feature_class.toLowerCase()) return 1;
-                        return a.feature_level - b.feature_level;
-                    });
-
-                    var final_string = "";
-                    if (primary_features.length > 0) {
-                        const primary_discipline = primary_features.find(feature => feature.feature_discipline !== undefined && feature.feature_discipline !== null && feature.feature_discipline !== "")?.feature_discipline || "";
-                        const primary_class = primary_features.find(feature => feature.feature_class !== undefined && feature.feature_class !== null && feature.feature_class !== "")?.feature_class || "";
-                        final_string += `Primary Class (${primary_discipline} ${primary_class}) features\n`;
-                        for (let feature of primary_features) {
-                            final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
-                        }
-                    }
-                    if (secondary_features.length > 0 && adventuring_grade != copper_rank) {
-                        const secondary_discipline = secondary_features.find(feature => feature.feature_discipline !== undefined && feature.feature_discipline !== null && feature.feature_discipline !== "")?.feature_discipline || "";
-                        const secondary_class = secondary_features.find(feature => feature.feature_class !== undefined && feature.feature_class !== null && feature.feature_class !== "")?.feature_class || "";
-                        final_string += `Secondary Class (${secondary_discipline} ${secondary_class}) features\n`;
-                        for (let feature of secondary_features) {
-                            final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
-                        }
-                    }
-                    if (uncategorized_features.length > 0) {
-                        final_string += `Uncategorized features\n`;
-                        for (let feature of uncategorized_features) {
-                            final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
-                        }
-                    }
-
-                    output["feature_summary"] = final_string.trimEnd();
-
-                    setAttrs(output, {silent: false});
-                });
-            });
-        });
-    });
-
-    on("change:quirk_summary change:trait_summary change:feature_summary", function(eventInfo) {
-        getAttrs(["quirk_summary", "trait_summary", "feature_summary"], function(v) {
-            var output = {};
-
-            const quirk_summary = v["quirk_summary"];
-            const trait_summary = v["trait_summary"];
-            const feature_summary = v["feature_summary"];
-
-            var all_text = "";
-            if (quirk_summary != undefined && quirk_summary != "")
-            all_text += "Quirks\n" + quirk_summary.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
-            if (trait_summary != undefined && trait_summary != "")
-            all_text += "Traits\n" + trait_summary.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
-            if (feature_summary != undefined && feature_summary != "")
-            all_text += "Features\n" + feature_summary.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
-
-            output["quirk_traits_features_summary"] = all_text.trimEnd();
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:repeating_equipment remove:repeating_equipment change:_reporder:equipment", function(eventInfo) {
-        getSectionIDsOrdered("repeating_equipment", function(ids) {
-            var attrs_to_get = ids.map(id => `repeating_equipment_${id}_equipment_name`).concat(ids.map(id => `repeating_equipment_${id}_equipment_quantity`)).concat(ids.map(id => `repeating_equipment_${id}_equipment_weight`)).concat("added_slots");
-
-            getAttrs(attrs_to_get, function(v) {
-                var output = {};
-                var equipment_value_pair = "";
-                var total_weight = 0;
-                const added_slots = parseInt(v["added_slots"]);
-                const total_slots = 8 + added_slots;
-
-                for (const id of ids) {
-                    const equipmentName = v[`repeating_equipment_${id}_equipment_name`];
-                    const equipmentQuantity = parseInt(v[`repeating_equipment_${id}_equipment_quantity`]);
-                    if (equipmentName == undefined || equipmentName == "")
-                    continue;
-                    equipment_value_pair += `${equipmentName} (${equipmentQuantity})\n`;
-                }
-
-                equipment_value_pair = equipment_value_pair.trimEnd();
-
-                output["equipment_summary"] = equipment_value_pair;
-
-                for (const id of ids) {
-                    const equipmentWeight = parseFloat(v[`repeating_equipment_${id}_equipment_weight`]);
-                    const equipmentQuantity = parseFloat(v[`repeating_equipment_${id}_equipment_quantity`]);
-                    if (equipmentQuantity == 0 || equipmentWeight == 0)
-                    continue;
-                    total_weight += equipmentQuantity * equipmentWeight;
-                }
-
-                output["equipment_weight_label"] = `${total_weight}/${total_slots}`;
-
-                setAttrs(output, {silent: false});
-            });
-        });
-    });
-
-    on("change:added_slots", function(eventInfo) {
-        getAttrs(["added_slots", "equipment_weight_label"], function(v) {
-            var output = {};
-            const added_slots = parseInt(v["added_slots"]);
-            const total_slots = 8 + added_slots;
-            const equipment_weight_label = v["equipment_weight_label"];
-            const total_weight = parseInt(equipment_weight_label.split("/")[0]);
-
-            output["equipment_weight_label"] = `${total_weight}/${total_slots}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:repeating_bonds change:fond_memories remove:repeating_bonds change:_reporder:bonds", function(eventInfo) {
-        var output = {};
-
-        getSectionIDsOrdered("repeating_bonds", function(ids) {
-            var attrs_to_get = ids.map(id => `repeating_bonds_${id}_bond_name`).concat(ids.map(id => `repeating_bonds_${id}_bond_level`));
-            attrs_to_get.push("fond_memories");
-            getAttrs(attrs_to_get, function(v) {
-                const fond_memories = parseInt(v["fond_memories"]);
-                var bond_strength = 0;
-                const bond_amount = ids.length;
-
-                var bond_lines = [];
-                for (let i = 0; i < ids.length; i++) {
-                    const id = ids[i];
-                    const bondName = v[`repeating_bonds_${id}_bond_name`];
-                    const bondLevel = v[`repeating_bonds_${id}_bond_level`];
-                    if (bondName == undefined || bondName == "" || bondLevel == undefined || bondLevel == "")
-                    continue;
-                    bond_lines.push(`${bondName} (Rank ${bondLevel})`);
-                    bond_strength += parseInt(bondLevel);
-                }
-
-                var bond_label = "";
-                bond_label += `Fond memories: ${fond_memories}/50\n`;
-                bond_label += `Bond points: ${bond_strength}\n`;
-                bond_label += `Bonds: ${bond_amount}\n\n`;
-
-                bond_label += bond_lines.join('\n');
-
-                output["bond_amount_label"] = bond_label.trim();
-
-                setAttrs(output, {silent: true});
-            });
-        });
-    });
-
-    var getSectionIDsOrdered = function(sectionName, callback) {
-        'use strict';
-        getAttrs([`_reporder_${sectionName}`], function(v) {
-            getSectionIDs(sectionName, function(idArray) {
-                let reporderArray = v[`_reporder_${sectionName}`] ? v[`_reporder_${sectionName}`].toLowerCase().split(',') : [],
-                ids = [...new Set(reporderArray.filter(x => idArray.includes(x)).concat(idArray))];
-                callback(ids);
-            });
-        });
-    };
-
-    on("change:repeating_ranks change:_reporder:ranks remove:repeating_ranks", function(eventInfo) {
-        getSectionIDsOrdered("repeating_ranks", function(ids) {
-            var output = {};
-
-            for (var i = 0; i < ids.length; i++) {
-                var id = ids[i];
-
-                output[`repeating_ranks_${id}_rank_level`] = i + 1;
-                output[`repeating_ranks_${id}_rank_level_label`] = `Rank ${i + 1}`;
-            }
-
-            setAttrs(output, {silent: true});
-
-            const name_ranks_attributes = ids.map(id => `repeating_ranks_${id}_rank_name`).concat(ids.map(id => `repeating_ranks_${id}_rank_level`));
-            getAttrs(name_ranks_attributes, function(v) {
-                var output = {};
-                var ranks_value_pair = "";
-
-                for (let i = 0; i < ids.length; i++) {
-                    const id = ids[i];
-                    const rankName = v[`repeating_ranks_${id}_rank_name`];
-                    const rankLevel = v[`repeating_ranks_${id}_rank_level`];
-                    if (rankName == undefined || rankName == "")
-                    continue;
-                    ranks_value_pair += `Level ${rankLevel}: ${rankName}\n`;
-                }
-
-                ranks_value_pair = ranks_value_pair.trimEnd();
-
-                output["rank_summary"] = ranks_value_pair;
-
-                setAttrs(output, {silent: true});
-            });
-        });
-    });
-
-    on("change:repeating_attacks change:repeating_attacks:attack_mastery change:repeating_attacks:attack_bonus", function(eventInfo) {
-        getAttrs(["repeating_attacks_attack_mastery", "repeating_attacks_attack_bonus", "mastery_bonus"], function(v) {
-            var output = {};
-
-            const mastery = v["repeating_attacks_attack_mastery"];
-            const attack_bonus = parseInt(v["repeating_attacks_attack_bonus"]);
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const attack_mastery = mastery == "on" ? mastery_bonus : 0;
-
-            const attack_roll = attack_mastery + attack_bonus;
-            const attack_roll_label = `+${attack_roll}`;
-
-            output["repeating_attacks_attack_mastery_value"] = attack_mastery;
-            output["repeating_attacks_attack_roll"] = attack_roll_label;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:repeating_attacks", function(eventInfo) {
-        const id = eventInfo.triggerName;
-        if (eventInfo["sourceAttribute"].includes("attack_rank")) {
-            const new_rank = eventInfo["newValue"];
-            var attrs_to_get = [`${id}_attack_damage_${new_rank}`, `${id}_attack_description_${new_rank}`, `${id}_attack_damage`, `${id}_attack_description`];
-            getAttrs(attrs_to_get, function(v) {
-                var output = {};
-
-                var new_damage = v[`${id}_attack_damage_${new_rank}`];
-                var new_description = v[`${id}_attack_description_${new_rank}`];
-
-                if (new_damage == undefined || new_damage == "") {
-                    new_damage = v[`${id}_attack_damage`];
-                    output[`${id}_attack_damage_${new_rank}`] = new_damage;
-                }
-                if (new_description == undefined || new_description == "") {
-                    new_description = v[`${id}_attack_description`];
-                    output[`${id}_attack_description_${new_rank}`] = new_description;
-                }
-
-                output[`${id}_attack_damage`] = new_damage;
-                output[`${id}_attack_description`] = new_description;
-
-                setAttrs(output, {silent: true});
-            });
-        }
-        else {
-            var attrs_to_get = [`${id}_attack_rank`, `${id}_attack_damage`, `${id}_attack_description`];
-            getAttrs(attrs_to_get, function(v) {
-                var output = {};
-
-                const rank = v[`${id}_attack_rank`];
-                const damage = v[`${id}_attack_damage`];
-                const description = v[`${id}_attack_description`];
-
-                output[`${id}_attack_damage_${rank}`] = damage;
-                output[`${id}_attack_description_${rank}`] = description;
-
-                setAttrs(output, {silent: true});
-            });
-        }
-    });
-
-    on("change:mastery_bonus", function(eventInfo) {
-        const mastery_bonus = parseInt(eventInfo.newValue);
-        getSectionIDs("attacks", function(ids) {
-            var attrs_to_get = ids.map(id => `repeating_attacks_${id}_attack_mastery`).concat(ids.map(id => `repeating_attacks_${id}_attack_bonus`));
-            getAttrs(attrs_to_get, function(v) {
-                var output = {};
-
-                for (let i = 0; i < ids.length; i++) {
-                    const id = ids[i];
-                    const mastery = v[`repeating_attacks_${id}_attack_mastery`];
-                    const attack_bonus = parseInt(v[`repeating_attacks_${id}_attack_bonus`]);
-
-                    const attack_mastery = mastery == "on" ? mastery_bonus : 0;
-
-                    const attack_roll = attack_mastery + attack_bonus;
-                    const attack_roll_label = `+${attack_roll}`;
-
-                    output[`repeating_attacks_${id}_attack_mastery_value`] = attack_mastery;
-                    output[`repeating_attacks_${id}_attack_roll`] = attack_roll_label;
-                }
-
-                setAttrs(output, {silent: true});
-            });
-        });
-    });
-
-    on("change:attunements_total change:attunements_max", function(eventInfo) {
-        getAttrs(["attunements_total", "attunements_max"], function(v) {
-            var output = {};
-
-            const attunements_total = parseInt(v["attunements_total"]);
-            const max_attunements = parseInt(v["attunements_max"]);
-            const attunements_label = `${attunements_total}/${max_attunements}`;
-
-            output["attunements_label"] = attunements_label;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:fire change:wood change:earth change:water change:wind change:metal change:order change:chaos change:astral", function(eventInfo) {
-        getAttrs(["fire", "wood", "earth", "water", "wind", "metal", "order", "chaos", "astral"], function(v) {
-            var output = {};
-
-            const fire = v["fire"] == "on" ? 1 : 0;
-            const wood = v["wood"] == "on" ? 1 : 0;
-            const earth = v["earth"] == "on" ? 1 : 0;
-
-            const water = v["water"] == "on" ? 1 : 0;
-            const wind = v["wind"] == "on" ? 1 : 0;
-            const metal = v["metal"] == "on" ? 1 : 0;
-
-            const order = v["order"] == "on" ? 2 : 0;
-            const chaos = v["chaos"] == "on" ? 2 : 0;
-            const astral = v["astral"] == "on" ? 2 : 0;
-
-            const total = fire + wood + earth + water + wind + metal + order + chaos + astral;
-
-            output["attunements_total"] = total;
-
-            setAttrs(output, {silent: false});
-        });
-    });
-
-    on("change:family change:friends change:enemies", function(eventInfo) {
-        getAttrs(["family", "friends", "enemies"], function(v) {
-            var output = {};
-
-            const family = v["family"];
-            const friends = v["friends"];
-            const enemies = v["enemies"];
-
-            const relationships = `Family: ${family}\nFriends: ${friends}\nEnemies: ${enemies}`;
-
-            output["relationships"] = relationships;
-
-            setAttrs(output, {silent: false});
-        });
-    });
-
-    on("change:background change:personality change:appearance change:goals change:beliefs change:relationships change:hobbies change:secrets change:fears change:hometown change:residence change:occupation", function(eventInfo) {
-        getAttrs(["background", "personality", "appearance", "goals", "beliefs", "relationships", "hobbies", "secrets", "fears", "hometown", "residence", "occupation"], function(v) {
-            var output = {};
-
-            const background = v["background"];
-            const personality = v["personality"];
-            const appearance = v["appearance"];
-            const goals = v["goals"];
-            const beliefs = v["beliefs"];
-            const relationships = v["relationships"];
-            const hobbies = v["hobbies"];
-            const secrets = v["secrets"];
-            const fears = v["fears"];
-            const hometown = v["hometown"];
-            const residence = v["residence"];
-            const occupation = v["occupation"];
-
-            var relationship_label = "";
-            if (relationships !== undefined && relationships !== "") {
-                relationship_label = relationships.split("\n").map(line => `    ${line}`).join("\n");
-            }
-
-            var details = ""
-            if (background !== undefined && background !== "")
-            details += `Background: ${background}\n`;
-            if (personality !== undefined && personality !== "")
-            details += `Personality: ${personality}\n`;
-            if (appearance !== undefined && appearance !== "")
-            details += `Appearance: ${appearance}\n`;
-            if (goals !== undefined && goals !== "")
-            details += `Goals: ${goals}\n`;
-            if (beliefs !== undefined && beliefs !== "")
-            details += `Beliefs: ${beliefs}\n`;
-            if (relationships !== undefined && relationships !== "")
-            details += `Relationships: \n${relationship_label}\n`;
-            if (hobbies !== undefined && hobbies !== "")
-            details += `Hobbies: ${hobbies}\n`;
-            if (secrets !== undefined && secrets !== "")
-            details += `Secrets: ${secrets}\n`;
-            if (fears !== undefined && fears !== "")
-            details += `Fears: ${fears}\n`;
-            if (hometown !== undefined && hometown !== "")
-            details += `Hometown: ${hometown}\n`;
-            if (residence !== undefined && residence !== "")
-            details += `Residence: ${residence}\n`;
-            if (occupation !== undefined && occupation !== "")
-            details += `Occupation: ${occupation}`;
-
-            output["details"] = details.trim();
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:base_defense change:bonus_defense change:mastery_bonus", function(eventInfo) {
-        getAttrs(["base_defense", "bonus_defense", "mastery_bonus"], function(v) {
-            var output = {};
-
-            const base_defense = parseInt(v["base_defense"]);
-            const bonus_defense = parseInt(v["bonus_defense"]);
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const total_defense = base_defense + bonus_defense + mastery_bonus;
-
-            output["total_defense"] = total_defense;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:base_fortitude change:bonus_fortitude change:mastery_bonus", function(eventInfo) {
-        getAttrs(["base_fortitude", "bonus_fortitude", "mastery_bonus"], function(v) {
-            var output = {};
-
-            const base_fortitude = parseInt(v["base_fortitude"]);
-            const bonus_fortitude = parseInt(v["bonus_fortitude"]);
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const total_fortitude = base_fortitude + bonus_fortitude + mastery_bonus;
-
-            output["total_fortitude"] = total_fortitude;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:base_willpower change:bonus_willpower change:mastery_bonus", function(eventInfo) {
-        getAttrs(["base_willpower", "bonus_willpower", "mastery_bonus"], function(v) {
-            var output = {};
-
-            const base_willpower = parseInt(v["base_willpower"]);
-            const bonus_willpower = parseInt(v["bonus_willpower"]);
-            const mastery_bonus = parseInt(v["mastery_bonus"]);
-
-            const total_willpower = base_willpower + bonus_willpower + mastery_bonus;
-
-            output["total_willpower"] = total_willpower;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    /*
-    on("change:spirit1 change:spirit2 change:spirit3 change:spirit4 change:spirit5", function(eventInfo) {
-    const changed_spirit = eventInfo.sourceAttribute;
-    const spirit_number = parseInt(changed_spirit.slice(-1));
-
-    getAttrs(["spirit1", "spirit2", "spirit3", "spirit4", "spirit5"], function(v) {
-    var output = {};
-
-    for (let i = 1; i <= 5; i++) {
-    const spirit = v[`spirit${i}`];
-    if (spirit == undefined || spirit == "")
-    continue;
-    if (i < spirit_number)
-    output[`spirit${i}_checked`] = "on";
-    else
-    output[`spirit${i}_checked`] = "0";
-    }
-
-    setAttrs(output, {silent: true});
-    });
-    });
-
-    on("change:barrier1 change:barrier2 change:barrier3", function(eventInfo) {
-    const changed_barrier = eventInfo.sourceAttribute;
-    const barrier_number = parseInt(changed_barrier.slice(-1));
-
-    getAttrs(["barrier1", "barrier2", "barrier3"], function(v) {
-    var output = {};
-
-    for (let i = 1; i <= 3; i++) {
-    const barrier = v[`barrier${i}`];
-    if (barrier == undefined || barrier == "")
-    continue;
-    if (i < barrier_number)
-    output[`barrier${i}_checked`] = "on";
-    else
-    output[`barrier${i}_checked`] = "0";
-    }
-
-    setAttrs(output, {silent: true});
-    });
-    });
-
-    on("change:glyph1 change:glyph2 change:glyph3", function(eventInfo) {
-    const changed_glyph = eventInfo.sourceAttribute;
-    const glyph_number = parseInt(changed_glyph.slice(-1));
-
-    getAttrs(["glyph1", "glyph2", "glyph3"], function(v) {
-    var output = {};
-
-    for (let i = 1; i <= 5; i++) {
-    const glyph = v[`glyph${i}`];
-    if (glyph == undefined || glyph == "")
-    continue;
-    if (i < glyph_number)
-    output[`glyph${i}_checked`] = "on";
-    else
-    output[`glyph${i}_checked`] = "0";
-    }
-
-    setAttrs(output, {silent: true});
-    });
-    });
-    */
-
-    on("change:movement_distance", function(eventInfo) {
-        getAttrs(["movement_distance"], function(v) {
-            var output = {};
-
-            const movement_distance = parseInt(v["movement_distance"]);
-            const movement_zone = Math.floor(movement_distance / 10);
-
-            output["movement_zone"] = movement_zone;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:movement_zone", function(eventInfo) {
-        getAttrs(["movement_zone"], function(v) {
-            var output = {};
-
-            const movement_zone = parseInt(v["movement_zone"]);
-            const movement_distance = movement_zone * 10;
-
-            output["movement_distance"] = movement_distance;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:max_movement_distance", function(eventInfo) {
-        getAttrs(["max_movement_distance"], function(v) {
-            var output = {};
-
-            const max_movement_distance = parseInt(v["max_movement_distance"]);
-            const max_movement_zone = Math.floor(max_movement_distance / 10);
-
-            output["max_movement_zone"] = max_movement_zone;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:max_movement_zone", function(eventInfo) {
-        getAttrs(["max_movement_zone"], function(v) {
-            var output = {};
-
-            const max_movement_zone = parseInt(v["max_movement_zone"]);
-            const max_movement_distance = max_movement_zone * 10;
-
-            output["max_movement_distance"] = max_movement_distance;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("sheet:opened", function(eventInfo) {
-        getSectionIDsOrdered("repeating_storages", function(ids) {
-            var output = {};
-            if (ids.length == 0) {
-                var newStorageLine = `repeating_storages_${generateRowID()}`;
-                output[`${newStorageLine}_storage_name`] = "Guild Storage";
-                output[`${newStorageLine}_storage_capacity`] = 20;
-                output[`${newStorageLine}_storage_description`] = "The Cloudbreaker Guild allows you to store 20 Item Slots worth of items and equipment. You can request that your stored items be delivered to you between missions. You can also store your items on your rides, allowing you to swap your inventory anytime as long as you can access your ride’s trunk. Different rides can store different amounts of items.";
-
-                setAttrs(output, {silent: false});
-            }
-        });
-    });
-
-    on("change:repeating_storages remove:repeating_storages change:_reporder:storages", function(eventInfo) {
-        getSectionIDsOrdered("repeating_storages", function(ids) {
-            var attrs_to_get = ids.map(id => `repeating_storages_${id}_storage_name`).concat(ids.map(id => `repeating_storages_${id}_storage_capacity`));
-            getAttrs(attrs_to_get, function(v) {
-                var output = {};
-                var storage_value_pair = "";
-                var total_capacity = 0;
-
-                for (let i = 0; i < ids.length; i++) {
-                    const id = ids[i];
-                    const storageName = v[`repeating_storages_${id}_storage_name`];
-                    const storageCapacity = parseInt(v[`repeating_storages_${id}_storage_capacity`]);
-                    if (storageName == undefined || storageName == "")
-                    continue;
-                    storage_value_pair += `${storageName} (${storageCapacity} slots)\n`;
-                    total_capacity += storageCapacity;
-                }
-
-                storage_value_pair = storage_value_pair.trimEnd();
-
-                output["storage_storages"] = storage_value_pair;
-                output["storage_total_capacity"] = total_capacity;
-
-                setAttrs(output, {silent: false});
-            });
-        });
-    });
-
-    on("change:repeating_possessions remove:repeating_possessions change:_reporder:possessions", function(eventInfo) {
-        getSectionIDsOrdered("repeating_possessions", function(ids) {
-            var attrs_to_get = ids.map(id => `repeating_possessions_${id}_possession_name`).concat(ids.map(id => `repeating_possessions_${id}_possession_weight`)).concat(ids.map(id => `repeating_possessions_${id}_possession_quantity`));
-            getAttrs(attrs_to_get, function(v) {
-                var output = {};
-                var possession_value_pair = "";
-                var total_weight = 0;
-
-                for (let i = 0; i < ids.length; i++) {
-                    const id = ids[i];
-                    const possessionName = v[`repeating_possessions_${id}_possession_name`];
-                    const possessionWeight = parseFloat(v[`repeating_possessions_${id}_possession_weight`]);
-                    const possessionQuantity = parseFloat(v[`repeating_possessions_${id}_possession_quantity`]);
-                    if (possessionName == undefined || possessionName == "")
-                    continue;
-                    possession_value_pair += `${possessionName} (${possessionQuantity})\n`;
-                    total_weight += possessionWeight * possessionQuantity;
-                }
-
-                possession_value_pair = possession_value_pair.trimEnd();
-
-                output["possession_items"] = possession_value_pair;
-                output["possessions_total_weight"] = total_weight;
-
-                setAttrs(output, {silent: false});
-            });
-        });
-    });
-
-    on("change:storage_total_capacity change:possessions_total_weight", function(eventInfo) {
-        getAttrs(["storage_total_capacity", "possessions_total_weight"], function(v) {
-            var output = {};
-
-            const storage_capacity = parseInt(v["storage_total_capacity"]);
-            const total_weight = parseInt(v["possessions_total_weight"]);
-
-            output["storage_total_weight_label"] = `${total_weight}/${storage_capacity}`;
-
-            setAttrs(output, {silent: true});
-        });
-    });
-
-    on("change:repeating_storages change:_reporder:storages remove:repeating_storages change:repeating_possessions remove:repeating_possessions change:_reporder:possessions", function(eventInfo) {
-        getSectionIDsOrdered("repeating_storages", function(storageIDs) {
-            getSectionIDsOrdered("repeating_possessions", function(possessionsIDs) {
-                var attrs_to_get = storageIDs.map(id => `repeating_storages_${id}_storage_capacity`).concat(storageIDs.map(id => `repeating_storages_${id}_storage_name`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_name`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_quantity`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_weight`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_storage`));
-                getAttrs(attrs_to_get, function(v) {
-                    var output = {};
-                    var storage_value_pairs = {};
-
-                    for (let i = 0; i < storageIDs.length; i++) {
-                        const storageID = storageIDs[i];
-                        const storageName = v[`repeating_storages_${storageID}_storage_name`];
-                        const storageCapacity = parseInt(v[`repeating_storages_${storageID}_storage_capacity`]);
-                        storage_value_pairs[storageName] = {capacity: storageCapacity, weight: 0, items: []};
-                    }
-
-                    for (let i = 0; i < possessionsIDs.length; i++) {
-                        const possessionID = possessionsIDs[i];
-                        const possessionName = v[`repeating_possessions_${possessionID}_possession_name`];
-                        const possessionQuantity = parseInt(v[`repeating_possessions_${possessionID}_possession_quantity`]);
-                        const possessionWeight = parseFloat(v[`repeating_possessions_${possessionID}_possession_weight`]);
-                        var possessionStorage = v[`repeating_possessions_${possessionID}_possession_storage`];
-                        if (possessionStorage == undefined || possessionStorage == "")
-                        possessionStorage = "Guild Storage";
-                        storage_value_pairs[possessionStorage].weight += possessionQuantity * possessionWeight;
-                        storage_value_pairs[possessionStorage].items.push({name: possessionName, quantity: possessionQuantity});
-                    }
-
-                    var storage_label = "";
-                    for (const [storageName, storageData] of Object.entries(storage_value_pairs)) {
-                        storage_label += `${storageName} (${storageData.weight}/${storageData.capacity})\n`;
-                        for (let item of storageData.items) {
-                            storage_label += `  ${item.name} (${item.quantity})\n`;
-                        }
-                    }
-
-                    output["storage_contents"] = storage_label.trimEnd();
-
-                    setAttrs(output, {silent: true});
-                });
-            });
-        });
-    });
-</script>
-
-
 <html>
 <div class="charsheet">
     <input class="sheet-tabstoggle" name="attr_sheetTab" type="hidden" value="character"/>
@@ -1929,13 +99,15 @@
                 <span data-i18n="primary-class-text">
                     ⬖ Primary Class:
                 </span>
-                <input name="attr_character_primary_class" type="text"/>
+                <input name="attr_character_primary_class" type="text" list="primary_class"/>
+                <datalist id="primary_class" class="sheet-classlist sheet-primary"></datalist>
             </div>
             <div>
                 <span data-i18n="secondary-class-text">
                     ⬗ Secondary Class:
                 </span>
-                <input name="attr_character_secondary_class" type="text"/>
+                <input name="attr_character_secondary_class" type="text" list="secondary_class"/>
+                <datalist id="secondary_class" class="sheet-classlist sheet-secondary"></datalist>
             </div>
         </div>
         <!-- Quirks -->
@@ -5838,3 +4010,1919 @@
     </div>
 </rolltemplate>
 </html>
+
+<script type="text/worker">
+    const copper_rank = "copper";
+    const silver_rank = "silver";
+    const gold_rank = "gold";
+    const platinum_rank = "platinum";
+
+    var getSectionIDsOrdered = function (sectionName, callback) {
+        'use strict';
+        getAttrs([`_reporder_${sectionName}`], function (v) {
+            getSectionIDs(sectionName, function (idArray) {
+                let reporderArray = v[`_reporder_${sectionName}`] ? v[`_reporder_${sectionName}`].toLowerCase().split(',') : [],
+                ids = [...new Set(reporderArray.filter(x => idArray.includes(x)).concat(idArray))];
+                callback(ids);
+            });
+        });
+    };
+
+    const tabs = [
+    "character",
+    "combat",
+    "magic",
+    "notes",
+    "options"
+    ];
+    tabs.forEach(tab => {
+        on(`clicked:${tab}`, function() {
+            var output = {};
+
+            output["sheetTab"] = tab;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:character_level", function(eventInfo) {
+        var level = 1;
+        if (eventInfo.newValue != undefined || eventInfo.newValue != "")
+        level = parseInt(eventInfo.newValue);
+        var new_level = level < 1 ? 1 : level;
+        const capped_level = new_level > 12 ? 12 : new_level;
+        const grade_ranked = Math.floor((capped_level) / 4);
+
+        const grade = new_level == 89 ? platinum_rank : new_level > 8 ? gold_rank : new_level > 4 ? silver_rank : copper_rank;
+        const total_attributes = 7 + grade_ranked;
+
+        getAttrs(["downgrade_level"], function(v) {
+            var output = {};
+
+            var downgrade = v["downgrade_level"];
+            var downgraded_rank = grade;
+            var mastery_total = 2 + grade_ranked;
+            if (downgrade == copper_rank) {
+                downgraded_rank = copper_rank;
+                mastery_total = 3;
+            }
+            else if (downgrade == silver_rank && grade != copper_rank) {
+                downgraded_rank = silver_rank;
+                mastery_total = 4;
+            }
+
+            output["character_level"] = new_level;
+            output["adventuring_grade"] = downgraded_rank;
+            output["total_attributes"] = total_attributes;
+            output["mastery_bonus"] = mastery_total;
+
+            setAttrs(output, {silent: false});
+        });
+
+        getAttrs(["armor_hp", "unarmored_toughness", "added_hp", "attunements_total", "added_mp", "added_resolve", "downgrade_level", "armor_type"], function(v) {
+            var output = {};
+
+            const downgrade = v["downgrade_level"];
+            const armor_type = v["armor_type"];
+
+            const armor_hp = parseInt(v["armor_hp"]);
+            const unarmored_toughness = v["unarmored_toughness"];
+            const added_hp = parseInt(v["added_hp"]);
+            const attunements_total = parseInt(v["attunements_total"]);
+            const added_mp = parseInt(v["added_mp"]);
+            const added_resolve = parseInt(v["added_resolve"]);
+
+            var hp_max = 15 + (capped_level - 1) * 2 + armor_hp;
+            if (unarmored_toughness == "on")
+            hp_max = 20 + (capped_level - 1) * 3;
+
+            if (downgrade == copper_rank) {
+                if (armor_type == "light")
+                hp_max = Math.min(hp_max, 30);
+                else if (armor_type == "medium")
+                hp_max = Math.min(hp_max, 40);
+                else if (armor_type == "heavy")
+                hp_max = Math.min(hp_max, 50);
+                else if (armor_type == "none" && unarmored_toughness == "on")
+                hp_max = Math.min(hp_max, 29);
+                else if (armor_type == "none")
+                hp_max = Math.min(hp_max, 21);
+            }
+            else if (downgrade == silver_rank && grade != copper_rank) {
+                if (armor_type == "light")
+                hp_max = Math.min(hp_max, 45);
+                else if (armor_type == "medium")
+                hp_max = Math.min(hp_max, 55);
+                else if (armor_type == "heavy")
+                hp_max = Math.min(hp_max, 70);
+                else if (armor_type == "none" && unarmored_toughness == "on")
+                hp_max = Math.min(hp_max, 41);
+                else if (armor_type == "none")
+                hp_max = Math.min(hp_max, 29);
+            }
+
+            var mp_max = 15 + (capped_level - 1) * 2 + 10 * attunements_total;
+
+            if (downgrade == copper_rank)
+            mp_max = Math.min(mp_max, 50);
+            else if (downgrade == silver_rank && grade != copper_rank)
+            mp_max = Math.min(mp_max, 70);
+
+            const resolve_max = 30 + (capped_level - 1) * 4 + added_resolve;
+
+            output["hp_max"] = hp_max + added_hp;
+            output["mp_max"] = mp_max + added_mp;
+            output["resolve_max"] = resolve_max;
+
+            setAttrs(output, {silent: true});
+        });
+
+
+        getAttrs(["added_quirk", "quirk_total"], function(v) {
+            var output = {};
+            const quirk_total = parseInt(v["quirk_total"]);
+            const quirk_max = 2 + grade_ranked + parseInt(v["added_quirk"]);
+
+            output["quirk_points_label"] = `${quirk_total}/${quirk_max}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:adventuring_grade", function(eventInfo) {
+        const new_grade = eventInfo.newValue;
+        const new_grade_value = new_grade == platinum_rank ? 3 : new_grade == gold_rank ? 3 : new_grade == silver_rank ? 2 : 1;
+
+        getAttrs(["minor_action", "downgrade_level"], function(v) {
+            var output = {};
+
+            const downgrade = v["downgrade_level"];
+
+            var minor_action = new_grade_value;
+
+            if (downgrade == copper_rank)
+            minor_action = Math.min(minor_action, 1);
+            else if (downgrade == silver_rank && new_grade_value != copper_rank)
+            minor_action = Math.min(minor_action, 2);
+
+            output["minor_action"] = minor_action;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:downgrade_level", function(eventInfo) {
+        getAttrs(["character_level"], function(v) {
+            var output = {};
+
+            const downgrade = eventInfo.newValue;
+            const character_level = parseInt(v["character_level"]);
+
+            const capped_level = character_level > 12 ? 12 : character_level;
+
+            const grade = character_level == 89 ? platinum_rank : character_level > 8 ? gold_rank : character_level > 4 ? silver_rank : copper_rank;
+            const grade_ranked = Math.floor((capped_level) / 4);
+
+            var new_grade = grade;
+            if (downgrade == copper_rank)
+            new_grade = copper_rank;
+            else if (downgrade == silver_rank && grade != copper_rank)
+            new_grade = silver_rank;
+
+            var mastery_bonus = 2 + grade_ranked;
+            if (downgrade == copper_rank)
+            mastery_bonus = 3;
+            else if (downgrade == silver_rank && grade != copper_rank)
+            mastery_bonus = 4;
+
+            var minor_action = new_grade == copper_rank ? 1 : new_grade == silver_rank ? 2 : 3;
+
+            output["adventuring_grade"] = new_grade;
+            output["mastery_bonus"] = mastery_bonus;
+            output["minor_action"] = minor_action;
+
+            setAttrs(output, {silent: false});
+
+            getAttrs(["armor_hp", "unarmored_toughness", "added_hp", "armor_type"], function(v) {
+                var output = {};
+
+                const armor_type = v["armor_type"];
+
+                const armor_hp = parseInt(v["armor_hp"]);
+                const unarmored_toughness = v["unarmored_toughness"];
+                const added_hp = parseInt(v["added_hp"]);
+
+                var hp_max = 15 + (capped_level - 1) * 2 + armor_hp;
+                if (unarmored_toughness == "on")
+                hp_max = 20 + (capped_level - 1) * 3;
+
+                if (downgrade == copper_rank) {
+                    if (armor_type == "light")
+                    hp_max = Math.min(hp_max, 30);
+                    else if (armor_type == "medium")
+                    hp_max = Math.min(hp_max, 40);
+                    else if (armor_type == "heavy")
+                    hp_max = Math.min(hp_max, 50);
+                    else if (armor_type == "none" && unarmored_toughness == "on")
+                    hp_max = Math.min(hp_max, 29);
+                    else if (armor_type == "none")
+                    hp_max = Math.min(hp_max, 21);
+                }
+                else if (downgrade == silver_rank && grade != copper_rank) {
+                    if (armor_type == "light")
+                    hp_max = Math.min(hp_max, 45);
+                    else if (armor_type == "medium")
+                    hp_max = Math.min(hp_max, 55);
+                    else if (armor_type == "heavy")
+                    hp_max = Math.min(hp_max, 70);
+                    else if (armor_type == "none" && unarmored_toughness == "on")
+                    hp_max = Math.min(hp_max, 41);
+                    else if (armor_type == "none")
+                    hp_max = Math.min(hp_max, 29);
+                }
+
+                output["hp_max"] = hp_max + added_hp;
+
+                setAttrs(output, {silent: true});
+            });
+
+            getAttrs(["attunements_total", "added_mp"], function(v) {
+                var output = {};
+
+                const attunements_total = parseInt(v["attunements_total"]);
+                const added_mp = parseInt(v["added_mp"]);
+
+                var mp_max = 15 + (capped_level - 1) * 2 + 10 * attunements_total;
+
+                if (downgrade == copper_rank)
+                mp_max = Math.min(mp_max, 50);
+                else if (downgrade == silver_rank && grade != copper_rank)
+                mp_max = Math.min(mp_max, 70);
+
+                output["mp_max"] = mp_max + added_mp;
+
+                setAttrs(output, {silent: true});
+            });
+        });
+    });
+
+    on("change:added_resolve", function(eventInfo) {
+        getAttrs(["added_resolve", "character_level"], function(v) {
+            var output = {};
+
+            const character_level = parseInt(v["character_level"]);
+            const capped_level = character_level > 12 ? 12 : character_level;
+
+            const added_resolve = parseInt(v["added_resolve"]);
+            const resolve_max = 30 + (capped_level - 1) * 4 + added_resolve;
+
+            output["resolve_max"] = resolve_max;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:added_hp change:armor_hp change:unarmored_toughness change:armor_type", function(eventInfo) {
+        getAttrs(["added_hp", "armor_hp", "unarmored_toughness", "character_level", "armor_type", "downgrade_level"], function(v) {
+            var output = {};
+
+            const downgrade = v["downgrade_level"];
+            const armor_type = v["armor_type"];
+
+            const character_level = parseInt(v["character_level"]);
+            const capped_level = character_level > 12 ? 12 : character_level;
+
+            const added_hp = parseInt(v["added_hp"]);
+            const armor_hp = parseInt(v["armor_hp"]);
+            const unarmored_toughness = v["unarmored_toughness"];
+
+            var hp_max = 15 + (capped_level - 1) * 2 + armor_hp;
+            if (unarmored_toughness == "on")
+            hp_max = 20 + (capped_level - 1) * 3;
+
+            if (downgrade == copper_rank) {
+                if (armor_type == "light")
+                hp_max = Math.min(hp_max, 30);
+                else if (armor_type == "medium")
+                hp_max = Math.min(hp_max, 40);
+                else if (armor_type == "heavy")
+                hp_max = Math.min(hp_max, 50);
+                else if (armor_type == "none" && unarmored_toughness == "on")
+                hp_max = Math.min(hp_max, 29);
+                else if (armor_type == "none")
+                hp_max = Math.min(hp_max, 21);
+            }
+            else if (downgrade == silver_rank) {
+                if (armor_type == "light")
+                hp_max = Math.min(hp_max, 45);
+                else if (armor_type == "medium")
+                hp_max = Math.min(hp_max, 55);
+                else if (armor_type == "heavy")
+                hp_max = Math.min(hp_max, 70);
+                else if (armor_type == "none" && unarmored_toughness == "on")
+                hp_max = Math.min(hp_max, 41);
+                else if (armor_type == "none")
+                hp_max = Math.min(hp_max, 29);
+            }
+
+            output["hp_max"] = hp_max + added_hp;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:added_mp change:attunements_total", function(eventInfo) {
+        getAttrs(["added_mp", "attunements_total", "character_level", "downgrade_level"], function(v) {
+            var output = {};
+
+            const downgrade = v["downgrade_level"];
+
+            const character_level = parseInt(v["character_level"]);
+            const capped_level = character_level > 12 ? 12 : character_level;
+
+            const added_mp = parseInt(v["added_mp"]);
+            const attunements_total = parseInt(v["attunements_total"]);
+            var mp_max = 15 + (capped_level - 1) * 2 + 10 * attunements_total;
+
+            if (downgrade == copper_rank)
+            mp_max = Math.min(mp_max, 50);
+            else if (downgrade == silver_rank)
+            mp_max = Math.min(mp_max, 70);
+
+            output["mp_max"] = mp_max + added_mp;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:repeating_quirks remove:repeating_quirks change:_reporder:quirks", function(eventInfo) {
+        getSectionIDsOrdered("repeating_quirks", function(ids) {
+            var attrs_to_get = ids.map(id => `repeating_quirks_${id}_quirk_name`).concat(ids.map(id => `repeating_quirks_${id}_quirk_level`));
+
+            getAttrs(attrs_to_get, function(v) {
+                var output = {};
+                var quirk_value_pair = "";
+                var total_quirk_points = 0;
+
+                ids.forEach(id => {
+                    var quirkName = v[`repeating_quirks_${id}_quirk_name`];
+                    const quirkLevel = v[`repeating_quirks_${id}_quirk_level`];
+                    if (quirkName == undefined || quirkName == "")
+                    quirkName = "Unnamed Quirk";
+                    total_quirk_points += parseInt(quirkLevel);
+                    quirk_value_pair += `${quirkName} (Rank ${quirkLevel})\n`;
+                });
+
+                quirk_value_pair = quirk_value_pair.trimEnd();
+
+                output["quirk_summary"] = quirk_value_pair;
+                if (total_quirk_points == undefined)
+                total_quirk_points = 0;
+                output["quirk_total"] = total_quirk_points;
+                setAttrs(output, {silent: false});
+            });
+        });
+    });
+
+    on("change:quirk_total change:added_quirk", function(eventInfo) {
+        getAttrs(["added_quirk", "character_level", "quirk_total"], function(v) {
+            var output = {};
+
+            const character_level = parseInt(v["character_level"]);
+            const added_quirk = parseInt(v["added_quirk"]);
+            const quirk_total = parseInt(v["quirk_total"]);
+            const capped_level = character_level > 12 ? 12 : character_level;
+            const grade_ranked = Math.floor((capped_level + 1) / 4);
+
+            const quirk_max = 2 + grade_ranked + added_quirk;
+
+            output["quirk_points_label"] = `${eventInfo.newValue}/${quirk_max}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:strength change:mastery_bonus", function(eventInfo) {
+        getAttrs(["strength", "mastery_bonus", "brute", "brute_bns", "endurance", "endurance_bns", "intimidation", "intimidation_bns"], function(v) {
+            var output = {};
+
+            const strength = parseInt(v["strength"]);
+
+            const brute = v["brute"] == "on";
+            const endurance = v["endurance"] == "on";
+            const intimidation = v["intimidation"] == "on";
+
+            const brute_bns = parseInt(v["brute_bns"]);
+            const endurance_bns = parseInt(v["endurance_bns"]);
+            const intimidation_bns = parseInt(v["intimidation_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const brute_total = strength + (brute ? mastery_bonus : 0) + brute_bns;
+            const endurance_total = strength + (endurance ? mastery_bonus : 0) + endurance_bns;
+            const intimidation_total = strength + (intimidation ? mastery_bonus : 0) + intimidation_bns;
+
+            output["brute_mastery"] = brute ? mastery_bonus : 0;
+            output["endurance_mastery"] = endurance ? mastery_bonus : 0;
+            output["intimidation_mastery"] = intimidation ? mastery_bonus : 0;
+
+            output["brute_total_label"] = `+${brute_total}`;
+            output["endurance_total_label"] = `+${endurance_total}`;
+            output["intimidation_total_label"] = `+${intimidation_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:brute change:brute_bns", function(eventInfo) {
+        getAttrs(["strength", "mastery_bonus", "brute", "brute_bns"], function(v) {
+            var output = {};
+
+            const strength = parseInt(v["strength"]);
+
+            const brute = v["brute"] == "on";
+            const brute_bns = parseInt(v["brute_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const brute_total = strength + (brute ? mastery_bonus : 0) + brute_bns;
+
+            output["brute_mastery"] = brute ? mastery_bonus : 0;
+            output["brute_total_label"] = `+${brute_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:endurance change:endurance_bns", function(eventInfo) {
+        getAttrs(["strength", "mastery_bonus", "endurance", "endurance_bns"], function(v) {
+            var output = {};
+
+            const strength = parseInt(v["strength"]);
+
+            const endurance = v["endurance"] == "on";
+            const endurance_bns = parseInt(v["endurance_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const endurance_total = strength + (endurance ? mastery_bonus : 0) + endurance_bns;
+
+            output["endurance_mastery"] = endurance ? mastery_bonus : 0;
+            output["endurance_total_label"] = `+${endurance_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:intimidation change:intimidation_bns", function(eventInfo) {
+        getAttrs(["strength", "mastery_bonus", "intimidation", "intimidation_bns"], function(v) {
+            var output = {};
+
+            const strength = parseInt(v["strength"]);
+
+            const intimidation = v["intimidation"] == "on";
+            const intimidation_bns = parseInt(v["intimidation_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const intimidation_total = strength + (intimidation ? mastery_bonus : 0) + intimidation_bns;
+
+            output["intimidation_mastery"] = intimidation ? mastery_bonus : 0;
+            output["intimidation_total_label"] = `+${intimidation_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:agility change:mastery_bonus", function(eventInfo) {
+        getAttrs(["agility", "mastery_bonus", "sports", "sports_bns", "thievery", "thievery_bns", "deception", "deception_bns"], function(v) {
+            var output = {};
+
+            const agility = parseInt(v["agility"]);
+
+            const sports = v["sports"] == "on";
+            const thievery = v["thievery"] == "on";
+            const deception = v["deception"] == "on";
+
+            const sports_bns = parseInt(v["sports_bns"]);
+            const thievery_bns = parseInt(v["thievery_bns"]);
+            const deception_bns = parseInt(v["deception_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const sports_total = agility + (sports ? mastery_bonus : 0) + sports_bns;
+            const thievery_total = agility + (thievery ? mastery_bonus : 0) + thievery_bns;
+            const deception_total = agility + (deception ? mastery_bonus : 0) + deception_bns;
+
+            output["sports_mastery"] = sports ? mastery_bonus : 0;
+            output["thievery_mastery"] = thievery ? mastery_bonus : 0;
+            output["deception_mastery"] = deception ? mastery_bonus : 0;
+
+            output["sports_total_label"] = `+${sports_total}`;
+            output["thievery_total_label"] = `+${thievery_total}`;
+            output["deception_total_label"] = `+${deception_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:sports change:sports_bns", function(eventInfo) {
+        getAttrs(["agility", "mastery_bonus", "sports", "sports_bns"], function(v) {
+            var output = {};
+
+            const agility = parseInt(v["agility"]);
+
+            const sports = v["sports"] == "on";
+            const sports_bns = parseInt(v["sports_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const sports_total = agility + (sports ? mastery_bonus : 0) + sports_bns;
+
+            output["sports_mastery"] = sports ? mastery_bonus : 0;
+            output["sports_total_label"] = `+${sports_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:thievery change:thievery_bns", function(eventInfo) {
+        getAttrs(["agility", "mastery_bonus", "thievery", "thievery_bns"], function(v) {
+            var output = {};
+
+            const agility = parseInt(v["agility"]);
+
+            const thievery = v["thievery"] == "on";
+            const thievery_bns = parseInt(v["thievery_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const thievery_total = agility + (thievery ? mastery_bonus : 0) + thievery_bns;
+
+            output["thievery_mastery"] = thievery ? mastery_bonus : 0;
+            output["thievery_total_label"] = `+${thievery_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:deception change:deception_bns", function(eventInfo) {
+        getAttrs(["agility", "mastery_bonus", "deception", "deception_bns"], function(v) {
+            var output = {};
+
+            const agility = parseInt(v["agility"]);
+
+            const deception = v["deception"] == "on";
+            const deception_bns = parseInt(v["deception_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const deception_total = agility + (deception ? mastery_bonus : 0) + deception_bns;
+
+            output["deception_mastery"] = deception ? mastery_bonus : 0;
+            output["deception_total_label"] = `+${deception_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:awareness change:mastery_bonus", function(eventInfo) {
+        getAttrs(["awareness", "mastery_bonus", "detect", "detect_bns", "information", "information_bns", "reason", "reason_bns"], function(v) {
+            var output = {};
+
+            const awareness = parseInt(v["awareness"]);
+
+            const detect = v["detect"] == "on";
+            const information = v["information"] == "on";
+            const reason = v["reason"] == "on";
+
+            const detect_bns = parseInt(v["detect_bns"]);
+            const information_bns = parseInt(v["information_bns"]);
+            const reason_bns = parseInt(v["reason_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const detect_total = awareness + (detect ? mastery_bonus : 0) + detect_bns;
+            const information_total = awareness + (information ? mastery_bonus : 0) + information_bns;
+            const reason_total = awareness + (reason ? mastery_bonus : 0) + reason_bns;
+
+            output["detect_mastery"] = detect ? mastery_bonus : 0;
+            output["information_mastery"] = information ? mastery_bonus : 0;
+            output["reason_mastery"] = reason ? mastery_bonus : 0;
+
+            output["detect_total_label"] = `+${detect_total}`;
+            output["information_total_label"] = `+${information_total}`;
+            output["reason_total_label"] = `+${reason_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:detect change:detect_bns", function(eventInfo) {
+        getAttrs(["awareness", "mastery_bonus", "detect", "detect_bns"], function(v) {
+            var output = {};
+
+            const awareness = parseInt(v["awareness"]);
+
+            const detect = v["detect"] == "on";
+            const detect_bns = parseInt(v["detect_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const detect_total = awareness + (detect ? mastery_bonus : 0) + detect_bns;
+
+            output["detect_mastery"] = detect ? mastery_bonus : 0;
+            output["detect_total_label"] = `+${detect_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:information change:information_bns", function(eventInfo) {
+        getAttrs(["awareness", "mastery_bonus", "information", "information_bns"], function(v) {
+            var output = {};
+
+            const awareness = parseInt(v["awareness"]);
+
+            const information = v["information"] == "on";
+            const information_bns = parseInt(v["information_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const information_total = awareness + (information ? mastery_bonus : 0) + information_bns;
+
+            output["information_mastery"] = information ? mastery_bonus : 0;
+            output["information_total_label"] = `+${information_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:reason change:reason_bns", function(eventInfo) {
+        getAttrs(["awareness", "mastery_bonus", "reason", "reason_bns"], function(v) {
+            var output = {};
+
+            const awareness = parseInt(v["awareness"]);
+
+            const reason = v["reason"] == "on";
+            const reason_bns = parseInt(v["reason_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const reason_total = awareness + (reason ? mastery_bonus : 0) + reason_bns;
+
+            output["reason_mastery"] = reason ? mastery_bonus : 0;
+            output["reason_total_label"] = `+${reason_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:empathy change:mastery_bonus", function(eventInfo) {
+        getAttrs(["empathy", "mastery_bonus", "psychology", "psychology_bns", "artistry", "artistry_bns", "appeal", "appeal_bns"], function(v) {
+            var output = {};
+
+            const empathy = parseInt(v["empathy"]);
+
+            const psychology = v["psychology"] == "on";
+            const artistry = v["artistry"] == "on";
+            const appeal = v["appeal"] == "on";
+
+            const psychology_bns = parseInt(v["psychology_bns"]);
+            const artistry_bns = parseInt(v["artistry_bns"]);
+            const appeal_bns = parseInt(v["appeal_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const psychology_total = empathy + (psychology ? mastery_bonus : 0) + psychology_bns;
+            const artistry_total = empathy + (artistry ? mastery_bonus : 0) + artistry_bns;
+            const appeal_total = empathy + (appeal ? mastery_bonus : 0) + appeal_bns;
+
+            output["psychology_mastery"] = psychology ? mastery_bonus : 0;
+            output["artistry_mastery"] = artistry ? mastery_bonus : 0;
+            output["appeal_mastery"] = appeal ? mastery_bonus : 0;
+
+            output["psychology_total_label"] = `+${psychology_total}`;
+            output["artistry_total_label"] = `+${artistry_total}`;
+            output["appeal_total_label"] = `+${appeal_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:psychology change:psychology_bns", function(eventInfo) {
+        getAttrs(["empathy", "mastery_bonus", "psychology", "psychology_bns"], function(v) {
+            var output = {};
+
+            const empathy = parseInt(v["empathy"]);
+
+            const psychology = v["psychology"] == "on";
+            const psychology_bns = parseInt(v["psychology_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const psychology_total = empathy + (psychology ? mastery_bonus : 0) + psychology_bns;
+
+            output["psychology_mastery"] = psychology ? mastery_bonus : 0;
+            output["psychology_total_label"] = `+${psychology_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:artistry change:artistry_bns", function(eventInfo) {
+        getAttrs(["empathy", "mastery_bonus", "artistry", "artistry_bns"], function(v) {
+            var output = {};
+
+            const empathy = parseInt(v["empathy"]);
+
+            const artistry = v["artistry"] == "on";
+            const artistry_bns = parseInt(v["artistry_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const artistry_total = empathy + (artistry ? mastery_bonus : 0) + artistry_bns;
+
+            output["artistry_mastery"] = artistry ? mastery_bonus : 0;
+            output["artistry_total_label"] = `+${artistry_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:appeal change:appeal_bns", function(eventInfo) {
+        getAttrs(["empathy", "mastery_bonus", "appeal", "appeal_bns"], function(v) {
+            var output = {};
+
+            const empathy = parseInt(v["empathy"]);
+
+            const appeal = v["appeal"] == "on";
+            const appeal_bns = parseInt(v["appeal_bns"]);
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const appeal_total = empathy + (appeal ? mastery_bonus : 0) + appeal_bns;
+
+            output["appeal_mastery"] = appeal ? mastery_bonus : 0;
+            output["appeal_total_label"] = `+${appeal_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    /*
+    Arcanist
+    Chemist
+    Climbing
+    Impersonation
+
+    Infiltration
+    Mechanic
+    Navigation
+    Thaumaturgist
+
+    Free Toolkit places
+    */
+    on("change:mastery_bonus", function(eventInfo) {
+        const mastery_bonus = parseInt(eventInfo.newValue);
+        const kit_list = [
+        "arcanist",
+        "chemist",
+        "climbing",
+        "impersonation",
+        "infiltration",
+        "mechanic",
+        "navigation",
+        "thaumaturgist"
+        ];
+        var attrs_to_get = kit_list.map(kit => `${kit}`).concat(kit_list.map(kit => `${kit}_bns`)).concat(kit_list.map(kit => `${kit}_quality`));
+        getAttrs(attrs_to_get, function(v) {
+            var output = {};
+
+            for (let i = 0; i < kit_list.length; i++) {
+                const kit = kit_list[i];
+                const kit_mastered = v[`${kit}`] == "on";
+                if (!kit_mastered)
+                continue;
+                const kit_bns = parseInt(v[`${kit}_bns`]);
+                const kit_quality = parseInt(v[`${kit}_quality`]);
+
+                const kit_total = kit_quality + (kit_mastered ? mastery_bonus : 0) + kit_bns;
+
+                output[`${kit}_mastery`] = kit_mastered ? mastery_bonus : 0;
+                output[`${kit}_total_label`] = `+${kit_total}`;
+            }
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:arcanist change:arcanist_bns change:arcanist_quality", function(eventInfo) {
+        getAttrs(["mastery_bonus", "arcanist", "arcanist_bns", "arcanist_quality"], function(v) {
+            var output = {};
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+            const arcanist = v["arcanist"] == "on";
+            const arcanist_bns = parseInt(v["arcanist_bns"]);
+            const arcanist_quality = parseInt(v["arcanist_quality"]);
+
+            const arcanist_total = arcanist_quality + (arcanist ? mastery_bonus : 0) + arcanist_bns;
+
+            output["arcanist_mastery"] = arcanist ? mastery_bonus : 0;
+            output["arcanist_total_label"] = `+${arcanist_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:chemist change:chemist_bns change:chemist_quality", function(eventInfo) {
+        getAttrs(["mastery_bonus", "chemist", "chemist_bns", "chemist_quality"], function(v) {
+            var output = {};
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+            const chemist = v["chemist"] == "on";
+            const chemist_bns = parseInt(v["chemist_bns"]);
+            const chemist_quality = parseInt(v["chemist_quality"]);
+
+            const chemist_total = chemist_quality + (chemist ? mastery_bonus : 0) + chemist_bns;
+
+            output["chemist_mastery"] = chemist ? mastery_bonus : 0;
+            output["chemist_total_label"] = `+${chemist_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:climbing change:climbing_bns change:climbing_quality", function(eventInfo) {
+        getAttrs(["mastery_bonus", "climbing", "climbing_bns", "climbing_quality"], function(v) {
+            var output = {};
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+            const climbing = v["climbing"] == "on";
+            const climbing_bns = parseInt(v["climbing_bns"]);
+            const climbing_quality = parseInt(v["climbing_quality"]);
+
+            const climbing_total = climbing_quality + (climbing ? mastery_bonus : 0) + climbing_bns;
+
+            output["climbing_mastery"] = climbing ? mastery_bonus : 0;
+            output["climbing_total_label"] = `+${climbing_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:impersonation change:impersonation_bns change:impersonation_quality", function(eventInfo) {
+        getAttrs(["mastery_bonus", "impersonation", "impersonation_bns", "impersonation_quality"], function(v) {
+            var output = {};
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+            const impersonation = v["impersonation"] == "on";
+            const impersonation_bns = parseInt(v["impersonation_bns"]);
+            const impersonation_quality = parseInt(v["impersonation_quality"]);
+
+            const impersonation_total = impersonation_quality + (impersonation ? mastery_bonus : 0) + impersonation_bns;
+
+            output["impersonation_mastery"] = impersonation ? mastery_bonus : 0;
+            output["impersonation_total_label"] = `+${impersonation_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:infiltration change:infiltration_bns change:infiltration_quality", function(eventInfo) {
+        getAttrs(["mastery_bonus", "infiltration", "infiltration_bns", "infiltration_quality"], function(v) {
+            var output = {};
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+            const infiltration = v["infiltration"] == "on";
+            const infiltration_bns = parseInt(v["infiltration_bns"]);
+            const infiltration_quality = parseInt(v["infiltration_quality"]);
+
+            const infiltration_total = infiltration_quality + (infiltration ? mastery_bonus : 0) + infiltration_bns;
+
+            output["infiltration_mastery"] = infiltration ? mastery_bonus : 0;
+            output["infiltration_total_label"] = `+${infiltration_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:mechanic change:mechanic_bns change:mechanic_quality", function(eventInfo) {
+        getAttrs(["mastery_bonus", "mechanic", "mechanic_bns", "mechanic_quality"], function(v) {
+            var output = {};
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+            const mechanic = v["mechanic"] == "on";
+            const mechanic_bns = parseInt(v["mechanic_bns"]);
+            const mechanic_quality = parseInt(v["mechanic_quality"]);
+
+            const mechanic_total = mechanic_quality + (mechanic ? mastery_bonus : 0) + mechanic_bns;
+
+            output["mechanic_mastery"] = mechanic ? mastery_bonus : 0;
+            output["mechanic_total_label"] = `+${mechanic_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:navigation change:navigation_bns change:navigation_quality", function(eventInfo) {
+        getAttrs(["mastery_bonus", "navigation", "navigation_bns", "navigation_quality"], function(v) {
+            var output = {};
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+            const navigation = v["navigation"] == "on";
+            const navigation_bns = parseInt(v["navigation_bns"]);
+            const navigation_quality = parseInt(v["navigation_quality"]);
+
+            const navigation_total = navigation_quality + (navigation ? mastery_bonus : 0) + navigation_bns;
+
+            output["navigation_mastery"] = navigation ? mastery_bonus : 0;
+            output["navigation_total_label"] = `+${navigation_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:thaumaturgist change:thaumaturgist_bns change:thaumaturgist_quality", function(eventInfo) {
+        getAttrs(["mastery_bonus", "thaumaturgist", "thaumaturgist_bns", "thaumaturgist_quality"], function(v) {
+            var output = {};
+
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+            const thaumaturgist = v["thaumaturgist"] == "on";
+            const thaumaturgist_bns = parseInt(v["thaumaturgist_bns"]);
+            const thaumaturgist_quality = parseInt(v["thaumaturgist_quality"]);
+
+            const thaumaturgist_total = thaumaturgist_quality + (thaumaturgist ? mastery_bonus : 0) + thaumaturgist_bns;
+
+            output["thaumaturgist_mastery"] = thaumaturgist ? mastery_bonus : 0;
+            output["thaumaturgist_total_label"] = `+${thaumaturgist_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:mastery_bonus", function(eventInfo) {
+        const mastery_bonus = parseInt(eventInfo.newValue);
+        getSectionIDs("toolkits", function(ids) {
+            var attrs_to_get = ids.map(id => `repeating_toolkits_${id}_toolkit`).concat(ids.map(id => `repeating_toolkits_${id}_toolkit_bns`)).concat(ids.map(id => `repeating_toolkits_${id}_toolkit_quality`));
+            getAttrs(attrs_to_get, function(v) {
+                var output = {};
+
+                for (let id of ids) {
+                    const toolkit = v[`repeating_toolkits_${id}_toolkit`];
+                    const toolkit_mastered = toolkit == "on";
+                    if (!toolkit_mastered)
+                    continue;
+                    const toolkit_bns = parseInt(v[`repeating_toolkits_${id}_toolkit_bns`]);
+                    const toolkit_quality = parseInt(v[`repeating_toolkits_${id}_toolkit_quality`]);
+
+                    const toolkit_mastery_bonus = toolkit_mastered ? mastery_bonus : 0;
+                    const toolkit_total = toolkit_quality + toolkit_mastery_bonus + toolkit_bns;
+
+                    output[`repeating_toolkits_${id}_toolkit_mastery`] = toolkit_mastery_bonus;
+                    output[`repeating_toolkits_${id}_toolkit_total_label`] = `+${toolkit_total}`;
+                }
+
+                setAttrs(output, {silent: true});
+            });
+        });
+    });
+
+    on("change:repeating_toolkits", function(eventInfo) {
+        getAttrs(["repeating_toolkits_toolkit", "repeating_toolkits_toolkit_bns", "repeating_toolkits_toolkit_quality", "mastery_bonus"], function(v) {
+            var output = {};
+
+            const toolkit = v["repeating_toolkits_toolkit"];
+            const toolkit_mastered = toolkit == "on";
+            const toolkit_bns = parseInt(v["repeating_toolkits_toolkit_bns"]);
+            const toolkit_quality = parseInt(v["repeating_toolkits_toolkit_quality"]);
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const toolkit_mastery_bonus = toolkit_mastered ? mastery_bonus : 0;
+            const toolkit_total = toolkit_quality + toolkit_mastery_bonus + toolkit_bns;
+
+            output["repeating_toolkits_toolkit_mastery"] = toolkit_mastery_bonus;
+            output["repeating_toolkits_toolkit_total_label"] = `+${toolkit_total}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:repeating_traits", function(eventInfo) {
+        getAttrs(["repeating_traits_trait_lifeform", "character_lifeform"], function(v) {
+            var output = {};
+
+            const lifeform = v["repeating_traits_trait_lifeform"];
+            const character_lifeform = v["character_lifeform"];
+
+            if (lifeform != "")
+            return;
+
+            output["repeating_traits_trait_lifeform"] = character_lifeform;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:repeating_traits remove:repeating_traits change:_reporder:traits", function(eventInfo) {
+        getSectionIDsOrdered("repeating_traits", function(ids) {
+            var attrs_to_get = ids.map(id => `repeating_traits_${id}_trait_name`).concat(ids.map(id => `repeating_traits_${id}_trait_type`));
+
+            getAttrs(attrs_to_get, function(v) {
+                var output = {};
+                var trait_value_pair = "";
+
+                for (const id of ids) {
+                    const traitName = v[`repeating_traits_${id}_trait_name`];
+                    const traitType = v[`repeating_traits_${id}_trait_type`];
+                    if (traitName == undefined || traitName == "")
+                    continue;
+                    trait_value_pair += `${traitName} (${traitType} trait)\n`;
+                }
+
+                trait_value_pair = trait_value_pair.trimEnd();
+
+                output["trait_summary"] = trait_value_pair;
+
+                setAttrs(output, {silent: false});
+            });
+        });
+    });
+
+    on("change:repeating_features remove:repeating_features change:_reporder:features change:character_primary_class change:character_secondary_class change:adventuring_grade", function(eventInfo) {
+        getAttrs(["character_primary_class", "character_secondary_class", "adventuring_grade"], function(v) {
+            var output = {};
+
+            const adventuring_grade = v["adventuring_grade"];
+
+            const primary_class = v["character_primary_class"].toLowerCase();
+            const secondary_class = v["character_secondary_class"].toLowerCase();
+
+            getSectionIDsOrdered("repeating_features", function(ids) {
+                var attrs_to_get =
+                ids.map(id => `repeating_features_${id}_feature_name`)
+                .concat(ids.map(id => `repeating_features_${id}_feature_level`))
+                .concat(ids.map(id => `repeating_features_${id}_feature_class`))
+                .concat(ids.map(id => `repeating_features_${id}_feature_discipline`));
+
+                getAttrs(attrs_to_get, function(v) {
+                    var output = {};
+                    var primary_features = [];
+                    var secondary_features = [];
+                    var uncategorized_features = [];
+
+                    for (let i = 0; i < ids.length; i++) {
+                        const id = ids[i];
+                        const featureClass = v[`repeating_features_${id}_feature_class`];
+                        const featureDiscipline = v[`repeating_features_${id}_feature_discipline`];
+
+                        const featureName = v[`repeating_features_${id}_feature_name`];
+                        const featureLevel = v[`repeating_features_${id}_feature_level`];
+
+                        if ((primary_class == undefined || primary_class == "") && (secondary_class == undefined || secondary_class == "")) {
+                            uncategorized_features.push({
+                                feature_discipline: featureDiscipline,
+                                feature_class: featureClass,
+                                feature_name: featureName,
+                                feature_level: featureLevel
+                            });
+                            continue;
+                        }
+
+                        if (featureClass != undefined && featureClass != "") {
+                            if (primary_class.includes(featureClass.toLowerCase())) {
+                                primary_features.push({
+                                    feature_discipline: featureDiscipline,
+                                    feature_class: featureClass,
+                                    feature_name: featureName,
+                                    feature_level: featureLevel
+                                });
+                            } else if (secondary_class.includes(featureClass.toLowerCase())) {
+                                secondary_features.push({
+                                    feature_discipline: featureDiscipline,
+                                    feature_class: featureClass,
+                                    feature_name: featureName,
+                                    feature_level: featureLevel
+                                });
+                            }
+                        }
+                        else if (featureDiscipline != undefined && featureDiscipline != "") {
+                            if (primary_class.includes(featureDiscipline.toLowerCase())) {
+                                primary_features.push({
+                                    feature_discipline: featureDiscipline,
+                                    feature_class: featureClass,
+                                    feature_name: featureName,
+                                    feature_level: featureLevel
+                                });
+                            } else if (secondary_class.includes(featureDiscipline.toLowerCase())) {
+                                secondary_features.push({
+                                    feature_discipline: featureDiscipline,
+                                    feature_class: featureClass,
+                                    feature_name: featureName,
+                                    feature_level: featureLevel
+                                });
+                            }
+                        }
+                        else {
+                            uncategorized_features.push({
+                                feature_discipline: featureDiscipline,
+                                feature_class: featureClass,
+                                feature_name: featureName,
+                                feature_level: featureLevel
+                            });
+                        }
+                    }
+
+                    if (primary_features.length == 0 && secondary_features.length == 0 && uncategorized_features.length == 0) {
+                        for (let i = 0; i < ids.length; i++) {
+                            const id = ids[i];
+                            const featureName = v[`repeating_features_${id}_feature_name`];
+                            const featureLevel = v[`repeating_features_${id}_feature_level`];
+
+                            const featureClass = v[`repeating_features_${id}_feature_class`];
+                            const featureDiscipline = v[`repeating_features_${id}_feature_discipline`];
+
+                            uncategorized_features.push({
+                                feature_discipline: featureDiscipline,
+                                feature_class: featureClass,
+                                feature_name: featureName,
+                                feature_level: featureLevel
+                            });
+                        }
+                    }
+
+                    primary_features.sort((a, b) => a.feature_level - b.feature_level);
+                    secondary_features.sort((a, b) => a.feature_level - b.feature_level);
+                    uncategorized_features.sort((a, b) => {
+                        if (a.feature_discipline.toLowerCase() < b.feature_discipline.toLowerCase()) return -1;
+                        if (a.feature_discipline.toLowerCase() > b.feature_discipline.toLowerCase()) return 1;
+                        if (a.feature_class.toLowerCase() < b.feature_class.toLowerCase()) return -1;
+                        if (a.feature_class.toLowerCase() > b.feature_class.toLowerCase()) return 1;
+                        return a.feature_level - b.feature_level;
+                    });
+
+                    var final_string = "";
+                    if (primary_features.length > 0) {
+                        const primary_discipline = primary_features.find(feature => feature.feature_discipline !== undefined && feature.feature_discipline !== null && feature.feature_discipline !== "")?.feature_discipline || "";
+                        const primary_class = primary_features.find(feature => feature.feature_class !== undefined && feature.feature_class !== null && feature.feature_class !== "")?.feature_class || "";
+                        final_string += `Primary Class (${primary_discipline} ${primary_class}) features\n`;
+                        for (let feature of primary_features) {
+                            final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
+                        }
+                    }
+                    if (secondary_features.length > 0 && adventuring_grade != copper_rank) {
+                        const secondary_discipline = secondary_features.find(feature => feature.feature_discipline !== undefined && feature.feature_discipline !== null && feature.feature_discipline !== "")?.feature_discipline || "";
+                        const secondary_class = secondary_features.find(feature => feature.feature_class !== undefined && feature.feature_class !== null && feature.feature_class !== "")?.feature_class || "";
+                        final_string += `Secondary Class (${secondary_discipline} ${secondary_class}) features\n`;
+                        for (let feature of secondary_features) {
+                            final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
+                        }
+                    }
+                    if (uncategorized_features.length > 0) {
+                        final_string += `Uncategorized features\n`;
+                        for (let feature of uncategorized_features) {
+                            final_string += `  ${feature.feature_name} (Rank ${feature.feature_level})\n`;
+                        }
+                    }
+
+                    output["feature_summary"] = final_string.trimEnd();
+
+                    setAttrs(output, {silent: false});
+                });
+            });
+        });
+    });
+
+    on("change:quirk_summary change:trait_summary change:feature_summary", function(eventInfo) {
+        getAttrs(["quirk_summary", "trait_summary", "feature_summary"], function(v) {
+            var output = {};
+
+            const quirk_summary = v["quirk_summary"];
+            const trait_summary = v["trait_summary"];
+            const feature_summary = v["feature_summary"];
+
+            var all_text = "";
+            if (quirk_summary != undefined && quirk_summary != "")
+            all_text += "Quirks\n" + quirk_summary.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
+            if (trait_summary != undefined && trait_summary != "")
+            all_text += "Traits\n" + trait_summary.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
+            if (feature_summary != undefined && feature_summary != "")
+            all_text += "Features\n" + feature_summary.split("\n").map(line => `  ${line}`).join("\n") + "\n\n";
+
+            output["quirk_traits_features_summary"] = all_text.trimEnd();
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:repeating_equipment remove:repeating_equipment change:_reporder:equipment", function(eventInfo) {
+        getSectionIDsOrdered("repeating_equipment", function(ids) {
+            var attrs_to_get = ids.map(id => `repeating_equipment_${id}_equipment_name`).concat(ids.map(id => `repeating_equipment_${id}_equipment_quantity`)).concat(ids.map(id => `repeating_equipment_${id}_equipment_weight`)).concat("added_slots");
+
+            getAttrs(attrs_to_get, function(v) {
+                var output = {};
+                var equipment_value_pair = "";
+                var total_weight = 0;
+                const added_slots = parseInt(v["added_slots"]);
+                const total_slots = 8 + added_slots;
+
+                for (const id of ids) {
+                    const equipmentName = v[`repeating_equipment_${id}_equipment_name`];
+                    const equipmentQuantity = parseInt(v[`repeating_equipment_${id}_equipment_quantity`]);
+                    if (equipmentName == undefined || equipmentName == "")
+                    continue;
+                    equipment_value_pair += `${equipmentName} (${equipmentQuantity})\n`;
+                }
+
+                equipment_value_pair = equipment_value_pair.trimEnd();
+
+                output["equipment_summary"] = equipment_value_pair;
+
+                for (const id of ids) {
+                    const equipmentWeight = parseFloat(v[`repeating_equipment_${id}_equipment_weight`]);
+                    const equipmentQuantity = parseFloat(v[`repeating_equipment_${id}_equipment_quantity`]);
+                    if (equipmentQuantity == 0 || equipmentWeight == 0)
+                    continue;
+                    total_weight += equipmentQuantity * equipmentWeight;
+                }
+
+                output["equipment_weight_label"] = `${total_weight}/${total_slots}`;
+
+                setAttrs(output, {silent: false});
+            });
+        });
+    });
+
+    on("change:added_slots", function(eventInfo) {
+        getAttrs(["added_slots", "equipment_weight_label"], function(v) {
+            var output = {};
+            const added_slots = parseInt(v["added_slots"]);
+            const total_slots = 8 + added_slots;
+            const equipment_weight_label = v["equipment_weight_label"];
+            const total_weight = parseInt(equipment_weight_label.split("/")[0]);
+
+            output["equipment_weight_label"] = `${total_weight}/${total_slots}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:repeating_bonds change:fond_memories remove:repeating_bonds change:_reporder:bonds", function(eventInfo) {
+        var output = {};
+
+        getSectionIDsOrdered("repeating_bonds", function(ids) {
+            var attrs_to_get = ids.map(id => `repeating_bonds_${id}_bond_name`).concat(ids.map(id => `repeating_bonds_${id}_bond_level`));
+            attrs_to_get.push("fond_memories");
+            getAttrs(attrs_to_get, function(v) {
+                const fond_memories = parseInt(v["fond_memories"]);
+                var bond_strength = 0;
+                const bond_amount = ids.length;
+
+                var bond_lines = [];
+                for (let i = 0; i < ids.length; i++) {
+                    const id = ids[i];
+                    const bondName = v[`repeating_bonds_${id}_bond_name`];
+                    const bondLevel = v[`repeating_bonds_${id}_bond_level`];
+                    if (bondName == undefined || bondName == "" || bondLevel == undefined || bondLevel == "")
+                    continue;
+                    bond_lines.push(`${bondName} (Rank ${bondLevel})`);
+                    bond_strength += parseInt(bondLevel);
+                }
+
+                var bond_label = "";
+                bond_label += `Fond memories: ${fond_memories}/50\n`;
+                bond_label += `Bond points: ${bond_strength}\n`;
+                bond_label += `Bonds: ${bond_amount}\n\n`;
+
+                bond_label += bond_lines.join('\n');
+
+                output["bond_amount_label"] = bond_label.trim();
+
+                setAttrs(output, {silent: true});
+            });
+        });
+    });
+
+    var getSectionIDsOrdered = function(sectionName, callback) {
+        'use strict';
+        getAttrs([`_reporder_${sectionName}`], function(v) {
+            getSectionIDs(sectionName, function(idArray) {
+                let reporderArray = v[`_reporder_${sectionName}`] ? v[`_reporder_${sectionName}`].toLowerCase().split(',') : [],
+                ids = [...new Set(reporderArray.filter(x => idArray.includes(x)).concat(idArray))];
+                callback(ids);
+            });
+        });
+    };
+
+    on("change:repeating_ranks change:_reporder:ranks remove:repeating_ranks", function(eventInfo) {
+        getSectionIDsOrdered("repeating_ranks", function(ids) {
+            var output = {};
+
+            for (var i = 0; i < ids.length; i++) {
+                var id = ids[i];
+
+                output[`repeating_ranks_${id}_rank_level`] = i + 1;
+                output[`repeating_ranks_${id}_rank_level_label`] = `Rank ${i + 1}`;
+            }
+
+            setAttrs(output, {silent: true});
+
+            const name_ranks_attributes = ids.map(id => `repeating_ranks_${id}_rank_name`).concat(ids.map(id => `repeating_ranks_${id}_rank_level`));
+            getAttrs(name_ranks_attributes, function(v) {
+                var output = {};
+                var ranks_value_pair = "";
+
+                for (let i = 0; i < ids.length; i++) {
+                    const id = ids[i];
+                    const rankName = v[`repeating_ranks_${id}_rank_name`];
+                    const rankLevel = v[`repeating_ranks_${id}_rank_level`];
+                    if (rankName == undefined || rankName == "")
+                    continue;
+                    ranks_value_pair += `Level ${rankLevel}: ${rankName}\n`;
+                }
+
+                ranks_value_pair = ranks_value_pair.trimEnd();
+
+                output["rank_summary"] = ranks_value_pair;
+
+                setAttrs(output, {silent: true});
+            });
+        });
+    });
+
+    on("change:repeating_attacks change:repeating_attacks:attack_mastery change:repeating_attacks:attack_bonus", function(eventInfo) {
+        getAttrs(["repeating_attacks_attack_mastery", "repeating_attacks_attack_bonus", "mastery_bonus"], function(v) {
+            var output = {};
+
+            const mastery = v["repeating_attacks_attack_mastery"];
+            const attack_bonus = parseInt(v["repeating_attacks_attack_bonus"]);
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const attack_mastery = mastery == "on" ? mastery_bonus : 0;
+
+            const attack_roll = attack_mastery + attack_bonus;
+            const attack_roll_label = `+${attack_roll}`;
+
+            output["repeating_attacks_attack_mastery_value"] = attack_mastery;
+            output["repeating_attacks_attack_roll"] = attack_roll_label;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:repeating_attacks", function(eventInfo) {
+        const id = eventInfo.triggerName;
+        if (eventInfo["sourceAttribute"].includes("attack_rank")) {
+            const new_rank = eventInfo["newValue"];
+            var attrs_to_get = [`${id}_attack_damage_${new_rank}`, `${id}_attack_description_${new_rank}`, `${id}_attack_damage`, `${id}_attack_description`];
+            getAttrs(attrs_to_get, function(v) {
+                var output = {};
+
+                var new_damage = v[`${id}_attack_damage_${new_rank}`];
+                var new_description = v[`${id}_attack_description_${new_rank}`];
+
+                if (new_damage == undefined || new_damage == "") {
+                    new_damage = v[`${id}_attack_damage`];
+                    output[`${id}_attack_damage_${new_rank}`] = new_damage;
+                }
+                if (new_description == undefined || new_description == "") {
+                    new_description = v[`${id}_attack_description`];
+                    output[`${id}_attack_description_${new_rank}`] = new_description;
+                }
+
+                output[`${id}_attack_damage`] = new_damage;
+                output[`${id}_attack_description`] = new_description;
+
+                setAttrs(output, {silent: true});
+            });
+        }
+        else {
+            var attrs_to_get = [`${id}_attack_rank`, `${id}_attack_damage`, `${id}_attack_description`];
+            getAttrs(attrs_to_get, function(v) {
+                var output = {};
+
+                const rank = v[`${id}_attack_rank`];
+                const damage = v[`${id}_attack_damage`];
+                const description = v[`${id}_attack_description`];
+
+                output[`${id}_attack_damage_${rank}`] = damage;
+                output[`${id}_attack_description_${rank}`] = description;
+
+                setAttrs(output, {silent: true});
+            });
+        }
+    });
+
+    on("change:mastery_bonus", function(eventInfo) {
+        const mastery_bonus = parseInt(eventInfo.newValue);
+        getSectionIDs("attacks", function(ids) {
+            var attrs_to_get = ids.map(id => `repeating_attacks_${id}_attack_mastery`).concat(ids.map(id => `repeating_attacks_${id}_attack_bonus`));
+            getAttrs(attrs_to_get, function(v) {
+                var output = {};
+
+                for (let i = 0; i < ids.length; i++) {
+                    const id = ids[i];
+                    const mastery = v[`repeating_attacks_${id}_attack_mastery`];
+                    const attack_bonus = parseInt(v[`repeating_attacks_${id}_attack_bonus`]);
+
+                    const attack_mastery = mastery == "on" ? mastery_bonus : 0;
+
+                    const attack_roll = attack_mastery + attack_bonus;
+                    const attack_roll_label = `+${attack_roll}`;
+
+                    output[`repeating_attacks_${id}_attack_mastery_value`] = attack_mastery;
+                    output[`repeating_attacks_${id}_attack_roll`] = attack_roll_label;
+                }
+
+                setAttrs(output, {silent: true});
+            });
+        });
+    });
+
+    on("change:attunements_total change:attunements_max", function(eventInfo) {
+        getAttrs(["attunements_total", "attunements_max"], function(v) {
+            var output = {};
+
+            const attunements_total = parseInt(v["attunements_total"]);
+            const max_attunements = parseInt(v["attunements_max"]);
+            const attunements_label = `${attunements_total}/${max_attunements}`;
+
+            output["attunements_label"] = attunements_label;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:fire change:wood change:earth change:water change:wind change:metal change:order change:chaos change:astral", function(eventInfo) {
+        getAttrs(["fire", "wood", "earth", "water", "wind", "metal", "order", "chaos", "astral"], function(v) {
+            var output = {};
+
+            const fire = v["fire"] == "on" ? 1 : 0;
+            const wood = v["wood"] == "on" ? 1 : 0;
+            const earth = v["earth"] == "on" ? 1 : 0;
+
+            const water = v["water"] == "on" ? 1 : 0;
+            const wind = v["wind"] == "on" ? 1 : 0;
+            const metal = v["metal"] == "on" ? 1 : 0;
+
+            const order = v["order"] == "on" ? 2 : 0;
+            const chaos = v["chaos"] == "on" ? 2 : 0;
+            const astral = v["astral"] == "on" ? 2 : 0;
+
+            const total = fire + wood + earth + water + wind + metal + order + chaos + astral;
+
+            output["attunements_total"] = total;
+
+            setAttrs(output, {silent: false});
+        });
+    });
+
+    on("change:family change:friends change:enemies", function(eventInfo) {
+        getAttrs(["family", "friends", "enemies"], function(v) {
+            var output = {};
+
+            const family = v["family"];
+            const friends = v["friends"];
+            const enemies = v["enemies"];
+
+            const relationships = `Family: ${family}\nFriends: ${friends}\nEnemies: ${enemies}`;
+
+            output["relationships"] = relationships;
+
+            setAttrs(output, {silent: false});
+        });
+    });
+
+    on("change:background change:personality change:appearance change:goals change:beliefs change:relationships change:hobbies change:secrets change:fears change:hometown change:residence change:occupation", function(eventInfo) {
+        getAttrs(["background", "personality", "appearance", "goals", "beliefs", "relationships", "hobbies", "secrets", "fears", "hometown", "residence", "occupation"], function(v) {
+            var output = {};
+
+            const background = v["background"];
+            const personality = v["personality"];
+            const appearance = v["appearance"];
+            const goals = v["goals"];
+            const beliefs = v["beliefs"];
+            const relationships = v["relationships"];
+            const hobbies = v["hobbies"];
+            const secrets = v["secrets"];
+            const fears = v["fears"];
+            const hometown = v["hometown"];
+            const residence = v["residence"];
+            const occupation = v["occupation"];
+
+            var relationship_label = "";
+            if (relationships !== undefined && relationships !== "") {
+                relationship_label = relationships.split("\n").map(line => `    ${line}`).join("\n");
+            }
+
+            var details = ""
+            if (background !== undefined && background !== "")
+            details += `Background: ${background}\n`;
+            if (personality !== undefined && personality !== "")
+            details += `Personality: ${personality}\n`;
+            if (appearance !== undefined && appearance !== "")
+            details += `Appearance: ${appearance}\n`;
+            if (goals !== undefined && goals !== "")
+            details += `Goals: ${goals}\n`;
+            if (beliefs !== undefined && beliefs !== "")
+            details += `Beliefs: ${beliefs}\n`;
+            if (relationships !== undefined && relationships !== "")
+            details += `Relationships: \n${relationship_label}\n`;
+            if (hobbies !== undefined && hobbies !== "")
+            details += `Hobbies: ${hobbies}\n`;
+            if (secrets !== undefined && secrets !== "")
+            details += `Secrets: ${secrets}\n`;
+            if (fears !== undefined && fears !== "")
+            details += `Fears: ${fears}\n`;
+            if (hometown !== undefined && hometown !== "")
+            details += `Hometown: ${hometown}\n`;
+            if (residence !== undefined && residence !== "")
+            details += `Residence: ${residence}\n`;
+            if (occupation !== undefined && occupation !== "")
+            details += `Occupation: ${occupation}`;
+
+            output["details"] = details.trim();
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:base_defense change:bonus_defense change:mastery_bonus", function(eventInfo) {
+        getAttrs(["base_defense", "bonus_defense", "mastery_bonus"], function(v) {
+            var output = {};
+
+            const base_defense = parseInt(v["base_defense"]);
+            const bonus_defense = parseInt(v["bonus_defense"]);
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const total_defense = base_defense + bonus_defense + mastery_bonus;
+
+            output["total_defense"] = total_defense;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:base_fortitude change:bonus_fortitude change:mastery_bonus", function(eventInfo) {
+        getAttrs(["base_fortitude", "bonus_fortitude", "mastery_bonus"], function(v) {
+            var output = {};
+
+            const base_fortitude = parseInt(v["base_fortitude"]);
+            const bonus_fortitude = parseInt(v["bonus_fortitude"]);
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const total_fortitude = base_fortitude + bonus_fortitude + mastery_bonus;
+
+            output["total_fortitude"] = total_fortitude;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:base_willpower change:bonus_willpower change:mastery_bonus", function(eventInfo) {
+        getAttrs(["base_willpower", "bonus_willpower", "mastery_bonus"], function(v) {
+            var output = {};
+
+            const base_willpower = parseInt(v["base_willpower"]);
+            const bonus_willpower = parseInt(v["bonus_willpower"]);
+            const mastery_bonus = parseInt(v["mastery_bonus"]);
+
+            const total_willpower = base_willpower + bonus_willpower + mastery_bonus;
+
+            output["total_willpower"] = total_willpower;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    /*
+    on("change:spirit1 change:spirit2 change:spirit3 change:spirit4 change:spirit5", function(eventInfo) {
+    const changed_spirit = eventInfo.sourceAttribute;
+    const spirit_number = parseInt(changed_spirit.slice(-1));
+
+    getAttrs(["spirit1", "spirit2", "spirit3", "spirit4", "spirit5"], function(v) {
+    var output = {};
+
+    for (let i = 1; i <= 5; i++) {
+    const spirit = v[`spirit${i}`];
+    if (spirit == undefined || spirit == "")
+    continue;
+    if (i < spirit_number)
+    output[`spirit${i}_checked`] = "on";
+    else
+    output[`spirit${i}_checked`] = "0";
+    }
+
+    setAttrs(output, {silent: true});
+    });
+    });
+
+    on("change:barrier1 change:barrier2 change:barrier3", function(eventInfo) {
+    const changed_barrier = eventInfo.sourceAttribute;
+    const barrier_number = parseInt(changed_barrier.slice(-1));
+
+    getAttrs(["barrier1", "barrier2", "barrier3"], function(v) {
+    var output = {};
+
+    for (let i = 1; i <= 3; i++) {
+    const barrier = v[`barrier${i}`];
+    if (barrier == undefined || barrier == "")
+    continue;
+    if (i < barrier_number)
+    output[`barrier${i}_checked`] = "on";
+    else
+    output[`barrier${i}_checked`] = "0";
+    }
+
+    setAttrs(output, {silent: true});
+    });
+    });
+
+    on("change:glyph1 change:glyph2 change:glyph3", function(eventInfo) {
+    const changed_glyph = eventInfo.sourceAttribute;
+    const glyph_number = parseInt(changed_glyph.slice(-1));
+
+    getAttrs(["glyph1", "glyph2", "glyph3"], function(v) {
+    var output = {};
+
+    for (let i = 1; i <= 5; i++) {
+    const glyph = v[`glyph${i}`];
+    if (glyph == undefined || glyph == "")
+    continue;
+    if (i < glyph_number)
+    output[`glyph${i}_checked`] = "on";
+    else
+    output[`glyph${i}_checked`] = "0";
+    }
+
+    setAttrs(output, {silent: true});
+    });
+    });
+    */
+
+    on("change:movement_distance", function(eventInfo) {
+        getAttrs(["movement_distance"], function(v) {
+            var output = {};
+
+            const movement_distance = parseInt(v["movement_distance"]);
+            const movement_zone = Math.floor(movement_distance / 10);
+
+            output["movement_zone"] = movement_zone;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:movement_zone", function(eventInfo) {
+        getAttrs(["movement_zone"], function(v) {
+            var output = {};
+
+            const movement_zone = parseInt(v["movement_zone"]);
+            const movement_distance = movement_zone * 10;
+
+            output["movement_distance"] = movement_distance;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:max_movement_distance", function(eventInfo) {
+        getAttrs(["max_movement_distance"], function(v) {
+            var output = {};
+
+            const max_movement_distance = parseInt(v["max_movement_distance"]);
+            const max_movement_zone = Math.floor(max_movement_distance / 10);
+
+            output["max_movement_zone"] = max_movement_zone;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:max_movement_zone", function(eventInfo) {
+        getAttrs(["max_movement_zone"], function(v) {
+            var output = {};
+
+            const max_movement_zone = parseInt(v["max_movement_zone"]);
+            const max_movement_distance = max_movement_zone * 10;
+
+            output["max_movement_distance"] = max_movement_distance;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("sheet:opened", function(eventInfo) {
+        getSectionIDsOrdered("repeating_storages", function(ids) {
+            var output = {};
+            if (ids.length == 0) {
+                var newStorageLine = `repeating_storages_${generateRowID()}`;
+                output[`${newStorageLine}_storage_name`] = "Guild Storage";
+                output[`${newStorageLine}_storage_capacity`] = 20;
+                output[`${newStorageLine}_storage_description`] = "The Cloudbreaker Guild allows you to store 20 Item Slots worth of items and equipment. You can request that your stored items be delivered to you between missions. You can also store your items on your rides, allowing you to swap your inventory anytime as long as you can access your ride’s trunk. Different rides can store different amounts of items.";
+
+                setAttrs(output, {silent: false});
+            }
+        });
+    });
+
+    on("change:repeating_storages remove:repeating_storages change:_reporder:storages", function(eventInfo) {
+        getSectionIDsOrdered("repeating_storages", function(ids) {
+            var attrs_to_get = ids.map(id => `repeating_storages_${id}_storage_name`).concat(ids.map(id => `repeating_storages_${id}_storage_capacity`));
+            getAttrs(attrs_to_get, function(v) {
+                var output = {};
+                var storage_value_pair = "";
+                var total_capacity = 0;
+
+                for (let i = 0; i < ids.length; i++) {
+                    const id = ids[i];
+                    const storageName = v[`repeating_storages_${id}_storage_name`];
+                    const storageCapacity = parseInt(v[`repeating_storages_${id}_storage_capacity`]);
+                    if (storageName == undefined || storageName == "")
+                    continue;
+                    storage_value_pair += `${storageName} (${storageCapacity} slots)\n`;
+                    total_capacity += storageCapacity;
+                }
+
+                storage_value_pair = storage_value_pair.trimEnd();
+
+                output["storage_storages"] = storage_value_pair;
+                output["storage_total_capacity"] = total_capacity;
+
+                setAttrs(output, {silent: false});
+            });
+        });
+    });
+
+    on("change:repeating_possessions remove:repeating_possessions change:_reporder:possessions", function(eventInfo) {
+        getSectionIDsOrdered("repeating_possessions", function(ids) {
+            var attrs_to_get = ids.map(id => `repeating_possessions_${id}_possession_name`).concat(ids.map(id => `repeating_possessions_${id}_possession_weight`)).concat(ids.map(id => `repeating_possessions_${id}_possession_quantity`));
+            getAttrs(attrs_to_get, function(v) {
+                var output = {};
+                var possession_value_pair = "";
+                var total_weight = 0;
+
+                for (let i = 0; i < ids.length; i++) {
+                    const id = ids[i];
+                    const possessionName = v[`repeating_possessions_${id}_possession_name`];
+                    const possessionWeight = parseFloat(v[`repeating_possessions_${id}_possession_weight`]);
+                    const possessionQuantity = parseFloat(v[`repeating_possessions_${id}_possession_quantity`]);
+                    if (possessionName == undefined || possessionName == "")
+                    continue;
+                    possession_value_pair += `${possessionName} (${possessionQuantity})\n`;
+                    total_weight += possessionWeight * possessionQuantity;
+                }
+
+                possession_value_pair = possession_value_pair.trimEnd();
+
+                output["possession_items"] = possession_value_pair;
+                output["possessions_total_weight"] = total_weight;
+
+                setAttrs(output, {silent: false});
+            });
+        });
+    });
+
+    on("change:storage_total_capacity change:possessions_total_weight", function(eventInfo) {
+        getAttrs(["storage_total_capacity", "possessions_total_weight"], function(v) {
+            var output = {};
+
+            const storage_capacity = parseInt(v["storage_total_capacity"]);
+            const total_weight = parseInt(v["possessions_total_weight"]);
+
+            output["storage_total_weight_label"] = `${total_weight}/${storage_capacity}`;
+
+            setAttrs(output, {silent: true});
+        });
+    });
+
+    on("change:repeating_storages change:_reporder:storages remove:repeating_storages change:repeating_possessions remove:repeating_possessions change:_reporder:possessions", function(eventInfo) {
+        getSectionIDsOrdered("repeating_storages", function(storageIDs) {
+            getSectionIDsOrdered("repeating_possessions", function(possessionsIDs) {
+                var attrs_to_get = storageIDs.map(id => `repeating_storages_${id}_storage_capacity`).concat(storageIDs.map(id => `repeating_storages_${id}_storage_name`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_name`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_quantity`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_weight`)).concat(possessionsIDs.map(id => `repeating_possessions_${id}_possession_storage`));
+                getAttrs(attrs_to_get, function(v) {
+                    var output = {};
+                    var storage_value_pairs = {};
+
+                    for (let i = 0; i < storageIDs.length; i++) {
+                        const storageID = storageIDs[i];
+                        const storageName = v[`repeating_storages_${storageID}_storage_name`];
+                        const storageCapacity = parseInt(v[`repeating_storages_${storageID}_storage_capacity`]);
+                        storage_value_pairs[storageName] = {capacity: storageCapacity, weight: 0, items: []};
+                    }
+
+                    for (let i = 0; i < possessionsIDs.length; i++) {
+                        const possessionID = possessionsIDs[i];
+                        const possessionName = v[`repeating_possessions_${possessionID}_possession_name`];
+                        const possessionQuantity = parseInt(v[`repeating_possessions_${possessionID}_possession_quantity`]);
+                        const possessionWeight = parseFloat(v[`repeating_possessions_${possessionID}_possession_weight`]);
+                        var possessionStorage = v[`repeating_possessions_${possessionID}_possession_storage`];
+                        if (possessionStorage == undefined || possessionStorage == "")
+                        possessionStorage = "Guild Storage";
+                        storage_value_pairs[possessionStorage].weight += possessionQuantity * possessionWeight;
+                        storage_value_pairs[possessionStorage].items.push({name: possessionName, quantity: possessionQuantity});
+                    }
+
+                    var storage_label = "";
+                    for (const [storageName, storageData] of Object.entries(storage_value_pairs)) {
+                        storage_label += `${storageName} (${storageData.weight}/${storageData.capacity})\n`;
+                        for (let item of storageData.items) {
+                            storage_label += `  ${item.name} (${item.quantity})\n`;
+                        }
+                    }
+
+                    output["storage_contents"] = storage_label.trimEnd();
+
+                    setAttrs(output, {silent: true});
+                });
+            });
+        });
+    });
+
+    on("sheet:opened change:repeating_ranks remove:repeating_ranks change:repeating_features remove:repeating_features", function(eventInfos) {
+        getSectionIDs("ranks", function(ranktIDs) {
+            getSectionIDs("features", function(featuresIDs) {
+                var attrs_to_get = [];
+                attrs_to_get.push("character_primary_class");
+                attrs_to_get.push("character_secondary_class");
+
+                for (let i = 0; i < ranktIDs.length; i++) {
+                    attrs_to_get.push(`repeating_ranks_${ranktIDs[i]}_rank_name`);
+                }
+                for (let i = 0; i < featuresIDs.length; i++) {
+                    attrs_to_get.push(`repeating_features_${featuresIDs[i]}_feature_discipline`);
+                    attrs_to_get.push(`repeating_features_${featuresIDs[i]}_feature_class`);
+                }
+
+                getAttrs(attrs_to_get, function(v) {
+                    var output = {};
+                    const primary_class = v["character_primary_class"];
+                    const secondary_class = v["character_secondary_class"];
+
+                    var ranks = [];
+                    var rankName = null;
+                    for (let i = 0; i < ranktIDs.length; i++) {
+                        rankName = v[`repeating_ranks_${ranktIDs[i]}_rank_name`];
+                        if (rankName == undefined) continue;
+                        rankName = rankName.trim();
+                        if (!ranks.includes(rankName)) ranks.push(rankName);
+                    }
+
+                    var features = [];
+                    for (let i = 0; i < featuresIDs.length; i++) {
+                        const featureDiscipline = v[`repeating_features_${featuresIDs[i]}_feature_discipline`].trim();
+                        const featureClass = v[`repeating_features_${featuresIDs[i]}_feature_class`].trim();
+                        if (featureDiscipline == undefined || featureClass == undefined) continue;
+                        const feature = `${featureDiscipline} ${featureClass}`;
+                        if (!features.includes(feature)) features.push(feature);
+                    }
+
+                    var total_classes = [];
+                    for (let rank of ranks) {
+                        if (!total_classes.includes(rank)) total_classes.push(rank);
+                    }
+
+                    for (let feature of features) {
+                        if (!total_classes.includes(feature)) total_classes.push(feature);
+                    }
+
+                    var options = [];
+                    var value_to_add = {};
+                    var is_primary = false;
+                    for (let class_name of total_classes) {
+                        value_to_add = {};
+                        is_primary = primary_class.toLowerCase().includes(class_name.toLowerCase());
+                        value_to_add["value"] = class_name;
+                        if (is_primary) {
+                            value_to_add["selected"] = true;
+                        }
+                        options.push(value_to_add);
+                    }
+                    populateListOptions({
+                        elemSelector: '.sheet-primary',
+                        optionsArray: options,
+                        callback: () => {console.log("Primary class options populated");}
+                    });
+
+                    options = [];
+                    value_to_add = {};
+                    var is_secondary = false;
+                    for (let class_name of total_classes) {
+                        value_to_add = {};
+                        is_secondary = secondary_class.toLowerCase().includes(class_name.toLowerCase());
+                        value_to_add["value"] = class_name;
+                        if (is_secondary) {
+                            value_to_add["selected"] = true;
+                        }
+                        options.push(value_to_add);
+                    }
+                    populateListOptions({
+                        elemSelector: '.sheet-secondary',
+                        optionsArray: options,
+                        callback: () => {console.log("Secondary class options populated");}
+                    });
+                });
+            });
+        });
+    });
+</script>
