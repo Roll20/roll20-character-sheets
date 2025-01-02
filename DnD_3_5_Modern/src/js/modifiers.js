@@ -1,3 +1,8 @@
+const modmap = {
+    "str":"for",
+    "wis":"sag",
+}
+
 on("change:repeating_modifiers", (eventInfo) => {
     let modifierId = eventInfo.triggerName;
     if (eventInfo.sourceAttribute.includes("options-flag")) {
@@ -80,8 +85,10 @@ let getLargestModifierOfEachTypeFor = (modifiersList,attr_name) =>{
     let filteredModifierList = [];
     for(let modifier of modifiersList){
         const applyToOther = modifier.applyToOther?.map(apply => apply?.toLowerCase());
+        const applyToOtherMap = modifier.applyToOther?.map(apply => modmap[apply?.toLowerCase()]);
         if(modifier.applyTo.endsWith("_all") || !_name || modifier.applyTo.endsWith(_name) ||
-            (modifier.applyTo.endsWith("_other") && applyToOther?.includes(_name))
+            (modifier.applyTo.endsWith("_other") && applyToOther?.includes(_name)) ||
+            (modifier.applyTo.endsWith("_other") && applyToOtherMap?.includes(_name))
         ){
             let type = modifier.type;
             //Untyped && circumstance always apply
