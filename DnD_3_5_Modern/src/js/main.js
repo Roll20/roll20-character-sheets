@@ -8,4 +8,5 @@
 //=include classes.js
 //=include modifiers.js
 //=include saves.js
+//=include update.js
 
