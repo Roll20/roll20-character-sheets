@@ -13776,11 +13776,11 @@ function updateAilments(ailmentOverride=[], callback=()=>{}) {
 		/* Custom Ailments */
 		updateCustomAilments(["RoundEnd"], "standard", "true", function(returnValues) {
 		Object.assign(autoScriptOverrideList, returnValues.overrideList);
-		Object.assign(output, returnValues.output);
+		autoScriptOverrideList.output = {...autoScriptOverrideList.output, ...returnValues.output};
 	
 		updateCustomAilments(["OnAction", "WhenHit"], "decay", "true", function(returnValues) {
 		Object.assign(autoScriptOverrideList, returnValues.overrideList);
-		Object.assign(output, returnValues.output);
+		autoScriptOverrideList.output = {...autoScriptOverrideList.output, ...returnValues.output};
 	
 		/* AutoScripts */
 		resetConditionals();
@@ -14317,12 +14317,12 @@ on('clicked:rollCombat', (info) => {
 	let autoScriptOverrideList = {};
 	updateBleed("standard", function(returnValues) {
 	Object.assign(autoScriptOverrideList, returnValues.overrideList);
-	Object.assign(output, returnValues.output);
+	autoScriptOverrideList.output = {...autoScriptOverrideList.output, ...returnValues.output};
 		
 	/* Custom Ailments processing */
 	updateCustomAilments(["OnAction"], "standard", "false", function(returnValues) {
 	Object.assign(autoScriptOverrideList, returnValues.overrideList);
-	Object.assign(output, returnValues.output);
+	autoScriptOverrideList.output = {...autoScriptOverrideList.output, ...returnValues.output};
 
 	/* AutoScripts */
 	let AutoScript = "";
@@ -15879,12 +15879,12 @@ on('clicked:declareAction', (info) => {
 	let autoScriptOverrideList = {};
 	updateBleed("standard", function(returnValues) {
 	Object.assign(autoScriptOverrideList, returnValues.overrideList);
-	Object.assign(output, returnValues.output);
+	autoScriptOverrideList.output = returnValues.output;
 
 	/* Custom Ailments processing */
 	updateCustomAilments(["OnAction"], "standard", "false", function(returnValues) {
 	Object.assign(autoScriptOverrideList, returnValues.overrideList);
-	Object.assign(output, returnValues.output);
+	autoScriptOverrideList.output = {...autoScriptOverrideList.output, ...returnValues.output};
 
 	/* AutoScripts */
 	let AutoScript = "";
@@ -17117,7 +17117,7 @@ Block and Evade also include Defensive */
 /* callback: Function to be run on returnValues. Defaults to an empty function */
 /* messageHeaderTitle: Title of the standard chat message printed by the function */
 async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true", sendMessage="true", overrideList={}, callback=() => {}, messageHeaderTitle=getTranslationByKeyCustom("AutoEffects", "autoeffect-title")) {
-	
+
 	/* If using generic token mode, switches to the correct token before applying incoming AutoEffects */
 	let tokenId = (overrideList.tokenId != undefined) ? overrideList.tokenId : "";
 	changeActiveToken(tokenId, () => {
@@ -17187,6 +17187,10 @@ async function AutoScriptMain(inputAutoScript, triggerType="None", collect="true
 	let stylingList = parseAutoScriptStyling(values.autoScriptStyling);
 	
 	let output = {};
+	if (overrideList.output) {
+		output = overrideList.output;
+		delete overrideList.output;
+	}
 	let tempOutput = {};
 	let returnValues = { checkResult:"success", error:false };
 	let challengeRollList = {};
