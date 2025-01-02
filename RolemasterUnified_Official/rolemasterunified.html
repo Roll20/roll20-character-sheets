@@ -5418,7 +5418,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision ed256d48d349d2861bbe135f3bfdccd39b239b44
+Revision b238f1ca01f63462a35840fa08a1d67bd021f0fb
 
 
 <hr>
@@ -7692,7 +7692,6 @@ onCheck("clicked:repeating_creatureskill:creatureskillrollmod", (ev) => {
 // listranks is the currently known lists, indexed by list name.  Value is ranks (int)
 function _spellDoQuery(prevranks, listtype, filter, subtarget, cost, listranks) {
   const costarray = generateCostArray(cost);
-  var data = getCharmancerData();
 
   getCompendiumQueryPending(`Category:SpellList ${listtype}`, (lists) => {
       // So on error we get 1 element and it has an expansion set to 0.
@@ -7728,7 +7727,6 @@ function _spellDoQuery(prevranks, listtype, filter, subtarget, cost, listranks) 
 // base lists and display that.
 function _spellDoBaseListQuery(selectedbase, profession, cost, previousranks) {
   const costarray = generateCostArray(cost);
-  var data = getCharmancerData();
 
   if (selectedbase.length == 0) {
     return;
@@ -9079,14 +9077,17 @@ function getSpecialisedSkillRanks(results) {
   });
 }
 
+/**
+ * Remember; data.levelup may be nil
+ */
 function levelUpStart(_) {
     console.log("********** Level up start **********");
     pendingInfo();
     RMUCosts.reset();
     const data = getCharmancerData();
 
-    let previous_level = parseIntDefault(data.levelup.values.current_level);
-
+    let previous_level = parseIntDefault(data.levelup?.values?.current_level, 0);
+ 
     getAttrsPending(["level", "xp", "xplevel", "dp_misc", "dp_used_misc"], (ev) => {
 	// If we are at any level but 0, we get 2 free statgains.
 	const level = parseIntDefault(ev.level, 0);
@@ -9261,13 +9262,13 @@ function levelUpStart(_) {
     addPendingFunction('Talents add', () => {
       const data = getCharmancerData();
       console.log("data.level.values.current_level");
-      if (previous_level !=  parseIntDefault(data.levelup.values.current_level, 0)) {
+      if (previous_level !=  parseIntDefault(data.levelup?.values?.current_level, 0)) {
 	return;
       }
       for (obj of savedtalents) {
 	addRepeatingSection('added_talents', 'talent', (id) => {
 	    setCharmancerOptions(`${id}_talent`, "Category:Talent",
-		{ selected: data.levelup.data[obj] });
+		{ selected: data?.levelup?.data[obj] });
 	});
       }
     });
@@ -12345,8 +12346,8 @@ const potentialInventory = {
   "Herb": true, "Herbs": true,
 };
 
-drop.handleDrop = function() {
-  console.log("Handle drop");
+drop.handleDrop = function(ev) {
+  console.log("Handle drop", ev);
 
   getAttrs(['drop_name', 'drop_data', 'drop_category'], (drop) => {
       console.log(drop);
@@ -13790,14 +13791,18 @@ function handleBleed(currentphase, bleedlist) {
   }
 
   // Shift current phase to 1..4
-  currentphase = (currentphase - 1) % 4 + 1;
+  const relphase = (currentphase - 1) % 4 + 1;
 
   const bleeds = JSON.parse(bleedlist);
   let total = 0;
 
   for (let bleed of bleeds) {
-    if (bleed.phase == currentphase) {
-      console.log(`Bleed: ${bleed.phase}  ${bleed.amount}`);
+    if (bleed.phase == relphase) {
+      // May be some bleeds without a startphase.
+      if (bleed.startphase && bleed.startphase == currentphase) {
+	console.log("First turn; skipping");
+	continue;
+      }
       total += bleed.amount;
     }
   }
@@ -14781,7 +14786,7 @@ injury.parseInjuryString = function (str) {
 		    } else {
 			bl = [];
 		    }
-		    bl.push({phase: relphase, amount: value});
+		    bl.push({startphase: currentphase, phase: relphase, amount: value});
 		    // Get the total bleed
 		    let bleed = 0;
 		    for (const b of bl){

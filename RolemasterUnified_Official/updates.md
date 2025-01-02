@@ -1,3 +1,12 @@
+# 2024-12-24
+
+- The Maybe a release.. and maybe not a release release.  Not sure if this will got out
+on Christmas Eve.
+- Fix a bug where "Clear Saved" breaks level up
+- Remove some dead code in level up - should be a trivial smidge faster.
+- Discover the 'actions-test' was not being called - re-enable and fix errors
+- Fix bleed so you don't bleed straight after being hit
+
 # 2024-12-17
 
 - Edit talents so you can delete excess talents (@major havok)
