@@ -44,7 +44,6 @@ let updateAllSaves = (modifierList) => {
     let saves = ["ref","vig","vol"];
     getAttrs(["dex_mod","con_mod","sag_mod","ref_base","ref_mod","vig_base","vig_mod","vol_base","vol_mod"], (values) => {
         for(let save of saves){
-            debugger;
             let carac = 0;
             let caracName = 0;
             switch (save){
@@ -63,6 +62,7 @@ let updateAllSaves = (modifierList) => {
             }
             let base = parseInt(values[`${save}_base`]) || 0;
             let mod = parseInt(values[`${save}_mod`]) || 0;
+            let save_name = `^{saves.${save}.roll}`
             let total = base+carac;
             let mods = mod;
             let roll = `${carac}[${caracName}] + ${base}[${save}_base] + ${mod}[${save}_mod]`
@@ -73,7 +73,7 @@ let updateAllSaves = (modifierList) => {
             }
             let toUpdate = {};
             toUpdate[`${save}_total`] = total + mods;
-            toUpdate[`${save}_roll_value`] = `&{template:main} {{titre=Test de ${save}}} {{subtitle=@{character_name} }} {{Jet=[[1d20+${roll}]]}}`;
+            toUpdate[`${save}_roll_value`] = `&{template:main} {{titre=${save_name}}} {{subtitle=@{character_name} }} {{Jet=[[1d20+${roll}]]}}`;
             toUpdate[`${save}_modified`] = !!mods;
             setAttrs(toUpdate);
         }

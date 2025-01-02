@@ -125,7 +125,7 @@ let updateAttack = (attackId, modifiers) => {
 }
 
 let getRollFromModifiers = (modifiers) => {
-    let baseRoll = "&{template:attack} {{titre=Attaque avec @{name}}} {{subtitle=@{character_name}}}";
+    let baseRoll = `&{template:attack} {{titre=^{rolltemplate.attack.with} @{name}}} {{subtitle=@{character_name}}}`;
     let attackRoll = "1d20+@{bba}[BAB]+@{atq-carac-val}[Caracteristic]+@{atq-bonus}[Enhancement Bonus]+@{atq-bonus-2}[Misc Bonus]";
     let damageRoll = "@{dgt-base}[Base Damage]+@{dgt-carac-val}[Caracteristic]+@{dgt-bonus}[Enhancement Bonus]";
     for(let modifier of modifiers){

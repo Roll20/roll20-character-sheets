@@ -82,7 +82,7 @@ function updateSkillList(skillList,modifierList){
             }
             toUpdate[`${skillId}_modified`] = (!!mods);
             toUpdate[`${skillId}_total`] = total+mods;
-            toUpdate[`${skillId}_skillrollvalue`] = `&{template:main} {{titre=Test de '@{name}'}} {{subtitle=@{character_name} }} {{Jet=[[1d20+${roll}]]}}`;
+            toUpdate[`${skillId}_skillrollvalue`] = `&{template:main} {{titre=^{rolltemplate.rollof} '@{name}'}} {{subtitle=@{character_name} }} {{Jet=[[1d20+${roll}]]}}`;
             toUpdate[`${skillId}_caracname`] = caracname;
         }
         setAttrs(toUpdate, {silent: true});

@@ -38,7 +38,6 @@ let updateModifierAndApplyChanges = (modifier_id) => {
 
 //Get all modifiers Id then call a recursive method to build a list of modifiers
 let getModifiersByTypeAndUpdateValues = (applicationType,callback,callback_id) => {
-    debugger;
     getSectionIDs("repeating_modifiers", (idArray) => {
         getNextModifierByTypeAndUpdateValues(idArray, [], applicationType,callback,callback_id);
     });
@@ -79,7 +78,6 @@ let getNextModifierByTypeAndUpdateValues = (modifierToGetList,modifierList,appli
 }
 
 let getLargestModifierOfEachTypeFor = (modifiersList,attr_name) =>{
-    debugger;
     let types = {};
     let _name = attr_name?.toLowerCase();
     let filteredModifierList = [];

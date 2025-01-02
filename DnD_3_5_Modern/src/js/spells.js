@@ -9,7 +9,7 @@ for(let i = 0 ; i < 10; i++) {
 }
 
 
-let baseSpell = "&{template:spell} {{name=Sort: @{name}}}";
+let baseSpell = "&{template:spell} {{name=^{spells.spell}: @{name}}}";
 let update_spell = (id,level) =>{
     let school = id+"_school";
     let casting = id+"_casting-time";
