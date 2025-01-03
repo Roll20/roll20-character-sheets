@@ -4614,8 +4614,28 @@
     /* Attribute Related Fuctions */
     async function setActiveAttribute(cache, set_values) {
         const temp = {};
-        clog(cache, temp, `setActiveAttribute(${cache.active_attributes})`);
+        temp.active_attributes = [
+            'attack mastery',
+            'combat technique',
+            'defense mastery',
+            'demure',
+            'energized',
+            'extra actions',
+            'extra defenses',
+            'fragile',
+            'hardboiled',
+            'inept attack',
+            'inept defense',
+            'massive damage',
+            'reduced damage',
+            'social mastery',
+            'tough',
+            'unassailable',
+            'unsettled',
+        ];
+        clog(cache, temp, `setActiveAttribute()`);
         // Collect required values
+        /*
         temp.get_attrs = [];
         if (!Array.isArray(cache.active_attributes)) {
             const string_to_array = [];
@@ -4624,9 +4644,11 @@
         } else {
             cache.active_attributes.push('massive damage');
         }
+        */
         // Calculate Base Value
-        for (let i = 0; i < cache.active_attributes.length; i++) {
-            switch(cache.active_attributes[i]) {
+        for (let i = 0; i < temp.active_attributes.length; i++) {
+            /*
+            switch(temp.active_attributes[i]) {
                 case 'attack mastery':
                     if (cache.acv === undefined) {
                         cache.acv = Math.round((
@@ -4792,35 +4814,26 @@
                     }
                 break;
             }
+            */
             // Apply values
-            switch(cache.active_attributes[i]) {
+            switch(temp.active_attributes[i]) {
                 case 'attack mastery':
-                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
+                    cache.attrdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.acv += a.elevel;
                         }
                     });
                 break;
                 case 'combat technique':
-                    cache.hardboiled = 0;
-                    cache.reflexes = 0;
-                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
-                        for (let i = 0, n = a.config.length; i < n; i++) {
+                    cache.attrdb[temp.active_attributes[i]].forEach(a => {
+                        for (let i = 0; i < a.config.length; i++) {
                             switch (a.config[i].name) {
                                 case 'hardboiled':
-                                    cache.active_attributes.unshift('hardboiled');
+                                    temp.active_attributes.unshift('hardboiled');
                                     if (a.active) {
                                         cache.hardboiled += (a.config[i].rank * 10);
                                     }
                                 break;
-                                /*
-                                case 'lightning reflexes':
-                                    cache.attribute.unshift('lightning reflexes');
-                                    if (a.active) {
-                                        cache.reflexes += (a.config[i].rank);
-                                    }
-                                break;
-                                */
                             }
                         }
                     });
@@ -4828,37 +4841,63 @@
                     cache.shockvalue += cache.hardboiled;
                 break;
                 case 'defense mastery':
-                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
+                    cache.attrdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.dcv += a.elevel;
                         }
                     });
                 break;
+                case 'demure':
+                    cache.defectdb[temp.active_attributes[i]].forEach(a => {
+                        if (a.active) {
+                            cache.scv -= Math.max(0, (a.level * 2));
+                        }
+                    });
+                break;
+                case 'energized':
+                    cache.attrdb[temp.active_attributes[i]].forEach(a => {
+                        if (a.active) {
+                            cache.energy += (a.elevel * 10);
+                        }
+                    });
+                break;
                 case 'extra actions':
-                    cache.actions = 1;
-                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
+                    cache.attrdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.actions += a.elevel;
                         }
                     });
                 break;
                 case 'extra defenses':
-                    cache.defenses = 0;
-                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
+                    cache.attrdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.defenses += a.elevel;
                         }
                     });
                 break;
-                case 'energized':
-                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
+                case 'fragile':
+                    cache.defectdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
-                            cache.energy += (a.elevel * 10);
+                            cache.health -= Math.max(0, (a.level * 10));
+                        }
+                    });
+                break;
+                case 'inept attack':
+                    cache.defectdb[temp.active_attributes[i]].forEach(a => {
+                        if (a.active) {
+                            cache.acv -= Math.max(0, a.level);
+                        }
+                    });
+                break;
+                case 'inept defense':
+                    cache.defectdb[temp.active_attributes[i]].forEach(a => {
+                        if (a.active) {
+                            cache.dcv -= Math.max(0, a.level);
                         }
                     });
                 break;
                 case 'massive damage':
-                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
+                    cache.attrdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             const limited = a.limiters.find(l => {
                                 return l.name === 'focussed damage' || l.name === 'targeted damage';
@@ -4867,40 +4906,56 @@
                         }
                     });
                 break;
-                case 'social mastery':
-                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
+                case 'reduced damage':
+                    cache.defectdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
-                            const scv = a.elevel * 2;
-                            cache.scv += scv;
-                            //cache.society += scv;
+                            cache.dm -= Math.max(0, a.level);
+                        }
+                    });
+                break;
+                case 'social mastery':
+                    cache.attrdb[temp.active_attributes[i]].forEach(a => {
+                        if (a.active) {
+                            cache.scv += (a.elevel * 2);
                         }
                     });
                 break;
                 case 'tough':
-                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
+                    cache.attrdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.health += (a.elevel * 10);
                         }
                     });
                 break;
                 case 'unassailable':
-                    cache.attrdb[cache.active_attributes[i]].forEach(a => {
+                    cache.attrdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.sanity += (a.elevel * 2);
                         }
                     });
                 break;
+                case 'unsettled':
+                    cache.defectdb[temp.active_attributes[i]].forEach(a => {
+                        if (a.active) {
+                            cache.sanity -= Math.max(0 ,(a.level * 2));
+                        }
+                    });
+                break;
             }
-            if (cache.active_attributes[i] === 'massive damage') {
+            if (
+                temp.active_attributes[i] === 'massive damage' ||
+                temp.active_attributes[i] === 'reduced damage'
+            ) {
                 cache.statsdb.dm.base = cache.dm;
                 set_values.static_character_dm_base = cache.statsdb.dm.base;
             }
         }
+        /*
         if (
-            cache.active_attributes[0] === 'energized' ||
-            cache.active_attributes[0] === 'tough' ||
-            cache.active_attributes[0] === 'unassailable' ||
-            cache.active_attributes[0] === 'social mastery'
+            temp.active_attributes[0] === 'energized' ||
+            temp.active_attributes[0] === 'tough' ||
+            temp.active_attributes[0] === 'unassailable' ||
+            temp.active_attributes[0] === 'social mastery'
         ) {
             const derived_values = {
                 'energized':'energy',
@@ -4909,13 +4964,14 @@
                 'social mastery':'society',
             };
             const point_max = 
-                cache[derived_values[cache.active_attributes[0]]] + 
-                cache.statsdb[derived_values[cache.active_attributes[0]].temp];
+                cache[derived_values[temp.active_attributes[0]]] + 
+                cache.statsdb[derived_values[temp.active_attributes[0]].temp];
             const point_loss = 
-                cache.statsdb[derived_values[cache.active_attributes[0]].damage] + 
-                cache.statsdb[derived_values[cache.active_attributes[0]].stun];
-            setStatusStateDescription(cache, set_values, derived_values[cache.active_attributes[0]], point_max, point_loss);
+                cache.statsdb[derived_values[temp.active_attributes[0]].damage] + 
+                cache.statsdb[derived_values[temp.active_attributes[0]].stun];
+            setStatusStateDescription(cache, set_values, derived_values[temp.active_attributes[0]], point_max, point_loss);
         }
+        */
     }
 
     function getSizeTemplate(cache) {
@@ -5679,12 +5735,6 @@
 
     async function setDefectCharacteristic(cache, set_values, query) {
         const defectCharacteristics = {
-            "achilles heel":{
-                1: "rare attack form",
-                2: "uncommon attack form",
-                3: "common attack form",
-                "default": ""
-            },
             "awkward size":{
                 0: "Medium",
                 1: "Large",
@@ -5770,10 +5820,10 @@
                 3: "-3 Attack Combat Value",
                 "default": ""
             },
-            "inept defence":{
-                1: "-1 Defence Combat Value",
-                2: "-2 Defence Combat Value",
-                3: "-3 Defence Combat Value",
+            "inept defense":{
+                1: "-1 Defense Combat Value",
+                2: "-2 Defense Combat Value",
+                3: "-3 Defense Combat Value",
                 "default": ""
             },
             "involuntary change":{
@@ -5918,23 +5968,35 @@
                 "default": ""
             }
         };
-        for (let i = 0; i < query.db.config.length; i++) {
-            if (
-                query.db.config[i].name === 'aspect_name' ||
-                query.db.config[i].name === 'aspect_stat' ||
-                query.db.config[i].name === 'aspect_type'
-            ) { query[`${query.db.config[i].name}`] = query.db.config[i].rank; }
+        let characteristic = '';
+        switch (query.defect) {
+            case 'achilles heel':
+                query.config_index = cache.defectdb['achilles heel'][query.index].config.findIndex(c => c.name === 'achilles heel');
+                characteristic = 
+                    cache.defectdb['achilles heel'][query.index].config[query.config_index].rank ||
+                    'not configued';
+            break;
+            case 'shortcoming':
+                for (let i = 0; i < query.db.config.length; i++) {
+                    if (
+                        query.db.config[i].name === 'aspect_name' ||
+                        query.db.config[i].name === 'aspect_stat' ||
+                        query.db.config[i].name === 'aspect_type'
+                    ) { query[`${query.db.config[i].name}`] = query.db.config[i].rank; }
+                }
+                characteristic =
+                    `${getTranslationByKey(query.aspect_stat)} - ` +
+                    `${getTranslationByKey(query.aspect_type)} ${getTranslationByKey("aspect")}` +
+                    `${
+                        query.aspect_name === query.aspect_stat ? "" :
+                        " (" + getTranslationByKey(query.aspect_name.toKebobCase()) + ")"
+                    }`;
+            break;
+            default:
+                characteristic = 
+                    defectCharacteristics[`${query.defect}`][query.level] || 
+                    defectCharacteristics[`${query.defect}`]["default"];
         }
-        const shortcoming = query.defect === 'shortcoming' ?
-            `${getTranslationByKey(query.aspect_stat)} - ` +
-            `${getTranslationByKey(query.aspect_type)} ${getTranslationByKey("aspect")}` +
-            `${
-                query.aspect_name === query.aspect_stat ? "" :
-                " (" + getTranslationByKey(query.aspect_name.toKebobCase()) + ")"
-            }` : false;
-        const characteristic = shortcoming !== false ? shortcoming :
-            defectCharacteristics[`${query.defect}`][query.level] || 
-            defectCharacteristics[`${query.defect}`]["default"];
         return characteristic;
     }
 
@@ -10673,9 +10735,9 @@
                 case 'repeating_attribute_configuration':
                 case 'repeating_defect_configuration':
                     const all_configurations = [
+                        'achilles heel',
                         'aspect_stat',
                         'attacktype',
-                        //'attribute',
                         'attributetype',
                         'augmented_stat',
                         'broad category',
@@ -10706,6 +10768,7 @@
                         'taunt',
                         'techniques',
                         'transform',
+                        'trigger',
                         'unaffected',
                         'weapon_class'
                     ];
@@ -10823,6 +10886,7 @@
                         `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
+                /*
                 case 'choose_aspect_name':
                     query.title = `${getTranslationByKey("choose-aspect")}`;
                     query.options = '';
@@ -10842,11 +10906,14 @@
                         `|${getTranslationByKey("minor")},minor`;
                     query.last = query.next;
                 break;
+                */
+                /*
                 case 'choose_enemy':
                     query.title = `${getTranslationByKey("choose-enemy")}`;
                     query.options = '';
                     query.last = query.next;
                 break;
+                */
                 case 'damage_type':
                     query.title =
                         `${getTranslationByKey("choose")} ` +
@@ -10869,15 +10936,19 @@
                         `|${getTranslationByKey("ranged")},ranged`;
                     query.last = query.next;
                 break;
+                case 'achilles heel':
                 case 'enemy':
                 case 'group':
                 case 'origin template':
                 case 'species':
+                case 'trigger':
                     query.title =
+                        query.next === 'achilles heel' ? `${getTranslationByKey("choose-achilles-heel")}` :
                         query.next === 'enemy' ? `${getTranslationByKey("choose-enemy")}` :
                         query.next === 'group' ? `${getTranslationByKey("choose-group")}` :
                         query.next === 'origin template' ? `${getTranslationByKey("choose-origin-template")}` :
                         query.next === 'species' ? `${getTranslationByKey("choose-species")}` :
+                        query.next === 'trigger' ? `${getTranslationByKey("choose-triggers")}` :
                         '';
                     query.options = `|${query.db.config[query.config_index].rank}`;
                     query.last = query.next;
@@ -11827,11 +11898,11 @@
                         query.load = query.selection.split("~");
                         query.config_index = int(query.load[1]);
                         query.config_name = query.load[0];
-                        query.next = (
+                        query.next =
                             query.config_name === 'unaffected' &&
                             query.all_attributes &&
-                            !query.all_weapons
-                        ) ? 'weapon_enhancement' : query.config_name;
+                            !query.all_weapons ?
+                        'weapon_enhancement' : query.config_name;
                     break;
                     // => configurations
                     case 'aspect_stat':
@@ -11906,20 +11977,6 @@
                         set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
-                    /*
-                    case 'choose_aspect_name':
-                        query.aspect_name = query.selection;
-                        query.next = 'defect_menu';
-                    break;
-                    case 'choose_aspect_stat':
-                        query.aspect_stat = query.selection;
-                        query.next = 'choose_aspect_type';
-                    break;
-                    case 'choose_aspect_type':
-                        query.aspect_type = query.selection;
-                        query.next = query.aspect_type === 'all' ? 'defect_menu' : 'choose_aspect_name';
-                    break;
-                    */
                     case 'damage_type':
                     case 'weapon_class':
                         if (query.selection === 'exit') { return; }
@@ -11940,14 +11997,18 @@
                         set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
+                    case 'achilles heel':
                     case 'defense type':
                     case 'enemy':
                     case 'group':
                     case 'origin template':
                     case 'species':
+                    case 'trigger':
                         if (query.selection !== 0) {
                             query.db.config[query.config_index].rank = query.selection;
-                            set_values[cache.source] = await setConfiguration(cache, set_values, query);
+                            set_values[cache.source] = cache.type === 'attribute' ?
+                                await setConfiguration(cache, set_values, query) :
+                                await setDefectConfiguration(cache, set_values, query);
                             query.next = 'exit';
                         }
                     break;
@@ -12396,6 +12457,12 @@
                             set_values[`repeating_defect_${query.row_id}_${query.fields[i]}`] = value;
                         }
                         switch (query.defect) {
+                            case 'easily distracted':
+                                query.config.push({
+                                    name: 'trigger',
+                                    rank: ''
+                                });
+                            break;
                             case 'shortcoming':
                                 query.config.push({
                                     name: 'aspect_name',
@@ -12637,6 +12704,17 @@
                             set_values[`${cache.source_path}_configuration`] = query.type === 'attribute' ?
                                 await setConfiguration(cache, set_values, query) :
                                 await setDefectConfiguration(cache, set_values, query);
+                            const defect_values = [
+                                'inept attack',
+                                'inept defense',
+                                'reduced damage',
+                                'demure',
+                                'fragile',
+                                'unsettled'
+                            ];
+                            if (defect_values.findIndex(d => d === query.defect) !== -1) {
+                                await setDerivedValues(cache, set_values);
+                            }
                         }
                         if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
                             setPowerFluxPoolPoints(cache, set_values);
@@ -13449,6 +13527,7 @@
         const defects = {
             'acv':'inept attack',
             'dcv':'inept defense',
+            'dm':'reduced damage',
             'scv':'demure',
             'health':'fragile',
             'sanity':'unsettled'
@@ -13478,12 +13557,18 @@
         cache.acv = Math.round((cache.body + cache.mind + cache.soul) / 3);
         cache.dcv = Math.round((cache.body + cache.mind + cache.soul) / 3);
         cache.scv = Math.round((cache.mind + cache.soul) / 2) * int(cache.rulesdb.rules_optional_society_status);
+        cache.dm = 5;
+        cache.actions = 1;
+        cache.defenses = 0;
+        cache.hardboiled = 0;
+        /*
         cache.active_attributes = [];
         for (let i = 0; i < derived_values.length; i++) {
             if (cache[derived_values[i]] !== 0) {
                 cache.active_attributes.push(derived_attributes[derived_values[i]]);
             }
         }
+        */
         // Apply defects
         // Apply attributes to combat values
         await setActiveAttribute(cache, set_values);
