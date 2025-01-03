@@ -296,7 +296,7 @@ The utility mod HeroSystem6eHeroic_HDImporter (available in the quick install me
 
 ### HERO Roller
 
-If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. It is not currently 100% compatible due to a case sensitivity problem (HS6e uses *OCV* and HS6eH uses *ocv*). Adding a fix for this issue is on my list of things to do.
+If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. Version 1.3.1 of Hero Roller adds support for HS6eH attribute names. 
 
 # <a id="tokens">Tokens</a>
 
@@ -331,4 +331,4 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
 *First version by Villain In Glasses, August 1, 2021.*
-*Last updated by Villain in Glasses on November 12, 2024 to represent the sheet as of Version 3.80.*
+*Last updated by Villain in Glasses on November 21, 2024 to represent the sheet as of Version 3.81 and updated support in Hero Roller 1.3.1.*
