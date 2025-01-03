@@ -15219,7 +15219,7 @@
 			
 			<div class="item-version-information">
 				<!-- Update version before release. -->
-				<input type="text" value="3.92" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+				<input type="text" value="4.0" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 			</div>
 		</div>
 		
@@ -16279,10 +16279,10 @@
 			version = 3.92;
 		}
 		
-		// if (version < 3.91) {
-		// 	// No updates needed.
-		// 	version = 3.91;
-		// }
+		if (version < 4.00) {
+			// No updates needed.
+			version = 4.00;
+		}
 		
 		if (version != origVersion) {
 			console.log(`Updated ${name} from ${origVersion} to ${version}`);
@@ -19070,9 +19070,9 @@
 			const optionId = String(maxSkillNum + reserveSkillNum + baseCombatSkillNum).padStart(2,'0');
 			
 			getAttrs(["skillName"+lowId, "skillType"+lowId, "skillLevels"+lowId, "skillCP"+lowId, "skillName"+highId, "skillType"+highId, "skillLevels"+highId, "skillCP"+highId, "skillName"+startId, "skillType"+startId, "skillLevels"+startId, "skillCP"+startId, "skillName"+optionId, "skillType"+optionId, "skillLevels"+optionId, "skillCP"+optionId, "optionFewerLanguages", "treasures"], function(values) {
-				var attributes = new Object();
 				
-				let option = (values.optionFewerLanguages === "on") ? true : false;
+				var attributes = new Object();
+				const option = (values.optionFewerLanguages === "on") ? true : false;
 				let theString = "";
 				
 				if ((!option) && (highId === startId)) {
@@ -19152,16 +19152,16 @@
 		// All calculations handled by the function calculateLanguageSkillCost(...).
 		// optionFewerLanguages, when true, shifts five language skill over to combat skills.
 		
-		getAttrs(["enhancerLing", "skillFluency76","skillLiteracy76", "skillFluency77","skillLiteracy77", "skillFluency78", "skillLiteracy78", "skillFluency79", "skillLiteracy79", "skillFluency80", "skillLiteracy80", "skillFluency81", "skillLiteracy81", "skillFluency82", "skillLiteracy82", "skillFluency83", "skillLiteracy83", "skillFluency84", "skillLiteracy84", "optionLiteracyCostsPoints", "optionFewerLanguages"], function(values) {
+		getAttrs(["enhancerLing", "skillFluency76","skillLiteracy76", "skillFluency77", "skillLiteracy77", "skillFluency78", "skillLiteracy78", "skillFluency79", "skillLiteracy79", "skillFluency80", "skillLiteracy80", "skillFluency81", "skillLiteracy81", "skillFluency82", "skillLiteracy82", "skillFluency83", "skillLiteracy83", "skillFluency84", "skillLiteracy84", "optionLiteracyCostsPoints", "optionFewerLanguages"], function(values) {
 			var attributes = new Object();
 			
 			const linguist = values.enhancerLing;
-			const literacyCost = (values.optionLiteracyCostsPoints !== 0) ? 1 : 0;
+			const literacyCost = (values.optionLiteracyCostsPoints === "on") ? 1 : 0;
 			let skillId = "";
 			let tempCost = 0;
 			let languageSkillsCost = 0;	
 			const startCount = maxSkillNum + reserveSkillNum + baseCombatSkillNum + flexSkillNum + maxCombatLevelNum + 1;
-			const endCount = startCount + maxLanguageSkillNum - ( (values.optionFewerLanguages === "on") ? flexSkillNum : 0 );
+			const endCount = startCount-1 + maxLanguageSkillNum - ( (values.optionFewerLanguages === "on") ? flexSkillNum : 0 );
 			
 			for (let i = startCount; i <= endCount; i++) {
 				// General combat skills with costs determined by their skill type or levels.
@@ -19206,13 +19206,13 @@
 	function swapLanguagePositions(lowId, highId) {
 		on("clicked:skillDown"+lowId+" clicked:skillUp"+highId, function() {
 			
-			// We need to account for optionFewerLanguages. When true, the last five skills need to be skipped. We will need to pass additional IDs.
+			// We need to account for optionFewerLanguages. When true, the last five skills need to be skipped.
 			const startId = String(maxSkillNum + reserveSkillNum + baseCombatSkillNum + flexSkillNum + maxCombatLevelNum + 1).padStart(2,'0');
 			const optionId = String(maxSkillNum + reserveSkillNum + baseCombatSkillNum + maxCombatLevelNum + maxLanguageSkillNum).padStart(2,'0');
 			
 			getAttrs(["skillName"+lowId, "skillFluency"+lowId, "skillLiteracy"+lowId, "skillCP"+lowId, "skillName"+highId, "skillFluency"+highId, "skillLiteracy"+highId, "skillCP"+highId, "skillName"+startId, "skillFluency"+startId, "skillLiteracy"+startId, "skillCP"+startId, "skillName"+optionId, "skillFluency"+optionId, "skillLiteracy"+optionId, "skillCP"+optionId, "optionFewerLanguages"], function(values) {
-				var attributes = new Object();
 				
+				var attributes = new Object();
 				let option = (values.optionFewerLanguages === "on") ? true : false;
 				let theString = "";
 				
@@ -19296,12 +19296,12 @@
 		getAttrs(["enhancerJack","enhancerLing","enhancerSch","enhancerSci","enhancerTrav","enhancerWell","interactionLevels","intellectLevels","agilityLevels","noncombatLevels","overallLevels"], function(values) {
 			
 			// Check for purchased enhancers and assign costs of 3 CP for each.
-			const enhancerJackStatus=values.enhancerJack;
-			const enhancerLingStatus=values.enhancerLing;
-			const enhancerSchStatus=values.enhancerSch;
-			const enhancerSciStatus=values.enhancerSci;
-			const enhancerTravStatus=values.enhancerTrav;
-			const enhancerWellStatus=values.enhancerWell;
+			const enhancerJackStatus = values.enhancerJack;
+			const enhancerLingStatus = values.enhancerLing;
+			const enhancerSchStatus = values.enhancerSch;
+			const enhancerSciStatus = values.enhancerSci;
+			const enhancerTravStatus = values.enhancerTrav;
+			const enhancerWellStatus = values.enhancerWell;
 			let enhancerJackCost = 0;
 			let enhancerLingCost = 0;
 			let enhancerSchCost = 0;
@@ -19309,24 +19309,40 @@
 			let enhancerTravCost = 0;
 			let enhancerWellCost = 0;
 					
-			if (enhancerJackStatus!=0) {
+			if (enhancerJackStatus !== 0) {
 				enhancerJackCost = 3;
 			}
-			if (enhancerLingStatus!=0) {
+			if (enhancerLingStatus !== 0) {
 				enhancerLingCost = 3;
 			}
-			if (enhancerSchStatus!=0) {
+			if (enhancerSchStatus !== 0) {
 				enhancerSchCost = 3;
 			}
-			if (enhancerSciStatus!=0) {
+			if (enhancerSciStatus !== 0) {
 				enhancerSciCost = 3;
 			}
-			if (enhancerTravStatus!=0) {
+			if (enhancerTravStatus !== 0) {
 				enhancerTravCost = 3;
 			}
-			if (enhancerWellStatus!=0) {
+			if (enhancerWellStatus !== 0) {
 				enhancerWellCost = 3;
 			}
+			
+			// Calculate costs for each wide-scope non-combat level.
+			const interactionSkillLevels = parseInt(values.interactionLevels)||0;
+			const intellectSkillLevels = parseInt(values.intellectLevels)||0;
+			const agilitySkillLevels = parseInt(values.agilityLevels)||0;
+			const noncombatSkillLevels = parseInt(values.noncombatLevels)||0;
+			const overallSkillLevels = parseInt(values.overallLevels)||0;
+			
+			let interactionSkillLevelsCost = interactionSkillLevels*4;
+			let intellectSkillLevelsCost = intellectSkillLevels*4;
+			let agilitySkillLevelsCost = agilitySkillLevels*6;
+			let noncombatSkillLevelsCost = noncombatSkillLevels*10;
+			let overallSkillLevelsCost = overallSkillLevels*12;
+			
+			skillEnhancersCost = enhancerJackCost+enhancerLingCost+enhancerSchCost+enhancerSciCost+enhancerTravCost+enhancerWellCost;
+			skillLevelsCost = interactionSkillLevelsCost+intellectSkillLevelsCost+agilitySkillLevelsCost+noncombatSkillLevelsCost+overallSkillLevelsCost;
 			
 			setAttrs({
 				"enhancerJackCP":enhancerJackCost,
@@ -19334,38 +19350,14 @@
 				"enhancerSchCP":enhancerSchCost,
 				"enhancerSciCP":enhancerSciCost,
 				"enhancerWellCP":enhancerWellCost,
-				"enhancerTravCP":enhancerTravCost
-			});
-			
-			// Calculate costs for each wide-scope non-combat level.
-			const interactionSkillLevels=parseInt(values.interactionLevels)||0;
-			const intellectSkillLevels=parseInt(values.intellectLevels)||0;
-			const agilitySkillLevels=parseInt(values.agilityLevels)||0;
-			const noncombatSkillLevels=parseInt(values.noncombatLevels)||0;
-			const overallSkillLevels=parseInt(values.overallLevels)||0;
-			
-			let interactionSkillLevelsCost= interactionSkillLevels*4;
-			let intellectSkillLevelsCost= intellectSkillLevels*4;
-			let agilitySkillLevelsCost= agilitySkillLevels*6;
-			let noncombatSkillLevelsCost= noncombatSkillLevels*10;
-			let overallSkillLevelsCost= overallSkillLevels*12;
-			
-			setAttrs({
+				"enhancerTravCP":enhancerTravCost,
 				"interactionLevelsCP":interactionSkillLevelsCost,
 				"intellectLevelsCP":intellectSkillLevelsCost,
 				"agilityLevelsCP":agilitySkillLevelsCost,
 				"noncombatLevelsCP":noncombatSkillLevelsCost,
-				"overallLevelsCP":overallSkillLevelsCost
+				"overallLevelsCP":overallSkillLevelsCost,
+				"hiddenEnhancerSkillsCost":skillEnhancersCost+skillLevelsCost
 			});
-			
-			skillEnhancersCost = enhancerJackCost+enhancerLingCost+enhancerSchCost+enhancerSciCost+enhancerTravCost+enhancerWellCost;
-			skillLevelsCost=interactionSkillLevelsCost+intellectSkillLevelsCost+agilitySkillLevelsCost+noncombatSkillLevelsCost+overallSkillLevelsCost;
-			
-			setAttrs({
-				"hiddenEnhancerSkillsCost":skillEnhancersCost+skillLevelsCost,
-			});
-			
-		//addSkillPoints();
 		});
 	});
 	
