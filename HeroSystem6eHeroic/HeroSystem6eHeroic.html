@@ -16259,6 +16259,8 @@
 				attributes["skillCP"+oldId] = 0;
 			}
 			
+			updateEnhancerSkillCosts();
+			
 			version = 4.01;
 		}
 		
@@ -18504,7 +18506,7 @@
 	}
 	
 	
-	function calculateSkillChance(skillType,skillCP,enhancerJack,enhancerSch,enhancerSci,enhancerTrav,strengthChance,dexterityChance,constitutionChance,intelligenceChance,egoChance,presenceChance,interactionSkillLevels,intellectSkillLevels,agilitySkillLevels,bonusLevels) {
+	function calculateSkillChance(skillType, skillCP, enhancerJack, enhancerSch, enhancerSci, enhancerTrav, strengthChance, dexterityChance, constitutionChance, intelligenceChance, egoChance, presenceChance, interactionSkillLevels, intellectSkillLevels, agilitySkillLevels, bonusLevels) {
 		// Calculates the skill roll chance for a general skill.
 		//
 		// A bit crazy, but all of these variables need to be passed to this function for the the switch function contained below
@@ -19270,12 +19272,17 @@
 	}
 	
 	
-	/* Skill Enhancers and wide-scope noncombat levels */
+	// /* Skill Enhancers and wide-scope noncombat levels */
 	on("change:enhancerJack change:enhancerLing change:enhancerSch change:enhancerSci change:enhancerTrav change:enhancerWell change:interactionLevels change:intellectLevels change:agilityLevels change:noncombatLevels change:overallLevels", function () {
 		// If any of the enhancers or wide-scope noncombat levels change (anything in the lower right skill block) recalculate their costs.
 		// Because enhancers lower the costs of other skills and wide-scope levels change the rolls of other other skills, the
 		// non-combat skills 01-50 will have their costs and roll chances recalculated as well.
 		
+		updateEnhancerSkillCosts();
+	});
+	
+	
+	function updateEnhancerSkillCosts() {
 		getAttrs(["enhancerJack","enhancerLing","enhancerSch","enhancerSci","enhancerTrav","enhancerWell","interactionLevels","intellectLevels","agilityLevels","noncombatLevels","overallLevels"], function(values) {
 			
 			// Check for purchased enhancers and assign costs of 3 CP for each.
@@ -19297,21 +19304,21 @@
 			skillLevelsCost = interactionSkillLevelsCost+intellectSkillLevelsCost+agilitySkillLevelsCost+noncombatSkillLevelsCost+overallSkillLevelsCost;
 			
 			setAttrs({
-				"enhancerJackCP":enhancerJackCost,
-				"enhancerLingCP":enhancerLingCost,
-				"enhancerSchCP":enhancerSchCost,
-				"enhancerSciCP":enhancerSciCost,
-				"enhancerWellCP":enhancerWellCost,
-				"enhancerTravCP":enhancerTravCost,
-				"interactionLevelsCP":interactionSkillLevelsCost,
-				"intellectLevelsCP":intellectSkillLevelsCost,
-				"agilityLevelsCP":agilitySkillLevelsCost,
-				"noncombatLevelsCP":noncombatSkillLevelsCost,
-				"overallLevelsCP":overallSkillLevelsCost,
-				"hiddenEnhancerSkillsCost":skillEnhancersCost+skillLevelsCost
+				"enhancerJackCP": enhancerJackCost,
+				"enhancerLingCP": enhancerLingCost,
+				"enhancerSchCP": enhancerSchCost,
+				"enhancerSciCP": enhancerSciCost,
+				"enhancerWellCP": enhancerWellCost,
+				"enhancerTravCP": enhancerTravCost,
+				"interactionLevelsCP": interactionSkillLevelsCost,
+				"intellectLevelsCP": intellectSkillLevelsCost,
+				"agilityLevelsCP": agilitySkillLevelsCost,
+				"noncombatLevelsCP": noncombatSkillLevelsCost,
+				"overallLevelsCP": overallSkillLevelsCost,
+				"hiddenEnhancerSkillsCost": skillEnhancersCost + skillLevelsCost
 			});
 		});
-	});
+	}
 	
 	
 	/* ----------------------------------------------------- */
