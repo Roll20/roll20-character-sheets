@@ -18920,7 +18920,7 @@
 			let tempCost = 0;
 			let combatSkillsCost = 0;	
 			let startCount = maxSkillNum + reserveSkillNum + 1;
-			let endCount = startCount + baseCombatSkillNum + ( (values.optionFewerLanguages === "on") ? flexSkillNum : 0 );
+			let endCount = maxSkillNum + reserveSkillNum + baseCombatSkillNum + ( (values.optionFewerLanguages === "on") ? flexSkillNum : 0 );
 			
 			for (let i = startCount; i <= endCount; i++) {
 				// General combat skills with costs determined by their skill type or levels.
@@ -19267,55 +19267,24 @@
 	on("change:enhancerJack change:enhancerLing change:enhancerSch change:enhancerSci change:enhancerTrav change:enhancerWell change:interactionLevels change:intellectLevels change:agilityLevels change:noncombatLevels change:overallLevels", function () {
 		// If any of the enhancers or wide-scope noncombat levels change (anything in the lower right skill block) recalculate their costs.
 		// Because enhancers lower the costs of other skills and wide-scope levels change the rolls of other other skills, the
-		// non-combat skills 01-30 will have their costs and roll chances recalculated as well.
+		// non-combat skills 01-50 will have their costs and roll chances recalculated as well.
 		
 		getAttrs(["enhancerJack","enhancerLing","enhancerSch","enhancerSci","enhancerTrav","enhancerWell","interactionLevels","intellectLevels","agilityLevels","noncombatLevels","overallLevels"], function(values) {
 			
 			// Check for purchased enhancers and assign costs of 3 CP for each.
-			const enhancerJackStatus = values.enhancerJack;
-			const enhancerLingStatus = values.enhancerLing;
-			const enhancerSchStatus = values.enhancerSch;
-			const enhancerSciStatus = values.enhancerSci;
-			const enhancerTravStatus = values.enhancerTrav;
-			const enhancerWellStatus = values.enhancerWell;
-			let enhancerJackCost = 0;
-			let enhancerLingCost = 0;
-			let enhancerSchCost = 0;
-			let enhancerSciCost = 0;
-			let enhancerTravCost = 0;
-			let enhancerWellCost = 0;
-					
-			if (enhancerJackStatus !== 0) {
-				enhancerJackCost = 3;
-			}
-			if (enhancerLingStatus !== 0) {
-				enhancerLingCost = 3;
-			}
-			if (enhancerSchStatus !== 0) {
-				enhancerSchCost = 3;
-			}
-			if (enhancerSciStatus !== 0) {
-				enhancerSciCost = 3;
-			}
-			if (enhancerTravStatus !== 0) {
-				enhancerTravCost = 3;
-			}
-			if (enhancerWellStatus !== 0) {
-				enhancerWellCost = 3;
-			}
+			const enhancerJackCost = (values.enhancerJack === "on") ? 3 : 0;
+			const enhancerLingCost = (values.enhancerLing === "on") ? 3 : 0;
+			const enhancerSchCost = (values.enhancerSch === "on") ? 3 : 0;
+			const enhancerSciCost = (values.enhancerSci === "on") ? 3 : 0;
+			const enhancerTravCost = (values.enhancerTrav === "on") ? 3 : 0;
+			const enhancerWellCost = (values.enhancerWell === "on") ? 3 : 0;
 			
 			// Calculate costs for each wide-scope non-combat level.
-			const interactionSkillLevels = parseInt(values.interactionLevels)||0;
-			const intellectSkillLevels = parseInt(values.intellectLevels)||0;
-			const agilitySkillLevels = parseInt(values.agilityLevels)||0;
-			const noncombatSkillLevels = parseInt(values.noncombatLevels)||0;
-			const overallSkillLevels = parseInt(values.overallLevels)||0;
-			
-			let interactionSkillLevelsCost = interactionSkillLevels*4;
-			let intellectSkillLevelsCost = intellectSkillLevels*4;
-			let agilitySkillLevelsCost = agilitySkillLevels*6;
-			let noncombatSkillLevelsCost = noncombatSkillLevels*10;
-			let overallSkillLevelsCost = overallSkillLevels*12;
+			const interactionSkillLevelsCost = (parseInt(values.interactionLevels)||0)*4;
+			const intellectSkillLevelsCost = (parseInt(values.intellectLevels)||0)*4;
+			const agilitySkillLevelsCost = (parseInt(values.agilityLevels)||0)*6;
+			const noncombatSkillLevelsCost = (parseInt(values.noncombatLevels)||0)*10;
+			const overallSkillLevelsCost = (parseInt(values.overallLevels)||0)*12;
 			
 			skillEnhancersCost = enhancerJackCost+enhancerLingCost+enhancerSchCost+enhancerSciCost+enhancerTravCost+enhancerWellCost;
 			skillLevelsCost = interactionSkillLevelsCost+intellectSkillLevelsCost+agilitySkillLevelsCost+noncombatSkillLevelsCost+overallSkillLevelsCost;
@@ -22013,7 +21982,6 @@
 			
 			let isAoE = (values["weaponAreaEffect"+weaponId] === "on") ? true : false;
 			const useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
-			// const optionMinusOne = (values.optionD6MinusOne === "on") ? true : false;
 			let isNormal = (values["weaponNormalDamage"+weaponId] === "on") ? true : false;
 			let dispDoS = (values.displayDegreeOfSuccess === "on") ? true : false;
 			let stunMod = parseInt(values["weaponStunMod"+weaponId])||0;
