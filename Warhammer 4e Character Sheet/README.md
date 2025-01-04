@@ -81,6 +81,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Jan 4th 2025 v1.74c
+
+- New Custom Critical Dmg Wounds rules, which can be configured in the settings tab. Allows for changing of the static crit dmg wounds from the core crit tables. There are 3 customization options, 2 are add or replace normal dmg with a custom dmg die (e.g. 1d10, 1d10!, etc), and the 3rd a custom rule which will take the Tens die of the critical roll as crit dmg wounds, and if the roll is a dubs crit it will roll another 1d100 and add the Tens die and contiune to do so if there are continous dub crits on the rolls. This is entended to add options for WFRP4e to simulate other crit dmg models like the popular WFRP2e feature Ulric's Fury.
+- Fix Char Roll showing when it should not.
+
+
 Dec 14th 2024 v1.74b
 
 - New Custom Race option added to Race dropdown menu, will allow entering owna Custom Race name. See setting's tab for Custom Race Stating Characteristics Modifier, this allows the Char Roll to generate starting Charactistics for the Customer Race.reset to menu by clicking the X.
