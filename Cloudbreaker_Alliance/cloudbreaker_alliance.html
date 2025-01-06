@@ -2,6 +2,11 @@
 
 <html>
 <div class="charsheet">
+    <datalist id="primary_class" class="sheet-classlist sheet-primary"></datalist>
+    <datalist id="secondary_class" class="sheet-classlist sheet-secondary"></datalist>
+    <datalist id="discipline_list" class="sheet-discipline"></datalist>
+    <datalist id="class_list" class="sheet-class"></datalist>
+    <datalist id="ranks_list" class="sheet-ranks"></datalist>
     <input class="sheet-tabstoggle" name="attr_sheetTab" type="hidden" value="character"/>
     <div class="sheet-header">
         <div>
@@ -100,14 +105,12 @@
                     ⬖ Primary Class:
                 </span>
                 <input name="attr_character_primary_class" type="text" list="primary_class"/>
-                <datalist id="primary_class" class="sheet-classlist sheet-primary"></datalist>
             </div>
             <div>
                 <span data-i18n="secondary-class-text">
                     ⬗ Secondary Class:
                 </span>
                 <input name="attr_character_secondary_class" type="text" list="secondary_class"/>
-                <datalist id="secondary_class" class="sheet-classlist sheet-secondary"></datalist>
             </div>
         </div>
         <!-- Quirks -->
@@ -1859,7 +1862,7 @@
                         <div class="sheet-repeatingFeature">
                             <div>
                                 <input data-i18n-placeholder="feature-name-input-placeholder" data-i18n-title="feature-name-input-title" name="attr_feature_name" placeholder="Feature name" title="Feature name" type="text"/>
-                                <input data-i18n-placeholder="feature-discipline-input-placeholder" data-i18n-title="feature-discipline-input-title" name="attr_feature_discipline" placeholder="Discipline" title="Feature discipline" type="text"/>
+                                <input list="discipline_list" data-i18n-placeholder="feature-discipline-input-placeholder" data-i18n-title="feature-discipline-input-title" name="attr_feature_discipline" placeholder="Discipline" title="Feature discipline" type="text" />
                                 <input class="sheet-folder" name="attr_feature_fold" type="checkbox"/>
                                 <span class="sheet-folder">
                                 </span>
@@ -1868,7 +1871,7 @@
                             <input class="sheet-folder" name="attr_feature_fold" type="hidden"/>
                             <div class="sheet-foldable">
                                 <div>
-                                    <input data-i18n-placeholder="feature-class-input-placeholder" data-i18n-title="feature-class-input-title" name="attr_feature_class" placeholder="Class" title="Class" type="text"/>
+                                    <input list="class_list" data-i18n-placeholder="feature-class-input-placeholder" data-i18n-title="feature-class-input-title" name="attr_feature_class" placeholder="Class" title="Class" type="text"/>
                                     <input data-i18n-title="feature-level-input-title" name="attr_feature_level" title="Feature level" type="number" value="1"/>
                                 </div>
                                 <textarea data-i18n-placeholder="feature-description-textarea-placeholder" name="attr_feature_description" placeholder="Feature description" style="width: 100%;"></textarea>
@@ -3280,7 +3283,7 @@
                 <fieldset class="repeating_ranks">
                     <div class="sheet-repeatingRank">
                         <div>
-                            <input data-i18n-placeholder="rank-name-input-placeholder" data-i18n-title="rank-name-input-title" name="attr_rank_name" placeholder="Discipline / Class" style="flex: 1 1 auto;" title="Discipline / Class" type="text"/>
+                            <input data-i18n-placeholder="rank-name-input-placeholder" data-i18n-title="rank-name-input-title" name="attr_rank_name" placeholder="Discipline / Class" style="flex: 1 1 auto;" title="Discipline / Class" type="text" list="ranks_list"/>
                             <input name="attr_rank_level" type="hidden"/>
                             <input name="attr_rank_level_label" type="hidden"/>
                             <span name="attr_rank_level_label" style="font-weight: bold;">
@@ -5839,6 +5842,10 @@
         });
     });
 
+    on("change:_reporder:ranks", function(eventInfos) {
+        console.log(eventInfos);
+    });
+
     on("sheet:opened change:repeating_ranks remove:repeating_ranks change:repeating_features remove:repeating_features", function(eventInfos) {
         getSectionIDs("ranks", function(ranktIDs) {
             getSectionIDs("features", function(featuresIDs) {
@@ -5869,12 +5876,16 @@
                     }
 
                     var features = [];
+                    var disciplines = [];
+                    var classes = [];
                     for (let i = 0; i < featuresIDs.length; i++) {
                         const featureDiscipline = v[`repeating_features_${featuresIDs[i]}_feature_discipline`].trim();
                         const featureClass = v[`repeating_features_${featuresIDs[i]}_feature_class`].trim();
                         if (featureDiscipline == undefined || featureClass == undefined) continue;
                         const feature = `${featureDiscipline} ${featureClass}`;
                         if (!features.includes(feature)) features.push(feature);
+                        if (!disciplines.includes(featureDiscipline)) disciplines.push(featureDiscipline);
+                        if (!classes.includes(featureClass)) classes.push(featureClass);
                     }
 
                     var total_classes = [];
@@ -5920,6 +5931,49 @@
                         elemSelector: '.sheet-secondary',
                         optionsArray: options,
                         callback: () => {console.log("Secondary class options populated");}
+                    });
+
+                    options = [];
+                    value_to_add = {};
+                    for (let class_name of total_classes) {
+                        value_to_add = {};
+                        value_to_add["value"] = class_name;
+                        options.push(value_to_add);
+                    }
+                    populateListOptions({
+                        elemSelector: '.sheet-ranks',
+                        optionsArray: options,
+                        callback: () => {console.log("Ranks options populated");}
+                    });
+
+                    options = [];
+                    value_to_add = {};
+                    for (let discipline of disciplines) {
+                        if (discipline === "") continue;
+                        value_to_add = {};
+                        value_to_add["value"] = discipline;
+                        options.push(value_to_add);
+                    }
+                    console.log(options);
+                    populateListOptions({
+                        elemSelector: '.sheet-discipline',
+                        optionsArray: options,
+                        callback: () => {console.log("Disciplines options populated");}
+                    });
+
+                    options = [];
+                    value_to_add = {};
+                    for (let class_name of classes) {
+                        if (class_name === "") continue;
+                        value_to_add = {};
+                        value_to_add["value"] = class_name;
+                        options.push(value_to_add);
+                    }
+                    console.log(options);
+                    populateListOptions({
+                        elemSelector: '.sheet-class',
+                        optionsArray: options,
+                        callback: () => {console.log("Classes options populated");}
                     });
                 });
             });
