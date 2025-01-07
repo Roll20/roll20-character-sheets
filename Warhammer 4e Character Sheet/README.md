@@ -81,6 +81,15 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Jan 4th 2025 v1.74c
+
+- New Custom Critical Wounds rules, which can be configured in the settings tab. Allows for changing of the static crit dmg wounds from the core crit tables. There are 3 customization options, 2 are add or replace normal dmg with a custom dmg die (e.g. 1d10, 1d10!, etc), and the 3rd a custom rule which will take the Tens die of the critical roll as crit dmg wounds, and if the roll is a dubs crit it triggers a Ulrics Furt Die (exploding 10). This is intended to add options for WFRP4e to simulate other crit dmg models like the popular WFRP2e feature Ulric's Fury.
+- New Custom Combat Rules, which can be configured in the settings tab. One for Twohanded weapons, changes Strike Mighty Blow to add another +1 dmg per lvl (total +2 per lvl) for all 2h melee weapons, and adds Twohanded Quality makes a Defender suffer -1 SL to his opposed melee test when attacked by a 2h weapon, unless he dodges which is not a melee test. And another for Melee defensive talents, which disables stacking of melee defensive talents, changes reversal test SL bonus when defending with melee parry weapons only (not including shields), and riposte test SL bonus removed. This allow for a alternate combat model which is a bit more gritty with less def SL stacking and makes 2h a bit more viable.
+- Fix NPC crit rolls not always working. Also fully compatible with the new crit wound options.
+- Fix Char Roll showing when it should not.
+- Fix multiple fields showing incorrectly with new character sheets until certain values are set.
+
+
 Dec 14th 2024 v1.74b
 
 - New Custom Race option added to Race dropdown menu, will allow entering owna Custom Race name. See setting's tab for Custom Race Stating Characteristics Modifier, this allows the Char Roll to generate starting Charactistics for the Customer Race.reset to menu by clicking the X.
