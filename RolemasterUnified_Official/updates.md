@@ -1,7 +1,23 @@
+# 2025-1-7
+
+- Custom profession support.
+  - Documented: https://github.com/nashidau/RMU-Interchange/blob/main/Profession.md
+- Improve the styling of buttons & selected
+- Update to creatures.  Not so visible to most users as of yet.
+- Can now select 'no swap' for stat swaps at creation (@rdanhenry)
+- Sort spell lists in charactermancer (@rdanhenry)
+- Add 'C' to Urban survival.  C is City/Civilisations.
+- Force reset of any background jobs at the start of the charactermancer finish.
+- Save powerlevel (@rdanhenry)
+- cleanups:
+  - remove old dead rollstats2 call
+  - Pending info now returns count
+
+Also all the items in the 24th update:
+
 # 2024-12-24
 
-- The Maybe a release.. and maybe not a release release.  Not sure if this will got out
-on Christmas Eve.
+(not released, part of next update)
 - Fix a bug where "Clear Saved" breaks level up
 - Remove some dead code in level up - should be a trivial smidge faster.
 - Discover the 'actions-test' was not being called - re-enable and fix errors
@@ -13,7 +29,6 @@ on Christmas Eve.
   - Genericise the code used by edit spells and edit talents
 - Fix rendering of side panel after CSS breaks roll20
 - Set status penalty to 0 on creature creation.
-
 
 # 2024-12-12
 
