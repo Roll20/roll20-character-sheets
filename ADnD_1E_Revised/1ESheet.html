@@ -63,9 +63,11 @@
             <span class="left">
               <span>v<span name="attr_sheet_version">
             </span>
-            <span class="right"> • 12/8/24'</span>
+            <span class="right"> • 1/2/25'</span>
           </h5>
           <ul>
+            <li>Added 4 new keys to the &{template:general} roll template. ie {{bigtext1}} thru {{bigtext4}}. Should be helpful for anyone wanting to inject some big text and/or rolls into their customized macros.</li>
+            <li>Added local auto-fill checkbox for THAC0</li>
             <li>Roll templates now have an increased max-height for embedded images based on the viewport width. Should help to display larger images.<br>
               <strong>FYI:</strong> images can be included with sheet rolls by using roll20's normal chat image format. ie <strong>[x](URL that ends in a common image format such as .jpg, .png, .gif)</strong> So if you want to display an image with a given roll, simply include a properly formatted image code macro within any text-based field. ie Name, Notes, Description. Macro-text can also be modified to include an image. ie <strong>{{subtag=[x](URL)}}</strong></li>
             <li>Fix for crit damage rolls; I've added parenthesis around the crit damage dice so that the entire roll is multiplied x2. This is a non-issue unless you want bonuses included with the crit multiplier. While it's common for crit damage to only double the dice roll and then add bonuses, you can include bonuses with the damage dice if desired. Note that the damage modifier field will also be included after any multiplier. Use it however you like.</li>
@@ -2875,7 +2877,10 @@
             <label class="matrix-level center"><span>Level</span></label>
             <label class="matrix-hd center" style="margin-left: -1em;"><span>HD/Lvl</span></label>
             <span></span>
-            <h4>Autofill Table:</h4>
+            <label class="inline-label" title="@{autofill_matrix} | Let the sheet auto-fill the to-hit tables when the class and level selectors are changed in the attack Matrix window.">
+              <input type="checkbox" name="attr_autofill_matrix" value="1" checked />
+              <h4>Autofill Table:</h4>
+            </label>
             <label class="center width-large">
               <select class="width-fill border" name="attr_matrix_class" title="@{matrix_class}">
                 <option value="0" selected style="font-weight: bold;">~ Select the Class or Monster ~</option>
@@ -5048,7 +5053,7 @@
       </span>
 
       <span class="sheet-row">
-        <span class="sheet-span-two smaller-text">
+        <span class="sheet-span-two sheet-smaller-text">
           {{#damagetype}}<span class="sheet-bold">Type:&nbsp;</span>{{damagetype}}&nbsp;{{/damagetype}}
             {{#rate}}<span class="sheet-bold">RoF:&nbsp;</span>{{rate}}&nbsp;{{/rate}}
               {{#range}}<span class="sheet-bold">Range:&nbsp;</span>{{range}}&nbsp;{{/range}}
@@ -5131,6 +5136,26 @@
         {{#subtag}}
           <span class="sheet-subheader sheet-span-two">{{subtag}}</span>
         {{/subtag}}
+      </span>
+      <span class="sheet-row">
+        {{#bigtext1}}
+          <span class="sheet-big-text sheet-span-two">{{bigtext1}}</span>
+        {{/bigtext1}}
+      </span>
+      <span class="sheet-row">
+        {{#bigtext2}}
+          <span class="sheet-big-text sheet-span-two">{{bigtext2}}</span>
+        {{/bigtext2}}
+      </span>
+      <span class="sheet-row">
+        {{#bigtext3}}
+          <span class="sheet-big-text sheet-span-two">{{bigtext3}}</span>
+        {{/bigtext3}}
+      </span>
+      <span class="sheet-row">
+        {{#bigtext4}}
+          <span class="sheet-big-text sheet-span-two">{{bigtext4}}</span>
+        {{/bigtext4}}
       </span>
       <!--Success/Failure for Roll High-->
       {{#roll_high}}
@@ -5291,11 +5316,10 @@
           {{#uses_max}}
             {{#^rollTotal() uses_max 0}}
               {{#uses}}
-                <span class="sheet-inlineroll-reset">Uses:{{uses}}/{{uses_max}}&nbsp;</span>
+                <span class="sheet-inlineroll-reset">Uses:{{uses}}/{{uses_max}}</span>
               {{/uses}}
             {{/^rollTotal() uses_max 0}}
           {{/uses_max}}
-
           {{#quantity_max}}
             {{#quantity}}
               <span class="sheet-inlineroll-reset">Qty:{{quantity}}/{{quantity_max}}</span>
@@ -5304,7 +5328,7 @@
         </span>
       </span>
 
-      {{#allprops() name subtag footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target roll_target2 rolldecimal nwp_mod_applied mod_applied wis_applied current_encumbrance dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes locked_doors}}
+      {{#allprops() name subtag bigtext1 bigtext2 bigtext3 bigtext4 footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target roll_target2 rolldecimal nwp_mod_applied mod_applied wis_applied current_encumbrance dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes locked_doors}}
         <!-- <span class="sheet-row sheet-span-two sheet-all-props">
           {{key}}{{value}}
         </span> -->
@@ -5312,32 +5336,24 @@
           <span class="sheet-tcat">{{key}}</span>
           <span>{{value}}</span>
         </span>
-      {{/allprops() name subtag footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target roll_target2 rolldecimal nwp_mod_applied mod_applied wis_applied current_encumbrance dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes locked_doors}}
+      {{/allprops() name subtag bigtext1 bigtext2 bigtext3 bigtext4 footer freetext color effect_type school spell_level spell_class spell_class_level range duration area_of_effect components casting_time saving_throw save_type link type roll roll_high roll_low roll_target roll_target2 rolldecimal nwp_mod_applied mod_applied wis_applied current_encumbrance dex_adjustment quantity quantity_max uses uses_max whisper attribute_mod_1_name attribute_mod_1 attribute_mod_1_max attribute_mod_2_name attribute_mod_2 attribute_mod_2_max attribute_mod_3_name attribute_mod_3 attribute_mod_3_max attribute_mod_4_name attribute_mod_4 attribute_mod_4_max attribute_mod_5_name attribute_mod_5 attribute_mod_5_max attribute_mod_6_name attribute_mod_6 attribute_mod_6_max notes locked_doors}}
 
       <span class="sheet-row">
-        <span class="sheet-span-two smaller-text">
-          {{#nwp_mod_applied}}<span class="sheet-bold">NWP Mod Applied:</span>{{nwp_mod_applied}}&nbsp;{{/nwp_mod_applied}}
-            {{#mod_applied}}<span class="sheet-bold">Mod Applied:</span>{{mod_applied}}&nbsp;{{/mod_applied}}
-              {{#wis_applied}}<span class="sheet-bold">Wis Applied:</span>{{wis_applied}}&nbsp;{{/wis_applied}}
-                {{#dex_adjustment}}<span class="sheet-bold">Dex Adj:</span>{{dex_adjustment}}&nbsp;{{/dex_adjustment}}
-                  {{#encumbrance}}<span class="sheet-bold">Encumbrance:</span>{{encumbrance}}&nbsp;{{/encumbrance}}
-                    {{#rollTotal() current_encumbrance 0}}
-                      {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Normal</span>
-                        &nbsp;<span>None</span>{{/current_encumbrance}}
-                    {{/rollTotal() current_encumbrance 0}}
-                    {{#rollTotal() current_encumbrance 1}}
-                      {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Heavy</span>
-                        &nbsp;<span>No DEX Bonus to Init.</span>{{/current_encumbrance}}
-                    {{/rollTotal() current_encumbrance 1}}
-                    {{#rollTotal() current_encumbrance 2}}
-                      {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Very Heavy</span>
-                        &nbsp;<span>No DEX Bonus to Init, Delayed, +1 Segment if Surprised.</span>{{/current_encumbrance}}
-                    {{/rollTotal() current_encumbrance 2}}
-                    {{#rollTotal() current_encumbrance 3}}
-                      {{#current_encumbrance}}<span class="sheet-bold">Encum/Bulk - Encumbered</span>
-                        &nbsp;<span>No DEX Bonus to Init or AC, Go Last in Init, +2 Segments if Surprised, Cannot Charge, Enemies get +2 to-hit.</span>{{/current_encumbrance}}
-                    {{/rollTotal() current_encumbrance 3}}
-        </span>
+        <!-- keep }}{{ on same line otherwise the vtt mysteriously adds whitespace -->
+        <span class="sheet-span-two sheet-smaller-text">{{#nwp_mod_applied}}
+          <span class="sheet-bold">NWP Mod Applied:</span>{{nwp_mod_applied}}&nbsp;{{/nwp_mod_applied}}{{#mod_applied}}
+          <span class="sheet-bold">Mod Applied:</span>{{mod_applied}}&nbsp;{{/mod_applied}}{{#wis_applied}}
+          <span class="sheet-bold">Wis Applied:</span>{{wis_applied}}&nbsp;{{/wis_applied}}{{#dex_adjustment}}
+          <span class="sheet-bold">Dex Adj:</span>{{dex_adjustment}}&nbsp;{{/dex_adjustment}}{{#encumbrance}}
+          <span class="sheet-bold">Encumbrance:</span>{{encumbrance}}&nbsp;{{/encumbrance}}{{#rollTotal() current_encumbrance 0}}{{#current_encumbrance}}
+          <span class="sheet-bold">Encum/Bulk - Normal</span>&nbsp;
+          <span>None</span>{{/current_encumbrance}}{{/rollTotal() current_encumbrance 0}}{{#rollTotal() current_encumbrance 1}}{{#current_encumbrance}}
+          <span class="sheet-bold">Encum/Bulk - Heavy</span>&nbsp;
+          <span>No DEX Bonus to Init.</span>{{/current_encumbrance}}{{/rollTotal() current_encumbrance 1}}{{#rollTotal() current_encumbrance 2}}{{#current_encumbrance}}
+          <span class="sheet-bold">Encum/Bulk - Very Heavy</span>&nbsp;
+          <span>No DEX Bonus to Init, Delayed, +1 Segment if Surprised.</span>{{/current_encumbrance}}{{/rollTotal() current_encumbrance 2}}{{#rollTotal() current_encumbrance 3}}{{#current_encumbrance}}
+          <span class="sheet-bold">Encum/Bulk - Encumbered</span>&nbsp;
+          <span>No DEX Bonus to Init or AC, Go Last in Init, +2 Segments if Surprised, Cannot Charge, Enemies get +2 to-hit.</span>{{/current_encumbrance}}{{/rollTotal() current_encumbrance 3}}</span>
       </span>
 
       {{#notes}}

@@ -6,11 +6,8 @@
 <div class=main>
 	<!-- Logo -->
 	<div class="logo">
-		<img class="img" src="https://raw.githubusercontent.com/ctotone/JdR/main/Ten%20candles/img/logo_official_dark.png"/>	
-        <!-- <button type="action" name="act_conflict" data-i18n-title="conflict_dice" title="Conflict Dice" class="d6"></button> -->
+		<img class="img" src="https://raw.githubusercontent.com/ctotone/JdR/main/Ten%20candles/img/logo_official_dark.png"/>
 		<button type="roll" name="roll_conflict" value="@{conflict}" data-i18n-title="conflict_dice" title="Conflict Dice" class="d6"></button>
-        <!-- Old roll
-        <button type="roll" name="roll_Conflict" data-i18n-title="conflict_dice" title="Conflict Dice" value="&{template:tencandles} {{title=^{roll_d6_title}}}{{conflict=[[?{How many dice?|1}d6s=6]]}}" class="d6"></button> -->
 	</div>
 	<br>
 
@@ -183,7 +180,7 @@
 
 <script type="text/worker">
     on('clicked:conflict-action', (info) => {
-        startRoll("&{template:tencandles} {{title=^{roll_d6_title}}} {{roll=[[?{How many dice?|1}d6s=6]]}} {{high=[[0]]}} {{low=[[0]]}}", (diceroll) => {
+        startRoll("&{template:tencandles} {{title=^{roll_d6_title}}} {{roll=[[@{rollmodifier}d6s=6]]}} {{high=[[0]]}} {{low=[[0]]}}", (diceroll) => {
             const total = diceroll.results.roll.result
             const dice = diceroll.results.roll.dice; //This will be an array of the values rolled on all the dice
             let total6s = 0;
@@ -202,6 +199,12 @@
             );
         });
     });
+
+	on("sheet:opened", function(eventInfo){
+        setAttrs({
+            rollmodifier: "?{" + getTranslationByKey("how_many_dice") + "|1}",
+        });
+    });	
 	
 
 	on("sheet:opened change:character_name", function(eventInfo) {
