@@ -21,6 +21,9 @@ v1.1.0 [Screenshot](cof2e.png)
 - Ajout d'options d'attaque pour script COFantasy2
 - Remplacement import profil en JSON par import de voie depuis PDF
 - Ajout d'un bouton de génération de l'équipement de base du profil
+- Ajout de la gestion de l'AGI/CON maximum selon l'armure
+- Ajout de l'onglet Script et des options d'attaque sur les fiches de PNJ
+- Ajout d'un champ propriétés sur les ressources
 
 ### Version 1.0.0 (2024-12-24)
 
