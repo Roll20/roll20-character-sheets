@@ -35,8 +35,10 @@
   <input type="hidden" name="attr_def_base" value="10">
   <input type="hidden" name="attr_def_car" value="AGI">
   <input type="hidden" name="attr_def_car_bonus" value="0">
+  <input type="hidden" name="attr_def_car_max" value="0">
   <input type="hidden" name="attr_def_buff" value="0">
   <input type="hidden" name="attr_def_cond" value="0">
+  <input type="hidden" name="attr_pv_buff" value="0">
   <input type="hidden" name="attr_dr_buff" value="0">
   <input type="hidden" name="attr_pm_buff" value="0">
   <input type="hidden" name="attr_pc_buff" value="0">
@@ -44,8 +46,7 @@
   <!-- Other hidden attributes -->
   <input type="hidden" name="attr_rangs_voies" value="">
   <input type="hidden" name="attr_noms_voies" value="">
-  <input type="hidden" name="attr_armor_malus" value="0">
-
+  
   <!-- COFantasy MOD interaction -->
   <input type="hidden" name="attr_script_title" value="">
   <input type="hidden" name="attr_cofantasy" value="">
@@ -60,7 +61,7 @@
     <div>
       <img
         class="logo"
-        title="Version 1.0.0 - 20/12/2024"
+        title="Version 1.1.0 - 05/01/2025"
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesOublieesFantasy2/cof2e_logo.jpg"
       />
     </div>
@@ -1032,11 +1033,11 @@
                   </div>
                   <div class="bordered">
                     Possédés :&nbsp;
-                    <input type="number" class="two-digits" name="attr_jet-dispo" title="@{jet-dispo}" value="0">
+                    <input type="number" class="two-digits" name="attr_jet-dispo_max" title="@{jet-dispo_max}" value="0">
                   </div>
                   <div class="bordered">
                     Taux perte :&nbsp;
-                    <input type="number" class="two-digits" name="attr_jet-dispo" title="@{jet-dispo}" value="0">
+                    <input type="number" class="two-digits" name="attr_jet-perte" title="@{jet-perte}" value="0">
                     &nbsp;%
                   </div>
                 </div>
@@ -3895,8 +3896,12 @@
 
                 <div class="d-flex">
                   <input type="text" name="attr_res-desc" title="@{res-desc}" placeholder="Nom de la ressource" value="">
-                  Valeur :
-                  <input type="number" name="attr_res-val" title="@{res-val}" value="1">
+                  Nombre :
+                  <input type="number" class="two-digits" name="attr_res-val" title="@{res-val}" value="1">
+                </div>
+
+                <div class="d-flex">
+                  <textarea class="one-row" name="attr_res-props" title="@{res-props} Propriétés" placeholder="Propriétés"></textarea>
                 </div>
 
               </fieldset>
@@ -4247,6 +4252,9 @@
                     <li>Ajout d'options d'attaque pour script COFantasy2</li>
                     <li>Remplacement import profil en JSON par import de voie depuis PDF</li>
                     <li>Ajout d'un bouton de génération de l'équipement de base du profil</li>
+                    <li>Ajout de la gestion de l'AGI/CON maximum selon l'armure</li>
+                    <li>Ajout de l'onglet Script et des options d'attaque sur les fiches de PNJ</li>
+                    <li>Ajout d'un champ propriétés sur les ressources</li>
                   </ul>
                 </details>
               </li>
@@ -4276,12 +4284,13 @@
 
     </div>
 
-    <!-- Fiche PNJ -->
+    <!-<li>Fiche PNJ -->
     <div class="cof-npc">
       <input type="hidden" class="tabs-toggle" name="attr_npc_tab" value="main" />
       <div>
         <button type="action" name="act_npc_main-btn" class="main-tab tab-btn npc-main-btn">TRAITS</button>
         <button type="action" name="act_npc_config-btn" class="main-tab tab-btn npc-config-btn">CONFIGURATION</button>
+        <button type="action" name="act_npc_script-btn" class="main-tab tab-btn npc-script-btn">SCRIPT</button>
       </div>
 
       <div class="npc-main-tab">
@@ -4471,6 +4480,8 @@
                 </button>
               </div>
               <div class="d-flex d-flex-middle bordered">
+                <input type="hidden" name="attr_arme-label" value="">
+                <span class="align-self-center" name="attr_arme-label"></span>&nbsp;
                 <input type="text" name="attr_arme-nom" title="@{arme-nom}" placeholder="Arme/attaque" value="">
               </div>
               <div class="d-flex d-flex-middle bordered">
@@ -4529,27 +4540,54 @@
               </div>
               <div class="d-flex d-flex-middle bordered">
                 <input type="text" name="attr_arme-special" title="@{arme-special}" placeholder="Effet, capacités spéciales..." value="">
+                <button type="action" class="flat-btn img-btn float-right" name="act_armeopt-btn">
+                  <span class="img-btn">y</span>
+                </button>
               </div>
-              <!-- <button type="action" class="flat-btn img-btn" name="act_arme-opt-btn">
-                <span class="img-btn">y</span>
-              </button> -->
 
             </div>
 
-            <input type="hidden" class="cof-wopt-toggle" name="attr_arme-opt" value="0"/>
+            <input type="hidden" class="cof-wopt-toggle" name="attr_armeopt" value="0"/>
             <div class="weapon-opt">
               <div class="weapon-option">
                 <div></div>
                 <div class="bordered">
+                  <select name="attr_arme-atktype" class="select-lg" title="@{arme-atktype} Type d'arme/attaque">
+                    <option value="">Type d'attaque...</option>
+                    <option value="main">Arme en main</option>
+                    <option value="jet">Arme de jet</option>
+                    <option value="sort">Sortilège</option>
+                    <option value="naturel">Arme naturelle</option>
+                  </select>
                 </div>
                 <div class="bordered">
+                  <input type="text" name="attr_arme-atkmods" placeholder="Modificateurs d'attaque" title="@{arme-atkmods} Modificateurs séparés par des virgules&#10; deBonus: avec dé bonus&#10; deMalus: avec dé malus&#10; auto: réussite automatique&#10; choc: peut faire des attaques non léthales sans malus&#10; explodeMax: dés de dégâts explosifs&#10; pasDeDmg: l'attaque ne fait pas de DM&#10; poudre: arme à poudre&#10; reroll1: relance les 1 sur les dés de DM&#10; tempDmg: fait toujours des attaques non léthales" value="">
                 </div>
                 <div class="bordered">
+                  <input type="text" name="attr_arme-options" placeholder="Options d'attaque avec argument" title="@{arme-options} Options d'attaque">
                 </div>
-                <div class="bordered">
-                </div>
-                <div></div>
               </div>
+
+              <input type="hidden" class="cof-thrown-toggle" name="attr_arme-jet" value="0"/>
+              <div class="weapon-thrown">
+                <div class="weapon-throw">
+                  <div></div>
+                  <div class="bordered">
+                    Disponibles :&nbsp;
+                    <input type="number" class="two-digits" name="attr_jet-dispo" title="@{jet-dispo}" value="0">
+                  </div>
+                  <div class="bordered">
+                    Possédés :&nbsp;
+                    <input type="number" class="two-digits" name="attr_jet-dispo_max" title="@{jet-dispo_max}" value="0">
+                  </div>
+                  <div class="bordered">
+                    Taux perte :&nbsp;
+                    <input type="number" class="two-digits" name="attr_jet-perte" title="@{jet-perte}" value="0">
+                    &nbsp;%
+                  </div>
+                </div>
+              </div>
+  
             </div>
 
           </fieldset>
@@ -4694,6 +4732,37 @@
 
       </div>
 
+      <div class="npc-script-tab">
+        <h3><span name="attr_script_title"></span></h3>
+
+        <input class="show-script" type="hidden" name="attr_script_show" value="0">
+        <div class="show-script">
+
+          <div class="sheet-2colrow">
+  
+            <div class="sheet-col">
+  
+              <ul>
+                <li>
+                  Renuméroter les attaques&nbsp;
+                  <button type="action" class="flat-btn img-btn" name="act_renum_npcatk-btn" title="Renuméroter les attaques">
+                    <span class="img-btn">x</span>
+                  </button>
+                </li>
+              </ul>
+
+            </div>
+  
+            <div class="sheet-col">
+              <h4>Prédicats</h4>
+              <textarea name="attr_predicats_script" title="@{predicats_script} Prédicats" value=""></textarea>
+            </div>
+  
+          </div>
+
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -4800,6 +4869,8 @@
 
 </rolltemplate>
 
+<script type="text/worker">
+</script>
 <script type="text/worker">
 
 /**
@@ -5166,7 +5237,8 @@ const SWData = {
         "def_base",
         "armure", "armure_eqp",
         "bouclier", "bouclier_eqp",
-        "agi", "con", "def_car_bonus", "capabilities",
+        "agi", "con", "def_car_bonus", "def_car_max",
+        "capabilities",
         "def_cond",
         "def_buff",
         "def_action"
@@ -6012,7 +6084,7 @@ on("change:sheet_type", function() {
  */
 [ 
   "pc_main", "pc_abilities", "pc_gears", "pc_config", "pc_script", "pc_version",
-  "npc_main", "npc_config"
+  "npc_main", "npc_config", "npc_script"
 ].forEach(button => {
   on(`clicked:${button}-btn`, function() {
     const [ type, value ] = button.split("_");
@@ -6681,6 +6753,9 @@ function updateDef() {
     }
     values.agi = 0;
     values.con = 0;
+    def_car_max = intval(values.def_car_max);
+    def_car_bonus = def_car_max > 0 ? Math.min(def_car_bonus, def_car_max) : def_car_bonus;
+    values.def_car_max = 0;
     values.def_car_bonus = def_car_bonus;
     def = addValues(values);
     setAttrs({ def, def_car, def_car_bonus }, false);
@@ -6959,7 +7034,7 @@ function insertRolls(text, options = {}) {
 }
 
 /**
- * Numbering attacks
+ * Numbering PC attacks
  */
 on("change:repeating_armes:arme-nom clicked:renum_atk-btn", function(eventInfo) {
   const renumber = (eventInfo.triggerName === "clicked:renum_atk-btn");
@@ -6985,21 +7060,23 @@ on("change:repeating_armes:arme-nom clicked:renum_atk-btn", function(eventInfo) 
 /**
  * Display attack options row
  */
-on("clicked:repeating_armes:armeopt-btn", function() {
-  getAttrs(["repeating_armes_armeopt"], function(values) {
-    const option = 1 - intval(values.repeating_armes_armeopt);
-    setAttrs({ repeating_armes_armeopt: option });
+on("clicked:repeating_armes:armeopt-btn clicked:repeating_npcarmes:armeopt-btn", function(eventInfo) {
+  const [ section ] = eventInfo.triggerName.split("_").slice(1);
+  getAttrs([`repeating_${section}_armeopt`], function(values) {
+    const option = 1 - intval(values[`repeating_${section}_armeopt`]);
+    setAttrs({ [`repeating_${section}_armeopt`]: option });
   });
 });
 
 /**
  * Display thrown weapon options
  */
-on("change:repeating_armes:arme-atktype", function() {
-  getAttrs(["repeating_armes_arme-atktype"], function(values) {
-    const type = strval(values["repeating_armes_arme-atktype"]);
+on("change:repeating_armes:arme-atktype change:repeating_npcarmes:arme-atktype", function(eventInfo) {
+  const [ section ] = eventInfo.triggerName.split("_").slice(1);
+  getAttrs([`repeating_${section}_arme-atktype`], function(values) {
+    const type = strval(values[`repeating_${section}_arme-atktype`]);
     const thrown = type === "jet" ? 1 : 0;
-    setAttrs({ ["repeating_armes_arme-jet"]: thrown });
+    setAttrs({ [`repeating_${section}_arme-jet`]: thrown });
   });
 });
 
@@ -7429,7 +7506,7 @@ function updatePathPV(path) {
     if (!pathPV)
       return;
 
-    setAttrs({ [`voie${path}pv`]: pathPV.pv })
+    setAttrs({ [`voie${path}pv`]: pathPV.pv });
   });
 }
 
@@ -7467,7 +7544,7 @@ seq(9).forEach(path => {
     // Find path's PV based on name
     updatePathPV(path);
   });
-  
+
   // Update PV max
   on(`change:voie${path}pv`, function () {
     updatePVMax();
@@ -7952,7 +8029,7 @@ on(eventList("change", [
     "atkid"
   ].map(a => `repeating_equipement_equip-${a}`), function(values) {
     const [ on, name, detail, props, atk, atkid ] = Object.keys(values);
-    const equiped = boolval(values[on]);
+    const equiped = intval(values[on]);
     const equipment = strval(values[name]);
     const description = strval(values[detail]);
     const properties = strval(values[props]);
@@ -7970,14 +8047,23 @@ on(eventList("change", [
       return;
     }
 
+    const shield = equipment.toLowerCase().includes("bouclier");
+    //const helmet = equipment.toLowerCase().includes("casque") || equipment.toLowerCase().includes("heaume");
     properties.split("\n").forEach(prop => {
       const { name, value } = parseNameValue(prop);
       if (name === "")
         return;
 
       if (name === "bonus-def") {
-        attributes.set("armure", value);
-        attributes.set("armure_malus", value);
+        const attrib = shield ? "bouclier" : "armure";
+        attributes.set(attrib, intval(value));
+        attributes.set(attrib + "_eqp", equiped);
+        if (!shield)
+          attributes.set("armure_malus", intval(value));
+        return;
+      }
+      if (name === "agi-max") {
+        attributes.set("def_car_max", intval(value));
         return;
       }
       
@@ -8009,6 +8095,7 @@ on(eventList("change", [
       attributes.set(rowId + "special", description);
     }
 
+    console.log(attributes)
     if (attributes.size > 0)
       setAttrs(Object.fromEntries(attributes));
   });
@@ -8571,6 +8658,30 @@ on("change:pnjatk", function() {
         setAttrs(Object.fromEntries(updates));
     });
   }) 
+});
+
+/**
+ * Numbering NPC attacks
+ */
+on("change:repeating_npcarmes:arme-nom clicked:renum_npcatk-btn", function(eventInfo) {
+  const renumber = (eventInfo.triggerName === "clicked:renum_npcatk-btn");
+  getSectionIDsOrdered("repeating_npcarmes", function (rowIds) {
+    const labels = rowIds.map(id => `repeating_npcarmes_${id}_arme-label`);
+    getAttrs([ "max_attack_label", ...labels ], function (values) {
+      const maxLabel = intval(values.max_attack_label);
+      delete values.max_attack_label;
+      let numLabel = renumber ? 0 : maxLabel;
+      const updates = new Map();
+      Object.keys(values).forEach(label => {
+        if (renumber || intval(values[label]) === 0)
+          updates.set(label, ++numLabel);
+      });
+      if (renumber || numLabel > maxLabel)
+        updates.set("max_attack_label", numLabel);
+      if (updates.size > 0)
+        setAttrs(Object.fromEntries(updates));
+    });
+  });
 });
 
 /**
