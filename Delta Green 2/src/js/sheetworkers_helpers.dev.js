@@ -699,26 +699,26 @@ var addTargetStat = function addTargetStat(values, names, attrName) {
 var updatebondscore = function updatebondscore(values, update) {
   var manualscore = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
   var character_creation_bonds = values["character_creation_bonds"] === 'active' ? true : false;
-  var willpower_points_max = parseInt(values.willpower_points_max) || 0;
-  var initial_willpower = character_creation_bonds ? willpower_points_max : Math.floor(willpower_points_max / 2);
+  var charisma_score = parseInt(values["charisma_score"]) || 0;
+  var bond_value = character_creation_bonds ? charisma_score : Math.floor(charisma_score / 2);
   var flag = manualscore ? 1 : parseInt(values["repeating_bonds_setScore"]) || 0;
   var bond_score_old = parseInt(values["repeating_bonds_score_old"]) || 0;
   var bond_score = 0;
 
   if (flag === 0) {
-    bond_score = initial_willpower;
+    bond_score = bond_value;
   } else {
     bond_score = parseInt(values["repeating_bonds_score"]) || 0;
 
-    if (bond_score > willpower_points_max) {
-      if (willpower_points_max > bond_score_old) {
-        bond_score = willpower_points_max;
+    if (bond_score > charisma_score) {
+      if (bond_score_old <= charisma_score) {
+        bond_score = charisma_score;
       }
     }
   }
 
   update["repeating_bonds_score"] = bond_score;
-  update["repeating_bonds_score_old"] = bond_score_old;
+  update["repeating_bonds_score_old"] = bond_score;
   update["repeating_bonds_setScore"] = 1;
   update["repeating_bonds_color"] = BondButtonColor(bond_score);
 };

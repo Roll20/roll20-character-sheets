@@ -1,3 +1,292 @@
+# 2024-12-24
+
+- The Maybe a release.. and maybe not a release release.  Not sure if this will got out
+on Christmas Eve.
+- Fix a bug where "Clear Saved" breaks level up
+- Remove some dead code in level up - should be a trivial smidge faster.
+- Discover the 'actions-test' was not being called - re-enable and fix errors
+- Fix bleed so you don't bleed straight after being hit
+
+# 2024-12-17
+
+- Edit talents so you can delete excess talents (@major havok)
+  - Genericise the code used by edit spells and edit talents
+- Fix rendering of side panel after CSS breaks roll20
+- Set status penalty to 0 on creature creation.
+
+
+# 2024-12-12
+
+The Author is an Idiot bugfix release for Treasure Law.
+
+- Allow drops from all magic item types
+- Save descriptions for all items (even new format)
+- Funky line as you lose hits or PP
+- Fix a maneuver penalty error which was messing up item drops
+
+# 2024-12-10
+
+- Finalise handling of Professions with selectable Base lists
+    - Alchemists are the first users
+- Creatures: Add hx for Hand Crossbows, and a few other attacks
+- Half shield bonus skill for partial block - not the full one.
+- Try and squash the super long list of errors when you first update stateud
+- Compendium data: Move a long bow to Bow, Long for the table.
+- Creatures: Creatures can now roll skills.
+- Equipment:
+  - Perception Penalties are now applied
+  - Ranged Penalties are now applied.
+- Take a terrible guess if it's a ranged or melee weapon when adding attacks
+- Creatures now have framework for type of attack (melee, ranged, directed)
+  - Does not (yet) change attack
+  - Add test to validate attack types
+- Change 'maneuver_penalty' -> status_penalty
+  - Update everywhere except inventory; it was a collision of names before.
+
+# 2024-12-3
+
+- Initiative modified by maneuver penalty
+- Update rolltemplate for initiative to show penalty if present.
+- Add tests and validations for creatures.
+- All creature weapons now have a size (usually 0)
+- Display a message when an injury takes a character to negative hits.
+- Fix a stupid misplaced class for RRs
+
+# 2024-11-26
+
+- Handle the knockback results when they have a ' in them.
+- Handle short swords and a few other weapons for creatures.
+
+
+# 2024-11-19
+
+- Stats are now right aligned.
+- Fix update for specialised skills.
+- RRs:
+    - now have a box.  Make them standout more.
+    - Use the pretty name. not the attribute name.
+    - Number now rolls with modifier.
+- Fix an issue causing some characters to have problems levelling up.
+- Fixed specialisations show the skill name when rolling.
+- Handle knacks for Alchemists.
+
+# 2024-11-14
+
+- Add description to each step of the Charactermancer buttons
+- Clear ranks on specialised skills if 0.  Previously worked for non specilised skills, this fixes
+    specialised skills as well (@ixs)
+- Add base lists selection in charactermancer.   Useful for professions with base lists.  Additionally
+base lists are now stored on the sheet.  So they persist.
+- Add control to stop progression until you have entered all data on the sheet required.
+- Bump sheet version 7
+  - Existing charaacters will have their base lists updated on the main sheet.
+
+# 2024-11-7
+
+- Sheet version to 6.  Funny how lots happen at once.
+- Force a skill recalculation after update.
+- Fix dependancy issue in edit.js: It depends on the skill list.   Can now edit dynamic specialisations for
+the new vocational skills.
+- Remove some dead code in skills.
+- Update similar skills modifier for fixed specialisations.
+- Make roll button for dynamic specialisations actually visible.  0 width buttons are really hard to see and click.
+
+# 2024-11-5
+
+- Bump sheet version to 5
+- Vocational skills are now dynamic specialisations.  No longer a fixed list.
+  - Cleans up a lot of space on the sheet
+  - Update the level up process to match
+  - Automatically move old skills across
+
+# 2024-10-29
+
+- Finaly update skills to show specilisations,
+- Fix translation issue identified by Jon_joe.
+    - Seems French has 2 strings translated.  And one exposed a bug
+    - Add tests for case
+    - improve code flow.  My JS has improved.
+- Add injury string to direcly rolled cripts
+- New combat has moved; now in creatures too
+- Improve favourite skills buttons and layout
+- Remove some spurious nil class descriptions
+- RRs can now click on number or die
+
+# 2024-10-22
+
+- Spells: Fix a nbs[ instead of a space
+- Less message spew during creation.
+- Less message spew during attacks.
+- Fix actions code to not break level up
+- Attacks small layout changes.
+- Heading for feats of strength
+- Move New Combat to the status block
+- move EP near level.
+- CC updates.
+
+# 2024-10-15
+
+- Start of Power Level support
+    - Sheet version to 4: Set everyones powerlevel to Superior
+    - Show powerlevel on sheet
+    - Add create step for power level
+    - Add support for powerlevel during stat rolling
+- Use the roll20 dice roller for dice; not the js one.
+- Send stat rolls to the chat.
+- More messages when injuries are applied.
+- Make checkboxes a standard size,
+- NPC upload button on the front page.
+- Directly rolled crits now have injury string
+
+
+# 2024-10-8
+
+- (Hopefully) quieten monsters AP messages.
+- Handle a numeric AT (some monsters)
+- Updated attack testing significantly.
+- Remove some not-an-error errors in attacks
+- Stop using D for side.  That's death/defeat.  O is now side. (Odd)
+- Fix for monsters dropped from compendium
+
+Compendium: Fix the couple of corrupted attack tables which were causing random failures on
+some attacks.  This has been bugging up a few characters (and creatures).
+
+# 2024-10-3
+
+- Remove a lot of debug in level up and stuff.
+- Allow creatures to be called NPCs on drop
+- Creatures (NPCS) now display spells
+
+# 2024-10-1
+
+Work continues on improving 'stuff' (aka Inventory or items).  So first up we have casting penalties
+for armor calculated and working.  This may may the spell casters in your group most unhappy.  I hope
+they stocked up on Transcendance.   We have also added a 'pack' and 'store'.  A pack is backpack or
+similar item you can drop if in combat.   Or maybe on your horse.  There is a toggle button to carry
+or not carry it.  Encumberance pnealties are calcualted depending if carried or not.   Store is for
+stuff you character doesn't have with them.  Homewares or buried treaures.  You can move items between
+the three lists easily.
+
+Then there is a pile of small items; Spells persist previous ranks on levelup.  Lots of people have
+asked for this - Enjoy!
+
+- Stuff (aka Inventory)
+  - Spell equipped correctly.
+  - Items only count to encumberance% if equipped (w/ test)
+  - Add Store & Backpack sections
+  - Add toggle for backpack carried
+  - Allow items to move between sections with a click
+- Add support for transcendance and spell Enc% penalties
+- Make bleed a local (internal change)
+- Reset current round/phase on new combat.
+- Show the current round in the action box
+- Don't set negative PP on the character sheet (min 0)
+- Spells remember how many you got on level up.
+
+# 2024-9-26
+
+Start work on fully supporting encumbrance and maneuver penalties.  So now we
+calculate load (we did not before), our max pace (been empty forever), change
+the property name to carried_weight (was set, but never used before).
+
+- Creatures:
+  - Handle more attack types
+  - Creature attacks work again with the new maneuver penalties.
+  - Fix issue with creatures without skills failing
+- Update maxpace and load %s on sheet
+  - Need to update equipment in the compendium to make this effective.
+- Add a dot to show skills you have a profession bonus in
+- Update DB:
+  - Add passive block to active dodges and passive dodge to active block
+  - Cap running ranks, not passive DB at 50.
+
+# 2024-9-24
+
+A number of small updates this week.  Starting some work to fix a mumber of other wierd bugs; but nothing yet.
+Thank you to all who have reported problems.  Please let me know if there are more.
+
+- Dark mode tweaks for side panel, and the crit box.  Dark mode is still a long
+  way from complete on the main sheet; but the side panel should be usual.
+- Spell rank modifier when casting; missed that in the other massive improvements.
+- Don't barf AP updates on New Combat.
+- Fix for weight allowance (thanks spaturno80).  I totally misread those rules.  Like totally.
+- Creature sheet improvements for skills and other items.
+- Async: Recover is a few more wierd situations (thanks major__havoc).
+- Spells: Show trickery and grace bonuses in spells.  This is the sort of
+  feature you get when I play with the sheet, not just GM with the sheet.
+
+[Compendium]
+Add base lists by profession to the spell law list. Treasure Law data imported
+for most non-magical items.  Chapter 1 complete.  Chapter 2 is 75% complete.
+Monsters for other modules are getting ready too.
+
+# 2024-9-19
+
+Urgent fix for a roll20 API change.  Some of the values in fields from the
+charactermancer started getting expansion ids shoved on the return values.
+(if they contain a ~).
+
+So before we look parse the string, remove any expansion ids on the end.
+
+
+Sheet updates:
+- Force HP and PP to max on levelup
+
+# 2024-9-17
+
+Miscalenous bug fix week!
+
+After one week of activity there are a number of bugs.  Talents seemed to cause most grief - I've
+fixed a lot of them.  Hopefully this means peoples sheets won't lock up anymore.
+
+Otherwise it's a whole host of little things.
+
+- Hair is now a box you can edit
+- Save gender set during character creation
+- Initiative:
+  - Fix the button so it works again (stupid roll20 quotes)
+  - Show the penalty in the result box
+  - Send the value to the tracker
+- Fix a few missing translation strings.
+- Set correct ranks for written languages.
+- On creation, make sure each stat gain has a unique name
+- Creature:
+  - Allow JSON and string items.
+  - RR rolls for creatures
+  - Injuries for creatures
+- Talents
+  - Save talent cost correctly for single tier talents
+  - Fix some of the talents that cause problems on some browsers.
+  - Handle more errors
+  - Delete a malformed talent in the database
+- Roll templates (side panel)
+  - Add basic darkmode support
+  - Put the results before the mods for skills and spell rolls.
+- Can edit height/weight/build on sheet
+- Stat gains uniquely identified during levelup
+- Fix for item's name's template in the compendium
+- Partial fix for vmabraces`greaves
+- Fix for short bow and long bow attack tables
+- Remove old Claw & Shockbolt hacks from compendium
+- Spells correct display of realm stats
+- Fix vambrace and greave ordering
+- Update equipment on deletion
+- Add a pending reset button to hopefully unjam people.
+- Add an animated icon when doing work
+
+
+# 2024-9-12
+
+The first post compendium release... and it's small.  This is a good thing.
+Sooner I get to Treasure Law I guess.
+
+
+- Rewrite the way we track spell lists on level up.
+  - Makes Hybrids happy; stops duplicated lists during level up
+  - Track lists from from the sheet side.  Should stop the annoying
+    duplicate spell list after level up.
+- Fix a problem with single tier talents not applying
+
 # 2024-9-10
 
 The headline feature of this weeks release is using CRP (Custom Roll Parsing)

@@ -6,68 +6,68 @@ There are two possible results: one and only one active shield; no active shield
 We need to make sure that the right thing™ is done
 */
 on("change:repeating_shields:shield_active", function(eventInfo) {
-	var caller = "???";
-		// Get the source shield, its row ID and whether it was turned on or off
-		var sourceShield = eventInfo.sourceAttribute;
-		var sourceShieldId = extractRowId(sourceShield);
-		var mode = eventInfo.newValue;
+	var caller = "Action Listener for Active Shields";
+	// Get the source shield, its row ID and whether it was turned on or off
+	var sourceShield = eventInfo.sourceAttribute;
+	var sourceShieldId = extractRowId(sourceShield);
+	var mode = eventInfo.newValue;
 
-		// Get all the shields
-		getSectionIDs("shields", function(idarray) {
-				var prefix = "repeating_shields_";
-				var suffix = "_shield_active";
+	// Get all the shields
+	getSectionIDs("shields", function(idarray) {
+		var prefix = "repeating_shields_";
+		var suffix = "_shield_active";
 
-				// Gather all the shield_active states (as attribute names)
-				var attrsToGet = [];
-				for(id of idarray) {
-						attrsToGet.push(prefix + id + suffix);
+		// Gather all the shield_active states (as attribute names)
+		var attrsToGet = [];
+		for(let id of idarray) {
+			attrsToGet.push(prefix + id + suffix);
+		}
+
+		// Get the attributes
+		safeGetAttrs( attrsToGet, function(shieldActiveStates) {
+			var activeShields = [];
+			var activeShieldRowId = "";
+
+			for (let attr of attrsToGet) {
+				if (shieldActiveStates[ attr ] === "on") {
+					activeShields.push(attr);
 				}
+			}
 
-				// Get the attributes
-				safeGetAttrs( attrsToGet, function(shieldActiveStates) {
-						var activeShields = [];
-						var activeShieldRowId = "";
-
-						for (attr of attrsToGet) {
-								if (shieldActiveStates[ attr ] === "on") {
-										activeShields.push(attr);
-								}
+			var attrsToChange = {};
+			// 0 active shields? Deactivate shields, nothing to do.
+			if (activeShields.length === 0) {
+				// do something for deactivation
+				debugLog(caller, "Deactivating shields/parry weapons ...");
+				activeShieldRowId = "";
+			} else if (activeShields.length === 1) {
+				// this is the active shield
+				var activeShield = activeShields[0];
+				debugLog(caller, "Setting active shields/parry weapons to \"" + activeShield + "\"");
+				activeShieldRowId = extractRowId(activeShield);
+			} else {
+				// If one shield got activated, deactivate all others.
+				if (mode === "on") {
+					activeShieldRowId = sourceShieldId;
+					debugLog(caller, "Setting active shields/parry weapons to \"" + sourceShield + "\" and deactivating all others ...");
+					for (let activeShield of activeShields) {
+						if (activeShield !== sourceShield) {
+							attrsToChange[ activeShield ] = 0;
 						}
-
-						var attrsToChange = {};
-						// 0 active shields? Deactivate shields, nothing to do.
-						if (activeShields.length === 0) {
-								// do something for deactivation
-								debugLog(caller, "Deactivating shields/parry weapons ...");
-								activeShieldRowId = "";
-						} else if (activeShields.length === 1) {
-								// this is the active shield
-								var activeShield = activeShields[0];
-								debugLog(caller, "Setting active shields/parry weapons to \"" + activeShield + "\"");
-								activeShieldRowId = extractRowId(activeShield);
-						} else {
-								// If one shield got activated, deactivate all others.
-								if (mode === "on") {
-										activeShieldRowId = sourceShieldId;
-										debugLog(caller, "Setting active shields/parry weapons to \"" + sourceShield + "\" and deactivating all others ...");
-										for (activeShield of activeShields) {
-												if (activeShield !== sourceShield) {
-														attrsToChange[ activeShield ] = 0;
-												}
-										}
-								} else {
-								// If one shield got deactivated and there is another active shield, keep one and only one shield. (This case should not happen.)
-										debugLog(caller, "Impossible case triggered: One shield deactivated and more than one active shield remaining. Deactivating all but the first active shield.");
-										activeShieldRowId = extractRowId(activeShields[0]);
-										for (var i = 1; i < activeShields.length; i++) {
-												attrsToChange[ activeShields[i] ] = 0;
-										}
-								}
-						}
-						attrsToChange[ "activeShieldRowId" ] = activeShieldRowId;
-						safeSetAttrs( attrsToChange, { silent: true }, () => { calculateCombatValues() } );
-				});
+					}
+				} else {
+				// If one shield got deactivated and there is another active shield, keep one and only one shield. (This case should not happen.)
+					debugLog(caller, "Impossible case triggered: One shield deactivated and more than one active shield remaining. Deactivating all but the first active shield.");
+					activeShieldRowId = extractRowId(activeShields[0]);
+					for (let i = 1; i < activeShields.length; i++) {
+							attrsToChange[ activeShields[i] ] = 0;
+					}
+				}
+			}
+			attrsToChange[ "activeShieldRowId" ] = activeShieldRowId;
+			safeSetAttrs( attrsToChange, { silent: true }, () => { calculateCombatValues() } );
 		});
+	});
 });
 
 /* Helper attributes "TP_W_Aktiv" and "TP_Bonus_Aktiv" for combat calculations
@@ -162,19 +162,22 @@ function(eventInfos) {
 // Not working: Peitsche
 on(
 "change:kk change:kk_basis change:kk_mod "+
-"change:taw_anderthalbhander change:taw_dolche change:taw_fechtwaffen " +
+"change:taw_anderthalbhander change:taw_bastardstaebe change:taw_dolche " +
+"change:taw_fechtwaffen " +
 "change:taw_hiebwaffen change:taw_infanteriewaffen change:taw_kettenstabe " +
 "change:taw_kettenwaffen change:taw_lanzenreiten change:taw_peitsche " +
 "change:taw_raufen change:taw_ringen change:taw_sabel change:taw_schwerter " +
 "change:taw_speere change:taw_stabe change:taw_zweihandflegel " +
 "change:taw_zweihand-hiebwaffen change:taw_zweihandschwerter " +
-"change:at_anderthalbhander change:at_dolche change:at_fechtwaffen change:at_hiebwaffen " +
+"change:at_anderthalbhander change:at_bastardstaebe change:at_dolche change:at_fechtwaffen " +
+"change:at_hiebwaffen " +
 "change:at_infanteriewaffen change:at_kettenstabe change:at_kettenwaffen " +
 "change:at_lanzenreiten change:at_peitsche change:at_raufen change:at_ringen change:at_sabel " +
 "change:at_schwerter change:at_speere change:at_stabe change:at_zweihandflegel " +
 "change:at_zweihand-hiebwaffen change:at_zweihandschwerter " +
 "change:pabasis " +
-"change:pa_anderthalbhander change:pa_dolche change:pa_fechtwaffen change:pa_hiebwaffen " +
+"change:pa_anderthalbhander change: pa_bastardstaebe change:pa_dolche change:pa_fechtwaffen " +
+"change:pa_hiebwaffen " +
 "change:pa_infanteriewaffen change:pa_kettenstabe change:pa_kettenwaffen " +
 "change:pa_lanzenreiten change:pa_peitsche change:pa_raufen change:pa_ringen change:pa_sabel " +
 "change:pa_schwerter change:pa_speere change:pa_stabe change:pa_zweihandflegel " +
@@ -194,87 +197,87 @@ function(eventInfos) {
 
 function calculateCombatValues() {
 	var caller = "calculateCombatValues";
-		debugLog(caller, "calculating combat values");
-		// Zunächst sammeln wir Infos über die aktiven Waffen und Schilde
-		// "activeShieldRowId" can be the id of either a shield or a parry weapon
-		safeGetAttrs([ "activeShieldRowId", "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4" ], function(rowIdValues) {
-				var weapon = 0;
-				if (rowIdValues["NKW_Aktiv1"] === "1") {
-						weapon = 1;
-				} else if (rowIdValues["NKW_Aktiv2"] === "1") {
-						weapon = 2;
-				} else if (rowIdValues["NKW_Aktiv3"] === "1") {
-						weapon = 3;
-				} else if (rowIdValues["NKW_Aktiv4"] === "1") {
-						weapon = 4;
-				} else {
-						// didn't find an active weapon. setting values to 0;
-						attrsToChange = {
-								"AT_Aktiv": 0,
-								"AT_Aktiv_TaW": "0",
-								"PA_Aktiv": 0,
-								"PA_Aktiv_TaW": "0",
-								"shield_pa": 0,
-								"parryweapon_at": 0,
-								"parryweapon_pa": 0,
-								"shield_pa_available": "0",
-								"parryweapon_pa_available": "0"
-						}
-						safeSetAttrs(attrsToChange);
-						return;
-				}
-				var variablesToGet = [
-						"KK", "KK_Basis", "KK_mod",
-					"NKW_AT_typ" + weapon, "NKW" + weapon + "ATMod",
-					"NKW_PA_typ" + weapon, "NKW" + weapon + "PAMod",
-					"INIModNKW" + weapon,
-					"NKW" + weapon + "_Spez", "NKW" + weapon + "_SB",
-						"TaW_anderthalbhander", "TaW_dolche", "TaW_fechtwaffen", "TaW_hiebwaffen",
-						"TaW_infanteriewaffen", "TaW_kettenstabe", "TaW_kettenwaffen", "TaW_lanzenreiten", "TaW_peitsche", "TaW_raufen", "TaW_ringen", "TaW_sabel",
-						"TaW_schwerter", "TaW_speere", "TaW_stabe", "TaW_zweihandflegel", "TaW_zweihand-hiebwaffen", "TaW_zweihandschwerter",
-						"AT_anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen",
-						"AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", 
-						"AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter", 
-						"AT_mod_wounds",
-						"PA_anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen",
-						"PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", 
-						"PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
-						"PA_mod_wounds",
-						"PABasis", "sf_schildkampfI", "sf_schildkampfII", "sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "be_at_mod", "be_pa_mod",
-						"sf_beidhandigerkampfI", "sf_beidhandigerkampfII", "vorteil_beidhaendig"
-						 ];
+	debugLog(caller, "calculating combat values");
+	// Zunächst sammeln wir Infos über die aktiven Waffen und Schilde
+	// "activeShieldRowId" can be the id of either a shield or a parry weapon
+	safeGetAttrs([ "activeShieldRowId", "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4" ], function(rowIdValues) {
+		var weapon = 0;
+		if (rowIdValues["NKW_Aktiv1"] === "1") {
+			weapon = 1;
+		} else if (rowIdValues["NKW_Aktiv2"] === "1") {
+			weapon = 2;
+		} else if (rowIdValues["NKW_Aktiv3"] === "1") {
+			weapon = 3;
+		} else if (rowIdValues["NKW_Aktiv4"] === "1") {
+			weapon = 4;
+		} else {
+			// didn't find an active weapon. setting values to 0;
+			attrsToChange = {
+				"AT_Aktiv": 0,
+				"AT_Aktiv_TaW": "0",
+				"PA_Aktiv": 0,
+				"PA_Aktiv_TaW": "0",
+				"shield_pa": 0,
+				"parryweapon_at": 0,
+				"parryweapon_pa": 0,
+				"shield_pa_available": "0",
+				"parryweapon_pa_available": "0"
+			}
+			safeSetAttrs(attrsToChange);
+			return;
+		}
+		var variablesToGet = [
+			"KK", "KK_Basis", "KK_mod",
+			"NKW_AT_typ" + weapon, "NKW" + weapon + "ATMod",
+			"NKW_PA_typ" + weapon, "NKW" + weapon + "PAMod",
+			"INIModNKW" + weapon,
+			"NKW" + weapon + "_Spez", "NKW" + weapon + "_SB",
+			"TaW_anderthalbhander", "TaW_bastardstaebe", "TaW_dolche", "TaW_fechtwaffen", "TaW_hiebwaffen",
+			"TaW_infanteriewaffen", "TaW_kettenstabe", "TaW_kettenwaffen", "TaW_lanzenreiten", "TaW_peitsche", "TaW_raufen", "TaW_ringen", "TaW_sabel",
+			"TaW_schwerter", "TaW_speere", "TaW_stabe", "TaW_zweihandflegel", "TaW_zweihand-hiebwaffen", "TaW_zweihandschwerter",
+			"AT_anderthalbhander", "AT_bastardstaebe", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen",
+			"AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel",
+			"AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter",
+			"AT_mod_wounds",
+			"PA_anderthalbhander", "PA_bastardstaebe", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen",
+			"PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel",
+			"PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
+			"PA_mod_wounds",
+			"PABasis", "sf_schildkampfI", "sf_schildkampfII", "sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "be_at_mod", "be_pa_mod",
+			"sf_beidhandigerkampfI", "sf_beidhandigerkampfII", "vorteil_beidhaendig"
+	 ];
 
-				// Wurde dieses Event dadurch ausgelöst, dass sich die Aktivität eines Schildes geändert hat, dann müssen wir die activeShieldRowId noch manuell bearbeiten, da diese eventuell noch nicht korrekt gesetzt wurde
-				var activeShieldRowId = rowIdValues["activeShieldRowId"];
+		// Wurde dieses Event dadurch ausgelöst, dass sich die Aktivität eines Schildes geändert hat, dann müssen wir die activeShieldRowId noch manuell bearbeiten, da diese eventuell noch nicht korrekt gesetzt wurde
+		var activeShieldRowId = rowIdValues["activeShieldRowId"];
 
-				// Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
-				if (activeShieldRowId) {
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_bf");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_ini_mod");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_name");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tp");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tpkk");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_combat_technique");
-				}
+		// Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
+		if (activeShieldRowId) {
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_bf");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_ini_mod");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_name");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tp");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tpkk");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_combat_technique");
+		}
 
-				safeGetAttrs(variablesToGet, function(values) {
-						var attrsToChange = {};
+		safeGetAttrs(variablesToGet, function(values) {
+			var attrsToChange = {};
 
 			// Prepare against NaN KK
 			if (isNaN(values["KK"])) {
 				values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
 			}
 
-						// Used for AT, PA and TP calc
-						let tpkkMod = parseInt(values["NKW" + weapon + "_SB"]);
+			// Used for AT, PA and TP calc
+			let tpkkMod = parseInt(values["NKW" + weapon + "_SB"]);
 
-						// Berechne Waffen-AT
-						var ATkampftechnikRaw = values["NKW_AT_typ" + weapon];
-						// AT-Wert nur berechenbar, wenn dahinterstehende Kampftechnik bekannt
-						if (ATkampftechnikRaw && ATkampftechnikRaw !== "0") {
+			// Berechne Waffen-AT
+			var ATkampftechnikRaw = values["NKW_AT_typ" + weapon];
+			// AT-Wert nur berechenbar, wenn dahinterstehende Kampftechnik bekannt
+			if (ATkampftechnikRaw && ATkampftechnikRaw !== "0") {
 				var AT = 0;
 				var taw = 0;
 				var ATkampftechnik = ATkampftechnikRaw.match("@{AT_(.*)}");
@@ -292,30 +295,30 @@ function calculateCombatValues() {
 					AT = parseInt(values["AT_" + ATkampftechnik[1].toLowerCase()]);
 				}
 
-								var atMod = parseInt(values["NKW" + weapon +"ATMod"]);
-								var spec = parseInt(values["NKW" + weapon + "_Spez"]);
-								var atValue = AT + atMod + spec + (values.AT_mod_wounds || 0);
-								// bei aktivem Schild (nicht bei Parierwaffen), wird der AT Wert der Hauptwaffe um den AT-Mod des Schildes verändert
-								if (activeShieldRowId && values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
-										atValue = atValue + parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
-								}
-								if (values["be_at_mod"]) {
-										atValue -= parseInt(values["be_at_mod"]);
-								}
+				var atMod = parseInt(values["NKW" + weapon +"ATMod"]);
+				var spec = parseInt(values["NKW" + weapon + "_Spez"]);
+				var atValue = AT + atMod + spec + (values.AT_mod_wounds || 0);
+				// bei aktivem Schild (nicht bei Parierwaffen), wird der AT Wert der Hauptwaffe um den AT-Mod des Schildes verändert
+				if (activeShieldRowId && values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
+					atValue = atValue + parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
+				}
+				if (values["be_at_mod"]) {
+					atValue -= parseInt(values["be_at_mod"]);
+				}
 
 				// Negative TP/KK reduziert auch AT
-								if (tpkkMod && tpkkMod < 0) {
-										atValue += tpkkMod;
-								}
-								attrsToChange["AT_Aktiv"] = Math.max(0, atValue);
-								attrsToChange["AT_Aktiv_TaW"] = taw;
-						}
+				if (tpkkMod && tpkkMod < 0) {
+					atValue += tpkkMod;
+				}
+					attrsToChange["AT_Aktiv"] = Math.max(0, atValue);
+					attrsToChange["AT_Aktiv_TaW"] = taw;
+			}
 
-						// Berechne Waffen-PA
-						var PAkampftechnikRaw = values["NKW_PA_typ" + weapon];
-						var paValue = 0;
-						// Wir berechnen den PA Wert nur, wenn ein Talenttyp für den PA Wert der Waffe ausgewählt ist
-						if (PAkampftechnikRaw && PAkampftechnikRaw !== "0" ) {
+			// Berechne Waffen-PA
+			var PAkampftechnikRaw = values["NKW_PA_typ" + weapon];
+			var paValue = 0;
+			// Wir berechnen den PA Wert nur, wenn ein Talenttyp für den PA Wert der Waffe ausgewählt ist
+			if (PAkampftechnikRaw && PAkampftechnikRaw !== "0" ) {
 				var PA = 0;
 				var taw = 0;
 				var PAkampftechnik = PAkampftechnikRaw.match("@{PA_(.*)}");
@@ -333,120 +336,120 @@ function calculateCombatValues() {
 					PA = parseInt(values["PA_" + PAkampftechnik[1].toLowerCase()]);
 				}
 
-								var paMod = parseInt(values["NKW" + weapon +"PAMod"]);
-								var spec = parseInt(values["NKW" + weapon + "_Spez"]);
-								var wounds = isNaN(values['PA_mod_wounds']) ? 0 : values['PA_mod_wounds'];
-								paValue = PA + paMod + spec + wounds;
+				var paMod = parseInt(values["NKW" + weapon +"PAMod"]);
+				var spec = parseInt(values["NKW" + weapon + "_Spez"]);
+				var wounds = isNaN(values['PA_mod_wounds']) ? 0 : values['PA_mod_wounds'];
+				paValue = PA + paMod + spec + wounds;
 
-								if (values["be_pa_mod"]) {
-										paValue -= parseInt(values["be_pa_mod"]);
-								}
-								
-								if (Number.isNaN(paValue) || paValue < 0) {
-										paValue = 0;
-								}
-								if (tpkkMod && tpkkMod < 0) {
-										paValue += tpkkMod;
-								}
-								attrsToChange["PA_Aktiv"] = Math.max(0, paValue);
-								attrsToChange["PA_Aktiv_TaW"] = taw;
+				if (values["be_pa_mod"]) {
+						paValue -= parseInt(values["be_pa_mod"]);
+				}
+
+				if (Number.isNaN(paValue) || paValue < 0) {
+						paValue = 0;
+				}
+				if (tpkkMod && tpkkMod < 0) {
+						paValue += tpkkMod;
+				}
+				attrsToChange["PA_Aktiv"] = Math.max(0, paValue);
+				attrsToChange["PA_Aktiv_TaW"] = taw;
+			}
+
+			// Berechne Schild-PA und Parierwaffen-AT (Annahme: Kampf mit "falscher" Hand)
+			var shieldPa = 0;
+			var parryweaponAT = 0;
+			var parryweaponPa = 0;
+			// natürlich nur, wenn ein Schild aktiv ist (Siehe WdS S. 70)
+			if (activeShieldRowId) {
+				var linkhand = values["sf_linkhand"];
+				if (values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
+					// Lade die Werte der für Schildparaden relevanten SF
+					var schildkampf1 = values["sf_schildkampfI"];
+					var schildkampf2 = values["sf_schildkampfII"];
+					// Wir starten mit dem PA Basiswert des Charakters
+					shieldPa = parseInt(values["PABasis"]);
+					// Für Schildkampf 2 werden 5 Punkte, für Schildkampf 1 3 Punkte und für Linkhand 1 Punkt addiert
+					if (schildkampf2 === "1") {
+						shieldPa += 5;
+					} else if (schildkampf1 === "1") {
+						shieldPa += 3;
+					} else if (linkhand === "1") {
+						shieldPa += 1;
+					}
+
+					// Ist der PA Wert der Waffe >= 21 werden 3 Punkte, >= 18 2 Punkte und >= 15 1 Punkt addiert
+					if (paValue >= 21) {
+						shieldPa += 3;
+					} else if (paValue >= 18) {
+						shieldPa += 2;
+					} else if (paValue >= 15) {
+						shieldPa += 1;
+					}
+
+					// berechne BE modifikator mit ein
+					if (values["be_pa_mod"]) {
+						shieldPa -= parseInt(values["be_pa_mod"]);
+					}
+
+					// Zuletzt: Addiere den PA-Modifikator des Schildes
+					shieldPa += parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_pa_mod"]);
+				} else if (values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "parryweapon") {
+					// Parierwaffen-AT besteht aus: AT der Kampftechnik + AT-WM der Waffe + Wundmod. + BE-Mod
+					// TODO: Spezialisierungen beachten
+					var parryWeaponCombatTechnique = values["repeating_shields_" + activeShieldRowId + "_combat_technique"];
+					if (DSAsane(parryWeaponCombatTechnique, "melee-combat-technique")) {
+						var AT = 0;
+
+						// Suche nach der richtigen Schreibweise des Attributnamens ...
+						AT = parseInt(values["AT_" + parryWeaponCombatTechnique]);
+						if (isNaN(AT)) {
+							AT = parseInt(values["AT_" + parryWeaponCombatTechnique.toLowerCase()])
 						}
 
-						// Berechne Schild-PA und Parierwaffen-AT (Annahme: Kampf mit "falscher" Hand)
-						var shieldPa = 0;
-						var parryweaponAT = 0;
-						var parryweaponPa = 0;
-						// natürlich nur, wenn ein Schild aktiv ist (Siehe WdS S. 70)
-						if (activeShieldRowId) {
-								var linkhand = values["sf_linkhand"];
-								if (values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
-										// Lade die Werte der für Schildparaden relevanten SF
-										var schildkampf1 = values["sf_schildkampfI"];
-										var schildkampf2 = values["sf_schildkampfII"];
-										// Wir starten mit dem PA Basiswert des Charakters
-										shieldPa = parseInt(values["PABasis"]);
-										// Für Schildkampf 2 werden 5 Punkte, für Schildkampf 1 3 Punkte und für Linkhand 1 Punkt addiert
-										if (schildkampf2 === "1") {
-												shieldPa += 5;
-										} else if (schildkampf1 === "1") {
-												shieldPa += 3;
-										} else if (linkhand === "1") {
-												shieldPa += 1;
-										}
+						var atMod = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
 
-										// Ist der PA Wert der Waffe >= 21 werden 3 Punkte, >= 18 2 Punkte und >= 15 1 Punkt addiert
-										if (paValue >= 21) {
-												shieldPa += 3;
-										} else if (paValue >= 18) {
-												shieldPa += 2;
-										} else if (paValue >= 15) {
-												shieldPa += 1;
-										}
+						var atValue =
+							AT + atMod
+							+ values["AT_mod_wounds"]
+							- parseInt(values["be_at_mod"]);
+						attrsToChange["parryweapon_at"] = atValue;
+					}
 
-										// berechne BE modifikator mit ein
-										if (values["be_pa_mod"]) {
-												shieldPa -= parseInt(values["be_pa_mod"]);
-										}
+					var parierwaffen1 = values["sf_parierwaffenI"];
+					var parierwaffen2 = values["sf_parierwaffenII"];
+					// Basis für Parierwaffen-PA ist die PA der Hauptwaffe
+					parryweaponPa = Math.max(0, paValue);
 
-										// Zuletzt: Addiere den PA-Modifikator des Schildes
-										shieldPa += parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_pa_mod"]);
-								} else if (values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "parryweapon") {
-										// Parierwaffen-AT besteht aus: AT der Kampftechnik + AT-WM der Waffe + Wundmod. + BE-Mod
-										// TODO: Spezialisierungen beachten
-										var parryWeaponCombatTechnique = values["repeating_shields_" + activeShieldRowId + "_combat_technique"];
-										if (DSAsane(parryWeaponCombatTechnique, "melee-combat-technique")) {
-												var AT = 0;
+					// Dazu wird der PA-Mod der Parierwaffe addiert
+					parryweaponPa += parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_pa_mod"]);
 
-												// Suche nach der richtigen Schreibweise des Attributnamens ...
-												AT = parseInt(values["AT_" + parryWeaponCombatTechnique]);
-												if (isNaN(AT)) {
-														AT = parseInt(values["AT_" + parryWeaponCombatTechnique.toLowerCase()])
-												}
+					if (parierwaffen2 === "1") {
+						parryweaponPa += 2;
+					} else if (parierwaffen1 === "1") {
+						parryweaponPa += -1;
+					} else if (linkhand === "1") {
+						parryweaponPa += -4;
+					} else {
+						// Ohne die SF Linkhand können Parierwaffen nicht verwendet werden
+						parryweaponPa = 0;
+					}
+				}
+				// Wundeinfluss (bei Parierwaffe über PA-Wert der Hauptwaffe bereits drin)
+				shieldPa = Math.max(0, shieldPa + (isNaN(values['PA_mod_wounds']) ? 0 : values['PA_mod_wounds']));
+			}
 
-												var atMod = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
-
-												var atValue =
-														AT + atMod
-														+ values["AT_mod_wounds"]
-														- parseInt(values["be_at_mod"]);
-												attrsToChange["parryweapon_at"] = atValue;
-										}
-
-										var parierwaffen1 = values["sf_parierwaffenI"];
-										var parierwaffen2 = values["sf_parierwaffenII"];
-										// Basis für Parierwaffen-PA ist die PA der Hauptwaffe
-										parryweaponPa = Math.max(0, paValue);
-
-										// Dazu wird der PA-Mod der Parierwaffe addiert
-										parryweaponPa += parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_pa_mod"]);
-
-										if (parierwaffen2 === "1") {
-												parryweaponPa += 2;
-										} else if (parierwaffen1 === "1") {
-												parryweaponPa += -1;
-										} else if (linkhand === "1") {
-												parryweaponPa += -4;
-										} else {
-												// Ohne die SF Linkhand können Parierwaffen nicht verwendet werden
-												parryweaponPa = 0;
-										}
-								}
-								// Wundeinfluss (bei Parierwaffe über PA-Wert der Hauptwaffe bereits drin)
-								shieldPa = Math.max(0, shieldPa + (isNaN(values['PA_mod_wounds']) ? 0 : values['PA_mod_wounds']));
-						}
-						
-						if (shieldPa > 0) {
-								attrsToChange["shield_pa_available"] = "on";
-						} else {
-								attrsToChange["shield_pa_available"] = "0";
-						}
-						if (parryweaponPa > 0) {
-								attrsToChange["parryweapon_pa_available"] = "on";
-						} else {
-								attrsToChange["parryweapon_pa_available"] = "0";
-						}
-						attrsToChange["shield_pa"] = shieldPa;
-						attrsToChange["parryweapon_pa"] = parryweaponPa;
+			if (shieldPa > 0) {
+				attrsToChange["shield_pa_available"] = "on";
+			} else {
+				attrsToChange["shield_pa_available"] = "0";
+			}
+			if (parryweaponPa > 0) {
+				attrsToChange["parryweapon_pa_available"] = "on";
+			} else {
+				attrsToChange["parryweapon_pa_available"] = "0";
+			}
+			attrsToChange["shield_pa"] = shieldPa;
+			attrsToChange["parryweapon_pa"] = parryweaponPa;
 
 			// Set INI modifier from (main) weapon
 			var weaponini = 0;
@@ -456,28 +459,28 @@ function calculateCombatValues() {
 			}
 			attrsToChange["INI_mod_hauptwaffe"] = weaponini;
 
-						// Set INI modifier from shields/parry weapons
-						var shieldparryini = 0;
-						if (activeShieldRowId) {
-								shieldparryini = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_ini_mod"]);
-						}
-						attrsToChange["ShieldParryINI"] = shieldparryini;
+			// Set INI modifier from shields/parry weapons
+			var shieldparryini = 0;
+			if (activeShieldRowId) {
+				shieldparryini = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_ini_mod"]);
+			}
+			attrsToChange["ShieldParryINI"] = shieldparryini;
 
-						// Set shield parry weapon BF (Bruchfaktor; lit. breaking factor -> fragility)
-						var shieldparrybf = 0;
-						if (activeShieldRowId) {
-								shieldparrybf = values["repeating_shields_" + activeShieldRowId + "_shield_bf"];
-								if (shieldparrybf === undefined || isNaN(parseInt(shieldparrybf))) {
-										shieldparrybf = 0;
-								}
-						}
-						attrsToChange["shield_bf"] = shieldparrybf;
+			// Set shield parry weapon BF (Bruchfaktor; lit. breaking factor -> fragility)
+			var shieldparrybf = 0;
+			if (activeShieldRowId) {
+				shieldparrybf = values["repeating_shields_" + activeShieldRowId + "_shield_bf"];
+				if (shieldparrybf === undefined || isNaN(parseInt(shieldparrybf))) {
+					shieldparrybf = 0;
+				}
+			}
+			attrsToChange["shield_bf"] = shieldparrybf;
 
-						// Set shield parry weapon TP/KK (damage modifier based on low/high strength)
-						var shieldparrytpkkdefault = "13/3";
-						var shieldparrytpkk = shieldparrytpkkdefault;
-						if (activeShieldRowId) {
-								shieldparrytpkk = values["repeating_shields_" + activeShieldRowId + "_shield_tpkk"];
+			// Set shield parry weapon TP/KK (damage modifier based on low/high strength)
+			var shieldparrytpkkdefault = "13/3";
+			var shieldparrytpkk = shieldparrytpkkdefault;
+			if (activeShieldRowId) {
+				shieldparrytpkk = values["repeating_shields_" + activeShieldRowId + "_shield_tpkk"];
 
 				// Check for correct TP/KK
 				{
@@ -496,87 +499,115 @@ function calculateCombatValues() {
 						shieldparrytpkk = shieldparrytpkkdefault;
 					}
 				}
-								// We are misusing the TP/KK function a bit ...
-								var TPKK = new Object();
-								TPKK["Schwellenwert"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[1]);
-								TPKK["Schritt"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[2]);
-								shieldparrytpkk = calculateTpKKModFromValuesAndWeaponNumber(
-										{
-												"KK": values["KK"],
-												"NKW-schild_SchwellenwertKK": TPKK["Schwellenwert"],
-												"NKW-schild_Schwellenwert": TPKK["Schritt"]
-										},
-										"-schild"
-								);
-						}
-						attrsToChange["shield_tpkk"] = shieldparrytpkk;
+				// We are misusing the TP/KK function a bit ...
+				var TPKK = new Object();
+				TPKK["Schwellenwert"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[1]);
+				TPKK["Schritt"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[2]);
+				shieldparrytpkk = calculateTpKKModFromValuesAndWeaponNumber(
+					{
+						"KK": values["KK"],
+						"NKW-schild_SchwellenwertKK": TPKK["Schwellenwert"],
+						"NKW-schild_Schwellenwert": TPKK["Schritt"]
+					},
+					"-schild"
+				);
+			}
+			attrsToChange["shield_tpkk"] = shieldparrytpkk;
 
-						// Set shield parry weapon TP (damage)
-						// For now no calculations, just showing text
-						var shieldparrytp = "";
-						var shieldparrytproll = "";
-						if (activeShieldRowId) {
-								shieldparrytp = values["repeating_shields_" + activeShieldRowId + "_shield_tp"];
-								if (shieldparrytp === undefined || shieldparrytp === "") {
-										shieldparrytp = " ";
-								} else {
-										shieldparrytproll = shieldparrytp.replace("W", "d");
-								}
-						}
-						attrsToChange["shield_tp"] = shieldparrytp;
-						attrsToChange["shield_tp_roll"] = shieldparrytproll;
+			// Set shield parry weapon TP (damage)
+			// For now no calculations, just showing text
+			var shieldparrytp = "";
+			var shieldparrytproll = "";
+			if (activeShieldRowId) {
+				shieldparrytp = values["repeating_shields_" + activeShieldRowId + "_shield_tp"];
+				if (shieldparrytp === undefined || shieldparrytp === "") {
+					shieldparrytp = " ";
+				} else {
+					shieldparrytproll = shieldparrytp.replace("W", "d");
+				}
+			}
+			attrsToChange["shield_tp"] = shieldparrytp;
+			attrsToChange["shield_tp_roll"] = shieldparrytproll;
 
-						// Set shield parry weapon name
-						var shieldparryname = "";
-						if (activeShieldRowId) {
-								shieldparryname = values["repeating_shields_" + activeShieldRowId + "_shield_name"];
-								if (shieldparryname === undefined || shieldparryname === "") {
-										shieldparryname = " ";
-								}
-						}
-						attrsToChange["shield_name"] = shieldparryname;
+			// Set shield parry weapon name
+			var shieldparryname = "";
+			if (activeShieldRowId) {
+				shieldparryname = values["repeating_shields_" + activeShieldRowId + "_shield_name"];
+				if (shieldparryname === undefined || shieldparryname === "") {
+					shieldparryname = " ";
+				}
+			}
+			attrsToChange["shield_name"] = shieldparryname;
 
-						safeSetAttrs(attrsToChange);
-				});
+			safeSetAttrs(attrsToChange);
 		});
+	});
 }
 
-// Wird eine Nahkampfwaffe aktiviert, werden alle anderen deaktiviert. Auf diese Weise wird sichergestellt, dass immer maximal eine Nahkampfwaffe aktiv ist.
-// Funktionsweise siehe Methode unten zum deaktivieren der Schilde
-on("change:nkw_aktiv1 change:nkw_aktiv2 change:nkw_aktiv3 change:nkw_aktiv4", function(eventInfo) {
-		if (eventInfo.newValue !== "1") {
-				return;
-		}
-		var attrsToChange = {};
-		for (var i = 1; i <= 4; i++) {
-				if (eventInfo.sourceAttribute !== "nkw_aktiv" + i) {
-						attrsToChange["NKW_Aktiv" + i] = 0;
+// Toggling hints for encumbrance affecting AT/PA
+on([
+		"be_at_mod",
+		"be_pa_mod",
+	].map(attr => `change:${attr}`).join(" "), function(eventInfo) {
+		const caller = "Action Listener for Toggling Hints for Encumbrance Affecting AT/PA";
+		const sourceAttr = eventInfo["sourceAttribute"];
+		const hintAttr = sourceAttr + "_hint";
+		let attrsToChange = {};
+
+		switch (sourceAttr)
+		{
+			case "be_at_mod":
+			case "be_pa_mod":
+				if (eventInfo["newValue"] > 0)
+				{
+					attrsToChange[hintAttr] = 1;
+				} else {
+					attrsToChange[hintAttr] = 0;
 				}
+				break;
+			default:
+				debugLog(caller, "sourceAttribute not be_at_mod or be_pa_mod.");
+				break;
 		}
 		safeSetAttrs(attrsToChange);
 });
 
-on("change:atbasis change:taw_peitsche change:at_peitsche", function(eventInfo) {
-		// do prevent infinite loop
-		if (eventInfo.sourceType === "sheetworker" && eventInfo.sourceAttribute === "AT_peitsche") {
-				return;
+// Wird eine Nahkampfwaffe aktiviert, werden alle anderen deaktiviert. Auf diese Weise wird sichergestellt, dass immer maximal eine Nahkampfwaffe aktiv ist.
+// Funktionsweise siehe Methode unten zum deaktivieren der Schilde
+on("change:nkw_aktiv1 change:nkw_aktiv2 change:nkw_aktiv3 change:nkw_aktiv4", function(eventInfo) {
+	if (eventInfo.newValue !== "1") {
+		return;
+	}
+	var attrsToChange = {};
+	for (let i = 1; i <= 4; i++) {
+		if (eventInfo.sourceAttribute !== "nkw_aktiv" + i) {
+			attrsToChange["NKW_Aktiv" + i] = 0;
 		}
-		safeGetAttrs([ "ATbasis", "TaW_peitsche" ], function(values) {
-				var peitscheAT = 0;
-				if (values["TaW_peitsche"]) {
-						peitscheAT = parseInt(values["ATbasis"]) + parseInt(values["TaW_peitsche"]);
-				}
-				safeSetAttrs({ "AT_peitsche": peitscheAT });
-		});
+	}
+	safeSetAttrs(attrsToChange);
+});
+
+on("change:atbasis change:taw_peitsche change:at_peitsche", function(eventInfo) {
+	// do prevent infinite loop
+	if (eventInfo.sourceType === "sheetworker" && eventInfo.sourceAttribute === "AT_peitsche") {
+		return;
+	}
+	safeGetAttrs([ "ATbasis", "TaW_peitsche" ], function(values) {
+		var peitscheAT = 0;
+		if (values["TaW_peitsche"]) {
+			peitscheAT = parseInt(values["ATbasis"]) + parseInt(values["TaW_peitsche"]);
+		}
+		safeSetAttrs({ "AT_peitsche": peitscheAT });
+	});
 });
 
 on(
 "change:sf_linkhand change:sf_beidhandigerkampfI change:sf_beidhandigerkampfII change:vorteil_beidhaendig " +
 "change:sf_parierwaffeni change:sf_parierwaffenii " +
 "change:sf_schildkampfi change:sf_schildkampfii ", function(eventInfo) {
-		safeGetAttrs(["sf_linkhand", "sf_beidhandigerkampfI", "sf_beidhandigerkampfII", "vorteil_beidhaendig", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
-				var caller = "???";
-				var attrsToChange = {};
+	safeGetAttrs(["sf_linkhand", "sf_beidhandigerkampfI", "sf_beidhandigerkampfII", "vorteil_beidhaendig", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
+		var caller = "???";
+		var attrsToChange = {};
 
 		// Caution: This might cause trouble if some function other than this one changed these attributes.
 		if (eventInfo.sourceType === "sheetworker")
@@ -644,10 +675,10 @@ on(
 				}
 				break;
 		}
-				safeSetAttrs(attrsToChange, () => {
+		safeSetAttrs(attrsToChange, () => {
 			calculateCombatValues(eventInfo);
-				});
 		});
+	});
 });
 
 on(
@@ -657,39 +688,39 @@ on(
 "change:nkw3_schwellenwertkk change:nkw3_schwellenwert " +
 "change:nkw4_schwellenwertkk change:nkw4_schwellenwert", function(eventInfo) {
 
-		var weaponsToCalculate = [];
-		let attrsToGet = [ "KK", "KK_Basis", "KK_mod" ];
+	var weaponsToCalculate = [];
+	let attrsToGet = [ "KK", "KK_Basis", "KK_mod" ];
 
-		// Gather all affected melee weapons (NKW)
-		// Changes to KK (strength) can affect all weapons
-		// Compare with lowercase as all attribute names are lowercase in eventInfo
-		if (eventInfo.sourceAttribute === "kk") {
-				for (var weapon = 1; weapon <= 4; weapon++) {
-						weaponsToCalculate.push(weapon);
-						attrsToGet.push("NKW" + weapon + "_Schwellenwert");
-						attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
-				}
-		// Use the slot (number) of the weapon which just got changed
-		} else {
-				let matchResult = eventInfo.sourceAttribute.match(/nkw(\d)_.*/i);
-				let weapon = matchResult[1];
-				weaponsToCalculate.push(weapon);
-				attrsToGet.push("NKW" + weapon + "_Schwellenwert");
-				attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
+	// Gather all affected melee weapons (NKW)
+	// Changes to KK (strength) can affect all weapons
+	// Compare with lowercase as all attribute names are lowercase in eventInfo
+	if (eventInfo.sourceAttribute === "kk") {
+		for (let weapon = 1; weapon <= 4; weapon++) {
+			weaponsToCalculate.push(weapon);
+			attrsToGet.push("NKW" + weapon + "_Schwellenwert");
+			attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
 		}
+	// Use the slot (number) of the weapon which just got changed
+	} else {
+		let matchResult = eventInfo.sourceAttribute.match(/nkw(\d)_.*/i);
+		let weapon = matchResult[1];
+		weaponsToCalculate.push(weapon);
+		attrsToGet.push("NKW" + weapon + "_Schwellenwert");
+		attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
+	}
 
-		safeGetAttrs(attrsToGet, function(values) {
+	safeGetAttrs(attrsToGet, function(values) {
 		// Prepare against NaN KK
 		if (isNaN(values["KK"])) {
 			values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
 		}
-				let attrsToChange = {};
-				for (var i = 0; i < weaponsToCalculate.length; i++) {
-						let weapon = weaponsToCalculate[i];
-						attrsToChange["NKW" + weapon +  "_SB"] = calculateTpKKModFromValuesAndWeaponNumber(values, weapon);
-				}
-				safeSetAttrs(attrsToChange);
-		})
+		let attrsToChange = {};
+		for (let i = 0; i < weaponsToCalculate.length; i++) {
+			let weapon = weaponsToCalculate[i];
+			attrsToChange["NKW" + weapon +  "_SB"] = calculateTpKKModFromValuesAndWeaponNumber(values, weapon);
+		}
+		safeSetAttrs(attrsToChange);
+	});
 });
 
 /* TP/KK modifies (usually only) TP, but sometimes also AT and PA
@@ -745,13 +776,13 @@ Str. Dif. Flo. Res.
 
 // Special version
 function calculateTpKKModFromValuesAndWeaponNumber(values, weapon) {
-		const func = "calculateTpKKModFromValuesAndWeaponNumber";
-		let KK = parseInt(values["KK"]);
-		let threshold = parseInt(values["NKW" + weapon + "_SchwellenwertKK"]);
-		let step = parseInt(values["NKW" + weapon + "_Schwellenwert"]);
+	const func = "calculateTpKKModFromValuesAndWeaponNumber";
+	let KK = parseInt(values["KK"]);
+	let threshold = parseInt(values["NKW" + weapon + "_SchwellenwertKK"]);
+	let step = parseInt(values["NKW" + weapon + "_Schwellenwert"]);
 
-		var tpkkMod = calculateTpKKMod(KK, threshold, step);
-		return tpkkMod;
+	var tpkkMod = calculateTpKKMod(KK, threshold, step);
+	return tpkkMod;
 }
 
 // General version
@@ -783,43 +814,42 @@ function calculateTpKKMod(KK, threshold, step) {
 
 // calculate shield attack modifier
 on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_knaufschlag change:sf_schmutzigetricks change:at_raufen change:at_mod_wounds", function(eventInfos) {
-		safeGetAttrs(["activeShieldRowId"], function(rowIdValues) {
-				var caller = "???";
-				var activeShieldRowId = rowIdValues["activeShieldRowId"];
-				if (eventInfos.sourceAttribute && eventInfos.sourceAttribute.endsWith("_shield_active")) {
-						if (eventInfos.newValue === "on") {
-								activeShieldRowId = extractRowId(eventInfos.sourceAttribute);
-						} else if (eventInfos.sourceType === "player") {
-								activeShieldRowId = undefined;
-						}
+	safeGetAttrs(["activeShieldRowId"], function(rowIdValues) {
+		var caller = "???";
+		var activeShieldRowId = rowIdValues["activeShieldRowId"];
+		if (eventInfos.sourceAttribute && eventInfos.sourceAttribute.endsWith("_shield_active")) {
+				if (eventInfos.newValue === "on") {
+						activeShieldRowId = extractRowId(eventInfos.sourceAttribute);
+				} else if (eventInfos.sourceType === "player") {
+						activeShieldRowId = undefined;
 				}
+		}
 
-				let variablesToGet = [ "sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag", "AT_raufen", "AT_mod_wounds"]
+		let variablesToGet = [ "sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag", "AT_raufen", "AT_mod_wounds"]
 
-				// Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
-				if (activeShieldRowId) {
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_combat_technique");
-				} else {
-						debugLog(caller, "no active shield found");
-						safeSetAttrs({
+		// Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
+		if (activeShieldRowId) {
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_combat_technique");
+		} else {
+			debugLog(caller, "no active shield found");
+			safeSetAttrs({
 				"shield_at": 0,
 				"shield_at_available": "0",
 				"shield_at_mod": 0
 			});
-						return;
-				}
+			return;
+		}
 
-				safeGetAttrs(variablesToGet, function(values) {
-						let result = calculateShieldAttack(values, activeShieldRowId);
-						debugLog(caller, 'calculated shield attack');
-						debugLog(caller, result);
-						safeSetAttrs(result);
-				});
-
+		safeGetAttrs(variablesToGet, function(values) {
+			let result = calculateShieldAttack(values, activeShieldRowId);
+			debugLog(caller, 'calculated shield attack');
+			debugLog(caller, result);
+			safeSetAttrs(result);
 		});
+	});
 });
 
 function calculateShieldAttack(values, activeShieldRowId) {
@@ -1141,7 +1171,7 @@ on(
 			};
 
 		// Add contents to the results data structure
-		for (macro of elements) {
+		for (let macro of elements) {
 			if (Object.hasOwn(macro, "prefix")) {
 				transformed["common"]["prefix"] += macro["prefix"] + " ";
 			} else if (Object.hasOwn(macro, "suffix")) {
@@ -1342,17 +1372,17 @@ on(
 						passthrough["rollTime"] = Date.now();
 						passthrough["rollTag"] = generateShortRollTag(passthrough["rollTime"]);
 						passthrough["rollMacro"] =
-								"@{gm_roll_opt} " +
-								"&{template:DSA-Nahkampf-Patzer} " +
-								"{{name=Nahkampfpatzer}} " +
-								"{{wurf=[[2d6cs1cf6]]}} " +
-								"{{isOriginalRoll=[[0]]}} " +
-								"{{showRollTag=[[@{show_roll_tags}]]}} " +
-								"{{rollTag=[[0]]}} " +
-								"{{rollTime=[[0]]}} " +
-								"{{rollExpired=[[0]]}} " +
-								"{{rollTimeHuman=[[0]]}} " +
-								"{{passthrough=[[0]]}}";
+							"@{gm_roll_opt} " +
+							"&{template:DSA-Nahkampf-Patzer} " +
+							"{{name=Nahkampfpatzer}} " +
+							"{{wurf=[[2d6cs1cf6]]}} " +
+							"{{isOriginalRoll=[[0]]}} " +
+							"{{showRollTag=[[@{show_roll_tags}]]}} " +
+							"{{rollTag=[[0]]}} " +
+							"{{rollTime=[[0]]}} " +
+							"{{rollExpired=[[0]]}} " +
+							"{{rollTimeHuman=[[0]]}} " +
+							"{{passthrough=[[0]]}}";
 						console.log(passthrough);
 					}
 				} else {
@@ -1481,17 +1511,17 @@ on('clicked:combat_reaction', async (info) => {
 			passthrough["rollTime"] = received["rollTime"];
 			passthrough["rollTag"] = received["rollTag"];
 			passthrough["rollMacro"] =
-					"@{gm_roll_opt} " +
-					"&{template:DSA-Nahkampf-Patzer} " +
-					"{{name=Nahkampfpatzer}} " +
-					"{{wurf=[[2d6cs1cf6]]}} " +
-					"{{isOriginalRoll=[[0]]}} " +
-					"{{showRollTag=[[@{show_roll_tags}]]}} " +
-					"{{rollTag=[[0]]}} " +
-					"{{rollTime=[[0]]}} " +
-					"{{rollExpired=[[0]]}} " +
-					"{{rollTimeHuman=[[0]]}} " +
-					"{{passthrough=[[0]]}}";
+				"@{gm_roll_opt} " +
+				"&{template:DSA-Nahkampf-Patzer} " +
+				"{{name=Nahkampfpatzer}} " +
+				"{{wurf=[[2d6cs1cf6]]}} " +
+				"{{isOriginalRoll=[[0]]}} " +
+				"{{showRollTag=[[@{show_roll_tags}]]}} " +
+				"{{rollTag=[[0]]}} " +
+				"{{rollTime=[[0]]}} " +
+				"{{rollExpired=[[0]]}} " +
+				"{{rollTimeHuman=[[0]]}} " +
+				"{{passthrough=[[0]]}}";
 			console.log(passthrough);
 		} else {
 			result = -2;

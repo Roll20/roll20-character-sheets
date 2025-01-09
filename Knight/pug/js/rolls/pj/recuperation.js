@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable no-undef */
 on('clicked:recuperation', (info) => {
   const roll = info.htmlAttributes.value;

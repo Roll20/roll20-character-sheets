@@ -1,13 +1,13 @@
 <!----------------------->			
 <!-- [CHARACTER SHEET] -->
 <!----------------------->	
+<input type="hidden" name="attr_conflict" value="">
+<button type="action" name="act_conflict-action" data-i18n-title="conflict_dice" title="Conflict Dice" class="hidden"></button>
 <div class=main>
 	<!-- Logo -->
 	<div class="logo">
 		<img class="img" src="https://raw.githubusercontent.com/ctotone/JdR/main/Ten%20candles/img/logo_official_dark.png"/>
-        <button type="action" name="act_conflict" data-i18n-title="conflict_dice" title="Conflict Dice" class="d6"></button>
-        <!-- Old roll
-        <button type="roll" name="roll_Conflict" data-i18n-title="conflict_dice" title="Conflict Dice" value="&{template:tencandles} {{title=^{roll_d6_title}}}{{conflict=[[?{How many dice?|1}d6s=6]]}}" class="d6"></button> -->
+		<button type="roll" name="roll_conflict" value="@{conflict}" data-i18n-title="conflict_dice" title="Conflict Dice" class="d6"></button>
 	</div>
 	<br>
 
@@ -32,7 +32,8 @@
 				<p><button type="roll" name="roll_Hope" data-i18n-title="hope_dice" title="Hope Dice" value="&{template:tencandles-hope} {{title=^{roll_hope_dice_title}}}{{hope=[[1d6>5]]}}" class="dicehope"></button><input class="card1" type="text" name="attr_moment"></textarea></span><input class="moment_rank" type="text" name="attr_moment_rank"></p>
 				<input type="hidden" class="extremite_check" name="attr_extremite_check" value='0'>
 				<p><input type="checkbox" name="attr_extremite_check" data-i18n-title="burn" title="Check when the card is burned"><span class="receiver-extremite_check" data-i18n="brink">Brink : "Someone seen you..."</span></p>
-				<p><input class="card2" type="text" name="attr_extremite"></p>
+				<p><input class="card2" type="text" name="attr_extremite"></p>				
+				<p><input class="card2" type="text" name="attr_extremite1"></p>
 			</div>
 		</div>
 	</div>
@@ -178,8 +179,8 @@
 </rolltemplate>
 
 <script type="text/worker">
-    on('clicked:conflict', (info) => {
-        startRoll("&{template:tencandles} {{title=^{roll_d6_title}}} {{roll=[[?{How many dice?|1}d6s=6]]}} {{high=[[0]]}} {{low=[[0]]}}", (diceroll) => {
+    on('clicked:conflict-action', (info) => {
+        startRoll("&{template:tencandles} {{title=^{roll_d6_title}}} {{roll=[[@{rollmodifier}d6s=6]]}} {{high=[[0]]}} {{low=[[0]]}}", (diceroll) => {
             const total = diceroll.results.roll.result
             const dice = diceroll.results.roll.dice; //This will be an array of the values rolled on all the dice
             let total6s = 0;
@@ -198,4 +199,19 @@
             );
         });
     });
+
+	on("sheet:opened", function(eventInfo){
+        setAttrs({
+            rollmodifier: "?{" + getTranslationByKey("how_many_dice") + "|1}",
+        });
+    });	
+	
+
+	on("sheet:opened change:character_name", function(eventInfo) {
+		getAttrs(["character_name", "conflict"], function(v) {
+			var attrsToChange = {};
+			attrsToChange["conflict"] = "%{" + v["character_name"] + "|conflict-action}";
+			setAttrs(attrsToChange);
+		});
+	});
 </script>

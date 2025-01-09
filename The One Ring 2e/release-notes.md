@@ -4,6 +4,14 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 03.12.00 (Build 34)
+
+- added "Favoured" modifier for pc combat proficiencies to allow handling of specific cultural virtues (e.g. Hobbit Cultural Virtue Sure At The Mark)
+
+## 03.11.00 (Build 33)
+
+- fixed stance toggle attack bonus bug 
+
 ## 03.10.01 (Build 32)
 
 - fixed minor CSS layout bug 
