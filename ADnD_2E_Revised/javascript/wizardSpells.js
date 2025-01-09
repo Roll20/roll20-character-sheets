@@ -2169,9 +2169,11 @@ wiz3['Invisibility, 10\' Radius'] = {
     'reference': 'p. 193',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Two p. 464',
+    'errata': 'Sage Advice #206 p. 89+90\nSage Advice #253 p. 22\nSage Advice #268 p. 112\nDungeon Master Option: High-Level Campaigns p. 72',
     'damage': '',
     'damage-type': '',
     'healing': '',
+    'special-conditions': ['invisibility'],
     'effect': 'This spell confers invisibility upon all creatures within 10 feet of the recipient. Gear carried and light sources are included, but any light emitted is still visible. The center of the effect is mobile with the recipient. Those affected by this spell cannot see each other. Any affected creature moving out of the area becomes visible, but creatures moving into the area after the spell is cast do not become invisible. Affected creatures (other than the recipient) that attack negate the invisibility only for themselves. If the spell recipient attacks, the *invisibility, 10’ radius* spell is broken for all.'
 };
 
