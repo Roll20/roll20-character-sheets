@@ -265,7 +265,7 @@ on("clicked:levelup", () =>{
 						newrowattrs['repeating_summary_' + newrowid + '_newval'] = newval;	
                 	}
 				});
-				setAttrs(Object.assign(update,newrowattrs),{silent:true},()=>{
+				setAttrs(Object.assign(update,newrowattrs),{silent:false},()=>{
 					console.log('inside repeating section');
 					console.info(newrowattrs);
 					console.info(update);
