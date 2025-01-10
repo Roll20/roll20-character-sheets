@@ -14,7 +14,7 @@ function bundle_html() {
     return src('html/main.html')
         .pipe(include())
         .on('error', console.log)
-        .pipe(rename('dnd_3_5_modern.html'))
+        .pipe(rename('dnd_3-5_epic_6.html'))
         .pipe(dest('../dist'));
 }
 
@@ -23,14 +23,14 @@ function bundle_css() {
     return src('css/main.css')
         .pipe(include())
         .on('error', console.log)
-        .pipe(rename('dnd_3_5_modern.css'))
+        .pipe(rename('dnd_3-5_epic_6.css'))
         .pipe(dest('../dist'));
 }
 
 function copy_to_root_dir(done) {
-    src('../dist/dnd_3_5_modern.html')
+    src('../dist/dnd_3-5_epic_6.html')
         .pipe(dest('..'));
-    src('../dist/dnd_3_5_modern.css')
+    src('../dist/dnd_3-5_epic_6.css')
         .pipe(dest('..'));
     return done()
 }
