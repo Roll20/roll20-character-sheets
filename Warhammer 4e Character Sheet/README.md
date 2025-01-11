@@ -83,7 +83,8 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
 Jan 10th 2025 v1.74d
 
-- Sheet Assets move to prevent url encoding problem
+- Fix for the sheet background and images sometimes not working in roll20. Sheet Assets moved to prevent url encoding problem.
+- Fix issue prevent Race field to show on new sheets.
 
 
 Jan 4th 2025 v1.74c
