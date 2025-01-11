@@ -2501,6 +2501,7 @@ wiz3['Vampiric Touch'] = {
     'materials': '',
     'reference': 'p. 197',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 975',
     'damage': '[[{floor([[@{level-wizard}]]/2),6}kl1]]d6',
     'damage-type': '',
     'healing': 'Equal to damage',
@@ -2522,10 +2523,12 @@ wiz3['Water Breathing'] = {
     'materials': 'A short reed or piece of straw.',
     'reference': 'p. 197',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 1000',
+    'errata': 'Sage Advice #255 p. 24',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The recipient of a *water breathing* spell is able to breathe water freely for the duration of the spell. The caster can touch more than one creature with a single casting; in this case the duration is divided by the number of creatures touched. The reverse, *air breathing* enables water-breathing creatures to comfortably survive in the atmosphere for an equal duration.'
+    'effect': 'The recipient of a *water breathing* spell is able to breathe water freely for the duration of the spell. The caster can touch more than one creature with a single casting; in this case the duration is divided by the number of creatures touched.\n&emsp;The reverse, *air breathing* enables water-breathing creatures to comfortably survive in the atmosphere for an equal duration.\n&emsp;*Water breathing* is not sufficient to allow spellcasting underwater. The caster must be able to move and speak freely, by use of a *free action* effect or an *airy water* spell.'
 };
 
 wiz3['Wind Wall'] = {

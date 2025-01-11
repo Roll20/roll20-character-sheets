@@ -1637,10 +1637,12 @@ pri3['Water Breathing'] = {
     'materials': '',
     'reference': 'p. 273',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Three p. 691',
+    'errata': 'Sage Advice #255 p. 24',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The recipient of a *water breathing* spell is able to breathe under water freely for the duration of the spell—i.e., one hour for each experience level of the caster. The priest can divide the base duration between multiple characters. Thus, an 8th-level priest can confer this ability to two characters for four hours, four for two hours, eight for one hour, etc., to a minimum of one half-hour per character.\n&emsp;The reverse, *air breathing*, enables water-breathing creatures to survive comfortably in the atmosphere for an equal duration. Note that neither version prevents the recipient creature from breathing in its natural element.'
+    'effect': 'The recipient of a *water breathing* spell is able to breathe under water freely for the duration of the spell—i.e., one hour for each experience level of the caster. The priest can divide the base duration between multiple creatures. Thus, an 8th-level priest can confer this ability to two creatures for 4 hours, four for 2 hours, eight for 1 hour, and so on, to a minimum of ½ hour per creature.\n&emsp;The reverse, *air breathing*, enables water-breathing creatures to survive comfortably in the atmosphere for an equal duration. Note that neither version prevents the recipient creature from breathing in its natural element.\n&emsp;*Water breathing* is not sufficient to allow spellcasting underwater. The caster must be able to move and speak freely, by use of a *free action* effect or an *airy water* spell.'
 };
 
 pri3['Water Walk'] = {
