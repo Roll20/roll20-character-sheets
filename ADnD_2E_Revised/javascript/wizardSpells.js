@@ -158,7 +158,7 @@ wiz1['Charm Person'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'special-conditions': ['charm'],
+    'special-conditions': [CHARM],
     'effect': 'This spell affects any single *person* it is cast upon. The term person includes any bipedal human, demihuman or humanoid of man-size or smaller, such as brownies, dryads, dwarves, elves, gnolls, gnomes, goblins, half-elves, halflings, half-orcs, hobgoblins, humans, kobolds, lizard men, nixies, orcs, pixies, sprites, troglodytes, and others. Thus, a 10th-level fighter could be charmed, but an ogre could not.\n&emsp;The person receives a saving throw vs. spell to avoid the effect, with any adjustment due to Wisdom (see Table 5). If the person receives damage from the caster’s group in the same round the *charm* is cast, an additional bonus of +1 per hit point of damage received is added to the victim’s saving throw.\n&emsp;If the spell recipient fails his saving throw, he regards the caster as a trusted friend and ally to be heeded and protected. The spell does not enable the caster to control the charmed creature as if it were an automaton, but any word or action of the caster is viewed in the most favorable way. Thus, a charmed person would not obey a suicide command, but he might believe the caster if assured that the only chance to save the caster’s life is for the person to hold back an onrushing red dragon for “just a minute or two.” Note also that the spell does not endow the caster with linguistic capabilities beyond those he normally possesses (i.e., he must speak the victim’s language to communicate his commands).\n&emsp;The duration of the spell is a function of the charmed person’s Intelligence and is tied to the saving throw. The spell may be broken if a successful saving throw is rolled, and this saving throw is checked on a periodic basis, according to the creature’s Intelligence (see the following table). If the caster harms, or attempts to harm, the charmed person by some overt action, or if a *dispel magic* spell is successfully cast upon the charmed person, the *charm* spell is broken.\n&emsp;If two or more *charm* effects simultaneously affect a creature, the result is decided by the DM. This could range from one effect being clearly dominant, to the subject being torn by conflicting desires, to new saving throws that could negate both spells.\n&emsp;Note that the subject has full memory of the events that took place while he was charmed.}}{{style=center1 sheet-spell-center2}}{{c1-1=**Intelligence Score**}}{{c2-1=3 or less}}{{c3-1=4–6}}{{c4-1=7–9}}{{c5-1=10–12}}{{c6-1=13–14}}{{c7-1=15–16}}{{c8-1=17}}{{c9-1=18}}{{c10-1=19 or more}}{{c1-2=**Time Between Checks**}}{{c2-2=3 months}}{{c3-2=2 months}}{{c4-2=1 month}}{{c5-2=3 weeks}}{{c6-2=2 weeks}}{{c7-2=1 week}}{{c8-2=3 days}}{{c9-2=2 days}}{{c10-2=1 day}}{{effects2=&emsp;**Note:** The period between checks is the time period during which the check occurs. When to roll the check during this time is determined (randomly or by selection) by the DM. The roll is made secretly.',
 };
 
@@ -180,6 +180,7 @@ wiz1['Chill Touch'] = {
     'damage': '[[1d4]]',
     'damage-type': '',
     'healing': '',
+    'special-conditions': [TOUCH_ATTACKS],
     'effect': 'When the caster completes this spell, a blue glow encompasses his hand. This energy attacks the life force of any living creature upon which the wizard makes a successful melee attack. The caster can make one touch attack each round the *chill touch* spell lasts. The touched creature must roll a successful saving throw vs. spell or suffer 1d4 points of damage and lose 1 point of Strength. If the save is successful, the creature remains unharmed. Creatures not rated for Strength suffer a –1 penalty to their attack rolls for every other successful touch. Lost Strength returns at the rate of 1 point per hour. Damage must be cured magically or healed naturally.\n&emsp;This spell has a special effect on undead creatures. Undead touched by the caster suffer no damage or Strength loss, but they must successfully save vs. spell or flee for 1d4 rounds + 1 round per level of the caster. Currently flee for 1d4+[[@{level-wizard}]] rounds.'
 };
 
@@ -200,7 +201,7 @@ wiz1['Color Spray'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'special-conditions': ['blindness'],
+    'special-conditions': [BLINDNESS],
     'effect': 'Upon casting this spell, the wizard causes a vivid, fan-shaped spray of clashing colors to spring forth from his hand. These make a triangular plane, 5 feet wide at the caster’s end opening to 20 feet wide at the far end, which ends 20 feet from the caster.\n&emsp;From one to six ([[1d6]]) creatures within the area are affected in order of increasing distance from the wizard. All creatures above the level of the spellcaster and all those of 6th level or 6 Hit Dice or more are entitled to a saving throw vs. spell. Blind or unseeing creatures are not affected by the spell.\n&emsp;Creatures not allowed or failing saving throws, and whose Hit Dice or levels are less than or equal to the spellcaster’s level, are struck unconscious for 2d4 rounds; those with Hit Dice or levels 1 or 2 greater than the wizard’s level are blinded for 1d4 rounds; those with Hit Dice or levels 3 or more greater than that of the spellcaster are stunned (reeling and unable to think or act coherently) for one round.'
 };
 
@@ -223,6 +224,7 @@ wiz1['Comprehend Languages'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
+    'special-conditions': [TOUCH_ATTACKS],
     'effect': 'When this spell is cast, the wizard is able to understand the spoken words of a creature or read an otherwise incomprehensible written message (such as writing in another language). In either case, the wizard must touch the creature or the writing. Note that the ability to read does not necessarily impart understanding of the material, nor does the spell enable the caster to speak or write an unknown language. Written material can be read at the rate of one page or equivalent per round. Magical writing cannot be read, other than to know it is magical, but the spell is often useful when deciphering treasure maps. This spell can be foiled by certain warding magic (the 3rd-level *secret page* and *illusionary script* spells), and it does not reveal messages concealed in otherwise normal text.\n&emsp;The reverse of this spell, *confuse languages*, cancels a *comprehend languages* spell or renders a writing or a creature’s speech incomprehensible, for the same duration as above.'
 };
 
@@ -530,7 +532,7 @@ wiz1['Light'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'special-conditions': ['blindness'],
+    'special-conditions': [BLINDNESS],
     'effect': 'This spell creates a luminous glow, equal to torchlight, within a fixed radius of the spell’s center. Objects in darkness beyond this sphere can be seen, at best, as vague and shadowy shapes. The spell is centered on a point selected by the caster, and he must have a line of sight and unobstructed path for the spell when it is cast. *Light* can spring from air, rock, metal, wood, or almost any similar substance.\n&emsp;The effect is immobile unless it is specifically centered on a moveable object or mobile creature. If this spell is cast upon a creature, the applicable magic resistance and saving throw rolls must be made. Successful resistance negates the spell, while a successful saving throw indicates that the spell is centered immediately behind the creature, rather than upon the creature itself. *Light* taken into an area of magical darkness does not function, but if cast directly against magical darkness negates it (but only for the duration of the *light* spell, if the darkness effect is continual).\n&emsp;*Light* centered on the visual organs of a creature blinds it. The caster can end the spell at any time by uttering a single word. Note that, unlike the 1st-level priest spell, this spell is not reversible.\n&emsp;A piece of chalk with *Light* cast on it will not write glowing messages. If the chalk is broken in two pieces, then the spell either ends or the biggest piece keeps the effect.'
 };
 
@@ -737,6 +739,7 @@ wiz1['Shocking Grasp'] = {
     'damage': '[[1d8+[[@{level-wizard}]] ]]',
     'damage-type': 'Electrical',
     'healing': '',
+    'special-conditions': [TOUCH_ATTACKS],
     'effect': 'When the wizard casts this spell, he develops a powerful electrical charge that gives a jolt to the creature touched. The spell remains in effect for one round per level of the caster ([[@{level-wizard}]] rounds) or until it is discharged by the caster touching another creature. The shocking grasp delivers 1d8 points of damage, plus 1 point per level of the wizard (for example, a 2nd-level wizard would discharge a shock causing 1d8+2 points of damage). While the wizard must come close enough to his opponent to lay a hand on the opponent’s body or upon an electrical conductor that touches the opponent’s body, a like touch from the opponent does not discharge the spell.\n&emsp;A *shocking grasp* spell won’t work as a fantasy defibrillator to bring back a character from negative hit points.',
 };
 
@@ -979,7 +982,7 @@ wiz2['Blindness'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'special-conditions': ['blindness'],
+    'special-conditions': [BLINDNESS],
     'effect': 'The *blindness* spell causes the victim to become blind, able to see only a grayness before its eyes. Various *cure* spells will not remove this effect, and only a *dispel magic* or the spellcaster can do away with the blindness if the creature fails its initial saving throw vs. spell.'
 };
 
@@ -1022,7 +1025,7 @@ wiz2['Continual Light'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'special-conditions': ['blindness'],
+    'special-conditions': [BLINDNESS],
     'effect': 'This spell is similar to a *light* spell, except that it is as bright as full daylight and lasts until negated by magical darkness or by a *dispel magic* spell. Creatures who suffer penalties in bright light suffer them in this spell’s area of effect. As with the *light* spell, it can be cast into the air, onto an object, or at a creature. When cast at a creature, the target gets a saving throw vs. spell; success indicates that the spell affects the space about 1 foot behind the creature instead. Note that this spell can also blind a creature if it is successfully cast upon the creature’s visual organs. If the spell is cast on a small object that is then placed in a light-proof covering, the spell’s effects are blocked until the covering is removed.\n&emsp;A *continual light* brought into an area of magical darkness (or vice versa) is temporarily negated so that the otherwise prevailing light conditions exist in the overlapping areas of effect. If multiple *continual lights* are brought into an area of magical darkness, only one *continual light* will go out per magical darkness effect and the remaining will work as normal. A direct casting of *continual light* against a similar or weaker magical darkness cancels both. The wizard’s version of *continual light* cannot be reversed to create magical darkness.\n&emsp;This spell eventually consumes the material it is cast upon, but the process takes far longer than the time in the typical campaign. Extremely hard and expensive materials can last hundreds or even thousands of years. Perishable materials, such as most foodstuffs, will rot normally long before a *continual light* spell can affect them. Likewise, most creatures will be dust before the spell will hurt them. If an object is consumed by this spell, the spell ceases to function.'
 };
 
@@ -1043,7 +1046,7 @@ wiz2['Darkness, 15\' Radius'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'special-conditions': ['blindness'],
+    'special-conditions': [BLINDNESS],
     'effect': 'This spell causes total, impenetrable darkness in the area of effect. Infravision is useless. Neither normal nor magical light works unless a *light* or *continual light* spell is used. In the former event, the *darkness* spell is negated by the *light* spell, and vice versa. Inside *darkness* characters are effectively blind.'
 };
 
@@ -1063,7 +1066,7 @@ wiz2['Deafness'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'special-conditions': ['deafness'],
+    'special-conditions': [DEAFNESS],
     'effect': 'The *deafness* spell causes the recipient to become totally deaf and unable to hear any sounds. The victim is allowed a saving throw vs. spell. This *deafness* can be done away with only by means of a *dispel magic* spell or by the spellcaster.'
 };
 
@@ -1250,7 +1253,7 @@ wiz2['Glitterdust'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'special-conditions': ['blindness'],
+    'special-conditions': [BLINDNESS],
     'effect': 'This spell creates a cloud of glittering golden particles within the area of effect. Those in the area must roll a successful saving throw vs. spell or be blinded for [[1d4+1]] rounds. In addition, all within the area are covered by the dust, which cannot be removed and continues to sparkle until it fades. Note that this reveals invisible creatures. The dust fades in 1d4 rounds plus one round per caster level.  Currently dust fades in [[1d4+[[@{level-wizard}]] ]] rounds. Thus, *glitterdust* cast by a 3rd-level wizard lasts for four to seven rounds.'
 };
 
@@ -1311,7 +1314,7 @@ wiz2['Invisibility'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'special-conditions': ['invisibility'],
+    'special-conditions': [INVISIBILITY],
     'effect': 'This spell causes the creature touched to vanish from sight and be undetectable by normal vision or even infravision. Of course, the invisible creature is not magically silenced, and certain other conditions can render the creature detectable. Even allies cannot see the invisible creature or his gear, unless these allies can normally see invisible things or employ magic to do so. Items dropped or put down by the invisible creature become visible; items picked up disappear if tucked into the clothing or pouches worn by the creature. Note, however, that light never becomes invisible, although a source of light can become so (thus, the effect is that of a light with no visible source).\n&emsp;The spell remains in effect until it is magically broken or dispelled, until the wizard or recipient cancels it, until the recipient attacks any creature, or until 24 hours have passed. Thus, the invisible being can open doors, talk, eat, climb stairs, etc., but if he attacks, he immediately becomes visible, although the invisibility enables him to attack first. Note that the priest spells *bless*, *chant*, and *prayer* are not attacks for this purpose. All highly Intelligent (Intelligence 13 or more) creatures with 10 or more Hit Dice or levels of experience have a chance to detect invisible objects (they roll saving throws vs. spell; success means they noticed the invisible object). Undead are not immune to *invisibility* and can therefore not see an invisible creature.\n&emsp;An invisible wizard breaks his *invisibility* if he directs an illusion to attack or another magical effect that cannot act without direction from the spell-caster such as *unseen servants*, and the various *Bigby’s hand* effects. Note that independent creatures that obay the caster, such as golems, attack on their own and do not break the caster’s *invisibility*.\n&emsp;**Permanency:** If this spell is made permanent, the recipient gains the innate ability to become invisible at will and remain so indefinitely. Any attack breaks the invisibility, but the recipient can become invisible again during the next round. The return to invisibility has an initiative modifier of +3 (slower), and the recipient can take no other action other than normal movement during a round in which he becomes invisible.'
 };
 
@@ -1477,7 +1480,7 @@ wiz2['Melf\'s Acid Arrow'] = {
     'damage': '2d4 for [[1+floor([[@{level-wizard}]]/3)]] rounds of',
     'damage-type': 'Acid',
     'healing': '',
-    'special-conditions': ['continuing-damage'],
+    'special-conditions': [CONTINUING_DAMAGE],
     'effect': 'By means of this spell, the wizard creates a magical arrow that speeds to its target as if fired from the bow of a fighter of the same level as the wizard. Currently THAC0 [[21-[[@{level-wizard}]] ]]. No modifiers for strength, dexterity, range, nonproficiency, or specialization are used. The arrow has no attack or damage bonus, but it inflicts 2d4 points of acid damage (with saving throws for items on the target); there is no splash damage. For every three levels that the caster has achieved, the acid, unless somehow neutralized, lasts for another round, inflicting another 2d4 points of damage each round. So at 3rd–5th level, the acid lasts two rounds; at 6th–8th level, the acid lasts for three rounds, etc. Currently [[1+floor([[@{level-wizard}]]/3)]] total rounds.\n&emsp;The spell duration can be shortened if the acid is washed off, magically dispelled, or removed in other ways at the DM’s discretion (such as hastily removing the victim’s armor).'
 };
 
@@ -1560,7 +1563,7 @@ wiz2['Pyrotechnics'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'special-conditions': ['blindness'],
+    'special-conditions': [BLINDNESS],
     'effect': 'A *pyrotechnics* spell draws on an existing fire source to produce one of two effects, at the option of the caster.\n&emsp;First, it can produce a flashing and fiery burst of glowing, colored aerial *fireworks* that lasts one round. This effect temporarily blinds those creatures in, under, or within 120 feet of the area and that have an unobstructed line of sight to the burst. Creatures viewing this are blinded for 1d4+1 rounds unless they successfully save vs. spell. The fireworks fill a volume 10 times greater than that of the original fire source.\n&emsp;Second, this spell can also cause a thick, writhing stream of *smoke* to arise from the source and form a choking cloud that lasts for one round per experience level of the caster. Currently [[@{level-wizard}]] rounds. This covers a roughly spherical volume from the ground or floor up (or conforming to the shape of a confined area) that totally obscures vision beyond 2 feet. The smoke fills a volume 100 times that of the fire source. All within the cloud must roll successful saving throws vs. spell or suffer –2 penalties to all combat rolls and Armor Class.\n&emsp;The spell uses one fire source within a 20-foot cube, which is immediately extinguished. An extremely large fire used as a source might be only partially extinguished. Magical fires are not extinguished, although a fire-based creature (such as a fire elemental) used as a source suffers 1 point of damage per caster level. Currently [[@{level-wizard}]] points of damage. This spell does not function under water.'
 };
 
@@ -2072,7 +2075,7 @@ wiz3['Haste'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'special-conditions': ['magical-aging'],
+    'special-conditions': [MAGICAL_AGING],
     'effect': 'When this spell is cast, each affected creature functions at double its normal movement and attack rates. A hasted creature gains a –2 initiative bonus. Thus, a creature moving at 6 and attacking once per round would move at 12 and attack twice per round. Spellcasting and spell effects are *not* sped up. The number of creatures that can be affected is equal to the caster’s experience level; those creatures closest to the center of effect are affected first. All affected by *haste* must be in the designated area of effect. Note that this spell negates the effects of a *slow* spell. Additionally, this spell instantly ages the recipient by one year, the moment they receive the spell (i.e. during the first round of the spell’s effect), because of sped-up metabolic processes (like all magical aging, this requires a system shock roll). This spell is not cumulative with itself or with similar magic (including *boots of speed* or *potion of speed*).\n&emsp;If multiple *haste* effects are cast, only the best take effect and aging only happens once, unless the effects overlap, then aging happens again when the first effect expires and the next take effect. A *haste* do not increase the movement rate of magical granted movement, such as the *fly* spell or the effect of magical items, such as *broom of flying* or *carpet of flying*.',
     'psionics': 'A *hasted* psionicist or wild talent psionic user can only activate one power per round.',
 };
@@ -2173,7 +2176,7 @@ wiz3['Invisibility, 10\' Radius'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'special-conditions': ['invisibility'],
+    'special-conditions': [INVISIBILITY],
     'effect': 'This spell confers invisibility upon all creatures within 10 feet of the recipient. Gear carried and light sources are included, but any light emitted is still visible. The center of the effect is mobile with the recipient. Those affected by this spell cannot see each other. Any affected creature moving out of the area becomes visible, but creatures moving into the area after the spell is cast do not become invisible. Affected creatures (other than the recipient) that attack negate the invisibility only for themselves. If the spell recipient attacks, the *invisibility, 10’ radius* spell is broken for all.'
 };
 
@@ -2256,7 +2259,7 @@ wiz3['Melf\'s Minute Meteors'] = {
     'damage': '*Hit:* 1-foot-diameter, 1d4 Fire\n*Splash:* Within 3 feet, 1',
     'damage-type': 'Fire',
     'healing': '',
-    'special-conditions': ['invisibility'],
+    'special-conditions': [GRENADE_LIKE],
     'effect': 'This spell enables the wizard to cast small globes of fire (one for each experience level he has attained. Currently [[@{level-wizard}]] meteors), each of which bursts into a 1-foot-diameter sphere upon impact, inflicting 1d4 points of damage to the creature struck. It can also ignite combustible materials (even solid planks). The meteors are treated as missiles hurled by the wizard with a +2 bonus to the attack rolls and with no penalty for range. Misses are treated as grenadelike missiles that inflict 1 point of damage to creatures within 3 feet.\n&emsp;The spell can be cast in either of two ways:\n&emsp;A) The wizard discharges five meteors every round (see the “Multiple Attacks and Initiative” section in Chapter 9: Combat). Note that this carries over into at least the following round.\n&emsp;B) The wizard discharges only one meteor per round. In addition to releasing the missile, the caster can perform other actions in the round, including spellcasting, melee, or device use. Spells requiring concentration force the wizard to forgo the rest of the missiles to maintain concentration. Also, if the wizard fails to maintain an exact mental count of the number of missiles he has remaining, he has involuntarily lost the remaining portion of the spell.\n&emsp;The spell ends when the caster has fired off as many meteors as he has experience levels, when he forgoes casting any still remaining, or when a successful *dispel magic* spell is thrown upon the caster.'
 };
 
