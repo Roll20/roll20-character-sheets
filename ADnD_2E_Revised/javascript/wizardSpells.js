@@ -668,11 +668,11 @@ wiz1['Protection From Evil'] = {
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'None',
-    'materials': 'The wizard must trace a 3-foot-diameter circle on the floor (or ground) with\n*Protection From Evil:* Powdered silver\n*Protection Frm Good:* Powdered iron.',
+    'materials': 'The wizard must trace a 3-foot-diameter circle on the floor (or ground) with\n*Protection From Evil:* Powdered silver.\n*Protection Frm Good:* Powdered iron.',
     'reference': 'p. 177',
     'book': 'PHB',
     'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 700',
-    'errata': 'The Complete Psionics Handbook p. 110\nSage Advice #156 p. 57\nSage Advice #225 p. 83\nDungeon Master Option: High-Level Campaigns p. 74',
+    'errata': 'The Complete Psionics Handbook p. 110\nSage Advice #156 p. 57\nSage Advice #225 p. 83\nSage Advice #241 p. 16\nDungeon Master Option: High-Level Campaigns p. 74',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -2076,8 +2076,8 @@ wiz3['Haste'] = {
     'damage-type': '',
     'healing': '',
     'special-conditions': [MAGICAL_AGING],
-    'effect': 'When this spell is cast, each affected creature functions at double its normal movement and attack rates. A hasted creature gains a –2 initiative bonus. Thus, a creature moving at 6 and attacking once per round would move at 12 and attack twice per round. Spellcasting and spell effects are *not* sped up. The number of creatures that can be affected is equal to the caster’s experience level; those creatures closest to the center of effect are affected first. All affected by *haste* must be in the designated area of effect. Note that this spell negates the effects of a *slow* spell. Additionally, this spell instantly ages the recipient by one year, the moment they receive the spell (i.e. during the first round of the spell’s effect), because of sped-up metabolic processes (like all magical aging, this requires a system shock roll). This spell is not cumulative with itself or with similar magic (including *boots of speed* or *potion of speed*).\n&emsp;If multiple *haste* effects are cast, only the best take effect and aging only happens once, unless the effects overlap, then aging happens again when the first effect expires and the next take effect. A *haste* do not increase the movement rate of magical granted movement, such as the *fly* spell or the effect of magical items, such as *broom of flying* or *carpet of flying*.',
     'psionics': 'A *hasted* psionicist or wild talent psionic user can only activate one power per round.',
+    'effect': 'When this spell is cast, each affected creature functions at double its normal movement and attack rates. A hasted creature gains a –2 initiative bonus. Thus, a creature moving at 6 and attacking once per round would move at 12 and attack twice per round. Spellcasting and spell effects are *not* sped up. The number of creatures that can be affected is equal to the caster’s experience level; those creatures closest to the center of effect are affected first. All affected by *haste* must be in the designated area of effect. Note that this spell negates the effects of a *slow* spell. Additionally, this spell instantly ages the recipient by one year, the moment they receive the spell (i.e. during the first round of the spell’s effect), because of sped-up metabolic processes (like all magical aging, this requires a system shock roll). This spell is not cumulative with itself or with similar magic (including *boots of speed* or *potion of speed*).\n&emsp;If multiple *haste* effects are cast, only the best take effect and aging only happens once, unless the effects overlap, then aging happens again when the first effect expires and the next take effect. A *haste* do not increase the movement rate of magical granted movement, such as the *fly* spell or the effect of magical items, such as *broom of flying* or *carpet of flying*.',
 };
 
 wiz3['Hold Person'] = {
@@ -2276,6 +2276,8 @@ wiz3['Monster Summoning I'] = {
     'materials': 'A tiny bag and a small (not necessarily lit) candle.',
     'reference': 'p. 195',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 585',
+    'errata': 'Sage Advice #217 p. 82\nSage Advice #228 p. 85\nSage Advice #245 p. 16',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -2295,10 +2297,13 @@ wiz3['Nondetection'] = {
     'materials': 'A pinch of diamond dust worth 300 gp.',
     'reference': 'p. 195',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 620',
+    'errata': 'The Complete Psionics Handbook p. 110\nSage Advice #257 p. 23',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By casting this spell, the wizard makes the creature or object touched undetectable by divination spells such as *clairaudience*, *clairvoyance*, *locate object*, *ESP*, and detect spells. It also prevents location by such magical items as *crystal balls* and *ESP medallions*. It does not affect the *know alignment* spell or the ability of intelligent or high-level beings to detect invisible creatures. If a divination is attempted, the *nondetection* caster must roll a saving throw vs. spell. If this is successful, the divination fails.'
+    'psionics': '*Nondetection* is fully effective against psionic sensing.',
+    'effect': 'By casting this spell, the wizard makes the creature or object touched undetectable by divination spells such as *clairaudience*, *clairvoyance*, *locate object*, *ESP*, and detect spells. It also prevents location by such magical items as *crystal balls* and *ESP medallions*. It does not affect the *know alignment* spell or the ability of intelligent or high-level beings to detect invisible creatures. If a divination is attempted, the *nondetection* caster must roll a saving throw vs. spell. If this is successful, the divination fails.\n&emsp;*Nondetection* does not protect the recipient against *glyph of warding*, *alarm*, and other warding spells, as most warding spells are in the Abjuration school and not Divination.'
 };
 
 wiz3['Phantom Steed'] = {
@@ -2314,31 +2319,34 @@ wiz3['Phantom Steed'] = {
     'materials': '',
     'reference': 'p. 195',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 662',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard creates a quasi-real, horselike creature. The steed can be ridden only by the wizard who created it, or by any person for whom the wizard specifically creates such a mount. A phantom steed has a black head and body, gray mane and tail, and smoke-colored, insubstantial hooves that make no sound. Its eyes are milky-colored. It does not fight, but all normal animals shun it and only monstrous ones will attack. The mount has an Armor Class of 2 and [[ [[@{level-wizard}]]+7]] hit points. If it loses all of its hit points, the phantom steed disappears. A phantom steed moves at a movement rate of [[ [[@{level-wizard}]]*4]], to a maximum movement rate of 48. It has what seems to be a saddle and a bit and bridle. It can bear its rider’s weight, plus up to [[ [[@{level-wizard}]]*10]] pounds.\n&emsp;These mounts gain certain powers according to the level of the wizard who created them:\n&emsp;8th Level: The ability to pass over sandy, muddy, or even swampy ground without difficulty.\n&emsp;10th Level: The ability to pass over water as if it were firm, dry ground.\n&emsp;12th Level: The ability to travel in the air as if it were firm land, so chasms and the like can be crossed without benefit of a bridge. Note, however, that the mount cannot casually take off and fly; the movement must be between points of similar altitude.\n&emsp;14th Level: The ability to perform as if it were a pegasus; it flies at a rate of 48 per round upon command.\n&emsp;Note that a mount’s abilities include those of lower levels; thus, a 12th-level mount has the 8th-, 10th-, and 12th-level abilities.'
+    'effect': 'When this spell is cast, the wizard creates a quasi-real, horselike creature. The steed can be ridden only by the wizard who created it, or by any person for whom the wizard specifically creates such a mount. A phantom steed has a black head and body, gray mane and tail, and smoke-colored, insubstantial hooves that make no sound. Its eyes are milky-colored. It does not fight, but all normal animals shun it and only monstrous ones will attack. The mount has an Armor Class of 2 and 7 hit points, plus 1 per level of the caster. If it loses all of its hit points, the phantom steed disappears. A phantom steed moves at a movement rate of 4 per level of the spellcaster, to a maximum movement rate of 48. It has what seems to be a saddle and a bit and bridle. It can bear its rider’s weight, plus up to 10 pounds per caster level. Current phantom steed statistics:\n&emsp;• Armor Class: 2\n&emsp;• Hit Points: [[7+[[@{level-wizard}]] ]]\n&emsp;• Movement rate: [[ {4*[[@{level-wizard}]],48}kl1]]\n&emsp;• Carrying capacity: [[10*[[@{level-wizard}]] ]] pounds\n&emsp;These mounts gain certain powers according to the level of the wizard who created them:\n&emsp;*8th Level:* The ability to pass over sandy, muddy, or even swampy ground without difficulty.\n&emsp;*10th Level:* The ability to pass over water as if it were firm, dry ground.\n&emsp;*12th Level:* The ability to travel in the air as if it were firm land, so chasms and the like can be crossed without benefit of a bridge. Note, however, that the mount cannot casually take off and fly; the movement must be between points of similar altitude.\n&emsp;*14th Level:* The ability to perform as if it were a pegasus; it flies at a rate of 48 per round upon command.\n&emsp;Note that a mount’s abilities include those of lower levels; thus, a 12th-level mount has the 8th-, 10th-, and 12th-level abilities.'
 };
 
 wiz3['Protection from Good, 10\' Radius (Reverse of Protection from Evil, 10\' Radius)'] =
 wiz3['Protection from Evil, 10\' Radius'] = {
     'level': '3',
     'school': 'Abjuration (Reversible)',
-    'school-spells-and-magic': 'Abjuration, Alchemy (Reversible)',
+    'school-spells-and-magic': 'Abjuration, Alchemy, Geometry (Reversible)',
     'range': 'Touch',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
-    'aoe': '10-foot radius',
+    'aoe': '10-foot radius around creature touched',
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'None',
-    'materials': 'Powdered silver or iron.',
+    'materials': '\n*Protection from Evil*: Powdered silver.\n*Protection from Good*: Powdered iron.',
     'reference': 'p. 195',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 701',
+    'errata': 'The Complete Psionics Handbook p. 110\nSage Advice #153 p. 7\nSage Advice #156 p. 57\nSage Advice #225 p. 83\nSage Advice #241 p. 16\nDungeon Master Option: High-Level Campaigns p. 74',
     'damage': '',
     'damage-type': '',
     'healing': '',
     'psionics': 'All telepathic powers used against someone with protected from evil have their power scores reduced by 2. Additionally, the spell prevents mental control such as domination.',
-    'effect': 'The globe of protection of this spell is identical in all respects to a *protection from evil* spell, except that it encompasses a much larger area and its duration is greater. The effect is centered on and moves with the creature touched. Any protected creature within the circle can break the warding against enchanted or summoned monsters by meleeing them. If a creature too large to fit into the area of effect is the recipient of the spell, the spell acts as a normal *protection from evil* spell for that creature only.\n&emsp;To complete this spell, the caster must trace a circle 20 feet in diameter using powdered silver. The material component for the reverse is powdered iron.'
+    'effect': 'The globe of protection of this spell is identical in all respects to a *protection from evil* spell, except that it encompasses a much larger area and its duration is greater. The circle is centered on and moves with the creature touched. Any protected creature within the circle can break the warding against enchanted or summoned monsters by meleeing them. If a creature too large to fit into the area of effect is the recipient of the spell, the spell acts as a normal *protection from evil* spell for that creature only.\n&emsp;To complete this spell, the caster must trace a circle 20 feet in diameter using powdered silver. The material component for the reverse is powdered iron.'
 };
 
 wiz3['Protection From Normal Missiles'] = {

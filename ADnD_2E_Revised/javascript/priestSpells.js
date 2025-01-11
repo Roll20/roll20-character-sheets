@@ -396,7 +396,7 @@ pri1['Protection From Evil'] = {
     'reference': 'p. 256',
     'book': 'PHB',
     'book-compendium': 'Priest’s Spell Compendium Volume Two p. 466',
-    'errata': 'The Complete Psionics Handbook p. 110\nSage Advice #156 p. 57\nSage Advice #225 p. 83\nDungeon Master Option: High-Level Campaigns p. 74',
+    'errata': 'The Complete Psionics Handbook p. 110\nSage Advice #156 p. 57\nSage Advice #225 p. 83\nSage Advice #241 p. 16\nDungeon Master Option: High-Level Campaigns p. 74+79',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -2006,18 +2006,20 @@ pri4['Protection From Evil, 10\' Radius'] = {
     'sphere': 'Protection',
     'range': 'Touch',
     'duration': '[[@{level-priest}]] turns',
-    'aoe': '10-foot radius',
+    'aoe': '10-foot-radius sphere',
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'None',
-    'materials': 'Holy (or unholy) water and incense (or smoldering dung)',
+    'materials': '\n*Protection from Evil*: Holy water and incense.\n*Protection from Good*: Unholy water and smoldering dung',
     'reference': 'p. 278',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Two p. 466',
+    'errata': 'The Complete Psionics Handbook p. 110\nSage Advice #153 p. 7\nSage Advice #156 p. 57\nSage Advice #225 p. 83\nSage Advice #241 p. 16\nDungeon Master Option: High-Level Campaigns p. 74+79',
     'damage': '',
     'damage-type': '',
     'healing': '',
     'psionics': 'All telepathic powers used against someone with protected from evil have their power scores reduced by 2. Additionally, the spell prevents mental control such as domination.',
-    'effect': 'The globe of protection of this spell is identical in all respects to that of a *protection from evil* spell, except that it encompasses a much larger area and its duration is greater. The effect is centered on and moves with the creature touched. Any protected creature within the circle will break the warding against enchanted/summoned monsters if he attacks those monsters. A creature unable to fit completely into the area of effect (for example, a 21-foot-tall titan) remains partially exposed and subject to whatever penalties the DM decides. If such a creature is the recipient of the spell, the spell acts as a normal *protection from evil* spell for that creature only.\n&emsp;The reverse, *protection from good, 10’ radius,* wards against good creatures.\n&emsp;To complete this spell, the priest must trace a circle 20 feet in diameter using holy (or unholy) water and incense (or smoldering dung), according to the *protection from evil* spell.'
+    'effect': 'The globe of protection of this spell is identical in all respects to that of a *protection from evil* spell, except that it encompasses a much larger area and its duration is greater. The effect is centered on and moves with the creature touched. Any protected creature within the circle will break the warding against enchanted/summoned monsters if he attacks those monsters. A creature unable to fit completely into the area of effect (for example, a 21-foot-tall titan) remains partially exposed and subject to whatever penalties the DM decides. If such a creature is the recipient of the spell, the spell acts as a normal *protection from evil* spell for that creature only.\n&emsp;To complete this spell, the priest must trace a circle 20 feet in diameter using holy water and incense.\n&emsp;The reverse, *protection from good 10’ radius*, wards against good creatures. To complete this spell, the priest must trace a circle 20 feet in diameter using unholy water and smoldering dung.'
 };
 
 pri4['Protection From Lightning'] = {
