@@ -2361,10 +2361,11 @@ wiz3['Protection From Normal Missiles'] = {
     'materials': 'A piece of tortoise or turtle shell.',
     'reference': 'p. 196',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 706',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the wizard bestows total invulnerability to hurled and projected missiles such as arrows, axes, bolts, javelins, small stones, and spears. Furthermore, it causes a reduction of 1 from each die of damage (but no die inflicts less than 1 point of damage inflicted by large or magical missiles, such as ballista missiles, catapult stones, hurled boulders, and magical arrows, bolts, javelins, etc. Note, however, that this spell does not convey any protection from such magical attacks as fireballs, lightning bolts, or magic missiles.'
+    'effect': 'By means of this spell, the wizard bestows total invulnerability to hurled and projected missiles such as arrows, axes, bolts, javelins, small stones, and spears. Furthermore, it causes a reduction of 1 from each die of damage (but no die inflicts less than 1 point of damage inflicted by large or magical missiles, such as ballista missiles, catapult stones, hurled boulders, and magical arrows, bolts, javelins, etc. Note, however, that this spell does not convey any protection from such magical attacks as *fireballs*, *lightning bolts*, or *magic missiles*.'
 };
 
 wiz3['Secret Page'] = {
@@ -2380,10 +2381,11 @@ wiz3['Secret Page'] = {
     'materials': 'Powdered herring scales and either will o’ wisp or boggart essense.',
     'reference': 'p. 196',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 777',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When cast, a *secret page* spell alters the actual contents of a page so that they appear to be something entirely different. Thus, a map can be changed to become a treatise on burnishing ebony walking sticks. The text of a spell can be altered to show a ledger page or even another form of spell. *Confuse languages* and *explosive runes* spells may be cast upon the secret page, but a *comprehend languages* spell cannot reveal the secret page’s contents. The caster is able to reveal the original contents by speaking a command word, perusing the actual page, and then returning it to its secret page form. The caster can also remove the spell by double repetition of the command word. Others noting the dim magic of a page within this spell cloaking its true contents can attempt to dispel magic, but if it fails, the page is destroyed. A *true seeing* spell does not reveal the contents unless cast in combination with a *comprehend languages* spell. An *erase* spell can destroy the writing.'
+    'effect': 'When cast, a *secret page* spell alters the actual contents of a page so that they appear to be something entirely different. Thus, a map can be changed to become a treatise on burnishing ebony walking sticks. The text of a spell can be altered to show a ledger page or even another form of spell. *Confuse languages* and *explosive runes* spells can be cast upon the secret page, but a *comprehend languages* spell cannot reveal the secret page’s contents. The caster is able to reveal the original contents by speaking a command word, perusing the actual page, and then returning it to its secret page form. The caster can also remove the spell by double repetition of the command word. Others noting the dim magic of a page within this spell cloaking its true contents can attempt to dispel magic, but if it fails, the page is destroyed. A *true seeing* spell does not reveal the contents unless cast in combination with a *comprehend languages* spell. An *erase* spell can destroy the writing.'
 };
 
 wiz3['Sepia Snake Sigil'] = {
@@ -2399,10 +2401,12 @@ wiz3['Sepia Snake Sigil'] = {
     'materials': '100 gp worth of powdered amber, a scale from any snake, and a pinch of mushroom spores.',
     'reference': 'p. 196',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 620',
+    'errata': 'Sage Advice #238 p. 81',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, a small written symbol appears in the text of any written work. When read, the so-called sepia snake springs into being and strikes at the nearest living creature (but does not attack the wizard who cast the spell). Its attack is made as if it were a monster with Hit Dice equal to the level of the wizard who cast the spell. If it strikes successfully, the victim is engulfed in a shimmering amber field of force, frozen and immobilized until released, either at the caster’s command, by a successful *dispel magic* spell, or until a time equal to 1d4 days + 1 day per caster level has elapsed. Until then, nothing can get at the victim, move the shimmering force surrounding him, or otherwise affect him. The victim does not age, grow hungry, sleep, or regain spells while in this state. He is not aware of his surroundings. If the sepia snake misses its target, it dissipates in a flash of brown light, with a loud noise and a puff of dun-colored smoke that is 10 feet in diameter and lasts for one round.\n&emsp;The spell cannot be detected by normal observation, and *detect magic* reveals only that the entire text is magical. A *dispel magic* can remove it; an *erase* spell destroys the entire page of text. It can be cast in combination with other spells that hide or garble text.'
+    'effect': 'When this spell is cast, a small written symbol appears in the text of any written work. When read, the so-called sepia snake springs into being and strikes at the nearest living creature (but does not attack the wizard who cast the spell). Its attack is made as if it were a monster with Hit Dice equal to the level of the wizard who cast the spell. If it strikes successfully, the victim is engulfed in a shimmering amber field of force, frozen and immobilized until released, either at the caster’s command, by a successful *dispel magic* spell, or until a time equal to 1d4 days + 1 day per caster level has elapsed. Currently [[1d4+[[@{level-wizard}]] ]] days. Until then, nothing can get at the victim, move the shimmering force surrounding him, or otherwise affect him. The victim does not age, grow hungry, sleep, or regain spells while in this state. He is not aware of his surroundings.\n&emsp;If the sepia snake misses its target, it dissipates in a flash of brown light, with a loud noise and a puff of dun-colored smoke that is 10 feet in diameter and lasts for one round.\n&emsp;The spell cannot be detected by normal observation, and *detect magic* reveals only that the entire text is magical. A *dispel magic* can remove it; an *erase* spell destroys the entire page of text. It can be cast in combination with other spells that hide or garble text.\n&emsp;A *sepia snake sigil* cannot be placed on the wizard’s hand and used to attack.'
 };
 
 wiz3['Slow'] = {
@@ -2417,6 +2421,7 @@ wiz3['Slow'] = {
     'materials': 'A drop of molasses.',
     'reference': 'p. 196',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 827',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -2426,19 +2431,21 @@ wiz3['Slow'] = {
 wiz3['Spectral Force'] = {
     'level': '3',
     'school': 'Illusion/Phantasm',
-    'range': '[[60+[[@{level-wizard}]] ]] yards',
+    'range': '[[60+10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
-    'aoe': '[[40+10*[[@{level-wizard}]] ]]-foot cube',
+    'aoe': '40-foot cube + [[@{level-wizard}]] 10-foot cubes',
     'components': 'V, S',
     'cast-time': '3',
     'saving-throw': 'Special',
     'materials': '',
     'reference': 'p. 197',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Three p. 841',
+    'errata': 'Sage Advice #255 p. 25\nSage Advice #264 p. 26',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The *spectral force* spell creates an illusion in which sound, smell, and thermal illusions are included. It is otherwise similar to the *improved phantasmal force* spell. The spell lasts for three rounds after concentration ceases.'
+    'effect': 'The *spectral force* spell creates an illusion in which sound, smell, and thermal illusions are included. It is otherwise similar to the *improved phantasmal force* spell. The spell lasts for three rounds after concentration ceases.\n&emsp;The illusion can only move inside the area of effect.'
 };
 
 wiz3['Suggestion'] = {
@@ -2454,10 +2461,11 @@ wiz3['Suggestion'] = {
     'materials': 'A snake’s tongue and either a bit of honeycomb or a drop of sweet oil.',
     'reference': 'p. 197',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 890',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast by the wizard, he influences the actions of the chosen recipient by the utterance of a few words—phrases or a sentence or two—suggesting a course of action desirable to the spellcaster. The creature to be influenced must, of course, be able to understand the wizard’s suggestion—it must be spoken in a language that the spell recipient understands.\n&emsp;The suggestion must be worded in such a manner as to make the action sound reasonable; asking the creature to stab itself, throw itself onto a spear, immolate itself, or do some other obviously harmful act automatically negates the effect of the spell. However, a suggestion that a pool of acid was actually pure water and that a quick dip would be refreshing is another matter. Urging a red dragon to stop attacking the wizard’s party so that the dragon and party could jointly loot a rich treasure elsewhere is likewise a reasonable use of the spell’s power.\n&emsp;The course of action of a suggestion can continue in effect for a considerable duration, such as in the case of the red dragon mentioned above. Conditions that will trigger a special action can also be specified; if the condition is not met before the spell expires, the action will not be performed. If the target successfully rolls its saving throw, the spell has no effect. Note that a very reasonable suggestion causes the saving throw to be made with a penalty (such as -1, -2, etc.) at the discretion of the DM. Undead are not subject to suggestion.'
+    'effect': 'When this spell is cast by the wizard, he influences the actions of the chosen recipient by the utterance of a few words—phrases or a sentence or two—suggesting a course of action desirable to the spellcaster. The creature to be influenced must, of course, be able to understand the wizard’s suggestion—it must be spoken in a language that the spell recipient understands.\n&emsp;The suggestion must be worded in such a manner as to make the action sound reasonable; asking the creature to stab itself, throw itself onto a spear, immolate itself, or do some other obviously harmful act automatically negates the effect of the spell. However, a suggestion that a pool of acid was actually pure water and that a quick dip would be refreshing is another matter. Urging a red dragon to stop attacking the wizard’s party so that the dragon and party could jointly loot a rich treasure elsewhere is likewise a reasonable use of the spell’s power.\n&emsp;The course of action of a *suggestion* can continue in effect for a considerable duration, such as in the case of the red dragon mentioned above. Conditions that will trigger a special action can also be specified; if the condition is not met before the spell expires, the action will not be performed. If the target successfully rolls its saving throw, the spell has no effect. Note that a very reasonable suggestion causes the saving throw to be made with a penalty (such as -1, -2, etc.) at the discretion of the DM. Undead are not subject to *suggestion*.'
 };
 
 wiz3['Babble (Reverse of Tongues)'] =
@@ -2473,10 +2481,12 @@ wiz3['Tongues'] = {
     'materials': 'A small clay model of a ziggurat, which shatters when the spell is pronounced.',
     'reference': 'p. 197',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 943',
+    'errata': 'The Complete Wizard’s Handbook p. 84\nSage Advice #152 p. 59',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables the wizard to speak and understand additional languages, whether they are racial tongues or regional dialects. This does not enable the caster to speak with animals. The spell enables the caster to be understood by all creatures of that type within hearing distance, usually 60 feet. This spell does not predispose the subject toward the caster in any way.\n&emsp;The wizard can speak one additional tongue for every three levels of experience. Currently speak [[floor([[@{level-wizard}]]/3)]] additional tongues. The reverse of the spell cancels the effect of the *tongues* spell or confuses verbal communication of any sort within the area of effect.'
+    'effect': 'This spell enables the wizard to speak and understand additional languages, whether they are racial tongues or regional dialects. This does not enable the caster to speak with animals. The spell enables the caster to be understood by all creatures of that type within hearing distance, usually 60 feet. This spell does not predispose the subject toward the caster in any way. The wizard can speak one additional tongue for every three levels of experience. Currently speak [[floor([[@{level-wizard}]]/3)]] additional tongues.\n&emsp;The reverse of the spell, *babble*, cancels the effect of the *tongues* spell or confuses verbal communication of any sort within the area of effect.'
 };
 
 wiz3['Vampiric Touch'] = {

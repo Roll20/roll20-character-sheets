@@ -2155,10 +2155,12 @@ pri4['Tongues'] = {
     'materials': '',
     'reference': 'p. 280',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Three p. 648',
+    'errata': 'The Complete Wizard’s Handbook p. 84\nSage Advice #152 p. 59',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables the caster to speak and understand additional languages, whether they are racial tongues or regional dialects, but not communications of animals or mindless creatures. When the spell is cast, the spellcaster selects the language or languages to be understood. The spell then empowers the caster with the ability to speak and understand the language desired with perfect fluency and accent. The spell enables the priest to be understood by all speakers of that language within hearing distance, usually 60 feet. This spell does not predispose the subject toward the caster in any way. The priest can speak one additional tongue for every three levels of experience. Currently [[floor([[@{level-priest}]]/3)]] additional tongues.\n&emsp;The reverse of the spell cancels the effect of the *tongues* spell or confuses verbal communication of any sort within the area of effect.'
+    'effect': 'This spell enables the caster to speak and understand additional languages, whether they are racial tongues or regional dialects, but not communications of animals or mindless creatures. When the spell is cast, the spellcaster selects the language or languages to be understood. The spell then empowers the caster with the ability to speak and understand the language desired with perfect fluency and accent. The spell enables the priest to be understood by all speakers of that language within hearing distance, usually 60 feet. This spell does not predispose the subject toward the caster in any way. The priest can speak one additional tongue for every three levels of experience. Currently [[floor([[@{level-priest}]]/3)]] additional tongues.\n&emsp;The reverse of the spell, *babble*, cancels the effect of the *tongues* spell or confuses verbal communication of any sort within the area of effect.'
 };
 
 const pri5 = {};
