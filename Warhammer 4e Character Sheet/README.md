@@ -81,6 +81,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Jan 10th 2025 v1.74d
+
+- Fix for the sheet background and images sometimes not working in roll20. Sheet Assets moved to prevent url encoding problem.
+- Fix issue prevent Race field to show on new sheets.
+
+
 Jan 4th 2025 v1.74c
 
 - New Custom Critical Wounds rules, which can be configured in the settings tab. Allows for changing of the static crit dmg wounds from the core crit tables. There are 3 customization options, 2 are add or replace normal dmg with a custom dmg die (e.g. 1d10, 1d10!, etc), and the 3rd a custom rule which will take the Tens die of the critical roll as crit dmg wounds, and if the roll is a dubs crit it triggers a Ulrics Furt Die (exploding 10). This is intended to add options for WFRP4e to simulate other crit dmg models like the popular WFRP2e feature Ulric's Fury.
