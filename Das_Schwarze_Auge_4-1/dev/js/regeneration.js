@@ -812,6 +812,206 @@ on(
 	});
 });
 
+/*
+	Change Exhaustion/Overexertion
+
+DSA is a bit complicated regarding exhaustion/overexertion. The fact that the sheet allows to deactivate one or the other or both makes it even worse. Since several regeneration types require increases/decreases to exhaustion/overexertion, this function was created to implement the logic only once.
+
+If one time effects are applied, use the default steps = 1.
+*/
+
+function changeExhaustionOverexertion (
+	{
+		xhEnabled = true,
+		xh = 0,
+		xhMax = 0,
+		xhRate = 0,
+		oxEnabled = true,
+		ox = 0,
+		oxMax = 0,
+		oxRate = 0,
+		steps = 1
+	} = {}
+) {
+	// Boilerplate
+	const caller = "changeExhaustionOverexertion";
+	debugLog(caller, "xhEnabled", xhEnabled, "xh", xh, "xhMax", xhMax, "xhRate", xhRate, "oxEnabled", oxEnabled, "ox", ox, "oxMax", oxMax, "oxRate", oxRate, "steps", steps);
+
+	// Preparation
+	const curValues = { "xh": xh, "ox": ox };
+	const minValues = { "xh": 0, "ox": 0 };
+	const maxValues = { "xh": xhMax, "ox": oxMax };
+	const rates = { "xh": xhRate, "ox": oxRate };
+	let results = {
+		"xhNew": 0,
+		"xhChange": 0,
+		"oxNew": 0,
+		"oxChange": 0,
+	};
+	debugLog(caller, "curValues", curValues, "minValues", minValues, "maxValues", maxValues, "rates", rates, "results", results);
+
+	/// Input Sanitation
+	if (typeof xhEnabled !== 'boolean')
+	{
+		xhEnabled = true;
+		debugLog(caller, "xhEnabled not boolean.");
+	}
+	if (isNaN(parseInt(xh)) === true)
+	{
+		curValues["xh"] = 0;
+		debugLog(caller, "xh cannot be converted to an integer.");
+	}
+	if (isNaN(parseInt(xhMax)) === true)
+	{
+		maxValues["xh"] = 0;
+		debugLog(caller, "xhMax cannot be converted to an integer.");
+	}
+	if (isNaN(parseInt(xhRate)) === true)
+	{
+		rates["xh"] = 0;
+		debugLog(caller, "xhRate cannot be converted to an integer.");
+	}
+	if (typeof oxEnabled !== 'boolean')
+	{
+		oxEnabled = true;
+		debugLog(caller, "oxEnabled not boolean.");
+	}
+	if (isNaN(parseInt(ox)) === true)
+	{
+		curValues["ox"] = 0;
+		debugLog(caller, "ox cannot be converted to an integer.");
+	}
+	if (isNaN(parseInt(oxMax)) === true)
+	{
+		maxValues["ox"] = 0;
+		debugLog(caller, "oxMax cannot be converted to an integer.");
+	}
+	if (isNaN(parseInt(oxRate)) === true)
+	{
+		rates["ox"] = 0;
+		debugLog(caller, "oxRate cannot be converted to an integer.");
+	}
+	if (isNaN(parseInt(steps)) === true)
+	{
+		steps = 0;
+		debugLog(caller, "steps cannot be converted to an integer.");
+	}
+
+	//// Max values must not be less than min values
+	maxValues["xh"] = Math.max(maxValues["xh"], minValues["xh"]);
+	maxValues["ox"] = Math.max(maxValues["ox"], minValues["ox"]);
+
+	//// Rates must have the same sign, if non-zero
+	if (xhEnabled === true && oxEnabled === true)
+	{
+		if (
+			(rates["xh"] < 0 && rates["ox"] > 0)
+			||
+			(rates["xh"] > 0 && rates["ox"] < 0)
+		)
+		{
+			debugLog(caller, "xhRate and oxRate do not have the same sign. Exiting ...");
+			return;
+		}
+	}
+
+	//// Build-up Case: Usually, only xhRate is used by the game. Excess exhaustion gets added to overexertion.
+	if (rates["xh"] > 0 && rates["ox"] === 0)
+	{
+		rates["ox"] = rates["xh"];
+	}
+
+	//// Make all required values immune against accidental overwrite
+	Object.freeze(curValues);
+	Object.freeze(minValues);
+	Object.freeze(maxValues);
+
+	// Calculations
+	/// Case Definition
+	let variant = "both";
+	if (xhEnabled === true && oxEnabled === true)
+	{
+		variant = "both";
+	} else if (xhEnabled === true && oxEnabled === false) {
+		variant = "xh-only";
+	} else if (xhEnabled === false && oxEnabled === true) {
+		variant = "ox-only";
+	} else if (xhEnabled === false && oxEnabled === false) {
+		variant = "none";
+	}
+
+	if (rates["xh"] > 0 || rates["ox"] > 0)
+	{
+		variant += "+";
+	} else if (rates["xh"] < 0 || rates["ox"] < 0) {
+		variant += "-";
+	}
+
+	/// Cases
+	results["xhNew"] = curValues["xh"];
+	results["oxNew"] = curValues["ox"];
+
+	switch(variant)
+	{
+		case "both+":
+			for (let step = 0; step < steps; step++)
+			{
+				if (results["xhNew"] < maxValues["xh"])
+				{
+					results["xhNew"] += rates["xh"];
+					if (results["xhNew"] > maxValues["xh"])
+					{
+						let xhExcess = results["xhNew"] - maxValues["xh"];
+						results["oxNew"] += xhExcess;
+					}
+				} else if (results["oxNew"] < maxValues["ox"]) {
+					results["oxNew"] += rates["ox"];
+				} else {
+					break;
+				}
+			}
+			break;
+		case "both-":
+			for (let step = 0; step < steps; step++)
+			{
+				if (results["oxNew"] > minValues["ox"])
+				{
+					results["oxNew"] += rates["ox"];
+				} else if (results["xhNew"] > minValues["xh"]) {
+					results["xhNew"] += rates["xh"];
+				} else {
+					break;
+				}
+			}
+			break;
+		case "xh-only+":
+		case "xh-only-":
+			results["xhNew"] += steps * rates["xh"];
+			break;
+		case "ox-only+":
+		case "ox-only-":
+			results["oxNew"] += steps * rates["ox"];
+			break;
+		case "none+":
+		case "none-":
+			break;
+		default:
+			debugLog(caller, "Default case of variant switch triggered. Should not happen.");
+			break;
+	}
+	//// Limiting
+	results["xhNew"] = Math.max(minValues["xh"], results["xhNew"]);
+	results["oxNew"] = Math.max(minValues["ox"], results["oxNew"]);
+	results["xhNew"] = Math.min(maxValues["xh"], results["xhNew"]);
+	results["oxNew"] = Math.min(maxValues["ox"], results["oxNew"]);
+
+	//// Changes
+	results["xhChange"] = results["xhNew"] - curValues["xh"];
+	results["oxChange"] = results["oxNew"] - curValues["ox"];
+
+	return results;
+}
+
 // Generating Regeneration Roll (Sleep)
 on(
 	[
