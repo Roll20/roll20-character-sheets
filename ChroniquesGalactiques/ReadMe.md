@@ -12,11 +12,28 @@ Des fonctionnalit&eacute;s avanc&eacute;es facilitent l'import des données tech
 
 # Version courante
 
-V4.5.1 [Screenshot](cog_v4.png)
+V4.7.0 [Screenshot](cog_v4.png)
 
 # Notes de version
 
 ___Chroniques Oubliées Galactiques Version 2___
+
+## V4.7.0 (2024.08.24)
+
+- Gestion des capacités avec nombre d'utilisations limitées
+  - Configuration dans l'onglet Capacités
+  - Décompte d'utilisation, message d'alerte de dépassement, bouton de rechargement
+  - Chargement automatique à l'import d'un profil
+- Boutons gain/perte de PV
+- Refactorisation code JS
+
+## V4.6.0 (2024.06.24)
+
+- Migration de la fiche en CSE
+- Ajout de zones rétractables/extensibles
+  - Dans l'onglet Capacités
+  - Dans l'onglet Equipements
+- Correction de bugs mineurs dans les fonctions d'import de profil et statblock
 
 ## V4.5.1 (2024.05.26)
 

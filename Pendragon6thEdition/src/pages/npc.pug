@@ -6,69 +6,55 @@
       +dropInput({name: 'type', i18n: 'type', accept: 'type'})
   .characteristics.grid.mb
     .grid.core.auto-flow-col
-        each value in ['size', 'dexterity', 'strength', 'constitution', 'appearance']
+        each value in characteristics
             .grid.row.centered
                 +attributeButton(value)
                 .shield.mt
-                    +hoverSpan(value)
+                    +numberInput(value)
     .grid.statistic.auto-flow-col
-
         .col
             +primarySubheader('health')
             +npcTable(healthRows)
         .col
             +primarySubheader('other')
             +npcTable(npcOtherRows)
+    input(type='hidden' name='attr_hide_npc_knight_attributes' value='1')
     .grid.statistic.auto-flow-col
         .col
             +primarySubheader('knight')
             +npcTable(["knight value", "ransom"])
         .col
             +primarySubheader('other')
-            +npcTable(["morale loss", "valorous"])
+            +npcTable(["morale loss", "valorous modifier"])
   
   include ./components/attacks.pug
   
   .grid.skills
-    .header
-      h1(data-i18n='skills')
-    .grid.combat-skills
-        each val in combatSkills
-          .row.grid
-              +rollButton(val)
-              +numberInput(val)
-    .row
+    +header('skills')
+    .grid.combat-skills.hide
+      each val in combatSkills
+        .row.grid
+          +rollButton(val)
+          +numberInput(val)
+    .row.hide
       +subHeader('other')
-    .repeating-container
-        fieldset(class='repeating_skills')
+    .repeating-container.hide
+      fieldset(class='repeating_skills')
+        .grid.auto-flow-col.3columns
+          +nameTargetValue()
+
+  include ./components/personality-traits.pug
+
+  .grid.passions
+    +header('passions')
+    .repeating-container.hide
+        fieldset(class='repeating_passions')
           .grid.auto-flow-col.3columns
-            +textInput('name')
-            +numberInput('skill')
-            +repeatingRollButton('skill')
-  .grid.2column.align-start
-    .grid.traits
-      .header
-        h1(data-i18n='traits')
-      .repeating-container
-          fieldset(class='repeating_traits')
-            .grid.auto-flow-col.3columns
-              +textInput('name')
-              +numberInput('traits')
-              +repeatingRollButton('traits')
-    .grid.passions
-      .header
-        h1(data-i18n='passions')
-      .repeating-container
-          fieldset(class='repeating_passions')
-            .grid.auto-flow-col.3columns
-              +textInput('name')
-              +numberInput('passion')
-              +repeatingRollButton('passion')
+            +nameTargetValue()
   
   .grid.abilities
-    .header
-      h1(data-i18n='abilities')
-    .repeating-container
+    +header('abilities')
+    .repeating-container.hide
         fieldset(class='repeating_abilities')
           .row.grid.flags
             +repeatingFlags()
@@ -80,7 +66,9 @@
                 span.display(name='attr_notes')
                 +textArea('notes')
 
+  include ./components/equipment.pug
+
   .grid
-    .header
-      h1(data-i18n='description')
-    textarea(data-i18n-placeholder='description' name='attr_description')
+    +header('description')
+    .grid.description.gap.hide
+      +notesTextarea('description')

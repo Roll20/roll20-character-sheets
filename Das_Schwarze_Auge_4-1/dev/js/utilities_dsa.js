@@ -147,7 +147,7 @@ function generateShortRollTag (integer) {
 	var result = [];
 	var rest = integer;
 
-	for (n = digits; n >= 0; n--) {
+	for (let n = digits; n >= 0; n--) {
 		result.push(charset[Math.trunc(rest/Math.pow(base, n))]);
 		rest = rest % Math.pow(base, n);
 	}
@@ -176,6 +176,24 @@ function DSAsane (value, type) {
 	}
 
 	switch(type) {
+		case "int":
+			// General
+			// Must be number of parseInt()-able number
+			// integer
+			if (!limitedIntValid(value, -Infinity, Infinity)) {
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
+				sane = false;
+			}
+			break;
+		case "non-negative int":
+			// General
+			// Must be number of parseInt()-able number
+			// Non-negative integer
+			if (!limitedIntValid(value, 0, Infinity)) {
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
+				sane = false;
+			}
+			break;
 		case "stat":
 			// MU, KL, IN, ...
 			// Must be number or parseInt()-able number
@@ -216,7 +234,8 @@ function DSAsane (value, type) {
 			// Limited set of combat techniques to choose from
 			// Must be within the set
 			const meleeCombatTechniques = [
-					"anderthalbhander", "dolche",              "fechtwaffen",
+					"anderthalbhander", "bastardstaebe",       "dolche",
+					"fechtwaffen",
 					"hiebwaffen",       "infanteriewaffen",    "kettenstabe",
 					"kettenwaffen",     "lanzenreiten",        "peitsche",
 					"raufen",           "ringen",              "sabel",
@@ -255,7 +274,7 @@ function countStats (statsArray) {
 		debugLog(caller, "Array is empty.");
 	}
 
-	for (stat of statsArray)
+	for (let stat of statsArray)
 	{
 		if (validStats.has(stat))
 		{
@@ -263,6 +282,36 @@ function countStats (statsArray) {
 		}
 	}
 	return statsCount;
+}
+
+/*
+	Extracts two-letter stats from an array of strings returning an array with the two-letter stats only
+	Beware: input.length is not necessarily output.length!
+*/
+function extractStats (statsArray) {
+	var caller = "extractStats";
+	const statPattern = /(?:MU|IN|KL|CH|GE|FF|KO|KK)/;
+
+	var results = [];
+
+	if (Array.isArray(statsArray) === false)
+	{
+		debugLog(caller, "statsArray not an array.");
+	}
+	if (statsArray.length === 0)
+	{
+		debugLog(caller, "Array is empty.");
+	}
+
+	for (let entry of statsArray)
+	{
+		let result = entry.match(statPattern);
+		if (result)
+		{
+			results.push(result[0]);
+		}
+	}
+	return results;
 }
 
 /*

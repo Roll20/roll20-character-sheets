@@ -69,7 +69,7 @@ function migrationCheck() {
 								if not and it is the first migration, than the function name is saved as "firstFunction"
 								if it is not the first migration to apply it is added to "functionsToCall" array
 						*/
-						for (version of versionsWithMigrations) {
+						for (let version of versionsWithMigrations) {
 								if (dataVersion < version) {
 										var functionName = "migrateTo" + version;
 										debugLog(caller, "dataVersion " + dataVersion + " is older than version " + version + " which needs a migration. Invoking migration function: " + functionName);
