@@ -1451,6 +1451,24 @@ on('clicked:reg_sleep-action', async (info) => {
 	{
 		resultsOnly[property] = results["results"][property].result;
 	}
+	if (Object.hasOwn(resultsOnly, "xhrequired"))
+	{
+		if (resultsOnly["xhrequired"] === 1)
+		{
+			resultsOnly["xhrequired"] = true;
+		} else {
+			resultsOnly["xhrequired"] = false;
+		}
+	}
+	if (Object.hasOwn(resultsOnly, "oxrequired"))
+	{
+		if (resultsOnly["oxrequired"] === 1)
+		{
+			resultsOnly["oxrequired"] = true;
+		} else {
+			resultsOnly["oxrequired"] = false;
+		}
+	}
 	Object.freeze(resultsOnly);
 
 	// Fast Decision
@@ -1810,20 +1828,20 @@ on('clicked:reg_sleep-action', async (info) => {
 		let exhaustionNew = 0;
 		let exhaustionLoss = 0;
 		let exhaustionAddiction = 0;
-		let exhaustionChanged = 0;
+		let exhaustionChange = 0;
 		let overexertionNew = 0;
 		let overexertionLoss = 0;
 		let overexertionAddiction = 0;
-		let overexertionChanged = 0;
+		let overexertionChange = 0;
 
 		/// Regeneration can only take place if not under severe food restriction or even mild addiction withdrawal
 		if (
 			(duration > 0)
 			&&
 			(
-				(resultsOnly["xhrequired"] === 1)
+				(resultsOnly["xhrequired"])
 				||
-				(resultsOnly["oxrequired"] === 1)
+				(resultsOnly["oxrequired"])
 			)
 		)
 		{
@@ -1851,53 +1869,31 @@ on('clicked:reg_sleep-action', async (info) => {
 			}
 
 			// Handle regeneration cases
-			exhaustionNew = exhaustion;
-			overexertionNew = overexertion;
 			switch(regCase)
 			{
 				case "normal":
-					// Regeneration Order: Overexertion, Exhaustion
-					// As long as there is overexertion, there cannot be exhaustion regeneration
-					/// Take into account that people can turn off exhaustion but keep overexertion turned on
-					/// In case both are disabled, nothing happens (see checks below).
-					/// If only overexertion is disabled, exhaustion changes accordingly, excess exhaustion will be lost.
-					/// If only exhaustion is disabled, use overexertion like it's exhaustion.
-
-					// Hourly regeneration rates
-					const exhaustionReg = -4;
-					const overexertionReg = -2;
-
-					// Calculations
-					if (resultsOnly["xhrequired"] === 1 & resultsOnly["oxrequired"] === 0)
 					{
-						overexertionNew = 0;
-					} else if (resultsOnly["xhrequired"] === 0 & resultsOnly["oxrequired"] === 1) {
-						exhaustionNew = 0;
-					} else if (resultsOnly["xhrequired"] === 0 & resultsOnly["oxrequired"] === 0) {
-						exhaustionNew = 0;
-						overexertionNew = 0;
+						let result = changeExhaustionOverexertion(
+							{
+								"xhEnabled": resultsOnly["xhrequired"],
+								"xh": resultsOnly["xh"],
+								"xhMax": exhaustionMax,
+								"xhRate": -4,
+								"oxEnabled": resultsOnly["oxrequired"],
+								"ox": resultsOnly["ox"],
+								"oxMax": overexertionMax,
+								"oxRate": -2,
+								"steps": duration,
+							}
+						);
+						// Finish
+						exhaustionNew = result["xhNew"];
+						overexertionNew = result["oxNew"];
+						exhaustionLoss = result["xhChange"];
+						overexertionLoss = result["oxChange"];
+						exhaustionChange = result["xhChange"];
+						overexertionChange = result["oxChange"];
 					}
-					for (let hour = 0; hour < duration; hour++)
-					{
-						if (overexertionNew > 0)
-						{
-							overexertionNew += overexertionReg;
-							overexertionChanged = 1;
-						} else if (exhaustionNew > 0) {
-							exhaustionNew += exhaustionReg;
-							exhaustionChanged = 1;
-						} else {
-							break;
-						}
-					}
-
-					// Cap at 0
-					exhaustionNew = Math.max(0, exhaustionNew);
-					overexertionNew = Math.max(0, overexertionNew);
-
-					// Finish
-					exhaustionLoss = exhaustionNew - exhaustion;
-					overexertionLoss = overexertionNew - overexertion;
 					break;
 				case "foodrestricted":
 					const foodRestrictionRegeneration = 0;
@@ -1905,54 +1901,42 @@ on('clicked:reg_sleep-action', async (info) => {
 					overexertionLoss = foodRestrictionRegeneration;
 					break;
 				case "withdrawal":
-					// Preparations
-					const withdrawalMild = 1/3;
-					const withdrawalSevere = 1/2;
-					const toxicity = resultsOnly["addictionpoisonstrength"];
-					let exhaustionGain = 0;
-
-					// Calculate addiction effect
-					if (resultsOnly["addictioneffect"] === 1)
 					{
-						exhaustionGain = DSAround(toxicity * withdrawalMild);
-					} else {
-						exhaustionGain = DSAround(toxicity * withdrawalSevere);
-					}
+						// Preparations
+						const withdrawalMild = 1/3;
+						const withdrawalSevere = 1/2;
+						const toxicity = resultsOnly["addictionpoisonstrength"];
+						let exhaustionGain = 0;
 
-					// Apply addiction effect
-					/// Take into account that people can turn off exhaustion but keep overexertion turned on
-					/// In case both are disabled, nothing happens (see checks below).
-					/// If only overexertion is disabled, exhaustion changes accordingly, excess exhaustion will be lost.
-					/// If only exhaustion is disabled, use overexertion like it's exhaustion.
-					if (resultsOnly["oxrequired"] === 1 && resultsOnly["xhrequired"] === 0)
-					{
-						exhaustionNew = overexertionNew;
-					}
-					exhaustionNew += exhaustionGain;
-					exhaustionChanged = 1;
-
-					let excessExhaustion = Math.max(0, exhaustionNew - exhaustionMax);
-					if (exhaustionNew > exhaustionMax)
-					{
-						overexertionNew += excessExhaustion;
-						overexertionChanged = 1;
-						overexertionNew = Math.min(overexertionNew, overexertionMax);
-						exhaustionNew = Math.min(exhaustionNew, exhaustionMax);
-					}
-
-					// Finish
-					exhaustionAddiction = Math.max(0, exhaustionNew - exhaustion);
-					if (resultsOnly["oxrequired"] === 1)
-					{
-						if (resultsOnly["xhrequired"] === 1)
+						// Calculate addiction effect
+						if (resultsOnly["addictioneffect"] === 1)
 						{
-							overexertionAddiction = excessExhaustion;
+							exhaustionGain = DSAround(toxicity * withdrawalMild);
 						} else {
-							overexertionAddiction = exhaustionAddication;
-							exhaustionAddiction = exhaustionMin;
+							exhaustionGain = DSAround(toxicity * withdrawalSevere);
 						}
-					} else {
-						overexertionAddiction = overexertionMin;
+
+						// Apply addiction effect
+						let result = changeExhaustionOverexertion(
+							{
+								"xhEnabled": resultsOnly["xhrequired"],
+								"xh": resultsOnly["xh"],
+								"xhMax": exhaustionMax,
+								"xhRate": exhaustionGain,
+								"oxEnabled": resultsOnly["oxrequired"],
+								"ox": resultsOnly["ox"],
+								"oxMax": overexertionMax,
+								"oxRate": 0,
+							}
+						);
+
+						// Finish
+						exhaustionNew = result["xhNew"];
+						overexertionNew = result["oxNew"];
+						exhaustionAddiction = result["xhChange"];
+						overexertionAddiction = result["oxChange"];
+						exhaustionChange = result["xhChange"];
+						overexertionChange = result["oxChange"];
 					}
 					break;
 				default:
@@ -1963,9 +1947,9 @@ on('clicked:reg_sleep-action', async (info) => {
 			(duration === 0)
 			&&
 			(
-				(resultsOnly["xhrequired"] === 1)
+				(resultsOnly["xhrequired"])
 				||
-				(resultsOnly["oxrequired"] === 1)
+				(resultsOnly["oxrequired"])
 			)
 		)
 		{
@@ -1974,26 +1958,18 @@ on('clicked:reg_sleep-action', async (info) => {
 		}
 		/// Finish
 		/// Show exhaustion if there is overexertion even if no regeneration took place
-		if (
-			(
-				(exhaustionChanged === 1)
-				||
-				(overexertionChanged === 1)
-			)
-			&&
-			(resultsOnly["xhrequired"] === 1)
-		)
+		computed["xhnew"] = exhaustionNew;
+		computed["xhloss"] = exhaustionLoss;
+		computed["xhaddiction"] = exhaustionAddiction;
+		computed["oxnew"] = overexertionNew;
+		computed["oxloss"] = overexertionLoss;
+		computed["oxaddiction"] = overexertionAddiction;
+		if (exhaustionChange !== 0 && resultsOnly["xhrequired"])
 		{
-			computed["xhnew"] = exhaustionNew;
-			computed["xhloss"] = exhaustionLoss;
-			computed["xhaddiction"] = exhaustionAddiction;
 			attrsToChange["erschoepfung"] = exhaustionNew;
 		}
-		if (overexertionChanged === 1 && resultsOnly["oxrequired"] === 1)
+		if (overexertionChange !== 0 && resultsOnly["oxrequired"])
 		{
-			computed["oxnew"] = overexertionNew;
-			computed["oxloss"] = overexertionLoss;
-			computed["oxaddiction"] = overexertionAddiction;
 			attrsToChange["ueberanstrengung"] = overexertionNew;
 		}
 
