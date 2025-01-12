@@ -2362,6 +2362,24 @@ on('clicked:reg_deepbreath-action', async (info) => {
 	{
 		resultsOnly[property] = results["results"][property].result;
 	}
+	if (Object.hasOwn(resultsOnly, "xhrequired"))
+	{
+		if (resultsOnly["xhrequired"] === 1)
+		{
+			resultsOnly["xhrequired"] = true;
+		} else {
+			resultsOnly["xhrequired"] = false;
+		}
+	}
+	if (Object.hasOwn(resultsOnly, "oxrequired"))
+		{
+		if (resultsOnly["oxrequired"] === 1)
+		{
+			resultsOnly["oxrequired"] = true;
+		} else {
+			resultsOnly["oxrequired"] = false;
+		}
+	}
 	Object.freeze(resultsOnly);
 
 	// Fast Decision
@@ -2407,9 +2425,9 @@ on('clicked:reg_deepbreath-action', async (info) => {
 		const overexertionMax = resultsOnly["oxmax"];
 		const overexertionMin = 0;
 		let exhaustionNew = 0;
-		let exhaustionChanged = 0;
+		let exhaustionChange = 0;
 		let overexertionNew = 0;
-		let overexertionChanged = 0;
+		let overexertionChange = 0;
 
 		/// Regeneration Order: Overexertion, Exhaustion
 		/// As long as there is overexertion, there cannot be exhaustion regeneration
@@ -2424,37 +2442,35 @@ on('clicked:reg_deepbreath-action', async (info) => {
 		const buildUpRate = 1;
 
 		/// Calculations
-		if (resultsOnly["xhrequired"] === 1 & resultsOnly["oxrequired"] === 1)
 		{
-			exhaustionNew = exhaustion + buildUpRate;
-			if (exhaustionNew > exhaustionMax)
-			{
-				overexertionNew = overexertionNew + 1;
-			}
-		} else if (resultsOnly["xhrequired"] === 1 & resultsOnly["oxrequired"] === 0)
-		{
-			exhaustionNew = exhaustion + buildUpRate;
-			overexertionNew = 0;
-		} else if (resultsOnly["xhrequired"] === 0 & resultsOnly["oxrequired"] === 1) {
-			exhaustionNew = 0;
-			overexertionNew = overexertion + buildUpRate;
-		} else if (resultsOnly["xhrequired"] === 0 & resultsOnly["oxrequired"] === 0) {
-			exhaustionNew = 0;
-			overexertionNew = 0;
+			let result = changeExhaustionOverexertion(
+				{
+					"xhEnabled": resultsOnly["xhrequired"],
+					"xh": resultsOnly["xh"],
+					"xhMax": exhaustionMax,
+					"xhRate": buildUpRate,
+					"oxEnabled": resultsOnly["oxrequired"],
+					"ox": resultsOnly["ox"],
+					"oxMax": overexertionMax,
+				}
+			);
+			// Finish
+			exhaustionNew = result["xhNew"];
+			overexertionNew = result["oxNew"];
+			exhaustionChange = result["xhChange"];
+			overexertionChange = result["oxChange"];
 		}
-		exhaustionNew = Math.min(exhaustionNew, exhaustionMax);
-		overexertionNew = Math.min(overexertionNew, overexertionMax);
 
 		/// Finish
 		/// Always show what's active/required
-		if (resultsOnly["xhrequired"] === 1)
+		computed["xhnew"] = exhaustionNew;
+		computed["oxnew"] = overexertionNew;
+		if (resultsOnly["xhrequired"])
 		{
-			computed["xhnew"] = exhaustionNew;
 			attrsToChange["erschoepfung"] = exhaustionNew;
 		}
-		if (resultsOnly["oxrequired"] === 1)
+		if (resultsOnly["oxrequired"])
 		{
-			computed["oxnew"] = overexertionNew;
 			attrsToChange["ueberanstrengung"] = overexertionNew;
 		}
 
