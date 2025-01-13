@@ -24222,13 +24222,18 @@ var updateKnackSummary = function fnupdateKnackSummary() {
     var listKnack =function(knack,base){
       let rid=generateRowIdNoUnderscore(),
           pre=buildPre("NSM",rid);
-      if("knackname" in knack ) {vals[pre+"Name"]=base+", "+knack.knackname ;
-                                vals[pre + "buttonInfo"]=
-                                  (["Arrow Weaving","Beast Weaving","Elementalism","Gauntlet Weaving","Illusionism","Nethermancy","Rider Weaving","River Weaving","Scout Weaving","Sea Weaving","Shamanism","Sky Weaving","Story Weaving","Thief Weaving","Thread Smithing","Weapon Weaving","Wizardry"].indexOf(base)!==-1
-                                  ? "Thread Weaving" : base) + ", "+knack.knackname;
-                                vals[pre + "KnackName"] = knack.knackname;
-                                vals[pre + "BaseTalent"]= base;
-    }
+          if("knackname" in knack ) {
+            vals[pre+"Name"]=base+", "+knack.knackname ;
+            vals[pre + "KnackName"] = knack.knackname;
+            vals[pre + "BaseTalent"]= base;
+            //Special Cases for the Button Info are Thread Weaving ( that have alternative names ) and Pathes ( that don't have the base in front)
+            if("knacktype" in knack && knack.knacktype=="Path")
+            vals[pre + "buttonInfo"]="Paths:" + knack.knackname;
+            else if(["Arrow Weaving","Beast Weaving","Elementalism","Gauntlet Weaving","Illusionism","Nethermancy","Rider Weaving","River Weaving","Scout Weaving","Sea Weaving","Shamanism","Sky Weaving","Story Weaving","Thief Weaving","Thread Smithing","Weapon Weaving","Wizardry"].indexOf(base)!==-1)
+            vals[pre + "buttonInfo"]= "Thread Weaving, " +  knack.knackname;
+            else
+            vals[pre + "buttonInfo"]=base +", " + knack.knackname;
+          }
     if("requirement" in knack ) vals[pre+"Requirement"]= knack.requirement;
     if("restrictions" in knack ) vals[pre+"Restrictions"]= knack.restrictions;
     if("page" in knack ) vals[pre+"Book"]= knack.page;
