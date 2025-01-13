@@ -12855,8 +12855,19 @@
     getAttrs(['character_avatar', 'sheet_image', 'sheet_image_url'], (v) => {
       const output = {};
       const whichImage = +v.sheet_image;
-      // roll20 url includes extra meta after the image extension. best to remove it.
-      const avatarURL = v.character_avatar.split('?')[0];
+      // roll20 urls includes extra meta after the image extension
+
+      const avatarURL = (function getAvatarUrl(url) {
+        // check url for common image extension
+        const extensions = /(\.png|\.jpg|\.gif)/i;
+        const match = url.match(extensions);
+        // trim excess after extension
+        if (match) {
+          return url.slice(0, match.index + match[0].length);
+        }
+        return url;
+      })(v.character_avatar);
+
       const sheetURL = v.sheet_image_url || avatarURL;
       // clog(`avatarURL:${avatarURL}`);
       // clog(`sheetURL:${sheetURL}`);
@@ -12866,7 +12877,7 @@
   };
 
   on('change:character_avatar change:sheet_image change:sheet_image_url', (eventInfo) => {
-    clog(`change detected:${eventInfo.sourceAttribute}`);
+    // clog(`change detected:${eventInfo.sourceAttribute}`);
     portraitUrlCalc();
   });
 
