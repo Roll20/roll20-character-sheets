@@ -12850,19 +12850,31 @@
     charismaCalcs();
   });
 
-  // uses CRP to auto-update link with sheet_image_src
-  on('clicked:postimage', (eventInfo) => {
+  portraitUrlCalc = () => {
     getAttrs(['character_avatar', 'sheet_image', 'sheet_image_url'], (v) => {
       const output = {};
       const whichImage = +v.sheet_image;
-      const sheetURL = v.sheet_image_url;
-      const avatarURL = v.character_avatar;
+      // roll20 url includes extra meta after the image extension. best to remove it.
+      const avatarURL = v.character_avatar.split('?')[0];
+      const sheetURL = v.sheet_image_url || avatarURL;
+      clog(`avatarURL:${avatarURL}`);
+      clog(`sheetURL:${sheetURL}`);
       output.sheet_image_src = whichImage === 0 ? sheetURL : avatarURL;
-      const roll_string = `?{Display the portrait image?|YES,@{sheet_image_src}|NO,&nbsp;}`;
-      startRoll(roll_string, (roll) => {
-        finishRoll(roll.rollId);
-      });
       setAttrs(output, {silent: true});
+    });
+  };
+
+  on('change:character_avatar change:sheet_image change:sheet_image_url', (eventInfo) => {
+    clog(`change detected:${eventInfo.sourceAttribute}`);
+    portraitUrlCalc();
+  });
+
+  // uses CRP to auto-update link with sheet_image_src
+  on('clicked:postimage', (eventInfo) => {
+    portraitUrlCalc();
+    const roll_string = `?{Display the portrait image?|YES,@{sheet_image_src}|NO,&nbsp;}`;
+    startRoll(roll_string, (roll) => {
+      finishRoll(roll.rollId);
     });
   });
 
