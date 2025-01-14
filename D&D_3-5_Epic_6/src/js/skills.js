@@ -66,7 +66,10 @@ function updateSkillList(skillList,modifierList){
             let synergy = parseInt(values[`${skillId}_synergy`]) || 0;
             carac = carac.replace("@{", "").replace("}", "");
             let caracname = carac.split("_")[0];
-            caracname = caracname.charAt(0).toUpperCase() + caracname.slice(1);
+            if(getTranslationByKey(`attribute.${caracname}`)){
+                caracname = getTranslationByKey(`attribute.${caracname}`)
+            }
+            caracname = caracname.charAt(0).toUpperCase() + caracname.slice(1).toLowerCase();
             caracname = "(" + caracname + ")";
             let caracVal = caracs[carac] || 0;
             let mods = 0;
