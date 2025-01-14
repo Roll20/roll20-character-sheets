@@ -1,3 +1,25 @@
+# 2025-1-14
+
+The wait... it's already halfway through January update!
+
+- Knack selection now respects power levels.
+    - Stil don't support 'set to average' and # stat boosts
+    - Coming soon
+- Knack and Profession Bonus won't continue until you select all items in
+    charactermancer.
+- Subtle now works for 'A' spells (0; it's not really a thing that happens)
+- Always apply armor casting penalty - even if you don't have transcendance
+- Update treasure law armor to include material
+- Armor: Make sure we use the material if supplied
+- Fix armor metal vs other materials
+- Make sure ranged penalty is always a penalty
+- Creatures now roll $Realm RRs, not 'undefined RR'
+- Partial Dark Mode; not quite usuable, but you can look.
+- Custom professions
+  - Save weapon costs correctly.
+  - Save the correct Knacks/profession bonuses
+  - Fix level up spell lists (improves Roll20 Characters too)
+
 # 2025-1-7
 
 - Custom profession support.
