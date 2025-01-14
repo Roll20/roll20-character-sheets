@@ -63,10 +63,10 @@
             <span class="left">
               <span>v<span name="attr_sheet_version">
             </span>
-            <span class="right"> • 1/10/25'</span>
+            <span class="right"> • 1/13/25'</span>
           </h5>
           <ul>
-            <li>Updated portrait image url calc. Not only can you post the sheet's image to chat by clicking the image directly, but you can also access the sheet's image url for macros by calling the attribute directly; @{selected|sheet_image_url} Posting an image to chat example [x](@{selected|sheet_image_url})</li>
+            <li>Updated the portrait image option: Added "none" as an option. Updated the image url parsing to detect png, jpg, and gif. While you can post a sheet's image to chat by simply clicking on the portrait image, you can now access the sheet's image URL as well for macro usuage. Call the attribute's value directly using; @{selected|sheet_image_url} macro example; <code>[x](@{selected|sheet_image_url})</code></li>
             <li>Added <code>{{bigname}}</code> to both templates. This key can be used to display text in the header that is 1.75x's larger than the normal header ie <code>{{name}}</code>. These additional keys are provided for those that desire to customize and/or their own macros. They do not impact the sheet's default rolls and macros. Feel free to experiment.</li>
             <li>Added some missing css for the bigtext if used in the attacks roll template.</li>
             <li>Added the same <code>{{bigtext1}}</code> thru <code>{{bigtext4}}</code> keys to the &{template:attacks} roll template.</li>
@@ -413,7 +413,7 @@
       </label>
     </section>
     <section class="npc-box statblock3">
-      <input type="checkbox" class="hidden toggle-avatar" name="attr_sheet_image" value="1" checked />
+      <input type="hidden" class="toggle-avatar" name="attr_sheet_image" value="1" />
       <div class="image-avatar" name="attr_sheet_image_url" title="Send image to chat.">
         <img name="attr_character_avatar" />
         <button type="action" name="act_postimage" class="image-link"></button>
@@ -554,7 +554,7 @@
       </div>
       <!-- Portrait -->
       <div class="portrait-box">
-        <input type="checkbox" class="hidden toggle-avatar" name="attr_sheet_image" value="1" checked />
+        <input type="hidden" class="toggle-avatar" name="attr_sheet_image" value="1" />
         <div class="image-avatar" name="attr_sheet_image_url" title="Send image to chat.">
           <img name="attr_character_avatar" />
           <button type="action" name="act_postimage" class="image-link"></button>
@@ -4442,9 +4442,10 @@
         <span class="inline-label width-fill">
           <h4 class="stack-text">Sheet Image:</h4>
           <label>
-            <select name="attr_sheet_image" title="@{sheet_image} | Displays the avatar or provided url as an image in the top left corner of the sheet." style="width:8em;">
+            <select name="attr_sheet_image" title="@{sheet_image} | Image displayed on the sheet. Defaults to a selected Avatar." style="width:11em;">
+              <option value="1" selected>Use Avatar</option>
               <option value="0">Use URL</option>
-              <option value="1" selected="">Avatar</option>
+              <option value="2">None</option>
             </select>
             <button type="roll" class="button" value="[**LINK**](@{sheet_image_url})" title="Send image to chat.">
               <span>Image URL:</span>
@@ -12856,7 +12857,6 @@
       const output = {};
       const whichImage = +v.sheet_image;
       // roll20 urls includes extra meta after the image extension
-
       const avatarURL = (function getAvatarUrl(url) {
         // check url for common image extension
         const extensions = /(\.png|\.jpg|\.gif)/i;
@@ -12869,9 +12869,15 @@
       })(v.character_avatar);
 
       const sheetURL = v.sheet_image_url || avatarURL;
-      // clog(`avatarURL:${avatarURL}`);
-      // clog(`sheetURL:${sheetURL}`);
-      output.sheet_image_src = whichImage === 0 ? sheetURL : avatarURL;
+      if (whichImage === 0) {
+        output.sheet_image_src = sheetURL;
+      }
+      if (whichImage === 1) {
+        output.sheet_image_src = avatarURL;
+      }
+      if (whichImage === 2) {
+        output.sheet_image_src = '';
+      }
       setAttrs(output, {silent: true});
     });
   };

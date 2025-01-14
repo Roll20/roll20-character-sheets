@@ -4,8 +4,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Material+Icons&display=swap');
 
 /*
-@import url('https://fonts.googleapis.com/css2?family=Rye:wght@400;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rye:wght@400;600&display=swap');
 */
 
 /* Misc variables Custom colors for Roll Template */
@@ -1498,8 +1499,14 @@ section.npc-box.statblock3 .image-avatar {
   display: flex;
   grid-column: 3/4;
   grid-row-start: 1;
-  justify-content: center;
+  position: absolute;
   width: 100%;
+}
+
+/* sheet is set to no image */
+.charsheet .portrait-box:has(input[type='hidden'].toggle-avatar[value="2"]),
+.charsheet .wrapper .npc-box.statblock3:has(.toggle-avatar[value="2"]) {
+  display: none;
 }
 
 /* sheet image avatar or url toggle */
@@ -1508,16 +1515,18 @@ section.npc-box.statblock3 .image-avatar {
 }
 
 /* hides the ghosted outline when no avatar has been selected yet */
-.charsheet input[type='checkbox'].toggle-avatar:checked ~ .image-avatar img {
+.charsheet input[type='hidden'].toggle-avatar[value="1"] ~ .image-avatar img,
+.charsheet input[type='hidden'].toggle-avatar[value="2"] ~ .image-avatar img {
   display: none;
 }
 
-.charsheet input[type='checkbox'].toggle-avatar:checked ~ .image-avatar img[src] {
+.charsheet input[type='hidden'].toggle-avatar[value="1"] ~ .image-avatar img[src] {
   display: inherit;
 }
 
 /* needs important to overide inline style added by roll20 */
-.charsheet input[type='checkbox'].toggle-avatar:checked ~ .image-avatar {
+.charsheet input[type='hidden'].toggle-avatar[value="1"] ~ .image-avatar,
+.charsheet input[type='hidden'].toggle-avatar[value="2"] ~ .image-avatar {
   background-image: none !important;
   min-width: auto;
 }
@@ -1547,13 +1556,15 @@ section.npc-box.statblock3 .image-avatar {
 /* img url is a background image which is not detected by the grid
  this prevents collapsing the 3rd column when using an image */
 .charsheet .header-box:has(.image-avatar:checked[style*='http']),
-.charsheet .header-box:has(.toggle-avatar:checked + .image-avatar img) {
+.charsheet .header-box:has(.toggle-avatar[value="1"] + .image-avatar img),
+.charsheet .header-box:has(.toggle-avatar[value="2"] + .image-avatar img) {
   grid-template-columns: 1fr 1.5fr auto;
 }
 
 .charsheet .header-box:has(.image-avatar[style*='http']),
-.charsheet .header-box:has(.toggle-avatar:checked + .image-avatar img[src]) {
+.charsheet .header-box:has(.toggle-avatar[value="1"] + .image-avatar img[src]) {
   grid-template-columns: 1fr 1.5fr 1fr;
+  position: relative;
 }
 
 .charsheet .background,
@@ -1567,7 +1578,7 @@ section.npc-box.statblock3 .image-avatar {
 @container (max-width: 281px) {
 
   .charsheet .background .wrapper .header-box:has(.image-avatar[style*='http']) .logo-box .ac-columns,
-  .charsheet .background .wrapper .header-box:has(.toggle-avatar:checked + .image-avatar img[src]) .logo-box .ac-columns {
+  .charsheet .background .wrapper .header-box:has(.toggle-avatar[value="1"] + .image-avatar img[src]) .logo-box .ac-columns {
     align-self: baseline;
     flex-direction: row;
     margin: 4.1em -4.5em 0 0;
@@ -1575,12 +1586,12 @@ section.npc-box.statblock3 .image-avatar {
   }
 
   .charsheet .background .wrapper .header-box:has(.image-avatar[style*='http']) .logo-box .ac-columns label:nth-child(2),
-  .charsheet .background .wrapper .header-box:has(.toggle-avatar:checked + .image-avatar img[src]) .logo-box .ac-columns label:nth-child(2) {
+  .charsheet .background .wrapper .header-box:has(.toggle-avatar[value="1"] + .image-avatar img[src]) .logo-box .ac-columns label:nth-child(2) {
     margin-left: 5px;
   }
 
   .charsheet .background .wrapper .header-box:has(.image-avatar[style*='http']) .logo-box .ac-columns label:last-child,
-  .charsheet .background .wrapper .header-box:has(.toggle-avatar:checked + .image-avatar img[src]) .logo-box .ac-columns label:last-child {
+  .charsheet .background .wrapper .header-box:has(.toggle-avatar[value="1"] + .image-avatar img[src]) .logo-box .ac-columns label:last-child {
     margin-left: 8px;
   }
 }
@@ -1590,9 +1601,9 @@ section.npc-box.statblock3 .image-avatar {
     display: block;
     max-height: var(--portrait-min-xy);
     min-height: var(--portrait-min-xy);
-    position: relative;
+    /* position: relative; */
     right: 3.95vw;
-    top: -1.97em;
+    top: 0;
   }
 }
 
