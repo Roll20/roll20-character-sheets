@@ -63,9 +63,10 @@
             <span class="left">
               <span>v<span name="attr_sheet_version">
             </span>
-            <span class="right"> • 1/16/25'</span>
+            <span class="right"> • 1/17/25'</span>
           </h5>
           <ul>
+            <li>AC calculation updated: check added to remove low Dex penalties beyond AC 10. "Armor class below 10 is not possible except through cursed items." DMG p73</li>
             <li>Fixed a z-index bug where the sheet's portrait could overlap other header areas preventing input/access. This only happens if the use URL option is chosen in the sheet settings but no URL is provided.</li>
             <li>Small adjustment to the roll template header and subheader padding.</li>
             <li>Changed the attack template font style to be the same as the general template.</li>
@@ -9714,9 +9715,28 @@
         );
         const combinedModMagic = int(armorModAC + armorMagicAC);
         const rearAC = int(baseAC + armorModAC + armorMagicAC);
-        const shieldlessAC = int(rearAC + armorBonus);
+
+        // Dex penalty only appllies up to AC 10
+        // "Armor class below 10 is not possible except through cursed items." DMG p73
+        // check for low Dex pen and do not apply if AC >= 10
+        let armorBonusPenaltyCap = 1;
+        if (armorBonus > 0 && rearAC >= 10) {
+          clog(`Check1: Dex Penalty & AC is 10+ \n armorBonus:${armorBonus} rearAC:${rearAC} \n Dex Penalty set to 0`);
+          armorBonusPenaltyCap = 0;
+        }
+
+        const shieldlessAC = int(rearAC + (armorBonus * armorBonusPenaltyCap));
         const combinedShieldModMagic = int(armorShield_acValue + shieldModValue + shieldMagicValue);
-        const totalAC = int(shieldlessAC + combinedShieldModMagic);
+        let totalAC = int(shieldlessAC + combinedShieldModMagic);
+
+        // check for low Dex pen after shield and do not apply if AC >= 10
+        if (armorBonus > 0 && combinedShieldModMagic >= 10) {
+          clog(`Check2: Dex Penalty & AC is 10+ \n armorBonus:${armorBonus} combinedShieldModMagic:${combinedShieldModMagic} \n Dex Penalty set to 0`);
+          totalAC = int(shieldlessAC + armorBonus + combinedShieldModMagic); // removes Dex pen
+        }
+
+        //const totalAC = int(shieldlessAC + combinedShieldModMagic);
+
         // add a plus sign to result (n<=0?"":"+") + n
         const armorclass_magic_with_shield_add_sign = (-1 * (armorMagicAC + shieldMagicValue) <= 0 ? '' : '+') + -1 * (armorMagicAC + shieldMagicValue);
         const armorclass_magic_total_add_sign = (-1 * armorMagicAC_total <= 0 ? '' : '+') + -1 * armorMagicAC_total;
