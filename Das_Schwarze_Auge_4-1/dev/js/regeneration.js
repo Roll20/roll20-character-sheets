@@ -3462,6 +3462,7 @@ on(
 		const specialSkill = parseInt(values["sf_astrale_meditation"]);
 		const thonnysUse = parseInt(values["reg_astralmeditation_use_thonnys"]);
 		const thonnysLeaves = parseInt(values["reg_astralmeditation_use_thonnys_amount"]);
+		const thonnysLeavesMin = 1;
 		// Combined with the special skill Thonnys grants reduced cost only at full dose
 		const thonnysFullDoseLeaves = 7;
 		const targetRaw = parseInt(values["reg_astralmeditation_conversion_target"]);
@@ -3495,7 +3496,17 @@ on(
 			setup += 1;
 		}
 		if (
-			(thonnysUse === 1) && (thonnysLeaves >= thonnysFullDoseLeaves)
+			(thonnysUse === 1)
+			&&
+			(
+				(
+					(specialSkill === 1)
+					&&
+					(thonnysLeaves >= thonnysFullDoseLeaves)
+				)
+				||
+				(thonnysLeaves >= thonnysLeavesMin)
+			)
 		)
 		{
 			setup += 2;
