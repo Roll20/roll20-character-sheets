@@ -1037,6 +1037,7 @@ const melee = [
 // Regeneration buttons
 const reg = [
 	'reg_astralmeditation',
+	'reg_astralmeditation_set_full',
 	'reg_deepbreath',
 	'reg_karmicmeditation',
 	'reg_relax',

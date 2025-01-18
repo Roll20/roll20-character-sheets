@@ -3929,6 +3929,122 @@ on(
 	});
 });
 
+// Generating Set Full Roll (Astral Meditation)
+on(
+	[
+		"ae", "ae_max",
+		"sf_astrale_meditation",
+		"reg_astralmeditation_use_thonnys",
+		"reg_astralmeditation_use_thonnys_amount",
+	].map(attr => "change:" + attr).join(" "),
+	function(eventInfo) {
+	safeGetAttrs(
+		[
+			"AE", "AE_max",
+			"sf_astrale_meditation",
+			"reg_astralmeditation_use_thonnys",
+			"reg_astralmeditation_use_thonnys_amount",
+		], function(values) {
+		const caller = "Action Listener for Generation of Set Full Roll (Astral Meditation)";
+		debugLog(caller, "eventInfo", eventInfo, "values", values);
+
+		/*
+		Roll Code Generation
+		Preparation
+		*/
+		const AE = parseInt(values["AE"]);
+		const AEMax = values["AE_max"];
+		const specialSkill = parseInt(values["sf_astrale_meditation"]);
+		const thonnysUse = parseInt(values["reg_astralmeditation_use_thonnys"]);
+		const thonnysLeaves = parseInt(values["reg_astralmeditation_use_thonnys_amount"]);
+		const thonnysLeavesMin = 1;
+		const thonnysFullDoseLeaves = 7;
+		const AECostInitiationDefault = 1;
+		let attrsToChange = {};
+
+		// Determination of setup
+		/// 	0: no special skill, no Thonnys
+		/// 	1: Special skill Astral Meditation only
+		/// 	2: Herb Thonnys used only
+		/// 	3: Astral Meditation + Thonnys used
+		let setup = 0;
+
+		if (specialSkill === 1)
+		{
+			setup += 1;
+		}
+		if (
+			(thonnysUse === 1)
+			&&
+			(
+				(
+					(specialSkill === 1)
+					&&
+					(thonnysLeaves >= thonnysFullDoseLeaves)
+				)
+				||
+				(thonnysLeaves >= thonnysLeavesMin)
+			)
+		)
+		{
+			setup += 2;
+		}
+
+		// Determination of Maximum Required Life Points to Convert
+		let maxConversionRequired = AEMax - AE;
+		if (setup !== 3)
+		{
+			maxConversionRequired += AECostInitiationDefault;
+		}
+
+		/// Nothing to do with AE = AEMax
+		if (AE === AEMax)
+		{
+			maxConversionRequired = 0;
+		}
+
+		// Roll Setup
+		const baseRoll = [
+			"&{template:reg-astralmeditation-set-full}",
+			`{{maxconv=[[${maxConversionRequired}]]}}`,
+		];
+
+		// Build roll
+		let roll = [];
+		roll = roll.concat(baseRoll);
+
+		attrsToChange["reg_astralmeditation_set_full_roll"] = roll.join(" ").trim();
+
+		debugLog(caller, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
+	});
+});
+
+on('clicked:reg_astralmeditation_set_full-action', async (info) => {
+	// Boilerplate
+	const caller = "Action Listener for Set Full Button (Astral Meditation)";
+	let attrsToChange = {};
+
+	// Roll
+	let results = await startRoll("@{reg_astralmeditation_set_full_roll}");
+	debugLog(caller, "head", "info:", info, "results:", results);
+	let rollID = results.rollId;
+
+	// Convenience Object
+	let resultsOnly = {};
+	for (let property in results.results)
+	{
+		resultsOnly[property] = results.results[property].result;
+	}
+
+	// Finish
+	attrsToChange["reg_astralmeditation_conversion_target"] = resultsOnly["maxconv"];
+	debugLog(caller, "tail", "rollID", rollID, "resultsOnly", resultsOnly, "attrsToChange", attrsToChange);
+	safeSetAttrs(attrsToChange);
+
+	finishRoll(rollID);
+});
+
 on('clicked:reg_astralmeditation-action', async (info) => {
 	const caller = "Action Listener for Regeneration Button (Astral Meditation)";
 	let results = await startRoll("@{reg_astralmeditation_roll}");
