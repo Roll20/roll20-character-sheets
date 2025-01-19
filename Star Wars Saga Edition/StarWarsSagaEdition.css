@@ -21,6 +21,7 @@ input.tab::before,
   --input-disabled-bg:#e3e3e3;
   --input-disabled-border:#444;
   --input-disabled-border-top:#999;
+  --input-darker-text: #333;
   --checkbox-accent: #606060; /* This is now unused on the sheet because of visible-checkbox */
   --checkbox-bg:#eee;
   --checkbox-checked-bg:#ddd;
@@ -29,10 +30,14 @@ input.tab::before,
   --checkbox-check:#222;
   --checkbox-disabled-bg:#cecece;
   --checkbox-disabled-check:#606060;
+  --toggle-bar: #eeeefb;
+  --toggle-bar-checked: #cacad5;
+  --toggle-shadow: #4441;
   --header-bg: #000;
   --header-bg-highlight: #333;
   --col1-bg:#a7a8aa;
   --col1-bg-2:#c6c7ca;
+  --col1-bg-2-highlight:#d7d8db;
   --header-text: #fff;
   --header-text-highlight: #b9b9b9;
   --clickable-highlight: #0004;
@@ -55,6 +60,18 @@ input.tab::before,
   --button-gradient2: #e6e6e6;
   --button-shadow1: #ffffff33;
   --button-shadow2: #0000000d;
+  --bonuses-bg: #7794;
+  --bonuses-skills-bg: #0000000c;
+  --bonuses-skills-border: #8a8aa844;
+  --bonuses-toggle-shadow: #4444;
+  --scrollbar1-thumb: #a7a7ae;
+  --scrollbar1-shaft: #d3d3dc;
+  --scrollbar2-thumb: #9090ae;
+  --scrollbar2-shaft: #d9d9e6;
+}
+
+.ui-dialog {
+    scrollbar-color: var(--scrollbar1-thumb) var(--scrollbar1-shaft);
 }
 
 .center {
@@ -161,6 +178,17 @@ input[type="number"]:hover {
     width: calc(100% - 300px) !important;
 }
 
+input:focus-visible {
+    /* Could also adjust the outline, but this is specific to each browser. */
+    z-index: 1;
+    position: relative;
+}
+
+input.tab[type="radio"]:focus {
+    outline: none!important;
+    outline-offset: 0px;
+}
+
 /* ******** GRIDS ******** */
 
 .flex-break {
@@ -169,7 +197,7 @@ input[type="number"]:hover {
 }
 
 .flex-texthead {
-    height:21.433px;
+    height:21px;
     margin-right:-2px;
 }
 
@@ -180,6 +208,99 @@ input[type="number"]:hover {
     align-self: end;
     line-height: 15px;
     margin-top:4px;
+}
+
+.repcontrol {
+    margin-bottom: 15px;
+}
+
+/* Bonuses and Penalties Grid */
+.repcontainer[data-groupname="repeating_bonuses"] > .repitem {
+    display:inline-block;
+    width:33.33%;
+}
+
+.repcontainer[data-groupname="repeating_bonuses"] {
+    display:flex;
+    flex-wrap:wrap;
+}
+
+.bonuses-grid {
+    display:grid;
+    grid-template-columns: 3fr 2fr;
+    gap:4px;
+    margin:4px;
+    border: 1px solid var(--rule-borders);
+    border-radius:5px;
+    padding: 5px;
+    box-sizing: content-box;
+}
+
+.bonuses-header {
+    grid-column: 1/3;
+    display: flex;
+    gap: 4px;
+}
+
+.bonuses-header input[type="text"] {
+    width: calc(100% - 65px);
+    color: var(--input-darker-text);
+}
+
+.bonus-categories-grid {
+    margin: 6px 2px 4px 4px;
+    display:grid;
+    grid-template-columns: 1fr 3fr 2fr;
+    row-gap: 2px;
+}
+
+.bonuses-grid .bonus-categories-grid label,
+.bonuses-grid .bonus-categories-grid h4 {
+    font-size:13px;
+}
+
+.bonuses-grid select {
+    width: auto;
+}
+
+.bonuses-defenses > div {
+    display:inline-flex;
+    margin-left: -5px;
+    margin-right: -5px;
+    width: 100%;
+}
+
+.bonuses-defenses div div {
+    flex-basis: 50px;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.bonuses-skills {
+    grid-column-start: span 2;
+    height: 200px;
+    overflow: scroll;
+    border-style: inset;
+    border-width: 2px;
+    padding: 5px;
+    background-color: var(--bonuses-skills-bg);
+    border-radius: 5px;
+    border-color: var(--bonuses-skills-border);
+}
+
+/* If the bonus is active */
+.bonuses-grid:has(.bonuses-header .visible-checkbox:checked) {
+    background-color: var(--bonuses-bg);
+    outline: 1px solid var(--rule-borders);
+    scrollbar-color: var(--scrollbar2-thumb) var(--scrollbar2-shaft);
+}
+
+.bonuses-header .visible-checkbox:checked ~ input[type="text"] {
+    font-weight:bold;
+}
+
+.bonuses-header .visible-checkbox:checked ~ label.toggle-bar {
+    box-shadow: 0px 0px 6px 1px var(--bonuses-toggle-shadow) inset;
 }
 
 /* Vitals Grid (HP, Threshold, Condition Track, Second Wind) */
@@ -254,6 +375,7 @@ input[type="number"]:hover {
     grid-template-rows:auto;
     justify-content: center;
     grid-row-gap: 1px;
+    grid-column-gap: 2px;
 }
 
 .attacks-grid-attack-title.col1,
@@ -263,15 +385,17 @@ input[type="number"]:hover {
     font-size: 13px;
     background-color:var(--col1-bg-2);
     cursor: pointer;
-    margin-right:2px;
+}
+
+.sectAttack-show:checked ~ label.col1:hover {
+    background-color: var(--col1-bg-2-highlight);
 }
 
 .attacks-grid-weapon-name {
     grid-column:2/9;
-    color:#333;
+    color: var(--input-darker-text);
     font-weight:bold;
-    width:calc(100% - 2px);
-    margin-right:2px;
+    width:100%;
 }
 
 .attacks-grid-damage-type {
@@ -704,16 +828,12 @@ textarea.equipment-note-field {
     width:100%;
     padding:1px 2px;
 	margin-left: -2px;
+    line-height: 21px;
 }
 
-.charsheet label.textHead {
-    margin-right: 2px;
-    padding: 2.5px 0px;
-}
-
+.charsheet label.textHead,
 .charsheet label.textHead2Col {
     margin-right: 2px;
-    padding: 2.5px 5px;
 }
 
 h4 {
@@ -757,6 +877,11 @@ h4 {
 
 .charsheet div.bot-margin {
     margin-bottom: 15px;
+}
+
+.repcontainer[data-groupname="repeating_bonuses"] > .repitem {
+    display:inline-block;
+    width:33.33%;
 }
 
 .repcontainer[data-groupname="repeating_organization"] > .repitem {
@@ -902,15 +1027,15 @@ label.toggle-bar {
     height: 17px;
     margin-bottom:-3px;
     box-sizing: border-box;
-    background-color: #eeeefb;
+    background-color: var(--toggle-bar);
     border-radius: 30px;
     cursor: pointer;
     transition: background-color .25s;
-    box-shadow: 0px 0px 6px 1px #4441 inset
+    box-shadow: 0px 0px 6px 1px var(--toggle-shadow) inset
 }
 
 .toggle-bar:has(input:checked) {
-    background-color: #cacad5;
+    background-color: var(--toggle-bar-checked);
 }
 
 label.toggle-bar input {
@@ -1031,12 +1156,14 @@ input:checked + .toggle-knob::after {
 
 /* ******** Hiding sections and show/hide toggle ******** */
 .forceShow:not(:checked) ~ .forceBody,
+.forceShow:not(:checked) ~ div.repcontainer .forceBody,
 .organizationShow:not(:checked) ~ .organizationBody,
 .SRShow:not(:checked) ~ .SRBody,
 .DRShow:not(:checked) ~ .DRBody,
 .immuneShow:not(:checked) ~ .immuneBody,
 .statusBody:not(:checked) ~ .statusBody,
 .pilotSkillShow:not(:checked) ~ .pilotBody,
+.commanderSkillShow:not(:checked) ~ .commanderBody,
 .sectAttack-show:not(:checked) ~ .sectAttack,
 .sectCon-show:checked ~ .sectCon,
 .sect-show:not(:checked) ~ .sect,
@@ -1055,7 +1182,9 @@ input:checked + .toggle-knob::after {
 
 /* Section for showing/hiding specific skills */
 .athleticsShow:not(:checked) ~ .athleticsBody,
-.athleticsShow:checked ~ .noathleticsBody {
+.athleticsShow:not(:checked) ~ div.repcontainer .athleticsBody,
+.athleticsShow:checked ~ .noathleticsBody,
+.athleticsShow:checked ~ div.repcontainer .noathleticsBody {
     display:none!important;
 }
 
@@ -1130,6 +1259,16 @@ input:not(:checked) + label.clickable.textHead2Col {
 	border-radius: 5px;
 	padding: 5px;
 	margin-bottom: 5px;
+}
+
+span.setting {
+    font-weight: normal;
+    font-size: 13px;
+    user-select: none;
+}
+
+label:has(.setting):hover {
+    text-shadow: 0px 0px 2px var(--clickable-highlight);
 }
 
 .visible-checkbox + span {
@@ -1286,7 +1425,9 @@ input:not(:checked) + label.clickable.textHead2Col {
   --dm-scrollbar1-shaft: #2e2e40;
   --dm-scrollbar2-thumb: #1e1e44;
   --dm-scrollbar2-shaft: #60608c;
+  --dm-scrollbar3-shaft: #232331;
   --dm-col1: #55555a;
+  --dm-col1-highlight: #727275;
   --dm-input-border: #707099;
   --dm-input-border-top: #44445c;
   --dm-input-disabled-bg: #334;
@@ -1305,7 +1446,7 @@ input:not(:checked) + label.clickable.textHead2Col {
   --dm-header-bg-highlight: #44a;
   --dm-header-text: #f5f5f5;
   --dm-clickable-hover:#eee;
-  --dm-clickable-highlight:#fff4;
+  --dm-clickable-highlight:#fff6;
   --dm-button-bg: #747492;
   --dm-button-gradient1:#d9d9e3;
   --dm-button-gradient2: #b8b8cc;
@@ -1318,10 +1459,15 @@ input:not(:checked) + label.clickable.textHead2Col {
   --dm-tab-inactive-gradient2: #292929;
   --dm-toggle-bar: #446;
   --dm-toggle-bar-checked: #3c3cbc;
+  --dm-toggle-shadow: #0008;
   --dm-toggle-knob:#bbbbd7;
   --dm-toggle-knob-border:#6c6c8f;
   --dm-toggle-knob-active:#d1d1ec;
   --dm-toggle-knob-active-border:#9d9dcc;
+  --dm-bonuses-outline: #556;
+  --dm-bonuses-outline-active: #8a8aa8;
+  --dm-bonuses-toggle-shadow: #000a;
+  --dm-bonuses-toggle-outline: #0006;
   /* Colors below are for the CT buttons */
   --dm-ct-bg: #747492;
   --dm-ct-border: #000f;
@@ -1362,6 +1508,10 @@ input:not(:checked) + label.clickable.textHead2Col {
     color: var(--dark-primarytext);
 }
 
+.sheet-darkmode .charsheet .sectAttack-show:checked ~ label.col1:hover {
+    background-color: var(--dm-col1-highlight);
+}
+
 .sheet-darkmode .charsheet hr {
 	opacity: 0.3;
 }
@@ -1385,6 +1535,11 @@ input:not(:checked) + label.clickable.textHead2Col {
 	color: var(--dark-primarytext);
 }
 
+.sheet-darkmode .charsheet label span.setting {
+    color: var(--dark-primarytext);
+}
+
+/* Begin section for checkboxes */
 .sheet-darkmode .charsheet input[type=radio],
 .sheet-darkmode .charsheet input[type=checkbox] {
 	accent-color: var(--dm-checkbox-accent);
@@ -1407,6 +1562,16 @@ input:not(:checked) + label.clickable.textHead2Col {
 	transition: 60ms all linear;
 }
 
+.sheet-darkmode .charsheet .visible-checkbox:hover {
+    filter: brightness(125%);
+}
+
+.sheet-darkmode .charsheet .visible-checkbox:hover::before {
+    filter:none; /* This gets rid of the contrast filter from light mode. */
+}
+/* End section for checkboxes */
+
+/* Start section for crew */
 .sheet-darkmode .skills-grid .skills-grid-name label {
     color:var(--dark-primarytext);
 }
@@ -1431,14 +1596,7 @@ input:not(:checked) + label.clickable.textHead2Col {
 .sheet-darkmode .charsheet .defaultCrew:not(:checked) ~ .defaultCrewLock[type="checkbox"]::before {
     box-shadow: inset 1em 1em var(--dm-checkbox-disabled-check); /*The dimensions don't actually make a difference, as long as they are larger than the width and height. */
 }
-
-.sheet-darkmode .charsheet .visible-checkbox:hover {
-    filter: brightness(125%);
-}
-
-.sheet-darkmode .charsheet .visible-checkbox:hover::before {
-    filter:none; /* This gets rid of the contrast filter from light mode. */
-}
+/* End section for crew */
 
 .sheet-darkmode .charsheet div.textHead2Col,
 .sheet-darkmode .charsheet div.textHead,
@@ -1455,6 +1613,10 @@ input:not(:checked) + label.clickable.textHead2Col {
 
 .sheet-darkmode .clickable:hover {
     color: var(--dm-clickable-hover);
+    text-shadow: 0px 0px 3px var(--dm-clickable-highlight);
+}
+
+.sheet-darkmode label:has(.setting):hover {
     text-shadow: 0px 0px 3px var(--dm-clickable-highlight);
 }
 
@@ -1503,7 +1665,7 @@ input:not(:checked) + label.clickable.textHead2Col {
 /* Start section for toggle switches */
 .sheet-darkmode label.toggle-bar {
     background-color: var(--dm-toggle-bar);
-    box-shadow: 0px 0px 6px 1px #0008 inset
+    box-shadow: 0px 0px 6px 1px var(--dm-toggle-shadow) inset
 }
 
 .sheet-darkmode .toggle-bar:has(input:checked) {
@@ -1522,6 +1684,29 @@ input:not(:checked) + label.clickable.textHead2Col {
     border-color: var(--dm-toggle-knob-active-border);
 }
 /* End section for toggle switches */
+
+/* Start section for Bonuses and Penalties */
+.sheet-darkmode .charsheet .bonuses-grid {
+    border: 1px solid var(--dm-bonuses-outline);
+}
+
+.sheet-darkmode .charsheet .bonuses-skills {
+    background-color: #0002;
+    border-color: #8a8aa888;
+}
+
+.sheet-darkmode .charsheet .bonuses-grid:has(.bonuses-header .visible-checkbox:checked) {
+    /* If the bonus is active */
+    border-color: var(--dm-bonuses-outline-active);
+    outline: 1px solid var(--dm-bonuses-outline-active);
+    scrollbar-color: var(--dm-scrollbar1-thumb) var(--dm-scrollbar3-shaft);
+}
+
+.sheet-darkmode .charsheet .bonuses-header .visible-checkbox:checked ~ label.toggle-bar {
+    box-shadow: 0px 0px 6px 1px var(--dm-bonuses-toggle-shadow) inset;
+    outline: 1px solid var(--dm-bonuses-toggle-outline);
+}
+/* End section for Bonuses and Penalties */
 
 /* Start section for condition track buttons and heavy load warning */
 .sheet-darkmode .charsheet input.ct-label + label,
