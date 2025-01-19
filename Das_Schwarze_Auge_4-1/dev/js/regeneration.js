@@ -4290,6 +4290,53 @@ on('clicked:reg_astralmeditation-action', async (info) => {
 	}
 });
 
+// Auto-Enable Checkboxes on Input Change
+on(
+	[
+		"reg_karmicmeditation_mod_motivation_mission_value",
+		"reg_karmicmeditation_mod_motivation_selfish_value",
+		"reg_karmicmeditation_mod_motivation_sinner_value",
+		"reg_karmicmeditation_mod_location_other_world_value",
+		"reg_karmicmeditation_mod_location_demonic_value",
+	].map(attr => "change:" + attr).join(" "),
+	function(eventInfo) {
+	safeGetAttrs(
+		[
+			"reg_karmicmeditation_mod_motivation_mission",
+			"reg_karmicmeditation_mod_motivation_selfish",
+			"reg_karmicmeditation_mod_motivation_sinner",
+			"reg_karmicmeditation_mod_location_other_world",
+			"reg_karmicmeditation_mod_location_demonic",
+		], function(values) {
+		// Boilerplate
+		const caller = "Action Listener for Auto-Enable Checkboxes (Karmic Meditation)";
+		debugLog(caller, "eventInfo", eventInfo, "values", values);
+		const trigger = eventInfo["triggerName"];
+		let attrsToChange = {};
+
+		// Preparation
+		/// Function for getting corresponding checkbox attribute name
+		function getCorrespondingAttr(attr)
+		{
+			const suffixLength = "_value".length;
+			return attr.slice(0, -suffixLength);
+		}
+		/// Get corresponding checkbox attribute
+		const checkboxAttr = getCorrespondingAttr(trigger);
+		const checkboxState = values[checkboxAttr];
+
+		// Calculations
+		if (checkboxState !== "1")
+		{
+			attrsToChange[checkboxAttr] = "1";
+		}
+
+		// Finish
+		debugLog(caller, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
+	});
+});
+
 // Generating Regeneration Roll (Karmic Meditation)
 on(
 	[
