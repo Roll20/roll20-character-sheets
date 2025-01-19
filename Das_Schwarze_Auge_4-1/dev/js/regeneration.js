@@ -3401,7 +3401,43 @@ on(
 	});
 });
 
+// Auto-Enable Checkboxes on Input Change
+on(
+	[
+		"reg_astralmeditation_location_leyline_strength",
+		"reg_astralmeditation_use_thonnys_amount",
+	].map(attr => "change:" + attr).join(" "),
+	function(eventInfo) {
+	safeGetAttrs(
+		[
+			"reg_astralmeditation_location_leyline",
+			"reg_astralmeditation_use_thonnys",
+		], function(values) {
+		// Boilerplate
+		const caller = "Action Listener for Auto-Enable Checkboxes (Karmic Meditation)";
+		debugLog(caller, "eventInfo", eventInfo, "values", values);
+		const trigger = eventInfo["triggerName"];
+		let attrsToChange = {};
 
+		// Preparation
+		const correspondingAttr = {
+			"reg_astralmeditation_location_leyline_strength": "reg_astralmeditation_location_leyline",
+			"reg_astralmeditation_use_thonnys_amount": "reg_astralmeditation_use_thonnys",
+		};
+		const checkboxAttr = correspondingAttr[trigger];
+		const checkboxState = values[checkboxAttr];
+
+		// Calculations
+		if (checkboxState !== "1")
+		{
+			attrsToChange[checkboxAttr] = "1";
+		}
+
+		// Finish
+		debugLog(caller, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
+	});
+});
 
 // Generating Regeneration Roll (Astral Meditation)
 on(
