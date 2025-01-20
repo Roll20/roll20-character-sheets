@@ -2537,17 +2537,18 @@ wiz3['Wind Wall'] = {
     'school-spells-and-magic': 'Alteration, Elemental Air',
     'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': '[[@{level-wizard}]] rounds',
-    'aoe': 'wall, [[10*[[@{level-wizard}]] ]] x [[5*[[@{level-wizard}]] ]] feet, 2 feet wide',
+    'aoe': 'wall, [[10*[[@{level-wizard}]] ]] x [[5*[[@{level-wizard}]] ]] feet, 2 feet thick',
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'Special',
     'materials': 'A tiny fan and a feather of exotic origin.',
     'reference': 'p. 198',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 1021',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell brings forth an invisible vertical curtain of wind 2 feet thick and of considerable strength—a strong breeze sufficient to blow away any bird smaller than an eagle or tear papers and like materials from unsuspecting hands. (If in doubt, a saving throw vs. spell determines whether the subject maintains its grasp.) Normal insects cannot pass such a barrier. Loose materials, even cloth garments, fly upward when caught in a wind wall. Arrows and bolts are deflected upward and miss, while sling stones and other missiles under two pounds in weight receive a –4 penalty to a first shot and –2 penalties thereafter. Gases, most breath weapons, and creatures in gaseous form cannot pass this wall, although it is no barrier to noncorporeal creatures.'
+    'effect': 'This spell brings forth an invisible vertical curtain of wind 2 feet thick and of considerable strength—a strong breeze sufficient to blow away any bird smaller than an eagle or tear papers and like materials from unsuspecting hands. (If in doubt, a saving throw vs. spell determines whether the subject maintains its grasp.) Normal insects cannot pass such a barrier. Loose materials, even cloth garments, fly upward when caught in a *wind wall*. Arrows and bolts are deflected upward and miss, while sling stones and other missiles under two pounds in weight receive a –4 penalty to a first shot and –2 penalties thereafter. Gases, most breath weapons, and creatures in gaseous form cannot pass this wall, although it is no barrier to noncorporeal creatures.'
 };
 
 wiz3['Wraithform'] = {
@@ -2563,10 +2564,12 @@ wiz3['Wraithform'] = {
     'materials': 'A bit of gauze and a wisp of smoke.',
     'reference': 'p. 198',
     'book': 'PHB',
+    'book-compendium': 'Wizard’s Spell Compendium Volume Four p. 1035',
+    'errata': 'Sage Advice #201 p. 44\nSage Advice #264 p. 26',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard and all of his gear become insubstantial. The caster is subject only to magical or special attacks, including those by weapons of +1 or better, or by creatures otherwise able to affect those struck only by magical weapons. Undead of most sorts will ignore an individual in wraithform, believing him to be a wraith or spectre, though a lich or special undead may save vs. spell with a –4 penalty to recognize the spell.\n&emsp;The wizard can pass through small holes or narrow openings, even mere cracks, with all he wears or holds in his hands, as long as the spell persists. Note, however, that the caster cannot fly without additional magic. No form of attack is possible when in wraithform, except against creatures that exist on the Ethereal Plane, where all attacks (both ways) are normal. A successful *dispel magic* spell forces the wizard in wraithform back to normal form. The spellcaster can end the spell with a single word.'
+    'effect': 'When this spell is cast, the wizard and all of his gear become insubstantial. The caster is subject only to magical or special attacks, including those by weapons of +1 or better, or by creatures otherwise able to affect those struck only by magical weapons. Undead of most sorts will ignore an individual in *wraithform*, believing him to be a wraith or spectre, though a lich or special undead may save vs. spell with a –4 penalty to recognize the spell.\n&emsp;The wizard can pass through small holes or narrow openings, even mere cracks, with all he wears or holds in his hands, as long as the spell persists. Note, however, that the caster cannot fly without additional magic. No form of attack is possible when in *wraithform*, except against creatures that exist on the Ethereal Plane, where all attacks (both ways) are normal. A successful *dispel magic* spell forces the wizard in *wraithform* back to normal form. The spellcaster can end the spell with a single word.'
 };
 
 const wiz4 = {};
