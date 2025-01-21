@@ -918,6 +918,8 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
     <div class='choice create_culture_weighttraining_show'><div class='prop_pair'><span class='prop_prop culture_select_group' data-i18n='weighttraining'>To translatte</span><span class='prop_value culture_select_group create_culture_weighttraining_ranks'></span></div></div>
 
+    <div class='choice create_culture_attunement_show'><div class='prop_pair'><span class='prop_prop culture_select_group' data-i18n='attunement'>To translatte</span><span class='prop_value culture_select_group create_culture_attunement_ranks'></span></div></div>
+
     <div class='choice create_culture_unarmed_show'><div class='prop_pair'><select name='comp_create_cultureunarmed_select' class='create_cultureunarmed culture_select_group prop_prop'><option value='strikes' data-i18n='strikes'>Strikes</option><option value='sweepsthrows' data-i18n='sweepsthrows'>Sweeps & Throws</option><option value='wrestling' data-i18n='wrestling'>Wrestling</option><option value='beak' data-i18n='beak'>Beak</option><option value='bite' data-i18n='bite'>Bite</option><option value='claw' data-i18n='claw'>Claw</option><option value='horn' data-i18n='horn'>Horn</option><option value='ram' data-i18n='ram'>Ram</option><option value='stinger' data-i18n='stinger'>Stinger</option><option value='trample' data-i18n='trample'>Trample</option></select>
 <span class='culture_select_group prop_value create_culture_unarmed_ranks'></span></div></div>
 
@@ -976,7 +978,11 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
     <div class='choice create_culture_medicine_show'><div class='prop_pair'><span class='prop_prop culture_select_group' data-i18n='medicine'>To translatte</span><span class='prop_value culture_select_group create_culture_medicine_ranks'></span></div></div>
 
+    <div class='choice create_culture_poisonmastery_show'><div class='prop_pair'><span class='prop_prop culture_select_group' data-i18n='poisonmastery'>To translatte</span><span class='prop_value culture_select_group create_culture_poisonmastery_ranks'></span></div></div>
+
     <div class='choice create_culture_climbing_show'><div class='prop_pair'><span class='prop_prop culture_select_group' data-i18n='climbing'>To translatte</span><span class='prop_value culture_select_group create_culture_climbing_ranks'></span></div></div>
+
+    <div class='choice create_culture_flying_show'><div class='prop_pair'><span class='prop_prop culture_select_group' data-i18n='flying'>To translatte</span><span class='prop_value culture_select_group create_culture_flying_ranks'></span></div></div>
 
     <div class='choice create_culture_running_show'><div class='prop_pair'><span class='prop_prop culture_select_group' data-i18n='running'>To translatte</span><span class='prop_value culture_select_group create_culture_running_ranks'></span></div></div>
 
@@ -2189,7 +2195,7 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
 
 <div>
-    <div class='foe'>
+    <div class='foe fancybox'>
 
       <span style='grid-column: span 1'>
         Target:
@@ -2579,7 +2585,13 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 </div>
     <div>Eat/Drink</div> <div><div class='aptrackerbox'><input checked='checked' class='aptrack reset' type='radio' name='attr_aptrack_eat' value='0'><input class='aptrack' type='radio' name='attr_aptrack_eat' value='1'><input class='aptrack' type='radio' name='attr_aptrack_eat' value='2'></div>
 </div>
-    <div class='double'>Concentration</div> <input name='attr_aptrack_concentration' type='checkbox'>
+    <div class='double'>Concentration</div> 
+          <div>
+            <input name='attr_aptrack_concentration' type='checkbox'>
+            
+              <input type='checkbox' name='attr_aptrack_cocentration_prev1' disabled>
+              <input type='checkbox' name='attr_aptrack_cocentration_prev2' disabled>
+          </div>
     <div>Free Used</div> <input name='attr_aptrack_freeused' type='checkbox'>
     <div>AP/Phase</div>
     <div>
@@ -2739,7 +2751,7 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
     
   
-      <div class='foe'>
+      <div class='foe fancybox'>
 
       <span style='grid-column: span 1'>
         Target:
@@ -5366,7 +5378,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 09744839906cd945eef2649f6a885dbfaf69370f
+Revision 745ecfc9098ac3471d2a7ad477c002fc177ff7d9
 
 
 <hr>
@@ -13831,7 +13843,8 @@ onCheck("clicked:newcombat", () => {
       aptrack_eat: 0,
       aptrack_stand: 0,
       aptrack_freeused: 0,
-      aptrack_concentraction: 0,
+      aptrack_concentration: 0,
+      aptrack_lastconcentration: 0,
       aptrack_melee_x: 0,
       aptrack_missile_x: 0,
       aptrack_spell_x: 0,
@@ -13839,7 +13852,8 @@ onCheck("clicked:newcombat", () => {
       aptrack_eat_x: 0,
       aptrack_stand_x: 0,
       aptrack_freeused_x: 0,
-      aptrack_concentraction_x: 0,
+      aptrack_concentration_x: 0,
+      aptrack_lastconcentration_x: 0,
       currentphase: 0,
       currentphasedisplay: 0,
       freeactionphase: -1 },
@@ -13963,6 +13977,9 @@ function roundString(phases) {
 function doTurn() {
   getAttrs(["character_name", "currentphase",  "actionapperphase",
       "bleedlist", "hp", "freeactionphase",
+      "aptrack_concentration",
+      "aptrack_concentration_prev1",
+      "aptrack_concentration_prev2",
       "statusstagger", "statusstun75", "statusstun50", "statusstun25",
       "statuslist"],
     (turn) => {
@@ -14043,6 +14060,12 @@ function doTurn() {
 	sendMessage(`${name} is stunned at -25 for ${roundString(statusstun25)} rounds`);
 	updates.statuseffect = -25;
       }
+
+      /*  */
+      updates.aptrack_concentration_prev3 = turn.aptrack_concentration_prev2;
+      updates.aptrack_concentration_prev2 = turn.aptrack_concentration_prev1;
+      updates.aptrack_concentration_prev1 = turn.aptrack_concentration;
+      updates.aptrack_concentration = 0; 
 
       updates.currentphase = currentphase;
       updates.statusstagger = statusstagger;
@@ -14540,7 +14563,7 @@ creature.newCreature = function(name, jdata) {
     updates.critresist = cdata.critresist;
   }
 
-  updates.level = parseInt(cdata.level);
+  updates.level = parseInt(cdata.level || cdata.Level);
   updates.hits = parseInt(cdata.hits);
   updates.hp = updates.hits;
   updates.hp_max = updates.hp;

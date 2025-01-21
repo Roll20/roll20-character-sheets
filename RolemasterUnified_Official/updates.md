@@ -1,3 +1,11 @@
+# 2025-1-21
+
+- Creature: Handle Level correctly on dropped creatures.
+- Dark Mode updates - closer to useful
+- Creature layout updates.
+
+
+
 # 2025-1-14
 
 The wait... it's already halfway through January update!
