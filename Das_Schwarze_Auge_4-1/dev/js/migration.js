@@ -850,21 +850,21 @@ function migrateTo20240414(migrationChain) {
 	];
 	var attrsToChange =	{
 		"reg_sleep_le_ko": "@{KO} - 1d20",
-		"reg_sleep_le_fixed": "off",
+		"reg_sleep_le_fixed": "-1",
 		"reg_sleep_le_mod_advantages_disadvantages": 0,
 		"reg_sleep_le_mod_food_restriction": 0,
 		"reg_sleep_ae_base": "1d6",
 		"reg_sleep_ae_in": "@{IN} - 1d20",
-		"reg_sleep_ae_fixed": "off",
+		"reg_sleep_ae_fixed": "-1",
 		"reg_sleep_ae_mod_advantages_disadvantages": 0,
 		"reg_sleep_ae_mod_special_skills": 0,
 		"reg_sleep_ae_mod_food_restriction": 0,
 		"reg_sleep_ae_mod_homesickness": 0,
 		"reg_sleep_addiction_withdrawal_effect": 0,
 		"reg_sleep_food_restriction_effect": 0,
-		"reg_sleep_mod_somnambulism": 0,
-		"reg_sleep_sleep_disorder_effect": 0,
-		"reg_sleep_sleep_disorder_trigger": 0,
+		"reg_sleep_mod_somnambulism": "0",
+		"reg_sleep_sleep_disorder_effect": "1d6 - 1",
+		"reg_sleep_sleep_disorder_trigger": "1d0",
 		"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}"
 	};
 	safeGetAttrs(attrsToGet, function(values) {

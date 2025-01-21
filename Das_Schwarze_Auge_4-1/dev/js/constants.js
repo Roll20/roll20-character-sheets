@@ -338,7 +338,7 @@ const defaultValues = {
 	"reg_sleep_ae_mod_cuffed": 0,
 	"reg_sleep_ae_mod_food_restriction": 0,
 	"reg_sleep_ae_mod_homesickness": 0,
-	"reg_sleep_addiction_withdrawal_effect": "0",
+	"reg_sleep_addiction_withdrawal_effect": 0,
 	"reg_sleep_food_restriction_effect": 0,
 	"reg_sleep_mod_somnambulism": "0",
 	"reg_sleep_sleep_disorder_effect": "1d6 - 1",
