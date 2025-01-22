@@ -81,6 +81,13 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Jan 20th 2025 v1.75
+
+- Add Cantor Talent from Heart of Glass/Ubersreik Adventures 1, situational test bonus for entertain singing.
+- Add Chanty Talent from Sea of Claws, situational test bonus for entertain singing.
+- Fix Master of Disguise Talent, now shows situational test bonus for entertain acting.
+
+
 Jan 10th 2025 v1.74d
 
 - Fix for the sheet background and images sometimes not working in roll20. Sheet Assets moved to prevent url encoding problem.
