@@ -3756,11 +3756,24 @@ details[open].thac0-box {
   font-family: var(--font-buttons1);
   font-size: var(--text-med);
   font-weight: normal;
-  margin: 0 2px 2px 2px;
+  margin: 2px;
   padding: 0 2px 0 2px;
   text-shadow: none;
   vertical-align: middle;
   width: auto;
+}
+
+/* adding backtick removes sheet formatting & roll20 pink for chatmenu buttons */
+.sheet-rolltemplate-attacks a[href^='`!'],
+.sheet-rolltemplate-general a[href^='`!'],
+.sheet-rolltemplate-attacks a[href^='`~'],
+.sheet-rolltemplate-general a[href^='`~'] {
+  color: inherit;
+  display: inline-block;
+  font-weight: normal;
+  margin-block: 1px;
+  text-decoration: underline 1px solid #999;
+  white-space: normal;
 }
 
 /*urls*/
@@ -3768,6 +3781,7 @@ details[open].thac0-box {
 .sheet-rolltemplate-general a[href^='http'] {
   color: var(--link-hover);
   cursor: pointer;
+  display: inline-block;
   font-weight: bold;
   margin: 2px 0 2px;
   padding: 0 2px 0 2px;
@@ -3807,6 +3821,15 @@ details[open].thac0-box {
   border-radius: 4px;
   box-shadow: 1px 1px 3px var(--color-darkgrey1);
   color: var(--link-hover);
+}
+
+.sheet-rolltemplate-attacks a[href^='`!']:hover,
+.sheet-rolltemplate-general a[href^='`!']:hover,
+.sheet-rolltemplate-attacks a[href^='`~']:hover,
+.sheet-rolltemplate-general a[href^='`~']:hover {
+  background-position: inherit;
+  color: var(--link-hover);
+  text-decoration-color: var(--link-hover);
 }
 
 .charsheet .background .wrapper button[type='action']:hover span,
@@ -4219,7 +4242,7 @@ details[open].thac0-box {
   grid-template-columns: 1fr auto;
   outline: 2px solid var(--color-white1);
   outline-offset: -5px;
-  overflow: visible;
+  overflow: hidden;
   position: relative;
   width: auto;
   z-index: 1;
@@ -4253,26 +4276,62 @@ details[open].thac0-box {
   width: auto;
 }
 
+.sheet-rolltemplate-attacks .sheet-row:has(.sheet-big-text),
+.sheet-rolltemplate-general .sheet-row:has(.sheet-big-text) {
+  line-height: 1.75em;
+}
+
 .sheet-rolltemplate-attacks .sheet-row.sheet-all-props,
 .sheet-rolltemplate-general .sheet-row.sheet-all-props {
   align-items: start;
-  line-height: 1.65em;
   text-align: center;
 }
 
-.sheet-rolltemplate-attacks .sheet-row.sheet-all-props span:has(+ span:empty),
-.sheet-rolltemplate-general .sheet-row.sheet-all-props span:has(+ span:empty) {
-  display: block;
+/* better all props handling */
+
+/* left */
+.sheet-rolltemplate-attacks .sheet-row.sheet-all-props .sheet-tcat:not(:empty):has(+ span br),
+.sheet-rolltemplate-general .sheet-row.sheet-all-props .sheet-tcat:not(:empty):has(+ span br) {
+  display: inline-block;
+  grid-column: 1/-1;
+  text-align: left;
+  white-space: normal;
+}
+
+.sheet-rolltemplate-attacks .sheet-row.sheet-all-props span:first-child:not(.sheet-span-two),
+.sheet-rolltemplate-general .sheet-row.sheet-all-props span:first-child:not(.sheet-span-two) {
+  display: inline-block;
+  text-align: left;
+}
+
+.sheet-rolltemplate-attacks .sheet-row span:first-child:not(.sheet-span-two),
+.sheet-rolltemplate-general .sheet-row span:first-child:not(.sheet-span-two) {
+  align-self: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+  margin-inline: auto;
+  margin-left: 0;
+  white-space: nowrap;
+}
+
+/* center */
+.sheet-rolltemplate-attacks .sheet-row.sheet-all-props span.sheet-tcat:has(+ span:empty),
+.sheet-rolltemplate-general .sheet-row.sheet-all-props span.sheet-tcat:has(+ span:empty) {
+  display: inline-block;
+  align-items: center;
   grid-column: 1/-1;
   margin-inline: auto;
   text-align: center;
+  white-space: normal;
 }
 
+/* right */
 .sheet-rolltemplate-attacks .sheet-row.sheet-all-props span:empty + span,
 .sheet-rolltemplate-general .sheet-row.sheet-all-props span:empty + span {
-  flex-direction: row;
-  flex-wrap: wrap;
+  display: inline-block;
   grid-column: 1/-1;
+  margin-inline: auto;
+  margin-right: 0;
 }
 
 .sheet-rolltemplate-general .sheet-row:has(.sheet-span-two:empty):not(:last-child) {
@@ -4303,6 +4362,7 @@ details[open].thac0-box {
   grid-column: span 2;
   justify-content: center;
   position: relative;
+  text-align: center;
 }
 
 .sheet-rolltemplate-attacks .sheet-template-header,
@@ -4346,11 +4406,19 @@ details[open].thac0-box {
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 
+/* needed to prevent visible notch when {{bigname}} and {{name}} are used together */
+.sheet-rolltemplate-attacks .sheet-row:has(.sheet-bigger-text) + .sheet-row:has(.sheet-template-header) .sheet-template-header,
+.sheet-rolltemplate-general .sheet-row:has(.sheet-bigger-text) + .sheet-row:has(.sheet-template-header) .sheet-template-header,
+.sheet-rolltemplate-attacks .sheet-row:has(.sheet-bigger-text) + .sheet-row:has(.sheet-subheader) .sheet-subheader,
+.sheet-rolltemplate-general .sheet-row:has(.sheet-bigger-text) + .sheet-row:has(.sheet-subheader) .sheet-subheader {
+  border-radius: 0;
+  margin-top: -2px;
+}
+
 .sheet-rolltemplate-attacks .sheet-bigger-text,
 .sheet-rolltemplate-general .sheet-row .sheet-bigger-text {
   font-size: calc(var(--text-xxl) * 1.5);
   line-height: normal;
-  margin-bottom: -5px;
   min-height: 1em;
   padding: 2px;
   z-index: 1;
@@ -4388,11 +4456,6 @@ details[open].thac0-box {
   display: inline-flex;
 }
 
-.sheet-rolltemplate-general .sheet-row span:first-child:not(.sheet-span-two) {
-  text-align: start;
-  white-space: normal;
-}
-
 .sheet-rolltemplate-attacks span.sheet-text.sheet-text,
 .sheet-rolltemplate-attacks-table span.sheet-text.sheet-text,
 .sheet-rolltemplate-general span.sheet-text.sheet-text {
@@ -4416,8 +4479,10 @@ details[open].thac0-box {
 
 .sheet-rolltemplate-general .sheet-tcat + span,
 .sheet-rolltemplate-attacks .sheet-tcat + span {
+  align-items: center;
+  flex-direction: row;
   justify-content: end;
-  flex-direction: column;
+  text-align: right;
 }
 
 .sheet-rolltemplate-attacks .sheet-row .sheet-tcat,
@@ -4444,6 +4509,8 @@ details[open].thac0-box {
 .sheet-rolltemplate-general .sheet-right,
 .sheet-rolltemplate-general span span.sheet-right {
   justify-content: right;
+  margin-inline: auto;
+  margin-right: 0;
   text-align: right;
 }
 
@@ -4526,7 +4593,7 @@ details[open].thac0-box {
 .sheet-rolltemplate-general .sheet-success,
 .sheet-rolltemplate-general .sheet-failure {
   font-family: var(--font-headers);
-  font-size: var(--text-lg);
+  font-size: var(--text-xl);
   text-align: center;
 }
 
@@ -4536,6 +4603,18 @@ details[open].thac0-box {
 
 .sheet-rolltemplate-general .sheet-failure {
   color: #85000a;
+}
+
+.sheet-rolltemplate-general .sheet-row:has(.sheet-success) + .sheet-row:has(.inlinerollresult) .inlinerollresult:nth-child(2) {
+  border-color: #3fb315;
+}
+
+.sheet-rolltemplate-general .sheet-failure + .sheet-row:has(.inlinerollresult) .inlinerollresult:nth-child(2) {
+  border-color: #85000a;
+}
+
+.sheet-rolltemplate-general div .sheet-row:has(.sheet-tcat.sheet-success) {
+  background-color: initial;
 }
 
 .sheet-rolltemplate-general span {
@@ -4554,7 +4633,6 @@ details[open].thac0-box {
   display: inline-block;
   font-family: var(--font-inputs);
   line-height: 1em;
-  margin: 2px;
   min-height: 1em;
   min-width: 1.1em;
   padding: 0 1px 0 1px;
