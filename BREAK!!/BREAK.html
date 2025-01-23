@@ -977,14 +977,8 @@
 	<div class="sheet-template-container">
 		<div class="sheet-template-header"><h1>{{charName}} {{rollName}}</h1></div>
 		<div class="sheet-template-contents">
-			<div class="sheet-template-row"><span>Total = </span>{{computed::total}} / {{computed::attribute}}</div>
+			<div class="sheet-template-row"><span>Total = </span>{{computed::roll1}} / {{computed::attribute}}</div>
 			<div class="sheet-template-row"><span></span>{{computed::result}}</div>
-			<div class="sheet-template-row"><span>Dice = </span>{{computed::firstDie}}, {{computed::secondDie}}</div>
-			<div class="sheet-rolls">
-				<div class="sheet-template-row"><span>Modifier = </span>{{computed::modifier}}</div>
-				<div class="sheet-template-row"><span>Roll Type = </span>{{computed::rollType}}</div>
-				<div class="sheet-template-row">{{#attribute}}<span>Target = </span>{{computed::attribute}}{{/attribute}}</div>
-			</div>
 		</div>
 	</div>
 </rolltemplate>
@@ -1370,11 +1364,12 @@
 		}
 		var attribute = eventInfo.triggerName.replace("clicked:", "").replace("square", "").replace(squareNumber, "");
 		attribute = attribute.charAt(0).toUpperCase() + attribute.slice(1);
+		const attributeName = attribute;
 
 		getAttrs(["character_name"], function(values) {
 			var character_name = values["character_name"]||"";
 
-			const rollString = "@{rollWhisperType} &{template:carac} {{charName=" + character_name + "}} {{rollName=" + attribute + " " + squareNumber + "}} {{modifier=[[?{Modifiers|0}]]}} {{rollType=[[?{Roll Type|Basic, 0|Edge, 1|Snag, -1}]]}} {{roll1=[[[[1+abs(?{Roll Type})]]d20]]}} {{total=[[0]]}} {{attribute=[[0]]}} {{result=[[0]]}} {{firstDie=[[0]]}} {{secondDie=[[0]]}}";
+			const rollString = `@{rollWhisperType} &{template:carac} {{charName=${character_name}}} {{rollName=${attributeName} ${squareNumber}}} {{roll1=[[[[1+abs(?{Roll Type|Basic, 0|Edge, 1|Snag, -1})]]d20cs${squareNumber}cf20 +?{Modifiers|0}]]}} {{rollType=[[?{Roll Type|Basic, 0|Edge, 1|Snag, -1}]]}} {{modifier=[[?{Modifiers|0}]]}} {{attribute=[[${squareNumber}]]}} {{result=[[0]]}}`;
 
 			startRoll(rollString, function(results) {
 				const l_roll1 = results.results.roll1;
@@ -1399,17 +1394,10 @@
 					l_rollType = "Snag";
 				}
 
-				const firstDieValue = `${l_roll1.dice[0]}`;
-				const secondDieValue = l_roll1.dice[1] ? `${l_roll1.dice[1]}` : "/";
-
 				const computed = {
-					total: l_selectedDie.total,
+					roll1: l_selectedDie.total,
 					result: l_selectedDie.result,
-					modifier: modifier,
-					rollType: l_rollType,
-					attribute: squareNumber,
-					firstDie: firstDieValue,
-					secondDie: secondDieValue
+					attribute: squareNumber
 				};
 
 				finishRoll(results.rollId, computed);
@@ -1421,10 +1409,10 @@
 	on(`${rollAttributes}`, function(eventInfo) {
 		const attributeName = eventInfo.triggerName.replace("clicked:", "");
 		getAttrs([`${attributeName}_total`, "character_name"], function(values) {
-			var attribute = parseInt(values[`${attributeName}_total`])||0;
-			var character_name = values["character_name"]||"";
+			const attribute = parseInt(values[`${attributeName}_total`])||0;
+			const character_name = values["character_name"]||"";
 
-			const rollString = "@{rollWhisperType} &{template:carac} {{charName=" + character_name + "}} {{rollName=" + attributeName + "}} {{modifier=[[?{Modifiers|0}]]}} {{attribute=[[0]]}} {{rollType=[[?{Roll Type|Basic, 0|Edge, 1|Snag, -1}]]}} {{roll1=[[[[1+abs(?{Roll Type})]]d20]]}} {{total=[[0]]}} {{result=[[0]]}} {{firstDie=[[0]]}} {{secondDie=[[0]]}}";
+			const rollString = `@{rollWhisperType} &{template:carac} {{charName=${character_name}}} {{rollName=${attributeName}}} {{roll1=[[[[1+abs(?{Roll Type|Basic, 0|Edge, 1|Snag, -1})]]d20cs${attribute}cf20 +?{Modifiers|0}]]}} {{rollType=[[?{Roll Type|Basic, 0|Edge, 1|Snag, -1}]]}} {{modifier=[[?{Modifiers|0}]]}} {{attribute=[[${attribute}]]}} {{result=[[0]]}}`;
 
 			startRoll(rollString, function(results) {
 				const l_roll1 = results.results.roll1;
@@ -1449,17 +1437,10 @@
 					l_rollType = "Snag";
 				}
 
-				const firstDieValue = `${l_roll1.dice[0]}`;
-				const secondDieValue = l_roll1.dice[1] ? `${l_roll1.dice[1]}` : "/";
-
 				const computed = {
-					total: l_selectedDie.total,
+					roll1: l_selectedDie.total,
 					result: l_selectedDie.result,
-					modifier: modifier,
-					rollType: l_rollType,
-					attribute: attribute,
-					firstDie: firstDieValue,
-					secondDie: secondDieValue
+					attribute: attribute
 				};
 
 				finishRoll(results.rollId, computed);
