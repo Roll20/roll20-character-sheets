@@ -2144,7 +2144,7 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo) {
         return comparerFields.every(f => weapon1[f] === weapon2[f]);
     }
     let setWeaponFunc = function (weapon) {
-        if (weapon['bonusInt'] > 1) {
+        if (weapon['bonusInt'] > 0) {
             weapon['small-medium'] += weapon['bonus'];
             weapon['large'] += weapon['bonus'];
             weapon['thac0'] = weapon['thac0'] - weapon['bonusInt'];

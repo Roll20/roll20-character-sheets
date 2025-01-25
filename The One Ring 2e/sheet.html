@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="03-12-00" />
+<input type="hidden" name="attr_version" value="03-13-00" />
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" />
 <input type="checkbox" name="attr_parsedrolls" value="1" class="hidden config-parsed-rolls" checked="checked" hidden
     readonly />
@@ -238,8 +238,12 @@
                     <label data-i18n="shadow" class="right">Shadow</label>
                     <span class="diamond-small">
                         <span><input name="attr_shadow" value="0" type="number"></span></span>
-                    <div></div>
-                    <span class="diamond-small">
+                    <div class="center">
+                        <span class="diamond-small">
+                            <span><input name="attr_taint" value="0" type="number"></span></span>
+                        <label data-i18n="taint" data-i18n-title="taint-title" class="center">Taint</label>
+                    </div>
+                        <span class="diamond-small">
                         <span><input name="attr_shadowscar" value="0" type="number"></span></span>
                     <label data-i18n="scars" class="left">Scars</label>
                 </div>
@@ -1719,7 +1723,7 @@
 
         // ATTRIBUTES
         const attrs = await asw.getAttrs([
-            "favorill", "weary", "miserable", "hope", "shadow", "shadowscar", "favourill_id",
+            "favorill", "weary", "miserable", "hope", "shadow", "shadowscar", "taint", "favourill_id",
             "stanceattack_active", "stanceattackbonus", "stancedamagebonus", "whisper"
         ]);
         let wearyStr = (attrs.weary == "on" || attrs.weary == 1) ? "{{weary=Weary}}" : "",
@@ -1727,7 +1731,7 @@
             miserableStr = (attrs.miserable == "on" || attrs.miserable == 1) ? "{{miserable=Miserable}}" : "",
             miserable = (attrs.miserable == "on" || attrs.miserable == 1) ? 1 : 0,
             hope = int(attrs.hope),
-            shadow = int(attrs.shadow) + int(attrs.shadowscars),
+            shadow = int(attrs.shadow) + int(attrs.shadowscars) + int(attrs.taint),
             favourill_id = int(attrs.favourill_id),
             stanceAttackActive = int(attrs.stanceattack_active),
             stanceAttackBonus = int(attrs.stanceattackbonus),
@@ -2089,34 +2093,35 @@
     });
 
     // calc miserable and favourill_id
-    on("change:hope change:shadow change:shadowscars change:favorill sheet:opened", () => {
-        getAttrs(["hope", "hope_max", "shadow", "shadowscar", "favourill_id", "favorill", "sheetTab" ], (values) => {
+    on("change:hope change:shadow change:shadowscars change:taint change:favorill sheet:opened", () => {
+        getAttrs(["hope", "hope_max", "shadow", "shadowscar", "taint", "favourill_id", "favorill", "sheetTab" ], (values) => {
             if (values.sheetTab ==="isPC"){
                 const hope = int(values.hope),
                         hope_max = int(values.hope_max),
                         shadow = int(values.shadow),
                         scars = int(values.shadowscar),
+                        taint = int(values.taint),
                         favorill = values.favorill,
                         favourill_id = int(values.favourill_id),
                         maxshadow = hope_max - scars;
                 // miserable
-                if ( (shadow + scars) >= hope ) {
+                if ( (shadow + scars + taint) >= hope ) {
                     setAttrs({
                         miserable: 1,
                     });
-                    clog(`Set miserable based on shadow score: shadow ${shadow} + scars ${scars} higher than current hope ${hope}.`);
+                    clog(`Set miserable based on shadow score: shadow ${shadow} + scars ${scars} + taint ${taint} higher than current hope ${hope}.`);
                 }  else {				
                     setAttrs({
                         miserable: 0,
                     });
                 }; 
                 // favourill
-                if ( (shadow + scars) >= hope_max || favorill === "{2t[feat]}kl1") {
+                if ( (shadow + scars + taint) >= hope_max || favorill === "{2t[feat]}kl1") {
                     setAttrs({
                         favourill_id: 0,
                         favorill : "{2t[feat]}kl1" // to make table rolls consistent
                     });
-                    clog(`Set illfavoured rolls global state or shadow score: shadow ${shadow} + scars ${scars} higher than maximum hope ${hope_max}.`);
+                    clog(`Set illfavoured rolls global state or shadow score: shadow ${shadow} + scars ${scars} + taint ${taint} higher than maximum hope ${hope_max}.`);
                 } else if (favorill === "{1t[feat]}"){
                     setAttrs({
                         favourill_id: 1,
@@ -3195,6 +3200,24 @@
                         hlog(`
 ### New
 - added "Favoured" modifier for pc combat proficiencies to allow handling of specific cultural virtues (e.g. Hobbit Cultural Virtue Sure At The Mark)
+                        `, releaselog);
+                        hlog("==============", releaselog);
+                        attrs['releaselog'] =  releaselog.msg + values['releaselog'];
+                        if (Object.keys(attrs).length) {
+                            setAttrs(attrs);
+                        }
+                    });
+                }
+            }
+            if (build < 35) {
+                attrs["build"] = 35;
+                let releaselog = {msg:""};
+                hlog(`Release 03.13.00 - ${new Date().toLocaleString()}`, releaselog);
+                if (v.sheettab === "isPC"){
+                    getAttrs(['releaselog'], function(values){
+                        hlog(`
+### New
+- added "Taint" of items that will add to shadow / scars and leads to miserable / ill-favoured state when >= hope / hope_max
                         `, releaselog);
                         hlog("==============", releaselog);
                         attrs['releaselog'] =  releaselog.msg + values['releaselog'];
