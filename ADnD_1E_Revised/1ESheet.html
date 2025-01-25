@@ -2776,20 +2776,26 @@
             <span class="subheader label-matrix">Attack Matrix</span>
             <span class="material-icons"></span>
           </summary>
+          <input type="hidden" class="toggle-fighter5 hidden" name="attr_matrix_class" value="0" />
+          <input type="checkbox" class="toggle-matrixhd hidden" name="attr_toggle_matrixhd" value="1" />
           <div class="matrix-class section">
             <label></label>
             <label></label>
             <label class="center">
               <span>Class/Monster</span>
             </label>
-            <input type="checkbox" name="attr_toggle_matrixhd" value="1" class="toggle-matrixhd hidden" />
+            <label class="fighter5 matrix-level center" title="@{toggle_fighter5} | Use a 5% progression to-hit table. This is a Fighter only option and will have no effect for other classes.">
+              <span>Use 5%</span>
+              <input type="checkbox" class="hidden" name="attr_toggle_fighter5" value="1">
+            </label>
             <label class="matrix-level center">
               <span>Level</span>
             </label>
-            <label class="matrix-hd center" style="margin-left: -1em;">
+            <label class="matrix-hd center">
               <span>HD/Lvl</span>
             </label>
-            <span></span>
+            <label></label>
+
             <label class="inline-label" title="@{autofill_matrix} | Let the sheet auto-fill the to-hit tables when the class and level selectors are changed in the attack Matrix window. NOTE: THAC0 uses the 1e table data.">
               <input type="checkbox" name="attr_autofill_matrix" value="1" checked />
               <h4>Autofill Table:</h4>
@@ -2805,11 +2811,13 @@
                 <option value="5">Monster</option>
               </select>
             </label>
-            <input type="checkbox" name="attr_toggle_matrixhd" value="1" class="toggle-matrixhd hidden" />
+            <label class="fighter5 matrix-level center" title="@{toggle_fighter5} | Use a 5% progression to-hit table. This is a Fighter only option and will have no effect for other classes.">
+              <input type="checkbox" name="attr_toggle_fighter5" value="1">
+            </label>
             <label class="matrix-level center">
               <input class="width-small border" type="number" min="0" name="attr_matrix_level" value="1" title="@{matrix_level}">
             </label>
-            <label class="matrix-hd center" style="margin-left: -1em;">
+            <label class="matrix-hd center">
               <select class="width-small-plus border" name="attr_matrix_hitdice" title="@{matrix_hitdice}">
                 <option value="0" selected>Select HD/Lvl</option>
                 <option value="1">up to 1-1</option>
@@ -2883,14 +2891,20 @@
             <span class="label-matrix">THAC0</span>
             <span class="material-icons"></span>
           </summary>
+          <input type="hidden" class="toggle-fighter5 hidden" name="attr_matrix_class" value="0" />
+          <input type="checkbox" class="toggle-matrixhd hidden" name="attr_toggle_matrixhd" value="1" />
           <div class="matrix-class section">
             <label></label>
             <label></label>
             <label class="center"><span>Class/Monster</span></label>
-            <input type="checkbox" name="attr_toggle_matrixhd" value="1" class="toggle-matrixhd hidden" />
+            <label class="fighter5 matrix-level center" title="@{toggle_fighter5} | Use a 5% progression to-hit table. This is a Fighter only option and will have no effect for other classes.">
+              <span>Use 5%</span>
+              <input type="checkbox" class="hidden" name="attr_toggle_fighter5" value="1">
+            </label>
             <label class="matrix-level center"><span>Level</span></label>
             <label class="matrix-hd center" style="margin-left: -1em;"><span>HD/Lvl</span></label>
             <span></span>
+
             <label class="inline-label" title="@{autofill_matrix} | Let the sheet auto-fill the to-hit tables when the class and level selectors are changed in the attack Matrix window. NOTE: THAC0 uses the 1e table data.">
               <input type="checkbox" name="attr_autofill_matrix" value="1" checked />
               <h4>Autofill Table:</h4>
@@ -2906,7 +2920,9 @@
                 <option value="5">Monster</option>
               </select>
             </label>
-            <input type="checkbox" name="attr_toggle_matrixhd" value="1" class="toggle-matrixhd hidden" />
+            <label class="fighter5 matrix-level center" title="@{toggle_fighter5} | Use a 5% progression to-hit table. This is a Fighter only option and will have no effect for other classes.">
+              <input type="checkbox" name="attr_toggle_fighter5" value="1">
+            </label>
             <label class="matrix-level center">
               <input class="width-small border" type="number" min="0" name="attr_matrix_level" value="1" title="@{matrix_level}" />
             </label>
@@ -4530,9 +4546,9 @@
             <span>Use THAC0:</span>
             <input type="checkbox" name="attr_toggle_to_hit_table" value="1" />
           </label>
-          <label title="@{toggle_fighter_5_to_hit} | Use a 5% progression to-hit table. This is a Fighter only option and will have no effect for other classes.">
+          <label title="@{toggle_fighter5} | Use a 5% progression to-hit table. This is a Fighter only option and will have no effect for other classes.">
             <span>Use Fighter 5%:</span>
-            <input type="checkbox" name="attr_toggle_fighter_5_to_hit" value="1" />
+            <input type="checkbox" name="attr_toggle_fighter5" value="1" />
           </label>
           <label title="@{toggle_auto_damage} | Auto roll damage regardless of the attack roll.">
             <span>Auto Roll Damage:</span>
@@ -11321,9 +11337,9 @@
   }
 
   // Attack Matrix Autofill To-Hit table
-  on('change:matrix_class change:matrix_level change:matrix_hitdice change:autofill_matrix', (eventInfo) => {
+  on('change:matrix_class change:matrix_level change:matrix_hitdice change:autofill_matrix change:toggle_fighter5', (eventInfo) => {
     // clog(`Matrix Autofill Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(['matrix_class', 'matrix_level', 'matrix_hitdice', 'autofill_matrix'], (v) => {
+    getAttrs(['matrix_class', 'matrix_level', 'matrix_hitdice', 'autofill_matrix', 'toggle_fighter5'], (v) => {
       const output = {};
       const autocalcFill = +v.autofill_matrix || 0;
       // bail out if auto-fill is not enabled.
@@ -11331,6 +11347,7 @@
       const classSelected = +v.matrix_class || 0;
       const levelSelected = +v.matrix_level || 0;
       const hitdiceSelected = +v.matrix_hitdice || 0;
+      const fighter5Selected = +v.toggle_fighter5 || 0;
       // clog('Ready to autofill attack matrix.');
       if (classSelected === 0) return;
       // clerics table
@@ -11527,212 +11544,212 @@
           output.thac9 = 12;
           output.thac10 = 11;
         } else if (levelSelected < 3) {
-          output[`thac-10`] = 25;
-          output[`thac-9`] = 24;
-          output[`thac-8`] = 23;
-          output[`thac-7`] = 22;
-          output[`thac-6`] = 21;
-          output[`thac-5`] = 20;
-          output[`thac-4`] = 20;
-          output[`thac-3`] = 20;
-          output[`thac-2`] = 20;
-          output[`thac-1`] = 20;
-          output.thac00 = 20;
-          output.thac0 = 20;
-          output.thac1 = 19;
-          output.thac2 = 18;
-          output.thac3 = 17;
-          output.thac4 = 16;
-          output.thac5 = 15;
-          output.thac6 = 14;
-          output.thac7 = 13;
-          output.thac8 = 12;
-          output.thac9 = 11;
-          output.thac10 = 10;
+          output[`thac-10`] = 25 - fighter5Selected;
+          output[`thac-9`] = 24 - fighter5Selected;
+          output[`thac-8`] = 23 - fighter5Selected;
+          output[`thac-7`] = 22 - fighter5Selected;
+          output[`thac-6`] = 21 - fighter5Selected; //20
+          output[`thac-5`] = 20; //20
+          output[`thac-4`] = 20; //20
+          output[`thac-3`] = 20; //20
+          output[`thac-2`] = 20; //20
+          output[`thac-1`] = 20; //20
+          output.thac00 = 20 - fighter5Selected;
+          output.thac0 = 20 - fighter5Selected; //19
+          output.thac1 = 19 - fighter5Selected;
+          output.thac2 = 18 - fighter5Selected;
+          output.thac3 = 17 - fighter5Selected;
+          output.thac4 = 16 - fighter5Selected;
+          output.thac5 = 15 - fighter5Selected;
+          output.thac6 = 14 - fighter5Selected;
+          output.thac7 = 13 - fighter5Selected;
+          output.thac8 = 12 - fighter5Selected;
+          output.thac9 = 11 - fighter5Selected;
+          output.thac10 = 10 - fighter5Selected;
         } else if (levelSelected < 5) {
-          output[`thac-10`] = 23;
-          output[`thac-9`] = 22;
-          output[`thac-8`] = 21;
-          output[`thac-7`] = 20;
-          output[`thac-6`] = 20;
-          output[`thac-5`] = 20;
-          output[`thac-4`] = 20;
-          output[`thac-3`] = 20;
-          output[`thac-2`] = 20;
-          output[`thac-1`] = 19;
-          output.thac00 = 18;
-          output.thac0 = 18;
-          output.thac1 = 17;
-          output.thac2 = 16;
-          output.thac3 = 15;
-          output.thac4 = 14;
-          output.thac5 = 13;
-          output.thac6 = 12;
-          output.thac7 = 11;
-          output.thac8 = 10;
-          output.thac9 = 9;
-          output.thac10 = 8;
+          output[`thac-10`] = 23 - fighter5Selected;
+          output[`thac-9`] = 22 - fighter5Selected;
+          output[`thac-8`] = 21 - fighter5Selected; //20
+          output[`thac-7`] = 20; //20
+          output[`thac-6`] = 20; //20
+          output[`thac-5`] = 20; //20
+          output[`thac-4`] = 20; //20
+          output[`thac-3`] = 20; //20
+          output[`thac-2`] = 20 - fighter5Selected; //19
+          output[`thac-1`] = 19 - fighter5Selected;
+          output.thac00 = 18 - fighter5Selected;
+          output.thac0 = 18 - fighter5Selected;
+          output.thac1 = 17 - fighter5Selected;
+          output.thac2 = 16 - fighter5Selected;
+          output.thac3 = 15 - fighter5Selected;
+          output.thac4 = 14 - fighter5Selected;
+          output.thac5 = 13 - fighter5Selected;
+          output.thac6 = 12 - fighter5Selected;
+          output.thac7 = 11 - fighter5Selected;
+          output.thac8 = 10 - fighter5Selected;
+          output.thac9 = 9 - fighter5Selected;
+          output.thac10 = 8 - fighter5Selected;
         } else if (levelSelected < 7) {
-          output[`thac-10`] = 21;
-          output[`thac-9`] = 20;
-          output[`thac-8`] = 20;
-          output[`thac-7`] = 20;
-          output[`thac-6`] = 20;
-          output[`thac-5`] = 20;
-          output[`thac-4`] = 20;
-          output[`thac-3`] = 19;
-          output[`thac-2`] = 18;
-          output[`thac-1`] = 17;
-          output.thac00 = 16;
-          output.thac0 = 16;
-          output.thac1 = 15;
-          output.thac2 = 14;
-          output.thac3 = 13;
-          output.thac4 = 12;
-          output.thac5 = 11;
-          output.thac6 = 10;
-          output.thac7 = 9;
-          output.thac8 = 8;
-          output.thac9 = 7;
-          output.thac10 = 6;
+          output[`thac-10`] = 21 - fighter5Selected; //20
+          output[`thac-9`] = 20; //20
+          output[`thac-8`] = 20; //20
+          output[`thac-7`] = 20; //20
+          output[`thac-6`] = 20; //20
+          output[`thac-5`] = 20; //20
+          output[`thac-4`] = 20 - fighter5Selected; //19
+          output[`thac-3`] = 19 - fighter5Selected;
+          output[`thac-2`] = 18 - fighter5Selected;
+          output[`thac-1`] = 17 - fighter5Selected;
+          output.thac00 = 16 - fighter5Selected;
+          output.thac0 = 16 - fighter5Selected;
+          output.thac1 = 15 - fighter5Selected;
+          output.thac2 = 14 - fighter5Selected;
+          output.thac3 = 13 - fighter5Selected;
+          output.thac4 = 12 - fighter5Selected;
+          output.thac5 = 11 - fighter5Selected;
+          output.thac6 = 10 - fighter5Selected;
+          output.thac7 = 9 - fighter5Selected;
+          output.thac8 = 8 - fighter5Selected;
+          output.thac9 = 7 - fighter5Selected;
+          output.thac10 = 6 - fighter5Selected;
         } else if (levelSelected < 9) {
-          output[`thac-10`] = 20;
-          output[`thac-9`] = 20;
-          output[`thac-8`] = 20;
-          output[`thac-7`] = 20;
-          output[`thac-6`] = 20;
-          output[`thac-5`] = 19;
-          output[`thac-4`] = 18;
-          output[`thac-3`] = 17;
-          output[`thac-2`] = 16;
-          output[`thac-1`] = 15;
-          output.thac00 = 14;
-          output.thac0 = 14;
-          output.thac1 = 13;
-          output.thac2 = 12;
-          output.thac3 = 11;
-          output.thac4 = 10;
-          output.thac5 = 9;
-          output.thac6 = 8;
-          output.thac7 = 7;
-          output.thac8 = 6;
-          output.thac9 = 5;
-          output.thac10 = 4;
+          output[`thac-10`] = 20; //20
+          output[`thac-9`] = 20; //20
+          output[`thac-8`] = 20; //20
+          output[`thac-7`] = 20; //20
+          output[`thac-6`] = 20 - fighter5Selected; //19
+          output[`thac-5`] = 19 - fighter5Selected;
+          output[`thac-4`] = 18 - fighter5Selected;
+          output[`thac-3`] = 17 - fighter5Selected;
+          output[`thac-2`] = 16 - fighter5Selected;
+          output[`thac-1`] = 15 - fighter5Selected;
+          output.thac00 = 14 - fighter5Selected;
+          output.thac0 = 14 - fighter5Selected;
+          output.thac1 = 13 - fighter5Selected;
+          output.thac2 = 12 - fighter5Selected;
+          output.thac3 = 11 - fighter5Selected;
+          output.thac4 = 10 - fighter5Selected;
+          output.thac5 = 9 - fighter5Selected;
+          output.thac6 = 8 - fighter5Selected;
+          output.thac7 = 7 - fighter5Selected;
+          output.thac8 = 6 - fighter5Selected;
+          output.thac9 = 5 - fighter5Selected;
+          output.thac10 = 4 - fighter5Selected;
         } else if (levelSelected < 11) {
-          output[`thac-10`] = 20;
-          output[`thac-9`] = 20;
-          output[`thac-8`] = 20;
-          output[`thac-7`] = 19;
-          output[`thac-6`] = 18;
-          output[`thac-5`] = 17;
-          output[`thac-4`] = 16;
-          output[`thac-3`] = 15;
-          output[`thac-2`] = 14;
-          output[`thac-1`] = 13;
-          output.thac00 = 12;
-          output.thac0 = 12;
-          output.thac1 = 11;
-          output.thac2 = 10;
-          output.thac3 = 9;
-          output.thac4 = 8;
-          output.thac5 = 7;
-          output.thac6 = 6;
-          output.thac7 = 5;
-          output.thac8 = 4;
-          output.thac9 = 3;
-          output.thac10 = 2;
+          output[`thac-10`] = 20; //20
+          output[`thac-9`] = 20; //20
+          output[`thac-8`] = 20 - fighter5Selected; //19
+          output[`thac-7`] = 19 - fighter5Selected;
+          output[`thac-6`] = 18 - fighter5Selected;
+          output[`thac-5`] = 17 - fighter5Selected;
+          output[`thac-4`] = 16 - fighter5Selected;
+          output[`thac-3`] = 15 - fighter5Selected;
+          output[`thac-2`] = 14 - fighter5Selected;
+          output[`thac-1`] = 13 - fighter5Selected;
+          output.thac00 = 12 - fighter5Selected;
+          output.thac0 = 12 - fighter5Selected;
+          output.thac1 = 11 - fighter5Selected;
+          output.thac2 = 10 - fighter5Selected;
+          output.thac3 = 9 - fighter5Selected;
+          output.thac4 = 8 - fighter5Selected;
+          output.thac5 = 7 - fighter5Selected;
+          output.thac6 = 6 - fighter5Selected;
+          output.thac7 = 5 - fighter5Selected;
+          output.thac8 = 4 - fighter5Selected;
+          output.thac9 = 3 - fighter5Selected;
+          output.thac10 = 2 - fighter5Selected;
         } else if (levelSelected < 13) {
-          output[`thac-10`] = 20;
-          output[`thac-9`] = 19;
-          output[`thac-8`] = 18;
-          output[`thac-7`] = 17;
-          output[`thac-6`] = 16;
-          output[`thac-5`] = 15;
-          output[`thac-4`] = 14;
-          output[`thac-3`] = 13;
-          output[`thac-2`] = 12;
-          output[`thac-1`] = 11;
-          output.thac00 = 10;
-          output.thac0 = 10;
-          output.thac1 = 9;
-          output.thac2 = 8;
-          output.thac3 = 7;
-          output.thac4 = 6;
-          output.thac5 = 5;
-          output.thac6 = 4;
-          output.thac7 = 3;
-          output.thac8 = 2;
-          output.thac9 = 1;
-          output.thac10 = 0;
+          output[`thac-10`] = 20 - fighter5Selected; //19
+          output[`thac-9`] = 19 - fighter5Selected;
+          output[`thac-8`] = 18 - fighter5Selected;
+          output[`thac-7`] = 17 - fighter5Selected;
+          output[`thac-6`] = 16 - fighter5Selected;
+          output[`thac-5`] = 15 - fighter5Selected;
+          output[`thac-4`] = 14 - fighter5Selected;
+          output[`thac-3`] = 13 - fighter5Selected;
+          output[`thac-2`] = 12 - fighter5Selected;
+          output[`thac-1`] = 11 - fighter5Selected;
+          output.thac00 = 10 - fighter5Selected;
+          output.thac0 = 10 - fighter5Selected;
+          output.thac1 = 9 - fighter5Selected;
+          output.thac2 = 8 - fighter5Selected;
+          output.thac3 = 7 - fighter5Selected;
+          output.thac4 = 6 - fighter5Selected;
+          output.thac5 = 5 - fighter5Selected;
+          output.thac6 = 4 - fighter5Selected;
+          output.thac7 = 3 - fighter5Selected;
+          output.thac8 = 2 - fighter5Selected;
+          output.thac9 = 1 - fighter5Selected;
+          output.thac10 = 0 - fighter5Selected;
         } else if (levelSelected < 15) {
-          output[`thac-10`] = 18;
-          output[`thac-9`] = 17;
-          output[`thac-8`] = 16;
-          output[`thac-7`] = 15;
-          output[`thac-6`] = 14;
-          output[`thac-5`] = 13;
-          output[`thac-4`] = 12;
-          output[`thac-3`] = 11;
-          output[`thac-2`] = 10;
-          output[`thac-1`] = 9;
-          output.thac00 = 8;
-          output.thac0 = 8;
-          output.thac1 = 7;
-          output.thac2 = 6;
-          output.thac3 = 5;
-          output.thac4 = 4;
-          output.thac5 = 3;
-          output.thac6 = 2;
-          output.thac7 = 1;
-          output.thac8 = 0;
-          output.thac9 = -1;
-          output.thac10 = -2;
+          output[`thac-10`] = 18 - fighter5Selected;
+          output[`thac-9`] = 17 - fighter5Selected;
+          output[`thac-8`] = 16 - fighter5Selected;
+          output[`thac-7`] = 15 - fighter5Selected;
+          output[`thac-6`] = 14 - fighter5Selected;
+          output[`thac-5`] = 13 - fighter5Selected;
+          output[`thac-4`] = 12 - fighter5Selected;
+          output[`thac-3`] = 11 - fighter5Selected;
+          output[`thac-2`] = 10 - fighter5Selected;
+          output[`thac-1`] = 9 - fighter5Selected;
+          output.thac00 = 8 - fighter5Selected;
+          output.thac0 = 8 - fighter5Selected;
+          output.thac1 = 7 - fighter5Selected;
+          output.thac2 = 6 - fighter5Selected;
+          output.thac3 = 5 - fighter5Selected;
+          output.thac4 = 4 - fighter5Selected;
+          output.thac5 = 3 - fighter5Selected;
+          output.thac6 = 2 - fighter5Selected;
+          output.thac7 = 1 - fighter5Selected;
+          output.thac8 = 0 - fighter5Selected;
+          output.thac9 = -1 - fighter5Selected;
+          output.thac10 = -2 - fighter5Selected;
         } else if (levelSelected < 17) {
-          output[`thac-10`] = 16;
-          output[`thac-9`] = 15;
-          output[`thac-8`] = 14;
-          output[`thac-7`] = 13;
-          output[`thac-6`] = 12;
-          output[`thac-5`] = 11;
-          output[`thac-4`] = 10;
-          output[`thac-3`] = 9;
-          output[`thac-2`] = 8;
-          output[`thac-1`] = 7;
-          output.thac00 = 6;
-          output.thac0 = 6;
-          output.thac1 = 5;
-          output.thac2 = 4;
-          output.thac3 = 3;
-          output.thac4 = 2;
-          output.thac5 = 1;
-          output.thac6 = 0;
-          output.thac7 = -1;
-          output.thac8 = -2;
-          output.thac9 = -3;
-          output.thac10 = -4;
+          output[`thac-10`] = 16 - fighter5Selected;
+          output[`thac-9`] = 15 - fighter5Selected;
+          output[`thac-8`] = 14 - fighter5Selected;
+          output[`thac-7`] = 13 - fighter5Selected;
+          output[`thac-6`] = 12 - fighter5Selected;
+          output[`thac-5`] = 11 - fighter5Selected;
+          output[`thac-4`] = 10 - fighter5Selected;
+          output[`thac-3`] = 9 - fighter5Selected;
+          output[`thac-2`] = 8 - fighter5Selected;
+          output[`thac-1`] = 7 - fighter5Selected;
+          output.thac00 = 6 - fighter5Selected;
+          output.thac0 = 6 - fighter5Selected;
+          output.thac1 = 5 - fighter5Selected;
+          output.thac2 = 4 - fighter5Selected;
+          output.thac3 = 3 - fighter5Selected;
+          output.thac4 = 2 - fighter5Selected;
+          output.thac5 = 1 - fighter5Selected;
+          output.thac6 = 0 - fighter5Selected;
+          output.thac7 = -1 - fighter5Selected;
+          output.thac8 = -2 - fighter5Selected;
+          output.thac9 = -3 - fighter5Selected;
+          output.thac10 = -4 - fighter5Selected;
         } else if (levelSelected >= 17) {
-          output[`thac-10`] = 14;
-          output[`thac-9`] = 13;
-          output[`thac-8`] = 12;
-          output[`thac-7`] = 11;
-          output[`thac-6`] = 10;
-          output[`thac-5`] = 9;
-          output[`thac-4`] = 8;
-          output[`thac-3`] = 7;
-          output[`thac-2`] = 6;
-          output[`thac-1`] = 5;
-          output.thac00 = 4;
-          output.thac0 = 4;
-          output.thac1 = 3;
-          output.thac2 = 2;
-          output.thac3 = 1;
-          output.thac4 = 0;
-          output.thac5 = -1;
-          output.thac6 = -2;
-          output.thac7 = -3;
-          output.thac8 = -4;
-          output.thac9 = -5;
-          output.thac10 = -6;
+          output[`thac-10`] = 14 - fighter5Selected;
+          output[`thac-9`] = 13 - fighter5Selected;
+          output[`thac-8`] = 12 - fighter5Selected;
+          output[`thac-7`] = 11 - fighter5Selected;
+          output[`thac-6`] = 10 - fighter5Selected;
+          output[`thac-5`] = 9 - fighter5Selected;
+          output[`thac-4`] = 8 - fighter5Selected;
+          output[`thac-3`] = 7 - fighter5Selected;
+          output[`thac-2`] = 6 - fighter5Selected;
+          output[`thac-1`] = 5 - fighter5Selected;
+          output.thac00 = 4 - fighter5Selected;
+          output.thac0 = 4 - fighter5Selected;
+          output.thac1 = 3 - fighter5Selected;
+          output.thac2 = 2 - fighter5Selected;
+          output.thac3 = 1 - fighter5Selected;
+          output.thac4 = 0 - fighter5Selected;
+          output.thac5 = -1 - fighter5Selected;
+          output.thac6 = -2 - fighter5Selected;
+          output.thac7 = -3 - fighter5Selected;
+          output.thac8 = -4 - fighter5Selected;
+          output.thac9 = -5 - fighter5Selected;
+          output.thac10 = -6 - fighter5Selected;
         }
         output.attack_matrix_flag = 0;
       }
