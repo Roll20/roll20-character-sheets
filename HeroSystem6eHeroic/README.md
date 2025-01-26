@@ -341,5 +341,6 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 
 *First version by Villain In Glasses, August 1, 2021.*
 *Recent updates:*
+*January 25, 2025 adds damage type (killing, normal, and power) to the weapon worksheet (Version 4.10).*
 *January 3, 2025 to represent the sheet as of Version 4.02.*
-*November 21, 2024 to represent the sheet as of Version 3.81 and updated support in Hero Roller 1.3.1.*
+*November 21, 2024 to represent the sheet as of Version 3.81 and updated support in Hero Roller 1.3.0.*
