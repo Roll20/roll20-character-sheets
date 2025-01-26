@@ -305,7 +305,7 @@ The utility mod HeroSystem6eHeroic_HDImporter (available in the quick install me
 
 ### HERO Roller
 
-If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. Version 1.3.1 of Hero Roller adds support for HS6eH attribute names. 
+If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. Version 1.3.0 of Hero Roller adds support for HS6eH attribute names.
 
 # <a id="tokens">Tokens</a>
 
