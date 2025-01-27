@@ -220,8 +220,10 @@
     display: none;
   }
 
-  .settings {
-    display: flex;
+  .wrapper.tab-content.settings .settings-tab-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 1rem;
   }
 
   .settings-options,
@@ -231,8 +233,16 @@
     border: 2px solid #000;
     border-radius: 5px;
     background-color: #eaeaea;
-    min-width: 400px;
-    width: 60%;
+    height: fit-content;
+  }
+
+  
+  .settings-options h3,
+  .announcements h3 {
+    text-transform: capitalize;
+  } 
+  .announcements ol span {
+    font-weight: bold;
   }
 
   /* Text */
@@ -1496,7 +1506,7 @@
   }
 
   /* change checkbox appearance */
-  input[type="checkbox"] {
+  input[type="checkbox"], button.action-checkbox {
     height: 1em;
     width: 1em;
     -webkit-appearance: none;
@@ -1511,13 +1521,17 @@
     cursor: pointer;
   }
 
-  input[type="checkbox"]:checked {
+  input[type="checkbox"]:checked, 
+  /* input.action-checkbox[value="1"] + button.action-checkbox,  */
+  input.action-checkbox:checked + button.action-checkbox {
     border: 1px solid #000;
     background-color: #fff;
     vertical-align: text-bottom;
   }
 
-  input[type="checkbox"]:checked::after {
+  input[type="checkbox"]:checked::after, 
+  /* input.action-checkbox[value="1"] + button.action-checkbox::after,  */
+  input.action-checkbox:checked + button.action-checkbox::after {
     content: "3";
     font-family: pictos;
     color: #000;
@@ -1749,6 +1763,7 @@
     border: 2px solid #000;
     border-radius: 4px;
     -font-size: 1.05em;
+    box-shadow: 2px 2px 2px #999;
   }
 
 
@@ -2020,7 +2035,7 @@
     border: none;
     grid-column: 1/span 2;
     grid-row-start: 4;
-    overflow: hidden;
+    -overflow: hidden;
   }
 
   .character-skills {
@@ -2041,7 +2056,7 @@
 
   input.dice_only:checked
     ~ div.character
-    .box.character-skill-dice-box {
+    .character-skill-dice-box {
     display: flex;
     min-width: 20em;
     -margin-top: -1.5em;
@@ -2052,11 +2067,8 @@
   .character-column3 {
     height: fit-content;
     grid-column-start: 3;
-    -grid-row-end: span 6;
     grid-row: 3/span 8;
     border: none;
-    overflow: hidden;
-    -display: flex;
   }
   .character-column3 .box {
     margin-bottom: 4px;
@@ -2389,11 +2401,11 @@
   }
 
   input.tab[value="monster"]
-    ~ div.character
-    .box.character-skill-dice-box,
+    ~ div.character .character-grid 
+    .monster.character-skill-dice-box,
   input.monster_only:checked
-    ~ div.character
-    .box.character-skill-dice-box {
+    ~ div.character .character-grid 
+    .monster.character-skill-dice-box {
     display: grid;
     padding: 0;
     margin: 0 0 0 0;
@@ -3485,38 +3497,54 @@
   } 
   .dice-rolls-info {
     position: relative;
-    display: flex;
+    display: block;
     justify-content: center;
     align-items: flex-end;
     padding: 4px;
     text-align: center;
     grid-area: dice-rolls-info;
   }
-  .dice-rolls-pushable {
+  .dice-rolls-info > div {
     display:flex;
     flex-direction:row;
     justify-items: flex-start;
     align-self: flex-start;
     align-content: center;
-    grid-area:dice-rolls-info;
     padding-top: 0.5rem;
-    padding-left: 1rem;
+    padding-left: 0.5rem;
   }
-  .dice-rolls-pushable label {
+  .dice-rolls-info label {
     width: auto;
     font-size: 1.25rem;
     font-weight: normal;
     vertical-align: middle;
-    padding-right: 0.25rem;
+    padding-left: 0.5rem;
     margin-bottom: 0;
     cursor:pointer;
   }
-  .dice-rolls-pushable input:checked::after {
+  .dice-rolls-info input {
+    vertical-align: middle;
+    align-self: center;
+  }
+  .dice-rolls-info input:checked::after {
     top: -5px;
   }
   input[type="checkbox"].api-toggle-show:checked ~ .dice-rolls-pushable {
     display: none;
   }
+  input[type="checkbox"].hide-whisper:checked ~ .dice-rolls-whisper {
+    display: none;
+  }
+  /* input[type="hidden"].whisper-roll[value="1"] ~ input#whisper-toggle::after {
+    content: '3';
+  }
+  input[type="hidden"].whisper-roll[value="0"] ~ input#whisper-toggle::after {
+    content: '*';
+    font-family: pictos;
+    color: #000;
+    position: relative;
+    top: -5px;
+  } */
 
   .dice-rolls-smaller {
     height: 17px;
@@ -6332,8 +6360,8 @@
 /* add drop shadow to dice */
 
 .sheet-rolltemplate-mutantyearzero .sheet-template-dice {
-  margin: 1px;
-  box-shadow: -3px 2px 3px #000;
+  margin: 2px;
+  box-shadow: 2px 2px 2px #222;
   line-height: 0;
   padding: 3px;
   text-align: center;
@@ -6342,8 +6370,8 @@
   align-content: center;
   align-items: center;
   justify-content: center;
-  height: 2em;
-  width: 2em;
+  height: 1.8em;
+  width: 1.8em;
 }
 
 .sheet-rolltemplate-mutantyearzero
@@ -6436,7 +6464,7 @@
 
 .sheet-rolltemplate-mutantyearzero .sheet-template-dice > span {
   font-family: 'Didact Gothic', 'DidactGothic', Verdana, Helvetica, Arial, sans-serif;
-  font-size: 2em;
+  font-size: 1.8em;
   line-height: 1em;
   font-weight: normal;
   padding: 0;
