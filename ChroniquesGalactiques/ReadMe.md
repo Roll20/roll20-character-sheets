@@ -12,11 +12,16 @@ Des fonctionnalit&eacute;s avanc&eacute;es facilitent l'import des données tech
 
 # Version courante
 
-V4.7.0 [Screenshot](cog_v4.png)
+V4.8.0 [Screenshot](cog_v4.png)
 
 # Notes de version
 
 ___Chroniques Oubliées Galactiques Version 2___
+
+
+## V4.8.0 (2025.01.25)
+
+- Compatibilité avec le dark-mode Roll20 (jets du chat)
 
 ## V4.7.0 (2024.08.24)
 
