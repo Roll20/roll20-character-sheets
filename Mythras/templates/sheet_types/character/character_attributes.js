@@ -142,7 +142,13 @@ function calcDamageMod(v) {
         damage_mod_table_value = str + siz;
     }
 
-    const damage_mod_step = Math.ceil(damage_mod_table_value / 5) - 5 + damageModOther + damageModTemp;
+    var damage_mod_step = 0;
+    
+    if (damage_mod_table_value < 51) {
+        damage_mod_step = Math.ceil(damage_mod_table_value / 5) - 5 + damageModOther + damageModTemp;
+    } else {
+        damage_mod_step = Math.ceil((damage_mod_table_value - 50) / 10) + 5 + damageModOther + damageModTemp;
+    }
 
     return {
         damage_mod: damageModTable(damage_mod_step)
@@ -356,8 +362,8 @@ function calcMoveRate(v) {
     const moveRateOther = parseInt(v['movement_rate_other']) || 0;
     const moveRateTemp = parseInt(v['movement_rate_temp']) || 0;
     const core_value = moveRateSpecies + moveRateOther + moveRateTemp;
-    const moveAfterFatigue = applyMovementMod(core_value, fatigueTable[v['fatigue']]['movement']);
-    newAttrs['movement_rate'] = applyMovementMod(moveAfterFatigue, loadTable[v['encumbrance_load']]['movement']);
+    const moveAfterFatigue = applyMovementMod(core_value, fatigueTable[v['fatigue']]['movement'] || "+0");
+    newAttrs['movement_rate'] = applyMovementMod(moveAfterFatigue, loadTable[v['encumbrance_load']]['movement'] || "+0");
 
     return newAttrs;
 }
@@ -909,7 +915,7 @@ on('change:attribute_mode', function(event) {
 /* Fatigue */
 const fatigueTable = {
     /* fresh */ '9': { "skills": '0', "action_points": '0', "initiative": '0', "movement": "+0", "recovery": "-"},
-    /* winded */ '8': { "skills": '1', "action_points": '0', "initiative": '0', "movement": '-1', "recovery": .25},
+    /* winded */ '8': { "skills": '1', "action_points": '0', "initiative": '0', "movement": '+0', "recovery": .25},
     /* tired */ '7': { "skills": '1', "action_points": '0', "initiative": '0', "movement": '-1', "recovery": 3},
     /* wearied */ '6': { "skills": '2', "action_points": '0', "initiative": '-2', "movement": '-2', "recovery": 6},
     /* exhausted */ '5': { "skills": '2', "action_points": '-1', "initiative": '-4', "movement": '*.5', "recovery": 12},

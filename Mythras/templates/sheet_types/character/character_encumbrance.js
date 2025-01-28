@@ -1,5 +1,6 @@
 /* Encumbrance */
 const loadTable = {
+    /* Old Default */ 'Normal': {"skills": '0', "movement": '+0'},
     /* Normal */ '0': {"skills": '0', "movement": '+0'},
     /* Burdened */ '1': {"skills": '1', "movement": '-2'},
     /* Overloaded */ '2': {"skills": '2', "movement": '*.5'},

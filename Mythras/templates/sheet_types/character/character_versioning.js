@@ -1335,3 +1335,21 @@ function upgradeCharacter3Dot6() {
         });
     });
 }
+
+/**
+ * Make the changes needs to get a character sheet updated from 3.6+ to 3.8
+ */
+function upgradeCharacter3Dot8() {
+    console.log("Upgrading character to 3.8");
+
+    getAttrs(['fatigue', 'healing_rate'].concat(actionPointGetAttrs, initGetAttrs, moveRateGetAttrs, damageModGetAttrs), function(v) {
+        setAttrs({
+            "version": "3.8",
+            ...calcFatigue(v),
+            ...calcActionPoints(v),
+            ...calcInitiativeBonus(v),
+            ...calcMoveRate(v),
+            ...calcDamageMod(v)
+        });
+    });
+}
