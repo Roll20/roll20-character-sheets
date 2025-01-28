@@ -15,7 +15,8 @@ var versionsWithMigrations = [
 		20240414,
 		20240510,
 		20240519,
-		20241002
+		20241002,
+		20250122,
 ];
 
 /*
@@ -850,21 +851,21 @@ function migrateTo20240414(migrationChain) {
 	];
 	var attrsToChange =	{
 		"reg_sleep_le_ko": "@{KO} - 1d20",
-		"reg_sleep_le_fixed": "off",
+		"reg_sleep_le_fixed": "-1",
 		"reg_sleep_le_mod_advantages_disadvantages": 0,
 		"reg_sleep_le_mod_food_restriction": 0,
 		"reg_sleep_ae_base": "1d6",
 		"reg_sleep_ae_in": "@{IN} - 1d20",
-		"reg_sleep_ae_fixed": "off",
+		"reg_sleep_ae_fixed": "-1",
 		"reg_sleep_ae_mod_advantages_disadvantages": 0,
 		"reg_sleep_ae_mod_special_skills": 0,
 		"reg_sleep_ae_mod_food_restriction": 0,
 		"reg_sleep_ae_mod_homesickness": 0,
 		"reg_sleep_addiction_withdrawal_effect": 0,
 		"reg_sleep_food_restriction_effect": 0,
-		"reg_sleep_mod_somnambulism": 0,
-		"reg_sleep_sleep_disorder_effect": 0,
-		"reg_sleep_sleep_disorder_trigger": 0,
+		"reg_sleep_mod_somnambulism": "0",
+		"reg_sleep_sleep_disorder_effect": "1d6 - 1",
+		"reg_sleep_sleep_disorder_trigger": "1d0",
 		"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}"
 	};
 	safeGetAttrs(attrsToGet, function(values) {
@@ -1171,6 +1172,115 @@ function migrateTo20241002(migrationChain) {
 		debugLog(caller, "attrsToInit", attrsToInit);
 		safeSetAttrs(attrsToInit, {}, function () {
 			callNextMigration(migrationChain);
+		});
+	});
+}
+
+/*
+	Migration steps:
+	- Initialize newly added attributes (regeneration-related)
+	- Fix errors introduced with previous version of migrateTo20240414()
+*/
+function migrateTo20250122(migrationChain) {
+	// Boilerplate
+	const caller = "migrateTo20250122";
+	debugLog(caller, "Invoked.");
+
+	// Preparation
+	/// New attributes in need of default values
+	const attrsToInit = [
+		"reg_astralmeditation_mod_skill_source",
+		"reg_astralmeditation_mod_skill_value",
+		"reg_rest_duration_auto",
+		"reg_sleep_ae_factor_metal_sensitive_conscious_contact",
+		"reg_sleep_ae_mod_cuffed",
+	];
+	/// Uninitialized attributes from pre-initialization times now needed and properly initialized
+	const attrsToModernize = [
+		"LE",
+		"LE_max",
+		"AU",
+		"AU_max",
+		"erschoepfung",
+		"ueberanstrengung",
+		"AE",
+		"AE_max",
+		"KE",
+		"KE_max",
+	];
+	/// Errors from migrateTo20240414()
+	const attrsToCorrect = [
+		"reg_sleep_le_fixed",
+		"reg_sleep_ae_fixed",
+		"reg_sleep_mod_somnambulism",
+		"reg_sleep_sleep_disorder_effect",
+		"reg_sleep_sleep_disorder_trigger",
+	];
+	const defaultCorrection = {
+		"reg_sleep_le_fixed": { "correct": -1, "wrong": "off" },
+		"reg_sleep_ae_fixed": { "correct": -1, "wrong": "off" },
+		"reg_sleep_mod_somnambulism": { "correct": "0", "wrong": 0 },
+		"reg_sleep_sleep_disorder_effect": { "correct": "1d6 - 1", "wrong": 0 },
+		"reg_sleep_sleep_disorder_trigger": { "correct": "1d0", "wrong": 0 },
+	}
+
+	/// Sanitization
+	/// List of triggering attributes
+	/// Use these attributes to trigger a change to propagate through the sheet resetting them to the initial value afterwards
+	const triggerAttrs = [ "AU", "CH", "RitualkenntnisWert" ];
+
+	/// Reduction to one array
+	const attrsToGet = [ ...attrsToInit, ...attrsToModernize, ...attrsToCorrect, ...triggerAttrs ];
+
+	// Attribute operations
+	safeGetAttrs(attrsToGet, function(outer) {
+		// Boilerplate
+		let attrsToChange = {};
+
+		// New attribute initialization
+		/// Uses the positive effect of safeGetAttrs() to add unknown attributes with their default value
+		for (attr of attrsToInit)
+		{
+			attrsToChange[attr] = outer[attr];
+		}
+
+		// Modernization of pre-existing attributes
+		for (attr of attrsToModernize)
+		{
+			let value = 0;
+			if (isNaN(parseInt(outer[attr])))
+			{
+				if (Object.hasOwn(defaultValues, attr))
+				{
+					value = defaultValues[attr];
+				} else {
+					value = 0;
+				}
+				attrsToChange[attr] = value;
+			}
+		}
+
+		// Repair erroneously initialized attributes
+		for (attr of attrsToCorrect)
+		{
+			// Only correct if (still) at wrong initialized value
+			if (outer[attr] === defaultCorrection[attr]["wrong"])
+			{
+				attrsToChange[attr] = defaultCorrection[attr]["correct"];
+			}
+		}
+
+		// Set triggers for automatic propagation through action listeners
+		attrsToChange["AU"] = parseInt(outer["AU"]) + 1;
+		attrsToChange["CH"] = parseInt(outer["CH"]) + 1;
+		attrsToChange["RitualkenntnisWert"] = parseInt(outer["RitualkenntnisWert"]) + 1;
+
+		debugLog(caller, "outer", outer, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange, {}, function () {
+			const attrsToRestore = { "AU": outer["AU"], "CH": outer["CH"], "RitualkenntnisWert": outer["RitualkenntnisWert"] };
+			safeSetAttrs(attrsToRestore, {}, function() {
+				callNextMigration(migrationChain);
+			});
 		});
 	});
 }
