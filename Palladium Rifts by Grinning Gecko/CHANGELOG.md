@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1] - 2025-01-27
+
+### Changed
+
+- Move Perception from Saving Throws to beside Initiative.
+- Active Profile columns now fill the width.
+
 ## [1.6.0] - 2020-04-18
 
 ### Added
