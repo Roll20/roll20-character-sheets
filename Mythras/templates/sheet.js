@@ -353,7 +353,7 @@ function upgradeGeneric3Dot1() {
  * @param version the sheet version already parse to a float or 0 if not a valid float
  */
 function versioning(sheet_type, version) {
-    const latestVersion = '3.6';
+    const latestVersion = '3.8';
     if (!sheet_type) {
         sheet_type = "pc";
     }
@@ -386,14 +386,20 @@ function versioning(sheet_type, version) {
             upgradeCharacter3Dot4();
         }
         versioning(sheet_type, '3.4');
-    } else if (version < 3.6) { /* TODO change this when we next introduce a version that requires updating */
+    } else if (version < 3.6) {
         if (sheet_type === 'character' || sheet_type === 'pc' || sheet_type === 'creature' || sheet_type === 'spirit') {
             console.log("running character 3.6 update");
             upgradeCharacter3Dot6();
         }
         versioning(sheet_type, '3.6');
+    } else if (version < 3.8) { /* TODO change this when we next introduce a version that requires updating */
+        if (sheet_type === 'character' || sheet_type === 'pc' || sheet_type === 'creature' || sheet_type === 'spirit') {
+            console.log("running character 3.8 update");
+            upgradeCharacter3Dot8();
+        }
+        versioning(sheet_type, '3.8');
     } else {
-        setattr({"version": 3.6})
+        setAttrs({"version": 3.8})
     }
 }
 
