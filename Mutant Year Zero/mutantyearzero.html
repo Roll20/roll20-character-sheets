@@ -1612,8 +1612,15 @@
             </div>
             <div class="dice-rolls-whisper">              
               <!-- <input type="hidden" class="whisper-roll hidden" name="attr_whisper_the_roll" hidden /> -->
-              <input name="attr_whisper_the_roll" id="whisper-toggle" type="checkbox" value="1" data-i18n-title="whisper-toggle-title" />
-              <label for="whisper-toggle" data-i18n="whisper-toggle" data-i18n-title="whisper-toggle-title">Whisper rolls</label>
+              <!-- <input name="attr_whisper_the_roll" id="whisper-toggle" type="checkbox" value="1" data-i18n-title="whisper-toggle-title" /> -->
+              <div>
+                <span data-i18n="whisper-toggle" data-i18n-title="whisper-toggle-title" title="Roll is visible to everyone in chat, whisper it so only GM sees it, or use a query popup to ask. Change defaults in Settings tab.">Whisper roll</span>?
+              </div>
+              <div>
+                <input type="radio" name="attr_whisper_the_roll" id="radio_whisper_disabled" value="0" hidden></radio><label for="radio_whisper_disabled">No</label>
+                <input type="radio" name="attr_whisper_the_roll" id="radio_whisper_enabled" value="1" hidden></radio><label for="radio_whisper_enabled">Yes</label>
+                <input type="radio" name="attr_whisper_the_roll" id="radio_whisper_query" value="2" hidden></radio><label for="radio_whisper_query" i18n-title="whisper-query-option">Ask</label>
+              </div>
             </div>
             <!--
             <div class="dice-rolls-whisper">              
@@ -3023,16 +3030,23 @@
           <option value="1" data-i18n="whisper-rolls">Whisper rolls to the GM</option>
           <option value="2" data-i18n="whisper-query">Always use a query (hide whisper option in dice pool).</option>
         </select> -->
-      <div>
+        
+        <span data-i18n="whisper-default-option">Default option for whispering rolls</span>:
+        <select name="attr_whisper" title="@{whisper}">
+          <option value="0" data-i18n="whisper-nothing" selected default>Do not whisper</option>
+          <option value="1" data-i18n="whisper-rolls">Whisper to the GM</option>
+          <option value="2" data-i18n="whisper-query">Use a query</option>
+        </select>
+      <!-- <div>
         <input type="checkbox" name="attr_whisper" value="1" />
         <span data-i18n="whisper-default-option">Whisper rolls by default</span>
       </div>
         <input type="checkbox" name="attr_whisper_query" value="1" />
         <span data-i18n="whisper-query-option">Ask if roll should be whispered (use query)</span>
-      </div>
+      </div> -->
       <div>
         <input type="checkbox" name="attr_api_toggle" value="1" title="@{api_toggle}" style="vertical-align: center;"  />
-        <span data-i18n="api-toggle">Use API script for dice rolls (requires paid account and activated MYZ Roller API script)</span>
+        <span data-i18n="api-toggle">API script for dice rolls (requires paid account)</span>
       </div>
       <!-- <div>
         <span data-i18n="whisper-options">Whisper Options:</span>
@@ -4606,63 +4620,40 @@ extraAttributesArr = [
     clog(`** UPDATING TO V3.10 FROM ${old_version} **`);
     const setter = {
       whisper : 0,
-      whisper_query : 0,
+      //whisper_query : 0,
       whisper_option : "",
       whisper_option_api : "!myz",
       whisper_the_roll : 0
     };
 
-    getAttrs(["api_toggle","whisper_option","whisper_option_api","whisper_query","whisper","whisper_the_roll"], (values) => {
-      //clog(`----- Upgrading from whisper settings: ${JSON.stringify(values)}`);
+    getAttrs(["api_toggle","whisper_option","whisper_option_api","whisper","whisper_the_roll"], (values) => {
+      clog(`----- Upgrading from whisper settings: ${JSON.stringify(values)}`);
       const option_api = values.whisper_option_api,
             option = values.whisper_option,
-            toggle = int(values.api_toggle);
-      if ( toggle === 1 ) {
-        //clog(`----- Whisper Upgrade: API rolls is ENABLED`);
-      
-        if ( option_api == "@{translation_whisper_api_macro_query}" ) {
-          //clog(`----- Whisper Upgrade: API roll whisper through QUERY`);
-
-          setter.whisper_query = 1;
-          setter.whisper_option = "@{translation_whisper_macro_query}";
-          setter.whisper_option_api = "@{translation_whisper_api_macro_query}";
-        } else if ( option_api == "!wmyz" ) {
-          //clog(`----- Whisper Upgrade: API roll whisper ENABLED through SETTING`);
-          setter.whisper = 1;
-          setter.whisper_option = "/w gm";
-          setter.whisper_option_api = "!wmyz";
-          setter.whisper_the_roll = 1;                   
-        } else if ( option_api == "!myz" ) {
-          //clog(`----- Whisper Upgrade: API roll whisper DISABLED through SETTING`);
-          setter.whisper = 0;
-          setter.whisper_option = "";
-          setter.whisper_option_api = "!myz";
-          setter.whisper_the_roll = 0;         
-        } else {
-          //clog(`----- Whisper Upgrade: API roll whisper settings not matched!!!`);          
-        }
+            api = int(values.api_toggle);
+   
+      if ( ( api === 1 && option_api == "@{translation_whisper_api_macro_query}" ) || 
+            ( api !== 1 && option == "@{translation_whisper_macro_query}" ) ) {
+        clog(`----- Whisper Upgrade: whisper through QUERY`);
+        setter.whisper = 2;
+        setter.whisper_option = "@{translation_whisper_macro_query}";
+        setter.whisper_option_api = "@{translation_whisper_api_macro_query}";
+      } else if ( ( api === 1 && option_api == "!wmyz" ) || 
+                  ( api !== 1 && option == "/w gm" ) ) {
+        clog(`----- Whisper Upgrade: whisper ENABLED through SETTING`);
+        setter.whisper = 1;
+        setter.whisper_option = "/w gm";
+        setter.whisper_option_api = "!wmyz";
+        setter.whisper_the_roll = 1;                   
+      } else if ( ( api === 1 && option_api == "!myz" ) || 
+                  ( api !== 1 && option == "" ) ) {
+        clog(`----- Whisper Upgrade: whisper DISABLED through SETTING`);
+        setter.whisper = 0;
+        setter.whisper_option = "";
+        setter.whisper_option_api = "!myz";
+        setter.whisper_the_roll = 0;         
       } else {
-        //clog(`----- Whisper Upgrade: API rolls is DISABLED`);
-        if ( option == "@{translation_whisper_macro_query}" ) {
-          //clog(`----- Whisper Upgrade: Regular roll whisper through QUERY`);
-          setter.whisper_query = 1;
-          setter.whisper_option = "@{translation_whisper_macro_query}";
-          setter.whisper_option_api = "@{translation_whisper_api_macro_query}";
-        } else if ( option == "/w gm" ) {
-          //clog(`----- Whisper Upgrade: Regular roll whisper ENABLED through SETTING`);
-          setter.whisper = 1;
-          setter.whisper_option = "/w gm";
-          setter.whisper_option_api = "!wmyz";
-          setter.whisper_the_roll = 1;             
-        } else if ( option == "" ) {
-          //clog(`----- Whisper Upgrade: Regular roll whisper DISABLED through SETTING`);
-          setter.whisper = 0;
-          setter.whisper_option = "0";
-          setter.whisper_option_api = "0";
-          setter.whisper_the_roll = 0;          
-        } else {
-          //clog(`----- Whisper Upgrade: Regular roll whisper settings not matched!!!`);          
-        }
+        clog(`----- Whisper Upgrade: roll whisper settings not matched!!!`);          
       }
 
       //clog(`----- Upgrading to whisper settings: ${JSON.stringify(setter)}`);
@@ -5605,13 +5596,12 @@ extraAttributesArr = [
   }); */
 
   /* Set whiper options for the sheet */ 
-  on("change:whisper change:whisper_query", (ev) => {
-    getAttrs(["api_toggle","whisper","whisper_query","whisper_option","whisper_option_api","translation_whisper_api_macro_query","translation_whisper_macro_query"], function (values) {
+  on("change:whisper", (ev) => {
+    getAttrs(["api_toggle","whisper","whisper_option","whisper_option_api","translation_whisper_api_macro_query","translation_whisper_macro_query"], function (values) {
       const whisper = int(values.whisper),
             api = int(values.api_toggle),
-            query = int(values.whisper_query),
             setter = {};
-
+      /*
       if (query === 1) {
         setter.whisper = 0; 
         setter.whisper_option = values.translation_whisper_macro_query;
@@ -5627,7 +5617,21 @@ extraAttributesArr = [
           setter.whisper_option = "";
           setter.whisper_option_api = "!myz";
           setter.whisper_the_roll = 0; 
-        }
+        }        
+      }
+      */
+      if ( whisper === 1 ) {     
+        setter.whisper_option = "/w gm";
+        setter.whisper_option_api = "!wmyz";
+        setter.whisper_the_roll = 1;
+      } else if ( whisper === 2 ) {   
+        setter.whisper_option = values.translation_whisper_macro_query;
+        setter.whisper_option_api = values.translation_whisper_api_macro_query;
+        setter.whisper_the_roll = 0;
+      } else {              
+        setter.whisper_option = "";
+        setter.whisper_option_api = "!myz";
+        setter.whisper_the_roll = 0;
       }
 
       //clog(`Whisper settings: whisper: ${values.whisper}, ${JSON.stringify(setter)}`);
@@ -5747,7 +5751,7 @@ extraAttributesArr = [
   on("sheet:opened clicked:dice_pool_clear", function () {
     getAttrs(["whisper"], (values) => { 
       //clog(`Change Detected: Clear Dice Pool - button clicked or sheet loaded (whisper is ${values.whisper})`);
-      const whisper = (int(values.whisper) === 1) ? 1 : 0;
+      //const whisper = (int(values.whisper) === 1) ? 1 : 0;
       setAttrs({
         attribute: 0,
         skill: 0,
@@ -5790,7 +5794,7 @@ extraAttributesArr = [
         gear_die_two: 0,
         gear_die_one: 0,
         current_preset: getTranslationByKey('custom-roll'),
-        whisper_the_roll: whisper,
+        whisper_the_roll: int(values.whisper),
         include_with_roll: "",
         pushable: 1,
         push_latest: "",
@@ -5899,9 +5903,9 @@ extraAttributesArr = [
   
 
   on("clicked:roll_the_dice", () => {
-    getAttrs( ["character_name", "character_id", "chartype","attribute", "skill", "gear", "current_preset",  "pushable","include_with_roll", "whisper_query", "whisper_the_roll","translation_whisper_macro_query"], async (values) => {
+    getAttrs( ["character_name", "character_id", "chartype","attribute", "skill", "gear", "current_preset",  "pushable","include_with_roll", "whisper_option", "whisper_the_roll","translation_whisper_macro_query"], async (values) => {
       
-      const whisper = (int(values.whisper_query) === 1) ? values.translation_whisper_macro_query : (int(values.whisper_the_roll) === 1) ? "/w gm" : "" ;
+      //const whisper = (int(values.whisper) === 2) ? values.translation_whisper_macro_query : (int(values.whisper_the_roll) === 1) ? "/w gm" : "" ;
       //clog("Whisper string : " + whisper);
 
       const trigger = {name : values.current_preset},
@@ -5916,7 +5920,7 @@ extraAttributesArr = [
           skill: int(values.skill),
           gear: int(values.gear),
           totalDice: int(values.attribute)+Math.abs(int(values.skill))+int(values.gear),
-          whisper: whisper,
+          whisper_option: values.whisper_option,
           pushable: int(values.pushable),
           pushroll: 0,
           include: values.include_with_roll,
@@ -5944,7 +5948,7 @@ extraAttributesArr = [
         for(let i = 1; i <= Math.abs(roll.skill); i++) { skillStr += `{{negative-die-${litnum[i]}= [[1]] }} {{negative-roll-${litnum[i]}= [[1d6]] }} `; }
       }
       for(let i = 1; i <= roll.gear; i++) { gearStr += `{{gear-die-${litnum[i]}= [[1]] }} {{gear-roll-${litnum[i]}= [[1d6]] }} `; }
-      rollStr = `${roll.whisper} &{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{chartype_id=[[${attributes['chartype_id']}]]}} {{name=${roll.name}}} {{successes=[[0]]}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} ${attributeStr} ${skillStr} ${gearStr}`;
+      rollStr = `${roll.whisper_option} &{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{chartype_id=[[${attributes['chartype_id']}]]}} {{name=${roll.name}}} {{successes=[[0]]}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} ${attributeStr} ${skillStr} ${gearStr}`;
     }    
 
     //clog("Roll string; "+ rollStr);
@@ -6027,7 +6031,7 @@ extraAttributesArr = [
         roll.pushable = 0;
       }
 
-      roll.pushRollStr = `${roll.whisper} &{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{chartype_id=[[${attributes['chartype_id']}]]}} {{name=${roll.name}}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} {{successes=[[${successes}]]}} {{failures=[[${failures}]]}} {{gearfails=[[${gearfails}]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr}`;
+      roll.pushRollStr = `${roll.whisper_option} &{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{chartype_id=[[${attributes['chartype_id']}]]}} {{name=${roll.name}}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} {{successes=[[${successes}]]}} {{failures=[[${failures}]]}} {{gearfails=[[${gearfails}]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr}`;
       
       const pushRoll = {
         attributes: attributes,
@@ -6036,7 +6040,7 @@ extraAttributesArr = [
         failures: failures,
         gearfails: gearfails,
         totalDice: roll.totalDice,
-        whisper: roll.whisper,
+        whisper_option: roll.whisper_option,
         include: roll.include,
       };
       
