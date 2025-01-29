@@ -2,6 +2,11 @@
 
 ## [1.6.1] - 2025-01-27
 
+### Added
+
+- Add roll buttons to punch and kick damage.
+- Add kick damage to Supernatural Strength.
+
 ### Changed
 
 - Move Perception from Saving Throws to beside Initiative.
