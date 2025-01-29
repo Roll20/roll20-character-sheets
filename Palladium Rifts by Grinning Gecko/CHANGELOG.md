@@ -6,6 +6,7 @@
 
 - Add roll buttons to punch and kick damage.
 - Add kick damage to Supernatural Strength.
+- Add Ammo tracker to Profile tab.
 
 ### Changed
 
