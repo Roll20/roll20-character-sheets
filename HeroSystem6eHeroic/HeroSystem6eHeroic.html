@@ -275,9 +275,9 @@
 					<div class="item-characteristics-size-attributes-row">
 						<h2>Mass</h2>
 						<input type="text" value="100 kg" name="attr_sizeMass" readonly title="@{sizeMass}" tabindex="-1"/>
-						<h2>Dim</h2>
-						<input type="text" value="2&#xd7;1&#xd7;1 m&#179;" name="attr_sizeDimensions" readonly title="@{sizeDimensions}" min="1" tabindex="-1"/>
-						<h2>OCV</h2>
+						<h2>Length</h2>
+						<input type="text" value="2&#xd7; m" name="attr_sizeLength" readonly title="@{sizeLength}" min="1" tabindex="-1"/>
+						<h2>OCV+</h2>
 						<input type="text" value="0" name="attr_sizeOCV" readonly title="@{sizeOCV}" tabindex="-1"/>
 						<h2>KB</h2>
 						<input type="text" value="0" name="attr_sizeKB" readonly title="@{sizeKB}" tabindex="-1"/>
@@ -298,7 +298,7 @@
 					<div class="item-characteristics-primary-attributes-row">
 						<input type="text" value="0" name="attr_sizeNet" readonly title="@{sizeNet}" tabindex="-1"/>
 						<h2>Size</h2>
-						<input type="number" value="0" name="attr_size" title="@{size}" min="0" tabindex="5"/>
+						<input type="number" value="0" name="attr_size" title="@{size}" min="0" max="50" tabindex="5"/>
 						<h2>&#8205;</h2>
 						<h2>&#8205;</h2>
 						<input type="text" value="0" name="attr_sizeCP" readonly tabindex="-1" title="@{sizeCP}"/>
@@ -17268,6 +17268,110 @@
 		});
 	});
 	
+	
+	// Update vehicle size
+	on("change:size change:useVehicleAttributes", function () {
+		getAttrs(["size", "useVehicleAttributes"], function(values) {
+			var attributes = new Object();
+			
+			const statValue = Math.min(Math.max(0, parseInt(values.size)||0), 50);
+			const isVehicle = (values.useVehicleAttributes === "on" ) ? true : false;
+			let mass = 0;
+			let dimension = 0;
+			let tempString = "";
+			
+			attributes.sizeCP = statValue * 5;
+			
+			// If vehicle update size attributes. Otherwise reset them to size 0 defaults.
+			if (isVehicle) {
+				if (statValue <= 3) {
+					mass = 2 ** statValue * 100;
+					tempString = mass.toString() + " kg";
+				} else if (statValue <= 6) {
+					mass = 2 ** statValue * 0.1;
+					tempString = mass.toString() + " t";
+				} else if (statValue <= 13) {
+					mass = 2 ** (statValue - 7) * 12.5;
+					tempString = mass.toString() + " t";
+				} else if (statValue <= 16) {
+					mass = 2 ** (statValue - 7) * 0.0125;
+					tempString = mass.toString() + " kt";
+				} else if (statValue <= 23) {
+					mass = 2 ** (statValue - 17) * 12.5;
+					tempString = mass.toString() + " kt";
+				} else if (statValue <= 26) {
+					mass = 2 ** (statValue - 17) * 0.0125;
+					tempString = mass.toString() + " Mt";
+				} else if (statValue <= 33) {
+					mass = 2 ** (statValue - 27) * 12.5;
+					tempString = mass.toString() + " Mt";
+				} else if (statValue <= 36) {
+					mass = 2 ** (statValue - 27) * 0.125;
+					tempString = mass.toString() + " Gt";
+				} else if (statValue <= 43) {
+					mass = 2 ** (statValue - 37) * 12.5;
+					tempString = mass.toString() + " Gt";
+				} else if (statValue <= 46) {
+					mass = 2 ** (statValue - 44) * 1.6;
+					tempString = mass.toString() + " Tt";
+				} else {
+					mass = 2 ** (statValue - 47) * 12.5;
+					tempString = mass.toString() + " Tt";
+				}
+				
+				attributes.sizeMass = tempString;
+				
+				if ((statValue % 3) === 0) {
+					if (statValue <= 18) {
+						dimension = 2 * 2 ** (statValue/3);
+						tempString = dimension.toString() + " m";
+					} else if (statValue <= 24) {
+						dimension = 2 * 125 * 2 ** ((statValue-21)/3);
+						tempString = dimension.toString() + " m";
+					} else {
+						dimension = 2 ** ((statValue-27)/3);
+						tempString = dimension.toString() + " km";
+					}
+				} else if ((statValue % 3) === 1) {
+					if (statValue <= 25) {
+						dimension = 2 * 1.25 * (2 ** ((statValue-1)/3) );
+						tempString = dimension.toString() + " m";
+					} else {
+						dimension = 1.25 * (2 ** ((statValue-28)/3) );
+						tempString = dimension.toString() + " km";
+					}
+				} else {
+					if (statValue <= 5) {
+						dimension = 2 * 1.6 * (2 ** ((statValue-2)/3) );
+						tempString = dimension.toString() + " m";
+					} else if (statValue <= 26) {
+						dimension = 12.5 * (2 ** ((statValue-8)/3) );
+						tempString = dimension.toString() + " m";
+					} else if (statValue <= 35) {
+						dimension = 1.6 * (2 ** ((statValue-29)/3) );
+						tempString = dimension.toString() + " km";
+					} else {
+						dimension = 12.5 * (2 ** ((statValue-38)/3) );;
+						tempString = dimension.toString() + " km";
+					}
+				}
+				
+				attributes.sizeLength = tempString;
+				attributes.sizeNet = statValue;
+				attributes.sizeOCV = Math.floor(statValue*2/3);
+				attributes.sizeKB = -statValue;
+				attributes.strengthMod = statValue;
+				attributes.bodyMod = statValue;
+			} else {
+				attributes.sizeOCV = 0;
+				attributes.sizeKB = 0;
+				attributes.strengthMod = 0;
+				attributes.bodyMod = 0;
+			}
+			
+			setAttrs(attributes);
+		});
+	});
 	
 	// Combat Characteristics
 
