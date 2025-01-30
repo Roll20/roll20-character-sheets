@@ -2805,9 +2805,12 @@
               <input type="checkbox" class="hidden" name="attr_toggle_fighter5" value="1">
             </label>
 
-            <label></label>
+            <label class="inline-label" title="@{sync_matrix_class} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes.">
+              <input type="checkbox" name="attr_sync_matrix_class" value="1" checked />
+              <h4>Sync to Class:</h4>
+            </label>
             <label>
-              <select class="class-selected width-large border" name="attr_class_selected">
+              <select class="class-selected width-large border" name="attr_class_selected" title="@{class_selected} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes.">
                 <option value="0" style="font-weight: bold;" selected>~ Select ~</option>
                 <option value="1">Class 1</option>
                 <option value="2">Class 2</option>
@@ -2818,10 +2821,10 @@
             <label>
               <input type="hidden" class="class-selected" name="attr_class_selected" value="0" />
               <input class="show-none" placeholder="n/a" readonly />
-              <input class="show-class1-name" name="attr_class" placeholder="n/a" readonly />
-              <input class="show-class2-name" name="attr_secondclass" placeholder="n/a" readonly />
-              <input class="show-class3-name" name="attr_thirdclass" placeholder="n/a" readonly />
-              <input class="show-monster-name" placeholder="Monster" readonly />
+              <input class="show-class1-name" name="attr_class" title="@{class}" placeholder="n/a" readonly />
+              <input class="show-class2-name" name="attr_secondclass" title="@{secondclass}" placeholder="n/a" readonly />
+              <input class="show-class3-name" name="attr_thirdclass" title="@{thirdclass}" placeholder="n/a" readonly />
+              <input class="show-monster-name" placeholder="Monster HD" readonly />
             </label>
             <label class="matrix-level">
               <!-- calc this attr based on the class selected -->
@@ -2846,7 +2849,7 @@
             </label>
             <label class="width-large">
               <select class="width-fill border" name="attr_matrix_class" title="@{matrix_class}">
-                <option value="0" selected style="font-weight: bold;">~ Select the Class or Monster ~</option>
+                <option value="0" selected style="font-weight: bold;">~ Select Class or Monster ~</option>
                 <option value="1">Cleric, Druid or Monk</option>
                 <option value="2">Fighter, Paladin, Ranger or Bard</option>
                 <option value="3">Magic-User or Illusionist</option>
@@ -3031,7 +3034,7 @@
               </label>
               <details class="small-damage">
                 <summary>
-                  <span class="material-icons custom-btn-nav toggle-critdamage"></span>
+                  <span class="material-icons custom-btn-nav toggle-critdamage" title="Open to Roll Crit Damage"></span>
                   <input type="text" class="width-medium" name="attr_weapon_damagesmallmedium" title="@{repeating_weapon_$X_weapon_damagesmallmedium}" value="" placeholder="1d4" />
                   <button class="text-only hide-as-npc" type="roll" name="roll_weapon_damagesmallmedium_roll" title="%{repeating_weapon_$X_weapon_damagesmallmedium_roll} | PC Roll" value="@{weapon_damagesmallmedium_macro_text}"><span class="dice-button nowrap">DMG S/M</span></button>
                   <button class="text-only hide-as-pc" type="roll" name="roll_weapon_damagesmallmedium_npc_roll" title="%{repeating_weapon_$X_weapon_damagesmallmedium_npc_roll} | NPC Roll" value="@{weapon_damagesmallmedium_macro_npc_text}"><span class="dice-button nowrap">DMG S/M</span></button>
@@ -11305,17 +11308,37 @@
   }
 
   // Attack Matrix Autofill To-Hit table
-  on('change:matrix_class change:matrix_level change:matrix_hitdice change:autofill_matrix change:toggle_fighter5', (eventInfo) => {
+  on('change:matrix_class change:matrix_level change:matrix_hitdice change:autofill_matrix change:sync_matrix_class change:toggle_fighter5 change:class_selected change:level change:level_2 change:level_3', (eventInfo) => {
     // clog(`Matrix Autofill Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(['matrix_class', 'matrix_level', 'matrix_hitdice', 'autofill_matrix', 'toggle_fighter5'], (v) => {
+    getAttrs(['matrix_class', 'matrix_level', 'matrix_hitdice', 'autofill_matrix', 'toggle_fighter5', 'sync_matrix_class', 'class_selected', 'level', 'level_2', 'level_3'], (v) => {
       const output = {};
       const autocalcFill = +v.autofill_matrix || 0;
+      const syncClass = +v.sync_matrix_class || 0;
       // bail out if auto-fill is not enabled.
       if (!autocalcFill) return;
+      const classLinked = +v.class_selected || 0;
+      let levelSelected = +v.matrix_level || 0;
       const classSelected = +v.matrix_class || 0;
-      const levelSelected = +v.matrix_level || 0;
       const hitdiceSelected = +v.matrix_hitdice || 0;
       const fighter5Selected = +v.toggle_fighter5 || 0;
+      // check if a class has been selected and use that classes level unless chaged
+      if (syncClass === 1) {
+        if (classLinked === 1){
+          clog(`Linked Class is: Class 1 Current Level:${v.level}`);
+          levelSelected = +v.level || 0;
+          output.matrix_level = levelSelected;
+        }
+        if (classLinked === 2){
+          clog(`Linked Class is: Class 2 Current Level:${v.level_2}`);
+          levelSelected = +v.level_2 || 0;
+          output.matrix_level = levelSelected;
+        }
+        if (classLinked === 3){
+          clog(`Linked Class is: Class 3 Current Level:${v.level_3}`);
+          levelSelected = +v.level_3 || 0;
+          output.matrix_level = levelSelected;
+        }
+      }
       // clog('Ready to autofill attack matrix.');
       if (classSelected === 0) return;
       // clerics table
