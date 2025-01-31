@@ -380,7 +380,7 @@
 				<!-- Vehicle power systems -->
 				<div class="item-characteristics-vehicle-power-systems">
 					<div class="item-characteristics-power-system">
-						<input type="text" value="" placeholder="Primary Power System" name="attr_primaryReserveLabel" title="@{primaryReserveLabel}" maxlength="24" tabindex="61">
+						<input type="text" value="" placeholder="Main Power" name="attr_primaryReserveLabel" title="@{primaryReserveLabel}" maxlength="24" tabindex="61">
 						<div class="item-characteristics-power-system-block">
 							<div class="item-characteristics-power-system-row">
 								<h2>END</h2>
@@ -462,6 +462,8 @@
 		</div>
 		
 		<div class="grid-container-characteristics-rightGrid">
+			<input type="hidden" class="sheet-health-display" name="attr_sheetHealthDisplay" value="standard"/>
+			
 			<div class="item-characteristics-portrait">
 					
 				<!-- Hidden variables for the portrait display slideshow -->
@@ -545,6 +547,47 @@
 				<button type="action" class="button buttonReset" tabindex="-1" name="act_resetHealth" title="%{resetHealth}">Reset</button>
 			</div>
 			
+			<div class="item-characteristics-health">
+				<h2>BODY</h2>
+				<div class="item-health-stat">
+					<input type="text" name="attr_CurrentBODY" title="@{CurrentBODY}" value="10" maxlength="3" pattern="[0-9]+" tabindex="50"/>
+					<div class="item-health-stat-plus-minus-enclosure">
+						<button type="action" class="button buttonPlus" tabindex="-1" name="act_bodyPlus">
+							<span>&#10095;</span>
+						</button>
+						<button type="action" class="button buttonMinus" tabindex="-1" name="act_bodyMinus">
+							<span>&#10094;</span>
+						</button>
+					</div>
+				</div>
+				<h2>END</h2>
+				<div class="item-health-stat">
+					<input type="text" name="attr_CurrentPrimaryEND" title="@{CurrentPrimaryEND}" value="20" maxlength="3" pattern="[0-9]+" tabindex="51"/>
+					<div class="item-health-stat-plus-minus-enclosure">
+						<button type="action" class="button buttonPlus" tabindex="-1" name="act_primaryPlus">
+							<span>&#10095;</span>
+						</button>
+						<button type="action" class="button buttonMinus" tabindex="-1" name="act_primaryMinus">
+							<span>&#10094;</span>
+						</button>
+					</div>
+				</div>
+				<h2>AUX</h2>
+				<div class="item-health-stat">
+					<input type="text" name="attr_CurrentAuxiliaryEND" title="@{CurrentAuxiliaryEND}" value="20" maxlength="3" pattern="[0-9]+" tabindex="52"/>
+					<div class="item-health-stat-plus-minus-enclosure">
+						<button type="action" class="button buttonPlus" tabindex="-1" name="act_auxiliaryPlus">
+							<span>&#10095;</span>
+						</button>
+						<button type="action" class="button buttonMinus" tabindex="-1" name="act_auxiliaryMinus">
+							<span>&#10094;</span>
+						</button>
+					</div>
+				</div>
+				<button type="action" class="button buttonRecover" tabindex="-1" name="act_recoverHealth" title="%{recoverHealth}">Recover</button>
+				<button type="action" class="button buttonReset" tabindex="-1" name="act_resetHealth" title="%{resetHealth}">Reset</button>
+			</div>
+			
 			<div class="grid-container-container-turn-segments">
 				<label class="container-speed-indicator" >
 					<input type="checkbox" name="attr_speedIndicator01">
@@ -620,7 +663,7 @@
 					</div>
 					
 					<div class="subitem-characteristics-perception-stat-container">
-						<input type="text" value="Vision" name="attr_perceptionVisionLabel" title="@{perceptionVisionLabel}" maxlength="12" tabindex="61">
+						<input type="text" value="" placeholder="Vision" name="attr_perceptionVisionLabel" title="@{perceptionVisionLabel}" maxlength="12" tabindex="61">
 						<div class="subitem-characteristics-perception-column-container">
 							<span>+<input type="number" name="attr_perceptionModifierVision" title="@{perceptionModifierVision}" value="0" min="-10" max="10" step="1" tabindex="62"></span>
 							
@@ -631,7 +674,7 @@
 					</div>
 					
 					<div class="subitem-characteristics-perception-stat-container">
-						<input type="text" value="Hearing" name="attr_perceptionHearingLabel" title="@{perceptionHearingLabel}" maxlength="12" tabindex="63">
+						<input type="text" value="" placeholder="Hearing" name="attr_perceptionHearingLabel" title="@{perceptionHearingLabel}" maxlength="12" tabindex="63">
 						<div class="subitem-characteristics-perception-column-container">
 							<span>+<input type="number" name="attr_perceptionModifierHearing" title="@{perceptionModifierHearing}" value="0" min="-10" max="10" step="1" tabindex="64"></span>
 							
@@ -642,7 +685,7 @@
 					</div>
 					
 					<div class="subitem-characteristics-perception-stat-container">
-						<input type="text" value="Smell" name="attr_perceptionSmellLabel" title="@{perceptionSmellLabel}" maxlength="12" tabindex="65">
+						<input type="text" value="" placeholder="Smell" name="attr_perceptionSmellLabel" title="@{perceptionSmellLabel}" maxlength="12" tabindex="65">
 						<div class="subitem-characteristics-perception-column-container">
 							<span>+<input type="number" name="attr_perceptionModifierSmell" title="@{perceptionModifierSmell}" value="0" min="-10" max="10" step="1" tabindex="66"></span>
 							
@@ -15493,6 +15536,8 @@
 <input type="hidden" name="CurrentBODY_max" value="10"/>
 <input type="hidden" name="CurrentSTUN_max" value="20"/>
 <input type="hidden" name="CurrentEND_max" value="20"/>
+<input type="hidden" name="CurrentPrimary_max" value="0"/>
+<input type="hidden" name="CurrentAuxiliary_max" value="0"/>
 
 <!-- Hidden secondary attribute for Hero Roller support -->
 <input type="hidden" name="attr_GetSTRDice" value="2"/>
@@ -16564,7 +16609,8 @@
 		getAttrs(["useVehicleAttributes"], function(values) {
 			
 			setAttrs({
-				"sheetAttributes": (values["useVehicleAttributes"] === "on") ? "vehicle" : "standard"
+				"sheetAttributes": (values["useVehicleAttributes"] === "on") ? "vehicle" : "standard",
+				"sheetHealthDisplay": (values["useVehicleAttributes"] === "on") ? "vehicle" : "standard"
 			});
 		});
 	});
@@ -16821,25 +16867,25 @@
 	
 	/* Increment and Decrement buttons for Health Fields on Page 1: Characteristics */
 	
-	// Add 1 to currentBODY
+	// Add 1 to CurrentBODY
 	on("clicked:bodyPlus", function () {
-		getAttrs(["currentBODY"], function(values) {
-			const currentValue = parseInt(values.currentBODY)||0;
+		getAttrs(["CurrentBODY"], function(values) {
+			const currentValue = parseInt(values.CurrentBODY)||0;
 			
 			setAttrs({
-				"currentBODY":currentValue+1
+				"CurrentBODY":currentValue+1
 			});
 			
 		});
 	});
 	
-	// Subtract 1 from currentBODY
+	// Subtract 1 from CurrentBODY
 	on("clicked:bodyMinus", function () {
-		getAttrs(["currentBODY"], function(values) {
-			const currentValue = parseInt(values.currentBODY)||0;
+		getAttrs(["CurrentBODY"], function(values) {
+			const currentValue = parseInt(values.CurrentBODY)||0;
 			
 			setAttrs({
-				"currentBODY":currentValue-1
+				"CurrentBODY":currentValue-1
 			});
 		});
 	});
@@ -16880,40 +16926,86 @@
 		});
 	});
 	
-	// Add 1 to currentEND
+	// Add 1 to CurrentEND
 	on("clicked:endurancePlus", function () {
-		getAttrs(["currentEND"], function(values) {
-			const currentValue = parseInt(values.currentEND)||0;
+		getAttrs(["CurrentEND"], function(values) {
+			const currentValue = parseInt(values.CurrentEND)||0;
 			
 			// Attempt to correct negative END values.
 			setAttrs({
-				"currentEND": Math.max(0, currentValue+1)
+				"CurrentEND": Math.max(0, currentValue+1)
 			});
 		});
 	});
 	
-	// Subtract 1 from currentEND
+	// Subtract 1 from CurrentEND
 	on("clicked:enduranceMinus", function () {
-		getAttrs(["currentEND"], function(values) {
-			const currentValue = parseInt(values.currentEND)||0;
+		getAttrs(["CurrentEND"], function(values) {
+			const currentValue = parseInt(values.CurrentEND)||0;
 			
 			setAttrs({
-				"currentEND":Math.max(0,currentValue-1)
+				"CurrentEND":Math.max(0,currentValue-1)
 			});
 		});
 	});
 	
-	// Subtract X from currentEND.
+	// Add 1 to CurrentPrimaryEND
+	on("clicked:primaryPlus", function () {
+		getAttrs(["CurrentPrimaryEND"], function(values) {
+			const currentValue = parseInt(values.CurrentPrimaryEND)||0;
+			
+			// Attempt to correct negative END values.
+			setAttrs({
+				"CurrentPrimaryEND": Math.max(0, currentValue+1)
+			});
+		});
+	});
+	
+	// Subtract 1 from CurrentPrimaryEND
+	on("clicked:primaryMinus", function () {
+		getAttrs(["CurrentPrimaryEND"], function(values) {
+			const currentValue = parseInt(values.CurrentPrimaryEND)||0;
+			
+			setAttrs({
+				"CurrentPrimaryEND":Math.max(0,currentValue-1)
+			});
+		});
+	});
+	
+	// Add 1 to CurrentAuxiliaryEND
+	on("clicked:auxiliaryPlus", function () {
+		getAttrs(["CurrentAuxiliaryEND"], function(values) {
+			const currentValue = parseInt(values.CurrentAuxiliaryEND)||0;
+			
+			// Attempt to correct negative END values.
+			setAttrs({
+				"CurrentAuxiliaryEND": Math.max(0, currentValue+1)
+			});
+		});
+	});
+	
+	// Subtract 1 from CurrentAuxiliaryEND
+	on("clicked:auxiliaryMinus", function () {
+		getAttrs(["CurrentAuxiliaryEND"], function(values) {
+			const currentValue = parseInt(values.CurrentAuxiliaryEND)||0;
+			
+			setAttrs({
+				"CurrentAuxiliaryEND":Math.max(0,currentValue-1)
+			});
+		});
+	});
+	
+	// Subtract X from CurrentEND.
 	// Used for power and attack buttons.
 	function subtractEndurance(enduranceSpent) {
-		getAttrs(["currentEND"], function(values) {
-			let currentValue = parseInt(values.currentEND)||0;
+		getAttrs(["CurrentEND"], function(values) {
+			let currentValue = parseInt(values.CurrentEND)||0;
 			
 			currentValue = currentValue - enduranceSpent;
 			
 			// Attempt to correct negative END values.
 			setAttrs({
-				"currentEND":Math.max(0,currentValue)
+				"CurrentEND":Math.max(0,currentValue)
 			});
 		});
 	}
@@ -16921,11 +17013,14 @@
 	// Reset endurance and stun in item-characteristics-health when the reset action button is clicked.
 	// Also resets targeting choices if that option is checked.
 	on("clicked:resetHealth", function () {
-		getAttrs(["enduranceNet", "stunNet", "optionResetTargeting", "optionResetCSLs", "targetSelection", "rangeMartial", "rangeManeuver", "maneuverSelection", "running", "gearSlideSelection", "weaponStates", "weaponType01", "weaponType02", "weaponType03", "weaponType04", "weaponType05", "weaponType06", "martialManeuverOCVmod01", "martialManeuverOCVmod02", "martialManeuverOCVmod03", "martialManeuverOCVmod04", "martialManeuverOCVmod05", "martialManeuverOCVmod06", "martialManeuverOCVmod07", "martialManeuverOCVmod08", "martialManeuverOCVmod09", "martialManeuverOCVmod10", "martialManeuverDCVmod01", "martialManeuverDCVmod02", "martialManeuverDCVmod03", "martialManeuverDCVmod04", "martialManeuverDCVmod05", "martialManeuverDCVmod06", "martialManeuverDCVmod07", "martialManeuverDCVmod08", "martialManeuverDCVmod09", "martialManeuverDCVmod10", "martialManeuverCSLmod01", "martialManeuverCSLmod02", "martialManeuverCSLmod03", "martialManeuverCSLmod04", "martialManeuverCSLmod05", "martialManeuverCSLmod06", "martialManeuverCSLmod07", "martialManeuverCSLmod08", "martialManeuverCSLmod09", "martialManeuverCSLmod10", "weaponCSL01", "weaponCSL02", "weaponCSL03", "weaponCSL04", "weaponCSL05", "weaponCSL06", "currentDCV", "ocvNet"], function(values) {
+		getAttrs(["enduranceNet", "stunNet", "primaryReserveEND", "auxiliaryReserveEND", "optionResetTargeting", "optionResetCSLs", "targetSelection", "rangeMartial", "rangeManeuver", "maneuverSelection", "running", "gearSlideSelection", "weaponStates", "weaponType01", "weaponType02", "weaponType03", "weaponType04", "weaponType05", "weaponType06", "martialManeuverOCVmod01", "martialManeuverOCVmod02", "martialManeuverOCVmod03", "martialManeuverOCVmod04", "martialManeuverOCVmod05", "martialManeuverOCVmod06", "martialManeuverOCVmod07", "martialManeuverOCVmod08", "martialManeuverOCVmod09", "martialManeuverOCVmod10", "martialManeuverDCVmod01", "martialManeuverDCVmod02", "martialManeuverDCVmod03", "martialManeuverDCVmod04", "martialManeuverDCVmod05", "martialManeuverDCVmod06", "martialManeuverDCVmod07", "martialManeuverDCVmod08", "martialManeuverDCVmod09", "martialManeuverDCVmod10", "martialManeuverCSLmod01", "martialManeuverCSLmod02", "martialManeuverCSLmod03", "martialManeuverCSLmod04", "martialManeuverCSLmod05", "martialManeuverCSLmod06", "martialManeuverCSLmod07", "martialManeuverCSLmod08", "martialManeuverCSLmod09", "martialManeuverCSLmod10", "weaponCSL01", "weaponCSL02", "weaponCSL03", "weaponCSL04", "weaponCSL05", "weaponCSL06", "currentDCV", "ocvNet"], function(values) {
 			var attributes = new Object();
 			
 			const maxEND = parseInt(values.enduranceNet);
 			const maxSTUN = parseInt(values.stunNet);
+			const maxMAIN = parseInt(values.primaryReserveEND);
+			const maxAUX = parseInt(values.auxiliaryReserveEND);
+			
 			let states = values.weaponStates;
 			var weaponId;
 			var maneuverId;
@@ -16996,8 +17091,10 @@
 				}
 			}
 			
-			attributes.currentSTUN = maxSTUN;
-			attributes.currentEND = maxEND;
+			attributes.CurrentSTUN = maxSTUN;
+			attributes.CurrentEND = maxEND;
+			attributes.CurrentPrimaryEND = maxMAIN;
+			attributes.CurrentAuxiliaryEND = maxAUX;
 			attributes.ephemeralOCV = parseInt(values["ocvNet"])||3;
 			attributes.ephemeralDCV = parseInt(values["currentDCV"])||3;
 			
@@ -17010,8 +17107,21 @@
 	
 	// Recover endurance and stun when the recover button in the item-characteristics-health box is clicked.
 	on("clicked:recoverHealth", function () {
-		getAttrs(["character_title", "endurance","stun","CurrentEND", "CurrentSTUN", "weightEndPenalty", "recovery", "dingbat"], function(values) {
+		getAttrs(["useVehicleAttributes"], function(values) {
+			const isVehicle = (values.useVehicleAttributes === "on" ) ? true : false;
+			
+			if (isVehicle) {
+				vehicleRecovery();
+			} else {
+				standardRecovery();
+			}
+		});
+	});
+	
+	function standardRecovery() {
+		getAttrs(["whisperToGM", "character_title", "endurance", "stun", "CurrentEND", "CurrentSTUN", "weightEndPenalty", "recovery", "dingbat"], function(values) {
 			var theRoll = values.whisperToGM||"";
+			
 			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
 			const currentEND = parseInt(values.CurrentEND)||0;
 			const currentSTUN = parseInt(values.CurrentSTUN)||0;
@@ -17030,17 +17140,54 @@
 			startRoll(theRoll, (results) => {
 				recoverSTUN = results.results["STUN Recovery"].result;
 				recoverEND = results.results["END Recovery"].result;
-					
+				
 				setAttrs({
-					CurrentSTUN:Math.min(currentSTUN + recoverSTUN, maxSTUN),
-					CurrentEND:Math.max(0,Math.min(currentEND + recoverEND, maxEND))
+					CurrentSTUN: Math.min(currentSTUN + recoverSTUN, maxSTUN),
+					CurrentEND: Math.max(0,Math.min(currentEND + recoverEND, maxEND))
 				});
 				
 				finishRoll(results.rollId, {});
 			});
-			
 		});
-	});
+		
+		return;
+	}
+	
+	function vehicleRecovery() {
+		getAttrs(["whisperToGM", "character_title", "CurrentPrimaryEND", "CurrentAuxiliaryEND", "primaryReserveEND", "auxiliaryReserveEND", "dingbat"], function(values) {
+			var theRoll = values.whisperToGM||"";
+			
+			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
+			
+			const currentPrimaryEND = parseInt(values.CurrentPrimaryEND)||0;
+			const currentAuxiliaryEND = parseInt(values.CurrentAuxiliaryEND)||0;
+			
+			// If character is boosted, than their max is what they are currently at
+			const maxPrimaryEND = Math.max(parseInt(values.primaryReserveEND), currentPrimaryEND);
+			const maxAuxiliaryEND = Math.max(parseInt(values.auxiliaryReserveEND), currentAuxiliaryEND);
+			
+			theRoll += "&{template:custom-activate} ";
+			theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+			
+			theRoll += "{{MAIN Recovery=[[@{primaryReserveREC}[MAIN]]] (@{CurrentPrimaryEND})}} "
+			+ "{{AUX Recovery=[[@{auxiliaryReserveREC}[AUX]]] (@{CurrentAuxiliaryEND})}}";
+			
+			startRoll(theRoll, (results) => {				
+				recoverMAIN = results.results["MAIN Recovery"].result;
+				recoverAUX = results.results["AUX Recovery"].result;
+				
+				setAttrs({
+					treasures: "hello",
+					CurrentPrimaryEND: Math.max(0, Math.min(currentPrimaryEND + recoverMAIN, maxPrimaryEND)),
+					CurrentAuxiliaryEND: Math.max(0, Math.min(currentAuxiliaryEND + recoverAUX, maxAuxiliaryEND))
+				});
+				
+				finishRoll(results.rollId, {});
+			});
+		});
+		
+		return;
+	}
 	
 	
 	/* -------------------------------------- */
@@ -17470,7 +17617,8 @@
 			
 			// Update cost		
 			setAttrs({
-				"primaryReserveCP": reserveCP
+				"primaryReserveCP": reserveCP,
+				"CurrentPrimaryEND_max": endValue
 			});
 		});
 	});
@@ -17488,10 +17636,12 @@
 			
 			// Update cost		
 			setAttrs({
-				"auxiliaryReserveCP": reserveCP
+				"auxiliaryReserveCP": reserveCP,
+				"CurrentAuxiliaryEND_max": endValue
 			});
 		});
 	});
+	
 	
 	// Combat Characteristics
 
@@ -17827,8 +17977,8 @@
 			setAttrs({
 				"hiddenSTUN": savedStatValue,
 				"stun": statValue,
-				"currentSTUN": statValue,
-				"currentSTUN_max": statValue
+				"CurrentSTUN": statValue,
+				"CurrentSTUN_max": statValue
 			});
 			
 			// Update characteristics cost
@@ -18565,13 +18715,13 @@
 					}
 				}
 				
-				theRoll	+= (subtractENDAmt ? "{{END=[[@{powerEND"+powerId+"}]] (@{currentEND})}}" : "");
+				theRoll	+= (subtractENDAmt ? "{{END=[[@{powerEND"+powerId+"}]] (@{CurrentEND})}}" : "");
 				theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 				
 				startRoll(theRoll, (results) => {
 					// Roll activation and effect dice. If the option to auto apply endurance is TRUE, subtract the power's END once from endurance.
-					
-					let theResult = new Object();
+					// 
+					// let theResult = new Object();
 					
 					// Subtract END cost if option checked.
 					if (subtractEND) {
@@ -21288,7 +21438,7 @@
 					} else {
 						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]-@{targetOCVPenalty}[TargetOCV]+@{ocvMod}[CSL]-@{rangeOCVPenalty}[RangeOCV]+(?{Modifiers|0})[Modifiers] ]]}}" + "{{Result=[[3d6cf6cs1]]}}";
 					}
-					theRoll	+= (subtractENDAmt ? "{{END=[[@{martialManeuverEndurance"+maneuverId+"}]] (@{currentEND})}}" : "");
+					theRoll	+= (subtractENDAmt ? "{{END=[[@{martialManeuverEndurance"+maneuverId+"}]] (@{CurrentEND})}}" : "");
 					theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 				} else if (isBlocking) {
 					// Use the Defense template for a block.					
@@ -21304,7 +21454,7 @@
 						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{ocvMod}[CSL]+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}} ";
 					}
 					if (subtractENDAmt != 0) {
-						theRoll	+= "{{END=[[@{martialManeuverEndurance"+maneuverId+"}]] (@{currentEND})}}";
+						theRoll	+= "{{END=[[@{martialManeuverEndurance"+maneuverId+"}]] (@{CurrentEND})}}";
 					}
 				} else if (isDodging) {
 					// Use the Defense template for a dodge.
@@ -21313,7 +21463,7 @@
 					theRoll += "{{label=DCV}}";
 					theRoll += "{{data="+netDCV+"}}";
 					if (subtractENDAmt != 0) {
-						theRoll	+= "{{END=[[@{martialManeuverEndurance"+maneuverId+"}]] (@{currentEND})}}";
+						theRoll	+= "{{END=[[@{martialManeuverEndurance"+maneuverId+"}]] (@{CurrentEND})}}";
 					}
 				} else {
 					return;
@@ -22662,7 +22812,7 @@
 					}
 				}
 				
-				theRoll	+= (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{currentEND})}}" : "");
+				theRoll	+= (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}]] (@{CurrentEND})}}" : "");
 				theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 				
 			} else if (values.maneuverSelection === "block") {
@@ -22677,7 +22827,7 @@
 				} else {
 					theRoll += "{{OCV=[[@{ocv}[OCV]+@{weaponOCV"+weaponId+"}[WeaponOCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isShield ? "+[[@{shieldDCV}]][ShieldDCV]" : "") + "+@{weaponPenalty"+weaponId+"}[Strength]+(?{Modifiers|0})[Modifiers]]]}} " + "{{Result=[[3d6cf6cs1]]}}";
 				}
-				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
+				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{CurrentEND})}}" : "");
 			}
 			
 			startRoll(theRoll, (results) => {
@@ -22845,7 +22995,7 @@
 				}
 				
 				if (subtractENDAmt != 0) {
-					theRoll	+= (subtractENDAmt ? "{{END=[[@{martialManeuverEndurance"+maneuverId+"}]] (@{currentEND})}}" : "");
+					theRoll	+= (subtractENDAmt ? "{{END=[[@{martialManeuverEndurance"+maneuverId+"}]] (@{CurrentEND})}}" : "");
 				}
 			} else {
 				// Use the attack roll template.
@@ -22892,7 +23042,7 @@
 					}
 				}
 				
-				theRoll	+= (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}+@{martialManeuverEndurance"+maneuverId+"}]] (@{currentEND})}}" : "");
+				theRoll	+= (subtractENDAmt ? "{{END=[[@{weaponEndurance"+weaponId+"}+@{martialManeuverEndurance"+maneuverId+"}]] (@{CurrentEND})}}" : "");
 				theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 			}
 			
@@ -22950,7 +23100,7 @@
 			theRoll += "{{subtitle=Dodges}} ";
 			theRoll += "{{label=DCV}}";
 			theRoll += "{{data="+netDCV+"}}";
-			theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
+			theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{CurrentEND})}}" : "");
 			
 			startRoll(theRoll, (results) => {
 				let theResult = new Object();
@@ -22990,7 +23140,7 @@
 			theRoll += "{{subtitle=Set}} ";
 			theRoll += "{{label=DCV}}";
 			theRoll += "{{data="+netDCV+"}}";
-			theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
+			theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{CurrentEND})}}" : "");
 			
 			startRoll(theRoll, (results) => {
 				let theResult = new Object();
@@ -23370,7 +23520,7 @@
 					}
 				}
 				
-				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}}" : "");
+				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{CurrentEND})}}" : "");
 				theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 				
 			} else if (values.maneuverSelection === "block") {
@@ -23386,7 +23536,7 @@
 					theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]+(?{Modifiers|0})[Modifiers]]]}} " + "{{Result=[[3d6cf6cs1]]}}";
 				}
 				
-				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
+				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{CurrentEND})}}" : "");
 			} else if (values.maneuverSelection === "grab") {
 				// Grab Roll
 				theRoll += "&{template:custom-contest} {{title=@{character_name}"+dingbat+"@{character_title}}}";
@@ -23400,7 +23550,7 @@
 					theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]-[[@{targetOCVPenalty}]][TargetOCV]+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}";
 				}
 				
-				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
+				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{CurrentEND})}}" : "");
 			} else if (values.maneuverSelection === "grabBy") {
 				// Grab By Roll
 				theRoll += "&{template:custom-contest} {{title=@{character_name}"+dingbat+"@{character_title}}}";
@@ -23414,7 +23564,7 @@
 					theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}";
 				}
 				
-				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{currentEND})}}" : "");
+				theRoll	+= (subtractENDAmt ? "{{END=[[@{hiddenBasicEndurance}]] (@{CurrentEND})}}" : "");
 				theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 				
 			} else if (values.maneuverSelection === "trip") {
@@ -23430,7 +23580,7 @@
 					theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]-[[@{targetOCVPenalty}]][TargetOCV]+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}";
 				}
 				
-				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{currentEND})}}" : "");
+				theRoll	+= (subtractENDAmt ? "{{END=[[1]] (@{CurrentEND})}}" : "");
 				theRoll += "{{" + damageLabel + " = [Roll](~hiddenDamageRoll)}}";
 			}
 			
