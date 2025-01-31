@@ -270,7 +270,7 @@
 					<input type="hidden" value="0" name="attr_flightMod" step="1" tabindex="47" title="@{flightMod}"/>
 				</div>
 				
-				<!-- Vehicle size attribute -->
+				<!-- Vehicle size details -->
 				<div class="item-characteristics-vehicle-size-attributes">
 					<div class="item-characteristics-size-attributes-row">
 						<h2>Mass</h2>
@@ -377,7 +377,88 @@
 					</div>
 				</div>
 				
+				<!-- Vehicle power systems -->
+				<div class="item-characteristics-vehicle-power-systems">
+					<div class="item-characteristics-power-system">
+						<input type="text" value="" placeholder="Primary Power System" name="attr_primaryReserveLabel" title="@{primaryReserveLabel}" maxlength="24" tabindex="61">
+						<div class="item-characteristics-power-system-block">
+							<div class="item-characteristics-power-system-row">
+								<h2>END</h2>
+								<input type="number" value="0" name="attr_primaryReserveEND" min ="0" step="4" tabindex="33" title="@{primaryReserveEND}"/>
+								<div class="subitem-characteristics-reserve-cost">
+									<h2>CP</h2>
+									<input type="text" value="0" name="attr_primaryReserveCP" readonly tabindex="-1" title="@{primaryReserveCP}"/>
+								</div>
+							</div>
+							<div class="item-characteristics-power-system-row">
+								<h2>REC</h2>
+								<input type="number" value="0" name="attr_primaryReserveREC" min ="0" step="3" tabindex="34" title="@{primaryReserveREC}"/>
+								<div class="custom-select-alternate">
+									<select name="attr_primaryReserveLIM" title="@{attr_primaryReserveLIM}" tabindex="-1">
+										<option value="0" selected>Limit</option>
+										<option value="0">0</option>
+										<option value="0.25">0.25</option>
+										<option value="0.50">0.50</option>
+										<option value="0.75">0.75</option>
+										<option value="1.00">1.00</option>
+										<option value="1.25">1.25</option>
+										<option value="1.50">1.50</option>
+										<option value="1.75">1.75</option>
+										<option value="2.00">2.00</option>
+										<option value="2.25">2.25</option>
+										<option value="2.50">2.50</option>
+										<option value="2.75">2.75</option>
+										<option value="3.00">3.00</option>
+									</select>
+								</div>
+							</div>
+							<div class="item-characteristics-power-system-row">
+								<textarea placeholder="Limitations" name="attr_primaryReserveText" title="@{primaryReserveText}" cols="18" rows="2" maxlength="50" tabindex="3"></textarea>
+							</div>
+						</div>
+					</div>
+					
+					<div class="item-characteristics-power-system">
+						<input type="text" value="" placeholder="Auxiliary Power" name="attr_auxiliaryReserveLabel" title="@{auxiliaryReserveLabel}" maxlength="24" tabindex="61">
+						<div class="item-characteristics-power-system-block">
+							<div class="item-characteristics-power-system-row">
+								<h2>END</h2>
+								<input type="number" value="0" name="attr_auxiliaryReserveEND" step="4" min ="0" tabindex="33" title="@{auxiliaryReserveEND}"/>
+								<div class="subitem-characteristics-reserve-cost">
+									<h2>CP</h2>
+									<input type="text" value="0" name="attr_auxiliaryReserveCP" readonly tabindex="-1" title="@{attr_auxiliaryReserveCP}"/>
+								</div>
+							</div>
+							<div class="item-characteristics-power-system-row">
+								<h2>REC</h2>
+								<input type="number" value="0" name="attr_auxiliaryReserveREC" min ="0" step="3" tabindex="34" title="@{auxiliaryReserveREC}"/>
+								<div class="custom-select-alternate">
+									<select name="attr_auxiliaryReserveLIM" title="@{attr_auxiliaryReserveLIM}" tabindex="-1">
+										<option value="0" selected>Limit</option>
+										<option value="0">0</option>
+										<option value="0.25">0.25</option>
+										<option value="0.50">0.50</option>
+										<option value="0.75">0.75</option>
+										<option value="1.00">1.00</option>
+										<option value="1.25">1.25</option>
+										<option value="1.50">1.50</option>
+										<option value="1.75">1.75</option>
+										<option value="2.00">2.00</option>
+										<option value="2.25">2.25</option>
+										<option value="2.50">2.50</option>
+										<option value="2.75">2.75</option>
+										<option value="3.00">3.00</option>
+									</select>
+								</div>
+							</div>
+							<div class="item-characteristics-power-system-row">
+								<textarea placeholder="Limitations" name="attr_auxiliaryReserveText" title="@{auxiliaryReserveText}" cols="18" rows="2" maxlength="50" tabindex="3"></textarea>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
+			
 		</div>
 		
 		<div class="grid-container-characteristics-rightGrid">
@@ -17370,6 +17451,45 @@
 			}
 			
 			setAttrs(attributes);
+		});
+	});
+	
+	
+	// Vehicle Power Systems
+	
+	on("change:primaryReserveEND change:primaryReserveREC change:primaryReserveLIM", function () {
+		getAttrs(["primaryReserveEND", "primaryReserveREC", "primaryReserveLIM"], function(values) {
+		  
+			const endValue = Math.max(0, parseInt(values.primaryReserveEND)||0);
+			const recValue = Math.max(0, parseInt(values.primaryReserveREC)||0);
+			const limValue = Math.max(0, parseFloat(values.primaryReserveLIM)||0);
+			const endCost = 1;
+			const recCost = 2;
+			
+			let reserveCP = heroRoundLow( (endCost * Math.floor(endValue/4) + recCost * Math.floor(recValue/3))/(1+limValue) );	
+			
+			// Update cost		
+			setAttrs({
+				"primaryReserveCP": reserveCP
+			});
+		});
+	});
+	
+	on("change:auxiliaryReserveEND change:auxiliaryReserveREC change:auxiliaryReserveLIM", function () {
+		getAttrs(["auxiliaryReserveEND", "auxiliaryReserveREC", "auxiliaryReserveLIM"], function(values) {
+		  
+			const endValue = Math.max(0, parseInt(values.auxiliaryReserveEND)||0);
+			const recValue = Math.max(0, parseInt(values.auxiliaryReserveREC)||0);
+			const limValue = Math.max(0, parseFloat(values.auxiliaryReserveLIM)||0);
+			const endCost = 1;
+			const recCost = 2;
+			
+			let reserveCP = heroRoundLow( (endCost * Math.ceil(endValue/4) + recCost * Math.ceil(recValue/3))/(1+limValue) );	
+			
+			// Update cost		
+			setAttrs({
+				"auxiliaryReserveCP": reserveCP
+			});
 		});
 	});
 	
