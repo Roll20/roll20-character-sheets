@@ -7,6 +7,7 @@ const INFO = 2;
 const WARNING = 3;
 const ERROR = 4;
 
+const ERRATA_FIELD = 'errata';
 const PSIONICS_HANDBOOK = 'The Complete Psionics Handbook';
 
 const BOOK_FIELDS = [
@@ -1165,21 +1166,21 @@ function parseSpheres(spheresStrings, regex) {
 
 const getSpellSchools = function (spell, books) {
     let schoolRules = getActiveSettings(SCHOOL_FIELDS, books);
-    return spell['school'] + `%NEWLINE%S&M: (${spell[SCHOOL_SPELLS_AND_MAGIC]})`;
-    // return schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
-    //     ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
-    //     : spell['school'];
+    //return spell['school'] + `%NEWLINE%S&M: (${spell[SCHOOL_SPELLS_AND_MAGIC]})`;
+    return schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
+         ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
+         : spell['school'];
 }
 
 const getSpellSpheres = function (spell, sphereRules) {
-    return spell['sphere'] + `%NEWLINE%Druid: ${spell['sphere-druids']}%NEWLINE%Necro: ${spell['sphere-necromancers']}%NEWLINE%S&M: ${spell[SPHERE_SPELLS_AND_MAGIC]}`
+    // return spell['sphere'] + `%NEWLINE%Druid: ${spell['sphere-druids']}%NEWLINE%Necro: ${spell['sphere-necromancers']}%NEWLINE%S&M: ${spell[SPHERE_SPELLS_AND_MAGIC]}`
 
-    // if (sphereRules.has(SPHERE_SPELLS_AND_MAGIC))
-    //     return spell[SPHERE_SPELLS_AND_MAGIC] || spell['sphere'];
+    if (sphereRules.has(SPHERE_SPELLS_AND_MAGIC))
+        return spell[SPHERE_SPELLS_AND_MAGIC] || spell['sphere'];
 
-    // let sphere = spell['sphere'];
-    // sphereRules.forEach(rule => sphere += spell[rule] || '');
-    // return sphere;
+    let sphere = spell['sphere'];
+    sphereRules.forEach(rule => sphere += spell[rule] || '');
+    return sphere;
 }
 
 function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, activeBooks, optionalSpheres) {
@@ -1403,7 +1404,7 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
         let levelField = isPriest ? 'level-priest' : 'level-wizard';
         let className = isPriest ? 'Priest' : 'Wizard';
 
-        getAttrs([...BOOK_FIELDS, ...optionalRulesFields, levelField], function(books) {
+        getAttrs([...BOOK_FIELDS, ...optionalRulesFields, levelField, ERRATA_FIELD], function(books) {
             if (bookInactiveShowToast(books, spell))
                 return;
 
@@ -1431,7 +1432,7 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
                 [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
                 [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
                 [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-                [`repeating_spells-${section}_spell-reference`]    : displayReference(spell),
+                [`repeating_spells-${section}_spell-reference`]    : displayReference(spell, books),
                 [`repeating_spells-${section}_spell-subtlety`]     : spell['subtlety'] || '',
                 [`repeating_spells-${section}_spell-sensory`]      : spell['sensory'] || '',
                 [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
@@ -1489,12 +1490,13 @@ const displaySpellLevel = function(level, className) {
         : `Level ${level} ${className}`;
 }
 
-const displayReference = function(spell) {
+const displayReference = function(spell, books) {
     let reference = `${spell['book']} ${spell['reference']}`
     if (spell['book-compendium'])
         reference += `\n${spell['book-compendium']}`;
 
-    if (spell['errata'])
+    let activeSettings = getActiveSettings([ERRATA_FIELD], books);
+    if (activeSettings.has(ERRATA_FIELD) && spell['errata'])
         reference += `\n${spell['errata']}`;
 
     return reference;
