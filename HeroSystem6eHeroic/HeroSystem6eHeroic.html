@@ -9841,12 +9841,12 @@
 					</label>
 				</div>
 				<div class="item-health-stat">
-					<input type="text" name="attr_CurrentSTUN" title="@{CurrentSTUN}" value="20" maxlength="3" pattern="[0-9]+" tabindex="-1"/>
-					<div class="item-health-stat-plus-minus-enclosure ">
-						<button type="action" class="button buttonPlus" tabindex="-1" name="act_stunPlus">
+					<input type="text" name="attr_CurrentPrimaryEND" title="@{CurrentPrimaryEND}" value="20" maxlength="3" pattern="[0-9]+" tabindex="51"/>
+					<div class="item-health-stat-plus-minus-enclosure">
+						<button type="action" class="button buttonPlus" tabindex="-1" name="act_primaryPlus">
 							<span>&#10095;</span>
 						</button>
-						<button type="action" class="button buttonMinus" tabindex="-1" name="act_stunMinus">
+						<button type="action" class="button buttonMinus" tabindex="-1" name="act_primaryMinus">
 							<span>&#10094;</span>
 						</button>
 					</div>
@@ -9862,12 +9862,12 @@
 					</label>
 				</div>
 				<div class="item-health-stat">
-					<input type="text" name="attr_CurrentEND" title="@{CurrentEND}" value="20" maxlength="3" pattern="[0-9]+" tabindex="-1"/>
-					<div class="item-health-stat-plus-minus-enclosure ">
-						<button type="action" class="button buttonPlus" tabindex="-1" name="act_endurancePlus">
+					<input type="text" name="attr_CurrentAuxiliaryEND" title="@{CurrentAuxiliaryEND}" value="20" maxlength="3" pattern="[0-9]+" tabindex="52"/>
+					<div class="item-health-stat-plus-minus-enclosure">
+						<button type="action" class="button buttonPlus" tabindex="-1" name="act_auxiliaryPlus">
 							<span>&#10095;</span>
 						</button>
-						<button type="action" class="button buttonMinus" tabindex="-1" name="act_enduranceMinus">
+						<button type="action" class="button buttonMinus" tabindex="-1" name="act_auxiliaryMinus">
 							<span>&#10094;</span>
 						</button>
 					</div>
@@ -17134,15 +17134,26 @@
 	// Subtract X from CurrentEND.
 	// Used for power and attack buttons.
 	function subtractEndurance(enduranceSpent) {
-		getAttrs(["CurrentEND"], function(values) {
-			let currentValue = parseInt(values.CurrentEND)||0;
+		getAttrs(["CurrentEND", "CurrentPrimaryEND", "CurrentAuxiliaryEND", "activeReserve", "useVehicleAttributes"], function(values) {
+			var attributes = new Object();
+			const isVehicle = (values.useVehicleAttributes === "on" ) ? true : false;
 			
-			currentValue = currentValue - enduranceSpent;
+			let currentValue;
 			
-			// Attempt to correct negative END values.
-			setAttrs({
-				"CurrentEND":Math.max(0,currentValue)
-			});
+			if (isVehicle) {
+				if ( (parseInt(values.activeReserve)||0) === 0) {
+					currentValue = parseInt(values.CurrentPrimaryEND)||0;
+					attributes.CurrentPrimaryEND = Math.max(0, (currentValue - enduranceSpent)); 
+				} else {
+					currentValue = parseInt(values.CurrentAuxiliaryEND)||0;
+					attributes.CurrentAuxiliaryEND = Math.max(0, (currentValue - enduranceSpent)); 
+				}
+			} else {
+				currentValue = parseInt(values.CurrentEND)||0;
+				attributes.CurrentEND = Math.max(0, (currentValue - enduranceSpent)); 
+			}
+			
+			setAttrs(attributes);
 		});
 	}
 	
@@ -17242,8 +17253,8 @@
 	// Synchronize reserve selections.
 	on("change:reserveSelectChar change:reserveSelectGear change:reserveSelectPowers", function () {
 		getAttrs(["reserveSelectChar", "reserveSelectGear", "reserveSelectPowers"], function(values) {
-			
 			let newSelection;
+			
 			const charSelect = parseInt(values.reserveSelectChar)||0;
 			const gearSelect = parseInt(values.reserveSelectGear)||0;
 			const powerSelect = parseInt(values.reserveSelectPowers)||0;
