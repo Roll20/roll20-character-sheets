@@ -327,7 +327,7 @@
 						<h2>OCV</h2>
 						<input type="number" value="3" name="attr_ocv" min="0" tabindex="18" title="@{ocv}"/>
 						<input type="number" value="0" name="attr_ocvMod" tabindex="19" title="@{ocvMod}"/>
-						<h2>&#8205;</h2> <!-- Invisible character -->
+						<h2>&#8205;</h2>
 						<input type="text" value="0" name="attr_ocvCP" readonly tabindex="-1" title="@{ocvCP}"/>
 					</div>
 					
@@ -336,7 +336,7 @@
 						<h2>DCV</h2>
 						<input type="number" value="3" name="attr_dcv" min="0" tabindex="20" title="@{dcv}"/>
 						<input type="number" value="0" name="attr_dcvMod" tabindex="21" title="@{dcvMod}"/>
-						<h2>&#8205;</h2> <!-- Invisible character -->
+						<h2>&#8205;</h2>
 						<input type="text" value="0" name="attr_dcvCP" readonly tabindex="-1" title="@{dcvCP}"/>
 					</div>
 					
@@ -345,7 +345,7 @@
 						<h2>Speed</h2>
 						<input type="number" value="2" name="attr_speed" min="1" max="12" tabindex="26" title="@{speed}"/>
 						<input type="number" value="0" name="attr_speedMod" tabindex="27" title="@{speedMod}"/>
-						<h2>&#8205;</h2> <!-- Invisible character -->
+						<h2>&#8205;</h2>
 						<input type="text" value="0" name="attr_speedCP" readonly tabindex="-1" title="@{speedCP}"/>
 					</div>
 					
@@ -354,7 +354,7 @@
 						<h2>PD</h2>
 						<input type="number" value="2" name="attr_pd" min="0" tabindex="28" title="@{pd}"/>
 						<input type="number" value="0" name="attr_pdMod" tabindex="29" title="@{pdMod}"/>
-						<h2>&#8205;</h2> <!-- Invisible character -->
+						<h2>&#8205;</h2>
 						<input type="text" value="0" name="attr_pdCP" readonly tabindex="-1" title="@{pdCP}"/>
 					</div>
 					
@@ -363,7 +363,7 @@
 						<h2>ED</h2>
 						<input type="number" value="2" name="attr_ed" min="0" tabindex="30" title = "@{ed}"/>
 						<input type="number" value="0" name="attr_edMod" tabindex="31" title = "@{edMod}"/>
-						<h2>&#8205;</h2> <!-- Invisible character -->
+						<h2>&#8205;</h2>
 						<input type="text" value="0" name="attr_edCP" readonly tabindex="-1" title="@{edCP}"/>
 					</div>
 					
@@ -372,7 +372,7 @@
 						<h2>Body</h2>
 						<input type="number" value="10" name="attr_body" min ="1" tabindex="32" title="@{body}"/>
 						<input type="number" value="0" name="attr_bodyMod" tabindex="33" title="@{bodyMod}"/>
-						<h2>&#8205;</h2> <!-- Invisible character -->
+						<h2>&#8205;</h2>
 						<input type="text" value="0" name="attr_bodyCP" readonly tabindex="-1" title="@{bodyCP}"/>
 					</div>
 				</div>
@@ -17371,7 +17371,11 @@
 		// All character attributes added in one function to avoid getAttrs() limitations.
 		
 		// Add attribute costs in one go
-		getAttrs(["strengthCP","dexterityCP","constitutionCP","intelligenceCP","egoCP","presenceCP","ocvCP","dcvCP","omcvCP","dmcvCP","speedCP","pdCP","edCP","bodyCP","stunCP","enduranceCP","recoveryCP","runningCP","leapingCP","swimmingCP"], function(values) {
+		getAttrs(["strengthCP", "dexterityCP", "constitutionCP", "intelligenceCP", "egoCP", "presenceCP", "ocvCP", "dcvCP", "omcvCP", "dmcvCP","speedCP", "pdCP", "edCP", "bodyCP", "stunCP", "enduranceCP", "recoveryCP", "runningCP", "leapingCP", "swimmingCP", "useVehicleAttributes", "sizeCP", "primaryReserveCP", "auxiliaryReserveCP"], function(values) {
+				const isVehicle = (values.useVehicleAttributes === "on" ) ? true : false;
+				
+				const sizeCost = parseInt(values.sizeCP)||0;
+				
 				const strengthCost = parseInt(values.strengthCP)||0;
 				const dexterityCost = parseInt(values.dexterityCP)||0;
 				const constitutionCost = parseInt(values.constitutionCP)||0;
@@ -17393,15 +17397,32 @@
 				const endCost = parseInt(values.enduranceCP)||0;
 				const recCost = parseInt(values.recoveryCP)||0;
 				
+				const primaryReserveCost = parseInt(values.primaryReserveCP)||0;
+				const auxiliaryReserveCost = parseInt(values.auxiliaryReserveCP)||0;
+				
 				const runningCost = parseInt(values.runningCP)||0;
 				const leapingCost = parseInt(values.leapingCP)||0;
 				const swimmingCost = parseInt(values.swimmingCP)||0;
 				
-				let primaryAttributesCost = strengthCost+dexterityCost+constitutionCost+intelligenceCost+egoCost+presenceCost;	
-				let combatValuesCost = ocvCost+dcvCost+omcvCost+dmcvCost;
-				let defenseCost = pdCost+edCost;
-				let healthCost = bodyCost+stunCost+endCost+recCost;
-				let movementCost = runningCost+leapingCost+swimmingCost;
+				let primaryAttributesCost = 0;
+				let combatValuesCost = 0;
+				let defenseCost = 0;
+				let healthCost = 0;
+				let movementCost = 0;
+				
+				if (isVehicle) {
+					primaryAttributesCost = strengthCost+dexterityCost+sizeCost;	
+					combatValuesCost = ocvCost+dcvCost;
+					defenseCost = pdCost+edCost;
+					healthCost = bodyCost+primaryReserveCost+auxiliaryReserveCost;
+					movementCost = runningCost+leapingCost+swimmingCost;
+				} else {
+					primaryAttributesCost = strengthCost+dexterityCost+constitutionCost+intelligenceCost+egoCost+presenceCost;	
+					combatValuesCost = ocvCost+dcvCost+omcvCost+dmcvCost;
+					defenseCost = pdCost+edCost;
+					healthCost = bodyCost+stunCost+endCost+recCost;
+					movementCost = runningCost+leapingCost+swimmingCost;
+				}
 				
 				let characterAttributeCost = primaryAttributesCost+combatValuesCost+speedCost+defenseCost+healthCost+movementCost;
 				
@@ -17771,6 +17792,9 @@
 			}
 			
 			setAttrs(attributes);
+			
+			// Update totals
+			sumCharacteristicPoints();
 		});
 	});
 	
@@ -17788,11 +17812,14 @@
 			
 			let reserveCP = heroRoundLow( (endCost * Math.floor(endValue/4) + recCost * Math.floor(recValue/3))/(1+limValue) );	
 			
-			// Update cost		
+			// Update cost
 			setAttrs({
 				"primaryReserveCP": reserveCP,
 				"CurrentPrimaryEND_max": endValue
 			});
+			
+			// Update totals
+			sumCharacteristicPoints();
 		});
 	});
 	
@@ -17807,11 +17834,14 @@
 			
 			let reserveCP = heroRoundLow( (endCost * Math.ceil(endValue/4) + recCost * Math.ceil(recValue/3))/(1+limValue) );	
 			
-			// Update cost		
+			// Update cost	
 			setAttrs({
 				"auxiliaryReserveCP": reserveCP,
 				"CurrentAuxiliaryEND_max": endValue
 			});
+			
+			// Update totals
+			sumCharacteristicPoints();
 		});
 	});
 	
@@ -17843,7 +17873,7 @@
 				"ephemeralOCV": Math.max(0, statValue + statMod)
 			});
 			
-			// Update costs
+			// Update totals
 			sumCharacteristicPoints();
 		});
 	});
@@ -17876,7 +17906,7 @@
 	
 	// Update Defensive Combat Value and hidden attribute currentDCV
 	on("change:dcv change:dcvMod change:weightDexDCVPenalty change:shieldDCV change:shieldCarried change:bonusDCVmodifier change:useCharacteristicMaximums change:optionTakesNoSTUN", function () {
-		getAttrs(["dcv", "dcvMod", "useCharacteristicMaximums", "weightDexDCVPenalty","shieldDCV", "shieldCarried", "bonusDCVmodifier", "optionTakesNoSTUN"], function(values) {
+		getAttrs(["dcv", "dcvMod", "useCharacteristicMaximums", "weightDexDCVPenalty", "shieldDCV", "shieldCarried", "bonusDCVmodifier", "optionTakesNoSTUN"], function(values) {
 		  
 			const statValue = parseInt(values.dcv)||0;
 			const shieldBonus = parseInt(values.shieldDCV)||0;
