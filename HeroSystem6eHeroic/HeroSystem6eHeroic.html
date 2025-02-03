@@ -379,7 +379,7 @@
 				
 				<div class="item-characteristics-vehicle-propulsion-systems">
 					<div class="item-characteristics-propulsion-system">
-						<input type="text" value="" placeholder="Propulsion System" name="attr_primaryPropulsionLabel" title="@{secondaryPropulsionLabel}" maxlength="24" tabindex="61">
+						<input type="text" value="" placeholder="Propulsion System" name="attr_primaryPropulsionLabel" title="@{primaryPropulsionLabel}" maxlength="24" tabindex="61">
 						<div class="item-characteristics-propulsion-system-block">
 							
 							<div class="item-characteristics-propulsion-system-row">
@@ -401,7 +401,7 @@
 							</div>
 							<div class="item-characteristics-propulsion-system-row">
 								<div class="subitem-characteristics-system-value">
-									<h2>Value</h2>
+									<h2>Base</h2>
 									<input type="number" value="0" name="attr_primaryPropulsion" min="0" step="1" tabindex="46" title="@{primaryPropulsion}"/>
 								</div>
 								<div class="custom-select-alternate">
@@ -435,8 +435,6 @@
 										<option value="2.50">2.50</option>
 										<option value="2.75">2.75</option>
 										<option value="3.00">3.00</option>
-										<!-- <option value="MPf">MP f</option>
-										<option value="MPv">MP v</option> -->
 									</select>
 								</div>
 							</div>
@@ -447,7 +445,6 @@
 					</div>
 					
 					<div class="item-characteristics-propulsion-system">
-						<div class="item-characteristics-propulsion-system">
 						<input type="text" value="" placeholder="Propulsion System" name="attr_secondaryPropulsionLabel" title="@{secondaryPropulsionLabel}" maxlength="24" tabindex="61">
 						<div class="item-characteristics-propulsion-system-block">
 							
@@ -470,7 +467,7 @@
 							</div>
 							<div class="item-characteristics-propulsion-system-row">
 								<div class="subitem-characteristics-system-value">
-									<h2>Value</h2>
+									<h2>Base</h2>
 									<input type="number" value="0" name="attr_secondaryPropulsion" min="0" step="1" tabindex="46" title="@{secondaryPropulsion}"/>
 								</div>
 								<div class="custom-select-alternate">
@@ -504,8 +501,6 @@
 										<option value="2.50">2.50</option>
 										<option value="2.75">2.75</option>
 										<option value="3.00">3.00</option>
-										<!-- <option value="MPf">MP f</option>
-										<option value="MPv">MP v</option> -->
 									</select>
 								</div>
 							</div>
@@ -514,6 +509,7 @@
 							</div>
 						</div>
 					</div>
+					
 				</div>
 				
 				<!-- Vehicle power systems -->
@@ -594,6 +590,15 @@
 								<textarea placeholder="Limitations" name="attr_auxiliaryReserveText" title="@{auxiliaryReserveText}" cols="18" rows="2" maxlength="50" tabindex="3"></textarea>
 							</div>
 						</div>
+					</div>
+				</div>
+				
+				<!-- Vehicle systems power/END draw -->
+				<div class="item-characteristics-vehicle-power-draw">
+					<div class="item-characteristics-size-attributes-row">
+						<h2>Systems Power Draw</h2>
+						<input type="number" value="0" name="attr_systemsEND" step="1" tabindex="45" title="@{systemsEND}"/>
+						<button type="action" class="button button-Power-END" tabindex="-1" name="act_buttonSystemsEND" title="%{buttonSystemsEND}	" tabindex="-1">END</button>
 					</div>
 				</div>
 			</div>
@@ -17544,32 +17549,32 @@
 				const swimmingCost = parseInt(values.swimmingCP)||0;
 				const primaryPropulsionCost = parseInt(values.primaryPropulsionCP)||0;
 				const secondaryPropulsionCost = parseInt(values.secondaryPropulsionCP)||0;
-				const baseMoveCredit = -16;
+				const baseMoveCredit = -14;
 				
-				let primaryAttributesCost = 0;
+				let characterAttributesCost = 0;
 				let combatValuesCost = 0;
 				let defenseCost = 0;
 				let healthCost = 0;
 				let movementCost = 0;
 				
 				if (isVehicle) {
-					primaryAttributesCost = strengthCost+dexterityCost+sizeCost;	
+					characterAttributesCost = strengthCost+dexterityCost+sizeCost;	
 					combatValuesCost = ocvCost+dcvCost;
 					defenseCost = pdCost+edCost;
 					healthCost = bodyCost+primaryReserveCost+auxiliaryReserveCost;
-					movementCost = runningCost+leapingCost+swimmingCost;
+					movementCost = primaryPropulsionCost+secondaryPropulsionCost+baseMoveCredit;
 				} else {
-					primaryAttributesCost = strengthCost+dexterityCost+constitutionCost+intelligenceCost+egoCost+presenceCost;	
+					characterAttributesCost = strengthCost+dexterityCost+constitutionCost+intelligenceCost+egoCost+presenceCost;	
 					combatValuesCost = ocvCost+dcvCost+omcvCost+dmcvCost;
 					defenseCost = pdCost+edCost;
 					healthCost = bodyCost+stunCost+endCost+recCost;
-					movementCost = primaryPropulsionCost+secondaryPropulsionCost+baseMoveCredit;
+					movementCost = runningCost+leapingCost+swimmingCost;
 				}
 				
-				let characterAttributeCost = primaryAttributesCost+combatValuesCost+speedCost+defenseCost+healthCost+movementCost;
+				let netCost = Math.max(0, characterAttributesCost+combatValuesCost+speedCost+defenseCost+healthCost+movementCost);
 				
 			setAttrs({
-					"characteristicsCost":parseInt(characterAttributeCost)
+				"characteristicsCost": netCost
 			});
 		});
 	}
@@ -17984,6 +17989,13 @@
 			
 			// Update totals
 			sumCharacteristicPoints();
+		});
+	});
+	
+	/* Use power systems draw button */
+	on("clicked:buttonSystemsEND", function() {
+		getAttrs(["systemsEND"], function(values) {
+			subtractEndurance( Math.max(0, parseInt(values.systemsEND||0)) );
 		});
 	});
 	
