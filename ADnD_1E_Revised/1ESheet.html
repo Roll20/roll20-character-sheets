@@ -63,12 +63,14 @@
             <span class="left">
               <span>v<span name="attr_sheet_version">
             </span>
-            <span class="right"> • 1/24/25'</span>
+            <span class="right"> • 2/2/25'</span>
           </h5>
           <ul>
+            <li>Added an option to the Attack Matrix/THAC0 section to sync to-Hit values to a class. Table data will continue to auto-adjust whenever the class level changes. Multi/Dual-class characters should choose the most favorable class. Class names entered on the sheet need to match one of the core 1e classes in order for this option to work.</li>
             <li>Added an option to use a 5% progression based to-Hit table for Fighters. (DMG p74) Use 5% checkbox added to Settings|Misc. Options and inside the Attack/THAC0 Matrix window.</li>
             <li>Attack/THACO Matrix section has been updated so that it's opened/closed state will remain persistent. It will be open by default on new sheets.</li>
             <li>Removed the character_name validation warning for the use of commas within a character's name.</li>
+            <li>Removed alternating row background-color from the &{template:attacks} roll template.</li>
             <li>AC calculation updated: check added to remove low Dex penalties beyond AC 10. "Armor class below 10 is not possible except through cursed items." DMG p73</li>
             <li>Added formatting for chat menu and api button links in the roll template. Including a backtick just inside the first parenthesis of the button macro removes the default sheet formatting & roll20's default pink text. ie [Click Me](`~some_ability)</li>
             <li>Improved the roll template's allprops schema to better handle custom key=value pairs.{{sans equal sign text is centered}}, {{=%NEWLINE% empty on the left, text aligns to the right}} {{empty on the right, text aligns to the left=%NEWLINE%}} Use %NEWLINE% or carriage returns inside of the roll template to create new rows within the same key.</li>
@@ -2788,47 +2790,49 @@
         </div>
         <span class="material-icons"></span>
         <div class="sect border">
+          <input type="checkbox" class="toggle-matrix-autofill hidden" name="attr_autofill_matrix" value="1" checked />
+          <input type="checkbox" class="toggle-sync-class hidden" name="attr_sync_matrix_class" value="1" />
           <input type="hidden" class="toggle-fighter5 hidden" name="attr_matrix_class" value="0" />
           <input type="checkbox" class="toggle-matrixhd hidden" name="attr_toggle_matrixhd" value="1" />
           <div class="matrix-class">
             <label class="inline-label" title="@{autofill_matrix} | Let the sheet auto-fill the to-hit tables when the class and level selectors are changed in the attack Matrix window. NOTE: The Autofill Table option uses the 1e table data to establish the base THAC0, but it does not use the repeating 20's.">
-              <input type="checkbox" name="attr_autofill_matrix" value="1" checked />
               <h4>Autofill Table:</h4>
+              <input type="checkbox" name="attr_autofill_matrix" value="1" checked />
             </label>
-            <label><span>Class</span></label>
-            <label></label>
+            <label class="show-sync-class"></label>
+            <label class="show-sync-class"><span>Class</span></label>
             <label class="matrix-level"><span>Level</span></label>
             <label class="matrix-hd"><span>HD/Lvl</span></label>
             <label><span>Use Table</span></label>
-            <label class="fighter5 matrix-level" title="@{toggle_fighter5} | Use a 5% progression to-hit table. This is a Fighter only option and will have no effect for other classes.">
+            <label class="fighter5 matrix-level" title="@{toggle_fighter5} | Use a 5% progression to-Hit table. This is a Fighter only option and will have no effect for other classes.">
               <span>Use 5%</span>
               <input type="checkbox" class="hidden" name="attr_toggle_fighter5" value="1">
             </label>
 
-            <label class="inline-label" title="@{sync_matrix_class} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes.">
-              <input type="checkbox" name="attr_sync_matrix_class" value="1" checked />
+            <label class="inline-label" title="@{sync_matrix_class} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes. Note: multi-class/dual-class characters should pick the most favorable class.">
               <h4>Sync to Class:</h4>
+              <input type="checkbox" name="attr_sync_matrix_class" value="1" />
             </label>
-            <label>
-              <select class="class-selected width-large border" name="attr_class_selected" title="@{class_selected} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes.">
-                <option value="0" style="font-weight: bold;" selected>~ Select ~</option>
-                <option value="1">Class 1</option>
+            <label class="show-sync-class">
+              <select class="class-selected border" name="attr_class_selected" title="@{class_selected} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes. Note: multi-class/dual-class characters should pick the most favorable class.">
+                <option value="1" selected>Class 1</option>
                 <option value="2">Class 2</option>
                 <option value="3">Class 3</option>
-                <option value="4">Monster</option>
               </select>
             </label>
-            <label>
+            <label class="show-sync-class">
               <input type="hidden" class="class-selected" name="attr_class_selected" value="0" />
               <input class="show-none" placeholder="n/a" readonly />
               <input class="show-class1-name" name="attr_class" title="@{class}" placeholder="n/a" readonly />
               <input class="show-class2-name" name="attr_secondclass" title="@{secondclass}" placeholder="n/a" readonly />
               <input class="show-class3-name" name="attr_thirdclass" title="@{thirdclass}" placeholder="n/a" readonly />
-              <input class="show-monster-name" placeholder="Monster HD" readonly />
             </label>
-            <label class="matrix-level">
-              <!-- calc this attr based on the class selected -->
-              <input class="width-small border" type="number" min="0" name="attr_matrix_level" value="1" title="@{matrix_level}" />
+            <!-- calc this attr based on the class selected -->
+            <label class="matrix-level show-sync-class">
+              <input class="width-small border" type="number" name="attr_matrix_level" value="1" title="@{matrix_level}" readonly />
+            </label>
+            <label class="matrix-level show-when-not-synced">
+              <input class="width-small border" type="number" name="attr_matrix_level" value="1" title="@{matrix_level}" />
             </label>
             <label class="matrix-hd">
               <select class="width-small-plus border" name="attr_matrix_hitdice" title="@{matrix_hitdice}">
@@ -2847,9 +2851,9 @@
                 <option value="12">16+</option>
               </select>
             </label>
-            <label class="width-large">
-              <select class="width-fill border" name="attr_matrix_class" title="@{matrix_class}">
-                <option value="0" selected style="font-weight: bold;">~ Select Class or Monster ~</option>
+            <label class="width-auto show-sync-class" title="@{matrix_class}">
+              <select class="border readonly" name="attr_matrix_class" style="pointer-events: none;">
+                <option value="0" selected style="font-weight: bold;">Select a Class</option>
                 <option value="1">Cleric, Druid or Monk</option>
                 <option value="2">Fighter, Paladin, Ranger or Bard</option>
                 <option value="3">Magic-User or Illusionist</option>
@@ -2858,7 +2862,18 @@
                 <option value="5">Monster</option>
               </select>
             </label>
-            <label class="fighter5 matrix-level" title="@{toggle_fighter5} | Use a 5% progression to-hit table. This is a Fighter only option and will have no effect for other classes.">
+            <label class="width-auto show-when-not-synced">
+              <select class="border" name="attr_matrix_class" title="@{matrix_class}">
+                <option value="0" selected style="font-weight: bold;">Select a Class or Monster</option>
+                <option value="1">Cleric, Druid or Monk</option>
+                <option value="2">Fighter, Paladin, Ranger or Bard</option>
+                <option value="3">Magic-User or Illusionist</option>
+                <option value="4">Thief or Assassin</option>
+                <option value="6">0-lvl Halfling or Human</option>
+                <option value="5">Monster</option>
+              </select>
+            </label>
+            <label class="fighter5 matrix-level" title="@{toggle_fighter5} | Use a 5% progression to-Hit table. This is a Fighter only option and will have no effect for other classes.">
               <input type="checkbox" name="attr_toggle_fighter5" value="1">
             </label>
           </div>
@@ -4517,7 +4532,7 @@
             <span>Use THAC0:</span>
             <input type="checkbox" name="attr_toggle_to_hit_table" value="1" />
           </label>
-          <label title="@{toggle_fighter5} | Use a 5% progression to-hit table. This is a Fighter only option and will have no effect for other classes.">
+          <label title="@{toggle_fighter5} | Use a 5% progression to-Hit table. This is a Fighter only option and will have no effect for other classes.">
             <span>Use Fighter 5%:</span>
             <input type="checkbox" name="attr_toggle_fighter5" value="1" />
           </label>
@@ -11275,6 +11290,22 @@
     });
   });
 
+  // match class name to core class & return # for hit table lookup
+  function matchClassName(name) {
+    const lowerCaseName = name.toLowerCase();
+    if (/cleric|druid|monk/.test(lowerCaseName)) {
+      return 1;
+    } else if (/fighter|paladin|ranger|bard|cavalier|barbarian/.test(lowerCaseName)) {
+      return 2;
+    } else if (/magic-user|illusionist|magic|mage/.test(lowerCaseName)) {
+      return 3;
+    } else if (/thief|assassin|rogue|thief-acrobat|acrobat/.test(lowerCaseName)) {
+      return 4;
+    } else {
+      return 99;
+    }
+  }
+
   // THAC0
   function calcThac0() {
     getAttrs(['thac00', 'autofill_matrix'], (v) => {
@@ -11310,7 +11341,7 @@
   // Attack Matrix Autofill To-Hit table
   on('change:matrix_class change:matrix_level change:matrix_hitdice change:autofill_matrix change:sync_matrix_class change:toggle_fighter5 change:class_selected change:level change:level_2 change:level_3', (eventInfo) => {
     // clog(`Matrix Autofill Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(['matrix_class', 'matrix_level', 'matrix_hitdice', 'autofill_matrix', 'toggle_fighter5', 'sync_matrix_class', 'class_selected', 'level', 'level_2', 'level_3'], (v) => {
+    getAttrs(['matrix_class', 'matrix_level', 'matrix_hitdice', 'autofill_matrix', 'toggle_fighter5', 'sync_matrix_class', 'class_selected', 'class', 'secondclass', 'thirdclass', 'level', 'level_2', 'level_3'], (v) => {
       const output = {};
       const autocalcFill = +v.autofill_matrix || 0;
       const syncClass = +v.sync_matrix_class || 0;
@@ -11318,25 +11349,35 @@
       if (!autocalcFill) return;
       const classLinked = +v.class_selected || 0;
       let levelSelected = +v.matrix_level || 0;
-      const classSelected = +v.matrix_class || 0;
+      let classSelected = +v.matrix_class || 0;
+      const class1Name = v.class || '';
+      const class2Name = v.secondclass || '';
+      const class3Name = v.thirdclass || '';
       const hitdiceSelected = +v.matrix_hitdice || 0;
       const fighter5Selected = +v.toggle_fighter5 || 0;
-      // check if a class has been selected and use that classes level unless chaged
+      // sync enabled?
+      // check for selected class and use that class level unless chaged
       if (syncClass === 1) {
         if (classLinked === 1){
-          clog(`Linked Class is: Class 1 Current Level:${v.level}`);
-          levelSelected = +v.level || 0;
+          // clog(`Linked Class is: ${class1Name} Current Level:${v.level}`);
+          classSelected = matchClassName(class1Name);
+          levelSelected = +v.level;
           output.matrix_level = levelSelected;
+          output.matrix_class = classSelected;
         }
         if (classLinked === 2){
-          clog(`Linked Class is: Class 2 Current Level:${v.level_2}`);
-          levelSelected = +v.level_2 || 0;
+          // clog(`Linked Class is: ${class2Name} Current Level:${v.level_2}`);
+          classSelected = matchClassName(class2Name);
+          levelSelected = +v.level_2;
           output.matrix_level = levelSelected;
+          output.matrix_class = classSelected;
         }
         if (classLinked === 3){
-          clog(`Linked Class is: Class 3 Current Level:${v.level_3}`);
-          levelSelected = +v.level_3 || 0;
+          // clog(`Linked Class is: ${class3Name} Current Level:${v.level_3}`);
+          classSelected = matchClassName(class3Name);
+          levelSelected = +v.level_3;
           output.matrix_level = levelSelected;
+          output.matrix_class = classSelected;
         }
       }
       // clog('Ready to autofill attack matrix.');
@@ -12292,6 +12333,33 @@
           output.thac9 = -2;
           output.thac10 = -3;
         }
+        output.attack_matrix_flag = 0;
+      }
+      // NO CLASS found when Sync is enabled: Reset table
+      if (classSelected === 99) {
+        clog('Error: Class not recognized or class name is empty.');
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 20;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 20;
+        output[`thac-2`] = 20;
+        output[`thac-1`] = 20;
+        output.thac00 = 20;
+        output.thac0 = 20;
+        output.thac1 = 20;
+        output.thac2 = 20;
+        output.thac3 = 20;
+        output.thac4 = 20;
+        output.thac5 = 20;
+        output.thac6 = 20;
+        output.thac7 = 20;
+        output.thac8 = 20;
+        output.thac9 = 20;
+        output.thac10 = 20;
         output.attack_matrix_flag = 0;
       }
       setAttrs(output, {silent: true});
