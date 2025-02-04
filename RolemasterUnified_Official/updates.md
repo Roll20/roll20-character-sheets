@@ -1,10 +1,15 @@
+# 2025-2-4
+
+- Creatures: Validate attacks for all listed attacks.
+- Correctly adjust attack size
+- Change display of attack size for creatures.
+- Add meditation to attack skills.
+
 # 2025-1-21
 
 - Creature: Handle Level correctly on dropped creatures.
 - Dark Mode updates - closer to useful
 - Creature layout updates.
-
-
 
 # 2025-1-14
 
