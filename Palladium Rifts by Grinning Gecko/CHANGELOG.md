@@ -13,6 +13,7 @@
 - Move Perception from Saving Throws to beside Initiative.
 - Active Profile columns now fill the width.
 - Fix issue where damage that rolls into the next layer now outputs the correct layer name.
+- Alternating colors on repeating rows, except in the Modifier Picker.
 
 ## [1.6.0] - 2022-04-18
 
@@ -84,7 +85,6 @@
 - Move Modern Strike: Pulse to Strike: Single bonus.
 - Added Migrate button instead of auto-migrating on sheet load.
 - Output PPE/ISP/MDC to chat when an amount is deducted from the sheet using the action buttons.
-- Alternating colors on repeating rows, except in the Modifier Picker.
 
 ## [1.2.0] - 2021-10-15
 
