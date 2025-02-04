@@ -84,6 +84,7 @@
 - Move Modern Strike: Pulse to Strike: Single bonus.
 - Added Migrate button instead of auto-migrating on sheet load.
 - Output PPE/ISP/MDC to chat when an amount is deducted from the sheet using the action buttons.
+- Alternating colors on repeating rows, except in the Modifier Picker.
 
 ## [1.2.0] - 2021-10-15
 
