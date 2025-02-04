@@ -14,6 +14,7 @@
 - Active Profile columns now fill the width.
 - Fix issue where damage that rolls into the next layer now outputs the correct layer name.
 - Alternating colors on repeating rows, except in the Modifier Picker.
+- Fix issue where using a `+` in a skill modifier dialog would cause the roll to be 0.
 
 ## [1.6.0] - 2022-04-18
 
