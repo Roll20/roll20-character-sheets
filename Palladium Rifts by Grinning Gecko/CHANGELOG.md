@@ -12,6 +12,7 @@
 
 - Move Perception from Saving Throws to beside Initiative.
 - Active Profile columns now fill the width.
+- Fix issue where damage that rolls into the next layer now outputs the correct layer name.
 
 ## [1.6.0] - 2020-04-18
 
