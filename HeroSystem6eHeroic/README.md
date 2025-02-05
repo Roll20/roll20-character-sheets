@@ -204,97 +204,97 @@ The only trick to the Complications section is to remember that points gained fr
 
 ![Page 6](/HeroSystem6eHeroic/images/screenshot-06-scaled.png)
 
-The last page of this sheet contains a number of options.
+The last page of this sheet contains a number of gameplay or display options.
 
 #### Character Options:
 
 ### Use Characteristic Maximums
 
-If checked, character point costs are doubled above the standard Hero System maximums.
+&emsp; If checked, character point costs are doubled above the standard Hero System maximums.
 
 ### Literacy Costs Character Points
 
-If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
+&emsp; If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
 
 ### More Combat Skills; Fewer Languages
 
-This option adds five more combat skill slots at the cost of five language slots. Any skills hidden by this option are not counted as purchased skills.
+&emsp; This option adds five more combat skill slots at the cost of five language slots. Any skills hidden by this option are not counted as purchased skills.
 
 ### Takes No Stun
 
-This option is commonly used for automaton-type characters that cannot be stunned and do not use END.
+&emsp; This option is commonly used for automaton-type characters that cannot be stunned and do not use END.
 
 ### Untiring
 
-Similarly, Untiring is a more limited form of *Takes No STUN* where the character does not pay END costs for strength.
+&emsp; Similarly, Untiring is a more limited form of *Takes No STUN* where the character does not pay END costs for strength.
 
 ### Super-heroic Campaign Endurance 
 
-If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
+&emsp; If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
 
 ### Weapon Damage Limited to 2x Base Damage
 
-Most heroic-level campaigns cap enhanced weapon damages. Uncheck this to remove the cap.
+&emsp; Most heroic-level campaigns cap enhanced weapon damages. Uncheck this to remove the cap.
 
 ### Choose d6-1 over d3 when Adjusted Damage is ambiguous
 
-HERO damage tables often contain a choice between xd6+d3 or (x+1)d6-1. The latter is slightly better on paper, but some players prefer the former.
+&emsp; HERO damage tables often contain a choice between xd6+d3 or (x+1)d6-1. The latter is slightly better on paper, but some players prefer the former.
 
 ### Carry all Gear Sets
 
-If checked, carried weight includes both A and B sets of weapons and armor. This option essentially declares whether a character has a single kit or two kits.
+&emsp; If checked, carried weight includes both A and B sets of weapons and armor. This option essentially declares whether a character has a single kit or two kits.
 
 ### Use Vehicle Attributes
 
-This option changes the *Characteristics* page and the Health Status widgets. See the [Vehicles](#vehicles) section below.
+&emsp; This option changes the *Characteristics* page and the Health Status widgets. See the [Vehicles](#vehicles) section below.
 
 ## Gameplay Options:
 
 ### Display Degree of Success
 
-By default this is checked, showing the amount a roll succeeded or failed by. In the case of attacks it will show the DCV that you are able to hit. Unchecking this will instead show a Base Chance for skills, and the total OCV bonus for attacks, followed by a Roll line that will show the results of 3d6 roll. This doesn't affect anything rules wise, just a preference on how players would want to see the details of their rolls.
+&emsp; By default this is checked, showing the amount a roll succeeded or failed by. In the case of attacks it will show the DCV that you are able to hit. Unchecking this will instead show a Base Chance for skills, and the total OCV bonus for attacks, followed by a Roll line that will show the results of 3d6 roll. This doesn't affect anything rules wise, just a preference on how players would want to see the details of their rolls.
 
 ### Use Hit Location System
 
-Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
+&emsp; Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
 ### Health Reset Buttons reset Combat Choices
 
-When checked a reset returns maneuver and targeting selections to their default states.
+&emsp; When checked a reset returns maneuver and targeting selections to their default states.
 
 ### Health Reset Buttons reset applied CSLs
 
-Similarly, here a reset also returns applied Combat Skill Levels to zero.
+&emsp; Similarly, here a reset also returns applied Combat Skill Levels to zero.
 
 ### Attack and Power Buttons Apply END Costs
 
-If checked, these buttons will subtract an attack or power's endurance cost once from a character's current END in addition to their normal effects.
+&emsp; If checked, these buttons will subtract an attack or power's endurance cost once from a character's current END in addition to their normal effects.
 
 ### Show Power Descriptions in Chat
 
-Uncheck if you would like to tidy up powers in the chat area.
+&emsp; Uncheck if you would like to tidy up powers in the chat area.
 
 ### Show Tally Bar
 
-Uncheck to hide the Tally Bar.
+&emsp; Uncheck to hide the Tally Bar.
 
 ### Tally Net CP instead of Spent CP
 
-If you prefer an accounting only of spent character points, uncheck this option. This method is more in keeping with 6th Edition sources.
+&emsp; If you prefer an accounting only of spent character points, uncheck this option. This method is more in keeping with 6th Edition sources.
 
 ### Name-Title Separator 
 
-Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color. Font size seems to be just right or too small.
+&emsp; Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color. Font size seems to be just right or too small.
 
 ### Whisper Rolls to GM
 
-This dropdown offers three options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
+&emsp; This dropdown offers three options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
 
 ![Delete Option](/HeroSystem6eHeroic/images/OptionDelete.png)
 
 ### Activate Item Delete Mode. Deactivate to complete Deletion
 
-This option activates or deactivates the line item deletion mode for gear, skills, powers, talents, and complications. Select whichever items you would like to remove. These items will not be deleted until you deactivate the mode. You may abandon your selections and abort the mode by either pressing one of the *reset* buttons or by closing the character sheet.
+&emsp; This option activates or deactivates the line item deletion mode for gear, skills, powers, talents, and complications. Select whichever items you would like to remove. These items will not be deleted until you deactivate the mode. You may abandon your selections and abort the mode by either pressing one of the *reset* buttons or by closing the character sheet.
 
 >[!CAUTION]
 > Use of the Delete Mode may lead to unwanted data loss. Deleted items are not recoverable.
