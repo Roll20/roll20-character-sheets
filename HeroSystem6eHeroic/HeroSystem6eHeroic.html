@@ -413,7 +413,7 @@
 									</div>
 								</div>
 								<div class="item-characteristics-propulsion-system-row">
-									<button type="action" class="button button-Power-END" tabindex="-1" name="act_buttonSystemsEND" title="%{buttonSystemsEND}	" tabindex="-1">END</button>
+									<button type="action" class="button button-Power-END" tabindex="-1" name="act_buttonPrimaryPropulsionEND" title="%{buttonPrimaryPropulsionEND}	" tabindex="-1">END</button>
 									<div class="custom-select-propulsion">
 										<select name="attr_primaryNoncombatMultiple" title="@{attr_primaryNoncombatMultiple}" tabindex="-1">
 											<option value="1" selected>NC &#215;2</option>
@@ -446,12 +446,12 @@
 								</div>
 								<div class="item-characteristics-propulsion-system-row">
 									<div class="subitem-characteristics-system-value">
-										<h2>Adv:</h2>
-										<input type="number" value="0" name="attr_primaryPropulsionAdv" min="0" step="1" tabindex="41" title="@{primaryPropulsion}"/>
+										<h2>Adv</h2>
+										<input type="number" value="0" name="attr_primaryPropulsionAdv" min="0" step="0.25" tabindex="41" title="@{primaryPropulsion}"/>
 									</div>
 									<div class="subitem-characteristics-system-value">
-										<h2>Lim:</h2>
-										<input type="number" value="0" name="attr_primaryPropulsionLim" step="1" tabindex="42" title="@{primaryPropulsionMod}"/>
+										<h2>Lim</h2>
+										<input type="number" value="0" name="attr_primaryPropulsionLim" min="0" step="0.25" tabindex="42" title="@{primaryPropulsionMod}"/>
 									</div>
 								</div>
 								<div class="item-characteristics-propulsion-system-row">
@@ -506,7 +506,7 @@
 									</div>
 								</div>
 								<div class="item-characteristics-propulsion-system-row">
-									<button type="action" class="button button-Power-END" tabindex="-1" name="act_buttonSystemsEND" title="%{buttonSystemsEND}	" tabindex="-1">END</button>
+									<button type="action" class="button button-Power-END" tabindex="-1" name="act_buttonSecondaryPropulsionEND" title="%{buttonSecondaryPropulsionEND}	" tabindex="-1">END</button>
 									<div class="custom-select-propulsion">
 										<select name="attr_secondaryNoncombatMultiple" title="@{attr_secondaryNoncombatMultiple}" tabindex="-1">
 											<option value="1" selected>NC &#215;2</option>
@@ -539,12 +539,12 @@
 								</div>
 								<div class="item-characteristics-propulsion-system-row">
 									<div class="subitem-characteristics-system-value">
-										<h2>Adv:</h2>
-										<input type="number" value="0" name="attr_secondaryPropulsionAdv" min="0" step="1" tabindex="45" title="@{secondaryPropulsion}"/>
+										<h2>Adv</h2>
+										<input type="number" value="0" name="attr_secondaryPropulsionAdv" min="0" step="0.25" tabindex="45" title="@{secondaryPropulsion}"/>
 									</div>
 									<div class="subitem-characteristics-system-value">
-										<h2>Lim:</h2>
-										<input type="number" value="0" name="attr_secondaryPropulsionLim" step="1" tabindex="46" title="@{secondaryPropulsionMod}"/>
+										<h2>Lim</h2>
+										<input type="number" value="0" name="attr_secondaryPropulsionLim" min="0" step="0.25" tabindex="46" title="@{secondaryPropulsionMod}"/>
 									</div>
 								</div>
 								<div class="item-characteristics-propulsion-system-row">
@@ -18093,6 +18093,20 @@
 		});
 	});
 	
+	/* Use propulsion systems END button */
+	on("clicked:buttonPrimaryPropulsionEND", function() {
+		getAttrs(["primaryPropulsionEND"], function(values) {
+			subtractEndurance( Math.max(0, parseInt(values.primaryPropulsionEND||0)) );
+		});
+	});
+	
+	
+	on("clicked:buttonSecondaryPropulsionEND", function() {
+		getAttrs(["secondaryPropulsionEND"], function(values) {
+			subtractEndurance( Math.max(0, parseInt(values.secondaryPropulsionEND||0)) );
+		});
+	});
+	
 	
 	// Combat Characteristics
 
@@ -18669,8 +18683,8 @@
 	
 	
 	// Update primary propulsion mode for vehicles.
-	on("change:primaryPropulsionMode change:primaryPropulsion change:primaryPropulsionMod change:primaryNoncombatMultiple change:primaryPropulsionLim change:primaryPropulsionAdv change:weightMovePenalty", function() {
-		getAttrs(["primaryPropulsionMode", "primaryPropulsion", "primaryPropulsionMod", "primaryNoncombatMultiple", "primaryPropulsionAdv", "primaryPropulsionLim", "weightMovePenalty"], function(values) {
+	on("change:primaryPropulsionMode change:primaryPropulsion change:primaryPropulsionMod change:primaryNoncombatMultiple change:primaryPropulsionLim change:primaryPropulsionAdv change:weightMovePenalty change:primaryPropulsionMPf change:primaryPropulsionMPv change:primaryPropulsionCostsEND", function() {
+		getAttrs(["primaryPropulsionMode", "primaryPropulsion", "primaryPropulsionMod", "primaryNoncombatMultiple", "primaryPropulsionAdv", "primaryPropulsionLim", "primaryPropulsionMPf", "primaryPropulsionMPv", "primaryPropulsionCostsEND", "weightMovePenalty"], function(values) {
 			
 			const statValue = Math.max(0, parseInt(values.primaryPropulsion)||0);
 			const statMod = parseInt(values.primaryPropulsionMod)||0;
@@ -18679,9 +18693,13 @@
 			const theMode = values.primaryPropulsionMode||"ground";
 			let statNet = 0;
 			let statCP = 0;
-			let advantages = Math.max(0, parseFloat(values.primaryPropulsionAdv)||0);
-			let limitations = Math.max(0, parseFloat(values.primaryPropulsionLim)||0);
+			const advantages = Math.max(0, parseFloat(values.primaryPropulsionAdv)||0);
+			const costsEND = (values.primaryPropulsionCostsEND === "noEND") ? 0 : ((values.primaryPropulsionCostsEND === "costsENDhalf") ? 0.25 : 0.5);
+			const limitations = Math.max(0, parseFloat(values.primaryPropulsionLim)||0) + costsEND;
+			let endurance = 0;
 			let netMove = "NA";
+			const isMPv = (values.primaryPropulsionMPv === "on" ) ? true : false;
+			const isMPf = (values.primaryPropulsionMPf === "on" ) ? true : false;
 			
 			switch (theMode) {
 				case "ground":		statNet = Math.max(0, statValue + statMod + penalty);
@@ -18716,12 +18734,24 @@
 			}
 			
 			statCP = heroRoundLow( (1+advantages) * statCP );
+			
+			if (costsEND !== 0) {
+				endurance = Math.max(1, heroRoundLow( statCP/((costsEND === 0.25) ? 20 : 10 )));
+			}
+			
 			statCP = heroRoundLow( statCP/(1+limitations) );
+			
+			if (isMPf) {
+				statCP = Math.max(1, heroRoundLow( statCP/10 ));
+			} else if (isMPv) {
+				statCP = Math.max(1, heroRoundLow( statCP/5 ));
+			}
 			
 			// Update cost and net movement	
 			setAttrs({
 				"primaryPropulsionCP": heroRoundHigh(statCP),
-				"primaryPropulsionNet": netMove
+				"primaryPropulsionNet": netMove,
+				"primaryPropulsionEND": endurance
 			});
 			
 			// Update characteristics cost
@@ -18731,8 +18761,8 @@
 	
 	
 	// Update secondary propulsion mode for vehicles.
-	on("change:secondaryPropulsionMode change:secondaryPropulsion change:secondaryPropulsionMod change:secondaryNoncombatMultiple change:secondaryPropulsionADV change:secondaryPropulsionLIM change:weightMovePenalty", function() {
-		getAttrs(["secondaryPropulsionMode", "secondaryPropulsion", "secondaryPropulsionMod", "secondaryNoncombatMultiple", "secondaryPropulsionADV", "secondaryPropulsionLIM", "weightMovePenalty"], function(values) {
+	on("change:secondaryPropulsionMode change:secondaryPropulsion change:secondaryPropulsionMod change:secondaryNoncombatMultiple change:secondaryPropulsionAdv change:secondaryPropulsionLim change:primaryPropulsionMPf change:primaryPropulsionMPv change:secondaryPropulsionCostsEND change:weightMovePenalty", function() {
+		getAttrs(["secondaryPropulsionMode", "secondaryPropulsion", "secondaryPropulsionMod", "secondaryNoncombatMultiple", "secondaryPropulsionAdv", "secondaryPropulsionLim", "secondaryPropulsionMPf", "secondaryPropulsionMPv", "secondaryPropulsionCostsEND", "weightMovePenalty"], function(values) {
 			
 			const statValue = Math.max(0, parseInt(values.secondaryPropulsion)||0);
 			const statMod = parseInt(values.secondaryPropulsionMod)||0;
@@ -18741,9 +18771,13 @@
 			const theMode = values.secondaryPropulsionMode||"ground";
 			let statNet = 0;
 			let statCP = 0;
-			let advantages = Math.max(0, parseFloat(values.secondaryPropulsionADV)||0);
-			let limitations = Math.max(0, parseFloat(values.secondaryPropulsionLIM)||0);
+			let advantages = Math.max(0, parseFloat(values.secondaryPropulsionAdv)||0);
+			let limitations = Math.max(0, parseFloat(values.secondaryPropulsionLim)||0);
+			let costsEND = (values.secondaryPropulsionCostsEND === "noEND") ? 0 : ((values.secondaryPropulsionCostsEND === "costsENDhalf") ? 0.25 : 0.5);
+			let endurance = 0;
 			let netMove = "NA";
+			const isMPv = (values.secondaryPropulsionMPv === "on" ) ? true : false;
+			const isMPf = (values.secondaryPropulsionMPf === "on" ) ? true : false;
 			
 			switch (theMode) {
 				case "ground":		statNet = Math.max(0, statValue + statMod + penalty);
@@ -18778,12 +18812,24 @@
 			}
 			
 			statCP = heroRoundLow( (1+advantages) * statCP );
+			
+			if (costsEND !== 0) {
+				endurance = Math.max(1, heroRoundLow( statCP/((costsEND === 0.25) ? 20 : 10 )));
+			}
+			
 			statCP = heroRoundLow( statCP/(1+limitations) );
+			
+			if (isMPf) {
+				statCP = Math.max(1, heroRoundLow( statCP/10 ));
+			} else if (isMPv) {
+				statCP = Math.max(1, heroRoundLow( statCP/5 ));
+			}
 			
 			// Update cost and net movement	
 			setAttrs({
 				"secondaryPropulsionCP": heroRoundHigh(statCP),
-				"secondaryPropulsionNet": netMove
+				"secondaryPropulsionNet": netMove,
+				"secondaryPropulsionEND": endurance
 			});
 			
 			// Update characteristics cost
