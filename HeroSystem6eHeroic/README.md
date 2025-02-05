@@ -174,7 +174,7 @@ Skill Enhancers, when purchased (checked), reduce the cost of relevant knowledge
 
 ![Page 4](/HeroSystem6eHeroic/images/screenshot-04-scaled.png)
 
-The Power page can accommodate twenty powers. The top and bottom sections have different color schemes for organizational purposes, but are otherwise the same. A health status bar occupies the upper right corner of the sheet along with a range table and limited selection of standard maneuvers (to be expanded in a future update). Each section displays one power in its fully expanded form, which is activated by clicking on the power's name. The up and down arrow widgets will move the power accordingly, swapping positions with the upper or lower power.
+The Power page can accommodate twenty powers. The top and bottom sections have different color schemes for organizational purposes, but are otherwise the same. A health status indicator bar occupies the upper right corner of the sheet along with a range table and limited selection of standard maneuvers (to be expanded in a future update). Each section displays one power in its fully expanded form, which is activated by clicking on the power's name. The up and down arrow widgets will move the power accordingly, swapping positions with the upper or lower power.
 
 HS6eH calculates a power's character and endurance costs from the base cost provided and advantages and limitations entered. A power framework is treated as its own entry as shown in the figure below. The second power "Ice Bolts" belongs to the Multipower as a Variable Slot. The "AF" in "Reduced AF" refers to *autofire,* which is an advantage chosen for this particular power that increases the cost of Reduced Endurance.
 
@@ -246,7 +246,7 @@ The last page of this sheet contains a number of gameplay or display options.
 
 ### Use Vehicle Attributes
 
-&emsp; This option changes the *Characteristics* page and the Health Status widgets. See the [Vehicles](#vehicles) section below.
+&emsp; This option changes the *Characteristics* page and the Health Status Indicators. See the [Vehicles](#vehicles) section below.
 
 ## Gameplay Options:
 
@@ -313,7 +313,7 @@ Note that HERO System vehicles typically start with 12 m of running and 4 m of s
 
 ![Reserves](/HeroSystem6eHeroic/images/VehiclePower.png)
 
-The primary and auxiliary endurance reserves replace the *END* and *STUN* attributes in the Health Status widget (as *END* and *AUX*). Endurance costs will be subtracted from one of these two attributes, selected by the adjacent radio buttons as shown below.
+The primary and auxiliary endurance reserves replace the *END* and *STUN* attributes in the Health Status Indicator (as *END* and *AUX*). Endurance costs will be subtracted from one of these two attributes, selected by the adjacent radio buttons as shown below.
 
 ![VehicleHealth](/HeroSystem6eHeroic/images/HealthStatusVehicle.png)
 
