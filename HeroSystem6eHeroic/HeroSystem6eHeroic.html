@@ -429,19 +429,16 @@
 							
 							<div class="item-characteristics-propulsion-system-more">
 								<div class="item-characteristics-propulsion-system-row">
-									<div class="subitem-characteristics-system-value">
-										<h2>MPf</h2>
-										<label class="container-checkbox-small">
-											<input type="checkbox" name="attr_primaryPropulsionMPf">
-											<span class="checkmark-small"></span>
-										</label>
+									<div class="custom-select-propulsion">
+										<select name="attr_primaryPropulsionSlotType" title="@{attr_primaryPropulsionSlotType}" tabindex="-1">
+											<option value="single" selected>Single Power</option>
+											<option value="variableSlot">Variable Slot</option>
+											<option value="fixedSlot">Fixed Slot</option>
+										</select>
 									</div>
-									<div class="subitem-characteristics-system-value">
-										<h2>MPv</h2>
-										<label class="container-checkbox-small">
-											<input type="checkbox" name="attr_primaryPropulsionMPv">
-											<span class="checkmark-small"></span>
-										</label>
+									<div class="subitem-characteristics-system-cost">
+										<h2>CP</h2>
+										<input type="text" value="0" name="attr_primaryPropulsionCP" readonly tabindex="-1" title="@{primaryPropulsionCP"/>
 									</div>
 								</div>
 								<div class="item-characteristics-propulsion-system-row">
@@ -522,19 +519,16 @@
 							
 							<div class="item-characteristics-propulsion-system-more">
 								<div class="item-characteristics-propulsion-system-row">
-									<div class="subitem-characteristics-system-value">
-										<h2>MPf</h2>
-										<label class="container-checkbox-small">
-											<input type="checkbox" name="attr_secondaryPropulsionMPf">
-											<span class="checkmark-small"></span>
-										</label>
+									<div class="custom-select-propulsion">
+										<select name="attr_secondaryPropulsionSlotType" title="@{attr_secondaryPropulsionSlotType}" tabindex="-1">
+											<option value="single" selected>Single Power</option>
+											<option value="variableSlot">Variable Slot</option>
+											<option value="fixedSlot">Fixed Slot</option>
+										</select>
 									</div>
-									<div class="subitem-characteristics-system-value">
-										<h2>MPv</h2>
-										<label class="container-checkbox-small">
-											<input type="checkbox" name="attr_secondaryPropulsionMPv">
-											<span class="checkmark-small"></span>
-										</label>
+									<div class="subitem-characteristics-system-cost">
+										<h2>CP</h2>
+										<input type="text" value="0" name="attr_secondaryPropulsionCP" readonly tabindex="-1" title="@{secondaryPropulsionCP"/>
 									</div>
 								</div>
 								<div class="item-characteristics-propulsion-system-row">
@@ -15646,14 +15640,6 @@
 			
 			<div class="item-options-row">
 				<label class="container-checkbox">
-					<input type="checkbox" name="attr_useVehicleAttributes">
-					<span class="checkmark" title="@{useVehicleAttributes}"></span>
-				</label>
-				<h1>Use Vehicle Attributes</h1>
-			</div>
-			
-			<div class="item-options-row">
-				<label class="container-checkbox">
 					<input type="checkbox" name="attr_useCharacteristicMaximums">
 					<span class="checkmark" title="@{useCharacteristicMaximums}"></span>
 				</label>
@@ -15722,6 +15708,14 @@
 					<span class="checkmark" title="@{optionCarryAllSets}"></span>
 				</label>
 				<h1>Carry all Gear Sets</h1>
+			</div>
+			
+			<div class="item-options-row">
+				<label class="container-checkbox">
+					<input type="checkbox" name="attr_useVehicleAttributes">
+					<span class="checkmark" title="@{useVehicleAttributes}"></span>
+				</label>
+				<h1>Use Vehicle Attributes</h1>
 			</div>
 			
 			<div class="item-thematic-break">
@@ -18683,8 +18677,8 @@
 	
 	
 	// Update primary propulsion mode for vehicles.
-	on("change:primaryPropulsionMode change:primaryPropulsion change:primaryPropulsionMod change:primaryNoncombatMultiple change:primaryPropulsionLim change:primaryPropulsionAdv change:weightMovePenalty change:primaryPropulsionMPf change:primaryPropulsionMPv change:primaryPropulsionCostsEND", function() {
-		getAttrs(["primaryPropulsionMode", "primaryPropulsion", "primaryPropulsionMod", "primaryNoncombatMultiple", "primaryPropulsionAdv", "primaryPropulsionLim", "primaryPropulsionMPf", "primaryPropulsionMPv", "primaryPropulsionCostsEND", "weightMovePenalty"], function(values) {
+	on("change:primaryPropulsionMode change:primaryPropulsion change:primaryPropulsionMod change:primaryNoncombatMultiple change:primaryPropulsionLim change:primaryPropulsionAdv change:weightMovePenalty change:primaryPropulsionSlotType change:primaryPropulsionCostsEND", function() {
+		getAttrs(["primaryPropulsionMode", "primaryPropulsion", "primaryPropulsionMod", "primaryNoncombatMultiple", "primaryPropulsionAdv", "primaryPropulsionLim", "primaryPropulsionSlotType", "primaryPropulsionCostsEND", "weightMovePenalty"], function(values) {
 			
 			const statValue = Math.max(0, parseInt(values.primaryPropulsion)||0);
 			const statMod = parseInt(values.primaryPropulsionMod)||0;
@@ -18693,13 +18687,12 @@
 			const theMode = values.primaryPropulsionMode||"ground";
 			let statNet = 0;
 			let statCP = 0;
-			const advantages = Math.max(0, parseFloat(values.primaryPropulsionAdv)||0);
 			const costsEND = (values.primaryPropulsionCostsEND === "noEND") ? 0 : ((values.primaryPropulsionCostsEND === "costsENDhalf") ? 0.25 : 0.5);
+			const advantages = Math.max(0, parseFloat(values.primaryPropulsionAdv)||0);
 			const limitations = Math.max(0, parseFloat(values.primaryPropulsionLim)||0) + costsEND;
 			let endurance = 0;
 			let netMove = "NA";
-			const isMPv = (values.primaryPropulsionMPv === "on" ) ? true : false;
-			const isMPf = (values.primaryPropulsionMPf === "on" ) ? true : false;
+			const slotType = values.primaryPropulsionSlotType;
 			
 			switch (theMode) {
 				case "ground":		statNet = Math.max(0, statValue + statMod + penalty);
@@ -18735,16 +18728,16 @@
 			
 			statCP = heroRoundLow( (1+advantages) * statCP );
 			
-			if (costsEND !== 0) {
-				endurance = Math.max(1, heroRoundLow( statCP/((costsEND === 0.25) ? 20 : 10 )));
+			if (costsEND === 0.25) {
+				endurance = Math.max(1, heroRoundLow(statCP/20));
+			} else if (costsEND === 0.5) {
+				endurance = Math.max(1, heroRoundLow(statCP/10));
 			}
 			
 			statCP = heroRoundLow( statCP/(1+limitations) );
 			
-			if (isMPf) {
-				statCP = Math.max(1, heroRoundLow( statCP/10 ));
-			} else if (isMPv) {
-				statCP = Math.max(1, heroRoundLow( statCP/5 ));
+			if (slotType !== "single") {
+				statCP = (slotType === "variableSlot") ? Math.max(1, heroRoundLow( statCP/5 )) : Math.max(1, heroRoundLow( statCP/10 ));
 			}
 			
 			// Update cost and net movement	
@@ -18761,8 +18754,8 @@
 	
 	
 	// Update secondary propulsion mode for vehicles.
-	on("change:secondaryPropulsionMode change:secondaryPropulsion change:secondaryPropulsionMod change:secondaryNoncombatMultiple change:secondaryPropulsionAdv change:secondaryPropulsionLim change:primaryPropulsionMPf change:primaryPropulsionMPv change:secondaryPropulsionCostsEND change:weightMovePenalty", function() {
-		getAttrs(["secondaryPropulsionMode", "secondaryPropulsion", "secondaryPropulsionMod", "secondaryNoncombatMultiple", "secondaryPropulsionAdv", "secondaryPropulsionLim", "secondaryPropulsionMPf", "secondaryPropulsionMPv", "secondaryPropulsionCostsEND", "weightMovePenalty"], function(values) {
+	on("change:secondaryPropulsionMode change:secondaryPropulsion change:secondaryPropulsionMod change:secondaryNoncombatMultiple change:secondaryPropulsionAdv change:secondaryPropulsionLim change:secondaryPropulsionSlotType change:secondaryPropulsionCostsEND change:weightMovePenalty", function() {
+		getAttrs(["secondaryPropulsionMode", "secondaryPropulsion", "secondaryPropulsionMod", "secondaryNoncombatMultiple", "secondaryPropulsionAdv", "secondaryPropulsionLim", "secondaryPropulsionSlotType", "secondaryPropulsionCostsEND", "weightMovePenalty"], function(values) {
 			
 			const statValue = Math.max(0, parseInt(values.secondaryPropulsion)||0);
 			const statMod = parseInt(values.secondaryPropulsionMod)||0;
@@ -18771,13 +18764,12 @@
 			const theMode = values.secondaryPropulsionMode||"ground";
 			let statNet = 0;
 			let statCP = 0;
-			let advantages = Math.max(0, parseFloat(values.secondaryPropulsionAdv)||0);
-			let limitations = Math.max(0, parseFloat(values.secondaryPropulsionLim)||0);
 			let costsEND = (values.secondaryPropulsionCostsEND === "noEND") ? 0 : ((values.secondaryPropulsionCostsEND === "costsENDhalf") ? 0.25 : 0.5);
+			let advantages = Math.max(0, parseFloat(values.secondaryPropulsionAdv)||0);
+			let limitations = Math.max(0, parseFloat(values.secondaryPropulsionLim)||0) + costsEND;
 			let endurance = 0;
 			let netMove = "NA";
-			const isMPv = (values.secondaryPropulsionMPv === "on" ) ? true : false;
-			const isMPf = (values.secondaryPropulsionMPf === "on" ) ? true : false;
+			const slotType = values.secondaryPropulsionSlotType;
 			
 			switch (theMode) {
 				case "ground":		statNet = Math.max(0, statValue + statMod + penalty);
@@ -18813,16 +18805,16 @@
 			
 			statCP = heroRoundLow( (1+advantages) * statCP );
 			
-			if (costsEND !== 0) {
-				endurance = Math.max(1, heroRoundLow( statCP/((costsEND === 0.25) ? 20 : 10 )));
+			if (costsEND === 0.25) {
+				endurance = Math.max(1, heroRoundLow(statCP/20));
+			} else if (costsEND === 0.5) {
+				endurance = Math.max(1, heroRoundLow(statCP/10));
 			}
 			
 			statCP = heroRoundLow( statCP/(1+limitations) );
 			
-			if (isMPf) {
-				statCP = Math.max(1, heroRoundLow( statCP/10 ));
-			} else if (isMPv) {
-				statCP = Math.max(1, heroRoundLow( statCP/5 ));
+			if (slotType !== "single") {
+				statCP = (slotType === "variableSlot") ? Math.max(1, heroRoundLow( statCP/5 )) : Math.max(1, heroRoundLow( statCP/10 ));
 			}
 			
 			// Update cost and net movement	

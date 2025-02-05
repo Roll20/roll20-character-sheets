@@ -26,6 +26,8 @@ The number of skills (50 general skills, up to 12 combat skills, 9 maneuvers, an
 
 &emsp; [Page 6: Options](#page-6)
 
+&emsp; [Vehicles](#vehicles)
+
 &emsp; [Mod Support](#mods)
 
 &emsp; [Tokens](#tokens)
@@ -293,6 +295,24 @@ This option activates or deactivates the line item deletion mode for gear, skill
 >[!CAUTION]
 > Use of the Delete Mode may lead to unwanted data loss. Deleted items are not recoverable.
 
+# <a id="vehicles">Vehicles</a>
+
+![Vehicles](/HeroSystem6eHeroic/images/vehicle-sheet-scaled.png)
+
+The "Use Vehicle Attributes" option reconfigures the first page for use with vehicle characters. This option adds the *Size* attribute, which determines secondary characteristics like length, mass, and the OCV bonus to hit the vehicle (*OCV+*). Size also adds to strength, reflected in the strength modifier. Many characteristics like *CON*, *INT*, *EGO*, and *PRE* aren't used for vehicles and are hidden (but not deleted).
+
+This configuration has four tailored power sections that would commonly used by vehicles: two movement powers (propulsion systems) and two endurance reserves (power systems).
+
+![Propulsion](/HeroSystem6eHeroic/images/VehiclePropulsion.png)
+
+Note that HERO System vehicles typically start with 12 m of running and 4 m of swimming. Since most vehicles add modifies to or buyback these attributes, this sheet assumes zero for each and refunds the character 14 points.
+
+![Reserves](/HeroSystem6eHeroic/images/VehiclePower.png)
+
+The primary and auxiliary endurance reserves replace the *END* and *STUN* attributes in the Health Status widget (as *END* and *AUX*). Endurance costs will be subtracted from one of these two attributes, selected by the adjacent radio buttons as shown below.
+
+![VehicleHealth](/HeroSystem6eHeroic/images/VehiclePower.png)
+
 # <a id="mods">Mod Support</a>
 
 ### HERO System 6e Heroic HD Importer
@@ -311,7 +331,9 @@ If you would like more flexibility in creating macros you might consider adding 
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
 
-Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes *currentDCV,* *currentBODY,* and *currentEND* these should automatically be coupled with their maximum values. The hidden attribute *currentDCV* is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty + DCV Modifier.
+Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes *CurrentDCV,* *CurrentBODY,* and *CurrentEND* these should automatically be coupled with their maximum values. The hidden attribute *currentDCV* is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty + DCV Modifier.
+
+Vehicles do not have *STUN* and don't use the *END* attribute. For vehicles, I suggest using *CurrentPrimaryEND* and *CurrentAuxiliaryEND*, which point to the two vehicle endurance reserves.
 
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
 
@@ -341,6 +363,7 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 
 *First version by Villain In Glasses, August 1, 2021.*
 *Recent updates:*
+*February 5, 2025 adds vehicle support (Version 4.40).*
 *January 25, 2025 adds damage type (killing, normal, and power) to the weapon worksheet (Version 4.10).*
 *January 3, 2025 to represent the sheet as of Version 4.02.*
 *November 21, 2024 to represent the sheet as of Version 3.81 and updated support in Hero Roller 1.3.0.*
