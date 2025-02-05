@@ -244,6 +244,10 @@ HERO damage tables often contain a choice between xd6+d3 or (x+1)d6-1. The latte
 
 If checked, carried weight includes both A and B sets of weapons and armor. This option essentially declares whether a character has a single kit or two kits.
 
+### Use Vehicle Attributes
+
+This option changes the *Characteristics* page and the Health Status widgets. See the [Vehicles](#vehicles) section below.
+
 ## Gameplay Options:
 
 ### Display Degree of Success
@@ -305,13 +309,13 @@ This configuration has four tailored power sections that would commonly used by 
 
 ![Propulsion](/HeroSystem6eHeroic/images/VehiclePropulsion.png)
 
-Note that HERO System vehicles typically start with 12 m of running and 4 m of swimming. Since most vehicles add modifies to or buyback these attributes, this sheet assumes zero for each and refunds the character 14 points.
+Note that HERO System vehicles typically start with 12 m of running and 4 m of swimming. Since most vehicles add modifiers to or buyback these attributes, this sheet assumes zero for each and refunds the character 14 points.
 
 ![Reserves](/HeroSystem6eHeroic/images/VehiclePower.png)
 
 The primary and auxiliary endurance reserves replace the *END* and *STUN* attributes in the Health Status widget (as *END* and *AUX*). Endurance costs will be subtracted from one of these two attributes, selected by the adjacent radio buttons as shown below.
 
-![VehicleHealth](/HeroSystem6eHeroic/images/VehiclePower.png)
+![VehicleHealth](/HeroSystem6eHeroic/images/HealthStatusVehicle.png)
 
 # <a id="mods">Mod Support</a>
 
