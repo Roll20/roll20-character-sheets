@@ -377,9 +377,21 @@
 					</div>
 				</div>
 				
+				<input type="hidden" class="vehicle-checks" name="attr_vehicleChecks"  value="hide"/>
+				
 				<div class="item-characteristics-vehicle-propulsion-systems">
 					<div class="item-characteristics-propulsion-system">
-						<input type="text" value="" placeholder="Propulsion System" name="attr_primaryPropulsionLabel" title="@{primaryPropulsionLabel}" maxlength="24" tabindex="40">
+						<div class="item-characteristics-system-heading">
+							<div class="subitem-characterstics-system-heading-deletebox">
+								<label class="container-xbox-tiny">
+									<input type="checkbox" name="attr_primaryPropulsionDelete">
+									<span class="checkmark" title="@{primaryPropulsionDelete}"></span>
+								</label>
+							</div>
+							<div class="subitem-characterstics-system-heading-text">
+								<input type="text" value="" placeholder="Propulsion System" name="attr_primaryPropulsionLabel" title="@{primaryPropulsionLabel}" maxlength="24" tabindex="40">
+							</div>
+						</div>
 						
 						<div class="item-characteristics-propulsion-system-block">
 							<input type="hidden" class="show-primary-propulsion" name="attr_showPrimaryPropulsion" value="essentials"/>
@@ -469,7 +481,17 @@
 					</div>
 					
 					<div class="item-characteristics-propulsion-system">
-						<input type="text" value="" placeholder="Propulsion System" name="attr_secondaryPropulsionLabel" title="@{secondaryPropulsionLabel}" maxlength="24" tabindex="44">
+						<div class="item-characteristics-system-heading">
+							<div class="subitem-characterstics-system-heading-deletebox">
+								<label class="container-xbox-tiny">
+									<input type="checkbox" name="attr_secondaryPropulsionDelete">
+									<span class="checkmark" title="@{secondaryPropulsionDelete}"></span>
+								</label>
+							</div>
+							<div class="subitem-characterstics-system-heading-text">
+								<input type="text" value="" placeholder="Propulsion System" name="attr_secondaryPropulsionLabel" title="@{secondaryPropulsionLabel}" maxlength="24" tabindex="44">
+							</div>
+						</div>
 						
 						<div class="item-characteristics-propulsion-system-block">
 							<input type="hidden" class="show-secondary-propulsion" name="attr_showSecondaryPropulsion" value="essentials"/>
@@ -562,7 +584,18 @@
 				<!-- Vehicle power systems -->
 				<div class="item-characteristics-vehicle-power-systems">
 					<div class="item-characteristics-power-system">
-						<input type="text" value="" placeholder="Main Power" name="attr_mainReserveLabel" title="@{mainReserveLabel}" maxlength="24" tabindex="50">
+						<div class="item-characteristics-system-heading">
+							<div class="subitem-characterstics-system-heading-deletebox">
+								<label class="container-xbox-tiny">
+									<input type="checkbox" name="attr_mainPowerDelete">
+									<span class="checkmark" title="@{mainPowerDelete}"></span>
+								</label>
+							</div>
+							<div class="subitem-characterstics-system-heading-text">
+								<input type="text" value="" placeholder="Main Power" name="attr_mainReserveLabel" title="@{mainReserveLabel}" maxlength="24" tabindex="50">
+							</div>
+						</div>
+						
 						<div class="item-characteristics-power-system-block">
 							<div class="item-characteristics-power-system-row">
 								<div class="subitem-characteristics-system-value">
@@ -589,7 +622,18 @@
 					</div>
 					
 					<div class="item-characteristics-power-system">
-						<input type="text" value="" placeholder="Auxiliary Power" name="attr_auxiliaryReserveLabel" title="@{auxiliaryReserveLabel}" maxlength="24" tabindex="54">
+						<div class="item-characteristics-system-heading">
+							<div class="subitem-characterstics-system-heading-deletebox">
+								<label class="container-xbox-tiny">
+									<input type="checkbox" name="attr_auxiliaryPowerDelete">
+									<span class="checkmark" title="@{auxiliaryPowerDelete}"></span>
+								</label>
+							</div>
+							<div class="subitem-characterstics-system-heading-text">
+								<input type="text" value="" placeholder="Auxiliary Power" name="attr_auxiliaryReserveLabel" title="@{auxiliaryReserveLabel}" maxlength="24" tabindex="54">
+							</div>
+						</div>
+						
 						<div class="item-characteristics-power-system-block">
 							<div class="item-characteristics-power-system-row">
 								<div class="subitem-characteristics-system-value">
@@ -18800,6 +18844,81 @@
 			sumCharacteristicPoints();
 		});
 	});
+	
+	
+	// Show vehicle system checks or delete items marked for deletion.
+	// DANGER: Risk of data loss.
+	on("change:vehicleChecks change:activateDeleteChecks", function() {
+		getAttrs(["vehicleChecks", "activateDeleteChecks", "primaryPropulsionDelete", "secondaryPropulsionDelete", "mainPowerDelete", "auxiliaryPowerDelete"], function(values) {
+			var attributes = new Object();
+			var itemId = "";
+			
+			if (values.activateDeleteChecks === "on") {
+				attributes.vehicleChecks = "delete";
+				
+				// Clear all delete checks for safety.
+				clearVehicleChecks();
+			} else {
+				attributes.vehicleChecks = "hide";
+				
+				if (values.primaryPropulsionDelete === "on") {
+					attributes.primaryPropulsionLabel = "";
+					attributes.primaryPropulsionMode = "ground";
+					attributes.primaryPropulsion = "0";
+					attributes.primaryPropulsionMod = "0";
+					attributes.primaryNoncombatMultiple = "1";
+					attributes.primaryPropulsionSlotType = "single";
+					attributes.primaryPropulsionAdv = "0";
+					attributes.primaryPropulsionLimitations = "0";
+					attributes.primaryPropulsionCostsEND = "noEND";
+					attributes.primaryPropulsionText = "";
+				}
+				
+				if (values.secondaryPropulsionDelete === "on") {
+					attributes.secondaryPropulsionLabel = "";
+					attributes.secondaryPropulsionMode = "ground";
+					attributes.secondaryPropulsion = "0";
+					attributes.secondaryPropulsionMod = "0";
+					attributes.secondaryNoncombatMultiple = "1";
+					attributes.secondaryPropulsionSlotType = "single";
+					attributes.secondaryPropulsionAdv = "0";
+					attributes.secondaryPropulsionLimitations = "0";
+					attributes.secondaryPropulsionCostsEND = "noEND";
+					attributes.secondaryPropulsionText = "";
+				}
+				
+				if (values.mainPowerDelete === "on") {
+					attributes.mainReserveLabel = "";
+					attributes.mainReserveEND = "0";
+					attributes.mainReserveREC = "0";
+					attributes.mainReserveLIM = "0";
+					attributes.mainReserveText = "";
+				}
+				
+				if (values.auxiliaryPowerDelete === "on") {
+					attributes.auxiliaryReserveLabel = "";
+					attributes.auxiliaryReserveEND = "0";
+					attributes.auxiliaryReserveREC = "0";
+					attributes.auxiliaryReserveLIM = "0";
+					attributes.auxiliaryReserveText = "";
+				}
+			}
+			
+			setAttrs(attributes);
+		});
+	});
+	
+	
+	function clearVehicleChecks() {
+		var attributes = new Object();
+		
+		attributes.primaryPropulsionDelete = 0;
+		attributes.secondaryPropulsionDelete = 0;
+		attributes.mainPowerDelete = 0;
+		attributes.auxiliaryPowerDelete = 0;
+		
+		setAttrs(attributes);
+	}
 	
 	
 	// Update point totals when option: useCharacteristicMaximums checked or unchecked.
