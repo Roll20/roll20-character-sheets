@@ -643,63 +643,40 @@ const update_to_3_10 = async (old_version, upgraded_version) => {
   clog(`** UPDATING TO V3.10 FROM ${old_version} **`);
   const setter = {
     whisper : 0,
-    whisper_query : 0,
+    //whisper_query : 0,
     whisper_option : "",
     whisper_option_api : "!myz",
     whisper_the_roll : 0
   };
 
-  getAttrs(["api_toggle","whisper_option","whisper_option_api","whisper_query","whisper","whisper_the_roll"], (values) => {
-    //clog(`----- Upgrading from whisper settings: ${JSON.stringify(values)}`);
+  getAttrs(["api_toggle","whisper_option","whisper_option_api","whisper","whisper_the_roll"], (values) => {
+    clog(`----- Upgrading from whisper settings: ${JSON.stringify(values)}`);
     const option_api = values.whisper_option_api,
           option = values.whisper_option,
-          toggle = int(values.api_toggle);
-    if ( toggle === 1 ) {
-      //clog(`----- Whisper Upgrade: API rolls is ENABLED`);
-    
-      if ( option_api == "@{translation_whisper_api_macro_query}" ) {
-        //clog(`----- Whisper Upgrade: API roll whisper through QUERY`);
-
-        setter.whisper_query = 1;
-        setter.whisper_option = "@{translation_whisper_macro_query}";
-        setter.whisper_option_api = "@{translation_whisper_api_macro_query}";
-      } else if ( option_api == "!wmyz" ) {
-        //clog(`----- Whisper Upgrade: API roll whisper ENABLED through SETTING`);
-        setter.whisper = 1;
-        setter.whisper_option = "/w gm";
-        setter.whisper_option_api = "!wmyz";
-        setter.whisper_the_roll = 1;                   
-      } else if ( option_api == "!myz" ) {
-        //clog(`----- Whisper Upgrade: API roll whisper DISABLED through SETTING`);
-        setter.whisper = 0;
-        setter.whisper_option = "";
-        setter.whisper_option_api = "!myz";
-        setter.whisper_the_roll = 0;         
-      } else {
-        //clog(`----- Whisper Upgrade: API roll whisper settings not matched!!!`);          
-      }
+          api = int(values.api_toggle);
+ 
+    if ( ( api === 1 && option_api == "@{translation_whisper_api_macro_query}" ) || 
+          ( api !== 1 && option == "@{translation_whisper_macro_query}" ) ) {
+      clog(`----- Whisper Upgrade: whisper through QUERY`);
+      setter.whisper = 2;
+      setter.whisper_option = "@{translation_whisper_macro_query}";
+      setter.whisper_option_api = "@{translation_whisper_api_macro_query}";
+    } else if ( ( api === 1 && option_api == "!wmyz" ) || 
+                ( api !== 1 && option == "/w gm" ) ) {
+      clog(`----- Whisper Upgrade: whisper ENABLED through SETTING`);
+      setter.whisper = 1;
+      setter.whisper_option = "/w gm";
+      setter.whisper_option_api = "!wmyz";
+      setter.whisper_the_roll = 1;                   
+    } else if ( ( api === 1 && option_api == "!myz" ) || 
+                ( api !== 1 && option == "" ) ) {
+      clog(`----- Whisper Upgrade: whisper DISABLED through SETTING`);
+      setter.whisper = 0;
+      setter.whisper_option = "";
+      setter.whisper_option_api = "!myz";
+      setter.whisper_the_roll = 0;         
     } else {
-      //clog(`----- Whisper Upgrade: API rolls is DISABLED`);
-      if ( option == "@{translation_whisper_macro_query}" ) {
-        //clog(`----- Whisper Upgrade: Regular roll whisper through QUERY`);
-        setter.whisper_query = 1;
-        setter.whisper_option = "@{translation_whisper_macro_query}";
-        setter.whisper_option_api = "@{translation_whisper_api_macro_query}";
-      } else if ( option == "/w gm" ) {
-        //clog(`----- Whisper Upgrade: Regular roll whisper ENABLED through SETTING`);
-        setter.whisper = 1;
-        setter.whisper_option = "/w gm";
-        setter.whisper_option_api = "!wmyz";
-        setter.whisper_the_roll = 1;             
-      } else if ( option == "" ) {
-        //clog(`----- Whisper Upgrade: Regular roll whisper DISABLED through SETTING`);
-        setter.whisper = 0;
-        setter.whisper_option = "0";
-        setter.whisper_option_api = "0";
-        setter.whisper_the_roll = 0;          
-      } else {
-        //clog(`----- Whisper Upgrade: Regular roll whisper settings not matched!!!`);          
-      }
+      clog(`----- Whisper Upgrade: roll whisper settings not matched!!!`);          
     }
 
     //clog(`----- Upgrading to whisper settings: ${JSON.stringify(setter)}`);
@@ -1235,6 +1212,25 @@ on("sheet:opened change:credits change:credits_vehicle change:credits_stash", fu
   });
 });
 
+on("change:powerincrease", (ev) => {
+  //clog(`Power increase button clicked: ${JSON.stringify(ev)}`);
+  getAttrs(["powerincrease","energypoints_max","energypoints"], (values) => {
+    const inc = int(values.powerincrease),
+          energy = int(values.energypoints),
+          setter = {},
+          silent = {silent: true};
+    if ( inc === 1 ) {
+      setter.energypoints_max = 12; 
+      clog(`Energy points max increased to 12`);
+    } else {
+      setter.energypoints_max = 10;
+      setter.energypoints = Math.min(energy,10);
+      clog(`Energy points max set to 10`);
+    }
+    setAttrs(setter,silent);
+  });
+});
+
 //Battle Level
 // Function also used in upgrade script
 const battleLvl = () => {
@@ -1627,57 +1623,41 @@ Object.keys(pools).forEach((which) => {
   });
 });
 
-/* Set the whisper query options
-on("sheet:opened change:whisper_query", (ev) => {
-  getAttrs(["whisper","whisper_query","whisper_query","translation_whisper_api_macro_query","translation_whisper_macro_query"], (values) => {
-    const output = {},
-          query = int(values.whisper_query);
-    output.whisper_query = int(values.whisper);
-    output.whisper_option = (query === 1) ? values.translation_whisper_macro_query : 
-                            (output.whisper_query === 1) ? "/w gm" : "";
-    output.whisper_option_api = (query === 1) ? values.translation_whisper_api_macro_query : 
-                                (output.whisper_query === 1) ? "!wmyz" : "!myz";
-    setAttrs(output);
-  });
-}); */
-
 /* Set whiper options for the sheet */ 
-on("change:whisper change:whisper_query", (ev) => {
-  getAttrs(["api_toggle","whisper","whisper_query","whisper_option","whisper_option_api","translation_whisper_api_macro_query","translation_whisper_macro_query"], function (values) {
+on("change:whisper", (ev) => {
+  getAttrs(["api_toggle","whisper","whisper_option","whisper_option_api","translation_whisper_api_macro_query","translation_whisper_macro_query"], function (values) {
     const whisper = int(values.whisper),
           api = int(values.api_toggle),
-          query = int(values.whisper_query),
           setter = {};
-
-    if (query === 1) {
-      setter.whisper = 0; 
+    if ( whisper === 1 ) {     
+      setter.whisper_option = "/w gm";
+      setter.whisper_option_api = "!wmyz";
+      setter.whisper_the_roll = 1;
+    } else if ( whisper === 2 ) {   
       setter.whisper_option = values.translation_whisper_macro_query;
       setter.whisper_option_api = values.translation_whisper_api_macro_query;
-    } else { 
-      setter.whisper_query = 0;
-      if ( whisper === 1 ) {     
-        setter.whisper_option = "/w gm";
-        setter.whisper_option_api = "!wmyz";
-        setter.whisper_the_roll = 1;
-      } else {   
-        setter.whisper = 0; 
-        setter.whisper_option = "";
-        setter.whisper_option_api = "!myz";
-        setter.whisper_the_roll = 0; 
-      }
+      setter.whisper_the_roll = 0;
+    } else {              
+      setter.whisper_option = "";
+      setter.whisper_option_api = "!myz";
+      setter.whisper_the_roll = 0;
     }
 
     //clog(`Whisper settings: whisper: ${values.whisper}, ${JSON.stringify(setter)}`);
     setAttrs(setter,silent);       
   });
 });
-on("clicked:whisperroll", (ev) => {
-  getAttrs(["whisper_the_roll"], (values) => {
-    const value = int(values.whisper_the_roll) === 1 ? 0 : 1;
-    //clog(`Clicked on whisper roll action checkbox, changed from ${values.whisper_the_roll} to ${value}`);
-    setAttrs({
-      whisper_the_roll : value,
-    });
+on("change:rolltemplate_toggle", function(ev) {
+  clog(`Rolltemplate type changed: ${JSON.stringify(ev)}`);
+  getAttrs(["rolltemplate_option"], (values) => {
+    const option = int(values.rolltemplate_option),
+          setter = {};
+    if ( option === 1 ) {
+      setter.rolltemplate_option = "myz";
+    } else {
+      setter.rolltemplate_option = "mutantyearzero";
+    }
+    setAttrs(setter,{silent: true});
   });
 });
 
@@ -1780,58 +1760,38 @@ const monster_dicePoolButtons = (which) => {
   });
 };
 
-
+/* RESET DICE POOL */
 on("sheet:opened clicked:dice_pool_clear", function () {
   getAttrs(["whisper"], (values) => { 
     //clog(`Change Detected: Clear Dice Pool - button clicked or sheet loaded (whisper is ${values.whisper})`);
-    const whisper = (int(values.whisper) === 1) ? 1 : 0;
+    //const whisper = (int(values.whisper) === 1) ? 1 : 0;
     setAttrs({
       attribute: 0,
       skill: 0,
       gear: 0,
-      attribute_die_twelve: 0,
-      attribute_die_eleven: 0,
-      attribute_die_ten: 0,
-      attribute_die_nine: 0,
-      attribute_die_eight: 0,
-      attribute_die_seven: 0,
-      attribute_die_six: 0,
-      attribute_die_five: 0,
-      attribute_die_four: 0,
-      attribute_die_three: 0,
-      attribute_die_two: 0,
-      attribute_die_one: 0,
-      negative_die_one: 0,
-      negative_die_two: 0,
-      negative_die_three: 0,
-      skill_die_ten: 0,
-      skill_die_nine: 0,
-      skill_die_eight: 0,
-      skill_die_seven: 0,
-      skill_die_six: 0,
-      skill_die_five: 0,
-      skill_die_four: 0,
-      skill_die_three: 0,
-      skill_die_two: 0,
-      skill_die_one: 0,
-      gear_die_twelve: 0,
-      gear_die_eleven: 0,
-      gear_die_ten: 0,
-      gear_die_nine: 0,
-      gear_die_eight: 0,
-      gear_die_seven: 0,
-      gear_die_six: 0,
-      gear_die_five: 0,
-      gear_die_four: 0,
-      gear_die_three: 0,
-      gear_die_two: 0,
-      gear_die_one: 0,
       current_preset: getTranslationByKey('custom-roll'),
-      whisper_the_roll: whisper,
+      whisper_the_roll: int(values.whisper),
       include_with_roll: "",
       pushable: 1,
       push_latest: "",
+      showattrextra: "0",
+      showgearextra: "0",
     });
+  });
+});
+
+on("clicked:add_die_attr clicked:add_die_gear", function(ev) {
+  clog(`clicked add die: ${JSON.stringify(ev)}`);
+  getAttrs(["","attribute","gear"], (values) => {
+    const base = int(values.attribute),
+          gear = int(values.gear),
+          setter = {},
+          silent = {silent: true};
+
+    if( base <= 12 ) { setter.attribute = 13; }
+    else { setter.attribute = base + 1; }
+    clog(`clicked add die, setter: ${JSON.stringify(setter)}`);
+    setAttrs(setter,silent);
   });
 });
 
@@ -1936,10 +1896,7 @@ on('clicked:push', async (ev) => {
 
 
 on("clicked:roll_the_dice", () => {
-  getAttrs( ["character_name", "character_id", "chartype","attribute", "skill", "gear", "current_preset",  "pushable","include_with_roll", "whisper_query", "whisper_the_roll","translation_whisper_macro_query"], async (values) => {
-    
-    const whisper = (int(values.whisper_query) === 1) ? values.translation_whisper_macro_query : (int(values.whisper_the_roll) === 1) ? "/w gm" : "" ;
-    //clog("Whisper string : " + whisper);
+  getAttrs( ["character_name", "character_id", "chartype","attribute", "skill", "gear", "current_preset",  "pushable","include_with_roll", "whisper_option", "whisper_the_roll","translation_whisper_macro_query"], async (values) => {
 
     const trigger = {name : values.current_preset},
       attributes = {
@@ -1953,7 +1910,9 @@ on("clicked:roll_the_dice", () => {
         skill: int(values.skill),
         gear: int(values.gear),
         totalDice: int(values.attribute)+Math.abs(int(values.skill))+int(values.gear),
-        whisper: whisper,
+        whisper: ( int(values.whisper_the_roll) === 1 ) ? 
+                  "/w gm" : ( int(values.whisper_the_roll) === 2 ) ? 
+                  values.translation_whisper_macro_query : "",
         pushable: int(values.pushable),
         pushroll: 0,
         include: values.include_with_roll,
@@ -1974,17 +1933,17 @@ const executeRoll = function({trigger,attributes,roll}) {
   if (roll.pushRollStr) {
     rollStr = roll.pushRollStr;
   } else {     
-    for(let i = 1; i <= roll.attribute; i++) { attributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}= [[1d6]] }} `; }
+    for(let i = 1; i <= roll.attribute; i++) { attributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}= [[1d6cf<2cs>5]] }} `; }
     if( roll.skill >= 0 ) {
-      for(let i = 1; i <= roll.skill; i++) { skillStr += `{{skill-die-${litnum[i]}= [[1]] }} {{skill-roll-${litnum[i]}= [[1d6]] }} `; }
+      for(let i = 1; i <= roll.skill; i++) { skillStr += `{{skill-die-${litnum[i]}= [[1]] }} {{skill-roll-${litnum[i]}= [[1d6cf<0cs>5]] }} `; }
     } else if ( roll.skill < 0) {
-      for(let i = 1; i <= Math.abs(roll.skill); i++) { skillStr += `{{negative-die-${litnum[i]}= [[1]] }} {{negative-roll-${litnum[i]}= [[1d6]] }} `; }
+      for(let i = 1; i <= Math.abs(roll.skill); i++) { skillStr += `{{negative-die-${litnum[i]}= [[1]] }} {{negative-roll-${litnum[i]}= [[1d6cf<0cs>5]] }} `; }
     }
-    for(let i = 1; i <= roll.gear; i++) { gearStr += `{{gear-die-${litnum[i]}= [[1]] }} {{gear-roll-${litnum[i]}= [[1d6]] }} `; }
-    rollStr = `${roll.whisper} &{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{chartype_id=[[${attributes['chartype_id']}]]}} {{name=${roll.name}}} {{successes=[[0]]}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} ${attributeStr} ${skillStr} ${gearStr}`;
+    for(let i = 1; i <= roll.gear; i++) { gearStr += `{{gear-die-${litnum[i]}= [[1]] }} {{gear-roll-${litnum[i]}= [[1d6cf<2cs>5]] }} `; }
+    rollStr = `${roll.whisper} &{template:@{rolltemplate_option}} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{chartype_id=[[${attributes['chartype_id']}]]}} {{name=${roll.name}}} {{successes=[[0]]}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} ${attributeStr} ${skillStr} ${gearStr}`;
   }    
 
-  //clog("Roll string; "+ rollStr);
+  clog("Roll string; "+ rollStr);
 
   startRoll(rollStr, (results) => {
     //clog("Roll results: "+ JSON.stringify(results));
@@ -2002,15 +1961,15 @@ const executeRoll = function({trigger,attributes,roll}) {
       let r = (results.results[`attribute-roll-${litnum[i]}`]).result;
       //clog(`results attribute ${i} : ${r}`);
       if ( r == '6' || r == 6 ) {        
-        pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[6]]}} `; 
+        pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[6cs>5]]}} `; 
         successes++;
         //clog(`results attribute die ${i} is 6, total ${successes} successes`);
       } else if ( r == '1' || r == 1 ) {     
-        pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[1]]}} `; 
+        pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[1cf<2]]}} `; 
         failures++;          
         //clog(`results attribute die ${i} is 0, total ${failures} failures`);
       } else {
-        pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[1d6]]}} `; 
+        pushAttributeStr += `{{attribute-die-${litnum[i]}=[[1]] }} {{attribute-roll-${litnum[i]}=[[1d6cf<2cs>5]]}} `; 
         //clog(`results attribute die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
       }
     }
@@ -2019,11 +1978,11 @@ const executeRoll = function({trigger,attributes,roll}) {
         let r = (results.results[`skill-roll-${litnum[i]}`]).result;
         //clog(`results skill ${i} : ${r}`);
         if ( r == '6' || r == 6 ) {        
-          pushSkillStr += `{{skill-die-${litnum[i]}=[[1]]}} {{skill-roll-${litnum[i]}=[[6]]}} `; 
+          pushSkillStr += `{{skill-die-${litnum[i]}=[[1]]}} {{skill-roll-${litnum[i]}=[[6cs>5]]}} `; 
           successes++;  
           //clog(`results skill die ${i} is 6, total ${successes} successes`);
         } else {
-          pushSkillStr += `{{skill-die-${litnum[i]}=[[1]]}} {{skill-roll-${litnum[i]}=[[1d6]]}} `; 
+          pushSkillStr += `{{skill-die-${litnum[i]}=[[1]]}} {{skill-roll-${litnum[i]}=[[1d6cs>5]]}} `; 
           //clog(`results skill die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
         }
       }
@@ -2032,11 +1991,11 @@ const executeRoll = function({trigger,attributes,roll}) {
         let r = (results.results[`negative-roll-${litnum[i]}`]).result;
         //clog(`negative skill ${i} : ${r}`);
         if ( r == '6' || r == 6 ) {        
-          pushSkillStr += `{{negative-die-${litnum[i]}=[[1]]}} {{negative-roll-${litnum[i]}=[[6]]}} `; 
+          pushSkillStr += `{{negative-die-${litnum[i]}=[[1]]}} {{negative-roll-${litnum[i]}=[[6cs>5]]}} `; 
           successes++;  
           //clog(`results negative skill die ${i} is 6, total ${successes} successes (decreased)`);
         } else {
-          pushSkillStr += `{{negative-die-${litnum[i]}=[[1]]}} {{negative-roll-${litnum[i]}=[[1d6]]}} `; 
+          pushSkillStr += `{{negative-die-${litnum[i]}=[[1]]}} {{negative-roll-${litnum[i]}=[[1d6cs>5]]}} `; 
           //clog(`results skill die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
         }
       }
@@ -2045,16 +2004,16 @@ const executeRoll = function({trigger,attributes,roll}) {
       let r = (results.results[`gear-roll-${litnum[i]}`]).result;
       //clog(`results gear ${i} : ${r}`);
       if ( r == '6' || r == 6 ) {        
-        pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[6]]}} `; 
+        pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[6cs>5]]}} `; 
         successes++;
         //clog(`results gear die ${i} is 6, total ${successes} successes`);
       } else if ( r == '1' || r == 1 ) {     
-        pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[1]]}} `; 
+        pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[1cf<2]]}} `; 
         failures++;   
         gearfails++;       
         //clog(`results gear die ${i} is 0, total ${failures} failures and ${gearfails} from gear`);
       } else {
-        pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[1d6]]}} `;  
+        pushGearStr += `{{gear-die-${litnum[i]}=[[1]]}} {{gear-roll-${litnum[i]}=[[1d6cf<2cs>5]]}} `;  
         //clog(`results gear die ${i} is ${r}, total ${successes} successes and ${failures} failures`);
       }
     }
@@ -2064,7 +2023,7 @@ const executeRoll = function({trigger,attributes,roll}) {
       roll.pushable = 0;
     }
 
-    roll.pushRollStr = `${roll.whisper} &{template:mutantyearzero} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{chartype_id=[[${attributes['chartype_id']}]]}} {{name=${roll.name}}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} {{successes=[[${successes}]]}} {{failures=[[${failures}]]}} {{gearfails=[[${gearfails}]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr}`;
+    roll.pushRollStr = `${roll.whisper} &{template:@{rolltemplate_option}} {{character_id=${attributes['character_id']}}} {{character_name=${attributes['character_name']}}} {{chartype_id=[[${attributes['chartype_id']}]]}} {{name=${roll.name}}} {{push=[[${roll.pushable}]]}} {{pushroll=[[${roll.pushroll}]]}} {{successes=[[${successes}]]}} {{failures=[[${failures}]]}} {{gearfails=[[${gearfails}]]}} ${pushAttributeStr} ${pushSkillStr} ${pushGearStr}`;
     
     const pushRoll = {
       attributes: attributes,
