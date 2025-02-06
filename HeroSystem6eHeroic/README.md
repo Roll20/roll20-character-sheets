@@ -309,7 +309,7 @@ This configuration has four tailored power sections that would commonly used by 
 
 ![Propulsion](/HeroSystem6eHeroic/images/VehiclePropulsion.png)
 
-Note that HERO System vehicles typically start with 12 m of running and 4 m of swimming. Since most vehicles add modifiers to or buyback these attributes, this sheet assumes zero for each and refunds the character 14 points.
+Note that HERO System vehicles typically start with 12 m of *Running* and 4 m of *Swimming*. Since most vehicles add modifiers to or buyback these attributes, this sheet assumes zero for each and refunds the character 14 points.
 
 ![Reserves](/HeroSystem6eHeroic/images/VehiclePower.png)
 
