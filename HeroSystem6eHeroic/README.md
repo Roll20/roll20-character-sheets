@@ -315,6 +315,8 @@ Note that HERO System vehicles typically start with 12 m of *Running* and 4 m of
 
 The *More* button reveals inputs for advantage and limitation values as well as the option to add endurance costs. In the example above we noted "Costs END (-1/2)" in the text box, but didn't enter "0.5" as a limitation. This is not necessary because the selection of "Full END" automatically applied this limitation.
 
+If a propulsion system is part of a multipower, which would be entered on the Powers page, change the *Single Power* selection to *Variable Slot* or *Fixed Slot* as appropriate.
+
 ![Reserves](/HeroSystem6eHeroic/images/VehiclePower.png)
 
 The primary and auxiliary endurance reserves replace the *END* and *STUN* attributes in the Health Status Indicator (as *END* and *AUX*). Endurance costs will be subtracted from one of these two attributes, selected by the adjacent radio buttons as shown below.
