@@ -313,7 +313,7 @@ Note that HERO System vehicles typically start with 12 m of *Running* and 4 m of
 
 ![MorePropulsion](/HeroSystem6eHeroic/images/VehiclePropulsionMore.png)
 
-The *More* button reveals inputs for advantage and limitation values as well as the option to add endurance costs. In the example below we noted "Costs END (-1/2)" in the text box, but didn't enter "0.5" as a limitation. This is not necessary because the selection of "Full END" automatically applied this limitation.
+The *More* button reveals inputs for advantage and limitation values as well as the option to add endurance costs. In the example above we noted "Costs END (-1/2)" in the text box, but didn't enter "0.5" as a limitation. This is not necessary because the selection of "Full END" automatically applied this limitation.
 
 ![Reserves](/HeroSystem6eHeroic/images/VehiclePower.png)
 
