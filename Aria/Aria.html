@@ -5,9 +5,16 @@
 <input type="hidden" name="attr_nameinrolls" value="1">
 <input type="hidden" name="attr_pj_pnj" value="pj">
 <div class="body">
-    <input type="hidden" class="tabstoggle" name="attr_optiontab" value="0">
+    <input type="hidden" class="tabstoggle" name="attr_optiontab" value=false>
     <button type="action" class="l_options btn-min" name="act_options" title="Afficher/Cacher les options"></button>
     <div class="options">
+        <input type="hidden" class="optionsWarning" name="attr_showWarning" value=false>
+        <div class="co-comp1-div">
+            <p style="margin-top: 100px"><b>ATTENTION</b></p>
+            <p>Les compétences seront réinitialisées pour être recalculées.</p>
+            <button type="action" class="l_calcul-comp1" name="act_validateWarning">Confirmer</button>
+            <button type="action" class="l_noconf" name="act_noconf">Annuler</button>
+        </div>
         <h1>Options</h1> Type de fiche :
         <select class="opt-field pj_pnj" name="attr_pj-pnj">
             <option value="pj">PJ</option>
@@ -31,27 +38,14 @@
         <hr class="hr_opt">
         <h3>Calculs des compétences</h3>
         <br>
-        <p style="position: relative; top: -28px; margin-bottom: -15px; line-height: 15px;">Calcul automatique des compétences en fonction des caractéristiques du personnage.
-            <br> <span style="color: #AA0000;">&#10071; Les compétences seront réinitialisées pour être recalculées.</span></p> Méthode 1 : Calculs prêts à jouer :
-        <button type="action" class="l_co-comp1-bu" name="act_co-comp1-bu" title="( ( Lien1 + Lien2 ) / 2 ) x 5">Calculer</button>
-        <input type="hidden" class="co-comp1-hi" name="attr_co_comp1" value="0">
-        <br>
-        <div class="co-comp1-div">
-            <p style="margin-top: 100px"><b>ATTENTION</b></p>
-            <p>Les compétences seront réinitialisées pour être recalculées.</p>
-            <button type="action" class="l_calcul-comp1" name="act_calcul-comp1">Confirmer</button>
-            <button type="action" class="l_noconf" name="act_noconf">Annuler</button>
-        </div> Méthode 2 : Calculs pour personnalisation de personnage :
-        <button type="action" class="l_co-comp2-bu" name="act_co-comp2-bu" title="( Lien1 + Lien2 ) x 2">Calculer</button>
-        <input type="hidden" class="co-comp2-hi" name="attr_co_comp2" value="0">
+        <p style="position: relative; top: -28px; margin-bottom: -15px; line-height: 15px;">Calcul automatique des compétences en fonction des caractéristiques du personnage.<br>
+            <span style="color: #AA0000;">&#10071; Les compétences seront réinitialisées pour être recalculées.</span>
+        </p>Méthode 1 : Calculs prêts à jouer :
+        <button type="action" class="l_co-comp1-bu" name="act_skillCalculate1" title="( ( Lien1 + Lien2 ) / 2 ) x 5">Calculer</button>
+        <br> Méthode 2 : Calculs pour personnalisation de personnage :
+        <button type="action" class="l_co-comp2-bu" name="act_skillCalculate2" title="( Lien1 + Lien2 ) x 2">Calculer</button>
         <br>
         <p style="position: relative; top: -10px;">Il vous restera alors 50 points à répartir</p>
-        <div class="co-comp1-div">
-            <p style="margin-top: 100px"><b>ATTENTION</b></p>
-            <p>Les compétences seront réinitialisées pour être recalculées.</p>
-            <button type="action" class="l_calcul-comp2" name="act_calcul-comp2">Confirmer</button>
-            <button type="action" class="l_noconf" name="act_noconf">Annuler</button>
-        </div>
         <hr class="hr_opt">
         <h3>Personnages prétirés</h3>
         <br>
@@ -511,10 +505,9 @@ on(`sheet:opened`, eventInfo => {
     });
 
     setAttrs({
-        optiontab: "0",
-        co_comp1: "0",
-        co_comp2: "0",
-        co_comp3: "0",
+        optiontab: false,
+        showWarning:false,
+        skillCalculateMethod: 0,
         pretire: "0",
         selectpretire: "0"
     });
@@ -648,79 +641,65 @@ on("change:couronnes change:orbes change:scepres change:rois sheet:opened", () =
 
 on(`clicked:options`, () => {
     getAttrs(["OptionTab"], values => {
-        const OptionTab1 = values.OptionTab || 0;
-        if(OptionTab1 === "1") {
-            setAttrs({
-                optiontab: "0",
-                co_comp1: "0",
-                co_comp2: "0",
-                co_comp3: "0",
-                pretire: "0",
-                selectpretire: "0"
-            });
-        } else {
-            setAttrs({
-                optiontab: "1",
-                co_comp1: "0",
-                co_comp2: "0",
-                co_comp3: "0",
-                pretire: "0",
-                selectpretire: "0"
-            });
-        }
+        const OptionTab1 = values.OptionTab;
+        setAttrs({
+            optiontab: !OptionTab1,
+            showWarning: false,
+            pretire: "0",
+            selectpretire: "0"
+        });
     });
 });
 
-on(`clicked:co-comp1-bu`, () => {
+on(`clicked:skillCalculate1`, () => {
     setAttrs({
-        co_comp1: "1",
-        co_comp2: "0",
-        co_comp3: "0",
-        optiontab: "1",
+        skillCalculateMethod: 1,
+        showWarning: true,
+        warningText: "Les compétences seront réinitialisées pour être recalculées.",
+        optiontab: true,
         pretire: "0"
     });
 });
 
-on(`clicked:co-comp2-bu`, () => {
+on(`clicked:skillCalculate2`, () => {
     setAttrs({
-        co_comp1: "0",
-        co_comp2: "1",
-        co_comp3: "0",
-        optiontab: "1",
-        pretire: "0"
-    });
-});
-
-on(`clicked:co-comp3-bu`, () => {
-    setAttrs({
-        co_comp1: "0",
-        co_comp2: "0",
-        co_comp3: "1",
-        optiontab: "1",
+        skillCalculateMethod: 2,
+        showWarning: true,
+        warningText: "Les compétences seront réinitialisées pour être recalculées.",
+        optiontab: true,
         pretire: "0"
     });
 });
 
 on(`clicked:pretire-bu`, () => {
     setAttrs({
-        co_comp3: "0",
-        co_comp1: "0",
-        co_comp2: "0",
-        optiontab: "1",
+        showWarning: false,
+        skillCalculateMethod: 0,
+        optiontab: true,
         pretire: "1"
     });
 });
 
 on(`clicked:noconf`, () => {
     setAttrs({
-        co_comp1: "0",
-        co_comp2: "0",
-        co_comp3: "0",
+        showWarning: false,
+        skillCalculateMethod: 0,
         pretire: "0"
     });
 });
 
-on(`clicked:calcul-comp1`, () => {
+on(`clicked:validateWarning`, () => {
+    getAttrs(["skillCalculateMethod"], values => {
+        if(values.skillCalculateMethod == 1) {
+            CalculateSkills1();
+        }
+        if(values.skillCalculateMethod == 2) {
+            CalculateSkills2();
+        }
+    });
+});
+
+const CalculateSkills1 = () => {
     getAttrs(["force", "dexterite", "endurance", "intelligence", "charisme"], values => {
         const FOR = +values.force || 0;
         const DEX = +values.dexterite || 0;
@@ -749,16 +728,15 @@ on(`clicked:calcul-comp1`, () => {
             soigner: Math.floor((INT + CHA) / 2) * 5,
             survie: Math.floor((END + INT) / 2) * 5,
             voler: Math.floor((INT + CHA) / 2) * 5,
-            optiontab: "0",
-            co_comp1: "0",
-            co_comp2: "0",
-            co_comp3: "0",
+            optiontab: false,
+            showWarning: false,
+            skillCalculateMethod: 0,
             pretire: "0"
         });
     });
-});
+};
 
-on(`clicked:calcul-comp2`, () => {
+const CalculateSkills2 = () => {
     getAttrs(["force", "dexterite", "endurance", "intelligence", "charisme"], values => {
         const FOR = +values.force || 0;
         const DEX = +values.dexterite || 0;
@@ -787,14 +765,13 @@ on(`clicked:calcul-comp2`, () => {
             soigner: (INT + CHA) * 2,
             survie: (END + INT) * 2,
             voler: (INT + CHA) * 2,
-            optiontab: "0",
-            co_comp1: "0",
-            co_comp2: "0",
-            co_comp3: "0",
+            optiontab: false,
+            showWarning: false,
+            skillCalculateMethod: 0,
             pretire: "0"
         });
     });
-});
+};
 
 const pretires = [
     { character_name: "Reveka Cosovei", profession: "Sorcière", age: 22, force: 9, dexterite: 10, endurance: 12, intelligence: 16, charisme: 13, blessures: 0, protection: 0,
