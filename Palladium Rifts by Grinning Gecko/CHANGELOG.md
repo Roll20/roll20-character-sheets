@@ -2,6 +2,10 @@
 
 ## [1.7.0] - 2025-02-08
 
+### Added
+
+- Add Damage to Ancient Weapon Proficiencies (applies to Pole Arm and Whip).
+
 ### Changed
 
 - Add 20 to Turn Tracker initiative when a Natural 20 is rolled.
