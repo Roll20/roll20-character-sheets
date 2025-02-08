@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.0] - 2025-02-08
+
+### Changed
+
+- Add 20 to Turn Tracker initiative when a Natural 20 is rolled.
+
 ## [1.6.1] - 2025-01-27
 
 ### Added

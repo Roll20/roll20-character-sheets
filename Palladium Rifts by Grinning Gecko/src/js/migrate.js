@@ -172,6 +172,9 @@ async function migrateAttributes() {
     {
       version: "1.6.1",
     },
+    {
+      version: "1.7.0",
+    }
   ];
 
   const { version, migrated } = await getAttrsAsync(["version", "migrated"]);
