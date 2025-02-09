@@ -1919,12 +1919,12 @@
             {{/damage}} {{#penetrating}}
             <div class="sheet-result-fail sheet-rt-grid">
                 <div class="sheet-rt-key">Penetrating (armor)</div>
-                <div class="sheet-rt-value sheet-mouseover-hideroll">{{penetrating}}</div>
+                <div class="sheet-rt-value sheet-mouseover-hideroll">-{{penetrating}}</div>
             </div>
             {{/penetrating}} {{#piercing}}
             <div class="sheet-result-fail sheet-rt-grid">
                 <div class="sheet-rt-key">Piercing (forcefield)</div>
-                <div class="sheet-rt-value sheet-mouseover-hideroll">{{piercing}}</div>
+                <div class="sheet-rt-value sheet-mouseover-hideroll">-{{piercing}}</div>
             </div>
             {{/piercing}} {{/defended}} {{#forcefield0key}}
             <div class="sheet-result-fail sheet-rt-grid">
@@ -7623,7 +7623,7 @@
                     const sections = ['config','enhancements','limiters'];
                     const indexes = {
                         config:['damage_type','weapon_class'],
-                        enhancements:['accurate','autofire','flexible','homing','indirect','range'],
+                        enhancements:['accurate','autofire','flexible','homing','indirect','penetrating','piercing','range'],
                         limiters:['inaccurate'],
                     };
                     for (let i = 0; i < sections.length; i++) {
@@ -8278,6 +8278,10 @@
                             ` {{stun=Stun }}` : '';
                         roll.template += roll.attacker.weapon.autofire !== undefined ?
                             ` {{autofire=${damage.hits}}}` : '';
+                        roll.template += roll.attacker.weapon.penetrating !== undefined ?
+                            ` {{penetrating=${roll.attacker.weapon.penetrating * 10}}}` : '';
+                        roll.template += roll.attacker.weapon.piercing !== undefined ?
+                            ` {{piercing=${roll.attacker.weapon.piercing * 10}}}` : '';
                         damage.taken = 0;
                         if (damage.received !== 0) {
                             damage.absorbed = [];
@@ -8291,7 +8295,7 @@
                                 'armor':[],
                                 'absorption':[]
                             };
-                            clog(cache, defenses, 'actionRoll(defenses)');debugger;
+                            clog(cache, defenses, 'actionRoll(defenses)');
                             for (let p = 0; p < protections.length; p++) {
                                 for (let i = 0; i < cache.attrdb[protections[p]].length; i++) {
                                     if (
@@ -8346,7 +8350,13 @@
                                             }
                                             // Calculate damage against armor_rating.
                                             for (let i = 0; i < damage.hits; i++) {
-                                                const damage_taken = Math.max(damage.received - defenses.armor_rating, 0);
+                                                const damage_taken = Math.max(damage.received - (
+                                                    protections[p] === 'armor' && roll.attacker.weapon.penetrating !== undefined ?
+                                                        Math.max(defenses.armor_rating - (roll.attacker.weapon.penetrating * 10), 0) :
+                                                    protections[p] === 'force field' && roll.attacker.weapon.piercing !== undefined ?
+                                                        Math.max(defenses.armor_rating - (roll.attacker.weapon.piercing * 10), 0) :
+                                                    defenses.armor_rating
+                                                ), 0);
                                                 let damage_stopped = 0;
                                                 // Record damage stopped for Conversion with Escalate.
                                                 if (protections[p] === 'force field' || protections[p] === 'armor') {
