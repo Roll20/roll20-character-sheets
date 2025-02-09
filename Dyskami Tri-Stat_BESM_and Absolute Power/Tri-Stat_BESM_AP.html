@@ -1913,7 +1913,7 @@
             </div>
             {{/autofire}} {{^defended}} {{#damage}}
             <div class="sheet-result-fail sheet-rt-grid">
-                <div class="sheet-rt-key">{{stun}}Damage{{#autofire}} per Hit{{/autofire}}</div>
+                <div class="sheet-rt-key">{{stun}}Damage{{#autofire}} per hit{{/autofire}}</div>
                 <div class="sheet-rt-value sheet-mouseover-hideroll">+{{damage}}</div>
             </div>
             {{/damage}} {{#penetrating}}
@@ -4048,6 +4048,7 @@
                     case 'soul':
                         temp.push(
                             'attrdb',
+                            'defectdb',
                             'groupdb',
                             'rulesdb',
                             'statsdb'
@@ -4634,187 +4635,8 @@
             'unsettled',
         ];
         clog(cache, temp, `setActiveAttribute()`);
-        // Collect required values
-        /*
-        temp.get_attrs = [];
-        if (!Array.isArray(cache.active_attributes)) {
-            const string_to_array = [];
-            string_to_array.push(cache.active_attributes);
-            cache.active_attributes = string_to_array;
-        } else {
-            cache.active_attributes.push('massive damage');
-        }
-        */
         // Calculate Base Value
         for (let i = 0; i < temp.active_attributes.length; i++) {
-            /*
-            switch(temp.active_attributes[i]) {
-                case 'attack mastery':
-                    if (cache.acv === undefined) {
-                        cache.acv = Math.round((
-                            (
-                                cache.statsdb.body.base +
-                                (cache.statsdb.body.augmented || 0) +
-                                cache.statsdb.body.temp -
-                                cache.statsdb.body.damage -
-                                (cache.statsdb.body.shortcoming || 0)
-                            ) +
-                            (
-                                cache.statsdb.mind.base +
-                                (cache.statsdb.mind.augmented || 0) +
-                                cache.statsdb.mind.temp -
-                                cache.statsdb.mind.damage -
-                                (cache.statsdb.mind.shortcoming || 0)
-                            ) +
-                            (
-                                cache.statsdb.soul.base +
-                                (cache.statsdb.soul.augmented || 0) +
-                                cache.statsdb.soul.temp -
-                                cache.statsdb.soul.damage -
-                                (cache.statsdb.soul.shortcoming || 0)
-                            )
-                        ) / 3);
-                    }
-                break;
-                case 'combat technique':
-                    for (let i = 0, n = temp.attrdb.config.length; i < n; i++) {
-                        switch (temp.attrdb.config[i].name) {
-                            case 'hardboiled':
-                                cache.shockvalue =
-                                (
-                                    cache.statsdb.body.base +
-                                    (cache.statsdb.body.augmented || 0) +
-                                    cache.statsdb.body.temp -
-                                    cache.statsdb.body.damage -
-                                    (cache.statsdb.body.shortcoming || 0)
-                                ) +
-                                (
-                                    cache.statsdb.soul.base +
-                                    (cache.statsdb.soul.augmented || 0) +
-                                    cache.statsdb.soul.temp -
-                                    cache.statsdb.soul.damage -
-                                    (cache.statsdb.soul.shortcoming || 0)
-                                )
-                            break;
-                        }
-                    }
-                break;
-                case 'defense mastery':
-                    if (cache.dcv === undefined) {
-                        cache.dcv = Math.round((
-                            (
-                                cache.statsdb.body.base +
-                                (cache.statsdb.body.augmented || 0) +
-                                cache.statsdb.body.temp -
-                                cache.statsdb.body.damage -
-                                (cache.statsdb.body.shortcoming || 0)
-                            ) +
-                            (
-                                cache.statsdb.mind.base +
-                                (cache.statsdb.mind.augmented || 0) +
-                                cache.statsdb.mind.temp -
-                                cache.statsdb.mind.damage -
-                                (cache.statsdb.mind.shortcoming || 0)
-                            ) +
-                            (
-                                cache.statsdb.soul.base +
-                                (cache.statsdb.soul.augmented || 0) +
-                                cache.statsdb.soul.temp -
-                                cache.statsdb.soul.damage -
-                                (cache.statsdb.soul.shortcoming || 0)
-                            )
-                        ) / 3);
-                    }
-                break;
-                case 'energized':
-                    if (cache.energy === undefined) {
-                        cache.energy = (
-                            (
-                                cache.statsdb.mind.base +
-                                (cache.statsdb.mind.augmented || 0) +
-                                cache.statsdb.mind.temp -
-                                cache.statsdb.mind.damage -
-                                (cache.statsdb.mind.shortcoming || 0)
-                            ) +
-                            (
-                                cache.statsdb.soul.base +
-                                (cache.statsdb.soul.augmented || 0) +
-                                cache.statsdb.soul.temp -
-                                cache.statsdb.soul.damage -
-                                (cache.statsdb.soul.shortcoming || 0)
-                            )
-                        ) * 5;
-                    }
-                break;
-                case 'massive damage':
-                    cache.dm = 5;
-                break;
-                case 'social mastery':
-                    if (
-                        cache.scv === undefined ||
-                        cache.society === undefined
-                    ) {
-                        const scv = Math.round((
-                            (
-                                cache.statsdb.mind.base +
-                                (cache.statsdb.mind.augmented || 0) +
-                                cache.statsdb.mind.temp -
-                                cache.statsdb.mind.damage -
-                                (cache.statsdb.mind.shortcoming || 0)
-                            ) +
-                            (
-                                cache.statsdb.soul.base +
-                                (cache.statsdb.soul.augmented || 0) +
-                                cache.statsdb.soul.temp -
-                                cache.statsdb.soul.damage -
-                                (cache.statsdb.soul.shortcoming || 0)
-                            )
-                        ) / 2);
-                        cache.scv = scv;
-                        cache.society = scv;
-                    }
-                break;
-                case 'tough':
-                    if (cache.health === undefined) {
-                        cache.health = (
-                            (
-                                cache.statsdb.body.base +
-                                (cache.statsdb.body.augmented || 0) +
-                                cache.statsdb.body.temp -
-                                cache.statsdb.body.damage -
-                                (cache.statsdb.body.shortcoming || 0)
-                            ) +
-                            (
-                                cache.statsdb.soul.base +
-                                (cache.statsdb.soul.augmented || 0) +
-                                cache.statsdb.soul.temp -
-                                cache.statsdb.soul.damage -
-                                (cache.statsdb.soul.shortcoming || 0)
-                            )
-                        ) * 5;
-                    }
-                break;
-                case 'unassailable':
-                    if (cache.sanity === undefined) {
-                        cache.sanity =
-                        (
-                            cache.statsdb.mind.base +
-                            (cache.statsdb.mind.augmented || 0) +
-                            cache.statsdb.mind.temp -
-                            cache.statsdb.mind.damage -
-                            (cache.statsdb.mind.shortcoming || 0)
-                        ) +
-                        (
-                            cache.statsdb.soul.base +
-                            (cache.statsdb.soul.augmented || 0) +
-                            cache.statsdb.soul.temp -
-                            cache.statsdb.soul.damage -
-                            (cache.statsdb.soul.shortcoming || 0)
-                        )
-                    }
-                break;
-            }
-            */
             // Apply values
             switch(temp.active_attributes[i]) {
                 case 'attack mastery':
@@ -4850,7 +4672,7 @@
                 case 'demure':
                     cache.defectdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
-                            cache.scv -= Math.max(0, (a.level * 2));
+                            cache.scv = Math.max(0, cache.scv -= (a.level * 2));
                         }
                     });
                 break;
@@ -4878,21 +4700,25 @@
                 case 'fragile':
                     cache.defectdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
-                            cache.health -= Math.max(0, (a.level * 10));
+                            cache.health = Math.max(0, cache.health -= (a.level * 10));
                         }
                     });
                 break;
                 case 'inept attack':
+                /*
                     cache.defectdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
                             cache.acv -= Math.max(0, a.level);
                         }
                     });
                 break;
+                */
                 case 'inept defense':
                     cache.defectdb[temp.active_attributes[i]].forEach(a => {
-                        if (a.active) {
-                            cache.dcv -= Math.max(0, a.level);
+                        const attack_type_index = a.config.findIndex(c => c.name === 'attack_type');
+                        if (a.active && a.config[attack_type_index].rank === 'any') {
+                            const cv = `${temp.active_attributes[i] === 'inept attack' ? "acv" : "dcv"}`;
+                            cache[cv] = Math.max(0, cache[cv] -= a.level);
                         }
                     });
                 break;
@@ -4909,7 +4735,7 @@
                 case 'reduced damage':
                     cache.defectdb[temp.active_attributes[i]].forEach(a => {
                         if (a.active) {
-                            cache.dm -= Math.max(0, a.level);
+                            cache.dm = Math.max(0, cache.dm -= a.level);
                         }
                     });
                 break;
@@ -5814,6 +5640,7 @@
                 3: "completely mute",
                 "default": ""
             },
+            /*
             "inept attack":{
                 1: "-1 Attack Combat Value",
                 2: "-2 Attack Combat Value",
@@ -5826,6 +5653,7 @@
                 3: "-3 Defense Combat Value",
                 "default": ""
             },
+            */
             "involuntary change":{
                 1: "Difficult to trigger",
                 2: "Moderately easy to trigger",
@@ -5975,6 +5803,18 @@
                 characteristic = 
                     cache.defectdb['achilles heel'][query.index].config[query.config_index].rank ||
                     'not configued';
+            break;
+            case 'inept attack':
+            case 'inept defense':
+                const cv_mod = query.next === 'write_newdefect' ?
+                    0 : cache.defectdb[`${query.defect}`][query.index].level;
+                query.config_index = query.next === 'write_newdefect' ?
+                    -1 : cache.defectdb[`${query.defect}`][query.index].config.findIndex(c => c.name === 'attack_type');
+                const inept_attack_type = query.next === 'write_newdefect' ?
+                    'any' : cache.defectdb[`${query.defect}`][query.index].config[query.config_index].rank;
+                characteristic = 
+                    `-${cv_mod * (inept_attack_type === 'any' ? 1 : 2)} ` +
+                    `${query.defect === 'inept attack' ? "ACV" : "DCV"}`;
             break;
             case 'shortcoming':
                 for (let i = 0; i < query.db.config.length; i++) {
@@ -6867,7 +6707,7 @@
             "emphasized":'damage_type',
             "group":'group',
             "optimized":'damage_type',
-            "focussed damage":'damage_type',
+            "focussed damage":'weapon_class',
             "targeted":'enemy',
             "targeted damage":'enemy',
             "species":'species',
@@ -7136,10 +6976,12 @@
     function getCV(cache, cv) {
         const temp = {};
         clog(cache, temp, `getCV(${cv})`);
+        /*
         temp.mastery = cache.attrdb[`${cv} mastery`].length !== 0 ?
             cache.attrdb[`${cv} mastery`].map(m => {
                 return m.active ? m.elevel : 0;
             }).reduce((m, n) => { return m + n; }, 0) : 0;
+        */
         temp.cv = 0;
         for (let i = 0; i < 3; i++) {
             temp.cv += 
@@ -7149,11 +6991,9 @@
                 (cache.statsdb[all_stats[i]].shortcoming || 0);
         }
         temp.cv += cache.attrdb.augmented.length !== 0 ?
-            cache.attrdb.augmented.map(m => {
-                return m.active ? m.elevel : 0;
-            }).reduce((m, n) => { return m + n; }, 0) : 0;
+            cache.attrdb.augmented.map(m => m.active ? m.elevel : 0).reduce((m, n) => m + n, 0) : 0;
         temp.cv = Math.round(temp.cv/3);
-        return temp.cv + temp.mastery;
+        return temp.cv;// + temp.mastery;
     }
 
     async function actionRoll(cache, set_values) {
@@ -7163,7 +7003,7 @@
                 edge: 0,
                 obstacle: 0
             },
-            stat: 0,
+            stat: [],
             template: '&{template:rolls}' +
                 ' {{pronoun=@{static_character_details_pronoun}}}' +
                 ' {{character_name=@{static_character_details_name}}}',
@@ -7180,8 +7020,8 @@
         if (cache.source_type === 'react') {
             roll.attacker = rollEscape.unescape(cache.originalRollId);
         }
-        const rulebook = await crpGet(cache, 'static_rules_base_default') || 'besm';
-        const color = rulebook === 'besmx' ? 'besm' : rulebook;
+        //const rulebook = await crpGet(cache, 'static_rules_base_default') || 'besm';
+        const color = cache.rulebook === 'besmx' ? 'besm' : cache.rulebook;
         query.attributes = [];
         const filtered_attributes = all_attributes.map(a => {
             return (a === 'skills' || a === 'skill group'|| a === 'weapon') ? '' : a;
@@ -7290,7 +7130,7 @@
                     query.has_deflection = false;
                     if (roll.type === 'defense') {
                         cache.attrdb['combat technique'].forEach(a => {
-                            for (let i = 0, n = a.config.length; i < n; i++) {
+                            for (let i = 0; i < a.config.length; i++) {
                                 if (
                                     a.config[i].name === 'deflection' &&
                                     a.active
@@ -7315,20 +7155,21 @@
                                 query.has_deflection
                             )
                         ) {
-                            for (let i = 0, n = cache.attrdb.weapon.length; i < n; i++) {
-                                const ranged_weapon = roll.type === 'defense' ?
-                                    cache.attrdb.weapon[i].enhancements.findIndex(e => {
-                                        return e.name === 'range';
-                                    }) : -1;
+                            const weapons = [];
+                            for (let i = 0; i < cache.attrdb.weapon.length; i++) {
+                                const ranged_weapon =
+                                    cache.attrdb.weapon[i].enhancements.findIndex(e => e.name === 'range');
+                                const weapon_name = cache.attrdb.weapon[i].name === '' ?
+                                    getTranslationByKey("weapon") : cache.attrdb.weapon[i].name;
                                 if (cache.attrdb.weapon[i].active && roll.type === 'attack') {
-                                    query.options += `|${cache.attrdb.weapon[i].name},${i}`;
+                                    weapons.push(`${weapon_name},${i}`);
                                 } else if (
                                     cache.attrdb.weapon[i].active && 
                                     roll.type === 'defense' &&
                                     roll.attacker.weapon.range === 0 &&
                                     ranged_weapon === -1
                                 ) {
-                                    query.options += `|${cache.attrdb.weapon[i].name},${i}`;
+                                    weapons.push(`${weapon_name},${i}`);
                                 } else if (
                                     cache.attrdb.weapon[i].active && 
                                     roll.type === 'defense' &&
@@ -7339,12 +7180,13 @@
                                         query.options += `|${getTranslationByKey("deflection")},` +
                                         `?{${getTranslationByKey("choose-weapon")}`;
                                     }
-                                    query.options += `&#124;${cache.attrdb.weapon[i].name}&#44;${i}`;
+                                    query.options += `&#124;${weapon_name}&#44;${i}`;
                                     if (i === n-1) {
                                         query.options += `&#124;${getTranslationByKey("go-back")}&#44;select_weapon&#125;`;
                                     }
                                 }
                             }
+                            query.options = `|${weapons.sort().join("|")}`;
                         }
                     }
                     if (
@@ -7375,28 +7217,75 @@
                     query.options += `|${getTranslationByKey("go-back")},rollsroot`;
                 break;
                 case 'is_enemy':
-                    const enemy_indexies = [];
-                    for (let i = 0; i < cache.defectdb['inept defense'].length; i++) {
-                        if (cache.defectdb['inept defense'][i].active) {
-                            for (let j = 0; j < cache.defectdb['inept defense'][i].config.length; j++) {
-                                if (cache.defectdb['inept defense'][i].config.findIndex(d => d.rank === 'enemy') !== -1) {
-                                    enemy_indexies.push([i,j]);
+                    if (roll.enemies === undefined) {
+                        const enemy_attributes = [];
+                        const enemy_defects = [];
+                        query.enemies = [];
+                        roll.enemies = [];
+                        if (roll.type === 'attack') {
+                            enemy_attributes.push('enemy attack','massive damage','weapon');
+                            enemy_defects.push('inept attack');
+                        } else {
+                            enemy_attributes.push('enemy defense','weapon');
+                            enemy_defects.push('inept defense');
+                        }
+                        for (let i = 0; i < enemy_attributes.length; i++) {
+                            for (let j = 0; j < cache.attrdb[enemy_attributes[i]].length; j++) {
+                                const enemy_index = cache.attrdb[enemy_attributes[i]][j].config.findIndex(c => c.name === 'enemy');
+                                if (enemy_index !== -1) {
+                                    query.enemies.push({
+                                        applies_to: `${
+                                            enemy_attributes[i] === 'enemy attack' ? 'attack' :
+                                            enemy_attributes[i] === 'enemy defense' ? 'defense' : 'damage'
+                                        }`,
+                                        is_defect: false,
+                                        name: cache.attrdb[enemy_attributes[i]][j].config[enemy_index].rank.toLowerCase(),
+                                        rank: cache.attrdb[enemy_attributes[i]][j].elevel,
+                                    });
                                 }
                             }
                         }
+                        for (let i = 0; i < enemy_defects.length; i++) {
+                            for (let j = 0; j < cache.defectdb[enemy_defects[i]].length; j++) {
+                                const enemy_index = cache.defectdb[enemy_defects[i]][j].config.findIndex(c => c.name === 'enemy');
+                                if (enemy_index !== -1) {
+                                    query.enemies.push({
+                                        applies_to: `${
+                                            enemy_defects[i] === 'inept attack' ? 'attack' :
+                                            enemy_defects[i] === 'inept defense' ? 'defense' : 'damage'
+                                        }`,
+                                        is_defect: true,
+                                        name: cache.defectdb[enemy_defects[i]][j].config[enemy_index].rank.toLowerCase(),
+                                        rank: cache.defectdb[enemy_defects[i]][j].level,
+                                    });
+                                }
+                            }
+                            
+                        }
                     }
-                    if (enemy_indexies.length !== 1) {
-                        query.title = '';
-                        query.options = '';
-                        for (let i = 0; i < enemy_indexies.length; i++) {
-                            query.options += `|${cache.defectdb['inept defense'][enemy_indexies[i][0]].config[enemy_indexies[i][1]].enemy},` +
-                            `${cache.defectdb['inept defense'][enemy_indexies[i][0]].rank}`;
+                    if (query.enemies.length !== 0) {
+                        const enemies = [...query.enemies].map(e => e.name.toLowerCase()).sort();
+                        if (enemies.length === 1) {
+                            query.title = 
+                                `${getTranslationByKey("does-this-roll-apply-to-enemy")} ` +
+                                `${enemies[0].name.capitalize()}?`;
+                            query.options = 
+                                `|${getTranslationByKey("no")},no` +
+                                `|${getTranslationByKey("yes")},${enemies[0]}`;
+                        } else {
+                            query.title =
+                                `${getTranslationByKey("select-enemies-this-roll-applies-to")}`;
+                            query.options = roll.enemies.length === 0 ?
+                                `|${getTranslationByKey("none")},no` : `|${getTranslationByKey("done")},done`;
+                            query.options += '|' + enemies.map(e => {
+                                const bracket = roll.enemies.findIndex(r => r.name === e) !== -1;
+                                return `${bracket ? '[' : ''}${e.capitalize()}${bracket ? ']' : ''},${e}`;
+                            }).join('|');
                         }
                     } else {
-                        query.title = `Apply Inept Defense vs. ` +
-                            `${cache.defectdb['inept defense'][enemy_indexies[0][0]].config[enemy_indexies[0][1]].enemy}`;
-                        query.options = `|${getTranslationByKey("no")},no|${getTranslationByKey("yes")},` +
-                            `${cache.defectdb['inept defense'][enemy_indexies[0][0]].rank}`;
+                        query.title = '';
+                        query.options = '';
+                        query.selection = 'done';
                     }
                     query.last = query.next;
                 break;
@@ -7427,9 +7316,6 @@
                         `|${getTranslationByKey("target-number")},target_number` +
                         `|${getTranslationByKey("go-back")},${(
                             cache.rulesdb.rules_optional_maneuvers_status &&
-                            roll.type === 'attack'
-                        ) || (
-                            query.selection === 'unarmed' &&
                             roll.type === 'attack'
                         ) ? 'combat_maneuver' : 'select_weapon'
                         }`;
@@ -7611,7 +7497,6 @@
                         temp: [],
                         stats: [],
                     };
-                    //query.shortcoming.exists = cache.defectdb.shortcoming.length !== 0;
                     if (cache.defectdb.shortcoming.length !== 0) {
                         query.shortcoming.temp = cache.defectdb.shortcoming.map(s => {
                             if (s.active) {
@@ -7622,9 +7507,7 @@
                                     return s.config[0].rank;
                                 } else {
                                     for (let i = 0; i < roll.stat.length; i++) {
-                                        if (
-                                            s.config[0].rank === roll.stat[i]
-                                        ) {
+                                        if (s.config[0].rank === roll.stat[i]) {
                                             return s.config[0].rank;
                                         }
                                     }
@@ -7684,49 +7567,33 @@
                         roll.is_swarm ? 'damage' :
                         roll.weapon.index === -1 || roll.weapon.is_attribute ? 'none' :
                         query.selection === 'unarmed' ? 'stun' :
-                        cache.attrdb.weapon[roll.weapon.index].enhancements.findIndex(e => {
-                            return e.name === 'stun';
-                        }) !== -1 ? 'stun' : 'damage';
-                    let enemy = false;
-                    if (cache.defectdb['inept defense'].length !== 0) {
-                        cache.inept_defense = [];
-                        for (var i = 0; i < cache.defectdb['inept defense'].length; i++) {
-                            if (cache.defectdb['inept defense'][i].active) {
-                                const index = cache.defectdb['inept defense'][i].config.findIndex(d => d.name === 'attack_type');
-                                cache.inept_defense.push(
-                                    [`${cache.defectdb['inept defense'][i].config[index].rank}`,cache.defectdb['inept defense'][i].rank]
-                                );
-                            }
-                        }
-                        for (var i = 0; i < cache.inept_defense.length; i++) {
-                            if (cache.inept_defense[i][0] === 'enemy') {
-                                enemy = true;
-                            }
-                        }
-                    }
+                        cache.attrdb.weapon[roll.weapon.index].enhancements.findIndex(e => e.name === 'stun') !== -1 ?
+                            'stun' : 'damage';
                     query.next = (
                         query.selection === 'rollsroot' || 
                         query.selection === 'select_weapon'
                     ) ? query.selection : (
                             cache.rulesdb.rules_optional_maneuvers_status &&
                             roll.type === 'attack'
-                        ) || (
-                            query.selection === 'unarmed' &&
-                            roll.type === 'attack'
                         ) ? 'combat_maneuver' : 
                         cache.source_type !== 'react' ?
-                            'target_type' :
-                        enemy ? 'is_enemy' : 'done';
+                            'target_type' : 'done';
                     query.do_roll = query.selection === 'select_weapon' ?
                         false : query.do_roll;
                 break;
                 case 'is_enemy':
-                    if (roll.enemy === undefined) {
-                        roll.enemy = query.selection * -2;
+                    if (query.selection === 'no' || query.selection === 'done') {
+                        query.next = 'done';
+                        query.do_roll = true;
                     } else {
-                        roll.enemy -= query.selection * 2;
+                        const select_index = roll.enemies.findIndex(e => e.name === query.selection);
+                        const enemy_index = query.enemies.findIndex(e => e.name === query.selection);
+                        if (select_index !== -1) {
+                            roll.enemies.splice(select_index, 1);
+                        } else {
+                            roll.enemies.push(query.enemies[enemy_index]);
+                        }
                     }
-                    query.next = 'done';
                 break;
                 case 'combat_maneuver':
                     roll.maneuver = query.selection;
@@ -7742,7 +7609,8 @@
                     roll.target.number = int(query.selection);
                     // There is inentionally no 'break' statement here so code execution falls through to exit loop (i.e. query.do_roll = true).
                 case 'target_select':
-                    query.do_roll = true;
+                    query.next = 'is_enemy';
+                    //query.do_roll = true;
                 break;
             }
         }
@@ -7755,11 +7623,11 @@
                     const sections = ['config','enhancements','limiters'];
                     const indexes = {
                         config:['damage_type','weapon_class'],
-                        enhancements:['accurate','flexible','homing','indirect','range'],
+                        enhancements:['accurate','autofire','flexible','homing','indirect','range'],
                         limiters:['inaccurate'],
                     };
                     for (let i = 0; i < sections.length; i++) {
-                        for (let j = 0, m = indexes[sections[i]].length; j < m; j++) {
+                        for (let j = 0; j < indexes[sections[i]].length; j++) {
                             const index = 
                                 cache.attrdb.weapon[roll.weapon.index][sections[i]].findIndex(c => {
                                     return c.name === indexes[sections[i]][j];
@@ -7810,8 +7678,9 @@
                     }
                 }
                 // Weapon ACV/DCV
-                roll.cv = roll.is_swarm ? roll.swarm_acv : getCV(cache, roll.type);
+                roll.cv = roll.is_swarm ? roll.swarm_acv : cache.statsdb.acv.base;
                 const weapon_type = roll.weapon.range !== 0 ? 'ranged attack' : 'melee attack';
+                //=> apply melee/ranged attack attribute
                 if (cache.attrdb[weapon_type].length !== 0) {
                     for (let i = 0; i < cache.attrdb[weapon_type].length; i++) {
                         const class_index = 
@@ -7824,62 +7693,109 @@
                         }
                     }
                 }
-                if (roll.type === 'attack' && cache.defectdb['inept attack'].length !== 0) {
-                    for (let i = 0; i < cache.defectdb['inept attack'].length; i++) {
-                        const class_index = 
-                            cache.defectdb['inept attack'][i].config.findIndex(c => c.name === 'weapon_class');
-                        if (cache.defectdb['inept attack'][i].active) {
-                            const conditional = cache.defectdb['inept attack'][i].config[class_index].rank !== 'any';
-                            roll.cv -= conditional ?
-                                cache.defectdb['inept attack'][i].config[class_index].rank === roll.weapon.weapon_class ?
-                                    cache.defectdb['inept attack'][i].rank * 2 : 0 :
-                                cache.defectdb['inept attack'][i].rank * 2;
-                        }
-                    }
-                } else if (roll.type === 'defense' && cache.defectdb['inept defense'].length !== 0) {
-                    for (let i = 0; i < cache.inept_defense.length; i++) {
-                        const attack_type = roll.attacker.weapon.range !== 0 ? 'ranged attack' : 'melee attack';
-                        roll.cv -=
-                            cache.inept_defense[i][0] === attack_type ? cache.inept_defense[i][1] * 2 :
-                            cache.inept_defense[i][0] === 'any' ? cache.inept_defense[i][1] :
-                            0;
-                    }
-                }
-                roll.cv += roll.enemy || 0;
-                //=> compute targeted attack here
-                // Weapon DM
-                roll.dm = 5;//cache.static_character_dm_base;
-                for (let i = 0, n = cache.attrdb['massive damage'].length; i < n; i++) {
-                    if (
-                        cache.attrdb['massive damage'][i].active && (
-                            cache.attrdb['massive damage'][i].config.class === roll.weapon.class ||
-                            cache.attrdb['massive damage'][i].config.class === undefined
-                        )
-                    ) {
-                        roll.dm += cache.attrdb['massive damage'][i].elevel;
-                    }
-                }
-                //=> compute targeted massive damage here
+                //=> Apply conditional inept attack/defense (i.e. melee/ranged or enemy criteria)
                 if (
-                    !roll.weapon.range ||
-                    roll.weapon.enhancements.findIndex(e => {
-                        return e.name === 'muscle';
-                    }) !== -1
+                    roll.type === 'attack' || roll.type === 'defense' && 
+                    cache.defectdb[`inept ${roll.type}`].length !== 0
                 ) {
-                    for (let i = 0, n = cache.attrdb['superstrength'].length; i < n; i++) {
-                        if (
-                            cache.attrdb['superstrength'][i].active &&
-                            cache.attrdb['superstrength'][i].config.class === roll.weapon.class
-                        ) {
-                            roll.dm += cache.attrdb['superstrength'][i].elevel * (
-                                rulebook === 'absolutepower' ? 2 : 1
-                            );
+                    for (let i = 0; i < cache.defectdb[`inept ${roll.type}`].length; i++) {
+                        const attack_index = cache.defectdb[`inept ${roll.type}`][i].config.findIndex(c => c.name === 'attack_type');
+                        const attack_type = cache.defectdb[`inept ${roll.type}`][i].config[attack_index].rank;
+                        if (cache.defectdb[`inept ${roll.type}`][i].active && attack_type !== 'any') {
+                            if (
+                                roll.weapon.range === 0 && attack_type === 'melee attacks' ||
+                                roll.weapon.range !== 0 && attack_type === 'ranged attacks'
+                            ) {
+                                roll.cv = Math.max(0, roll.cv -= cache.defectdb[`inept ${roll.type}`][i].level);
+                            } else if (attack_type === 'enemy' && roll.enemies.length !== 0) {
+                                const enemy_index = cache.defectdb[`inept ${roll.type}`][i].config.findIndex(c => c.name === 'enemy');
+                                const enemy_name = cache.defectdb[`inept ${roll.type}`][i].config[enemy_index].rank;
+                                if (
+                                    cache.defectdb[`inept ${roll.type}`][i].active && 
+                                    roll.enemies.findIndex(e => e.name === enemy_name) !== -1
+                                ) {
+                                    roll.cv = Math.max(0, roll.cv -= cache.defectdb[`inept ${roll.type}`][i].level);
+                                }
+                            }
                         }
                     }
                 }
-                if (cache.defectdb['reduced damage'].length !== 0) {
-                    roll.dm -= cache.defectdb['reduced damage'].map(r => r.rank).reduce((m, n) => m + n, 0);
-                    if (roll.dm < 0) { roll.dm = 0; }
+                //=> apply enemy attack/defense
+                if (
+                    roll.type === 'attack' || roll.type === 'defense' && 
+                    cache.attrdb[`enemy ${roll.type}`].length !== 0 &&
+                    roll.enemies.length !== 0
+                ) {
+                    for (let i = 0; i < cache.attrdb[`enemy ${roll.type}`].length; i++) {
+                        const enemy_index = cache.attrdb[`enemy ${roll.type}`][i].config.findIndex(c => c.name === 'enemy');
+                        const enemy_name = cache.attrdb[`enemy ${roll.type}`][i].config[enemy_index].rank;
+                        if (
+                            cache.attrdb[`enemy ${roll.type}`][i].active && 
+                            roll.enemies.findIndex(e => e.name === enemy_name) !== -1
+                        ) {
+                            roll.cv += (cache.attrdb[`enemy ${roll.type}`][i].elevel * 2);
+                        }
+                    }
+                }
+                // Weapon DM
+                if (roll.weapon.elevel < 1) { roll.dm = 0; } else {
+                    roll.dm = cache.statsdb.dm.base;
+                    //=> Apply conditional massive damage (i.e. focused or targeted)
+                    for (let i = 0; i < cache.attrdb['massive damage'].length; i++) {
+                        const enemy_index = cache.attrdb['massive damage'][i].config.findIndex(e => e.name === 'enemy');
+                        const enemy_name = enemy_index !== -1 ? cache.attrdb['massive damage'][i].config[enemy_index].rank : '';
+                        const weapon_index = cache.attrdb['massive damage'][i].config.findIndex(e => e.name === 'weapon_class');
+                        const weapon_class = weapon_index !== -1 ? cache.attrdb['massive damage'][i].config[weapon_index].rank : '';
+                        const is_enemy = roll.enemies.length !== 0 ? roll.enemies.findIndex(e => e.name === enemy_name) !== -1 : false;
+                        if (cache.attrdb['massive damage'][i].active) {
+                            if (
+                                enemy_index !== -1 && weapon_index !== -1 &&
+                                is_enemy && roll.weapon.weapon_class === weapon_class
+                            ) {
+                                roll.dm += cache.attrdb['massive damage'][i].elevel;
+                            } else if (enemy_index !== -1 && weapon_index === -1 && is_enemy) {
+                                roll.dm += cache.attrdb['massive damage'][i].elevel;
+                            } else if (
+                                weapon_index !== -1 && enemy_index === -1 && 
+                                roll.weapon.weapon_class === weapon_class
+                            ) {
+                                roll.dm += cache.attrdb['massive damage'][i].elevel;
+                            }
+                        }
+                    }
+                    //=> Apply Superstrength
+                    //   weapons whose class is 'melee'
+                    //   weapons with 'muscle' enhancement
+                    //   weapons with elevel 0 get superstrength damage instead of DM
+                    //   weapons with elevel -1 get no damage bonus
+                    roll.superstrenth_damage = 0;
+                    if (
+                        (
+                            !roll.weapon.range ||
+                            roll.weapon.enhancements.findIndex(e => e.name === 'muscle') !== -1
+                        ) && roll.weapon.elevel > 0
+                    ) {
+                        for (let i = 0; i < cache.attrdb['superstrength'].length; i++) {
+                            if (cache.attrdb['superstrength'][i].active) {
+                                roll.dm += cache.attrdb['superstrength'][i].elevel * (
+                                    cache.rulebook === 'absolutepower' ? 2 : 1
+                                );
+                            }
+                        }
+                    } else if (!roll.weapon.range && roll.weapon.elevel === 0) {
+                        for (let i = 0; i < cache.attrdb['superstrength'].length; i++) {
+                            if (cache.attrdb['superstrength'][i].active) {
+                                roll.superstrenth_damage += cache.attrdb['superstrength'][i].elevel * (
+                                    cache.rulebook === 'absolutepower' ? 10 : 5
+                                );
+                            }
+                        }
+                    }
+                    if (cache.defectdb['reduced damage'].length !== 0) {
+                        const reduced_damage = cache.defectdb['reduced damage'].map(r => r.active ? r.level : 0).reduce((m, n) => m + n, 0);
+                        roll.dm = Math.max(0, roll.dm -= reduced_damage);
+                    }
+                    //roll.dm = dm;// * roll.weapon.elevel;
                 }
             break;
             case 'initiative':
@@ -7899,7 +7815,7 @@
                     }
                 });
                 roll.mod.edge += cache.reflexes;
-                roll.cv = getCV(cache, 'attack');
+                roll.cv = cache.statsdb.acv.base;// getCV(cache, 'attack');
                 roll.initiative_dice = await getDice(cache, query, roll);
                 roll.initiative_roll = await startRoll(`! ${roll.initiative_dice}`);
                 finishRoll(roll.initiative_roll.rollId);
@@ -8355,14 +8271,18 @@
                                     ) + roll.attacker.cv
                                 ) * damage.percentage
                             ) : 0;
+                        damage.hits = roll.attacker.weapon.autofire !== undefined ?
+                            roll.result === 0 ? 1 : Math.ceil(roll.result/3) : 1;
                         roll.template += ` {{damage=${damage.received}}}`;
                         roll.template += roll.attacker.weapon.severity === 'stun' ?
                             ` {{stun=Stun }}` : '';
-                        damage.taken = damage.received;
-                        if (damage.taken !== 0) {
+                        roll.template += roll.attacker.weapon.autofire !== undefined ?
+                            ` {{autofire=${damage.hits}}}` : '';
+                        damage.taken = 0;
+                        if (damage.received !== 0) {
                             damage.absorbed = [];
                             damage.converted = [];
-                            damage.stopped = [];
+                            damage.stopped = 0;
     
                             const protections = ['force field','armor','absorption'];
                             const defenses = {
@@ -8375,25 +8295,19 @@
                             for (let p = 0; p < protections.length; p++) {
                                 for (let i = 0; i < cache.attrdb[protections[p]].length; i++) {
                                     if (
-                                        damage.taken !== 0 && // consider moving this out of the for statements to only read once, if damage calculation to protections will be calculated later...
+                                        //damage.taken !== 0 && // consider moving this out of the for statements to only read once, if damage calculation to protections will be calculated later...
                                         cache.attrdb[protections[p]][i].active
                                     ) {
                                         const protection = cache.attrdb[protections[p]][i];
-                                        clog(cache, protection, `>>>>protection(${protection.name})`);
+                                        //clog(cache, protection, `>>>>protection(${protection.name})`);
                                         const ar_index = 
-                                            protection.config.findIndex(c => {
-                                                return c.name === 'armor rating';
-                                            });
+                                            protection.config.findIndex(c => c.name === 'armor rating');
                                         defenses.armor_rating = ar_index !== -1 ? 
                                             protection.config[ar_index].rank : 0;
                                         // Determine armor_rating if Emphasized or Optimized.
-                                        const eo_index = protection.limiters.findIndex(l => {
-                                            return l.name === 'emphasized' || l.name === 'optimized';
-                                        });
+                                        const eo_index = protection.limiters.findIndex(l => l.name === 'emphasized' || l.name === 'optimized');
                                         if (eo_index !== -1) {
-                                            const dt_index = protection.config.findIndex(c => {
-                                                return c.name === 'damage_type';
-                                            })
+                                            const dt_index = protection.config.findIndex(c => c.name === 'damage_type');
                                             defenses.armor_rating = 
                                                 roll.attacker.weapon.damage_type === protection.config[dt_index].rank ? //=> specialized
                                                 defenses.armor_rating * 2 : //=> not specialized
@@ -8416,28 +8330,33 @@
                                                     // add irritant
                                                 )
                                             ) {
-                                                const transform_index = protection.config.findIndex(c => {
-                                                    return c.name === 'transform';
-                                                });
+                                                const transform_index = protection.config.findIndex(c => c.name === 'transform');
                                                 damage.absorbed.push({
                                                     name: protection.name,
-                                                    total: damage.taken > defenses.armor_rating ? defenses.armor_rating : damage.taken,
+                                                    total: damage.received > defenses.armor_rating ? 
+                                                        defenses.armor_rating * damage.hits : damage.received * damage.hits,
                                                     transform: protection.config[transform_index].rank.substring(
                                                         0, protection.config[transform_index].rank.length - 7
                                                     ),
-                                                    synergistic: protection.enhancements.findIndex(c => {
-                                                        return c.name === 'synergistic'
-                                                    }) !== -1 ? true : false,
-                                                    capped: protection.limiters.findIndex(c => {
-                                                        return c.name === 'capped'
-                                                    }) !== -1 ? true : false,
+                                                    synergistic: protection.enhancements.findIndex(c => c.name === 'synergistic') !== -1 ?
+                                                        true : false,
+                                                    capped: protection.limiters.findIndex(c => c.name === 'capped') !== -1 ?
+                                                        true : false,
                                                 });
                                             }
                                             // Calculate damage against armor_rating.
-                                            damage.taken = Math.max(damage.taken - defenses.armor_rating, 0);
-                                            // Record damage stopped for Conversion with Escalate.
-                                            if (protections[p] === 'force field' || protections[p] === 'armor') {
-                                                damage.stopped.push(Math.min(damage.taken, defenses.armor_rating));
+                                            for (let i = 0; i < damage.hits; i++) {
+                                                const damage_taken = Math.max(damage.received - defenses.armor_rating, 0);
+                                                let damage_stopped = 0;
+                                                // Record damage stopped for Conversion with Escalate.
+                                                if (protections[p] === 'force field' || protections[p] === 'armor') {
+                                                    damage_stopped += Math.min(damage_taken, defenses.armor_rating);
+                                                    if (protections[p] === 'force field' && damage_taken !== 0) {
+                                                        defenses.armor_rating = Math.max(defenses.armor_rating - 10, 0);
+                                                    }
+                                                }
+                                                damage.taken += Math.max(damage_taken, damage_stopped);
+                                                damage.stopped += damage_stopped;
                                             }
                                             // Add active protection to the roll template.
                                             const label = protections[p] === 'force field' ?
@@ -8449,16 +8368,17 @@
                                                 damage.taken !== 0 &&
                                                 protections[p] === 'force field'
                                             ) {
-                                                defenses.armor_rating = Math.max(defenses.armor_rating - 10, 0);
+                                                //defenses.armor_rating = Math.max(defenses.armor_rating - (10 * damage.hits), 0);
                                                 protection.config[ar_index].rank = defenses.armor_rating;
                                                 let value = '';
-                                                for (let j = 0, m = protection.config.length; j < m; j++) {
+                                                for (let j = 0; j < protection.config.length; j++) {
                                                     value += `${protection.config[j].name.capitalize()}` +
                                                     ` (${protection.config[j].rank})\n`;
                                                 }
                                                 set_values[`repeating_attribute_${protection.row_id.toLowerCase()}_configuration`] = value;
                                                 if (defenses.armor_rating === 0) {
                                                     set_values[`repeating_attribute_${protection.row_id.toLowerCase()}_active`] = false;
+                                                    protection.active = false;
                                                 }
                                             }
                                         }
@@ -8477,49 +8397,52 @@
                                         absortion_type === 'health' ? cache.statsdb.health.stun : 0
                                     );
                                     damage.absorbed[i].temp = 0;
+                                    damage.absorbed[i].over = 0;
                                     //=> Note: has to be damage and temp...remaining calculated later.
                                     //=> also, should heal stun since it is loss of health.
-                                    if (
-                                        damage.absorbed[i].total > current_damage
-                                    ) {
-                                        damage.absorbed[i].over = damage.absorbed[i].total - current_damage;
-                                        cache.statsdb[absortion_type].damage = 0;
-                                        if (absortion_type === 'health') { cache.statsdb.health.stun = 0; }
-
-                                        damage.absorbed[i].temp += damage.absorbed[i].capped ? 
-                                            0 : damage.absorbed[i].over;
-                                        damage.absorbed[i].temp = damage.absorbed[i].capped ?
-                                            damage.absorbed[i].temp : damage.absorbed[i].temp > max_points ? 
-                                                max_points : damage.absorbed[i].temp;
-                                                
-                                        roll.template += 
-                                            ` {{absorption${i}key=${damage.absorbed[i].name}}}` +
-                                            ` {{absorption${i}value=${damage.absorbed[i].total}}}`;
-                                    } else {
-                                        cache.statsdb[absortion_type].damage -= damage.absorbed[i].total;
-                                        if (cache.statsdb[absortion_type].damage < 0) {
-                                            damage.absorbed[i].temp = damage.absorbed[i].capped ? 0 :
-                                                cache.statsdb[absortion_type].damage * -1;
-                                            cache.statsdb[absortion_type].damage = 0;
-                                        }
+                                    for (let j = 0; j < damage.hits; j++) {
                                         if (
-                                            absortion_type === 'health' &&
-                                            cache.statsdb[absortion_type].damage === 0 &&
-                                            damage.absorbed[i].temp !== 0
+                                            damage.absorbed[i].total > current_damage
                                         ) {
-                                            cache.statsdb.health.stun -= damage.absorbed[i].temp;
-                                            if (cache.statsdb.health.stun < 0) {
+                                            damage.absorbed[i].over = damage.absorbed[i].total - current_damage;
+                                            cache.statsdb[absortion_type].damage = 0;
+                                            if (absortion_type === 'health') { cache.statsdb.health.stun = 0; }
+
+                                            damage.absorbed[i].temp += damage.absorbed[i].capped ? 
+                                                0 : damage.absorbed[i].over;
+                                            damage.absorbed[i].temp = damage.absorbed[i].capped ?
+                                                damage.absorbed[i].temp : damage.absorbed[i].temp > max_points ? 
+                                                    max_points : damage.absorbed[i].temp;
+                                                    
+                                            roll.template += 
+                                                ` {{absorption${i}key=${damage.absorbed[i].name}}}` +
+                                                ` {{absorption${i}value=${damage.absorbed[i].total}}}`;
+                                        } else {
+                                            cache.statsdb[absortion_type].damage -= damage.absorbed[i].total;
+                                            if (cache.statsdb[absortion_type].damage < 0) {
                                                 damage.absorbed[i].temp = damage.absorbed[i].capped ? 0 :
-                                                    cache.statsdb.health.stun * -1;
-                                                cache.statsdb.health.stun = 0;
+                                                    cache.statsdb[absortion_type].damage * -1;
+                                                cache.statsdb[absortion_type].damage = 0;
                                             }
+                                            if (
+                                                absortion_type === 'health' &&
+                                                cache.statsdb[absortion_type].damage === 0 &&
+                                                damage.absorbed[i].temp !== 0
+                                            ) {
+                                                cache.statsdb.health.stun -= damage.absorbed[i].temp;
+                                                if (cache.statsdb.health.stun < 0) {
+                                                    damage.absorbed[i].temp = damage.absorbed[i].capped ? 0 :
+                                                        cache.statsdb.health.stun * -1;
+                                                    cache.statsdb.health.stun = 0;
+                                                }
+                                            }
+                                            
+                                            const healed_points = damage.absorbed[i].total > current_damage ?
+                                                current_damage : damage.absorbed[i].total;
+                                            roll.template += 
+                                                ` {{absorption${i}key=${damage.absorbed[i].name}}}` +
+                                                ` {{absorption${i}value=${healed_points}}}`;
                                         }
-                                        
-                                        const healed_points = damage.absorbed[i].total > current_damage ?
-                                            current_damage : damage.absorbed[i].total;
-                                        roll.template += 
-                                            ` {{absorption${i}key=${damage.absorbed[i].name}}}` +
-                                            ` {{absorption${i}value=${healed_points}}}`;
                                     }
                                 }
                             }
@@ -10326,8 +10249,8 @@
                     query.options = 
                         `|${getTranslationByKey("any")},any` +
                         `|${getTranslationByKey("enemy")},enemy` +
-                        `|${getTranslationByKey("melee")},melee attack` +
-                        `|${getTranslationByKey("ranged")},ranged attack`;
+                        `|${getTranslationByKey("melee")},melee attacks` +
+                        `|${getTranslationByKey("ranged")},ranged attacks`;
                     query.last = query.next;
                 break;
                 
@@ -10409,10 +10332,8 @@
                         query.title = 'Is this group an item or shield?';
                         query.options = 
                             `|${getTranslationByKey("no")},no` +
-                            `|${getTranslationByKey("yes")},yes` +
+                            `|${getTranslationByKey("item")},yes` +
                             `|${getTranslationByKey("shield")},shield`;
-                            //`|${getTranslationByKey("gear")},gear` +
-                            //`|${getTranslationByKey("exit")},exit`;
                         query.last = query.next;
                     }
                 break;
@@ -10737,8 +10658,8 @@
                     const all_configurations = [
                         'achilles heel',
                         'aspect_stat',
-                        'attacktype',
-                        'attributetype',
+                        'attack_type',
+                        'attribute_type',
                         'augmented_stat',
                         'broad category',
                         'capacity_type',
@@ -11305,12 +11226,14 @@
                         query.selection = query.selection[0];
                         query.next = query.selection;
                     break;
+                    /*
                     case 'choose_enemy':
                         query.config_index = query.config.findIndex(c => c.name === 'attack_type'); 
                         query.config[query.config_index].enemy = query.selection;
                         query.enemy = query.selection;
-                        query.next = query.selection === '' ? 'choose_enemy' : 'defect_menu';
+                        query.next = query.selection === '' ? 'choose_enemy' : 'write_attack_type';
                     break;
+                    */
                     case 'add_attribute':
                         query.attribute = query.selection;
                         query.attribute_translation = query.attribute.toKebobCase();
@@ -11364,19 +11287,26 @@
                         query.next = 'attribute_menu';
                     break;
                     case 'attack_type':
-                        query.config_index = query.config.findIndex(c => c.name === 'attack_type'); 
-                        if (query.config_index !== -1) {
-                            query.config[query.config_index].rank = query.selection;
+                        query.attack_index = query.db.config.findIndex(c => c.name === 'attack_type');
+                        query.db.config[query.attack_index].rank = query.selection;
+                        query.config_index = query.db.config.findIndex(c => c.name === 'enemy');
+                        if (query.selection === 'enemy') {
+                            if (query.config_index === -1) {
+                                query.config_index = query.db.config.push({
+                                    name: 'enemy',
+                                    rank: ''
+                                }) - 1;
+                            }
                         } else {
-                            query.config.push({
-                                name: 'attack_type',
-                                rank: query.selection
-                            });
+                            if (query.config_index !== -1) {
+                                query.db.config.splice(query.config_index, 1);
+                            }
+                            set_values[`${cache.source_path}_configuration`] = 
+                                await setDefectConfiguration(cache, set_values, query);
+                            await setDerivedValues(cache, set_values);
                         }
-                        query.attack_type = query.selection;
-                        query.next = query.selection === 'enemy' ? 'choose_enemy' : 'defect_menu';
+                        query.next = query.selection === 'enemy' ? 'enemy' : 'exit';
                     break;
-                    
                     case 'set_skill':
                         //if (query.selection !== 'add_attribute') {
                             const skill_and_group = query.selection.split("~");
@@ -12006,9 +11936,12 @@
                     case 'trigger':
                         if (query.selection !== 0) {
                             query.db.config[query.config_index].rank = query.selection;
-                            set_values[cache.source] = cache.type === 'attribute' ?
+                            set_values[cache.source] = query.type === 'attribute' ?
                                 await setConfiguration(cache, set_values, query) :
                                 await setDefectConfiguration(cache, set_values, query);
+                            if (query.next === 'enemy' && query.type === 'defect') {
+                                await setDerivedValues(cache, set_values);
+                            }
                             query.next = 'exit';
                         }
                     break;
@@ -12461,6 +12394,17 @@
                                 query.config.push({
                                     name: 'trigger',
                                     rank: ''
+                                });
+                            break;
+                            case 'inept attack':
+                            case 'inept defense':
+                                query.config.push({
+                                    name: query.defect,
+                                    rank: ''
+                                });
+                                query.config.push({
+                                    name: 'attack_type',
+                                    rank: 'any'
                                 });
                             break;
                             case 'shortcoming':
@@ -13897,158 +13841,159 @@
         clog({},temp,'getEvents()','event');
         // Input names
         temp.change_events = [
-            'rules_optional_variable_status',
-            'rules_optional_criticalhits_status',
-            'rules_optional_criticalfailures_status',
-            'rules_optional_dice_status',
-            'rules_optional_genre_status',
-            'static_sheet_settings_theme',
-            'static_rules_base_default',
             'repeating_attribute:active',
             'repeating_defect:active',
-            'repeating_skill:active'
+            'repeating_skill:active',
+            'rules_optional_criticalfailures_status',
+            'rules_optional_criticalhits_status',
+            'rules_optional_dice_status',
+            'rules_optional_genre_status',
+            'rules_optional_variable_status',
+            'static_rules_base_default',
+            'static_sheet_settings_theme',
         ];
         temp.event_string = `change:${temp.change_events.join(" change:")}`;
         // Button names
         temp.button_events = [
-            'static_journal_page_number',
-            'static_journal_title_name',
-            'static_journal_delete_button',
-            'static_attributes_lock_button',
-            'static_character_details_class',
-            'static_character_details_height',
-            'static_character_details_race',
-            'static_character_details_weight',
-            'static_sheet_settings_type',
-            'static_sheet_settings_gm',
-            'static_character_points_base',
-            'static_character_points_gained',
-            'static_character_points_temp',
-            'static_character_details_size',
-            'static_character_energy_temp',
-            'static_character_energy_damage',
-            'static_character_health_temp',
-            'static_character_health_damage',
-            'static_character_health_stun',
-            'static_character_sanity_temp',
-            'static_character_sanity_damage',
-            'static_character_society_temp',
-            'static_character_society_damage',
-            'static_character_body_base',
-            'static_character_body_temp',
-            'static_character_body_damage',
-            'static_character_mind_base',
-            'static_character_mind_temp',
-            'static_character_mind_damage',
-            'static_character_soul_base',
-            'static_character_soul_temp',
-            'static_character_soul_damage',
-            'static_sheet_settings_theme',
-            'static_attribute_group_name',
-            'static_attribute_group_type',
-            'static_attribute_group_source',
-            'static_attribute_group_item',
-            'static_attribute_group_level',
-            'static_attribute_group_stat',
-            'static_attribute_group_configuration',
-            'static_attribute_group_enhancements',
-            'static_attribute_group_limiters',
-            'static_screen_help_button',
-            'static_screen_edit_button',
-            'static_screen_accordion_button',
-            'static_screen_rolls_button',
-            'static_status_update_button',
-            'static_status_add_button',
-            'static_status_delete_button',
-            'static_attributes_delete_button',
-            'static_status_accordion_button',
-            'static_stats_edit_button',
-            'static_stats_accordion_button',
-            'static_capabilities_accordion_button',
-            'static_journal_accordion_button',
-            'static_journal_add_button',
-            'static_journal_save_button',
-            'static_journal_select_button',
-            'static_gmscreen_edit_button',
-            'static_rules_accordion_button',
             'react_button_roll_defense',
             'react_button_roll_skill',
             'react_button_roll_stat',
-            'rules_optional_shockvalue_button',
-            'rules_optional_knockout_button',
-            'rules_optional_seriousinjury_button',
-            'rules_optional_maneuvers_button',
-            'rules_optional_individual_button',
-            'rules_optional_mos_button',
-            'rules_optional_sanity_button',
-            'rules_optional_movementpenalties_button',
-            'rules_optional_knockback_button',
-            'rules_optional_society_button',
-            'rules_optional_shield_button',
-            'rules_optional_rangepenalties_button',
-            'rules_optional_extradamage_button',
-            'rules_optional_enhancedrecovery_button',
-            'rules_optional_spreadinitiative_button',
-            'rules_attribute_extradefenses_button',
+            'repeating_attribute:accordion',
+            'repeating_attribute:attribute',
+            'repeating_attribute:configuration',
+            'repeating_attribute:enhancements',
+            'repeating_attribute:level',
+            'repeating_attribute:limiters',
+            'repeating_attribute:stat',
+            'repeating_condition:delete',
+            'repeating_defect:accordion',
+            'repeating_defect:configuration',
+            'repeating_defect:defect',
+            'repeating_defect:rank',
+            'repeating_skill:accordion',
+            'repeating_skill:rank',
+            'repeating_skill:specializations',
+            'repeating_skill:stat',
             'rules_attribute_deathdodge_button',
             'rules_attribute_debilitate_button',
             'rules_attribute_eknockback_button',
+            'rules_attribute_expertise_button',
+            'rules_attribute_extradefenses_button',
             'rules_attribute_flankdefense_button',
             'rules_attribute_hardboiled_button',
-            'rules_attribute_tournament_button',
-            'rules_attribute_expertise_button',
             'rules_attribute_miniobject_button',
             'rules_attribute_speedburst_button',
             'rules_attribute_taunt_button',
-            'rules_enhancement_cognition_button',
-            'rules_enhancement_sixthsense_button',
-            'rules_enhancement_summoncreatures_button',
-            'rules_enhancement_transfer_button',
+            'rules_attribute_tournament_button',
+            'rules_defect_nohealing_button',
             'rules_enhancement_absorption_button',
+            'rules_enhancement_absorption_button',
+            'rules_enhancement_cognition_button',
+            'rules_enhancement_conversion_button',
             'rules_enhancement_conversion_button',
             'rules_enhancement_forcefield_button',
             'rules_enhancement_powerflux_button',
+            'rules_enhancement_sixthsense_button',
             'rules_enhancement_sizechange_button',
-            'rules_limiter_transmute_button',
-            'static_attributes_accordions_button',
+            'rules_enhancement_summoncreatures_button',
+            'rules_enhancement_teleport_button',
+            'rules_enhancement_transfer_button',
+            'rules_enhancement_weapon_button',
             'rules_homebrew_ammotracking_button',
             'rules_homebrew_depletereserve_button',
             'rules_homebrew_disperse_button',
             'rules_homebrew_specificlimiter_button',
-            'rules_defect_nohealing_button',
-            'rules_enhancement_teleport_button',
-            'rules_enhancement_weapon_button',
-            'rules_enhancement_absorption_button',
-            'rules_enhancement_conversion_button',
-            'rules_limiter_teleport_button',
             'rules_limiter_absorption_button',
             'rules_limiter_merge_button',
             'rules_limiter_plantcontrol_button',
             'rules_limiter_powerflux_button',
+            'rules_limiter_teleport_button',
             'rules_limiter_timed_button',
+            'rules_limiter_transmute_button',
+            'rules_optional_enhancedrecovery_button',
+            'rules_optional_extradamage_button',
+            'rules_optional_individual_button',
+            'rules_optional_knockback_button',
+            'rules_optional_knockout_button',
+            'rules_optional_maneuvers_button',
+            'rules_optional_mos_button',
+            'rules_optional_movementpenalties_button',
+            'rules_optional_rangepenalties_button',
+            'rules_optional_sanity_button',
+            'rules_optional_seriousinjury_button',
+            'rules_optional_shield_button',
+            'rules_optional_shockvalue_button',
+            'rules_optional_society_button',
+            'rules_optional_spreadinitiative_button',
+            'static_attribute_group_configuration',
+            'static_attribute_group_enhancements',
+            'static_attribute_group_item',
+            'static_attribute_group_level',
+            'static_attribute_group_limiters',
+            'static_attribute_group_name',
+            'static_attribute_group_source',
+            'static_attribute_group_stat',
+            'static_attribute_group_type',
+            'static_attributes_accordions_button',
             'static_attributes_add_button',
+            'static_attributes_delete_button',
             'static_attributes_groupselect_button',
             'static_attributes_grouptoggle_button',
-            'static_skills_uitoggle_button',
-            'static_skills_uiselect_button',
-            'static_skills_add_button',
+            'static_attributes_lock_button',
+            'static_capabilities_accordion_button',
+            'static_character_body_base',
+            'static_character_body_damage',
+            'static_character_body_temp',
+            'static_character_details_class',
+            'static_character_details_height',
+            'static_character_details_pronoun',
+            'static_character_details_race',
+            'static_character_details_size',
+            'static_character_details_weight',
+            'static_character_energy_damage',
+            'static_character_energy_temp',
+            'static_character_health_damage',
+            'static_character_health_stun',
+            'static_character_health_temp',
+            'static_character_mind_base',
+            'static_character_mind_damage',
+            'static_character_mind_temp',
+            'static_character_points_base',
+            'static_character_points_gained',
+            'static_character_points_temp',
+            'static_character_sanity_damage',
+            'static_character_sanity_temp',
+            'static_character_society_damage',
+            'static_character_society_temp',
+            'static_character_soul_base',
+            'static_character_soul_damage',
+            'static_character_soul_temp',
+            'static_gmscreen_edit_button',
+            'static_journal_accordion_button',
+            'static_journal_add_button',
+            'static_journal_delete_button',
+            'static_journal_page_number',
+            'static_journal_save_button',
+            'static_journal_select_button',
+            'static_journal_title_name',
+            'static_rules_accordion_button',
+            'static_screen_accordion_button',
+            'static_screen_edit_button',
+            'static_screen_help_button',
+            'static_screen_rolls_button',
+            'static_sheet_settings_gm',
+            'static_sheet_settings_theme',
+            'static_sheet_settings_type',
             'static_skills_accordions_button',
-            'repeating_attribute:accordion',
-            'repeating_attribute:attribute',
-            'repeating_attribute:level',
-            'repeating_attribute:stat',
-            'repeating_attribute:configuration',
-            'repeating_attribute:enhancements',
-            'repeating_attribute:limiters',
-            'repeating_condition:delete',
-            'repeating_defect:accordion',
-            'repeating_defect:defect',
-            'repeating_defect:rank',
-            'repeating_defect:configuration',
-            'repeating_skill:accordion',
-            'repeating_skill:stat',
-            'repeating_skill:rank',
-            'repeating_skill:specializations'
+            'static_skills_add_button',
+            'static_skills_uiselect_button',
+            'static_skills_uitoggle_button',
+            'static_stats_accordion_button',
+            'static_stats_edit_button',
+            'static_status_accordion_button',
+            'static_status_add_button',
+            'static_status_delete_button',
+            'static_status_update_button',
         ];
         temp.event_string += ` clicked:${temp.button_events.join(" clicked:")}`;
         // Repeating sections
