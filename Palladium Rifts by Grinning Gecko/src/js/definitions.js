@@ -1500,6 +1500,8 @@ const COMBAT_KEYS = [
   "damage_range",
   "damage_range_single",
   "damage_range_burst",
+  "damage_range_1",
+  "damage_range_2",
   "critical",
   "knockout",
   "deathblow",
