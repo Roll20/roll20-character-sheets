@@ -297,6 +297,13 @@ async function palladiumAddToTurnTracker(initKey, attacksKey) {
     initKey,
     attacksKey,
   ]);
+  if (!attacks) {
+    const noAttacksMessage = await startRoll(
+      `@{opt_whisper}&{template:custom} {{color=red}} {{title=@{selected|character_name} has no attacks with the Active Profile.}}`
+    )
+    finishRoll(noAttacksMessage.rollId);
+    return;
+  }
   const initString = init > 0 ? `+${init}` : `${init}`;
   const roll = await startRoll(
     `@{opt_whisper}&{template:initiative} {{title=@{selected|character_name} rolls initiative!}} {{diceroll=[[1d20]]}} {{modifier=${initString}}}`

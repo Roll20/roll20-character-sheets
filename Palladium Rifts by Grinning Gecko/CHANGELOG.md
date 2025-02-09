@@ -10,6 +10,7 @@
 ### Changed
 
 - Add 20 to Turn Tracker initiative when a Natural 20 is rolled.
+- Output error message to chat when TT is clicked if the Active Profile has no attacks.
 
 ## [1.6.1] - 2025-01-27
 
