@@ -5,6 +5,7 @@
 ### Added
 
 - Add Damage to Ancient Weapon Proficiencies (applies to Pole Arm and Whip).
+- Add YouTube tutorial link.
 
 ### Changed
 
