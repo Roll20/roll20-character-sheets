@@ -263,6 +263,7 @@ const defaultValues = {
 	"shield_tpkk": "13/3",
 	"shield_tp_roll": "1d6 + 1",
 
+	/// 
 	/// Encumbrance, Armour, Initiative
 	"BE": 0,
 	"be_at_mod": 0,
@@ -302,23 +303,47 @@ const defaultValues = {
 	"wound_rb": 0,
 
 	// Regeneration
+	/// Astral Meditation
+	"reg_astralmeditation_conversion_target_auto": 1,
+	"reg_astralmeditation_limit_life_energy_soft_auto": 9,
+	"reg_astralmeditation_mod_skill_source": "Wert nicht ermittelbar",
+	"reg_astralmeditation_mod_skill_value": 0,
+	"reg_astralmeditation_roll": "&{template:reg-astralmeditation} {{setup=[[0]]}} {{conversiontarget=[[1]]}} {{impossible=[[0d1]]}}",
+	"reg_astralmeditation_set_full_roll": "&{template:reg-astralmeditation-set-full} {{maxconv=[[0]]}}",
+
+	/// Deep Breath
+	"reg_deepbreath_roll": "&{template:reg-deepbreath} {{charactername=@{character_name}}} {{au=[[12]]}} {{xh=[[0]]}} {{ox=[[0]]}} {{nonerequired=[[1]]}}",
+
+	/// Karmic Meditation
+	"reg_karmicmeditation_roll": "&{template:reg-karmicmeditation} {{ke=[[0]]}} {{kemax=[[0]]}} {{notrequired=[[0]]}}",
+
+	/// Relax
+	"reg_relax_duration_auto": 1,
+	"reg_relax_roll": "&{template:reg-relax} {{charactername=@{character_name}}} {{duration=[[1]]}} {{au=[[12]]}} {{ko=[[8]]}} {{nonerequired=[[1]]}}",
+
+	/// Rest
+	"reg_rest_duration_auto": 1,
+	"reg_rest_roll": "&{template:reg-rest} {{charactername=@{character_name}}} {{au=[[12]]}} {{xh=[[0]]}} {{xhmax=[[8]]}} {{ox=[[0]]}} {{oxmax=[[8]]}} {{rt=[[0]]}} {{nonerequired=[[1]]}}",
+
+	/// Sleep
 	"reg_sleep_le_ko": "@{KO} - 1d20",
-	"reg_sleep_le_fixed": "off",
+	"reg_sleep_le_fixed": -1,
 	"reg_sleep_le_mod_advantages_disadvantages": 0,
 	"reg_sleep_le_mod_food_restriction": 0,
 	"reg_sleep_ae_base": "1d6",
 	"reg_sleep_ae_in": "@{IN} - 1d20",
-	"reg_sleep_ae_fixed": "off",
-	"reg_sleep_ae_mod_advantages_disadvantages": 0,
+	"reg_sleep_ae_fixed": -1,
+	"reg_sleep_ae_factor_metal_sensitive_conscious_contact": 1,
 	"reg_sleep_ae_mod_special_skills": 0,
+	"reg_sleep_ae_mod_cuffed": 0,
 	"reg_sleep_ae_mod_food_restriction": 0,
 	"reg_sleep_ae_mod_homesickness": 0,
-	"reg_sleep_addiction_withdrawal_effect": "0",
+	"reg_sleep_addiction_withdrawal_effect": 0,
 	"reg_sleep_food_restriction_effect": 0,
 	"reg_sleep_mod_somnambulism": "0",
 	"reg_sleep_sleep_disorder_effect": "1d6 - 1",
 	"reg_sleep_sleep_disorder_trigger": "1d0",
-	"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}",
+	"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{duration=[[6]]}} {{le=[[12]]}} {{au=[[12]]}} {{xh=[[0]]}} {{ox=[[0]]}} {{ae=[[12]]}} {{ke=[[0]]}} {{rt=[[0]]}} {{nonerequired=[[1]]}}",
 
 	// Repeating sections
 	"repeating_conjuration-spells-myranor": {
@@ -1035,12 +1060,19 @@ const melee = [
 */
 // Regeneration buttons
 const reg = [
+	'reg_astralmeditation',
+	'reg_astralmeditation_set_full',
+	'reg_deepbreath',
+	'reg_karmicmeditation',
+	'reg_relax',
+	'reg_rest',
 	'reg_sleep'
 ];
 
-// Minimum regeneration per regeneration phase (sleep)
+// Minimum regeneration
 const regLimitLower = {
 	'le': 0,
+	'au': 0,
 	'ae': 0,
 	'ke': 0
 };

@@ -109,7 +109,12 @@ The weapons section contains space for five weapons (or spells or abilities with
 
 ![Weapons Table B](/HeroSystem6eHeroic/images/weapons.png)
 
-With the Weapon Worksheet open, begin by entering a weapon's base damage (the shield works the same way). HS6eH will attempt to translate entered damage to a valid HERO damage dice string, meaning some combination of xd6, +d3, +1, and -1 for killing damage and xd6 and +d3 for normal damage (if "Normal Damage" is checked). The resulting dice value appears on the right under "Results." Next, set the weapon's minimum strength value and the strength the character actually applies. If strength improves damage, check "DMG Enhanced by STR." Generally one only adds increments of +5 STR over the minimum since +5 STR = + 1 DC (damage class). Using less than a character's maximum strength may mean saving END costs. Note that typically a weapon's damage class can only be doubled via strength and skill enhancements, but this may be overridden with the option "Weapon Damage limited to 2x Base Damage." Combat Skill Levels can increase damage as well at a cost of +2 CSLs = + 1 DC. These may be entered either in the worksheet or, more conveniently for play, adjusted from the Weapons Table.
+With the Weapon Worksheet open, begin by entering a weapon's base damage (the shield works the same way). HS6eH will attempt to translate entered damage to a valid HERO damage dice string, meaning some combination of xd6, +d3, +1, and -1 for killing damage and xd6 and +d3 for normal damage (*Damage Type* of *Normal* or *Power*). The resulting dice string will appear on the right under "Results."
+
+> [!TIP]
+> A weapon with damage type *power* will use the violet power template for attack rolls and damage. Potentially useful for special weapons or weapon-like adjustment powers.
+
+Next, set the weapon's minimum strength value and the strength the character actually uses. If strength improves damage, check "DMG Enhanced by STR." Generally one only adds increments of +5 STR over the minimum since +5 STR = + 1 DC (damage class). Using less than a character's maximum strength may mean saving END costs. Note that typically a weapon's damage class can only be doubled via strength and skill enhancements, but this may be overridden with the option "Weapon Damage limited to 2x Base Damage." Combat Skill Levels can increase damage as well at a cost of +2 CSLs = + 1 DC. These may be entered either in the worksheet or, more conveniently for play, adjusted from the Weapons Table.
 
 ![Weapon Worksheet](/HeroSystem6eHeroic/images/weaponWorksheet.png)
 
@@ -300,7 +305,7 @@ The utility mod HeroSystem6eHeroic_HDImporter (available in the quick install me
 
 ### HERO Roller
 
-If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. Version 1.3.1 of Hero Roller adds support for HS6eH attribute names. 
+If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. Version 1.3.0 of Hero Roller adds support for HS6eH attribute names.
 
 # <a id="tokens">Tokens</a>
 
@@ -336,5 +341,6 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 
 *First version by Villain In Glasses, August 1, 2021.*
 *Recent updates:*
+*January 25, 2025 adds damage type (killing, normal, and power) to the weapon worksheet (Version 4.10).*
 *January 3, 2025 to represent the sheet as of Version 4.02.*
-*November 21, 2024 to represent the sheet as of Version 3.81 and updated support in Hero Roller 1.3.1.*
+*November 21, 2024 to represent the sheet as of Version 3.81 and updated support in Hero Roller 1.3.0.*

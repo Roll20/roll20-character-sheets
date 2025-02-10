@@ -1,6 +1,22 @@
 # Changelog
 
-## [1.6.0] - 2020-04-18
+## [1.6.1] - 2025-01-27
+
+### Added
+
+- Add roll buttons to punch and kick damage.
+- Add kick damage to Supernatural Strength.
+- Add Ammo tracker to Profile tab.
+
+### Changed
+
+- Move Perception from Saving Throws to beside Initiative.
+- Active Profile columns now fill the width.
+- Fix issue where damage that rolls into the next layer now outputs the correct layer name.
+- Alternating colors on repeating rows, except in the Modifier Picker.
+- Fix issue where using a `+` in a skill modifier dialog would cause the roll to be 0.
+
+## [1.6.0] - 2022-04-18
 
 ### Added
 

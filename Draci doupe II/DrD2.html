@@ -302,7 +302,7 @@
                 <div class="drd-row mastickar">
                     <span class="drd-profession-name">Mastičkář</span>
                     <input type="number" class="drd-profession-level" name="attr_mastickar_level" min="0" max="5" value="0" title="@{mastickar_level}"/>
-                    <button type="roll" tabindex="-1" value="@{whisper_option} &{template:drd-default} @{name_option} {{character_id=@{character_id}}} {{subtitle=Povolání}} {{profession=mastičkář}} {{level=@{mastickar_level}}} {{result=[[?{Zvol typ hodu|obyčejně, 2d6 [obyčejně]|přesně, 3d6kh2 [přesně]|nepřesně, 3d6dh1 [nepřesně]}+@{mastickar_level}]]}}"></button>        
+                    <button type="roll" tabindex="-1" value="@{whisper_option} &{template:drd-default} @{name_option} {{character_id=@{character_id}}} {{subtitle=Povolání}} {{profession=mastičkář}} {{level=@{mastickar_level}}} {{result=[[?{Zvol typ hodu|obyčejně, 2d6 [obyčejně]|přesně, 3d6kh2 [přesně]|nepřesně, 3d6dh1 [nepřesně]}+@{mastickar_level}]]}}"></button>
                 </div>
                 <div class="drd-row zarikavac">
                     <span class="drd-profession-name">Zaříkávač</span>
@@ -1108,7 +1108,7 @@
                                 <option value="Paměť kamene (Duše)">Paměť kamene (Duše)</option>
                                 <option value="Paměť dřeva (Duše)">Paměť dřeva (Duše)</option>
                                 <option value="Znak vodanoje (Duše)">Znak vodanoje (Duše)</option>
-                                <option value="Znak skalnika (Duše)">Znak skalnika (Duše)</option>
+                                <option value="Znak skalníka (Duše)">Znak skalníka (Duše)</option>
                                 <option value="Znak lešije (Duše)">Znak lešije (Duše)</option>
                             </datalist>
                         </div>
@@ -2852,7 +2852,7 @@
             }, {silent: false});
         });
     });
-    
+
     /*
      * Tab switching
      * https://wiki.roll20.net/CSS_Wizardry#Tabs
@@ -2945,11 +2945,11 @@
                 initializeAttrs(Object.getOwnPropertyNames(v), Object.values(v));
             });
         });
-        
+
         getAttrs(professions, function(v){
             initializeAttrs(Object.getOwnPropertyNames(v), Object.values(v));
         });
-        
+
         getAttrs(['professions_total', 'character_level', 'tenacity_current', 'tenacity_current_max', 'amulets_total', 'npc_owner', 'group_size', 'npc_characteristic', 'danger', 'advantages'], function(v) {
             //workerLog(`Initializing\n[${Object.getOwnPropertyNames(v)}] = [${Object.values(v)}]`);
             setAttrs({
@@ -2999,7 +2999,7 @@
             var currentRows = idArray.length;
             var newrowAttrs = {};
             for(var i = currentRows; i < minRows; i++) {
-                var newRowId = generateRowID();                
+                var newRowId = generateRowID();
                 newrowAttrs["repeating_" + sectionName + "_" + newRowId + "_" + fieldName] = 0;
             }
             setAttrs(newrowAttrs);
@@ -3059,7 +3059,7 @@
             }, {silent: true});
         });
     });
-    
+
     /* JQuery to move acquired professions to the top */
     function orderProfessions(){
         professions.forEach(attr => {
@@ -3101,8 +3101,8 @@
             }
         });
     });
-    
-    /* 
+
+    /*
      * Calculate character level
      * Stat level sum needs to be atleast 15
      */
@@ -3132,7 +3132,7 @@
             calculateLevel();
         }
     });
-    
+
     /* JQuery to show/hide group count */
     function showGroupCount(groupSize) {
         if((groupSize === 'individual') || (groupSize === 'swarm')) {
@@ -3241,7 +3241,7 @@
                     if(scarred >= level){exhausted = 0;}
                     if(exhausted < 0){exhausted = 0;}
                     if(exhausted > level){exhausted = level;}
-                    
+
                     if(srcAttr.includes('level')){
                         if(srcAttr.includes('bond') && level > 5) {
                             //workerLog(`${srcAttr} exceeded its max, resetting`);
@@ -3263,7 +3263,7 @@
                         if(sheetType === 'npc' && !srcAttr.includes('bond')) {current = currentMax;}
                         exhausted = currentMax - Math.abs(current);
                     }
-                    
+
                     setAttrs({
                         [`${group}_level`]: level,
                         [`${group}_pool`]: pool,
@@ -3489,7 +3489,7 @@
                     break;
                 default:
                     break;
-            } 
+            }
         }
     }
 
@@ -3504,7 +3504,7 @@
         });
     }
 
-    /* 
+    /*
      * Write “X”, “/” or “ ” to appropriate stat squares
      * squareGroup = body/spirit/influence/companion/network
      * level = represents, among other things, the number of visible squares to write to
@@ -3546,15 +3546,16 @@
         }
     }
 
-    /* ===== PARAMETERS ==========
-    destinations = the name of the attribute that stores the total quantity
-        can be a single attribute, or an array: ['total_cost', 'total_weight']
-        If more than one, the matching fields must be in the same order. 
-    section = name of repeating fieldset, without the repeating_
-    fields = the name of the attribute field to be summed
-          destination and fields both can be a single attribute: 'weight'
-          or an array of attributes: ['weight','number','equipped']
-    */
+    /* 
+     * ===== PARAMETERS =====
+     * destinations = the name of the attribute that stores the total quantity
+     *      can be a single attribute, or an array: ['total_cost', 'total_weight']
+     *      If more than one, the matching fields must be in the same order.
+     * section = name of repeating fieldset, without the repeating_
+     * fields = the name of the attribute field to be summed
+     *      destination and fields both can be a single attribute: 'weight'
+     *      or an array of attributes: ['weight','number','equipped']
+     */
     const repeatingSum = (destinations, section, fields) => {
         if (!Array.isArray(destinations)) destinations = [destinations.replace(/\s/g, '').split(',')];
         if (!Array.isArray(fields)) fields = [fields.replace(/\s/g, '').split(',')];
@@ -3568,8 +3569,8 @@
                     output[destination] = idArray.reduce((total, id) => total + getValue(section, id, fields[index]) * commonMultipliers.reduce((subtotal, mult) => subtotal * getValue(section, id, mult), 1), 0);
                 });
                 setAttrs(output, {silent: true});
-            }); 
-        }); 
+            });
+        });
     };
     on('change:repeating_amulets:amulet_charge remove:repeating_amulets', function(eventInfo){
         repeatingSum('amulets_total', 'amulets', 'amulet_charge');
@@ -3599,37 +3600,33 @@
         <div class="template-content">
                 {{#profession}}
                     {{#level}}
-                    <div class="template-label">
-                        <span>+{{level}} [{{profession}}]</span>
-                    </div>
+                        <div class="template-label">
+                            <span>+{{level}} [{{profession}}]</span>
+                        </div>
                     {{/level}}
                 {{/profession}}
                 {{^profession}}
                     {{#level}}
-                    <div class="template-label">
-                        <span>+{{level}}</span>
-                    </div>
+                        <div class="template-label">
+                            <span>+{{level}}</span>
+                        </div>
                     {{/level}}
                 {{/profession}}
                 {{#profession}}
                     {{^level}}
-                    <div class="template-label">
-                        <span>{{profession}}</span>
-                    </div>
+                        <div class="template-label">
+                            <span>{{profession}}</span>
+                        </div>
                     {{/level}}
                 {{/profession}}
             {{#allprops() title subtitle profession level character_name character_id}}
-            {{#rollGreater() result 8}}
-            <span class="template-result-success">{{result}}</span>
-            {{/rollGreater() result 8}}
-            {{#^rollGreater() result 8}}
-            <span class="template-result">{{result}}</span>
-            {{/^rollGreater() result 8}}
+                {{#rollGreater() result 8}}
+                    <span class="template-result-success">{{result}}</span>
+                {{/rollGreater() result 8}}
+                {{#^rollGreater() result 8}}
+                    <span class="template-result">{{result}}</span>
+                {{/^rollGreater() result 8}}
             {{/allprops() title subtitle profession level character_name character_id}}
         </div>
     </div>
 </rolltemplate>
-
-
-
-
