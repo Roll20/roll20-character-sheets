@@ -10541,15 +10541,41 @@
   });
 
   // Thief Autofill Base Column
-  on('change:thief_level change:autofill_thief', (eventInfo) => {
+  on('change:thief_level change:autofill_thief change:sync_thief_class change:thief_class_selected change:class change:secondclass change:thirdclass change:level change:level_2 change:level_3', (eventInfo) => {
     clog(`Thief Autofill Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(['thief_level', 'autofill_thief'], (v) => {
+    getAttrs(['thief_level', 'autofill_thief', 'sync_thief_class', 'thief_class_selected', 'class', 'secondclass', 'thirdclass', 'level', 'level_2', 'level_3'], (v) => {
       const output = {};
       const autocalcFill = +v.autofill_thief || 0;
+      const syncClass = +v.sync_thief_class || 0;
       // bail out if auto-fill is not enabled.
       if (!autocalcFill) return;
-      const levelSelected = +v.thief_level || 0;
-      clog(`Thief Level:${levelSelected}`);
+      const classLinked = +v.thief_class_selected || 1;
+      let levelSelected = +v.thief_level || 0;
+      const class1Name = v.class || '';
+      const class2Name = v.secondclass || '';
+      const class3Name = v.thirdclass || '';
+      // sync enabled?
+      // check for selected class and use that class level unless chaged
+      if (syncClass === 1) {
+        if (classLinked === 1){
+          // clog(`Linked Class is: ${class1Name} Current Level:${v.level}`);
+          classSelected = matchClassName(class1Name);
+          levelSelected = +v.level;
+          output.thief_level = levelSelected;
+        }
+        if (classLinked === 2){
+          // clog(`Linked Class is: ${class2Name} Current Level:${v.level_2}`);
+          classSelected = matchClassName(class2Name);
+          levelSelected = +v.level_2;
+          output.thief_level = levelSelected;
+        }
+        if (classLinked === 3){
+          // clog(`Linked Class is: ${class3Name} Current Level:${v.level_3}`);
+          classSelected = matchClassName(class3Name);
+          levelSelected = +v.level_3;
+          output.thief_level = levelSelected;
+        }
+      }
       if (levelSelected === 0) return;
       // set Base by level
       if (levelSelected === 1) {
