@@ -1,29 +1,44 @@
-@font-face {
-  font-family: 'Play';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Play-Bold'), url(http://themes.googleusercontent.com/static/fonts/play/v4/ZzUearZLklGfoL18Ti0GaQ.woff) format('woff');
+@import url('https://fonts.googleapis.com/css?family=Play:wght@400&display=swap');
+
+input.tab::before,
+label.clickable,
+.sheet-textHead > span,
+.sheet-textHead,
+.sheet-texthead2Col,
+.sheet-textHead2Col,
+.sheet-record {
+    font-family: 'Play';
 }
 
 :root {
 	/* Light mode colors */
   --sheet-text: #000;
+  --active-tab-bg1:#dcdcdc;
+  --active-tab-bg2:#fcfcfc;
+  --inactive-tab-bg1:#fff;
+  --inactive-tab-bg2:#c8c8c8;
   --input-border: #222;
   --input-border-top: #ccc;
   --input-disabled-bg:#e3e3e3;
   --input-disabled-border:#444;
   --input-disabled-border-top:#999;
   --header-bg: #000;
+  --header-bg-highlight: #555;
+  --col1-bg:#a7a8aa;
   --header-text: #fff;
-  --button-border: #d0d0d0;
-  --button-bg: #a7a8aa;
+  --header-text-highlight: #b9b9b9;
+  --roll-button-border: #d0d0d0;
+  --roll-button-bg: #a7a8aa;
   --button-inset: #ffffff80;
   --button-image: #000000;
   --button2-text: #333;
   --checkbox-accent: #606060;
-  --persistent-checked-bg: #888;
-  --persistent-checked-inset: #6668;
-  --persistent-checked-textshadow: #707070c0;
+  --rule-borders: #777;
+  --ct-checked-text: #fff;
+  --ct-checked-bg: #888;
+  --ct-checked-inset1: #5559;
+  --ct-checked-inset2: #bbb9;
+  --ct-checked-textshadow: #707070c0;
   --button-border: #8886;
   --button-border-bot: #7776;
   --button-text-shadow: #ffffffc0;
@@ -65,9 +80,8 @@
     font-size:14px;     
     width: auto;
 	margin-bottom: 0px;
-	user-select: none;	
 }
-
+ 
 .long {
     width: 100px;
 }
@@ -96,7 +110,7 @@
 .charsheet input[disabled]::-webkit-inner-spin-button,
 .charsheet input[readonly]::-webkit-outer-spin-button,
 .charsheet input[readonly]::-webkit-inner-spin-button {
-	/* This is necessary for Chrome, since the spin buttons still take up space in disabled input boxes, even while invisible. */
+	/* This is necessary for Chrome, since the spin buttons still take up space in disabled and readonly input boxes, even while invisible. */
 	display:none;
 }
  
@@ -140,7 +154,9 @@
 }
  
 .charsheet div.sheet-textHead, 
-.charsheet div.sheet-textHead2Col {
+.charsheet div.sheet-textHead2Col,
+.charsheet label.sheet-textHead,
+.charsheet label.sheet-textHead2Col {
     background-color: var(--header-bg);
     color: var(--header-text);
     font-size: 15px;
@@ -151,11 +167,6 @@
     padding:1px 2px;
     border-spacing: 0px 4px;   
 	margin-left: -2px;
-}
-
-/* Color the span when the checkbox is checked */
-.charsheet .DSP input[type="checkbox"].DSPRed:checked + span {
-    color: red; /* Your desired color */
 }
 
 .charsheet div.sheet-textHead2Col, 
@@ -190,11 +201,6 @@
     height:60px;
     min-width:385px;
 }
-.charsheet textarea.VehActionNotes {
-    font-size: 12px;
-    height:60px;
-    min-width:378;
-}
 .charsheet textarea.StatBlock {
     font-size: 12px;
     height:60px;
@@ -226,14 +232,14 @@
 
 /* ******** Buttons, Checkboxes, and Radio Buttons ******** */
 .charsheet button[type=roll] {
-    padding: 5px 10px 5px !important;
+    padding: 6px 10px 4px !important;
     font-size: 20px;
-    background-color: var(--button-bg);
+    background-color: var(--roll-button-bg);
     font-weight: bold;
     text-shadow: 1px 1px var(--button-border);
     color: var(--button-image);
     border-radius: 100px;
-    border: 1px solid var(--button-border);
+    border: 1px solid var(--roll-button-border);
     cursor: pointer;
     box-shadow: 0 1px 0 var(--button-inset) inset;
 }
@@ -254,12 +260,6 @@
 	color: var(--button2-text);
 	text-shadow: 0 1px 1px var(--button-text-shadow);
 	background-color: var(--button-bg);
-	background-image: -moz-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -ms-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(var(--button-gradient1)), to(var(--button-gradient2)));
-	background-image: -webkit-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -o-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
 	border: 1px solid var(--button-border);
 	border-bottom-color: var(--button-border-bot);
 	border-radius: 4px;
@@ -276,56 +276,87 @@
 	accent-color: var(--checkbox-accent);
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox {
+.charsheet input.ct-label {
 	display:none;
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox + label {
-	width:90%;
+/* Begin code for Condition Track labels */
+.charsheet input.ct-label + label {
+	width:80%;
 	padding: 0px 3px;
 	text-align: center;
+    font-family: 'Play';
 	font-size: 12px;
 	user-select: none;
-	line-height: 16px;
-	margin-top: 1px	
+	line-height: 1.3em;
 	color: var(--button2-text);
 	text-shadow: 0 1px 1px var(--button-text-shadow);
 	background-color: var(--button-bg);
-	background-image: -moz-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -ms-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(var(--button-gradient1)), to(var(--button-gradient2)));
-	background-image: -webkit-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -o-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
 	border: 1px solid var(--button-border);
 	border-bottom-color: var(--button-border-bot);
 	border-radius: 100px;
-	box-shadow: inset 0 1px 0 var(--button-shadow1), 0 1px 2px var(--button-shadow2);
+	box-shadow: inset 0 2px 0 var(--button-shadow1), 0 2px 2px var(--button-shadow2);
+    margin-left:3px;
+    margin-top:2px;
 	cursor: pointer;
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox:checked + label {
-	text-shadow: 0 1px 1px var(--persistent-checked-textshadow);
-	background-image: none;
-	background-color: var(--persistent-checked-bg);
-	color: var(--sheet-text);
-	box-shadow: 0 1px 0 var(--persistent-checked-inset) inset;
+.charsheet input[type="checkbox"].ct-persistent + label {
+    margin-left:0px;
+    margin-top:6px;
+    width:89%;
+    line-height: 1.6em;
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox:hover + label {
+.charsheet input.ct-label:checked + label {
+	text-shadow: 0 1px 1px var(--ct-checked-textshadow);
+	background-image: none;
+	background-color: var(--ct-checked-bg);
+	/*color: var(--sheet-text);*/
+    color:var(--ct-checked-text);
+	box-shadow: 1px 2px 2px var(--ct-checked-inset1) inset, -1px -1px 2px var(--ct-checked-inset2) inset;
+}
+
+.charsheet input.ct-label:hover + label {
 	filter: brightness(103%);
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox:checked:hover + label {
-	filter: brightness(107%);
+.charsheet input.ct-label:checked:hover + label {
+	filter: brightness(109%);
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox:active + label {
-	filter: contrast(120%);
+.charsheet input.ct-label:active + label {
+	filter: contrast(95%);
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox:checked:active + label {
-	filter: contrast(107%);
+.charsheet input.ct-label:checked:active + label {
+	filter: contrast(105%);
+}
+ 
+/* ******** Start code for hiding sections ******** */
+.forceShow:not(:checked) ~ .forceBody,
+.organizationShow:not(:checked) ~ .organizationBody,
+.SRShow:not(:checked) ~ .SRBody,
+.DRShow:not(:checked) ~ .DRBody,
+.immuneShow:not(:checked) ~ .immuneBody,
+.DefArmorLevelShow:not(:checked) ~ .DefArmorLevelBody,
+.PerceptionShow:not(:checked) ~ .PerceptionBody,
+.statusBody:not(:checked) ~ .statusBody,
+.athleticsShow:not(:checked) ~ .athleticsBody,
+.athleticsShow:checked ~ .noathleticsBody,
+.pilotSkillShow:not(:checked) ~ .pilotBody,
+.sectAttack-show:checked ~ .sectAttack,
+.sect-show:not(:checked) ~ .sect,
+.SkillShow:not(:checked) + .SkillBody,
+.other-mod-toggle:checked ~ .repcontainer .other-mod-off,
+.other-mod-toggle:checked ~ .other-mod-off,
+.other-mod-toggle:not(:checked) ~ .repcontainer .other-mod-on,
+.other-mod-toggle:not(:checked) ~ .other-mod-on {
+    display: none;
+}
+
+.sheet-hidden {
+    display: none !important;       
 }
  
 .skillsHeader {
@@ -408,6 +439,27 @@
 .defaultCrew:not(:checked) ~ .defaultCrewLock {
 	pointer-events:none;
 }
+
+/* Code for hideable sections */
+.charsheet label.sheet-textHead {
+    margin-right: 2px;
+    padding: 2.5px 0px;
+}
+
+.charsheet label.sheet-textHead2Col {
+    margin-right: 2px;
+    padding: 2.5px 5px;
+}
+
+label.clickable:hover {
+    background-color: var(--header-bg-highlight);
+    text-shadow: 0px 0px 4px var(--header-text-highlight);
+    cursor: pointer;
+}
+
+input:not(:checked) + label.clickable {
+    margin-bottom:5px;
+}
  
 /* ******** Start code for tabs ******** */
 .charsheet div.sheet-tab-content
@@ -421,7 +473,7 @@
 }
 
 .rule-sections {
-	border: 1px solid #777;
+	border: 1px solid var(--rule-borders);
 	border-radius: 5px;
 	padding: 5px;
 	margin-bottom: 5px;
@@ -443,31 +495,22 @@
     content: attr(title);
     text-align: center;
     display: inline-block;
-     
-    background: #fff;
-    background: -moz-linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-    background: -webkit-linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-    background: -ms-linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-    background: -o-linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-    background: linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-     
+    background: var(--inactive-tab-bg1);
+    background: linear-gradient(to top, var(--inactive-tab-bg2), var(--inactive-tab-bg1), var(--inactive-tab-bg2));
     width: 150px;
-    height: 20px;
+    height: 22px;
     font-size: 18px;
 }
 
 .charsheet input.tab:checked::before {
-    background: #dcdcdc;
-    background: -moz-linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    background: -webkit-linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    background: -ms-linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    background: -o-linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    background: linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    /* border-bottom-color: #fff; */
+    background: var(--active-tab-bg1);
+    background: linear-gradient(to top, var(--active-tab-bg2), var(--active-tab-bg1), var(--active-tab-bg2));
 }
+
 .charsheet input.tab:not(:first-child)::before {
     border-left: none;
 }
+
 .charsheet div.sheet-tab-content { 
     margin: 2px 0 0 5px;
     padding: 5px;
@@ -494,90 +537,16 @@
 	margin-right: 30px;
 }
 
-.charsheet .sheet-col1, 
-.charsheet .sheet-skillsCol1, 
-.charsheet .sheet-skillsCrewCol1 {
-    font-size: 13px;
-    font-weight: bold;
-    text-align: left;
-    padding-left: 5px;	
-}
-
-.sheet-darkmode .sheet-col1, 
-.sheet-darkmode .sheet-skillsCol1, 
-.sheet-darkmode .sheet-skillsCrewCol1 {
+.sheet-col1, 
+.sheet-skillsCol1, 
+.sheet-skillsCrewCol1 {
     font-size: 13px;
     font-weight: bold;
     text-align: left;
     padding-left: 5px;
-	color: var(--dark-primarytext);	
 }
-
-.charsheet label.skillsLabel {
-    font-size: 13px;
-    font-weight: bold;
-    text-align: left;
-}
-
-.sheet-darkmode label.skillsLabel {
-    font-size: 13px;
-    font-weight: bold;
-    text-align: left;
-	color: var(--dark-primarytext);	
-}
-
-.charsheet label.secondarysLabel {
-    color: var(--header-text);
-    font-size: 15px;
-    font-weight: bold;
-    text-align: center;
-    border-radius: 4px;
-    width: 100%;
-    padding: 1px 2px;
-    border-spacing: 0px 2px;	
-}
-
-.charsheet label.secondarysLabel:hover {
-    color:white;
-    filter: drop-shadow(0px 0px 3px #c6c6c6);  
-    cursor: pointer;	
-}
-
-.charsheet label.topskillsLabel {
-    font-weight: bold;	
-}
-
-.charsheet label.topskillsLabel:hover {
-    filter: drop-shadow(0px 0px 3px #c6c6c6);  
-    cursor: pointer;	
-}
-
-.darkmode label.topskillsLabel {
-    color: var(--header-text);
-    font-weight: bold;	
-}
-
-.darkmode label.topskillsLabel:hover {
-    color:white;
-    filter: drop-shadow(0px 0px 3px #c6c6c6);  
-    cursor: pointer;	
-}
-
-.charsheet label.secondarysForceLabel {
-    color: var(--header-text);
-    font-size: 15px;
-    font-weight: bold;
-	margin-left: 127px;	
-}
-
-.charsheet label.secondarysForceLabel:hover {
-    color:white;
-    filter: drop-shadow(0px 0px 3px #c6c6c6);  
-    cursor: pointer;	
-}
-
 .sheet-col1 {
-    background-color: #a7a8aa;
+    background-color: var(--col1-bg);
     border-radius: 5px;
 }
 .sheet-skillsCol1 {
@@ -669,14 +638,35 @@
   --dm-input-disabled-border: #444457;
   --dm-input-disabled-border-top: #393949;
   --dm-header-bg: #338;
+  --dm-header-bg-highlight: #44a;
   --dm-header-text: #f5f5f5;
+  --dm-button-bg: #747492;
+  --dm-button-gradient1:#cacad4;
+  --dm-button-gradient2: #9e9eb0;
+  --dm-button-border:#59596b;
+  --dm-button-shadow:#cacaea;
   --dm-tab-active-gradient1: #333;
   --dm-tab-active-gradient2: #6e6e6e;
   --dm-tab-inactive-gradient1: #444;
   --dm-tab-inactive-gradient2: #292929;
-  --dm-persistent-checked-bg: #6e6e87;
-  --dm-persistent-checked-inset: #6688;
-  --dm-persistent-checked-border: #88a6;
+  /* Colors below are for the CT buttons */
+  --dm-ct-bg: #747492;
+  --dm-ct-border: #000f;
+  --dm-ct-text: #f5f5f5;
+  --dm-ct-checked-bg: #6e6e87;
+  --dm-ct-inset1: #0005;
+  --dm-ct-inset2: #fff9;
+  --dm-ct-checked-inset1: #0005;
+  --dm-ct-checked-inset2: #fff9;
+  --dm-ct-checked-border: #88a6;
+  --dm-ct-checked-text:#f5f5f5;
+  --dm-ct-normal-bg:#00cc00;
+  --dm-ct-minus1-bg:#66cc00;
+  --dm-ct-minus2-bg:#cccc00;
+  --dm-ct-minus5-bg:#cc6600;
+  --dm-ct-minus10-bg:#cc0000;
+  --dm-ct-helpless-bg:#6600cc;
+  --dm-ct-persistent-bg:#00cccc; /* #474760; */
 }
 .sheet-darkmode .ui-dialog { 
 	scrollbar-color: var(--dm-scrollbar1-thumb) var(--dm-scrollbar1-shaft);
@@ -733,14 +723,15 @@
 }
 
 .sheet-darkmode .charsheet div.sheet-textHead2Col,
-.sheet-darkmode .charsheet div.sheet-textHead {
+.sheet-darkmode .charsheet div.sheet-textHead,
+.sheet-darkmode .charsheet label.sheet-textHead,
+.sheet-darkmode .charsheet label.sheet-textHead2Col {
 	background-color: var(--dm-header-bg);
 	color: var(--dm-header-text);
 }
 
-/* Color the span when the checkbox is checked */
-.sheet-darkmode .DSP input[type="checkbox"].DSPRed:checked + span {
-    color: red; /* Your desired color */
+.sheet-darkmode .charsheet label.clickable:hover {
+    background-color: var(--dm-header-bg-highlight);
 }
 
 .sheet-darkmode .charsheet input.tab {
@@ -755,67 +746,63 @@
     background: linear-gradient(to top, var(--dm-tab-active-gradient1), var(--dm-tab-active-gradient2), var(--dm-tab-active-gradient1));
 }
 
-.sheet-darkmode .charsheet input[type="checkbox"].Persistent-checkbox + label {
-	width:90%;
-	padding: 0px 3px;
-	text-align: center;
-	font-size: 12px;
-	user-select: none;
-	line-height: 16px;
-	margin-top: 1px;
-	color: #ffffff;
-	background-color: var(--dm-persistent-checked-bg);
-	background-image: -moz-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -ms-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(var(--button-gradient1)), to(var(--button-gradient2)));
-	background-image: -webkit-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -o-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	border: 1px solid var(--dm-persistent-checked-border);
-	border-bottom-color: var(--button-border-bot);
-	border-radius: 100px;
-	box-shadow: 0 1px 0 var(--dm-persistent-checked-inset) inset;
-	cursor: pointer;
+.sheet-darkmode .charsheet button[type=roll] {
+    background-color: var(--dm-button-bg);
+    /* These do not use color variables because linear-gradients have problems with them as background-images. */
+    background-image: -moz-linear-gradient(top, #cacad4, #9e9eb0);
+    background-image: -ms-linear-gradient(top, #cacad4, #9e9eb0);
+    background-image: -webkit-linear-gradient(top, #cacad4, #9e9eb0);
+    background-image: -o-linear-gradient(top, #cacad4, #9e9eb0);
+    background-image: linear-gradient(top, #cacad4, #9e9eb0);
+    border: 1px solid var(--dm-button-border);
+    box-shadow: 0 1px 0 var(--dm-button-shadow) inset;
 }
 
-.sheet-darkmode .charsheet input[type="checkbox"].ctnormal:checked + label {
-	background-color: #63fe00;
-	color: #474747;	
-	font-weight: bold;	
+/* Start section for condition track buttons */
+.sheet-darkmode .charsheet input.ct-label + label {
+	background-color: var(--dm-ct-bg);
+    color:var(--dm-ct-text);
+    font-weight:400;
+    box-shadow: 0px 1px 1px var(--dm-ct-checked-inset2) inset, -1px -2px 2px var(--dm-ct-checked-inset1) inset, 0 2px 2px var(--button-shadow2);
+    border: 1px solid var(--dm-ct-border);
 }
 
-.sheet-darkmode .charsheet input[type="checkbox"].ctminus1:checked + label {
-	background-color: #d6fe01;
-	color: #474747;	
-	font-weight: bold;		
+.sheet-darkmode .charsheet input.ct-label:checked + label {
+	box-shadow: 1px 2px 2px var(--dm-ct-checked-inset1) inset, -1px -1px 2px var(--dm-ct-checked-inset2) inset;
+	border: 1px solid var(--dm-ct-checked-border);
+    font-weight:bold;
 }
 
-.sheet-darkmode .charsheet input[type="checkbox"].ctminus2:checked + label {
-	background-color: #feff01;
-	color: #474747;	
-	font-weight: bold;	
+.sheet-darkmode .charsheet input.ct-normal:checked + label {
+	background-color: var(--dm-ct-normal-bg);
 }
 
-.sheet-darkmode .charsheet input[type="checkbox"].ctminus5:checked + label {
-	background-color: #ffc001;
-	color: #474747;	
-	font-weight: bold;		
+.sheet-darkmode .charsheet input.ct-minus1:checked + label {
+	background-color: var(--dm-ct-minus1-bg);	
 }
 
-.sheet-darkmode .charsheet input[type="checkbox"].ctminus10:checked + label {
-	background-color: #ff0101;
-	color: #474747;	
-	font-weight: bold;		
+.sheet-darkmode .charsheet input.ct-minus2:checked + label {
+	background-color: var(--dm-ct-minus2-bg);	
 }
 
-.sheet-darkmode .charsheet input[type="checkbox"].cthelpless:checked + label {
-	background-color: #8104fc;	
-	font-weight: bold;	
+.sheet-darkmode .charsheet input.ct-minus5:checked + label {
+	background-color: var(--dm-ct-minus5-bg);			
 }
 
-.sheet-darkmode .charsheet input[type="checkbox"].ctpersistent:checked + label {
-	background-color: #5501eb;	
-	font-weight: bold;	
+.sheet-darkmode .charsheet input.ct-minus10:checked + label {
+	background-color: var(--dm-ct-minus10-bg);	
+}
+
+.sheet-darkmode .charsheet input.ct-helpless:checked + label {
+	background-color: var(--dm-ct-helpless-bg);	
+}
+
+.sheet-darkmode .charsheet input.ct-persistent:checked + label {
+	background-color: var(--dm-ct-persistent-bg);
+}
+
+.sheet-darkmode .charsheet input.ct-label:checked:hover + label {
+	filter: brightness(104%);
 }
 
 /* This doesn't work right now, but hopefully it can be fixed eventually. */
@@ -834,8 +821,7 @@
 .sheet-rolltemplate-skill,
 .sheet-rolltemplate-second-wind,
 .sheet-rolltemplate-statBlock,
-.sheet-rolltemplate-Status,
-.sheet-rolltemplate-StatusVeh {
+.sheet-rolltemplate-Status {
   --rt-text: #000;
   --rt-bg: #fff;
   --rt-header-bg: #000;
@@ -848,10 +834,12 @@
   --rt-result-bg: #000;
   --rt-result-text: #f5f5f5;
   --rt-result-border: #a7a8aa;
-  --rt-result-crit-bg: #15abad;
-  --rt-result-crit-border: #29e3e6;  
+  --rt-result-crit-bg: #44c1ff;
+  --rt-result-crit-border: #44c1ff;
   --rt-result-fail-bg: #b31515;
-  --rt-result-mixed-bg: #4a57ed;
+  --rt-result-fail-border: #b31515;
+  --rt-result-mixed-bg: #525cca;
+  --rt-result-mixed-border: #525cca;
 }
 
 	/* All roll templates (or most of them, anyway) */
@@ -860,8 +848,7 @@
 .sheet-rolltemplate-skill table,
 .sheet-rolltemplate-second-wind table,
 .sheet-rolltemplate-statBlock table,
-.sheet-rolltemplate-Status table,
-.sheet-rolltemplate-StatusVeh table {
+.sheet-rolltemplate-Status table {
     width:100%;
     font-size: 1em;
 	background-color: var(--rt-bg);
@@ -878,8 +865,7 @@
 .sheet-rolltemplate-skill th,
 .sheet-rolltemplate-second-wind th,
 .sheet-rolltemplate-statBlock th,
-.sheet-rolltemplate-Status th, 
-.sheet-rolltemplate-StatusVeh th {
+.sheet-rolltemplate-Status th {
     background-color: var(--rt-header-bg);
     color: var(--rt-header-text);
 	text-align: center;
@@ -893,14 +879,6 @@
 .sheet-rolltemplate-attack .sheet-subheader {
     background-color: var(--rt-subheader-bg);
     color: var(--rt-subheader-text);
-    font-size: 1.1em;
-    text-align: center;
-}
-
-.sheet-rolltemplate-sagadefault .sheet-h3,
-.sheet-rolltemplate-attack .sheet-h3 {
-    background-color: var(--rt-h3-bg);
-    color: var(--rt-h3-text);
     font-size: 1em;
     font-style: italic;
     text-align: center;
@@ -911,8 +889,7 @@
 .sheet-rolltemplate-skill .sheet-tcat,
 .sheet-rolltemplate-second-wind .sheet-tcat,
 .sheet-rolltemplate-statBlock .sheet-tcat,
-.sheet-rolltemplate-Status .sheet-tcat,
-.sheet-rolltemplate-StatusVeh .sheet-tcat {
+.sheet-rolltemplate-Status .sheet-tcat {
     font-weight: bold;
 }
 
@@ -957,7 +934,7 @@
 .sheet-rolltemplate-skill .inlinerollresult.fullcrit,
 .sheet-rolltemplate-second-wind .inlinerollresult.fullcrit {
     background-color: var(--rt-result-crit-bg);
-    border: 2px solid var(--rt-result-crit-border);
+    border-color: var(--rt-result-crit-border);
 }
 
 .sheet-rolltemplate-sagadefault .inlinerollresult.fullfail,
@@ -965,6 +942,7 @@
 .sheet-rolltemplate-skill .inlinerollresult.fullfail,
 .sheet-rolltemplate-second-wind .inlinerollresult.fullfail {
     background-color: var(--rt-result-fail-bg);
+    border-color: var(--rt-result-fail-border);
 }
 
 .sheet-rolltemplate-sagadefault .inlinerollresult.importantroll,
@@ -972,6 +950,7 @@
 .sheet-rolltemplate-skill .inlinerollresult.importantroll,
 .sheet-rolltemplate-second-wind .inlinerollresult.importantroll {
     background-color: var(--rt-result-mixed-bg);
+    border-color: var(--rt-result-mixed-border);
 }
 
 .sheet-rolltemplate-sagadefault div,
@@ -1005,7 +984,7 @@
     text-align: center;
     border-left: none;
 	border-top-right-radius: 2.5px;
-    width: 75px;
+    width: 65px;
 }
 
 .sheet-rolltemplate-skill tr:last-child td {
@@ -1051,15 +1030,13 @@
 
 	/* Sheet roll template for stat block */
 .sheet-rolltemplate-statBlock td,
-.sheet-rolltemplate-Status td,
-.sheet-rolltemplate-StatusVeh td {
+.sheet-rolltemplate-Status td {
     text-align:left;
 	padding: 2px;
 }
 
 .sheet-rolltemplate-statBlock .inlinerollresult,
-.sheet-rolltemplate-Status .inlinerollresult,
-.sheet-rolltemplate-StatusVeh .inlinerollresult {
+.sheet-rolltemplate-Status .inlinerollresult {
 	/* This makes the roll appear as regular text, though the formula is still displayed if hovered. */
     display: inline;
     background-color: transparent;
@@ -1078,23 +1055,20 @@
 .sheet-rolltemplate-skill.sheet-rolltemplate-darkmode,
 .sheet-rolltemplate-second-wind.sheet-rolltemplate-darkmode,
 .sheet-rolltemplate-statBlock.sheet-rolltemplate-darkmode,
-.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode,
-.sheet-rolltemplate-StatusVeh.sheet-rolltemplate-darkmode {
+.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode {
   --rtdm-text: #f0f0f0;
   --rtdm-bg: #404062;
   --rtdm-header-bg: #000;
   --rtdm-header-text: #e6e6e6;
   --rtdm-subheader-bg: #06063c;
   --rtdm-subheader-text: #f5f5f5;
-  --rtdm-h3-bg: #14147d;
-  --rtdm-h3-text: #f5f5f5;  
   --rtdm-tr-odd: #2e2e46;
   --rtdm-tr-even: #404062;
   --rtdm-result-text: #f5f5f5;
   --rtdm-result-bg: #4a206c;
   --rtdm-result-border: #732d95;
-  --rtdm-result-crit-bg: #0a9ea1;
-  --rtdm-result-crit-border: #17e4e8;
+  --rtdm-result-crit-bg: #00a0c2;
+  --rtdm-result-crit-border: #13ebee;
   --rtdm-result-fail-bg: #790505;
   --rtdm-result-fail-border: #c41919;
   --rtdm-result-mixed-bg: #3944ca;
@@ -1105,8 +1079,7 @@
 .sheet-rolltemplate-skill.sheet-rolltemplate-darkmode,
 .sheet-rolltemplate-second-wind.sheet-rolltemplate-darkmode,
 .sheet-rolltemplate-statBlock.sheet-rolltemplate-darkmode,
-.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode,
-.sheet-rolltemplate-StatusVeh.sheet-rolltemplate-darkmode
+.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode
  {
     background-color: var(--dark-surface2); 
 	/* This uses the default Roll20 color variable to prevent colored rectangles from poking through in the rounded corners. */
@@ -1117,8 +1090,7 @@
 .sheet-rolltemplate-skill.sheet-rolltemplate-darkmode table,
 .sheet-rolltemplate-second-wind.sheet-rolltemplate-darkmode table,
 .sheet-rolltemplate-statBlock.sheet-rolltemplate-darkmode table,
-.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode table,
-.sheet-rolltemplate-StatusVeh.sheet-rolltemplate-darkmode table {
+.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode table {
 	background-color: transparent;
 }
 
@@ -1127,8 +1099,7 @@
 .sheet-rolltemplate-skill.sheet-rolltemplate-darkmode th,
 .sheet-rolltemplate-second-wind.sheet-rolltemplate-darkmode th,
 .sheet-rolltemplate-statBlock.sheet-rolltemplate-darkmode th,
-.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode th,
-.sheet-rolltemplate-StatusVeh.sheet-rolltemplate-darkmode th {
+.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode th {
 	background-color: var(--rtdm-header-bg);
     color: var(--rtdm-header-text) !important; /* The default dark mode has an important tag that needs to be overwritten. */
 }
@@ -1138,8 +1109,7 @@
 .sheet-rolltemplate-skill.sheet-rolltemplate-darkmode td,
 .sheet-rolltemplate-second-wind.sheet-rolltemplate-darkmode td,
 .sheet-rolltemplate-statBlock.sheet-rolltemplate-darkmode td,
-.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode td,
-.sheet-rolltemplate-StatusVeh.sheet-rolltemplate-darkmode td {
+.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode td {
     color: var(--rtdm-text);
 }
 
@@ -1147,12 +1117,6 @@
 .sheet-rolltemplate-attack.sheet-rolltemplate-darkmode .sheet-subheader {
     background-color: var(--rtdm-subheader-bg);
     color: var(--rtdm-subheader-text);
-}
-
-.sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode .sheet-h3,
-.sheet-rolltemplate-attack.sheet-rolltemplate-darkmode .sheet-h3 {
-    background-color: var(--rtdm-h3-bg);
-    color: var(--rtdm-h3-text);
 }
 
 .sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode tr:nth-child(odd),
@@ -1218,89 +1182,13 @@
 
 	/* DARK MODE for statBlock Template*/
 .sheet-rolltemplate-statBlock.sheet-rolltemplate-darkmode td,
-.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode td,
-.sheet-rolltemplate-StatusVeh.sheet-rolltemplate-darkmode td {
+.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode td {
     background-color: var(--rtdm-bg);
 }
 
 .sheet-rolltemplate-statBlock.sheet-rolltemplate-darkmode .inlinerollresult,
-.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode .inlinerollresult,
-.sheet-rolltemplate-StatusVeh.sheet-rolltemplate-darkmode .inlinerollresult {
+.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode .inlinerollresult {
     border: none;
 	background-color: transparent;
     color: var(--rtdm-text); /* same as text color */
-}
-
-.charsheet label.defenseStatslabel {
-    font-size: 13px;
-    font-weight: bold;
-    text-align: center;
-    padding-left: 5px;	
-}
-
-.charsheet label.defenseStatslabel:hover {
-    color:white;
-    filter: drop-shadow(0px 0px 3px #c6c6c6);  
-    cursor: pointer;	
-}
-
-.sheet-darkmode label.defenseStatslabel {
-    font-size: 13px;
-    font-weight: bold;
-    text-align: center;
-    padding-left: 5px;
-	color: var(--dark-primarytext);	
-}
-
-.sheet-darkmode label.defenseStatslabel:hover {
-    color:white;
-    filter: drop-shadow(0px 0px 3px #c6c6c6);  
-    cursor: pointer;	
-}
-
-
-/* ******** Start code for hiding sections ******** */
-input.reflexformula-show:not(:checked) ~ table tr.reflexhide,
-input.reflexflatformula-show:not(:checked) ~ table tr.reflexflathide,
-input.fortformula-show:not(:checked) ~ table tr.forthide,
-input.willformula-show:not(:checked) ~ table tr.willhide,
-.oldattacksShow:not(:checked) ~ .newattackBody,
-.oldattacksShow:checked ~ .oldattackBody,
-.attacksShow:not(:checked) ~ .attackBody,
-.forceShow:not(:checked) ~ .forceBody,
-.forcePowerListShow:not(:checked) ~ .forceBodylist,
-.forceDesc-show:not(:checked) ~ .forceDesc,
-.forceFormula-show:not(:checked) ~ .forceFormula,
-.forcePowerShow:not(:checked) ~ .forcePowers,
-.organizationShow:not(:checked) ~ .organizationBody,
-.SRShow:not(:checked) ~ .SRBody,
-.DRShow:not(:checked) ~ .DRBody,
-.immuneShow:not(:checked) ~ .immuneBody,
-.DefArmorLevelShow:not(:checked) ~ .DefArmorLevelBody,
-.perceptionShow:not(:checked) ~ .PerceptionBody,
-.initiativeShow:not(:checked) ~ .InitiativeBody,
-.statusShow:not(:checked) ~ .statusBody,
-.grappleShow:not(:checked) ~ .sectGrapple,
-.athleticsShow:not(:checked) ~ .athleticsBody,
-.athleticsShow:checked ~ .noathleticsBody,
-.pilotSkillShow:not(:checked) ~ .pilotBody,
-.sectAttack-show:checked ~ .sectAttack,
-.defenseShow:not(:checked) ~ .defenseBody,
-.skillShow:not(:checked) ~ .skillBody,
-.attOption-show:not(:checked) ~ .attOptionBody,
-.armor-show:not(:checked) ~ .armorBody,
-.formula-show:not(:checked) ~ .formulaBody,
-.StarshipManeuvers-Show:not(:checked) ~ .StarshipManeuvers,
-.StarshipManeuversSuite-Show:not(:checked) ~ .StarshipManeuversSuite,
-.sect-show:not(:checked) ~ .sect,
-.SkillShow:not(:checked) + .SkillBody,
-.other-mod-toggle:checked ~ .repcontainer .other-mod-off,
-.other-mod-toggle:checked ~ .other-mod-off,
-.other-mod-toggle:not(:checked) ~ .repcontainer .other-mod-on,
-.other-mod-toggle:not(:checked) ~ .other-mod-on {
-    display: none;
-}
-
-.sheet-hidden {
-    display: none !important;       
 }

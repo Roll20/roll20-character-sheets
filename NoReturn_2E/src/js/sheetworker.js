@@ -1,6 +1,7 @@
 /*
     CREATED by          Gorthian
-    Letzte Änderung		2023-10-05
+    Version				1.1 HF3
+    Letzte Änderung		2023-12-16
 */
 
 /* TAB MENU */
@@ -210,6 +211,8 @@ attributeslist.forEach(attribut => {
      
             if(biomechanik==1) { //Hat das Attribut Biomechanik werden alle Fertigkeits-Würfel zu Hazard-Di
                 hazard = summe;
+            } else { //Andernfalls wird der Hazard-Di auf 1 gesetzt
+                hazard = 1;
             }
             setDicebot(getTranslationByKey("attributsprobe"),getTranslationByKey(attribut),summe," ",hazard);
         });
