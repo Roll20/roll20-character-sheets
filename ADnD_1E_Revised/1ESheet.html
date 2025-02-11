@@ -63,9 +63,10 @@
             <span class="left">
               <span>v<span name="attr_sheet_version">
             </span>
-            <span class="right"> • 2/9/25'</span>
+            <span class="right"> • 2/10/25'</span>
           </h5>
           <ul>
+            <li>Added options to autofill Thief Skills racial and Dex modifiers.</li>
             <li>Added an option to the Thief Skills to sync to a class. Base value will continue to auto-adjust whenever the class level changes.</li>
             <li>Added an option to the Attack Matrix/THAC0 section to sync to-Hit values to a class. Table data will continue to auto-adjust whenever the class level changes. Multi/Dual-class characters should choose the most favorable class. Class names entered on the sheet need to match one of the core 1e classes in order for this option to work.</li>
             <li>Added an option to use a 5% progression based to-Hit table for Fighters. (DMG p74) Use 5% checkbox added to Settings|Misc. Options and inside the Attack/THAC0 Matrix window.</li>
@@ -3831,6 +3832,10 @@
         <label class="show-sync-class"></label>
         <label class="show-sync-class"><span>Class</span></label>
         <label class="thief-level"><span>Level</span></label>
+        <label class="inline-label" title="@{autofill_thief_dex} | Let the sheet auto-fill the Dex modifiers based on the character's Dexterity.">
+          <span>Autofill Dex:</span>
+          <input type="checkbox" name="attr_autofill_thief_dex" value="1" /></label>
+        <label><span>Race</span></label>
 
         <label class="inline-label" title="@{sync_thief_class} | Linking to a class will automatically adjust the thief base  values when the linked class level changes.">
           <span>Sync to Class:</span>
@@ -3854,6 +3859,21 @@
         </label>
         <label class="thief-level show-sync-class">
           <input class="width-small border" type="number" name="attr_thief_level" value="1" title="@{thief_level}" readonly />
+        </label>
+        <label class="inline-label" title="@{autofill_thief_race} | Let the sheet auto-fill the racial modifiers based on the character's race.">
+          <span>Autofill Race:</span>
+          <input type="checkbox" name="attr_autofill_thief_race" value="1" />
+        </label>
+        <label>
+          <select>
+            <option selected>n/a</option>
+            <option value="dwarf">Dwarf</option>
+            <option value="elf">Elf</option>
+            <option value="gnome">Gnome</option>
+            <option value="half-elf">Half-elf</option>
+            <option value="halfling">Halfling</option>
+            <option value="half-orc">Half-orc</option>
+          </select>
         </label>
       </div>
       <div class="sect">
@@ -12746,6 +12766,53 @@
     }
   }
 
+  // Thief Dex Class Entry
+  class ThiefDexterityEntry {
+    constructor(pickPockets, openLocks, findRemoveTraps, moveSilently, hideInShadows) {
+      this.pickPockets = pickPockets;
+      this.openLocks = openLocks;
+      this.findRemoveTraps = findRemoveTraps;
+      this.moveSilently = moveSilently;
+      this.hideInShadows = hideInShadows;
+    }
+    getPickPockets() {
+      return this.pickPockets;
+    }
+    getOpenLocks() {
+      return this.openLocks;
+    }
+    getFindRemoveTraps() {
+      return this.findRemoveTraps;
+    }
+    getMoveSilently() {
+      return this.moveSilently;
+    }
+    getHideInShadows() {
+      return this.hideInShadows;
+    }
+  }
+
+  class ThiefDexterityAdjustmentTable {
+    constructor() {
+      // pickPockets, openLocks, findRemoveTraps, moveSilently, hideInShadows
+      this.dexterity_dict = {
+        9:  new ThiefDexterityEntry(-15, -10, -10, -20, -10),
+        10: new ThiefDexterityEntry(-10, -5, -10, -15, -5),
+        11: new ThiefDexterityEntry(-5, 0, -5, -10, 0),
+        12: new ThiefDexterityEntry(0, 0, 0, -5, 0),
+        13: new ThiefDexterityEntry(0, 0, 0, 0, 0),
+        14: new ThiefDexterityEntry(0, 0, 0, 0, 0),
+        15: new ThiefDexterityEntry(0, 0, 0, 0, 0),
+        16: new ThiefDexterityEntry(0, 5, 0, 0, 0),
+        17: new ThiefDexterityEntry(5, 10, 0, 5, 5),
+        18: new ThiefDexterityEntry(10, 15, 5, 10, 10),
+      };
+    }
+    getEntry(str_value) {
+      return this.dexterity_dict[getValidVariable(str_value, 'dexterity', 9, 18)];
+    }
+  }
+
   class ConstitutionEntry {
     constructor(hitpointbonus, systemshock, resurrectionsurvival) {
       this.hitpointbonus = hitpointbonus;
@@ -12871,6 +12938,7 @@
   const AT_DEX = new DexterityAdjustmentTable();
   const AT_CON = new ConstitutionAdjustmentTable();
   const AT_CHA = new CharismaAdjustmentTable();
+  const AT_DEX_THIEF = new ThiefDexterityAdjustmentTable();
 
   // Allows easy modification of variables
   const parseValues = (values, stat, type = 'int') => {
@@ -12942,6 +13010,33 @@
       setAttrs(output);
     });
   };
+
+  dexterityCalcsThief = () => {
+    getAttrs(['dexterity'], (values) => {
+      const output = {};
+      //get dexterity value and look up table data
+      const stat_dex = parseValues(values, 'dexterity', 'int');
+      const pickPockets = AT_DEX_THIEF.getEntry(stat_dex).getPickPockets();
+      const openLocks = AT_DEX_THIEF.getEntry(stat_dex).getOpenLocks();
+      const findRemoveTraps = AT_DEX_THIEF.getEntry(stat_dex).getFindRemoveTraps();
+      const moveSilently = AT_DEX_THIEF.getEntry(stat_dex).getMoveSilently();
+      const hideInShadows = AT_DEX_THIEF.getEntry(stat_dex).getHideInShadows();
+      output.pickpockets_ability_mod = pickPockets;
+      output.openlocks_ability_mod = openLocks;
+      output.findtraps_ability_mod = findRemoveTraps;
+      output.movequietly_ability_mod = moveSilently;
+      output.hideinshadows_ability_mod = hideInShadows;
+      setAttrs(output);
+    });
+  };
+  on('change:autofill_thief_dex change:dexterity', (eventInfo) => {
+    getAttrs(['autofill_thief_dex'], (v) => {
+      const autofill_thief_dex = +v.autofill_thief_dex;
+      //bail out if not enabled
+      if (autofill_thief_dex === 0) return;
+      dexterityCalcsThief();
+    });
+  });
 
   constitutionCalcs = () => {
     getAttrs(['constitution', 'class', 'secondclass', 'thirdclass'], (values) => {
