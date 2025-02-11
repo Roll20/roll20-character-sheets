@@ -10,9 +10,42 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-v3.16.1 [Screenshot](coc_v2.png)
+v3.20.0 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.20.0 (2025-01-25)
+
+- Compatibilité des jets de chat avec le dark-mode Roll20
+
+## v3.19.0 (2024-08-24)
+
+- Gestion des capacités avec nomre d'utilisations limitées
+  - Configuration dans l'onglet Capacités
+  - Décompte d'utilisation, message d'alerte de dépassement, bouton de rechargement
+  - Chargement automatique à l'import d'un profil
+- Boutons gain/perte de PV
+
+## v3.18.0 (2024-06-24)
+
+- Migration de la fiche en CSE
+- Ajout de zones rétractables/extensibles
+  - Dans l'onglet Capacités
+  - Dans l'onglet Equipements
+- Correction de bugs mineurs dans les fonctions d'import de profil et statblock
+
+## v3.17.1 (2024-06-03)
+
+- Fix des bugs Roll20 (styles CSS in-line, sheet.json)
+- Pas de modification fonctionnelle
+
+## v3.17.0 (2024-05-01)
+
+- Fiche de personnage
+  - Modification de l'onglet "Capacités", avec 3 sous-onglets
+    - Jets de capacités
+    - Traits
+    - Buffs
 
 ## v3.16.1 (2023-10-22)
 

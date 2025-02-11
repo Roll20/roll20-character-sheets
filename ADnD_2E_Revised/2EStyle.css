@@ -251,10 +251,10 @@ textarea.sheet-input-like {
     display: block;
 }
 
-/* Fake checkbox */
+/*#region Fake checkbox*/
 .charsheet label input[type="radio"],
 .charsheet label input[type="checkbox"] {
-    display: none;
+    display: inline-block; /* Display the checkbox to show mouse over text */
 }
 
 .charsheet label input[type="radio"] + span::before,
@@ -292,6 +292,21 @@ textarea.sheet-input-like {
 .charsheet input[type="checkbox"]:checked + span::before {
     content: "✓";
 }
+
+/* Actual checkbox aligned for mouseover text */
+.charsheet label input[type="radio"],
+.charsheet input[type="checkbox"] {
+    opacity: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    left: 14px;
+    margin-left: -10px;
+    margin-right: -6px;
+    cursor: pointer;
+    z-index: 1;
+}
+/*#endregion Fake checkbox*/
 
 .charsheet input.sheet-tab1:checked ~ .sheet-section-character-page,
 .charsheet input.sheet-tab2:checked ~ .sheet-section-monster-page,
@@ -382,7 +397,8 @@ textarea.sheet-input-like {
 .charsheet input.sheet-tab82:checked ~ .sheet-section-weapon-player-option,
 .charsheet input.sheet-tab83:checked ~ .sheet-section-weapon-player-option-melee,
 .charsheet input.sheet-tab84:checked ~ .sheet-section-weapon-player-option-ranged,
-.charsheet input.sheet-tab85:checked ~ .sheet-section-settings-page {
+.charsheet input.sheet-tab85:checked ~ .sheet-section-dm-page,
+.charsheet input.sheet-tab86:checked ~ .sheet-section-settings-page {
     display: block;
 }
 
@@ -496,28 +512,20 @@ textarea.sheet-input-like {
 .charsheet input.sheet-tab82:checked + span.sheet-tab82,
 .charsheet input.sheet-tab83:checked + span.sheet-tab83,
 .charsheet input.sheet-tab84:checked + span.sheet-tab84,
-.charsheet input.sheet-tab85:checked + span.sheet-tab85 {
+.charsheet input.sheet-tab85:checked + span.sheet-tab85,
+.charsheet input.sheet-tab86:checked + span.sheet-tab86 {
     display: inline-table;
     background: #ab8b57;
     color: white;
     border-radius: 4px;
 }
 
+/* Tab styling */
 .charsheet input[type="radio"] {
     opacity: 0;
     width: 120px;
     height: 30px;
     position: absolute;
-    cursor: pointer;
-    z-index: 1;
-}
-.charsheet input[type="checkbox"] {
-    opacity: 0;
-    width: 16px;
-    height: 16px;
-    position: relative;
-    left: 10px;
-    margin: -10px;
     cursor: pointer;
     z-index: 1;
 }
@@ -592,10 +600,18 @@ table.sheet-default-header-every-third-column td:nth-child(3n+1),
     font-weight: bold;
 }
 
+table.sheet-background-gray-pair3-header tr:nth-child(6n+4),
+table.sheet-background-gray-pair3-header tr:nth-child(6n+5),
+table.sheet-background-gray-pair3-header tr:nth-child(6n+6),
 table.sheet-background-gray-pair3 tr:nth-child(6n+5),
 table.sheet-background-gray-pair3 tr:nth-child(6n+6),
 table.sheet-background-gray-pair3 tr:nth-child(6n+7) {
     background-color: rgb(0, 0, 0, 10%);
+}
+
+.sheet-align-bottom,
+table.sheet-align-bottom-row1 tr:first-child {
+    vertical-align: bottom;
 }
 
 .sheet-centering,
@@ -621,6 +637,11 @@ table.sheet-centering-padding-5-column5 td:nth-child(5) {
     vertical-align: middle;
 }
 
+table.sheet-left-column1 th:nth-child(1),
+table.sheet-left-column1 td:nth-child(1) {
+    text-align: left;
+}
+
 table.sheet-rogue-info th,
 table.sheet-rogue-info td {
     text-align: center;
@@ -640,6 +661,7 @@ table.sheet-rogue-info-center-column1 th:nth-child(1) {
     margin-right: auto;
 }
 
+table.sheet-centering-padding-2-row1 tr:first-child th:not(:first-child),
 .sheet-centering-padding-2 {
     padding-left: 2px;
     padding-right: 2px;
@@ -754,7 +776,8 @@ th {
     visibility: collapse;
 }
 
-.sheet-hidden {
+.sheet-hidden,
+.charsheet .sheet-hidden {
     display: none;
 }
 
@@ -1325,6 +1348,12 @@ input.sheet-toast-error:checked ~ .sheet-toast-content {
     font-size: 9pt;
     text-align: left;
 }
+.sheet-rolltemplate-2Edefault td.sheet-template-default-desc.sheet-justify {
+    text-align: justify;
+}
+.sheet-rolltemplate-2Edefault td.sheet-template-default-desc.sheet-center {
+    text-align: center;
+}
 
 /*#endregion*/
 /*#region Styles for the 2Eattack Template /*/
@@ -1427,6 +1456,9 @@ input.sheet-toast-error:checked ~ .sheet-toast-content {
 
 /*#endregion*/
 /*#region Styles for the 2Egrenade Template /*/
+.sheet-rolltemplate-2Egrenademiss {
+    /*Overwrite roll commands to look like a button*/
+}
 .sheet-rolltemplate-2Egrenademiss .sheet-template-head {
     background: #B7A64E;
 }
@@ -1441,6 +1473,16 @@ input.sheet-toast-error:checked ~ .sheet-toast-content {
 .sheet-rolltemplate-2Egrenademiss .sheet-miss-text {
     font-size: 8pt;
 }
+.sheet-rolltemplate-2Egrenademiss a[href^="`"] {
+    background-color: rgb(206, 15, 105);
+    padding: 5px;
+    color: white;
+    display: inline-block;
+    border: 1px solid white;
+}
+.sheet-rolltemplate-2Egrenademiss p:last-child {
+    margin-bottom: 0;
+}
 
 /*#endregion*/
 /*#region Styles for the 2Epocrit Template*/
@@ -1450,21 +1492,34 @@ input.sheet-toast-error:checked ~ .sheet-toast-content {
 .sheet-rolltemplate-2Epocrit .sheet-template-body td {
     font-size: 10pt;
 }
-.sheet-rolltemplate-2Epocrit p,
-.sheet-rolltemplate-2Epocrit p .inlinerollresult {
-    font-size: 10pt;
-}
-.sheet-rolltemplate-2Epocrit p:last-child {
+.sheet-rolltemplate-2Epocrit p:last-child,
+.sheet-rolltemplate-2Epocrit div:last-child {
     margin-bottom: 0;
+}
+.sheet-rolltemplate-2Epocrit p .inlinerollresult,
+.sheet-rolltemplate-2Epocrit div .inlinerollresult {
+    font-size: 10pt;
 }
 .sheet-rolltemplate-2Epocrit .sheet-template-injury {
     font-size: 9pt;
     font-style: italic;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 0 0 9px;
 }
-.sheet-rolltemplate-2Epocrit .sheet-template-injury span {
+.sheet-rolltemplate-2Epocrit .sheet-template-injury > span {
     display: inline-block;
     margin-left: 8px;
     text-indent: -8px;
+}
+.sheet-rolltemplate-2Epocrit .sheet-template-injury ul {
+    margin: 0 0 0 5px;
+}
+.sheet-rolltemplate-2Epocrit .sheet-template-injury ul li::marker {
+    content: "-";
+}
+.sheet-rolltemplate-2Epocrit .sheet-template-injury ul li span {
+    padding-left: 3px;
+    display: block;
 }
 
 /*#endregion*/

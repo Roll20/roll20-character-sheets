@@ -1,0 +1,679 @@
+<script type="text/worker">
+    include js/_library.js
+    include js/fixe.js
+    include js/voies.js
+    include js/inventaire.js
+    include js/vehicules.js
+    include js/profil.js
+    include js/combat.js
+    include js/popup.js
+</script>
+
+div(class="content")
+    - var initiative = 'https://image.noelshack.com/fichiers/2023/47/3/1700660998-initiative.png';
+    - var contact = 'https://image.noelshack.com/fichiers/2023/47/3/1700660998-contact.png';
+    - var distance = 'https://image.noelshack.com/fichiers/2023/47/3/1700660998-distance.png';
+    - var magique = 'https://image.noelshack.com/fichiers/2023/47/3/1700660998-magique.png';
+    - var defense = 'https://image.noelshack.com/fichiers/2023/47/3/1700660998-defense.png';
+    - var reduction = 'https://image.noelshack.com/fichiers/2024/03/5/1705677051-resistance.png';
+    - var arrow = 'https://image.noelshack.com/fichiers/2023/47/2/1700573454-arrow.png';
+
+    - var fullStr = {'for':'force','dex':'dexterite','con':'constitution','per':'perception','int':'intelligence','cha':'charisme','mod':'modificateur','temp':'temporaire'};
+
+    - var menu = ['traits-mental', 'combat', 'inventaire', 'vehicules', 'voies', 'profil'];
+    - var car = ['force', 'dexterite', 'constitution', 'perception', 'intelligence', 'charisme'];
+    - var dataCmbt = ['initiative', 'contact', 'distance', 'magique', 'defense', 'reduction'];
+    - var dataCmbtImg = {'initiative':initiative, 'contact':contact, 'distance':distance, 'magique':magique, 'defense':defense, 'reduction':reduction};
+
+    - var subattributs = ['pv', 'maho', 'folie', 'serenite', 'volonte', 'chance'];
+    - var subattributs2 = ['blessure', 'ki', 'resistance-mentale'];
+    - var isSimple = {'pv':false, 'maho':false, 'folie':true, 'serenite':false, 'volonte':false, 'chance':false};
+    - var isDouble = {'pv':true, 'maho':true, 'folie':false, 'serenite':true, 'volonte':false, 'chance':true};
+    - var isLock = {'for':true, 'dex':true, 'int':true, 'force':false, 'dexterite':false, 'intelligence':false, 'armure':true,'niveau':true, 'mod':false, 'temp':false,'profil':true, 'action':true, 'volonte':true,'blessure':false, 'ki':false, 'resistance-mentale':false, 'etat':true};
+    - var isSelect = {'force':true, 'dexterite':true, 'intelligence':true, 'armure':false,'niveau':false, 'mod':false, 'temp':false,'profil':false, 'action':false, 'volonte':false,'blessure':false, 'ki':false, 'resistance-mentale':false, 'etat':false};
+    - var color = {'pv':'red', 'maho':'red', 'folie':'blue', 'serenite':'blue', 'volonte':'yellow', 'chance':'yellow', 'blessure':'red', 'ki':'green', 'resistance-mentale':'yellow'};
+    - var select = {'force':car, 'dexterite':car, 'intelligence':car}
+    - var traitsmental = ['phobies', 'folies'];
+
+    mixin subDataCmbt(name, ...data)
+        each s in data
+            if isLock[s]
+                label(class='lock')
+                    if s == 'action'
+                        span(
+                            class='label'
+                            data-i18n=`${s}-defensive-short`
+                        )=`${s}`
+                    else if fullStr[s]
+                        span(
+                            class='label'
+                            data-i18n=`${fullStr[s]}`
+                        )=`${fullStr[s]}`
+                    else
+                        span(
+                            class='label'
+                            data-i18n=`${s}`
+                        )=`${s}`
+                    span(
+                        class='score'
+                        name=`attr_${name}-${s}`
+                    )='0'
+            else if isSelect[s]
+                label
+                    select(name=`attr_${name}-carac`)
+                        each carac in select[s]
+                            if s == carac
+                                option(value=carac data-i18n=carac selected)
+                            else
+                                option(value=carac data-i18n=carac)
+                    span(
+                        class='score'
+                        name=`attr_${name}-carac-value`
+                    )='0'
+            else
+                label
+                    if fullStr[s]
+                        span(
+                            class='label'
+                            data-i18n=`${fullStr[s]}`
+                        )=`${s}`
+                    else
+                        span(
+                            class='label'
+                            data-i18n=`${s}`
+                        )=`${s}`
+                    input(
+                        type='number'
+                        class='score'
+                        name=`attr_${name}-${s}`
+                        value='0'
+                    )
+
+    mixin subAttributs(name, c, color, s)
+        div(class=`mainsa ${s}`)
+            div(class=`main ${color}`)
+                span(
+                    class='title'
+                    data-i18n=`${name}`
+                )
+                div(class=`${c}`)
+                    if isLock[name]
+                        span(
+                            class='score'
+                            name=`attr_${name}`
+                        )='0'
+                    else if isDouble[name]
+                        input(
+                            type='number'
+                            class='score'
+                            name=`attr_${name}`
+                            value='0'
+                            min='0'
+                        )
+
+                        span(
+                            class='separator'
+                        )='/'
+
+                        if name === 'pv'
+                            span(
+                                class='score_max'
+                                name=`attr_${name}_max`
+                            )='10'
+                        else if name === 'serenite'
+                            span(
+                                class='score_max'
+                                name=`attr_${name}_max`
+                            )='2'
+                        else if name === 'chance'
+                            span(
+                                class='score_max'
+                                name=`attr_${name}_max`
+                            )='2'
+                        else
+                            span(
+                                class='score_max'
+                                name=`attr_${name}_max`
+                            )='0'
+                    else
+                        input(
+                            type='number'
+                            class='score'
+                            name=`attr_${name}`
+                            value='0'
+                        )
+            unless name === 'folie'
+                div(class=`submain`)
+                    label(class='demi')
+                        span(
+                            class='title'
+                            data-i18n='modificateur-short'
+                            )='mod.'
+                        input(
+                            type='number'
+                            name=`attr_${name}-mod`
+                            value='0'
+                        )
+                    label(class='demi')
+                        span(
+                            class='title'
+                            data-i18n='temporaire-short'
+                            )='mod.'
+                        input(
+                            type='number'
+                            name=`attr_${name}-temp`
+                            value='0'
+                        )
+                    if name === 'serenite'
+                        label(class='full lock')
+                            span(
+                                class='title'
+                                data-i18n='base'
+                                )='base'
+                            span(
+                                class='score'
+                                name=`attr_${name}-base`
+                                )='2'
+                            input(
+                                type='hidden'
+                                name=`attr_${name}-base`
+                                value='2'
+                            )
+                    else
+                        label(class='full lock')
+                            span(
+                                class='title'
+                                data-i18n='base'
+                                )='base'
+                            span(
+                                class='score'
+                                name=`attr_${name}-base`
+                                )='0'
+                            input(
+                                type='hidden'
+                                name=`attr_${name}-base`
+                                value='0'
+                            )
+                    if name === 'pv'
+                        label(class='demi lock')
+                            span(
+                                class='title'
+                                data-i18n='des-de-vie-short'
+                                )='Dv'
+                            span(
+                                class='score'
+                                name=`attr_${name}-dv`
+                                value='10'
+                            )
+                            input(
+                                type='hidden'
+                                name=`attr_${name}-dv`
+                                value='10'
+                            )
+                        label(class='demi lock')
+                            span(
+                                class='title'
+                                data-i18n='constitution-short'
+                                )='con'
+                            span(
+                                class='score'
+                                name=`attr_${name}-con`
+                                value='0'
+                            )
+                            input(
+                                type='hidden'
+                                name=`attr_${name}-con`
+                                value='0'
+                            )
+
+    mixin subAttributs2(name, color)
+        div(class=`mainsa`)
+            if name === 'resistance-mentale'
+                button(
+                    type='action'
+                    name=`act_${name}`
+                    class=`btn ${color}`
+
+                )
+                    span(data-i18n=`roll-${name}`)
+            else
+                div(class=`main ${color}`)
+                    span(
+                        class='title'
+                        data-i18n=`${name}`
+                    )
+                    div(class=`${c}`)
+                        if isLock[name]
+                            span(
+                                class='score'
+                                name=`attr_${name}`
+                            )='0'
+                        else
+                            input(
+                                type='number'
+                                class='score'
+                                name=`attr_${name}`
+                                value='0'
+                            )
+
+    input(
+        type='hidden'
+        name='attr_volonte'
+        value='0'
+    )
+
+    input(
+        type='hidden'
+        name='attr_historique'
+    )
+
+    input(
+        type='hidden'
+        value='0'
+        name='attr_popup'
+        class='popup'
+    )
+
+    input(
+        type='hidden'
+        class='menu'
+        value="traits-mental"
+        name="attr_menu"
+    )
+
+    input(
+        type='hidden'
+        class='mode-edition'
+        value="0"
+        name="attr_edition"
+    )
+
+    input(
+        type='hidden'
+        class='parametres'
+        value="0"
+        name="attr_options"
+    )
+
+    include parts/popup.pug
+
+    div(class='options')
+        button(
+            type='action'
+            class='mode_edition'
+            name='act_edition'
+        )
+            p(
+            data-i18n='mode-edition'
+            )='mode edition'
+
+        button(
+            type='action'
+            class='parametres'
+            name='act_options'
+        )
+            p()='y'
+
+    div(class='data-options')
+        select(name='attr_roll-type')
+            option(value='' data-i18n='roll-public')='Jet public'
+            option(value='/w gm' data-i18n='roll-prive')='Jet privé'
+
+    div(class='attributs')
+        //Création de la liste des attributs
+        each c in car
+            div(class='main_block')
+                button(
+                    type='action'
+                    class='title'
+                    name=`act_roll${c}`
+                    data-i18n=`${c}-short`
+                )=`${c}`
+
+                div(
+                    class='attr-block'
+                )
+                    span(
+                        class='header h1'
+                        data-i18n=`valeur-short`
+                        )=`val.`
+                    span(
+                        class='header h2'
+                        data-i18n=`modificateur-short`
+                    )
+                    span(
+                        class='score s1'
+                        name=`attr_${c}-total`
+                    )='10'
+                    span(
+                        class='score s2'
+                        name=`attr_${c}-mod`
+                    )='0'
+
+    div(class='edit_attributs')
+        //Création de la liste des attributs en MODE EDITION
+        each c in car
+            div(class='main_block')
+                button(
+                    type='action'
+                    class='title'
+                    name=`act_roll${c}`
+                    data-i18n=`${c}-short`
+                )=`${c}`
+
+                div(
+                    class='block'
+                )
+                    span(
+                        class='header h1'
+                        data-i18n=`valeur-short`
+                        )=`val.`
+                    span(
+                        class='header h2'
+                        data-i18n=`modificateur-short`
+                    )
+                    span(
+                        class='score s1'
+                        name=`attr_${c}-total`
+                    )='10'
+                    span(
+                        class='score s2'
+                        name=`attr_${c}-mod`
+                    )='0'
+
+                    span(
+                        class='toedit'
+                        data-i18n='base'
+                    )='base'
+                    input(
+                        type='number'
+                        name=`attr_${c}-base`
+                        value='10'
+                        min='0'
+                    )
+
+                    span(
+                        class='toedit'
+                        data-i18n='divers'
+                    )='divers'
+                    input(
+                        type='number'
+                        name=`attr_${c}-divers`
+                        value='0'
+                    )
+
+                    span(
+                        class='toedit'
+                        data-i18n='temporaire-short'
+                    )='temp.'
+                    input(
+                        type='number'
+                        name=`attr_${c}-temp`
+                        value='0'
+                    )
+
+                    input(
+                        type='hidden'
+                        name=`attr_${c}-total`
+                        value='10'
+                    )
+
+                    input(
+                        type='hidden'
+                        name=`attr_${c}-mod`
+                        value='0'
+                    )
+
+    div(class='subattributs')
+        each sa in subattributs
+            if isDouble[sa]
+                if isSimple[sa]
+                    +subAttributs(sa, 'value', color[sa], '')
+                else
+                    +subAttributs(sa, 'value', color[sa], 'unsimple')
+            else if isSimple[sa]
+                +subAttributs(sa, 'svalue', color[sa], '')
+            else
+                +subAttributs(sa, 'svalue', color[sa], 'unsimple')
+
+    div(class='subattributs2')
+        each sa in subattributs2
+            if sa === 'resistance-mentale'
+                +subAttributs2(sa, color[sa])
+            else
+                +subAttributs2(sa, color[sa])
+
+    div(class='mainSheet')
+        div(class='leftprofil')
+            div(class='mainBlockData')
+                select(name='attr_type')
+                    option(value='eiyu' data-i18n='eiyu' selected)
+
+                div(class='data')
+                    label
+                        span()
+                            span(data-i18n='nom')='Nom'
+                            span()=' : '
+                        input(
+                            type='text'
+                            name='attr_character_name'
+                            )
+                    label
+                        span()
+                            span(data-i18n='profil')='Profil'
+                            span()=' : '
+                        input(
+                            type='text'
+                            name='attr_profil'
+                            )
+                    label
+                        span()
+                            span(data-i18n='origine')='Origine'
+                            span()=' : '
+                        input(
+                            type='text'
+                            name='attr_origine'
+                            )
+                    label
+                        span()
+                            span(data-i18n='religion')='Religion'
+                            span()=' : '
+                        input(
+                            type='text'
+                            name='attr_religion'
+                            )
+                    input(
+                            class='getLvl'
+                            type='hidden'
+                            name='attr_niveau'
+                            value='1'
+                        )
+
+                    div(class='niveau')
+                        span()
+                            span(data-i18n='niveau')='Niveau'
+                            span()=' : '
+                        div(class='downlvl')
+                            button(
+                                    class='downlvl'
+                                    type='action'
+                                    name='act_downlvl'
+                                )
+                                    img(
+                                        src=arrow
+                                        data-i18n-title='lvldown'
+                                    )
+                        input(
+                            type='niveau'
+                            name='attr_niveau'
+                            value='1'
+                            readonly
+                            )
+
+                        div(class='uplvl')
+
+                            button(
+                                class='uplvl'
+                                type='action'
+                                name='act_uplvl'
+                            )
+                                img(
+                                    src=arrow
+                                    data-i18n-title='lvlup'
+                                )
+
+                div(class='eqData')
+                    //Création de la liste de combat
+                    each c in dataCmbt
+                        input(
+                            class=`${c}-edit`
+                            type='hidden'
+                            name=`attr_${c}-edit`
+                            value='0'
+                        )
+
+                        div(class=`${c}`)
+                            div(class='main')
+                                if c === 'defense'
+                                    button(
+                                        type='action'
+                                        class='label'
+                                        name=`act_${c}`
+                                        data-i18n-title=`${c}-title`
+                                        )
+                                        img(
+                                            src=dataCmbtImg[c]
+                                        )
+                                    span(
+                                        class='value'
+                                        name=`attr_${c}`
+                                        data-i18n-title=`${c}-title`
+                                    )='10'
+                                else if c === 'reduction'
+                                    button(
+                                        type='action'
+                                        class='label'
+                                        name=`act_${c}`
+                                        data-i18n-title=`${c}-degats`
+                                        )
+                                        img(
+                                            src=dataCmbtImg[c]
+                                        )
+                                    span(
+                                        class='value'
+                                        name=`attr_${c}`
+                                        data-i18n-title=`${c}-degats`
+                                    )='0'
+                                else
+                                    button(
+                                        type='action'
+                                        class='label'
+                                        name=`act_${c}`
+                                        data-i18n-title=`${c}-roll`
+                                        )
+                                        img(
+                                            src=dataCmbtImg[c]
+                                        )
+                                    span(
+                                        class='value'
+                                        name=`attr_${c}`
+                                        data-i18n-title=`${c}`
+                                    )='0'
+                                button(
+                                    type='action'
+                                    name=`act_${c}-edit`
+                                    class='edit'
+                                    data-i18n-title=`${c}-edit`
+                                )='y'
+                            div(class='submain')
+                                case c
+                                    when 'initiative'
+                                        input(
+                                            type='hidden'
+                                            name=`attr_${c}-armure`
+                                            value='0'
+                                        )
+
+                                        +subDataCmbt(c, 'dexterite', 'armure', 'etat', 'mod', 'temp')
+                                    when 'contact'
+                                        input(
+                                            type='hidden'
+                                            name=`attr_${c}-profil`
+                                            value='0'
+                                        )
+                                        input(
+                                            type='hidden'
+                                            name=`attr_${c}-niveau`
+                                            value='0'
+                                        )
+
+                                        +subDataCmbt(c, 'profil', 'force', 'niveau', 'etat', 'mod', 'temp')
+                                    when 'distance'
+                                        input(
+                                            type='hidden'
+                                            name=`attr_${c}-profil`
+                                            value='0'
+                                        )
+                                        input(
+                                            type='hidden'
+                                            name=`attr_${c}-niveau`
+                                            value='0'
+                                        )
+
+                                        +subDataCmbt(c, 'profil', 'dexterite', 'niveau', 'etat', 'mod', 'temp')
+                                    when 'magique'
+                                        input(
+                                            type='hidden'
+                                            name=`attr_${c}-niveau`
+                                            value='0'
+                                        )
+
+                                        +subDataCmbt(c, 'intelligence', 'niveau', 'etat', 'mod', 'temp')
+                                    when 'defense'
+                                        input(
+                                            type='hidden'
+                                            name=`attr_${c}-armure`
+                                            value='0'
+                                        )
+                                        input(
+                                            type='hidden'
+                                            name=`attr_${c}-action`
+                                            value='0'
+                                        )
+
+                                        +subDataCmbt(c, 'dexterite', 'armure', 'action', 'etat', 'mod', 'temp')
+
+                                    when 'reduction'
+                                        input(
+                                            type='hidden'
+                                            name=`attr_${c}-armure`
+                                            value='0'
+                                        )
+                                        +subDataCmbt(c, 'armure', 'mod', 'temp')
+
+        div(class='sheet')
+            div(class='menu')
+                //Création du menu
+                each val in menu
+                    button(
+                        type='action'
+                        class=`menu_${val}`
+
+                        name=`act_${val}`
+                        )
+                            p(
+                                data-i18n=`tab-${val}`
+                            )=`tab-${val}`
+
+            include parts/traits.pug
+            include parts/voies.pug
+            include parts/inventaire.pug
+            include parts/combat.pug
+            include parts/vehicules.pug
+            include parts/profil.pug
+
+        include parts/etats.pug
+
+include templates/niveau.html
+include templates/std.html
+include templates/combat.html
