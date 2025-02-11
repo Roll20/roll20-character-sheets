@@ -44,7 +44,7 @@
             <div class="roles-cell">
               <h2> Roles </h2>
               <fieldset class="repeating_roles">
-                <select class="full dropdown" name="attr_role1">
+                <select class="full dropdown" name="attr_role">
                   <option></option>
                   <option value="diva">Diva</option>
                   <option value="virtuoso">Virtuoso</option>
@@ -1709,7 +1709,7 @@
                   </h3>
                   <h3>
                     Mojo<br/>
-                    <textarea type="text" name="attr_npcMojo" class="full"></textarea>
+                    <textarea type="text" name="attr_npcMojoAbilities" class="full"></textarea>
                   </h3>
                 </div>
               </div>
@@ -1923,15 +1923,53 @@
 on("change:drop_data", () => {
   getAttrs(['drop_name', 'drop_category', 'drop_data'], ({drop_name, drop_category, drop_data}) => {
     const update_attrs = {}
-    if(drop_category === "Riffs") {
-      const rowID = generateRowID()
-      const prefix = `repeating_riffs_${rowID}`
-      update_attrs[`${prefix}_riff`] = drop_name
-    }
-    if(drop_category === "Solos") {
-      const rowID = generateRowID()
-      const prefix = `repeating_solos_${rowID}`
-      update_attrs[`${prefix}_solo`] = drop_name
+    let RowID, prefix, parsedData
+    
+    switch(drop_category) {
+      case "Riffs":
+        rowID = generateRowID()
+        prefix = `repeating_riffs_${rowID}`
+        update_attrs[`${prefix}_riff`] = drop_name
+      break;
+
+      case "Solos":
+        rowID = generateRowID()
+        prefix = `repeating_solos_${rowID}`
+        update_attrs[`${prefix}_solo`] = drop_name
+      break;
+
+      case "Roles":
+        rowID = generateRowID()
+        prefix = `repeating_roles_${rowID}`
+        parsedData = JSON.parse(drop_data)
+        update_attrs[`${prefix}_role`] = parsedData.Selector
+      break;
+
+      case "Assets":
+        rowID = generateRowID()
+        prefix = `repeating_assets_${rowID}`
+        parsedData = JSON.parse(drop_data)
+        update_attrs[`${prefix}_asset-type`] = parsedData.Selector
+      break;
+
+      case "NPCs":
+      case "NPC Spotlights":
+        rowID = generateRowID()
+        prefix = `repeating_npcs_${rowID}`
+        parsedData = JSON.parse(drop_data)
+        update_attrs[`${prefix}_npcName`] = drop_name
+        update_attrs[`${prefix}_npcMusic`] = parsedData.music || 0
+        update_attrs[`${prefix}_npcViolence`] = parsedData.violence || 0
+        update_attrs[`${prefix}_npcAuthority`] = parsedData.authority || 0
+        update_attrs[`${prefix}_npcMinds`] = parsedData.minds || 0
+        update_attrs[`${prefix}_npcTech`] = parsedData.tech || 0
+        update_attrs[`${prefix}_npcMojo`] = parsedData.mojo || 0
+
+        update_attrs[`${prefix}_npcThreat`] = parsedData.threat || 0
+        update_attrs[`${prefix}_npcLeadership`] = parsedData.leadership || 0
+        update_attrs[`${prefix}_npcGear`] = parsedData.gear || null
+        update_attrs[`${prefix}_npcAbilities`] = parsedData.abilities || null
+      break;
     }
     setAttrs(update_attrs)
   })
@@ -1939,3 +1977,7 @@ on("change:drop_data", () => {
 
 
 </script>
+
+
+
+

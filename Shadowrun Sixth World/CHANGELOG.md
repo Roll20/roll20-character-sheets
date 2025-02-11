@@ -1,5 +1,12 @@
 Change Log
 ==============================================
+**2024-10-11 ** v.88 Chuz (James Culp)
+	Added lwa spirits from Shadows In Focus: That Old Voodoo to the Spirit NPC sheet.  (Agwe, Azaca, Damballah, Erzulie, Ghede, Legba, Obatala, Ogoun and Shango)
+**2024-06-05 ** v.87 Chuz (James Culp)
+	Bugfix - Found an issue with imports where items would be dropped mysteriously.  This affected anything that was in a repeating list and was tied to unique ids within Roll20.  Added another check to prevent duplicate ids.
+**2024-03-03 ** v.86 Chuz (James Culp)
+	Bugfix - Essence Mod works again
+	Added Omega, Exoware and Gammaware to Augmentation grade drop downs and essence calculations.  They do not however add the bad luck quality or extra condition monitor boxes when selected.
 **2023-09-04 ** v.85 Chuz (James Culp)
 	New Feature - GM Helper sheet, added extended test and d6 roll buttons so GMs can roll from the sheet if needed.
 	Bugfix - PC Vehicles tab, handling mod was only reflected on the onroad handling value not the offroad value when settings mode was turned off.

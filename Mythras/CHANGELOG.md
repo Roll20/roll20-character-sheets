@@ -4,6 +4,21 @@ All notable changes to the Mythras sheet will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## 3.8
+### Fixed
+- Corrected damage modifier calculations for table values above 50
+- Corrected movement modifier for fatigue level of winded
+- Corrected an issue preventing moveRate calculations when old encumbrance values were in place
+
+## 3.7
+### Fixed
+- Deleting a weapon will now actually remove the row instead of just clearing the data
+
+## 3.6
+### Fixed
+- Combat Styles did not default to applying Encumbrance penalties
+- Professional Skills and Combat Style did not proper evaluate which encumbrance penalties should apply when STR or DEX was part of the base score.
+
 ## 3.5
 ### Fixed
 - [Various reapeating fields can not be added to the macro bar #77](https://github.com/DigitalPagan/Mythras-Roll20-Sheet/issues/77)

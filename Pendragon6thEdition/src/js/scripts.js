@@ -1,12 +1,3 @@
-const characteristics = {
-  movement: ["strength", "dexterity"],
-  hp: ["size", "constitution"],
-  unconscious: ["hit_points"],
-  knockdown: ["size"],
-  majorWound: ["constitution"],
-  healingRate: ["constitution"],
-};
-
 //When performing calculations in King Arthur Pendragon, round
 //0.5 and higher fractions upward and lesser fractions downward.
 //For example, a character with a Damage value of 4.43 would
@@ -16,6 +7,26 @@ const round = (sum) => (sum % 1 >= 0.5 ? Math.ceil(sum) : Math.floor(sum));
 
 const total = (v) =>
   Object.values(v).reduce((partialSum, a) => partialSum + parseFloat(a), 0);
+
+const updateBrawling = () => {
+  const brawlingDamage = (values) => {
+    //Brawl Damage =  (STR+SIZ)/6
+    const damage = round(total(values) / 6);
+    return {
+      character_damage: `${damage}D6`,
+      brawling_damage: `${damage}`,
+      brawling_damage_open: `${round(damage / 2)}`,
+    };
+  };
+
+  getAttrs(characteristics.brawlDamage, (values) => {
+    setAttrs(brawlingDamage(values));
+  });
+};
+
+characteristics.brawlDamage.forEach((attr) => {
+  on(`change:${attr}`, () => updateBrawling());
+});
 
 characteristics.movement.forEach((attr) => {
   on(`change:${attr}`, () => {
@@ -83,7 +94,7 @@ on(`change:sheet_select`, ({ newValue }) => {
 });
 
 on(`change:repeating_events:new_glory`, ({ triggerName }) => {
-  const repeatingRow = helpers.getReprowid(triggerName);
+  const repeatingRow = getReprowid(triggerName);
 
   getSectionIDs("events", (idArray) => {
     let characteristics = [];
@@ -92,9 +103,9 @@ on(`change:repeating_events:new_glory`, ({ triggerName }) => {
     );
 
     getAttrs(characteristics, (values) => {
-      const parsedNums = helpers.parseIntegers(values);
+      const parsedNums = parseIntegers(values);
       const gloryValues = Object.values(parsedNums);
-      const sum = helpers.sumIntegers(gloryValues);
+      const sum = sumIntegers(gloryValues);
 
       setAttrs({
         glory_total: sum,

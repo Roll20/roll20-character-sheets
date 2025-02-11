@@ -1,0 +1,104 @@
+.grid.header-body.statistical-data(id='statistical-data-pc').border
+		.section-header
+			h1(data-i18n='statistical data' data-i18n-title='statistical data' title='statistical data') statistical data
+
+		//STATISTICS
+		.grid.section-body
+			.grid.section-stats
+				h2.aligned-left(data-i18n='8. statistics' data-i18n-title='8. statistics' title='8. statistics') 8. statistics
+				each string in ['score', '×5']
+					h2.center(data-i18n=string data-i18n-title=string)= string
+				h2.aligned-left(data-i18n='distinguishing features' data-i18n-title='') distinguishing features
+			.grid.section-stats.body
+				each val, key in statsObject
+					+betterbutton(key, key,'', val,true)
+					if (val === 'POW' || val === 'STR' || val === 'CON' )
+						label(data-i18n-title=key + ' score' title=key + ' score')
+							input( min=0 name='attr_' + key + '_score' placeholder='-' title='@{' + key + '_score' + '}' type='text' value=' ')
+					else
+						label(data-i18n-title=key + ' score' title=key + ' score')
+							input(data-i18n-placeholder='-' min=0 name='attr_' + key + '_score' placeholder='-' title='@{' + key + '_score' + '}' type='text' value=' ')
+					span.center(name='attr_' + key title='@{' + key + '}')
+					label(data-i18n-title=key + ' distinguishing features' title=key + ' distinguishing features')
+						input(data-i18n-placeholder='distinguishing features' name='attr_' + key + '_features' placeholder='distinguishing features' title='@{' + key + '_features' + '}' type='text')
+					input(name='attr_' + key type='hidden' value='0')
+					input(name='attr_' + key +'_hidden' type='hidden' value='0')
+
+			//DERIVED ATTRIBUTES
+			.grid.section-derived
+				h2(class='aligned-left' data-i18n-title='9. derived attributes') 9. derived attributes
+				each string in ['maximum', 'current']
+					h2(class='center')= string
+			.grid.section-derived.body
+				each val, key in {'hit points': 'HP', 'willpower points': 'WP', 'sanity points': 'SAN', 'breaking point': 'BP', 'luck':'Luck'}
+					- const presetValue =  (val === 'HP' || val === 'WP') ? 0 : (val === 'SAN') ? 0 : (val === 'BP') ? 0: 50;
+					- const attrName = key.replace(' ','_');
+					if (val === 'SAN') 
+						input(name='attr_past_sanity', type='hidden' value=' ')
+							
+						+betterbutton(attrName, key,'', val,true)
+					else if (val==='Luck')
+							
+						+betterbutton(attrName, key,'', '',true)
+				
+					else if (val==='WP' || val==='HP')
+						.explainer
+							.derived-attr.nbsp
+								h3.aligned-left(data-i18n=key data-i18n-title=key)= key
+								span.para(data-i18n=val)=  val 
+							.tooltip-container
+								span.questionmark ?
+								span.tooltip-text
+									if (val==='HP')
+										p 
+											span.zero_val Dead (0HP):
+											| An Agent at 0 HP is dead.
+											| Sometimes it’s possible to resuscitate a dead character. 
+											| If the Handler says resuscitation is possible, someone must make a First Aid test. 
+										p
+											span.low_val  Unconscious (1HP-2HP):
+											| An Agent whose HP hits 1 or 2 falls unconscious. An unconscious Agent is helpless and can be killed with a single attack without having to roll. 
+											| At 3 HP or more (or after an hour passes), the Agent regains consciousness.
+										p   Any time your Agent is reduced to 2 or fewer HP, make a CON×5 test. Failure indicates permanent injury.
+										p 
+											span.normal_val Normal (3HP-MaxHP)
+										p
+											span.extra_val Extra Point (> MaxHP):
+											| An Agent can more than the maximum HP through unnatural means.
+									if (val==='WP')
+										p 
+											span.zero_val Lose Control (0 WP):
+											| An Agent at 0 WP cannot succeed at any tests, including SAN tests. 
+											| Sooner or later the Agent falls asleep, regardless of any 
+											| disorders or stimulants, long enough to regain WP.
+										p
+											span.low_val  Emotional Breakdown (1WP-2WP):
+											| An Agent whose WP hits 1 or 2 has an emotional breakdown. 
+											| The Agent suffers a −20% penalty to all actions until WP rises above 2.
+										p 
+											span.normal_val Normal (3WP-MaxWP)	
+										p
+											span.extra_val Extra Point (> MaxWP):
+											| An Agent can get more than the maximum WP through unnatural means.
+					else
+						.derived-attr.nbsp
+							h3.aligned-left(data-i18n=key data-i18n-title=key)= key
+							span.para(data-i18n=val)=  val 
+					span(class='center' name='attr_' + attrName + '_max' title='@{' + attrName + '_max' + '}')
+					if (val === 'Luck')
+						span(class='center' name='attr_' + attrName + '_max' title='@{' + attrName + '_max' + '}')
+							input(name='attr_' + attrName placeholder='10' title='@{' + attrName + '}' type='hidden' value=presetValue)
+							span.percent %
+					else
+						label(data-i18n-title=key title=key)
+							if (val==='WP')
+								+input_colored_element('willpower')
+							else if (val==='HP')
+								+input_colored_element('hit')
+							else
+								input(name='attr_' + attrName placeholder='-' title='@{' + attrName + '}' type='text' style="width:100%;" value=' ')
+					input(name='attr_' + attrName + '_max' type='hidden' value=presetValue)
+			//PHYSICAL DESCRIPTION
+			.grid.section-physical
+				h2(class='aligned-left' data-i18n-title='10. physical description') 10. physical description
+				textarea(name='attr_physical_description' placeholder='physical description' title='@{physical_description}')

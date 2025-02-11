@@ -23,7 +23,39 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
-### Sep 23, 2023
+### Jan 28, 2025
+- Updated the Hybrid Character to allow entering the advanced class level
+
+### Jan 18, 2025
+- Resolved an issue with the repeating sections not showing the edit controls when appropriate
+
+<details>
+  <summary><u>Expand for 2024 Changes</u></summary>
+
+### Nov 27, 2024
+- Removed scrollbars from the collapsing sections
+
+### Nov 17, 2024
+- Added a new roll template used by skills that has a more streamlined appearance
+- Added a new toggle button at the top of the sheet to toggle between skill roll templates, that defaults to the existing style
+- Added transitions for all collapsible sections of the sheet to make it more pleasing to use
+- Added collapsing sections for all areas of the sheet's character page
+
+### Apr 10, 2024
+- Added support for collapsing the character avatar/stat grid section to show only the stat grid when collapsed
+- Resolved a small issue with the background when the sheet scrolled sideways for the mobile app
+
+### Apr 5, 2024
+- Added support for collapsing the entire trainer features section
+- Added support for showing the character avatar in the stat grid section
+- Improved visibility of section headers
+
+</details>
+
+<details>
+  <summary><u>Expand for 2023 Changes</u></summary>
+
+### Sep 23, 2023
 - Added an Advanced Class section to the Hybrid sheet's character details section
 
 ### Feb 22, 2023
@@ -44,6 +76,8 @@ Things we want to add to the character sheet, presented in no particular order o
   - Updated the scatter selection to change the attack rolls, so that lower-hit moves aren't rolling many sets of dice
   - Added support for scatter attacks that hit up to 10 times
   - Clarified the intent of each scatter type selection by explicitly stating how many hits are in each roll
+
+</details>
 
 <details>
   <summary><u>Expand for 2022 Changes</u></summary>
