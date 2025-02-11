@@ -83,13 +83,36 @@
       {{attackrollum}} [Roll] {{computed::attackmoddescription}}
     </p>
     {{#rollTotal() computed::ishit 1}}
-      Hits {{computed::hitlocation}} for {{computed::damage}}
-      {{#rollTotal() computed::hascritical 1}}
-        <br>Critical Roll {{computed::critical}}
-	<br><i>{{computed::critdescription}}</i>
-	<br>{{computed::criteffect}}
-      {{/rollTotal() computed::hascritical 1}}
-      <br>
+      Hits {{computed::hitlocation}} for {{computed::damage}}<br>
+      {{#rollTotal() computed::hascritical0 1}}
+      Critical Roll {{computed::critical}}<br>
+	<i>{{computed::critdescription0}}</i><br>
+	{{computed::criteffect0}}<br>
+      {{/rollTotal() computed::hascritical0 1}}
+      {{#rollTotal() computed::hascritical1 1}}
+	<i>{{computed::critdescription1}}</i><br>
+	{{computed::criteffect1}}<br>
+      {{/rollTotal() computed::hascritical1 1}}
+      {{#rollTotal() computed::hascritical2 1}}
+	<i>{{computed::critdescription2}}</i><br>
+	{{computed::criteffect2}}<br>
+      {{/rollTotal() computed::hascritical2 1}}
+
+      {{#rollTotal() computed::hascritical3 1}}
+	<i>{{computed::critdescription3}}</i><br>
+	{{computed::criteffect3}}<br>
+      {{/rollTotal() computed::hascritical3 1}}
+
+      {{#rollTotal() computed::hascritical4 1}}
+	<i>{{computed::critdescription4}}</i><br>
+	{{computed::criteffect4}}<br>
+      {{/rollTotal() computed::hascritical4 1}}
+
+      {{#rollTotal() computed::hascritical5 1}}
+	<i>{{computed::critdescription5}}</i><br>
+	{{computed::criteffect5}}<br>
+      {{/rollTotal() computed::hascritical5 1}}
+
       [Apply](~{{targetescaped}}|applyattackresult||{{computed::injurystring}})
     {{/rollTotal() computed::ishit 1}}
   </div>
@@ -1063,6 +1086,8 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     <label for='levelupspells'>Spells</label>
   <input type='radio' name='tabsetlevelup' id='leveluptalents'>
     <label for='leveluptalents'>Talents</label>
+  <input type='radio' name='tabsetlevelup' id='leveluptrainingpackage'>
+    <label for='leveluptalents'>Training Packags</label>
 
   <div class='tab-panels'>
 
@@ -1948,6 +1973,11 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
     </div>
 
+    <div class='tab-panel'>
+      <h2>Traing Packages</h2>
+
+    </div>
+
   </div>
 </div>
 
@@ -1986,6 +2016,7 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
   <div class='cmspecialization'>
     <select name='comp_cmskillranks' required></select>
     <input name='comp_specname'>
+    <input name='comp_sheetprefix' type='hidden'>
     <i><input class='cminputinline' name='comp_skillrankscombo' type='text'></i>
   </div>
 </charmancer>
@@ -2414,9 +2445,13 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     </div>
 
     <div class='prop_pair'>
-      <span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></span> Initiative</span>
+      <span>
+        <button name='act_rollinitiative' class='fancybutton'>Initative 
+          <span name='attr_initiative'></span>
+        </button>
+        <!-- span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></span></span-->
+      </span>
       <span class='prop_value'>
-        <span name='attr_initiative'></span><button type='action' name='act_rollinitiative' class='editbutton rollbutton'><span style='font-family:dicefontd10;'>j</span></button>
         <button name='act_newcombat' type='action' class='fancybuttoninline fancybutton'>
             New Combat</button>
       </span>
@@ -2738,9 +2773,13 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     </div>
 
     <div class='prop_pair'>
-      <span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></span> Initiative</span>
+      <span>
+        <button name='act_rollinitiative' class='fancybutton'>Initative 
+          <span name='attr_initiative'></span>
+        </button>
+        <!-- span class='iconwrap'><span class='prop_prop_plain'><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span></span></span-->
+      </span>
       <span class='prop_value'>
-        <span name='attr_initiative'></span><button type='action' name='act_rollinitiative' class='editbutton rollbutton'><span style='font-family:dicefontd10;'>j</span></button>
         <button name='act_newcombat' type='action' class='fancybuttoninline fancybutton'>
             New Combat</button>
       </span>
@@ -5395,7 +5434,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision d70a48ea56503a8bde45a7168ab22d1b5d000ffc
+Revision 88b31786ffd27e5abd3cbb367e62faab3308bc9b
 
 
 <hr>
@@ -6601,9 +6640,6 @@ function addPendingFunction(name, func) {
       cb: func
   };
   pendingList.push(item);
-  if (pendingList.length == 1) {
-      setAttrs({workpending: 1});
-  }
 }
 
 /* Same as addPendingFunction, but inserts at head of queue.
@@ -6618,9 +6654,6 @@ function addPendingFunctionNext(name, func) {
       cb: func
   };
   pendingList.unshift(item);
-  if (pendingList.length == 1) {
-      setAttrs({workpending: 1});
-  }
 }
 
 let asyncTimeout = false;
@@ -6661,7 +6694,6 @@ function checkPending() {
       rmuasync = 0;
     }
   }
-  setAttrs({workpending: 0});
 }
 
 function pendingInfo() {
@@ -6675,7 +6707,6 @@ function pendingReset() {
     console.log(`Pending reset: ${rmuasync} with ${pendingList.length} queued`);
     rmuasync = 0;
     pendingList = [];
-    setAttrs({workpending: 0});
   }
 }
 
@@ -9095,7 +9126,7 @@ function levelUpStart(_) {
 
     let costs = {};
 
-    addPendingFunction("Level Up fetch costs", () => {
+    addPendingFunction("LevelUp: fetch costs", () => {
       const toget = [];
       categories.forEach(cat => {
 	toget.push(cat.aname + '_cost');
@@ -9118,7 +9149,7 @@ function levelUpStart(_) {
     let savedtalents = [];
     let savedstatgains = [];
 
-    addPendingFunction("Level Up Start body", () => {
+    addPendingFunction("LevelUp: Display Costs", () => {
 	// So we need to get the profession & Costs
 	dpspent = 0;
 
@@ -9174,62 +9205,32 @@ function levelUpStart(_) {
 	      savedskills.push(prefix);
 	      continue;
 	    }
-	    const match = prefix.match(/cmskill_(.*)_specializations/)
 	    if (!match || match.length < 2) {
 	      rmuerror("Coulnd't match regex against ", prefix, index);
 	      continue;
 	    }
-	    // what match regex
-	    const origname = match[0];
-	    // the capture - the id
-	    const skillname = match[1];
-	    console.log(match, 'wholething', match[0], 'cmskill',  match[1]);
-
-	    // See if these match the name of any of the skills on the sheet
-	    //  (match by user visible name)
-	    const sname = `${sectionname}_specname`;
-
-	    // Get the appropriate specialisation (if any)
-	    const thisspecskills = specialisedranks[skillname];
-	    for (skill in thisspecskills) {
-	      
-	    }
-/*
-	    const skill = RMUSkills.getSkillByName(skillname)
-	      const costarray = generateCostArray(costs[skill.category]);
-	    addRepeatingSection(`cmskill${skillname}`, 'specialization', origname,
-		(sectionname) => {
-		console.log("recreate section", sectionname);
-		const rname = `${sectionname}_cmskillranks`;
-		cmPopulateListOptions(rname, costarray, data.levelup.values[rname])
-		setAttrsPending({[sname]: data.levelup.values[sname]});
-		}
-		);*/
 	  }
 	}
     });
 
 
     addPendingFunction('Levelup: Create specialisations from ranks', () => {
-	console.log('specranks', specialisedranks);
 	for (const skillname in specialisedranks) {
 	  const specials = specialisedranks[skillname];
-	  console.log(skillname, specials);
 	  specials.forEach(skill => {
-	      console.log('add repeatin', `cmskill${skill.aname}`, 'specialization', skill.aname);
 	      addRepeatingSection(`cmskill${skill.aname}`, 'specialization', `cmskill_${skill.aname}_specializations`,
 		  (sectionname) => {
 		      const costarray = generateCostArray(costs[skill.category]);
-		      console.log( skill.category, costs[skill.category]);
-		      console.log("recreate section", sectionname);
 		      const longname = `${sectionname}_skillrankscombo`;
 		      const sname = `${sectionname}_specname`;
 		      const rname = `${sectionname}_cmskillranks`;
 		      const bonus = `${sectionname}_cmskillbonus`;
+		      const prefix = `${sectionname}_sheetprefix`;
 
 		      cmPopulateListOptions(rname, costarray, 0)
 		      setAttrsPending({[sname]: skill.name,
-			  [longname]: `Current ranks ${skill.ranks}  Bonus: ${skill.bonus}`
+			  [longname]: `Current ranks ${skill.ranks}  Bonus: ${skill.bonus}`,
+			  [prefix] : skill.prefix
 			    });
 	      });
 	  });
@@ -9252,7 +9253,7 @@ function levelUpStart(_) {
     });
 
    
-    // FIXME: This is duplicated below.   I hsould make it function
+    // FIXME: This is duplicated below.   I should make it function
     const listRanks = {};
     {
       const spellRanks = {}
@@ -9407,6 +9408,7 @@ onCheck("mancerfinish:levelup", (ev) => {
   // Skills
   addPendingFunction("LevelupFinish: Skills", () => {
       const values = data.levelup.values;
+      console.log("values", values);
       for (const purchase in values) {
 	if (purchase.endsWith("_specname")) {
 	  // It's the name of a specialisation; skip it and get it with 
@@ -9424,6 +9426,10 @@ onCheck("mancerfinish:levelup", (ev) => {
 	  // Spell list, skip it - get cmranks & listname at once.
 	  continue;
 	}
+	if (purchase.endsWith("_sheetprefix")) {
+	  // Handled later
+	  continue;
+	}
 
 	const [ranks, cost] = optionDecodeIntPair(values[purchase]);
 	if (!ranks || ranks < 1) {
@@ -9431,12 +9437,13 @@ onCheck("mancerfinish:levelup", (ev) => {
 	}
 
 	if (purchase.startsWith("repeating")) {
-	  const matches = purchase.match(/^repeating_([^_]*)_cmskill_([^_]*).*$/);
-	  const id = matches[1];
-	  const skill = matches[2];
-	  const name = values[`repeating_${id}_cmskill_${skill}_specializations_specname`];
-	  const skillattr = `repeating_specialization${skill}_${id}_ranks_misc`;
-	  const skillname = `repeating_specialization${skill}_${id}_name`;
+	  const namekey = purchase.replace(/_cmskillranks$/, "_specname");
+	  const prefixkey = purchase.replace(/_cmskillranks$/, "_sheetprefix");
+	  const name = values[namekey];
+	  const prefix = values[prefixkey];
+	  console.log("Prefix", prefix, prefixkey,  "name", name, namekey);
+	  const skillattr = `${prefix}_ranks_misc`;
+	  const skillname = `${prefix}_name`;
 	  setAttrs({[skillname]: name}); 
 	  miscAttrSet(skillattr, levelstr, ranks);
 	} else {
@@ -12851,6 +12858,11 @@ function numericToCritCode(num) {
 
 // FIXME: Should do long names as well
 function sizeToNumeric(code) {
+    let x = parseIntDefault(code, -99);
+    if (x != -99) {
+	return x;
+    }
+
     switch (code) {
 	case 'I': return 1;
 	case 'II': return 2;
@@ -12898,14 +12910,6 @@ function sizeFromNumeric(value) {
     rmuerror("Unknown size: ", value);
     return "M"
 }
-
-/*
-F E + A
-G E + B
-H E + C
-I E + C + A
-J E + C + B
-*/
 
 (function() {
     // FIXME: This should be structure
@@ -13061,15 +13065,102 @@ J E + C + B
 
     attacks.knownCrits = {}
 
-    attacks.getCritical = function(severity, type, index, donefn) {
+    attacks.resolveCriticalList = function(critlist, index, donfn) {
+	const allresults = []
+	for (const {sev, type} of critlist) {
+	    console.log("iter", sev, type);
+	    let sevcode = numericToCritCode(sev);
+	    const crit = attacks.knownCrits[type][index]
+	    const results = {}
+	    // Get the C-H, C-St etc codes.
+	    for (res in crit) {
+		if (res[0] == sevcode) {
+		    const suffix = res.substring(2)
+		    if (suffix != 'description' && suffix != 'effect') {
+			results[suffix] = crit[res];
+		    }
+		}
+	    }
+
+	    // So need to A-effect & A-description
+	    allresults.push({
+		    description: crit[sevcode + '-description'],
+		    effect: crit[sevcode + '-effect'],
+		    type: attacks.critsToName[type],
+		    results: results,
+		    code : sevcode + type});
+	}
+
+	donfn(allresults);
+	//return allresults;
+    }
+
+    /*
+    F E + A
+    G E + B
+    H E + C
+    I E + C + A
+    J E + C + B
+    */
+    attacks.getCritical = function(severity, type, index, overflow, additional, donefn) {
+	const crits = [];
 	// Move to known sizes:
-	// FIXME: Clamping E+ for now.
-	if (severity > 4) severity = 4;
+	if (severity > 4) {
+	    crits.push({ sev: 4, type: type }); // Start with an E, then append some
+	    switch (severity) {
+	    case 5 /*F*/: crits.push({sev: 0, type:type}); break;
+	    case 6 /*G*/: crits.push({sev: 1, type:type}); break;
+	    case 7 /*H*/: crits.push({sev: 2, type:type}); break;
+	    case 8 /*I*/: 
+		crits.push({sev: 2, type:type});
+		crits.push({sev: 0, type:type});
+		break;
+	    default /*J or more*/:
+		crits.push({sev: 2, type:type});
+		crits.push({sev: 1, type:type});
+		break;
+	    }
+	    console.log(crits);
+	} else {
+	    crits.push({ sev: severity, type: type }); // Start with an E, then append some
+	}
 
 	if (type.length > 1) {
 	    type = attacks.critnameToCode[type];
 	}
 
+	// If we need to fetch crits here, do that first.
+	{
+	    const tofetch = {}
+	    for (let i = 0 ; i < crits.length ; i ++) {
+		console.log(crits[i].type)
+		if (!attacks.knownCrits[crits[i].type]) {
+		    const critname = "Criticals:" + attacks.critsToName[crits[i].type];
+		    tofetch[critname] = true;
+		}
+	    }
+	    if (tofetch.length > 0) { tofetch["Criticals:H"] = true;}
+	    const tofetchflat = Object.keys(tofetch);
+	    console.log("Need to fetch", tofetch, tofetchflat);
+	    if (tofetchflat.length > 0) {
+		getCompendiumPage("Criticals:" + attacks.critsToName[type], (data) => {
+		    // FIXME: Handle errots here & multiple
+		    console.log("fetched", data)
+		    let result = JSON.parse(data.data['data-critical'])
+		    // Save this
+		    attacks.knownCrits[type] = result;
+		    attacks.resolveCriticalList(crits, index, donefn);
+		});
+
+		return;
+	    }
+	}
+
+	attacks.resolveCriticalList(crits, index, donefn);
+
+	// so this becime a new function. 
+
+/*
 	let sevcode = numericToCritCode(severity);
 
 	// So need to A-effect & A-description
@@ -13086,20 +13177,14 @@ J E + C + B
 		}
 	    }
 
-	    donefn(
-		attacks.knownCrits[type][index][desc],
-		attacks.knownCrits[type][index][effect],
-		results
-	    );
+	    donefn([{
+		    description : attacks.knownCrits[type][index][desc],
+		    effect: attacks.knownCrits[type][index][effect],
+		    type:  attacks.critsToName[type],
+		    results: results,
+		    code: sevcode + type}]);
 	    return;
-	}
-	getCompendiumPage("Criticals:" + attacks.critsToName[type], (data) => {
-		// FIXME: Handle erros here
-		let result = JSON.parse(data.data['data-critical'])
-		// Save this
-		attacks.knownCrits[type] = result;
-		attacks.getCritical(severity, type, index, donefn)
-	});
+	}*/
     }
 
     // Returns an object:
@@ -13156,6 +13241,34 @@ J E + C + B
 	return { critical: true, damage: +(res[1]), 
 		severity: sev, type: type, typename: name,
 		severitynumeric: numeric, elvis: numeric};
+    }
+
+    //
+    // Given a set of crit results and some hits.  Generate
+    // an injury string, and descriptions.
+
+    attacks.generateAttackResult = function (hits, critlist, result) {
+	console.log("Generate attack result", hits, critlist, result);
+
+	let injurystring = injury.updateInjuryString(hits, false, 'attacker', result);
+
+	for (let i = 0 ; i < critlist.length ; i ++) {
+	    let crit = critlist[i];
+	    result['hascritical' + i] = 1
+	    result['criteffect' + i] = crit.effect;
+	    if (critlist.length > 1) {
+		result['critdescription' + i] = crit.code + ": " + crit.description
+	    } else {
+		result['critdescription' + i] = crit.description
+	    }
+	    injurystring += crit.code + ":"
+	    injurystring += injury.updateInjuryString(0, crit.results, 'attacker', result);
+	}
+
+	result.injurystring = injurystring;
+
+	console.log("Final value", result);
+	return result
     }
 
     // Params:
@@ -13311,15 +13424,12 @@ J E + C + B
 
 	// Get critical
 	if (critinfo.critical) {
-	    console.log(critinfo);
+	    console.log("has a critical; getting crit", critinfo);
 	    attacks.getCritical(critinfo.severitynumeric, critinfo.type, hit.critindex,
-		(desc, effect, critinfo) => {
-		    console.log("Crit Done: ", desc, effect);
-		    result.criteffect = effect;
-		    result.critdescription = desc;
-		    result.hascritical = 1;
-		    result.injurystring = injury.updateInjuryString(injuryhits, critinfo, 'attacker', result);
-		    console.log(result);
+			false, false, // OVerflow and additional
+		(critinfo) => {
+		    attacks.generateAttackResult(injuryhits, critinfo, result)
+		    result.ishit = 1;
 		    finishRoll(rollId, result);
 		});
 	    return;
@@ -13465,9 +13575,24 @@ J E + C + B
 	    "{\{attackrollum=$[[0]]}} " +
 	    "{\{attackroll=$[[1]]}} " +
 	    "{\{critical=$[[2]]}} " +
-	    "{\{hascritical=[[0]]}} " +
-	    "{\{critdescription=[[0]]}} " +
-	    "{\{criteffect=[[0]]}} " +
+	    "{\{hascritical0=[[0]]}} " +
+	    "{\{hascritical1=[[0]]}} " +
+	    "{\{hascritical2=[[0]]}} " +
+	    "{\{hascritical3=[[0]]}} " +
+	    "{\{hascritical4=[[0]]}} " +
+	    "{\{hascritical5=[[0]]}} " +
+	    "{\{critdescription0=[[0]]}} " +
+	    "{\{critdescription1=[[0]]}} " +
+	    "{\{critdescription2=[[0]]}} " +
+	    "{\{critdescription3=[[0]]}} " +
+	    "{\{critdescription4=[[0]]}} " +
+	    "{\{critdescription5=[[0]]}} " +
+	    "{\{criteffect0=[[0]]}} " +
+	    "{\{criteffect1=[[0]]}} " +
+	    "{\{criteffect2=[[0]]}} " +
+	    "{\{criteffect3=[[0]]}} " +
+	    "{\{criteffect4=[[0]]}} " +
+	    "{\{criteffect5=[[0]]}} " +
 	    "{\{attackresult=[[0]]}} " +
 	    "{\{damage=[[0]]}} " +
 	    "{\{ishit=[[0]]}} " +
@@ -13610,7 +13735,9 @@ J E + C + B
 	    const loc = {}
 	    loc.hitlocation = hitLocation[croll].location;
 	    loc.side = (croll & 1) ? "Left" : "Right";
-	    attacks.getCritical(degree, type, index, (desc, effect, critinfo) => {
+	    attacks.getCritical(degree, type, index, false, false, (critinfo) => {
+		    const desc = critinfo[0].descirption
+		    const effect = critinfo[0].effect
 		    const injurystring = injury.updateInjuryString(0, critinfo, 'attacker', loc);
 		    finishRoll(roll.rollId, {
 			type: type,
@@ -13643,9 +13770,9 @@ J E + C + B
 	    }
 	    const index = hitLocation[croll].rollindex;
 	    console.log(degree, type, index);
-	    attacks.getCritical(degree, type, index, (desc, effect) => {
-		    console.log("desc", desc);
-		    console.log("effect", effect);
+	    attacks.getCritical(degree, type, index, false, false, (critinfo) => {
+		    const desc = critinfo[0].descirption
+		    const effect = critinfo[0].effect
 		    finishRoll(roll.rollId, {
 			type: type,
 			degree: numericToCritCode(degree),
@@ -14903,18 +15030,18 @@ injury.updateInjuryString = function(hits, critical, attacker, result) {
     }
 
     if (!critical) {
-	return istr;
+	return istr + 'Z';
     }
 
     // So get all the effects that we care about, except H
     for (let [critfield, value] of Object.entries(critical)) {
-	if (critfield == 'description' || critfield == 'effect' || critfield == 'H') {
-	    // Ignore this; we deal elsewhere. (effect is just a composite)
+	if (critfield == 'H') {
+	    // Ignore this; we deal elsewhere.
 	    continue;
 	}
 	const istrfield = injury.criticalmaps[critfield];
 	if (typeof(istrfield) !== 'string') {
-	    rmuerror("Unknown critical type", critfield, value, critical);
+	    rmuerror("Update Injury string Unknown critical type", critfield, value, critical);
 	} else {
 	    // Sometimes negatives has '( )' around them
 	    value = value.replace(/[)(]/g, "");
@@ -14974,6 +15101,11 @@ onCheck("clicked:applyinjuryhack", () => {
    The second is the descrtive parts.
 */
 injury.parseInjuryString = function (str) {
+    // So we may have multiple crits in the form of "Z<sev><type>:"
+    //  Just squash them for now.  When we do immunities; we will
+    //  need to handle them specifically.
+    str = str.replaceAll(/Z[A-Z][A-Z]:/g, "");
+
     // Split it stupid.  It splits then throws away excess fields with limited.
     let ind = str.indexOf("Z");
     ind = (ind == -1) ? str.length : ind;
@@ -15005,34 +15137,45 @@ injury.parseInjuryString = function (str) {
 	    // down results.
 	const noknock = critresist.includes('!')
 
+	// Pull the fields out.  If we modify save to updates
+	// as well.  So anything changed will ne in updates.
+	let hp = parseIntDefault(cdata.hp, 0);
+	let injurypenalty = parseIntDefault(cdata.injurypenalty, 0);
+	let fatigue = parseIntDefault(cdata.fatigue, 0);
+	let statusstagger = parseIntDefault(cdata.statusstagger, 0);
+	let statusstun25 = parseIntDefault(cdata.statusstun25, 0);
+	let statusstun50 = parseIntDefault(cdata.statusstun50, 0);
+	let statusstun75 = parseIntDefault(cdata.statusstun75, 0);
+	let grapplestatus = parseIntDefault(cdata.grapplestatus, 0);
+
+	// FIXME: Error handle on this
+	let bl = cdata.bleedlist ? JSON.parse(cdata.bleedlist) : [];
+
 	for (res of found) {
 	    var value = parseInt(res.substring(1));
 	    injurydata[res[0]] = value; // Save it
 	    switch (res[0]) {
 		case 'H':
-		    let hp = parseIntDefault(cdata.hp, 0);
-		    updates.hp = hp - value;
+		    hp -= value;
+		    updates.hp = hp;
 		    break;
 		case 'P':
-		    updates.injurypenalty = parseIntDefault(cdata.injurypenalty, 0) - value;
+		    injurypenalty -= value;
+		    updates.injurypenalty = injurypenalty;
 		    reported = true; // Needs healing time
 		    break;
 		case 'F':
-		    updates.fatigue = parseIntDefault(cdata.fatigue, 0) - value;
+		    fatigue -= value;
+		    updates.fatigue = fatigue;
 		    break;
 		case 'B': {
 		    if (nobleed) {
 			// If nobleed, they just add to hits - no need to report.
-			updates.hp = hp.value;
+			hp -= value;
+			updates.hp = hp;
 			break;
 		    } else {
 			reported = true;
-			let bl;
-			if (cdata.bleedlist) {
-			    bl = JSON.parse(cdata.bleedlist);
-			} else {
-			    bl = [];
-			}
 			bl.push({startphase: currentphase, phase: relphase, amount: value});
 			// Get the total bleed
 			let bleed = 0;
@@ -15048,22 +15191,26 @@ injury.parseInjuryString = function (str) {
 		    if (noknock) {
 			sendMessage(`${cdata.character_name} immediately recovers from the blow`);
 		    } else {
-			updates.statusstagger = parseIntDefault(cdata.statusstagger, 0) + value;
+			statusstagger += value;
+			updates.statusstagger = statusstagger;
 			// This trumps everything else - apply immediately
 			updates.statuseffect = 'staggered';
 		    }
 		    break;
 		case 'Q': // stun25
-		    updates.statusstun25 = parseIntDefault(cdata.statusstun25, 0) + 4 * value;
-		    updates.statusstun25info = roundString(updates.statusstun25);
+		    statusstun25 += 4 * value;
+		    updates.statusstun25 = statusstun25;
+		    updates.statusstun25info = roundString(statusstun25);
 		    break;
 		case 'W':
-		    updates.statusstun50 = parseIntDefault(cdata.statusstun50, 0) + 4 * value;
-		    updates.statusstun50info = roundString(updates.statusstun50);
+		    statusstun50 += 4 * value;
+		    updates.statusstun50 = statusstun50;
+		    updates.statusstun50info = roundString(statusstun50);
 		    break;
 		case 'E':
-		    updates.statusstun75 = parseIntDefault(cdata.statusstun75, 0) + 4 * value;
-		    updates.statusstun75info = roundString(updates.statusstun75);
+		    statusstun75 += 4 * value;
+		    updates.statusstun75 = statusstun75;
+		    updates.statusstun75info = roundString(statusstun75);
 		    break;
 		case 'K':
 		    if (noknock) {
@@ -15083,8 +15230,9 @@ injury.parseInjuryString = function (str) {
 		    sendMessage(`${cdata.character_name} must make a breakage check at ${value}`);
 		    break;
 		case 'G':
-		    updates.grapplestatus = parseIntDefault(cdata.grapplestatus, 0) + value;
-		    sendMessage(`${cdata.character_name} is grappled at ${value}`);
+		    grapplestatus += value;
+		    updates.grapplestatus = grapplestatus;
+		    sendMessage(`${cdata.character_name} is grappled at ${grapplestatus} (increase ${value}`);
 		    break;
 		case 'L': case 'O': // Already saved... do notihing
 		    break;
@@ -15093,6 +15241,7 @@ injury.parseInjuryString = function (str) {
 		    break;
 	    }
 	}
+
 	if (reported) {
 	    sendMessage(`${cdata.character_name} has an injury`);
 	    addSpecificInjury(injurydata);

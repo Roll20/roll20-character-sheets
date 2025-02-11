@@ -1,3 +1,28 @@
+# 2025-2-11
+
+- Fix the stupid problem where buying Specialised skills
+    caused them to be duplicated.  Was only with culture ranks!
+    Big thanks for @rdanhenry for helping me nail it down, along with
+    (in no particular order) @adsmalley, @dudimous, @ixs, @grim, @nefrekin,
+    @bambo and probably some others I've forgottem
+- Handle multiple criticals from the same attack.
+    - F-J crits now handled.
+    - This is a big set of changes through this parsing code
+    - Designed to also support "addional crits"
+- Injury
+    - Now has tests.
+    - Support for multiple H (hits) in the same string.
+    - Adds a 'Z' on hits only attacks
+    - Handle duplicate any attribute.
+- Make the initiative button big and green (@everyone apparently)
+- Added 'Class' to creatures;  can search for Class:III creatures now
+- Don't set 'workpending' attribute - stops a lot of warnings
+    and it did not work anyway
+- Tests for fetching Criticals.
+- Start on Training Packages
+- Template for custom currencies.
+- Remove some old cruft from the todo.
+
 # 2025-2-4
 
 - Creatures: Validate attacks for all listed attacks.
