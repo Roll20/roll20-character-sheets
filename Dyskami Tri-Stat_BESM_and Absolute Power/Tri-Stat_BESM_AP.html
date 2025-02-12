@@ -7105,7 +7105,9 @@
                 case 'attribute':
                     query.title = `${getTranslationByKey("select-attribute")}`;
                     query.options = query.attributes.sort().join('');
-                    query.options += `|${getTranslationByKey("go-back")},rollsroot`;
+                    query.options += roll.type === 'defense' ?
+                        `|${getTranslationByKey("exit")},exit` :
+                        `|${getTranslationByKey("go-back")},rollsroot`;
                     query.last = query.next;
                 break;
                 case 'defense':
@@ -7207,14 +7209,11 @@
                             query.has_deflection
                         )
                     ) ? `|${getTranslationByKey("unarmed")},unarmed` : '';
-                    const encode = {
-                        '|':'&#124;',
-                        ',':'&#44;'
-                    };
-                    query.options += query.attributes.length === 0 ? '' :
-                        `|${getTranslationByKey("attribute")},?{${getTranslationByKey("select-attribute")}` +
-                        `${query.attributes.join("").replace(/[|,]/g, m => encode[m])}&#125;`;
-                    query.options += `|${getTranslationByKey("go-back")},rollsroot`;
+                    query.options += query.attributes.length !== 0 && roll.type === 'defense' ?
+                        `|${getTranslationByKey("attribute")},attribute` : '';
+                    query.options += roll.type === 'attack' ? 
+                        `|${getTranslationByKey("touch")},touch` +
+                        `|${getTranslationByKey("go-back")},rollsroot` : '';
                 break;
                 case 'is_enemy':
                     if (roll.enemies === undefined) {
@@ -7442,13 +7441,25 @@
                     query.next = query.selection;
                 break;
                 case 'attribute':
-                    if (query.selection !== 'rollsroot') {
+                    if (query.selection !== 'rollsroot' || query.selection !== 'exit') {
                         const selected_attribute = query.selection.split('~');
                         query.attribute = cache.attrdb[selected_attribute[0]][selected_attribute[1]];
-                        query.name = query.attribute.name;
-                        query.result = query.attribute.stat === 'variable' ? [] : [query.attribute.stat];
+                        if (roll.type === 'defense') {
+                            const range_index = query.attribute.enhancements.indexOf(e => e.name === 'range');
+                            roll.weapon.range = range_index !== -1 ?
+                                query.attribute.enhancements[range_index].rank : 0;
+                            roll.weapon.is_attribute = true;
+                            roll.weapon.elevel = query.attribute.elevel;
+                            roll.weapon.name = query.attribute.name || selected_attribute[0];
+                            roll.weapon.severity = 'none';
+                        } else {
+                            query.name = query.attribute.name;
+                            query.result = query.attribute.stat === 'variable' ?
+                                [] : [query.attribute.stat];
+                        }
                     }
-                    query.next = query.selection === 'rollsroot' ? query.selection : 'stat';
+                    query.next = query.selection === 'rollsroot' || query.selection === 'exit' ? 
+                        query.selection : roll.type === 'defense' ? 'done' : 'stat';
                 break;
                 case 'skill_group':
                     if (query.skill_groups.length !== 0 && query.selection !== 'rollsroot') {
@@ -7544,13 +7555,30 @@
                         range: 0
                     };
                     // Get weapon range and name
-                    if (
+                    if (query.selection === 'attribute') {
+                        query.next = 'attribute';
+                        break;
+                    } else if (
+                        query.selection === 'rollsroot' || 
+                        query.selection === 'select_weapon'
+                    ) {
+                        query.next = query.selection;
+                        query.do_roll = false;
+                        break;
+                    } else if (
                         query.selection === 'personal' ||
                         query.selection === 'movement' ||
                         query.selection === 'unarmed'
                     ) {
                         roll.weapon.name = query.selection;
-                    } else if (isNaN(query.selection)) {
+                    } else if (query.selection === 'touch') {
+                        roll.weapon.name = 'touch';
+                        roll.weapon.elevel = -1;
+                        roll.mod.edge += 1;
+                    } else if (
+                        isNaN(query.selection) &&
+                        query.selection.indexOf('~') !== -1
+                    ) {
                         query.load = query.selection.split("~");
                         roll.weapon.index = int(query.load[1]);
                         roll.weapon.name = 
@@ -7564,22 +7592,20 @@
                             cache.attrdb.weapon[roll.weapon.index].elevel;
                     }
                     roll.weapon.severity = 
-                        roll.is_swarm ? 'damage' :
-                        roll.weapon.index === -1 || roll.weapon.is_attribute ? 'none' :
+                        roll.is_swarm ? 'damage' : (
+                            roll.weapon.index === -1 || 
+                            roll.weapon.is_attribute || 
+                            query.selection === 'touch'
+                        ) ? 'none' : 
                         query.selection === 'unarmed' ? 'stun' :
                         cache.attrdb.weapon[roll.weapon.index].enhancements.findIndex(e => e.name === 'stun') !== -1 ?
                             'stun' : 'damage';
                     query.next = (
-                        query.selection === 'rollsroot' || 
-                        query.selection === 'select_weapon'
-                    ) ? query.selection : (
                             cache.rulesdb.rules_optional_maneuvers_status &&
                             roll.type === 'attack'
                         ) ? 'combat_maneuver' : 
                         cache.source_type !== 'react' ?
-                            'target_type' : 'done';
-                    query.do_roll = query.selection === 'select_weapon' ?
-                        false : query.do_roll;
+                            'target_type' : 'is_enemy';
                 break;
                 case 'is_enemy':
                     if (query.selection === 'no' || query.selection === 'done') {
@@ -7664,7 +7690,7 @@
                             break;
                         }
                     }
-                } else {
+                } else if (roll.weapon.name !== 'touch') {
                     roll.weapon.weapon_class = roll.is_swarm ? 'special' : 'unarmed';
                     roll.weapon.damage_type = roll.is_swarm ? 'penetrating' : 'blunt';
                     roll.weapon.elevel = 0;
