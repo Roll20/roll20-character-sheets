@@ -13138,12 +13138,43 @@
     });
   });
 
+  // match class name to core class & return # for hit table lookup
+  function matchRaceName(name) {
+    const lowerCaseName = name.toLowerCase();
+    if (/human/.test(lowerCaseName)) {
+      return 1;
+    } else if (/dwarf/.test(lowerCaseName)) {
+      return 2;
+    } else if (/half-elf/.test(lowerCaseName)) { // Check for "half-elf" before "elf"
+      return 5;
+    } else if (/elf/.test(lowerCaseName)) {
+      return 3;
+    } else if (/gnome/.test(lowerCaseName)) {
+      return 4;
+    } else if (/halfling|hobbit/.test(lowerCaseName)) {
+      return 6;
+    } else if (/half-orc/.test(lowerCaseName)) {
+      return 7;
+    } else {
+      return 0;
+    }
+  }
+
   // Thief Skills Racial Calculations
-  on('change:autofill_thief_race change:thief_race_selected', (eventInfo) => {
-    getAttrs(['autofill_thief_race'], (v) => {
+  on('change:race change:autofill_thief_race change:thief_race_selected', (eventInfo) => {
+    const triggerAttr = eventInfo.sourceAttribute;
+    getAttrs(['race','autofill_thief_race'], (v) => {
+      const output = {};
       const autofill_thief_race = +v.autofill_thief_race;
-      //bail out if not enabled
+      // bail out if not enabled
       if (autofill_thief_race === 0) return;
+
+      // check attr_race for a match to the race selector
+      const race = v.race || 'human';
+      if (triggerAttr === 'autofill_thief_race' || triggerAttr === 'race') {
+        output.thief_race_selected = matchRaceName(race);
+      }
+      setAttrs(output, {silent: true});
       thiefSkillsRacialCalcs();
     });
   });
