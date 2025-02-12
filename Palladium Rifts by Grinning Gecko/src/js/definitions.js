@@ -1504,6 +1504,8 @@ const COMBAT_KEYS = [
   "damage_range_1_name",
   "damage_range_2",
   "damage_range_2_name",
+  "damage_range_3",
+  "damage_range_3_name",
   "critical",
   "knockout",
   "deathblow",

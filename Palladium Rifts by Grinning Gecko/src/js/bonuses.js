@@ -156,6 +156,8 @@ async function combineBonuses(rowIds, destinationPrefix) {
       `${destinationPrefix}_damage_range_1_name`,
       `${destinationPrefix}_damage_range_2`,
       `${destinationPrefix}_damage_range_2_name`,
+      `${destinationPrefix}_damage_range_3`,
+      `${destinationPrefix}_damage_range_3_name`,
     ],
     section: "bonuses",
     fields: [
@@ -170,6 +172,8 @@ async function combineBonuses(rowIds, destinationPrefix) {
       "damage_range_1_name",
       "damage_range_2",
       "damage_range_2_name",
+      "damage_range_3",
+      "damage_range_3_name",
     ],
     filter: rowIds,
   });
