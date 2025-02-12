@@ -63,7 +63,7 @@
             <span class="left">
               <span>v<span name="attr_sheet_version">
             </span>
-            <span class="right"> • 2/10/25'</span>
+            <span class="right"> • 2/11/25'</span>
           </h5>
           <ul>
             <li>Added options to autofill Thief Skills racial and Dex modifiers.</li>
@@ -3865,14 +3865,15 @@
           <input type="checkbox" name="attr_autofill_thief_race" value="1" />
         </label>
         <label>
-          <select>
-            <option selected>n/a</option>
-            <option value="dwarf">Dwarf</option>
-            <option value="elf">Elf</option>
-            <option value="gnome">Gnome</option>
-            <option value="half-elf">Half-elf</option>
-            <option value="halfling">Halfling</option>
-            <option value="half-orc">Half-orc</option>
+          <select name="attr_thief_race_selected" title="@{thief_race_selected}">
+            <option value="0" selected>n/a</option>
+            <option value="1">Human</option>
+            <option value="2">Dwarf</option>
+            <option value="3">Elf</option>
+            <option value="4">Gnome</option>
+            <option value="5">Half-elf</option>
+            <option value="6">Halfling</option>
+            <option value="7">Half-orc</option>
           </select>
         </label>
       </div>
@@ -10548,7 +10549,7 @@
     hearnoiseCalc();
   });
   on('change:climbwalls_base change:climbwalls_racial_mod change:climbwalls_ability_mod change:climbwalls_magic', (eventInfo) => {
-    clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     climbwallsCalc();
   });
   on('change:readlanguages_base change:readlanguages_racial_mod change:readlanguages_ability_mod change:readlanguages_magic', (eventInfo) => {
@@ -12483,12 +12484,12 @@
   });
 
   // Auto-fill Abilities
-  function getValidVariable(str_value, string_type = 'UNDEFINED', lower_bound = 3, higher_bound = 25) {
-    if (str_value < 3) {
+  function getValidVariable(str_value, string_type, lower_bound, higher_bound) {
+    if (str_value < lower_bound) {
       console.log(`Error: ${string_type} value is not a number or out of range. [${str_value}].\nDefaulting to ${lower_bound}.`);
       return lower_bound;
     }
-    if (str_value > 25) {
+    if (str_value > higher_bound) {
       console.log(`Error: ${string_type} value is out of range. [${str_value}].\nDefaulting to ${higher_bound}.`);
       return higher_bound;
     }
@@ -12766,53 +12767,6 @@
     }
   }
 
-  // Thief Dex Class Entry
-  class ThiefDexterityEntry {
-    constructor(pickPockets, openLocks, findRemoveTraps, moveSilently, hideInShadows) {
-      this.pickPockets = pickPockets;
-      this.openLocks = openLocks;
-      this.findRemoveTraps = findRemoveTraps;
-      this.moveSilently = moveSilently;
-      this.hideInShadows = hideInShadows;
-    }
-    getPickPockets() {
-      return this.pickPockets;
-    }
-    getOpenLocks() {
-      return this.openLocks;
-    }
-    getFindRemoveTraps() {
-      return this.findRemoveTraps;
-    }
-    getMoveSilently() {
-      return this.moveSilently;
-    }
-    getHideInShadows() {
-      return this.hideInShadows;
-    }
-  }
-
-  class ThiefDexterityAdjustmentTable {
-    constructor() {
-      // pickPockets, openLocks, findRemoveTraps, moveSilently, hideInShadows
-      this.dexterity_dict = {
-        9:  new ThiefDexterityEntry(-15, -10, -10, -20, -10),
-        10: new ThiefDexterityEntry(-10, -5, -10, -15, -5),
-        11: new ThiefDexterityEntry(-5, 0, -5, -10, 0),
-        12: new ThiefDexterityEntry(0, 0, 0, -5, 0),
-        13: new ThiefDexterityEntry(0, 0, 0, 0, 0),
-        14: new ThiefDexterityEntry(0, 0, 0, 0, 0),
-        15: new ThiefDexterityEntry(0, 0, 0, 0, 0),
-        16: new ThiefDexterityEntry(0, 5, 0, 0, 0),
-        17: new ThiefDexterityEntry(5, 10, 0, 5, 5),
-        18: new ThiefDexterityEntry(10, 15, 5, 10, 10),
-      };
-    }
-    getEntry(str_value) {
-      return this.dexterity_dict[getValidVariable(str_value, 'dexterity', 9, 18)];
-    }
-  }
-
   class ConstitutionEntry {
     constructor(hitpointbonus, systemshock, resurrectionsurvival) {
       this.hitpointbonus = hitpointbonus;
@@ -12931,6 +12885,95 @@
     }
   }
 
+  // Thief Skills Dex Entry
+  class ThiefSkillsDexEntry {
+    constructor(pickPockets, openLocks, findRemoveTraps, moveSilently, hideInShadows) {
+      this.pickPockets = pickPockets;
+      this.openLocks = openLocks;
+      this.findRemoveTraps = findRemoveTraps;
+      this.moveSilently = moveSilently;
+      this.hideInShadows = hideInShadows;
+    }
+    getPickPockets() {
+      return this.pickPockets;
+    }
+    getOpenLocks() {
+      return this.openLocks;
+    }
+    getFindRemoveTraps() {
+      return this.findRemoveTraps;
+    }
+    getMoveSilently() {
+      return this.moveSilently;
+    }
+    getHideInShadows() {
+      return this.hideInShadows;
+    }
+  }
+
+  class ThiefSkillsDexAdjustmentTable {
+    constructor() {
+      // pickPockets, openLocks, findRemoveTraps, moveSilently, hideInShadows
+      this.dexterity_dict = {
+        9:  new ThiefSkillsDexEntry(-15, -10, -10, -20, -10),
+        10: new ThiefSkillsDexEntry(-10, -5, -10, -15, -5),
+        11: new ThiefSkillsDexEntry(-5, 0, -5, -10, 0),
+        12: new ThiefSkillsDexEntry(0, 0, 0, -5, 0),
+        13: new ThiefSkillsDexEntry(0, 0, 0, 0, 0),
+        14: new ThiefSkillsDexEntry(0, 0, 0, 0, 0),
+        15: new ThiefSkillsDexEntry(0, 0, 0, 0, 0),
+        16: new ThiefSkillsDexEntry(0, 5, 0, 0, 0),
+        17: new ThiefSkillsDexEntry(5, 10, 0, 5, 5),
+        18: new ThiefSkillsDexEntry(10, 15, 5, 10, 10),
+      };
+    }
+    getEntry(str_value) {
+      return this.dexterity_dict[getValidVariable(str_value, 'dexterity', 9, 18)];
+    }
+  }
+
+  // Thief Skills Racial Entry
+  class ThiefSkillsRacialEntry {
+    constructor(pickPockets, openLocks, findRemoveTraps, moveSilently, hideInShadows, hearNoise, climbWalls, readLanguages) {
+      this.pickPockets = pickPockets;
+      this.openLocks = openLocks;
+      this.findRemoveTraps = findRemoveTraps;
+      this.moveSilently = moveSilently;
+      this.hideInShadows = hideInShadows;
+      this.hearNoise = hearNoise;
+      this.climbWalls = climbWalls;
+      this.readLanguages = readLanguages;
+    }
+    getPickPockets() {return this.pickPockets;}
+    getOpenLocks() {return this.openLocks;}
+    getFindRemoveTraps() {return this.findRemoveTraps;}
+    getMoveSilently() {return this.moveSilently;}
+    getHideInShadows() {return this.hideInShadows;}
+    getHearNoise() {return this.hearNoise;}
+    getClimbWalls() {return this.climbWalls;}
+    getReadLanguages() {return this.readLanguages;}
+  }
+
+  class ThiefSkillsRacialAdjustmentTable {
+    // thief_race_selected selector is 0=n/a, 1=Human, 2=Dwarf, 3=Elf, 4=Gnome, 5=Half-elf, 6=Halfling, 7=Half-orc
+    constructor() {
+      // pickPockets, openLocks, findRemoveTraps, moveSilently, hideInShadows, hearNoise, climbWalls, readLanguages
+      this.dexterity_dict = {
+        0: new ThiefSkillsRacialEntry(0, 0, 0, 0, 0, 0, 0, 0), // n/a
+        1: new ThiefSkillsRacialEntry(0, 0, 0, 0, 0, 0, 0, 0), // human
+        2: new ThiefSkillsRacialEntry(0, 10, 15, 0, 0, 0, -10, -5), // dwarf
+        3: new ThiefSkillsRacialEntry(5, -5, 0, 5, 10, 5, 0, 0), // elf
+        4: new ThiefSkillsRacialEntry(0, 5, 10, 5, 5, 10, -15, 0), // gnome
+        5: new ThiefSkillsRacialEntry(10, 0, 0, 0, 5, 0, 0, 0), // half-elf
+        6: new ThiefSkillsRacialEntry(5, 5, 5, 10, 15, 5, -15, -5), // halfling
+        7: new ThiefSkillsRacialEntry(-5, 5, 5, 0, 0, 5, 5, -10), // half-orc
+      };
+    }
+    getEntry(str_value) {
+      return this.dexterity_dict[getValidVariable(str_value, 'thief_race_selected', 0, 7)];
+    }
+  }
+
   // Globals for Ability Calcs
   const AT_STR = new StrengthAdjustmentTable();
   const AT_INT = new IntelligenceAdjustmentTable();
@@ -12938,7 +12981,8 @@
   const AT_DEX = new DexterityAdjustmentTable();
   const AT_CON = new ConstitutionAdjustmentTable();
   const AT_CHA = new CharismaAdjustmentTable();
-  const AT_DEX_THIEF = new ThiefDexterityAdjustmentTable();
+  const AT_THIEF_SKILLS_DEX = new ThiefSkillsDexAdjustmentTable();
+  const AT_THIEF_SKILLS_RACIAL = new ThiefSkillsRacialAdjustmentTable();
 
   // Allows easy modification of variables
   const parseValues = (values, stat, type = 'int') => {
@@ -12975,9 +13019,6 @@
       const race_value = parseValues(values, 'race', 'str');
       if (/human/gi.test(race_value)) {
         output.bonuslanguages = AT_INT.getEntry(stat_int).getBonusLanguages();
-      } else {
-        // clog('Demi-Human: Bonus Languages Not Set');
-        return;
       }
       output.knowspell = AT_INT.getEntry(stat_int).getKnowSpell();
       output.minspells = AT_INT.getEntry(stat_int).getMinSpells();
@@ -13011,33 +13052,6 @@
     });
   };
 
-  dexterityCalcsThief = () => {
-    getAttrs(['dexterity'], (values) => {
-      const output = {};
-      //get dexterity value and look up table data
-      const stat_dex = parseValues(values, 'dexterity', 'int');
-      const pickPockets = AT_DEX_THIEF.getEntry(stat_dex).getPickPockets();
-      const openLocks = AT_DEX_THIEF.getEntry(stat_dex).getOpenLocks();
-      const findRemoveTraps = AT_DEX_THIEF.getEntry(stat_dex).getFindRemoveTraps();
-      const moveSilently = AT_DEX_THIEF.getEntry(stat_dex).getMoveSilently();
-      const hideInShadows = AT_DEX_THIEF.getEntry(stat_dex).getHideInShadows();
-      output.pickpockets_ability_mod = pickPockets;
-      output.openlocks_ability_mod = openLocks;
-      output.findtraps_ability_mod = findRemoveTraps;
-      output.movequietly_ability_mod = moveSilently;
-      output.hideinshadows_ability_mod = hideInShadows;
-      setAttrs(output);
-    });
-  };
-  on('change:autofill_thief_dex change:dexterity', (eventInfo) => {
-    getAttrs(['autofill_thief_dex'], (v) => {
-      const autofill_thief_dex = +v.autofill_thief_dex;
-      //bail out if not enabled
-      if (autofill_thief_dex === 0) return;
-      dexterityCalcsThief();
-    });
-  });
-
   constitutionCalcs = () => {
     getAttrs(['constitution', 'class', 'secondclass', 'thirdclass'], (values) => {
       const output = {};
@@ -13068,6 +13082,73 @@
     });
   };
 
+  thiefSkillsDexCalcs = () => {
+    getAttrs(['dexterity'], (values) => {
+      const output = {};
+      //get dexterity value and look up table data
+      const stat_dex = parseValues(values, 'dexterity', 'int');
+      const pickPockets = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getPickPockets();
+      const openLocks = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getOpenLocks();
+      const findRemoveTraps = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getFindRemoveTraps();
+      const moveSilently = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getMoveSilently();
+      const hideInShadows = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getHideInShadows();
+      output.pickpockets_ability_mod = pickPockets;
+      output.openlocks_ability_mod = openLocks;
+      output.findtraps_ability_mod = findRemoveTraps;
+      output.movequietly_ability_mod = moveSilently;
+      output.hideinshadows_ability_mod = hideInShadows;
+      setAttrs(output);
+    });
+  };
+
+  thiefSkillsRacialCalcs = () => {
+    getAttrs(['thief_race_selected'], (values) => {
+      const output = {};
+      //get racial value from select and look up table data
+      const stat_dex = parseValues(values, 'thief_race_selected', 'int');
+      const pickPockets = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getPickPockets();
+      const openLocks = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getOpenLocks();
+      const findRemoveTraps = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getFindRemoveTraps();
+      const moveSilently = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getMoveSilently();
+      const hideInShadows = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getHideInShadows();
+      const hearNoise = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getHearNoise();
+      const climbWalls = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getClimbWalls();
+      const readLanguages = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getReadLanguages();
+
+      output.pickpockets_racial_mod = pickPockets;
+      output.openlocks_racial_mod = openLocks;
+      output.findtraps_racial_mod = findRemoveTraps;
+      output.movequietly_racial_mod = moveSilently;
+      output.hideinshadows_racial_mod = hideInShadows;
+      output.hearnoise_racial_mod = hearNoise;
+      output.climbwalls_racial_mod = climbWalls;
+      output.readlanguages_racial_mod = readLanguages;
+
+      setAttrs(output);
+    });
+  };
+
+  // Thief Skills Dex Calculations
+  on('change:autofill_thief_dex change:dexterity', (eventInfo) => {
+    getAttrs(['autofill_thief_dex'], (v) => {
+      const autofill_thief_dex = +v.autofill_thief_dex;
+      //bail out if not enabled
+      if (autofill_thief_dex === 0) return;
+      thiefSkillsDexCalcs();
+    });
+  });
+
+  // Thief Skills Racial Calculations
+  on('change:autofill_thief_race change:thief_race_selected', (eventInfo) => {
+    getAttrs(['autofill_thief_race'], (v) => {
+      const autofill_thief_race = +v.autofill_thief_race;
+      //bail out if not enabled
+      if (autofill_thief_race === 0) return;
+      thiefSkillsRacialCalcs();
+    });
+  });
+
+  // Strength Calculations
   on('change:strength change:exceptionalstrength', (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     strengthCalcs();
