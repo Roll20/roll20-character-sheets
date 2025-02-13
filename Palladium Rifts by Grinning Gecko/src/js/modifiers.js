@@ -15,7 +15,6 @@ async function addModifierToBonusesAsync(section, rowId) {
   const thingAttrs = REPEATING_BONUS_KEYS.map(
     (key) => `repeating_${section}_${rowId}_${key}`
   );
-  console.log("thingAttrs", thingAttrs);
   thingAttrs.push(thingBonusId);
   const a = await getAttrsAsync(thingAttrs);
   console.log(a);
