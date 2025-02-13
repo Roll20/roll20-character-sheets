@@ -81,6 +81,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Feb 13th 2025 v1.75a
+
+- Translated sheet to Roll20 CSE sanitiztion standard. No changes to layout or look.
+- Fixed problem with Dual wield Situational Bonuses showing when Custom Roll outcome was actived on weapons.
+
+
 Jan 20th 2025 v1.75
 
 - Add Cantor Talent from Heart of Glass/Ubersreik Adventures 1, situational test bonus for entertain singing.
