@@ -5,9 +5,16 @@
 <input type="hidden" name="attr_nameinrolls" value="1">
 <input type="hidden" name="attr_pj_pnj" value="pj">
 <div class="body">
-    <input type="hidden" class="tabstoggle" name="attr_optiontab" value="0">
+    <input type="hidden" class="tabstoggle" name="attr_optiontab" value=false>
     <button type="action" class="l_options btn-min" name="act_options" title="Afficher/Cacher les options"></button>
     <div class="options">
+        <input type="hidden" class="optionsWarning" name="attr_showWarning" value=false>
+        <div class="option-warning-div">
+            <p style="margin-top: 100px"><b>ATTENTION</b></p>
+            <p><span name="attr_warningText"></span></p>
+            <button type="action" class="l_calcul-comp1" name="act_validateWarning">Confirmer</button>
+            <button type="action" class="l_noconf" name="act_noconf">Annuler</button>
+        </div>
         <h1>Options</h1> Type de fiche :
         <select class="opt-field pj_pnj" name="attr_pj-pnj">
             <option value="pj">PJ</option>
@@ -31,27 +38,14 @@
         <hr class="hr_opt">
         <h3>Calculs des compétences</h3>
         <br>
-        <p style="position: relative; top: -28px; margin-bottom: -15px; line-height: 15px;">Calcul automatique des compétences en fonction des caractéristiques du personnage.
-            <br> <span style="color: #AA0000;">&#10071; Les compétences seront réinitialisées pour être recalculées.</span></p> Méthode 1 : Calculs prêts à jouer :
-        <button type="action" class="l_co-comp1-bu" name="act_co-comp1-bu" title="( ( Lien1 + Lien2 ) / 2 ) x 5">Calculer</button>
-        <input type="hidden" class="co-comp1-hi" name="attr_co_comp1" value="0">
-        <br>
-        <div class="co-comp1-div">
-            <p style="margin-top: 100px"><b>ATTENTION</b></p>
-            <p>Les compétences seront réinitialisées pour être recalculées.</p>
-            <button type="action" class="l_calcul-comp1" name="act_calcul-comp1">Confirmer</button>
-            <button type="action" class="l_noconf" name="act_noconf">Annuler</button>
-        </div> Méthode 2 : Calculs pour personnalisation de personnage :
-        <button type="action" class="l_co-comp2-bu" name="act_co-comp2-bu" title="( Lien1 + Lien2 ) x 2">Calculer</button>
-        <input type="hidden" class="co-comp2-hi" name="attr_co_comp2" value="0">
+        <p style="position: relative; top: -28px; margin-bottom: -15px; line-height: 15px;">Calcul automatique des compétences en fonction des caractéristiques du personnage.<br>
+            <span style="color: #AA0000;">&#10071; Les compétences seront réinitialisées pour être recalculées.</span>
+        </p>Méthode 1 : Calculs prêts à jouer :
+        <button type="action" class="l_co-comp1-bu" name="act_skillCalculate1" title="( ( Lien1 + Lien2 ) / 2 ) x 5">Calculer</button>
+        <br> Méthode 2 : Calculs pour personnalisation de personnage :
+        <button type="action" class="l_co-comp2-bu" name="act_skillCalculate2" title="( Lien1 + Lien2 ) x 2">Calculer</button>
         <br>
         <p style="position: relative; top: -10px;">Il vous restera alors 50 points à répartir</p>
-        <div class="co-comp1-div">
-            <p style="margin-top: 100px"><b>ATTENTION</b></p>
-            <p>Les compétences seront réinitialisées pour être recalculées.</p>
-            <button type="action" class="l_calcul-comp2" name="act_calcul-comp2">Confirmer</button>
-            <button type="action" class="l_noconf" name="act_noconf">Annuler</button>
-        </div>
         <hr class="hr_opt">
         <h3>Personnages prétirés</h3>
         <br>
@@ -72,15 +66,6 @@
             <option value="11">Calliope Appolosia (Mage de Varna (Flamme))</option>
         </select>
         <button type="action" class="l_pretire-bu" name="act_pretire-bu">Valider</button>
-        <input type="hidden" class="pretire-hi" name="attr_pretire" value="0">
-        <br>
-        <div class="pretire-div">
-            <p style="margin-top: 100px"><b>ATTENTION</b></p>
-            <p>Toutes les données de cette fiche seront supprimées.
-                <br>Elles seront remplacées par celles du personnage prétiré choisi.</p>
-            <button type="action" class="l_calcul-pretire" name="act_calcul-pretire">Confirmer</button>
-            <button type="action" class="l_noconf" name="act_noconf">Annuler</button>
-        </div>
         <hr class="hr_opt"> </div>
     <div class="fiche">
         <input type="hidden" class="toggle-pj-pnj" name="attr_pj-pnj" value="pj">
@@ -511,12 +496,10 @@ on(`sheet:opened`, eventInfo => {
     });
 
     setAttrs({
-        optiontab: "0",
-        co_comp1: "0",
-        co_comp2: "0",
-        co_comp3: "0",
-        pretire: "0",
-        selectpretire: "0"
+        optiontab: false,
+        showWarning:false,
+        skillCalculateMethod: 0,
+        selectpretire: 0
     });
 
     const versionator = version => {
@@ -648,79 +631,71 @@ on("change:couronnes change:orbes change:scepres change:rois sheet:opened", () =
 
 on(`clicked:options`, () => {
     getAttrs(["OptionTab"], values => {
-        const OptionTab1 = values.OptionTab || 0;
-        if(OptionTab1 === "1") {
+        const OptionTab1 = values.OptionTab;
+        setAttrs({
+            optiontab: !OptionTab1,
+            showWarning: false,
+            selectpretire: 0
+        });
+    });
+});
+
+on(`clicked:skillCalculate1`, () => {
+    setAttrs({
+        skillCalculateMethod: 1,
+        showWarning: true,
+        warningText: "Les compétences seront réinitialisées pour être recalculées.",
+        optiontab: true,
+        selectpretire: 0
+    });
+});
+
+on(`clicked:skillCalculate2`, () => {
+    setAttrs({
+        skillCalculateMethod: 2,
+        showWarning: true,
+        warningText: "Les compétences seront réinitialisées pour être recalculées.",
+        optiontab: true,
+        selectpretire: 0
+    });
+});
+
+on(`clicked:pretire-bu`, () => {
+    getAttrs(["selectpretire"], values => {
+        if(values.selectpretire > 0) {
             setAttrs({
-                optiontab: "0",
-                co_comp1: "0",
-                co_comp2: "0",
-                co_comp3: "0",
-                pretire: "0",
-                selectpretire: "0"
-            });
-        } else {
-            setAttrs({
-                optiontab: "1",
-                co_comp1: "0",
-                co_comp2: "0",
-                co_comp3: "0",
-                pretire: "0",
-                selectpretire: "0"
+                showWarning: true,
+                warningText: "Toutes les données de cette fiche seront supprimées. Elles seront remplacées par celles du personnage prétiré choisi.",
+                skillCalculateMethod: 0,
+                optiontab: true
             });
         }
     });
 });
 
-on(`clicked:co-comp1-bu`, () => {
-    setAttrs({
-        co_comp1: "1",
-        co_comp2: "0",
-        co_comp3: "0",
-        optiontab: "1",
-        pretire: "0"
-    });
-});
-
-on(`clicked:co-comp2-bu`, () => {
-    setAttrs({
-        co_comp1: "0",
-        co_comp2: "1",
-        co_comp3: "0",
-        optiontab: "1",
-        pretire: "0"
-    });
-});
-
-on(`clicked:co-comp3-bu`, () => {
-    setAttrs({
-        co_comp1: "0",
-        co_comp2: "0",
-        co_comp3: "1",
-        optiontab: "1",
-        pretire: "0"
-    });
-});
-
-on(`clicked:pretire-bu`, () => {
-    setAttrs({
-        co_comp3: "0",
-        co_comp1: "0",
-        co_comp2: "0",
-        optiontab: "1",
-        pretire: "1"
-    });
-});
-
 on(`clicked:noconf`, () => {
     setAttrs({
-        co_comp1: "0",
-        co_comp2: "0",
-        co_comp3: "0",
-        pretire: "0"
+        showWarning: false,
+        skillCalculateMethod: 0,
+        selectpretire: 0
     });
 });
 
-on(`clicked:calcul-comp1`, () => {
+on(`clicked:validateWarning`, () => {
+    getAttrs(["skillCalculateMethod", "selectpretire"], values => {
+        if(values.skillCalculateMethod > 0) {
+            CalculateSkills(values.skillCalculateMethod);
+            return;
+        }
+
+        if(values.selectpretire > 0){
+            FillPreMadeChar(values.selectpretire - 1);
+            return;
+        }
+    });
+});
+
+const CalculateSkills = method => {
     getAttrs(["force", "dexterite", "endurance", "intelligence", "charisme"], values => {
         const FOR = +values.force || 0;
         const DEX = +values.dexterite || 0;
@@ -728,73 +703,44 @@ on(`clicked:calcul-comp1`, () => {
         const INT = +values.intelligence || 0;
         const CHA = +values.charisme || 0;
 
-        setAttrs({
-            artisanat: Math.floor((DEX + INT) / 2) * 5,
-            combatrapp: Math.floor((FOR + DEX) / 2) * 5,
-            combatdist: Math.floor((DEX + INT) / 2) * 5,
-            connnature: Math.floor((DEX + INT) / 2) * 5,
-            connsecret: Math.floor((INT + CHA) / 2) * 5,
-            courir: Math.floor((DEX + END) / 2) * 5,
-            discretion: Math.floor((DEX + CHA) / 2) * 5,
-            droit: Math.floor((INT + CHA) / 2) * 5,
-            esquiver: Math.floor((DEX + INT) / 2) * 5,
-            intimider: Math.floor((FOR + CHA) / 2) * 5,
-            lire: Math.floor((INT + CHA) / 2) * 5,
-            mentir: Math.floor((INT + CHA) / 2) * 5,
-            perception: Math.floor((INT + CHA) / 2) * 5,
-            piloter: Math.floor((DEX + END) / 2) * 5,
-            psychologie: Math.floor((END + INT) / 2) * 5,
-            reflexes: Math.floor((DEX + INT) / 2) * 5,
-            serrures: Math.floor((DEX + END) / 2) * 5,
-            soigner: Math.floor((INT + CHA) / 2) * 5,
-            survie: Math.floor((END + INT) / 2) * 5,
-            voler: Math.floor((INT + CHA) / 2) * 5,
-            optiontab: "0",
-            co_comp1: "0",
-            co_comp2: "0",
-            co_comp3: "0",
-            pretire: "0"
-        });
-    });
-});
-
-on(`clicked:calcul-comp2`, () => {
-    getAttrs(["force", "dexterite", "endurance", "intelligence", "charisme"], values => {
-        const FOR = +values.force || 0;
-        const DEX = +values.dexterite || 0;
-        const END = +values.endurance || 0;
-        const INT = +values.intelligence || 0;
-        const CHA = +values.charisme || 0;
+        var calculationMethod = method == 1 ? SkillMethod1 : SkillMethod2;
 
         setAttrs({
-            artisanat: (DEX + INT) * 2,
-            combatrapp: (FOR + DEX) * 2,
-            combatdist: (DEX + INT) * 2,
-            connnature: (DEX + INT) * 2,
-            connsecret: (INT + CHA) * 2,
-            courir: (DEX + END) * 2,
-            discretion: (DEX + CHA) * 2,
-            droit: (INT + CHA) * 2,
-            esquiver: (DEX + INT) * 2,
-            intimider: (FOR + CHA) * 2,
-            lire: (INT + CHA) * 2,
-            mentir: (INT + CHA) * 2,
-            perception: (INT + CHA) * 2,
-            piloter: (DEX + END) * 2,
-            psychologie: (END + INT) * 2,
-            reflexes: (DEX + INT) * 2,
-            serrures: (DEX + END) * 2,
-            soigner: (INT + CHA) * 2,
-            survie: (END + INT) * 2,
-            voler: (INT + CHA) * 2,
-            optiontab: "0",
-            co_comp1: "0",
-            co_comp2: "0",
-            co_comp3: "0",
-            pretire: "0"
+            artisanat: calculationMethod(DEX, INT),
+            combatrapp: calculationMethod(FOR, DEX),
+            combatdist: calculationMethod(DEX, INT),
+            connnature: calculationMethod(DEX, INT),
+            connsecret: calculationMethod(INT, CHA),
+            courir: calculationMethod(DEX, END),
+            discretion: calculationMethod(DEX, CHA),
+            droit: calculationMethod(INT, CHA),
+            esquiver: calculationMethod(DEX, INT),
+            intimider: calculationMethod(FOR, CHA),
+            lire: calculationMethod(INT, CHA),
+            mentir: calculationMethod(INT, CHA),
+            perception: calculationMethod(INT, CHA),
+            piloter: calculationMethod(DEX, END),
+            psychologie: calculationMethod(END, INT),
+            reflexes: calculationMethod(DEX, INT),
+            serrures: calculationMethod(DEX, END),
+            soigner: calculationMethod(INT, CHA),
+            survie: calculationMethod(END, INT),
+            voler: calculationMethod(INT, CHA),
+            optiontab: false,
+            showWarning: false,
+            skillCalculateMethod: 0,
+            selectpretire: 0
         });
     });
-});
+};
+
+const SkillMethod1 = (value1, value2) => {
+    return Math.floor((value1 + value2) / 2) * 5;
+}
+
+const SkillMethod2 = (value1, value2) => {
+    return (value1 + value2) * 2;
+}
 
 const pretires = [
     { character_name: "Reveka Cosovei", profession: "Sorcière", age: 22, force: 9, dexterite: 10, endurance: 12, intelligence: 16, charisme: 13, blessures: 0, protection: 0,
@@ -802,14 +748,14 @@ const pretires = [
     courir: 70, discretion: 45, droit: 70, esquiver: 65, intimider: 65, lire: 70, mentir: 60, perception: 70, piloter: 55, psychologie: 65, reflexes: 75, serrures: 55, soigner: 70, survie: 65, voler: 70,
     "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_name":  "Magie de la mort\nPoints de mort: 10", "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_score": 10,
     possessions: "Bouteille\nToile goudronnée\n5 torches\nGibecière\nCanne de marche\nJeu de dés\nCarte d’Aria",
-    couronnes:0, orbes: 0, sceptres: 4, rois: 32, pretire: "0", selectpretire: "0", notes: "" },
+    couronnes:0, orbes: 0, sceptres: 4, rois: 32, notes: "" },
 
     { character_name: "Taloche", profession: "Prodige (Écuyer)", age: 16, force: 12, dexterite: 12, endurance: 12, intelligence: 12, charisme: 12, blessures: 0, protection: 0,
     "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_arme": "Dague", "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_degats": "1d4", vie: 12, artisanat: 50, combatrapp: 50, combatdist: 50, connnature: 50, connsecret: 50,
     courir: 50, discretion: 50, droit: 50, esquiver: 50, intimider: 50, lire: 50, mentir: 50, perception: 50, piloter: 50, psychologie: 50, reflexes: 50, serrures: 50, soigner: 50, survie: 50, voler: 50,
     "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_name": "Prodige Choisissez l’une de vos compétences et passez-la à 80 % définitivement. Vous ne pouvez faire appel à votre compétence spéciale que trois fois.)",
     possessions: "Dague\nBriquet\n3 Collets\nÉcuelle\nLanterne\nSac de couchage\nTimbale (bois)\nVerroterie",
-    couronnes:0, orbes: 0, sceptres: 0, rois: 0, pretire: "0", selectpretire: "0", notes: "" },
+    couronnes:0, orbes: 0, sceptres: 0, rois: 0, notes: "" },
 
     { character_name: "Zavrazhny Rustem", profession: "Alchimiste", age: 21, force: 10, dexterite: 13, endurance: 10, intelligence: 14, charisme: 13, blessures: 0, protection: 0,
     "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_arme": "Fronde", "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_degats": "1d6", vie: 10, artisanat: 75, combatrapp: 55, combatdist: 65, connnature: 65, connsecret: 65,
@@ -818,7 +764,7 @@ const pretires = [
     "repeating_specialskills_-OAyVpJj47Z1MFq1XS1C_specialskill_name": "Identifier une substance", "repeating_specialskills_-OAyVpJj47Z1MFq1XS1C_specialskill_score": 40,
     "repeating_specialskills_-OAyVqRBIZYja5n44vR1_specialskill_name": "Magnétite capricieuse (Vous pouvez attirer les objets métalliques dans un rayon de 10 m autour de vous. Les armes quittent les mains de leur porteur, les serrures se débloquent et les seaux s’envolent. En cas d’échec, vous obtenez l’effet inverse (les assaillants resserrent leur prise, les verrous se grippent, les seaux s’ancrent au sol), ajoutant un malus de -20 % à tout jet visant à les manipuler contre leur gré.)", "repeating_specialskills_-OAyVqRBIZYja5n44vR1_specialskill_score": 50,
     possessions: "Fronde\nBesace\n5 fioles\nCire à cacheter\n3 feuilles de parchemin\nPlume d'oie\nPot d'encre\n5 boîtes à ingrédients\nTraité de météorologie",
-    couronnes:0, orbes: 5, sceptres: 0, rois: 22, pretire: "0", selectpretire: "0", notes: "" },
+    couronnes:0, orbes: 5, sceptres: 0, rois: 22, notes: "" },
 
     { character_name: "Philinda Marteline", profession: "Aventurière", age: 18, force: 12, dexterite: 12, endurance: 12, intelligence: 12, charisme: 12, blessures: 0, protection: 2,
     "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_arme": "Arbalète", "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_degats": "2d6",
@@ -826,7 +772,7 @@ const pretires = [
     courir: 60, discretion: 60, droit: 60, esquiver: 70, intimider: 60, lire: 60, mentir: 60, perception: 60, piloter: 60, psychologie: 50, reflexes: 60, serrures: 60, soigner: 60, survie: 80, voler: 70,
     "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_name": "Chanceuse (Une fois par jour, vous pouvez transformer un échec en succès ou un échec critique en échec simple. Vous ne pouvez pas transformer un succès en succès critique.)",
     possessions: "Plastron en cuir rigide\nArbalète\nGourdin\nGibecière\n3 collets\nSac de couchage (épais)\nLanterne\nBriquet\nBoussole",
-    couronnes:0, orbes: 1, sceptres: 5, rois: 34, pretire: "0", selectpretire: "0", notes: "" },
+    couronnes:0, orbes: 1, sceptres: 5, rois: 34, notes: "" },
 
     { character_name: "Calisse Lapointe", profession: "Combattante", age: 19, force: 15, dexterite: 13, endurance: 14, intelligence: 10, charisme: 8, blessures: 0, protection: 4,
     "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_arme": "Pertuisane", "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_degats": "1d6+2",
@@ -834,7 +780,7 @@ const pretires = [
     courir: 65, discretion: 50, droit: 35, esquiver: 75, intimider: 55, lire: 45, mentir: 45, perception: 45, piloter: 55, psychologie: 65, reflexes: 75, serrures: 65, soigner: 55, survie: 55, voler: 45,
     "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_name": "Bagout fulgurant (Vous êtes littéralement capable de faire prendre des vessies pour des lanternes à votre interlocuteur ou votre interlocutrice. Ce dernier ou cette dernière croit sans discuter vos affirmations et se range à votre avis directement. Il ou elle n’en devient pas forcément un•e allié•e pour autant. Vous ne pouvez utiliser ce pouvoir que dix fois durant la campagne.)",
     possessions: "Plastron de cuir et métal\nPertuisane\nÉpée courte\nBouclier\nCouverture\nGourde\n3 cataplasmes\nRations de piste (1 semaine)\nSac à dos",
-    couronnes:0, orbes: 2, sceptres: 31, rois: 22, pretire: "0", selectpretire: "0", notes: "" },
+    couronnes:0, orbes: 2, sceptres: 31, rois: 22, notes: "" },
 
     { character_name: "Honorin Bicastre", profession: "Mage de l'académie d'Aria", age: 22, force: 9, dexterite: 10, endurance: 11, intelligence: 16, charisme: 14, blessures: 0, protection: 0,
     "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_arme": "Bâton", "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_degats": "1d6", vie: 11, artisanat: 65, combatrapp: 45, combatdist: 65, connnature: 75, connsecret: 75,
@@ -842,7 +788,7 @@ const pretires = [
     "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_name": "Modélisation", "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_score": 60,
     "repeating_specialskills_-OAyVpJj47Z1MFq1XS1C_specialskill_name": "Faveurs d'Ina (La déesse de la compassion vous a en sa sainte garde. Pour les dix prochains affrontements, vous ignorez la première blessure qui vous est infligée et ne subissez pas la perte de points de vie correspondante.)",
     possessions: "Jeu de cartes (25 + joker)\nBâton\nSablier\nLongue-vue\n10 feuilles de papier\nPinceau\nPot à encre\nTraité de théologie",
-    couronnes:0, orbes: 7, sceptres: 5, rois: 21, pretire: "0", selectpretire: "0", notes: "" },
+    couronnes:0, orbes: 7, sceptres: 5, rois: 21, notes: "" },
 
     { character_name: "Odéryse Lamarche", profession: "Miséricordieuse", age: 35, force: 11, dexterite: 13, endurance: 13, intelligence: 14, charisme: 9, blessures: 0, protection: 1,
     "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_arme": "Épée", "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_degats": "1d6+1", vie: 13, artisanat: 55, combatrapp: 60, combatdist: 65, connnature: 65, connsecret: 60,
@@ -851,7 +797,7 @@ const pretires = [
     "repeating_specialskills_-OAyVpJj47Z1MFq1XS1C_specialskill_name": "Voler la magie", "repeating_specialskills_-OAyVpJj47Z1MFq1XS1C_specialskill_score": 30,
     "repeating_specialskills_-OAyVqRBIZYja5n44vR1_specialskill_name": "Sens de la traque (Vous connaissez instinctivement l’orientation vers laquelle se tourner pour trouver un mage atteint de la folie de la fin. Vous ne pouvez vous focaliser sur un mage en particulier et votre sens de la traque peut tout à fait passer d’un mage à un autre en fonction de la proximité. Quand vous faites appel à cette capacité, faites votre jet sous Sens de la traque de sorte que SEUL LE MJ connaisse le résultat. Il vous indiquera alors la direction, sans que vous sachiez si elle est digne de foi ou non.)", "repeating_specialskills_-OAyVqRBIZYja5n44vR1_specialskill_score": 50,
     possessions: "Plastron de cuir souple\nÉpée\nJeu de cartes (10 + joker)\nSac de couchage (épais)\nTente\nMarmite\nTimbale (bois)\nUstensiles de toilette",
-    couronnes:0, orbes: 2, sceptres: 21, rois: 11, pretire: "0", selectpretire: "0", notes: "" },
+    couronnes:0, orbes: 2, sceptres: 21, rois: 11, notes: "" },
 
     { character_name: "Ambroise-Gabriel Francœur", profession: "Noble", age: 39, force: 10, dexterite: 10, endurance: 11, intelligence: 13, charisme: 16, blessures: 0, protection: 0,
     "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_arme": "Canne-épée", "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_degats": "1d6",
@@ -859,7 +805,7 @@ const pretires = [
     courir: 50, discretion: 75, droit: 80, esquiver: 55, intimider: 65, lire: 60, mentir: 90, perception: 70, piloter: 50, psychologie: 75, reflexes: 55, serrures: 50, soigner: 70, survie: 55, voler: 45,
     "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_name": "Mécènes peu regardants (Vous êtes doué pour trouver des financements incongrus mais de confiance. Vous pouvez lever des fonds de la sorte jusqu’à dix fois durant la campagne, pour un investissement maximal égal à chaque fois au coût d’un petit navire de commerce).",
     possessions: "Canne-épée\nPoignard\nLaissez-passer\nMiroir\nCarte\nFiole d’hydromel\nCoffret\nPorte-bonheur\nUstensiles de toilette",
-    couronnes:0, orbes: 8, sceptres: 13, rois: 5, pretire: "0", selectpretire: "0", notes: "" },
+    couronnes:0, orbes: 8, sceptres: 13, rois: 5, notes: "" },
 
     { character_name: "Basilis Presteroi", profession: "Voleur", age: 20, force: 10, dexterite: 14, endurance: 11, intelligence: 14, charisme: 11, blessures: 0, protection: 0,
     "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_arme": "Dague", "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_degats": "1d4",
@@ -867,7 +813,7 @@ const pretires = [
     courir: 65, discretion: 60, droit: 70, esquiver: 60, intimider: 60, lire: 70, mentir: 70, perception: 70, piloter: 55, psychologie: 60, reflexes: 80, serrures: 65, soigner: 70, survie: 50, voler: 90,
     "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_name": "Oreilles opportunes (Vous êtes au courant des rumeurs les plus pointues sur un sujet précis. Une fois par jour, vous pouvez demander à votre MJ des renseignements sur un thème spécifique et ce dernier doit vous transmettre les éléments le concernant, à l’exception des points identifiés comme secrets. Vous savez en outre quelles sont les rumeurs les plus fondées.)",
     possessions: "Dague\nHachette\nOutils de crochetage\nPasse-partout\nDéguisement\nJeu de cartes truqué\n3 timbales (à bonneteau)\nSifflet\nTrousse de maquillage",
-    couronnes:0, orbes: 3, sceptres: 11, rois: 17, pretire: "0", selectpretire: "0", notes: "" },
+    couronnes:0, orbes: 3, sceptres: 11, rois: 17, notes: "" },
 
     { character_name: "Demetrius Petralis", profession: "Mage de Varna (bouclier)", age: 27, force: 8, dexterite: 11, endurance: 14, intelligence: 17, charisme: 10, blessures: 0, protection: 0,
     "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_arme": "Poings", "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_degats": "1", vie: 14, artisanat: 70, combatrapp: 45, combatdist: 70, connnature: 70, connsecret: 75,
@@ -875,7 +821,7 @@ const pretires = [
     "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_name": "Bouclier", "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_score": 50,
     "repeating_specialskills_-OAyVpJj47Z1MFq1XS1C_specialskill_name": "Invisibilisation  (À l’instar de nombreuses femmes d’Aqabah, vous pouvez devenir invisible aux yeux du monde. Vous êtes toujours là mais les gens ne font tout simplement pas attention à vous, à moins que vous ne tentiez une action marquante à leur encontre. Quand vous utilisez cette compétence, vous faites un jet sous Invisibilisation à chaque fois que vous quittez une pièce et/ou abordez un nouveau groupe de personnes. En cas d’échec, vous êtes automatiquement le centre de l’attention et la source de toutes les suspicions.)", "repeating_specialskills_-OAyVpJj47Z1MFq1XS1C_specialskill_score": 50,
     possessions: "Carte d’Aria\nLaissez-passer\nBoussole\nTraité de zoologie\nNécessaire à écrire\nBoîte\nCasserole\nGourde",
-    couronnes:0, orbes: 2, sceptres: 4, rois: 31, pretire: "0", selectpretire: "0", notes: "Vous ne pouvez utiliser vos poings que pour la légitime défense." },
+    couronnes:0, orbes: 2, sceptres: 4, rois: 31, notes: "Vous ne pouvez utiliser vos poings que pour la légitime défense." },
 
     { character_name: "Calliope Appolosia", profession: "Mage de Varna (Flamme)", age: 29, force: 9, dexterite: 10, endurance: 12, intelligence: 16, charisme: 13, blessures: 0, protection: 0,
     "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_arme": "Poings", "repeating_weapon_-OAtV5CF16ljNY0Pc2u0_degats": "1", vie: 12, artisanat: 65, combatrapp: 45, combatdist: 65, connnature: 65, connsecret: 70,
@@ -883,25 +829,26 @@ const pretires = [
     "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_name": "Flamme", "repeating_specialskills_-OAwKVN3oBgCdJPfkl28_specialskill_score": 50,
     "repeating_specialskills_-OAyVpJj47Z1MFq1XS1C_specialskill_name": "Création d'eau (Une fois par jour, vous pouvez générer suffisamment d’eau pour hydrater un humain pendant une journée (environ 2 litres). Vous devez simplement prendre soin de bien vous sécher les mains après un tel miracle, pour éviter de parasiter la génération de flamme.)",
     possessions: "Bouteille\nToile goudronnée\n5 torches\nGibecière\nCanne de marche\nJeu de dés\nCarte de Varna\nLaissez-passer\nBoussole",
-    couronnes:0, orbes: 0, sceptres: 2, rois: 6, pretire: "0", selectpretire: "0", notes: "Vous ne pouvez utiliser vos poings que pour la légitime défense." }
+    couronnes:0, orbes: 0, sceptres: 2, rois: 6, notes: "Vous ne pouvez utiliser vos poings que pour la légitime défense." }
     ];
 
-on(`clicked:calcul-pretire`, () => {
-    getAttrs(["selectpretire", "character_name"], values => {
-        const selectpretire = (+values.selectpretire || 0) - 1;
-
+    const FillPreMadeChar = selectpretire => {
         if(selectpretire < 0) {
-            setAttrs({ pretire: "0", selectpretire: "0" });
             return;
         }
-
+    
         getSectionIDs("repeating_specialskills", skillIds => {
             skillIds.forEach( id => removeRepeatingRow(`repeating_specialskills_${id}`));
         });
         getSectionIDs("repeating_weapon", weaponIds => {
             weaponIds.forEach( id => removeRepeatingRow(`repeating_weapon_${id}`));
         });
-        setAttrs(pretires[selectpretire]);
-    });
-});
+
+        var attrs = structuredClone(pretires[selectpretire]);
+        attrs.optiontab = false;
+        attrs.showWarning = false;
+        attrs.skillCalculateMethod = 0;
+        attrs.selectpretire = 0;
+        setAttrs(attrs);
+    };
 </script>
