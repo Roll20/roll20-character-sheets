@@ -5750,21 +5750,6 @@
             ></button>
           </label>
           <label
-            ><span>Perception</span>
-            <input
-              type="hidden"
-              value="0"
-              name="attr_active_profile_perceptioncheck"
-            />
-            <span>+</span>
-            <span name="attr_active_profile_perceptioncheck"></span>
-            <button
-              type="roll"
-              value="@{opt_whisper}&{template:custom} {{title=@{character_name} looks around carefully &#x1F440;}} {{Perception Check=[[d20+@{active_profile_perceptioncheck}]]}}"
-              name="roll_active_profile_bonus_perceptioncheck"
-            ></button>
-          </label>
-          <label
             ><span>Poison: Lethal vs. 14</span>
             <input
               type="hidden"
@@ -11831,7 +11816,7 @@ async function palladiumAddToTurnTracker(initKey, attacksKey) {
   if (!attacks) {
     const noAttacksMessage = await startRoll(
       `@{opt_whisper}&{template:custom} {{color=red}} {{title=@{selected|character_name} has no attacks with the Active Profile.}}`
-    )
+    );
     finishRoll(noAttacksMessage.rollId);
     return;
   }
@@ -11849,7 +11834,11 @@ async function palladiumAddToTurnTracker(initKey, attacksKey) {
   const nat20bonus = roll.results.diceroll.result === 20 ? 20 : 0;
   const computedWithNat20 = computed + nat20bonus;
   const addToTracker = await startRoll(
-    `@{opt_whisper}&{template:custom} {{title=@{selected|character_name} added to Turn Tracker}} ${nat20bonus === 20 ? '{{Natural 20!=20 points added to initiative roll!}}' : ''} {{Initiative=[[[[${computedWithNat20}]] &{tracker}]]}}`
+    `@{opt_whisper}&{template:custom} {{title=@{selected|character_name} added to Turn Tracker}} ${
+      nat20bonus === 20
+        ? "{{Natural 20!=20 points added to initiative roll!}}"
+        : ""
+    } {{Initiative=[[[[${computedWithNat20}]] &{tracker}]]}}`
   );
   finishRoll(addToTracker.rollId);
   // https://app.roll20.net/forum/post/6817409/multiple-initiative-values-for-a-single-character/?pageforid=6817748#post-6817748
@@ -11885,15 +11874,24 @@ async function isNewRow(e) {
  * @param {*} e Roll20 change event object.
  */
 async function setRowDefaults(e, setAttrsOptions) {
+  console.log("setRowDefaults", e, setAttrsOptions);
   const [r, section, rowId, attr] = e.sourceAttribute.split("_");
   const rowPrefix = `${r}_${section}_${rowId}`;
+  const row = await getAttrsAsync([
+    `${rowPrefix}_levelacquired`,
+    `${rowPrefix}_level`,
+  ]);
   const a = await getAttrsAsync(["character_level"]);
-  const attrs = {
-    [`${rowPrefix}_levelacquired`]: a["character_level"],
-    [`${rowPrefix}_level`]: 1,
-  };
-  console.log(attrs);
-  await setAttrsAsync(attrs, setAttrsOptions);
+  console.log("setRowDefaults", row, a);
+  // Loose comparison because it could be 1 or "1".
+  if (row[`${rowPrefix}_levelacquired`] == 1 && row[`${rowPrefix}_level`] == 1 && a["character_level"] > 1) {
+    const attrs = {
+      [`${rowPrefix}_levelacquired`]: a["character_level"],
+      [`${rowPrefix}_level`]: 1,
+    };
+    console.log(attrs);
+    await setAttrsAsync(attrs, setAttrsOptions);
+  }
 }
 
   /* endinject */
@@ -12888,10 +12886,9 @@ async function addModifierToBonusesAsync(section, rowId) {
   const thingAttrs = REPEATING_BONUS_KEYS.map(
     (key) => `repeating_${section}_${rowId}_${key}`
   );
-  console.log("thingAttrs", thingAttrs);
   thingAttrs.push(thingBonusId);
   const a = await getAttrsAsync(thingAttrs);
-  console.log(a);
+  console.log("addModifierToBonusesAsync a", a);
   const attrs = {};
   let bonusRowId;
   if (a[thingBonusId]) {
@@ -12900,10 +12897,52 @@ async function addModifierToBonusesAsync(section, rowId) {
     bonusRowId = generateRowID();
     attrs[thingBonusId] = bonusRowId;
   }
+  const existingAttrs = await getAttrsAsync(
+    REPEATING_BONUS_KEYS.map((key) => `repeating_bonuses_${bonusRowId}_${key}`)
+  );
+  console.log("addModifierToBonusesAsync existingAttrs", existingAttrs);
   REPEATING_BONUS_KEYS.forEach((key) => {
+    // If the modifier key doesn't exist, don't update.
+    if (!a[`repeating_${section}_${rowId}_${key}`]) {
+      return;
+    }
+
+    // If the values are equal, don't update.
+    if (
+      existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] &&
+      existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] ===
+        a[`repeating_${section}_${rowId}_${key}`]
+    ) {
+      return;
+    }
+
+    // If the key already exists and the value is effectively null on both sides, don't update it.
+    if (
+      existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] &&
+      (existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] === 0 ||
+        existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] === "0" ||
+        existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] === "") &&
+      (a[`repeating_${section}_${rowId}_${key}`] === 0 ||
+        a[`repeating_${section}_${rowId}_${key}`] === "0" ||
+        a[`repeating_${section}_${rowId}_${key}`] === "")
+    ) {
+      return;
+    }
+
+    // If the key doesn't already exist and the value is effectively null, don't create it.
+    if (
+      !existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] &&
+      (a[`repeating_${section}_${rowId}_${key}`] === 0 ||
+        a[`repeating_${section}_${rowId}_${key}`] === "0" ||
+        a[`repeating_${section}_${rowId}_${key}`] === "")
+    ) {
+      return;
+    }
+
     attrs[`repeating_bonuses_${bonusRowId}_${key}`] =
-      a[`repeating_${section}_${rowId}_${key}`] || 0;
+      a[`repeating_${section}_${rowId}_${key}`] || "";
   });
+  console.log("addModifierToBonusesAsync attrs", attrs);
   await setAttrsAsync(attrs);
 }
 
