@@ -1,6 +1,36 @@
 # Changelog
 
-## [1.6.0] - 2020-04-18
+## [1.7.0] - 2025-02-08
+
+### Added
+
+- Add Damage to Ancient Weapon Proficiencies (applies to Pole Arm and Whip).
+- Add hideable YouTube tutorial link.
+- Output error message to chat when TT is clicked if the Active Profile has no attacks.
+- Add nameable Modern Damage 1, 2, and 3 to Modifiers and Profiles for extra damage types.
+
+### Changed
+
+- Add 20 to Turn Tracker initiative when a Natural 20 is rolled.
+- Fix some grid layout issues in Modifiers and Profiles.
+
+## [1.6.1] - 2025-01-27
+
+### Added
+
+- Add roll buttons to punch and kick damage.
+- Add kick damage to Supernatural Strength.
+- Add Ammo tracker to Profile tab.
+
+### Changed
+
+- Move Perception from Saving Throws to beside Initiative.
+- Active Profile columns now fill the width.
+- Fix issue where damage that rolls into the next layer now outputs the correct layer name.
+- Alternating colors on repeating rows, except in the Modifier Picker.
+- Fix issue where using a `+` in a skill modifier dialog would cause the roll to be 0.
+
+## [1.6.0] - 2022-04-18
 
 ### Added
 

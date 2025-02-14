@@ -7,6 +7,9 @@ const INFO = 2;
 const WARNING = 3;
 const ERROR = 4;
 
+const ERRATA_FIELD = 'errata';
+const PSIONICS_HANDBOOK = 'The Complete Psionics Handbook';
+
 const BOOK_FIELDS = [
     'book-phb','book-tcfhb','book-tcthb','book-tcprhb','book-tcwhb','book-psionics',
     'book-tom','book-aaeg',
@@ -29,6 +32,30 @@ const THAC0_FORMULAS = {
     'priest':     l => 22-(Math.ceil(l/3)*2),
     'rogue':      l => 21-Math.ceil(l/2),
     'psionicist': l => 21-Math.ceil(l/2),
+}
+
+const SPELL_LEVEL_REQUIREMENT = {
+    'Wizard': {
+        '1': 1,
+        '2': 3,
+        '3': 5,
+        '4': 7,
+        '5': 9,
+        '6': 12,
+        '7': 14,
+        '8': 16,
+        '9': 18,
+    },
+    'Priest': {
+        '1': 1,
+        '2': 3,
+        '3': 5,
+        '4': 7,
+        '5': 9,
+        '6': 11,
+        '7': 14,
+        'q': 10,
+    }
 }
 
 const SCHOOL_SPELLS_AND_MAGIC = 'school-spells-and-magic';
@@ -306,6 +333,16 @@ const getActiveSettings = function (settingFields, values) {
         .filter(Boolean)
         .filter(book => book !== '0');
     return new Set(settings);
+}
+
+const isBookActive = function (books, obj) {
+    let activeBooks = getActiveSettings(BOOK_FIELDS, books);
+    console.log(activeBooks);
+    if (typeof obj === 'string') {
+        return activeBooks.has(obj);
+    }
+
+    return false
 }
 
 const isBookInactive = function (books, obj) {
@@ -1129,12 +1166,15 @@ function parseSpheres(spheresStrings, regex) {
 
 const getSpellSchools = function (spell, books) {
     let schoolRules = getActiveSettings(SCHOOL_FIELDS, books);
+    //return spell['school'] + `%NEWLINE%S&M: (${spell[SCHOOL_SPELLS_AND_MAGIC]})`;
     return schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
-        ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
-        : spell['school'];
+         ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
+         : spell['school'];
 }
 
 const getSpellSpheres = function (spell, sphereRules) {
+    // return spell['sphere'] + `%NEWLINE%Druid: ${spell['sphere-druids']}%NEWLINE%Necro: ${spell['sphere-necromancers']}%NEWLINE%S&M: ${spell[SPHERE_SPELLS_AND_MAGIC]}`
+
     if (sphereRules.has(SPHERE_SPELLS_AND_MAGIC))
         return spell[SPHERE_SPELLS_AND_MAGIC] || spell['sphere'];
 
@@ -1317,6 +1357,39 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
 }
 //#endregion
 
+//#region Wizard and Priest Dispel Magic button
+on('clicked:dispel-setup-wiz', function (eventInfo) {
+    dispelRoll(eventInfo, '[[@{level-wizard}]]')
+});
+
+on('clicked:dispel-setup-pri', function (eventInfo) {
+    dispelRoll(eventInfo, '[[@{level-priest}]]')
+});
+
+function dispelRoll(eventInfo, classLevel) {
+    getAttrs(['tab11','wtype'], async function (values) {
+        let visibility = "";
+        console.log(values['tab11'], values['wtype']);
+        if (values['tab11'] === '2' && values['wtype'].startsWith('/w gm')) {
+            visibility = '/w gm ';
+        } else {
+            visibility = await extractQueryResult(`?{Are dispel rolls public or only to GM?|Public, |GM only,/w gm }`);
+        }
+
+        let rollBuilder = new RollTemplateBuilder('2Edefault');
+        rollBuilder.push('name=Dispel Roll',`desc=@{character_name} dispels effects and potions of level [[1d20+${classLevel}-11]] and below`, `desc1=[Roll again](~@{character_name}|dispel)`, 'align1=center', 'color=dark-blue');
+
+        let roll = visibility + rollBuilder.string();
+
+        let newValue = {};
+        newValue['dispel-macro'] = roll;
+        setAttrs(newValue);
+
+        await printRoll(roll);
+    });
+}
+//#endregion
+
 //#region Wizard and Priest spells and Powers setup
 function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
     if (!spellsTable[section])
@@ -1331,9 +1404,20 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
         let levelField = isPriest ? 'level-priest' : 'level-wizard';
         let className = isPriest ? 'Priest' : 'Wizard';
 
-        getAttrs([...BOOK_FIELDS, ...optionalRulesFields, levelField], function(books) {
+        getAttrs([...BOOK_FIELDS, ...optionalRulesFields, levelField, ERRATA_FIELD], function(books) {
             if (bookInactiveShowToast(books, spell))
                 return;
+
+            let effect = spell['effect'];
+            if (spell['psionics'] && isBookActive(books, PSIONICS_HANDBOOK)) {
+                effect += `}}{{psionics=${spell['psionics']}`;
+            }
+            if (spell['special-conditions']) {
+                spell['special-conditions'].forEach(condition => {
+                    effect += `}}{{${condition}=1`;
+                });
+            }
+
 
             let spellInfo = {
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
@@ -1348,13 +1432,13 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
                 [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
                 [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
                 [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-                [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
+                [`repeating_spells-${section}_spell-reference`]    : displayReference(spell, books),
                 [`repeating_spells-${section}_spell-subtlety`]     : spell['subtlety'] || '',
                 [`repeating_spells-${section}_spell-sensory`]      : spell['sensory'] || '',
                 [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
                 [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
                 [`repeating_spells-${section}_spell-crit-size`]    : spell['crit-size'] || '',
-                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
+                [`repeating_spells-${section}_spell-effect`]       : effect
             };
 
             if (isPriest) {
@@ -1404,6 +1488,18 @@ const displaySpellLevel = function(level, className) {
     return level === 'q'
         ? 'Quest Spell Priest'
         : `Level ${level} ${className}`;
+}
+
+const displayReference = function(spell, books) {
+    let reference = `${spell['book']} ${spell['reference']}`
+    if (spell['book-compendium'])
+        reference += `\n${spell['book-compendium']}`;
+
+    let activeSettings = getActiveSettings([ERRATA_FIELD], books);
+    if (activeSettings.has(ERRATA_FIELD) && spell['errata'])
+        reference += `\n${spell['errata']}`;
+
+    return reference;
 }
 
 // --- Start setup Spell Slots --- //
@@ -2050,7 +2146,7 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo) {
         return comparerFields.every(f => weapon1[f] === weapon2[f]);
     }
     let setWeaponFunc = function (weapon) {
-        if (weapon['bonusInt'] > 1) {
+        if (weapon['bonusInt'] > 0) {
             weapon['small-medium'] += weapon['bonus'];
             weapon['large'] += weapon['bonus'];
             weapon['thac0'] = weapon['thac0'] - weapon['bonusInt'];
@@ -2070,54 +2166,224 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo) {
 });
 //#endregion
 
-on('clicked:grenade-miss', async function(eventInfo) {
-    let rollBuilder = new RollTemplateBuilder('2Egrenademiss');
-    let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
-    switch (grenade) {
-        case 'Acid':       rollBuilder.push('name=Acid','aoe=[[1]]','aoesplash=[[1+6]]',`hitdmg=[Damage](~@{character_name}|acid-hit)`,`splashdmg=[Damage](~@{character_name}|acid-splash)`); break;
-        case 'Holy water': rollBuilder.push('name=Holy water','aoe=[[1]]','aoesplash=[[1+6]]',`hitdmg=[Damage](~@{character_name}|holy-water-hit)`,`splashdmg=[Damage](~@{character_name}|holy-water-splash)`); break;
-        case 'Oil (lit)':  rollBuilder.push('name=Oil (lit)','aoe=[[3]]','aoesplash=[[3+6]]',`hitdmg=[Round 1](~@{character_name}|oil-lit-hit1) [Round 2](~@{character_name}|oil-lit-hit2)`,`splashdmg=[Damage](~@{character_name}|oil-lit-splash)`); break;
-        case 'Poison':     rollBuilder.push('name=Poison','aoe=[[1]]','aoesplash=[[1+6]]','hitdmg=Special','splashdmg=Special'); break;
-        case 'Other': {
-            let name   = await extractQueryResult('?{Grenade name}');
-            let aoe    = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
-            let damage = await extractQueryResult('?{Direct damage|1d6}');
-            let splash = await extractQueryResult('?{Splash damage|1d3}');
-
-            let customGrenade = {}
-            customGrenade['custom-grenade-name'] = name;
-            customGrenade['custom-grenade-hit'] = damage;
-            customGrenade['custom-grenade-splash'] = splash;
-            setAttrs(customGrenade);
-
-            rollBuilder.push(`name=${name}`,`aoe=[[${aoe}]]`,`aoesplash=[[${aoe}+6]]`,`hitdmg=[Damage](~@{character_name}|custom-grenade-hit)`,`splashdmg=[Damage](~@{character_name}|custom-grenade-splash)`);
+on('clicked:grenade-miss', function(eventInfo) {
+    getAttrs(['tab11'], async function(values) {
+        let templateVisibility = '';
+        let rollVisibility = '/em';
+        if (values['tab11'] === '2') {
+            templateVisibility = '@{wtype}';
+            rollVisibility = '@{wtype}';
         }
-    }
-    let distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
-    rollBuilder.push('direction=[[1d10]]', `distancename=${distanceName}`);
-    switch (distanceName) {
-        case 'Short': rollBuilder.push('distance=[[1d6cs1cf6]]'); break;
-        case 'Medium': rollBuilder.push('distance=[[1d10cs1cf10]]'); break;
-        case 'Long': rollBuilder.push('distance=[[2d10cs1cf10]]'); break;
-    }
-    rollBuilder.push('hit=[[0]]','splash=[[0]]');
-    let finalRollText = rollBuilder.string();
-    console.log(finalRollText);
-    startRoll(finalRollText, function (roll) {
-        console.log(roll);
-        let computedRolls = {
-            hit: 0,
-            splash: 0
-        };
 
-        // See if monster is within direct hit
-        if (roll.results.distance.result <= roll.results.aoe.result / 2) {
-            computedRolls.hit = 1;
-        } else if (roll.results.distance.result <= roll.results.aoesplash.result / 2) {
-            computedRolls.splash = 1;
+        let rollBuilder = new RollTemplateBuilder('2Egrenademiss');
+        const query = '?{What grenade have been thrown?'.concat(
+            '|Acid',
+            '|Holy water',
+            '|Oil (lit)',
+            '|Poison',
+            '|Boulder',
+            '|--------',
+            '|Fire Seed missile',
+            '|Ice Knife',
+            '|Melf’s Minute Meteor',
+            '|Otiluke’s Freezing Sphere - Globe of cold',
+            '|Produce Flame',
+            '|Puffball',
+            '|Sol’s Searing Orb',
+            '|Other',
+            '}'
+        );
+        let grenade = await extractQueryResult(query);
+        switch (grenade) {
+            case 'Acid': {
+                rollBuilder.push(
+                    'name=Acid',
+                    'aoe=[[1]]',
+                    'aoesplash=[[1+6]]',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;2d4&rbrack;&rbrack; acid damage using their Acid! &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1&rbrack;&rbrack; acid damage using their Acid! &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Holy water': {
+                rollBuilder.push(
+                    'name=Holy water',
+                    'aoe=[[1]]',
+                    'aoesplash=[[1+6]]',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1d6+1&rbrack;&rbrack; damage using their Holy water! &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;2&rbrack;&rbrack; damage using their Holy water! &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Oil (lit)': {
+                rollBuilder.push(
+                    'name=Oil (lit)',
+                    'aoe=[[3]]',
+                    'aoesplash=[[3+6]]',
+                    `hitdmg=[Round 1](\`${rollVisibility} rolls &lbrack;&lbrack;2d6&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Direct Hit, first round&#41;) [Round 2]({rollVisibility}\`$ rolls &lbrack;&lbrack;1d6&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Direct Hit, second round&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1d3&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Poison': {
+                rollBuilder.push(
+                    'name=Poison',
+                    'aoe=[[1]]',
+                    'aoesplash=[[1+6]]',
+                    `hitdmg=[Special](\`${rollVisibility} affects the target creature with Poison! Consult DMG p. 101 for the effect. &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Special](\`${rollVisibility} affects the target creature with Poison! Consult DMG p. 101 for the effect. &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Boulder': {
+                let damage = await extractQueryResult('?{Direct Hit damage|3d10}');
+                rollBuilder.push(
+                    'name=Boulder',
+                    'aoe=[[2]]',
+                    'aoesplash=[[2]]',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage using their Boulder! &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage, minus the distance the boulder has bounced in feet since it first hit the ground, using their Boulder! &#40;Scatter&#41;)`,
+                    'bounce=[[3d10]]'
+                );
+                break;
+            }
+            case '--------': return;
+            case 'Fire Seed missile': {
+                rollBuilder.push(
+                    'name=Fire Seed missile',
+                    'aoe=[[10]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} causes creatures failing a save vs. spell &lbrack;&lbrack;2d8&rbrack;&rbrack; fire damage &#40;one-half damage if a saving throw vs. spell is successful&#41; using their Fire Seed missile! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break
+            }
+            case 'Ice Knife': {
+                rollBuilder.push(
+                    'name=Ice Knife',
+                    'aoe=[[10]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} causes creatures failing a save vs. paralyzation to suffer &lbrack;&lbrack;1d4&rbrack;&rbrack; cold damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of numbness using their Ice Knife! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Melf’s Minute Meteor': {
+                rollBuilder.push(
+                    'name=Melf’s Minute Meteor',
+                    'aoe=[[1]]',
+                    'aoesplash=[[6]]',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1d4&rbrack;&rbrack; fire damage using their Melf’s Minute Meteor! &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1&rbrack;&rbrack; fire damage using their Melf’s Minute Meteor! &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Otiluke’s Freezing Sphere - Globe of cold': {
+                rollBuilder.push(
+                    'name=Otiluke’s Freezing Sphere (Globe of cold)',
+                    'aoe=[[20]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} causes creatures failing a save vs. spell &lbrack;&lbrack;6d6&rbrack;&rbrack; cold damage &#40;one-half damage if a saving throw vs. spell is successful&#41; using their Otiluke’s Freezing Sphere - Globe of cold! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Produce Flame': {
+                rollBuilder.push(
+                    'name=Produce Flame',
+                    'aoe=[[3]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1d4+1&rbrack;&rbrack; fire damage using their Produce Flame! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Puffball': {
+                rollBuilder.push(
+                    'name=Puffball',
+                    'aoe=[[10]]',
+                    'aoesplash=',
+                    `hitdmg=[Effect](\`${rollVisibility} causes creatures failing a save vs. poison to be unable to attack and lose all Dexterity bonuses to Armor Class and saving throws using their Puffball! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Sol’s Searing Orb': {
+                rollBuilder.push(
+                    'name=Sol’s Searing Orb',
+                    'aoe=[[6]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} causes normal creatures failing a saving throw vs. spell &lbrack;&lbrack;3d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of blindness. Or causes undead &lbrack;&lbrack;6d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d6&rbrack;&rbrack; rounds of blindness. All victims are allowed a saving throw vs. spell, with success indicating half damage and no blindness. Using their Sol’s Searing Orb! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Other': {
+                let name = await extractQueryResult('?{Grenade name}');
+                let aoe = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
+                let damage = await extractQueryResult('?{Direct Hit damage|1d6}');
+                let splash = await extractQueryResult('?{Splash damage|1d3}');
+                splash = splash.trim();
+
+                let escapedName = name.replaceAll('(','&#40;')
+                    .replaceAll(')','&#41;')
+                    .replaceAll('[','&lbrack;')
+                    .replaceAll(']','&rbrack;');
+
+                rollBuilder.push(
+                    `name=${name}`,
+                    `aoe=[[${aoe}]]`,
+                    `aoesplash=[[${aoe}+6]]`,
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Direct Hit&#41;)`,
+                );
+
+                if (splash === '' || splash === '0') {
+                    rollBuilder.push('splashdmg=');
+                } else {
+                    rollBuilder.push(`splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${splash}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Splash&#41;)`);
+                }
+            }
         }
-        console.log(computedRolls);
-        finishRoll(roll.rollId, computedRolls);
+
+        let distanceName;
+        switch (grenade) {
+            case 'Fire Seed missile':
+            case 'Melf’s Minute Meteor':
+            case 'Produce Flame':
+            case 'Sol’s Searing Orb':
+                distanceName = 'Short';
+                break;
+            default:
+                distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
+        }
+        rollBuilder.push('direction=[[1d10]]', `distancename=${distanceName}`);
+        let distanceRoll;
+        switch (distanceName) {
+            case 'Short':  distanceRoll='1d6cs1cf6'; break;
+            case 'Medium': distanceRoll='1d10cs1cf10'; break;
+            case 'Long':   distanceRoll='2d10cs1cf10'; break;
+        }
+        if (grenade === 'Boulder') {
+            distanceRoll = distanceRoll + '*2';
+        }
+        rollBuilder.push(`distance=[[${distanceRoll}]]`);
+        rollBuilder.push('hit=[[0]]','splash=[[0]]');
+        let finalRollText = `${templateVisibility} ${rollBuilder.string()}`;
+        console.log(finalRollText);
+        startRoll(finalRollText, function (roll) {
+            let computedRolls = {
+                hit: 0,
+                splash: 0
+            };
+
+            // See if monster is within direct hit
+            if (roll.results.aoe && roll.results.distance.result <= roll.results.aoe.result / 2) {
+                computedRolls.hit = 1;
+            } else if (roll.results.aoesplash && roll.results.distance.result <= roll.results.aoesplash.result / 2) {
+                computedRolls.splash = 1;
+            }
+            finishRoll(roll.rollId, computedRolls);
+        });
     });
 });
 
@@ -2176,7 +2442,7 @@ on('clicked:repeating_ammo:crit2', function (eventInfo) {
 const SPELL_HITS_REGEX = /\((\dd\d\+?\d?|\d) hit/i;
 
 async function debugSeverity(severityDice) {
-    return false
+    return true
         ? parseInt(await extractQueryResult('?{Debug severity|1}'))
         : await extractRollResult(severityDice);
 }
@@ -2886,43 +3152,278 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
             a.D[2]['stored-gear-weight-total']=(m.allgearweight-m.mountgearweight);
         })
         .execute();
-})
+});
 
-on('change:repeating_scrolls:scroll', async function (eventInfo) {
-    if (!eventInfo.newValue)
-        return;
+//#region Scroll
+const getScrollSpells = function (scrollName) {
+    if (!scrollName)
+        return null;
 
-    let spellName = eventInfo.newValue.replace(/ scroll$/, '');
+    let spellName = scrollName.replace(/ scroll$/, '');
     let wizardSpell = wizardSpells['wizmonster'][spellName];
     let priestSpell = priestSpells['primonster'][spellName];
     if (!wizardSpell && !priestSpell)
-        return
+        return null;
 
-    let spell;
-    let spellClass;
-    if (wizardSpell && priestSpell) {
-        spellClass = await extractQueryResult(`?{Is ${eventInfo.newValue} a Wizard or Priest scroll?|Wizard|Priest}`);
-        spell = spellClass === 'Wizard' ? wizardSpell : priestSpell;
-    } else if (wizardSpell) {
-        spell = wizardSpell;
-        spellClass = 'Wizard';
-    } else {
-        spell = priestSpell;
-        spellClass = 'Priest';
+    return {wizardSpell, priestSpell}
+}
+
+const getScrollCasterClassAndLevel = async function (spLevelMatch, scrollName, scrollSpells) {
+    if (spLevelMatch) {
+        if (spLevelMatch[1].match(/wizard/i)) {
+            return {
+                casterClass: 'Wizard',
+                casterLevel: '@{level-class2}',
+            }
+        }
+        if (spLevelMatch[1].match(/priest/i)) {
+            return {
+                casterClass: 'Priest',
+                casterLevel: '@{level-class3}',
+            }
+        }
     }
 
-    getAttrs([...BOOK_FIELDS, ...SCHOOL_FIELDS, ...SPHERE_FIELDS], async function(books) {
-        if (bookInactiveShowToast(books, spell))
+    if (!scrollSpells) {
+        return null
+    }
+
+    let {wizardSpell, priestSpell} = scrollSpells;
+    if (wizardSpell && priestSpell) {
+        let casterClass = await extractQueryResult(`?{Is '${scrollName}' a Wizard or Priest scroll?|Wizard|Priest}`);
+        return {
+            casterClass: casterClass,
+            casterLevel: casterClass === 'Wizard' ? '@{level-class2}' : '@{level-class3}',
+        }
+    }
+    if (wizardSpell) {
+        return {
+            casterClass: 'Wizard',
+            casterLevel: '@{level-class2}',
+        }
+    }
+    if (priestSpell) {
+        return {
+            casterClass: 'Priest',
+            casterLevel: '@{level-class3}',
+        }
+    }
+
+    return null
+}
+
+const getScrollSpellLevelRequirement = function (spLevelMatch, scrollSpells, casterClass) {
+    if (spLevelMatch) {
+        let spellLevelMatch = spLevelMatch[1].match(/\d+/);
+        if (spellLevelMatch) {
+            let spellLevel = spellLevelMatch[0];
+            if (spellLevel.match(/^[1-7]$/)) { // Handle spells in the normal range for both classes
+                return SPELL_LEVEL_REQUIREMENT[casterClass][spellLevel];
+            }
+            if (spellLevel.match(/^[8-9]$/) && casterClass === 'Wizard') { // Handle high level wizard spells
+                return SPELL_LEVEL_REQUIREMENT[casterClass][spellLevel];
+            }
+        }
+
+        if (spLevelMatch[1].match(/quest/i) && casterClass === 'Priest') { // Handle quest spells
+            return SPELL_LEVEL_REQUIREMENT[casterClass]['q'];
+        }
+    }
+
+    if (!scrollSpells) {
+        return null
+    }
+
+    let {wizardSpell, priestSpell} = scrollSpells;
+    if (wizardSpell && priestSpell) {
+        let spellLevel = casterClass === 'Wizard' ? wizardSpell.level : priestSpell.level;
+        return SPELL_LEVEL_REQUIREMENT[casterClass][spellLevel];
+    }
+    if (wizardSpell) {
+        return SPELL_LEVEL_REQUIREMENT[casterClass][wizardSpell.level];
+    }
+    if (priestSpell) {
+        return SPELL_LEVEL_REQUIREMENT[casterClass][priestSpell.level]
+    }
+
+    return null
+}
+
+const getCasterFailureInfo = function (failureSystem, levelRequirement, casterLevel) {
+    let casterFailure = '';
+    let casterSingleClass = false;
+    if (failureSystem.includes('spell-level')) {
+        casterFailure = `{(${levelRequirement}-(${casterLevel}))*5,0}kh1`;
+        casterSingleClass = failureSystem === 'spell-level';
+    } else if (failureSystem.includes('casting-level')) {
+        casterFailure = `{((@{scroll-level})-(${casterLevel}))*5,0}kh1`;
+        casterSingleClass = failureSystem === 'casting-level';
+    }
+    return {casterFailure, casterSingleClass};
+}
+
+
+const getScrollRogueFailureInfo = function (failureSystem) {
+    let rogueClass;
+    let rogueFailure = '';
+    let rogueSingleClass = false;
+
+    if (failureSystem.includes('thief')) {
+        rogueClass = 'Thief';
+        rogueFailure = `100-({0,@{level-class4}}>10*75)`;
+        rogueSingleClass = failureSystem === 'thief';
+    } else if (failureSystem.includes('bard')) {
+        rogueClass = 'Bard';
+        rogueFailure = `100-({0,@{level-class4}}>10*85)`;
+        rogueSingleClass = failureSystem === 'bard';
+    }
+    return {
+        rogueClass: rogueClass,
+        rogueFailure: rogueFailure,
+        rogueSingleClass: rogueSingleClass,
+    };
+}
+
+
+on('change:scroll-failure-system', function (eventInfo) {
+    let failureSystem = eventInfo.newValue;
+    if (!failureSystem)
+        return;
+
+    // Handle the static values without any validation
+    if (failureSystem === 'custom') {
+        return;
+    } else if (failureSystem === 'disabled') {
+        TAS.repeating('scrolls')
+            .field('scroll-failure')
+            .each(function (row) {
+                row['scroll-failure'] =  '0';
+            })
+            .execute();
+        return;
+    }
+
+    getSectionIDs('scrolls', function (ids) {
+        let fullFieldNames = ['level-class2','level-class3','level-class4']
+        ids.forEach(id => fullFieldNames.push(`repeating_scrolls_${id}_scroll`,`repeating_scrolls_${id}_scroll-macro`));
+        getAttrs(fullFieldNames, async function (values) {
+            await keepContextRoll();
+
+            // Validate that the correct fields are filled out before proceeding
+            let wizardLevel = parseInt(values['level-class2']) || 0;
+            let priestLevel = parseInt(values['level-class3']) || 0;
+            let rogueLevel = parseInt(values['level-class4']) || 0;
+
+            if (failureSystem.includes('level') && !wizardLevel && !priestLevel &&
+                (failureSystem.includes('thief') || failureSystem.includes('bard')) && !rogueLevel) {
+                return showToast(WARNING, 'Missing Class levels', `You have no Wizard, Priest, or Rogue levels in the fields @{level-class2}, @{level-class3}, or @{level-class4}. Either the Wizard or Priest, and Rogue fields must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
+            }
+
+            if (failureSystem.includes('level') && !wizardLevel && !priestLevel) {
+                return showToast(WARNING, 'Missing Wizard/Priest level', `You have no Wizard or Priest levels in the fields @{level-class2} or @{level-class3}. Either of these fields must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
+            }
+
+            if ((failureSystem.includes('thief') || failureSystem.includes('bard')) && !rogueLevel) {
+                return showToast(WARNING, 'Missing Rogue level', `You have no Rogue level in the field @{level-class4}. This field must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
+            }
+
+            let newValues = {};
+            let unhandledScrolls = [];
+            let {rogueClass, rogueFailure, rogueSingleClass} = getScrollRogueFailureInfo(failureSystem);
+
+            // Set new failure chance for each scroll
+            for (let id of ids) {
+                if (rogueSingleClass) {
+                    newValues[`repeating_scrolls_${id}_scroll-failure`] = `${rogueFailure} [${rogueClass}]`;
+                    continue;
+                }
+
+                let scrollName = values[`repeating_scrolls_${id}_scroll`];
+                let scrollMacro = values[`repeating_scrolls_${id}_scroll-macro`];
+
+                let scrollSpells = getScrollSpells(scrollName);
+                let spLevelMatch = scrollMacro.match(/\{\{splevel=(.*?)}} *\{\{/);
+
+                let casterClassAndLevel = await getScrollCasterClassAndLevel(spLevelMatch, scrollName, scrollSpells);
+                if (!casterClassAndLevel) {
+                    unhandledScrolls.push(scrollName);
+                    continue;
+                }
+
+                let {casterClass, casterLevel} = casterClassAndLevel;
+                let levelRequirement = getScrollSpellLevelRequirement(spLevelMatch, scrollSpells, casterClass);
+                if (!levelRequirement && failureSystem.includes('spell-level')) {
+                    unhandledScrolls.push(scrollName);
+                    continue;
+                }
+
+                let {casterFailure, casterSingleClass} = getCasterFailureInfo(failureSystem, levelRequirement, casterLevel);
+
+                let spellFailure;
+                if (casterSingleClass) {
+                    spellFailure = `${casterFailure} [${casterClass}]`;
+                } else if (failureSystem.includes('best')) {
+                    spellFailure = `{[[${casterFailure}]] [${casterClass}], [[${rogueFailure}]] [${rogueClass}]}kl1`;
+                } else if (failureSystem.includes('select')) {
+                    casterFailure = casterFailure
+                        .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                        .replaceAll(',', '&#44;');
+                    rogueFailure = rogueFailure
+                        .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                        .replaceAll(',','&#44;');
+                    spellFailure = `?{Cast ${scrollName} as a ${casterClass} or a ${rogueClass}?|${casterClass},${casterFailure} [${casterClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
+                }
+
+                newValues[`repeating_scrolls_${id}_scroll-failure`] = spellFailure;
+            }
+
+            if (unhandledScrolls.length > 0) {
+                let toastObject = getToastObject(WARNING, 'Unhandled Scrolls', `Could not determine spell failure chance for the following scrolls. Please update them manually:\n* ${unhandledScrolls.join('\n* ')}`);
+                Object.assign(newValues, toastObject);
+            }
+
+            setAttrs(newValues);
+        })
+    });
+});
+
+on('change:repeating_scrolls:scroll', async function (eventInfo) {
+    let scrollName = eventInfo.newValue;
+    let scrollSpells = getScrollSpells(scrollName);
+    if (!scrollSpells)
+        return;
+
+    let spell;
+    let casterClass;
+    let casterLevel;
+
+    let {wizardSpell, priestSpell} = scrollSpells;
+    if (wizardSpell && priestSpell) {
+        casterClass = await extractQueryResult(`?{Is '${scrollName}' a Wizard or Priest scroll?|Wizard|Priest}`);
+        spell = casterClass === 'Wizard' ? wizardSpell : priestSpell;
+        casterLevel = casterClass === 'Wizard' ? '@{level-class2}' : '@{level-class3}';
+    } else if (wizardSpell) {
+        casterClass = 'Wizard';
+        spell = wizardSpell;
+        casterLevel = '@{level-class2}';
+    } else {
+        casterClass = 'Priest';
+        spell = priestSpell;
+        casterLevel = '@{level-class3}'
+    }
+
+    getAttrs([...BOOK_FIELDS, ...SCHOOL_FIELDS, ...SPHERE_FIELDS, 'scroll-failure-system'], async function(values) {
+        if (bookInactiveShowToast(values, spell))
             return
 
         let parse = parseSourceAttribute(eventInfo);
 
         let rollBuilder = new RollTemplateBuilder('2Espell');
         rollBuilder.push(`title=@{scroll}\n(Casting level @{scroll-level})`);
-        rollBuilder.push(`splevel=${displaySpellLevel(spell.level, spellClass)}`);
-        rollBuilder.push(`school=${getSpellSchools(spell, books)}`);
-        if (spellClass === 'Priest') {
-            let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
+        rollBuilder.push(`splevel=${displaySpellLevel(spell.level, casterClass)}`);
+        rollBuilder.push(`school=${getSpellSchools(spell, values)}`);
+        if (casterClass === 'Priest') {
+            let sphereRules = getActiveSettings(SPHERE_FIELDS, values);
             rollBuilder.push(`sphere=${getSpellSpheres(spell, sphereRules)}`);
         }
         rollBuilder.push(`range=${spell['range']}`);
@@ -2944,30 +3445,56 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         rollBuilder.push('checkroll=[[1d100]]%');
         rollBuilder.push('checktarget=[[@{scroll-failure}]]%');
         rollBuilder.push('fail=DM roll for Magical Spell Failure');
+        rollBuilder.push('character=@{character_name}');
         rollBuilder.push(`effects=${spell['effect']}`);
+        if (spell['psionics'] && isBookActive(books, PSIONICS_HANDBOOK)) {
+            rollBuilder.push(`psionics=${spell['psionics']}`);
+        }
+        if (spell['special-conditions']) {
+            spell['special-conditions'].forEach(condition => {
+                rollBuilder.push(`${condition}=1`)
+            });
+        }
 
         let scrollMacro = rollBuilder.string();
         scrollMacro = scrollMacro.replaceAll('[[@{level-wizard}]]','[[@{scroll-level}]]')
             .replaceAll('[[@{level-priest}]]', '[[@{scroll-level}]]');
 
         let recommendedMinimumLevel;
-
-        let spellLevel = parseInt(spell.level);
-        if (isNaN(spellLevel)) {
+        let levelRequirement = SPELL_LEVEL_REQUIREMENT[casterClass][spell.level];
+        if (levelRequirement < 6) {
             recommendedMinimumLevel = 6;
-        } else if (spellLevel <= 3) {
-            recommendedMinimumLevel = 6;
-        } else if (spellLevel === 4 || spellLevel === 5) {
-            recommendedMinimumLevel = spellLevel*2;
-        } else if (spellLevel === 6 && spellClass === 'Priest') {
-            recommendedMinimumLevel = spellLevel*2;
-        } else if (spellLevel >= 6) {
-            recommendedMinimumLevel = spellLevel*2+1
+        } else {
+            recommendedMinimumLevel = levelRequirement+1;
         }
 
-        let scribeLevel = await extractQueryResult(`?{At what level is ${eventInfo.newValue} scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}}`);
+        let scribeLevel = await extractQueryResult(`?{At what level is ${scrollName} scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}}`);
 
-        let spellFailure = await extractQueryResult(`?{What is the risk of spell failure for ${eventInfo.newValue}? (If you do not use this rule, set the value to 0)|0}`);
+        let failureSystem = values['scroll-failure-system'];
+
+        let {casterFailure, casterSingleClass} = getCasterFailureInfo(failureSystem, levelRequirement, casterLevel);
+        let {rogueClass, rogueFailure, rogueSingleClass} = getScrollRogueFailureInfo(failureSystem);
+
+        let spellFailure;
+        if (failureSystem === '' || failureSystem === 'disabled') {
+            spellFailure = '0';
+        } else if (failureSystem === 'custom') {
+            spellFailure = await extractQueryResult(`?{What is the risk of spell failure for ${scrollName}?|0}`);
+        } else if (rogueSingleClass) {
+            spellFailure = `${rogueFailure} [${rogueClass}]`;
+        } else if (casterSingleClass) {
+            spellFailure = `${casterFailure} [${casterClass}]`;
+        } else if (failureSystem.includes('best')) {
+            spellFailure = `{[[${casterFailure}]] [${casterClass}], [[${rogueFailure}]] [${rogueClass}]}kl1`;
+        } else if (failureSystem.includes('select')) {
+            casterFailure = casterFailure
+                .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                .replaceAll(',', '&#44;');
+            rogueFailure = rogueFailure
+                .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                .replaceAll(',','&#44;');
+            spellFailure = `?{Cast ${scrollName} as a ${casterClass} or a ${rogueClass}?|${casterClass},${casterFailure} [${casterClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
+        }
 
         let scrollInfo = {
             [`repeating_scrolls_${parse.rowId}_scroll-speed`]: spell['cast-time'],
@@ -2979,6 +3506,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         setAttrs(scrollInfo);
     });
 });
+//#endregion
 //#endregion
 
 on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_gem`, function(eventInfo) {
@@ -3275,6 +3803,8 @@ const FOLDABLE_REPEATING_SECTIONS = [
     ...PSIONIC_CORE_SECTIONS.map(e => e.section),
     'potions',
     'dusts',
+    'magic-items',
+    'wands',
     'scrolls',
 ];
 FOLDABLE_REPEATING_SECTIONS.forEach(section => {
