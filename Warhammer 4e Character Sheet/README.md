@@ -84,7 +84,8 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 Feb 14th 2025 v1.75b
 
 - Fixed alignment issue with coin swap buttons
-- Fixed Weapon Magical Effects textarea sizing
+- Fixed Weapon settings Magical Effects textarea sizing
+- Fixed Spell Quickbar header spacing
 
 
 Feb 13th 2025 v1.75a
