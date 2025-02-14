@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1] - 2025-02-14
+
+### Changed
+
+- Only copy attributes from Modifiers to the Profile Picker if they have a value.
+- Remove Perception from Saving Throws in the Active Profile.
+
 ## [1.7.0] - 2025-02-08
 
 ### Added
