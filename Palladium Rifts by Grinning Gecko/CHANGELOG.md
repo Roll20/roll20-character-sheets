@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.7.0] - 2025-02-08
+
+### Added
+
+- Add Damage to Ancient Weapon Proficiencies (applies to Pole Arm and Whip).
+- Add hideable YouTube tutorial link.
+- Output error message to chat when TT is clicked if the Active Profile has no attacks.
+- Add nameable Modern Damage 1, 2, and 3 to Modifiers and Profiles for extra damage types.
+
+### Changed
+
+- Add 20 to Turn Tracker initiative when a Natural 20 is rolled.
+- Fix some grid layout issues in Modifiers and Profiles.
+
 ## [1.6.1] - 2025-01-27
 
 ### Added
