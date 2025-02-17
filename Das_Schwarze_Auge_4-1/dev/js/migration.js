@@ -1195,7 +1195,7 @@ function migrateTo20250122(migrationChain) {
 		"reg_sleep_ae_factor_metal_sensitive_conscious_contact",
 		"reg_sleep_ae_mod_cuffed",
 	];
-	/// Uninitialized attributes from pre-initialization times now needed and properly initialized
+	/// Uninitialized attributes from pre-initialization times now needed and properly initialized (stored as integer, not as string)
 	const attrsToModernize = [
 		"LE",
 		"LE_max",
@@ -1207,6 +1207,7 @@ function migrateTo20250122(migrationChain) {
 		"AE_max",
 		"KE",
 		"KE_max",
+		"RitualkenntnisWert",
 	];
 	/// Errors from migrateTo20240414()
 	const attrsToCorrect = [
@@ -1234,6 +1235,7 @@ function migrateTo20250122(migrationChain) {
 
 	// Attribute operations
 	safeGetAttrs(attrsToGet, function(outer) {
+		debugLog(caller, "outer head: attributes", outer)
 		// Boilerplate
 		let attrsToChange = {};
 
@@ -1248,6 +1250,7 @@ function migrateTo20250122(migrationChain) {
 		for (attr of attrsToModernize)
 		{
 			let value = 0;
+			// Handle non-parseable values
 			if (isNaN(parseInt(outer[attr])))
 			{
 				if (Object.hasOwn(defaultValues, attr))
@@ -1257,6 +1260,21 @@ function migrateTo20250122(migrationChain) {
 					value = 0;
 				}
 				attrsToChange[attr] = value;
+				// Also fix for later re-use
+				outer[attr] = value;
+			} else {
+			// Handle parseable values stored as string
+			/// At some point (2023 to 2024?) trying to save a stringified integer to
+			/// an attribute backed by a number-type text box led to silently assigning
+			/// an empty value to the attribute instead.
+			/// This would in the next "round" of safeGetAttrs be detected and maybe
+			/// even corrected, but not without losing the correct/actual value.
+				if (parseInt(outer[attr]) !== outer[attr])
+				{
+					let parsedInteger = parseInt(outer[attr]);
+					attrsToChange[attr] = parsedInteger;
+					outer[attr] = parsedInteger;
+				}
 			}
 		}
 
