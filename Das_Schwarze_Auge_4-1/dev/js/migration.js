@@ -591,9 +591,14 @@ function migrateTo20220604(migrationChain) {
 
 	var attrsToChange = {};
 
-	safeGetAttrs(attrsToGet, function(v) {
+	safeGetAttrs(attrsToGet, function(v, missingAttrs, badDefAttrs) {
+		debugLog(caller, "values of safeGetAttrs", v, "missingAttrs", missingAttrs, "badDefAttrs", badDefAttrs);
 		for (let attr of attrsToGet)
 		{
+			if (missingAttrs.includes(attr))
+			{
+				break;
+			}
 			if (attr.match("visibli"))
 			{
 				var newAttr = attr.replace(/visibli/gm, "visibili");
