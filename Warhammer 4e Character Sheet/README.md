@@ -86,6 +86,8 @@ Feb 14th 2025 v1.75b
 - Fixed alignment issue with coin swap buttons
 - Fixed Weapon settings Magical Effects textarea sizing
 - Fixed Spell Quickbar header spacing
+- Fixed problem with Wounds calc not being correct if Larger the Average sized and changes to SB/TB/WPB where made. Only Race change will automatically reset Size and recalculate wounds.
+- Updated Sheet.json to add some of the recent custom setting defaults
 
 
 Feb 13th 2025 v1.75a
