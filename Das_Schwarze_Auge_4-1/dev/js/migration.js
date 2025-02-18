@@ -579,17 +579,17 @@ function migrateTo20220116(migrationChain) {
 	- Use new attributes for spell "Visibili Vanitar"
 */
 function migrateTo20220604(migrationChain) {
-	var caller = "migrateTo20220604";
+	const caller = "migrateTo20220604";
 	debugLog(caller, "Invoked.");
 
-	var attrsToGet = [
+	const attrsToGet = [
 		"zauber_visibli",
 		"z_visibli_action",
 		"Spez_visibli",
 		"ZfW_visibli"
 	];
 
-	var attrsToChange = {};
+	let attrsToChange = {};
 
 	safeGetAttrs(attrsToGet, function(v, missingAttrs, badDefAttrs) {
 		debugLog(caller, "values of safeGetAttrs", v, "missingAttrs", missingAttrs, "badDefAttrs", badDefAttrs);
@@ -601,7 +601,7 @@ function migrateTo20220604(migrationChain) {
 			}
 			if (attr.match("visibli"))
 			{
-				var newAttr = attr.replace(/visibli/gm, "visibili");
+				let newAttr = attr.replace(/visibli/gm, "visibili");
 				if (attr.match("z_visibli_action"))
 				{
 					attrsToChange[newAttr] = v[attr].replace(/visibli/gm, "visibili");
@@ -611,7 +611,7 @@ function migrateTo20220604(migrationChain) {
 				if (attr.match("Spez_visibli") && v[attr] === 0)
 				{
 					attrsToChange[newAttr] = "";
-				}					
+				}
 			}
 		}
 
