@@ -329,18 +329,20 @@ function migrateTo20200809(migrationChain) {
 }
 
 /*
-		Migration steps:
-		- Check for shield attack availability
-		- Update wound modifiers
-		- Update initiative modifiers from the main (melee) weapon
-		- Calculate initiative base and initiative dice based on three special skills (Kampfgespür, Kampfreflexe, Klingentänzer)
+	Migration steps:
+	- Check for shield attack availability
+	- Update wound modifiers
+	- Update initiative modifiers from the main (melee) weapon
+	- Calculate initiative base and initiative dice based on three special skills (Kampfgespür, Kampfreflexe, Klingentänzer)
 */
 function migrateTo20210413(migrationChain) {
-	var caller = "migrateTo20210413";
-		debugLog(caller, "migrateTo20210413 invoked");
+	const caller = "migrateTo20210413";
+	debugLog(caller, "started");
 
-		safeGetAttrs(["activeShieldRowId"], function(values) {
-		var variablesToGet = [
+	safeGetAttrs(["activeShieldRowId"], function(outerValues) {
+		debugLog(caller, "Attributes gotten (outer)", outerValues);
+		const variablesToGet =
+		[
 			"sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag",
 			"KK_Basis", "KK_mod",
 			"AT_raufen",
@@ -360,39 +362,41 @@ function migrateTo20210413(migrationChain) {
 			"inibasis", "inizugek",
 			"INIModNKW1", "INIModNKW2", "INIModNKW3", "INIModNKW4",
 			"sf_kampfgespur", "sf_kampfreflexe", "sf_klingentanzer",
-			"BE_TaW"
+			"BE_TaW",
 		];
 		// Updates for shield attack
-		var activeShieldRowId = values["activeShieldRowId"];
-		
-				// Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
-				if (activeShieldRowId) {
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
-						variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
-				}
+		const activeShieldRowId = outerValues["activeShieldRowId"];
 
-		safeGetAttrs(variablesToGet, function(values) {
+		// Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
+		if (activeShieldRowId) {
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
+			variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
+		}
+
+		safeGetAttrs(variablesToGet, function(innerValues) {
+			debugLog(caller, "Attributes gotten (inner)", innerValues);
 			/*
 				* KK might be ill-defined right now (NaN)
 				* Reason: sheet:opened recalculates KK, but requires KK_mod_wounds
 				* KK_mod_wounds is existing at that point
 				* Make up our own little KK here for migration purposes
 			*/
-			values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
-				let attrsToChange = {};
+			innerValues["KK"] = Math.max(0, parseInt(innerValues["KK_Basis"]) + parseInt(innerValues["KK_mod"]));
+			let attrsToChange = {};
 
-				for (let i = 1; i <= 4; i++) {
-						attrsToChange["NKW" + i + "_SB"] = calculateTpKKModFromValuesAndWeaponNumber(values, i);
-				}
+			for (let i = 1; i <= 4; i++)
+			{
+					attrsToChange["NKW" + i + "_SB"] = calculateTpKKModFromValuesAndWeaponNumber(innerValues, i);
+			}
 
-				let result = calculateShieldAttack(values, activeShieldRowId);
+			const result = calculateShieldAttack(innerValues, activeShieldRowId);
 
-				attrsToChange["shield_at_mod"] = result.shieldAtMod;
-				attrsToChange["shield_at_available"] = result.shieldAtAvailable;
+			attrsToChange["shield_at_mod"] = result.shieldAtMod;
+			attrsToChange["shield_at_available"] = result.shieldAtAvailable;
 
 			// Updates for wound modifiers
-			var mods = calculateWoundModifiers(values);
+			const mods = calculateWoundModifiers(innerValues);
 			Object.assign(attrsToChange, {
 				"AT_mod_wounds": mods["AT"],
 				"PA_mod_wounds": mods["PA"],
@@ -407,31 +411,36 @@ function migrateTo20210413(migrationChain) {
 				"KO_mod_wounds": mods["KO"],
 				"KK_mod_wounds": mods["KK"]
 			});
-			
-				attrsToChange["shield_at"] = Math.max(0, parseInt(values["AT_raufen"]) + parseInt(attrsToChange["AT_mod_wounds"]));
+
+			attrsToChange["shield_at"] = Math.max(0, parseInt(innerValues["AT_raufen"]) + parseInt(attrsToChange["AT_mod_wounds"]));
 
 			// Updates for INI modifiers
 			// Set INI modifier from (main) weapon
-			var weaponini = 0;
-			for (let weapon = 1; weapon <= 4; weapon++) {
-				if (DSAsane(values["INIModNKW" + weapon], "ini-mod-weapon")) {
-					debugLog(caller, "INIModNKW" + weapon, "is", values["INIModNKW" + weapon]);
-					weaponini = parseInt(values["INIModNKW" + weapon]);
+			let weaponini = 0;
+			for (let weapon = 1; weapon <= 4; weapon++)
+			{
+				if (DSAsane(innerValues["INIModNKW" + weapon], "ini-mod-weapon"))
+				{
+					debugLog(caller, "INIModNKW" + weapon, "is", innerValues["INIModNKW" + weapon]);
+					weaponini = parseInt(innerValues["INIModNKW" + weapon]);
 				}
 			}
 			attrsToChange["INI_mod_hauptwaffe"] = weaponini;
 
 			// Calculate initiative base considering special skills and encumbrance
-			var inibasis2 = parseInt(values['inibasis']) + parseInt(values.inizugek) + parseInt(attrsToChange["IB_mod_wounds"]);
+			let inibasis2 = parseInt(innerValues['inibasis']) + parseInt(innerValues.inizugek) + parseInt(attrsToChange["IB_mod_wounds"]);
 
 			// Kampfreflexe is a prerequisite for the others, so stop if not active
-			var IBbonus = 0;
-			var INIdicecount = "1";
-			if (values.sf_kampfreflexe !== "0" && values.BE_TaW <= 4) {
+			let IBbonus = 0;
+			let INIdicecount = "1";
+			if (innerValues.sf_kampfreflexe !== "0" && innerValues.BE_TaW <= 4)
+			{
 				IBbonus += 4;
-				if (values.sf_kampfgespur !== "0" && values.BE_TaW <= 4) {
+				if (innerValues.sf_kampfgespur !== "0" && innerValues.BE_TaW <= 4)
+				{
 					IBbonus += 2;
-					if (values.sf_klingentanzer !== "0" && values.BE_TaW <= 2) {
+					if (innerValues.sf_klingentanzer !== "0" && innerValues.BE_TaW <= 2)
+					{
 						INIdicecount = "2";
 					} else {
 						INIdicecount = "1";
@@ -442,14 +451,15 @@ function migrateTo20210413(migrationChain) {
 			inibasis2 += IBbonus;
 			inibasis2 = Math.max(0, inibasis2);
 
-				attrsToChange["inibasis2"] = inibasis2;
-				attrsToChange["INI_dice_count"] = INIdicecount;
+			attrsToChange["inibasis2"] = inibasis2;
+			attrsToChange["INI_dice_count"] = INIdicecount;
 
-				safeSetAttrs(attrsToChange, {}, function(){
-						callNextMigration(migrationChain);
-				});
+			debugLog(caller, "attrsToChange", attrsToChange);
+			safeSetAttrs(attrsToChange, {}, function(){
+				callNextMigration(migrationChain);
+			});
 		});
-		});
+	});
 }
 
 /*
