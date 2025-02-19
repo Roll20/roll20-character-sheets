@@ -243,78 +243,89 @@ function migrateTo20190427 (migrationChain) {
 }
 
 /*
-		Migration steps:
-		- if more than one close range weapon is active, only keep the first one of them as active
-		- if no close range weapon is active, set the first one active
-		- calculate attack value for "Peitsche" talent
-		- calculate fighting values
-		- set shield_pa and parryweapon_pa to 0
-		- set shield_pa_available and parryweapon_pa_available to "0"
-		- change name of sf Ruestungsgewoehnung II to correct "sf_rustungsgewohnungII" instead of "sf_rustungsgewonungII"
-		- calculate BE from armor
-		- calculate BE modifications for weapons
+	Migration steps:
+	- if more than one close range weapon is active, only keep the first one of them as active
+	- if no close range weapon is active, set the first one active
+	- calculate attack value for "Peitsche" talent
+	- calculate fighting values
+	- set shield_pa and parryweapon_pa to 0
+	- set shield_pa_available and parryweapon_pa_available to "0"
+	- change name of sf Ruestungsgewoehnung II to correct "sf_rustungsgewohnungII" instead of "sf_rustungsgewonungII"
+	- calculate BE from armor
+	- calculate BE modifications for weapons
 */
 function migrateTo20200809(migrationChain) {
-	var caller = "migrateTo20200809";
-		debugLog(caller, "migrateTo20200809 invoked");
+	const caller = "migrateTo20200809";
+	debugLog(caller, "started");
 
-		safeGetAttrs([
-						"NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4", "TaW_peitsche", "ATbasis", 
-						"RS_gBE1", "rs1_rg1", "RS_gBE2", "rs2_rg1", "RS_gBE3", "rs3_rg1", "RS_gBE4", "rs4_rg1", 
-						"RS_Aktiv1", "RS_Aktiv2", "RS_Aktiv3", "RS_Aktiv4", "BE_RG", "BE_Last", "sf_rustungsgewohnungI", "sf_rustungsgewonungII", "sf_rustungsgewohnungIII",
-						"BE_TaW", "NKW_AT_typ1", "NKW_PA_typ1", "NKW_AT_typ2", "NKW_PA_typ2",  
-						"NKW_AT_typ3", "NKW_PA_typ3", "NKW_AT_typ4", "NKW_PA_typ4"], function(v) {
-				
-				var attrsToChange = {};
-				var activeCount = 0;
-				for (let i = 1; i <= 4; i++) {
-						if (v["NKW_Aktiv" + i] === "1") {
-								activeCount += 1;
-						}
-						if (activeCount > 1) {
-								attrsToChange["NKW_Aktiv" + i] = "0";
-						}
-				}
-				if (activeCount === 0) {
-						attrsToChange["NKW_Aktiv1"] = "1";
-				}
+	safeGetAttrs(
+		[
+			"NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4", "TaW_peitsche", "ATbasis",
+			"RS_gBE1", "rs1_rg1", "RS_gBE2", "rs2_rg1", "RS_gBE3", "rs3_rg1", "RS_gBE4", "rs4_rg1",
+			"RS_Aktiv1", "RS_Aktiv2", "RS_Aktiv3", "RS_Aktiv4", "BE_RG", "BE_Last", "sf_rustungsgewohnungI", "sf_rustungsgewonungII", "sf_rustungsgewohnungIII",
+			"BE_TaW", "NKW_AT_typ1", "NKW_PA_typ1", "NKW_AT_typ2", "NKW_PA_typ2",
+			"NKW_AT_typ3", "NKW_PA_typ3", "NKW_AT_typ4", "NKW_PA_typ4",
+		], function(v) {
+		debugLog(caller, "Attributes gotten", v);
 
-				var peitscheAT = 0;
-				if (v["TaW_peitsche"]) {
-						peitscheAT = parseInt(v["ATbasis"]) + parseInt(v["TaW_peitsche"]);
-				}
-				attrsToChange["AT_peitsche"] = peitscheAT;
+		let attrsToChange = {};
+		let activeCount = 0;
+		for (let i = 1; i <= 4; i++)
+		{
+			if (v["NKW_Aktiv" + i] === "1")
+			{
+				activeCount += 1;
+			}
+			if (activeCount > 1)
+			{
+				attrsToChange["NKW_Aktiv" + i] = "0";
+			}
+		}
+		if (activeCount === 0)
+		{
+			attrsToChange["NKW_Aktiv1"] = "1";
+		}
 
-				if (v["sf_rustungsgewonungII"] === "1") {
-						attrsToChange["sf_rustungsgewohnungII"] = "1";
-				}
+		let peitscheAT = 0;
+		if (v["TaW_peitsche"])
+		{
+			peitscheAT = parseInt(v["ATbasis"]) + parseInt(v["TaW_peitsche"]);
+		}
+		attrsToChange["AT_peitsche"] = peitscheAT;
 
-				// take calculated values into "v" so that they are available to following computation steps
-				Object.assign(v, attrsToChange);
+		if (v["sf_rustungsgewonungII"] === "1")
+		{
+			attrsToChange["sf_rustungsgewohnungII"] = "1";
+		}
 
-				var calculatedRuestungBE = calculateRuestungBE(v, {});
-				// apply calculated values to attrsToChange
-				Object.assign(attrsToChange, calculatedRuestungBE);
+		// take calculated values into "v" so that they are available to following computation steps
+		Object.assign(v, attrsToChange);
 
-				var beTaw = 0;
-				// take BE_RG from calculated values
-				if (calculatedRuestungBE["BE_RG"]) {
-						beTaw += parseInt(calculatedRuestungBE["BE_RG"]);
-				}
-				if (v["BE_Last"]) {
-						beTaw += parseInt(v["BE_Last"]);
-				}
-				attrsToChange["BE_TaW"] = beTaw;
-				v["BE_TaW"] = beTaw;
+		const calculatedRuestungBE = calculateRuestungBE(v, {});
+		// apply calculated values to attrsToChange
+		Object.assign(attrsToChange, calculatedRuestungBE);
 
-				var weaponBE = calculateWeaponBE(v);
-				attrsToChange["be_at_mod"] = weaponBE.be_at;
-				attrsToChange["be_pa_mod"] = weaponBE.be_pa;
+		let beTaw = 0;
+		// take BE_RG from calculated values
+		if (calculatedRuestungBE["BE_RG"]) {
+			beTaw += parseInt(calculatedRuestungBE["BE_RG"]);
+		}
+		if (v["BE_Last"]) {
+			beTaw += parseInt(v["BE_Last"]);
+		}
+		attrsToChange["BE_TaW"] = beTaw;
+		v["BE_TaW"] = beTaw;
 
-				safeSetAttrs(attrsToChange, {}, function(){
-						callNextMigration(migrationChain);
-				});
+		const weaponBE = calculateWeaponBE(v);
+		attrsToChange["be_at_mod"] = weaponBE.be_at;
+		attrsToChange["be_pa_mod"] = weaponBE.be_pa;
+
+		debugLog(caller, "attrsToChange", attrsToChange);
+
+		safeSetAttrs(attrsToChange, {}, function(){
+			callNextMigration(migrationChain);
 		});
+	});
 }
 
 /*
