@@ -23,7 +23,7 @@ function bundle(isProduction) {
       });
     }
 
-    const injectedHTML = minifiedHTML.replace(/<script type="text\/worker"><\/script>/, `\r<script type="text/worker">${js}</script>`);
+    const injectedHTML = minifiedHTML.replace(/<script type="text\/worker"><\/script>/, `\r<script type="text/worker">${js.trim()}</script>`);
 
     fs.writeFileSync(bundledOutput, injectedHTML, 'utf8');
     console.log(`${isProduction ? 'Production' : 'Development'} build complete!`);
