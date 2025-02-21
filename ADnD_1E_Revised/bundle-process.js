@@ -2,10 +2,10 @@ const fs = require('fs'); // used to read and write files
 const {minify} = require('html-minifier'); // used to minify HTML
 const chokidar = require('chokidar'); // used to watch for src file changes
 const argv = require('minimist')(process.argv.slice(2)); // used to parse command-line arguments
-const isProduction = argv.prod; // production flag
-const isDevelopment = argv.dev; // development flag
 const htmlInput = 'src/index.html';
-const bundledOutput = '1ESheet.html'; // output file
+const isProduction = argv.prod; // --prod flag
+const isDevelopment = argv.dev; // --dev flag
+const bundledOutput = '1ESheet.html'; // final output file
 
 function bundle(isProduction) {
   const jsInput = isProduction ? 'prod/index.js' : 'dev/index.js'; // conditional JS input
@@ -13,8 +13,7 @@ function bundle(isProduction) {
   try {
     const html = fs.readFileSync(htmlInput, 'utf8');
     const js = fs.readFileSync(jsInput, 'utf8');
-
-    let minifiedHTML = html; // initialize with original HTML
+    let minifiedHTML = html; // original HTML
 
     // Minify only in production
     if (isProduction) {
