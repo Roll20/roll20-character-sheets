@@ -10,7 +10,7 @@ Then, run `npm install` in this folder to install the package.json dependencies.
 
 Edit the html and js source files; `src/index.html`, `src/index.js`. CSS can be edited directly using `1ESheet.css`.
 
-With dependencies installed you can run `npm run dev` to render an un-minified version for devlopment. `npm run dev` will also watch for any changes in the src files and automatically update `1ESheet.html` when detected.
+With dependencies installed you can run `npm run dev` to render an un-minified version for development. `npm run dev` will also watch for any changes in the src files and automatically update `1ESheet.html` when detected.
 
 Output will be rendered as `1ESheet.html`.
 
