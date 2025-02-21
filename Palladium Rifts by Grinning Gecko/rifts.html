@@ -14146,6 +14146,10 @@ on(
   change:repeating_psionics:addtobonuses",
   async (e) => {
     console.log("change:repeating_powersabilities:addtobonuses", e);
+    // Exit if the change is coming from the sheetworker (ex. import).
+    if (e.sourceType === "sheetworker") {
+      return;
+    }
     const [r, section, rowId] = e.sourceAttribute.split("_");
     const enabled = Boolean(Number(e.newValue));
     if (enabled) {
@@ -14352,7 +14356,7 @@ async function recalculateMovement(manualFeetPerMelee) {
     attrs.importexportstatus = `Done importing ${section}...`;
     await setAttrsAsync(attrs);
     // { silent: true } isn't working, so we're not going to import addtobonuses.
-    // await setAttrsAsync(addToBonusAttrs, { silent: true });
+    await setAttrsAsync(addToBonusAttrs, { silent: true });
   }
 
   function importAll(data) {

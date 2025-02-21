@@ -75,7 +75,7 @@
     attrs.importexportstatus = `Done importing ${section}...`;
     await setAttrsAsync(attrs);
     // { silent: true } isn't working, so we're not going to import addtobonuses.
-    // await setAttrsAsync(addToBonusAttrs, { silent: true });
+    await setAttrsAsync(addToBonusAttrs, { silent: true });
   }
 
   function importAll(data) {
