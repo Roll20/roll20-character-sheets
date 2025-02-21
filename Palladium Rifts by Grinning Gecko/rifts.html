@@ -14336,27 +14336,18 @@ async function recalculateMovement(manualFeetPerMelee) {
     console.log("setRepeatingRows", section, data);
     if (!data) return;
     console.log("continuing setRepeatingRows", section);
-    const addToBonusAttrs = {};
     const attrs = data.reduce((acc, row) => {
       const rowId = generateRowID();
       Object.entries(row).forEach(([key, val]) => {
         if (parseInt(val) == 0 || val == "") {
           return;
         }
-        // Special treatment for addtobonuses because we don't want it triggering an event.
-        if (key === "addtobonuses") {
-          addToBonusAttrs[`repeating_${section}_${rowId}_addtobonuses`] = val;
-          return;
-        }
         acc[`repeating_${section}_${rowId}_${key}`] = val;
       });
       return acc;
     }, {});
-    console.log("setRepeatingRows", attrs, addToBonusAttrs);
     attrs.importexportstatus = `Done importing ${section}...`;
     await setAttrsAsync(attrs);
-    // { silent: true } isn't working, so we're not going to import addtobonuses.
-    await setAttrsAsync(addToBonusAttrs, { silent: true });
   }
 
   function importAll(data) {
