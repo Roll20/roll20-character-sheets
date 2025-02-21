@@ -81,6 +81,11 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Feb 19th 2025 v1.75c
+
+- Fixed alignment issue with coin swap buttons, which was not fixed last update.
+
+
 Feb 14th 2025 v1.75b
 
 - Fixed alignment issue with coin swap buttons
