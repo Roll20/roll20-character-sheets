@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.2] - 2025-02-21
+
+### Changed
+
+- Don't import `Add to Profiles` flag because it causes the event to trigger twice, adding the same modifier twice.
+
 ## [1.7.1] - 2025-02-14
 
 ### Changed

@@ -55,18 +55,27 @@
     console.log("setRepeatingRows", section, data);
     if (!data) return;
     console.log("continuing setRepeatingRows", section);
+    const addToBonusAttrs = {};
     const attrs = data.reduce((acc, row) => {
       const rowId = generateRowID();
       Object.entries(row).forEach(([key, val]) => {
-        if (parseInt(val) == 0) {
+        if (parseInt(val) == 0 || val == "") {
+          return;
+        }
+        // Special treatment for addtobonuses because we don't want it triggering an event.
+        if (key === "addtobonuses") {
+          addToBonusAttrs[`repeating_${section}_${rowId}_addtobonuses`] = val;
           return;
         }
         acc[`repeating_${section}_${rowId}_${key}`] = val;
       });
       return acc;
     }, {});
+    console.log("setRepeatingRows", attrs, addToBonusAttrs);
     attrs.importexportstatus = `Done importing ${section}...`;
     await setAttrsAsync(attrs);
+    // { silent: true } isn't working, so we're not going to import addtobonuses.
+    // await setAttrsAsync(addToBonusAttrs, { silent: true });
   }
 
   function importAll(data) {
@@ -92,7 +101,10 @@
 
   on("clicked:import", async (e) => {
     console.log("import", e);
-    await setAttrsAsync({ importexportstatus: "Importing core..." });
+    await setAttrsAsync({
+      importexportstatus: "Importing core...",
+      importing: "1",
+    });
     const a = await getAttrsAsync(["importexport"]);
     const data = JSON.parse(a.importexport);
     console.log(data);
@@ -113,6 +125,7 @@
     await setAttrsAsync({
       importexportstatus:
         "Done importing, but triggered events are probably still running. To be sure open your browser console and when the logging stops, the import is really done.",
+      importing: "",
     });
   });
 })();
