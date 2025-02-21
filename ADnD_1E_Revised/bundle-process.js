@@ -4,6 +4,7 @@ const chokidar = require('chokidar'); // used to watch for src file changes
 const argv = require('minimist')(process.argv.slice(2)); // used to parse command-line arguments
 const isProduction = argv.prod; // production flag
 const isDevelopment = argv.dev; // development flag
+const htmlInput = 'src/index.html';
 const bundledOutput = '1ESheet.html'; // output file
 
 function bundle(isProduction) {
