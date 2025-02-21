@@ -1,6 +1,6 @@
 # AD&D1e Revised
 
-This is the character sheet for AD&D1e Revised.
+This is the community character sheet for AD&D1e Revised.
 
 ## Development
 
@@ -19,4 +19,5 @@ Output will be rendered as `1ESheet.html` located at root.
 
 With dependencies installed you can run `npm run prod` to build a finalized project for Roll20's live servers.
 Output will be rendered as `1ESheet.html`.
-
+<br>
+##
