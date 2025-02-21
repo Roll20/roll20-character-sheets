@@ -19,5 +19,8 @@ Output will be rendered as `1ESheet.html` located at root.
 
 With dependencies installed you can run `npm run prod` to build a finalized project for Roll20's live servers.
 Output will be rendered as `1ESheet.html`.
+
+## Custom Games
+
+If you want to use this code for a Roll20 Custom game; copy the raw text from `1ESheet.html` and `1ESheet.css` located at root and paste into the appropriate Game Settings editor tab.
 <br>
-##
