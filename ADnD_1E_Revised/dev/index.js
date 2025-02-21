@@ -262,7 +262,7 @@ const section_attribute = (section, id, field) => `repeating_${section}_${id}_${
 // then end the worker
 //  output.sheet_version = current_version;
 //  setAttrs(output, {silent: true}, versionator(current_version, final_version));
-// dont forget any close brackets for getattrs, etc.
+// don't forget any close brackets for getattrs, etc.
 //  };
 // END
 
@@ -4238,7 +4238,7 @@ calcAC = (recalc) => {
       const combinedModMagic = int(armorModAC + armorMagicAC);
       const rearAC = int(baseAC + armorModAC + armorMagicAC);
 
-      // Dex penalty only appllies up to AC 10
+      // Dex penalty only applies up to AC 10
       // "Armor class below 10 is not possible except through cursed items." DMG p73
       // check for low Dex pen and do not apply if AC >= 10
       let armorBonusPenaltyCap = 1;
