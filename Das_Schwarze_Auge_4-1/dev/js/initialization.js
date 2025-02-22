@@ -62,6 +62,8 @@ function initializeSheet(migrationChain) {
 		"wound_bauch", "wound_brust", "wound_kopf", "wound_la", "wound_lb", "wound_ra", "wound_rb",
 
 		// Regeneration
+		"reg_deepbreath_roll",
+		"reg_relax_roll",
 		"reg_sleep_le_ko", "reg_sleep_le_fixed",
 		"reg_sleep_le_mod_advantages_disadvantages", "reg_sleep_le_mod_food_restriction",
 		"reg_sleep_ae_base", "reg_sleep_ae_in", "reg_sleep_ae_fixed",

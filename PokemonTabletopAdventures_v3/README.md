@@ -23,6 +23,15 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Jan 28, 2025
+- Updated the Hybrid Character to allow entering the advanced class level
+
+### Jan 18, 2025
+- Resolved an issue with the repeating sections not showing the edit controls when appropriate
+
+<details>
+  <summary><u>Expand for 2024 Changes</u></summary>
+
 ### Nov 27, 2024
 - Removed scrollbars from the collapsing sections
 
@@ -40,6 +49,8 @@ Things we want to add to the character sheet, presented in no particular order o
 - Added support for collapsing the entire trainer features section
 - Added support for showing the character avatar in the stat grid section
 - Improved visibility of section headers
+
+</details>
 
 <details>
   <summary><u>Expand for 2023 Changes</u></summary>

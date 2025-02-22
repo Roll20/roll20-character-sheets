@@ -6,11 +6,28 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.1.0 [Screenshot](cof2e.png)
+v1.2.0 [Screenshot](cof2e.png)
 
 ## Notes de version
 
-### Version 1.1.0 (2024-01-05)
+### Version _1.2.0_ (2025-02-04)
+
+- Ajout d'une gestion des armures, boucliers et casques équipés
+- Ajout d'une option pour vérifier les points de capacités utilisés
+- Déplacement de l'import des voies dans un sous-onglet Import de l'onglet Capacités
+- Ajout d'une icône pour chaque nom de voie en mode Edition pour l'import du texte des capacités
+- Modification du calcul des DR max avec une base de 2 sauf pour les profils d'Aventuriers (3 DR)
+- Modification du calcul des PC max avec une base de 2 sauf pour les profils de Mystiques (3 PC)
+- Ajout d'options de configuration pour forcer la valeur max des PV, DR, PC et PM
+- Modification du champ RD dans la fiche de PNJ
+- Amélioration de le reconnaissance d'inline-rolls dans les descriptions de capacités
+- Ajout du détail de la bourse par type de pièces et total du trésor en PA
+- Ajout de la gestion des objets en main
+- Ajout de la possibilité de lier un FX Roll20 aux jets de caractéristiques et d'attaques
+- Persomancien (version expérimentale)
+- Ajout des boutons des menus d'action sur la fiche de PNJ
+
+### Version 1.1.0 (2025-01-05)
 
 - Ajout d'un bouton pour le test de chance
 - Ajout d'un champ paramètre et d'un champ propriétés pour chaque capacité
