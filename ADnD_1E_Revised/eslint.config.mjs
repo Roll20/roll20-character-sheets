@@ -61,7 +61,12 @@ export default [
           functions: 'only-multiline',
         },
       ],
-      'ignores': ['**/node_modules/**', '**/prod/**', '**/dev/**', '**/1ESheet.html'],
+      'ignores': [
+        'node_modules/',
+        'prod/',
+        'dev/',
+        '1ESheet.html'
+      ],
       'arrow-body-style': 'off',
       'prefer-arrow-callback': 'off',
       'no-console': 'off',
