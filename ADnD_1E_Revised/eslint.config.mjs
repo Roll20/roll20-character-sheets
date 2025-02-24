@@ -5,6 +5,12 @@ import html from 'eslint-plugin-html';
 export default [
   {
     files: ['**/*.js', '**/*.vue', '**/*.html'], // Adjust as needed
+    ignores: [
+        'node_modules/',
+        'prod/',
+        'dev/',
+        '1ESheet.html'
+      ],
     languageOptions: {
       ecmaVersion: 2021,
       sourceType: 'module',
@@ -60,12 +66,6 @@ export default [
           exports: 'never',
           functions: 'only-multiline',
         },
-      ],
-      'ignores': [
-        'node_modules/',
-        'prod/',
-        'dev/',
-        '1ESheet.html'
       ],
       'arrow-body-style': 'off',
       'prefer-arrow-callback': 'off',
