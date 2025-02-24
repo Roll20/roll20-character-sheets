@@ -17,7 +17,7 @@ async function addModifierToBonusesAsync(section, rowId) {
   );
   thingAttrs.push(thingBonusId);
   const a = await getAttrsAsync(thingAttrs);
-  console.log(a);
+  console.log("addModifierToBonusesAsync a", a);
   const attrs = {};
   let bonusRowId;
   if (a[thingBonusId]) {
@@ -26,10 +26,52 @@ async function addModifierToBonusesAsync(section, rowId) {
     bonusRowId = generateRowID();
     attrs[thingBonusId] = bonusRowId;
   }
+  const existingAttrs = await getAttrsAsync(
+    REPEATING_BONUS_KEYS.map((key) => `repeating_bonuses_${bonusRowId}_${key}`)
+  );
+  console.log("addModifierToBonusesAsync existingAttrs", existingAttrs);
   REPEATING_BONUS_KEYS.forEach((key) => {
+    // If the modifier key doesn't exist, don't update.
+    if (!a[`repeating_${section}_${rowId}_${key}`]) {
+      return;
+    }
+
+    // If the values are equal, don't update.
+    if (
+      existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] &&
+      existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] ===
+        a[`repeating_${section}_${rowId}_${key}`]
+    ) {
+      return;
+    }
+
+    // If the key already exists and the value is effectively null on both sides, don't update it.
+    if (
+      existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] &&
+      (existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] === 0 ||
+        existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] === "0" ||
+        existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] === "") &&
+      (a[`repeating_${section}_${rowId}_${key}`] === 0 ||
+        a[`repeating_${section}_${rowId}_${key}`] === "0" ||
+        a[`repeating_${section}_${rowId}_${key}`] === "")
+    ) {
+      return;
+    }
+
+    // If the key doesn't already exist and the value is effectively null, don't create it.
+    if (
+      !existingAttrs[`repeating_bonuses_${bonusRowId}_${key}`] &&
+      (a[`repeating_${section}_${rowId}_${key}`] === 0 ||
+        a[`repeating_${section}_${rowId}_${key}`] === "0" ||
+        a[`repeating_${section}_${rowId}_${key}`] === "")
+    ) {
+      return;
+    }
+
     attrs[`repeating_bonuses_${bonusRowId}_${key}`] =
-      a[`repeating_${section}_${rowId}_${key}`] || 0;
+      a[`repeating_${section}_${rowId}_${key}`] || "";
   });
+  console.log("addModifierToBonusesAsync attrs", attrs);
   await setAttrsAsync(attrs);
 }
 

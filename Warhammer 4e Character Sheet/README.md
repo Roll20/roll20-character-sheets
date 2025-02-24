@@ -81,6 +81,48 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Feb 19th 2025 v1.75c
+
+- Fixed alignment issue with coin swap buttons, which was not fixed last update.
+
+
+Feb 14th 2025 v1.75b
+
+- Fixed alignment issue with coin swap buttons
+- Fixed Weapon settings Magical Effects textarea sizing
+- Fixed Spell Quickbar header spacing
+- Fixed problem with Wounds calc not being correct if Larger the Average sized and changes to SB/TB/WPB where made. Only Race change will automatically reset Size and recalculate wounds.
+- Updated Sheet.json to add some of the recent custom setting defaults
+
+
+Feb 13th 2025 v1.75a
+
+- Translated sheet to Roll20 CSE Sanitization standard. No changes to layout or look.
+- Fixed problem with Dual wield Situational Bonuses showing in DW rolls when Custom Roll outcome was active on weapons.
+
+
+Jan 20th 2025 v1.75
+
+- Add Cantor Talent from Heart of Glass/Ubersreik Adventures 1, situational test bonus for entertain singing.
+- Add Chanty Talent from Sea of Claws, situational test bonus for entertain singing.
+- Fix Master of Disguise Talent, now shows situational test bonus for entertain acting.
+
+
+Jan 10th 2025 v1.74d
+
+- Fix for the sheet background and images sometimes not working in roll20. Sheet Assets moved to prevent url encoding problem.
+- Fix issue prevent Race field to show on new sheets.
+
+
+Jan 4th 2025 v1.74c
+
+- New Custom Critical Wounds rules, which can be configured in the settings tab. Allows for changing of the static crit dmg wounds from the core crit tables. There are 3 customization options, 2 are add or replace normal dmg with a custom dmg die (e.g. 1d10, 1d10!, etc), and the 3rd a custom rule which will take the Tens die of the critical roll as crit dmg wounds, and if the roll is a dubs crit it triggers a Ulrics Furt Die (exploding 10). This is intended to add options for WFRP4e to simulate other crit dmg models like the popular WFRP2e feature Ulric's Fury.
+- New Custom Combat Rules, which can be configured in the settings tab. One for Twohanded weapons, changes Strike Mighty Blow to add another +1 dmg per lvl (total +2 per lvl) for all 2h melee weapons, and adds Twohanded Quality makes a Defender suffer -1 SL to his opposed melee test when attacked by a 2h weapon, unless he dodges which is not a melee test. And another for Melee defensive talents, which disables stacking of melee defensive talents, changes reversal test SL bonus when defending with melee parry weapons only (not including shields), and riposte test SL bonus removed. This allow for a alternate combat model which is a bit more gritty with less def SL stacking and makes 2h a bit more viable.
+- Fix NPC crit rolls not always working. Also fully compatible with the new crit wound options.
+- Fix Char Roll showing when it should not.
+- Fix multiple fields showing incorrectly with new character sheets until certain values are set.
+
+
 Dec 14th 2024 v1.74b
 
 - New Custom Race option added to Race dropdown menu, will allow entering owna Custom Race name. See setting's tab for Custom Race Stating Characteristics Modifier, this allows the Char Roll to generate starting Charactistics for the Customer Race.reset to menu by clicking the X.

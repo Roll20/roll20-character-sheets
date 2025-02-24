@@ -1,10 +1,109 @@
+# 2025-2-18
+
+- Add all the specific static manuever tables from Core Law. 
+    Thanks to @grim5352 for the tables.
+- Add shield bash to known attacks
+- Start of Uses counting: Count use of normal skills.
+- Fix specialisation bonus - Use 0 ranks or highest - 25.
+- Reneable initiative buttons.  Actions buttons need to have type
+    'action'.
+- Fix specified crits
+- Add F->J & X,Y specified crits too
+- Add Fate Points - Just a simple text box (@coreylpierce)
+- Fix for creating specialised skills during levelup.
+- (Creature Law) Update parsing of crit reduction and other resistances.
+
+# 2025-2-11
+
+- Fix the stupid problem where buying Specialised skills
+    caused them to be duplicated.  Was only with culture ranks!
+    Big thanks for @rdanhenry for helping me nail it down, along with
+    (in no particular order) @adsmalley, @dudimous, @ixs, @grim, @nefrekin,
+    @bambo and probably some others I've forgottem
+- Handle multiple criticals from the same attack.
+    - F-J crits now handled.
+    - This is a big set of changes through this parsing code
+    - Designed to also support "addional crits"
+- Injury
+    - Now has tests.
+    - Support for multiple H (hits) in the same string.
+    - Adds a 'Z' on hits only attacks
+    - Handle duplicate any attribute.
+- Make the initiative button big and green (@everyone apparently)
+- Added 'Class' to creatures;  can search for Class:III creatures now
+- Don't set 'workpending' attribute - stops a lot of warnings
+    and it did not work anyway
+- Tests for fetching Criticals.
+- Start on Training Packages
+- Template for custom currencies.
+- Remove some old cruft from the todo.
+
+# 2025-2-4
+
+- Creatures: Validate attacks for all listed attacks.
+- Correctly adjust attack size
+- Change display of attack size for creatures.
+- Add meditation to attack skills.
+
+# 2025-1-21
+
+- Creature: Handle Level correctly on dropped creatures.
+- Dark Mode updates - closer to useful
+- Creature layout updates.
+
+# 2025-1-14
+
+The wait... it's already halfway through January update!
+
+- Knack selection now respects power levels.
+    - Stil don't support 'set to average' and # stat boosts
+    - Coming soon
+- Knack and Profession Bonus won't continue until you select all items in
+    charactermancer.
+- Subtle now works for 'A' spells (0; it's not really a thing that happens)
+- Always apply armor casting penalty - even if you don't have transcendance
+- Update treasure law armor to include material
+- Armor: Make sure we use the material if supplied
+- Fix armor metal vs other materials
+- Make sure ranged penalty is always a penalty
+- Creatures now roll $Realm RRs, not 'undefined RR'
+- Partial Dark Mode; not quite usuable, but you can look.
+- Custom professions
+  - Save weapon costs correctly.
+  - Save the correct Knacks/profession bonuses
+  - Fix level up spell lists (improves Roll20 Characters too)
+
+# 2025-1-7
+
+- Custom profession support.
+  - Documented: https://github.com/nashidau/RMU-Interchange/blob/main/Profession.md
+- Improve the styling of buttons & selected
+- Update to creatures.  Not so visible to most users as of yet.
+- Can now select 'no swap' for stat swaps at creation (@rdanhenry)
+- Sort spell lists in charactermancer (@rdanhenry)
+- Add 'C' to Urban survival.  C is City/Civilisations.
+- Force reset of any background jobs at the start of the charactermancer finish.
+- Save powerlevel (@rdanhenry)
+- cleanups:
+  - remove old dead rollstats2 call
+  - Pending info now returns count
+
+Also all the items in the 24th update:
+
+# 2024-12-24
+
+(not released, part of next update)
+- Fix a bug where "Clear Saved" breaks level up
+- Remove some dead code in level up - should be a trivial smidge faster.
+- Discover the 'actions-test' was not being called - re-enable and fix errors
+- Fix bleed so you don't bleed straight after being hit
+
 # 2024-12-17
 
 - Edit talents so you can delete excess talents (@major havok)
   - Genericise the code used by edit spells and edit talents
 - Fix rendering of side panel after CSS breaks roll20
 - Set status penalty to 0 on creature creation.
-
 
 # 2024-12-12
 
