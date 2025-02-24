@@ -4505,6 +4505,7 @@ function setEquipment(id) {
   const nonRep = ['equipment_tabs_type', 'equipment_tabs_carry'];
   const fields = [
     section_attribute('equipment', id, 'equipment_type'),
+    section_attribute('equipment', id, 'equipment_magical'),
     section_attribute('equipment', id, 'equipment_show_type'),
     section_attribute('equipment', id, 'equipment_show_carry'),
     section_attribute('equipment', id, 'equipment_current'),
@@ -4540,6 +4541,7 @@ function setEquipment(id) {
     const equipType = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
     clog(`equipType:${equipType}`);
     output.repeating_equipment_equipment_type = equipType <= 0 || equipTab === -1 ? 0 : equipType;
+    output.repeating_equipment_equipment_magical = +v[section_attribute('equipment', id, 'equipment_magical')] || 0;
     output.repeating_equipment_equipment_show_type = +v[section_attribute('equipment', id, 'equipment_show_type')] || 0;
     output.repeating_equipment_equipment_current = +v[section_attribute('equipment', id, 'equipment_current')] || 0;
     output.repeating_equipment_equipment_current_max = +v[section_attribute('equipment', id, 'equipment_current_max')] || 0;
