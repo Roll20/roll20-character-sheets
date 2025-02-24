@@ -1,6 +1,4 @@
 // GiGs custom handling for number type and logs
-// const int = (score, fallback = 0) => parseInt(score) || fallback;
-// const float = (score, fallback = 0) => parseFloat(score) || fallback;
 const int = (score, error = 0) => parseInt(score) || error;
 const float = (score, error = 0) => parseFloat(score) || error;
 const clog = (text, color = 'green') => {

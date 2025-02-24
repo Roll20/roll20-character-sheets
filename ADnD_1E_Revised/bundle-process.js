@@ -14,16 +14,19 @@ function bundle(isProduction) {
     const html = fs.readFileSync(htmlInput, 'utf8');
     const js = fs.readFileSync(jsInput, 'utf8');
     let minifiedHTML = html; // original HTML
-
+    let injectedHTML = '';
     // Minify only in production
     if (isProduction) {
       minifiedHTML = minify(html, {
         collapseWhitespace: true,
         minifyJS: true,
       });
+      injectedHTML = minifiedHTML.replace(/<script type="text\/worker"><\/script>/, `\r<script type="text/worker">${js.trim()}</script>`);
+    } else {
+      injectedHTML = minifiedHTML.replace(/<script type="text\/worker"><\/script>/, `\r<script type="text/worker">\r${js.trim()}\r</script>`);
     }
 
-    const injectedHTML = minifiedHTML.replace(/<script type="text\/worker"><\/script>/, `\r<script type="text/worker">${js.trim()}</script>`);
+    // const injectedHTML = minifiedHTML.replace(/<script type="text\/worker"><\/script>/, `\r<script type="text/worker">\r${js.trim()}\r</script>`);
 
     fs.writeFileSync(bundledOutput, injectedHTML, 'utf8');
     console.log(`${isProduction ? 'Production' : 'Development'} build complete!`);
