@@ -1,11 +1,12 @@
 const fs = require('fs'); // used to read and write files
+const path = require('path'); // used to resolve file paths
 const {minify} = require('html-minifier'); // used to minify HTML
 const chokidar = require('chokidar'); // used to watch for src file changes
 const argv = require('minimist')(process.argv.slice(2)); // used to parse command-line arguments
-const htmlInput = 'src/index.html';
+const htmlInput = 'index.html';
 const isProduction = argv.prod; // --prod flag
 const isDevelopment = argv.dev; // --dev flag
-const bundledOutput = '1ESheet.html'; // final output file
+const bundledOutput = path.resolve(__dirname, '../1ESheet.html'); // final output file in the root folder
 
 function bundle(isProduction) {
   const jsInput = isProduction ? 'prod/index.js' : 'dev/index.js'; // conditional JS input
@@ -25,8 +26,6 @@ function bundle(isProduction) {
     } else {
       injectedHTML = minifiedHTML.replace(/<script type="text\/worker"><\/script>/, `\r<script type="text/worker">\r${js.trim()}\r</script>`);
     }
-
-    // const injectedHTML = minifiedHTML.replace(/<script type="text\/worker"><\/script>/, `\r<script type="text/worker">\r${js.trim()}\r</script>`);
 
     fs.writeFileSync(bundledOutput, injectedHTML, 'utf8');
     console.log(`${isProduction ? 'Production' : 'Development'} build complete!`);
