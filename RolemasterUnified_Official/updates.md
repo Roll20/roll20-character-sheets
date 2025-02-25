@@ -1,3 +1,14 @@
+# 2025-2-25
+
+- Edit attacks
+- Remove pre-compendium culture support
+- Support better DB and targets for creatures
+- Support better DB for characters
+- Use count for transcent (had armor and casted a spell);
+- Creatures:
+  - Parse ranks for movement skills correctly
+  - Use specialisation for specialised skills
+
 # 2025-2-18
 
 - Add all the specific static manuever tables from Core Law. 

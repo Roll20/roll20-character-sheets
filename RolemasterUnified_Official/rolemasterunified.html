@@ -2353,6 +2353,8 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
 
 
+
+  Defense <select name='attr_creaturedefense' class='creaturedefense fancyselect'></select>
 </div>
 
 <div class='creaturestatus'>
@@ -2995,7 +2997,9 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
  
  
 
-      <button class='fancybuttoninline fancybutton' type='action' name='act_attackaddsave'>Add</button>
+      <button class='fancybuttoninline fancybutton' type='action' name='act_attackaddsave'>
+        <span name='attr_attackaddaction'></span>
+      </button>
       <button class='fancybuttoninline fancybutton' type='action' name='act_attackaddcancel'>Cancel</button>
       </div>
     </div>
@@ -3026,10 +3030,16 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
             <button type='action' name='act_rmuattackroll'
                 class='rollbutton fancybutton fancybuttoninline'>Attack
             </button>
-            <div></div>
+            <div>
+            </div>
+            <div>
+            <button type='action' class='fancybuttoninline fancybutton' name='act_editattack'
+               ><span style="font-family:Pictos;">p</span>
+               </button>
             <button type='action' class='fancybuttoninline fancybutton' name='act_deleteattack'
                ><span style="font-family:Pictos;">#</span>
               </button>
+            </div>
 	</div>
     </fieldset>
 
@@ -5449,7 +5459,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision aadf611f3da7c53e9d7bac84235e438c9fb88144
+Revision 99849a7c35f7441070014c21a033b68e1ecc4e87
 
 
 <hr>
@@ -6877,7 +6887,6 @@ function onCheck(str, func) {
       rmuerror(`${item} doesn't have a colon from ${str}`);
     }
   }
-
   on(str, func);
 }
 
@@ -8418,6 +8427,7 @@ function getSubtlePenalty(realm, type, trickery, subtle, voice, hands, enc, meta
 
   // Armor and Transcendance
   if (enc || metalenc) {
+    RMUSkills.uses("transcendence"); 
     let epen = 0;
     if (enc > 0 && pentable.armorenc) {
       epen += enc * pentable.armorenc;
@@ -11474,32 +11484,6 @@ onCheck("mancerfinish:newcharacter", (ev) => {
 console.log("cultures loaded");
 let RMUCultures = {}
 
-// FIXME: This needs to die
-RMUCultures.cultures = {
- cosmopolitan : { skills : {
-	languages: '19', perception: '2', trading: '1', regionown: '5', bodydevelopment: '1', influence: '2', regionneighbour: '2', socialawareness: '3', lores: '7', running: '1', unarmed: '1', religionphilosophy: '2', craftingvocation: '6', compositionperf: '4',  } },
- sylvan : { skills : {
-	tracking: '1', perception: '1', regionown: '5', herbalism: '1', animalhandling: '2', unarmed: '1', medicine: '1', concealment: '1', climbing: '2', bodydevelopment: '1', running: '2', stalking: '2', socialawareness: '1', lores: '4', languages: '13', survival: '2', craftingvocation: '4', rangedweapons: '1',  } },
- mariner : { skills : {
-	languages: '15', perception: '2', regionown: '5', navigation: '1', regionneighbour: '2', socialawareness: '1', lores: '5', unarmed: '1', medicine: '1', weighttraining: '1', climbing: '1', bodydevelopment: '1', swimming: '2', running: '1', trading: '1', acrobatics: '1', influence: '1', jumping: '1', survival: '1', craftingvocation: '4', compositionperf: '1',  } },
- urban : { skills : {
-	languages: '17', perception: '2', trading: '2', running: '1', regionown: '5', bodydevelopment: '1', influence: '2', regionneighbour: '3', socialawareness: '2', animalhandling: '1', lores: '7', unarmed: '1', religionphilosophy: '1', craftingvocation: '7', compositionperf: '3',  } },
- underground : { skills : {
-	stalking: '3', languages: '13', perception: '2', meleeweapons: '1', climbing: '1', regionown: '5', bodydevelopment: '2', concealment: '1', running: '1', socialawareness: '1', lores: '4', medicine: '2', unarmed: '1', survival: '2', craftingvocation: '5', weighttraining: '1',  } },
- reaver : { skills : {
-	tracking: '1', perception: '1', regionown: '5', regionneighbour: '1', animalhandling: '1', unarmed: '2', medicine: '1', riding: '1', meleeweapons: '1', climbing: '1', bodydevelopment: '2', running: '2', maneuveringinarmor: '2', stalking: '1', lores: '3', languages: '11', jumping: '1', survival: '1', craftingvocation: '3', rangedweapons: '1',  } },
- rural : { skills : {
-	languages: '13', perception: '1', regionown: '5', regionneighbour: '1', herbalism: '1', animalhandling: '3', medicine: '1', weighttraining: '1', riding: '2', piloting: '1', climbing: '1', bodydevelopment: '1', swimming: '1', running: '1', trading: '1', socialawareness: '1', influence: '1', lores: '4', craftingvocation: '4', compositionperf: '1',  } },
- nomad : { skills : {
-	tracking: '1', perception: '1', regionown: '5', navigation: '1', regionneighbour: '2', herbalism: '1', animalhandling: '4', unarmed: '1', medicine: '1', riding: '3', bodydevelopment: '1', running: '2', trading: '1', socialawareness: '1', lores: '4', languages: '14', survival: '1', craftingvocation: '4', compositionperf: '1',  } },
- harsh : { skills : {
-	running: '2', tracking: '1', perception: '2', meleeweapons: '1', concealment: '1', regionown: '5', bodydevelopment: '3', navigation: '1', maneuveringinarmor: '1', stalking: '2', lores: '2', medicine: '2', unarmed: '1', survival: '3', languages: '8', craftingvocation: '4',  } },
- highland : { skills : {
-	tracking: '1', perception: '1', regionown: '5', socialawareness: '1', animalhandling: '1', unarmed: '1', medicine: '1', meleeweapons: '1', climbing: '1', running: '2', bodydevelopment: '2', swimming: '1', maneuveringinarmor: '1', stalking: '1', lores: '4', languages: '13', jumping: '1', survival: '2', craftingvocation: '4', compositionperf: '1',  } },
-
-};
-
-
 
 
 RMUCultures.selectedSkillInfo = {
@@ -11968,6 +11952,7 @@ frontpage.updateDB = function () {
     var updates = {};
     const db_extra = miscBonusTotal(ev.db_misc || "")[0];
     const basedb = +ev.qu * 3 + db_extra;
+    updates.db_base = basedb;
     const encump = parseIntDefault(ev.encumberance_penalty, 0);
     updates.db_qu = basedb;
 
@@ -14032,9 +14017,9 @@ function sizeFromNumeric(value) {
 		"{\{targetattorso=[[0[@{target|at_torso}] ]]}} " +
 		"{\{targetatarms=[[0[@{target|at_arms}] ]]}} " +
 		"{\{targetatlegs=[[0[@{target|at_legs}] ]]}} " +
-		"{\{targetdodge=[[0[@{target|db_passivedodge}] ]]}} " +
-		"{\{targetdodgemissile=[[0[@{target|db_passivedodgemissile}] ]]}} " +
-		"{\{targetblock=[[0[@{target|db_passiveblock}] ]]}} " +
+		"{\{targetdb=[[0[@{target|db}] ]]}} " +
+		"{\{targetdbmissile=[[0[@{target|db}] ]]}} " +
+		"{\{targetdbdirected=[[0[@{target|db}] ]]}} " +
 		"{\{targetcritred=[[0[@{target|critreduction}] ]]}} " +
 		"{\{targettokenid=[[0[@{target|token_id}] ]]}} " +
 		"";
@@ -14045,19 +14030,15 @@ function sizeFromNumeric(value) {
 		const attorso= attacks.getDataFromRoll(roll.results.targetattorso.expression);
 		const atarms = attacks.getDataFromRoll(roll.results.targetatarms.expression);
 		const atlegs = attacks.getDataFromRoll(roll.results.targetatlegs.expression);
-		const dodge = attacks.getDataFromRoll(roll.results.targetdodge.expression);
-		const dodgem = attacks.getDataFromRoll(roll.results.targetdodgemissile.expression);
-		const block = attacks.getDataFromRoll(roll.results.targetblock.expression);
+		const db = attacks.getDataFromRoll(roll.results.targetdb.expression);
+		const dodgem = attacks.getDataFromRoll(roll.results.targetdb.expression);
+		const block = attacks.getDataFromRoll(roll.results.targetdb.expression);
 		const critred = attacks.getDataFromRoll(roll.results.targetcritred.expression);
 		const tokenid = attacks.getDataFromRoll(roll.results.targettokenid.expression);
 		let atstr = athead
 		if (athead != attorso || athead != atarms || athead != atlegs) {
 		    atstr = `${attorso},${athead},${atarms},${atlegs}`
 		}
-		console.log(attorso, athead, atarms, atlegs);
-		console.log(dodge, block);
-		console.log(tokenid);
-		const db = Math.max(dodge, block);
 		VsetAttrs({target_at: atstr,
 			target_name: tname,
 			target_db: db,
@@ -14147,13 +14128,14 @@ function sizeFromNumeric(value) {
 
     
     onCheck("clicked:attackadd", () => {
-	setAttrs({"attackaddshow" : "on",  "attackaddmessage" : ""});
+	setAttrs({attackaddshow : "on",  attackaddmessage : " ",
+		    attackaddaction: "Add", attackaddbasename : "new"});
     });
 
     let attackadditems = [
 	"attackaddname", "attackaddskill", "attackaddtable", "attackaddsize",
 	"attackaddfumble", "attackaddmodifier", "attackaddri", "attackaddstrength",
-	"attackaddtype",
+	"attackaddtype", "attackaddbasename"
     ];
 
     // Returns 'true' if it validate, else an error mesasge (string)
@@ -14174,6 +14156,7 @@ function sizeFromNumeric(value) {
     onCheck("clicked:attackaddsave", () =>  {
 	// So we need to get the things; if there is an error we set the error mesage
 	getAttrs(attackadditems, (items) => {
+	    console.log("Fetched data:", items);
 	    const validate = attackaddvalidate(items);
 	    let updates = {};
 	    if (typeof(validate) == 'string') {
@@ -14184,8 +14167,13 @@ function sizeFromNumeric(value) {
 	    updates.attackaddmessage = "";
 	    updates.attackaddshow = "off";
 
-	    const rowid = generateRowID();
-	    const prefix = `repeating_attack_${rowid}`;
+	    let prefix = "";
+	    if (items.attackaddbasename && items.attackaddbasename != 'new') {
+		prefix = items.attackaddbasename;
+	    } else {
+		const rowid = generateRowID();
+		prefix = `repeating_attack_${rowid}`;
+	    }
 
 	    getCompendiumPage(`AttackTable:${items.attackaddtable}`, cdata => {
 		updates[`${prefix}_attackname`] = items.attackaddname;
@@ -14204,6 +14192,7 @@ function sizeFromNumeric(value) {
 		updates[`${prefix}_attackdata`] = cdata?.data['data-attack'] || "";
 		// Once we have set it, update them all
 		setAttrs(updates, attacks.updateAttackBonuses);
+		console.log("Items saved", updates);
 	    });
 	});
 
@@ -14274,9 +14263,33 @@ function sizeFromNumeric(value) {
 	removeRepeatingRow(basename);
     });
 
-
-
-
+    onCheck('clicked:repeating_attack:editattack', (ev) => {
+	const basename = ev.sourceAttribute.replace("_editattack", "");
+	console.log("Edit attack", basename);
+	const updates = {}
+	updates.attackaddshow = 'on'
+	updates.attackaddmessage = `Edit item: ${basename}`;
+	// Don't get source - it is user now
+	getAttrs([`${basename}_attackname`,`${basename}_attacksize`,
+		    `${basename}_attackbasefumble`, `${basename}_attacktable`,
+		    `${basename}_attackstr`,
+		    `${basename}_attackskill`, `${basename}_attackri`,
+		    `${basename}_attacktype`, `${basename}_attackmodifier`,
+		    ], (attackinfo) => {
+		updates.attackaddname = attackinfo[`${basename}_attackname`];
+		updates.attackaddfumble = attackinfo[`${basename}_attackbasefumble`];
+		updates.attackaddstrength = attackinfo[`${basename}_attackstr`];
+		updates.attacktable = attackinfo[`${basename}_attacktable`];
+		updates.attackaddskill = attackinfo[`${basename}_attackskill`];
+		updates.attackaddri = attackinfo[`${basename}_attackri`];
+		updates.attackaddtype = attackinfo[`${basename}_attacktype`];
+		updates.attackaddmodifier = attackinfo[`${basename}_attackmodifier`];
+		updates.attackaddsize = sizeToNumeric(attackinfo[`${basename}_attacksize`]);
+		updates.attackaddbasename = basename;
+		updates.attackaddaction = 'Update';
+		setAttrs(updates);
+	});
+    });
 })();
 
 
@@ -14605,19 +14618,23 @@ onCheck("change:activedefense change:parrymod", (_) => {
 	  const update = {};
 	  let db = parseIntDefault(ev.parrymod, 0);
 	  if (ev.activedefense == 'partialblock') {
-	    update.activedb = db + ev.db_passiveblock;
+	    update.db = db + ev.db_passiveblock;
 	  } else if (ev.activedefense == 'partialdodge') {
 	    let melee = db + ev.db_partialdodge;
 	    let missile = db + ev.db_partialdodgemissile;
 	    update.activedb = `${melee} / ${missile}`;
+	    update.db = melee;
 	  } else if (ev.activedefense == 'fullblock') {
 	    update.activedb = db + ev.db_fullblock;
+	    update.db = db + ev.db_fullblock;
 	  } else if (ev.activedefense == 'fulldodge') {
 	    let melee = db + ev.db_fulldodge;
 	    let missile = db + ev.db_fulldodgemissile;
 	    update.activedb = `${melee} / ${missile}`;
+	    update.activedb = melee;
 	  } else { // passive
 	    update.activedb = db + Math.max(ev.db_passiveblock, ev.db_passivedodge);
+	    update.db = update.activedb;
 	  }
 	  console.log("update is", update, ev);
 	  setAttrs(update);
@@ -14973,7 +14990,7 @@ creature.weaponcodes =
   "cba": { "table": "Ball, Cold", "display": "Cold Ball", "size": 0, "type": "ranged" },
   "cl": { "table": "Claw", "size": 0, "type": "melee" },
   "cr": { "table": "Crush", "size": 0, "type": "melee" },
-  "ebo": { "table": "Bolt, Earth", "size": 0, "type": "directed", "display" : "Earth Ball" },
+  "ebo": { "table": "Bolt, Ice", "size": 2, "crit": "I", "type": "directed", "display" : "Earth Ball" },
   "fba": { "table": "Ball, Fire", "size": 0, "type": "ball", "display": "Fire ball" },
   "fbo": { "table": "Bolt, Fire", "size": 0, "type": "directed", "display": "Fire Bolt" },
   "gr": { "table": "Grapple", "size": 0, "type": "melee" },
@@ -15142,6 +15159,32 @@ creature.parseAttack = function(attack, cdata, updates) {
   updates[`${prefix}_type`] = type;
 }
 
+/* */
+creature.parseDefenses = function(defenses) {
+  const defs = creature.parseJSONMaybe(defenses);
+  const update = {}
+
+  update.elemSelector = ".creaturedefense";
+
+  let options = []
+  options.push({label: "Default", value: 0 });
+  defs.forEach(def => {
+      options.push({label: def.name, value: def.dbmod});
+  });
+  update.optionsArray = options;
+  populateListOptions(update);
+}
+
+onCheck("change:creaturedefense", (ev) => {
+  let newmod = parseIntDefault(ev.newValue, 0);
+  getAttrs(["db_base"], (db) => {
+      let dbbase = parseIntDefault(db.db_base, 0);
+      setAttrs({db: dbbase + newmod});
+  });
+
+});
+
+
 
 creature.newCreature = function(name, jdata) {
   console.log("new creatures", name, jdata, typeof(jdata));
@@ -15174,6 +15217,8 @@ creature.newCreature = function(name, jdata) {
   
   updates.at_torso = updates.at_head = updates.at_arms = updates.at_legs = updates.at;
   updates.db = cdata.DB;
+  updates.db_base = cdata.DB; // Base is this - change when people click different defense
+  updates.defenses = cdata.defenses || [];
 
   updates.critreduction = cdata.critreduction || 0;
   if (cdata.critresist) {
@@ -15273,9 +15318,11 @@ creature.newCreature = function(name, jdata) {
   updates.togglenpcupload = 0;
 
   updates.statuspenalty = 0;
-  updates.description = creature.content;
+  //updates.description = creature.content || creature['data-description'];
 
   VrmuSetAttrs(updates);
+
+  creature.parseDefenses(updates.defenses)
   /*
   console.log({
     bar1_link:'hits',
@@ -15853,6 +15900,12 @@ onCheck("sheet:opened", (_) => {
 	}
 
 	doVersionCheck(sheet.version || 1);
+
+
+	if (sheet.sheetselect == 'creaturesheet') {
+	  // FIXME: add a creature init call
+	  getAttrs(["defenses"], data => { creature.parseDefenses(data.defenses) });
+	}
     });
 
 });
