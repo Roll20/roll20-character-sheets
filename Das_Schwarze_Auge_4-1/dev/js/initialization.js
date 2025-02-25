@@ -21,11 +21,11 @@ function initializeSheet(migrationChain) {
 		// Combat
 		/// Melee AT Values
 		"AT_Aktiv", "AT_Aktiv_TaW", "atbasis",
-		"AT_Anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen", "AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", "AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter",
+		"AT_Anderthalbhander", "AT_bastardstaebe", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen", "AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", "AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter",
 
 		/// Melee PA Values
 		"PA_Aktiv", "PA_Aktiv_TaW", "pabasis",
-		"PA_Anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
+		"PA_Anderthalbhander", "PA_bastardstaebe", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
 
 		/// Melee other
 		"NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4",
@@ -35,7 +35,7 @@ function initializeSheet(migrationChain) {
 
 		/// Ranged Combat
 		"FK_Aktiv", "fkbasis",
-		"AT_Armbrust", "AT_Belagerungswaffen", "AT_Blasrohr", "AT_Bogen", "AT_Diskus", "AT_peitsche", "AT_Schleuder", "AT_Wurfbeile", "AT_Wurfmesser", "AT_Wurfspeere",
+		"AT_Armbrust", "AT_Belagerungswaffen", "AT_Blasrohr", "AT_Bogen", "AT_Diskus", "AT_feuerwaffen", "AT_Schleuder", "AT_Wurfbeile", "AT_Wurfmesser", "AT_Wurfspeere",
 		"FKWFK1", "FKWFK2", "FKWFK3", "FKWFK4",
 		"FKWtyp1", "FKWtyp2", "FKWtyp3", "FKWtyp4",
 
@@ -62,6 +62,8 @@ function initializeSheet(migrationChain) {
 		"wound_bauch", "wound_brust", "wound_kopf", "wound_la", "wound_lb", "wound_ra", "wound_rb",
 
 		// Regeneration
+		"reg_deepbreath_roll",
+		"reg_relax_roll",
 		"reg_sleep_le_ko", "reg_sleep_le_fixed",
 		"reg_sleep_le_mod_advantages_disadvantages", "reg_sleep_le_mod_food_restriction",
 		"reg_sleep_ae_base", "reg_sleep_ae_in", "reg_sleep_ae_fixed",
@@ -80,9 +82,9 @@ function initializeSheet(migrationChain) {
 	defaults = { "Basis": 8, "Mod": 0 };
 
 	safeguardAttrs = [];
-	for ( stem of attrStems )
+	for ( let stem of attrStems )
 	{
-		for ( ext of attrExtensions )
+		for ( let ext of attrExtensions )
 		{
 			safeguardAttrs.push(stem + "_" + ext);
 		}
@@ -93,7 +95,7 @@ function initializeSheet(migrationChain) {
 		safeguardAttrs.concat(["data_version"]),
 		function(v, missing, badDef)
 		{
-				debugLog(caller, "Safeguard attributes:", v);
+			debugLog(caller, "Safeguard attributes:", v);
 			var attrs = { "sheet_initialized": false };
 			var dataVersionSet = true;
 
@@ -104,7 +106,7 @@ function initializeSheet(migrationChain) {
 			}
 			if ( dataVersionSet === false )
 			{
-				for ( attr of safeguardAttrs )
+				for ( let attr of safeguardAttrs )
 				{
 					// None of the safeguard attributes should be undefined (missing) or have a bad value (NaN, undefined)
 					if (
@@ -120,9 +122,9 @@ function initializeSheet(migrationChain) {
 				{
 					// The safeguard attributes should all be at their default values
 					debugLog(caller, "Checking safeguard attributes ...");
-					for ( attr of safeguardAttrs )
+					for ( let attr of safeguardAttrs )
 					{
-						for ( ext of attrExtensions )
+						for ( let ext of attrExtensions )
 						{
 							if ( attr.search(ext) > -1 )
 							{
@@ -142,7 +144,7 @@ function initializeSheet(migrationChain) {
 				}
 				if ( attrs["sheet_initialized"] === false )
 				{
-					for ( attr of attrsToInit )
+					for ( let attr of attrsToInit )
 					{
 						attrs[attr] = getDefaultValue(attr);
 					}

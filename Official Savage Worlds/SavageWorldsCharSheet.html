@@ -2,7 +2,7 @@
 <script type="text/worker">
   //# sourceURL=SWADE.js
 const sheetVersionPrefix = 'Official Savage Worlds v';
-const sheetVersion = '1.00.31';
+const sheetVersion = '1.00.32';
 
 // Define colors for Logs
 const r20color = '#E948C9';
@@ -1299,10 +1299,22 @@ traits.forEach((trait) => {
     });
 });
 
-on("change:staticfighting change:staticpiloting", function(eventInfo) {
-    let modValue;
-    eventInfo.newValue === "on" ? (modValue = "0") : (modValue = "-2");
-    eventInfo.sourceAttribute === "staticfighting" ? setAttrs({ fightingmod: modValue }) : setAttrs({ pilotingmod: modValue });
+static.forEach(attr => {
+    on(`sheet:opened change:${attr}`,(event) => {
+        const baseAttr = attr.replace(/^static/,'');
+        getAttrs([attr,`${baseAttr}mod`],values => {
+            const setObj = {};
+            if(values[attr] === 'on'){
+                setObj[`${baseAttr}mod`] = values[`${baseAttr}mod`] == -2 ?
+                0 :
+                values[`${baseAttr}mod`];
+            }else{
+                setObj[`${baseAttr}mod`] = -2;
+            }
+            
+            setAttrs(setObj);
+        })
+    })
 });
 
 on("change:showFightingByDefault", function(eventInfo) {
@@ -2255,7 +2267,6 @@ const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
             return m;
         }, searchArray);
         debug({searchArray});
-        debugger;
         lookupBurndown(statblock, productArray, searchArray, callback, origBlock,IDPathways);
     });
 };
@@ -2269,6 +2280,9 @@ const compendiumDataLookup = function({queue, callback, origBlock,IDPathways}){
 const lookupBurndown = function(statblock, productArray, searchArray, callback, origBlock,IDPathways) {
     getCompendiumQuery(searchArray, (dataArr) => {
         debug({dataArr});
+        if(!Array.isArray(dataArr)){
+            dataArr = [];
+        }
         PHEGCategories.forEach((category) => {
             if (origBlock[`data-${category}`]) {
                 origBlock[`data-${category}`] = origBlock[`data-${category}`].map((obj) => {
@@ -2343,8 +2357,8 @@ const getPHEGDetails = function(phegObj, productArray, dataArr) {
         }
     });
     let compendiumObj;
-    const objExpansion = productArray.find((id) => {
-        compendiumObj = dataArr.find((dataObj) => +dataObj.data.Expansion === id && 
+    const objExpansion = productArray?.find((id) => {
+        compendiumObj = dataArr?.find((dataObj) => +dataObj.data.Expansion === id && 
             (dataObj.data[nameAttrLookup[phegObj.lookupType]] || dataObj.name) === objName);
         if (compendiumObj) {
             return true;
@@ -2354,7 +2368,7 @@ const getPHEGDetails = function(phegObj, productArray, dataArr) {
     });
     
     if (!compendiumObj) { //If we didn't find an object matching the expansion pathways and the object name, just find the first item with a matching name
-        compendiumObj = dataArr.find((dataObj) => (dataObj.data[nameAttrLookup[phegObj.type]] || dataObj.name) === objName);
+        compendiumObj = dataArr?.find((dataObj) => (dataObj.data[nameAttrLookup[phegObj.type]] || dataObj.name) === objName);
         if (!compendiumObj) { //If there still isn't a matching compendium object, return the original PHEG
             phegObj.data[requiredAttrLookup[phegObj.type]] = phegObj.data[requiredAttrLookup[phegObj.type]] || phegObj.name;
             return phegObj;
@@ -3269,6 +3283,12 @@ const compendiumBestiary = function () {
             typeof lookupObj.pace !== 'undefined'
               ? (finalCharacterDetails['pace'] = lookupObj.pace)
               : log('Pace', 'Not found', r20color);
+            // set pace mod
+            // set parry mod
+            // set toughness mod
+            ['pace','parry','tufness'].forEach(attr => {
+              finalCharacterDetails[`${attr}mod`] = lookupObj[`${attr}mod`] || 0;
+            })
             //set Token  and Avatar URLs
             typeof lookupObj.Token !== 'undefined'
               ? (finalCharacterDetails['tokenURL'] = lookupObj.Token)
@@ -3290,6 +3310,8 @@ const compendiumBestiary = function () {
             //switch character sheet view to mini-view
             //run dice handling
             finalCharacterDetails = processAdditionalPHEGs(lookupObj,finalCharacterDetails,monster);
+            // set toughness armor to override any calculations
+            finalCharacterDetails.toughnessArmor = lookupObj.toughnessArmor || 0;
             if (lookupObj.runningDie) {
               finalCharacterDetails.runningDie = `1d${lookupObj.runningDie}`;
             }
@@ -3299,7 +3321,6 @@ const compendiumBestiary = function () {
               'Write PHEG data and all remaining attributes to character sheet',
               r20color
             );
-            debugger;
             setAttrs(finalCharacterDetails);
           });
         },
@@ -3309,7 +3330,6 @@ const compendiumBestiary = function () {
 };
 
 const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster){
-  debugger;
   const PHEGCategoryExtraSets = {
     Edges: {
       edgeCount: obj => obj['data-Edges'].length,
@@ -7650,7 +7670,7 @@ on(
                         </div>
                       </div>+
                     </div>
-                    <input class="otraitmod" type="number" name="attr_knowledgeothermod" title="@{knowledgeothermod}" value="0"/>
+                    <input class="otraitmod" type="number" name="attr_knowledgeothermod" title="@{knowledgeothermod}" value="-2"/>
                     <details>
                       <summary class="config">y</summary>
                       <div class="traitmodplus">
@@ -8968,7 +8988,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_academicsmod" title="@{academicsmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_academicsmod" title="@{academicsmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -9080,7 +9100,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_athleticsmod" title="@{athleticsmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_athleticsmod" title="@{athleticsmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -9197,7 +9217,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_battlemod" title="@{battlemod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_battlemod" title="@{battlemod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -9309,7 +9329,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_boatingmod" title="@{boatingmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_boatingmod" title="@{boatingmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -9421,7 +9441,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_commonknowledgemod" title="@{commonknowledgemod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_commonknowledgemod" title="@{commonknowledgemod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -9533,7 +9553,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_drivingmod" title="@{drivingmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_drivingmod" title="@{drivingmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -9645,7 +9665,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_electronicsmod" title="@{electronicsmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_electronicsmod" title="@{electronicsmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -9757,7 +9777,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_faithmod" title="@{faithmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_faithmod" title="@{faithmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -9869,7 +9889,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_fightingmod" title="@{fightingmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_fightingmod" title="@{fightingmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -9981,7 +10001,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_focusmod" title="@{focusmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_focusmod" title="@{focusmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -10093,7 +10113,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_gamblingmod" title="@{gamblingmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_gamblingmod" title="@{gamblingmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -10205,7 +10225,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_hackingmod" title="@{hackingmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_hackingmod" title="@{hackingmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -10317,7 +10337,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_healingmod" title="@{healingmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_healingmod" title="@{healingmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -10429,7 +10449,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_intimidationmod" title="@{intimidationmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_intimidationmod" title="@{intimidationmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -10541,7 +10561,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_languagemod" title="@{languagemod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_languagemod" title="@{languagemod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -10653,7 +10673,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_noticemod" title="@{noticemod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_noticemod" title="@{noticemod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -10765,7 +10785,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_occultmod" title="@{occultmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_occultmod" title="@{occultmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -10877,7 +10897,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_performancemod" title="@{performancemod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_performancemod" title="@{performancemod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -10989,7 +11009,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_persuasionmod" title="@{persuasionmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_persuasionmod" title="@{persuasionmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -11101,7 +11121,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_pilotingmod" title="@{pilotingmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_pilotingmod" title="@{pilotingmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -11213,7 +11233,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_psionicsmod" title="@{psionicsmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_psionicsmod" title="@{psionicsmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -11330,7 +11350,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_repairmod" title="@{repairmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_repairmod" title="@{repairmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -11442,7 +11462,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_researchmod" title="@{researchmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_researchmod" title="@{researchmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -11554,7 +11574,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_ridingmod" title="@{ridingmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_ridingmod" title="@{ridingmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -11666,7 +11686,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_sciencemod" title="@{sciencemod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_sciencemod" title="@{sciencemod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -11778,7 +11798,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_shootingmod" title="@{shootingmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_shootingmod" title="@{shootingmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -11890,7 +11910,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_spellcastingmod" title="@{spellcastingmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_spellcastingmod" title="@{spellcastingmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -12010,7 +12030,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_stealthmod" title="@{stealthmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_stealthmod" title="@{stealthmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -12122,7 +12142,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_survivalmod" title="@{survivalmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_survivalmod" title="@{survivalmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -12239,7 +12259,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_tauntmod" title="@{tauntmod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_tauntmod" title="@{tauntmod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -12351,7 +12371,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_thieverymod" title="@{thieverymod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_thieverymod" title="@{thieverymod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -12463,7 +12483,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_trademod" title="@{trademod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_trademod" title="@{trademod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -12575,7 +12595,7 @@ on(
                       </div>
                     </div>+
                   </div>
-                  <input class="otraitmod" type="number" name="attr_weirdsciencemod" title="@{weirdsciencemod}" value="0"/>
+                  <input class="otraitmod" type="number" name="attr_weirdsciencemod" title="@{weirdsciencemod}" value="-2"/>
                   <details>
                     <summary class="config">y</summary>
                     <div class="traitmodplus">
@@ -12709,7 +12729,7 @@ on(
                           </div>
                         </div>+
                       </div>
-                      <input class="otraitmod" type="number" name="attr_knowledgeothermod" title="@{knowledgeothermod}" value="0"/>
+                      <input class="otraitmod" type="number" name="attr_knowledgeothermod" title="@{knowledgeothermod}" value="-2"/>
                       <details>
                         <summary class="config">y</summary>
                         <div class="traitmodplus">
@@ -14835,7 +14855,7 @@ on(
                     </div>
                   </div>+
                 </div>
-                <input class="otraitmod" type="number" name="attr_pastrengthmod" title="@{pastrengthmod}" value="0"/>
+                <input class="otraitmod" type="number" name="attr_pastrengthmod" title="@{pastrengthmod}" value="-2"/>
                 <details>
                   <summary class="config">y</summary>
                   <div class="traitmodplus">
@@ -15272,7 +15292,7 @@ on(
                     </div>
                   </div>+
                 </div>
-                <input class="otraitmod" type="number" name="attr_rastrengthmod" title="@{rastrengthmod}" value="0"/>
+                <input class="otraitmod" type="number" name="attr_rastrengthmod" title="@{rastrengthmod}" value="-2"/>
                 <details>
                   <summary class="config">y</summary>
                   <div class="traitmodplus">

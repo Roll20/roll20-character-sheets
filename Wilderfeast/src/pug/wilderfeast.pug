@@ -1,0 +1,577 @@
+mixin notes
+  .wf-container.wf-green.col-span-6.wf__notes
+    h3.wf-heading(data-i18n="notes") Notes
+    fieldset.repeating_notes
+      .wf-note
+        .wf-input
+          label(data-i18n="note_name") Title
+          input(
+            name="attr_note_name"
+            type="text"
+            data-i18n-placeholder="note_name_placeholder"
+            placeholder="Note Title"
+          )
+        .wf-input
+          label(data-i18n="note_details") Details...
+          textarea(
+            name="attr_note_details"
+            data-i18n-placeholder="note_details_placeholder"
+            placeholder="Details..."
+          )
+
+.wf
+  .wf__wrapper
+    input(name="attr_version" value="1.0" type="hidden")
+    input(name="attr_sheet" value="wilder" type="hidden")
+    input(name="attr_style" value="mighty" type="hidden")
+    input(name="attr_skill" value="assurance" type="hidden")
+    input(name="attr_hp_mod" value="0" type="hidden")
+    input(name="attr_advantage" value="0" type="hidden")
+
+    h1.wf__title
+      span(data-i18n="wilderfeast") Wilderfeast
+
+    .wf__sheet-toggle
+      label(data-i18n="sheet") Sheet
+      select(name="attr_sheet")
+        option(value="wilder" data-i18n="wilder") Wilder
+        option(value="pack" data-i18n="pack") Pack
+        option(value="area" data-i18n="area") Area
+
+    main.wilder
+      .wf__header.wf-navy
+        .wf-input
+          label(data-i18n="character_name") Name
+          input(
+            name="attr_character_name"
+            type="text"
+            data-i18n-placeholder="name_placeholder"
+            placeholder="Name"
+          )
+        .wf-input
+          label(data-i18n="pronouns") Pronouns
+          input(
+            name="attr_pronouns"
+            type="text"
+            data-i18n-placeholder="pronouns_placeholder"
+            placeholder="Pronouns"
+          )
+        .wf-input
+          label(data-i18n="specialty") Specialty
+          input(
+            name="attr_specialty"
+            type="text"
+            data-i18n-placeholder="specialty_placeholder"
+            placeholder="Specialty"
+          )
+      .wf__body
+        //- Styles
+        .wf-container.wf-orange.col-span-2.wf__styles
+          h3.wf-heading(data-i18n="styles") Styles
+          - const styles = ["mighty", "precise", "swift", "tricky"];
+          each style in styles
+            .wf__style
+              .wf-input--style
+                label(for=style)
+                  input(name="attr_style" id=style type="radio" value=style)
+                  span(data-i18n=style)= style
+              .wf-input
+                label.sr-only(data-i18n=`${style}_value`)= `${style} value`
+                input(name=`attr_${style}` type="number" value="1" min="1" max="5" placeholder="1")
+
+        //- Skills
+        .wf-container.wf-navy.col-span-4.wf__skills
+          h3.wf-heading(data-i18n="skills") Skills
+          -
+            const skills = ["assurance", "display", "shot",
+                            "call", "grab", "strike",
+                            "craft", "hoard", "study",
+                            "cure", "search", "traversal"];
+          each skill in skills
+            .wf-skill.wf-input
+              label(for=skill)
+                input(name="attr_skill" id=skill type="radio" value=skill)
+                span(data-i18n=skill)= skill
+                input(name=`attr_${skill}` type="number" min="0" max="5" placeholder="0")
+
+        //- Dice Tray
+        .wf-container.wf-black.col-span-6.wf__dice-tray
+          .wf__actions.grid
+            .empty
+            div
+              span(data-i18n="select_style_skill") Select a STYLE and SKILL.
+
+            button.wf-action(name="act_focus_up" type="action")
+              img(
+                src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/refs/heads/master/Wilderfeast/assets/d8.svg"
+              )
+              span(data-i18n="focus_up") FOCUS UP
+              img(
+                src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/refs/heads/master/Wilderfeast/assets/d8.svg"
+              )
+
+            div
+              span(data-i18n="choose_action_die_focus") Add a d8 Action Die to your dice pool.
+
+            button.wf-action--wild(name="act_go_wild" type="action")
+              img(
+                src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/refs/heads/master/Wilderfeast/assets/d20.svg"
+              )
+              span(data-i18n="go_wild") GO WILD
+              img(
+                src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/refs/heads/master/Wilderfeast/assets/d20.svg"
+              )
+
+            div
+              span(data-i18n="choose_action_die_wild") Choose one of your TRAITS and describe how it helps you in this situation. Then, remove 1 Style Die and replace it with a d20 Action Die.
+
+        //- Stamina
+        .wf-container.wf-black.col-span-2.wf__stamina
+          h3.wf-heading(data-i18n="stamina") Stamina
+
+          .wf-input--valuemax
+            .wf-input
+              label(data-i18n="current") Current
+              input(name="attr_hp" placeholder="0" min="0" type="number")
+            .wf-input
+              label(data-i18n="max") Max
+              input(name="attr_hp_max" placeholder="0" min="0" type="number")
+
+        //- Conditions
+        .wf-container.wf-red.col-span-4.wf__conditions.grid
+          h3.wf-heading(data-i18n="conditions") Conditions
+          -
+            const conditions = [
+              { label: "Burned", name: "burned" },
+              { label: "Caught", name: "caught" },
+              { label: "Confused", name: "confused", min: 1 },
+              { label: "Discordant", name: "discordant" },
+              { label: "Expanded", name: "expanded" },
+              { label: "Exposed", name: "exposed" },
+              { label: "Fatigued", name: "fatigued", min: 1 },
+              { label: "Frightened", name: "frightened", min: 1 },
+              { label: "Invigorated", name: "invigorated", min: 1 },
+              { label: "Hidden", name: "hidden" },
+              { label: "Poisoned", name: "poisoned", min: 1 },
+              { label: "Rehabilitating", name: "rehabilitating", min: 1, max: 6 },
+              { label: "Rested", name: "rested", min: 1 },
+              { label: "Stunned", name: "stunned", min: 1 },
+              { label: "Wounded", name: "wounded", min: 1, max: 3 },
+            ];
+          each condition in conditions
+            .wf-input
+              label
+                input(name=`attr_${condition.name}` type="checkbox")
+                span(data-i18n=condition.name)= condition.label
+                if condition.min >= 0
+                  | &nbsp;
+                  span X
+
+              if condition.min >= 0
+                input(
+                  name=`attr_${condition.name}_level`
+                  type="number"
+                  min=condition.min
+                  max=condition.max
+                  placeholder=condition.min
+                )
+
+        //- Tools & Techniques
+        .wf-container.wf-black.col-span-3.wf__tool_techniques
+          h3.wf-heading(data-i18n="tools_and_techniques") Tools & Techniques
+          .wf-tool
+            .wf-invisible
+              .wf-input.inline
+                label(data-i18n="tool") Tool
+                input(name="attr_tool" type="text")
+              .wf-input.inline
+                label(data-i18n="range") Range
+                input(name="attr_range" type="text")
+            .wf-tool__durability
+              h4.wf-heading(data-i18n="durability") Durability
+              .wf-input.wf-black
+                label(data-i18n="current") Current
+                input(name="attr_tool_durability" placeholder="0" min="0" type="number")
+              .wf-input.wf-black
+                label(data-i18n="max") Max
+                input(name="attr_tool_durability_max" placeholder="0" min="0" type="number")
+            .wf-input.wf-black.col-span-2
+              label(data-i18n="details") Details
+              textarea(
+                name="attr_tool_details"
+                data-i18n-placeholder="tool_details_placeholder"
+                placeholder="Details..."
+              )
+
+          h4.wf-heading(data-i18n="techniques") Techniques
+          fieldset.repeating_techniques
+            .wf-technique.grid.grid-cols-2
+              .wf-input
+                label(data-i18n="technique_name") Name
+                input(
+                  name="attr_tech_name"
+                  type="text"
+                  data-i18n-placeholder="tech_name_placeholder"
+                  placeholder="Technique"
+                )
+              .wf-input
+                label(data-i18n="technique_cost") Cost
+                input(
+                  name="attr_tech_cost"
+                  type="text"
+                  data-i18n-placeholder="tech_cost_placeholder"
+                  placeholder="Passive"
+                )
+              .wf-input.col-span-2
+                label(data-i18n="technique_details") Details
+                textarea(
+                  name="attr_tech_details"
+                  data-i18n-placeholder="tech_details_placeholder"
+                  placeholder="Details..."
+                )
+
+        //- Traits
+        .wf-container.wf-green.col-span-3.wf__traits
+          h3.wf-heading(data-i18n="traits") Traits
+          .wf-trait--default
+            span
+              strong(data-i18n="grit") Grit
+              | &nbsp;
+              em(data-i18n="grit_cost") (Cost: 1 Success)
+              | &nbsp;
+              span(data-i18n="grit_details") Increase [A] by 1.
+          .wf-trait--default
+            span
+              strong(data-i18n="insight") Insight
+              | &nbsp;
+              em(data-i18n="insight_cost") (Cost: 1 Success)
+              | &nbsp;
+              span(data-i18n="insight_details") Establish a detail about the situation.
+          fieldset.repeating_traits
+            .wf-trait.grid.grid-cols-2
+              .wf-input
+                label(data-i18n="trait_name") Name
+                input(
+                  name="attr_trait_name"
+                  type="text"
+                  data-i18n-placeholder="trait_name_placeholder"
+                  placeholder="Trait"
+                )
+              .wf-input
+                label(data-i18n="trait_cost") Cost
+                input(
+                  name="attr_trait_cost"
+                  type="text"
+                  data-i18n-placeholder="trait_cost_placeholder"
+                  placeholder="Passive"
+                )
+              .wf-input.col-span-2
+                label(data-i18n="trait_details") Details
+                textarea(
+                  name="attr_trait_details"
+                  data-i18n-placeholder="trait_details_placeholder"
+                  placeholder="Details..."
+                )
+
+        //- About You
+        .wf-container.wf-black.col-span-4.wf__you-are.grid.grid-cols-2
+          .wf-input.inline.col-span-2
+            label(data-i18n="you_are") You Are
+            input(name="attr_you_are" type="text")
+          .wf-input.inline.col-span-2
+            label(data-i18n="but_struggle_to_be") But You Struggle to Be
+            input(name="attr_but_struggle_to_be" type="text")
+          .wf-input.col-span-2
+            label(data-i18n="monstrous_acquaintance") Monstrous Acquaintance
+            textarea(
+              name="attr_monstrous_acquaintance"
+              data-i18n-placeholder="monstrous_acquaintance_placeholder"
+              placeholder="Monstrous Acquaintance..."
+            )
+          .wf-input
+            label(data-i18n="staple") Staple
+            input(name="attr_staple" type="text")
+          .wf-input
+            label(data-i18n="spice") Spice
+            input(name="attr_spice" type="text")
+
+        //- Portrait
+        .wf-container.wf-navy.col-span-2.wf__portrait
+          img(
+            name="attr_character_avatar"
+            data-i18n-title="character_avatar"
+            title="Despite everything, it's still you."
+          )
+
+        //- Three Course Background
+        .wf-container.wf-navy.col-span-6.wf__background.grid.grid-cols-2
+          h3.wf-heading(data-i18n="three_course_background") 3 Course Background
+
+          .wf-input
+            label(data-i18n="upbringing") Upbringing
+            textarea(
+              name="attr_upbringing"
+              data-i18n-placeholder="upbringing_placeholder"
+              placeholder="What is the meal that defines your childhood?"
+            )
+          .wf-input
+            label(data-i18n="initiation") Initiation
+            textarea(
+              name="attr_initiation"
+              data-i18n-placeholder="initiation_placeholder"
+              placeholder="What is the meal that made you a wilder?"
+            )
+          .wf-input
+            label(data-i18n="ambition") Ambition
+            textarea(
+              name="attr_ambition"
+              data-i18n-placeholder="ambition_placeholder"
+              placeholder="What is the meal you want to eat most?"
+            )
+          .wf-input
+            label(data-i18n="connection") Connection
+            textarea(
+              name="attr_connection"
+              data-i18n-placeholder="connection_placeholder"
+              placeholder="The two of you share a bond over this dish."
+            )
+
+        +notes
+
+    main.pack
+      .wf__header.wf-navy
+        .wf-input
+          label(data-i18n="pack_name") Pack Name
+          input(
+            name="attr_character_name"
+            type="text"
+            data-i18n-placeholder="pack_name_placeholder"
+            placeholder="Pack Name"
+          )
+        .wf-input
+          label(data-i18n="members") Members
+          input(
+            name="attr_members"
+            type="text"
+            data-i18n-placeholder="members_placeholder"
+            placeholder="Members"
+          )
+        .wf-input--valuemax
+          label.text-center(data-i18n="harmony") Harmony
+          .wf-input
+            label(data-i18n="current") Current
+            input(name="attr_harmony" placeholder="0" min="0" type="number")
+          .wf-input
+            label(data-i18n="max") Max
+            input(name="attr_harmony_max" placeholder="0" min="0" type="number")
+
+      .wf__body
+        //- Ingredients
+        .wf-container.wf-orange.col-span-3.wf__ingredients
+          h3.wf-heading(data-i18n="ingredients") Ingredients
+          fieldset.repeating_ingredients
+            .wf-ingredient
+              .wf-input
+                label(data-i18n="ingredient_name") Name
+                input(
+                  name="attr_ingredient_name"
+                  type="text"
+                  data-i18n-placeholder="ingredient_name_placeholder"
+                  placeholder="Ingredient"
+                )
+              .wf-input.text-center
+                label(data-i18n="ingredient_quantity") Qty.
+                input(
+                  name="attr_ingredient_quantity"
+                  type="number"
+                  data-i18n-placeholder="ingredient_quantity_placeholder"
+                  min="0"
+                  value="1"
+                  placeholder="0"
+                )
+              .wf-input.col-span-2
+                label(data-i18n="ingredient_effects") Effects
+                input(
+                  name="attr_ingredient_effects"
+                  type="text"
+                  data-i18n-placeholder="ingredient_effects_placeholder"
+                  placeholder="Effects..."
+                )
+
+        //- Den
+        .wf-container.wf-navy.col-span-3.wf__den
+          h3.wf-heading(data-i18n="den") Den
+          fieldset.repeating_monsters
+            .wf-monster
+              .wf-input
+                label(data-i18n="monster_name") Monster
+                input(
+                  name="attr_monster_name"
+                  type="text"
+                  data-i18n-placeholder="monster_name_placeholder"
+                  placeholder="Name"
+                )
+              .wf-input.text-center
+                label(data-i18n="monster_rehab") Rehab
+                input(
+                  name="attr_monster_rehab"
+                  type="number"
+                  data-i18n-placeholder="monster_rehab_placeholder"
+                  min="1"
+                  value="1"
+                  placeholder="0"
+                )
+              .wf-input.col-span-2
+                label(data-i18n="monster_location") Location
+                input(
+                  name="attr_monster_location"
+                  type="text"
+                  data-i18n-placeholder="monster_location_placeholder"
+                  placeholder="Location..."
+                )
+
+        +notes
+
+    main.area
+      .wf__header.wf-navy
+        .wf-input
+          label(data-i18n="area_name") Area Name
+          input(
+            name="attr_character_name"
+            type="text"
+            data-i18n-placeholder="area_name_placeholder"
+            placeholder="Area Name"
+          )
+
+      .wf__body
+        //- Portrait
+        .wf-container.col-span-6.wf__portrait
+          img(
+            name="attr_character_avatar"
+            data-i18n-title="character_avatar"
+            title="Despite everything, it's still you."
+          )
+
+        //- Traits
+        .wf-container.wf-green.col-span-3.wf__traits
+          h3.wf-heading(data-i18n="traits") Traits
+          fieldset.repeating_traits
+            .wf-trait
+              .wf-input
+                label(data-i18n="trait_name") Name
+                input(
+                  name="attr_trait_name"
+                  type="text"
+                  data-i18n-placeholder="trait_name_placeholder"
+                  placeholder="Trait"
+                )
+              .wf-input.col-span-2
+                label(data-i18n="trait_details") Details
+                textarea(
+                  name="attr_trait_details"
+                  data-i18n-placeholder="trait_details_placeholder"
+                  placeholder="Details..."
+                )
+
+        //- Communities (Name container + Current/Max Health+ Details)
+        .wf-container.wf-navy.col-span-3.wf__communities
+          h3.wf-heading(data-i18n="communities") Communities
+          fieldset.repeating_communities
+            .wf-community.grid.grid-cols-2
+              .wf-input
+                label(data-i18n="community_name") Community
+                input(
+                  name="attr_community_name"
+                  type="text"
+                  data-i18n-placeholder="community_name_placeholder"
+                  placeholder="Community"
+                )
+              .wf-input--valuemax
+                label.text-center(data-i18n="hp") Health
+                .wf-input
+                  label(data-i18n="current") Current
+                  input(name="attr_hp" placeholder="0" min="0" type="number")
+                .wf-input
+                  label(data-i18n="max") Max
+                  input(name="attr_hp_max" placeholder="0" min="0" type="number")
+              .wf-input.col-span-2
+                label(data-i18n="community_details") Details
+                textarea(
+                  name="attr_community_details"
+                  data-i18n-placeholder="community_details_placeholder"
+                  placeholder="Details..."
+                )
+
+        //- Ways of Forages
+        .wf-container.wf-orange.col-span-3.wf__forages
+          h3.wf-heading(data-i18n="forages") Forages
+          fieldset.repeating_forages
+            .wf-forage.grid.grid-cols-2
+              .wf-input
+                label(data-i18n="forage_name") Forage
+                input(
+                  name="attr_forage_name"
+                  type="text"
+                  data-i18n-placeholder="forage_name_placeholder"
+                  placeholder="Forage"
+                )
+              .wf-input
+                label(data-i18n="forage_style") Style
+                input(
+                  name="attr_forage_style"
+                  type="text"
+                  data-i18n-placeholder="forage_style_placeholder"
+                  placeholder="Style"
+                )
+              .wf-input.col-span-2
+                label(data-i18n="forage_details") Details
+                textarea(
+                  name="attr_forage_details"
+                  data-i18n-placeholder="forage_details_placeholder"
+                  placeholder="Details..."
+                )
+
+        //- Ways of Travels
+        .wf-container.wf-navy.col-span-3.wf__travels
+          h3.wf-heading(data-i18n="travels") Travels
+          fieldset.repeating_travels
+            .wf-travel.grid.grid-cols-2
+              .wf-input
+                label(data-i18n="travel_name") Travel
+                input(
+                  name="attr_travel_name"
+                  type="text"
+                  data-i18n-placeholder="travel_name_placeholder"
+                  placeholder="Travel"
+                )
+              .wf-input
+                label(data-i18n="travel_style") Style
+                input(
+                  name="attr_travel_style"
+                  type="text"
+                  data-i18n-placeholder="travel_style_placeholder"
+                  placeholder="Style"
+                )
+              .wf-input.col-span-2
+                label(data-i18n="travel_details") Details
+                textarea(
+                  name="attr_travel_details"
+                  data-i18n-placeholder="travel_details_placeholder"
+                  placeholder="Details..."
+                )
+
+        //- Additional Notes
+        +notes
+
+    footer.wf__version
+      span(data-i18n="version") Version
+      | &nbsp;
+      span(name="attr_version")
+
+include rolltemplate
+include translations
+
+script(type="text/worker")
+  include ../js/constants.js
+  include ../js/eventhandlers.js
+  include ../js/dice.js
