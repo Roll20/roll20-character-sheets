@@ -5,6 +5,7 @@ import html from 'eslint-plugin-html';
 export default [
   {
     files: ['**/*.js', '**/*.vue', '**/*.html'], // Adjust as needed
+    ignores: ['**/node_modules/**', '**/dist/**', '**/prod/**'],
     languageOptions: {
       ecmaVersion: 2021,
       sourceType: 'module',
