@@ -1,3 +1,29 @@
+# 2025-2-25
+
+- Edit attacks
+- Remove pre-compendium culture support
+- Support better DB and targets for creatures
+- Support better DB for characters
+- Use count for transcent (had armor and casted a spell);
+- Creatures:
+  - Parse ranks for movement skills correctly
+  - Use specialisation for specialised skills
+
+# 2025-2-18
+
+- Add all the specific static manuever tables from Core Law. 
+    Thanks to @grim5352 for the tables.
+- Add shield bash to known attacks
+- Start of Uses counting: Count use of normal skills.
+- Fix specialisation bonus - Use 0 ranks or highest - 25.
+- Reneable initiative buttons.  Actions buttons need to have type
+    'action'.
+- Fix specified crits
+- Add F->J & X,Y specified crits too
+- Add Fate Points - Just a simple text box (@coreylpierce)
+- Fix for creating specialised skills during levelup.
+- (Creature Law) Update parsing of crit reduction and other resistances.
+
 # 2025-2-11
 
 - Fix the stupid problem where buying Specialised skills

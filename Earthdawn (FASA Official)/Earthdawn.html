@@ -3,12 +3,10 @@
 <meta charset="UTF-8">
 
 <!--
-v3.42 25 02 09
+v3.43 25 XX XX
 
 Character Sheet For Earthdawn Developped by JBF (Discord/Facebook Jiboux Faure) v2.
 Largerly using material from the work on the Official FASA version of Chris Dickey
-Whenever possible I kept the original comments of Chris, prefixing them with CD to identify pieces of code that were unchanged
-Version of my code are prefixed JBF, usually with YYMMDD for me to remember the versioning
 -->
 
 <!--  Note, this is a generic roll that can be pasted into a macro. Store it here to be handy.
@@ -128,7 +126,7 @@ Version of my code are prefixed JBF, usually with YYMMDD for me to remember the 
                 type="number">
 
               </div>
-
+              <input type="hidden" value="20" name="attr_Damage_max"> <!--Necessary for bar initialization-->
             </div>
 
         </div>
@@ -881,16 +879,16 @@ Version of my code are prefixed JBF, usually with YYMMDD for me to remember the 
       <input type="checkbox" name="attr_API" value="2" class="sheet-hidden sheet-testCloseChecked" >
       <div class="sheet-HideIfNotCloseChecked sheet-small">
         <div class="sheet-text-center"><b>Warning - Character is set to expect API but API is not responding. Temporarily displaying NoAPI version !</b></div>
-        <div>- To ignore this warning and keep this character in NoAPI mode (for example a character imported from an API game to a NoAPI Game) :
+        <div>- To set definitely this sheet to not expect the API press the following button :
           <button class="ui-draggable sheet-button-nodice sheet-text-button" name="act_stop-using-api" type="action"
           title="Click this button if you definitely stopped using the API.">Forget API</button>
         </div>
 
         <div>- To set all new characters to not expect the API, go to the Game default sheet settings.</div>
-        <div>- If you think the API is running, you can try the following button to try again communicating to the API (note that due to a roll20 restriction, on any new character, you need to initialize the communication by either hitting this button or closing/reopening the sheet)
+        <div>- You can try the following button to reconnect to the API (note that due to a roll20 restriction, on any new character, you need to initialize the communication by either hitting this button or closing/reopening the sheet)
           <button class="ui-draggable sheet-button-nodice sheet-text-button" name="roll_pingapi" type="roll"
           value="!Earthdawn~ charID: @{character_id}~ APIPing"
-          title="Click this button if you confirm using the API.">Try API again</button>
+          title="Click this button if you confirm using the API.">Reconnect to API</button>
         </div>
         <div>- If the above doesn't work, the API may be crashed. Ask the GM to go in the API Console to restart the API.</div>
       </div>
@@ -3561,7 +3559,7 @@ Version of my code are prefixed JBF, usually with YYMMDD for me to remember the 
                     <button class="sheet-text-button ui-draggable sheet-HideIfNotCloseChecked sheet-api"
                     name="roll_DSP_halfMagic"
                     type="roll"
-                    value="!Earthdawn~ charID: @{character_id}~ foreach:sct:c~ modValue : ?{Modification|0} ~ K-ask: ?{How many Karma to spend on this test|0} : 0 ~ Value: ?{What Attribute|Per|Dex|Str|Tou|Per|Wil|Cha}~ Reason: @{DSP_Name} @{DSP_Circle} Half-Magic ?{What Attribute} test~ Roll: @{DSP_Circle}"
+                    value="!Earthdawn~ charID: @{character_id}~ foreach:sct:c~ modValue : ?{Modification|0} ~ K-ask: ?{How many Karma to spend on this test|0} : 0 ~ Value: ?{What Attribute|Per|Dex|Str|Tou|Per|Wil|Cha}~ Reason: @{DSP_Name} Half-Magic ?{What Attribute} test~ Roll: @{DSP_Circle}"
                     title="%{selected|DSP_halfMagic}   Roll a half magic check for this Character.">Half Magic
                    </button>
                    <button class="sheet-text-button ui-draggable sheet-HideIfNotCloseChecked sheet-NoAPI"
@@ -9381,7 +9379,7 @@ Version of my code are prefixed JBF, usually with YYMMDD for me to remember the 
 
           <!--JBF Karma Toggle-Simple-->
           <span class="sheet-Karma-ControlBox">
-            <input type="hidden" name="attr_WPN_Karma-Ask" value="{ Karma mode is ASK. Choose number of Karma between 0 and 1 |0}"> <!-- JBF : Holds the string used to make the Karma Query in ask mode. See sheet-workers for details-->
+            <input type="hidden" name="attr_WPN_Karma-Ask" value="0"> <!-- JBF : Holds the string used to make the Karma Query in ask mode. See sheet-workers for details-->
             <input type="checkbox" name="attr_WPN_Karma-Limit_max" value="0" hidden checked class="sheet-testCloseChecked">
             <span class="sheet-HideIfCloseChecked" >
               <input type="checkbox" name="attr_WPN_Karma-Limit_max" hidden value="1"  class="sheet-testCloseChecked">
@@ -9512,11 +9510,11 @@ Version of my code are prefixed JBF, usually with YYMMDD for me to remember the 
           <div class="sheet-Creation sheet-headerbar sheet-HideIfCreature"> <b class="sheet-creation-order">6-</b> Racial & Karma Abilities </div>
           <div class="sheet-Creation sheet-text-center sheet-HideIfCreature sheet-small"> Automatically Determined by your Race and Discipline. </div>
           <div class="sheet-content sheet-HideIfCreature sheet-HideIfNotOverview">
-            <span class="sheet-autoexpand-wrap" title="@{RacialAbilities}  Racial Abilities.">
+            <span class="sheet-autoexpand-wrap" style="min-width:6em;" title="@{RacialAbilities}  Racial Abilities.">
               <input name="attr_RacialAbilities" class="sheet-text-left sheet-LockIfNotHomeBrew"
               placeholder="Racial Abilities"
               type="text" >
-              <span name="attr_RacialAbilities" class="sheet-autoexpand">
+              <span name="attr_RacialAbilities" class="sheet-autoexpand ">
               </span>
             </span>
             <br>
@@ -9976,7 +9974,7 @@ Version of my code are prefixed JBF, usually with YYMMDD for me to remember the 
               </span>
             </fieldset>
           </div>
-          <button class="sheet-button-nodice sheet-text-button sheet-addbutton repcontrol" name="act_addline-personality" type="action" style="margin-top:-25px;">+Add</button>
+          <button class="sheet-button-nodice sheet-text-button sheet-addbutton repcontrol sheet-HideIfCombat sheet-HideIfNotPC" name="act_addline-personality" type="action" style="margin-top:-25px;">+Add</button>
 
                 <!--Notes - NPC Attitude-->
           <div class="sheet-HideIfPC">
@@ -10035,7 +10033,7 @@ Version of my code are prefixed JBF, usually with YYMMDD for me to remember the 
             In order for those functions to work properly, you need to link the character sheet with a token on the map, by selecting this token, and pressing the button below
             <br>
             <button class="ui-draggable sheet-button-nodice sheet-text-button" name="roll_TokenLink" type="roll"
-            value="!Earthdawn~ charID: @{character_id}~ LinkToken: ?{Standard both sets the token to display in the standard way and links the token|Standard|SetTokenOnly|LinkOnly}"
+            value="!Earthdawn~ charID: @{character_id}~ LinkToken: Standard"
             title="Clicking this button will Link this Character with the selected Token on the map."> Link Token</button>
           </div>
           <div class="sheet-Creation sheet-headerbar sheet-HideIfNotCreature">
@@ -10866,7 +10864,7 @@ Version of my code are prefixed JBF, usually with YYMMDD for me to remember the 
                     <!-- Weapon Fieldset- Karma & DP -->
                     <!--JBF Karma Toggle-Simple-->
                     <span class="sheet-Karma-ControlBox">
-                      <input type="hidden" name="attr_WPN_Karma-Ask" value="{ Karma mode is ASK. Choose number of Karma between 0 and 1 |0}"> <!-- JBF : Holds the string used to make the Karma Query in ask mode. See sheet-workers for details-->
+                      <input type="hidden" name="attr_WPN_Karma-Ask" value="0"> <!-- JBF : Holds the string used to make the Karma Query in ask mode. See sheet-workers for details-->
                       <input type="checkbox" name="attr_WPN_Karma-Limit_max" value="0" hidden checked class="sheet-testCloseChecked">
                       <span class="sheet-HideIfCloseChecked" >
                         <input type="checkbox" name="attr_WPN_Karma-Limit_max" hidden value="1"  class="sheet-testCloseChecked">
@@ -13274,7 +13272,7 @@ Version of my code are prefixed JBF, usually with YYMMDD for me to remember the 
 <!-- WORKERS -->
 <script type="text/worker">
 
-var SheetVersion=3.42;
+var SheetVersion=3.43;
 
 // This is Test code to see if worker threads are active (working).   If wt-test1 changes, change wt-test2. if wt-test2 does not update, sheetworkers are not working.
 on("change:wt-test1", function ocwttest1() {
@@ -13292,6 +13290,11 @@ function escapeRegExp(string) {
 }
 
 
+//Function errlog : only objective is for it not to be log, in order to search and find easier all the temporary logs
+function errlog(string) {
+  log(string);
+}
+
 
 
 // This is a wrapper for parseInt.
@@ -13301,7 +13304,7 @@ function escapeRegExp(string) {
 var getInt = function fnGetInt( vals, fld, lg ) {
   'use strict';
   if( lg )        // Note: For debugging purposes, merely comment out this line to log everything.
-  console.log( "Got " +  fld + " = " + vals[ fld ]  );
+   errlog( "Got " +  fld + " = " + vals[ fld ]  );
   return parseInt( vals[ fld ] ) || 0;
 };  // End getInt()
 
@@ -13319,9 +13322,7 @@ var safeString = function( str )  {
   'use strict';
   try {
     return (( typeof str === "string" ) ? str: ( typeof str === "number" ) ? str.toString() : "" );
-  } catch(err) {
-    log( Earthdawn.timeStamp() + "Earthdawn:safeString() error caught: " + err );
-  }
+  } catch( err ) { errlog(  "Earthdawn:safeString() error caught: " + err  ); }
 };  // end safeString
 
 
@@ -13339,7 +13340,7 @@ var getEdition = function fnGetInt( vals ) {
 var parseJSON = function (str,dflt){
   try{ return JSON.parse(safeString( str ).replace(/=&gt;/g,":").replace(/\n/," ")); } //JBF@JBF : roll20 rake is making the opposite replace, so necessary to get appropriate JSONs
   catch(err){
-    if(str!=="HomeBrew") log("Earthdawn trying to parse unvalid JSON " + str);
+    if(str!=="HomeBrew") errlog("Earthdawn trying to parse unvalid JSON " + str);
     return dflt  ? dflt : {};
   }
 }; //End parseJSON()
@@ -13358,17 +13359,17 @@ function mergeJSON(prim,sec){
 
 
 // This is a wrapper for call backs that log when callback is entered and exited.
-// The console.log lines should be commented out when not actively  debugging.
+// The errlog lines should be commented out when not actively  debugging.
 var fn = function fnfn(cb){
   'use strict';
   return function fnfn2(){
-    // console.log( Date.now() + ' : EarthDawn - '+(cb.name||'(anonymous function)') + "(" + JSON.stringify(arguments) +" )");//uncomment this line if you want the entry of the function with timestamp & arguments
-    // console.log( Date.now() + ' : EarthDawn - '+(cb.name||'(anonymous function)'));//uncomment this line if you want the entry of the function with timestamps but not arguments
-    // console.log('EarthDawn - '+(cb.name||'(anonymous function)') + "(" + JSON.stringify(arguments) +" )");//uncomment this line if you want the entry of the function with arguments but no timestamp
-    // console.log('EarthDawn - '+(cb.name||'(anonymous function)'));//uncomment this line if you want the entry of the function without timestamp nor arguments
+    // errlog( Date.now() + ' : EarthDawn - '+(cb.name||'(anonymous function)') + "(" + JSON.stringify(arguments) +" )");//uncomment this line if you want the entry of the function with timestamp & arguments
+    // errlog( Date.now() + ' : EarthDawn - '+(cb.name||'(anonymous function)'));//uncomment this line if you want the entry of the function with timestamps but not arguments
+    // errlog('EarthDawn - '+(cb.name||'(anonymous function)') + "(" + JSON.stringify(arguments) +" )");//uncomment this line if you want the entry of the function with arguments but no timestamp
+    // errlog('EarthDawn - '+(cb.name||'(anonymous function)'));//uncomment this line if you want the entry of the function without timestamp nor arguments
     cb.apply({},arguments);
-    // console.log( Date.now() + ' : EarthDawn - '+(cb.name||'(anonymous function)' ) + " - End "); //uncomment this line if you want the exit of the function with timestamp
-    // console.log('EarthDawn - '+(cb.name||'(anonymous function)' ) + " - End "); //uncomment this line if you want the exit of the function without timestamp
+    // errlog( Date.now() + ' : EarthDawn - '+(cb.name||'(anonymous function)' ) + " - End "); //uncomment this line if you want the exit of the function with timestamp
+    // errlog('EarthDawn - '+(cb.name||'(anonymous function)' ) + " - End "); //uncomment this line if you want the exit of the function without timestamp
   };
 };
 
@@ -13382,7 +13383,7 @@ var callstack = function fncallstack(){
   .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
   .split('\n');
   stack.shift();
-  console.log(stack);
+  errlog(stack);
 };  //end callstack
 
 
@@ -13394,7 +13395,7 @@ var logvalues = function fnlogvalues( vals ) {
   //        var txt = "getAttrs -";
   //        for(var key in vals)
   //            txt += " " + key + ": " + vals[ key ] ;
-  //        console.log( txt );
+  //        errlog( txt );
 };  //end logvalues
 
 
@@ -13405,7 +13406,7 @@ var setAttrsLog = function fnlogvalues( vals, opt, cb ) {
   // var txt = "setAttrs -";
   // for(var key in vals)
   // txt += " " + key + ": " + vals[ key ] ;
-  // console.log( txt );
+  // errlog( txt );
   setAttrs( vals, opt, cb );
 };  //end setAttrsLog
 
@@ -13418,7 +13419,7 @@ var logvalues2 = function fnlogvalues( vals ) {
   var txt = "getAttrs -";
   for(var key in vals)
   txt += " " + key + ": " + vals[ key ] ;
-  console.log( txt );
+  errlog( txt );
 };  //end logvalues2
 
 
@@ -13429,7 +13430,7 @@ var setAttrsLog2 = function fnlogvalues( vals, opt, cb ) {
   var txt = "setAttrs -";
   for(var key in vals)
   txt += " " + key + ": " + vals[ key ] ;
-  console.log( txt );
+  errlog( txt );
   setAttrs( vals, opt, cb );
 };  //end setAttrsLog2
 
@@ -13456,9 +13457,7 @@ var getParam = function ( str, num, delim ) {
     found = str.slice( j, i).trim();
   }
   return found;
-  } catch(err) {
-  log("Earthdawn:getParam() error caught: " + err + " str: " + str + " num: " + num + " delim: "+delim);
-}
+  } catch( err ) { errlog( "Earthdawn:getParam() error caught: " + err + " str: " + str + " num: " + num + " delim: "+delim ); }
 };  // end getParam()
 
 
@@ -13468,12 +13467,12 @@ var buildPre = function ( code, rowID ) {
   try {
     let ret = "";
     if ( !code ) {
-      log("Earthdawn:buildPre() error. invalid code: " + code + "   rowID: " + rowID);
+      errlog("Earthdawn:buildPre() error. invalid code: " + code + "   rowID: " + rowID);
       return;
     }
     code = safeString( code ).toUpperCase();
     if ((_.isString( rowID ) && rowID.length < 4)) {
-      log("Earthdawn:buildPre() error. rowId wrong format: " + rowID + "   code: " + code);
+      errlog("Earthdawn:buildPre() error. rowId wrong format: " + rowID + "   code: " + code);
       rowID = "xYz";
     }
     if( !rowID )    rowID = "xYz";
@@ -13504,12 +13503,10 @@ var buildPre = function ( code, rowID ) {
       case "ENC": ret = "repeating_enchanting_" + rowID + "_" + code + "_"; break;
       case "NSM": ret = "repeating_knacksummary_"+ rowID + "_" + code + "_"; break;
 
-      default: log("Earthdawn:buildPre() error. Unknown code: " + code + "   RowID: " + rowID );
+      default: errlog("Earthdawn:buildPre() error. Unknown code: " + code + "   RowID: " + rowID );
     }
     return safeString( ret ).replace( /_xYz_/g, "_");     // return it as "repeating_talents_name" with rowID totally gone.
-  } catch(err) {
-    log("Earthdawn:buildPre() error caught: " + err );
-  }
+  } catch( err ) { errlog( "Earthdawn:buildPre() error caught: " + err  ); }
 };  // end buildPre
 
 
@@ -13522,17 +13519,15 @@ var buildPre = function ( code, rowID ) {
 var buildShortPre = function ( ei, code ) {
   'use strict';
   try {
-  if ( !ei || (_.isString( ei ) && ei.length<4)) {log("Earthdawn:buildShortPre() error. Unknown eventinfo: " + ei + "   code: " + code); return ;}
+  if ( !ei || (_.isString( ei ) && ei.length<4)) { errlog("Earthdawn:buildShortPre() error. Unknown eventinfo: " + ei + "   code: " + code); return ; }
   else if( _.isString( ei )) {
     if( code ) return buildPre( code, ei );
     else return buildPre( repeatSection( 3, ei ), repeatSection( 2, ei ));
   } else if ( code ) return buildPre(code);
   else if ( ei["sourceAttribute"] )  return buildPre(repeatSection(3,ei["sourceAttribute"]));
-  log("Earthdawn:buildShortPre() error. Unknown eventinfo: " + JSON.stringify(ei));
+  errlog( "Earthdawn:buildShortPre() error. Unknown eventinfo: " + JSON.stringify(ei));
   return;
-  } catch(err) {
-    log("Earthdawn:buildShortPre() error caught: " + err);
-}
+  } catch( err ) { errlog( "Earthdawn:buildShortPre() error caught: " + err ); }
 };  // end buildShortPre
 
 
@@ -13561,9 +13556,7 @@ var repeatSection = function ( section, str ) {
       if(safeString( str ).startsWith("repeating")) x.shift();
       return x.join("_");
     }
-  } catch(err) {
-    log("Earthdawn:repeatSection() error caught: " + err + " section: " + section+ " str: " + str);
-  }
+  } catch( err ) { errlog( "Earthdawn:repeatSection() error caught: " + err + " section: " + section+ " str: " + str ); }
 }; // end repeatSection
 
 
@@ -13585,9 +13578,7 @@ var getSectionIDsOrdered = function (sectionName, callback) {
       callback([...new Set(safeString( reporder ).toLowerCase().split(",").filter(x => idArray.includes(x)).concat(idArray))]);
     });
   });
-  } catch(err) {
-    log("Earthdawn:getSectionIDsOrdered() error caught: " + err + " sectionName: " + sectionName);
-  }
+  } catch( err ) { errlog( "Earthdawn:getSectionIDsOrdered() error caught: " + err + " sectionName: " + sectionName ); }
 
 
 };  // end getSectionIDsOrdered()
@@ -13605,9 +13596,7 @@ var fullName = function fnfullName( name, ei ) {
     return name.slice( 0, u+1) + ei + name.slice( u);       // If ei is a string, then insert the RowID contained within eventInfo into name and return that.
   } else
   return name;                // If ei is an actual eventInfo object, then simply return name, since the system does not need the rowID if it came from a repeating section.
-  } catch(err) {
-    log("Earthdawn:fullName() error caught: " + err + " name: " + name+ " ei: " + JSON.stringify(ei));
-  }
+  } catch( err ) { errlog( "Earthdawn:fullName() error caught: " + err + " name: " + name+ " ei: " + JSON.stringify(ei) ); }
 };  // End fullName
 
 
@@ -13625,9 +13614,7 @@ function getAttrib ( ei ) {
   if ( ei["sourceAttribute"] )
     return ei["sourceAttribute"];
   return ei["eventname"];
-  } catch(err) {
-    log("Earthdawn:getAttrib() error caught: " + err + " ei: " + JSON.stringify(ei));
-  }
+  } catch( err ) { errlog( "Earthdawn:getAttrib() error caught: " + err + " ei: " + JSON.stringify(ei) ); }
 }; //end getAttrib
 
 
@@ -13648,9 +13635,10 @@ function generateRowIdNoUnderscore() {
 var ConditionHealth = function fnConditionHealth(eventInfo) { // If Damage exceeds the health ratings apply appropriate status
   'use strict';
   try{
+    if(eventInfo && eventInfo.sourceType=="API") return; //API updates itself the conditions and markers because there is no chain trigger from sheetworker to API for the update of the token markers
   getAttrs([ "Damage", "Damage-Unc-Rating", "Damage-Death-Rating", "Damage-Stun","CreationMode"], function gaConditionHealth(values) {
     'use strict';
-     //log ( "EarthDawn : ConditionHealth() " +JSON.stringify(eventInfo));
+    //log( "EarthDawn : ConditionHealth() " +JSON.stringify(eventInfo));
     logvalues( values);
     let att=getAttrib(eventInfo).toLowerCase();
     if ( values[ "CreationMode" ] == "0" ) {
@@ -13660,22 +13648,20 @@ var ConditionHealth = function fnConditionHealth(eventInfo) { // If Damage excee
         dmg=getInt(values,"Damage"),
         dmgstn=Math.max(0,getInt(values,"Damage-Stun"));
       if( dmg > death || (dmg+dmgstn) > unc ) { //Character is dead
-        vals[ "condition-Health" ] = (dmg > death) ? "-5" : "5";
-        vals[ "condition-KnockedDown" ] = "1";
-        vals[ "condition-Blindsided" ] = "1";
+        vals[ "condition-Health" ] = (dmg > death) ? -5 : 5;
+        vals[ "condition-KnockedDown" ] = 1;
+        vals[ "condition-Blindsided" ] = 1;
       } else{
       vals[ "condition-Health" ]="0";
       if(eventInfo && eventInfo.previousValue && (
         safeString(att).toLowerCase()=="damage" && (eventInfo.previousValue+dmgstn>unc) ||
         safeString(att).toLowerCase()=="damage-stun" && (eventInfo.previousValue+dmg>unc)      ))
-        vals[ "condition-Blindsided" ] = "0";
+        vals[ "condition-Blindsided" ] = 0;
       }
       setAttrsLog( vals );
     }
   });
-  } catch(err) {
-  log("Earthdawn:ConditionHealth() error caught: " + err );
-  }
+  } catch( err ) { errlog( "Earthdawn:ConditionHealth() error caught: " + err  ); }
 }; //End ConditionHealth
 on("change:damage change:damage-unc-rating change:damage-death-rating change-damage-stun", fn(ConditionHealth) );
 
@@ -13691,9 +13677,7 @@ var UpdateResistPain = function fnUpdateResistPain() {
     vals["Total-ResistPain"]=x;      setAttrsLog( vals );
 
   });
-  } catch(err) {
-  log("Earthdawn:UpdateResistPain() error caught: " + err );
-  }
+  } catch( err ) { errlog( "Earthdawn:UpdateResistPain() error caught: " + err  ); }
 }; //End ConditionHealth
 on("change:race-resistpain change:special-resistpain change:creature-resistpain", fn(UpdateResistPain) );
 
@@ -13702,7 +13686,7 @@ on("change:race-resistpain change:special-resistpain change:creature-resistpain"
 var UpdateAdjustGlobalModifiers = function fnUpdateAdjustGlobalModifiers(eventInfo) {
   'use strict';
   try{
-  // log ( "EarthDawn : UpdateAdjustGlobalModifiers()");
+  //log( "EarthDawn : UpdateAdjustGlobalModifiers()");
     getAttrs([ "condition-Darkness" , "Adjust-Effect-Tests-Auto", "effectIsAction", "Wounds",
     "Creature-Fury", "Total-ResistPain", "Adjust-Effect-Tests-Misc" , "Adjust-Effect-Tests-Total", "combatOption-TailAttack", "condition-Harried",
     "combatOption-DefensiveStance", "Misc-DefStance-Penalty", "Misc-DefStance-Bonus", "condition-KnockedDown", "Adjust-All-Tests-Auto",
@@ -13798,9 +13782,7 @@ var UpdateAdjustGlobalModifiers = function fnUpdateAdjustGlobalModifiers(eventIn
       setAttrsLog( vals );
       updateRepStep();
     });
-  } catch(err) {
-    log("Earthdawn:UpdateAdjustGlobalModifiers() error caught: " + err + " ei: " + JSON.stringify(eventInfo));
-  }
+  } catch( err ) { errlog( "Earthdawn:UpdateAdjustGlobalModifiers() error caught: " + err + " ei: " + JSON.stringify(eventInfo) ); }
 }; // End UpdateAdjustGlobalModifiers()
 on( "change:effectisaction change:wounds  change:creature-fury   change:total-resistpain   change:adjust-effect-tests-misc change:combatoption-tailattack   change:condition-harried     change:misc-defstance-penalty change:condition-knockeddown  change:adjust-all-tests-misc change:condition-darkness change:misc-aggstance-bonus    change:combatoption-calledshot   change:condition-rangelong  change:creature-ambushing_max   change:creature-ambushing   change:Creature-DivingCharging_max   change:creature-divingcharging  change:adjust-attacks-misc  change:adjust-damage-misc   change:condition-cover  change:condition-surprised  change:condition-blindsided   change:adjust-defenses-misc ",  fn(UpdateAdjustGlobalModifiers) );
 
@@ -13830,9 +13812,7 @@ on("change:combatoption-aggressiveattack change:combatoption-defensivestance", f
     };
     UpdateAdjustGlobalModifiers();
   });
-  } catch(err) {
-    log("Earthdawn:ocCoAggDef() error caught: " + err + " ei: " + JSON.stringify(eventInfo));
-  }
+  } catch( err ) { errlog( "Earthdawn:ocCoAggDef() error caught: " + err + " ei: " + JSON.stringify(eventInfo) ); }
 }));  //end ocAggDef
 
 
@@ -13840,7 +13820,7 @@ on("change:combatoption-aggressiveattack change:combatoption-defensivestance", f
 var updateAdjustTN = function fnUpdateAdjustTN() {
   'use strict';
   try{
-  // log ( "EarthDawn : UpdateAdjustTN()");
+  //log( "EarthDawn : UpdateAdjustTN()");
   getAttrs([ "combatOption-Reserved", "Adjust-TN-Misc" ], function gaUpdateAdjustTN(values) {
     'use strict';
     logvalues( values);
@@ -13849,9 +13829,7 @@ var updateAdjustTN = function fnUpdateAdjustTN() {
     vals["Adjust-TN-Total"] = getInt( values, "combatOption-Reserved") * 2 + getInt( values, "Adjust-TN-Misc");
     setAttrsLog(vals);
   });
-  } catch(err) {
-    log("Earthdawn:updateAdjustTN() error caught: " + err);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateAdjustTN() error caught: " + err ); }
 };  // End updateAdjustTN()
 on("change:combatoption-reserved change:adjust-tn-misc", fn(updateAdjustTN) );
 
@@ -13861,11 +13839,9 @@ on("change:combatoption-reserved change:adjust-tn-misc", fn(updateAdjustTN) );
 var updateEffectIsAction = function fnUpdateEffectIsAction( eventInfo ) {
   'use strict';
   try{
-  // log ( "EarthDawn : UpdateEffectIsAction()");
+  //log( "EarthDawn : UpdateEffectIsAction()");
   setAttrsLog({ "Dex-ActnEfct": "1", "Str-ActnEfct": "1", "Tou-ActnEfct": "1", "Per-ActnEfct": "1", "Wil-ActnEfct": "1", "Cha-ActnEfct": "1", "Test-Trigger-3": "1" });
-  } catch(err) {
-    log("Earthdawn:updateEffectIsAction() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));
-  }
+  } catch( err ) { errlog( "Earthdawn:updateEffectIsAction() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo) ); }
 }; // End updateEffectIsAction()
 on("change:effectisaction", fn(updateEffectIsAction) );
 
@@ -13881,9 +13857,7 @@ var calculateAttribCosts = function fnCalculateAttribCosts(orig) {  // calculate
     cost += (diff);
   }
   return cost;
-  } catch(err) {
-    log("Earthdawn:calculateAttribCosts() error caught: " + err + " orig: " + orig);
-  }
+  } catch( err ) { errlog( "Earthdawn:calculateAttribCosts() error caught: " + err + " orig: " + orig ); }
 };  //end calculateAttribCosts
 
 
@@ -13904,9 +13878,7 @@ var updateAttribCosts = function fnUpdateAttribCosts() { // At character creatio
     val -= values[ "Attrib-Karma-Orig" ];
     setAttrsLog({ "Attr-Costs": val });
   });
-  } catch(err) {
-    log("Earthdawn:updateAttribCosts() error caught: " + err);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateAttribCosts() error caught: " + err ); }
 }; // End updateAttribCosts()
 on("change:attrib-dex-orig change:attrib-str-orig change:attrib-tou-orig change:attrib-per-orig change:attrib-wil-orig change:attrib-cha-orig change:attrib-karma-orig", fn(updateAttribCosts));
 //JBF : Trigger via Recalc or updateAttribCurr
@@ -13920,7 +13892,7 @@ on("change:attrib-dex-orig change:attrib-str-orig change:attrib-tou-orig change:
 var updateAttribCurr = function fnUpdateAttribCurr( attrib) {
   'use strict';
   try{
-  // log ( "EarthDawn : UpdateAttribCurr( " + attrib +" ) "  );
+  //log( "EarthDawn : UpdateAttribCurr( " + attrib +" ) "  );
   var curr = "Attrib-" + attrib + "-Curr";
   var orig = "Attrib-" + attrib + "-Orig";
   var race = "Attrib-" + attrib + "-Race";
@@ -13935,9 +13907,7 @@ var updateAttribCurr = function fnUpdateAttribCurr( attrib) {
       setAttrsLog( vals ); //Silent mode unreliable, so deleted, and replaced by eventInfo["sourceType"] checks at the appropriate places
     }
   });
-  } catch(err) {
-    log("Earthdawn:updateAttribCurr() error caught: " + err + " attrib: " + attrib);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateAttribCurr() error caught: " + err + " attrib: " + attrib ); }
 }; // End updateAttribCurr()
 on("change:attrib-dex-orig change:attrib-dex-race change:attrib-dex-increases change:dex-adjust-attr", fn(_.partial(updateAttribCurr, "Dex")));
 on("change:attrib-str-orig change:attrib-str-race change:attrib-str-increases change:str-adjust-attr", fn(_.partial(updateAttribCurr, "Str")));
@@ -13956,7 +13926,7 @@ on("change:attrib-cha-orig change:attrib-cha-race change:attrib-cha-increases ch
 var backfillOrigAttrib = function fnBackfillOrigAttrib( attrib ) {
   'use strict';
   try{
-  // log ( "EarthDawn : BackfillOrigAttrib( "+ attrib + " )");
+  //log( "EarthDawn : BackfillOrigAttrib( "+ attrib + " )");
   var step = attrib + "-Step";
   var orig = "Attrib-" + attrib + "-Orig";
   var race = "Attrib-" + attrib + "-Race";
@@ -13975,9 +13945,7 @@ var backfillOrigAttrib = function fnBackfillOrigAttrib( attrib ) {
       // updateAttribCurr( attrib, true); As the silent mode is unreliable there is no need any more to do manual calls
     }
   });
-  } catch(err) {
-    log("Earthdawn:backfillOrigAttrib() error caught: " + err + " attrib: " + attrib);
-  }
+  } catch( err ) { errlog( "Earthdawn:backfillOrigAttrib() error caught: " + err + " attrib: " + attrib ); }
 }; // End backfillOrigAttrib()
 
 
@@ -13986,7 +13954,7 @@ var backfillOrigAttrib = function fnBackfillOrigAttrib( attrib ) {
 var updateAttribStep = function fnUpdateAttribStep( attrib ) {
   'use strict';
   try{
-  // log ( "EarthDawn : updateAttribStep( "+ attrib + " )");
+  //log( "EarthDawn : updateAttribStep( "+ attrib + " )");
   var step = attrib + "-Step";
   var curr = "Attrib-" + attrib + "-Curr";
   var adjust= attrib + "-Adjust";
@@ -13998,9 +13966,7 @@ var updateAttribStep = function fnUpdateAttribStep( attrib ) {
     if( vals[ step ] != getInt( values, step) )
     setAttrsLog( vals );
   });
-  } catch(err) {
-    log("Earthdawn:updateAttribStep() error caught: " + err + " attrib: " + attrib);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateAttribStep() error caught: " + err + " attrib: " + attrib ); }
 }; // End updateAttribStep()
 //trigger by curr or adjust
 
@@ -14009,7 +13975,7 @@ var updateAttribStep = function fnUpdateAttribStep( attrib ) {
 var updateAttribFinal = function fnUpdateAttribFinal( base ) {    //calculate Action Test Step for the attribute
   'use strict';
   try{
-  // log ( "EarthDawn : updateAttribFinal( "+ base + " )");
+  //log( "EarthDawn : updateAttribFinal( "+ base + " )");
   let bs = _.isString( base ) ? base : (base[ "sourceAttribute"].slice(0, 1).toUpperCase() + base[ "sourceAttribute"].slice(1, 3)),
   efct = bs + "-Effect";
   getAttrs( [ bs + "-Step", bs + "-Mods", efct, bs,  "Adjust-Effect-Tests-Total",
@@ -14027,9 +13993,7 @@ var updateAttribFinal = function fnUpdateAttribFinal( base ) {    //calculate Ac
     if( Object.keys(vals).length > 0 )
     setAttrsLog( vals );
   });
-  } catch(err) {
-    log("Earthdawn:updateAttribFinal() error caught: " + err + " base: " + base);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateAttribFinal() error caught: " + err + " base: " + base ); }
 }; // End updateAttribFinal()
 on("change:adjust-all-tests-total change:adjust-effect-tests-total", fn(function ocAdjustAllAttribFinal() {
   'use strict';
@@ -14071,9 +14035,7 @@ const repeatingSum = (destinations, section, fields) => {
       setAttrs(output);
     });
   });
-  } catch(err) {
-    log("Earthdawn:repeatingSum() error caught: " + err + " destination: " + destination + " section: " + section);
-  }
+  } catch( err ) { errlog( "Earthdawn:repeatingSum() error caught: " + err + " destination: " + destination + " section: " + section ); }
 };//end repeatingSum
 on('change:repeating_inventory remove:repeating_inventory', fn(function ocInventoryWeight() {
   repeatingSum("Cont1-Weight", "Inventory",["INV_UnitWeight","INV_Qty","INV_Carried1"]  );
@@ -14103,7 +14065,7 @@ var ocBlood = function fnocBlood(eventInfo) {
               setAttrsLog(vals);
       });
     });
-  } catch(err) {    log("Earthdawn:ocBlood() error caught: " + err); }
+  } catch( err ) { errlog( "Earthdawn:ocBlood() error caught: " + err ); }
 };
 on('change:repeating_blood:bl_damage-blood-magic change:repeating_blood:bl_blood-magic-active remove:repeating_blood', fn( ocBlood));
 
@@ -14123,13 +14085,11 @@ on("change:repeating_inventory:inv_carried1 change:repeating_inventory:inv_carri
       case "carried1" : vals[ pre+"Carried2" ]=0; vals[ pre+"Carried3" ]=0;break;
       case "carried2" : vals[ pre+"Carried1" ]=0; vals[ pre+"Carried3" ]=0;break;
       case "carried3" : vals[ pre+"Carried1" ]=0; vals[ pre+"Carried2" ]=0;break;
-      default: log("EarthDawn Mutual Exclusion between inventory containers failed");  vals[ pre+"Carried1" ]=0; vals[ pre+"Carried2" ]=0;vals[ pre+"Carried2" ]=3;
+      default: errlog( "Earthdawn Mutual Exclusion between inventory containers failed");  vals[ pre+"Carried1" ]=0; vals[ pre+"Carried2" ]=0;vals[ pre+"Carried2" ]=3;
     };
     setAttrsLog(vals, {silent:true});
   });
-  } catch(err) {
-    log("Earthdawn:ocCarried() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));
-  }
+  } catch( err ) { errlog( "Earthdawn:ocCarried() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo) ); }
 })); //End ocCarried
 
 
@@ -14143,9 +14103,7 @@ var UpdateCarried = function fnUpdateCarried() {
 
     setAttrsLog({ "Carrying-Carried": val });
   });
-  } catch(err) {
-    log("Earthdawn:UpdateCarried() error caught: " + err);
-  }
+  } catch( err ) { errlog( "Earthdawn:UpdateCarried() error caught: " + err ); }
 };
 on(" change:weight-supply change:weight-gear change:cont1-weight change:cont2-weight change:cont2-weight  change:cont1-carried change:cont2-carried change:cont3-carried change:weight-coin", fn(UpdateCarried) );
 
@@ -14193,7 +14151,7 @@ var repEquipped = function fnrepEquipped( eventInfo ) {
         vals={"Armor-Phys":0 ,"Armor-Myst" : 0, "Armor-IP":0 , "Shield-Phys":0, "Shield-Myst":0, "Shield-IP":0}, //If we don't find any better values, we will reset
         nb=[0,0,0,0], // [nb shield, nb shield equipped, nb armor, nb full armor equipped
         n=0;
-        // log("eq " + eq + " pre3 "+ pre3);
+        //log("eq " + eq + " pre3 "+ pre3);
 
 
         for(let i=0; i < idarray.length; i++){
@@ -14236,7 +14194,7 @@ var repEquipped = function fnrepEquipped( eventInfo ) {
 
         if(eq==2){ //Finally deal with initialization of a new line...
           if((!p && n==0 ) || (p && nb[3]==0)      ){ //there is no line equipped, equip
-            // log("equipping because first time")
+            //log("equipping because first time")
             vals[pre+"Type_max"]="1";
             eq=1;
           }
@@ -14258,9 +14216,6 @@ var repEquipped = function fnrepEquipped( eventInfo ) {
         }
 
 
-        //log("Shield-Name " +vals["Shield-Name"]);
-
-        // log("vals " + JSON.stringify(vals));
         setAttrsLog( vals,null,function() {
         updateIP();
         updatePD();
@@ -14270,7 +14225,7 @@ var repEquipped = function fnrepEquipped( eventInfo ) {
       });
       });
     });
-  } catch(err) {log("Earthdawn:repEquipped() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));}
+  } catch( err ) { errlog( "Earthdawn:repEquipped() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo) ); }
 }; // End repEquipped
 on("change:repeating_armor:arm_piece change:repeating_armor:arm_type change:repeating_armor:arm_type_max change:repeating_armor:arm_phys change:repeating_armor:arm_phys-adjust change:repeating_armor:arm_myst change:repeating_armor:arm_myst-adjust change:repeating_armor:arm_ip change:repeating_armor:arm_name remove:repeating_armor", fn(repEquipped) );
 
@@ -14293,9 +14248,7 @@ var updateCarry = function fnUpdateCarry() {
     if( carry != values[ "Carrying-Capacity" ])
     setAttrsLog({ "Carrying-Capacity": carry });
   });
-  } catch(err) {
-    log("Earthdawn:updateCarry() error caught: " + err);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateCarry() error caught: " + err ); }
 }; // End updateCarry()
 on("change:misc-carry-adjust", fn(updateCarry) );
 
@@ -14312,9 +14265,7 @@ var calcED3Death = function fnCalcED3Death(value) { // function used to calculat
   } else {
     return 4 + calcED3Death( value-3 );
   }
-  } catch(err) {
-    log("Earthdawn:calcED3Death() error caught: " + err);
-  }
+  } catch( err ) { errlog( "Earthdawn:calcED3Death() error caught: " + err ); }
 }; // End calcED3Death()
 
 
@@ -14397,14 +14348,14 @@ var updateHealth = function fnUpdateHealth(eventInfo,cb) {
         if( Object.keys(backfill).length == 0 )  vals[ "Recovery-Tests_max" ] = val;
         else if(backfill[ "recovery-tests_max" ]) vals["Recovery-Tests-Misc-Adjust"] = getInt( values, "Recovery-Tests-Misc-Adjust") - val + getInt(values,"Recovery-Tests_max" );
       }
+      vals["Wounds_max"]=8; //Make sure it is still with this value in order to make sure the bar doesn't disappear
+
 
       setAttrsLog( vals ,function(){
         if(cb) cb();
       });
     });
-  } catch(err) {
-    log("Earthdawn:updateHealth() error caught: " + err);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateHealth() error caught: " + err ); }
 }; // End updateHealth()
 on("change:working-durability change:damage-unconscious-adjust change:damage-unconscious-buff change:damage-death-rating-adjust change:damage-death-rating-buff change:damage-blood change:wound-threshold-adjust change:wound-threshold-buff change:recovery-tests-misc-adjust change:recovery-tests-auto-adjust", fn(updateHealth) );
 on("change:recovery-tests_max change:wound-threshold change:damage-death-rating change:damage-unc-rating", fn(updateHealth) );
@@ -14414,7 +14365,7 @@ on("change:recovery-tests_max change:wound-threshold change:damage-death-rating 
 var updateKnockdown = function fnUpdateKnockdown(eventInfo,cb) {
   'use strict';
   try{
-  // log ( "EarthDawn : updateInitiative() ");
+  //log( "EarthDawn : updateInitiative() ");
   getAttrs([ "Str-Step", "Knockdown-Adjust", "Knockdown" , "Knockdown-addSR" , "SrRating"], function gaUpdateKnockdown(values) {
     'use strict';
     logvalues( values);
@@ -14433,9 +14384,7 @@ var updateKnockdown = function fnUpdateKnockdown(eventInfo,cb) {
       if(cb) cb();
     });
   });
-  } catch(err) {
-    log("Earthdawn:updateKnockdown() error caught: " + err);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateKnockdown() error caught: " + err ); }
 }; // End updateKnockdown()
 on("change:str-step change:knockdown-adjust", fn(updateKnockdown) );
 on("change:knockdown change:knockdown-addsr" , fn(updateKnockdown) );
@@ -14445,7 +14394,7 @@ on("change:knockdown change:knockdown-addsr" , fn(updateKnockdown) );
 var updateInitiative = function fnUpdateInitiative(eventInfo,cb) {
   'use strict';
   try{
-  // log ( "EarthDawn : updateInitiative() ");
+  //log( "EarthDawn : updateInitiative() ");
   getAttrs([ "Initiative", "Initiative-Step", "Initiative-addSR","SrRating", "Initiative-Mod-Auto", "Dex-Step", "Dex-Mods", "Adjust-Effect-Tests-Total", "Initiative-Adjust","Initiative-Auto-Adjust", "Initiative-Mods", "IP", "Creature-Ambushing_max", "Creature-Ambushing" ], function gaUpdateInitiative(values) {
     'use strict';
     logvalues( values);
@@ -14473,9 +14422,7 @@ var updateInitiative = function fnUpdateInitiative(eventInfo,cb) {
       if(cb) cb();
     });
   });
-  } catch(err) {
-    log("Earthdawn:updateInitiative() error caught: " + err);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateInitiative() error caught: " + err ); }
 }; // End updateInitiative()
 on("change:dex-step change:adjust-effect-tests-total change:initiative-adjust change:initiative-auto-adjust change:initiative-mods change:dex-mods change:ip change:creature-ambushing_max change:creature-ambushing", fn(updateInitiative) );
 on("change:initiative-step change:initiative-addsr" , fn(updateInitiative) );
@@ -14484,7 +14431,7 @@ on("change:initiative-step change:initiative-addsr" , fn(updateInitiative) );
 var updateIP = function fnUpdateIP() {
   'use strict';
   try{
-  // log ( "EarthDawn : updateIP() ");
+  //log( "EarthDawn : updateIP() ");
   getAttrs([ "Armor-IP", "Shield-IP", "Misc-IP-Mod", "Misc-IP-Adjust" ], function gaUpdateIP(values) { //, "condition-NoShield"
     'use strict';
     logvalues( values);
@@ -14492,9 +14439,7 @@ var updateIP = function fnUpdateIP() {
     + getInt( values, "Misc-IP-Mod") + getInt( values, "Misc-IP-Adjust");
     setAttrsLog({ "IP": val });
   });
-  } catch(err) {
-    log("Earthdawn:updateIP() error caught: " + err);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateIP() error caught: " + err ); }
 };  //end updateIP
 on("change:armor-ip change:shield-ip change:misc-ip-mod change:misc-ip-adjust ", fn(updateIP) ); //change:condition-noshield
 
@@ -14513,7 +14458,7 @@ var updateKarma = function fnUpdateKarma(eventInfo,cb) {
     let currval= getInt(values,"Karma_max");
     // if ( getEdition( values ) == 4 && getInt( values, "Karma-Modifier" ) != 0) {     // NB : Prior to 4th edition, Karma depends on Karmic Ritual rank, so is entered manually in those versions of the sheet.   Also, if karma modifier is zero (because race is not selected or is "Other", don't set anything since for Dragons we directly enter values we don't want overwritten.
     let val = ((getInt( values, "Karma-Modifier")+getInt( values, "Karma-Modifier-Adjust")) * getInt( values, "working-Circle")) + getInt( values, "Misc-Karma-max-Adjust")  + getInt( values, "Attrib-Karma-Orig") ;
-    //log ( "currval " + currval + " val "+ val + val)
+    //log( "currval " + currval + " val "+ val + val)
     if( val < 0 )
     val = 0;
     if( !backfill && val != currval) //Normal case, we want to adjust Karma_max
@@ -14526,9 +14471,7 @@ var updateKarma = function fnUpdateKarma(eventInfo,cb) {
     });
 
   });
-  } catch(err) {
-    log("Earthdawn:updateKarma() error caught: " + err);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateKarma() error caught: " + err ); }
 }; // End updateKarma()
 on("change:karma_max change:karma-modifier change:karma-modifier-adjust change:working-circle change:misc-karma-max-adjust change:attrib-karma-orig ", fn(updateKarma) );
 //Race : via Karma-Modifier -- edition : No Trigger: In editions different than 4 Karma is readonly
@@ -14540,7 +14483,7 @@ on("change:karma_max change:karma-modifier change:karma-modifier-adjust change:w
 var updateLpStatus = function fnUpdateLpStatus() {
   'use strict';
   try{
-  // log ( "EarthDawn : updateLpStatus() ");
+  //log( "EarthDawn : updateLpStatus() ");
   getAttrs([ "LP-Total", "LP-Status" , "LP-Reputation"], function gaUpdateLpStatus(values) {
     'use strict';
     logvalues( values);
@@ -14557,9 +14500,7 @@ var updateLpStatus = function fnUpdateLpStatus() {
     if( vals[ "LP-Status" ] != values[ "LP-Status" ] || vals[ "LP-Reputation" ] != values[ "LP-Reputation" ])
     setAttrsLog( vals );
   });
-  } catch(err) {
-    log("Earthdawn:updateLPStatus() error caught: " + err);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateLPStatus() error caught: " + err ); }
 };//end updateLPStatus
 on("change:lp-total", fn(updateLpStatus) );
 
@@ -14568,7 +14509,7 @@ on("change:lp-total", fn(updateLpStatus) );
 var updateMaBase = function fnupdateMaBase(eventInfo,cb) {
   'use strict';
   try{
-   //log ( "EarthDawn : updateMaBase() ");
+   //log( "EarthDawn : updateMaBase() ");
   getAttrs([ "Attrib-Wil-Curr", "MA-Base", "edition" ], function gaupdateMaBase(values) {
     'use strict';
     logvalues( values);
@@ -14584,9 +14525,7 @@ var updateMaBase = function fnupdateMaBase(eventInfo,cb) {
         updateDefenseNatural("armor-myst",cb);
       });
   });
-  } catch(err) {
-    log("Earthdawn:updateMaBase() error caught: " + err);
-  }
+  } catch( err ) { errlog( "Earthdawn:updateMaBase() error caught: " + err ); }
 }; // End updateMA()
 
 
@@ -14601,7 +14540,7 @@ var calcED3Defense = function fnCalcED3Defense(value) { // function used to calc
   } else {
     return 3 + calcED3Defense( value-7 );
   };
-  } catch(err) {log("Earthdawn:calcED3Defense() error caught: " + err);}
+  } catch( err ) { errlog( "Earthdawn:calcED3Defense() error caught: " + err ); }
 }; // End calcED3Defense()
 
 
@@ -14609,7 +14548,7 @@ var calcED3Defense = function fnCalcED3Defense(value) { // function used to calc
 var updateMD = function fnUpdateMD() {
   'use strict';
   try{
-  // log ( "EarthDawn : updateMD() ");
+  //log( "EarthDawn : updateMD() ");
   getAttrs([ "MD-Nat", "MD-Buff", "Defense-Myst-Adjust", "Shield-Myst", "Shield-Myst-Buff", "condition-Blindsided",  "Adjust-Defenses-Total", "edition", "MD" ], function gaUpdateMD(values) { //"condition-NoShield",
     'use strict';
     logvalues( values);
@@ -14622,12 +14561,12 @@ var updateMD = function fnUpdateMD() {
       valauto += shield;
     };
     let valunmod= val - valauto - getInt(values, "MD-Buff");
-    vals[ "MD" ]=val;
+    vals[ "MD" ]=Math.max(2,val);
     vals[ "MD-Mod-Auto" ]=valauto;
     vals[ "MD-UnMod" ]=valunmod;
     setAttrsLog(vals);
   });
-  } catch(err) {log("Earthdawn:updateMD() error caught: " + err);}
+  } catch( err ) { errlog( "Earthdawn:updateMD() error caught: " + err ); }
 }; // End updateMD()
 on("change:md-nat change:defense-myst-adjust change:md-buff change:shield-myst change:shield-myst-buff ", fn(updateMD) ); //change:condition-noshield
 //edition via recalc, Adjust-Defenses-Total via md-nat
@@ -14637,7 +14576,7 @@ on("change:md-nat change:defense-myst-adjust change:md-buff change:shield-myst c
 var updateMovement = function fnUpdateMovement() {
   'use strict';
   try{
-  // log ( "EarthDawn : updateMovement() ");
+  //log( "EarthDawn : updateMovement() ");
   getAttrs([  "Fly-Movement", "Fly-Movement-Race", "Misc-Fly-Movement-Adjust", "Movement", "Movement-Race", "Misc-Movement-Adjust", "Movement-Buff", "condition-ImpairedMovement",
   "condition-KnockedDown" ], function gaUpdateMovement(values) {
     'use strict';
@@ -14665,7 +14604,7 @@ var updateMovement = function fnUpdateMovement() {
     vals[ "Fly-Movement-Base" ] = fbase;
     setAttrsLog( vals );
   });
-  } catch(err) {log("Earthdawn:updateMovement() error caught: " + err);}
+  } catch( err ) { errlog( "Earthdawn:updateMovement() error caught: " + err ); }
 };  //end updateMovement
 on("change:fly-movement-race change:misc-fly-movement-adjust change:movement-race change:misc-movement-adjust change:movement-buff change:condition-impairedmovement change:condition-knockeddown", fn(updateMovement) );
 
@@ -14674,7 +14613,7 @@ on("change:fly-movement-race change:misc-fly-movement-adjust change:movement-rac
 var updateMysticArmor = function fnUpdateMysticArmor() {
   'use strict';
   try{
-  // log ( "EarthDawn : updateMysticArmor() ");
+  //log( "EarthDawn : updateMysticArmor() ");
   getAttrs([ "Armor-Myst", "MA-Buff", "Armor-Myst-Adjust", "MA-Nat", "condition-Blindsided", "Shield-Myst", "edition" , "Mystic-Armor", "Shield-Myst-Buff"], function gaUpdateMysticArmor(values) { //, "condition-NoShield"
     'use strict';
     logvalues( values);
@@ -14685,7 +14624,7 @@ var updateMysticArmor = function fnUpdateMysticArmor() {
     if( val != values[ "Mystic-Armor" ])
     setAttrsLog({ "Mystic-Armor": val });
   });
-  } catch(err) {log("Earthdawn:updateMysticArmor() error caught: " + err);}
+  } catch( err ) { errlog( "Earthdawn:updateMysticArmor() error caught: " + err ); }
 }; // End updateMysticArmor()
 on("change:armor-myst change:ma-buff change:armor-myst-adjust change:ma-nat change:condition-blindsided change:shield-myst change:shield-myst-buff", fn(updateMysticArmor) ); // change:condition-noshield
 //edition in recalc
@@ -14695,7 +14634,7 @@ on("change:armor-myst change:ma-buff change:armor-myst-adjust change:ma-nat chan
 var updateDefensebase = function fnUpdateDefensebase( attr, def,cb) {
   'use strict';
   try{
-   //log ( "EarthDawn : updateDefensebase( " + attr + " , " + def + " )");
+   //log( "EarthDawn : updateDefensebase( " + attr + " , " + def + " )");
   let attrib = "Attrib-" + attr + "-Curr",
   defense = def + "-Base";
   let vals = {};
@@ -14714,7 +14653,7 @@ var updateDefensebase = function fnUpdateDefensebase( attr, def,cb) {
         updateDefenseNatural(def,cb);
       });
   });
-} catch(err) {log("Earthdawn:updateDefensebase() error caught: " + err + " attr: "+attr + " def: "+def);}
+} catch( err ) { errlog( "Earthdawn:updateDefensebase() error caught: " + err + " attr: "+attr + " def: "+def ); }
 }; // End updateDefensebase()
 //Directly triggered in UpdateCurr
 
@@ -14728,7 +14667,7 @@ var updateDefenseNatural = function fnUpdateDefenseNatural( eventInfo , cb) {
   try{
     let att =getAttrib(eventInfo).toLowerCase();
     let vals = {};
-     //log ( "EarthDawn : updateDefenseNatural( " + att + " )");
+     //log( "EarthDawn : updateDefenseNatural( " + att + " )");
     let att2, att3, att4, att5,backfill, defAdjust = 0;
     if(safeString( att ).endsWith("-nat")) { //This is a potentially a backfill
       if(eventInfo && !_.isString(eventInfo) && eventInfo.sourceType=="player") backfill=true;
@@ -14747,7 +14686,7 @@ var updateDefenseNatural = function fnUpdateDefenseNatural( eventInfo , cb) {
       case "pa":      att3 = "PA";    att4 = "Armor-Phys-Nat-Adjust";   att5 = "Armor-Phys-Nat-Auto-Adjust";            break;
       case "ma":      att3 = "MA";    att4 = "Armor-Myst-Nat-Adjust";   att5 = "Armor-Myst-Nat-Auto-Adjust";            break;
       default:
-      log("Earthdawn sheetworker error, updateDefenseNatural found " + att );
+      errlog( "Earthdawn sheetworker error, updateDefenseNatural found " + att );
       return;
     }
     // There is no PA-Base, but this should default gracefully.
@@ -14766,11 +14705,11 @@ var updateDefenseNatural = function fnUpdateDefenseNatural( eventInfo , cb) {
         else vals[ att4 ] = getInt(values, att4 ) + getInt(values, att3 + "-Nat") - val;
       }
       setAttrsLog( vals, null , function(){
-      //  log ( "EarthDawn : updateDefenseNatural( " + att + " )" + " returning " +JSON.stringify(vals));
+      //log( "EarthDawn : updateDefenseNatural( " + att + " )" + " returning " +JSON.stringify(vals));
         if(cb) cb();
       });
     });
-  } catch(err) {log("Earthdawn:updateDefenseNatural() error caught: " + err + " aeventInfottr: "+JSON.stringify(eventInfo));}
+  } catch( err ) { errlog( "Earthdawn:updateDefenseNatural() error caught: " + err + " aeventInfottr: "+JSON.stringify(eventInfo) ); }
 }; // End updateDefenseNatural()
 
 on("change:pd-base change:md-base change:sd-base change:defense-phys-nat-adjust change:defense-myst-nat-adjust change:defense-soc-nat-adjust change:armor-phys-nat-adjust change:armor-myst-nat-adjust change:defense-phys-nat-auto-adjust change:defense-myst-nat-auto-adjust change:defense-soc-nat-auto-adjust change:ma-base change:armor-phys-nat-auto-adjust change:armor-myst-nat-auto-adjust", fn(updateDefenseNatural) );
@@ -14787,7 +14726,7 @@ on("change:pd-nat-addsr change:md-nat-addsr change:sd-nat-addsr change:pa-nat-ad
 var updatePD = function fnUpdatePD() {
   'use strict';
   try{
-  // log ( "EarthDawn : updatePD() ");
+  //log( "EarthDawn : updatePD() ");
   getAttrs([ "PD-Nat", "PD-Buff","Adjust-Defenses-Total", "Defense-Phys-Adjust", "Shield-Phys", "Shield-Phys-Buff", "condition-Blindsided",  "edition", "PD" ], function gaUpdatePD(values) { //"condition-NoShield",
     'use strict';
     logvalues( values);
@@ -14800,12 +14739,12 @@ var updatePD = function fnUpdatePD() {
       valauto+=shield;
     };
     let valunmod= val - valauto - getInt (values, "PD-Buff");
-    vals[ "PD" ] =val;
+    vals[ "PD" ] =Math.max(2,val);
     vals[ "PD-Mod-Auto" ]=valauto;
     vals[ "PD-UnMod" ]=valunmod;
     setAttrsLog(vals);
   });
-  } catch(err) {log("Earthdawn:updatePD() error caught: " + err);}
+  } catch( err ) { errlog( "Earthdawn:updatePD() error caught: " + err ); }
 }; // End updatePD()
 on("change:pd-nat change:pd-buff change:defense-phys-adjust change:shield-phys change:shield-phys-buff change:condition-blindsided ", fn(updatePD) ); //change:condition-noshield
 //edition is in recalc. Adjust-Defenses-Total changes the PD-Nat
@@ -14815,7 +14754,7 @@ on("change:pd-nat change:pd-buff change:defense-phys-adjust change:shield-phys c
 var updatePhysicalArmor = function fnUpdatePhysicalArmor() {
   'use strict';
   try{
-  // log ( "EarthDawn : updatePhysicalArmor() ");
+  //log( "EarthDawn : updatePhysicalArmor() ");
   getAttrs([ "Armor-Phys", "PA-Buff", "Armor-Phys-Adjust", "PA-Nat", "condition-Blindsided", "Shield-Phys", "Shield-Phys-Buff", "edition", "Physical-Armor" ], function gaUpdatePhysicalArmor(values) { //, "condition-NoShield"
     'use strict';
     logvalues( values);
@@ -14825,7 +14764,7 @@ var updatePhysicalArmor = function fnUpdatePhysicalArmor() {
     if( val != values[ "Physical-Armor" ])
     setAttrsLog({ "Physical-Armor": val });
   });
-  } catch(err) {log("Earthdawn:updatePhysicalArmor() error caught: " + err);}
+  } catch( err ) { errlog( "Earthdawn:updatePhysicalArmor() error caught: " + err ); }
 }; // End updatePhysicalArmor()
 on("change:armor-phys change:pa-buff change:armor-phys-adjust change:pa-nat change:condition-blindsided change:shield-phys change:shield-phys-buff", fn(updatePhysicalArmor) ); //change:condition-noshield
 //edition is in recalc
@@ -14858,13 +14797,13 @@ var updateRace = function fnUpdateRace(eventInfo,data,cb) { // Race based modifi
       //singleAttr was useful for an unknown roll20 bug, but it doesn't seem to happen in this function. Left as a backup
       function singleAttr( key, val) {
         //let vals={};
-        // log("setting key " + key + " to  " + val);
+        //log("setting key " + key + " to  " + val);
         vals[ key ] = val;
         //setAttrsLog( vals );
       }
 
       //due to the new format of races in v3 of the sheet we don't want updaterace to trigger before updateCharacterSheet has completed
-      if(parseFloat( values[ "edition_max" ]) <3) {log("Earthdawn - updateRace inhibited because older sheet version");return;}
+      if(parseFloat( values[ "edition_max" ]) <3) { errlog("Earthdawn - updateRace inhibited because older sheet version"); return; }
 
       if(_.isString(eventInfo)){
         if(data && data!=="" && data!=={}) {trigger="compendium"; race=eventInfo; vals["Race"]=race;}
@@ -14896,7 +14835,7 @@ var updateRace = function fnUpdateRace(eventInfo,data,cb) { // Race based modifi
           }
           // else {
           //   //if(race!=="" && race!=="Creature" && race!=="Spirit")
-          //   log("Earthdawn-updateRace :No match in Compendium for " + race + " Using local database");
+          //   errlog( "Earthdawn-updateRace :No match in Compendium for " + race + " Using local database");
           // }
 
           if(values["NPC"]=="-1"){ //Objects : reset everything
@@ -14992,7 +14931,7 @@ var updateRace = function fnUpdateRace(eventInfo,data,cb) { // Race based modifi
         });
       });
     });
-  } catch(err) {log("Earthdawn:updateRace() error caught: " + err);}
+  } catch( err ) { errlog( "Earthdawn:updateRace() error caught: " + err ); }
 }; // End on updateRace()
 on("change:race change:npc", fn(updateRace) );
 
@@ -15001,7 +14940,7 @@ on("change:race change:npc", fn(updateRace) );
 var updateRecovery = function fnUpdateRecovery(eventInfo,cb) {
   'use strict';
   try{
-  // log ( "EarthDawn : updateRecovery() ");
+  //log( "EarthDawn : updateRecovery() ");
   getAttrs([ "Recovery-Step", "Tou-Step","Tou-Mods","Adjust-Effect-Tests-Total", "Recovery-Adjust", "Recovery-Buff", "Wounds", "Creature-Fury", "Total-ResistPain"  ], function gaUpdateRecovery(values) {
     'use strict';
     logvalues( values);
@@ -15013,7 +14952,7 @@ var updateRecovery = function fnUpdateRecovery(eventInfo,cb) {
       if(cb) cb();
     });
   });
-} catch(err) {log("Earthdawn:updateRecovery() error caught: " + err);}
+} catch( err ) { errlog( "Earthdawn:updateRecovery() error caught: " + err ); }
 }; // End updateRecovery()
 on("change:tou-effect change:recovery-adjust change:recovery-buff", fn(updateRecovery) );
 //on("change:adjust-all-tests-auto change:adjust-all-tests-misc change:adjust-effect-tests-auto change:adjust-effect-tests-misc change:combatoption-tailattack", fn(function ocConAdjustAllTestsMisc() {
@@ -15026,7 +14965,7 @@ on("change:tou-effect change:recovery-adjust change:recovery-buff", fn(updateRec
 var updateSD = function fnUpdateSD() {
   'use strict';
   try{
-  // log ( "EarthDawn : updateSD() ");
+  //log( "EarthDawn : updateSD() ");
   getAttrs([ "SD-Nat","Defense-Soc-Adjust", "SD-Buff", "SD" ], function gaUpdateSD(values) {
     'use strict';
     logvalues( values);
@@ -15036,7 +14975,7 @@ var updateSD = function fnUpdateSD() {
     if( val != values[ "SD" ])
     setAttrsLog({ "SD": val });
   });
-} catch(err) {log("Earthdawn:updateSD() error caught: " + err);}
+} catch( err ) { errlog( "Earthdawn:updateSD() error caught: " + err ); }
 }; // End updateSD()
 on("change:sd-nat change:defense-soc-adjust change:sd-buff", fn(updateSD) );
 
@@ -15068,7 +15007,7 @@ var updateWeightCoin = function fnUpdateWeightCoin() {
     if( Object.keys(vals).length > 0)
     setAttrsLog( vals );
   });
-  } catch(err) {log("Earthdawn:updateWeightCoin() error caught: " + err);}
+  } catch( err ) { errlog( "Earthdawn:updateWeightCoin() error caught: " + err ); }
 };
 on("change:wealth_gold change:wealth_silver change:wealth_copper", fn(updateWeightCoin) );
 
@@ -15092,7 +15031,7 @@ var updateWeightSupply = function fnUpdateWeightSupply() {
     if( val != values[ "Weight-Supply" ])
     setAttrsLog({ "Weight-Supply": val });
   });
-  } catch(err) {log("Earthdawn:updateWeightSupply() error caught: " + err);}
+  } catch( err ) { errlog( "Earthdawn:updateWeightSupply() error caught: " + err ); }
 };  // end updateWeightSupply
 on("change:healing_booster change:healing_healing change:healing_last_chance change:healing_closure change:healing_kit change:healing_physician_kit change:gear_rations_trail change:gear_rations_mine", fn(updateWeightSupply) );
 
@@ -15102,7 +15041,7 @@ var updateTalentSummary = function fnupdateTalentSummary() {
   'use strict';
   try{
     var attarray = ["uatta","edition"];
-    // log ( "EarthDawn : updateTalentSummary() ");
+    //log( "EarthDawn : updateTalentSummary() ");
     getSectionIDs("repeating_matrix", function gsIdRepeatingMatrix(marray) {
       for( let i = 0; i < marray.length; i++) {
         attarray.push( buildPre( "SPM", marray[ i ] ) + "Rank");
@@ -15157,9 +15096,6 @@ var updateTalentSummary = function fnupdateTalentSummary() {
 
             var artype = _.groupBy( arr, "type");       // Now artype is an object whose named properties are objects (groups) that contain arrays of objects.
             // var artype2 = _.sortBy( artype, x => x[0].type);  // artype2 is an array of arrays of objects.
-
-            // log("artype " + JSON.stringify(artype));
-            // log("artype2 " + JSON.stringify(artype2));
 
             if(vrnk>0 || (artype["V"])){
               let vnb=(artype["V"] ? artype["V"].length : 0);
@@ -15280,7 +15216,7 @@ var updateTalentSummary = function fnupdateTalentSummary() {
       });
     });
   });
-  } catch(err) {log("Earthdawn:updateTalentSummary() error caught: " + err);}
+  } catch( err ) { errlog( "Earthdawn:updateTalentSummary() error caught: " + err ); }
 }; // End updateTalentSummary()
 on("change:uatta change:repeating_discipline change:repeating_matrix:spm_rank change:repeating_matrix:spm_origin change:repeating_talents:t_rank change:repeating_talents:t_type change:repeating_talents:t_typeother remove:repeating_talents remove:repeating_matrix", fn(updateTalentSummary) );
 
@@ -15302,7 +15238,7 @@ var CoSplitMovement = function fnCoSplitMovement() {
     harr = Math.max( harr, 0);
     setAttrsLog({ "condition-Harried": harr });
   });
-} catch(err) {log("Earthdawn:CoSplitMovement() error caught: " + err);}
+} catch( err ) { errlog( "Earthdawn:CoSplitMovement() error caught: " + err ); }
 };
 on("change:combatoption-splitmovement", fn(CoSplitMovement) );
 
@@ -15315,7 +15251,7 @@ on("change:combatoption-splitmovement", fn(CoSplitMovement) );
 var updateDurability = function fnupdateDurability(eventInfo,cb) {
   'use strict';
   try{
-    //log ( "EarthDawn : updateDurability() " + JSON.stringify(eventInfo));
+    //log( "EarthDawn : updateDurability() " + JSON.stringify(eventInfo));
   // Go through all the discipline ranks and calculate durability.
   getSectionIDs("repeating_discipline", function gsIdRepeatingDiscipline(darray) {
     let i;
@@ -15396,7 +15332,7 @@ var updateDurability = function fnupdateDurability(eventInfo,cb) {
         res2.sort();
         if( res2.length > 0 )   // Now do Durability Rank Adjust for whatever discipline has the highest rank.
         dur += getInt( values, "Durability-Rating-Adjust") * parseInt2( res2[ res2.length -1 ].slice(4));
-         // console.log( "Durability: " + dur + " Circle: " + cir);
+         // errlog( "Durability: " + dur + " Circle: " + cir);
        } //end Namegiver case
        else { //Creature Case
 
@@ -15417,7 +15353,7 @@ var updateDurability = function fnupdateDurability(eventInfo,cb) {
       });
     });
   });
-} catch(err) {log("Earthdawn:updateDurability() error caught: " + err);}
+} catch( err ) { errlog( "Earthdawn:updateDurability() error caught: " + err ); }
 }; // End updateDurability
 on("change:working-durability change:repeating_discipline change:durability-rating-adjust change:srrating change:creature-durability change:isnamegiver", fn(updateDurability) );
 
@@ -15429,7 +15365,7 @@ on("change:working-durability change:repeating_discipline change:durability-rati
 var UpdateLinkValue = function fnUpdateLinkValue( linkOutList ) {
   'use strict';
   try {
-      // log("Earthdawn UpdateLinkValue " + JSON.stringify(linkOutList));
+      // errlog( "Earthdawn UpdateLinkValue " + JSON.stringify(linkOutList));
     let linkout,
         code, rowid,
         linkOutArray = [];
@@ -15453,10 +15389,10 @@ var UpdateLinkValue = function fnUpdateLinkValue( linkOutList ) {
         // case "SKA":
         // case "SKL":
         // case "TI":
-        default: log("Earthdawn : Error in UpdateLinkValue : Not a Valid Link " + linkout);
+        default: errlog( "Earthdawn : Error in UpdateLinkValue : Not a Valid Link " + linkout);
       };
     };
-  } catch(err) {log("Earthdawn:UpdateLinkValue() error caught: " + err + " linkOutList: "+ linkOutList);}
+  } catch( err ) { errlog( "Earthdawn:UpdateLinkValue() error caught: " + err + " linkOutList: "+ linkOutList ); }
 };//end UpdateLinkValue
 
 
@@ -15549,7 +15485,7 @@ var repRanks = function fnrepRanks( eventInfo ,code, sil) {
         });
       });
     });
-  } catch(err) {log("Earthdawn:repRanks() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));}
+  } catch( err ) { errlog( "Earthdawn:repRanks() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo) ); }
 }; // End repRanks
 on("change:repeating_talents:t_rank change:repeating_talents:t_rank-adjust change:repeating_talents:t_special change:repeating_talents:t_linksgetvalue change:repeating_talents:t_linksprovidevalue change:repeating_talents:t_addsr", fn(repRanks) );
 on("change:repeating_weapons:wpn_rank change:repeating_weapons:wpn_rank-adjust change:repeating_weapons:wpn_special change:repeating_weapons:wpn_linksgetvalue change:repeating_weapons:wpn_linksprovidevalue change:repeating_weapons:wpn_addsr", fn(repRanks) );
@@ -15609,7 +15545,7 @@ var repTType = function fnrepTType( eventInfo) {
 
       setAttrsLog(vals);
     });
-  } catch(err) {log("Earthdawn:repTType() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));}
+  } catch( err ) { errlog( "Earthdawn:repTType() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo) ); }
 }; // End repTType
 on("change:repeating_talents:t_type", fn(repTType) );
 
@@ -15632,7 +15568,7 @@ var ocSrRating = function fnocSrRating() {
   getSectionIDs("repeating_weapons", function gsIdocSrRating(tarray) {
     for( let i = 0; i < tarray.length; i++) repRanks(tarray[i],"WPN")
 });
-} catch(err) {log("Earthdawn:ocSrRating() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:ocSrRating() error caught: " + err  ); }
 }; // End ocSrRating
 on("change:srrating", fn(ocSrRating) );
 
@@ -15647,7 +15583,7 @@ var repThreadRanks = function fnrepThreadRanks( eventInfo) {
   //after this line, because eventInfo is either a roll20 eventInfo, or a fullname string substitute, we know for a fact that we have att in the full name format
   let code = repeatSection(3,att);
   let rowid = repeatSection(2,att);
-  if(rowid && rowid.length<4) log("Earthdawn - repThreadRanks incorrect rowid for eventInfo: " +JSON.stringify(eventInfo));
+  if(rowid && rowid.length<4) errlog( "Earthdawn - repThreadRanks incorrect rowid for eventInfo: " +JSON.stringify(eventInfo));
   let pre = buildPre(code,rowid);
   let strlo = pre + "LinksProvideValueList";
   getAttrs([strlo], function gaRepThreadRank(values) {
@@ -15656,7 +15592,7 @@ var repThreadRanks = function fnrepThreadRanks( eventInfo) {
     var linkOutList= values[strlo];
     if( linkOutList.length > 2 ) UpdateLinkValue( linkOutList );
   });
-} catch(err) {log("Earthdawn:repThreadRanks() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));}
+} catch( err ) { errlog( "Earthdawn:repThreadRanks() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo) ); }
 }; // End repThreadRanks
 on("change:repeating_threads:ti_rank", fn(repThreadRanks) );
 
@@ -15673,7 +15609,7 @@ on("change:repeating_threads:ti_rank", fn(repThreadRanks) );
 //   //after this line, because eventInfo is either a roll20 eventInfo, or a fullname string substitute, we know for a fact that we have att in the full name format
 //   let code = repeatSection(3,att);
 //   let rowid = repeatSection(2,att);
-//   if(rowid && rowid.length<4) log("Earthdawn - repStrain incorrect rowid for eventInfo: " +JSON.stringify(eventInfo));
+//   if(rowid && rowid.length<4) errlog( "Earthdawn - repStrain incorrect rowid for eventInfo: " +JSON.stringify(eventInfo));
 //   let pre = buildPre(code,rowid);
 //   let strs = pre + "Strain",
 //   strsm = pre + "Strain_max",
@@ -15701,7 +15637,7 @@ on("change:repeating_threads:ti_rank", fn(repThreadRanks) );
 //     setAttrsLog(vals);
 //
 //   });
-// } catch(err) {log("Earthdawn:repStrain() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));}
+// } catch( err ) { errlog( "Earthdawn:repStrain() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo) ); }
 // }; // End repThreadRanks
 // on("change:repeating_talents:t_strain change:repeating_talents:t_strainadvanced change:repeating_knacks:nac_strain change:repeating_knacks:nac_strainadvanced change:repeating_skills:sk_strain change:repeating_skills:sk_strainadvanced change:repeating_spell:sp_strain change:repeating_spell:sp_strainadvanced change:repeating_weapons:wpn_strain change:repeating_weapons:wpn_strainadvanced", fn(repStrain) );
 
@@ -15746,7 +15682,7 @@ var repMatrixType = function fnrepMatrixType( eventInfo ) {
       setAttrsLog( vals );
     });
   });
-} catch(err) {log("Earthdawn:repMatrixType() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));}
+} catch( err ) { errlog( "Earthdawn:repMatrixType() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo) ); }
 }; // End repMatrixType
 on("change:repeating_matrix:spm_type change:repeating_matrix:spm_origin change:repeating_matrix:spm_linksgetvaluelist", fn(repMatrixType) );
 // on("change:repeating_matrix", fn(repMatrixType) );
@@ -15784,7 +15720,7 @@ var repDiscipline = function fnrepDiscipline( eventInfo , source, data , cb) {
       'use strict';
       logvalues( values);
 
-      if(parseFloat( values[ "edition_max" ]) <3) {log("Earthdawn - repDiscipline inhibited because older sheet version");return;}
+      if(parseFloat( values[ "edition_max" ]) <3) { errlog( "Earthdawn - repDiscipline inhibited because older sheet version" ); return; }
 
       //log("repDiscipline with name " + nm  +" eventInfo " + JSON.stringify(eventInfo) + " data " + data );
 
@@ -15938,7 +15874,7 @@ var repDiscipline = function fnrepDiscipline( eventInfo , source, data , cb) {
         });
       });
    });
-  } catch(err) {log("Earthdawn:repDiscipline() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));}
+  } catch( err ) { errlog( "Earthdawn:repDiscipline() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo) ); }
 }; // End repDiscipline
 on("change:repeating_discipline:dsp_name change:repeating_discipline:dsp_circle", fn(repDiscipline) );
 
@@ -16001,7 +15937,6 @@ on("change:repeating_discipline:dsp_name change:repeating_discipline:dsp_circle"
 
               if(( values[pre2 + "Type"] &&  values[pre2 + "Type"].includes("Path") ) && (values[pre2 + "BaseDisc"]==values[pre + "Name"] || (!values[pre2 + "BaseDisc"] && primdisc==values[pre+"Name"]))) {//If non initialized Path, take the primary Disciplines
                 if(!values[pre2 + "BaseDisc"]) vals[pre2 + "BaseDisc"]=primdisc; //Initialize BaseDisc to Primary Discipline
-              //  log("processing Path " + values[pre2 + "Name"] + " with data " + values[pre2 + "Name_max"]);
                 ddata2=parseJSON(values[pre2 + "Name_max"]);
                 //process array
                 for(j=0;j<=getInt(values,pre2+"Circle");j++){
@@ -16020,8 +15955,6 @@ on("change:repeating_discipline:dsp_name change:repeating_discipline:dsp_circle"
                     };
                   }
                 }
-            //    log("processing Path " + values[pre2 + "Name"] + " with pd " +pd[2] );
-
               }
             }
             //Copy discipline & path result in the global var
@@ -16082,7 +16015,7 @@ on("change:repeating_discipline:dsp_name change:repeating_discipline:dsp_circle"
       });
     });
   });
-} catch(err) {log("Earthdawn:countDiscipline() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:countDiscipline() error caught: " + err  ); }
 }; // End countDiscipline
 on("change:repeating_discipline remove:repeating_discipline change:custom-karma-ability", fn(countDiscipline) );
 
@@ -16148,7 +16081,7 @@ var repSpellName = function fnrepSpellName( eventInfo ) {
     if( Object.keys(vals).length > 0)
     setAttrsLog( vals );
   });
-} catch(err) {log("Earthdawn:repSpellName() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));}
+} catch( err ) { errlog( "Earthdawn:repSpellName() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo) ); }
 }; // End repSpellName
 on("change:repeating_spell:sp_name change:repeating_spell:sp_circle", fn(repSpellName ) );
 
@@ -16174,7 +16107,7 @@ var repTalentType = function fnrepTalentType( eventInfo ) {
     if( Object.keys(vals).length > 0)
     setAttrsLog( vals );
   });
-} catch(err) {log("Earthdawn:repTalentType() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));}
+} catch( err ) { errlog( "Earthdawn:repTalentType() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo) ); }
 }; // End repSpellName
 on("change:repeating_talents:t_name change:repeating_talent:t_textimport", fn(repTalentType ) );
 
@@ -16200,7 +16133,7 @@ var updateSSWillEffect = function fnupdateSSWillEffect(  ) {
       setAttrsLog( vals );
     });
   });
-} catch(err) {log("Earthdawn:updateSSWillEffect() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:updateSSWillEffect() error caught: " + err  ); }
 }; // End updateSSWillEffect
 on("change:ss-wileffect", fn(updateSSWillEffect) );
 
@@ -16265,7 +16198,7 @@ var repModType = function fnrepModType( eventInfo,code ) {
     if( Object.keys(vals).length > 0)
     setAttrsLog( vals );
   });
-} catch(err) {log("Earthdawn:repModType() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo));}
+} catch( err ) { errlog( "Earthdawn:repModType() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo) ); }
 }; // End repModType
 on("change:repeating_talents:t_mod-type change:repeating_knacks:nac_mod-type change:repeating_skills:sk_mod-type", fn(repModType) );
 on("change:repeating_talents:t_poison-type change:repeating_knacks:nac_poison-type change:repeating_skills:sk_poison-type", fn(repModType) );
@@ -16290,7 +16223,7 @@ on("change:repeating_talents:t_poison-type change:repeating_knacks:nac_poison-ty
 //     setAttrsLog( vals );
 //   }
 //   });
-// } catch(err) {log("Earthdawn:repPoisonType() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo));}
+// } catch( err ) { errlog( "Earthdawn:repPoisonType() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo) ); }
 // }; // End repModType
 // on("change:repeating_talents:t_mod-type change:repeating_knacks:nac_mod-type change:repeating_skills:sk_mod-type", fn(repPoisonType) );
 // on("change:repeating_talents:t_poison-type change:repeating_knacks:nac_poison-type change:repeating_skills:sk_poison-type", fn(repPoisonType) );
@@ -16358,7 +16291,7 @@ case 18:     dice += "d12!+d10!+d8!+";  break;
 }
 } // End 4th edition
 return dice.slice(0,-1);     // Trim off the trailing "+"
-} catch(err) { log( "ED.StepToDice() error caught: " + err); }
+} catch( err ) { errlog(  "ED.StepToDice() error caught: " + err ); }
 };  //   End StepToDice()
 
 
@@ -16390,19 +16323,17 @@ var updateRepStep = function fnupdateRepStep( eventInfo ) {
     // It also scans for all the Special in order to find the maximum Resist Pain
     function doRow( code, rid, values ) {
       try {
-        if( rid && rid.length < 4) log("Earthdawn - updateRepStep-Dorow incorrect rowid : " + rid + "    code: " + code );
+        if( rid && rid.length < 4) errlog( "Earthdawn - updateRepStep-Dorow incorrect rowid : " + rid + "    code: " + code );
         let pre = buildPre( code, rid),
           preWrite = buildPre( code, values[ pre + "RowID" ] || rid),
           def=getInt( values, pre + "Defensive" ),
           dst=(getInt( values, "combatOption-DefensiveStance")==1),
           agg=(getInt( values, "combatOption-AggressiveAttack")==1),
           aggdefmod=0;
-          // log("agg " +agg + " def " + def + " dst " + dst + " DSP " + getInt( values, "Misc-DefStance-Penalty") + " DSB "+ getInt( values, "Misc-DefStance-Bonus") + " AGP " + getInt( values, "Misc-AggStance-Penalty"));
 
           //ResistPain Calculate
           if(scanrp && safeString(values[pre+"Special"]).toLowerCase().includes(", resistpain ,")) {
             maxrp=Math.max(maxrp,getInt(values,pre+"Effective-Rank"));
-            //log("Updating Resist Pain to " + maxrp);
         }
 
           if((agg||dst) && def!==0)
@@ -16416,15 +16347,12 @@ var updateRepStep = function fnupdateRepStep( eventInfo ) {
               case 7 : aggdefmod= dst? -getInt( values, "Misc-DefStance-Penalty")                                         : 0                                          ;break; //Defense Buff (e.g. Acrobatic Defense or any Talent that boosts PD or MD only): No Penalty from Defensive Stance.  No Penalty from Aggressive Attack
             }
 
-            // log("aggdefmod " + aggdefmod);
           let workingMods = ( (values[ pre + "ActnEfct" ] !== "1" ) ? 0  : aggdefmod)
               + ( (values[ pre + "ActnEfct" ] !== "1" ) ? 0  : kwtest( values[pre+"Special"] , "NotVisionBased","n") * getInt( values, "condition-Darkness" )) //If Not Vision Based, Ignore the Darkness Penalty
               - ( Math.max(getInt( values, pre + "MoveBased" ),kwtest( values[pre+"Special"] , "MoveBased","n")  )  * getInt( values, "condition-ImpairedMovement" )), //Temporarly accept the pre+MoveBased or the keyword Movebased
           attribMods = 0,
           modType = 0,
           att = "";
-          // log("workingMods " + workingMods);
-
 
         switch ( values[ pre + "Mod-Type" ] ) {
           case "Action":    modType = getInt( values,  "Adjust-All-Tests-Total" );    break;
@@ -16448,7 +16376,7 @@ var updateRepStep = function fnupdateRepStep( eventInfo ) {
         // if( step !== getInt( values, pre + "Step" ))
         vals[ preWrite + "Step" ] = step;
         vals[ preWrite + "Step_max" ] = StepToDice(step);
-      } catch(err) { log( "Earthdawn:updateRepStep-doRow() error caught: " + err + "   for code: " + code + " rid: " + rid + "values: "); log( values ); }
+      } catch( err ) { errlog(  "Earthdawn:updateRepStep-doRow() error caught: " + err + "   for code: " + code + " rid: " + rid + "values: " + JSON.stringify( values ) ); }
     } // end of function doRow()
 
 
@@ -16462,16 +16390,16 @@ var updateRepStep = function fnupdateRepStep( eventInfo ) {
         case "talents" : code = "T";    break;
         case "skills"  : code = "SK";   break;
         case "knacks"  : code = "NAC";  break;
-        default: log("Earthdawn : Error illegal att in updateRepStep: " + att);
+        default: errlog( "Earthdawn : Error illegal att in updateRepStep: " + att); return; //Return added in V3.43 becuause it seems to me we can't flowdown the rest of the code.
       }
-      let     pre = buildPre( code, rid );
+      let pre = buildPre( code, rid );
 
       if ( safeString( att ).startsWith( "repeating_talents" ) || safeString( att ).startsWith( "repeating_skills" ) || safeString( att ).startsWith( "repeating_knacks" )) {
         getV = _.union(getV, [ pre+"RowID", pre+"MoveBased",
         pre+"Defensive", pre+"ActnEfct",
         pre+"Mod-Auto", pre+"Mod-Type", pre+"Attribute" , pre+"BaseStep",
         pre+"Step", pre+"Mods", pre+"Effective-Rank" ]);
-      } else log("Earthdawn : Error illegal att in updateRepStep: " + att );
+      } else errlog( "Earthdawn : Error illegal att in updateRepStep: " + att );
       getAttrs( getV, function gaUpdateRepStepRepeating(values) {
         'use strict';
         doRow( code, rid, values );
@@ -16481,7 +16409,6 @@ var updateRepStep = function fnupdateRepStep( eventInfo ) {
     } else {      // Since the value that changed is not inside a repeating section, we need to get all the  values needed for our calculations outside the repeating section, plus ALL the repeating sections and their values!
       let i = 0, pre;
       scanrp=true;
-      //log("global UpdateRepStep");
       getSectionIDs("repeating_talents", function gsRepStepIdTalents(tarray) {
         for( i = 0; i < tarray.length; i++ ) {
           pre = buildPre( "T", tarray[ i ]);
@@ -16519,7 +16446,7 @@ var updateRepStep = function fnupdateRepStep( eventInfo ) {
         });
       });
     } // end not repeating.
-  } catch(err) {log("Earthdawn:updateRepStep() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo));}
+  } catch( err ) { errlog( "Earthdawn:updateRepStep() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo) ); }
 }; // End updateRepStep()
 on("change:repeating_talents:t_movebased  change:repeating_talents:t_actnefct change:repeating_talents:t_defensive change:repeating_talents:t_mod-type change:repeating_talents:t_attribute change:repeating_talents:t_mods change:repeating_talents:t_effective-rank change:repeating_talents:t_special remove:repeating_talents", fn( updateRepStep ));
 on("change:repeating_skills:sk_movebased  change:repeating_skills:sk_actnefct change:repeating_skills:sk_defensive change:repeating_skills:sk_mod-type change:repeating_skills:sk_attribute change:repeating_skills:sk_mods change:repeating_skills:sk_effective-rank change:repeating_skills:sk_special remove:repeating_skills", fn( updateRepStep ));
@@ -16572,7 +16499,7 @@ var updateLanguage = function fnUpdateLangauge( code ) {
       setAttrsLog( vals );
     });
   });
-  } catch(err) {log("Earthdawn:updateLanguage() error caught: " + err +" code: " +code);}
+  } catch( err ) { errlog( "Earthdawn:updateLanguage() error caught: " + err +" code: " +code ); }
 }; // End updateLanguage()
 
 on("change:repeating_skilll:skl_speak", fn(_.partial(updateLanguage, "SS")));
@@ -16606,7 +16533,7 @@ var updateSkillType = function fnupdateSkillType( eventInfo ) {
     }
     setAttrsLog( vals );
   });
-} catch(err) {log("Earthdawn:updateSkillType() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo));}
+} catch( err ) { errlog( "Earthdawn:updateSkillType() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo) ); }
 }; // End updateSkillType()
 on("change:repeating_skills:sk_class", fn(updateSkillType));
 
@@ -16655,7 +16582,7 @@ var updateCreatureFlags = function fnUpdateCreatureFlags() {
     if( val != values[ "CreatureFlags" ])
     setAttrsLog({ "CreatureFlags": val });
   });
-} catch(err) {log("Earthdawn:updateCreatureFlags() error caught: " + err);}
+} catch( err ) { errlog( "Earthdawn:updateCreatureFlags() error caught: " + err ); }
 }; // End updateCreatureFlags()
 on("change:creature-resistpain change:creature-fury change:creature-hardenedarmor change:creature-grabandbite change:creature-hamstring change:creature-overrun change:creature-pounce change:creature-squeezethelife change:opponent-clipthewing change:opponent-cracktheshell change:opponent-defang change:opponent-enrage change:opponent-provoke change:opponent-pryloose", fn(updateCreatureFlags));
 
@@ -16678,7 +16605,7 @@ var updateTarget = function fnupdateTarget( eventInfo ) {
   val += ": @{selected|token_id}";
   vals[ sa ] = val;
   setAttrsLog( vals );
-} catch(err) {log("Earthdawn:updateTarget() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo));}
+} catch( err ) { errlog( "Earthdawn:updateTarget() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo) ); }
 }; // End updateTarget()
 on("change:repeating_talents:t_target change:repeating_knacks:nac_target change:repeating_skills:sk_target", fn( updateTarget ));
 
@@ -16701,15 +16628,14 @@ var sanitize = function fnsanitize( name, value) {
         .replace( /\@\{/gi, "{")        // and all @ signs followed by {
         .replace( /\[+/gi, "[" ).replace( /\]+/gi, "]" ).replace( /\{+/gi, "{" ).replace( /\}+/gi, "}" ).replace( /\(+/gi, "(" ).replace( /\)+/gi, ")" )    // All sequences of more than one [] {} () get replaced by a single one.
         + end;
-      // log("sanitize " + value +" into "+newVal + " for " + name);
     if ( value !== newVal ) {
       let vals = {};
       vals[ name ] = newVal;
       setAttrsLog( vals );
       if(safeString( name ).endsWith("_Name") && ["T","SK","SP","ARM","WPN","INV","BL","MNT","NAC"].includes(repeatSection(3,name))) AutoFill(name,"sanitize",newVal);
-      //JBF@JBF compendium : should call directly Autofill
+      //Compendium : should call directly Autofill
     }
-  } catch(err) {log("Earthdawn:sanitize() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:sanitize() error caught: " + err  ); }
 }; // End sanitize()
 
 
@@ -16726,7 +16652,7 @@ var sanitize = function fnsanitize( name, value) {
       vals[ name ] = newVal;
       setAttrsLog( vals );
     }
-  } catch(err) {log("Earthdawn:spellsanitize() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:spellsanitize() error caught: " + err  ); }
 }; // End spellsanitize()
 
 
@@ -16746,7 +16672,7 @@ var spellsanitize2 = function fnspellsanitize2( eventInfo ) {
     getAttrs([ att ], function gaspellSanitize(values) {
       if(values[att]) spellsanitize(att,values[att]);
   });
-} catch(err) {log("Earthdawn:spellsanitize2() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:spellsanitize2() error caught: " + err  ); }
 }; // End spellsanitize2()
   on("change:repeating_spell:sp_aoe change:repeating_spell:sp_duration change:repeating_spell:sp_range", fn( spellsanitize2 ));
 
@@ -16765,7 +16691,6 @@ var spellsanitize2 = function fnspellsanitize2( eventInfo ) {
       // return;
       att = eventInfo["sourceAttribute"];
     }
-    // log("presanitize " + att);
     // Clumsily deal the the name vandalism.
     if( safeString( att ).startsWith( "repeating_" ))
     {
@@ -16808,7 +16733,7 @@ var spellsanitize2 = function fnspellsanitize2( eventInfo ) {
       'use strict';
       sanitize( newAtt, values[ newAtt ] );
     });
-  } catch(err) {log("Earthdawn:preSanitize() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:preSanitize() error caught: " + err  ); }
 }; // End preSanitize()
   on("change:player-name change:character_name change:misc-poolname-1 change:misc-poolname-2 change:misc-poolname-3 change:armor-name change:shield-name change:record-date-real change:record-date-throalic change:record-reason change:wealth_other  change:repeating_talents:t_name change:repeating_talents:t_displaytext change:repeating_talents:t_successtext change:repeating_talents:t_failtext change:repeating_knacks:nac_name change:repeating_knacks:nac_displaytext change:repeating_knacks:nac_successtext change:repeating_knacks:nac_failtext change:repeating_knacks:nac_basetalent change:repeating_knacks:nac_restrictions change:repeating_skills:sk_name change:repeating_skills:sk_displaytext change:repeating_skills:sk_successtext change:repeating_skills:sk_failtext change:repeating_skilll:skl_name ", fn( preSanitize ));
   on("change:repeating_spell:sp_name change:repeating_spell:sp_displaytext change:repeating_spell:sp_successtext change:repeating_spell:sp_failtext change:repeating_spell:sp_range change:repeating_spell:sp_aoe change:repeating_weapons:wpn_name change:repeating_weapons:wpn_range change:repeating_weapons:wpn_date change:repeating_mount:mnt_name change:repeating_threads:ti_name change:repeating_maneuvers:man_name change:repeating_maneuvers:man_desc change:repeating_armor:arm_name", fn( preSanitize ));
@@ -16824,7 +16749,7 @@ var spellsanitize2 = function fnspellsanitize2( eventInfo ) {
       for( i = 0; i < tarray.length; i++)
       UpdateWeaponDamage( tarray[ i ]);
     });
-  } catch(err) {log("Earthdawn:updateAllWeaponDamage() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo));}
+  } catch( err ) { errlog( "Earthdawn:updateAllWeaponDamage() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo) ); }
 }; // End updateAllWeaponDamage
   on("change:adjust-damage-total-cc change:str-mods change:str-step change:str-adjust", fn(updateAllWeaponDamage) );
 
@@ -16851,7 +16776,7 @@ var spellsanitize2 = function fnspellsanitize2( eventInfo ) {
       vals[ pre + "Damage_max" ] = StepToDice(vals[ pre+"Damage"]);
       setAttrsLog(vals);
     });
-  } catch(err) {log("Earthdawn:updateWeaponDamage() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo));}
+  } catch( err ) { errlog( "Earthdawn:updateWeaponDamage() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo) ); }
 }; // End UpdateWeaponDamage
   on("change:repeating_weapons", fn(UpdateWeaponDamage) );
   //on("change:repeating_weapons:wpn_closecombat change:repeating_weapons:wpn_mods change:repeating_weapons:wpn_effective-rank", fn(UpdateWeaponDamage) );
@@ -16859,18 +16784,19 @@ var spellsanitize2 = function fnspellsanitize2( eventInfo ) {
 
 
   // This sets the unc rating (minus stun damage taken) into Damage_max, where token bars use it.
-  on("change:damage-stun change:damage-unc-rating", fn(function ocDamageStun( eventInfo ) {
+  var UpdateDamageMax = function ocUpdateDamageMax( eventInfo ) {
     'use strict';
     try{
-    getAttrs([ "Damage-Unc-Rating", "Damage-Stun" ], function gaDamageStun(values) {
+    getAttrs([ "Damage-Unc-Rating", "Damage-Stun" ], function gaUpdateDamageMax(values) {
       'use strict';
       logvalues( values);
       let vals = {};
       vals[ "Damage_max" ] = getInt( values, "Damage-Unc-Rating" ) - getInt( values, "Damage-Stun" );
       setAttrsLog( vals );
     });
-  } catch(err) {log("Earthdawn:ocDamageStun() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo));}
-}));//end ocDamageStun
+  } catch( err ) { errlog( "Earthdawn:UpdateDamageMax() error caught: " + err +" eventInfo: " +JSON.stringify(eventInfo) ); }
+};//end UpdateDamageMax
+on("change:damage-stun change:damage-unc-rating", fn( UpdateDamageMax)  );
 
 
 
@@ -16964,7 +16890,7 @@ var spellsanitize2 = function fnspellsanitize2( eventInfo ) {
       let v = {},
       x = getInt( values, "wt-test1" ) + 7;
       if(!values["edition"]) {
-        log("Earthdawn-Recalc : defaulting new character to Ed.4")
+        errlog( "Earthdawn-Recalc : defaulting new character to Ed.4")
         v["edition"]=4;
         }
       v[ "wt-test2" ] = x;
@@ -17014,6 +16940,7 @@ var spellsanitize2 = function fnspellsanitize2( eventInfo ) {
     updateAttribCosts();
     updateCarry();
     updateHealth();
+    UpdateDamageMax();
     updateInitiative();
     updateKnockdown();
     updateIP();
@@ -17127,7 +17054,7 @@ var spellsanitize2 = function fnspellsanitize2( eventInfo ) {
     let date= new Date();
     setAttrsLog({  "LastRecalc": date.toString() });
     //log("Ending recalc() after " + (Date.now() - timer) + " ms.");
-  } catch(err) {log("Earthdawn:recalc() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:recalc() error caught: " + err  ); }
 } // end recalc()
   on("change:edition clicked:recalc", fn(recalc));
 
@@ -17142,10 +17069,10 @@ var spellsanitize2 = function fnspellsanitize2( eventInfo ) {
       if( safeString( values[ "SpecialFunction" ] ).trim().endsWith( "Recalc" ))
       recalc();                   // If SpecialFunction has been set to Recalc - Recalculate all calculated fields.
       else if (safeString( values[ "SpecialFunction" ] ).trim().endsWith( "SheetWorkerTest")) {
-        log("Earthdawn : SpecialFunction SheetWorkerTest");
+        errlog( "Earthdawn : SpecialFunction SheetWorkerTest");
       } // End SheetWrokerTest code
     });
-  } catch(err) {log("Earthdawn:ocSpecialFunct() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:ocSpecialFunct() error caught: " + err  ); }
 })); // End ocSpecialFunct
 
 
@@ -17179,7 +17106,7 @@ var spellsanitize2 = function fnspellsanitize2( eventInfo ) {
       }
       setAttrsLog(vals);
     });
-  } catch(err) {log("Earthdawn:ocNewDay() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:ocNewDay() error caught: " + err  ); }
 }));//end ocNewDay
 
 
@@ -17202,7 +17129,7 @@ on("clicked:setalloptions clicked:resetalloptions", fn(function ocSetAllOptions(
     vals["legend-transaction-mode"]= m;
     vals["legend-calc-mode"]= m;
     setAttrsLog(vals);
-} catch(err) {log("Earthdawn:ocSetAllOptions() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:ocSetAllOptions() error caught: " + err  ); }
 }));//end ocSetAllOptions
 
 
@@ -17218,7 +17145,7 @@ on("clicked:settalentdefault", fn(function ocSetTalentDefault() {
     setAttrsLog(vals);
 });
 });
-} catch(err) {log("Earthdawn:ocSetTalentDefault() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:ocSetTalentDefault() error caught: " + err  ); }
 }));//end ocSetTalentDefault
 
 
@@ -17333,7 +17260,7 @@ on("clicked:settalentdefault", fn(function ocSetTalentDefault() {
           }
         });
 
-  } catch(err) {log("Earthdawn:checkIfNewPC() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:checkIfNewPC() error caught: " + err  ); }
 }; // End checkIfNewPC()
   //called on change of NPC
   on("change:npc", fn(checkIfNewPC));
@@ -17345,7 +17272,7 @@ on("clicked:settalentdefault", fn(function ocSetTalentDefault() {
   var updateCharactersheet = function fnUpdateCharactersheet( newSheetVersion, fromSheetVersion, origSheetVersion, recurse, values, showNotes, notes , flags) {
     'use strict';
     try{
-    log("EarthDawn : UpdateCharacterSheet : Conversion to: " + newSheetVersion + " from: " + fromSheetVersion + " orig: " + origSheetVersion + " recurse: " +recurse );
+    errlog( "Earthdawn : UpdateCharacterSheet : Conversion to: " + newSheetVersion + " from: " + fromSheetVersion + " orig: " + origSheetVersion + " recurse: " +recurse );
     let vals = [];
     let newflags=flags;
     let toSheetVersion;
@@ -17514,7 +17441,7 @@ on("clicked:settalentdefault", fn(function ocSetTalentDefault() {
                             'use strict';
 
                             function updateRow( code, rid, flags)  {
-                              if(rid && rid.length<4) log("Earthdawn - updateCharacterSheet incorrect rowid: " +rid+ "     code: "+code);
+                              if(rid && rid.length<4) errlog( "Earthdawn - updateCharacterSheet incorrect rowid: " +rid+ "     code: "+code);
                               pre = buildPre( code, rid);
                               rowflags=flags;
                               vals[pre + "Name"]= values[pre + "Name"]+"ɷ";     //Name is overwritten to trigger Autofill. Adding a charcter 192 will trigger a change, and the sanitize should do the rest
@@ -17610,7 +17537,7 @@ on("clicked:settalentdefault", fn(function ocSetTalentDefault() {
                               pre=buildPre("NAC",values[prev+"RowID"]); //non vandalized
                               let links = values[prev+"Linked"];
                               if (links){ // This section is for importing links. Up to v2, only Knacks had links and links were unidirectional
-                                 log ("links before sanitizing" + links) ;
+                                 //log("links before sanitizing" + links) ;
                                 links = safeString( links ).replace( /[\{|\(|\)|\@|\}]/gi, ""); //Sanitizing.links if it exists is in the form of an autocalc i.e (@{fully_qualifiedname}+@{fully_qualifiedname}). After sanitizing they will be fully_qualifiedname+fully_qualifiedname
                                 linkArray=safeString( links ).split("+");// Now we split the list by +, so we get an array [ fully_qualifiedname,fully_qualifiedname]
                                 for(j=0;j<linkArray.length;j++){
@@ -17620,14 +17547,14 @@ on("clicked:settalentdefault", fn(function ocSetTalentDefault() {
                                     if (rid){
                                       newflags=addAPIflag( newflags, "LinkAdd2", "NAC : " + values[prev+"RowID"] + " : T : " + rid); //APIFlag syntax is LinkAdd2,code,rowid,code,rid, the first set being the attribute Getting the value, and the second the one providing
                                     }
-                                    else log("EarthDawn UpdateCharacterSheet() Tried to create a link to a non existing spellcasting talent : " + tal);
+                                    else errlog( "Earthdawn UpdateCharacterSheet() Tried to create a link to a non existing spellcasting talent : " + tal);
                                   } else if(safeString( linkArray[j] ).startsWith("repeating")){ //Non Spellcasting Talents are on the repeating_XXX-RowId format
                                     let rid= repeatSection(2,linkArray[j]);
                                     let pre2v=buildPre(repeatSection(3,linkArray[j]),safeString( rid ).toLowerCase()), // Really don't know why, but we need a vandalized rowid
                                     pre2=buildPre(repeatSection(3,linkArray[j]),rid)
                                     let tal= values[pre2v+"Name"];
 
-                                    if(! tal)  log ("Earthdawn: UpdateCharacterSheet - Tried to create a link to an ability that doesn't exist: " + rid); // This line is to get rid of dead links...
+                                    if(! tal)  errlog("Earthdawn: UpdateCharacterSheet - Tried to create a link to an ability that doesn't exist: " + rid); // This line is to get rid of dead links...
                                     else {if (!linkArray[j].endsWith("Mods") && tal!==undefined && repeatSection(3,linkArray[j])!=="NAC"){ //Links with Talents and Weapons have 2 entries, so one of them has to be skipped
 
                                       newflags=addAPIflag( newflags, "LinkAdd2", "NAC : " + values[prev+"RowID"] + " :" +repeatSection(3,linkArray[j]) + " : " + values[pre2v+"RowID"]); //APIFlag syntax is LinkAdd2,code,rowid,code,rid, the first set being the attribute Getting the value, and the second the one providing
@@ -18005,14 +17932,6 @@ on("clicked:settalentdefault", fn(function ocSetTalentDefault() {
             getAttrs( getV , function gaUpdateCharacterSheet(values) {
               'use strict';
 
-              // log("Hide-Spells-Tab" + values["Hide-Spells-tab"]);
-              // vals["Hide-Spells-Tab"]=values["Hide-Spells-tab"]||"1";
-              // newflags=addAPIflag( newflags, "RemoveAttr", "Hide-Spells-tab" );
-              // log("corrected Hide-Spells-Tab bug ");
-
-
-
-
         if( Object.keys(vals).length > 0 )    // If the code above just changed some values, do those before making the recursive call.
         setAttrsLog( vals, undefined , function fnUpdateCharactersheetSetAttrsLog( vals ) {
           'use strict';
@@ -18049,14 +17968,6 @@ on("clicked:settalentdefault", fn(function ocSetTalentDefault() {
               getAttrs( getV , function gaUpdateCharacterSheet(values) {
                 'use strict';
 
-                // log("Hide-Spells-Tab" + values["Hide-Spells-tab"]);
-                // vals["Hide-Spells-Tab"]=values["Hide-Spells-tab"]||"1";
-                // newflags=addAPIflag( newflags, "RemoveAttr", "Hide-Spells-tab" );
-                // log("corrected Hide-Spells-Tab bug ");
-
-
-
-
           if( Object.keys(vals).length > 0 )    // If the code above just changed some values, do those before making the recursive call.
           setAttrsLog( vals, undefined , function fnUpdateCharactersheetSetAttrsLog( vals ) {
             'use strict';
@@ -18090,14 +18001,6 @@ on("clicked:settalentdefault", fn(function ocSetTalentDefault() {
 
             getAttrs( getV , function gaUpdateCharacterSheet(values) {
               'use strict';
-
-              // log("Hide-Spells-Tab" + values["Hide-Spells-tab"]);
-              // vals["Hide-Spells-Tab"]=values["Hide-Spells-tab"]||"1";
-              // newflags=addAPIflag( newflags, "RemoveAttr", "Hide-Spells-tab" );
-              // log("corrected Hide-Spells-Tab bug ");
-
-
-
 
         if( Object.keys(vals).length > 0 )    // If the code above just changed some values, do those before making the recursive call.
         setAttrsLog( vals, undefined , function fnUpdateCharactersheetSetAttrsLog( vals ) {
@@ -19793,7 +19696,7 @@ else if( fromSheetVersion < 3.42 ) {
       recalc();       // If we actually updated something, recalculate every field.
     }
   }
-} catch(err) {log("Earthdawn:updatecharactersheet() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:updatecharactersheet() error caught: " + err  ); }
 }; // End updatecharactersheet()
 
 
@@ -19842,7 +19745,7 @@ var onSheetOpened = function fnOnSheetOpened(){
 
   });
 
-} catch(err) {log("Earthdawn:OnSheetOpened() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:OnSheetOpened() error caught: " + err  ); }
 };//end OnSheetOpened
 on('sheet:opened', fn(onSheetOpened));
 
@@ -19868,77 +19771,9 @@ var addAPIflag = function fnaddAPIflag( flag, cmd, line ) {
   vals[pre+"toAPI"]=newflag;
   setAttrsLog(vals);
   return ((flag||"") + newflag);
-} catch(err) {log("Earthdawn:addAPIflag() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:addAPIflag() error caught: " + err  ); }
 }; // End addAPIflag()
 
-
-
-// fnprocessSWflag() This routine receives a list of commands from the API to process.
-// The list is newline delimited.
-// Each item on the list has a command, a comma, and some data for the command. Each command has its own requirements for format.
-// cmd tells  what exact type of communication this is.
-// line is the details needed to process this command.
-// accepted commands are
-// recalc, that will trigger recalc()
-// trigger,fully qualified attribute name,value that will use setAttrsLog to write the value in the attribute (triggering any sheetworker routine necessary)
-// The flag eventually has been written in attr_SWflag
-// var processSWflag = function fnprocessSWflag(eventInfo) {
-//   'use strict';
-//   try{
-//   if( safeString( eventInfo[ "sourceType" ] ).toLowerCase() !== "api" || !( "newValue" in eventInfo  )) return;   //The routine resets the value of SWflag at the end, and the silent mode of setAttrs is erratic. We want to avoid circular loop
-//   let flags = eventInfo[ "newValue" ];
-//   //log("Earthdawn SWflag :" + flags);
-//   if( flags ) flags = safeString( flags ).trim();
-//   if( !flags ) { log("Earthdawn:processSWflag() error : SWflag is undefined"); return;};
-//   let cmdArray = safeString( flags ).split("\n") ;
-//   let i, cmdLine;
-//   let vals={};
-//   for( i = 0; i < cmdArray.length; i++ ) {
-//     cmdLine = cmdArray[ i ];
-//     switch(getParam( cmdLine, 1, ",").toLowerCase()) {
-//       case "ping" : break; //Just used for the watchdog
-//       case "recalc" : recalc(); break;
-//       case "sheetupdate" : onSheetOpened(); break;
-//       case "trigger" :{     // Trigger, (attribute name to trigger) (: colon) (data to be written to activate the trigger). (newline).
-//         let comma = cmdLine.indexOf(",");
-//         let colon = cmdLine.indexOf(":");
-//         if( comma === -1 || colon <= comma ) {log("Earthdawn:processSWflag() error. cmd trigger, cmdLine improperly formatted: " + cmdLine); break;}
-//         vals[ cmdLine.substring(comma +1, colon).trim() ] = cmdLine.substring( colon +1 ).trim();
-//       };
-//       break;
-//       case "trigger2" :  {   // Trigger2, routine to call, fully qualified attribute name to be passed as eventInfo. (newline).
-//         let trig2 = getParam( cmdLine, 2, ",").toLowerCase();
-//         //log('trigger2 '+trig2)
-//
-//         if( trig2 === "autofill" )
-//           AutoFill( getParam( cmdLine, 3, "," ),"API");
-//         else if( safeString( trig2 ).endsWith( "getvalue" ) || safeString( trig2 ).endsWith( "providevalue" ))
-//           switch(  repeatSection( 3, getParam( cmdLine, 2, ",")).toUpperCase() ) {     //code Let's make sure after a link or an Autofill that we locally recalculate
-//             case "NAC":
-//             case "SK" :
-//             case "WPN" :
-//             case "T" : repRanks( repeatSection( 2, getParam( cmdLine, 2, ",")) , repeatSection( 3, getParam( cmdLine, 2, ",")).toUpperCase()); break;
-//             case "SPM" : repMatrixType( repeatSection( 2, getParam( cmdLine, 2, ","))); break; //rowid
-//             default :   log("Earthdawn:processSWflag() error : invalid trigger2 getvalue: " + cmdLine );
-//           }
-//         else
-//           log("Earthdawn:processSWflag() error : invalid trigger2: " + cmdLine );
-//       }
-//       break;
-//       default: log("Earthdawn:processSWflag() error. Unknown cmd: " + cmdLine);
-//     };
-//   };
-//   vals[ "SWflag" ] = "";
-//   //API Watchdog - If any flag is received, the API must be running
-//   vals["API"]="1";
-//   vals["API_max"]="1";
-//
-//
-//   setAttrsLog( vals );
-//
-// } catch(err) {log("Earthdawn:processSWflag() error caught: " + err );}
-// }; // End processSWflag()
-// on("change:swflag", fn(processSWflag));
 
 
 
@@ -19995,7 +19830,7 @@ getAttrs( [pre+"toSheetworker" , pre+"toSheetworker_max"] , function gacleanupMs
       case "trigger" :{     // Trigger, (attribute name to trigger) (: colon) (data to be written to activate the trigger). (newline).
         let comma = cmdLine.indexOf(",");
         let colon = cmdLine.indexOf(":");
-        if( comma === -1 || colon <= comma ) {log("Earthdawn:processMsgtoSW() error. cmd trigger, cmdLine improperly formatted: " + cmdLine); break;}
+        if( comma === -1 || colon <= comma ) { errlog("Earthdawn:processMsgtoSW() error. cmd trigger, cmdLine improperly formatted: " + cmdLine); break;}
         vals[ cmdLine.substring(comma +1, colon).trim() ] = cmdLine.substring( colon +1 ).trim();
       };
       break;
@@ -20012,13 +19847,13 @@ getAttrs( [pre+"toSheetworker" , pre+"toSheetworker_max"] , function gacleanupMs
             case "WPN" :
             case "T" : repRanks( repeatSection( 2, getParam( cmdLine, 2, ",")) , repeatSection( 3, getParam( cmdLine, 2, ",")).toUpperCase()); break;
             case "SPM" : repMatrixType( repeatSection( 2, getParam( cmdLine, 2, ","))); break; //rowid
-            default :   log("Earthdawn:processMsgtoSW() error : invalid trigger2 getvalue: " + cmdLine );
+            default :   errlog( "Earthdawn:processMsgtoSW() error : invalid trigger2 getvalue: " + cmdLine );
           }
         else
-          log("Earthdawn:processMsgtoSW() error : invalid trigger2: " + cmdLine );
+          errlog( "Earthdawn:processMsgtoSW() error : invalid trigger2: " + cmdLine );
       }
       break;
-      default: log("Earthdawn:processMsgtoSW() error. Unknown cmd: " + cmdLine);
+      default: errlog( "Earthdawn:processMsgtoSW() error. Unknown cmd: " + cmdLine);
     };
   // //API Watchdog - If any flag is received, the API must be running
   vals["API"]="1";
@@ -20036,7 +19871,7 @@ getAttrs( [pre+"toSheetworker" , pre+"toSheetworker_max"] , function gacleanupMs
 
 });
 
-} catch(err) {log("Earthdawn:processMsgtoSW() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:processMsgtoSW() error caught: " + err  ); }
 }; // End processMsgtoSW()
 on("change:repeating_message:msg_tosheetworker change:repeating_message:msg_tosheetworker_max", fn(processMsgtoSW));
 
@@ -20086,7 +19921,7 @@ var cleanupMsgs = function fncleanupMsgs(eventInfo) {
         }
       });
     });
-  } catch(err) {log("Earthdawn:cleanupMsgs() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:cleanupMsgs() error caught: " + err  ); }
 }; // End cleanupMsgs()
 
 
@@ -20123,7 +19958,7 @@ var resetEditMode = function fnresetEditMode() {
     setAttrsLog(vals);
   }
   });
-} catch(err) {log("Earthdawn:resetEditMode() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:resetEditMode() error caught: " + err  ); }
 }; // End resetEditMode()
 on("change:tab change:creationmode", fn(resetEditMode));
 
@@ -20146,7 +19981,7 @@ var UpdateKask = function fnUpdateKask(eventInfo) {
   let att =getAttrib(eventInfo);
   let kdp = ( safeString( att ).toLowerCase().includes("karma")  ? "Karma" : ( safeString( att ).toLowerCase().includes( "dp" )  ? "DP" : undefined));
   let chgmax = safeString( att ).toLowerCase().includes("max");
-  if (!kdp) {log("Earthdawn: UpdateKask() error. Invalid eventInfo:" + att); return;};
+  if (!kdp) { errlog("Earthdawn: UpdateKask() error. Invalid eventInfo:" + att); return;};
   let att2 = att.substring(0, safeString( att ).toLowerCase().lastIndexOf(safeString( kdp ).toLowerCase()));
   let pre;
   if (safeString( att ).startsWith( "repeating") && !rec){ // we got called locally by the trigger repeating sections are vandalized, we have to go back through buildPre
@@ -20156,7 +19991,7 @@ var UpdateKask = function fnUpdateKask(eventInfo) {
   else if (safeString( att ).startsWith( "repeating") && rec){ // we got called by recalc with a complete name
     let code= repeatSection(3,att2);
     let rid= repeatSection(2,att2);
-    if(rid && rid.length<4) log("Earthdawn - updateKask incorrect rowid for eventInfo: " +JSON.stringify(eventInfo));
+    if(rid && rid.length<4) errlog( "Earthdawn - updateKask incorrect rowid for eventInfo: " +JSON.stringify(eventInfo));
     pre=buildPre(code,rid); // BuildPre complete as we got called via the recalc with a complete name
   }
   else{
@@ -20179,7 +20014,7 @@ var UpdateKask = function fnUpdateKask(eventInfo) {
 
     setAttrsLog(vals);
   });
-  } catch(err) {log("Earthdawn:UpdateKask() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:UpdateKask() error caught: " + err  ); }
 }; //end UpdateKask()
 on("change:dex-karma-limit_max change:dex-karma change:dex-karma-limit", fn(UpdateKask));
 on("change:str-karma-limit_max change:str-karma change:str-karma-limit", fn(UpdateKask));
@@ -20230,7 +20065,7 @@ var UpdateKarmaGlobalMode = function fnUpdateKarmaGlobalMode(eventInfo) {
     //log("KGM2 " + kdp + " " + vals[kdp+"GlobalMode2"]);
     setAttrsLog(vals);
   });
-} catch(err) {log("Earthdawn:UpdateKarmaGlobalMode() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:UpdateKarmaGlobalMode() error caught: " + err  ); }
 }; //end UpdateKarmaGlobalMode()
 on("change:karma change:karmaglobalmode change:dp change:dpglobalmode", fn(UpdateKarmaGlobalMode));
 
@@ -20245,7 +20080,7 @@ var repMatrixNotes = function fnrepMatrixNotes( eventInfo) {
   if (att==="" || eventInfo["sourceType"] !=="player") return;
   let show=eventInfo["newValue"];
   let rowid = repeatSection(2,att);
-  if(rowid && rowid.length<4) log("Earthdawn - repMatrixNotes incorrect rowid for eventInfo: " +JSON.stringify(eventInfo));
+  if(rowid && rowid.length<4) errlog( "Earthdawn - repMatrixNotes incorrect rowid for eventInfo: " +JSON.stringify(eventInfo));
   let pre = buildPre("SPM",rowid);
   let vals={};
   getSectionIDs("repeating_matrix", function gsUpdateCharacterSheetIdMatrix(marray) {
@@ -20259,7 +20094,7 @@ var repMatrixNotes = function fnrepMatrixNotes( eventInfo) {
       });
     });
   });
-} catch(err) {log("Earthdawn:repMatrixNotes() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:repMatrixNotes() error caught: " + err  ); }
 }; //end repMatrixNotes()
 on("change:repeating_matrix:spm_shownotes", fn(repMatrixNotes));
 
@@ -20279,7 +20114,7 @@ var repSpellCombatSlot = function fnrepSpellCombatSlot( eventInfo) {
       setAttrsLog(vals, {silent:true});
     }
   });
-} catch(err) {log("Earthdawn:repSpellCombatSlot() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:repSpellCombatSlot() error caught: " + err  ); }
 }; //end repSpellCombatSlot()
 on("change:repeating_spell:sp_combatslot", fn(repSpellCombatSlot));
 
@@ -20325,7 +20160,7 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
 
 
           if(!ddata["DT_C1"] && !ddata["TO_Novice"] && !ddata["TO_Journeyman"]) {
-            log("Earthdawn CreateTalent error. Tried to create for uneligible discipline " + values[pre+"Name"]);
+            errlog( "Earthdawn CreateTalent error. Tried to create for uneligible discipline " + values[pre+"Name"]);
             return;
           }
 
@@ -20344,9 +20179,6 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
             else circletotier=["","Journeyman","Journeyman","Journeyman","Journeyman","Warden","Warden","Warden","Warden","Master","Master"];
 
           }else circletotier=["","Novice","Novice","Novice","Novice","Journeyman","Journeyman","Journeyman","Journeyman","Warden","Warden","Warden","Warden","Master","Master","Master"]
-
-          // log("tnamearray "+JSON.stringify(tnamearray));
-
 
           //JBF@JBF : need to rethink how to identify the discipline number
           for( let i = 0; i < darray.length; i++) { //Count the number of disciplines and spellcasting
@@ -20390,7 +20222,7 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
           if(getInt(values,pre+"Circle")>=1 && cmin <=1 && ddata["Free_C1"] ) {
             if(ddata["issc"]=="1"){ // Spellcaster case : Deal with the Free Matrix only if it is the first and only Matrix
               if(nbsc==1){
-                log("Earthdawn CreateTalents - First Spellcaster Discipline - Creating Matrixes and WIL");
+                errlog( "Earthdawn CreateTalents - First Spellcaster Discipline - Creating Matrixes and WIL");
 
                 if(cmax>=5) // We created a spellcaster directly at Circle >=5. The first matrix must be enhanced
                   AbilityDrop("Enhanced Matrix","repeating_matrix","SPM","Magic:Enhanced Matrix",{roll20_Origin:"Free-link",linkadd:"DSP;"+ddata.name},"noduplicate");
@@ -20447,7 +20279,7 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
             }
             if(nbem==0 && nbsm==2){
               vals[mpre2+"Type"]="15";
-            }  else log("Earthdawn CreateTalent Error - Abnormal number of Free Matrixes - Nb Enhanced" + nbem + "nbStandard " + nbsm);
+            }  else errlog( "Earthdawn CreateTalent Error - Abnormal number of Free Matrixes - Nb Enhanced" + nbem + "nbStandard " + nbsm);
           } //End creation of Circle 5 Enhanced Matrix
 
 
@@ -20496,9 +20328,7 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
           }
          } }
           if(ddata["abilityadd_C" + j]){
-            //log(ddata["abilityadd_C" + j]);
             let newdata=parseJSON(ddata["abilityadd_C" + j])
-            // log("processing new data " + JSON.stringify(newdata));
             if( newdata.names && newdata.code && newdata.rep)
             AbilityDrop(newdata.names,newdata.rep,newdata.code,"",newdata,"AbilityAdd");
           }
@@ -20527,7 +20357,7 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
         }
 
           // if( nbdisc >= 2 && cmin<=1 && ddata.Type=="Discipline") { //This way of counting the multidisciplining is discontinued
-          //   log("recording multidisciplining");
+          //log("recording multidisciplining");
           //   vals["LP-D"+nbdisc+"-Talents"]=multinb;
           //   vals["LP-D"+nbdisc+"-Circle"]=mincircle;
           // }
@@ -20535,14 +20365,13 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
           //   vals[ "APIflag" ] = flags;
           vals[pre+"Circle_max"] = Math.max(1,getInt(values,pre+"Circle")); //Store the last Circle processed (Min 1 to allow for Circle 0 creation of Talents)
           vals[pre+"show-createbutton"] = 0;
-          //log("Create Talents vals "+JSON.stringify(vals));
           setAttrsLog( vals );
         });
       });
       });
       });
     });
-  } catch(err) {log("Earthdawn:ocCreateTalents() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:ocCreateTalents() error caught: " + err  ); }
 })); //End ocCreateTalents()
 
 
@@ -20595,7 +20424,7 @@ on("clicked:repeating_knacksummary:addknack", fn(function ocAddKnack(eventInfo) 
               setAttrsLog(vals);
               AbilityDrop(nm,rep,code,un,data,"AbilityAdd,noduplicate,overwrite" + (ktype=="BindingSecret"? "" : ",knack")); //The Knack keyword informs AbilityDrop to split when using the name, which is not the case for Binsing Secrets
       });
-    } catch(err) {log("Earthdawn:ocAddKnack() error caught: " + err );}
+    } catch( err ) { errlog( "Earthdawn:ocAddKnack() error caught: " + err  ); }
   })); //End ocAddKnack()
 
 
@@ -20652,7 +20481,7 @@ on("clicked:repeating_talents:addto0 clicked:repeating_talents:addto1 clicked:re
 
         });
       });
-    } catch(err) {log("Earthdawn:ocAddtalentOption() error caught: " + err );}
+    } catch( err ) { errlog( "Earthdawn:ocAddtalentOption() error caught: " + err  ); }
   })); //End ocAddTalentOption()
 
 
@@ -20664,7 +20493,7 @@ var updateLPSummary = function fnupdateLPSummary() {
   let statarray = ["Dex","Str","Tou","Per","Wil","Cha"];
   let attarray = ["Attrib-Dex-Increases","Attrib-Str-Increases","Attrib-Tou-Increases","Attrib-Per-Increases","Attrib-Wil-Increases","Attrib-Cha-Increases","LP-CreationOffset","LP-CreationOffset-Spells","LS-Speak-Rank","LS-ReadWrite-Rank","LP-Current","LP-Total", "LP-SpellsOption","Per-Step","NbDisc","LP-AttribOption","LP-Extra-Cost","LP-D2-Circle","LP-D3-Circle","LP-D4-Circle","LP-D2-Talents","LP-D3-Talents","LP-D4-Talents"];
 
-  //log ( "EarthDawn : updateLPSummary() ");
+  //log( "EarthDawn : updateLPSummary() ");
   getSectionIDs("repeating_matrix", function gsIdRepeatingMatrix(marray) {
     for( let i = 0; i < marray.length; i++) {
       attarray.push( buildPre( "SPM", marray[ i ] ) + "Rank");
@@ -20749,10 +20578,10 @@ var updateLPSummary = function fnupdateLPSummary() {
                       case "exemplar" :
                       case "warden" : o=2; break;
                       case "master" : o=3; break;
-                      default : log("EarthDawn LPSummary - CalcOffset - Unknown discipline Tier for "+ n +" : "+ JSON.stringify(t)); return 0;
+                      default : errlog( "Earthdawn LPSummary - CalcOffset - Unknown discipline Tier for "+ n +" : "+ JSON.stringify(t)); return 0;
                     }
                     if(!d) return o; //If no discipline number specified, calculate just with the offset due to tier
-                    if( isNaN(parseInt(d[d.length-1]))) {log("EarthDawn LPSummary - CalcOffset - Unknown discipline number : "+ JSON.stringify(d)); return o;}
+                    if( isNaN(parseInt(d[d.length-1]))) { errlog("EarthDawn LPSummary - CalcOffset - Unknown discipline number : "+ JSON.stringify(d)); return o; }
                     else return (Math.min(3,o+parseInt2(d[d.length-1])-1)); //1st discipline, no offset, each subsequent discipline counts as 1 rank higher in the Fibonacci
                   };//end CalcOffset()
 
@@ -21035,7 +20864,7 @@ var updateLPSummary = function fnupdateLPSummary() {
       });
     });
   });
-} catch(err) {log("Earthdawn:updateLPSummary() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:updateLPSummary() error caught: " + err  ); }
 }; // End updateLPSummary()
 on("change:repeating_skills:sk_rank change:repeating_skills:sk_type change:repeating_threads:ti_rank change:repeating_threads:ti_type change:repeating_matrix:spm_rank change:repeating_matrix:spm_origin change:repeating_talents:t_rank change:repeating_talents:t_type change:repeating_knacks:nac_requirements change:repeating_knacks:nac_type change:repeating_spell remove:repeating_talents remove:repeating_matrix remove:repeating_spell remove:repeating_knacks remove:repeating_threads remove:repeating_skills change:repeating_discipline remove:repeating_discipline", fn(updateLPSummary) );
 on("change:attrib-dex-increases change:attrib-str-increases change:attrib-tou-increases change:attrib-per-increases change:attrib-wil-increases change:attrib-cha-increases change:lp-creationoffset change:lp-creationoffset-spells change:lp-current change:lp-total change:lp-spellsoption change:per-step change:ls-speak-rank change:ls-readwrite-rank change:lp-attriboption change:lp-extra-cost change:nbdisc change:lp-d2-circle change:lp-d3-circle change:lp-d4-circle change:lp-d2-talents change:lp-d3-talents change:lp-d4-talents", fn(updateLPSummary) );
@@ -21064,6 +20893,8 @@ on("clicked:endcreation_post", fn(function ocEndAndPost() {
     vals["DP"]=values["DP_max"];
     vals["Damage"]=0;
     vals["Wounds"]=0;
+    vals["Wounds_max"]=8;
+
     vals["Recovery-Tests"]=values["Recovery-Tests_max"];
     setAttrsLog(vals);
   });
@@ -21087,13 +20918,14 @@ on("clicked:set_lp_offset", fn(function ocSetLPOffset() {
 on("clicked:endcreation_nopost", fn(function ocEndAndNoPost() {
   'use strict';
   let vals = {};
-  getAttrs([ "NPC" ,,"Karma_max" , "Recovery-Tests_max" , "DP_max" ], function(values) {
+  getAttrs([ "NPC" ,"Karma_max" , "Recovery-Tests_max" , "DP_max" ], function(values) {
   // vals["show_tips"] = values["NPC"]=="0"? "1" :"0";
   vals[ "tab" ] = values["NPC"]=="0"? "11" :"1";
   vals[ "tab-adjust" ] = "4";
   vals["CreationMode"]=0;
   vals["Damage"]=0;
   vals["Wounds"]=0;
+  vals["Wounds_max"]=8;
 
   vals["Karma"]=values["Karma_max"];
   vals["DP"]=values["DP_max"];
@@ -21161,7 +20993,7 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
         case "Import" : trigger2="Import"; break;
         case "AbilityAdd" : trigger2="AbilityAdd"; fromAPI=true; break;
         case "sanitize" : trigger2="player"; break;
-        default : log("Earthdawn - Autofill unknown call from trigger " + trigger); trigger2="unknown";
+        default : errlog( "Earthdawn - Autofill unknown call from trigger " + trigger); trigger2="unknown";
       }
     } else {
       switch(eventInfo.sourceType){
@@ -21175,7 +21007,6 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
         return;
       }
     }
-  //  log("AutoFill processed in trigger2 " + trigger2);
 
 
 
@@ -21261,7 +21092,6 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
 
         if(!found) { //Using the local database
           if(trigger2=="player") vals[ pre+"buttonInfo"]= ""; //If there was a button info, reset it.
-          //if(nm && safeString( nm ).toLowerCase().includes("thread")) log("Autofill "+nm+ "no match in compendium" )
 
 
           // if (att==="" || eventInfo["sourceType"] !=="player") return;
@@ -21270,8 +21100,6 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
           if(values["edition"]=="-1")
           masterdatabase={}; //1879
           else masterdatabase={//ED All editions. Done for ED4, but close enough for other editions
-
-            //Compendium Database is redone by category as a JSON
 
             "SK":[
               //Skills-PG
@@ -22204,12 +22032,9 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
           }
           if(found) {
           //log("Earthdawn Autofill found it in local database" + JSON.stringify(entry));
-          //if(nm && safeString( nm ).toLowerCase().includes("thread")) log("Autofill "+nm+ " found match in local database" )
           entry=mergeJSON(data,entry); //merge the JSON with priority on the import
           source="local";
         }
-
-        //if(nm && safeString( nm ).toLowerCase().includes("thread")) log("Autofill "+nm+ " testing the Abilityadd " + found + " trigger "+trigger + " data "+JSON.stringify(data));
 
           if(!found && trigger=="AbilityAdd" && data) //For an add ability, fall back to the JSON if not found somewhere else {
             {
@@ -22242,7 +22067,7 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
 
             let ind=compendium_pages.findIndex(page => ((safeString(page.data.Name)==aug || safeString(page.name)==aug ) &&(safeString(page.data.Category)=="Talents" || safeString(page.data.Category)=="Knacks" ))   );
             if(ind==-1) {
-              log("Earthdawn-Autofill tried to merge data of the Augment Knack " +tname + " with its base Talent or Knack "+aug + " but couldn't find it in compendium.")
+              errlog( "Earthdawn-Autofill tried to merge data of the Augment Knack " +tname + " with its base Talent or Knack "+aug + " but couldn't find it in compendium.")
               } else {
                 let entry2=compendium_pages[ind].data; //Entry Data will be Entry2 Data except a few cases...
                 entry2.Name=entry.Name;
@@ -22265,7 +22090,7 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
 
       });
     });
-  } catch(err) {log("Earthdawn:AutoFill() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:AutoFill() error caught: " + err  ); }
 }; //end AutoFill()
   on("change:repeating_talents:t_name change:repeating_skills:sk_name change:repeating_spell:sp_name change:repeating_weapons:wpn_name change:repeating_blood:bl_name change:repeating_armor:arm_name", fn(AutoFill));
   //In updateCharacterSheet, Autofill is triggered by rewriting the name
@@ -22354,7 +22179,7 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
         fields=["Type","Rank","Tier","Total-Cost","Alchemical-Cost","Specific-Material","EDN","Duration", "Note"];
         notesnm="";
         break;
-        default : log("Earthdawn:FillEntryData() unknown code: " + code ); return;
+        default : errlog( "Earthdawn:FillEntryData() unknown code: " + code ); return;
       }
 
       let attarray=["Adjustment-Notes","Race", "Movement","SrRating",pre+"Name",pre+"Type",pre+"Notes",pre+"Rank",pre+"Rank-Adjust",pre+"Attribute",pre+"RowID","edition","APIflag","isNamegiver","Dex-Step","Str-Step","Tou-Step","Per-Step","Wil-Step","Cha-Step","Initiative-Step","WeightAdjustment","Race"];
@@ -22374,7 +22199,7 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
         if(entry["abilityadd"] &&  ["BL","T","SK","ENC","NAC"].includes(code)){ //Process AbilityAdd, need to filter by code to avoid double addition (exemple Astral Sensitive Eye creates INV & BL)
           let addjson=parseJSON(entry["abilityadd"]);
           if(addjson.names && addjson.rep && addjson.code) AbilityDrop(addjson.names,addjson.rep,addjson.code,undefined,addjson,"AbilityAdd");
-          else log("Earthdawn FillEntryData - Trying to Add nested Ability with invalid JSON");
+          else errlog( "Earthdawn FillEntryData - Trying to Add nested Ability with invalid JSON");
          }
 
          //v3.4: New management of Keywords. Merge the Special list, that are Official keywords, and the roll20_Special that are the non official
@@ -22409,7 +22234,7 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
         if(code=="NAC" && entry.roll20_Requirements ){ //for Knacks, requirements are in the form of "Rank X", sometimes with "Rank X, somethingelse"
           let m=safeString( entry.roll20_Requirements ).match(/Rank\s*(\d+)/i);
           if(m) singleAttr("Requirements", m[1]);
-          else log("Earthdawn.FillEntrydata unrecognized Requirement for Knacks" + JSON.stringify(entry));
+          else errlog( "Earthdawn.FillEntrydata unrecognized Requirement for Knacks" + JSON.stringify(entry));
         }
 
       if(code=="SK" && entry.Class=="Knowledge") entry.roll20_Attribute="Per";
@@ -22468,7 +22293,8 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
           if( entry.roll20_Attribute)  val-= getInt(values, (safeString( entry.roll20_Attribute ).trim() + "-Step"));
           if( code=="WPN" ) val-= getInt(values,"Str-Step");
           //log("addSR " +entry.Name + " val "+ val + " data " +JSON.stringify(entry));
-          //if( entry.roll20_Attribute) log("Attribute " +entry.Name + " Attribute name is "+(entry.roll20_Attribute.trim() + "-Step")+ " "+getInt(values, (entry.roll20_Attribute + "-Step")));
+          //if( entry.roll20_Attribute)
+          //log("Attribute " +entry.Name + " Attribute name is "+(entry.roll20_Attribute.trim() + "-Step")+ " "+getInt(values, (entry.roll20_Attribute + "-Step")));
           singleAttr( "Rank", val);
         } else if(safeString( tf ).match( new RegExp(rgMove,"i"))){
           //log("Move "+tname);
@@ -22506,8 +22332,6 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
           let val=getInt(entry,"Step");
           if( entry.roll20_Attribute && !stepisrank)  val-= getInt(values, (safeString( entry.roll20_Attribute ).trim() + "-Step"));
           if( code=="WPN" ) val-= getInt(values,"Str-Step");
-          //if( code=="WPN" ) log("Step Calculation for Damage, Step was " + getInt(entry,"Step") + " substracting Str " + getInt(values,"Str-Step"));
-          //if( entry.roll20_Attribute) log("Attribute " +entry.Name + " Attribute name is "+(entry.roll20_Attribute.trim() + "-Step")+ " "+getInt(values, (entry.roll20_Attribute + "-Step")));
           if(entry.Rank) singleAttr("Rank-Adjust",val - getInt(entry,"Rank")); //We were given a Rank, let's use it
 
           else if(entry.roll20_Rank_Adjust) singleAttr("Rank",val - getInt(entry,"roll20_Rank_Adjust")); //There is a rank adjustment, potentially from the Talent/Power description
@@ -22646,7 +22470,7 @@ var AutoFill = function fnAutoFill(eventInfo,trigger,nm,data,comp_data) {
       });
     //For an unknown reason, Weapons Rank don't trigger repRanks... So let's make sure it triggers
   });
-} catch(err) {log("Earthdawn:FillEntryData() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:FillEntryData() error caught: " + err  ); }
 }; //end FillEntryData()
 
 
@@ -22662,7 +22486,7 @@ var updateKnackSummary = function fnupdateKnackSummary() {
     vals=[],
     dfltrk,dflt,
     maxvalue=0,filtered,knackn,knacklist,entry;
-    // log ( "EarthDawn : updateKnackSummary() ");
+    //log( "EarthDawn : updateKnackSummary() ");
     let knarray=[]; // All the knacks already known
     let talentarray=[],spellarray=[]; //List of all that will have to be tested for knacks
 
@@ -24606,13 +24430,13 @@ var updateKnackSummary = function fnupdateKnackSummary() {
 
     var checkRequirement =function(req,trk,lg ){
       let req2,nork,rk,meet=false;
-      if(lg) log("req " + req + " trk "+trk);
+      if(lg) errlog( "Earthdawn-checkRequirement - req " + req + " trk "+trk );
       if(!req || req.length <=3 ) return true;
       req2=safeString( req ).toLowerCase().trim().replace("\'","’"); //Replace single quotes U+0027 that can be seen as string delimiter by apostrophe U+2019 that is just a character for apostrophe
       nork= isNaN(req2[req2.length-1]);
       rk= nork? 0 : parseInt2(req2.substring(req2.length-2).trim()); //Requirement end with a one or 2 digit number, separated by a space
       req2=nork ? req2 : req2.substring(0,req2.length-2).trim();            //Removed the found rank if any
-      if(lg) log("req2 " + req2 + " rk "+rk);
+      if(lg) errlog( "Earthdawn-checkRequirement - req2 " + req2 + " rk "+rk);
 
       if(req2=="rank") {
         return ((dflt ? dfltrk : trk)>=rk); //Case of just Rank X, referring directly to the rank of the tested talent
@@ -24620,7 +24444,7 @@ var updateKnackSummary = function fnupdateKnackSummary() {
       req2=safeString( req2 ).replace("rank","").replace("circle","").trim(); //We have a requirement on another entry to test... we will have to find this entry in chararray
       let filtered = charray.filter(entry => entry.name.toLowerCase() === req2);
 
-      if(lg) log("req3 " + req2 + " filtered "+JSON.stringify(filtered));
+      if(lg) errlog( "Earthdawn-checkRequirement - req3 " + req2 + " filtered "+JSON.stringify(filtered));
 
       for(let j=0; j<filtered.length;j++){
         let rrk =  ("rank" in filtered[j]) ? parseInt(filtered[j].rank) : 0;
@@ -24846,7 +24670,6 @@ var updateKnackSummary = function fnupdateKnackSummary() {
                   }
                 }
 
-                // log("charray "+ JSON.stringify(charray))
                 // s+=JSON.stringify(charray);
                 vals["Knack-Summary"]=s;
                 setAttrsLog(vals);
@@ -24858,7 +24681,7 @@ var updateKnackSummary = function fnupdateKnackSummary() {
       });
     });
   });
-  } catch(err) {log("Earthdawn:updateKnackSummary() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:updateKnackSummary() error caught: " + err  ); }
 }; // End updateKnackSummary()
 on("clicked:knacksummary", fn(updateKnackSummary) );
 
@@ -24872,7 +24695,7 @@ var cleanKnackSummary = function fncleanKnackSummary() {
       for( let i = 0; i < nsmarray.length; i++)
       removeRepeatingRow("repeating_knacksummary_" + nsmarray[i]);
     });
-  } catch(err) {log("Earthdawn:clanKnackSummary() error caught: " + err);}
+  } catch( err ) { errlog( "Earthdawn:clanKnackSummary() error caught: " + err ); }
 }; // End updateLanguage()
 
 on("change:knack-summary-param change:knacks-edit-mode", fn(cleanKnackSummary));
@@ -24978,7 +24801,6 @@ var AbilityDrop = function fnAbilityDrop(nm,rep,code,un,data,mode,comp_data) { /
     getAttrs( attarray, function gaRepName(values) { //Get an array of all the names
       if(!nodup && !hardcoded && !(code=="SPM"))
       for( let i = 0; i < tarray.length; i++) {
-        //if(nm=="Charge") log("AbilityDrop nm: " + nm + " checking name against : " + values[buildPre( code, tarray[ i ] ) + "Name"]);
         if(!values[buildPre( code, tarray[ i ] ) + "Name"] || values[buildPre( code, tarray[ i ] ) + "Name"]=="" || safeString( values[buildPre( code, tarray[ i ] ) + "Name"] ).toLowerCase().replace(/\s/g, '')==safeString( nm ).toLowerCase().replace(/\s/g,'') //Remove space and case sensitivity
       || (values[buildPre( code, tarray[ i ] ) + "Type"]=="Racial" &&  data.roll20_Type=="Racial")  && ( //additional intent to catch and avoid duplicates for Astral Sight and Versatility
         (safeString( values[buildPre( code, tarray[ i ] ) + "Name"] ).toLowerCase().startsWith("astral") && safeString( nm ).toLowerCase().startsWith("astral")) ||
@@ -24991,9 +24813,6 @@ var AbilityDrop = function fnAbilityDrop(nm,rep,code,un,data,mode,comp_data) { /
           found=true;
         }
       }
-
-      //if(nm=="Charge") log("AbilityDrop nm: " + nm + " found : " + found + " code " + code + " rowID " + rowID);
-
 
       if(hardcoded) {//Case of Hardcoded.
         if(chk) vals[hardcoded]= (mul==1) ? "1"  : "0"; //Checkbox
@@ -25011,7 +24830,6 @@ var AbilityDrop = function fnAbilityDrop(nm,rep,code,un,data,mode,comp_data) { /
           vals[buildPre( code, rowID )+"RowID"]=rowID;
         }
         //From here we have a rowID, either new or already existing
-        //if(nm=="Charge") log("code " + code + " rowID " + rowID);
         newInfo = buildPre( code, rowID );
         // vals[newInfo+"RowID"]=newId;
 
@@ -25161,25 +24979,11 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
             if(data["roll20_Damage_Blood_Magic"]||data["Damage_Blood_Magic"]) { AbilityDrop(nm,"repeating_blood","BL",un,data,"noduplicate");
             vals["show_blood"]="1";}
 
-            //v3.3 : The abilitadd test is moved to FIllEntryData
-            // if(data["abilityadd"]){ //Process AbilityAdd
-            //   let addjson=parseJSON(data["abilityadd"]);
-            //   log("abilityadd " +JSON.stringify(addjson));
-            //   if(addjson.names && addjson.rep && addjson.code) AbilityDrop(addjson.names,addjson.rep,addjson.code,un,addjson,"AbilityAdd");
-            //   else log("Earthdawn CompendiumDropMgt - Trying to Add nested Ability with invalid JSON");
-            //  }
             break;
           } // end talents
           case  "Skills" :{
             AbilityDrop(nm,"repeating_skills","SK",un,data);
             vals["tab"]="5";
-            //v3.3 : The abilitadd test is moved to FIllEntryData
-            // if(data["abilityadd"]){ //Process AbilityAdd
-            //   let addjson=parseJSON(data["abilityadd"]);
-            //   //log("abilityadd " +JSON.stringify(addjson));
-            //   if(addjson.names && addjson.rep && addjson.code) AbilityDrop(addjson.names,addjson.rep,addjson.code,un,addjson,"AbilityAdd");
-            //   else log("Earthdawn CompendiumDropMgt - Trying to Add nested Ability with invalid JSON");
-            //  }
             break;
           } // end skills
           case  "Knacks" :{
@@ -25220,7 +25024,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
             //   let addjson=parseJSON(data["abilityadd"]);
             //   //log("abilityadd " +JSON.stringify(addjson));
             //   if(addjson.names && addjson.rep && addjson.code) AbilityDrop(addjson.names,addjson.rep,addjson.code,un,addjson,"AbilityAdd");
-            //   else log("Earthdawn CompendiumDropMgt - Trying to Add nested Ability with invalid JSON");
+            //   else errlog( "Earthdawn CompendiumDropMgt - Trying to Add nested Ability with invalid JSON");
             //  }
             if(data["Type"]=="Matrix")  {
               AbilityDrop(nm,"repeating_matrix","SPM",un,data,"noduplicate");
@@ -25273,7 +25077,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
               //   let addjson=parseJSON(data["abilityadd"]);
               //   //log("abilityadd " +JSON.stringify(addjson));
               //   if(addjson.names && addjson.rep && addjson.code) AbilityDrop(addjson.names,addjson.rep,addjson.code,un,addjson,"AbilityAdd");
-              //   else log("Earthdawn CompendiumDropMgt - Trying to Add nested Ability with invalid JSON");
+              //   else errlog( "Earthdawn CompendiumDropMgt - Trying to Add nested Ability with invalid JSON");
               //  }
 
 
@@ -25303,7 +25107,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
 
 
             default: // If category doesn't correspond, just reset and exit
-            log("Earthdawn:CompendiumDropMgt() non droppable compendium category " + values["drop_category"]);
+            errlog( "Earthdawn:CompendiumDropMgt() non droppable compendium category " + values["drop_category"]);
             vals["drop_data"]=""; //In the case of a non-droppable, we also reset the data... In other cases the data has to be processed first
           }
 
@@ -25320,7 +25124,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
     });
 
   }
-  catch(err) {log("Earthdawn:CompendiumDropMgt() error caught: " + err );}
+  catch( err ) { errlog( "Earthdawn:CompendiumDropMgt() error caught: " + err  ); }
 }; //end CompendiumDropMgt()
  on("change:drop_name", fn(CompendiumDropMgt));
 
@@ -25364,12 +25168,12 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
 
 
 
-     if(!eventInfo) {log("Earthdawn:textImport() no eventInfo"); return;}
+     if(!eventInfo) { errlog("Earthdawn:textImport() no eventInfo"); return;}
      if(eventInfo.sourceType!=="player") {
-       if(eventInfo.newValue && eventInfo.newValue!=="") log("Earthdawn:textImport() not triggered by player");
+       if(eventInfo.newValue && eventInfo.newValue!=="") errlog( "Earthdawn:textImport() not triggered by player");
        return;
      }
-     if(!eventInfo.newValue) {log("Earthdawn:textImport() unknown newValue " +  JSON.stringify(eventInfo)); return;}
+     if(!eventInfo.newValue) { errlog("Earthdawn:textImport() unknown newValue " +  JSON.stringify(eventInfo)); return; }
 
      if(safeString( eventInfo.sourceAttribute ).toLowerCase()=="textimportcreature") code="creature";
      else if(safeString( eventInfo.sourceAttribute ).startsWith("repeating_masks")) code="mask";
@@ -25377,7 +25181,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
      else if(safeString( eventInfo.sourceAttribute ).startsWith("repeating_skills")) code="SK";
      else if(safeString( eventInfo.sourceAttribute ).startsWith("repeating_knacks")) code="NAC";
      else if(safeString( eventInfo.sourceAttribute ).startsWith("repeating_spell")) code="SP";
-     else {log("Earthdawn:textImport() unknown sourceAttribute in eventInfo " +  JSON.stringify(eventInfo)); return;}
+     else { errlog("Earthdawn:textImport() unknown sourceAttribute in eventInfo " +  JSON.stringify(eventInfo)); return; }
 
 
      getAttrs([  "edition" ], function gatextImport(values) {
@@ -25408,7 +25212,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
            if( fullText.slice( i, eol ).match( /^\s*(\d+|\SCol\S)\s*$/ ) ) {
              let x = fullText.slice( eol, prev ).match( /^[A-Z\s]+$/ );
              if( x ) {
-               log( "Earthdawn - Warning. Stripped out string '" + safeString( x[0] ).trim() + "' because it looked like a chapter heading across a page break. If not, you probably ought to add it back in again manually.");
+               errlog( "Earthdawn - Warning. Stripped out string '" + safeString( x[0] ).trim() + "' because it looked like a chapter heading across a page break. If not, you probably ought to add it back in again manually.");
                fullText = fullText.slice( 0, i) + fullText.slice( prev );    // Page Number and Page Header. Strip the current line and the next.
              } else
              fullText = fullText.slice( 0, i) + fullText.slice( eol );   // Page Number only. Strip the current line out.
@@ -25457,7 +25261,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
          function textBlock( tBlock, liberal ) {
            'use strict';
            if( typeof tBlock !== 'string' ) {
-             log( "Earthdawn textImport.textBlock: Bad Value" +JSON.stringify(tBlock));
+             errlog( "Earthdawn textImport.textBlock: Bad Value" +JSON.stringify(tBlock));
              return;
            }
            // So if we find a newline that we are going to keep, and then a line that starts with a capital letter and has 4 or less words before the next newline, and then a Capital letter, keep the 2nd newline as well.
@@ -25591,8 +25395,8 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
              else if( typeof arrayIndex === 'string' )   // arrayIndex really holds the string to operate upon instead of block.
              curr = arrayIndex;
              else {
-               log( "Earthdawn statBlock() bad parameter: typeof arrayIndex " + typeof arrayIndex );
-               log( arrayIndex );
+               errlog( "Earthdawn statBlock() bad parameter: typeof arrayIndex " + typeof arrayIndex );
+               errlog( arrayIndex );
                return;
              }
 
@@ -25609,8 +25413,8 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
                  ret[ "field" ] = safeString( curr ).replace( fnd2[ 0 ], c ).trim()
                  ret[ "val" ] = c;
                } else {
-                 log( "Earthdawn statBlock() data error.   Somehow did not find: " + tf + "     in " + fnd2[ 0 ] );
-                 log( "Earthdawn - toFind: " + toFind + "   arrayIndex: " + arrayIndex + "   cmd: " + cmd + "   attrib: " + attrib);
+                 errlog( "Earthdawn statBlock() data error.   Somehow did not find: " + tf + "     in " + fnd2[ 0 ] );
+                 errlog( "Earthdawn - toFind: " + toFind + "   arrayIndex: " + arrayIndex + "   cmd: " + cmd + "   attrib: " + attrib);
                }
                ret[ "remain" ] = safeString( curr ).replace( fnd2[ 0 ], "").trim();
              } else {    // We ether did not look for, or did not find a value. Let's just try for Field.
@@ -25626,8 +25430,8 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
              (("field" in ret) ? ret[ "field" ] : (( "raw" in ret)?  ret[ "raw"] : "" ));   // if have a val, use it. otherwise use what we have.
              return ret;
            } catch(err) {
-             log("Earthdawn statBlock() error caught: " + err );
-             log( "Earthdawn - toFind: " + toFind + "   arrayIndex: " + arrayIndex + "   cmd: " + cmd + "   attrib: " + attrib);
+             errlog( "Earthdawn statBlock() error caught: " + err );
+             errlog( "Earthdawn - toFind: " + toFind + "   arrayIndex: " + arrayIndex + "   cmd: " + cmd + "   attrib: " + attrib);
            }
          } // end statBlock()
 
@@ -25674,7 +25478,6 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
          function parseCreature(name ) {
            'use strict';
            try {
-             //log( "parse " + name); log(block);
 
              let lastBlock = 9999,   // This holds the index number of the first label that is not a short simple value. The short simple values are all lumped into one afterblock. The ones after this index all have special processing.
              carryover="",
@@ -25731,7 +25534,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
 
              blockIndexArray = _.sortBy( blockIndexArray, "index" );
              if( blockIndexArray.length < 1) {
-               log( "Earthdawn - Warning, TextImport was not able to parse that at all");
+               errlog( "Earthdawn - Warning, TextImport was not able to parse that at all");
                return;
              }
              blockIndexArray.push( {name: "eof", index: block.length + blockOffset});
@@ -25815,9 +25618,9 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
                        if(fnd && fnd[1]) entry.Step=safeString( fnd[1] ).trim();
                        entry.Rank=dmgrk;
                        wpnArray.push( entry);
-                       log ("fnd " + JSON.stringify(fnd));
+                       //log("fnd " + JSON.stringify(fnd));
                      } else
-                       log( "ED.textImport.Damage: unable to parse: '" + dmgarr[ i ] + "' of " + t);
+                       errlog( "ED.textImport.Damage: unable to parse: '" + dmgarr[ i ] + "' of " + t);
                    }
                    carryover = "";
                  } break;
@@ -26008,7 +25811,6 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
                          } else
                          lst = safeString( sp ).replace( "\n", " " ); //JBF@JBF cancelled starting and ending with a comma, makes searching easier.
                        }
-                       //log( "tf " + tf + " lst  " + lst); log( "lst2 " + lst2);
 
                        if( lst ) {                     // Dragons : Armored Scales, Dragonsight (21), Dragonspeech (19), Resist Pain (2) or
                                                       //ED3 : Powers: Camouflage (5): 9, Climbing S (5): 12, Durability (5)
@@ -26182,7 +25984,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
                            if( l != -1 ) nm = toCheck.slice( 0, l);
                            if( nm.search( /\(.*?Opponent.*?\)/i ) !== -1)  opponent = true;     // The word Opponent anywhere inside of parentheses.
                            //nm = safeString( nm ).replace( /Opponent\,*/gi, "" );     // remove the word Opponent
-                           //log ("Opponent " + (opponent ? "-1" : "1"));
+                           //log("Opponent " + (opponent ? "-1" : "1"));
                            mandata={Name:nm , Type: (opponent ? "-1" : "1")}
                            if(l != -1 ) mandata.Description=toCheck.slice( l+1);
                            //nm = safeString( nm ).replace( new RegExp( "(" + safeString( name ).replace(",", "|" ).replace( /\s+/g, "") + ")+"+"[\s\,]*", "gi" ), "");  // remove creature name
@@ -26199,7 +26001,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
 
                            manArray.push(mandata);
                            // } else    // could not find a colon.
-                           // log( "Warning!   Could not parse Special Maneuver " + toCheck + "   Do it manually. ");
+                           // errlog( "Warning!   Could not parse Special Maneuver " + toCheck + "   Do it manually. ");
                          }
                        }
                      } break;      // End maneuver
@@ -26226,7 +26028,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
                          } // end for each spell
                        } break;    // spells
                        default:
-                       log( "ED.textImport.Creature: Somehow got value of: " + tf);
+                       errlog( "ED.textImport.Creature: Somehow got value of: " + tf);
                      } // end switch
                    } // end for each label found
 
@@ -26237,7 +26039,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
                    if(spArray.length>0) data["Spells"]=spArray;
                    if(wpnArray.length>0) data["Weapons"]=wpnArray;
 
-                 } catch(err) { log( "Earthdawn.textImport.parseCreature() error caught: " + err); }
+                 } catch( err ) { errlog(  "Earthdawn.textImport.parseCreature() error caught: " + err ); }
                  return true;
                } // end parseCreature
 
@@ -26283,7 +26085,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
                    blockIndex( "Tier" );
                    blockIndexArray = _.sortBy( blockIndexArray, "index" );
                    if( blockIndexArray.length < 1) {
-                     log( "Earthdawn textImport : Warning, TextImport was not able to parse that at all");
+                     errlog( "Earthdawn textImport : Warning, TextImport was not able to parse that at all");
                      return;
                    }
                    let end = block.indexOf( "\n", blockIndexArray[ blockIndexArray.length -1 ][ "index" ] + 2 - blockOffset );   // First newline after last stat block entry
@@ -26385,12 +26187,12 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
                            data["roll20_Type"] (( code == "SK" ) ? "F1-" : "TO1-") + x[ "val" ];
                          } break;
                          default:
-                         log( "ED.textImport.Talent: Somehow got value of: " + tf, po );
+                         errlog( "ED.textImport.Talent: Somehow got value of: " + tf, po );
                        } // end switch tofind
                      } // end for blockindex array
 
                      if( followup.length > 0 )
-                     log( "Earthdawn textImport" + safeString( followup ).trim());
+                     errlog( "Earthdawn textImport" + safeString( followup ).trim());
                      data["Description"]= textBlock( fullText.slice( end + blockOffset ).trim()) + "\n" + safeString( afterBlock ).trim();
                      data["Name"]= name;    // Set name last, so autofill does not trigger while this is still running.
                    } break;    // end Talents, Knacks, and Skills.
@@ -26423,13 +26225,12 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
                        blockIndex( "Extra Threads" );
                        blockIndexArray = _.sortBy( blockIndexArray, "index" );
                        if( blockIndexArray.length < 1) {
-                         log( "Earthdawn textImport : Warning, TextImport was not able to parse that at all");
+                         errlog( "Earthdawn textImport : Warning, TextImport was not able to parse that at all");
                          return;
                        }
                        let end = block.length,
                        effect, succ, extra, txt, afterBlock;
                        blockIndexArray.push( {name: "eof", index: end + blockOffset });
-                       //log(block ); log( blockIndexArray);
 
                        for( let i = blockIndexArray.length -2; i > -1; --i) {
                          let tf = blockIndexArray[ i ][ "name"];
@@ -26543,7 +26344,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
                              data["roll20_ExtraThreads"] =  parseThreads( 1, extra );
                            } break;
                            default:
-                           log( "ED.textImport.Spell: Somehow got value of: " + tf );
+                           errlog( "ED.textImport.Spell: Somehow got value of: " + tf );
                          } // end switch tofind
                        } // End for each token found.
 
@@ -26584,12 +26385,12 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
                        + safeString( afterBlock ).trim();
                        data["Name"] = name;
                        if( followup.length > 0 )
-                       log( safeString( followup ).trim());
+                       errlog( safeString( followup ).trim());
                      } break;      // End Spell import
 
 
                      default:
-                     log( "ED.textImport() Unknown code" + code);
+                     errlog( "ED.textImport() Unknown code" + code);
                    } // end Switch
 
 
@@ -26613,7 +26414,7 @@ var CompendiumDropMgt = function fnCompendiumDropMgt(eventInfo) {
                    setAttrsLog(vals);
 
                  });
-               } catch(err) {log("Earthdawn:textImport() error caught: " + err );}
+               } catch( err ) { errlog( "Earthdawn:textImport() error caught: " + err  ); }
              }; //end textImport()
   on("change:textimportcreature change:repeating_masks:msk_textimport change:repeating_talents:t_textimport change:repeating_knacks:nac_textimport change:repeating_skills:sk_textimport change:repeating_spell:sp_textimport", fn(textImport));
 
@@ -26703,7 +26504,7 @@ var BuildCompendiumQuery = function fnBuildCompendiumQuery(nm,code) {
 
 return safeString( q ).replace("\'","%E2%80%99");
 
-} catch(err) {log("Earthdawn:BuildCompendiumQuery() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:BuildCompendiumQuery() error caught: " + err  ); }
 }; //end CompendiumQuery()
 
 
@@ -26723,7 +26524,7 @@ var getCompendiumQuery2 = function fngetCompendiumQuery2(q,comp_data,cb) {
         results=comp_data.filter(elements => elements.name==fnd[1]);
       cb(results);
     }
-} catch(err) {log("Earthdawn:getCompendiumQuery2() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:getCompendiumQuery2() error caught: " + err  ); }
 }; //end GetCompendiumQuery2()
 
 
@@ -26739,7 +26540,7 @@ on("clicked:import_talents clicked:import_knacks clicked:import_skills clicked:i
       case "clicked:import_skills" : rep="repeating_skills"; code="SK"; break;
       case "clicked:import_spells" : rep="repeating_spell"; code="SP"; break;
       case "clicked:import_knacks" : rep="repeating_knacks"; code="NAC"; nac=true; break;
-      default : log("Earthdawn:ocImportAll() unknown eventInfo: " + JSON.stringify(eventInfo) ); return;
+      default : errlog( "Earthdawn:ocImportAll() unknown eventInfo: " + JSON.stringify(eventInfo) ); return;
     }
 
     getSectionIDs(rep, function gsIdRepeatingTalents(tarray) {
@@ -26772,7 +26573,7 @@ on("clicked:import_talents clicked:import_knacks clicked:import_skills clicked:i
 });
 });
   });
-} catch(err) {log("Earthdawn:ocImportAll() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:ocImportAll() error caught: " + err  ); }
 }));//end ocImportAll
 
 
@@ -26787,7 +26588,7 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
     vals[trigger]=tv
     setAttrsLog(vals);
 
-} catch(err) {log("Earthdawn:ocTabMgmt() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:ocTabMgmt() error caught: " + err  ); }
 }));//end ocTabMgmt
 
 
@@ -26860,7 +26661,7 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
         });
       });
       });
-    } catch(err) {log("Earthdawn:FillDataCreature() error caught: " + err );}
+    } catch( err ) { errlog( "Earthdawn:FillDataCreature() error caught: " + err  ); }
   }; //end FillDataCreature()
 
 
@@ -26949,7 +26750,7 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
           });
         });
       });
-    } catch(err) {log("Earthdawn:FillDataCreature2() error caught: " + err );}
+    } catch( err ) { errlog( "Earthdawn:FillDataCreature2() error caught: " + err  ); }
   }; //end FillDataCreature2()
 
 
@@ -27120,7 +26921,7 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
                 AbilityDrop("Atk-" + nm,"repeating_talents","T",null,datacopy2);
               } else AbilityDrop("Atk-" + nm,"repeating_talents","T",null,datacopy2);
 
-            } else log("Earthdawn.FillEntryCreature Error : Trying to create Attack with undefined name :" +JSON.stringify(arr[j]));
+            } else errlog( "Earthdawn.FillEntryCreature Error : Trying to create Attack with undefined name :" +JSON.stringify(arr[j]));
            }
           }//end attacks
 
@@ -27177,7 +26978,7 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
           recalc();
         });
       });
-    } catch(err) {log("Earthdawn:FillDataCreature3() error caught: " + err );}
+    } catch( err ) { errlog( "Earthdawn:FillDataCreature3() error caught: " + err  ); }
   }; //end FillDataCreature3()
 
 
@@ -27196,7 +26997,7 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
 
       setAttrsLog(vals);
     });
-  } catch(err) {log("Earthdawn:ocAddSuggPowers() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:ocAddSuggPowers() error caught: " + err  ); }
 }));//end ocAddSUggPowers
 
 //Add all the powers on the suggested list
@@ -27250,7 +27051,7 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
 
       let data=database[values["addspells_Disc"]];
       if(!data){
-        log("Earthdawn.addspells, unknown discipline " + values["addspells_Disc"]);
+        errlog( "Earthdawn.addspells, unknown discipline " + values["addspells_Disc"]);
         return;
       }
 
@@ -27265,7 +27066,7 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
 
       AbilityArrayDrop (data2,"repeating_spell","SP");
     });
-  } catch(err) {log("Earthdawn:ocAddSpells() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:ocAddSpells() error caught: " + err  ); }
 }));//end ocAddSpells
 
 
@@ -27321,7 +27122,7 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
                     let v=getInt(data2,tf) + (adj||0);
                     vals[att] = getInt(values,att) + mult * v;
                   }
-                } catch(err) {   log( "Earthdawn FillMask.Adjust() error caught: " + err );    }
+                } catch( err ) { errlog(  "Earthdawn FillMask.Adjust() error caught: " + err  ); }
               }//end Adjust
 
               // Start of the main Code
@@ -27425,9 +27226,9 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
                   }
                 } else { //A couple of masks add tranmple with the damage max
                   if(mult>0) { // We need to deal with a very special case where it is referred as highest attack and highest damage
-                    // log("processing exceptional attack " + atkmax + " dmg " + dmgmax);
-                    // log("details dmg " + dmgmax  + " " + getInt(arr[j],"Dmg_Step"));
-                    // log("details atk " + atkmax  + " " + getInt(arr[j],"Atk_Step"));
+                    //log("processing exceptional attack " + atkmax + " dmg " + dmgmax);
+                    //log("details dmg " + dmgmax  + " " + getInt(arr[j],"Dmg_Step"));
+                    //log("details atk " + atkmax  + " " + getInt(arr[j],"Atk_Step"));
 
                     let nm=safeString( arr[j]["Name"] ).trim();
                     let datacopy={},datacopy2={};
@@ -27499,7 +27300,7 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
           });
         });
       });
-    } catch(err) {log("Earthdawn:FillMask() error caught: " + err );}
+    } catch( err ) { errlog( "Earthdawn:FillMask() error caught: " + err  ); }
   }; //end FillDataMask()
 
 
@@ -27556,7 +27357,7 @@ on("clicked:tab clicked:tab-spells clicked:tab-grim clicked:tab-adjust clicked:t
               setAttrsLog(vals);
 
       });
-    } catch(err) {log("Earthdawn:FillDataTrap() error caught: " + err );}
+    } catch( err ) { errlog( "Earthdawn:FillDataTrap() error caught: " + err  ); }
   }; //end FillDataTrap()
 
 
@@ -27608,7 +27409,7 @@ for(let j=0; j<arr.length ; j++){
          }
        }
        });
-  } catch(err) {log("Earthdawn:AbilityArrayDrop () error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:AbilityArrayDrop () error caught: " + err  ); }
 }; //end AbilityArrayDrop ()
 
 
@@ -27625,7 +27426,7 @@ var RemoveMask = function fnFillDataCreature(eventInfo) {
       for(var key in eventInfo.removedInfo)
         if (safeString( key ).endsWith("Details")) data=parseJSON(eventInfo.removedInfo[key]);
     if(data)     FillDataMask(data,-1);
-  } catch(err) {log("Earthdawn:RemoveMask() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:RemoveMask() error caught: " + err  ); }
 }; //end RemoveMask()
 on("remove:repeating_masks", fn(RemoveMask) );
 
@@ -27644,7 +27445,7 @@ on("sheet:compendium-drop", fn(function onCompDrop() {
       else                                  setDefaultToken({                    "bar2_link":"Wounds", "bar3_link":"Damage", "height":crsize, "width":crsize});
   //}
   });
-} catch(err) {log("Earthdawn:ocCompDrop error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:ocCompDrop error caught: " + err  ); }
 }));//End ocCompDrop
 
 
@@ -27652,18 +27453,6 @@ on("sheet:compendium-drop", fn(function onCompDrop() {
 
 
 //************** v3.18LP Tracking functions*****
-
-
-// var CountTransac = function fnCountTransaction(eventInfo) {
-//   'use strict';
-//   try{
-//     log("CountTransaction " + JSON.stringify(eventInfo));
-//     getSectionIDs("repeating_transaction", function(tarray) {
-//       setAttrs({"TransacQueueLength" : tarray.length})
-//     });
-//   } catch(err) {log("Earthdawn:CountTransac() error caught: " + err );}
-// }; //end CountTransac ()
-// on("change:repeating_transaction remove:repeating_transaction", fn(CountTransac) );
 
 
 var PostTransac= function fnPostTransac(transacarray,cb){
@@ -27713,10 +27502,6 @@ var PostTransac= function fnPostTransac(transacarray,cb){
 
      vals["Wealth_Gold"]=parseInt2(gold);
      vals["Wealth_Silver"]=parseInt2(silver);
-     // log(silver);
-     // log(vals["Wealth_Silver"]);
-     // log(silver-parseFloat(vals["Wealth_Silver"]));
-     // log(spcp*(silver-parseFloat(vals["Wealth_Silver"])));
      vals["Wealth_Copper"]=parseInt2(spcp*silver)-(spcp*vals["Wealth_Silver"]);
 
 
@@ -27737,7 +27522,7 @@ var PostTransac= function fnPostTransac(transacarray,cb){
 
     setAttrsLog(vals,null,cb);
   });
-} catch(err) {log("Earthdawn:PostTransac() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:PostTransac() error caught: " + err  ); }
 
 } //End PostTransac
 
@@ -27764,7 +27549,7 @@ on("clicked:post_update", fn(function ocPost_Update() {
       setAttrsLog(vals);
     });
   });
-} catch(err) {log("Earthdawn:ocPost_Update() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:ocPost_Update() error caught: " + err  ); }
 })); //End ocPost_Update
 
 
@@ -27778,7 +27563,7 @@ on("clicked:transacignoreall", fn(function ocTransacIgnoreAll() {
 
         setAttrs({"TransacQueueLength" : 0});
   });
-} catch(err) {log("Earthdawn:ocTransacIgnoreAll() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:ocTransacIgnoreAll() error caught: " + err  ); }
 })); //End ocTransacIgnoreAll
 
 
@@ -27794,7 +27579,7 @@ on("clicked:repeating_transaction:transacignore", fn(function ocTransacIgnore(ev
 
         });
 
-} catch(err) {log("Earthdawn:ocTransacIgnore() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:ocTransacIgnore() error caught: " + err  ); }
 })); //End ocTransacIgnore
 
 
@@ -27822,7 +27607,7 @@ on("clicked:repeating_transaction:transacupdate", fn(function ocTransacUpdate(ev
         });
 
 
-} catch(err) {log("Earthdawn:ocTransacUpdate() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:ocTransacUpdate() error caught: " + err  ); }
 })); //End ocTransacUpdate
 
 
@@ -27865,7 +27650,7 @@ on("clicked:transacupdateall", fn(function ocTransacUpdateAll() {
         });
 
 });
-} catch(err) {log("Earthdawn:ocTransacUpdateAll() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:ocTransacUpdateAll() error caught: " + err  ); }
 })); //End ocTransacUpdateAll
 
 
@@ -27874,7 +27659,7 @@ on("clicked:transacupdateall", fn(function ocTransacUpdateAll() {
 var updateLPTransac = function fnupdateLPTransac(eventInfo) {
   'use strict';
   try{
-    //log ( "updateLPTransac() " + JSON.stringify(eventInfo));
+    //log( "updateLPTransac() " + JSON.stringify(eventInfo));
 
     let att = getAttrib(eventInfo)||"";
     let attlc=att.toLowerCase();
@@ -27900,7 +27685,7 @@ var updateLPTransac = function fnupdateLPTransac(eventInfo) {
          case "NAC" : attarray.push(pre+"Name");attarray.push(pre+"Requirements");attarray.push(pre+"Type"); break;
          case "SP" : attarray.push(pre+"Name");attarray.push(pre+"Circle"); attarray.push(pre+"Type"); break;
          case "DSP" : attarray.push(pre+"Name");attarray.push(pre+"Circle"); attarray.push(pre+"Type");break;
-         default : log("Earthdawn LPTransac - Unknown trigger 1 "+  att); return;
+         default : errlog( "Earthdawn LPTransac - Unknown trigger 1 "+  att); return;
         }
       } else { //When it is a remove, we won't get the code
         let x = safeString( att ).split("_"),
@@ -27913,13 +27698,13 @@ var updateLPTransac = function fnupdateLPTransac(eventInfo) {
           case "knacks" : code = "NAC" ; break;
           case "spell" : code = "SP" ; break;
           case "discipline" : code = "DSP" ;break;
-          default : log("Earthdawn LPTransac - Unknown case for Removal"+  att); return;
+          default : errlog( "Earthdawn LPTransac - Unknown case for Removal"+  att); return;
          }
          rowid = x[2];
          pre = buildPre(code,rowid);
       }
     } else{
-      log("Earthdawn LPTransac - Unknown trigger 2 "+  att);
+      errlog( "Earthdawn LPTransac - Unknown trigger 2 "+  att);
       return;
     }
 
@@ -27994,7 +27779,7 @@ var updateLPTransac = function fnupdateLPTransac(eventInfo) {
       switch(code){
         case "ATT" :  nm= att.split("-")[1];nm=nm.charAt(0).toUpperCase() + nm.slice(1); rkdspl="Attribute Increase"; break;
         case "KAR" :  nm= "Karma Ritual"; rkdspl=""; break;
-        case "LS"  :  nm= (attlc=="ls-speak-rank" ? "Speak Language" : "Read & Write Language") + "Novice Skill"; rkdspl="Rank"; break;
+        case "LS"  :  nm= (attlc=="ls-speak-rank" ? "Speak Language " : "Read & Write Language ") + "Novice Skill"; rkdspl="Rank"; break;
         case "TI"  :  nm=values[pre+"Name"]; rkdspl="Thread Rank";rknm="Rank";tynm="Type"; tydflt="Novice"; break;
         case "NAC" :  nm=values[pre+"Name"]; rkdspl="Knack Rank";rknm="Requirements";tynm="Type"; tydflt="Knack"; break;
         case "SK"  :  nm=values[pre+"Name"]; rkdspl="Skill Rank";rknm="Rank";tynm="Type"; tydflt="Novice"; break;
@@ -28002,7 +27787,7 @@ var updateLPTransac = function fnupdateLPTransac(eventInfo) {
         case "SP"  : nm=values[pre+"Name"]; rkdspl="Spell Circle"; rknm="Circle"; tynm="Type"; tydflt="Spell"; break;
         case "DSP" : nm=values[pre+"Name"]; rkdspl=(((values[pre+"Type"])=="Discipline") ? "Circle" : "Rank");rknm="Circle" ;tynm="Type"; tydflt="Discipline"; break;
         case "SPM" : nm="Matrix";rknm="Rank";rkdspl="Rank";tynm="Origin"; tydflt="TO1-Novice"; break;
-        default : log("Earthdawn LPTransac - Unknown triger "+  att); return;
+        default : errlog( "Earthdawn LPTransac - Unknown triger "+  att); return;
        }
 
        if(eventInfo.previousValue && eventInfo.newValue && eventInfo.newValue==eventInfo.previousValue &&eventInfo.sourceType=="player") eventInfo.previousValue=undefined; //This is due to a bug in roll20... where it sometimes return identical values. the sourceType is because for Circle, Circle_max triggers it in CreateTalents
@@ -28011,17 +27796,17 @@ var updateLPTransac = function fnupdateLPTransac(eventInfo) {
        switch(code){
          case "ATT" :
          if(values["LP-AttribOption"]=="0") return; //With this optional rule, Attrib Increases do not cost so Ignore them
-          oldval.rk=parseInt(eventInfo.previousValue)|0;
-          newval.rk=parseInt(eventInfo.newValue)|0;
+          oldval.rk=parseInt2(eventInfo.previousValue);
+          newval.rk=parseInt2(eventInfo.newValue);
           break;
         case "KAR" :
-          oldval.rk=parseInt(eventInfo.previousValue)|0;
-          newval.rk=parseInt(eventInfo.newValue)|0;
+          oldval.rk=parseInt2(eventInfo.previousValue);
+          newval.rk=parseInt2(eventInfo.newValue);
           if(oldval.rk>=newval.rk) return; //We only buy
           break;
         case "LS"  :
-          oldval.rk=parseInt(eventInfo.previousValue)|0;
-          newval.rk=parseInt(eventInfo.newValue)|0;
+          oldval.rk=parseInt2(eventInfo.previousValue);
+          newval.rk=parseInt2(eventInfo.newValue);
           break;
           case "T"   : ///need to deal with the multidisciplining case
           if(eventInfo.removedInfo){
@@ -28071,18 +27856,16 @@ var updateLPTransac = function fnupdateLPTransac(eventInfo) {
             newval.tier= values[pre+tynm] || tydflt;
             oldval.tier= values[pre+tynm] || tydflt;
             newval.rk=0;
-            oldval.rk=values[pre+rknm]||0;
+            oldval.rk=getInt(values,pre+rknm);
           }else{
             newval.tier=values[pre+tynm] || tydflt;
             oldval.tier=(eventInfo.sourceAttribute == (pre+tynm).toLowerCase())? (eventInfo.previousValue || tydflt) : (values[pre+tynm] || tydflt);
-            newval.rk=values[pre+rknm]||0;
-            oldval.rk=(eventInfo.sourceAttribute == (pre+rknm).toLowerCase())? eventInfo.previousValue||0 : values[pre+rknm]||0;
+            newval.rk=getInt(values,pre+rknm);
+            oldval.rk=(eventInfo.sourceAttribute == (pre+rknm).toLowerCase())? parseInt2(eventInfo.previousValue) : getInt(values,pre+rknm);
           }
         break;
-         default : log("Earthdawn LPTransac - Unknown triger "+  att); return;
+         default : errlog( "Earthdawn LPTransac - Unknown triger "+  att); return;
         }
-
-
 
         //Time to Calculate
         switch(code){
@@ -28189,10 +27972,6 @@ var updateLPTransac = function fnupdateLPTransac(eventInfo) {
           amountsp = newval.spcost - oldval.spcost;
           amountdays=newval.amountdays-oldval.amountdays
           amountlp = newval.lpcost - oldval.lpcost;
-
-        //  log("oldval "+JSON.stringify(oldval));
-          //log("newval "+JSON.stringify(newval));
-
           break;
 
           case "SK"  :
@@ -28242,9 +28021,8 @@ var updateLPTransac = function fnupdateLPTransac(eventInfo) {
           amountdays= (newval.tier=="SpellKnack" ? newval.rk : 1);
           break;
 
-          default : log("Earthdawn LPTransac - Unknown triger "+  att); return;
+          default : errlog( "Earthdawn LPTransac - Unknown triger "+  att); return;
         }
-
 
         if(amountlp<0||amountsp<0||amountdays<0){
           rtype="Refund";
@@ -28273,7 +28051,7 @@ var updateLPTransac = function fnupdateLPTransac(eventInfo) {
     }
 });
 
-} catch(err) {log("Earthdawn:updateLPTransac() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:updateLPTransac() error caught: " + err  ); }
 }; // End updateLPTransac()
 on("change:repeating_skills:sk_rank change:repeating_skills:sk_type change:repeating_threads:ti_rank change:repeating_threads:ti_type change:repeating_matrix:spm_rank change:repeating_matrix:spm_origin change:repeating_talents:t_rank change:repeating_talents:t_type change:repeating_talents:t_typeother change:repeating_knacks:nac_requirements change:repeating_knacks:nac_type change:repeating_spell:sp_circle change:repeating_spell:sp_type remove:repeating_talents remove:repeating_matrix remove:repeating_spell remove:repeating_knacks remove:repeating_threads remove:repeating_skills change:repeating_discipline:dsp_circle change:repeating_discipline:dsp_type  remove:repeating_discipline", fn(updateLPTransac) );
 on("change:karma change:attrib-dex-increases change:attrib-str-increases change:attrib-tou-increases change:attrib-per-increases change:attrib-wil-increases change:attrib-cha-increases change:ls-speak-rank change:ls-readwrite-rank", fn(updateLPTransac) );
@@ -28305,7 +28083,7 @@ on("clicked:repeating_talents:populateselect clicked:repeating_knacks:populatese
       case "weapons" : code="WPN"; break;
       case "discipline" : code="DSP"; break;
       case "spell" : code="SP"; break;
-      default: log("Earthdawn - LinkSelect Populate unknown precode " +precode);return;
+      default: errlog( "Earthdawn - LinkSelect Populate unknown precode " +precode);return;
     }
     let pre=buildPre(code,rid);
 
@@ -28327,7 +28105,7 @@ on("clicked:repeating_talents:populateselect clicked:repeating_knacks:populatese
         case "repeating_weapons" : code2="WPN"; break;
         case "repeating_discipline" : code2="DSP"; break;
         case "repeating_spell" : code2="SP"; break;
-        default: log("Earthdawn - LinkSelect Populate unknown sid " +sid);return;
+        default: errlog( "Earthdawn - LinkSelect Populate unknown sid " +sid);return;
       }
 
 
@@ -28352,14 +28130,14 @@ on("clicked:repeating_talents:populateselect clicked:repeating_knacks:populatese
             elemSelector: '.dynamicSelect',
             optionsArray: options,
             callback: () => {
-              //console.log('Options should be populated')
+              //errlog('Options should be populated')
             }
           });
         });
       });
     });
 
-  } catch(err){ log("Earthdawn PopulateLinkList Error :" + err)}
+  } catch(err){ errlog("Earthdawn PopulateLinkList Error :" + err); }
 }));//End PopulateLinkList
 
 
@@ -28383,7 +28161,7 @@ on("clicked:repeating_talents:linkcreate clicked:repeating_knacks:linkcreate cli
       case "weapons" : code="WPN"; break;
       case "discipline" : code="DSP"; break;
       case "spell" : code="SP"; break;
-      default: log("Earthdawn - LinkCreate Populate unknown precode " +precode);return;
+      default: errlog( "Earthdawn - LinkCreate Populate unknown precode " +precode);return;
     }
     let pre=buildPre(code,rid);
 
@@ -28404,12 +28182,12 @@ on("clicked:repeating_talents:linkcreate clicked:repeating_knacks:linkcreate cli
         elemSelector: '.dynamicSelect',
         optionsArray: options,
         callback: () => {
-          //console.log('Options should be populated')
+          //errlog('Options should be populated')
         }
       });
     });
 
-  } catch(err){ log("Earthdawn LinkCreate Error :" + err)}
+  } catch(err){ errlog("Earthdawn LinkCreate Error :" + err); }
 }));//End ocCreateLink
 
 
@@ -28469,9 +28247,9 @@ var LinkAdd = function fnLinkAdd(codeget,ridget,codeprov,ridprovlst) {
           llst = safeString(llst).split( "," );
           dlst = safeString(dlst).split( "," );
           if( llst.length != dlst.length ) {
-            log( "Earthdawn - Warning! internal data mismatch in linkadd2.");
-            log( dlst );
-            log( llst);
+            errlog( "Earthdawn - Warning! internal data mismatch in linkadd2.");
+            errlog( dlst );
+            errlog( llst);
             llst = [];
             dlst = [];
           }
@@ -28501,7 +28279,7 @@ var LinkAdd = function fnLinkAdd(codeget,ridget,codeprov,ridprovlst) {
 
       setAttrsLog(vals);
     });
-  } catch(err){ log("Earthdawn LinkAdd Error :" + err)}
+  } catch(err){ errlog("Earthdawn LinkAdd Error :" + err); }
 };//End LinkAdd
 
 
@@ -28525,7 +28303,7 @@ on("clicked:repeating_talents:populatedelete clicked:repeating_knacks:populatede
       case "weapons" : code="WPN"; break;
       case "discipline" : code="DSP"; break;
       case "spell" : code="SP"; break;
-      default: log("Earthdawn - LinkSelect Populate unknown precode " +precode);return;
+      default: errlog( "Earthdawn - LinkSelect Populate unknown precode " +precode);return;
     }
     let pre=buildPre(code,rid);
     let options = [{ label: 'Select Link', value: 'Select', selected: "true"}]
@@ -28536,7 +28314,7 @@ on("clicked:repeating_talents:populatedelete clicked:repeating_knacks:populatede
 
       //Manage the case where they don't have the same length
       if(llst.length!==dlst.length){
-        log("Earthdawn LinkRemove Mismatch !! " + llst + " " +dlst);
+        errlog( "Earthdawn LinkRemove Mismatch !! " + llst + " " +dlst);
         return;
       }
 
@@ -28549,12 +28327,12 @@ on("clicked:repeating_talents:populatedelete clicked:repeating_knacks:populatede
         elemSelector: '.dynamicSelect2',
         optionsArray: options,
         callback: () => {
-          //console.log('Options should be populated')
+          //errlog('Options should be populated')
         }
       });
     });
 
-  } catch(err){ log("Earthdawn PopulateDeleteList Error :" + err)}
+  } catch(err){ errlog("Earthdawn PopulateDeleteList Error :" + err); }
 }));//End PopulateDeleteList
 
 
@@ -28579,7 +28357,7 @@ on("clicked:repeating_talents:linkdelete clicked:repeating_knacks:linkdelete cli
       case "weapons" : code="WPN"; break;
       case "discipline" : code="DSP"; break;
       case "spell" : code="SP"; break;
-      default: log("Earthdawn - LinkCreate Populate unknown precode " +precode);return;
+      default: errlog( "Earthdawn - LinkCreate Populate unknown precode " +precode);return;
     }
     let pre=buildPre(code,rid);
 
@@ -28601,12 +28379,12 @@ on("clicked:repeating_talents:linkdelete clicked:repeating_knacks:linkdelete cli
         elemSelector: '.dynamicSelect2',
         optionsArray: options,
         callback: () => {
-          //console.log('Options should be populated')
+          //errlog('Options should be populated')
         }
       });
     });
 
-  } catch(err){ log("Earthdawn LinkDelete Error :" + err)}
+  } catch(err){ errlog("Earthdawn LinkDelete Error :" + err); }
 }));//End ocDeleteLink
 
 
@@ -28646,9 +28424,9 @@ var LinkRemove = function fnLinkRemove(codeget,ridget,codeprov,ridprov,halfr) {
           llst = safeString(llst).split( "," );
           dlst = safeString(dlst).split( "," );
           if( llst.length != dlst.length ) {
-            log( "Earthdawn - Warning! internal data mismatch in linkremove.");
-            log( dlst );
-            log( llst);
+            errlog( "Earthdawn - Warning! internal data mismatch in linkremove.");
+            errlog( dlst );
+            errlog( llst);
             llst = [];
             dlst = [];
           }
@@ -28679,7 +28457,7 @@ var LinkRemove = function fnLinkRemove(codeget,ridget,codeprov,ridprov,halfr) {
 
       setAttrsLog(vals);
     });
-  } catch(err){ log("Earthdawn LinkRemove Error :" + err)}
+  } catch(err){ errlog("Earthdawn LinkRemove Error :" + err); }
 };//End LinkRemove
 
 
@@ -28689,7 +28467,7 @@ var RemoveHalfLinks = function fnRemoveHalfLinks(eventInfo) {
   'use strict';
   try{
     //log("RemoveHalfLinks "+JSON.stringify(eventInfo));
-    if(!eventInfo.removedInfo) {log("Earthdawn - RemovedHalfLinks no RemovedInfo " +JSON.stringify(eventInfo)); return;}
+    if(!eventInfo.removedInfo) { errlog( "Earthdawn - RemovedHalfLinks no RemovedInfo " + JSON.stringify(eventInfo) ); return; }
     let gllst,pllst,pre,rowid,code;
     let att = getAttrib(eventInfo)||"";
     let x = safeString( att ).split("_"),
@@ -28703,7 +28481,7 @@ var RemoveHalfLinks = function fnRemoveHalfLinks(eventInfo) {
       case "knacks" : code = "NAC" ; break;
       case "spell" : code = "SP" ; break;
       case "discipline" : code = "DSP" ;break;
-      default : log("Earthdawn RemoveHalfLink - Unknown case for Removal"+  att); return;
+      default : errlog( "Earthdawn RemoveHalfLink - Unknown case for Removal"+  att); return;
     }
     rowid = x[2];
     pre = buildPre(code,rowid);
@@ -28731,7 +28509,7 @@ var RemoveHalfLinks = function fnRemoveHalfLinks(eventInfo) {
       }
     }
 
-  } catch(err) {log("Earthdawn:RemoveHalfLinks() error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:RemoveHalfLinks() error caught: " + err  ); }
 }; // End RemoveHalfLinks()
 on("remove:repeating_talents remove:repeating_threads remove:repeating_weapons remove:repeating_skills remove:repeating_matrix remove:repeating_knacks remove:repeating_discipline remove:repeating_spell", fn(RemoveHalfLinks) );
 
@@ -28786,11 +28564,11 @@ var LinkAddByName = function fnLinkAddByName(codeget,ridget,codeprov,nmprovlst) 
       if(ridprov.length>0 && ridprov.length<10) //If we found more than 10 hits, it must not be intentional, something went wrong
         LinkAdd(codeget,ridget,codeprov,ridprov.join("|")); //LinkAdd called in a | list of rowid
       else if (ridprov.length>=10)
-        log("Earthdawn LinkAddByName too many target found " + nmprovlst + " code "+ codeprov);
-      else log("Earthdawn LinkAddByName Target not found " + nmprovlst + " code "+ codeprov);
+        errlog( "Earthdawn LinkAddByName too many target found " + nmprovlst + " code "+ codeprov);
+      else errlog( "Earthdawn LinkAddByName Target not found " + nmprovlst + " code "+ codeprov);
     });
   });
-  } catch(err){ log("Earthdawn LinkAddByName Error :" + err)}
+} catch(err){ errlog("Earthdawn LinkAddByName Error :" + err); }
 };//End LinkAddByName
 
 
@@ -28818,7 +28596,7 @@ var kwsanitize = function fnsanitize( input ) {
 
        //log("kwsanitize " + input +" into "+newVal);
        return newVal;
-  } catch(err) {log("Earthdawn:kwsanitize() for " + input + " error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:kwsanitize() for " + input + " error caught: " + err  ); }
 }; // End kwsanitize()
 
 
@@ -28841,7 +28619,7 @@ var prekwSanitize = function fnpreSanitize( eventInfo ) {
   {
     pre= buildPre( repeatSection( 3, att ), repeatSection( 2, att ));
     newAtt=pre+"Special";
-  } else {log("Earthdawn:prekwSanitize() should not have triggered: " + JSON.stringify(eventInfo) );return;}
+  } else { errlog("Earthdawn:prekwSanitize() should not have triggered: " + JSON.stringify(eventInfo) ); return; }
   if( !isStr && "newValue" in eventInfo){
   newVal=kwsanitize( eventInfo[ "newValue"] );
   if(newVal !== eventInfo[ "newValue"]){
@@ -28857,7 +28635,7 @@ var prekwSanitize = function fnpreSanitize( eventInfo ) {
         setAttrsLog(vals)
       }
   });
-} catch(err) {log("Earthdawn:prekwSanitize() error caught: " + err );}
+} catch( err ) { errlog( "Earthdawn:prekwSanitize() error caught: " + err  ); }
 }; // End prekwSanitize()
 on("change:repeating_talents:t_special change:repeating_knacks:nac_special change:repeating_skills:sk_special", fn( prekwSanitize ));
 
@@ -28874,7 +28652,7 @@ var kwtest = function fnkwtest( kwlst, kw, opt ) {
 
      if(opt=="n") return bres ? 1 : 0;
      else return bres;
-  } catch(err) {log("Earthdawn:kwtest() for " + kw + " in " + kwlst + " error caught: " + err );}
+  } catch( err ) { errlog( "Earthdawn:kwtest() for " + kw + " in " + kwlst + " error caught: " + err  ); }
 }; // End kwtest()
 
 
@@ -28898,7 +28676,7 @@ on("clicked:repeating_talents:addkeyword clicked:repeating_knacks:addkeyword cli
       case "spell" : code="SP"; break;
       case "weapons" : code="WPN"; break;
       case "armor" : code="ARM"; break;
-      default: log("Earthdawn - AddKeyword Populate unknown precode " +precode);return;
+      default: errlog( "Earthdawn - AddKeyword Populate unknown precode " +precode);return;
     }
     let pre=buildPre(code,rid);
 
@@ -28916,7 +28694,7 @@ on("clicked:repeating_talents:addkeyword clicked:repeating_knacks:addkeyword cli
 
     });
 
-  } catch(err){ log("Earthdawn AddKeyword Error :" + err)}
+  } catch(err){ errlog("Earthdawn AddKeyword Error :" + err); }
 }));//End AddKeyword
 
 
@@ -28924,7 +28702,7 @@ var updateTalentNameFilter = function fnupdateTalentNameFilter() {
   'use strict';
   try{
     var attarray = ["TalentNameFilter"];
-     //log ( "EarthDawn : updateTalentNameFilter() ");
+     //log( "EarthDawn : updateTalentNameFilter() ");
 
     getSectionIDs("repeating_talents", function gsIdRepeatingTalents(tarray) {
       for( let i = 0; i < tarray.length; i++) attarray.push( buildPre( "T", tarray[ i ] ) + "Name");
@@ -28959,7 +28737,7 @@ var updateTalentNameFilter = function fnupdateTalentNameFilter() {
       });
     });
   });
-} catch(err) {log("Earthdawn:updateTalentNameFilter() error caught: " + err);}
+} catch( err ) { errlog( "Earthdawn:updateTalentNameFilter() error caught: " + err ); }
 }; // End updateTalentNameFilter()
 on("change:talentnamefilter", fn(updateTalentNameFilter) );
 
@@ -28970,7 +28748,7 @@ var updateSpellNameFilter = function fnupdateSpellNameFilter() {
   'use strict';
   try{
     var attarray = ["SpellNameFilter"];
-     //log ( "EarthDawn : updateTalentNameFilter() ");
+     //log( "EarthDawn : updateTalentNameFilter() ");
 
       getSectionIDs("repeating_spell", function gsIdRepeatingSpells(nacarray) {
         for( let i = 0; i < nacarray.length; i++){
@@ -28994,7 +28772,7 @@ var updateSpellNameFilter = function fnupdateSpellNameFilter() {
           setAttrsLog(vals);
     });
   });
-} catch(err) {log("Earthdawn:updateSpellNameFilter() error caught: " + err);}
+} catch( err ) { errlog( "Earthdawn:updateSpellNameFilter() error caught: " + err ); }
 }; // End updateSpellNameFilter()
 on("change:spellnamefilter", fn(updateSpellNameFilter) );
 
@@ -29029,7 +28807,7 @@ on("clicked:addline-talents clicked:addline-discipline clicked:addline-knacks cl
       case "enchanting" : code="ENC"; break;
       case "inventory" : code="INV"; break;
       case "maneuvers" : code="MAN"; break;
-      default: log("Earthdawn - AddLine  unknown precode " +precode);return;
+      default: errlog( "Earthdawn - AddLine  unknown precode " +precode);return;
     }
     let rid=generateRowIdNoUnderscore(),
     pre=buildPre(code,rid),
@@ -29038,10 +28816,8 @@ on("clicked:addline-talents clicked:addline-discipline clicked:addline-knacks cl
     vals[pre+"RowID"]=rid;
 
     setAttrsLog(vals);
-  } catch(err){ log("Earthdawn AddLine Error :" + err)}
+  } catch(err){ errlog("Earthdawn AddLine Error :" + err); }
 }));//End AddLine
-
-
 
 
 

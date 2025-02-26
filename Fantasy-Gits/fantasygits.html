@@ -356,23 +356,12 @@
                   <label><span>Name</span>
                     <input type="text" name="attr_name" placeholder="Skill name">
                   </label>
-                  <div><span>Attr</span>
-                    <select name="attr_attr">
-                      <option value="—">—</option>
-                      <option value="s">str</option>
-                      <option value="d">dex</option>
-                      <option value="h">hea</option>
-                      <option value="i">int</option>
-                      <option value="w">wis</option>
-                      <option value="c">cha</option>
-                    </select>
-                  </div>
                   <div>
                     <div class="s_table">
                       <div class="s_t_head">
-                        <div class="s_t_cell">Base</div>
+                        <div class="s_t_cell">Attr</div>
                         <div class="s_t_cell" style="pointer-events: none"><span>+</span></div>
-                        <div class="s_t_cell">Lvl</div>
+                        <div class="s_t_cell">Skill</div>
                         <div class="s_t_cell" style="pointer-events: none"><span>+</span></div>
                         <div class="s_t_cell">Mod</div>
                         <div class="s_t_cell" style="pointer-events: none"><span>=</span></div>
@@ -381,11 +370,19 @@
                       <div class="s_t_body">
                         <div class="s_t_row">
                           <div class="s_t_cell">
-                            <input type="text" name="attr_base" value="0">
+                            <select name="attr_attr" style="-webkit-appearance: none; font-family: monospace; font-size: 0.85em; font-weight: bold; text-align: center; border-radius: 5px; border-bottom: 2px solid rgba(255, 255, 255, 0.33); background: rgba(0, 0, 0, 0.25); width: 100%; max-width: 100%">
+                              <option value="—">—</option>
+                              <option value="s">str</option>
+                              <option value="d">dex</option>
+                              <option value="h">hea</option>
+                              <option value="i">int</option>
+                              <option value="w">wis</option>
+                              <option value="c">cha</option>
+                            </select>
                           </div>
                           <div class="s_t_cell" style="pointer-events: none"><span>+</span></div>
                           <div class="s_t_cell">
-                            <input type="text" name="attr_lvl" value="0">
+                            <input type="text" name="attr_base" value="0">
                           </div>
                           <div class="s_t_cell" style="pointer-events: none"><span>+</span></div>
                           <div class="s_t_cell">
@@ -393,6 +390,7 @@
                           </div>
                           <div class="s_t_cell" style="pointer-events: none"><span>=</span></div>
                           <div class="s_t_cell">
+                            <input type="hidden" name="attr_lvl" value="0">
                             <input type="text" name="attr_total" value="0">
                           </div>
                         </div>
@@ -1209,8 +1207,9 @@ on(`clicked:skill_layout_1 clicked:talent_layout_1 clicked:item_layout_1`, async
   let n = e.htmlAttributes.name.replace("act_", "");
 
   Fila.adicionar(async () => {
-    let v1 = (await PK.pegarAtributos([`${n}`]))[`${n}`] || 0;
-    let x = (v1 + 1) > 4 ? 1 : v1 + 1;
+  let v1 = await PK.pegarAtributos([`${n}`]);
+  let v = parseInt(v1[`${n}`] || 1);
+    let x = (v + 1) > 4 ? 1 : v + 1;
     await PK.salvarAtributos({
       [`${n}`]: x
     });
@@ -1629,4 +1628,93 @@ on(`change:repeating_weapon`, async (e) => {
   updateActions("weapon", [e.sourceAttribute.split("_")[2]]);
 });
 
+// UPDATE
+on(`sheet:opened`, async (e) => {
+    let newversion = "1.0.1";
+    let date = "2025/02/24";
+
+    let v1 = await PK.pegarAtributos(["old_version", "version", "update", "last_update"]);
+    let version = v1.version || "0.0.0"; // Garante que tenha um valor padrão
+    let update = v1.update || "no";
+
+    if (version === newversion && update === "yes") {
+        console.log(`Sheet is already updated to version ${newversion}`);
+        return;
+    }
+
+    console.log(`Updating from version ${version} to ${newversion}...`);
+
+    let attr = {
+        "old_version": version,
+        "version": newversion,
+        "update": "yes",
+        "last_update": date
+    };
+
+    let updateComplete = await updateSheet250224();
+
+    if (updateComplete) {
+        await PK.salvarAtributos(attr);
+        console.log(`Update completed! New version: ${newversion} (${date})`);
+    } else {
+        console.log("Update failed or no changes needed.");
+    }
+});
+
+async function updateSheet250224() {
+    let s1 = await PK.pegarSecao("skill") ?? [];
+
+    if (s1.length === 0) {
+        console.log("No skills found. Skipping update.");
+        return false;
+    }
+
+    let atributos = await PK.pegarAtributos(s1.flatMap(i => [
+        `repeating_skill_${i}_name`,
+        `repeating_skill_${i}_base`,
+        `repeating_skill_${i}_lvl`,
+        `repeating_skill_${i}_mod`
+    ]));
+
+    let updates = s1.map(i => {
+        let base = parseInt(atributos[`repeating_skill_${i}_base`]) || 0;
+        let lvl = parseInt(atributos[`repeating_skill_${i}_lvl`]) || 0;
+        let mod = parseInt(atributos[`repeating_skill_${i}_mod`]) || 0;
+
+        return {
+            [`repeating_skill_${i}_base`]: base + lvl,
+            [`repeating_skill_${i}_lvl`]: 0,
+            [`repeating_skill_${i}_mod`]: mod
+        };
+    });
+
+    // Aplica todas as atualizações em paralelo
+    await Promise.all(updates.map(update => PK.salvarAtributos(update)));
+
+    console.log(`Updated ${s1.length} skills.`);
+    return true;
+}
+
 </script>
+<div class="s-register">
+  <label>
+  <span style="font-weight: bold"><span>Sheet Version </span><span name="attr_version"></span> (<span name="attr_last_update"></span>)</span>
+  <input type="checkbox" name="attr_update_log" value="1">
+  Log
+  <div class="s-log">
+    <ul>
+      <li>2025/02/24 - <strong>Version 1.0.1</strong>
+        <ul>
+          <li>Modified <strong>Skill structure</strong> for better usability: <code>{Attr + Base + Lvl + Mod = Total} → {Attr + Skill + Mod = Total}</code> </li>
+          <li>Buttons to change Layout Appearance (Skills, Talents...) now work on the first click instead of requiring two.</li>
+        </ul>
+      </li>
+      <li>2024/12/24 - <strong>Version 1.0.0</strong> - Initial release</li>
+    </ul>
+  </div>
+  </label>
+</div>
+<input type="hidden" name="attr_old_version" value="1.0.0">
+<input type="hidden" name="attr_version" value="1.0.0">
+<input type="hidden" name="attr_update" value="no">
+<input type="hidden" name="attr_last_update" value="2024/12/24">
