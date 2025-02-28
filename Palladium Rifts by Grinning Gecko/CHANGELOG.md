@@ -5,6 +5,7 @@
 ### Changed
 
 - Fix issue where importing an Ability/Magic/Psionic with `addtobonuses` would cause it to get added to the Modifier Picker twice.
+- Fix issue with Trust/Intimidate/Charm/Impress roll buttons not showing Success or Failure.
 
 ## [1.7.1] - 2025-02-14
 
