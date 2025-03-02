@@ -1913,7 +1913,7 @@
             </div>
             {{/penetrating}} {{#piercing}}
             <div class="sheet-result-fail sheet-rt-grid">
-                <div class="sheet-rt-key">Piercing (forcefield)</div>
+                <div class="sheet-rt-key">Piercing (force field)</div>
                 <div class="sheet-rt-value sheet-mouseover-hideroll">-{{piercing}}</div>
             </div>
             {{/piercing}} {{/defended}} {{#forcefield0key}}
@@ -2297,7 +2297,7 @@
     const base_limiters = ['activation','assisted','backlash','charges','concentration','consumable','delay','dependent','deplete','detectable','emotional','environmental','equipment','imbue','irreversible','localised','maximum','object','permanent','recovery','semi-permanent','unpredictable'];
     const tsc_ap_base_limiters = ['acceleration','haywire','ignore','timed'];
     const base_custom_limiters = {
-        'armor':['emphasized','optimized'],
+        'armor':['emphasized','gap','optimized'],
         'flight':['glide','maintain','skim','spread'],
         'force field':['both directions','internal'],
         'ground speed':['road-bound'],
@@ -2752,7 +2752,7 @@
         'unaffected':['several attributes','many attributes','all attributes'],
     };
     const nested_limiters = {
-        'armor':['emphasized','optimized'],
+        'armor':['emphasized','gap','optimized'],
         'mind control':['broad category','narrow category','specific category','single category'],
         'plant control':['group','species'],
         'summon creature':['narrow category','specific category','single category'],
@@ -3274,7 +3274,7 @@
     function isObjectEmpty(obj) { 
         for (let x in obj) { return false; }
         return true;
-     }
+        }
 
     async function crpQuery(cache, query, tag = '') {
         const rxGrab = /^0\[(.*)\]\s*$/;
@@ -3708,9 +3708,9 @@
         clog(cache, temp, 'setSheetLogo()');
         temp.logos = ['tristatcore','besm','absolutepower'];
         temp.logo = cache.static_sheet_settings_type.toLowerCase() === 'gm' ? 
-           cache.static_rules_base_default : 
-           cache.static_sheet_settings_gm === '' ?
-           'besm' : await crpGet(cache, 'static_rules_base_default');
+            cache.static_rules_base_default : 
+            cache.static_sheet_settings_gm === '' ?
+            'besm' : await crpGet(cache, 'static_rules_base_default');
         temp.logo = temp.logo === 'besmx' ? 'besm' : temp.logo;
         temp.logo = temp.logo.indexOf('undefined') !== -1 ?
             'besm' : temp.logo;
@@ -5258,7 +5258,7 @@
         clog(cache, temp, 'setConditionAnemic()');
         temp.input1 = -1;
     }
-  
+    
     async function getConditionDescription(cache, condition, contagion = false) {
         const temp = {};
         clog(cache, temp, 'getConditionDescription()');
@@ -6788,12 +6788,18 @@
         clog(cache, temp, 'selectTarget()');
         temp.template = `! ` +
             `{{charname=[[0[@{target|character_name}] ]]}} ` +
-            `{{charid=[[0[@{target|character_id}] ]]}}`;
+            `{{charid=[[0[@{target|character_id}] ]]}} ` +
+            `{{attrdb=[[0[@{target|attrdb}] ]]}} ` +
+            `{{defectdb=[[0[@{target|defectdb}] ]]}}`;
         temp.roll = await startRoll(temp.template);
         roll.target.name = 
             temp.roll.results.charname.expression.match(rxGrab)[1];
         roll.target.id = 
             temp.roll.results.charid.expression.match(rxGrab)[1];
+        roll.target.attrdb = 
+            temp.roll.results.attrdb.expression.match(rxGrab)[1];
+        roll.target.defectdb = 
+            temp.roll.results.defectdb.expression.match(rxGrab)[1];
         finishRoll(temp.roll.rollId);
     }
 
@@ -7122,23 +7128,66 @@
                     query.last = query.next;
                 break;
                 case 'combat_maneuver':
+                    roll.target.has_gap = false;
+                    if (roll.target.attrdb.armor.length !== 0) {
+                        for (let i = 0; i < roll.target.attrdb.armor.length; i++) {
+                            if (roll.target.attrdb.armor[i].active) {
+                                const gap_index = roll.target.attrdb.armor[i].limiters.findIndex(c => c.name === 'gap');
+                                if (gap_index !== -1) {
+                                    roll.target.has_gap = true;
+                                    i = roll.target.attrdb.armor.length;//=> only support first active armor.
+                                }
+                            }
+                        }
+                    }
+                    roll.target.has_weak_point = 0;
+                    if (roll.target.defectdb['weak point'].length !== 0) {
+                        for (let i = 0; i < roll.target.defectdb['weak point'].length; i++) {
+                            if (roll.target.defectdb['weak point'][i].active) {
+                                roll.target.has_weak_point = roll.target.defectdb['weak point'][i].level;
+                                i = roll.target.defectdb['weak point'].length;//=> only support first weak point.
+                            }
+                        }
+                    }
                     query.title = `${getTranslationByKey("select-maneuver")}`;
                     query.options = roll.weapon.is_attribute && !roll.weapon.range ? 
                         `|${getTranslationByKey("touch")},touch` : `|${getTranslationByKey("attack")},attack`;
-                    query.options += cache.rulesdb.rules_optional_maneuvers_status ?
-                        `|${getTranslationByKey("called-shot")},?{${getTranslationByKey("select-called-shot")}` +
-                            `&#124;${getTranslationByKey("bypass-armor")}&#44;bypass armor` +
-                            `&#124;${getTranslationByKey("reduce-armor")}&#44;reduce armor` +
-                            `&#124;${getTranslationByKey("vital-spot")}&#44;vital spot` +
-                            `&#124;${getTranslationByKey("weak-point")}&#44;weak point&#125;` : '';
-                    query.options += !roll.weapon.range && cache.rulesdb.rules_optional_maneuvers_status ?
-                        `|${getTranslationByKey("grapple")},?{${getTranslationByKey("select-grapping-maneuver")}` +
-                            `&#124;${getTranslationByKey("bite")}&#44;bite` +
-                            `&#124;${getTranslationByKey("grab")}&#44;grab` +
-                            `&#124;${getTranslationByKey("lock")}&#44;lock` +
-                            `&#124;${getTranslationByKey("pin")}&#44;pin` +
-                            `&#124;${getTranslationByKey("throw")}&#44;throw&#125;` : '';
+                    if (cache.rulesdb.rules_optional_maneuvers_status) {
+                        query.options +=
+                            `|${getTranslationByKey("called-shot")},?{${getTranslationByKey("select-called-shot")}`;
+                            query.options += roll.target.has_gap ?
+                                `&#124;${getTranslationByKey("bypass-armor")}&#44;bypass armor` : '';
+                            query.options += 
+                                `&#124;${getTranslationByKey("disarm")}&#44;disarm`;
+                            query.options += cache.rulesdb.rules_optional_knockout_status ?
+                                `&#124;${getTranslationByKey("knockout")}&#44;knockout` : '';
+                            query.options += roll.target.has_gap ?
+                                `&#124;${getTranslationByKey("reduce-armor")}&#44;reduce armor` : '';
+                            query.options +=
+                                `&#124;${getTranslationByKey("specific-location")}&#44;specific location` +
+                                `&#124;${getTranslationByKey("vital-spot")}&#44;vital spot`;
+                            query.options += roll.target.has_weak_point ?
+                                `&#124;${getTranslationByKey("weak-point")}&#44;weak point` : '';
+                            query.options += '&#125;';
+                    }
+                    if (!roll.weapon.range && cache.rulesdb.rules_optional_maneuvers_status) {
+                        query.options +=
+                            `|${getTranslationByKey("grapple")},?{${getTranslationByKey("select-grapping-maneuver")}` +
+                                `&#124;${getTranslationByKey("bite")}&#44;bite` +
+                                `&#124;${getTranslationByKey("grab")}&#44;grab` +
+                                `&#124;${getTranslationByKey("lock")}&#44;lock` +
+                                `&#124;${getTranslationByKey("pin")}&#44;pin` +
+                                `&#124;${getTranslationByKey("throw")}&#44;throw&#125;`;
+                    }
                     query.options += `|${getTranslationByKey("go-back")},select_weapon`;
+                    query.last = query.next;
+                break;
+                case 'specific location':
+                    query.title = `${getTranslationByKey("specify-location")}`;
+                    query.options =
+                        `|${getTranslationByKey("large-spot")},large spot` +
+                        `|${getTranslationByKey("small-spot")},small spot` +
+                        `|${getTranslationByKey("tiny-spot")},tiny spot`;
                     query.last = query.next;
                 break;
                 case 'target_type':
@@ -7156,11 +7205,23 @@
                 case 'target_select':
                     query.title = '';
                     await selectTarget(cache, roll);
+                    roll.target.attrdb = JSON.parse(roll.target.attrdb);
+                    roll.target.defectdb = JSON.parse(roll.target.defectdb);
+                    query.last = query.next;
+                break;
+                case 'ranged_combat_maneuver':
+                    query.title = `${getTranslationByKey("select-maneuver")}`;
+                    query.options = 
+                        `|${getTranslationByKey("attack")},attack` +
+                        `|${getTranslationByKey("specific-location")},?{${getTranslationByKey("specify-location")}` +
+                        `&#124;${getTranslationByKey("large-spot")}&#44;15` +
+                        `&#124;${getTranslationByKey("small-spot")}&#44;18` +
+                        `&#124;${getTranslationByKey("tiny-spot")}&#44;21&#125;`;
                     query.last = query.next;
                 break;
                 case 'target_number':
                     query.title = 'Enter Target Number';
-                    query.options = '';
+                    query.options = `|${int(query.tn)}`;
                     query.last = query.next;
                 break;
                 case 'initiative':
@@ -7423,6 +7484,10 @@
                             cache.attrdb.weapon[roll.weapon.index].name;
                         roll.weapon.elevel = 
                             cache.attrdb.weapon[roll.weapon.index].elevel;
+                        const range_index = cache.attrdb.weapon[roll.weapon.index].enhancements.findIndex(e => e.name === 'range');
+                        if (range_index !== -1) {
+                            roll.weapon.range = cache.attrdb.weapon[roll.weapon.index].enhancements[range_index].rank;
+                        }
                     }
                     roll.weapon.severity = 
                         roll.is_swarm ? 'damage' : (
@@ -7436,7 +7501,7 @@
                     query.next = (
                             cache.rulesdb.rules_optional_maneuvers_status &&
                             roll.type === 'attack'
-                        ) ? 'combat_maneuver' : 
+                        ) ? 'target_type' ://'combat_maneuver' : 
                         cache.source_type !== 'react' ?
                             'target_type' : 'is_enemy';
                 break;
@@ -7456,19 +7521,54 @@
                 break;
                 case 'combat_maneuver':
                     roll.maneuver = query.selection;
-                    query.next = query.selection === 'select_weapon' ?
-                        query.selection : 'target_type';
+                    switch (roll.maneuver) {
+                        case 'disarm':
+                            roll.mod.obstacle -= roll.weapon.range === 0 ? 1 : 2;
+                        break;
+                        case 'knockout':
+                            roll.weapon.severity = 'stun';
+                        case 'reduce armor':
+                            roll.mod.obstacle -= 1;
+                        break;
+                        case 'bypass armor':
+                        case 'vital spot':
+                            roll.mod.obstacle -= 2;
+                        break;
+                        case 'weak point':
+                            roll.mod.obstacle -= roll.target.has_weak_point === 1 ? 1 : 2;
+                        break;
+                    }
+                    query.next = 
+                        query.selection === 'select_weapon' ||
+                        query.selection === 'specific location' ? 
+                        query.selection : 'is_enemy';
+                break;
+                case 'specific location':
+                    roll.maneuver = query.selection;
+                    roll.target.specific_location = 
+                        roll.maneuver === 'large spot' ? 1 :
+                        roll.maneuver === 'small spot' ? 2 : 3;
+                    roll.mod.obstacle -= roll.target.specific_location === 1 ? 1 : 2;
+                    query.next = 'is_enemy';
                 break;
                 case 'target_type':
                     query.target = query.selection;
                     roll.target_type = query.selection;
-                    query.next = query.selection;
+                    query.next = (
+                        query.target === 'target_number' &&
+                        cache.rulesdb.rules_optional_maneuvers_status &&
+                        roll.weapon.range
+                    ) ? 'ranged_combat_maneuver' : query.selection;
+                break;
+                case 'ranged_combat_maneuver':
+                    query.tn = query.selection;
+                    query.next = 'target_number';
                 break;
                 case 'target_number':
                     roll.target.number = int(query.selection);
                     // There is inentionally no 'break' statement here so code execution falls through to exit loop (i.e. query.do_roll = true).
                 case 'target_select':
-                    query.next = 'is_enemy';
+                    query.next = 'combat_maneuver';
                 break;
             }
         }
@@ -7477,6 +7577,14 @@
             case 'defense':
                 roll.name = cache.character_name;
                 roll.pronoun = cache.static_character_details_pronoun;
+                if (roll.type === 'defense') {
+                    if (
+                        roll.attacker.target.has_weak_point === 3 ||
+                        roll.attacker.target.specific_location === 3
+                    ) {
+                        roll.mod.edge += 1;
+                    }
+                }
                 if (roll.weapon.index !== -1) {
                     const sections = ['config','enhancements','limiters'];
                     const indexes = {
@@ -8139,7 +8247,7 @@
                             ` {{penetrating=${roll.attacker.weapon.penetrating * 10}}}` : '';
                         roll.template += roll.attacker.weapon.piercing !== undefined ?
                             ` {{piercing=${roll.attacker.weapon.piercing * 10}}}` : '';
-                        damage.taken = 0;
+                        damage.taken = damage.received;
                         if (damage.received !== 0) {
                             damage.absorbed = [];
                             damage.converted = [];
@@ -8153,9 +8261,11 @@
                                 'absorption':[]
                             };
                             clog(cache, defenses, 'actionRoll(defenses)');
+                            roll.has_protections = false;
                             for (let p = 0; p < protections.length; p++) {
                                 for (let i = 0; i < cache.attrdb[protections[p]].length; i++) {
                                     if (cache.attrdb[protections[p]][i].active) {
+                                        roll.has_protections = true;
                                         const protection = cache.attrdb[protections[p]][i];
                                         const ar_index = 
                                             protection.config.findIndex(c => c.name === 'armor rating');
@@ -8201,32 +8311,35 @@
                                                         true : false,
                                                 });
                                             }
+                                            // Determine if armor has Gap and has been reduced or bypassed.
+                                            const gap_index = protection.limiters.findIndex(c => c.name === 'gap');
+                                            const has_gap = 
+                                                gap_index !== -1 && roll.attacker.maneuver === 'bypass armor' ? 0 :
+                                                gap_index !== -1 && roll.attacker.maneuver === 'reduce armor' ? 0.5 : 1;
                                             // Calculate damage against armor_rating.
                                             for (let i = 0; i < damage.hits; i++) {
-                                                const damage_taken = Math.max(damage.received - (
+                                                damage.taken = (Math.max(damage.taken - (
                                                     protections[p] === 'armor' && roll.attacker.weapon.penetrating !== undefined ?
-                                                        Math.max(defenses.armor_rating - (roll.attacker.weapon.penetrating * 10), 0) :
+                                                        Math.max(Math.round(defenses.armor_rating * has_gap) - (roll.attacker.weapon.penetrating * 10), 0) :
                                                     protections[p] === 'force field' && roll.attacker.weapon.piercing !== undefined ?
                                                         Math.max(defenses.armor_rating - (roll.attacker.weapon.piercing * 10), 0) :
+                                                    protections[p] === 'armor' ? Math.round(defenses.armor_rating * has_gap) : 
                                                     defenses.armor_rating
-                                                ), 0);
-                                                let damage_stopped = 0;
+                                                ), 0)) * (roll.attacker.maneuver === 'vital spot' ? 2 : 1);
                                                 // Record damage stopped for Conversion with Escalate.
                                                 if (protections[p] === 'force field' || protections[p] === 'armor') {
-                                                    damage_stopped += Math.min(damage_taken, defenses.armor_rating);
-                                                    if (protections[p] === 'force field' && damage_taken !== 0) {
+                                                    damage.stopped += damage.received - damage.taken;
+                                                    if (protections[p] === 'force field' && damage.taken !== 0) {
                                                         defenses.armor_rating = Math.max(defenses.armor_rating - 10, 0);
                                                     }
                                                 }
-                                                damage.taken += Math.max(damage_taken, damage_stopped);
-                                                damage.stopped += damage_stopped;
                                             }
                                             // Add active protection to the roll template.
                                             const label = protections[p] === 'force field' ?
                                                 protections[p].removeWhiteSpace() : protections[p];
                                             roll.template += protections[p] !== 'absorption' ?
-                                                ` {{${label}${i}key=${protection.name}}}` +
-                                                ` {{${label}${i}value=${defenses.armor_rating}}}` : '';
+                                                ` {{${label}${i}key=${protection.name}${has_gap !== 1 ? ' ('+roll.attacker.maneuver+')' : ''}}}` +
+                                                ` {{${label}${i}value=${has_gap * defenses.armor_rating}}}` : '';
                                             if (
                                                 damage.taken !== 0 &&
                                                 protections[p] === 'force field'
@@ -8244,10 +8357,12 @@
                                                 }
                                             }
                                         }
-                                    } else {
-                                        damage.taken = damage.received * damage.hits;
                                     }
                                 }
+                            }
+                            if (!roll.has_protections) {
+                                damage.taken = 
+                                    (damage.taken * (roll.attacker.maneuver === 'vital spot' ? 2 : 1)) * damage.hits;
                             }
                             // Apply Damage, Absorption, and Conversion
                             // Apply Absorption
@@ -8551,12 +8666,12 @@
                 case 'sheetsettings':
                     query.title = `${getTranslationByKey("sheet-settings")}`;
                     query.options = 
-                         `|${getTranslationByKey("debug-level")},static_sheet_settings_debug` +
-                         `|${getTranslationByKey("game-master-name")},static_sheet_settings_gm` +
-                         `|${getTranslationByKey("player-name")},static_sheet_settings_player` +
-                         `|${getTranslationByKey("sheet-type")},static_sheet_settings_type` +
-                         `|${getTranslationByKey("theme")},static_sheet_settings_theme` +
-                         `|${getTranslationByKey("go-back")},screenroot`;
+                            `|${getTranslationByKey("debug-level")},static_sheet_settings_debug` +
+                            `|${getTranslationByKey("game-master-name")},static_sheet_settings_gm` +
+                            `|${getTranslationByKey("player-name")},static_sheet_settings_player` +
+                            `|${getTranslationByKey("sheet-type")},static_sheet_settings_type` +
+                            `|${getTranslationByKey("theme")},static_sheet_settings_theme` +
+                            `|${getTranslationByKey("go-back")},screenroot`;
                 break;
                 // Screen Menu Options Level 2
                 case 'static_character_details_size':
@@ -8761,8 +8876,8 @@
                     query.title = `${getTranslationByKey("choose")} ${query.selection.capitalize()} ` +
                         `${getTranslationByKey("point-type")}`;
                     query.options = 
-                         `|${getTranslationByKey("damage")},damage` +
-                         `|${getTranslationByKey("temp")},temp`;
+                            `|${getTranslationByKey("damage")},damage` +
+                            `|${getTranslationByKey("temp")},temp`;
                     query.options += query.selection === 'health' ?
                         `|${getTranslationByKey("stun")},stun` : '';
                     query.options += `|${getTranslationByKey("go-back")},statusroot`;
@@ -8773,10 +8888,10 @@
                     query.point_type = query.selection;
                     query.title = `${getTranslationByKey("choose-method")}`;
                     query.options = 
-                         `|${getTranslationByKey("add-value")},addpoints` +
-                         `|${getTranslationByKey("remove-value")},removepoints` +
-                         `|${getTranslationByKey("set-value")},setpoints` +
-                         `|${getTranslationByKey("go-back")},statusroot`;
+                            `|${getTranslationByKey("add-value")},addpoints` +
+                            `|${getTranslationByKey("remove-value")},removepoints` +
+                            `|${getTranslationByKey("set-value")},setpoints` +
+                            `|${getTranslationByKey("go-back")},statusroot`;
                 break;
                 case 'addpoints':
                 case 'removepoints':
@@ -11945,6 +12060,11 @@
                                 query.aspect_index = query.db.config.findIndex(c => c.name === 'aspect_type');
                                 query.cost_multiplier = query.aspect_index !== -1 ?
                                     query.db.config[query.aspect_index].rank === 'all' ? 2 : 1 : 1;
+                            } else if (query.attribute === 'armor' || query.attribute === 'force field') {
+                                const ar_index = query.db.config.findIndex(c => c.name === 'armor rating');
+                                if (ar_index !== -1) {
+                                    query.db.config[ar_index].rank = (query.attribute === 'armor' ? 5 : 10) * query.elevel;
+                                }
                             }
                             query.cost = (cache.source_section === 'attribute' ?
                                 query.attribute === 'skill group' ?
