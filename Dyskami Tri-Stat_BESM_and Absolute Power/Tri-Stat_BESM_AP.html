@@ -6896,7 +6896,6 @@
             }
             query.skills.sort();
         }
-        
         roll.template += cache.source_type === 'react' ?
             ` {{color=color-react-${color}}} {{color-react=color-${color}}}` :
             ` {{color=color-${color}}} {{color-react=color-react-${color}}}`;
@@ -7338,19 +7337,31 @@
                     if (query.selection !== 'rollsroot' || query.selection !== 'exit') {
                         const selected_attribute = query.selection.split('~');
                         query.attribute = cache.attrdb[selected_attribute[0]][selected_attribute[1]];
-                        if (roll.type === 'defense') {
+                        const range_index = query.attribute.enhancements.findIndex(e => e.name === 'range');
+                        roll.weapon = {
+                            damage_type: 'none',
+                            elevel: query.attribute.elevel,
+                            index: int(selected_attribute[1]),
+                            is_attribute: true,
+                            maneuver: roll.type,
+                            name: query.attribute.name || query.attribute.attribute,
+                            range: range_index !== -1 ?
+                                query.attribute.enhancements[range_index].rank : 0,
+                            severity: 'none',
+                            weapon_class: 'special',
+                        };
+                        /*if (roll.type !== 'defense') /*{
                             const range_index = query.attribute.enhancements.indexOf(e => e.name === 'range');
                             roll.weapon.range = range_index !== -1 ?
                                 query.attribute.enhancements[range_index].rank : 0;
-                            roll.weapon.is_attribute = true;
                             roll.weapon.elevel = query.attribute.elevel;
                             roll.weapon.name = query.attribute.name || selected_attribute[0];
                             roll.weapon.severity = 'none';
-                        } else {
+                        } else*/ //{
                             query.name = query.attribute.name;
                             query.result = query.attribute.stat === 'variable' ?
                                 [] : [query.attribute.stat];
-                        }
+                        //}
                     }
                     query.next = query.selection === 'rollsroot' || query.selection === 'exit' ? 
                         query.selection : roll.type === 'defense' ? 'done' : 'stat';
@@ -7585,7 +7596,7 @@
                         roll.mod.edge += 1;
                     }
                 }
-                if (roll.weapon.index !== -1) {
+                if (roll.weapon.index !== -1 && !roll.weapon.is_attribute) {
                     const sections = ['config','enhancements','limiters'];
                     const indexes = {
                         config:['damage_type','weapon_class'],
@@ -7630,7 +7641,7 @@
                             break;
                         }
                     }
-                } else if (roll.weapon.name !== 'touch') {
+                } else if (roll.weapon.name !== 'touch' && !roll.weapon.is_attribute) {
                     roll.weapon.weapon_class = roll.is_swarm ? 'special' : 'unarmed';
                     roll.weapon.damage_type = roll.is_swarm ? 'penetrating' : 'blunt';
                     roll.weapon.elevel = 0;
@@ -7645,17 +7656,21 @@
                 }
                 // Weapon ACV/DCV
                 roll.cv = roll.is_swarm ? roll.swarm_acv : cache.statsdb.acv.base;
-                const weapon_type = roll.weapon.range !== 0 ? 'ranged attack' : 'melee attack';
+                const attribute_type = `${roll.weapon.range !== 0 ? 'ranged' : 'melee'} ${roll.type}`;
                 //=> apply melee/ranged attack attribute
-                if (cache.attrdb[weapon_type].length !== 0) {
-                    for (let i = 0; i < cache.attrdb[weapon_type].length; i++) {
+                //if (cache.attrdb[weapon_type].length !== 0)
+                if (
+                    roll.type === 'attack' || roll.type === 'defense' && 
+                    cache.attrdb[attribute_type].length !== 0
+                ) {
+                    for (let i = 0; i < cache.attrdb[attribute_type].length; i++) {
                         const class_index = 
-                            cache.attrdb[weapon_type][i].config.findIndex(c => c.name === 'weapon_class');
+                            cache.attrdb[attribute_type][i].config.findIndex(c => c.name === 'weapon_class');
                         if (
-                            cache.attrdb[weapon_type][i].active &&
-                            cache.attrdb[weapon_type][i].config[class_index].rank === roll.weapon.weapon_class
+                            cache.attrdb[attribute_type][i].active &&
+                            cache.attrdb[attribute_type][i].config[class_index].rank === roll.weapon.weapon_class
                         ) {
-                            roll.cv += cache.attrdb[weapon_type][i].elevel * 2;
+                            roll.cv += cache.attrdb[attribute_type][i].elevel * 2;
                         }
                     }
                 }
