@@ -3274,7 +3274,7 @@
     function isObjectEmpty(obj) { 
         for (let x in obj) { return false; }
         return true;
-     }
+        }
 
     async function crpQuery(cache, query, tag = '') {
         const rxGrab = /^0\[(.*)\]\s*$/;
@@ -3708,9 +3708,9 @@
         clog(cache, temp, 'setSheetLogo()');
         temp.logos = ['tristatcore','besm','absolutepower'];
         temp.logo = cache.static_sheet_settings_type.toLowerCase() === 'gm' ? 
-           cache.static_rules_base_default : 
-           cache.static_sheet_settings_gm === '' ?
-           'besm' : await crpGet(cache, 'static_rules_base_default');
+            cache.static_rules_base_default : 
+            cache.static_sheet_settings_gm === '' ?
+            'besm' : await crpGet(cache, 'static_rules_base_default');
         temp.logo = temp.logo === 'besmx' ? 'besm' : temp.logo;
         temp.logo = temp.logo.indexOf('undefined') !== -1 ?
             'besm' : temp.logo;
@@ -5258,7 +5258,7 @@
         clog(cache, temp, 'setConditionAnemic()');
         temp.input1 = -1;
     }
-  
+    
     async function getConditionDescription(cache, condition, contagion = false) {
         const temp = {};
         clog(cache, temp, 'getConditionDescription()');
@@ -6890,7 +6890,6 @@
             }
             query.skills.sort();
         }
-        
         roll.template += cache.source_type === 'react' ?
             ` {{color=color-react-${color}}} {{color-react=color-${color}}}` :
             ` {{color=color-${color}}} {{color-react=color-react-${color}}}`;
@@ -7277,19 +7276,31 @@
                     if (query.selection !== 'rollsroot' || query.selection !== 'exit') {
                         const selected_attribute = query.selection.split('~');
                         query.attribute = cache.attrdb[selected_attribute[0]][selected_attribute[1]];
-                        if (roll.type === 'defense') {
+                        const range_index = query.attribute.enhancements.findIndex(e => e.name === 'range');
+                        roll.weapon = {
+                            damage_type: 'none',
+                            elevel: query.attribute.elevel,
+                            index: int(selected_attribute[1]),
+                            is_attribute: true,
+                            maneuver: roll.type,
+                            name: query.attribute.name || query.attribute.attribute,
+                            range: range_index !== -1 ?
+                                query.attribute.enhancements[range_index].rank : 0,
+                            severity: 'none',
+                            weapon_class: 'special',
+                        };
+                        /*if (roll.type !== 'defense') /*{
                             const range_index = query.attribute.enhancements.indexOf(e => e.name === 'range');
                             roll.weapon.range = range_index !== -1 ?
                                 query.attribute.enhancements[range_index].rank : 0;
-                            roll.weapon.is_attribute = true;
                             roll.weapon.elevel = query.attribute.elevel;
                             roll.weapon.name = query.attribute.name || selected_attribute[0];
                             roll.weapon.severity = 'none';
-                        } else {
+                        } else*/ //{
                             query.name = query.attribute.name;
                             query.result = query.attribute.stat === 'variable' ?
                                 [] : [query.attribute.stat];
-                        }
+                        //}
                     }
                     query.next = query.selection === 'rollsroot' || query.selection === 'exit' ? 
                         query.selection : roll.type === 'defense' ? 'done' : 'stat';
@@ -7477,7 +7488,7 @@
             case 'defense':
                 roll.name = cache.character_name;
                 roll.pronoun = cache.static_character_details_pronoun;
-                if (roll.weapon.index !== -1) {
+                if (roll.weapon.index !== -1 && !roll.weapon.is_attribute) {
                     const sections = ['config','enhancements','limiters'];
                     const indexes = {
                         config:['damage_type','weapon_class'],
@@ -7522,7 +7533,7 @@
                             break;
                         }
                     }
-                } else if (roll.weapon.name !== 'touch') {
+                } else if (roll.weapon.name !== 'touch' && !roll.weapon.is_attribute) {
                     roll.weapon.weapon_class = roll.is_swarm ? 'special' : 'unarmed';
                     roll.weapon.damage_type = roll.is_swarm ? 'penetrating' : 'blunt';
                     roll.weapon.elevel = 0;
@@ -7537,17 +7548,21 @@
                 }
                 // Weapon ACV/DCV
                 roll.cv = roll.is_swarm ? roll.swarm_acv : cache.statsdb.acv.base;
-                const weapon_type = roll.weapon.range !== 0 ? 'ranged attack' : 'melee attack';
+                const attribute_type = `${roll.weapon.range !== 0 ? 'ranged' : 'melee'} ${roll.type}`;
                 //=> apply melee/ranged attack attribute
-                if (cache.attrdb[weapon_type].length !== 0) {
-                    for (let i = 0; i < cache.attrdb[weapon_type].length; i++) {
+                //if (cache.attrdb[weapon_type].length !== 0)
+                if (
+                    roll.type === 'attack' || roll.type === 'defense' && 
+                    cache.attrdb[attribute_type].length !== 0
+                ) {
+                    for (let i = 0; i < cache.attrdb[attribute_type].length; i++) {
                         const class_index = 
-                            cache.attrdb[weapon_type][i].config.findIndex(c => c.name === 'weapon_class');
+                            cache.attrdb[attribute_type][i].config.findIndex(c => c.name === 'weapon_class');
                         if (
-                            cache.attrdb[weapon_type][i].active &&
-                            cache.attrdb[weapon_type][i].config[class_index].rank === roll.weapon.weapon_class
+                            cache.attrdb[attribute_type][i].active &&
+                            cache.attrdb[attribute_type][i].config[class_index].rank === roll.weapon.weapon_class
                         ) {
-                            roll.cv += cache.attrdb[weapon_type][i].elevel * 2;
+                            roll.cv += cache.attrdb[attribute_type][i].elevel * 2;
                         }
                     }
                 }
@@ -8551,12 +8566,12 @@
                 case 'sheetsettings':
                     query.title = `${getTranslationByKey("sheet-settings")}`;
                     query.options = 
-                         `|${getTranslationByKey("debug-level")},static_sheet_settings_debug` +
-                         `|${getTranslationByKey("game-master-name")},static_sheet_settings_gm` +
-                         `|${getTranslationByKey("player-name")},static_sheet_settings_player` +
-                         `|${getTranslationByKey("sheet-type")},static_sheet_settings_type` +
-                         `|${getTranslationByKey("theme")},static_sheet_settings_theme` +
-                         `|${getTranslationByKey("go-back")},screenroot`;
+                            `|${getTranslationByKey("debug-level")},static_sheet_settings_debug` +
+                            `|${getTranslationByKey("game-master-name")},static_sheet_settings_gm` +
+                            `|${getTranslationByKey("player-name")},static_sheet_settings_player` +
+                            `|${getTranslationByKey("sheet-type")},static_sheet_settings_type` +
+                            `|${getTranslationByKey("theme")},static_sheet_settings_theme` +
+                            `|${getTranslationByKey("go-back")},screenroot`;
                 break;
                 // Screen Menu Options Level 2
                 case 'static_character_details_size':
@@ -8761,8 +8776,8 @@
                     query.title = `${getTranslationByKey("choose")} ${query.selection.capitalize()} ` +
                         `${getTranslationByKey("point-type")}`;
                     query.options = 
-                         `|${getTranslationByKey("damage")},damage` +
-                         `|${getTranslationByKey("temp")},temp`;
+                            `|${getTranslationByKey("damage")},damage` +
+                            `|${getTranslationByKey("temp")},temp`;
                     query.options += query.selection === 'health' ?
                         `|${getTranslationByKey("stun")},stun` : '';
                     query.options += `|${getTranslationByKey("go-back")},statusroot`;
@@ -8773,10 +8788,10 @@
                     query.point_type = query.selection;
                     query.title = `${getTranslationByKey("choose-method")}`;
                     query.options = 
-                         `|${getTranslationByKey("add-value")},addpoints` +
-                         `|${getTranslationByKey("remove-value")},removepoints` +
-                         `|${getTranslationByKey("set-value")},setpoints` +
-                         `|${getTranslationByKey("go-back")},statusroot`;
+                            `|${getTranslationByKey("add-value")},addpoints` +
+                            `|${getTranslationByKey("remove-value")},removepoints` +
+                            `|${getTranslationByKey("set-value")},setpoints` +
+                            `|${getTranslationByKey("go-back")},statusroot`;
                 break;
                 case 'addpoints':
                 case 'removepoints':
