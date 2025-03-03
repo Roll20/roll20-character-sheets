@@ -8,6 +8,23 @@ const HtmlMinimizerPlugin = require('html-minimizer-webpack-plugin');
 const HtmlWorkerScriptPlugin = require('./HtmlWorkerScriptPlugin.js');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
+// Create a custom plugin for dev/build completion logging
+class BuildCompletionPlugin {
+  apply(compiler) {
+    compiler.hooks.done.tap('BuildCompletionPlugin', (stats) => {
+      if (mode === 'development') {
+        setTimeout(() => {
+          console.log('\x1b[32m%s\x1b[0m', '✓ Build complete - watching for changes...\n');
+        }, 400);
+      }
+      if (mode === 'production') {
+        setTimeout(() => {
+          console.log('\x1b[32m%s\x1b[0m', '✓ Build complete \n');
+        }, 900);
+      }
+    });
+  }
+}
 const webpackConfig = {
   entry: path.join(__dirname, 'src/index.js'),
   resolve: {
@@ -45,6 +62,7 @@ const webpackConfig = {
         {from: path.join(__dirname, 'src/translation.json'), to: path.join(__dirname, mode === 'production' ? 'prod' : 'dist')},
       ],
     }),
+    new BuildCompletionPlugin(),
   ],
   cache: {
     type: 'filesystem', // Recommended for production builds
