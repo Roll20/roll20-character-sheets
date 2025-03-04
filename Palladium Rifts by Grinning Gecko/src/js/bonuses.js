@@ -420,14 +420,8 @@ on("change:repeating_bonusselections:enabled", async (e) => {
   await outputSelectedBonusIds();
 });
 
-const insertedBonuses = [];
 async function insertSelection(name, bonusRowId, level) {
   console.log("insertSelection", name, bonusRowId, level);
-  if (insertedBonuses.includes(bonusRowId)) {
-    return;
-  } else {
-    insertedBonuses.push(bonusRowId);
-  }
   const selectionRowId = generateRowID();
   const attrs = {};
   attrs[`repeating_bonusselections_${selectionRowId}_bonus_id`] = bonusRowId;
