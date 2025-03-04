@@ -7,8 +7,32 @@ const TerserPlugin = require('terser-webpack-plugin');
 const HtmlMinimizerPlugin = require('html-minimizer-webpack-plugin');
 const HtmlWorkerScriptPlugin = require('./HtmlWorkerScriptPlugin.js');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
-// Create a custom plugin for dev/build completion logging
+class ForceFileCopyPlugin {
+  constructor(options) {
+    this.options = options;
+  }
+  apply(compiler) {
+    compiler.hooks.beforeCompile.tap('ForceFileCopyPlugin', () => {
+      if (mode === 'development') {
+        this.options.files.forEach((file) => {
+          try {
+            const sourcePath = path.join(__dirname, file.from);
+            const destPath = path.join(__dirname, 'dist', file.to);
+            // Create '/dist' directory if it doesn't exist
+            const fs = require('fs');
+            if (!fs.existsSync(path.join(__dirname, 'dist'))) {
+              fs.mkdirSync(path.join(__dirname, 'dist'));
+            }
+            fs.copyFileSync(sourcePath, destPath);
+          } catch (error) {
+            console.error(`Error copying ${file.from}: ${error.message}`);
+          }
+        });
+      }
+    });
+  }
+}
+// build/prod completion logging
 class BuildCompletionPlugin {
   apply(compiler) {
     compiler.hooks.done.tap('BuildCompletionPlugin', (stats) => {
@@ -38,7 +62,7 @@ const webpackConfig = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env'], // Updated preset
+            presets: ['@babel/preset-env'],
           },
         },
       },
@@ -58,8 +82,22 @@ const webpackConfig = {
     new HtmlWorkerScriptPlugin(),
     new CopyWebpackPlugin({
       patterns: [
-        {from: path.join(__dirname, 'src/pathfinder.css'), to: path.join(__dirname, mode === 'production' ? 'prod' : 'dist')},
-        {from: path.join(__dirname, 'src/translation.json'), to: path.join(__dirname, mode === 'production' ? 'prod' : 'dist')},
+        {
+          from: path.join(__dirname, 'src/pathfinder.css'),
+          to: path.join(__dirname, mode === 'production' ? 'prod' : 'dist'),
+          force: true,
+        },
+        {
+          from: path.join(__dirname, 'src/translation.json'),
+          to: path.join(__dirname, mode === 'production' ? 'prod' : 'dist'),
+          force: true,
+        },
+      ],
+    }),
+    new ForceFileCopyPlugin({
+      files: [
+        {from: 'src/pathfinder.css', to: 'pathfinder.css'},
+        {from: 'src/translation.json', to: 'translation.json'},
       ],
     }),
     new BuildCompletionPlugin(),
