@@ -1,10 +1,26 @@
+# 2025-3-4
+
+- Defenses for creatures on Land, Sea and the Air (and climbing)
+- More spells formats for creatures
+- Creatures talens now line break.
+- Show defense bonus for the dfense dropdown
+- Creatures can have shields (with passive dodge too)
+- Can now 'refresh' data for creatures.
+- Tweak layout of the fancybox so it has less margins on the sides.
+- Uses now works with specialised skills - not implemented all over yet
+  - Track Grace & Spell Trcikery
+- Start of Level Up review:  Show stat gains for now.
+- Fix use of Total/Ranks/Uses in charactermancer.  Cleans up Dark mode a bit
+- Add a usecounttotal; so total number of rolls for a character total
+- Show usecount for normal skills
+
 # 2025-2-25
 
 - Edit attacks
 - Remove pre-compendium culture support
 - Support better DB and targets for creatures
 - Support better DB for characters
-- Use count for transcent (had armor and casted a spell);
+- Use count for transcendance (had armor and casted a spell);
 - Creatures:
   - Parse ranks for movement skills correctly
   - Use specialisation for specialised skills
