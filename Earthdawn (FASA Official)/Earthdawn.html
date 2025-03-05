@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 
 <!--
-v3.43 25 XX XX
+v3.44 25 03 01
 
 Character Sheet For Earthdawn Developped by JBF (Discord/Facebook Jiboux Faure) v2.
 Largerly using material from the work on the Official FASA version of Chris Dickey
@@ -12891,7 +12891,7 @@ Largerly using material from the work on the Official FASA version of Chris Dick
                   <option value="!Earthdawn~ charID: @{character_id}~ Chatmenu: Inspect" title="Allows you to inspect various variables, repeating sections, etc.">
                     Inspect
                   </option>
-                  <option value="!Earthdawn~ foreach~ StatusToToken" title="Set the Token to have the same conditions and status set as its associated character.">
+                  <option value="!Earthdawn~ charID: @{character_id}~ foreach~ StatusToToken" title="Set the Token to have the same conditions and status set as its associated character.">
                     Status to Token
                   </option>
                   <option value="!Earthdawn~ charID: @{character_id}~ Debug: test" title="This will run API code under edParse Test">
@@ -13272,7 +13272,7 @@ Largerly using material from the work on the Official FASA version of Chris Dick
 <!-- WORKERS -->
 <script type="text/worker">
 
-var SheetVersion=3.43;
+var SheetVersion=3.44;
 
 // This is Test code to see if worker threads are active (working).   If wt-test1 changes, change wt-test2. if wt-test2 does not update, sheetworkers are not working.
 on("change:wt-test1", function ocwttest1() {
@@ -13704,8 +13704,8 @@ var UpdateAdjustGlobalModifiers = function fnUpdateAdjustGlobalModifiers(eventIn
 
       //Effect & Action
       // My interpretation of the rules (unclear) is that effect tests are adjusted for little except wounds.
-      let effectauto = (getInt( values, "Wounds") * ((getInt( values, "Wounds") <= getInt( values, "Creature-Fury" )) ? 1 : -1 ))
-      + Math.min( getInt( values, "Wounds"), getInt( values, "Total-ResistPain" ));
+      let effectauto = (getInt( values, "Wounds") <= getInt( values, "Creature-Fury" )) ? getInt( values, "Wounds") :
+      (  Math.min( getInt( values, "Wounds"), getInt( values, "Total-ResistPain")) - getInt( values, "Wounds") );  //Parenthensis to allow proper stacking of Fury and Resist Pain, i.e. juste Fury until Wounds>Resist Paun
       let effecttotal = effectauto + getInt( values, "Adjust-Effect-Tests-Misc");
       //Action
 
@@ -13814,6 +13814,19 @@ on("change:combatoption-aggressiveattack change:combatoption-defensivestance", f
   });
   } catch( err ) { errlog( "Earthdawn:ocCoAggDef() error caught: " + err + " ei: " + JSON.stringify(eventInfo) ); }
 }));  //end ocAggDef
+
+
+
+//Official Ruling on 25 03 01 that Full Darkness implies Blindsided
+//According to self-evident clarification from Josh .... ;)
+on("change:condition-darkness", fn(function ocDarkness( eventInfo) {
+  'use strict';
+  try{
+    if(eventInfo && eventInfo.newValue=="4")
+      setAttrsLog({"condition-Blindsided":"1"});
+
+} catch( err ) { errlog( "Earthdawn:ocDarkness() error caught: " + err + " ei: " + JSON.stringify(eventInfo) ); }
+}));  //end ocDarkness
 
 
 
@@ -19554,7 +19567,6 @@ else if( fromSheetVersion < 3.41 ) {
 
 } // End ver 3.41
 
-
 else if( fromSheetVersion < 3.42 ) {
   toSheetVersion = 3.42;
 
@@ -19677,6 +19689,44 @@ else if( fromSheetVersion < 3.42 ) {
 });
 
 } // End ver 3.42
+
+else if( fromSheetVersion < 3.44 ) {
+  toSheetVersion = 3.44;
+
+  var newNotes = "Earthdawn by FASA Character Sheet version: " + toSheetVersion + " by Chris Dickey and JB Faure .\n"
+  // Note: Put update stuff here.
+  + "Access the WIKI by pressing the red '?' button at the top right of the character name. "
+  + "Thanks to a self-evident clarification ;) from Josh, we now know that being blinded or in full darkness makes you also blindsided... So Blindsided condition will be automatically applied.\n"
+  + "Fixed a bug about stacking Fury and Resist Pain.\n"
+
+
+  + notes;
+  // Comment this line out if not to change tab to force release notes visible.
+  showNotes = (showNotes === -1) ? -1 : 1;
+
+
+    let i,pre,newflags="";
+    let getV=[];
+
+
+
+
+        getAttrs( getV , function gaUpdateCharacterSheet(values) {
+          'use strict';
+
+
+
+  if( Object.keys(vals).length > 0 )    // If the code above just changed some values, do those before making the recursive call.
+  setAttrsLog( vals, undefined , function fnUpdateCharactersheetSetAttrsLog( vals ) {
+    'use strict';
+    updateCharactersheet( newSheetVersion, toSheetVersion, origSheetVersion, recurse + 1, values, showNotes, newNotes, newflags);        // Recursively call this routine to do any subsequent updates.
+  });
+  else{
+    updateCharactersheet( newSheetVersion, toSheetVersion, origSheetVersion, recurse + 1, values, showNotes, newNotes, newflags);        // Recursively call this routine to do any subsequent updates.
+  }
+  });
+
+} // End ver 3.44
 
     else  {
 
@@ -22684,7 +22734,7 @@ var updateKnackSummary = function fnupdateKnackSummary() {
 ,	{"knackname":"Stone Flesh [Karma]","requirement":"Rank 9","page":"AJMP","knacktype":"Karma Knack"}
 ]},{"talent":"Burning Vigor","knacks":[	{"knackname":"Burning Strength","requirement":"Rank 5, Fires of Gahad rank 3","restrictions":"Fire Eater rank 1","page":"AJMP","knacktype":"Knack"}
 ]},{"talent":"Call of Harrow","knacks":[	{"knackname":"All Tied Up [Special Maneuver]","requirement":"Rank 6","page":"AJMP","knacktype":"Special Maneuver Knack"}
-,	{"knackname":"Assault [Special Maneuver]","requirement":"Rank 5","page":"AJMP","knacktype":"Special Maneuver Knack"}
+,	{"knackname":"Beautiful Assault [Special Maneuver]","requirement":"Rank 5","page":"AJMP","knacktype":"Special Maneuver Knack"}
 ,	{"knackname":"Dispersing Strike [Special Maneuver]","requirement":"Rank 4","page":"AJMP","knacktype":"Special Maneuver Knack"}
 ,	{"knackname":"Exploit Corruption","requirement":"Rank 5","restrictions":"Horror Stalker rank 5","page":"AJMP","knacktype":"Knack"}
 ,	{"knackname":"Lance Bloatform [Special Maneuver]","requirement":"Rank 6","page":"AJMP","knacktype":"Special Maneuver Knack"}
@@ -22771,7 +22821,7 @@ var updateKnackSummary = function fnupdateKnackSummary() {
 ]},{"talent":"Heartening Laugh","knacks":[	{"knackname":"Shared Anger","requirement":"Rank 7, Fires of Gahad rank 5","restrictions":"Fire Eater rank 3","page":"AJMP","knacktype":"Knack"}
 ,	{"knackname":"Warming Laughter","requirement":"Rank 5, Fires of Gahad rank 3","restrictions":"Fire Eater rank 1","page":"AJMP","knacktype":"Knack"}
 ]},{"talent":"Horror Stalker","knacks":[	{"knackname":"All Tied Up [Special Maneuver]","requirement":"Rank 6","page":"AJMP","knacktype":"Special Maneuver Knack"}
-,	{"knackname":"Assault [Special Maneuver]","requirement":"Rank 5","page":"AJMP","knacktype":"Special Maneuver Knack"}
+,	{"knackname":"Beautiful Assault [Special Maneuver]","requirement":"Rank 5","page":"AJMP","knacktype":"Special Maneuver Knack"}
 ,	{"knackname":"Dispersing Strike [Special Maneuver]","requirement":"Rank 4","page":"AJMP","knacktype":"Special Maneuver Knack"}
 ,	{"knackname":"Lance Bloatform [Special Maneuver]","requirement":"Rank 6","page":"AJMP","knacktype":"Special Maneuver Knack"}
 ,	{"knackname":"Mold Baggi [Special Maneuver]","requirement":"Rank 3","page":"AJMP","knacktype":"Special Maneuver Knack"}
