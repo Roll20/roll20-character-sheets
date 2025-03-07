@@ -22867,7 +22867,8 @@
 		if (isNormal) {
 			// Conditions leading to zero, half, or full d6 rounding differs by advantage.
 			if (advantage === 0.25) {
-				limitD3 = 0.55;
+				limitD3 = 0.4;
+				limitD6 = 0.7;
 			} else if (advantage === 0.5) {
 				limitD3 = 0.60;
 			} else if (advantage === 0.75) {
@@ -22891,10 +22892,7 @@
 				plusPipHigh = 0.4;
 				limitD3 = 0.65;
 			} else if (advantage === 0.25) {
-				// plusPipLow = 0.2;
-				// plusPipHigh = 0.4;
-				// limitD3 = 0.65;
-				// minusPipLow = 0.8;
+				// Not used.
 			} else if (advantage === 0.5) {
 				plusPipLow = 0.2;
 				plusPipHigh = 0.5;
@@ -22942,15 +22940,18 @@
 				numberOfD6 = damageClass;
 				numberOfD3 = 0;
 			} else if (advantage === 0.25) {
-				numberOfD6 = Math.floor(normDC);
-				
-				// Special cases.
-				if ( (damageClass % 5) === 1) {
+				if (damageClass ===1) {
+					numberOfD6 = 0;
 					numberOfD3 = 1;
-				} else if (damageClass === 2) {
+				} else if (damageClass == 2) {
 					numberOfD6 = 1;
+					numberOfD3 = 0;
+				} else {
+					numberOfD6 = Math.floor(normDC);
+					numberOfD6 += (normDC - numberOfD6 > limitD6) ? 1 : 0;
+					numberOfD3 = ((normDC - numberOfD6 > limitD3) && (normDC - numberOfD6 < limitD6)) ? 1 : 0;	
 				}
-			} if (advantage === 0.75) {
+			} else if (advantage === 0.75) {
 				numberOfD6 = Math.floor(normDC);
 				
 				if ((remainder > limitD3) && (remainder < limitD6)) {
