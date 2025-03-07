@@ -18823,7 +18823,7 @@
 	
 	// Update primary propulsion mode for vehicles.
 	on("change:primaryPropulsionMode change:primaryPropulsion change:primaryPropulsionMod change:primaryNoncombatMultiple change:primaryPropulsionLimitations change:primaryPropulsionAdv change:weightMovePenalty change:primaryPropulsionSlotType change:primaryPropulsionCostsEND change:primaryFTLvelocty change:primaryInstantFTL change:primaryPropulsionAdds", function() {
-		getAttrs(["primaryPropulsionMode", "primaryPropulsion", "primaryPropulsionMod", "primaryNoncombatMultiple", "primaryPropulsionAdv", "primaryPropulsionLimitations", "primaryPropulsionSlotType", "primaryPropulsionCostsEND", "weightMovePenalty", "primaryFTLvelocty", "primaryInstantFTL", "primaryPropulsionAdds"], function(values) {
+		getAttrs(["primaryPropulsionMode", "primaryPropulsion", "primaryPropulsionMod", "primaryNoncombatMultiple", "primaryPropulsionAdv", "primaryPropulsionLimitations", "primaryPropulsionSlotType", "primaryPropulsionCostsEND", "weightMovePenalty", "primaryFTLvelocty", "primaryInstantFTL", "primaryPropulsionAdds", "strengthNet"], function(values) {
 			
 			const statValue = Math.max(0, parseInt(values.primaryPropulsion)||0);
 			const statMod = parseInt(values.primaryPropulsionMod)||0;
@@ -20259,9 +20259,9 @@
 					
 					// Determine skill chance.
 					if (isVehicle) {
-						skillRollChance = calculateSkillChance(values["skillType"+skillId], (parseInt(values["skillCP"+skillId])||0), values.enhancerJack, values.enhancerSch, values.enhancerSci, values.enhancerTrav, (parseInt(values.strengthChance)||8), (parseInt(values.dexterityChance)||8), 8, 8, 8, 8, (parseInt(values.interactionLevels)||0), (parseInt(values.intellectLevels)||0), (parseInt(values.agilityLevels)||0), bonusLevels + Math.max.apply(null, groupBonusLevels));
+						skillRollChance = calculateSkillChance(values["skillType"+skillId], (parseInt(values["skillCP"+skillId])||0), values.enhancerJack, values.enhancerSch, values.enhancerSci, values.enhancerTrav, (parseInt(values.strengthChance)||9), (parseInt(values.dexterityChance)||9), 9, 9, 9, 9, (parseInt(values.interactionLevels)||0), (parseInt(values.intellectLevels)||0), (parseInt(values.agilityLevels)||0), bonusLevels + Math.max.apply(null, groupBonusLevels));
 					} else {
-						skillRollChance = calculateSkillChance(values["skillType"+skillId], (parseInt(values["skillCP"+skillId])||0), values.enhancerJack, values.enhancerSch, values.enhancerSci, values.enhancerTrav, (parseInt(values.strengthChance)||8), (parseInt(values.dexterityChance)||8), (parseInt(values.constitutionChance)||8), (parseInt(values.intelligenceChance)||8), (parseInt(values.egoChance)||8), (parseInt(values.presenceChance)||8), (parseInt(values.interactionLevels)||0), (parseInt(values.intellectLevels)||0), (parseInt(values.agilityLevels)||0), bonusLevels + Math.max.apply(null, groupBonusLevels));
+						skillRollChance = calculateSkillChance(values["skillType"+skillId], (parseInt(values["skillCP"+skillId])||0), values.enhancerJack, values.enhancerSch, values.enhancerSci, values.enhancerTrav, (parseInt(values.strengthChance)||9), (parseInt(values.dexterityChance)||9), (parseInt(values.constitutionChance)||9), (parseInt(values.intelligenceChance)||9), (parseInt(values.egoChance)||9), (parseInt(values.presenceChance)||9), (parseInt(values.interactionLevels)||0), (parseInt(values.intellectLevels)||0), (parseInt(values.agilityLevels)||0), bonusLevels + Math.max.apply(null, groupBonusLevels));
 					}
 					
 					attributes["selectSkillState"+skillId] = groupBonusLevels.every(currentValue => currentValue === 0) ? "0" : "2";
@@ -22774,7 +22774,7 @@
 				theDC = Math.round(theDC);
 			} else if (theAdvantage === 0.25) {
 				// Standard 3:2:1 points ratio doesn't work.
-				theDC = (1 + theAdvantage) * ( 3.25 * Number(dice) + 1.5 * Number(halfDice) + 0.8 * thePip);
+				theDC = (1 + theAdvantage) * ( 3.2 * Number(dice) + 1.8 * Number(halfDice) + 1 * thePip);
 				theDC = Math.round(theDC);
 			} else if (theAdvantage === 0.5) {
 				// Standard 3:2:1 points ratio doesn't work.
@@ -22792,7 +22792,7 @@
 				}
 				theDC = Math.round(theDC);
 			} else if (theAdvantage === 1.25) {
-				theDC = (1 + theAdvantage) * ( 3 * Number(dice) + 2 * Number(halfDice) + 1 * thePip);
+				theDC = (1 + theAdvantage) * ( 3.2 * Number(dice) + 1.8 * Number(halfDice) + 1 * thePip);
 				// Need disambiguation.
 				if (thePip === -1) {
 					theDC += 1;
@@ -22891,9 +22891,10 @@
 				plusPipHigh = 0.4;
 				limitD3 = 0.65;
 			} else if (advantage === 0.25) {
-				plusPipLow = 0.2;
-				limitD3 = 0.65;
-				plusPipHigh = 0.55;
+				// plusPipLow = 0.2;
+				// plusPipHigh = 0.4;
+				// limitD3 = 0.65;
+				// minusPipLow = 0.8;
 			} else if (advantage === 0.5) {
 				plusPipLow = 0.2;
 				plusPipHigh = 0.5;
@@ -22993,23 +22994,11 @@
 					}
 				}
 			} else if (advantage === 0.25) {
-				// Follows a different method.
-				numberOfD6 = Math.floor(damageClass/4);
-				remainder = damageClass % 4;
-				if (remainder === 0) {
-					numberOfD3 = 0;
-					theAdds = 0;
-				} else if (remainder === 1) {
-					numberOfD3 = 0;
-					theAdds = 1;
-				} else if (remainder === 2) {
-					numberOfD3 = 1;
-					theAdds = 0;
-				} else if (remainder === 3) {
-					numberOfD6 += 1;
-					numberOfD3 = 0;
-					theAdds = -1;
-				}
+				// 0.25 works differently.
+				integerPart = Math.floor(damageClass/4);
+				numberOfD6 = integerPart + ((damageClass % 4) === 3 ? 1 : 0);
+				numberOfD3 = ((damageClass % 4) === 2 ? 1 : 0);
+				theAdds = ((damageClass % 4) === 1 ? 1 : ((damageClass % 4) === 3 ? -1 : 0));
 			} else if (advantage === 0.5) {
 				if ((remainder > plusPipLow) && (remainder < plusPipHigh)) {
 					theAdds = 1;
