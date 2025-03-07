@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.7.2] - 2025-02-28
+
+### Changed
+
+- Fix issue where importing an Ability/Magic/Psionic with `addtobonuses` would cause it to get added to the Modifier Picker twice.
+- Fix issue with Trust/Intimidate/Charm/Impress roll buttons not showing Success or Failure.
+- Add PE Bonus as an optional modifier to Disease save, since if it's a Magic Disease, the PE is already factored in.
+- Fix issue with Active Profile Curse save.
+- Add PE Bonus as an optional modifier to Fatigue and Pain saves.
+- Add PP Bonus as an optional modifier to Maintain Balance.
+
+## [1.7.1] - 2025-02-14
+
+### Changed
+
+- Only copy attributes from Modifiers to the Profile Picker if they have a value.
+- Remove Perception from Saving Throws in the Active Profile.
+- Fix issue where importing would set the Level Acquired to the current character level.
+
+## [1.7.0] - 2025-02-08
+
+### Added
+
+- Add Damage to Ancient Weapon Proficiencies (applies to Pole Arm and Whip).
+- Add hideable YouTube tutorial link.
+- Output error message to chat when TT is clicked if the Active Profile has no attacks.
+- Add nameable Modern Damage 1, 2, and 3 to Modifiers and Profiles for extra damage types.
+
+### Changed
+
+- Add 20 to Turn Tracker initiative when a Natural 20 is rolled.
+- Fix some grid layout issues in Modifiers and Profiles.
+
 ## [1.6.1] - 2025-01-27
 
 ### Added
