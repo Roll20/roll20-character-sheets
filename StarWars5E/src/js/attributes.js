@@ -41,7 +41,7 @@ const npc_repeating = [
     },
     {
         section_name:"repeating_npcreaction",
-        attributes:["name","desc"]
+        attributes:["npc_options-flag","name","desc"]
     },
     {
         section_name:"repeating_legendary",
