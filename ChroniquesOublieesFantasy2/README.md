@@ -6,9 +6,26 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.2.0 [Screenshot](cof2e.png)
+v1.3.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.3.0_ (2025-03-09)
+
+- Ajout de buffs aux caractéristiques pris en compte dans les attributes dérivés
+- Ajout d'un contrôle sur le niveau minimum requis pour les rangs de capacités
+- Ajout d'une case "en selle" (pour gestion de la voie du cavalier)
+- Affichage optionnel d'un bouton Chance dans les jets de caracs, d'attaques et de capacités
+- Prise en compte de l'état Immobilisé pour les jets d'attaque avec dé malus
+- Ajout de toutes les armes et armures dans la liste des équipements reconnus
+- Gestion simplifée du suivi des munitions
+- Gestion de l'usure des armes (low-fantasy)
+- Ajout d'une option pour départager les jets d'initiative identiques
+- Ajout d'un menu de chat pour les états préjudiciables
+- Ajout de 4 listes d'actions sur l'onglet Script des fiches de PJ et PNJ.
+- Prise en compte des attaques groupées sur la fiche de PNJ
+- Ajout d'un onglet Equipement simplifié sur la fiche de PNJ
+- Correction d'un bug dans l'appel du _Persomancien_
 
 ### Version _1.2.0_ (2025-02-04)
 
