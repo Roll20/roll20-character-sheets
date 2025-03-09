@@ -34,4 +34,9 @@ on('sheet:opened', ev => {
 
     setCursedArcana('arcane1')
     setCursedArcana('arcane2')
+
+    // Here make the version magic
+    setAttrs({
+        'version': 1.0
+    })
 })

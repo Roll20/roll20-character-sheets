@@ -1,6 +1,9 @@
 const {src, dest, watch, series} = require('gulp')
 const include = require('gulp-include')
 const rename = require('gulp-rename')
+const Stream = require('stream')
+const PluginError = require('plugin-error')
+const cssbeautify = require('gulp-cssbeautify');
 
 
 /* TODO: Idea V4 Before Generating html, generate pug template into html to reuse the same code for several place in the application */
@@ -15,13 +18,14 @@ function bundle_html(done){
 }
 
 /* Bundle the css in one big file */
-function bundle_css(done){
-    src('css/main.css')
+function bundle_css(){
+    return src('css/main.css')
         .pipe(include())
+        .pipe(flattenCSS())
+        .pipe(cssbeautify())
         .on('error',console.log)
         .pipe(rename('StarWars5e_CSS.css'))
         .pipe(dest('../dist'));
-    done();
 }
 
 function copy_to_root_dir(done){
@@ -50,4 +54,36 @@ exports.watch = () => {
     watch("js/*/*",{ ignoreInitial: false },exports.default);
     watch("html/*",{ ignoreInitial: false },exports.default);
     watch("html/*/*",{ ignoreInitial: false },exports.default);
+}
+
+function flattenCSS(obj, options) {
+
+
+    options = options || {};
+
+    var stream = new Stream.Transform({objectMode: true});
+
+
+    stream._transform = async function (file, encoding, callback) {
+        const { default: flatten } = await import('css-flatten');
+
+        if (file.isNull()) {
+            throw new PluginError('custom-flatten', 'File is null!');
+        }
+
+        if (file.isStream()) {
+            throw new PluginError('custom-flatten', 'Streams are not supported!');
+        }
+        try {
+            const input = file.contents.toString();
+            const output = flatten(input);
+            file.contents = Buffer.from(output, encoding);
+            callback(null, file);
+        } catch (err) {
+            console.error(err);
+            throw new PluginError('custom-flatten', err);
+        }
+    };
+
+    return stream;
 }

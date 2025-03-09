@@ -16,14 +16,13 @@ let update = (fromVersion) => {
     switch (fromVersion){
         case "2.5":
         case "3.0b":
-            //Upgrade from 2.5 to 3.0b
-            setAttrs({version:"3.0-beta"},false,update("3.0-beta"))
-            return;
         case "3.0-beta":
-            //Upgrade while in 3.0b
-            console.log("Sw5e sheet updated itself");
+            //Upgrade from 2.5 to 3.0
+            setAttrs({version:"3.0"},false,update("3.0"))
+            return;
+        case "3.0":
         default:
-            setAttrs({version:"3.0-beta"},false)
+            console.log("Sw5e sheet updated itself");
             return;
     }
 }
