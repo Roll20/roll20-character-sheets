@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.7.3] - 2025-02-28
+
+### Changed
+
+- Fix import race condition that caused WPs and Combat Skills to be duplicated in the Modifier Picker.
+
 ## [1.7.2] - 2025-02-28
 
 ### Changed
