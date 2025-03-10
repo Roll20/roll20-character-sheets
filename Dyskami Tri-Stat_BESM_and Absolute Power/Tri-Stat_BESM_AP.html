@@ -3088,11 +3088,12 @@
 
     /* Utility Functions */
     async function upgradeSheetVersion(cache, set_values) {
-        let sheet_version = parseFloat(cache.static_sheet_settings_version);
         const temp = {};
-        clog(cache, temp, `upgradeSheetVersion(${sheet_version})`);
-        while (sheet_version < global_sheet_current_version) {
-            switch (sheet_version) {
+        temp.sheet_version = parseFloat(cache.static_sheet_settings_version);
+        temp.current_version = global_sheet_current_version;
+        clog(cache, temp, `upgradeSheetVersion()`);debugger;
+        while (temp.sheet_version < temp.current_version) {
+            switch (temp.sheet_version) {
                 case 0.1:
                     const get_attr = ['attrdb','defectdb','statsdb'];
                     const get_attrs = await getAttrsAsync(get_attr);
@@ -3150,13 +3151,13 @@
                     set_values.attrdb = JSON.stringify(cache.attrdb);
                     set_values.groupdb = JSON.stringify(cache.groupdb);
                     set_values.statsdb = JSON.stringify(cache.statsdb);
-                    sheet_version = 0.2;
+                    temp.sheet_version = 0.2;
                 break;
                 default:
-                    sheet_version = global_sheet_current_version;
+                    temp.sheet_version = temp.current_version;
             }
         }
-        cache.static_sheet_settings_version = sheet_version;
+        cache.static_sheet_settings_version = temp.current_version;
         set_values.static_sheet_settings_version = cache.static_sheet_settings_version;
     }
 
