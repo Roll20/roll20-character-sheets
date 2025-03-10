@@ -205,9 +205,10 @@
             </div>
         </div>
         <div class="section-break"></div>
+
         <div>
             <!-- Roll Title -->
-            <input name="attr_static_roll_accordion_state" class="accordion-roll" type="checkbox" value="1" />
+            <input name="attr_static_roll_accordions_state" class="accordion-roll" type="checkbox" value="1" />
             <div class="grid-container-collapsible-title-bar theme-border">
                 <!-- Title Buttons Left -->
                 <div class="grid-minor-title-buttons-left">
@@ -249,8 +250,7 @@
                 <div class="styling-border theme-border">
                     <div class="container-roll styling-background theme-background">
                         <fieldset class="repeating_roll">
-                            <input name="attr_visibility" class="roll-visibility" type="hidden" value="1" readonly />
-                            <div class="roll-visibility-show">
+                            <div class="grid-major-roll-top">
                                 <input name="attr_state" class="accordion-roll" type="checkbox" value="1" />
                                 <div class="grid-container-collapsible-title-bar theme-border">
                                     <div class="grid-minor-title-buttons-left">
@@ -268,6 +268,7 @@
                                             <span class="material-icons expand">expand_less</span>
                                         </button>
                                     </div>
+                                    <input name="attr_static_roll_accordions_state" type="hidden" value="1" />
                                 </div>
                                 <div class="styling-border theme-border accordion-roll">
                                     <div class="styling-background theme-background">
@@ -6799,6 +6800,18 @@
         }
         for (let i = 0; i < cache.defect_ids.length; i++) {
             temp[`repeating_defect_${cache.defect_ids[i]}_state`] = temp.static_attributes_accordions_state;
+        }
+        Object.assign(set_values, temp);
+    }
+
+    function setRollAccordions(cache, set_values) {
+        // Note: 0 == closed, 1 == opened
+        const temp = {};
+        clog(cache, temp, 'setRollAccordions()');
+        const global_state = int(cache.static_roll_accordions_state);
+        temp.static_roll_accordions_state = global_state === 0 ? 1 : 0;
+        for (let i = 0; i < cache.roll_ids.length; i++) {
+            temp[`repeating_roll_${cache.roll_ids[i]}_state`] = temp.static_roll_accordions_state;
         }
         Object.assign(set_values, temp);
     }
@@ -13966,6 +13979,14 @@
                     break;
                     case 'character':
                         await openMenu(cache, set_values);
+                    break;
+                    case 'roll':
+                        switch (cache.source_id) {
+                            case 'accordions':
+                                cache.roll_ids = await getSectionIDsAsync('roll');
+                                setRollAccordions(cache, set_values);
+                            break;
+                        }
                     break;
                     case 'sheet':
                         switch (cache.source_id) {
