@@ -4252,11 +4252,11 @@
                         );
                     break;
                     case 'lock':
-                    temp.push(
-                        'attrdb',
-                        'groupdb',
-                        'static_group_visible_id',
-                    );
+                        temp.push(
+                            'attrdb',
+                            'groupdb',
+                            'static_group_visible_id',
+                        );
                     break;
                     case 'save':
                     case 'select':
@@ -4270,6 +4270,9 @@
                                 );
                             break;
                         }
+                    break;
+                    case 'settings':
+                        temp.push('character_name');
                     break;
                     case 'groupselect':
                     case 'grouptoggle':
@@ -13550,10 +13553,14 @@
         ) {
             cache.rulebook = await crpGet(cache, 'static_rules_base_default') || 'besm';
             cache.rulesdb = await crpGet(cache, 'rulesdb');
-            cache.rulesdb = JSON.parse(cache.rulesdb);
-            updateSheetRulesSummary(cache, set_values);
-            set_values.static_skills_show_state = 
-                cache.rulesdb.rules_optional_individual_status === 1 ? 1 : 0;
+            if (cache.rulesdb === `${cache.static_sheet_settings_gm}|rulesdb`) {
+                clog(cache, 'GM missing! Please create GM sheet.','ERROR');
+            } else {
+                cache.rulesdb = JSON.parse(cache.rulesdb);
+                updateSheetRulesSummary(cache, set_values);
+                set_values.static_skills_show_state = 
+                    cache.rulesdb.rules_optional_individual_status === 1 ? 1 : 0;
+            }
         }
         if (cache.static_sheet_settings_initialized !== 1) {
             // Create databases
