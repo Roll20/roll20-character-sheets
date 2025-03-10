@@ -11947,12 +11947,16 @@ async function setRowDefaults(e, setAttrsOptions) {
   const a = await getAttrsAsync(["character_level"]);
   console.log("setRowDefaults", row, a);
   // Loose comparison because it could be 1 or "1".
-  if (row[`${rowPrefix}_levelacquired`] == 1 && row[`${rowPrefix}_level`] == 1 && a["character_level"] > 1) {
+  if (
+    row[`${rowPrefix}_levelacquired`] == 1 &&
+    row[`${rowPrefix}_level`] == 1 &&
+    a["character_level"] > 1
+  ) {
     const attrs = {
       [`${rowPrefix}_levelacquired`]: a["character_level"],
       [`${rowPrefix}_level`]: 1,
     };
-    console.log(attrs);
+    console.log("setRowDefaults character_level > 1", attrs);
     await setAttrsAsync(attrs, setAttrsOptions);
   }
 }
@@ -12645,21 +12649,39 @@ async function updateSelection(name, selectionRowId, level) {
   await setAttrsAsync(attrs);
 }
 
+const pendingInserts = new Set(); // Track rows being inserted to prevent duplicates
 on(
   "change:repeating_bonuses:name \
   change:repeating_bonuses:level",
   async (e) => {
-    console.log("change:repeating_bonuses:name", e);
+    console.log("change:repeating_bonuses:name/level", e);
+
     const [r, section, rowId] = e.sourceAttribute.split("_");
+    if (!rowId) return;
+
     const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
     const levelKey = `repeating_bonuses_${rowId}_level`;
     const nameKey = `repeating_bonuses_${rowId}_name`;
+
     const a = await getAttrsAsync([selectionIdKey, levelKey, nameKey]);
-    console.log(a);
+
+    console.log(`Processed for ${rowId}:`, e.triggerName, a);
+
+    if (!a[nameKey] || !a[levelKey]) {
+      return; // Ensure both values exist before proceeding
+    }
+
     if (a[selectionIdKey]) {
       await updateSelection(a[nameKey], a[selectionIdKey], a[levelKey]);
     } else {
-      await insertSelection(a[nameKey], rowId, a[levelKey]);
+      if (!pendingInserts.has(rowId)) {
+        pendingInserts.add(rowId);
+        console.log(`Inserting selection for row ${rowId}`);
+        await insertSelection(a[nameKey], rowId, a[levelKey]);
+        pendingInserts.delete(rowId); // Remove from pending after insertion
+      } else {
+        console.log(`Skipping duplicate insert for row ${rowId}`);
+      }
     }
   }
 );
@@ -12773,7 +12795,7 @@ on("change:repeating_h2h", async (e) => {
   }
 
   // Exit if the sheetworker was doing something other than increasing the level.
-  if (e.sourceType === "sheetworker" && !e.sourceAttribute.endsWith("_level")) {
+  if (e.sourceType === "sheetworker" && !isNew && !e.sourceAttribute.endsWith("_level")) {
     return;
   }
   // Exit if only the name was changed.
@@ -12894,7 +12916,7 @@ on("change:repeating_wp change:repeating_wpmodern", async (e) => {
   console.log("isNew", isNew);
 
   // Exit if the sheetworker was doing something other than increasing the level.
-  if (e.sourceType === "sheetworker" && !e.sourceAttribute.endsWith("_level")) {
+  if (e.sourceType === "sheetworker" && !isNew && !e.sourceAttribute.endsWith("_level")) {
     return;
   }
   // Exit if only the name was changed.

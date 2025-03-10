@@ -368,12 +368,16 @@ async function setRowDefaults(e, setAttrsOptions) {
   const a = await getAttrsAsync(["character_level"]);
   console.log("setRowDefaults", row, a);
   // Loose comparison because it could be 1 or "1".
-  if (row[`${rowPrefix}_levelacquired`] == 1 && row[`${rowPrefix}_level`] == 1 && a["character_level"] > 1) {
+  if (
+    row[`${rowPrefix}_levelacquired`] == 1 &&
+    row[`${rowPrefix}_level`] == 1 &&
+    a["character_level"] > 1
+  ) {
     const attrs = {
       [`${rowPrefix}_levelacquired`]: a["character_level"],
       [`${rowPrefix}_level`]: 1,
     };
-    console.log(attrs);
+    console.log("setRowDefaults character_level > 1", attrs);
     await setAttrsAsync(attrs, setAttrsOptions);
   }
 }
