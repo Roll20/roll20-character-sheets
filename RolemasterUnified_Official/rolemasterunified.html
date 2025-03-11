@@ -151,6 +151,12 @@
   </div>
 </rolltemplate>
 
+<rolltemplate class='sheet-rolltemplate-rmutrackeradd'>
+  <div class='sheet-rolltemplate-rmumsg'>
+    <i>{{whom}}</i> added to template.
+  </div>
+</rolltemplate>
+
 <rolltemplate class="sheet-rolltemplate-rmuendurance">
   <div class='sheet-rolltemplate-rmurollbox sheet-rolltemplate-noboxes'>
     <i>{{name}}</i> rolls {{computed::firstroll}} {{computed::secondroll}}
@@ -2317,7 +2323,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 </div>
 
 <div class='creatureattacks'>
-  <span class='creatureheading'>Attacks</span>
+  <span class='creatureheading'>Attacks</span><br>
+
+  <span>Parry <input type='number' name='attr_parrymod' min='0' step='1'></span>
+  <span>Mod <input type='number' name='attr_othermod' step='1'></span>
 
   <!--  -->
   <fieldset class='repeating_creatureattack'>
@@ -2583,13 +2592,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
   <h1>Oh my god; it's a tracker!</h1>
 
-  <p>This is not even close to finished yet... So just delte this sheet and come
-  back in a few weeks.</p>
-
   <!-- Toolbar -->
-  <div>
+  <div class='fancybox'>
     <button type='action' name='act_trackeraddcreature' class='fancybutton'>Add</button>
-    <button type='action' name='act_trackerrefreshall' class='fancybutton'>Refresh All</button>
+    <button type='action' name='act_trackerrefreshall' class='fancybutton disabled'>Refresh All</button>
     <select class='fancyselect'> 
       <option>1 AP/Phase</option>
       <option>2 AP/Phase</option>
@@ -2601,6 +2607,80 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
   <div class='tracked'>
 
   </div>
+
+  <fieldset class='repeating_trackercharacter'>
+    <div class='trackedcharacter'>
+      <div class='trackedname span2'>
+        <span name='attr_trackedname'></span>
+        <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+          <span style="font-family:Pictos;">#</span>
+        </button>
+        <button type='action' name='act_trackedrefresh'
+                  class='rollbutton fancybutton fancybuttoninline'>
+              <span style="font-family:Pictos;">1</span>
+        </button>
+      </div>
+  
+      <div class='span2'>
+        <select name='attr_trackedaction' class='fancyselect'>
+          <option value='melee'>Melee</option>
+          <option value='missile'>Missile</option>
+          <option value='spell'>Spell</option>
+          <option value='perception'>Perception</option>
+          <option value='eat'>Eat</option>
+          <option value='stand'>Stand</option>
+        </select>
+   
+        <input name='attr_trackedap' value='1' type='radio'>
+        <input name='attr_trackedap' value='2' type='radio'>
+        <input name='attr_trackedap' value='3' type='radio'>
+        <input name='attr_trackedap' value='4' type='radio'>
+
+        Free <input name='attr_trackedfreeaction' type='checkbox'>
+        Conc <input name='attr_trackedconcentration' type='checkbox'>
+      </div>
+
+      <div class='span2'>
+        <select name='attr_trackedmove' class='fancyselect'>
+          <option value='s'>Run 31'/Dash</option>
+        </select>
+        <select name='attr_trackeddefense' class='fancyselect'>
+          <option value='a'>Passive Dodge</option>
+        </select>
+      </div>
+
+      <div class='span3'>
+        <select name='attr_trackedattack' class='fancyselect'>
+          <option value='s'>55Mcl</option>
+        </select>
+
+        Parry: <input type='number' name='attr_trackedparrymod' min='0' step='1'> 
+        Mod: <input type='number' name='attr_trackedothermod' step='1'> 
+      
+        <button type='action' name='act_trackeddoattack' class='fancybuttoninline fancybutton'>
+          Attack!
+        </button>
+      </div>
+
+      <div class='span4'>
+        Percepion 55; Footwork 22; Runnning 23
+      </div>
+
+      <div class='span2'>
+        Chan <span name='attr_trackedchannelingrr'></span>;
+        Ess <span name='attr_trackedessencerr'></span>;
+        Ment <span name='attr_trackedmentalismrr'></span>;
+        Fear<span name='attr_trackedfearrr'></span>; 
+        Phys <span name='attr_trackedphysicalrr'></span>;
+      </div>
+
+      <div class='spanall'>
+        <span>
+          <input type='text' name='attr_trackednotes' class='trackednotes'> 
+        </span>
+      </div>
+    </div>
+  </fieldset>
 
 
 </div>
@@ -5596,7 +5676,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 6db5c4392765351f8ccf13715362cb73ad28643a
+Revision 1e92774fe662c44a87460c7b8bd9ddb77dcf570f
 
 
 <hr>
@@ -7658,6 +7738,7 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
     // My best bonus updates are little different.
     function updateSpecializations(skill, pbonus, catbonus, log) {
       let bestbonus = -200; // Assume no one can get worse than this
+      let bestranks = 0;
       skill.specializations.forEach((spec) => {
 	  const aname = spec.aname;
 	  getAttrsPending([aname + "_ranks_misc", aname + "_misc", aname + "_ranks"], (attrs) => {
@@ -14629,6 +14710,8 @@ onCheck("clicked:newcombat", () => {
       aptrack_freeused_x: 0,
       aptrack_concentration_x: 0,
       aptrack_lastconcentration_x: 0,
+      parrymod: 0,
+      othermod: 0,
       currentphase: 0,
       currentphasedisplay: 0,
       freeactionphase: -1 },
@@ -16379,12 +16462,93 @@ function upgradeV6to7() {
 // vim: set sw=2 sts=2 syn=javascript :
 
 
+let tracker = {}
+
 
 onCheck("clicked:trackerinit", () => {
   console.log("Tracker sheet start");
   setAttrs({sheetselect: "trackersheet"});
 });
 
+
+onCheck("clicked:trackeraddcreature", () =>{
+  tracker.dataGet('target', generateRowID());
+});
+
+onCheck("clicked:repeating_trackercharacter:trackedrefresh", (ev) =>{
+    const basename = ev.sourceAttribute.replace("_trackedrefresh", "");
+    let rowid = basename.match("-.*");
+    getAttrs([`${basename}_trackedname`], (data) => {
+        tracker.dataGet(data[`${basename}_trackedname`], rowid);
+    });
+});
+
+
+
+onCheck("clicked:repeating_trackercharacter:deletetracked", (ev) => {
+  const basename = ev.sourceAttribute.replace("_deletetracked", "");
+  removeRepeatingRow(basename);
+});
+
+const fields = {
+    // Type is the type of data.
+    // Field is what we pull on the source character
+    trackedname: { type: "string", field: "character_name" },
+    trackedat: { type: "string", field: "at" },
+    trackeddb: { type: "string", field: "db" },
+    trackedchannelingrr: { type: "number", field: "rr_channeling_bonus" },
+    trackedessencerr: { type: "number", field: "rr_essence_bonus" },
+    trackedmentalismrr: { type: "number", field: "rr_mentalism_bonus" },
+    trackedfearrr: { type: "number", field: "rr_fear_bonus" },
+    trackedphysicalrr: { type: "number", field: "rr_physical_bonus" },
+    trackedparrymod: { type: "number", field: "parrymod" },
+    trackedothermod: { type: "number", field: "othermod" },
+    trackedtokenid: { type: "string", field: "token_id" },
+}
+
+tracker.extractResults = function(prefix, roll) {
+  const results = {}
+  const rr = roll.results;
+  for (const field in fields) {
+    const info = fields[field];
+    if (info.type == 'string') {
+      results[prefix + field] = attacks.getDataFromRoll(rr[field].expression);
+    } else if (info.type == 'number') {
+      results[prefix + field] = parseInt(attacks.getDataFromRoll(rr[field].expression));
+    } else {
+      rmuerror("Unkown type");
+    }
+  }
+  return results;
+}
+
+tracker.buildString = function(whom) {
+  let reqs = ["&{template:rmuattacktarget} [[1d20]]"];
+  for (const field in fields) {
+    const info = fields[field];
+    if (info.type == 'string') {
+      reqs.push(`{\{${field}=[[0[@{${whom}|${info.field}}] ]]}}`);
+    } else if (info.type == 'number') {
+      reqs.push(`{\{${field}=[[0[@{${whom}|${info.field}}] ]]}}`);
+    } else {
+      rmuerror("Unkown type, barfing");
+    }
+  }
+  return reqs.join(" ");
+}
+
+
+tracker.dataGet = function(whom, rowid) {
+  const roll_string = tracker.buildString(whom);
+  startRoll(roll_string, roll => {
+    const prefix = `repeating_trackercharacter_${rowid}_`;
+    // FIXME: Should not do prefix: Instead do extract, then a fixup pass,
+    // then add the prefix
+    const results = tracker.extractResults(prefix, roll);
+    finishRoll(roll.rollId);
+    setAttrs(results);
+  });
+}
 
 console.log("Tracker sheet loaded");
 
