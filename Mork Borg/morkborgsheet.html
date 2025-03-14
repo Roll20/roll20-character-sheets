@@ -5,8 +5,10 @@
 
       <div class="section white-bg yellow-border">
         <label class="inline">
-          <span data-i18n="name-u" class="unifraktur">Name</span> <input type=text name="attr_char_name" class="mediumwidth" />
+          <span data-i18n="name-u" class="unifraktur">Name</span>
         </label>
+        <input type="text" name="attr_char_name" class="mediumwidth inline" />
+        <input type="text" name="attr_character_name" value="" class="no-display"/>
       </div>
       <div class="section white-bg yellow-border">
         <label>
@@ -42,8 +44,6 @@
           <span class="note monospace" data-i18n="powers-left-u">Remaining</span>
         </label>
         <input type="number" name="attr_power_total" value="0" />
-        <br />
-        <br />
         <fieldset class="repeating_powers" name="repeating_powers">
           <textarea type="text" name="attr_power" class="shorttextarea"></textarea>
         </fieldset>
@@ -227,28 +227,26 @@
             </label>
           </div>
         </div>
-        <div>
-          <fieldset class="repeating_weapons" name="repeating_weapons">
-            <input type=text name="attr_weaponname" class="short" />
-            <select name="attr_attacktype" class="short">
-              <option value="@{strength}">Melee</option>
-              <option value="@{presence}">Ranged</option>
-            </select>
-            <select name="attr_weapondamage" class="short">
-              <option value="1d2" selected="selected">d2</option>
-              <option value="1d4">d4</option>
-              <option value="1d6">d6</option>
-              <option value="1d8">d8</option>
-              <option value="1d10">d10</option>
-              <option value="1d12">d12</option>
-              <option value="?{Damage die|1d2}">Special</option>
-            </select>
-            <!--
-            <button type="roll" value="&{template:default} {{name=@{char_name} @{labelattacks} @{labelwith} @{weaponname}}} {{@{labelattack}:=[[1d20 + @{attacktype}]]}} {{@{labeldamage}:=[[@{weapondamage} - ?{Enemy Armor|1d0} - ?{Enemy Shield?|no,0|yes,1}]]}} {{@{labelifcrit}:=@{labelfumblemsg}.}} {{@{labeliffumble}:=@{labelattackfumble}.}}" name="roll_strength2"></button>
-            -->
-            <button type="roll" value="&{template:attack} {{name=@{char_name} @{labelattacks} @{labelwith} @{weaponname}}} {{attack=@{labelattack}: [[1d20 + @{attacktype}]]}} {{damage=@{labeldamage}: [[@{weapondamage}]]}} {{critdmg=[[@{weapondamage}*2]]}} {{critmsg=@{labelfumblemsg}.}} {{dmgfumble=@{labelattackfumble}.}}" name="roll_strength2"></button>
-          </fieldset>
-        </div>
+        <fieldset class="repeating_weapons" name="repeating_weapons">
+          <input type=text name="attr_weaponname" class="short" />
+          <select name="attr_attacktype" class="short">
+            <option value="@{strength}">Melee</option>
+            <option value="@{presence}">Ranged</option>
+          </select>
+          <select name="attr_weapondamage" class="short">
+            <option value="1d2" selected="selected">d2</option>
+            <option value="1d4">d4</option>
+            <option value="1d6">d6</option>
+            <option value="1d8">d8</option>
+            <option value="1d10">d10</option>
+            <option value="1d12">d12</option>
+            <option value="?{Damage die|1d2}">Special</option>
+          </select>
+          <!--
+          <button type="roll" value="&{template:default} {{name=@{char_name} @{labelattacks} @{labelwith} @{weaponname}}} {{@{labelattack}:=[[1d20 + @{attacktype}]]}} {{@{labeldamage}:=[[@{weapondamage} - ?{Enemy Armor|1d0} - ?{Enemy Shield?|no,0|yes,1}]]}} {{@{labelifcrit}:=@{labelfumblemsg}.}} {{@{labeliffumble}:=@{labelattackfumble}.}}" name="roll_strength2"></button>
+          -->
+          <button type="roll" value="&{template:attack} {{name=@{char_name} @{labelattacks} @{labelwith} @{weaponname}}} {{attack=@{labelattack}: [[1d20 + @{attacktype}]]}} {{damage=@{labeldamage}: [[@{weapondamage}]]}} {{critdmg=[[@{weapondamage}*2]]}} {{critmsg=@{labelfumblemsg}.}} {{dmgfumble=@{labelattackfumble}.}}" name="roll_strength2"></button>
+        </fieldset>
       </div>
       <div class="section white-bg yellow-border">
         <label>
@@ -299,14 +297,16 @@
             </label>
           </div>
           <div class="col">
-            <label>
+            <label class="aligns-right">
               <span class="note" data-i18n="equipment-item-large-u">Large?</span>
             </label>
           </div>
         </div>
         <fieldset class="repeating_equipment" name="repeating_equipment">
-              <textarea type=text name="attr_equipment" class="shorttextarea mediumwidth"></textarea>
-              <input name="attr_equipment_large" type="checkbox" value="large">
+          <textarea type=text name="attr_equipment" class="shorttextarea mediumwidth"></textarea>
+          <span>
+            <input name="attr_equipment_large" type="checkbox" value="large">
+          </span>
         </fieldset>
       </div>
       <div class="section white-bg yellow-border">
@@ -527,6 +527,15 @@
         ['agidr']: armor_agi_modifier,
         ['defdr']: armor_def_modifier,
       });
+    });
+  });
+  
+  // sync name change to character_name
+  on('change:char_name', (eventInfo) => {
+    console.log(`Change detected: ${eventInfo.sourceAttribute}`);
+    setAttrs({
+      character_name: eventInfo.newValue,
+      silent: true,
     });
   });
 </script>
