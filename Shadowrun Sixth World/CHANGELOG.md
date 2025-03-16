@@ -1,5 +1,33 @@
 Change Log
 ==============================================
+**2024-10-11 ** v.88 Chuz (James Culp)
+	Added lwa spirits from Shadows In Focus: That Old Voodoo to the Spirit NPC sheet.  (Agwe, Azaca, Damballah, Erzulie, Ghede, Legba, Obatala, Ogoun and Shango)
+**2024-06-05 ** v.87 Chuz (James Culp)
+	Bugfix - Found an issue with imports where items would be dropped mysteriously.  This affected anything that was in a repeating list and was tied to unique ids within Roll20.  Added another check to prevent duplicate ids.
+**2024-03-03 ** v.86 Chuz (James Culp)
+	Bugfix - Essence Mod works again
+	Added Omega, Exoware and Gammaware to Augmentation grade drop downs and essence calculations.  They do not however add the bad luck quality or extra condition monitor boxes when selected.
+**2023-09-04 ** v.85 Chuz (James Culp)
+	New Feature - GM Helper sheet, added extended test and d6 roll buttons so GMs can roll from the sheet if needed.
+	Bugfix - PC Vehicles tab, handling mod was only reflected on the onroad handling value not the offroad value when settings mode was turned off.
+	Bugfix - GM Helper sheet, incrementing OS using the + button was doing strange things, this has been fixed.
+**2023-07-10 ** v.84 Chuz (James Culp)
+	Bugfix - AoE Spells weren't adding the right amount of drain for 12m and 14m
+	Bugfix - Attribute+Attribute selections were missing Strength
+	New Feature - skill mods in the repeating skill list now should update those skills everywhere in the sheet.
+	Bugfix - Sprint rolls now include -1 skill modifier if the PC doesn't have an Athletics skill.  Also added a function to resynch the hidden skill attributes any time a skill name is changed (via the drop down changing) or a skill is deleted.
+	Bugfix - Fixed the increment button on the OS Tracker it now adds 1 instead of concatenating a 1 after the other digits sometimes.
+**2023-06-15 ** v.83 Chuz (James Culp)
+	New Feature - Beginning work on the GM Helper sheet, step 1 add an OS Tracker.  I'm open to suggestions for other helpful GM tools to include in this sheet in the usual venues (Discord, Patreon, Roll20 DMs)
+	New Feature - GMs rejoice, select a token on the board and click the "Track Selected" button on the GM Helper character sheet to add the selected character's name and A/S/D/F to the tracker.
+**2023-05-30 ** v.82 Chuz (James Culp)
+	Update - Added Hack & Slash Matrix Actions to the Rolls Pane -> Matrix Roll Buttons
+	New Feature - Added Matrix Roll Buttons Legality Filter, this allows you to hide illegal actions.  For pcs without a matrix persona or that are worried about OS
+	New Feature - Added Matrix Roll Buttons Access Level Filter, this allows you to hide actions that are not usable at a particular Matrix Access Level (outsider/user/admin)
+**2023-05-22 ** v.81 Chuz (James Culp)
+	Bugfix - More weapon dicepool tweaks
+	New Feature - NPC->Spirits made spirits awakened and now display the spells section for them.  Dicepool does not auto-update when spirit force changes, that is an exercise for the user.
+	New Feature - Added Critter Powers drag and drop from the compendium for spirits and grunts.
 **2023-05-18 ** v.80 Chuz (James Culp)
 	Bugfix - PC Qualities were always showing up as Negative regardless of the actual type.
 	Bugfix - PC->Spells Ranges of Touch were showing up as LOS.
@@ -15,7 +43,7 @@ Change Log
 	Bugfix - (?) Trying to fix some dicepool bugs on NPC and Vehicle sheets tied to grunt groups.
 	Bugfix - Vehicle physical and matrix condition monitors weren't updating right on drag and drop
 **2023-03-13 ** v.76 Chuz (James Culp)
-Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
+	Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
 **2023-03-06 ** v.75 Chuz (James Culp)
 	New Feature - PC-Magic-Conjuring Added Astral Reputation and added AsRep to Summon Spirit button output
 	New Feature - Added Heat, Reputation and AsRep to the Social Pane

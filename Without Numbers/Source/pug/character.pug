@@ -1,0 +1,386 @@
+
+input(type="hidden", name="attr_setting_foci_location", value="left").foci-loc
+input(type="hidden", name="attr_setting_skill_query", value="hover").skills-query
+input(type="hidden", name="attr_magic_type", value="arcanist").magic-type
+input(type="hidden", name="attr_setting_ai_enable", value="").ai-setting
+input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman-setting
+
+//- Core
+.core.core-info.cols-2
+	.info.flex.core-box-text
+		+text-input("character_name", "NAME").important
+		+text-input("level", "LEVEL", "no-spinners")(type="number", min="1", value="1").level.center
+		+text-input("class", "CLASS").level-rest.swn.wwn
+		+text-input("background", "BACKGROUND").col25
+		each val in core.swnInfo
+			+text-input(val, val).col25.swn
+		each val in core.wwnInfo
+			+text-input(val, val).col25.wwn
+		.grid.w-full.grid-flow-col.cwn
+			each val in ["first", "second", "third", "fourth"]
+				+text-input(`edge_${val}`, `EDGE_${val}`).
+	.saves.core-box
+		h3(data-i18n="SAVING_THROWS")
+		.flex-between
+			each val in saves
+				if val === "luck"
+					input(type="hidden", name="attr_luck_save", value="1").hider
+				+makeSave(val)
+	.menus.core-box
+		h3(data-i18n="INITIATIVE_FIXED")
+		.menus-content.center
+			button(type="roll", name="roll_Initiative", data-i18n="INITIATIVE_FIXED", value="&{template:swn-default} {{system=@{system}}} {{charname=@{character_name}}} {{title=^{INITIATIVE_FIXED}}} {{ =[[1d8+@{dexterity_mod} &{tracker}]]}}").btn
+
+//- Stats
+.core.core-stats.cols-2
+	.main.core-box-text
+		h3(data-i18n="CORE_STATISTICS")
+		.main-content.gap-1
+			+text-input-duo("HP", "HP_max", false, {value: "0"}).important
+				.label
+					button(type="roll", name="roll_HP", data-i18n="HIT_POINTS" value!="&{template:swn-default} {{system=@{system}}} {{charname=@{character_name}}} {{title=^{HIT_POINTS}}} {{=[[{abs(@{setting_heroic_enable}-1)*@{level}d6 + @{level}*@{constitution_mod}[CON] + @{level}*@{extra_hp_query}, abs(@{setting_heroic_enable}-1)*@{hp|max} + 1d1, 0d0 + @{setting_heroic_enable}*ceil(([[6*@{level}]] [Level] + [[@{level}*@{constitution_mod}]] [Con] + [[@{level}*@{extra_hp_query}]] [Bonus])/2)}kh1]]}} {{info=^{MAXIMUM_HP_1} @{level}d6 + @{level}&ast;[[@{constitution_mod}[CON] + @{extra_hp_query}]] ^{MAXIMUM_HP_2} [[@{hp|max} + 1]]}}").btn
+			.swn.cwn
+				+text-input-duo("strain_permanent_extra", "cyberware_strain_total", "PERMANENT_STRAIN", {readonly: true, "data-i18n-title": "TOTAL_CYBERWARE_STRAIN"}, "", "+", "+")(type="number", min="0", value="0", data-i18n-title="PERMANENT_STRAIN_EXTRA").center
+			.wwn
+				+text-input("current_strain", "CURRENT_STRAIN")(type="number", min="0", value="0").center
+			input(type="hidden" name="attr_strain_above_max", value="0").strain-above-max
+			+text-input-trio("strain_extra", "strain", "strain_max", "SYSTEM_STRAIN_/_MAX", {readonly: true, title: "Total Strain", "data-i18n-title": "TOTAL_STRAIN", class: "total-strain"}, {value: "10", readonly: true, "data-i18n-title": "CONSTITUTION"}, "", "=")(min="0", value="0", data-i18n-title="STRAIN_EXTRA", title: "Strain Extra") System Strain / Max
+			+text-input-duo("xp", "xp_next", "XP_NEXT_LEVEL", {min: "0", value: "3"})(min="0", value="0")
+			.swn.wwn
+				+text-input("AC", "ARMOR_CLASS")(type="number", value="10", readonly, data-i18n-title="AC_DESC").center
+			.swn.cwn
+				+text-input("attack_bonus", "ATTACK_BONUS")(type="number", min="0", value="0").center
+			.wwn
+				+text-input("dexterity_mod", "DEX_MOD")(type="number", min="0", value="0").center
+			input(type="hidden", name="attr_setting_heroic_enable", value="0").hider
+			+text-input("hp_doom")(type="number").center
+				button(type="roll", name="roll_Doom", data-i18n="DOOM_DAMAGE", data-i18n-title="DEFY_DOOM", value!="&{template:swn-default} {{system=@{system}}} {{charname=@{character_name}}} {{title=^{DEFYING_DOOM}}} {{^{DOOM_DAMAGE}=[[@{level}d@{doom_size}]]}}").btn
+		.grid.wwn.grid-flow-col.gap-1.mt
+			each val in ["attack_bonus", "melee_attack_bonus", "ranged_attack_bonus"]
+				+text-input(val, val)(type="number", min="0", value="0").center
+		.grid.wwn.grid-flow-col.gap-1.mt
+			+text-input("initiative_bonus", "INITIATIVE_BONUS")(type="number", min="0", value="0").center
+		.grid.cwn.grid-flow-col.gap-1.mt
+			+text-input("major_injuries", "MAJOR_INJURIES")
+	.attributes.core-box
+		.edit.grid.gap-1
+			.grid.grid-flow-col.gap-1.attr-grid
+				span.spacer
+				each val in ["BASE", "BOOSTS", "ATTRIBUTE", "BONUS", "MODIFIER"]
+					span(data-i18n=val).font-bold.ellipsis
+			each attr in attributes
+				.grid.grid-flow-col.gap-1.attr-grid
+					- const physical = ["strength", "dexterity", "constitution"].includes(attr)
+					- const classes = physical ? "ai-disabled transhuman-disabled" : ""
+					span(data-i18n=attr.toUpperCase()).font-bold.ellipsis
+					input(type="number", name=`attr_${attr}_base`, value="0" class=classes)
+					input(type="number", name=`attr_${attr}_boosts`, value="0" class=classes)
+					span(name=`attr_${attr}`).center
+					input(type="number", name=`attr_${attr}_bonus`, value="0")
+					.mod
+						input(type="hidden", name=`attr_${attr}_mod`, value="0")
+						span(name=`attr_${attr}_mod`).font-bold.mod.center
+		.display.grid.gap-1
+			.grid.grid-flow-col.gap-1.attr-display-grid
+				span.spacer
+				each val in ["ATTRIBUTE", "BONUS", "MODIFIER"]
+					span(data-i18n=val).font-bold.ellipsis.center
+			each attr in attributes
+				.grid.grid-flow-col.gap-1.attr-display-grid
+					- const physical = ["strength", "dexterity", "constitution"].includes(attr)
+					span(data-i18n=attr.toUpperCase()).font-bold.ellipsis
+					span(name=`attr_${attr}`).center
+					span(name=`attr_${attr}_bonus`).center
+					span(name=`attr_${attr}_mod`).center.mod.font-bold
+	.wealth.grid.core-box-text.wwn
+		h3(data-i18n="WEALTH")
+		.grid.grid-flow-col
+			each val in ["sp"]
+				+text-input(val, val)
+		.grid.mt
+			h3(data-i18n="OTHER_WEALTH")
+			textarea(name=`attr_wealth`)
+
+	.money.grid.core-box-text.cwn
+		.flex
+			h3(data-i18n="MONEY")
+			+text-input("money").center
+		.grid.mt
+			h3(data-i18n="OTHER_MONEY")
+			textarea(name=`attr_money`)
+
+	.resources.core-box-text.swn
+		.flex
+			h3(data-i18n="RESOURCES")
+			+text-input("credits", "CREDITS")(type="number", value="0").credits.center.col50
+		fieldset.repeating_resources
+			+text-input-duo("resource_count", "resource_count_max", "").display
+				.label
+					span(name="attr_resource_name")
+			.flex-center.edit
+				input(type="text", name="attr_resource_name")
+				input(type="number", name="attr_resource_count")
+				span.slash /
+				input(type="number", name="attr_resource_count_max")
+
+.column
+	//- Weapons
+	include components/weapons.pug
+
+	//- Shells
+	.section.ai-enabled.transhuman-enabled
+		+sectionheader("show_shells", "SHELLS")
+		.shells
+			.grey-box
+				.flex-center
+					h3(data-i18n="SHELLS")
+				.table-header.shells-grid.rep-grid.notdetails
+					.active(data-i18n="ACTIVE?").notdetails
+					each attr in ["str", "dex", "con"]
+						div(classname=`${attr}` data-i18n=`${attr.toUpperCase()}`).notdetails
+					.affinity(data-i18n="AFFINITY?").notdetails
+					.name.ellipsis(data-i18n="NAME").notdetails
+				fieldset.repeating_shells
+					.show-chevron
+						+collapseChevron()
+						button.display.invisible-button(name="roll_Shell", type="roll", value!="&{template:swn-default} {{system=@{system}}} {{charname=@{character_name}}} {{info=^{SHELL} — STR @{shell_strength} - DEX @{shell_dexterity} - CON @{shell_constitution}}} {{title=@{shell_name}}} {{desc=^{BASIC_ABILITIES}:\n @{shell_ability} @{shell_affinity_active}}}")
+						.table-header.shells-grid.rep-grid.details.no-highlight
+							.active(data-i18n="ACTIVE?")
+						each attr in ["str", "dex", "con"]
+							div(classname=`${attr}` data-i18n=`${attr.toUpperCase()}`)
+							.affinity(data-i18n="AFFINITY?")
+							.name.ellipsis(data-i18n="NAME")
+						.shells-grid.rep-grid
+							+fake-text-input().center
+								input(type="checkbox", name="attr_shell_active", value="1").inline-input.rep-radio
+							each attr in ["shell_strength", "shell_dexterity", "shell_constitution"]
+								+text-input(attr)(type="number", value="0").center.inline-input
+							+fake-text-input().center
+								input(type="checkbox", name="attr_shell_affinity_active" value="\n\n^{AFFINITY_ABILITIES}:\n @{shell_affinity}").inline-input
+							+text-input("shell_name").inline-input.edit
+							+text-input("shell_name").display
+						input(type="hidden", name="attr_shell_ability", value="").hide-empty
+						.rep-grid.details
+							.table-header
+								.shell-ability(data-i18n="BASIC_ABILITIES")
+							span(name="attr_shell_ability").display
+							textarea(name="attr_shell_ability").edit
+						.rep-grid.details
+							.table-header
+								.shell-affinity(data-i18n="AFFINITY_ABILITIES")
+							span(name="attr_shell_affinity").display
+							textarea(name="attr_shell_affinity").edit
+
+	//- Edge
+	include components/edge.pug
+
+	//- Foci
+	.section.foci-left
+		+foci
+
+
+	//- Psionics and/or Space Magic
+	include components/psionics.pug
+
+	include components/space_magic.pug
+
+	include components/arts.pug
+
+	include components/graced.pug
+
+	include components/magic.pug
+
+	include components/legate.pug
+
+	include components/cyberdeck.pug
+
+.column
+	//- Skills
+	.section
+		input(type="hidden" vale="attr_skills")
+		+sectionheader("show_skills", "SKILLS")
+		.skills
+			.grid.skill-container
+				each skill in skills.revised
+					.swn
+						+makeSkill(skill)
+				each skill in skills.wwn
+					.wwn
+						+makeSkill(skill, !!customSkills[skill], customSkills[skill])
+				each skill in skills.cwn
+					.cwn
+						+makeSkill(skill, !!customSkills[skill], customSkills[skill])
+				each skill in skills.magic
+					.magic
+						+makeSkill(skill, !!customSkills[skill], customSkills[skill])
+				each skill in skills.spaceMagic
+					.space_magic
+						+makeSkill(skill, !!customSkills[skill], customSkills[skill])
+			input(type="hidden", name="attr_homebrew_extra_skills", value="0").hider
+			.skills-repeating.mt
+				fieldset.repeating_skills
+					+makeSkill("", true)
+			.skill-container
+				+unspentSkillPoints()
+
+
+	//- Foci
+	.section.foci-right
+		+foci
+
+
+//- AI
+include components/ai.pug
+
+//- Gear
+.section.cols-2
+	+sectionheader("show_gear", "GEAR")
+	.gear.halfgrid
+		.equipment.column
+			.grey-box.readied-stowed.grid.grid-flow-col.gap-1
+				h3(data-i18n="EQUIPMENT")
+				input(type="hidden", name="attr_gear_readied_over", value="0").input-gear-over
+				+text-input-duo("gear_readied", "gear_readied_max", "READIED", {value: "5", readonly: true, "data-i18n-title": "STRENGTH/2"})(value="0", readonly)
+				input(type="hidden", name="attr_gear_stowed_over", value="0").input-gear-over
+				+text-input-duo("gear_stowed", "gear_stowed_max", "STOWED", {value: "10", readonly: true, "data-i18n-title": "STRENGTH"})(value="0", readonly)
+				.swn.grid.grid-flow-col.gap-1
+					each val in ["credits", "credits_owed"]
+						+text-input(val, val)(value="0", min="0", type="number").center
+				.wwn
+					+text-input("lifestyle", "LIFESTYLE")
+			.grey-box.simple-repsection
+				.table-header.gear-grid.grid.gap-1
+					.center #
+					each item in ["NAME", "ENCUMBRANCE", "STATUS", "BUNDLED"]
+						.ellipsis(data-i18n=item data-i18n-title=item)
+
+				fieldset.repeating_gear
+					.show-chevron
+						+collapseChevron()
+						button.display.invisible-button(name="roll_GEAR", type="roll", value!="&{template:swn-default} {{system=@{system}}} {{charname=@{character_name}}} {{title=@{gear_name}}} {{desc=@{gear_description}}}")
+						.display
+							.grid.gear-grid.gap-1.border-bottom
+								span(name="attr_gear_amount").center
+								span(name="attr_gear_name").ellipsis.font-bold
+								span(name="attr_gear_encumbrance").center
+								span(name="attr_gear_status")
+								+fake-text-input().relative
+									input(name="attr_gear_bundled" type="checkbox" value="on")
+							.details
+								span(name="attr_gear_description")
+						.edit.grid.gap-1
+							.grid.grid-flow-col.gap-1.gear-grid
+								+text-input("gear_amount", "AMOUNT")(type="number", value="1", min="0").center
+								+text-input("gear_name", "NAME")(data-i18n-placeholder="ITEM")
+								+text-input("gear_encumbrance", "ENC")(type="number", value="0", step="any").center
+								+gearStatus("gear")
+								+fake-text-input().relative
+									input(name="attr_gear_bundled" type="checkbox" value="on")
+							.details
+								textarea(name="attr_gear_description", data-i18n-placeholder="DESCRIPTION")
+			.grey-box.other
+				h3(data-i18n="OTHER_EQUIPMENT")
+				textarea(name="attr_gear_other").other-gear
+		.column
+
+			include components/armor.pug
+
+			.cyberware.simple-repsection.grey-box
+				.flex-center
+					h3
+						| #[span(data-i18n="CYBERWARE")] – #[span(data-i18n="TOTAL_CYBERWARE_STRAIN")] #[span(name="attr_cyberware_strain_total")]
+				fieldset.repeating_cyberware
+					.show-chevron
+						+collapseChevron
+						button.display.invisible-button(name="roll_Cyberware", type="roll", value!="&{template:swn-default} {{system=@{system}}} {{charname=@{character_name}}} {{title=@{cyberware_name}}} {{info=^{CYBERWARE}; @{cyberware_strain} ^{STRAIN}}} {{desc=@{cyberware_description}}}")
+						.display
+							.name.ellipsis.flex-between.mb
+								span(name="attr_cyberware_name")
+								span #[span(name="attr_cyberware_strain")] #[span(data-i18n="STRAIN")]
+							.details
+								.grid.gap-1.grid-flow-col
+									each val in ["TYPE", "CONCEALMENT", "COST"]
+										span #[span(data-i18n=val).font-bold]: #[span(name=`attr_cyberware_${val.toLowerCase()}`)]
+								span(name="attr_cyberware_description")
+						.edit.grid.gap-1
+							.grid.gap-1.grid-flow-col.name-row
+								+text-input("cyberware_name", "NAME").name
+								+text-input("cyberware_strain", "STRAIN_COST")(type="number" value="0").name.center
+							.grid.gap-1.grid-flow-col.cwn
+								+text-input("cyberware_type", "TYPE")
+								+text-input("cyberware_concealment", "CONCEALMENT")
+								+text-input("cyberware_cost", "COST")
+							textarea(name="attr_cyberware_description", data-i18n-placeholder="DESCRIPTION").details
+
+//- Misc
+.section.cols-2
+	+sectionheader("show_misc", "MISCELLANEOUS")
+	.misc
+		.grid.gap-1.goal-lang
+			.goals.grey-box
+				h3(data-i18n="GOALS")
+				fieldset.repeating_goals
+					.show-chevron.simple-repsection
+						+collapseChevron()
+						.display
+							.grid.grid-flow-col.goal.mb.name
+								span(name="attr_goal_name")
+								span.level #[span(data-i18n="XP")]:#[span(name="attr_goal_xp")]
+							.details
+								span(name="attr_goal_description")
+						.edit
+							.grid.grid-flow-col.goal.mb
+								+text-input("goal_name").name.grow
+								+text-input("goal_xp")(type="number", min="0", data-i18n-placeholder="XP").xp.center
+							.grid
+								textarea(name="attr_goal_description", data-i18n-placeholder="DESCRIPTION")
+			.languages.grey-box
+				h3(data-i18n="LANGUAGES")
+				fieldset.repeating_languages
+					+text-input("language")
+		.grid.mt.gap-1.proj-ally
+			.grid.gap-1
+				.projects.grey-box.wwn
+					.grid.grid-flow-col.name.ellipsis
+						h3(data-i18n="PROJECTS")
+						+text-input("renown", "RENOWN")
+					+simpleRepeating("projects")
+				.grey-box.cwn
+					.grid.grid-flow-col.name.ellipsis
+						h3(data-i18n="ALIASES_IDS")
+					+simpleRepeating("alias")
+				.grey-box.cwn
+					.grid.grid-flow-col.name.ellipsis
+						h3(data-i18n="ASSETS_OWNED_PROPERTY")
+					+simpleRepeating("property")
+				.grey-box
+					.grid.grid-flow-col.name.ellipsis
+						h3(data-i18n="LIFESTYLE")
+					fieldset(class=`repeating_lifestyle`)
+						.show-chevron.simple-repsection.lifestyle
+							+collapseChevron()
+							.display
+								.grid.grid-flow-col.gap-1.mb.name.ellipsis
+									span(name="attr_name")
+									span(data-i18n="COST") #[span(name="attr_cost")]
+								.details
+									span(name="attr_description")
+							.edit
+								.grid.grid-flow-col.gap-1.mb.name
+									+text-input("name", "NAME")
+									+text-input("cost", "COST").center
+								.grid
+									textarea(name="attr_description", data-i18n-placeholder="DESCRIPTION")
+			.allies.grey-box.wwn.cwn
+				.div
+					h3(data-i18n="ALLIES_ENEMIES").wwn
+					h3(data-i18n="FRIENDS_AND_ACQUAINTANCES").cwn
+				.grid.grid-flow-col.subheaders.gap-1
+					each val in ["name", "location", "status"]
+						.ellipsis(data-i18n=val.toUpperCase())
+				fieldset.repeating_allies
+					.grid.grid-flow-col.subheaders.gap-1
+						each val in ["name", "location", "status"]
+							+text-input(val)
+		.notes.mt
+			textarea(name="attr_notes", data-i18n-placeholder="NOTES")

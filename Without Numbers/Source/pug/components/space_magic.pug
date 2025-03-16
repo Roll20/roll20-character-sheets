@@ -1,0 +1,65 @@
+.section.space_magic
+    +sectionheader("show_space_magic", false)
+        span(data-i18n="SPACE_MAGIC")
+
+    div
+        .space-magic
+            h3(data-i18n="TYPE_OF_MAGIC")
+            select(name="attr_magic_type")
+                each val in ["arcanist", "magister", "adept"]
+                    option(value=val data-i18n=val.toUpperCase())
+            .adept
+                .magic-effort.grey-box
+                    h3(data-i18n="MAGIC_EFFORT")
+                    +text-input("magic_total_effort", "TOTAL")(type="number", value="0", min="0").center
+                    each val in ["current", "scene", "day"]
+                        +text-input(`magic_committed_effort_${val}`, `${val.toUpperCase()}`)(type="number", value="0", min="0").center
+                    +text-input("magic_uncommitted_effort", "UNCOMMITTED")(type="number", value="1", readonly).center
+                .spells.grey-box.simple-repsection
+                    .flex-center
+                        h3(data-i18n="ABILITIES")
+                    .flex.edit
+                        .name.ellipsis(data-i18n="NAME")
+                    fieldset.repeating_abilities
+                        .show-chevron
+                            +collapseChevron
+                            button.display.invisible-button(type="roll", name="roll_Ability", value!="&{template:swn-default} {{system=@{system}}} {{charname=@{character_name}}} {{title=@{ability_name}}} {{info=^{ABILITY}}} {{desc=@{ability_description}}}")
+                            .display
+                                .name.ellipsis.flex-center
+                                    span(name="attr_ability_name")
+                                .details #[span(name="attr_ability_description")]
+                            .edit.flex-wrap
+                                input.name.ellipsis(type="text", name="attr_ability_name")
+                                textarea.details(name="attr_ability_description")
+            .spellcaster
+                .spell-slots.grey-box
+                    h3(data-i18n="SPELL_SLOTS")
+                    each val in ["first", "second", "third", "fourth", "fifth"]
+                        +text-input(`spell-slots-${val}-level`, `${val}_LEVEL`)(type="number", value="0", min="0").center
+                .spells.grey-box.simple-repsection
+                    .flex-center
+                        h3(data-i18n="SPELLS")
+                    .grid.grid-flow-col.gap-1.edit
+                        .name.ellipsis(data-i18n="NAME")
+                        .level(data-i18n="LEVEL")
+                        .prepared.arcanist(data-i18n="PREPARED")
+                        .damage(data-i18n="DAMAGE")
+                    fieldset.repeating_spells
+                        .show-chevron
+                            +collapseChevron
+                            button.display.invisible-button(type="roll", name="roll_Spell", value!="&{template:swn-default} {{system=@{system}}} {{charname=@{character_name}}} {{title=@{spell_name}}} {{info=^{SPELL}}} {{desc=@{spell_description}}} {{damage=[[@{spell_damage}]]}}")
+                            .display.grid
+                                .name.ellipsis.grid.grid-flow-col.gap-1
+                                    span(name="attr_spell_name")
+                                    span.level #[span(data-i18n="LEVEL")]-#[span(name="attr_spell_level")]
+                                    div
+                                        span.prepared.arcanist #[span(data-i18n="PREPARED")]:
+                                        input.prepared.arcanist(type="number", name="attr_spell_prepared", value="0", min="0")
+                                .details #[span(name="attr_spell_description")]
+                            .edit.grid
+                                .grid.grid-flow-col.gap-1
+                                    input.name.ellipsis(type="text", name="attr_spell_name")
+                                    input.level(type="number", name="attr_spell_level", value="0", min="0")
+                                    input.prepared.arcanist(type="number", name="attr_spell_prepared", value="0", min="0")
+                                    input.damage(type="text", name="attr_spell_damage", value="0")
+                                textarea.details(name="attr_spell_description")

@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable max-len */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable camelcase */
@@ -24,6 +25,8 @@ rollCombatDistance.forEach((button) => {
       `${ODValue.dexterite}`,
       'tir',
       `${ODValue.tir}`,
+      'aura',
+      `${ODValue.aura}`,
       'devasterAnatheme',
       'bourreauTenebres',
       'equilibreBalance',
@@ -268,6 +271,8 @@ rollCombatDistance.forEach((button) => {
     const oDexterite = +attrs[`${ODValue.dexterite}`];
     const vTir = +attrs.tir;
     const oTir = +attrs[`${ODValue.tir}`];
+    const vAura = +attrs.aura;
+    const oAura = +attrs[`${ODValue.aura}`];
 
     let attaquesSurprises = [];
     let attaquesSurprisesValue = [];
@@ -292,12 +297,14 @@ rollCombatDistance.forEach((button) => {
     let isTenebricide = false;
     let isTirRafale = false;
     let isUltraviolence = false;
+    let isLourd = false;
 
     let isELumiere = false;
     let lumiereValue = 0;
 
     let isEAkimbo = false;
     let isEAmbidextrie = false;
+    let isTirSecurite = false;
 
     let isBourreau = false;
     let isDevastation = false;
@@ -397,7 +404,7 @@ rollCombatDistance.forEach((button) => {
 
     // GESTION DES EFFETS
 
-    const effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir);
+    const effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir, vAura, oAura);
 
     bDegats = bDegats.concat(effets.bDegats);
     eASAssassin = effets.eASAssassin;
@@ -412,7 +419,6 @@ rollCombatDistance.forEach((button) => {
 
     isAntiAnatheme = effets.isAntiAnatheme;
 
-    isAssassin = effets.isAssassin;
     isAssistantAttaque = effets.isAssistantAttaque;
 
     isCadence = effets.isCadence;
@@ -442,6 +448,7 @@ rollCombatDistance.forEach((button) => {
 
     isEAkimbo = effets.isAkimbo;
     isEAmbidextrie = effets.isAmbidextrie;
+    isTirSecurite = effets.isTirSecurite;
 
     isBourreau = effets.isBourreau;
     isDevastation = effets.isDevastation;
@@ -464,7 +471,6 @@ rollCombatDistance.forEach((button) => {
     const ameliorationsA = getWeaponsDistanceAA(prefix, attrs, vDiscretion, oDiscretion, isAssistantAttaque, eASAssassinValue, isCadence, vCadence, nowSilencieux, isTirRafale, isObliteration, isAntiAnatheme);
 
     exec = exec.concat(ameliorationsA.exec);
-
     bonus = bonus.concat(ameliorationsA.bonus);
 
     baseDegats += ameliorationsA.diceDegats;
@@ -507,7 +513,7 @@ rollCombatDistance.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, vPilonnage, vPilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd);
+    const getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, vPilonnage, vPilonnageType, hasArmure, oTir, isEAkimbo, isEAmbidextrie, isDeuxMains, isLourd, isTirSecurite);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);
@@ -801,11 +807,9 @@ rollCombatDistance.forEach((button) => {
       if (isDevastation && !devaste && !equilibre) { exec.push(`{{vDevastation=${i18n_devastation} ${eDevastationValue} ${i18n_inclus}}}`); }
 
       finalRoll = await startRoll(exec.join(' '));
-      const tJet = finalRoll.results.jet.result;
       const rJet = finalRoll.results.jet.dice;
 
       const tBonus = finalRoll.results.bonus.result;
-      const tExploit = finalRoll.results.Exploit.result;
 
       const rDegats = finalRoll.results.degats.dice;
       const rViolence = finalRoll.results.violence.dice;
@@ -838,28 +842,7 @@ rollCombatDistance.forEach((button) => {
 
       finishRoll(finalRoll.rollId, computed);
 
-      if (tJet !== 0 && computed.basejet === tExploit) {
-        const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
-        const rExploit = exploitRoll.results.jet.dice;
-        const exploitPairOrImpair = isGuidage === true ? 1 : 0;
-
-        const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
-          const vC = valeurCourante;
-          let nV = 0;
-
-          if (vC % 2 === exploitPairOrImpair) {
-            nV = 1;
-          }
-
-          return accumulateur + nV;
-        }, 0);
-
-        const exploitComputed = {
-          jet: jetExploit,
-        };
-
-        finishRoll(exploitRoll.rollId, exploitComputed);
-      }
+      await postRoll(computed, roll, jet, finalRoll, conditions);
 
       if (hasEnergieRetiree) {
         if (energieIsEspoir) {

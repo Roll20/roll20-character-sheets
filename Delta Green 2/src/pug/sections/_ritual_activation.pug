@@ -1,0 +1,202 @@
+
+
+
+mixin rituals(ritualsAttrs) 
+	input(type='hidden' name='attr_complexity_text' value='')
+	input(type='hidden' name='attr_activation_time_text' value='')
+	input(type='hidden' name='attr_study_time_text' value='')
+	input(type='hidden' name='attr_study_cost_text' value='')
+	input(type='hidden' name='attr_cost_text' value='')
+
+
+	+damagehiddenbuttons('pay_cost')
+	+damagehiddenbuttons('force_connection')
+	+damagehiddenbuttons('accept_failure')
+	+damagehiddenbuttons('attack_damage')
+	+damagehiddenbuttons('heal_damage')
+	+damagehiddenbuttons('attack_lethality_percent')
+	+damagehiddenbuttons('heal_lethality_percent')
+	+damagehiddenbuttons('power')
+	each ritual in ritualsAttrs
+		- const attrName = ritual.replace(' ', '_').replace('%', 'percent')
+		- const atype = ritual.includes('%') ? 'number' : 'text';
+		if (attrName==='ritual')
+			.form-normal-group
+				input(type='hidden' class='edit_test' name='attr_test')
+				span.edit_text
+					input(style='width:100%; padding: 0px 0px; margin: 0px 0;box-sizing: border-box;'  type='text' name='attr_name' value='ritual' title='@{repeating_rituals_${x}_' + attrName + '}')
+				span.unedit_text
+					-const ritualrollName='ritual';			
+					+editablebetterbutton_rep(ritualrollName,'',`pressable special_div`,``,true)
+				label.switch-edit
+						input(type='checkbox' name='attr_test' value='editable')
+						span.vslider
+
+		else if (attrName==='sanity_cost')
+				input(type='hidden' class='edit_test' name='attr_test')
+				span.edit_text
+					span.ritualsanloss
+						input(data-i18n-placeholder='0' name='attr_sanity_loss_success' type='text' )
+						span /
+						input(data-i18n-placeholder='1' name='attr_sanity_loss_failure' type='text' )
+				span.unedit_text
+					span.ritualsanloss
+						span(name='attr_sanity_loss_success')
+						span /
+						span(name='attr_sanity_loss_failure')
+		else if (attrName==='complexity')					
+			label.ritual_label(data-i18n-title=ritual + ' input' title=ritual + ' input')
+				input(type='hidden' class='edit_test' name='attr_test')
+				span.edit_text
+					select(name='attr_complexity' title='@{repeating_rituals_${x}_complexity}')
+						optgroup(label='complexity_type')
+							option(data-i18n-value='simple' ) simple
+							option(data-i18n-value='complex') complex
+							option(data-i18n-value='elaborate') elaborate
+				span.unedit_text
+					span(name='attr_complexity')
+		else if (attrName==='activation_time')
+			label.ritual_label(data-i18n-title=ritual + ' input' title=ritual + ' input')
+				input(type='hidden' class='edit_test' name='attr_test')
+				span.edit_text
+					+time_attributes('activation')
+				span.unedit_text
+					span.space-after(name='attr_activation_time') 
+					| 
+					span(name='attr_activation_time_unit')
+		else if (attrName==='extra')
+			label.ritual_label(data-i18n-title=ritual + ' input' title=ritual + ' input' style='display: grid; position:relative;')
+				input(type='hidden' class='edit_test' name='attr_test')
+				span.edit_text.allowpopup
+					span
+					.othergrid.advancedinfo
+						input.advanced(type='checkbox')
+						span
+						.modifiers_rituals 
+							+advanced_mod_rituals()
+				span.unedit_text.allowpopup
+					+ritualInfo()
+		else
+			label.ritual_label(data-i18n-title=ritual + ' input' title=ritual + ' input')
+				input(type='hidden' class='edit_test' name='attr_test')
+				span.edit_text
+					if (attrName==='skill_percent')
+						input(data-i18n-placeholder=ritual name='attr_' + attrName list='ritualskills'  title='@{repeating_rituals_${x}_' + attrName + '}' type='text'  value='@{ritual_skill}')
+					else
+						input(data-i18n-placeholder=ritual name='attr_' + attrName title='@{repeating_rituals_${x}_' + attrName + '}' type=atype value='')
+				span.unedit_text
+					if (attrName === 'skill_percent')
+						span(name='attr_skill_span')
+					else
+						span(name='attr_' + attrName )
+		if (attrName!=='extra')							
+			.vert-line
+
+
+mixin ritualInfo()
+	span
+	.othergrid.updateinfo
+		input(type='checkbox')
+		span
+		.summary.ritualInfo
+			h2.title.bigger
+				span(name='attr_name')
+			+ritualInformation()
+			span.item.readrituals(name='attr_description')
+
+
+mixin ritualInformation()
+	.item.sheet-template-inline-block.readinformation
+		span.capitalize.italic(name='attr_complexity_text')
+		span .
+		|
+		span(data-i18n="study time:" style="text-transform:capitalize;") study time:
+		| 
+		span.capitalize.italic(name='attr_study_time_text')
+		span ;
+		span(data-i18n="activation time:" style="text-transform:capitalize;") activation time: 
+		|
+		span.capitalize.italic(name='attr_activation_time_text')
+		span ;
+		
+		| 
+		span(name="attr_study_cost_text")
+		span .
+		|
+		span.italic(name='attr_cost_text')
+
+mixin ritual_attack_target(attrName)
+	select(name='attr_'+attrName+'_target_stat')
+		optgroup('data-i18n-title'='direct healing')
+			option(data-i18n='hit points' value='hit_points')
+			option(data-i18n='willpower points' value='willpower_points') 
+		optgroup('data-i18n-title' value='target stats')
+			option(dat i18n='strength' value='strength_score')
+			option(data-i18n='constitution' value='constitution_score')
+			option(data-i18n='dexterity' value='dexterity_score')
+			option(data-i18n='intelligence' value='intelligence_score')
+			option(data-i18n='charisma' value='charisma_score')
+		option(data-i18n='power' value='power_score')
+
+mixin advanced_mod_rituals()
+	h2.title(data-i18n="ritual information") ritual information
+	.two-col
+		.item-number
+			span(data-i18n='unnatural gain') unnatural gain
+			span
+				input(type='text' name='attr_unnatural_gain' title='@{repeating_rituals_${x}_unnatural_gain}' value='0' style="width: 4rem !important;")
+				
+		span
+	.two-col
+		.item-text
+			span(data-i18n='study time') study time
+			+time_attributes('study')
+		.item-number
+			span(data-i18n='SAN loss for learning') san loss for learning
+			span 
+				input(type='text' name='attr_sanity_loss_for_learning' title='@{repeating_rituals_${x}_sanity_loss_for_learning}' value='0' style="width: 4rem !important;")
+				
+	.item-textbox
+		span(data-i18n='ritual description') ritual duration 
+		textarea(data-i18n-placeholder='ritual description' name='attr_description' placeholder='ritual description' title='@{repeating_rituals_${x}_description}')
+	h2.title(data-i18n="additional costs") additional costs
+	- const additional_cost = ['strength_score','constitution_score','dexterity_score','intelligence_score','charisma_score']
+	.two-col.large-row-space
+		each cost in additional_cost
+			- const costName=cost.replace('_score','')
+			.item-text
+				span(data-i18n=costName) #{costName}
+				input(type='text' name='attr_' + cost + '_cost' title='@{repeating_rituals_${x}_' + cost + '_cost}' value='0' style="width: 4rem !important;")
+
+	h2.title(data-i18n="additional features") additional features
+	.two-col
+		.item-check
+			input.fix-check(name='attr_flawed_ritual' type='checkbox' value='active')
+			span(data-i18n='flawed ritual') flawed ritual
+		.item-check
+			input.fix-check(name='attr_power_reaction' type='checkbox' value='active')
+			span(data-i18n='power contest') power contest
+	.two-col
+		.item 
+			span.capitalize(data-i18n='attack') attack 
+		.item
+			span.capitalize(data-i18n='heal') heal
+	.two-col
+		- const attack_or_heal = ['attack','heal']
+		each action in attack_or_heal
+			.item-ritual-attack
+				+ritual_attack_target(action)
+				input.dmg_or_perc(type='hidden' name='attr_'+action+'_isLethal')
+				input.amount.isdmg(type='text' name='attr_'+action+'_damage_amount' title='@{repeating_rituals_${x}_'+action+'_damage_amount}' value='' data-i18n-placeholder='-')
+				input.amount.islethal(type='text' name='attr_'+action+'_lethality_percent_amount' title='@{repeating_rituals_${x}_'+action+'_lethality_percent_amount}' value='' data-i18n-placeholder='%')
+				select.tiny-select(name='attr_'+action+'_isLethal')
+					option(value='damage')  
+					option(value='lethality_percent') %
+	
+mixin time_attributes(timeAttr)
+	span
+		input(type='text' name='attr_' + timeAttr + '_time' value='' style="width: 3rem !important;")
+		select.small-select(	name='attr_' + timeAttr + '_time_unit')
+			each time in unitsOfTime
+				option(data-i18n-value=time value=time) #{time}
+				
