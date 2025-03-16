@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable default-case */
 /* eslint-disable max-len */
 /* eslint-disable prefer-destructuring */
@@ -17,9 +18,11 @@ monkZenRoll.forEach((button) => {
       'MALWarriorScholarA',
       'MALWarriorHeraldA',
       'MALWarriorScoutA',
+      'equilibreBalance',
     ];
 
     const attrs = await getAttrsAsync(attributs);
+    const equilibre = +attrs.equilibreBalance;
 
     const armureL = attrs.armureLegende;
 
@@ -115,36 +118,17 @@ monkZenRoll.forEach((button) => {
     bonus = bonus.concat(OD);
     bonus = bonus.concat(ODMALWarrior);
 
-    exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
-    exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
-    exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
+    const bonusTotal = bonus.reduce((accumulateur, valeurCourante) => parseInt(accumulateur, 10) + parseInt(valeurCourante, 10), 0);
+    const stringRoll = `{{jet=[[ [[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s]]}}`;
+    exec.push(stringRoll);
+    exec.push('{{basejet=[[0]]}}');
+    exec.push(`{{tBonus=[[${bonusTotal}]]}}`);
+    const finalRoll = await startRoll(exec.join(' '));
+    const computed = computeSimpleRoll(finalRoll, bonusTotal);
 
-    startRoll(exec.join(' '), (results) => {
-      const tJet = results.results.jet.result;
-      const tBonus = results.results.tBonus.result;
-      const tExploit = results.results.Exploit.result;
-
-      const total = tJet + tBonus;
-
-      finishRoll(
-        results.rollId,
-        {
-          jet: total,
-        },
-      );
-
-      if (tJet !== 0 && tJet === tExploit) {
-        startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
-          const tExploit2 = exploit.results.jet.result;
-
-          finishRoll(
-            exploit.rollId,
-            {
-              jet: tExploit2,
-            },
-          );
-        });
-      }
+    finishRoll(finalRoll.rollId, computed);
+    await postRoll(computed, roll, stringRoll, finalRoll, {
+      equilibre,
     });
   });
 });

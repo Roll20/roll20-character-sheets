@@ -144,17 +144,11 @@ function upgradeCharacter3Dot0() {
     getSectionIDs("repeating_discipline", function(disciplineIds) {
     getSectionIDs("repeating_psionictalent", function(psionictalentIds) {
     getSectionIDs("repeating_trait", function(traitIds) {
-    getSectionIDs("repeating_standardskill", function(customstdskillIds) {
     getSectionIDs("repeating_worksong", function(worksongIds) {
 
         let worksongGetAttrs = [];
         worksongIds.forEach(id => {
             worksongGetAttrs.push(`repeating_worksong_${id}_name`, `repeating_worksong_${id}_description`);
-        });
-
-        let customstdskillGetAttrs = [];
-        customstdskillIds.forEach(id => {
-            customstdskillGetAttrs.push(`repeating_standardskill_${id}_name`, `repeating_standardskill_${id}_fumbled`, `repeating_standardskill_${id}_trained`, `repeating_standardskill_${id}_temp`, `repeating_standardskill_${id}_penalty`, `repeating_standardskill_${id}_experience`, `repeating_standardskill_${id}_other`, `repeating_standardskill_${id}_total`, `repeating_standardskill_${id}_notes`, `repeating_standardskill_${id}_char1`, `repeating_standardskill_${id}_char2`);
         });
 
         let traitGetAttrs = [];
@@ -357,7 +351,7 @@ function upgradeCharacter3Dot0() {
             arcanemagicrank1spellGetAttrs, arcanemagicrank2spellGetAttrs, arcanemagicrank3spellGetAttrs, arcanemagicrank4spellGetAttrs, arcanemagicrank5spellGetAttrs,
             divinemagicrank1spellGetAttrs, divinemagicrank2spellGetAttrs, divinemagicrank3spellGetAttrs, divinemagicrank4spellGetAttrs, divinemagicrank5spellGetAttrs,
             superpowerGetAttrs, superpowerboostGetAttrs, superpowerlimitGetAttrs, faepowerGetAttrs, alchemicaltraditionGetAttrs, alchemicalformulaGetAttrs,
-            artificespellGetAttrs, psionictalentGetAttrs, disciplineGetAttrs, traitGetAttrs, customstdskillGetAttrs, worksongGetAttrs,
+            artificespellGetAttrs, psionictalentGetAttrs, disciplineGetAttrs, traitGetAttrs, worksongGetAttrs,
             ['spirit', 'action_points_other', 'action_points_add_one', 'notes', "location2_display", "income_day", "setting_option",
                 "income_month", "income_season", "income_year", "type", "prana_points_temp", "prana_points", "prana_points_max",
                 "prana_points_other", "power_points_temp", "power_points", "power_points_max", "power_points_other", "linguistics_enabled"
@@ -452,12 +446,6 @@ function upgradeCharacter3Dot0() {
                     newAttrs = {...newAttrs, ...convertSkillToProSkill(`repeating_language_${languageId}`, '@{int}', '@{cha}', skillId, v)};
                 });
             }
-
-            /* Move custom standard skills to professional skills */
-            customstdskillIds.forEach(id => {
-                const skillId = 'repeating_professionalskill_' + generateRowID();
-                newAttrs = {...newAttrs, ...convertSkillToProSkill(`repeating_standardskill_${id}`, v[`repeating_standardskill_${id}_char1`], v[`repeating_standardskill_${id}_char2`], skillId, v)};
-            });
 
             /* Migration affiliations */
             if (debug) {console.log("Converting Affiliations");}
@@ -1218,5 +1206,150 @@ function upgradeCharacter3Dot0() {
     });
     });
     });
+}
+
+/**
+ * Make the changes needs to get a character sheet updated from 3.0 to 3.1
+ */
+function upgradeCharacter3Dot1() {
+    if (debug) {
+        console.log("Upgrading character to 3.1");
+    }
+
+    getSectionIDs("repeating_standardskill", function(customstdskillIds) {
+        let customstdskillGetAttrs = [];
+        customstdskillIds.forEach(id => {
+            customstdskillGetAttrs.push(`repeating_standardskill_${id}_name`, `repeating_standardskill_${id}_fumbled`, `repeating_standardskill_${id}_trained`, `repeating_standardskill_${id}_temp`, `repeating_standardskill_${id}_penalty`, `repeating_standardskill_${id}_experience`, `repeating_standardskill_${id}_other`, `repeating_standardskill_${id}_total`, `repeating_standardskill_${id}_notes`, `repeating_standardskill_${id}_char1`, `repeating_standardskill_${id}_char2`);
+        });
+
+        /* Fetch attrs */
+        getAttrs(customstdskillGetAttrs.concat(['sheet_notes']), function (v) {
+            let newAttrs = {'version': '3.1'};
+
+            /* Migration custom standard skills */
+            if (debug) {console.log("Converting Custom Standard Skills");}
+            customstdskillIds.forEach(id => {
+                newAttrs = {...newAttrs, ...convertSkillToV3(`repeating_standardskill_${id}`, v)};
+            });
+
+            /* Move shet_notes to sheetnotes to avoid conflicts with repating items using _notes */
+            if (v['sheet_notes']) {
+                newAttrs['sheetnotes'] = v['sheet_notes'];
+                newAttrs['sheet_notes'] = "";
+            }
+
+            setAttrs(newAttrs);
+        });
+    });
+}
+
+/**
+ * Make the changes needs to get a character sheet updated from 3.1+ to 3.4
+ */
+function upgradeCharacter3Dot4() {
+    console.log("Upgrading character to 3.4");
+
+    getSectionIDs("repeating_meleeweapon", function(meleeIds) {
+        getSectionIDs("repeating_rangedweapon", function(rangedIds) {
+            
+            let meleeGetAttrs = [];
+            meleeIds.forEach(id => {
+                meleeGetAttrs.push(`repeating_meleeweapon_${id}_name`, `repeating_meleeweapon_${id}_favored`);
+            });
+
+            let rangedGetAttrs = [];
+            rangedIds.forEach(id => {
+                rangedGetAttrs.push(`repeating_rangedweapon_${id}_name`, `repeating_rangedweapon_${id}_favored`);
+            });
+
+            getAttrs(['character_id'].concat(rangedGetAttrs, meleeGetAttrs), function(v) {
+                let newAttrs = {'version': '3.4'};
+                
+                let weaponButtons = ""
+                meleeIds.forEach(id => {
+                    if (v[`repeating_meleeweapon_${id}_favored`] === '1') {
+                        const name = v[`repeating_meleeweapon_${id}_name`];
+                        weaponButtons = weaponButtons + ` [${name}](~${v['character_id']}|repeating_meleeweapon_${id}_roll)`;
+                        console.log(`Upgrading repeating_meleeweapon_${id}_rollval`);
+                        newAttrs[`repeating_meleeweapon_${id}_rollval`] = `%{${v['character_id']}|repeating_meleeweapon_${id}_roll}`;
+                    }
+                });
+                rangedIds.forEach(id => {
+                    if (v[`repeating_rangedweapon_${id}_favored`] === '1') {
+                        const name = v[`repeating_rangedweapon_${id}_name`];
+                        weaponButtons = weaponButtons + ` [${name}](~${v['character_id']}|repeating_rangedweapon_${id}_roll)`;
+                        console.log(`Upgrading repeating_rangedweapon_${id}_rollval`);
+                        newAttrs[`repeating_rangedweapon_${id}_rollval`] = `%{${v['character_id']}|repeating_rangedweapon_${id}_roll}`;
+                    }
+                });
+                console.log("Upgrading weapon_buttons to " + weaponButtons);
+                newAttrs['weapon_buttons'] = weaponButtons;
+                console.log("newAttrs = " + newAttrs);
+                setAttrs(newAttrs);
+            });
+        });
+    });
+}
+
+/**
+ * Make the changes needs to get a character sheet updated from 3.4+ to 3.6
+ */
+function upgradeCharacter3Dot6() {
+    console.log("Upgrading character to 3.6");
+
+    getSectionIDs("repeating_professionalskill", function(proSkillIds) {
+        getSectionIDs("repeating_combatstyle", function(combatStyleIds) {
+            let proSkillGetAttrs = [];
+            proSkillIds.forEach(id => {
+                proSkillGetAttrs.push(`repeating_professionalskill_${id}_char1`, `repeating_professionalskill_${id}_char2`);
+            });
+
+            let combatStyleGetAttrs = [];
+            combatStyleIds.forEach(id => {
+                combatStyleGetAttrs.push(`repeating_combatstyle_${id}_char1`, `repeating_combatstyle_${id}_char2`);
+            });
+
+            getAttrs(proSkillGetAttrs.concat(combatStyleGetAttrs), function(v) {
+                let newAttrs = {"version": '3.6'};
+
+                proSkillIds.forEach(id => {
+                    if (v[`repeating_professionalskill_${id}_char1`] === '@{str}' || v[`repeating_professionalskill_${id}_char1`] === '@{dex}' ||
+                        v[`repeating_professionalskill_${id}_char2`] === '@{str}' || v[`repeating_professionalskill_${id}_char2`] === '@{dex}') {
+                        newAttrs[`repeating_professionalskill_${id}_encumbered`] = 1;
+                    } else {
+                        newAttrs[`repeating_professionalskill_${id}_encumbered`] = 0;
+                    }
+                });
+
+                combatStyleIds.forEach(id => {
+                    if (v[`repeating_combatstyle_${id}_char1`] === '@{str}' || v[`repeating_combatstyle_${id}_char1`] === '@{dex}' ||
+                        v[`repeating_combatstyle_${id}_char2`] === '@{str}' || v[`repeating_combatstyle_${id}_char2`] === '@{dex}') {
+                        newAttrs[`repeating_combatstyle_${id}_encumbered`] = 1;
+                    } else {
+                        newAttrs[`repeating_combatstyle_${id}_encumbered`] = 0;
+                    }
+                });
+
+                setAttrs(newAttrs);
+            });
+        });
+    });
+}
+
+/**
+ * Make the changes needs to get a character sheet updated from 3.6+ to 3.8
+ */
+function upgradeCharacter3Dot8() {
+    console.log("Upgrading character to 3.8");
+
+    getAttrs(['fatigue', 'healing_rate'].concat(actionPointGetAttrs, initGetAttrs, moveRateGetAttrs, damageModGetAttrs), function(v) {
+        setAttrs({
+            "version": "3.8",
+            ...calcFatigue(v),
+            ...calcActionPoints(v),
+            ...calcInitiativeBonus(v),
+            ...calcMoveRate(v),
+            ...calcDamageMod(v)
+        });
     });
 }

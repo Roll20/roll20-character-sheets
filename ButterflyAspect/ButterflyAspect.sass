@@ -1,725 +1,873 @@
 $sizes: (full: 100%, threequarters: 75%, half: 50%, quarter: 25%)
 
-input.selector-switch
-    display: none
+$textdark: #373b44
+$textlight: #C8C4BB
+$borderdark: #373b44
+$borderlight: #C8C4BB
+$backgrounddark: #2b2b2b
+$backgroundlight: #f5f5f5
 
-    &.rollmod:not(:checked)~.container button.rollmod,
-    &.rollmod:checked~.container button.norollmod
-        display: none
+@mixin grid($columns, $gap, $a_content: null, $j_content: null,  $a_items: null, $j_items: null)
+  display: grid
+  grid-template-columns: $columns
+  grid-gap: $gap
+  @if $a_content != null
+    align-content: $a_content
+  @if $j_content != null
+  justify-content: $j_content
+  @if $a_items != null
+  align-items: $a_items
+  @if $j_items != null
+  justify-items: $j_items
 
 .sheetform
-    background-color: transparent
+  background-color: transparent
 
 .charsheet
-    .container
-        width: 850px
-        padding: 0
-        margin: 0
+  color: $textdark
 
-        button[type="roll"]
-            width: auto
-            height: 24px
-            padding: 0
-            margin: 0
-            border-top-left-radius: 10px
-            border-bottom-right-radius: 10px
-            border-radius: unset
-            background-image: none
-            background-color: transparent
-            box-sizing: border-box
-            -moz-box-sizing: border-box
-            -webkit-box-sizing: border-box
+  .container
+    width: 850px
+    padding: 0
+    margin: 0
 
-            label
-                line-height: 24px
-                font-size: 13px
-                text-align: center
-                font-weight: 700
+    button
+      color: $textdark
 
-            input
-                line-height: 24px
-                font-size: 13px
-                text-align: center
-                font-weight: 700
+    button[type="roll"]
+      width: auto
+      height: 24px
+      padding: 0
+      margin: 0
+      border-top-left-radius: 10px
+      border-bottom-right-radius: 10px
+      border-radius: unset
+      background-image: none
+      background-color: transparent
+      box-sizing: border-box
+      -moz-box-sizing: border-box
+      -webkit-box-sizing: border-box
 
-        input
-            background: transparent
-            width: 100%
-            border: 1px solid #ddd
-            border-radius: 3px
+    input:not([type=checkbox])
+      background: transparent
+      width: 100%
+      border: 1px solid $borderlight
+      border-radius: 3px
 
-        input[type=number]
-            text-align: center
-            -moz-appearance: textfield
-            -webkit-appearance: textfield
+    input[type=number],
+    input[type=text].center
+      text-align: center
+      -moz-appearance: textfield
+      -webkit-appearance: textfield
 
-        textarea
-            background: transparent
-            margin: 0
-            width: 100%
-            height: 65px
-            resize: vertical
-            box-sizing: border-box
-            border: 1px solid #ddd
-            border-radius: 3px
+    textarea
+      background: transparent
+      margin: 0
+      width: 100%
+      height: 65px
+      resize: vertical
+      box-sizing: border-box
+      border: 1px solid $borderlight
+      border-radius: 3px
+
+    select
+      background: transparent
+      width: 100%
+      border: 1px solid $borderlight
+      border-radius: 3px
+
+    label
+      width: auto
+      color: $textdark
+
+    .options-flag,
+    .options-flag+span
+      position: absolute
+      top: -10px
+      left: -10px
+
+    .options-flag
+      opacity: 0
+      width: 16px
+      min-height: 16px
+      z-index: 2
+
+      &+span
+        white-space: nowrap
+        width: 16px
+        height: 16px
+        font-size: 16px
+        font-family: pictos
+        color: #bbb
+        cursor: pointer
+        margin-top: 0
+        display: none
+
+      &:not(:checked) ~ .hiddenBox,
+      &:not(:checked) ~ div .hiddenBox
+        display: none !important
+
+    .number-20
+      font-size: 20px
+
+    .float
+      float: left
+      box-sizing: border-box
+      width: 100%
+      margin: 4px 0
+      padding-right: 5px
+
+    @each $name, $percent in $sizes
+      .#{$name}
+        width: $percent
+
+    .break
+      clear: both
+
+    .textcenter
+      text-align: center
+
+    .formular
+      padding: 9px
+      margin-top: 15px
+      border: 1px solid $borderlight
+      border-radius: 3px
+
+      label
+        display: block
+        float: left
+        height: 20px
+        margin-top: -19px
+        margin-bottom: 0px
+        background: #fff
+        padding: 2px 5px 2px 5px
+        font-weight: normal
+
+      input
+        box-sizing: border-box
+        border: 0
+
+    .gridplace
+
+      &:not(.repcontrol)
 
         select
-            background: transparent
+          border: none
+          margin: 0
 
-        label
-            width: auto
+        input,
+        select,
+        button:not(.repcontrol_add):not(.repcontrol_edit):not(.repcontrol_del)
+          width: -webkit-fill-available
+          width: -moz-available
+          -webkit-box-shadow: none
+          -moz-box-shadow: none
+          box-shadow: none
 
-        .options-flag,
-        .options-flag+span
-            position: absolute
-            top: -10px
-            left: -10px
+        .repitem,
+        .items
 
-        .options-flag
-            opacity: 0
-            width: 16px
-            min-height: 16px
-            z-index: 2
+          &:nth-child(even)
+            background: $backgroundlight
 
-            &+span
-                white-space: nowrap
-                width: 16px
-                height: 16px
-                font-size: 16px
-                font-family: pictos
-                color: #bbb
-                cursor: pointer
-                margin-top: 0
-                display: none
+        .repcontrol_move
+          float: left
 
-            ~ .hiddenBox,
-            ~ div .hiddenBox
-                display: none
+        .repcontrol_del
+          width: auto
 
-            &:checked ~ .hiddenBox,
-            &:checked ~ div .hiddenBox
-                display: inherit
+    .navigation
+      display: flex
+      flex-direction: row
+      justify-content: space-evenly
 
-        .number-20
-            font-size: 20px
+      button
+        padding: calc(.5em + .45em) calc(.9em + .45em)
+        color: $textdark
+        background: conic-gradient(from 90deg at 3px 3px,#0000 90deg,$textdark 0) .45em .45em/calc(100% - 3px - 2*.45em) calc(100% - 3px - 2*.45em)
+        transition: .3s linear, color 0s, background-color 0s
+        font-size: 14px
+        border: 0
+        user-select: none
+        -webkit-user-select: none
+        touch-action: manipulation
 
-        .float
-            float: left
-            box-sizing: border-box
-            width: 100%
-            margin: 4px 0
-            padding-right: 5px
+    .sheet-attribute_skills,
+    .sheet-weapons_mage,
+    .sheet-asects_inventory,
+    .sheet-xp
+        display: none
 
-        @each $name, $percent in $sizes
-            .#{$name}
-                width: $percent
+    $buttons: (attribute_skills, weapons_mage, asects_inventory, xp)
+    @each $button in $buttons
+      .sheet-tabstoggle[value="#{$button}"] ~ div.sheet-#{$button}
+        display: block
 
-        .break
-            clear: both
+    .header
+      margin-bottom: 4px
+      padding: 2px 8px
+      background: black
+      color: white
+      font-weight: bold
+      border-top-left-radius: 10px
+      border-bottom-right-radius: 10px
 
-        .textcenter
-            text-align: center
+      span
+        text-transform: uppercase
+
+      .right
+        border: none
+        float: right
+        height: unset
+        color: #fff
+        font-size: 15px
+        text-shadow: none
+        text-transform: none
+        font-weight: normal
+
+        &.dice:before
+          content: "t"
+          padding-right: 5px
+
+        input
+          height: 21px
+
+    .head-logo
+      vertical-align: middle
+
+      .logo
+        height: 200px
+
+      .settings
+        margin-top: 20px
+
+        select
+          width: -webkit-fill-available
+          width: -moz-available
+
+    .head-info
+
+      .head-info-boxes
+        width: 100%
+
+        >div
+
+          &:first-child
+            height: 36px
+
+        input
+          width: 100%
+          box-sizing: border-box
+
+        textarea
+          height: 64px
+          border: none
 
         .formular
-            padding: 9px
-            margin-top: 15px
-            border: 1px solid #ddd
+          margin-bottom: 5px
+
+    .attribute,
+    .extra
+      display: inherit
+
+      .attribute-stats,
+      .extra-stats
+
+        input
+          width: -webkit-fill-available
+          width: -moz-available
+          text-align: center
+
+        button
+          display: block
+          float: left
+          margin-top: -21px
+          background: var(--color-surface1)
+          padding: 2px 5px 2px 5px
+          color: $textdark
+          border: 1px solid $borderlight
+          border-radius: 3px
+
+        button[type="roll"]
+
+          &:before
+            content: ""
+            display: none
+
+      .attribute-stats
+        @include grid(197px 197px 197px, 5px 20px)
+
+      .extra-stats
+        @include grid(197px, 5px 20px)
+
+        .formular
+
+          .max
+            background: var(--color-surface1)
+            display: block
+            float: right
+            height: 26px
+            width: 50px !important
+            margin-top: -21px
+            margin-right: -5px
+            border: 1px solid
+            margin-top: -21px2
+
+    .skills
+      display: inherit
+
+      .grid
+        @include grid(530px 120px 60px 60px 55px, 5px)
+
+        >div
+          background-color: $backgroundlight
+          font-weight: bold
+          text-align: center
+
+      .gridplace
+
+        input
+          border: none
+          width: -webkit-fill-available
+          width: -moz-available
+
+        button[type="roll"]
+          border: none
+          width: -webkit-fill-available
+          width: -moz-available
+
+        .basicskills .items,
+        .repcontainer .repitem
+          @include grid(530px 120px 60px 60px 55px, 5px)
+          min-height: 40px
+
+          select
+            width: -webkit-fill-available
+            width: -moz-available
+            box-shadow: none
+
+          input.liketextarea
+            width: 845px
+            height: 26px
+            border: 1px solid $borderlight
             border-radius: 3px
 
-            label
+          textarea
+            width: 845px
+
+          div
+            margin: auto 0
+            text-align: center
+
+    .status
+      position: relative
+      display: inherit
+
+      .repeat-stress,
+      .repeat-mana
+        display: none
+
+      input#checkbox-stress[value="1"] ~ .repeat-stress,
+      input#checkbox-mana[value="1"] ~ .repeat-mana
+        display: block
+
+      .header,
+      .repeat-wounds,
+      .repeat-stress,
+      .repeat-mana
+        position: relative
+
+        input.options-flag
+          width: auto
+
+        &:hover .options-flag+span
+          display: block
+
+      .sheet-status-row
+
+        &.wounds
+          @for $i from 1 through 10
+            input#attr_usable_wounds[value="#{$i}"] ~div.wounds:nth-child(n+#{$i + 3})
+              display: none
+
+        &.stress
+          @for $i from 1 through 10
+            input#attr_usable_stress[value="#{$i}"] ~div.stress:nth-child(n+#{$i + 3})
+              display: none
+
+        &.mana
+          @for $i from 1 through 20
+            input#attr_usable_mana[value="#{$i}"] ~div.mana:nth-child(n+#{$i + 2})
+              display: none
+
+      .settings
+        position: relative
+        display: flex !important
+        flex-direction: row
+        justify-content: space-evenly
+
+        input
+          position: absolute
+          top: -10px
+          left: -10px
+          opacity: 0
+          width: 16px
+          min-height: 16px
+          z-index: 2
+
+        label
+          color: red
+          user-select: none
+          width: min-content
+
+        input:checked+label
+          color: green
+
+      .sheet-status-row
+        @include grid(repeat(10, 9%), 1%)
+
+        .statusbox
+          position: relative
+          width: min-content
+
+          input[type="checkbox"]
+            display: none
+            & + label
+              &::before
+                width: 30px
+                height: 30px
                 display: block
-                float: left
-                height: 20px
-                margin-top: -19px
-                margin-bottom: 0px
-                background: #fff
-                padding: 2px 5px 2px 5px
-                color: #b9b9b9
-                font-weight: normal
-
-            input
-                box-sizing: border-box
-                border: 0
-
-        .gridplace
-
-            .repcontainer
-
-                select
-                    border: none
-                    margin: 0
-
-                input,
-                select,
-                button
-                    width: -webkit-fill-available
-                    width: -moz-available
-                    -webkit-box-shadow: none
-                    -moz-box-shadow: none
-                    box-shadow: none
-
-                .repitem
-
-                    &:nth-child(even)
-                        background: #EEE
-
-                .repcontrol_move
-                    float: left
-
-                .repcontrol_del
-                    width: auto
-
-        .header
-            margin-bottom: 4px
-            padding: 2px 8px
-            background: black
-            color: white
-            font-weight: bold
-            border-top-left-radius: 10px
-            border-bottom-right-radius: 10px
-
-            span
-                text-transform: uppercase
-
-            button
-                border: none
-                float: right
-                height: unset
-                color: #fff
-                font-size: 15px
-                text-shadow: none
-
-                &:before
-                    content: "t"
-                    padding-right: 5px
-
-        .head
-            .head-logo
-                width: 200px
-                vertical-align: middle
-
-            .logo
-                height: 200px
-
-            .settings
-
-                select
-                    width: -webkit-fill-available
-                    width: -moz-available
-
-            .head-info
-                width: calc(100% - 200px)
-
-                .head-info-boxes
-                    width: 100%
-
-                    >div
-
-                        &:first-child
-                            height: 36px
-
-                    input
-                        width: 100%
-                        box-sizing: border-box
-
-                    textarea
-                        height: 64px
-                        border: none
-
-                    .formular
-                        margin-bottom: 5px
-
-        .head-stats
-            display: flex
-            width: 100%
-            justify-content: space-between
-
-            >div
-                width: min-content
-                height: 36px
-
-            input
-                max-width: 100px
-                float: right
-                text-align: center
-
-            .formular
-
-                >input
-                    width: -webkit-fill-available
-                    width: -moz-available
-
-            button
-                display: block
-                float: left
-                margin-top: -21px !important
-                background: #fff
-                padding: 2px 5px 2px 5px !important
-                color: #b9b9b9
-                border: 1px solid #ddd
-                border-radius: 3px
-
-            button[type="roll"]
-
-                &:before
-                    content: ""
-                    display: none
-
-            .health
-                display: flex
-                width: max-content
-                font-size: x-large
-
-                input
-                    max-width: 80px
+                content: " "
 
-            .ressourcen
-
-                >div
-                    width: max-content
-                    margin: 14px auto
-                    line-height: 10px
-
-                    *
-                        width: auto
-                        float: left
+          label
+            display: inline-block
+            width: 30px
+            height: 30px
+            font-size: 30px
+            line-height: 30px
+            background-color: transparent
+            cursor: pointer
+            margin: 0
+            padding: 0
 
-        .attribut
-            display: inherit
+          label.value
+            position: absolute
+            top: 7px
+            left: 16px
+            font-size: 25px
+            width: auto
+            user-select: none
 
-            .attribut-stats
-                display: flex
-                width: 100%
-                justify-content: space-evenly
-                flex-flow: row wrap
+        &.wounds
 
-                .formular
-                    width: 21%
-                    height: 56px
+          input[type="checkbox"]
 
-                input
-                    width: -webkit-fill-available
-                    width: -moz-available
-                    text-align: center
-
-                button
-                    display: block
-                    float: left
-                    margin-top: -21px
-                    background: #fff
-                    padding: 2px 5px 2px 5px
-                    color: #b9b9b9
-                    border: 1px solid #ddd
-                    border-radius: 3px
+            & + label
+              &::before
+                background-image: url("https://codeberg.org/ButterflyAspect/roll20-character-sheet/raw/branch/develop/img/heart_full.png")
+                background-repeat: no-repeat
 
-                button[type="roll"]
+          input[type="checkbox"]:checked
+            & + label
+              &::before
+                background-image: url("https://codeberg.org/ButterflyAspect/roll20-character-sheet/raw/branch/develop/img/heart_empty.png")
 
-                    &:before
-                        content: ""
-                        display: none
+        &.stress
 
-        @mixin grid_skill
-            display: grid
-            grid-template-columns: 465px 120px 60px 60px 60px 55px
-            grid-gap: 5px
+          input[type="checkbox"]
 
-        .skills
-            display: inherit
+            & + label
+              &::before
+                background-image: url("https://codeberg.org/ButterflyAspect/roll20-character-sheet/raw/branch/develop/img/face_happy.png")
+                background-repeat: no-repeat
 
-            .grid
-                @include grid_skill
+          input[type="checkbox"]:checked
+            & + label
+              &::before
+                background-image: url("https://codeberg.org/ButterflyAspect/roll20-character-sheet/raw/branch/develop/img/face-dizzy.png")
 
-                >div
-                    background-color: #EEE
-                    font-weight: bold
-                    text-align: center
+        &.mana
 
-            .gridplace
+          input[type="checkbox"]
 
-                input
-                    border: none
-                    width: -webkit-fill-available
-                    width: -moz-available
+            & + label
+              &::before
+                background-image: url("https://codeberg.org/ButterflyAspect/roll20-character-sheet/raw/branch/develop/img/mage_stick_violet.png")
+                background-repeat: no-repeat
 
-                button[type="roll"]
-                    border: none
-                    width: -webkit-fill-available
-                    width: -moz-available
+          input[type="checkbox"]:checked
+            & + label
+              &::before
+                background-image: url("https://codeberg.org/ButterflyAspect/roll20-character-sheet/raw/branch/develop/img/mage_stick.png")
 
-                .repcontainer
+    .consequences
+      display: inherit
 
-                    .repitem
+      .grid
 
-                        .repeat-skill
-                            @include grid_skill
-                            min-height: 40px
+        .repeat-consequences
+          @include grid(90px 325px, 5px)
 
-                        input.liketextarea
-                            width: 845px
-                            height: 26px
-                            border: 1px solid #ddd
-                            border-radius: 3px
+      .repcontainer
 
-                        textarea
-                            width: 845px
+        .repitem
 
-                        div
-                            margin: auto 0
-                            text-align: center
+          .repeat-consequences
+            @include grid(90px 325px, 5px)
 
-                        .repeat-weapon
+            select:not(:hover)
+              -webkit-appearance: none
+              -moz-appearance: none
+              appearance: none
 
-                            input.options-flag
-                                width: auto
+    .weapons
+      display: inherit
 
-                            &:hover .options-flag+span
-                                display: block
+      .grid
+        @include grid(470px 120px 90px 90px 55px, 5px)
 
-        @mixin grid_weapons
-            display: grid
-            grid-template-columns: 465px 120px 60px 60px 60px 55px
-            grid-gap: 5px
+        >div
+          background-color: $backgroundlight
+          font-weight: bold
+          text-align: center
 
-        .weapons
-            display: inherit
+      .gridplace
 
-            .grid
-                @include grid_weapons
+        input
+          border: none
+          width: -webkit-fill-available
+          width: -moz-available
 
-                >div
-                    background-color: #EEE
-                    font-weight: bold
-                    text-align: center
+        button[type="roll"]
+          border: none
+          width: -webkit-fill-available
+          width: -moz-available
 
-            .gridplace
+        .repcontainer
 
-                input
-                    border: none
-                    width: -webkit-fill-available
-                    width: -moz-available
+          .repitem
 
-                button[type="roll"]
-                    border: none
-                    width: -webkit-fill-available
-                    width: -moz-available
+            .repeat-weapon
+              @include grid(470px 120px 90px 90px 55px, 5px)
+              min-height: 40px
 
-                .repcontainer
+            input.liketextarea
+              width: 845px
+              height: 26px
+              border: 1px solid $borderlight
+              border-radius: 3px
 
-                    .repitem
+            textarea
+              width: 845px
 
-                        .repeat-weapon
-                            @include grid_weapons
-                            min-height: 40px
+            div
+              margin: auto 0
+              text-align: center
 
-                        input.liketextarea
-                            width: 845px
-                            height: 26px
-                            border: 1px solid #ddd
-                            border-radius: 3px
+            .repeat-weapon
 
-                        textarea
-                            width: 845px
+              input.options-flag
+                width: auto
 
-                        div
-                            margin: auto 0
-                            text-align: center
-
-                        .repeat-weapon
-
-                            input.options-flag
-                                width: auto
-
-                            &:hover .options-flag+span
-                                display: block
-
-        @mixin grid_colums_mage
-            grid-template-columns: 100px 355px 60px 60px 60px 60px 60px 55px
-            grid-gap: 5px
-
-        @mixin grid_mage
-            display: grid
-            @include grid_colums_mage
-
-        .mage
-            display: inherit
-
-            input
-                border: none
-
-            button[type="roll"]
-                border: none
-                width: -webkit-fill-available
-                width: -moz-available
-
-                &::before
-                    content: ""
-
-                input
-                    pointer-events: none
-
-            .grid
-                @include grid_mage
-
-                >div
-                    background-color: #EEE
-                    font-weight: bold
-                    text-align: center
-
-            .gridplace
-
-                .repcontainer
-
-                    .repitem
-
-                        .repeat-mage
-                            @include grid_mage
-                            min-height: 40px
-
-                            input.options-flag
-                                width: auto
-
-                            &:hover .options-flag+span
-                                display: block
-
-                            div.select-3
-                                width: 42px
-                                margin: auto
-
-                            div.select-4
-                                width: 56px
-                                margin: auto
-
-                            div.hiddenBox
-                                grid-template-columns: 60px 60px 60px 60px 60px 60px 60px 60px 60px 60px 60px 60px 60px
-                                grid-gap: 5px
-                                grid-template-rows: auto
-                                grid-template-areas: ". . . . . . . . . . attribut damage healing" "textarea textarea textarea textarea textarea textarea textarea textarea textarea textarea textarea textarea textarea"
-
-                                #attribut
-                                    grid-area: attribut
-
-                                #damage
-                                    grid-area: damage
-
-                                #healing
-                                    grid-area: healing
-
-                                #textarea
-                                    grid-area: textarea
-
-                        input[type="checkbox"]
-                            width: auto
-                            float: left
-
-                        div
-                            margin: auto 0
-                            text-align: center
-
-        .aspects
-            display: inherit
-
-        .stunts
-            display: inherit
-
-            .repeat-stunt:hover .options-flag+span
+              &:hover .options-flag+span
                 display: block
 
-        .inventar
-            display: inherit
+    .mage
+      display: inherit
 
-            .rustung
-                padding-bottom: 4px
+      input
+        border: none
 
-            input[type=text],
-            input[type=number]
-                width: 81px
+      button[type="roll"]
+        border: none
+        width: -webkit-fill-available
+        width: -moz-available
 
-            input[name=attr_name],
-            input[name=attr_ruestungName]
-                width: 250px
+        input
+          padding: 0
+          pointer-events: none
 
-            .repeat-inv:hover .options-flag+span
+      .grid
+        @include grid(500px 90px 90px 90px 55px, 5px)
+
+        >div
+          background-color: $backgroundlight
+          font-weight: bold
+          text-align: center
+
+      .gridplace
+
+        .repcontainer
+
+          .repitem
+
+            .repeat-mage
+              @include grid(500px 90px 90px 90px 55px, 5px)
+              min-height: 40px
+
+              input.options-flag
+                width: auto
+
+              &:hover .options-flag+span
                 display: block
 
-        .notes
-            display: inherit
+              div.hiddenBox
+                @include grid(165px 165px 165px 165px 165px, 5px)
+                grid-template-rows: auto
+                grid-template-areas: ". . . . ." "textarea textarea textarea textarea textarea"
 
-            .repeat-notes:hover .options-flag+span
-                display: block
+                #textarea
+                  grid-area: textarea
 
-        .xp
-            display: inherit
+            input[type="checkbox"]
+              width: auto
+              float: left
 
-            .totalxp
-                display: grid
-                grid-auto-flow: column
-                grid-gap: 50px
+            input[name="attr_spelleffekt"]
+              width: calc(100% - 18px)
 
-                input
-                    width: 100%
-                    text-align: end
+            input[name="attr_spelleffekt_wiederstand"]
+              float: none
 
-            .repcontainer
-                padding-top: 15px
+            div
+              margin: auto 0
+              text-align: center
 
-                .repitem
-                    display: grid
-                    grid-template-columns: 210px 50px 10px 210px 50px 10px 210px 50px
-                    grid-gap: 5px
-                    height: 40px
+              &#verbraucht
+                margin: auto auto
 
-                    div
-                        margin: auto 0
+    .aspects
+      display: inherit
 
-            .brackets
-                border-left: 1px solid #aaa
-                border-right: 1px solid #aaa
-                border-radius: 12px
+    .stunts
+      display: inherit
 
-                input
-                    border: none
-                    text-align: center
+      .repeat-stunt:hover .options-flag+span
+        display: block
 
-        .version
-            text-align: right
+    .inventar
+      display: inherit
+
+      div[data-groupname=repeating_extras]
+        padding-top: 4px
+
+      input
+        width: 81px
+
+      input[name=attr_name]
+        width: 250px
+
+      input[name=attr_ruestungName]
+        width: 335px
+
+      .repeat-inv:hover .options-flag+span
+        display: block
+
+    .notes
+      display: inherit
+
+      .repeat-notes:hover .options-flag+span
+        display: block
+
+    .xp
+      display: inherit
+
+      .totalxp
+        display: grid
+        grid-auto-flow: column
+        grid-gap: 50px
+
+        input
+          width: 100%
+          text-align: end
+
+      .repcontainer
+        padding-top: 15px
+
+        .repitem
+          display: grid
+          grid-template-columns: 210px 50px 10px 210px 50px 10px 210px 50px
+          grid-gap: 5px
+          height: 40px
+
+          div
+            margin: auto 0
+
+      .brackets
+        border-left: 1px solid #aaa
+        border-right: 1px solid #aaa
+        border-radius: 12px
+
+        input
+          border: none
+          text-align: center
+
+    .version
+      text-align: right
 
 .sheet-darkmode
 
-    button,
-    input,
-    optgroup,
-    select,
-    textarea,
-    .charsheet
-        color: #EEE
+  input.readonly
+    cursor: not-allowed
 
-    .btn,
-    .btn.btn-default
-        color: rgb(200, 195, 188)
-        text-shadow: rgba(24, 26, 27, 0.75) 0px 1px 1px
-        background-color: rgb(30, 32, 33)
-        background-image: linear-gradient(rgb(24, 26, 27), rgb(38, 41, 43))
-        border-color: rgb(62, 68, 70) rgb(62, 68, 70) rgb(67, 73, 76)
-        box-shadow: rgba(24, 26, 27, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.05) 0px 1px 2px
+  button,
+  input,
+  optgroup,
+  select,
+  textarea,
+  .charsheet
+    color: #C8C4BB
 
-    .sheetform
-        background-color: transparent
+  .btn,
+  .btn.btn-default
+    color: $textlight
+    text-shadow: rgba(24, 26, 27, 0.75) 0px 1px 1px
+    background-color: $backgrounddark
+    background-image: linear-gradient(rgb(24, 26, 27), rgb(38, 41, 43))
+    border-color: rgb(62, 68, 70) rgb(62, 68, 70) rgb(67, 73, 76)
+    box-shadow: rgba(24, 26, 27, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.05) 0px 1px 2px
 
-    .charsheet
-        
-        .container
+  .sheetform
+    background-color: transparent
 
-            button,
-            input,
-            optgroup,
-            select,
-            textarea
-                border-color: rgb(58, 62, 65)
-            
-            .formular
-                border-color: rgb(58, 62, 65)
-                
-                label,
-                button
-                    background-color: var(--dark-surface1)
-                    color: rgb(188, 182, 173)
-                
-                button
-                    border-color: rgb(58, 62, 65)
+  .charsheet
 
-            .gridplace
-                
-                .repcontainer
-                    
-                    .repitem:nth-child(2n)
-                        background-color: rgb(34, 36, 38)
+    .container
 
-            .skills,
-            .weapons,
-            .mage
-                
-                .grid > div
-                    background-color: rgb(34, 36, 38)
+      button,
+      input,
+      optgroup,
+      select,
+      textarea
+        border-color: $borderdark
+        color: $textlight
+
+      .navigation
+        display: flex
+        flex-direction: row
+        justify-content: space-evenly
+
+        button
+          padding: calc(.5em + .45em) calc(.9em + .45em)
+          color: $textlight
+          background: conic-gradient(from 90deg at 3px 3px,#0000 90deg,$textlight 0) .45em .45em/calc(100% - 3px - 2*.45em) calc(100% - 3px - 2*.45em)
+          transition: .3s linear, color 0s, background-color 0s
+
+      .formular
+        border-color: $borderdark
+
+        label,
+        button
+          background-color: var(--dark-surface1)
+          color: $textlight
+
+        button
+          border-color: $borderdark
+
+      .gridplace
+
+        .repitem,
+        .items
+
+          &:nth-child(even)
+            background-color: $borderdark
+
+      .navigation
+
+        button
+          --color: $textlight
+
+      .skills,
+      .weapons,
+      .mage
+
+        .grid > div
+          background-color: $borderdark
 
 .sheet-rolltemplate-butterfly
 
+  .sheet-container
+    background-color: #ffffff
+    border-top-left-radius: 10px
+    border-bottom-right-radius: 10px
+    width: 240px
+
+    .sheet-header
+      margin-bottom: 4px
+      padding: 2px 8px
+      background: black
+      color: white
+      font-weight: bold
+      border-top-left-radius: 10px
+      border-bottom-right-radius: 10px
+
+      span
+        text-transform: uppercase
+
+    .sheet-content
+      text-align: initial
+
+      p
+        line-height: 14px
+
+        &:last-child
+          margin: 0
+
+      div
+        padding: 5px
+
+        &:nth-child(even)
+          background: $backgroundlight
+
+        span
+          margin-left: 15px
+          font-weight: bold
+
+        .sheet-text
+          margin-left: 20px
+          font-weight: normal
+
+      .sheet-desc
+        grid-column: span 2
+        padding: 5px
+        text-align: center
+
+        span
+          right: unset
+          float: none
+          margin: 0
+
+    .inlinerollresult,
+    .sheet-fakeroll,
+    .sheet-spacer
+      background-color: transparent
+      border: none
+      position: relative
+      right: 30px
+      float: right
+      margin: 0
+      padding: 0
+
+      &.fullcrit
+        color: #3FB315
+
+      &.fullfail
+        color: #B31515
+
+      &.importandivoll
+        color: #4A57ED
+
+  &.sheet-rolltemplate-darkmode
+
     .sheet-container
-        background-color: #ffffff
-        border-top-left-radius: 10px
-        border-bottom-right-radius: 10px
-        width: 240px
+      color: #EEE
+      background-color: var(--dark-surface1)
 
-        .sheet-header
-            margin-bottom: 4px
-            padding: 2px 8px
-            background: black
-            color: white
-            font-weight: bold
-            border-top-left-radius: 10px
-            border-bottom-right-radius: 10px
+      .sheet-content
+        border: solid 1px var(--dark-surface1)
+        border-top: none
 
-            span
-                text-transform: uppercase
+        div
 
-        .sheet-content
-            text-align: initial
-
-            p
-                line-height: 14px
-
-                &:last-child
-                    margin: 0
-
-            div
-                padding: 5px
-
-                &:nth-child(even)
-                    background: #EEE
-
-                span
-                    margin-left: 15px
-                    font-weight: bold
-
-            .sheet-desc
-                grid-column: span 2
-                padding: 5px
-                text-align: center
-
-                span
-                    right: unset
-                    float: none
-                    margin: 0
-
-        .inlinerollresult,
-        .sheet-fakeroll
-            background-color: transparent
-            border: none
-            position: relative
-            right: 30px
-            float: right
-            margin: 0
-            padding: 0
-
-            &.fullcrit
-                color: #3FB315
-
-            &.fullfail
-                color: #B31515
-
-            &.importandivoll
-                color: #4A57ED
-
-    &.sheet-rolltemplate-darkmode
-
-        .sheet-container
-            color: #EEE
-            background-color: var(--dark-surface1)
-
-            .sheet-content
-                border: solid 1px var(--dark-surface1)
-                border-top: none
-
-                div
-
-                    &:nth-child(even)
-                        background: var(--dark-surface2)
+          &:nth-child(even)
+            background: var(--dark-surface2)

@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable no-plusplus */
 /* eslint-disable max-len */
 /* eslint-disable prefer-destructuring */
@@ -49,6 +50,8 @@ rollCombatContact.forEach((button) => {
       `${ODValue.tir}`,
       'combat',
       `${ODValue.combat}`,
+      'aura',
+      `${ODValue.aura}`,
       'energiePJ',
       'espoir',
       'devasterAnatheme',
@@ -300,6 +303,8 @@ rollCombatContact.forEach((button) => {
     const oTir = +attrs[`${ODValue.tir}`];
     const vCombat = +attrs.combat;
     const oCombat = +attrs[`${ODValue.combat}`];
+    const vAura = +attrs.aura;
+    const oAura = +attrs[`${ODValue.aura}`];
 
     let attaquesSurprises = [];
     let attaquesSurprisesValue = [];
@@ -348,6 +353,7 @@ rollCombatContact.forEach((button) => {
     let isEAmbidextrie = false;
     let isELourd = false;
     let isEDeuxMains = false;
+    let isTirSecurite = false;
 
     let isAAgressive = false;
     let isASoeur = false;
@@ -443,7 +449,12 @@ rollCombatContact.forEach((button) => {
     // GESTION DES BONUS DE BASE
     let dForce = vForce;
 
-    if (hasArmure) { dForce += oForce * 3; }
+    if (hasArmure) {
+      if (oForce > 5) {
+        dForce += 5 * 3;
+        dForce += (oForce - 5);
+      } else dForce += oForce * 3;
+    }
 
     bDegats.push(dForce);
     exec.push(`{{vForce=${dForce}}}`);
@@ -468,7 +479,7 @@ rollCombatContact.forEach((button) => {
     if (hasOptions) {
       // GESTION DES EFFETS
 
-      effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir);
+      effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir, vAura, oAura);
 
       bDegats = bDegats.concat(effets.bDegats);
       eASAssassin = effets.eASAssassin;
@@ -519,6 +530,7 @@ rollCombatContact.forEach((button) => {
 
       isEAkimbo = effets.isAkimbo;
       isEAmbidextrie = effets.isAmbidextrie;
+      isTirSecurite = effets.isTirSecurite;
 
       isBourreau = effets.isBourreau;
       isDevastation = effets.isDevastation;
@@ -636,7 +648,7 @@ rollCombatContact.forEach((button) => {
 
     // GESTION DU STYLE
 
-    const getStyle = getStyleContactMod(attrs, CPrecisValues, baseDegats, baseViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd);
+    const getStyle = getStyleContactMod(attrs, CPrecisValues, baseDegats, baseViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd, isTirSecurite);
 
     exec = exec.concat(getStyle.exec);
     cRoll = cRoll.concat(getStyle.cRoll);
@@ -962,14 +974,12 @@ rollCombatContact.forEach((button) => {
 
       finalRoll = await startRoll(exec.join(' '));
 
-      const tJet = finalRoll.results.jet.result;
       const rJet = finalRoll.results.jet.dice;
 
       const rDegats = finalRoll.results.degats.dice;
       const rViolence = finalRoll.results.violence.dice;
 
       const tBonus = finalRoll.results.bonus.result;
-      const tExploit = finalRoll.results.Exploit.result;
 
       const tDegats = finalRoll.results.degats.result;
       const tViolence = finalRoll.results.violence.result;
@@ -1005,28 +1015,7 @@ rollCombatContact.forEach((button) => {
 
       finishRoll(finalRoll.rollId, computed);
 
-      if (tJet !== 0 && computed.basejet === tExploit) {
-        const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
-        const rExploit = exploitRoll.results.jet.dice;
-        const exploitPairOrImpair = isGuidage === true ? 1 : 0;
-
-        const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
-          const vC = valeurCourante;
-          let nV = 0;
-
-          if (vC % 2 === exploitPairOrImpair) {
-            nV = 1;
-          }
-
-          return accumulateur + nV;
-        }, 0);
-
-        const exploitComputed = {
-          jet: jetExploit,
-        };
-
-        finishRoll(exploitRoll.rollId, exploitComputed);
-      }
+      await postRoll(computed, roll, jet, finalRoll, conditions);
 
       if (hasEnergieRetiree) {
         if (energieIsEspoir) {

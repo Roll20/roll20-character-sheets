@@ -22,7 +22,7 @@
 
 <!-- Please check any that apply: -->
 
-- [ ] This sheet has been made on behalf of, or by, the game's publisher.
+- [ ] I have authorization from the game's publisher to make this an official sheet on Roll20 with their name attached.
 - [ ] This game is not a traditionally published game, but a copy of the game rules can be purchased/downloaded/found at: <   >
 - [ ] This sheet is for an unofficial fan game, modification to an existing game, or a homebrew system.
 
