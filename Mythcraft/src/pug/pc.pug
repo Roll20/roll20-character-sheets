@@ -37,7 +37,7 @@
 			+title('personality / background')
 			+textarea('personality background')
 		.grid.gap-4.attributes
-			each val in ['str', 'dex', 'end', 'luck', 'awr', 'int', 'cha']
+			each val in attributes
 				.grid.attribute.justify-center.items-center.border
 					.circle.rounded-full.border.grid.justify-center.items-center.font-bold
 						h3.text-center(data-i18n=val)
@@ -48,50 +48,107 @@
 			.grid.rounded-md.content-start.p-2.repeating-container.relative.border
 				+title('currency')
 				+textarea("currency")
+
 		.grid.grid-flow-col.grid-cols-2.gap-4
-			.grid.double-border-2.rounded-md.content-start.p-2.repeating-container.relative.inventory
-				+title('inventory')
-				fieldset(class=`repeating_inventory`)
-					.grid.descriptor.relative.gap-1
-						+editFlag()
-						.grid.grid-flow-col.gap-4
-							.grid.col-auto-fr.gap-2
-								h3(data-i18n='name')
-								span.display(name=`attr_${attrName('name')}`)
-								+textInput('name')
-							.grid.col-auto-fr.gap-2
-								h3(data-i18n='qty')
-								span.display.text-center(name=`attr_${attrName('qty')}`)
-								+textInput('qty')
-						+repeatingChatButton("item")
-						.grid.notes
-							span.display.pl-4(name='attr_notes')
-							+textarea('notes')
-			.grid.double-border-2.rounded-md.content-start.p-2.repeating-container.relative.talents
-				+title('talents')
-				fieldset(class=`repeating_talents`)
-					.grid.descriptor.relative.gap-1
-						+editFlag()
-						.grid.grid-flow-col.gap-4
-							.grid.col-auto-fr.gap-2
-								h3(data-i18n='name')
-								span.display(name=`attr_${attrName('name')}`)
-								+textInput('name')
-							.grid.col-auto-fr.gap-2
-								h3(data-i18n='level')
-								span.display.text-center(name=`attr_${attrName('level')}`)
-								+textInput('level')
-						+repeatingChatButton("name")
-						.grid.notes
-							span.display.pl-4(name='attr_notes')
-							+textarea('notes')
-		.grid.double-border-2.rounded-md.content-start.p-2.repeating-container.relative.abilities
-			+title('bop / lineage abilities')
-			+simpleRepeatingSection('abilities')
+			+repeatingList('inventory', ['name', 'qty'])
+			+repeatingList('talents', ['name', 'level'])
 
-	include pages/combat.pug
+		+repeatingList('abilities', ['name'])
+		
+	.grid.gap-4.combat
+		.grid.grid-flow-col.gap-4
+			.hit-points.grid.double-border-2.rounded-md
+				.max.grid.justify-center.p-2
+					h2.text-center(data-i18n='max hp')
+					+numberInput("max hp")
+				.grid.grid-flow-col
+					each val in ["hp", "shield"]
+						.grid.justify-center.p-2(class=`${val}`)
+							h2.text-center(data-i18n=val)
+							+numberInput(val)
+			.grid.justify-center.grid-flow-col.gap-4
+				each val in ["armor rating", "speed", "death points"]
+					.grid
+						.double-border-2.p-2.justify-center.rounded-md
+							+numberInput(val)
+						h2.text-center(data-i18n=val)
+		.grid.grid-flow-col
+			.grid
+				.double-border-2.p-2.justify-center.rounded-md
+					+numberInput("ap/rounded")
+				h2.text-center(data-i18n="ap/rounded")
+			
+			.grid
+				.grid.grid-flow-col.gap-2
+					h2.text-center(data-i18n="special action points")
+					+numberInput("special action points")
+				.grid.grid-flow-col
+					- let n = 1;
+					while n < 21
+						span= n++
 
-	include pages/magic.pug
+		.grid.gap-4.justify-between.items-center.attributes
+			each val in combatAttributes
+				.grid.relative.justify-center.items-center
+					.circle.rounded-full.border.grid.justify-center.items-center.font-bold
+						h2.text-center(data-i18n=val)
+						+numberInput(val)
+			div
+			each val in derivedAttributes
+				.grid.relative.justify-center.items-center(class=`${val}`)
+					.circle.rounded-full.border.grid.justify-center.items-center.font-bold
+						h3.text-center(data-i18n=val)
+						+numberInput(val)
+		.grid.gap-4.grid-flow-col.auto-cols-fr
+			.grid.double-border-2.rounded-md.relative
+				+title("attacks & spellcasting")
+			.grid.gap-4
+				+repeatingList('reactive actions', ['name'])
+				+repeatingList('conditions', ['name'])
+		+repeatingList('abilities list', ['name'])
 
-	include pages/journal.pug
-	
+	.grid.gap-4.magic
+		.grid.grid-flow-col.gap-4.mb-4
+			.grid.double-border-2.rounded-md.items-center.justify-center
+				h2.text-center(data-i18n='source / level')
+				+numberInput("source")
+			.grid.grid-flow-col.gap-4.items-center
+				each val in ["max spell points", "current spell points", "spellcasting ability"]
+					.grid
+						.double-border-2.p-2.justify-center.rounded-md
+							+numberInput(val)
+						h2.text-center(data-i18n=val)
+						
+		.grid.gap-4.items-center
+			.grid.double-border-2.rounded-md.content-start.p-2.source-magic.relative.repeating-container
+				.grid.gap-2.items-center.justify-center.absolute.title
+					+textInput('source magic')
+					h2.text-center(data-i18n='source magic')
+				+subheaders(['name', 'apc'])
+				+repeatingSection('source magic', ['name', 'apc'])
+
+			+repeatingList('rituals', ['name'])
+
+			+repeatingList('spells', ['name', 'apc', 'spc'])
+
+	.grid.gap-4.journal
+		.grid.double-border-2.rounded-md.content-start.p-2.relative
+			+title('additional background & occupation info')
+			+textarea('additional background occupation info')
+			
+		.grid.gap-4.grid-flow-col.auto-cols-fr
+			+repeatingList('location request contacts', ['name'])
+
+			.grid.justify-center.gap-4.resources
+				.grid.double-border-2.rounded-md.content-start.p-2.repeating-container.relative
+					+title('resources')
+					fieldset(class="repeating_resources")
+						.grid.content-start.p-2
+							+textInput('name')
+							.grid.gap-2.grid-flow-col
+								+numberInput('current')
+								+numberInput('max')
+						.grid
+							h3.text-center(data-i18n='current/max')
+
+		+repeatingList('journal', ['name', 'date'])
