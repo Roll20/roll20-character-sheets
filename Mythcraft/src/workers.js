@@ -1,3 +1,12 @@
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -34,6 +43,31 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var mentalAttributes = ["awareness", "intellect", "charisma"];
+var metaphysicAttributes = ["luck", "coordination"];
+var physicalAttributes = ["strength", "dexterity", "endurance"];
+var attributes = __spreadArray(__spreadArray(__spreadArray([], mentalAttributes, true), metaphysicAttributes, true), physicalAttributes, true);
+var action_points = ["coordination", "action_points_base"];
+action_points.forEach(function (attr) {
+    on("change:".concat(attr), function () {
+        getAttrs(action_points, function (values) {
+            var coordination = values.coordination, action_points_base = values.action_points_base;
+            var cor = parseInt(coordination);
+            var ap_base = parseInt(action_points_base);
+            var action_points = ap_base;
+            if (cor === -1 || cor === -2) {
+                action_points = ap_base - 1 || 0;
+            }
+            else if (cor === -3) {
+                action_points = ap_base - 2 || 0;
+            }
+            else {
+                action_points = Math.ceil(cor / 2) + ap_base;
+            }
+            setAttrs({ action_points: action_points });
+        });
+    });
+});
 var _this = this;
 var versioningAttr = "latest_versioning_upgrade";
 on("sheet:opened", function () {

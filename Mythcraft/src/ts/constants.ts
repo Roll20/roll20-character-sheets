@@ -1,10 +1,16 @@
 //Set variables, traits, and other attributes
 
-// const attributes = [
-//     "dexterity",
-//     "strength",
-//     "charisma",
-// ]
+const mentalAttributes = ["awareness", "intellect", "charisma"];
+const metaphysicAttributes = ["luck", "coordination"];
+const physicalAttributes = ["strength", "dexterity", "endurance"];
+
+const attributes = [
+  ...mentalAttributes,
+  ...metaphysicAttributes,
+  ...physicalAttributes,
+];
+
+const action_points = ["coordination", "action_points_base"];
 
 // const skills = [
 //   "awareness",,
