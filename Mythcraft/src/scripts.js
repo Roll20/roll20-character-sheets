@@ -48,23 +48,121 @@ var metaphysicAttributes = ["luck", "coordination"];
 var physicalAttributes = ["strength", "dexterity", "endurance"];
 var attributes = __spreadArray(__spreadArray(__spreadArray([], mentalAttributes, true), metaphysicAttributes, true), physicalAttributes, true);
 var action_points = ["coordination", "action_points_base"];
+var hit_points = ["endurance", "hit_points_base", "level"];
+var critical_range = ["critical_range", "luck", "critical_range_base"];
+var armor_rating = ["armor_rating_base"];
+var anticipation = ["anticipation_base", "awareness"];
+var fortitude = ["fortitude_base", "endurance"];
+var logic = ["logic_base", "intellect"];
+var reflexes = ["reflexes_base", "dexterity"];
+var willpower = ["willpower_base", "charisma"];
 action_points.forEach(function (attr) {
     on("change:".concat(attr), function () {
         getAttrs(action_points, function (values) {
-            var coordination = values.coordination, action_points_base = values.action_points_base;
-            var cor = parseInt(coordination);
-            var ap_base = parseInt(action_points_base);
-            var action_points = ap_base;
-            if (cor === -1 || cor === -2) {
-                action_points = ap_base - 1 || 0;
-            }
-            else if (cor === -3) {
-                action_points = ap_base - 2 || 0;
-            }
-            else {
-                action_points = Math.ceil(cor / 2) + ap_base;
+            var _a = parseIntegers(values), coordination = _a.coordination, action_points_base = _a.action_points_base;
+            var action_points = action_points_base;
+            switch (coordination) {
+                case -1:
+                case -2:
+                    action_points = action_points_base - 1 || 0;
+                    break;
+                case -3:
+                    action_points = action_points_base - 2 || 0;
+                    break;
+                default:
+                    action_points = Math.ceil(coordination / 2) + action_points_base;
+                    break;
             }
             setAttrs({ action_points: action_points });
+        });
+    });
+});
+hit_points.forEach(function (attr) {
+    on("change:".concat(attr), function () {
+        getAttrs(hit_points, function (values) {
+            var _a = parseIntegers(values), endurance = _a.endurance, hit_points_base = _a.hit_points_base, level = _a.level;
+            var die_pips = 0;
+            var set_hit_points = 0;
+            if (endurance >= -2 && endurance <= 12) {
+                if (endurance === -3) {
+                    die_pips = 0;
+                    set_hit_points = 0;
+                }
+                else if (endurance >= -2 && endurance <= -1) {
+                    die_pips = 2;
+                    set_hit_points = 1;
+                }
+                else if (endurance >= 0 && endurance <= 2) {
+                    die_pips = 4;
+                    set_hit_points = 2;
+                }
+                else if (endurance >= 3 && endurance <= 5) {
+                    die_pips = 6;
+                    set_hit_points = 3;
+                }
+                else if (endurance >= 6 && endurance <= 8) {
+                    die_pips = 8;
+                    set_hit_points = 4;
+                }
+                else if (endurance >= 9 && endurance <= 11) {
+                    die_pips = 10;
+                    set_hit_points = 5;
+                }
+                else if (endurance >= 12) {
+                    die_pips = 12;
+                    set_hit_points = 6;
+                }
+            }
+            var hit_point_die = die_pips ? "".concat(level, "d").concat(die_pips) : 0;
+            var hit_die_formula = "".concat(hit_points_base, "+").concat(hit_point_die, "+").concat(level);
+            setAttrs({ hit_point_die: hit_point_die, hit_die_formula: hit_die_formula, set_hit_points: set_hit_points });
+        });
+    });
+});
+critical_range.forEach(function (attr) {
+    on("change:".concat(attr), function () {
+        getAttrs(critical_range, function (values) {
+            var _a = parseIntegers(values), luck = _a.luck, critical_range_base = _a.critical_range_base, critical_range = _a.critical_range;
+            var range = critical_range_base;
+            if (luck === 12) {
+                range = critical_range_base - 2;
+            }
+            else if (luck >= 6 && luck <= 11) {
+                range = critical_range_base - 1;
+            }
+            var cr = range < 16 ? 16 : range;
+            if (cr !== critical_range) {
+                setAttrs({ critical_range: cr });
+            }
+        });
+    });
+});
+on("change:luck", function () {
+    getAttrs(["luck"], function (values) {
+        var luck = parseInt(values.luck);
+        var attrs = {};
+        attrs.rerolls = Math.ceil(luck / 2);
+        if (luck < 0) {
+            attrs.never_crit = true;
+            attrs.luck_negative_modifier = luck;
+        }
+        else {
+            attrs.luck_critical_modifier = luck;
+        }
+        setAttrs(attrs);
+    });
+});
+[anticipation, fortitude, logic, reflexes, willpower].forEach(function (scoreAttributes) {
+    scoreAttributes.forEach(function (attr) {
+        on("change:".concat(attr), function () {
+            getAttrs(scoreAttributes, function (values) {
+                var _a;
+                var sum = sumIntegers(Object.values(parseIntegers(values)));
+                var name = scoreAttributes
+                    .find(function (e) { return e.includes("base"); })
+                    .replace("_base", "");
+                setAttrs((_a = {}, _a[name] = sum, _a));
+            });
         });
     });
 });
@@ -89,10 +187,9 @@ var versioning = function (version) { return __awaiter(_this, void 0, void 0, fu
                 versioning(1);
                 updateMessage(1);
                 break;
-            case version < 1.1:
-                updateMessage(1.1);
-                versionOneOne();
-                versioning(1.1);
+            case version < 1.01:
+                updateMessage(1.01);
+                versioning(1.01);
                 break;
             default:
                 console.log("%c Sheet is update to date.", "color: green; font-weight:bold");
@@ -137,11 +234,16 @@ var getTranslations = function (translationKeys) {
     return translations;
 };
 var parseInteger = function (string) { return parseFloat(string) || 0; };
-var parseIntegers = function (numbers) {
+var parseIntegers = function (values) {
     var parsedNumbers = {};
-    for (var _i = 0, _a = Object.entries(numbers); _i < _a.length; _i++) {
+    for (var _i = 0, _a = Object.entries(values); _i < _a.length; _i++) {
         var _b = _a[_i], key = _b[0], value = _b[1];
-        parsedNumbers[key] = parseInteger(value);
+        if (typeof value === "string") {
+            parsedNumbers[key] = parseInteger(value);
+        }
+        else if (typeof value === "number") {
+            parsedNumbers[key] = value;
+        }
     }
     return parsedNumbers;
 };

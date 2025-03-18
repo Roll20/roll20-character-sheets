@@ -1,36 +1,20 @@
 .pc.p-2.w-full.h-full
 	input(type="hidden"  name="attr_tab" value="main")
-	input(type="hidden"  name="attr_action_points" value="3")
-
+	
 	.header.grid.gap-4.mb-4
 		.flex.flex-wrap.flex-row.gap-4
 			.logo.grow-0
 				img(src='images/logo.png')
 			.grid.gap-1.grow.bio
-				.grid.grid-flow-col.gap-1
-					+headerInput('character name')
-					+headerInput('lineage')
-				.grid.grid-flow-col.gap-1
-					+headerInput('level')
-					+headerInput('height')
-					+headerInput('weight')
-				.grid.grid-flow-col.gap-1
-					+headerInput('eye color')
-					+headerInput('hair color')
-					+headerInput('other')
+				each row in [['character name', 'lineage'], ['level', 'height', 'weight'], ['eye color', 'hair color', 'other']]
+					.grid.grid-flow-col.gap-1
+						each header in row
+							+headerInput(header)
 		.grid.gap-2.grid-flow-col.auto-cols-min
-			.grid.radio-button
-				input(type="radio" name="attr_tab" value="main" checked)
-				span(data-i18n='main')
-			.grid.radio-button
-				input(type="radio" name="attr_tab" value="combat")
-				span(data-i18n='combat')
-			.grid.radio-button
-				input(type="radio" name="attr_tab" value="magic")
-				span(data-i18n='magic')
-			.grid.radio-button
-				input(type="radio" name="attr_tab" value="journal")
-				span(data-i18n='journal')
+			each tab in ['main', 'combat', 'magic', 'journal']
+				.grid.radio-button
+					input(type="radio" name="attr_tab" value=tab checked=(!!tab === 'main'))
+					span(data-i18n=tab)
 
 
 	.grid.gap-4.main
@@ -38,10 +22,10 @@
 			+title('personality / background')
 			+textarea('personality background')
 		.grid.gap-4.attributes
-			each val in attributes
+			each val in coreAttributes
 				.grid.attribute.justify-center.items-center.border
 					.circle.rounded-full.border.grid.justify-center.items-center.font-bold
-						h3.text-center(data-i18n=val)
+						h3.text-center(data-i18n=shortName(val))
 						+numberInput(val)
 					.box.grid.justify-center.items-center.skill
 						h3.text-center(data-i18n='skills/bonus')
@@ -71,12 +55,13 @@
 				each val in ["armor rating", "speed", "death points"]
 					.grid
 						.double-border-2.p-2.justify-center.rounded-md
-							+numberInput(val)
+							- const def = val === 'armor rating' ? 10 : 0
+							+numberInput(val, def)
 						h2.text-center(data-i18n=val)
 		.grid.grid-flow-col
 			.grid
 				.double-border-2.p-2.justify-center.rounded-md
-					+numberInput("ap")
+					+numberInput("action points")
 				h2.text-center(data-i18n="ap/rounded")
 			
 			.grid
@@ -92,14 +77,18 @@
 			each val in combatAttributes
 				.grid.relative.justify-center.items-center
 					.circle.rounded-full.border.grid.justify-center.items-center.font-bold
-						h2.text-center(data-i18n=val)
+						h2.text-center(data-i18n=shortName(val))
 						+numberInput(val)
 			div
 			each val in derivedAttributes
 				.grid.relative.justify-center.items-center(class=`${val}`)
 					.circle.rounded-full.border.grid.justify-center.items-center.font-bold
-						h3.text-center(data-i18n=val)
-						+numberInput(val)
+						h3.text-center(data-i18n=shortName(val))
+						span.text-center(name=`attr_${attrName(val)}`)
+			.grid.relative.justify-center.items-center(class=`${val}`)
+				.circle.rounded-full.border.grid.justify-center.items-center.font-bold
+					h3.text-center(data-i18n="rerolls")
+					+numberInput("rerolls")
 		.grid.gap-4.grid-flow-col.auto-cols-fr
 			.grid.double-border-2.rounded-md.relative
 				+title("attacks & spellcasting")

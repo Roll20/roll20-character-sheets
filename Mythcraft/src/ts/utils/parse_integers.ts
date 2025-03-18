@@ -1,10 +1,14 @@
 const parseInteger = (string: string) => parseFloat(string) || 0;
 
-const parseIntegers = (numbers: { [s: string]: string }) => {
-  const parsedNumbers: { [s: string]: number } = {};
+const parseIntegers = (values: Attrs) => {
+  const parsedNumbers: { [key: keyof Attrs]: number } = {};
 
-  for (let [key, value] of Object.entries(numbers)) {
-    parsedNumbers[key] = parseInteger(value);
+  for (let [key, value] of Object.entries(values)) {
+    if (typeof value === "string") {
+      parsedNumbers[key] = parseInteger(value);
+    } else if (typeof value === "number") {
+      parsedNumbers[key] = value;
+    }
   }
   return parsedNumbers;
 };

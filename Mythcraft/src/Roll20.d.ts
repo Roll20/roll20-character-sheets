@@ -12,6 +12,8 @@ declare type EventInfo = {
 
 declare type AttributeContent = string | number | boolean;
 
+declare type Attrs = { [key: string]: AttributeContent };
+
 declare function getAttrs(
   attributes: string[],
   callback?: (values: { [key: string]: string }) => void

@@ -23,10 +23,10 @@ const versioning = async (version: number) => {
       versioning(1);
       updateMessage(1);
       break;
-    case version < 1.1:
-      updateMessage(1.1);
-      versionOneOne();
-      versioning(1.1);
+    case version < 1.01:
+      updateMessage(1.01);
+      // versionOneOne();
+      versioning(1.01);
       break;
     default:
       console.log(
