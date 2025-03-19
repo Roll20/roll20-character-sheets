@@ -1,3 +1,11 @@
+# 2025-3-18
+
+- Add whisper toggle - GM or Public
+- Add whisper toggle to basically every roll in the game
+- Tracker:
+  - Add a return to charactersheet
+  - Send skill data (not shown yet).
+
 # 2025-3-11
 
 - Lots of tracker updates.  Still not ready for primetime (but should not break anything)
