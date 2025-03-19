@@ -1755,47 +1755,23 @@
                 <input name="attr_PushCapacityMod" type="number" style="width:13%" value="0" title="Mod value is multiplied x4"/>
             </div>
         </div>
-        <h3>Gear and Tools &#128736;</h3>
-        <div class="quickborder">
-            <label style="width:83%; font-size:13px" >Select your SB + TB value to set Carry, Lift & Push capacity:</label>
-            <select name="attr_GearCarry" style="width:17%">
-                <option disabled style="background:gray;font-weight:bold;color:white;">SB + TB</option>
-                <option value="0.9" >0 (x0.9)</option>
-                <option value="2.25">1 (x2.25)</option>
-                <option value="4.5" >2 (x4.5)</option>
-                <option value="9"   >3 (x9)</option>
-                <option value="18"  >4 (x18)</option>
-                <option value="27"  >5 (x27)</option>
-                <option value="36"  selected>6 (x36)</option>
-                <option value="45"  >7 (x45)</option>
-                <option value="56"  >8 (x56)</option>
-                <option value="67"  >9 (x67)</option>
-                <option value="78"  >10 (x78)</option>
-                <option value="90"  >11 (x90)</option>
-                <option value="112" >12 (x112)</option>
-                <option value="225" >13 (x225)</option>
-                <option value="337" >14 (x337)</option>
-                <option value="450" >15 (x450)</option>
-                <option value="675" >16 (x675)</option>
-                <option value="900" >17 (x900)</option>
-                <option value="1350">18 (x1350)</option>
-                <option value="1800">19 (x1800)</option>
-                <option value="2250">20 (x2250)</option>
-            </select>
-            <!-- end of line-->
-            <label style="width:20%">Carry Max:</label>
-            <input name="attr_GearCarryMax" style="width:16%" type="text" disabled value="@{GearCarry}+@{GearCarryMod}"/>
-            <div class="spacing" style="width:3%"></div>
-            <label style="width:16%">Available:</label>
-            <input name="attr_GearCarryAvailable" style="width:16%" type="text" disabled value="(@{GearCarryMax}-(@{GearCarryCurrent}))"/>
-            <input type="hidden" name="attr_GearCarryCurrent" value="@{gearwt}"/><!-- hidden input needed for repeatingsum -->
-            <div class="spacing" style="width:4%"></div> 
-            <label style="width:9%">Mod:</label>
-            <input name="attr_GearCarryMod" style="width:16%" type="number" value="0" title="Mod value has No multiplier"/>
-            <div class="spacing" style="width:40%"></div>
-            <label style="width:15%">Gear List</label>
-            <input type="checkbox" name="attr_hidegearlist" value="1" class="arrow icon" title="Hide Gear List" style="margin-bottom:5px"/>
-            <div class="spacing" style="width:41%"></div>
+		<!-- end of line-->
+		<input type="hidden" name="attr_GearCarry" value=""/><!-- hidden input needed for script -->
+        <label style="width:20%">Carry Max:</label>
+        <input name="attr_GearCarryMax" style="width:16%" type="text" disabled value="@{GearCarry}+@{GearCarryMod}"/>
+        <div class="spacing" style="width:3%"></div>
+        <label style="width:16%">Available:</label>
+        <input name="attr_GearCarryAvailable" style="width:16%" type="text" disabled value="(@{GearCarryMax}-(@{GearCarryCurrent}))"/>
+        <input type="hidden" name="attr_GearCarryCurrent" value="@{gearwt}"/><!-- hidden input needed for repeatingsum -->
+        <div class="spacing" style="width:4%"></div> 
+        <label style="width:9%">Mod:</label>
+        <input name="attr_GearCarryMod" style="width:16%" type="number" value="0" title="Mod value has No multiplier"/>
+		<!-- end of line-->
+		<div class="quickborder">
+			<div class="spacing" style="width:30%"></div>
+			<label style="width:37%; font-size: 16px;">GEAR AND TOOLS</label>
+            <input type="checkbox" name="attr_hidegearlist" value="1" class="arrow icon" title="Hide Gear List" style="width: 3%; margin-bottom:5px"/>
+            <div class="spacing" style="width:30%"></div>
             <div class="hbody">
                 <fieldset class="repeating_gears">
                     <input name="attr_GearName" style="width:63%" type="text" placeholder="Gear Name"/>
@@ -1809,7 +1785,7 @@
                     <div class="hbody"><textarea style="height:65px" name="attr_GearNotes" placeholder="Gear Description"></textarea></div>
                 </fieldset>
             </div><!--hbody closing div-->
-        </div>
+        </div><!-- quickborder -->
 	</div><!-- rightbox -->
 </div><!-- grid2 -->
 </div>
@@ -4828,6 +4804,71 @@
 </div>
 <!-- Script Section %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-->
 <script type="text/worker">
+/* --- script for SB + TB carry capacity--- */
+on("change:SB change:TB sheet:opened", () => {
+    getAttrs(["SB", "TB"], values => {
+        const SB = +values["SB"];
+        const TB = +values["TB"];
+        var sumofsbtb = SB + TB;
+        var gearcarry = "";
+
+        if (sumofsbtb == 0) {
+            gearcarry = 1.125;
+        } else if (sumofsbtb == 1) {
+            gearcarry = 2.25;
+        } else if (sumofsbtb == 2) {
+            gearcarry = 4.5;
+        } else if (sumofsbtb == 3) {
+            gearcarry = 9;
+        } else if (sumofsbtb == 4) {
+            gearcarry = 18;
+        } else if (sumofsbtb == 5) {
+            gearcarry = 27;
+        } else if (sumofsbtb == 6) {
+            gearcarry = 36;
+        } else if (sumofsbtb == 7) {
+            gearcarry = 45;
+        } else if (sumofsbtb == 8) {
+            gearcarry = 56;
+        } else if (sumofsbtb == 9) {
+            gearcarry = 67;
+        } else if (sumofsbtb == 10) {
+            gearcarry = 78;
+        } else if (sumofsbtb == 11) {
+            gearcarry = 90;
+        } else if (sumofsbtb == 12) {
+            gearcarry = 112;
+        } else if (sumofsbtb == 13) {
+            gearcarry = 225;
+        } else if (sumofsbtb == 14) {
+            gearcarry = 337;
+        } else if (sumofsbtb == 15) {
+            gearcarry = 450;
+        } else if (sumofsbtb == 16) {
+            gearcarry = 675;
+        } else if (sumofsbtb == 17) {
+            gearcarry = 900;
+        } else if (sumofsbtb == 18) {
+            gearcarry = 1350;
+        } else if (sumofsbtb == 19) {
+            gearcarry = 1800;
+        } else if (sumofsbtb == 20) {
+            gearcarry = 2250;
+        } else if (sumofsbtb == 21) {
+            gearcarry = 2700;
+        } else if (sumofsbtb == 22) {
+            gearcarry = 3150;
+        } else if (sumofsbtb == 23) {
+            gearcarry = 3600;
+        } else if (sumofsbtb == 24) {
+            gearcarry = 4050;
+        } else if (sumofsbtb > 25) {
+            gearcarry = 4500;
+        };
+        setAttrs({ "GearCarry": gearcarry });
+    });
+});
+
 /* --- script for auto-calc rank--- */
 on("change:advtotal1 change:advtotal2 change:advtotal3 sheet:opened", function() {
   getAttrs(["advtotal1","advtotal2","advtotal3"], function(values) {
