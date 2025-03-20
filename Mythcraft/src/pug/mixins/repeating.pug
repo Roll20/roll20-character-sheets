@@ -1,33 +1,52 @@
 mixin repeatingSection(name, values)
-	fieldset(class=`repeating_${attrName(name)}`)
-		.grid.descriptor.relative.gap-1
-			+editFlag()
-			.grid.grid-flow-col.gap-2.custom-grid
+	- const attr = attrName(name)
+	fieldset(class=`repeating_${attr}`)
+		.grid.gap-2.relative.repeating-grid
+			.grid.grid-flow-col.gap-2.displayed
+				+repeatingChatButton(attr)
 				each val in values
-					.grid
-						span.display(name=`attr_${attrName(val)}`)
-						.edit.grid.grid-flow-col.gap-2.col-auto-fr.items-center
+					span.display(name=`attr_${attr}`)
+			+editToggle()
+			+collapseToggle()
+			.collapsible.grid.gap-2
+				//- each val in values
+				//- 	.grid.gap-2.col-auto-fr.items-center
+				//- 		h4(data-i18n=val)
+				//- 		span(name=`attr_${attrName(val)}`)
+				.description
+					span.display(name='attr_description')
+			.edit.grid.gap-2
+				.grid.gap-2.grid-flow-col
+					each val in values
+						.grid.gap-2.col-auto-fr.items-center
 							h4(data-i18n=val)
 							+textInput(val)
-			+repeatingChatButton("name")
-			.grid.notes
-				span.display.pl-4(name='attr_notes')
-				+textarea('notes')
+				.description
+					+textarea('description')
+
 
 mixin repeatingList(name, values)
-	.grid.double-border-2.rounded-md.content-start.p-2.repeating-container.relative(class=buttonName(name))
+	.grid.double-border-2.rounded-md.content-start.p-2.relative(class=buttonName(name))
 		+title(name)
 		+subheaders(values)
 		+repeatingSection(name, values)
 
 mixin repeatingSkills(attribute, values)
-	fieldset(class=`repeating_${attribute}_skills`)
-		.grid.gap-1.custom-grid.relative
-			.grid.grid-flow-col.gap-2
+	fieldset(class=`repeating_${attrName(attribute)}_skills`)
+		.grid.gap-2.relative.repeating-grid
+			.grid.grid-flow-col.gap-2.displayed
 				+repeatingRollButton(`${attribute}_skill`)
 				span.text-center(name="attr_bonus")
-			+editFlag()
-			.edit
+			+editToggle()
+			+collapseToggle()
+			.collapsible.grid.gap-2
+				each val in ["category", "bonus", "attribute"]
+					.grid.gap-2.col-auto-fr.items-center
+						h4(data-i18n=val)
+						span(name=`attr_${attrName(val)}`)
+				.description
+					span.display(name='attr_description')
+			.edit.grid.gap-2
 				each val in ["name", "category"]
 					.grid.gap-2.col-auto-fr.items-center
 						h4(data-i18n=val)
@@ -40,10 +59,7 @@ mixin repeatingSkills(attribute, values)
 					select(name="attr_attribute")
 						each val in coreAttributes
 							option(value=val data-i18n=val)
-				.notes
-					+textarea('notes')
-			.collapse
-				span(name="attr_category")
-				.notes
-					span.display.pl-4(name='attr_notes')
+				.description
+					+textarea('description')
+
 	
