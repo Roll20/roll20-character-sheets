@@ -38,9 +38,12 @@
       <input type="checkbox" class="announcements-show" name="attr_show_announcements" value="1" data-i18n-title="close-announcements" title="Close Announcements" />
       <span class="announcements-exit" data-i18n-title="close">*</span><br>
       <h3 data-i18n="latest-announcements">Latest Announcements</h3>
-      <span class="footer">12/6/24</span>
+      <span class="footer">3/19/25</span>
       <ol>
-        <strong>v1.9</strong>
+        <strong>v1.92</strong>
+        <li>Added a validation check to the character name field. Character names that include ')', ']', '}', or '|' will be flagged with an error. These are reserved characters that can cause problems with roll macros and sheetworker processing. Simply omit these problematic characters and/or substitute with a non-special character.</li>
+        <li>Minor adjustments; Willpower/Experience layout. Fixed alignment and hover state for the Artifact dice pool images. Changed the background for the roll template header and the left-aligned the dice type labels.</li>
+        <strong>v1.91</strong>
         <li>Note about character names; Including non-alpha-numeric characters 'may' break sheet rolls/macros. Specifically ')', ']', '}', or '|'. Underscores, dashes, and apostrophes should be fine.</li>
         <li>Changed the artifact dice checkboxes to a drop-down selector.</li>
         <li>Minor adjustments for translations.</li>
@@ -211,7 +214,9 @@
         <div class="monster monster-stat1">
           <div class="header-top monster-stats-box1">
             <input type="checkbox" name="attr_character_name_error" class="hidden error" value="1" />
-            <input class="input-number header-h1" type="text" name="attr_character_name" value="" data-i18n-title="character-name" title="@{character_name} | NOTE: Including non-alpha-numeric characters 'may' break sheet rolls/macros. Specifically ')', ']', '}', or '|'. Underscores, dashes, and apostrophes should be fine." data-i18n-placeholder="monster-name" placeholder="Monster's Name/Type" />
+            <label data-i18n-title="character-name" title="@{character_name} | NOTE: Including non-alpha-numeric characters 'may' break sheet rolls/macros. Specifically ')', ']', '}', or '|'. Underscores, dashes, and apostrophes should be fine.">
+              <input class="input-number header-h1" type="text" name="attr_character_name" value="" data-i18n-placeholder="monster-name" placeholder="Monster's Name/Type" />
+            </label>
           </div>
           <div class="column-header-bottom monster-stats-box2">
             <span data-i18n="move">Move</span>
@@ -502,7 +507,9 @@
           </div>
           <div class="heading-box2">
             <input type="checkbox" name="attr_character_name_error" class="hidden error" value="1" />
-            <input class="input" type="text" name="attr_character_name" value="" data-i18n-title="character-name" title="@{character_name} | NOTE: Including non-alpha-numeric characters 'may' break sheet rolls/macros. Specifically ')', ']', '}', or '|'. Underscores, dashes, and apostrophes should be fine." />
+            <label data-i18n-title="character-name" title="@{character_name} | NOTE: Including non-alpha-numeric characters 'may' break sheet rolls/macros. Specifically ')', ']', '}', or '|'. Underscores, dashes, and apostrophes should be fine.">
+              <input class="input" type="text" name="attr_character_name" value="" data-i18n-title="character-name" />
+            </label>
           </div>
           <div class="heading-box3">
             <span class="label" data-i18n="profession">Profession</span>
@@ -4392,26 +4399,22 @@
     }
     // Check for specific characters that can break a macro
     // can we substitute with an html special?
-    if (/[)|\}\|]/.test(attr)) {
+    if (/[)|\}\|\]]/.test(attr)) {
       return false;
     }
     return true;
   };
 
   // Validate character name for illegal characters
-  on('change:character_name', (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(['character_name'], (v) => {
-      const output = {};
-      const attr = v[`${eventInfo.sourceAttribute}`];
-      // validate input
-      const isText = isAlphaNumericWithSpaces(attr);
-      // clog(`Valid Input?: ${isText}`);
-      // write to a hidden checkbox in html ie 'X_error', CSS to style
-      output[`${eventInfo.sourceAttribute}_error`] = isText === true ? 0 : 1;
-      setAttrs(output, {silent: true});
-    });
-  });
+  const nameChanged = (name, attr) => {
+    const output = {};
+    // validate input
+    const isText = isAlphaNumericWithSpaces(attr);
+    // clog(`Valid Input?: ${isText}`);
+    // write to a hidden checkbox in html ie 'X_error', CSS to style
+    output[`${name}_error`] = isText === true ? 0 : 1;
+    setAttrs(output, {silent: true});
+  };
 
   /* version tracking */
   const newAnnouncement = (old_version, new_version, show_announcement) => {
@@ -4438,7 +4441,7 @@
     // set the sheet version you are upgrading sheet to,
     // and set show_announcement to 1 if you want to force an announcement to be shown.
     // don't set a code_version; we use the switch below for that.
-    const new_version = 1.9;
+    const new_version = 1.92;
     const show_announcement = 0;
     if (!old_version) old_version = 0;
     switch (true) {
@@ -4451,8 +4454,12 @@
         clog('Updating to version 1.77');
         update_to_1_77(old_version);
         break;
+      case old_version >= 1.77 && old_version < 1.92:
+        clog('Updating to version 1.92');
+        update_to_1_92(old_version);
+        break;
       default:
-        // if reach this, all codeversion upgrades are complete
+        // all codeversion upgrades are complete
         // can run your recalculate function to show announcements
         newAnnouncement(old_version, new_version, show_announcement);
     }
@@ -4473,7 +4480,7 @@
         if (v[key]) setter[key] = v[value];
       });
 
-      // MUST set the version to a specific value here, the one where the sheet was updated like this.
+      // set the version
       const current_version = 1.71;
       setter.version = current_version;
       setAttrs(setter, {silent: true}, versionator(current_version));
@@ -4485,11 +4492,22 @@
   const update_to_1_77 = (old_version) => {
     const setter = {};
     localRollMacro();
-    // MUST set the version to a specific value here, the one where the sheet was updated like this.
-    const current_version = 1.9;
+    // set the version
+    const current_version = 1.77;
     setter.version = current_version;
     setAttrs(setter, {silent: true}, versionator(current_version));
     clog('Updating localized rolls to match the dice pool roller.');
+  };
+
+  // character_name validation check
+  const update_to_1_92 = (old_version) => {
+    const setter = {};
+    nameChanged();
+    // set the version
+    const current_version = 1.92;
+    setter.version = current_version;
+    setAttrs(setter, {silent: true}, versionator(current_version));
+    clog('Checking character_name for invalid characters.');
   };
 
   on('sheet:opened', () => {
@@ -4801,7 +4819,7 @@
       let pc = int(v.strength_pc);
       let monster = int(v.strength_monster);
       let forceupdate = 0;
-      clog(`MONSTER/PC STRENGTH SWAP --- tab:${tab} str:${str} pc:${pc} monster:${monster}`);
+      // clog(`MONSTER/PC STRENGTH SWAP --- tab:${tab} str:${str} pc:${pc} monster:${monster}`);
       // check if character existed before strength_pc or _monster stats were introduced.
       if (str > 0) {
         if (pc === 0 || monster === 0) forceupdate = 1;
@@ -6677,6 +6695,14 @@
         setAttrs(output, {silent: true});
         finishRoll(roll.rollId);
       });
+    });
+  });
+
+  on('change:character_name', (eventInfo) => {
+    getAttrs(['character_name'], (v) => {
+      const attr = v[`${eventInfo.sourceAttribute}`];
+      const name = `${eventInfo.sourceAttribute}`;
+      nameChanged(name, attr);
     });
   });
 </script>
