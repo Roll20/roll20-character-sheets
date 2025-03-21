@@ -57966,7 +57966,7 @@ const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void
     const settings = (0, settings_1.getSettings)();
     // Purge cache after we're done
     console.log("Clearing cache on sheet-http");
-    yield makeServerCall(`${settings.sheetHttpUrl}/purge?path=${encodeURIComponent(sheetName)}&repo=${settings.repoName}`, {});
+    yield makeServerCall(`${settings.sheetHttpUrl}/purge?path=${encodeURIComponent(sheetName.replace(/\\(.)/g, '$1'))}&repo=${settings.repoName}`, {});
 });
 exports.processFiles = processFiles;
 const processMetaData = (sheetName, jsonObj) => __awaiter(void 0, void 0, void 0, function* () {
@@ -57987,7 +57987,7 @@ const processMetaData = (sheetName, jsonObj) => __awaiter(void 0, void 0, void 0
         : "";
     return yield makeServerCall(fullUrl, {
         repo: settings.repoName,
-        sheet_folder: sheetName,
+        sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
         options_hash: optionsHash,
     });
 });
@@ -57999,7 +57999,7 @@ const processHTMLFile = (sheetName, fname) => __awaiter(void 0, void 0, void 0, 
     const cssData = yield fs.readFileSync(filePath, { encoding: "utf-8" });
     return yield makeServerCall(fullUrl, {
         repo: settings.repoName,
-        sheet_folder: sheetName,
+        sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
         data: cssData,
     });
 });
@@ -58015,7 +58015,7 @@ const processPreviewImageFile = (sheetName, fname) => __awaiter(void 0, void 0, 
     });
     return yield makeServerCall(fullUrl, {
         repo: settings.repoName,
-        sheet_folder: sheetName,
+        sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
         file_name: fname,
         data: imgData,
     });
@@ -58029,7 +58029,7 @@ const processCSSFile = (sheetName, fname) => __awaiter(void 0, void 0, void 0, f
     const cssData = yield fs.readFileSync(filePath, { encoding: "utf-8" });
     return yield makeServerCall(fullUrl, {
         repo: settings.repoName,
-        sheet_folder: sheetName,
+        sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
         data: cssData,
     });
 });
@@ -58043,7 +58043,7 @@ const processUserOptions = (sheetName, userOptionsObj) => __awaiter(void 0, void
     ].join("/");
     return yield makeServerCall(fullUrl, {
         repo: settings.repoName,
-        sheet_folder: sheetName,
+        sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
         data: userOptionsObj,
     });
 });
