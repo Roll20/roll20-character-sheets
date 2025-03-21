@@ -36,7 +36,7 @@ function migrationCheck() {
 				return functionList;
 		}
 		safeGetAttrs(["character_sheet_version", "data_version", "sheet_initialized"], function(v) {
-				var caller = "migrationCheck";
+				const caller = "migrationCheck";
 				debugLog(caller, "Sheet Initialization Status:", v["sheet_initialized"]);
 				debugLog(caller, "Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
 
@@ -74,34 +74,21 @@ function migrationCheck() {
 				}
 
 				let functionsToCall = [];
-				let firstFunction;
 
 		if (initialized)
 		{
-						/*
-								we run over the possible migrations and check if they are already applied.
-								if not and it is the first migration, than the function name is saved as "firstFunction"
-								if it is not the first migration to apply it is added to "functionsToCall" array
-						*/
-						for (let version of versionsWithMigrations) {
-								if (dataVersion < version) {
-										var functionName = "migrateTo" + version;
-										debugLog(caller, "dataVersion " + dataVersion + " is older than version " + version + " which needs a migration. Invoking migration function: " + functionName);
-										if (firstFunction) {
-												functionsToCall.push(functionName);
-										} else {
-												firstFunction = functionName;
-										}
-								};
-						}
+						functionsToCall = gatherMigrationFunctions(dataVersion);
 				} else {
-			firstFunction = "initializeSheet";
+						functionsToCall.push("initializeSheet");
+						functionsToCall = [ ...functionsToCall, ...gatherMigrationFunctions(dataVersion)];
 				}
 
 				// if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
 				// then we call the function with name "firstFunction"
-				if (firstFunction) {
+				if (functionsToCall.length > 0) {
 						functionsToCall.push("setCurrentVersion");
+						// shift() removes the first item of the array in place and returns it
+						const firstFunction = functionsToCall.shift();
 						window[firstFunction](functionsToCall);
 				}
 		});
