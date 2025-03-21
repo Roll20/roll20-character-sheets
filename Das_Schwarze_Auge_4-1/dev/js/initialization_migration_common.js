@@ -20,78 +20,79 @@ Relevant character sheet versions
 * 20230618: Confirmation/Reaction Buttons
 * 20240414: Regeneration (Sleep)
 */
-function migrationCheck() {
-		function gatherMigrationFunctions(dataVersion)
-		{
-				const caller = "gatherMigrationFunctions()";
+function migrationCheck()
+{
+	function gatherMigrationFunctions(dataVersion)
+	{
+		const caller = "gatherMigrationFunctions()";
 
-				let functionList = [];
-				for (let version of versionsWithMigrations) {
-						if (dataVersion < version) {
-								const functionName = "migrateTo" + version;
-								debugLog(caller, `dataVersion ${dataVersion} is older than version ${version} which needs a migration. Adding migration function: ${functionName}.`);
-								functionList.push(functionName);
-						}
-				}
-				return functionList;
+		let functionList = [];
+		for (let version of versionsWithMigrations) {
+			if (dataVersion < version) {
+				const functionName = "migrateTo" + version;
+				debugLog(caller, `dataVersion ${dataVersion} is older than version ${version} which needs a migration. Adding migration function: ${functionName}.`);
+				functionList.push(functionName);
+			}
 		}
-		safeGetAttrs(["character_sheet_version", "data_version", "sheet_initialized"], function(v) {
-				const caller = "migrationCheck";
-				debugLog(caller, "Sheet Initialization Status:", v["sheet_initialized"]);
-				debugLog(caller, "Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
+		return functionList;
+	}
+	safeGetAttrs(["character_sheet_version", "data_version", "sheet_initialized"], function(v) {
+		const caller = "migrationCheck";
+		debugLog(caller, "Sheet Initialization Status:", v["sheet_initialized"]);
+		debugLog(caller, "Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
 
-				let initialized = v["sheet_initialized"];
-				let dataVersion = parseInt(v["data_version"]);
-				let sheetVersion = parseInt(v["character_sheet_version"]);
+		let initialized = v["sheet_initialized"];
+		let dataVersion = parseInt(v["data_version"]);
+		let sheetVersion = parseInt(v["character_sheet_version"]);
 
-				/*
-				If the character is new, data_version (the attribute) is just an empty string and dataVersion (the variable declared in this function) is NaN.
-				New characters do not need any migration, but sheet initialization to set up the sheet including setting data_version to the current sheet version.
+		/*
+			If the character is new, data_version (the attribute) is just an empty string and dataVersion (the variable declared in this function) is NaN.
+			New characters do not need any migration, but sheet initialization to set up the sheet including setting data_version to the current sheet version.
 
-				Why this is necessary
-				* Sheet-defined attributes such as data_version will change automatically if they are different in a new sheet version.
-				* Once a sheet-defined attribute is changed e. g. via setAttrs(), the value will not change with new sheet version.
-				* If a character was not opened for a long time (before data_version was set via script), the character's data version will update when the value is changed in a new sheet
-				* This would lead to no migrations being performed.
-				* On the other hand data_version could be left at its initial value, but that would mean that every new character would get all migrations unnecessarily!
-				*/
+			Why this is necessary
+			* Sheet-defined attributes such as data_version will change automatically if they are different in a new sheet version.
+			* Once a sheet-defined attribute is changed e. g. via setAttrs(), the value will not change with new sheet version.
+			* If a character was not opened for a long time (before data_version was set via script), the character's data version will update when the value is changed in a new sheet
+			* This would lead to no migrations being performed.
+			* On the other hand data_version could be left at its initial value, but that would mean that every new character would get all migrations unnecessarily!
+		*/
 
-				// Initialization First Safeguard Check (function not called based on one attribute)
-				if (
-						initialized === 0
-						||
-						initialized === "0"
-						||
-						initialized === "false"
-						||
-						initialized === false
-				) {
-						debugLog(caller, "initialized is false.");
-						initialized = false;
-				} else {
-						debugLog(caller, "initialized is true. Skipping initialization.");
-						initialized = true;
-				}
+		// Initialization First Safeguard Check (function not called based on one attribute)
+		if (
+			initialized === 0
+			||
+			initialized === "0"
+			||
+			initialized === "false"
+			||
+			initialized === false
+		) {
+			debugLog(caller, "initialized is false.");
+			initialized = false;
+		} else {
+			debugLog(caller, "initialized is true. Skipping initialization.");
+			initialized = true;
+		}
 
-				let functionsToCall = [];
+		let functionsToCall = [];
 
 		if (initialized)
 		{
-						functionsToCall = gatherMigrationFunctions(dataVersion);
-				} else {
-						functionsToCall.push("initializeSheet");
-						functionsToCall = [ ...functionsToCall, ...gatherMigrationFunctions(dataVersion)];
-				}
+			functionsToCall = gatherMigrationFunctions(dataVersion);
+		} else {
+			functionsToCall.push("initializeSheet");
+			functionsToCall = [ ...functionsToCall, ...gatherMigrationFunctions(dataVersion)];
+		}
 
-				// if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
-				// then we call the function with name "firstFunction"
-				if (functionsToCall.length > 0) {
-						functionsToCall.push("setCurrentVersion");
-						// shift() removes the first item of the array in place and returns it
-						const firstFunction = functionsToCall.shift();
-						window[firstFunction](functionsToCall);
-				}
-		});
+			// if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
+			// then we call the function with name "firstFunction"
+			if (functionsToCall.length > 0) {
+				functionsToCall.push("setCurrentVersion");
+				// shift() removes the first item of the array in place and returns it
+				const firstFunction = functionsToCall.shift();
+				window[firstFunction](functionsToCall);
+			}
+	});
 }
 
 function setCurrentVersion() {
@@ -100,11 +101,11 @@ function setCurrentVersion() {
 }
 
 function callNextMigration(migrationChain) {
-		if (migrationChain && migrationChain.length > 0) {
-				let nextMigration = migrationChain.shift();
-				if (nextMigration) {
-						window[nextMigration](migrationChain);
-				}
+	if (migrationChain && migrationChain.length > 0) {
+		let nextMigration = migrationChain.shift();
+		if (nextMigration) {
+			window[nextMigration](migrationChain);
 		}
+	}
 }
 /* initialization migration common end */
