@@ -478,6 +478,7 @@
 									<button type="action" class="button button-Power-END" tabindex="-1" name="act_buttonPrimaryPropulsionEND" title="%{buttonPrimaryPropulsionEND}	" tabindex="-1">END</button>
 									<div class="custom-select-propulsion">
 										<select name="attr_primaryNoncombatMultiple" title="@{attr_primaryNoncombatMultiple}" tabindex="-1">
+											<option value="0">NC &#215;1</option>
 											<option value="1" selected>NC &#215;2</option>
 											<option value="2">NC &#215;4</option>
 											<option value="3">NC &#215;8</option>
@@ -628,6 +629,7 @@
 									<button type="action" class="button button-Power-END" tabindex="-1" name="act_buttonSecondaryPropulsionEND" title="%{buttonSecondaryPropulsionEND}	" tabindex="-1">END</button>
 									<div class="custom-select-propulsion">
 										<select name="attr_secondaryNoncombatMultiple" title="@{attr_secondaryNoncombatMultiple}" tabindex="-1">
+											<option value="0">NC &#215;1</option>
 											<option value="1" selected>NC &#215;2</option>
 											<option value="2">NC &#215;4</option>
 											<option value="3">NC &#215;8</option>
@@ -9932,7 +9934,7 @@
 					<input type="text" value="0" name="attr_enhancerWellCP" readonly tabindex="-1"/>
 				</div>
 				
-			 	<div class="subitem-skillsTab-flex-container-levels-row">
+				 <div class="subitem-skillsTab-flex-container-levels-row">
 					<h1>Interaction Skill Levels</h1>
 					<input type="number" name="attr_interactionLevels" min="0" value="0" tabindex="440"/>
 					<input type="text" name="attr_interactionLevelsCP" value="0" readonly tabindex="-1"/>
@@ -15942,7 +15944,7 @@
 			
 			<div class="item-version-information">
 				<!-- Update version before release. -->
-				<input type="text" value="4.5" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+				<input type="text" value="4.51" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 			</div>
 		</div>
 		
@@ -17038,8 +17040,8 @@
 			version = 4.10;
 		}
 		
-		if (version < 4.5) {
-			version = 4.5;
+		if (version < 4.51) {
+			version = 4.51;
 		}
 		
 		if (version != origVersion) {
@@ -22956,7 +22958,7 @@
 				
 				if ((remainder > limitD3) && (remainder < limitD6)) {
 					numberOfD3 = 1;
-				} else if (remainder > limidD6) {
+				} else if (remainder > limitD6) {
 					numberOfD6 += 1;
 				}
 			} else {
@@ -23094,7 +23096,7 @@
 		
 		var weaponId = String(num).padStart(2,'0');
 		
-		on(`change:weaponDamage${weaponId} change:weaponAdvantage${weaponId} change:weaponDamageType${weaponId} change:weaponCSL${weaponId} change:weaponEnhancedByStr${weaponId} change:weaponStrengthMin${weaponId} change:weaponStrength${weaponId} change:optionD6MinusOne`, function () {
+		on(`change:weaponDamage${weaponId} change:weaponAdvantage${weaponId} change:weaponDamageType${weaponId} change:weaponCSL${weaponId} change:weaponEnhancedByStr${weaponId} change:weaponStrengthMin${weaponId} change:weaponStrength${weaponId} change:optionD6MinusOne change:optionWeaponDamageCap`, function () {
 			getAttrs(["weaponDamage"+weaponId, "weaponAdvantage"+weaponId, "weaponDamageType"+weaponId, "weaponCSL"+weaponId, "optionWeaponDamageCap", "optionD6MinusOne", "weaponEnhancedByStr"+weaponId, "weaponStrengthMin"+weaponId, "weaponStrength"+weaponId, "strengthNet"], function(values) {
 				
 				var attributes = new Object();
@@ -23116,7 +23118,7 @@
 				let strengthEnhanced = (values["weaponEnhancedByStr"+weaponId] === "on") ? true : false;
 				let strengthApplied = parseInt(values["weaponStrength"+weaponId])||0;
 				let minStrength = parseInt(values["weaponStrengthMin"+weaponId])||0;
-				let stengthLevels = 0;
+				let strengthLevels = 0;
 				let adjustedDC = 0;
 				let adjustedDamage = theDamage;
 				let penaltyOCV = 0;
@@ -23152,7 +23154,7 @@
 				}
 				
 				// Adjust DC due to Strength levels and CSLs.
-				if (damageLevels > theDC) {
+				if (capDamage && (damageLevels > theDC)) {
 					adjustedDC = 2*theDC;
 				} else {
 					adjustedDC = theDC + damageLevels;

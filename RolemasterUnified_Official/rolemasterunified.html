@@ -2197,8 +2197,15 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 <input type='hidden' name='attr_sheetselect' class='sheetselect'>
 <div class='creaturesheet'>
 
+<div style='float:right'>
+  <select name='attr_whispertype' class='fancyselect'>
+    <option value=''>Public</option>
+    <option value='/w gm'>GM Only</option>
+  </select>
+</div>
 
 <h1 class='creaturetitle'><span name='attr_character_name'>Creature</span></h1>
+
 
 <div class='creature-multicolumn'>
 <div class='creaturestats'>
@@ -2591,6 +2598,8 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 <div class='trackersheet'>
 
   <h1>Oh my god; it's a tracker!</h1>
+  
+  <button type='action' name='act_trackedreturntocharacter' class='fancybutton'>Revert to Character</button>
 
   <!-- Toolbar -->
   <div class='fancybox'>
@@ -2662,8 +2671,8 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
         </button>
       </div>
 
+      <!-- Skills -->
       <div class='span4'>
-        Percepion 55; Footwork 22; Runnning 23
       </div>
 
       <div class='span2'>
@@ -2703,8 +2712,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
 
 <div style='float:right'>
-  <input type='hidden' name='attr_workpending' class='hidenext'>
-  <span class="loader"></span>
+  <select name='attr_whispertype' class='fancyselect'>
+    <option value=''>Public</option>
+    <option value='/w gm'>GM Only</option>
+  </select>
 </div>
 
 
@@ -5676,7 +5687,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 1e92774fe662c44a87460c7b8bd9ddb77dcf570f
+Revision 571c18dfe0cc142f19928b790f79d98888a6ddc5
 
 
 <hr>
@@ -7998,7 +8009,7 @@ RMUSkills.handleSkillRoll = function(cdata, usemod) {
     additionalmodstr = "[[ ?{Modifier|0} ]] {\{modifier=$[[2]]}} "
   }
 
-  startRoll("&{template:rmuskill} [[ 1d100!>96 ]] [[ 1d100!>96 ]] " +
+  startRoll("@{whispertype} &{template:rmuskill} [[ 1d100!>96 ]] [[ 1d100!>96 ]] " +
 	  additionalmodstr +
 	  "{\{roll=$[[0]]}} " +
 	  "{\{oeroll=$[[1]]}} " +
@@ -8955,7 +8966,7 @@ onCheck(spellcastevents.join(" "), (ev) => {
 
 //	`Casting ${name}`; // So far nothing to report
 	console.log(mod, mlog);
-	startRoll("&{template:rmuspell} " +
+	startRoll("@{whispertype} &{template:rmuspell} " +
 	      "[[ 1d100!>96 ]] [[ 1d100!>96 ]] " +
 	      "{\{roll=$[[0]]}} " +
 	      "{\{oeroll=$[[1]]}} " +
@@ -9260,7 +9271,7 @@ console.log("RRs init\n");
      const type = ev.htmlAttributes['data-rr']
      const pretty = ev.htmlAttributes['data-rrpretty']
      const modstr = (usemod) ? "[[ ?{Modifier|0} ]] {\{mod=$[[4]]}} " : "";
-     startRoll("&{template:rmurr} " +
+     startRoll("@{whispertype} &{template:rmurr} " +
 	`[[ [[ 1d100!>96 ]] + [[ 1d100!>96 ]] + [[ @{rr_${type}_bonus} ]] ]] ` +
 	modstr +
 	"{\{firstroll=$[[0]]}} " +
@@ -14214,7 +14225,7 @@ function sizeFromNumeric(value) {
 	// FIXME: Entity should be all; not just )
 	cdata.targetescaped = cdata.targetname.replaceAll(")", '&#41;');
 
-	const roll_string = "&{template:rmuattack} " +
+	const roll_string = "@{whispertype} &{template:rmuattack} " +
 	    `[[ [[ 1d100!>96 ]] + ${attackmod} ]] ` +
 	    "[[ 1d100 ]] " + // crit roll
 	    `{\{name=${cdata.character}}} ` +
@@ -14335,7 +14346,7 @@ function sizeFromNumeric(value) {
     });
 
     attacks.getTargetData = function(whom) {
-	const roll_string = "&{template:rmuattacktarget} [[1d20]]  " +
+	const roll_string = "@{whispertype} &{template:rmuattacktarget} [[1d20]]  " +
 	    "{\{who=@{character_name}}} " +
 	    `{\{targetname=[[0[@{${whom}|character_name}] ]]}} ` +
 	    `{\{targetsize=[[0[@{${whom}|size}] ]]}} ` +
@@ -14381,7 +14392,7 @@ function sizeFromNumeric(value) {
 
 
     onCheck('clicked:rollcrit', (ev) => {
-	const roll_string = "&{template:rmucritical}" +
+	const roll_string = "@{whispertype} &{template:rmucritical}" +
 		"{\{who=@{character_name}}}" +
 		"{\{roll=[[1d100]]}}" +
 		"{\{type=[[0[?{CriticalType|Acid,A|Cold,C|Electricity,E|Grapple,G|Heat,H|" +
@@ -14416,7 +14427,7 @@ function sizeFromNumeric(value) {
     });
 
     onCheck('clicked:rollcritselect', (ev) => {
-	const roll_string = "&{template:rmucriticallookup}" +
+	const roll_string = "@{whispertype} &{template:rmucriticallookup}" +
 		"{\{who=@{character_name}}}" +
 		"{\{roll=[[?{What crit result?}]]}}" +
 		"{\{type=[[0[?{CriticalType|Acid,A|Cold,C|Electricity,E|Grapple,G|Heat,H|" +
@@ -14658,7 +14669,7 @@ onCheck(actionevents, (ev) => {
   select = select.replace("_x", "")
 
   // Send to chat as a rollmessage
-  startRoll(`&{template:rmuactionmsg}  {\{who=@{character_name}}} {\{ap=${ev.newValue}}} ` +
+  startRoll(`@{whispertype} &{template:rmuactionmsg}  {\{who=@{character_name}}} {\{ap=${ev.newValue}}} ` +
 	` {\{action=[[0]]}} {\{whoescaped=[[0[@{character_name}] ]]}}`,
     roll => {
 	console.log(roll);
@@ -14674,7 +14685,7 @@ onCheck("change:aptrack_freeused", (_) => { handleFreeClicked(); });
 onCheck("change:aptrack_loaded", (ev) => {
   console.log(ev);
   if (ev.newValue == 'on') {
-    startRoll(`&{template:rmuactionload}  {\{who=@{character_name}}} `, roll => {
+    startRoll(`@{whispertype} &{template:rmuactionload}  {\{who=@{character_name}}} `, roll => {
 	finishRoll(roll.rollId);
     });
   } else {
@@ -15098,7 +15109,7 @@ onCheck("clicked:enduranceroll", (_) => {
     // FIXME: Encumberance penalty as well
     getAttrs(['character_name', 'endurance', 'fatigue', 'injurypenalty',
 	      'hppenalty', 'hp'], (ev) => {
-	const roll_string = "&{template:rmuendurance} " +
+	const roll_string = "@{whispertype} &{template:rmuendurance} " +
 	    "[[ [[ 1d100!>96 ]] + [[ 1d100!>96 ]] ]] " +
 	    "{\{firstroll=$[[0]]}} " +
 	    "{\{secondroll=$[[1]]}} " +
@@ -15223,7 +15234,7 @@ function updatePenalties() {
 
 /** resting for minutes just recovers fatigue. */
 onCheck("clicked:statusrest", (_) => {
-  startRoll("&{template:rmurest}" +
+  startRoll("@{whispertype} &{template:rmurest}" +
       "{\{who=@{character_name}}}" +
       "{\{rests=rests}}" +
       "{\{period=[[?{How many minutes?}]]}}" +
@@ -15256,7 +15267,7 @@ onCheck("clicked:statusrest", (_) => {
 
 onCheck("clicked:rollinitiative", () => {
   // roll20 treats floor as round to negative infinity, so ceil since they should be neagtive
-  startRoll('&{template:rmuinit} [[ [[ 2d10 ]] + @{initiative} + [[ceil(@{statuspenalty} / 10)]] &{tracker}]] ' +
+  startRoll('@{whispertype} &{template:rmuinit} [[ [[ 2d10 ]] + @{initiative} + [[ceil(@{statuspenalty} / 10)]] &{tracker}]] ' +
       '{\{actor=@{character_name} }} ' +
       '{\{bonus=@{initiative} }} ' +
       '{\{total=$[[2]]}} {\{roll=$[[0]]}} ' +
@@ -15606,14 +15617,22 @@ creature.newCreature = function(name, jdata) {
 
   // "data-skills": [ { "skill": "Running", "bonus": 43 } ],
   const skills = creature.parseJSONMaybe(cdata['data-skills'], [])
-  console.log("skills is", skills);
-  for (const { skill, bonus } of skills) {
+  const skillcompressed = []
+  for (const { skill, bonus, ranks} of skills) {
     console.log('skills', skill, bonus);
     const rowid = generateRowID();
     const prefix = `repeating_creatureskill_${rowid}`;
     updates[`${prefix}_name`] = skill;
     updates[`${prefix}_bonus`] = bonus;
+    if (ranks) {
+      updates[`${prefix}_ranks`] = ranks;
+      skillcompressed.push(`${skill} (${ranks}) ${bonus}`)
+    } else {
+      skillcompressed.push(`${skill} ${bonus}`)
+    }
   }
+  updates.skillstring = skillcompressed.join(";");
+  
 
   {
     const talents = creature.parseJSONMaybe(cdata['data-talents'], [])
@@ -16116,7 +16135,7 @@ console.log(injury);
 	log += '+75&nbsp;[Magic and Herbalism] ';
     }
 
-    startRoll("&{template:rmurecovery} " +
+    startRoll("@{whispertype} &{template:rmurecovery} " +
 	"[[ 1d100!>96 ]] [[ 1d100!>96 ]] " +
 	     "{\{roll=$[[0]]}} " +
 	     "{\{oeroll=$[[1]]}} " +
@@ -16464,6 +16483,9 @@ function upgradeV6to7() {
 
 let tracker = {}
 
+onCheck("clicked:trackedreturntocharacter", () => {
+  setAttrs({sheetselect: "playersheet"});
+});
 
 onCheck("clicked:trackerinit", () => {
   console.log("Tracker sheet start");
@@ -16504,6 +16526,7 @@ const fields = {
     trackedparrymod: { type: "number", field: "parrymod" },
     trackedothermod: { type: "number", field: "othermod" },
     trackedtokenid: { type: "string", field: "token_id" },
+    trackedskills: { type: "skillstring", field: "skillstring" },
 }
 
 tracker.extractResults = function(prefix, roll) {
@@ -16515,6 +16538,8 @@ tracker.extractResults = function(prefix, roll) {
       results[prefix + field] = attacks.getDataFromRoll(rr[field].expression);
     } else if (info.type == 'number') {
       results[prefix + field] = parseInt(attacks.getDataFromRoll(rr[field].expression));
+    } else if (info.type == 'skillstring') {
+      tracker.handleSkillString(attacks.getDataFromRoll(rr[field].expression), results);
     } else {
       rmuerror("Unkown type");
     }
@@ -16526,7 +16551,7 @@ tracker.buildString = function(whom) {
   let reqs = ["&{template:rmuattacktarget} [[1d20]]"];
   for (const field in fields) {
     const info = fields[field];
-    if (info.type == 'string') {
+    if (info.type == 'string' || info.type == 'skillstring') {
       reqs.push(`{\{${field}=[[0[@{${whom}|${info.field}}] ]]}}`);
     } else if (info.type == 'number') {
       reqs.push(`{\{${field}=[[0[@{${whom}|${info.field}}] ]]}}`);
@@ -16546,8 +16571,27 @@ tracker.dataGet = function(whom, rowid) {
     // then add the prefix
     const results = tracker.extractResults(prefix, roll);
     finishRoll(roll.rollId);
+    console.log(results);
     setAttrs(results);
   });
+}
+
+
+tracker.handleSkillString = function(string, updates) {
+  console.log("Handle skill string", string);
+  if (!string || string == '') return;
+  let skills = string.split(';');
+  console.log(skills);
+  for (skill of skills) {
+    console.log(">", skill);
+    const match = skill.match(/^(.*) (\d*)$/);
+    console.log(match, match.length);
+    if (match.length < 3) {
+      continue;
+    }
+   // updates[`repeat_trackedskill${rowid}_name`] = match[1];
+   // updates[`repeat_trackedskill${rowid}_bonus`] = match[2];
+  }
 }
 
 console.log("Tracker sheet loaded");
