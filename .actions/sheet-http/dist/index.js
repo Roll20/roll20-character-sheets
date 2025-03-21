@@ -58066,15 +58066,19 @@ const makeServerCall = (fullUrl, dataObj) => __awaiter(void 0, void 0, void 0, f
 });
 exports.makeServerCall = makeServerCall;
 const getSheetJsonObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
-    const filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "sheet.json");
+    let filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "sheet.json");
     console.warn("Filepath for Json:", filePath);
+    filePath = filePath.replace(/\\(.)/g, '$1');
+    console.warn("Filepath for Json Post cleanup:", filePath);
     const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
     const jsObj = JSON.parse(jsonFile);
     return jsObj;
 });
 exports.getSheetJsonObj = getSheetJsonObj;
 const getSheetRootTranslationJsonObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
-    const filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "translation.json");
+    let filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "translation.json");
+    filePath = filePath.replace(/\\(.)/g, '$1');
+    console.warn("Filepath for translation post cleanup:", filePath);
     try {
         const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
         const jsObj = JSON.parse(jsonFile);
