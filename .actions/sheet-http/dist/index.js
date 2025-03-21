@@ -58096,7 +58096,8 @@ const getSheetRootTranslationJsonObj = (sheetName) => __awaiter(void 0, void 0, 
     }
 });
 const getFileNamesObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
-    const dirPath = path.join(process.env["GITHUB_WORKSPACE"], sheetName);
+    console.warn("running getFileNamesObj");
+    const dirPath = path.join(process.env["GITHUB_WORKSPACE"], sheetName.replace(/\\(.)/g, '$1'));
     const data = yield fs.readdirSync(dirPath);
     return data;
 });
