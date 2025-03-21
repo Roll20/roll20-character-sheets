@@ -57907,7 +57907,8 @@ const settings_1 = __nccwpck_require__(1685);
 const remarkable_1 = __nccwpck_require__(191);
 const translationCode_1 = __nccwpck_require__(2708);
 const constructFilePath = (sheetName, moreParts) => {
-    return path.join(process.env["GITHUB_WORKSPACE"], sheetName, ...moreParts);
+    const filepath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, ...moreParts);
+    return filepath.replace(/\\(.)/g, '$1'); // Remove escaping backslashes
 };
 exports.constructFilePath = constructFilePath;
 const processAdvancedSheet = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void 0, function* () {
@@ -58066,7 +58067,7 @@ const makeServerCall = (fullUrl, dataObj) => __awaiter(void 0, void 0, void 0, f
 exports.makeServerCall = makeServerCall;
 const getSheetJsonObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
     const filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "sheet.json");
-    console.warn(filePath);
+    console.warn("Filepath for Json:", filePath);
     const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
     const jsObj = JSON.parse(jsonFile);
     return jsObj;
