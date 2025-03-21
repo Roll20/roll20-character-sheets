@@ -21,6 +21,20 @@ Relevant character sheet versions
 * 20240414: Regeneration (Sleep)
 */
 function migrationCheck() {
+		function gatherMigrationFunctions(dataVersion)
+		{
+				const caller = "gatherMigrationFunctions()";
+
+				let functionList = [];
+				for (let version of versionsWithMigrations) {
+						if (dataVersion < version) {
+								const functionName = "migrateTo" + version;
+								debugLog(caller, `dataVersion ${dataVersion} is older than version ${version} which needs a migration. Adding migration function: ${functionName}.`);
+								functionList.push(functionName);
+						}
+				}
+				return functionList;
+		}
 		safeGetAttrs(["character_sheet_version", "data_version", "sheet_initialized"], function(v) {
 				var caller = "migrationCheck";
 				debugLog(caller, "Sheet Initialization Status:", v["sheet_initialized"]);
