@@ -57926,11 +57926,14 @@ exports.processAdvancedSheet = processAdvancedSheet;
 const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void 0, function* () {
     // First thing that has to be handled is the metaData and sheet options
     // This is important as some later things work off
+    console.warn("About to start Meta Data");
     yield processMetaData(sheetName, sheetJsonObj);
     // Lets go ahead and hand the user options as we have that data already
     const jsonObj = !sheetJsonObj.useroptions ? {} : sheetJsonObj.useroptions;
+    console.warn("About to start user options");
     yield processUserOptions(sheetName, jsonObj);
     let fnames = yield getFileNamesObj(sheetName);
+    console.warn("About to start Translations");
     // So translations are fun. We have some situations.
     // Rather than cram it in the loop below here we'll just run processTranslatins
     yield (0, translationCode_1.processTranslations)(fnames, sheetName);
@@ -57943,6 +57946,7 @@ const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void
         console.log("CSS Upload passed no css file in sheet.json");
     }
     else {
+        console.warn("About to start css");
         yield processCSSFile(sheetName, cssFilename);
     }
     // Walk through files and lets get this rolling
@@ -57951,13 +57955,16 @@ const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void
         // as the root can have a lot of crap
         if (fn.toLowerCase().includes(".html")) {
             if (!sheetJsonObj.html) {
+                console.warn("About to start html 1");
                 yield processHTMLFile(sheetName, fn);
             }
             else if (sheetJsonObj.html && sheetJsonObj.html == fn) {
+                console.warn("About to start html 2");
                 yield processHTMLFile(sheetName, fn);
             }
         }
         else if (sheetJsonObj.preview && sheetJsonObj.preview == fn) {
+            console.warn("About to start preview image");
             yield processPreviewImageFile(sheetName, fn);
         }
         // Translations already done above
