@@ -95,7 +95,7 @@ function migrationCheck() {
 }
 
 function setCurrentVersion() {
-	var currentVersion = versionsWithMigrations.slice(-1).pop();
+	const currentVersion = versionsWithMigrations.at(-1);
 	safeSetAttrs({ "data_version": currentVersion });
 }
 
