@@ -79,6 +79,8 @@
           <div class="col-custom transparent-bg">
             <label class="centered max-hit-points">
               <input name="attr_hp_max" type="number" class="num" value="0" />
+              <!-- sync with sheetworker for token progress bar for hp_curr -->
+              <input name="attr_hp_curr_max" type="hidden" value="0" />
               <span class="monospace note" data-i18n="max-hit-points-u">Max</span>
             </label>
           </div>
@@ -306,7 +308,7 @@
           <span class="monospace" data-i18n="miseries-u">Miseries</span>
         </label>
         <div class="miseries white-bg">
-          <label><input name="attr_miseries" type="radio" value="0" selected><span>-</span></label>
+          <label><input name="attr_miseries" type="radio" value="0" checked><span>-</span></label>
           <label><input name="attr_miseries" type="radio" value="1"><span>1</span></label>
           <label><input name="attr_miseries" type="radio" value="2"><span>2</span></label>
           <label><input name="attr_miseries" type="radio" value="3"><span>3</span></label>
@@ -823,11 +825,22 @@
   });
 
   // sync name change to character_name
+  // enables token name nameplate
   on('change:char_name', (eventInfo) => {
-    console.log(`Change detected: ${eventInfo.sourceAttribute}`);
     setAttrs({
       character_name: eventInfo.newValue,
       silent: true,
+    });
+  });
+
+  // sync hp_curr_max to hp_max
+  // enables token progress bar
+  on('sheet:opened change:hp_max', (eventInfo) => {
+    getAttrs(['hp_max'], (v) => {
+      const output = {};
+      const hpMax = +v['hp_max'] || 0;
+      output.hp_curr_max = hpMax;
+      setAttrs(output, {silent: true});
     });
   });
 </script>
