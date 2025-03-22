@@ -43,6 +43,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var mentalAttributes = ["awareness", "intellect", "charisma"];
 var metaphysicAttributes = ["luck", "coordination"];
 var physicalAttributes = ["strength", "dexterity", "endurance"];
@@ -56,6 +67,49 @@ var fortitude = ["fortitude_base", "endurance"];
 var logic = ["logic_base", "intellect"];
 var reflexes = ["reflexes_base", "dexterity"];
 var willpower = ["willpower_base", "charisma"];
+var dropWarning = function (v) {
+    console.log("%c Compendium Drop Error: ".concat(v), "color: orange; font-weight:bold");
+};
+var dropAttrs = ["drop_name", "drop_data", "drop_content"];
+var handle_drop = function () {
+    getAttrs(dropAttrs, function (v) {
+        var _a;
+        if (!v.drop_name || !v.drop_data) {
+            return;
+        }
+        var page = {
+            name: v.drop_name,
+            data: (_a = parseJSON(v.drop_data)) !== null && _a !== void 0 ? _a : v.drop_data,
+            content: v.drop_content
+        };
+        var Category = page.data.Category;
+        switch (Category) {
+            case "Creatures":
+            case "Backgrounds":
+            case "Professions":
+                handle_bop(page);
+                break;
+            case "Skills":
+                handle_skills(page);
+                break;
+            default:
+                dropWarning("Unknown category: ".concat(Category));
+        }
+        setAttrs({
+            drop_name: "",
+            drop_data: "",
+            drop_content: "",
+            drop_category: ""
+        }, {
+            silent: true
+        });
+    });
+};
+["data"].forEach(function (attr) {
+    on("change:drop_".concat(attr), function () {
+        handle_drop();
+    });
+});
 action_points.forEach(function (attr) {
     on("change:".concat(attr), function () {
         getAttrs(action_points, function (values) {
@@ -198,6 +252,83 @@ var versioning = function (version) { return __awaiter(_this, void 0, void 0, fu
         return [2];
     });
 }); };
+var getRow = function (section) { return "repeating_".concat(section, "_").concat(generateRowID()); };
+var getUpdate = function (attrs, page, repeatingRow) {
+    var update = {};
+    attrs.forEach(function (attr) {
+        var _a, _b;
+        var sheetAttr = repeatingRow ? "".concat(repeatingRow, "_").concat(attr) : attr;
+        if ((_a = page[attr]) !== null && _a !== void 0 ? _a : page.data[attr]) {
+            update[sheetAttr] = (_b = page[attr]) !== null && _b !== void 0 ? _b : roll20Attribute(attr, page.data[attr]);
+        }
+    });
+    if (repeatingRow) {
+        update["".concat(repeatingRow, "_toggle_edit")] = false;
+    }
+    return update;
+};
+var parseJSON = function (jsonString) {
+    try {
+        if (typeof jsonString === "object") {
+            return jsonString;
+        }
+        return JSON.parse(jsonString);
+    }
+    catch (e) {
+        console.log("Error parsing JSON: ".concat(jsonString));
+        return undefined;
+    }
+};
+var processDataArrays = function (array, callback) {
+    if (array === undefined) {
+        return;
+    }
+    var parsed = typeof array === "string" ? parseJSON(array) : array;
+    var map = parsed.map(function (e) { return callback(e); });
+    return map === null || map === void 0 ? void 0 : map.reduce(function (acc, val) { return (__assign(__assign({}, acc), val)); });
+};
+var resetRepeatingRows = function (sections) {
+    sections.forEach(function (section) {
+        getSectionIDs("repeating_".concat(section), function (ids) {
+            ids.forEach(function (id) {
+                removeRepeatingRow("repeating_".concat(section, "_").concat(id));
+            });
+        });
+    });
+};
+var resetSkillList = function (npcSkills) {
+    console.log(npcSkills);
+};
+var roll20Attribute = function (attr, value) {
+    if (attr === "skill" && typeof value === "string") {
+        return "@{".concat(createAttributeName(value), "}");
+    }
+    return value;
+};
+var handle_bop = function (page) {
+    var attrs = ["name", "occupation", "description"];
+    var row = getRow("additional-info");
+    var update = getUpdate(attrs, page, row);
+    update["".concat(row, "_category")] = page.data.Category;
+    try {
+        setAttrs(update, { silent: true });
+    }
+    catch (e) {
+        dropWarning("Error setting attributes: ".concat(e));
+    }
+};
+var handle_skills = function (page) {
+    var attrs = ["name", "category", "description"];
+    var row = getRow("skills");
+    var update = getUpdate(attrs, page, row);
+    update["".concat(row, "_bonus")] = 1;
+    try {
+        setAttrs(update, { silent: true });
+    }
+    catch (e) {
+        dropWarning("Error setting attributes: ".concat(e));
+    }
+};
 var convertIntegerNegative = function (number) {
     return number > 0 ? -Math.abs(number) : number;
 };
