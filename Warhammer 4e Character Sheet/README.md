@@ -93,6 +93,7 @@ Mar 22nd 2025 v1.76
 - Fixed Offhand weapon not adding Strike Might Blow dmg in the roll template.
 - Fixed skill test rolls showing the Drunk modifier when it wasnt actually applying to them.
 - Fixed Frenzy not always adding extra dmg to Melee attacks correctly
+- Fixed Entangle not working to Melee mainhand attacks
 
 
 Feb 19th 2025 v1.75c
