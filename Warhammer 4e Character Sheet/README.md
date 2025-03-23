@@ -83,7 +83,7 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
 Mar 22nd 2025 v1.76
 
-- New High Elf Player's Guide support, including Yenlui/Talents and skills for HE career's.
+- New High Elf Player's Guide support, including Yenlui and Talents for HE career's.
 - New Sword-dancing casting support, adds new spellbook page for Sword-dancing spells. And added to Quick Cast menu.
 - New High Magic (Qhaysh) added to list of Arcane Magic types, and channeling. And added to Quick Cast menu.
 - Simple Yenlui implementation for records only.
