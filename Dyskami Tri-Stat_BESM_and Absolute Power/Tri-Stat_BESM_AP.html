@@ -2113,7 +2113,7 @@
 <!-- Sheet Workers -->
 <script type="text/worker">
     /* Global Variables */
-    const global_sheet_current_version = 0.3;
+    const global_sheet_current_version = 0.4;
     const all_attributes = ['absorption','alternate form','alternate identity','armor','attack mastery','augmented','capacity','change state','cognition','combat technique','companion','connected','control environment','conversion','data access','defense mastery','dimension walk','dynamic powers','elasticity','enemy attack','enemy defense','energized','exorcism','expertise','extra actions','extra arms','extra defenses','features','flight','force field','ground speed','healing','heightened awareness','heightened senses','illusion','immovable','immunity','immutable','inspire','jumping','massive damage','melee attack','melee defense','merge','metamorphosis','mimic','mind control','mind shield','minions','mulligan','nullify','plant control','pocket dimension','portal','power flux','power variation','projection','ranged attack','ranged defense','regeneration','reincarnation','resilient','sensory block','sixth sense','size change','skill group','skills','social mastery','spaceflight','special movement','summon creatures','supersense','superspeed','superstrength','swarm','taunt','telekinesis','telepathy','teleport','tough','transfer','transmute','tunneling','unaffected','unassailable','undetectable','unknown power','water speed','wealth','weapon'];
     const all_conditions = ['anemic','blinded','contagious','continuing','dead','demoralized','drained','incapacitated','incurable','irritant','lethargic','prone','serious injury','stunned','tangled','unconscious'];
     const all_defects = ['achilles heel','awkward size','bane','blind fury','conditional ownership','confined','cursed','demure','easily distracted','fragile','hounded','impaired manipulation','impaired speech','inept attack','inept defense','involuntary change','ism','magnet','marked','nemesis','nightmares','no healing','obligated','phobia','physical impairment','red tape','reduced damage','sensory impairment','shortcoming','significant other','skeleton in the closet','social fault','special requirement','unappealing','unique defect','unsettled','vulnerability','wanted','weak point'];
@@ -3088,11 +3088,12 @@
 
     /* Utility Functions */
     async function upgradeSheetVersion(cache, set_values) {
-        let sheet_version = parseFloat(cache.static_sheet_settings_version);
         const temp = {};
-        clog(cache, temp, `upgradeSheetVersion(${sheet_version})`);
-        while (sheet_version < global_sheet_current_version) {
-            switch (sheet_version) {
+        temp.sheet_version = parseFloat(cache.static_sheet_settings_version);
+        temp.current_version = global_sheet_current_version;
+        clog(cache, temp, `upgradeSheetVersion()`);debugger;
+        while (temp.sheet_version < temp.current_version) {
+            switch (temp.sheet_version) {
                 case 0.1:
                     const get_attr = ['attrdb','defectdb','statsdb'];
                     const get_attrs = await getAttrsAsync(get_attr);
@@ -3150,13 +3151,13 @@
                     set_values.attrdb = JSON.stringify(cache.attrdb);
                     set_values.groupdb = JSON.stringify(cache.groupdb);
                     set_values.statsdb = JSON.stringify(cache.statsdb);
-                    sheet_version = 0.2;
+                    temp.sheet_version = 0.2;
                 break;
                 default:
-                    sheet_version = global_sheet_current_version;
+                    temp.sheet_version = temp.current_version;
             }
         }
-        cache.static_sheet_settings_version = sheet_version;
+        cache.static_sheet_settings_version = temp.current_version;
         set_values.static_sheet_settings_version = cache.static_sheet_settings_version;
     }
 
@@ -4139,11 +4140,11 @@
                         );
                     break;
                     case 'lock':
-                    temp.push(
-                        'attrdb',
-                        'groupdb',
-                        'static_group_visible_id',
-                    );
+                        temp.push(
+                            'attrdb',
+                            'groupdb',
+                            'static_group_visible_id',
+                        );
                     break;
                     case 'save':
                     case 'select':
@@ -4157,6 +4158,9 @@
                                 );
                             break;
                         }
+                    break;
+                    case 'settings':
+                        temp.push('character_name');
                     break;
                     case 'groupselect':
                     case 'grouptoggle':
@@ -13418,10 +13422,14 @@
         ) {
             cache.rulebook = await crpGet(cache, 'static_rules_base_default') || 'besm';
             cache.rulesdb = await crpGet(cache, 'rulesdb');
-            cache.rulesdb = JSON.parse(cache.rulesdb);
-            updateSheetRulesSummary(cache, set_values);
-            set_values.static_skills_show_state = 
-                cache.rulesdb.rules_optional_individual_status === 1 ? 1 : 0;
+            if (cache.rulesdb === `${cache.static_sheet_settings_gm}|rulesdb`) {
+                clog(cache, 'GM missing! Please create GM sheet.','ERROR');
+            } else {
+                cache.rulesdb = JSON.parse(cache.rulesdb);
+                updateSheetRulesSummary(cache, set_values);
+                set_values.static_skills_show_state = 
+                    cache.rulesdb.rules_optional_individual_status === 1 ? 1 : 0;
+            }
         }
         if (cache.static_sheet_settings_initialized !== 1) {
             // Create databases

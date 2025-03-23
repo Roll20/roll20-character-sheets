@@ -1,3 +1,21 @@
+# 2025-3-18
+
+- Add whisper toggle - GM or Public
+- Add whisper toggle to basically every roll in the game
+- Tracker:
+  - Add a return to charactersheet
+  - Send skill data (not shown yet).
+
+# 2025-3-11
+
+- Lots of tracker updates.  Still not ready for primetime (but should not break anything)
+  - Basic layout
+  - Notes field
+  - Refresh
+- Othermod/parrymod now on the creature sheet
+- Sync othermod/parrymod 
+- New combat clears othermod and parrymod.
+
 # 2025-3-4
 
 - Defenses for creatures on Land, Sea and the Air (and climbing)
