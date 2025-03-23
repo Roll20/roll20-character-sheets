@@ -35687,11 +35687,14 @@
 				{{/rollGreater() defensive 0}}
 				
 				{{#^rollGreater() target test}}
-				{{#rollGreater() menacing 0}}
 				{{#rollGreater() sladd 0}}
+				{{#rollGreater() menacing 0}}
 					<div class="col-1 center pad-l-md pad-r-md rt-slmod" style="color: #55B800">+{{sladd}}SL <span  data-i18n="MENACING"></span></div>
-				{{/rollGreater() sladd 0}}
 				{{/rollGreater() menacing 0}}
+				{{#rollGreater() lileathsblessing 0}}
+					<div class="col-1 center pad-l-md pad-r-md rt-slmod" style="color: #55B800">+{{sladd}}SL <span  data-i18n="LILEATHS-BLESSING"></span></div>
+				{{/rollGreater() lileathsblessing 0}}
+				{{/rollGreater() sladd 0}}
 				{{/^rollGreater() target test}}
 
 				{{#^rollWasFumble() test}}
@@ -36381,9 +36384,6 @@
 							{{#rollGreater() gregarious 0}}
 								<div class="col-1 pad-l-md pad-r-md rt-effects" style="color: #858585"><span  data-i18n="GREGARIOUS" data-i18n-title="GREGARIOUS-SIT"></span>: <span  data-i18n="USE-REVERSE-DICE"></span></div>
 							{{/rollGreater() gregarious 0}}
-							{{#rollGreater() menacing 0}}
-								<div class="col-1 center pad-l-md pad-r-md rt-slmod" style="color: #858585">+{{sitfail}}SL <span  data-i18n="MENACING"></span></div>
-							{{/rollGreater() menacing 0}}
 							{{#rollGreater() pharmacist 0}}
 								<div class="col-1 center pad-l-md pad-r-md rt-slmod" style="color: #858585"><span  data-i18n="PHARMACIST" data-i18n-title="PHARMACIST-SIT"></span>: <span  data-i18n="USE-REVERSE-DICE"></span></div>
 							{{/rollGreater() pharmacist 0}}
@@ -50934,13 +50934,36 @@ on('clicked:repeating_spellbookarcane:spellcast clicked:repeating_spellbookarcan
 on('clicked:repeating_spellbookarcane:extchannellingloreroll', (eventInfo) => {
 	getAttrs(["initiative_houserule"], function(v) {	
 	
-   let roll = '{{test=[[@{roll_rule}]]}} {{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Talent_AethyricAttunementLvl} [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusChannel}]]}} {{sladd=[[0]]}} {{modvalue=[[?{Channeling Roll Modifier|@{prefix2-_ChanMod}}]]}} {{title=^{EXTENDED-CHANNELLING-TEST}}} {{skill=^{ADVANCED-SKILL}}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see}-@{DrunkMod}]]}} {{drunk=[[@{DrunkMod}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{distracted=[[@{DistractedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{character_name=@{character_name}}} {{target=[[ [[(@{condgen_see}*-1)]] [COND] + @{prefix2-_ExtChannellingLore} [SKILL] + ?{Channeling Roll Modifier|0} [MOD] ]]}} {{skilltest=true}} {{accuchanexlsl=[[?{Accumulated Extended Channelling SL (Start at 0)|@{prefix2-_spellchannelsl}}}} {{SLmod=[[?{SL Modifier|0}]]]]}} {{SLmod=[[?{SL Modifier|0}]]}} {{rolltype=[[9]]}} {{lore=[[@{prefix2-_MagicLore}]]}} {{robes=[[@{Used_Wizard_Robes}]]}} {{mod1type=[[@{prefix2-_ExtChannellingLoreRoll_modtype1}]]}} {{mod1=@{prefix2-_ExtChannellingLoreRoll_mod1}}} {{mod2type=[[@{prefix2-_ExtChannellingLoreRoll_modtype2}]]}} {{mod2=@{prefix2-_ExtChannellingLoreRoll_mod2}}} {{mod3type=[[@{prefix2-_ExtChannellingLoreRoll_modtype3}]]}} {{mod3=@{prefix2-_ExtChannellingLoreRoll_mod3}}} {{NPC=[[0]]}} {{RTminor=@{RT-minor}}} {{RTmajor=@{RT-major}}} {{reroll=@{RT-reroll}prefix2-_extchannellingloreroll)}} {{sptal1=[[@{Talent_AethyricAttunementLvl}]]}} {{testoutcome=[[0]]}}';
+		playerclickedid = eventInfo.sourceAttribute.split('_')[2] || '';			
+
+		getSectionIDs("repeating_spellbookarcane", function (ids) {
+		if (playerclickedid == ids.toLowerCase) return;
+			const output = {};
+			ids.forEach(id => {
+			
+				let playerId = playerclickedid.toLowerCase();
+				if(playerId == id.toLowerCase()) {
+			getAttrs([`repeating_spellbookarcane_${id}_MagicLore`], function(t) {
+
+					lorecheck = t[`repeating_spellbookarcane_${id}_MagicLore`];
+					console.log(lorecheck);	
+
+   let roll = '{{test=[[@{roll_rule}]]}} {{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Talent_AethyricAttunementLvl}>addsl< [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusChannel}>addsl<]]}} {{sladd=[[0>sladd<]]}} {{modvalue=[[?{Channeling Roll Modifier|@{prefix2-_ChanMod}}]]}} {{title=^{EXTENDED-CHANNELLING-TEST}}} {{skill=^{ADVANCED-SKILL}}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see}-@{DrunkMod}]]}} {{drunk=[[@{DrunkMod}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{distracted=[[@{DistractedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{character_name=@{character_name}}} {{target=[[ [[(@{condgen_see}*-1)]] [COND] + @{prefix2-_ExtChannellingLore} [SKILL] + ?{Channeling Roll Modifier|0} [MOD] ]]}} {{skilltest=true}} {{accuchanexlsl=[[?{Accumulated Extended Channelling SL (Start at 0)|@{prefix2-_spellchannelsl}}}} {{SLmod=[[?{SL Modifier|0}]]]]}} {{SLmod=[[?{SL Modifier|0}]]}} {{rolltype=[[9]]}} {{lore=[[@{prefix2-_MagicLore}]]}} {{robes=[[@{Used_Wizard_Robes}]]}} {{mod1type=[[@{prefix2-_ExtChannellingLoreRoll_modtype1}]]}} {{mod1=@{prefix2-_ExtChannellingLoreRoll_mod1}}} {{mod2type=[[@{prefix2-_ExtChannellingLoreRoll_modtype2}]]}} {{mod2=@{prefix2-_ExtChannellingLoreRoll_mod2}}} {{mod3type=[[@{prefix2-_ExtChannellingLoreRoll_modtype3}]]}} {{mod3=@{prefix2-_ExtChannellingLoreRoll_mod3}}} {{NPC=[[0]]}} {{RTminor=@{RT-minor}}} {{RTmajor=@{RT-major}}} {{reroll=@{RT-reroll}prefix2-_extchannellingloreroll)}} {{sptal1=[[@{Talent_AethyricAttunementLvl}]]}} {{testoutcome=[[0]]}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = eventInfo.triggerName.slice(8, -23);
    
    let rollBegins = '@{Whisper} &{template:whfrp2e}';
    let rollPart = roll.replaceAll('prefix2-', `${prefix}`);
    extsl = 0;
+   
+   if (lorecheck === 9) {
+   addsl = '+@{Talent_LileathsblessingLvl}*2';
+   sladd = '+@{Talent_LileathsblessingLvl}';
+   rollPart = rollPart.replaceAll('>addsl<', addsl).replaceAll('>sladd<', sladd);  
+
+   rollPart += ' {{lileathsblessing=[[@{Talent_LileathsblessingLvl}*2]]}}';  
+
+   }
    	
                console.log(trigger);		
                console.log(rollPart);		
@@ -50950,9 +50973,11 @@ on('clicked:repeating_spellbookarcane:extchannellingloreroll', (eventInfo) => {
             const test = results.results.test.result
             const sl = results.results.sl.result
             const slbonus = results.results.slbonus.result
+            const sladd = results.results.sladd.result
             const slbonusatk = results.results.slbonusatk.result
             const sptal1 = results.results.sptal1.result
             const SLmod = results.results.SLmod.result
+			if (lorecheck === 9) {sptal2 = results.results.lileathsblessing.result} else {sptal2 = 0}
             const accuchanexlsl = results.results.accuchanexlsl.result
             const lore = results.results.lore.result
             const robes = results.results.robes.result
@@ -50964,9 +50989,9 @@ on('clicked:repeating_spellbookarcane:extchannellingloreroll', (eventInfo) => {
 
             const computed2 = (((test-1)%10)+1) ;
 			
-			if ( test <= target ) { var computed3 = computed + sptal1 + robes + SLmod ;} else  { var computed3 = computed + robes + SLmod ;}
-			if ( test <= target ) { var computed4 = slbonusatk + robes ;} else  { var computed4 = robes ;}
-			if ( test <= target ) { var computed5 = slbonusatk + robes + SLmod ;} else  { var computed5 = robes + SLmod ;}
+			if ( test <= target ) { var computed3 = computed + sptal1 + sptal2 + robes + SLmod ;} else  { var computed3 = computed + robes + sladd + SLmod ;}
+			if ( test <= target ) { var computed4 = slbonusatk + robes ;} else  { var computed4 = robes + sladd ;}
+			if ( test <= target ) { var computed5 = slbonusatk + robes + SLmod ;} else  { var computed5 = robes + sladd + SLmod ;}
 
 			if ( computed >= computed3 ) {extsl = computed;} else {extsl = computed3;}	
 			if ( test <= target ) {if ( extsl === 0 ) {extsl += 1;}}
@@ -50990,18 +51015,18 @@ on('clicked:repeating_spellbookarcane:extchannellingloreroll', (eventInfo) => {
 			} else if ( computed3 === 0 ) {
 			if ( test <= target ) { outcome = 1; } else { outcome = 0; } 
 			} else { outcome = 0; } 
-
-            finishRoll(
-                results.rollId,
-                {
-                    test: computed2,
-                    sl: computed,
-                    slbonus: computed3,
-                    slbonusatk: computed4,
-                    sladd: computed5,
-                    testoutcome: outcome,
-                }
-            );
+			
+				finishRoll(
+					results.rollId,
+					{
+						test: computed2,
+						sl: computed,
+						slbonus: computed3,
+						slbonusatk: computed4,
+						sladd: computed5,
+						testoutcome: outcome,
+					}
+				);
 					
 				getSectionIDs("repeating_spellbookarcane", function (ids) {
                     const output = {};
@@ -51043,7 +51068,12 @@ on('clicked:repeating_spellbookarcane:extchannellingloreroll', (eventInfo) => {
 					
                     });
 				});
-    });
+		});
+		});
+	}
+});
+});
+
     });
 });
 
@@ -51234,15 +51264,39 @@ on('clicked:repeating_spellbookrituals:spellcast  clicked:repeating_spellbookrit
 	
 on('clicked:repeating_spellbookrituals:extchannellingloreroll', (eventInfo) => {
 	getAttrs(["initiative_houserule"], function(v) {	
-	
-   let roll = '{{test=[[@{roll_rule}]]}} {{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Talent_AethyricAttunementLvl} [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusChannel}]]}} {{sladd=[[0]]}} {{modvalue=[[?{Channeling Roll Modifier|@{prefix2-_ChanMod}}]]}} {{title=^{EXTENDED-CHANNELLING-TEST}}} {{skill=^{ADVANCED-SKILL}}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see}-@{DrunkMod}]]}} {{drunk=[[@{DrunkMod}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{distracted=[[@{DistractedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{character_name=@{character_name}}} {{target=[[ [[(@{condgen_see}*-1)]] [COND] + @{prefix2-_ExtChannellingLore} [SKILL] + ?{Channeling Roll Modifier|0} [MOD] ]]}} {{skilltest=true}} {{accuchanexlsl=[[?{Accumulated Extended Channelling SL (Start at 0)|@{prefix2-_spellchannelsl}}]]}} {{ritualsacr=@{prefix2-_ritualsacr}}} {{SLmod=[[?{SL Modifier|0}]]}} {{SLmod=[[?{SL Modifier|0}]]}} {{rolltype=[[9]]}} {{lore=[[@{prefix2-_MagicLore}]]}} {{robes=[[@{Used_Wizard_Robes}]]}} {{mod1type=[[@{prefix2-_ExtChannellingLoreRoll_modtype1}]]}} {{mod1=@{prefix2-_ExtChannellingLoreRoll_mod1}}} {{mod2type=[[@{prefix2-_ExtChannellingLoreRoll_modtype2}]]}} {{mod2=@{prefix2-_ExtChannellingLoreRoll_mod2}}} {{mod3type=[[@{prefix2-_ExtChannellingLoreRoll_modtype3}]]}} {{mod3=@{prefix2-_ExtChannellingLoreRoll_mod3}}} {{NPC=[[0]]}} {{RTminor=@{RT-minor}}} {{RTmajor=@{RT-major}}} {{reroll=@{RT-reroll}prefix2-_extchannellingloreroll)}} {{sptal1=[[@{Talent_AethyricAttunementLvl}]]}} {{testoutcome=[[0]]}}';
+
+		playerclickedid = eventInfo.sourceAttribute.split('_')[2] || '';			
+
+		getSectionIDs("repeating_spellbookrituals", function (ids) {
+		if (playerclickedid == ids.toLowerCase) return;
+			const output = {};
+			ids.forEach(id => {
+			
+				let playerId = playerclickedid.toLowerCase();
+				if(playerId == id.toLowerCase()) {
+			getAttrs([`repeating_spellbookrituals_${id}_MagicLore`], function(t) {
+
+				lorecheck = t[`repeating_spellbookrituals_${id}_MagicLore`];
+
+   let roll = '{{test=[[@{roll_rule}]]}} {{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Talent_AethyricAttunementLvl}>addsl< [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusChannel}>addsl<]]}} {{sladd=[[0>sladd<]]}} {{modvalue=[[?{Channeling Roll Modifier|@{prefix2-_ChanMod}}]]}} {{title=^{EXTENDED-CHANNELLING-TEST}}} {{skill=^{ADVANCED-SKILL}}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see}-@{DrunkMod}]]}} {{drunk=[[@{DrunkMod}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{distracted=[[@{DistractedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{character_name=@{character_name}}} {{target=[[ [[(@{condgen_see}*-1)]] [COND] + @{prefix2-_ExtChannellingLore} [SKILL] + ?{Channeling Roll Modifier|0} [MOD] ]]}} {{skilltest=true}} {{accuchanexlsl=[[?{Accumulated Extended Channelling SL (Start at 0)|@{prefix2-_spellchannelsl}}]]}} {{ritualsacr=@{prefix2-_ritualsacr}}} {{SLmod=[[?{SL Modifier|0}]]}} {{SLmod=[[?{SL Modifier|0}]]}} {{rolltype=[[9]]}} {{lore=[[@{prefix2-_MagicLore}]]}} {{robes=[[@{Used_Wizard_Robes}]]}} {{mod1type=[[@{prefix2-_ExtChannellingLoreRoll_modtype1}]]}} {{mod1=@{prefix2-_ExtChannellingLoreRoll_mod1}}} {{mod2type=[[@{prefix2-_ExtChannellingLoreRoll_modtype2}]]}} {{mod2=@{prefix2-_ExtChannellingLoreRoll_mod2}}} {{mod3type=[[@{prefix2-_ExtChannellingLoreRoll_modtype3}]]}} {{mod3=@{prefix2-_ExtChannellingLoreRoll_mod3}}} {{NPC=[[0]]}} {{RTminor=@{RT-minor}}} {{RTmajor=@{RT-major}}} {{reroll=@{RT-reroll}prefix2-_extchannellingloreroll)}} {{sptal1=[[@{Talent_AethyricAttunementLvl}]]}} {{testoutcome=[[0]]}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = eventInfo.triggerName.slice(8, -23);
    
    let rollBegins = '@{Whisper} &{template:whfrp2e}';
    let rollPart = roll.replaceAll('prefix2-', `${prefix}`);
    extsl = 0;
-   	
+   
+   if (lorecheck === 9) {
+	addsl = '+@{Talent_LileathsblessingLvl}*2';
+	sladd = '+@{Talent_LileathsblessingLvl}';
+	rollPart = rollPart.replaceAll('>addsl<', addsl).replaceAll('>sladd<', sladd);  
+ 
+ 
+	rollPart += ' {{lileathsblessing=[[@{Talent_LileathsblessingLvl}*2]]}}';  
+ 
+	}
+
+   console.log(lorecheck);	
                console.log(trigger);		
                console.log(rollPart);		
    
@@ -51251,8 +51305,10 @@ on('clicked:repeating_spellbookrituals:extchannellingloreroll', (eventInfo) => {
             const test = results.results.test.result
             const sl = results.results.sl.result
             const slbonus = results.results.slbonus.result
+            const sladd = results.results.sladd.result
             const slbonusatk = results.results.slbonusatk.result
             const sptal1 = results.results.sptal1.result
+			if (lorecheck === 9) {sptal2 = results.results.lileathsblessing.result} else {sptal2 = 0}
             const SLmod = results.results.SLmod.result
             const accuchanexlsl = results.results.accuchanexlsl.result
             const lore = results.results.lore.result
@@ -51265,9 +51321,9 @@ on('clicked:repeating_spellbookrituals:extchannellingloreroll', (eventInfo) => {
 
             const computed2 = (((test-1)%10)+1) ;
 			
-			if ( test <= target ) { var computed3 = computed + sptal1 + robes + SLmod ;} else  { var computed3 = computed + SLmod + robes ;}
-			if ( test <= target ) { var computed4 = slbonusatk + robes ;} else  { var computed4 = robes ;}
-			if ( test <= target ) { var computed5 = slbonusatk + robes + SLmod ;} else  { var computed5 = robes + SLmod ;}
+			if ( test <= target ) { var computed3 = computed + sptal1 + sptal2 + robes + SLmod ;} else  { var computed3 = computed + SLmod + robes + sladd ;}
+			if ( test <= target ) { var computed4 = slbonusatk + robes ;} else  { var computed4 = robes + sladd ;}
+			if ( test <= target ) { var computed5 = slbonusatk + robes + SLmod ;} else  { var computed5 = robes + sladd + SLmod ;}
 
 			if ( computed >= computed3 ) {extsl = computed;} else {extsl = computed3;}	
 			if ( test <= target ) {if ( extsl === 0 ) {extsl += 1;}}
@@ -51345,6 +51401,11 @@ on('clicked:repeating_spellbookrituals:extchannellingloreroll', (eventInfo) => {
                     });
 				});
 		});
+		});
+	}
+});
+});
+
     });
 });
 
@@ -51789,10 +51850,11 @@ on('clicked:repeating_divinemiracles:miracle clicked:repeating_divinemiracles:mi
 	else if (trigger === 'channellingshadows') {cond = '{{cond=[[@{condgen_see_move}-@{DrunkMod}]]}} {{unconscious=[[@{UnconsciousMod}]]}} {{drunk=[[0]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{distracted=[[@{DistractedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{robes=[[@{Used_Wizard_Robes}]]}} {{sptal1=[[@{Talent_AethyricAttunementLvl}]]}} {{accuchanexlsl=[[@{Quick_Spell_AccuSL_8}';
 	addtak= '*@{ChannellingShadowsTaken}';
 	rollPart = rollPart2.replaceAll('cond-', `(@{condgen_see_move}-@{DrunkMod})`).replaceAll('>addtak<', addtak);}  
-	else if (trigger === 'channellinghighmagic') {cond = '{{cond=[[@{condgen_see_move}-@{DrunkMod}]]}} {{unconscious=[[@{UnconsciousMod}]]}} {{drunk=[[0]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{distracted=[[@{DistractedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{robes=[[@{Used_Wizard_Robes}]]}} {{sptal1=[[@{Talent_AethyricAttunementLvl}]]}} {{lileathsblessing=[[@{Talent_LileathsblessingLvl}]]}} {{accuchanexlsl=[[@{Quick_Spell_AccuSL_9}';
+	else if (trigger === 'channellinghighmagic') {cond = '{{cond=[[@{condgen_see_move}-@{DrunkMod}]]}} {{unconscious=[[@{UnconsciousMod}]]}} {{drunk=[[0]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{distracted=[[@{DistractedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{robes=[[@{Used_Wizard_Robes}]]}} {{sptal1=[[@{Talent_AethyricAttunementLvl}]]}} {{lileathsblessing=[[@{Talent_LileathsblessingLvl}*2]]}} {{accuchanexlsl=[[@{Quick_Spell_AccuSL_9}';
 	addtak= '*@{ChannellingHighMagicTaken}';
-	addsl = '+@{Talent_LileathsblessingLvl}';
-	rollPart = rollPart2.replaceAll('cond-', `(@{condgen_see_move}-@{DrunkMod})`).replaceAll('>addtak<', addtak).replaceAll('>addsl<', addsl);}  
+	addsl = '+@{Talent_LileathsblessingLvl}*2';
+	sladd = '+@{Talent_LileathsblessingLvl}';
+	rollPart = rollPart2.replaceAll('cond-', `(@{condgen_see_move}-@{DrunkMod})`).replaceAll('>addtak<', addtak).replaceAll('>addsl<', addsl).replaceAll('>sladd<', sladd);}  
 	else if (trigger === 'channellingwitch') {cond = '{{cond=[[@{condgen_see_move}-@{DrunkMod}]]}} {{unconscious=[[@{UnconsciousMod}]]}} {{drunk=[[0]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{distracted=[[@{DistractedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{robes=[[@{Used_Wizard_Robes}]]}} {{sptal1=[[@{Talent_AethyricAttunementLvl}]]}} {{accuchanexlsl=[[@{Quick_Spell_AccuSL_10}';
 	addtak= '*@{ChannellingWitchTaken}';
 	rollPart = rollPart2.replaceAll('cond-', `(@{condgen_see_move}-@{DrunkMod})`).replaceAll('>addtak<', addtak);}  
@@ -51917,6 +51979,7 @@ on('clicked:repeating_divinemiracles:miracle clicked:repeating_divinemiracles:mi
             if (trigger === 'channellinglight') {robes = results.results.robes.result; sptal1 = results.results.sptal1.result}
             if (trigger === 'channellingdeath') {robes = results.results.robes.result; sptal1 = results.results.sptal1.result}
             if (trigger === 'channellingshadows') {robes = results.results.robes.result; sptal1 = results.results.sptal1.result}
+            if (trigger === 'channellinghighmagic') {robes = results.results.robes.result; sptal1 = results.results.sptal1.result}
             if (trigger === 'channellingwitch') {robes = results.results.robes.result; sptal1 = results.results.sptal1.result}
             if (trigger === 'channellingdark') {robes = results.results.robes.result; sptal1 = results.results.sptal1.result}
             if (trigger === 'channellingchaos') {robes = results.results.robes.result; sptal1 = results.results.sptal1.result}
@@ -52184,7 +52247,6 @@ on('clicked:repeating_divinemiracles:miracle clicked:repeating_divinemiracles:mi
 				 const computed = (Math.floor(target / 10) - Math.floor(test / 10)) ;
 				 const computed2 = (((test-1)%10)+1) ;
 				 
-
 				 if ( test <= target ) { var computed3 = computed + SLmod ;} else  { var computed3 = computed + SLmod ;}
 				 if ( test <= target ) { var computed4 = slbonusatk ;} else  { var computed4 = 0 ;}
 				 if ( test <= target ) { var computed5 = slbonusatk + SLmod ;} else  { var computed5 = SLmod ;}
