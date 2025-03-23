@@ -89,7 +89,7 @@ Mar 22nd 2025 v1.76
 - Simple Yenlui implementation for records only.
 - Added another 4 (total 8 now) Arcane Lore to talent's to support HE caster's learning all 8 colors.
 - Enhanced Spellbook/Arcane spells tab to support High Magic spell features, ie Sacrafice and Multi Wind spells. For record only, no logic to support this mechanic yet.
-- Creature Traits added, found in the Talent Tab. Similar to Talents but dont cost XP, most are stat change and attack/roll modifier effects. Intended for Monsters/NPCs and special conditions.
+- Creature Trait list added, found in the Talent Tab. Intended for Monsters/NPCs and special conditions.
 - Fixed Offhand weapon not adding Strike Might Blow dmg in the roll template.
 - Fixed skill test rolls showing the Drunk modifier when it wasnt actually applying to them.
 - Fixed Frenzy not always adding extra dmg to Melee attacks correctly
