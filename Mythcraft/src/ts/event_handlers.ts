@@ -122,6 +122,65 @@ on(`change:luck`, () => {
   }
 );
 
+on("change:repeating_skills:attribute", (event) => {
+  const { sourceAttribute, newValue } = event;
+  const repeatingRow = getFieldsetRow(sourceAttribute);
+
+  // Attribute will be @{...}. Remove the @{}
+  const attribute = newValue.substring(2, newValue.length - 1);
+
+  if (attribute === "luck") {
+    setAttrs({ [`${repeatingRow}_attribute_abbreviation`]: attribute });
+    return;
+  }
+
+  const abbreviation = attribute.substring(0, 3);
+
+  // Awareness first 3 letters are "awa" but abbreviation is "awr"
+  if (attribute === "awareness") {
+    setAttrs({
+      [`${repeatingRow}_attribute_abbreviation`]:
+        getTranslationByKey(abbreviation),
+    });
+    return;
+  }
+
+  setAttrs({ [`${repeatingRow}_attribute_abbreviation`]: abbreviation });
+});
+
+// on("change:skills_sorting", (event) => {
+//   const { newValue } = event;
+
+//     getSectionIDs("skills",  (ids) => {
+//       const groupName = "repeating_skills";
+//       const attributes: string[] = []
+
+//       ids.forEach((id) => {
+//         attributes.push(`${groupName}_${id}_name`, `${groupName}_${id}_attribute`, `${groupName}_${id}_category`, `${groupName}_${id}_description`, `${groupName}_${id}_bonus`)
+//       });
+
+//       getAttrs(attributes, (values) => {
+//         console.log("values", values);
+//         if(newValue === "name") {
+//           const sortedValues = Object.keys(values).filter((key) => key.includes("name")).sort((a, b) => values[a].localeCompare(values[b]));
+
+//           let update = []
+//           sortedValues.forEach((key) => {
+//             const row = getFieldsetRow(key);
+
+//           }
+
+//           console.log("sortedValues", sortedValues);
+//         }
+//       });
+//     });
+
+// const skills = newValue.split(",").map((skill) => skill.trim());
+// const sortedSkills = skills.sort((a, b) => a.localeCompare(b));
+
+// setAttrs({ [`${repeatingRow}_skills_sorting`]: sortedSkills.join(", ") });
+//}
+
 //Calculate a simple derived attribute
 
 //Calculate all the values of a repeating section. Useful for calculating weights, totals, etc.

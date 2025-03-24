@@ -89,19 +89,22 @@ var handle_drop = function () {
             case "Professions":
                 handle_bop(page);
                 break;
+            case "Features":
+                handle_feature(page);
+                break;
+            case "Lineages":
+                handle_lineage(page);
             case "Skills":
                 handle_skills(page);
                 break;
             default:
                 dropWarning("Unknown category: ".concat(Category));
         }
-        setAttrs({
+        setDropAttrs({
             drop_name: "",
             drop_data: "",
             drop_content: "",
             drop_category: ""
-        }, {
-            silent: true
         });
     });
 };
@@ -220,6 +223,24 @@ on("change:luck", function () {
         });
     });
 });
+on("change:repeating_skills:attribute", function (event) {
+    var _a, _b, _c;
+    var sourceAttribute = event.sourceAttribute, newValue = event.newValue;
+    var repeatingRow = getFieldsetRow(sourceAttribute);
+    var attribute = newValue.substring(2, newValue.length - 1);
+    if (attribute === "luck") {
+        setAttrs((_a = {}, _a["".concat(repeatingRow, "_attribute_abbreviation")] = attribute, _a));
+        return;
+    }
+    var abbreviation = attribute.substring(0, 3);
+    if (attribute === "awareness") {
+        setAttrs((_b = {},
+            _b["".concat(repeatingRow, "_attribute_abbreviation")] = getTranslationByKey(abbreviation),
+            _b));
+        return;
+    }
+    setAttrs((_c = {}, _c["".concat(repeatingRow, "_attribute_abbreviation")] = abbreviation, _c));
+});
 var _this = this;
 var versioningAttr = "latest_versioning_upgrade";
 on("sheet:opened", function () {
@@ -300,16 +321,46 @@ var resetSkillList = function (npcSkills) {
     console.log(npcSkills);
 };
 var roll20Attribute = function (attr, value) {
-    if (attr === "skill" && typeof value === "string") {
+    if (attr === "attribute" && typeof value === "string") {
         return "@{".concat(createAttributeName(value), "}");
     }
     return value;
+};
+var setDropAttrs = function (update, silent) {
+    if (silent === void 0) { silent = { silent: true }; }
+    try {
+        setAttrs(update, silent);
+    }
+    catch (e) {
+        dropWarning("Error setting attributes: ".concat(e));
+    }
 };
 var handle_bop = function (page) {
     var attrs = ["name", "occupation", "description"];
     var row = getRow("additional-info");
     var update = getUpdate(attrs, page, row);
     update["".concat(row, "_category")] = page.data.Category;
+    if (page.data.Category === "Backgrounds") {
+        update["background"] = page.name;
+        update["occupation_tag"] = page.data.occupation;
+    }
+    setDropAttrs(update);
+};
+var handle_feature = function (page) {
+    var attrs = ["name", "description"];
+    var row = getRow("abilities");
+    var update = getUpdate(attrs, page, row);
+    ["lineage", "profession"].forEach(function (attr) {
+        if (page.data[attr]) {
+            update["".concat(row, "_source")] = page.data[attr];
+        }
+    });
+    setDropAttrs(update);
+};
+var handle_lineage = function (page) {
+    var attrs = ["height", "weight", "speed", "size"];
+    var update = getUpdate(attrs, page);
+    update["lineage"] = page.name;
     try {
         setAttrs(update, { silent: true });
     }
@@ -318,16 +369,14 @@ var handle_bop = function (page) {
     }
 };
 var handle_skills = function (page) {
-    var attrs = ["name", "category", "description"];
+    var attrs = ["name", "category", "description", "attribute"];
     var row = getRow("skills");
     var update = getUpdate(attrs, page, row);
     update["".concat(row, "_bonus")] = 1;
-    try {
-        setAttrs(update, { silent: true });
+    if (typeof page.data.attribute === "string") {
+        update["".concat(row, "_attribute_abbreviation")] = page.data.attribute.substring(0, 3);
     }
-    catch (e) {
-        dropWarning("Error setting attributes: ".concat(e));
-    }
+    setDropAttrs(update);
 };
 var convertIntegerNegative = function (number) {
     return number > 0 ? -Math.abs(number) : number;
@@ -343,12 +392,12 @@ var convertIntegersNegatives = function (numbers) {
 var createAttributeName = function (name) {
     return name === null || name === void 0 ? void 0 : name.replace(/ /g, "_").toLowerCase();
 };
-var findRepeatingFieldName = function (trigger) { return trigger.split("_")[1]; };
-var getReprowAttributeName = function (key) {
-    var reprowid = getReprowid(key);
+var getFieldsetAttr = function (key) {
+    var reprowid = getFieldsetRow(key);
     return key.split("".concat(reprowid, "_"))[1];
 };
-var getReprowid = function (trigger) {
+var getFieldsetGroupName = function (trigger) { return trigger.split("_")[1]; };
+var getFieldsetRow = function (trigger) {
     var split = trigger.split("_");
     return "".concat(split[0], "_").concat(split[1], "_").concat(split[2]);
 };

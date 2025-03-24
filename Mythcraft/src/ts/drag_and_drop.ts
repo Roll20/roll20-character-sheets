@@ -29,6 +29,11 @@ const handle_drop = () => {
       case "Professions":
         handle_bop(page);
         break;
+      case "Features":
+        handle_feature(page);
+        break;
+      case "Lineages":
+        handle_lineage(page);
       case "Skills":
         handle_skills(page);
         break;
@@ -36,17 +41,12 @@ const handle_drop = () => {
         dropWarning(`Unknown category: ${Category}`);
     }
 
-    setAttrs(
-      {
-        drop_name: "",
-        drop_data: "",
-        drop_content: "",
-        drop_category: "",
-      },
-      {
-        silent: true,
-      }
-    );
+    setDropAttrs({
+      drop_name: "",
+      drop_data: "",
+      drop_content: "",
+      drop_category: "",
+    });
   });
 };
 

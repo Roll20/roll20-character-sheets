@@ -6,10 +6,18 @@
 			.logo.grow-0
 				img(src='images/logo.png')
 			.grid.gap-1.grow.bio
-				each row in [['character name', 'lineage'], ['level', 'height', 'weight'], ['eyes', 'hair', 'size']]
-					.grid.grid-flow-col.gap-4
-						each header in row
-							+headerInput(header)
+				.grid.grid-flow-col.gap-2.name-row
+					each val in ['character name', 'lineage']
+						+headerInput(val)
+				.grid.grid-flow-col.gap-2.level-row
+					.grid.col-auto-fr.gap-1.grid-flow-col.items-center
+						h3(data-i18n="level")
+						+numberInput("level")
+					each val in ['height', 'weight', 'size']
+						+headerInput(val)
+				.grid.grid-flow-col.gap-2.appearance-row
+					each val in ['appearance', 'age']
+						+headerInput(val)
 		.grid.gap-2.grid-flow-col.auto-cols-min
 			each tab in ['main', 'combat', 'magic', 'journal']
 				.grid.tab.relative
@@ -18,31 +26,29 @@
 
 
 	.grid.gap-4.main
-		.grid.gap-2.double-border-2.rounded-md.content-start.p-2.relative.personality
+		.grid.gap-2.double-border-2.rounded-md.content-start.p-2.relative
 			+title('personality / background')
 			.grid.grid-flow-col.gap-2.personality
-				each val in ['drives', 'quirks', 'values']
-					.grid.gap-2.col-auto-fr(class=`${val}`)
-						h3.text-center(data-i18n=val)
-						+textInput(val)
+				each val in [ 'values', 'drive', 'quirk']
+					+headerInput(val)(class=`${val}`)
 			.grid.grid-flow-col.gap-2.background
 				each val in ['background', 'occupation tag']
-					.grid.gap-2.col-auto-fr(class=`${val}`)
-						h3.text-center(data-i18n=val)
-						+textInput(val)
-			//- +textarea('personality background')
+					+headerInput(val)(class=`${val}`)
 
-		.grid.gap-4.grid-flow-col.items-center.content-start.attributes.relative
+		.grid.gap-2.grid-flow-col.items-center.content-start.attrs.relative
 			each val in coreAttributes
 				.circle.rounded-full.border.grid.justify-center.items-center.font-bold
-					h3.text-center(data-i18n=shortName(val))
+					+attributeRoll(shortName(val), `${val}`)
 					+numberInput(val)
 
 		.grid.grid-flow-cols.gap-4.content-start.p-2.relative.two-col-grid
 			.grid.gap-4.content-start
 				.grid.double-border-2.rounded-md.content-start.p-2.relative.skills
 					+title('skills')
-					+subheaders(['name','bonus'])
+					.grid.grid-flow-col.gap-2.mb-2.border-bottom.subheaders
+						.grid.grid-flow-col.gap-2.custom-grid
+							each val in ['name','category', 'attribute', 'bonus']
+								h3(data-i18n=val)
 					+repeatingSkills('skill')
 				+repeatingList('inventory', {display: ['name', 'qty']})
 				.grid.double-border-2.rounded-md.content-start.p-2.relative
@@ -50,7 +56,7 @@
 					+textarea("currency")
 			.grid.gap-4.content-start
 				+repeatingList('talents', {display: ['name', 'level']})
-				+repeatingList('abilities', {display: ['name']})
+				+repeatingList('abilities', {display: ['name'], collapse: ["source"]})
 		
 	.grid.gap-4.combat
 		.grid.grid-flow-col.gap-4
@@ -64,12 +70,18 @@
 							h2.text-center(data-i18n=val)
 							+numberInput(val)
 			.grid.justify-center.grid-flow-col.gap-4
-				each val in ["armor rating", "speed", "death points"]
-					.grid
-						.double-border-2.p-2.justify-center.rounded-md
-							- const def = val === 'armor rating' ? 10 : 0
-							+numberInput(val, def)
-						h2.text-center(data-i18n=val)
+				.grid
+					.double-border-2.p-2.justify-center.rounded-md.armor-rating
+						+numberInput("armor rating", 10)
+					h2.text-center(data-i18n=val)
+				.grid
+					.double-border-2.p-2.justify-center.rounded-md
+						+textInput("speed")
+					h2.text-center(data-i18n="speed")
+				.grid
+					.double-border-2.p-2.justify-center.rounded-md
+						+numberInput("death points", 0)
+					h2.text-center(data-i18n="death points")
 		.grid.grid-flow-col
 			.grid
 				.double-border-2.p-2.justify-center.rounded-md
@@ -112,7 +124,10 @@
 	.grid.gap-4.magic
 		.grid.grid-flow-col.gap-4.mb-4
 			.grid.double-border-2.rounded-md.items-center.justify-center
-				h2.text-center(data-i18n='source/level')
+				.grid.gap-1.grid-flow-col.items-center
+					h2.text-center(data-i18n='source')
+					span /
+					h2.text-center(data-i18n='level')
 				+numberInput("source")
 			.grid.grid-flow-col.gap-4.items-center
 				each val in ["max spell points", "current spell points", "spellcasting ability"]

@@ -5,9 +5,10 @@ const handle_bop = (page: CompendiumAttributes) => {
 
   update[`${row}_category`] = page.data.Category;
 
-  try {
-    setAttrs(update, { silent: true });
-  } catch (e) {
-    dropWarning(`Error setting attributes: ${e}`);
+  if (page.data.Category === "Backgrounds") {
+    update["background"] = page.name;
+    update["occupation_tag"] = page.data.occupation;
   }
+
+  setDropAttrs(update);
 };

@@ -2,11 +2,12 @@
 // Definitions by: Karl Erik Hofseth https://github.com/Karlinator
 
 declare type EventInfo = {
+  newValue: string;
+  previousValue: string;
+  removedInfo: string;
   sourceAttribute: string;
   sourceType: string;
-  previousValue: string;
-  newValue: string;
-  removedInfo: string;
+  triggerName: string;
 };
 
 declare type AttrValue = string | number | boolean;
