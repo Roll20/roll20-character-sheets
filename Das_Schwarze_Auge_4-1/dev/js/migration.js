@@ -628,7 +628,7 @@ function migrateTo20220116(migrationChain) {
 */
 function migrateTo20220604(migrationChain) {
 	const caller = "migrateTo20220604";
-	debugLog(caller, "Invoked.");
+	debugLog(caller, "started");
 
 	const attrsToGet = [
 		"zauber_visibli",
@@ -649,7 +649,7 @@ function migrateTo20220604(migrationChain) {
 			}
 			if (attr.match("visibli"))
 			{
-				let newAttr = attr.replace(/visibli/gm, "visibili");
+				const newAttr = attr.replace(/visibli/gm, "visibili");
 				if (attr.match("z_visibli_action"))
 				{
 					attrsToChange[newAttr] = v[attr].replace(/visibli/gm, "visibili");
@@ -663,7 +663,7 @@ function migrateTo20220604(migrationChain) {
 			}
 		}
 
-		debugLog(caller, attrsToChange);
+		debugLog(caller, "attrsToChange", attrsToChange);
 		safeSetAttrs(attrsToChange, {}, function(){
 			callNextMigration(migrationChain);
 		});
