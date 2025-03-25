@@ -575,11 +575,11 @@ function migrateTo20211010(migrationChain) {
 	- Build beta roll button ability calls
 */
 function migrateTo20220116(migrationChain) {
-	var caller = "migrateTo20220116";
-	debugLog(caller, "Invoked.");
+	const caller = "migrateTo20220116";
+	debugLog(caller, "started");
 
-	var results = calcCritLevels({'Tollpatsch': 0, 'wilde Magie': 0});
-	var attrsToChange = {
+	const results = calcCritLevels({'Tollpatsch': 0, 'wilde Magie': 0});
+	let attrsToChange = {
 		'cs_talent': results['talent']['success'],
 		'cf_talent': results['talent']['failure'],
 		'cs_kampf_at': results['kampf_at']['success'],
@@ -595,8 +595,8 @@ function migrateTo20220116(migrationChain) {
 	}
 
 	// Build list of attributes
-	var attrsToGet = ["character_name"];
-	var ebeTalents = []
+	let attrsToGet = ["character_name"];
+	let ebeTalents = []
 	for(let talent of talents_ebe)
 	{
 		ebeTalents.push(talent + "-ebe");
@@ -615,7 +615,7 @@ function migrateTo20220116(migrationChain) {
 
 		attrsToChange["eidsegen_action"] = "%{" + v["character_name"] + "|eidsegen-action}";
 
-		debugLog(caller, attrsToChange);
+		debugLog(caller, "attrsToChange", attrsToChange);
 		safeSetAttrs(attrsToChange, {}, function(){
 			callNextMigration(migrationChain);
 		});
