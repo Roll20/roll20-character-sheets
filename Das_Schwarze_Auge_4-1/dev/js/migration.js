@@ -549,19 +549,20 @@ function migrateTo20210718 (migrationChain) {
 	- Initialize "new" attributes LE to LEAktuell, AU to AusAktuell, AE to ASPAktuell, KE to KEAktuell
 */
 function migrateTo20211010(migrationChain) {
-	var caller = "migrateTo20211010";
-	debugLog(caller, "migrateTo20211010 invoked");
+	const caller = "migrateTo20211010";
+	debugLog(caller, "started");
 
 	safeGetAttrs([
 			"LEAktuell", "AusAktuell", "ASPAktuell", "KEAktuell"
 			], function(v) {
 
-		var attrsToChange = {};
+		let attrsToChange = {};
 		attrsToChange["LE"] = v["LEAktuell"];
 		attrsToChange["AU"] = v["AusAktuell"];
 		attrsToChange["AE"] = v["ASPAktuell"];
 		attrsToChange["KE"] = v["KEAktuell"];
 
+		debugLog(caller, "attrsToChange", attrsToChange);
 		safeSetAttrs(attrsToChange, {}, function(){
 			callNextMigration(migrationChain);
 		});
