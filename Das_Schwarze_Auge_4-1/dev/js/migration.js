@@ -675,10 +675,12 @@ function migrateTo20220604(migrationChain) {
 	- Initialize attribute "sheet_initialized"
 */
 function migrateTo20220821(migrationChain) {
-	var caller = "migrateTo20220821";
-	debugLog(caller, "Invoked.");
+	const caller = "migrateTo20220821";
+	debugLog(caller, "started");
 
-	var attrsToChange = { "sheet_initialized": true };
+	const attrsToChange = { "sheet_initialized": true };
+
+	debugLog(caller, "attrsToChange", attrsToChange);
 	safeSetAttrs(attrsToChange, {}, function(){
 		callNextMigration(migrationChain);
 	});
