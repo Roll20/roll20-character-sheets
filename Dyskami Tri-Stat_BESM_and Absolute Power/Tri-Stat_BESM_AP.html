@@ -208,7 +208,7 @@
 
         <div>
             <!-- Roll Title -->
-            <input name="attr_static_roll_accordions_state" class="accordion-roll" type="checkbox" value="1" />
+            <!--<input name="attr_static_roll_accordions_state" class="accordion-roll" type="checkbox" value="1" />-->
             <div class="grid-container-collapsible-title-bar theme-border">
                 <!-- Title Buttons Left -->
                 <div class="grid-minor-title-buttons-left">
@@ -233,10 +233,11 @@
                 </div>
                 <!-- Title -->
                 <div class="grid-minor-rollmacro-title theme-title">
-                    <span data-i18n="roll-macros">Roll Macros</span>
+                    <span data-i18n="rolls">Rolls</span>
                 </div>
                 <!-- Title Buttons Right -->
                 <div class="grid-minor-title-buttons-right">
+                    <!--
                     <button name="act_static_roll_add_button" class="styling-section-button button-click-animation theme-button" type="action">
                         <span class="material-icons">add</span>
                     </button>
@@ -246,7 +247,9 @@
                     <button name="act_static_roll_accordions_button" class="styling-section-button button-click-animation theme-button" type="action">
                         <span class="material-icons expand">expand_less</span>
                     </button>
+                    -->
                 </div>
+                <!--
                 <div class="styling-border theme-border">
                     <div class="container-roll styling-background theme-background">
                         <fieldset class="repeating_roll">
@@ -316,6 +319,7 @@
                         </fieldset>
                     </div>
                 </div>
+                -->
             </div>
         </div>
         <div class="section-break"></div>
@@ -4291,6 +4295,12 @@
                             'statsdb'
                         );
                     break;
+                    case '2d6':
+                    case 'attack':
+                    case 'attribute':
+                    case 'initiative':
+                    case 'skill':
+                    case 'stat':
                     case 'rolls':
                         temp.push(
                             'attrdb',
@@ -7031,11 +7041,11 @@
         query.next = cache.source_type === 'react' ? 
             cache.source_attribute === 'skill' ?
                 cache.rulesdb.rules_optional_individual_status !== 0 ? 'skill' : 'skill_group' :
-            cache.source_attribute : 'rollsroot';
+            cache.source_attribute : cache.source_id; //'rollsroot';
         roll.type = cache.source_type === 'react' ? 
             cache.source_attribute === 'skill' ?
                 cache.rulesdb.rules_optional_individual_status !== 0 ? 'skill' : 'skill_group' :
-        cache.source_attribute : '';
+        cache.source_attribute : cache.source_id;
         while (!query.do_roll) {
             switch(query.next) {
                 // Roll Menu Options Root
@@ -7930,10 +7940,15 @@
                 finishRoll(roll.initiative_roll.rollId);
                 roll.dice_values = 
                     roll.initiative_roll.results.total.expression.split("+");
+                if (roll.dice.type === 'edge') {
+                    roll.dice_values.sort((a, b) => b - a);
+                } else if (roll.dice.type === 'obstacle') {
+                    roll.dice_values.sort((a, b) => a - b);
+                }
                 roll.dice_total = 
                     `{{total=[[ [[1d0+${roll.dice_values[0]}]] + [[1d0+${roll.dice_values[1]}]] `;
                 for (let i = 2, n = roll.dice_values.length; i < n; i++) {
-                    roll.dice_total += `+ [[1d0+${roll.dice_values[i]}]] `
+                    roll.dice_total += `+ [[1d0+${roll.dice_values[i]}]] - [[${roll.dice_values[i]}]] `
                 }
                 roll.dice_total += 
                     `+ [[${roll.cv}]] &{tracker} ]]}}`;
@@ -8055,13 +8070,13 @@
         // Roll against initial roll template and determine dice.
         query.crp = await startRoll(roll.template);
         roll.results = [];
-        for (let i = 0, n = roll.dice.number; i < n; i++) {
+        for (let i = 0; i < roll.dice.number; i++) {
             roll.results.push(query.crp.results[`dice${i}`].result);
         }
         roll.computed = {
             total: 0,
         };
-        for (let i = 0, n = roll.dice.number; i < n; i++) {
+        for (let i = 0; i < roll.dice.number; i++) {
             if (i === 0 || i === 1) {
                 roll.computed[`dice_value${i}`] = 
                     roll.dice.type === 'obstacle' ? _.min(roll.results) :
@@ -9866,6 +9881,48 @@
                         query.transpated_stat = query.stat.map(s => getTranslationByKey(s));
                         query.display_stat = `${query.transpated_stat.join('+')}`;
                         set_values[`${cache.source_path}_stat`] = query.display_stat;
+                    break;
+                }
+            }
+        }
+    }
+
+    async function rollMenu(cache, set_values) {
+        const query = {};
+        clog(cache, query, 'rollMenu()');
+        query.next = cache.source_id;
+        query.commit = false;
+        while (!query.commit) {
+            switch (query.next) {
+                case 'add':
+                    query.fields = ['name','modifier','attribute','stat','target','maneuver','enemy'];
+                    query.title = `${getTranslationByKey("roll-type")}`;
+                    query.options =
+                        `|2d6,2d6` +
+                        `|${getTranslationByKey("attack")},attack` +
+                        `|${getTranslationByKey("attribute")},attribute` +
+                        `|${getTranslationByKey("initiative")},initiative` +
+                        `|${getTranslationByKey("skill")},skill` +
+                        `|${getTranslationByKey("stat")},stat`;
+                    query.last = query.next;
+                break;
+                case 'delete':
+
+                break;
+            }
+            if (!query.commit) {
+                if (query.title !== '') { await crpQuery(cache, query, query.last); }
+                switch (query.last) {
+                    case 'add':
+                        query.row_id = generateRowID();
+                        query.type = query.selection;
+                        for (let i = 0; i < query.fields.length; i++) {
+                            set_values[`repeating_roll_${query.row_id}_${query.fields[i]}`] = '';
+                        }
+                        query.commit = true;
+                    break;
+                    case 'delete':
+
                     break;
                 }
             }
@@ -13982,9 +14039,20 @@
                     break;
                     case 'roll':
                         switch (cache.source_id) {
+                            case '2d6':
+                            case 'attack':
+                            case 'attribute':
+                            case 'initiative':
+                            case 'skill':
+                            case 'stat':
+                                await actionRoll(cache, set_values);
+                            break;
                             case 'accordions':
                                 cache.roll_ids = await getSectionIDsAsync('roll');
                                 setRollAccordions(cache, set_values);
+                            break;
+                            case 'add':
+                                await rollMenu(cache, set_values);
                             break;
                         }
                     break;
