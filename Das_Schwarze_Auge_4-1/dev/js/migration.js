@@ -489,11 +489,10 @@ Encumbrance from armour for initiative calculation
 Dummy attribute for display of value is not used anymore, BE used instead
 */
 function migrateTo20210718 (migrationChain) {
-	var caller = "migrateTo20210718";
-	debugLog(caller, "migrateTo20210718 invoked");
-	var func = "migrateTo20210718";
+	const caller = "migrateTo20210718";
+	debugLog(caller, "started");
 
-	var requirements = [
+	const requirements = [
 		"Ges_BE",
 		"BE_Last",
 		"BE_TaW",
@@ -506,33 +505,40 @@ function migrateTo20210718 (migrationChain) {
 		"sf_rustungsgewohnungIII"
 	];
 
-	var defaultValue = 0;
+	const defaultValue = 0;
 
 	safeGetAttrs(requirements, function(values) {
 		results = checkRequiredProperties(requirements, values);
-		if (results["errors"] >= 1) {
+		if (results["errors"] >= 1)
+		{
 			debugLog(caller, "Missing properties: '" + results["missing"].toString() + "'. Using default values. 0 for 'Ges_BE', 'BE_Last', 'BE_TaW' and 'sf_rustungsgewohnungIII'.");
-			for (let req of requirements) {
-				if (!Object.hasOwn(values, req)) {
+			for (let req of requirements)
+			{
+				if (!Object.hasOwn(values, req))
+				{
 					values[req] = defaultValue;
 				}
 			}
 		}
 		// Check sanity
-		var reqsToCheck = requirements.slice(0,3);
-		for (let req of reqsToCheck) {
-			if (!DSAsane(values[req], "encumbrance")) {
+		let reqsToCheck = requirements.slice(0,3);
+		for (let req of reqsToCheck)
+		{
+			if (!DSAsane(values[req], "encumbrance"))
+			{
 				debugLog(caller, "'" + req + "' not sane, set to default value (" + defaultValue + ").");
 				values[req] = defaultValue;
 			}
 		}
-		update = {};
-		update["BE_RG"] = parseInt(values["Ges_BE"]);
-		update["BE_Last"] = parseInt(values["BE_Last"]);
-		update["BE"] = parseInt(values["Ges_BE"]) + parseInt(values["BE_Last"]);
-		update["BE_RG_INI"] = calculateRuestungBE(values, {"sourceType": "migration"})["BE_RG_INI"];
-		debugLog(caller, "Gathering new values complete:", update);
-		safeSetAttrs(update, {}, function() {
+
+		let attrsToChange = {};
+		attrsToChange["BE_RG"] = parseInt(values["Ges_BE"]);
+		attrsToChange["BE_Last"] = parseInt(values["BE_Last"]);
+		attrsToChange["BE"] = parseInt(values["Ges_BE"]) + parseInt(values["BE_Last"]);
+		attrsToChange["BE_RG_INI"] = calculateRuestungBE(values, {"sourceType": "migration"})["BE_RG_INI"];
+
+		debugLog(caller, "Gathering new values complete:", attrsToChange);
+		safeSetAttrs(attrsToChange, {}, function() {
 			callNextMigration(migrationChain);
 		});
 	});
