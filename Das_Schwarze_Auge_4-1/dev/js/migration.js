@@ -691,17 +691,17 @@ function migrateTo20220821(migrationChain) {
 	- Initialize attributes "AT_Aktiv_TaW", "PA_Aktiv_TaW", "k_mod_left_hand", "parryweapon_at", "TP_W_Aktiv", "TP_Bonus_Aktiv"
 */
 function migrateTo20230618(migrationChain) {
-	var caller = "migrateTo20230618";
-	debugLog(caller, "Invoked.");
+	const caller = "migrateTo20230618";
+	debugLog(caller, "started");
 
-	var attrsToChange =	{ "AT_Aktiv_TaW": "0", "PA_Aktiv_TaW": "0", "k_mod_left_hand": 9, "parryweapon_at": 0, "TP_W_Aktiv": 1, "TP_Bonus_Aktiv": 0 };
+	let attrsToChange =	{ "AT_Aktiv_TaW": "0", "PA_Aktiv_TaW": "0", "k_mod_left_hand": 9, "parryweapon_at": 0, "TP_W_Aktiv": 1, "TP_Bonus_Aktiv": 0 };
 
 	const outerAttrsToGet = [
 		// Attribute nur für AT_Aktiv_TaW, PA_Aktiv_TaW und parryweapon_at
 		"activeShieldRowId"
 	];
 	safeGetAttrs(outerAttrsToGet, function(outerValues) {
-		var innerAttrsToGet = [
+		let innerAttrsToGet = [
 			// Attribute für mehrere Initialisierungen
 			"NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4",
 			"sf_linkhand", "sf_beidhandigerkampfI", "sf_beidhandigerkampfII", "vorteil_beidhaendig",
@@ -728,8 +728,9 @@ function migrateTo20230618(migrationChain) {
 		// Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
 		// combat_technique ist neu und wird daher auf einen Standardwert gesetzt
 		// Gibt es keine activeShieldRow, ist nichts zu tun
-		var activeShieldRowId = outerValues["activeShieldRowId"];
-		if (activeShieldRowId) {
+		let activeShieldRowId = outerValues["activeShieldRowId"];
+		if (activeShieldRowId)
+		{
 			innerAttrsToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
 			innerAttrsToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
 			attrsToChange["repeating_shields_" + activeShieldRowId + "_combat_technique"] = "Dolche";
@@ -737,129 +738,146 @@ function migrateTo20230618(migrationChain) {
 
 		safeGetAttrs(innerAttrsToGet, function(innerValues) {
 			// AT_Aktiv_TaW, PA_Aktiv_TaW und parryweapon_at
-			var weapon = 0;
-			if (innerValues["NKW_Aktiv1"] === "1") {
-				weapon = 1;
-			} else if (innerValues["NKW_Aktiv2"] === "1") {
-				weapon = 2;
-			} else if (innerValues["NKW_Aktiv3"] === "1") {
-				weapon = 3;
-			} else if (innerValues["NKW_Aktiv4"] === "1") {
-				weapon = 4;
-			} else {
-				// didn't find an active weapon. setting innerValues to 0;
-				attrsToChange = {
-					"AT_Aktiv_TaW": "0",
-					"PA_Aktiv_TaW": "0",
-					"parryweapon_at": 0
+			{
+				let weapon = 0;
+				if (innerValues["NKW_Aktiv1"] === "1")
+				{
+					weapon = 1;
+				} else if (innerValues["NKW_Aktiv2"] === "1") {
+					weapon = 2;
+				} else if (innerValues["NKW_Aktiv3"] === "1") {
+					weapon = 3;
+				} else if (innerValues["NKW_Aktiv4"] === "1") {
+					weapon = 4;
+				} else {
+					// didn't find an active weapon. setting innerValues to 0;
+					attrsToChange = {
+						"AT_Aktiv_TaW": "0",
+						"PA_Aktiv_TaW": "0",
+						"parryweapon_at": 0
+					};
 				}
-			}
-			/// AT_Aktiv_TaW
-			var ATkampftechnikRaw = innerValues["NKW_AT_typ" + weapon];
-			//// AT-Wert nur berechenbar, wenn dahinterstehende Kampftechnik bekannt
-			if (ATkampftechnikRaw && ATkampftechnikRaw !== "0") {
-				var taw = 0;
-				var ATkampftechnik = ATkampftechnikRaw.match("@{AT_(.*)}");
+				/// AT_Aktiv_TaW
+				const ATkampftechnikRaw = innerValues["NKW_AT_typ" + weapon];
+				//// AT-Wert nur berechenbar, wenn dahinterstehende Kampftechnik bekannt
+				if (ATkampftechnikRaw && ATkampftechnikRaw !== "0")
+				{
+					let taw = 0;
+					const ATkampftechnik = ATkampftechnikRaw.match("@{AT_(.*)}");
 
-				// Suche nach der richtigen Schreibweise des Attributnamens ...
-				taw = parseInt(innerValues["TaW_" + ATkampftechnik[1]]);
-				if (isNaN(taw)) {
-					taw = parseInt(innerValues["TaW_" + ATkampftechnik[1].toLowerCase()]);
+					// Suche nach der richtigen Schreibweise des Attributnamens ...
+					taw = parseInt(innerValues["TaW_" + ATkampftechnik[1]]);
+					if (isNaN(taw))
+					{
+						taw = parseInt(innerValues["TaW_" + ATkampftechnik[1].toLowerCase()]);
+					}
+					attrsToChange["AT_Aktiv_TaW"] = taw;
 				}
-				attrsToChange["AT_Aktiv_TaW"] = taw;
-			}
 
-			/// PA_Aktiv_TaW
-			var PAkampftechnikRaw = innerValues["NKW_PA_typ" + weapon];
-			//// Wir berechnen den PA Wert nur, wenn ein Talenttyp für den PA Wert der Waffe ausgewählt ist
-			if (PAkampftechnikRaw && PAkampftechnikRaw !== "0" ) {
-				var taw = 0;
-				var PAkampftechnik = PAkampftechnikRaw.match("@{PA_(.*)}");
+				/// PA_Aktiv_TaW
+				const PAkampftechnikRaw = innerValues["NKW_PA_typ" + weapon];
+				//// Wir berechnen den PA Wert nur, wenn ein Talenttyp für den PA Wert der Waffe ausgewählt ist
+				if (PAkampftechnikRaw && PAkampftechnikRaw !== "0" )
+				{
+					let taw = 0;
+					const PAkampftechnik = PAkampftechnikRaw.match("@{PA_(.*)}");
 
-				// Suche nach der richtigen Schreibweise des Attributnamens ...
-				taw = parseInt(innerValues["TaW_" + PAkampftechnik[1]]);
-				if (isNaN(taw)) {
-					taw = parseInt(innerValues["TaW_" + PAkampftechnik[1].toLowerCase()]);
+					// Suche nach der richtigen Schreibweise des Attributnamens ...
+					taw = parseInt(innerValues["TaW_" + PAkampftechnik[1]]);
+					if (isNaN(taw)) {
+						taw = parseInt(innerValues["TaW_" + PAkampftechnik[1].toLowerCase()]);
+					}
+					attrsToChange["PA_Aktiv_TaW"] = taw;
 				}
-				attrsToChange["PA_Aktiv_TaW"] = taw;
-			}
 
-			/// parryweapon_at
-			if (activeShieldRowId) {
-				var linkhand = innerValues["sf_linkhand"];
-				if (innerValues["repeating_shields_" + activeShieldRowId + "_shield_type"] === "parryweapon") {
-					// Parierwaffen-AT besteht aus: AT der Kampftechnik + AT-WM der Waffe + Wundmod. + BE-Mod
-					var parryWeaponCombatTechnique = "Dolche";
-					if (DSAsane(parryWeaponCombatTechnique, "melee-combat-technique")) {
-						var AT = 0;
+				/// parryweapon_at
+				if (activeShieldRowId) {
+					if (innerValues["repeating_shields_" + activeShieldRowId + "_shield_type"] === "parryweapon")
+					{
+						// Parierwaffen-AT besteht aus: AT der Kampftechnik + AT-WM der Waffe + Wundmod. + BE-Mod
+						const parryWeaponCombatTechnique = "Dolche";
+						if (DSAsane(parryWeaponCombatTechnique, "melee-combat-technique"))
+						{
+							let AT = 0;
 
-						// Suche nach der richtigen Schreibweise des Attributnamens ...
-						AT = parseInt(innerValues["AT_" + parryWeaponCombatTechnique]);
-						if (isNaN(AT)) {
-							AT = parseInt(innerValues["AT_" + parryWeaponCombatTechnique.toLowerCase()])
+							// Suche nach der richtigen Schreibweise des Attributnamens ...
+							AT = parseInt(innerValues["AT_" + parryWeaponCombatTechnique]);
+							if (isNaN(AT))
+							{
+								AT = parseInt(innerValues["AT_" + parryWeaponCombatTechnique.toLowerCase()])
+							}
+
+							const atMod = parseInt(innerValues["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
+
+							const atValue =
+								AT + atMod
+								+ innerValues["AT_mod_wounds"]
+								- parseInt(innerValues["be_at_mod"]);
+							attrsToChange["parryweapon_at"] = atValue;
 						}
-
-						var atMod = parseInt(innerValues["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
-
-						var atValue =
-							AT + atMod
-							+ innerValues["AT_mod_wounds"]
-							- parseInt(innerValues["be_at_mod"]);
-						attrsToChange["parryweapon_at"] = atValue;
 					}
 				}
 			}
 
 			// TP-Würfelattribute
 			/// TP_W_Aktiv
-			var weapon = 0;
-			if (innerValues["NKW_Aktiv1"] === "1") {
-				weapon = "1";
-			} else if (innerValues["NKW_Aktiv2"] === "1") {
-				weapon = "2";
-			} else if (innerValues["NKW_Aktiv3"] === "1") {
-				weapon = "3";
-			} else if (innerValues["NKW_Aktiv4"] === "1") {
-				weapon = "4";
+			{
+				let weapon = 0;
+				if (innerValues["NKW_Aktiv1"] === "1")
+				{
+					weapon = "1";
+				} else if (innerValues["NKW_Aktiv2"] === "1") {
+					weapon = "2";
+				} else if (innerValues["NKW_Aktiv3"] === "1") {
+					weapon = "3";
+				} else if (innerValues["NKW_Aktiv4"] === "1") {
+					weapon = "4";
+				}
+
+				const diceCountAttr = "NKWschaden" + weapon + "_1";
+				let diceCount = parseInt(innerValues[diceCountAttr]);
+
+				if (isNaN(diceCount))
+				{
+					debugLog(caller, "Invalid number gotten for attribute", diceCountAttr + ":", innerValues[diceCountAttr] + ". Setting to 1.");
+					diceCount = 1;
+				}
+
+				attrsToChange["TP_W_Aktiv"] = diceCount;
 			}
-
-			var diceCountAttr = "NKWschaden" + weapon + "_1";
-			var diceCount = parseInt(innerValues[diceCountAttr]);
-
-			if (isNaN(diceCount)) {
-				debugLog(func, "Invalid number gotten for attribute", diceCountAttr + ":", innerValues[diceCountAttr] + ". Setting to 1.");
-				diceCount = 1;
-			}
-
-			attrsToChange["TP_W_Aktiv"] = diceCount;
 
 			/// TP_Bonus_Aktiv
-			var weapon = 0;
-			if (innerValues["NKW_Aktiv1"] === "1") {
-				weapon = "1";
-			} else if (innerValues["NKW_Aktiv2"] === "1") {
-				weapon = "2";
-			} else if (innerValues["NKW_Aktiv3"] === "1") {
-				weapon = "3";
-			} else if (innerValues["NKW_Aktiv4"] === "1") {
-				weapon = "4";
-			}
+			{
+				let weapon = 0;
+				if (innerValues["NKW_Aktiv1"] === "1")
+				{
+					weapon = "1";
+				} else if (innerValues["NKW_Aktiv2"] === "1") {
+					weapon = "2";
+				} else if (innerValues["NKW_Aktiv3"] === "1") {
+					weapon = "3";
+				} else if (innerValues["NKW_Aktiv4"] === "1") {
+					weapon = "4";
+				}
 
-			var damageAttr = "NKWschaden" + weapon + "_2";
-			var bonusAttr = "NKW" + weapon + "_SB";
-			var damage = parseInt(innerValues[damageAttr]);
-			var bonus = parseInt(innerValues[bonusAttr]);
+				const damageAttr = "NKWschaden" + weapon + "_2";
+				const bonusAttr = "NKW" + weapon + "_SB";
+				let damage = parseInt(innerValues[damageAttr]);
+				let bonus = parseInt(innerValues[bonusAttr]);
 
-			if (isNaN(damage)) {
-				debugLog(func, "Invalid number gotten for attribute", damageAttr + ":", innerValues[damageAttr] + ". Setting to 0.");
-				damage = 0;
-			}
-			if (isNaN(bonus)) {
-				debugLog(func, "Invalid number gotten for attribute", bonusAttr + ":", innerValues[bonusAttr] + ". Setting to 0.");
-				bonus = 0;
-			}
+				if (isNaN(damage))
+				{
+					debugLog(func, "Invalid number gotten for attribute", damageAttr + ":", innerValues[damageAttr] + ". Setting to 0.");
+					damage = 0;
+				}
+				if (isNaN(bonus))
+				{
+					debugLog(func, "Invalid number gotten for attribute", bonusAttr + ":", innerValues[bonusAttr] + ". Setting to 0.");
+					bonus = 0;
+				}
 
-			attrsToChange["TP_Bonus_Aktiv"] = damage + bonus;
+				attrsToChange["TP_Bonus_Aktiv"] = damage + bonus;
+			}
 
 			// k_mod_left_hand
 			const ambidextrous = innerValues["vorteil_beidhaendig"];
@@ -868,10 +886,12 @@ function migrateTo20230618(migrationChain) {
 			const ambidextrousFighting2 = innerValues["sf_beidhandigerkampfII"];
 
 			/// Advantage trumps the two lower special skills and is on par with the highest special skill
-			if (ambidextrous === "on") {
+			if (ambidextrous === "on")
+			{
 				attrsToChange["k_mod_left_hand"] = 0;
 			} else {
-				if (ambidextrousFighting2 === "1") {
+				if (ambidextrousFighting2 === "1")
+				{
 					attrsToChange["k_mod_left_hand"] = 0;
 				} else if (ambidextrousFighting1 === "1") {
 					attrsToChange["k_mod_left_hand"] = 3;
@@ -881,7 +901,8 @@ function migrateTo20230618(migrationChain) {
 					attrsToChange["k_mod_left_hand"] = 9;
 				}
 			}
-			debugLog(caller, attrsToChange);
+
+			debugLog(caller, "attrsToChange", attrsToChange);
 			safeSetAttrs(attrsToChange, {}, function(){
 				callNextMigration(migrationChain);
 			});
