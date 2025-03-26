@@ -1,3 +1,18 @@
+# 2025-3-25
+
+- Tracker now shows skills correctly.
+- Creature Law: Template for Encounter Tables
+- Creature Law: Finish template for creatures
+- Treasure Law: Add will stat bonus
+- RRs: Swap the two RR rolls to be consistent with other stuff
+- RRs: Fix use of sub attributes
+- Skills; Fix uses for skills with specialisations in level up
+- Uses:
+  - Taking injuries tickles a use of 'bodydevelopment'
+  - Casting a spell tickles a use of 'powerdevelopment'
+  - Total uses >= Current uses (for new ones)t
+  - Display correct global counter for uses.
+
 # 2025-3-18
 
 - Add whisper toggle - GM or Public
