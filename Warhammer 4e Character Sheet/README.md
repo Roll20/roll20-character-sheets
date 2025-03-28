@@ -81,6 +81,15 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Mar 28nd 2025 v1.76a
+
+- Fix distracting text showing melee attacks when it should not
+- Fix Impact bonus from x2 size not working after using melee reset button until VsSize was changed again
+- Add Skink as Player Race, from the Lustria book
+- Dwarf & HE talents work correctly with Auto XP calc
+- More Traits added
+
+
 Mar 22nd 2025 v1.76
 
 - New High Elf Player's Guide support, including Yenlui and Talents for HE career's.
