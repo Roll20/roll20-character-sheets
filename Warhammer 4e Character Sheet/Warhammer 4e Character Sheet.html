@@ -818,8 +818,8 @@
 					<div class="col-1-6 center pad-r-sm">
 
 					<input type="hidden" name="attr_Wounds" value=" " />
-					<input type="hidden" name="attr_Precurrwounds" value="  @{Wounds}+(@{Hardy}*@{Toughnessbonus})+@{Modifiers}+(@{Trait_Hardy}*@{Toughnessbonus})-@{Damage}  " />
-					<input type="hidden" name="attr_PreMaxwounds" value="  @{Wounds}+(@{Hardy}*@{Toughnessbonus})+@{Modifiers}+(@{Trait_Hardy}*@{Toughnessbonus})-@{Impale}  " />
+					<input type="hidden" name="attr_Precurrwounds" value="  @{Wounds}+(@{Hardy}*@{Toughnessbonus})+@{Modifiers}-@{Damage}  " />
+					<input type="hidden" name="attr_PreMaxwounds" value="  @{Wounds}+(@{Hardy}*@{Toughnessbonus})+@{Modifiers}-@{Impale}  " />
 						<input class="center" type="number" name="attr_CurrWounds" value=" ((((@{Precurrwounds}) + (@{PreMaxwounds})) - abs((@{Precurrwounds}) - (@{PreMaxwounds})))/2) " disabled />
 
 					</div>
@@ -827,8 +827,8 @@
 					<div class="col-1-6 center pad-r-sm">
 
 					<input type="hidden" name="attr_Wounds" value=" " />
-					<input type="hidden" name="attr_Precurrwounds2" value="  @{Wounds}+(@{Talent_HardyLvl}*@{Toughnessbonus})+@{Modifiers}+(@{Trait_Hardy}*@{Toughnessbonus})-@{Damage}  " />
-					<input type="hidden" name="attr_PreMaxwounds2" value="  @{Wounds}+(@{Talent_HardyLvl}*@{Toughnessbonus})+@{Modifiers}+(@{Trait_Hardy}*@{Toughnessbonus})-@{Impale}  " />
+					<input type="hidden" name="attr_Precurrwounds2" value="  @{Wounds}+(@{Talent_HardyLvl}*@{Toughnessbonus})+@{Modifiers}-@{Damage}  " />
+					<input type="hidden" name="attr_PreMaxwounds2" value="  @{Wounds}+(@{Talent_HardyLvl}*@{Toughnessbonus})+@{Modifiers}-@{Impale}  " />
 						<input class="center" type="number" name="attr_CurrWounds2" value=" ((((@{Precurrwounds2}) + (@{PreMaxwounds2})) - abs((@{Precurrwounds2}) - (@{PreMaxwounds2})))/2) " disabled />
 
 					</div>
@@ -28641,6 +28641,24 @@
 											</div>
 										</div>
 										<div class="row">
+											<div class="col-1-2 left">
+												<span data-i18n="SIZE" class="nowrap"></span>
+											</div>
+											<div class="col-1-2 center" style="padding-right: 4px;">
+												<select class="select-no-arrow-center2" name="attr_Size" style="width: 52px; height: 13px !important; font-size: 10px !important;" >
+													<option value="1" data-i18n="NPC-SIZE-MONSTROUS">Monstrous</option>
+													<option value="2" data-i18n="NPC-SIZE-ENORMOUS">Enormous</option>
+													<option value="3" data-i18n="NPC-SIZE-LARGE">Large</option>
+													<option disabled>────────</option>
+													<option value="4" selected="selected" data-i18n="NPC-SIZE-AVERAGE">Average</option>
+													<option disabled>────────</option>
+													<option value="5" data-i18n="NPC-SIZE-SMALL">Small</option>
+													<option value="6" data-i18n="NPC-SIZE-LITTLE">Little</option>
+													<option value="7" data-i18n="NPC-SIZE-TINY">Tiny</option>
+												</select>
+											</div>
+										</div>
+										<div class="row">
 											<div class="col-3-4 left">
 												<span data-i18n="STEALTHY" class="nowrap"></span>
 											</div>
@@ -43793,68 +43811,74 @@
 		});
 		});
 		
-on("change:strengthbonus change:toughnessbonus change:ToughnessAdv change:ToughnessMod change:willpowerbonus change:race change:size", function (event) {
-		getAttrs(['StrengthBonus', 'ToughnessBonus', 'WillPowerBonus', 'Race', 'Size'], function (w) {
+on("change:strengthbonus change:toughnessbonus change:ToughnessAdv change:ToughnessMod change:willpowerbonus change:race change:size change:trait_hardy", function (event) {
+		getAttrs(['StrengthBonus', 'ToughnessBonus', 'WillPowerBonus', 'Race', 'Size', 'Trait_Hardy'], function (w) {
 		const str = +w.StrengthBonus || 0;
 		const tou = +w.ToughnessBonus || 0;
 		const wil = +w.WillPowerBonus || 0;
+		const har = +w.Trait_Hardy || 0;
 		const race = w.Race.toLowerCase();
 		let wounds = str + tou*2 + wil;
 		let lenc = 1;
 		let size = w.Size;
 
+		console.log("test");
+
 		if (event.triggerName == "size") {
 		if(size == 7) {
-		wounds -= str + tou*2 + wil - 1;
+		wounds -= str + tou*2 + wil - 1 - har*tou;
 		}
 		if(size == 6) {
-		wounds -= str + tou + wil;
+		wounds -= str + tou + wil - har*tou;
 		}
 		if(size == 5) {
-		wounds -= str;
+		wounds -= str - har*tou;
+		}
+		if(size == 4) {
+		wounds = (str + tou*2 + wil + har*tou);
 		}
 		if(size == 3) {
-		wounds = (str + tou*2 + wil)*2;
+		wounds = (str + tou*2 + wil + har*tou)*2;
 		lenc = 2;
 		}
 		if(size == 2) {
-		wounds = (str + tou*2 + wil)*4;
+		wounds = (str + tou*2 + wil + har*tou)*4;
 		lenc = 4;
 		}
 		if(size == 1) {
-		wounds = (str + tou*2 + wil)*8;
+		wounds = (str + tou*2 + wil + har*tou)*8;
 		lenc = 8;
 		}
 		
 		} else if (event.triggerName == "race") {
 		
 		if(race === 'halfling') {
-		wounds -= str;
+		wounds -= str - har*tou;
 		size = 5;
 		}
 		if(race === 'gnome') {
-		wounds -= str;
+		wounds -= str - har*tou;
 		size = 5;
 		}
 		if(race === 'ogre') {
-		wounds = (str + tou*2 + wil)*2;
+		wounds = (str + tou*2 + wil + har*tou)*2;
 		lenc = 2;
 		size = 3;
 		}
 		if(race === 'human') {
-		wounds = (str + tou*2 + wil);
+		wounds = (str + tou*2 + wil + har*tou);
 		size = 4;
 		}
 		if(race === 'high elf') {
-		wounds = (str + tou*2 + wil);
+		wounds = (str + tou*2 + wil + har*tou);
 		size = 4;
 		}
 		if(race === 'wood elf') {
-		wounds = (str + tou*2 + wil);
+		wounds = (str + tou*2 + wil + har*tou);
 		size = 4;
 		}
 		if(race === 'dwarf') {
-		wounds = (str + tou*2 + wil);
+		wounds = (str + tou*2 + wil + har*tou);
 		size = 4;		
 		setAttrs({
 		goals: 1,
@@ -43864,7 +43888,7 @@ on("change:strengthbonus change:toughnessbonus change:ToughnessAdv change:Toughn
 		goals: 0,
 		});}
 		if(race === 'norse') {
-		wounds = (str + tou*2 + wil);
+		wounds = (str + tou*2 + wil + har*tou);
 		size = 4;
 		}
 		if(race === 'custom') {
@@ -43872,24 +43896,27 @@ on("change:strengthbonus change:toughnessbonus change:ToughnessAdv change:Toughn
 		}
 		} else {
 		if(size == 7) {
-		wounds -= str + tou*2 + wil - 1;
+		wounds -= str + tou*2 + wil - 1 - har*tou;
 		}
 		if(size == 6) {
-		wounds -= str + tou + wil;
+		wounds -= str + tou + wil - har*tou;
 		}
 		if(size == 5) {
-		wounds -= str;
+		wounds -= str - har*tou;
+		}
+		if(size == 4) {
+		wounds = str + tou*2 + wil + har*tou;
 		}
 		if(size == 3) {
-		wounds = (str + tou*2 + wil)*2;
+		wounds = (str + tou*2 + wil + har*tou)*2;
 		lenc = 2;
 		}
 		if(size == 2) {
-		wounds = (str + tou*2 + wil)*4;
+		wounds = (str + tou*2 + wil + har*tou)*4;
 		lenc = 4;
 		}
 		if(size == 1) {
-		wounds = (str + tou*2 + wil)*8;
+		wounds = (str + tou*2 + wil + har*tou)*8;
 		lenc = 8;
 		}
 		}
