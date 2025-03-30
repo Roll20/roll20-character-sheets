@@ -326,9 +326,6 @@
         <input type="text" name="attr_fiefname" />
       </div>
       <div class="common">
-        <div>
-          <button type="roll" class="rolling" value="&{template:daegong-dif} {{dif=[[1d6]]}}">난이도 굴림</button>
-        </div>
     </div>
   </div>
 
@@ -420,14 +417,21 @@
 
   <hr>
   <div class="section seasons">
-    <h2 data-i18n="계절별 위기">계절별 위기</h2>
+    <div>
+      <h2 data-i18n="계절별 위기" style="display:inline-block;">계절별 위기</h2>
+      <button type="roll" class="rolling" value="&{template:daegong-dif}  {{dif=[[1d6]]}} {{step=?{단계|사건단계|운영단계}}} {{season=?{계절|봄|여름|가을|겨울}}} {{addDif=[[?{추가 난이도 보정치|0}]]}}">난이도 굴림</button>
+      <label class="extbox" for="season_ext">
+        <span>추가 위기 팩</span>
+        <span class="material-symbols-rounded">extension</span>
+      </label>
+    </div>
 
     <input type="checkbox" class="displaynone" id="season_ext" />
     <div class="add-ext">
       <div>
         <h3>안내사항</h3>
         <p>추가로 제공되는 텍스트를 붙여넣습니다. 양식은 다음과 같습니다.</p>
-        <p>[ {"season":"common/winter/spring/summer/fall 중 택1","difficulty" : "easy/normal/hard 중 택1","content":"사건 단계 내용","content_dif":"운영 단계 내용"}, {…}, {…}, … {…} ]</p>
+        <p>[ {"title":"제목","season":"common/winter/spring/summer/fall 중 택1","difficulty" : "easy/normal/hard 중 택1","content":"사건 단계 내용","content_dif":"운영 단계 내용"}, {…}, {…}, … {…} ]</p>
         <p>줄바꿈은 \n으로 변환해 입력해 주세요. 내용에 큰따옴표(")를 사용할 수 없습니다. 후행 쉼표(마지막 } 이후 쉼표)를 작성하지 마십시오.</p>
       </div>
       <div style="grid-column:span 2;">
@@ -437,67 +441,178 @@
     </div>
 
     <div class="st-row">
-      <select name="attr_sel-season" aria-placeholder="계절 선택">
-        <option value="winter">겨울</option>
-        <option value="spring">봄</option>
-        <option value="summer">여름</option>
-        <option value="fall">가을</option>
-      </select>
-      <select name="attr_sel-dif" aria-placeholder="난이도 선택">
-        <option value="easy">쉬움</option>
-        <option value="normal">보통</option>
-        <option value="hard">어려움</option>
-      </select>
-      <button name="act_season-roll" type="action">t</button>
-
-      <label class="extbox" for="season_ext">
-        <span>추가 위기 팩</span>
-        <span class="material-symbols-rounded">extension</span>
-      </label>
 
     </div>
 
     <div class="season-item">
       <h3 class="sheet-label">
         <span>겨울</span>
-        <input type="text" name="attr_season-winter-diff" />
+        <button name="act_season-roll" class="material-symbols-rounded" type="action" value="winter">play_circle</button>
         <input type="text" name="attr_season-winter-t" />
       </h3>
-      <button type="roll" class="season-title" value="&{template:daegong-crisis} {{season=겨울}} {{title=@{season-winter-t}}} {{content=@{season-winter}}} {{content_dif=@{season-winter-d}}} {{difficulty=@{season-winter-diff}}} {{ev=사건}}">사건단계</button>
-      <button type="roll" class="season-title" value="&{template:daegong-crisis} {{season=겨울}} {{title=@{season-winter-t}}} {{content=@{season-winter}}} {{content_dif=@{season-winter-d}}} {{difficulty=@{season-winter-diff}}} {{op=운영}}">운영단계</button>
+      <div class="season-title">
+        <button type="roll" value="&{template:daegong-crisis} {{season=겨울}} {{title=@{season-winter-t}}} {{content=@{season-winter}}} {{difficulty=@{dif-winter-ev}}} {{ev=사건}}">사건단계</button>
+        <div>
+          <span>난이도 
+            <select name="attr_dif-winter-ev" aria-placeholder="사건단계 난이도 선택">
+              <option value="easy">쉬움</option>
+              <option value="normal">보통</option>
+              <option value="hard">어려움</option>
+            </select>
+            <button name="act_season-show-desc" type="action" value="winter|ev" class="material-symbols-rounded">arrow_downward</button>
+          </span>
+          <span>
+            목표 성공수 <input type="text" name="attr_sucnum-winter-ev" style="width:30px;"/>
+          </span>
+        </div>
+      </div>
+
+      <div class="season-title">
+        <button type="roll" value="&{template:daegong-crisis} {{season=겨울}} {{title=@{season-winter-t}}} {{content=@{season-winter-d}}} {{difficulty=@{dif-winter-op}}} {{op=운영}}">운영단계</button>
+        <div>
+          <span>난이도 
+            <select name="attr_dif-winter-op" aria-placeholder="운영단계 난이도 선택">
+              <option value="easy">쉬움</option>
+              <option value="normal">보통</option>
+              <option value="hard">어려움</option>
+            </select>
+            <button name="act_season-show-desc" type="action" value="winter|op" class="material-symbols-rounded">arrow_downward</button>
+          </span>
+          <span>
+            목표 성공수 <input type="text" name="attr_sucnum-winter-op" style="width:30px;"/>
+          </span>
+        </div>
+      </div>
       <textarea name="attr_season-winter"></textarea>
       <textarea name="attr_season-winter-d"></textarea>
     </div>
+
+
     <div class="season-item">
       <h3 class="sheet-label">
         <span>봄</span>
-        <input type="text" name="attr_season-spring-diff" />
+        <button name="act_season-roll" class="material-symbols-rounded" type="action" value="spring">play_circle</button>
         <input type="text" name="attr_season-spring-t" />
       </h3>
-      <button type="roll" class="season-title" value="&{template:daegong-crisis} {{season=봄}} {{title=@{season-spring-t}}} {{content=@{season-spring}}} {{content_dif=@{season-spring-d}}} {{difficulty=@{season-spring-diff}}} {{ev=사건}}">사건단계</button>
-      <button type="roll" class="season-title" value="&{template:daegong-crisis} {{season=봄}} {{title=@{season-spring-t}}} {{content=@{season-spring}}} {{content_dif=@{season-spring-d}}} {{difficulty=@{season-spring-diff}}} {{op=운영}}">운영단계</button>
+      <div class="season-title">
+        <button type="roll" value="&{template:daegong-crisis} {{season=봄}} {{title=@{season-spring-t}}} {{content=@{season-spring}}} {{difficulty=@{dif-spring-ev}}} {{ev=사건}}">사건단계</button>
+        <div>
+          <span>난이도 
+            <select name="attr_dif-spring-ev" aria-placeholder="사건단계 난이도 선택">
+              <option value="easy">쉬움</option>
+              <option value="normal">보통</option>
+              <option value="hard">어려움</option>
+            </select>
+            <button name="act_season-show-desc" type="action" value="spring|ev" class="material-symbols-rounded">arrow_downward</button>
+          </span>
+          <span>
+            목표 성공수 <input type="text" name="attr_sucnum-spring-ev" style="width:30px;"/>
+          </span>
+        </div>
+      </div>
+
+      <div class="season-title">
+        <button type="roll" value="&{template:daegong-crisis} {{season=봄}} {{title=@{season-spring-t}}} {{content=@{season-spring-d}}} {{difficulty=@{dif-spring-op}}} {{op=운영}}">운영단계</button>
+        <div>
+          <span>난이도 
+            <select name="attr_dif-spring-op" aria-placeholder="운영단계 난이도 선택">
+              <option value="easy">쉬움</option>
+              <option value="normal">보통</option>
+              <option value="hard">어려움</option>
+            </select>
+            <button name="act_season-show-desc" type="action" value="spring|op" class="material-symbols-rounded">arrow_downward</button>
+          </span>
+          <span>
+            목표 성공수 <input type="text" name="attr_sucnum-spring-op" style="width:30px;"/>
+          </span>
+        </div>
+      </div>
       <textarea name="attr_season-spring"></textarea>
       <textarea name="attr_season-spring-d"></textarea>
     </div>
     <div class="season-item">
       <h3 class="sheet-label">
         <span>여름</span>
-        <input type="text" name="attr_season-summer-diff" />
+        <button name="act_season-roll" class="material-symbols-rounded" type="action" value="summer">play_circle</button>
         <input type="text" name="attr_season-summer-t" />
       </h3>
-      <button type="roll" class="season-title" value="&{template:daegong-crisis} {{season=여름}} {{title=@{season-summer-t}}} {{content=@{season-summer}}} {{content_dif=@{season-summer-d}}} {{difficulty=@{season-summer-diff}}} {{ev=사건}}">사건단계</button>
-      <button type="roll" class="season-title" value="&{template:daegong-crisis} {{season=여름}} {{title=@{season-summer-t}}} {{content=@{season-summer}}} {{content_dif=@{season-summer-d}}} {{difficulty=@{season-summer-diff}}} {{op=운영}}">운영단계</button>
+      <div class="season-title">
+        <button type="roll" value="&{template:daegong-crisis} {{season=여름}} {{title=@{season-summer-t}}} {{content=@{season-summer}}} {{difficulty=@{dif-summer-ev}}} {{ev=사건}}">사건단계</button>
+        <div>
+          <span>난이도 
+            <select name="attr_dif-summer-ev" aria-placeholder="사건단계 난이도 선택">
+              <option value="easy">쉬움</option>
+              <option value="normal">보통</option>
+              <option value="hard">어려움</option>
+            </select>
+            <button name="act_season-show-desc" type="action" value="summer|ev" class="material-symbols-rounded">arrow_downward</button>
+          </span>
+          <span>
+            목표 성공수 <input type="text" name="attr_sucnum-summer-ev" style="width:30px;"/>
+          </span>
+        </div>
+      </div>
+
+      <div class="season-title">
+        <button type="roll" value="&{template:daegong-crisis} {{season=여름}} {{title=@{season-summer-t}}} {{content=@{season-summer-d}}} {{difficulty=@{dif-summer-op}}} {{op=운영}}">운영단계</button>
+        <div>
+          <span>난이도 
+            <select name="attr_dif-summer-op" aria-placeholder="운영단계 난이도 선택">
+              <option value="easy">쉬움</option>
+              <option value="normal">보통</option>
+              <option value="hard">어려움</option>
+            </select>
+            <button name="act_season-show-desc" type="action" value="summer|op" class="material-symbols-rounded">arrow_downward</button>
+          </span>
+          <span>
+            목표 성공수 <input type="text" name="attr_sucnum-summer-op" style="width:30px;"/>
+          </span>
+        </div>
+      </div>
       <textarea name="attr_season-summer"></textarea>
       <textarea name="attr_season-summer-d"></textarea>
     </div>
+
+
     <div class="season-item">
       <h3 class="sheet-label">
         <span>가을</span>
-        <input type="text" name="attr_season-fall-diff" />
+        <button name="act_season-roll" class="material-symbols-rounded" type="action" value="fall">play_circle</button>
         <input type="text" name="attr_season-fall-t" />
       </h3>
-      <button type="roll" class="season-title" value="&{template:daegong-crisis} {{season=가을}} {{title=@{season-fall-t}}} {{content=@{season-fall}}} {{content_dif=@{season-fall-d}}} {{difficulty=@{season-fall-diff}}} {{ev=사건}}">사건단계</button>
-      <button type="roll" class="season-title" value="&{template:daegong-crisis} {{season=가을}} {{title=@{season-fall-t}}} {{content=@{season-fall}}} {{content_dif=@{season-fall-d}}} {{difficulty=@{season-fall-diff}}} {{op=운영}}">운영단계</button>
+      <div class="season-title">
+        <button type="roll" value="&{template:daegong-crisis} {{season=가을}} {{title=@{season-fall-t}}} {{content=@{season-fall}}} {{difficulty=@{dif-fall-ev}}} {{ev=사건}}">사건단계</button>
+        <div>
+          <span>난이도 
+            <select name="attr_dif-fall-ev" aria-placeholder="사건단계 난이도 선택">
+              <option value="easy">쉬움</option>
+              <option value="normal">보통</option>
+              <option value="hard">어려움</option>
+            </select>
+            <button name="act_season-show-desc" type="action" value="fall|ev" class="material-symbols-rounded">arrow_downward</button>
+          </span>
+          <span>
+            목표 성공수 <input type="text" name="attr_sucnum-fall-ev" style="width:30px;"/>
+          </span>
+        </div>
+      </div>
+
+      <div class="season-title">
+        <button type="roll" value="&{template:daegong-crisis} {{season=가을}} {{title=@{season-fall-t}}} {{content=@{season-fall-d}}} {{difficulty=@{dif-fall-op}}} {{op=운영}}">운영단계</button>
+        <div>
+          <span>난이도 
+            <select name="attr_dif-fall-op" aria-placeholder="운영단계 난이도 선택">
+              <option value="easy">쉬움</option>
+              <option value="normal">보통</option>
+              <option value="hard">어려움</option>
+            </select>
+            <button name="act_season-show-desc" type="action" value="fall|op" class="material-symbols-rounded">arrow_downward</button>
+          </span>
+          <span>
+            목표 성공수 <input type="text" name="attr_sucnum-fall-op" style="width:30px;"/>
+          </span>
+        </div>
+      </div>
       <textarea name="attr_season-fall"></textarea>
       <textarea name="attr_season-fall-d"></textarea>
     </div>
@@ -900,13 +1015,14 @@
       {{#season}}{{season}}의 위기{{/season}}
       {{#skill}}{{skill}}{{/skill}}
     </h3>
-    {{#difficulty}}<span>{{difficulty}}</span>{{/difficulty}}
+    {{#difficulty}}
+    <span class="sheet-rt-dif-{{difficulty}}"></span>
+    {{/difficulty}}
   </div>
   <h4>{{title}} / {{op}}{{ev}}단계</h4>
   <div class="sheet-rt-border"></div>
   <div class="sheet-rt-box">
-    {{#ev}}{{content}}{{/ev}}
-    {{#op}}{{content_dif}}{{/op}}
+    {{#content}}{{content}}{{/content}}
   </div>
 </div>
 </rolltemplate>
@@ -916,7 +1032,7 @@
 <rolltemplate class="sheet-rolltemplate-daegong-dif">
 <div class="sheet-rt">
   <div class="sheet-rt-title">
-    <h3>난이도</h3>
+    <h3>{{season}}의 {{step}} 난이도</h3>
   </div>
   <div class="sheet-rt-border"></div>
   <div class="sheet-one-dicebox">
@@ -924,16 +1040,16 @@
   </div>
   <div class="sheet-rt-box sheet-rt-table">
     {{#rollBetween() dif 1 2 }}
-    <div>목표 성공수</div><span>쉬움</span>
-    <div>난이도</div><span>4</span>
+      <div>난이도</div><span>쉬움</span>
+      <div>목표 성공수</div><span>4{{#rollGreater() addDif 0 }} + {{addDif}}{{/rollGreater() addDif 0}}</span>
     {{/rollBetween() dif 1 2 }}
     {{#rollBetween() dif 3 4 }}
       <div>난이도</div><span>평범</span>
-      <div>목표 성공수</div><span>6</span>
+      <div>목표 성공수</div><span>6{{#rollGreater() addDif 0 }} + {{addDif}}{{/rollGreater() addDif 0}}</span>
     {{/rollBetween() dif 3 4 }}
     {{#rollBetween() dif 5 6 }}
       <div>난이도</div><span>어려움</span>
-      <div>목표 성공수</div><span>8</span>
+      <div>목표 성공수</div><span>8{{#rollGreater() addDif 0 }} + {{addDif}}{{/rollGreater() addDif 0}}</span>
     {{/rollBetween() dif 5 6 }}
   </div>
 </div>
@@ -1384,20 +1500,79 @@ on('clicked:r-opPhase',(e)=>{
   });
 
 
-  on('clicked:season-roll',()=>{
+
+  // attr-season-t : 계절별 위기 제목
+  // attr-season : 계절별 사건단계 위기내용
+  // attr-season-d : 계절별 운영단계 위기내용
+  // attr-sel_season : 선택된 계절 (이제안씀)
+  // attr-sel-dif : 선택된 난이도 (다른걸로 변경)
+  // attr_add-season : 추가 위기
+
+
+  on('clicked:season-show-desc',(e)=>{
+    // e.htmlAttributes.value = 계절|ev,op종류
+    var season = e.htmlAttributes.value.split('|')[0];
+    var step = e.htmlAttributes.value.split('|')[1];
+
+    const season_title= 'season-'+season+'-t';
+    const season_dif = 'dif-'+season+'-'+step;
+
+    // 해당 위기 제목, 난이도, 계절 추가 위기 가져오기
+    getAttrs([season_title,season_dif,'add-season'], (v)=>{
+      // 계절 추가
+      var add_season = v['add-season'];
+      add_season = add_season.replace(/\n/g, '');
+      try {
+        JSON_season = JSON.parse(add_season);
+      } catch {
+        JSON_season = [];
+      }
+      var crisisArr = crisisDATA.concat(JSON_season);
+      crisisArr = _.uniq(crisisArr);
+
+      const p_title = v[season_title];
+      const p_dif = v[season_dif];
+
+      var targetAttrName = '';
+      _.each(crisisArr, data=>{
+        if(data.title == p_title && data.difficulty == p_dif){
+          if (step==='ev') {
+            targetAttrName = 'season-'+season;
+            setAttrs({
+              [targetAttrName] : data.content
+            });
+
+          } else if (step==='op') {
+            targetAttrName = 'season-'+season+'-d';
+            setAttrs({
+              [targetAttrName] : data.content_dif
+            });
+          } else {
+            log("error");
+            return false;
+          }
+        }
+      });
+
+    });
+  });
+
+  on('clicked:season-roll',(e)=>{
+    // e.htmlAttributes.value = 계절
+    var season = e.htmlAttributes.value;
+    
+    // 기존 위기 제목
     var seasonArr = [];
-    getAttrs(['season-winter','season-spring','season-summer','season-fall'], (v)=>{
-      seasonArr.push(v['season-winter']);
-      seasonArr.push(v['season-spring']);
-      seasonArr.push(v['season-summer']);
-      seasonArr.push(v['season-fall']);
+    getAttrs(['season-winter-t','season-spring-t','season-summer-t','season-fall-t'], (v)=>{
+      seasonArr.push(v['season-winter-t']);
+      seasonArr.push(v['season-spring-t']);
+      seasonArr.push(v['season-summer-t']);
+      seasonArr.push(v['season-fall-t']);
     });
 
-    getAttrs(['sel-season','sel-dif','add-season'], (v)=>{
-      var sel_season = v['sel-season'];
-      var sel_dif = v['sel-dif'];
+    getAttrs(['add-season'], (v)=>{
+      var sel_season = e.htmlAttributes.value;
       var add_season = v['add-season'];
-  
       add_season = add_season.replace(/\n/g, '');
       try {
         JSON_season = JSON.parse(add_season);
@@ -1405,50 +1580,31 @@ on('clicked:r-opPhase',(e)=>{
         JSON_season = [];
       }
 
+      // 해당하는 계절 위기 데이터 타이틀만 배열로 출력
       var crisisArr = crisisDATA.concat(JSON_season);
-      crisisArr = _.uniq(crisisArr);
-      var crisisRandBox = [];
-      _.each(crisisArr, data=>{
-        if((data.season == sel_season || data.season == 'common') && (data.difficulty == sel_dif)){
-          if(seasonArr.indexOf(data.content) === -1) {
-            crisisRandBox.push(data);
-          }
-        }
+      crisisTitleArr = _.map(crisisArr, function(obj) {
+        // 중복 출력방지
+        if(_.indexOf(seasonArr,obj.title)!==-1) return false;
+        if(obj.season == sel_season || obj.season == 'common') return obj.title;
       });
-      
-      var crisis = crisisRandBox[Math.floor(Math.random()*crisisRandBox.length)];
-      const attrName = 'season-'+sel_season;
-      const attrNameD = attrName+'-d';
-      const attrNameT = attrName+'-t';
-      const attrDiff = attrName+'-diff';
+      crisisTitleArr = _.compact(_.uniq(crisisTitleArr));
 
-      var sel_season_k, sel_dif_k;
-      switch(sel_season) {
-        case 'winter': sel_season_k = '겨울'; break;
-        case 'spring': sel_season_k = '봄'; break;
-        case 'summer': sel_season_k = '여름'; break;
-        case 'fall': sel_season_k = '가을'; break;
-      }
-      switch(sel_dif) {
-        case 'easy': sel_dif_k = '쉬움'; break;
-        case 'normal': sel_dif_k = '보통'; break;
-        case 'hard': sel_dif_k = '어려움'; break;
-      }
-
+      // 해당하는 계절 위기 데이터 중 랜덤으로 하나 선택
+      var crisis = crisisTitleArr[Math.floor(Math.random()*crisisTitleArr.length)];
+      const attrNameT = 'season-'+sel_season+'-t';
       // 시트에 표시
-      setAttrs({
-        [attrName]: crisis.content,
-        [attrNameT]: crisis.title,
-        [attrNameD]: crisis.content_dif,
-        [attrDiff]: sel_dif_k
-      });
+      setAttrs({[attrNameT]: crisis});
+      // 여기까지 완료 
 
     });
-
   });
+
+
   on('change:season-winter change:season-spring change:season-summer change:season-fall',(season)=>{
     var tgName = season.triggerName+"-d";
   });
+
+
 
   const relDATA
   = [

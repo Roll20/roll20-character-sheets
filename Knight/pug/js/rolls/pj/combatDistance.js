@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable max-len */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable camelcase */
@@ -806,11 +807,9 @@ rollCombatDistance.forEach((button) => {
       if (isDevastation && !devaste && !equilibre) { exec.push(`{{vDevastation=${i18n_devastation} ${eDevastationValue} ${i18n_inclus}}}`); }
 
       finalRoll = await startRoll(exec.join(' '));
-      const tJet = finalRoll.results.jet.result;
       const rJet = finalRoll.results.jet.dice;
 
       const tBonus = finalRoll.results.bonus.result;
-      const tExploit = finalRoll.results.Exploit.result;
 
       const rDegats = finalRoll.results.degats.dice;
       const rViolence = finalRoll.results.violence.dice;
@@ -843,28 +842,7 @@ rollCombatDistance.forEach((button) => {
 
       finishRoll(finalRoll.rollId, computed);
 
-      if (tJet !== 0 && computed.basejet === tExploit) {
-        const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
-        const rExploit = exploitRoll.results.jet.dice;
-        const exploitPairOrImpair = isGuidage === true ? 1 : 0;
-
-        const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
-          const vC = valeurCourante;
-          let nV = 0;
-
-          if (vC % 2 === exploitPairOrImpair) {
-            nV = 1;
-          }
-
-          return accumulateur + nV;
-        }, 0);
-
-        const exploitComputed = {
-          jet: jetExploit,
-        };
-
-        finishRoll(exploitRoll.rollId, exploitComputed);
-      }
+      await postRoll(computed, roll, jet, finalRoll, conditions);
 
       if (hasEnergieRetiree) {
         if (energieIsEspoir) {

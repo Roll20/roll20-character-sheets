@@ -127,7 +127,7 @@ function calcCritLevels (effects) {
 	if (propertyCheck['errors'] >= 1)
 	{
 		debugLog(caller, 'Missing properties:', propertyCheck['missing'], '. Missing values added with default value 0.');
-		for (property of propertyCheck['missing'])
+		for (let property of propertyCheck['missing'])
 		{
 			effects[property] = 0;
 		}
@@ -135,7 +135,7 @@ function calcCritLevels (effects) {
 
 	// Assumption: safeGetAttrs() used, so no undefined or NaN
 	// Correct values: 0 or 1
-	for (property of effectList)
+	for (let property of effectList)
 	{
 		if (isNaN(parseInt(effects[property])))
 		{
@@ -153,11 +153,11 @@ function calcCritLevels (effects) {
 	debugLog(caller, 'Inputs sanitized: effects:', effects);
 
 	/* Calculations */
-	for (type of types)
+	for (let type of types)
 	{
-		for (effect of effectList)
+		for (let effect of effectList)
 		{
-			for (crit of ['success', 'failure'])
+			for (let crit of ['success', 'failure'])
 				result[type][crit] += effects[effect] * effectMatrix[type][effect][crit];
 			}
 		}
@@ -174,28 +174,29 @@ on("sheet:opened change:character_name", function(eventInfo) {
 	var repeatingTalents = [];
 
 	getSectionIDs("conjuration-spells-myranor", function(ids) {
-		for (id of ids)
+		for (let id of ids)
 		{
 			repeatingTalents.push("repeating_conjuration-spells-myranor_" + id + "_spell");
 		}
-		for(talent of talents_ebe)
+		for (let talent of talents_ebe)
 		{
 			ebeTalents.push(talent + "-ebe");
 		}
-		for(attr of [].concat(talents, ebeTalents, spells, melee, reg, repeatingTalents))
+		for (let attr of [].concat(talents, ebeTalents, spells, melee, reg, repeatingTalents))
 		{
 			attrsToGet.push(attr + "_action");
 		}
 		safeGetAttrs(attrsToGet, function(v) {
 			var attrsToChange = {};
 
-			for (attr of attrsToGet)
+			for (let attr of attrsToGet)
 			{
 				// No action buttons for character name and combat techniques required
 				if (attr.match("t_ka_") || attr === "character_name") continue;
 				attrsToChange[attr] = "%{" + v["character_name"] + "|" + attr.replace(/_action$/gm, "") + "-action}";
 			}
 
+			attrsToChange["rc_attack_action"] = "%{" + v["character_name"] + "|rc_attack-action}";
 			attrsToChange["eidsegen_action"] = "%{" + v["character_name"] + "|eidsegen-action}";
 
 			debugLog(func, attrsToChange);

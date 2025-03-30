@@ -1,13 +1,18 @@
-const resetSkillList = (skills) => {
-  const skillList = parseJSON(skills);
-  const names = skillList.map(({ name }) => name.toLowerCase());
+const resetSkillList = (npcSkills) => {
   const update = {};
+  const addSkill = (skill) => (update[skill] = 0);
 
-  [...skills, ...combatSkills].forEach((skill) => {
-    if (!names.includes(skill)) {
-      update[skill] = 0;
-    }
-  });
+  if (npcSkills) {
+    const skillList = parseJSON(npcSkills);
+    const names = skillList.map(({ name }) => name?.toLowerCase());
+    [...skills, ...combatSkills].forEach((skill) => {
+      if (!names.includes(skill)) {
+        addSkill(skill);
+      }
+    });
+  } else {
+    [...skills, ...combatSkills].forEach((skill) => addSkill(skill));
+  }
 
   setAttrs(update);
 };

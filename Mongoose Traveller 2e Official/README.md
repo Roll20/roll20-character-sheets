@@ -25,4 +25,29 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 
 - Removed all table elements
 
+### Version 1.0.04
+
+- Fixed URL to orange divider
+- Increased and normalised font sizes, borders, colours and spacing across sheet
+- Fixed bug in Ship sheet repeating blocks
+- Added 'Current Characteristic Values' toggle to allow characteristics to use absolute levels rather than 'Temp' offsets and set the _max version of a version of these attributes to allow better representation on tokens
+- Added missing translations
+- Updated character sheet image
+- Fixed Jack-of-All-Trades not updating untrained skill DMs properly
+
+### Version 1.0.05
+
+- Fixed darkmode rolltemplates to be more visible
+- Changed font to be more readable after user feedback
+- Removed fail, crit and important borders from roll results in rolltemplates
+- Added code to add 'combat item weight' to total item weight, and added sub-totals
+
+### Version 1.0.06
+- Removed italics from skill mods for clarity
+- Added 'Ask for Difficulty' checkbox which will show a difficulty dropdown and calculate success/failure for characteristic/skill rolls
+- Changed Psionics powers to reflect the rules with reach, difficulty, check time etc. This also calculates success/failure and displays
+- Added custom psionics repeating row
+- Fixed animal darkmode combat rolls
+- Minor formatting fixes
+
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)

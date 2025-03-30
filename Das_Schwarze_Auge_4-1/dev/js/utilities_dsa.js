@@ -147,7 +147,7 @@ function generateShortRollTag (integer) {
 	var result = [];
 	var rest = integer;
 
-	for (n = digits; n >= 0; n--) {
+	for (let n = digits; n >= 0; n--) {
 		result.push(charset[Math.trunc(rest/Math.pow(base, n))]);
 		rest = rest % Math.pow(base, n);
 	}
@@ -176,6 +176,24 @@ function DSAsane (value, type) {
 	}
 
 	switch(type) {
+		case "int":
+			// General
+			// Must be number of parseInt()-able number
+			// integer
+			if (!limitedIntValid(value, -Infinity, Infinity)) {
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
+				sane = false;
+			}
+			break;
+		case "non-negative int":
+			// General
+			// Must be number of parseInt()-able number
+			// Non-negative integer
+			if (!limitedIntValid(value, 0, Infinity)) {
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
+				sane = false;
+			}
+			break;
 		case "stat":
 			// MU, KL, IN, ...
 			// Must be number or parseInt()-able number
@@ -216,7 +234,8 @@ function DSAsane (value, type) {
 			// Limited set of combat techniques to choose from
 			// Must be within the set
 			const meleeCombatTechniques = [
-					"anderthalbhander", "dolche",              "fechtwaffen",
+					"anderthalbhander", "bastardstaebe",       "dolche",
+					"fechtwaffen",
 					"hiebwaffen",       "infanteriewaffen",    "kettenstabe",
 					"kettenwaffen",     "lanzenreiten",        "peitsche",
 					"raufen",           "ringen",              "sabel",
@@ -255,7 +274,7 @@ function countStats (statsArray) {
 		debugLog(caller, "Array is empty.");
 	}
 
-	for (stat of statsArray)
+	for (let stat of statsArray)
 	{
 		if (validStats.has(stat))
 		{
@@ -284,7 +303,7 @@ function extractStats (statsArray) {
 		debugLog(caller, "Array is empty.");
 	}
 
-	for (entry of statsArray)
+	for (let entry of statsArray)
 	{
 		let result = entry.match(statPattern);
 		if (result)
@@ -319,7 +338,7 @@ function DSAround (num) {
 }
 
 /*
-	When displaying modifiers, make use of real minus sign (U+2212) or ± (U+00B1).
+	When displaying modifiers, make use of plus sign, the real minus sign (U+2212) or ± (U+00B1).
 */
 function prettifyMod(uglyModifier) {
 	var prettyModifier;
@@ -336,5 +355,23 @@ function prettifyMod(uglyModifier) {
 		prettyModifier = "+" + String(uglyModifier);
 	}
 	return prettyModifier;
+}
+
+/*
+	When displaying roll results, make use of real minus sign (U+2212), but do not add a plus sign or ± (U+00B1).
+*/
+function prettifyResult(uglyResult) {
+	let prettyResult;
+	if(isNaN(parseInt(uglyResult)))
+	{
+		return uglyResult;
+	}
+	if(uglyResult < 0)
+	{
+		prettyResult = "−" + String(Math.abs(uglyResult));
+	} else {
+		prettyResult = String(uglyResult);
+	}
+	return prettyResult;
 }
 /* utilities dsa end */

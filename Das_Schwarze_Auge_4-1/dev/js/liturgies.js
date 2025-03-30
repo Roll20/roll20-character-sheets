@@ -37,7 +37,7 @@ on('clicked:eidsegen-action', async (info) => {
 	// Negativer TaW: |effTaW| zu Teilwürfen addieren
 	if (effTaW < 0)
 	{
-		for (roll in rolls)
+		for (let roll in rolls)
 		{
 			effRolls[roll] = rolls[roll] + Math.abs(effTaW);
 		}
@@ -45,7 +45,7 @@ on('clicked:eidsegen-action', async (info) => {
 	}
 
 	// TaP-Verbrauch für jeden Wurf
-	for (roll in effRolls)
+	for (let roll in effRolls)
 	{
 		TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
 	}

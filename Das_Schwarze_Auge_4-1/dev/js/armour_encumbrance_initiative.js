@@ -91,7 +91,7 @@ function calculateRuestungBE(values, eventInfo) {
 		// Get armour names
 		var armours = [];
 
-		for (name of [
+		for (let name of [
 			[ values["RSName1"], values["RSAktiv1"] ],
 			[ values["RSName2"], values["RSAktiv2"] ],
 			[ values["RSName3"], values["RSAktiv3"] ],
@@ -101,7 +101,7 @@ function calculateRuestungBE(values, eventInfo) {
 				armours.push(name[0]);
 			}
 		}
-		for (name in armours) {
+		for (let name in armours) {
 			armours[name] = armours[name]
 				.replace(/[^a-zA-ZäöüÄÖÜß|]/g, "")
 				.toLowerCase();
@@ -123,7 +123,7 @@ function calculateRuestungBE(values, eventInfo) {
 		if (RGarmours.length === 0) debugLog(caller, "Warnung: Kein gültiger Rüstungsnamen für Rüstungsgewöhnung I gefunden, da kein Zeichen aus dem folgenden Zeichenvorrat stammt: a-z, A-Z, ä, ö, ü, Ä, Ö, Ü, ß.");
 
 		// Find the first match and stop
-		for (armour of armours) {
+		for (let armour of armours) {
 			if (RGarmours.indexOf(armour) > -1) {
 				RGBonus = 1;
 				debugLog(caller, "Rüstungsgewöhnung I: \"" + armour + "\" erhält den Bonus.");
@@ -140,7 +140,7 @@ function calculateRuestungBE(values, eventInfo) {
 
 	// Encumbrance calculation
 		var totalBe = 0;
-		for (var i = 1; i <= 4; i++) {
+		for (let i = 1; i <= 4; i++) {
 				if (values["RSAktiv" + i] === "1") {
 						totalBe += parseFloat(values["RS_gBE" + i]);
 				}

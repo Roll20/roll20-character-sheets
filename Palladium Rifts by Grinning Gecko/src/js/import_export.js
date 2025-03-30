@@ -58,7 +58,7 @@
     const attrs = data.reduce((acc, row) => {
       const rowId = generateRowID();
       Object.entries(row).forEach(([key, val]) => {
-        if (parseInt(val) == 0) {
+        if (parseInt(val) == 0 || val == "") {
           return;
         }
         acc[`repeating_${section}_${rowId}_${key}`] = val;
@@ -92,7 +92,10 @@
 
   on("clicked:import", async (e) => {
     console.log("import", e);
-    await setAttrsAsync({ importexportstatus: "Importing core..." });
+    await setAttrsAsync({
+      importexportstatus: "Importing core...",
+      importing: "1",
+    });
     const a = await getAttrsAsync(["importexport"]);
     const data = JSON.parse(a.importexport);
     console.log(data);
@@ -113,6 +116,7 @@
     await setAttrsAsync({
       importexportstatus:
         "Done importing, but triggered events are probably still running. To be sure open your browser console and when the logging stops, the import is really done.",
+      importing: "",
     });
   });
 })();
