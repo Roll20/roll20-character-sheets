@@ -4,6 +4,9 @@ This sheet is created for use in Godbound games on Roll20, based on the Characte
 
 ## Features / Changelog
 
+- v4.2
+  - Minor
+    * Misc Effort Spent added to Effort Spent in the Resources section.
 - v4.1
   - Minor
     * Minor fix for missed HTML and CSS code in the 4.0 update.

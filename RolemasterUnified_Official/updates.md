@@ -1,3 +1,14 @@
+# 2025-4-1
+
+- Fix for the stat abbrievations used in skill summaries
+  - Add test too
+- Spell message nits:
+  - Remove the trailing . in the PP message
+  - Fix unbalanced brace in message for grace
+- Uses; clear per level count on level up
+- Skills:
+  - forEachSkill has a completion callback
+
 # 2025-3-25
 
 - Tracker now shows skills correctly.
@@ -12,6 +23,7 @@
   - Casting a spell tickles a use of 'powerdevelopment'
   - Total uses >= Current uses (for new ones)t
   - Display correct global counter for uses.
+- Roll/Lookup crit: Handle scaled crits a lot better.
 
 # 2025-3-18
 

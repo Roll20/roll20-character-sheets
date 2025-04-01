@@ -5716,7 +5716,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 86a2b8652cc8f655eb565f1d85085bac9a1ade4e
+Revision ceec0b05fe360cc519d2ffba9e5f0dcdc8b5d16c
 
 
 <hr>
@@ -5751,35 +5751,6 @@ function cherror(message) {
 	console.log('>', arguments[i]);
     }
 }
-
-const StatInfo = [
-  { display: "Agility", aname: "agility", attr: "ag", will: false },
-  { display: "Constitution", aname: "constitution", attr: "co", will: false },
-  { display: "Empathy", aname: "empathy", attr: "em", will: true },
-  { display: "Intuition", aname: "intuition", attr: "in", will: true },
-  { display: "Memory", aname: "memory", attr: "me", will: true },
-  { display: "Presence", aname: "presence", attr: "pr", will: true },
-  { display: "Quickness", aname: "quickness", attr: "qu", will: false },
-  { display: "Reasoning", aname: "reasoning", attr: "re", will: true },
-  { display: "Self Discipline", aname: "selfdiscipline", attr: "sd", will: true },
-  { display: "Strength", aname: "strength", attr: "st", will: false },
-
-]
-
-function getStatNameFromAbbr(abbr) {
-    if (abbr == 'rs') {
-	return "Realm Stat";
-    }
-    for (let i = 0 ; i < StatInfo.length ; i ++) {
-	if (StatInfo[i].abbr == abbr){
-	    // Use the translated version
-	    return getTranslationByKey(StatInfo[i].aname);
-	}
-    }
-    console.log("Could not find stat "  + abbr);
-    return null;
-}
-
 
 
 function parseIntDefault(str, def) {
@@ -7883,13 +7854,21 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
   // Each is called with skill structure and then the category
   // If the skill is a specialisation, a third argument is present - the
   // actual 'skill'
-  function forEachSkill(func) {
+  function forEachSkill(func, donefn) {
+    let catcount = categories.length
+
     categories.forEach(cat => {
-	catForEachSkill(cat, func);
+	catForEachSkill(cat, func, () => {
+	  catcount --;
+	  if (catcount == 0) {
+	    donefn();
+	  }
+	});
     });
   }
   RMUSkills.forEachSkill = forEachSkill;
-  function catForEachSkill(cat, func) {
+  function catForEachSkill(cat, func, donefn) {
+    let outstanding = 1;
     cat.skills.forEach(skill => {
         if (skill.specializations) {
             skill.specializations.forEach(
@@ -7898,6 +7877,7 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
                 }
             );
 	} else if (skill.dynamicspecializations) {
+	    outstanding ++;
             getSectionIDs(`repeating_specialization${skill.aname}`,
                 idarray => {
                     for (const id of idarray) {
@@ -7905,6 +7885,11 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
                         let subskill = { aname: `repeating_specialization${skill.aname}_${id}` };
                         func(subskill, cat, skill)
                     }
+		    outstanding --;
+		    console.log("for each", outstanding);
+		    if (outstanding == 0 && donefn) {
+		      donefn();
+		    }
                 }
 	      );
 	} else {
@@ -7912,6 +7897,10 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
             func(skill, cat);
 	}
     });
+    outstanding --;
+    if (outstanding == 0 && donefn) {
+      donefn();
+    }
   }
 
   RMUSkills.catForEachSkill = catForEachSkill;
@@ -8346,7 +8335,20 @@ RMUSkills.usesspecialisation = function(name, specialisation) {
 
       });
   });
+}
 
+/*  */
+RMUSkills.usesClear = function() {
+  // Clear all the non-specialised ones
+  toclear = {}
+  RMUSkills.forEachSkill((subskill, cat, skill) => {
+      toclear[`${subskill.aname}_usecount`] = 0;
+    },
+    () => {
+      console.log("to clear done", toclear);
+      setAttrs(toclear);
+    }
+  );
 }
 
 
@@ -8964,7 +8966,7 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	    mlog += ` -0&nbsp;[Overcast ${overcast} levels (${overpenalty} + ${grace} Grace (0 capped))]`;
 	  } else if (grace > 0) {
 	    const modified = overpenalty - grace;
-	    mlog += ` -${modified}&nbsp;[Overcast ${overcast} levels ({${overpenalty} + ${grace} Grace)]`
+	    mlog += ` -${modified}&nbsp;[Overcast ${overcast} levels (${overpenalty} + ${grace} Grace)]`
 	    mod -= modified;
 	  } else {
 	    // FIXME: add grace here
@@ -9024,7 +9026,7 @@ onCheck(spellcastevents.join(" "), (ev) => {
 	      if (nopp) {
 		ppmsg = 'No PP cost';
 	      } else {
-		ppmsg = `${level} PP.`;
+		ppmsg = `${level} PP`;
 		pp -= level;
 		RMUSkills.uses('powerdevelopment');
 	      }
@@ -10270,6 +10272,7 @@ onCheck("mancerfinish:levelup", (ev) => {
       setAttrsPending(updates);
     });
   });
+  addPendingFunction("LevelupFinish: Clear Uses count", RMUSkills.usesClear);
   addPendingFunction("LevelupFinish: Front page", updateFrontPage);
   addPendingFunction("LevelupFinish: Finish cmancer (roll20)", finishCharactermancer)
   pendingInfo();
@@ -10329,8 +10332,6 @@ let RMUPurchase = {};
   });
 
   // Add a handler for each category, then each category add each of the skills
-  on('sheet:opened', () => {
-
       categories.forEach(cat => {
 	let skills = []
 	// FIXME: Subskills/specializations
@@ -10364,7 +10365,6 @@ let RMUPurchase = {};
 	    }); 
 	});
       });
-  });
 
   on("clicked:completebuy", (ev) => {
     let level = `Level ${Math.floor(Math.random() * 50)}`;
@@ -10393,6 +10393,10 @@ let RMUPurchase = {};
 
 
 })();
+
+
+
+
 
 
 
@@ -10458,6 +10462,39 @@ RMUStats.statgainroll = function(temp, pot) {
   }
   return gain;
 }
+
+
+const StatInfo = [
+  { display: "Agility", aname: "agility", abbr: "Ag", attr: "ag", will: false },
+  { display: "Constitution", aname: "constitution", abbr: "Co", attr: "co", will: false },
+  { display: "Empathy", aname: "empathy", abbr: "Em", attr: "em", will: true },
+  { display: "Intuition", aname: "intuition", abbr: "In", attr: "in", will: true },
+  { display: "Memory", aname: "memory", abbr: "Me", attr: "me", will: true },
+  { display: "Presence", aname: "presence", abbr: "Pr", attr: "pr", will: true },
+  { display: "Quickness", aname: "quickness", abbr: "Qu", attr: "qu", will: false },
+  { display: "Reasoning", aname: "reasoning", abbr: "Re", attr: "re", will: true },
+  { display: "Self Discipline", aname: "selfdiscipline", abbr: "SD", attr: "sd", will: true },
+  { display: "Strength", aname: "strength", abbr: "St", attr: "st", will: false },
+
+]
+
+function getStatNameFromAbbr(abbr) {
+    if (abbr == 'rs') {
+	return "Realm Stat";
+    }
+    for (let i = 0 ; i < StatInfo.length ; i ++) {
+    console.log(i, abbr, StatInfo[i].abbr);
+	if (StatInfo[i].attr == abbr.toLowerCase()){
+	    // Use the translated version
+	    return getTranslationByKey(StatInfo[i].aname);
+	}
+    }
+    console.log("Could not find stat "  + abbr);
+    return null;
+}
+
+
+
 
 // Super async - takes name of stat.  Respects pending
 //  Shoukd be the fullname 'constitution'.
@@ -13747,6 +13784,30 @@ function sizeFromNumeric(value) {
 	/* 100 */ { location: "Head", armorlocation: 2, rollindex: 19, down: 81 },
     ];
 
+    const downByIndex = [
+	/* 0 */ 0, 
+	/* 1 */ 1,
+	/* 2 */ 1,
+	/* 3 */ 1,
+	/* 4 */ 1,
+	/* 5 */ 1,
+	/* 6 */ 1,
+	/* 7 */ 2,
+	/* 8 */ 3,
+	/* 9 */ 4,
+	/* 10 */ 9,
+	/* 11 */ 7,
+	/* 12 */ 8,
+	/* 13 */ 6,
+	/* 14 */ 5,
+	/* 15 */ 10,
+	/* 16 */ 12,
+	/* 17 */ 11,
+	/* 18 */ 13,
+	/* 19 */ 14,
+    ];
+
+
     /* Returns an obj of location, side, at  */
     attacks.getLocation = function(roll) {
 	if (typeof(roll) != 'Number') {
@@ -13778,8 +13839,7 @@ function sizeFromNumeric(value) {
 
     attacks.resolveCriticalList = function(critlist, index, donfn) {
 	const allresults = []
-	for (const {sev, type} of critlist) {
-	    console.log("iter", sev, type);
+	for (const {sev, type, origsev} of critlist) {
 	    let sevcode = numericToCritCode(sev);
 	    const crit = attacks.knownCrits[type][index]
 	    const results = {}
@@ -13815,6 +13875,13 @@ function sizeFromNumeric(value) {
     */
     attacks.getCritical = function(severity, type, index, overflow, additional, donefn) {
 	const crits = [];
+	let origsev = severity;
+
+	while (severity < 0) {
+	    index = downByIndex[index];
+	    severity ++;
+	}
+
 	// Move to known sizes:
 	if (severity > 4) {
 	    crits.push({ sev: 4, type: type }); // Start with an E, then append some
@@ -13833,7 +13900,8 @@ function sizeFromNumeric(value) {
 	    }
 	    console.log(crits);
 	} else {
-	    crits.push({ sev: severity, type: type }); // Start with an E, then append some
+	    // We only use origsev here;
+	    crits.push({ sev: severity, type: type, origsev: origsev }); // Start with an E, then append some
 	}
 
 	if (type.length > 1) {
@@ -14099,6 +14167,7 @@ function sizeFromNumeric(value) {
 	}
 
 	// If we are less than 'A'/1 walk index down
+	// FIXME: This is now handled by resolve crit - should use that instead.
 	if (critinfo.severitynumeric < 0) {
 	    let sev = critinfo.severitynumeric;
 	    // hit.roll contains the sanitised roll (1-100)
