@@ -9397,7 +9397,11 @@
                             cache.attrdb.skills[cache.skill_index].individual.findIndex(s => s.skill === all_skills[i]) === -1 ?
                             `|${getTranslationByKey(all_skills[i].toKebobCase())},${all_skills[i]}` : '';
                     }
-                    query.options += `|${getTranslationByKey("exit")},exit`;
+                    if(query.options === '') {
+                        query.title = '';
+                    } else {
+                        query.options += `|${getTranslationByKey("exit")},exit`;
+                    }
                     query.last = query.next;
                 break;
                 case 'edit_skill':
@@ -9568,10 +9572,10 @@
                     break;
                     case 'add_skill':
                     case 'static_skills_add_button':
-                        query.skill = query.selection === 'exit' ?
+                        query.skill = query.selection === 'exit' || query.options === '' ?
                             '' : query.selection;
                         query.stat = skill_stats[query.skill];
-                        query.next = query.selection === 'exit' ?
+                        query.next = query.selection === 'exit' || query.options === '' ?
                             'exit' : 'write_newskill';
                     break;
                     case 'edit_skill':
@@ -9665,7 +9669,7 @@
                 const skilldb = query.next === 'write_newskill' ?
                     cache.attrdb.skills[cache.skill_index].individual :
                     cache.attrdb.skills[cache.skill_index].individual[query.individual_index];
-                const cost = skills_cost[query.skill][cache.rulesdb.rules_optional_genre_status];
+                const cost = query.next === 'exit' ? 0 : skills_cost[query.skill][cache.rulesdb.rules_optional_genre_status];
                 switch (query.next) {
                     case 'write_newskill'://-> write skill object into cache and create repeating section
                         const fields = ['cost','points','rank','skill','specializations','stat'];
