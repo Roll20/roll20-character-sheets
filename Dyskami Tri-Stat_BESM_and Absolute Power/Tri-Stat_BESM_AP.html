@@ -232,6 +232,13 @@
                     <button name="act_static_roll_stat_button" class="styling-section-button button-click-animation theme-button" type="action">
                         <span class="material-symbols-outlined">person</span>
                     </button>
+                    <!--
+                    <input name="attr_static_roll_skill_state" class="block-switch" type="checkbox" value="0" />
+                    <div class="block-a"></div>
+                    <div class="block-b">
+                    
+                    </div>
+                    -->
                 </div>
                 <!-- Title -->
                 <div class="grid-minor-rollmacro-title theme-title">
@@ -6980,6 +6987,7 @@
     async function actionRoll(cache, set_values) {
         const roll = { // contains all data relevant to the roll
             base: 0,
+            enemies: [],
             mod: {
                 edge: 0,
                 obstacle: 0
@@ -6988,6 +6996,9 @@
             template: '&{template:rolls}' +
                 ' {{pronoun=@{static_character_details_pronoun}}}' +
                 ' {{character_name=@{static_character_details_name}}}',
+            weapon: {
+                range: 0,
+            },
         };
         const query = { // contains data for the roll itself
             answer: false,
@@ -7001,53 +7012,64 @@
         if (cache.source_type === 'react') {
             roll.attacker = rollEscape.unescape(cache.originalRollId);
         }
+        roll.type = cache.source_type === 'react' ? 
+            cache.source_attribute === 'skill' ?
+                cache.rulesdb.rules_optional_individual_status !== 0 ? 'skill' : 'skill_group' :
+            cache.source_attribute :
+            cache.source_id === 'skill' ?
+                cache.rulesdb.rules_optional_individual_status !== 0 ? 'skill' : 'skill_group' :
+            cache.source_id;
+        if (cache.source_type === 'react' && roll.type === 'skill' && cache.attrdb.skills.length === 0) {
+            roll.type = 'stat';
+            query.next = 'stat';
+        }
         const color = cache.rulebook === 'besmx' ? 'besm' : cache.rulebook;
-        query.attributes = [];
-        const filtered_attributes = all_attributes.map(a => {
-            return (a === 'skills' || a === 'skill group'|| a === 'weapon') ? '' : a;
-        }).filter(n => n);
-        for (let i = 0; i < filtered_attributes.length; i++) {
-            for (let j = 0; j < cache.attrdb[filtered_attributes[i]].length; j++) {
-                const attribute = cache.attrdb[filtered_attributes[i]][j];
-                if (attribute.active && attribute.stat !== 'none') {
-                    query.attributes.length = query.attributes.push(
-                        `|${attribute.name === '' ? filtered_attributes[i].capitalize() : attribute.name.capitalize()},` +
-                        `${filtered_attributes[i]}~${j}`
-                    );
-                    roll.is_swarm = filtered_attributes[i] === 'swarm';
-                    if (roll.is_swarm) {
-                        query.elevel = cache.attrdb.swarm[j].elevel;
+        // if (roll.type === 'skill' || roll.type === 'skill_group') {
+            //query.skill_type = cache.rulesdb.rules_optional_individual_status ? 'skills' : 'skill group';
+            /*if (roll.type === 'skill_group') {
+                query.skills = cache.attrdb['skill group'].map(s => s.active ? s.name : '').filter(n => n).sort();
+            } else {
+                query.skills = [];
+                for (let i = 0; i < cache.attrdb.skills.length; i++) {
+                    if (cache.attrdb.skills[i].active) {
+                        for (let j = 0; j < cache.attrdb.skills[i].individual.length; j++) {
+                            if (cache.attrdb.skills[i].individual[j].active) {
+                                query.skills.push(cache.attrdb.skills[i].individual[j].skill);
+                            }
+                        }
                     }
                 }
-            }
-        }
-        query.skill_type = cache.rulesdb.rules_optional_individual_status ? 'skills' : 'skill group';
-        if (query.skill_type === 'skill group') {
-            query.skills = cache.attrdb[query.skill_type].map(s => s.active ? s.name : '').filter(n => n).sort();
-        } else {
-            query.skills = [];
-            for (let i = 0; i < cache.attrdb.skills.length; i++) {
-                if (cache.attrdb.skills[i].active) {
-                    for (let j = 0; j < cache.attrdb.skills[i].individual.length; j++) {
-                        if (cache.attrdb.skills[i].individual[j].active) {
-                            query.skills.push(cache.attrdb.skills[i].individual[j].skill);
+                query.skills.sort();
+            }*/
+        //} else {
+        if (roll.type === 'attribute' || roll.type === 'attack' || roll.type === 'defense') {
+            query.attributes = [];
+            const filtered_attributes = all_attributes.map(a => {
+                return (a === 'skills' || a === 'skill group'|| a === 'weapon') ? '' : a;
+            }).filter(n => n);
+            for (let i = 0; i < filtered_attributes.length; i++) {
+                for (let j = 0; j < cache.attrdb[filtered_attributes[i]].length; j++) {
+                    const attribute = cache.attrdb[filtered_attributes[i]][j];
+                    if (attribute.active && attribute.stat !== 'none') {
+                        query.attributes.length = query.attributes.push(
+                            `|${attribute.name === '' ? filtered_attributes[i].capitalize() : attribute.name.capitalize()},` +
+                            `${filtered_attributes[i]}~${j}`
+                        );
+                        roll.is_swarm = filtered_attributes[i] === 'swarm';
+                        if (roll.is_swarm) {
+                            query.elevel = cache.attrdb.swarm[j].elevel;
                         }
                     }
                 }
             }
-            query.skills.sort();
         }
         roll.template += cache.source_type === 'react' ?
             ` {{color=color-react-${color}}} {{color-react=color-${color}}}` :
             ` {{color=color-${color}}} {{color-react=color-react-${color}}}`;
-        query.next = cache.source_type === 'react' ? 
-            cache.source_attribute === 'skill' ?
-                cache.rulesdb.rules_optional_individual_status !== 0 ? 'skill' : 'skill_group' :
-            cache.source_attribute : cache.source_id; //'rollsroot';
-        roll.type = cache.source_type === 'react' ? 
-            cache.source_attribute === 'skill' ?
-                cache.rulesdb.rules_optional_individual_status !== 0 ? 'skill' : 'skill_group' :
-        cache.source_attribute : cache.source_id;
+        query.next = roll.type;//cache.source_type === 'react' ? 
+            //cache.source_attribute === 'skill' ?
+                //cache.rulesdb.rules_optional_individual_status !== 0 ? 'skill' : 'skill_group' :
+            //cache.source_attribute : cache.source_id; //'rollsroot';
         while (!query.do_roll) {
             switch(query.next) {
                 // Roll Menu Options Root
@@ -7195,7 +7217,7 @@
                         `|${getTranslationByKey("go-back")},rollsroot` : '';
                 break;
                 case 'is_enemy':
-                    if (roll.enemies === undefined) {
+                    if (roll.enemies.length === 0) {
                         const enemy_attributes = [];
                         const enemy_defects = [];
                         query.enemies = [];
@@ -7269,23 +7291,25 @@
                 break;
                 case 'combat_maneuver':
                     roll.target.has_gap = false;
-                    if (roll.target.attrdb.armor.length !== 0) {
-                        for (let i = 0; i < roll.target.attrdb.armor.length; i++) {
-                            if (roll.target.attrdb.armor[i].active) {
-                                const gap_index = roll.target.attrdb.armor[i].limiters.findIndex(c => c.name === 'gap');
-                                if (gap_index !== -1) {
-                                    roll.target.has_gap = true;
-                                    i = roll.target.attrdb.armor.length;//=> only support first active armor.
+                    roll.target.has_weak_point = 0;
+                    if (query.target === 'opposed_roll') {
+                        if (roll.target.attrdb.armor.length !== 0) {
+                            for (let i = 0; i < roll.target.attrdb.armor.length; i++) {
+                                if (roll.target.attrdb.armor[i].active) {
+                                    const gap_index = roll.target.attrdb.armor[i].limiters.findIndex(c => c.name === 'gap');
+                                    if (gap_index !== -1) {
+                                        roll.target.has_gap = true;
+                                        i = roll.target.attrdb.armor.length;//=> only support first active armor.
+                                    }
                                 }
                             }
                         }
-                    }
-                    roll.target.has_weak_point = 0;
-                    if (roll.target.defectdb['weak point'].length !== 0) {
-                        for (let i = 0; i < roll.target.defectdb['weak point'].length; i++) {
-                            if (roll.target.defectdb['weak point'][i].active) {
-                                roll.target.has_weak_point = roll.target.defectdb['weak point'][i].level;
-                                i = roll.target.defectdb['weak point'].length;//=> only support first weak point.
+                        if (roll.target.defectdb['weak point'].length !== 0) {
+                            for (let i = 0; i < roll.target.defectdb['weak point'].length; i++) {
+                                if (roll.target.defectdb['weak point'][i].active) {
+                                    roll.target.has_weak_point = roll.target.defectdb['weak point'][i].level;
+                                    i = roll.target.defectdb['weak point'].length;//=> only support first weak point.
+                                }
                             }
                         }
                     }
@@ -7720,7 +7744,15 @@
                     roll.target.number = int(query.selection);
                     // There is inentionally no 'break' statement here so code execution falls through to exit loop (i.e. query.do_roll = true).
                 case 'target_select':
-                    query.next = roll.type === 'stat' || roll.type === 'attribute' ? 'done' : 'combat_maneuver';
+                    query.next = 
+                        roll.type === 'stat' || 
+                        roll.type === 'attribute' || 
+                        roll.type === 'skill' ||
+                        roll.type === 'skill_group' || (
+                            query.target === 'target_number' &&
+                            cache.rulesdb.rules_optional_maneuvers_status &&
+                            roll.weapon.range
+                        ) ? 'done' : 'combat_maneuver';
                 break;
             }
         }
@@ -13759,6 +13791,7 @@
             showDynamicGroupFields(cache, set_values);
             cache.static_group_visible_id = cache.static_group_visible_id || 0;
             setAttributeGroupVisibility(cache, set_values);
+            //set_values.static_roll_skill_state = cache.rulesdb.rules_optional_individual_status;
         }
         set_values.static_character_details_name = cache.character_name;
         setAttrsAsync(set_values,{silent:true});
