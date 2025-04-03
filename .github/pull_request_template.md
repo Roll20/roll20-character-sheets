@@ -2,10 +2,12 @@
 
 # Submission Checklist
 
-> [!WARNING] Submission Checklist
+> [!WARNING]
+> Submission Checklist
 > Failure to complete this checklist in its entirety will result in your Pull Request being dismissed. If you have any questions, please feel free to create an issue.
 
-> [!INFO] Draft Pull Requests
+> [!INFO]
+> Draft Pull Requests
 > If you are unclear about any of the rules regarding the creation of character sheets, or need assistance from the Roll20 team, please feel free to create a Draft PR and request feedback. We'd much rather provide assistance than reject a PR.
 
 <!-- Check these off by replacing the empty space with an 'x' in each of these boxes. If you fail to meet all these criteria, your PR will be rejected. -->
