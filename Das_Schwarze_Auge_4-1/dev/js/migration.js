@@ -988,9 +988,10 @@ function migrateTo20240414(migrationChain) {
 	- Migrate "subtag1" to sf_representations
 */
 function migrateTo20240510(migrationChain) {
-	var caller = "migrateTo20240510";
-	debugLog(caller, "Invoked.");
-	let valueMap = {
+	const caller = "migrateTo20240510";
+	debugLog(caller, "started");
+
+	const valueMap = {
 		"---": "",
 		"gildenmagisch": "Mag",
 		"elfisch": "Elf",
@@ -1004,13 +1005,13 @@ function migrateTo20240510(migrationChain) {
 	};
 
 	safeGetAttrs(["subtag1"], function (v) {
-		var attrsToChange = {};
+		let attrsToChange = {};
 
 		if (Object.hasOwn(valueMap, v["subtag1"]))
 		{
 			attrsToChange["sf_representations"] = valueMap[v["subtag1"]];
 		}
-		debugLog(caller, attrsToChange);
+		debugLog(caller, "attrsToChange", attrsToChange);
 		safeSetAttrs(attrsToChange, {}, function () {
 			callNextMigration(migrationChain);
 		});
