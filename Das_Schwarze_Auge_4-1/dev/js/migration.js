@@ -1024,7 +1024,7 @@ function migrateTo20240510(migrationChain) {
 */
 function migrateTo20240519(migrationChain) {
 	const caller = "migrateTo20240519";
-	debugLog(caller, "Invoked.");
+	debugLog(caller, "started");
 	const attrMap = {
 		"z_angste_representation": "z_aengstelindern_representation",
 		"z_animato_representation": "z_animatio_representation",
@@ -1195,7 +1195,7 @@ function migrateTo20240519(migrationChain) {
 	];
 
 	safeGetAttrs(attrsToGet, function (v) {
-		var attrsToChange = {};
+		let attrsToChange = {};
 
 		for (let property in attrMap)
 		{
@@ -1206,7 +1206,7 @@ function migrateTo20240519(migrationChain) {
 			}
 			attrsToChange[property] = v[oldAttr];
 		}
-		debugLog(caller, attrsToChange);
+		debugLog(caller, "attrsToChange", attrsToChange);
 		safeSetAttrs(attrsToChange, {}, function () {
 			callNextMigration(migrationChain);
 		});
