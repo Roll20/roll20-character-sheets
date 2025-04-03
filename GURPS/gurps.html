@@ -4361,6 +4361,9 @@
 				<ul>
 					<li><b>BUGFIX:</b> A couple of translation updates and fixing a page reference for Aim. Suggested by Spriteanon and Uncle Mojo.</li>
 					<li><b>BUGFIX:</b> When adding a brand new spell, not all of the modifiers were correctly added. This has now been fixed.</li>
+					<li><b>BUGFIX:</b> Fixed translation error on Grimoire tab for the "Spells based on" drop-down menu.</li>
+					<li><b>BUGFIX:</b> Combat Tab > Your Hit Locations Sub-tab. Hit Location Damage was not always syncing to Hit Points, this has been fixed.</li>
+					<li><b>ENHANCEMENT:</b> Combat Tab > Your Hit Locations Sub-tab. Added checkbox to turn on/off Hit Points syncing. Added link button to reset Hit Points.</li>
 				</ul>
 				
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -10816,7 +10819,22 @@ visualize what it will look like in chat.
 								<span data-i18n="flexible-armor-tooltip"><b>Flexible Armor</b> If damage fails to penetrate DR, victim suffers <i>blunt trauma</i>.<br />Cutting, impaling, piercing does 1 HP per <i>full</i> 10 HP damage.<br />Crushing damage does 5 HP per <i>full</i> 5 HP damage.<br />If layered armor, only damage that penetrates outer layer inflicts blunt trauma. B379</span>
 							</span>
 						</div>
-											
+						<span>|</span>
+						<div style="display: inline-block;">
+							<input type="checkbox" name="attr_damage_update_hit_points" value="1" />
+							<span class="popup">
+								<span data-i18n="update-hit-points-label">Update Hit Points</span>
+							</span>
+							<span class="tooltip">
+								<span data-i18n="update-hit-points-tooltip">
+									If checked, when applying damage to a location, current <b>Hit Points</b> is updated.
+								</span>
+							</span>
+						</div>
+						<span>|</span>
+						<button type="action" name="act_damage_reset_hit_points" class="link" title="Reset all hit locations to 0 damage and Hit Points to Max">
+							<span data-i18n="reset-hit-points-label">Reset HP</span>
+						</button>		
 					</div>
 					<div class="hit-location-container">
 
@@ -24659,7 +24677,10 @@ Select the indent level of the spell. This is handy to help show the spell belon
 
 			<!-- current version notes: 2.24.0 -->
 			<ul>
-				<li></li>
+				<li><b>BUGFIX:</b> A couple of translation updates and fixing a page reference for Aim. Suggested by Spriteanon and Uncle Mojo.</li>
+				<li><b>BUGFIX:</b> When adding a brand new spell, not all of the modifiers were correctly added. This has now been fixed.</li>
+				<li><b>BUGFIX:</b> Fixed translation error on Grimoire tab for the "Spells based on" drop-down menu.</li>
+				<li><b>ENHANCEMENT:</b> Combat Tab > Your Hit Locations Sub-tab. Added checkbox to turn on/off Hit Points syncing. Added link button to reset Hit Points.</li>
 			</ul>
 
 			<h4>Version: 2.23.1</h4>
@@ -43771,7 +43792,7 @@ B378
 	// check if damage table hit points were modified
 	on(`change:repeating_hitlocation:damage`, event => {
 	
-		let previousValue = Number.isNaN(event.previousValue) ? 0 : Number(event.previousValue);
+		let previousValue = (event.previousValue === undefined || Number.isNaN(event.previousValue)) ? 0 : Number(event.previousValue);
 	
 		let newValue = Number.isNaN(event.newValue) ? 0 : Number(event.newValue);
 	
@@ -55001,6 +55022,46 @@ Characters with Skill: ${knowsSkill}`;
 		});
 
 	}
+
+	on("clicked:damage_reset_hit_points", event => {
+
+		resetHitLocationHitPoints();
+
+		// set hit_points to hit_points_max
+		let fields = ["hit_points_max"];
+
+		getAttrs(fields, values => {
+			let maxHitPoints = Number(values.hit_points_max) ?? 0;
+
+			let keyValues = {
+				hit_points: maxHitPoints
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	});
+
+	const resetHitLocationHitPoints = () => {
+
+		getSectionIDs("repeating_hitlocation", ids => {
+
+			let keyValues = {};
+
+			ids.forEach(id => {
+
+				let key = `repeating_hitlocation_${id}_damage`;
+
+				keyValues[key] = 0;
+
+			});
+
+			setAttrs(keyValues, { silent: true });
+
+		});
+
+	}	
 
 	const quickModAreas = ["melee", "range"];
 
