@@ -30,11 +30,11 @@ Please complete this section if you are adding a new sheet to the repository.
 If you are submitting a new sheet to the repository, please fill in any empty spaces indicated by [  ].
 
 - The name of this game is: [   ]  
-  _(i.e. Dungeons & Dragons 5th Edition, The Dresden Files RPG)_
-- The publisher of this game is: [   ] 
-  _(i.e. Wizards of the Coast, Evil Hat)_
-- The name of this game system/family is: [   ] 
-  _(i.e. Dungeons & Dragons, FATE)_
+  > _(i.e. Dungeons & Dragons 5th Edition, The Dresden Files RPG)_
+- The publisher of this game is: [   ]  
+  > _(i.e. Wizards of the Coast, Evil Hat)_
+- The name of this game system/family is: [   ]  
+  > _(i.e. Dungeons & Dragons, FATE)_
 
 - [ ] I have followed the [Character Sheets Standards](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository) when building this sheet.
 - [ ] I have authorization from the game's publisher to make this an official sheet on Roll20 with their name attached.
