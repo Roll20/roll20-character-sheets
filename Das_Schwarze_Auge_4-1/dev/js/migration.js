@@ -1219,7 +1219,7 @@ function migrateTo20240519(migrationChain) {
 */
 function migrateTo20241002(migrationChain) {
 	const caller = "migrateTo20241002";
-	debugLog(caller, "Invoked.");
+	debugLog(caller, "started");
 
 	const attrsToGet = [ "be_at_mod", "be_pa_mod"];
 	safeGetAttrs(attrsToGet, function(values) {
@@ -1235,8 +1235,8 @@ function migrateTo20241002(migrationChain) {
 		{
 			if (DSAsane(values[attr], "int"))
 			{
-				let value = values[attr];
-				let hintAttr = attr + "_hint";
+				const value = values[attr];
+				const hintAttr = attr + "_hint";
 				if (value > 0)
 				{
 					attrsToInit[hintAttr] = 1;
