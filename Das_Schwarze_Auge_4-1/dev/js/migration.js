@@ -915,8 +915,8 @@ function migrateTo20230618(migrationChain) {
 	- Initialize sleep regeneration attributes
 */
 function migrateTo20240414(migrationChain) {
-	var caller = "migrateTo20240414";
-	debugLog(caller, "Invoked.");
+	const caller = "migrateTo20240414";
+	debugLog(caller, "started");
 
 	const attrsToGet = [
 		'MagieTab',
@@ -925,7 +925,7 @@ function migrateTo20240414(migrationChain) {
 		'verstecke_ueberanstrengung',
 		'KE'
 	];
-	var attrsToChange =	{
+	let attrsToChange = {
 		"reg_sleep_le_ko": "@{KO} - 1d20",
 		"reg_sleep_le_fixed": "-1",
 		"reg_sleep_le_mod_advantages_disadvantages": 0,
@@ -976,7 +976,7 @@ function migrateTo20240414(migrationChain) {
 		{
 			attrsToChange["KE"] = 0;
 		}
-		debugLog(caller, attrsToChange);
+		debugLog(caller, "attrsToChange", attrsToChange);
 		safeSetAttrs(attrsToChange, {}, function(){
 			callNextMigration(migrationChain);
 		});
