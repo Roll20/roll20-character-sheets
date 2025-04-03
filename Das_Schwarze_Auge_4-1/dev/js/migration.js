@@ -1261,7 +1261,7 @@ function migrateTo20241002(migrationChain) {
 function migrateTo20250122(migrationChain) {
 	// Boilerplate
 	const caller = "migrateTo20250122";
-	debugLog(caller, "Invoked.");
+	debugLog(caller, "started");
 
 	// Preparation
 	/// New attributes in need of default values
@@ -1356,7 +1356,7 @@ function migrateTo20250122(migrationChain) {
 		}
 
 		// Repair erroneously initialized attributes
-		for (attr of attrsToCorrect)
+		for (let attr of attrsToCorrect)
 		{
 			// Only correct if (still) at wrong initialized value
 			if (outer[attr] === defaultCorrection[attr]["wrong"])
