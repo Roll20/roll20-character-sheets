@@ -9414,11 +9414,17 @@
                     query.last = query.next;
                 break;
                 case 'remove_skill':
-                    query.title = 'Remove';
-                    query.options = cache.attrdb.skills[cache.skill_index].individual.map((s, i) => {
-                        return `|${s.skill.capitalize()},${s.skill}~${i}~${s.row_id}`;
-                    });
-                    query.options += `|${getTranslationByKey("go-back")},select_task`;
+                case 'static_skills_delete_button':
+                    if (cache.attrdb.skills[cache.skill_index].individual.length === 0) {
+                        query.title = '';
+                        query.options = '';
+                    } else {
+                        query.title = 'Remove';
+                        query.options = cache.attrdb.skills[cache.skill_index].individual.map((s, i) => {
+                            return `|${s.skill.capitalize()},${s.skill}~${i}~${s.row_id}`;
+                        });
+                        query.options += `|${getTranslationByKey("exit")},exit`;
+                    }
                     query.last = query.next;
                 break;
                 case 'remove_confirm':
@@ -9592,7 +9598,11 @@
                             'skill_menu' : query.selection;
                     break;
                     case 'remove_skill':
-                        if (query.selection === 'select_task') {
+                    case 'static_skills_delete_button':
+                        if (cache.attrdb.skills[cache.skill_index].individual.length === 0) {
+                            query.next = 'exit';
+                            query.commit = true;
+                        } else if (query.selection === 'select_task') {
                             query.next = 'select_task';
                         } else {
                             query.remove = query.selection.split('~');
@@ -9604,7 +9614,7 @@
                             cache.attrdb.skills[cache.skill_index].individual.splice(int(query.remove[1]),1);
                             setSkillsPointTotal(cache, set_values);
                             removeRepeatingRow(`repeating_skill_${query.remove[2]}`);
-                            query.next = 'write_attrdb'; //=> This is used just to exit the loop, end script.
+                            query.next = 'exit'; //=> This is used just to exit the loop, end script.
                         } else {
                             query.next = query.selection;
                         }
@@ -13364,6 +13374,7 @@
             'static_sheet_settings_type',
             'static_skills_accordions_button',
             'static_skills_add_button',
+            'static_skills_delete_button',
             'static_skills_uiselect_button',
             'static_skills_uitoggle_button',
             'static_stats_accordion_button',
@@ -13868,6 +13879,7 @@
                             break;
                             case 'edit':
                             case 'add':
+                            case 'delete':
                                 await skillsMenu(cache, set_values);
                             break;
                             case 'uiselect':
