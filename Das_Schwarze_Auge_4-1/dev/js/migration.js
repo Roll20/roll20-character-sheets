@@ -2,7 +2,7 @@
 /*
  this list has to be always ordered ascending in order to apply the migration steps in the correct order
 */
-var versionsWithMigrations = [
+const versionsWithMigrations = [
 		20190427,
 		20200809,
 		20210413,
