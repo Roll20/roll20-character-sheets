@@ -58216,7 +58216,7 @@ const uploadFakeTranslations = (sheetName, codesToUpload) => __awaiter(void 0, v
     for (const lc of codesToUpload) {
         yield (0, processSheet_1.makeServerCall)(fullUrl, {
             repo: settings.repoName,
-            sheet_folder: sheetName,
+            sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
             language_code: lc,
             data: tdata,
         });
@@ -58245,7 +58245,7 @@ const uploadTranslations = (sheetName, tdirecname) => __awaiter(void 0, void 0, 
             continue; // skip things not in LANGUAGE CODES
         if (extension !== "json")
             continue; // we skip any non json
-        const filePath = (0, processSheet_1.constructFilePath)(sheetName, [tdirecname, fname]);
+        const filePath = (0, processSheet_1.constructFilePath)(sheetName.replace(/\\(.)/g, '$1').replace(/\\(.)/g, '$1'), [tdirecname, fname]);
         // Endpoint expects it as json send
         const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
         const jsObj = JSON.parse(jsonFile);
@@ -58262,7 +58262,7 @@ const uploadTranslations = (sheetName, tdirecname) => __awaiter(void 0, void 0, 
         // Okay do the compare
         yield (0, processSheet_1.makeServerCall)(fullUrl, {
             repo: settings.repoName,
-            sheet_folder: sheetName,
+            sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
             language_code,
             data: jsObj,
         });
@@ -58272,12 +58272,12 @@ const uploadTranslations = (sheetName, tdirecname) => __awaiter(void 0, void 0, 
     }
 });
 const getTranslationFileNames = (sheetName, transDirName) => __awaiter(void 0, void 0, void 0, function* () {
-    const dirPath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, transDirName);
+    const dirPath = path.join(process.env["GITHUB_WORKSPACE"], sheetName.replace(/\\(.)/g, '$1'), transDirName);
     const data = yield fs.readdirSync(dirPath);
     return data;
 });
 const getSheetRootTranslationJsonObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
-    const filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "translation.json");
+    const filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName.replace(/\\(.)/g, '$1'), "translation.json");
     const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
     const jsObj = JSON.parse(jsonFile);
     return jsObj;
