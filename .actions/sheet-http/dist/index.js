@@ -58216,7 +58216,7 @@ const uploadFakeTranslations = (sheetName, codesToUpload) => __awaiter(void 0, v
     for (const lc of codesToUpload) {
         yield (0, processSheet_1.makeServerCall)(fullUrl, {
             repo: settings.repoName,
-            sheet_folder: sheetName,
+            sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
             language_code: lc,
             data: tdata,
         });
@@ -58265,7 +58265,7 @@ const uploadTranslations = (sheetName, tdirecname) => __awaiter(void 0, void 0, 
         console.warn("e3333");
         yield (0, processSheet_1.makeServerCall)(fullUrl, {
             repo: settings.repoName,
-            sheet_folder: sheetName,
+            sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
             language_code,
             data: jsObj,
         });
