@@ -58246,6 +58246,7 @@ const uploadTranslations = (sheetName, tdirecname) => __awaiter(void 0, void 0, 
         if (extension !== "json")
             continue; // we skip any non json
         const filePath = (0, processSheet_1.constructFilePath)(sheetName.replace(/\\(.)/g, '$1'), [tdirecname, fname]);
+        console.warn("e2 - filePath ", filePath);
         // Endpoint expects it as json send
         const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
         const jsObj = JSON.parse(jsonFile);
@@ -58278,6 +58279,7 @@ const getTranslationFileNames = (sheetName, transDirName) => __awaiter(void 0, v
 });
 const getSheetRootTranslationJsonObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
     const filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName.replace(/\\(.)/g, '$1'), "translation.json");
+    console.warn("E1", filePath);
     const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
     const jsObj = JSON.parse(jsonFile);
     return jsObj;
