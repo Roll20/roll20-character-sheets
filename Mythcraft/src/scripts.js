@@ -117,20 +117,26 @@ action_points.forEach(function (attr) {
     on("change:".concat(attr), function () {
         getAttrs(action_points, function (values) {
             var _a = parseIntegers(values), coordination = _a.coordination, action_points_base = _a.action_points_base;
-            var action_points = action_points_base;
+            var action_points_per_round = action_points_base;
             switch (coordination) {
                 case -1:
                 case -2:
-                    action_points = action_points_base - 1 || 0;
+                    action_points_per_round = action_points_base - 1 || 0;
                     break;
                 case -3:
-                    action_points = action_points_base - 2 || 0;
+                    action_points_per_round = action_points_base - 2 || 0;
                     break;
                 default:
-                    action_points = Math.ceil(coordination / 2) + action_points_base;
+                    action_points_per_round =
+                        Math.ceil(coordination / 2) + action_points_base;
                     break;
             }
-            setAttrs({ action_points: action_points });
+            console.table({
+                coordination: coordination,
+                action_points_per_round: action_points_per_round,
+                action_points_base: action_points_base
+            });
+            setAttrs({ action_points_per_round: action_points_per_round });
         });
     });
 });

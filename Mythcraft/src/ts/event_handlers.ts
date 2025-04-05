@@ -2,23 +2,30 @@ action_points.forEach((attr) => {
   on(`change:${attr}`, () => {
     getAttrs(action_points, (values) => {
       const { coordination, action_points_base } = parseIntegers(values);
-      let action_points = action_points_base;
+      let action_points_per_round = action_points_base;
 
       switch (coordination) {
         case -1:
         case -2:
-          action_points = action_points_base - 1 || 0;
+          action_points_per_round = action_points_base - 1 || 0;
           break;
         case -3:
-          action_points = action_points_base - 2 || 0;
+          action_points_per_round = action_points_base - 2 || 0;
           break;
         default:
-          // Base Action Points + half of the Coordination attribute
-          action_points = Math.ceil(coordination / 2) + action_points_base;
+          // Action Points Per Round + half of the Coordination attribute
+          action_points_per_round =
+            Math.ceil(coordination / 2) + action_points_base;
           break;
       }
 
-      setAttrs({ action_points });
+      console.table({
+        coordination,
+        action_points_per_round,
+        action_points_base,
+      });
+
+      setAttrs({ action_points_per_round });
     });
   });
 });
