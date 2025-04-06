@@ -4137,6 +4137,7 @@
                             'groupdb',
                             'rulesdb',
                             'static_group_visible_id',
+                            'statsdb'
                         );
                     break;
                     case 'lock':
@@ -12035,6 +12036,14 @@
                         cache.groupdb[cache.static_group_visible_id].item = query.selection;
                         set_values.static_attribute_group_item = query.selection.capitalize();
                         await setGroupCharacterPoints(cache, set_values);
+                        cache.statsdb.cp.spent =
+                            getSpentCharacterPoints(cache);
+                        set_values.static_character_points_spent = cache.statsdb.cp.spent;
+                        set_values.static_character_points_remaining =
+                            cache.statsdb.cp.base +
+                            cache.statsdb.cp.gained +
+                            cache.statsdb.cp.temp -
+                            cache.statsdb.cp.spent;
                     break;
                     case 'write_grouptype':
                         cache.groupdb[cache.static_group_visible_id].group_type = query.selection;
@@ -12146,6 +12155,14 @@
                         } else {
                             setGroupCharacterPoints(cache, set_values);
                         }
+                        cache.statsdb.cp.spent =
+                            getSpentCharacterPoints(cache);
+                        set_values.static_character_points_spent = cache.statsdb.cp.spent;
+                        set_values.static_character_points_remaining =
+                            cache.statsdb.cp.base +
+                            cache.statsdb.cp.gained +
+                            cache.statsdb.cp.temp -
+                            cache.statsdb.cp.spent;
                     break;
                     case 'write_stat':
                         if (query.type === 'group') {
