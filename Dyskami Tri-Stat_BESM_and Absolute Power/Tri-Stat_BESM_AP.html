@@ -3091,7 +3091,7 @@
         const temp = {};
         temp.sheet_version = parseFloat(cache.static_sheet_settings_version);
         temp.current_version = global_sheet_current_version;
-        clog(cache, temp, `upgradeSheetVersion()`);debugger;
+        clog(cache, temp, `upgradeSheetVersion()`);
         while (temp.sheet_version < temp.current_version) {
             switch (temp.sheet_version) {
                 case 0.1:
@@ -5972,7 +5972,11 @@
                 description += query.config[query.c_index].rank.length !== 0 ? '; hidden from ' + query.config[query.c_index].rank.capitalize().sort().join(", ") : '';
             break;
             case "unique attribute": description = ""; break;
-            case "unknown power": description = `${query.elevel} Character Points`; break;
+            case "unknown power":
+                query.config_index = query.config_index === undefined ?
+                    query.config.findIndex(c => c.name === 'unknown power') : query.config_index;
+                description = `${query.config[query.config_index].rank} Character Points`;
+            break;
             case "water speed": description = `Water speed up to ${(get1or3(query.elevel, 1) * (10 ** (Math.ceil(query.elevel / 2)))).toLocaleString()} kph`; break;
             case "wealth": description = getCharacteristicByAttr(cache, set_values, query); break;
             case "weapon": description = `${query.elevel}`; break;
@@ -10060,10 +10064,15 @@
                 case 'static_attribute_group_level':
                 case 'repeating_attribute_level':
                 case 'repeating_defect_rank':
-                    query.title = cache.source_section === 'defect' ?
-                        `${getTranslationByKey("rank")}` :
-                        `${getTranslationByKey("level")}`;
-                    query.options = `|${query.db.level || 0}`;
+                    if (query.attribute === 'unknown power') {
+                        query.title = '';
+                        query.options = '';
+                    } else {
+                        query.title = cache.source_section === 'defect' ?
+                            `${getTranslationByKey("rank")}` :
+                            `${getTranslationByKey("level")}`;
+                        query.options = `|${query.db.level || 0}`;
+                    }
                     query.last = query.next;
                 break;
                 case 'static_attribute_group_enhancements':
@@ -10380,6 +10389,7 @@
                         'transform',
                         'trigger',
                         'unaffected',
+                        'unknown power',
                         'weapon_class'
                     ];
                     query.configurations = [];
@@ -10659,7 +10669,7 @@
                     query.last = query.next;
                 break;
                 case 'supersense':
-                case'supersenses_or_techniques':
+                case 'supersenses_or_techniques':
                     query.title = getTranslationByKey("choose-supersense");
                     query.options = '|' + supersenses.map(s => `${s.capitalize()},${s}`).sort().join('|');
                     query.options += '|Other,other';
@@ -10746,6 +10756,13 @@
                     }
                     query.options += '|' + classes.sort().join("|") + 
                         `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
+                break;
+                case 'unknown power':
+                    query.title = getTranslationByKey("character-points");
+                    //query.unknown_index = cache.attrdb['unknown power'].findIndex(u => u.row_id === cache.originalCaseRowID);
+                    query.config_index = cache.attrdb['unknown power'][query.index].config.findIndex(c => c.name === 'unknown power');
+                    query.options = `|${cache.attrdb['unknown power'][query.index].config[query.config_index].rank}`;
                     query.last = query.next;
                 break;
 
@@ -10925,6 +10942,11 @@
                     case 'static_attribute_group_level':
                     case 'repeating_attribute_level':
                     case 'repeating_defect_rank':
+                        if (query.attribute === 'unknown power') {
+                            query.next = 'exit';
+                            query.commit = true;
+                            clog(cache, 'Unknown Power does not require levels. Add Character Points through Configuration instead.', 'ERROR');
+                        }
                         if (isNaN(query.selection)) {
                             query.next = 'select_level';
                         } else {
@@ -11606,6 +11628,30 @@
                         set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
                         query.next = 'exit';
                     break;
+                    case 'unknown power':
+                        if (isNaN(query.selection)) {
+                            query.next = 'unknown power';
+                        } else {
+                            query.rank = int(query.selection);
+                            cache.attrdb[query.attribute][query.index].config[query.config_index].rank = query.rank;
+                            cache.attrdb[query.attribute][query.index].points = query.rank;
+                            set_values[`${cache.source_path}_configuration`] = await setConfiguration(cache, set_values, query);
+                            set_values[`${cache.source_path}_points`] = query.rank;
+                            if (cache.groupdb[cache.static_group_visible_id].group_type === 'power flux') {
+                                setPowerFluxPoolPoints(cache, set_values);
+                            } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
+                                setPowerVariationGroupPoints(cache, set_values);
+                                setPowerVariationPoolPoints(cache, set_values);
+                            } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'dynamic powers') {
+                                setDynamicPowersPoolLevels(cache, set_values);
+                            } else {
+                                setGroupCharacterPoints(cache, set_values, cache.static_group_visible_id);
+                            }
+                            setCharacterPointsRemaining(cache, set_values);
+                            query.next = 'exit';
+                        }
+                    break;
+
                     case 'add_defect':
                         query.defect = query.selection;
                         query.task = 'add';
