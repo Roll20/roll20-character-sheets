@@ -1,10 +1,127 @@
+# 2025-4-1
+
+- Fix for the stat abbrievations used in skill summaries
+  - Add test too
+- Spell message nits:
+  - Remove the trailing . in the PP message
+  - Fix unbalanced brace in message for grace
+- Uses; clear per level count on level up
+- Skills:
+  - forEachSkill has a completion callback
+
+# 2025-3-25
+
+- Tracker now shows skills correctly.
+- Creature Law: Template for Encounter Tables
+- Creature Law: Finish template for creatures
+- Treasure Law: Add will stat bonus
+- RRs: Swap the two RR rolls to be consistent with other stuff
+- RRs: Fix use of sub attributes
+- Skills; Fix uses for skills with specialisations in level up
+- Uses:
+  - Taking injuries tickles a use of 'bodydevelopment'
+  - Casting a spell tickles a use of 'powerdevelopment'
+  - Total uses >= Current uses (for new ones)t
+  - Display correct global counter for uses.
+- Roll/Lookup crit: Handle scaled crits a lot better.
+
+# 2025-3-18
+
+- Add whisper toggle - GM or Public
+- Add whisper toggle to basically every roll in the game
+- Tracker:
+  - Add a return to charactersheet
+  - Send skill data (not shown yet).
+
+# 2025-3-11
+
+- Lots of tracker updates.  Still not ready for primetime (but should not break anything)
+  - Basic layout
+  - Notes field
+  - Refresh
+- Othermod/parrymod now on the creature sheet
+- Sync othermod/parrymod 
+- New combat clears othermod and parrymod.
+
+# 2025-3-4
+
+- Defenses for creatures on Land, Sea and the Air (and climbing)
+- More spells formats for creatures
+- Creatures talens now line break.
+- Show defense bonus for the dfense dropdown
+- Creatures can have shields (with passive dodge too)
+- Can now 'refresh' data for creatures.
+- Tweak layout of the fancybox so it has less margins on the sides.
+- Uses now works with specialised skills - not implemented all over yet
+  - Track Grace & Spell Trcikery
+- Start of Level Up review:  Show stat gains for now.
+- Fix use of Total/Ranks/Uses in charactermancer.  Cleans up Dark mode a bit
+- Add a usecounttotal; so total number of rolls for a character total
+- Show usecount for normal skills
+
+# 2025-2-25
+
+- Edit attacks
+- Remove pre-compendium culture support
+- Support better DB and targets for creatures
+- Support better DB for characters
+- Use count for transcendance (had armor and casted a spell);
+- Creatures:
+  - Parse ranks for movement skills correctly
+  - Use specialisation for specialised skills
+
+# 2025-2-18
+
+- Add all the specific static manuever tables from Core Law. 
+    Thanks to @grim5352 for the tables.
+- Add shield bash to known attacks
+- Start of Uses counting: Count use of normal skills.
+- Fix specialisation bonus - Use 0 ranks or highest - 25.
+- Reneable initiative buttons.  Actions buttons need to have type
+    'action'.
+- Fix specified crits
+- Add F->J & X,Y specified crits too
+- Add Fate Points - Just a simple text box (@coreylpierce)
+- Fix for creating specialised skills during levelup.
+- (Creature Law) Update parsing of crit reduction and other resistances.
+
+# 2025-2-11
+
+- Fix the stupid problem where buying Specialised skills
+    caused them to be duplicated.  Was only with culture ranks!
+    Big thanks for @rdanhenry for helping me nail it down, along with
+    (in no particular order) @adsmalley, @dudimous, @ixs, @grim, @nefrekin,
+    @bambo and probably some others I've forgottem
+- Handle multiple criticals from the same attack.
+    - F-J crits now handled.
+    - This is a big set of changes through this parsing code
+    - Designed to also support "addional crits"
+- Injury
+    - Now has tests.
+    - Support for multiple H (hits) in the same string.
+    - Adds a 'Z' on hits only attacks
+    - Handle duplicate any attribute.
+- Make the initiative button big and green (@everyone apparently)
+- Added 'Class' to creatures;  can search for Class:III creatures now
+- Don't set 'workpending' attribute - stops a lot of warnings
+    and it did not work anyway
+- Tests for fetching Criticals.
+- Start on Training Packages
+- Template for custom currencies.
+- Remove some old cruft from the todo.
+
+# 2025-2-4
+
+- Creatures: Validate attacks for all listed attacks.
+- Correctly adjust attack size
+- Change display of attack size for creatures.
+- Add meditation to attack skills.
+
 # 2025-1-21
 
 - Creature: Handle Level correctly on dropped creatures.
 - Dark Mode updates - closer to useful
 - Creature layout updates.
-
-
 
 # 2025-1-14
 
