@@ -3218,7 +3218,7 @@
         const temp = {};
         temp.sheet_version = parseFloat(cache.static_sheet_settings_version);
         temp.current_version = global_sheet_current_version;
-        clog(cache, temp, `upgradeSheetVersion()`);
+        clog(cache, temp, `upgradeSheetVersion()`);debugger;
         while (temp.sheet_version < temp.current_version) {
             switch (temp.sheet_version) {
                 case 0.1:
@@ -7015,7 +7015,7 @@
             values: []
         };
         clog(cache, roll, 'actionRoll(roll)');
-        clog(cache, query, 'actionRoll(query)');
+        clog(cache, query, 'actionRoll(query)');debugger;
         if (cache.source_type === 'react') {
             roll.attacker = rollEscape.unescape(cache.originalRollId);
         }
@@ -7446,10 +7446,13 @@
                 break;
                 case 'specialization':
                     query.title = 'Select Specialization';
-                    query.options = '|None,none';
+                    const specializations = [];
                     for (let i = 0; i < query.skills[query.index].spec.length; i++) {
-                        query.options += `|${getTranslationByKey(query.skills[query.index].spec[i].toKebobCase())},${i}`;
+                        const specialization = getTranslationByKey(query.skills[query.index].spec[i].toKebobCase());
+                        specializations.push(`${specialization === false ? 
+                            query.skills[query.index].spec[i] : specialization},${i}`);
                     }
+                    query.options = '|None,none|' + specializations.sort().join("|");
                     query.last = query.next;
                 break;
                 case 'stat':
