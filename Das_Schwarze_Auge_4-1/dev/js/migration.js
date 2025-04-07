@@ -17,6 +17,7 @@ const versionsWithMigrations = [
 		20240519,
 		20241002,
 		20250122,
+		20250413,
 ];
 
 /*
@@ -1376,6 +1377,51 @@ function migrateTo20250122(migrationChain) {
 			safeSetAttrs(attrsToRestore, {}, function() {
 				callNextMigration(migrationChain);
 			});
+		});
+	});
+}
+
+/*
+	Migration steps:
+	- Check and fix two integer attribute values saved as strings
+*/
+function migrateTo20250413(migrationChain) {
+	// Boilerplate
+	const caller = "migrateTo20250413";
+	debugLog(caller, "started");
+
+	// Preparation
+	/// Existing attributes in need of checking for value types
+	const attrsToGet = [
+		"reg_sleep_addiction_withdrawal_effect",
+		"reg_sleep_food_restriction_effect",
+	];
+
+	// Attribute operations
+	safeGetAttrs(attrsToGet, function(values) {
+		// Boilerplate
+		let attrsToChange = {};
+
+		// Checking and Sanitization
+		for (attr of attrsToGet)
+		{
+			let value = values[attr];
+			if (typeof(value) !== "numeric")
+			{
+				// Try converting to integer
+				if (isNaN(parseInt(value)))
+				{
+					value = getDefaultValue(attr);
+				} else {
+					value = parseInt(value);
+				}
+				attrsToChange[attr] = value;
+			}
+		}
+
+		debugLog(caller, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange, {}, function () {
+			callNextMigration(migrationChain);
 		});
 	});
 }
