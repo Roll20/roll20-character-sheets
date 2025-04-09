@@ -2639,15 +2639,15 @@
          Deadly Assault
         </button>
        </div>
-       <!--<div class="grc4 advancedweapon-shrink">
+       <div class="grc4 advancedweapon-shrink">
        <input type="hidden" name="attr_focusattack"/>
         <button
-               type="roll"
-               name="roll_focusattack"
+               type="action"
+               name="act_focusattack"
                value="@{focusattack}">
          Focus
         </button>
-       </div>-->
+       </div>
       </div>
      </div> <!--Advanced Block Grid-->
     </div>
@@ -2854,15 +2854,15 @@
          Deadly Assault
         </button>
        </div>
-       <!--<div class="grc4 advancedweapon-shrink">
+       <div class="grc4 advancedweapon-shrink">
        <input type="hidden" name="attr_focusattack"/>
         <button
-               type="roll"
-               name="roll_focusattack"
+               type="action"
+               name="act_focusattack"
                value="@{focusattack}">
          Focus
         </button>
-       </div>-->
+       </div>
       </div>
      </div> <!--Advanced Block Grid-->
     </div>
@@ -3052,10 +3052,10 @@
  <div class="sheet-repeating-fields">
   <fieldset class="repeating_profitloss">
    <div class="bag-grid bags">
-    <div class="location">
+    <div class="name">
      <textarea title="Memo" name="attr_plMemo" placeholder="Memo..."></textarea>
     </div>
-    <div class="name">
+    <div class="location">
      Debits: <input title="Debits" step="any" type="number" name="attr_plDebits"/>
     </div>
     <div class="quantity">
@@ -4717,13 +4717,15 @@
 
     WeaponCol.forEach(col => {
     on(`change:repeating_weapons${col} sheet:opened change:bab change:slow change:haste`,function(){
-        getAttrs(["BAB","slow","haste"],function(values){
+        getAttrs(["BAB","slow","haste",`character_name`],function(values){
             getSectionIDs(`repeating_weapons${col}`,function(array){
                 let rows = {};
                 for (let arrayID of array){
                     rows[`repeating_weapons${col}_` + arrayID + `_weaponbab`] = values.BAB;
                     rows[`repeating_weapons${col}_` + arrayID + `_`+`weaponhaste`] = values.haste;
                     rows[`repeating_weapons${col}_` + arrayID + `_`+`weaponslow`] = values.slow;
+                    rows[`repeating_weapons${col}_` + arrayID + `_`+`character_name`] = values.character_name;
+                    rows[`repeating_weapons${col}_` + arrayID + `_`+`ArrayID`] = arrayID;
                 }
                 if(rows){
                     setAttrs(rows);
@@ -5040,7 +5042,84 @@
     });
 
     //Focus <Pending>
+    // weapondamage is the name of the damage button
 
+    WeaponCol.forEach(col => {
+     on(`clicked:repeating_weapons${col}:focusattack`, function(){
+      getAttrs([
+       `repeating_weapons${col}_bonustoattack`,
+       `repeating_weapons${col}_critlow`,
+       `repeating_weapons${col}_weaponhaste`,
+       `repeating_weapons${col}_weaponbab`,
+       `repeating_weapons${col}_enhancetoattack`,
+       `repeating_weapons${col}_weapontodamage`,
+       `repeating_weapons${col}_bonustodamage`,
+       `repeating_weapons${col}_dnum`,
+       `repeating_weapons${col}_dtype`,
+       `repeating_weapons${col}_enchdamagedice`,
+       `repeating_weapons${col}_extraenchdicecrit`,
+       `repeating_weapons${col}_weaponcritmod`,
+       `repeating_weapons${col}_twohanded`,
+       `repeating_weapons${col}_weapontohit`,
+      // `repeating_weapons${col}_character_name`,
+      // `repeating_weapons${col}_arrayID`,
+       `repeating_weapons${col}_weapondamagtype`], function(values){
+       // const arrayID = values[`repeating_weapons${col}_arrayID`]
+       // const characterName = values[`repeating_weapons${col}_character_name`];
+       const featBonusToAttack = values[`repeating_weapons${col}_bonustoattack`] || 0;
+       const featBonusToDamage = values[`repeating_weapons${col}_bonustodamage`] || 0;
+       const dieQuantity = values[`repeating_weapons${col}_dnum`] || 1;
+       const dieType = values[`repeating_weapons${col}_dtype`];
+       const weaponEnhancement = values[`repeating_weapons${col}_enhancetoattack`] || 0;
+       const baseAttack = values[`repeating_weapons${col}_weaponbab`] || 0;
+       const minCritThreshold = values[`repeating_weapons${col}_critlow`]|| 20 ;
+       const keyAttackAttribute = values[`repeating_weapons${col}_weapontohit`] || 0;
+       const keyDamageAttribute = values[`repeating_weapons${col}_weapontodamage`] ;
+       const twoHandedToggle = values[`repeating_weapons${col}_twohanded`];
+       const magicDice = values[`repeating_weapons${col}_enchdamagedice`];
+       const magicCriticalDice = values[`repeating_weapons${col}_extraenchdicecrit`];
+       const magicDamageType = values[`repeating_weapons${col}_weapondamagtype`];
+       const criticalModifier = values[`repeating_weapons${col}_weaponcritmod`];
+       let macroRoll = `&{template:custom} {{title=Focus Attack}}{{Attack Roll=[[1d20cs>${minCritThreshold}+${baseAttack}`+
+               `[BAB]+${keyAttackAttribute}[Key Attribute]+${featBonusToAttack}[Feats]+${weaponEnhancement}[Enhancement]`+
+               `-@{slow}[Slow]+((0?{Focus Points Spent})*3)[Focus]+(0?{Miscellaneous attack bonuses?})[Misc.]]]}}`;
+       if (twoHandedToggle === "on"){
+        macroRoll = macroRoll + `{{Damage=[[[[${dieQuantity}+(0?{Focus Points Spent})]]${dieType}+floor(`+
+                `(${keyDamageAttribute})*1.5)[Key Attribute]+${featBonusToDamage}[Feat]+${weaponEnhancement}[Magic]+((`+
+                `0?{Focus Points Spent})*3)[Focus]]]}}`;
+       }
+       if (twoHandedToggle !== "on"){
+        macroRoll = macroRoll + `{{Damage=[[[[${dieQuantity}+(0?{Focus Points Spent})]]${dieType}+floor(`+
+                `${keyDamageAttribute})[Key Attribute]+${featBonusToDamage}[Feat]+${weaponEnhancement}[Magic]+((0?{`+
+                `Focus Points Spent})*3)[Focus]]]}}`;
+       }
+       if (magicDice){
+        macroRoll = macroRoll + `{{${magicDamageType} Damage=[[${magicDice}[${magicDamageType}]]]}}`;
+       }
+       macroRoll = macroRoll + `{{Critical Confirmation Roll=[[1d20cs>${minCritThreshold}+${baseAttack}`+
+               `[BAB]+${keyAttackAttribute}[Key Attribute]+${featBonusToAttack}[Feats]+${weaponEnhancement}[Enhancement]`+
+               `-@{slow}[Slow]+((0?{Focus Points Spent})*3)[Focus]+(0?{Miscellaneous attack bonuses?})[Misc.]]]}}`;
+       if (twoHandedToggle === "on"){
+        macroRoll = macroRoll + `{{Critical Damage=[[[[((${dieQuantity}+(0?{Focus Points Spent}))*${criticalModifier})]]`+
+                `${dieType}+(floor(${keyDamageAttribute}*1.5)*${criticalModifier})[Key Attribute]+(`+
+                `${featBonusToDamage}*${criticalModifier}[Feat])+(${weaponEnhancement}*${criticalModifier})+(((0?{Focus`+
+                ` Points Spent})*3)*${criticalModifier})[Focus]]]}}`;
+       }
+       if (twoHandedToggle !== "on"){
+        macroRoll = macroRoll + `{{Critical Damage=[[[[((${dieQuantity}+(0?{Focus Points Spent}))*${criticalModifier})]]`+
+                `${dieType}+(${keyDamageAttribute}*${criticalModifier})[Key Attribute]+(`+
+                `${featBonusToDamage}*${criticalModifier}[Feat])+(${weaponEnhancement}*${criticalModifier})+(((0?{Focus`+
+                ` Points Spent})*3)*${criticalModifier})[Focus]]]}}`;
+       }
+       if (magicCriticalDice){
+        macroRoll = macroRoll + `{{Bonus Critical Damage = [[${magicCriticalDice}]]}}`
+       }
+       startRoll(macroRoll,function(roll){
+        finishRoll(roll.rollId);
+       });
+      });
+     });
+    })
 
     // </editor-fold>
 
