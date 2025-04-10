@@ -45,13 +45,13 @@
         </div>
             
         <div class="sheet-sub-skill">
-            <button data-i18n="armicinetiche-label" class="sub-skill" name="roll_armicinetiche" type="roll" value="&{template:default} {{name=Armi Cinetiche}} {{personaggio=@{nome}}} {{Result=[[2d12+(@{tot_armicinetiche})]]}}">Armi Cinetiche</button>
+            <button data-i18n="armicinetiche-label" class="sub-skill" name="roll_armicinetiche" type="roll" value="&{template:default} {{name=Armi Cinetiche}} {{personaggio=@{nome}}} {{Result=[[2d12+(tot_armicinetiche)]]}}">Armi Cinetiche</button>
             <input class="sub-skill" name="attr_armicinetiche" type="number" value="">
             <input readonly class="tot-sub-skill" name="attr_tot_armicinetiche" type="number" value="">
         </div>
             
         <div class="sheet-sub-skill">
-            <button data-i18n="armienergetiche-label" class="sub-skill" name="roll_armienergetiche" type="roll" value="&{template:default} {{name=Armi Energetiche}} {{personaggio=@{nome}}} {{Result=[[2d12+(@{tot_armienergetiche})]]}}">Armi Energetiche</button>
+            <button data-i18n="armienergetiche-label" class="sub-skill" name="roll_armienergetiche" type="roll" value="&{template:default} {{name=Armi Energetiche}} {{personaggio=@{nome}}} {{Result=[[2d12+(tot_armienergetiche)]]}}">Armi Energetiche</button>
             <input class="sub-skill" name="attr_armienergetiche" type="number" value="">
             <input readonly class="tot-sub-skill" name="attr_tot_armienergetiche" type="number" value="" >
         </div>
@@ -766,62 +766,62 @@
 
     });
 
-    on('change:repeating_attacchi:weapon', (eventInfo) => {
+    const weapons = {
+        ["armapersonalizzata-option"]: {bonusattacco: "0", danno: "0", tipo: "-"},
+        ["colpodisarmato-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d4", tipo: "Kinetic"},
+        ["guantoferrato-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d6", tipo: "Kinetic"},
+        ["pugnopotenziato-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d8", tipo: "Kinetic"},
+        ["alabarda-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d8", tipo: "Kinetic"},
+        ["ascialeggera-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d8", tipo: "Kinetic"},
+        ["asciadarmi-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d10", tipo: "Kinetic"},
+        ["asciagrande-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d6", tipo: "Kinetic"},
+        ["bastoneferrato-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d6", tipo: "Kinetic"},
+        ["brandistocco-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d6", tipo: "Kinetic"},
+        ["coltello-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d6", tipo: "Kinetic"},
+        ["coltellotattico-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d8", tipo: "Kinetic"},
+        ["falcione-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d8", tipo: "Kinetic"},
+        ["tridente-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d10", tipo: "Kinetic"},
+        ["frusta-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d4", tipo: "Kinetic"},
+        ["giavellotto-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d8", tipo: "Kinetic"},
+        ["lancia-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d10", tipo: "Kinetic"},
+        ["martellosemplice-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d8", tipo: "Kinetic"},
+        ["martellodarmi-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d10", tipo: "Kinetic"},
+        ["martellopesante-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d6", tipo: "Kinetic"},
+        ["randello-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d6", tipo: "Kinetic"},
+        ["ololama-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d10", tipo: "Kinetic"},
+        ["ololamainastata-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d6", tipo: "Kinetic"},
+        ["spadaleggera-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d8", tipo: "Kinetic"},
+        ["spadadarmi-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d10", tipo: "Kinetic"},
+        ["spadone-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d6", tipo: "Kinetic"},
+        ["arcocompound-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d8", tipo: "Kinetic"},
+        ["balestracompound-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d10", tipo: "Kinetic"},
+        ["cerbottana-option"]: {bonusattacco: "tot_armicinetiche", danno: "1", tipo: "Kinetic"},
+        ["fuciledardi-option"]: {bonusattacco: "tot_armicinetiche", danno: "1", tipo: "Kinetic"},
+        ["rete-option"]: {bonusattacco: "tot_armicinetiche", danno: "", tipo: "Kinetic"},
+        ["pistola-option"]: {bonusattacco: "tot_armicinetiche", danno: "1d10", tipo: "Kinetic"},
+        ["pistolapesante-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d6", tipo: "Kinetic"},
+        ["mitraglietta-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d6", tipo: "Kinetic"},
+        ["shotgun-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d8", tipo: "Kinetic"},
+        ["fucilericognizione-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d6", tipo: "Kinetic"},
+        ["fucileassalto-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d8", tipo: "Kinetic"},
+        ["fucileprecisione-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d8", tipo: "Kinetic"},
+        ["fucilepesante-option"]: {bonusattacco: "tot_armicinetiche", danno: "3d6", tipo: "Kinetic"},
+        ["mitragliatrice-option"]: {bonusattacco: "tot_armicinetiche", danno: "2d10", tipo: "Kinetic"},
+        ["taser-option"]: {bonusattacco: "tot_armienergetiche", danno: "1d4", tipo: "Energetic"},
+        ["pistolablaster-option"]: {bonusattacco: "tot_armienergetiche", danno: "1d10", tipo: "Energetic"},
+        ["pistolablasterpesante-option"]: {bonusattacco: "tot_armienergetiche", danno: "2d6", tipo: "Energetic"},
+        ["mitragliettablaster-option"]: {bonusattacco: "tot_armienergetiche", danno: "2d6", tipo: "Energetic"},
+        ["shotgunblaster-option"]: {bonusattacco: "tot_armienergetiche", danno: "2d8", tipo: "Energetic"},
+        ["fucileblaster-option"]: {bonusattacco: "tot_armienergetiche", danno: "2d8", tipo: "Energetic"},
+        ["fucileblasterpesante-option"]: {bonusattacco: "tot_armienergetiche", danno: "3d6", tipo: "Energetic"},
+        ["mitragliatriceblaster-option"]: {bonusattacco: "tot_armienergetiche", danno: "2d10", tipo: "Energetic"},
+        ["proiettorearco-option"]: {bonusattacco: "tot_armienergetiche", danno: "2d6", tipo: "Energetic"},
+        ["raggioprotonico-option"]: {bonusattacco: "tot_armienergetiche", danno: "2d10", tipo: "Energetic"}
+    };
+    
+    on("change:repeating_attacchi:weapon", (eventInfo) => {
 
-        getAttrs(['repeating_attacchi_weapon'], values => {
-
-            const weapons = {
-                ["armapersonalizzata-option"]: {bonusattacco: "", danno: "", tipo: ""},
-                ["colpodisarmato-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d4", tipo: "Kinetic"},
-                ["guantoferrato-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d6", tipo: "Kinetic"},
-                ["pugnopotenziato-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d8", tipo: "Kinetic"},
-                ["alabarda-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d8", tipo: "Kinetic"},
-                ["ascialeggera-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d8", tipo: "Kinetic"},
-                ["asciadarmi-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d10", tipo: "Kinetic"},
-                ["asciagrande-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d6", tipo: "Kinetic"},
-                ["bastoneferrato-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d6", tipo: "Kinetic"},
-                ["brandistocco-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d6", tipo: "Kinetic"},
-                ["coltello-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d6", tipo: "Kinetic"},
-                ["coltellotattico-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d8", tipo: "Kinetic"},
-                ["falcione-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d8", tipo: "Kinetic"},
-                ["tridente-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d10", tipo: "Kinetic"},
-                ["frusta-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d4", tipo: "Kinetic"},
-                ["giavellotto-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d8", tipo: "Kinetic"},
-                ["lancia-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d10", tipo: "Kinetic"},
-                ["martellosemplice-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d8", tipo: "Kinetic"},
-                ["martellodarmi-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d10", tipo: "Kinetic"},
-                ["martellopesante-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d6", tipo: "Kinetic"},
-                ["randello-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d6", tipo: "Kinetic"},
-                ["ololama-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d10", tipo: "Kinetic"},
-                ["ololamainastata-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d6", tipo: "Kinetic"},
-                ["spadaleggera-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d8", tipo: "Kinetic"},
-                ["spadadarmi-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d10", tipo: "Kinetic"},
-                ["spadone-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d6", tipo: "Kinetic"},
-                ["arcocompound-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d8", tipo: "Kinetic"},
-                ["balestracompound-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d10", tipo: "Kinetic"},
-                ["cerbottana-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1", tipo: "Kinetic"},
-                ["fuciledardi-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1", tipo: "Kinetic"},
-                ["rete-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "", tipo: "Kinetic"},
-                ["pistola-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "1d10", tipo: "Kinetic"},
-                ["pistolapesante-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d6", tipo: "Kinetic"},
-                ["mitraglietta-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d6", tipo: "Kinetic"},
-                ["shotgun-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d8", tipo: "Kinetic"},
-                ["fucilericognizione-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d6", tipo: "Kinetic"},
-                ["fucileassalto-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d8", tipo: "Kinetic"},
-                ["fucileprecisione-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d8", tipo: "Kinetic"},
-                ["fucilepesante-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "3d6", tipo: "Kinetic"},
-                ["mitragliatrice-option"]: {bonusattacco: "@{tot_armicinetiche}", danno: "2d10", tipo: "Kinetic"},
-                ["taser-option"]: {bonusattacco: "@{tot_armienergetiche}", danno: "1d4", tipo: "Energetic"},
-                ["pistolablaster-option"]: {bonusattacco: "@{tot_armienergetiche}", danno: "1d10", tipo: "Energetic"},
-                ["pistolablasterpesante-option"]: {bonusattacco: "@{tot_armienergetiche}", danno: "2d6", tipo: "Energetic"},
-                ["mitragliettablaster-option"]: {bonusattacco: "@{tot_armienergetiche}", danno: "2d6", tipo: "Energetic"},
-                ["shotgunblaster-option"]: {bonusattacco: "@{tot_armienergetiche}", danno: "2d8", tipo: "Energetic"},
-                ["fucileblaster-option"]: {bonusattacco: "@{tot_armienergetiche}", danno: "2d8", tipo: "Energetic"},
-                ["fucileblasterpesante-option"]: {bonusattacco: "@{tot_armienergetiche}", danno: "3d6", tipo: "Energetic"},
-                ["mitragliatriceblaster-option"]: {bonusattacco: "@{tot_armienergetiche}", danno: "2d10", tipo: "Energetic"},
-                ["proiettorearco-option"]: {bonusattacco: "@{tot_armienergetiche}", danno: "2d6", tipo: "Energetic"},
-                ["raggioprotonico-option"]: {bonusattacco: "@{tot_armienergetiche}", danno: "2d10", tipo: "Energetic"}
-            };
+        getAttrs(["repeating_attacchi_weapon"], values => {
 
             let selectedWeapon = values.repeating_attacchi_weapon.trim();
             let matchedWeapon = null;
@@ -841,7 +841,7 @@
 
             if (matchedWeapon) {
 
-                const bonusAttaccoAttr = matchedWeapon.bonusattacco === "@{tot_armienergetiche}" 
+                const bonusAttaccoAttr = matchedWeapon.bonusattacco === "tot_armienergetiche" 
                     ? "tot_armienergetiche" 
                     : "tot_armicinetiche";
     
@@ -849,9 +849,9 @@
 
                     const output = {
 
-                        repeating_attacchi_bonusattacco: values[bonusAttaccoAttr],
-                        repeating_attacchi_danno: matchedWeapon.danno,
-                        repeating_attacchi_tipo: matchedWeapon.tipo
+                        'repeating_attacchi_bonusattacco': values[bonusAttaccoAttr],
+                        'repeating_attacchi_danno': matchedWeapon.danno,
+                        'repeating_attacchi_tipo': matchedWeapon.tipo
 
                     };
 
@@ -859,6 +859,63 @@
 
                 });
             }
+        });
+    });
+
+
+    on("change:tot_armienergetiche change:tot_armicinetiche", function() {
+        // Otteniamo tutti gli ID delle righe della sezione ripetuta
+        getSectionIDs("repeating_attacchi", function(ids) {
+            // Aggiungiamo gli attributi da prendere (weapon per ogni riga e i totali)
+            const attrsToGet = ids.map(id => `repeating_attacchi_${id}_weapon`);
+            attrsToGet.push("tot_armienergetiche", "tot_armicinetiche");
+    
+            // Recuperiamo i valori di questi attributi
+            getAttrs(attrsToGet, function(values) {
+                const output = {};
+    
+                // Log per vedere tutti gli attributi recuperati
+                console.log("Valori recuperati da getAttrs:", values);
+    
+                // Iteriamo su tutte le righe
+                ids.forEach(id => {
+                    const weaponName = values[`repeating_attacchi_${id}_weapon`]?.trim(); // nome arma selezionata
+                    let matchedWeapon = null;
+    
+                    // Cerchiamo l'arma tra quelle definite
+                    for (let key in weapons) {
+
+                        if (getTranslationByKey(key) === weaponName && key !== "armapersonalizzata-option") {
+                            matchedWeapon = weapons[key];
+                            break;
+                        }
+                    }
+    
+                    // Se l'arma è trovata, aggiorniamo il bonus di attacco
+                    if (matchedWeapon) {
+                        const tipo = matchedWeapon.tipo.toLowerCase().trim();  // Kinetic o Energy, trattato in minuscolo
+                        console.log("Tipo dell'arma:", tipo); // Log del tipo dell'arma
+    
+                        let bonusAttr;
+    
+                        // Determiniamo quale attributo usare per il bonus
+                        if (tipo === "kinetic") {
+                            bonusAttr = "tot_armicinetiche";  // Se Kinetic, usiamo tot_armicinetiche
+                        } else if (tipo === "energetic") { // Gestiamo anche "energetic"
+                            bonusAttr = "tot_armienergetiche"; // Se Energy, usiamo tot_armienergetiche
+                        }
+    
+                        // Verifica che l'attributo del bonus esista
+                        const bonus = values[bonusAttr] !== undefined ? values[bonusAttr] : 0;
+    
+                        // Applichiamo il bonus solo se l'arma è presente
+                        output[`repeating_attacchi_${id}_bonusattacco`] = bonus;
+                    }
+                });
+    
+                // Impostiamo gli output per aggiornare i valori
+                setAttrs(output);
+            });
         });
     });
     
