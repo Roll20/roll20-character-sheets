@@ -73,5 +73,13 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Added simple Crew sub-tab to Ship, auto-calculates total salaries on Ship details
 - Fixed bug where Effect was not being added to damage for Dexterity weapons
 
+### Version 1.1.02
+- Revamped equipment weight and added encumberance
+- Added 'carried' flag to weapons and armour
+- Moved initiative to top of combat panel
+- Added psionic 'special abilities' repeating block
+- Fixed bug with boon/bane and 'ask for difficulty'
+- Fixed bug with equipment drag and drop KG vs. Kg
+
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 
