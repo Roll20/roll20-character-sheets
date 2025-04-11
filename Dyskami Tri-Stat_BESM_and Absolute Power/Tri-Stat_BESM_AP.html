@@ -253,12 +253,13 @@
             <div class="styling-border theme-border accordion-roll">
                 <div class="container-roll styling-background theme-background">
                     <fieldset class="repeating_roll">
+                        <div class="repeating-break">
                         <input name="attr_state" class="accordion-roll" type="checkbox" value="1" />
                         <div class="grid-container-collapsible-title-bar theme-border">
                             <div class="grid-minor-title-buttons-left">
                                 <button name="act_rollmacro" class="styling-section-button button-click-animation theme-button" type="action">
-                                    <span name="attr_rolltype" class="material-icons expand">casino</span>
-                                    <input name="attr_rolltype" type="hidden" value="casino" />
+                                    <span name="attr_icon" class="material-icons expand">casino</span>
+                                    <input name="attr_icon" type="hidden" value="casino" />
                                 </button>
                             </div>
                             <div class="grid-minor-section-title theme-title">
@@ -317,6 +318,7 @@
                                     <input name="attr_enemy" class="grid-minor-input-enemy styling-pill-input theme-input" type="text" value="" readonly />
                                 </div>
                             </div>
+                        </div>
                         </div>
                     </fieldset>
                 </div>
@@ -2231,7 +2233,7 @@
 <!-- Sheet Workers -->
 <script type="text/worker">
     /* Global Variables */
-    const global_sheet_current_version = 0.5;
+    const global_sheet_current_version = 0.6;
     const all_attributes = ['absorption','alternate form','alternate identity','armor','attack mastery','augmented','capacity','change state','cognition','combat technique','companion','connected','control environment','conversion','data access','defense mastery','dimension walk','dynamic powers','elasticity','enemy attack','enemy defense','energized','exorcism','expertise','extra actions','extra arms','extra defenses','features','flight','force field','ground speed','healing','heightened awareness','heightened senses','illusion','immovable','immunity','immutable','inspire','jumping','massive damage','melee attack','melee defense','merge','metamorphosis','mimic','mind control','mind shield','minions','mulligan','nullify','plant control','pocket dimension','portal','power flux','power variation','projection','ranged attack','ranged defense','regeneration','reincarnation','resilient','sensory block','sixth sense','size change','skill group','skills','social mastery','spaceflight','special movement','summon creatures','supersense','superspeed','superstrength','swarm','taunt','telekinesis','telepathy','teleport','tough','transfer','transmute','tunneling','unaffected','unassailable','undetectable','unknown power','water speed','wealth','weapon'];
     const all_conditions = ['anemic','blinded','contagious','continuing','dead','demoralized','drained','incapacitated','incurable','irritant','lethargic','prone','serious injury','stunned','tangled','unconscious'];
     const all_defects = ['achilles heel','awkward size','bane','blind fury','conditional ownership','confined','cursed','demure','easily distracted','fragile','hounded','impaired manipulation','impaired speech','inept attack','inept defense','involuntary change','ism','magnet','marked','nemesis','nightmares','no healing','obligated','phobia','physical impairment','red tape','reduced damage','sensory impairment','shortcoming','significant other','skeleton in the closet','social fault','special requirement','unappealing','unique defect','unsettled','vulnerability','wanted','weak point'];
@@ -2243,7 +2245,7 @@
     const tsc_ap_attributes = ['expertise','taunt'];
     const besmx_attributes = ['extra defenses'];
     const kb_attributes = ['immovable'];
-    const dbs = ['attrdb','conditiondb','defectdb','groupdb','journaldb','statsdb'];
+    const dbs = ['attrdb','conditiondb','defectdb','groupdb','journaldb','rolldb','statsdb'];
     const all_skills = ['acrobatics','animal training','architecture','area knowledge','artisan','biological sciences','boating','burglary','business','civilisation','climbing','computers','controlled breathing','cultural arts','demolitions','disguise','domestic arts','driving','engineering','environmental sciences','electronics','empathy','etiquette','forgery','gaming','interrogation','intimidation','languages','law','leadership','listening','mechanics','medical','military sciences','naturopathy','navigation','occult','occupation','performing arts','persuasion','physical sciences','piloting','poisons','police sciences','power lifting','religion','riding','search','seduction','sleight of hand','social sciences','sports','stealth','street sense','survival','swimming','urban tracking','visual arts','wilderness tracking','writing'];
     const all_skill_groups = ['academic','adventuring','artistic','business','detective','domestic','military','occupation','scientific','social','street','technical'];
     const normalize_attributes = {
@@ -3003,6 +3005,23 @@
         stat: 'none',
         totalpoints: 0,
     };
+    const roll_macro_template = {
+        attribute: {
+            id: '',
+            name: '',
+        },
+        enemy: {
+            id: '',
+            name: '',
+        },
+        id: '',
+        maneuver: '',
+        modifier: '',
+        name: '',
+        stat: '',
+        target: '',
+        type: '',
+    };
 
     /* Custom Prototypes */
     String.prototype.toSnakeCase = function() {
@@ -3211,8 +3230,9 @@
         temp.current_version = global_sheet_current_version;
         clog(cache, temp, `upgradeSheetVersion()`);
         while (temp.sheet_version < temp.current_version) {
-            switch (temp.sheet_version) {
-                case 0.1:
+            //switch (temp.sheet_version) {
+            if (temp.sheet_version <= 0.1) {
+                //case 0.1:
                     const get_attr = ['attrdb','defectdb','statsdb'];
                     const get_attrs = await getAttrsAsync(get_attr);
                     cache.attrdb = JSON.parse(get_attrs.attrdb);
@@ -3270,8 +3290,14 @@
                     set_values.groupdb = JSON.stringify(cache.groupdb);
                     set_values.statsdb = JSON.stringify(cache.statsdb);
                     temp.sheet_version = 0.2;
-                break;
-                default:
+                //break;
+            } else if (temp.sheet_version <= 0.5) {
+                //case 0.5:
+                    set_values.rolldb = [];
+                    temp.sheet_version = 0.6;
+                //break;
+            } else {
+                //default:
                     temp.sheet_version = temp.current_version;
             }
         }
@@ -4122,6 +4148,9 @@
                             case 'accordion':
                                 temp.push(`${cache.source_path}_state`);
                             break;
+                            case 'name':
+                                temp.push('rolldb');
+                            break;
                         }
                     break;
                     case 'skill':
@@ -4200,6 +4229,9 @@
                                     'statsdb',
                                     `${event_info.sourceAttribute}`
                                 );
+                            break;
+                            case 'roll':
+                                temp.push('rolldb');
                             break;
                             case 'skills':
                                 temp.push(
@@ -9949,12 +9981,14 @@
     async function rollMenu(cache, set_values) {
         const query = {};
         clog(cache, query, 'rollMenu()');
-        query.next = cache.source_id;
+        query.next = cache.source_type === 'static' ? cache.source_id : cache.source_attribute;
         query.commit = false;
         while (!query.commit) {
             switch (query.next) {
                 case 'add':
-                    query.fields = ['name','modifier','attribute','stat','target','maneuver','enemy'];
+                    query.fields = ['attribute','enemy','icon','maneuver','modifier','name','stat','target','type'];
+                    query.title = '';
+                    /*
                     query.title = `${getTranslationByKey("roll-type")}`;
                     query.options =
                         `|2d6,2d6` +
@@ -9963,10 +9997,17 @@
                         `|${getTranslationByKey("initiative")},initiative` +
                         `|${getTranslationByKey("skill")},skill` +
                         `|${getTranslationByKey("stat")},stat`;
+                    */
                     query.last = query.next;
                 break;
                 case 'delete':
 
+                break;
+                case 'name':
+                    query.title = getTranslationByKey("name");
+                    query.index = cache.rolldb.findIndex(r => r.id.toLowerCase() === cache.source_id);
+                    query.options = `|${cache.rolldb[query.index].name || ''}`;
+                    query.last = query.next;
                 break;
             }
             if (!query.commit) {
@@ -9975,13 +10016,60 @@
                     case 'add':
                         query.row_id = generateRowID();
                         query.type = query.selection;
+                        query.rolldb = Object.assign({}, roll_macro_template);
+                        query.rolldb.id = query.row_id;
                         for (let i = 0; i < query.fields.length; i++) {
-                            set_values[`repeating_roll_${query.row_id}_${query.fields[i]}`] = '';
+                            let value = '';
+                            switch(query.fields[i]) {
+                                //case 'attribute':break;
+                                //case 'enemy':break;
+                                case 'icon':
+                                    value = 'casino';
+                                /*
+                                    value = 
+                                        query.type === 'attack' ? 'swords' :
+                                        query.type === 'attribute' ? 'cognition' :
+                                        query.type === 'initiative' ? 'acute' :
+                                        query.type === 'skill' ? 'multimodal_hand_eye' :
+                                        query.type === 'stat' ? 'person' : 'casino';
+                                */
+                                break;
+                                //case 'maneuver':break;
+                                case 'modifier':
+                                    value = getTranslationByKey("normal");
+                                    query.rolldb.modifier = 'normal';
+                                break;
+                                //case 'stat':break;
+                                //case 'target':break;
+                                case 'name':
+                                    value = getTranslationByKey("roll-macro");
+                                    query.rolldb.name = value;
+                                break;
+                                case 'type':
+                                    value = '2d6';
+                                    query.rolldb.type = '2d6';
+                                break;
+                                default: value = getTranslationByKey("not-applicable");
+                            }
+                            set_values[`repeating_roll_${query.row_id}_${query.fields[i]}`] = value;
                         }
+                        if (cache.rolldb === undefined) {
+                            cache.rolldb = [];
+                        }
+                        cache.rolldb.push(query.rolldb);
                         query.commit = true;
                     break;
                     case 'delete':
 
+                    break;
+                    case 'name':
+                        if (query.selection !== '') {
+                            cache.rolldb[query.index].name = query.selection;
+                            set_values[`${cache.source_path}_name`] = query.selection;
+                            query.commit = true;
+                        } else {
+                            query.next = 'name';
+                        }
                     break;
                 }
             }
@@ -13773,7 +13861,8 @@
                     removed: false,
                 },
             ];
-            const statsdb = {
+            const statsdb = {actions:{base:1,extra:0},acv:{base:0,mastery:0},body:{base:0,damage:0,temp:0,augmented:0},dcv:{base:0,mastery:0},defenses:{base:0,extra:0},dm:{base:5,massive:0},mind:{base:0,damage:0,temp:0,augmented:0},scv:{base:0,mastery:0},shockvalue:{base:0,hardboiled:0},soul:{base:0,damage:0,temp:0,augmented:0},energy:{base:0,damage:0,temp:0,energized:0},health:{base:0,damage:0,stun:0,temp:0,tough:0},sanity:{base:0,damage:0,temp:0,unassailable:0},society:{base:0,damage:0,temp:0,mastery:0},cp:{base:int(cache.character_default_value_points, 0),gained:0,spent:0,temp:0}};
+            /*{
                 actions:{
                     base:1,
                     extra:0
@@ -13851,11 +13940,14 @@
                     spent:0,
                     temp:0
                 }
-            };
+            };*/
+            const rolldb = [];
+
             cache.static_group_visible_id = 0;
             cache.groupdb = groupdb;
             cache.journaldb = journaldb;
             cache.statsdb = statsdb;
+            cache.rolldb = rolldb;
             showDynamicGroupFields(cache, set_values);
             setAttributeGroupVisibility(cache, set_values);
             set_values.character_default_value_points = int(cache.character_default_value_points, 0);
@@ -13901,7 +13993,7 @@
         const values = await getAttrsAsync(attrs_keys);
         clog(cache, values, 'getAttrs()', 'info');
         Object.assign(cache, values, event_info);
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < dbs.length; i++) {
             if (cache[dbs[i]] !== undefined) {
                 cache[dbs[i]] = JSON.parse(cache[dbs[i]]);
             }
@@ -14046,6 +14138,9 @@
                         switch (cache.source_attribute) {
                             case 'accordion':
                                 setAccordion(cache, set_values);
+                            break;
+                            case 'name':
+                                await rollMenu(cache, set_values);
                             break;
                         }
                     break;
