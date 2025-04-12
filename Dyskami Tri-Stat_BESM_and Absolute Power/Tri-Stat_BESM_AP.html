@@ -257,10 +257,18 @@
                         <input name="attr_state" class="accordion-roll" type="checkbox" value="1" />
                         <div class="grid-container-collapsible-title-bar theme-border">
                             <div class="grid-minor-title-buttons-left">
-                                <button name="act_rollmacro" class="styling-section-button button-click-animation theme-button" type="action">
-                                    <span name="attr_icon" class="material-icons expand">casino</span>
-                                    <input name="attr_icon" type="hidden" value="casino" />
-                                </button>
+                                <input name="attr_button" class="block-switch" type="checkbox" value="1" />
+                                <div class="block-a">
+                                    <button name="act_rollmacro" class="styling-section-button button-click-animation theme-button" type="action">
+                                        <span class="material-icons">casino</span>
+                                    </button>
+                                </div>
+                                <div class="block-b">
+                                    <button name="act_rollmacro" class="styling-section-button button-click-animation theme-button" type="action">
+                                        <span name="attr_icon" class="material-symbols">casino</span>
+                                        <input name="attr_icon" type="hidden" value="casino" />
+                                    </button>
+                                </div>
                             </div>
                             <div class="grid-minor-section-title theme-title">
                                 <span name="attr_name"></span>
@@ -282,10 +290,10 @@
                                     </button>
                                     <input name="attr_name" class="grid-minor-input-rollname force-column-width styling-pill-input theme-input" type="text" value="" readonly />
 
-                                    <div class="grid-minor-rolltype styling-pill theme-minor">
+                                    <button name="act_type" class="grid-minor-rolltype styling-pill button-click-animation input-button theme-minor" type="action">
                                         <span data-i18n="type">Type</span>
-                                    </div>
-                                    <input name="attr_type" class="grid-minor-input-rolltype styling-pill-input theme-input" type="text" value="" readonly />
+                                    </button>
+                                    <input name="attr_type" class="grid-minor-input-rolltype force-column-width styling-pill-input theme-input" type="text" value="" readonly />
 
                                     <button name="act_modifier" class="grid-minor-modifier styling-pill button-click-animation input-button theme-minor" type="action">
                                         <span data-i18n="modifier">Modifier</span>
@@ -4149,6 +4157,7 @@
                                 temp.push(`${cache.source_path}_state`);
                             break;
                             case 'name':
+                            case 'type':
                                 temp.push('rolldb');
                             break;
                         }
@@ -9982,6 +9991,7 @@
         const query = {};
         clog(cache, query, 'rollMenu()');
         query.next = cache.source_type === 'static' ? cache.source_id : cache.source_attribute;
+        query.index = query.next !== 'add' ? cache.rolldb.findIndex(r => r.id.toLowerCase() === cache.source_id) : -1;
         query.commit = false;
         while (!query.commit) {
             switch (query.next) {
@@ -10005,8 +10015,17 @@
                 break;
                 case 'name':
                     query.title = getTranslationByKey("name");
-                    query.index = cache.rolldb.findIndex(r => r.id.toLowerCase() === cache.source_id);
                     query.options = `|${cache.rolldb[query.index].name || ''}`;
+                    query.last = query.next;
+                break;
+                case 'type':
+                    query.title = getTranslationByKey("type");
+                    query.options = '|2d6,2d6' +
+                        `|${getTranslationByKey("attack")},attack` +
+                        `|${getTranslationByKey("attribute")},attribute` +
+                        `|${getTranslationByKey("initiative")},initiative` +
+                        `|${getTranslationByKey("skill")},skill` +
+                        `|${getTranslationByKey("stat")},stat`;
                     query.last = query.next;
                 break;
             }
@@ -10025,14 +10044,6 @@
                                 //case 'enemy':break;
                                 case 'icon':
                                     value = 'casino';
-                                /*
-                                    value = 
-                                        query.type === 'attack' ? 'swords' :
-                                        query.type === 'attribute' ? 'cognition' :
-                                        query.type === 'initiative' ? 'acute' :
-                                        query.type === 'skill' ? 'multimodal_hand_eye' :
-                                        query.type === 'stat' ? 'person' : 'casino';
-                                */
                                 break;
                                 //case 'maneuver':break;
                                 case 'modifier':
@@ -10070,6 +10081,73 @@
                         } else {
                             query.next = 'name';
                         }
+                    break;
+                    case 'type':
+                        const macro_fields = ['attribute','enemy','maneuver','modifier','stat','target'];
+                        set_values[`${cache.source_path}_icon`] =
+                            query.selection === 'attack' ? 'swords' :
+                            query.selection === 'attribute' ? 'cognition' :
+                            query.selection === 'initiative' ? 'acute' :
+                            query.selection === 'skill' ? 'multimodal_hand_eye' :
+                            query.selection === 'stat' ? 'person' : 'casino';
+                        cache.rolldb[query.index].type = query.selection;
+                        set_values[`${cache.source_path}_type`] =
+                            query.selection === '2d6' ? '2d6' : getTranslationByKey(query.selection);
+                        set_values[`${cache.source_path}_button`] = query.selection === '2d6' ? 0 : 1;
+                        switch (query.selection) {
+                            case '2d6':
+                            case 'initiative':
+                                for (let i = 0; i < macro_fields.length; i++) {
+                                    let value = '';
+                                    switch (macro_fields[i]) {
+                                        case 'modifier': value = getTranslationByKey("not-configured"); break;
+                                        default: value = getTranslationByKey("not-applicable");
+                                    }
+                                    set_values[`${cache.source_path}_${macro_fields[i]}`] = value;
+                                }
+                            break;
+                            case 'attack':
+                            for (let i = 0; i < macro_fields.length; i++) {
+                                let value = '';
+                                switch(macro_fields[i]) {
+                                    case 'attribute':
+                                    case 'enemy':
+                                    case 'maneuver':
+                                    case 'modifier':
+                                    case 'target': value = getTranslationByKey("not-configured"); break;
+                                    default: value = getTranslationByKey("not-applicable");
+                                }
+                                set_values[`${cache.source_path}_${macro_fields[i]}`] = value;
+                            }
+                            break;
+                            case 'attribute':
+                            for (let i = 0; i < macro_fields.length; i++) {
+                                let value = '';
+                                switch(macro_fields[i]) {
+                                    case 'attribute':
+                                    case 'modifier':
+                                    case 'stat':
+                                    case 'target': value = getTranslationByKey("not-configured"); break;
+                                    default: value = getTranslationByKey("not-applicable");
+                                }
+                                set_values[`${cache.source_path}_${macro_fields[i]}`] = value;
+                            }
+                            break;
+                            case 'skill':
+                            case 'stat':
+                            for (let i = 0; i < macro_fields.length; i++) {
+                                let value = '';
+                                switch(macro_fields[i]) {
+                                    case 'modifier':
+                                    case 'stat':
+                                    case 'target': value = getTranslationByKey("not-configured"); break;
+                                    default: value = getTranslationByKey("not-applicable");
+                                }
+                                set_values[`${cache.source_path}_${macro_fields[i]}`] = value;
+                            }
+                            break;
+                        }
+                        query.commit = true;
                     break;
                 }
             }
@@ -13640,6 +13718,7 @@
             'repeating_roll:rollmacro',
             'repeating_roll:stat',
             'repeating_roll:target',
+            'repeating_roll:type',
             'repeating_skill:accordion',
             'repeating_skill:rank',
             'repeating_skill:specializations',
@@ -14140,6 +14219,7 @@
                                 setAccordion(cache, set_values);
                             break;
                             case 'name':
+                            case 'type':
                                 await rollMenu(cache, set_values);
                             break;
                         }
