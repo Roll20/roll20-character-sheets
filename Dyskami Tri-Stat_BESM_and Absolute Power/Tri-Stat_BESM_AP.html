@@ -4156,7 +4156,9 @@
                             case 'accordion':
                                 temp.push(`${cache.source_path}_state`);
                             break;
+                            case 'modifier':
                             case 'name':
+                            case 'target':
                             case 'type':
                                 temp.push('rolldb');
                             break;
@@ -7111,7 +7113,7 @@
                     }
                 }
             }
-        }
+        }debugger;
         roll.template += cache.source_type === 'react' ?
             ` {{color=color-react-${color}}} {{color-react=color-${color}}}` :
             ` {{color=color-${color}}} {{color-react=color-react-${color}}}`;
@@ -10013,9 +10015,21 @@
                 case 'delete':
 
                 break;
+                case 'modifier':
+                    query.title = getTranslationByKey("modifier");
+                    query.options = '|Normal,0|Minor Edge,1|Minor Obstacle,-1|Major Edge,2|Major Obstacle,-2';
+                    query.last = query.next;
+                break;
                 case 'name':
                     query.title = getTranslationByKey("name");
                     query.options = `|${cache.rolldb[query.index].name || ''}`;
+                    query.last = query.next;
+                break;
+                case 'target':
+                    query.title = getTranslationByKey("target");
+                    query.options =
+                        `|${getTranslationByKey("opposed-roll")},target_select` +
+                        `|${getTranslationByKey("target-number")},target_number`;
                     query.last = query.next;
                 break;
                 case 'type':
@@ -10073,6 +10087,17 @@
                     case 'delete':
 
                     break;
+                    case 'modifier':
+                        query.modifier =
+                            query.selection === 1 ? getTranslationByKey("minor-edge") :
+                            query.selection === 2 ? getTranslationByKey("major-edge") :
+                            query.selection === -1 ? getTranslationByKey("minor-obstacle") :
+                            query.selection === -2 ? getTranslationByKey("major-obstacle") :
+                            getTranslationByKey("normal");
+                        set_values[`${cache.source_path}_modifier`] = query.modifier;
+                        cache.rolldb[query.index].modifier = query.selection;
+                        query.commit = true;
+                    break;
                     case 'name':
                         if (query.selection !== '') {
                             cache.rolldb[query.index].name = query.selection;
@@ -10081,6 +10106,14 @@
                         } else {
                             query.next = 'name';
                         }
+                    break;
+                    case 'target':
+                        query.target = query.selection === 'target_select' ?
+                            getTranslationByKey("opposed-roll") :
+                            getTranslationByKey("target-number");
+                        set_values[`${cache.source_path}_target`] = query.target;
+                        cache.rolldb[query.index].modifier = query.selection;
+                        query.commit = true;
                     break;
                     case 'type':
                         const macro_fields = ['attribute','enemy','maneuver','modifier','stat','target'];
@@ -14218,7 +14251,9 @@
                             case 'accordion':
                                 setAccordion(cache, set_values);
                             break;
+                            case 'modifier':
                             case 'name':
+                            case 'target':
                             case 'type':
                                 await rollMenu(cache, set_values);
                             break;
