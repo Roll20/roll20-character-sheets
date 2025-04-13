@@ -4156,6 +4156,8 @@
                             case 'accordion':
                                 temp.push(`${cache.source_path}_state`);
                             break;
+                            case 'attribute':
+                                temp.push('attrdb');
                             case 'modifier':
                             case 'name':
                             case 'target':
@@ -7113,7 +7115,7 @@
                     }
                 }
             }
-        }debugger;
+        }
         roll.template += cache.source_type === 'react' ?
             ` {{color=color-react-${color}}} {{color-react=color-${color}}}` :
             ` {{color=color-${color}}} {{color-react=color-react-${color}}}`;
@@ -10012,6 +10014,49 @@
                     */
                     query.last = query.next;
                 break;
+                case 'attribute':
+                    const attributes = [];
+                    query.type = cache.rolldb[query.index].type === 'attack' ? 'weapon' : 'attribute';
+                    query.title = getTranslationByKey(`${query.type === 'weapon' ?
+                        'choose-attack' : 'choose-attribute'}`);
+                    if (query.type === 'weapon') {
+                        const translation = getTranslationByKey("weapon");
+                        for (let i = 0; i < cache.attrdb.weapon.length; i++) {
+                            if (cache.attrdb.weapon[i].active) {
+                                const name = cache.attrdb.weapon[i].name === '' ?
+                                    translation : cache.attrdb.weapon[i].name;
+                                attributes.push(`${name},${i}`);
+                            }
+                        }
+                    } else {
+                        const filtered_attributes = all_attributes.map(a => {
+                            return (a === 'skills' || a === 'skill group'|| a === 'weapon') ? '' : a;
+                        }).filter(n => n);
+                        for (let i = 0; i < filtered_attributes.length; i++) {
+                            for (let j = 0; j < cache.attrdb[filtered_attributes[i]].length; j++) {
+                                const attribute = cache.attrdb[filtered_attributes[i]][j];
+                                if (attribute.active && attribute.stat !== 'none') {
+                                    attributes.push(
+                                        `${attribute.name === '' ? 
+                                            getTranslationByKey(filtered_attributes[i].toKebobCase()) : 
+                                            attribute.name},` +
+                                        `${filtered_attributes[i]}~${j}`
+                                    );/*
+                                    roll.is_swarm = filtered_attributes[i] === 'swarm';
+                                    if (roll.is_swarm) {
+                                        query.elevel = cache.attrdb.swarm[j].elevel;
+                                    }*/
+                                }
+                            }
+                        }
+                    }
+                    query.options = '|' + attributes.sort().join("|") +
+                        `${query.type === 'weapon' ?
+                        '|' + getTranslationByKey("unarmed") + ',unarmed' +
+                        '|' + getTranslationByKey("touch") + ',touch' : ''
+                    }`;
+                    query.last = query.next;
+                break;
                 case 'delete':
 
                 break;
@@ -10083,6 +10128,9 @@
                         }
                         cache.rolldb.push(query.rolldb);
                         query.commit = true;
+                    break;
+                    case 'attribute':
+
                     break;
                     case 'delete':
 
@@ -14251,6 +14299,7 @@
                             case 'accordion':
                                 setAccordion(cache, set_values);
                             break;
+                            case 'attribute':
                             case 'modifier':
                             case 'name':
                             case 'target':
