@@ -4160,6 +4160,7 @@
                                 temp.push('attrdb');
                             case 'modifier':
                             case 'name':
+                            case 'stat':
                             case 'target':
                             case 'type':
                                 temp.push('rolldb');
@@ -10025,7 +10026,7 @@
                             if (cache.attrdb.weapon[i].active) {
                                 const name = cache.attrdb.weapon[i].name === '' ?
                                     translation : cache.attrdb.weapon[i].name;
-                                attributes.push(`${name},${i}`);
+                                attributes.push(`${name},${name}~${i}~weapon`);
                             }
                         }
                     } else {
@@ -10040,7 +10041,7 @@
                                         `${attribute.name === '' ? 
                                             getTranslationByKey(filtered_attributes[i].toKebobCase()) : 
                                             attribute.name},` +
-                                        `${filtered_attributes[i]}~${j}`
+                                        `${attribute.name}~${j}~${filtered_attributes[i]}`
                                     );/*
                                     roll.is_swarm = filtered_attributes[i] === 'swarm';
                                     if (roll.is_swarm) {
@@ -10068,6 +10069,19 @@
                 case 'name':
                     query.title = getTranslationByKey("name");
                     query.options = `|${cache.rolldb[query.index].name || ''}`;
+                    query.last = query.next;
+                break;
+                case 'stat':
+                    query.title = `${getTranslationByKey("select-stats")}`;
+                    query.options = 
+                        `|${getTranslationByKey("body")},body` +
+                        `|${getTranslationByKey("mind")},mind` +
+                        `|${getTranslationByKey("soul")},soul` +
+                        `|Avg ${getTranslationByKey("body")}+${getTranslationByKey("mind")},body~mind` +
+                        `|Avg ${getTranslationByKey("body")}+${getTranslationByKey("soul")},body~soul` +
+                        `|Avg ${getTranslationByKey("mind")}+${getTranslationByKey("soul")},mind~soul` +
+                        `|Avg ${getTranslationByKey("body")}+${getTranslationByKey("mind")}+${getTranslationByKey("soul")},body~mind~soul` +
+                        `|${getTranslationByKey("variable")},variable`;
                     query.last = query.next;
                 break;
                 case 'target':
@@ -10130,7 +10144,12 @@
                         query.commit = true;
                     break;
                     case 'attribute':
-
+                        const [attr_name, attr_index, attr] = query.selection.split("~");
+                        set_values[`${cache.source_path}_attribute`] = attr_name === '' ?
+                            getTranslationByKey(attr.toKebobCase()) : attr_name;
+                        cache.rolldb[query.index].attribute.id = cache.attrdb[attr][attr_index].row_id;
+                        cache.rolldb[query.index].attribute.name = attr;
+                        query.commit = true;
                     break;
                     case 'delete':
 
@@ -10154,6 +10173,14 @@
                         } else {
                             query.next = 'name';
                         }
+                    break;
+                    case 'stat':
+                        query.stat = query.selection.split("~");
+                        cache.rolldb[query.index].stat = query.stat;
+                        set_values[`${cache.source_path}_stat`] = query.stat.length === 1 ? 
+                            getTranslationByKey(query.stat[0]) :
+                            `Avg ${query.stat.map(s => getTranslationByKey(s)).join(" + ")}`;
+                        query.commit = true;
                     break;
                     case 'target':
                         query.target = query.selection === 'target_select' ?
@@ -14302,6 +14329,7 @@
                             case 'attribute':
                             case 'modifier':
                             case 'name':
+                            case 'stat':
                             case 'target':
                             case 'type':
                                 await rollMenu(cache, set_values);
