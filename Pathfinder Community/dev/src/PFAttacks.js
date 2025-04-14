@@ -253,14 +253,12 @@ function updateRepeatingWeaponDamageDiff(id, newval, oldval, callback) {
 
 function updateRepeatingWeaponCritConfDiff(eventInfo, newval, oldval, callback) {
   var diff = (newval || 0) - (oldval || 0);
-  if (diff !== 0) {
-    getAttrs(['repeating_weapon_crit_conf_mod'], function (v) {
-      var curr = parseInt(v['repeating_weapon_crit_conf_mod'], 10) || 0;
-      curr += diff;
-      setAttrs({repeating_weapon_crit_conf_mod: curr}, PFConst.silentParams, callback);
-      // updateRepeatingWeaponCritAsync(null, eventInfo);
-    });
-  }
+  getAttrs(['repeating_weapon_crit_conf_mod'], function (v) {
+    var curr = parseInt(v['repeating_weapon_crit_conf_mod'], 10) || 0;
+    curr += diff;
+    setAttrs({repeating_weapon_crit_conf_mod: curr}, PFConst.silentParams, callback);
+    // updateRepeatingWeaponCritAsync(null, eventInfo);
+  });
 }
 export function updateRepeatingWeaponAbilityDropdowns(eventInfo, ability) {
   getSectionIDs('repeating_weapon', function (ids) {
@@ -412,14 +410,6 @@ function updateRepeatingWeaponCrit(id, v, setter, wasChecked) {
     attackTypeBonusField = '',
     attackTypeBonus = 0,
     newBonus = 0;
-  console.log(`~~~~~~ Change detected:
-        idStr: ${idStr};
-        critConfirmTotalField: ${v[critConfirmTotalField]}
-        critConfirmField: ${v[critConfirmField]}
-        critConfirmFieldTemp: ${v[critConfirmFieldTemp]}
-        attkTypeField: ${v[attkTypeField]}
-        attackBuff: ${v[attackBuff]}
-      `);
   try {
     setter = setter || {};
     critConfirmBonus = v[critConfirmField] || 0;
@@ -430,19 +420,12 @@ function updateRepeatingWeaponCrit(id, v, setter, wasChecked) {
         attackTypeBonus = v[attackTypeBonusField] || 0;
       }
     }
-    newBonus = critConfirmBonus + attackTypeBonus + critConfirmTemp + attackBuff;
-    console.log(`~~~~~ Change detected:
-      idStr: ${idStr};
-      critConfirmBonus: ${critConfirmBonus};
-      attackTypeBonus: ${attackTypeBonus};
-      critConfirmTemp: ${critConfirmTemp};
-      attackBuff: ${attackBuff};
-      critConfirmTotalField: ${v[critConfirmTotalField]}
-      newBonus: ${newBonus};
-		`);
-    if (newBonus !== (v[critConfirmTotalField] || 0)) {
-      setter[critConfirmTotalField] = newBonus;
-    }
+    // newBonus = critConfirmBonus + attackTypeBonus + critConfirmTemp + attackBuff;
+    newBonus = critConfirmBonus + attackTypeBonus + attackBuff;
+    // if (newBonus !== (v[critConfirmTotalField] || 0)) {
+    //   setter[critConfirmTotalField] = newBonus; // sets crit_conf_mod
+    // }
+    setter[critConfirmTotalField] = newBonus;
   } catch (err) {
     TAS.error('updateRepeatingWeaponCrit: error updating crit for id  ' + id, err);
   } finally {
@@ -505,7 +488,7 @@ function updateRepeatingWeaponsFromCritAsync(attacktype, eventInfo) {
     return;
   }
   getSectionIDs('repeating_weapon', function (ids) {
-    var attrs = [globalCritBonusField];
+    var attrs = [globalCritBonusField, 'buff_crit_conf-total'];
     if (!ids || _.size(ids) < 1) {
       return;
     }
@@ -515,7 +498,6 @@ function updateRepeatingWeaponsFromCritAsync(attacktype, eventInfo) {
       attrs.push('repeating_weapon_' + idStr + 'crit_confirm');
       attrs.push('repeating_weapon_' + idStr + 'crit_confirm_temp');
       attrs.push('repeating_weapon_' + idStr + 'attack-type');
-      attrs.push('buff_crit_conf-total');
     });
     //TAS.debug("about to get ",attrs);
     getAttrs(attrs, function (v) {
@@ -887,10 +869,12 @@ function getRecalculatedAttack(id, v, setter) {
     }
     updateRepeatingWeaponCrit(id, v, localsetter);
 
-    newCritBonus = critConfirmBonus + attackTypeCritBonus + critConfirmTempBonus + attackBuffBonus;
-    if (newCritBonus !== currCritBonus) {
-      localsetter[prefix + 'crit_conf_mod'] = newCritBonus;
-    }
+    // newCritBonus = critConfirmBonus + attackTypeCritBonus + critConfirmTempBonus + attackBuffBonus;
+    newCritBonus = critConfirmBonus + attackTypeCritBonus + attackBuffBonus;
+    // if (newCritBonus !== currCritBonus) {
+    //   localsetter[prefix + 'crit_conf_mod'] = newCritBonus;
+    // }
+    localsetter[prefix + 'crit_conf_mod'] = newCritBonus;
     if (!attkTypeForGrid) {
       if (v[prefix + 'attack-type_macro_insert'] !== '0') {
         localsetter[prefix + 'attack-type_macro_insert'] = '0';
