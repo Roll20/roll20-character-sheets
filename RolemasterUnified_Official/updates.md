@@ -1,3 +1,24 @@
+# 2025-4-15
+
+- Fix some typos in the skill roll messages.
+- Fix crit roll lookups.
+- Fix subtle penalty Channeling/Mentalism.
+- Status and Injury penalty names were sometimes inconsistent.
+    - Move to statuspenalty and injurypenalty everywhere.
+    - Transitory data, so should not impact anyone.
+    - Fixes issue where penalties were not applying to attacks.
+- Treasure Law:
+    - Fix sizes on some weapons.
+    - Correctly specify attack tables on weapons.
+- Attacks:
+    - Add a button to remove target.
+    - Fix styling of the target drop downs.
+- Staus
+    - Add a button (three actually) to remove stuns
+- Creature
+    - Content complete
+    - Unscale creature hits.
+
 # 2025-4-1
 
 - Fix for the stat abbrievations used in skill summaries
@@ -6,6 +27,7 @@
   - Remove the trailing . in the PP message
   - Fix unbalanced brace in message for grace
 - Uses; clear per level count on level up
+- Remove purchase module.
 - Skills:
   - forEachSkill has a completion callback
 
