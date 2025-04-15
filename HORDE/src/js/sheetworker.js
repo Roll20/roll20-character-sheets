@@ -1,5 +1,5 @@
 function attributsprobe(attribut) {
-    console.log("Starte Attributsprobe");
+    // console.log("Starte Attributsprobe");
     getAttrs([attribut,attribut+"_bonus"], function(values) {
         let schwierigkeit = parseInt(values[attribut]||0);
         let bonus = parseInt(values[attribut+"_bonus"]||0);
@@ -17,7 +17,7 @@ function attributsprobe(attribut) {
             if (ergebnis > 0 && ergebnis < 6) {beschreibung = getTranslationByKey("info-einfacher_erfolg");} else
             if (ergebnis > 5 && ergebnis < 11) {beschreibung = getTranslationByKey("info-besonderer_erfolg");} else
             if (ergebnis > 10) {beschreibung = getTranslationByKey("info-exzellenter_erfolg");}
-            console.log(beschreibung);
+            // console.log(beschreibung);
 
             finishRoll(
                 results.rollId,
@@ -33,7 +33,7 @@ function attributsprobe(attribut) {
 }
 
 function angriff(waffe) {
-    console.log("Starte Angriffs");
+    // console.log("Starte Angriffs");
     getAttrs([waffe,waffe+"_attribut",waffe+"_schaden",waffe+"_notiz"], function(values) {
         let name = values[waffe]||"";
         let attribut = values[waffe+"_attribut"]||"";
@@ -57,7 +57,7 @@ function angriff(waffe) {
                 if (ergebnis == 6) kritischer_treffer = kritischer_treffer +1;
             }
 
-            console.log(fehlschlag+","+leichter_treffer+","+mittlerer_treffer+","+kritischer_treffer);
+            // console.log(fehlschlag+","+leichter_treffer+","+mittlerer_treffer+","+kritischer_treffer);
 
             finishRoll(
                 results.rollId,
@@ -73,30 +73,14 @@ function angriff(waffe) {
     });
 }
 
-on("clicked:probe-intelligenz", function() {
-    attributsprobe("intelligenz");    
+['intelligenz', 'mut', 'koerperkraft', 'geschick', 'charisma'].forEach(attr => {
+    on(`clicked:probe-${attr}`, function() {
+        attributsprobe(attr);
+    });
 });
 
-on("clicked:probe-mut", function() {
-    attributsprobe("mut");    
-});
-
-on("clicked:probe-koerperkraft", function() {
-    attributsprobe("koerperkraft");    
-});
-
-on("clicked:probe-geschick", function() {
-    attributsprobe("geschick");    
-});
-
-on("clicked:probe-charisma", function() {
-    attributsprobe("charisma");    
-});
-
-on("clicked:angriff-linke-hand", function() {
-    angriff("linke-hand");    
-});
-
-on("clicked:angriff-rechte-hand", function() {
-    angriff("rechte-hand");    
+['linke-hand', 'rechte-hand'].forEach(waffe => {
+    on(`clicked:angriff-${waffe}`, function() {
+        angriff(waffe);
+    });
 });
