@@ -104,10 +104,14 @@ function setCurrentVersion()
 	safeSetAttrs({ "data_version": currentVersion });
 }
 
-function callNextMigration(migrationChain) {
-	if (migrationChain && migrationChain.length > 0) {
-		let nextMigration = migrationChain.shift();
+function callNextMigration(migrationChain)
+{
+	const caller = "callNextMigration:";
+	if (migrationChain && migrationChain.length > 0)
+	{
+		const nextMigration = migrationChain.shift();
 		if (nextMigration) {
+			console.log(caller, "nextMigration:", nextMigration);
 			window[nextMigration](migrationChain);
 		}
 	}
