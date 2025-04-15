@@ -24,22 +24,22 @@ function migrationCheck()
 {
 	function gatherMigrationFunctions(dataVersion)
 	{
-		const caller = "gatherMigrationFunctions()";
+		const caller = "gatherMigrationFunctions:";
 
 		let functionList = [];
 		for (let version of versionsWithMigrations) {
 			if (dataVersion < version) {
 				const functionName = "migrateTo" + version;
-				debugLog(caller, `dataVersion ${dataVersion} is older than version ${version} which needs a migration. Adding migration function: ${functionName}.`);
+				console.log(caller, `dataVersion ${dataVersion} is older than version ${version} which needs a migration. Adding migration function: ${functionName}.`);
 				functionList.push(functionName);
 			}
 		}
 		return functionList;
 	}
 	safeGetAttrs(["character_sheet_version", "data_version", "sheet_initialized"], function(v) {
-		const caller = "migrationCheck";
-		debugLog(caller, "Sheet Initialization Status:", v["sheet_initialized"]);
-		debugLog(caller, "Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
+		const caller = "migrationCheck:";
+		console.log(caller, "Sheet Initialization Status:", v["sheet_initialized"]);
+		console.log(caller, "Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
 
 		let initialized = v["sheet_initialized"];
 		let dataVersion = parseInt(v["data_version"]);
@@ -67,10 +67,10 @@ function migrationCheck()
 			||
 			initialized === false
 		) {
-			debugLog(caller, "initialized is false.");
+			console.log(caller, "initialized is false.");
 			initialized = false;
 		} else {
-			debugLog(caller, "initialized is true. Skipping initialization.");
+			console.log(caller, "initialized is true. Skipping initialization.");
 			initialized = true;
 		}
 
