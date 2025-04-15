@@ -88,6 +88,7 @@ function migrationCheck()
 			// then we call the function with name "firstFunction"
 			if (functionsToCall.length > 0) {
 				functionsToCall.push("setCurrentVersion");
+				console.log(caller, "functionsToCall", functionsToCall);
 				// shift() removes the first item of the array in place and returns it
 				const firstFunction = functionsToCall.shift();
 				window[firstFunction](functionsToCall);
