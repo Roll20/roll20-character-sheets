@@ -1,6 +1,8 @@
 <input class="toggle-token" type="hidden" name="attr_display_token" value="0" />
 <input class="toggle-monster" type="hidden" name="attr_monster" value="0" />
 <input class="toggle-workskills" type="hidden" name="attr_workskills" value="0" />
+<input class="toggle-sw20" type="hidden" name="attr_sw20" value="0" />
+<input class="toggle-aog" type="hidden" name="attr_aog" value="0" />
 <input class="toggle-expanded" type="hidden" name="attr_fellow_expanded" value="0" />
 <input class="toggle-fautocalc" type="hidden" name="attr_fellow_autocalc" value="0" />
 <input class="toggle-tabs" type="hidden" name="attr_tab" value="page1"  />
@@ -33,7 +35,7 @@
         <input type="hidden" name="attr_class_action" value="">
     </div>
 </div>
-
+<!-- reputation -->
 <div class="grid col2-main page1">
     <div class="grid">
         <div class="grid guild nogap">
@@ -480,6 +482,10 @@
                     <div class="input">Abyss Gazer</div>
                     <div><input type="number" name="attr_gazer_level" /></div>
 
+                    <input class="toggle-class" type="hidden" name="attr_arcanist_level" value="0" />
+                    <div class="input aog-class">Arcanist</div>
+                    <div class="aog-class"><input type="number" name="attr_arcanist_level" /></div>
+
                     <input class="toggle-class" type="hidden" name="attr_scout_level" value="0" />
                     <div class="input">Scout</div>
                     <div><input type="number" name="attr_scout_level" /></div>
@@ -519,6 +525,18 @@
                     <input class="toggle-class" type="hidden" name="attr_dhunter_level" value="0" />
                     <div class="input">Dark Hunter</div>
                     <div><input type="number" name="attr_dhunter_level" /></div>
+
+                    <input class="toggle-class" type="hidden" name="attr_mystic_level" value="0" />
+                    <div class="input sw20-class">Mystic</div>
+                    <div class="sw20-class"><input type="number" name="attr_mystic_level" /></div>
+
+                    <input class="toggle-class" type="hidden" name="attr_runesmith_level" value="0" />
+                    <div class="input aog-class">Runesmith</div>
+                    <div class="aog-class"><input type="number" name="attr_runesmith_level" /></div>
+
+                    <input class="toggle-class" type="hidden" name="attr_aristocrat_level" value="0" />
+                    <div class="input aog-class">Aristocrat</div>
+                    <div class="aog-class"><input type="number" name="attr_aristocrat_level" /></div>
                 </div>
             </div>
 
@@ -1103,6 +1121,24 @@
                             </span>
                             <span class="label">Magic Power</span>
                             <span class="input">Abyss Gazer</span>
+                        </div>
+
+                        <input class="magic-power" type="hidden" name="attr_arcanist_power" value="" />
+                        <div class="grid nogap magic-circle">
+                            <span class="editable">
+                                <input class="editmode" type="hidden" name="attr_arcanist_power_edit" value="0" />
+                                <input type="checkbox" name="attr_arcanist_power_edit" value="1" />
+                                <div class="editbox">
+                                    <input type="number" name="attr_arcanist_power_mod" value="0" />
+                                </div>
+                                <button class="input lrg" type="roll" name="roll_arcanist"
+                                    value="&{template:swskill} @{roll_template_token} {{reroll=[Reroll](~arcanist)}} {{name=@{character_name}}} {{skill=Arcanist Spellcasting}} {{class=Arcanist}} {{level=@{arcanist_level}}} {{ability=Intelligence}} {{modifier=@{intelligence_modifier}}} {{result=[[[[2d6]]+@{arcanist_power}]]}} {{raw=$[[0]]}} {{result2=[[[[12+5]]+@{arcanist_power}]]}}" />
+                                <span class="input lrg" name="attr_arcanist_power" />
+                                <input class="toggle-modifier" type="hidden" name="attr_arcanist_power_mod" value="0" />
+                                <span name="attr_arcanist_power_mod" />
+                            </span>
+                            <span class="label">Magic Power</span>
+                            <span class="input">Arcanist</span>
                         </div>
 
                         <input class="magic-power" type="hidden" name="attr_bard_power" value="" />
@@ -2232,7 +2268,19 @@
         <option value="2">Fellow</option>
     </select>
 
-    <div class="label monster0 slot1">Work Skills</div>
+    <div class="label monster0 slot1">Show 2.0 Mystic Class</div>
+    <label class="switch monster0">
+        <input type="checkbox" name="attr_sw20" value="1" />
+        <span class="slider"></span>
+    </label>
+
+    <div class="label monster0 slot1">Show 2.0 <em>Age of Grimoire</em> Classes</div>
+    <label class="switch monster0">
+        <input type="checkbox" name="attr_aog" class="attr_aog" value="1" />
+        <span class="slider"></span>
+    </label>
+
+    <div class="label monster0 slot1">Show Work Skills</div>
     <label class="switch monster0">
         <input type="checkbox" name="attr_workskills" value="1" />
         <span class="slider"></span>
@@ -2283,7 +2331,7 @@
         .concat(correction_list.map(i => "ability_" + i))
         .concat(growth_list.map(i => "growth_" + i))
         .concat(["movement_enhancements_modifier"]);
-
+// class data
     const class_data = {
         "fighter": "Fighter",
         "grappler": "Grappler",
@@ -2298,6 +2346,7 @@
         "druid": "Druid",
         "warlock": "Warlock",
         "gazer": "Abyss Gazer",
+        "arcanist": "Arcanist",
         "scout": "Scout",
         "ranger": "Ranger",
         "sage": "Sage",
@@ -2307,7 +2356,10 @@
         "alchemist": "Alchemist",
         "geomancer": "Geomancer",
         "tactician": "Tactician",
-        "dhunter": "Dark Hunter"
+        "dhunter": "Dark Hunter",
+        "mystic": "Mystic",
+        "Runesmith": "runesmith",
+        "Aristocrat": "aristocrat"
     };
     const class_list = Object.keys(class_data);
     const magic_power_data = {
@@ -2340,6 +2392,10 @@
             "wizard": true
         },
         "gazer": {
+            "ability": "intelligence",
+            "wizard": true
+        },
+        "arcanist": {
             "ability": "intelligence",
             "wizard": true
         },
