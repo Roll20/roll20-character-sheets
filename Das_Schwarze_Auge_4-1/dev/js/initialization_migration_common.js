@@ -96,8 +96,11 @@ function migrationCheck()
 	});
 }
 
-function setCurrentVersion() {
+function setCurrentVersion()
+{
+	const caller = "setCurrentVersion:";
 	const currentVersion = versionsWithMigrations.at(-1);
+	console.log(caller, "currentVersion:", currentVersion);
 	safeSetAttrs({ "data_version": currentVersion });
 }
 
