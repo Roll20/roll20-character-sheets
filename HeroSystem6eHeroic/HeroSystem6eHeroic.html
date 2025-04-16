@@ -15984,7 +15984,7 @@
 			
 			<div class="item-version-information">
 				<!-- Update version before release. -->
-				<input type="text" value="4.52" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+				<input type="text" value="4.53" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 			</div>
 		</div>
 		
@@ -17080,8 +17080,40 @@
 			version = 4.10;
 		}
 		
-		if (version < 4.52) {
-			version = 4.52;
+		if (version < 4.53) {
+			
+			let powerID = "";
+			let isEmpty;
+			let isFramework;
+			let isAttack;
+			let hasActivation;
+			let usesEND;
+			
+			for (let i=1; i<=20; i++) {
+				powerId = String(i).padStart(2,'0');
+				
+				values = await _getAttrs(["powerEffect"+powerId, "powerType"+powerId, "powerAttack"+powerId, "powerActivate"+powerId, "powerReducedEND"+powerId]);
+				
+				isEmpty = ( (values["powerEffect"+powerId]).toLowerCase().replace(/\s/g, '') !== '') ? false : true;
+				isFramework = ( (values["powerType"+powerId] === "multipower") || (values["powerType"+powerId] === "powerPool") || (values["powerType"+powerId] === "powerControl") ) ? true : false;
+				isAttack = (values["powerAttack"+powerId] === "on") ? true : false;
+				hasActivation = (values["powerActivate"+powerId] === "on") ? true : false;
+				usesEND = ( (values["powerReducedEND"+powerId] === "noEND") || (values["powerReducedEND"+powerId] === "zeroEND") || (values["powerReducedEND"+powerId] === "zeroENDAF") ) ? false : true;
+				
+				if (isEmpty || isFramework) {
+					attributes["powerAction"+powerId] = "none";
+				} else if ( (isAttack || hasActivation ) && usesEND) {
+					attributes["powerAction"+powerId] = "all";
+				} else if (isAttack || hasActivation) {
+					attributes["powerAction"+powerId] = "roll";
+				} else if (usesEND) {
+					attributes["powerAction"+powerId] = "end";
+				} else {
+					attributes["powerAction"+powerId] = "none";
+				}
+			}
+			
+			version = 4.53;
 		}
 		
 		if (version != origVersion) {
@@ -19605,22 +19637,22 @@
 				if (isAttack) {
 					if (isMental) {
 						if (dispDoS) {
-							theRoll	+= "{{Hit DMCV=[[11-3d6cf6cs1+@{omcv}[OMCV]+?{OMCV Modifier|0}[Modifiers]-[[" + (isAoE ? 0 : 1) + "]}}";
+							theRoll	+= "{{Hit DMCV=[[11-3d6cf6cs1+@{omcv}[OMCV]+?{OMCV Modifier|0}[Modifiers]]]"+(isAoE ? " (AoE)}}" : "}}");
 						} else {
-							theRoll	+= "{{OMCV=[[@{omcv}[OMCV]+?{OMCV Modifier|0}[Modifiers]]]}}-[[" + (isAoE ? 0 : 1) + "]}}+{{Result=[[3d6cf6cs1]]}}";
+							theRoll	+= "{{OMCV=[[@{omcv}[OMCV]+?{OMCV Modifier|0}[Modifiers]]]}}+{{Result=[[3d6cf6cs1]]"+(isAoE ? " (AoE)}}" : "}}");
 						}
-					} else if  (isRanged && hasRangePenalty) {
+					} else if (isRanged && hasRangePenalty) {
 						// Keeping Mental CV functionality here if future cases come up where it becomes needed.
 						if (dispDoS) {
-							theRoll	+= "{{Hit "+ (isMental ? "DMCV" : "DCV") + "=[[11-3d6cf6cs1" + (isMental ? "+@{omcv}[OMCV]"  : "+@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-" + theRangePenalty + "[RangeOCV]" + (isBraced ? "+"+braceMod+"[Braced]" :"") +  "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}} ";
+							theRoll	+= "{{Hit "+ (isMental ? "DMCV" : "DCV") + "=[[11-3d6cf6cs1" + (isMental ? "+@{omcv}[OMCV]"  : "+@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-" + theRangePenalty + "[RangeOCV]" + (isBraced ? "+"+braceMod+"[Braced]" :"") +  "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]"+(isAoE ? " (AoE)}}" : "}}");
 						} else {
-							theRoll	+= "{{" + (isMental ? "OMCV=[[@{omcv}[OMCV]"  : "OCV=[[@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-" + theRangePenalty + "[RangeOCV]" + (isBraced ? "+"+braceMod+"[Braced]" :"") +  "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}}"+"{{Result=[[3d6cf6cs1]]}}";
+							theRoll	+= "{{" + (isMental ? "OMCV=[[@{omcv}[OMCV]"  : "OCV=[[@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]-" + theRangePenalty + "[RangeOCV]" + (isBraced ? "+"+braceMod+"[Braced]" :"") +  "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}}"+"{{Result=[[3d6cf6cs1]]"+(isAoE ? " (AoE)}}" : "}}");
 						}
 					} else {
 						if (dispDoS) {
-							theRoll	+= "{{Hit "+ (isMental ? "DMCV" : "DCV") + "=[[11-3d6cf6cs1" + (isMental ? "+@{omcv}[OMCV]"  : "+@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (isRanged ? "-0[NetRangePenalty]" :"") + "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}} ";
+							theRoll	+= "{{Hit "+ (isMental ? "DMCV" : "DCV") + "=[[11-3d6cf6cs1" + (isMental ? "+@{omcv}[OMCV]"  : "+@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (isRanged ? "-0[NetRangePenalty]" :"") + "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]"+(isAoE ? " (AoE)}}" : "}}");
 						} else {
-							theRoll	+= "{{" + (isMental ? "OMCV=[[@{omcv}[OMCV]"  : "OCV=[[@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (isRanged ? "-0[NetRangePenalty]" :"") + "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}}"+"{{Result=[[3d6cf6cs1]]}}";
+							theRoll	+= "{{" + (isMental ? "OMCV=[[@{omcv}[OMCV]"  : "OCV=[[@{ocv}[OCV]") + (isSet ? "+1[Set]" :"") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (isRanged ? "-0[NetRangePenalty]" :"") + "+?{" + (isMental ? "MOCV" : "OCV") + " Modifier|0}[Modifiers]]]}}"+"{{Result=[[3d6cf6cs1]]"+(isAoE ? " (AoE)}}" : "}}");
 						}
 					}
 				}
@@ -23724,21 +23756,21 @@
 				// Attack and damage rolls.
 				if (isMental) {
 					if (dispDoS) {
-						theRoll	+= "{{Hit DMCV=[[11-3d6cf6cs1[Roll]+@{omcv}[OMCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]+@{weaponOCV"+weaponId+"}[WeaponOCV]+(?{Modifiers|0})[Modifiers]]]}} ";
+						theRoll	+= "{{Hit DMCV=[[11-3d6cf6cs1[Roll]+@{omcv}[OMCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]+@{weaponOCV"+weaponId+"}[WeaponOCV]+(?{Modifiers|0})[Modifiers]]]"+(isAoE ? " (AoE)}}" : "}}");
 					} else {
-						theRoll += "{{OMCV=[[@{omcv}[OMCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]+@{weaponOCV"+weaponId+"}[WeaponOCV]+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+						theRoll += "{{OMCV=[[@{omcv}[OMCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]+@{weaponOCV"+weaponId+"}[WeaponOCV]+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]"+(isAoE ? " (AoE)}}" : "}}");
 					}
 				} else if (isRanged && hasRangePenalty) {
 					if (dispDoS) {
-						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[Strength]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RangeMod]"+ (isBraced ? "+2[Braced]" :"") +"+(?{Modifiers|0})[Modifiers]]]}} ";
+						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[Strength]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RangeMod]"+ (isBraced ? "+2[Braced]" :"") +"+(?{Modifiers|0})[Modifiers]]]"+(isAoE ? " (AoE)}}" : "}}");
 					} else {
-						theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[Strength]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RangeMod]"+ (isBraced ? "+2[Braced]" :"") +"+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+						theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[Strength]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RangeMod]"+ (isBraced ? "+2[Braced]" :"") +"+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]"+(isAoE ? " (AoE)}}" : "}}");
 					}
 				} else {
 					if (dispDoS) {
-						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[Strength]") : ("+@{weaponPenalty"+weaponId+"}[Strength]")) + (isRanged ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}} ";
+						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[Strength]") : ("+@{weaponPenalty"+weaponId+"}[Strength]")) + (isRanged ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]"+(isAoE ? " (AoE)}}" : "}}");
 					} else {
-						theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]"+ (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[Strength]") : ("+@{weaponPenalty"+weaponId+"}[Strength]")) + (isRanged ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+						theRoll += "{{OCV=[[@{ocv}[OCV]+" + maneuverOCV.toString() + "[ManOCV]+@{maneuverOCVmod}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]"+ (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[Strength]") : ("+@{weaponPenalty"+weaponId+"}[Strength]")) + (isRanged ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]"+(isAoE ? " (AoE)}}" : "}}");
 					}
 				}
 				
@@ -23967,21 +23999,21 @@
 				// Roll details.
 				if (isMental) {
 					if (dispDoS) {
-						theRoll	+= "{{Hit DMCV=[[11-3d6cf6cs1[Roll]+@{omcv}[OMCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod}[CSL]+@{weaponOCV"+weaponId+"}[WeaponOCV]+(?{Modifiers|0})[Modifiers]]]}} ";
+						theRoll	+= "{{Hit DMCV=[[11-3d6cf6cs1[Roll]+@{omcv}[OMCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod}[CSL]+@{weaponOCV"+weaponId+"}[WeaponOCV]+(?{Modifiers|0})[Modifiers]]]"+(isAoE ? " (AoE)}}" : "}}");
 					} else {
-						theRoll += "{{OMCV=[[@{omcv}[OMCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod}[CSL]+@{weaponOCV"+weaponId+"}[WeaponOCV]+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+						theRoll += "{{OMCV=[[@{omcv}[OMCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod}[CSL]+@{weaponOCV"+weaponId+"}[WeaponOCV]+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]"+(isAoE ? " (AoE)}}" : "}}");
 					}
 				} else if (isRanged && hasRangePenalty) {
 					if (dispDoS) {
-						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[STR]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RMod]+@{martialManeuverRNGmod"+maneuverId+"}[ManRMod]"+ (isBraced ? "+2[Braced]" :"") +"+(?{Modifiers|0})[Modifiers]]]}} ";
+						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[STR]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RMod]+@{martialManeuverRNGmod"+maneuverId+"}[ManRMod]"+ (isBraced ? "+2[Braced]" :"") +"+(?{Modifiers|0})[Modifiers]]]"+(isAoE ? " (AoE)}}" : "}}");
 					} else {
-						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[STR]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RMod]+@{martialManeuverRNGmod"+maneuverId+"}[ManRMod]"+ (isBraced ? "+2[Braced]" :"") +"+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]+@{weaponPenalty"+weaponId+"}[STR]-@{rangeOCVPenalty}[RangeOCV]+@{weaponRangeMod"+weaponId+"}[RMod]+@{martialManeuverRNGmod"+maneuverId+"}[ManRMod]"+ (isBraced ? "+2[Braced]" :"") +"+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]"+(isAoE ? " (AoE)}}" : "}}");
 					}
 				} else {
 					if (dispDoS) {
-						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[STR]") : ("+@{weaponPenalty"+weaponId+"}[STR]")) + (isRanged ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}} ";
+						theRoll	+= "{{Hit DCV=[[11-3d6cf6cs1[Roll]+@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]" + (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[STR]") : ("+@{weaponPenalty"+weaponId+"}[STR]")) + (isRanged ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]"+(isAoE ? " (AoE)}}" : "}}");
 					} else {
-						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]"+ (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[STR]") : ("+@{weaponPenalty"+weaponId+"}[STR]")) + (isRanged ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]}}"
+						theRoll += "{{OCV=[[@{ocv}[OCV]+@{martialManeuverOCV"+maneuverId+"}[ManOCV]+@{martialManeuverOCVmod"+maneuverId+"}[CSL]" + (isSet ? "+1[Set]" :"") +"+@{weaponOCV"+weaponId+"}[WeaponOCV]"+ (isShield ? "-[[@{shieldDCV}]][ShieldDCV]" : "") + "-[[" + (isAoE ? 0 : 1) + "*@{targetOCVPenalty}]][TargetOCV]" + (strengthPenalty ? ("+" + penaltyOCV.toString() + "[STR]") : ("+@{weaponPenalty"+weaponId+"}[STR]")) + (isRanged ? "-0[NetRangePenalty]" :"") +"+(?{Modifiers|0})[Modifiers]]]}}" + "{{Result=[[3d6cf6cs1]]"+(isAoE ? " (AoE)}}" : "}}");
 					}
 				}
 				
