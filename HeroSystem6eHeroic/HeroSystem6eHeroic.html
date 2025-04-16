@@ -15984,7 +15984,7 @@
 			
 			<div class="item-version-information">
 				<!-- Update version before release. -->
-				<input type="text" value="4.53" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+				<input type="text" value="4.54" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 			</div>
 		</div>
 		
@@ -16759,371 +16759,7 @@
 		});
 	};
 
-	// Get the URL to the pseudo attribute attr_character_avatar for use in the Portrait Section.
-	on("sheet:opened", async function() {
-		let attributes = {sheetTab:"characteristics"};
-
-		// Fetch just what is needed to determine the version
-		let values = await _getAttrs(["version", "totalCharacterCost", "validateMay23", "character_name", "character_avatar"]);
-		let name = values.character_name;
-		let origVersion = parseFloat(values.version)||1.0;
-		let statValue = 0;
-		
-		attributes.theSheetAvatar = values.character_avatar;
-		
-		// Version Checks
-		// Check for unversioned sheets
-		if (values.validateMay23 == undefined) {
-			// if no points spent, then it's a new sheet
-			if (parseInt(values.totalCharacterCost)||0 != 0)
-				origVersion = 1.0;
-				
-			attributes.validateMay23 = 1;
-		}
-		let version = origVersion;
-		
-		if (version < 1.1) {
-			values = await _getAttrs(["intelligenceChance", "enhancedPerceptionModifier", "body", "stun", "endurance", "strength", "optionSuperHeroicEndurance"]);
-			var hiddenBasicEndurance = (parseInt(values.strength)||0) / (values.optionSuperHeroicEndurance != 0 ? 10 : 5);
-			
-			attributes.perceptionEnhanced = parseInt(values.intelligenceChance)||11 + parseInt(values.enhancedPerceptionModifier)||0;
-			attributes.CurrentBODY_max = parseInt(values.body)||0;
-			attributes.CurrentSTUN_max = parseInt(values.stun)||0;
-			attributes.CurrentEND_max = parseInt(values.endurance)||0;
-			attributes.hiddenBasicEndurance = Math.max(1, heroRoundLow(hiddenBasicEndurance));
-			version = 1.1;
-		}
-		
-		if (version < 2.1) {
-			values = await _getAttrs(["whisperToGM"]);
-			if (values.whisperToGM||0 == "on")
-				attributes.whisperToGM = "/w GM ";
-			else
-				attributes.whisperToGM = "";
-			version = 2.1;
-		}
-		
-		if (version < 2.3) {
-			values = await _getAttrs(["martialManeuverOCV01", "martialManeuverOCV02", "martialManeuverOCV03", "martialManeuverOCV04", "martialManeuverOCV05", "martialManeuverOCV06", "martialManeuverOCV07", "martialManeuverOCV08", "martialManeuverOCV09", "martialManeuverDCV01", "martialManeuverDCV02", "martialManeuverDCV03", "martialManeuverDCV04", "martialManeuverDCV05", "martialManeuverDCV06", "martialManeuverDCV07", "martialManeuverDCV08", "martialManeuverDCV09", "strength", "intelligence", "useCharacteristicMaximums", "enhancedPerceptionModifier", "perceptionModifierVision", "perceptionModifierHearing", "perceptionModifierSmell"]);
-			
-			// Ensure hiddenBasicDamage is available.
-			statValue = parseInt(values.strength)||0;
-			let theNumberOfD6 = (parseInt((statValue - (statValue%5))/5)||0).toString();
-			
-			let theNumberOfD3 = 0;
-			if (statValue%5 > 2) {
-				theNumberOfD3 = 1;
-			}
-			
-			var hiddenDamage = theNumberOfD6.concat("d6+",theNumberOfD3.toString(),"d3");
-			
-			attributes.hiddenBasicDamage = hiddenDamage;
-			
-			// Update martial maneuver text CVs to integers.
-			attributes.martialManeuverOCV01 = parseInt(values.martialManeuverOCV01)||0;
-			attributes.martialManeuverDCV01 = parseInt(values.martialManeuverDCV01)||0;
-			
-			attributes.martialManeuverOCV02 = parseInt(values.martialManeuverOCV02)||0;
-			attributes.martialManeuverDCV02 = parseInt(values.martialManeuverDCV02)||0;
-			
-			attributes.martialManeuverOCV03 = parseInt(values.martialManeuverOCV03)||0;
-			attributes.martialManeuverDCV03 = parseInt(values.martialManeuverDCV03)||0;
-			
-			attributes.martialManeuverOCV04 = parseInt(values.martialManeuverOCV04)||0;
-			attributes.martialManeuverDCV04 = parseInt(values.martialManeuverDCV04)||0;
-			
-			attributes.martialManeuverOCV05 = parseInt(values.martialManeuverOCV05)||0;
-			attributes.martialManeuverDCV05 = parseInt(values.martialManeuverDCV05)||0;
-			
-			attributes.martialManeuverOCV06 = parseInt(values.martialManeuverOCV06)||0;
-			attributes.martialManeuverDCV06 = parseInt(values.martialManeuverDCV06)||0;
-			
-			attributes.martialManeuverOCV07 = parseInt(values.martialManeuverOCV07)||0;
-			attributes.martialManeuverDCV07 = parseInt(values.martialManeuverDCV07)||0;
-			
-			attributes.martialManeuverOCV08 = parseInt(values.martialManeuverOCV08)||0;
-			attributes.martialManeuverDCV08 = parseInt(values.martialManeuverDCV08)||0;
-			
-			attributes.martialManeuverOCV09 = parseInt(values.martialManeuverOCV09)||0;
-			attributes.martialManeuverDCV09 = parseInt(values.martialManeuverDCV09)||0;
-			attributes.martialManeuverDamage09 = hiddenDamage;
-			
-			// Update perception roll chances.
-			statValue = parseInt(values.intelligence)||10;
-			enhancedPerceptionMod = parseInt(values.enhancedPerceptionModifier)||0;
-			perceptionModVision = parseInt(values.perceptionModifierVision)||0;
-			perceptionModHearing = parseInt(values.perceptionModifierHearing)||0;
-			perceptionModSmell = parseInt(values.perceptionModifierSmell)||0;
-			
-			attributes.perceptionVision = calculateRoll(statValue) + enhancedPerceptionMod + perceptionModVision;
-			attributes.perceptionHearing = calculateRoll(statValue) + enhancedPerceptionMod + perceptionModHearing;
-			attributes.perceptionSmell = calculateRoll(statValue) + enhancedPerceptionMod + perceptionModSmell;
-			
-			// Add sheet_name identifier.
-			attributes.sheet_name = "HeroSystem6eHeroic";
-			
-			version = 2.3;
-		}
-		
-		if (version < 2.41) {
-			values = await _getAttrs(["intelligence"]);
-			
-			// Update to new addition: perceptionBase.
-			statValue = parseInt(values.intelligence)||10;
-			
-			attributes.perceptionBase = calculateRoll(statValue);
-			
-			version = 2.42;
-		}
-		
-		if (version < 2.51) {
-			values = await _getAttrs(["weaponStrength01", "weaponStrength02", "weaponStrength03", "weaponStrength04", "weaponStrength05", "shieldName", "shieldDamage", "shieldNormalDamage", "shieldStrength", "shieldOCV"]);
-			
-			// Updates to shield and weapon stats.
-			
-			attributes.weaponStrengthMin01 = parseInt(values.weaponStrength01)||0;
-			attributes.weaponStrengthMin02 = parseInt(values.weaponStrength02)||0;
-			attributes.weaponStrengthMin03 = parseInt(values.weaponStrength03)||0;
-			attributes.weaponStrengthMin04 = parseInt(values.weaponStrength04)||0;
-			attributes.weaponStrengthMin05 = parseInt(values.weaponStrength05)||0;
-			attributes.weaponStrengthMin06 = parseInt(values.shieldStrength)||0;
-			
-			(values.shieldName) ? (attributes.weaponName06 = values.shieldName) : (attributes.weaponName06 = "");
-			(attributes.shieldDamage) ? (attributes.weaponDamage06 = values.shieldDamage) : (attributes.weaponDamage06 = "0");
-			(attributes.shieldNormalDamage) ? (attributes.weaponNormalDamage06 = values.shieldNormalDamage) : (attributes.weaponNormalDamage06 = "on");
-			attributes.weaponStrength06 = parseInt(values.shieldStrength)||0;
-			attributes.weaponOCV06 = parseInt(values.shieldOCV)||0;
-			
-			attributes.gearSlideSelection = "gearManeuvers";
-			
-			version = 2.51;
-		}
-		
-		if (version < 2.82) {
-			// Turn on Roll and END buttons for occupied power slots.
-			values = await _getAttrs(["powerEffect01", "powerEffect02", "powerEffect03", "powerEffect04", "powerEffect05", "powerEffect06", "powerEffect07", "powerEffect08", "powerEffect09", "powerEffect10", "powerEffect11", "powerEffect12", "powerEffect13", "powerEffect14", "powerEffect15", "powerEffect16", "powerEffect17"]);
-			
-			attributes.powerAction01 = ((values.powerEffect01).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction02 = ((values.powerEffect02).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction03 = ((values.powerEffect03).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction04 = ((values.powerEffect04).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction05 = ((values.powerEffect05).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction06 = ((values.powerEffect06).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction07 = ((values.powerEffect07).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction08 = ((values.powerEffect08).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction09 = ((values.powerEffect09).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction10 = ((values.powerEffect10).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction11 = ((values.powerEffect11).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction12 = ((values.powerEffect12).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction13 = ((values.powerEffect13).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction14 = ((values.powerEffect14).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction15 = ((values.powerEffect15).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction16 = ((values.powerEffect16).replace(/\s/g, '') === '') ? "false" : "true";
-			attributes.powerAction17 = ((values.powerEffect17).replace(/\s/g, '') === '') ? "false" : "true";
-			
-			version = 2.82;
-		}
-		
-		if (version < 2.90) {
-			
-			values = await _getAttrs(["strength", "dexterity", "constitution", "intelligence", "ego", "presence"]);
-			
-			attributes.strengthNet = parseInt(values.strength)||0;
-			attributes.dexterityNet = parseInt(values.dexterity)||0;	
-			attributes.constitutionNet = parseInt(values.constitution)||0;
-			attributes.intelligenceNet = parseInt(values.intelligence)||0;
-			attributes.egoNet = parseInt(values.ego)||0;
-			attributes.presenceNet = parseInt(values.presence)||0;
-			
-			// Initialize attribute mods to 0.
-			attributes.strengthMod = 0;
-			attributes.dexterityMod = 0;	
-			attributes.constitutionMod = 0;
-			attributes.intelligenceMod = 0;
-			attributes.egoMod = 0;
-			
-			attributes.ocvMod = 0;
-			attributes.dcvMod = 0;	
-			attributes.omcvMod = 0;
-			attributes.dmcvMod = 0;
-			attributes.speedMod = 0;
-			
-			attributes.pdMod = 0;
-			attributes.edMod = 0;	
-			attributes.bodyMod = 0;
-			attributes.stunMod = 0;
-			attributes.enduranceMod = 0;
-			attributes.recoveryMod = 0;
-			
-			attributes.runningMod = 0;
-			attributes.leapingMod = 0;
-			attributes.swimmingMod = 0;
-			
-			version = 2.90;
-		}
-		
-		if (version < 3.05) {
-			// Update martial maneuver selections and starting weapon states.
-			values = await _getAttrs(["martialManeuverBlock01", "martialManeuverBlock02", "martialManeuverBlock03", "martialManeuverBlock04", "martialManeuverBlock05", "martialManeuverBlock06", "martialManeuverBlock07", "martialManeuverBlock08", "martialManeuverBlock09", "martialManeuverBlock10", "weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06"]);
-			
-			let maneuverId;
-			let states = "DDDDDDOOOOOO";
-			
-			for (let i=1; i<=maxManeuverNum; i++) {
-				maneuverId = String(i).padStart(2,'0');
-				if (values["martialManeuverBlock"+maneuverId] === "on") {
-					attributes["martialManeuverType"+maneuverId] = "block";
-				} else {
-					attributes["martialManeuverType"+maneuverId] = "attack";
-				}
-			}
-			
-			attributes.weaponType01 = "defense";
-			attributes.weaponType02 = "defense";
-			attributes.weaponType03 = "defense";
-			attributes.weaponType04 = "defense";
-			attributes.weaponType05 = "defense";
-			attributes.weaponType06 = "defense";
-			
-			attributes.gearSlideSelection = "gearTreasures";
-			attributes.maneuverSelection = "block";
-			attributes.useManeuvers = "true";
-			attributes.weaponStates = states;
-			
-			version = 3.05;
-		}
-		
-		if (version < 3.50) {
-			// Update carry weight
-			values = await _getAttrs(["carriedWeight", "strength", "strengthMod"]);
-			
-			statValue = (parseInt(values.strength)||0) + (parseInt(values.strengthMod)||0);
-			
-			attributes.liftWeightDisplay = displayMass( calculateLift(statValue) );
-			attributes.freeCarry = calculateLift(statValue)/10;
-			attributes.freeCarryDisplay = displayMass( calculateLift(statValue)/10 );
-			attributes.carriedWeightDisplay = displayMass(parseFloat(values.carriedWeight)||0);
-			
-			version = 3.50;
-		}
-		
-		if (version < 4.02) {
-			// Add 30 to combat and language skill IDs to make room for a block of twenty general skills.
-			values = await _getAttrs(["skillName31", "skillType31", "skillLevels31", "skillName32", "skillType32", "skillLevels32",  "skillName33", "skillType33", "skillLevels33", "skillName34", "skillType34", "skillLevels34", "skillName35", "skillType35", "skillLevels35", "skillName36", "skillType36", "skillLevels36", "skillName37", "skillType37", "skillLevels37", "skillLevels38",  "skillLevels39", "skillLevels40", "skillName41", "skillFluency41", "skillLiteracy41", "skillName42", "skillFluency42", "skillLiteracy42", "skillName43", "skillFluency43", "skillLiteracy43", "skillName44", "skillFluency44", "skillLiteracy44", "skillName45", "skillFluency45", "skillLiteracy45", "skillName46", "skillFluency46", "skillLiteracy46", "skillName47", "skillFluency47", "skillLiteracy47", "skillName48", "skillFluency48", "skillLiteracy48", "skillName49", "skillFluency49", "skillLiteracy49"]);
-			
-			let newId;
-			let oldId; 
-			
-			for (let i=31; i<= 37; i++) {
-				oldId = String(i).padStart(2,'0');
-				newId = String(i+30).padStart(2,'0');
-				
-				// Move old skill to new slot.
-				attributes["skillName"+newId] = values["skillName"+oldId]||"";
-				attributes["skillType"+newId] = values["skillType"+oldId]||"none";
-				attributes["skillLevels"+newId] = values["skillLevels"+oldId]||0;
-				
-				// Delete otherwise visible old skill values.
-				attributes["skillName"+oldId] = "";
-				attributes["skillType"+oldId] = "none";
-			}
-			
-			for (let i=38; i<= 40; i++) {
-				oldId = String(i).padStart(2,'0');
-				newId = String(i+35).padStart(2,'0');
-				
-				// Move old skill to new slot.
-				attributes["skillLevels"+newId] = values["skillLevels"+oldId]||0;
-			}
-			
-			for (let i=41; i<= 49; i++) {
-				oldId = String(i).padStart(2,'0');
-				newId = String(i+35).padStart(2,'0');
-				
-				// Move old skill to new slot.
-				attributes["skillName"+newId] = values["skillName"+oldId]||"";
-				attributes["skillFluency"+newId] = values["skillFluency"+oldId]||"none";
-				attributes["skillLiteracy"+newId] = values["skillLiteracy"+oldId]||0;
-				
-				// Delete otherwise visible old skill values.
-				attributes["skillName"+oldId] = "";
-			}
-			
-			for (let i=31; i<=50; i++) {
-				oldId = String(i).padStart(2,'0');
-				
-				// Remove old CP values in extend general skill range.
-				attributes["skillCP"+oldId] = 0;
-			}
-			
-			updateEnhancerSkillCosts();
-			
-			version = 4.02;
-		}
-		
-		if (version < 4.10) {
-			values = await _getAttrs(["weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06", "weaponNormalDamage11", "weaponNormalDamage12", "weaponNormalDamage13", "weaponNormalDamage14", "weaponNormalDamage15", "weaponNormalDamage16"]);
-			
-			let weaponId = "";
-			
-			// Update weapons and the shield.
-			for (let i=1; i<=6; i++) {
-				weaponId = String(i).padStart(2,'0');
-				attributes["weaponDamageType"+weaponId] = (values["weaponNormalDamage"+weaponId] === "on") ? "normal" : "killing";
-			}
-			
-			for (let i=11; i<=15; i++) {
-				weaponId = String(i).padStart(2,'0');
-				attributes["weaponDamageType"+weaponId] = (values["weaponNormalDamage"+weaponId] === "on") ? "normal" : "killing";
-			}
-			
-			version = 4.10;
-		}
-		
-		if (version < 4.53) {
-			
-			let powerID = "";
-			let isEmpty;
-			let isFramework;
-			let isAttack;
-			let hasActivation;
-			let usesEND;
-			
-			for (let i=1; i<=20; i++) {
-				powerId = String(i).padStart(2,'0');
-				
-				values = await _getAttrs(["powerEffect"+powerId, "powerType"+powerId, "powerAttack"+powerId, "powerActivate"+powerId, "powerReducedEND"+powerId]);
-				
-				isEmpty = ( (values["powerEffect"+powerId]).toLowerCase().replace(/\s/g, '') !== '') ? false : true;
-				isFramework = ( (values["powerType"+powerId] === "multipower") || (values["powerType"+powerId] === "powerPool") || (values["powerType"+powerId] === "powerControl") ) ? true : false;
-				isAttack = (values["powerAttack"+powerId] === "on") ? true : false;
-				hasActivation = (values["powerActivate"+powerId] === "on") ? true : false;
-				usesEND = ( (values["powerReducedEND"+powerId] === "noEND") || (values["powerReducedEND"+powerId] === "zeroEND") || (values["powerReducedEND"+powerId] === "zeroENDAF") ) ? false : true;
-				
-				if (isEmpty || isFramework) {
-					attributes["powerAction"+powerId] = "none";
-				} else if ( (isAttack || hasActivation ) && usesEND) {
-					attributes["powerAction"+powerId] = "all";
-				} else if (isAttack || hasActivation) {
-					attributes["powerAction"+powerId] = "roll";
-				} else if (usesEND) {
-					attributes["powerAction"+powerId] = "end";
-				} else {
-					attributes["powerAction"+powerId] = "none";
-				}
-			}
-			
-			version = 4.53;
-		}
-		
-		if (version != origVersion) {
-			console.log(`Updated ${name} from ${origVersion} to ${version}`);
-			attributes.version = version;
-		}
-		
-		// We are doing this with awaits in order to only do a single setAttrs at the end.
-		setAttrs(attributes);
-	});
+	
 	
 	
 	// Open with first tab (thanks to GiGs).
@@ -25143,6 +24779,356 @@
 				});
 			});
 		});
+	});
+	
+	
+	// Character upgrades and portrait assignment
+	on("sheet:opened", async function() {
+		let attributes = {sheetTab:"characteristics"};
+	
+		// Fetch just what is needed to determine the version
+		let values = await _getAttrs(["version", "totalCharacterCost", "validateMay23", "character_name", "character_avatar"]);
+		let name = values.character_name;
+		let origVersion = parseFloat(values.version)||1.0;
+		let statValue = 0;
+		let ID = "";
+		
+		// Get the URL to the pseudo attribute attr_character_avatar for use in the Portrait Section.
+		attributes.theSheetAvatar = values.character_avatar;
+		
+		// Version Checks
+		// Check for unversioned sheets
+		if (values.validateMay23 == undefined) {
+			// if no points spent, then it's a new sheet
+			if (parseInt(values.totalCharacterCost)||0 != 0)
+				origVersion = 1.0;
+				
+			attributes.validateMay23 = 1;
+		}
+		let version = origVersion;
+		
+		if (version < 1.1) {
+			values = await _getAttrs(["intelligenceChance", "enhancedPerceptionModifier", "body", "stun", "endurance", "strength", "optionSuperHeroicEndurance"]);
+			var hiddenBasicEndurance = (parseInt(values.strength)||0) / (values.optionSuperHeroicEndurance != 0 ? 10 : 5);
+			
+			attributes.perceptionEnhanced = parseInt(values.intelligenceChance)||11 + parseInt(values.enhancedPerceptionModifier)||0;
+			attributes.CurrentBODY_max = parseInt(values.body)||0;
+			attributes.CurrentSTUN_max = parseInt(values.stun)||0;
+			attributes.CurrentEND_max = parseInt(values.endurance)||0;
+			attributes.hiddenBasicEndurance = Math.max(1, heroRoundLow(hiddenBasicEndurance));
+			version = 1.1;
+		}
+		
+		if (version < 2.1) {
+			values = await _getAttrs(["whisperToGM"]);
+			if (values.whisperToGM||0 == "on")
+				attributes.whisperToGM = "/w GM ";
+			else
+				attributes.whisperToGM = "";
+			version = 2.1;
+		}
+		
+		if (version < 2.3) {
+			values = await _getAttrs(["martialManeuverOCV01", "martialManeuverOCV02", "martialManeuverOCV03", "martialManeuverOCV04", "martialManeuverOCV05", "martialManeuverOCV06", "martialManeuverOCV07", "martialManeuverOCV08", "martialManeuverOCV09", "martialManeuverDCV01", "martialManeuverDCV02", "martialManeuverDCV03", "martialManeuverDCV04", "martialManeuverDCV05", "martialManeuverDCV06", "martialManeuverDCV07", "martialManeuverDCV08", "martialManeuverDCV09", "strength", "intelligence", "useCharacteristicMaximums", "enhancedPerceptionModifier", "perceptionModifierVision", "perceptionModifierHearing", "perceptionModifierSmell"]);
+			
+			// Ensure hiddenBasicDamage is available.
+			statValue = parseInt(values.strength)||0;
+			let theNumberOfD6 = (parseInt((statValue - (statValue%5))/5)||0).toString();
+			
+			let theNumberOfD3 = 0;
+			if (statValue%5 > 2) {
+				theNumberOfD3 = 1;
+			}
+			
+			var hiddenDamage = theNumberOfD6.concat("d6+",theNumberOfD3.toString(),"d3");
+			
+			attributes.hiddenBasicDamage = hiddenDamage;
+			
+			// Update martial maneuver text CVs to integers.
+			attributes.martialManeuverOCV01 = parseInt(values.martialManeuverOCV01)||0;
+			attributes.martialManeuverDCV01 = parseInt(values.martialManeuverDCV01)||0;
+			
+			attributes.martialManeuverOCV02 = parseInt(values.martialManeuverOCV02)||0;
+			attributes.martialManeuverDCV02 = parseInt(values.martialManeuverDCV02)||0;
+			
+			attributes.martialManeuverOCV03 = parseInt(values.martialManeuverOCV03)||0;
+			attributes.martialManeuverDCV03 = parseInt(values.martialManeuverDCV03)||0;
+			
+			attributes.martialManeuverOCV04 = parseInt(values.martialManeuverOCV04)||0;
+			attributes.martialManeuverDCV04 = parseInt(values.martialManeuverDCV04)||0;
+			
+			attributes.martialManeuverOCV05 = parseInt(values.martialManeuverOCV05)||0;
+			attributes.martialManeuverDCV05 = parseInt(values.martialManeuverDCV05)||0;
+			
+			attributes.martialManeuverOCV06 = parseInt(values.martialManeuverOCV06)||0;
+			attributes.martialManeuverDCV06 = parseInt(values.martialManeuverDCV06)||0;
+			
+			attributes.martialManeuverOCV07 = parseInt(values.martialManeuverOCV07)||0;
+			attributes.martialManeuverDCV07 = parseInt(values.martialManeuverDCV07)||0;
+			
+			attributes.martialManeuverOCV08 = parseInt(values.martialManeuverOCV08)||0;
+			attributes.martialManeuverDCV08 = parseInt(values.martialManeuverDCV08)||0;
+			
+			attributes.martialManeuverOCV09 = parseInt(values.martialManeuverOCV09)||0;
+			attributes.martialManeuverDCV09 = parseInt(values.martialManeuverDCV09)||0;
+			attributes.martialManeuverDamage09 = hiddenDamage;
+			
+			// Update perception roll chances.
+			statValue = parseInt(values.intelligence)||10;
+			enhancedPerceptionMod = parseInt(values.enhancedPerceptionModifier)||0;
+			perceptionModVision = parseInt(values.perceptionModifierVision)||0;
+			perceptionModHearing = parseInt(values.perceptionModifierHearing)||0;
+			perceptionModSmell = parseInt(values.perceptionModifierSmell)||0;
+			
+			attributes.perceptionVision = calculateRoll(statValue) + enhancedPerceptionMod + perceptionModVision;
+			attributes.perceptionHearing = calculateRoll(statValue) + enhancedPerceptionMod + perceptionModHearing;
+			attributes.perceptionSmell = calculateRoll(statValue) + enhancedPerceptionMod + perceptionModSmell;
+			
+			// Add sheet_name identifier.
+			attributes.sheet_name = "HeroSystem6eHeroic";
+			
+			version = 2.3;
+		}
+		
+		if (version < 2.41) {
+			values = await _getAttrs(["intelligence"]);
+			
+			// Update to new addition: perceptionBase.
+			statValue = parseInt(values.intelligence)||10;
+			
+			attributes.perceptionBase = calculateRoll(statValue);
+			
+			version = 2.42;
+		}
+		
+		if (version < 2.51) {
+			values = await _getAttrs(["weaponStrength01", "weaponStrength02", "weaponStrength03", "weaponStrength04", "weaponStrength05", "shieldName", "shieldDamage", "shieldNormalDamage", "shieldStrength", "shieldOCV"]);
+			
+			// Updates to shield and weapon stats.
+			
+			attributes.weaponStrengthMin01 = parseInt(values.weaponStrength01)||0;
+			attributes.weaponStrengthMin02 = parseInt(values.weaponStrength02)||0;
+			attributes.weaponStrengthMin03 = parseInt(values.weaponStrength03)||0;
+			attributes.weaponStrengthMin04 = parseInt(values.weaponStrength04)||0;
+			attributes.weaponStrengthMin05 = parseInt(values.weaponStrength05)||0;
+			attributes.weaponStrengthMin06 = parseInt(values.shieldStrength)||0;
+			
+			(values.shieldName) ? (attributes.weaponName06 = values.shieldName) : (attributes.weaponName06 = "");
+			(attributes.shieldDamage) ? (attributes.weaponDamage06 = values.shieldDamage) : (attributes.weaponDamage06 = "0");
+			(attributes.shieldNormalDamage) ? (attributes.weaponNormalDamage06 = values.shieldNormalDamage) : (attributes.weaponNormalDamage06 = "on");
+			attributes.weaponStrength06 = parseInt(values.shieldStrength)||0;
+			attributes.weaponOCV06 = parseInt(values.shieldOCV)||0;
+			
+			attributes.gearSlideSelection = "gearManeuvers";
+			
+			version = 2.51;
+		}
+		
+		if (version < 2.90) {
+			
+			values = await _getAttrs(["strength", "dexterity", "constitution", "intelligence", "ego", "presence"]);
+			
+			attributes.strengthNet = parseInt(values.strength)||0;
+			attributes.dexterityNet = parseInt(values.dexterity)||0;	
+			attributes.constitutionNet = parseInt(values.constitution)||0;
+			attributes.intelligenceNet = parseInt(values.intelligence)||0;
+			attributes.egoNet = parseInt(values.ego)||0;
+			attributes.presenceNet = parseInt(values.presence)||0;
+			
+			// Initialize attribute mods to 0.
+			attributes.strengthMod = 0;
+			attributes.dexterityMod = 0;	
+			attributes.constitutionMod = 0;
+			attributes.intelligenceMod = 0;
+			attributes.egoMod = 0;
+			
+			attributes.ocvMod = 0;
+			attributes.dcvMod = 0;	
+			attributes.omcvMod = 0;
+			attributes.dmcvMod = 0;
+			attributes.speedMod = 0;
+			
+			attributes.pdMod = 0;
+			attributes.edMod = 0;	
+			attributes.bodyMod = 0;
+			attributes.stunMod = 0;
+			attributes.enduranceMod = 0;
+			attributes.recoveryMod = 0;
+			
+			attributes.runningMod = 0;
+			attributes.leapingMod = 0;
+			attributes.swimmingMod = 0;
+			
+			version = 2.90;
+		}
+		
+		if (version < 3.05) {
+			// Update martial maneuver selections and starting weapon states.
+			values = await _getAttrs(["martialManeuverBlock01", "martialManeuverBlock02", "martialManeuverBlock03", "martialManeuverBlock04", "martialManeuverBlock05", "martialManeuverBlock06", "martialManeuverBlock07", "martialManeuverBlock08", "martialManeuverBlock09", "martialManeuverBlock10", "weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06"]);
+			
+			let maneuverId;
+			let states = "DDDDDDOOOOOO";
+			
+			for (let i=1; i<=maxManeuverNum; i++) {
+				maneuverId = String(i).padStart(2,'0');
+				if (values["martialManeuverBlock"+maneuverId] === "on") {
+					attributes["martialManeuverType"+maneuverId] = "block";
+				} else {
+					attributes["martialManeuverType"+maneuverId] = "attack";
+				}
+			}
+			
+			attributes.weaponType01 = "defense";
+			attributes.weaponType02 = "defense";
+			attributes.weaponType03 = "defense";
+			attributes.weaponType04 = "defense";
+			attributes.weaponType05 = "defense";
+			attributes.weaponType06 = "defense";
+			
+			attributes.gearSlideSelection = "gearTreasures";
+			attributes.maneuverSelection = "block";
+			attributes.useManeuvers = "true";
+			attributes.weaponStates = states;
+			
+			version = 3.05;
+		}
+		
+		if (version < 3.50) {
+			// Update carry weight
+			values = await _getAttrs(["carriedWeight", "strength", "strengthMod"]);
+			
+			statValue = (parseInt(values.strength)||0) + (parseInt(values.strengthMod)||0);
+			
+			attributes.liftWeightDisplay = displayMass( calculateLift(statValue) );
+			attributes.freeCarry = calculateLift(statValue)/10;
+			attributes.freeCarryDisplay = displayMass( calculateLift(statValue)/10 );
+			attributes.carriedWeightDisplay = displayMass(parseFloat(values.carriedWeight)||0);
+			
+			version = 3.50;
+		}
+		
+		if (version < 4.02) {
+			// Add 30 to combat and language skill IDs to make room for a block of twenty general skills.
+			values = await _getAttrs(["skillName31", "skillType31", "skillLevels31", "skillName32", "skillType32", "skillLevels32",  "skillName33", "skillType33", "skillLevels33", "skillName34", "skillType34", "skillLevels34", "skillName35", "skillType35", "skillLevels35", "skillName36", "skillType36", "skillLevels36", "skillName37", "skillType37", "skillLevels37", "skillLevels38",  "skillLevels39", "skillLevels40", "skillName41", "skillFluency41", "skillLiteracy41", "skillName42", "skillFluency42", "skillLiteracy42", "skillName43", "skillFluency43", "skillLiteracy43", "skillName44", "skillFluency44", "skillLiteracy44", "skillName45", "skillFluency45", "skillLiteracy45", "skillName46", "skillFluency46", "skillLiteracy46", "skillName47", "skillFluency47", "skillLiteracy47", "skillName48", "skillFluency48", "skillLiteracy48", "skillName49", "skillFluency49", "skillLiteracy49"]);
+			
+			let newId;
+			let oldId; 
+			
+			for (let i=31; i<= 37; i++) {
+				oldId = String(i).padStart(2,'0');
+				newId = String(i+30).padStart(2,'0');
+				
+				// Move old skill to new slot.
+				attributes["skillName"+newId] = values["skillName"+oldId]||"";
+				attributes["skillType"+newId] = values["skillType"+oldId]||"none";
+				attributes["skillLevels"+newId] = values["skillLevels"+oldId]||0;
+				
+				// Delete otherwise visible old skill values.
+				attributes["skillName"+oldId] = "";
+				attributes["skillType"+oldId] = "none";
+			}
+			
+			for (let i=38; i<= 40; i++) {
+				oldId = String(i).padStart(2,'0');
+				newId = String(i+35).padStart(2,'0');
+				
+				// Move old skill to new slot.
+				attributes["skillLevels"+newId] = values["skillLevels"+oldId]||0;
+			}
+			
+			for (let i=41; i<= 49; i++) {
+				oldId = String(i).padStart(2,'0');
+				newId = String(i+35).padStart(2,'0');
+				
+				// Move old skill to new slot.
+				attributes["skillName"+newId] = values["skillName"+oldId]||"";
+				attributes["skillFluency"+newId] = values["skillFluency"+oldId]||"none";
+				attributes["skillLiteracy"+newId] = values["skillLiteracy"+oldId]||0;
+				
+				// Delete otherwise visible old skill values.
+				attributes["skillName"+oldId] = "";
+			}
+			
+			for (let i=31; i<=50; i++) {
+				oldId = String(i).padStart(2,'0');
+				
+				// Remove old CP values in extend general skill range.
+				attributes["skillCP"+oldId] = 0;
+			}
+			
+			updateEnhancerSkillCosts();
+			
+			version = 4.02;
+		}
+		
+		if (version < 4.10) {
+			values = await _getAttrs(["weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06", "weaponNormalDamage11", "weaponNormalDamage12", "weaponNormalDamage13", "weaponNormalDamage14", "weaponNormalDamage15", "weaponNormalDamage16"]);
+			
+			let weaponId = "";
+			
+			// Update weapons and the shield.
+			for (let i=1; i<=6; i++) {
+				weaponId = String(i).padStart(2,'0');
+				attributes["weaponDamageType"+weaponId] = (values["weaponNormalDamage"+weaponId] === "on") ? "normal" : "killing";
+			}
+			
+			for (let i=11; i<=15; i++) {
+				weaponId = String(i).padStart(2,'0');
+				attributes["weaponDamageType"+weaponId] = (values["weaponNormalDamage"+weaponId] === "on") ? "normal" : "killing";
+			}
+			
+			version = 4.10;
+		}
+		
+		if (version < 4.53) {
+			
+			let powerID = "";
+			let isEmpty;
+			let isFramework;
+			let isAttack;
+			let hasActivation;
+			let usesEND;
+			
+			for (let i=1; i<=20; i++) {
+				powerId = String(i).padStart(2,'0');
+				
+				values = await _getAttrs(["powerEffect"+powerId, "powerType"+powerId, "powerAttack"+powerId, "powerActivate"+powerId, "powerReducedEND"+powerId]);
+				
+				isEmpty = ( (values["powerEffect"+powerId]).toLowerCase().replace(/\s/g, '') !== '') ? false : true;
+				isFramework = ( (values["powerType"+powerId] === "multipower") || (values["powerType"+powerId] === "powerPool") || (values["powerType"+powerId] === "powerControl") ) ? true : false;
+				isAttack = (values["powerAttack"+powerId] === "on") ? true : false;
+				hasActivation = (values["powerActivate"+powerId] === "on") ? true : false;
+				usesEND = ( (values["powerReducedEND"+powerId] === "noEND") || (values["powerReducedEND"+powerId] === "zeroEND") || (values["powerReducedEND"+powerId] === "zeroENDAF") ) ? false : true;
+				
+				if (isEmpty || isFramework) {
+					attributes["powerAction"+powerId] = "none";
+				} else if ( (isAttack || hasActivation ) && usesEND) {
+					attributes["powerAction"+powerId] = "all";
+				} else if (isAttack || hasActivation) {
+					attributes["powerAction"+powerId] = "roll";
+				} else if (usesEND) {
+					attributes["powerAction"+powerId] = "end";
+				} else {
+					attributes["powerAction"+powerId] = "none";
+				}
+			}
+			
+			version = 4.53;
+		}
+		
+		if (version < 4.54) {
+			
+			version = 4.54;
+			
+		}
+		
+		if (version != origVersion) {
+			console.log(`Updated ${name} from ${origVersion} to ${version}`);
+			attributes.version = version;
+		}
+		
+		// We are doing this with awaits in order to only do a single setAttrs at the end.
+		setAttrs(attributes);
 	});
 	
 	// End sheet workers
