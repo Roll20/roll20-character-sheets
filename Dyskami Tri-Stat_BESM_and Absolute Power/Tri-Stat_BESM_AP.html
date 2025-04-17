@@ -4157,7 +4157,11 @@
                                 temp.push(`${cache.source_path}_state`);
                             break;
                             case 'attribute':
-                                temp.push('attrdb');
+                                temp.push('attrdb','rolldb');
+                            break;
+                            case 'maneuver':
+                                temp.push('rolldb','rulesdb')
+                            break;
                             case 'modifier':
                             case 'name':
                             case 'stat':
@@ -7368,8 +7372,8 @@
                         }
                     }
                     query.title = `${getTranslationByKey("select-maneuver")}`;
-                    query.options = roll.weapon.is_attribute && !roll.weapon.range ? 
-                        `|${getTranslationByKey("touch")},touch` : `|${getTranslationByKey("attack")},attack`;
+                    query.options = `|${getTranslationByKey("attack")},attack`;//roll.weapon.is_attribute && !roll.weapon.range ? 
+                        //`|${getTranslationByKey("touch")},touch` : `|${getTranslationByKey("attack")},attack`;
                     if (cache.rulesdb.rules_optional_maneuvers_status) {
                         query.options +=
                             `|${getTranslationByKey("called-shot")},?{${getTranslationByKey("select-called-shot")}`;
@@ -9994,6 +9998,38 @@
 
     async function rollMenu(cache, set_values) {
         const query = {};
+        const button_supported = {
+            "2d6": {
+                "default": false,
+            },
+            "attack": {
+                "target":true,
+                "attribute":true,
+                "maneuver":true,
+                "enemy":true,
+                "default": false,
+            },
+            "attribute": {
+                "target":true,
+                "attribute":true,
+                "stat":true,
+                "default": false,
+            },
+            "initiative": {
+                "default": false,
+            },
+            "skill": {
+                "target":true,
+                "stat":true,
+                "default": false,
+            },
+            "stat": {
+                "target":true,
+                "stat":true,
+                "default": false,
+            },
+            
+        };
         clog(cache, query, 'rollMenu()');
         query.next = cache.source_type === 'static' ? cache.source_id : cache.source_attribute;
         query.index = query.next !== 'add' ? cache.rolldb.findIndex(r => r.id.toLowerCase() === cache.source_id) : -1;
@@ -10003,63 +10039,97 @@
                 case 'add':
                     query.fields = ['attribute','enemy','icon','maneuver','modifier','name','stat','target','type'];
                     query.title = '';
-                    /*
-                    query.title = `${getTranslationByKey("roll-type")}`;
-                    query.options =
-                        `|2d6,2d6` +
-                        `|${getTranslationByKey("attack")},attack` +
-                        `|${getTranslationByKey("attribute")},attribute` +
-                        `|${getTranslationByKey("initiative")},initiative` +
-                        `|${getTranslationByKey("skill")},skill` +
-                        `|${getTranslationByKey("stat")},stat`;
-                    */
                     query.last = query.next;
                 break;
                 case 'attribute':
-                    const attributes = [];
-                    query.type = cache.rolldb[query.index].type === 'attack' ? 'weapon' : 'attribute';
-                    query.title = getTranslationByKey(`${query.type === 'weapon' ?
-                        'choose-attack' : 'choose-attribute'}`);
-                    if (query.type === 'weapon') {
-                        const translation = getTranslationByKey("weapon");
-                        for (let i = 0; i < cache.attrdb.weapon.length; i++) {
-                            if (cache.attrdb.weapon[i].active) {
-                                const name = cache.attrdb.weapon[i].name === '' ?
-                                    translation : cache.attrdb.weapon[i].name;
-                                attributes.push(`${name},${name}~${i}~weapon`);
+                    if (button_supported[cache.rolldb[query.index].type][cache.source_attribute || 'default']) {
+                        const attributes = [];
+                        query.type = cache.rolldb[query.index].type === 'attack' ? 'weapon' : 'attribute';
+                        query.title = getTranslationByKey(`${query.type === 'weapon' ?
+                            'choose-attack' : 'choose-attribute'}`);
+                        if (query.type === 'weapon') {
+                            const translation = getTranslationByKey("weapon");
+                            for (let i = 0; i < cache.attrdb.weapon.length; i++) {
+                                if (cache.attrdb.weapon[i].active) {
+                                    const name = cache.attrdb.weapon[i].name === '' ?
+                                        translation : cache.attrdb.weapon[i].name;
+                                    attributes.push(`${name},${name}~${i}~weapon`);
+                                }
                             }
-                        }
-                    } else {
-                        const filtered_attributes = all_attributes.map(a => {
-                            return (a === 'skills' || a === 'skill group'|| a === 'weapon') ? '' : a;
-                        }).filter(n => n);
-                        for (let i = 0; i < filtered_attributes.length; i++) {
-                            for (let j = 0; j < cache.attrdb[filtered_attributes[i]].length; j++) {
-                                const attribute = cache.attrdb[filtered_attributes[i]][j];
-                                if (attribute.active && attribute.stat !== 'none') {
-                                    attributes.push(
-                                        `${attribute.name === '' ? 
-                                            getTranslationByKey(filtered_attributes[i].toKebobCase()) : 
-                                            attribute.name},` +
-                                        `${attribute.name}~${j}~${filtered_attributes[i]}`
-                                    );/*
-                                    roll.is_swarm = filtered_attributes[i] === 'swarm';
-                                    if (roll.is_swarm) {
-                                        query.elevel = cache.attrdb.swarm[j].elevel;
-                                    }*/
+                        } else {
+                            const filtered_attributes = all_attributes.map(a => {
+                                return (a === 'skills' || a === 'skill group'|| a === 'weapon') ? '' : a;
+                            }).filter(n => n);
+                            for (let i = 0; i < filtered_attributes.length; i++) {
+                                for (let j = 0; j < cache.attrdb[filtered_attributes[i]].length; j++) {
+                                    const attribute = cache.attrdb[filtered_attributes[i]][j];
+                                    if (attribute.active && attribute.stat !== 'none') {
+                                        attributes.push(
+                                            `${attribute.name === '' ? 
+                                                getTranslationByKey(filtered_attributes[i].toKebobCase()) : 
+                                                attribute.name},` +
+                                            `${attribute.name}~${j}~${filtered_attributes[i]}`
+                                        );
+                                    }
                                 }
                             }
                         }
+                        const unarmed = getTranslationByKey("unarmed");
+                        const touch = getTranslationByKey("touch");
+                        query.options = '|' + attributes.sort().join("|") +
+                            `${query.type === 'weapon' ?
+                            '|' + unarmed + ',' + unarmed + '~-1~unarmed' +
+                            '|' + touch + ',' + touch + '~-1~touch' : ''
+                        }`;
+                        query.last = query.next;
+                    } else {
+                        clog(cache, 'Not Applicable', 'ERROR');
+                        query.commit = true;
                     }
-                    query.options = '|' + attributes.sort().join("|") +
-                        `${query.type === 'weapon' ?
-                        '|' + getTranslationByKey("unarmed") + ',unarmed' +
-                        '|' + getTranslationByKey("touch") + ',touch' : ''
-                    }`;
-                    query.last = query.next;
                 break;
                 case 'delete':
 
+                break;
+                case 'enemy':
+                    if (button_supported[cache.rolldb[query.index].type][cache.source_attribute || 'default']) {
+                            
+                    } else {
+                        clog(cache, 'Not Applicable', 'ERROR');
+                        query.commit = true;
+                    }
+                break;
+                case 'maneuver':
+                    if (button_supported[cache.rolldb[query.index].type][cache.source_attribute || 'default']) {
+                        query.title = getTranslationByKey("select-maneuver");
+                        query.options =
+                            `|${getTranslationByKey("attack")},attack`;
+                        if (cache.rulesdb.rules_optional_maneuvers_status) {
+                            query.options +=
+                                `|${getTranslationByKey("called-shot")},?{${getTranslationByKey("select-called-shot")}`;
+                                query.options +=
+                                    `&#124;${getTranslationByKey("bypass-armor")}&#44;bypass armor` +
+                                    `&#124;${getTranslationByKey("disarm")}&#44;disarm`;
+                                query.options += cache.rulesdb.rules_optional_knockout_status ?
+                                    `&#124;${getTranslationByKey("knockout")}&#44;knockout` : '';
+                                query.options +=
+                                    `&#124;${getTranslationByKey("reduce-armor")}&#44;reduce armor` +
+                                    `&#124;${getTranslationByKey("specific-location")}&#44;specific location` +
+                                    `&#124;${getTranslationByKey("vital-spot")}&#44;vital spot` +
+                                    `&#124;${getTranslationByKey("weak-point")}&#44;weak point`;
+                                query.options += '&#125;';
+                                query.options +=
+                                    `|${getTranslationByKey("grapple")},?{${getTranslationByKey("select-grapping-maneuver")}` +
+                                        `&#124;${getTranslationByKey("bite")}&#44;bite` +
+                                        `&#124;${getTranslationByKey("grab")}&#44;grab` +
+                                        `&#124;${getTranslationByKey("lock")}&#44;lock` +
+                                        `&#124;${getTranslationByKey("pin")}&#44;pin` +
+                                        `&#124;${getTranslationByKey("throw")}&#44;throw&#125;`;
+                        }
+                        query.last = query.next; 
+                    } else {
+                        clog(cache, 'Not Applicable', 'ERROR');
+                        query.commit = true;
+                    }
                 break;
                 case 'modifier':
                     query.title = getTranslationByKey("modifier");
@@ -10072,24 +10142,34 @@
                     query.last = query.next;
                 break;
                 case 'stat':
-                    query.title = `${getTranslationByKey("select-stats")}`;
-                    query.options = 
-                        `|${getTranslationByKey("body")},body` +
-                        `|${getTranslationByKey("mind")},mind` +
-                        `|${getTranslationByKey("soul")},soul` +
-                        `|Avg ${getTranslationByKey("body")}+${getTranslationByKey("mind")},body~mind` +
-                        `|Avg ${getTranslationByKey("body")}+${getTranslationByKey("soul")},body~soul` +
-                        `|Avg ${getTranslationByKey("mind")}+${getTranslationByKey("soul")},mind~soul` +
-                        `|Avg ${getTranslationByKey("body")}+${getTranslationByKey("mind")}+${getTranslationByKey("soul")},body~mind~soul` +
-                        `|${getTranslationByKey("variable")},variable`;
-                    query.last = query.next;
+                    if (button_supported[cache.rolldb[query.index].type][cache.source_attribute || 'default']) {
+                        query.title = `${getTranslationByKey("select-stats")}`;
+                        query.options = 
+                            `|${getTranslationByKey("body")},body` +
+                            `|${getTranslationByKey("mind")},mind` +
+                            `|${getTranslationByKey("soul")},soul` +
+                            `|Avg ${getTranslationByKey("body")}+${getTranslationByKey("mind")},body~mind` +
+                            `|Avg ${getTranslationByKey("body")}+${getTranslationByKey("soul")},body~soul` +
+                            `|Avg ${getTranslationByKey("mind")}+${getTranslationByKey("soul")},mind~soul` +
+                            `|Avg ${getTranslationByKey("body")}+${getTranslationByKey("mind")}+${getTranslationByKey("soul")},body~mind~soul` +
+                            `|${getTranslationByKey("variable")},variable`;
+                        query.last = query.next;
+                    } else {
+                        clog(cache, 'Not Applicable', 'ERROR');
+                        query.commit = true;
+                    }
                 break;
                 case 'target':
-                    query.title = getTranslationByKey("target");
-                    query.options =
-                        `|${getTranslationByKey("opposed-roll")},target_select` +
-                        `|${getTranslationByKey("target-number")},target_number`;
-                    query.last = query.next;
+                    if (button_supported[cache.rolldb[query.index].type][cache.source_attribute || 'default']) {
+                        query.title = getTranslationByKey("target");
+                        query.options =
+                            `|${getTranslationByKey("opposed-roll")},target_select` +
+                            `|${getTranslationByKey("target-number")},target_number`;
+                        query.last = query.next;
+                    } else {
+                        clog(cache, 'Not Applicable', 'ERROR');
+                        query.commit = true;
+                    }
                 break;
                 case 'type':
                     query.title = getTranslationByKey("type");
@@ -10113,18 +10193,13 @@
                         for (let i = 0; i < query.fields.length; i++) {
                             let value = '';
                             switch(query.fields[i]) {
-                                //case 'attribute':break;
-                                //case 'enemy':break;
                                 case 'icon':
                                     value = 'casino';
                                 break;
-                                //case 'maneuver':break;
                                 case 'modifier':
                                     value = getTranslationByKey("normal");
                                     query.rolldb.modifier = 'normal';
                                 break;
-                                //case 'stat':break;
-                                //case 'target':break;
                                 case 'name':
                                     value = getTranslationByKey("roll-macro");
                                     query.rolldb.name = value;
@@ -10147,12 +10222,21 @@
                         const [attr_name, attr_index, attr] = query.selection.split("~");
                         set_values[`${cache.source_path}_attribute`] = attr_name === '' ?
                             getTranslationByKey(attr.toKebobCase()) : attr_name;
-                        cache.rolldb[query.index].attribute.id = cache.attrdb[attr][attr_index].row_id;
+                        cache.rolldb[query.index].attribute.id = attr === 'unarmed' || attr === 'touch' ?
+                            attr : cache.attrdb[attr][attr_index].row_id;
                         cache.rolldb[query.index].attribute.name = attr;
                         query.commit = true;
                     break;
                     case 'delete':
 
+                    break;
+                    case 'enemy':
+
+                    break;
+                    case 'maneuver':
+                        set_values[`${cache.source_path}_maneuver`] = getTranslationByKey(query.selection);
+                        cache.rolldb[query.index].modifier = query.selection;
+                        query.commit = true;
                     break;
                     case 'modifier':
                         query.modifier =
@@ -14327,6 +14411,7 @@
                                 setAccordion(cache, set_values);
                             break;
                             case 'attribute':
+                            case 'maneuver':
                             case 'modifier':
                             case 'name':
                             case 'stat':
