@@ -15984,7 +15984,7 @@
 			
 			<div class="item-version-information">
 				<!-- Update version before release. -->
-				<input type="text" value="4.54" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+				<input type="text" value="4.60" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 			</div>
 		</div>
 		
@@ -24785,7 +24785,7 @@
 	// Character upgrades and portrait assignment
 	on("sheet:opened", async function() {
 		let attributes = {sheetTab:"characteristics"};
-	
+		
 		// Fetch just what is needed to determine the version
 		let values = await _getAttrs(["version", "totalCharacterCost", "validateMay23", "character_name", "character_avatar"]);
 		let name = values.character_name;
@@ -24840,38 +24840,15 @@
 				theNumberOfD3 = 1;
 			}
 			
-			var hiddenDamage = theNumberOfD6.concat("d6+",theNumberOfD3.toString(),"d3");
-			
-			attributes.hiddenBasicDamage = hiddenDamage;
+			attributes.hiddenBasicDamage = theNumberOfD6.concat("d6+",theNumberOfD3.toString(),"d3");
 			
 			// Update martial maneuver text CVs to integers.
-			attributes.martialManeuverOCV01 = parseInt(values.martialManeuverOCV01)||0;
-			attributes.martialManeuverDCV01 = parseInt(values.martialManeuverDCV01)||0;
-			
-			attributes.martialManeuverOCV02 = parseInt(values.martialManeuverOCV02)||0;
-			attributes.martialManeuverDCV02 = parseInt(values.martialManeuverDCV02)||0;
-			
-			attributes.martialManeuverOCV03 = parseInt(values.martialManeuverOCV03)||0;
-			attributes.martialManeuverDCV03 = parseInt(values.martialManeuverDCV03)||0;
-			
-			attributes.martialManeuverOCV04 = parseInt(values.martialManeuverOCV04)||0;
-			attributes.martialManeuverDCV04 = parseInt(values.martialManeuverDCV04)||0;
-			
-			attributes.martialManeuverOCV05 = parseInt(values.martialManeuverOCV05)||0;
-			attributes.martialManeuverDCV05 = parseInt(values.martialManeuverDCV05)||0;
-			
-			attributes.martialManeuverOCV06 = parseInt(values.martialManeuverOCV06)||0;
-			attributes.martialManeuverDCV06 = parseInt(values.martialManeuverDCV06)||0;
-			
-			attributes.martialManeuverOCV07 = parseInt(values.martialManeuverOCV07)||0;
-			attributes.martialManeuverDCV07 = parseInt(values.martialManeuverDCV07)||0;
-			
-			attributes.martialManeuverOCV08 = parseInt(values.martialManeuverOCV08)||0;
-			attributes.martialManeuverDCV08 = parseInt(values.martialManeuverDCV08)||0;
-			
-			attributes.martialManeuverOCV09 = parseInt(values.martialManeuverOCV09)||0;
-			attributes.martialManeuverDCV09 = parseInt(values.martialManeuverDCV09)||0;
-			attributes.martialManeuverDamage09 = hiddenDamage;
+			for (let i=1; i<=9; i++) {
+				ID = String(i).padStart(2,'0');
+				
+				attributes["martialManeuverOCV"+ID] = parseInt(values["martialManeuverOCV"+ID])||0;
+				attributes["martialManeuverDCV"+ID] = parseInt(values["martialManeuverDCV"+ID])||0;
+			}
 			
 			// Update perception roll chances.
 			statValue = parseInt(values.intelligence)||10;
@@ -24966,24 +24943,21 @@
 			// Update martial maneuver selections and starting weapon states.
 			values = await _getAttrs(["martialManeuverBlock01", "martialManeuverBlock02", "martialManeuverBlock03", "martialManeuverBlock04", "martialManeuverBlock05", "martialManeuverBlock06", "martialManeuverBlock07", "martialManeuverBlock08", "martialManeuverBlock09", "martialManeuverBlock10", "weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06"]);
 			
-			let maneuverId;
 			let states = "DDDDDDOOOOOO";
 			
 			for (let i=1; i<=maxManeuverNum; i++) {
-				maneuverId = String(i).padStart(2,'0');
-				if (values["martialManeuverBlock"+maneuverId] === "on") {
-					attributes["martialManeuverType"+maneuverId] = "block";
+				ID = String(i).padStart(2,'0');
+				if (values["martialManeuverBlock"+ID] === "on") {
+					attributes["martialManeuverType"+ID] = "block";
 				} else {
-					attributes["martialManeuverType"+maneuverId] = "attack";
+					attributes["martialManeuverType"+ID] = "attack";
 				}
 			}
 			
-			attributes.weaponType01 = "defense";
-			attributes.weaponType02 = "defense";
-			attributes.weaponType03 = "defense";
-			attributes.weaponType04 = "defense";
-			attributes.weaponType05 = "defense";
-			attributes.weaponType06 = "defense";
+			for (let i=1; i<=6; i++) {
+				ID = String(i).padStart(2,'0');
+				attributes["weaponType"+ID] = "defense";
+			}
 			
 			attributes.gearSlideSelection = "gearTreasures";
 			attributes.maneuverSelection = "block";
@@ -25014,7 +24988,7 @@
 			let newId;
 			let oldId; 
 			
-			for (let i=31; i<= 37; i++) {
+			for (let i=31; i<=37; i++) {
 				oldId = String(i).padStart(2,'0');
 				newId = String(i+30).padStart(2,'0');
 				
@@ -25064,25 +25038,22 @@
 		if (version < 4.10) {
 			values = await _getAttrs(["weaponNormalDamage01", "weaponNormalDamage02", "weaponNormalDamage03", "weaponNormalDamage04", "weaponNormalDamage05", "weaponNormalDamage06", "weaponNormalDamage11", "weaponNormalDamage12", "weaponNormalDamage13", "weaponNormalDamage14", "weaponNormalDamage15", "weaponNormalDamage16"]);
 			
-			let weaponId = "";
-			
 			// Update weapons and the shield.
 			for (let i=1; i<=6; i++) {
-				weaponId = String(i).padStart(2,'0');
-				attributes["weaponDamageType"+weaponId] = (values["weaponNormalDamage"+weaponId] === "on") ? "normal" : "killing";
+				ID = String(i).padStart(2,'0');
+				attributes["weaponDamageType"+ID] = (values["weaponNormalDamage"+ID] === "on") ? "normal" : "killing";
 			}
 			
 			for (let i=11; i<=15; i++) {
-				weaponId = String(i).padStart(2,'0');
-				attributes["weaponDamageType"+weaponId] = (values["weaponNormalDamage"+weaponId] === "on") ? "normal" : "killing";
+				ID = String(i).padStart(2,'0');
+				attributes["weaponDamageType"+ID] = (values["weaponNormalDamage"+ID] === "on") ? "normal" : "killing";
 			}
 			
 			version = 4.10;
 		}
 		
-		if (version < 4.53) {
+		if (version < 4.60) {
 			
-			let powerID = "";
 			let isEmpty;
 			let isFramework;
 			let isAttack;
@@ -25090,36 +25061,30 @@
 			let usesEND;
 			
 			for (let i=1; i<=20; i++) {
-				powerId = String(i).padStart(2,'0');
+				ID = String(i).padStart(2,'0');
 				
-				values = await _getAttrs(["powerEffect"+powerId, "powerType"+powerId, "powerAttack"+powerId, "powerActivate"+powerId, "powerReducedEND"+powerId]);
+				values = await _getAttrs(["powerEffect"+ID, "powerType"+ID, "powerAttack"+ID, "powerActivate"+ID, "powerReducedEND"+ID]);
 				
-				isEmpty = ( (values["powerEffect"+powerId]).toLowerCase().replace(/\s/g, '') !== '') ? false : true;
-				isFramework = ( (values["powerType"+powerId] === "multipower") || (values["powerType"+powerId] === "powerPool") || (values["powerType"+powerId] === "powerControl") ) ? true : false;
-				isAttack = (values["powerAttack"+powerId] === "on") ? true : false;
-				hasActivation = (values["powerActivate"+powerId] === "on") ? true : false;
-				usesEND = ( (values["powerReducedEND"+powerId] === "noEND") || (values["powerReducedEND"+powerId] === "zeroEND") || (values["powerReducedEND"+powerId] === "zeroENDAF") ) ? false : true;
+				isEmpty = ( (values["powerEffect"+ID]).toLowerCase().replace(/\s/g, '') !== '') ? false : true;
+				isFramework = ( (values["powerType"+ID] === "multipower") || (values["powerType"+ID] === "powerPool") || (values["powerType"+ID] === "powerControl") ) ? true : false;
+				isAttack = (values["powerAttack"+ID] === "on") ? true : false;
+				hasActivation = (values["powerActivate"+ID] === "on") ? true : false;
+				usesEND = ( (values["powerReducedEND"+ID] === "noEND") || (values["powerReducedEND"+ID] === "zeroEND") || (values["powerReducedEND"+ID] === "zeroENDAF") ) ? false : true;
 				
 				if (isEmpty || isFramework) {
-					attributes["powerAction"+powerId] = "none";
+					attributes["powerAction"+ID] = "none";
 				} else if ( (isAttack || hasActivation ) && usesEND) {
-					attributes["powerAction"+powerId] = "all";
+					attributes["powerAction"+ID] = "all";
 				} else if (isAttack || hasActivation) {
-					attributes["powerAction"+powerId] = "roll";
+					attributes["powerAction"+ID] = "roll";
 				} else if (usesEND) {
-					attributes["powerAction"+powerId] = "end";
+					attributes["powerAction"+ID] = "end";
 				} else {
-					attributes["powerAction"+powerId] = "none";
+					attributes["powerAction"+ID] = "none";
 				}
 			}
 			
-			version = 4.53;
-		}
-		
-		if (version < 4.54) {
-			
-			version = 4.54;
-			
+			version = 4.60;
 		}
 		
 		if (version != origVersion) {
