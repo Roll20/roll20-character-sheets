@@ -81,6 +81,92 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Mar 22nd 2025 v1.76
+
+- New High Elf Player's Guide support, including Yenlui and Talents for HE career's.
+- New Sword-dancing casting support, adds new spellbook page for Sword-dancing spells. And added to Quick Cast menu.
+- New High Magic (Qhaysh) added to list of Arcane Magic types, and channeling. And added to Quick Cast menu.
+- Simple Yenlui implementation for records only.
+- Added another 4 (total 8 now) Arcane Lore to talent's to support HE caster's learning all 8 colors.
+- Enhanced Spellbook/Arcane spells tab to support High Magic spell features, ie Sacrafice and Multi Wind spells. For record only, no logic to support this mechanic yet.
+- Creature Trait list added, found in the Talent Tab. Intended for Monsters/NPCs and special conditions.
+- Fixed Offhand weapon not adding Strike Might Blow dmg in the roll template.
+- Fixed skill test rolls showing the Drunk modifier when it wasnt actually applying to them.
+- Fixed Frenzy not always adding extra dmg to Melee attacks correctly
+- Fixed Entangle not working to Melee mainhand attacks
+
+
+Feb 19th 2025 v1.75c
+
+- Fixed alignment issue with coin swap buttons, which was not fixed last update.
+
+
+Feb 14th 2025 v1.75b
+
+- Fixed alignment issue with coin swap buttons
+- Fixed Weapon settings Magical Effects textarea sizing
+- Fixed Spell Quickbar header spacing
+- Fixed problem with Wounds calc not being correct if Larger the Average sized and changes to SB/TB/WPB where made. Only Race change will automatically reset Size and recalculate wounds.
+- Updated Sheet.json to add some of the recent custom setting defaults
+
+
+Feb 13th 2025 v1.75a
+
+- Translated sheet to Roll20 CSE Sanitization standard. No changes to layout or look.
+- Fixed problem with Dual wield Situational Bonuses showing in DW rolls when Custom Roll outcome was active on weapons.
+
+
+Jan 20th 2025 v1.75
+
+- Add Cantor Talent from Heart of Glass/Ubersreik Adventures 1, situational test bonus for entertain singing.
+- Add Chanty Talent from Sea of Claws, situational test bonus for entertain singing.
+- Fix Master of Disguise Talent, now shows situational test bonus for entertain acting.
+
+
+Jan 10th 2025 v1.74d
+
+- Fix for the sheet background and images sometimes not working in roll20. Sheet Assets moved to prevent url encoding problem.
+- Fix issue prevent Race field to show on new sheets.
+
+
+Jan 4th 2025 v1.74c
+
+- New Custom Critical Wounds rules, which can be configured in the settings tab. Allows for changing of the static crit dmg wounds from the core crit tables. There are 3 customization options, 2 are add or replace normal dmg with a custom dmg die (e.g. 1d10, 1d10!, etc), and the 3rd a custom rule which will take the Tens die of the critical roll as crit dmg wounds, and if the roll is a dubs crit it triggers a Ulrics Furt Die (exploding 10). This is intended to add options for WFRP4e to simulate other crit dmg models like the popular WFRP2e feature Ulric's Fury.
+- New Custom Combat Rules, which can be configured in the settings tab. One for Twohanded weapons, changes Strike Mighty Blow to add another +1 dmg per lvl (total +2 per lvl) for all 2h melee weapons, and adds Twohanded Quality makes a Defender suffer -1 SL to his opposed melee test when attacked by a 2h weapon, unless he dodges which is not a melee test. And another for Melee defensive talents, which disables stacking of melee defensive talents, changes reversal test SL bonus when defending with melee parry weapons only (not including shields), and riposte test SL bonus removed. This allow for a alternate combat model which is a bit more gritty with less def SL stacking and makes 2h a bit more viable.
+- Fix NPC crit rolls not always working. Also fully compatible with the new crit wound options.
+- Fix Char Roll showing when it should not.
+- Fix multiple fields showing incorrectly with new character sheets until certain values are set.
+
+
+Dec 14th 2024 v1.74b
+
+- New Custom Race option added to Race dropdown menu, will allow entering owna Custom Race name. See setting's tab for Custom Race Stating Characteristics Modifier, this allows the Char Roll to generate starting Charactistics for the Customer Race.reset to menu by clicking the X.
+- Fix issue with Dual Wield trigger checkbox not showing correctly in Declare Actions section.
+- Fix issue with impact/damaging not showing on Attack rolls with Size modifier Large Vs Small.
+- Fix mixed up Impact/Impale checkboxes on the NPC pages.
+- Fix Dangerous Quality fumble sometimes not showing when test Unit or 10s Die is 9.
+- Fix Warpstone Quality now only triggered on crit again.
+- Resolved some issues with dulpicate crit translations.
+- Cleaned up minor CSS file errors.
+
+
+Dec 14th 2024 v1.74a
+
+- Fix for Conditions not working
+
+
+Dec 12th 2024 v1.74
+
+- New Dwarf Player's Guide Talents, to support the new Dwarf career's. Talents with direct roll modifier are integrated, but some of the indirect ones are manually applied by the GM/players. Including new attack mode Whirlwind of Death. These Talents are intended for Dwarfs only, but sheet will allow any race to use them (at GM discretion).
+- New Grudges, option to switch between Goals or Grudges recording on the Background Tab. Dwarf Race PCs automatically switch to Grudges, but can be changed back manually if desired.
+- New Characteristics Auto Roller for new characters, for every officially supported Race. This will only show if Starting WeaponSkill and Fellowship are empty, like at PC creation.
+- All talent based situational SL modifiers (Grey ones) now have mouse over labels with their RAW test text added. To aid GM/player to determine if they should be added to the roll. 
+- Reworked the Weapon Quality configuration boxes, added more linear layout and alphabetized. New added are, Entangle to Melee weapon Qualities. And Crewed and Salvo to Ranged weapon Qualities.
+- Magic/Melee/Range Quickbar rework, new pop out buttons under the Combat Actions section. Declared Attack Options, e.g. Charge/Defensive/Called Shot/Frenzy/DW/Disarm etc, have all been moved to Declare Attack Options. Players must click these to enable talents add automatically to the Roll outcome. This simulates how Talent based Special Action options have to be called before attacking. 
+- Dual Wield is no longer a situational bonus, its now been moved in the Declared Attack Options section of the Melee Quickbar. Brining all these types of special attack actions into one place.
+- Distracted now correctly applies to all test rolls.
+- Warpstone Quality changed to the EiS version.
+
 
 Oct  9th 2024 v1.73a
 
