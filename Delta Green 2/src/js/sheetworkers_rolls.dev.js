@@ -803,8 +803,7 @@ var setRepeatingParametersAndInputNames = function setRepeatingParametersAndInpu
   } else {
     console.error("Section ".concat(section, " not found"));
   }
-}; //levelup character
-
+};
 
 var initializeRolls = function initializeRolls() {
   if (!_isInitialized) {
