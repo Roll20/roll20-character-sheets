@@ -10792,7 +10792,7 @@
                 case 'environment':
                 case 'feature':
                 case 'resiliency':
-                    query.title = getTranslationByKey(`${query.next === 'add_sixth_sense' ? 'add_sixth_sense' : 'set-' + query.next}`);
+                    query.title = getTranslationByKey(`${query.next === 'add_sixth_sense' ? 'choose-sixth-sense' : 'set-' + query.next}`);
                     query.options = '';
                     query.last = query.next;
                 break;
@@ -10822,7 +10822,7 @@
                 case 'resilient':
                 case 'sixth sense':
                     query.config_index = query.db.config.findIndex(c => c.name === query.next);
-                    query.title = getTranslationByKey(`choose-${query.next}`);
+                    query.title = getTranslationByKey(`choose-${query.next.toKebobCase()}`);
                     if (query.next === 'immunity') {
                         query.options = query.db.config[query.config_index].rank !== '' ?
                             `|${query.db.config[query.config_index].rank}` : '';
@@ -12261,6 +12261,14 @@
                             query.db.config[query.config_index].rank.splice(query.env_index, 1);
                         } else {
                             query.db.config[query.config_index].rank[query.env_index] = query[query.config_name];
+                        }
+                        if (query.next === 'write_sixth_sense') {
+                            const sixth_senses = [];
+                            for (let i = 0; i < cache.attrdb['sixth sense'].length; i++) {
+                                const sixth_index = cache.attrdb['sixth sense'][i].config.findIndex(c => c.name === 'sixth sense');
+                                Array.prototype.push.apply(sixth_senses, cache.attrdb['sixth sense'][i].config[sixth_index].rank);
+                            }
+                            set_values.static_character_capabilities_sixthsense = sixth_senses.sort().capitalize().join(", ");
                         }
                         set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
                     break;
