@@ -56,7 +56,7 @@ on("change:repeating_h2h", async (e) => {
   }
 
   // Exit if the sheetworker was doing something other than increasing the level.
-  if (e.sourceType === "sheetworker" && !e.sourceAttribute.endsWith("_level")) {
+  if (e.sourceType === "sheetworker" && !isNew && !e.sourceAttribute.endsWith("_level")) {
     return;
   }
   // Exit if only the name was changed.

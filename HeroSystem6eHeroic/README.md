@@ -373,6 +373,7 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 
 *First version by Villain In Glasses, August 1, 2021.*
 *Recent updates:*
+*March 7, 2025 adds Mental as a weapon damage type (Version 4.50).*
 *February 5, 2025 adds vehicle support (Version 4.40).*
 *January 25, 2025 adds damage type (killing, normal, and power) to the weapon worksheet (Version 4.10).*
 *January 3, 2025 to represent the sheet as of Version 4.02.*

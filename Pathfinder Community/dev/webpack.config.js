@@ -103,9 +103,17 @@ const webpackConfig = {
     }),
     new BuildCompletionPlugin(),
   ],
-  cache: {
-    type: 'filesystem', // Recommended for production builds
+  watch: mode === 'development' ? true : false,
+  watchOptions: {
+    ignored: ['**/node_modules', '**/dist', '**/prod'],
+    aggregateTimeout: 300,
   },
+  cache:
+    mode === 'production'
+      ? {
+          type: 'filesystem',
+        }
+      : false, // Disable cache in development mode
   optimization: {
     minimize: true,
     minimizer: [

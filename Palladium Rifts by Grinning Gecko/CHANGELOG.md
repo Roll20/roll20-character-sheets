@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.7.4] - 2025-03-30
+
+### Changed
+
+- Fix missing quote on "Output ISP/PPE/Damage usage to chat" attribute.
+
+## [1.7.3] - 2025-02-28
+
+### Changed
+
+- Fix import race condition that caused WPs and Combat Skills to be duplicated in the Modifier Picker.
+
 ## [1.7.2] - 2025-02-28
 
 ### Changed

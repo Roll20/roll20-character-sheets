@@ -442,21 +442,39 @@ async function updateSelection(name, selectionRowId, level) {
   await setAttrsAsync(attrs);
 }
 
+const pendingInserts = new Set(); // Track rows being inserted to prevent duplicates
 on(
   "change:repeating_bonuses:name \
   change:repeating_bonuses:level",
   async (e) => {
-    console.log("change:repeating_bonuses:name", e);
+    console.log("change:repeating_bonuses:name/level", e);
+
     const [r, section, rowId] = e.sourceAttribute.split("_");
+    if (!rowId) return;
+
     const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
     const levelKey = `repeating_bonuses_${rowId}_level`;
     const nameKey = `repeating_bonuses_${rowId}_name`;
+
     const a = await getAttrsAsync([selectionIdKey, levelKey, nameKey]);
-    console.log(a);
+
+    console.log(`Processed for ${rowId}:`, e.triggerName, a);
+
+    if (!a[nameKey] || !a[levelKey]) {
+      return; // Ensure both values exist before proceeding
+    }
+
     if (a[selectionIdKey]) {
       await updateSelection(a[nameKey], a[selectionIdKey], a[levelKey]);
     } else {
-      await insertSelection(a[nameKey], rowId, a[levelKey]);
+      if (!pendingInserts.has(rowId)) {
+        pendingInserts.add(rowId);
+        console.log(`Inserting selection for row ${rowId}`);
+        await insertSelection(a[nameKey], rowId, a[levelKey]);
+        pendingInserts.delete(rowId); // Remove from pending after insertion
+      } else {
+        console.log(`Skipping duplicate insert for row ${rowId}`);
+      }
     }
   }
 );

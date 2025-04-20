@@ -1,3 +1,70 @@
+# 2025-4-15
+
+- Fix some typos in the skill roll messages.
+- Fix crit roll lookups.
+- Fix subtle penalty Channeling/Mentalism.
+- Status and Injury penalty names were sometimes inconsistent.
+    - Move to statuspenalty and injurypenalty everywhere.
+    - Transitory data, so should not impact anyone.
+    - Fixes issue where penalties were not applying to attacks.
+- Treasure Law:
+    - Fix sizes on some weapons.
+    - Correctly specify attack tables on weapons.
+- Attacks:
+    - Add a button to remove target.
+    - Fix styling of the target drop downs.
+- Staus
+    - Add a button (three actually) to remove stuns
+- Creature
+    - Content complete
+    - Unscale creature hits.
+
+# 2025-4-1
+
+- Fix for the stat abbrievations used in skill summaries
+  - Add test too
+- Spell message nits:
+  - Remove the trailing . in the PP message
+  - Fix unbalanced brace in message for grace
+- Uses; clear per level count on level up
+- Remove purchase module.
+- Skills:
+  - forEachSkill has a completion callback
+
+# 2025-3-25
+
+- Tracker now shows skills correctly.
+- Creature Law: Template for Encounter Tables
+- Creature Law: Finish template for creatures
+- Treasure Law: Add will stat bonus
+- RRs: Swap the two RR rolls to be consistent with other stuff
+- RRs: Fix use of sub attributes
+- Skills; Fix uses for skills with specialisations in level up
+- Uses:
+  - Taking injuries tickles a use of 'bodydevelopment'
+  - Casting a spell tickles a use of 'powerdevelopment'
+  - Total uses >= Current uses (for new ones)t
+  - Display correct global counter for uses.
+- Roll/Lookup crit: Handle scaled crits a lot better.
+
+# 2025-3-18
+
+- Add whisper toggle - GM or Public
+- Add whisper toggle to basically every roll in the game
+- Tracker:
+  - Add a return to charactersheet
+  - Send skill data (not shown yet).
+
+# 2025-3-11
+
+- Lots of tracker updates.  Still not ready for primetime (but should not break anything)
+  - Basic layout
+  - Notes field
+  - Refresh
+- Othermod/parrymod now on the creature sheet
+- Sync othermod/parrymod 
+- New combat clears othermod and parrymod.
+
 # 2025-3-4
 
 - Defenses for creatures on Land, Sea and the Air (and climbing)
