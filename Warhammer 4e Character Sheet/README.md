@@ -81,6 +81,41 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+Mar 22nd 2025 v1.76
+
+- New High Elf Player's Guide support, including Yenlui and Talents for HE career's.
+- New Sword-dancing casting support, adds new spellbook page for Sword-dancing spells. And added to Quick Cast menu.
+- New High Magic (Qhaysh) added to list of Arcane Magic types, and channeling. And added to Quick Cast menu.
+- Simple Yenlui implementation for records only.
+- Added another 4 (total 8 now) Arcane Lore to talent's to support HE caster's learning all 8 colors.
+- Enhanced Spellbook/Arcane spells tab to support High Magic spell features, ie Sacrafice and Multi Wind spells. For record only, no logic to support this mechanic yet.
+- Creature Trait list added, found in the Talent Tab. Intended for Monsters/NPCs and special conditions.
+- Fixed Offhand weapon not adding Strike Might Blow dmg in the roll template.
+- Fixed skill test rolls showing the Drunk modifier when it wasnt actually applying to them.
+- Fixed Frenzy not always adding extra dmg to Melee attacks correctly
+- Fixed Entangle not working to Melee mainhand attacks
+
+
+Feb 19th 2025 v1.75c
+
+- Fixed alignment issue with coin swap buttons, which was not fixed last update.
+
+
+Feb 14th 2025 v1.75b
+
+- Fixed alignment issue with coin swap buttons
+- Fixed Weapon settings Magical Effects textarea sizing
+- Fixed Spell Quickbar header spacing
+- Fixed problem with Wounds calc not being correct if Larger the Average sized and changes to SB/TB/WPB where made. Only Race change will automatically reset Size and recalculate wounds.
+- Updated Sheet.json to add some of the recent custom setting defaults
+
+
+Feb 13th 2025 v1.75a
+
+- Translated sheet to Roll20 CSE Sanitization standard. No changes to layout or look.
+- Fixed problem with Dual wield Situational Bonuses showing in DW rolls when Custom Roll outcome was active on weapons.
+
+
 Jan 20th 2025 v1.75
 
 - Add Cantor Talent from Heart of Glass/Ubersreik Adventures 1, situational test bonus for entertain singing.

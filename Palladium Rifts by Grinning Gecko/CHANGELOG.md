@@ -1,6 +1,67 @@
 # Changelog
 
-## [1.6.0] - 2020-04-18
+## [1.7.4] - 2025-03-30
+
+### Changed
+
+- Fix missing quote on "Output ISP/PPE/Damage usage to chat" attribute.
+
+## [1.7.3] - 2025-02-28
+
+### Changed
+
+- Fix import race condition that caused WPs and Combat Skills to be duplicated in the Modifier Picker.
+
+## [1.7.2] - 2025-02-28
+
+### Changed
+
+- Fix issue where importing an Ability/Magic/Psionic with `addtobonuses` would cause it to get added to the Modifier Picker twice.
+- Fix issue with Trust/Intimidate/Charm/Impress roll buttons not showing Success or Failure.
+- Add PE Bonus as an optional modifier to Disease save, since if it's a Magic Disease, the PE is already factored in.
+- Fix issue with Active Profile Curse save.
+- Add PE Bonus as an optional modifier to Fatigue and Pain saves.
+- Add PP Bonus as an optional modifier to Maintain Balance.
+
+## [1.7.1] - 2025-02-14
+
+### Changed
+
+- Only copy attributes from Modifiers to the Profile Picker if they have a value.
+- Remove Perception from Saving Throws in the Active Profile.
+- Fix issue where importing would set the Level Acquired to the current character level.
+
+## [1.7.0] - 2025-02-08
+
+### Added
+
+- Add Damage to Ancient Weapon Proficiencies (applies to Pole Arm and Whip).
+- Add hideable YouTube tutorial link.
+- Output error message to chat when TT is clicked if the Active Profile has no attacks.
+- Add nameable Modern Damage 1, 2, and 3 to Modifiers and Profiles for extra damage types.
+
+### Changed
+
+- Add 20 to Turn Tracker initiative when a Natural 20 is rolled.
+- Fix some grid layout issues in Modifiers and Profiles.
+
+## [1.6.1] - 2025-01-27
+
+### Added
+
+- Add roll buttons to punch and kick damage.
+- Add kick damage to Supernatural Strength.
+- Add Ammo tracker to Profile tab.
+
+### Changed
+
+- Move Perception from Saving Throws to beside Initiative.
+- Active Profile columns now fill the width.
+- Fix issue where damage that rolls into the next layer now outputs the correct layer name.
+- Alternating colors on repeating rows, except in the Modifier Picker.
+- Fix issue where using a `+` in a skill modifier dialog would cause the roll to be 0.
+
+## [1.6.0] - 2022-04-18
 
 ### Added
 
