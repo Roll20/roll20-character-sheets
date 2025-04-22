@@ -1,259 +1,748 @@
-	// ==============================
-// === TABLES XP ===============
-// ==============================
-const xpSkillTable = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
-const xpBaseCosts = [0, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 90, 100];
+<!-- ======= ONGLET SELECTOR ======= -->
+<div class="onglets" style="display: flex; align-items: flex-end; gap: 2rem; flex-wrap: wrap;">
 
-// ==============================
-// === 1. COMPÉTENCES COMMUNES =
-// ==============================
-const commonSkills = {
-  armessimples: "arm", camouflage: "nin", cac: "tai", esquive: "tai",
-  gensou: "gen", henge: "nin", kawarimi: "gen", mental: "esp",
-  parade: "arm", physique: "cor", survie: "nin", vigilance: "nin"
-};
+<!-- Sélecteur du village -->
+<div style="display: flex; flex-direction: column;">
+  <select name="attr_village">
+    <option value="">-- Choisir un village --</option>
+    <option value="https://files.d20.io/images/437618135/OFzexWgB3BU18N4zuExEQQ/original.jpg?174504396555">Konoha</option>
+    <option value="https://files.d20.io/images/437618132/b8dznpmz1sZVZ8JU1GR3_g/original.png?17450439655">Suna</option>
+    <option value="https://files.d20.io/images/437618133/lBfGDqaN3jMuheNpVE-vig/original.jpg?17450439665">Kiri</option>
+    <option value="https://files.d20.io/images/437618136/FdE4evNpAIXQB-FFPsv1vw/original.jpg?17450439655">Iwa</option>
+    <option value="https://files.d20.io/images/437618137/eUcKcx-KcmahOCxcp3baUw/original.jpg?174504396555">Kumo</option>
+  </select>
 
-for (const skill in commonSkills) {
-  const baseAttr = commonSkills[skill];
-  on(`change:scmp_${skill} change:${baseAttr} sheet:opened`, () => {
-    getAttrs([`scmp_${skill}`, baseAttr], values => {
-      const base = parseInt(values[baseAttr]) || 0;
-      const mod = parseInt(values[`scmp_${skill}`]) || 0;
-      setAttrs({ [`stcmp_${skill}`]: base + mod });
-    });
-  });
-}
+  <!-- Logo du village avec <img> -->
+  <img name="attr_village_logo" style="width:64px;height:64px;margin-top:5px;">
+</div>
 
-// =========================================
-// === 2. XP DES CARACTÉRISTIQUES (base) ===
-// =========================================
-const baseAttrs = ['cor', 'esp', 'arm', 'tai', 'nin', 'gen', 'lign'];
+  
+  <!-- ======= SECTION IDENTITÉ (ONGLET MAIN) ======= -->
+  <div class="section-identite">
+	<h2>Identité</h2>
+  
+	<label>Prénom :
+	  <input type="text" name="attr_prenom">
+	</label>
+  
+	<label>Clan :
+	  <select name="attr_clan">
+		<option value="">-- Choisir un clan --</option>
+		<option value="Aburame">Aburame</option>
+		<option value="Akaba">Akaba</option>
+		<option value="Akimichi">Akimichi</option>
+		<option value="Aniki">Aniki</option>
+		<option value="Ao">Ao</option>
+		<option value="Eshimuro">Eshimuro</option>
+		<option value="Hyuga">Hyuga</option>
+		<option value="Inuzuka">Inuzuka</option>
+		<option value="Ishida">Ishida</option>
+		<option value="Kagayaki">Kagayaki</option>
+		<option value="Kato">Kato</option>
+		<option value="Kenta">Kenta</option>
+		<option value="Kurama">Kurama</option>
+		<option value="Mitokado">Mitokado</option>
+		<option value="Morino">Morino</option>
+		<option value="Munefuda">Munefuda</option>
+		<option value="Nara">Nara</option>
+		<option value="Sarutobi">Sarutobi</option>
+		<option value="Senju">Senju</option>
+		<option value="Shimadoku">Shimadoku</option>
+		<option value="Shimura">Shimura</option>
+		<option value="Takeda">Takeda</option>
+		<option value="Uchiha">Uchiha</option>
+		<option value="Utatane">Utatane</option>
+		<option value="Yamanaka">Yamanaka</option>
+		<option value="Hachimon">Lignée — Hachimon (LIGN)</option>
+		<option value="Kriegstier">Lignée — Kriegstier (LIGN)</option>
+		<option value="Ninpō">Lignée — Ninpō (LIGN)</option>
+		<option value="Shōkan-shi">Lignée — Shōkan-shi (LIGN)</option>
+	  </select>
+	</label>
+  
+	<p>
+	  Invoquer une action de lignée :
+	  <button type="roll" name="roll_lignee" value="@{character_name} veut faire une action de lignée !">🎲</button>
+	</p>
+  
+	<label>Grade :
+	  <select name="attr_grade">
+		<option value="">-- Choisir un grade --</option>
+		<option value="Genin">Genin</option>
+		<option value="Chūnin">Chūnin</option>
+		<option value="Jōnin">Jōnin</option>
+		<option value="Sensei">Sensei</option>
+		<option value="Sannin">Sannin</option>
+		<option value="Kage">Kage</option>
+	  </select>
+	</label>
+  </div>
+  
+  <div class="section-xp">
+	<h2>Expérience (XP)</h2>
+	<label>
+	  XP Totale :
+	  <input type="number" name="attr_xp_total" value="0">
+	</label>
+	<label>
+	  XP Utilisée :
+	  <input type="number" name="attr_xp_utilisee" readonly>
+	</label>
+	<label>
+	  XP Restante :
+	  <input type="number" name="attr_xp_restante" readonly>
+	</label>
+  </div>
+	
+<!-- ======= SECTION CARACTÉRISTIQUES DE BASE ======= -->
+<div class="section-caracteristiques">
+	<h2>Caractéristiques de base</h2>
+  
+	<div class="carac-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
+	  
+	  <label>
+		COR :
+		<input type="number" name="attr_cor" value="1" min="1">
+		<input type="number" name="attr_xp_cor" readonly style="width: 50px;" title="XP COR">
+	  </label>
+  
+	  <label>
+		ESP :
+		<input type="number" name="attr_esp" value="1" min="1">
+		<input type="number" name="attr_xp_esp" readonly style="width: 50px;" title="XP ESP">
+	  </label>
+  
+	  <label>
+		ARM :
+		<input type="number" name="attr_arm" value="1" min="1">
+		<input type="number" name="attr_xp_arm" readonly style="width: 50px;" title="XP ARM">
+	  </label>
+  
+	  <label>
+		TAI :
+		<input type="number" name="attr_tai" value="1" min="1">
+		<input type="number" name="attr_xp_tai" readonly style="width: 50px;" title="XP TAI">
+	  </label>
+  
+	  <label>
+		NIN :
+		<input type="number" name="attr_nin" value="1" min="1">
+		<input type="number" name="attr_xp_nin" readonly style="width: 50px;" title="XP NIN">
+	  </label>
+  
+	  <label>
+		GEN :
+		<input type="number" name="attr_gen" value="1" min="1">
+		<input type="number" name="attr_xp_gen" readonly style="width: 50px;" title="XP GEN">
+	  </label>
+  
+	  <label>
+		LIGN :
+		<input type="number" name="attr_lign" value="1" min="1">
+		<input type="number" name="attr_xp_lign" readonly style="width: 50px;" title="XP LIGN">
+	  </label>
+  
+	</div>
+  </div>
+  
+<!-- ====== BONUS SPÉCIAL ====== -->
+<div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+	<label style="flex: 1;">
+	  <input type="checkbox" name="attr_bonus_actif">
+	  Activer un bonus spécial
+	</label>
+  
+	<label style="flex: 2;">
+	  Cible du bonus :
+	  <select name="attr_bonus_type">
+		<option value="">-- Choisir --</option>
+		<option value="chakra">Chakra +50</option>
+		<option value="vigueur">Vigueur +1</option>
+		<option value="caractere">Caractère +1</option>
+	  </select>
+	</label>
+  </div>
+  
+<!-- ======= SECTION STATS SECONDAIRES ======= -->
+<div class="section-secondaires">
+	<h2>Caractéristiques secondaires</h2>
+  
+	<div class="degats-grid" style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: space-between;">
+  
+	  <!-- Colonne gauche -->
+	  <div class="secondaires-col" style="flex: 1; min-width: 240px;">
+		<label>
+		  Interceptions ARM :
+		  <input type="number" name="attr_interceptions_arm" readonly>
+		</label>
+  
+		<label>
+		  Interceptions TAI :
+		  <input type="number" name="attr_interceptions_tai" readonly>
+		</label>
+  
+		<label>
+		  Vigueur :
+		  <input type="number" name="attr_vigueur" readonly>
+		</label>
+  
+		<label>
+		  Caractère :
+		  <input type="number" name="attr_caractere" readonly>
+		</label>
+	  </div>
+  
+	  <!-- Colonne droite : Dégâts -->
+	  <div class="degats-col" style="flex: 1; min-width: 240px;">
+		<label>Dégâts ARM :</label>
+		<div class="degats-row" style="display: flex; gap: 0.5rem;">
+		  <input type="number" name="attr_degats_arm_base" readonly placeholder="Base">
+		  <input type="number" name="attr_degats_arm_bonus" value="0" placeholder="Bonus">
+		  <input type="number" name="attr_degats_arm" readonly placeholder="Total">
+		</div>
+  
+		<label>Dégâts TAI :</label>
+		<div class="degats-row" style="display: flex; gap: 0.5rem;">
+		  <input type="number" name="attr_degats_tai_base" readonly placeholder="Base">
+		  <input type="number" name="attr_degats_tai_bonus" value="0" placeholder="Bonus">
+		  <input type="number" name="attr_degats_tai" readonly placeholder="Total">
+		</div>
+  
+		<label>Dégâts GEN :</label>
+		<div class="degats-row" style="display: flex; gap: 0.5rem;">
+		  <input type="number" name="attr_degats_gen_base" readonly placeholder="Base">
+		  <input type="number" name="attr_bonus_degats_gen" value="0" placeholder="Bonus">
+		  <input type="number" name="attr_degats_gen" readonly placeholder="Total">
+		</div>
+  
+		<label>Dégâts NIN :</label>
+		<div class="degats-row" style="display: flex; gap: 0.5rem;">
+		  <input type="number" name="attr_degats_nin_base" readonly placeholder="Base">
+		  <input type="number" name="attr_bonus_degats_nin" value="0" placeholder="Bonus">
+		  <input type="number" name="attr_degats_nin" readonly placeholder="Total">
+		</div>
+	  </div>
+	</div>
+  
+	<!-- Initiative -->
+	<div style="margin-top: 1rem;">
+	  <label>
+		Initiative :
+		<input type="number" name="attr_initiative" readonly>
+	  </label>
+  
+	  <button type="roll"
+		name="roll_initiative"
+		value="/roll 1d10!! + @{initiative} &{tracker} {{name=Initiative}} {{Personnage=@{character_name}}} {{Résultat=[[1d10!! + @{initiative}]]}}">
+		Lancer Initiative
+	  </button>
+	</div>
+  </div>
+  
+  
 
-baseAttrs.forEach(attr => {
-  on(`change:${attr}`, () => {
-    getAttrs([attr], values => {
-      let score = parseInt(values[attr]) || 1;
-      score = Math.min(score, xpBaseCosts.length - 1);
-      const cost = xpBaseCosts.slice(1, score).reduce((a, b) => a + b, 0);
-      setAttrs({ [`xp_${attr}`]: cost });
-    });
-  });
-});
+<!-- ======= SECTION CHAKRA ======= -->
+<div class="section-chakra">
+	<h2>Chakra</h2>
+  
+	<!-- Chakra global -->
+	<div class="chakra-grid" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+	  <label>
+		Chakra total :
+		<input type="number" name="attr_chakra" readonly>
+	  </label>
+  
+	  <label>
+		Perte actuelle :
+		<input type="number" name="attr_chakra_perdu" value="0">
+	  </label>
+  
+	  <label>
+		Chakra restant :
+		<input type="number" name="attr_chakra_restant" readonly>
+	  </label>
+	</div>
+  
+	<!-- Infos liées à la gestion du chakra -->
+	<div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+	  <label>
+		Régénération / tour :
+		<input type="number" name="attr_regen" step="0.01" readonly>
+	  </label>
+  
+	  <label>
+		Contrôle du chakra :
+		<input type="number" name="attr_controle" readonly>
+	  </label>
+  
+	  <label>
+		Nindō (max 10) :
+		<input type="number" name="attr_nindo" min="0" max="10" value="0">
+	  </label>
+  
+	  <label>
+		Spécialisations disponibles :
+		<input type="number" name="attr_specialisation_chakra" readonly>
+	  </label>
+  
+	  <label>
+		Total de spécialisations utilisées :
+		<input type="number" name="attr_chakra_specialisation_total" readonly>
+	  </label>
+	</div>
+  </div>
+  
 
-// ===========================================
-// === 3. CALCUL DU CHAKRA TOTAL & RESTANT ===
-// ===========================================
-on("change:cor change:esp change:chakra_colossal change:chakra_endurci change:chakra_imperieux sheet:opened", () => {
-  getAttrs(["cor", "esp", "chakra_colossal", "chakra_endurci", "chakra_imperieux", "chakra_restant"], values => {
-    const toInt = v => parseInt(v) || 0;
+  
+<!-- ======= SECTION BLESSURES ======= -->
+<div class="section-blessures">
+	<h2>Crans de blessure</h2>
+  
+	<div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+  
+	  <!-- Colonne 1 : États standards -->
+	  <div class="cran-container">
+  
+		<!-- Fatigue -->
+		<fieldset class="cran-fatigue">
+		  <legend>Fatigue</legend>
+		  <label><input type="checkbox" name="attr_fatigue1"> Fatigue 1</label>
+		  <label><input type="checkbox" name="attr_fatigue2"> Fatigue 2</label>
+		</fieldset>
+  
+		<!-- Sonné -->
+		<fieldset class="cran-sonne">
+		  <legend>Sonné</legend>
+		  <label><input type="checkbox" name="attr_sonne"> Sonné</label>
+		</fieldset>
+  
+		<!-- Blessures -->
+		<fieldset class="cran-blessures">
+		  <legend>Blessures</legend>
+		  <label><input type="checkbox" name="attr_blessure1"> Blessure 1</label>
+		  <label><input type="checkbox" name="attr_blessure2"> Blessure 2</label>
+		  <label><input type="checkbox" name="attr_blessure3"> Blessure 3</label>
+		</fieldset>
+	  </div>
+  
+<!-- Colonne 2 : Crans supplémentaires -->
+<div class="cran-container">
 
-    const totalChakra =
-      (toInt(values.cor) * 50) +
-      (toInt(values.esp) * 50) +
-      (toInt(values.chakra_colossal) * 100) +
-      (toInt(values.chakra_endurci) * 50) +
-      (toInt(values.chakra_imperieux) * 50);
+	<!-- Activation des crans avancés -->
+	<label style="margin-bottom: 0.5rem;">
+	  <input type="checkbox" name="attr_mode_blessures_avancees">
+	  Activer les blessures avancées
+	</label>
+  
+	<!-- Fatigue Optionnelle -->
+	<fieldset class="cran-fatigue-optionnelle">
+	  <legend>Fatigue Supplémentaire</legend>
+	  <label><input type="checkbox" name="attr_fatigue_a"> Fatigue A</label>
+	  <label><input type="checkbox" name="attr_fatigue_b"> Fatigue B</label>
+	</fieldset>
+  
+	<!-- Blessures Supplémentaires -->
+	<fieldset class="cran-blessures-sup">
+	  <legend>Blessures Supplémentaires</legend>
+	  <label><input type="checkbox" name="attr_blessure4"> Blessure 4</label>
+	  <label><input type="checkbox" name="attr_blessure5"> Blessure 5</label>
+	  <label><input type="checkbox" name="attr_blessure6"> Blessure 6</label>
+	</fieldset>
+  </div>
+  
 
-    const actuel = parseInt(values.chakra_restant);
-    const restant = isNaN(actuel) || actuel === 0 ? totalChakra : actuel;
+<!-- ======= SECTION COMPÉTENCES COMMUNES ======= -->
+<div class="section-competences">
+	<h2>Compétences communes</h2>
+  
+	<table>
+	  <thead>
+		<tr>
+		  <th>Compétence</th>
+		  <th>Score</th>
+		  <th>Total</th>
+		  <th>Commentaire</th>
+		  <th>XP</th>
+		</tr>
+	  </thead>
+	  <tbody>
+  
+		<!-- Compétence : Armes Simples (ARM) -->
+		<tr>
+		  <td>Armes simples (ARM)
+			<button type="roll" name="roll_armessimples"
+			  value="/roll 1d10!! + @{stcmp_armessimples} + ?{Bonus|0} &{template:default} {{name=Jet d'Armes Simples}} {{Résultat=[[1d10!! + @{stcmp_armessimples} + ?{Bonus|0}]]}}">
+			</button>
+		  </td>
+		  <td><input type="number" name="attr_scmp_armessimples" /></td>
+		  <td><input type="number" name="attr_stcmp_armessimples" readonly /></td>
+		  <td><input type="text" name="attr_comment_armessimples" /></td>
+		  <td><input type="number" name="attr_xp_scmp_armessimples" readonly /></td>
+		</tr>
+  
+		<!-- Camouflage (NIN) -->
+		<tr>
+		  <td>Camouflage (NIN)
+			<button type="roll" name="roll_camouflage"
+			  value="/roll 1d10!! + @{stcmp_camouflage} + ?{Bonus|0} &{template:default} {{name=Jet de Camouflage}} {{Résultat=[[1d10!! + @{stcmp_camouflage} + ?{Bonus|0}]]}}">
+			</button>
+		  </td>
+		  <td><input type="number" name="attr_scmp_camouflage" /></td>
+		  <td><input type="number" name="attr_stcmp_camouflage" readonly /></td>
+		  <td><input type="text" name="attr_comment_camouflage" /></td>
+		  <td><input type="number" name="attr_xp_scmp_camouflage" readonly /></td>
+		</tr>
+  
+		<!-- Corps à corps (TAI) -->
+		<tr>
+		  <td>Corps à corps (TAI)
+			<button type="roll" name="roll_cac"
+			  value="/roll 1d10!! + @{stcmp_cac} + ?{Bonus|0} &{template:default} {{name=Jet de CAC}} {{Résultat=[[1d10!! + @{stcmp_cac} + ?{Bonus|0}]]}}">
+			</button>
+		  </td>
+		  <td><input type="number" name="attr_scmp_cac" /></td>
+		  <td><input type="number" name="attr_stcmp_cac" readonly /></td>
+		  <td><input type="text" name="attr_comment_cac" /></td>
+		  <td><input type="number" name="attr_xp_scmp_cac" readonly /></td>
+		</tr>
+  
+		<!-- Esquive (TAI) -->
+		<tr>
+		  <td>Esquive (TAI)
+			<button type="roll" name="roll_esquive"
+			  value="/roll 1d10!! + @{stcmp_esquive} + ?{Bonus|0} &{template:default} {{name=Jet d'Esquive}} {{Résultat=[[1d10!! + @{stcmp_esquive} + ?{Bonus|0}]]}}">
+			</button>
+		  </td>
+		  <td><input type="number" name="attr_scmp_esquive" /></td>
+		  <td><input type="number" name="attr_stcmp_esquive" readonly /></td>
+		  <td><input type="text" name="attr_comment_esquive" /></td>
+		  <td><input type="number" name="attr_xp_scmp_esquive" readonly /></td>
+		</tr>
+  
+		<!-- Gensou (GEN) -->
+		<tr>
+		  <td>Gensou (GEN)
+			<button type="roll" name="roll_gensou"
+			  value="/roll 1d10!! + @{stcmp_gensou} + ?{Bonus|0} &{template:default} {{name=Jet de Gensou}} {{Résultat=[[1d10!! + @{stcmp_gensou} + ?{Bonus|0}]]}}">
+			</button>
+		  </td>
+		  <td><input type="number" name="attr_scmp_gensou" /></td>
+		  <td><input type="number" name="attr_stcmp_gensou" readonly /></td>
+		  <td><input type="text" name="attr_comment_gensou" /></td>
+		  <td><input type="number" name="attr_xp_scmp_gensou" readonly /></td>
+		</tr>
+  
+		<!-- Henge (NIN) -->
+		<tr>
+		  <td>Henge (NIN)
+			<button type="roll" name="roll_henge"
+			  value="/roll 1d10!! + @{stcmp_henge} + ?{Bonus|0} &{template:default} {{name=Jet de Henge}} {{Résultat=[[1d10!! + @{stcmp_henge} + ?{Bonus|0}]]}}">
+			</button>
+		  </td>
+		  <td><input type="number" name="attr_scmp_henge" /></td>
+		  <td><input type="number" name="attr_stcmp_henge" readonly /></td>
+		  <td><input type="text" name="attr_comment_henge" /></td>
+		  <td><input type="number" name="attr_xp_scmp_henge" readonly /></td>
+		</tr>
+  
+		<!-- Kawarimi (GEN) -->
+		<tr>
+		  <td>Kawarimi (GEN)
+			<button type="roll" name="roll_kawarimi"
+			  value="/roll 1d10!! + @{stcmp_kawarimi} + ?{Bonus|0} &{template:default} {{name=Jet de Kawarimi}} {{Résultat=[[1d10!! + @{stcmp_kawarimi} + ?{Bonus|0}]]}}">
+			</button>
+		  </td>
+		  <td><input type="number" name="attr_scmp_kawarimi" /></td>
+		  <td><input type="number" name="attr_stcmp_kawarimi" readonly /></td>
+		  <td><input type="text" name="attr_comment_kawarimi" /></td>
+		  <td><input type="number" name="attr_xp_scmp_kawarimi" readonly /></td>
+		</tr>
+  
+		<!-- Mental (ESP) -->
+		<tr>
+		  <td>Mental (ESP)
+			<button type="roll" name="roll_mental"
+			  value="/roll 1d10!! + @{stcmp_mental} + ?{Bonus|0} &{template:default} {{name=Jet de Mental}} {{Résultat=[[1d10!! + @{stcmp_mental} + ?{Bonus|0}]]}}">
+			</button>
+		  </td>
+		  <td><input type="number" name="attr_scmp_mental" /></td>
+		  <td><input type="number" name="attr_stcmp_mental" readonly /></td>
+		  <td><input type="text" name="attr_comment_mental" /></td>
+		  <td><input type="number" name="attr_xp_scmp_mental" readonly /></td>
+		</tr>
+  
+		<!-- Parade (ARM) -->
+		<tr>
+		  <td>Parade (ARM)
+			<button type="roll" name="roll_parade"
+			  value="/roll 1d10!! + @{stcmp_parade} + ?{Bonus|0} &{template:default} {{name=Jet de Parade}} {{Résultat=[[1d10!! + @{stcmp_parade} + ?{Bonus|0}]]}}">
+			</button>
+		  </td>
+		  <td><input type="number" name="attr_scmp_parade" /></td>
+		  <td><input type="number" name="attr_stcmp_parade" readonly /></td>
+		  <td><input type="text" name="attr_comment_parade" /></td>
+		  <td><input type="number" name="attr_xp_scmp_parade" readonly /></td>
+		</tr>
+  
+		<!-- Physique (COR) -->
+		<tr>
+		  <td>Physique (COR)
+			<button type="roll" name="roll_physique"
+			  value="/roll 1d10!! + @{stcmp_physique} + ?{Bonus|0} &{template:default} {{name=Jet de Physique}} {{Résultat=[[1d10!! + @{stcmp_physique} + ?{Bonus|0}]]}}">
+			</button>
+		  </td>
+		  <td><input type="number" name="attr_scmp_physique" /></td>
+		  <td><input type="number" name="attr_stcmp_physique" readonly /></td>
+		  <td><input type="text" name="attr_comment_physique" /></td>
+		  <td><input type="number" name="attr_xp_scmp_physique" readonly /></td>
+		</tr>
+  
+		<!-- Survie (NIN) -->
+		<tr>
+		  <td>Survie (NIN)
+			<button type="roll" name="roll_survie"
+			  value="/roll 1d10!! + @{stcmp_survie} + ?{Bonus|0} &{template:default} {{name=Jet de Survie}} {{Résultat=[[1d10!! + @{stcmp_survie} + ?{Bonus|0}]]}}">
+			</button>
+		  </td>
+		  <td><input type="number" name="attr_scmp_survie" /></td>
+		  <td><input type="number" name="attr_stcmp_survie" readonly /></td>
+		  <td><input type="text" name="attr_comment_survie" /></td>
+		  <td><input type="number" name="attr_xp_scmp_survie" readonly /></td>
+		</tr>
+  
+		<!-- Vigilance (NIN) -->
+		<tr>
+		  <td>Vigilance (NIN)
+			<button type="roll" name="roll_vigilance"
+			  value="/roll 1d10!! + @{stcmp_vigilance} + ?{Bonus|0} &{template:default} {{name=Jet de Vigilance}} {{Résultat=[[1d10!! + @{stcmp_vigilance} + ?{Bonus|0}]]}}">
+			</button>
+		  </td>
+		  <td><input type="number" name="attr_scmp_vigilance" /></td>
+		  <td><input type="number" name="attr_stcmp_vigilance" readonly /></td>
+		  <td><input type="text" name="attr_comment_vigilance" /></td>
+		  <td><input type="number" name="attr_xp_scmp_vigilance" readonly /></td>
+		</tr>
+  
+	  </tbody>
+	</table>
+  </div>
+  
 
-    setAttrs({
-      chakra: totalChakra,
-      chakra_restant: restant
-    });
-  });
-});
-
-// ===============================
-// === 4. STATS SECONDAIRES =====
-// ===============================
-on("change:cor change:esp change:arm change:tai change:nin change:gen change:chakra change:chakra_endurci change:chakra_imperieux change:chakra_fulgurant change:stcmp_physique sheet:opened", () => {
-  getAttrs([
-    "cor", "esp", "arm", "tai", "nin", "gen", "chakra", "chakra_endurci",
-    "chakra_imperieux", "chakra_fulgurant", "stcmp_physique"
-  ], values => {
-    const toInt = v => parseInt(values[v]) || 0;
-
-    const cor = toInt("cor");
-    const esp = toInt("esp");
-    const arm = toInt("arm");
-    const tai = toInt("tai");
-
-    const controle = cor + esp;
-    let spe = 1;
-    if (controle >= 5 && controle <= 9) spe = 2;
-    else if (controle >= 10 && controle <= 13) spe = 4;
-    else if (controle >= 14 && controle <= 19) spe = 6;
-    else if (controle >= 20) spe = 9;
-
-    const initiative = toInt("stcmp_physique") + (toInt("chakra_fulgurant") * 2);
-    const vigueur = cor + 2 + toInt("chakra_endurci");
-    const caractere = esp + 2 + toInt("chakra_imperieux");
-    const regen = Math.floor(toInt("chakra") * (spe * 0.01));
-    const interceptions_arm = Math.floor(arm / 2);
-    const interceptions_tai = Math.floor(tai / 2);
-
-    setAttrs({
-      controle,
-      specialisation_chakra: spe,
-      initiative,
-      vigueur,
-      caractere,
-      regen,
-      interceptions_arm,
-      interceptions_tai
-    });
-  });
-});
-
-// ===============================
-// === 5. DÉGÂTS ================
-// ===============================
-on("change:cor change:arm change:tai change:gen change:nin change:chakra_acere change:chakra_explosif change:bonus_degats_gen change:bonus_degats_nin change:degats_tai_bonus change:degats_arm_bonus sheet:opened", () => {
-  getAttrs([
-    "cor", "arm", "tai", "gen", "nin",
-    "chakra_acere", "chakra_explosif",
-    "bonus_degats_gen", "bonus_degats_nin",
-    "degats_tai_bonus", "degats_arm_bonus"
-  ], values => {
-    const toInt = v => parseInt(values[v]) || 0;
-
-    const baseArm = toInt("cor") + toInt("arm") + toInt("chakra_acere");
-    const baseTai = toInt("cor") + toInt("tai") + toInt("chakra_explosif");
-    const baseGen = toInt("gen") + 1;
-    const baseNin = toInt("nin") + 1;
-
-    setAttrs({
-      degats_arm_base: baseArm,
-      degats_tai_base: baseTai,
-      degats_gen_base: baseGen,
-      degats_nin_base: baseNin,
-      degats_arm: baseArm + toInt("degats_arm_bonus"),
-      degats_tai: baseTai + toInt("degats_tai_bonus"),
-      degats_gen: baseGen + toInt("bonus_degats_gen"),
-      degats_nin: baseNin + toInt("bonus_degats_nin")
-    });
-  });
-});
-
-// ============================================
-// === 6. XP COMPÉTENCES COMMUNES ============
-// ============================================
-Object.keys(commonSkills).forEach(skill => {
-  on(`change:scmp_${skill}`, () => {
-    getAttrs([`scmp_${skill}`], values => {
-      const score = Math.min(parseInt(values[`scmp_${skill}`]) || 1, xpSkillTable.length);
-      const xp = xpSkillTable.slice(1, score).reduce((a, b) => a + b, 0);
-      setAttrs({ [`xp_scmp_${skill}`]: xp });
-    });
-  });
-});
-
-// ==============================================
-// === 7. XP DES COMPÉTENCES SPÉCIFIQUES (REP) ===
-// ==============================================
-on("change:repeating_cmpspe:scmps change:repeating_cmpspe:nom_cmps", function (eventInfo) {
-  const rowId = eventInfo.sourceAttribute.split("_")[2];
-  getAttrs([`repeating_cmpspe_${rowId}_nom_cmps`, `repeating_cmpspe_${rowId}_scmps`], function (values) {
-    const attrBase = values[`repeating_cmpspe_${rowId}_nom_cmps`];
-    const mod = parseInt(values[`repeating_cmpspe_${rowId}_scmps`]) || 0;
-
-    getAttrs([attrBase], function (baseValues) {
-      const base = parseInt(baseValues[attrBase]) || 0;
-      const total = base + mod;
-      const xp = xpSkillTable.slice(1, mod).reduce((a, b) => a + b, 0);
-
-      setAttrs({
-        [`repeating_cmpspe_${rowId}_stcmps`]: total,
-        [`repeating_cmpspe_${rowId}_xp_cmps`]: xp
-      });
-    });
-  });
-});
-
-// =========================================
-// === 8. XP TOTALE UTILISÉE & RESTANTE ====
-// =========================================
-function calculateTotalXP() {
-  getSectionIDs("repeating_cmpspe", ids => {
-    const attrs = ["xp_total", ...baseAttrs.map(a => `xp_${a}`), ...Object.keys(commonSkills).map(s => `xp_scmp_${s}`)];
-    ids.forEach(id => attrs.push(`repeating_cmpspe_${id}_xp_cmps`));
-
-    getAttrs(attrs, values => {
-      let totalXP = 0;
-
-      baseAttrs.forEach(attr => totalXP += parseInt(values[`xp_${attr}`]) || 0);
-      Object.keys(commonSkills).forEach(skill => totalXP += parseInt(values[`xp_scmp_${skill}`]) || 0);
-      ids.forEach(id => totalXP += parseInt(values[`repeating_cmpspe_${id}_xp_cmps`]) || 0);
-
-      const total = parseInt(values.xp_total) || 0;
-      setAttrs({
-        xp_utilisee: totalXP,
-        xp_restante: total - totalXP
-      });
-    });
-  });
-}
-on("change:xp_total sheet:opened", calculateTotalXP);
-baseAttrs.forEach(attr => on(`change:xp_${attr}`, calculateTotalXP));
-Object.keys(commonSkills).forEach(skill => on(`change:xp_scmp_${skill}`, calculateTotalXP));
-on("change:repeating_cmpspe:xp_cmps", calculateTotalXP);
-
-// ===============================
-// === LOGO DU VILLAGE ======
-// ===============================
-
-on("change:village sheet:opened", () => {
-	getAttrs(["village"], values => {
-	  const logoURL = values.village || "";
-	  setAttrs({ village_logo: logoURL });
-	});
-  });
+ <!-- ======= SECTION COMPÉTENCES SPÉCIFIQUES ======= -->
+<div class="section-competences">
+	<h2>Compétences spécifiques (combat, terrain, clan, etc.)</h2>
+  
+	<fieldset class="repeating_cmpspe">
+	  <table>
+		<thead>
+		  <tr>
+			<th>Compétence</th>
+			<th>Score Perso</th>
+			<th>Total (Base + Mod)</th>
+			<th>Commentaire</th>
+			<th>XP</th>
+		  </tr>
+		</thead>
+		<tbody>
+		  <tr>
+			<td>
+			  <select name="attr_nom_cmps">
+				<option value="arm">Armes Exotiques (ARM)</option>
+				<option value="tai">Chūken (TAI)</option>
+				<option value="esp">Collecte d'infos (ESP)</option>
+				<option value="arm">Coup Spécial (ARM)</option>
+				<option value="tai">Coup Spécial (TAI)</option>
+				<option value="nin">Doton (NIN)</option>
+				<option value="esp">Éducation (ESP)</option>
+				<option value="nin">Empathie (NIN)</option>
+				<option value="gen">Faux Semblants (GEN)</option>
+				<option value="gen">Fūin (GEN)</option>
+				<option value="nin">Futon (NIN)</option>
+				<option value="tai">Gōken (TAI)</option>
+				<option value="cor">Intimidation (COR)</option>
+				<option value="gen">Iryō (GEN)</option>
+				<option value="tai">Jūken (TAI)</option>
+				<option value="nin">Katon (NIN)</option>
+				<option value="gen">Kuchiyose (GEN)</option>
+				<option value="esp">Lois & Traditions (ESP)</option>
+				<option value="tai">Manipulation (TAI)</option>
+				<option value="esp">Médecine (ESP)</option>
+				<option value="cor">Premiers Soins (COR)</option>
+				<option value="nin">Raïton (NIN)</option>
+				<option value="cor">Régénération (COR)</option>
+				<option value="nin">Rés. Élémentaires (NIN)</option>
+				<option value="cor">Rés. Environnementales (COR)</option>
+				<option value="esp">Rés. Psychiques (ESP)</option>
+				<option value="cor">Rés. Physiques (COR)</option>
+				<option value="arm">Science des Explosifs (ARM)</option>
+				<option value="arm">Science des Pièges (ARM)</option>
+				<option value="nin">Science des Drogues (NIN)</option>
+				<option value="nin">Science des Poisons (NIN)</option>
+				<option value="gen">Sentinelle (GEN)</option>
+				<option value="gen">Sixième Sens (GEN)</option>
+				<option value="nin">Suiton (NIN)</option>
+				<option value="arm">Technologie (ARM)</option>
+				<option value="gen">Yūryoku (GEN)</option>
+				<option value="nin">Jiton (NIN)</option>
+				<option value="nin">Kage (NIN)</option>
+				<option value="nin">Kikaichū (NIN)</option>
+				<option value="nin">Mokuton (NIN)</option>
+				<option value="nin">Sumi (NIN)</option>
+			  </select>
+  
+			  <button type="roll" name="roll_cmps"
+				value="/roll 1d10!! + @{repeating_cmpspe_stcmps} + ?{Bonus/Malus ?|0} &{template:default} {{name=Jet de @{repeating_cmpspe_nom_cmps}}} {{Personnage=@{character_name}}} {{Résultat=[[1d10!! + @{repeating_cmpspe_stcmps} + ?{Bonus/Malus ?|0}]]}}">
+			  </button>
+			</td>
+  
+			<td>
+			  <input type="number" name="attr_scmps" value="0" />
+			</td>
+  
+			<td>
+			  <input type="number" name="attr_stcmps" readonly />
+			</td>
+  
+			<td>
+			  <input type="text" name="attr_comment_cmps" />
+			</td>
+  
+			<td>
+			  <input type="number" name="attr_xp_cmps" readonly style="width: 50px;" />
+			</td>
+		  </tr>
+		</tbody>
+	  </table>
+	</fieldset>
+  </div>
+  
+  <!-- ======= SECTION CHAKRA : CHOIX DES SPÉCIALISATIONS ======= -->
+<div class="section-choix-specialisations">
+	<h3>Choix des Spécialisations</h3>
+	<p>
+	  Attribuez des points à vos spécialisations
+	  (<span name="attr_specialisation_chakra"></span> max).
+	  Total actuel : <span name="attr_chakra_specialisation_total"></span>
+	</p>
+  
+	<div class="specialisations-grid">
+	  <label>
+		Acéré (max 5) :
+		<input type="number" name="attr_chakra_acere" min="0" max="5" value="0">
+	  </label>
+  
+	  <label>
+		Colossal (max 9) :
+		<input type="number" name="attr_chakra_colossal" min="0" max="9" value="0">
+	  </label>
+  
+	  <label>
+		Endurci (max 5) :
+		<input type="number" name="attr_chakra_endurci" min="0" max="5" value="0">
+	  </label>
+  
+	  <label>
+		Explosif (max 5) :
+		<input type="number" name="attr_chakra_explosif" min="0" max="5" value="0">
+	  </label>
+  
+	  <label>
+		Fulgurant (max 5) :
+		<input type="number" name="attr_chakra_fulgurant" min="0" max="5" value="0">
+	  </label>
+  
+	  <label>
+		Héréditaire (max 3) :
+		<input type="number" name="attr_chakra_hereditaire" min="0" max="3" value="0">
+	  </label>
+  
+	  <label>
+		Impérieux (max 5) :
+		<input type="number" name="attr_chakra_imperieux" min="0" max="5" value="0">
+	  </label>
+  
+	  <label>
+		Inépuisable (max 3) :
+		<input type="number" name="attr_chakra_inepuisable" min="0" max="3" value="0">
+	  </label>
+  
+	  <label>
+		Puissant (max 1) :
+		<input type="number" name="attr_chakra_puissant" min="0" max="1" value="0">
+	  </label>
+  
+	  <label>
+		Rémanent (max 1) :
+		<input type="number" name="attr_chakra_remanent" min="0" max="1" value="0">
+	  </label>
+	</div>
+  </div>
+  
 
 
-
-// =====================================
-// === 10. VALIDATION SPÉ CHAKRA =======
-// =====================================
-on("change:chakra_acere change:chakra_colossal change:chakra_endurci change:chakra_explosif change:chakra_fulgurant change:chakra_hereditaire change:chakra_imperieux change:chakra_inepuisable change:chakra_puissant change:chakra_remanent change:specialisation_chakra", () => {
-  const chakraAttrs = [
-    "chakra_acere", "chakra_colossal", "chakra_endurci", "chakra_explosif",
-    "chakra_fulgurant", "chakra_hereditaire", "chakra_imperieux", "chakra_inepuisable",
-    "chakra_puissant", "chakra_remanent", "specialisation_chakra"
-  ];
-
-  getAttrs(chakraAttrs, values => {
-    const toInt = v => parseInt(values[v]) || 0;
-
-    const total =
-      toInt("chakra_acere") + toInt("chakra_colossal") + toInt("chakra_endurci") +
-      toInt("chakra_explosif") + toInt("chakra_fulgurant") + toInt("chakra_hereditaire") +
-      toInt("chakra_imperieux") + toInt("chakra_inepuisable") +
-      toInt("chakra_puissant") + toInt("chakra_remanent");
-
-    const max = toInt("specialisation_chakra");
-
-    setAttrs({ chakra_specialisation_total: total });
-
-    if (total > max) {
-      setTimeout(() => {
-        alert(`⚠️ Vous avez dépassé la limite de spécialisations (${max}). Veuillez ajuster vos points.`);
-      }, 50);
-    }
-
-    const fields = chakraAttrs.slice(0, -1); // sans specialisation_chakra
-    fields.forEach(name => {
-      const input = document.querySelector(`input[name="attr_${name}"]`);
-      if (input) {
-        input.classList.toggle("over-limit", total > max);
-      }
-    });
-  });
-});
-			  
-on("change:prenom", () => {
-	getAttrs(["prenom"], values => {
-	  const nom = values.prenom || "";
-	  setAttrs({ character_name: nom });
-	});
-  });	  
+  <!-- ======= SECTION SPÉCIALISATIONS DE CHAKRA ======= -->
+<div class="section-specialisations">
+	<h2>Spécialisations de Chakra</h2>
+  
+	<table>
+	  <thead>
+		<tr>
+		  <th>Nom</th>
+		  <th>Max</th>
+		  <th>Description</th>
+		</tr>
+	  </thead>
+	  <tbody>
+		<tr>
+		  <td>Acéré</td>
+		  <td>5</td>
+		  <td>+2 dégâts Armes</td>
+		</tr>
+		<tr>
+		  <td>Colossal</td>
+		  <td>9</td>
+		  <td>+100 points de chakra</td>
+		</tr>
+		<tr>
+		  <td>Endurci</td>
+		  <td>5</td>
+		  <td>+1 Vigueur, +50 points de chakra</td>
+		</tr>
+		<tr>
+		  <td>Explosif</td>
+		  <td>5</td>
+		  <td>+2 dégâts Taïjutsu</td>
+		</tr>
+		<tr>
+		  <td>Fulgurant</td>
+		  <td>5</td>
+		  <td>+2 Initiative, +10m supplémentaire au Déplacement Simple dans un tour.</td>
+		</tr>
+		<tr>
+		  <td>Héréditaire</td>
+		  <td>3</td>
+		  <td>+1 utilisation de pouvoir de lignée actif supplémentaire par session</td>
+		</tr>
+		<tr>
+		  <td>Impérieux</td>
+		  <td>5</td>
+		  <td>+1 Caractère, +50 points de chakra</td>
+		</tr>
+		<tr>
+		  <td>Inépuisable</td>
+		  <td>3</td>
+		  <td>+1% à la régénération</td>
+		</tr>
+		<tr>
+		  <td>Puissant</td>
+		  <td>1</td>
+		  <td>Annule les paliers de réserve naturelle de chakra et les échecs automatiques liés aux Blessures.</td>
+		</tr>
+		<tr>
+		  <td>Rémanent</td>
+		  <td>1</td>
+		  <td>Le chakra appliqué en petite quantité sur un objet ne disparaît pas et reste actif tant qu’un personnage le souhaite.</td>
+		</tr>
+	  </tbody>
+	</table>
+  </div>
