@@ -16404,6 +16404,7 @@
 	</div>
 </rolltemplate>
 
+
 <rolltemplate class="sheet-rolltemplate-custom-success-roll">
 	<div class="template-wrapper">
 		<div class="sheet-container sheet-color-{{color}}">
@@ -16461,7 +16462,6 @@
 	  <div class="sheet-container sheet-color-{{color}}">
 		<div class="sheet-header">
 		  {{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
-		  {{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
 		  {{#PHASE12}}
 		  {{#rollTotal() PHASE12 0}}
 		  <div class="sheet-subtitle">Recovery: Full Phase Action</div>
@@ -16470,28 +16470,14 @@
 		  <div class="sheet-subtitle">Recovery: Post Segment 12</div>
 		  {{/^rollTotal() PHASE12 0}}
 		  {{/PHASE12}}
+		  {{#label}}<div class="sheet-label">{{label}}</div>{{/label}}
+		  {{#data}}<div class="sheet-data">{{data}}</div>{{/data}}
 		</div>
 		<div class="sheet-content">
-		  {{#SUCCESS}}
-			{{#^rollLess() computed::SUCCESS 0}}
-			<div class="sheet-key">Activate Armor</div>
-			<div class="sheet-value">{{SUCCESS}}</div>
-			{{/^rollLess() computed::SUCCESS 0}}
-			{{#rollLess() computed::SUCCESS 0}}
-			<div class="sheet-key">Failed to Activate</div>
-			<div class="sheet-value">{{SUCCESS}}</div>
-			{{/rollLess() computed::SUCCESS 0}}
-		  {{/SUCCESS}}
-		  {{#rollTotal() PHASE12 0}}
-			<div class="sheet-key">Phase</div>
-			<div class="sheet-value">Full</div>
-			<div class="sheet-key">DCV</div>
-			<div class="sheet-value">1/2</div>
-		  {{/rollTotal() PHASE12 0}}
-		  {{#allprops() title subtitle desc color SUCCESS PHASE12}}
+		  {{#allprops() title subtitle label data desc color PHASE12}}
 		  <div class="sheet-key">{{key}}</div>
 		  <div class="sheet-value">{{value}}</div>
-		  {{/allprops() title subtitle desc color SUCCESS PHASE12}}
+		  {{/allprops() title subtitle label data desc color PHASE12}}
 		  {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
 		</div>
 	  </div>
@@ -17375,8 +17361,9 @@
 		});
 	});
 	
+	
 	function standardRecovery() {
-		getAttrs(["whisperToGM", "character_title", "endurance", "stun", "CurrentEND", "CurrentSTUN", "weightEndPenalty", "recovery", "dingbat"], function(values) {
+		getAttrs(["whisperToGM", "character_title", "endurance", "stun", "CurrentEND", "CurrentSTUN", "weightEndPenalty", "recovery", "currentDCV", "dingbat"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			
 			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
@@ -17387,12 +17374,18 @@
 			const maxEND = Math.max(parseInt(values.endurance), currentEND);
 			const maxSTUN = Math.max(parseInt(values.stun), currentSTUN);
 			
+			// DCV for display.
+			const fullDCV = parseInt(values["currentDCV"])||3;
+			const halfDCV = heroRoundHigh( (parseInt(values["currentDCV"])||3)/2 );
+			
 			theRoll += "&{template:custom-activate} ";
 			theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+			theRoll += "{{PHASE12=[[?{Recovery Type|Post Segement 12 (includes END penalty),1|Recovery Action,0}]]}} ";
+			theRoll += "{{label=DCV}}";
+			theRoll += "{{data=[["+fullDCV+"*?{Recovery Type}+"+halfDCV+"*(1-?{Recovery Type})]]}}";
 			
-			theRoll += "{{PHASE12=[[?{Recovery Type|Post Segement 12 (includes END penalty),1|Recovery Action,0}]]}} "
-			+ "{{STUN Recovery=[[@{recoveryNet}[Recovery]]] (@{CurrentSTUN})}} "
-			+ "{{END Recovery=[[@{recoveryNet}[Recovery]-[[@{weightEndPenalty}*?{Recovery Type}]][END/Turn Cost]]] (@{CurrentEND})}}";
+			theRoll += "{{STUN Recovery=[[@{recoveryNet}[Recovery]]] (@{CurrentSTUN})}} ";
+			theRoll += "{{END Recovery=[[@{recoveryNet}[Recovery]-[[@{weightEndPenalty}*?{Recovery Type}]][END/Turn Cost]]] (@{CurrentEND})}}";
 			
 			startRoll(theRoll, (results) => {
 				recoverSTUN = results.results["STUN Recovery"].result;
@@ -17410,8 +17403,9 @@
 		return;
 	}
 	
+	
 	function vehicleRecovery() {
-		getAttrs(["whisperToGM", "character_title", "CurrentMainEND", "CurrentAuxiliaryEND", "mainReserveEND", "auxiliaryReserveEND", "dingbat"], function(values) {
+		getAttrs(["whisperToGM", "character_title", "CurrentMainEND", "CurrentAuxiliaryEND", "mainReserveEND", "auxiliaryReserveEND", "currentDCV", "dingbat"], function(values){
 			var theRoll = values.whisperToGM||"";
 			
 			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
@@ -17423,18 +17417,23 @@
 			const maxPrimaryEND = Math.max(parseInt(values.mainReserveEND), CurrentMainEND);
 			const maxAuxiliaryEND = Math.max(parseInt(values.auxiliaryReserveEND), currentAuxiliaryEND);
 			
+			// DCV for display.
+			const fullDCV = parseInt(values["currentDCV"])||3;
+			
 			theRoll += "&{template:custom-activate} ";
 			theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
+			theRoll += "{{PHASE12=[[{1}]]}} ";
+			theRoll += "{{label=DCV}}";
+			theRoll += "{{data=[["+fullDCV+"]]}}";
 			
-			theRoll += "{{MAIN Recovery=[[@{mainReserveREC}[MAIN]]] (@{CurrentMainEND})}} "
-			+ "{{AUX Recovery=[[@{auxiliaryReserveREC}[AUX]]] (@{CurrentAuxiliaryEND})}}";
+			theRoll += "{{MAIN Recovery=[[@{mainReserveREC}[MAIN]]] (@{CurrentMainEND})}} ";
+			theRoll += "{{AUX Recovery=[[@{auxiliaryReserveREC}[AUX]]] (@{CurrentAuxiliaryEND})}}";
 			
 			startRoll(theRoll, (results) => {				
 				recoverMAIN = results.results["MAIN Recovery"].result;
 				recoverAUX = results.results["AUX Recovery"].result;
 				
 				setAttrs({
-					treasures: "hello",
 					CurrentMainEND: Math.max(0, Math.min(CurrentMainEND + recoverMAIN, maxPrimaryEND)),
 					CurrentAuxiliaryEND: Math.max(0, Math.min(currentAuxiliaryEND + recoverAUX, maxAuxiliaryEND))
 				});
