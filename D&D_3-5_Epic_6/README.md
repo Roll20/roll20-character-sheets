@@ -9,6 +9,9 @@ Sheet User Guide : https://wiki.roll20.net/Dungeons_and_Dragons_3.5_E6#Sheet_Ove
 Problem & suggestions can be submitted here : https://github.com/BE-Arbiter/roll20-character-sheets
 
 # Changelog
+## 2025-04-25
+- Bugfix : When an attack parameter is empty, the result of the roll is no longer "0"
+- Bugfix : When Dexterity is negative, it impacts Flat footed AC as it should.
 ## 2025-01-11
 - Add of the User Guide link to the readme and json
 - Update the logo link to the roll20 github
