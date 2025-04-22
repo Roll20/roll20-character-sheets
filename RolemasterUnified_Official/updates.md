@@ -1,3 +1,20 @@
+# 2025-4-22
+
+- Typo updates
+- Display current status as the current impacting status
+- Update stun/stagger/etc status immediately
+- Separate updating status end ending turn.
+- Update status after injuries are applied immediately
+- Fix a bug where you could only bleed once per turn.
+- Creature
+  - Default tokens for all Creature Law 1 Creatures
+        Thanks to Grim!
+  - Display and Implemente Crit Immunities.
+    - Sorry to players
+- Inventory
+  - Add placeholders for weapon materials
+  - Work on item edit (not complete)
+
 # 2025-4-15
 
 - Fix some typos in the skill roll messages.
