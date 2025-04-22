@@ -23,6 +23,9 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Apr 13, 2025
+- Added a range output to the various move roll templates
+
 ### Jan 28, 2025
 - Updated the Hybrid Character to allow entering the advanced class level
 

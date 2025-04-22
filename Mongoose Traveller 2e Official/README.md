@@ -50,4 +50,36 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Fixed animal darkmode combat rolls
 - Minor formatting fixes
 
+### Version 1.1.01
+- Implemented Traveller compendium drop to character sheet for equipment etc.
+- Minor css styling changes to remove inconsistent orange text
+- Added and fixed compendium buttons for new compendium structure
+- Added  hover animation when dragging items from compendium to character sheet
+- Animals drag and drop
+- Vehicles drag and drop
+- Green ticks on trained skills
+- Improved visibility of PC sub-tab buttons (Prime, Skills etc.)
+- Removed some orange borders as we had border overload!
+- Changed Skill 'Trained' to a (pseudo) checkbox and styled in green for visibility when ticked
+- Study period and history/allies etc. textareas now resizeable
+- Rolltemplate made slightly more compact
+- Fixed broken animal skills
+- Added NPC Weapon and Armour drop targets and updated drag and drop as these categories have changed
+- Added Lifepath section to Prime
+- Added 'Custom' to Skills when using extended characteristics like Luck (Misc Mod is used for the modifier)
+- Added repeating Study Periods
+- Added Bonus/Penalty attributes to Ship components
+- Added Ship's Locker sub-tab to Ship
+- Added simple Crew sub-tab to Ship, auto-calculates total salaries on Ship details
+- Fixed bug where Effect was not being added to damage for Dexterity weapons
+
+### Version 1.1.02
+- Revamped equipment weight and added encumberance
+- Added 'carried' flag to weapons and armour
+- Moved initiative to top of combat panel
+- Added psionic 'special abilities' repeating block
+- Fixed bug with boon/bane and 'ask for difficulty'
+- Fixed bug with equipment drag and drop KG vs. Kg
+
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
+
