@@ -43,18 +43,16 @@ baseAttrs.forEach(attr => {
 // ===========================================
 // === 3. CALCUL DU CHAKRA TOTAL & RESTANT ===
 // ===========================================
-on("change:cor change:esp change:chakra_colossal change:chakra_endurci change:chakra_imperieux change:bonus_actif change:bonus_type sheet:opened", () => {
-  getAttrs(["cor", "esp", "chakra_colossal", "chakra_endurci", "chakra_imperieux", "bonus_actif", "bonus_type", "chakra_restant"], values => {
-    const toInt = v => parseInt(values[v]) || 0;
-    const bonusChakra = (values.bonus_actif === "on" && values.bonus_type === "chakra") ? 50 : 0;
+on("change:cor change:esp change:chakra_colossal change:chakra_endurci change:chakra_imperieux sheet:opened", () => {
+  getAttrs(["cor", "esp", "chakra_colossal", "chakra_endurci", "chakra_imperieux", "chakra_restant"], values => {
+    const toInt = v => parseInt(v) || 0;
 
     const totalChakra =
       (toInt(values.cor) * 50) +
       (toInt(values.esp) * 50) +
       (toInt(values.chakra_colossal) * 100) +
       (toInt(values.chakra_endurci) * 50) +
-      (toInt(values.chakra_imperieux) * 50) +
-      bonusChakra;
+      (toInt(values.chakra_imperieux) * 50);
 
     const actuel = parseInt(values.chakra_restant);
     const restant = isNaN(actuel) || actuel === 0 ? totalChakra : actuel;
@@ -66,15 +64,13 @@ on("change:cor change:esp change:chakra_colossal change:chakra_endurci change:ch
   });
 });
 
-
 // ===============================
 // === 4. STATS SECONDAIRES =====
 // ===============================
-on("change:cor change:esp change:arm change:tai change:nin change:gen change:chakra change:chakra_endurci change:chakra_imperieux change:chakra_fulgurant change:stcmp_physique change:bonus_actif change:bonus_type sheet:opened", () => {
+on("change:cor change:esp change:arm change:tai change:nin change:gen change:chakra change:chakra_endurci change:chakra_imperieux change:chakra_fulgurant change:stcmp_physique sheet:opened", () => {
   getAttrs([
     "cor", "esp", "arm", "tai", "nin", "gen", "chakra", "chakra_endurci",
-    "chakra_imperieux", "chakra_fulgurant", "stcmp_physique",
-    "bonus_actif", "bonus_type"
+    "chakra_imperieux", "chakra_fulgurant", "stcmp_physique"
   ], values => {
     const toInt = v => parseInt(values[v]) || 0;
 
@@ -90,15 +86,92 @@ on("change:cor change:esp change:arm change:tai change:nin change:gen change:cha
     else if (controle >= 14 && controle <= 19) spe = 6;
     else if (controle >= 20) spe = 9;
 
-    const bonusActif = values.bonus_actif === "on";
-    const bonusType = values.bonus_type;
+    const initiative = toInt("stcmp_physique") + (toInt("chakra_fulgurant") * 2);
+    const vigueur = cor + 2 + toInt("chakra_endurci");
+    const caractere = esp + 2 + toInt("chakra_imperieux");
+    const regen = Math.floor(toInt("chakra") * (spe * 0.01));
+    const interceptions_arm = Math.floor(arm / 2);
+    const interceptions_tai = Math.floor(tai / 2);
 
-    const bonusVigueur = bonusActif && bonusType === "vigueur" ? 1 : 0;
-    const bonusCaractere = bonusActif && bonusType === "caractere" ? 1 : 0;
+    setAttrs({
+      controle,
+      specialisation_chakra: spe,
+      initiative,
+      vigueur,
+      caractere,
+      regen,
+      interceptions_arm,
+      interceptions_tai
+    });
+  });
+});
+on("change:cor change:esp change:chakra_colossal change:chakra_endurci change:chakra_imperieux change:bonus_chakra sheet:opened", () => {
+  getAttrs(["cor", "esp", "chakra_colossal", "chakra_endurci", "chakra_imperieux", "chakra_restant", "bonus_chakra"], values => {
+    const toInt = v => parseInt(v) || 0;
+
+    const totalChakra =
+      (toInt(values.cor) * 50) +
+      (toInt(values.esp) * 50) +
+      (toInt(values.chakra_colossal) * 100) +
+      (toInt(values.chakra_endurci) * 50) +
+      (toInt(values.chakra_imperieux) * 50) +
+      toInt(values.bonus_chakra); // Bonus manuel
+
+    const actuel = parseInt(values.chakra_restant);
+    const restant = isNaN(actuel) || actuel === 0 ? totalChakra : actuel;
+
+    setAttrs({
+      chakra: totalChakra,
+      chakra_restant: restant
+    });
+  });
+});
+
+on("change:cor change:esp change:chakra_colossal change:chakra_endurci change:chakra_imperieux change:bonus_chakra sheet:opened", () => {
+  getAttrs(["cor", "esp", "chakra_colossal", "chakra_endurci", "chakra_imperieux", "chakra_restant", "bonus_chakra"], values => {
+    const toInt = v => parseInt(v) || 0;
+
+    const totalChakra =
+      (toInt(values.cor) * 50) +
+      (toInt(values.esp) * 50) +
+      (toInt(values.chakra_colossal) * 100) +
+      (toInt(values.chakra_endurci) * 50) +
+      (toInt(values.chakra_imperieux) * 50) +
+      toInt(values.bonus_chakra); // Bonus manuel
+
+    const actuel = parseInt(values.chakra_restant);
+    const restant = isNaN(actuel) || actuel === 0 ? totalChakra : actuel;
+
+    setAttrs({
+      chakra: totalChakra,
+      chakra_restant: restant
+    });
+  });
+});
+
+on("change:cor change:esp change:arm change:tai change:nin change:gen change:chakra change:chakra_endurci change:chakra_imperieux change:chakra_fulgurant change:stcmp_physique change:bonus_vigueur change:bonus_caractere sheet:opened", () => {
+  getAttrs([
+    "cor", "esp", "arm", "tai", "nin", "gen", "chakra", "chakra_endurci",
+    "chakra_imperieux", "chakra_fulgurant", "stcmp_physique",
+    "bonus_vigueur", "bonus_caractere"
+  ], values => {
+    const toInt = v => parseInt(values[v]) || 0;
+
+    const cor = toInt("cor");
+    const esp = toInt("esp");
+    const arm = toInt("arm");
+    const tai = toInt("tai");
+
+    const controle = cor + esp;
+    let spe = 1;
+    if (controle >= 5 && controle <= 9) spe = 2;
+    else if (controle >= 10 && controle <= 13) spe = 4;
+    else if (controle >= 14 && controle <= 19) spe = 6;
+    else if (controle >= 20) spe = 9;
 
     const initiative = toInt("stcmp_physique") + (toInt("chakra_fulgurant") * 2);
-    const vigueur = cor + 2 + toInt("chakra_endurci") + bonusVigueur;
-    const caractere = esp + 2 + toInt("chakra_imperieux") + bonusCaractere;
+    const vigueur = cor + 2 + toInt("chakra_endurci") + toInt("bonus_vigueur");
+    const caractere = esp + 2 + toInt("chakra_imperieux") + toInt("bonus_caractere");
     const regen = Math.floor(toInt("chakra") * (spe * 0.01));
     const interceptions_arm = Math.floor(arm / 2);
     const interceptions_tai = Math.floor(tai / 2);
@@ -129,7 +202,7 @@ on("change:cor change:arm change:tai change:gen change:nin change:chakra_acere c
     const toInt = v => parseInt(values[v]) || 0;
 
     const baseArm = toInt("cor") + toInt("arm") + (toInt("chakra_acere") * 2);
-    const baseTai = toInt("cor") + toInt("tai") + (toInt("chakra_explosif") * 2);    
+    const baseTai = toInt("cor") + toInt("tai") + (toInt("chakra_explosif") * 2);
     const baseGen = toInt("gen") + 1;
     const baseNin = toInt("nin") + 1;
 
@@ -266,23 +339,4 @@ on("change:prenom", () => {
 	  const nom = values.prenom || "";
 	  setAttrs({ character_name: nom });
 	});
-  });
-  
-  on("change:mode_blessures_avancees sheet:opened", () => {
-    getAttrs(["mode_blessures_avancees"], values => {
-      const actif = values["mode_blessures_avancees"] === "on";
-  
-      const fatigueSup = document.querySelector('fieldset.cran-fatigue-optionnelle');
-      const blessuresSup = document.querySelector('fieldset.cran-blessures-sup');
-  
-      if (fatigueSup) {
-        fatigueSup.disabled = !actif;
-        fatigueSup.querySelectorAll("input[type='checkbox']").forEach(cb => cb.disabled = !actif);
-      }
-  
-      if (blessuresSup) {
-        blessuresSup.disabled = !actif;
-        blessuresSup.querySelectorAll("input[type='checkbox']").forEach(cb => cb.disabled = !actif);
-      }
-    });
   });
