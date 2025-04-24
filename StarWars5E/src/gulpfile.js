@@ -4,9 +4,15 @@ const rename = require('gulp-rename')
 const Stream = require('stream')
 const PluginError = require('plugin-error')
 const cssbeautify = require('gulp-cssbeautify');
+const pug = require('gulp-pug');
 
-
-/* TODO: Idea V4 Before Generating html, generate pug template into html to reuse the same code for several place in the application */
+function compile_pug(done) {
+    src('pug/*.pug')
+        .pipe(pug({pretty: true}))
+        .on('error', console.log)
+        .pipe(dest('generated'));
+    done();
+}
 /* Bundle the html in one big file, including the js file compilated earlier */
 function bundle_html(done){
     src('html/main.html')
@@ -37,11 +43,13 @@ function copy_to_root_dir(done){
 }
 
 exports.default = series(
+    compile_pug,
     bundle_css,
     bundle_html
 );
 
 exports.build = series (
+    compile_pug,
     bundle_css,
     bundle_html,
     copy_to_root_dir
@@ -57,8 +65,6 @@ exports.watch = () => {
 }
 
 function flattenCSS(obj, options) {
-
-
     options = options || {};
 
     var stream = new Stream.Transform({objectMode: true});
