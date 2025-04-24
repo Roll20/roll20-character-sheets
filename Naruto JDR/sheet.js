@@ -339,4 +339,4 @@ on("change:prenom", () => {
 	  const nom = values.prenom || "";
 	  setAttrs({ character_name: nom });
 	});
-  });
+  });	  
