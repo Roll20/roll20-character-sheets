@@ -81,5 +81,8 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Fixed bug with boon/bane and 'ask for difficulty'
 - Fixed bug with equipment drag and drop KG vs. Kg
 
+### Version 1.1.03
+- Added missing Telepathy expanding button
+
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 
