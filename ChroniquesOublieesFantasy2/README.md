@@ -6,9 +6,23 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.3.0 [Screenshot](cof2e.png)
+v1.4.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.4.0_ (2025-04-08)
+
+- Ajout d'un bouton pour afficher un check-up de l'état du personnage
+- Ajout d'un bouton pour activer la concentration sur les capacités de sort
+- Ajout des tables de coups et d'échecs critiques sur les fiches de PJ et PNJ
+- Ajout d'une _roll query_ pour les DM des sorts de zone en attaque
+- Prise en compte des propriétés magiques des armes
+- Prise en compte des règles optionnelles de peur
+- Prise en compte de la valeur d'Ombre
+- Ajout des bonus de base aux titres des jets d'attaques, de capacités et de compétences
+- Ajout de tags aux jets dans le chat
+- Amélioration des textes descriptifs dans les jets de capacités
+- Ajustements cosmétiques pour les cases à cocher et boutons radio
 
 ### Version _1.3.0_ (2025-03-09)
 
@@ -44,7 +58,7 @@ v1.3.0 [Screenshot](cof2e.png)
 - Persomancien (version expérimentale)
 - Ajout des boutons des menus d'action sur la fiche de PNJ
 
-### Version 1.1.0 (2025-01-05)
+### Version _1.1.0_ (2025-01-05)
 
 - Ajout d'un bouton pour le test de chance
 - Ajout d'un champ paramètre et d'un champ propriétés pour chaque capacité
@@ -59,6 +73,6 @@ v1.3.0 [Screenshot](cof2e.png)
 - Ajout de l'onglet Script et des options d'attaque sur les fiches de PNJ
 - Ajout d'un champ propriétés sur les ressources
 
-### Version 1.0.0 (2024-12-24)
+### Version _1.0.0_ (2024-12-24)
 
 Version initiale

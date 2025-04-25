@@ -52,6 +52,25 @@ const npc_repeating = [
     }
 ];
 
+const power_levels = ['cantrip',1,2,3,4,5,6,7,8,9];
+const power_repeating_attr = ["options-flag","detail-flag","powername","powerschool","powercastingtime",
+    "powerrange","powertarget","powerconcentration","powerduration","power_ability","innate","poweroutput",
+    "poweroutput","powerattack","powerdamage","powerdamagetype","powerdamage2","powerdamagetype2","powerhealing",
+    "powerdmgmod","power_damage_progression","powersave","powersavesuccess","powerhldie","powerhldietype",
+    "powerhlbonus","includedesc","powerdescription","powerathigherlevels","powerattackid","powerlevel"
+];
+const power_attrs = [
+    "force_power_points_total","force_power_points_expended","tech_power_points_total","tech_power_points_expended"
+];
+
+const powerSections = [];
+for(let power_level of power_levels){
+    powerSections.push({
+        "section_name": `repeating_power-${power_level}`,
+        "attributes": power_repeating_attr
+    });
+}
+
 const ship_attrs = [
 
 ];

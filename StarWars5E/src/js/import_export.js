@@ -154,8 +154,8 @@ let export_sections = (sectionsToExport,index,exportDto, callback) =>{
 }
 /* NPC */
 let clean_npc = (callback) => {
-    clean_sections(npc_repeating,0,() => {
-        clean_attributes(npc_attrs, () => {
+    clean_sections([...npc_repeating,...powerSections],0,() => {
+        clean_attributes([...npc_attrs,...power_attrs], () => {
             console.log("NPC Sheet Cleaned");
             callback();
         });
@@ -177,8 +177,8 @@ let export_npc = () => {
         "attribs": [],
         "sections": []
     };
-    export_attributes(npc_attrs,exportDto, () => {
-        export_sections(npc_repeating,0,exportDto,() => {
+    export_attributes([...npc_attrs,...power_attrs],exportDto, () => {
+        export_sections([...npc_repeating,...powerSections],0,exportDto,() => {
             const export_string = JSON.stringify(exportDto, null, 3);
             setAttrs({"json_value":export_string});
         });

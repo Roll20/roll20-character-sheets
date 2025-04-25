@@ -38,7 +38,7 @@
             <option value="3">Advantage (+20)</option>
             <option value="2">Advantage (+10)</option>
             <option value="1">Advantage</option>
-            <option value="0" selected>Default</option>
+            <option value="0" selected>No Advantage</option>
             <option value="-1">Disadvantage</option>
             <option value="-2">Disadvantage (-10)</option>
             <option value="-3">Disadvantage (-20)</option>
@@ -1695,6 +1695,14 @@
                     fields.push(`repeating_specialisations_${id}_specialisation_name`);
                     fields.push(`repeating_specialisations_${id}_specialisation_total`);
                 }
+              getSectionIDs("repeating_specialisations2", function(idarray5) {
+                  for (var i=0; i < idarray5.length; i++) {
+                      let id = idarray5[i];
+                      fields.push(`repeating_specialisations2_${id}_specialisation2_name`);
+                      fields.push(`repeating_specialisations2_${id}_specialisation2_skill`);
+                      fields.push(`repeating_specialisations2_${id}_specialisation2_advances`);
+                      fields.push(`repeating_specialisations2_${id}_specialisation2_total`);
+                  }
                 getAttrs(skill_list.concat(fields)
                     .concat(["str_bonus"]).concat(trigger_fields), function(values) {
                     let update = {};
@@ -1719,6 +1727,18 @@
                         test = test == 0 && melee_list.includes(spec) ? melee :
                             test == 0 && ranged_list.includes(spec) ? ranged :
                             test;
+
+                          for (var i=0; i < idarray5.length; i++) {
+                              let id = idarray5[i];
+                              let name = values[`repeating_specialisations2_${id}_specialisation2_name`];
+                              let advances = values[`repeating_specialisations2_${id}_specialisation2_advances`];
+                              let total = parseInt(values[`repeating_specialisations2_${id}_specialisation2_total`])||0;
+
+                              if (name == spec) {
+                                  test = total
+                                  break;
+                              }
+                          }
                     } else if (repeater == "repeating_powers") {
                         test = test == 0 ? psychic : test;
                     }
@@ -1731,6 +1751,7 @@
                     }
                     setAttrs(update);
                 });
+              });
             });
         });
     });

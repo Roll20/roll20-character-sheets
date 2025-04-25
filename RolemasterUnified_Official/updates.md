@@ -1,3 +1,53 @@
+# 2025-4-22
+
+- Typo updates
+- Display current status as the current impacting status
+- Update stun/stagger/etc status immediately
+- Separate updating status end ending turn.
+- Update status after injuries are applied immediately
+- Fix a bug where you could only bleed once per turn.
+- Creature
+  - Default tokens for all Creature Law 1 Creatures
+        Thanks to Grim!
+  - Display and Implemente Crit Immunities.
+    - Sorry to players
+- Inventory
+  - Add placeholders for weapon materials
+  - Work on item edit (not complete)
+
+# 2025-4-15
+
+- Fix some typos in the skill roll messages.
+- Fix crit roll lookups.
+- Fix subtle penalty Channeling/Mentalism.
+- Status and Injury penalty names were sometimes inconsistent.
+    - Move to statuspenalty and injurypenalty everywhere.
+    - Transitory data, so should not impact anyone.
+    - Fixes issue where penalties were not applying to attacks.
+- Treasure Law:
+    - Fix sizes on some weapons.
+    - Correctly specify attack tables on weapons.
+- Attacks:
+    - Add a button to remove target.
+    - Fix styling of the target drop downs.
+- Staus
+    - Add a button (three actually) to remove stuns
+- Creature
+    - Content complete
+    - Unscale creature hits.
+
+# 2025-4-1
+
+- Fix for the stat abbrievations used in skill summaries
+  - Add test too
+- Spell message nits:
+  - Remove the trailing . in the PP message
+  - Fix unbalanced brace in message for grace
+- Uses; clear per level count on level up
+- Remove purchase module.
+- Skills:
+  - forEachSkill has a completion callback
+
 # 2025-3-25
 
 - Tracker now shows skills correctly.
@@ -12,6 +62,7 @@
   - Casting a spell tickles a use of 'powerdevelopment'
   - Total uses >= Current uses (for new ones)t
   - Display correct global counter for uses.
+- Roll/Lookup crit: Handle scaled crits a lot better.
 
 # 2025-3-18
 
