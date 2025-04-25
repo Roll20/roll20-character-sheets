@@ -77,6 +77,15 @@ critical_range.forEach((attr) => {
     getAttrs(critical_range, (values) => {
       const { luck, critical_range_base, critical_range } =
         parseIntegers(values);
+
+      if (luck < 0) {
+        //Luck < 0 never Critically Hit
+        setAttrs({
+          critical_range: 0, // Reset to default
+        });
+        return;
+      }
+
       let range = critical_range_base;
 
       if (luck === 12) {
@@ -88,7 +97,9 @@ critical_range.forEach((attr) => {
       const cr = range < 16 ? 16 : range;
 
       if (cr !== critical_range) {
-        setAttrs({ critical_range: cr });
+        setAttrs({
+          critical_range: cr,
+        });
       }
     });
   });
@@ -99,14 +110,13 @@ on(`change:luck`, () => {
     const luck = parseInt(values.luck);
     const attrs: Attrs = {};
     //Reroll 1d20 for every 2 points of Luck
-    attrs.rerolls = Math.ceil(luck / 2);
+    attrs.rerolls = Math.ceil(luck / 2) || 0;
 
     if (luck < 0) {
       //Luck < 0 never Critically Hit and subtract LUCK from every d20 roll
-      attrs.never_crit = true;
       attrs.luck_negative_modifier = luck;
     } else {
-      attrs.luck_critical_modifier = luck;
+      attrs.luck_negative_modifier = 0;
     }
 
     setAttrs(attrs);

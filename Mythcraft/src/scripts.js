@@ -186,6 +186,12 @@ critical_range.forEach(function (attr) {
     on("change:".concat(attr), function () {
         getAttrs(critical_range, function (values) {
             var _a = parseIntegers(values), luck = _a.luck, critical_range_base = _a.critical_range_base, critical_range = _a.critical_range;
+            if (luck < 0) {
+                setAttrs({
+                    critical_range: 0
+                });
+                return;
+            }
             var range = critical_range_base;
             if (luck === 12) {
                 range = critical_range_base - 2;
@@ -195,7 +201,9 @@ critical_range.forEach(function (attr) {
             }
             var cr = range < 16 ? 16 : range;
             if (cr !== critical_range) {
-                setAttrs({ critical_range: cr });
+                setAttrs({
+                    critical_range: cr
+                });
             }
         });
     });
@@ -204,13 +212,12 @@ on("change:luck", function () {
     getAttrs(["luck"], function (values) {
         var luck = parseInt(values.luck);
         var attrs = {};
-        attrs.rerolls = Math.ceil(luck / 2);
+        attrs.rerolls = Math.ceil(luck / 2) || 0;
         if (luck < 0) {
-            attrs.never_crit = true;
             attrs.luck_negative_modifier = luck;
         }
         else {
-            attrs.luck_critical_modifier = luck;
+            attrs.luck_negative_modifier = 0;
         }
         setAttrs(attrs);
     });
