@@ -4157,6 +4157,7 @@
                                 temp.push(`${cache.source_path}_state`);
                             break;
                             case 'attribute':
+                            case 'enemy':
                                 temp.push('attrdb','rolldb');
                             break;
                             case 'maneuver':
@@ -10092,7 +10093,31 @@
                 break;
                 case 'enemy':
                     if (button_supported[cache.rolldb[query.index].type][cache.source_attribute || 'default']) {
-                            
+                        query.title = getTranslationByKey("choose-enemy");
+                        query.enemies = [];
+                        //const enemy_template = {name:'',attack:{index:-1,c_index:-1,},damage:{index:-1,c_index:-1,},defense:{index:-1,c_index:-1,},};
+                        const enemy_attrs = ['enemy attack','enemy defense','massive damage'];
+                        for (let i = 0; i < enemy_attrs.length; i++) {
+                            for (let j = 0; j < cache.attrdb[enemy_attrs[i]].length; j++) {
+                                if (cache.attrdb[enemy_attrs[i]][j].active) {
+                                    const enemy_index = cache.attrdb[enemy_attrs[i]][j].config.findIndex(c => c.name === 'enemy');
+                                    if (enemy_index !== -1) {
+                                        const enemy_name = cache.attrdb[enemy_attrs[i]][j].config[enemy_index].rank;
+                                        let enemy_exists = query.enemies.length !== 0 ? query.enemies.findIndex(e => e.name === enemy_name) : -1;
+                                        //const enemy_type = i === 0 ? 'attack' : i === 1 ? 'defense' : 'damage';
+                                        if (enemy_exists === -1) {
+                                            enemy_exists = query.enemies.push({}) - 1;//enemy_exists = query.enemies.push(structuredClone(enemy_template)) - 1;
+                                            query.enemies[enemy_exists].name = enemy_name;
+                                        }
+                                        query.enemies[enemy_exists][enemy_attrs[i]] = j;
+                                        //query.enemies[enemy_exists][enemy_type].index = j;
+                                        //query.enemies[enemy_exists][enemy_type].c_index = enemy_index;
+                                    }
+                                }
+                            }
+                        }
+                        query.options = '|' + query.enemies.map(e => `${e.name.capitalize()},${e.name}`).filter(n => n).sort().join("|");
+                        query.last = query.next;
                     } else {
                         clog(cache, 'Not Applicable', 'ERROR');
                         query.commit = true;
@@ -10231,7 +10256,9 @@
 
                     break;
                     case 'enemy':
-
+                        set_values[`${cache.source_path}_enemy`] = query.selection.capitalize();
+                        cache.rolldb[query.index].enemy = query.selection;
+                        query.commit = true;
                     break;
                     case 'maneuver':
                         set_values[`${cache.source_path}_maneuver`] = getTranslationByKey(query.selection);
@@ -14411,6 +14438,7 @@
                                 setAccordion(cache, set_values);
                             break;
                             case 'attribute':
+                            case 'enemy':
                             case 'maneuver':
                             case 'modifier':
                             case 'name':
