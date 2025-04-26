@@ -244,7 +244,8 @@ on("change:repeating_cmpspe:scmps change:repeating_cmpspe:nom_cmps", function (e
     getAttrs([attrBase], function (baseValues) {
       const base = parseInt(baseValues[attrBase]) || 0;
       const total = base + mod;
-      const xp = xpSkillTable.slice(1, mod).reduce((a, b) => a + b, 0);
+      const xp = mod > 1 ? xpSkillTable.slice(1, mod).reduce((a, b) => a + b, 0) : 0;
+
 
       setAttrs({
         [`repeating_cmpspe_${rowId}_stcmps`]: total,
