@@ -10089,7 +10089,14 @@
                     }
                 break;
                 case 'delete':
-
+                    const rolls = [];
+                    query.title = getTranslationByKey("remove");
+                    for (let i = 0; i < cache.rolldb.length; i++) {
+                        rolls.push(`${cache.rolldb[i].name},${cache.rolldb[i].id}`);
+                    }
+                    query.options = '|' + rolls.sort().join("|");
+                    query.options += `|${getTranslationByKey("exit")},exit`;
+                    query.last = query.next;
                 break;
                 case 'enemy':
                     if (button_supported[cache.rolldb[query.index].type][cache.source_attribute || 'default']) {
@@ -10253,7 +10260,14 @@
                         query.commit = true;
                     break;
                     case 'delete':
-
+                        if (query.selection !== 'exit') {
+                            const index = cache.rolldb.findIndex(r => r.id === query.selection);
+                            if (index !== -1) {
+                                cache.rolldb.splice(index, 1);
+                                removeRepeatingRow(`repeating_roll_${query.selection}`);
+                            }
+                        }
+                        query.commit = true;
                     break;
                     case 'enemy':
                         set_values[`${cache.source_path}_enemy`] = query.selection.capitalize();
@@ -14578,6 +14592,7 @@
                                 setRollAccordions(cache, set_values);
                             break;
                             case 'add':
+                            case 'delete':
                                 await rollMenu(cache, set_values);
                             break;
                         }
