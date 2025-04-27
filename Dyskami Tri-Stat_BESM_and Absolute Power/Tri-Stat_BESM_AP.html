@@ -301,7 +301,8 @@
                                     <input name="attr_modifier" class="grid-minor-input-modifier styling-pill-input theme-input" type="text" value="" readonly />
 
                                     <button name="act_attribute" class="grid-minor-rollattribute styling-pill button-click-animation input-button theme-minor" type="action">
-                                        <span data-i18n="attribute">Attribute</span>
+                                        <span name="attr_attrlabel" data-i18n="attribute">Attribute</span>
+                                        <input name="attr_attrlabel" type="hidden" value="" readonly />
                                     </button>
                                     <input name="attr_attribute" class="grid-minor-input-rollattribute styling-pill-input theme-input" type="text" value="" readonly />
 
@@ -4161,7 +4162,7 @@
                                 temp.push('attrdb','rolldb');
                             break;
                             case 'maneuver':
-                                temp.push('rolldb','rulesdb')
+                                temp.push('rolldb','rulesdb');
                             break;
                             case 'modifier':
                             case 'name':
@@ -4169,6 +4170,18 @@
                             case 'target':
                             case 'type':
                                 temp.push('rolldb');
+                            break;
+                            case 'rollmacro':
+                                temp.push(
+                                    'attrdb',
+                                    'character_name',
+                                    'conditiondb',
+                                    'defectdb',
+                                    'rolldb',
+                                    'rulesdb',
+                                    'static_character_details_pronoun',
+                                    'statsdb',
+                                );
                             break;
                         }
                     break;
@@ -6909,14 +6922,18 @@
     async function getDice(cache, query, roll) {
         const temp = {};
         clog(cache, temp, 'getDice()');
-        query.title = 'Roll is';
-        query.options = 
-            `|Normal,0` +
-            `|Minor Edge,1` +
-            `|Minor Obstacle,-1` +
-            `|Major Edge,2` +
-            `|Major Obstacle,-2`;
-        await crpQuery(cache, query);
+        if (cache.source_attribute === 'rollmacro') {
+            query.selection = cache.rolldb[query.macro_index].modifier;
+        } else {
+            query.title = 'Roll is';
+            query.options = 
+                `|Normal,0` +
+                `|Minor Edge,1` +
+                `|Minor Obstacle,-1` +
+                `|Major Edge,2` +
+                `|Major Obstacle,-2`;
+            await crpQuery(cache, query);
+        }
         const exceed2dice =
             cache.rulesdb.rules_optional_dice_status === 'exceed' ? true : false;
         temp.string = '{{total=[[';
@@ -7071,7 +7088,14 @@
         if (cache.source_type === 'react') {
             roll.attacker = rollEscape.unescape(cache.originalRollId);
         }
-        roll.type = cache.source_type === 'react' ? 
+        if (cache.source_attribute === 'rollmacro') {
+            query.macro_index = cache.rolldb.findIndex(r => r.id === cache.originalCaseRowID);
+        }
+        roll.type = cache.source_attribute === 'rollmacro' ?
+            cache.rolldb[query.macro_index].type === 'skill' ?
+                cache.rulesdb.rules_optional_individual_status !== 0 ? 'skill' : 'skill_group' :
+            cache.rolldb[query.macro_index].type :
+            cache.source_type === 'react' ? 
             cache.source_attribute === 'skill' ?
                 cache.rulesdb.rules_optional_individual_status !== 0 ? 'skill' : 'skill_group' :
             cache.source_attribute :
@@ -7132,6 +7156,7 @@
         while (!query.do_roll) {
             switch(query.next) {
                 // Roll Menu Options Root
+                /*
                 case 'rollsroot':
                     query.title = 'Choose a roll';
                     query.options = 
@@ -7148,6 +7173,7 @@
                         `|${getTranslationByKey("stat")},stat`;
                     query.last = query.next;
                 break;
+                */
                 // 1st tier roll options
                 case '2d6':
                     query.title = '';
@@ -7163,11 +7189,19 @@
                     query.last = query.next;
                 break;
                 case 'attribute':
-                    query.title = `${getTranslationByKey("select-attribute")}`;
-                    query.options = query.attributes.sort().join('');
-                    query.options += roll.type === 'defense' ?
-                        `|${getTranslationByKey("exit")},exit` :
-                        `|${getTranslationByKey("go-back")},rollsroot`;
+                    if (cache.source_attribute === 'rollmacro') {
+                        query.title = '';
+                        const attr_name = cache.rolldb[query.macro_index].attribute.name;
+                        const attr_id = cache.rolldb[query.macro_index].attribute.id;
+                        const attr_index = cache.attrdb[attr_name].findIndex(a => a.row_id === attr_id);
+                        query.selection = `${attr_name}~${attr_index}`;
+                    } else {
+                        query.title = `${getTranslationByKey("select-attribute")}`;
+                        query.options = query.attributes.sort().join('');
+                        query.options += //roll.type === 'defense' ?
+                            `|${getTranslationByKey("exit")},exit`;// :
+                            //`|${getTranslationByKey("go-back")},rollsroot`;
+                    }
                     query.last = query.next;
                 break;
                 case 'defense':
@@ -7414,15 +7448,20 @@
                     query.last = query.next;
                 break;
                 case 'target_type':
-                    query.title = `${getTranslationByKey("select-target-type")}`;
-                    query.options = 
-                        `|${getTranslationByKey("opposed-roll")},target_select` +
-                        `|${getTranslationByKey("target-number")},target_number` +
-                        `|${getTranslationByKey("go-back")},${(
-                            cache.rulesdb.rules_optional_maneuvers_status &&
-                            roll.type === 'attack'
-                        ) ? 'combat_maneuver' : 'select_weapon'
-                        }`;
+                    if (cache.source_attribute === 'rollmacro') {
+                        query.title = '';
+                        query.selection = cache.rolldb[query.macro_index].target;
+                    } else {
+                        query.title = `${getTranslationByKey("select-target-type")}`;
+                        query.options = 
+                            `|${getTranslationByKey("opposed-roll")},target_select` +
+                            `|${getTranslationByKey("target-number")},target_number` +
+                            `|${getTranslationByKey("go-back")},${(
+                                cache.rulesdb.rules_optional_maneuvers_status &&
+                                roll.type === 'attack'
+                            ) ? 'combat_maneuver' : 'select_weapon'
+                            }`;
+                    }
                     query.last = query.next;
                 break;
                 case 'target_select':
@@ -7509,7 +7548,9 @@
                 break;
                 case 'stat':
                     query.title = '';
-                    roll.stat = await getStats(cache, query);
+                    roll.stat = cache.source_attribute === 'rollmacro' ?
+                        cache.rolldb[query.macro_index].stat :
+                        await getStats(cache, query);
                     roll.denominator = roll.stat.length;
                     roll.title_stats = roll.denominator !== 1 ? 
                         `${roll.stat.capitalize().join('+')} ` : 
@@ -7556,10 +7597,12 @@
             }
             // Take action on the selected menu item
             switch (query.next) {
+                /*
                 case 'rollsroot':
                     roll.type = query.selection;
                     query.next = query.selection;
                 break;
+                */
                 case 'attribute':
                     if (query.selection !== 'rollsroot' || query.selection !== 'exit') {
                         const selected_attribute = query.selection.split('~');
@@ -10020,6 +10063,7 @@
                 "default": false,
             },
             "skill": {
+                "attribute":true,
                 "target":true,
                 "stat":true,
                 "default": false,
@@ -10222,6 +10266,7 @@
                         query.type = query.selection;
                         query.rolldb = Object.assign({}, roll_macro_template);
                         query.rolldb.id = query.row_id;
+                        set_values[`repeating_roll_${query.row_id}_attrlabel`] = getTranslationByKey("attribute");
                         for (let i = 0; i < query.fields.length; i++) {
                             let value = '';
                             switch(query.fields[i]) {
@@ -10312,7 +10357,7 @@
                             getTranslationByKey("opposed-roll") :
                             getTranslationByKey("target-number");
                         set_values[`${cache.source_path}_target`] = query.target;
-                        cache.rolldb[query.index].modifier = query.selection;
+                        cache.rolldb[query.index].target = query.selection;
                         query.commit = true;
                     break;
                     case 'type':
@@ -10338,46 +10383,52 @@
                                     }
                                     set_values[`${cache.source_path}_${macro_fields[i]}`] = value;
                                 }
+                                set_values[`${cache.source_path}_attrlabel`] = getTranslationByKey("attribute");
                             break;
                             case 'attack':
-                            for (let i = 0; i < macro_fields.length; i++) {
-                                let value = '';
-                                switch(macro_fields[i]) {
-                                    case 'attribute':
-                                    case 'enemy':
-                                    case 'maneuver':
-                                    case 'modifier':
-                                    case 'target': value = getTranslationByKey("not-configured"); break;
-                                    default: value = getTranslationByKey("not-applicable");
+                                for (let i = 0; i < macro_fields.length; i++) {
+                                    let value = '';
+                                    switch(macro_fields[i]) {
+                                        case 'attribute':
+                                        case 'enemy':
+                                        case 'maneuver':
+                                        case 'modifier':
+                                        case 'target': value = getTranslationByKey("not-configured"); break;
+                                        default: value = getTranslationByKey("not-applicable");
+                                    }
+                                    set_values[`${cache.source_path}_${macro_fields[i]}`] = value;
                                 }
-                                set_values[`${cache.source_path}_${macro_fields[i]}`] = value;
-                            }
+                                set_values[`${cache.source_path}_attrlabel`] = getTranslationByKey("weapon");
                             break;
                             case 'attribute':
-                            for (let i = 0; i < macro_fields.length; i++) {
-                                let value = '';
-                                switch(macro_fields[i]) {
-                                    case 'attribute':
-                                    case 'modifier':
-                                    case 'stat':
-                                    case 'target': value = getTranslationByKey("not-configured"); break;
-                                    default: value = getTranslationByKey("not-applicable");
-                                }
-                                set_values[`${cache.source_path}_${macro_fields[i]}`] = value;
-                            }
-                            break;
                             case 'skill':
-                            case 'stat':
-                            for (let i = 0; i < macro_fields.length; i++) {
-                                let value = '';
-                                switch(macro_fields[i]) {
-                                    case 'modifier':
-                                    case 'stat':
-                                    case 'target': value = getTranslationByKey("not-configured"); break;
-                                    default: value = getTranslationByKey("not-applicable");
+                                for (let i = 0; i < macro_fields.length; i++) {
+                                    let value = '';
+                                    switch(macro_fields[i]) {
+                                        case 'attribute':
+                                        case 'modifier':
+                                        case 'stat':
+                                        case 'target': value = getTranslationByKey("not-configured"); break;
+                                        default: value = getTranslationByKey("not-applicable");
+                                    }
+                                    set_values[`${cache.source_path}_${macro_fields[i]}`] = value;
                                 }
-                                set_values[`${cache.source_path}_${macro_fields[i]}`] = value;
-                            }
+                                set_values[`${cache.source_path}_attrlabel`] = getTranslationByKey(`${
+                                    query.selection === 'skill' ? 'skill' : 'attribute'
+                                }`);
+                            break;
+                            case 'stat':
+                                for (let i = 0; i < macro_fields.length; i++) {
+                                    let value = '';
+                                    switch(macro_fields[i]) {
+                                        case 'modifier':
+                                        case 'stat':
+                                        case 'target': value = getTranslationByKey("not-configured"); break;
+                                        default: value = getTranslationByKey("not-applicable");
+                                    }
+                                    set_values[`${cache.source_path}_${macro_fields[i]}`] = value;
+                                }
+                                set_values[`${cache.source_path}_attrlabel`] = getTranslationByKey("attribute");
                             break;
                         }
                         query.commit = true;
@@ -14460,6 +14511,9 @@
                             case 'target':
                             case 'type':
                                 await rollMenu(cache, set_values);
+                            break;
+                            case 'rollmacro':
+                                await actionRoll(cache, set_values);
                             break;
                         }
                     break;
