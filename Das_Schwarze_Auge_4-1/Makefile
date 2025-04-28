@@ -60,9 +60,29 @@ HTML = \
 	dev/html/sheet/footer.html \
 	dev/html/sheet/outro.html \
 	dev/html/roll_templates/intro.html \
+	dev/html/roll_templates/crp/intro.html \
 	dev/html/roll_templates/crp/talents.html \
+	dev/html/roll_templates/crp/spells.html \
+	dev/html/roll_templates/crp/liturgies.html \
+	dev/html/roll_templates/crp/hand_to_hand_combat.html \
+	dev/html/roll_templates/crp/outro.html \
+	dev/html/roll_templates/regeneration/intro.html \
+	dev/html/roll_templates/regeneration/deepbreath.html \
+	dev/html/roll_templates/regeneration/relax.html \
+	dev/html/roll_templates/regeneration/rest.html \
 	dev/html/roll_templates/regeneration/sleep.html \
+	dev/html/roll_templates/regeneration/astralmeditation.html \
+	dev/html/roll_templates/regeneration/karmicmeditation.html \
+	dev/html/roll_templates/regeneration/outro.html \
+	dev/html/roll_templates/legacy/intro.html \
 	dev/html/roll_templates/legacy/talents.html \
+	dev/html/roll_templates/legacy/spells.html \
+	dev/html/roll_templates/legacy/liturgies.html \
+	dev/html/roll_templates/legacy/stats.html \
+	dev/html/roll_templates/legacy/hand_to_hand_combat.html \
+	dev/html/roll_templates/legacy/ranged_combat.html \
+	dev/html/roll_templates/legacy/combat_shared.html \
+	dev/html/roll_templates/legacy/outro.html \
 	dev/html/roll_templates/tests.html \
 	dev/html/roll_templates/outro.html \
 	$(JS)
