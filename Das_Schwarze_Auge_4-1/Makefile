@@ -59,12 +59,12 @@ HTML = \
 	dev/html/sheet/sections/info.html \
 	dev/html/sheet/footer.html \
 	dev/html/sheet/outro.html \
-	dev/html/roll\ templates/intro.html \
-	dev/html/roll\ templates/crp.html \
-	dev/html/roll\ templates/regeneration.html \
-	dev/html/roll\ templates/legacy.html \
-	dev/html/roll\ templates/tests.html \
-	dev/html/roll\ templates/outro.html \
+	dev/html/roll_templates/intro.html \
+	dev/html/roll_templates/crp/talents.html \
+	dev/html/roll_templates/regeneration/sleep.html \
+	dev/html/roll_templates/legacy/talents.html \
+	dev/html/roll_templates/tests.html \
+	dev/html/roll_templates/outro.html \
 	$(JS)
 JS = \
 	dev/js/intro.js \
