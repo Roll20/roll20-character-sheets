@@ -7546,9 +7546,10 @@
                     query.last = query.next;
                 break;
                 case 'specialization':
-                    if (cache.source_attribute === 'rollmacro') {
+                    if (cache.source_attribute === 'rollmacro') {debugger;
                         query.title = '';
-                        query.selection = 0;
+                        const no_specilization = query.skills[0].spec.findIndex(s => s === 'not-configured') !== -1;
+                        query.selection = no_specilization ? 'none' : 0;
                     } else {
                         query.title = 'Select Specialization';
                         const specializations = [];
@@ -7662,7 +7663,7 @@
                     query.next = 
                         query.selection === 'rollsroot' ? query.selection : 'stat';
                 break;
-                case 'skill':debugger;
+                case 'skill':
                     if (query.skills.length !== 0 && query.selection !== 'exit') {
                         const is_rollmacro = cache.source_attribute === 'rollmacro';
                         query.index = is_rollmacro ? 0 : int(query.selection);
@@ -10236,7 +10237,8 @@
                             const skill_index = cache.attrdb.skills.findIndex(s => s.row_id);
                             const individual_index = cache.attrdb.skills[skill_index].individual.findIndex(s => s.row_id);
                             const specializations = [...cache.attrdb.skills[skill_index].individual[individual_index].specializations];
-                            query.options = '|' + specializations.map(s => `${getTranslationByKey(s) || s.capitalize()},${s}`).sort().join("|");
+                            query.options = `|${getTranslationByKey("none")},not-configured|`;
+                            query.options += specializations.map(s => `${getTranslationByKey(s) || s.capitalize()},${s}`).sort().join("|");
                             query.options += `|${getTranslationByKey("exit")},exit`;
                         } else if (cache.rules_optional_maneuvers_status) {
                             query.title = getTranslationByKey("select-maneuver");
