@@ -1,3 +1,32 @@
+# 2025-4-29
+
+- Hide the inventory add/edit box on sheet open
+- Inventory add/edit:
+  - Enable editing
+  - Fix saving data
+  - Save Armor and shield properties
+  - Add OB Bonus for weapons
+  - Add item strength
+- Can now delete skill specialisations (Many, but most recently Osaran / @nlbsanarak)
+- Spells:
+  - Generate the correct RR targets for spells (@rdanhenry & @twistor - thanks!)
+  - Armor Enc% fix for Channelers.  Sorry Channelers  (@major__havoc)
+  - Allow overcasting instant spells with no prep (@coreylpierce & @jdale)
+- Stat gain: Fix the message.
+- Skills
+  - Allow Pbonus != 1. (@ixs)
+  - Fix the calculation for 27 (and only 27) ranks being wrong (@nlbsanarak thanks)
+  - Add tests for skills bonuses;
+    - Check 0,1,2,11,21,27,31,41 & 101 are correct
+    - Check each rank is strictly greater than the previous
+- Fix concentration tracker with a new dot
+- SWRaces Coversion Guide
+  - Fix for heights and weights
+- Races: Update template to be a bit mroe verbose on heights/weights
+- Tracker:
+  - Update the way movements are displayed.
+  - Show 'Okay' if no status messages
+
 # 2025-4-22
 
 - Typo updates
