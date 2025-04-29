@@ -1,8 +1,10 @@
 /*-----background-----*/
 .charsheet {
     background-image: url("https://i.imgur.com/pxJQ2ln.jpeg");
-    background-size: 400px 400px;
-    background-repeat: repeat;
+    background-size: 800px auto;
+    background-repeat: repeat-y;
+    background-position: center top;
+    background-attachment: scroll;
 }
 
 /* Transparent panels override */
@@ -11,58 +13,62 @@
 }
 
 /*----- Tab Visibility Controls -----*/
-input.sheet-tab1:not(:checked) ~ .sheet-tab1,
-input.sheet-tab2:not(:checked) ~ .sheet-tab2,
-input.sheet-tab3:not(:checked) ~ .sheet-tab3,
-input.sheet-tab4:not(:checked) ~ .sheet-tab4,
-input.sheet-tab5:not(:checked) ~ .sheet-tab5,
-input.sheet-tab6:not(:checked) ~ .sheet-tab6 {
-    display: none;
+.sheet-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
-/*----- Tab Appearance -----*/
-input.sheet-tab {
-    width: calc(16% - 4px);
-    max-width: 160px;
-    height: 24px;
-    position: relative;
-    cursor: pointer;
-    z-index: 1;
-    margin-right: 1px;
-    outline: none; /* Removed !important for accessibility friendliness */
+.sheet-tab-toggle {
+  display: none;
 }
 
-input.sheet-tab1 {
-    margin-left: 1px;
+.sheet-tab-label {
+  padding: 6px 12px;
+  background-color: #2c2c2c;
+  color: #ccc;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-/* Tab Label Styling */
-input.sheet-tab::before {
-    content: attr(title);
-    display: inline-block;
-    color: #89E799;
-    background: #114C12;
-    border: 1px solid #89E799;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    width: 100%;
-    height: 100%;
-    line-height: 24px;
+.sheet-tab-label:hover {
+  background-color: #444;
+  color: #fff;
 }
 
-input.sheet-tab:checked::before {
-    color: #114C12;
-    background: #89E799;
+.sheet-tab-toggle[value="main"]:checked ~ .sheet-tab1,
+.sheet-tab-toggle[value="skills"]:checked ~ .sheet-tab2,
+.sheet-tab-toggle[value="combat"]:checked ~ .sheet-tab3,
+.sheet-tab-toggle[value="perks"]:checked ~ .sheet-tab4,
+.sheet-tab-toggle[value="inventory"]:checked ~ .sheet-tab5,
+.sheet-tab-toggle[value="tactics"]:checked ~ .sheet-tab6 {
+  display: block;
 }
 
-/* Tab Bottom Divider */
-.sheet-tab-br {
-    border-bottom: 1px solid #a8a8a8;
-    margin-bottom: 5px;
-    margin-top: 1px;
+
+/* Hide all tab contents by default */
+.sheet-tab-content {
+  display: none;
+  padding: 10px;
+  background-color: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: white;
+  width: 100%;
+}
+
+/* Show only selected tab's content */
+.sheet-tab-toggle[value="main"]:checked ~ .sheet-tab-main,
+.sheet-tab-toggle[value="skills"]:checked ~ .sheet-tab-skills,
+.sheet-tab-toggle[value="combat"]:checked ~ .sheet-tab-combat,
+.sheet-tab-toggle[value="perks"]:checked ~ .sheet-tab-perks,
+.sheet-tab-toggle[value="inventory"]:checked ~ .sheet-tab-inventory,
+.sheet-tab-toggle[value="tactics"]:checked ~ .sheet-tab-tactics {
+  display: block;
 }
 
 /*-----Sheet Arrow System (optional expandable sections)-----*/
@@ -128,11 +134,12 @@ input.sheet-arrow[type="checkbox"]:checked + span::before {
 h5 {
     color: #89E799;
     font-weight: bold;
+    text-align: center;
 }
 
 th {
-    text-shadow: 0px 0px 10px black;
-    color: black;
+    color: inherit;
+    text-shadow: none;
 }
 
 h4, h3 {
@@ -148,7 +155,20 @@ h4, h3 {
 
 h2 {
     text-shadow: 0px 0px 20px black;
-    color: black;
+    color: #89E799;
+}
+
+.sheet-special-header {
+    color: #89E799 !important;
+    text-shadow: none;
+    text-align: center;
+    font-weight: bold;
+}
+
+.sheet-special-subheader {
+    color: #89E799 !important;
+    font-weight: bold;
+    text-align: center;
 }
 
 .sheet-center {
@@ -168,6 +188,256 @@ h2 {
     font-size: 0.6em;
 }
 
+.sheet-biotable {
+  width: 98%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 10px;
+}
+
+/* Text inputs aligned to the left (for left-side fields like Age, Sex, etc.) */
+.sheet-text-leftalign {
+  width: 85%;
+  margin-left: 10px;
+  resize: none;
+}
+
+/* Text inputs aligned to the right (for right-side fields like Height, Eyes, etc.) */
+.sheet-text-rightalign {
+  width: 85%;
+  margin-right: 10px;
+  resize: none;
+}
+
+/* Wider fields like Concept input */
+.sheet-text-wide {
+  width: 96%;
+  margin-left: 10px;
+}
+
+/* Wide textarea for Appearance */
+.sheet-textarea-wide {
+  width: 96%;
+  margin-left: 10px;
+  resize: vertical;
+}
+
+/* Table styling for Experience & Karma section */
+.sheet-expkarma-table {
+  width: 98%;
+  table-layout: fixed;
+}
+
+/* Small number input field (60px) */
+.sheet-smallfield {
+  width: 60px;
+}
+
+/* Wide number input field (90px) */
+.sheet-widefield {
+  width: 90px;
+}
+
+.sheet-special-th {
+    color: #89E799;
+    font-weight: bold;
+}
+
+/* ----- Skill Tables (All: Combat, Technical, Social, etc.) ----- */
+
+/* ----- Defense Skill Table Styling ----- */
+
+.sheet-skillname {
+    width: 25%;
+    font-weight: bold;
+    color: #89E799;
+}
+
+.sheet-skillformula {
+    color: #89E799;
+    font-size: 0.9em;
+}
+
+.sheet-skillheader {
+    background: #3e4c3f;
+    color: #f1f1e6;
+    text-align: left;
+    padding: 8px;
+    border: 1px solid #606e60;
+}
+
+/* ----- Defense Skills Table Wrapper ----- */
+.sheet-defensetable {
+    width: 80%;
+    border-collapse: separate;
+    border-spacing: 6px;
+    font-size: 12px;
+}
+
+/* Skill Category Header: "Combat Skills", "Technical Skills", etc. */
+.sheet-skillcategory {
+    text-align: left;
+    font-weight: bold;
+    background: #3e4c3f;
+    color: #f1f1e6;
+    padding: 10px 6px;
+    font-size: 14px;
+    border: 1px solid #606e60;
+}
+
+/* Total / Bonus / Point input widths */
+.sheet-skillfield {
+    width: 40px;
+}
+
+/* SPECIAL and Defaulting columns */
+.sheet-skilltag {
+    width: 30px;
+    margin-right: 2px;
+}
+
+/* Specialization input field */
+.sheet-specialization {
+    width: 100%;
+    max-width: 240px;
+    margin-right: 8px;
+}
+
+/* Skill Category width (Combat, Technical, etc.) */
+.sheet-skilltable {
+    width: 98%;
+    table-layout: fixed;
+}
+
+/* Specialization header center */
+.sheet-skilltable th:last-child {
+    text-align: center;
+}
+
+/* Align and scale all health-related tables to center with fixed layout */
+.sheet-healthblock {
+    width: 98%;
+    margin: 0 auto;
+    table-layout: fixed;
+}
+
+/* Widen the formula field in Health section for better visibility */
+.sheet-health-formula {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+/* Align Armor, Outfit & Weapon sections to center like Health section */
+.sheet-armorblock {
+    width: 98%;
+    margin: 0 auto;
+}
+
+/* Shared class for full-width fields (used in Ammo Type, Notes, Bonuses) */
+.sheet-fullwidth {
+    width: 97%;
+}
+
+/* Specific width class for Weapon Name fields */
+.sheet-weapon-name {
+    width: 90%;
+}
+
+/* Fixed width for Fire Mode input box */
+.sheet-firemode {
+    width: 100px;
+}
+
+/* Short/Medium/Long/Extreme Range field sizing */
+.sheet-rangebox {
+    width: 60px;
+}
+
+/* Heading styling override for subheadings like Weapons, Armor & Outfits */
+.sheet-subheading {
+    text-align: left;
+    font-size: 15px;
+    margin: 6px 0;
+    font-weight: bold;
+}
+
+/* Optional: If you want narrower subheadings in some sections like Armor */
+.sheet-subheading-small {
+    font-size: 15px;
+    margin: 4px 0;
+    font-weight: bold;
+}
+
+/* Perk input styling */
+
+.sheet-perk-name {
+  width: 75%;
+}
+
+.sheet-perk-mini {
+  width: 50px;
+}
+
+.sheet-perk-notes {
+  width: 97%;
+  height: 4.5em;
+  overflow: auto;
+  resize: vertical;
+}
+
+/* Inventory Table - full width */
+.sheet-inventory-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Currency input fields (Caps, NCR, Denarius) */
+.sheet-inventory-currency {
+  width: 40%;
+}
+
+/* Inventory amount field */
+.sheet-inventory-amount {
+  width: 30%;
+}
+
+/* Inventory weight field */
+.sheet-inventory-weight {
+  width: 18%;
+}
+
+/* Item description textarea */
+.sheet-inventory-description {
+  width: 97%;
+  text-align: center;
+  resize: vertical;
+  font-size: 0.9em;
+}
+
+/* Tactic / Martial Art Inputs */
+
+/* Name input (long input) */
+.sheet-tactic-name {
+  width: 75%;
+}
+
+/* Req Hits & Tac Point (short inputs) */
+.sheet-tactic-small {
+  width: 74px;
+}
+
+/* Notes textarea */
+.sheet-tactic-notes {
+  width: 97%;
+  height: 4.5em;
+  resize: vertical;
+  overflow: auto;
+  font-size: 0.9em;
+}
+
+
 /*-----tables & textarea-----*/
 
 table.sheet-center {
@@ -182,8 +452,11 @@ table.sheet-center {
     box-shadow: 0 0 5px 3px #114C12;
 }
 
-table.sheet-center td, th {
+table.sheet-center td,
+table.sheet-center th {
     padding: 5px;
+    word-wrap: break-word;
+    word-break: break-word;
 }
 
 textarea {
@@ -204,8 +477,8 @@ textarea {
 
 input.sheet-bigcheck[type="checkbox"] {
     opacity: 0;
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     position: relative;
     top: 5px;
     left: 6px;
@@ -245,8 +518,8 @@ input.sheet-bigcheck[type="checkbox"]:checked + span::before {
 
 input.sheet-roundcheck[type="checkbox"] {
     opacity: 0;
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     position: relative;
     top: 5px;
     left: 6px;
@@ -272,7 +545,7 @@ input.sheet-roundcheck[type="checkbox"] + span::before {
 }
 
 input.sheet-roundcheck[type="checkbox"]:checked + span::before {
-    color: red;
+    color: #ff4545;
     font-size: 1em;
     content: "✓";
 }
