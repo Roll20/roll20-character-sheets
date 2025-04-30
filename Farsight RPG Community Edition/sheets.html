@@ -501,7 +501,7 @@
                                 <option data-i18n="proiettorearco-option">Proiettore ad arco</option>
                                 <option data-i18n="raggioprotonico-option">Raggio Protonico</option>
                             </select>
-                            <button class="attacco" name="roll_attacco" type="roll" value="&{template:default} {{name=@{weapon}}} {{personaggio=@{nome}}} {{attacco=[[2d12+@{bonusattacco}]]}} {{danno=[[@{danno}]]}} {{tipo=@{tipo}}}"></button>
+                            <button class="attacco" name="roll_attacco" type="roll" value="&{template:default} {{name=@{weapon} }} {{personaggio=@{nome} }} {{attacco=[[2d12+@{bonusattacco}]] }} {{danno=[[@{danno}]] }} {{tipo=@{tipo} }}"></button>
                             <span data-i18n="descrizione-label" class="sheet-toggle-show text-white">Descrizione</span>
                             <input class="sheet-toggle-show" name="show" type="checkbox">
                             <div class="attacchi">
@@ -780,6 +780,35 @@
                 
             </div>
 
+            <div class="npc_abilita">
+                <button data-i18n="cmb-button" class="button-text cmb" type="roll" value="&{template:default} {{name=Combattività }} {{Risultato=[[ 2d12+@{combattività}]] }}"></button></button>
+                <input class="cmb" name="attr_combattività" type="text">
+                <button data-i18n="rob-button" class="button-text rob" type="roll" value="&{template:default} {{name=Robustezza }} {{Risultato=[[ 2d12+@{robustezza}]] }}"></button>
+                <input class="rob" name="attr_robustezza" type="text">
+                <button data-i18n="des-button" class="button-text des" type="roll" value="&{template:default} {{name=Destrezza }} {{Risultato=[[ 2d12+@{destrezza}]] }}"></button>
+                <input class="des" name="attr_destrezza" type="text">
+                <button data-i18n="per-button" class="button-text per" type="roll" value="&{template:default} {{name=Percezione }} {{Risultato=[[ 2d12+@{percezione}]] }}"></button>
+                <input class="per" name="attr_percezione" type="text">
+                <button data-i18n="int-button" class="button-text int" type="roll" value="&{template:default} {{name=Intelligenza }} {{Risultato=[[ 2d12+@{intelligenza}]] }}"></button>
+                <input class="int" name="attr_intelligenza" type="text">
+                <button data-i18n="vol-button" class="button-text vol" type="roll" value="&{template:default} {{name=Volontà }} {{Risultato=[[ 2d12+@{volontà}]] }}"></button>
+                <input class="vol" name="attr_volontà" type="text">
+                <button data-i18n="tec-button" class="button-text tec" type="roll" value="&{template:default} {{name=Tecnica }} {{Risultato=[[ 2d12+@{tecnica}]] }}"></button>
+                <input class="tec" name="attr_tecnica" type="text">
+
+                <div class="qualifiche">
+                    <label data-i18n="qualifiche-label" class="titolosezione">Qualifiche</label>
+                    <div class="repeat-qualifiche">
+                        <fieldset class="repeating_qualifiche">
+                            <input data-i18n-placeholder="qualifica-placeholder" class="qualifica" name="attr_qualifica" type="text" aria-placeholder="Qualifica">
+                            <input class="bonus" name="attr_bonus" type="number" value="">
+                            <button class="qualifica skill" name="roll_qualifica" type="roll" value="&{template:default} {{name=@{qualifica} }} {{Risultato=[[ 2d12+@{bonus}]] }}"></button>
+                        </fieldset>
+                    </div>
+                </div>
+
+            </div>
+
             <div class="npc_tratti">
 
             </div>
@@ -808,6 +837,7 @@
 
 <script type="text/worker">
 
+    // TEMPLATE SWITCH
     const buttonTemplate = ["pg", "npc", "vehicle", "ship"];
     buttonTemplate.forEach(button => {
         on(`clicked:${button}`, function() {
@@ -817,6 +847,7 @@
         });
     });
 
+    // TAB SWITCH
     const buttonTab = ["character", "powers", "biography"];
     buttonTab.forEach(button => {
         on(`clicked:${button}`, function() {
@@ -826,6 +857,8 @@
         });
     });
 
+
+    // STATS ATTRIBUTE SAVE
     let fieldskill = ["combattività","armibianche","armicinetiche","armienergetiche","arminaturali","artiglieria","lanciare","lottare","robustezza","atletica","forza","g-zero","nuotare","scalare","tempra","destrezza","acrobazia","cavalcare","danza","furtività","manolesta","pilotare","riflessi","percezione","allerta","arti-visive","intuito","ispezionare","musica","sopravvivenza","intelligenza","arti-belliche","erudizione","lucidità","medicina","natura","psicopotere","scienza","volontà","carisma","commercio","fermezza","intimidire","mondanità","scaltrezza","vita-di-strada","tecnica","astronautica","cibernetica","computer","esplosivi","meccatronica","mistificazione"];
     let fieldbio = ["robustezza","volontà","classe","livello","destrezza","difesa"]
 
@@ -1010,6 +1043,7 @@
 
     });
 
+    // WEAPON OBJECTS
     const weapons = {
         ["armapersonalizzata-option"]: {bonusattacco: "0", danno: "0", tipo: "-"},
         ["colpodisarmato-option"]: {bonusattacco: "tot_arminaturali", danno: "1d4", tipo: "Kinetic"},
@@ -1062,7 +1096,8 @@
         ["proiettorearco-option"]: {bonusattacco: "tot_armienergetiche", danno: "2d6", tipo: "Energetic"},
         ["raggioprotonico-option"]: {bonusattacco: "tot_armienergetiche", danno: "2d10", tipo: "Energetic"}
     };
-    
+
+    // REPEATING ATTACK SAVE
     on("change:repeating_attacchi:weapon", (eventInfo) => {
 
         getAttrs(["repeating_attacchi_weapon"], values => {
@@ -1121,7 +1156,7 @@
         });
     });
 
-
+    // REPEATING ATTACK UPDATE
     on("change:tot_armienergetiche change:tot_armicinetiche change:tot_arminaturali change:tot_armibianche", function() {
         // Otteniamo tutti gli ID delle righe della sezione ripetuta
         getSectionIDs("repeating_attacchi", function(ids) {
@@ -1196,6 +1231,25 @@
             });
         });
     });
-    
+
+
+    // NPC SKILLS SAVE
+    on("change:repeating_qualifiche:qualifica change:repeating_qualifiche:bonus", (eventInfo) => {
+        getAttrs(["repeating_qualifiche_qualifica", "repeating_qualifiche_bonus"], values => {
+
+            var qualifica = values.repeating_qualifiche_qualifica;
+            var qualificaBonus = values.repeating_qualifiche_bonus;
+
+            const output = {
+                "repeating_qualifiche_qualifica": qualifica,
+                "repeating_qualifiche_bonus": qualificaBonus
+            };
+
+            console.log(output)
+
+            setAttrs(output);
+
+        })
+    })
     
 </script>
