@@ -7106,24 +7106,6 @@
             query.next = 'stat';
         }
         const color = cache.rulebook === 'besmx' ? 'besm' : cache.rulebook;
-        // if (roll.type === 'skill' || roll.type === 'skill_group') {
-            //query.skill_type = cache.rulesdb.rules_optional_individual_status ? 'skills' : 'skill group';
-            /*if (roll.type === 'skill_group') {
-                query.skills = cache.attrdb['skill group'].map(s => s.active ? s.name : '').filter(n => n).sort();
-            } else {
-                query.skills = [];
-                for (let i = 0; i < cache.attrdb.skills.length; i++) {
-                    if (cache.attrdb.skills[i].active) {
-                        for (let j = 0; j < cache.attrdb.skills[i].individual.length; j++) {
-                            if (cache.attrdb.skills[i].individual[j].active) {
-                                query.skills.push(cache.attrdb.skills[i].individual[j].skill);
-                            }
-                        }
-                    }
-                }
-                query.skills.sort();
-            }*/
-        //} else {
         if (roll.type === 'attribute' || roll.type === 'attack' || roll.type === 'defense') {
             query.attributes = [];
             const filtered_attributes = all_attributes.map(a => {
@@ -7148,31 +7130,9 @@
         roll.template += cache.source_type === 'react' ?
             ` {{color=color-react-${color}}} {{color-react=color-${color}}}` :
             ` {{color=color-${color}}} {{color-react=color-react-${color}}}`;
-        query.next = roll.type;//cache.source_type === 'react' ? 
-            //cache.source_attribute === 'skill' ?
-                //cache.rulesdb.rules_optional_individual_status !== 0 ? 'skill' : 'skill_group' :
-            //cache.source_attribute : cache.source_id; //'rollsroot';
+        query.next = roll.type;
         while (!query.do_roll) {
             switch(query.next) {
-                // Roll Menu Options Root
-                /*
-                case 'rollsroot':
-                    query.title = 'Choose a roll';
-                    query.options = 
-                        '|2d6,2d6' +
-                        `|${getTranslationByKey("attack")},attack`;
-                    query.options += query.attributes.length !== 0 ?
-                        `|${getTranslationByKey("attribute")},attribute` : '';
-                    query.options +=
-                        `|${getTranslationByKey("initiative")},initiative`;
-                    query.options += query.skills.length !== 0 ?
-                        `|${getTranslationByKey("skill")},` +
-                        `${cache.rulesdb.rules_optional_individual_status ? 'skill': 'skill_group'}` : '';
-                    query.options +=
-                        `|${getTranslationByKey("stat")},stat`;
-                    query.last = query.next;
-                break;
-                */
                 // 1st tier roll options
                 case '2d6':
                     query.title = '';
@@ -7197,9 +7157,8 @@
                     } else {
                         query.title = `${getTranslationByKey("select-attribute")}`;
                         query.options = query.attributes.sort().join('');
-                        query.options += //roll.type === 'defense' ?
-                            `|${getTranslationByKey("exit")},exit`;// :
-                            //`|${getTranslationByKey("go-back")},rollsroot`;
+                        query.options +=
+                            `|${getTranslationByKey("exit")},exit`;
                     }
                     query.last = query.next;
                 break;
@@ -7210,37 +7169,92 @@
                     query.last = query.next;
                 break;
                 case 'select_weapon':
-                    query.has_weapons = cache.attrdb.weapon.length;
-                    if (
-                        (
-                            roll.type === 'defense' &&
-                            query.has_weapons === 0 &&
-                            roll.attacker.weapon.range === 0
-                        ) || roll.is_swarm
-                    ) {
+                    if (cache.source_attribute === 'rollmacro') {
                         query.title = '';
-                        query.selection = 'unarmed';
-                        break;
-                    }
-                    query.has_deflection = false;
-                    if (roll.type === 'defense') {
-                        cache.attrdb['combat technique'].forEach(a => {
-                            for (let i = 0; i < a.config.length; i++) {
-                                if (
-                                    a.config[i].name === 'deflection' &&
-                                    a.active
-                                ) {
-                                    query.has_deflection = true;
-                                }
-                            }
-                        });
-                    }
-                    query.title = roll.type === 'attack' ?
-                        `${getTranslationByKey("choose-attack")}` :
-                        `${getTranslationByKey("choose-defense")}`;
-                    query.options = '';
-                    if (query.has_weapons) {
+                    } else {
+                        query.has_weapons = cache.attrdb.weapon.length;
                         if (
+                            (
+                                roll.type === 'defense' &&
+                                query.has_weapons === 0 &&
+                                roll.attacker.weapon.range === 0
+                            ) || roll.is_swarm
+                        ) {
+                            query.title = '';
+                            query.selection = 'unarmed';
+                            break;
+                        }
+                        query.has_deflection = false;
+                        if (roll.type === 'defense') {
+                            cache.attrdb['combat technique'].forEach(a => {
+                                for (let i = 0; i < a.config.length; i++) {
+                                    if (
+                                        a.config[i].name === 'deflection' &&
+                                        a.active
+                                    ) {
+                                        query.has_deflection = true;
+                                    }
+                                }
+                            });
+                        }
+                        query.title = roll.type === 'attack' ?
+                            `${getTranslationByKey("choose-attack")}` :
+                            `${getTranslationByKey("choose-defense")}`;
+                        query.options = '';
+                        if (query.has_weapons) {
+                            if (
+                                roll.type === 'attack' || (
+                                    roll.type === 'defense' &&
+                                    roll.attacker.weapon.range === 0
+                                ) || (
+                                    roll.type === 'defense' &&
+                                    roll.attacker.weapon.range !== 0 &&
+                                    query.has_deflection
+                                )
+                            ) {
+                                const weapons = [];
+                                for (let i = 0; i < cache.attrdb.weapon.length; i++) {
+                                    const ranged_weapon =
+                                        cache.attrdb.weapon[i].enhancements.findIndex(e => e.name === 'range');
+                                    const weapon_name = cache.attrdb.weapon[i].name === '' ?
+                                        getTranslationByKey("weapon") : cache.attrdb.weapon[i].name;
+                                    if (cache.attrdb.weapon[i].active && roll.type === 'attack') {
+                                        weapons.push(`${weapon_name},${i}`);
+                                    } else if (
+                                        cache.attrdb.weapon[i].active && 
+                                        roll.type === 'defense' &&
+                                        roll.attacker.weapon.range === 0 &&
+                                        ranged_weapon === -1
+                                    ) {
+                                        weapons.push(`${weapon_name},${i}`);
+                                    } else if (
+                                        cache.attrdb.weapon[i].active && 
+                                        roll.type === 'defense' &&
+                                        roll.attacker.weapon.range !== 0 &&
+                                        query.has_deflection
+                                    ) {
+                                        if (query.options === '') {
+                                            query.options += `|${getTranslationByKey("deflection")},` +
+                                            `?{${getTranslationByKey("choose-weapon")}`;
+                                        }
+                                        query.options += `&#124;${weapon_name}&#44;${i}`;
+                                        if (i === n-1) {
+                                            query.options += `&#124;${getTranslationByKey("go-back")}&#44;select_weapon&#125;`;
+                                        }
+                                    }
+                                }
+                                query.options = `|${weapons.sort().join("|")}`;
+                            }
+                        }
+                        if (
+                            roll.type === 'defense' &&
+                            roll.attacker.weapon.range !== 0
+                        ) {
+                            query.options += 
+                                `|${getTranslationByKey("personal")},personal` +
+                                `|${getTranslationByKey("movement")},movement`;
+                        }
+                        query.options += (
                             roll.type === 'attack' || (
                                 roll.type === 'defense' &&
                                 roll.attacker.weapon.range === 0
@@ -7249,193 +7263,160 @@
                                 roll.attacker.weapon.range !== 0 &&
                                 query.has_deflection
                             )
-                        ) {
-                            const weapons = [];
-                            for (let i = 0; i < cache.attrdb.weapon.length; i++) {
-                                const ranged_weapon =
-                                    cache.attrdb.weapon[i].enhancements.findIndex(e => e.name === 'range');
-                                const weapon_name = cache.attrdb.weapon[i].name === '' ?
-                                    getTranslationByKey("weapon") : cache.attrdb.weapon[i].name;
-                                if (cache.attrdb.weapon[i].active && roll.type === 'attack') {
-                                    weapons.push(`${weapon_name},${i}`);
-                                } else if (
-                                    cache.attrdb.weapon[i].active && 
-                                    roll.type === 'defense' &&
-                                    roll.attacker.weapon.range === 0 &&
-                                    ranged_weapon === -1
-                                ) {
-                                    weapons.push(`${weapon_name},${i}`);
-                                } else if (
-                                    cache.attrdb.weapon[i].active && 
-                                    roll.type === 'defense' &&
-                                    roll.attacker.weapon.range !== 0 &&
-                                    query.has_deflection
-                                ) {
-                                    if (query.options === '') {
-                                        query.options += `|${getTranslationByKey("deflection")},` +
-                                        `?{${getTranslationByKey("choose-weapon")}`;
-                                    }
-                                    query.options += `&#124;${weapon_name}&#44;${i}`;
-                                    if (i === n-1) {
-                                        query.options += `&#124;${getTranslationByKey("go-back")}&#44;select_weapon&#125;`;
-                                    }
-                                }
-                            }
-                            query.options = `|${weapons.sort().join("|")}`;
-                        }
+                        ) ? `|${getTranslationByKey("unarmed")},unarmed` : '';
+                        query.options += query.attributes.length !== 0 && roll.type === 'defense' ?
+                            `|${getTranslationByKey("attribute")},attribute` : '';
+                        query.options += roll.type === 'attack' ? 
+                            `|${getTranslationByKey("touch")},touch` +
+                            `|${getTranslationByKey("go-back")},rollsroot` : '';
                     }
-                    if (
-                        roll.type === 'defense' &&
-                        roll.attacker.weapon.range !== 0
-                    ) {
-                        query.options += 
-                            `|${getTranslationByKey("personal")},personal` +
-                            `|${getTranslationByKey("movement")},movement`;
-                    }
-                    query.options += (
-                        roll.type === 'attack' || (
-                            roll.type === 'defense' &&
-                            roll.attacker.weapon.range === 0
-                        ) || (
-                            roll.type === 'defense' &&
-                            roll.attacker.weapon.range !== 0 &&
-                            query.has_deflection
-                        )
-                    ) ? `|${getTranslationByKey("unarmed")},unarmed` : '';
-                    query.options += query.attributes.length !== 0 && roll.type === 'defense' ?
-                        `|${getTranslationByKey("attribute")},attribute` : '';
-                    query.options += roll.type === 'attack' ? 
-                        `|${getTranslationByKey("touch")},touch` +
-                        `|${getTranslationByKey("go-back")},rollsroot` : '';
+                    query.last = query.next;
                 break;
                 case 'is_enemy':
-                    if (roll.enemies.length === 0) {
-                        const enemy_attributes = [];
-                        const enemy_defects = [];
-                        query.enemies = [];
-                        roll.enemies = [];
-                        if (roll.type === 'attack') {
-                            enemy_attributes.push('enemy attack','massive damage','weapon');
-                            enemy_defects.push('inept attack');
-                        } else {
-                            enemy_attributes.push('enemy defense','weapon');
-                            enemy_defects.push('inept defense');
-                        }
-                        for (let i = 0; i < enemy_attributes.length; i++) {
-                            for (let j = 0; j < cache.attrdb[enemy_attributes[i]].length; j++) {
-                                const enemy_index = cache.attrdb[enemy_attributes[i]][j].config.findIndex(c => c.name === 'enemy');
-                                if (enemy_index !== -1) {
-                                    query.enemies.push({
-                                        applies_to: `${
-                                            enemy_attributes[i] === 'enemy attack' ? 'attack' :
-                                            enemy_attributes[i] === 'enemy defense' ? 'defense' : 'damage'
-                                        }`,
-                                        is_defect: false,
-                                        name: cache.attrdb[enemy_attributes[i]][j].config[enemy_index].rank.toLowerCase(),
-                                        rank: cache.attrdb[enemy_attributes[i]][j].elevel,
-                                    });
-                                }
-                            }
-                        }
-                        for (let i = 0; i < enemy_defects.length; i++) {
-                            for (let j = 0; j < cache.defectdb[enemy_defects[i]].length; j++) {
-                                const enemy_index = cache.defectdb[enemy_defects[i]][j].config.findIndex(c => c.name === 'enemy');
-                                if (enemy_index !== -1) {
-                                    query.enemies.push({
-                                        applies_to: `${
-                                            enemy_defects[i] === 'inept attack' ? 'attack' :
-                                            enemy_defects[i] === 'inept defense' ? 'defense' : 'damage'
-                                        }`,
-                                        is_defect: true,
-                                        name: cache.defectdb[enemy_defects[i]][j].config[enemy_index].rank.toLowerCase(),
-                                        rank: cache.defectdb[enemy_defects[i]][j].level,
-                                    });
-                                }
-                            }
-                            
-                        }
-                    }
-                    if (query.enemies.length !== 0) {
-                        const enemies = [...query.enemies].map(e => e.name.toLowerCase()).sort();
-                        if (enemies.length === 1) {
-                            query.title = 
-                                `${getTranslationByKey("does-this-roll-apply-to-enemy")} ` +
-                                `${enemies[0].name.capitalize()}?`;
-                            query.options = 
-                                `|${getTranslationByKey("no")},no` +
-                                `|${getTranslationByKey("yes")},${enemies[0]}`;
-                        } else {
-                            query.title =
-                                `${getTranslationByKey("select-enemies-this-roll-applies-to")}`;
-                            query.options = roll.enemies.length === 0 ?
-                                `|${getTranslationByKey("none")},no` : `|${getTranslationByKey("done")},done`;
-                            query.options += '|' + enemies.map(e => {
-                                const bracket = roll.enemies.findIndex(r => r.name === e) !== -1;
-                                return `${bracket ? '[' : ''}${e.capitalize()}${bracket ? ']' : ''},${e}`;
-                            }).join('|');
-                        }
-                    } else {
+                    if (cache.source_attribute === 'rollmacro') {
                         query.title = '';
-                        query.options = '';
+                        if (cache.rolldb[query.macro_index].enemy !== '') {
+                            roll.enemies.push(cache.rolldb[query.macro_index].enemy);
+                        }
                         query.selection = 'done';
+                    } else {
+                        if (roll.enemies.length === 0) {
+                            const enemy_attributes = [];
+                            const enemy_defects = [];
+                            query.enemies = [];
+                            roll.enemies = [];
+                            if (roll.type === 'attack') {
+                                enemy_attributes.push('enemy attack','massive damage','weapon');
+                                enemy_defects.push('inept attack');
+                            } else {
+                                enemy_attributes.push('enemy defense','weapon');
+                                enemy_defects.push('inept defense');
+                            }
+                            for (let i = 0; i < enemy_attributes.length; i++) {
+                                for (let j = 0; j < cache.attrdb[enemy_attributes[i]].length; j++) {
+                                    const enemy_index = cache.attrdb[enemy_attributes[i]][j].config.findIndex(c => c.name === 'enemy');
+                                    if (enemy_index !== -1) {
+                                        query.enemies.push({
+                                            applies_to: `${
+                                                enemy_attributes[i] === 'enemy attack' ? 'attack' :
+                                                enemy_attributes[i] === 'enemy defense' ? 'defense' : 'damage'
+                                            }`,
+                                            is_defect: false,
+                                            name: cache.attrdb[enemy_attributes[i]][j].config[enemy_index].rank.toLowerCase(),
+                                            rank: cache.attrdb[enemy_attributes[i]][j].elevel,
+                                        });
+                                    }
+                                }
+                            }
+                            for (let i = 0; i < enemy_defects.length; i++) {
+                                for (let j = 0; j < cache.defectdb[enemy_defects[i]].length; j++) {
+                                    const enemy_index = cache.defectdb[enemy_defects[i]][j].config.findIndex(c => c.name === 'enemy');
+                                    if (enemy_index !== -1) {
+                                        query.enemies.push({
+                                            applies_to: `${
+                                                enemy_defects[i] === 'inept attack' ? 'attack' :
+                                                enemy_defects[i] === 'inept defense' ? 'defense' : 'damage'
+                                            }`,
+                                            is_defect: true,
+                                            name: cache.defectdb[enemy_defects[i]][j].config[enemy_index].rank.toLowerCase(),
+                                            rank: cache.defectdb[enemy_defects[i]][j].level,
+                                        });
+                                    }
+                                }
+                                
+                            }
+                        }
+                        if (query.enemies.length !== 0) {
+                            const enemies = [...query.enemies].map(e => e.name.toLowerCase()).sort();
+                            if (enemies.length === 1) {
+                                query.title = 
+                                    `${getTranslationByKey("does-this-roll-apply-to-enemy")} ` +
+                                    `${enemies[0].name.capitalize()}?`;
+                                query.options = 
+                                    `|${getTranslationByKey("no")},no` +
+                                    `|${getTranslationByKey("yes")},${enemies[0]}`;
+                            } else {
+                                query.title =
+                                    `${getTranslationByKey("select-enemies-this-roll-applies-to")}`;
+                                query.options = roll.enemies.length === 0 ?
+                                    `|${getTranslationByKey("none")},no` : `|${getTranslationByKey("done")},done`;
+                                query.options += '|' + enemies.map(e => {
+                                    const bracket = roll.enemies.findIndex(r => r.name === e) !== -1;
+                                    return `${bracket ? '[' : ''}${e.capitalize()}${bracket ? ']' : ''},${e}`;
+                                }).join('|');
+                            }
+                        } else {
+                            query.title = '';
+                            query.options = '';
+                            query.selection = 'done';
+                        }
                     }
                     query.last = query.next;
                 break;
                 case 'combat_maneuver':
                     roll.target.has_gap = false;
                     roll.target.has_weak_point = 0;
-                    if (query.target === 'opposed_roll') {
-                        if (roll.target.attrdb.armor.length !== 0) {
-                            for (let i = 0; i < roll.target.attrdb.armor.length; i++) {
-                                if (roll.target.attrdb.armor[i].active) {
-                                    const gap_index = roll.target.attrdb.armor[i].limiters.findIndex(c => c.name === 'gap');
-                                    if (gap_index !== -1) {
-                                        roll.target.has_gap = true;
-                                        i = roll.target.attrdb.armor.length;//=> only support first active armor.
+                    if (cache.source_attribute === 'rollmacro') {
+                        query.title = '';
+                        query.selection = cache.rolldb[query.macro_index].maneuver;
+                    } else {
+                        if (cache.rulesdb.rules_optional_maneuvers_status) {
+                            if (query.target === 'opposed_roll') {
+                                if (roll.target.attrdb.armor.length !== 0) {
+                                    for (let i = 0; i < roll.target.attrdb.armor.length; i++) {
+                                        if (roll.target.attrdb.armor[i].active) {
+                                            const gap_index = roll.target.attrdb.armor[i].limiters.findIndex(c => c.name === 'gap');
+                                            if (gap_index !== -1) {
+                                                roll.target.has_gap = true;
+                                                i = roll.target.attrdb.armor.length;//=> only support first active armor.
+                                            }
+                                        }
+                                    }
+                                }
+                                if (roll.target.defectdb['weak point'].length !== 0) {
+                                    for (let i = 0; i < roll.target.defectdb['weak point'].length; i++) {
+                                        if (roll.target.defectdb['weak point'][i].active) {
+                                            roll.target.has_weak_point = roll.target.defectdb['weak point'][i].level;
+                                            i = roll.target.defectdb['weak point'].length;//=> only support first weak point.
+                                        }
                                     }
                                 }
                             }
-                        }
-                        if (roll.target.defectdb['weak point'].length !== 0) {
-                            for (let i = 0; i < roll.target.defectdb['weak point'].length; i++) {
-                                if (roll.target.defectdb['weak point'][i].active) {
-                                    roll.target.has_weak_point = roll.target.defectdb['weak point'][i].level;
-                                    i = roll.target.defectdb['weak point'].length;//=> only support first weak point.
-                                }
+                            query.title = `${getTranslationByKey("select-maneuver")}`;
+                            query.options = `|${getTranslationByKey("attack")},attack`;
+                            if (cache.rulesdb.rules_optional_maneuvers_status) {
+                                query.options +=
+                                    `|${getTranslationByKey("called-shot")},?{${getTranslationByKey("select-called-shot")}`;
+                                    query.options += roll.target.has_gap ?
+                                        `&#124;${getTranslationByKey("bypass-armor")}&#44;bypass armor` : '';
+                                    query.options += 
+                                        `&#124;${getTranslationByKey("disarm")}&#44;disarm`;
+                                    query.options += cache.rulesdb.rules_optional_knockout_status ?
+                                        `&#124;${getTranslationByKey("knockout")}&#44;knockout` : '';
+                                    query.options += roll.target.has_gap ?
+                                        `&#124;${getTranslationByKey("reduce-armor")}&#44;reduce armor` : '';
+                                    query.options +=
+                                        `&#124;${getTranslationByKey("specific-location")}&#44;specific location` +
+                                        `&#124;${getTranslationByKey("vital-spot")}&#44;vital spot`;
+                                    query.options += roll.target.has_weak_point ?
+                                        `&#124;${getTranslationByKey("weak-point")}&#44;weak point` : '';
+                                    query.options += '&#125;';
                             }
+                            if (!roll.weapon.range && cache.rulesdb.rules_optional_maneuvers_status) {
+                                query.options +=
+                                    `|${getTranslationByKey("grapple")},?{${getTranslationByKey("select-grapping-maneuver")}` +
+                                        `&#124;${getTranslationByKey("bite")}&#44;bite` +
+                                        `&#124;${getTranslationByKey("grab")}&#44;grab` +
+                                        `&#124;${getTranslationByKey("lock")}&#44;lock` +
+                                        `&#124;${getTranslationByKey("pin")}&#44;pin` +
+                                        `&#124;${getTranslationByKey("throw")}&#44;throw&#125;`;
+                            }
+                            query.options += `|${getTranslationByKey("go-back")},select_weapon`;
+                        } else {
+                            query.title = '';
+                            query.selection = 'attack';
                         }
                     }
-                    query.title = `${getTranslationByKey("select-maneuver")}`;
-                    query.options = `|${getTranslationByKey("attack")},attack`;//roll.weapon.is_attribute && !roll.weapon.range ? 
-                        //`|${getTranslationByKey("touch")},touch` : `|${getTranslationByKey("attack")},attack`;
-                    if (cache.rulesdb.rules_optional_maneuvers_status) {
-                        query.options +=
-                            `|${getTranslationByKey("called-shot")},?{${getTranslationByKey("select-called-shot")}`;
-                            query.options += roll.target.has_gap ?
-                                `&#124;${getTranslationByKey("bypass-armor")}&#44;bypass armor` : '';
-                            query.options += 
-                                `&#124;${getTranslationByKey("disarm")}&#44;disarm`;
-                            query.options += cache.rulesdb.rules_optional_knockout_status ?
-                                `&#124;${getTranslationByKey("knockout")}&#44;knockout` : '';
-                            query.options += roll.target.has_gap ?
-                                `&#124;${getTranslationByKey("reduce-armor")}&#44;reduce armor` : '';
-                            query.options +=
-                                `&#124;${getTranslationByKey("specific-location")}&#44;specific location` +
-                                `&#124;${getTranslationByKey("vital-spot")}&#44;vital spot`;
-                            query.options += roll.target.has_weak_point ?
-                                `&#124;${getTranslationByKey("weak-point")}&#44;weak point` : '';
-                            query.options += '&#125;';
-                    }
-                    if (!roll.weapon.range && cache.rulesdb.rules_optional_maneuvers_status) {
-                        query.options +=
-                            `|${getTranslationByKey("grapple")},?{${getTranslationByKey("select-grapping-maneuver")}` +
-                                `&#124;${getTranslationByKey("bite")}&#44;bite` +
-                                `&#124;${getTranslationByKey("grab")}&#44;grab` +
-                                `&#124;${getTranslationByKey("lock")}&#44;lock` +
-                                `&#124;${getTranslationByKey("pin")}&#44;pin` +
-                                `&#124;${getTranslationByKey("throw")}&#44;throw&#125;`;
-                    }
-                    query.options += `|${getTranslationByKey("go-back")},select_weapon`;
                     query.last = query.next;
                 break;
                 case 'specific location':
@@ -7491,22 +7472,36 @@
                     roll.template += ' {{initiative=1}} {{title=Initiative}}';
                 break;
                 case 'skill_group':
-                    query.title = `Select Skill Group`;
-                    query.skill_groups = [];
-                    for (let i = 0; i < all_skill_groups.length; i++) {
-                        const skill_group = { name: '', elevel: 0 };
-                        for (let j = 0; j < cache.attrdb['skill group'].length; j++) {
-                            if (cache.attrdb['skill group'][j].name.toLowerCase() === all_skill_groups[i]) {
-                                skill_group.name = all_skill_groups[i];
-                                skill_group.elevel += cache.attrdb['skill group'][j].elevel;
+                    if (cache.source_attribute === 'rollmacro') {
+                        query.title = '';
+                        const skill_id = cache.rolldb[query.macro_index].attribute.id;
+                        const skill_index = cache.attrdb['skill group'].findIndex(s => s.row_id === skill_id);
+                        query.skilldb = cache.attrdb['skill group'][skill_index];
+                        query.skill_groups = [{
+                            name: query.skilldb.name,
+                            elevel: query.skilldb.elevel,
+                        }];
+                        query.index = skill_index;
+                        query.name = getTranslationByKey(`${query.skilldb.name.toKebobCase()}`);
+                        query.level = query.skilldb.elevel;
+                    } else {
+                        query.title = `Select Skill Group`;
+                        query.skill_groups = [];
+                        for (let i = 0; i < all_skill_groups.length; i++) {
+                            const skill_group = { name: '', elevel: 0 };
+                            for (let j = 0; j < cache.attrdb['skill group'].length; j++) {
+                                if (cache.attrdb['skill group'][j].name.toLowerCase() === all_skill_groups[i]) {
+                                    skill_group.name = all_skill_groups[i];
+                                    skill_group.elevel += cache.attrdb['skill group'][j].elevel;
+                                }
                             }
+                            if (skill_group.name !== '') { query.skill_groups.push(skill_group); }
                         }
-                        if (skill_group.name !== '') { query.skill_groups.push(skill_group); }
+                        query.options = query.skill_groups.map((s, i) => `|${
+                            getTranslationByKey(s.name.toKebobCase())
+                        },${i}`).join('');
+                        query.options += `|${getTranslationByKey("go-back")},rollsroot`;
                     }
-                    query.options = query.skill_groups.map((s, i) => `|${
-                        getTranslationByKey(s.name.toKebobCase())
-                    },${i}`).join('');
-                    query.options += `|${getTranslationByKey("go-back")},rollsroot`;
                     query.last = query.next;
                 break;
                 case 'skill':
@@ -7546,7 +7541,7 @@
                     query.last = query.next;
                 break;
                 case 'specialization':
-                    if (cache.source_attribute === 'rollmacro') {debugger;
+                    if (cache.source_attribute === 'rollmacro') {
                         query.title = '';
                         const no_specilization = query.skills[0].spec.findIndex(s => s === 'not-configured') !== -1;
                         query.selection = no_specilization ? 'none' : 0;
@@ -7558,7 +7553,9 @@
                             specializations.push(`${specialization === false ? 
                                 query.skills[query.index].spec[i] : specialization},${i}`);
                         }
-                        query.options = '|None,none|' + specializations.sort().join("|");
+                        query.options = '|None,none';
+                        query.options += specializations.length !== 0 ? '|' + specializations.sort().join("|") : '';
+                        query.options += `|${getTranslationByKey("exit")},exit`;
                     }
                     query.last = query.next;
                 break;
@@ -7756,11 +7753,21 @@
                         range: 0
                     };
                     // Get weapon range and name
-                    if (query.selection === 'attribute') {
+                    if (cache.source_attribute === 'rollmacro') {
+                        roll.weapon.index = 
+                            cache.attrdb.weapon.findIndex(w => w.row_id === cache.rolldb[query.macro_index].attribute.id);
+                        query.weapondb = cache.attrdb.weapon[roll.weapon.index];
+                        roll.weapon.name = query.weapondb.name;
+                        const range_index = 
+                            query.weapondb.enhancements.findIndex(e => e.name === 'range');
+                        roll.weapon.range = range_index !== -1 ?
+                            query.weapondb.enhancements[range_index].rank : 0;
+                        roll.weapon.elevel = query.weapondb.elevel;
+                    } else if (query.selection === 'attribute') {
                         query.next = 'attribute';
                         break;
                     } else if (
-                        query.selection === 'rollsroot' || 
+                        //query.selection === 'rollsroot' || 
                         query.selection === 'select_weapon'
                     ) {
                         query.next = query.selection;
@@ -8031,7 +8038,8 @@
                         const enemy_name = enemy_index !== -1 ? cache.attrdb['massive damage'][i].config[enemy_index].rank : '';
                         const weapon_index = cache.attrdb['massive damage'][i].config.findIndex(e => e.name === 'weapon_class');
                         const weapon_class = weapon_index !== -1 ? cache.attrdb['massive damage'][i].config[weapon_index].rank : '';
-                        const is_enemy = roll.enemies.length !== 0 ? roll.enemies.findIndex(e => e.name === enemy_name) !== -1 : false;
+                        const is_enemy = roll.enemies.length !== 0 ? 
+                            roll.enemies.findIndex(e => e.toLowerCase() === enemy_name.toLowerCase()) !== -1 : false;
                         if (cache.attrdb['massive damage'][i].active) {
                             if (
                                 enemy_index !== -1 && weapon_index !== -1 &&
@@ -10223,7 +10231,9 @@
                                 }
                             }
                         }
-                        query.options = '|' + query.enemies.map(e => `${e.name.capitalize()},${e.name}`).filter(n => n).sort().join("|");
+                        query.options = `|${getTranslationByKey("none")},not-configured`;
+                        query.options += '|' + query.enemies.map(e => `${e.name.capitalize()},${e.name}`).filter(n => n).sort().join("|");
+                        query.options += `|${getTranslationByKey("exit")},exit`;
                         query.last = query.next;
                     } else {
                         clog(cache, 'Not Applicable', 'ERROR');
@@ -10240,7 +10250,7 @@
                             query.options = `|${getTranslationByKey("none")},not-configured|`;
                             query.options += specializations.map(s => `${getTranslationByKey(s) || s.capitalize()},${s}`).sort().join("|");
                             query.options += `|${getTranslationByKey("exit")},exit`;
-                        } else if (cache.rules_optional_maneuvers_status) {
+                        } else if (cache.rulesdb.rules_optional_maneuvers_status) {
                             query.title = getTranslationByKey("select-maneuver");
                             query.options =
                                 `|${getTranslationByKey("attack")},attack` +
@@ -10262,7 +10272,7 @@
                                     `&#124;${getTranslationByKey("throw")}&#44;throw&#125;`;
                         } else {
                             query.title = '';
-                            query.selection = `${getTranslationByKey("attack")},attack`;
+                            query.selection = 'attack';
                         }
                         query.last = query.next; 
                     } else {
@@ -10383,12 +10393,14 @@
                         query.commit = true;
                     break;
                     case 'enemy':
-                        set_values[`${cache.source_path}_enemy`] = query.selection.capitalize();
-                        cache.rolldb[query.index].enemy = query.selection;
+                        set_values[`${cache.source_path}_enemy`] = query.selection === 'not-configured' ?
+                            `${getTranslationByKey(query.selection)}` : query.selection.capitalize();
+                        cache.rolldb[query.index].enemy = query.selection === 'not-configured' ?
+                            '' : query.selection;
                         query.commit = true;
                     break;
                     case 'maneuver':
-                        set_values[`${cache.source_path}_maneuver`] = getTranslationByKey(query.selection);
+                        set_values[`${cache.source_path}_maneuver`] = getTranslationByKey(query.selection.toKebobCase());
                         cache.rolldb[query.index].maneuver = query.selection;
                         query.commit = true;
                     break;
@@ -10490,10 +10502,15 @@
                                     let value = '';
                                     switch(macro_fields[i]) {
                                         case 'attribute':
-                                        case 'maneuver':
                                         case 'modifier':
                                         case 'stat':
                                         case 'target': value = getTranslationByKey("not-configured"); break;
+                                        case 'maneuver':
+                                            value = getTranslationByKey(`${
+                                                cache.rulesdb.rules_optional_individual_status ?
+                                                    "not-configured" : "not-applicable"
+                                            }`);
+                                        break;
                                         default: value = getTranslationByKey("not-applicable");
                                     }
                                     set_values[`${cache.source_path}_${macro_fields[i]}`] = value;
