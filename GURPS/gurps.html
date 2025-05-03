@@ -18536,7 +18536,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 						</label>
 					</div>
 					<div class="grid-item">
-						<input type="number" name="attr_vehicle_earth_gravities" value="0" title="Macro: @{NAME|vehicle_earth_gravities}" />
+						<input type="number" name="attr_vehicle_earth_gravities" readonly value="0" title="Macro: @{NAME|vehicle_earth_gravities}" />
 					</div>
 				</div>
 
@@ -59009,7 +59009,7 @@ Characters with Skill: ${knowsSkill}`;
 
 	};
 
-	const vehicleVelicityFields = [
+	const vehicleVelocityFields = [
 		"vehicle_movement_type",
 		"vehicle_acceleration",
 		"vehicle_deceleration",
@@ -59018,7 +59018,7 @@ Characters with Skill: ${knowsSkill}`;
 		"vehicle_change_in_velocity"
 	];
 
-	vehicleVelicityFields.forEach(field => {
+	vehicleVelocityFields.forEach(field => {
 
 		on(`change:${field}`, event => {
 
@@ -59035,7 +59035,7 @@ Characters with Skill: ${knowsSkill}`;
 	 */
 	function updateVehicleTurnRadiusMovements() {
 	
-		getAttrs(vehicleVelicityFields, function (values) {
+		getAttrs(vehicleVelocityFields, function (values) {
 
 			console.log("updateVehicleTurnRadiusMovements", values);
 	
@@ -59106,6 +59106,47 @@ Characters with Skill: ${knowsSkill}`;
 	
 		});
 	
+	}
+
+	const spacecraftGravityAccelerationFields = [
+		"vehicle_spacecraft",
+		"vehicle_acceleration"
+	];
+
+	spacecraftGravityAccelerationFields.forEach(field => {
+
+		on(`change:${field}`, event => {
+
+			updateSpacecraftGravityAcceleration();
+
+		});
+
+	});
+
+	const updateSpacecraftGravityAcceleration = () => {
+
+		getAttrs(spacecraftGravityAccelerationFields, values => {
+
+			let isSpacecraft = Number(values.vehicle_spacecraft) || 0;
+
+			let acceleration = Number(values.vehicle_acceleration) || 0;
+
+			let gravityAcceleration = 0;
+
+			if (isSpacecraft == 1) {
+				
+				gravityAcceleration =acceleration / 10;
+
+				// set 2 decimal places
+				gravityAcceleration = Math.round(gravityAcceleration * 100) / 100;
+			} 
+
+			setAttrs({
+				vehicle_earth_gravities: gravityAcceleration
+			});
+
+		});
+
 	}
 
 </script>
