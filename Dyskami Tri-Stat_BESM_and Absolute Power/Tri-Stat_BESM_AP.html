@@ -7407,7 +7407,6 @@
                     roll.template += ' {{initiative=1}} {{title=Initiative}}';
                 break;
                 case 'skill_group':
-                    query.title = `Select Skill Group`;
                     query.skill_groups = [];
                     for (let i = 0; i < all_skill_groups.length; i++) {
                         const skill_group = { name: '', elevel: 0 };
@@ -7419,14 +7418,21 @@
                         }
                         if (skill_group.name !== '') { query.skill_groups.push(skill_group); }
                     }
-                    query.options = query.skill_groups.map((s, i) => `|${
-                        getTranslationByKey(s.name.toKebobCase())
-                    },${i}`).join('');
-                    query.options += `|${getTranslationByKey("go-back")},rollsroot`;
+                    if (query.skill_groups.length === 0) {
+                        query.title = '';
+                        clog(cache, 'No skill groups found', 'ERROR');
+                        query.selection = 'stat';
+                        break;
+                    } else {
+                        query.title = `Select Skill Group`;
+                        query.options = query.skill_groups.map((s, i) => `|${
+                            getTranslationByKey(s.name.toKebobCase())
+                        },${i}`).join('');
+                        query.options += `|${getTranslationByKey("exit")},exit`;
+                    }
                     query.last = query.next;
                 break;
                 case 'skill':
-                    query.title = `Select Skill`;
                     query.skills = [];
                     for (let i = 0; i < all_skills.length; i++) {
                         const skill = { name: '', rank: 0, spec: [], stat: [] };
@@ -7444,10 +7450,19 @@
                         }
                         if (skill.name !== '') { query.skills.push(skill); }
                     }
-                    query.options = query.skills.map((s, i) => `|${
-                        getTranslationByKey(s.name.toKebobCase())
-                    },${i}`).join('');
-                    query.options += `|${getTranslationByKey("go-back")},rollsroot`;
+                    if (query.skills.length === 0) {
+                        query.title = '';
+                        clog(cache, 'No skills found', 'ERROR');
+                        query.selection = 'exit';
+                        query.skills.push({spec:[]});
+                        break;
+                    } else {
+                        query.title = `Select Skill`;
+                        query.options = query.skills.map((s, i) => `|${
+                            getTranslationByKey(s.name.toKebobCase())
+                        },${i}`).join('');
+                        query.options += `|${getTranslationByKey("exit")},exit`;
+                    }
                     query.last = query.next;
                 break;
                 case 'specialization':
@@ -7548,7 +7563,7 @@
                         query.selection : roll.type === 'defense' ? 'done' : 'stat';
                 break;
                 case 'skill_group':
-                    if (query.skill_groups.length !== 0 && query.selection !== 'rollsroot') {
+                    if (query.skill_groups.length !== 0 && query.selection !== 'exit') {
                         query.index = int(query.selection);
                         query.name = getTranslationByKey(`${query.skill_groups[query.index].name.toKebobCase()}`);
                         query.level = query.skill_groups[query.index].elevel;
@@ -7556,22 +7571,22 @@
                         roll.type = 'stat';
                     }
                     query.next = 
-                        query.selection === 'rollsroot' ? query.selection : 'stat';
+                        query.selection === 'exit' ? query.selection : 'stat';
                 break;
                 case 'skill':
-                    if (query.skills.length !== 0 && query.selection !== 'rollsroot') {
+                    if (query.skills.length !== 0 && query.selection !== 'exit') {
                         query.index = int(query.selection);
                         query.name = getTranslationByKey(`${query.skills[query.index].name.toKebobCase()}`);
                         query.level = query.skills[query.index].rank;
                         query.stat = query.skills[query.index].stat;
                         query.specializations = '';
+                        query.next = 
+                            query.skills[query.selection].spec.length !== 0 ? 
+                            'specialization' : 'stat';
                     } else {
                         roll.type = 'stat';
+                        query.next = 'stat';
                     }
-                    query.next = 
-                        query.selection === 'rollsroot' ? query.selection : 
-                        query.skills[query.selection].spec.length !== 0 ? 'specialization' :
-                        'stat';
                 break;
                 case 'specialization':
                     if (query.selection !== 'none') {
