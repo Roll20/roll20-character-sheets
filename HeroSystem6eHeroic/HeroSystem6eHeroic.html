@@ -1430,7 +1430,7 @@
 					
 					<div class="subitem-tab-gear-flex-container-set-defense-column">
 						<div class="item-tab-gear-set-defense-title">
-							<h1>Adjustments</h1>
+							<h1></h1>
 						</div>
 						
 						<div class="subitem-tab-gear-flex-container-set-damage-button">
@@ -22006,37 +22006,80 @@
 		var armorId = String(num).padStart(2,'0');	
 		
 		
-		on(`change:armorPD${armorId} change:armorED${armorId} change:powerDefense${armorId} change:mentalDefense${armorId} change:flashDefense${armorId}`, function() {
-			getAttrs(["armorPD"+armorId, "armorED"+armorId, "powerDefense"+armorId, "mentalDefense"+armorId, "flashDefense"+armorId, "pd", "ed"], function(values) {
+		on(`change:armorPD${armorId} change:armorED${armorId} change:powerDefense${armorId} change:mentalDefense${armorId} change:flashDefense${armorId} change:pdNet change:edNet`, function() {
+			getAttrs(["armorPD"+armorId, "armorED"+armorId, "powerDefense"+armorId, "mentalDefense"+armorId, "flashDefense"+armorId, "pdNet", "edNet"], function(values) {
 			
 			var attributes = new Object();
 			
-			const rPD = parseInt(values["armorPD"+armorId])||0;
-			const rED = parseInt(values["armorED"+armorId])||0;
-			const powerDEF = parseInt(values["powerDefense"+armorId])||0;
-			const mentalDEF = parseInt(values["mentalDefense"+armorId])||0;
-			const flashDEF = parseInt(values["flashDefense"+armorId])||0;
-			
+			const maxDEF = 99;
+			const minDEF = 0;
+			const PD = Math.min(maxDEF, Math.max(minDEF, parseInt(values.pdNet)||0));
+			const ED = Math.min(maxDEF, Math.max(minDEF, parseInt(values.edNet)||0));
+			const rPD = Math.min(maxDEF, Math.max(minDEF, parseInt(values["armorPD"+armorId])||0));
+			const rED = Math.min(maxDEF, Math.max(minDEF, parseInt(values["armorED"+armorId])||0));
+			const powerDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["powerDefense"+armorId])||0));
+			const mentalDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["mentalDefense"+armorId])||0));
+			const flashDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["flashDefense"+armorId])||0));
 			let armorString = "";
+			let first = true;
+			let numDEF = 0;
+			let numDigits = 0;
 			
+			// Get an approximate idea of the space required.			
 			if (rPD !== 0) {
-				armorString += " " + rPD.toString() + " PD";
+				numDEF++;
+				numDigits += (rPD >= 10) ? 2 : 1;
+			}
+			if (rED !== 0) {
+				numDEF++;
+				numDigits += (rED >= 10) ? 2 : 1;
+			}
+			if (powerDEF !== 0) {
+				numDEF++;
+				numDigits += (powerDEF >= 10) ? 2 : 1;
+			}
+			if (mentalDEF !== 0) {
+				numDEF++;
+				numDigits += (mentalDEF >= 10) ? 2 : 1;
+			}
+			if (flashDEF !== 0) {
+				numDEF++;
+				numDigits += (flashDEF >= 10) ? 2 : 1;
+			}
+			
+			const theBreak = (numDEF <= 3) ? " ❖ " : " ";
+			const theSpace = (numDEF <= 3) ? " " : "";
+			
+			// Create a space-optimized string of defense stats.
+			if (rPD !== 0) {
+				armorString += rPD.toString() + theSpace + ((numDEF > 4) && (numDigits > 7) ? "P" : "PD");
+				attributes["totalPD"+armorId] = PD + rPD;
+				first = false;
+			} else {
+				attributes["totalPD"+armorId] = PD;
 			}
 			
 			if (rED !== 0) {
-				armorString += " " + rED.toString() + " ED";
+				armorString += (first ? "" : theBreak) + rED.toString() + theSpace + ((numDEF > 4) && (numDigits > 7) ? "E" : "ED");
+				attributes["totalED"+armorId] = ED + rED;
+				first = false;
+			} else {
+				attributes["totalED"+armorId] = ED;
 			}
 			
 			if (powerDEF !== 0) {
-				armorString += " " + powerDEF.toString() + " PW";
+				armorString += (first ? "" : theBreak) + powerDEF.toString() + theSpace + ((numDEF > 4) || (numDigits > 4) ? "PW" : "PWD");
+				first = false;
 			}
 			
 			if (mentalDEF !== 0) {
-				armorString += " " + mentalDEF.toString() + " MN";
+				armorString += (first ? "" : theBreak) + mentalDEF.toString() + theSpace + ((numDEF > 4) || (numDigits > 6) ? "M" : "MD");
+				first = false;
 			}
 			
 			if (flashDEF !== 0) {
-				armorString += " " + flashDEF.toString() + " FL";
+				armorString += (first ? "" : theBreak) + flashDEF.toString() + theSpace + ((numDEF > 4) || (numDigits > 6) ? "F" : "FD");
+				first = false;
 			}
 			
 			attributes["armorDefense"+armorId] = armorString;
