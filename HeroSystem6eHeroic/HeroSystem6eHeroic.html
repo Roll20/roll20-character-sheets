@@ -22262,8 +22262,8 @@
 		var armorId = String(num).padStart(2,'0');	
 		
 		
-		on(`change:armorPD${armorId} change:armorED${armorId} change:powerDefense${armorId} change:mentalDefense${armorId} change:flashDefense${armorId} change:pdNet change:edNet`, function() {
-			getAttrs(["armorPD"+armorId, "armorED"+armorId, "powerDefense"+armorId, "mentalDefense"+armorId, "flashDefense"+armorId, "pdNet", "edNet"], function(values) {
+		on(`change:armorPD${armorId} change:armorED${armorId} change:powerDefense${armorId} change:mentalDefense${armorId} change:flashDefense${armorId} change:flashDefenseSight${armorId} change:flashDefenseHearing${armorId} change:flashDefenseSmell${armorId} change:flashDefenseMental${armorId} change:flashDefenseTouch${armorId} change:flashDefenseRadio${armorId} change:pdNet change:edNet`, function() {
+			getAttrs(["armorPD"+armorId, "armorED"+armorId, "powerDefense"+armorId, "mentalDefense"+armorId, "flashDefense"+armorId, "flashDefenseSight"+armorId, "flashDefenseHearing"+armorId, "flashDefenseSmell"+armorId, "flashDefenseTouch"+armorId, "flashDefenseMental"+armorId, "flashDefenseRadio"+armorId, "pdNet", "edNet"], function(values) {
 			
 			var attributes = new Object();
 			
@@ -22276,7 +22276,15 @@
 			const powerDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["powerDefense"+armorId])||0));
 			const mentalDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["mentalDefense"+armorId])||0));
 			const flashDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["flashDefense"+armorId])||0));
+			const flashDefSight = (values["flashDefenseSight"+armorId] === "on") ? true : false;
+			const flashDefHearing = (values["flashDefenseHearing"+armorId] === "on") ? true : false;
+			const flashDefSmell = (values["flashDefenseSmell"+armorId] === "on") ? true : false;
+			const flashDefTouch = (values["flashDefenseTouch"+armorId] === "on") ? true : false;
+			const flashDefMental = (values["flashDefenseMental"+armorId] === "on") ? true : false;
+			const flashDefRadio = (values["flashDefenseRadio"+armorId] === "on") ? true : false;
+			
 			let armorString = "";
+			let flashDefSenseString = "";
 			let first = true;
 			let numDEF = 0;
 			let numDigits = 0;
@@ -22336,6 +22344,20 @@
 			if (flashDEF !== 0) {
 				armorString += (first ? "" : theBreak) + flashDEF.toString() + theSpace + ((numDEF > 4) || (numDigits > 6) ? "F" : "FD");
 				first = false;
+				
+				// Add sense tags.
+				if (numDEF < 3) {
+					flashDefSenseString += flashDefSight ? "v" : "";
+					flashDefSenseString += flashDefHearing ? "h" : "";
+					flashDefSenseString += flashDefSmell ? "s" : "";
+					flashDefSenseString += flashDefTouch ? "t" : "";
+					flashDefSenseString += flashDefMental ? "m" : "";
+					flashDefSenseString += flashDefRadio ? "r" : "";
+					
+					if (flashDefSenseString.length > 0) {
+						armorString += " (" + flashDefSenseString + ")";
+					}
+				}
 			}
 			
 			attributes["armorDefense"+armorId] = armorString;
