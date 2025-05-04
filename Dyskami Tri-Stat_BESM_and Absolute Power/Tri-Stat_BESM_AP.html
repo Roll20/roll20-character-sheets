@@ -7054,6 +7054,7 @@
         for (let i = 0, n = stats.length; i < n; i++) {
             temp[i] = 
                 cache.statsdb[stats[i]].base +
+                (cache.statsdb[stats[i]].augmented || 0) +
                 cache.statsdb[stats[i]].temp -
                 cache.statsdb[stats[i]].damage - (
                     stats[i] === 'health' ? 
@@ -7560,6 +7561,19 @@
                         },${i}`).join('');
                         query.options += `|${getTranslationByKey("exit")},exit`;
                     }
+                    if (query.skills.length === 0) {
+                        query.title = '';
+                        clog(cache, 'No skills found', 'ERROR');
+                        query.selection = 'exit';
+                        query.skills.push({spec:[]});
+                        break;
+                    } else {
+                        query.title = `Select Skill`;
+                        query.options = query.skills.map((s, i) => `|${
+                            getTranslationByKey(s.name.toKebobCase())
+                        },${i}`).join('');
+                        query.options += `|${getTranslationByKey("exit")},exit`;
+                    }
                     query.last = query.next;
                 break;
                 case 'specialization':
@@ -7672,7 +7686,7 @@
                         query.selection : roll.type === 'defense' ? 'done' : 'stat';
                 break;
                 case 'skill_group':
-                    if (query.skill_groups.length !== 0 && query.selection !== 'rollsroot') {
+                    if (query.skill_groups.length !== 0 && query.selection !== 'exit') {
                         query.index = int(query.selection);
                         query.name = getTranslationByKey(`${query.skill_groups[query.index].name.toKebobCase()}`);
                         query.level = query.skill_groups[query.index].elevel;
@@ -7680,7 +7694,7 @@
                         roll.type = 'stat';
                     }
                     query.next = 
-                        query.selection === 'rollsroot' ? query.selection : 'stat';
+                        query.selection === 'exit' ? query.selection : 'stat';
                 break;
                 case 'skill':
                     if (query.skills.length !== 0 && query.selection !== 'exit') {
@@ -7701,6 +7715,7 @@
                         }
                     } else {
                         roll.type = 'stat';
+                        query.next = 'stat';
                     }
                     query.next = 
                         query.selection === 'exit' ? query.selection : 
