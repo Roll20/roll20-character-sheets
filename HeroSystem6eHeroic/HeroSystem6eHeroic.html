@@ -1422,7 +1422,7 @@
 						</div>
 						<div class="subitem-tab-gear-flex-container-set-defense-row">
 							<div class="subitem-tab-gear-flex-container-set-damage-button">
-								<button type="action" class="button buttonOK" tabindex="93" name="act_buttonDefenseOK">OK</button>
+								<button type="action" class="button buttonOK" tabindex="7" name="act_buttonDefenseOK">OK</button>
 							</div>
 						</div>
 					</div>
@@ -22129,42 +22129,49 @@
 	arrayOf(maxArmorNum).forEach(num => {
 		var armorId = String(num).padStart(2,'0');
 		on(`clicked:activateArmor${armorId}`, (info) => {
-			getAttrs(["whisperToGM", "character_title", "displayDegreeOfSuccess", "armorActivation"+armorId, "armorLocations"+armorId, "totalPD"+armorId, "totalED"+armorId, "dingbat"], function(values) {
+			getAttrs(["whisperToGM", "character_title", "displayDegreeOfSuccess", "optionHitLocationSystem", "armorActivation"+armorId, "armorLocations"+armorId, "armorPD"+armorId, "armorED"+armorId, "powerDefense"+armorId, "mentalDefense"+armorId, "flashDefense"+armorId, "dingbat"], function(values) {
 				var theRoll = values.whisperToGM||"";
-				var actOn = values["armorActivation"+armorId]||18;
-				var locations = values["armorLocations"+armorId]||"";
+				
+				const actOn = values["armorActivation"+armorId]||18;
+				const dispDoS = (values.displayDegreeOfSuccess === "on") ? true : false;
+				const useLocations = (values.optionHitLocationSystem === "on") ? true : false;
+				const locations = values["armorLocations"+armorId]||"";
 				const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
+				
+				const maxDEF = 99;
+				const minDEF = 0;
+				
+				const rPD = Math.min(maxDEF, Math.max(minDEF, parseInt(values["armorPD"+armorId])||0));
+				const rED = Math.min(maxDEF, Math.max(minDEF, parseInt(values["armorED"+armorId])||0));
+				const powerDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["powerDefense"+armorId])||0));
+				const mentalDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["mentalDefense"+armorId])||0));
+				const flashDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["flashDefense"+armorId])||0));
 				
 				theRoll += "&{template:custom-activate} ";
 				theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
 				theRoll += "{{subtitle= Defends with @{armorName"+armorId+"}**}} ";
 				
-				if (actOn >= 18) {
-					if (locations.trim() != "") {
-						theRoll += "{{Locations=@{armorLocations"+armorId+"}}}";
+				if (actOn < 18) {
+					if (dispDoS) {
+						theRoll += "{{SUCCESS=[[@{armorActivation"+armorId+"}[Armor Activation]-3d6cf6cs1[Roll]]]}} ";
+					} else {
+						theRoll += "{{Activate on = [[@{armorActivation"+armorId+"}]] **or less**}} ";
+						theRoll += "{{Result = [[3d6cf6cs1]]}} ";
 					}
-				} else if (values.displayDegreeOfSuccess != 0) {
-					theRoll += "{{SUCCESS=[[@{armorActivation"+armorId+"}[Armor Activation]-3d6cf6cs1[Roll]]]}} ";
-				} else {
-					theRoll += "{{Activate on = [[@{armorActivation"+armorId+"}]] **or less**}} "
-						+ "{{Result = [[3d6cf6cs1]]}} ";
 				}
 				
-				theRoll += "{{Resistant Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} "
-					+ "{{Total Defense = ";
+				theRoll += (useLocations && (locations.trim() !== "")) ? "{{Locations=@{armorLocations"+armorId+"}}}" : "";
 				
-				// if TotalPD is not filled, then calcluate Character + Armor
-				if (values["totalPD"+armorId] == 0)	
-					theRoll += "**PD [[@{pd}[Character PD]+@{armorPD"+armorId+"}[Armor PD]]] ";
-				else
-					theRoll += "**PD ``@{totalPD"+armorId+"}`` ";
+				theRoll += ((rPD !== 0) || (rED !== 0)) ? "{{Resistant Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} " : "";
+				if ((rPD !== 0) || (rED !== 0)) {
+					theRoll += "{{Resistant Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} ";
+					theRoll += "{{Total Defense = **PD ``@{totalPD"+armorId+"}`` ED ``@{totalED"+armorId+"}``**}} ";
+				}
 				
-				// if TotalED is not filled, then calcluate Character + Armor
-				if (values["totalED"+armorId] == 0)
-					theRoll += "ED [[@{ed}[Character ED]+@{armorED"+armorId+"}[Armor ED]]]**}}";
-				else
-					theRoll += "ED ``@{totalED"+armorId+"}``**}}";
-					
+				theRoll += (powerDEF !== 0) ? "{{Power Defense = **``@{powerDefense"+armorId+"}``**}} " : "";
+				theRoll += (mentalDEF !== 0) ? "{{Mental Defense = **``@{mentalDefense"+armorId+"}``**}} " : "";
+				theRoll += (flashDEF !== 0) ? "{{Flash Defense = **``@{flashDefense"+armorId+"}``**}} " : "";
+				
 				startRoll(theRoll, (results) => {
 					finishRoll(results.rollId, {});
 				});
