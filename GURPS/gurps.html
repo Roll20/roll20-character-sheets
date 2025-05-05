@@ -18182,8 +18182,8 @@ Select the indent level of the spell. This is handy to help show the spell belon
 					</div>
 					<div class="grid-item">
 						<select name="attr_vehicle_injury_tolerance">
-							<option value="machine" data-i18n="machine-option">Machine meta-trait (HT 10)</option>
-							<option value="machine" data-i18n="unpowered-option">Unpowered (HT 12)</option>
+							<option value="Machine" data-i18n="machine-option">Machine meta-trait (HT 10)</option>
+							<option value="Unpowered" data-i18n="unpowered-option">Unpowered (HT 12)</option>
 						</select>
 					</div>
 					<div class="grid-item">
@@ -19195,8 +19195,8 @@ Select the indent level of the spell. This is handy to help show the spell belon
 					</div>
 
 					<div class="grid-item">
-						<input type="hidden" name="attr_vehicle_injury_tolerance" value="Unliving">
-						<input type="hidden" name="attr_vehicle_injury_tolerance_description" value="Unliving">
+						<input type="hidden" name="attr_vehicle_injury_tolerance" value="Machine">
+						<input type="hidden" name="attr_vehicle_injury_tolerance_description" value="Injury Tolerance: Unliving. B380. Impaling and huge piercing a wounding modifier of x1; large piercing, x1/2; piercing, x1/3; and small piercing, x1/5.">
 						<div class="standard-tooltip">
 							<b><span name="attr_vehicle_injury_tolerance"></span></b>
 							<span class="tooltiptext">
@@ -19276,9 +19276,17 @@ Select the indent level of the spell. This is handy to help show the spell belon
 						</div>
 						<div class="grid-cell">
 							<div class="standard-tooltip">
-								<h4><span data-i18n="abbreviation-disabled-label">Dis</span></h4>
+								<h4><span data-i18n="abbreviation-threshold">Thresh</span></h4>
 								<span class="tooltiptext">
 									<span data-i18n="vehicle-hit-location-disabled-tooltip">Disabled/Crippled Threshold.<br>If a <b>single</b> attack meets or exceeds this value, the extremity or structure is disabled.<br><b>NOTE:</b> In most cases, if disabled/crippled in one injury, the excess damage is lost.<br><b>Dismemberment:</b> If injury is <i>twice</i> the threshold, then extremity is destroyed. <i>Cutting</i> or <i>Explosion</i> will sever the limb.<br>See B421.</span>
+								</span>
+							</div>
+						</div>
+						<div class="grid-cell">
+							<div class="standard-tooltip">
+								<h4><span data-i18n="abbreviation-disabled-label">Dis</span></h4>
+								<span class="tooltiptext">
+									<span data-i18n="vehicle-hit-location-disabled-checkbox-tooltip">Certain location must make a HT if they suffer damage. If failed, check this box. If vehicle location exceedes the Hit Point Threshold, mark the location as disabled.</span>
 								</span>
 							</div>
 						</div>
@@ -19352,7 +19360,12 @@ Select the indent level of the spell. This is handy to help show the spell belon
 								<input type="number" value="1" step="1" min="1" name="attr_divisor" title="Macro: @{NAME|repeating_vehicle-hit-location-table_$[row #]_divisor}" />
 							</div>
 							<div class="grid-cell">
-								<input type="text" name="attr_disabled" value="0" readonly="readonly" title="Macro: @{NAME|repeating_vehicle-hit-location-table_$[row #]_disabled}" />
+								<input type="number" name="attr_disabled" value="0" readonly="readonly" title="Macro: @{NAME|repeating_vehicle-hit-location-table_$[row #]_disabled}" />
+							</div>
+							<div class="grid-cell">
+								<label class="container-label-input">
+									<input type="checkbox" name="attr_disabled_checked" value="1" title="Macro: @{NAME|repeating_vehicle-hit-location-table_$[row #]_disabled_checked}" />
+								</label>
 							</div>
 							<div class="grid-cell">
 								<label class="container-label-input">
@@ -59232,6 +59245,34 @@ Characters with Skill: ${knowsSkill}`;
 			setAttrs({
 				vehicle_hit_point_half_speed: halfSpeed,
 				vehicle_hit_point_effects: effects	
+			});
+
+		});
+
+	}
+
+	on(`change:vehicle_injury_tolerance`, event => {
+
+		updateVehicleInjuryTolerance();
+
+	});
+
+	const updateVehicleInjuryTolerance = () => {
+
+		getAttrs(["vehicle_injury_tolerance"], values => {
+
+			let injuryTolerance = Number(values.vehicle_injury_tolerance) || 0;
+
+			let description = "";
+
+			if (injuryTolerance == "Machine") {
+				description = "Injury Tolerance: Unliving. B380. Impaling and huge piercing a wounding modifier of x1; large piercing, x1/2; piercing, x1/3; and small piercing, x1/5.";
+			} else {
+				description = "Injury Tolerance: Homogenous. B380. Impaling and huge piercing have a wounding modifier of x1/2; large piercing, x1/3; piercing, x1/5; and small piercing, x1/10.";
+			}
+
+			setAttrs({
+				vehicle_injury_tolerance_description: description
 			});
 
 		});
