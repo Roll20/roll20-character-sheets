@@ -8072,7 +8072,24 @@
                     }
                 }
                 // Weapon DM
-                if (roll.weapon.elevel < 1) { roll.dm = 0; } else {
+                //=> Apply Superstrength
+                //   weapons whose class is 'melee'
+                //   weapons with 'muscle' enhancement
+                //   weapons with elevel 0 get superstrength damage instead of DM
+                //   weapons with elevel -1 get no damage bonus
+                if (roll.weapon.elevel < 1) {
+                    roll.dm = 0;
+                    if (!roll.weapon.range && roll.weapon.elevel === 0) {
+                        roll.superstrenth_damage = 0;
+                        for (let i = 0; i < cache.attrdb['superstrength'].length; i++) {
+                            if (cache.attrdb['superstrength'][i].active) {
+                                roll.superstrenth_damage += cache.attrdb['superstrength'][i].elevel * (
+                                    cache.rulebook === 'absolutepower' ? 10 : 5
+                                );
+                            }
+                        }
+                    }
+                } else {
                     roll.dm = cache.statsdb.dm.base;
                     //=> Apply conditional massive damage (i.e. focused or targeted)
                     for (let i = 0; i < cache.attrdb['massive damage'].length; i++) {
@@ -8098,12 +8115,6 @@
                             }
                         }
                     }
-                    //=> Apply Superstrength
-                    //   weapons whose class is 'melee'
-                    //   weapons with 'muscle' enhancement
-                    //   weapons with elevel 0 get superstrength damage instead of DM
-                    //   weapons with elevel -1 get no damage bonus
-                    roll.superstrenth_damage = 0;
                     if (
                         (
                             !roll.weapon.range ||
@@ -8114,14 +8125,6 @@
                             if (cache.attrdb['superstrength'][i].active) {
                                 roll.dm += cache.attrdb['superstrength'][i].elevel * (
                                     cache.rulebook === 'absolutepower' ? 2 : 1
-                                );
-                            }
-                        }
-                    } else if (!roll.weapon.range && roll.weapon.elevel === 0) {
-                        for (let i = 0; i < cache.attrdb['superstrength'].length; i++) {
-                            if (cache.attrdb['superstrength'][i].active) {
-                                roll.superstrenth_damage += cache.attrdb['superstrength'][i].elevel * (
-                                    cache.rulebook === 'absolutepower' ? 10 : 5
                                 );
                             }
                         }
@@ -8607,7 +8610,10 @@
                                 (
                                     (
                                         damage.multiplier * roll.attacker.weapon.elevel
-                                    ) + roll.attacker.cv
+                                    ) + roll.attacker.cv + (
+                                        roll.attacker.superstrenth_damage !== undefined ? 
+                                        roll.attacker.superstrenth_damage : 0
+                                    )
                                 ) * damage.percentage
                             ) : 0;
                         damage.hits = roll.attacker.weapon.autofire !== undefined ?
