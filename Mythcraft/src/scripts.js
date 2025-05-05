@@ -89,6 +89,9 @@ var handle_drop = function () {
             case "Professions":
                 handle_bop(page);
                 break;
+            case "Equipment":
+                handle_equipment(page);
+                break;
             case "Features":
                 handle_feature(page);
                 break;
@@ -359,6 +362,17 @@ var handle_bop = function (page) {
     }
     setDropAttrs(update);
 };
+var handle_equipment = function (page) {
+    console.log(page.data);
+    var attrs = ["name", "description"];
+    var row = getRow("inventory");
+    var update = getUpdate(attrs, page, row);
+    update["".concat(row, "_qty")] = page.data.quantity ? page.data.quantity : 1;
+    if (page.data.subcategory === "weapon") {
+        handle_weapon(page);
+    }
+    setDropAttrs(update);
+};
 var handle_feature = function (page) {
     var attrs = ["name", "description"];
     var row = getRow("abilities");
@@ -389,6 +403,28 @@ var handle_skills = function (page) {
     if (typeof page.data.attribute === "string") {
         update["".concat(row, "_attribute_abbreviation")] = page.data.attribute.substring(0, 3);
     }
+    setDropAttrs(update);
+};
+var handle_weapon = function (page) {
+    var attrs = [
+        "apc",
+        "cost",
+        "damage_type",
+        "damage",
+        "name",
+        "range",
+        "reload",
+        "size",
+        "subcategory",
+        "tags",
+        "type",
+        "weight",
+    ];
+    var row = getRow("attacks");
+    var update = getUpdate(attrs, page, row);
+    update["".concat(row, "_category")] = page.data.Category;
+    update["".concat(row, "_attribute")] = "@{".concat(page.data.attribute, "}");
+    console.log(update);
     setDropAttrs(update);
 };
 var convertIntegerNegative = function (number) {

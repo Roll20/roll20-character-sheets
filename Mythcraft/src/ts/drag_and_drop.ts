@@ -29,6 +29,9 @@ const handle_drop = () => {
       case "Professions":
         handle_bop(page);
         break;
+      case "Equipment":
+        handle_equipment(page);
+        break;
       case "Features":
         handle_feature(page);
         break;
