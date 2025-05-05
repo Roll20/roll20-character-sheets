@@ -22129,7 +22129,7 @@
 	arrayOf(maxArmorNum).forEach(num => {
 		var armorId = String(num).padStart(2,'0');
 		on(`clicked:activateArmor${armorId}`, (info) => {
-			getAttrs(["whisperToGM", "character_title", "displayDegreeOfSuccess", "optionHitLocationSystem", "armorActivation"+armorId, "armorLocations"+armorId, "armorPD"+armorId, "armorED"+armorId, "powerDefense"+armorId, "mentalDefense"+armorId, "flashDefense"+armorId, "dingbat"], function(values) {
+			getAttrs(["whisperToGM", "character_title", "displayDegreeOfSuccess", "optionHitLocationSystem", "armorActivation"+armorId, "armorLocations"+armorId, "armorPD"+armorId, "armorED"+armorId, "powerDefense"+armorId, "mentalDefense"+armorId, "flashDefense"+armorId, "flashDefenseSight"+armorId, "flashDefenseHearing"+armorId, "flashDefenseSmell"+armorId, "flashDefenseTouch"+armorId, "flashDefenseMental"+armorId, "flashDefenseRadio"+armorId, "dingbat"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				
 				const actOn = values["armorActivation"+armorId]||18;
@@ -22146,6 +22146,27 @@
 				const powerDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["powerDefense"+armorId])||0));
 				const mentalDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["mentalDefense"+armorId])||0));
 				const flashDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["flashDefense"+armorId])||0));
+				const flashDefSight = (values["flashDefenseSight"+armorId] === "on") ? true : false;
+				const flashDefHearing = (values["flashDefenseHearing"+armorId] === "on") ? true : false;
+				const flashDefSmell = (values["flashDefenseSmell"+armorId] === "on") ? true : false;
+				const flashDefTouch = (values["flashDefenseTouch"+armorId] === "on") ? true : false;
+				const flashDefMental = (values["flashDefenseMental"+armorId] === "on") ? true : false;
+				const flashDefRadio = (values["flashDefenseRadio"+armorId] === "on") ? true : false;
+				
+				let flashSenseString = ""; 
+				
+				if (flashDEF !== 0) {
+					flashSenseString += flashDefSight ? "v" : "";
+					flashSenseString += flashDefHearing ? "h" : "";
+					flashSenseString += flashDefSmell ? "s" : "";
+					flashSenseString += flashDefTouch ? "t" : "";
+					flashSenseString += flashDefMental ? "m" : "";
+					flashSenseString += flashDefRadio ? "r" : "";
+					
+					if (flashSenseString.length > 0) {
+						flashSenseString = " (" + flashSenseString + ")";
+					}
+				}
 				
 				theRoll += "&{template:custom-activate} ";
 				theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
@@ -22170,7 +22191,7 @@
 				
 				theRoll += (powerDEF !== 0) ? "{{Power Defense = **``@{powerDefense"+armorId+"}``**}} " : "";
 				theRoll += (mentalDEF !== 0) ? "{{Mental Defense = **``@{mentalDefense"+armorId+"}``**}} " : "";
-				theRoll += (flashDEF !== 0) ? "{{Flash Defense = **``@{flashDefense"+armorId+"}``**}} " : "";
+				theRoll += (flashDEF !== 0) ? "{{Flash Defense = **``@{flashDefense"+armorId+"}``** "+flashSenseString+"}} " : "";
 				
 				startRoll(theRoll, (results) => {
 					finishRoll(results.rollId, {});
