@@ -16362,7 +16362,7 @@
 			
 			<div class="item-version-information">
 				<!-- Update version before release. -->
-				<input type="text" value="4.64" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+				<input type="text" value="4.65" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 			</div>
 		</div>
 		
@@ -17170,8 +17170,6 @@
 			setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
 		});
 	};
-
-	
 	
 	
 	// Open with first tab (thanks to GiGs).
@@ -17183,7 +17181,9 @@
 		setAttrs({
 			sheetTab: "characteristics",
 			targetSelection: 1,
-			activateDeleteChecks: 0
+			activateDeleteChecks: 0,
+			setDefenseToggle: '0',
+			setDamageToggle: '0'
 		});
 	});
 	
@@ -22129,8 +22129,10 @@
 	arrayOf(maxArmorNum).forEach(num => {
 		var armorId = String(num).padStart(2,'0');
 		on(`clicked:activateArmor${armorId}`, (info) => {
-			getAttrs(["whisperToGM", "character_title", "displayDegreeOfSuccess", "optionHitLocationSystem", "armorActivation"+armorId, "armorLocations"+armorId, "armorPD"+armorId, "armorED"+armorId, "powerDefense"+armorId, "mentalDefense"+armorId, "flashDefense"+armorId, "flashDefenseSight"+armorId, "flashDefenseHearing"+armorId, "flashDefenseSmell"+armorId, "flashDefenseTouch"+armorId, "flashDefenseMental"+armorId, "flashDefenseRadio"+armorId, "dingbat"], function(values) {
+			getAttrs(["whisperToGM", "character_title", "displayDegreeOfSuccess", "optionHitLocationSystem", "armorActivation"+armorId, "armorLocations"+armorId, "armorPD"+armorId, "armorED"+armorId, "powerDefense"+armorId, "mentalDefense"+armorId, "flashDefense"+armorId, "flashDefenseSight"+armorId, "flashDefenseHearing"+armorId, "flashDefenseSmell"+armorId, "flashDefenseTouch"+armorId, "flashDefenseMental"+armorId, "flashDefenseRadio"+armorId, "useVehicleAttributes", "dingbat"], function(values) {
 				var theRoll = values.whisperToGM||"";
+				
+				const isVehicle = (values.useVehicleAttributes === "on" ) ? true : false;
 				
 				const actOn = values["armorActivation"+armorId]||18;
 				const dispDoS = (values.displayDegreeOfSuccess === "on") ? true : false;
@@ -22164,7 +22166,7 @@
 					flashSenseString += flashDefRadio ? "r" : "";
 					
 					if (flashSenseString.length > 0) {
-						flashSenseString = " (" + flashSenseString + ")";
+						flashSenseString = " [" + flashSenseString + "]";
 					}
 				}
 				
@@ -22183,10 +22185,14 @@
 				
 				theRoll += (useLocations && (locations.trim() !== "")) ? "{{Locations=@{armorLocations"+armorId+"}}}" : "";
 				
-				theRoll += ((rPD !== 0) || (rED !== 0)) ? "{{Resistant Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} " : "";
 				if ((rPD !== 0) || (rED !== 0)) {
-					theRoll += "{{Resistant Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} ";
-					theRoll += "{{Total Defense = **PD ``@{totalPD"+armorId+"}`` ED ``@{totalED"+armorId+"}``**}} ";
+					if (isVehicle) {
+						theRoll += "{{Armor Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} ";
+						theRoll += "{{Total Defense = **rPD ``@{totalPD"+armorId+"}`` rED ``@{totalED"+armorId+"}``**}} ";
+					} else {
+						theRoll += "{{Resistant Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} ";
+						theRoll += "{{Total Defense = **PD ``@{totalPD"+armorId+"}`` ED ``@{totalED"+armorId+"}``**}} ";
+					}
 				}
 				
 				theRoll += (powerDEF !== 0) ? "{{Power Defense = **``@{powerDefense"+armorId+"}``**}} " : "";
@@ -22420,7 +22426,7 @@
 				numDigits += (flashDEF >= 10) ? 2 : 1;
 			}
 			
-			const theBreak = (numDEF <= 3) ? " ⦁ " : " ";
+			const theBreak = (numDEF <= 3) ? " • " : " ";
 			const theSpace = (numDEF <= 3) ? " " : "";
 			
 			// Create a space-optimized string of defense stats.
@@ -22464,7 +22470,7 @@
 					flashSenseString += flashDefRadio ? "r" : "";
 					
 					if (flashSenseString.length > 0) {
-						armorString += " (" + flashSenseString + ")";
+						armorString += " [" + flashSenseString + "]";
 					}
 				}
 			}
@@ -25455,7 +25461,7 @@
 	});
 	
 	
-	// Character upgrades and portrait assignment
+	// Character upgrades and portrait assignment.
 	on("sheet:opened", async function() {
 		let attributes = {sheetTab:"characteristics"};
 		
@@ -25760,8 +25766,29 @@
 			version = 4.60;
 		}
 		
-		if (version < 4.64) {
-			version = 4.64;
+		if (version < 4.65) {
+			
+			let armorString = "";
+			let rPD = 0;
+			let rED = 0;
+			
+			for (let i=1; i<=4; i++) {
+				ID = String(i).padStart(2,'0');
+				
+				values = await _getAttrs(["armorPD"+ID, "armorED"+ID]);
+				
+				rPD = parseInt(values["armorPD"+ID])||0;
+				rED = parseInt(values["armorED"+ID])||0;
+				
+				armorString = "";
+				armorString += (rPD !== 0) ? rPD.toString() + " PD" : "";
+				armorString += ((rPD !== 0) && (rED !== 0)) ? " • " : "";
+				armorString += (rED !== 0) ? rED.toString() + " ED" : "";
+				
+				attributes["armorDefense"+ID] = armorString;
+			}
+			
+			version = 4.65;
 		}
 		
 		if (version != origVersion) {
