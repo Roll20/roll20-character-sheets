@@ -1,3 +1,30 @@
+# 2025-5-6
+
+- Inventory
+  - Fix for items not saving strength (thanks @nlbsanarak)
+  - Persist and restore materials correctly
+  - Start saving DB bonus for Armor and OB for Weapons
+  - Style all the drop downs
+  - Weapons
+    - Add attack table
+    - Add attack size
+    - Add attack skill
+  - Manually aded weapons now populate attack table
+  - Materials no longer joined by ','
+- Fix for null pointer error during version update.
+  - Force a version bump to 9 to run it again.
+- Attacks
+  - Make layout a little clearer - bold ftw
+  - Add materials interface
+  - Edit materials
+  - Add additional crit field
+  - Use fancy selects in the drop downs for add attack
+  - Show weapon mateiral
+  - Remove some dead code
+  - Materials now in Injury string and are sent to the defender
+- Fix non-1 pbonus for specialised skills
+- PBonus message improvement
+
 # 2025-4-29
 
 - Hide the inventory add/edit box on sheet open
