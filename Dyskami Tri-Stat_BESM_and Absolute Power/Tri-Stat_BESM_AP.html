@@ -11928,6 +11928,25 @@
                                     (cache.statsdb[s_stat].damage || 0);
                                 await setDerivedValues(cache, set_values);
                             }
+                        } else if (query.remove[0] === 'augmented') {
+                            const aug_index = cache.attrdb.augmented.findIndex(a => a.row_id === query.remove[1]);
+                            const stat_index = cache.attrdb.augmented[aug_index].config.findIndex(c => c.name === 'augmented_stat');
+                            query.stat = cache.attrdb.augmented[aug_index].config[stat_index].rank;
+                            cache.statsdb[query.stat].augmented = 0;
+                            for (let i = 0; i < cache.attrdb.augmented.length; i++) {
+                                if (cache.attrdb.augmented[i].row_id !== query.remove[1]) {
+                                    const temp_index = cache.attrdb.augmented[i].config.findIndex(c => c.name === 'augmented_stat');
+                                    if (query.stat = cache.attrdb.augmented[aug_index].config[temp_index].rank === query.stat) {
+                                        cache.statsdb[query.stat].augmented += cache.attrdb.augmented[i].elevel;
+                                    }
+                                }
+                            }
+                            set_values[`static_character_${query.stat}_remaining`] =
+                                cache.statsdb[query.stat].base +
+                                (cache.statsdb[query.stat].augmented || 0) +
+                                cache.statsdb[query.stat].temp -
+                                (cache.statsdb[query.stat].damage || 0);
+                            await setDerivedValues(cache, set_values);
                         }
                         if (cache.groupdb[cache.static_group_visible_id].locked) {
                             clog(cache, 'Attributes belonging to an active (i.e. locked) Power Variation cannot be removed', `Error Message (${query.last})`);
