@@ -29,8 +29,12 @@ If you feel you've contributed to the development of this character sheet, don't
 * Benjamin Bandelow
 * Andreas J.
 * Matt Z. (github.com/Briteblade)
+* Justin B. (github.com/Adrail86)
 
 ### Changelog
+
+### 2025-05-02
+* Changed essence to be player input value instead of calculation to allow for individual exalt type calculations
 
 ### 2023-12-12
 * Mortal 'castes' added by github.com/Adrail86
