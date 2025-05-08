@@ -19390,27 +19390,28 @@ Select the indent level of the spell. This is handy to help show the spell belon
 
 						<input type="hidden" name="attr_toggle_notes">
 						<div class="expandable-section">
-							<div class="hit-location-notes-grid">
-								<div class="item grid-header">
-									<div class="popup left-align text-right-align">
-										<span data-i18n="hits-label">Hits</span>
+							<div class="vehicle-hit-location-notes-grid">
+								<div class="grid-cell grid-cell__heading">
+									<div class="standard-tooltip">
+										<h4><span data-i18n="hits-label">Hits</span></h4>
+										<span class="tooltiptext">
+											<span data-i18n="hitlocation-hits-tooltip">Enter individual hits here, if limb is crippled, burning, etc.<br />Example: -6 pi (major wound), -2 burn.</span>
+										</span>
 									</div>
-									<span class="tooltip tooltip-margin-medium">
-										<span data-i18n="hitlocation-hits-tooltip">Enter individual hits here, if limb is crippled, burning, etc.<br />Example: -6 pi (major wound), -2 burn.</span>
-									</span>
 								</div>
-								<div class="item">
+								<div class="grid-cell">
 									<input type="text" name="attr_hits" class="textbox-full-width" title="Macro: @{NAME|repeating_hitlocation_$[row #]_hits}" />
 								</div>
-								<div class="item text-right-align">
-									<div class="popup left-align text-right-align">
-										<span data-i18n="notes-label">Notes</span>
+								<div class="grid-cell">&nbsp;</div>
+								<div class="grid-cell grid-cell__heading">
+									<div class="standard-tooltip">
+										<h4><span data-i18n="notes-label">Notes</span></h4>
+										<span class="tooltiptext">
+											<span data-i18n="hitlocation-notes-tooltip">Notes that could apply to the hit location armor, damage, or other effects.</span>
+										</span>
 									</div>
-									<span class="tooltip tooltip-margin-medium">
-										<span data-i18n="hitlocation-notes-tooltip">Notes that could apply to the hit location armor, damage, or other effects.</span>
-									</span>
 								</div>
-								<div class="item">
+								<div class="grid-cell">
 									<input type="text" name="attr_notes" class="textbox-full-width" title="Macro: @{NAME|repeating_hitlocation_$[row #]_notes}" />
 								</div>
 							</div>
@@ -59278,5 +59279,40 @@ Characters with Skill: ${knowsSkill}`;
 		});
 
 	}
+
+	on(`change:repeating_vehicle-hit-location-table:damage`, event => {
+
+		if (event.sourceType !== "player") {
+			return;
+		}
+
+		const previousValue = Number(event.previousValue) || 0;
+
+		const newValue = Number(event.newValue) || 0;
+
+		const damage = newValue - previousValue;
+
+		updateVehicleHitPoints(damage);
+
+	});
+
+	const updateVehicleHitPoints = damage => {
+
+		getAttrs(["vehicle_hit_points", "vehicle_hit_points_max"], values => {
+
+			let hitPoints = Number(values.vehicle_hit_points) || 0;
+
+			let maxHitPoints = Number(values.vehicle_hit_points_max) || 0;
+
+			hitPoints += damage;
+
+			setAttrs({
+				vehicle_hit_points: hitPoints
+			});
+
+		});
+
+	}
+	
 
 </script>
