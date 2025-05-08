@@ -107,7 +107,7 @@ The *Defense* entry space is actually a button that brings up a worksheet in whi
 
 ![Armor Worksheet](/HeroSystem6eHeroic/images/armorWorksheet.png)
 
-The "Roll" button to send an item's critical information to the chat window. If ACT is not *NA* Roll20 will make an activation roll. If the option to use the hit location system is active, Roll20 will also display locations.
+Use the "Roll" button to send an item's critical information to the chat window. If ACT is not *NA* Roll20 will make an activation roll. If the option to use the hit location system is active, Roll20 will also display locations.
 
 ![Armor Activation Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat.png)![Armor Activation Alternate Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat2.png)
 
@@ -115,7 +115,7 @@ The weapons section contains space for five weapons (or spells or abilities with
 
 ![Weapons Table B](/HeroSystem6eHeroic/images/weapons.png)
 
-With the Weapon Worksheet open, begin by entering a weapon's base damage (the shield works the same way). HS6eH will attempt to translate entered damage to a valid HERO damage dice string, meaning some combination of xd6, +d3, +1, and -1 for killing damage and xd6 and +d3 for normal damage (*Damage Type* of *Normal* or *Power*). The resulting dice string will appear on the right under "Results."
+With the Weapon Worksheet open, begin by entering a weapon's base damage. HS6eH will attempt to translate entered damage to a valid HERO damage dice string, meaning some combination of xd6, +d3, +1, and -1 for killing damage and xd6 and +d3 for normal damage (*Damage Type* of *Normal* or *Power*). The resulting dice string will appear on the right under "Results."
 
 > [!TIP]
 > A weapon with damage type *power* will use the violet power template for attack rolls and damage. Potentially useful for special weapons or weapon-like adjustment powers.
@@ -376,9 +376,17 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
 *First version by Villain In Glasses, August 1, 2021.*
+
 *Recent updates:*
+
+*May 8, 2025 added mental, power, and flash defense to armor (Version 4.70)*
+
 *March 7, 2025 adds Mental as a weapon damage type (Version 4.50).*
+
 *February 5, 2025 adds vehicle support (Version 4.40).*
+
 *January 25, 2025 adds damage type (killing, normal, and power) to the weapon worksheet (Version 4.10).*
+
 *January 3, 2025 to represent the sheet as of Version 4.02.*
+
 *November 21, 2024 to represent the sheet as of Version 3.81 and updated support in Hero Roller 1.3.0.*
