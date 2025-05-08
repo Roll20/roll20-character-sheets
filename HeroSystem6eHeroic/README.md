@@ -89,21 +89,25 @@ The default roll for Perception is equal to the character's Intelligence Roll. P
 
 ![Page 2](/HeroSystem6eHeroic/images/screenshot-02-scaled.png)
 
-The Gear page provides space for most of a character's physical goods (weapons, armor, and equipment) as well as a section of common and martial combat maneuvers.
+The Gear page provides space for most of a character's attacks, defenses, and equipment (physical goods or equivalent powers) as well as a section for common and martial combat maneuvers.
 
 Along the top is an accounting of your carried weight and DCV and movement penalties. The Endurance cost is accounted for automatically when taking a Post-Segment 12 recovery. Each value is read-only except "DCV Modifier." Use this field to account for skill levels or items that might reduce or enhance your DCV (see the note on current DCV in the token section below).
 
 ![Encumbrance](/HeroSystem6eHeroic/images/encumbrance.png)
 
-To the right of encumbrance bar you will find OCV* and DCV*. These combat values represent the character's OCV and DCV after the modifiers applied by the most recent maneuver. If the last action was use of a mental power, these values represent OMCV and DMCV. One exception are roll modifiers. These will not be applied to OCV* and DCV* due limitations of Roll20's roll actions.
+To the right of the encumbrance bar you will find OCV* and DCV*. These combat values represent the character's OCV and DCV after the modifiers applied by the most recent maneuver. If the action was a mental power, these values represent OMCV and DMCV. Roll modifiers are not applied to OCV* and DCV* due limitations of Roll20's roll actions.
 
 ![Ephemeral CVs](/HeroSystem6eHeroic/images/ephemeralCVs.png)
 
-The sheet includes space for four suits or pieces of armor (plus four more accessible via the "A/B" set button). If PD/ED are left at 0, then Total Defense will be automatically calculated when you click Roll. Although this sheet is designed for the simpler armor activation approach, there is a field for hit locations if your GM chooses to use that system.
+The sheet includes space for four defenses (plus four more accessible via the "A/B" set button). 
 
 ![Armor Table](/HeroSystem6eHeroic/images/armor.png)
 
-Click the "Roll" button to roll armor activation. A message like the one shown below will be sent to the chat window. If ACT is set to NA, and locations are filled then the second message will appear.
+The *Defense* entry space is actually a button that brings up a worksheet in which you can enter values for PD, ED, power defense, mental defense, and flash defense. The sheet will use these values to create a summary of these defenses for display in the parent table.
+
+![Armor Worksheet](/HeroSystem6eHeroic/images/armorWorksheet.png)
+
+The "Roll" button to send an item's critical information to the chat window. If ACT is not *NA* Roll20 will make an activation roll. If the option to use the hit location system is active, Roll20 will also display locations.
 
 ![Armor Activation Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat.png)![Armor Activation Alternate Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat2.png)
 
