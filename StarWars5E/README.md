@@ -8,6 +8,9 @@ More Information
 - [Star Wars 5e Discord](https://discord.gg/zYcPYTu)
 
 # Changelog
+## 2025-05-07
+* Improvement : Added prepared checkbox for power
+* Bugfix : Solved issue with "item modifiers" 
 ## 2025-04-25
 * Chore : Redone powers using PUG templating
 * Improvement : Added detail view for powers
