@@ -1,3 +1,14 @@
+# 2025-5-8
+
+Midweek release for something different.
+
+- Inventory
+  - Allow saving of Armor again
+  - Show notes when editing
+- Attacks
+  - Toggle appearance of additional crits correctly
+  - Persist extra crit, and allow it to be edited
+
 # 2025-5-6
 
 - Inventory

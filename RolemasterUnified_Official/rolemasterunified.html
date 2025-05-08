@@ -3292,11 +3292,11 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     </div> 
 
       <div><!-- Empty --></div>
-      <input type='checkbox' class='toggle' name='attr_attackaddadditionalcriticaltype'>
+      <input type='checkbox' class='toggle' name='attr_attackaddadditionalcritical'>
         <div class='toggler'>&nbsp;&nbsp;Critical Type</div>
-      <input type='checkbox' class='toggle' name='attr_attackaddadditionalcriticalseverity'>
+      <input type='checkbox' class='toggle' name='attr_attackaddadditionalcritical'>
         <div class='toggler'>
-          <select class='fancyselect'>
+          <select name='attr_attackaddadditionalcriticaltype' class='fancyselect'>
             <option value='A'>Acid</option>
             <option value='B'>Subdual</option>
             <option value='G'>Grapple</option>
@@ -3318,7 +3318,7 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
         <div class='toggler'>&nbsp;&nbsp;Degree</div>
       <input type='checkbox' class='toggle' name='attr_attackaddadditionalcritical'>
         <div class='toggler'>
-          <select class='fancyselect'>
+          <select name='attr_attackaddadditionalcriticalseverity' class='fancyselect'>
             <option value='0'>Same</option>
             <option value='-1'>1 Less</option>
             <option value='-2'>2 Less</option>
@@ -5739,11 +5739,13 @@ Uses (Lvl/Total) <span name='attr_traps_usecount'></span> / <span name='attr_tra
     <span  class='inventoryarmortoggle'><b>DB Bonus</b></span>
     <input type='number' name='attr_inventoryaddarmordbbonus'  class='inventoryarmortoggle'>
 
+    
     <span class='inventoryshieldtoggle'><b>Number of Attacks</b></span>
     <input type='number' name='attr_inventoryaddshieldattacks'   class='inventoryshieldtoggle'>
     <span  class='inventoryshieldtoggle'><b>DB Bonus</b></span>
     <input type='number' name='attr_inventoryaddshielddb'  class='inventoryshieldtoggle'>
 
+    
     <span  class='inventoryweapontoggle'><b>OB Bonus</b></span>
     <input type='number' name='attr_inventoryaddweaponobbonus'  class='inventoryweapontoggle'>
 
@@ -5952,7 +5954,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 205642aa76e52e69a342edcf98fa83dc96a741f2
+Revision 18851fdb3efa112fb13b58c4fb33038e1bcc68f6
 
 
 <hr>
@@ -13448,7 +13450,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	  if (update.type == 'Armor') {
 	    system.Subtype = ia.inventoryaddarmorsubtype;
 	    system.AT = ia.inventoryaddarmorat;
-	    const db = parseletIntDefault(ia.inventoryadddbbonus, 0);
+	    const db = parseIntDefault(ia.inventoryaddarmordbbonus, 0);
 	    if (db != 0) {
 	      system.DB = ia.inventoryaddarmordbbonus;
 	    }
@@ -13523,6 +13525,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	  update.inventoryaddweight = parseIntDefault(item[`${basename}_itemweight`], 0);
 	  update.inventoryaddtype = item[`${basename}_itemtype`] || 'Equipment';
 	  update.inventoryaddstrength = parseIntDefault(item[`${basename}_itemstrength`], 0);
+	  update.inventoryaddnotes = item[`${basename}_itemnotes`] || '';
 
 	  //
 	  {
@@ -14235,6 +14238,7 @@ function sizeFromNumeric(value) {
     attacks.knownCrits = {}
 
     attacks.resolveCriticalList = function(critlist, index, donfn) {
+	console.log(critlist, index)
 	const allresults = []
 	for (const {sev, type, origsev} of critlist) {
 	    let sevcode = numericToCritCode(sev);
@@ -14263,15 +14267,7 @@ function sizeFromNumeric(value) {
 	//return allresults;
     }
 
-    /*
-    F E + A
-    G E + B
-    H E + C
-    I E + C + A
-    J E + C + B
-    */
-    attacks.getCritical = function(severity, type, index, overflow, additional, donefn) {
-	const crits = [];
+    attacks.generateCritList = function(crits, severity, type) {
 	let origsev = severity;
 
 	while (severity < 0) {
@@ -14300,6 +14296,25 @@ function sizeFromNumeric(value) {
 	    // We only use origsev here;
 	    crits.push({ sev: severity, type: type, origsev: origsev }); // Start with an E, then append some
 	}
+	return crits;
+    }
+
+    /*
+    F E + A
+    G E + B
+    H E + C
+    I E + C + A
+    J E + C + B
+    */
+    attacks.getCritical = function(severity, type, index, overflow, additional, donefn) {
+	const crits = [];
+	let origsev = severity;
+
+	attacks.generateCritList(crits, severity, type, origsev);
+/*	if (additional && additional != '') {
+	    let newsev = parseIntDefault(additional.substring(1), 0) + origsev;
+	    attacks.generateCritList(crits, newsev, additional.substring(0,1), origsev);
+	}*/
 
 	if (type.length > 1) {
 	    type = attacks.critnameToCode[type];
@@ -14332,34 +14347,6 @@ function sizeFromNumeric(value) {
 	}
 
 	attacks.resolveCriticalList(crits, index, donefn);
-
-	// so this becime a new function. 
-
-/*
-	let sevcode = numericToCritCode(severity);
-
-	// So need to A-effect & A-description
-	let effect = sevcode + "-effect";
-	let desc = sevcode + "-description";
-
-	if (attacks.knownCrits[type]) {
-	    // Grab all the other fields in a critical
-	    let results = {}
-	    const crit = attacks.knownCrits[type][index]
-	    for (res in crit) {
-		if (res[0] == sevcode) {
-		    results[res.substring(2)] = crit[res];
-		}
-	    }
-
-	    donefn([{
-		    description : attacks.knownCrits[type][index][desc],
-		    effect: attacks.knownCrits[type][index][effect],
-		    type:  attacks.critsToName[type],
-		    results: results,
-		    code: sevcode + type}]);
-	    return;
-	}*/
     }
 
     // Returns an object:
@@ -14460,6 +14447,7 @@ function sizeFromNumeric(value) {
     //      - cdata.attackmod = The numeric attack modifer - all mods
     //	    - cdata.attackmoddescription = Description of the above
     //      - cdata.statuspenalty = values.statuspenalty || 0;
+    //      - cdata.extracrit = <CritType><number>  (number is relative crit type)
 
     //		
     // Results are:
@@ -14602,7 +14590,7 @@ function sizeFromNumeric(value) {
 	if (critinfo.critical) {
 	    console.log("has a critical; getting crit", critinfo);
 	    attacks.getCritical(critinfo.severitynumeric, critinfo.type, hit.critindex,
-			false, false, // OVerflow and additional
+			false, cdata.extracrit, // OVerflow and additional
 		(critinfo) => {
 		    attacks.generateAttackResult(injuryhits, critinfo, result)
 		    result.ishit = 1;
@@ -14788,6 +14776,7 @@ function sizeFromNumeric(value) {
 			`${basename}_attackname`,
 			`${basename}_attackfumble`,
 			`${basename}_attacktype`,
+			`${basename}_attackextracrit`,
 			`${basename}_materialgroup`,
 			'size', `${basename}_attacksize`,
 			'statuspenalty', 'statuseffect',
@@ -14827,6 +14816,7 @@ function sizeFromNumeric(value) {
 		cdata.statuspenalty = parseIntDefault(values.statuspenalty, 0);
 		cdata.useap = (values.attackuseap == 'on') ? true : false;
 		cdata.materialgroup = values[`${basename}_materialgroup`] || '';
+		cdata.extracrit = values[`${basename}_attackextracrit`] || '';
 		// Use the attack type to get the right AP
 		cdata.attacktype = values[`${basename}_attacktype`];
 		if (cdata.attacktype == 'melee') {
@@ -15072,6 +15062,14 @@ function sizeFromNumeric(value) {
 		updates[`${prefix}_materialgroup`] = mtype.join('');
 	    }
 
+	    // Critical
+	    if (items.attackaddadditionalcritical && items.attackaddadditionalcritical == 'on') {
+		updates[`${prefix}_attackextracrit`] = items.attackaddadditionalcriticaltype +
+			    items.attackaddadditionalcriticalseverity;
+	    } else {
+		updates[`${prefix}_attackextracrit`] = '';
+	    }
+
 	    getCompendiumPage(`AttackTable:${items.attackaddtable}`, cdata => {
 		updates[`${prefix}_attackname`] = items.attackaddname;
 		updates[`${prefix}_attacksize`] = sizeFromNumeric(items.attackaddsize);
@@ -15171,8 +15169,9 @@ function sizeFromNumeric(value) {
 		    `${basename}_attackstr`,
 		    `${basename}_attackskill`, `${basename}_attackri`,
 		    `${basename}_attacktype`, `${basename}_attackmodifier`,
-		    `${basename}_materialgroup`
+		    `${basename}_materialgroup`, `${basename}_attackextracrit`,
 		    ], (attackinfo) => {
+		console.log(attackinfo);
 		updates.attackaddname = attackinfo[`${basename}_attackname`];
 		updates.attackaddfumble = attackinfo[`${basename}_attackbasefumble`];
 		updates.attackaddstrength = attackinfo[`${basename}_attackstr`];
@@ -15190,9 +15189,20 @@ function sizeFromNumeric(value) {
 		    updates.attackaddmaterials = material.includes('s') ? 'on' : 'off';
 		    updates.attackaddmaterialm = material.includes('m') ? 'on' : 'off';
 		}
+		{
+		    const extracrit = attackinfo[`${basename}_attackextracrit`] || '';
+		    if (extracrit && extracrit.length > 1) {
+			updates.attackaddadditionalcritical = 'on'
+			updates.attackaddadditionalcriticaltype = extracrit.substring(0, 1);
+			updates.attackaddadditionalcriticalseverity = extracrit.substring(1);
+		    } else {
+			updates.attackaddadditionalcritical = 0
+		    }
+		}
 
 		updates.attackaddbasename = basename;
 		updates.attackaddaction = 'Update';
+		console.log(updates);
 		setAttrs(updates);
 	});
     });
