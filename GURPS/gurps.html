@@ -19207,6 +19207,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 
 					<div class="grid-item">
 						<label class="container-label-input grid__gap_small">
+							<input type="hidden" name="attr_vehicle_sync_hit_points" value="1">
 							<input type="checkbox" name="attr_vehicle_sync_hit_points" value="1">
 							<div class="standard-tooltip">
 								<span data-i18n="sync-hp-label">Sync HP</span>
@@ -57320,7 +57321,6 @@ Characters with Skill: ${knowsSkill}`;
 
 	const quickModAreas = ["melee", "range"];
 
-
 	quickModAreas.forEach(area => {
 
 		on(`change:repeating_${area}-quick-modifier:apply`, event => {
@@ -59298,21 +59298,119 @@ Characters with Skill: ${knowsSkill}`;
 
 	const updateVehicleHitPoints = damage => {
 
-		getAttrs(["vehicle_hit_points", "vehicle_hit_points_max"], values => {
+		getAttrs(["vehicle_hit_points", "vehicle_hit_points_max", "vehicle_sync_hit_points"], values => {
 
 			let hitPoints = Number(values.vehicle_hit_points) || 0;
 
 			let maxHitPoints = Number(values.vehicle_hit_points_max) || 0;
 
-			hitPoints += damage;
+			let shouldSyncHitPoints = Number(values.vehicle_sync_hit_points) || 0;
 
-			setAttrs({
-				vehicle_hit_points: hitPoints
+			if (shouldSyncHitPoints == 1) {
+				
+				hitPoints += damage;
+
+				setAttrs({
+					vehicle_hit_points: hitPoints
+				});
+			}
+
+		});
+
+	}
+
+	on(`change:repeating_vehicle-hit-location-table:disabled_checked`, event => {
+
+		if (event.sourceType !== "player") {
+			return;
+		}
+
+		updateVehicleTopSpeedByHitLocations(event);
+
+	});
+
+	const updateVehicleTopSpeedByHitLocations = event => {
+
+		getSectionIDs("repeating_vehicle-hit-location-table", ids => {
+
+			let disabledFields = ids.map(id => `repeating_vehicle-hit-location-table_${id}_disabled_checked`);
+
+			let reducedTopSpeedFields = ids.map(id => `repeating_vehicle-hit-location-table_${id}_reduced_top_speed`);
+
+			// combine the two array
+			let fields = disabledFields.concat(reducedTopSpeedFields);
+						
+			getAttrs(fields, values => {
+
+				let disabled = false;
+
+				let reducedTopSpeedPercentage = 0;
+
+				ids.forEach(id => {
+
+					disabled = values[`repeating_vehicle-hit-location-table_${id}_disabled_checked`] == "1" ? true : false;
+
+					if (disabled) {
+						reducedTopSpeedPercentage += Number(values[`repeating_vehicle-hit-location-table_${id}_reduced_top_speed`]) || 0;
+					}
+
+				});
+
+				// handle user error
+				if (reducedTopSpeedPercentage > 100) {
+					reducedTopSpeedPercentage = 100;
+				}
+
+				setAttrs({
+					vehicle_location_speed_mod_percentage: reducedTopSpeedPercentage
+				});
+
 			});
 
 		});
 
 	}
-	
+
+	on("clicked:vehicle_reset_hp", event => {
+
+		resetVehicleHitLocationHitPoints();
+
+		// set hit_points to hit_points_max
+		let fields = ["vehicle_hit_points_max"];
+
+		getAttrs(fields, values => {
+			let maxHitPoints = Number(values.vehicle_hit_points_max) ?? 0;
+
+			let keyValues = {
+				vehicle_hit_points: maxHitPoints
+			};
+
+			setAttrs(keyValues);
+
+		});
+
+	});
+
+	const resetVehicleHitLocationHitPoints = () => {
+
+		getSectionIDs("repeating_vehicle-hit-location-table", ids => {
+
+			let keyValues = {};
+
+			ids.forEach(id => {
+
+				let key = `repeating_vehicle-hit-location-table_${id}_damage`;
+
+				keyValues[key] = 0;
+
+			});
+
+			console.log("keyValues:", keyValues);
+
+			setAttrs(keyValues, { silent: true });
+
+		});
+
+	}	
 
 </script>
