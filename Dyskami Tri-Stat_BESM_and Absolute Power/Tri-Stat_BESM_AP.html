@@ -2446,7 +2446,7 @@
         'wealth':{},
         'weapon':{},
     };
-    const base_limiters = ['activation','assisted','backlash','charges','concentration','consumable','delay','dependent','deplete','detectable','emotional','environmental','equipment','imbue','irreversible','localised','maximum','object','permanent','recovery','semi-permanent','unpredictable'];
+    const base_limiters = ['activation','assisted','backlash','charges','concentration','consumable','delay','dependent','deplete','detectable','emotional','environmental','equipment','imbue','irreversible','localized','maximum','object','permanent','recovery','semi-permanent','unpredictable'];
     const tsc_ap_base_limiters = ['acceleration','haywire','ignore','timed'];
     const base_custom_limiters = {
         'armor':['emphasized','gap','optimized'],
@@ -5970,6 +5970,7 @@
             db.map(c =>
                 `${c.name.capitalize()} ` +
                 `(${
+                    c.name === 'notes' ? c.rank :
                     c.name === 'techniques' || c.name === 'movements' ?
                         c.rank.map(t => t.name.capitalize() + ' (' + t.rank + ')').sort().join(", ") :
                     c.name === 'complete_resilience' ?
@@ -11211,6 +11212,7 @@
                         'immunity',
                         'material category',
                         'movements',
+                        'notes',
                         'origin template',
                         'resilient',
                         'senses',
@@ -11464,6 +11466,11 @@
                         );
                     }
                     query.options = '|' + query.movements.sort().join('|');
+                    query.last = query.next;
+                break;
+                case 'notes':
+                    query.title = getTranslationByKey("notes");
+                    query.options = '|' + query.db.config[query.config_index].rank;
                     query.last = query.next;
                 break;
                 case 'other_sense':
@@ -12398,6 +12405,10 @@
                         query.has_movement = query.movements.findIndex(m => m.name === query.movement);
                         query.next = query.rank === undefined ? 'movement_rank' : 'write_movement';
                     break;
+                    case 'notes':
+                        query.selection = query.selection === 0 ? '' : query.selection;
+                        query.next = 'write_notes';
+                    break;
                     case 'other_sense':
                     case 'taunt':
                         if (query.selection === 0) { return; }
@@ -12739,6 +12750,10 @@
                                         0
                                 });
                         }
+                        query.config.push({
+                            name: 'notes',
+                            rank: '',
+                        });
                         if (cache.groupdb[cache.static_group_visible_id].group_type === 'power variation') {
                             query.config.push({
                                 name: 'base points',
@@ -12919,6 +12934,7 @@
                         query.db.config[query.config_index].rank = query[query.config_name];
                         set_values[`${cache.source}`] = await setConfiguration(cache, set_values, query);
                     break;
+                    case 'write_notes':
                     case 'write_supersense':
                     case 'write_taunt':
                         query.db.config[query.config_index].rank = query.selection;
