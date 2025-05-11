@@ -2584,7 +2584,7 @@
         'unknown power':{},
         'water speed':{},
         'wealth':{},
-        'weapon':{'alt-munition':{rank:0},'anemic':{rank:1},'aura':{rank:1},'autofire':{rank:3},'demoralize':{rank:1},'fieldless':{rank:1},'hands':{rank:1},'helper':{rank:1},'inconspicuous':{rank:3},'indirect':{rank:1},'ingest':{rank:1},'insidious':{rank:3},'linked':{rank:1},'multidimensional':{rank:1},'muscle':{rank:1},'psychic':{rank:4},'reach':{rank:1},'selective':{rank:1},'stun':{rank:1},'trap':{rank:1}}
+        'weapon':{'alt-munition':{rank:0},'anemic':{rank:1},'aura':{rank:1},'autofire':{rank:3},'demoralize':{rank:1},'fieldless':{rank:1},'hands':{rank:1},'helper':{rank:1},'inconspicuous':{rank:3},'indirect':{rank:1},'ingest':{rank:1},'insidious':{rank:3},'linked':{rank:1},'multidimensional':{rank:1},'muscle':{rank:1},'non-penetrating':{},'psychic':{rank:4},'reach':{rank:1},'selective':{rank:1},'stun':{rank:1},'trap':{rank:1}}
     };
     const limiter_ranks = {
         'absorption':{'capped':{rank:1}},
@@ -6826,6 +6826,7 @@
             'localized',
             'maximum',
             'multiple illusions',
+            'non-penetrating',
             'object',
             'penetrating',
             'permanent',
@@ -8072,64 +8073,63 @@
                     }
                 }
                 // Weapon DM
-                if (roll.weapon.elevel < 1) { roll.dm = 0; } else {
-                    roll.dm = cache.statsdb.dm.base;
-                    //=> Apply conditional massive damage (i.e. focused or targeted)
-                    for (let i = 0; i < cache.attrdb['massive damage'].length; i++) {
-                        const enemy_index = cache.attrdb['massive damage'][i].config.findIndex(e => e.name === 'enemy');
-                        const enemy_name = enemy_index !== -1 ? cache.attrdb['massive damage'][i].config[enemy_index].rank : '';
-                        const weapon_index = cache.attrdb['massive damage'][i].config.findIndex(e => e.name === 'weapon_class');
-                        const weapon_class = weapon_index !== -1 ? cache.attrdb['massive damage'][i].config[weapon_index].rank : '';
-                        const is_enemy = roll.enemies.length !== 0 ? 
-                            roll.enemies.findIndex(e => e.toLowerCase() === enemy_name.toLowerCase()) !== -1 : false;
-                        if (cache.attrdb['massive damage'][i].active) {
-                            if (
-                                enemy_index !== -1 && weapon_index !== -1 &&
-                                is_enemy && roll.weapon.weapon_class === weapon_class
-                            ) {
-                                roll.dm += cache.attrdb['massive damage'][i].elevel;
-                            } else if (enemy_index !== -1 && weapon_index === -1 && is_enemy) {
-                                roll.dm += cache.attrdb['massive damage'][i].elevel;
-                            } else if (
-                                weapon_index !== -1 && enemy_index === -1 && 
-                                roll.weapon.weapon_class === weapon_class
-                            ) {
-                                roll.dm += cache.attrdb['massive damage'][i].elevel;
-                            }
+                //=> Apply Superstrength
+                //   weapons whose class is 'melee'
+                //   weapons with 'muscle' enhancement
+                //   weapons with elevel 0 get superstrength damage instead of DM
+                //   weapons with elevel -1 get no damage bonus
+                roll.superstrength_damage = 0;
+                if (roll.weapon.weapon_class === 'unarmed') {
+                    for (let i = 0; i < cache.attrdb['superstrength'].length; i++) {
+                        if (cache.attrdb['superstrength'][i].active) {
+                            roll.superstrength_damage += cache.attrdb['superstrength'][i].elevel * (
+                                cache.rulebook === 'absolutepower' ? 10 : 5
+                            );
                         }
                     }
-                    //=> Apply Superstrength
-                    //   weapons whose class is 'melee'
-                    //   weapons with 'muscle' enhancement
-                    //   weapons with elevel 0 get superstrength damage instead of DM
-                    //   weapons with elevel -1 get no damage bonus
-                    roll.superstrenth_damage = 0;
-                    if (
-                        (
-                            !roll.weapon.range ||
-                            roll.weapon.enhancements.findIndex(e => e.name === 'muscle') !== -1
-                        ) && roll.weapon.elevel > 0
-                    ) {
-                        for (let i = 0; i < cache.attrdb['superstrength'].length; i++) {
-                            if (cache.attrdb['superstrength'][i].active) {
-                                roll.dm += cache.attrdb['superstrength'][i].elevel * (
-                                    cache.rulebook === 'absolutepower' ? 2 : 1
-                                );
-                            }
-                        }
-                    } else if (!roll.weapon.range && roll.weapon.elevel === 0) {
-                        for (let i = 0; i < cache.attrdb['superstrength'].length; i++) {
-                            if (cache.attrdb['superstrength'][i].active) {
-                                roll.superstrenth_damage += cache.attrdb['superstrength'][i].elevel * (
-                                    cache.rulebook === 'absolutepower' ? 10 : 5
-                                );
-                            }
+                }
+                roll.dm = roll.weapon.elevel < 1 ? 0 : cache.statsdb.dm.base;
+                //=> Apply conditional massive damage (i.e. focused or targeted)
+                for (let i = 0; i < cache.attrdb['massive damage'].length; i++) {
+                    const enemy_index = cache.attrdb['massive damage'][i].config.findIndex(e => e.name === 'enemy');
+                    const enemy_name = enemy_index !== -1 ? cache.attrdb['massive damage'][i].config[enemy_index].rank : '';
+                    const weapon_index = cache.attrdb['massive damage'][i].config.findIndex(e => e.name === 'weapon_class');
+                    const weapon_class = weapon_index !== -1 ? cache.attrdb['massive damage'][i].config[weapon_index].rank : '';
+                    const is_enemy = roll.enemies.length !== 0 ? 
+                        roll.enemies.findIndex(e => e.toLowerCase() === enemy_name.toLowerCase()) !== -1 : false;
+                    if (cache.attrdb['massive damage'][i].active) {
+                        if (
+                            enemy_index !== -1 && weapon_index !== -1 &&
+                            is_enemy && roll.weapon.weapon_class === weapon_class
+                        ) {
+                            roll.dm += cache.attrdb['massive damage'][i].elevel;
+                        } else if (enemy_index !== -1 && weapon_index === -1 && is_enemy) {
+                            roll.dm += cache.attrdb['massive damage'][i].elevel;
+                        } else if (
+                            weapon_index !== -1 && enemy_index === -1 && 
+                            roll.weapon.weapon_class === weapon_class
+                        ) {
+                            roll.dm += cache.attrdb['massive damage'][i].elevel;
                         }
                     }
-                    if (cache.defectdb['reduced damage'].length !== 0) {
-                        const reduced_damage = cache.defectdb['reduced damage'].map(r => r.active ? r.level : 0).reduce((m, n) => m + n, 0);
-                        roll.dm = Math.max(0, roll.dm -= reduced_damage);
+                }
+                if (
+                    (
+                        !roll.weapon.range ||
+                        roll.weapon.enhancements.findIndex(e => e.name === 'muscle') !== -1
+                    ) && roll.weapon.weapon_class !== 'unarmed'
+                ) {
+                    for (let i = 0; i < cache.attrdb['superstrength'].length; i++) {
+                        if (cache.attrdb['superstrength'][i].active) {
+                            roll.dm += cache.attrdb['superstrength'][i].elevel * (
+                                cache.rulebook === 'absolutepower' ? 2 : 1
+                            );
+                        }
                     }
+                }
+                if (cache.defectdb['reduced damage'].length !== 0) {
+                    const reduced_damage = cache.defectdb['reduced damage'].map(r => r.active ? r.level : 0).reduce((m, n) => m + n, 0);
+                    roll.dm = Math.max(0, roll.dm -= reduced_damage);
                 }
             break;
             case 'initiative':
@@ -8607,7 +8607,7 @@
                                 (
                                     (
                                         damage.multiplier * roll.attacker.weapon.elevel
-                                    ) + roll.attacker.cv
+                                    ) + roll.attacker.cv + roll.attacker.superstrength_damage
                                 ) * damage.percentage
                             ) : 0;
                         damage.hits = roll.attacker.weapon.autofire !== undefined ?
