@@ -145,22 +145,7 @@ on("change:repeating_skills:attribute", (event) => {
 
   // Attribute will be @{...}. Remove the @{}
   const attribute = newValue.substring(2, newValue.length - 1);
-
-  if (attribute === "luck") {
-    setAttrs({ [`${repeatingRow}_attribute_abbreviation`]: attribute });
-    return;
-  }
-
-  const abbreviation = attribute.substring(0, 3);
-
-  // Awareness first 3 letters are "awa" but abbreviation is "awr"
-  if (attribute === "awareness") {
-    setAttrs({
-      [`${repeatingRow}_attribute_abbreviation`]:
-        getTranslationByKey(abbreviation),
-    });
-    return;
-  }
+  const abbreviation = getAttributeAbbreviation(attribute);
 
   setAttrs({ [`${repeatingRow}_attribute_abbreviation`]: abbreviation });
 });

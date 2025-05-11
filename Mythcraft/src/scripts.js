@@ -100,6 +100,9 @@ var handle_drop = function () {
             case "Skills":
                 handle_skills(page);
                 break;
+            case "Talents":
+                handle_talent(page);
+                break;
             default:
                 dropWarning("Unknown category: ".concat(Category));
         }
@@ -240,22 +243,12 @@ on("change:luck", function () {
     });
 });
 on("change:repeating_skills:attribute", function (event) {
-    var _a, _b, _c;
+    var _a;
     var sourceAttribute = event.sourceAttribute, newValue = event.newValue;
     var repeatingRow = getFieldsetRow(sourceAttribute);
     var attribute = newValue.substring(2, newValue.length - 1);
-    if (attribute === "luck") {
-        setAttrs((_a = {}, _a["".concat(repeatingRow, "_attribute_abbreviation")] = attribute, _a));
-        return;
-    }
-    var abbreviation = attribute.substring(0, 3);
-    if (attribute === "awareness") {
-        setAttrs((_b = {},
-            _b["".concat(repeatingRow, "_attribute_abbreviation")] = getTranslationByKey(abbreviation),
-            _b));
-        return;
-    }
-    setAttrs((_c = {}, _c["".concat(repeatingRow, "_attribute_abbreviation")] = abbreviation, _c));
+    var abbreviation = getAttributeAbbreviation(attribute);
+    setAttrs((_a = {}, _a["".concat(repeatingRow, "_attribute_abbreviation")] = abbreviation, _a));
 });
 var _this = this;
 var versioningAttr = "latest_versioning_upgrade";
@@ -364,7 +357,7 @@ var handle_bop = function (page) {
 };
 var handle_equipment = function (page) {
     console.log(page.data);
-    var attrs = ["name", "description"];
+    var attrs = ["name", "description", "cost", "tags"];
     var row = getRow("inventory");
     var update = getUpdate(attrs, page, row);
     update["".concat(row, "_qty")] = page.data.quantity ? page.data.quantity : 1;
@@ -405,6 +398,19 @@ var handle_skills = function (page) {
     }
     setDropAttrs(update);
 };
+var handle_talent = function (page) {
+    var attrs = [
+        "name",
+        "description",
+        "level",
+        "prerequisites",
+        "stack",
+        "track",
+    ];
+    var row = getRow("talents");
+    var update = getUpdate(attrs, page, row);
+    setDropAttrs(update);
+};
 var handle_weapon = function (page) {
     var attrs = [
         "apc",
@@ -423,8 +429,13 @@ var handle_weapon = function (page) {
     var row = getRow("attacks");
     var update = getUpdate(attrs, page, row);
     update["".concat(row, "_category")] = page.data.Category;
-    update["".concat(row, "_attribute")] = "@{".concat(page.data.attribute, "}");
-    console.log(update);
+    if (typeof page.data.attribute === "string") {
+        update["".concat(row, "_attribute")] = "@{".concat(page.data.attribute, "}");
+        update["".concat(row, "_attribute_abbreviation")] = getAttributeAbbreviation(page.data.attribute);
+    }
+    else {
+        console.warn("Attribute is not a string: ".concat(page.data.attribute, ", ").concat(page.data.name));
+    }
     setDropAttrs(update);
 };
 var convertIntegerNegative = function (number) {
@@ -440,6 +451,22 @@ var convertIntegersNegatives = function (numbers) {
 };
 var createAttributeName = function (name) {
     return name === null || name === void 0 ? void 0 : name.replace(/ /g, "_").toLowerCase();
+};
+var getAttributeAbbreviation = function (attribute) {
+    if (attribute === "luck") {
+        return attribute;
+    }
+    var abbreviation = attribute.substring(0, 3);
+    if (attribute === "awareness") {
+        var key = getTranslationByKey(abbreviation);
+        if (key) {
+            return key;
+        }
+        else {
+            console.warn("Key not found for awareness abbreviation: ".concat(abbreviation));
+        }
+    }
+    return abbreviation;
 };
 var getFieldsetAttr = function (key) {
     var reprowid = getFieldsetRow(key);

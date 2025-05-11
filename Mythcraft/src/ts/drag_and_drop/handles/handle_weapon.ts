@@ -17,20 +17,18 @@ const handle_weapon = (page: CompendiumAttributes) => {
   const update = getUpdate(attrs, page, row);
 
   update[`${row}_category`] = page.data.Category;
-  update[`${row}_attribute`] = `@{${page.data.attribute}}`;
 
-  // Category: "EquiCategorypment";
-  // apc: "4-STR, min 3";
-  // attribute: "strength";
-  // cost: "45";
-  // damage: "1d8";
-  // damage_type: "sharp";
-  // range: "melee";
-  // size: "large";
-  // subcategory: "weapon";
-  // tags: "Hand-and-a-Half (reduce APC by 1, min 2)";
-  // type: "blade";
+  if (typeof page.data.attribute === "string") {
+    update[`${row}_attribute`] = `@{${page.data.attribute}}`;
 
-  console.log(update);
+    update[`${row}_attribute_abbreviation`] = getAttributeAbbreviation(
+      page.data.attribute
+    );
+  } else {
+    console.warn(
+      `Attribute is not a string: ${page.data.attribute}, ${page.data.name}`
+    );
+  }
+
   setDropAttrs(update);
 };

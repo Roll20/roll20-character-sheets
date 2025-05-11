@@ -40,6 +40,9 @@ const handle_drop = () => {
       case "Skills":
         handle_skills(page);
         break;
+      case "Talents":
+        handle_talent(page);
+        break;
       default:
         dropWarning(`Unknown category: ${Category}`);
     }
