@@ -23,6 +23,9 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### May 11, 2025
+- Updated move frequency options to match the updated rules
+
 ### Apr 13, 2025
 - Added a range output to the various move roll templates
 
