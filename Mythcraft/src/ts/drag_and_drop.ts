@@ -25,6 +25,8 @@ const handle_drop = () => {
       case "Creatures":
       // resetRepeatingRows(repeatingSections);
       // resetSkillList(page.data.skills);
+      case "Conditions":
+        handle_conditions(page);
       case "Backgrounds":
       case "Professions":
         handle_bop(page);

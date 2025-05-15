@@ -85,6 +85,8 @@ var handle_drop = function () {
         var Category = page.data.Category;
         switch (Category) {
             case "Creatures":
+            case "Conditions":
+                handle_conditions(page);
             case "Backgrounds":
             case "Professions":
                 handle_bop(page);
@@ -353,6 +355,12 @@ var handle_bop = function (page) {
         update["background"] = page.name;
         update["occupation_tag"] = page.data.occupation;
     }
+    setDropAttrs(update);
+};
+var handle_conditions = function (page) {
+    var attrs = ["name", "description"];
+    var row = getRow("conditions");
+    var update = getUpdate(attrs, page, row);
     setDropAttrs(update);
 };
 var handle_equipment = function (page) {
