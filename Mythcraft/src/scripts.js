@@ -102,6 +102,9 @@ var handle_drop = function () {
             case "Skills":
                 handle_skills(page);
                 break;
+            case "Spells":
+                handle_spell(page);
+                break;
             case "Talents":
                 handle_talent(page);
                 break;
@@ -293,6 +296,9 @@ var getUpdate = function (attrs, page, repeatingRow) {
         if ((_a = page[attr]) !== null && _a !== void 0 ? _a : page.data[attr]) {
             update[sheetAttr] = (_b = page[attr]) !== null && _b !== void 0 ? _b : roll20Attribute(attr, page.data[attr]);
         }
+        else {
+            update[sheetAttr] = "-";
+        }
     });
     if (repeatingRow) {
         update["".concat(repeatingRow, "_toggle_edit")] = false;
@@ -405,6 +411,28 @@ var handle_skills = function (page) {
         update["".concat(row, "_attribute_abbreviation")] = page.data.attribute.substring(0, 3);
     }
     setDropAttrs(update);
+};
+var handle_spell = function (page) {
+    var _a;
+    var attrs = [
+        "name",
+        "description",
+        "source",
+        "type",
+        "focus",
+        "apc",
+        "spc",
+        "description",
+    ];
+    var row = getRow("spells");
+    var update = getUpdate(attrs, page, row);
+    if ((_a = page.data) === null || _a === void 0 ? void 0 : _a.damage) {
+        var row_1 = getRow("attacks");
+        var attackAttr = ["damage", "damage_type"];
+        var updateAttack = getUpdate(attackAttr, page, row_1);
+        console.log("Attack", updateAttack);
+    }
+    console.log("Spell update", update);
 };
 var handle_talent = function (page) {
     var attrs = [

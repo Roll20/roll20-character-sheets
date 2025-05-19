@@ -42,6 +42,9 @@ const handle_drop = () => {
       case "Skills":
         handle_skills(page);
         break;
+      case "Spells":
+        handle_spell(page);
+        break;
       case "Talents":
         handle_talent(page);
         break;
