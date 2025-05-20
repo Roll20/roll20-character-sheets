@@ -413,16 +413,24 @@ var handle_skills = function (page) {
     setDropAttrs(update);
 };
 var handle_spell = function (page) {
-    var _a;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
     var attrs = [
-        "name",
-        "description",
-        "source",
-        "type",
-        "focus",
         "apc",
-        "spc",
         "description",
+        "focus",
+        "function",
+        "name",
+        "source",
+        "spc",
+        "type",
+        "damage",
+        "damage_type",
+        "upcharge",
+        "range",
+        "duration",
+        "cast_time",
+        "prerequisites",
+        "recharge",
     ];
     var row = getRow("spells");
     var update = getUpdate(attrs, page, row);
@@ -432,7 +440,35 @@ var handle_spell = function (page) {
         var updateAttack = getUpdate(attackAttr, page, row_1);
         console.log("Attack", updateAttack);
     }
+    if ((_b = page.data) === null || _b === void 0 ? void 0 : _b.function_note) {
+        update["".concat(row, "_function")] = "".concat(page.data["function"], " (").concat(page.data.function_note, ")");
+    }
+    if ((_c = page.data) === null || _c === void 0 ? void 0 : _c.liturgy_apc) {
+        update["".concat(row, "_apc")] = "".concat(page.data.liturgy_apc, " (liturgy apc)");
+    }
+    if ((_d = page.data) === null || _d === void 0 ? void 0 : _d.liturgy_spc) {
+        update["".concat(row, "_spc")] = "".concat(page.data.liturgy_spc, " (liturgy spc)");
+    }
+    if (((_e = page.data) === null || _e === void 0 ? void 0 : _e.requires) && ((_f = page.data) === null || _f === void 0 ? void 0 : _f.materials)) {
+        update["".concat(row, "_requires")] = "".concat((_g = page.data) === null || _g === void 0 ? void 0 : _g.requires, " (").concat(page.data.materials, ")");
+    }
+    else if ((_h = page.data) === null || _h === void 0 ? void 0 : _h.requires) {
+        update["".concat(row, "_requires")] = "".concat((_j = page.data) === null || _j === void 0 ? void 0 : _j.requires);
+    }
+    else if ((_k = page.data) === null || _k === void 0 ? void 0 : _k.materials) {
+        update["".concat(row, "_requires")] = "".concat((_l = page.data) === null || _l === void 0 ? void 0 : _l.materials);
+    }
+    if (((_m = page.data) === null || _m === void 0 ? void 0 : _m.source) && ((_o = page.data) === null || _o === void 0 ? void 0 : _o.type)) {
+        update["".concat(row, "_source")] = "".concat(page.data.source, " (").concat(page.data.type, ")");
+    }
+    else if ((_p = page.data) === null || _p === void 0 ? void 0 : _p.source) {
+        update["".concat(row, "_source")] = "".concat(page.data.source);
+    }
+    else if ((_q = page.data) === null || _q === void 0 ? void 0 : _q.type) {
+        update["".concat(row, "_source")] = "".concat(page.data.type);
+    }
     console.log("Spell update", update);
+    setDropAttrs(update);
 };
 var handle_talent = function (page) {
     var attrs = [

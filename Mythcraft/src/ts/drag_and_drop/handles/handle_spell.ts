@@ -1,13 +1,21 @@
 const handle_spell = (page: CompendiumAttributes) => {
   const attrs = [
-    "name",
-    "description",
-    "source",
-    "type",
-    "focus",
     "apc",
-    "spc",
     "description",
+    "focus",
+    "function",
+    "name",
+    "source",
+    "spc",
+    "type",
+    "damage",
+    "damage_type",
+    "upcharge",
+    "range",
+    "duration",
+    "cast_time",
+    "prerequisites",
+    "recharge",
   ];
   const row = getRow("spells");
   const update = getUpdate(attrs, page, row);
@@ -20,6 +28,38 @@ const handle_spell = (page: CompendiumAttributes) => {
     console.log("Attack", updateAttack);
   }
 
+  if (page.data?.function_note) {
+    update[
+      `${row}_function`
+    ] = `${page.data.function} (${page.data.function_note})`;
+  }
+
+  if (page.data?.liturgy_apc) {
+    update[`${row}_apc`] = `${page.data.liturgy_apc} (liturgy apc)`;
+  }
+
+  if (page.data?.liturgy_spc) {
+    update[`${row}_spc`] = `${page.data.liturgy_spc} (liturgy spc)`;
+  }
+
+  if (page.data?.requires && page.data?.materials) {
+    update[
+      `${row}_requires`
+    ] = `${page.data?.requires} (${page.data.materials})`;
+  } else if (page.data?.requires) {
+    update[`${row}_requires`] = `${page.data?.requires}`;
+  } else if (page.data?.materials) {
+    update[`${row}_requires`] = `${page.data?.materials}`;
+  }
+
+  if (page.data?.source && page.data?.type) {
+    update[`${row}_source`] = `${page.data.source} (${page.data.type})`;
+  } else if (page.data?.source) {
+    update[`${row}_source`] = `${page.data.source}`;
+  } else if (page.data?.type) {
+    update[`${row}_source`] = `${page.data.type}`;
+  }
+
   console.log("Spell update", update);
-  //setDropAttrs(update);
+  setDropAttrs(update);
 };
