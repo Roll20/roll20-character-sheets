@@ -1,3 +1,13 @@
+# 2025-5-20
+
+- Creatures now go down at 0, not -1
+- Save Item strength correctly (I hope)
+- Fix encoding of Essence's Perceptions
+- Fix some partial block errors.
+- Dropping a Creature on a character won't turn you into a character (Major__havoc)
+- Fix some attack messages.
+
+
 # 2025-5-13
 
 - Fix specialiszation and favourites

@@ -5954,7 +5954,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 3b6bfaffed875062ffccd9faf70fd4287d791284
+Revision ca1b1c706154ca1510c3ef8d5c32edd3dcf83850
 
 
 <hr>
@@ -12719,7 +12719,7 @@ frontpage.updateDB = function () {
 				     `${F(shielddb)} Shield DB\n` +
 				     `${F(shield_ranks)} Shield Ranks`; 
     }
-    const shield_bonus = ev.shield_bonus;
+    const shield_bonus = parseIntDefault(ev.shield_bonus, 0);
     {
       const sb2 = Math.floor(shield_bonus / 2);
       updates.db_partialblock = basedb + shielddb + runningranks + 
@@ -13440,13 +13440,13 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	    setAttrs({"inventoryaddmessage": "Need name of inventory item"});
 	    return;
 	  }
+	  let system = {}
 	  update.name = ia.inventoryaddname;
 	  update.weight = parseIntDefault(ia.inventoryaddweight, 0);
-	  update.strength = parseIntDefault(ia.inventoryaddstrength, 0);
+	  system.Strength = parseIntDefault(ia.inventoryaddstrength, 0);
 	  update.notes = ia.inventoryaddnotes || "";
 	  update.count = 1;
 	  update.type = ia.inventoryaddtype;
-	  let system = {}
 	  if (update.type == 'Armor') {
 	    system.Subtype = ia.inventoryaddarmorsubtype;
 	    system.AT = ia.inventoryaddarmorat;
@@ -13524,7 +13524,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	  update.inventoryaddname = item[`${basename}_itemname`] || 'Item';
 	  update.inventoryaddweight = parseIntDefault(item[`${basename}_itemweight`], 0);
 	  update.inventoryaddtype = item[`${basename}_itemtype`] || 'Equipment';
-	  update.inventoryaddstrength = parseIntDefault(item[`${basename}_itemstrength`], 0);
+	  update.inventoryaddstrength = parseIntDefault(sys.Strength, 0);
 	  update.inventoryaddnotes = item[`${basename}_itemnotes`] || '';
 
 	  //
@@ -13601,12 +13601,18 @@ const potentialInventory = {
 drop.handleDrop = function(ev) {
   console.log("Handle drop", ev);
 
-  getAttrs(['drop_name', 'drop_data', 'drop_category'], (drop) => {
+  getAttrs(['drop_name', 'drop_data', 'drop_category', 'sheetselect', 'charactercreated'], (drop) => {
       console.log(drop);
       if (potentialInventory[drop.drop_category] === true) {
 	RMUInventory.itemDrop(drop.drop_name, drop.drop_data);
       } else if (drop.drop_category == 'Creature' || drop.drop_category == 'NPC') {
-	creature.newCreature("Creature", drop.drop_data);
+	// If we have a sheetselect ; don't allow to change your sheet
+	if (drop.charactercreated == true || drop.charactercreated == 'true' ||
+	      drop.sheetselect == 'trackersheet') {
+	  console.log("Can't change to a creature now!\n");
+	} else {
+	  creature.newCreature("Creature", drop.drop_data);
+	}
       } else {
 	rmuerror("Don't know how to handle a ", drop.drop_category);
       }
@@ -16053,17 +16059,18 @@ creature.parseAttackString = function(string) {
   // The > sometimes is turned in &gt;  
   string = string.replace("&gt;", ">")
 
-  //                             1.OB  2.Size       3.sizen  4.Attack type       5 > 6 >>  7. extra
-  let match = string.match(/^(-?\d+)([A-Za][Ii]?)\((\d*)\)([a-z]*)(?:\[(\w*)])?(>)?(≫)?(?:\(.*\))?$/);
+  //                       1.OB  2.Size       3.sizen  4.Attack type  5 []    6 > 7 >>  8. extra
+  match = string.match(/^(-?\d+)([A-Za][Ii]?)\((\d*)\)([a-z]*)(?:\[(\w*)])?(>)?(≫)?(?:\(.*\))?$/);
   if (match) {
     return {
       OB: match[1],
       size: match[2],
       sizen: parseInt(match[3]),
       type: match[4], 
-      nextround: match[5] ? true : false,
-      bonus: match[6] ? true : false,
-      extra: match[7]
+      crit: match[5],
+      nextround: match[6] ? true : false,
+      bonus: match[7] ? true : false,
+      extra: match[8],
     }
   }
 
@@ -16713,7 +16720,7 @@ injury.parseInjuryString = function (str) {
 	    sendMessage(`${cdata.character_name} has an injury`);
 	    addSpecificInjury(injurydata);
 	}
-	if (updates.hp < 0) {
+	if (updates.hp <= 0) {
 	    sendMessage(`${cdata.character_name} is down`);
 	}
 	sendMessage(`${cdata.character_name} has ${original} applied`);
