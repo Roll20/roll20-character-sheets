@@ -10779,7 +10779,7 @@
         let item_base = 0;
         let item_bonus = 0;
         _.each(idarray, function(currentID) {
-            if((!v[inventory + currentID + "_equipped"] || v[inventory + currentID + "_equipped"] === "1") && v[inventory + currentID + "_itemmodifiers"] && v[inventory + currentID + "_itemmodifiers"].toLowerCase().indexOf(attr > -1)) {
+            if( (!v[inventory + currentID + "_equipped"] || v[inventory + currentID + "_equipped"] === "1") && v[inventory + currentID + "_itemmodifiers"] && v[inventory + currentID + "_itemmodifiers"].toLowerCase().indexOf(attr) > -1) {
                 var mods = v[inventory + currentID + "_itemmodifiers"].toLowerCase().split(",");
                 _.each(mods, function(mod) {
                     if(mod.indexOf(attr) > -1 && mod.indexOf("save") === -1) {
@@ -11596,10 +11596,11 @@
     };
     
     var update_inventory_from_power_info_change = function(inventory, idarray,hiddenInventory, hiddenIdArray, power_mod, atk, dc, itemfields, update) {
-        itemfields.push(get_attrs_from_inventory_for_change(inventory,idarray));
-        itemfields.push(get_attrs_from_inventory_for_change(hiddenInventory,hiddenIdArray));
+        itemfields.push(...get_attrs_from_inventory_for_change(inventory,idarray));
+        itemfields.push(...get_attrs_from_inventory_for_change(hiddenInventory,hiddenIdArray));
     
         getAttrs(itemfields, function(v) {
+    
             let inventory_values = check_inventory_from_power_info_change(inventory,idarray, v);
             let hiddenInventory_values = check_inventory_from_power_info_change(hiddenInventory,hiddenIdArray, v);
     
@@ -11610,7 +11611,9 @@
             else {
                 atk = parseInt(atk, 10) + parseInt(v["pb"], 10);
                 dc = parseInt(dc, 10) + parseInt(v["pb"], 10);
-            };
+            }
+    
+            debugger;
     
             update["power_attack_mod"] = power_mod + inventory_values.power_mod + hiddenInventory_values.power_mod;
             update["power_attack_bonus"] = atk + inventory_values.atk + hiddenInventory_values.atk;
@@ -11627,7 +11630,7 @@
         let dc = 0;
     
         _.each(idarray, function(currentID) {
-            if((!v[inventory + currentID + "_equipped"] || v[inventory + currentID + "_equipped"] === "1") && v[inventory + currentID + "_itemmodifiers"] && v[inventory + currentID + "_itemmodifiers"].toLowerCase().indexOf("power" > -1)) {
+            if((!v[inventory + currentID + "_equipped"] || v[inventory + currentID + "_equipped"] === "1") && v[inventory + currentID + "_itemmodifiers"] && v[inventory + currentID + "_itemmodifiers"].toLowerCase().indexOf("power") > -1) {
                 var mods = v[inventory + currentID + "_itemmodifiers"].toLowerCase().split(",");
                 _.each(mods, function(mod) {
                     if(mod.indexOf("power attack") > -1) {
@@ -12307,9 +12310,9 @@
                             var new_mod = !isNaN(parseInt(mod.replace(/[^0-9]/g, ""), 10)) ? parseInt(mod.replace(/[^0-9]/g, ""), 10) : false;
                             item_bonus = new_mod ? item_bonus + new_mod : item_bonus;
                         }
-                    };
+                    }
                 });
-            };
+            }
         });
     
         return item_bonus;
