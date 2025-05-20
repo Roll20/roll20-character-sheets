@@ -6,9 +6,24 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.4.0 [Screenshot](cof2e.png)
+v1.5.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.5.0_ (2025-05-08)
+
+- Ajout d'un onglet Notes aux fiches de PJ (cases _Apparence_, _Biographie_, _Contacts_, _Aventures_)
+- Ajout d'une couleur de fond aux PV selon l'état courant (Jaune si moins de 50% de PV restants, Rouge si 1 PV restant, Rouge foncé si 0 PV restant)
+- Ajout d'une * aux capacités de sort en mode affichage
+- Ajout d'un ajustement optionnel des PM dépensés par une capacité de sort
+- Prise en compte des capacités avec paramètre évolutif
+- Amélioration des objets en main (main gauche selon bouclier équipé ou pas)
+- Mise au point de la vérification des points de capacités et du calcul auto des PV
+- Correction de l'import PDF pour les voies de magie destructrice et magie élémentaire
+- Ajout de la possibilité d'épingler certains jets à la barre d'actions Roll20
+- Ajout de buffs aux DMs avec possibilité de jet optionnel
+- Ajout d'une gestion d'attributs personnalisés
+- Ajout d'une case attaque active/inactive pour le script COFantasy2
 
 ### Version _1.4.0_ (2025-04-08)
 

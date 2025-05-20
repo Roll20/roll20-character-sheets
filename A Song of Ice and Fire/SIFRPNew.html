@@ -1873,9 +1873,9 @@
                                 <div class="sheet-item sheet-tcenter" style="width: 25%;">
                                     <input type="hidden" name="attr_movementCalc"
                                         value="@{baseMovement} + floor(@{athleticsRun}/2) - (@{bulk}/2)" readonly>
-                                    <input type="hidden" name="attr_movementMin" value=1 disabled="true">
+                                    <input type="hidden" name="attr_movementMin" value=1 >
                                     <input type="number" name="attr_movement"
-                                        value="(((@{movementCalc} + @{movementMin}) + abs(@{movementCalc} - @{movementMin})) / 2)"
+                                        value="4"  
                                         readonly style="background: #4A798B !important; color: white !important; font-weight: bold !important; text-align: center !important;"></div>
                                 <div class="sheet-item" style="width: 15%"><span data-i18n="yds">yds</span></div>
                             </div>
@@ -1895,15 +1895,16 @@
                                             value="(@{movement} * @{sprintMulti}) - @{bulk}" readonly>
                                         <input type="hidden" name="attr_sprintMin" value=1 disabled="true">
                                         <input type="number" name="attr_sprint"
-                                            value="(((@{sprintCalc} + @{sprintMin}) + abs(@{sprintCalc} - @{sprintMin})) / 2)"
+                                            value="16"
                                             readonly style="background: #4A798B !important; color: white !important; font-weight: bold !important; text-align: center !important;"></div>
                                     <div class="sheet-item" style="width: 15%"><span data-i18n="yds">yds</span></div>
                                 </div>
                             <div class="sheet-row">
                                 <div class="sheet-item sheet-tcenter" style="width: 50%;"><label data-i18n="bulk">Bulk</label>
                                 </div>
-                                <div class="sheet-item sheet-tcenter" style="width: 25%;"><input type="number"
-                                        name="attr_bulk" value="(@{armorBulk} + @{totalWeaponBulk})"readonly style="background: #4A798B !important; color: white !important; font-weight: bold !important; text-align: center !important;">
+                                <div class="sheet-item sheet-tcenter" style="width: 25%;">
+									<input type="number"
+                                        name="attr_bulk" value="0" readonly style="background: #4A798B !important; color: white !important; font-weight: bold !important; text-align: center !important;">
                                 </div>
                             </div>
                         </div>
@@ -2207,7 +2208,7 @@
                             <div class="sheet-item" style="width: 30%">
                                 <input name="attr_Drawback" type="text">
                             </div>
-                        <div class="sheet-item" style="width:70%">
+                        <div style="display: inline-block; vertical-align: top;width:60%"">
                             <!-- <input name="attr_DrawbackEffect" type="text"> -->
    							<textarea class="sheet-tiny" name="attr_DrawbackEffect"></textarea>
                          </div>
@@ -2694,9 +2695,9 @@
                      <div class="sheet-row">
                         <h3><span data-i18n="abilities">Abilities</span></h3>                            
                     </div>
-					<div class="sheet-row">
-						<div class="sheet-item" style="width:20%"><label nodata-i18n="special_gear">Special Gear :</label></div> <!-- This 'special_gear' will need to be added to the translation json -->
-						<div class="sheet-item" style="width:80%"><textarea class="sheet-tiny" style="background: #e5e5e5" name="attr_ArmyGear" spellcheck="false"></textarea></div>
+					<div class="sheet-row" style=" height: 62px">
+						<div class="sheet-item" style="width:20%; height: 60px"><label nodata-i18n="special_gear">Special Gear :</label></div> <!-- This 'special_gear' will need to be added to the translation json -->
+						<div class="sheet-item" style="width:80%; height: 60px"><textarea class="sheet-tiny" style="height: 48px; background: #e5e5e5" name="attr_ArmyGear" spellcheck="false"></textarea></div>
 					</div>
                    <br>
 
@@ -4196,7 +4197,7 @@ on("change:awareness change:cunning change:status change:intrigueDefenseBonus ch
 		let IntrigueDefense =  Awareness + Cunning + Status + IntrigueDefenseBonus;
 		let ComposureMax = Will * 3 + ComposureBonus;
 		let FrustrationMax = Will;
-		let CombatDefense = Agility + Athletics + DefenseBonus + ArmorPenalty;
+		let CombatDefense = Agility + Athletics + Awareness + DefenseBonus + ArmorPenalty;
 		
 		console.log('  IntrigueDefense ' + IntrigueDefense + ' ComposureMax ' + ComposureMax + ' FrustrationMax '  + FrustrationMax + ' CombatDefense ' + CombatDefense);
         setAttrs({
@@ -4226,9 +4227,9 @@ on("change:baseMovement change:athleticsRun change:bulk change:movementCalc chan
 		let TotalWeaponBulk = parseInt(values.totalWeaponBulk) || 0;
 
 		    MovementCalc =  BaseMovement + Math.floor(AthleticsRun/2) - Math.floor(Bulk/2);
-		    Movement = MovementCalc + MovementMin + Math.abs((MovementCalc - MovementMin) / 2);
-		    SprintCalc = Movement + SprintMulti - Bulk;
-		let Sprint = SprintCalc + SprintMin + Math.abs((SprintCalc - SprintMin) / 2);
+		    Movement = (MovementCalc + MovementMin + Math.abs(MovementCalc - MovementMin)) / 2;
+		    SprintCalc = Movement * (SprintMulti - Bulk);
+		let Sprint = (SprintCalc + SprintMin + Math.abs(SprintCalc - SprintMin)) / 2;
 		    Bulk = ArmorBulk + TotalWeaponBulk;
 		
 		console.log('  MovementCalc ' + MovementCalc + ' Movement ' + Movement + ' SprintCalc '  + SprintCalc + ' Sprint ' + Sprint + ' Bulk ' + Bulk);
