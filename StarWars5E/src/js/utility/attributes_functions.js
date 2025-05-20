@@ -35,7 +35,7 @@ var check_inventory_from_attr_change = function (inventory, idarray,v,attr) {
     let item_base = 0;
     let item_bonus = 0;
     _.each(idarray, function(currentID) {
-        if((!v[inventory + currentID + "_equipped"] || v[inventory + currentID + "_equipped"] === "1") && v[inventory + currentID + "_itemmodifiers"] && v[inventory + currentID + "_itemmodifiers"].toLowerCase().indexOf(attr > -1)) {
+        if( (!v[inventory + currentID + "_equipped"] || v[inventory + currentID + "_equipped"] === "1") && v[inventory + currentID + "_itemmodifiers"] && v[inventory + currentID + "_itemmodifiers"].toLowerCase().indexOf(attr) > -1) {
             var mods = v[inventory + currentID + "_itemmodifiers"].toLowerCase().split(",");
             _.each(mods, function(mod) {
                 if(mod.indexOf(attr) > -1 && mod.indexOf("save") === -1) {
