@@ -5954,7 +5954,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 18851fdb3efa112fb13b58c4fb33038e1bcc68f6
+Revision ca1b1c706154ca1510c3ef8d5c32edd3dcf83850
 
 
 <hr>
@@ -8180,14 +8180,14 @@ RMUSkills.updateFavoriteSkillSpecialisation = function(skillname, attrname) {
   const specialisation = skillname.substring(splitindex + 1).trim();
   const skill =  RMUSkills.getSkillByDisplayName(specskill);
   if (!skill) {
-    console.log("Can;t find skill", specskill)
+    console.log("Can't find skill", specskill)
     return RMUSkills.updateFavoriteSKillsDefault(attrname);
   }
   if (!skill.dynamicspecializations) {
     console.log("Not a dynamic skill... giveup");
     return RMUSkills.updateFavoriteSKillsDefault(attrname);
   }
-  const prefix = `repeating_specialization${specskill}`;
+  const prefix = `repeating_specialization${skill.aname}`;
   getSectionIDs(prefix, (idarray) => {
       let toget = [];
       for (const id of idarray) {
@@ -12719,7 +12719,7 @@ frontpage.updateDB = function () {
 				     `${F(shielddb)} Shield DB\n` +
 				     `${F(shield_ranks)} Shield Ranks`; 
     }
-    const shield_bonus = ev.shield_bonus;
+    const shield_bonus = parseIntDefault(ev.shield_bonus, 0);
     {
       const sb2 = Math.floor(shield_bonus / 2);
       updates.db_partialblock = basedb + shielddb + runningranks + 
@@ -13440,13 +13440,13 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	    setAttrs({"inventoryaddmessage": "Need name of inventory item"});
 	    return;
 	  }
+	  let system = {}
 	  update.name = ia.inventoryaddname;
 	  update.weight = parseIntDefault(ia.inventoryaddweight, 0);
-	  update.strength = parseIntDefault(ia.inventoryaddstrength, 0);
+	  system.Strength = parseIntDefault(ia.inventoryaddstrength, 0);
 	  update.notes = ia.inventoryaddnotes || "";
 	  update.count = 1;
 	  update.type = ia.inventoryaddtype;
-	  let system = {}
 	  if (update.type == 'Armor') {
 	    system.Subtype = ia.inventoryaddarmorsubtype;
 	    system.AT = ia.inventoryaddarmorat;
@@ -13524,7 +13524,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	  update.inventoryaddname = item[`${basename}_itemname`] || 'Item';
 	  update.inventoryaddweight = parseIntDefault(item[`${basename}_itemweight`], 0);
 	  update.inventoryaddtype = item[`${basename}_itemtype`] || 'Equipment';
-	  update.inventoryaddstrength = parseIntDefault(item[`${basename}_itemstrength`], 0);
+	  update.inventoryaddstrength = parseIntDefault(sys.Strength, 0);
 	  update.inventoryaddnotes = item[`${basename}_itemnotes`] || '';
 
 	  //
@@ -13601,12 +13601,18 @@ const potentialInventory = {
 drop.handleDrop = function(ev) {
   console.log("Handle drop", ev);
 
-  getAttrs(['drop_name', 'drop_data', 'drop_category'], (drop) => {
+  getAttrs(['drop_name', 'drop_data', 'drop_category', 'sheetselect', 'charactercreated'], (drop) => {
       console.log(drop);
       if (potentialInventory[drop.drop_category] === true) {
 	RMUInventory.itemDrop(drop.drop_name, drop.drop_data);
       } else if (drop.drop_category == 'Creature' || drop.drop_category == 'NPC') {
-	creature.newCreature("Creature", drop.drop_data);
+	// If we have a sheetselect ; don't allow to change your sheet
+	if (drop.charactercreated == true || drop.charactercreated == 'true' ||
+	      drop.sheetselect == 'trackersheet') {
+	  console.log("Can't change to a creature now!\n");
+	} else {
+	  creature.newCreature("Creature", drop.drop_data);
+	}
       } else {
 	rmuerror("Don't know how to handle a ", drop.drop_category);
       }
@@ -14311,7 +14317,10 @@ function sizeFromNumeric(value) {
 	let origsev = severity;
 
 	attacks.generateCritList(crits, severity, type, origsev);
-/*	if (additional && additional != '') {
+	/*
+	this is barfign because the additonal crit is not being fetched.
+	so I should fix tat.
+	if (additional && additional != '') {
 	    let newsev = parseIntDefault(additional.substring(1), 0) + origsev;
 	    attacks.generateCritList(crits, newsev, additional.substring(0,1), origsev);
 	}*/
@@ -16050,17 +16059,18 @@ creature.parseAttackString = function(string) {
   // The > sometimes is turned in &gt;  
   string = string.replace("&gt;", ">")
 
-  //                             1.OB  2.Size       3.sizen  4.Attack type       5 > 6 >>  7. extra
-  let match = string.match(/^(-?\d+)([A-Za][Ii]?)\((\d*)\)([a-z]*)(?:\[(\w*)])?(>)?(≫)?(?:\(.*\))?$/);
+  //                       1.OB  2.Size       3.sizen  4.Attack type  5 []    6 > 7 >>  8. extra
+  match = string.match(/^(-?\d+)([A-Za][Ii]?)\((\d*)\)([a-z]*)(?:\[(\w*)])?(>)?(≫)?(?:\(.*\))?$/);
   if (match) {
     return {
       OB: match[1],
       size: match[2],
       sizen: parseInt(match[3]),
       type: match[4], 
-      nextround: match[5] ? true : false,
-      bonus: match[6] ? true : false,
-      extra: match[7]
+      crit: match[5],
+      nextround: match[6] ? true : false,
+      bonus: match[7] ? true : false,
+      extra: match[8],
     }
   }
 
@@ -16520,7 +16530,7 @@ injury.parseInjuryString = function (str) {
 		"statusstagger", "statusstun75", "statusstun50", "statusstun25",
 		"critresist", "critimmune",
 		"grapplestatus"], (cdata) => {
-
+	console.log("data for creature", cdata);
 	// Pull the fields out.  If we modify save to updates
 	// as well.  So anything changed will be in updates.
 	let hp = parseIntDefault(cdata.hp, 0);
@@ -16543,15 +16553,17 @@ injury.parseInjuryString = function (str) {
 	}
 	// Creature is immune to bleeding results. Convert every hit
 	//of bleeding to a concussion hit.
-	const nobleed = critresist.includes('#')
+	const nobleed = critresist.includes('#');
 	    // Creature is immune to stun results. If the creature can be
 	    // staggered, relegate the result to the comparable Stagger
 	    // result: Daze - stagger, Stun/ stun unable to parry - knock
 	    // back, down- knock down.
-	const nostun = critresist.includes('@')
+	const nostun = critresist.includes('@');
 	    // Creature is immune to stagger, knock back and knock
 	    // down results.
-	const noknock = critresist.includes('!')
+	const noknock = critresist.includes('!');
+	    // Creature does not get fatigued
+	const nofatigue = critresist.includes('*');
 
 	// FIXME: Error handle on this
 	let bl = cdata.bleedlist ? JSON.parse(cdata.bleedlist) : [];
@@ -16591,8 +16603,12 @@ injury.parseInjuryString = function (str) {
 			reported = true; // Needs healing time
 			break;
 		    case 'F':
-			fatigue -= value;
-			updates.fatigue = fatigue;
+			if (nofatigue) {
+			    sendMessage(`${cdata.character_name} is not winded`);
+			} else {
+			    fatigue -= value;
+			    updates.fatigue = fatigue;
+			}
 			break;
 		    case 'B': {
 			  if (nobleed) {
@@ -16624,19 +16640,40 @@ injury.parseInjuryString = function (str) {
 			}
 			break;
 		    case 'Q': // stun25
-			statusstun25 += 4 * value;
-			updates.statusstun25 = statusstun25;
-			updates.statusstun25info = roundString(statusstun25);
+			if (nostun) {
+			    // A single round of stun 25
+			    statusstun25 = 4;
+			    updates.statusstun25 = statusstun25;
+			    updates.statusstun25info = roundString(statusstun25);
+			} else {
+			    statusstun25 += 4 * value;
+			    updates.statusstun25 = statusstun25;
+			    updates.statusstun25info = roundString(statusstun25);
+			}
 			break;
 		    case 'W': // Stun 50
-			statusstun50 += 4 * value;
-			updates.statusstun50 = statusstun50;
-			updates.statusstun50info = roundString(statusstun50);
+			if (nostun) {
+			    // A single round of stun 25
+			    statusstun25 = 4;
+			    updates.statusstun25 = statusstun25;
+			    updates.statusstun25info = roundString(statusstun25);
+			} else {
+			    statusstun50 += 4 * value;
+			    updates.statusstun50 = statusstun50;
+			    updates.statusstun50info = roundString(statusstun50);
+			}
 			break;
 		    case 'E': // Stun 75
-			statusstun75 += 4 * value;
-			updates.statusstun75 = statusstun75;
-			updates.statusstun75info = roundString(statusstun75);
+			if (nostun) {
+			    // Turns into a single round of stun 25
+			    statusstun25 = 4;
+			    updates.statusstun25 = statusstun25;
+			    updates.statusstun25info = roundString(statusstun25);
+			} else {
+			    statusstun75 += 4 * value;
+			    updates.statusstun75 = statusstun75;
+			    updates.statusstun75info = roundString(statusstun75);
+			}
 			break;
 		    case 'K':
 			if (noknock) {
@@ -16669,11 +16706,21 @@ injury.parseInjuryString = function (str) {
 	    }
 	}
 
+	if (fatigue < -50) {
+	    const foverflow = fatigue + 50;
+	    console.log("foverflow", foverflow, fatigue);
+	    injurypenalty += foverflow;
+	    fatigue = -50;
+	    updates.injurypenalty = injurypenalty;
+	    updates.fatigue = fatigue;
+	    reported = true; // Needs healing time
+	}
+
 	if (reported) {
 	    sendMessage(`${cdata.character_name} has an injury`);
 	    addSpecificInjury(injurydata);
 	}
-	if (updates.hp < 0) {
+	if (updates.hp <= 0) {
 	    sendMessage(`${cdata.character_name} is down`);
 	}
 	sendMessage(`${cdata.character_name} has ${original} applied`);

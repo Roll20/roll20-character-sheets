@@ -94,14 +94,14 @@ var update_power_info = function(attr) {
     getAttrs(["powercasting_ability","power_dc_mod","globalpowermod","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod"], function(v) {
         if(attr && v["powercasting_ability"] && v["powercasting_ability"].indexOf(attr) === -1) {
             return
-        };
+        }
         if(!v["powercasting_ability"] || (v["powercasting_ability"] && v["powercasting_ability"] === "0*")) {
             update["power_attack_bonus"] = "0";
             update["power_save_dc"] = "0";
             var callback = function() {update_attacks("powers")};
             setAttrs(update, {silent: true}, callback);
             return
-        };
+        }
         var attr = attr ? attr : "";
         console.log("UPDATING POWER INFO: " + attr);
 
@@ -120,10 +120,11 @@ var update_power_info = function(attr) {
 };
 
 var update_inventory_from_power_info_change = function(inventory, idarray,hiddenInventory, hiddenIdArray, power_mod, atk, dc, itemfields, update) {
-    itemfields.push(get_attrs_from_inventory_for_change(inventory,idarray));
-    itemfields.push(get_attrs_from_inventory_for_change(hiddenInventory,hiddenIdArray));
+    itemfields.push(...get_attrs_from_inventory_for_change(inventory,idarray));
+    itemfields.push(...get_attrs_from_inventory_for_change(hiddenInventory,hiddenIdArray));
 
     getAttrs(itemfields, function(v) {
+
         let inventory_values = check_inventory_from_power_info_change(inventory,idarray, v);
         let hiddenInventory_values = check_inventory_from_power_info_change(hiddenInventory,hiddenIdArray, v);
 
@@ -134,7 +135,7 @@ var update_inventory_from_power_info_change = function(inventory, idarray,hidden
         else {
             atk = parseInt(atk, 10) + parseInt(v["pb"], 10);
             dc = parseInt(dc, 10) + parseInt(v["pb"], 10);
-        };
+        }
 
         update["power_attack_mod"] = power_mod + inventory_values.power_mod + hiddenInventory_values.power_mod;
         update["power_attack_bonus"] = atk + inventory_values.atk + hiddenInventory_values.atk;
@@ -151,20 +152,20 @@ var check_inventory_from_power_info_change = function(inventory, idarray, v) {
     let dc = 0;
 
     _.each(idarray, function(currentID) {
-        if((!v[inventory + currentID + "_equipped"] || v[inventory + currentID + "_equipped"] === "1") && v[inventory + currentID + "_itemmodifiers"] && v[inventory + currentID + "_itemmodifiers"].toLowerCase().indexOf("power" > -1)) {
+        if((!v[inventory + currentID + "_equipped"] || v[inventory + currentID + "_equipped"] === "1") && v[inventory + currentID + "_itemmodifiers"] && v[inventory + currentID + "_itemmodifiers"].toLowerCase().indexOf("power") > -1) {
             var mods = v[inventory + currentID + "_itemmodifiers"].toLowerCase().split(",");
             _.each(mods, function(mod) {
                 if(mod.indexOf("power attack") > -1) {
                     var substr = mod.slice(mod.lastIndexOf("power attack") + "power attack".length);
                     atk = substr && substr.length > 0 && !isNaN(parseInt(substr,10)) ? atk + parseInt(substr,10) : atk;
                     power_mod = substr && substr.length > 0 && !isNaN(parseInt(substr,10)) ? power_mod + parseInt(substr,10) : power_mod;
-                };
+                }
                 if(mod.indexOf("power dc") > -1) {
                     var substr = mod.slice(mod.lastIndexOf("power dc") + "power dc".length);
                     dc = substr && substr.length > 0 && !isNaN(parseInt(substr,10)) ? dc + parseInt(substr,10) : dc;
-                };
+                }
             });
-        };
+        }
     });
 
     return {atk : atk, power_mod : power_mod, dc : dc};
