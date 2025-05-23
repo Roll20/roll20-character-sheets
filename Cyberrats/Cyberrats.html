@@ -439,7 +439,10 @@
   </section>
   
   <section class="loadout">
-    <h3>Loadout</h3>
+    <h2>Loadout</h2>
+    
+    <h3>Powers</h3>
+    <span class="centertext"><i>You've equipped <span name="attr_powersEquipped"></span>/5 powers.</i></span>
     <fieldset class="repeating_powers filtered_powers">
       <input class="hidden equipped" type="checkbox" name="attr_equipped">
       <button type="roll"  name="roll_power" value="&{template:powers} {{title=Power}} {{name=@{character_name}}} {{description=@{powertext}}} {{cost=@{powercost}}} {{powerName=@{powername}}}"></button>
@@ -450,7 +453,44 @@
       </span>
       <textarea class="maxwidth" class="powertext" spellcheck="false" name="attr_powertext"></textarea>
     </fieldset>
-  </section>
+    
+    
+  <input class="hidden sheet-space" name="attr_space" type="checkbox">
+  <div class="optional">
+    <h3>Munitions</h3>
+    <span class="centertext"><i>You've equipped <span name="attr_munitionsEquipped"></span>/3 munitions.</i></span>
+    <fieldset class="repeating_Muns filtered_Muns filtered">
+    <input class="hidden equipped" type="checkbox" name="attr_equipped">
+    <div class="Munholder">
+      <button type="roll"  name="roll_mun" value="&{template:powers} {{title=Munition}} {{name=@{character_name}}} {{fuel=Diesel}} {{description=@{muntext}}} {{cost=@{muncost}}} {{powerName=@{munname}}}"></button>
+      <input class="munname" spellcheck="false" type="text" name="attr_munname" value="Name">
+    </div>
+    <span class="right">
+      <label class="inline">Diesel Cost</label>
+      <input class="cost" type="text" name="attr_muncost" value="">
+    </span>
+    <textarea class="maxwidth" spellcheck="false" name="attr_muntext"></textarea>
+  </fieldset>
+    
+    <h3>Armaments</h3>
+    <span class="centertext"><i>You've equipped <span name="attr_armsEquipped"></span>/3 armaments.</i></span>
+      <fieldset class="repeating_arm filtered_arm filtered">
+       <input class="hidden equipped" type="checkbox" name="attr_equipped">
+        <div class="weapon">
+          <button type="action" class="btn d6" name="act_rollarm" value=""></button>
+          <input class="weapon" spellcheck="false" type="text" name="attr_armname" value="Name">
+          <label class="harmlabel">Harm</label>
+          <input class="harmcounter" type="number" name="attr_harm" value="1">
+          <span class="upgrades">
+            <label>Upgrades:</label>
+            <input type="number" value="0" name="attr_upgrades"></input>
+          </span>
+          <span class="hidden rangetext" name="attr_rangetext" value=""></span>
+          <textarea class="maxwidth" spellcheck="false" name="attr_weapontext">Description and upgrades</textarea>
+        </div>
+      </fieldset>
+  
+  </div>
   
   <input class="hidden sheet-space" name="attr_space" type="checkbox">
     <section class="mech">
@@ -512,11 +552,17 @@
             
               <!-- Munitions -->
                   <h3>Munitions</h3>
+                        <input type="hidden" name="attr_munitionsEquipped" value="0">
+                        <span>You've equipped <span name="attr_munitionsEquipped"></span>/3 munitions.</span>
                     <fieldset class="repeating_Muns">
-                      <label class="inline">Equipped?</label>
-                      <input class="equippedMun" type="checkbox" name="attr_equipped">
-                      <button type="roll"  name="roll_mun" value="&{template:powers} {{title=Munition}} {{name=@{character_name}}} {{fuel=Diesel}} {{description=@{muntext}}} {{cost=@{muncost}}} {{powerName=@{munname}}}"></button>
-                      <input class="munname" spellcheck="false" type="text" name="attr_munname" value="Name">
+                      <span>
+                        <label class="inline">Equipped?</label>
+                        <input class="equippedMun" type="checkbox" name="attr_equipped">
+                      </span>
+                      <div class="Munholder">
+                        <button type="roll"  name="roll_mun" value="&{template:powers} {{title=Munition}} {{name=@{character_name}}} {{fuel=Diesel}} {{description=@{muntext}}} {{cost=@{muncost}}} {{powerName=@{munname}}}"></button>
+                        <input class="munname" spellcheck="false" type="text" name="attr_munname" value="Name">
+                      </div>
                       <span class="right">
                         <label class="inline">Diesel Cost</label>
                         <input class="cost" type="text" name="attr_muncost" value="">
@@ -525,6 +571,8 @@
                     </fieldset>
               <!-- Armaments -->
               <h3>Armaments</h3>
+              <input type="hidden" name="attr_armsEquipped" value="0">
+              <span>You've equipped <span name="attr_armsEquipped"></span>/3 armaments.</span>
               <fieldset class="repeating_arm">
                   <label class="inline">Equipped?</label>
                   <input class="equippedArm" type="checkbox" name="attr_equipped">
@@ -1807,22 +1855,18 @@
         <div class="sheet-armUpgrades">
           <h4>Fuse die rolled a = {{fuseDie}}</h4>
            You have {{armUpgrades}} upgrades.
-           
- 
- 
-          {{#rollGreater() computed::fuseDie computed::armUpgrades}}
-            <h5>Fuse is safe</h5>
-          {{/rollGreater() computed::fuseDie computed::armUpgrades}}
 
-          {{#^rollGreater() computed::fuseDie computed::armUpgrades}}
+          {{#rollGreater() fuseDie armUpgrades}}
+            <h5>Fuse is safe</h5>
+          {{/rollGreater() fuseDie armUpgrades}}
+
+          {{#^rollGreater() fuseDie armUpgrades}}
             <h5>Fuse blows, armament disabled</h5>
-          {{/^rollGreater() computed::fuseDie computed::armUpgrades}}
+          {{/^rollGreater() fuseDie armUpgrades}}
            
         </div>
       <!-- {{/fuseDie}} -->
       {{/armUpgrades}}
-      
-      
 
 </rolltemplate>
 
@@ -2832,8 +2876,31 @@ on("change:repeating_powers:equipped", function(eventInfo) {
       }
     );
   });
+});
+
+on("change:repeating_muns:equipped", function(eventInfo) {
+  const changeval = eventInfo.newValue === "on" ? 1 : -1;
 
 
+  getAttrs(["munitionsEquipped"], (values) => {
+    setAttrs(
+      {
+        munitionsEquipped: parseInt(values.munitionsEquipped) + changeval
+      }
+    );
+  });
+});
+
+on("change:repeating_arm:equipped", function(eventInfo) {
+  const changeval = eventInfo.newValue === "on" ? 1 : -1;
+
+  getAttrs(["armsEquipped"], (values) => {
+    setAttrs(
+      {
+        armsEquipped: parseInt(values.armsEquipped) + changeval
+      }
+    );
+  });
 });
 
 on("change:buildingnameroom1 change:buildingnameroom2 change:buildingnameroom3 change:buildingnameroom4 change:buildingnameroom5 change:buildingnameroom6 change:buildingnameroom7 change:buildingnameroom8 change:buildingnameroom9 change:buildingnameroom10 change:buildingnameroom11 change:buildingnameroom12 change:buildingnameroom13 change:buildingnameroom14 change:buildingnameroom15 change:buildingnameroom16 ", function(eventInfo){
