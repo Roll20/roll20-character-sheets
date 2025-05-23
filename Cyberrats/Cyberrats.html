@@ -485,11 +485,33 @@
                 <label>Diesel</label>
                 <hr class="overline">
               </div>
+              <div class="subsystems">
+                <h3>Subsystems</h3>
+                <fieldset class="repeating_Subs">
+                    <span class="subspan">
+                        <label>Type:</label>
+                        <select>
+                          <option value="Shoulder">Locomotion</option>
+                          <option value="Shoulder">Power Source</option>
+                          <option value="Shoulder">Shoulder</option>
+                          <option value="Shoulder">Undercarriage</option>
+                        </select>
+                        
+                        <button type="roll" class="d6" name="roll_mun" value="&{template:powers} {{title=Subsystem}} {{name=@{character_name}}} {{description=@{subtext}}} {{powerName=@{subnamerep}}}"></button>
+                    </span>
+                    <input name="attr_subnamerep" type="text" value="Name"/>
+                    <textarea class="maxwidth" spellcheck="false" value="Description" name="attr_subtext">Description</textarea>
+                </fieldset>
+              
+              </div>
             </div>
              <!-- End mechleft -->
+            
+            
             <div class="mechright">
-              <!-- Armaments -->
-                  <h3>Munition</h3>
+            
+              <!-- Munitions -->
+                  <h3>Munitions</h3>
                     <fieldset class="repeating_Muns">
                       <label class="inline">Equipped?</label>
                       <input class="equippedMun" type="checkbox" name="attr_equipped">
@@ -501,7 +523,33 @@
                       </span>
                       <textarea class="maxwidth" spellcheck="false" name="attr_muntext"></textarea>
                     </fieldset>
-              <!-- Munitions -->
+              <!-- Armaments -->
+              
+              <h3>Armaments</h3>
+              <fieldset class="repeating_weapon">
+                  <label class="inline">Equipped?</label>
+                  <input class="equippedMun" type="checkbox" name="attr_equipped">
+                  <div class="weapon">
+                    <button type="action" class="btn d6" name="act_rollArm" value=""></button>
+                    <input class="weapon" spellcheck="false" type="text" name="attr_weaponname" value="Name">
+                    <label class="harmlabel">Harm</label>
+                    <input class="harmcounter" type="number" name="attr_harm" value="1">
+                    <span class="ammo">
+                      <label>Upgrades:</label>
+                      <input type="number" value="1" name="attr_upgrades"></input>
+                    </span>
+                    <span class="range flexspan">
+                      <label class="narrow">Range:</label>
+                      <label class="small narrow">Close:</label>
+                      <input type="checkbox" value="true" name="attr_closerange"></input>
+                      <label class="small narrow">Near:</label>
+                      <input type="checkbox" value="true" name="attr_nearrange"></input>
+                      <label class="small narrow">Far:</label>
+                      <input type="checkbox" value="true" name="attr_farrange"></input>
+                    </span>
+                    <textarea class="maxwidth" spellcheck="false" name="attr_weapontext">Description and upgrades</textarea>
+                  </div>
+                </fieldset>
               <!-- Subsystems -->
             </div>
             
@@ -1702,10 +1750,7 @@
           {{fuel}} Cost: {{cost}}
         </div>
       {{/cost}}
-
 </rolltemplate>
-
-
 
 <rolltemplate class="sheet-rolltemplate-weapon">
 
@@ -2553,6 +2598,42 @@ on("clicked:repeating_weapon:reload", function(eventInfo) {
 
 on("clicked:repeating_weapon:rollweapon", function(eventInfo) {
 
+    getAttrs([
+      "repeating_weapon_weaponname",
+      "repeating_weapon_rangetext",
+      "repeating_weapon_weapontext",
+      "repeating_weapon_ammo",
+      "repeating_weapon_harm",
+      "repeating_weapon_hasammo"
+    ], function(values) {
+        if(!values.repeating_weapon_rangetext) {
+          values.repeating_weapon_rangetext = "";
+        }
+      
+        const hasAmmo = values.repeating_weapon_hasammo === "true";
+        
+        const lowAmmostr = (hasAmmo && `${values.repeating_weapon_ammo}` < 2) ? "{{lowAmmo=true}}" : "";
+        const ammoStr = hasAmmo ? `{{ammo=${values.repeating_weapon_ammo -1}}}` + lowAmmostr : "";
+      
+        startRoll(`&{template:weapon} {{title=Weapon}} {{name=@{character_name}}} {{description=${values.repeating_weapon_weapontext}}} {{weaponname=${values.repeating_weapon_weaponname}}} {{harm=${values.repeating_weapon_harm}}} {{range=${values.repeating_weapon_rangetext}}} ` + ammoStr, (results) => {
+              finishRoll(
+                  results.rollId,
+                  {
+                  }
+              );
+        });
+            
+        if(hasAmmo) 
+        {
+          setAttrs( {
+            repeating_weapon_ammo: values.repeating_weapon_ammo -1
+          });
+        }
+    });
+});
+
+on("clicked:repeating_weapon:rollArm", function(eventInfo) {
+console.log(eventInfo);
     getAttrs([
       "repeating_weapon_weaponname",
       "repeating_weapon_rangetext",
