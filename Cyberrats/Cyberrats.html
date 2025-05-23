@@ -524,20 +524,20 @@
                       <textarea class="maxwidth" spellcheck="false" name="attr_muntext"></textarea>
                     </fieldset>
               <!-- Armaments -->
-              
               <h3>Armaments</h3>
-              <fieldset class="repeating_weapon">
+              <fieldset class="repeating_arm">
                   <label class="inline">Equipped?</label>
-                  <input class="equippedMun" type="checkbox" name="attr_equipped">
+                  <input class="equippedArm" type="checkbox" name="attr_equipped">
                   <div class="weapon">
-                    <button type="action" class="btn d6" name="act_rollArm" value=""></button>
-                    <input class="weapon" spellcheck="false" type="text" name="attr_weaponname" value="Name">
+                    <button type="action" class="btn d6" name="act_rollarm" value=""></button>
+                    <input class="weapon" spellcheck="false" type="text" name="attr_armname" value="Name">
                     <label class="harmlabel">Harm</label>
                     <input class="harmcounter" type="number" name="attr_harm" value="1">
-                    <span class="ammo">
+                    <span class="upgrades">
                       <label>Upgrades:</label>
-                      <input type="number" value="1" name="attr_upgrades"></input>
+                      <input type="number" value="0" name="attr_upgrades"></input>
                     </span>
+                    <span class="hidden rangetext" name="attr_rangetext" value=""></span>
                     <span class="range flexspan">
                       <label class="narrow">Range:</label>
                       <label class="small narrow">Close:</label>
@@ -1800,6 +1800,29 @@
            {{range}}
         </div>
       {{/range}}
+      
+      
+      {{#armUpgrades}}
+        <!-- {{#fuseDie}} -->
+        <div class="sheet-armUpgrades">
+          <h4>Fuse die rolled a = {{fuseDie}}</h4>
+           You have {{armUpgrades}} upgrades.
+           
+ 
+ 
+          {{#rollGreater() computed::fuseDie computed::armUpgrades}}
+            <h5>Fuse is safe</h5>
+          {{/rollGreater() computed::fuseDie computed::armUpgrades}}
+
+          {{#^rollGreater() computed::fuseDie computed::armUpgrades}}
+            <h5>Fuse blows, armament disabled</h5>
+          {{/^rollGreater() computed::fuseDie computed::armUpgrades}}
+           
+        </div>
+      <!-- {{/fuseDie}} -->
+      {{/armUpgrades}}
+      
+      
 
 </rolltemplate>
 
@@ -2379,11 +2402,13 @@ function getResults(numDice) {
     : [...Array(numDice)].map((_, i) => `$[[${i}]]`).join(" ");
 }
 
-function getRangeText(close, near, far) {
+function getRangeText(close, near, far, isArmament) {
   // Not the cleanest but is the fastest.
   const rangecount = 0 + (close ? 1 : 0)  + (near ? 1 : 0) + (far ? 1 : 0);
 
-  let rangeText = "This weapon operates at ";
+  const weapon = isArmament ? "armament" : "weapon";
+
+  let rangeText = `This ${weapon} operates at `;
   
   if(rangecount === 0) { return " "; }
   if(rangecount === 3) { return rangeText + "Close, Near, and Far ranges."; }
@@ -2632,39 +2657,72 @@ on("clicked:repeating_weapon:rollweapon", function(eventInfo) {
     });
 });
 
-on("clicked:repeating_weapon:rollArm", function(eventInfo) {
-console.log(eventInfo);
+on("clicked:repeating_arm:rollarm", function(eventInfo) {
     getAttrs([
-      "repeating_weapon_weaponname",
-      "repeating_weapon_rangetext",
-      "repeating_weapon_weapontext",
-      "repeating_weapon_ammo",
-      "repeating_weapon_harm",
-      "repeating_weapon_hasammo"
+      "repeating_arm_armname",
+      "repeating_arm_rangetext",
+      "repeating_arm_weapontext",
+      "repeating_arm_upgrades",
+      "repeating_arm_harm",
+      "repeating_arm_upgrades",
     ], function(values) {
-        if(!values.repeating_weapon_rangetext) {
-          values.repeating_weapon_rangetext = "";
+    console.log(values);
+        if(!values.repeating_arm_rangetext) {
+          values.repeating_arm_rangetext = "";
         }
-      
-        const hasAmmo = values.repeating_weapon_hasammo === "true";
         
-        const lowAmmostr = (hasAmmo && `${values.repeating_weapon_ammo}` < 2) ? "{{lowAmmo=true}}" : "";
-        const ammoStr = hasAmmo ? `{{ammo=${values.repeating_weapon_ammo -1}}}` + lowAmmostr : "";
-      
-        startRoll(`&{template:weapon} {{title=Weapon}} {{name=@{character_name}}} {{description=${values.repeating_weapon_weapontext}}} {{weaponname=${values.repeating_weapon_weaponname}}} {{harm=${values.repeating_weapon_harm}}} {{range=${values.repeating_weapon_rangetext}}} ` + ammoStr, (results) => {
+        console.log(values.repeating_arm_upgrades);
+       // Do we have at least one upgrade? If not, don't show the fuse die at all.
+       if(values.repeating_arm_upgrades > 0) {
+       
+              startRoll(`&{template:weapon} {{title=Armament}} {{name=@{character_name}}} {{description=${values.repeating_arm_weapontext}}} {{weaponname=${values.repeating_arm_armname}}} {{harm=${values.repeating_arm_harm}}} {{range=${values.repeating_arm_rangetext}}} {{fuseDie=[[1d6]]}} {{armUpgrades=[[${values.repeating_arm_upgrades}]]}} `, (results) => {
               finishRoll(
                   results.rollId,
                   {
                   }
               );
         });
+       
+               <!-- startRoll(`&{template:weapon}  -->
+               <!-- {{title=Armament}}  -->
+               <!-- <!-- {{name=@{character_name}}}  --> -->
+               <!-- <!-- {{description=${values.repeating_arm_weapontext}}}  --> -->
+               <!-- <!-- {{weaponname=${values.repeating_arm_armname}}}  --> -->
+               <!-- <!-- {{harm=${values.repeating_arm_harm}}}  --> -->
+               <!-- <!-- {{range=${values.repeating_arm_rangetext}}} --> -->
+               <!-- <!-- {{fuseDie=[[1d6]]}}  --> -->
+               <!-- <!-- {{armUpgrades=[[${values.repeating_arm_upgrades}]]}}  --> -->
+               <!-- `, (results) => { -->
+              <!-- finishRoll( -->
+
+                  <!-- results.rollId, -->
+                  <!-- { -->
+                    <!-- <!-- fuseDie, --> -->
+                    <!-- <!-- armUpgrades --> -->
+                  <!-- } -->
+              <!-- ); -->
+        <!-- }); -->
+       }
+       else {
+               startRoll(`&{template:weapon} 
+               {{title=Armament}} 
+               <!-- {{name=@{character_name}}}  -->
+               <!-- {{description=${values.repeating_arm_weapontext}}}  -->
+               <!-- {{weaponname=${values.repeating_arm_armname}}}  -->
+               <!-- {{harm=${values.repeating_arm_harm}}}   -->
+               {{range=${values.repeating_arm_rangetext}}}`
+               , (results) => {
+              finishRoll(
+                  results.rollId,
+                  {
+                  }
+              );
+        });
+       }
+
+
             
-        if(hasAmmo) 
-        {
-          setAttrs( {
-            repeating_weapon_ammo: values.repeating_weapon_ammo -1
-          });
-        }
+
     });
 });
 
@@ -2681,6 +2739,23 @@ on("change:repeating_weapon:closerange change:repeating_weapon:nearrange change:
       const rangeText = getRangeText(close, near, far);
       setAttrs({
         repeating_weapon_rangetext : rangeText,
+      });
+    });
+});
+
+
+on("change:repeating_arm:closerange change:repeating_arm:nearrange change:repeating_arm:farrange", function(eventInfo) {
+    getAttrs([
+      "repeating_arm_closerange",
+      "repeating_arm_nearrange",
+      "repeating_arm_farrange"
+    ], function(values) {
+      const close = values.repeating_arm_closerange === "true";
+      const near = values.repeating_arm_nearrange === "true";
+      const far = values.repeating_arm_farrange === "true";
+      const rangeText = getRangeText(close, near, far, true);
+      setAttrs({
+        repeating_arm_rangetext : rangeText,
       });
     });
 });
