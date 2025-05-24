@@ -1238,7 +1238,7 @@
       <select name="attr_campaign_type">
         <option value="campaignCore">Cyberrats Core</option>
         <option value="campaignSpace">Cyberrats in Space</option>
-        <option value="campaignCustom">Custom</option>
+        <!-- <option value="campaignCustom">Custom</option> -->
       </select>
     </div>
 
@@ -1702,7 +1702,7 @@
             </span>
               
             <span class="bonus">
-              <label class="narrow" for="attr_milSecondary">Is the Space Force a target?</label>
+              <label class="narrow" for="attr_spaceForceSecondary">Is the Space Force a target?</label>
               <input type="checkbox" name="attr_spaceForceSecondary" value="1">
             </span>
            </div>
@@ -2321,8 +2321,6 @@
   </div>
   {{/rollLess() roll 3}}
 
-
-  
   
   <!-- Success -->
   {{#rollGreater() roll 2}}
@@ -2358,25 +2356,51 @@
       
       
       <!-- You won and the military was the only target -->
-      {{#isMilitary}}
-      {{^multiple}}
-        <div class="deets">Valdivian's Victory Meter decreases by 2 and the Interlopers Victory Meter incresaes by 2.</div>
-      {{/multiple}}
-      {{/isMilitary}}
-      
-      <!-- You won against multiple targets and military was one of them -->
-      {{#isMilitary}}
-      {{#multiple}}
-        <div class="deets">The Victory Meter for the non-Military Target decreases by 1. Additionally, Valdivian's Victory Meter decreases by 1, and the Interlopers Victory Meter incresaes by 1.</div>
-      {{/multiple}}
-      {{/isMilitary}}
-      
-      <!-- Succeed against multiple targets, neither are Military -->
-      {{^isMilitary}}
-        {{#multiple}}
-          <div class="deets">The Victory Meters of all Targets decrease by 1.</div>
+      {{^mech}}
+        {{#isMilitary}}
+        {{^multiple}}
+          <div class="deets">Valdivian's Victory Meter decreases by 2 and the Interlopers Victory Meter incresaes by 2.</div>
         {{/multiple}}
-      {{/isMilitary}}
+        {{/isMilitary}}
+        
+        <!-- You won against multiple targets and military was one of them -->
+        {{#isMilitary}}
+        {{#multiple}}
+          <div class="deets">The Victory Meter for the non-Military Target decreases by 1. Additionally, Valdivian's Victory Meter decreases by 1, and the Interlopers Victory Meter incresaes by 1.</div>
+        {{/multiple}}
+        {{/isMilitary}}
+        
+        <!-- Succeed against multiple targets, neither are Military -->
+        {{^isMilitary}}
+          {{#multiple}}
+            <div class="deets">The Victory Meters of all Targets decrease by 1.</div>
+          {{/multiple}}
+        {{/isMilitary}}
+       {{/mech}}
+       
+       
+      <!-- You won and the space force was the only target -->
+      {{#mech}}
+        {{#isMilitary}}
+        {{^multiple}}
+          <div class="deets">The Swarm's Victory Meter decreases by 2 and the Interlopers Victory Meter incresaes by 2.</div>
+        {{/multiple}}
+        {{/isMilitary}}
+        
+        <!-- You won against multiple targets and military was one of them -->
+        {{#isMilitary}}
+        {{#multiple}}
+          <div class="deets">The Victory Meter for the non-Military Target decreases by 1. Additionally, The Swarm's Victory Meter decreases by 1, and the Interlopers Victory Meter incresaes by 1.</div>
+        {{/multiple}}
+        {{/isMilitary}}
+        
+        <!-- Succeed against multiple targets, neither are Military -->
+        {{^isMilitary}}
+          {{#multiple}}
+            <div class="deets">The Victory Meters of all Targets decrease by 1.</div>
+          {{/multiple}}
+        {{/isMilitary}}
+       {{/mech}}
       
   </div>
   {{/rollGreater() roll 2}}
@@ -2388,7 +2412,11 @@
       {{#rollLess() roll 6}}
       <div class="costs deets">
         Either injure two Operartives on this mission or kill one Operative who as on the misson. Alternatively, sacrifice an Assistant who was on the mission.
+        {{#mech}}
+           Alternatively, Disable one mech assigned to this mission.
+        {{/mech}} 
       </div>
+
       {{/rollLess() roll 6}}
       
       <!-- Injure Operatives dangerous -->
@@ -2408,6 +2436,9 @@
       {{#rollLess() roll 5}}
         <div class="costs deets">
           Either injure two Operartives on this mission or kill one Operative who as on the misson. Alternatively, sacrifice an Assistant who was on the mission.
+          {{#mech}}
+             Alternatively, Disable one mech assigned to this mission.
+          {{/mech}} 
         </div>
       {{/rollLess() roll 5}}
     
@@ -3381,7 +3412,7 @@ console.log("Load");
 });
 
 on("clicked:secondary", function() {
-  getAttrs(["powerOps", "gearOps", "injuredOps", "careerOps", "dangerousSecondary", "bonusSecondary", "threatSecondary", "multipleSecondary"], (values) => {
+  getAttrs(["powerOps", "gearOps", "injuredOps", "careerOps", "dangerousSecondary", "bonusSecondary", "threatSecondary", "multipleSecondary", "milSecondary"], (values) => {
     const numPower = parseInt(values.powerOps);
     const numGear = parseInt(values.gearOps);
     const numInj = parseInt(values.injuredOps);
@@ -3435,6 +3466,71 @@ on("clicked:secondary", function() {
     const roll_results_secondary = getResults(numDice);
     
     startRoll(`&{template:mission} {{roll=${roll_formula_secondary}}} {{results=${roll_results_secondary}}}` + anyInjuredText + DangerousText + militaryText + multipleText, (results) => {
+          finishRoll(
+              results.rollId,
+              {
+              }
+          );
+      });
+    
+  });
+});
+
+on("clicked:secondaryMech", function() {
+  getAttrs(["mechOps", "mechLoadedOps", "injuredOps", "damageOps", "dangerousSecondary", "bonusSecondary", "threatSecondary", "multipleSecondary", "spaceForceSecondary"], (values) => {
+    const numMechs = parseInt(values.mechOps);
+    const numInj = parseInt(values.injuredOps);
+    const numLoadedMec = parseInt(values.mechLoadedOps);
+    const damageOps = parseInt(values.damageOps);
+    const bonusDice = parseInt(values.bonusSecondary);
+    const threat = parseInt(values.threatSecondary);
+    const isDangerous = values.dangerousSecondary == 1;
+    const isMultiple = values.multipleSecondary == 1;
+    const isSpaceForce = values.spaceForceSecondary == 1;
+    let zeroDice = false;
+    
+    let numDice = 1;
+    
+    numDice += (Math.floor(numMechs / 2)); // Extra dice for every 2 Operatives with a mech.
+    
+    numDice -= numInj; // -1 per Injured Operative
+    
+    numDice += numLoadedMec; // +1 per Operative with a fully loaded mech
+    
+    numDice += damageOps; // +1 per Operative whose mech can deal 5 harm
+    
+    
+    
+    // -1 die if it's just dismounted
+    if(numMechs === 0) {
+      numDice--;
+    }
+    
+    if(threat >=3) {
+      numDice--;
+    }
+    
+    if(numDice > 5) {
+      numDice = 5;
+    }
+    
+    if(numDice <= 0) {
+      numDice = 0;
+      zeroDice = true;
+    }
+    
+    const anyInjuredText = numInj > 0 ? "{{anyInjured=${anyInjured}}}" : "";
+
+    const DangerousText = isDangerous ? "{{dangerous=true}}" : "";
+    
+    const militaryText = isSpaceForce ? "{{isMilitary=true}}" : "";
+    
+    const multipleText = isMultiple ? "{{multiple=true}}" : "";
+    
+    const roll_formula_secondary = buildDicePool(numDice);
+    const roll_results_secondary = getResults(numDice);
+    
+    startRoll(`&{template:mission} {{roll=${roll_formula_secondary}}} {{results=${roll_results_secondary}}}` + anyInjuredText + "{{mech=true}}" + DangerousText + militaryText + multipleText, (results) => {
           finishRoll(
               results.rollId,
               {
@@ -3505,8 +3601,8 @@ on("clicked:drops", function() {
 
 
 // Reset after each mission
-on("clicked:reset", function() { // TODO reset mech powers too!
-  getAttrs(["hp_max", "resetpowers", "biotech_max", "barrier_max", "soak_max", "shard_max"], (values) => {
+on("clicked:reset", function() {
+  getAttrs(["hp_max", "resetpowers", "biotech_max", "barrier_max", "soak_max", "shard_max", "mech_diesel_max", "mech_shard_max", "mech_SP_max", "mech_soak_max"], (values) => {
     // Set HP to max HP
     // Set Biotech to max Biotech
     const hp = values.hp_max;
@@ -3514,12 +3610,20 @@ on("clicked:reset", function() { // TODO reset mech powers too!
     const sk = values.soak_max;
     const sd = values.shard_max;
     const bm = values.barrier_max;
+    const md = values.mech_diesel_max;
+    const msh = values.mech_shard_max;
+    const msp = values.mech_SP_max;
+    const msk = values.mech_soak_max;
     setAttrs({
       "hp" : hp,
       "biotech" : bt,
       "barrier" : bm,
       "soak": sk,
-      "shard": sd
+      "shard": sd,
+      "mech_diesel" : md,
+      "mech_shard" : msh,
+      "mech_SP" : msp,
+      "mech_soak": msk
     });
     
     // Unuse all drones
