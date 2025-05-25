@@ -7,6 +7,7 @@
 - Add "Refresh All Profiles" button.
 - Add Range, Duration, Frequency, Damage, DC, and Skill to Modifiers.
 - Add Frequency to Magic, Psionics.
+- Add rollable attribute checks to Profiles, including D20 + Attribute, D20 + Attribute Bonus, D20 Under Attribute, and D100 Under Attribute.
 
 ### Changed
 
