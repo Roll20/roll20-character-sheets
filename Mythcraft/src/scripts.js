@@ -223,7 +223,7 @@ on("change:luck", function () {
     getAttrs(["luck"], function (values) {
         var luck = parseInt(values.luck);
         var attrs = {};
-        attrs.rerolls = Math.ceil(luck / 2) || 0;
+        attrs.rerolls_max = Math.ceil(luck / 2) || 0;
         if (luck < 0) {
             attrs.luck_negative_modifier = luck;
         }

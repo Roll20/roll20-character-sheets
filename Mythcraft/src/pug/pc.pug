@@ -21,7 +21,7 @@
 					each val in ['appearance']
 						+headerInput(val)
 		.grid.gap-2.grid-flow-col.auto-cols-min
-			each tab in ['main', 'combat', 'magic', 'journal']
+			each tab in ['main', 'combat', 'magic', 'talents', 'journal', ]
 				.grid.tab.relative
 					input(type="radio" name="attr_tab" value=tab checked=(!!tab === 'main'))
 					span(data-i18n=tab)
@@ -57,8 +57,8 @@
 					+title('currency')
 					+textarea("currency")
 			.grid.gap-6.content-start
-				+repeatingList('talents', {display: ['name', 'stack', "track"], collapse: ['prerequisites']})
-				+repeatingList('abilities', {display: ['name', 'source']})
+				+repeatingList('favorites', {display: ['name', 'source', ]})
+
 		
 	.grid.gap-6.combat
 		.grid.grid-flow-col.gap-2.hp-row
@@ -92,12 +92,21 @@
 				.grid.double-border-2.rounded-md.p-2.relative
 					+title("special action points")
 					+numberInputWithMax("special action points")
+				.grid.double-border-2.rounded-md.p-2.relative
+					+title("rerolls")
+					.grid.grid-flow-col.gap-2
+						.grid.justify-center.items-center
+							+numberInput("rerolls")
+							h3.text-center(data-i18n="current")
+						.grid.justify-center.items-center
+							+attrSpan("rerolls_max")(class="text-center")
+							h3.text-center(data-i18n="max")
 
 		.grid.gap-1.justify-between.items-center.attrs
 			each val in combatAttributes
 				.grid.relative.justify-center.items-center
 					.circle.rounded-full.border.grid.justify-center.items-center.font-bold
-						+attributeRoll(shortName(val), `@{${val}}`)
+						+attributeRoll(shortName(val), `${val}`)
 						+numberInput(val)
 			div
 			each val in derivedAttributes
@@ -105,10 +114,11 @@
 					.circle.rounded-full.border.grid.justify-center.items-center.font-bold
 						h3.text-center(data-i18n=shortName(val))
 						+attrSpan(val)(class="text-center")
-			.grid.relative.justify-center.items-center(class=`${val}`)
+			.grid.relative.justify-center.items-center(class=`${val}`).rerolls
 				.circle.rounded-full.border.grid.justify-center.items-center.font-bold
 					h3.text-center(data-i18n="rerolls")
-					+numberInput("rerolls")
+					.grid.grid-flow-col.gap-2
+						span(name="attr_rerolls_max" class="text-center")
 		
 		.grid.double-border-2.rounded-md.p-2.relative.attacks
 			+title("attacks & spellcasting")
@@ -118,7 +128,6 @@
 		.grid.gap-4.grid-flow-col.auto-cols-fr
 			+repeatingList('reactive actions', {display: ['name']})
 			+repeatingList('conditions', {display: ['name']})
-		+repeatingList('abilities list', {display: ['name']})
 
 	.grid.gap-6.magic
 		.grid.grid-flow-col.gap-4.mb-4
@@ -178,3 +187,7 @@
 							+numberInputWithMax('value')
 
 		+repeatingList('journal', {display: ['name', 'date']})
+
+	.grid.gap-6.talents
+		+repeatingList('talents', {display: ['name', 'stack', "track"], collapse: ['prerequisites']})
+		+repeatingList('abilities', {display: ['name', 'source']})
