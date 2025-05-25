@@ -2436,6 +2436,7 @@
           <h5>Spell Level</h5>
           <h5>Range</h5>
           <h5>Duration</h5>
+          <h5>Frequency</h5>
           <h5>Damage</h5>
           <h5></h5>
           <h5></h5>
@@ -2461,6 +2462,8 @@
     <span name="attr_range"></span>
     <input type="hidden" value="0" name="attr_duration" />
     <span name="attr_duration"></span>
+    <input type="hidden" value="0" name="attr_frequency" />
+    <span name="attr_frequency"></span>
     <span name="attr_damage"></span>
     <input type="hidden" value="0" name="attr_damage" />
     <span name="attr_damage_unit"></span>
@@ -2491,8 +2494,7 @@
   ><input type="checkbox" name="attr_addtobonuses" value="1" /> Add to Profiles
   &rarr; <span class="picker-title">Modifier Picker</span></label
 >
-<br />
-<br />
+<br /><br />
 <div class="spell-details">
   <label
     ><span>Starting range</span
@@ -2517,6 +2519,23 @@
   <label
     ><span>Duration unit</span
     ><input type="text" value="" name="attr_duration_unit" list="time-units" />
+  </label>
+  <label
+    ><span>Starting frequency</span
+    ><input type="number" value="0" name="attr_frequency_starting"
+  /></label>
+  <label
+    ><span>Frequency per level</span
+    ><input type="number" value="0" name="attr_frequency_per_level"
+  /></label>
+  <label
+    ><span>Frequency unit</span
+    ><input
+      type="text"
+      value=""
+      name="attr_frequency_unit"
+      list="frequency-units"
+    />
   </label>
   <label
     ><span>Starting damage</span
@@ -3291,6 +3310,7 @@
           <h5>Psionic</h5>
           <h5>Range</h5>
           <h5>Duration</h5>
+          <h5>Frequency</h5>
           <h5>Damage</h5>
           <h5></h5>
           <h5></h5>
@@ -3315,6 +3335,8 @@
     <span name="attr_range"></span>
     <input type="hidden" value="0" name="attr_duration" />
     <span name="attr_duration"></span>
+    <input type="hidden" value="0" name="attr_frequency" />
+    <span name="attr_frequency"></span>
     <span name="attr_damage"></span>
     <input type="hidden" value="0" name="attr_damage" />
     <span name="attr_damage_unit"></span>
@@ -3374,6 +3396,23 @@
   <label
     ><span>Duration unit</span
     ><input type="text" value="" name="attr_duration_unit" list="time-units" />
+  </label>
+  <label
+    ><span>Starting frequency</span
+    ><input type="number" value="0" name="attr_frequency_starting"
+  /></label>
+  <label
+    ><span>Frequency per level</span
+    ><input type="number" value="0" name="attr_frequency_per_level"
+  /></label>
+  <label
+    ><span>Frequency unit</span
+    ><input
+      type="text"
+      value=""
+      name="attr_frequency_unit"
+      list="frequency-units"
+    />
   </label>
   <label
     ><span>Starting damage</span
@@ -4126,23 +4165,133 @@
         <div class="bonuses-container">
           <h3>Modifiers, Weapons, Armor, Gear</h3>
           <div class="repeating-bonuses-outer">
+            <div class="heading">
+              <h5>Info</h5>
+              <h5>Ability</h5>
+              <h5>Range</h5>
+              <h5>Duration</h5>
+              <h5>Frequency</h5>
+              <h5>Damage</h5>
+              <h5></h5>
+              <h5></h5>
+              <h5 title="Damage Capacity">D.C.</h5>
+              <h5>Skill</h5>
+              <h5></h5>
+              <h5>Level</h5>
+            </div>
             <fieldset class="repeating_modifiers">
               <details class="info">
                 <summary>
-                  <div class="bonus-thing-heading">
+                  <div class="abilities-list">
                     <b class="click-expand"
-                      ><span title="Click for more info">&nbsp;&#9432;</span></b
+                      ><span class="not-readonly" title="Click for more info"
+                        >&nbsp;&#9432;</span
+                      ></b
                     >
-                    <label
-                      ><span>Name</span>
-                      <input type="text" name="attr_name" />
-                    </label>
-                    <label
-                      ><span>Level</span>
-                      <input type="number" value="1" name="attr_level" />
-                    </label>
+                    <input type="text" value="" name="attr_name" />
+                    <input type="hidden" value="0" name="attr_range" />
+                    <span name="attr_range"></span>
+                    <input type="hidden" value="0" name="attr_duration" />
+                    <span name="attr_duration"></span>
+                    <input type="hidden" value="0" name="attr_frequency" />
+                    <span name="attr_frequency"></span>
+                    <span name="attr_damage"></span>
+                    <input type="hidden" value="0" name="attr_damage" />
+                    <span name="attr_damage_unit"></span>
+                    <button
+                      type="roll"
+                      value="@{opt_whisper}&{template:custom} {{title=@{character_name} connects with @{name}}} {{Damage=[[@{damage}]] @{damage_unit}}}"
+                      name="roll_powerability_damage"
+                    ></button>
+                    <input type="hidden" value="0" name="attr_dc" />
+                    <span name="attr_dc"></span>
+                    <input type="hidden" value="0" name="attr_percentage" />
+                    <span name="attr_percentage"></span>
+                    <button
+                      type="roll"
+                      value="@{opt_whisper}&{template:skill} [[ [[{@{percentage} + [[ {{ @{opt_iq_bonus},0 }dl1 } * @{active_profile_mod_iq_bonus} ]] +(?{Modifier?|0}),98}kl1]] + [[1d100]] ]] {{title=@{character_name} uses @{name}}} {{target=$[[1]]}} {{roll=$[[2]]}} {{total=$[[3]]}} {{add_skill=[[@{opt_add_skill}]]}}"
+                      name="roll_powerability_skill"
+                    ></button>
+                    <input type="number" value="1" name="attr_level" />
                   </div>
                 </summary>
+                <br />
+                <div class="ability-details">
+                  <label
+                    ><span>Starting range</span
+                    ><input type="number" value="0" name="attr_range_starting"
+                  /></label>
+                  <label
+                    ><span>Range per level</span
+                    ><input type="number" value="0" name="attr_range_per_level"
+                  /></label>
+                  <label
+                    ><span>Range unit</span
+                    ><input type="text" value="" name="attr_range_unit" list="distance-units" />
+                  </label>
+                  <label
+                    ><span>Starting duration</span
+                    ><input type="number" value="0" name="attr_duration_starting"
+                  /></label>
+                  <label
+                    ><span>Duration per level</span
+                    ><input type="number" value="0" name="attr_duration_per_level"
+                  /></label>
+                  <label
+                    ><span>Duration unit</span
+                    ><input type="text" value="" name="attr_duration_unit" list="time-units" />
+                  </label>
+                  <label
+                    ><span>Starting frequency</span
+                    ><input type="number" value="0" name="attr_frequency_starting"
+                  /></label>
+                  <label
+                    ><span>Frequency per level</span
+                    ><input type="number" value="0" name="attr_frequency_per_level"
+                  /></label>
+                  <label
+                    ><span>Frequency unit</span
+                    ><input
+                      type="text"
+                      value=""
+                      name="attr_frequency_unit"
+                      list="frequency-units"
+                    />
+                  </label>
+                  <label
+                    ><span>Starting damage</span
+                    ><input type="text" value="0" name="attr_damage_starting"
+                  /></label>
+                  <label
+                    ><span>Damage per level</span
+                    ><input type="text" value="0" name="attr_damage_per_level"
+                  /></label>
+                  <label
+                    ><span>Damage unit</span
+                    ><input type="text" value="" name="attr_damage_unit" list="damage-units" />
+                  </label>
+                  <label
+                    ><span title="Starting Damage Capacity">Starting D.C.</span
+                    ><input type="number" value="0" name="attr_dc_starting"
+                  /></label>
+                  <label
+                    ><span title="Damage Capacity per level">D.C. per level</span
+                    ><input type="number" value="0" name="attr_dc_per_level"
+                  /></label>
+                  <label
+                    ><span title="Damage Capacity unit">D.C. unit</span
+                    ><input type="text" value="" name="attr_dc_unit" list="damage-units" />
+                  </label>
+                  <label
+                    ><span>Starting skill %</span
+                    ><input type="number" value="0" name="attr_percentage_starting"
+                  /></label>
+                  <label
+                    ><span>Skill % per level</span
+                    ><input type="number" value="0" name="attr_percentage_per_level"
+                  /></label>
+                  <label></label>
+                </div>
                 <div class="details-body">
                   <label class="description"
                     ><b>Description</b>
@@ -6633,7 +6782,7 @@
                       name="act_updateprofiles"
                       class="metal-btn btn-silver-flat"
                     >
-                      Refresh All Profiles
+                      Refresh All Profiles &#x27F3;
                     </button>
                     <input type="hidden" name="attr_default_mdc" />
                     <input type="hidden" name="attr_default_profile" />
@@ -11413,7 +11562,7 @@ const SKILL_KEYS = [
   "description",
 ];
 
-const ABILITIES_REPEATERS = ["magic", "psionics", "powersabilities"];
+const ABILITIES_REPEATERS = ["magic", "psionics", "powersabilities", "modifiers"];
 
 const MAGIC_KEYS = REPEATING_BONUS_KEYS.concat([
   "name",
@@ -12142,6 +12291,7 @@ async function migrateAttributes() {
     },
     {
       version: "1.8.0",
+      function: updateMagicPsionicsLevels
     },
   ];
 
@@ -13312,18 +13462,10 @@ async function updateActiveProfile(rowId) {
   await setAttrsAsync(attrs);
 }
 
-//   const a = await getAttrsAsync(["psionic_ability"]);
-//   const attrs = {};
-//   attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
-//     a["psionic_ability"];
-
 async function updateProfile(rowId) {
   const bonusIdsString = await getAttrsAsync([`repeating_profiles_${rowId}_bonus_ids`]);
   console.log("bonusIdsString", bonusIdsString);
   const bonusIds = bonusIdsString[`repeating_profiles_${rowId}_bonus_ids`].split(",");
-  // const bonusIds = (
-  //   await getAttrsAsync([`repeating_profiles_${rowId}_bonus_ids`])
-  // )[`repeating_profiles_${rowId}_bonus_ids`].split(",");
   console.log(bonusIds);
   const bonusNameKeys = bonusIds.map((id) => `repeating_bonuses_${id}_name`);
   const a = await getAttrsAsync(bonusNameKeys);
@@ -14264,7 +14406,8 @@ on(
 on(
   "change:repeating_powersabilities:dc \
   change:repeating_magic:dc \
-  change:repeating_psionics:dc",
+  change:repeating_psionics:dc \
+  change:repeating_modifiers:dc",
   async (e) => {
     const [r, section, rowId] = e.sourceAttribute.split("_");
     const prefix = `${r}_${section}_${rowId}`;
@@ -14505,7 +14648,7 @@ async function recalculateMovement(manualFeetPerMelee) {
 on("sheet:opened", async (e) => {
   console.log("sheet:opened", e);
   await setAttrsAsync({ debug: "0" });
-  // await migrateAttributes();
+  await migrateAttributes();
 });
 
 on("clicked:migrate", async (e) => {

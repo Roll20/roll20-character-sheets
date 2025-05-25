@@ -5,6 +5,8 @@
 ### Added
 
 - Add "Refresh All Profiles" button.
+- Add Range, Duration, Frequency, Damage, DC, and Skill to Modifiers.
+- Add Frequency to Magic, Psionics.
 
 ### Changed
 

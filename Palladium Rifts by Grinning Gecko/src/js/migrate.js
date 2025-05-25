@@ -168,6 +168,7 @@ async function migrateAttributes() {
     },
     {
       version: "1.8.0",
+      function: updateMagicPsionicsLevels
     },
   ];
 

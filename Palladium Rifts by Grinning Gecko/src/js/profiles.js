@@ -21,18 +21,10 @@ async function updateActiveProfile(rowId) {
   await setAttrsAsync(attrs);
 }
 
-//   const a = await getAttrsAsync(["psionic_ability"]);
-//   const attrs = {};
-//   attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
-//     a["psionic_ability"];
-
 async function updateProfile(rowId) {
   const bonusIdsString = await getAttrsAsync([`repeating_profiles_${rowId}_bonus_ids`]);
   console.log("bonusIdsString", bonusIdsString);
   const bonusIds = bonusIdsString[`repeating_profiles_${rowId}_bonus_ids`].split(",");
-  // const bonusIds = (
-  //   await getAttrsAsync([`repeating_profiles_${rowId}_bonus_ids`])
-  // )[`repeating_profiles_${rowId}_bonus_ids`].split(",");
   console.log(bonusIds);
   const bonusNameKeys = bonusIds.map((id) => `repeating_bonuses_${id}_name`);
   const a = await getAttrsAsync(bonusNameKeys);
