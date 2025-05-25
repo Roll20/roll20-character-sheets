@@ -2427,6 +2427,7 @@
         </label>
         <label>
           <span>Spell Strength</span>
+          <input type="hidden" name="attr_base_spellstrength" value="12" />
           <input type="number" name="attr_spellstrength" value="0" />
         </label>
         <div class="heading">
@@ -6627,6 +6628,13 @@
                     <button type="action" name="act_getdefaultprofile">
                       Debug Defaults
                     </button>
+                    <button
+                      type="action"
+                      name="act_updateprofiles"
+                      class="metal-btn btn-silver-flat"
+                    >
+                      Refresh All Profiles
+                    </button>
                     <input type="hidden" name="attr_default_mdc" />
                     <input type="hidden" name="attr_default_profile" />
                     <label>Active</label>
@@ -9602,7 +9610,7 @@
     </span>
     <hr />
     <h3>Options</h3>
-    <input type="hidden" name="attr_version" value="1.7.4" />
+    <input type="hidden" name="attr_version" value="1.8.0" />
     <label>Version: <span name="attr_version"></span></label>
     <input type="hidden" name="attr_migrated" value="0" />
     <label>Migrated: <span name="attr_migrated"></span></label>
@@ -12133,7 +12141,7 @@ async function migrateAttributes() {
       function: migrateAddRowIds,
     },
     {
-      version: "1.7.4",
+      version: "1.8.0",
     },
   ];
 
@@ -12320,6 +12328,8 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
         base = `${destinationPrefix}_mod_ma_bonus`;
       } else if (field == "charmimpress") {
         base = `${destinationPrefix}_mod_pb_bonus`;
+      } else if (field == "spellstrength") {
+        base = `base_spellstrength`;
       }
       await repeatingSumAsync(
         rsaDestinations,
@@ -13308,9 +13318,12 @@ async function updateActiveProfile(rowId) {
 //     a["psionic_ability"];
 
 async function updateProfile(rowId) {
-  const bonusIds = (
-    await getAttrsAsync(["repeating_profiles_bonus_ids"])
-  ).repeating_profiles_bonus_ids.split(",");
+  const bonusIdsString = await getAttrsAsync([`repeating_profiles_${rowId}_bonus_ids`]);
+  console.log("bonusIdsString", bonusIdsString);
+  const bonusIds = bonusIdsString[`repeating_profiles_${rowId}_bonus_ids`].split(",");
+  // const bonusIds = (
+  //   await getAttrsAsync([`repeating_profiles_${rowId}_bonus_ids`])
+  // )[`repeating_profiles_${rowId}_bonus_ids`].split(",");
   console.log(bonusIds);
   const bonusNameKeys = bonusIds.map((id) => `repeating_bonuses_${id}_name`);
   const a = await getAttrsAsync(bonusNameKeys);
@@ -13319,6 +13332,7 @@ async function updateProfile(rowId) {
     (acc, cur) => `${acc}     ✔︎${cur}`.trim(),
     ""
   );
+  console.log("names", bonusNameKeys, names);
   const globals = await getAttrsAsync(["psionic_ability"]);
   await setAttrsAsync({
     [`repeating_profiles_${rowId}_bonus_names`]: names,
@@ -13330,6 +13344,14 @@ async function updateProfile(rowId) {
   const isActive = await isDefault("profiles", rowId);
   if (isActive) {
     await updateActiveProfile(rowId);
+  }
+}
+
+async function updateAllProfiles() {
+  const rowIds = await getSectionIDsAsync("profiles");
+  console.log("updateAllProfiles", rowIds);
+  for (const rowId of rowIds) {
+    await updateProfile(rowId);
   }
 }
 
@@ -13479,6 +13501,11 @@ on("clicked:repeating_profiles:checkbonusids", async (e) => {
       : "0";
   }
   await setAttrsAsync(attrs);
+});
+
+on("clicked:updateprofiles", async (e) => {
+  console.log("clicked:updateprofiles", e);
+  await updateAllProfiles();
 });
 
 on(

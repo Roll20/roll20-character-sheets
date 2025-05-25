@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.8.0] - 2025-05-25
+
+### Added
+
+- Add "Refresh All Profiles" button.
+
+### Changed
+
+- Fix issue where spell strength was not being calculated correctly.
+
 ## [1.7.4] - 2025-03-30
 
 ### Changed
