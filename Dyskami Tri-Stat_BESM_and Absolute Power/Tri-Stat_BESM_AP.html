@@ -8045,10 +8045,25 @@
                 }
                 // Weapon ACV/DCV
                 roll.cv = roll.is_swarm ? roll.swarm_acv : cache.statsdb.acv.base;
-                const attribute_type = `${roll.weapon.range !== 0 ? 'ranged' : 'melee'} ${roll.type}`;
-                //=> apply melee/ranged attack attribute
-                //if (cache.attrdb[weapon_type].length !== 0)
+                const attribute_type = roll.type === 'attack' ? 
+                    `${roll.weapon.range !== 0 ? 'ranged' : 'melee'} ${roll.type}` :
+                    `${roll.attacker.weapon.range !== 0 ? 'ranged' : 'melee'} ${roll.type}`;
+                //=> apply melee/ranged attack/defense attribute
                 if (
+                    attribute_type === 'ranged defense' && 
+                    (
+                        roll.weapon.name === 'personal' || roll.weapon.name === 'movement'
+                    )
+                ) {
+                    for (let i = 0; i < cache.attrdb[attribute_type].length; i++) {
+                        if (cache.attrdb[attribute_type][i].active) {
+                            const defense_index = cache.attrdb[attribute_type][i].config.findIndex(c => c.name === 'defense type');
+                            if (cache.attrdb[attribute_type][i].config[defense_index].rank === roll.weapon.name) {
+                                roll.cv += cache.attrdb[attribute_type][i].elevel * 2;
+                            }
+                        }
+                    }
+                } else if (
                     roll.type === 'attack' || roll.type === 'defense' && 
                     cache.attrdb[attribute_type].length !== 0
                 ) {
@@ -11839,7 +11854,7 @@
                     case 'static_attribute_group_enhancements':
                     case 'static_attribute_group_limiters':
                     case 'repeating_attribute_enhancements':
-                    case 'repeating_attribute_limiters':debugger;
+                    case 'repeating_attribute_limiters':
                         if (query.selection === 'exit') { return; }
                         query.customization = query.selection.split('~').map(s => isNaN(s) ? s : Number(s));
                         query.has_rank = customizationHasRank(query);
