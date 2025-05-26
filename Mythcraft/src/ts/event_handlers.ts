@@ -19,12 +19,6 @@ action_points.forEach((attr) => {
           break;
       }
 
-      console.table({
-        coordination,
-        action_points_per_round,
-        action_points_base,
-      });
-
       setAttrs({ action_points_per_round });
     });
   });
@@ -150,60 +144,60 @@ on("change:repeating_skills:attribute", (event) => {
   setAttrs({ [`${repeatingRow}_attribute_abbreviation`]: abbreviation });
 });
 
-// on("change:skills_sorting", (event) => {
-//   const { newValue } = event;
+//TODO: Source should probably be tags
+// Handle talents
+const favoriteAttributes = ["name", "source", "description"];
 
-//     getSectionIDs("skills",  (ids) => {
-//       const groupName = "repeating_skills";
-//       const attributes: string[] = []
+["repeating_abilities", "repeating_favorites"].forEach((fieldset) => {
+  favoriteAttributes.forEach((attr) => {
+    on(`change:${fieldset}:${attr}`, (event) => {
+      const { newValue } = event;
 
-//       ids.forEach((id) => {
-//         attributes.push(`${groupName}_${id}_name`, `${groupName}_${id}_attribute`, `${groupName}_${id}_category`, `${groupName}_${id}_description`, `${groupName}_${id}_bonus`)
-//       });
+      getAttrs([`${fieldset}_link`], (values) => {
+        const favoriteRow = values[`${fieldset}_link`];
+        if (favoriteRow) {
+          const update: Attrs = {
+            [`${favoriteRow}_${attr}`]: newValue,
+          };
+          setAttrs(update, { silent: true });
+        }
+      });
+    });
+  });
 
-//       getAttrs(attributes, (values) => {
-//         console.log("values", values);
-//         if(newValue === "name") {
-//           const sortedValues = Object.keys(values).filter((key) => key.includes("name")).sort((a, b) => values[a].localeCompare(values[b]));
+  on(`change:${fieldset}:toggle_favorite`, (event) => {
+    const { sourceAttribute, newValue } = event;
+    const abilitiesRow = getFieldsetRow(sourceAttribute);
+    const isFavorite = newValue === "true";
 
-//           let update = []
-//           sortedValues.forEach((key) => {
-//             const row = getFieldsetRow(key);
+    if (isFavorite) {
+      getAttrs(
+        [
+          `${abilitiesRow}_description`,
+          `${abilitiesRow}_link`,
+          `${abilitiesRow}_name`,
+          `${abilitiesRow}_source`,
+        ],
+        (values) => {
+          const favoriteRow = getRow("favorites");
+          const update = {
+            [`${favoriteRow}_description`]:
+              values[`${abilitiesRow}_description`],
+            [`${favoriteRow}_link`]: abilitiesRow,
+            [`${favoriteRow}_name`]: values[`${abilitiesRow}_name`],
+            [`${favoriteRow}_source`]: values[`${abilitiesRow}_source`],
+            [`${favoriteRow}_toggle_edit`]: false,
+            [`${abilitiesRow}_link`]: favoriteRow,
+          };
 
-//           }
-
-//           console.log("sortedValues", sortedValues);
-//         }
-//       });
-//     });
-
-// const skills = newValue.split(",").map((skill) => skill.trim());
-// const sortedSkills = skills.sort((a, b) => a.localeCompare(b));
-
-// setAttrs({ [`${repeatingRow}_skills_sorting`]: sortedSkills.join(", ") });
-//}
-
-//Calculate a simple derived attribute
-
-//Calculate all the values of a repeating section. Useful for calculating weights, totals, etc.
-// on(`change:repeating_events:weight`, ({ triggerName }) => {
-//   const repeatingRow = getRepeatingRowId(triggerName);
-
-//   getSectionIDs("events", (idArray) => {
-//     let rows = [];
-//     idArray.forEach((id) =>
-//       rows.push(`repeating_events_${id}_weight`)
-//     );
-
-//     getAttrs(rows, (values) => {
-//       const parsedNumbers = parseIntegers(values);
-//       const weightValues = Object.values(parsedNumbers);
-//       const sum = sumIntegers(weightValues);
-
-//       setAttrs({
-//         weight_total: sum,
-//         [`${repeatingRow}_total_weight`]: sum,
-//       });
-//     });
-//   });
-// });
+          setAttrs(update, { silent: true });
+        }
+      );
+    } else {
+      getAttrs([`${abilitiesRow}_link`], (values) => {
+        const favoriteRow = values[`${abilitiesRow}_link`];
+        removeRepeatingRow(favoriteRow);
+      });
+    }
+  });
+});

@@ -142,11 +142,6 @@ action_points.forEach(function (attr) {
                         Math.ceil(coordination / 2) + action_points_base;
                     break;
             }
-            console.table({
-                coordination: coordination,
-                action_points_per_round: action_points_per_round,
-                action_points_base: action_points_base
-            });
             setAttrs({ action_points_per_round: action_points_per_round });
         });
     });
@@ -254,6 +249,55 @@ on("change:repeating_skills:attribute", function (event) {
     var attribute = newValue.substring(2, newValue.length - 1);
     var abbreviation = getAttributeAbbreviation(attribute);
     setAttrs((_a = {}, _a["".concat(repeatingRow, "_attribute_abbreviation")] = abbreviation, _a));
+});
+var favoriteAttributes = ["name", "source", "description"];
+["repeating_abilities", "repeating_favorites"].forEach(function (fieldset) {
+    favoriteAttributes.forEach(function (attr) {
+        on("change:".concat(fieldset, ":").concat(attr), function (event) {
+            var newValue = event.newValue;
+            getAttrs(["".concat(fieldset, "_link")], function (values) {
+                var _a;
+                var favoriteRow = values["".concat(fieldset, "_link")];
+                if (favoriteRow) {
+                    var update = (_a = {},
+                        _a["".concat(favoriteRow, "_").concat(attr)] = newValue,
+                        _a);
+                    setAttrs(update, { silent: true });
+                }
+            });
+        });
+    });
+    on("change:".concat(fieldset, ":toggle_favorite"), function (event) {
+        var sourceAttribute = event.sourceAttribute, newValue = event.newValue;
+        var abilitiesRow = getFieldsetRow(sourceAttribute);
+        var isFavorite = newValue === "true";
+        if (isFavorite) {
+            getAttrs([
+                "".concat(abilitiesRow, "_description"),
+                "".concat(abilitiesRow, "_link"),
+                "".concat(abilitiesRow, "_name"),
+                "".concat(abilitiesRow, "_source"),
+            ], function (values) {
+                var _a;
+                var favoriteRow = getRow("favorites");
+                var update = (_a = {},
+                    _a["".concat(favoriteRow, "_description")] = values["".concat(abilitiesRow, "_description")],
+                    _a["".concat(favoriteRow, "_link")] = abilitiesRow,
+                    _a["".concat(favoriteRow, "_name")] = values["".concat(abilitiesRow, "_name")],
+                    _a["".concat(favoriteRow, "_source")] = values["".concat(abilitiesRow, "_source")],
+                    _a["".concat(favoriteRow, "_toggle_edit")] = false,
+                    _a["".concat(abilitiesRow, "_link")] = favoriteRow,
+                    _a);
+                setAttrs(update, { silent: true });
+            });
+        }
+        else {
+            getAttrs(["".concat(abilitiesRow, "_link")], function (values) {
+                var favoriteRow = values["".concat(abilitiesRow, "_link")];
+                removeRepeatingRow(favoriteRow);
+            });
+        }
+    });
 });
 var _this = this;
 var versioningAttr = "latest_versioning_upgrade";
