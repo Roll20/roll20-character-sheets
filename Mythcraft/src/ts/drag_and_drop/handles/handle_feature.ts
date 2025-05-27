@@ -5,7 +5,7 @@ const handle_feature = (page: CompendiumAttributes) => {
 
   ["lineage", "profession"].forEach((attr) => {
     if (page.data[attr]) {
-      update[`${row}_source`] = page.data[attr];
+      update[`${row}_tags`] = page.data[attr];
     }
   });
 

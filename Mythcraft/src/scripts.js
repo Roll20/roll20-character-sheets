@@ -87,6 +87,7 @@ var handle_drop = function () {
             case "Creatures":
             case "Conditions":
                 handle_conditions(page);
+                break;
             case "Backgrounds":
             case "Professions":
                 handle_bop(page);
@@ -250,8 +251,8 @@ on("change:repeating_skills:attribute", function (event) {
     var abbreviation = getAttributeAbbreviation(attribute);
     setAttrs((_a = {}, _a["".concat(repeatingRow, "_attribute_abbreviation")] = abbreviation, _a));
 });
-var favoriteAttributes = ["name", "source", "description"];
-["repeating_abilities", "repeating_favorites"].forEach(function (fieldset) {
+var favoriteAttributes = ["name", "tags", "description"];
+["repeating_abilities", "repeating_favorites", "repeating_talents"].forEach(function (fieldset) {
     favoriteAttributes.forEach(function (attr) {
         on("change:".concat(fieldset, ":").concat(attr), function (event) {
             var newValue = event.newValue;
@@ -276,7 +277,7 @@ var favoriteAttributes = ["name", "source", "description"];
                 "".concat(abilitiesRow, "_description"),
                 "".concat(abilitiesRow, "_link"),
                 "".concat(abilitiesRow, "_name"),
-                "".concat(abilitiesRow, "_source"),
+                "".concat(abilitiesRow, "_tags"),
             ], function (values) {
                 var _a;
                 var favoriteRow = getRow("favorites");
@@ -284,7 +285,7 @@ var favoriteAttributes = ["name", "source", "description"];
                     _a["".concat(favoriteRow, "_description")] = values["".concat(abilitiesRow, "_description")],
                     _a["".concat(favoriteRow, "_link")] = abilitiesRow,
                     _a["".concat(favoriteRow, "_name")] = values["".concat(abilitiesRow, "_name")],
-                    _a["".concat(favoriteRow, "_source")] = values["".concat(abilitiesRow, "_source")],
+                    _a["".concat(favoriteRow, "_tags")] = values["".concat(abilitiesRow, "_tags")],
                     _a["".concat(favoriteRow, "_toggle_edit")] = false,
                     _a["".concat(abilitiesRow, "_link")] = favoriteRow,
                     _a);
@@ -414,7 +415,6 @@ var handle_conditions = function (page) {
     setDropAttrs(update);
 };
 var handle_equipment = function (page) {
-    console.log(page.data);
     var attrs = ["name", "description", "cost", "tags"];
     var row = getRow("inventory");
     var update = getUpdate(attrs, page, row);
@@ -430,7 +430,7 @@ var handle_feature = function (page) {
     var update = getUpdate(attrs, page, row);
     ["lineage", "profession"].forEach(function (attr) {
         if (page.data[attr]) {
-            update["".concat(row, "_source")] = page.data[attr];
+            update["".concat(row, "_tags")] = page.data[attr];
         }
     });
     setDropAttrs(update);
@@ -515,16 +515,10 @@ var handle_spell = function (page) {
     setDropAttrs(update);
 };
 var handle_talent = function (page) {
-    var attrs = [
-        "name",
-        "description",
-        "level",
-        "prerequisites",
-        "stack",
-        "track",
-    ];
+    var attrs = ["name", "description", "level", "prerequisites"];
     var row = getRow("talents");
     var update = getUpdate(attrs, page, row);
+    update["".concat(row, "_tags")] = "".concat(page.data.stack, ", ").concat(page.data.track);
     setDropAttrs(update);
 };
 var handle_weapon = function (page) {

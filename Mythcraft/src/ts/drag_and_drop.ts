@@ -27,6 +27,7 @@ const handle_drop = () => {
       // resetSkillList(page.data.skills);
       case "Conditions":
         handle_conditions(page);
+        break;
       case "Backgrounds":
       case "Professions":
         handle_bop(page);

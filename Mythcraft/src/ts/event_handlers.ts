@@ -144,60 +144,60 @@ on("change:repeating_skills:attribute", (event) => {
   setAttrs({ [`${repeatingRow}_attribute_abbreviation`]: abbreviation });
 });
 
-//TODO: Source should probably be tags
-// Handle talents
-const favoriteAttributes = ["name", "source", "description"];
+const favoriteAttributes = ["name", "tags", "description"];
 
-["repeating_abilities", "repeating_favorites"].forEach((fieldset) => {
-  favoriteAttributes.forEach((attr) => {
-    on(`change:${fieldset}:${attr}`, (event) => {
-      const { newValue } = event;
+["repeating_abilities", "repeating_favorites", "repeating_talents"].forEach(
+  (fieldset) => {
+    favoriteAttributes.forEach((attr) => {
+      on(`change:${fieldset}:${attr}`, (event) => {
+        const { newValue } = event;
 
-      getAttrs([`${fieldset}_link`], (values) => {
-        const favoriteRow = values[`${fieldset}_link`];
-        if (favoriteRow) {
-          const update: Attrs = {
-            [`${favoriteRow}_${attr}`]: newValue,
-          };
-          setAttrs(update, { silent: true });
-        }
+        getAttrs([`${fieldset}_link`], (values) => {
+          const favoriteRow = values[`${fieldset}_link`];
+          if (favoriteRow) {
+            const update: Attrs = {
+              [`${favoriteRow}_${attr}`]: newValue,
+            };
+            setAttrs(update, { silent: true });
+          }
+        });
       });
     });
-  });
 
-  on(`change:${fieldset}:toggle_favorite`, (event) => {
-    const { sourceAttribute, newValue } = event;
-    const abilitiesRow = getFieldsetRow(sourceAttribute);
-    const isFavorite = newValue === "true";
+    on(`change:${fieldset}:toggle_favorite`, (event) => {
+      const { sourceAttribute, newValue } = event;
+      const abilitiesRow = getFieldsetRow(sourceAttribute);
+      const isFavorite = newValue === "true";
 
-    if (isFavorite) {
-      getAttrs(
-        [
-          `${abilitiesRow}_description`,
-          `${abilitiesRow}_link`,
-          `${abilitiesRow}_name`,
-          `${abilitiesRow}_source`,
-        ],
-        (values) => {
-          const favoriteRow = getRow("favorites");
-          const update = {
-            [`${favoriteRow}_description`]:
-              values[`${abilitiesRow}_description`],
-            [`${favoriteRow}_link`]: abilitiesRow,
-            [`${favoriteRow}_name`]: values[`${abilitiesRow}_name`],
-            [`${favoriteRow}_source`]: values[`${abilitiesRow}_source`],
-            [`${favoriteRow}_toggle_edit`]: false,
-            [`${abilitiesRow}_link`]: favoriteRow,
-          };
+      if (isFavorite) {
+        getAttrs(
+          [
+            `${abilitiesRow}_description`,
+            `${abilitiesRow}_link`,
+            `${abilitiesRow}_name`,
+            `${abilitiesRow}_tags`,
+          ],
+          (values) => {
+            const favoriteRow = getRow("favorites");
+            const update = {
+              [`${favoriteRow}_description`]:
+                values[`${abilitiesRow}_description`],
+              [`${favoriteRow}_link`]: abilitiesRow,
+              [`${favoriteRow}_name`]: values[`${abilitiesRow}_name`],
+              [`${favoriteRow}_tags`]: values[`${abilitiesRow}_tags`],
+              [`${favoriteRow}_toggle_edit`]: false,
+              [`${abilitiesRow}_link`]: favoriteRow,
+            };
 
-          setAttrs(update, { silent: true });
-        }
-      );
-    } else {
-      getAttrs([`${abilitiesRow}_link`], (values) => {
-        const favoriteRow = values[`${abilitiesRow}_link`];
-        removeRepeatingRow(favoriteRow);
-      });
-    }
-  });
-});
+            setAttrs(update, { silent: true });
+          }
+        );
+      } else {
+        getAttrs([`${abilitiesRow}_link`], (values) => {
+          const favoriteRow = values[`${abilitiesRow}_link`];
+          removeRepeatingRow(favoriteRow);
+        });
+      }
+    });
+  }
+);

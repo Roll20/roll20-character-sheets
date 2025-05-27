@@ -1,5 +1,4 @@
 const handle_equipment = (page: CompendiumAttributes) => {
-  console.log(page.data);
   const attrs = ["name", "description", "cost", "tags"];
   const row = getRow("inventory");
   const update = getUpdate(attrs, page, row);
