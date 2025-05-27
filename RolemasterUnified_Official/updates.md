@@ -1,3 +1,9 @@
+# 2025-5-27
+
+- Update weapons to match current Creature Law
+- Gracefully ignore invalid weapons
+- Update Spell Law spells to use JSON - ready for new uploads
+
 # 2025-5-20
 
 - Creatures now go down at 0, not -1
