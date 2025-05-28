@@ -341,9 +341,6 @@ var getUpdate = function (attrs, page, repeatingRow) {
         if ((_a = page[attr]) !== null && _a !== void 0 ? _a : page.data[attr]) {
             update[sheetAttr] = (_b = page[attr]) !== null && _b !== void 0 ? _b : roll20Attribute(attr, page.data[attr]);
         }
-        else {
-            update[sheetAttr] = "-";
-        }
     });
     if (repeatingRow) {
         update["".concat(repeatingRow, "_toggle_edit")] = false;
@@ -457,14 +454,12 @@ var handle_skills = function (page) {
     setDropAttrs(update);
 };
 var handle_spell = function (page) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
     var attrs = [
         "apc",
         "description",
         "focus",
-        "function",
         "name",
-        "source",
         "spc",
         "type",
         "damage",
@@ -502,16 +497,11 @@ var handle_spell = function (page) {
     else if ((_k = page.data) === null || _k === void 0 ? void 0 : _k.materials) {
         update["".concat(row, "_requires")] = "".concat((_l = page.data) === null || _l === void 0 ? void 0 : _l.materials);
     }
-    if (((_m = page.data) === null || _m === void 0 ? void 0 : _m.source) && ((_o = page.data) === null || _o === void 0 ? void 0 : _o.type)) {
-        update["".concat(row, "_source")] = "".concat(page.data.source, " (").concat(page.data.type, ")");
+    var tags = "".concat(page.data.source, " ").concat(page.data.type, ", ").concat(page.data["function"]);
+    if ((_m = page.data) === null || _m === void 0 ? void 0 : _m.function_note) {
+        tags += ", ".concat(page.data.function_note);
     }
-    else if ((_p = page.data) === null || _p === void 0 ? void 0 : _p.source) {
-        update["".concat(row, "_source")] = "".concat(page.data.source);
-    }
-    else if ((_q = page.data) === null || _q === void 0 ? void 0 : _q.type) {
-        update["".concat(row, "_source")] = "".concat(page.data.type);
-    }
-    console.log("Spell update", update);
+    update["".concat(row, "_tags")] = tags;
     setDropAttrs(update);
 };
 var handle_talent = function (page) {

@@ -3,9 +3,7 @@ const handle_spell = (page: CompendiumAttributes) => {
     "apc",
     "description",
     "focus",
-    "function",
     "name",
-    "source",
     "spc",
     "type",
     "damage",
@@ -17,6 +15,7 @@ const handle_spell = (page: CompendiumAttributes) => {
     "prerequisites",
     "recharge",
   ];
+
   const row = getRow("spells");
   const update = getUpdate(attrs, page, row);
 
@@ -52,14 +51,12 @@ const handle_spell = (page: CompendiumAttributes) => {
     update[`${row}_requires`] = `${page.data?.materials}`;
   }
 
-  if (page.data?.source && page.data?.type) {
-    update[`${row}_source`] = `${page.data.source} (${page.data.type})`;
-  } else if (page.data?.source) {
-    update[`${row}_source`] = `${page.data.source}`;
-  } else if (page.data?.type) {
-    update[`${row}_source`] = `${page.data.type}`;
+  let tags = `${page.data.source} ${page.data.type}, ${page.data.function}`;
+  if (page.data?.function_note) {
+    tags += `, ${page.data.function_note}`;
   }
 
-  console.log("Spell update", update);
+  update[`${row}_tags`] = tags;
+
   setDropAttrs(update);
 };

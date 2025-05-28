@@ -12,8 +12,6 @@ const getUpdate = (
     if (page[attr] ?? page.data[attr]) {
       //@ts-expect-error indexing error
       update[sheetAttr] = page[attr] ?? roll20Attribute(attr, page.data[attr]);
-    } else {
-      update[sheetAttr] = "-";
     }
   });
 
