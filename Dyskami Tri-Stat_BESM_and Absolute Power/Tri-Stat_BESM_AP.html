@@ -3690,7 +3690,8 @@
                             set_values.static_attribute_group_poolname = getTranslationByKey("dynamic-powers");
                         break;
                         case 'gear':
-                            set_values.static_attribute_group_poolname = getTranslationByKey("amount-of-gear");
+                            setGearPoolLevels(cache, set_values);
+                            set_values.static_attribute_group_poolname = getTranslationByKey("gear");
                         break;
                     }
                     set_values.static_attribute_group_level = `${cache.groupdb[i].level || 0} (${cache.groupdb[i].elevel || 0})`;
@@ -3771,19 +3772,22 @@
             `${temp.dynamic_levels_used} / ${temp.dynamic_levels_available}`;
     }
 
-    function setGearPoolLevels(cache, set_values, query) {
+    function setGearPoolLevels(cache, set_values) {
         if (cache.is_sheetopened) { return; }
         const gear_by_level = {
+            0:0,
             1:2,
             2:5
         };
-        clog(cache, query,'setGearPoolLevels()');
-        query.gear_levels_used = cache.groupdb[cache.static_group_visible_id].attribute_ids.length;
-        query.gear_max = query.elevel < 3 ? 
-            gear_by_level[query.elevel] : 
-            get1or2andHalfor5(query.elevel) * (10 ** (Math.floor(query.elevel / 3)));
-        set_values.static_attribute_group_poolpoints = `${query.gear_levels_used} / ${query.gear_max}`;
-        cache.groupdb[cache.static_group_visible_id].pool_points = query.gear_max;
+        const temp = {};
+        clog(cache, temp,'setGearPoolLevels()');
+        temp.db = cache.groupdb[cache.static_group_visible_id];
+        temp.gear_levels_used = temp.db.attribute_ids.length;
+        temp.gear_max = temp.db.elevel < 3 ? 
+            gear_by_level[temp.db.elevel] : 
+            get1or2andHalfor5(temp.db.elevel) * (10 ** (Math.floor(temp.db.elevel / 3)));
+        set_values.static_attribute_group_poolpoints = `${temp.gear_levels_used} / ${temp.gear_max}`;
+        cache.groupdb[cache.static_group_visible_id].pool_points = temp.gear_max;
     }
 
     function setNonStandardGroupPoints(cache, set_values) {
@@ -12309,7 +12313,7 @@
                             setDynamicPowersPoolLevels(cache, set_values);
                             setGroupCharacterPoints(cache, set_values);
                         } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'gear') {
-                            setGearPoolLevels(cache, set_values, query);
+                            setGearPoolLevels(cache, set_values);
                             setGroupCharacterPoints(cache, set_values);
                         } else {
                             setGroupCharacterPoints(cache, set_values);
@@ -13117,7 +13121,7 @@
                             setDynamicPowersPoolLevels(cache, set_values);
                             setGroupCharacterPoints(cache, set_values);
                         } else if (cache.groupdb[cache.static_group_visible_id].group_type === 'gear') {
-                            setGearPoolLevels(cache, set_values, query);
+                            setGearPoolLevels(cache, set_values);
                             setGroupCharacterPoints(cache, set_values);
                         } else {
                             setGroupCharacterPoints(cache, set_values);
