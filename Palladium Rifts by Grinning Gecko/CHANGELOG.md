@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.8.1] - 2025-05-28
+
+### Changed
+
+- Make Active Profile checkboxes look like radio buttons.
+
 ## [1.8.0] - 2025-05-25
 
 ### Added
