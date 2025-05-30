@@ -1,0 +1,1220 @@
+@import url("https://fonts.googleapis.com/css2?family=Oswald&display=swap");
+:root {
+  --box-header-bg: #1F2442; /* dark blue */
+  --box-background-bg: #D2DFF1; /* light blue */
+  --hint-color: #A0A0A0;
+  --bonus-feats-bg: #BD3960; /* reddish pink */
+  --psionic-bg: #872A83; /* burgundyish */
+  --spells-bg: #7554A3; /* violet */
+  --input-color: #B900F8; /* fuschia */
+}
+
+label {
+  /* Reset styling that Roll20 applies programmatically */
+  font-weight: revert !important;
+  font-size: revert !important;
+  margin-bottom: revert !important;
+  padding-right: revert !important;
+}
+
+input[type=text], input[type=number], textarea {
+  border: none;
+  -webkit-appearance: none;
+  -ms-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: white;
+  border-radius: 0px;
+}
+
+main {
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: 135px [demographicsend] 140px [defenseend] 300px [proficienciesend];
+  row-gap: 5px;
+}
+main * {
+  font-family: "Oswald", sans-serif;
+  text-transform: uppercase;
+}
+
+div.hint {
+  font-size: 70%;
+}
+
+.hint {
+  color: var(--hint-color);
+}
+
+.attribute {
+  border-bottom: solid 2px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  column-gap: 2px;
+}
+.attribute .attribute_name {
+  align-self: end;
+}
+.attribute .attribute_input {
+  align-self: end;
+  text-align: center;
+}
+
+input.attribute_input {
+  width: 100% !important; /* important to override roll20 width on number inputs */
+  color: var(--input-color);
+  height: 24px !important;
+  padding: 0px;
+}
+
+textarea {
+  color: var(--input-color);
+  padding: 0px;
+}
+
+/*
+ * Example on char sheet: Level, Defense, Armor, Hit Points
+ */
+.box {
+  display: grid;
+  grid-template-rows: 24px auto;
+  border: 2px solid var(--box-header-bg);
+}
+.box .header {
+  background-color: var(--box-header-bg);
+  width: 100%;
+  color: white;
+  justify-self: center;
+  display: grid;
+  box-sizing: border-box;
+}
+.box .header .text {
+  place-self: center;
+  font-size: 130%;
+}
+
+/*
+ * Example on char sheet: Talents, Mutations
+ */
+.box_with_header_input .header {
+  justify-self: stretch;
+  grid-template-columns: 1fr 1fr auto;
+  grid-template-rows: 24px;
+  column-gap: 4px;
+}
+.box_with_header_input .header .main_header {
+  justify-self: start;
+  align-self: center;
+  margin-left: 3px;
+}
+.box_with_header_input .header .input_header, .box_with_header_input .header input {
+  justify-self: end;
+  align-self: center;
+}
+.box_with_header_input .header input {
+  width: 60px !important;
+  height: 17px !important;
+  text-align: center;
+}
+
+/*
+ * Example on char sheet: Total Def, Base Def, etc. under DEFENSE
+ */
+.subbox {
+  grid-template-rows: 16px auto;
+  border: none;
+}
+.subbox .header {
+  background-color: white;
+  color: black;
+  border-bottom: 2px solid var(--box-header-bg);
+}
+.subbox .header .text {
+  font-size: 80%;
+}
+.subbox .header.no_border {
+  border-bottom: none;
+}
+
+.subbox:not(:first-child) {
+  border-left: 2px solid var(--box-header-bg);
+}
+
+/*
+ * Example char sheet: Movement, Initiative, Heroic Actions
+ */
+.horizontal_box {
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: auto minmax(30px, 1fr);
+  border: 2px solid var(--box-header-bg);
+}
+
+.inputbox .header {
+  background-color: white;
+  color: black;
+  padding-left: 2px;
+}
+.inputbox .header .text {
+  place-self: start;
+  font-size: 70%;
+}
+
+/* Using `content` instead of `box_content` is too generic, and matches some Roll20 styling */
+.box .box_content {
+  place-self: stretch;
+  display: grid;
+  place-content: stretch;
+}
+
+.box .box_content input.attribute_input {
+  text-align: center;
+}
+
+.box .box_content .attribute_input {
+  height: 100% !important;
+}
+
+.subbox .box_content .attribute_input {
+  font-size: 150%;
+}
+
+.inputbox .box_content .attribute_input {
+  font-size: 120%;
+}
+
+/*
+ * First row of character sheet
+ */
+#main_demographics {
+  display: grid;
+  grid-template-columns: 25fr [logoend] 13fr [raceend] 3fr [physicalityend] 9fr [backgroundend] 15fr [nationalityend] 7fr [mentalstateend] 13fr [genderend] 15fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  column-gap: 5px;
+}
+#main_demographics .logo {
+  grid-column: 1/logoend;
+  grid-row: 1/3;
+}
+#main_demographics .attribute_character_name {
+  grid-column: logoend/nationalityend;
+}
+#main_demographics .attribute_player_name {
+  grid-column: nationalityend/-1;
+}
+#main_demographics .attribute_race {
+  grid-column: logoend/raceend;
+}
+#main_demographics .attribute_nationality {
+  grid-column: raceend/nationalityend;
+}
+#main_demographics .attribute_languages {
+  grid-column: backgroundend/genderend;
+}
+#main_demographics .attribute_class {
+  grid-column: 1/logoend;
+}
+#main_demographics .attribute_background {
+  grid-column: logoend/backgroundend;
+}
+#main_demographics .attribute_size {
+  grid-column: nationalityend/genderend;
+}
+#main_demographics .attribute_alignment {
+  grid-column: 1/logoend;
+}
+#main_demographics .attribute_physicality {
+  grid-column: logoend/physicalityend;
+}
+#main_demographics .attribute_mental_state {
+  grid-column: physicalityend/mentalstateend;
+}
+#main_demographics .attribute_gender {
+  grid-column: mentalstateend/genderend;
+}
+#main_demographics .box_level {
+  margin-top: 15px;
+  grid-column: genderend/-1;
+  grid-row: 2/-1;
+}
+#main_demographics .box_level .box_content .attribute_input {
+  font-size: 250%;
+}
+
+/*
+ * Second row of character sheet
+ */
+#defense {
+  display: grid;
+  grid-template-columns: 22fr [shielddefend] 18fr [defensend] 18fr [armorend] 18fr [armortypened] 24fr [hpend];
+  grid-template-rows: 2fr 1fr;
+  column-gap: 5px;
+  row-gap: 2px;
+}
+
+.box_defense {
+  grid-column: 1/defensend;
+}
+.box_defense > .box_content {
+  display: grid;
+  grid-template-columns: 20fr 16fr 16fr 16fr 14fr 18fr;
+}
+.box_defense .box_total_def .header .text {
+  font-size: 90%;
+}
+.box_defense .box_base_def .box_content {
+  place-self: center;
+  font-size: 150%;
+}
+
+.box_armor .armor_proficiencies .box_content {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr 1fr;
+  margin: 1px;
+}
+.box_armor .armor_proficiencies .box_content label {
+  font-size: 76% !important; /* override roll20 */
+}
+.box_armor .armor_proficiencies .box_content .hint {
+  grid-column: 1/3;
+  grid-row: 2/3;
+  place-self: center;
+}
+
+.box_armor_type {
+  grid-column: armorend/armortypened;
+  grid-row: 1/-1;
+}
+.box_armor_type .box_armor_type_value {
+  grid-template-rows: auto;
+  grid-template-columns: 24px auto;
+  border: 1px solid var(--box-header-bg);
+}
+.box_armor_type .box_armor_type_value .header .text {
+  place-self: center;
+}
+.box_armor_type .box_armor_type_value .attribute_input {
+  font-size: 80%;
+}
+.box_armor_type > .header {
+  background-color: revert;
+}
+.box_armor_type > .header .box_armor_type_value {
+  border: none;
+}
+.box_armor_type > .box_content {
+  border-top: 2px solid var(--box-header-bg);
+}
+.box_armor_type .box_damage_resistance .header {
+  border-bottom: none;
+}
+.box_armor_type .box_damage_resistance .damage_resistance {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: 1fr 2fr;
+  border-top: 2px solid var(--box-header-bg);
+}
+.box_armor_type .box_damage_resistance .damage_resistance .attribute_input {
+  grid-row: 1/-1;
+}
+.box_armor_type .box_damage_resistance .damage_resistance .charges {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+  place-self: center;
+  padding-bottom: 1px;
+}
+.box_armor_type .box_damage_resistance .damage_resistance .charges input[type=checkbox] {
+  width: 13px;
+  height: 13px;
+}
+.box_armor_type .box_damage_resistance .damage_resistance .charges_header {
+  font-size: 70%;
+  place-self: center;
+}
+
+.subbox .box_content .damage_resistance .attribute_input {
+  font-size: 100%;
+}
+
+.box_hit_points {
+  grid-column: armortypened/-1;
+  grid-row: 1/-1;
+}
+.box_hit_points > .box_content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 3fr 1fr;
+}
+.box_hit_points > .box_content > .attribute_input {
+  font-size: 250%;
+}
+.box_hit_points .inputbox {
+  border: none;
+  border-top: 2px solid var(--box-header-bg);
+}
+.box_hit_points .box_armor_hardness {
+  grid-template-columns: 50px auto;
+}
+.box_hit_points .box_hp_temporary {
+  grid-template-columns: 50px auto;
+  border-left: 2px solid var(--box-header-bg);
+}
+.box_hit_points .subbox .box_content .attribute_input {
+  font-size: 300%;
+}
+
+.shield_def {
+  grid-column: 1/shielddefend;
+  grid-row: 2/3;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 1fr;
+  grid-template-rows: 18px 36px;
+}
+.shield_def > .box {
+  border-right: none;
+}
+.shield_def > .subbox {
+  border-top: 2px solid var(--box-header-bg);
+  border-bottom: 2px solid var(--box-header-bg);
+}
+.shield_def > .box:not(:first-child) {
+  border-left: 2px solid var(--box-header-bg);
+}
+.shield_def > .box:last-child {
+  border-right: 2px solid var(--box-header-bg);
+}
+.shield_def .box_shield_def {
+  grid-row: 1/-1;
+  grid-template-rows: 14px auto;
+}
+.shield_def .box_shield_def .header .text {
+  font-size: 58%;
+}
+.shield_def .subbox .header .text {
+  font-size: 70%;
+}
+.shield_def .box .box_content .attribute_input {
+  font-size: 150%;
+}
+.shield_def .box_shield_def_max_hp, .shield_def .box_shield_def_current {
+  grid-row: 1/-1;
+  grid-template-rows: 14px auto;
+}
+.shield_def .box_shield_def_name {
+  grid-template-columns: 1fr 3fr;
+  grid-template-rows: auto;
+  border-bottom: none;
+}
+.shield_def .box_shield_def_name .header {
+  margin-left: 0px;
+  padding-left: 1px;
+}
+.shield_def .box_shield_def_name .header .text {
+  font-size: 60%;
+  padding-left: 1px;
+}
+.shield_def .box_shield_def_name .box_content .attribute_input {
+  font-size: 80%;
+}
+.shield_def .box_shield_def_name input {
+  vertical-align: revert;
+}
+.shield_def .box_shield_def_hardness {
+  grid-row: 2/3;
+  grid-template-rows: 10px auto;
+}
+.shield_def .box_shield_def_hardness .header {
+  margin-left: 0px;
+  padding-left: 2px;
+}
+.shield_def .box_shield_def_hardness .box_content .attribute_input {
+  font-size: 110%;
+}
+
+.movement {
+  grid-column: shielddefend/armorend;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  row-gap: 2px;
+  column-gap: 3px;
+}
+.movement .box_movement {
+  grid-column: 1/-1;
+  grid-row: 1/2;
+}
+.movement .box_initiative {
+  grid-column: 1/2;
+  grid-row: 2/3;
+}
+.movement .box_heroic_actions {
+  grid-column: 2/3;
+  grid-row: 2/3;
+}
+.movement .box_heroic_actions .box_content {
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 2px;
+}
+.movement .horizontal_box .header .text {
+  font-size: 116%;
+  padding-right: 3px;
+}
+.movement .horizontal_box .box_content {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+.movement .horizontal_box .box_content .attribute_input {
+  font-size: 115%;
+}
+
+#proficiencies {
+  display: grid;
+  grid-template-columns: 22fr 78fr;
+  column-gap: 3px;
+}
+#proficiencies .box_weapon_proficiencies {
+  background: var(--box-background-bg);
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+}
+#proficiencies .box_weapon_proficiencies .box_content {
+  margin-top: 2px;
+  justify-content: center;
+}
+#proficiencies .box_talents .box_content {
+  /*
+   * Disable the Roll20 up/down arrows on number inputs, they take up too much room
+   */
+  grid-template-rows: 12px repeat(12, 1fr);
+  grid-auto-flow: column;
+  margin-left: 2px;
+}
+#proficiencies .box_talents .box_content input::-webkit-outer-spin-button,
+#proficiencies .box_talents .box_content input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#proficiencies .box_talents .box_content input[type=number] {
+  -moz-appearance: textfield;
+}
+#proficiencies .box_talents .box_content input[type=number],
+#proficiencies .box_talents .box_content input[type=text] {
+  height: 18px;
+  border-bottom: 1px solid black;
+  outline: 0;
+  font-size: 100%;
+  color: var(--input-color);
+}
+#proficiencies .box_talents .box_content input[type=number] {
+  width: 25px;
+}
+#proficiencies .box_talents .box_content input[type=text] {
+  width: 80px;
+}
+#proficiencies .box_talents .box_content label {
+  display: grid;
+  grid-template-columns: 14px 26px auto auto;
+  column-gap: 1px;
+  place-content: stretch;
+}
+#proficiencies .box_talents .box_content label .name {
+  vertical-align: bottom;
+}
+#proficiencies .box_talents .box_content label .filler {
+  width: 13px;
+}
+#proficiencies .box_talents .box_content label .fully {
+  grid-column: 3/-1;
+  width: 118px;
+  padding-right: 0px;
+}
+
+#page1_lower {
+  display: grid;
+  grid-template-columns: 52fr 48fr;
+  column-gap: 5px;
+  place-content: stretch;
+}
+#page1_lower #page1_lower_left {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 3px;
+  row-gap: 5px;
+}
+#page1_lower #page1_lower_right {
+  display: grid;
+  row-gap: 5px;
+  grid-template-rows: auto auto 48px;
+}
+
+#weapon_attacks {
+  grid-column: 1/-1;
+  background: var(--box-background-bg);
+  padding: 5px;
+}
+#weapon_attacks .box_weapon_attacks {
+  border: none;
+}
+#weapon_attacks .box_weapon_attacks .repitem {
+  display: grid;
+  grid-template-columns: 31.57fr 12.6fr 36.8fr 19fr;
+  padding-bottom: 4px;
+}
+#weapon_attacks .box_weapon_attacks .repitem .box_base_range {
+  border-right: 2px solid var(--box-header-bg);
+}
+#weapon_attacks .box_weapon_attacks .repitem .box_notes {
+  grid-column: 1/3;
+}
+#weapon_attacks .box_weapon_attacks .repitem .box_notes .main_header {
+  align-self: center;
+}
+#weapon_attacks .box_weapon_attacks .repitem .inputbox {
+  border: none;
+  border-left: 2px solid var(--box-header-bg);
+  border-top: 2px solid var(--box-header-bg);
+  border-bottom: 2px solid var(--box-header-bg);
+  grid-template-columns: 30px auto;
+}
+#weapon_attacks .box_weapon_attacks .repitem .box_ammo_count {
+  border-right: 2px solid var(--box-header-bg);
+}
+#weapon_attacks .box_weapon_attacks .repitem:not(first-child) .subbox {
+  border-top: 2px solid var(--box-header-bg);
+}
+
+#resistances .box_resistances {
+  border: none;
+  background: var(--box-background-bg);
+}
+#resistances .box_resistances .box_content {
+  grid-template-rows: repeat(6, 1fr);
+  grid-auto-flow: column;
+  margin-bottom: 3px;
+  margin-left: 3px;
+}
+#resistances .box_resistances .box_content label {
+  font-size: 85% !important;
+}
+
+#immunities .box_immunities {
+  border: none;
+  background: var(--box-background-bg);
+}
+#immunities .box_immunities .box_content {
+  grid-template-rows: repeat(3, 1fr);
+  grid-auto-flow: column;
+  margin-bottom: 3px;
+  margin-left: 3px;
+}
+#immunities .box_immunities .box_content label {
+  font-size: 85% !important;
+}
+
+#curses .box_curses > .box_content {
+  grid-template-columns: 1fr 1fr;
+}
+#curses .box_curses > .box_content .curse_type {
+  display: grid;
+  align-content: start;
+  justify-content: center;
+}
+#curses .box_curses > .box_content .curse_type label {
+  font-size: 120% !important;
+}
+#curses .box_curses > .box_content .curse_type .remark {
+  font-size: 65%;
+  text-align: center;
+}
+#curses .box_curses > .box_content .weredisease {
+  border-right: 2px solid var(--box-header-bg);
+}
+#curses .box_curses > .box_content .box_curses_notes {
+  border: none;
+  border-top: 2px solid var(--box-header-bg);
+  padding: 1px;
+  grid-column: 1/-1;
+  grid-template-columns: 30px auto;
+  grid-template-rows: auto;
+}
+#curses .box_curses > .box_content .box_curses_notes .box_content textarea {
+  padding: 0px;
+  margin: 0px;
+  font-size: 85%;
+  text-align: left;
+  height: 95% !important;
+}
+
+#conditions .box_conditions .box_content {
+  padding: 1px;
+}
+#conditions .box_conditions .box_content textarea {
+  font-size: 85%;
+  text-align: left;
+}
+
+#mutations .box_with_header_input .input_header.text {
+  text-transform: initial;
+}
+#mutations .box_mutations .repitem {
+  display: grid;
+  grid-template-columns: 80fr 20fr;
+  grid-template-rows: 1fr 2fr;
+}
+#mutations .box_mutations .repitem .inputbox {
+  border: none;
+  border-bottom: 2px solid var(--box-header-bg);
+  grid-template-columns: 30px auto;
+}
+#mutations .box_mutations .repitem .box_mutation_name {
+  grid-template-columns: 50px auto;
+}
+#mutations .box_mutations .repitem .box_mutation_type {
+  border-left: 2px solid var(--box-header-bg);
+}
+#mutations .box_mutations .repitem .box_mutation_notes {
+  grid-column: 1/-1;
+  grid-template-rows: auto;
+}
+#mutations .box_mutations .repitem .box_mutation_notes .header .text {
+  color: var(--hint-color);
+}
+#mutations .box_mutations .repitem .box_mutation_notes .box_content textarea {
+  padding: 0px;
+  margin: 0px;
+  font-size: 85%;
+  text-align: left;
+  height: 95% !important;
+}
+
+#cybernetics .box_cybernetics .repitem {
+  display: grid;
+  grid-template-columns: 60fr 19fr 21fr;
+}
+#cybernetics .box_cybernetics .repitem .inputbox {
+  border: none;
+  border-bottom: 2px solid var(--box-header-bg);
+  grid-template-rows: auto;
+}
+#cybernetics .box_cybernetics .repitem .inputbox .header {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+#cybernetics .box_cybernetics .repitem .inputbox .header .text {
+  padding-left: 2px;
+}
+#cybernetics .box_cybernetics .repitem .box_cybernetic_type, #cybernetics .box_cybernetics .repitem .box_cybernetic_hardness {
+  border-left: 2px solid var(--box-header-bg);
+}
+#cybernetics .box_cybernetics .repitem .box_cybernetic_notes {
+  grid-column: 1/-1;
+  grid-template-rows: auto;
+}
+#cybernetics .box_cybernetics .repitem .box_cybernetic_notes .header .text {
+  color: var(--hint-color);
+}
+#cybernetics .box_cybernetics .repitem .box_cybernetic_notes input {
+  font-size: 85%;
+}
+
+#barter_units {
+  display: grid;
+  grid-template-columns: 38fr 62fr;
+}
+#barter_units .box_barter_units {
+  background: var(--box-header-bg);
+  border-left: 10px solid var(--box-header-bg);
+  border-right: 10px solid var(--box-header-bg);
+}
+#barter_units .box_barter_units .header .text {
+  font-size: 90%;
+}
+#barter_units .box_barter_units input {
+  justify-self: center;
+  width: 95% !important;
+  text-align: center;
+}
+#barter_units .box_barter_units_notes {
+  padding: 1px;
+  grid-template-rows: auto;
+  grid-template-columns: 30px auto;
+}
+#barter_units .box_barter_units_notes .box_content textarea {
+  padding: 0px;
+  margin: 0px;
+  font-size: 85%;
+  text-align: left;
+  height: 95% !important;
+}
+
+#page2 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 16fr auto 61fr;
+  grid-column-gap: 5px;
+  grid-row-gap: 3px;
+}
+
+#race_traits .box, #general_feats .box, #bonus_feats .box {
+  border-bottom: none;
+}
+#race_traits .box .header, #general_feats .box .header, #bonus_feats .box .header {
+  padding-left: 2px;
+}
+#race_traits .box .header .text, #general_feats .box .header .text, #bonus_feats .box .header .text {
+  place-self: start;
+}
+#race_traits .box .attribute, #general_feats .box .attribute, #bonus_feats .box .attribute {
+  grid-template-columns: 50px auto;
+}
+#race_traits .box .attribute .attribute_name, #general_feats .box .attribute .attribute_name, #bonus_feats .box .attribute .attribute_name {
+  padding-left: 2px;
+}
+#race_traits .box .attribute .attribute_input, #general_feats .box .attribute .attribute_input, #bonus_feats .box .attribute .attribute_input {
+  text-align: left;
+}
+
+#bonus_feats .box .header {
+  background: var(--bonus-feats-bg);
+}
+#bonus_feats .box .attribute {
+  grid-template-columns: 0px auto;
+}
+
+#class_skills {
+  grid-row: 2/4;
+}
+#class_skills .box .inputbox {
+  border: none;
+  border-top: 2px solid var(--box-header-bg);
+}
+#class_skills .box .inputbox .header .text {
+  font-size: 100%;
+}
+#class_skills .box .box_class_skills_attr {
+  padding: 1px;
+  grid-template-rows: auto;
+  grid-template-columns: 35px auto;
+}
+#class_skills .box .box_class_skills_attr .box_content {
+  padding: 1px;
+}
+#class_skills .box .box_class_skills_attr .box_content textarea {
+  text-align: left;
+}
+
+#henchmen {
+  grid-column: 2/-1;
+}
+#henchmen .box_henchmen .repitem {
+  display: grid;
+  grid-template-columns: 16fr 8fr [damagestart] 5fr 6fr 14fr [rangestart] 6fr 6fr 39fr;
+}
+#henchmen .box_henchmen .repitem > .box {
+  border: none;
+  border-bottom: 2px solid var(--box-header-bg);
+  border-left: 2px solid var(--box-header-bg);
+}
+#henchmen .box_henchmen .repitem > .box_henchmen_name,
+#henchmen .box_henchmen .repitem .box_henchmen_weapon,
+#henchmen .box_henchmen .repitem .box_henchmen_notes {
+  border-left: none;
+}
+#henchmen .box_henchmen .repitem .subbox .box_content .attribute_input {
+  font-size: 100%;
+}
+#henchmen .box_henchmen .repitem .box_henchmen_damage {
+  grid-column: damagestart/span 3;
+}
+#henchmen .box_henchmen .repitem .box_henchmen_range {
+  grid-column: rangestart/span 2;
+}
+#henchmen .box_henchmen .repitem .box_henchmen_hp {
+  /*
+   * Disable the Roll20 up/down arrows on number inputs, they take up too much room
+   */
+}
+#henchmen .box_henchmen .repitem .box_henchmen_hp input::-webkit-outer-spin-button,
+#henchmen .box_henchmen .repitem .box_henchmen_hp input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#henchmen .box_henchmen .repitem .box_henchmen_hp input[type=number] {
+  -moz-appearance: textfield;
+}
+#henchmen .box_henchmen .repitem .box_henchmen_attack_bonus .header .text {
+  font-size: 70%;
+}
+#henchmen .box_henchmen .repitem .box_henchmen_notes {
+  grid-column: 1/-1;
+  grid-template-columns: 70px auto;
+  grid-template-rows: auto;
+}
+#henchmen .box_henchmen .repitem .box_henchmen_notes .box_content {
+  padding: 1px;
+}
+#henchmen .box_henchmen .repitem .box_henchmen_notes .box_content textarea {
+  text-align: left;
+  font-size: 90%;
+}
+
+#psionics {
+  background: var(--box-background-bg);
+  padding: 5px;
+  grid-column: 2/3;
+  column-gap: 3px;
+  row-gap: 5px;
+  display: grid;
+  grid-template-columns: 33fr 20fr 20fr 20fr;
+}
+#psionics .box {
+  border-color: var(--psionic-bg);
+}
+#psionics .box .header {
+  background: var(--psionic-bg);
+}
+#psionics .box_will .inputbox {
+  border: none;
+}
+#psionics .box_will .inputbox .header {
+  margin-left: 0px;
+  padding-left: 2px;
+  background: white;
+}
+#psionics .box_will .inputbox .header .text {
+  color: var(--hint-color);
+}
+#psionics .box_will .box_will_max {
+  border-bottom: 2px solid var(--psionic-bg);
+}
+#psionics .box_psionic_ability, #psionics .box_psi_attack_bonus, #psionics .box_psi_save_dc {
+  grid-template-rows: 40px auto;
+}
+#psionics .box_psionic_ability .header .text, #psionics .box_psi_attack_bonus .header .text, #psionics .box_psi_save_dc .header .text {
+  font-size: 110%;
+}
+#psionics .box_psionic_powers_known {
+  border-bottom: none;
+  grid-column: 1/-2;
+}
+#psionics .box_psionic_powers_known .inputbox {
+  border: none;
+  border-bottom: 2px solid var(--psionic-bg);
+  grid-template-rows: auto;
+  grid-template-columns: 30px auto;
+}
+#psionics .box_psionic_powers_known .inputbox .header {
+  background: white;
+  padding: 2px;
+}
+#psionics .box_psionic_powers_known .inputbox .header .text {
+  font-size: 115%;
+}
+#psionics .box_psionic_powers_known_will {
+  border-bottom: none;
+  grid-column: -2/-1;
+}
+#psionics .box_psionic_powers_known_will .box_psionic_powers_known_will_attr {
+  border-bottom: 2px solid var(--psionic-bg);
+}
+
+#equipment .box_content {
+  padding: 2px;
+}
+#equipment .box_content textarea {
+  text-align: left;
+}
+
+#page3 {
+  display: grid;
+  grid-template-columns: 40fr 11fr 49fr;
+  grid-template-rows: 90px auto;
+  grid-column-gap: 5px;
+  grid-row-gap: 5px;
+}
+
+#backstory {
+  grid-row: 1/3;
+}
+#backstory .box_content {
+  padding: 2px;
+}
+
+#misc_demographics {
+  grid-row: 1/2;
+  grid-column: 2/4;
+  display: grid;
+  grid-template-columns: 32fr 27fr 18fr 19fr;
+  grid-template-rows: 40px 40px;
+  column-gap: 5px;
+}
+#misc_demographics .attribute_age {
+  grid-column: 3/5;
+}
+#misc_demographics .attribute_clan {
+  grid-column: 1/3;
+}
+
+#tattoos {
+  grid-row: 2/3;
+  grid-column: 2/4;
+}
+#tattoos .box_tattoos .box_content {
+  display: grid;
+  grid-template-columns: 68fr 16fr 16fr;
+}
+#tattoos .box_tattoos .box_content .repcontainer, #tattoos .box_tattoos .box_content .repcontrol {
+  grid-column: 1/-1;
+}
+#tattoos .box_tattoos .box_content .repitem {
+  display: grid;
+  grid-template-columns: 68fr 16fr 16fr;
+}
+#tattoos .box_tattoos .box_content .repitem input {
+  border-bottom: 2px solid var(--box-header-bg);
+  border-left: 2px solid var(--box-header-bg);
+}
+#tattoos .box_tattoos .box_content .repitem .input_tattoo_mark {
+  border-left: none;
+}
+
+#devotee_benefits {
+  grid-column: 1/-1;
+}
+#devotee_benefits .box_devotee_benefits .box_content {
+  display: grid;
+  grid-template-columns: 39fr 12fr [alignmentend] 4fr [believerend] 17fr [followerend] 6fr [adherentend] 22fr;
+}
+#devotee_benefits .box_devotee_benefits .box_content .inputbox {
+  border: none;
+  border-left: 2px solid var(--box-header-bg);
+  border-bottom: 2px solid var(--box-header-bg);
+}
+#devotee_benefits .box_devotee_benefits .box_content .inputbox .box_content {
+  grid-template-columns: auto;
+}
+#devotee_benefits .box_devotee_benefits .box_content .box_pantheon {
+  border-left: none;
+}
+#devotee_benefits .box_devotee_benefits .box_content .box_believer {
+  grid-column: 2/believerend;
+}
+#devotee_benefits .box_devotee_benefits .box_content .box_adherent {
+  grid-column: believerend/adherentend;
+}
+#devotee_benefits .box_devotee_benefits .box_content .box_apostle {
+  grid-column: adherentend/-1;
+}
+#devotee_benefits .box_devotee_benefits .box_content .box_deity {
+  border-bottom: none;
+  border-left: none;
+}
+#devotee_benefits .box_devotee_benefits .box_content .box_alignment {
+  border-bottom: none;
+}
+#devotee_benefits .box_devotee_benefits .box_content .box_follower {
+  grid-column: alignmentend/followerend;
+  border-bottom: none;
+}
+#devotee_benefits .box_devotee_benefits .box_content .box_fanatic {
+  grid-column: followerend/-1;
+  border-bottom: none;
+}
+
+#philosophy {
+  grid-column: 1/-1;
+}
+#philosophy .box_philosophy .box_content {
+  display: grid;
+  grid-template-columns: 3fr 7fr;
+}
+#philosophy .box_philosophy .box_content .inputbox {
+  border: none;
+}
+#philosophy .box_philosophy .box_content .inputbox .box_content {
+  grid-template-columns: auto;
+}
+#philosophy .box_philosophy .box_content .box_type {
+  border-right: 2px solid var(--box-header-bg);
+}
+
+#campaign_notes {
+  grid-column: 1/3;
+  grid-row: 5/8;
+}
+#campaign_notes .box_content {
+  padding: 2px;
+}
+
+#allies_enemies {
+  grid-column: 3/-1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+#allies_enemies .box_content {
+  padding: 2px;
+}
+#allies_enemies .box_enemies {
+  border-left: none;
+}
+
+#organizations {
+  grid-column: 3/-1;
+}
+#organizations .box_content {
+  padding: 2px;
+}
+
+#additional_notes {
+  grid-column: 3/-1;
+}
+#additional_notes .box_content {
+  padding: 2px;
+}
+
+#page4 {
+  display: grid;
+  grid-template-columns: 34fr 34fr 32fr;
+  grid-template-rows: auto 140px 250px auto;
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
+}
+
+#spells_header {
+  grid-column: 1/-1;
+  grid-row: 1/2;
+  display: grid;
+  grid-template-columns: 23fr 16fr 15fr 14fr 22fr;
+  grid-template-rows: 1fr 1fr;
+  grid-column-gap: 15px;
+  grid-row-gap: 10px;
+}
+#spells_header .horizontal_box {
+  grid-template-columns: 1fr 1fr;
+  border-radius: 5px;
+}
+#spells_header .horizontal_box .header .text {
+  text-align: center;
+  font-size: 115%;
+}
+#spells_header .horizontal_box .box_content {
+  padding: 3px;
+}
+#spells_header .horizontal_box .box_content .attribute_input {
+  font-size: 200%;
+}
+#spells_header .box_spells_title {
+  grid-template-rows: auto;
+}
+#spells_header .box_spells_title .header .text {
+  font-size: 400%;
+}
+#spells_header .box_spells_will {
+  grid-column: 5/6;
+  grid-row: 1/3;
+}
+#spells_header .box_spells_will .header {
+  border-bottom: none;
+}
+#spells_header .box_spells_will .box_spells_will_max {
+  border-top: none;
+  border-left: none;
+  border-right: 2px solid var(--box-header-bg);
+  border-bottom: 2px solid var(--box-header-bg);
+}
+#spells_header .box_spells_will .box_spells_will_current {
+  border-left: none;
+  border-top: none;
+  border-right: none;
+  border-bottom: 2px solid var(--box-header-bg);
+}
+#spells_header .box_spells_will > .box_content {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 3fr 1fr;
+}
+#spells_header .box_spells_will > .box_content .box_content {
+  place-content: stretch;
+  padding: 3px;
+}
+#spells_header .box_spells_will > .box_content .box_content .attribute_input {
+  font-size: 300%;
+}
+#spells_header .box_spells_will > .box_content .box_will_temporary {
+  border: none;
+  grid-column: 1/-1;
+  grid-template-columns: 50px auto;
+}
+#spells_header .box_spells_will > .box_content .box_will_temporary .attribute_input {
+  font-size: 130%;
+}
+#spells_header .box_spell_origins {
+  border-radius: 5px;
+}
+#spells_header .box_spell_origins .box_content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  padding: 2px;
+  font-size: 80%;
+}
+#spells_header .box_spellcasting_ability {
+  border-radius: 5px;
+}
+#spells_header .box_spellcasting_ability .box_content .attribute_input {
+  font-size: 200%;
+}
+
+#cantrips {
+  grid-column: 1/3;
+}
+#cantrips .box_cantrips {
+  border: none;
+}
+#cantrips .box_cantrips .header {
+  background-color: var(--spells-bg);
+}
+#cantrips .box_cantrips .box_content {
+  padding: 2px;
+}
+
+#spells_known {
+  grid-column: 1/3;
+}
+#spells_known .box_spells_known {
+  border: none;
+}
+#spells_known .box_spells_known .header {
+  background-color: var(--spells-bg);
+}
+#spells_known .box_spells_known > .box_content {
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 20px;
+  grid-row-gap: 2px;
+}
+#spells_known .box_spells_known > .box_content .spell_known {
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+#spells_known .box_spells_known > .box_content .spell_known label {
+  display: grid;
+  place-content: center;
+  font-size: 70% !important;
+}
+#spells_known .box_spells_known > .box_content .spell_known label input[type=checkbox] {
+  grid-row: 2/3;
+}
+#spells_known .box_spells_known > .box_content .spell_known input {
+  border-bottom: 1px solid black;
+}
+
+#spell_components {
+  grid-column: 3/-1;
+  grid-row: 2/4;
+}
+#spell_components .box_content {
+  padding: 2px;
+}

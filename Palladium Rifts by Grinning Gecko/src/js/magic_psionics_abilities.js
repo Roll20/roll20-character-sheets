@@ -185,6 +185,10 @@ on(
   change:repeating_psionics:addtobonuses",
   async (e) => {
     console.log("change:repeating_powersabilities:addtobonuses", e);
+    // Exit if the change is coming from the sheetworker (ex. import).
+    if (e.sourceType === "sheetworker") {
+      return;
+    }
     const [r, section, rowId] = e.sourceAttribute.split("_");
     const enabled = Boolean(Number(e.newValue));
     if (enabled) {
@@ -199,7 +203,8 @@ on(
 on(
   "change:repeating_powersabilities:dc \
   change:repeating_magic:dc \
-  change:repeating_psionics:dc",
+  change:repeating_psionics:dc \
+  change:repeating_modifiers:dc",
   async (e) => {
     const [r, section, rowId] = e.sourceAttribute.split("_");
     const prefix = `${r}_${section}_${rowId}`;

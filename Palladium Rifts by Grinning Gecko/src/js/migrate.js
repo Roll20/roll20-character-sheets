@@ -166,6 +166,13 @@ async function migrateAttributes() {
       version: "1.5.0",
       function: migrateAddRowIds,
     },
+    {
+      version: "1.8.0",
+      function: updateMagicPsionicsLevels
+    },
+    {
+      version: "1.8.1",
+    },
   ];
 
   const { version, migrated } = await getAttrsAsync(["version", "migrated"]);

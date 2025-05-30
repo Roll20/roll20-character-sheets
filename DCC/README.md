@@ -3,10 +3,20 @@ Character Sheet for Dungeon Crawl Classics
 by bripod and sturtus
 
 ===============================================
-Roadmap/Unfinished
-- Armor Check Penalty resolution
-- mighty deed resolution
-- optional API checkbox in case of DCC HELPER usage, change buttons to API compatible buttons
+
+9/6/23
+- opts for using roll buttons without nested inputs to satisfy HTML standards and to fix buttons not - working
+- formatting fixes to introduce new roll buttons
+- adds sources for gnome, ranger, paladin, and bard classes
+- adds agility to initiative roll
+- adds field to set initiative die to d16 for two handed weapons
+- updates class radio input tabs to a dropdown menu
+
+8/31/23
+- switched out disabled attribute for readonly
+
+SOMEWHERE IN BETWEEN
+- somebody added sheet worker and Kith class (whatever that is)
 
 7/17/14
 - Added ranger, paladin, gnome, bard
