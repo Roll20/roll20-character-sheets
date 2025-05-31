@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.8.2] - 2025-05-22
+
+### Changed
+
+- Fix issue where new Modifiers damage field overwrites Ancient: Damage with 0.
+
 ## [1.8.1] - 2025-05-28
 
 ### Changed
