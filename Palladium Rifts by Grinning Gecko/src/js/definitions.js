@@ -1569,7 +1569,7 @@ const SKILL_KEYS = [
   "description",
 ];
 
-const ABILITIES_REPEATERS = ["magic", "psionics", "powersabilities"];
+const ABILITIES_REPEATERS = ["magic", "psionics", "powersabilities", "modifiers"];
 
 const MAGIC_KEYS = REPEATING_BONUS_KEYS.concat([
   "name",

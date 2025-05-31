@@ -203,7 +203,8 @@ on(
 on(
   "change:repeating_powersabilities:dc \
   change:repeating_magic:dc \
-  change:repeating_psionics:dc",
+  change:repeating_psionics:dc \
+  change:repeating_modifiers:dc",
   async (e) => {
     const [r, section, rowId] = e.sourceAttribute.split("_");
     const prefix = `${r}_${section}_${rowId}`;

@@ -119,6 +119,8 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
         base = `${destinationPrefix}_mod_ma_bonus`;
       } else if (field == "charmimpress") {
         base = `${destinationPrefix}_mod_pb_bonus`;
+      } else if (field == "spellstrength") {
+        base = `base_spellstrength`;
       }
       await repeatingSumAsync(
         rsaDestinations,
