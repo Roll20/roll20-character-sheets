@@ -1,0 +1,69 @@
+.armor.grey-box
+    h3.swn.wwn
+        | #[span(data-i18n="ARMOR")] – #[span(data-i18n="AC")] #[span(name="attr_AC")]
+    .cwn.w-full.grid.grid-flow-col.gap-1.mb.border-bottom.mt.pb-5
+        h3(data-i18n="ARMOR")
+        each val in ["melee_ac", "ranged_ac", "armor_soak", "trauma_target"]
+            +text-input(`armor_${val}`, `${val}`)(type="number", value="1", min="0").center
+
+    .table-header.armor-grid.rep-grid
+        .ellipsis.center(data-i18n="ACTIVE?")
+        .ellipsis(data-i18n="NAME")
+        each val in armor.cwn
+            .cwn.ellipsis(data-i18n=val.toUpperCase())
+        .swn.wwn.ellipsis(data-i18n="AC")
+    .armor-grid.rep-grid.edit
+        +text-input("innate_ac_name")(value="Innate AC", data-i18n="INNATE_AC").col-2
+        +text-input("innate_ac")(type="number", value="10").center
+    input(type="hidden", name="attr_show_armor_details", value="1").input-details
+    fieldset.repeating_armor
+        .show-chevron.mb
+            +collapseChevron
+            button.swn.wwn.display.invisible-button(name="roll_Armor", type="roll", value!="&{template:swn-default} {{system=@{system}}} {{charname=@{character_name}}} {{title=@{armor_name}}} {{info=^{ARMOR}: @{armor_ac}}} {{desc=@{armor_description}}}")
+            button.cwn.display.invisible-button(name="roll_Armor", type="roll", value!="&{template:swn-default} {{system=@{system}}} {{charname=@{character_name}}} {{title=@{armor_name}}} {{info=^{RANGED_ARMOR_CLASS}: @{armor_ranged_ac}, ^{MELEE_ARMOR_CLASS}: @{armor_melee_ac}, ^{ARMOR_DAMAGE_SOAK}: @{armor_damage_soak}, ^{ARMOR_TRAUMA_TARGET_MOD}: @{armor_trauma_target_mod}}}  {{desc=@{armor_description}}}")
+            .display
+                .grid.armor-grid.border-bottom.gap-1
+                    +fake-text-input().relative
+                        input(type="checkbox", name="attr_armor_active", value="1")
+                    .ellipsis.flex-between
+                        span(name="attr_armor_name").font-bold
+                    .wwn.swn.ellipsis.center
+                        span(name="attr_armor_ac")
+                    each val in armor.cwn
+                        span(name=`attr_${val}`).center.cwn
+                .details
+                    .grid.gap-1.grid-flow-col
+                        span #[span(data-i18n="TYPE").font-bold]: #[span(name=`attr_armor_type`)]
+                        span #[span(data-i18n="ENCUMBRANCE").font-bold]: #[span(name=`attr_armor_encumbrance`)]
+                        span.swn.wwn #[span(data-i18n="+STR").font-bold]: #[span(name=`attr_armor_encumbrance_bonus`)]
+                        span #[span(data-i18n="STATUS").font-bold]: #[span(name=`attr_armor_status`)]
+                    span(name="attr_armor_description")
+            .edit.grid.gap-1
+                .grid.grid-flow-col.gap-1.armor-grid
+                    +fake-text-input().relative
+                        input(type="checkbox", name="attr_armor_active", value="1")
+                    +text-input("armor_name", "NAME")
+                    .wwn.swn
+                        +text-input("armor_ac", "AC")(type="number", value="0").center
+                    each val in armor.cwn
+                        +text-input(val, val)(type="number", value="0").center.cwn
+                .grid.grid-flow-col.gap-1
+                    +fake-text-input("TYPE")
+                        select(name="attr_armor_type")
+                            option(value="none", data-i18n="NONE" selected)
+                            each val in armor.types
+                                option(value=val, data-i18n=val).swn
+                            each val in armor.cwnTypes
+                                option(value=val, data-i18n=val).cwn
+                            each val in armor.wwnTypes
+                                option(value=val, data-i18n=val).wwn
+
+                    +text-input("armor_encumbrance", "ENC")(type="number", value="0").center
+                    +text-input("armor_encumbrance_bonus", "+STR")(type="number", value="0").center.swn.wwn
+                    +fake-text-input("STATUS")
+                        select(name="attr_armor_status" value="OTHER")
+                            option(value="OTHER", data-i18n="OTHER", selected)
+                            each val in armor.status
+                                option(value=val, data-i18n=val)
+                    +text-input("armor_subtle", "SUBTLE").cwn
+                textarea(name="attr_armor_description", data-i18n-placeholder="DESCRIPTION")

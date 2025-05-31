@@ -1,0 +1,347 @@
+//- Changelog v1.1
+  - Stat bonuses now apply (e.g body_mod)
+  - Infrastructure changed for improved maintainability
+  - Fixed bug with drone structure handling (drone attribute values ported)
+include scaffold/_htmlelements.pug
+include scaffold/_rolltemplate mixins.pug
+include Mixins/_Sheet Mixins.pug
+- let templateName = 'rapidfire';
++hidden({name:'template_start',value:`&{template:${templateName}} {{footer=@{character_name}}} {{character_id=@{character_id}}} {{system=@{system}}}`})
++hidden({name:'collapsed',value:''})
++hidden({name:'system',value:'remnants'})
+main#main.subsystem-style.system-remnant
+  +hidden({name:'sheet_state',value:'settings',class:'sheet-state'})
+  +hidden({name:'system header'})
+  +img({name:'system header',role:'heading','aria-level':1,class:'system-header','data-i18n':'system header'})
+  nav#main-nav.subsystem-style.system-remnant
+    +navButton({name:'character','data-i18n':'character',class:'nav__button nav__button--tab nav__button--tab--left character',role:'heading','aria-level':4,trigger:{listenerFunc:'navigateSheet'}})
+    +navButton({name:'settings',class:'active nav__button nav__button--settings settings',trigger:{listenerFunc:'navigateSheet'}})
+      |y
+    +navButton({name:'battle remnant','data-i18n':'battle remnant',class:'nav__button nav__button--tab nav__button--tab--right battle-remnant',role:'heading','aria-level':4,trigger:{listenerFunc:'navigateSheet'}})
+  article#settings.subsystem-style.system-remnant.settings.active
+    section#system-behavior.section
+      +select-label('setting',{name:'system',class:'underlined'},null,{role:'heading','aria-level':4})
+        +option({value:'remnants','data-i18n':'remnants',selected:'',trigger:{triggeredFuncs:['setupSystem']}})
+      +input-label('difficulty automation',{name:'difficulty',value:'1',checked:'',class:'box',type:'checkbox'},null,{role:'heading','aria-level':4})
+      +select-label('action penalty automation',{name:'action penalty automation',class:'underlined'},null,{role:'heading','aria-level':4})
+        each value,index in ['disabled','ask','use input']
+          - let optObj = {value,'data-i18n':value};
+          if index === 0
+            - optObj.selected = '';
+          +option({value,'data-i18n':value})
+    section#sheet-behavior.section
+      +select-label('whisper rolls to gm',{name:'whisper',class:'underlined'},null,{role:'heading','aria-level':4})
+        +option({value:' ','data-i18n':'never',selected:''})
+        +option({value:'/w gm ','data-i18n':'always'})
+        +option({value:'?{Whisper|No, |Yes,/w gm }','data-i18n':'ask'})
+  article#character.character.subsystem-style.system-remnant
+    section#character-info.section
+      +h2({'data-i18n':'character info'})
+      each field in characterFields
+        - let inputObj = {name:field,type:'text',class:`underlined ${replaceSpaces(field)}`};
+        if field === 'character name'
+          - inputObj.trigger = {listener:true,triggeredFuncs:['setActionCalls']};
+        +input-label(field,inputObj,{},{role:'heading','aria-level':5})
+      .headed-textarea.appearance
+        +h5({'data-i18n':'appearance / mannerisms'})
+        +adaptiveTextarea({name:'appearance/mannerisms',class:'underlined'})
+      +track('health track','health')
+    section#stats.stat-grid.section.repeating-container
+      +h2({'data-i18n':'stats'})
+      +input-label('stat points',{name:'stat points',class:'boxed',type:'number'},{class:'stat_points'},{role:'heading','aria-level':4})
+      +input-label('reserve',{name:'reserve',class:'boxed',type:'number'},{class:'reserve'},{role:'heading','aria-level':4})
+      each name in stats
+        +roller({name,role:'heading','aria-level':4,'data-i18n':name})
+        +select({name,class:'boxed number'})
+          each value in [3,2,1,0,-1,-2,-3]
+            - let optObj = {value};
+            if value === 0
+              - optObj.selected = '';
+              - optObj.trigger = statTriggers[name];
+            +option(optObj)
+              !=value
+        +number({name:`${name} mod`,class:'boxed',trigger:statTriggers[name]})
+      .repeating-container__equipment.equipment.subsection
+        +h2({'data-i18n':'gear and money'})
+        +input-label('easy living',{name:'easy living',class:'boxed',type:'number'},{},{role:'heading','aria-level':4})
+        .repeat-columns
+          h5(data-i18n='name')
+          h5(data-i18n='quantity abbreviation')
+        +customControlFieldset('equipment')
+          +checkbox({name:'collapse',class:'collapse'})
+          +text({name:'name',class:'underlined',role:'heading','aria-level':3})
+          +number({name:'quantity',class:'underlined'})
+          .headed-textarea.notes.expanded
+            +h5({'data-i18n':'notes'})
+            +adaptiveTextarea({name:'notes',class:'underlined'})
+    section#secondary.section
+      .secondaries.stat-grid
+        +h2({'data-i18n':'secondary stats'})
+        +roller({name:'initiative',class:`initiative-label span-2`,'data-i18n':'initiative',role:'heading','aria-level':4})
+        +number({name:'initiative',class:`boxed initiative`,readonly:'',value:'0',trigger:{calculation:'calcInitiative'}})
+        +number({name:`initiative mod`,class:`boxed initiative_mod`,trigger:{affects:['initiative']}})
+        each name in secondaries
+          label(for=`${name}-mod` class=`${name}-label span-2` data-i18n=name role='heading' aria-level=4)
+          +number({name,class:`boxed ${name}`,readonly:'',value:secondaryDefaults[name],trigger:secondaryTriggers[name]})
+          +number({name:`${name} mod`,class:`boxed ${name}_mod`,id:`${name}-mod`,trigger:{affects:[`${name}`]}})
+        label(for='health' class='health-label' data-i18n='health',role='heading' aria-level=4)
+        .boxed.span-2
+          +number({name:'health',id:'health',trigger:{affects:['defence'],calculation:'totalHealth',initialFunc:'syncHealth'}})
+          span.slash /
+          +number(
+            {name:'health max',readonly:'',trigger:{affects:['defence'],triggeredFuncs:['calcHealth']}})
+        +number({name:`health mod`,class:`boxed health_mod`,trigger:{affects:['health_max']}})
+      .combat-gear.stat-grid
+        +h2({'data-i18n':'combat gear'})
+        each name in combatGear
+          - let inputObj = {name,class:'boxed',type:'number',trigger:combatGearTriggers[name]};
+          +input-label(name,inputObj,{class:`${name} contents`},{role:'heading','aria-level':4})
+    +repeating_section('skill','skills',['skills','level','stat','xp'])
+      +checkbox({name:'raw',hidden:'',class:'raw-control',value:1})
+      +roller({name:'roll',class:'raw'})
+        +span({name:'name','data-i18n-dynamic':'',role:'heading','aria-level':5})
+      +roller({name:'roll',class:'custom'})
+      +text({name:'name',role:'heading','aria-level':5,class:'custom underlined'})
+      +number({name:'level',class:'underlined',trigger:{triggeredFuncs:['skillEffects']}})
+      +select({name:'stat',class:'underlined'})
+        +option({value:'query','data-i18n':'ask',selected:'',trigger:{triggeredFuncs:['skillEffects']}})
+        each value in stats
+          +option({value,'data-i18n':value})
+      +number({name:'xp',class:'underlined'})
+    section#adjustments
+      .repeating-container.repeating-container--advantages.advantages.subsection.section
+        +h2({'data-i18n':'advantages'})
+        .repeat-columns
+          h5(data-i18n='name')
+        +customControlFieldset('advantage')
+          +checkbox({name:'collapse',class:'collapse'})
+          +text({name:'name',class:'underlined',role:'heading','aria-level':3})
+          .headed-textarea.notes.expanded
+            +h5({'data-i18n':'notes'})
+            +adaptiveTextarea({name:'notes',class:'underlined'})
+      .repeating-container.repeating-container--disadvantages.disadvantages.subsection.section
+        +h2({'data-i18n':'disadvantages'})
+        .repeat-columns
+          h5(data-i18n='name')
+        +customControlFieldset('disadvantage')
+          +checkbox({name:'collapse',class:'collapse'})
+          +text({name:'name',class:'underlined',role:'heading','aria-level':3})
+          .headed-textarea.notes.expanded
+            +h5({'data-i18n':'notes'})
+            +adaptiveTextarea({name:'notes',class:'underlined'})
+      .repeating-container.repeating-container--adjustments.adjustments.subsection.section
+        +h2({'data-i18n':'adjustments'})
+        .repeat-columns
+          h5(data-i18n='name')
+        +customControlFieldset('adjustment')
+          +checkbox({name:'collapse',class:'collapse'})
+          +text({name:'name',class:'underlined',role:'heading','aria-level':3})
+          .headed-textarea.mod.expanded
+            +h5({'data-i18n':'notes'})
+            +adaptiveTextarea({name:'notes',class:'underlined'})
+        //-
+          .headed-textarea.mods.expanded
+            +h5({'data-i18n':'mods'})
+            +adaptiveTextarea({name:'mods',class:'underlined'})
+    +repeating_section('weapon','weapons',['weapon','skill','damage'])
+      +checkbox({name:'collapse',class:'collapse'})
+      +roller({name:'roll'})
+      +text({name:'name',class:'underlined'})
+      +hidden({name:'skill',value:'select'})
+      +actionQuery({name:'skill action',trigger:{listenerFunc:'dynamicSelect'}})
+        +checkbox({name:'translate skill',hidden:'',value:'1',class:'translate-control',checked:''})
+        +span({name:'skill',class:'underlined translated','data-i18n-dynamic':''})
+        +span({name:'skill',class:'underlined untranslated'})
+      .roll-plus
+        +span({'data-i18n':'lead'})
+        span.plus +
+        +number({name:'damage',class:'underlined'})
+      .headed-textarea.notes.expanded
+        +h5({'data-i18n':'notes'})
+        +adaptiveTextarea({name:'notes',class:'underlined'})
+  article#remnant.battle-remnant.subsystem-style.system-remnant
+    section#remnant-pic.section
+      +track('structure track','structure')
+      +input-label('duress',{name:'duress',type:'number',class:'boxed'},{},{role:'heading','aria-level':2})
+      .image-container.remnant-token
+        +input-label('image prompt',{name:'remnant token',type:'text',class:'boxed',value:'https://s3.amazonaws.com/files.d20.io/images/259054779/OzN3yQwg7MbfXNtMYs-iOg/original.png',trigger:{triggeredFuncs:['imageInput']}},{class:'image-container__input stacked'},{role:'heading','aria-level':5})
+        +action({name:'remnant token',class:'image-container__button',trigger:{listenerFunc:'toggleImageInput'}})
+          +img({name:'remnant token',class:'image-container__image',src:'https://s3.amazonaws.com/files.d20.io/images/259054779/OzN3yQwg7MbfXNtMYs-iOg/original.png'})
+    section#remnant-ratings.stat-grid.section
+      +h2({'data-i18n':'total ratings'})
+      each name in remnantRatings
+        - let label = abbreviations[name] || name;
+        - let inputObj = {name,readonly:'',class:'boxed',trigger:remnantRatingTriggers[name]};
+        - let bonusObj = {name:`${name} mod`,class:'boxed',trigger:remnantRatingBonusTriggers[name]};
+        if name === 'situational awareness'
+          +roller({name:'situational awareness',class:'uppercase',role:'heading','aria-level':4,'data-i18n':label,class:'uppercase'})
+        else
+          h4(data-i18n=label)
+        +number(inputObj)
+        +number(bonusObj)
+      +roller({name:'remnant initiative','data-i18n':'initiative',role:'heading','aria-level':4})
+      +number({name:'remnant initiative',readonly:'',class:'boxed',trigger:{calculation:'calcRemnantInitiative'}})
+      +number({name:'remnant initiative mod',class:'boxed',trigger:{affects:['remnant initiative']}})
+      .remnant-skills
+        +h2({'data-i18n':'skills'})
+        .repeat-columns 
+          each value in ['skill','level','xp']
+            +h5({'data-i18n':value})
+        each name in remnantSkills
+          +roller({name:`${name} roll`,'data-i18n':name,role:'heading','aria-level':4})
+          - let levelObj = {name:`${name} level`,class:'underlined',trigger:remnantSkillTriggers[name]};
+          +number(levelObj)
+          +number({name:`${name} experience`,class:'underlined'})
+    section#remnant-stats.stat-grid.section
+      +h2({'data-i18n':'remnant stats'})
+      each name in remnantStats
+        if name === 'structure'
+          .input-label.span-all.structure
+            label(data-i18n='structure' for='structure' role='heading' aria-level=4)
+            .boxed.span-2
+              +number({name:'structure',id:'structure',trigger:{affects:['remnant_defence'],calculation:'totalHealth',initialFunc:'syncHealth'}})
+              span.slash /
+              +hidden({name:'structure max',value:5,trigger:{affects:['remnant_defence'],triggeredFuncs:['calcHealth']}})
+              +number({name:'structure base',value:5,trigger:{affects:['structure_max']}})
+        else
+          label(data-i18n=name for=replaceSpaces(name) role='heading' aria-level=4).span-2
+          - let inputObj = {name,class:'boxed',type:'number',id:replaceSpaces(name),trigger:remnantStatTriggers[name]};
+          +number(inputObj)
+      each name in remnantCombatStats
+        - let inputObj = {name,class:`boxed ${replaceSpaces(name)}_input`,type:'number',id:replaceSpaces(name),trigger:remnantCombatStatTriggers[name]};
+        label(data-i18n=name role='heading' aria-level=4 for=replaceSpaces(name) class=`${replaceSpaces(name)}_label`)
+        !=`<!-- inputObj: ${JSON.stringify(inputObj)}-->`
+        +input(inputObj)
+    +repeating_section('specialty','specialty',['name'],'remnant-specialty')
+      +checkbox({name:'collapse',class:'collapse'})
+      +text({name:'name',class:'underlined'})
+      .headed-textarea.description.expanded
+        +h5({'data-i18n':'description'})
+        +adaptiveTextarea({name:'description',class:'underlined'})
+    +repeating_section('trait','traits',['name','duress','focus'],'remnant-trait')
+      +checkbox({name:'collapse',class:'collapse'})
+      +text({name:'name',class:'underlined'})
+      +number({name:'duress',class:'underlined'})
+      +number({name:'focus',class:'underlined'})
+      .headed-textarea.description.expanded
+        +h5({'data-i18n':'description'})
+        +adaptiveTextarea({name:'description',class:'underlined'})
+    section#remnant-drone.repeating-container.repeating-container--drone.section
+      +h2({'data-i18n':'drones'})
+      +customControlFieldset('drone')
+        +checkbox({name:'collapse',class:'collapse'})
+        +text({name:'name',class:'underlined remnant-drone__name',role:'heading','aria-level':3})
+        +input-label('# active',{name:'active',type:'number',class:'boxed'},null,{role:'heading','aria-level':5,'data-i18n':label,'data-i18n':'# active'})
+        each name in droneStats
+          - let label = abbreviations[name] || name;
+          if /^(?:strike|assault)/.test(label)
+            - let hiddenName = /strike/.test(label) ? 'strike' : 'assault';
+            +hidden({name:hiddenName,type:'number',class:`underlined expanded--empty`})
+          if /^(?:strike|assault)$/.test(name)
+            - let inputObj = {name,type:'number',class:`boxed`};
+            if name === 'strike'
+              - inputObj.trigger = {affects:['repeating_drone_$x_strikerange']};
+            +roller-label(inputObj,{name,role:'heading','aria-level':5,'data-i18n':label},{class:`${replaceSpaces(name)}`})
+          else if name === 'struct'
+            .structure
+              +span({role:'heading','aria-level':5,'data-i18n':label})
+              .boxed.span-2
+                +number({name:'struct'})
+                span.slash /
+                +number({name:'struct max'})
+          else if name=== 'strikerange'
+            +input-label(label,{name,type:'number',class:`boxed`,readonly:'',trigger:{calculation:'calcStrikeRange'}},{class:replaceSpaces(name)},{role:'heading','aria-level':5,'data-i18n':label})
+          else
+            +input-label(label,{name,type:'number',class:`boxed`},{class:replaceSpaces(name)},{role:'heading','aria-level':5,'data-i18n':label})
+        .headed-textarea.description.expanded
+          +h5({'data-i18n':'description'})
+          +adaptiveTextarea({name:'description',class:'underlined'})
+    section#remnant-weapons.repeating-container.repeating-container--remnant-weapons.section
+      +h2({'data-i18n':'weapons'})
+      .repeat-columns 
+        each name in remnantWeaponInputs
+          +h5({'data-i18n':name})
+      +customControlFieldset('remnant weapon')
+        +checkbox({name:'collapse',class:'collapse'})
+        +roller({name:'roll'})
+        +text({name:'name',class:'underlined',role:'heading','aria-level':4})
+        +select({name:'skill',class:'underlined'})
+          +option({value:' ','data-i18n':'select',selected:'',trigger:{affects:['repeating_remnant-weapon_$x_damage']}})
+          +option({value:'assault','data-i18n':'assault'})
+          +option({value:'strike','data-i18n':'strike'})
+        +number({name:'bonus',class:'underlined'})
+        .roll-plus
+          +span({'data-i18n':'lead'})
+          span.plus +
+          +number({name:'damage',class:'underlined',readonly:'',trigger:{calculation:'calcRemnantDamage'}})
+        +number({name:'damage bonus',class:'underlined damage-bonus',trigger:{affects:['repeating_remnant-weapon_$x_damage']}})
+        +text({name:'type',class:'underlined'})
+        .headed-textarea.description.expanded
+          +h5({'data-i18n':'notes'})
+          +adaptiveTextarea({name:'notes',class:'underlined'})
+//-Rolltemplate definitions
++rolltemplate(templateName)
+  .content(class='{{#singleroll}}single-roll{{/singleroll}}')
+    +templateConditionalDisplay('header')
+      .header
+        .header__background.background
+          h3(tabindex='-1') {{header}}
+        .header__content
+          h3 {{header}}
+        .header__image
+    +templateConditionalDisplay('roll')
+      +hexagon({},'status').sheet-roll
+        h4(data-i18n='roll')
+        |{{roll}}
+    each num in [1,2,3,4,5,6]
+      +templateConditionalDisplay(`roll${num}`)
+        - let hexObj = {class:`sheet-roll`};
+        +hexagon(hexObj,`status${num}`)
+          h4(data-i18n='roll')
+          |{{roll#{num}}}
+    +templateConditionalDisplay('difficulty')
+      +hexagon().difficulty
+        h4(data-i18n='difficulty')
+        |{{difficulty}}
+    +templateConditionalDisplay('damage')
+      +hexagon().damage
+        +templateConditionalDisplay('damage_label')
+          h4 {{computed::damage_label}}
+        +templateConditionalDisplay('damage_label',true)
+          h4(data-i18n='damage')
+        |{{computed::damage}}
+    +templateConditionalDisplay('description')
+      .container-background.description
+      .description.text
+        h4(data-i18n='notes')
+        span {{description}}
+        +userTemplateFields
+    +templateConditionalDisplay('description',true)
+      +templateConditionalDisplay('custom_description')
+        .container-background.description
+        .description.text
+          +userTemplateFields
+    +characterLink()
++script()
+  include scaffold/utility.js
+  //- The below declarations import variables from the pug file and mixins into the sheetworker code
+  each content,prop in varObjects
+    |
+    |const !{prop} = !{JSON.stringify(content)};
+  |
+  |
+  include Javascript/variables.js
+  include scaffold/attribute_proxy.js
+  include scaffold/accessSheet.js
+  include scaffold/parse_cascade.js
+  include scaffold/sheetworker_aliases.js
+  //- All additional javascript files should start here
+  include Javascript/setupfunctions.js
+  include Javascript/clickfunctions.js
+  include Javascript/rollfunctions.js
+  include Javascript/initialchangefunctions.js
+  include Javascript/triggeredfunctions.js
+  include Javascript/calculators.js
+  include Javascript/updaters.js
+  //- All additional javascript files should end here
+  include scaffold/listeners.js

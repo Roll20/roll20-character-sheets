@@ -1,0 +1,1 @@
+Based on the excellent Mouseguard character sheet by seriouslysean
