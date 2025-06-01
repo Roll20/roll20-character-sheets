@@ -7346,41 +7346,27 @@
                             }
                             for (let i = 0; i < enemy_attributes.length; i++) {
                                 for (let j = 0; j < cache.attrdb[enemy_attributes[i]].length; j++) {
-                                    const enemy_index = cache.attrdb[enemy_attributes[i]][j].config.findIndex(c => c.name === 'enemy');
-                                    if (enemy_index !== -1) {/*
-                                        query.enemies.push({
-                                            applies_to: `${
-                                                enemy_attributes[i] === 'enemy attack' ? 'attack' :
-                                                enemy_attributes[i] === 'enemy defense' ? 'defense' : 'damage'
-                                            }`,
-                                            is_defect: false,
-                                            name: cache.attrdb[enemy_attributes[i]][j].config[enemy_index].rank.toLowerCase(),
-                                            rank: cache.attrdb[enemy_attributes[i]][j].elevel,
-                                        });
-                                        */
-                                        query.enemies.push(cache.attrdb[enemy_attributes[i]][j].config[enemy_index].rank);
+                                    const enemy_index = cache.attrdb[enemy_attributes[i]][j].active ?
+                                        cache.attrdb[enemy_attributes[i]][j].config.findIndex(c => c.name === 'enemy') : -1;
+                                    if (enemy_index !== -1) {
+                                        const enemy_name = cache.attrdb[enemy_attributes[i]][j].config[enemy_index].rank;
+                                        if (query.enemies.findIndex(e => e.toLowerCase() === enemy_name.toLowerCase()) === -1) {
+                                            query.enemies.push(enemy_name);
+                                        }
                                     }
                                 }
                             }
                             for (let i = 0; i < enemy_defects.length; i++) {
                                 for (let j = 0; j < cache.defectdb[enemy_defects[i]].length; j++) {
-                                    const enemy_index = cache.defectdb[enemy_defects[i]][j].config.findIndex(c => c.name === 'enemy');
+                                    const enemy_index = cache.defectdb[enemy_defects[i]][j].active ?
+                                        cache.defectdb[enemy_defects[i]][j].config.findIndex(c => c.name === 'enemy') : -1;
                                     if (enemy_index !== -1) {
-                                        /*
-                                        query.enemies.push({
-                                            applies_to: `${
-                                                enemy_defects[i] === 'inept attack' ? 'attack' :
-                                                enemy_defects[i] === 'inept defense' ? 'defense' : 'damage'
-                                            }`,
-                                            is_defect: true,
-                                            name: cache.defectdb[enemy_defects[i]][j].config[enemy_index].rank.toLowerCase(),
-                                            rank: cache.defectdb[enemy_defects[i]][j].level,
-                                        });
-                                        */
-                                        query.enemies.push(cache.defectdb[enemy_defects[i]][j].config[enemy_index].rank);
+                                        const enemy_name = cache.defectdb[enemy_defects[i]][j].config[enemy_index].rank;
+                                        if (query.enemies.findIndex(e => e.toLowerCase() === enemy_name.toLowerCase()) === -1) {
+                                            query.enemies.push(enemy_name);
+                                        }
                                     }
                                 }
-                                
                             }
                         }
                         if (query.enemies.length !== 0) {
@@ -8095,7 +8081,7 @@
                                 roll.weapon.range === 0 && attack_type === 'melee attacks' ||
                                 roll.weapon.range !== 0 && attack_type === 'ranged attacks'
                             ) {
-                                roll.cv = Math.max(0, roll.cv -= cache.defectdb[`inept ${roll.type}`][i].level);
+                                roll.cv = Math.max(0, roll.cv -= cache.defectdb[`inept ${roll.type}`][i].level * 2);
                             } else if (attack_type === 'enemy' && roll.enemies.length !== 0) {
                                 const enemy_index = cache.defectdb[`inept ${roll.type}`][i].config.findIndex(c => c.name === 'enemy');
                                 const enemy_name = cache.defectdb[`inept ${roll.type}`][i].config[enemy_index].rank;
@@ -8103,7 +8089,9 @@
                                     cache.defectdb[`inept ${roll.type}`][i].active && 
                                     roll.enemies.findIndex(e => e === enemy_name) !== -1
                                 ) {
-                                    roll.cv = Math.max(0, roll.cv -= cache.defectdb[`inept ${roll.type}`][i].level);
+                                    roll.cv = Math.max(0, roll.cv -= cache.defectdb[`inept ${roll.type}`][i].level * (
+                                        attack_type === 'any' ? 1 : 2
+                                    ));
                                 }
                             }
                         }
@@ -10308,12 +10296,11 @@
                     query.options += `|${getTranslationByKey("exit")},exit`;
                     query.last = query.next;
                 break;
-                case 'enemy':debugger;
+                case 'enemy':
                     if (button_supported[cache.rolldb[query.index].type][cache.source_attribute || 'default']) {
                         query.title = getTranslationByKey("choose-enemy");
                         query.enemies = [];
-                        //const enemy_template = {name:'',attack:{index:-1,c_index:-1,},damage:{index:-1,c_index:-1,},defense:{index:-1,c_index:-1,},};
-                        const enemy_attrs = ['enemy attack',/*'enemy defense',*/'massive damage'];
+                        const enemy_attrs = ['enemy attack','massive damage'];
                         for (let i = 0; i < enemy_attrs.length; i++) {
                             for (let j = 0; j < cache.attrdb[enemy_attrs[i]].length; j++) {
                                 if (cache.attrdb[enemy_attrs[i]][j].active) {
@@ -10321,14 +10308,10 @@
                                     if (enemy_index !== -1) {
                                         const enemy_name = cache.attrdb[enemy_attrs[i]][j].config[enemy_index].rank;
                                         let enemy_exists = query.enemies.length !== 0 ? query.enemies.findIndex(e => e === enemy_name) : -1;
-                                        //const enemy_type = i === 0 ? 'attack' : i === 1 ? 'defense' : 'damage';
                                         if (enemy_exists === -1) {
-                                            enemy_exists = query.enemies.push({}) - 1;//enemy_exists = query.enemies.push(structuredClone(enemy_template)) - 1;
+                                            enemy_exists = query.enemies.push({}) - 1;
                                             query.enemies[enemy_exists] = enemy_name;
                                         }
-                                        //query.enemies[enemy_exists][enemy_attrs[i]] = j;
-                                        //query.enemies[enemy_exists][enemy_type].index = j;
-                                        //query.enemies[enemy_exists][enemy_type].c_index = enemy_index;
                                     }
                                 }
                             }
