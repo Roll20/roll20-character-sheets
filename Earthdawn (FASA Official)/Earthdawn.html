@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 
 <!--
-v3.47 250525
+v3.47 250601
 
 Character Sheet For Earthdawn Developped by JBF (Discord/Facebook Jiboux Faure) v2.
 Largerly using material from the work on the Official FASA version of Chris Dickey
@@ -562,9 +562,16 @@ Largerly using material from the work on the Official FASA version of Chris Dick
             <input type="checkbox" name="attr_char_buttonInfo" value="" checked class="sheet-hidden sheet-testCloseChecked">
             <button type="compendium" class="sheet-HideIfCloseChecked" name="attr_char_buttonInfo" title="Compendium Info Button - Click to open compendium entry"></button>
 
-
             <span class="sheet-label-flex sheet-api" title="Sheet has detected the API and shows the API Mode.">API</span>
-            <span class="sheet-label-flex sheet-NoAPI" title="Sheet has not detected the API and shows the No-API Mode.">NoAPI</span>
+            <span class="sheet-label-flex sheet-NoAPI">
+              <input type="checkbox" name="attr_API" value="2" class="sheet-hidden sheet-testCloseChecked" >
+              <button class="ui-draggable sheet-button-nodice sheet-text-button sheet-HideIfCloseChecked" name="roll_pingapi" type="roll"
+              value="!Earthdawn~ charID: @{character_id}~ APIPing"
+              title="Sheet is set to not expect the API - click this button to attempt connecting to the API.">NoAPI</button>
+              <button class="ui-draggable sheet-button-nodice sheet-text-button sheet-HideIfNotCloseChecked sheet-helpbutton" name="roll_pingapi" type="roll"
+              value="!Earthdawn~ charID: @{character_id}~ APIPing"
+              title="Sheet is set to expect the API, but didn't detect it - click this button to attempt reconnecting to the API.">API-<span class="sheet-iconstatic sheet-icon-death"></span></button>
+            </span>
 
             <button class="sheet-text-button sheet-button-nodice sheet-NotCreation" name="roll_Standard-Step-Roll" type="roll"
             title="%{Standard-Step-Roll}   Just click this button to enter a step and roll it... As easy as this."
@@ -875,17 +882,19 @@ Largerly using material from the work on the Official FASA version of Chris Dick
     <div class="sheet-NoAPI">
       <input type="checkbox" name="attr_API" value="2" class="sheet-hidden sheet-testCloseChecked" >
       <div class="sheet-HideIfNotCloseChecked sheet-small">
-        <div class="sheet-text-center"><b>Warning - Character is set to expect API but API is not responding. Temporarily displaying NoAPI version !</b></div>
-        <div>- To set definitely this sheet to not expect the API press the following button :
-          <button class="ui-draggable sheet-button-nodice sheet-text-button" name="act_stop-using-api" type="action"
-          title="Click this button if you definitely stopped using the API.">Forget API</button>
+        <div class="sheet-text-center"><b>Warning - This character is set to attempt to connect to the API but API didn't respond. Temporarily displaying NoAPI Mode !</b></div>
+        <div>- Go to the Game default settings, to toggle if new characters should attempt to connect to the API or not.</div>
+        <div>-           <button class="ui-draggable sheet-button-nodice sheet-text-button" name="act_stop-using-api" type="action"
+                  title="Click this button if you definitely stopped using the API.">Forget API</button> :
+                  This button toggles this particular character to stop attempting to connect to the API when sheet is opened.
+
         </div>
 
-        <div>- To set all new characters to not expect the API, go to the Game default sheet settings.</div>
-        <div>- You can try the following button to reconnect to the API (note that due to a roll20 restriction, on any new character, you need to initialize the communication by either hitting this button or closing/reopening the sheet)
-          <button class="ui-draggable sheet-button-nodice sheet-text-button" name="roll_pingapi" type="roll"
-          value="!Earthdawn~ charID: @{character_id}~ APIPing"
-          title="Click this button if you confirm using the API.">Reconnect to API</button>
+        <div>- <button class="ui-draggable sheet-button-nodice sheet-text-button" name="roll_pingapi" type="roll"
+        value="!Earthdawn~ charID: @{character_id}~ APIPing"
+        title="Click this button if you confirm using the API.">Reconnect to API</button> :
+        This button will re-attempt to connecting to the API.( Note: due to a roll20 restriction, on the very first opening of a new character, you may need to press this button)
+
         </div>
         <div>- If the above doesn't work, the API may be crashed. Ask the GM to go in the API Console to restart the API.</div>
       </div>
@@ -7906,8 +7915,8 @@ Largerly using material from the work on the Official FASA version of Chris Dick
                       <b class="sheet-heading sheet-fixed-width sheet-txtMed sheet-nowrap sheet-titlespan">Matrix</b>
                       <b class="sheet-heading sheet-fixed-width sheet-txtShort sheet-titlespan">Origin</b>
                       <b class="sheet-heading sheet-fixed-width sheet-w50px sheet-titlespan"> Rank </b>
-                      <b class="sheet-heading sheet-fixed-width sheet-w50px sheet-titlespan">D.Rat.</b>
-                      <b class="sheet-heading sheet-fixed-width sheet-txtMed sheet-titlespan">Spell Name</b>
+                      <b class="sheet-heading sheet-fixed-width sheet-w100px sheet-titlespan">Dmg / D.Rat.</b>
+                      <b class="sheet-heading sheet-fixed-width sheet-txtMedplus sheet-titlespan">Spell Name</b>
                     </div>
                     <div class="sheet-HideIfEditMode sheet-ShowIfPrint">
                       <b class="sheet-heading sheet-fixed-width sheet-w75px sheet-titlespan">Mat.</b>
@@ -8016,9 +8025,15 @@ Largerly using material from the work on the Official FASA version of Chris Dick
 
 
                         <!-- Matrix Fieldset -DR-->
-                        <span class="sheet-nowrap0 sheet-HideIfNotEditMode sheet-fixed-width sheet-text-center sheet-w50px">
-                          <input name="attr_SPM_DR" type="number" value="10" class="sheet-w50px sheet-text-center" readonly
+                        <span class="sheet-nowrap0 sheet-HideIfNotEditMode sheet-fixed-width sheet-text-center sheet-w100px">
+                          <input name="attr_SPM_DR_max" type="number" value="0" class="sheet-numShort sheet-text-center"
+                          title="@{repeating_matrix_X_SPM_DR_max}:  Current Damage of this Matrix." >
+
+                          /
+
+                          <input name="attr_SPM_DR" type="number" value="10" class="sheet-numShort sheet-text-center" readonly
                           title="@{repeating_matrix_X_SPM_DR}:  Death Rating of this Matrix." >
+
                         </span>
 
 
@@ -8041,11 +8056,11 @@ Largerly using material from the work on the Official FASA version of Chris Dick
 
                         <!-- Matrix Fieldset - Contains & Master Button-->
                         <span class="sheet-api">
-                          <span class="sheet-nowrap0 sheet-HideIfNotEditMode sheet-fixed-width sheet-text-center sheet-txtMed">
-                            <input type="text" readonly name="attr_SPM_Contains" class="sheet-txtMed" title="@{repeating_matrix_X_SPM_Contains}:   Name of the Spell currently in this Matrix.">
+                          <span class="sheet-nowrap0 sheet-HideIfNotEditMode sheet-fixed-width sheet-text-center sheet-txtMedplus">
+                            <input type="text" readonly name="attr_SPM_Contains" class="sheet-txtMedplus" title="@{repeating_matrix_X_SPM_Contains}:   Name of the Spell currently in this Matrix.">
                           </span>
 
-                          <button class="sheet-text-button sheet-label-undersheet-HideIfEditMode sheet-HideIfPrint" name="roll_SPM_Roll" type="roll"
+                          <button class="sheet-text-button sheet-label-under sheet-HideIfEditMode sheet-HideIfPrint" name="roll_SPM_Roll" type="roll"
                           value="!Earthdawn~ charID: @{character_id}~ ForEach: inmt~ Spell: @{SPM_RowID}: Sequence : M"
                           title="%{selected|SPM_Roll} Start a new Spell, or Roll to Weave Threads, Spellcasting, or an Effect test for this spell.">
                             <input type="text" name="attr_SPM_Contains" class="sheet-txtMed sheet-buttonlabel" title="@{repeating_matrix_X_SPM_Contains}:   Name of the Spell currently in this Matrix.">
