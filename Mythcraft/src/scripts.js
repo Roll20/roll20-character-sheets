@@ -200,7 +200,7 @@ critical_range.forEach(function (attr) {
                 return;
             }
             var range = critical_range_base;
-            if (luck === 12) {
+            if (luck >= 12) {
                 range = critical_range_base - 2;
             }
             else if (luck >= 6 && luck <= 11) {
@@ -252,13 +252,13 @@ on("change:repeating_skills:attribute", function (event) {
     setAttrs((_a = {}, _a["".concat(repeatingRow, "_attribute_abbreviation")] = abbreviation, _a));
 });
 var favoriteAttributes = ["name", "tags", "description"];
-["repeating_abilities", "repeating_favorites", "repeating_talents"].forEach(function (fieldset) {
+["abilities", "favorites", "talents"].forEach(function (fieldset) {
     favoriteAttributes.forEach(function (attr) {
-        on("change:".concat(fieldset, ":").concat(attr), function (event) {
+        on("change:repeating_".concat(fieldset, ":").concat(attr), function (event) {
             var newValue = event.newValue;
-            getAttrs(["".concat(fieldset, "_link")], function (values) {
+            getAttrs(["repeating_".concat(fieldset, "_link")], function (values) {
                 var _a;
-                var favoriteRow = values["".concat(fieldset, "_link")];
+                var favoriteRow = values["repeating_".concat(fieldset, "_link")];
                 if (favoriteRow) {
                     var update = (_a = {},
                         _a["".concat(favoriteRow, "_").concat(attr)] = newValue,
@@ -268,7 +268,7 @@ var favoriteAttributes = ["name", "tags", "description"];
             });
         });
     });
-    on("change:".concat(fieldset, ":toggle_favorite"), function (event) {
+    on("change:repeating_".concat(fieldset, ":toggle_favorite"), function (event) {
         var sourceAttribute = event.sourceAttribute, newValue = event.newValue;
         var abilitiesRow = getFieldsetRow(sourceAttribute);
         var isFavorite = newValue === "true";
@@ -298,6 +298,21 @@ var favoriteAttributes = ["name", "tags", "description"];
                 removeRepeatingRow(favoriteRow);
             });
         }
+    });
+});
+["attacks", "inventory"].forEach(function (fieldset) {
+    on("change:repeating_".concat(fieldset, ":name"), function (event) {
+        var newValue = event.newValue;
+        getAttrs(["repeating_".concat(fieldset, "_link")], function (values) {
+            var _a;
+            var row = values["repeating_".concat(fieldset, "_link")];
+            if (row) {
+                var update = (_a = {},
+                    _a["".concat(row, "_name")] = newValue,
+                    _a);
+                setAttrs(update, { silent: true });
+            }
+        });
     });
 });
 var _this = this;
@@ -417,7 +432,9 @@ var handle_equipment = function (page) {
     var update = getUpdate(attrs, page, row);
     update["".concat(row, "_qty")] = page.data.quantity ? page.data.quantity : 1;
     if (page.data.subcategory === "weapon") {
-        handle_weapon(page);
+        var attackRow = getRow("attacks");
+        update["".concat(row, "_link")] = attackRow;
+        handle_weapon(page, attackRow, row);
     }
     setDropAttrs(update);
 };
@@ -511,7 +528,7 @@ var handle_talent = function (page) {
     update["".concat(row, "_tags")] = "".concat(page.data.stack, ", ").concat(page.data.track);
     setDropAttrs(update);
 };
-var handle_weapon = function (page) {
+var handle_weapon = function (page, attackRow, inventoryRow) {
     var attrs = [
         "apc",
         "cost",
@@ -526,9 +543,11 @@ var handle_weapon = function (page) {
         "type",
         "weight",
     ];
-    var row = getRow("attacks");
+    var row = attackRow ? attackRow : getRow("attacks");
     var update = getUpdate(attrs, page, row);
     update["".concat(row, "_category")] = page.data.Category;
+    update["".concat(row, "_bonus")] = 0;
+    update["".concat(row, "_link")] = inventoryRow;
     if (typeof page.data.attribute === "string") {
         update["".concat(row, "_attribute")] = "@{".concat(page.data.attribute, "}");
         update["".concat(row, "_attribute_abbreviation")] = getAttributeAbbreviation(page.data.attribute);

@@ -82,7 +82,7 @@ critical_range.forEach((attr) => {
 
       let range = critical_range_base;
 
-      if (luck === 12) {
+      if (luck >= 12) {
         range = critical_range_base - 2;
       } else if (luck >= 6 && luck <= 11) {
         range = critical_range_base - 1;
@@ -146,58 +146,71 @@ on("change:repeating_skills:attribute", (event) => {
 
 const favoriteAttributes = ["name", "tags", "description"];
 
-["repeating_abilities", "repeating_favorites", "repeating_talents"].forEach(
-  (fieldset) => {
-    favoriteAttributes.forEach((attr) => {
-      on(`change:${fieldset}:${attr}`, (event) => {
-        const { newValue } = event;
+["abilities", "favorites", "talents"].forEach((fieldset) => {
+  favoriteAttributes.forEach((attr) => {
+    on(`change:repeating_${fieldset}:${attr}`, (event) => {
+      const { newValue } = event;
 
-        getAttrs([`${fieldset}_link`], (values) => {
-          const favoriteRow = values[`${fieldset}_link`];
-          if (favoriteRow) {
-            const update: Attrs = {
-              [`${favoriteRow}_${attr}`]: newValue,
-            };
-            setAttrs(update, { silent: true });
-          }
-        });
+      getAttrs([`repeating_${fieldset}_link`], (values) => {
+        const favoriteRow = values[`repeating_${fieldset}_link`];
+        if (favoriteRow) {
+          const update: Attrs = {
+            [`${favoriteRow}_${attr}`]: newValue,
+          };
+          setAttrs(update, { silent: true });
+        }
       });
     });
+  });
 
-    on(`change:${fieldset}:toggle_favorite`, (event) => {
-      const { sourceAttribute, newValue } = event;
-      const abilitiesRow = getFieldsetRow(sourceAttribute);
-      const isFavorite = newValue === "true";
+  on(`change:repeating_${fieldset}:toggle_favorite`, (event) => {
+    const { sourceAttribute, newValue } = event;
+    const abilitiesRow = getFieldsetRow(sourceAttribute);
+    const isFavorite = newValue === "true";
 
-      if (isFavorite) {
-        getAttrs(
-          [
-            `${abilitiesRow}_description`,
-            `${abilitiesRow}_link`,
-            `${abilitiesRow}_name`,
-            `${abilitiesRow}_tags`,
-          ],
-          (values) => {
-            const favoriteRow = getRow("favorites");
-            const update = {
-              [`${favoriteRow}_description`]:
-                values[`${abilitiesRow}_description`],
-              [`${favoriteRow}_link`]: abilitiesRow,
-              [`${favoriteRow}_name`]: values[`${abilitiesRow}_name`],
-              [`${favoriteRow}_tags`]: values[`${abilitiesRow}_tags`],
-              [`${favoriteRow}_toggle_edit`]: false,
-              [`${abilitiesRow}_link`]: favoriteRow,
-            };
+    if (isFavorite) {
+      getAttrs(
+        [
+          `${abilitiesRow}_description`,
+          `${abilitiesRow}_link`,
+          `${abilitiesRow}_name`,
+          `${abilitiesRow}_tags`,
+        ],
+        (values) => {
+          const favoriteRow = getRow("favorites");
+          const update = {
+            [`${favoriteRow}_description`]:
+              values[`${abilitiesRow}_description`],
+            [`${favoriteRow}_link`]: abilitiesRow,
+            [`${favoriteRow}_name`]: values[`${abilitiesRow}_name`],
+            [`${favoriteRow}_tags`]: values[`${abilitiesRow}_tags`],
+            [`${favoriteRow}_toggle_edit`]: false,
+            [`${abilitiesRow}_link`]: favoriteRow,
+          };
 
-            setAttrs(update, { silent: true });
-          }
-        );
-      } else {
-        getAttrs([`${abilitiesRow}_link`], (values) => {
-          const favoriteRow = values[`${abilitiesRow}_link`];
-          removeRepeatingRow(favoriteRow);
-        });
+          setAttrs(update, { silent: true });
+        }
+      );
+    } else {
+      getAttrs([`${abilitiesRow}_link`], (values) => {
+        const favoriteRow = values[`${abilitiesRow}_link`];
+        removeRepeatingRow(favoriteRow);
+      });
+    }
+  });
+});
+
+["attacks", "inventory"].forEach((fieldset) => {
+  on(`change:repeating_${fieldset}:name`, (event) => {
+    const { newValue } = event;
+    getAttrs([`repeating_${fieldset}_link`], (values) => {
+      const row = values[`repeating_${fieldset}_link`];
+      if (row) {
+        const update: Attrs = {
+          [`${row}_name`]: newValue,
+        };
+        setAttrs(update, { silent: true });
       }
     });
-  }
-);
+  });
+});

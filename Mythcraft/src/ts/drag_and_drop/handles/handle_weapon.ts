@@ -1,4 +1,8 @@
-const handle_weapon = (page: CompendiumAttributes) => {
+const handle_weapon = (
+  page: CompendiumAttributes,
+  attackRow: string,
+  inventoryRow: string
+) => {
   const attrs = [
     "apc",
     "cost",
@@ -13,10 +17,12 @@ const handle_weapon = (page: CompendiumAttributes) => {
     "type",
     "weight",
   ];
-  const row = getRow("attacks");
+  const row = attackRow ? attackRow : getRow("attacks");
   const update = getUpdate(attrs, page, row);
 
   update[`${row}_category`] = page.data.Category;
+  update[`${row}_bonus`] = 0;
+  update[`${row}_link`] = inventoryRow;
 
   if (typeof page.data.attribute === "string") {
     update[`${row}_attribute`] = `@{${page.data.attribute}}`;

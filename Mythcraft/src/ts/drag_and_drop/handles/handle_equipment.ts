@@ -6,7 +6,9 @@ const handle_equipment = (page: CompendiumAttributes) => {
   update[`${row}_qty`] = page.data.quantity ? page.data.quantity : 1;
 
   if (page.data.subcategory === "weapon") {
-    handle_weapon(page);
+    const attackRow = getRow("attacks");
+    update[`${row}_link`] = attackRow;
+    handle_weapon(page, attackRow, row);
   }
 
   setDropAttrs(update);

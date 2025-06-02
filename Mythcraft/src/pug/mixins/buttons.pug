@@ -1,6 +1,8 @@
 - const templatePrefix = "&{template:rolls}"
 - const criticalStrike = "cs@{critical_range}"
-- const luckEffect = `+(@{luck_negative_modifier})${criticalStrike}`
+- const luckEffect = `(@{luck_negative_modifier}[negative luck modifier])${criticalStrike}`
+- const attribute = "@{attribute}[attribute]"
+- const bonus = "@{bonus}[bonus]"
 
 //- Luck is < 0 you can never crit hit & subtract Luck from every d20
 //- Luck >= 1 crits add Luck to damage
@@ -9,19 +11,24 @@
 
 //- damage luck >= 1 ? +luck : 0 (on crit)
 
-mixin attributeRoll(name, attribute)
-	button.text-center.uppercase(class!=`${attributes.class} ${attribute}` data-i18n=name name=`roll_${dashedName(attribute)}` type='roll' value!=`${templatePrefix} {{header=^{${attribute}}}} {{dice=[[1d20+@{${attribute}}${luckEffect}]]}} `)
+mixin attributeRoll(name, attr)
+	button.text-center.uppercase(class!=`${attributes.class} ${attr}` data-i18n=name name=`roll_${dashedName(attr)}` type='roll' value!=`${templatePrefix} {{header=^{${attr}}}} {{dice=[[1d20+@{${attr}}[attribute]+${luckEffect}]]}} `)
 
 mixin rollButton(name, formula)
-	button.text-capitalize(class!=attributes.class data-i18n=name name=`roll_${dashedName(name)}` type='roll' value!=`${templatePrefix} {{header=^{${name}}}} {{dice=[[1d20+${formula}${luckEffect}]]}} {{description=@{description}}}`)
+	button.text-capitalize(class!=attributes.class data-i18n=name name=`roll_${dashedName(name)}` type='roll' value!=`${templatePrefix} {{header=^{${name}}}} {{dice=[[1d20+${formula}+${luckEffect}]]}} {{description=@{description}}}`)
 
 mixin repeatingRollButton(name, includeDescription = false)
 	- const description = includeDescription ? "{{description=@{description}}" : ""
-	button.text-left.ellipsis.font-weight-bold(class!=attributes.class name=`roll_${dashedName(name)}` type='roll' value!=`${templatePrefix} {{header=@{name}}} {{dice=[[1d20+@{attribute}+@{bonus}${luckEffect}]]}} {${description}}}`)
+	button.text-left.ellipsis.font-weight-bold(class!=attributes.class name=`roll_${dashedName(name)}` type='roll' value!=`${templatePrefix} {{header=@{name}}} {{dice=[[1d20+${attribute}+${bonus}+${luckEffect}]]}} {${description}}}`)
+		span(name='attr_name')
+
+mixin repeatingRollButton(name, includeDescription = false)
+	- const description = includeDescription ? "{{description=@{description}}" : ""
+	button.text-left.ellipsis.font-weight-bold(class!=attributes.class name=`roll_${dashedName(name)}` type='roll' value!=`${templatePrefix} {{header=@{name}}} {{dice=[[1d20+@{spellcasting_ability}[spellcasting ability]+${bonus}+${luckEffect}]]}} {${description}}}`)
 		span(name='attr_name')
 
 mixin repeatingDamageButton(name, includeDescription = false)
-	button.ellipsis.font-weight-bold(class!=attributes.class name=`roll_${dashedName(name)}` type='roll' value!=`${templatePrefix} {{header=@{name} Damage}} {{dice=[[@{damage}+@{bonus}]]}} {{description=@{damage_type}}}`)
+	button.ellipsis.font-weight-bold(class!=attributes.class name=`roll_${dashedName(name)}` type='roll' value!=`${templatePrefix} {{header=@{name} Damage}} {{dice=[[@{damage}[damage]+${bonus}]]}} {{description=@{damage_type}}}`)
 		span(name='attr_damage')
 
 mixin repeatingChatIconButton(name)
