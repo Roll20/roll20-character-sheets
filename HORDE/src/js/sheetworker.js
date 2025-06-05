@@ -73,6 +73,26 @@ function angriff(waffe) {
     });
 }
 
+function angriff_npc(waffe) {
+    // console.log("Starte Angriffs");
+    getAttrs([waffe,waffe+"_notiz"], function(values) {
+        let name = values[waffe]||"";        
+        let notiz = values[waffe+"_notiz"]||"";
+
+        startRoll("&{template:angriff-npc} {{waffe="+name+"}} {{wurf=[[1d6]]}} {{notiz="+notiz+"}}", (results) => {
+            const wuerfel = results.results.wurf.dice;
+            const wurf = results.results.wurf.dice;            
+
+            finishRoll(
+                results.rollId,
+                {
+                    wurf: wurf
+                }
+            )
+        });
+    });
+}
+
 ['intelligenz', 'mut', 'koerperkraft', 'geschick', 'charisma'].forEach(attr => {
     on(`clicked:probe-${attr}`, function() {
         attributsprobe(attr);
@@ -82,5 +102,8 @@ function angriff(waffe) {
 ['linke-hand', 'rechte-hand'].forEach(waffe => {
     on(`clicked:angriff-${waffe}`, function() {
         angriff(waffe);
+    });
+    on(`clicked:angriff-npc-${waffe}`, function() {
+        angriff_npc(waffe);
     });
 });
