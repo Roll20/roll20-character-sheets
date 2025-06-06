@@ -124,7 +124,7 @@
 on("sheet:opened", async (e) => {
   console.log("sheet:opened", e);
   await setAttrsAsync({ debug: "0" });
-  await migrateAttributes();
+  // await migrateAttributes();
 });
 
 on("clicked:migrate", async (e) => {
