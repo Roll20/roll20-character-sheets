@@ -115,9 +115,9 @@ var check_inventory_from_skill_change = function(inventory, idarray,v,s){
                         var new_mod = !isNaN(parseInt(mod.replace(/[^0-9]/g, ""), 10)) ? parseInt(mod.replace(/[^0-9]/g, ""), 10) : false;
                         item_bonus = new_mod ? item_bonus + new_mod : item_bonus;
                     }
-                };
+                }
             });
-        };
+        }
     });
 
     return item_bonus;
