@@ -460,12 +460,16 @@
     <fieldset class="repeating_Muns filtered_Muns filtered">
       <input class="hidden equipped" type="checkbox" name="attr_equipped">
       <!-- <div class="Munholder"> -->
-        <button type="roll"  name="roll_mun" value="&{template:powers} {{title=Munition}} {{name=@{character_name}}} {{fuel=Diesel}} {{description=@{muntext}}} {{cost=@{muncost}}} {{powerName=@{munname}}}"></button>
+        <button type="roll"  name="roll_mun" value="&{template:powers} {{harm=@{munHarm}}} {{title=Munition}} {{name=@{character_name}}} {{fuel=Diesel}} {{description=@{muntext}}} {{cost=@{muncost}}} {{powerName=@{munname}}}"></button>
         <input class="munname" spellcheck="false" type="text" name="attr_munname" value="Name">
       <!-- </div> -->
       <span class="right">
         <label class="inline">Diesel Cost</label>
         <input class="cost" type="text" name="attr_muncost" value="">
+      </span>
+      <span class="right">
+        <label class="inline">Harm</label>
+        <input class="cost" type="number" name="attr_munHarm" value="">
       </span>
       <textarea class="maxwidth" spellcheck="false" name="attr_muntext"></textarea>
     </fieldset>
@@ -542,12 +546,16 @@
                         <input class="equippedMun" type="checkbox" name="attr_equipped">
                       </span>
                       <div class="Munholder">
-                        <button type="roll"  name="roll_mun" value="&{template:powers} {{title=Munition}} {{name=@{character_name}}} {{fuel=Diesel}} {{description=@{muntext}}} {{cost=@{muncost}}} {{powerName=@{munname}}}"></button>
+                        <button type="roll"  name="roll_mun" value="&{template:powers} {{harm=@{munHarm}}}  {{title=Munition}} {{name=@{character_name}}} {{fuel=Diesel}} {{description=@{muntext}}} {{cost=@{muncost}}} {{powerName=@{munname}}}"></button>
                         <input class="munname" spellcheck="false" type="text" name="attr_munname" value="Name">
                       </div>
                       <span class="right">
                         <label class="inline">Diesel Cost</label>
                         <input class="cost" type="text" name="attr_muncost" value="">
+                      </span>
+                      <span class="right">
+                        <label class="inline">Harm</label>
+                        <input class="cost" type="number" name="attr_munHarm" value="">
                       </span>
                       <textarea class="maxwidth" spellcheck="false" name="attr_muntext"></textarea>
                     </fieldset>
@@ -584,7 +592,7 @@
             <!-- </div> -->
           <input type="hidden" name="attr_show_hotbox" />
           <div class="hotboxDetail">
-            <h3>Hotbox</h3>
+            <h3 class="hb">Hotbox</h3>
             <div class="outerhot">
               <div class="mechleft">
                 <div class="heatholder">
@@ -599,11 +607,13 @@
                 </div>
               </div>
               <div class="mechright">
-
                 <div class="refheat">
                   <h4>Reference Heat</h4>
                   <div class="heat-thresholds">
                       <div>
+                        Heat ><span name="attr_smash_times4"></span>: 
+                        <span class="level overheating">OVERHEATING</span>
+                      </div><div>
                         Heat ≥ <span name="attr_smash_times3"></span>: 
                         <span class="level hot">Hot</span>
                       </div>
@@ -622,7 +632,7 @@
                     </div>
                 </div>
               </div>
-            </div>
+            </div> <!--Close Outerhot-->
 
           </div>  <!-- Close hotboxdetail -->
           
@@ -2250,6 +2260,14 @@
         </div>
       {{/powerName}}
       
+      {{#harm}}
+        <div class="sheet-powerHarm">
+          {{harm}} Harm
+        </div>
+      {{/harm}}
+      
+      
+      
       {{#description}}
         <div class="sheet-description">
           {{description}}
@@ -3503,7 +3521,9 @@ console.log("Load");
       sublockedroom6,
       //heat : sm,
       smash_times2: (sm * 2),
-      smash_times3: (sm * 3)
+      smash_times3: (sm * 3),
+      smash_times4: (sm * 4)
+      
     });
   });
 });
@@ -3515,7 +3535,9 @@ on("change:smash", function() {
 
     setAttrs({
       smash_times2: (smash * 2),
-      smash_times3: (smash * 3)
+      smash_times3: (smash * 3),
+      smash_times4: (smash * 4)
+      
     });
   });
 });
@@ -3525,11 +3547,11 @@ on("change:heat change:smash", function() {
     const heat = parseFloat(values.heat) || 0;
     const smash = parseFloat(values.smash) || 0;
     let level = "Cold";
-    console.log("smash", smash);
-    console.log("heat", heat);
 
     if (smash > 0) {
-      if (heat >= 3 * smash) {
+      if (heat > 4 * smash) {
+        level = "OVERHEATING";
+      } else if (heat >= 3 * smash) {
         level = "Hot";
       } else if (heat >= 2 * smash) {
         level = "Warm";
