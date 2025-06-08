@@ -20,6 +20,7 @@ pri1['Animal Friendship'] = {
     'effect': 'By means of this spell, the caster is able to show any animal of animal intelligence to semi-intelligence (i.e., Intelligence 1–4) that he desires friendship. If the animal does not roll a successful saving throw vs. spell immediately when the spell is begun, it stands quietly while the caster finishes the spell. Thereafter, it follows the caster about. The spell functions only if the caster actually wishes to be the animal’s friend. If the caster has ulterior motives, the animal always senses them (for example, the caster intends to eat the animal, send it ahead to set off traps, etc.).\n&emsp;The caster can teach the befriended animal three specific tricks or tasks for each point of Intelligence it possesses. Typical tasks are those taught to a dog or similar pet (i.e., they cannot be complex). Training for each such trick must be done over a period of one week, and all must be done within three months of acquiring the creature. During the three-month period, the animal will not harm the caster, but if the creature is left alone for more than a week, it will revert to its natural state and act accordingly.\n&emsp;The caster can use this spell to attract up to 2 Hit Dice of animal(s) per experience level he possesses. This is also the maximum total Hit Dice of the animals that can be attracted and trained at one time: no more than twice the caster’s experience level. Current maximum [[2*[[@{level-priest}]] ]] Hit Dice of animals. Only unaligned animals can be attracted, befriended, and trained.'
 };
 
+pri1['Curse (Reverse of Bless)'] =
 pri1['Bless'] = {
     'level': '1',
     'school': 'Conjuration/Summoning (Reversible)',
@@ -78,6 +79,7 @@ pri1['Command'] = {
     'effect': 'This spell enables the priest to command another creature with a single word. The command must be uttered in a language understood by the creature. The subject will obey to the best of his/its ability only as long as the command is absolutely clear and unequivocal; thus, a command of “Suicide!” is ignored. A command to “Die!” causes the creature to fall in a faint or cataleptic state for one round, but thereafter the creature revives and is alive and well. Typical commands are back, halt, flee, run, stop, fall, go, leave, surrender, sleep, rest, etc. No command affects a creature for more than one round; undead are not affected at all. Creatures with Intelligence of 13 (high) or more, or those with 6 or more Hit Dice (or experience levels) are entitled to a saving throw vs. spell, adjusted for Wisdom. (Creatures with 13 or higher Intelligence *and* 6 Hit Dice/levels get only one saving throw!)'
 };
 
+pri1['Destroy Water (Reverse of Create Water)'] =
 pri1['Create Water'] = {
     'level': '1',
     'school': 'Alteration (Reversible)',
@@ -97,6 +99,7 @@ pri1['Create Water'] = {
     'effect': 'When the priest casts a *create water* spell, up to 4 gallons of water are generated for every experience level of the caster (Currently up to [[4*[[@{level-priest}]] ]] gallons). The water is clean and drinkable (it is just like rain water). The created water can be dispelled within a round of its creation; otherwise, its magic fades, leaving normal water that can be used, spilled, evaporated, etc. The reverse of the spell, *destroy water*, obliterates without trace (no vapor, mist, fog, or steam) a like quantity of water. Water can be created or destroyed in an area as small as will actually contain the liquid, or in an area as large as 27 cubic feet (1 cubic yard).\n&emsp;Note that water can neither be created nor destroyed within a creature. For reference purposes, water weighs about 8½ pounds per gallon, and a cubic foot of water weighs approximately 64 pounds.'
 };
 
+pri1['Cause Light Wounds (Reverse of Cure Light Wounds)'] =
 pri1['Cure Light Wounds'] = {
     'level': '1',
     'school': 'Necromancy (Reversible)',
@@ -113,9 +116,11 @@ pri1['Cure Light Wounds'] = {
     'damage': '',
     'damage-type': '',
     'healing': '[[1d8]]',
+    'special-conditions': [TOUCH_ATTACKS],
     'effect': 'When casting this spell and laying his hand upon a creature, the priest causes 1d8 points of wound or other injury damage to the creature’s body to be healed. This healing cannot affect creatures without corporeal bodies, nor can it cure wounds of creatures not living or of extraplanar origin.\n&emsp;The reverse of the spell, *cause light wounds*, operates in the same manner, inflicting 1d8 points of damage. If a creature is avoiding this touch, an attack roll is needed to determine if the priest’s hand strikes the opponent and causes such a wound.\n&emsp;Curing is permanent only insofar as the creature does not sustain further damage; caused wounds will heal—or can be cured—just as any normal injury.'
 };
 
+pri1['Detect Good (Reverse of Detect Evil)'] =
 pri1['Detect Evil'] = {
     'level': '1',
     'school': 'Divination (Reversible)',
@@ -123,17 +128,18 @@ pri1['Detect Evil'] = {
     'sphere-spells-and-magic': 'Divination',
     'range': '0',
     'duration': '1 turn + [[5*[[@{level-priest}]] ]] rounds',
-    'aoe': '10 feet x 120 yards',
+    'aoe': '10 feet path ✕ 120 yards',
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
     'materials': 'The use of the priest’s holy symbol as its material component, with the priest holding it before him.',
     'reference': 'p. 253',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume One p. 198',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell discovers emanations of evil, or of good in the case of the reverse spell, from any creature, object, or area. Character alignment, however, is revealed only under unusual circumstances: characters who are strongly aligned, who do not stray from their faith, and who are of at least 9th level might radiate good or evil *if intent upon appropriate actions*. Powerful monsters, such as rakshasas or ki-rin, send forth emanations of evil or good, even if polymorphed. Aligned undead radiate evil, for it is this power and negative force that enable them to continue existing. An evilly cursed object or unholy water radiates evil, but a hidden trap or an unintelligent viper does not.\n&emsp;The degree of evil (dim, faint, moderate, strong, or overwhelming) and possibly its general nature (expectant, malignant, gloating, etc.) can be noted. If the evil is overwhelming, the priest has a 10% chance per level ([[10*[[@{level-priest}]] ]]%) of detecting its general bent (lawful, neutral, or chaotic). The duration of a *detect evil* (or *detect good*) spell is one turn plus five rounds per level of the priest. Thus, a 1st-level priest can cast a spell with a 15-round duration, a 2nd-level priest can cast a spell with a 20-round duration. Current duration [[10+(5*[[@{level-priest}]])]] rounds. The spell has a path of detection 10 feet wide in the direction the priest is facing. The priest must concentrate—stop, have quiet, and intently seek to detect the aura— for at least one round to receive a reading.'
+    'effect': 'This spell discovers emanations of evil, from any creature, object, or area. Character alignment, however, is revealed only under unusual circumstances: characters who are strongly aligned, who do not stray from their faith, and who are of at least 9th level might radiate good or evil *if intent upon appropriate actions*. Powerful monsters, such as rakshasas or ki-rin, send forth emanations of evil or good, even if polymorphed. Aligned undead radiate evil, for it is this power and negative force that enable them to continue existing. An evilly cursed object or unholy water radiates evil, but a hidden trap or an unintelligent viper does not.\n&emsp;The degree of evil (*faint, moderate, strong, overwhelming*) and possibly its general nature (*expectant, malignant, gloating*, etc.) can be noted. If the evil is overwhelming, the priest has a 10% chance per level (currently [[{10*[[@{level-priest}]],100}kl1]]% chance) of detecting its general bent (*lawful, neutral, chaotic*). The duration of a *detect evil* spell is one turn plus five rounds per level of the priest. Thus, a 1st-level priest can cast a spell with a 15-round duration, a 2nd-level priest can cast a spell with a 20-round duration, etc. The spell has a path of detection 10 feet wide in the direction the priest is facing. The priest must concentrate—stop, have quiet, and intently seek to detect the aura—for at least one round to receive a reading.\n&emsp;The reverse spell, *detect good*, operates the same way, but good emanations are discovered.'
 };
 
 pri1['Detect Magic'] = {
@@ -143,17 +149,20 @@ pri1['Detect Magic'] = {
     'sphere-spells-and-magic': 'All',
     'range': '0',
     'duration': '1 turn',
-    'aoe': '10 feet x 30 yards',
+    'aoe': '10 feet path × 30 yards',
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
     'materials': 'The use of the priest’s holy symbol.',
     'reference': 'p. 253',
     'book': 'PHB',
+    'book-compendium': 'Priest’ Spell Compendium Volume One p. 201',
+    'errata': 'Dungeon Master Guide p. 161\nThe Complete Psionics Handbook p. 110\nSage Advice #213 p. 85\nSage Advice #214 p. 78-79\nSage Advice #243 p. 22\nSage Advice #245 p. 17-18\nSage Advice #254 p. 24',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When the *detect magic* spell is cast, the priest detects magical radiations in a path 10 feet wide and up to 30 yards long, in the direction he is facing. The intensity of the magic can be detected (dim, faint, moderate, strong, or overwhelming). The caster has a 10% chance per level ([[10*[[@{level-priest}]] ]]%) to determine the sphere of the magic, but unlike the wizard version of the spell, the type of magic (alteration, conjuration, etc.) cannot be divined. The caster can turn, scanning a 60° arc per round. The spell is blocked by solid stone at least 1 foot thick, solid metal at least 1 inch thick, or solid wood at least 1 yard thick.'
+    'psionics': '*Detect magic* never detects psionic activity.',
+    'effect': 'When the *detect magic* spell is cast, the priest detects magical radiations in a path 10 feet wide and up to 30 yards long, in the direction he is facing. The intensity of the magic can be detected (dim, faint, moderate, strong, or overwhelming). The caster has a 10% chance per level ([[{10*[[@{level-priest}]],100}kl1]]%) to determine the sphere of the magic, but unlike the wizard version of the spell, the type of magic (alteration, conjuration, etc.) cannot be divined. The caster can turn, scanning a 60° arc per round. The spell is blocked by solid stone at least 1 foot thick, solid metal at least 1 inch thick, solid wood at least 1 yard thick, or a *wall of force*.\n&emsp;*Detect magic* can detect an invisible creature’s magical aura, but not pinpoint the invisible creature’s exact location. See *DUNGEON MASTER Guide* p. 161.\n&emsp;Casting *detect magic* on a cursed item generally indicates the sphere of magic the cursed item is imitating, i.e. *cloak of poisonousness* that imitates *cloak of protection* would radiate the protection sphere.'
 };
 
 pri1['Detect Poison'] = {
@@ -205,7 +214,7 @@ pri1['Endure Cold/Endure Heat'] = {
     'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'The create water spell requires at least a drop of water; the destroy water spell, at least a pinch of dust.',
+    'materials': '',
     'reference': 'p. 254',
     'book': 'PHB',
     'damage': '',
@@ -290,24 +299,28 @@ pri1['Invisibility to Undead'] = {
     'effect': 'This spell causes affected undead to lose track of and ignore the warded creature for the duration of the spell. Undead of 4 or fewer Hit Dice are automatically affected, but those with more Hit Dice receive a saving throw vs. spell to avoid the effect. Note that a priest protected by this spell cannot turn affected undead. The spell ends immediately if the recipient makes any attack, although casting spells such as *cure light wounds*, *augury*, or *chant* does not end the ward.'
 };
 
+pri1['Darkness (Reverse of Light)'] =
 pri1['Light'] = {
     'level': '1',
     'school': 'Alteration (Reversible)',
     'sphere': 'Sun',
     'sphere-spells-and-magic': 'Creation, Guardian, Sun',
     'range': '120 yards',
-    'duration': '1 hour + [[@{level-priest}]] turns',
-    'aoe': '20-feet-radius globe',
+    'duration': '*Light:* 1 hour + [[@{level-priest}]] turns\n*Darkness:* 30 mins + [[@{level-priest}/2]] turns',
+    'aoe': '20-foot-radius globe',
     'components': 'V, S',
     'cast-time': '4',
     'saving-throw': 'Special',
     'materials': '',
     'reference': 'p. 255',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Two p. 374',
+    'errata': 'Sage Advice #152 p. 59\nSage Advice #153 p. 7',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell causes a luminous glow within 20 feet of the spell’s center. The area of light thus caused is equal in brightness to torchlight. Objects in darkness beyond this sphere can be seen, at best, as vague and shadowy shapes. The spell is centered on a point selected by the caster, and he must have a line of sight or unobstructed path to that point when the spell is cast. Light can spring from air, rock, metal, wood, or almost any similar substance. The effect is immobile unless it is specifically centered on a movable object or mobile creature. If this spell is cast upon a creature, any applicable magic resistance and saving throws must be rolled. Successful resistance negates the spell, while a successful saving throw indicates that the spell is centered immediately behind the creature, rather than upon the creature itself. A *light* spell centered on the visual organs of a creature blinds it, reducing its attack and saving throw rolls by 4 and worsening its Armor Class by 4. The caster can extinguish the light at any time by uttering a single word. *Light* spells are not cumulative—multiple castings do not provide a brighter light.\n&emsp;The spell is reversible, causing darkness in the same area and under the same conditions as the *light* spell, but with half the duration. Magical darkness is equal to that of an unlit interior room— pitch darkness. Any normal light source or magical light source of lesser intensity than full daylight does not function in magical darkness. A *darkness* spell cast directly against a *light* spell cancels both, and vice versa.'
+    'special-conditions': ['blindness'],
+    'effect': 'This spell causes a luminous glow within 20 feet of the spell’s center. The area of light thus caused is equal in brightness to torchlight. Objects in darkness beyond this sphere can be seen, at best, as vague and shadowy shapes. The spell is centered on a point selected by the caster, and he must have a line of sight or unobstructed path to that point when the spell is cast. *Light* can spring from air, rock, metal, wood, or almost any similar substance. The effect is immobile unless it is specifically centered on a movable object or mobile creature.\n&emsp;If this spell is cast upon a creature, any applicable magic resistance and saving throws must be rolled. Successful resistance negates the spell, while a successful saving throw indicates that the spell is centered immediately behind the creature, rather than upon the creature itself. A *light* spell centered on the visual organs of a creature blinds it. The caster can extinguish the light at any time by uttering a single word. *Light* spells are not cumulative—multiple castings do not provide a brighter light\n&emsp;A piece of chalk with *Light* cast on it will not write glowing messages. If the chalk is broken in two pieces, then the spell either ends or the biggest piece keeps the effect.\n&emsp;The spell is reversible, causing *darkness* in the same area and under the same conditions as the *light* spell, but with half the duration. Magical darkness is equal to that of an unlit interior room—pitch darkness. Any normal light source or magical light source of lesser intensity than full daylight does not function in magical darkness. A *darkness* spell cast directly against a *light* spell cancels both, and vice versa.'
 };
 
 pri1['Locate Animals or Plants'] = {
@@ -368,25 +381,30 @@ pri1['Pass Without Trace'] = {
     'effect': 'When this spell is cast, the recipient can move through any type of terrain—mud, snow, dust, etc.—and leave neither footprints nor scent. The area that is passed over radiates magic for [[1d6]] turns after the affected creature passes. Thus, tracking a person or other creature covered by this spell is impossible by normal means. Of course, intelligent tracking techniques, such as using a spiral search pattern, can result in the trackers picking up the trail at a point where the spell has worn off.'
 };
 
+pri1['Protection From Good (Reverse of Protection From Evil)'] =
 pri1['Protection From Evil'] = {
     'level': '1',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Protection',
     'range': 'Touch',
     'duration': '[[3*[[@{level-priest}]] ]] rounds',
-    'aoe': '1 creature',
+    'aoe': 'Creature touched',
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'None',
-    'materials': 'Holy water or burning incense / A circle of unholy water or smoldering dung.',
+    'materials': '*Protection From Evil:* Holy water or burning incense.\n*Protection From Good:* A circle of unholy water or smoldering dung.',
     'reference': 'p. 256',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Two p. 466',
+    'errata': 'The Complete Psionics Handbook p. 110\nSage Advice #156 p. 57\nSage Advice #225 p. 83\nSage Advice #241 p. 16\nDungeon Master Option: High-Level Campaigns p. 74+79',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, it creates a magical barrier around the recipient at a distance of 1 foot. The barrier moves with the recipient and has three major effects:\n&emsp;First, all attacks made by evil or evilly enchanted creatures against the protected creature receive a penalty of –2 to each attack roll, and any saving throws caused by such attacks are made by the protected creature with a +2 bonus.\n&emsp;Second, any attempt to exercise mental control over the protected creature (if, for example, it has been charmed by a vampire) or to invade and take over its mind (as by a ghost’s magic jar attack) is blocked by this spell. Note that the protection does not prevent a vampire’s charm itself, nor end it, but it does prevent the vampire from exercising mental control through the barrier. Likewise, an outside life force is merely kept out, and would not be expelled if in place before the protection was cast.\n&emsp;Third, the spell prevents bodily contact by creatures of an extraplanar or conjured nature (such as aerial servants, elementals, imps, invisible stalkers, salamanders, water weirds, xorn, and others). This causes the natural (body) weapon attacks of such creatures to fail and the creature to recoil if such attacks require touching the protected creature. Animals or monsters summoned or conjured by spells or similar magic are likewise hedged from the character. This protection ends if the protected character makes a melee attack against or tries to force the barrier against the blocked creature.\n&emsp;This spell can be reversed to become *protection from good*, with the second and third benefits remaining unchanged.'
+    'psionics': 'All telepathic powers used against someone with protected from evil have their power scores reduced by 2. Additionally, the spell prevents mental control such as domination.',
+    'effect': 'When this spell is cast, it creates a magical barrier around the recipient at a distance of 1 foot. The barrier moves with the recipient and has three major effects:\n&emsp;First, all attacks made by evil or evilly enchanted creatures against the protected creature receive a penalty of –2 to each attack roll, and any saving throws caused by such attacks are made by the protected creature with a +2 bonus.\n&emsp;Second, any attempt to exercise mental control over the protected creature (if, for example, it has been charmed by a vampire) or to invade and take over its mind (as by a ghost’s *magic jar* attack) is blocked by this spell. Note that the protection does not prevent a vampire’s *charm* itself, nor end it, but it does prevent the vampire from exercising mental control through the barrier. Likewise, an outside life force is merely kept out, and would not be expelled if in place before the protection was cast.\n&emsp;Third, the spell prevents bodily contact by creatures of an extraplanar or conjured nature (such as aerial servants, elementals, imps, invisible stalkers, salamanders, water weirds, xorn, and others). This causes the natural (body) weapon attacks of such creatures to fail and the creature to recoil if such attacks require touching the protected creature. Animals or monsters summoned or conjured by spells or similar magic are likewise hedged from the character. The entire spell ends, losing all three effects, if the protected character makes a melee attack against or tries to force the barrier against the blocked creature.\n&emsp;This spell can be reversed to become *protection from good*; the second and third benefits remaining unchanged.\n\n&emsp;This spell does not specifically hedge out undead creatures (except ghouls, as stated in the *MONSTROUS MANUAL* tome), unless these have been brought by a *monster summoning* spell or equivalent magic or are from another plane.'
 };
 
+pri1['Putrefy Food & Drink (Reverse of Purify Food & Drink)'] =
 pri1['Purify Food & Drink'] = {
     'level': '1',
     'school': 'Alteration (Reversible)',
@@ -406,6 +424,7 @@ pri1['Purify Food & Drink'] = {
     'effect': 'When cast, this spell makes spoiled, rotten, poisonous, or otherwise contaminated food and water pure and suitable for eating and drinking. Up to 1 cubic foot of food and drink per level can be thus made suitable for consumption. This spell does not prevent subsequent natural decay or spoilage. Unholy water and similar food and drink of significance is spoiled by *purify food and drink*, but the spell has no effect on creatures of any type nor upon magical potions.\n&emsp;The reverse of the spell is *putrefy food and drink*. This spoils even holy water; however, it likewise has no effect upon creatures or potions.'
 };
 
+pri1['Cause Fear (Reverse of Remove Fear)'] =
 pri1['Remove Fear'] = {
     'level': '1',
     'school': 'Abjuration (Reversible)',
@@ -442,6 +461,7 @@ pri1['Sanctuary'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
+    'special-conditions': [TOUCH_ATTACKS],
     'effect': 'When the priest casts a *sanctuary* spell, any opponent attempting to strike or otherwise directly attack the protected creature must roll a saving throw vs. spell. If the saving throw is successful, the opponent can attack normally and is unaffected by that casting of the spell. If the saving throw is failed, the opponent loses track of and totally ignores the warded creature for the duration of the spell. Those not attempting to attack the subject remain unaffected. Note that this spell does not prevent the operation of area attacks (fireball, ice storm, etc.). While protected by this spell, the subject cannot take direct offensive action without breaking the spell, but may use nonattack spells or otherwise act in any way that does not violate the prohibition against offensive action. This allows a warded priest to heal wounds, for example, or to bless, perform an augury, chant, cast a light in the area (but not upon an opponent), and so on.'
 };
 
@@ -483,6 +503,7 @@ pri2['Aid'] = {
     'damage': '',
     'damage-type': '',
     'healing': '[[1d8]] temporary hit points',
+    'special-conditions': [TOUCH_ATTACKS],
     'effect': 'The recipient of this spell gains the benefit of a *bless* spell (+1 to attack rolls and saving throws) and a special bonus of 1d8 additional hit points for the duration of the spell. The *aid* spell enables the recipient to actually have more hit points than his full normal total. The bonus hit points are lost first when the recipient takes damage; they cannot be regained by curative magic.\n&emsp;For example, a 1st-level fighter has 8 hit points, suffers 2 points of damage (8–2 = 6), and then receives an aid spell that gives 5 additional hit points. The fighter now has 11 hit points, 5 of which are temporary. If he is then hit for 7 points of damage, 2 normal hit points and all 5 temporary hit points are lost. He then receives a *cure light wounds* spell that heals 4 points of damage, restoring him to his original 8 hit points.\n&emsp;Note that the operation of the spell is unaffected by permanent hit point losses due to energy drain, Hit Die losses, the loss of a familiar, or the operation of certain artifacts; the temporary hit point gain is figured from the new, lower total.'
 };
 
@@ -564,6 +585,7 @@ pri2['Charm Person or Mammal'] = {
     'effect': 'This spell affects any single person or mammal it is cast upon. The creature then regards the caster as a trusted friend and ally to be heeded and protected. The term *person* includes any bipedal human, demihuman or humanoid of man size or smaller, including brownies, dryads, dwarves, elves, gnolls, gnomes, goblins, half-elves, halflings, half-orcs, hobgoblins, humans, kobolds, lizard men, nixies, orcs, pixies, sprites, troglodytes, and others. Thus, a 10th-level fighter is included, while an ogre is not.\n&emsp;The spell does not enable the caster to control the charmed creature as if it were an automaton, but any word or action of the caster is viewed in the most favorable way. Thus, a charmed creature would not obey a suicide command, but might believe the caster if assured that the only chance to save the caster’s life is for the creature to hold back an onrushing red dragon for “just a minute or two” and if the charmed creature’s view of the situation suggests that this course of action still allows a reasonable chance of survival.\n&emsp;The subject’s attitudes and priorities are changed with respect to the caster, but basic personality and alignment are not. A request that a victim make itself defenseless, give up a valued item, or even use a charge from a valued item (especially against former associates or allies) might allow an immediate saving throw to see if the charm is thrown off. Likewise, a charmed creature does not necessarily reveal everything it knows or draw maps of entire areas. Any request may be refused, if such refusal is in character and does not directly harm the caster. The victim’s regard for the caster does not necessarily extend to the caster’s friends or allies. The victim does not react well to the charmer’s allies making suggestions such as, “Ask him this question. . .,” nor does the charmed creature put up with verbal or physical abuse from the charmer’s associates, if this is out of character.\n&emsp;Note also that the spell does not empower the caster with linguistic capabilities beyond those he normally has. The duration of the spell is a function of the charmed creature’s Intelligence, and it is tied to the saving throw. A successful saving throw breaks the spell. This saving throw is checked on a periodic basis according to the creature’s Intelligence, even if the caster has not overly strained the relationship.}}{{style=center1 sheet-spell-center2}}{{c1-1=**Intelligence Score**}}{{c2-1=3 or less}}{{c3-1=4–6}}{{c4-1=7–9}}{{c5-1=10–12}}{{c6-1=13–14}}{{c7-1=15–16}}{{c8-1=17}}{{c9-1=18}}{{c10-1=19 or more}}{{c1-2=**Period Between Checks**}}{{c2-2=3 months}}{{c3-2=2 months}}{{c4-2=1 month}}{{c5-2=3 weeks}}{{c6-2=2 weeks}}{{c7-2=1 week}}{{c8-2=3 days}}{{c9-2=2 days}}{{c10-2=1 day}}{{effects2=&emsp;If the caster harms, or attempts to harm, the charmed creature by some overt action, or if a *dispel magic* spell is successfully cast upon the charmed creature, the charm is broken automatically.\n&emsp;If the subject of the *charm person or mammal* spell successfully rolls its saving throw vs. the spell, the effect is negated.\n&emsp;This spell, if used in conjunction with the *animal friendship* spell, can keep the animal near the caster’s home base, if the caster must leave for an extended period.'
 };
 
+pri2['Undetectable Charm (Reverse of Detect Charm)'] =
 pri2['Detect Charm'] = {
     'level': '2',
     'school': 'Divination (Reversible)',
@@ -680,6 +702,7 @@ pri2['Flame Blade'] = {
     'effect': 'With this spell, the caster causes a blazing ray of red-hot fire to spring forth from his hand. This bladelike ray is wielded as if it were a scimitar. If the caster successfully hits with the flame blade in melee combat, the creature struck suffers 1d4+4 points of damage, with a damage bonus of +2 (i.e., 7–10 points) if the creature is undead or is especially vulnerable to fire. If the creature is protected from fire, the damage inflicted is reduced by 2 (i.e., 1d4+2 points). Fire dwellers and those using fire as an innate attack form suffer no damage from the spell. The flame blade can ignite combustible materials such as parchment, straw, dry sticks, cloth, etc. However, it is not a magical weapon in the normal sense of the term, so creatures (other than undead) struck only by magical weapons are not harmed by it. This spell does not function under water.'
 };
 
+pri2['Badberry (Reverse of Goodberry)'] =
 pri2['Goodberry'] = {
     'level': '2',
     'school': 'Alteration, Evocation (Reversible)',
@@ -699,6 +722,7 @@ pri2['Goodberry'] = {
     'effect': 'Casting a *goodberry* spell upon a handful of freshly picked berries makes 2d4 of them magical. The caster (as well as any other caster of the same faith and 3rd or higher level) can immediately discern which berries are affected. A *detect magic* spell discovers this also. Berries with the magic either enable a hungry creature of approximately man size to eat one and be as well-nourished as if a full normal meal were eaten, or else cure 1 point of physical damage from wounds or other similar causes, subject to a maximum of 8 points of such curing in any 24-hour period.\n&emsp;The reverse of the spell, *badberry*, causes 2d4 rotten berries to appear wholesome, but each actually delivers 1 point of poison damage (no saving throw) if ingested.'
 };
 
+pri2['Chill Metal (Reverse of Heat Metal)'] =
 pri2['Heat Metal'] = {
     'level': '2',
     'school': 'Alteration (Reversible)',
@@ -725,25 +749,28 @@ pri2['Hold Person'] = {
     'sphere-spells-and-magic': 'Charm, Law',
     'range': '120 yards',
     'duration': '[[2*[[@{level-priest}]] ]] rounds',
-    'aoe': '[[1d4]] persons in a 20-foot cube',
+    'aoe': '1 to 4 persons in a 20-foot cube',
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'Negate',
-    'materials': 'A small, straight piece of iron as the material component of this spell.',
+    'materials': 'A small, straight piece of iron.',
     'reference': 'p. 261',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Two p. 334',
+    'errata': 'The Complete Wizard’s Handbook p. 84\nSage Advice #152 p. 14\nSage Advice #223 p. 79',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell holds 1d4 humans, demihumans, or humanoid creatures rigidly immobile and in place for a minimum of six rounds (the spell lasts 2 rounds per caster level, and the priest must be of at least 3rd level to cast the spell).\n&emsp;The *hold person* spell affects any bipedal human, demihuman, or humanoid of man size or smaller, including brownies, dryads, dwarves, elves, gnolls, gnomes, goblins, half-elves, halflings, half-orcs, hobgoblins, humans, kobolds, lizard men, nixies, orcs, pixies, sprites, troglodytes, and others. Thus, a 10th-level fighter could be held, while an ogre could not.\n&emsp;The effect is centered on a point selected by the caster, and it affects persons selected by the caster within the area of effect. If the spell is cast at three persons, each gets a normal saving throw; if only two persons are being enspelled, each rolls his saving throw with a –1 penalty; if the spell is cast at only one person, the saving throw die roll suffers a –2 penalty. Saving throws are adjusted for Wisdom. Those who succeed on their saving throws are totally unaffected by the spell. Undead creatures cannot be held.\n&emsp;Held creatures cannot move or speak, but they remain aware of events around them and can use abilities not requiring motion or speech. Being held does not prevent the worsening of the subjects’ condition due to wounds, disease, or poison. The priest casting the *hold person* spell can end the spell with a single utterance at any time; otherwise, the duration is six rounds at 3rd level, eight rounds at 4th level, etc.'
+    'effect': 'This spell holds 1 to 4 humans, demihumans, or humanoid creatures rigidly immobile and in place for a minimum of six rounds. The spell lasts two rounds per caster level, and the priest must be of at least 3rd level to cast the spell.\n&emsp;The *hold person* spell affects any bipedal human, demihuman, or humanoid of man-size or smaller, including brownies, dryads, dwarves, elves, gnolls, gnomes, goblins, half-elves, halflings, half-orcs, hobgoblins, humans, kobolds, lizard men, nixies, orcs, pixies, sprites, troglodytes, and others. Thus, a 10th-level fighter could be held, while an ogre could not. Undead creatures cannot be held.\n&emsp;The effect is centered on a point selected by the caster, and it affects persons selected by the caster within the area of effect. If the spell is cast at three or four persons, each gets a normal saving throw; if only two persons are being enspelled, each rolls his saving throw with a –1 penalty; if the spell is cast at but one person, the saving throw die roll suffers a –2 penalty. Saving throws are adjusted for Wisdom. Those who succeed on their saving throws are totally unaffected by the spell.\n&emsp;Held creatures cannot move or speak, but they remain aware of events around them and can use abilities not requiring motion or speech. Being held does not prevent the worsening of the subject’s condition due to wounds, disease, or poison. The priest casting the *hold person* spell can end the spell with a single utterance at any time; otherwise, the duration is six rounds at 3rd level, eight rounds at 4th level, etc.\n&emsp;*Hold person* makes its victims rigid—if they’re falling, for instance, it cannot "freeze" them in mid-fall and suspend them in the air.'
 };
 
+pri2['Undetectable Alignment (Reverse of Know Alignment)'] =
 pri2['Know Alignment'] = {
     'level': '2',
     'school': 'Divination (Reversible)',
     'sphere': 'Divination',
     'range': '10 yards',
-    'duration': '1 turn',
+    'duration': '*Know Alignment:* 1 turn\n*Undetectable Alignment:* 24 hours',
     'aoe': '1 creature or object',
     'components': 'V, S',
     'cast-time': '1 round',
@@ -751,10 +778,12 @@ pri2['Know Alignment'] = {
     'materials': '',
     'reference': 'p. 261',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Two p. 324',
+    'errata': 'Sage Advice #241 p. 16',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A *know alignment* spell enables the priest to exactly read the aura of a creature or an aligned object (unaligned objects reveal nothing). The caster must remain stationary and concentrate on the subject for a full round. If the creature rolls a successful saving throw vs. spell, the caster learns nothing about that particular creature from the casting. Certain magical devices negate the power of the *know alignment* spell.\n&emsp;The reverse, *undetectable alignment*, conceals the alignment of an object or creature for 24 hours.'
+    'effect': 'A *know alignment* spell enables the priest to exactly read the aura of a creature or an aligned object, including sentient magical items (unaligned objects reveal nothing). The caster must remain stationary and concentrate on the subject for a full round. If the creature rolls a successful saving throw vs. spell, the caster learns nothing about that particular creature from the casting. Certain magical devices negate the power of the *know alignment* spell.\n&emsp;The reverse, *undetectable alignment*, conceals the alignment of an object or creature for 24 hours.'
 };
 
 pri2['Messenger'] = {
@@ -926,10 +955,10 @@ pri2['Spiritual Hammer'] = {
     'materials': 'A normal war hammer.',
     'reference': 'p. 263',
     'book': 'PHB',
-    'damage': '*Small/Medium:* 1d4+1+[[{{[[ceil([[@{level-priest}]]/6)]],3}kl1}]]\n*Large:* 1d4+[[{{[[ceil([[@{level-priest}]]/6)]],3}kl1}]]',
+    'damage': '*Small/Medium:* 1d4+1+[[{ceil([[@{level-priest}]]/6),3}kl1]]\n*Large:* 1d4+[[{ceil([[@{level-priest}]]/6),3}kl1]]',
     'damage-type': '',
     'healing': '',
-    'effect': 'By calling upon his deity, the caster of a *spiritual hammer* spell brings into existence a field of force shaped vaguely like a hammer. As long as the caster concentrates upon the hammer, it strikes at any opponent within its range, as desired. Each round the caster can choose to attack the same target as the previous round or switch to a new target that he can see anywhere within his maximum range. The spiritual hammer’s chance to successfully hit is equal to that of the caster, without any Strength bonuses. In addition, it strikes as a magical weapon with a bonus of +1 for every six experience levels (+[[{{[[ceil([[@{level-priest}]]/6)]],3}kl1}]]) (or fraction) of the spellcaster, up to a total of +3 to the attack roll and +3 to the damage roll for a 13th-level caster. The base damage inflicted when it scores a hit is exactly the same as a normal war hammer (1d4+1 points on opponents of man size or smaller, or 1d4 points on larger opponents, plus the magical bonus). The hammer strikes in the same direction as the caster is facing, so if he is behind the target, all bonuses for rear attack are gained along with the loss of any modifications to the target’s AC for shield and Dexterity.\n&emsp;As soon as the caster ceases concentration, the *spiritual hammer* spell ends. A *dispel magic* spell that includes either the caster or the force in its area of effect has a chance to dispel the spiritual hammer. If an attacked creature has magic resistance, the resistance is checked the first time the spiritual hammer strikes. If the hammer is successfully resisted, the spell is lost. If not, the hammer has its normal full effect for the duration of the spell.\n&emsp;The material component of this spell is a normal war hammer that the priest must hurl toward opponents while uttering a plea to his deity. The hammer disappears when the spell is cast.'
+    'effect': 'By calling upon his deity, the caster of a *spiritual hammer* spell brings into existence a field of force shaped vaguely like a hammer. As long as the caster concentrates upon the hammer, it strikes at any opponent within its range, as desired. Each round the caster can choose to attack the same target as the previous round or switch to a new target that he can see anywhere within his maximum range. The spiritual hammer’s chance to successfully hit is equal to that of the caster, without any Strength bonuses. In addition, it strikes as a magical weapon with a bonus of +1 for every six experience levels (or fraction) of the spellcaster, up to a total of +3 to the attack roll and +3 to the damage roll for a 13th-level caster. Currently +[[{ceil([[@{level-priest}]]/6),3}kl1]] to attack and damage rolls. The base damage inflicted when it scores a hit is exactly the same as a normal war hammer (1d4+1 points on opponents of man size or smaller, or 1d4 points on larger opponents, plus the magical bonus). The hammer strikes in the same direction as the caster is facing, so if he is behind the target, all bonuses for rear attack are gained along with the loss of any modifications to the target’s AC for shield and Dexterity.\n&emsp;As soon as the caster ceases concentration, the *spiritual hammer* spell ends. A *dispel magic* spell that includes either the caster or the force in its area of effect has a chance to dispel the spiritual hammer. If an attacked creature has magic resistance, the resistance is checked the first time the spiritual hammer strikes. If the hammer is successfully resisted, the spell is lost. If not, the hammer has its normal full effect for the duration of the spell.\n&emsp;The material component of this spell is a normal war hammer that the priest must hurl toward opponents while uttering a plea to his deity. The hammer disappears when the spell is cast.'
 };
 
 pri2['Trip'] = {
@@ -951,6 +980,7 @@ pri2['Trip'] = {
     'effect': 'This magic must be cast upon a normal object—a length of vine, a stick, a pole, a rope, or a similar object. The spell causes the object to rise slightly off the ground or floor it is resting on to trip most creatures crossing it, if they fail their saving throws vs. spell. Note that only as many creatures can be tripped as are actually stepping across the enchanted object. Thus, a 3-foot-long piece of rope could trip only one man-sized creature. Creatures moving at a very rapid pace (running) when tripped suffer 1 point of damage and are stunned for 1d4+1 rounds if the surface they fall upon is very hard (if it is turf or other soft material, they are merely stunned for the rest of that round). Very large creatures, such as elephants, are not affected at all by a *trip* spell. The object continues to trip all creatures passing over it, including the spellcaster, for as long as the spell duration lasts. A creature aware of the object and its potential adds a +4 bonus to its saving throw roll when crossing the object. The enchanted object is 80% undetectable unless a means that detects magical traps is employed or the operation of the spell is observed. This spell does not function under water.'
 };
 
+pri2['Straighten Wood (Reverse of Warp Wood)'] =
 pri2['Warp Wood'] = {
     'level': '2',
     'school': 'Alteration (Reversible)',
@@ -1047,6 +1077,7 @@ pri3['Call Lightning'] = {
     'effect': 'When a *call lightning* spell is cast, there must be a storm of some sort in the area—a rain shower, clouds and wind, hot and cloudy conditions, or even a tornado (including a whirlwind formed by a djinn or air elemental of 7 Hit Dice or more). The caster is then able to call down bolts of lightning. The caster can call down one bolt per turn. The caster need not call a bolt of lightning immediately—other actions, even spellcasting, can be performed; however, the caster must remain stationary and concentrate for a full round each time a bolt is called. The spell has a duration of one turn per caster level. Each bolt causes 2d8 points of electrical damage, plus an additional 1d8 points for each of the caster’s experience levels. Thus, a 4th-level caster calls down a 6d8 bolt (2d8+4d8).\n&emsp;The bolt of lightning flashes down in a vertical stroke at whatever distance the spellcaster decides, up to 360 yards away. Any creature within a 10-foot radius of the path or the point where the lightning strikes suffers full damage unless a successful saving throw vs. spell is rolled, in which case only one-half damage is taken.\n&emsp;Because it requires a storm overhead, this spell can only be used outdoors. It does not function under ground or under water.'
 };
 
+pri3['Continual Darkness (Reverse of Continual Light)'] =
 pri3['Continual Light'] = {
     'level': '3',
     'school': 'Alteration (Reversible)',
@@ -1054,17 +1085,20 @@ pri3['Continual Light'] = {
     'sphere-spells-and-magic': 'Creation, Guardian, Sun',
     'range': '120 yards',
     'duration': 'Permanent',
-    'aoe': '60-foot radius',
+    'aoe': '60-foot radius globe',
     'components': 'V, S',
     'cast-time': '6',
     'saving-throw': 'Special',
     'materials': '',
     'reference': 'p. 266',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume One p. 143',
+    'errata': 'Sage Advice #153 p. 7\nSage Advice #172 p. 90\nSage Advice #265 p. 24',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell is similar to a *light* spell, except that it is as bright as full daylight and lasts until negated by magical darkness or by a *dispel magic* spell. Creatures with penalties in bright light suffer them in this spell’s area of effect. As with the *light* spell, this can be cast into the air, onto an object, or at a creature. In the third case, the continual light affects the space about 1 foot behind a creature that successfully rolls its saving throw vs. spell (a failed saving throw means the continual light is centered on the creature and moves as it moves). Note that this spell also blinds a creature if it is successfully cast upon the creature’s visual organs. If the spell is cast on a small object that is then placed in a light-proof covering, the spell effects are blocked until the covering is removed.\n&emsp;Continual light brought into an area of magical darkness (or vice versa) cancels the darkness so that the otherwise prevailing light conditions exist in the overlapping areas of effect. A direct casting of a *continual light* spell against a similar or weaker magical darkness cancels both.\n&emsp;This spell eventually consumes the material it is cast upon, but the process takes far longer than the time in a typical campaign. Extremely hard and expensive materials might last hundreds or even thousands of years.\n&emsp;The reverse spell, *continual darkness*, causes complete absence of light (pitch blackness), similar to the *darkness* spell but of greater duration and area.'
+    'special-conditions': [BLINDNESS],
+    'effect': 'This spell is similar to a *light* spell, except that it is as bright as full daylight and lasts until negated by magical darkness or by a *dispel magic* spell. Creatures with penalties in bright light suffer them in this spell’s area of effect. As with the *light* spell, this can be cast into the air, onto an object, or at a creature. In the third case, the *continual light* affects the space about 1 foot behind a creature that successfully rolls its saving throw vs. spell (a failed saving throw means the *continual light* is centered on the creature and moves as it moves). Note that this spell also blinds a creature if it is successfully cast upon the creature’s visual organs. If the spell is cast on a small object that is then placed in a light-proof covering, the spell effects are blocked until the covering is removed.\n&emsp;*Continual light* brought into an area of magical darkness (or vice versa) cancels the darkness so that the otherwise prevailing light conditions exist in the overlapping areas of effect. If multiple *continual lights* are brought into an area of magical darkness, only one *continual light* will go out per magical darkness effect and the remaining will work as normal. A direct casting of a *continual light* spell against a similar or weaker magical darkness cancels both.\n&emsp;This spell eventually consumes the material it is cast upon, but the process takes far longer than the time in a typical campaign. Extremely hard and expensive materials might last hundreds or even thousands of years. Perishable materials, such as most foodstuffs, will rot normally long before a *continual light* spell can affect them. Likewise, most creatures will be dust before the spell will hurt them. If an object is consumed by this spell, the spell ceases to function.\n&emsp;The reverse spell, *continual darkness*, causes complete absence of light (pitch blackness), similar to the *darkness* spell but of greater duration and area.'
 };
 
 pri3['Create Food & Water'] = {
@@ -1086,6 +1120,7 @@ pri3['Create Food & Water'] = {
     'effect': 'When this spell is cast, the priest causes food and water to appear. The food thus created is highly nourishing if rather bland; each cubic foot of the material sustains three human-sized creatures or one horse-sized creature for a full day. The food decays and becomes inedible within 24 hours, although it can be restored for another 24 hours by casting a *purify food and water* spell upon it. The water created by this spell is the same as that created by the 1st-level priest spell create water. For each experience level the priest has attained, 1 cubic foot of food or water is created by the spell. For example, a 2nd-level priest could create 1 cubic foot of food and 1 cubic foot of water.'
 };
 
+pri3['Cause Blindness or Deafness (Reverse of Cure Blindness or Deafness)'] =
 pri3['Cure Blindness or Deafness'] = {
     'level': '3',
     'school': 'Abjuration (Reversible)',
@@ -1103,9 +1138,11 @@ pri3['Cure Blindness or Deafness'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
+    'special-conditions': [BLINDNESS, DEAFNESS, TOUCH_ATTACKS],
     'effect': 'By touching the creature afflicted, the priest employing the spell can permanently cure some forms of blindness or deafness. This spell does not restore or repair visual or auditory organs damaged by injury or disease.\n&emsp;Its reverse, *cause blindness or deafness*, requires a successful touch (successful attack roll) on the victim. If the victim rolls a successful saving throw, the effect is negated. If the saving throw is failed, a nondamaging magical blindness or deafness results.\n&emsp;A deafened creature can react only to what it can see or feel, and suffers a -1 penalty to surprise rolls, a +1 penalty to its initiative rolls, and a 20% chance of spell failure for spells with verbal components. A blinded creature suffers a -4 penalty to its attack rolls, a +4 penalty to its Armor Class, and a +2 penalty to its initiative rolls.'
 };
 
+pri3['Cause Disease (Reverse of Cure Disease)'] =
 pri3['Cure Disease'] = {
     'level': '3',
     'school': 'Abjuration (Reversible)',
@@ -1123,6 +1160,7 @@ pri3['Cure Disease'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
+    'special-conditions': [TOUCH_ATTACKS],
     'effect': 'This spell enables the caster to cure most diseases by placing his hand upon the diseased creature. The affliction rapidly disappears thereafter, making the cured creature whole and well in from one turn to 10 days, depending on the type of disease and the state of its advancement when the cure took place. (The DM must adjudicate these conditions.) The spell is also effective against parasitic monsters such as green slime, rot grubs, and others. When cast by a priest of at least 12th level, this spell cures lycanthropy if cast within three days of the infection. Note that the spell does not prevent reoccurrence of a disease if the recipient is again exposed.\n&emsp;The reverse of the *cure disease* spell is *cause disease*. To be  effective, the priest must touch the intended victim, and the victim must fail a saving throw vs. spell. The severity of the disease is decided by the priest (debilitating or fatal). The exact details of the disease are decided by the DM, but the following are typical:\n&emsp;*Debilitating:* The disease takes effect in 1d6 turns, after which the creature loses 1 point of Strength per hour until his Strength is reduced to 2 or less, at which time the recipient is weak and virtually helpless. If a creature has no Strength rating, it loses 10% of its hit points per Strength loss, down to 10% of its original hit points. If the disease also affects hit points, use the more severe penalty. Recovery requires a period of 1d3 weeks.\n&emsp;*Fatal:* This wasting disease is effective immediately. Infected creatures receive no benefit from *cure wound* spells while the disease is in effect; wounds heal at only 10% of the natural rate. The disease proves fatal within 1d6 months and can be cured only by magical means. Each month the disease progresses, the creature loses 2 points of Charisma, permanently.\n&emsp;The inflicted disease can be cured by the *cure disease* spell. Lycanthropy cannot be caused'
 };
 
@@ -1132,7 +1170,7 @@ pri3['Dispel Magic'] = {
     'sphere': 'Protection',
     'sphere-spells-and-magic': 'All',
     'range': '60 yards',
-    'duration': 'Special',
+    'duration': 'Instantaneous',
     'aoe': '30-foot cube or 1 item',
     'components': 'V, S',
     'cast-time': '6',
@@ -1140,11 +1178,34 @@ pri3['Dispel Magic'] = {
     'materials': '',
     'reference': 'p. 267',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume One p. 211',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When a priest casts this spell, it has a chance to neutralize or negate the magic it comes in contact with as follows:\n&emsp;First, it has a chance to remove spells and spell-like effects (including device effects and innate abilities) from creatures or objects. Second, it may disrupt the casting or use of these in the area of effect at the instant the dispel is cast. Third, it may destroy magical potions (which are treated as 12th level for purposes of this spell).\n&emsp;Each effect or potion in the spell’s area is checked to determine if it is dispelled. The caster can always dispel his own magic; otherwise, the chance depends on the difference in level between the magical effect and the caster. The base chance of successfully dispelling is 11 or higher on 1d20. If the caster is of higher level than the creator of the effect to be dispelled, the difference is *subtracted* from this base number needed. If the caster is of lower level, the difference is *added* to the base. A die roll of 20 always succeeds and a die roll of 1 always fails. Thus, if a caster is 10 levels higher than the magic he is trying to dispel, only a roll of 1 prevents the effect from being dispelled.\n&emsp;You dispel all effects and potions at level [[1d20-11+[[@{level-priest}]] ]] and below!\n&emsp;A *dispel magic* can affect only a specially enchanted item (such as a magical scroll, ring, wand, rod, staff, miscellaneous item, weapon, shield, or armor) if it is cast directly upon the item. This renders the item nonoperational for 1d4 rounds. An item possessed or carried by a creature has the creature’s saving throw against this effect; otherwise, it is automatically rendered nonoperational. An interdimensional interface (such as a *bag of holding*) rendered nonoperational is temporarily closed. Note that an item’s physical properties are unchanged: A nonoperational magical sword is still a sword. Artifacts and relics are not subject to this spell, but some of their spell-like effects may be, at the DM’s option. Note that this spell, if successful, will release charmed and similarly beguiled creatures. Certain spells or effects cannot be dispelled; these are listed in the spell descriptions.}}{{style=bottom3}}{{cs1-1=3}}{{cc1-1=center}}{{c1-1=**Summary of Dispel Magic Effects**}}{{c2-1=**Source of Effect**}}{{c3-1=Caster}}{{c4-1=Other caster/}}{{c5-1=&emsp;innate ability}}{{c6-1=Wand}}{{c7-1=Staff}}{{c8-1=Potion}}{{c9-1=Other magic}}{{c10-1=Artifact}}{{cc2-2=bottom}}{{c2-2=**Resists As**}}{{c3-2=None}}{{c4-2=Leve/HD of}}{{c5-2=&emsp;other caster}}{{c6-2=6th level}}{{c7-2=8th level}}{{c8-2=12th level}}{{c9-2=12th, unless special}}{{c10-2=DM discretion}}{{c2-3=**Result of Dispel**}}{{c3-3=Dispel automatic}}{{c5-3=Effect negated}}{{c6-3=&#42;}}{{c7-3=&#42}}{{c8-3=Potion destroyed}}{{c9-3=&#42}}{{c10-3=DM discretion}}{{effects2=&#42 Effect negated; if cast directly on item, item becomes nonoperational for 1d4 rounds.',
+    'effect': 'When a priest casts this spell, it has a chance to neutralize or negate magic it comes in contact with, as follows:\n&emsp;First, it has a chance to removes spells and spell-like effects (including device effects and innate abilities) from creatures or objects. Second, it can disrupts the casting or use of these in the area of effect at the instant the *dispel* is cast. Third, it can destroys magical potions (which are treated as 12th level for purposes of this spell).\n&emsp;Each effect or potion in the spell’s area is checked to determine if it is dispelled. The caster can always dispel his own magic; otherwise the chance to dispel depends on the difference in level between the magical effect and the caster. The base chance is 50% (11 or higher on 1d20 to dispel). If the caster is of higher level than the creator of the effect to be dispelled, the difference is *subtracted* from the number needed on 1d20 to dispel (making it *more* likely that the dispel succeeds). If the caster is of lower level, then the difference is *added* to the number needed on 1d20 (making it *less* likely that the dispel succeeds). A roll of 20 always succeeds and a roll of 1 always fails. Thus, if a caster is 10 levels higher than the magic he is trying to dispel, only a roll of 1 prevents the effect from being dispelled.\n&emsp;A *dispel magic* spell only affects a specially enchanted item—such as a magical scroll, ring, wand, rod, staff, miscellaneous item, weapon, shield, or armor—if it is cast directly upon that item alone. This renders the item nonoperational for 1d4 rounds. An item possessed and carried by a creature gains the creature’s saving throw against this effect; if unattended, an item is automatically rendered nonoperational for 1d4 rounds. An interdimensional interface (such as a *bag of holding*) rendered nonoperational is temporarily closed. Note that an item’s physical properties are unchanged: a nonoperational magical sword is still a sword.\n&emsp;Artifacts and relics are not subject to this spell, but some of their spell-like effects may be, at the DM’s option.\n&emsp;Note that this spell can be very effective when used upon charmed and similarly beguiled creatures. Certain spells or effects cannot be dispelled; these are listed in the spell descriptions.\n\n**Summary of *Dispel Magic* Effects**}}{{style=bottom3}}{{cc1-1=bottom}}{{c1-1=**Source of Effect**}}{{c2-1=Caster}}{{c3-1=Other caster/-\n&emsp;innate ability}}{{c4-1=Wand}}{{c5-1=Staff}}{{c6-1=Potion}}{{c7-1=Other magic item}}{{c8-1=Artifact}}{{cc1-2=bottom}}{{c1-2=**Resists As**}}{{c2-2=None}}{{c3-2=Leve/HD of\n&emsp;other caster}}{{c4-2=6th level}}{{c5-2=8th level}}{{c6-2=12th level}}{{c7-2=12th, unless special}}{{c8-2=DM discretion}}{{c1-3=**Result of Dispel**}}{{c2-3=Dispel automatic}}{{c3-3=Effect negated}}{{c4-3=&ast;}}{{c5-3=&ast;}}{{c6-3=Potion destroyed}}{{c7-3=&ast;}}{{c8-3=DM discretion}}{{effects2=&ast; Effect negated; if cast directly on item, item becomes nonoperational for 1d4 rounds.',
 };
+
+pri3['Dispel Magic (expanded)'] = {
+    'level': '3',
+    'school': 'Abjuration',
+    'sphere': 'Protection',
+    'sphere-spells-and-magic': 'All',
+    'range': '60 yards',
+    'duration': 'Instantaneous',
+    'aoe': '30-foot cube or 1 item, creature, or effect',
+    'components': 'V, S',
+    'cast-time': '6',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'p. 267',
+    'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume One p. 211',
+    'errata': 'Sage Advice #154 p. 6-7:\nSage Advice #157 p. 25\nSage Advice #179 p. 95\nSage Advice #214 p. 78\nSage Advice #217 p. 83\nSage Advice #228 p. 84-85\nSage Advice #237 p. 92\nSage Advice #241 p. 16\nSage Advice #245 p. 16\nSage Advice #252 p. 22\nSage Advice #253 p. 24\nSage Advice #273 p. 116\nDungeon Master Option: High-Level Campaigns p. 70+73+82\nWizard’s Spell Compendium Volume Three p. 656',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Dispel magic* has two primary applications, as an **area effect** or **targeted**. The caster can choose the desired application at the time of casting. When cast, *dispel magic* has a chance to neutralize or negate magic it comes in contact with as follows:\n&emsp;**Area effect:** *First,* it has a chance to ***remove*** spells and spell-like effects (including effects from devices, powers, innate abilities, and some potions&ast;) from creatures or objects, as well as dispel summoned or conjured creatures.\n&ast;*Note on potions:* Once a potion, elixir, oil, or ointment takes effect on a creature, any effects that apply only to the imbiber cannot be removed unless a *dispel magic* is **targeted** directly at the creature. If the potion’s effects extend to other creatures (such as the various potions of control) it can be dispelled normally with an **area effect** cast. All potion effects are treated as magic cast at 12th level for purposes of dispelling.\n&emsp;*Second,* it ***disrupts*** spell casting, scroll reading, and some device activation in the area of effect at the instant the *dispel* is cast. Spell-casting and magical-item use count as actions. A character cannot perform a second action in the same round even if the spell or item’s effect is disrupted.\n&emsp;• Spells and scrolls are used up and lost when disrupted.\n&emsp;• If the optional command word rule is in use, then majority of wands, staves, and rods can be disrupted. They lose the appropriate charges.\n&emsp;• Some wands, staves, and rods that are usable by non-spell-casters cannot be disrupted.\n&emsp;• Rings, weapons, armor, and miscellaneous magical items cannot be disrupted.\n&emsp;• Innate abilities and powers, such as druid shapeshifting, paladin lay on hands, or turn undead, cannot be disrupted.\n&emsp;*Third,* it can ***destroy magical potions*** still in the bottle (which are treated as 12th level for the purpose of this spell).\n&emsp;**Dispel roll:** Each effect or potion in the spell’s area is checked, with a separate roll, to determine if it is dispelled. The caster’s own magic is always automatically dispelled; otherwise, the effect or potion is dispelled if its level is less than or equal to 1d20 + 1 per level of the caster, - 11. Thus, a 6th level spellcaster, rolling a 13, gives a final value of 13+6-11 = 8, causing an effect cast by a spellcaster or device of 8th level or below to be dispelled. A roll of 20 always succeeds and a roll of 1 always fails. Thus, if a caster is 10 levels higher than the magic he is trying to dispel, only a roll of 1 prevents the effect from being dispelled.\n\n&emsp;**Targeted:** Casting *dispel magic* on a creature, item, or object does not radiate an area of effect. Thus, spells such as *stoneskin, minor globe of invulnerability* and *barkskin* could not be dispelled as the result of trying to negate the *magic of a wand of lightning*.\n&emsp;*Targeted on a magical item:* A *dispel magic* spell only affects a specially enchanted item–such as a magical scroll, ring, wand, rod, staff, miscellaneous item, weapon, shield, or armor–if it is cast directly upon that item alone. An unattended magical item is automatically nonoperational for 1d4 rounds. If the item is possessed or carried by a creature it gains the creature’s saving throw against this effect. An interdimensional interface (such as a *bag of holding*) rendered nonoperational would be temporarily closed. Note that an item’s physical properties are unchanged: A nonoperational magical sword is still a sword.\n&emsp;*Targeted on a creature:* A creature hit by a **targeted** *dispel magic* suffers the first two effects: ***Removal*** of spell effects, including potion effects that only apply to the creature, and ***disruption*** of spell casting as described above. It is up to the DM if the third effect, ***destruction of magical potions***, is also included.\n\n&emsp;**Permanency:** Spells made permanent with *permanency* can be dispelled. When dispelled, a permanent spell is destroyed, not temporarily rendered nonoperational. A creature or item never gains a saving throw to avoid a dispelling attempt against its permanent effects. To dispel a permanent spell the follows conditions must always be fulfilled:\n&emsp;1) Permanent spells must be individually **targeted** to be dispelled, requiring a separate *dispel magic* for each permanent effect.\n&emsp;2) The dispeller must make a successful **dispel roll** as described above.\n&emsp;3) Removing a permanent spell effect from a creature or magical item also requires that the dispeller is of higher level than the *permanency* caster at the time *permanency* was cast.\n\n&emsp;**Artifacts and relics:** Are not subject to this spell; however, some of their spell-like effects may be, at the DM’s option.\n&emsp;**Instantaneous effects:** Spells and potions whose basic durations are instantaneous cannot be dispelled. A *cure light wounds* spell or *potion of extra-healing*, cannot be dispelled after their healing properties have occurred. Likewise, petrification effect such as *flesh to stone* cannot be dispelled.\n&emsp;Note the this spell can be very effective when used upon charmed or similarly beguiled creatures. Certain spells or effects cannot be dispelled (such as a *protection from magic scroll* effect); these are listed in the spell descriptions.\n\n**Summary of *Dispel Magic* Effects**}}{{style=bottom3}}{{cc1-1=bottom}}{{c1-1=**Source of Effect**}}{{c2-1=Caster}}{{c3-1=Other caster/-\n&emsp;innate ability}}{{c4-1=Wand}}{{c5-1=Staff}}{{c6-1=Potion}}{{c7-1=Other magic item}}{{c8-1=Artifact}}{{cc1-2=bottom}}{{c1-2=**Resists As**}}{{c2-2=None}}{{c3-2=Leve/HD of\n&emsp;other caster}}{{c4-2=6th level}}{{c5-2=8th level}}{{c6-2=12th level}}{{c7-2=12th, unless special}}{{c8-2=DM discretion}}{{c1-3=**Result of Dispel**}}{{c2-3=Dispel automatic}}{{c3-3=Effect negated}}{{c4-3=&ast;}}{{c5-3=&ast;}}{{c6-3=Potion destroyed}}{{c7-3=&ast;}}{{c8-3=DM discretion}}{{cs9-1=3}}{{cc9-1=justify}}{{c9-1=\n&ast; Effect negated; if cast directly on item, item becomes nonoperational for 1d4 rounds.}}{{cs10-1=3}}{{cc10-1=center}}{{c10-1=[Dispel Roll](~@{character_name}|dispel-setup-pri)'
+}
 
 pri3['Feign Death'] = {
     'level': '3',
@@ -1159,10 +1220,12 @@ pri3['Feign Death'] = {
     'materials': '',
     'reference': 'p. 267',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume One p. 266',
+    'errata': 'Sage Advice #230 p. 94',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the caster or any other willing person can be put into a cataleptic state that is impossible to distinguish from actual death. Although the person affected can smell, hear, and know what is going on, no feeling or sight of any sort is possible; thus, any wounding or mistreatment of the body is not felt, no reaction occurs, and damage is only one-half normal. In addition, paralysis, poison, or energy level drain does not affect a person under the influence of this spell, but poison injected or otherwise introduced into the body becomes effective when the spell recipient is no longer under the influence of this spell, although a saving throw is permitted. However, the spell offers no protection from causes of certain death—being crushed under a landslide, etc. Only a willing individual can be affected by a *feign death* spell. The priest is able to end the spell effect at any time, but it requires a full round for bodily functions to begin again.\n&emsp;Note that, unlike the wizard version of this spell, only people can be affected, and that those of any level can be affected by the priest casting this spell.'
+    'effect': 'By means of this spell, the caster or any other willing person can be put into a cataleptic state that is impossible to distinguish from actual death. Although the person affected can smell, hear, and know what is going on, no feeling or sight of any sort is possible; thus, any wounding or mistreatment of the body is not felt, no reaction occurs, and damage is only one-half normal. In addition, paralysis, poison, or energy level drain does not affect a person under the influence of this spell, but poison injected or otherwise introduced into the body becomes effective when the spell recipient is no longer under the influence of this spell, although a saving throw is permitted. However, the spell offers no protection from causes of certain death—being crushed under a landslide, etc. Only a willing individual can be affected by a *feign death* spell. The priest is able to end the spell effect at any time, as will a successful *dispel*, but it requires a full round for bodily functions to begin again.\n&emsp;Note that, unlike the wizard version of this spell, only persons can be affected, and that those of any level can be affected by the priest casting this spell.'
 };
 
 pri3['Flame Walk'] = {
@@ -1222,12 +1285,13 @@ pri3['Hold Animal'] = {
     'effect': 'By means of this spell, the caster holds one to four animals rigid. Animals affected are normal or giant-sized mammals, birds, or rep-tiles, but not monsters such as centaurs, gorgons, harpies, naga, etc. Apes, bears, crocodiles, dogs, eagles, foxes, giant beavers, and similar animals are subject to this spell. The hold lasts for two rounds per caster level. The caster decides how many animals can be affected, but the greater the number, the better chance each has to successfully save against the spell. Each animal gets a saving throw: If only one is the subject of the spell, it has a penalty of –4 on its roll; if two are subject, each receives a penalty of –2 on its roll; if three are subject, each receives a penalty of –1 on its roll; and if four are subject, each gets an unmodified saving throw.\n&emsp;A maximum body weight of 400 pounds (100 pounds for non-mammals) per animal per caster level can be affected. (Currently [[400*[[@{level-priest}]] ]]-pound mammals or [[100*[[@{level-priest}]] ]]-pound nonmammals)—for example, an 8th-level caster can affect up to four 3,200-pound mammals or a like number of 800-pound nonmammals, such as birds or reptiles.'
 };
 
+pri3['Obscure Object (Reverse of Locate Object)'] =
 pri3['Locate Object'] = {
     'level': '3',
     'school': 'Divination (Reversible)',
     'sphere': 'Divination',
     'range': '[[60+10*[[@{level-priest}]] ]] yards',
-    'duration': '8 hours.',
+    'duration': '*Locate Object:* [[@{level-priest}]] rounds\n*Obscure Object:* 8 hours',
     'aoe': '1 object',
     'components': 'V, S, M',
     'cast-time': '1 turn',
@@ -1235,10 +1299,12 @@ pri3['Locate Object'] = {
     'materials': 'A piece of lodestone',
     'reference': 'p. 268',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Two p. 380',
+    'errata': 'Sage Advice #206 p. 88',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell helps locate a known or familiar object. The priest casts the spell, slowly turns, and will sense when he is facing in the direction of the object to be located, provided the object is within range—for example, 90 yards for 3rd-level priests, 100 yards for 4th, 110 yards for 5th, etc. The spell locates such objects as apparel, jewelry, furniture, tools, weapons, or even a ladder or stairway. Once the caster has fixed in his mind the items sought, the spell locates only that item. Attempting to find a specific item, such as a kingdom’s crown, requires an accurate mental image. If the image is not close enough to the actual item, the spell does not work; in short, desired but unique objects cannot be located by this spell unless they are known by the caster. The spell is blocked by lead.\n&emsp;The reversal, *obscure object*, hides an object from location by spell, *crystal ball*, or similar means for eight hours. The caster must touch the object being concealed.\n&emsp;Neither application of the spell affects living creatures.'
+    'effect': 'This spell helps locate a known or familiar object. The priest casts the spell, slowly turns, and will sense when he is facing in the direction of the object to be located, provided the object is within range—for example, 90 yards for 3rd-level priests, 100 yards for 4th, 110 yards for 5th, etc. The spell locates such objects as apparel, jewelry, furniture, tools, weapons, or even a ladder or stairway. Once the caster has fixed in his mind the items sought, the spell locates only that item. Attempting to find a specific item, such as a kingdom’s crown, requires an accurate mental image. If the image is not close enough to the actual item, the spell does not work; in short, desired but unique objects cannot be located by this spell unless they are known by the caster. The spell is blocked by lead.\n&emsp;The reverse, *obscure object*, hides an object from location by spell, *crystal ball*, or similar means for eight hours. The caster must touch the object being concealed.\n&emsp;Neither application of the spell affects living creatures.'
 };
 
 pri3['Magical Vestment'] = {
@@ -1362,19 +1428,23 @@ pri3['Pyrotechnics'] = {
     'sphere': 'Elemental (Fire)',
     'range': '160 yards',
     'duration': 'Special',
-    'aoe': '10 or 100 x fire',
+    'aoe': '10 or 100 times a single fire source',
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'Special',
-    'materials': 'One fire source within the area of effect which is immediately extinguished',
+    'materials': 'One fire source within a 20-foot cube, which is immediately extinguished.',
     'reference': 'p. 270',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Two p. 476',
+    'errata': 'Sage Advice #247 p. 20+22',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A *pyrotechnics* spell draws on an existing fire source to produce either of two effects, at the option of the caster.\n&emps;First, it can produce a flashing and fiery burst of glowing, colored  aerial fireworks that lasts one round. Creatures in, under, or within 120 feet of the area that have an unobstructed line of sight to the effect are blinded for [[1d4+1]] rounds unless they roll successful saving throws vs. spell. The fireworks fill a volume 10 times greater than the original fire source.\n&emsp;Second, it can cause a thick, writhing stream of smoke to arise from the source and form a choking cloud that lasts for one round per experience level of the caster. (Currently [[@{level-priest}]] rounds). This covers a roughly hemispherical volume from the ground or floor up (or conforming to the shape of a confined area) that totally obscures vision beyond 2 feet. The smoke fills a volume 100 times that of the fire source.\n&emsp;The spell uses one fire source within the area of effect, which is immediately extinguished. If an extremely large fire is used as the source, it is only partially extinguished by the casting. Magical fires are not extinguished, although a fire-based creature (such as a fire elemental) used as a source suffers [[1d4+[[@{level-priest}]] points of damage. This spell does not function under water.'
+    'special-conditions': [BLINDNESS],
+    'effect': 'A *pyrotechnics* spell draws on an existing fire source to produce either of two effects, at the option of the caster.\n&emsp;First, it can produce a flashing and fiery burst of glowing, colored  aerial *fireworks* that lasts one round. Creatures in, under, or within 120 feet of the area that have an unobstructed line of sight to the effect are blinded for 1d4+1 rounds unless they roll successful saving throws vs. spell. The fireworks fill a volume 10 times greater than the original fire source.\n&emsp;Second, it can cause a thick, writhing stream of *smoke* to arise from the source and form a choking cloud that lasts for one round per experience level of the caster. Currently [[@{level-priest}]] rounds. This covers a roughly hemispherical volume from the ground or floor up (or conforming to the shape of a confined area) that totally obscures vision beyond 2 feet. The smoke fills a volume 100 times that of the fire source.\n&emsp;The spell uses one fire source within a 20-foot cube, which is immediately extinguished. If an extremely large fire is used as the source, it is only partially extinguished by the casting. Magical fires are not extinguished, although a fire-based creature (such as a fire elemental) used as a source suffers 1d4 points of damage, plus 1 point of damage per caster level. Currently [[1d4+[[@{level-priest}]] ]] points of damage. This spell does not function under water.'
 };
 
+pri3['Bestow Curse (Reverse of Remove Curse)'] =
 pri3['Remove Curse'] = {
     'level': '3',
     'school': 'Abjuration (Reversible)',
@@ -1392,6 +1462,7 @@ pri3['Remove Curse'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
+    'special-conditions': [TOUCH_ATTACKS],
     'effect': 'Upon casting this spell, the priest is usually able to remove a curse on an object, on a person, or in the form of some undesired sending or evil presence. Note that the *remove curse* spell does not remove the curse from a cursed shield, weapon, or suit of armor, for example, although the spell typically enables the person afflicted with any such cursed item to get rid of it. Certain special curses may not be countered by this spell, or may be countered only by a caster of a certain level or more. A caster of 12th level or more can cure lycanthropy with this spell by casting it on the animal form. The were-creature receives a saving throw vs. spell and, if successful, the spell fails and the priest must gain a level before attempting the remedy on this creature again.\n&emsp;The reverse of the spell is not permanent; the *bestow curse* spell lasts for one turn for every experience level of the priest using the spell. (Currently [[@{level-priest}]] turns). The curse can have one of the following effects (roll percentile dice): 50% of the time it reduces one ability of the victim to 3 (the DM randomly determines which ability); 25% of the time it lowers the victim’s attack and saving throw rolls by –4; 25% of the time it makes the victim 50% likely to drop whatever he is holding (or do nothing, in the case of creatures not using tools)—roll each round.\n&emsp;It is possible for a priest to devise his own curse, and it should be similar in power to those given here. Consult your DM. The subject of a *bestow curse* spell must be touched. If the victim is touched, a saving throw is still applicable; if it is successful, the effect is negated. The bestowed curse cannot be dispelled.'
 };
 
@@ -1551,6 +1622,7 @@ pri3['Tree'] = {
     'effect': 'By means of this spell, the caster is able to assume the form of a small living tree or shrub or that of a large dead tree trunk with only a few limbs. Although the closest inspection cannot reveal that this plant is actually a person, and for all normal tests he is, in fact, a tree or shrub, the caster is able to observe all that goes on around him just as if he were in normal form. The Armor Class and hit points of the plant are those of the caster. The caster can remove the spell at any time, instantly changing from plant to his normal form and having full capability for any action normally possible (including spellcasting). Note that all clothing and gear worn or carried change with the caster.'
 };
 
+pri3['Air Breathing (Reverse of Water Breathing)'] =
 pri3['Water Breathing'] = {
     'level': '3',
     'school': 'Alteration (Reversible)',
@@ -1565,10 +1637,12 @@ pri3['Water Breathing'] = {
     'materials': '',
     'reference': 'p. 273',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Three p. 691',
+    'errata': 'Sage Advice #255 p. 24',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The recipient of a *water breathing* spell is able to breathe under water freely for the duration of the spell—i.e., one hour for each experience level of the caster. The priest can divide the base duration between multiple characters. Thus, an 8th-level priest can confer this ability to two characters for four hours, four for two hours, eight for one hour, etc., to a minimum of one half-hour per character.\n&emsp;The reverse, *air breathing*, enables water-breathing creatures to survive comfortably in the atmosphere for an equal duration. Note that neither version prevents the recipient creature from breathing in its natural element.'
+    'effect': 'The recipient of a *water breathing* spell is able to breathe under water freely for the duration of the spell—i.e., one hour for each experience level of the caster. The priest can divide the base duration between multiple creatures. Thus, an 8th-level priest can confer this ability to two creatures for 4 hours, four for 2 hours, eight for 1 hour, and so on, to a minimum of ½ hour per creature.\n&emsp;The reverse, *air breathing*, enables water-breathing creatures to survive comfortably in the atmosphere for an equal duration. Note that neither version prevents the recipient creature from breathing in its natural element.\n&emsp;*Water breathing* is not sufficient to allow spellcasting underwater. The caster must be able to move and speak freely, by use of a *free action* effect or an *airy water* spell.'
 };
 
 pri3['Water Walk'] = {
@@ -1652,6 +1726,7 @@ pri4['Call Woodland Beings'] = {
     'effect': 'By means of this spell, the caster is able to summon certain woodland creatures to his location. Naturally, this spell works only outdoors, but not necessarily only in wooded areas. The caster begins the incantation and continues uninterrupted until some called creature appears or two turns have elapsed. (The verbalization and somatic gesturing are easy, so this is not particularly exhausting to the spellcaster.) Only one type of the following sorts of beings can be summoned by the spell. They come only if they are within the range of the call.\n&emsp;The caster can call three times, for a different type each time. Once a call is successful, no other type can be called without another casting of the spell. (The DM will consult his outdoor map or base the probability of any such creature being within spell range upon the nature of the area the caster is in at the time of spellcasting.)\n&emsp;The creature(s) called by the spell are entitled to a saving throw vs. spell (with a –4 penalty) to avoid the summons. Any woodland beings answering the call are favorably disposed to the spellcaster and give whatever aid they are capable of. However, if the caller or members of the caller’s party are of evil alignment, the creatures are entitled to another saving throw vs. spell (this time with a +4 bonus) when they come within 10 yards of the caster or another evil character with him. These beings immediately seek to escape if their saving throws are successful. In any event, if the caster requests that the summoned creatures engage in combat on his behalf, they are required to roll a loyalty reaction check based on the caster’s Charisma and whatever dealings he has had with them.\n&emsp;This spell works with respect to neutral or good woodland creatures, as determined by the DM. Thus, the DM can freely add to or alter the list as he sees fit.\n&emsp;If the caster personally knows a certain individual woodland being, that being can be summoned at double the normal range. If this is done, no other woodland creatures are affected.\n&emsp;If a percentage chance is given in the accompanying table, druids and other nature-based priests add [[@{level-priest}]]%. These chances can be used if no other campaign information on the area is available.}}{{style=center2 sheet-spell-center3 sheet-spell-center4 sheet-spell-bottom2 sheet-spell-bottom3 sheet-spell-bottom4}}{{rs1-1=2}}{{c1-1=**Creature**\n**Type Called**}}{{c3-1=2d8 brownies}}{{c4-1=1d4 centaurs}}{{c5-1=1d4 dryads}}{{c6-1=1d8 pixies}}{{c7-1=1d4 satyrs}}{{c8-1=1d6 sprites}}{{c9-1=1 treant}}{{c10-1=1 unicorn}}{{cs1-2=3}}{{c1-2=**————Type of Woodlands————**}}{{cc2-2=center sheet-spell-bottom}}{{c2-2=**Light**}}{{c3-2=30%}}{{c4-2=5%}}{{c5-2=1%}}{{c6-2=10%}}{{c7-2=1%}}{{c8-2=0%}}{{c9-2=—}}{{c10-2=—}}{{c2-3=**Moderate/Sylvan**}}{{c3-3=20%}}{{c4-3=30%}}{{c5-3=25%}}{{c6-3=20%}}{{c7-3=30%}}{{c8-3=5%}}{{c9-3=5%}}{{c10-3=15%}}{{c2-4=**Dense/Virgin**}}{{c3-4=10%}}{{c4-4=5%}}{{c5-4=15%}}{{c6-4=10%}}{{c7-4=10%}}{{c8-4=25%}}{{c9-4=25%}}{{c10-4=20%'
 };
 
+pri4['Cloak of Fear (Reverse of Cloak of Bravery)'] =
 pri4['Cloak of Bravery'] = {
     'level': '4',
     'school': 'Conjuration/Summoning (Reversible)',
@@ -1690,6 +1765,7 @@ pri4['Control Temperature, 10\' Radius'] = {
     'effect': 'When this spell is cast, the temperature surrounding the caster can be altered by up to [[10*[[@{level-priest}]] ]]° F. ([[5.6*[[@{level-priest}]] ]]° C), either upward or downward. Thus, a 10th-level caster could raise or lower the surrounding temperature from 1 to 100 degrees F (1 to 55.6 degrees C). The spell can be used to ensure the comfort of the caster and those with him in extreme weather conditions. The party could stand about in shirt sleeves during the worst blizzard (although it would be raining on them) or make ice for their drinks during a scorching heat wave.\n&emsp;The spell also provides protection from intense normal and magical attacks. If the extreme of temperature is beyond what could be affected by the spell (a searing blast of a fireball or the icy chill of a white dragon), the spell reduces the damage caused by 5 points for every level of the caster. Currently [[5*[[@{level-priest}]] ]] points. Normal saving throws are still allowed, and the reduction is taken after the saving throw is made or failed. Once struck by such an attack, the spell immediately collapses.'
 };
 
+pri4['Cause Serious Wounds (Reverse of Cure Serious Wounds)'] =
 pri4['Cure Serious Wounds'] = {
     'level': '4',
     'school': 'Necromancy (Reversible)',
@@ -1709,6 +1785,7 @@ pri4['Cure Serious Wounds'] = {
     'effect': 'This spell is a more potent version of the *cure light wounds* spell. When laying his hand upon a creature, the priest heals 2d8+1 points of wound or other injury damage to the creature’s body. This healing cannot affect noncorporeal, nonliving, or extraplanar creatures.\n&emsp;*Cause serious wounds,* the reverse of the spell, operates similarly to the *cause light wounds* spell, the victim having to be touched first. If the touch is successful, 2d8+1 points of damage are inflicted.'
 };
 
+pri4['Undetectable Lie (Reverse of Detect Lie)'] =
 pri4['Detect Lie'] = {
     'level': '4',
     'school': 'Divination (Reversible)',
@@ -1766,6 +1843,7 @@ pri4['Free Action'] = {
     'effect': 'This spell enables the creature touched to move and attack normally for the duration of the spell, even under the influence of magic that impedes movement (such as *web* or *slow* spells) or while under water. It even negates or prevents the effects of paralysis and *hold* spells. Under water, the individual moves at normal (surface) speed and inflicts full damage, even with such cutting weapons as axes and swords and with such smashing weapons as flails, hammers, and maces, provided that the weapon is wielded in the hand rather than hurled. The *free action* spell does not, however, allow *water breathing* without further appropriate magic.'
 };
 
+pri4['Shrink Insect (Reverse of Giant Insect)'] =
 pri4['Giant Insect'] = {
     'level': '4',
     'school': 'Alteration (Reversible)',
@@ -1785,6 +1863,7 @@ pri4['Giant Insect'] = {
     'effect': 'By means of this spell, the priest can turn one or more normal-sized insects into larger forms resembling the giant insects described in the *Monstrous Manual.* Only one type of insect can be altered at one time (i.e., a single casting cannot affect both an ant and a fly) and all insects affected must be grown to the same size. The number of insects and the size to which they can be grown depends upon the priest’s level:}}{{style=center}}{{c1-1=**Priest’s**\n**Level**}}{{c2-1=7–9}}{{c3-1=10–12}}{{c4-1=13+}}{{c1-2=**Insect**\n**Hit Dice**}}{{c2-2=3}}{{c3-2=4}}{{c4-2=6}}{{c1-3=**Maximum**\n**Total HD**}}{{c2-3=9}}{{c3-3=12}}{{c4-3=15}}{{effects2=For example, an 8th-level priest can grow three insects to 3 Hit Dice, four insects to 2 Hit Dice, or nine insects to 1 Hit Die. Flying insects of 3 Hit Dice or more can carry a rider of human size (assume that such can carry 80 pounds per Hit Die).\n&emsp;If the casting is interrupted for any reason, or if the insects are currently subject to any other magical effect (including this one), the insects die and the spell is ruined. The DM decides how many normal insects of what type are available; this is often a greater limitation on the spell than the limits above.\n&emsp;If the insect created by this spell matches an existing monster description, use the monster description. Otherwise, unless the DM creates a special description, the giant form has an Armor Class of between 8 and 4, one attack, and inflicts 1d4 points of damage per Hit Die.\n&emsp;For example, a 14th-level priest uses the giant insect spell to enlarge one beetle (all that is available) to 6 HD size. The DM decides the beetle has AC 5 and bites for 6d4 points of damage.\n&emsp;Note that the spell works only on actual insects. Arachnids, crustaceans, and other types of small creatures are not affected. Any giant insects created by this spell do not attempt to harm the priest, but the priest’s control of such creatures is limited to simple commands (“attack,” “defend,” “guard,” and so forth). Orders to attack a certain creature when it appears or guard against a particular occurrence are too complex. Unless commanded to do otherwise, the giant insects attempt to attack whoever or whatever is near them.\n&emsp;The reverse of the spell, *shrink insect,* reduces any giant insect to normal insect size. The number of Hit Dice affected by the priest is subtracted from the number of Hit Dice of the insects, and any insect reduced to 0 Hit Dice has been shrunk. Partial shrinking is ignored; an insect is either shrunk or unaffected. Thus, a 9th-level priest attacked by giant ants could shrink three warrior ants or four worker ants to normal insect size with no saving throw. This spell has no effect on intelligent insectlike creatures.'
 };
 
+pri4['Hallucinatory Forest Reverse'] =
 pri4['Hallucinatory Forest'] = {
     'level': '4',
     'school': 'Illusion/Phantasm (Reversible)',
@@ -1842,6 +1921,7 @@ pri4['Imbue With Spell Ability'] = {
     'effect': 'By the use of this spell, the priest can transfer a limited number and selection of his currently memorized spells, and the ability to cast them, to another person. Only nonspellcasters (including rangers under 8th level and paladins under 9th level) can receive this bestowal; the *imbue with spell ability* enchantment does not function for those belonging to spellcasting classes, for unintelligent monsters, nor for any individual with less than 1 full Hit Die. In addition, the person thus imbued must have a Wisdom score of 9 or higher. Only priest spells of an informational or defensive nature or a *cure light wounds* spell can be transferred. Transferring any other spell type negates the entire attempt, including any allowable spells that were chosen. Higher level persons can receive more than one spell at the priest’s option:}}{{style=center1 sheet-spell-bottom2}}{{c1-1=**Level of Recipient**}}{{c2-1=1}}{{c3-1=3}}{{c4-1=5+}}{{c1-2=**Spells Imbued**}}{{c2-2=One 1st-level spell}}{{c3-2=Two 1st-level spells}}{{c4-2=Two 1st- and one 2nd-level spells}}{{effects2=The transferred spell’s variable characteristics (range, duration, area of effect, etc.) function according to the level of the priest originally imbuing the spell.\n&emsp;A priest who casts *imbue with spell ability* upon another character loses the number of 1st- and 2nd-level spells he has imbued until the recipient uses the transferred spells or is slain. For example, a 7th-level priest with five 1st- and four 2nd-level spells imbues a 10th-level fighter with a *cure light wounds* spell and a *slow poison* spell. The cleric now can have only four 1st-level spells memorized until the cure is cast and only three 2nd-level spells until the *slow poison* is cast, or until the fighter is killed. In the meantime, the priest remains responsible to his ethos for the use to which the spell is put.\n&emsp;This item, and any material component for the imbued spell, is consumed when the *imbue with spell ability* spell is cast.'
 };
 
+pri4['Raise Water (Reverse of Lower Water)'] =
 pri4['Lower Water'] = {
     'level': '4',
     'school': 'Alteration (Reversible)',
@@ -1861,6 +1941,7 @@ pri4['Lower Water'] = {
     'effect': 'The *lower water* spell causes water or similar fluid in the area of effect to sink away to a minimum depth of 1 inch. The depth can be lowered by up to 2 feet for every experience level of the priest. Currently [[2*[[@{level-priest}]] ]] feet. The water is lowered within a square area whose sides are 10 feet long per caster level. Currently [[10*[[@{level-priest}]] ]]. Thus, an 8th-level priest affects a volume up to 16 feet × 80 feet × 80 feet, a 9th-level caster affects a volume up to 18 feet × 90 feet × 90 feet, and so on. In extremely large and deep bodies of water, such as deep ocean, the spell creates a whirlpool that sweeps ships and similar craft downward, putting them at risk and rendering them unable to leave by normal movement for the duration of the spell. When cast on water elementals and other water-based creatures, this spell acts as a *slow* spell: The creature moves at half speed and makes half its usual number of attacks each round. The spell has no effect on other creatures.\n&emsp;Its reverse, *raise water,* causes water or similar fluids to return to their highest natural level: spring flood, high tide, etc. This can make fords impassable, float grounded ships, and may even sweep away bridges at the DM’s option. It negates *lower water* and vice versa.'
 };
 
+pri4['Poison (Reverse of Neutralize Poison)'] =
 pri4['Neutralize Poison'] = {
     'level': '4',
     'school': 'Necromancy (Reversible)',
@@ -1900,6 +1981,7 @@ pri4['Plant Door'] = {
     'effect': 'The *plant door* spell opens a magical portal or passageway through trees, undergrowth, thickets, or any similar growth—even growth of a magical nature. The plant door is open to the caster who cast the spell, casters of a higher level, or dryads; others must be shown the location of the door. The door even enables the caster to enter a solid tree trunk and remain hidden there until the spell ends. The spell also enables the passage or hiding of any man-sized or smaller creature; hiding is subject to space considerations. If the tree is cut down or burned, those within must leave before the tree falls or is consumed, or else they are killed also. The duration of the spell is [[@{level-priest}]] turns. If the caster opts to stay within an oak, the spell lasts nine times longer than normal; if within an ash tree, it lasts three times longer. The path created by the spell is up to 4 feet wide, 8 feet high, and 12 feet long per level of experience of the caster. This spell does not function on plant-based monsters (shambling mounds, molds, slimes, treants, etc.).'
 };
 
+pri4['Quench Fire (Reverse of Produce Fire)'] =
 pri4['Produce Fire'] = {
     'level': '4',
     'school': 'Alteration (Reversible)',
@@ -1919,23 +2001,27 @@ pri4['Produce Fire'] = {
     'effect': 'By means of this spell, the caster creates a common fire of up to 12 feet per side in area. Though it lasts only a single round (unless it ignites additional flammable material), the fire produced by the spell inflicts 1d4 points of damage plus 1 point per caster level (1d4 + 1/level) upon creatures within its area. It ignites combustible materials, such as cloth, oil, paper, parchment, wood, and the like, so as to cause continued burning.\n&emsp;The reverse, *quench fire,* extinguishes any normal fire (coals, oil, tallow, wax, wood, etc.) within the area of effect.'
 };
 
+pri4['Protection From Good, 10\' Radius (Reverse of Protection From Evil, 10\' Radius)'] =
 pri4['Protection From Evil, 10\' Radius'] = {
     'level': '4',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Protection',
     'range': 'Touch',
     'duration': '[[@{level-priest}]] turns',
-    'aoe': '10-foot radius',
+    'aoe': '10-foot-radius sphere',
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'None',
-    'materials': 'Holy (or unholy) water and incense (or smoldering dung)',
+    'materials': '\n*Protection from Evil*: Holy water and incense.\n*Protection from Good*: Unholy water and smoldering dung',
     'reference': 'p. 278',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Two p. 466',
+    'errata': 'The Complete Psionics Handbook p. 110\nSage Advice #153 p. 7\nSage Advice #156 p. 57\nSage Advice #225 p. 83\nSage Advice #241 p. 16\nDungeon Master Option: High-Level Campaigns p. 74+79',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The globe of protection of this spell is identical in all respects to that of a *protection from evil* spell, except that it encompasses a much larger area and its duration is greater. The effect is centered on and moves with the creature touched. Any protected creature within the circle will break the warding against enchanted/summoned monsters if he attacks those monsters. A creature unable to fit completely into the area of effect (for example, a 21-foot-tall titan) remains partially exposed and subject to whatever penalties the DM decides. If such a creature is the recipient of the spell, the spell acts as a normal *protection from evil* spell for that creature only.\n&emsp;The reverse, *protection from good, 10’ radius,* wards against good creatures.\n&emsp;To complete this spell, the priest must trace a circle 20 feet in diameter using holy (or unholy) water and incense (or smoldering dung), according to the *protection from evil* spell.'
+    'psionics': 'All telepathic powers used against someone with protected from evil have their power scores reduced by 2. Additionally, the spell prevents mental control such as domination.',
+    'effect': 'The globe of protection of this spell is identical in all respects to that of a *protection from evil* spell, except that it encompasses a much larger area and its duration is greater. The effect is centered on and moves with the creature touched. Any protected creature within the circle will break the warding against enchanted/summoned monsters if he attacks those monsters. A creature unable to fit completely into the area of effect (for example, a 21-foot-tall titan) remains partially exposed and subject to whatever penalties the DM decides. If such a creature is the recipient of the spell, the spell acts as a normal *protection from evil* spell for that creature only.\n&emsp;To complete this spell, the priest must trace a circle 20 feet in diameter using holy water and incense.\n&emsp;The reverse, *protection from good 10’ radius*, wards against good creatures. To complete this spell, the priest must trace a circle 20 feet in diameter using unholy water and smoldering dung.'
 };
 
 pri4['Protection From Lightning'] = {
@@ -2036,6 +2122,7 @@ pri4['Spell Immunity'] = {
     'effect': 'By means of this spell, the priest renders a creature touched immune to the effects of a specified spell of 4th level or lower. It protects against spells, spell-like effects of magical items, and innate spell-like abilities of creatures. It does not protect against breath weapons or gaze attacks of any type.\n&emsp;The spell has several additional limitations. First, the caster must have directly experienced the effect of the specified spell. For example, if the caster has been attacked by a *fireball* spell at some time, he can use the *spell immunity* spell to provide protection from a fireball. Second, the spell cannot affect a creature already magically protected by a potion, protective spell, ring, or other device. Third, only a particular spell can be protected against, not a certain sphere of spells or a group of spells that are similar in effect; thus, a creature given immunity to the *lightning bolt* spell is still vulnerable to a *shocking grasp* spell.'
 };
 
+pri4['Snakes to Sticks (Reverse of Sticks to Snakes)'] =
 pri4['Sticks to Snakes'] = {
     'level': '4',
     'school': 'Alteration (Reversible)',
@@ -2055,6 +2142,7 @@ pri4['Sticks to Snakes'] = {
     'effect': 'By means of this spell, the caster can change 1d4 sticks, plus one stick per experience level, into snakes; thus, a 9th-level priest can change 10–13 sticks into an equal number of snakes. These snakes attack as commanded by the priest. There must, of course, be sticks or similar pieces of wood (such as torches, spears, etc.) to turn into snakes. Such a stick cannot be larger than a staff. Sticks held by creatures are allowed a saving throw equal to that of the possessor (i.e., a spear held by an orc must roll the orc’s saving throw vs. polymorph). Magical items, such as staves and enchanted spears, are not affected by the spell. Only sticks within the area of effect are changed.\n&emsp;The type of snake created varies, but a typical specimen has 2 Hit Dice, Armor Class 6, a movement rate of 9, and either constricts for 1d4+1 points of damage per round or bites for 1 point plus poison (if any). The chance of a snake thus changed being venomous is 5% per caster level, if the spellcaster desires. Currently [[5*[[@{level-priest}]] chance of being venomous. Thus, an 11th-level priest has a maximum 55% chance that any snake created by the spell is poisonous. The spell lasts for two rounds for each experience level of the spellcaster.\n&emsp;The reverse spell changes normal-sized snakes to sticks for the same duration, or it negates the *sticks to snakes* spell according to the level of the priest countering the spell (for example, a 10th-level priest casting the reverse spell can turn 11-14 snakes back into sticks).'
 };
 
+pri4['Babble (Reverse of Tongues)'] =
 pri4['Tongues'] = {
     'level': '4',
     'school': 'Alteration (Reversible)',
@@ -2069,10 +2157,12 @@ pri4['Tongues'] = {
     'materials': '',
     'reference': 'p. 280',
     'book': 'PHB',
+    'book-compendium': 'Priest’s Spell Compendium Volume Three p. 648',
+    'errata': 'The Complete Wizard’s Handbook p. 84\nSage Advice #152 p. 59',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables the caster to speak and understand additional languages, whether they are racial tongues or regional dialects, but not communications of animals or mindless creatures. When the spell is cast, the spellcaster selects the language or languages to be understood. The spell then empowers the caster with the ability to speak and understand the language desired with perfect fluency and accent. The spell enables the priest to be understood by all speakers of that language within hearing distance, usually 60 feet. This spell does not predispose the subject toward the caster in any way. The priest can speak one additional tongue for every three levels of experience. Currently [[floor([[@{level-priest}]]/3)]] additional tongues.\n&emsp;The reverse of the spell cancels the effect of the *tongues* spell or confuses verbal communication of any sort within the area of effect.'
+    'effect': 'This spell enables the caster to speak and understand additional languages, whether they are racial tongues or regional dialects, but not communications of animals or mindless creatures. When the spell is cast, the spellcaster selects the language or languages to be understood. The spell then empowers the caster with the ability to speak and understand the language desired with perfect fluency and accent. The spell enables the priest to be understood by all speakers of that language within hearing distance, usually 60 feet. This spell does not predispose the subject toward the caster in any way. The priest can speak one additional tongue for every three levels of experience. Currently [[floor([[@{level-priest}]]/3)]] additional tongues.\n&emsp;The reverse of the spell, *babble*, cancels the effect of the *tongues* spell or confuses verbal communication of any sort within the area of effect.'
 };
 
 const pri5 = {};
@@ -2095,6 +2185,7 @@ pri5['Air Walk'] = {
     'effect': 'This spell enables a creature, which can be as big as the largest giant, to tread upon air as if it were walking on solid ground. Moving upward is similar to walking up a hill. A maximum upward angle of 45 degrees is possible at one-half the creature’s movement rate, as is a maximum downward angle of 45 degrees at the normal movement rate. An air-walking creature is in control of its movement, except when a strong wind is blowing. In this case, the creature gains or loses 10 feet of movement for every 10 miles per hour of wind velocity. The creature can, at the DM’s option, be subject to additional penalties in exceptionally strong or turbulent winds, such as loss of control of movement or suffering physical damage.\n&emsp;The spell can be placed upon a trained mount, so it can be ridden through the air. Of course, a mount not accustomed to such movement would certainly need careful and lengthy training, the details for which are up to the DM.'
 };
 
+pri5['Shrink Animal (Reverse of Animal Growth)'] =
 pri5['Animal Growth'] = {
     'level': '5',
     'school': 'Alteration (Reversible)',
@@ -2233,6 +2324,7 @@ pri5['Control Winds'] = {
     'effect': 'By means of a *control winds* spell, the caster is able to alter wind force in the area of effect. For every three levels of experience, the caster can increase or decrease wind forces by one level of strength. Currently [[floor([[@{level-priest}]]/3)]] wind levels of strength. Wind strengths are as follows:}}{{style=center2}}{{c1-1=**Wind Force**}}{{c2-1=Light Breeze}}{{c3-1=Moderate Breeze}}{{c4-1=Strong Breeze}}{{c5-1=Gale}}{{c6-1=Storm}}{{c7-1=Hurricane}}{{c1-2=**Miles Per Hour**}}{{c2-2=2–7}}{{c3-2=8–18}}{{c4-2=19–31}}{{c5-2=32–54}}{{c6-2=55–72}}{{c7-2=73–176}}{{effects2=&emsp;Winds in excess of 19 miles per hour drive small flying creatures—those eagle-sized and under—from the skies, severely affect missile accuracy, and make sailing difficult. Winds in excess of 32 miles per hour drive even man-sized flying creatures from the skies and cause minor ship damage. Winds in excess of 55 miles per hour drive all flying creatures from the skies, uproot small trees, knock down wooden structures, tear off roofs, and endanger ships. Winds in excess of 73 miles per hour are of hurricane force.\n&emsp;An “eye” of 40-foot radius, in which the wind is calm, exists around the caster. Note that while the spell can be used underground, if the spell is cast in an area smaller than the area of effect, the eye shrinks 1 foot for every foot of confinement. For example, if the area of effect is a 360-foot area, the eye shrinks by 10 feet to a 30-foot radius; a space under 320 feet in a radius would eliminate the eye and subject the spellcaster to the effects of the wind. Once the spell is cast, the wind force increases or decreases by 3 miles per hour per round until the maximum or minimum speed is attained. The caster, with one round of complete concentration, can stabilize the wind at its current strength, or set it to increase or decrease. However, the rate of the change cannot be altered. The spell remains in force for one turn for each level of experience of the caster. When the spell is exhausted, the force of the wind wanes or waxes at the same rate, until it reaches the level it was at before the spell took effect. Another caster can use a *control winds* spell to counter the effects of a like spell up to the limits of his own ability.'
 };
 
+pri5['Cause Critical Wounds (Reverse of Cure Critical Wounds)'] =
 pri5['Cure Critical Wounds'] = {
     'level': '5',
     'school': 'Necromancy (Reversible)',
@@ -2252,6 +2344,7 @@ pri5['Cure Critical Wounds'] = {
     'effect': 'The *cure critical wounds* spell is a very potent version of the *cure light wounds* spell. The priest lays his hand upon a creature and heals 3d8+3 points of damage from wounds or other damage. The spell does not affect creatures without corporeal bodies, those of extraplanar origin, or those not living.\n&emsp;The reversed spell, *cause critical wounds,* operates in the same fashion as other cause wounds spells, requiring a successful touch to inflict the 3d8+3 points of damage. Caused wounds heal via the same methods as do wounds of other sorts.'
 };
 
+pri5['Dispel Good (Reverse of Dispel Evil)'] =
 pri5['Dispel Evil'] = {
     'level': '5',
     'school': 'Abjuration (Reversible)',
@@ -2428,6 +2521,7 @@ pri5['Rainbow'] = {
     'effect': 'To cast this spell, the priest must be in sight of a rainbow, or have a special component (see below). The *rainbow* spell has two applications, and the priest can choose the desired one at the time of casting. These applications are as follows:\n&emsp;**Bow:** The spell creates a shimmering, multi-layered short composite bow of rainbow hues. It is light and easy to pull, so that any character can use it without penalty for non-proficiency. It is magical: Each of its shimmering missiles is the equivalent of a +2 weapon, including attack and damage bonuses. Magic resistance can negate the effect of any missile fired from the bow. The bow fires seven missiles before disappearing. It can be fired up to four times per round. Each time a missile is fired, one hue leaves the bow, corresponding to the color of arrow that is released. Each color of arrow has the ability to cause double damage to certain creatures, as follows:\n\nRed—fire dwellers/users and fire elementals\nOrange—creatures or constructs of clay, sand, earth, stone or similar materials, and earth elementals\nYellow—vegetable opponents (including fungus creatures, shambling mounds, treants, etc.)\nGreen—aquatic creatures, water elementals\nBlue—aerial creatures, electricity-using creatures, and air elementals\nIndigo—acid-using or poison-using creatures\nViolet—metallic or regenerating creatures\n\n&emsp;When the bow is drawn, an arrow of the appropriate color magically appears, nocked and ready. If no color is requested, or a color that has already been used is asked for, then the next arrow (in the order of the spectrum) appears.\n&emsp;**Bridge:** The caster causes the rainbow to form a seven-hued bridge up to 3 foot wide per level of the caster. Currently [[3*[[@{level-priest}]] ]] foot wide. It must be at least 20 feet long and can be as long as 120 yards, according to the caster’s desire. It lasts as long as the spell’s duration or until ordered out of existence by the caster.'
 };
 
+pri5['Slay Living (Reverse of Raise Dead)'] =
 pri5['Raise Dead'] = {
     'level': '5',
     'school': 'Necromancy (Reversible)',
@@ -2466,6 +2560,7 @@ pri5['Spike Stones'] = {
     'effect': 'The *spike stones* spell causes rock to shape itself into long, sharp points that tend to blend into the background. It is effective on both natural rock and worked stone. The spike stones serve to impede progress through an area and to inflict damage. If an area is carefully observed, each observer is 25% likely to notice the sharp points of rock. Otherwise, those entering the spell’s area of effect suffer 1d4 points of damage per round. The success of each attack is determined as if the caster of the spell were actually engaging in combat. Those entering the area are subject to attack immediately upon setting foot in the area and for each round spent in the area thereafter. The initial step enables the individual to become aware of some problem only if the initial attack succeeds; otherwise movement continues and the spike stones remain unnoticed until damage occurs. Charging or running victims suffer two attacks per round.\n&emsp;Those falling into pits affected by spike stones suffer six such attacks for every 10 feet fallen, each attack having a +2 bonus to the attack roll. In addition, the damage inflicted by each attack increases by +2 for every 10 feet fallen. Finally, the creatures also suffer normal falling damage.'
 };
 
+pri5['Transmute Mud to Rock (Reverse of Transmute Rock to Mud)'] =
 pri5['Transmute Rock to Mud'] = {
     'level': '5',
     'school': 'Alteration (Reversible)',
@@ -2641,6 +2736,7 @@ pri6['Conjure Animals'] = {
     'effect': 'The conjure animals spell enables the priest to magically create one or more mammals to attack his opponents. The total Hit Dice of the mammals cannot exceed twice the level of the priest (Currently [[2*[[@{level-priest}]] ]] Hit Dice), if the creature conjured is determined randomly. If a specific animal type is requested, the animal’s Hit Dice cannot exceed his level (Currently [[@{level-priest}]]). The DM selects the type of animal that appears if it is randomly called. Thus, a priest of 12th level could randomly conjure two mammals with 12 Hit Dice each, four with 6 Hit Dice each, six with 4 Hit Dice each, eight with 3 Hit Dice each, 12 with 2 Hit Dice each, or 24 with 1 Hit Die each. Count every +1 hit point added to a creature’s Hit Dice as ¼ of a Hit Die. Thus a creature with 4 + 3 Hit Dice equals a 4¾ Hit Dice creature. The conjured animals remain for two rounds for each level of the conjuring priest, or until slain, and they follow the caster’s verbal commands. Conjured animals unfailingly attack the priest’s opponents, but resist being used for any other purpose—they do not like it, become noticeably more difficult to control, and may refuse any action, break free, or turn on the caster, depending on the nature of the creature and the details of the situation. The conjured animals disappear when slain.'
 };
 
+pri6['Dismiss Fire Elemental (Reverse of Conjure Fire Elemental)'] =
 pri6['Conjure Fire Elemental'] = {
     'level': '6',
     'school': 'Conjuration/Summoning (Reversible)',
@@ -2660,6 +2756,7 @@ pri6['Conjure Fire Elemental'] = {
     'effect': 'Upon casting a *conjure fire elemental* spell, the caster opens a special gate to the elemental plane of Fire, and a fire elemental is summoned to the vicinity of the spellcaster. It is 65% likely that a 12 Hit Dice elemental appears, 20% likely that a 16 Hit Dice elemental appears, 9% likely that two to four salamanders appear, 4% likely that an efreeti appears, and 2% likely that a huge fire elemental of 21 to 24 Hit Dice appears. The caster need not fear that the elemental force summoned will turn on him, so concentration upon the activities of the fire elemental (or other creatures summoned) or protection from the creature is not necessary. The elemental summoned helps the caster however possible, including attacking the caster’s opponents. The fire elemental or other creature summoned remains for a maximum of one turn per level of the caster, or until it is slain, sent back by a *dispel magic* spell, the reverse of this spell, *dismiss fire elemental,* or similar magic.'
 };
 
+pri6['Lose the Path (Reverse of Find the Path)'] =
 pri6['Find the Path'] = {
     'level': '6',
     'school': 'Divination (Reversible)',
@@ -2718,6 +2815,7 @@ pri6['Forbiddance'] = {
     'effect': 'This spell can be used to secure a consecrated area (see the *Dungeon Master Guide*). The spell seals the area from teleportation, plane shifting, and ethereal penetration. At the option of the caster, the ward can be locked by a password, in which case it can be entered only by those speaking the proper words. Otherwise, the effect on those entering the enchanted area is based on their alignment, relative to the caster’s. The most severe penalty is used.\n&emsp;**Alignment identical:** No effect. If password locked, cannot enter area unless password is known (no saving throw).\n&emsp;**Alignment different with respect to law and chaos:** Save vs. spell to enter the area; if failed, suffer 2d6 points of damage. If password locked, cannot enter unless password is known.\n&emsp;**Alignment different with respect to good and evil:** Save vs. spell to enter this area; if failed, suffer 4d6 points of damage. If word locked, cannot enter unless password is known. The attempt does cause damage if the save is failed.\n&emsp;Once a saving throw is failed, an intruder cannot enter the forbidden area until the spell ceases. The ward cannot be dispelled by a caster of lesser level than the one who established it. Intruders who enter by rolling successful saving throws feel uneasy and tense, despite their success.'
 };
 
+pri6['Harm (Reverse of Heal)'] =
 pri6['Heal'] = {
     'level': '6',
     'school': 'Necromancy (Reversible)',
@@ -2833,6 +2931,7 @@ pri6['Stone Tell'] = {
     'effect': 'When the priest casts a *stone tell* spell upon an area, the very stones speak and relate to the caster who or what has touched them as well as revealing what is covered, concealed, or simply behind them. The stones relate complete descriptions, if asked. Note that a stone’s perspective, perception, and knowledge may hinder this divination. Such details, if any, are decided by the DM.'
 };
 
+pri6['Transmute Dust to Water (Reverse of Transmute Water to Dust)'] =
 pri6['Transmute Water to Dust'] = {
     'level': '6',
     'school': 'Alteration (Reversible)',
@@ -3048,6 +3147,7 @@ pri7['Confusion'] = {
     'effect': 'This spell causes confusion in one or more creatures within the area, creating indecision and the inability to take effective action. The spell affects 1d4 creatures, plus one creature per two caster levels. Thus, seven to ten creatures can be affected by a 12th- or 13th-level caster, eight to 11 by a 14th- or 15th-level caster, etc. These creatures are allowed saving throws vs. spell with -2 penalties, adjusted for Wisdom. Those successfully saving are unaffected by the spell. Confused creatures react as follows (roll 1d10):}}{{style=center1}}{{c1-1=**d10**}}{{c2-1=1}}{{c3-1=2-6}}{{c4-1=7-9}}{{c5-1=10}}{{c1-2=**Reaction**}}{{c2-2=Wander away (unless prevented) for duration of spell}}{{c3-2=Stand confused one round (then roll again)}}{{c4-2=Attack nearest creature for one round (then roll again)}}{{c5-2=Act normally for one round (then roll again)}}{{effects2=&emsp;The spell lasts one round for each level of the caster. Those who fail their saving throws are checked by the DM for actions each round, for the duration of the spell, or until they “wander away.”\n&emsp;Wandering creatures move as far from the caster as possible in their most typical mode of movement (characters walk, fish swim, bats fly, etc.). This is not panicked flight. Wandering creatures also have a 50% chance of using any special innate movement abilities (plane shift, burrowing, flight, etc.). Saving throws and actions are checked at the beginning of each round. Any confused creature that is attacked perceives the attacker as an enemy and acts according to its basic nature.\n&emsp;Note: If there are many creatures involved, the DM may decide to assume average results. For example, if there are 16 orcs affected and 25% could be expected to successfully roll the saving throw, then four are assumed to have succeeded, one wanders away, four attack the nearest creature, six stand confused and the last acts normally but must check next round. Since the orcs are not near the party, the DM decides that two who are supposed to attack the nearest creature attack each other, one attacks an orc that saved, and one attacks a confused orc, which strikes back. The next round, the base is 11 orcs, since four originally saved and one wandered off. Another one wanders off, five stands confused, four attack, and one acts normally.'
 };
 
+pri7['Dismiss Earth Elemental (Reverse of Conjure Earth Elemental)'] =
 pri7['Conjure Earth Elemental'] = {
     'level': '7',
     'school': 'Conjuration/Summoning (Reversible)',
@@ -3145,6 +3245,7 @@ pri7['Exaction'] = {
     'effect': 'When this spell is employed, the priest confronts some powerful creature from another plane (including devas and other powerful minions, for instance, but not demigods or deities of any sort) and requires of it some duty or quest. A creature of an alignment opposed to the priest (e.g., evil if the priest is good, chaotic if the priest is lawful) cannot be ordered around unless it is willing. Note that an absolute (true) neutral creature is effectively opposed to both good and evil, and both law and chaos.\n&emsp;The spellcaster must know something about the creature to exact service from it, or else he must offer some fair trade in return for the service. That is, if the priest is aware that the creature has received some favor from someone of the priest’s alignment, then the *exaction* spell can name this as cause. If no balancing reason for service is known, then some valuable gift or service must be pledged in return for the exaction. The service exacted must be reasonable with respect to the past or promised favor or reward, and with the being’s effort and risk. The spell then acts, subject to a magic resistance roll, as a quest upon the being that is to perform the required service. Immediately upon completion of the service, the being is transported to the vicinity of the priest, and the priest must then and there return the promised reward, whether it is irrevocable cancellation of a past debt or the giving of some service or other material reward. After this is done, the creature is instantly freed to return to its own plane.\n&emsp;The DM adjudicates when an equitable arrangement has been reached. If the caster requests too much, the creature is free to depart or to attack the priest (as if the agreement were breached) according to its nature. If circumstances leave the situation unbalanced (for example, the creature dies while achieving a result that was not worth dying for), then this might create a debt owed by the caster to the creature’s surviving kith and kin, making the caster vulnerable to a future *exaction* spell from that quarter. Agreeing to a future exaction or release in the event of catastrophic failure or death are common caster pledges in securing an exaction. Failure to fulfill the promise to the letter results in the priest being subject to exaction by the subject creature or by its master, liege, etc., at the very least. At worst, the creature can attack the reneging priest without fear of any of his spells affecting it, for the priest’s failure to live up to the bargain gives the creature immunity from the priest’s spell powers.'
 };
 
+pri7['Fire Quench (Reverse of Fire Storm)'] =
 pri7['Fire Storm'] = {
     'level': '7',
     'school': 'Evocation (Reversible)',
@@ -3184,6 +3285,7 @@ pri7['Gate'] = {
     'effect': 'Casting a *gate* spell has two effects: it causes an interdimensional connection between the plane of existence the priest is in and the plane in which dwells a specific being of great power. The result of this connection is that the sought-after being can step through the gate or portal, from its plane to that of the priest. Uttering the spell attracts the attention of the dweller on the other plane. When casting the spell, the priest must name the entity he desires to make use of the gate and to come to his aid. There is a 100% chance that *something* steps through the gate. The actions of the being that comes through depend on many factors, including the alignment of the priest, the nature of those accompanying him, and who or what opposes or threatens the priest. The DM will decide the exact result of the spell, based on the creature called, the desires of the caster and the needs of the moment. The being gated in either returns immediately or remains to take action. Casting this spell ages the priest five years.'
 };
 
+pri7['Unholy Word (Reverse of Holy Word)'] =
 pri7['Holy Word'] = {
     'level': '7',
     'school': 'Conjuration/Summoning (Reversible)',
@@ -3203,6 +3305,7 @@ pri7['Holy Word'] = {
     'effect': 'Uttering a *holy word* spell creates magic of tremendous power. It drives off evil creatures from other planes, forcing them to return to their own planes of existence, provided the speaker is in his home plane. Creatures so banished cannot return for at least a day. The spell further affects creatures of differing alignment as shown on the table below:}}{{style=fixed2 sheet-spell-fixed5 sheet-spell-bottom3 sheet-spell-bottom4 sheet-spell-bottom5 sheet-spell-center3 sheet-spell-center4 sheet-spell-center5}}{{c1-1=**Effects of Holy Word**\n&emsp;}}{{cs1-1=5}}{{cc1-1=center}}{{c2-1=**Creature’s**\n**Hit Dice or Level**}}{{c3-1=Less than 4}}{{c4-1=4 to 7+}}{{c5-1=8 to 11+}}{{c6-1=12 or more}}{{c7-1= }}{{c2-2=**General**}}{{cc2-2=bottom}}{{c3-2=Kills}}{{c4-2=Paralyzes\n1d4 turns}}{{c5-2=Slows\n2d4 rounds}}{{c6-2=Deafens\n1d4 rounds}}{{c7-2= }}{{c2-3=**Attack Move**}}{{c3-3=—}}{{c4-3=—}}{{c5-3=–50%}}{{c6-3=–25%}}{{c7-3= }}{{c2-4=**Dice**}}{{c3-4=—}}{{c4-4=—}}{{c5-4=–4*}}{{c6-4=–2}}{{c7-4= }}{{c2-5=**Spells**}}{{c3-5=—}}{{c4-5=—}}{{c5-5=—}}{{c6-5=50%}}{{c7-5=chance\nof failure}}{{effects2=* Slowed creatures attack only on even-numbered rounds until the effect wears off.\n\n&emsp;Affected creatures are those within the 30-foot-radius area of effect, which is centered on the priest casting the spell. The side effects are negated for deafened or silenced creatures, but such are still driven off if other-planar.\n&emsp;The reverse, *unholy word,* operates exactly the same way but affects creatures of good alignment.'
 };
 
+pri7['Wither (Reverse of Regenerate)'] =
 pri7['Regenerate'] = {
     'level': '7',
     'school': 'Necromancy (Reversible)',
@@ -3244,6 +3347,7 @@ pri7['Reincarnate'] = {
     'effect': 'With this spell, the priest can bring back a dead person in another body, if death occurred no more than one week before the casting of the spell. Reincarnation does not require any saving throw, system shock, or resurrection survival roll. The corpse is touched, and a new incarnation of the person appears in the area in [[1d6]] turns. The person reincarnated recalls the majority of his former life and form, but the character class, if any, of the new incarnation might be very different indeed. The new incarnation is determined on the accompanying table or by DM choice. If a player character race is indicated, the character must be created. At the DM’s option, certain special (expensive) incenses can be used that may increase the chance for a character to return as a specific race or species. A *wish* spell can restore a reincarnated character to its original form and status.\n&emsp;If an unusual creature form is indicated, the DM can (at his option only) use the guidelines for new player character races to allow the character to earn experience and advance in levels, although this may not be in the same class as before. If the reincarnated character returns as a creature eligible to be the same class as he was previously (i.e., a human fighter returns as an elf), the reincarnated character has half his previous levels and hit points. If the character returns as a new character class, his hit points are half his previous total, but he must begin again at 1st level. If the character returns as a creature unable to have a class, he has half the hit points and saving throws of his previous incarnation.}}{{style=center1 sheet-spell-center3}}{{c1-1=**Reincarnated Forms**\n&emsp;}}{{cs1-1=4}}{{c2-1=**D100**\n**Roll**}}{{c3-1=&emsp;}}{{c4-1=01-03}}{{c5-1=04-08}}{{c6-1=09-12}}{{c7-1=13-16}}{{c8-1=17-19}}{{c9-1=20-23}}{{c10-1=24-28}}{{c11-1=29-31}}{{c12-1=32-34}}{{c13-1=35-36}}{{c14-1=37-40}}{{c2-2=**Incarnation**}}{{cc2-2=bottom}}{{c4-2=Badger}}{{c5-2=Bear, black}}{{c6-2=Bear, brown}}{{c7-2=Boar, wild}}{{c8-2=Centaur}}{{c9-2=Dryad}}{{c10-2=Eagle}}{{c11-2=Elf}}{{c12-2=Faun/satyr}}{{c13-2=Fox}}{{c14-2=Gnome}}{{c2-3=**D100**\n**Roll**}}{{c4-3=41-44}}{{c5-3=45-58}}{{c6-3=59-61}}{{c7-3=62-64}}{{c8-3=65-68}}{{c9-3=69-70}}{{c10-3=71-75}}{{c11-3=76-80}}{{c12-3=81-85}}{{c13-3=86-00}}{{c2-4=**Incarnation**}}{{cc2-4=bottom}}{{c4-4=Hawk}}{{c5-4=Human}}{{c6-4=Lynx}}{{c7-4=Owl}}{{c8-4=Pixie}}{{c9-4=Raccoon}}{{c10-4=Stag}}{{c11-4=Wolf}}{{c12-4=Wolverine}}{{c13-4=DM’s choice'
 };
 
+pri7['Energy Drain (Reverse of Restoration)'] =
 pri7['Restoration'] = {
     'level': '7',
     'school': 'Necromancy (Reversible)',
@@ -3263,6 +3367,7 @@ pri7['Restoration'] = {
     'effect': 'When this spell is cast, the life energy level of the recipient creature is raised by one. This reverses any previous life energy level drain of the creature by a force or monster. Thus, if a 10th-level character had been struck by a wight and drained to 9th level, the *restoration* spell would bring the character up to exactly the number of experience points necessary to restore him to 10th level once again, restoring additional Hit Dice (or hit points) and level functions accordingly. Restoration is effective only if the spell is cast within one day of the recipient’s loss of life energy, per experience level of the priest casting it. Currently [[@{level-priest}]] days. A *restoration* spell restores the intelligence of a creature affected by a *feeblemind* spell. It also negates all forms of insanity. Casting this spell ages both the caster and the recipient by two years.\n&emsp;The reverse, *energy drain,* draws away one life energy level (see such undead as spectre, wight, and vampire, in the MONSTROUS MANUAL). The energy drain requires the victim to be touched. Casting this form of the spell does not age the caster.'
 };
 
+pri7['Destruction (Reverse of Resurrection)'] =
 pri7['Resurrection'] = {
     'level': '7',
     'school': 'Necromancy (Reversible)',
@@ -3282,6 +3387,7 @@ pri7['Resurrection'] = {
     'effect': 'The priest is able to restore life and complete strength to any living creature, including elves, by bestowing the *resurrection* spell. The creature can have been dead up to 10 years per level of the priest casting the spell. Currently [[10*[[@{level-priest}]] ]] years. Thus, a 19th-level priest can resurrect the bones of a creature dead up to 190 years. The creature, upon surviving a resurrection survival check, is immediately restored to full hit points and can perform strenuous activity. The spell cannot bring back a creature that has reached its allotted life span (i.e., died of natural causes). Casting this spell makes it impossible for the priest to cast further spells or engage in combat until he has had one day of bed rest for each experience level or Hit Die of the creature brought back to life. The caster ages three years upon casting this spell.\n&emsp;The reverse, *destruction,* causes the victim of the spell to be instantly dead and turned to dust. A *wish* spell or equivalent is required for recovery. Destruction requires a touch, either in combat or otherwise, and does not age the caster. In addition, the victim is allowed a saving throw (with a -4 penalty). If the save is successful, the victim receives 8d6 points of damage instead.\n&emsp;The DM may reduce the chances of successful resurrection if little of the creature’s remains are available.\n&emsp;The DM may reduce the chances of successful resurrection if little of the creature’s remains are available.'
 };
 
+pri7['Succor Reverse'] =
 pri7['Succor'] = {
     'level': '7',
     'school': 'Alteration, Enchantment (Reversible)',
@@ -3608,6 +3714,7 @@ pri1['Personal Reading'] = {
     'effect': 'This spell allows the priest to mathematically analyze personal information about one human or demihuman character and learn valuable facts about that character. To cast this spell, the priest must know the subject’s real name (the name the subject was given as a child) or the date and place of the character’s birth. The priest analyzes this information and is able to build a rough picture of the character’s life history and personal specifics.\n&emsp;The “historical” information discovered through this spell is generally vague. For example, the priest might learn that the subject was born in the woods and moved to the city only after hardship made his life untenable. Specific information is up to the DM. The DM might provide some or all of the following information.}}{{style=center1 sheet-spell-min1}}{{c1-1=•}}{{c2-1=•}}{{c3-1=•}}{{c4-1=•}}{{c5-1=•}}{{c1-2=The subject’s character class or career}}{{c2-2=The subject’s approximate level (stated in terms such as “novice,” “highly skilled,” “moderately competent,” etc.)}}{{c3-2=The subject’s standing in the community (“highly respected,” “mistrusted,” “considered an enigma,” etc.)}}{{c4-2=The subject’s success or failure in his profession}}{{c5-2=The subject’s prevailing character traits or mannerisms}}{{effects2=&emsp;If the priest casts the spell based on an alias or incorrect birth information, the reading will be inaccurate. The DM should develop a history and personality at odds with the truth. This might allow the priest to determine whether the name of the subject is correct—a reading giving information that conflicts with what the priest already knows should be a clue that the name is incorrect.\n&emsp;The subject need not be present during the casting. The priest can cast the spell without ever having met the subject.\n&emsp;A DM may rule that this spell can be cast on humanoids or monstrous creatures. The information available will be similar (considering that words like “profession” will mean something different when applied to an ogre). This spell will categorically fail on creatures that have no concept of a personal name.'
 };
 
+pri1['Ring of Woe (Reverse of Ring of Hands)'] =
 pri1['Ring of Hands'] = {
     'level': '1',
     'school': 'Abjuration (Reversible)',
@@ -4008,6 +4115,7 @@ pri2['Rally'] = {
     'effect': 'This spell allows the subject unit to make an immediate rally check. It allows the check during the Magic Phase, rather than forcing the unit to wait for the Rally Phase in the BATTLESYSTEM rules. If the priest casting the spell is of 12th level or higher, the subject unit receives a +1 bonus to its rally check die roll. The priest must have an uninterrupted line of sight to the unit.'
 };
 
+pri2['Defile (Reverse of Sanctify)'] =
 pri2['Sanctify'] = {
     'level': '2',
     'school': 'Conjuration/Summoning (Reversible)',
@@ -4141,6 +4249,7 @@ pri3['Choose Future'] = {
     'effect': 'In the round immediately following the casting of this spell, the affected creature is allowed two rolls for any normal attack roll, initiative roll, or saving throw. The affected creature can then choose the roll he prefers.\n&emsp;For example, a priest casts *choose future* on a warrior companion. In the next round, the warrior attacks an enemy with his sword. The warrior makes two attack rolls instead of one, then chooses which roll will determine the outcome of his attack.'
 };
 
+pri3['Break Camp (Reverse of Create Campsite)'] =
 pri3['Create Campsite'] = {
     'level': '3',
     'school': 'Conjuration/Summoning (Reversible)',
@@ -4274,6 +4383,7 @@ pri3['Know Customs'] = {
     'effect': 'This spell allows a caster to gain general knowledge of the customs, laws, and social etiquette of a tribe or village. The caster must be within 30 yards of a member of the tribe or village for the spell to have effect. The selected villager must possess the knowledge sought by the caster; for instance, he cannot be an infant, nor can he be mentally unstable or dead (although he can be asleep or unconscious).\n&emsp;The selected villager is allowed a saving throw; if he succeeds, the spell fails.\n&emsp;If the saving throw fails, the caster gains a general knowledge of the villager’s local laws and customs, including those that apply to relevant tribal or clan types (such as customs observed by all giants). Typical information revealed by *know customs* includes common courtesies (outsiders must avert their eyes when addressing local officials), local restrictions (no animals or unaccompanied elves within the city limits), important festivals, and common passwords that are known by the majority of citizens (such as a phrase necessary to pass the guards at the main gate). Additionally, the spell gives the caster a +1 reaction adjustment to encounters with members of the relevant tribe or village.\n&emsp;Knowing the local laws and customs does not guarantee that the caster will conduct himself properly. *Know customs* is to be used as a guide; the DM is free to adjust the quality of information provided by a villager.'
 };
 
+pri3['Line of Destruction (Reverse of Line of Protection)'] =
 pri3['Line of Protection'] = {
     'level': '3',
     'school': 'Abjuration (Reversible)',
@@ -4350,7 +4460,6 @@ pri3['Moment Reading'] = {
     'effect': 'This spell allows the priest to determine the “tenor of the now”—in other words, to learn the “force” that is most dominant at the time. To cast the spell, the priest generates a series of random numbers and then studies the pattern contained in that string of numbers. This pattern contains information about current conditions.\n&emsp;In game terms, when this spell is cast, the DM communicates to the priest’s player a single word or short phrase (no more than five words) describing the “tone” of the situation. Examples of suitable “tones” are “imminent danger” (the DM knows a dragon is approaching the area); “peace and tranquility” (the woods in which the PCs camp may look threatening, but the area is actually free of evil influence); or “betrayal” (one of the PCs’ hirelings is actually a spy of their enemy). The DM can make this comment cryptic, but it should always be accurate and contain some useful information.\n&emsp;This spell has no specified area of effect. The result of *moment reading* will always concern the priest and anyone else in his immediate vicinity, but the definition of “vicinity” will vary depending on the circumstances. For example, the tenor of the moment might be “severe danger” if the priest is entering the territory of a dragon who attacks interlopers on sight.\n&emsp;The tenor of the moment is always personally applicable to the priest. For example, even if the priest is in a nation dangerously close to war with its neighbor, this condition will not appear in the tenor of the moment unless the priest is personally involved (if he’s currently in the direct path of an invading army, for instance).\n&emsp;One casting of this spell tends to “taint” subsequent castings of the same spell unless they are separated by a minimum length of time. If a priest casts this spell twice within 12 hours, the second reading gives the same result as the first, regardless of the actual situation. If a second priest casts the spell within 12 hours of another priest’s use of the spell, he receives an accurate reading.'
 };
 
-// Updated by Sage Advice #247
 pri3['Random Causality'] = {
     'level': '3',
     'school': 'Alteration',
@@ -4364,6 +4473,7 @@ pri3['Random Causality'] = {
     'materials': 'A bronze die.',
     'reference': 'p. 69',
     'book': 'Tome of Magic',
+    'errata': 'Sage Advice #247 p. 20',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -4848,6 +4958,7 @@ pri4['Join With Astral Traveler'] = {
     'effect': 'When a priest casts the 7th-level *astral spell*, he leaves his physical body in suspended animation while his astral body travels. By touching the comatose body and casting *join with astral traveler*, a priest can cause his own astral body to leave his physical body in suspended animation. His astral body then travels along the silver cord of the originally projected priest. The caster joins the projected priest as if he were part of the original casting of the *astral spell*; i.e., his own silver cord is connected to the priest’s silver cord, and he is dependent upon the originally projected priest.\n&emsp;A priest who casts the 7th-level *astral spell* can project as many as seven other creatures along with himself. However, priests casting *join with astral traveler* are an exception to this limit. Any number of priests may join another priest in the Astral plane by use of this spell.'
 };
 
+pri4['Doubt (Reverse of Leadership)'] =
 pri4['Leadership'] = {
     'level': '4',
     'school': 'Enchantment/Charm, Alteration (Reversible)',
@@ -4963,6 +5074,7 @@ pri4['Solipsism'] = {
     'effect': 'This unusual spell is similar to *phantasmal force* and other illusion magic, except that the priest who casts the spell is the only creature who automatically believes the results of the spell. The spell creates the illusion of any object, creature, or force, as long as it is within the boundaries of the spell’s area of effect. The illusion is visual and tactile (that is, it can be seen and felt), but no other sensory stimuli are created.\n&emsp;*Solipsism* is the opposite of normal illusions in that anyone other than the caster must make an active effort to *believe* (rather than *dis*believe) the illusion. Characters trying to believe the reality of a solipsistic illusion must make a saving throw vs. breath weapon, modified by the magical defense adjustment for Wisdom. A successful save means that the character believes the illusion and it is part of reality for him. A failed save means that the character cannot convince himself of the illusion’s reality, and the illusion has no effect on him. A character can make a single attempt to believe each round.\n&emsp;Unlike true illusions, the image created by this spell does more than just duplicate reality. The image formed is *real* for those who believe in it. The illusion has all the normal properties that its form and function allow. Thus, a solipsistic bridge spanning a chasm could be crossed by the priest and those who believed. All others would see the priest apparently walking out onto nothingness. Likewise, a solipsistic giant would cause real damage to those who believed it.\n&emsp;The illusion remains in effect for as long as the priest continues to concentrate on it, until the priest is struck in combat, or until he is rendered unconscious. The level of concentration required is not extreme; the priest can move normally and may engage in combat, but is unable to cast any spell while maintaining a *solipsistic* illusion.\n&emsp;*Solipsism* can create only illusions that are external to the priest. Thus, the priest cannot create an illusion that he is the size of a giant, is unwounded, or has sprouted wings.'
 };
 
+pri4['Selective Passage (Reverse of Tanglefoot)'] =
 pri4['Tanglefoot'] = {
     'level': '4',
     'school': 'Alteration, Abjuration (Reversible)',
@@ -5058,6 +5170,7 @@ pri4['Weather Stasis'] = {
     'effect': '*Weather stasis* maintains the weather conditions prevalent in the area of effect when the spell is cast. The spell affects a cube whose sides equal the caster’s level times 10 feet (a 10th-level caster could affect a 100’ ✕ 100’ ✕ 100’ cube).\n&emsp;An area protected by *weather stasis* is unaffected by temperature variations in the surrounding environment. The spell also acts as a shield against rain, snow, and hail, which cannot enter the protected area. If conditions of precipitation existed in the area of effect when the spell was cast, the identical weather will continue for the duration of the spell.\n&emsp;For example, *weather stasis* is cast in an area where the temperature is 75° F. (24° C) and no precipitation is falling. Half an hour later, the temperature drops to 60 degrees and rain begins to fall. The protected area remains dry and the temperature stays at 75 degrees. If the spell had been cast while rain was falling in the area of effect, rain would continue to fall for the duration of the spell, even after it stopped raining in the surrounding area.\n&emsp;All physical objects other than rain, snow, and hail can pass into the protected area. All creatures and characters can move freely into and out of the area. The spell does not prevent water-based spells or water-based creatures (such as water elementals) from operating in the area.\n&emsp;The spell protects against both natural and magically generated weather. Night and day pass normally in the protected area, although temperature variations associated with night and day do not occur.'
 };
 
+pri5['Youthful Object (Reverse of Age Object)'] =
 pri5['Age Object'] = {
     'level': '5',
     'school': 'Alteration (Reversible)',
@@ -5153,6 +5266,7 @@ pri5['Chaotic Commands'] = {
     'effect': '*Chaotic commands* renders a creature immune to magical commands. *Taunt, forget, suggestion, domination, geas, demand, succor, command, enthrall, quest, exaction*, and other spells that place a direct verbal command upon a single individual automatically fail.\n&emsp;In addition, anyone casting one of these spells on a creature protected by *chaotic commands* must save vs. spell. Failure means that the caster must obey his own magic; the spell’s effect has backfired on the caster.'
 };
 
+pri5['Clutter Path (Reverse of Clear Path)'] =
 pri5['Clear Path'] = {
     'level': '5',
     'school': 'Alteration (Reversible)',
@@ -5538,6 +5652,7 @@ pri5['Undead Ward'] = {
     'effect': 'This spell prevents most types of undead creatures from entering the area of effect (a cube whose sides equal the caster’s level times 5 feet—a 15th-level caster could affect a cube whose sides equal 75 feet).\n&emsp;When an undead creature attempts to enter the protected area, the creature is affected by the ward as if it were being turned by a priest two levels lower than the caster. Currently level [[ [[@{level-priest}]]-2]]. The casting priest need not have the ability to turn undead himself. Thus, an *undead ward* created by a 10th-level priest would turn creatures as if by an 8th-level priest.\n&emsp;The results of the turning attempt are calculated normally. If a large number of undead assault the warded area, not all of them are turned by the spell, since the normal limitations apply. Undead who are unaffected by the turning attempt ignore the *undead ward* for its duration. Undead within the area of effect when the spell is cast are not affected. However, when such undead leave the area of effect, they are subject to the effects of the spell if they attempt to reenter.'
 };
 
+pri6['Restore Youth (Reverse of Age Creature)'] =
 pri6['Age Creature'] = {
     'level': '6',
     'school': 'Alteration (Reversible)',
@@ -5633,6 +5748,7 @@ pri6['Gravity Variation'] = {
     'effect': 'This spell changes the characteristics of a square region of terrain. The area can be no more than 120 yards on a side. The priest can effectively turn a flat plain into a slope of any direction, or may flatten an existing slope. The spell does not allow the priest to alter the pull of gravity, however.\n&emsp;This spell lets the priest create or negate a height differential of as much as 20 feet (a 2” slope in BATTLESYSTEM rules measurements) within the area of effect. This can have various consequences; the best way to discuss the effects is by example.\n&emsp;**Example 1:** Two units face each other on a flat plain. The priest can alter the slope of the terrain so that one unit is 2” of elevation higher than the other. The unit that is upslope gains the combat benefits for higher ground, and the unit that is downslope must pay the movement cost for moving uphill if it wishes to approach the other unit.\n&emsp;**Example 2:** One unit is on flat terrain; another unit, 6” away, is on a hill of 2” elevation. Using this spell, the priest can effectively eliminate this difference in elevation (raising the low ground or lowering the high ground). All combat and movement involving these two units is then conducted as if there were no elevation difference (i.e., no movement penalty, no combat benefit for higher ground, etc.). Alternatively, the priest could *increase* the height differential by 2”. Combat and movement would now be conducted as if the total difference in elevation were 4”.\n&emsp;**Example 3:** A unit faces a hill of 3” elevation. The priest casts *gravity variation*, decreasing the effective elevation of the hill to 1”. The unit pays a lower movement point cost to climb the hill. Alternatively, if the unit facing the hill were an enemy unit, the priest could increase the effective elevation to 5”.\n\n&emsp;The priest must specify the degree and direction of change at the moment of casting. These parameters cannot be changed while the spell remains in effect.\n&emsp;*Gravity variation* can have dramatic effects on siege engines and towers. Most siege engines can be moved only on the most gentle of slopes. By raising or lowering the effective elevation of siege engines by 2”, the priest can totally immobilize them by positioning them on a slope too steep to negotiate. In the case of siege towers, there is a 50% chance that the structures will topple over (totally destroying them).'
 };
 
+pri6['The Black Circle (Reverse of The Great Circle)'] =
 pri6['The Great Circle'] = {
     'level': '6',
     'school': 'Abjuration (Reversible)',
@@ -5862,6 +5978,7 @@ pri7['Age Dragon'] = {
     'effect': 'This spell allows the caster to cause any dragon to temporarily gain or lose one age level per five levels of the caster. Currently [[floor([[@{level-priest}]]/5)]] age levels. For instance, a 14th-level caster could cause a dragon to gain or lose two age levels; a mature adult dragon could be temporarily transformed into a young adult dragon or into a very old dragon. A dragon’s age cannot be reduced below hatchling or increased beyond great wyrm.\n&emsp;Unwilling dragons are allowed a saving throw vs. spells with a -4 penalty to avoid the effect.\n&emsp;A dragon affected by *age dragon* temporarily acquires the armor class, hit points, spell abilities, combat modifiers, size, and other attributes of his new age level. The dragon retains his memories and personality. At the end of the spell’s duration, the dragon returns to his normal age level.\n&emsp;If the dragon suffered damage while experiencing his modified age, these hit points remain lost when he resumes his normal age. If the dragon loses more hit points at his modified age than he has at his actual age, he dies when the spell expires. For example, a young adult bronze dragon with 110 hit points is aged to a mature adult with 120 hit points. The dragon suffers 115 hit points in combat. Unless the dragon is healed of 6 points of damage before the spell expires, the dragon dies at the end of the spell since his damage is greater than his actual hit points.\n&emsp;If a dragon is killed while under the effect of *age dragon*, he is dead at the end of the spell’s duration.'
 };
 
+pri7['Breath of Death (Reverse of Breath of Life)'] =
 pri7['Breath of Life'] = {
     'level': '7',
     'school': 'Necromantic (Reversible)',
@@ -6081,7 +6198,7 @@ priq['Abundance'] = {
     'range': '0',
     'duration': 'Permanent',
     'aoe': 'Special',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 turn',
     'saving-throw': 'None',
     'materials': '',
@@ -6100,7 +6217,7 @@ priq['Animal Horde'] = {
     'range': '0',
     'duration': '1 day',
     'aoe': '10-mile radius',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 turn',
     'saving-throw': 'None',
     'materials': '',
@@ -6119,7 +6236,7 @@ priq['Circle of Sunmotes'] = {
     'range': '200 yards',
     'duration': '3 turns',
     'aoe': '60-foot-radius hemisphere',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'None',
     'materials': '',
@@ -6138,7 +6255,7 @@ priq['Conformance'] = {
     'range': '0',
     'duration': '6 turns',
     'aoe': '80-foot-diameter sphere',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'None',
     'materials': '',
@@ -6157,7 +6274,7 @@ priq['Elemental Swarm'] = {
     'range': '240 yards',
     'duration': '6 turns',
     'aoe': 'Special',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '3 turns',
     'saving-throw': 'None',
     'materials': '',
@@ -6176,7 +6293,7 @@ priq['Etherwalk'] = {
     'range': 'Special',
     'duration': 'Special',
     'aoe': 'Special',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '5 rounds',
     'saving-throw': 'Negate',
     'materials': '',
@@ -6195,7 +6312,7 @@ priq['Fear Contagion'] = {
     'range': '240 yards',
     'duration': 'Special',
     'aoe': 'Special',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'Special',
     'materials': '',
@@ -6214,7 +6331,7 @@ priq['Health Blessing'] = {
     'range': '100 yards',
     'duration': '[[@{level-priest}]] days',
     'aoe': '50 creatures',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'None',
     'materials': '',
@@ -6233,7 +6350,7 @@ priq['Highway'] = {
     'range': '0',
     'duration': '1 day',
     'aoe': '1,000 square yards',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 turn',
     'saving-throw': 'None',
     'materials': '',
@@ -6252,7 +6369,7 @@ priq['Imago Interrogation'] = {
     'range': '0',
     'duration': 'Special',
     'aoe': 'The caster',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 turn',
     'saving-throw': 'None',
     'materials': '',
@@ -6271,7 +6388,7 @@ priq['Implosion/Inversion'] = {
     'range': '120 yards',
     'duration': 'Special',
     'aoe': 'One or more creatures',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'Negate',
     'materials': '',
@@ -6290,7 +6407,7 @@ priq['Interdiction'] = {
     'range': '240 yards',
     'duration': '1 day',
     'aoe': '[[200*[[@{level-priest}]] ]]-foot cube',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '2 turns',
     'saving-throw': 'Special',
     'materials': '',
@@ -6309,7 +6426,7 @@ priq['Mindnet'] = {
     'range': '0',
     'duration': '12 turns',
     'aoe': 'Special',
-    'components': '',
+    'components': 'V, S',
     'cast-time': 'Special',
     'saving-throw': 'Special',
     'materials': '',
@@ -6328,7 +6445,7 @@ priq['Planar Quest'] = {
     'range': 'Touch',
     'duration': 'Special',
     'aoe': 'Special',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '5 rounds',
     'saving-throw': 'Negate',
     'materials': '',
@@ -6347,7 +6464,7 @@ priq['Preservation'] = {
     'range': '480 yards',
     'duration': 'Special',
     'aoe': 'One structure',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 turn',
     'saving-throw': 'None',
     'materials': '',
@@ -6366,7 +6483,7 @@ priq['Revelation'] = {
     'range': 'Special',
     'duration': '1 day',
     'aoe': 'Special',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 turn',
     'saving-throw': 'None',
     'materials': '',
@@ -6385,7 +6502,7 @@ priq['Reversion'] = {
     'range': '0',
     'duration': 'Instantaneous',
     'aoe': '10-foot-radius sphere',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1',
     'saving-throw': 'None',
     'materials': '',
@@ -6404,7 +6521,7 @@ priq['Robe of Healing'] = {
     'range': 'Touch',
     'duration': '1 hour',
     'aoe': 'One robe',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'None',
     'materials': '',
@@ -6423,7 +6540,7 @@ priq['Siege Wall'] = {
     'range': '480 yards',
     'duration': 'Special',
     'aoe': 'One building',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 turn',
     'saving-throw': 'None',
     'materials': '',
@@ -6442,7 +6559,7 @@ priq['Shooting Stars'] = {
     'range': '120 yards',
     'duration': 'Instantaneous',
     'aoe': '40-yard radius',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': '½',
     'materials': '',
@@ -6461,7 +6578,7 @@ priq['Sphere of Security'] = {
     'range': '0',
     'duration': '6 turns',
     'aoe': '10-foot-radius sphere',
-    'components': '',
+    'components': 'V, S',
     'cast-time': 'Special',
     'saving-throw': 'None',
     'materials': '',
@@ -6480,7 +6597,7 @@ priq['Spiral of Degeneration'] = {
     'range': '0',
     'duration': '6 turns',
     'aoe': '50-foot-diameter sphere',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'Special',
     'materials': '',
@@ -6499,7 +6616,7 @@ priq['Stalker'] = {
     'range': '30 yards',
     'duration': 'Special',
     'aoe': 'Special',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'None',
     'materials': '',
@@ -6518,7 +6635,7 @@ priq['Storm of Vengeance'] = {
     'range': '400 yards',
     'duration': '1 turn',
     'aoe': '120-yard radius circle',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 turn',
     'saving-throw': 'Special',
     'materials': '',
@@ -6537,7 +6654,7 @@ priq['Transformation'] = {
     'range': '0',
     'duration': '3 turns',
     'aoe': '100-yard-radius sphere',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'None',
     'materials': '',
@@ -6556,7 +6673,7 @@ priq['Undead Plague'] = {
     'range': '1 mile',
     'duration': 'Special',
     'aoe': '100-yard square/level',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '2 rounds',
     'saving-throw': 'None',
     'materials': '',
@@ -6575,7 +6692,7 @@ priq['Warband Quest'] = {
     'range': '240 yards',
     'duration': 'Special',
     'aoe': '200 creatures',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'Negate',
     'materials': '',
@@ -6594,7 +6711,7 @@ priq['Ward Matrix'] = {
     'range': 'Special',
     'duration': '60 days',
     'aoe': 'Special',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '6 turns',
     'saving-throw': 'None',
     'materials': '',
@@ -6613,7 +6730,7 @@ priq['Wolf Spirits'] = {
     'range': '30 yards',
     'duration': 'Special',
     'aoe': 'Special',
-    'components': '',
+    'components': 'V, S',
     'cast-time': '2 turns',
     'saving-throw': 'None',
     'materials': '',
@@ -6744,6 +6861,7 @@ pri2['Animal Eyes'] = {
     'effect': 'By using this spell, the caster can temporarily see through the eyes of any animal. The caster points at any single animal within 100 yards, then closes his eyes and remains stationary. In his mind’s eye, he sees whatever the animal is seeing. If the subject animal is a squirrel studying the party from a tree branch, the caster sees himself and the party from the perspective of the squirrel. If the subject animal is a bird soaring overhead, the caster gets a bird’s eye view of the area below.\n&emsp;The spell has no effect on the subject animal, nor can the caster control the animal’s actions in any way. The animal is unaware of the spell and acts as it normally would. The spell persists until the end of its duration, or the caster moves or takes another action. The caster may voluntarily negate the spell by opening his eyes. The spell also ends if the animal is killed, or moves more than 100 yards away from the caster.\n&emsp;The subject animal must be one normally found in nature. It may not be supernatural, human, demihuman, nor of extraplanar origin.'
 };
 
+pri2['Obscure Follower (Reverse of Locate Animal Follower)'] =
 pri2['Locate Animal Follower'] = {
     'level': '2',
     'school': 'Divination (Reversible)',
@@ -7414,6 +7532,7 @@ pri3['Life Drain'] = {
     'effect': 'By casting this spell and touching another individual, a priest may fortify another’s life force at the expense of a victim. This spell enables the priest to drain 1–8 hit points plus 1 hp per level of the caster from a living creature. The priest may immediately bestow the hit points on him- or herself, or transfer them to another individual within 1–4 rounds of the casting. The stolen hit points can increase those of the recipient beyond the normal maximum, and these extra hit points only last for up to one turn per the caster’s level. Currently [[@{level-priest}]] turns. Any damage suffered by the subject is first subtracted from these additional hit points.\n&emsp;Though predominantly employed by evil priests at the expense of innocents, the spell may be used by those of noble intent, but only if all participants act of their own accord. However, if the victim (the donor of the life force) is unwilling, a saving throw indicates that the spell was partially resisted and only half the hit points were drained. Undead can neither benefit nor be harmed by *life draining*. It is possible, however, for an undead priest to drain hit points from a victim and bestow them on a living ally.'
 };
 
+pri3['Spirit Release (Reverse of Spirit Bind)'] =
 pri3['Spirit Bind'] = {
     'level': '3',
     'school': 'Necromancy (Reversible)',
@@ -7433,6 +7552,7 @@ pri3['Spirit Bind'] = {
     'effect': 'When cast near the corpse of a newly dead individual, this spell binds an individual’s life force to its physical remains, preventing a spirit’s departure to the afterlife. The (presumably unwilling) spirit of the deceased is entitled to a saving throw vs. spells to resist the effect (made as if still alive), modified by a –1 penalty for every three levels of experience past the 1st of the priest (–2 penalty at 7th level, –3 at 10th level, to a maximum of –6 at 19th level). Currently [[{ceil(([[@{level-priest}]]-1)/-3),-6}kh1]].\n&emsp;*Spirit bind* must be cast on the body of the deceased within one round of the individuals’ death, for every level of experience of the caster. Currently within [[@{level-priest}]] rounds. Thus a 10th-level priest may bind the spirit of an individual who was dead for up to a turn. If successful, the *spirit bound* corpse takes on a pale silvery or mauve radiance. Normal animals and even monsters of low intelligence will involuntarily shun this necromantic aura.\n&emsp;While under the effect of this spell, a cadaver becomes immune to the normal effects of rot and decay. *Spirit bind* may thus be employed to preserve a body for a subsequent *raising* or *resurrection*, for which the spirit bound individual is considered to have been dead for less than a day. Furthermore, because of the strong, necromantic link already forged between the spirit and the body, the victim receives a –10% bonus on his or her system shock roll.\n&emsp;However, this spell is more often put to much darker ends by death priests. Note that, for the deceased, being *spirit bound* is not a pleasant experience. The spirit may not be aware of its current location or the passage of time (or so good-aligned priests who employ this spell may like to think), but it is most certainly aware of being trapped or constrained. Once *bound* to its body, a spirit is much easier to coerce with threats of permanent imprisonment and to interrogate with *speak with dead* spells. Some sages speculate *spirit bind* may be also involved in the loathsome creation of a flesh golem.\n&emsp;While immune to normal decay and dissolution (and the ravaging of animals and dumb monsters), the *spirit bound* corpse is in no way protected from destruction by a sentient creature or individual. Should its body be destroyed, the spirit instead becomes *bound* to the last area resided by the physical remains. Such a restless, quasi-liberated spirit might become a non-corporeal undead (such as an apparition, banshee, haunt, poltergeist, wraith, ghost, or spectre). A spirit imprisoned in this manner may only be released by casting the reverse of this spell (see below) or *dispel evil* (*dispel magic* and *reverse curse* are ineffective). Because of the considerable dangers for the subject and moral quandaries involved, good-aligned priests are naturally reluctant to employ *spirit bind* except in the most dire emergencies.\n&emsp;The reverse of this spell, *spirit release*, severs a spirit’s ties with the material world and is a common practice at formal funerals. Unwilling, non-corporeal undead are entitled to a saving throw to resist the spell’s effects, subject to the same penalties as outlined for *spirit bind*. If failed, the undead spirit departs for the outer planes and is effectively dispersed. Note that neither version of this spell affects corporeal undead (such as ghouls, liches, and vampires), nor do they affect extraplanar creatures.'
 };
 
+pri4['Cure Insanity (Reverse of Cause Insanity)'] =
 pri4['Cause Insanity'] = {
     'level': '4',
     'school': 'Necromancy (Reversible)',
@@ -7528,6 +7648,7 @@ pri5['Scourge'] = {
     'effect': 'This nasty spell causes a major disease and weakness in victims who fail a saving throw vs. spells at a -3 penalty. Afflicted individuals are immediately stricken with a sickening *scourge* that quickly spreads to cover their entire bodies. The blackened boils, magenta blotches, violet lesions, seeping abscesses, and malignant cysts are excruciatingly painful, and highly debilitating.\n&emsp;In the short term, the Strength, Dexterity, and Charisma of each victim are reduced by 3. Attack rolls are similarly decreased by 3. The agonizing symptoms persist until a victim receives a *cure disease*, *heal*, or *restoration* spell bestowed by a more powerful priest than the original caster. *Dispel magic* and *remove curse* are powerless to mediate the symptoms of a *scourge*, but a *wish* will eradicate the infection immediately.\n&emsp;A *scourge* may also lead to a long-term, debilitating illness. Those ignoring the malignant disease resulting from the spell’s effects for more than a few days may be susceptible to much worse afflictions (such as gangrene, plague, or leprosy) that ultimately result in the victim’s untimely death within 1–4 weeks.\n&emsp;Furthermore, if a victim of the spell enters an area of dense population, there is always a chance that the disease may spread (1% per caster level, currently [[@{level-priest}]]%) into an epidemic of massive proportions. These long-term effects of the *scourge* are left to the discretion of the DM.\n&emsp;Because of its horrific affect, *scourge* is typically only granted to high priests of a malignant and evil god who is dedicated to spreading death and disease.'
 };
 
+pri5['Drain Undead (Reverse of Undead Regeneration)'] =
 pri5['Undead Regeneration'] = {
     'level': '5',
     'school': 'Necromancy (Reversible)',
@@ -7780,7 +7901,7 @@ pri1['Orison'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The most humble of priestly spells is the *orison*, a brief prayer or invocation of a minor nature. Typically, priests learn a number of *orisons* as acolytes or students in order to hone their spellcasting skills and emphasize concepts, ideals, or phrases of particular importance to the faith. Because an *orison*s is not even on par with other 1st-level magic, a priest memorizes a number of individual *orisons* equal to three +1 per level (up to a maximum of nine) when he devotes a 1st-level spell slot to *orison*. Currently [[{3+[[@{level-priest}]],9}kl1]]. In other words, a 1st-level priest can memorize four *orisons* for one 1st-level spell slot, a 2nd-level priest can memorize five, and so on.\n&emsp;Unlike cantrip, an *orison* must have a specific effect, although the priest need not decide which incantation he will use until he actually casts the spell. Regardless of the prayer chosen, the *orison’s* duration is never more than one round per level. Currently [[@{level-priest}]] rounds. Known *orisons* include the following:}}{{style=min1}}{{c1-2=**•**}}{{c2-2=**•**}}{{c3-2=**•**}}{{c4-2=**•**}}{{c5-2=**•**}}{{c6-2=**•**}}{{c7-2=**•**}}{{c8-2=**•**}}{{c9-2=**•**}}{{c10-2=**•**}}{{c1-1=**Alleviate:** A single creature suffering from nausea or pain is relieved of its discomfort. Magically induced nausea or pain is only alleviated if the victim passes a saving throw vs. spell with a –2 penalty.}}{{c2-1=**Calm:** A single creature that has been startled or frightened is soothed. Victims suffering from magical fear may attempt a save vs. spell with a –2 penalty to calm themselves.}}{{c3-1=**Clarity:** For the duration of the orison, the priest’s speech is clear and free of impediment—useful for readings from sacred texts and other such rites. Magical conditions such as *confuse languages* cannot be overcome by this *orison*.}}{{c4-1=**Courage:** The priest gains a +1 bonus to his next attack roll, as long as the attack is made within the spell’s duration.}}{{c5-1=**Guidance:** The priest gains a +1 bonus to a Wisdom or Intelligence check to determine the right course of action in a moral dilemma or puzzle.}}{{c6-1=**Healing:** By his touch, the priest may heal a creature of 1 point of damage.}}{{c7-1=**Magic sense:** If there is a persistent spell effect or magical item within 10 yards, the priest feels a recognizable tingle or sensation of some kind. He has no way to determine what item or spell may have caused the reaction.}}{{c8-1=**Memory:** Any item the priest commits to memory during the spell duration is more completely and permanently learned; he gains a +2 bonus to any checks to recall the exact appearance, wording, or meaning of an item, text, or message.}}{{c9-1=**Resistance to magic:** The caster gains a +1 bonus to his next saving throw against magic of any type, as long as it occurs during the *orison’s* duration.}}{{c10-1=**Resistance to poison:** The priest gains a +1 bonus to his next saving throw vs. poison, as long as it occurs during the *orison’s* duration.}}{{effects2=&emsp;Other *orison*s of similar power or scope may be permitted by the DM. Generally, an *orison* should not affect more than one creature or die roll at a time, and an *orison* that can actually cause immediate harm to a creature should inflict no more than 1 or 2 points of damage. An offensive *orison* would be quite rare and most probably associated with an evil or chaotic priesthood.'
+    'effect': 'The most humble of priestly spells is the *orison*, a brief prayer or invocation of a minor nature. Typically, priests learn a number of *orisons* as acolytes or students in order to hone their spellcasting skills and emphasize concepts, ideals, or phrases of particular importance to the faith. Because an *orison*s is not even on par with other 1st-level magic, a priest memorizes a number of individual *orisons* equal to three +1 per level (up to a maximum of nine) when he devotes a 1st-level spell slot to *orison*. Currently up to [[{3+[[@{level-priest}]],9}kl1]] *orisons*. In other words, a 1st-level priest can memorize four *orisons* for one 1st-level spell slot, a 2nd-level priest can memorize five, and so on.\n&emsp;Unlike cantrip, an *orison* must have a specific effect, although the priest need not decide which incantation he will use until he actually casts the spell. Regardless of the prayer chosen, the *orison’s* duration is never more than one round per level. Currently up to [[@{level-priest}]] rounds. Known *orisons* include the following:}}{{style=min1}}{{c1-1=**•**}}{{c2-1=**•**}}{{c3-1=**•**}}{{c4-1=**•**}}{{c5-1=**•**}}{{c6-1=**•**}}{{c7-1=**•**}}{{c8-1=**•**}}{{c9-1=**•**}}{{c10-1=**•**}}{{c1-2=**Alleviate:** A single creature suffering from nausea or pain is relieved of its discomfort. Magically induced nausea or pain is only alleviated if the victim passes a saving throw vs. spell with a –2 penalty.}}{{c2-2=**Calm:** A single creature that has been startled or frightened is soothed. Victims suffering from magical fear may attempt a save vs. spell with a –2 penalty to calm themselves.}}{{c3-2=**Clarity:** For the duration of the orison, the priest’s speech is clear and free of impediment—useful for readings from sacred texts and other such rites. Magical conditions such as *confuse languages* cannot be overcome by this *orison*.}}{{c4-2=**Courage:** The priest gains a +1 bonus to his next attack roll, as long as the attack is made within the spell’s duration.}}{{c5-2=**Guidance:** The priest gains a +1 bonus to a Wisdom or Intelligence check to determine the right course of action in a moral dilemma or puzzle.}}{{c6-2=**Healing:** By his touch, the priest may heal a creature of 1 point of damage.}}{{c7-2=**Magic sense:** If there is a persistent spell effect or magical item within 10 yards, the priest feels a recognizable tingle or sensation of some kind. He has no way to determine what item or spell may have caused the reaction.}}{{c8-2=**Memory:** Any item the priest commits to memory during the spell duration is more completely and permanently learned; he gains a +2 bonus to any checks to recall the exact appearance, wording, or meaning of an item, text, or message.}}{{c9-2=**Resistance to magic:** The caster gains a +1 bonus to his next saving throw against magic of any type, as long as it occurs during the *orison’s* duration.}}{{c10-2=**Resistance to poison:** The priest gains a +1 bonus to his next saving throw vs. poison, as long as it occurs during the *orison’s* duration.}}{{effects2=&emsp;Other *orison*s of similar power or scope may be permitted by the DM. Generally, an *orison* should not affect more than one creature or die roll at a time, and an *orison* that can actually cause immediate harm to a creature should inflict no more than 1 or 2 points of damage. An offensive *orison* would be quite rare and most probably associated with an evil or chaotic priesthood.'
 };
 pri1['Protection from Chaos'] = {
     'level': '1',
@@ -7914,6 +8035,7 @@ pri2['Chaos Ward'] = {
     'healing': '',
     'effect': 'By using this spell, the priest can create a shimmering aura of whirling light that surrounds the chosen creature. This protective aura makes the spell recipient more difficult to hit in hand-to-hand combat by providing a –1 bonus to the subject’s Armor Class. Against missile attacks or ranged spells aimed directly at the recipient, the *chaos ward* is even more effective since it provides a –2 bonus to Armor Class and a +2 bonus to any saving throws required. In addition, there is a chance that missile attacks or directed spells may be deflected or reflected by the chaotic energy of the shield, as shown below:}}{{c1-1=**d%¹**}}{{c2-1=01–85}}{{c3-1=86–95}}{{c4-1=96–99}}{{c5-1=100+}}{{c1-2=**Effect**}}{{c2-2=No unusual effect, subject gains normal benefits of *chaos ward*}}{{c3-2=Spell or attack automatically defeated}}{{c4-2=Spell or attack ricochets, affecting a random creature within 30 feet—normal attack roll or saving throw needs to be rolled for the random creature to be affected}}{{c5-2=Spell or attack reflected back at originator, normal attack roll or saving throw applies}}{{effects2=¹ Add the caster’s level to the d% roll.\n\n&emsp;In order to qualify as a spell aimed directly at the recipient, a spell must affect *only* the subject in question; a spell such as *hold person* or *sleep* that happens to include the subject in its area of effect does not count as a directed spell and does not trigger the *chaos ward*.'
 };
+pri2['Cause Moderate Wounds (Reverse of Cure Moderate Wounds)'] =
 pri2['Cure Moderate Wounds'] = {
     'level': '2',
     'school': 'Necromancy (Reversible)',
@@ -8706,6 +8828,7 @@ pri7['Antimineral Shell'] = {
     'healing': '',
     'effect': 'When a priest casts this spell, he creates an invisible force field or barrier that blocks the entrance of animated or living mineral creatures. It is effective against elementals and creatures of elemental origin such as aerial servants, djinns, and mephits; golems and other constructs; creatures of living stone, such as galeb duhr or xorn; and objects, weapons, or armor animated by some outside force. It does not bar the passage of undead monsters, living creatures carrying inanimate material, or nonanimated minerals such as a giant-thrown boulder or a common rockslide. The *antimineral shell* moves with the caster, but if the caster tries to force it against a creature affected by this spell, the *antimineral shell* fails.'
 };
+pri7['Dismiss Air or Water Elemental (Reverse of Conjure Air or Water Elemental)'] =
 pri7['Conjure Air or Water Elemental'] = {
     'level': '7',
     'school': 'Conjuration/Summoning (Reversible)',
