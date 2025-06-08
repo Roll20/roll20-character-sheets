@@ -506,7 +506,7 @@
           <!-- Todo: we could auto populate tug based on mechtype change -->
         </div>
       <div class="mechStuff">
-            <div class="mechleft">
+            <!-- <div class="mechleft"> -->
               <div class="subsystems">
                 <h3>Subsystems</h3>
                 <fieldset class="repeating_Subs">
@@ -526,11 +526,11 @@
                 </fieldset>
               
               </div>
-            </div>
+            <!-- </div> -->
              <!-- End mechleft -->
             
             
-            <div class="mechright">
+            <!-- <div class="mechright"> -->
             
               <!-- Munitions -->
                   <h3>Munitions</h3>
@@ -581,8 +581,51 @@
                   </div>
                 </fieldset>
               <!-- Subsystems -->
+            <!-- </div> -->
+          <input type="hidden" name="attr_show_hotbox" />
+          <div class="hotboxDetail">
+            <h3>Hotbox</h3>
+            <div class="outerhot">
+              <div class="mechleft">
+                <div class="heatholder">
+                  <label for="attr_heat">Current Heat: </label>
+                  <input class="heat" type="number" name="attr_heat" />
+                </div>
+                <input type="hidden" name="attr_heat_level_class" />
+                <div class="heatholder">
+                  <label for="attr_heat_level">Current Heat Level: </label>
+                  <input type="hidden" class="heat-color" name="attr_heat_level_class" />
+                  <span class="heatlevel" name="attr_heat_level"></span>
+                </div>
+              </div>
+              <div class="mechright">
+
+                <div class="refheat">
+                  <h4>Reference Heat</h4>
+                  <div class="heat-thresholds">
+                      <div>
+                        Heat ≥ <span name="attr_smash_times3"></span>: 
+                        <span class="level hot">Hot</span>
+                      </div>
+                      <div>
+                        Heat ≥ <span name="attr_smash_times2"></span>: 
+                        <span class="level warm">Warm</span>
+                      </div>
+                      <div>
+                        Heat ≥ <span name="attr_smash"></span>: 
+                        <span class="level cool">Cool</span>
+                      </div>
+                      <div>
+                        Heat < <span name="attr_smash"></span>: 
+                        <span class="level cold">Cold</span>
+                      </div>
+                    </div>
+                </div>
+              </div>
             </div>
-            
+
+          </div>  <!-- Close hotboxdetail -->
+          
       </div>
       
   
@@ -3069,6 +3112,16 @@ on("change:dicemod", function(eventInfo) {
    });
 });
 
+on("change:character_mechtype", function() {
+  getAttrs(["character_mechtype"], function(values) {
+    const mechType = (values.character_mechtype || "").trim().toLowerCase();
+    const isHotbox = mechType === "hotbox";
+    setAttrs({
+      show_hotbox: isHotbox ? "1" : "0"
+    });
+  });
+});
+
 function updateSmashFormulas(totalSmashDice) {
        const roll_formula_smash = buildDicePool(totalSmashDice);
        const roll_results_smash = getResults(totalSmashDice);
@@ -3447,7 +3500,47 @@ console.log("Load");
       roll_results_sly,
       roll_results_cyber,
       roll_results_smash,
-      sublockedroom6
+      sublockedroom6,
+      //heat : sm,
+      smash_times2: (sm * 2),
+      smash_times3: (sm * 3)
+    });
+  });
+});
+
+// Used for hotbox heat
+on("change:smash", function() {
+  getAttrs(["smash"], function(values) {
+    const smash = parseFloat(values.smash) || 0;
+
+    setAttrs({
+      smash_times2: (smash * 2),
+      smash_times3: (smash * 3)
+    });
+  });
+});
+
+on("change:heat change:smash", function() {
+  getAttrs(["heat", "smash"], function(values) {
+    const heat = parseFloat(values.heat) || 0;
+    const smash = parseFloat(values.smash) || 0;
+    let level = "Cold";
+    console.log("smash", smash);
+    console.log("heat", heat);
+
+    if (smash > 0) {
+      if (heat >= 3 * smash) {
+        level = "Hot";
+      } else if (heat >= 2 * smash) {
+        level = "Warm";
+      } else if (heat >= smash) {
+        level = "Cool";
+      }
+    }
+
+    setAttrs({
+      heat_level: level,
+      heat_level_class: level
     });
   });
 });
