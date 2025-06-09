@@ -4,7 +4,7 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
-## 03.13.00 (Build 35)
+## 03.14.00 (Build 36)
 
 - added brawl combat proficiency
 
