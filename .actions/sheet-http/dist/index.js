@@ -57907,7 +57907,8 @@ const settings_1 = __nccwpck_require__(1685);
 const remarkable_1 = __nccwpck_require__(191);
 const translationCode_1 = __nccwpck_require__(2708);
 const constructFilePath = (sheetName, moreParts) => {
-    return path.join(process.env["GITHUB_WORKSPACE"], sheetName, ...moreParts);
+    const filepath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, ...moreParts);
+    return filepath.replace(/\\(.)/g, '$1'); // Remove escaping backslashes
 };
 exports.constructFilePath = constructFilePath;
 const processAdvancedSheet = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void 0, function* () {
@@ -57925,14 +57926,17 @@ exports.processAdvancedSheet = processAdvancedSheet;
 const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void 0, function* () {
     // First thing that has to be handled is the metaData and sheet options
     // This is important as some later things work off
+    console.warn("About to start Meta Data");
     yield processMetaData(sheetName, sheetJsonObj);
     // Lets go ahead and hand the user options as we have that data already
     const jsonObj = !sheetJsonObj.useroptions ? {} : sheetJsonObj.useroptions;
+    console.warn("About to start user options");
     yield processUserOptions(sheetName, jsonObj);
     let fnames = yield getFileNamesObj(sheetName);
+    console.warn("About to start Translations");
     // So translations are fun. We have some situations.
     // Rather than cram it in the loop below here we'll just run processTranslatins
-    yield (0, translationCode_1.processTranslations)(fnames, sheetName);
+    yield (0, translationCode_1.processTranslations)(fnames, sheetName.replace(/\\(.)/g, '$1'));
     // Go ahead and pull translations direc and translation json out of the fnames
     // as they have been uploaded
     fnames = fnames.filter((val) => !["translations", "translation.json"].includes(val));
@@ -57942,6 +57946,7 @@ const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void
         console.log("CSS Upload passed no css file in sheet.json");
     }
     else {
+        console.warn("About to start css");
         yield processCSSFile(sheetName, cssFilename);
     }
     // Walk through files and lets get this rolling
@@ -57950,13 +57955,16 @@ const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void
         // as the root can have a lot of crap
         if (fn.toLowerCase().includes(".html")) {
             if (!sheetJsonObj.html) {
+                console.warn("About to start html 1");
                 yield processHTMLFile(sheetName, fn);
             }
             else if (sheetJsonObj.html && sheetJsonObj.html == fn) {
+                console.warn("About to start html 2");
                 yield processHTMLFile(sheetName, fn);
             }
         }
         else if (sheetJsonObj.preview && sheetJsonObj.preview == fn) {
+            console.warn("About to start preview image");
             yield processPreviewImageFile(sheetName, fn);
         }
         // Translations already done above
@@ -57965,7 +57973,7 @@ const processFiles = (sheetName, sheetJsonObj) => __awaiter(void 0, void 0, void
     const settings = (0, settings_1.getSettings)();
     // Purge cache after we're done
     console.log("Clearing cache on sheet-http");
-    yield makeServerCall(`${settings.sheetHttpUrl}/purge?path=${encodeURIComponent(sheetName)}&repo=${settings.repoName}`, {});
+    yield makeServerCall(`${settings.sheetHttpUrl}/purge?path=${encodeURIComponent(sheetName.replace(/\\(.)/g, '$1'))}&repo=${settings.repoName}`, {});
 });
 exports.processFiles = processFiles;
 const processMetaData = (sheetName, jsonObj) => __awaiter(void 0, void 0, void 0, function* () {
@@ -57986,7 +57994,7 @@ const processMetaData = (sheetName, jsonObj) => __awaiter(void 0, void 0, void 0
         : "";
     return yield makeServerCall(fullUrl, {
         repo: settings.repoName,
-        sheet_folder: sheetName,
+        sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
         options_hash: optionsHash,
     });
 });
@@ -57998,7 +58006,7 @@ const processHTMLFile = (sheetName, fname) => __awaiter(void 0, void 0, void 0, 
     const cssData = yield fs.readFileSync(filePath, { encoding: "utf-8" });
     return yield makeServerCall(fullUrl, {
         repo: settings.repoName,
-        sheet_folder: sheetName,
+        sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
         data: cssData,
     });
 });
@@ -58014,7 +58022,7 @@ const processPreviewImageFile = (sheetName, fname) => __awaiter(void 0, void 0, 
     });
     return yield makeServerCall(fullUrl, {
         repo: settings.repoName,
-        sheet_folder: sheetName,
+        sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
         file_name: fname,
         data: imgData,
     });
@@ -58028,7 +58036,7 @@ const processCSSFile = (sheetName, fname) => __awaiter(void 0, void 0, void 0, f
     const cssData = yield fs.readFileSync(filePath, { encoding: "utf-8" });
     return yield makeServerCall(fullUrl, {
         repo: settings.repoName,
-        sheet_folder: sheetName,
+        sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
         data: cssData,
     });
 });
@@ -58042,7 +58050,7 @@ const processUserOptions = (sheetName, userOptionsObj) => __awaiter(void 0, void
     ].join("/");
     return yield makeServerCall(fullUrl, {
         repo: settings.repoName,
-        sheet_folder: sheetName,
+        sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
         data: userOptionsObj,
     });
 });
@@ -58065,15 +58073,19 @@ const makeServerCall = (fullUrl, dataObj) => __awaiter(void 0, void 0, void 0, f
 });
 exports.makeServerCall = makeServerCall;
 const getSheetJsonObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
-    const filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "sheet.json");
-    console.warn(filePath);
+    let filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "sheet.json");
+    console.warn("Filepath for Json:", filePath);
+    filePath = filePath.replace(/\\(.)/g, '$1');
+    console.warn("Filepath for Json Post cleanup:", filePath);
     const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
     const jsObj = JSON.parse(jsonFile);
     return jsObj;
 });
 exports.getSheetJsonObj = getSheetJsonObj;
 const getSheetRootTranslationJsonObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
-    const filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "translation.json");
+    let filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "translation.json");
+    filePath = filePath.replace(/\\(.)/g, '$1');
+    console.warn("Filepath for translation post cleanup:", filePath);
     try {
         const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
         const jsObj = JSON.parse(jsonFile);
@@ -58084,7 +58096,8 @@ const getSheetRootTranslationJsonObj = (sheetName) => __awaiter(void 0, void 0, 
     }
 });
 const getFileNamesObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
-    const dirPath = path.join(process.env["GITHUB_WORKSPACE"], sheetName);
+    console.warn("running getFileNamesObj");
+    const dirPath = path.join(process.env["GITHUB_WORKSPACE"], sheetName.replace(/\\(.)/g, '$1'));
     const data = yield fs.readdirSync(dirPath);
     return data;
 });
@@ -58203,7 +58216,7 @@ const uploadFakeTranslations = (sheetName, codesToUpload) => __awaiter(void 0, v
     for (const lc of codesToUpload) {
         yield (0, processSheet_1.makeServerCall)(fullUrl, {
             repo: settings.repoName,
-            sheet_folder: sheetName,
+            sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
             language_code: lc,
             data: tdata,
         });
@@ -58232,11 +58245,11 @@ const uploadTranslations = (sheetName, tdirecname) => __awaiter(void 0, void 0, 
             continue; // skip things not in LANGUAGE CODES
         if (extension !== "json")
             continue; // we skip any non json
-        const filePath = (0, processSheet_1.constructFilePath)(sheetName, [tdirecname, fname]);
+        const filePath = (0, processSheet_1.constructFilePath)(sheetName.replace(/\\(.)/g, '$1').replace(/\\(.)/g, '$1'), [tdirecname, fname]);
         // Endpoint expects it as json send
         const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
         const jsObj = JSON.parse(jsonFile);
-        console.log("\nTranslation File", sheetName, language_code);
+        console.log("\nTranslation File", sheetName.replace(/\\(.)/g, '$1'), language_code);
         const jsTFileKeys = Object.keys(jsObj);
         const diff = _.difference(oTransKeys, jsTFileKeys);
         diff.forEach((elem) => {
@@ -58249,7 +58262,7 @@ const uploadTranslations = (sheetName, tdirecname) => __awaiter(void 0, void 0, 
         // Okay do the compare
         yield (0, processSheet_1.makeServerCall)(fullUrl, {
             repo: settings.repoName,
-            sheet_folder: sheetName,
+            sheet_folder: sheetName.replace(/\\(.)/g, '$1'),
             language_code,
             data: jsObj,
         });
@@ -58259,12 +58272,12 @@ const uploadTranslations = (sheetName, tdirecname) => __awaiter(void 0, void 0, 
     }
 });
 const getTranslationFileNames = (sheetName, transDirName) => __awaiter(void 0, void 0, void 0, function* () {
-    const dirPath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, transDirName);
+    const dirPath = path.join(process.env["GITHUB_WORKSPACE"], sheetName.replace(/\\(.)/g, '$1'), transDirName);
     const data = yield fs.readdirSync(dirPath);
     return data;
 });
 const getSheetRootTranslationJsonObj = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
-    const filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName, "translation.json");
+    const filePath = path.join(process.env["GITHUB_WORKSPACE"], sheetName.replace(/\\(.)/g, '$1'), "translation.json");
     const jsonFile = yield fs.readFileSync(filePath, { encoding: "utf-8" });
     const jsObj = JSON.parse(jsonFile);
     return jsObj;

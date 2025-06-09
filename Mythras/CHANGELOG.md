@@ -4,6 +4,12 @@ All notable changes to the Mythras sheet will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## 3.8
+### Fixed
+- Corrected damage modifier calculations for table values above 50
+- Corrected movement modifier for fatigue level of winded
+- Corrected an issue preventing moveRate calculations when old encumbrance values were in place
+
 ## 3.7
 ### Fixed
 - Deleting a weapon will now actually remove the row instead of just clearing the data

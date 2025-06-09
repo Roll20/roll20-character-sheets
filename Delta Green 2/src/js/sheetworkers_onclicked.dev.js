@@ -275,7 +275,7 @@ on("clicked:levelup", function () {
         }
       });
       setAttrs(Object.assign(update, newrowattrs), {
-        silent: true
+        silent: false
       }, function () {
         console.log('inside repeating section');
         console.info(newrowattrs);
