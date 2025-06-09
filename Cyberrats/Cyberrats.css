@@ -4,23 +4,41 @@
 /* A CSS Grid example using "grid-template-areas"
   https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-areas
 */
+
+/* This is a clever way to redefine our grid area if mech isn't present. Must keep the two aligned or we get nasty spaces! */
+input.sheet-space:not(:checked) ~ div > main {
+    grid-template-rows:  40px 230px 220px 300px 1fr 1fr 1fr 1fr;
+ grid-template-areas:
+                      "settings    settings     settings    settings"
+                      "header      header       header      header"
+                      "conditions  conditions   conditions  conditions"
+                      ".           .            .           portrait"
+                      "powers      powers       powers      background"
+                      "gear        .            items       background"
+                      "loadout     loadout      loadout     background"
+                      "notes       notes        notes       background"
+}
+
 main {
   display: grid;
   width: 800px;
-  height: 1460px;
+  height: 1660px;
   grid-gap: 4px;
   grid-template-columns: 240px 10px 240px 260px;
-  grid-template-rows:  40px 230px 220px 300px 1fr 1fr 1fr 1fr;
+  grid-template-rows:  40px 230px 220px 300px 1fr 1fr 1fr 1fr 1fr;
   grid-template-areas:
-                      "settings settings settings settings"
-                      "header header  header  header"
-                      "conditions conditions  conditions  conditions"
-                      ".  .  .  portrait"
-                      "powers  powers  powers  background"
-                      "gear  .  items     background"
-                      "loadout  loadout  loadout     background"
-                      "notes   notes    notes  background"
+                      "settings    settings     settings    settings"
+                      "header      header       header      header"
+                      "conditions  conditions   conditions  conditions"
+                      ".           .            .           portrait"
+                      "powers      powers       powers      background"
+                      "gear        .            items       background"
+                      "loadout     loadout      loadout     scars"
+                      "mech        mech         mech        scars"
+                      "notes       notes        notes       scars"
 }
+
+
 
 /*----------------- GENERAL CSS ------------------*/
 
@@ -133,6 +151,33 @@ section.empty {
   grid-area: loadout;
 }
 
+.mechStuff {
+  display: flex;
+  gap: 1rem;
+}
+
+.mechleft, .mechright {
+  flex: 1 1 50%;
+  box-sizing: border-box;
+}
+
+.mech {
+  grid-area: mech;
+  
+  background: repeating-linear-gradient(
+      45deg,
+      rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0.2) 10px,
+      rgba(0, 0, 0, 0.3) 10px,
+      rgba(0, 0, 0, 0.3) 20px
+      ),
+      url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/old_map_@2X.png);
+}
+
+.scars {
+  grid-area: scars;
+}
+
 .conditions {
   grid-area: conditions;
 }
@@ -182,6 +227,12 @@ input.sheet-briny:not(:checked) + section.conditions div .brinycond {
 
 div.briny {
   margin-top:10px;
+  display: none; /*default*/
+}
+section.mech {
+  display: none; /*default*/
+}
+section.scars {
   display: none; /*default*/
 }
 
@@ -254,6 +305,9 @@ hr.underline {
   border-bottom: 2px solid #acadb0;
 }
 
+div.autoExpand + hr.underline {
+  margin-bottom:5px;
+}
 
 hr.underline ~ label {
   margin-top: -4px;
@@ -307,8 +361,13 @@ span.ammo {
   display: none;
 }
 
-span.ammo > label {
+
+span.ammo > label, span.upgrades > label {
   width: fit-content;
+}
+
+span.upgrades {
+  display: flex;
 }
 
 span.ammo > p.slash {
@@ -325,7 +384,8 @@ input.hasammo[value="true"] + span.ammo {
 
 input.header-input {
   margin: 0;
-  margin-left: 0px !important; 
+  margin-left: 0px !important;
+  margin-top: 0px !important;
 }
 
 
@@ -390,6 +450,10 @@ label.inline ~ input {
   display: inline;
 }
 
+label.desc {
+  margin-bottom: 0px;
+}
+
 .autoExpand {
     overflow: hidden; 
     position: relative;
@@ -397,6 +461,7 @@ label.inline ~ input {
     width: fit-content; 
     height: 28px; 
     width: 100%;
+    margin-bottom: 3px;
 }
 
 .autoExpand.long {
@@ -438,6 +503,10 @@ span.range > input {
   font-variant: small-caps;
 }
 
+.mechholder > .sidebar-input ~ label {
+  margin-left: 1%;
+}
+
 hr.overline {
   border: unset;
   margin: 0;
@@ -446,6 +515,12 @@ hr.overline {
 }
 
 div.sideholder {
+  display: flex;
+  flex-direction: row;
+  flex-wrap:wrap;
+}
+
+div.mechholder {
   display: flex;
   flex-direction: row;
   flex-wrap:wrap;
@@ -471,12 +546,17 @@ label.setting ~ input {
   margin-top:3px;
 }
 
-span.briny-setting {
+span.briny-setting span.space-setting {
   position: relative;
   bottom: -5px;
   float:right;
   margin-bottom: 5px;
 }
+
+span.space-setting {
+  margin-left: 20px;
+}
+
 
 input.sheet-briny {
   margin-bottom:4px;
@@ -484,6 +564,33 @@ input.sheet-briny {
 
 input.sheet-briny:checked ~ div.briny {
   display:block;
+}
+
+input.sheet-space {
+  margin-bottom:4px;
+}
+
+div.space {
+  display: none;
+}
+
+input.sheet-space:checked ~ div.space {
+  display:block;
+}
+
+input.sheet-space:checked ~ section.mech {
+  display:block;
+}
+input.sheet-space:checked ~ section.scars {
+  display:block;
+}
+
+input.sheet-space:checked ~ div.optional {
+  display:block;
+}
+
+div.optional {
+  display:none;
 }
 
 .pictos {
@@ -502,6 +609,13 @@ input.cost {
   width: 45px;
 }
 
+
+.centerme {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    align-items: center;
+}
 
 
 /* Buttons */
@@ -862,6 +976,17 @@ width: 95%;
 z-index: -1;
 }
 
+.campaignCore, .campaignSpace, .campaignCustom {
+  display: none;
+}
+
+.campaignType[value="campaignCore"] ~ div.campaignCore,
+.campaignType[value="campaignSpace"] ~ div.campaignSpace,
+.campaignType[value="campaignCustom"] ~ div.campaignCustom {
+    display: block;
+}
+
+
 
 /* show the selected tab */
 .tabstoggle[value="basesheet"] ~ div.basesheet,
@@ -870,9 +995,17 @@ z-index: -1;
     display: block;
 }
 
+
 .tabstoggle[value="basesheet"] ~ div.tabholder > .basesheetbtn,
 .tabstoggle[value="charactersheet"] ~ div.tabholder > .charsheetbtn,
 .tabstoggle[value="campaignsheet"] ~ div.tabholder > .campaignsheetbtn {
+  background-color:#3287a8;
+  color: white;
+}
+
+.campaignToggle[value="campaignCore"] ~ div.campaignHolder > .campaignCoreBtn,
+.campaignToggle[value="campaignSpace"] ~ div.campaignHolder > .campaignSpaceBtn,
+.campaignToggle[value="campaignCustom"] ~ div.campaignHolder > .campaignCustomBtn {
   background-color:#3287a8;
   color: white;
 }
@@ -902,20 +1035,33 @@ input.sheet-briny:not(:checked) ~ div.basesheet > .basetabholder {
     display: grid !important;
 }
 
+.campaignToggle[value="mainbase"] ~ div.mainbase,
+.campaignToggle[value="subbase"] ~ div.subbase,
+.campaignToggle[value="hivebase"] ~ div.hivebase {
+    display: grid !important;
+}
 
 
-.basetabstoggle[value="mainbase"] ~ div.tabholder > .mainbasebtn,
-.basetabstoggle[value="subbase"] ~ div.tabholder > .subbasebtn,
-.basetabstoggle[value="hivebase"] ~ div.tabholder > .hivebasebtn {
+.basetabstoggle[value="campaignCore"] ~ div.campaignHolder > .campaignCoreBtn,
+.basetabstoggle[value="campaignSpace"] ~ div.campaignHolder > .campaignSpaceBtn,
+.basetabstoggle[value="campaignCustom"] ~ div.campaignHolder > .campaignCustomBtn {
   background-color:#3287a8;
   color: white;
 }
 
-
+span.centertext {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 
 /* Filtered Powers */
 .filtered_powers ~.repcontrol {
+  display: none; /* Hide the add/modify buttons*/
+}
+
+.filtered ~.repcontrol {
   display: none; /* Hide the add/modify buttons*/
 }
 
@@ -932,6 +1078,9 @@ input.equipped:not(:checked) ~ * {
 .knownname {
   width: 125px !important;
 }
+
+
+
 
 
 
@@ -1076,12 +1225,38 @@ label.basecost {
 
 }
 
+.mech {
+  font-color: white;
+}
+
+span.subspan {
+  display: flex;
+}
+
+span.subspan label {
+    width: 3em;
+}
+
+span.subspan select {
+  width: 10em;
+   margin-right: 1em;
+}
+
+span.subspan button {
+  height: 1em;
+}
+
+
 span.baselocker {
   justify-self: center;
   align-self: center;
   display: flex;
   position: relative;
   bottom: 5px;
+}
+
+.Munholder {
+  display: flex;
 }
 
 span.baselocker.sub {
@@ -2049,9 +2224,10 @@ div.centerbtn {
       "weaponName   ."
       "pdesc   pdesc"
       "range        range"
-      "ammo         ammo";
+      "ammo         ammo"
+      "fuse         fuse";
     grid-template-columns: 2fr 1fr;
-    grid-template-rows: auto auto auto auto auto auto;
+    grid-template-rows: auto auto auto auto auto auto auto;
     grid-column-gap: 3px;
 }
 
@@ -2066,6 +2242,13 @@ div.centerbtn {
 
 .sheet-rolltemplate-weapon  .sheet-range {
   grid-area: range;
+  font-size: .86em;
+  margin-bottom: 15px;
+  margin-top:11px;
+}
+
+.sheet-rolltemplate-weapon  .sheet-armUpgrades {
+  grid-area: fuse;
   font-size: .86em;
   margin-bottom: 15px;
   margin-top:11px;

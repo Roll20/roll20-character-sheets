@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2025-03-16 ** v.90 Chuz (James Culp)
+	Added i18n values for translating many placeholders and some other labels throughout the Player facing sheet.  Thanks to Talon_Zorch for his hard work translating the sheet on Crowdin and compiling the list for me to add.
 **2024-10-11 ** v.88 Chuz (James Culp)
 	Added lwa spirits from Shadows In Focus: That Old Voodoo to the Spirit NPC sheet.  (Agwe, Azaca, Damballah, Erzulie, Ghede, Legba, Obatala, Ogoun and Shango)
 **2024-06-05 ** v.87 Chuz (James Culp)
