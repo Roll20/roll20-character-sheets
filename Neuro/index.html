@@ -1,0 +1,258 @@
+<div>
+    <div  style="display: flex; flex-direction: row;">
+        <div>
+            <p><input type="radio" name="attr_test_type_txt" value="0" checked>Test zwykły</p>
+            <p><input type="radio" name="attr_test_type_txt" value="1">Test Otwarty</p>
+        </div>
+        <div>
+            <div class="charsheet-diffculty-level-value">
+                <input type="radio" class="charsheet-diffculty-level-value-left-radio" name="attr_difficulty_lvl" value="0" checked>
+                <p class="charsheet-diffculty-level-value-text">Łatwy</p>
+            </div>
+            <div class="charsheet-diffculty-level-value">
+                <input type="radio" class="charsheet-diffculty-level-value-left-radio" name="attr_difficulty_lvl" value="1">
+                <p class="charsheet-diffculty-level-value-text">Przeciętny</p>
+            </div>
+            <div class="charsheet-diffculty-level-value">
+                <input type="radio" class="charsheet-diffculty-level-value-left-radio" name="attr_difficulty_lvl" value="2">
+                <p class="charsheet-diffculty-level-value-text">Problematyczny</p>
+            </div>
+            <div class="charsheet-diffculty-level-value">
+                <input type="radio" class="charsheet-diffculty-level-value-left-radio" name="attr_difficulty_lvl" value="3">
+                <p class="charsheet-diffculty-level-value-text">Trudny</p>
+            </div>
+            <div class="charsheet-diffculty-level-value">
+                <input type="radio" class="charsheet-diffculty-level-value-left-radio" name="attr_difficulty_lvl" value="4">
+                <p class="charsheet-diffculty-level-value-text">Bardzo Trudny</p>
+            </div>
+            <div class="charsheet-diffculty-level-value">
+                <input type="radio" class="charsheet-diffculty-level-value-left-radio" name="attr_difficulty_lvl" value="5">
+                <p class="charsheet-diffculty-level-value-text">Cholernie Trudny</p>
+            </div>
+            <div class="charsheet-diffculty-level-value">
+                <input type="radio" class="charsheet-diffculty-level-value-left-radio" name="attr_difficulty_lvl" value="6">
+                <p class="charsheet-diffculty-level-value-text">Fart</p>
+                <input type="radio" class="charsheet-diffculty-level-value-right-radio" name="attr_difficulty_max_lvl" value="6" checked>
+            </div>
+            <div class="charsheet-diffculty-level-value">
+                <input type="radio" class="charsheet-diffculty-level-value-left-radio" name="attr_difficulty_lvl" value="7">
+                <p class="charsheet-diffculty-level-value-text">Mistrzowski</p>
+                <input type="radio" class="charsheet-diffculty-level-value-right-radio" name="attr_difficulty_max_lvl" value="7">
+            </div>
+            <div class="charsheet-diffculty-level-value">
+                <input type="radio" class="charsheet-diffculty-level-value-left-radio" name="attr_difficulty_lvl" value="8">
+                <p class="charsheet-diffculty-level-value-text">Arcymistrzowski</p>
+                <input type="radio" class="charsheet-diffculty-level-value-right-radio" name="attr_difficulty_max_lvl" value="8">
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="charheet-wsp-container">
+            <p class="charheet-wsp-label">Zręczność</p>
+            <input class="charheet-wsp-values" type="text" name="attr_zre">
+            <input class="charheet-wsp-values" type="text" name="attr_zre_mod">
+            <button type="action" name="act_test_zre">Roll</button>
+            <input class="charheet-wsp-values"type="text" name="attr_difficulty_zre" readonly>
+        </div>
+        <div class="charheet-wsp-container">
+            <p class="charheet-wsp-label">Percepcja</p>
+            <input class="charheet-wsp-values" type="text" name="attr_per">
+            <input class="charheet-wsp-values" type="text" name="attr_per_mod">
+            <button type="action" name="act_test_per">Roll</button>
+            <input class="charheet-wsp-values"type="text" name="attr_difficulty_per" readonly>
+        </div>
+        <div class="charheet-wsp-container">
+            <p class="charheet-wsp-label">Charakter</p>
+            <input class="charheet-wsp-values" type="text" name="attr_cha">
+            <input class="charheet-wsp-values" type="text" name="attr_cha_mod">
+            <button type="action" name="act_test_cha">Roll</button>
+            <input class="charheet-wsp-values"type="text" name="attr_difficulty_cha" readonly>
+        </div>
+        <div class="charheet-wsp-container">
+            <p class="charheet-wsp-label">Spryt</p>
+            <input class="charheet-wsp-values" type="text" name="attr_spr">
+            <input class="charheet-wsp-values" type="text" name="attr_spr_mod">
+            <button type="action" name="act_test_spr">Roll</button>
+            <input class="charheet-wsp-values"type="text" name="attr_difficulty_spr" readonly>
+        </div>
+        <div class="charheet-wsp-container">
+            <p class="charheet-wsp-label">Budowa</p>
+            <input class="charheet-wsp-values" type="text" name="attr_bud">
+            <input class="charheet-wsp-values" type="text" name="attr_bud_mod">
+            <button type="action" name="act_test_bud">Roll</button>
+            <input class="charheet-wsp-values"type="text" name="attr_difficulty_bud" readonly>
+        </div>
+    </div>
+    
+</div>
+<script type="text/worker">
+    // Pomocnicze funkcje
+    function clamp(val, min, max) {
+        return Math.max(min, Math.min(val, max));
+    }
+    function count_number(arr, target){
+        return arr.filter(n => n === target).length;
+    }
+
+    wsp_code = ["zre", "per", "cha", "spr", "bud"];
+    wsp_code_translate={
+        "zre":"Zręczność", 
+        "per":"Percepcja", 
+        "cha":"Charakter", 
+        "spr":"Spryt", 
+        "bud":"Budowa",
+    }
+    difficulty_values=[2,0,-2,-5,-8, -11, -15, -20, -24];
+
+    //####################################
+    //################ROLL################
+    //####################################
+    wsp_code.forEach(element => {
+        on(`clicked:test_${element}`, (info)=>{
+            name=wsp_code_translate[element]
+            startRoll(`&{template:test} {{difficulty_lvl_val=[[0[computed value]]]}} {{wsp=${name}}} {{test_type_txt=[[0[computed value]]]}} {{res=[[0[computed value]]]}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}} {{status1=[[0[computed value]]]}} {{status2=[[0[computed value]]]}} {{status3=[[0[computed value]]]}}`, (results) => {
+                let roll_dices = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
+                getAttrs([element,"test_type_txt", "difficulty_lvl"], function(values){
+                    let difficulty = (parseInt(values[element]||0));
+
+                    let difficulty_mod = (parseInt(values["difficulty_lvl"]||0));
+
+                    const test_type = (parseInt(values["test_type_txt"]||0));
+                    difficulty_mod += count_number(roll_dices,20);
+                    difficulty_mod -= count_number(roll_dices,1);
+
+                    if(difficulty_mod<0) difficulty_mod = 0;
+                    if(difficulty_mod>8) difficulty_mod = 8;
+
+                    difficulty += difficulty_values[difficulty_mod];
+
+                    
+
+                    const flags = roll_dices.map(r => {
+                        return r <= difficulty ? 0 : 1;
+                    });
+                    let final_result;
+                    if(!test_type){
+                        const success_num = flags.reduce((partialSum, a) => partialSum + a, 0);
+                        final_result = success_num
+                    }else{
+                        const sorted_dices = roll_dices.concat().sort(function(a, b){return a-b});
+                        final_result= difficulty - sorted_dices[1];
+                    }
+                    finishRoll(
+                    results.rollId,
+                    {
+                        roll1:roll_dices[0],
+                        roll2:roll_dices[1],
+                        roll3:roll_dices[2],
+                        status1:flags[0],
+                        status2:flags[1],
+                        status3:flags[2],
+                        res:final_result,
+                        test_type_txt:test_type,
+                        difficulty_lvl_val:difficulty_mod,
+                });
+                })
+            });
+        });
+    });
+    on("change:zre change:per change:cha change:spr change:bud sheet:opened",function(){
+        getAttrs(["difficulty_lvl","zre","per", "cha", "spr", "bud"], function(values){
+            const difficulty_lvl_index = clamp((parseInt(values.difficulty_lvl)||0), 1, 8);
+            const zre = clamp((parseInt(values["zre"])||0), 1, 50);
+            const per = clamp((parseInt(values["per"])||0), 1, 50);
+            const cha = clamp((parseInt(values["cha"])||0), 1, 50);
+            const spr = clamp((parseInt(values["spr"])||0), 1, 50);
+            const bud = clamp((parseInt(values["bud"])||0), 1, 50);
+            setAttrs({
+                "difficulty_zre":zre+difficulty_values[difficulty_lvl_index],
+                "difficulty_per":per+difficulty_values[difficulty_lvl_index],
+                "difficulty_cha":cha+difficulty_values[difficulty_lvl_index],
+                "difficulty_spr":spr+difficulty_values[difficulty_lvl_index],
+                "difficulty_bud":bud+difficulty_values[difficulty_lvl_index],
+            });
+        })
+    });
+
+    //####################################
+    //#############DIFFICULTY#############
+    //####################################
+    on("change:difficulty_lvl sheet:opened", function(){
+        getAttrs(["difficulty_lvl","zre","per", "cha", "spr", "bud"],function(values){
+            const lvl = parseInt(values["difficulty_lvl"]||0);
+            const zre = parseInt(values["zre"]||0);
+            const per = parseInt(values["per"]||0);
+            const cha = parseInt(values["cha"]||0);
+            const spr = parseInt(values["spr"]||0);
+            const bud = parseInt(values["bud"]||0);
+            setAttrs({
+                "difficulty_zre":zre + difficulty_values[lvl],
+                "difficulty_per":per + difficulty_values[lvl],
+                "difficulty_cha":cha + difficulty_values[lvl],
+                "difficulty_spr":spr + difficulty_values[lvl],
+                "difficulty_bud":bud + difficulty_values[lvl],
+            });
+        });
+    });
+</script>
+
+<rolltemplate class="sheet-rolltemplate-test">
+    <div class="sheet-rolltemplate-container">
+        <div class="sheet-rolltemplate-info">
+            <h2>
+                {{wsp}} - 
+                {{#rollTotal() computed::test_type_txt 0}}Test Zamknięty{{/rollTotal() computed::test_type_txt 0}}
+                {{#rollTotal() computed::test_type_txt 1}}Test Otwarty{{/rollTotal() computed::test_type_txt 1}}
+                {{#rollTotal() computed::difficulty_lvl_val 0}}Łatwy{{/rollTotal() computed::difficulty_lvl_val 0}}
+                {{#rollTotal() computed::difficulty_lvl_val 1}}Przeciętny{{/rollTotal() computed::difficulty_lvl_val 1}}
+                {{#rollTotal() computed::difficulty_lvl_val 2}}Problematyczny{{/rollTotal() computed::difficulty_lvl_val 2}}
+                {{#rollTotal() computed::difficulty_lvl_val 3}}Trudny{{/rollTotal() computed::difficulty_lvl_val 3}}
+                {{#rollTotal() computed::difficulty_lvl_val 4}}Bardzo Trudny{{/rollTotal() computed::difficulty_lvl_val 4}}
+                {{#rollTotal() computed::difficulty_lvl_val 5}}Cholernie Trudny{{/rollTotal() computed::difficulty_lvl_val 5}}
+                {{#rollTotal() computed::difficulty_lvl_val 6}}Fartowny{{/rollTotal() computed::difficulty_lvl_val 6}}
+                {{#rollTotal() computed::difficulty_lvl_val 7}}Mistrzowski{{/rollTotal() computed::difficulty_lvl_val 7}}
+                {{#rollTotal() computed::difficulty_lvl_val 8}}Arcymistrzowski{{/rollTotal() computed::difficulty_lvl_val 8}}
+            </h2>              
+            <h2>
+                {{#rollTotal() computed::test_type_txt 0}}
+                    {{#rollBetween() computed::res 0 1}}Sukces{{/rollBetween() computed::res 0 1}}
+                    {{#rollBetween() computed::res 2 3}}Porażka{{/rollBetween() computed::res 2 3}}
+                {{/rollTotal() computed::test_type_txt 0}}
+                {{#rollTotal() computed::test_type_txt 1}}
+                {{#rollBetween() computed::res 0 100}}Punkty sukcesu:{{/rollBetween() computed::res 0 100}}
+                {{#rollBetween() computed::res -100 -1}}Punkty porażki:{{/rollBetween() computed::res -100 -1}}
+                <span class="sheet-rolltemplate-open-result">{{computed::res}}</span>
+                {{/rollTotal() computed::test_type_txt 1}}
+            </h2>
+        </div>
+        <div class="sheet-rolltemplate-rolls">
+
+            {{#rollTotal() computed::status1 0}}
+            <div class="sheet-rolltemplate-value-testing sheet-rolltemplate-value-testing-succ">
+            {{/rollTotal() computed::status1 0}}
+            {{#rollTotal() computed::status1 1}}
+            <div class="sheet-rolltemplate-value-testing sheet-rolltemplate-value-testing-fail">
+            {{/rollTotal() computed::status1 1}}
+                <p class="sheet-rolltemplate-result-dice-value">{{roll1}}</p>
+            </div>
+
+            {{#rollTotal() computed::status2 0}}
+            <div class="sheet-rolltemplate-value-testing sheet-rolltemplate-value-testing-succ">
+            {{/rollTotal() computed::status2 0}}
+            {{#rollTotal() computed::status2 1}}
+            <div class="sheet-rolltemplate-value-testing sheet-rolltemplate-value-testing-fail">
+            {{/rollTotal() computed::status2 1}}
+                <p class="sheet-rolltemplate-result-dice-value">{{roll2}}</p>
+            </div>
+
+            {{#rollTotal() computed::status3 0}}
+            <div class="sheet-rolltemplate-value-testing sheet-rolltemplate-value-testing-succ">
+            {{/rollTotal() computed::status3 0}}
+            {{#rollTotal() computed::status3 1}}
+            <div class="sheet-rolltemplate-value-testing sheet-rolltemplate-value-testing-fail">
+            {{/rollTotal() computed::status3 1}}
+            <p class="sheet-rolltemplate-result-dice-value">{{roll3}}</p>
+            </div>
+        </div>
+    </div>
+</rolltemplate>
