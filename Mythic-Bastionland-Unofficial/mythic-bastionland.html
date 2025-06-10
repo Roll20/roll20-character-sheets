@@ -1,0 +1,147 @@
+<link rel="stylesheet" type="text/css" href="mythic-bastionland.css">
+
+<!-- Mythic Bastionland Character Sheet -->
+<div class="sheet-container">
+  <h1>Mythic Bastionland</h1>
+  <div class="sheet-header-row">
+    <div class="sheet-header-row-1">
+      <label>Knight
+        <input type="text" name="attr_knight" />
+      </label>
+      <label>Name
+        <input type="text" name="attr_name" />
+      </label>
+    </div>
+    <div class="sheet-header-row-2">
+      <label>Glory
+        <input type="number" name="attr_glory" />
+      </label>
+      <label>Rank
+        <input type="text" name="attr_rank" readonly />
+      </label>
+      <label>Age
+        <select name="attr_age">
+          <option value="Young">Young</option>
+          <option value="Mature">Mature</option>
+          <option value="Old">Old</option>
+        </select>
+      </label>
+    </div>
+  </div>
+  
+  <div class="sheet-stats-container">
+    <fieldset class="sheet-virtues">
+      <h2>Virtues</h2>
+      <div>
+        <label>Vigour
+          <input type="number" name="attr_vigour_current" placeholder="Current" />
+          /
+          <input type="number" name="attr_vigour_max" placeholder="Max" />
+        </label>
+      </div>
+      <div>
+        <label>Clarity
+          <input type="number" name="attr_clarity_current" placeholder="Current" />
+          /
+          <input type="number" name="attr_clarity_max" placeholder="Max" />
+        </label>
+      </div>
+      <div>
+        <label>Spirit
+          <input type="number" name="attr_spirit_current" placeholder="Current" />
+          /
+          <input type="number" name="attr_spirit_max" placeholder="Max" />
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="sheet-guard-armor">
+      <label>Guard (GD)
+        <input type="number" name="attr_guard_current" placeholder="Current" />
+        /
+        <input type="number" name="attr_guard_max" placeholder="Max" />
+      </label>
+
+      <label>Armor
+        <input type="number" name="attr_armor_total" readonly />
+      </label>
+    </fieldset>
+  </div>
+
+  <label>Ability
+    <input type="text" name="attr_ability" style="width: 100%;" />
+  </label>
+  
+  <label>Passion
+    <input type="text" name="attr_passion" style="width: 100%;" />
+  </label>
+
+  <div class="sheet-weapons-section">
+    <h2>Weapons</h2>
+    <fieldset class="repeating_weapons">
+      <input type="text" name="attr_weapon" placeholder="Weapon" />
+      <input type="text" name="attr_weapon_type" placeholder="Type" />
+      <input type="text" name="attr_weapon_damage" placeholder="Damage" />
+      <button type="roll" value="/roll @{weapon_damage}" name="roll_weapon_damage">Roll Damage</button>
+    </fieldset>
+  </div>
+
+  <div class="sheet-armor-section">
+    <h2>Armor</h2>
+    <fieldset>
+      <div>
+        <input type="text" name="attr_armor_coat_name" placeholder="Coat" />
+        <input type="number" name="attr_armor_coat_score" value="0" placeholder="Coat Score" />
+      </div>
+      <div>
+        <input type="text" name="attr_armor_plate_name" placeholder="Plate" />
+        <input type="number" name="attr_armor_plate_score" value="0" placeholder="Plate Score" />
+      </div>
+      <div>
+        <input type="text" name="attr_armor_helm_name" placeholder="Helm" />
+        <input type="number" name="attr_armor_helm_score" value="0" placeholder="Helm Score" />
+      </div>
+      <div>
+        <input type="text" name="attr_armor_shield_name" placeholder="Shield" />
+        <input type="number" name="attr_armor_shield_score" value="0" placeholder="Shield Score" />
+      </div>
+    </fieldset>
+  </div>
+  
+  <label>Property
+    <textarea name="attr_property"></textarea>
+  </label>
+  
+  <label>Notes
+    <textarea name="attr_notes"></textarea>
+  </label>
+</div>
+
+<script type="text/worker">
+on("change:glory", function() {
+  getAttrs(["glory"], function(values) {
+    var glory = parseInt(values["glory"]) || 0;
+    var rank = "Knight-Errant";
+    if (glory >= 3 && glory <= 5) {
+      rank = "Knight-Gallant";
+    } else if (glory >= 6 && glory <= 8) {
+      rank = "Knight-Tenant";
+    } else if (glory >= 9 && glory <= 11) {
+      rank = "Knight Dominant";
+    } else if (glory >= 12) {
+      rank = "Knight-Radiant";
+    }
+    setAttrs({"rank": rank});
+  });
+});
+
+on("change:armor_coat_score change:armor_plate_score change:armor_helm_score change:armor_shield_score", function() {
+  getAttrs(["armor_coat_score", "armor_plate_score", "armor_helm_score", "armor_shield_score"], function(values) {
+    var total = (parseInt(values["armor_coat_score"]) || 0) +
+                (parseInt(values["armor_plate_score"]) || 0) +
+                (parseInt(values["armor_helm_score"]) || 0) +
+                (parseInt(values["armor_shield_score"]) || 0);
+    setAttrs({"armor_total": total});
+  });
+});
+</script>
