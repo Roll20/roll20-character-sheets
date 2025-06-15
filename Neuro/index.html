@@ -263,7 +263,7 @@
                 <div class="charheet-skill-container">
                      <button type="action" name="act_test_blef" class="charsheet-roll-button"></button>
                     <p>Blef</p>
-                    <input type="number" name="attr_blef>
+                    <input type="number" name="attr_blef">
                 </div>
                 <div class="charheet-skill-container">
                      <button type="action" name="act_test_opieka_zwierz" class="charsheet-roll-button"></button>
@@ -594,56 +594,67 @@
     //####################################
     //################ROLL################
     //####################################
+    function set_difficulty_level(rolls, current_difficulty, max_difficulty_level) {
+            let difficulty_level = current_difficulty;
+            difficulty_level += count_number(rolls, 20);
+            difficulty_level -= count_number(rolls, 1);
 
+            if (difficulty_level < 0) difficulty_mod = 0;
+            if (difficulty_level > max_difficulty_level) difficulty_level = max_difficulty_level;
+
+            return difficulty_level
+        }
+    
+    function create_flag_success(rolls,difficulty){
+        const flags = rolls.map(r => {
+            return r <= difficulty ? 0 : 1;
+        });
+        return flags
+    }
+
+    function calculate_result_test(flags) {
+        const success_num = flags.reduce((partialSum, a) => partialSum + a, 0);
+        return success_num
+    }
+    function calculate_result_test_open(rolls, difficulty){
+        const sorted_dices = rolls.concat().sort(function (a, b) { return a - b });
+        return difficulty - sorted_dices[1];
+    }
     wsp_code.forEach(element => {
-        on(`clicked:test_${element}`, (info)=>{
-            name=wsp_code_translate[element]
-            startRoll(`&{template:test} {{difficulty_lvl_val=[[0[computed value]]]}} {{wsp=${name}}} {{test_type_txt=[[0[computed value]]]}} {{res=[[0[computed value]]]}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}} {{status1=[[0[computed value]]]}} {{status2=[[0[computed value]]]}} {{status3=[[0[computed value]]]}}`, (results) => {
-                const roll_dices = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
-                getAttrs([element,"test_type_txt", "difficulty_lvl"], function(values){
-                    let difficulty = (parseInt(values[element]||0));
+            on(`clicked:test_${element}`, (info) => {
+                name = wsp_code_translate[element]
+                startRoll(`&{template:test} {{difficulty_lvl_val=[[0[computed value]]]}} {{wsp=${name}}} {{test_type_txt=[[0[computed value]]]}} {{res=[[0[computed value]]]}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}} {{status1=[[0[computed value]]]}} {{status2=[[0[computed value]]]}} {{status3=[[0[computed value]]]}}`, (results) => {
+                    const roll_dices = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
+                    getAttrs([element, "test_type_txt", "difficulty_lvl"], function (values) {
+                        let difficulty = (parseInt(values[element] || 0));
+                        const test_type = (parseInt(values["test_type_txt"] || 0));
+                        const difficulty_mod = set_difficulty_level(roll_dices, (parseInt(values["difficulty_lvl"] || 0)), 8);
 
-                    let difficulty_mod = (parseInt(values["difficulty_lvl"]||0));
-
-                    const test_type = (parseInt(values["test_type_txt"]||0));
-                    difficulty_mod += count_number(roll_dices,20);
-                    difficulty_mod -= count_number(roll_dices,1);
-
-                    if(difficulty_mod<0) difficulty_mod = 0;
-                    if(difficulty_mod>8) difficulty_mod = 8;
-
-                    difficulty += difficulty_values[difficulty_mod];
-
-                    
-
-                    const flags = roll_dices.map(r => {
-                        return r <= difficulty ? 0 : 1;
-                    });
-                    let final_result;
-                    if(!test_type){
-                        const success_num = flags.reduce((partialSum, a) => partialSum + a, 0);
-                        final_result = success_num
-                    }else{
-                        const sorted_dices = roll_dices.concat().sort(function(a, b){return a-b});
-                        final_result= difficulty - sorted_dices[1];
-                    }
-                    finishRoll(
-                    results.rollId,
-                    {
-                        roll1:roll_dices[0],
-                        roll2:roll_dices[1],
-                        roll3:roll_dices[2],
-                        status1:flags[0],
-                        status2:flags[1],
-                        status3:flags[2],
-                        res:final_result,
-                        test_type_txt:test_type,
-                        difficulty_lvl_val:difficulty_mod,
+                        difficulty += difficulty_values[difficulty_mod];
+                        flags = create_flag_success(roll_dices, difficulty)
+                        let final_result;
+                        if (!test_type){
+                            final_result = calculate_result_test(flags)
+                        }else{
+                            final_result = calculate_result_test_open(roll_dices, difficulty)
+                        }
+                        finishRoll(
+                            results.rollId,
+                            {
+                                roll1: roll_dices[0],
+                                roll2: roll_dices[1],
+                                roll3: roll_dices[2],
+                                status1: flags[0],
+                                status2: flags[1],
+                                status3: flags[2],
+                                res: final_result,
+                                test_type_txt: test_type,
+                                difficulty_lvl_val: difficulty_mod,
+                            });
+                    })
                 });
-                })
             });
         });
-    });
     on("change:zre change:per change:cha change:spr change:bud sheet:opened",function(){
         getAttrs(["difficulty_lvl","zre","per", "cha", "spr", "bud"], function(values){
             const difficulty_lvl_index = clamp((parseInt(values.difficulty_lvl)||0), 1, 8);
