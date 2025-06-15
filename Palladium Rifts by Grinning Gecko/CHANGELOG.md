@@ -5,6 +5,7 @@
 ### Added
 
 - Add new modifier attributes to export.
+- Add Support & Request Thread button.
 
 ### Changed
 
