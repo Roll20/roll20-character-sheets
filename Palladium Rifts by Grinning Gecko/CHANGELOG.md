@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.8.3] - 2025-06-14
+
+### Changed
+
+- Fix Modifier damage unit on roll button.
+
 ## [1.8.2] - 2025-05-22
 
 ### Changed
