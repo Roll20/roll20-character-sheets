@@ -2,6 +2,10 @@
 
 ## [1.8.3] - 2025-06-14
 
+### Added
+
+- Add new modifier attributes to export.
+
 ### Changed
 
 - Fix Modifier damage unit on roll button.
