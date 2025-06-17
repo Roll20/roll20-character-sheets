@@ -382,19 +382,19 @@
     const currents = GLOBAL_CHARACTERISTICS_KEYS.map(characteristic => `${characteristic}_current`);
 
     getAttrs(["sheet_version", ...bases, ...currents], (values) => {
-      console.log(values)
       const update = {}
-      if (values.sheet_version !== GLOBAL_SHEET_VERSION) {
-        switch (values.sheet_version ?? "1.2") {
+      let {sheet_version} = values;
+      sheet_version = sheet_version === "" ? "1.2" : sheet_version;
+
+      if (sheet_version !== GLOBAL_SHEET_VERSION) {
+        switch (sheet_version) {
           case "1.2":
             [...bases,...currents].forEach(characteristic => {
-              console.log(characteristic, values[characteristic])
               update[characteristic] = values[characteristic].toUpperCase();
             })
             update.sheet_version = "1.3";
         }
       }
-      console.log(update)
       setAttrs(update);
     })
   })
