@@ -1,3 +1,14 @@
+# 2025-6-17
+
+- Fix a bug with Critscaling sometimes corrupting the critical
+- Move pack carried up a bit
+- Powerlevel change selector: Fix the event handler to work
+- Make onCheck more specific about changed values
+- Fix DB not updating after encumberance or shield change
+- Charactermancer: Fix some cultures not toggling the specialisation
+- Kill the old purchase.js which was still being loaded!?
+  - Removes a whole pile of the load time errors.
+
 # 2025-6-3
 
 - Attacks Edit

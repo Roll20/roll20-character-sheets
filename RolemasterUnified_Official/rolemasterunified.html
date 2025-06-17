@@ -5683,6 +5683,7 @@ Uses (Lvl/Total) <span name='attr_traps_usecount'></span> / <span name='attr_tra
     </div>
 
    <h3>Backpack</h3>
+  <label>Pack carried? <input type='checkbox' name='attr_packcarried'></label>
 
    <div class='inventory inventorytitle'>
         <span></span>
@@ -5714,7 +5715,6 @@ Uses (Lvl/Total) <span name='attr_traps_usecount'></span> / <span name='attr_tra
     </fieldset>
 
     <p>Backpack Weight: <span name='attr_packweight'></span><br>
-    <label>Pack carried? <input type='checkbox' name='attr_packcarried'></label>
     </p>
 
     <h3>Home / Storage</h3>
@@ -6031,7 +6031,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision e7b4f0dc4edd5660826cb266ad55d1c243beb98a
+Revision adc0f7a47c63e5e07a2a90bbc4594e3aca1c54bb
 
 
 <hr>
@@ -7441,6 +7441,10 @@ function onCheck(str, func) {
     // Each should have at least one :
     if (item != '' && !item.includes(":")) {
       rmuerror(`${item} doesn't have a colon from ${str}`);
+    }
+    // Must match one of these:
+    if (!item.match(/^(change|clicked|page|mancerchange|mancerfinish|remove|sheet):(repeating_[^:]*:)?[^:]*$/)) {
+      rmuerror(`${item} doesn't seem right`);
     }
   }
   on(str, func);
@@ -10673,90 +10677,6 @@ function getLevelUpSummary(cmdata) {
 
 
 
-let RMUPurchase = {};
-
-
-
-(function() {
-
-  console.log("Purchase Module Loaded\n");
-
-  function getFirstName(st) {
-    return st.replace(/2$/,'1');
-  }
-  function getSecondName(st) {
-    return st.replace(/1$/,'2');
-  }
-
-  on('clicked:startlevelup', (ev) => {
-    setAttrs({levelupactive: 1});
-  });
-
-  // Add a handler for each category, then each category add each of the skills
-      categories.forEach(cat => {
-	let skills = []
-	// FIXME: Subskills/specializations
-	RMUSkills.catForEachSkill(cat, skill => {
-	  skills.push(`change:${skill.aname}_buy1`, `change:${skill.aname}_buy2`);
-	});
-	on(skills.join(' '), ev => {
-	    console.log("get", `${cat.aname}_cost`);
-	    getAttrs(['dpspent', `${cat.aname}_cost`], (attr) => { 
-	    
-		let str = attr[`${cat.aname}_cost`];
-		const costs = str.split('/');
-		let cost1 = parseInt(costs[0]);
-		let cost2 = parseInt(costs[1]);
-
-		let delta = 0;
-		// if newvalue == oldvalue, do nothing ; FIXME
-		if (/1$/.test(ev.sourceAttribute)) {
-		  // first attribute
-		  delta = cost1;
-		} else {
-		  delta = cost2;
-		}
-		if (ev.newValue != 'on') {
-		  delta = -delta;
-		}
-
-		let dpspent = parseInt(attr.dpspent) || 0;
-		dpspent += delta;
-		setAttrs({dpspent: dpspent});
-	    }); 
-	});
-      });
-
-  on("clicked:completebuy", (ev) => {
-    let level = `Level ${Math.floor(Math.random() * 50)}`;
-    // Don't have a local cache, so loop through each skill. 
-    RMUSkills.forEachSkill(skill => {
-      let first = `${skill.aname}_buy1`;
-      let second = `${skill.aname}_buy2`;
-      getAttrs([first, second], ev => {
-	let ranks = 0;
-	if (ev[first] == 'on') {
-	  ranks = 1;
-	  if (ev[second] == 'on') {
-	    ranks = 2;
-	  }
-	} 
-	if (ranks > 0) {
-	  miscAttrSet(`${skill.aname}_ranks_misc`, level, ranks);
-	}
-      });
-    });
-    setAttrs({levelupactive: 0});
-    RMUSkills.updateAllSkills();
-
-    // FIXME: clear last level purchases
-  });
-
-
-})();
-
-
-
 
 
 
@@ -12461,7 +12381,7 @@ onCheck(changes, (event) => {
 
 
 onCheck("mancerchange:create_culture_lores1 mancerchange:create_culture_lores2 " +
-"mancerchange:create_culture_lores3 mancerchange:create_culture_lores4" +
+"mancerchange:create_culture_lores3 mancerchange:create_culture_lores4 " +
 "mancerchange:create_culture_craftingvocation1 mancerchange:create_culture_craftingvocation2 " +
 "mancerchange:create_culture_craftingvocation3 mancerchange:create_culture_craftingvocation4", (ev) => {
     console.log("change: ", ev);
@@ -12746,6 +12666,7 @@ frontpage.updateDB = function () {
 		  "shield_bonus", "shield_ranks",
 		  "shield_type_bonus", "shield_type_nattacks",
 		  "encumberance_penalty"], (ev) => {
+		  console.log("dooing update", ev);
     var updates = {};
     const db_extra = miscBonusTotal(ev.db_misc || "")[0];
     const basedb = +ev.qu * 3 + db_extra;
@@ -12869,7 +12790,7 @@ frontpage.updateDB = function () {
   });
 }
 onCheck("change:qu change:db_misc change:running_bonus change:running_ranks " +
-  "change:shield_bonus change:shield_ranks change:shield_type_bonus" +
+  "change:shield_bonus change:shield_ranks change:shield_type_bonus " +
   "change:encumberance_penalty", frontpage.updateDB);
 
 
@@ -14537,13 +14458,13 @@ function sizeFromNumeric(value) {
 	    numeric -= 'A'.charCodeAt(0);
 	}
 	console.log("numeric  - ", numeric);
-	console.log({critical: true, damage: +(res[1]), 
+	const critinfo = { critical: true, damage: +(res[1]), 
 		severity: sev, type: type, typename: name,
-		severitynumeric: numeric});
+		severitynumeric: numeric};
 
-	return { critical: true, damage: +(res[1]), 
-		severity: sev, type: type, typename: name,
-		severitynumeric: numeric, elvis: numeric};
+	console.log("parseCritical:", damage, "->", critinfo);
+
+	return critinfo;
     }
 
     //
@@ -14603,6 +14524,7 @@ function sizeFromNumeric(value) {
     //	    - fluff -> coming soon
     
     attacks.resolveAttack = function(rollId, rolls, cdata) {
+	console.log("ResolveAttacl", rollId, rolls, cdata);
 	let result = {};
 	let injuryhits = 0;
 	let moddescription = '';
@@ -14672,15 +14594,19 @@ function sizeFromNumeric(value) {
 
 	// Was there a critical?
 	let critinfo = attacks.parseCriticalResult(damage);
+	console.log("The cirtical result", critinfo, critinfo.severitynumeric);
 
 	// Scale it if there is a cricial now
-	if (critinfo.critical && cdata.attackcritadjust != 0) {
+	if (critinfo.critical && typeof(cdata.attackcritadjust) == 'number' && 
+		    cdata.attackcritadjust != 0) {
+	    console.log("Crit adjust from attack: ", cdata.attackcritadjust,
+		    typeof(cdata.attackcritadjust));
 	    critinfo.severitynumeric += cdata.attackcritadjust;
 	    critinfo.scaled = 1;
 	}
 
 	// Scale critical from size
-	console.log(cdata.targetsize);
+	console.log("Target size", cdata.targetsize, critinfo, critinfo.severitynumeric);
 	let sizedelta = +cdata.attacksize - +cdata.targetsize;
 
 	// Scale damage for size
@@ -16561,7 +16487,7 @@ onCheck('clicked:repeating_creatureattack:creaturemakeattack', (ev) => {
 
 });
 
-onCheck('changed:powerlevel', (ev) => {
+onCheck('change:powerlevel', (ev) => {
   const newpower = ev.newValue;
   console.log("New power level", newpower);
 
