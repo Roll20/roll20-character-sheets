@@ -3926,28 +3926,29 @@
             </div>
           </div>
         </div>
+
         <fieldset class="repeating_inventory">
-          <div class="compendium-drop-target">
+          <div>
             <div class="inventory-card">
               <div class="inventory-card-header">
                 <div class="inventory-field">
-                  <input type="text" name="attr_item_name" class="inventory-item-name"  placeholder="Name" accept="item_name"/>
+                  <input type="text" name="attr_item_name" class="inventory-item-name"  placeholder="Name"/>
                 </div>
 
                 <div class="inventory-field">
                   <label class="inventory-labeled-input">Qty:
-                    <input type="number" name="attr_item_qty" class="sheet-d6pp inventory-input qty-input" accept="item_qty"/>
+                    <input type="number" name="attr_item_qty" class="sheet-d6pp inventory-input qty-input"/>
                   </label>
                 </div>
 
                 <div class="inventory-field">
                   <label class="inventory-labeled-input">Wt:
-                    <input type="number" step="0.1" name="attr_item_weight" class="sheet-d6pp inventory-input weight-input" accept="item_weight"/>
+                    <input type="number" step="0.1" name="attr_item_weight" class="sheet-d6pp inventory-input weight-input"/>
                   </label>
                 </div>
 
                 <div class="inventory-field">
-                  <select name="attr_item_location" class="inventory-item-location" accept="item_location">
+                  <select name="attr_item_location" class="inventory-item-location">
                     <option value="equipped">Equipped</option>
                     <option value="horse">On Horse</option>
                     <option value="storage">Storage</option>
@@ -3956,11 +3957,21 @@
               </div>
 
               <div class="inventory-card-description">
-                <textarea name="attr_item_description" placeholder="Description..." accept="item_description"></textarea>
+                <textarea name="attr_item_description" placeholder="Description..."></textarea>
               </div>
             </div>
           </div>
         </fieldset>
+
+        <!-- Drop Zone -->
+        <div class="compendium-drop-target" style="opacity:0; height:1px; overflow:hidden; position:absolute;">
+          <p><strong>Drop an item here</strong></p>
+          <input type="text" name="attr_itemdrop_name" accept="item_name" placeholder="Name (hidden)" style="display:none;">
+          <input type="number" name="attr_itemdrop_qty" accept="item_qty" style="display:none;">
+          <input type="number" name="attr_itemdrop_weight" accept="item_weight" style="display:none;">
+          <input type="text" name="attr_itemdrop_location" accept="item_location" placeholder="Location" style="display:none;">
+          <textarea name="attr_itemdrop_description" accept="item_description" style="display:none;"></textarea>
+        </div>
 
         <!-- Control Buttons OUTSIDE the fieldset -->
         <div class="repcontrol" data-groupname="repeating_inventory"></div>
@@ -8451,6 +8462,35 @@
       setAttrs({
         recommended_weight: recommended
       });
+    });
+  });
+
+  on("change:itemdrop_name", function() {
+    getAttrs([
+      "itemdrop_name", "itemdrop_qty", "itemdrop_weight", "itemdrop_location","itemdrop_description"
+    ], function(values) {
+
+    const name = values.itemdrop_name;
+    if (!name) return; // skip if nothing dropped
+
+    const rowId = generateRowID();
+    const prefix = `repeating_inventory_${rowId}_`;
+
+    const all = {};
+    all[`${prefix}item_name`] = values.itemdrop_name || "";
+    all[`${prefix}item_qty`] = values.itemdrop_qty || "";
+    all[`${prefix}item_weight`] = values.itemdrop_weight || "";
+    all[`${prefix}item_location`] = values.itemdrop_location || "";
+    all[`${prefix}item_description`] = values.itemdrop_description || "";
+
+      // Clear the drop zone
+      all["itemdrop_name"] = "";
+      all["itemdrop_qty"] = "";
+      all["itemdrop_weight"] = "";
+      all["itemdrop_location"] = "";
+      all["itemdrop_description"] = "";
+
+      setAttrs(all);
     });
   });
 
