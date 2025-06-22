@@ -58,13 +58,13 @@
             <div class="charheet-skills-package-container">
                 <span>Walka wręcz</span>
                 <div class="charheet-skill-container">
-                     <button type="action" name="act_test_bijajtyka" class="charsheet-roll-button"></button>
-                    <p>Biajatyka</p>
-                    <input type="number" name="attr_bijajtyka">
+                     <button type="action" name="act_test_bijatyka" class="charsheet-roll-button"></button>
+                    <p>Bijatyka</p>
+                    <input type="number" name="attr_bijatyka">
                 </div>
                 <div class="charheet-skill-container">
                      <button type="action" name="act_test_br_ręczna" class="charsheet-roll-button"></button>
-                    <p>Walka wręcz</p>
+                    <p>Broń ręczna</p>
                     <input type="number" name="attr_br_ręczna">
                 </div>
                 <div class="charheet-skill-container">
@@ -248,7 +248,7 @@
                     <input type="number" name="attr_perswazja">
                 </div>
                 <div class="charheet-skill-container">
-                     <button type="action" name="act_zdol_przywódcze" class="charsheet-roll-button"></button>
+                     <button type="action" name="act_test_zdol_przywódcze" class="charsheet-roll-button"></button>
                     <p>Zdolności przywódcze</p>
                     <input type="number" name="attr_zdol_przywódcze">
                 </div>
@@ -437,6 +437,7 @@
     </div>
     
 </div>
+<!-- <script> -->
 <script type="text/worker">
     function clamp(val, min, max) {
         return Math.max(min, Math.min(val, max));
@@ -457,7 +458,7 @@
     }
     skill_code = {
         "zre": [
-          "bijajtyka",
+          "bijatyka",
           "br_ręczna",
           "rzucanie",
           "samochód",
@@ -525,8 +526,8 @@
         ]
     }
     skill_code_translate={
-        "bijajtyka": "Biajatyka",
-        "br_ręczna": "Walka wręcz",
+        "bijatyka": "Bijatyka",
+        "br_ręczna": "Broń ręczna",
         "rzucanie": "Rzucanie",
         "samochód": "Samochód",
         "motocykl": "Motocykl",
@@ -623,7 +624,7 @@
     wsp_code.forEach(element => {
             on(`clicked:test_${element}`, (info) => {
                 name = wsp_code_translate[element]
-                startRoll(`&{template:test} {{difficulty_lvl_val=[[0[computed value]]]}} {{wsp=${name}}} {{test_type_txt=[[0[computed value]]]}} {{res=[[0[computed value]]]}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}} {{status1=[[0[computed value]]]}} {{status2=[[0[computed value]]]}} {{status3=[[0[computed value]]]}}`, (results) => {
+                startRoll(`&{template:test} {{difficulty_lvl_val=[[0[computed value]]]}} {{test_name=${name}}} {{test_type_txt=[[0[computed value]]]}} {{res=[[0[computed value]]]}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}} {{status1=[[0[computed value]]]}} {{status2=[[0[computed value]]]}} {{status3=[[0[computed value]]]}}`, (results) => {
                     const roll_dices = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
                     getAttrs([element, "test_type_txt", "difficulty_lvl"], function (values) {
                         let difficulty = (parseInt(values[element] || 0));
@@ -641,9 +642,6 @@
                         finishRoll(
                             results.rollId,
                             {
-                                roll1: roll_dices[0],
-                                roll2: roll_dices[1],
-                                roll3: roll_dices[2],
                                 status1: flags[0],
                                 status2: flags[1],
                                 status3: flags[2],
@@ -673,6 +671,65 @@
         })
     });
 
+    function create_flag_success_skill(rollDices, threshold, points) {
+        const result = Array(rollDices.length).fill(0);
+      
+        const indexedRolls = rollDices
+          .map((val, i) => [i, val])
+          .sort((a, b) => a[1] - b[1]);
+      
+        for (const [i, val] of indexedRolls) {
+          if (val <= threshold) continue;
+      
+          const diff = val - threshold;
+      
+          if (diff > points) {
+            result[i] = 1;
+          } else {
+            points -= diff;
+          }
+        }
+      
+        return result;
+      }
+      
+
+    for (const [key, value] of Object.entries(skill_code)){
+        value.forEach(element=>{
+            on(`clicked:test_${element}`,(info)=>{
+                const name = `${skill_code_translate[element]}(${wsp_code_translate[key]})`;
+                startRoll(`&{template:test} {{difficulty_lvl_val=[[0[computed value]]]}} {{test_name=${name}}} {{test_type_txt=[[0[computed value]]]}} {{res=[[0[computed value]]]}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}} {{status1=[[0[computed value]]]}} {{status2=[[0[computed value]]]}} {{status3=[[0[computed value]]]}}`,(results)=>{
+                    const roll_dices = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
+                    getAttrs([element, key, "test_type_txt", "difficulty_lvl"],function (values){
+                        let difficulty = (parseInt(values[key] || 0));
+                        const points = (parseInt(values[element] || 0));
+                        const test_type = (parseInt(values["test_type_txt"] || 0));
+                        const difficulty_mod = set_difficulty_level(roll_dices, (parseInt(values["difficulty_lvl"] || 0)), 8);
+                        difficulty += difficulty_values[difficulty_mod];
+                        //TODO every multiple of 4 get smaller difficulty
+                        flags = create_flag_success_skill(roll_dices, difficulty, points);
+                        let final_result;
+                        if (!test_type){
+                            final_result = calculate_result_test(flags)
+                        }else{
+                            final_result = calculate_result_test_open(roll_dices, difficulty)
+                        }
+                        finishRoll(
+                            results.rollId,
+                            {
+                                status1: flags[0],
+                                status2: flags[1],
+                                status3: flags[2],
+                                res: final_result,
+                                test_type_txt: test_type,
+                                difficulty_lvl_val: difficulty_mod,
+                            });
+                    });
+                });
+            });
+        })
+    }
+
     //####################################
     //#############DIFFICULTY#############
     //####################################
@@ -699,7 +756,7 @@
     <div class="sheet-rolltemplate-container">
         <div class="sheet-rolltemplate-info">
             <h2>
-                {{wsp}} - 
+                {{test_name}} - 
                 {{#rollTotal() computed::test_type_txt 0}}Test Zamknięty{{/rollTotal() computed::test_type_txt 0}}
                 {{#rollTotal() computed::test_type_txt 1}}Test Otwarty{{/rollTotal() computed::test_type_txt 1}}
                 {{#rollTotal() computed::difficulty_lvl_val 0}}Łatwy{{/rollTotal() computed::difficulty_lvl_val 0}}
