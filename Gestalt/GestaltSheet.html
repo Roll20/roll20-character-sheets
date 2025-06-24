@@ -8,7 +8,9 @@
     <button type="action" name="act_attacks" class="sheet-button5">Attacks</button>
     <button type="action" name="act_defenses" class="sheet-button6">Defenses</button>
     <button type="action" name="act_spells" class="sheet-button7">Spells</button>
-    <button type="action" name="act_notes" class="sheet-button8">Notes</button>
+    <button type="action" name="act_oaths" class="sheet-button8">Oaths</button>
+    <button type="action" name="act_magicitems" class="sheet-button9">Magic Items</button>
+    <button type="action" name="act_notes" class="sheet-button10">Notes</button>
 </div>
 
 <div class="sheet-character">
@@ -20,6 +22,21 @@
 				<label>Primary Class:</label><input type="text" name="attr_primaryclass" />
 				<label>Secondary Class:</label><input type="text" name="attr_secondaryclass" />
 				<label>Level:</label><input type="number" value="1" name="attr_characterlevel" />
+				<label>Initiative:</label>
+				<div class="sheet-grid-sectioninit">
+					<div class="sheet-reflexsave">
+						<textarea title="Reflex Modifier" name="attr_finalrefsave" class="sheet-numwindow" readonly>0</textarea>
+					</div>
+					<div class="sheet-arbinit">
+						<input title="Arbitrary Initiative Modifier" type="number" placeholder="0" name="attr_initmod"  />
+					</div>
+					<div class="sheet-fininit">
+						<textarea title="Final Initiative Modifier" name="attr_finalinit" class="sheet-numwindow" readonly>0</textarea>
+					</div>
+					<div class="sheet-rollforinit">
+						<button title="Roll Initiative (Select your token first!)" type='roll' name='roll_testinit' value='&{template:default} {{name=@{character_name}}} {{Initiative=[[1d20 + @{finalinit} &{tracker}]]}}'></button>
+					</div>
+				</div>
 			</div>
 
 			<div class="sheet-lineage sheet-block">
@@ -544,10 +561,10 @@
 			<option value="3">Exceptional</option>
 		</select>
 		<fieldset class="repeating_attacks">
-			<input type="text" placeholder="Attack Name" name="attr_attackname" />
-			<input type="text" value="0" name="attr_attackbonus" />
-			<input type="text" value="1d4" name="attr_attackdamage" />
-			<input type="text" value="Properties" name="attr_attackproperties" />
+			<input title="Name of the attack" type="text" placeholder="Attack Name" name="attr_attackname" />
+			<input title="To-hit bonus" type="text" value="0" name="attr_attackbonus" />
+			<input title="Damage roll (include all bonuses)" type="text" value="1d4" name="attr_attackdamage" />
+			<input title="Attack Properties, like Finesse or Reach" type="text" value="Properties" name="attr_attackproperties" />
 			<button type='roll' name='roll_testattackroll' value='&{template:default} {{name=@{character_name}}} {{Attack roll to hit=[[1d20 + @{attackbonus}]]}} {{Damage value rolled=[[@{attackdamage}]]}}'></button>
 		</fieldset>
 
@@ -606,9 +623,8 @@
 					<input type="checkbox" id="armormedium" name="attr_armormedium" value="yes"> Medium Armor<br>
 					<input type="checkbox" id="armorheavy" name="attr_armorheavy" value="yes"> Heavy Armor<br>
 					<input type="checkbox" id="armorsuperheavy" name="attr_armorsuperheavy" value="yes"> Superheavy Armor<br>
-					<input type="checkbox" id="armorshields" name="attr_armorshields" value="yes"> Shields<br>
 					<label>Armor Name</label>
-					<input type="text" name="attr_armorname" />
+					<input title="Armor name. Include shields here too." type="text" name="attr_armorname" />
 					<label>Armor AC Bonus</label><input type="number" placeholder="0" name='attr_armoracbonus' value='0'>
 					<label>Armor Max Dex Bonus</label>(put 10 or higher for no max dex limit)<br><input type="number" name='attr_armormaxdexbonus' value='10'>
 					<label>Armor Threshold</label><input type="number" placeholder="0" name='attr_armorthreshold' value='0'>
@@ -672,7 +688,7 @@
 		<fieldset class="repeating_Spell Example">
 			<label>Spell Name</label><input type="text" name="attr_spellname" placeholder="Spell Name" />
 			<label>Spell Text</label><textarea placeholder='Enter spell info' maxlength='2000' minlength='10' name="attr_spelltext"></textarea>
-			<button type='roll' name='roll_pastespell' value='&{template:default} {{name=@{character_name}}} {{Primary Spell DC=@{finalspellcastingdcpri}}} {{Secondary Spell DC=@{finalspellcastingdcsec}}} {{Spell Name=@{spellname}}} {{Spell Text=@{spelltext}}}'></button>
+			<button title="Paste this spell into chat" type='roll' name='roll_pastespell' value='&{template:default} {{name=@{character_name}}} {{Primary Spell DC=@{finalspellcastingdcpri}}} {{Secondary Spell DC=@{finalspellcastingdcsec}}} {{Spell Name=@{spellname}}} {{Spell Text=@{spelltext}}}'></button>
 		</fieldset>
 	</span> 
 </div>
@@ -684,10 +700,41 @@
 	</span> 
 </div>
 
+<div class="sheet-oaths">
+    <h2>Oaths</h2><br>
+    <span>
+		<fieldset class="repeating_Oath">
+			<label>Oath</label><textarea placeholder='Enter your oath' maxlength='2000' minlength='1' name="attr_oathtext"></textarea>
+			<button title="Paste this oath into chat" type='roll' name='roll_pasteoath' value='&{template:default} {{name=@{character_name}}} {{Oath=@{oathtext}}}'></button>
+		</fieldset>
+	</span> 
+</div>
+
+<div class="sheet-magicitems">
+    <h2>Magic Item Inventory</h2><br>
+    <span>
+		<fieldset class="repeating_Magicitem">
+			<label>Item Name</label><input type="text" name="attr_magicitemname" placeholder="Item Name" />
+			<label>Item Description</label><textarea placeholder='Describe your item' maxlength='2000' minlength='1' name="attr_magicitemtext"></textarea><br>
+			<select name='attr_magicitemslot' class="abilitytype">
+					<option value="0">Head</option>
+					<option value="1">Hands</option>
+					<option value="2">Accessory</option>
+					<option value="3">Worn</option>
+					<option value="4" selected>Wielded</option>
+					<option value="5">Legs</option>
+					<option value="6">Exotic</option>
+					<option value="7">Stored</option>
+			</select>
+			<input type="checkbox" id="attunedornot" name="attr_attunedorno" value="no"> Attunement Required?
+			<button title="Paste item description into chat" type='roll' name='roll_pastemagicitem' value='&{template:default} {{name=@{character_name}}} {{Magic Item Name=@{magicitemname}}} {{Magic Item Description=@{magicitemtext}}}'></button>
+		</fieldset>
+	</span> 
+</div>
 
 
 <script type="text/worker">
-    const buttonlist = ["character", "skills", "traits", "classf", "feats", "attacks", "defenses", "spells", "notes"];
+    const buttonlist = ["character", "skills", "traits", "classf", "feats", "attacks", "defenses", "spells", "oaths", "magicitems", "notes"];
     buttonlist.forEach(button => {
         on(`clicked:${button}`, function() {
             setAttrs({
@@ -696,8 +743,8 @@
         });
     });
 	//Spellcasting and Saving Throws section
-	on("sheet:opened change:characterlevel change:strength change:dexterity change:constitution change:intelligence change:wisdom change:charisma change:proftypespellspri change:proftypespellssec change:spellcastingattribpri change:spellcastingattribsec change:spellcastingdcpri change:spellcastingdcsec change:saveproffort change:fortsave change:saveprofref change:refsave change:saveprofwill change:willsave change:proftypeacademia change:abilityscoreacademia change:academia change:proftypeacrobatics change:abilityscoreacrobatics change:acrobatics change:proftypeanimalh change:abilityscoreanimalh change:animalh change:proftypeaquatic change:abilityscoreaquatic change:aquatic change:proftypearcanel change:abilityscorearcanel change:arcanel change:proftypeathletics change:abilityscoreathletics change:athletics change:proftypebluff change:abilityscorebluff change:bluff change:proftypefieldcraft change:abilityscorefieldcraft change:fieldcraft change:proftypeintimidate change:abilityscoreintimidate change:intimidate change:proftypeinvestigation change:abilityscoreinvestigation change:investigation change:proftypemedicine change:abilityscoremedicine change:medicine change:proftypemerchantl change:abilityscoremerchantl change:merchantl change:proftypemilitaryl change:abilityscoremilitaryl change:militaryl change:proftypeperception change:abilityscoreperception change:perception change:proftypeperform change:abilityscoreperform change:profession change:proftypeprofession change:abilityscoreprofession change:profession change:proftypepolitique change:abilityscorepolitique change:politique change:proftypereligion change:abilityscorereligion change:religion change:proftypestealth change:abilityscorestealth change:stealth change:proftypetechl change:abilityscoretechl change:techl", function(){
-		getAttrs(["characterlevel","strength","dexterity","constitution","intelligence","wisdom","charisma","proftypespellspri","proftypespellssec","spellcastingattribpri","spellcastingdcpri","spellcastingattribsec","spellcastingdcsec","saveproffort","fortsave","saveprofref","refsave","saveprofwill","willsave","proftypeacademia","abilityscoreacademia","academia","proftypeacrobatics","abilityscoreacrobatics","acrobatics","proftypeanimalh","abilityscoreanimalh","animalh","proftypeaquatic","abilityscoreaquatic","aquatic","proftypearcanel","abilityscorearcanel","arcanel","proftypeathletics","abilityscoreathletics","athletics","proftypebluff","abilityscorebluff","bluff","proftypefieldcraft","abilityscorefieldcraft","fieldcraft","proftypeintimidate","abilityscoreintimidate","intimidate","proftypeinvestigation","abilityscoreinvestigation","investigation","proftypemedicine","abilityscoremedicine","medicine","proftypemerchantl","abilityscoremerchantl","merchantl","proftypemilitaryl","abilityscoremilitaryl","militaryl","proftypeperception","abilityscoreperception","perception","proftypeperform","abilityscoreperform","profession","proftypeprofession","abilityscoreprofession","profession","proftypepolitique","abilityscorepolitique","politique","proftypereligion","abilityscorereligion","religion","proftypestealth","abilityscorestealth","stealth","proftypetechl","abilityscoretechl","techl"], function(values) {
+	on("sheet:opened change:characterlevel change:strength change:dexterity change:constitution change:intelligence change:wisdom change:charisma change:initmod change:proftypespellspri change:proftypespellssec change:spellcastingattribpri change:spellcastingattribsec change:spellcastingdcpri change:spellcastingdcsec change:saveproffort change:fortsave change:saveprofref change:refsave change:saveprofwill change:willsave change:proftypeacademia change:abilityscoreacademia change:academia change:proftypeacrobatics change:abilityscoreacrobatics change:acrobatics change:proftypeanimalh change:abilityscoreanimalh change:animalh change:proftypeaquatic change:abilityscoreaquatic change:aquatic change:proftypearcanel change:abilityscorearcanel change:arcanel change:proftypeathletics change:abilityscoreathletics change:athletics change:proftypebluff change:abilityscorebluff change:bluff change:proftypefieldcraft change:abilityscorefieldcraft change:fieldcraft change:proftypeintimidate change:abilityscoreintimidate change:intimidate change:proftypeinvestigation change:abilityscoreinvestigation change:investigation change:proftypemedicine change:abilityscoremedicine change:medicine change:proftypemerchantl change:abilityscoremerchantl change:merchantl change:proftypemilitaryl change:abilityscoremilitaryl change:militaryl change:proftypeperception change:abilityscoreperception change:perception change:proftypeperform change:abilityscoreperform change:profession change:proftypeprofession change:abilityscoreprofession change:profession change:proftypepolitique change:abilityscorepolitique change:politique change:proftypereligion change:abilityscorereligion change:religion change:proftypestealth change:abilityscorestealth change:stealth change:proftypetechl change:abilityscoretechl change:techl", function(){
+		getAttrs(["characterlevel","strength","dexterity","constitution","intelligence","wisdom","charisma","initmod","proftypespellspri","proftypespellssec","spellcastingattribpri","spellcastingdcpri","spellcastingattribsec","spellcastingdcsec","saveproffort","fortsave","saveprofref","refsave","saveprofwill","willsave","proftypeacademia","abilityscoreacademia","academia","proftypeacrobatics","abilityscoreacrobatics","acrobatics","proftypeanimalh","abilityscoreanimalh","animalh","proftypeaquatic","abilityscoreaquatic","aquatic","proftypearcanel","abilityscorearcanel","arcanel","proftypeathletics","abilityscoreathletics","athletics","proftypebluff","abilityscorebluff","bluff","proftypefieldcraft","abilityscorefieldcraft","fieldcraft","proftypeintimidate","abilityscoreintimidate","intimidate","proftypeinvestigation","abilityscoreinvestigation","investigation","proftypemedicine","abilityscoremedicine","medicine","proftypemerchantl","abilityscoremerchantl","merchantl","proftypemilitaryl","abilityscoremilitaryl","militaryl","proftypeperception","abilityscoreperception","perception","proftypeperform","abilityscoreperform","profession","proftypeprofession","abilityscoreprofession","profession","proftypepolitique","abilityscorepolitique","politique","proftypereligion","abilityscorereligion","religion","proftypestealth","abilityscorestealth","stealth","proftypetechl","abilityscoretechl","techl"], function(values) {
 
 			//Variables
 			let tempcharacterlevel = parseInt(values.characterlevel)||0;
@@ -729,6 +776,12 @@
 			let tempfinalfortsave = 0;
 			let tempfinalrefsave = 0;
 			let tempfinalwillsave = 0;
+			
+			//temporary holder of initiative modifier
+			let temparbitraryinitmod = parseInt(values.initmod)||0;
+			
+			//temporary holder of final initiative modifier
+			let tempfinalinit = 0;
 			
 			//temporary holders of the final spell dc values
 			let tempfinalspellcastingdcpri = 0;
@@ -846,6 +899,9 @@
 			} else {
 					tempfinalwillsave = tempwisdom + temparbitrarywillbonus;
 			}
+			
+			//do Initiative
+			tempfinalinit = tempfinalrefsave + temparbitraryinitmod;
 	
 			setAttrs({
 				//spellcasting dcs
@@ -857,6 +913,8 @@
 				finalrefsave: tempfinalrefsave,
 				finalwillsave: tempfinalwillsave,
 				
+				//initiative
+				finalinit: tempfinalinit
 			
 			});
 		});
@@ -1668,8 +1726,6 @@
 				tempfinalthreshold = temparmorthreshold;
 			}
 
-			//set Unaware
-			tempfinalunaware = 15 + tempunaware;
 
 			//Check max dex
 			if (tempdexterity>=tempmaxdex){
@@ -1681,14 +1737,39 @@
 			//Do Defenses
 			if (tempdefenseprof === 0){
 				tempfinalactotal = 10 + tempcappeddex + tempactotal + temparmorac;
+				if (tempfinalactotal <= 15 + tempunaware){
+					tempfinalunaware = tempfinalactotal;
+				} else {
+					tempfinalunaware = 15 + tempunaware;
+				}
 			} else if (tempdefenseprof === 1){
 				tempfinalactotal = 10 + tempcappeddex + tempactotal + temparmorac + skilledbonus;
+				if (tempfinalactotal <= 15 + tempunaware){
+					tempfinalunaware = tempfinalactotal;
+				} else {
+					tempfinalunaware = 15 + tempunaware;
+				}
 			} else if (tempdefenseprof === 2){
 				tempfinalactotal = 10 + tempcappeddex + tempactotal + temparmorac + professionalbonus;
+				if (tempfinalactotal <= 15 + tempunaware){
+					tempfinalunaware = tempfinalactotal;
+				} else {
+					tempfinalunaware = 15 + tempunaware;
+				}
 			} else if (tempdefenseprof === 3){
 				tempfinalactotal = 10 + tempcappeddex + tempactotal + temparmorac + exceptionalbonus;
+				if (tempfinalactotal <= 15 + tempunaware){
+					tempfinalunaware = tempfinalactotal;
+				} else {
+					tempfinalunaware = 15 + tempunaware;
+				}
 			} else {
 				tempfinalactotal = 10 + tempcappeddex + tempactotal + temparmorac;
+				if (tempfinalactotal <= 15 + tempunaware){
+					tempfinalunaware = tempfinalactotal;
+				} else {
+					tempfinalunaware = 15 + tempunaware;
+				}
 			}
 
 
