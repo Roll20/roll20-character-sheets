@@ -1,3 +1,9 @@
+# 2025-6-24
+
+- Fix Training Packages title
+- Make training package tab actually clickable
+- Generate correct list of levelup skills for levelup summary.
+
 # 2025-6-17
 
 - Fix a bug with Critscaling sometimes corrupting the critical
