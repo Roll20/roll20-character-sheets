@@ -1109,7 +1109,7 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
   <input type='radio' name='tabsetlevelup' id='leveluptalents'>
     <label for='leveluptalents'>Talents</label>
   <input type='radio' name='tabsetlevelup' id='leveluptrainingpackage'>
-    <label for='leveluptalents'>Training Packags</label>
+    <label for='leveluptrainingpackage'>Training Packages</label>
 
   <div class='tab-panels'>
 
@@ -1995,11 +1995,17 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
     </div>
 
+
     <div class='tab-panel'>
-      <h2>Traing Packages</h2>
+      <h2>Training Packages</h2>
+
+      
+      <button type='action' class='fancybutton' name='act_dump_summary'>Dump Summary</button>
 
     </div>
 
+
+   
   </div>
 </div>
 
@@ -6031,7 +6037,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision adc0f7a47c63e5e07a2a90bbc4594e3aca1c54bb
+Revision 5a0f6652879e0afe5c618f1dfcae5b706a1e5279
 
 
 <hr>
@@ -10645,7 +10651,6 @@ function levelUpReview() {
   pendingInfo();
 
   console.log("LevelUpReview", cmdata);
-  console.log("LevelupReview: Summary", levelup);
 
   getAttrsPending(["level"], (ev) => {
       const level = parseIntDefault(ev.level, 0);
@@ -10653,24 +10658,138 @@ function levelUpReview() {
       levelstr = `Level ${newlevel}`; 
 
       const levelup = getLevelUpSummary(cmdata, level);
+      console.log("Levelup", levelup)
 
+      for (const statgain in levelup.statgains) {
+	addRepeatingSection('levelupreviewstatgains', 'levelupreviewlistitem', (id) => {
+	  const str = `${sg} (x${sgcount[sg].count})`;
+	  setCharmancerText({[`${id} .text`]: str});
+	});
+
+      }
+      for (const skill in levelup.skills) {
+	const deved = levelup.skills[skill]
+	let transskill = getTranslationByKey(skill)
+	// deved is an array of each specialisation
+	for (const obj of deved) {
+	  addRepeatingSection('levelupreviewskills', 'levelupreviewlistitem', (id) => {
+	    const skillmsg = obj.specialisation ?
+		  `${transskill}: ${obj.specialisation} &rarr; +${obj.ranks} Ranks` :
+		  `${transskill} &rarr; +${obj.ranks} Ranks`
+	    setCharmancerText({[`${id} .text`]: skillmsg });
+	});
+	}
+      }
   });
-/**/
+
+
+  return;
+/*
+  addPendingFunction("LevelupReview: Talents", () => {
+      const values = cmdata.levelup.values;
+      for (const purchase in values) {
+	if (!purchase.endsWith("_talent")) {
+	  // Skip non-talents
+	  continue;
+	}
+	addRepeatingSection('levelupreviewtalents', 'levelupreviewlistitem', (id) => {
+	    const prefix = purchase.match(/^(.*)_talent/)[1];
+
+	    const fullname = values[purchase];
+	    const splitname = fullname.match(/^Talent:([^?]*)?/)
+	    const talentname = splitname[1];
+
+	    const tierstr = values[`${prefix}_tier`] || "Tier 1";
+	    const tier = tierstr.match(/^Tier (\d\d*)/)[1]
+
+	    const cost = '?'
+
+	    const str = `${talentname} - Tier ${tier} - ${cost} DP`;
+	    setCharmancerText({[`${id} .text`]: str});
+	});
+      }
+  });
+
+}-}*/
   
 
 
   checkPending();
 }
 
+
+
+
 /**/
 function getLevelUpSummary(cmdata) {
   const result = {}
-
+  result.skills = {}
+  result.spelllists = {}
+  result.talents = {}
   result.statgains = countStatGains(cmdata);
+
+  const values = cmdata.levelup.values;
+  for (const purchase in values) {
+    // Name of a specialisation - ignore
+    if (purchase.endsWith("_specname") ||
+	purchase.endsWith("_skillrankscombo") ||
+	purchase.endsWith("_sheetprefix")) {
+      continue;
+    }
+    if (purchase.includes("_talent_")) {
+      console.log("Talent pruchase")
+    } else if (purchase.includes("spelllist")) {
+      console.log("Spell purchase");
+    } else {
+      const value = values[purchase];
+      if (typeof(value) != "string") {
+	continue;
+      }
+      const [ranks, cost] = optionDecodeIntPair(values[purchase]);
+      if (!ranks || ranks < 1) {
+	continue;
+      }
+      // So we have repeating or non-repeating: handle non -repeating first
+      if (purchase.startsWith("repeating")) {
+	// What is the name
+	const namekey = purchase.replace(/_cmskillranks$/, "_specname");
+	const name = values[namekey];
+	// Prefix on the sheet
+	const prefixkey = purchase.replace(/_cmskillranks$/, "_sheetprefix");
+	let prefix = values[prefixkey];
+	let skillname = purchase.match(/_cmskill_([^_]*)/)[1];
+	if (!prefix) {
+	  // New skill, generate the prefix
+	  let rowid = generateRowID();
+	  prefix = `repeating_specialization${skillname}_${rowid}`
+	}
+	// Saved as array of object: { specialisation: X, ranks: N, prefix: gIbErIsH ]
+	if (!result.skills[skillname]) {
+	  result.skills[skillname] = [];
+	}
+	result.skills[skillname].push({ specialisation: name,
+	      prefix: prefix, ranks: ranks})
+      } else {
+	// Skill is encoded as 'cmskill<name>ranks'
+	console.log("Saving: ", purchase);
+	const skill = purchase.match(/^cmskill(.*)ranks$/)[1];
+	result.skills[skill] = []
+	result.skills[skill].push({ ranks: ranks} );
+      }
+
+    }
+    
+  }
+
 
 
   return result
 }
+
+onCheck("clicked:dump_summary", () => {
+  console.log("Level Up Summary", getLevelUpSummary(getCharmancerData()));
+});
+
 
 
 
