@@ -1,0 +1,90 @@
+- const DICE = Array.from(Array(10).keys(), (key) => `roll_style${key + 1}`);
+
+mixin tags(array)
+  each tag in array
+    if (tag[0] === "^")
+      | {{#{tag}}}
+    else
+      | {{##{tag}}}
+  if block
+    block
+  each tag in array.reverse()
+    if (tag[0] === "^")
+      - tag = tag.slice(1);
+      | {{/#{tag}}}
+    else
+      | {{/#{tag}}}
+
+mixin rollFunctions(array)
+  each tag in array
+    | {{##{tag}}}
+  if block
+    block
+  each tag in array.reverse()
+    | {{/#{tag}}}
+
+mixin displayDie(die)
+  +rollFunctions([`rollBetween() ${die} 1 1`])
+    span.sheet-wf-style__face-1= `{{${die}}}`
+  +rollFunctions([`rollBetween() ${die} 2 2`])
+    span.sheet-wf-style__face-2= `{{${die}}}`
+  +rollFunctions([`rollBetween() ${die} 3 3`])
+    span.sheet-wf-style__face-3= `{{${die}}}`
+  +rollFunctions([`rollBetween() ${die} 4 4`])
+    span.sheet-wf-style__face-4= `{{${die}}}`
+  +rollFunctions([`rollBetween() ${die} 5 5`])
+    span.sheet-wf-style__face-5= `{{${die}}}`
+  +rollFunctions([`rollBetween() ${die} 6 20`])
+    span.sheet-wf-style__face-6= `{{${die}}}`
+
+rolltemplate.sheet-rolltemplate-action
+  .sheet-wf-wrapper
+    .sheet-wf-header
+      +tags(["character_name"])
+        .sheet-wf-character-name
+          span {{character_name}}
+      +tags(["wild"])
+        .sheet-wf-go-wild
+          span(data-i18n="goes_wild") Goes&#10;Wild
+      +tags(["focus"])
+        .sheet-wf-focus-up
+          span(data-i18n="focuses_up") Focuses&#10;Up
+      .sheet-wf-circumstance
+        +rollFunctions(["rollBetween() question 1 1"])
+          span(data-i18n="advantage") Advantage!
+        +rollFunctions(["rollBetween() question -1 -1"])
+          span(data-i18n="disadvantage") Disadvantage!
+
+      .sheet-wf-style-and-skill
+        span.sheet-wf-header--style {{style}}
+        | &nbsp;
+        span.sheet-wf-header--skill {{skill}}
+
+    .sheet-wf-dice-tray
+      .sheet-wf-style
+        +rollFunctions(["rollBetween() question 1 1"])
+          .sheet-wf-style__roll--advantage
+            each die in DICE
+              +tags([die])
+                +displayDie(die)
+        +rollFunctions(["rollBetween() question 0 0"])
+          .sheet-wf-style__roll
+            each die in DICE
+              +tags([die])
+                +displayDie(die)
+        +rollFunctions(["rollBetween() question -1 -1"])
+          .sheet-wf-style__roll--disadvantage
+            each die in DICE
+              +tags([die])
+                +displayDie(die)
+
+      .sheet-wf-action(class="sheet-wf-action--{{action_is}}")
+        +rollFunctions(["rollBetween() roll_action 1 4"])
+          span.sheet-wf-action__roll--partial {{roll_action}}
+          span.sheet-wf-action__result(data-i18n="success_partial") Partial Success
+        +rollFunctions(["rollBetween() roll_action 5 7"])
+          span.sheet-wf-action__roll {{roll_action}}
+          span.sheet-wf-action__result(data-i18n="success_standard") Standard Success
+        +rollFunctions(["rollBetween() roll_action 8 20"])
+          span.sheet-wf-action__roll--critical {{roll_action}}
+          span.sheet-wf-action__result(data-i18n="success_critical") Critical Success

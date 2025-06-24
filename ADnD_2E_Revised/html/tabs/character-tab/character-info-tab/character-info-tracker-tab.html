@@ -28,10 +28,6 @@
                         <td><input type="number" name="attr_temp-AC" title="@{temp-AC}" class="sheet-short"/></td>
                     </tr>
                     <tr>
-                        <td>AC Touch:</td>
-                        <td colspan="3"><input type="number" name="attr_ACtouch" title="@{ACtouch}" class="sheet-short"/></td>
-                    </tr>
-                    <tr>
                         <td>AC Missile:</td>
                         <td><input type="number" name="attr_ACmissile" title="@{ACmissile}" class="sheet-short"/></td>
                         <td colspan="2" class="sheet-note">* Body shield gives +2 vs missile</td>
@@ -42,7 +38,7 @@
                         <td colspan="2" class="sheet-note">* No Dex bonus</td>
                     </tr>
                     <tr>
-                        <td style="width:100px;">AC Shieldless:</td>
+                        <td>AC Shieldless:</td>
                         <td><input type="number" name="attr_ACshieldless" title="@{ACshieldless}" class="sheet-short"/></td>
                         <td colspan="2" class="sheet-note">* No AC from shield</td>
                     </tr>
@@ -53,11 +49,23 @@
 
                     </tr>
                     <tr>
-                        <td>AC Head:</td>
+                        <td>AC Head (opt):</td>
                         <td><input type="number" name="attr_AChead" title="@{AChead}" class="sheet-short"/></td>
-                        <td colspan="2"></td>
+                        <td colspan="2" class="sheet-note">
+                            <span title="The Complete Fighter's Handbook p. 107: No helmet = AC 10 + Dex bonus + Shield + Magic items. Requires a Called Shot at -8 to hit">* The Complete Fighter's Handbook p. 107+122 ⓘ</span>
+                            <br>
+                            <span title="Player's Option: Combat & Tactics p. 43: No helmet = AC 10. Requires Called Shot at -4 to hit. Individual helmet ACs can be found on p. 146-150">* Player's Option: Combat & Tactics p. 43, 146-150 ⓘ</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>AC Touch (opt):</td>
+                        <td><input type="number" name="attr_ACtouch" title="@{ACtouch}" class="sheet-short"/></td>
+                        <td colspan="2" class="sheet-note">* Player's Option: Spells & Magic p. 120: No base AC from Armor. Magical bonuses from Armor still apply.</td>
                     </tr>
                 </table>
+                <br>
+                <h4>Armor Type & Special Defenses:</h4>
+                <textarea name="attr_armortype" title="@{armortype}"></textarea>
                 <br>
                 <h4>Surprise Roll</h4>
                 <table class="sheet-default-header-first-row">
@@ -73,12 +81,24 @@
                         <td><input type="text" name="attr_classsurprise" title="@{classsurprise}" class="sheet-short" value="0"/></td>
                         <td><input type="text" name="attr_dexreact" title="@{dexreact}" class="sheet-short"/></td>
                         <td><input type="text" name="attr_miscsurprise" title="@{miscsurprise}" class="sheet-short" value="0"/></td>
-                        <td><button type="roll" name="roll_surprise" title="%{surprise}" value="/w gm &{template:2Einversecheck} {{checkvs=Surprise Check}} {{character=@{character_name}}} {{checkroll=[[1d10+[[(@{racialsurprise})+(@{classsurprise})+(@{dexreact})+(@{miscsurprise})+(@{misc-mod})]] ]]}} {{checktarget=[[3]]}} {{color=brown}}">Roll</button></td>
+                        <td><button type="roll" name="roll_surprise" title="%{surprise}" value="/w gm &{template:2Einversecheck} {{checkvs=Surprise Check}} {{character=@{character_name}}} {{checkroll=[[1d10+(@{racialsurprise} [Race])+(@{classsurprise} [Class])+(@{dexreact} [Dexterity])+(@{miscsurprise} [Misc])+(@{misc-mod})]]}} {{checktarget=[[3]]}} {{color=brown}}">Roll</button></td>
                     </tr>
                 </table>
                 <br>
-                <h4>Armor Type & Special Defenses:</h4>
-                <textarea name="attr_armortype" title="@{armortype}"></textarea>
+                <h4>Concealed and Secret Door roll</h4>
+                <table class="sheet-default-header-first-row">
+                    <tr>
+                        <th>Target</th>
+                        <th>Racial</th>
+                        <th>Search</th>
+                    </tr>
+                    <tr>
+                        <td><input type="number" name="attr_secret-door-base" title="@{secret-door-base}" class="sheet-short" value="1"></td>
+                        <td><input type="text" name="attr_secret-door-race" title="@{secret-door-race}" class="sheet-short" value="0" list="secret-door"></td>
+                        <td><button type="roll" name="roll_secret-door-check-dm" value="&{template:2Edefault} {{name=Search for Concealed/Secret door}} {{subtitle=for @{character_name}}} {{color=dark-purple}} {{[Secret by DM](~@{character_name}|secret-door-check)=}} {{desc=You try to find a concealed or secret door...}}">Roll</button></td>
+                    </tr>
+                </table>
+                insert_hidden-doors-note.html
                 <hr>
                 <h4>Movement</h4>
                 <input type="radio" name="attr_tab3" class="sheet-tab sheet-tab15" value="1" checked/><span class="sheet-tab sheet-tab15">Basic</span>&nbsp;
@@ -485,6 +505,7 @@
                 <input type="radio" name="attr_tab2" class="sheet-tab sheet-tab13" value="1" checked/><span class="sheet-tab sheet-tab13">Standard</span>&nbsp;
                 <input type="radio" name="attr_tab2" class="sheet-tab sheet-tab14" value="2"/><span class="sheet-tab sheet-tab14">Ravenloft</span>
 
+                <button type="action" name="act_saving-throws-character" class="btn" style="vertical-align: text-bottom">Update Saves</button>
                 <table class="sheet-default-header-first-column sheet-default-header-first-row">
                     <tr>
                         <td></td>
@@ -494,7 +515,7 @@
                     </tr>
                     <tr>
                         <td class="sheet-padding-right">Paralyzation</td>
-                        <td><input type="text" name="attr_partar" title="@{partar}" class="sheet-short" placeholder="Target"/></td>
+                        <td><input type="number" step="1" name="attr_partar" title="@{partar}" class="sheet-short" placeholder="Target"/></td>
                         <td><input type="text" name="attr_parmod" title="@{parmod}" class="sheet-table-dynamic" value="0"/></td>
                         <td><input type="text" name="attr_parnotes" title="@{parnotes}" placeholder="Situational Modifiers"/>
                             insert_saving-throw-button.html_(par,Paralyzation)
@@ -502,7 +523,7 @@
                     </tr>
                     <tr>
                         <td>Poison</td>
-                        <td><input type="text" name="attr_poitar" title="@{poitar}" class="sheet-short" placeholder="Target"/></td>
+                        <td><input type="number" step="1" name="attr_poitar" title="@{poitar}" class="sheet-short" placeholder="Target"/></td>
                         <td><input type="text" name="attr_poimod" title="@{poimod}" class="sheet-table-dynamic" value="0"/></td>
                         <td><input type="text" name="attr_poinotes" title="@{poinotes}" placeholder="Situational Modifiers"/>
                             insert_saving-throw-button.html_(poi,Poison)
@@ -510,7 +531,7 @@
                     </tr>
                     <tr>
                         <td>Death</td>
-                        <td><input type="text" name="attr_deatar" title="@{deatar}" class="sheet-short" placeholder="Target"/></td>
+                        <td><input type="number" step="1" name="attr_deatar" title="@{deatar}" class="sheet-short" placeholder="Target"/></td>
                         <td><input type="text" name="attr_deamod" title="@{deamod}" class="sheet-table-dynamic" value="0"/></td>
                         <td><input type="text" name="attr_deanotes" title="@{deanotes}" placeholder="Situational Modifiers"/>
                             insert_saving-throw-button.html_(dea,Death)
@@ -518,7 +539,7 @@
                     </tr>
                     <tr>
                         <td>Rod</td>
-                        <td><input type="text" name="attr_rodtar" title="@{rodtar}" class="sheet-short" placeholder="Target"/></td>
+                        <td><input type="number" step="1" name="attr_rodtar" title="@{rodtar}" class="sheet-short" placeholder="Target"/></td>
                         <td><input type="text" name="attr_rodmod" title="@{rodmod}" class="sheet-table-dynamic" value="0"/></td>
                         <td><input type="text" name="attr_rodnotes" title="@{rodnotes}" placeholder="Situational Modifiers"/>
                             insert_saving-throw-button.html_(rod,Rod)
@@ -526,7 +547,7 @@
                     </tr>
                     <tr>
                         <td>Staff</td>
-                        <td><input type="text" name="attr_statar" title="@{statar}" class="sheet-short" placeholder="Target"/></td>
+                        <td><input type="number" step="1" name="attr_statar" title="@{statar}" class="sheet-short" placeholder="Target"/></td>
                         <td><input type="text" name="attr_stamod" title="@{stamod}" class="sheet-table-dynamic" value="0"/></td>
                         <td><input type="text" name="attr_stanotes" title="@{stanotes}" placeholder="Situational Modifiers"/>
                             insert_saving-throw-button.html_(sta,Staff)
@@ -534,7 +555,7 @@
                     </tr>
                     <tr>
                         <td>Wand</td>
-                        <td><input type="text" name="attr_wantar" title="@{wantar}" class="sheet-short" placeholder="Target"/></td>
+                        <td><input type="number" step="1" name="attr_wantar" title="@{wantar}" class="sheet-short" placeholder="Target"/></td>
                         <td><input type="text" name="attr_wanmod" title="@{wanmod}" class="sheet-table-dynamic" value="0"/></td>
                         <td><input type="text" name="attr_wannotes" title="@{wannotes}" placeholder="Situational Modifiers"/>
                             insert_saving-throw-button.html_(wan,Wand)
@@ -542,7 +563,7 @@
                     </tr>
                     <tr>
                         <td>Petrification</td>
-                        <td><input type="text" name="attr_pettar" title="@{pettar}" class="sheet-short" placeholder="Target"/></td>
+                        <td><input type="number" step="1" name="attr_pettar" title="@{pettar}" class="sheet-short" placeholder="Target"/></td>
                         <td><input type="text" name="attr_petmod" title="@{petmod}" class="sheet-table-dynamic" value="0"/></td>
                         <td><input type="text" name="attr_petnotes" title="@{petnotes}" placeholder="Situational Modifiers"/>
                             insert_saving-throw-button.html_(pet,Petrification)
@@ -550,7 +571,7 @@
                     </tr>
                     <tr>
                         <td>Polymorph</td>
-                        <td><input type="text" name="attr_poltar" title="@{poltar}" class="sheet-short" placeholder="Target"/></td>
+                        <td><input type="number" step="1" name="attr_poltar" title="@{poltar}" class="sheet-short" placeholder="Target"/></td>
                         <td><input type="text" name="attr_polmod" title="@{polmod}" class="sheet-table-dynamic" value="0"/></td>
                         <td><input type="text" name="attr_polnotes" title="@{polnotes}" placeholder="Situational Modifiers"/>
                             insert_saving-throw-button.html_(pol,Polymorph)
@@ -558,7 +579,7 @@
                     </tr>
                     <tr>
                         <td>Breath</td>
-                        <td><input type="text" name="attr_breathtar" title="@{breathtar}" class="sheet-short" placeholder="Target"/></td>
+                        <td><input type="number" step="1" name="attr_breathtar" title="@{breathtar}" class="sheet-short" placeholder="Target"/></td>
                         <td><input type="text" name="attr_breathmod" title="@{breathmod}" class="sheet-table-dynamic" value="0"/></td>
                         <td><input type="text" name="attr_breathnotes" title="@{breathnotes}" placeholder="Situational Modifiers"/>
                             insert_saving-throw-button.html_(breath,Breath)
@@ -566,7 +587,7 @@
                     </tr>
                     <tr>
                         <td>Spell</td>
-                        <td><input type="text" name="attr_sptar" title="@{sptar}" class="sheet-short" placeholder="Target"/></td>
+                        <td><input type="number" step="1" name="attr_sptar" title="@{sptar}" class="sheet-short" placeholder="Target"/></td>
                         <td><input type="text" name="attr_spmod" title="@{spmod}" class="sheet-table-dynamic" value="0"/></td>
                         <td><input type="text" name="attr_spnotes" title="@{spnotes}" placeholder="Situational Modifiers"/>
                             insert_saving-throw-button.html_(sp,Spell)
@@ -583,7 +604,7 @@
                         </tr>
                         <tr>
                             <td>Fear</td>
-                            <td><input type="text" name="attr_ftar" title="@{ftar}" class="sheet-short" placeholder="Target"/></td>
+                            <td><input type="number" step="1" name="attr_ftar" title="@{ftar}" class="sheet-short" placeholder="Target"/></td>
                             <td><input type="text" name="attr_fmod" title="@{fmod}" class="sheet-table-dynamic" value="0"/></td>
                             <td><input type="text" name="attr_fnotes" title="@{fnotes}" placeholder="Situational Modifiers"/>
                                 insert_saving-throw-button.html_(f,Fear)
@@ -591,7 +612,7 @@
                         </tr>
                         <tr>
                             <td>Horror</td>
-                            <td><input type="text" name="attr_horrtar" title="@{horrtar}" class="sheet-short" placeholder="Target"/></td>
+                            <td><input type="number" step="1" name="attr_horrtar" title="@{horrtar}" class="sheet-short" placeholder="Target"/></td>
                             <td><input type="text" name="attr_horrmod" title="@{horrmod}" class="sheet-table-dynamic" value="0"/></td>
                             <td><input type="text" name="attr_horrnotes" title="@{horrnotes}" placeholder="Situational Modifiers"/>
                                 insert_saving-throw-button.html_(horr,Horror)
@@ -599,7 +620,7 @@
                         </tr>
                         <tr>
                             <td>Madness</td>
-                            <td><input type="text" name="attr_madtar" title="@{madtar}" class="sheet-short" placeholder="Target"/></td>
+                            <td><input type="number" step="1" name="attr_madtar" title="@{madtar}" class="sheet-short" placeholder="Target"/></td>
                             <td><input type="text" name="attr_madmod" title="@{madmod}" class="sheet-table-dynamic" value="0"/></td>
                             <td><input type="text" name="attr_madnotes" title="@{madnotes}" placeholder="Situational Modifiers"/>
                                 insert_saving-throw-button.html_(mad,Madness)
@@ -623,7 +644,7 @@
                             <td><input type="text" name="attr_magrestar" title="@{repeating_magicres_$X_magrestar}" class="sheet-short" placeholder="Target"/></td>
                             <td><input type="text" name="attr_magresmod" title="@{repeating_magicres_$X_magresmod}" class="sheet-table-dynamic" value="0"/></td>
                             <td><input type="text" name="attr_magresnotes" title="@{repeating_magicres_$X_magresnotes}" placeholder="Situational Modifiers"/></td>
-                            <td><button type="roll" name="roll_magressave" title="%{repeating_magicres_$X_magressave}" value="/w gm &{template:2Echeck} {{checkvs=Save with @{magresname}}} {{character=@{character_name}}} {{checkroll=[[1d100cs1cf100-(@{magresmod})-(@{misc-mod})]]%}} {{checktarget=[[@{magrestar}]]%}} {{color=orange}}"></button></td>
+                            <td><button type="roll" name="roll_magressave" title="%{repeating_magicres_$X_magressave}" value="/w gm &{template:2Echeck} {{checkvs=Save with @{magresname}}} {{character=@{character_name}}} {{checkroll=[[1d100cs1cf100-(@{magresmod} [Modifier])-(@{misc-mod})]]%}} {{checktarget=[[@{magrestar}]]%}} {{color=orange}}"></button></td>
                         </tr>
                     </table>
                 </fieldset>
@@ -634,15 +655,15 @@
                 <details>
                     <summary>Saving throw modifier notes</summary>
                     <ul>
-                        <li>Dwarves, Gnomes and Halflings get +1 saving throw vs Wands, Staves, Rods and Spells for every 3½ points in Constitution. (PHB p. 28, 30, 32)</li>
-                        <li>Dwarves and Halflings get the same bonus vs poisons. (PHB p. 28, 30)</li>
-                        <li>Elves have 90% resistance to Sleep and Charm-related spells. (PHB p. 29)</li>
-                        <li>Half-Elves have 30% resistance to Sleep and Charm-related spells. (PHB p.30)</li>
-                        <li>Poison save from high Constitution affects Humans, Elves, Gnomes, and Half-elves. It does <b>not</b> affect Dwarves and Halflings (PHB p. 21)</li>
-                        <li>Defense Adjustment from Dexterity affects saving throws against attacks that can be dodged, like lightning bolt. (PHB p. 20, DMG p. 93)</li>
-                        <li>Magical Defense Adjustment from Wisdom only affects spells that attack the Mind such as: <em>beguiling, charm, fear, hypnosis, illusions, possession, suggestion,</em> etc. (PHB p. 23, DMG p. 93)</li>
-                        <li>Psionicists gain a +2 bonus on all saving throws vs. enchantment/charm spells and the like. (The Complete Psionics Handbook p. 14)</li>
-                        <li>Magical Armor gives bonus to saving throws vs something physical. Magical armor never gives a saving throw bonus against gas (which it cannot block), poison (which operates internally), and spells that are mental or that cause no physical damage. (DMG p. 93)</li>
+                        <li><strong>Dwarves, Gnomes, Halflings:</strong> Get +1 saving throw vs Wands, Staves, Rods and Spells for every 3½ points in Constitution. (PHB p. 28, 30, 32)</li>
+                        <li><strong>Dwarves, Halflings:</strong> Get +1 saving throw vs poisons for every 3½ points in Constitution. (PHB p. 28, 30)</li>
+                        <li><strong>Elves</strong> have 90% resistance to Sleep and Charm-related spells. (PHB p. 29)</li>
+                        <li><strong>Half-Elves</strong> have 30% resistance to Sleep and Charm-related spells. (PHB p.30)</li>
+                        <li><strong>Humans, Elves, Gnomes, Half-elves:</strong> Get bonus to saving throw vs Poison from high Constitution. It does <b>not</b> affect Dwarves and Halflings (PHB p. 21)</li>
+                        <li><strong>Dexterity Defense Adjustment:</strong> Affects saving throws against attacks that can be <strong>dodged</strong>, like lightning bolt. (PHB p. 20, DMG p. 93)</li>
+                        <li><strong>Wisdom Magical Defense Adjustment:</strong> Only affects spells that attack the <strong>Mind</strong> such as: <em>beguiling, charm, fear, hypnosis, illusions, possession, suggestion,</em> etc. (PHB p. 23, DMG p. 93)</li>
+                        <li><strong>Psionicists:</strong> Gain a +2 bonus on all saving throws vs. enchantment/charm spells and the like. (The Complete Psionics Handbook p. 14)</li>
+                        <li><strong>Magical Armor:</strong> Gives bonus to saving throws vs something physical. Magical armor never gives a saving throw bonus against gas (which it cannot block), poison (which operates internally), and spells that are mental or that cause no physical damage. (DMG p. 93)</li>
                     </ul>
                 </details>
                 <hr>

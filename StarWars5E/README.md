@@ -8,6 +8,31 @@ More Information
 - [Star Wars 5e Discord](https://discord.gg/zYcPYTu)
 
 # Changelog
+## 2025-05-07
+* Improvement : Added prepared checkbox for power
+* Bugfix : Solved issue with "item modifiers" 
+## 2025-04-25
+* Chore : Redone powers using PUG templating
+* Improvement : Added detail view for powers
+* Improvement : Added Powers import / Export (for npc)
+## 2025-03-21
+* Feature : Import / Export for NPC
+## 2024-11-30
+* Bugfix : Fixing buttons for when the sheet is resized
+* Bugfix : Fixing PC Powers
+* Improvement : Remade NPC Powers
+## 2024-11-27
+* Chore : Massive refactor of the sheet using GULP as build engine
+* Chore : Removal of leftover unused code for 5e compendium & Charmancer integration
+* Chore : Migrating from Legacy sheet to CSE
+* Bugfix : Removal of handler for turning speed and flying speed
+* Bugfix : Removal of Hp calculationf for ship and PC which was causing problem or not working.
+* Improvement : Small adjustement of the roll-templates.
+## 2024-11-16
+* correction following problem in PR 13282 : Npc traits visibility & Sheet Refresh problem
+## 2024-07-06
+* Changed the npc Layout
+* Added the possibility to switch "edit/view" of npc traits
 ## 2022-03-19
 * Bug Fix - It was identified that because the default to-hit modifier had been changed from DEX to WIS on the Ship Sheet, sheets upgrading from 2.4 were over-riding any PC weapons to WIS that had not been EXPLICITLY set to DEX, because the weapon attacks on PC and Ship share the same repeating fieldset.  This is a documented Roll20 *feature*.  We have set the default back to DEX on the Ship Weapons for now as a fix for anyone else that still needs to upgrade.  In addition, the defaults between the SHIP and PC defaults have been aligned.  In version 2.4 the PC sheet set the defaults to STR, the SHIP to DEX and we have confirmed that once a name was placed in the 2.4 attack section the defaults would change to DEX.  This should now keep both attack sections in line and avoid a potential future upgrade where one set of defaults writes back over the other. *Ideally in the future the ship weapons will be separated into their own repeating fieldset.*
 * Copied the Save modifiers from the PC sheet to the Ship sheet 

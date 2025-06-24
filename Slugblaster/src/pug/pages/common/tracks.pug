@@ -1,0 +1,47 @@
+- const { tracks } = data.common;
++panel({ name: 'tracks', title: 'Tracks' })
+  +block('content')
+    +repeating('tracks')
+      - const { hidden, track, broadcast, repeating } = tracks;
+      - const [name, desc] = repeating;
+      +block('edit')
+        .row.tracks__edit
+          each field in hidden
+            +field(field)
+          each field in repeating
+            - const hideLabel = ['track_name'].includes(field.name);
+            - const divClass = field.span ? `col-${field.span}` : '';
+            - const labelClass = hideLabel ? 'visually-hidden' : null;
+            .tracks__field(class=`${field.name} ${divClass}`)
+              unless field.type === "checkbox"
+                +field(field)
+                label(class=labelClass, data-i18n=field.name, for=field.name)= field.label
+              else
+                label(for=field.name)
+                  +field(field)
+                  span(class=labelClass, data-i18n=field.name)= field.label
+
+      +block('view')
+        +bubble({ name: 'track', broadcast })
+          +block('header')
+            .tracks__view
+              .tracks__progress-track
+                - const twelve = Array.from(Array(12).keys(), (i) => i + 1);
+                each index in twelve
+                  - const letter = { ...track.letter };
+                  - const marker = { ...track.marker };
+                  - letter.name = `${letter.name}_${index}`;
+                  - marker.name = `${marker.name}_${index}`;
+                  +field(letter).track__letter-exists
+                  label.track__progress(class=`track__progress--${index}`)
+                    +field(marker).track__marker
+                    +span(letter).track__letter
+                    span.track__marked X
+                    span.visually-hidden(data-i18n=marker.name)= marker.label + ' ' + index
+          +block('content')
+            +span(name).track__name
+            +span(desc)
+            label(data-i18n=desc.name)= desc.label
+
+      +block('delete')
+        +span(name).track__name

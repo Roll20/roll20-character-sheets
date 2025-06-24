@@ -1,0 +1,54 @@
+- const attrName = name => name.replace(/ /g, '_');
+
+mixin table(rows)
+  .table
+    .grid.header.2column
+      h3.small-caps.text-left(data-i18n='statistic')
+      .flex-center
+        h3.small-caps(data-i18n='value')
+    .grid.body
+      each val in rows
+        - const inputs = ['armor points', 'current glory']
+        .row.grid.2column
+          h3.text-left(data-i18n=val)
+          if inputs.includes(val)
+            +textInput(val)
+          else
+            span.text-center(name=`attr_${attrName(val)}`)
+
+mixin npcTable(rows)
+  .table
+    .header.2column
+      h3.small-caps.text-left(data-i18n='statistic')
+      .flex-center
+        h3.small-caps(data-i18n='value')
+    .body
+      each val in rows
+        .row.grid.2column
+          h3.text-left(data-i18n=val)
+          +dropInput({name: val})
+
+mixin textArea(name)
+  textarea(data-i18n-placeholder=name name=`attr_${attrName(name)}` placeholder=name)
+
+mixin repeatingFlags(name)
+  - const attr = name ? `flag_${attrName(name)}` : 'flag'
+  input.flag(name=`attr_${attr}` title='Settings toggle' type='checkbox' value='true' checked)
+  span.pictos p
+
+mixin notesTextarea(name)
+  -const attr = attrName(name)
+  +repeatingFlags(name)
+  span.display(name=`attr_${attr}`)
+  +textArea(name)
+
+mixin hoverSpan(name)
+  -const attr = attrName(name)
+  span.display(name=`attr_${attr}`)
+  +numberInput(attr)
+
+mixin nameTargetValue()
+  +textInput('name')
+  +numberInput('target value')
+  +repeatingRollButton('target value')
+

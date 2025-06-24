@@ -5,7 +5,7 @@ ROGUE_ARMOR['No Armor'] = {
     'Open Locks'       : '0',
     'Find/Remove Traps': '0',
     'Move Silently'    : '+10',
-    'Hide in Shadows'  : '5',
+    'Hide in Shadows'  : '+5',
     'Detect Noise'     : '0',
     'Climb Walls'      : '+10',
     'Tunneling'        : '+10',
