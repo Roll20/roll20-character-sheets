@@ -1,3 +1,54 @@
+# 2025-6-24
+
+- Fix Training Packages title
+- Make training package tab actually clickable
+- Generate correct list of levelup skills for levelup summary.
+
+# 2025-6-17
+
+- Fix a bug with Critscaling sometimes corrupting the critical
+- Move pack carried up a bit
+- Powerlevel change selector: Fix the event handler to work
+- Make onCheck more specific about changed values
+- Fix DB not updating after encumberance or shield change
+- Charactermancer: Fix some cultures not toggling the specialisation
+- Kill the old purchase.js which was still being loaded!?
+  - Removes a whole pile of the load time errors.
+
+# 2025-6-3
+
+- Attacks Edit
+   - Restore the attack table correctly
+   - Option for attack crit scaling
+   - Be more liberal in letting attack edits.
+- Encumberance:
+   - Move to single % encumberance, not 5 increments
+   - Fix problem with negative weight allowance.
+   - Update weight when items are deleted always
+- DB
+   - Fix issue with partial block - hopefully for real this time
+   - Include parry in DB
+   - Add enhanced and restricted parry
+   - Placeholders for Flatfoot and Surprised
+   - Update when encumberance penalty changes.
+- Add support for manually adding description only talents
+- Add a space for unusual events
+- Fix a typo arkness -> darkness
+- Fix for creatures display for level, level variance and size
+- Internal
+  - Ignore more stuff
+- Add placeholder for called shots and parry mods.
+- Show last 3 errors
+- Add ability for attacks to adjust criticals up and down
+- Creature Law:
+  - Fix layout of inline creatures in Creature Law
+- Attacks/Targetting
+  - Don't fetch tokenid, it's not useful
+  - Refresh based on name
+- Creatures
+  - Publish perception as a special skill for creatures
+  - Placeholder for power level scaling.
+
 # 2025-5-27
 
 - Update weapons to match current Creature Law

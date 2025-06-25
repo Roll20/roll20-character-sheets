@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.8.3] - 2025-06-14
+
+### Added
+
+- Add new modifier attributes to export.
+- Add Support & Request Thread button.
+
+### Changed
+
+- Fix Modifier damage unit on roll button.
+
+## [1.8.2] - 2025-05-22
+
+### Changed
+
+- Fix issue where new Modifiers damage field overwrites Ancient: Damage with 0.
+
 ## [1.8.1] - 2025-05-28
 
 ### Changed

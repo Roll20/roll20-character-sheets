@@ -4,6 +4,10 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 03.14.00 (Build 36)
+
+- added brawl combat proficiency
+
 ## 03.13.00 (Build 35)
 
 - added "Taint" of items that will add to shadow / scars and leads to miserable / ill-favoured rolls when >= hope / hope_max
