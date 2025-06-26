@@ -977,11 +977,10 @@
       <option value="Doctor">Doctor</option>
       <option value="Engineer: Blacksmithing">Engineer: Blacksmithing</option>
       <option value="Engineer: Carpentry">Engineer: Carpentry</option>
-      <option value="Engineer: Disarm Explosives">Engineer: Disarm Explosives</option>
+      <option value="Engineer: Demolitions">Engineer: Demolitions</option>
       <option value="Engineer: Gunsmithing">Engineer: Gunsmithing</option>
       <option value="Engineer: Mining">Engineer: Mining</option>
-      <option value="Engineer: Set Explosives">Engineer: Set Explosives</option>
-      <option value="Far East Immigrant">Far East Immigrant</option>
+      <option value="Celestial">Celestial</option>
       <option value="Fast Draw">Fast Draw</option>
       <option value="Gambler">Gambler</option>
       <option value="Gunslinger">Gunslinger</option>
@@ -2743,7 +2742,12 @@
                   <div class="sheet-controls-group">
                     <label class="sheet-d6pp-label" style="margin: 0; display: inline;">Status:</label>
                     <input type="text" class="sheet-d6pp" name="attr_status" readonly/>
-                    <button type="action" class="sheet-d6pp" name="act_revive">Revive</button>
+                    <div class="d6pp-checkbox">
+                      <label class="inline-checkbox-label">
+                        <input type="checkbox" name="attr_revived_toggle" />
+                        Revived
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -4886,7 +4890,12 @@
           <div class="sheet-controls-group">
             <label class="sheet-d6pp-label" style="margin: 0; display: inline;">Status:</label>
             <input type="text" class="sheet-d6pp" name="attr_status" readonly/>
-            <button type="action" class="sheet-d6pp" name="act_revive">Revive</button>
+            <div class="d6pp-checkbox">
+              <label class="inline-checkbox-label">
+                <input type="checkbox" name="attr_revived_toggle" />
+                Revived
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -6145,7 +6154,7 @@
         ITEMS.prospectors_outfit,
       ]
     },
-    "Far East Immigrant": {
+    "Celestial": {
       details: "2D Unarmed\nActivate Martial Arts\nExtra pips on haste\nSpecialized: Acrobatics",
       cash: "$8.00",
       items: [
@@ -6231,7 +6240,7 @@
       ]
     },
     "Mountain Man": {
-      details: "2D Survival\nActivate Bow\nReaction: FixIt\nSpecialized: Forging",
+      details: "2D Survival\nActivate Bow\nReaction: FixIt\nSpecialized: Foraging",
       cash: "$5.00",
       items: [
         ...ITEM_GROUPS.horse_kit,
@@ -6275,7 +6284,7 @@
       ]
     },
     "Outlaw Brute": {
-      details: "2D Unarmed\n2D Athletics\nPre-action: Ignore Pain\nSpecialized: Brawling",
+      details: "2D Unarmed\n2D Physical\nPre-action: Ignore Pain\nSpecialized: Brawling",
       cash: "$5.00",
       items: [
         ...ITEM_GROUPS.horse_kit,
@@ -6915,6 +6924,7 @@
     const fields = [
       'character_name',
       'whisper_toggle',
+      'revived_toggle',
       'condition_knockout',
       'status',
       `${key}_weapon`,
@@ -6961,6 +6971,7 @@
     const fields = [
       'character_name',
       'whisper_toggle',
+      'revived_toggle',
       'condition_knockout',
       'status',
       `${key}_name`,
@@ -7018,7 +7029,7 @@
   }
 
   function isConscious(values) {
-    return values.status === "Conscious" || values.status === "Revived";
+    return values.status === "Conscious" || values.revived_toggle === "on";
   }
 
   function rollErrorMessage(message) {
@@ -7047,6 +7058,7 @@
     getAttrs([
       "character_name",
       "whisper_toggle",
+      "revived_toggle",
       "status",
       "condition_knockout"
     ], function (values) {
@@ -7099,17 +7111,27 @@
       "advantage",
       `${skill}_specialized`,
       "whisper_toggle",
+      "revived_toggle",
       "status",
       "condition_knockout",
-      "initiative_rollcode"
+      "initiative_rollcode",
     ];
 
     getAttrs(attrs, values => {
-      if (!canAct(values)) return;
+      const displayName = getDisplayName(skill, values);
+      const ableToAct = canAct(values);
+
+      if(displayName === "Endure" && !ableToAct) {
+        rollErrorMessage("❌ Since you are not conscious you are defenceless. Your Endure roll is 3.");
+        return;
+      }
+      if (!ableToAct) {
+        rollErrorMessage("❌ You are not conscious and cannot act.");
+        return;
+      }
 
       const name = values.character_name || "Character";
       const whisper = values.whisper_toggle || "";
-      const displayName = getDisplayName(skill, values);
       const rollcode = getRollcode(skill, values);
       const safeRollcode = makeSafeRollcode(rollcode);
       const delta = values[`${skill}_specialized`] === "(specialized)" ? 1 : 0;
@@ -7141,12 +7163,15 @@
       `${skill}_name`,
       "advantage",
       "whisper_toggle",
+      "revived_toggle",
       "status",
       "condition_knockout",
     ];
 
     getAttrs(attrs, values => {
-      if (!canAct(values)) return;
+      if (!canAct(values)) {
+        rollErrorMessage("❌ You are not conscious and cannot act.");
+      }return;
 
       const name = values.character_name || "Character";
       const whisper = values.whisper_toggle || "";
@@ -7171,11 +7196,11 @@
 
   function canAct(values) {
     if (isKnockedOut(values)) {
-      rollErrorMessage("❌ You are knocked out and cannot act.");
+      //rollErrorMessage("❌ You are knocked out and cannot act.");
       return false;
     }
     if (!isConscious(values)) {
-      rollErrorMessage("❌ You are not conscious and cannot act.");
+      //rollErrorMessage("❌ You are not conscious and cannot act.");
       return false;
     }
     return true;
