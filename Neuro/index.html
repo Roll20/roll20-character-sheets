@@ -71,7 +71,7 @@
                 <button type="action" name="act_test_zre" class="charsheet-roll-button charsheet-wsp-roll-button"></button>
                 <div class="charsheet-wsp-pair">
                     <p class="charsheet-wsp-pair-title">Próg</p>
-                    <input class="charsheet-wsp-values" value="0" type="number" name="attr_difficulty_zre" readonly>
+                    <input class="charsheet-wsp-values" value="0" type="number" min="1" name="attr_difficulty_zre" readonly>
                 </div>
             </div>
         </div>
@@ -670,14 +670,16 @@
 
             return difficulty_level
         }
-    function set_difficulty_level_skill(rolls, current_difficulty, max_difficulty_level,skill_level) {
+    function set_difficulty_level_skill(rolls, current_difficulty, max_difficulty_level,skill_level,test_type=true) {
             let difficulty_level = current_difficulty;
             difficulty_level += count_number(rolls, 20);
             difficulty_level -= count_number(rolls, 1);
             if (skill_level<1){
                 difficulty_level++;
             }else{
-                difficulty_level-=Math.floor(skill_level/4)
+                if(test_type){
+                    difficulty_level-=Math.floor(skill_level/4);
+                }
             }
             if (difficulty_level < 0) difficulty_mod = 0;
             if (difficulty_level > max_difficulty_level) difficulty_level = max_difficulty_level;
@@ -713,10 +715,11 @@
                 name = wsp_code_translate[element]
                 startRoll(`&{template:test} {{difficulty_lvl_val=[[0[computed value]]]}} {{test_name=${name}}} {{test_type_txt=[[0[computed value]]]}} {{res=[[0[computed value]]]}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}} {{status1=[[0[computed value]]]}} {{status2=[[0[computed value]]]}} {{status3=[[0[computed value]]]}}`, (results) => {
                     const roll_dices = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
-                    getAttrs([element, "test_type_txt", "difficulty_lvl", `${element}_mod`], function (values) {
+                    getAttrs([element, "test_type_txt", "difficulty_lvl", `${element}_mod`, "difficulty_max_lvl"], function (values) {
                         let difficulty = (parseInt(values[element] || 0))+(parseInt(values[`${element}_mod`] || 0));
                         const test_type = (parseInt(values["test_type_txt"] || 0));
-                        const difficulty_mod = set_difficulty_level(roll_dices, (parseInt(values["difficulty_lvl"] || 0)), 8);
+                        const max_level_difficulty = clamp(parseInt(values["difficulty_max_lvl"]) || 6, 6, 8);
+                        const difficulty_mod = set_difficulty_level(roll_dices, (parseInt(values["difficulty_lvl"] || 0)), max_level_difficulty);
 
                         difficulty += difficulty_values[difficulty_mod];
                         flags = create_flag_success(roll_dices, difficulty)
@@ -744,8 +747,8 @@
     wsp_code.forEach(element => {
         on(`change:${element} change:${element}_mod change:difficulty_lvl sheet:opened`, function () {
             getAttrs(["difficulty_lvl", element, `${element}_mod`, "difficulty_max_lvl"], function (values) {
-                const max_level_difficulty = clamp(parseInt(values.difficulty_max_lvl) || 0, 6, 8);
-                const difficulty_lvl_index = clamp(parseInt(values.difficulty_lvl) || 0, 0, max_level_difficulty);
+                const max_level_difficulty = clamp(parseInt(values["difficulty_max_lvl"]) || 6, 6, 8);
+                const difficulty_lvl_index = clamp(parseInt(values["difficulty_lvl"]) || 0, 0, max_level_difficulty);
                 const wsp = clamp((parseInt(values[element]) || 0), 0, 50);
                 const wsp_mod = clamp((parseInt(values[`${element}_mod`]) || 0), 0, 50);
                 setAttrs({
@@ -785,11 +788,12 @@
                 const name = `${skill_code_translate[element]}(${wsp_code_translate[key]})`;
                 startRoll(`&{template:test} {{difficulty_lvl_val=[[0[computed value]]]}} {{test_name=${name}}} {{test_type_txt=[[0[computed value]]]}} {{res=[[0[computed value]]]}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}} {{status1=[[0[computed value]]]}} {{status2=[[0[computed value]]]}} {{status3=[[0[computed value]]]}}`,(results)=>{
                     const roll_dices = [results.results.roll1.result, results.results.roll2.result, results.results.roll3.result];
-                    getAttrs([element, key, "test_type_txt", "difficulty_lvl",`${key}_mod`],function (values){
+                    getAttrs([element, key, "test_type_txt", "difficulty_lvl",`${key}_mod`, "difficulty_max_lvl"],function (values){
                         let difficulty = (parseInt(values[key] || 0))+(parseInt(values[`${key}_mod`] || 0));
                         const points = (parseInt(values[element] || 0));
                         const test_type = (parseInt(values["test_type_txt"] || 0));
-                        const difficulty_mod = set_difficulty_level_skill(roll_dices, (parseInt(values["difficulty_lvl"] || 0)), 8, points);
+                        const max_level_difficulty = clamp(parseInt(values["difficulty_max_lvl"]) || 6, 6, 8);
+                        const difficulty_mod = set_difficulty_level_skill(roll_dices, (parseInt(values["difficulty_lvl"] || 0)), max_level_difficulty, points, test_type!==2);
                         difficulty += difficulty_values[difficulty_mod];
                         flags = create_flag_success_skill(roll_dices, difficulty, points);
                         let final_result;
@@ -823,13 +827,12 @@
             const difficulty_lvl_index = clamp(parseInt(values.difficulty_lvl) || 0, 0, 8);
             if (difficulty_lvl_index > max_level_difficulty){
                 setAttrs({
-                    "difficulty_max_lvl":difficulty_lvl_index
+                    "difficulty_lvl":max_level_difficulty
                 });
             }
                 
         });
     });
-
     on("change:difficulty_max_lvl sheet:opened", function(){
         getAttrs(["difficulty_lvl", "difficulty_max_lvl"],function(values){
             const max_level_difficulty = clamp(parseInt(values.difficulty_max_lvl) || 0, 6, 8);
@@ -850,6 +853,9 @@
                 {{test_name}} - 
                 {{#rollTotal() computed::test_type_txt 0}}Test Zamknięty{{/rollTotal() computed::test_type_txt 0}}
                 {{#rollTotal() computed::test_type_txt 1}}Test Otwarty{{/rollTotal() computed::test_type_txt 1}}
+                {{#rollTotal() computed::test_type_txt 2}}Test Walki{{/rollTotal() computed::test_type_txt 2}}
+            </h2>
+            <h2>
                 {{#rollTotal() computed::difficulty_lvl_val 0}}Łatwy{{/rollTotal() computed::difficulty_lvl_val 0}}
                 {{#rollTotal() computed::difficulty_lvl_val 1}}Przeciętny{{/rollTotal() computed::difficulty_lvl_val 1}}
                 {{#rollTotal() computed::difficulty_lvl_val 2}}Problematyczny{{/rollTotal() computed::difficulty_lvl_val 2}}
