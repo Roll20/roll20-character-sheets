@@ -1,3 +1,32 @@
+# 2025-7-1
+
+Pre-Birthday release!
+
+- Fix versioning past version 7
+- Fucus -> Focus
+- Mental Fatigue/Endurance:
+  - Calculate the value
+  - Add a die roll button
+- Update feats of strength
+- Async (Internal)
+  - Add a warning if code double calls the async procedures.
+  - Discover there are literally hundreds of places it's called.. *sigh*
+- Inventory:
+  - More async of methods to make sure we don't double call
+- Attacks:
+  - Make one attacks update async
+- Skill updates all linear now (no double calls, should be faster)
+- Update DB is now async
+- Errors
+  - Keep an error count, and fix formating of last errors.
+- Arcane realm stat
+- Basic TP support
+- Creatures now set fields bars correctly:
+ - Green: HP
+ - Blue: PP
+ - Red: Status (total penalty)
+- Tracker can now target creatures (not super useful yet)
+
 # 2025-6-24
 
 - Fix Training Packages title

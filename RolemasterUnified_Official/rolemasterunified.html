@@ -1999,9 +1999,9 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     <div class='tab-panel'>
       <h2>Training Packages</h2>
 
-      
       <button type='action' class='fancybutton' name='act_dump_summary'>Dump Summary</button>
 
+      <div class='tplist'></div>
     </div>
 
 
@@ -2132,6 +2132,31 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
 <charmancer class="sheet-repeating-levelupreviewlistitem">
   <span class='text'></span>
+</charmancer>
+
+<charmancer class="sheet-repeating-tpitem">
+  <div>
+    <p><b><span class='tpname'></span></b></p>
+
+    <div style='display: grid;grid-template-columns: 2em 1fr'>
+      <span name='comp_tphas0' class='tphas0'></span>
+	    <span name='comp_tpskill0' class='tpskill0'></span>
+      <span name='comp_tphas1' class='tphas1'></span>
+	    <span name='comp_tpskill1' class='tpskill1'></span>
+      <span name='comp_tphas2' class='tphas2'></span>
+	    <span name='comp_tpskill2' class='tpskill2'></span>
+      <span name='comp_tphas3' class='tphas3'></span>
+	    <span name='comp_tpskill3' class='tpskill3'></span>
+      <span name='comp_tphas4' class='tphas4'></span>
+	    <span name='comp_tpskill4' class='tpskill4'></span>
+      <span name='comp_tphas5' class='tphas5'></span>
+	    <span name='comp_tpskill5' class='tpskill5'></span>
+      <span name='comp_tphas6' class='tphas6'></span>
+	    <span name='comp_tpskill6' class='tpskill6'></span>
+      <span name='comp_tphas7' class='tphas7'></span>
+	    <span name='comp_tpskill7' class='tpskill7'></span>
+    </div>
+  </div>
 </charmancer>
 
 
@@ -2560,6 +2585,16 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
           <span name='attr_endurance'></span>
           </button>
       </span>
+      <span><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span> <span name='attr_mentalendurance_info' class='stat_info'></span>
+        Mental Endurance:
+      </span>
+      <span>
+      <button type='action' class='rollbutton fancybutton fancybuttoninline' name='act_mentalfatigueroll'>
+          <span style='font-family: dicefontd10'>t</span>
+          <span name='attr_mentalendurance'></span>
+      </button>
+      </span>
+
       <span>Fatigue:</span>
       <span> <input type='number' name='attr_fatigue'></span>
     </div>
@@ -2759,6 +2794,16 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
         <button type='action' name='act_trackeddoattack' class='fancybuttoninline fancybutton'>
           Attack!
         </button>
+      </div>
+
+      <div class='span1'>
+        <button type='action' name='act_selecttarget'>Target</button>
+        <span name='attr_target_name'>X</span>
+        <span name='attr_target_name'>X</span>
+        <span name='attr_target_at'>X</span>
+        <span name='attr_target_db'>X</span>
+        <span name='attr_target_size'>X</span>
+        <span name='attr_target_crit'>X</span>
       </div>
 
       <div class='span1'>
@@ -3085,6 +3130,16 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
           <span name='attr_endurance'></span>
           </button>
       </span>
+      <span><span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span> <span name='attr_mentalendurance_info' class='stat_info'></span>
+        Mental Endurance:
+      </span>
+      <span>
+      <button type='action' class='rollbutton fancybutton fancybuttoninline' name='act_mentalfatigueroll'>
+          <span style='font-family: dicefontd10'>t</span>
+          <span name='attr_mentalendurance'></span>
+      </button>
+      </span>
+
       <span>Fatigue:</span>
       <span> <input type='number' name='attr_fatigue'></span>
     </div>
@@ -5969,11 +6024,14 @@ Uses (Lvl/Total) <span name='attr_traps_usecount'></span> / <span name='attr_tra
 
     <h3>Last Error</h3>
 
-    <p>Last errors reported:<br>
-      <span name='attr_lasterror1'></span>
-      <span name='attr_lasterror2'></span>
-      <span name='attr_lasterror3'></span>
-    </p>
+    <p>Count: <span name='attr_errorcount'></span></p>
+
+    <p>Last errors reported:</p>
+      <ul>
+        <li><span name='attr_lasterror1'></span></li>
+        <li><span name='attr_lasterror2'></span></li>
+        <li><span name='attr_lasterror3'></span></li>
+      </ul>
 
     <h3>Recalculate</h3>
 
@@ -6037,7 +6095,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 5a0f6652879e0afe5c618f1dfcae5b706a1e5279
+Revision 74c487716f0ded9a8ed3471b3c662951275fda6f
 
 
 <hr>
@@ -6055,6 +6113,8 @@ let lastmessages = {
   lasterror2: "",
   lasterror3: "",
 }
+let errorcount = 0;
+
 
 function rmuerror(message) {
     let msg = []
@@ -6063,11 +6123,13 @@ function rmuerror(message) {
 	console.log('>', arguments[i]);
         msg.push(arguments[i]);
     }
+    errorcount ++;
     lastmessages.lasterror3 = lastmessages.lasterror2;
     lastmessages.lasterror2 = lastmessages.lasterror1;
     lastmessages.lasterror1 = msg.join(" ");
+    lastmessages.errorcount = errorcount;
     console.log(lastmessages);
-    setAttrs(lastmessages);
+  //  setAttrs(lastmessages);
 }
 
 function rmuwarn(message) {
@@ -7066,6 +7128,16 @@ RMUCosts.getTotalCost = function() {
 
 
 
+
+
+function F(num) {
+  if (typeof(num) != 'number') {
+    rmuerror("F got passed a ", typeof(num), num);
+    return '   ';
+  }
+  return num.toString().padStart(3, ' ')
+}
+
 /**
  * Returns the bonus for a particualr name in a misctr
  */
@@ -7136,7 +7208,7 @@ function miscBonusTotal(miscstr, prefix = '') {
 	    total = parseInt(obj.absolute);
 	} else if (obj.hasOwnProperty('value')) {
 	    let value = parseIntDefault(obj.value, 0);
-	    log += `${prefix}${value}   ${obj.name}\n`;
+	    log += `${prefix}${F(value)}   ${obj.name}\n`;
 	    total += value;
 	} else if (obj.hasOwnProperty('message')) {
 	    log += `${prefix}${obj.message}\n`;
@@ -7275,10 +7347,24 @@ function miscRawGetFromString(miscstr) {
  *
  */
 
+// Number of nested async calls we are in.
 let rmuasync = 0;
+// Set to true while in an async call.
+// Cleared just before we call a handler.
+let rmuasyncnested = false;
+let rmuasyncprev = "";
 let pendingList = []
 
+function asyncSetNest(func, args) {
+  if (rmuasyncnested) {
+    rmuerror("Got a second async call Was:", rmuasyncprev, "new:", func, args);
+  }
+  rmuasyncprev = func + args;
+  rmuasyncnested = true;
+}
+
 function getAttrsPending(attrs, func) {
+  asyncSetNest("getAttrsPending", attrs);
   rmuasync ++;
   if (typeof(func) != 'function') {
     rmuerror("getAttrsPending needs a function", attrs, func);
@@ -7287,6 +7373,7 @@ function getAttrsPending(attrs, func) {
     return;
   }
   getAttrs(attrs, (ev) => {
+      rmuasyncnested = false;
       func(ev);
       rmuasync --;
       checkPending();
@@ -7294,6 +7381,7 @@ function getAttrsPending(attrs, func) {
 }
 
 function setAttrsPending(attrs, func) {
+  asyncSetNest("setAttrsPending", attrs);
   rmuasync ++;
   for (const x in attrs) {
     if (typeof(attrs[x]) != 'string' && typeof(attrs[x]) != 'number' &&
@@ -7303,6 +7391,7 @@ function setAttrsPending(attrs, func) {
   }
 
   setAttrs(attrs, (ev) => {
+      rmuasyncnested = false;
       if (func) func(ev);
       rmuasync --;
       checkPending();
@@ -7310,8 +7399,10 @@ function setAttrsPending(attrs, func) {
 }
 
 function getCompendiumPagePending(str, func) {
+  asyncSetNest("getCompendiumPagePending", str);
   rmuasync ++;
   getCompendiumPage(str, (ev) => {
+      rmuasyncnested = false;
       if (func) func(ev);
       rmuasync --;
       checkPending();
@@ -7319,8 +7410,10 @@ function getCompendiumPagePending(str, func) {
 }
 
 function getCompendiumQueryPending(str, func) {
+  asyncSetNest("getCompendiumQueryPending", str);
   rmuasync ++;
   getCompendiumQuery(str, (ev) => {
+      rmuasyncnested = false;
       if (func) func(ev);
       rmuasync --;
       checkPending();
@@ -7330,13 +7423,14 @@ function getCompendiumQueryPending(str, func) {
 function getSectionIDsPending(section, func) {
     if (!func) return;
 
+    asyncSetNest("getSectionIDsPending", section);
     rmuasync ++;
     getSectionIDs(section, idarray => {
-            func(idarray);
-            rmuasync --;
-            checkPending();
-        }
-    );
+	rmuasyncnested = false;
+	func(idarray);
+	rmuasync --;
+	checkPending();
+    });
 }
 
 function addRepeatingSectionPending(a, b, c, func) {
@@ -7344,8 +7438,10 @@ function addRepeatingSectionPending(a, b, c, func) {
     rmuerror("addRepeatingSectionPending needs a function:", a, b, c, func);
     return
   };
+  asyncSetNest("addRepeatingSectionPending", a);
   rmuasync ++;
   addRepeatingSection(a,b,c,(secid) => {
+      rmuasyncnested = false;
       func(secid);
       rmuasync --;
       checkPending();
@@ -7354,7 +7450,7 @@ function addRepeatingSectionPending(a, b, c, func) {
 
 
 function addPendingFunction(name, func) {
-  if (!func || typeof(func) != "function"){ 
+  if (!func || typeof(func) != "function"){
     rmuerror(`unable to save nil function (${name} -> ${typeof(func)})`);
     return;
   }
@@ -7368,7 +7464,7 @@ function addPendingFunction(name, func) {
 /* Same as addPendingFunction, but inserts at head of queue.
    This is a bit of smell */
 function addPendingFunctionNext(name, func) {
-  if (!func || typeof(func) != "function"){ 
+  if (!func || typeof(func) != "function"){
     rmuerror(`unable to save nil function (${name} -> ${typeof(func)})`);
     return;
   }
@@ -7397,8 +7493,8 @@ function checkPending() {
     rmuerror("Negative async count: Reseting");
     rmuasync = 0;
   }
-	
-  while (rmuasync == 0 && pendingList.length > 0) { 
+
+  while (rmuasync == 0 && pendingList.length > 0) {
     pendingInfo();
     // Take it off first, just in case someone does something weird
     const item = pendingList.shift();
@@ -7420,7 +7516,7 @@ function checkPending() {
 }
 
 function pendingInfo() {
-  console.log(`Pending level is ${rmuasync} with ${pendingList.length} queued`);
+  console.log(`Pending level is ${rmuasync} with ${pendingList.length} queued: Nested ${rmuasyncnested}`);
   return pendingList.length;
 }
 
@@ -7429,6 +7525,7 @@ function pendingReset() {
   if (rmuasync) {
     console.log(`Pending reset: ${rmuasync} with ${pendingList.length} queued`);
     rmuasync = 0;
+    rmuasyncnested = false;
     pendingList = [];
   }
 }
@@ -7671,7 +7768,7 @@ success : "The herb or poison is ready!  If treating a patient, you are alert en
 absolutesuccess : "The herb or poison has doubled potency.  If treating a patient, you know exactly what to do and they respond miraculously to your care (add +25 to the recovery roll).",
 },
  mentaldiscipline : {
-absolutefailure : "You are assailed by doubts and distractions.  Your feeble attempt at fucus creates a mental block that hinders your future attempts giving you a -25 to this skill until an Absolute Success is achieved.",
+absolutefailure : "You are assailed by doubts and distractions.  Your feeble attempt at focus creates a mental block that hinders your future attempts giving you a -25 to this skill until an Absolute Success is achieved.",
 failure : "You call forth your discipline and…  what was that noise?  Sorry, trying to focus here.  Why won't that itch go away?  Your effort is insufficient to get past the distractions.",
 unusualevent : "Carefully you follow the path of thought before realizing it is seemingly unrelated to your task.  If you succeed at your maneuver, the unexpected insite is treated as an Absolute Success.  If you fail, it has led you far astray to an Absolute Failure.",
 partialsuccess : "Your discipline is assailed by distractions and you find it difficult to focus.  You receive half the usual benefit or may try again next round with a +10 modification.",
@@ -7917,6 +8014,8 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
 	    statCache_.rs = Math.min(statCache_.in, statCache_.pr);
 	  } else if (rtemp == 'channeling/essence') {
 	    statCache_.rs = Math.min(statCache_.in, statCache_.em);
+	  } else if (rtemp == 'arcane') {
+	    statCache_.rs = Math.min(statCache_.em, statCache_.in, statCache_.pr);
 	  } else {
 	    console.log("No realm found", rtemp, realm);
 	    statCache_.rs = statCache_.em;
@@ -8097,26 +8196,30 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
     }
 
     // My best bonus updates are little different.
+    // FIXME: This is the thing that generates all the errors.
     function updateSpecializations(skill, pbonus, catbonus, log) {
       let bestbonus = -200; // Assume no one can get worse than this
       let bestranks = 0;
       skill.specializations.forEach((spec) => {
 	  const aname = spec.aname;
-	  getAttrsPending([aname + "_ranks_misc", aname + "_misc", aname + "_ranks"], (attrs) => {
-	      let [bonus, ranks, slog] = calculateSpecBonus(skill, attrs[aname + '_ranks_misc'],
-		attrs[aname + '_misc'], spec.stat, pbonus, catbonus, log);
-	      let update = {[aname + "_bonus"]: bonus, [aname + "_info"]: slog};
-	      if (ranks != 0) {
-		update[aname + "_ranks"] = ranks;
-	      } else if (attrs[aname + "_ranks"] && attrs[name + "_ranks"] != "")  {
-		update[aname + "_ranks"] = " "; // So there is something there; we set space
-	      }
-	      if (ranks == 0 && bonus > bestbonus) {
-		bestbonus = bonus;
-	      } else if ((bonus - 25) > bestbonus) {
-		bestbonus = bonus - 25;
-	      }
-	      setAttrs(update);
+	  // FIXME: This could be optimised to do in one call for all skills
+	  addPendingFunction("Skill Specialisation: " + skill.aname, () => {
+	    getAttrsPending([aname + "_ranks_misc", aname + "_misc", aname + "_ranks", "spcials"], (attrs) => {
+		let [bonus, ranks, slog] = calculateSpecBonus(skill, attrs[aname + '_ranks_misc'],
+		  attrs[aname + '_misc'], spec.stat, pbonus, catbonus, log);
+		let update = {[aname + "_bonus"]: bonus, [aname + "_info"]: slog};
+		if (ranks != 0) {
+		  update[aname + "_ranks"] = ranks;
+		} else if (attrs[aname + "_ranks"] && attrs[name + "_ranks"] != "")  {
+		  update[aname + "_ranks"] = " "; // So there is something there; we set space
+		}
+		if (ranks == 0 && bonus > bestbonus) {
+		  bestbonus = bonus;
+		} else if ((bonus - 25) > bestbonus) {
+		  bestbonus = bonus - 25;
+		}
+		setAttrsPending(update);
+	    });
 	  });
       });
       addPendingFunction("Specialisation Similar skill for " + skill.aname, () => {
@@ -10028,7 +10131,8 @@ const stats = [ "agility", "constitution", "empathy", "intuition", "memory", "pr
 function updateStatgainList(targetnames) {
   let updates = [];
 
-  getAttrsPending(forStatGains, (sts) => {
+  // Not pending; just trigger indepedantly
+  getAttrs(forStatGains, (sts) => {
       for (const st of stats) {
 	const temp = miscBonusTotal(sts[`${st}_misc`])[0];
 	const pot = miscBonusTotal(sts[`${st}_pot_misc`])[0];
@@ -10083,7 +10187,7 @@ function getSpecialisedSkillRanks(results) {
       cat.skills.forEach((skill) => {
 	  if (!skill.dynamicspecializations) return;
 	  let prefix = `repeating_specialization${skill.aname}`
-	  getSectionIDsPending(prefix, (ids) => {
+	  getSectionIDs(prefix, (ids) => {
 	      if (ids.length == 0) return;
 	      let specskill = [];
 	      results[skill.aname] = specskill;
@@ -10094,7 +10198,7 @@ function getSpecialisedSkillRanks(results) {
 		  toget.push(prefix + '_' + id + "_bonus");
 		  toget.push(prefix + '_' + id + "_usecount");
 		  toget.push(prefix + '_' + id + "_usecounttotal");
-		  getAttrsPending(toget, data => {
+		  getAttrs(toget, data => {
 		      specskill.push({
 			  category: cat.aname,
 			  id:id,
@@ -10120,6 +10224,7 @@ function levelUpStart(_) {
     pendingInfo();
     RMUCosts.reset();
     const data = getCharmancerData();
+    console.log(data);
 
     let previous_level = parseIntDefault(data.levelup?.values?.current_level, 0);
  
@@ -10460,6 +10565,14 @@ onCheck("mancerfinish:levelup", (ev) => {
 	  // the ranks
 	  continue;
 	}
+	// Errors and TP stuff: Ignore
+	if (purchase.startsWith("lasterror")) {
+	  continue;
+	}
+	if (purchase.startsWith("tp")) {
+	  continue;
+	}
+
 	if (purchase.includes("_talent_")) {
 	  continue;
 	}
@@ -10740,6 +10853,12 @@ function getLevelUpSummary(cmdata) {
       console.log("Talent pruchase")
     } else if (purchase.includes("spelllist")) {
       console.log("Spell purchase");
+    } else if (purchase.startsWith("tp")) {
+      console.log("TP Purchase");
+    } else if (purchase.startsWith("lasterror")) {
+      console.log("Error: Ignore");
+    } else if (purchase.startsWith("errorcount")) {
+      console.log("Error: Ignore");
     } else {
       const value = values[purchase];
       if (typeof(value) != "string") {
@@ -10787,7 +10906,43 @@ function getLevelUpSummary(cmdata) {
 }
 
 onCheck("clicked:dump_summary", () => {
-  console.log("Level Up Summary", getLevelUpSummary(getCharmancerData()));
+  let levelup = getLevelUpSummary(getCharmancerData());
+  console.log("Levelup summary", levelup);
+  getCompendiumQuery("Category:TrainingPackage", (tps) => {
+    console.log(tps);
+    if (!tps) {
+      console.log("No TPs found");
+      return;
+    }
+
+    for (let i = 0 ; i < tps.length ; i ++) {
+      let tp = tps[i];
+      addRepeatingSection("tplist", 'tpitem', 'tpx', (prefix) => {
+	console.log("tp.name", tp.name, typeof(tp.data.requires), tp.data.requires);
+	// So lets work out how much we have of this one:
+	let requires = JSON.parse(tp.data.requires)
+	let meets = 0
+	let needed = requires.length
+	const updates = {};
+	for (let i = 0 ; i < needed ; i ++) {
+	  const require = requires[i];
+	  if (require.skill) {
+	    updates[`${prefix} .tpskill${i}`] = require.skill
+	    if (levelup.skills[require.skill]) {
+	      updates[`${prefix} .tphas${i}`] = '+';
+	    } else {
+	      updates[`${prefix} .tphas${i}`] = '-';
+	    }
+	  }
+	}
+	updates[`${prefix} .tpname`] = tp.name;
+	setCharmancerText(updates);
+	console.log("Set TP", updates);
+      });
+    }
+  });
+
+  console.log("Level Up Summary", levelup);
 });
 
 
@@ -12752,14 +12907,16 @@ frontpage.updateFeatsOfStrength = function () {
   getAttrsPending(["weighttraining_bonus", "weight"], (data) => {
     const weight = parseIntDefault(data.weight, -100);
     const weightbonus = parseIntDefault(data.weighttraining_bonus, -100);
+    const updates = {}
 
     for (var i = 0 ; i < feats.length ; i ++) {
       const thisfeat = feats[i];
       const bonus = thisfeat.bonus + weightbonus;
       const limit = Math.floor(thisfeat.percent * weight / 100);
       const str = `${bonus} (${limit} lbs)`;
-      setAttrsPending({[thisfeat.name]: str});
+      updates[thisfeat.name] = str;
     }
+    setAttrsPending(updates);
   });
 }
 
@@ -12780,7 +12937,7 @@ function T(num) { // total
 }
 
 frontpage.updateDB = function () {
-  // FIXME: Update on these changing
+  addPendingFunction("Update DB", () => {
   getAttrsPending(["qu", "db_misc", "running_bonus", "running_ranks",
 		  "shield_bonus", "shield_ranks",
 		  "shield_type_bonus", "shield_type_nattacks",
@@ -12906,7 +13063,10 @@ frontpage.updateDB = function () {
     }
 
     setAttrsPending(updates);
+  })
   });
+  pendingInfo();
+  checkPending();
 }
 onCheck("change:qu change:db_misc change:running_bonus change:running_ranks " +
   "change:shield_bonus change:shield_ranks change:shield_type_bonus " +
@@ -12939,7 +13099,6 @@ function updateFrontPage() {
   addPendingFunction("Update frontpage.updateFeatsOfStrength();",   frontpage.updateFeatsOfStrength);
   addPendingFunction("Update frontpage.updateDB();",   frontpage.updateDB);
   addPendingFunction("Update RMUInventory.updateEquipped();",   RMUInventory.updateEquipped);
-  pendingInfo()
   checkPending();
 }
 onCheck("clicked:updatederived", updateFrontPage);
@@ -13119,7 +13278,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
       (str) => `change:repeating_stuff:${str}`).join(" ");
 
   RMUInventory.updateEncumberance = function() {
-    getSectionIDs("repeating_stuff", ids => {
+    getSectionIDsPending("repeating_stuff", ids => {
       let toget = ['weightallowance', 'weight', 'packcarried'];
       ids.forEach(id => {
 	  toget.push(`repeating_stuff_${id}_itemweight`);
@@ -13127,7 +13286,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	  toget.push(`repeating_stuff_${id}_itemequipped`);
 	  toget.push(`repeating_stuff_${id}_itemmaterial`);
       });
-      getSectionIDs('repeating_stuffpack', pids => {
+      getSectionIDsPending('repeating_stuffpack', pids => {
 	// Metal and equipped don't matter for pack stuff
 	pids.forEach(pid => {
 	      toget.push(`repeating_stuffpack_${pid}_itemweight`);
@@ -13216,13 +13375,19 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 
   /* Triggered when the weight of something changed  */
   onCheck(weight_event_list + " change:st", (ev) => {
-      RMUInventory.updateEncumberance();
+      addPendingFunction("Weight change: Update encumberance", RMUInventory.updateEncumberance);
+      checkPending();
   });
 
   /* Something was deleted */
   onCheck("remove:repeating_stuff", function(_) {
-      RMUInventory.updateEncumberance();
-      RMUInventory.updateEquipped();
+      console.log("Something was removed; update all");
+      pendingInfo(); 
+      addPendingFunction("Inventory: Remove Item: Update Encumberance",
+		RMUInventory.updateEncumberance);
+      addPendingFunction("Inventory: Remove Item: Update Equipped",
+		RMUInventory.updateEquipped);
+      checkPending();
   });
 
   /** Get a list of all the known attacks.
@@ -13294,7 +13459,6 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 		  rmuerror("Parsing object JSON", e);
 		  return;
 		}
-		console.log("Json", json);
 		// Look for magic fields:
 		//  - AT
 		//  - attack table
@@ -13317,12 +13481,12 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 		      updates.at_legs_info = name;
 		      break
 		    default:
-			updates.at_head = json.AT;
-			updates.at_torso = json.AT;
-				updates.at_legs = json.AT;
-				updates.at_arms = json.AT;
-				updates.at_head_info = updates.at_torso_info = updates.at_legs_info =
-				  updates.at_arms_info = name;
+		      updates.at_head = json.AT;
+		      updates.at_torso = json.AT;
+		      updates.at_legs = json.AT;
+		      updates.at_arms = json.AT;
+		      updates.at_head_info = updates.at_torso_info = updates.at_legs_info =
+			  updates.at_arms_info = name;
 		  }
 		}
 		if (json['DB Bonus']) {
@@ -13364,6 +13528,8 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 
   onCheck("change:repeating_stuff:itemcount", (ev) => {
     console.log(ev);
+    
+
     const nv = parseInt(ev.newValue, 10);
     if (Number.isNaN(nv) || nv < 1) {
       // reject, revert back
@@ -13371,15 +13537,20 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
       if (Number.isNaN(ov) || ov < 1) {
 	ov = 1;
       }
-      setAttrs({[ev.sourceAttribute]: ov}, RMUInventory.updateEncumberance);
-      return;
+      addPendingFunction("Reset Item count to a valid value", () => {
+      setAttrsPending({[ev.sourceAttribute]: ov});
+      });
     }
-    RMUInventory.updateEncumberance();
+    addPendingFunction("Inventory:ItemCount Change: Encumberance update", 
+	  RMUInventory.updateEncumberance);
+    checkPending()   
   });
 
 
   onCheck("change:repeating_stuff:itemsystem change:repeating_stuff:itemequipped", (ev) => {
-      RMUInventory.updateEquipped();
+     pendingInfo(); 
+     addPendingFunction("Inventory: Item equipped toggle", RMUInventory.updateEquipped);
+     checkPending();
   });
 
   onCheck("clicked:money_level", (_) => {
@@ -13448,33 +13619,36 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
     // Range is either 'short' or 'RI'
     const range = json['RI'] || json['short'] || '-';
 
-    getCompendiumPagePending("AttackTable:" + json['Attack Table'], (cdata) => {
-	if (!cdata.data['data-attack']) {
-	  rmuerror("Data attack missing in ", json['Attack Table']);
-	  return;
-	}
-	let min = cdata.data.min.match(/\d+/)[0] || 0;
-	let max = cdata.data.max.match(/\d+/)[0] || 0;
-	let attack_table = cdata.data['data-attack'] || "";
-	let attacktype = 'melee';
-	if (cdata.RI && parseIntDefault(cdata.RI, 0) > 0) {
-	  attacktype = 'ranged';
-	}
-	setAttrsPending({
-	    [`${prefix}_attackname`]: name,
-	    [`${prefix}_attacksize`]:  size,
-	    [`${prefix}_attacktable`]: json['Attack Table'],
-	    [`${prefix}_attackdata`]: attack_table,
-	    [`${prefix}_attackmin`]: min,
-	    [`${prefix}_attackmax`]: max,
-	    [`${prefix}_attackstr`]: json['Strength'],
-	    [`${prefix}_attackbasefumble`]: parseIntDefault(json.Fumble, 10),
-	    [`${prefix}_attacksource`]: 'inventory',
-	    [`${prefix}_attackskill`]: skill,
-	    [`${prefix}_atackri`]: range,
-	    [`${prefix}_materialgroup`] : materialgroup,
-	    [`${prefix}_attackmodifier`]: parseIntDefault(json.OB, 0),
-	    });
+    // Get ahead of the updates of OBs and the like
+    addPendingFunctionNext("Add attack " + name, () => {
+      getCompendiumPagePending("AttackTable:" + json['Attack Table'], (cdata) => {
+	  if (!cdata.data['data-attack']) {
+	    rmuerror("Data attack missing in ", json['Attack Table']);
+	    return;
+	  }
+	  let min = cdata.data.min.match(/\d+/)[0] || 0;
+	  let max = cdata.data.max.match(/\d+/)[0] || 0;
+	  let attack_table = cdata.data['data-attack'] || "";
+	  let attacktype = 'melee';
+	  if (cdata.RI && parseIntDefault(cdata.RI, 0) > 0) {
+	    attacktype = 'ranged';
+	  }
+	  setAttrsPending({
+	      [`${prefix}_attackname`]: name,
+	      [`${prefix}_attacksize`]:  size,
+	      [`${prefix}_attacktable`]: json['Attack Table'],
+	      [`${prefix}_attackdata`]: attack_table,
+	      [`${prefix}_attackmin`]: min,
+	      [`${prefix}_attackmax`]: max,
+	      [`${prefix}_attackstr`]: json['Strength'],
+	      [`${prefix}_attackbasefumble`]: parseIntDefault(json.Fumble, 10),
+	      [`${prefix}_attacksource`]: 'inventory',
+	      [`${prefix}_attackskill`]: skill,
+	      [`${prefix}_atackri`]: range,
+	      [`${prefix}_materialgroup`] : materialgroup,
+	      [`${prefix}_attackmodifier`]: parseIntDefault(json.OB, 0),
+	      });
+	});
       });
   }
 
@@ -15060,7 +15234,8 @@ function sizeFromNumeric(value) {
 		    });
     });
 
-    attacks.getTargetData = function(whom) {
+    attacks.getTargetData = function(whom, prefix = "") {
+	
 	const roll_string = "@{whispertype} &{template:rmuattacktarget} [[1d20]]  " +
 	    "{\{who=@{character_name}}} " +
 	    `{\{targetname=[[0[@{${whom}|character_name}] ]]}} ` +
@@ -15090,11 +15265,17 @@ function sizeFromNumeric(value) {
 		if (athead != attorso || athead != atarms || athead != atlegs) {
 		    atstr = `${attorso},${athead},${atarms},${atlegs}`
 		}
-		setAttrs({target_at: atstr,
+		let attrs = {target_at: atstr,
 			target_name: tname,
 			target_db: db,
 			target_size: sizeToNumeric(tsize),
-			target_crit: critred});
+			target_crit: critred};
+		if (prefix != "") {
+		    attrs = Object.keys(attrs).reduce((a, c) => 
+			    (a[`${prefix}${c}`] = attrs[c], a), {});
+
+		}
+		setAttrs(attrs);
 		finishRoll(roll.rollId, { targetname: tname })
 	});
     }
@@ -15292,14 +15473,14 @@ function sizeFromNumeric(value) {
     
     /**/
     attacks.updateAttackBonuses = function () {
-      getSectionIDs('repeating_attack', (ids) => {
+      getSectionIDsPending('repeating_attack', (ids) => {
 	let toget = []
 	ids.forEach((id) => {
 	    toget.push(`repeating_attack_${id}_attackskill`);
 	    toget.push(`repeating_attack_${id}_attackmodifier`);
 	    toget.push(`repeating_attack_${id}_attackbasefumble`);
 	});
-	getAttrs(toget, (attackinfo) => {
+	getAttrsPending(toget, (attackinfo) => {
 	    // Now I need to get the skill bonuses
 	    const skillSet = new Set();
 	    ids.forEach((id) => {
@@ -15309,8 +15490,9 @@ function sizeFromNumeric(value) {
 		    skillSet.add(attackinfo[`repeating_attack_${id}_attackskill`] + '_ranks');
 		}
 	    });
-	    getAttrs(Array.from(skillSet), (skills) => {
-		console.log(skills);
+	    getAttrsPending(Array.from(skillSet), (skills) => {
+		console.log("Attack bonuses retrieved", skills);
+		const updates = {}
 		ids.forEach((id) => {
 		    let prefix = `repeating_attack_${id}_`;
 
@@ -15326,15 +15508,14 @@ function sizeFromNumeric(value) {
 		    let fumble =
 			parseIntDefault(attackinfo[`repeating_attack_${id}_attackbasefumble`], 0);
 
-		    const updates = {}
 		    updates[prefix + 'attackbonus'] = skillbonus + modifier;
 		    updates[prefix + 'attackfumble'] =
 			    Math.max(1,
 				parseIntDefault(attackinfo[prefix + 'attackbasefumble'], 10)
 				- Math.floor(skillranks / 5));
 		    updates[prefix + 'attackranks'] = skillranks;
-		    setAttrs(updates);
 		});
+		setAttrsPending(updates);
 	    });
 		
 
@@ -15889,19 +16070,35 @@ onCheck("change:bodydevelopment_bonus change:powerdevelopment_bonus", (x) => {
 });
 
 // Update the endurance modifier
-onCheck("change:bodydevelopment_bonus change:endurance_misc", (_) => {
-    getAttrs(['bodydevelopment_bonus', 'endurance_misc'], (ev) => {
+onCheck("change:bodydevelopment_bonus change:endurance_misc change:mentalfocus_bonus", (_) => {
+    updateEnduranceBonus()
+});
+
+function updateEnduranceBonus() {
+    console.log("updateEnduranceBonus");
+    getAttrs(['bodydevelopment_bonus', 'endurance_misc', 'mentalfocus_bonus'], (ev) => {
 	let log = "Endurance\n" +
 	    `${F(ev.bodydevelopment_bonus)} Body Development\n`;
 	const end = miscBonusTotal(ev.endurance_misc);
 	log += end[1];
 	let total = parseIntDefault(ev.bodydevelopment_bonus, -100) + end[0];
 	log += `${T(total)} Total`;
+
+	let mfbonus = parseIntDefault(ev.mentalfocus_bonus, -100);
+	let mlog = "Mental Endurance\n" +
+	    `${F(mfbonus)} Mental Focus\n`;
+	mlog += end[1];
+	let mftotal = mfbonus + end[0]
+	mlog += `${T(mftotal)} Total`;
 	setAttrsPending({
 	    endurance: total,
-	    endurance_info: log });
+	    endurance_info: log,
+	    mentalendurance: mftotal,
+	    mentalendurance_info: mlog
+	    });
     });
-});
+}
+
 
 onCheck("change:hp", (_) => {
     getAttrs(['hp', 'hp_max'], (values) => {
@@ -15938,10 +16135,25 @@ onCheck("change:pp", (_) => {
     });
 });
 
+
 onCheck("clicked:enduranceroll", (_) => {
     // FIXME: Encumberance penalty as well
+    doEnduranceRoll("endurance");
+});
+
+onCheck("clicked:mentalfatigueroll", (_) => {
+    doEnduranceRoll("mental");
+});
+
+function doEnduranceRoll(type) {
+  if (type != "mental" && type != "endurance") {
+    rmuerror("Unknown endurance roll type");
+    type = "endurance";
+  }
+
     getAttrs(['character_name', 'endurance', 'fatigue', 'injurypenalty',
-	      'hppenalty', 'hp'], (ev) => {
+	      'hppenalty', 'hp', 'mentalendurance'], (ev) => {
+	      console.log(ev);
 	const roll_string = "@{whispertype} &{template:rmuendurance} " +
 	    "[[ [[ 1d100!>96 ]] + [[ 1d100!>96 ]] ]] " +
 	    "{\{firstroll=$[[0]]}} " +
@@ -15970,8 +16182,13 @@ onCheck("clicked:enduranceroll", (_) => {
 	      } else {
 		log += roll.results.firstroll.dice.join(' + ');
 	      }
-	      endroll += parseIntDefault(ev.endurance, 0);
-	      log += `) + ${ev.endurance}&nbsp;(Endurance)`
+	      if (type == 'mental') {
+		endroll += parseIntDefault(ev.mentalendurance, 0);
+		log += `) + ${ev.endurance}&nbsp;(Mental Endurance)`
+	      } else {
+		endroll += parseIntDefault(ev.endurance, 0);
+		log += `) + ${ev.endurance}&nbsp;(Endurance)`
+	      }
 	      for (const pen of [ ["fatigue", "Fatigue Penalty"],
 		      ['injurypenalty', "Injury Penalty"],
 		      ['hppenalty', "Hits Penalty"] ]) {
@@ -16054,7 +16271,7 @@ onCheck("clicked:enduranceroll", (_) => {
 	    });
 	});
     });
-});
+}
 
 function updatePenalties() {
   getAttrs(["fatigue", "hppenalty", "injurypenalty"], (ev) => {
@@ -16376,7 +16593,7 @@ onCheck("change:creaturedefense", (ev) => {
 });
 
 
-
+/**/
 creature.newCreature = function(name, jdata) {
   console.log("new creatures", name, jdata, typeof(jdata));
   let cdata = jdata;
@@ -16451,6 +16668,7 @@ creature.newCreature = function(name, jdata) {
     attacks = cdata['data-attack'];
   }
   console.log(attacks);
+  updates.attacklist = attacks.join(',');
   for (attack of attacks) {
     creature.parseAttack(attack, cdata, updates)
   }
@@ -16531,15 +16749,18 @@ creature.newCreature = function(name, jdata) {
   VrmuSetAttrs(updates);
 
   creature.parseDefenses(updates.defenses)
-  /*
-  console.log({
-    bar1_link:'hits',
+  setDefaultToken({
+    cd_bar1_l: 'hp',
+    bar1_link:'hp',
+    cd_bar2_l: 'pp',
     bar2_link: 'pp',
+    cd_bar3_l: 'statuspenalty',
+    bar3_link: 'statuspenalty',
     showname: true,
     showplayers_name: true,
-    width: 50,
-    height: 50
-  });*/
+    width: 70,
+    height: 70
+  });
 }
 
 creature.adjustPowerLevel = function(newpower) {
@@ -17233,13 +17454,21 @@ function doVersionCheck(version) {
   }
 
   // Version 7->8 was faulty, bump it to 9 to force it to run again.
+  if (version == 7) {
+    version = 8;
+  }
 
   if (version == 8) {
     // updatePenalties in in status; old value will be updateed by equipment update
-    addPendingFunction("Upgrade to 8: Manuever_penalty -> statuspenalty", updatePenalties);
-    addPendingFunction("Upgrade to 8: Update Equipment", RMUInventory.updateEquipped);
-    addPendingFunction("Upgrade to 8: Update Encumberance", RMUInventory.updateEncumberance);
+    addPendingFunction("Upgrade to 9: Manuever_penalty -> statuspenalty", updatePenalties);
+    addPendingFunction("Upgrade to 9: Update Equipment", RMUInventory.updateEquipped);
+    addPendingFunction("Upgrade to 9: Update Encumberance", RMUInventory.updateEncumberance);
     version = 9;
+  }
+
+  if (version == 9) {
+    addPendingFunction("Upgrade to 10: Update Endurance", updateEnduranceBonus);
+    version = 10;
   }
 
 
@@ -17248,6 +17477,7 @@ function doVersionCheck(version) {
 	setAttrsPending({version: version});
     });
   }
+
 }
 
 /**
@@ -17449,6 +17679,12 @@ onCheck("clicked:repeating_trackercharacter:deletetracked", (ev) => {
   removeRepeatingRow(basename);
 });
 
+onCheck("clicked:repeating_trackercharacter:selecttarget", (ev) => {
+  // We are keeping the last '_' as getTargetData doesn;t know about it
+  const basename = ev.sourceAttribute.replace("selecttarget", "");
+  attacks.getTargetData("target", basename)
+});
+
 const fields = {
     // Type is the type of data.
     // Field is what we pull on the source character
@@ -17467,6 +17703,7 @@ const fields = {
     trackedmoves: { type: "movestring", field: "movestring" },
     trackedstatuseffect: { type: "string", field: "statuseffect" },
     trackedstatusmessage: { type: "string", field: "statusmessage" },
+    trackedattacklist: { type: "attackstring", field: "attacklist" },
 }
 
 /**/
@@ -17483,8 +17720,10 @@ tracker.extractResults = function(roll, prefix) {
       tracker.handleSkillString(attacks.getDataFromRoll(rr[field].expression), results);
     } else if (info.type == 'movestring') {
       tracker.handleMoveString(attacks.getDataFromRoll(rr[field].expression), results);
+    } else if (info.type === 'attackstring') {
+      tracker.handleAttackString(attacks.getDataFromRoll(rr[field].expression), results);
     } else {
-      rmuerror("Unkown type");
+      rmuerror("Tracker Unknown type:", info.type);
     }
   }
   return results;
@@ -17562,6 +17801,18 @@ tracker.handleMoveString = function(string, updates) {
     updates[`trackedmove${i}pace`] = fields[2];
     updates[`trackedmove${i}rate`] = fields[3];
   }
+}
+
+tracker.handleAttackString = function(string, updates) {
+  console.log("Handle attack string", string);
+  if (!string || string == '') return;
+  let attacks = string.split(',')
+  console.log(attacks)
+  for (let i = 0 ; i < attacks.length ; i ++) {
+
+  }
+
+
 }
 
 
