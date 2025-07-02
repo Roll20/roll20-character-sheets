@@ -1037,10 +1037,15 @@
 
     <div class="spacer-md"></div>
 
-    <h2>Weight (lbs)</h2>
-    <input type="text" class="sheet-d6pp" name="attr_character_weight" placeholder="Your horse carries your weight."/><br/>
-    <div class="spacer-sm"></div>
-    <span name="attr_recommended_weight" class="sheet-d6pp-span"></span>
+    <h2>Height</h2>
+    <select class="sheet-d6pp-select" name="attr_height_category">
+      <option value="very short">Very Short (5')</option>
+      <option value="short">Short (5'4")</option>
+      <option value="normal" selected>Normal (5'8")</option>
+      <option value="tall">Tall (6')</option>
+      <option value="very tall">Very Tall (6'6")</option>
+    </select>
+    <span class="small-hint">You can adjust this later.</span>
     <div class="spacer-sm"></div>
     <h2><span name="attr_background_name"></span>:</h2>
     <div class="sheet-character-desc-grid">
@@ -8467,29 +8472,6 @@
     });
   });
 
-  on("change:strength", function () {
-    getAttrs(["strength"], function (values) {
-      const strength = parseInt(values.strength, 10) || 0;
-      let recommended = "";
-
-      if (strength <= 1) {
-        recommended = "Recommended 90–110 lbs";
-      } else if (strength === 2) {
-        recommended = "Recommended 110–135 lbs";
-      } else if (strength === 3) {
-        recommended = "Recommended 135–160 lbs";
-      } else if (strength === 4) {
-        recommended = "Recommended 160–190 lbs";
-      } else if (strength >= 5) {
-        recommended = "Recommended 190–220 lbs";
-      }
-
-      setAttrs({
-        recommended_weight: recommended
-      });
-    });
-  });
-
   on("change:itemdrop_name", function() {
     getAttrs([
       "itemdrop_name", "itemdrop_qty", "itemdrop_weight", "itemdrop_location","itemdrop_description"
@@ -8518,6 +8500,47 @@
       setAttrs(all);
     });
   });
+
+const getSuggestedWeight = (heightCategory, strength) => {
+    const heightBaseWeights = {
+      "very short": 120,
+      "short": 135,
+      "normal": 150,
+      "tall": 165,
+      "very tall": 185
+    };
+
+  const baseWeight = heightBaseWeights[heightCategory.toLowerCase()] || 150;
+  const multiplier = 1 + 0.1 * (strength - 3);
+  return Math.round(baseWeight * multiplier);
+};
+
+const getHeightDisplay = (heightCategory) => {
+  const heightDisplayMap = {
+    "very short": `5'0"`,
+    "short": `5'4"`,
+    "normal": `5'8"`,
+    "tall": `6'0"`,
+    "very tall": `6'6"`
+  };
+
+  return heightDisplayMap[heightCategory.toLowerCase()] || `5'8"`;
+};
+
+on("change:height_category change:strength", function () {
+  getAttrs(["height_category", "strength"], function (values) {
+    const height = values.height_category || "normal";
+    const strength = parseInt(values.strength, 10) || 3;
+
+    const suggestedWeight = getSuggestedWeight(height, strength);
+    const heightText = getHeightDisplay(height);
+
+    setAttrs({
+      character_weight: suggestedWeight,
+      character_height: heightText
+    });
+  });
+});
 
 </script>
 
