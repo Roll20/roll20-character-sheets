@@ -1038,12 +1038,26 @@
     <div class="spacer-md"></div>
 
     <h2>Height</h2>
-    <select class="sheet-d6pp-select" name="attr_height_category">
-      <option value="very short">Very Short (5')</option>
-      <option value="short">Short (5'4")</option>
-      <option value="normal" selected>Normal (5'8")</option>
-      <option value="tall">Tall (6')</option>
-      <option value="very tall">Very Tall (6'6")</option>
+    <select class="sheet-d6pp-select" name="attr_character_height">
+      <option value="5'">5'</option>
+      <option value="5&#39;1&quot;">5'1"</option>
+      <option value="5&#39;2&quot;">5'2"</option>
+      <option value="5&#39;3&quot;">5'3"</option>
+      <option value="5&#39;4&quot;">5'4"</option>
+      <option value="5&#39;5&quot;">5'5"</option>
+      <option value="5&#39;6&quot;">5'6"</option>
+      <option value="5&#39;7&quot;">5'7"</option>
+      <option value="5&#39;8&quot;" selected>5'8"</option>
+      <option value="5&#39;9&quot;">5'9"</option>
+      <option value="5&#39;10&quot;">5'10"</option>
+      <option value="5&#39;11&quot;">5'11"</option>
+      <option value="6&#39;">6'</option>
+      <option value="6&#39;1&quot;">6'1"</option>
+      <option value="6&#39;2&quot;">6'2"</option>
+      <option value="6&#39;3&quot;">6'3"</option>
+      <option value="6&#39;4&quot;">6'4"</option>
+      <option value="6&#39;5&quot;">6'5"</option>
+      <option value="6&#39;6&quot;">6'6"</option>
     </select>
     <span class="small-hint">You can adjust this later.</span>
     <div class="spacer-sm"></div>
@@ -2259,6 +2273,18 @@
                         <input type="text" class="sheet-d6pp sheet-small-input" name="attr_dodge_value" readonly />
                       </div>
                     </div>
+
+                    <input type="hidden" name="attr_preaction_selection_normal" />
+                    <input type="hidden" name="attr_preaction_selection_ignorepain" />
+                    <input type="hidden" name="attr_preaction_selection_disengage" />
+
+                    <!-- These toggles must be siblings of the hidden inputs -->
+                    <div class="sheet-multi-attack-toggle">
+                      <label for="attr_attack_count" class="sheet-d6pp-label">Multi-Attack:</label>
+                    </div>
+                    <div class="sheet-multi-attack-toggle">
+                      <input type="number" name="attr_attack_count" class="sheet-d6pp" value="0" min="0" />
+                    </div>
                   </div>
 
                   <div class="sheet-controls-group">
@@ -2698,12 +2724,6 @@
                   <!-- Left -->
                   <div class="sheet-controls-group">
                     <button type="action" class="sheet-d6pp" name="act_initiative">Roll Initiative</button>
-                  </div>
-                  <div class="sheet-controls-group">
-                    <div class="attack-count-group">
-                      <label for="attr_attack_count" class="sheet-d6pp-label">Multi-Attack:</label>
-                      <input type="number" name="attr_attack_count" class="sheet-d6pp" value="0" min="0" />
-                    </div>
                   </div>
                 </div>
               </div>
@@ -8257,6 +8277,48 @@
     });
   });
 
+  const getSuggestedWeight = (heightString, strength) => {
+    const baseWeightsByHeight = {
+        "5'": 120,
+        "5'1\"": 125,
+        "5'2\"": 130,
+        "5'3\"": 135,
+        "5'4\"": 140,
+        "5'5\"": 145,
+        "5'6\"": 150,
+        "5'7\"": 155,
+        "5'8\"": 160,
+        "5'9\"": 165,
+        "5'10\"": 170,
+        "5'11\"": 175,
+        "6'": 180,
+        "6'1\"": 185,
+        "6'2\"": 190,
+        "6'3\"": 195,
+        "6'4\"": 200,
+        "6'5\"": 205,
+        "6'6\"": 210
+      }
+
+    const baseWeight = baseWeightsByHeight[heightString] || 150; // default if unmatched
+    const multiplier = 1 + 0.1 * (strength - 3);
+    return Math.round(baseWeight * multiplier);
+  };
+
+  function populateStartingWeight() {
+    getAttrs(["character_height", "strength"], function (values) {
+      console.log("here");
+      const height = values.character_height || "5&#39;8&quot;";
+      const strength = parseInt(values.strength, 10) || 3;
+
+      const suggestedWeight = getSuggestedWeight(height, strength);
+
+      setAttrs({
+        character_weight: suggestedWeight
+      });
+    });
+  }
+
   on("clicked:final_step", function () {
     getAttrs(["sheet_mode", ...ATTRS], function (values) {
       const updates = {
@@ -8272,6 +8334,7 @@
       commitSpend();
       setAttrs(updates);
       toggleAllSections(true);
+      populateStartingWeight();
     });
   });
 
@@ -8500,47 +8563,6 @@
       setAttrs(all);
     });
   });
-
-const getSuggestedWeight = (heightCategory, strength) => {
-    const heightBaseWeights = {
-      "very short": 120,
-      "short": 135,
-      "normal": 150,
-      "tall": 165,
-      "very tall": 185
-    };
-
-  const baseWeight = heightBaseWeights[heightCategory.toLowerCase()] || 150;
-  const multiplier = 1 + 0.1 * (strength - 3);
-  return Math.round(baseWeight * multiplier);
-};
-
-const getHeightDisplay = (heightCategory) => {
-  const heightDisplayMap = {
-    "very short": `5'0"`,
-    "short": `5'4"`,
-    "normal": `5'8"`,
-    "tall": `6'0"`,
-    "very tall": `6'6"`
-  };
-
-  return heightDisplayMap[heightCategory.toLowerCase()] || `5'8"`;
-};
-
-on("change:height_category change:strength", function () {
-  getAttrs(["height_category", "strength"], function (values) {
-    const height = values.height_category || "normal";
-    const strength = parseInt(values.strength, 10) || 3;
-
-    const suggestedWeight = getSuggestedWeight(height, strength);
-    const heightText = getHeightDisplay(height);
-
-    setAttrs({
-      character_weight: suggestedWeight,
-      character_height: heightText
-    });
-  });
-});
 
 </script>
 
