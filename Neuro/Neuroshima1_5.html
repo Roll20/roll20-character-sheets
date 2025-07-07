@@ -2,21 +2,8 @@
 <div>
     <button type="action" name="act_skills">Umiejętności</button>
     <button type="action" name="act_equipment">Wyposażenie</button>
+    <button type="action" name="act_data">Dane Użytkownika</button>
 </div><div class="menu-roll">
-    <div>
-        <div class="test-type-group">
-            <input type="radio" name="attr_test_type_txt" value="0" checked>
-            <p class="test-name">Test Zwykły</p>
-        </div>
-        <div class="test-type-group">
-            <input type="radio" name="attr_test_type_txt" value="1">
-            <p class="test-name">Test Otwarty</p>
-        </div>
-        <div class="test-type-group">
-            <input type="radio" name="attr_test_type_txt" value="2">
-            <p class="test-name">Test Walki</p>
-        </div>
-    </div>
     <div>
         <div class="diffculty-level-value">
             <input type="radio" class="diffculty-level-value-left-radio" name="attr_difficulty_lvl" value="0" checked>
@@ -59,6 +46,35 @@
             <input type="radio" class="diffculty-level-value-right-radio" name="attr_difficulty_max_lvl" value="8">
         </div>
     </div>
+    <div>
+        <button class="hitloc" type="roll" name="roll_hitloc" title="Rzut na lokację"
+            value="&{template:hit-location} {{result=[[1d19]]}}"></button>
+
+        <button class="open" type="roll" name="roll_open"
+             value="&{template:test} {{test_name=@{last_test_name}}} {{difficulty_lvl_val=[[@{last_combat_difficulty}]]}} {{test_type_txt=[[1]]}} {{res=[[@{last_open_test_value}]]}}"></button>
+
+        <button class="combat" type="roll" name="roll_combat"
+            value="&{template:test} {{test_name=@{last_test_name}}} {{difficulty_lvl_val=[[@{last_combat_difficulty}]]}} {{test_type_txt=[[2]]}} {{roll1=[[@{last_combat_roll1}]]}} {{roll2=[[@{last_combat_roll2}]]}} {{roll3=[[@{last_combat_roll3}]]}} {{status1=[[@{last_combat_status1}]]}} {{status2=[[@{last_combat_status2}]]}} {{status3=[[@{last_combat_status3}]]}}"></button>
+    </div>
+</div><div class="data-container-tab" sot="color: wheat;">
+    imie
+    <input type="text" name="attr_character_name">
+    nazwa testu
+    <input type="text" name="attr_last_test_name">
+    status1
+    <input type="text" name="attr_last_combat_status1">
+    status2
+    <input type="text" name="attr_last_combat_status2">
+    status3
+    <input type="text" name="attr_last_combat_status3">
+    test otwarty
+    <input type="text" name="attr_last_open_test_value">
+    test walki
+    <input type="text" name="attr_last_combat_test_value">
+    test walki otwarty
+    <input type="text" name="attr_last_combat_opent_test_value">
+    poziom trudności
+    <input type="text" name="attr_last_combat_difficulty">
 </div><div class="skill-container-tab">
     <div class="wsp-container">
         <p class="wsp-label">Zręczność</p>
@@ -700,7 +716,7 @@ const skill_code_translate = {
 
 const difficulty_values = [2, 0, -2, -5, -8, -11, -15, -20, -24];
 
-const buttonlist = ["skills", "equipment"];
+const buttonlist = ["skills", "equipment", "data"];
 
 function clamp(val, min, max) {
   return Math.max(min, Math.min(val, max));
@@ -788,7 +804,6 @@ function calculate_result_test_open(rolls, difficulty, points = 0) {
       min1--;
     }
     points--;
-    console.log(`min1:${min1}, min2:${min2}, points:${points}`)
   }
   return difficulty - min2;
 }
@@ -798,15 +813,15 @@ function calculate_result_test_open(rolls, difficulty, points = 0) {
  *
  * A value of `0` in the returned array means success, and `1` means failure.
  * Rolls higher than the difficulty can be reduced using available skill points.
- * In a fight test, encountering a natural 20 stops the evaluation early.
+ * In a combat test, encountering a natural 20 stops the evaluation early.
  *
  * @param {number[]} rolls - Array of d20 roll values.
  * @param {number} difficulty - The base difficulty to beat or meet.
  * @param {number} points - Points that can be spent to reduce roll values.
- * @param {boolean} [is_fight=false] - If true, encountering a 20 halts further evaluation (used in combat tests).
+ * @param {boolean} [is_combat=false] - If true, encountering a 20 halts further evaluation (used in combat tests).
  * @returns {number[]} An array of 0s and 1s indicating success (0) or failure (1) for each roll.
  */
-function create_flag_success(rolls, difficulty, points, is_fight = false) {
+function create_flag_success(rolls, difficulty, points, is_combat = false) {
   const result = Array(rolls.length).fill(1);
 
   const indexedRolls = rolls
@@ -814,7 +829,7 @@ function create_flag_success(rolls, difficulty, points, is_fight = false) {
     .sort((a, b) => a[1] - b[1]);
 
   for (const [i, val] of indexedRolls) {
-    if (val === 20 && is_fight) break;
+    if (val === 20 && is_combat) break;
     const diff = val - difficulty;
     if (diff > points) continue;
     if (val > difficulty) {
@@ -843,18 +858,34 @@ function roll_test(template, name, wsp, wsp_mod, skill = null) {
     "difficulty_max_lvl",
     "test_type_txt",
   ].filter((a) => typeof a === "string" && a.length);
-  startRoll(
-    `&{template:${template}} {{test_name=${name}}} {{difficulty_lvl_val=[[0[computed value]]]}} {{test_type_txt=[[0[computed value]]]}} {{res=[[0[computed value]]]}} {{roll1=[[1d20]]}} {{roll2=[[1d20]]}} {{roll3=[[1d20]]}} {{status1=[[0[computed value]]]}} {{status2=[[0[computed value]]]}} {{status3=[[0[computed value]]]}}`,
-    (results) => {
+  const rollTemplate = `
+    &{template:${template}}
+    {{test_name=${name}}}
+    {{difficulty_lvl_val=[[0[computed value]]]}}
+    {{test_type_txt=[[0[computed value]]]}}
+    {{res=[[0[computed value]]]}}
+    {{roll1=[[1d20]]}}
+    {{roll2=[[1d20]]}}
+    {{roll3=[[1d20]]}}
+    {{test_type_txt=[[0]]}}
+    {{status1=[[0[computed value]]]}}
+    {{status2=[[0[computed value]]]}}
+    {{status3=[[0[computed value]]]}}
+    {{options=[[1]]}}
+    {{topen=[T. Otwarty](~@{character_name}|open)}}
+    {{tcombat=[T. Walki](~@{character_name}|combat)}}
+  `.trim().replace(/\n+/g, ' ');
+
+  startRoll(rollTemplate, (results) => {
       const roll_dices = [
         results.results.roll1.result,
         results.results.roll2.result,
         results.results.roll3.result,
       ];
       getAttrs(attrs_arr, function (values) {
-        let difficulty =
+        let difficulty_classic =
           parseInt(values[wsp] || 0) + parseInt(values[wsp_mod] || 0);
-        const test_type = parseInt(values["test_type_txt"] || 0);
+        let difficulty_combat = difficulty_classic;
         const max_level_difficulty = clamp(
           parseInt(values["difficulty_max_lvl"]) || 6,
           6,
@@ -862,40 +893,57 @@ function roll_test(template, name, wsp, wsp_mod, skill = null) {
         );
         const skill_value =
           skill === null ? null : parseInt(values[skill] || 0);
-        const difficulty_mod = set_difficulty_level(
+        const difficulty_mod_classic = set_difficulty_level(
           roll_dices,
           parseInt(values["difficulty_lvl"] || 0),
           max_level_difficulty,
-          skill === null ? null : skill_value,
-          test_type === 2
+          skill_value
+        );
+        const difficulty_mod_combat = set_difficulty_level(
+          roll_dices,
+          parseInt(values["difficulty_lvl"] || 0),
+          max_level_difficulty,
+          skill_value,
+          true
         );
 
-        difficulty += difficulty_values[difficulty_mod];
+        difficulty_classic += difficulty_values[difficulty_mod_classic];
+        difficulty_combat += difficulty_values[difficulty_mod_combat];
 
-        const flags = create_flag_success(roll_dices, difficulty, skill_value,test_type === 2);
-        let final_result;
-        switch (test_type) {
-          case 0:
-            final_result = calculate_result_test_classic(flags);
-            break;
-          case 1:
-            final_result = calculate_result_test_open(
-              roll_dices,
-              difficulty,
-              skill === null ? 0 : skill_value
-            );
-            break;
-          case 2:
-            final_result = calculate_result_test_classic(flags);
-            break;
-        }
+        const flags_classic = create_flag_success(
+          roll_dices,
+          difficulty_classic,
+          skill_value,
+        );
+        const flags_combat = create_flag_success(
+          roll_dices,
+          difficulty_combat,
+          skill_value,
+          true
+        );
+        const final_result_classic=calculate_result_test_classic(flags_classic);
+        const final_result_classic_open=calculate_result_test_open(roll_dices, difficulty_classic, skill === null ? 0 : skill_value);
+        const final_result_combat=calculate_result_test_classic(flags_combat);
+        const final_result_combat_open=calculate_result_test_open(roll_dices, difficulty_combat, skill === null ? 0 : skill_value);
+        setAttrs({
+          last_test_name: name,
+          last_combat_status1:flags_combat[0],
+          last_combat_status2:flags_combat[1],
+          last_combat_status3:flags_combat[2],
+          last_combat_roll1:roll_dices[0],
+          last_combat_roll2:roll_dices[1],
+          last_combat_roll3:roll_dices[2],
+          last_open_test_value:final_result_classic_open,
+          last_combat_test_value:final_result_combat,
+          last_combat_opent_test_value:final_result_combat_open,
+          last_combat_difficulty:difficulty_mod_combat,
+        });
         finishRoll(results.rollId, {
-          status1: flags[0],
-          status2: flags[1],
-          status3: flags[2],
-          res: final_result,
-          test_type_txt: test_type,
-          difficulty_lvl_val: difficulty_mod,
+          status1: flags_classic[0],
+          status2: flags_classic[1],
+          status3: flags_classic[2],
+          res: final_result_classic,
+          difficulty_lvl_val: difficulty_mod_classic,
         });
       });
     }
@@ -1048,6 +1096,7 @@ on("change:repeating_weapons:weapon_type", function (eventInfo) {
                 {{#rollTotal() computed::test_type_txt 0}}Test Zamknięty{{/rollTotal() computed::test_type_txt 0}}
                 {{#rollTotal() computed::test_type_txt 1}}Test Otwarty{{/rollTotal() computed::test_type_txt 1}}
                 {{#rollTotal() computed::test_type_txt 2}}Test Walki{{/rollTotal() computed::test_type_txt 2}}
+                {{#rollTotal() computed::test_type_txt 3}}Test Walki Otwarty{{/rollTotal() computed::test_type_txt 3}}
             </h2>
             <h2>
                 {{#rollTotal() computed::difficulty_lvl_val 0}}Łatwy{{/rollTotal() computed::difficulty_lvl_val 0}}
@@ -1101,5 +1150,25 @@ on("change:repeating_weapons:weapon_type", function (eventInfo) {
             <p class="sheet-rolltemplate-result-dice-value">{{roll3}}</p>
             </div>
         </div>
+        {{#rollTotal() options 1}}
+        <div class="sheet-rolltemplate-rolls">
+            {{topen}}
+            {{tcombat}}
+        </div>
+        {{/rollTotal() options 1}}
     </div>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-hit-location">
+    <h1>{{result}}
+    {{#rollBetween() result 1 2}} Głowa(1-2)</h1>{{/rollBetween() result 1 2}}
+    {{#rollBetween() result 3 4}} Prawa ręka(3-4)</h1>{{/rollBetween() result 3 4}}
+    {{#rollBetween() result 5 6}} Lewa Ręka(5-6)</h1>{{/rollBetween() result 5 6}}
+    {{#rollBetween() result 7 15}} Korpus(7-15)</h1>{{/rollBetween() result 7 15}}
+    {{#rollBetween() result 16 17}} Prawa Noga(16-17)</h1>{{/rollBetween() result 16 17}}
+    {{#rollBetween() result 18 19}} Lewa Noga(18-1)</h1>{{/rollBetween() result 18 19}}
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-test-open">
+    <h1>
+        Test otwarty {{name}} punkty:{{points}}
+    </h1>
 </rolltemplate>
