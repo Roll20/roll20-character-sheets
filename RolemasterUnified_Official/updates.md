@@ -1,3 +1,15 @@
+# 2025-07-08
+
+- Use ISO 8601 for dates.
+- Action tracking improvements
+   - Use a drop down instead of multiple actions
+   - Use a single AP track
+   - Many more actions
+   - Up to 20(!) phasee support
+- Add token actions for AP tracking
+- Creature data update
+- Investigate Beacon -> no go
+
 # 2025-7-1
 
 Pre-Birthday release!
