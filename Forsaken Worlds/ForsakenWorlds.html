@@ -1437,7 +1437,7 @@
 						<option value="Opp">Opposition</option>
 						<option value="Spec">Specialist</option>
 			</select>
-			<b>Illusion/Phantasm</b>
+			<b>Illusion/PhanFWSm</b>
 			<select class="sheet-mid" style="width: 100px" name="attr_3wSchoolIll" />
 						<option value="Gen">General</option>
 						<option value="Opp">Opposition</option>
@@ -1863,12 +1863,13 @@
 <!-- WORKERS -->
 <script type="text/worker">
 
-	/* ---- BEGIN: TheAaronSheet.js ---- */
-// Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
-// By:       The Aaron, Arcane Scriptomancer
-// Contact:  https://app.roll20.net/users/104025/the-aaron
+	/* ---- BEGIN: ForsakenWorldsSheet.js ---- */
+// Adaptado de: TheAaronSheet.js - https://github.com/shdwjk/TheAaronSheet
+// Modificações por: Lucas Trombini para sistema OGL 1.0 Forsaken Worlds    
+// By:       Lucas Trombini based on The Aaron, Arcane Scriptomancer
+// Contact:  https://app.roll20.net/users/224310/elcio-trombini
 
-var TAS = TAS || (function(){
+var FWS = FWS || (function(){
     'use strict';
 
     var version = '0.2.5',
@@ -1936,7 +1937,7 @@ var TAS = TAS || (function(){
                 }
             },
             callstack: {
-                key:     'TAS',
+                key:     'FWS',
                 title:   'function',
                 color: {
                     bgLabel: '#413FA9',
@@ -1946,7 +1947,7 @@ var TAS = TAS || (function(){
                 }
             },
             callstack_async: {
-                key:     'TAS',
+                key:     'FWS',
                 title:   'ASYNC CALL',
                 color: {
                     bgLabel: '#413FA9',
@@ -1955,9 +1956,9 @@ var TAS = TAS || (function(){
                     text:    'white'
                 }
             },
-            TAS: {
-                key:     'TAS',
-                title:   'TAS',
+            FWS: {
+                key:     'FWS',
+                title:   'FWS',
                 color: {
                     bgLabel: 'grey',
                     label:   'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)',
@@ -2032,7 +2033,7 @@ var TAS = TAS || (function(){
     colorLog = function(options){
         var coloredLoggerFunction,
             key = options.key,
-            label = options.title || 'TAS',
+            label = options.title || 'FWS',
             lBGColor = (options.color && options.color.bgLabel) || 'blue',
             lTxtColor = (options.color && options.color.label) || 'white',
             mBGColor = (options.color && options.color.bgText) || 'blue',
@@ -2048,7 +2049,7 @@ var TAS = TAS || (function(){
             /* eslint-enable no-console */
         };
         return function(){
-            if('TAS'===key || config.logging[key]){
+            if('FWS'===key || config.logging[key]){
                 /* eslint-disable no-console */
                dataLogger(coloredLoggerFunction,function(m){console.log(m);},_.toArray(arguments)); 
                 /* eslint-enable no-console */
@@ -2062,7 +2063,7 @@ var TAS = TAS || (function(){
     logInfo   = colorLog(loggingSettings.info),
     logNotice = colorLog(loggingSettings.notice),
     logLog    = colorLog(loggingSettings.log),
-    log       = colorLog(loggingSettings.TAS),
+    log       = colorLog(loggingSettings.FWS),
     logCS     = colorLog(loggingSettings.callstack),
     logCSA    = colorLog(loggingSettings.callstack_async),
 
@@ -2113,7 +2114,7 @@ var TAS = TAS || (function(){
     logCallstackSub = function(cs){
         var matches, csa;
         _.find(cs,function(line){
-            matches = line.match(/TAS_CALLSTACK_(\d+)/);
+            matches = line.match(/FWS_CALLSTACK_(\d+)/);
             if(matches){
                csa=callstackRegistry[matches[1]];
                logCSA( '===================='+(csa.label ? '> '+csa.label+' <' : '')+'====================');
@@ -2158,14 +2159,14 @@ var TAS = TAS || (function(){
             var ctxref=registerCallstack(cs,lbl);
 
             /*jshint -W054 */
-            return new Function('cb','ctx','TASlog',
-                "return function TAS_CALLSTACK_"+ctxref+"(){"+
+            return new Function('cb','ctx','FWSlog',
+                "return function FWS_CALLSTACK_"+ctxref+"(){"+
                     "var start,end;"+
-                    "TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
+                    "FWSlog('Entering: '+(cb.name||'(anonymous function)'));"+
                     "start=_.now();"+
                     "cb.apply(ctx||{},arguments);"+
                     "end=_.now();"+
-                    "TASlog('Exiting: '+(cb.name||'(anonymous function)')+' :: '+(end-start)+'ms elapsed');"+
+                    "FWSlog('Exiting: '+(cb.name||'(anonymous function)')+' :: '+(end-start)+'ms elapsed');"+
                 "};")(cb,ctx,log);
             /*jshint +W054 */
         }(callback,context,callstack,label));
@@ -2319,15 +2320,15 @@ var TAS = TAS || (function(){
 				operations = [],
                 after = [],
 			
-			repAttrs = function TAS_Repeating_Attrs(){
+			repAttrs = function FWS_Repeating_Attrs(){
 				attrNames = namesFromArgs(arguments,attrNames);
 				return this;
 			},
-			repFields = function TAS_Repeating_Fields(){
+			repFields = function FWS_Repeating_Fields(){
 				fieldNames = namesFromArgs(arguments,fieldNames);
 				return this;
 			},
-			repReduce = function TAS_Repeating_Reduce(func, initial, final, context) { 
+			repReduce = function FWS_Repeating_Reduce(func, initial, final, context) { 
 				operations.push({
                     type: 'reduce',
                     func: (func && _.isFunction(func) && func) || _.noop,
@@ -2337,7 +2338,7 @@ var TAS = TAS || (function(){
                 });
 				return this;
 			},
-			repMap = function TAS_Repeating_Map(func, final, context) {
+			repMap = function FWS_Repeating_Map(func, final, context) {
 				operations.push({
                     type: 'map',
                     func: (func && _.isFunction(func) && func) || _.noop,
@@ -2346,7 +2347,7 @@ var TAS = TAS || (function(){
                 });
 				return this;
 			},
-            repEach = function TAS_Repeating_Each(func, final, context) {
+            repEach = function FWS_Repeating_Each(func, final, context) {
 				operations.push({
                     type: 'each',
                     func: (func && _.isFunction(func) && func) || _.noop,
@@ -2355,7 +2356,7 @@ var TAS = TAS || (function(){
                 });
 				return this;
             },
-            repTap = function TAS_Repeating_Tap(final, context) {
+            repTap = function FWS_Repeating_Tap(final, context) {
 				operations.push({
                     type: 'tap',
                     final: (final && _.isFunction(final) && final) || _.noop,
@@ -2363,14 +2364,14 @@ var TAS = TAS || (function(){
                 });
 				return this;
             },
-            repAfter = function TAS_Repeating_After(callback,context) {
+            repAfter = function FWS_Repeating_After(callback,context) {
 				after.push({
                     callback: (callback && _.isFunction(callback) && callback) || _.noop,
                     context: context || {}
                 });
 				return this;
             },
-			repExecute = function TAS_Repeating_Execute(callback,context){
+			repExecute = function FWS_Repeating_Execute(callback,context){
 				var rowSet = {},
 					attrSet = {},
 					fieldIds = [],
@@ -4410,7 +4411,7 @@ var TAS = TAS || (function(){
 
 	/* sort out total gearweight */
 	on('change:repeating_gear:gearweigh change:gearweigh', function(){
-		TAS.repeating('gear')  //<-- The repeating section name
+		FWS.repeating('gear')  //<-- The repeating section name
 			.attrs('gearweigh','gearweighttotal')  //<-- the attributes outside the repeating section
 			.fields('gearweigh') //<-- the field (attribute) inside the repeating section
 			.reduce(function(m,r){
@@ -4424,7 +4425,7 @@ var TAS = TAS || (function(){
 	
 	/* sort out total weapweight */
 	on('change:repeating_weapons:weapweight change:weapweight', function(){
-		TAS.repeating('weapons')  //<-- The repeating section name
+		FWS.repeating('weapons')  //<-- The repeating section name
 			.attrs('weapweight','weapweighttotal')  //<-- the attributes outside the repeating section
 			.fields('weapweight') //<-- the field (attribute) inside the repeating section
 			.reduce(function(m,r){
