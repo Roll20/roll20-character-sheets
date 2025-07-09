@@ -1,4 +1,3 @@
-
 //####################################
 //###############CODES################
 //####################################
@@ -154,7 +153,6 @@ function count_number(arr, target) {
   return arr.filter((n) => n === target).length;
 }
 
-
 //####################################
 //################ROLL################
 //####################################
@@ -222,6 +220,9 @@ function calculate_result_test_classic(flags) {
  * @returns {number} The difference between the difficulty and the (possibly reduced) second-lowest die value.
  */
 function calculate_result_test_open(rolls, difficulty, points = 0) {
+  if(rolls.length < 2){
+    return 0
+  }
   const sorted_dices = rolls.concat().sort(function (a, b) {
     return a - b;
   });
@@ -281,7 +282,7 @@ function create_flag_success(rolls, difficulty, points, is_combat = false) {
  * @param {string} wsp_mod - Modifier for the base attribute.
  * @param {string} [skill=null] - Optional skill associated with the test, used to reduce the number of dice.
  */
-function roll_test(template, name, wsp, wsp_mod, skill = null) {
+function roll_test(template, name, wsp, wsp_mod, skill = null, dice = 3) {
   const attrs_arr = [
     wsp,
     wsp_mod,
@@ -304,6 +305,7 @@ function roll_test(template, name, wsp, wsp_mod, skill = null) {
     {{status2=[[0[computed value]]]}}
     {{status3=[[0[computed value]]]}}
     {{options=[[1]]}}
+    {{dice=[[${dice}]]}}
     {{topen=[T. Otwarty](~@{character_name}|open)}}
     {{tcombat=[T. Walki](~@{character_name}|combat)}}
   `
@@ -311,11 +313,12 @@ function roll_test(template, name, wsp, wsp_mod, skill = null) {
     .replace(/\n+/g, " ");
 
   startRoll(rollTemplate, (results) => {
-    const roll_dices = [
+    const refference_rolls =[
       results.results.roll1.result,
       results.results.roll2.result,
       results.results.roll3.result,
-    ];
+    ]
+    const roll_dices = refference_rolls.slice(0, dice);
     getAttrs(attrs_arr, function (values) {
       let difficulty_classic =
         parseInt(values[wsp] || 0) + parseInt(values[wsp_mod] || 0);
@@ -368,17 +371,18 @@ function roll_test(template, name, wsp, wsp_mod, skill = null) {
       );
       setAttrs({
         last_test_name: name,
-        last_combat_status1: flags_combat[0],
-        last_combat_status2: flags_combat[1],
-        last_combat_status3: flags_combat[2],
-        last_combat_roll1: roll_dices[0],
-        last_combat_roll2: roll_dices[1],
-        last_combat_roll3: roll_dices[2],
-        last_open_test_value: final_result_classic_open,
-        last_combat_test_value: final_result_combat,
-        last_combat_opent_test_value: final_result_combat_open,
-        last_classic_difficulty: difficulty_mod_classic,
-        last_combat_difficulty: difficulty_mod_combat,
+        last_combat_status1: flags_combat[0]|| 0,
+        last_combat_status2: flags_combat[1] || 0,
+        last_combat_status3: flags_combat[2] || 0,
+        last_combat_roll1: refference_rolls[0]|| 0,
+        last_combat_roll2: refference_rolls[1]|| 0,
+        last_combat_roll3: refference_rolls[2]|| 0,
+        last_open_test_value: final_result_classic_open|| 0,
+        last_combat_test_value: final_result_combat|| 0,
+        last_combat_opent_test_value: final_result_combat_open|| 0,
+        last_classic_difficulty: difficulty_mod_classic|| 0,
+        last_combat_difficulty: difficulty_mod_combat|| 0,
+        last_dice_number:dice|| 0,
       });
       finishRoll(results.rollId, {
         status1: flags_classic[0],
@@ -496,7 +500,6 @@ buttonlist.forEach((button) => {
  * ================================== REPEATING ===================================
  */
 
-
 /**
  * =============================
  * =========== MELEE ===========
@@ -523,19 +526,9 @@ on("change:repeating_weapons:weapon_type", function (eventInfo) {
       default:
         name_attr = "0";
     }
-
-    if (name_attr === "0") {
-      setAttrs({
-        [`repeating_weapons_${rowId}_weapon_skill_value`]: -1,
-      });
-    } else {
-      getAttrs([name_attr], function (value_attr) {
-        const skill_val = value_attr[name_attr] || 0;
-        setAttrs({
-          [`repeating_weapons_${rowId}_weapon_skill_value`]: skill_val,
-        });
-      });
-    }
+    setAttrs({
+      [`repeating_weapons_${rowId}_weapon_skill_value`]: skill_val,
+    });
   });
 });
 
@@ -544,3 +537,69 @@ on("change:repeating_weapons:weapon_type", function (eventInfo) {
  * ========== RANGE WEAPON ===========
  * ===================================
  */
+on("change:repeating_ranges:range_type", function (eventInfo) {
+  const rowId = eventInfo.sourceAttribute.split("_")[2];
+  const fullAttr = `repeating_ranges_${rowId}_range_type`;
+
+  getAttrs([fullAttr], function (values) {
+    const rangeType = values[fullAttr];
+    let name_attr = "";
+
+    switch (rangeType) {
+      case "pistol":
+        name_attr = "pistolety";
+        break;
+      case "rifle":
+        name_attr = "karabiny";
+        break;
+      case "machine-gun":
+        name_attr = "br_maszynowa";
+        break;
+      case "bow":
+        name_attr = "łuk";
+        break;
+      case "crosbow":
+        name_attr = "kusza";
+        break;
+      case "sling":
+        name_attr = "proca";
+        break;
+      default:
+        name_attr = "0";
+    }
+    setAttrs({
+      [`repeating_ranges_${rowId}_range_skill_value`]: name_attr,
+    });
+  });
+});
+
+on("clicked:repeating_ranges:rolledrange", function (eventInfo) {
+  const rowId = eventInfo.sourceAttribute.split("_")[2]; // wyciąga ID
+  const prefix = `repeating_ranges_${rowId}_`;
+
+  getAttrs(
+    [
+      `${prefix}range_name`,
+      `${prefix}range_damage`,
+      `${prefix}range_skill_value`,
+      `${prefix}range_type`,
+      `${prefix}range_location`,
+      `${prefix}range_pp`,
+      `${prefix}range_segment`,
+    ],
+    function (values) {
+      // Tutaj możesz np. wykonać rzut lub pokazać dane w konsoli:
+      const skill =
+        `${prefix}range_skill_value` === "0"
+          ? null
+          : values[`${prefix}range_skill_value`];
+      // finishRoll(...) lub sendChat(...), itd.
+      const skill_name =
+        skill === null
+          ? "Zręczność"
+          : `${skill_code_translate[skill]}(Zręczność)`;
+      const dice = clamp(parseInt(values[`${prefix}range_segment`]) || 0, 1, 3);
+      roll_test("test", skill_name, "zre", "zre_mod", skill, dice);
+    }
+  );
+});
