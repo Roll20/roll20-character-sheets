@@ -1,6 +1,4 @@
-/**
- * Description
- */
+
 //####################################
 //###############CODES################
 //####################################
@@ -156,6 +154,7 @@ function count_number(arr, target) {
   return arr.filter((n) => n === target).length;
 }
 
+
 //####################################
 //################ROLL################
 //####################################
@@ -223,7 +222,7 @@ function calculate_result_test_classic(flags) {
  * @returns {number} The difference between the difficulty and the (possibly reduced) second-lowest die value.
  */
 function calculate_result_test_open(rolls, difficulty, points = 0) {
-  let sorted_dices = rolls.concat().sort(function (a, b) {
+  const sorted_dices = rolls.concat().sort(function (a, b) {
     return a - b;
   });
   let min1 = sorted_dices[0];
@@ -273,12 +272,14 @@ function create_flag_success(rolls, difficulty, points, is_combat = false) {
 }
 
 /**
- * Make a test, create text in rolltemplate, assing values and calulate result of the test
- * @param {string} template - rolltemplate name
- * @param {string} name - name of test wsp or skill(wsp)
- * @param {string} wsp - name of wsp
- * @param {string} wsp_mod - modificator of
- * @param {string} skill
+ * Executes a skill or attribute test, formats the roll template,
+ * assigns necessary values, and calculates the result.
+ *
+ * @param {string} template - Name of the Roll20 rolltemplate to use.
+ * @param {string} name - Display name of the test (e.g. attribute or skill name).
+ * @param {string} wsp - Base attribute used for the test.
+ * @param {string} wsp_mod - Modifier for the base attribute.
+ * @param {string} [skill=null] - Optional skill associated with the test, used to reduce the number of dice.
  */
 function roll_test(template, name, wsp, wsp_mod, skill = null) {
   const attrs_arr = [
@@ -305,86 +306,94 @@ function roll_test(template, name, wsp, wsp_mod, skill = null) {
     {{options=[[1]]}}
     {{topen=[T. Otwarty](~@{character_name}|open)}}
     {{tcombat=[T. Walki](~@{character_name}|combat)}}
-  `.trim().replace(/\n+/g, ' ');
+  `
+    .trim()
+    .replace(/\n+/g, " ");
 
   startRoll(rollTemplate, (results) => {
-      const roll_dices = [
-        results.results.roll1.result,
-        results.results.roll2.result,
-        results.results.roll3.result,
-      ];
-      getAttrs(attrs_arr, function (values) {
-        let difficulty_classic =
-          parseInt(values[wsp] || 0) + parseInt(values[wsp_mod] || 0);
-        let difficulty_combat = difficulty_classic;
-        const max_level_difficulty = clamp(
-          parseInt(values["difficulty_max_lvl"]) || 6,
-          6,
-          8
-        );
-        const skill_value =
-          skill === null ? null : parseInt(values[skill] || 0);
-        const difficulty_mod_classic = set_difficulty_level(
-          roll_dices,
-          parseInt(values["difficulty_lvl"] || 0),
-          max_level_difficulty,
-          skill_value
-        );
-        const difficulty_mod_combat = set_difficulty_level(
-          roll_dices,
-          parseInt(values["difficulty_lvl"] || 0),
-          max_level_difficulty,
-          skill_value,
-          true
-        );
+    const roll_dices = [
+      results.results.roll1.result,
+      results.results.roll2.result,
+      results.results.roll3.result,
+    ];
+    getAttrs(attrs_arr, function (values) {
+      let difficulty_classic =
+        parseInt(values[wsp] || 0) + parseInt(values[wsp_mod] || 0);
+      let difficulty_combat = difficulty_classic;
+      const max_level_difficulty = clamp(
+        parseInt(values["difficulty_max_lvl"]) || 6,
+        6,
+        8
+      );
+      const skill_value = skill === null ? null : parseInt(values[skill] || 0);
+      const difficulty_mod_classic = set_difficulty_level(
+        roll_dices,
+        parseInt(values["difficulty_lvl"] || 0),
+        max_level_difficulty,
+        skill_value
+      );
+      const difficulty_mod_combat = set_difficulty_level(
+        roll_dices,
+        parseInt(values["difficulty_lvl"] || 0),
+        max_level_difficulty,
+        skill_value,
+        true
+      );
 
-        difficulty_classic += difficulty_values[difficulty_mod_classic];
-        difficulty_combat += difficulty_values[difficulty_mod_combat];
+      difficulty_classic += difficulty_values[difficulty_mod_classic];
+      difficulty_combat += difficulty_values[difficulty_mod_combat];
 
-        const flags_classic = create_flag_success(
-          roll_dices,
-          difficulty_classic,
-          skill_value,
-        );
-        const flags_combat = create_flag_success(
-          roll_dices,
-          difficulty_combat,
-          skill_value,
-          true
-        );
-        const final_result_classic=calculate_result_test_classic(flags_classic);
-        const final_result_classic_open=calculate_result_test_open(roll_dices, difficulty_classic, skill === null ? 0 : skill_value);
-        const final_result_combat=calculate_result_test_classic(flags_combat);
-        const final_result_combat_open=calculate_result_test_open(roll_dices, difficulty_combat, skill === null ? 0 : skill_value);
-        setAttrs({
-          last_test_name: name,
-          last_combat_status1:flags_combat[0],
-          last_combat_status2:flags_combat[1],
-          last_combat_status3:flags_combat[2],
-          last_combat_roll1:roll_dices[0],
-          last_combat_roll2:roll_dices[1],
-          last_combat_roll3:roll_dices[2],
-          last_open_test_value:final_result_classic_open,
-          last_combat_test_value:final_result_combat,
-          last_combat_opent_test_value:final_result_combat_open,
-          last_combat_difficulty:difficulty_mod_combat,
-        });
-        finishRoll(results.rollId, {
-          status1: flags_classic[0],
-          status2: flags_classic[1],
-          status3: flags_classic[2],
-          res: final_result_classic,
-          difficulty_lvl_val: difficulty_mod_classic,
-        });
+      const flags_classic = create_flag_success(
+        roll_dices,
+        difficulty_classic,
+        skill_value
+      );
+      const flags_combat = create_flag_success(
+        roll_dices,
+        difficulty_combat,
+        skill_value,
+        true
+      );
+      const final_result_classic = calculate_result_test_classic(flags_classic);
+      const final_result_classic_open = calculate_result_test_open(
+        roll_dices,
+        difficulty_classic,
+        skill === null ? 0 : skill_value
+      );
+      const final_result_combat = calculate_result_test_classic(flags_combat);
+      const final_result_combat_open = calculate_result_test_open(
+        roll_dices,
+        difficulty_combat,
+        skill === null ? 0 : skill_value
+      );
+      setAttrs({
+        last_test_name: name,
+        last_combat_status1: flags_combat[0],
+        last_combat_status2: flags_combat[1],
+        last_combat_status3: flags_combat[2],
+        last_combat_roll1: roll_dices[0],
+        last_combat_roll2: roll_dices[1],
+        last_combat_roll3: roll_dices[2],
+        last_open_test_value: final_result_classic_open,
+        last_combat_test_value: final_result_combat,
+        last_combat_opent_test_value: final_result_combat_open,
+        last_classic_difficulty: difficulty_mod_classic,
+        last_combat_difficulty: difficulty_mod_combat,
       });
-    }
-  );
+      finishRoll(results.rollId, {
+        status1: flags_classic[0],
+        status2: flags_classic[1],
+        status3: flags_classic[2],
+        res: final_result_classic,
+        difficulty_lvl_val: difficulty_mod_classic,
+      });
+    });
+  });
 }
-
 /**
- *
- *
- *
+ * ====================================
+ * =========== ASSIGN ROLLS ===========
+ * ====================================
  */
 wsp_code.forEach((element) => {
   on(
@@ -431,11 +440,11 @@ for (const [key, value] of Object.entries(skill_code)) {
     });
   });
 }
-
-//####################################
-//#############DIFFICULTY#############
-//####################################
-
+/**
+ * ===================================
+ * ============ DIFFICULTY ===========
+ * ===================================
+ */
 on("change:difficulty_lvl sheet:opened", function () {
   getAttrs(["difficulty_lvl", "difficulty_max_lvl"], function (values) {
     const max_level_difficulty = clamp(
@@ -483,6 +492,16 @@ buttonlist.forEach((button) => {
   });
 });
 
+/**
+ * ================================== REPEATING ===================================
+ */
+
+
+/**
+ * =============================
+ * =========== MELEE ===========
+ * =============================
+ */
 on("change:repeating_weapons:weapon_type", function (eventInfo) {
   const rowId = eventInfo.sourceAttribute.split("_")[2];
   const fullAttr = `repeating_weapons_${rowId}_weapon_type`;
@@ -519,3 +538,9 @@ on("change:repeating_weapons:weapon_type", function (eventInfo) {
     }
   });
 });
+
+/**
+ * ===================================
+ * ========== RANGE WEAPON ===========
+ * ===================================
+ */
