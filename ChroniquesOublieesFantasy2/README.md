@@ -6,9 +6,19 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.5.0 [Screenshot](cof2e.png)
+v1.6.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.6.0_ (2025-06-22)
+
+- Déplacement des propriétés magiques des armes vers les modificateurs d'attaque
+- Ajout d'un champ _Prédicats si porté_ aux lignes d'attaques et d'équipements
+- Création de deux lignes d'attaque pour une arme avec la propriété _lancer_
+- Ajout de la possibilité d'épingler les jets des capacités à la barre d'actions Roll20
+- Ajout d'une gestion de compétences dans la fiche de PNJ
+- Ajout de 3 coups spéciaux dans la fiche de PNJ
+- Ajout d'une liste de munitions sur l'onglet Equipement (script COFantasy)
 
 ### Version _1.5.0_ (2025-05-08)
 
