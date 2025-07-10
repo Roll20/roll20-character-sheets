@@ -2423,17 +2423,8 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     <span name='attr_attackname'></span>
     <span name='attr_notes'></span>
 
-
-<!--    <span name='attr_attack'></span>
-    <span name='attr_attacksize'></span>
-    <span name='attr_type'></span>
-    -->
     <input type='hidden' name='attr_attackersize'>
     <button type='action' class='fancybutton' name='act_creaturemakeattack'>Attack!</button>
-    <!--span class='Foo'>
-    <button type='roll' class='xtokenaction' name='attr_attack' title='Elvis'>Attack</button>
-    <button type='roll' class='xtokenaction' name='X' title='@{attr_attack}'><span name='attr_attack' ></span></button>
-    </span-->
 
   </fieldset>
 
@@ -2536,7 +2527,7 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     <div>Round <span name='attr_currentphasedisplay'></span></div>
     <div><button type='action' name='act_endphase' class='fancybutton fancybuttoninline'>End</button></div>
   </div> <!-- div.actionblock -->
-
+<!--
   <div class='grid4'>
     <div>Defense</div>
     <div style='grid-column: span 2'>
@@ -2555,7 +2546,7 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
       DB <span name='attr_activedb'></span>
     </div>
   </div>
-
+-->
 
 
 
@@ -6205,6 +6196,12 @@ This is not for usual use. </p>
 <button type='roll' class='tokenaction' value='/r d100' name='roll_Ap:Status'>Ap: Status</button>
 <button type='roll' class='tokenaction' value='/r d100' name='roll_EndTurn'>End Turn</button>
 -->
+<button type="roll" class='tokenaction' name="roll_Attack Primary" value="@{Attack Primary_action}">Attack Primary</button>
+<input type="hidden" name="attr_Attack Primary_action">
+<button type="action" style="-toby-display:none;" name="act_Attack Primary-action">Attack Primary</button>
+<button type="roll" class='tokenaction' name="roll_Attack Secondary" value="@{Attack Secondary_action}">Attack Secondary</button>
+<input type="hidden" name="attr_Attack Secondary_action">
+<button type="action" style="-toby-display:none;" name="act_Attack Secondary-action">Attack Secondary</button>
 <button type="roll" class='tokenaction' name="roll_ap➙melee" value="@{ap➙melee_action}">AP Missile</button>
 <input type="hidden" name="attr_ap➙melee_action">
 <button type="action" style="-toby-display:none;" name="act_ap➙melee-action">AP Missile</button>
@@ -6247,7 +6244,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision acd0e34adcbb952f6e623e5d45aed18c59d9cfce
+Revision 198656348dc73954323d65dc4fc9136e6754f129
 
 
 <hr>
@@ -7584,6 +7581,18 @@ function getSectionIDsPending(section, func) {
 	checkPending();
     });
 }
+
+function getSectionIDsOrdered(sectionName, callback) {
+  'use strict';
+  getAttrs([`_reporder_${sectionName}`], function (v) {
+    getSectionIDs(sectionName, function (idArray) {
+      let reporderArray = v[`_reporder_${sectionName}`] ? v[`_reporder_${sectionName}`].toLowerCase().split(',') : [],
+        ids = [...new Set(reporderArray.filter(x => idArray.includes(x)).concat(idArray))];
+      callback(ids);
+    });
+  });
+};
+
 
 function addRepeatingSectionPending(a, b, c, func) {
   if (!func) {
@@ -13191,6 +13200,8 @@ frontpage.updateDB = function () {
       const sb2 = Math.floor(shield_bonus / 2);
       updates.db_partialblock = basedb + shielddb + runningranks + 
 		  Math.round(Math.max(0, sb2) / 2) + passivedodgebonus;
+      console.log("Partial block", updates.db_partialblock, basedb, shielddb, runningranks,
+	   Math.round(Math.max(0, sb2) / 2), passivedodgebonus);
       updates.db_partialblock_info = "Partial Block\n" +
 				     `${F(basedb)} Base DB\n` +
 				     `${F(runningranks)} Passive dodge\n` +
@@ -15224,9 +15235,7 @@ function sizeFromNumeric(value) {
 	    attackmod -= cdata.parrymod;
 	}
 
-	console.log("ranged penalty", cdata.ranged_penalty);
-	if (cdata.ranged_penalty && cdata.ranged_penalty != 0) {
-	    condole.log("applying");
+	if (cdata.attacktype == 'ranged' && cdata.ranged_penalty && cdata.ranged_penalty != 0) {
 	    // If it exists, it's a penalty.  Maybe positive.  Maybe negative
 	    let rp = cdata.ranged_penalty;
 	    if (rp > 0) rp = -rp;
@@ -15292,6 +15301,9 @@ function sizeFromNumeric(value) {
     }
 
     onCheck('clicked:repeating_attack:rmuattackroll', (ev) => {
+	attacks.doAttack(ev);
+    });
+    attacks.doAttack = function (ev) {
 	const basename = ev.sourceAttribute.replace("_rmuattackroll", "");
 	getAttrs(['character_name', `${basename}_attackstr`, `${basename}_attackmin`,
 			`${basename}_attackmax`, `${basename}_attackdata`,
@@ -15351,7 +15363,7 @@ function sizeFromNumeric(value) {
 		cdata.actionselect = values.actionselect || 'nothing';
 		attacks.startAttack(cdata);
 	});
-    });
+    }
     attacks.datarollregex = /^0\[(.*)\]\s*$/;
     attacks.getDataFromRoll = function (str) {
 	return str.match(attacks.datarollregex)[1]
@@ -15729,8 +15741,6 @@ function sizeFromNumeric(value) {
 	});
     });
 })();
-
-
 
 // vim: set sw=4 sts=4 syn=javascript :
 
@@ -16227,7 +16237,7 @@ onCheck("change:activedefense change:parrymod change:parrytype", (_) => {
 	  }
 
 	  if (ev.activedefense == 'partialblock') {
-	    update.activedb  = `${db_partialblock}`
+	    update.activedb  = `${ev.db_partialblock}`
 	    update.db = db + ev.db_partialblock;
 	  } else if (ev.activedefense == 'partialdodge') {
 	    let melee = db + ev.db_partialdodge;
@@ -16937,7 +16947,10 @@ creature.newCreature = function(name, jdata) {
   console.log(attacks);
   updates.attacklist = attacks.join(',');
   for (attack of attacks) {
-    creature.parseAttack(attack, cdata, updates)
+    console.log(attack);
+    let up = {}
+    creature.parseAttack(attack, cdata, up)
+    setAttrs(up);
   }
 
   {
@@ -18094,11 +18107,11 @@ console.log("Tracker sheet loaded");
 
 /**/
 const actionCalls = [
-	/*'attack primary_action', 'attack secondary_action', */
+	'attack primary_action', 'attack secondary_action',
 	'ap➙melee_action',
 	'ap➙missile_action', 'ap➙clear_action', 'ap➙spell_action',
 	'ap➙perception_action', 'ap➙concentration_action', 'ap➙free_action',
-	'ap➙status_action', 'end turn'];
+	'ap➙status_action', 'end turn_action'];
 onCheck("sheet:opened change:character_name", (_) => {
   getAttrs(['character_name',...actionCalls],(attributes) => {
     const setObj = actionCalls.reduce((m,attr) => {
@@ -18113,12 +18126,48 @@ onCheck("sheet:opened change:character_name", (_) => {
 
 
 
+function apactionAttackSelect(prefix, ids, attackindex, handler) {
+  console.log(ids);
+  
+  if (!ids[attackindex]) {
+    rmuerror("We don't have an index of ", attackindex, ids, prefix, "apactionAttackSelect");
+    return;
+  }
 
-onCheck("clicked:attack secondary-action", (ev) => {
-	console.log(ev);
-});
-onCheck("clicked:attack primary-action", (ev) => {
-	console.log(ev);
+  // So get the right prefix
+  const id = prefix + '_' + ids[attackindex];
+  console.log(id);
+  console.log(handler);
+  // Fake up an event
+  handler({ sourceAttribute : id });
+}
+
+onCheck("clicked:attack primary-action clicked:attack secondary-action", (ev) => {
+    console.log(ev);
+    let attackindex = 0;
+    if (ev.triggerName.includes('secondary')) {
+      attackindex = 1;
+    }
+
+
+    // So we need to find out what sort of sheet
+    getAttrs(['sheetselect'], (sheet) => {
+	console.log(sheet);
+	if (sheet.sheetselect == 'playersheet') {
+	  getSectionIDs('repeating_attack', (attacklist) => {
+	      apactionAttackSelect('repeating_attack', attacklist, attackindex, attacks.doAttack);
+	  });
+	  
+	} else if (sheet.sheetselect == 'creaturesheet') {
+	  console.log("creature attack", sheet);
+	  getSectionIDs('repeating_creatureattack', (attacks) => {
+	      console.log("attacks rodered", attacks);
+	      apactionAttackSelect('repeating_creatureattack', attacks, attackindex, creature.doAttack);
+	  });
+	} else {
+	  rmuerror("Tokenactions: Primary attack: Unknown sheet:", sheet.sheetselect);
+	}
+    });
 });
 
 
@@ -18135,11 +18184,11 @@ onCheck("clicked:ap➙concentration-action", (ev) => { actionConcentration(ev); 
 onCheck("clicked:ap➙status-action", (ev) => { actionStatus(ev); });
 onCheck("clicked:ap➙clear-action", (ev) => { actionClear(); });
 
-onCheck("ckicked:end turn-action", (ev) => {
-    console.log("end turn0");
+onCheck("clicked:end turn-action", (ev) => {
+  doTurn();
 });
 
-// vim: set sw=4 sts=4 syn=javascript :
+// vim: set sw=2 sts=2 syn=javascript :
 
 
 
