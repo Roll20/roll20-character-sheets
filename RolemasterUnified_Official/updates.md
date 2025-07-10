@@ -1,3 +1,13 @@
+# 2025-07-10
+
+The Thursday little bug edition
+
+- Fix old 'condole.log' problem with ranged weapons (alpinecowboy)
+- Fix ranged weapon penalties applying to everything (!)
+- Fix partial block not being set (Major Havoc & others)
+- Enable Primary/Secondary attack token actions
+- Enable End Turn token action
+
 # 2025-07-08
 
 - Use ISO 8601 for dates.
