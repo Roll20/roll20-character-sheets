@@ -8,7 +8,6 @@ The Thursday little bug edition
 - Enable Primary/Secondary attack token actions
 - Enable End Turn token action
 
-
 # 2025-07-08
 
 - Use ISO 8601 for dates.
