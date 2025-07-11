@@ -220,8 +220,8 @@ function calculate_result_test_classic(flags) {
  * @returns {number} The difference between the difficulty and the (possibly reduced) second-lowest die value.
  */
 function calculate_result_test_open(rolls, difficulty, points = 0) {
-  if(rolls.length < 2){
-    return 0
+  if (rolls.length < 2) {
+    return 0;
   }
   const sorted_dices = rolls.concat().sort(function (a, b) {
     return a - b;
@@ -313,11 +313,11 @@ function roll_test(template, name, wsp, wsp_mod, skill = null, dice = 3) {
     .replace(/\n+/g, " ");
 
   startRoll(rollTemplate, (results) => {
-    const refference_rolls =[
+    const refference_rolls = [
       results.results.roll1.result,
       results.results.roll2.result,
       results.results.roll3.result,
-    ]
+    ];
     const roll_dices = refference_rolls.slice(0, dice);
     getAttrs(attrs_arr, function (values) {
       let difficulty_classic =
@@ -371,18 +371,18 @@ function roll_test(template, name, wsp, wsp_mod, skill = null, dice = 3) {
       );
       setAttrs({
         last_test_name: name,
-        last_combat_status1: flags_combat[0]|| 0,
+        last_combat_status1: flags_combat[0] || 0,
         last_combat_status2: flags_combat[1] || 0,
         last_combat_status3: flags_combat[2] || 0,
-        last_combat_roll1: refference_rolls[0]|| 0,
-        last_combat_roll2: refference_rolls[1]|| 0,
-        last_combat_roll3: refference_rolls[2]|| 0,
-        last_open_test_value: final_result_classic_open|| 0,
-        last_combat_test_value: final_result_combat|| 0,
-        last_combat_opent_test_value: final_result_combat_open|| 0,
-        last_classic_difficulty: difficulty_mod_classic|| 0,
-        last_combat_difficulty: difficulty_mod_combat|| 0,
-        last_dice_number:dice|| 0,
+        last_combat_roll1: refference_rolls[0] || 0,
+        last_combat_roll2: refference_rolls[1] || 0,
+        last_combat_roll3: refference_rolls[2] || 0,
+        last_open_test_value: final_result_classic_open || 0,
+        last_combat_test_value: final_result_combat || 0,
+        last_combat_opent_test_value: final_result_combat_open || 0,
+        last_classic_difficulty: difficulty_mod_classic || 0,
+        last_combat_difficulty: difficulty_mod_combat || 0,
+        last_dice_number: dice || 0,
       });
       finishRoll(results.rollId, {
         status1: flags_classic[0],
@@ -501,9 +501,9 @@ buttonlist.forEach((button) => {
  */
 
 /**
- * =============================
- * =========== MELEE ===========
- * =============================
+ * ====================================
+ * =========== MELEE WEAPON ===========
+ * ====================================
  */
 on("change:repeating_weapons:weapon_type", function (eventInfo) {
   const rowId = eventInfo.sourceAttribute.split("_")[2];
@@ -511,25 +511,45 @@ on("change:repeating_weapons:weapon_type", function (eventInfo) {
 
   getAttrs([fullAttr], function (values) {
     const weaponType = values[fullAttr];
-    let name_attr = "";
-
-    switch (weaponType) {
-      case "brawl":
-        name_attr = "bijatyka";
-        break;
-      case "melee":
-        name_attr = "br_ręczna";
-        break;
-      case "throw":
-        name_attr = "rzucanie";
-        break;
-      default:
-        name_attr = "0";
-    }
     setAttrs({
-      [`repeating_weapons_${rowId}_weapon_skill_value`]: skill_val,
+      [`repeating_weapons_${rowId}_weapon_skill_value`]: weaponType,
     });
   });
+});
+
+on("clicked:repeating_weapons:rolledweapon", function (eventInfo) {
+  const rowId = eventInfo.sourceAttribute.split("_")[2]; // wyciąga ID
+  const prefix = `repeating_weapons_${rowId}_`;
+
+  getAttrs(
+    [
+      `${prefix}weapon_name`,
+      `${prefix}weapon_damage`,
+      `${prefix}weapon_skill_value`,
+      `${prefix}weapon_type`,
+      `${prefix}weapon_location`,
+      `${prefix}weapon_pp`,
+      `${prefix}weapon_segment`,
+    ],
+    function (values) {
+      // Tutaj możesz np. wykonać rzut lub pokazać dane w konsoli:
+      const skill =
+        `${prefix}weapon_skill_value` === "0"
+          ? null
+          : values[`${prefix}weapon_skill_value`];
+      // finishRoll(...) lub sendChat(...), itd.
+      const skill_name =
+        skill === null
+          ? "Zręczność"
+          : `${skill_code_translate[skill]}(Zręczność)`;
+      const dice = clamp(
+        parseInt(values[`${prefix}weapon_segment`]) || 0,
+        1,
+        3
+      );
+      roll_test("test", skill_name, "zre", "zre_mod", skill, dice);
+    }
+  );
 });
 
 /**
@@ -537,41 +557,17 @@ on("change:repeating_weapons:weapon_type", function (eventInfo) {
  * ========== RANGE WEAPON ===========
  * ===================================
  */
-on("change:repeating_ranges:range_type", function (eventInfo) {
-  const rowId = eventInfo.sourceAttribute.split("_")[2];
-  const fullAttr = `repeating_ranges_${rowId}_range_type`;
+// on("change:repeating_ranges:range_type", function (eventInfo) {
+//   const rowId = eventInfo.sourceAttribute.split("_")[2];
+//   const fullAttr = `repeating_ranges_${rowId}_range_type`;
 
-  getAttrs([fullAttr], function (values) {
-    const rangeType = values[fullAttr];
-    let name_attr = "";
-
-    switch (rangeType) {
-      case "pistol":
-        name_attr = "pistolety";
-        break;
-      case "rifle":
-        name_attr = "karabiny";
-        break;
-      case "machine-gun":
-        name_attr = "br_maszynowa";
-        break;
-      case "bow":
-        name_attr = "łuk";
-        break;
-      case "crosbow":
-        name_attr = "kusza";
-        break;
-      case "sling":
-        name_attr = "proca";
-        break;
-      default:
-        name_attr = "0";
-    }
-    setAttrs({
-      [`repeating_ranges_${rowId}_range_skill_value`]: name_attr,
-    });
-  });
-});
+//   getAttrs([fullAttr], function (values) {
+//     const rangeType = values[fullAttr];
+//     setAttrs({
+//       [`repeating_ranges_${rowId}_range_skill_value`]: rangeType,
+//     });
+//   });
+// });
 
 on("clicked:repeating_ranges:rolledrange", function (eventInfo) {
   const rowId = eventInfo.sourceAttribute.split("_")[2]; // wyciąga ID
@@ -603,3 +599,25 @@ on("clicked:repeating_ranges:rolledrange", function (eventInfo) {
     }
   );
 });
+
+// on("change:range_type", () => {
+//   const attribute_name = "range_type";
+//   console.log("dupa")
+//   getAttrs([attribute_name], (values) => {
+//     const type = values[attribute_name];
+//     setAttrs({
+//       range_type_value: type,
+//     });
+//   });
+// });
+on("change:repeating_ranges:range_type", function (eventInfo) {
+    const rowId = eventInfo.sourceAttribute.split("_")[2];
+    const fullAttr = `repeating_ranges_${rowId}_range_type`;
+  
+    getAttrs([fullAttr], function (values) {
+      const rangeType = values[fullAttr];
+      setAttrs({
+        [`repeating_ranges_${rowId}_range_type_value`]: rangeType,
+      });
+    });
+  });
