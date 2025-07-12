@@ -102,5 +102,12 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Fixed spacecraft weapons resize column issue
 - Added traits to weapon description
 
+### Version 1.1.05
+- Added Monthly Salary to finances
+- Added Mod. to weapons for e.g. HUD or scopes or similar
+- Updated translation key for personal Armour for translations
+- Allow custom characteristics to be dragged to macro bar
+
+
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 
