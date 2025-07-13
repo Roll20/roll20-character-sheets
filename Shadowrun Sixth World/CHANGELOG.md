@@ -6,6 +6,7 @@ Change Log
 	Added Sprite levels 11-15
 	Added New Sprite Types (Assassin, Defender, Modular, Music, Primal)
 	Added CM and OS trackers per sprite
+	Added Register Sprite macro chain
 	Bugfix - While Compiling a Sprite, the 'Resist Fade' macro will now roll the proper stats (Willpower+Charisma instead of Willpower+Logic)
 **2025-03-16 ** v.90 Chuz (James Culp)
 	Added i18n values for translating many placeholders and some other labels throughout the Player facing sheet.  Thanks to Talon_Zorch for his hard work translating the sheet on Crowdin and compiling the list for me to add.
