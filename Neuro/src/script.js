@@ -143,6 +143,7 @@ const skill_code_translate = {
 };
 
 const difficulty_values = [2, 0, -2, -5, -8, -11, -15, -20, -24];
+const difficulty_treshold = [0, 10, 30, 60, 90, 120, 160, 200, 240];
 
 const buttonlist = ["skills", "equipment", "data"];
 
@@ -178,20 +179,23 @@ function set_difficulty_level(
 ) {
   let difficulty_level = current_difficulty;
 
-  difficulty_level += count_number(rolls, 20);
-  difficulty_level -= count_number(rolls, 1);
-
   if (skill_value < 1 && skill_value !== null) {
     difficulty_level++;
   } else if (!is_battle) {
     difficulty_level -= Math.floor(skill_value / 4);
   }
-
+  //TODO injuries, situation, etc difficulty %
   difficulty_level = Math.max(
     0,
     Math.min(difficulty_level, max_difficulty_level)
   );
 
+  difficulty_level += count_number(rolls, 20);
+  difficulty_level -= count_number(rolls, 1);
+  difficulty_level = Math.max(
+    0,
+    Math.min(difficulty_level, max_difficulty_level)
+  );
   return difficulty_level;
 }
 
@@ -505,9 +509,39 @@ buttonlist.forEach((button) => {
  * =========== MELEE WEAPON ===========
  * ====================================
  */
-on("change:repeating_weapons:weapon_type", function (eventInfo) {
+on("clicked:repeating_weapons:rolledweapon", function (eventInfo) {
   const rowId = eventInfo.sourceAttribute.split("_")[2];
-  const fullAttr = `repeating_weapons_${rowId}_weapon_type`;
+  const prefix = `repeating_weapons_${rowId}_`;
+
+  const attrsToGet = [
+    `${prefix}weapon_name`,
+    `${prefix}weapon_damage`,
+    `${prefix}weapon_skill_value`,
+    `${prefix}weapon_type`,
+    `${prefix}weapon_location`,
+    `${prefix}weapon_pp`,
+    `${prefix}weapon_segment`,
+  ];
+
+  getAttrs(attrsToGet, function (values) {
+    const skill_value = values[`${prefix}weapon_skill_value`];
+    console.log(values[`${prefix}weapon_skill_value`]);
+    const skill = skill_value === "0" ? null : skill_value;
+
+    const skill_name =
+      skill === null
+        ? "Zręczność"
+        : `${skill_code_translate[skill]}(Zręczność)`;
+
+    const dice = clamp(parseInt(values[`${prefix}weapon_segment`]) || 0, 1, 3);
+
+    roll_test("test", skill_name, "zre", "zre_mod", skill, dice);
+  });
+});
+
+on("change:repeating_weapons:weapon_skill", function (eventInfo) {
+  const rowId = eventInfo.sourceAttribute.split("_")[2];
+  const fullAttr = `repeating_weapons_${rowId}_weapon_skill`;
 
   getAttrs([fullAttr], function (values) {
     const weaponType = values[fullAttr];
@@ -517,107 +551,49 @@ on("change:repeating_weapons:weapon_type", function (eventInfo) {
   });
 });
 
-on("clicked:repeating_weapons:rolledweapon", function (eventInfo) {
-  const rowId = eventInfo.sourceAttribute.split("_")[2]; // wyciąga ID
-  const prefix = `repeating_weapons_${rowId}_`;
-
-  getAttrs(
-    [
-      `${prefix}weapon_name`,
-      `${prefix}weapon_damage`,
-      `${prefix}weapon_skill_value`,
-      `${prefix}weapon_type`,
-      `${prefix}weapon_location`,
-      `${prefix}weapon_pp`,
-      `${prefix}weapon_segment`,
-    ],
-    function (values) {
-      // Tutaj możesz np. wykonać rzut lub pokazać dane w konsoli:
-      const skill =
-        `${prefix}weapon_skill_value` === "0"
-          ? null
-          : values[`${prefix}weapon_skill_value`];
-      // finishRoll(...) lub sendChat(...), itd.
-      const skill_name =
-        skill === null
-          ? "Zręczność"
-          : `${skill_code_translate[skill]}(Zręczność)`;
-      const dice = clamp(
-        parseInt(values[`${prefix}weapon_segment`]) || 0,
-        1,
-        3
-      );
-      roll_test("test", skill_name, "zre", "zre_mod", skill, dice);
-    }
-  );
-});
-
 /**
  * ===================================
  * ========== RANGE WEAPON ===========
  * ===================================
  */
-// on("change:repeating_ranges:range_type", function (eventInfo) {
-//   const rowId = eventInfo.sourceAttribute.split("_")[2];
-//   const fullAttr = `repeating_ranges_${rowId}_range_type`;
-
-//   getAttrs([fullAttr], function (values) {
-//     const rangeType = values[fullAttr];
-//     setAttrs({
-//       [`repeating_ranges_${rowId}_range_skill_value`]: rangeType,
-//     });
-//   });
-// });
-
 on("clicked:repeating_ranges:rolledrange", function (eventInfo) {
-  const rowId = eventInfo.sourceAttribute.split("_")[2]; // wyciąga ID
+  const rowId = eventInfo.sourceAttribute.split("_")[2];
   const prefix = `repeating_ranges_${rowId}_`;
 
-  getAttrs(
-    [
-      `${prefix}range_name`,
-      `${prefix}range_damage`,
-      `${prefix}range_skill_value`,
-      `${prefix}range_type`,
-      `${prefix}range_location`,
-      `${prefix}range_pp`,
-      `${prefix}range_segment`,
-    ],
-    function (values) {
-      // Tutaj możesz np. wykonać rzut lub pokazać dane w konsoli:
-      const skill =
-        `${prefix}range_skill_value` === "0"
-          ? null
-          : values[`${prefix}range_skill_value`];
-      // finishRoll(...) lub sendChat(...), itd.
-      const skill_name =
-        skill === null
-          ? "Zręczność"
-          : `${skill_code_translate[skill]}(Zręczność)`;
-      const dice = clamp(parseInt(values[`${prefix}range_segment`]) || 0, 1, 3);
-      roll_test("test", skill_name, "zre", "zre_mod", skill, dice);
-    }
-  );
+  const attrsToGet = [
+    `${prefix}range_name`,
+    `${prefix}range_damage`,
+    `${prefix}range_skill_value`,
+    `${prefix}range_type`,
+    `${prefix}range_location`,
+    `${prefix}range_pp`,
+    `${prefix}range_segment`,
+  ];
+
+  getAttrs(attrsToGet, function (values) {
+    const skill_value = values[`${prefix}range_skill_value`];
+    console.log(values[`${prefix}range_skill_value`]);
+    const skill = skill_value === "0" ? null : skill_value;
+
+    const skill_name =
+      skill === null
+        ? "Zręczność"
+        : `${skill_code_translate[skill]}(Zręczność)`;
+
+    const dice = clamp(parseInt(values[`${prefix}range_segment`]) || 0, 1, 3);
+
+    roll_test("test", skill_name, "zre", "zre_mod", skill, dice);
+  });
 });
 
-// on("change:range_type", () => {
-//   const attribute_name = "range_type";
-//   console.log("dupa")
-//   getAttrs([attribute_name], (values) => {
-//     const type = values[attribute_name];
-//     setAttrs({
-//       range_type_value: type,
-//     });
-//   });
-// });
-on("change:repeating_ranges:range_type", function (eventInfo) {
-    const rowId = eventInfo.sourceAttribute.split("_")[2];
-    const fullAttr = `repeating_ranges_${rowId}_range_type`;
-  
-    getAttrs([fullAttr], function (values) {
-      const rangeType = values[fullAttr];
-      setAttrs({
-        [`repeating_ranges_${rowId}_range_type_value`]: rangeType,
-      });
+on("change:repeating_ranges:range_skill", function (eventInfo) {
+  const rowId = eventInfo.sourceAttribute.split("_")[2];
+  const fullAttr = `repeating_ranges_${rowId}_range_skill`;
+
+  getAttrs([fullAttr], function (values) {
+    const rangeType = values[fullAttr];
+    setAttrs({
+      [`repeating_ranges_${rowId}_range_skill_value`]: rangeType,
     });
   });
+});
