@@ -1,3 +1,4 @@
+
 //####################################
 //###############CODES################
 //####################################
@@ -181,7 +182,7 @@ function set_difficulty_level(
 
   if (skill_value < 1 && skill_value !== null) {
     difficulty_level++;
-  } else if (!is_battle) {
+  } else if (!is_battle && skill_value !== null) {
     difficulty_level -= Math.floor(skill_value / 4);
   }
   //TODO injuries, situation, etc difficulty %
