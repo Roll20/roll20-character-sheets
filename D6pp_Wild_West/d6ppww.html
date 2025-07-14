@@ -186,7 +186,6 @@
   <input type="hidden" name="attr_dodge_skillgroup" />
   <input type="hidden" name="attr_dodge_active" />
   <input type="hidden" name="attr_dodge_displayname" value="Dodge" />
-  <input type="hidden" name="attr_dodge_value" />
 
   <input type="hidden" name="attr_endure_attributes" />
   <input type="hidden" name="attr_endure_specialized" value="" />
@@ -2261,8 +2260,8 @@
                     <input type="hidden" name="attr_preaction_selection_ignorepain" />
                     <input type="hidden" name="attr_preaction_selection_disengage" />
                     <div class="sheet-dodge-toggle">
-                      <label class="sheet-d6pp-label" style="margin: 0; display: inline;">Times Attacked:</label>
-                      <input type="number" class="sheet-d6pp" name="attr_times_attacked" />
+                      <label class="sheet-d6pp-label" style="margin: 0; display: inline;"># Dodges:</label>
+                      <input type="number" class="sheet-d6pp" name="attr_times_attacked"/>
                     </div>
                     <div class="sheet-controls-group">
                       <input type="hidden" name="attr_preaction_selection_normal" />
@@ -2270,7 +2269,6 @@
                       <input type="hidden" name="attr_preaction_selection_disengage" />
                       <div class="sheet-dodge-toggle">
                         <button type="action" class="sheet-d6pp" name="act_dodge">Roll Dodge</button>
-                        <input type="text" class="sheet-d6pp sheet-small-input" name="attr_dodge_value" readonly />
                       </div>
                     </div>
 
@@ -2303,7 +2301,7 @@
                 <div class="sheet-grid-table six-col full-width">
                   <div class="grid-header">Target Number</div>
                   <div class="grid-header">Challenge Rating</div>
-                  <div class="grid-header">Times Attacked</div>
+                  <div class="grid-header"># Dodges</div>
                   <div class="grid-header">Modifier</div>
                   <div class="grid-header">Wound Penalty</div>
                   <div class="grid-header">Mounted Penalty</div>
@@ -2436,7 +2434,7 @@
                   <div class="grid-header">Range</div>
                   <div class="grid-header">Cover</div>
                   <div class="grid-header">Opponent's Dodge</div>
-                  <div class="grid-header">Times Attacked</div>
+                  <div class="grid-header"># Dodges</div>
                   <div class="grid-header">Modifier</div>
                   <div class="grid-header">Wound Penalty</div>
                   <div class="grid-header">Mounted Penalty</div>
@@ -4444,14 +4442,13 @@
           <div class="sheet-controls-group">
             <input type="hidden" name="attr_preaction_selection_normal" />
             <div class="sheet-dodge-toggle">
-              <label class="sheet-d6pp-label" style="margin: 0; display: inline;">Times Attacked:</label>
+              <label class="sheet-d6pp-label" style="margin: 0; display: inline;"># Dodges:</label>
               <input type="number" class="sheet-d6pp" name="attr_times_attacked" />
             </div>
             <div class="sheet-controls-group">
               <input type="hidden" name="attr_preaction_selection_normal" />
               <div class="sheet-dodge-toggle">
                 <button type="action" class="sheet-d6pp" name="act_dodge">Roll Dodge</button>
-                <input type="text" class="sheet-d6pp sheet-small-input" name="attr_dodge_value" readonly />
               </div>
             </div>
           </div>
@@ -4472,7 +4469,7 @@
         <div class="sheet-grid-table six-col full-width">
           <div class="grid-header">Target Number</div>
           <div class="grid-header">Challenge Rating</div>
-          <div class="grid-header">Times Attacked</div>
+          <div class="grid-header"># Dodges</div>
           <div class="grid-header">Modifier</div>
           <div class="grid-header">Wound Penalty</div>
           <div class="grid-header">Mounted Penalty</div>
@@ -4603,7 +4600,7 @@
           <div class="grid-header">Range</div>
           <div class="grid-header">Cover</div>
           <div class="grid-header">Opponent's Dodge</div>
-          <div class="grid-header">Times Attacked</div>
+          <div class="grid-header"># Dodges</div>
           <div class="grid-header">Modifier</div>
           <div class="grid-header">Wound Penalty</div>
           <div class="grid-header">Mounted Penalty</div>
@@ -7140,6 +7137,7 @@
       "status",
       "condition_knockout",
       "initiative_rollcode",
+      "times_attacked"
     ];
 
     getAttrs(attrs, values => {
@@ -7153,6 +7151,11 @@
       if (!ableToAct) {
         rollErrorMessage("❌ You are not conscious and cannot act.");
         return;
+      }
+
+      if (displayName === "Dodge") {
+        const current = parseInt(values.times_attacked, 10) || 0;
+        setAttrs({ times_attacked: current + 1 });
       }
 
       const name = values.character_name || "Character";
