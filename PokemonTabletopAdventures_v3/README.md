@@ -23,6 +23,12 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Jul 14, 2025
+- Added a collapsing section for skills
+- Fixed an issue where pokémon nature would affect trainer stats
+- Updated skill and capture pokémon visuals, for trainers only (for now)
+- Removed now-unneeded configuration page entry for skill attribute selection
+
 ### Jun 28, 2025
 - Reinstated 1/combat frequency option to accommodate homebrew
 
