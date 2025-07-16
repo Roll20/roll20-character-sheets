@@ -358,7 +358,7 @@ in the game in "Superior".</p>
 
 <charmancer class="sheet-charmancer-race">
 <div>
-<h2>Race and Culture</h2>
+  <h2>Race and Culture</h2>
 
 <div>
 
@@ -368,6 +368,7 @@ in the game in "Superior".</p>
 
     <select name='comp_race' required="required">
       <option value>Select...</option>
+      <option value='custom~custom'>Custom</option>
     </select>
 
     <hr>
@@ -391,13 +392,35 @@ in the game in "Superior".</p>
   <div class='cm_info'>
     <div class="compendium-page race-info" accept='Rules:Race'></div>
   </div>
-</div>
+
+  <div class='choice custom-race-upload'>
+    <textarea name='comp_customraceuploaddata'></textarea>
+    <button type='action' name='act_uploadrace' class='fancybutton'>Upload</button>
+    Message: <span class='uploadracemessage'></span>
+
+    <p>Format for custom races is a JSON file, as documented 
+      <a href='https://github.com/nashidau/RMU-Interchange/blob/main/Race.md'
+	target='_blank'>https://github.com/nashidau/RMU-Interchange/blob/main/Race.md</a>
+    </p>
+  </div>
+
+  <div style='display:none'>
+    <input type='text' name='comp_customrace'>
+  </div>
 
 </div>
 
+</div>
 
 
-<button class="fancybutton" type="submit" value="profession">Next (Profession)</button>
+
+  <span class="choice race-no-save">
+    <button class="fancybutton disabled" type="action" value="noaction">Next (Profession)</button>
+  </span>
+  <span class="choice race-save">
+    <button class="fancybutton" type="submit" value="profession">Next (Profession)</button>
+  </span>
+
 </div>
 </charmancer>
 
@@ -6247,7 +6270,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 1ab67984127d8e78c5d286b8fc001471553df408
+Revision b0bf9cb69bab879cb92fc6c7b3349b8e34285e1e
 
 
 <hr>
@@ -7742,6 +7765,7 @@ let RMURaces = {};
   RMURaces.raceSet = function(raceName, racedata) {
     console.log("Starting setting race");
     console.log(racedata)
+
     const rstr = `Racial (${raceName})`;
 
     // need to get:
@@ -7789,7 +7813,7 @@ let RMURaces = {};
 
     // Talents
     {
-      const talents = racedata['data-RacialTalents'];
+      const talents = racedata['data-RacialTalents'] || racedata['data-Talents'];
       for (const talent in talents) {
 	RMUTalents.addByName(talents[talent].Talent, 
 	    talents[talent].Tier || 1,
@@ -11762,17 +11786,176 @@ onCheck("page:race", () => {
   setCharmancerOptions("culture", "Category:Culture", cmdata?.race?.values?.culture);
 });
 
+/* Select of the Race page.
+  Need to handle custom selection.
+*/
 onCheck("mancerchange:race", (ev) => {
+    if (!ev.newValue) {
+      // Someone selected 'select...'.  Sigh
+      showChoices(['race-no-save']);
+      hideChoices(['race-no-save']);
+    }
+
+    if (ev.newValue == 'custom~custom') {
+      showChoices(['custom-race-upload']);
+      validateRaceProgress();
+      return;
+    }
+
+    hideChoices(['custom-race-upload']);
+
     // Get compendium page so it gets saved for later
     getCompendiumPage(ev.newValue, (pdata) => { } );
     changeCompendiumPage('race-info', ev.newValue);
+
+    validateRaceProgress();
+
 });
 onCheck("mancerchange:culture", (ev) => {
     // Get compendium page so it gets saved for later
     getCompendiumPage(ev.newValue, (pdata) => { } );
     changeCompendiumPage('race-info', ev.newValue);
+    validateRaceProgress();
+});
+onCheck("mancerchange:gender", () => {
+    validateRaceProgress(); 
 });
 
+
+// Validate if the 
+function validateRaceProgress() {
+  const cmdata = getCharmancerData();
+  console.log(cmdata);
+  const racepage = cmdata.race.values;
+
+  // We can move on if
+  //  - Race selected
+  //  - Culture selected
+  //  - Gender selected
+  // If Race is custom, then we need to check we have a validated race
+  let canProgress = true;
+
+  if (!racepage.gender) {
+    canProgress = false;
+  } else if (racepage.gender != 'M' && racepage.gender != 'F') {
+    canProgress = false;
+  }
+
+  // How about culture
+  if (!racepage.culture) {
+    canProgress = false;
+  }
+
+  // So we need a race or a custom rave
+  if (!racepage.race) {
+    canProgress = false;
+  } else if (racepage.race == 'custom~custom') {
+    if (!racepage.customrace) {
+      canProgress = false;
+    }
+  }
+
+  if (canProgress) {
+    hideChoices(["race-no-save"]);
+    showChoices(["race-save"]);
+  } else {
+    showChoices(["race-no-save"]);
+    hideChoices(["race-save"]);
+  }
+}
+
+onCheck("clicked:uploadrace", () => {
+  const cmdata = getCharmancerData();
+  const str = cmdata.race.values.customraceuploaddata;
+  cmdata.race.data.customrace = false;
+  let race = {};
+  try {
+    race = JSON.parse(str);
+  } catch (e) {
+    setCharmancerText({"uploadracemessage": `Error parsing json string: ${e.message}`});
+    console.log(str);
+    rmuerror({"uploadracemessage": `Error parsing json string: ${e.message}`});
+    return;
+  }
+
+  // So check for the fields we need
+  let result = validaterace(race)
+  console.log("parse race", result);
+  if (result.valid !== true) {
+    setCharmancerText({"uploadracemessage": result.message});
+    return;
+  }
+  console.log("Seeting succss");
+
+  setCharmancerText({"uploadracemessage": `${race.name} updated successfully`});
+
+  // Save a copy as the string
+  setAttrs({customrace: str});
+
+  setCharmancerText({"uploadracemessage": "Upload successful" });
+
+  validateRaceProgress();
+      
+  return;
+});
+
+const racerequiredfields = [
+  { name: "Name", type: "string" },
+  { name: "content", type: "string" },
+  { name: "Bonus DP", type: "number" },
+  { group: "data-health",  name: "Base Hits", type: "number" },
+  { group: "data-health",  name: "Recovery Mult", type: "string" },
+  { group: "data-health",  name: "Endurance", type: "number" },
+  { group: "data-rrs",  name: "Mentalism", type: "number", optional: true },
+  { group: "data-rrs",  name: "Physical", type: "number", optional: true },
+  { group: "data-rrs",  name: "Fear", type: "number", optional: true },
+  { group: "data-rrs",  name: "Essence", type: "number", optional: true },
+  { group: "data-rrs",  name: "Channeling", type: "number", optional: true },
+  { group: "data-stats",  name: "Reasoning", type: "number", optional: true },
+  { group: "data-stats",  name: "Agility", type: "number", optional: true },
+  { group: "data-stats",  name: "Strength", type: "number", optional: true },
+  { group: "data-stats",  name: "Memory", type: "number", optional: true },
+  { group: "data-stats",  name: "Self Discipline", type: "number", optional: true },
+  { group: "data-stats",  name: "Empathy", type: "number", optional: true },
+  { group: "data-stats",  name: "Intuition", type: "number", optional: true },
+  { group: "data-stats",  name: "Quickness", type: "number", optional: true },
+  { group: "data-stats",  name: "Presence", type: "number", optional: true },
+  { group: "data-stats",  name: "Constitution", type: "number", optional: true },
+  { group: "data-size",  name: "Stride", type: "number" },
+  { group: "data-size",  name: "Height (M)", type: "number" },
+  { group: "data-size",  name: "Height (F)", type: "number" },
+  { group: "data-size",  name: "Weight (M)", type: "number" },
+  { group: "data-size",  name: "Weight (F)", type: "number" },
+  { group: "data-size",  name: "Size", type: "string" },
+  { group: "data-size",  name: "Variance", type: "number" },
+];
+
+
+
+function validaterace(prof) {
+  const emsg = function(msg) { return { valid: false, message: msg };  };
+
+  for (test of racerequiredfields) {
+    let block = prof
+    if (test.group) {
+      block = prof[test.group];
+    }
+    if (block[test.name] != null) {
+      // It's here... chaeck type
+      if (typeof(block[test.name]) == test.type) {
+	// Great
+      } else {
+	return emsg(`Type of ${test.name} wrong.  Expect ${test.type}, ` +
+	    `got ${typeof(block[test.name])} (Value: ${block[test.name]}`);
+      }
+    } else if (test.optional) {
+      // Optional, don't care
+    } else {
+      return emsg(`Missing field ${test.name}`);
+    }
+  }
+  return { valid: true };
+}
 
 
 onCheck("page:profession", () => {
@@ -11801,10 +11984,13 @@ onCheck("mancerchange:profession", (ev) => {
     getCompendiumPage(ev.newValue);
     showChoices(["profession-save"]);
     hideChoices(["custom-profession-upload", "profession-no-save"]);
+    
 });
 
 
 function validateprofession(prof) {
+ 
+
   return true;
 }
 
@@ -12523,12 +12709,19 @@ onCheck("mancerfinish:newcharacter", (ev) => {
 
     // Race
     addPendingFunction("CMFinish: race data", () => {
-      console.log("Set race data");
+      console.log("Set race data", data);
       showChoices(["message-save-race"]);
-      const race = cleanCompendiumName(data.race.values.race)
-
-      setAttrsPending({race: race, critreduction: 0});
-      RMURaces.raceSet(race, data.race.data.race);
+      if (data.race.values.race == 'custom~custom') {
+	console.log(data.race.values.customrace);
+	const racedata = JSON.parse(data.race.values.customrace);
+	console.log("parsed", racedata);
+	setAttrs({race: racedata.Name + " (Custom)", critreduction: 0});
+	RMURaces.raceSet(racedata.Name, racedata);
+      } else { 
+       const racename = cleanCompendiumName(data.race.values.race)
+	setAttrs({race: racename, critreduction: 0});
+	RMURaces.raceSet(race, data.race.data.race);
+      }
     })
 
     addPendingFunction("CMFinish: Generate Height and Weight", () => {
