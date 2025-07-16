@@ -1,6 +1,8 @@
 Change Log
 ==============================================
-**2025-07-11 ** v.92 Karovex
+**2025-07-15 ** v.91 Chuz (James Culp)
+	Bugfix - Minor bugfixes
+**2025-07-11 ** v.91 Karovex
 	Added 'fade_compiling_modifier' to support the Sprite Conduit echo bonus
 	Added 'sprite_resist_dv_modifier' to suppor the Technoshaman compiling DV reduction
 	Added Sprite levels 11-15
