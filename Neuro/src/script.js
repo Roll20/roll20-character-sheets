@@ -1,4 +1,3 @@
-
 //####################################
 //###############CODES################
 //####################################
@@ -226,7 +225,8 @@ function calculate_result_test_classic(flags) {
  */
 function calculate_result_test_open(rolls, difficulty, points = 0) {
   if (rolls.length < 2) {
-    return 0;
+    const result = rolls[0]-points > 0 ? rolls[0] - points : 1;
+    return difficulty - result;
   }
   const sorted_dices = rolls.concat().sort(function (a, b) {
     return a - b;
@@ -399,6 +399,126 @@ function roll_test(template, name, wsp, wsp_mod, skill = null, dice = 3) {
     });
   });
 }
+/* ===== PARAMETERS ==========
+destinations = the name of the attribute that stores the total quantity
+section = name of repeating fieldset, without the repeating_
+fields = the name of the attribute field to be summed
+      can be a single attribute: 'weight'
+      or an array of attributes: ['weight','number','equipped']
+extras: everything after the fields parameter is optional and can be in any order:
+    'ceil'
+    'round'
+    'floor'
+    'ceil: 3'
+    'round: -2'
+    'round: equipment_weight, equipment_cost|2
+        you want to round the final total. 
+        If you supply a field name, it will round just that total. You can supply multiple fields, separated by commas.
+        If you supply a number, it will round to that many digits. 
+        round:1 rounds to tenths; floor:-3 rounds down to thousands, so 3567 would be shown as 3000.
+        If you dont supply a number, it assumes 0, and returns an integer (whole numbers).
+        IMPORTANT: if you list ANY field, then ALL fields to be rounded must be specifically stated.
+        Don't do this: floor:equipment_weight|2, round,
+    
+    'multiplier: 2'
+    'multiplier:equipment_weight|2'
+    'multiplier: equipment_weight|2, equipment_cost|3'
+        Multiplier will apply a multiple to the final total. You can multiple all fields, or specific fields.
+        It doesnt apply to attributes being added from outside the repeating section.
+        Multiplier can be negative, representing a subtraction.
+
+    'an_attribute'
+    'an_attribute:-1'
+    'an_attribute:0.5'
+    'an_attribute:equipment_cost'
+    'an_attribute:equipment_cost|-1'
+    'an_attribute:equipment_cost|-1,equipment_weight|2'
+        You can also list attributes from outside the repeating section. Don't try to add attributes from other repeating sections.
+        by default, the listed attribute will be added to all fields.
+        You can list one or more fields, and it will only be added to those fields.
+        You can list a number: the attribute will be multiplied by that amount. So -1 subtracts the attribute.
+*/
+const repeatingSum = (destinations, section, fields) => {
+  if (!Array.isArray(destinations))
+    destinations = [destinations.replace(/\s/g, "").split(",")];
+  if (!Array.isArray(fields)) fields = [fields.replace(/\s/g, "").split(",")];
+  getSectionIDs(`repeating_${section}`, (idArray) => {
+    const attrArray = idArray.reduce(
+      (m, id) => [
+        ...m,
+        ...fields.map((field) => `repeating_${section}_${id}_${field}`),
+      ],
+      []
+    );
+    getAttrs([...attrArray], (v) => {
+      const getValue = (section, id, field) =>
+        v[`repeating_${section}_${id}_${field}`] === "on"
+          ? 1
+          : parseFloat(v[`repeating_${section}_${id}_${field}`]) || 0;
+      const commonMultipliers =
+        fields.length <= destinations.length
+          ? []
+          : fields.splice(
+              destinations.length,
+              fields.length - destinations.length
+            );
+      const output = {};
+      destinations.forEach((destination, index) => {
+        output[destination] = idArray.reduce(
+          (total, id) =>
+            total +
+            getValue(section, id, fields[index]) *
+              commonMultipliers.reduce(
+                (subtotal, mult) => subtotal * getValue(section, id, mult),
+                1
+              ),
+          0
+        );
+      });
+      setAttrs(output);
+    });
+  });
+};
+on(
+  "change:repeating_injuries-head:head_injury_value remove:repeating_injuries-head",
+  function () {
+    repeatingSum("total-head", "injuries-head", "head_injury_value");
+  }
+);
+on(
+  "change:repeating_injuries-torso:torso_injury_value remove:repeating_injuries-torso",
+  function () {
+    repeatingSum("total-torso", "injuries-torso", "torso_injury_value");
+  }
+);
+on(
+  "change:repeating_injuries-arms:arms_injury_value remove:repeating_injuries-arms",
+  function () {
+    repeatingSum("total-arms", "injuries-arms", "arms_injury_value");
+  }
+);
+on(
+  "change:repeating_injuries-legs:legs_injury_value remove:repeating_injuries-legs",
+  function () {
+    repeatingSum("total-legs", "injuries-legs", "legs_injury_value");
+  }
+);
+on(
+  "change:total-head change:total-torso change:total-arms change:total-legs",
+  function () {
+    getAttrs(
+      ["total-head", "total-torso", "total-arms", "total-legs"],
+      function (values) {
+        let wounds =
+          parseInt(values["total-head"] || 0) +
+          parseInt(values["total-torso"] || 0) +
+          parseInt(values["total-arms"] || 0) +
+          parseInt(values["total-legs"] || 0);
+        setAttrs({ "total-injuries": wounds });
+      }
+    );
+  }
+);
 /**
  * ====================================
  * =========== ASSIGN ROLLS ===========
@@ -557,6 +677,18 @@ on("change:repeating_weapons:weapon_skill", function (eventInfo) {
  * ========== RANGE WEAPON ===========
  * ===================================
  */
+on("change:repeating_ranges:range_type", function (eventInfo) {
+  const rowId = eventInfo.sourceAttribute.split("_")[2];
+  const prefix = `repeating_ranges_${rowId}_`;
+
+  getAttrs([`${prefix}range_type`], function (values) {
+    setAttrs({
+      [`${prefix}range_type_value`]: values[`${prefix}range_type`],
+    });
+  });
+});
+
+
 on("clicked:repeating_ranges:rolledrange", function (eventInfo) {
   const rowId = eventInfo.sourceAttribute.split("_")[2];
   const prefix = `repeating_ranges_${rowId}_`;
