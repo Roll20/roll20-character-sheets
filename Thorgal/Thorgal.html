@@ -196,9 +196,9 @@
 				<label class="sheet-stat" data-i18n="perception-u">PERCEPTION</label>
 				<input type="text" name="attr_perception"  style="display: inline-block; vertical-align: top; margin: -34px 0px 0px 170px;" class="sheet-level" value="">
 
-				<button type='action' name='act_stealth-action' class="sheet-buttonSkill"  value='@{stealth_action}'><label class="sheet-skill" data-i18n="stealth-u">SURVIVAL</label></button>
-				<input type="text" name="attr_stealthBase"  class="sheet-level" style="margin: -28px 0px 0px 0px;" value="" data-i18n-title="stealth-defn">
-				<input type="text" name="attr_stealth" class="sheet-levelTotal" style="margin: -28px 0px 0px -4px;" value="" data-i18n-title="stealthTotal-defn">
+				<button type='action' name='act_survival-action' class="sheet-buttonSkill"  value='@{survival_action}'><label class="sheet-skill" data-i18n="survival-u">SURVIVAL</label></button>
+				<input type="text" name="attr_survivalBase"  class="sheet-level" style="margin: -28px 0px 0px 0px;" value="" data-i18n-title="survival-defn">
+				<input type="text" name="attr_survival" class="sheet-levelTotal" style="margin: -28px 0px 0px -4px;" value="" data-i18n-title="survivalTotal-defn">
 
 				<button type='action' name='act_rangedCombat-action' class="sheet-buttonSkill" style="margin: 0px 0px 0px -2px;" value='@{rangedCombat_action}'><label class="sheet-skill" data-i18n="rangedCombat-u">RANGED COMBAT</label></button>
 				<input type="text" name="attr_rangedCombatBase"  class="sheet-level" style="margin: -4px 0px 0px 0px;" value="" data-i18n-title="rangedCombat-defn">
@@ -436,7 +436,7 @@
 			<label class="sheet-sectionLine" style="width: 68px; background-color: Gray;" data-i18n="DL-u">DL</label>
 			<label class="sheet-sectionLine" style="width: 68px;" data-i18n="cost-u">COST</label>
 			<label class="sheet-sectionLine" style="width: 90px;" data-i18n="range-u">RANGE</label>
-			<label class="sheet-sectionLine" style="width: 328px; border-right: 0px solid Black;" data-i18n="effect-u">EFFECT</label>
+			<label class="sheet-sectionLine" style="width: 326px; border-right: 0px solid Black;" data-i18n="effect-u">EFFECT</label>
 
 			<button type='action' name='act_power1-action' style="box-sizing: content-box; width: 18px; heigth: 28px; border: 0px solid black; padding: 4px 1px 1px 4px;" value='@{power1_action}'><label class="sheet-attack-button">j</label></button>
 			<input name="attr_pName1"    type="text" class="sheet-sectionRow" style="width: 122px;"/>
@@ -741,12 +741,12 @@ on("change:agility change:vehicleHandlingBase change:reflexBase change:finesseBa
 });
 
 // Change Perception, Survival, Range Combat, or Sharp Senses
-on("change:perception change:survivalBase change:RangedCombatBase change:SharpSensesBase", function(eventInfo) {
+on("change:perception change:survivalBase change:rangedCombatBase change:sharpSensesBase", function(eventInfo) {
 	let NewAttribute = eventInfo.newValue;
 	let OldAttribute = eventInfo.previousValue;
 	let SourceAttribute = eventInfo.sourceAttribute;
 	
-	getAttrs(["perception", "survivalBase","reflexBase","finesseBase"], function(values) {
+	getAttrs(["perception", "survivalBase","rangedCombatBase","sharpSensesBase"], function(values) {
 		let Perception = parseInt(values.perception)||0;
 		let SurvivalBase = parseInt(values.survivalBase)||0;
 		let RangedCombatBase = parseInt(values.rangedCombatBase)||0;
@@ -754,6 +754,8 @@ on("change:perception change:survivalBase change:RangedCombatBase change:SharpSe
 		let SurvivalTotal = Perception + SurvivalBase;
 		let RangedCombatTotal = Perception + RangedCombatBase;
 		let SharpSensesTotal = Perception + SharpSensesBase;
+
+		console.log("  RangedCombatBase: " + RangedCombatBase + " SharpSensesTotal " + SharpSensesTotal);
 
 		console.log("  Perception: " + Perception + " SurvivalTotal " + SurvivalTotal + " RangedCombatTotal " + RangedCombatTotal + " SharpSensesTotal " + SharpSensesTotal);
 		setAttrs({                            
@@ -938,7 +940,7 @@ on("change:coordination_base change:wit_base ", function(eventInfo) {
 			console.log("attributeRolled " + Attribute + " attributePool " + attributePool + " attributeBase: " + attributeBase +  " derivedStat " + derivedStat + " SuppressDL " + SuppressDL);
 			let DicePool = String(attributePool);
 			console.log(" new DicePool " + DicePool );
-			DLrequest = "";
+			let DLrequest = "";
 			if ( SuppressDL != 1 ) {
 				DLrequest = " {{DL=[[?{Difficulty Level|10}]]}} " ;
 			}
