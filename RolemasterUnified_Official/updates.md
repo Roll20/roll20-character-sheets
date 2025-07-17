@@ -1,3 +1,10 @@
+# 2025-07-17
+
+Thursday updates?  A very weird Tuesday
+
+- Remove the old Race name translations.  Unused.
+- Custom Race support.
+
 # 2025-07-10
 
 The Thursday little bug edition
