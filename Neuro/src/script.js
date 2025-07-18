@@ -143,7 +143,8 @@ const skill_code_translate = {
 };
 
 const difficulty_values = [2, 0, -2, -5, -8, -11, -15, -20, -24];
-const difficulty_treshold = [0, 10, 30, 60, 90, 120, 160, 200, 240];
+const difficulty_treshold = [0, 11, 31, 61, 91, 121, 161, 201, 241];
+const difficulty_value_start = [-20, 0, 11, 31, 61, 91, 121, 161, 201, 241];
 
 const buttonlist = ["skills", "equipment", "data"];
 
@@ -157,6 +158,26 @@ function count_number(arr, target) {
 //####################################
 //################ROLL################
 //####################################
+/**
+ * Returns the index of the first element in the `difficulty_treshold` array
+ * that is greater than the provided `inputNumber`.
+ *
+ * This is typically used to determine the difficulty level for a given input
+ * based on predefined threshold ranges.
+ *
+ * @param {number} inputNumber - The number to compare against the threshold levels.
+ * @param {number} maxDifficulty - The maximum index threshold levels.
+ * @returns {number} The index of the first threshold greater than `inputNumber`
+ */
+function findMaxIndex(inputNumber, maxDifficulty) {
+  for (let i = 0; i < difficulty_treshold.length; i++) {
+    if (inputNumber < difficulty_treshold[i]) {
+      return i > maxDifficulty ? maxDifficulty : i;
+    }
+  }
+  return maxDifficulty;
+}
+
 /**
  * Calculates and adjusts the final difficulty level of a test.
  * It considers the number of 20s and 1s rolled, the skill value (if applicable),
@@ -225,7 +246,7 @@ function calculate_result_test_classic(flags) {
  */
 function calculate_result_test_open(rolls, difficulty, points = 0) {
   if (rolls.length < 2) {
-    const result = rolls[0]-points > 0 ? rolls[0] - points : 1;
+    const result = rolls[0] - points > 0 ? rolls[0] - points : 1;
     return difficulty - result;
   }
   const sorted_dices = rolls.concat().sort(function (a, b) {
@@ -688,7 +709,6 @@ on("change:repeating_ranges:range_type", function (eventInfo) {
   });
 });
 
-
 on("clicked:repeating_ranges:rolledrange", function (eventInfo) {
   const rowId = eventInfo.sourceAttribute.split("_")[2];
   const prefix = `repeating_ranges_${rowId}_`;
@@ -730,3 +750,73 @@ on("change:repeating_ranges:range_skill", function (eventInfo) {
     });
   });
 });
+
+on(
+  "change:difficulty_lvl change:difficulty_max_lvl change:total-injuries change:injuries-select change:armor-select change:total-armor change:total-bonus sheet:opened",
+  function () {
+    getAttrs(
+      [
+        "difficulty_lvl",
+        "total-injuries",
+        "injuries-select",
+        "armor-select",
+        "total-armor",
+        "difficulty_max_lvl",
+        "total-bonus",
+      ],
+      (values) => {
+        const difficulty_max_lvl = clamp(
+          parseInt(values["difficulty_max_lvl"] || 0),
+          6,
+          8
+        );
+        const start_lvl =
+          parseInt(difficulty_value_start[values["difficulty_lvl"]]) || 0;
+        const injuries = parseInt(values["total-injuries"]) || 0;
+        const armor = parseInt(values["total-armor"]) || 0;
+        const bonus = parseInt(values["total-bonus"]);
+
+        const injuries_status = values["injuries-select"] === "1";
+        const armor_status = values["armor-select"] === "1";
+
+        let total_sum = start_lvl + bonus;
+        if (injuries_status) {
+          total_sum += injuries;
+        }
+        if (armor_status) {
+          total_sum += armor;
+        }
+        const difficulty_pointer = findMaxIndex(total_sum, difficulty_max_lvl);
+        setAttrs({
+          "sum-difficulty": total_sum,
+          "difficulty-pointer": difficulty_pointer,
+        });
+      }
+    );
+  }
+);
+on(
+  "change:repeating_bonus:bonus-status change:repeating_bonus:bonus-row-value remove:repeating_bonus",
+  function () {
+    getSectionIDs("repeating_bonus", (idArray) => {
+      const attrNames = idArray.flatMap((id) => [
+        `repeating_bonus_${id}_bonus-status`,
+        `repeating_bonus_${id}_bonus-row-value`,
+      ]);
+      getAttrs(attrNames, (values) => {
+        let total = 0;
+
+        idArray.forEach((id) => {
+          const status = values[`repeating_bonus_${id}_bonus-status`];
+          const value =
+          parseFloat(values[`repeating_bonus_${id}_bonus-row-value`]) || 0;
+          if (status === "1") {
+            total += value;
+          }
+        });
+
+        setAttrs({ "total-bonus": total });
+      });
+    });
+  }
+);
