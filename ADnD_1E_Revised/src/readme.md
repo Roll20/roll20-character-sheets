@@ -11,7 +11,7 @@ Then, run `npm install` from the 'src/' folder to install the package.json depen
 Edit the sheet's HTML and JS/sheetworker files found in the 'src/' folder. (ie `src/index.html`, `src/index.js`)
 Sheet CSS can be edited directly using `1ESheet.css` located at root.
 
-With dependencies installed you can run `npm run dev` from within '/src' to render an un-minified version for development. `npm run dev` will also watch for any changes in the src files and automatically update `src/index.html`when detected.
+With dependencies installed you can run `npm run dev` from within '/src' to render an un-minified version for development. `npm run dev` will also watch for any changes in the src files and automatically update.
 
 Output will be rendered as `1ESheet.html` located at root.
 
