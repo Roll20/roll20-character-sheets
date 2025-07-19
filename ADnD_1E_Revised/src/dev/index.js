@@ -7554,7 +7554,12 @@ intelligenceCalcs = () => {
     // set bonus languages if human
     const race_value = parseValues(values, 'race', 'str');
     if (/human/gi.test(race_value)) {
+      console.log(`Change detected: Human`);
       output.bonuslanguages = AT_INT.getEntry(stat_int).getBonusLanguages();
+    }
+    if (/dwarf/gi.test(race_value) || /gnome/gi.test(race_value) || /half-orc/gi.test(race_value)) {
+      console.log(`Change detected: Dwarf, Gnome, or Half-Orc`);
+      output.bonuslanguages = Math.min(AT_INT.getEntry(stat_int).getBonusLanguages(), 2);
     }
     output.knowspell = AT_INT.getEntry(stat_int).getKnowSpell();
     output.minspells = AT_INT.getEntry(stat_int).getMinSpells();
