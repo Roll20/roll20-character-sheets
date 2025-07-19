@@ -7743,6 +7743,31 @@ const setWeaponsUpdate = (current_version, final_version) => {
   });
 };
 
+// One-time update: sets all weapons default values
+const setNWPUpdate = (current_version, final_version) => {
+  getSectionIDs('nonweaponproficiencies', (idArray) => {
+    const output = {};
+    const fields = [];
+    _.each(idArray, (id) => {
+      fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_attribute'));
+      fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_slots'));
+      fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_modifier'));
+      fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_macro_text'));
+    });
+    getAttrs(fields, (v) => {
+      _.each(idArray, (id) => {
+        output[`repeating_nonweaponproficiencies_${id}_attribute`] = +v[section_attribute('nonweaponproficiencies', id, 'nwp_attribute')] || 0;
+        output[`repeating_nonweaponproficiencies_${id}_slots`] = +v[section_attribute('nonweaponproficiencies', id, 'nwp_slots')] || 0;
+        output[`repeating_nonweaponproficiencies_${id}_modifier`] = +v[section_attribute('nonweaponproficiencies', id, 'nwp_modifier')] || 0;
+        output[`repeating_nonweaponproficiencies_${id}_macro_text`] = v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] || 0;
+      });
+      output.sheet_version = current_version;
+      clog(`VERSION UPDATE: setNWPUpdate completed`);
+      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+    });
+  });
+};
+
 // One-time update: migrate Weapon weight and cost to repeating_equipment
 const clearWeaponsWeightCost = () => {
   // clear old weapon weight and cost values
@@ -8065,6 +8090,8 @@ versionator = (current_version, final_version) => {
     initMacroUpdate(1.656, final_version);
   } else if (current_version < 1.658) {
     updateCriticalDamageMacro(1.658, final_version);
+  } else if (current_version < 1.659) {
+    setNWPUpdate(1.659, final_version);
     // all updates completed
   } else if (current_version < final_version) {
     setAttrs({
@@ -8078,7 +8105,7 @@ versionator = (current_version, final_version) => {
 // Versioning
 on('sheet:opened', () => {
   // SET LATEST VERSION HERE. needs to be => the last update made in versionator
-  const final_version = 1.658;
+  const final_version = 1.66;
   getAttrs(['sheet_version', 'old_character'], (v) => {
     const output = {};
     let current_version = float(v.sheet_version);
