@@ -144,7 +144,7 @@ const skill_code_translate = {
 
 const difficulty_values = [2, 0, -2, -5, -8, -11, -15, -20, -24];
 const difficulty_treshold = [0, 11, 31, 61, 91, 121, 161, 201, 241];
-const difficulty_value_start = [-20, 0, 11, 31, 61, 91, 121, 161, 201, 241];
+const difficulty_value_start = [-1, 0, 11, 31, 61, 91, 121, 161, 201, 241];
 
 const buttonlist = ["skills", "equipment", "data"];
 
@@ -198,7 +198,8 @@ function set_difficulty_level(
   skill_value = null,
   is_battle = false
 ) {
-  let difficulty_level = current_difficulty;
+  // let difficulty_level = current_difficulty;
+  let difficulty_level = findMaxIndex(current_difficulty, max_difficulty_level);
 
   if (skill_value < 1 && skill_value !== null) {
     difficulty_level++;
@@ -313,7 +314,7 @@ function roll_test(template, name, wsp, wsp_mod, skill = null, dice = 3) {
     wsp,
     wsp_mod,
     skill,
-    "difficulty_lvl",
+    "sum-difficulty",
     "difficulty_max_lvl",
     "test_type_txt",
   ].filter((a) => typeof a === "string" && a.length);
@@ -332,8 +333,8 @@ function roll_test(template, name, wsp, wsp_mod, skill = null, dice = 3) {
     {{status3=[[0[computed value]]]}}
     {{options=[[1]]}}
     {{dice=[[${dice}]]}}
-    {{topen=[T. Otwarty](~@{character_name}|open)}}
-    {{tcombat=[T. Walki](~@{character_name}|combat)}}
+    {{tOpen=[T. Otwarty](~@{character_name}|open)}}
+    {{tCombat=[T. Walki](~@{character_name}|combat)}}
   `
     .trim()
     .replace(/\n+/g, " ");
@@ -357,13 +358,13 @@ function roll_test(template, name, wsp, wsp_mod, skill = null, dice = 3) {
       const skill_value = skill === null ? null : parseInt(values[skill] || 0);
       const difficulty_mod_classic = set_difficulty_level(
         roll_dices,
-        parseInt(values["difficulty_lvl"] || 0),
+        parseInt(values["sum-difficulty"] || 0),
         max_level_difficulty,
         skill_value
       );
       const difficulty_mod_combat = set_difficulty_level(
         roll_dices,
-        parseInt(values["difficulty_lvl"] || 0),
+        parseInt(values["sum-difficulty"] || 0),
         max_level_difficulty,
         skill_value,
         true
@@ -667,7 +668,6 @@ on("clicked:repeating_weapons:rolledweapon", function (eventInfo) {
 
   getAttrs(attrsToGet, function (values) {
     const skill_value = values[`${prefix}weapon_skill_value`];
-    console.log(values[`${prefix}weapon_skill_value`]);
     const skill = skill_value === "0" ? null : skill_value;
 
     const skill_name =
@@ -725,7 +725,6 @@ on("clicked:repeating_ranges:rolledrange", function (eventInfo) {
 
   getAttrs(attrsToGet, function (values) {
     const skill_value = values[`${prefix}range_skill_value`];
-    console.log(values[`${prefix}range_skill_value`]);
     const skill = skill_value === "0" ? null : skill_value;
 
     const skill_name =
@@ -771,10 +770,10 @@ on(
           8
         );
         const start_lvl =
-          (parseInt(difficulty_value_start[values["difficulty_lvl"]]) || 0);
-        const injuries = (parseInt(values["total-injuries"]) || 0);
-        const armor = (parseInt(values["total-armor"]) || 0);
-        const bonus = (parseInt(values["total-bonus"]) || 0);
+          parseInt(difficulty_value_start[values["difficulty_lvl"]]) || 0;
+        const injuries = parseInt(values["total-injuries"]) || 0;
+        const armor = parseInt(values["total-armor"]) || 0;
+        const bonus = parseInt(values["total-bonus"]) || 0;
 
         const injuries_status = values["injuries-select"] === "1";
         const armor_status = values["armor-select"] === "1";
@@ -786,7 +785,6 @@ on(
         if (armor_status) {
           total_sum += armor;
         }
-        console.log(total_sum, difficulty_max_lvl)
         const difficulty_pointer = findMaxIndex(total_sum, difficulty_max_lvl);
         setAttrs({
           "sum-difficulty": total_sum,
@@ -796,28 +794,56 @@ on(
     );
   }
 );
+
+const sumCheckedValues = ({
+  section,
+  checkboxAttr,
+  valueAttr,
+  destinationAttr
+}) => {
+  getSectionIDs(`repeating_${section}`, (idArray) => {
+    const attrNames = idArray.flatMap((id) => [
+      `repeating_${section}_${id}_${checkboxAttr}`,
+      `repeating_${section}_${id}_${valueAttr}`
+    ]);
+
+    getAttrs(attrNames, (values) => {
+      let total = 0;
+
+      idArray.forEach((id) => {
+        const checkbox = values[`repeating_${section}_${id}_${checkboxAttr}`];
+        const value = parseFloat(values[`repeating_${section}_${id}_${valueAttr}`]) || 0;
+
+        if (checkbox === "1" || checkbox === "on") {
+          total += value;
+        }
+      });
+
+      setAttrs({ [destinationAttr]: total });
+    });
+  });
+};
+
 on(
   "change:repeating_bonus:bonus-status change:repeating_bonus:bonus-row-value remove:repeating_bonus",
-  function () {
-    getSectionIDs("repeating_bonus", (idArray) => {
-      const attrNames = idArray.flatMap((id) => [
-        `repeating_bonus_${id}_bonus-status`,
-        `repeating_bonus_${id}_bonus-row-value`,
-      ]);
-      getAttrs(attrNames, (values) => {
-        let total = 0;
+  () => {
+    sumCheckedValues({
+      section: "bonus",
+      checkboxAttr: "bonus-status",
+      valueAttr: "bonus-row-value",
+      destinationAttr: "total-bonus"
+    });
+  }
+);
 
-        idArray.forEach((id) => {
-          const status = values[`repeating_bonus_${id}_bonus-status`];
-          const value =
-          parseFloat(values[`repeating_bonus_${id}_bonus-row-value`]) || 0;
-          if (status === "1") {
-            total += value;
-          }
-        });
-
-        setAttrs({ "total-bonus": total });
-      });
+on(
+  "change:repeating_armor:armor-status change:repeating_armor:armor-debuff remove:repeating_armor",
+  () => {
+    sumCheckedValues({
+      section: "armor",
+      checkboxAttr: "armor-status",
+      valueAttr: "armor-debuff",
+      destinationAttr: "total-armor"
     });
   }
 );
