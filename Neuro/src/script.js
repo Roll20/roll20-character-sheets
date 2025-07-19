@@ -547,10 +547,10 @@ on(
  */
 wsp_code.forEach((element) => {
   on(
-    `change:${element} change:${element}_mod change:difficulty_lvl sheet:opened`,
+    `change:${element} change:${element}_mod change:difficulty-pointer sheet:opened`,
     function () {
       getAttrs(
-        ["difficulty_lvl", element, `${element}_mod`, "difficulty_max_lvl"],
+        ["difficulty-pointer", element, `${element}_mod`, "difficulty_max_lvl"],
         function (values) {
           const max_level_difficulty = clamp(
             parseInt(values["difficulty_max_lvl"]) || 6,
@@ -558,7 +558,7 @@ wsp_code.forEach((element) => {
             8
           );
           const difficulty_lvl_index = clamp(
-            parseInt(values["difficulty_lvl"]) || 0,
+            parseInt(values["difficulty-pointer"]) || 0,
             0,
             max_level_difficulty
           );
@@ -771,21 +771,22 @@ on(
           8
         );
         const start_lvl =
-          parseInt(difficulty_value_start[values["difficulty_lvl"]]) || 0;
-        const injuries = parseInt(values["total-injuries"]) || 0;
-        const armor = parseInt(values["total-armor"]) || 0;
-        const bonus = parseInt(values["total-bonus"]);
+          (parseInt(difficulty_value_start[values["difficulty_lvl"]]) || 0);
+        const injuries = (parseInt(values["total-injuries"]) || 0);
+        const armor = (parseInt(values["total-armor"]) || 0);
+        const bonus = (parseInt(values["total-bonus"]) || 0);
 
         const injuries_status = values["injuries-select"] === "1";
         const armor_status = values["armor-select"] === "1";
-
-        let total_sum = start_lvl + bonus;
+        let total_sum = 0;
+        total_sum = start_lvl + bonus;
         if (injuries_status) {
           total_sum += injuries;
         }
         if (armor_status) {
           total_sum += armor;
         }
+        console.log(total_sum, difficulty_max_lvl)
         const difficulty_pointer = findMaxIndex(total_sum, difficulty_max_lvl);
         setAttrs({
           "sum-difficulty": total_sum,
