@@ -7557,7 +7557,7 @@ intelligenceCalcs = () => {
       console.log(`Change detected: Human`);
       output.bonuslanguages = AT_INT.getEntry(stat_int).getBonusLanguages();
     }
-    if (/dwarf/gi.test(race_value) || /gnome/gi.test(race_value) || /half-orc/gi.test(race_value)) {
+    if (/dwarf/gi.test(race_value) || /gnome/gi.test(race_value) || /orc/gi.test(race_value)) {
       console.log(`Change detected: Dwarf, Gnome, or Half-Orc`);
       output.bonuslanguages = Math.min(AT_INT.getEntry(stat_int).getBonusLanguages(), 2);
     }
