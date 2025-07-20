@@ -34,6 +34,9 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
+## 20.07.2025
+     Fixed broken auto expanding textarea that was duplicatiing the NPC description.
+
 ## 23.05.2023
     Fixed 2 Headed Dragonsnail location roll
     Adjusted location of hit location button
