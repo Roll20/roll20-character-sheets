@@ -668,7 +668,7 @@ for (const [key, value] of Object.entries(skill_code)) {
     on(`clicked:test_${element}`, () => {
       roll_test(
         "test",
-        `${skill_code_translate[element]}(${wsp_code_translate[key]})`,
+        `${skill_code_translate[element]}\n(${wsp_code_translate[key]})`,
         key,
         `${key}_mod`,
         element
@@ -759,7 +759,7 @@ on("clicked:repeating_weapons:rolledweapon", function (eventInfo) {
     const skill_name =
       skill === null
         ? "Zręczność"
-        : `${skill_code_translate[skill]}(Zręczność)`;
+        : `${skill_code_translate[skill]}\n(Zręczność)`;
 
     const dice = clamp(parseInt(values[`${prefix}weapon_segment`]) || 0, 1, 3);
 
@@ -822,7 +822,7 @@ on("clicked:repeating_ranges:rolledrange", function (eventInfo) {
     const skill_name =
       skill === null
         ? "Zręczność"
-        : `${skill_code_translate[skill]}(Zręczność)`;
+        : `${skill_code_translate[skill]}\n(Zręczność)`;
 
     const dice = clamp(parseInt(values[`${prefix}range_segment`]) || 0, 1, 3);
 
@@ -972,5 +972,16 @@ on("change:repeating_ranges:range-state", function (eventInfo) {
     setAttrs({
       [`${prefix}range-state-value`]: difficulty_values[value],
     });
+  });
+});
+
+on("clicked:test-mod", function () {
+  getAttrs(["wsp-select", "skill-select"], function (values) {
+    const wsp = values["wsp-select"];
+    const skill = values["skill-select"];
+
+    const name = `${skill_code_translate[skill]}\n(${wsp_code_translate[wsp]})`;
+    const wsp_mod = `${wsp}_mod`;
+    roll_test("test", name, wsp, wsp_mod, skill);
   });
 });
