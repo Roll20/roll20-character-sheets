@@ -976,12 +976,28 @@ on("change:repeating_ranges:range-state", function (eventInfo) {
 });
 
 on("clicked:test-mod", function () {
-  getAttrs(["wsp-select", "skill-select"], function (values) {
-    const wsp = values["wsp-select"];
-    const skill = values["skill-select"];
-
-    const name = `${skill_code_translate[skill]}\n(${wsp_code_translate[wsp]})`;
-    const wsp_mod = `${wsp}_mod`;
-    roll_test("test", name, wsp, wsp_mod, skill);
-  });
+  getAttrs(
+    [
+      "wsp-select",
+      "skill-select",
+      "skill_name_inne1",
+      "skill_name_inne2",
+      "skill_name_inne3",
+    ],
+    function (values) {
+      const wsp = values["wsp-select"];
+      const skill = values["skill-select"];
+      let name = "";
+      if (!skill_code_translate[skill]) {
+        const tmp_skill = `skill_name_${skill}`;
+        name = `${values[tmp_skill]}\n(${wsp_code_translate[wsp]})`;
+        console.log(skill);
+        console.log(values[tmp_skill]);
+      } else {
+        name = `${skill_code_translate[skill]}\n(${wsp_code_translate[wsp]})`;
+      }
+      const wsp_mod = `${wsp}_mod`;
+      roll_test("test", name, wsp, wsp_mod, skill);
+    }
+  );
 });
