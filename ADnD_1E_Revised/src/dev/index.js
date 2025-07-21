@@ -2555,7 +2555,7 @@ versionator = (current_version, final_version) => {
   } else if (current_version < 1.658) {
     updateCriticalDamageMacro(1.658, final_version);
   } else if (current_version < 1.659) {
-    setNWPUpdate(1.659, final_version);
+    setNWPUpdate(1.66, final_version);
     // all updates completed
   } else if (current_version < final_version) {
     setAttrs({
