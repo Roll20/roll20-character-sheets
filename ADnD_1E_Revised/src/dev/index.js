@@ -7551,43 +7551,40 @@ intelligenceCalcs = () => {
   getAttrs(['intelligence', 'bonuslanguages', 'race'], (values) => {
     const output = {};
     const stat_int = parseValues(values, 'intelligence', 'int');
-    // set bonus languages if human
     const race_value = parseValues(values, 'race', 'str');
     let tableBonus = +AT_INT.getEntry(stat_int).getBonusLanguages();
     if (/human/gi.test(race_value)) {
-      console.log(`Change detected: Human`);
+      // bonus language INT table data is given for humans
       output.bonuslanguages = tableBonus;
     } else if (/dwarf/gi.test(race_value) || /gnome/gi.test(race_value) || /orc/gi.test(race_value)) {
-      console.log(`Change detected: Dwarf, Gnome, or Half-Orc`);
+      // dwarf, gnome, and half-orc are capped at 2
       output.bonuslanguages = Math.min(tableBonus, 2);
     } else if (/half-elf/gi.test(race_value) || /halfling/gi.test(race_value) || /hobbit/gi.test(race_value)) {
       // half-elf or halfling gain +1 for every point above 16
-      console.log(`Change detected: Half-elf, Halfling/Hobbit`);
-      if (tableBonus <= 4) {
+      if (tableBonus <= 5) {
         tableBonus = 0;
-      } else if (tableBonus === 5) {
-        tableBonus = 1;
       } else if (tableBonus === 6) {
-        tableBonus = 2;
+        tableBonus = 1;
       } else if (tableBonus === 7) {
-        tableBonus = 3;
+        tableBonus = 2;
       } else if (tableBonus === 8) {
-        tableBonus = 4;
+        tableBonus = 3;
       } else if (tableBonus === 9) {
-        tableBonus = 5;
+        tableBonus = 4;
       } else if (tableBonus === 10) {
-        tableBonus = 6;
+        tableBonus = 5;
       } else if (tableBonus === 11) {
-        tableBonus = 7;
+        tableBonus = 6;
       } else if (tableBonus === 12) {
+        tableBonus = 7;
+      } else if (tableBonus === 13) {
         tableBonus = 8;
-      } else if (tableBonus >= 13) {
+      } else if (tableBonus >= 14) {
         tableBonus = 9;
       }
       output.bonuslanguages = tableBonus;
     } else if (/elf/gi.test(race_value)) {
       // elf +1 for every point above 15
-      console.log(`Change detected: Elf`);
       if (tableBonus <= 4) {
         tableBonus = 0;
       } else if (tableBonus === 5) {
@@ -7613,7 +7610,6 @@ intelligenceCalcs = () => {
       }
       output.bonuslanguages = tableBonus;
     } else {
-      console.log(`Change detected: Unknown Race`);
       output.bonuslanguages = 0;
     }
     output.knowspell = AT_INT.getEntry(stat_int).getKnowSpell();
