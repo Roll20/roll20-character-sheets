@@ -342,6 +342,8 @@ function roll_test(
   const rollTemplate = `
     &{template:${template}}
     {{test_name=${name}}}
+    {{name=@{character_name}}}
+    {{message=@{total-difficulty-message}}}
     {{difficulty_lvl_val=[[0[computed value]]]}}
     {{test_type_txt=[[0[computed value]]]}}
     {{res=[[0[computed value]]]}}
@@ -649,10 +651,11 @@ wsp_code.forEach((element) => {
             max_level_difficulty
           );
           const wsp = clamp(parseInt(values[element]) || 0, 0, 50);
-          const wsp_mod = clamp(parseInt(values[`${element}_mod`]) || 0, 0, 50);
+          const wsp_mod = parseInt(values[`${element}_mod`] || 0);
+          const total_mod =
+            wsp + wsp_mod + difficulty_values[difficulty_lvl_index];
           setAttrs({
-            [`difficulty_${element}`]:
-              wsp + wsp_mod + difficulty_values[difficulty_lvl_index],
+            [`difficulty_${element}`]: total_mod < 1 ? "N" : total_mod,
           });
         }
       );
@@ -860,8 +863,10 @@ on(
           6,
           8
         );
+        let message_difficulty = "";
         const start_lvl =
           parseInt(difficulty_value_start[values["difficulty_lvl"]]) || 0;
+        message_difficulty += `${start_lvl}% baza poziomu trudności &#10;`;
         const injuries = parseInt(values["total-injuries"]) || 0;
         const armor = parseInt(values["total-armor"]) || 0;
         const bonus = parseInt(values["total-bonus"]) || 0;
@@ -873,17 +878,21 @@ on(
         total_sum = start_lvl + bonus;
         if (injuries_status) {
           total_sum += injuries;
+          message_difficulty += injuries ? `${injuries}% Rany &#10;` : "";
         }
         if (armor_status) {
           total_sum += armor;
+          message_difficulty += armor ? `${armor}% Pancerz &#10;` : "";
         }
         if (weight_status) {
           total_sum += weight;
+          message_difficulty += weight ? `${weight}% Obciążenie &#10;` : "";
         }
         const difficulty_pointer = findMaxIndex(total_sum, difficulty_max_lvl);
         setAttrs({
           "sum-difficulty": total_sum,
           "difficulty-pointer": difficulty_pointer,
+          "total-difficulty-message": message_difficulty,
         });
       }
     );
