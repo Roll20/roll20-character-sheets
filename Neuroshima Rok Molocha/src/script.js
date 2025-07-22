@@ -358,6 +358,7 @@ function roll_test(
     {{dice=[[${dice}]]}}
     {{tOpen=[T. Otwarty](~@{character_name}|open)}}
     {{tCombat=[T. Walki](~@{character_name}|combat)}}
+    {{tOpenCombat=[T.O. Walki](~@{character_name}|openCombat)}}
   `
     .trim()
     .replace(/\n+/g, " ");
