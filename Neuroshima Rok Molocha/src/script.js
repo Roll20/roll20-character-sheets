@@ -160,6 +160,68 @@ const difficulty_value_start = [-1, 0, 11, 31, 61, 91, 121, 161, 201, 241];
 
 const buttonlist = ["skills", "equipment", "data"];
 
+function range_difficulty_P(range) {
+  if (range < 10) return 0;
+  if (range < 20) return 20;
+  if (range < 30) return 40;
+  if (range < 40) return 80;
+  if (range < 60) return 120;
+  if (range < 80) return 160;
+  return null;
+}
+
+function range_difficulty_PM(range) {
+  if (range < 10) return 0;
+  if (range < 20) return 10;
+  if (range < 30) return 20;
+  if (range < 40) return 30;
+  if (range < 60) return 40;
+  if (range < 80) return 60;
+  if (range < 100) return 80;
+  if (range < 150) return 120;
+  if (range < 200) return 160;
+  return null;
+}
+
+function range_difficulty_K(range) {
+  if (range < 10) return 0;
+  if (range < 20) return 10;
+  if (range < 30) return 20;
+  if (range < 40) return 30;
+  if (range < 60) return 40;
+  if (range < 80) return 60;
+  if (range < 100) return 80;
+  if (range < 150) return 120;
+  if (range < 200) return 160;
+  return null;
+}
+
+function range_difficulty_S(range) {
+  if (range < 10) return 0;
+  if (range < 20) return 0;
+  if (range < 30) return 10;
+  if (range < 40) return 10;
+  if (range < 60) return 20;
+  if (range < 80) return 20;
+  if (range < 100) return 30;
+  if (range < 150) return 30;
+  if (range < 200) return 40;
+  if (range < 250) return 40;
+  if (range < 300) return 60;
+  if (range < 400) return 80;
+  if (range < 600) return 100;
+  if (range < 1000) return 120;
+  if (range < 1500) return 160;
+  return null;
+}
+
+function range_difficulty_SR(range) {
+  if (range < 10) return -30;
+  if (range < 20) return 0;
+  if (range < 30) return 30;
+  return null;
+}
+
 function clamp(val, min, max) {
   return Math.max(min, Math.min(val, max));
 }
@@ -329,7 +391,7 @@ function roll_test(
   wsp_mod,
   skill = null,
   dice = 3,
-  battle_mods = { mod: 0, difficulty: 0 }
+  battle_mods = { mod: 0, difficulty: 0, message: "" }
 ) {
   const attrs_arr = [
     wsp,
@@ -344,6 +406,7 @@ function roll_test(
     {{test_name=${name}}}
     {{name=@{character_name}}}
     {{message=@{total-difficulty-message}}}
+    {{messageCombat=${battle_mods.message}}}
     {{difficulty_lvl_val=[[0[computed value]]]}}
     {{test_type_txt=[[0[computed value]]]}}
     {{res=[[0[computed value]]]}}
@@ -747,12 +810,12 @@ on("clicked:repeating_weapons:rolledweapon", function (eventInfo) {
 
   const attrsToGet = [
     `${prefix}weapon_skill`,
-    `${prefix}weapon_location`,
+    `location`,
     `${prefix}weapon_segment`,
     `${prefix}bonus-defence`,
     `${prefix}bonus-attack`,
     `melee_attack_type`,
-    `${prefix}weapon-state-value`,
+    `state-value`,
     `${prefix}weapon-facilities-value`,
     `${prefix}weapon-impediments-value`,
   ];
@@ -766,26 +829,47 @@ on("clicked:repeating_weapons:rolledweapon", function (eventInfo) {
         : `${skill_code_translate[skill]}\n(Zręczność)`;
 
     const dice = clamp(parseInt(values[`${prefix}weapon_segment`]) || 0, 1, 3);
+    const location_arr = [0, 80, 60, 40, 40];
+    let message = "";
+
+    const location = location_arr[parseInt(values[`location`] || 0)];
+    message += location ? `${location}% celowanie w część ciała&#10;` : "";
+
+    const state_value = parseInt(values[`state-value`] || 0);
+    message += state_value ? `${state_value}% stan celu&#10;` : "";
+
+    const facilities = Math.abs(
+      parseInt(values[`${prefix}weapon-facilities-value`] || 0)
+    );
+    message += facilities ? `-${facilities}% ułatwienia broni&#10;` : "";
+
+    const impediments = parseInt(
+      values[`${prefix}weapon-impediments-value`] || 0
+    );
+    message += impediments ? `${impediments}% utrudnienia broni&#10;` : "";
 
     const diffculty_sum_weapon =
-      parseInt(values[`${prefix}weapon_location`] || 0) +
-      parseInt(values[`${prefix}weapon-state-value`] || 0) -
-      Math.abs(parseInt(values[`${prefix}weapon-facilities-value`] || 0)) +
-      parseInt(values[`${prefix}weapon-impediments-value`] || 0);
+      location + state_value - facilities + impediments;
+    message += `${diffculty_sum_weapon}% suma utrudnień walki&#10;`;
+
     let test_mod = 0;
     switch (values["melee_attack_type"]) {
       case "0":
         test_mod += parseInt(values[`${prefix}bonus-attack`] || 0);
+        message += `${test_mod}-bonus do zręczności w ataku&#10;`;
         break;
       case "1":
         test_mod += parseInt(values[`${prefix}bonus-defence`] || 0);
+        message += `${test_mod}-bonus do zręczności w obronie&#10;`;
         break;
       default:
         break;
     }
+
     roll_test("test", skill_name, "zre", "zre_mod", skill, dice, {
       mod: test_mod,
       difficulty: diffculty_sum_weapon,
+      message: message,
     });
   });
 });
@@ -795,29 +879,20 @@ on("clicked:repeating_weapons:rolledweapon", function (eventInfo) {
  * ========== RANGE WEAPON ===========
  * ===================================
  */
-on("change:repeating_ranges:range_type", function (eventInfo) {
-  const rowId = eventInfo.sourceAttribute.split("_")[2];
-  const prefix = `repeating_ranges_${rowId}_`;
-
-  getAttrs([`${prefix}range_type`], function (values) {
-    setAttrs({
-      [`${prefix}range_type_value`]: values[`${prefix}range_type`],
-      [`${prefix}range_difficulty`]: 0,
-    });
-  });
-});
 on("clicked:repeating_ranges:rolledrange", function (eventInfo) {
   const rowId = eventInfo.sourceAttribute.split("_")[2];
   const prefix = `repeating_ranges_${rowId}_`;
 
   const attrsToGet = [
     `${prefix}range_skill`,
-    `${prefix}range_location`,
+    `location`,
     `${prefix}range_segment`,
-    `${prefix}range-state-value`,
+    `${prefix}range_type`,
+    `state-value`,
     `${prefix}range-facilities-value`,
     `${prefix}range-impediments-value`,
     `${prefix}range_difficulty`,
+    `difficulty-range`,
   ];
 
   getAttrs(attrsToGet, function (values) {
@@ -830,15 +905,62 @@ on("clicked:repeating_ranges:rolledrange", function (eventInfo) {
 
     const dice = clamp(parseInt(values[`${prefix}range_segment`]) || 0, 1, 3);
 
+    const location_arr = [0, 80, 60, 40, 40];
+    let message = "-------------&#10;";
+
+    const location = location_arr[parseInt(values[`location`] || 0)];
+    message += location ? `${location}% celowanie w część ciała&#10;` : "";
+
+    const state_value = parseInt(values[`state-value`] || 0);
+    message += state_value ? `${state_value}% stan celu&#10;` : "";
+
+    const facilities = Math.abs(
+      parseInt(values[`${prefix}range-facilities-value`] || 0)
+    );
+    message += facilities ? `-${facilities}% ułatwienia broni&#10;` : "";
+
+    const impediments = parseInt(
+      values[`${prefix}range-impediments-value`] || 0
+    );
+    message += impediments ? `${impediments}% utrudnienia broni&#10;` : "";
+    const range = parseInt(values["difficulty-range"] || 0);
+    let range_difficulty = null;
+
+    switch (values[`${prefix}range_type`]) {
+      case "P":
+        range_difficulty = range_difficulty_P(range);
+        break;
+      case "PM":
+        range_difficulty = range_difficulty_PM(range);
+        break;
+      case "K":
+        range_difficulty = range_difficulty_K(range);
+        break;
+      case "S":
+        range_difficulty = range_difficulty_S(range);
+        break;
+      case "SR":
+        range_difficulty = range_difficulty_SR(range);
+        break;
+      case "Ł":
+        range_difficulty = range * 2;
+        break;
+      default:
+        break;
+    }
+    if (range_difficulty === null) {
+      console.log("Strzał poza zasięgiem broni");
+      return;
+    }
+    message += `${range_difficulty}% utrudnienie odległości&#10;`;
     const diffculty_sum_range =
-      parseInt(values[`${prefix}range_location`] || 0) +
-      parseInt(values[`${prefix}range-state-value`] || 0) -
-      Math.abs(parseInt(values[`${prefix}range-facilities-value`] || 0)) +
-      parseInt(values[`${prefix}range-impediments-value`] || 0) +
-      parseInt(values[`${prefix}range_difficulty`] || 0);
+      location + state_value - facilities + impediments + range_difficulty;
+    message += `${diffculty_sum_range}% suma utrudnień walki&#10;`;
+
     roll_test("test", skill_name, "zre", "zre_mod", skill, dice, {
       mod: 0,
       difficulty: diffculty_sum_range,
+      message: message,
     });
   });
 });
@@ -961,29 +1083,6 @@ on("change:specialization", function () {
     });
   });
 });
-on("change:repeating_weapons:weapon-state", function (eventInfo) {
-  const rowId = eventInfo.sourceAttribute.split("_")[2];
-  const prefix = `repeating_weapons_${rowId}_`;
-  getAttrs([`${prefix}weapon-state`], function (values) {
-    const difficulty_values = [0, 20, 40, 20, 40, 40, 80];
-    const value = parseInt(values[`${prefix}weapon-state`] || 0);
-    setAttrs({
-      [`${prefix}weapon-state-value`]: difficulty_values[value],
-    });
-  });
-});
-
-on("change:repeating_ranges:range-state", function (eventInfo) {
-  const rowId = eventInfo.sourceAttribute.split("_")[2];
-  const prefix = `repeating_ranges_${rowId}_`;
-  getAttrs([`${prefix}range-state`], function (values) {
-    const difficulty_values = [0, 20, 40, 20, 40, 40, 80];
-    const value = parseInt(values[`${prefix}range-state`] || 0);
-    setAttrs({
-      [`${prefix}range-state-value`]: difficulty_values[value],
-    });
-  });
-});
 
 on("clicked:test-mod", function () {
   getAttrs(
@@ -1010,4 +1109,13 @@ on("clicked:test-mod", function () {
       roll_test("test", name, wsp, wsp_mod, skill);
     }
   );
+});
+
+on("change:state sheet:opened", function () {
+  getAttrs(["state"], function (values) {
+    const status_difficulty = [0, 20, 40, 20, 40, 60, 80];
+    setAttrs({
+      "state-value": status_difficulty[parseInt(values["state"] || 0)],
+    });
+  });
 });
