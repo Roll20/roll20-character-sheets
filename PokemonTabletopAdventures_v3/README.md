@@ -23,6 +23,22 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Jul 20, 2025
+- Added Collapse/Expand button for all skills, so a single click closes/opens them all
+- Added collapsing section for giving held items a description to prevent continuous cross-referencing
+- Added skill talent pips to the skill roll button
+- Moved ball selection back out of the capture configuration section
+- Updated the colour used for the highlighted skill and all skill totals in dark mode to have a better contrast
+
+### Jul 14, 2025
+- Added a collapsing section for skills
+- Fixed an issue where pokémon nature would affect trainer stats
+- Updated skill and capture pokémon visuals, for trainers only (for now)
+- Removed now-unneeded configuration page entry for skill attribute selection
+
+### Jun 28, 2025
+- Reinstated 1/combat frequency option to accommodate homebrew
+
 ### May 11, 2025
 - Updated move frequency options to match the updated rules
 

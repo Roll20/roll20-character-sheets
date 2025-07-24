@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 
 <!--
-v3.47 250601
+v3.48 250608
 
 Character Sheet For Earthdawn Developped by JBF (Discord/Facebook Jiboux Faure) v2.
 Largerly using material from the work on the Official FASA version of Chris Dickey
@@ -578,11 +578,11 @@ Largerly using material from the work on the Official FASA version of Chris Dick
             value="@{RollType} &{template:rolltargetnumber} {{header= Roll }}  {{Step=[[?{Step|0}]] + [[?{Bonus or Karma Step|0}]]}} {{Result=[[ [[floor({?{Step}-8,0}kh1 / 11)]]d20! + [[ [[{1e3, 7}=[[{?{Step}, 0}kh1]] ]] + [[{6, 7, 7, 8, 9, 10, 11}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d12! + [[ [[{1e3, 6}=[[{?{Step}, 0}kh1]] ]] + [[{4, 5, 5, 6, 11}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d10! + [[ [[{1e3, 5}=[[{?{Step}, 0}kh1]] ]] + [[{2, 3, 3, 4, 9, 10, 10, 11}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d8! + [[ [[{1e3, 4}=[[{?{Step}, 0}kh1]] ]] + [[{1, 1, 2, 8, 8, 9}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d6! + [[{1, 2, 3}=[[{?{Step}, 0}kh1]] ]]d4! - [[{1, 2}=[[{?{Step}, 0}kh1]] * (3 - [[{?{Step}, 0}kh1]])]] + [[floor({?{Bonus or Karma Step}-8,0}kh1 / 11)]]d20! + [[ [[{1e3, 7}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{6, 7, 7, 8, 9, 10, 11}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d12! + [[ [[{1e3, 6}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{4, 5, 5, 6, 11}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d10! + [[ [[{1e3, 5}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{2, 3, 3, 4, 9, 10, 10, 11}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d8! + [[ [[{1e3, 4}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{1, 1, 2, 8, 8, 9}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d6! + [[{1, 2, 3}=[[{?{Bonus or Karma Step}, 0}kh1]] ]]d4! - [[{1, 2}=[[{?{Bonus or Karma Step}, 0}kh1]] * (3 - [[{?{Bonus or Karma Step}, 0}kh1]])]] ]]}}">
             <span class="sheet-iconstatic sheet-icon-dice"></span></button>
 
-            <button class="ui-draggable sheet-button-nodice sheet-text-button sheet-HideIfObject sheet-NoAPI sheet-NotCreation" name="act_newday" type="action"
+            <button class="ui-draggable sheet-button-nodice sheet-text-button sheet-HideIfObject sheet-NotCreation" name="act_newday" type="action"
             title="act_newday:   Clicking this button will set characters recovery tests to max and perform karma ritual.">
             <span class="sheet-iconstatic sheet-icon-newday"></span> </button>
 
-             <button class="ui-draggable sheet-button-nodice sheet-text-button sheet-api sheet-HideIfObject" name="button_NewDay" type="roll"
+             <button class="ui-draggable sheet-button-nodice sheet-text-button sheet-hidden sheet-HideIfObject" name="button_NewDay" type="roll"
             value="!Earthdawn~ charID: @{character_id}~ ForEach: c~ Misc: NewDay :@{Misc-KarmaRitual} :@{Misc-DPRitual}"
             title="button_NewDay:   Clicking this button will set characters recovery to max and perform karma ritual.">
             <span class="sheet-iconstatic sheet-icon-newday"></span> </button>
@@ -3977,6 +3977,7 @@ Largerly using material from the work on the Official FASA version of Chris Dick
           <div class="sheet-content sheet-ShowIfObject">
             <input name="attr_show_repeating_step_dice" type="checkbox" value="1" class="sheet-hidden sheet-testRepOption5">
 
+            <input name="attr_TO-List" type="hidden" value="{}"> <!--v3.48 contains the choices and status per type of TO-Choice in a format like { "TO1-Novice": [  { "name": "Avoid Blow", "disabled": false },{ "name": "Sprint", "disabled": true }],"TO1-Journeyman": [{ "name": "Disarm", "disabled": false }] }-->
 
             <input type="checkbox" hidden value="1" name="attr_talents-edit-mode" class="sheet-testRepEditMode" title="@{attr_talents-edit-mode} : Toggles the talent view to edit mode where the main attributes of each talents can be changed.">
             <div class="sheet-HideIfPrint sheet-HideIfOverviewNoEdit sheet-HideIfCombatNoEdit sheet-HideIfNotEditMode sheet-NotCreation sheet-HideIfCreature" style="width: 95%" title="@{TalentSummary}   Count of all talents base ranks broken down by source category. Includes all Talents on this tab and Matrix.">
@@ -4234,22 +4235,19 @@ Largerly using material from the work on the Official FASA version of Chris Dick
               <div class="sheet-filter-box sheet-ShowIfObject">
 
 
-                <!--v3.02 Talent Options Creation-->
+                <!--v3.02 Talent Options Creation - modified in 3.49-->
                 <input type="hidden" class="sheet-testTOSelector"  value="" name="attr_T_Name">
-                <div class="sheet-HideIfNotTOSelector sheet-bordered">
-                    <div>Create <input type="text" readonly name="attr_T_Type" class="sheet-txtShort"> Talents:</div>
-                    <input type="hidden"  value="" class="sheet-testEmpty"  name="attr_T_TO-Name-0" ></input><span class="sheet-nowrap0 sheet-HideIfEmpty"><button class="sheet-button-nodice sheet-text-button" name="act_addto0"  type="action" title="act_addto:   Add Talent Option."><input type="text" readonly name="attr_T_TO-Name-0"  class="sheet-txtMed"></button><button type="compendium" name="attr_T_TO-buttonInfo-0"  title="Compendium Info Button - Click to open compendium entry"></button></span>
-                    <input type="hidden"  value="" class="sheet-testEmpty"  name="attr_T_TO-Name-1" ></input><span class="sheet-nowrap0 sheet-HideIfEmpty"><button class="sheet-button-nodice sheet-text-button" name="act_addto1"  type="action" title="act_addto:   Add Talent Option."><input type="text" readonly name="attr_T_TO-Name-1"  class="sheet-txtMed"></button><button type="compendium" name="attr_T_TO-buttonInfo-1"  title="Compendium Info Button - Click to open compendium entry"></button></span>
-                    <input type="hidden"  value="" class="sheet-testEmpty"  name="attr_T_TO-Name-2" ></input><span class="sheet-nowrap0 sheet-HideIfEmpty"><button class="sheet-button-nodice sheet-text-button" name="act_addto2"  type="action" title="act_addto:   Add Talent Option."><input type="text" readonly name="attr_T_TO-Name-2"  class="sheet-txtMed"></button><button type="compendium" name="attr_T_TO-buttonInfo-2"  title="Compendium Info Button - Click to open compendium entry"></button></span>
-                    <input type="hidden"  value="" class="sheet-testEmpty"  name="attr_T_TO-Name-3" ></input><span class="sheet-nowrap0 sheet-HideIfEmpty"><button class="sheet-button-nodice sheet-text-button" name="act_addto3"  type="action" title="act_addto:   Add Talent Option."><input type="text" readonly name="attr_T_TO-Name-3"  class="sheet-txtMed"></button><button type="compendium" name="attr_T_TO-buttonInfo-3"  title="Compendium Info Button - Click to open compendium entry"></button></span>
-                    <input type="hidden"  value="" class="sheet-testEmpty"  name="attr_T_TO-Name-4" ></input><span class="sheet-nowrap0 sheet-HideIfEmpty"><button class="sheet-button-nodice sheet-text-button" name="act_addto4"  type="action" title="act_addto:   Add Talent Option."><input type="text" readonly name="attr_T_TO-Name-4"  class="sheet-txtMed"></button><button type="compendium" name="attr_T_TO-buttonInfo-4"  title="Compendium Info Button - Click to open compendium entry"></button></span>
-                    <input type="hidden"  value="" class="sheet-testEmpty"  name="attr_T_TO-Name-5" ></input><span class="sheet-nowrap0 sheet-HideIfEmpty"><button class="sheet-button-nodice sheet-text-button" name="act_addto5"  type="action" title="act_addto:   Add Talent Option."><input type="text" readonly name="attr_T_TO-Name-5"  class="sheet-txtMed"></button><button type="compendium" name="attr_T_TO-buttonInfo-5"  title="Compendium Info Button - Click to open compendium entry"></button></span>
-                    <input type="hidden"  value="" class="sheet-testEmpty"  name="attr_T_TO-Name-6" ></input><span class="sheet-nowrap0 sheet-HideIfEmpty"><button class="sheet-button-nodice sheet-text-button" name="act_addto6"  type="action" title="act_addto:   Add Talent Option."><input type="text" readonly name="attr_T_TO-Name-6"  class="sheet-txtMed"></button><button type="compendium" name="attr_T_TO-buttonInfo-6"  title="Compendium Info Button - Click to open compendium entry"></button></span>
-                    <input type="hidden"  value="" class="sheet-testEmpty"  name="attr_T_TO-Name-7" ></input><span class="sheet-nowrap0 sheet-HideIfEmpty"><button class="sheet-button-nodice sheet-text-button" name="act_addto7"  type="action" title="act_addto:   Add Talent Option."><input type="text" readonly name="attr_T_TO-Name-7"  class="sheet-txtMed"></button><button type="compendium" name="attr_T_TO-buttonInfo-7"  title="Compendium Info Button - Click to open compendium entry"></button></span>
-                    <input type="hidden"  value="" class="sheet-testEmpty"  name="attr_T_TO-Name-8" ></input><span class="sheet-nowrap0 sheet-HideIfEmpty"><button class="sheet-button-nodice sheet-text-button" name="act_addto8"  type="action" title="act_addto:   Add Talent Option."><input type="text" readonly name="attr_T_TO-Name-8"  class="sheet-txtMed"></button><button type="compendium" name="attr_T_TO-buttonInfo-8"  title="Compendium Info Button - Click to open compendium entry"></button></span>
-                    <input type="hidden"  value="" class="sheet-testEmpty"  name="attr_T_TO-Name-9" ></input><span class="sheet-nowrap0 sheet-HideIfEmpty"><button class="sheet-button-nodice sheet-text-button" name="act_addto9"  type="action" title="act_addto:   Add Talent Option."><input type="text" readonly name="attr_T_TO-Name-9"  class="sheet-txtMed"></button><button type="compendium" name="attr_T_TO-buttonInfo-9"  title="Compendium Info Button - Click to open compendium entry"></button></span>
-                    <input type="hidden"  value="" class="sheet-testEmpty"  name="attr_T_TO-Name-10"></input><span class="sheet-nowrap0 sheet-HideIfEmpty"><button class="sheet-button-nodice sheet-text-button" name="act_addto10" type="action" title="act_addto:   Add Talent Option."><input type="text" readonly name="attr_T_TO-Name-10" class="sheet-txtMed"></button><button type="compendium" name="attr_T_TO-buttonInfo-10" title="Compendium Info Button - Click to open compendium entry"></button></span>
-                    <input type="hidden"  value="" class="sheet-testEmpty"  name="attr_T_TO-Name-11"></input><span class="sheet-nowrap0 sheet-HideIfEmpty"><button class="sheet-button-nodice sheet-text-button" name="act_addto11" type="action" title="act_addto:   Add Talent Option."><input type="text" readonly name="attr_T_TO-Name-11" class="sheet-txtMed"></button><button type="compendium" name="attr_T_TO-buttonInfo-11" title="Compendium Info Button - Click to open compendium entry"></button></span>
+                <div class="sheet-HideIfNotTOSelector sheet-bordered" style="min-width:500px;">
+                    <input name="attr_T_TO-Trigger" type="hidden"> <!--Hidden trigger to leave time for the update before the populating of options-->
+                    <select name="attr_T_TO-Choice" class="fill-target sheet-txtLong"  data-list="TO-Choice-options" title="@{repeating_talents_X_T_TO-Choice} : Choose your Talent Option">
+                      <option value="">Select Talent Option</option>
+                    </select> <!--filltarget and the datalist are not used but useful for the sheetworker-->
+                    <input name="attr_T_TO-Choice" class="sheet-txtLong" readonly>
+                    <button type="action"      name="act_tovalidate" class="sheet-button-nodice sheet-text-button" title="Validate selected Talent Option">✔</button>
+                    <button type="action"      name="act_tocancel"   class="sheet-button-nodice sheet-text-button"   title="Cancel selected Talent Option">✘</button>
+                    <input type="checkbox" name="attr_T_TO-buttonInfo" value="" checked class="sheet-hidden sheet-testCloseChecked">
+                    <button type="compendium" class="sheet-HideIfCloseChecked" name="attr_T_TO-buttonInfo" title="Compendium Info Button - Click to open compendium entry"></button>
+
                 </div>
 
 
@@ -4273,7 +4271,7 @@ Largerly using material from the work on the Official FASA version of Chris Dick
                     <button class="sheet-text-button sheet-api" name="roll_T_Roll-fromSheet" type="roll"
                     value="!Earthdawn~ charID: @{character_id}~ Target: @{T_Target}~  @{T_RollType}~  foreach:sct:ust:c~ modValue : @{T_ModPrefix}{Modification|0} ~ K-ask: @{KarmaGlobalMode2}@{T_Karma-Ask}: @{DPGlobalMode2}@{T_DP-Ask}~ Action: T: @{T_RowID} "
                     title="%{selected|Roll_T_Roll-fromSheet} Roll this Talent Test.">
-                    <input name="attr_T_Name" type="text" class="sheet-buttonlabel sheet-txtMed sheet-HideIfEditMode" placeholder="Name">  </button>
+                    <input name="attr_T_Name" readonly type="text" class="sheet-buttonlabel sheet-txtMed sheet-HideIfEditMode" placeholder="Name">  </button>
 
                     <button class="sheet-hidden" name="roll_T_Roll" type="roll"
                     value="!Earthdawn~ charID: @{character_id}~ Target: @{T_Target-TA}~  @{T_RollType}~  foreach:sct:ust:c~ modValue : @{T_ModPrefix}{Modification|0} ~ K-ask: @{KarmaGlobalMode2}@{T_Karma-Ask}: @{DPGlobalMode2}@{T_DP-Ask}~  Action: T: @{T_RowID}"
@@ -4282,7 +4280,7 @@ Largerly using material from the work on the Official FASA version of Chris Dick
                     <button class="sheet-text-button sheet-NoAPI" name="roll_T_Roll-NoAPI" type="roll"
                     value="@{T_RollType} &{template:rolltargetnumber} @{T_Target-NoAPI} {{header=@{character_name} :  @{T_Name}}} {{Step=[[?{Step|@{T_Step}}]] + [[?{Bonus or Karma Step|0}]]}} {{Result=[[ [[floor({?{Step}-8,0}kh1 / 11)]]d20! + [[ [[{1e3, 7}=[[{?{Step}, 0}kh1]] ]] + [[{6, 7, 7, 8, 9, 10, 11}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d12! + [[ [[{1e3, 6}=[[{?{Step}, 0}kh1]] ]] + [[{4, 5, 5, 6, 11}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d10! + [[ [[{1e3, 5}=[[{?{Step}, 0}kh1]] ]] + [[{2, 3, 3, 4, 9, 10, 10, 11}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d8! + [[ [[{1e3, 4}=[[{?{Step}, 0}kh1]] ]] + [[{1, 1, 2, 8, 8, 9}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d6! + [[{1, 2, 3}=[[{?{Step}, 0}kh1]] ]]d4! - [[{1, 2}=[[{?{Step}, 0}kh1]] * (3 - [[{?{Step}, 0}kh1]])]] + [[floor({?{Bonus or Karma Step}-8,0}kh1 / 11)]]d20! + [[ [[{1e3, 7}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{6, 7, 7, 8, 9, 10, 11}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d12! + [[ [[{1e3, 6}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{4, 5, 5, 6, 11}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d10! + [[ [[{1e3, 5}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{2, 3, 3, 4, 9, 10, 10, 11}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d8! + [[ [[{1e3, 4}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{1, 1, 2, 8, 8, 9}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d6! + [[{1, 2, 3}=[[{?{Bonus or Karma Step}, 0}kh1]] ]]d4! - [[{1, 2}=[[{?{Bonus or Karma Step}, 0}kh1]] * (3 - [[{?{Bonus or Karma Step}, 0}kh1]])]] ]]}} {{Text=@{T_DisplayText} @{T_SuccessText}}}"
                     title="%{selected|Roll_T_Roll-NoAPI} Roll this Talent Test.">
-                    <input name="attr_T_Name" type="text" class="sheet-buttonlabel sheet-txtMed sheet-HideIfEditMode" placeholder="Name">  </button>
+                    <input name="attr_T_Name" type="text" class="sheet-buttonlabel sheet-txtMed sheet-HideIfEditMode" placeholder="Name" readonly>  </button>
 
 
                     <input name="attr_T_Name" type="text" list="talents" class="sheet-HideIfNotEditMode sheet-MedLongPlaceholder sheet-bordered-bottom sheet-HideIf1879" placeholder="Name">
@@ -5088,7 +5086,7 @@ Largerly using material from the work on the Official FASA version of Chris Dick
                           <button type="action" name="act_populateselect" title="@{repeating_talents_X_T_populateselect} : Press to populate the list of item of the relevant category"><span class="sheet-iconstatic sheet-icon-link"></span>Populate</button>
 
                           <select name="attr_T_LinkSelect3" class="dynamicSelect"  title="@{repeating_talents_X_T_LinksSelect3} : Select the Item to be linked, and press the Create Link button">
-                            <option value="Select" selected>Select Item</option>
+                          <option value="Select" selected>Select Item</option>
                           </select>
 
                           <input name="attr_T_LinkSelect3" type="checkbox" value="Select" checked class="sheet-hidden sheet-testCloseChecked">
@@ -5429,7 +5427,7 @@ Largerly using material from the work on the Official FASA version of Chris Dick
                     <button class="sheet-text-button sheet-api" name="roll_NAC_Roll-fromSheet" type="roll"
                     value="!Earthdawn~ charID: @{character_id}~   Target: @{NAC_Target}~ @{NAC_RollType}~ foreach:sct:ust:c~ modValue : @{NAC_ModPrefix}{Modification|0} ~ K-ask: @{KarmaGlobalMode2}@{NAC_Karma-Ask}: @{DPGlobalMode2}@{NAC_DP-Ask} ~Action: NAC: @{NAC_RowID}"
                     title="%{selected|Roll_NAC_Roll-fromSheet} Roll this Knack Test.">
-                    <input name="attr_NAC_Name" type="text" class="sheet-buttonlabel sheet-txtMed sheet-HideIfEditMode" placeholder="Name">  </button>
+                    <input name="attr_NAC_Name" readonly type="text" class="sheet-buttonlabel sheet-txtMed sheet-HideIfEditMode" placeholder="Name">  </button>
 
                     <button class="sheet-hidden" name="roll_NAC_Roll" type="roll"
                     value="!Earthdawn~ charID: @{character_id}~   Target: @{NAC_Target-TA}~ @{NAC_RollType}~ foreach:sct:ust:c~ modValue : @{NAC_ModPrefix}{Modification|0} ~ K-ask: @{KarmaGlobalMode2}@{NAC_Karma-Ask}: @{DPGlobalMode2}@{NAC_DP-Ask} ~Action: NAC: @{NAC_RowID}"
@@ -5438,7 +5436,7 @@ Largerly using material from the work on the Official FASA version of Chris Dick
                     <button class="sheet-text-button sheet-NoAPI" name="roll_NAC_Roll-NoAPI" type="roll"
                     value="@{NAC_RollType} &{template:rolltargetnumber} @{NAC_Target-NoAPI} {{header=@{character_name} :  @{NAC_Name}}} {{Step=[[?{Step|@{NAC_Step}}]] + [[?{Bonus or Karma Step|0}]]}} {{Result=[[ [[floor({?{Step}-8,0}kh1 / 11)]]d20! + [[ [[{1e3, 7}=[[{?{Step}, 0}kh1]] ]] + [[{6, 7, 7, 8, 9, 10, 11}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d12! + [[ [[{1e3, 6}=[[{?{Step}, 0}kh1]] ]] + [[{4, 5, 5, 6, 11}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d10! + [[ [[{1e3, 5}=[[{?{Step}, 0}kh1]] ]] + [[{2, 3, 3, 4, 9, 10, 10, 11}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d8! + [[ [[{1e3, 4}=[[{?{Step}, 0}kh1]] ]] + [[{1, 1, 2, 8, 8, 9}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d6! + [[{1, 2, 3}=[[{?{Step}, 0}kh1]] ]]d4! - [[{1, 2}=[[{?{Step}, 0}kh1]] * (3 - [[{?{Step}, 0}kh1]])]] + [[floor({?{Bonus or Karma Step}-8,0}kh1 / 11)]]d20! + [[ [[{1e3, 7}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{6, 7, 7, 8, 9, 10, 11}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d12! + [[ [[{1e3, 6}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{4, 5, 5, 6, 11}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d10! + [[ [[{1e3, 5}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{2, 3, 3, 4, 9, 10, 10, 11}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d8! + [[ [[{1e3, 4}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{1, 1, 2, 8, 8, 9}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d6! + [[{1, 2, 3}=[[{?{Bonus or Karma Step}, 0}kh1]] ]]d4! - [[{1, 2}=[[{?{Bonus or Karma Step}, 0}kh1]] * (3 - [[{?{Bonus or Karma Step}, 0}kh1]])]] ]]}} {{Text=@{NAC_DisplayText} @{NAC_SuccessText}}}"
                     title="%{selected|Roll_NAC_Roll-NoAPI} Roll this Knack Test.">
-                    <input name="attr_NAC_Name" type="text" class="sheet-buttonlabel sheet-txtMed sheet-HideIfEditMode" placeholder="Name">  </button>
+                    <input name="attr_NAC_Name" type="text" class="sheet-buttonlabel sheet-txtMed sheet-HideIfEditMode" placeholder="Name" readonly>  </button>
                     <!--JBF 210115 : In Edit mode, the name is out of the button to be editable-->
                     <input name="attr_NAC_Name" type="text" class="sheet-HideIfNotEditMode sheet-txtMed sheet-bordered-bottom" placeholder="Name">
 
@@ -6752,14 +6750,14 @@ Largerly using material from the work on the Official FASA version of Chris Dick
                         <button class="sheet-text-button sheet-api" name="roll_SK_Roll-fromSheet" type="roll"
                         value="!Earthdawn~ charID: @{character_id}~ Target: @{SK_Target}~ @{SK_RollType}~  foreach:sct:ust:c~ modValue : @{SK_ModPrefix}{Modification|0} ~ K-ask: @{KarmaGlobalMode2}@{SK_Karma-Ask}: @{DPGlobalMode2}@{SK_DP-Ask}~ Action: SK: @{SK_RowID} "
                         title="%{selected|Roll_SK_Roll-fromSheet} Roll this Skill Test.">
-                        <input name="attr_SK_Name" type="text" class="sheet-buttonlabel sheet-txtMed sheet-HideIfEditMode" placeholder="Name">  </button>
+                        <input name="attr_SK_Name" type="text" class="sheet-buttonlabel sheet-txtMed sheet-HideIfEditMode" placeholder="Name" readonly>  </button>
                         <button class="sheet-hidden" name="roll_SK_Roll" type="roll"
                         value="!Earthdawn~ charID: @{character_id}~ Target: @{SK_Target-TA}~ @{SK_RollType}~  foreach:sct:ust:c~ modValue : @{SK_ModPrefix}{Modification|0} ~ K-ask: @{KarmaGlobalMode2}@{SK_Karma-Ask}: @{DPGlobalMode2}@{SK_DP-Ask} ~ Action: SK: @{SK_RowID} "
                         title="%{selected|Roll_SK_Roll} Roll this Skill Test.   This version uses T_Target-TA instead of T_Target. on ?D1- target type it will try to get a Token ID.">Roll  </button>
                         <button class="sheet-text-button sheet-NoAPI" name="roll_SK_Roll-NoAPI" type="roll"
                         value="@{SK_RollType} &{template:rolltargetnumber} @{SK_Target-NoAPI} {{header=@{character_name} :  @{SK_Name}}} {{Step=[[?{Step|@{SK_Step}}]] + [[?{Bonus or Karma Step|0}]]}} {{Result=[[ [[floor({?{Step}-8,0}kh1 / 11)]]d20! + [[ [[{1e3, 7}=[[{?{Step}, 0}kh1]] ]] + [[{6, 7, 7, 8, 9, 10, 11}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d12! + [[ [[{1e3, 6}=[[{?{Step}, 0}kh1]] ]] + [[{4, 5, 5, 6, 11}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d10! + [[ [[{1e3, 5}=[[{?{Step}, 0}kh1]] ]] + [[{2, 3, 3, 4, 9, 10, 10, 11}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d8! + [[ [[{1e3, 4}=[[{?{Step}, 0}kh1]] ]] + [[{1, 1, 2, 8, 8, 9}=[[{((?{Step}-8) % 11)+1,0}kh1]] ]] ]]d6! + [[{1, 2, 3}=[[{?{Step}, 0}kh1]] ]]d4! - [[{1, 2}=[[{?{Step}, 0}kh1]] * (3 - [[{?{Step}, 0}kh1]])]] + [[floor({?{Bonus or Karma Step}-8,0}kh1 / 11)]]d20! + [[ [[{1e3, 7}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{6, 7, 7, 8, 9, 10, 11}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d12! + [[ [[{1e3, 6}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{4, 5, 5, 6, 11}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d10! + [[ [[{1e3, 5}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{2, 3, 3, 4, 9, 10, 10, 11}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d8! + [[ [[{1e3, 4}=[[{?{Bonus or Karma Step}, 0}kh1]] ]] + [[{1, 1, 2, 8, 8, 9}=[[{((?{Bonus or Karma Step}-8) % 11)+1,0}kh1]] ]] ]]d6! + [[{1, 2, 3}=[[{?{Bonus or Karma Step}, 0}kh1]] ]]d4! - [[{1, 2}=[[{?{Bonus or Karma Step}, 0}kh1]] * (3 - [[{?{Bonus or Karma Step}, 0}kh1]])]] ]]}} {{Text=@{SK_DisplayText} @{SK_SuccessText}}}"
                         title="%{selected|Roll_SK_Roll-NoAPI} Roll this Skill Test.">
-                        <input name="attr_SK_Name" type="text" class="sheet-buttonlabel sheet-txtMed sheet-HideIfEditMode" placeholder="Name">  </button>
+                        <input name="attr_SK_Name" type="text" class="sheet-buttonlabel sheet-txtMed sheet-HideIfEditMode" placeholder="Name" readonly>  </button>
                         <!-- <input name="attr_SK_Name"  type="text" class="sheet-HideIfNotEditMode sheet-txtMed sheet-bordered-bottom" placeholder="Name"> -->
                         <span class="sheet-HideIfNotEditMode" title="@{repeating_skills_X_SK_Name}:   Skill Name - This is an knowledge skill. Select a Skill or type your own.">
                           <input name="attr_SK_Name"  type="text" class="sheet-hidden sheet-testPlaceholder" placeholder="Name">
@@ -13380,7 +13378,7 @@ Largerly using material from the work on the Official FASA version of Chris Dick
 <!-- WORKERS -->
 <script type="text/worker">
 
-var SheetVersion=3.47;
+var SheetVersion=3.48;
 
 // This is Test code to see if worker threads are active (working).   If wt-test1 changes, change wt-test2. if wt-test2 does not update, sheetworkers are not working.
 on("change:wt-test1", function ocwttest1() {
@@ -13639,6 +13637,26 @@ var buildShortPre = function ( ei, code ) {
 };  // end buildShortPre
 
 
+// called with either nametotype or typetoname
+
+var MatrixTranslate = function ( x , y ){
+  'use strict';
+if( y =="nametotype") switch(safeString( x ).trim().toLowerCase()){
+  case "enhanced matrix" : return "15" ;
+  case "armored matrix" : return "25" ;
+  case "shared matrix" : return "-20" ;
+  case "standard matrix" : default: return "-10" ;
+}
+
+else switch(x){
+case "15" : return "Enhanced Matrix" ;
+case "25" : return "Armored Matrix" ;
+case "-20" : return "Shared Matrix" ;
+case "-10" : default: return "Standard Matrix" ;
+}
+
+
+};//end MatrixTranslate
 
 // This routine returns just one section of a repeating section name.
 // section: 0 = repeating. 1 = talents, knacks, weapons, etc. 2 = rowID, 3 = code (SP, WPN, etc.), 4 is the attribute name.
@@ -13796,7 +13814,7 @@ on("change:race-resistpain change:special-resistpain change:creature-resistpain"
 var UpdateAdjustGlobalModifiers = function fnUpdateAdjustGlobalModifiers(eventInfo) {
   'use strict';
   try{
-  log( "EarthDawn : UpdateAdjustGlobalModifiers()" + JSON.stringify(eventInfo));
+  //log( "EarthDawn : UpdateAdjustGlobalModifiers()" + JSON.stringify(eventInfo));
     getAttrs([ "condition-Darkness" ,  "effectIsAction", "Wounds", "Creature-Fury", "Total-ResistPain",
       "combatOption-TailAttack", "condition-Harried", "condition-Cover","condition-Surprised","combatOption-CalledShot", "condition-RangeLong","condition-Blindsided","condition-KnockedDown",
       "combatOption-DefensiveStance", "Misc-DefStance-Penalty", "Misc-DefStance-Bonus",
@@ -17130,6 +17148,7 @@ on("change:damage-stun change:damage-unc-rating", fn( UpdateDamageMax)  );
     ocBlood();
     updateRepStep();
     countDiscipline();
+    UpdateTOList();
     let i;
     getSectionIDs("repeating_discipline", function gsIdRepeatingDiscipline(tarray) {
       for( i = 0; i < tarray.length; i++)
@@ -19942,6 +19961,87 @@ else if( fromSheetVersion < 3.46 ) {
 
 } // End ver 3.46
 
+else if( fromSheetVersion < 3.45 ) {
+  toSheetVersion = 3.45;
+
+  var newNotes = "Earthdawn by FASA Character Sheet version: " + toSheetVersion + " by Chris Dickey and JB Faure .\n"
+  // Note: Put update stuff here.
+  + "Access the WIKI by pressing the red '?' button at the top right of the character name. "
+  + "New function Generate Report in the Parameter Tab. Allows a text export of your character in a format that is tailored to the WM people.\n"
+  + "New default Game parameter to set the title for the Miscellaneous Pools.\n"
+  + "New Knack Types : Augment Knack, Special Maneuver Knack, Karma Knack, Enchanting Knack. No Effect for now, but maybe some day.\n"
+
+
+  + notes;
+  // Comment this line out if not to change tab to force release notes visible.
+  showNotes = (showNotes === -1) ? -1 : 1;
+
+
+    let i,pre,newflags="";
+    let getV=[];
+
+
+
+
+        getAttrs( getV , function gaUpdateCharacterSheet(values) {
+          'use strict';
+
+
+
+  if( Object.keys(vals).length > 0 )    // If the code above just changed some values, do those before making the recursive call.
+  setAttrsLog( vals, undefined , function fnUpdateCharactersheetSetAttrsLog( vals ) {
+    'use strict';
+    updateCharactersheet( newSheetVersion, toSheetVersion, origSheetVersion, recurse + 1, values, showNotes, newNotes, newflags);        // Recursively call this routine to do any subsequent updates.
+  });
+  else{
+    updateCharactersheet( newSheetVersion, toSheetVersion, origSheetVersion, recurse + 1, values, showNotes, newNotes, newflags);        // Recursively call this routine to do any subsequent updates.
+  }
+  });
+
+} // End ver 3.45
+
+else if( fromSheetVersion < 3.48 ) {
+  toSheetVersion = 3.48;
+
+  var newNotes = "Earthdawn by FASA Character Sheet version: " + toSheetVersion + " by Chris Dickey and JB Faure .\n"
+  // Note: Put update stuff here.
+  + "Access the WIKI by pressing the red '?' button at the top right of the character name.\n"
+  + "Talent Options selector has been reworked completely.\n"
+  + "Fixed the NewDay Bug.\n"
+  + "Changed the API/NoAPI Indicators.\n"
+  + "Column for Language learned via Talents is hidden if you don't have the Talents.\n"
+  + "Matrix View offers a tracking field for Matrix Damage... No automation behind it.\n"
+  + "Changed some default values in Spells that didn't work well with Spell Knacks.\n"
+  + "Fixed some durations that were wrong in the LP Transactions.\n"
+
+  + "Misc Bugs.\n"
+
+
+  + notes;
+  // Comment this line out if not to change tab to force release notes visible.
+  showNotes = (showNotes === -1) ? -1 : 1;
+
+
+    let i,pre,newflags="";
+    let getV=[];
+
+
+        getAttrs( getV , function gaUpdateCharacterSheet(values) {
+          'use strict';
+
+
+  if( Object.keys(vals).length > 0 )    // If the code above just changed some values, do those before making the recursive call.
+  setAttrsLog( vals, undefined , function fnUpdateCharactersheetSetAttrsLog( vals ) {
+    'use strict';
+    updateCharactersheet( newSheetVersion, toSheetVersion, origSheetVersion, recurse + 1, values, showNotes, newNotes, newflags);        // Recursively call this routine to do any subsequent updates.
+  });
+  else{
+    updateCharactersheet( newSheetVersion, toSheetVersion, origSheetVersion, recurse + 1, values, showNotes, newNotes, newflags);        // Recursively call this routine to do any subsequent updates.
+  }
+  });
+
+} // End ver 3.48
+
 
     else  {
 
@@ -19975,6 +20075,7 @@ var onSheetOpened = function fnOnSheetOpened(){
     getAttrs(["edition_max", "NPC", "API", "API_max","LastRecalc"], function gaSheetOpened(values) {
     'use strict';
     logvalues( values);
+    UpdateTOList(); //Need to reload the TO List.
           //API Watchdog - Set to NoAPI no matter what, if the API is active it will reset to API.
           //Temporarily disabled until API is released
     let vals={};
@@ -20395,7 +20496,7 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
         rid = safeString( att ).split("_")[2],
         pre = buildPre("DSP",rid),
         vals = {},
-        attarray = [pre+"Name_max",pre+"Name",pre+"Type", pre+"Circle",pre+"Circle_max","NPC"]; //Need to have them also directly because pre will be normally cased, while darray will be loweredcased
+        attarray = [pre+"Name_max",pre+"Name",pre+"Type", pre+"Circle",pre+"Circle_max","NPC","TO-List"]; //Need to have them also directly because pre will be normally cased, while darray will be loweredcased
 
     getSectionIDs("repeating_talents", function gsIdRepeatingTalents(tarray) {
       for( let i = 0; i < tarray.length; i++) {
@@ -20417,11 +20518,11 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
           for( let i = 0; i < marray.length; i++){
             attarray.push( buildPre( "SPM", marray[ i ] ) + "Type");
             attarray.push( buildPre( "SPM", marray[ i ] ) + "Origin");
-
           }
 
         getAttrs( attarray , function gaCreateTalents(values) {
           let ddata = parseJSON(values[pre+"Name_max"]);
+          let toList = parseJSON(values["TO-List"])
 
 
           if(!ddata["DT_C1"] && !ddata["TO_Novice"] && !ddata["TO_Journeyman"]) {
@@ -20458,9 +20559,6 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
 
             if(ddatatmp.Type=="Discipline" && values[buildPre( "DSP", darray[ i ] ) + "Name"] == values [pre + "Name"]) //record the discipline number
             inddisc=Math.min(nbdisc,4);
-
-
-
           }
           nbdisc=Math.min(nbdisc,4);
 
@@ -20470,7 +20568,6 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
           if( !ty.startsWith("V") && !ty.startsWith("QD")){ //Talents learned through Versatility will actually be duplicated, and Devotions are just not Talents
             tnamearray.push( safeString( values[buildPre( "T", tarray[ i ] ) + "Name"] ).toLowerCase().trim());
             ridarray.push( tarray[ i ]);
-
             if(safeString( ty ).startsWith("TO"+inddisc)) //Count TO that we have already
             if(safeString( ty ).endsWith("Novice")) nbto[0]++;
             else if(safeString( ty ).endsWith("Journeyman")) nbto[1]++;
@@ -20478,6 +20575,10 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
             else if(safeString( ty ).endsWith("Master")) nbto[3]++;
           }
         }
+
+        for( let i = 0; i < marray.length; i++) //Add to the tnamearray the TO Matrixes
+          if(safeString(values[buildPre( "SPM", marray[ i ] ) + "Origin"]).startsWith("TO"))
+            tnamearray.push( MatrixTranslate( values[buildPre( "SPM", marray[ i ] ) + "Type"] , "typetoname").toLowerCase())
 
           let cmin=Math.max(1,getInt(values,pre+"Circle_max")+1),
           cmax=Math.max(1,getInt(values,pre+"Circle")); //Naming looks crazy, but DSP_Circle_max actually holds the last Circle to which the button was used,
@@ -20496,24 +20597,6 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
 
                 AbilityDrop("Standard Matrix","repeating_matrix","SPM","Magic:Standard Matrix",{roll20_Origin:"Free-link",linkadd:"DSP;"+ddata.name},"noduplicate");
 
-              // for(let i=0; i<2; i++ ){
-              //   mnewId = generateRowIdNoUnderscore();
-              //   mnewInfo = buildPre( "SPM", mnewId );
-              //   vals[mnewInfo+"RowID"]=mnewId;
-              //   vals[mnewInfo+"Origin"]="Free-link";
-              //   flags=addAPIflag( flags, "LinkAdd1", "SPM : " + mnewId + " : DSP : " + ddata.name); //APIFlag syntax is LinkAdd1,code,rowid,code,name, the first set being the attribute Getting the value, and the second the one providing
-              //   if(cmax>=5 && i==0) // We created a spellcaster directly at Circle >=5. The first matrix must be enhanced
-              //   vals[mnewInfo+"Type"]="15";}
-
-
-              //Creation of the Will Talent
-              //log("creating WIL");
-              // newId = generateRowIdNoUnderscore();
-              // newInfo = buildPre( "T", newId );
-              // vals[newInfo+"RowID"]=newId;
-              // vals[newInfo+"Name"]="Wil";
-              // AutoFill(newInfo+"Name","CreateTalents","Wil");
-              // vals[newInfo+"Type"]="Special";
             }
             } else
             //JBF@JBF Commented out, I think we don't have the choice than to recreate the talent in double if( tnamearray.indexOf(safeString( ddata["Free_C1"] ).toLowerCase().trim()) ==-1) //Non-spellcaster case, check if the talent already exists
@@ -20522,9 +20605,9 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
               newInfo = buildPre( "T", newId );
               vals[newInfo+"RowID"]=newId;
               vals[newInfo+"Name"]=safeString( ddata["Free_C1"] ).trim();
+              tnamearray.push(vals[newInfo+"Name"].toLowerCase());
               vals[newInfo+"Type"]="Free";
               AutoFill(newInfo+"Name","CreateTalents",safeString( ddata["Free_C1"] ).trim());
-              //flags=addAPIflag( flags, "LinkAdd1", "T : " + newId + " : DSP : " + ddata.name); //APIFlag syntax is LinkAdd1,code,rowid,code,name, the first set being the attribute Getting the value, and the second the one providing
               LinkAddByName("T", newId,"DSP",ddata.name);
             }
           }
@@ -20571,6 +20654,7 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
                 newInfo = buildPre( "T", newId );
                 vals[newInfo+"RowID"]=newId;
                 vals[newInfo+"Name"]=safeString( dtarr[i] ).trim();
+                tnamearray.push(vals[newInfo+"Name"].toLowerCase());
                 if(values["NPC"]!=="0") vals[newInfo+"Rank"]=cmax; //When creating an NPC, make the rank==Circle for faster NPC creation
                 AutoFill(newInfo+"Name","CreateTalents",safeString( dtarr[i] ).trim(),null,comp_data);
                 vals[newInfo+"Type"]="D"+inddisc+"-"+(j>=13 ? "Master" : (j>=9?"Warden":(j>=5?"Journeyman":"Novice")));
@@ -20598,11 +20682,10 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
             AbilityDrop(newdata.names,newdata.rep,newdata.code,"",newdata,"AbilityAdd");
           }
 
-      //  }
-
+        }
+        for(let j=cmin; j<=cmax;j++) {
 
         //   Talent Options
-          //for(let j=cmin; j<=cmax;j++) {
           if(ddata["TO_" + circletotier[j]]) { //Path start at Journeyman
             dtarr=safeString( ddata["TO_" + circletotier[j]] ).split(",");
             newId = generateRowIdNoUnderscore();
@@ -20611,26 +20694,31 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
             else if(ddata.Type=="Path-Journeyman" || ddata.Type=="Path-Master") vals[newInfo+"Type"]="PA-"+ circletotier[j];
             else vals[newInfo+"Type"]="TO"+inddisc+"-" + circletotier[j];
             vals[newInfo+"RowID"]=newId;
-            let k=0;
-            for( let i = 0; i < Math.min(11,dtarr.length); i++) {
-              if( tnamearray.indexOf(safeString( dtarr[i] ).toLowerCase().trim()) ==-1 ) { //process only if the talent doesn't already exist
-                vals[newInfo+"Name"]="TO-Selector"; // Name shouldn't be empty to not default the ability drop during creation
-                vals[newInfo+"TO-Name-"+k]=safeString( dtarr[i] ).trim();
-                vals[newInfo+"TO-buttonInfo-"+k]=(["Standard Matrix","Enhanced Matrix","Shared Matrix","Armored Matrix"].includes(safeString( dtarr[i] ).trim()) ? "Magic:" : (ddata.Type=="Questor" ? "Devotions:" : "Talents:")) + safeString( dtarr[i] ).trim();
-                k++;
-          } } }
+            vals[newInfo+"Name"]="TO-Selector"; // Name shouldn't be empty to not default the ability drop during creation
+            vals[newInfo+"TO-Trigger"] = new Date().getTime();
+            if(values["NPC"]!=="0") vals[newInfo+"Rank"]=cmax; //When creating an NPC, make the rank==Circle for faster NPC creation
+            if (!toList[vals[newInfo+"Type"]]) {
+              toList[vals[newInfo+"Type"]] = dtarr.map(name => {
+                return { name: safeString(name).trim(), disabled: false };
+              });
+            } //If the TO-List for this Tier does'nt exist, create it
+         }
         }
 
-          // if( nbdisc >= 2 && cmin<=1 && ddata.Type=="Discipline") { //This way of counting the multidisciplining is discontinued
-          //log("recording multidisciplining");
-          //   vals["LP-D"+nbdisc+"-Talents"]=multinb;
-          //   vals["LP-D"+nbdisc+"-Circle"]=mincircle;
-          // }
-          // if( flags !== "" )
-          //   vals[ "APIflag" ] = flags;
+        //Update of TO-List by disabling any entry that is already in the tnamearray
+        for (const ttype in toList) {
+          if (!Array.isArray(toList[ttype])) continue;
+
+          toList[ttype].forEach(entry => {
+            const nameLower = safeString(entry.name).toLowerCase().trim();
+            entry.disabled = tnamearray.includes(nameLower);
+          });
+        }
+
           vals[pre+"Circle_max"] = Math.max(1,getInt(values,pre+"Circle")); //Store the last Circle processed (Min 1 to allow for Circle 0 creation of Talents)
           vals[pre+"show-createbutton"] = 0;
-          setAttrsLog( vals );
+          vals["TO-List"]=JSON.stringify(toList);
+          setAttrsLog( vals)
         });
       });
       });
@@ -20638,6 +20726,182 @@ on("clicked:repeating_discipline:createtalents", fn(function ocCreateTalents(eve
     });
   } catch( err ) { errlog( "Earthdawn:ocCreateTalents() error caught: " + err  ); }
 })); //End ocCreateTalents()
+
+
+
+const UpdateTOList = function fnUpdateTOList(eventInfo) {
+  try {
+    let att = safeString(getAttrib(eventInfo)).toLowerCase();
+    let attarray = ["TO-List"];
+
+    getSectionIDs("repeating_talents", function(tarray) {
+      for (let i = 0; i < tarray.length; i++) {
+        let pre = buildPre("T", tarray[i]);
+        attarray.push(pre + "Name");
+        attarray.push(pre + "Type");
+        attarray.push(pre + "RowID");
+      }
+
+      getAttrs(attarray, function(values) {
+        let toList = parseJSON(values["TO-List"]);
+
+        for (let i = 0; i < tarray.length; i++) {
+          let pre = buildPre("T", tarray[i]);
+          let rid = values[pre+"RowID"];
+          let tname = safeString(values[pre + "Name"]).trim();
+          let ttype = safeString(values[pre + "Type"]).trim();
+
+          if (tname === "TO-Selector" && toList[ttype]) {
+                  let available = [];
+                  let known = [];
+
+                  toList[ttype].forEach(entry => {
+                      const opt = {
+                        label: entry.name,
+                        value: entry.name,
+                        //disabled: entry.disabled
+                        };
+                        if (entry.disabled) known.push(opt);
+                        else available.push(opt);
+                      });
+
+                      let options = [
+                        { label: `Select ${ttype}`, value: "" },
+                        ...available
+                      ];
+
+                      if (known.length > 0) {
+                        options.push(
+                          { label: "Already Known", value: "", disabled: true },
+                          ...known
+                        );
+                      }
+
+            //log(JSON.stringify(options));
+            populateListOptions({
+              elemSelector: `[data-reprowid="${rid}"] .fill-target`,
+              optionsArray: options
+            });
+          }
+        }
+      });
+    });
+  } catch (err) {
+    errlog("Earthdawn:UpdateTOList() error caught: " + err);
+  }
+};//end UpdateTOList
+on("change:to-list change:repeating_talents:t_to-trigger", function() {  UpdateTOList();});
+//Need to add a specific trigger inside the repeating_talents line to be sure to trigger after the select has been created by the DOM
+
+
+
+on("change:repeating_talents:t_to-choice", fn(function repTOChoice(eventInfo) {
+  'use strict';
+  try {
+    let att = getAttrib(eventInfo);
+    let vals={}
+    if (att === "") return;
+
+    let rowid = repeatSection(2, att),
+        pre = buildPre("T", rowid);
+
+    getAttrs([pre + "TO-Choice", pre + "Type"], function(values) {
+      let name = safeString(values[pre + "TO-Choice"]).trim();
+      let ttype = safeString(values[pre + "Type"]);
+
+      let compPrefix = "Talents:";
+      if (["Standard Matrix", "Enhanced Matrix", "Shared Matrix", "Armored Matrix"].includes(name)) {
+        compPrefix = "Magic:";
+      } else if (ttype.startsWith("QD")) {
+        compPrefix = "Devotions:";
+      }
+
+      vals[pre + "TO-buttonInfo"]=  name ? compPrefix + name : "";
+      setAttrsLog(vals);
+    });
+  } catch (err) {
+    errlog("Earthdawn:repTTOChoice() error caught: " + err + " eventInfo: " + JSON.stringify(eventInfo));
+  }
+}));//end repTOChoice
+
+
+
+on("clicked:repeating_talents:tovalidate", fn(function validateTO(eventInfo) {
+  'use strict';
+  try {
+    //Important Comment : Action Buttons in repeating sections DO NOT WORK, if there is an underscore, so it can't follow the usual repeating_section_rowid_code_name syntax. The button itself will have no code
+    let att = getAttrib(eventInfo),
+        rid = safeString( att ).split("_")[2],
+        pre = buildPre("T",rid),
+        vals = {},
+        attarray = ["TO-List", pre + "TO-Choice", pre + "Type"];
+
+
+    getAttrs(attarray, function(values) {
+      let selected = safeString(values[pre + "TO-Choice"]).trim();
+      let ttype = safeString(values[pre + "Type"]).trim();
+      let toList = parseJSON(values["TO-List"]);
+
+      if (!selected || !ttype || !toList[ttype]) return;
+
+      let ismat = ["Standard Matrix", "Enhanced Matrix", "Shared Matrix", "Armored Matrix"].includes(selected),
+          rep = ismat ? "repeating_matrix" : "repeating_talents",
+          code = ismat ? "SPM" : "T",
+          newdata = {
+            names: selected,
+            Type: ttype,
+            roll20_Origin: ttype,
+            rep: rep,
+            code: code
+          };
+
+          // Update TO-List JSON to disable this talent everywhere
+          for (const key in toList) {
+            if (!Array.isArray(toList[key])) continue;
+            toList[key].forEach(entry => {
+              if (safeString(entry.name).toLowerCase().trim() === selected.toLowerCase()) {
+                entry.disabled = true;
+              }
+            });
+          }
+
+      // Set attributes and process
+      vals["TO-List"] = JSON.stringify(toList);
+
+      if (ismat) {
+        // Drop matrix and delete the line
+        AbilityDrop(selected, rep, code, "", newdata, "AbilityAdd noduplicate");
+        setAttrsLog(vals, null, function() {
+          removeRepeatingRow("repeating_talents_" + rid);
+        });
+      } else {
+        // Fill in the Name and keep the line
+        AutoFill(pre + "Name", "API", selected, newdata);
+        setAttrsLog(vals);
+      }
+    });
+  } catch (err) {
+    errlog("Earthdawn:validateTO() error caught: " + err);
+  }
+}));//End act_tovalidate
+
+
+on("clicked:repeating_talents:tocancel", fn(function cancelTO(eventInfo) {
+  'use strict';
+  try {
+    let att = getAttrib(eventInfo);
+    if (att === "") return;
+    let rowid = repeatSection(2, att),
+        pre = buildPre("T", rowid),
+        vals = {};
+    vals[pre + "Name"] = "";
+    setAttrsLog(vals);
+  } catch (err) {
+    errlog("Earthdawn:cancelTO() error caught: " + err);
+  }
+}));//End cancelTO
+
+
 
 
 
@@ -20726,7 +20990,10 @@ on("clicked:repeating_talents:addto0 clicked:repeating_talents:addto1 clicked:re
 
             for( let i = 0; i < tarray.length; i++) {
               for( let j = 0; j < 16; j++)
-              if(values[ buildPre( "T", tarray[ i ] ) + "TO-Name-"+j]==tn) vals[ buildPre( "T", tarray[ i ] ) + "TO-Name-"+j]="";
+              if(values[ buildPre( "T", tarray[ i ] ) + "TO-Name-"+j]==tn){
+                //log("removing talent " + tn + " from line " +i + " TO # "+j);
+
+                 vals[ buildPre( "T", tarray[ i ] ) + "TO-Name-"+j]="";}
             }
 
             //Version in a new lines
@@ -25021,14 +25288,7 @@ var AbilityDrop = function fnAbilityDrop(nm,rep,code,un,data,mode,comp_data) { /
         if(code=="T" && (data.roll20_Type || data.Type )) data.roll20_Origin=data.roll20_Type || data.Type;     //Case of Matrix : Listed as Talents, but entered as SPM
         if(data.roll20_Origin=="Free") data.roll20_Origin="Free-link";
         if(data.roll20_Origin=="Item") data.roll20_Origin="Item-link";
-        switch(safeString( nm ).trim().toLowerCase()){
-          case "enhanced matrix" : data.roll20_Type="15" ; break;
-          case "armored matrix" : data.roll20_Type="25" ; break;
-          case "shared matrix" : data.roll20_Type="-20" ; break;
-          case "standard matrix" :
-          default:
-           data.roll20_Type="-10" ;
-        }
+        data.roll20_Type=MatrixTranslate(nm,"nametotype")
         code="SPM"; //We change to an SPM
       vals["Hide-Spells-Tab"]="0";
     }
@@ -28368,8 +28628,7 @@ on("clicked:repeating_talents:populateselect clicked:repeating_knacks:populatese
       let sid= (code=="SP" ? "repeating_spell" : values[pre+"LinkSelect2"]), //v3.3 for SP there is no Select2
       code2,
       attarray=[];
-      let options = [{ label: 'Select Item', value: 'Select', selected: "true"}]
-
+      let options = [{ label: 'Select Item', value: 'Select'}];
 
       switch(sid){
         case "repeating_talents" : code2="T"; break;
@@ -28403,7 +28662,7 @@ on("clicked:repeating_talents:populateselect clicked:repeating_knacks:populatese
 
           //log("options " + JSON.stringify(options))
           populateListOptions({
-            elemSelector: '.dynamicSelect',
+            elemSelector: `[data-reprowid="${rid}"] .dynamicSelect`,
             optionsArray: options,
             callback: () => {
               //errlog('Options should be populated')
