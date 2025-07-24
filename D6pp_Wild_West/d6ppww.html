@@ -40,7 +40,7 @@
   <input type="hidden" name="attr_willpower_displayname" value="Willpower" />
 
   <input type="hidden" name="attr_intelligence_string" />
-  <input type="hidden" name="attr_intellgence_base_string" />
+  <input type="hidden" name="attr_intelligence_base_string" />
   <input type="hidden" name="attr_intelligence_adjustment" />
   <input type="hidden" name="attr_intelligence_rollcode" />
   <input type="hidden" name="attr_intelligence_displayname" value="Intelligence" />
@@ -435,13 +435,13 @@
   <input type="hidden" name="attr_hunting_active" />
   <input type="hidden" name="attr_hunting_displayname" value="Hunting" />
 
-  <input type="hidden" name="attr_forging_attributes" />
-  <input type="hidden" name="attr_forging_specialized" value="" />
-  <input type="hidden" name="attr_forging_rollcode" />
-  <input type="hidden" name="attr_forging_string" />
-  <input type="hidden" name="attr_forging_skillgroup" />
-  <input type="hidden" name="attr_forging_active" />
-  <input type="hidden" name="attr_forging_displayname" value="Forging" />
+  <input type="hidden" name="attr_foraging_attributes" />
+  <input type="hidden" name="attr_foraging_specialized" value="" />
+  <input type="hidden" name="attr_foraging_rollcode" />
+  <input type="hidden" name="attr_foraging_string" />
+  <input type="hidden" name="attr_foraging_skillgroup" />
+  <input type="hidden" name="attr_foraging_active" />
+  <input type="hidden" name="attr_foraging_displayname" value="foraging" />
 
   <input type="hidden" name="attr_scavenging_attributes" />
   <input type="hidden" name="attr_scavenging_specialized" value="" />
@@ -1690,9 +1690,9 @@
             <div class="grid-cell"><span name="attr_fletching_string"></span></div>
             <div class="grid-cell"><span>Activated</span></div>
 
-            <div class="grid-cell"><span name="attr_forging_displayname"></span><span name="attr_forging_specialized"></span></div>
-            <div class="grid-cell"><span name="attr_forging_attributes"></span></div>
-            <div class="grid-cell"><span name="attr_forging_string"></span></div>
+            <div class="grid-cell"><span name="attr_foraging_displayname"></span><span name="attr_foraging_specialized"></span></div>
+            <div class="grid-cell"><span name="attr_foraging_attributes"></span></div>
+            <div class="grid-cell"><span name="attr_foraging_string"></span></div>
             <div class="grid-cell"><span>Activated</span></div>
 
             <div class="grid-cell"><span name="attr_hunting_displayname"></span><span name="attr_hunting_specialized"></span></div>
@@ -2361,7 +2361,7 @@
                     <option value="first_aid">First Aid (PWI)</option>
                     <option value="fletching">Fletching (PPM)</option>
                     <option value="forgery">Forgery (MII)</option>
-                    <option value="forging">Forging (PIM)</option>
+                    <option value="foraging">foraging (PIM)</option>
                     <option value="gambling">Gambling (PPI)</option>
                     <option value="gunsmithing">Gunsmithing (MMP)</option>
                     <option value="health">Health (HHH)</option>
@@ -3520,10 +3520,10 @@
                 <div class="grid-cell number-cell"><span name="attr_fletching_string"></span></div>
                 <div class="grid-cell"><button type="action" class="sheet-d6pp" name="act_fletching">Roll</button></div>
 
-                <div class="grid-cell number-cell"><span name="attr_forging_displayname"></span><span name="attr_forging_specialized"></span></div>
-                <div class="grid-cell number-cell"><span name="attr_forging_attributes"></span></div>
-                <div class="grid-cell number-cell"><span name="attr_forging_string"></span></div>
-                <div class="grid-cell"><button type="action" class="sheet-d6pp" name="act_forging">Roll</button></div>
+                <div class="grid-cell number-cell"><span name="attr_foraging_displayname"></span><span name="attr_foraging_specialized"></span></div>
+                <div class="grid-cell number-cell"><span name="attr_foraging_attributes"></span></div>
+                <div class="grid-cell number-cell"><span name="attr_foraging_string"></span></div>
+                <div class="grid-cell"><button type="action" class="sheet-d6pp" name="act_foraging">Roll</button></div>
 
                 <div class="grid-cell number-cell"><span name="attr_hunting_displayname"></span><span name="attr_hunting_specialized"></span></div>
                 <div class="grid-cell number-cell"><span name="attr_hunting_attributes"></span></div>
@@ -4266,7 +4266,12 @@
           <div class="sheet-controls-group">
             <label class="sheet-d6pp-label" style="margin: 0; display: inline;">Status:</label>
             <input type="text" class="sheet-d6pp" name="attr_status" readonly/>
-            <button type="action" class="sheet-d6pp" name="act_revive">Revive</button>
+            <div class="d6pp-checkbox">
+              <label class="inline-checkbox-label">
+                <input type="checkbox" name="attr_revived_toggle" />
+                Revived
+              </label>
+            </div>
           </div>
         </div>
       </div>
@@ -4529,7 +4534,7 @@
             <option value="first_aid">First Aid (PWI)</option>
             <option value="fletching">Fletching (PPM)</option>
             <option value="forgery">Forgery (MII)</option>
-            <option value="forging">Forging (PIM)</option>
+            <option value="foraging">foraging (PIM)</option>
             <option value="gambling">Gambling (PPI)</option>
             <option value="gunsmithing">Gunsmithing (MMP)</option>
             <option value="health">Health (HHH)</option>
@@ -5024,7 +5029,7 @@
     // Survival
     tracking: "PPI",
     hunting: "PPQ",
-    forging: "PIM",
+    foraging: "PIM",
     scavenging: "PPW",
     cooking: "IWM",
     fletching: "PPM",
@@ -5157,7 +5162,7 @@
     // Survival
     tracking: "survival",
     hunting: "survival",
-    forging: "survival",
+    foraging: "survival",
     scavenging: "survival",
     cooking: "survival",
     fletching: "survival",
@@ -7199,7 +7204,8 @@
     getAttrs(attrs, values => {
       if (!canAct(values)) {
         rollErrorMessage("❌ You are not conscious and cannot act.");
-      }return;
+        return;
+      }
 
       const name = values.character_name || "Character";
       const whisper = values.whisper_toggle || "";
