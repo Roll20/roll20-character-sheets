@@ -1,0 +1,61 @@
+include components/widgets
+include components/panel
+include components/numovermax
+include components/ability
+include components/relation
+include components/wounds
+include components/weapons
+
++hiddenInput('version', 1)
++hiddenInput('woundsMalus', 0)
+main
+    +panel('SHS - Fiche de suivi de', true).panel-name
+        +textLabelled('charname', 'Nom & Rôle:', 'charname')
+        +textLabelled('player', 'Joueur:', 'player')
+        +hiddenInput('character_name', '')
+        +actButton('testWounds', '')
+    +panel().panel-nav
+        +navRadio('page', 'Notes & relations', 'base')
+        +navRadio('page', 'Combat', 'combat')
+    +panel('Santé').panel-hp
+        +numOverMax('hp', 0, 0)
+    +panel('Protection').panel-armour
+        +numOverMax('armour', 0, 0)
+    +panel('Oxygène').panel-oxygen
+        +numOverMax('oxygen', 0, 0)
+    +panel('Caractéristiques').panel-carac
+        +ability('carrure', 'Carrure').carrure
+        +ability('motricite', 'Motricité').motricite
+        +ability('science', 'Science').science
+        +ability('relationnel', 'Relationnel').relationnel
+        +ability('sangfroid', 'Sang froid').sangfroid
+    +panel('Expertises (D8 -> D10)').panel-skills
+        +textareaInput('expertises')
+
+    +hiddenInput('page', 'base')
+    .page.page-combat
+        +panel('Blessures et états').panel-wounds
+            +wounds()
+        +panel('Armes').panel-weapons
+            +weapons()
+    .page.page-base
+        +panel('Notes &amp; Équipement').panel-notes
+            +textareaInput('notes')
+        +panel('Relations').panel-relations
+            +relation('friend', 'Ami(e) avec', '+')
+            +relation('inlove', 'Amoureux(se) de', '+')
+            +relation('family', 'Même famille que (préciser le lien)', '+')
+            +relation('hostile', 'Hostile envers', '-')
+include rolltemplates/simple.html
+include rolltemplates/attack.html
+include rolltemplates/goldorak.html
+include rolltemplates/damage.html
+include rolltemplates/burndamage.html
+script(type='text/worker')
+    include js/sections.js
+    include js/dice.js
+    include js/combat.js
+    include js/namechange.js
+    include js/ability.js
+    include js/wounds.js
+    include init.js
