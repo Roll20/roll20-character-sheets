@@ -1,3 +1,16 @@
+# 2025-07-22
+
+- Fix potential bug creating characters not using custom races.
+- Optmise race creation; so it's like 400 times faster.
+    - Single get and set
+    - Don't call multiple requests
+    - Correctly nest pending calls
+- First version of PC -> NPC generation.
+- PC token setting attempt #863.
+- Reorg some of the code to make it easier to find things.
+- Don't trigger potential race conditions updating proficiency bonuses.
+- Make the Dice icon larger and use the plain d10
+
 # 2025-07-17
 
 Thursday updates?  A very weird Tuesday
