@@ -130,9 +130,9 @@
 				<input type="text" name="attr_bruteForceBase"  class="sheet-level" style="margin: -28px 0px 0px 0px;" value="" data-i18n-title="bruteForce-defn">
 				<input type="text" name="attr_bruteForce" class="sheet-levelTotal" style="margin: -28px 0px 0px -4px;" value="" data-i18n-title="bruteForceTotal-defn">
 
-				<button type='action' name='act_unarmedCombat-action' class="sheet-buttonSkill" style="margin: 0px 0px 0px -2px;" value='@{unarmedCombat_action}'><label class="sheet-skill" data-i18n="unarmedCombat-u">UNARMED COMBAT</label></button>
-				<input type="text" name="attr_unarmedCombatBase"  class="sheet-level" style="margin: -4px 0px 0px 0px;" value="" data-i18n-title="unarmedCombat-defn">
-				<input type="text" name="attr_unarmedCombat" class="sheet-levelTotal" style="margin: -4px 0px 0px -4px;" value="" data-i18n-title="unarmedCombatTotal-defn">
+				<button type='action' name='act_intimidate-action' class="sheet-buttonSkill" style="margin: 0px 0px 0px -2px;" value='@{intimidate_action}'><label class="sheet-skill" data-i18n="intimidate-u">INTIMIDATE</label></button>
+				<input type="text" name="attr_intimidateBase"  class="sheet-level" style="margin: -4px 0px 0px 0px;" value="" data-i18n-title="intimidate-defn">
+				<input type="text" name="attr_intimidate" class="sheet-levelTotal" style="margin: -4px 0px 0px -4px;" value="" data-i18n-title="intimidateTotal-defn">
 
 				<button type='action' name='act_toughness-action' class="sheet-buttonSkill" style="margin: 0px 0px 0px -2px; border-bottom: 0px solid Black;" value='@{toughness_action}'><label class="sheet-skill" data-i18n="toughness-u">TOUGHNESS</label></button>
 				<input type="text" name="attr_toughnessBase"  class="sheet-level" style="margin: -4px 0px 0px 0px;" value="" data-i18n-title="toughness-defn">
@@ -693,25 +693,25 @@ on("sheet:opened", function(eventInfo){
 		return retId;
 	}
 
-// Change Constitution, Brute Force, Unarmed Combat, or Toughness
-on("change:constitution change:agility change:bruteForceBase change:unarmedCombatBase change:toughnessBase", function(eventInfo) {
+// Change Constitution, Brute Force, Intimidate, or Toughness
+on("change:constitution change:agility change:bruteForceBase change:intimidateBase change:toughnessBase", function(eventInfo) {
 	let NewAttribute = eventInfo.newValue;
 	let OldAttribute = eventInfo.previousValue;
 	let SourceAttribute = eventInfo.sourceAttribute;
 	
-	getAttrs(["constitution","agility","bruteForceBase","unarmedCombatBase","toughnessBase"], function(values) {
+	getAttrs(["constitution","agility","bruteForceBase","intimidateBase","toughnessBase"], function(values) {
 		let Constitution = parseInt(values.constitution)||0;
 		let Agility = parseInt(values.agility)||0;
 		let BruteForceBase = parseInt(values.bruteForceBase)||0;
-		let UnarmedCombatBase = parseInt(values.unarmedCombatBase)||0;
+		let IntimidateBase = parseInt(values.intimidateBase)||0;
 		let ToughnessBase = parseInt(values.toughnessBase)||0;
 		let BruteForceTotal = Constitution + BruteForceBase;
-		let UnarmedCombatTotal = Constitution + UnarmedCombatBase;
+		let IntimidateTotal = Constitution + IntimidateBase;
 		let ToughnessTotal = Constitution + ToughnessBase;
 
-		console.log("  Constitution: " + Constitution + " BruteForceTotal " + BruteForceTotal + " UnarmedCombatTotal " + UnarmedCombatTotal + " ToughnessTotal " + ToughnessTotal);
+		console.log("  Constitution: " + Constitution + " BruteForceTotal " + BruteForceTotal + " IntimidateTotal " + IntimidateTotal + " ToughnessTotal " + ToughnessTotal);
 		setAttrs({                            
-				bruteForce: BruteForceTotal, unarmedCombat: UnarmedCombatTotal, toughness: ToughnessTotal, vitalityBase: Constitution * 5 + 15, athleticismBase: Constitution + Agility
+				bruteForce: BruteForceTotal, intimidate: IntimidateTotal, toughness: ToughnessTotal, vitalityBase: Constitution * 5 + 15, athleticismBase: Constitution + Agility
 		});
 	});
 });
@@ -901,7 +901,7 @@ on("change:coordination_base change:wit_base ", function(eventInfo) {
 });
 
 
-	on('clicked:bruteForce-action clicked:unarmedCombat-action clicked:toughness-action clicked:crafting-action clicked:generalKnowledge-action clicked:arcaneKnowledge-action clicked:vehicleHandling-action clicked:reflex-action clicked:finesse-action clicked:stealth-action clicked:contacts-action clicked:trickery-action clicked:survival-action clicked:rangedCombat-action clicked:sharpSenses-action clicked:charisma-action clicked:starHeritage-action clicked:willpower-action', async (eventInfo) => {
+	on('clicked:bruteForce-action clicked:intimidate-action clicked:toughness-action clicked:crafting-action clicked:generalKnowledge-action clicked:arcaneKnowledge-action clicked:vehicleHandling-action clicked:reflex-action clicked:finesse-action clicked:stealth-action clicked:contacts-action clicked:trickery-action clicked:survival-action clicked:rangedCombat-action clicked:sharpSenses-action clicked:charisma-action clicked:starHeritage-action clicked:willpower-action', async (eventInfo) => {
 		console.log(" Clicked ---action");
 		console.log("  triggerName " + eventInfo.triggerName);
 		
@@ -911,7 +911,7 @@ on("change:coordination_base change:wit_base ", function(eventInfo) {
 
 		switch (eventInfo.triggerName) {
 			case "clicked:bruteforce-action": Attribute = "bruteforce"; AttributeName = "Brute Force"; AttributeBase = "bruteForceBase";  break;
-			case "clicked:unarmedcombat-action": Attribute = "unarmedcombat"; AttributeName = "Unarmed Combat"; AttributeBase = "unarmedCombatBase";  break;
+			case "clicked:intimidate-action": Attribute = "intimidate"; AttributeName = "Intimidate"; AttributeBase = "intimidateBase";  break;
 			case "clicked:toughness-action": Attribute = "toughness"; AttributeName = "Toughness"; AttributeBase = "bruteForceBase";  break;
 			case "clicked:crafting-action": Attribute = "crafting"; AttributeName = "Crafting"; AttributeBase = "craftingBase";  break;
 			case "clicked:generalknowledge-action": Attribute = "generalKnowledge"; AttributeName = "General Knowledge"; AttributeBase = "generalKnowledgeBase";  break;
