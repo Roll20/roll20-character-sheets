@@ -23,6 +23,11 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Jul 26, 2025
+- Resolved a few niggling issue with skills
+  - Sleight of Hand had a mismatch in attribute name for the selected ability modifier
+  - Engineering had the wrong value in the selected attribute drop-down selected by default
+
 ### Jul 20, 2025
 - Added Collapse/Expand button for all skills, so a single click closes/opens them all
 - Added collapsing section for giving held items a description to prevent continuous cross-referencing
