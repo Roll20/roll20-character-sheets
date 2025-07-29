@@ -1,4 +1,4 @@
-/* COF2e v1.6.0 */
+/* COF2e v1.7.0 */
 
 @import url('https://fonts.googleapis.com/css?family=Merriweather+Sans&display=swap');
 
@@ -76,6 +76,14 @@ summary h4 {
   display: inline;
 }
 
+.cofmain textarea {
+  resize: vertical;
+}
+
+.cofmain textarea.no-resize {
+  resize: none;
+}
+
 .cofmain textarea.xx-large {
   height: 24rem;
 }
@@ -140,12 +148,14 @@ option.optgroup {
   --cof-font: "Merriweather Sans", "Verdana";
   --cof-color: burlywood;
   --cof-dark: #3d3121;
+  --cof-light: whitesmoke;
   --cof-hilite: #6f5b41;
+  --cof-click: tomato;
 
   /* General Styles */
   width: 100%;
   min-width: 850px;
-  background-color: whitesmoke;
+  background-color: var(--cof-light);
   border: 1px solid black;
   border-radius: 10px;
   margin: 5px;
@@ -256,7 +266,8 @@ span.img-btn-xl {
 }
 
 .img-btn:hover {
-  color: tomato;
+  color: var(--cof-click);
+  transition: all 0.2s ease;
 }
 
 img.bubble-img {
@@ -264,9 +275,10 @@ img.bubble-img {
 }
 
 img.bubble-img:hover {
-  width: 20px;
-  background-color: tomato;
+  transform: scale(1.5);
+  background-color: var(--cof-click);
   border-radius: 100%;
+  transition: all 0.2s ease;
 }
 
 /* Action button as Roll button */
@@ -294,7 +306,8 @@ button[type="action"].block-title {
 }
 
 button[type="action"].block-title:hover {
-  background-color: gray;
+  color: var(--cof-click);
+  transition: all 0.1s ease;
 }
 
 /* General Layout */
@@ -396,6 +409,9 @@ div.path div.block-title {
 .cofmain .heading .token {
   width: 100%;
 }
+.cofmain .heading input[value="0"].token-mod ~ div.token-mod {
+  display: none;
+}
 
 .identity input[type="text"] {
   border-bottom: dashed 1px;
@@ -482,6 +498,7 @@ input[value="0"].pc-skills-btn ~ button.pc-skills-btn {
 .pc-otact-subtab,
 .pc-hands-subtab,
 .pc-rolls-subtab,
+.pc-master-subtab,
 .pc-skills-subtab,
 .pc-buffs-subtab,
 .pc-import-subtab,
@@ -502,6 +519,7 @@ input[value="0"].pc-skills-btn ~ button.pc-skills-btn {
 .tabs-toggle[value="hands"] ~ div .pc-hands-btn,
 .tabs-toggle[value="abilities"] ~ div .pc-abilities-btn,
 .tabs-toggle[value="rolls"] ~ div .pc-rolls-btn,
+.tabs-toggle[value="master"] ~ div .pc-master-btn,
 .tabs-toggle[value="skills"] ~ div .pc-skills-btn,
 .tabs-toggle[value="buffs"] ~ div .pc-buffs-btn,
 .tabs-toggle[value="import"] ~ div .pc-import-btn,
@@ -528,6 +546,7 @@ input[value="0"].pc-skills-btn ~ button.pc-skills-btn {
 .tabs-toggle[value="hands"] ~ div.pc-hands-subtab,
 .tabs-toggle[value="abilities"] ~ div.pc-abilities-tab,
 .tabs-toggle[value="rolls"] ~ div.pc-rolls-subtab,
+.tabs-toggle[value="master"] ~ div.pc-master-subtab,
 .tabs-toggle[value="skills"] ~ div.pc-skills-subtab,
 .tabs-toggle[value="buffs"] ~ div.pc-buffs-subtab,
 .tabs-toggle[value="import"] ~ div.pc-import-subtab,
@@ -574,6 +593,10 @@ input[value="1"].init-agi ~ div.init-agi {
 
 input[value="1"].bouclier-malus ~ div.bouclier-malus {
   display: block;
+}
+
+input[value="0"].arme-label + span.arme-label {
+  display: none;
 }
 
 .cofmancer .type-pol,
@@ -666,7 +689,7 @@ div.change-view {
 
 .pc-attributes .hits input[value="black"].pv-status ~ div.pv-color {
   background-color: firebrick;
-  color: whitesmoke;
+  color: var(--cof-light);
 }
 
 .pc-attributes .hit,
@@ -728,6 +751,11 @@ div.change-view {
   border-color: orange;
   border-width: 2px;
   border-style: dashed;
+  transition: all 0.2s ease-in-out;
+}
+
+input[type="hidden"][value="1"].has-buff + .has-buff {
+  font-weight: bolder;
 }
 
 .pc-luck-rd .luck {
@@ -758,6 +786,7 @@ div.change-view {
 .pc-otact-subtab,
 .pc-hands-subtab,
 .pc-rolls-subtab,
+.pc-master-subtab,
 .pc-skills-subtab,
 .pc-buffs-subtab,
 .pc-import-subtab {
@@ -925,6 +954,7 @@ button.spell-concentration {
 .weapon-opt textarea.one-row,
 .abilities .path textarea.one-row,
 .abilities .rank textarea.one-row,
+.pc-abilities-tab .pc-master-subtab textarea.one-row,
 .pc-roll-r1 textarea.one-row,
 .pc-gears .gears textarea.one-row,
 .pc-gears .ammos textarea.one-row,
@@ -938,6 +968,7 @@ button.spell-concentration {
   margin: 0;
   height: 2rem;
   resize: vertical;
+  transition: all 0.2s ease;
 }
 
 .weapon button[type="action"].float-right {
@@ -958,6 +989,7 @@ button.spell-concentration {
 .weapon-opt textarea.one-row:focus,
 .abilities .rank textarea.one-row:focus,
 .abilities .path textarea.one-row:focus,
+.pc-abilities-tab .pc-master-subtab textarea.one-row:focus,
 .pc-roll-r1 textarea.one-row:focus,
 .pc-gears .gears textarea.one-row:focus,
 .pc-gears .ammos textarea.one-row:focus,
@@ -1048,16 +1080,24 @@ input[value="0"].show-paths-789 ~ div.abilities {
   border: 1px dotted var(--cof-dark);
 }
 
+.pc-script-tab div.pc-configs {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  gap: 2px;
+}
+
 .pc-version-tab details ul {
   padding-left: 0;
   margin-left: 10px;
 }
 
-.pc-version-tab details li {
-  font-size: smaller;
+.pc-version-tab details li,
+.pc-version-tab details li em {
+  font-size: small;
 }
 
-.npc-config-tab .npc-configs {
+.npc-config-tab .npc-configs,
+.npc-script-tab .npc-configs {
   display: grid;
   grid-template-columns: 25% 75%;
   gap: 2px;

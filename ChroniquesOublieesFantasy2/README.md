@@ -6,9 +6,20 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.6.0 [Screenshot](cof2e.png)
+v1.7.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.7.0_ (2025-07-27)
+
+- Sous-onglet _Maîtrises_ dans l'onglet _Capacités_ pour les langues et les maîtrises spéciales d'armes / armures
+- Ajout d'un popup Roll20 sur le bouton DR pour choisir Récupération _Rapide_ ou _Complète_ ou _Se dépasser_
+- Ajout de la possibilité d'indiquer _jet:N_ dans le champ _Spécial_ d'une attaque de PNJ pour afficher la description du jet correspondant dans le chat Roll20
+- Ajout d'une option _Token Mod_ dans l'onglet Script pour permettre aux joueurs d'interagir avec le token de leur personnage
+  - Redimensionnement du token et liaison par défaut des barres aux attributs
+  - Application optionnelle d'un marker lorsque les PV tombent à 0
+  - Application optionnelle d'un marker avec compteur de PC restants
+  - Application optionnelle de markers selon les états préjudiciables subis
 
 ### Version _1.6.0_ (2025-06-22)
 
