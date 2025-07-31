@@ -235,6 +235,29 @@
       </div>
     </div>
 
+        <script id="✓ CALC : Display Page" type="text/worker">
+      on("sheet:opened change:changepage", function () {
+        getAttrs(["changepage"], function (values) {
+          const selectedPage = values.changepage || "sheet-base";
+
+          const pageMap = {
+            "sheet-base": "sheet-base-display",
+            "sheet-vehicle": "sheet-vehicle-display",
+            "sheet-notes": "sheet-notes-display"
+          };
+
+          Object.keys(pageMap).forEach(pageKey => {
+            const element = $20(`.${pageMap[pageKey]}`);
+            if (selectedPage === pageKey) {
+              element.removeClass("sheet-hidden");
+            } else {
+              element.addClass("sheet-hidden");
+            }
+          });
+        });
+      });
+    </script>
+
         <!-- ----- ROLL STATUS -----  -->
     <div class="sheet-main-header-blank">
       <div class="sheet-standardbox sheet-standardbox11">
@@ -291,29 +314,6 @@
           <input class="sheet-cogs-input sheet-general-hideshow" type="checkbox" name="attr_sheet-general-hideshow" />
           <span class="sheet-cogs-icon">y</span>
         </div>
-
-    <script id="✓ CALC : Display Page" type="text/worker">
-      on("sheet:opened change:changepage", function () {
-        getAttrs(["changepage"], function (values) {
-          const selectedPage = values.changepage || "sheet-base";
-
-          const pageMap = {
-            "sheet-base": "sheet-base-display",
-            "sheet-vehicle": "sheet-vehicle-display",
-            "sheet-notes": "sheet-notes-display"
-          };
-
-          Object.keys(pageMap).forEach(pageKey => {
-            const element = $20(`.${pageMap[pageKey]}`);
-            if (selectedPage === pageKey) {
-              element.removeClass("sheet-hidden");
-            } else {
-              element.addClass("sheet-hidden");
-            }
-          });
-        });
-      });
-    </script>
     </div>
 
   <div class="sheet-maingrid-area sheet-base-display sheet-hidden">
@@ -1273,7 +1273,7 @@
               "clothing-hands-armorclass",
               "clothing-belt-armorclass",
               "clothing-legs-armorclass",
-              "clothing-feet-armorclass"
+              "clothing-feets-armorclass"
             ], function(values) {
               const base = 5;
               const dex = parseInt(values["dex"], 10) || 0;
@@ -1287,7 +1287,7 @@
                 "clothing-hands-armorclass",
                 "clothing-belt-armorclass",
                 "clothing-legs-armorclass",
-                "clothing-feet-armorclass"
+                "clothing-feets-armorclass"
               ];
 
               const armorTotal = armorPieces.reduce((total, attr) => {
@@ -1430,6 +1430,18 @@
             </div>
           </div>
         </div>
+
+        <script id="✓ - CALC : Initiative = 1 + dex" type="text/worker">
+  on("sheet:opened change:dex", function () {
+    getAttrs(["dex"], function(values) {
+      const dex = parseInt(values.dex) || 0;
+      const initiative = 1 + dex;
+
+      setAttrs({ initiative });
+    });
+  });
+</script>
+
 
         <!-- HIT DIE -->
         <div class="sheet-standardbox sheet-standardbox12">
@@ -2037,7 +2049,7 @@
 
             <fieldset class="repeating_weapons">
               <div class="sheet-weapons-row1">
-                <button type="roll" class="sheet-button-attack" name="roll_talent" value="@{global-privacy-status} &{template:dzapocalypse} {{name=@{weapon_name}}} {{charactername=@{character_name}}} {{category=Weapon}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{weapon_hitmod}]]}} {{roll1=[[1d20+@{weapon_hitmod}]]}} {{roll2=[[1d20+@{weapon_hitmod}]]}} {{range=@{weapon_range}}} {{dmg1=[[@{weapon_dmg}+@{weapon_type_selector}]]}} {{dmg1type=@{weapon_dmgtype_selector}}} {{description=@{weapons-description}}} {{button=@{weapon-button}}} {{desc=[[1]]}}"></button>
+                <button type="roll" class="sheet-button-attack" name="roll_talent" value="@{global-privacy-status} &{template:dzapocalypse} {{name=@{weapon_name}}} {{charactername=@{character_name}}} {{category=Weapon}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{weapon_hitmod}+@{pb}]]}} {{roll1=[[1d20+@{weapon_hitmod}+@{pb}]]}} {{roll2=[[1d20+@{weapon_hitmod}+@{pb}]]}} {{range=@{weapon_range}}} {{dmg1=[[@{weapon_dmg}+@{weapon_type_selector}]]}} {{dmg1type=@{weapon_dmgtype_selector}}} {{description=@{weapons-description}}} {{button=@{weapon-button}}} {{desc=[[1]]}}"></button>
                 <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_weapon-button" />
                 <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:dzapocalypse-description} {{name=Details}} {{description=@{weapons-description}}} {{properties=@{weapons_properties}}} {{barrel=@{barrel_name}}} {{tactical1=@{tactical1_name}}} {{tactical2=@{tactical2_name}}} {{scope=@{scope_name}}} {{magazine=@{magazine_name}}}"></button>
                     
