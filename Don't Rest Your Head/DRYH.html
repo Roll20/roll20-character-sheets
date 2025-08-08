@@ -559,6 +559,60 @@ on("clicked:pcroll", function(event) {
 	});
 });
 
+on("clicked:upsort clicked:downsort", function(event) {
+	var field = event.htmlAttributes.value;
+	var direction = event.triggerName;
+	log(event);
+	getSectionIDs("repeating_nightmares", function(ids) {
+		var sorted = []; var ats = [];
+		log(ids); log(field);
+		if ( field == "creation" ) {
+			ids.sort(function(one,two) { 
+				if ( direction == "clicked:upsort" ) {
+					return one.localeCompare(two); 
+				} else {
+					return two.localeCompare(one); 
+				}
+			});
+			log(ids);
+			setSectionOrder("nightmares",ids);
+		} else {
+			for(i = 0; i < ids.length; i++) {
+				ats[i] = "repeating_nightmares_"+ids[i]+"_"+field;
+			}
+			getAttrs(ats, function(a) {
+				log(a);
+				if ( field == "name" ) {
+					ids.sort(function(one,two) { 
+						var first = a["repeating_nightmares_"+one+"_"+field].toLowerCase();
+						var second = a["repeating_nightmares_"+two+"_"+field].toLowerCase();
+						if ( direction == "clicked:upsort" ) {
+							return first.localeCompare(second); 
+						} else {
+							return second.localeCompare(first); 
+						}
+					});
+					log(ids);
+				} else if ( field == "pain" ) {
+					ids.sort(function(one,two) {
+						var first = Number(a["repeating_nightmares_"+one+"_"+field]);
+						var second = Number(a["repeating_nightmares_"+two+"_"+field]);
+						log(first+" vs "+second);
+						if ( direction == "clicked:upsort" ) {
+							return(first - second); 
+						} else {
+							return(second - first); 
+						}
+						
+					});
+					log(ids);
+				}
+				setSectionOrder("nightmares",ids);
+			});
+		}
+	});
+});
+
 </script>
 <div class="wrapper">
   <div class="modeblock">
@@ -860,6 +914,20 @@ on("clicked:pcroll", function(event) {
     <div class="header"><span data-i18n="Nightmares and Other Pains">Nightmares and Other Pains</span> 
     </div>
     <div class="nightmare-grid">
+      <div class="buttonbox"><b><span data-i18n="Sorting">Sorting</span> </b>
+        <button type="action" name="act_downsort" value="name"><span data-i18n="Name (ascending)">Name (ascending)</span> 
+        </button>
+        <button type="action" name="act_upsort" value="name"><span data-i18n="Name (descending)">Name (descending)</span> 
+        </button>
+        <button type="action" name="act_downsort" value="pain"><span data-i18n="Pain (ascending)">Pain (ascending)</span> 
+        </button>
+        <button type="action" name="act_upsort" value="pain"><span data-i18n="Pain (descending)">Pain (descending)</span> 
+        </button>
+        <button type="action" name="act_downsort" value="creation"><span data-i18n="Creation (ascending)">Creation (ascending)</span> 
+        </button>
+        <button type="action" name="act_upsort" value="creation"><span data-i18n="Creation (descending)">Creation (descending)</span> 
+        </button>
+      </div>
       <fieldset class="repeating_nightmares">
         <div class="nightmare-entry">
           <input type="text" name="attr_name"/>
