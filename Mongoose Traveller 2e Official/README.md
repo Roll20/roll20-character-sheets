@@ -108,6 +108,8 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Updated translation key for personal Armour for translations
 - Allow custom characteristics to be dragged to macro bar
 
+### Version 1.1.06
+- Added Robot tab to character sheet
 
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 
