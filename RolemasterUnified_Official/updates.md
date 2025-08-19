@@ -1,3 +1,10 @@
+# 2025-08-19
+
+- Display bonus when using 2 handed weapons
+- Add RRs for Arcane
+- Creature Skill roll updates
+  - Use the specific table when we can
+
 # 2025-08-12
 
 So after a short vacation... updates again!
