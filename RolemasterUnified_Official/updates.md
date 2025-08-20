@@ -1,3 +1,27 @@
+# 2025-08-12
+
+So after a short vacation... updates again!
+
+- DB:
+  - Add a DB Modifier - straight DB addtion (about 20 people have asked for
+        this, sorry it was so slow).
+  - Automatically update the DB Defense mode when it updates
+  - Autoamtically update DB when other fields change too
+- Update some specialisations for new books
+- Directed Spells use AP correctly when attacking
+- AP tracker displays (mirrors on Spell page)
+- New combat clears the 'free used' button
+- Automatically load missiles when using AP track.
+- Option for 2 handed weapons - add +10 bonus for them
+- After attack options - do things automatically after you attack
+  - Do nothing
+  - Clear AP
+  - Clear AP & End turn
+
+Known issues:
+- Specialised skills are not showing correctly in levelup
+- Refresh target isn't working correctly
+
 # 2025-07-22
 
 - Fix potential bug creating characters not using custom races.
@@ -8,8 +32,7 @@
 - First version of PC -> NPC generation.
 - PC token setting attempt #863.
 - Reorg some of the code to make it easier to find things.
-- Don't trigger potential race conditions updating proficiency bonuses.
-- Make the Dice icon larger and use the plain d10
+- Dont' trigger potential race conditions updating proficiency bonuses.
 
 # 2025-07-17
 
