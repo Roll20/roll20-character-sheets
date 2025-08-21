@@ -1,9 +1,15 @@
+# 2025-08-21
+
+- Fix parrymod and other(ob)mod for creatures
+- Show aptrack (the AP box) in the 4th box
+
 # 2025-08-19
 
 - Display bonus when using 2 handed weapons
 - Add RRs for Arcane
 - Creature Skill roll updates
   - Use the specific table when we can
+- New UI for critical rolls.
 
 # 2025-08-12
 
