@@ -59,24 +59,57 @@
 		<div class="core-panel">
 			<div class="characteristics">
 				<div class="characteristic-input-group hexagon">
-					<label data-i18n="might"></label>
+					<label data-characteristic="might" data-i18n="might"></label>
 					<input type="number" name="attr_might" />
 				</div>
 				<div class="characteristic-input-group hexagon">
-					<label data-i18n="agility"></label>
+					<label data-characteristic="agility" data-i18n="agility"></label>
 					<input type="number" name="attr_agility" />
 				</div>
 				<div class="characteristic-input-group hexagon">
-					<label data-i18n="reason"></label>
+					<label data-characteristic="reason" data-i18n="reason"></label>
 					<input type="number" name="attr_reason" />
 				</div>
 				<div class="characteristic-input-group hexagon">
-					<label data-i18n="intuition"></label>
+					<label data-characteristic="intuition" data-i18n="intuition"></label>
 					<input type="number" name="attr_intuition" />
 				</div>
 				<div class="characteristic-input-group hexagon">
-					<label data-i18n="presence"></label>
+					<label data-characteristic="presence" data-i18n="presence"></label>
 					<input type="number" name="attr_presence" />
+				</div>
+			</div>
+			<div class="roller-wrapper popup-wrapper">
+				<div class="overlay" data-popup-target="roller-wrapper"></div>
+				<div class="popup-content">
+					<h2>
+						<input type="hidden" class="characteristic-i18n-switch" name="attr_roller_characteristic" />
+						<span class="characteristic-i18n" data-i18n="might"></span>
+						<span class="characteristic-i18n" data-i18n="agility"></span>
+						<span class="characteristic-i18n" data-i18n="reason"></span>
+						<span class="characteristic-i18n" data-i18n="intuition"></span>
+						<span class="characteristic-i18n" data-i18n="presence"></span>
+						<span>Power Roll</span>
+					</h2>
+					<div class="roller-edge-bane-select">
+						<label>Double Bane</label>
+						<label>Bane</label>
+						<label></label>
+						<label>Edge</label>
+						<label>Double Edge</label>
+						<input type="radio" name="attr_roller_edge_bane" value="doubleBane" />
+						<input type="radio" name="attr_roller_edge_bane" value="bane" />
+						<input type="radio" name="attr_roller_edge_bane" value="" checked />
+						<input type="radio" name="attr_roller_edge_bane" value="edge" />
+						<input type="radio" name="attr_roller_edge_bane" value="doubleEdge" />
+					</div>
+					<div>
+						<label>Bonus or Penalty</label>
+						<input type="number" class="inner-spin" name="attr_roller_mod" />
+					</div>
+					<div>
+						<button type="action" name="act_powerroll">Roll!</button>
+					</div>
 				</div>
 			</div>
 			<div class="potencies">
@@ -182,20 +215,133 @@
 	<pre>This Draw Steel character sheet for Roll20 is an independent product published under the DRAW STEEL Creator License and is not affiliated with MCDM Productions, LLC. DRAW STEEL © 2024 MCDM Productions, LLC.</pre>
 </div>
 <rolltemplate class="sheet-rolltemplate-power">
-	<div class="sheet-template-title">
-		{{#char-name}}
-		<span>{{char-name}}: </span>
-		{{/char-name}}
-		<span> {{roll-type}}</span>
-		<span>{{roll}}</span>
-	</div>
 	<div class="sheet-template-body">
-		{{#rollGreater() computed::critical 0}}<div class="sheet-template-crit">Critical</div>{{/rollGreater() computed::critical 0}}
-		{{#rollLess() roll 12}}<div class="sheet-template-result">Tier 1 Result</div>{{/rollLess() roll 12}}
-		{{#rollBetween() roll 12 16}}<div class="sheet-template-result">Tier 2 Result</div>{{/rollBetween() roll 12 16}}
-		{{#rollGreater() roll 16}}<div class="sheet-template-result">Tier 3 Result</div>{{/rollGreater() roll 16}}
+		{{#rollGreater() computed::rawDice 18}}
+			<div class="sheet-template-crit">Critical</div>
+		{{/rollGreater() computed::rawDice 18}}
+		<div class="sheet-template-result">
+			Tier
+			{{computed::roll}}
+			Result
+		</div>
 	</div>
 </rolltemplate>
 <script type="text/worker">
-
+	function setActiveCharacterId(id) {
+		const ocid = getActiveCharacterId();
+		const data = {
+			id: '0',
+			type: 'setActiveCharacter',
+			data: id,
+		};
+		if (self.dispatchEvent) {
+			const event = new CustomEvent('message');
+			event.data = data;
+			self.dispatchEvent(event);
+		}
+		else {
+			self.onmessage({ data });
+		}
+		return ocid;
+	}
+	function getAttrsAsync(props) {
+		const acid = getActiveCharacterId();
+		let ocid = null;
+		return new Promise((resolve, reject) => {
+			ocid = setActiveCharacterId(acid);
+			try {
+				getAttrs(props, (values) => resolve(values));
+			}
+			catch {
+				reject();
+			}
+		}).finally(() => {
+			setActiveCharacterId(ocid);
+		});
+	}
+	function setAttrsAsync(props) {
+		const acid = getActiveCharacterId();
+		let ocid = null;
+		return new Promise((resolve, reject) => {
+			ocid = setActiveCharacterId(acid);
+			try {
+				setAttrs(props, undefined, (values) => resolve(values));
+			}
+			catch {
+				reject();
+			}
+		}).finally(() => {
+			setActiveCharacterId(ocid);
+		});
+	}
+	$20('.characteristic-input-group > label').on('click', async (e) => {
+		await setAttrsAsync({
+			roller_characteristic: e.htmlAttributes['data-characteristic'],
+			roller_edge_bane: '',
+			roller_mod: 0,
+		});
+		$20('.roller-wrapper').addClass('show');
+	});
+	$20('.overlay').on('click', (e) => {
+		$20(`.${e.htmlAttributes['data-popup-target']}`).removeClass('show');
+	});
+	on("clicked:powerroll", async () => {
+		const attrs = await getAttrsAsync([
+			'roller_characteristic', 'roller_edge_bane', 'roller_mod',
+			'might', 'agility', 'reason', 'intuition', 'presence',
+		]);
+		const characteristicValue = attrs[attrs.roller_characteristic];
+		const characteristicTranslation = getTranslationByKey(attrs.roller_characteristic);
+		const modifier = (() => {
+			if (!attrs.roller_mod) {
+				return '';
+			}
+			return attrs.roller_mod > 0
+				? ` + ${attrs.roller_mod} [Bonus]`
+				: ` - ${0 - attrs.roller_mod} [Penalty]`;
+		})();
+		const edgeBaneMod = (() => {
+			switch (attrs.roller_edge_bane) {
+				case 'bane':
+					return ' - 2 [Bane]';
+				case 'edge':
+					return ' + 2 [Edge]';
+				default:
+					return '';
+			}
+		})();
+		startRoll(
+			`&{template:power} {{roll=[[` +
+				`2d10 + ${characteristicValue} [${characteristicTranslation}]` +
+				modifier + edgeBaneMod +
+				`]]}} {{rawDice=[[0]]}} {{edgeBane=todo}}`,
+			(roll) => {
+				const doubleEdgeBane = (() => {
+					switch (attrs.roller_edge_bane) {
+						case 'doubleBane':
+							return -1;
+						case 'doubleEdge':
+							return 1;
+						default:
+							return 0;
+					}
+				})();
+				finishRoll(
+					roll.rollId,
+					{
+						rawDice: roll.results.roll.dice.reduce((sum, d) => sum + d, 0),
+						roll: (() => {
+							if (roll.results.roll.result >= 17) {
+								return Math.min(3 + doubleEdgeBane, 3);
+							}
+							if (roll.results.roll.result >= 12) {
+								return 2 + doubleEdgeBane;
+							}
+							return Math.max(1 + doubleEdgeBane, 1);
+						})(),
+					}
+				);
+			}
+		);
+	});
 </script>
