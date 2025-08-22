@@ -1,3 +1,8 @@
+# 2025-08-22
+
+- Emergency release to fix level up.
+- Disable the levelup summary which was most... broken.
+
 # 2025-08-21
 
 - Fix parrymod and other(ob)mod for creatures
