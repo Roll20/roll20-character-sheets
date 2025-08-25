@@ -1,3 +1,31 @@
+# 2025-08-26
+
+- Creatures
+  - Take AP penalties on attacks
+  - Arcane RRs for new creatures
+- Force RR update to get Arcane RRs for PCs
+- Sheet Load / Init
+  - On version check, pass in sheet version
+  - Make sure we check pending functions
+  - Version 11
+  - Old creatures, force arcane update
+- Levelup
+  - Save the current and new level.   Avoids lots of async code to fetch it many times
+  - Display as a hidden text entry.  So works with jumpgate and traditional.
+  - Skills are now resiliant to unexpected fields
+  - Add some space on the left of items.  So much prettier.
+  - Re-enable the levelup summary.
+    - ~700 lines of tests on this thing
+  - Summary now has:
+    - Skills
+    - Stat gains
+    - Talents
+    - Spell lists
+- Tests
+  - setCharmancerText is now emulated
+  - addRepeatingSection is now emulated
+  - Fix second countrStatGains test being ignored.
+
 # 2025-08-22
 
 - Emergency release to fix level up.
