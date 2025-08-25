@@ -529,7 +529,6 @@
 		<textarea name="attr_forgesteel_json"></textarea>
 		<button type="action" name="act_import">Import</button>
 	</div>
-	<code>TODO: TOC?</code>
 	<div style="font-family: Menlo, Monaco, Consolas">This Draw Steel character sheet for Roll20 is an independent product published under the DRAW STEEL Creator License and is not affiliated with MCDM Productions, LLC. DRAW STEEL © 2024 MCDM Productions, LLC.</div>
 </div>
 <rolltemplate class="sheet-rolltemplate-power">
@@ -689,10 +688,14 @@
 					case 'Choice':
 						return x.data.selected;
 					case 'Domain':
-						return x.data.selected
-							.flatMap(y => y.featuresByLevel)
-							.filter(y => y.level <= level)
-							.flatMap(y => y.features);
+						return [
+							...x.data.selected
+								.map(y => ({ ...y, type: 'DomainChoice' })),
+							...x.data.selected
+								.flatMap(y => y.featuresByLevel)
+								.filter(y => y.level <= level)
+								.flatMap(y => y.features),
+						];
 					case 'Kit':
 						return x.data.selected
 							.flatMap(y => [
@@ -740,9 +743,11 @@
 			const classs = forgesteelData.class.name;
 			const career = forgesteelData.career.name;
 			const subclass = [
-				forgesteelData.class.subclassName,
-				...features.filter(x => x.type === 'Domain')
-					.flatMap(x => x.data.selected)
+				...forgesteelData.class.subclasses
+					.filter(x => x.selected)
+					.map(x => x.name),
+				...features
+					.filter(x => x.type === 'DomainChoice')
 					.map(x => x.name),
 			].join(', ');
 			const victories = forgesteelData.state.victories;
@@ -761,10 +766,49 @@
 			const presence = forgesteelData.class.characteristics
 				.find(x => x.characteristic === 'Presence').value;
 			const potency_strong = Math.max(might, agility, reason, intuition, presence);
-			// size not found?
-			// speed not found?
-			// disengage?
-			// stability?
+			const sizeObject = features.filter(x => x.type === 'Size')
+				.map(x => x.data.size)
+				[0]
+				?? { value: 1, mod: 'M' };
+			const size = `${sizeObject.value}${sizeObject.mod ?? ''}`;
+			const speed = [
+				features
+					.filter(x => x.type === 'Speed')
+					.map(x => x.data.speed)
+					[0]
+					?? 5,
+				...features
+					.filter(x => x.type === 'Bonus' && x.data.field === 'Speed')
+					.map(x => x.data.field.value),
+				Math.max(
+					...features
+						.filter(x => x.type === 'KitStats')
+						.map(x => x.speed),
+					0
+				),
+			].reduce((sum, speed) => sum + speed, 0);
+			const disengage = [
+				...features
+					.filter(x => x.type === 'Bonus' && x.data.field === 'Disengage')
+					.map(x => x.data.field.value),
+				Math.max(
+					...features
+						.filter(x => x.type === 'KitStats')
+						.map(x => x.disengage),
+					0
+				),
+			].reduce((sum, speed) => sum + speed, 0);
+			const stability = [
+				...features
+					.filter(x => x.type === 'Bonus' && x.data.field === 'Stability')
+					.map(x => x.data.field.value),
+				Math.max(
+					...features
+						.filter(x => x.type === 'KitStats')
+						.map(x => x.stability),
+					0
+				),
+			].reduce((sum, speed) => sum + speed, 0);
 			const stamina_max = [
 				...features
 					.filter(x => x.type === 'Bonus' && x.data.field === 'Stamina')
@@ -822,16 +866,18 @@
 			// biography
 			const career_incident = (() => {
 				const incidentOption = forgesteelData.career.incitingIncidents.options
-					.find(x => x.id === forgesteelData.career.selectedID);
+					.find(x => x.id === forgesteelData.career.incitingIncidents.selectedID);
 				return incidentOption
 					? `${incidentOption.name}\n${incidentOption.description}`
 					: '';
 			})();
 			const complication = forgesteelData.complication?.name ?? '';
 			const complication_benefit = forgesteelData.complication
-				?.features[0]?.description;
+				?.features[0]?.description
+				?? '';
 			const complication_drawback = forgesteelData.complication
-				?.features[1]?.description;
+				?.features[1]?.description
+				?? '';
 			const	culture_environment = forgesteelData.culture.environment.name;
 			const culture_environment_description = forgesteelData.culture.environment.description;
 			const culture_organization = forgesteelData.culture.organization.name;
@@ -911,6 +957,10 @@
 				potency_strong,
 				potency_average: potency_strong - 1,
 				potency_weak: potency_strong - 2,
+				size,
+				speed,
+				disengage,
+				stability,
 				stamina_max,
 				stamina_winded: Math.floor(stamina_max / 2),
 				stamina_dead: 0 - Math.floor(stamina_max / 2),
