@@ -349,7 +349,7 @@
 						<label class="sublabel" data-i18n="stamina"></label>
 					</div>
 					<label class="kit kit-damage-label sublabel" data-i18n="melee-weapon-damage"></label>
-					<textarea class="modifier-all modifier-description"></textarea>
+					<textarea class="modifier-all modifier-description" name="attr_modifier_description"></textarea>
 					<div class="kit input-group kit-melee-damage-1-input-group">
 						<input type="number" class="kit-melee-damage-1" name="attr_kit_melee_damage_1" />
 						<label class="sublabel">≤11</label>
@@ -591,6 +591,21 @@
 			setActiveCharacterId(ocid);
 		});
 	}
+	function getSectionIDsAsync(sectionName) {
+		const acid = getActiveCharacterId();
+		let ocid = null;
+		return new Promise((resolve, reject) => {
+			ocid = setActiveCharacterId(acid);
+			try {
+				getSectionIDs(sectionName, (values) => resolve(values));
+			}
+			catch {
+				reject();
+			}
+		}).finally(() => {
+			setActiveCharacterId(ocid);
+		});
+	}
 
 	/**
 	** roller start
@@ -729,6 +744,12 @@
 			forgesteelData.culture.upbringing,
 		];
 		return flattenFeatures(baseFeatures, level);
+	}
+	async function clearRepeatingSection(sectionName) {
+		const sectionIDs = await getSectionIDsAsync(sectionName);
+		for (const sectionID of sectionIDs) {
+			removeRepeatingRow(`repeating_${sectionName}_${sectionID}`);
+		}
 	}
 
 	on('clicked:import', async () => {
@@ -935,6 +956,35 @@
 					.flatMap(x => x.data.selected),
 			].join(', ');
 
+			const kits = features
+				.filter(x => x.type === 'KitStats')
+				.reduce(
+					(acc, x) => {
+						const id = generateRowID();
+						return {
+							...acc,
+							[`repeating_modifiers_${id}_modifier_name`]: x.name, 
+							[`repeating_modifiers_${id}_modifier_type`]: 'kit',
+							[`repeating_modifiers_${id}_kit_weapon`]: x.weapon.join(', '),
+							[`repeating_modifiers_${id}_kit_armor`]: x.armor.join(', '),
+							[`repeating_modifiers_${id}_kit_speed`]: x.speed,
+							[`repeating_modifiers_${id}_kit_melee_distance`]: x.meleeDistance,
+							[`repeating_modifiers_${id}_kit_ranged_distance`]: x.rangedDistance,
+							[`repeating_modifiers_${id}_kit_disengage`]: x.disengage,
+							[`repeating_modifiers_${id}_kit_stability`]: x.stability,
+							[`repeating_modifiers_${id}_kit_stamina`]: x.stamina,
+							[`repeating_modifiers_${id}_kit_melee_damage_1`]: x.meleeDamage?.tier1 ?? '',
+							[`repeating_modifiers_${id}_kit_melee_damage_2`]: x.meleeDamage?.tier2 ?? '',
+							[`repeating_modifiers_${id}_kit_melee_damage_3`]: x.meleeDamage?.tier3 ?? '',
+							[`repeating_modifiers_${id}_kit_ranged_damage_1`]: x.rangedDamage?.tier1 ?? '',
+							[`repeating_modifiers_${id}_kit_ranged_damage_2`]: x.rangedDamage?.tier2 ?? '',
+							[`repeating_modifiers_${id}_kit_ranged_damage_3`]: x.rangedDamage?.tier3 ?? '',
+							[`repeating_modifiers_${id}_modifier_description`]: x.description,
+						}
+					},
+					{}
+				);
+
 			const newAttrs = {
 				forgesteel_json: '',
 				// core
@@ -988,9 +1038,11 @@
 				skills_intrigue,
 				skills_lore,
 				languages,
+				...kits,
 			};
 			console.log('import attributes', newAttrs);
 
+			await clearRepeatingSection('modifiers');
 			await setAttrsAsync(newAttrs);
 		}
 		catch (e) {
