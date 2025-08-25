@@ -513,9 +513,10 @@
 			<label for="import-minimize-checkbox">Minimize Panel</label>
 		</div>
 		<div class="minimize-show">
-			<h5 data-i18n="import"></h5>
+			<h5>Import</h5>
 		</div>
-		<code>TODO: import</code>
+		<textarea name="attr_forgesteel_json"></textarea>
+		<button type="action" name="act_import">Import</button>
 	</div>
 	<code>TODO: TOC?</code>
 	<div style="font-family: Menlo, Monaco, Consolas">This Draw Steel character sheet for Roll20 is an independent product published under the DRAW STEEL Creator License and is not affiliated with MCDM Productions, LLC. DRAW STEEL © 2024 MCDM Productions, LLC.</div>
@@ -580,6 +581,10 @@
 			setActiveCharacterId(ocid);
 		});
 	}
+
+	/**
+	** roller start
+	**/
 	$20('.characteristic-input-group > label').on('click', async (e) => {
 		await setAttrsAsync({
 			roller_characteristic: e.htmlAttributes['data-characteristic'],
@@ -591,7 +596,7 @@
 	$20('.overlay').on('click', (e) => {
 		$20(`.${e.htmlAttributes['data-popup-target']}`).removeClass('show');
 	});
-	on("clicked:powerroll", async () => {
+	on('clicked:powerroll', async () => {
 		const attrs = await getAttrsAsync([
 			'roller_characteristic', 'roller_edge_bane', 'roller_mod',
 			'might', 'agility', 'reason', 'intuition', 'presence',
@@ -650,4 +655,288 @@
 			}
 		);
 	});
+	/**
+	** roller end
+	**/
+
+	/**
+	** import start
+	**/
+	function flattenFeatures(features, level) {
+		const deepFeatureTypes = [
+			'Choice',
+			'Domain',
+			'Kit',
+			'Multiple Features',
+		];
+		if (!features.some(x => deepFeatureTypes.includes(x.type))) {
+			return features;
+		}
+		const flatFeatures = features
+			.flatMap(x => {
+				switch (x.type) {
+					case 'Choice':
+						return x.data.selected;
+					case 'Domain':
+						return x.data.selected
+							.flatMap(y => y.featuresByLevel)
+							.filter(y => y.level <= level)
+							.flatMap(y => y.features);
+					case 'Kit':
+						return x.data.selected
+							.flatMap(y => [
+								{ ...y, type: 'KitStats', features: undefined },
+								...y.features,
+							]);
+					case 'Multiple Features':
+						return x.data.features;
+					default:
+						return x;
+				}
+			});
+		return flattenFeatures(flatFeatures, level);
+	}
+	function getFeatures(forgesteelData) {
+		const level = forgesteelData.class.level;
+		const baseFeatures = [
+			...forgesteelData.features,
+			...forgesteelData.ancestry.features,
+			...forgesteelData.career.features,
+			...forgesteelData.class
+				.featuresByLevel.filter(x => x.level <= level)
+				.flatMap(x => x.features),
+			...forgesteelData.class
+				.subclasses.filter(x => x.selected)
+				.flatMap(x => x.featuresByLevel)
+				.filter(x => x.level <= level)
+				.flatMap(x => x.features),
+			forgesteelData.culture.environment,
+			forgesteelData.culture.organization,
+			forgesteelData.culture.upbringing,
+		];
+		return flattenFeatures(baseFeatures, level);
+	}
+
+	on('clicked:import', async () => {
+		const { forgesteel_json } = await getAttrsAsync(['forgesteel_json']);
+		try {
+			const forgesteelData = JSON.parse(forgesteel_json);
+
+			const features = getFeatures(forgesteelData);
+
+			const character_name = forgesteelData.name;
+			const ancestry = forgesteelData.ancestry.name;
+			const classs = forgesteelData.class.name;
+			const career = forgesteelData.career.name;
+			const subclass = [
+				forgesteelData.class.subclassName,
+				...features.filter(x => x.type === 'Domain')
+					.flatMap(x => x.data.selected)
+					.map(x => x.name),
+			].join(', ');
+			const victories = forgesteelData.state.victories;
+			const level = forgesteelData.class.level;
+			const wealth = forgesteelData.state.wealth;
+			const renown = forgesteelData.state.renown;
+			const experience = forgesteelData.state.xp;
+			const might = forgesteelData.class.characteristics
+				.find(x => x.characteristic === 'Might').value;
+			const agility = forgesteelData.class.characteristics
+				.find(x => x.characteristic === 'Agility').value;
+			const reason = forgesteelData.class.characteristics
+				.find(x => x.characteristic === 'Reason').value;
+			const intuition = forgesteelData.class.characteristics
+				.find(x => x.characteristic === 'Intuition').value;
+			const presence = forgesteelData.class.characteristics
+				.find(x => x.characteristic === 'Presence').value;
+			const potency_strong = Math.max(might, agility, reason, intuition, presence);
+			// size not found?
+			// speed not found?
+			// disengage?
+			// stability?
+			const stamina_max = [
+				...features
+					.filter(x => x.type === 'Bonus' && x.data.field === 'Stamina')
+					.map(x => x.data.value + ((level - 1) * x.data.valuePerLevel)),
+				Math.max(
+					...features
+						.filter(x => x.type === 'KitStats')
+						.map(x => Math.floor((level + 2) / 3) * x.stamina),
+					0
+				),
+			].reduce((sum, stamina) => sum + stamina, 0);
+			const recoveries_max = [
+				...features
+					.filter(x => x.type === 'Bonus' && x.data.field === 'Recoveries')
+					.map(x => x.data.value),
+			].reduce((sum, recoveries) => sum + recoveries, 0);
+			const damageTypes = [
+				'Acid',
+				'Cold',
+				'Corruption',
+				'Fire',
+				'Holy',
+				'Lightning',
+				'Poison',
+				'Psychic',
+				'Sonic',
+			];
+			const immunity = damageTypes
+				.map(damageType => {
+					const amount = features
+						.filter(x => x.type === 'Damage Modifier')
+						.flatMap(x => x.data.modifiers)
+						.filter(x => x.damageType === damageType && x.type === 'Immunity')
+						.map(x => x.value + ((level - 1) * x.valuePerLevel))
+						.reduce((sum, value) => sum + value, 0)
+					return { damageType, amount };
+				})
+				.filter(({ amount }) => amount)
+				.map(({ damageType, amount }) => `${damageType} ${amount}`)
+				.join(', ');
+			const weakness = damageTypes
+				.map(damageType => {
+					const amount = features
+						.filter(x => x.type === 'Damage Modifier')
+						.flatMap(x => x.data.modifiers)
+						.filter(x => x.damageType === damageType && x.type === 'Weakness')
+						.map(x => x.value + ((level - 1) * x.valuePerLevel))
+						.reduce((sum, value) => sum + value, 0)
+					return { damageType, amount };
+				})
+				.filter(({ amount }) => amount)
+				.map(({ damageType, amount }) => `${damageType} ${amount}`)
+				.join(', ');
+			const resource_name = features.find(x => x.type === 'Heroic Resource').name;
+			// biography
+			const career_incident = (() => {
+				const incidentOption = forgesteelData.career.incitingIncidents.options
+					.find(x => x.id === forgesteelData.career.selectedID);
+				return incidentOption
+					? `${incidentOption.name}\n${incidentOption.description}`
+					: '';
+			})();
+			const complication = forgesteelData.complication?.name ?? '';
+			const complication_benefit = forgesteelData.complication
+				?.features[0]?.description;
+			const complication_drawback = forgesteelData.complication
+				?.features[1]?.description;
+			const	culture_environment = forgesteelData.culture.environment.name;
+			const culture_environment_description = forgesteelData.culture.environment.description;
+			const culture_organization = forgesteelData.culture.organization.name;
+			const culture_organization_description = forgesteelData.culture.organization.description;
+			const culture_upbringing = forgesteelData.culture.upbringing.name;
+			const culture_upbringing_description = forgesteelData.culture.upbringing.description;
+			// skills and languages
+			const skills_crafting = features
+				.filter(x => x.type === 'Skill Choice')
+				.flatMap(x => x.data.selected)
+				.filter(x => [
+					'Alchemy', 'Architecture', 'Blacksmithing', 'Carpentry', 'Cooking',
+					'Fletching', 'Forgery', 'Jewelry', 'Mechanics', 'Tailoring',
+				].includes(x))
+				.join(', ');
+			const skills_exploration = features
+				.filter(x => x.type === 'Skill Choice')
+				.flatMap(x => x.data.selected)
+				.filter(x => [
+					'Climb', 'Drive', 'Endurance', 'Gymnastics', 'Heal',
+					'Jump', 'Lift', 'Navigate', 'Ride', 'Swim',
+				].includes(x))
+				.join(', ');
+			const skills_interpersonal = features
+				.filter(x => x.type === 'Skill Choice')
+				.flatMap(x => x.data.selected)
+				.filter(x => [
+					'Brag', 'Emphathize', 'Flirt', 'Gamble', 'Handle Animals',
+					'Interrogate', 'Intimidate', 'Lead', 'Lie', 'Music',
+					'Perform', 'Persuade', 'Read Person',
+				].includes(x))
+				.join(', ');
+			const skills_intrigue = features
+				.filter(x => x.type === 'Skill Choice')
+				.flatMap(x => x.data.selected)
+				.filter(x => [
+					'Alertness', 'Conceal Object', 'Disguise', 'Eavesdrop',
+					'Escape Artist', 'Hide', 'Pick Lock', 'Pick Pocket', 'Sabotage',
+					'Search', 'Sneak', 'Track',
+				].includes(x))
+				.join(', ');
+			const skills_lore = features
+				.filter(x => x.type === 'Skill Choice')
+				.flatMap(x => x.data.selected)
+				.filter(x => [
+					'Criminal Underworld', 'Culture', 'History', 'Magic', 'Monsters',
+					'Nature', 'Psionics', 'Religion', 'Rumors', 'Society',
+					'Strategy', 'Timescape',
+				].includes(x))
+				.join(', ');
+			const languages = [
+				...forgesteelData.culture.languages,
+				...features
+					.filter(x => x.type === 'Language Choice')
+					.flatMap(x => x.data.selected),
+			].join(', ');
+
+			const newAttrs = {
+				forgesteel_json: '',
+				// core
+				character_name,
+				ancestry,
+				class: classs,
+				career,
+				subclass,
+				victories,
+				level,
+				wealth,
+				renown,
+				experience,
+				// stats
+				might,
+				agility,
+				reason,
+				intuition,
+				presence,
+				potency_strong,
+				potency_average: potency_strong - 1,
+				potency_weak: potency_strong - 2,
+				stamina_max,
+				stamina_winded: Math.floor(stamina_max / 2),
+				stamina_dead: 0 - Math.floor(stamina_max / 2),
+				recoveries_max,
+				recovery_amount: Math.floor(stamina_max / 3),
+				immunity,
+				weakness,
+				resource_name,
+				surge_damage: potency_strong,
+				// biography
+				career_incident,
+				complication,
+				complication_benefit,
+				complication_drawback,
+				culture_environment,
+				culture_environment_description,
+				culture_organization,
+				culture_organization_description,
+				culture_upbringing,
+				culture_upbringing_description,
+				// skills and languages
+				skills_crafting,
+				skills_exploration,
+				skills_interpersonal,
+				skills_intrigue,
+				skills_lore,
+				languages,
+			};
+			console.log('import attributes', newAttrs);
+
+			await setAttrsAsync(newAttrs);
+		}
+		catch (e) {
+			console.error(e);
+		}
+	});
+	/**
+	** import end
+	**/
 </script>
