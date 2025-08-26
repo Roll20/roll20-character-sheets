@@ -415,7 +415,7 @@
 						<span>+</span>
 						<input type="text" class="power-roll-characteristic" data-i18n-placeholder="might-or-agility" name="attr_ranged_free_strike_characteristic" />
 					</div>
-					<label class="sublabel">≤11</label>
+					<label class="sublabel">≤ 11</label>
 					<input type="text" class="power-roll-tier-effect" name="attr_ranged_free_strike_tier_1" />
 					<label class="sublabel">12-16</label>
 					<input type="text" class="power-roll-tier-effect" name="attr_ranged_free_strike_tier_2" />
@@ -427,6 +427,10 @@
 		<fieldset class="repeating_abilities">
 			<div class="ability-card">
 				<input type="text" class="ability-name" data-i18n-placeholder="ability-name" name="attr_ability_name" />
+				<button type="action" data-i18n-title="ability-share" name="act_share">
+					<!-- speech balloon -->
+					&#128172;
+				</button>
 				<div class="ability-cost-input-group">
 					<label data-i18n="ability-cost"></label>
 					<input type="number" name="attr_ability_cost" />
@@ -452,7 +456,7 @@
 						<span>+</span>
 						<input type="text" class="power-roll-characteristic" name="attr_ability_characteristic" />
 					</div>
-					<label class="sublabel">≤11</label>
+					<label class="sublabel">≤ 11</label>
 					<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_1" />
 					<label class="sublabel">12-16</label>
 					<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_2" />
@@ -517,6 +521,52 @@
 		<div class="powerroll-tier">
 			Result: Tier {{computed::tier}}
 		</div>
+	</div>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-ability">
+	<div class="template-container">
+		<div class="header">{{name}}</div>
+		<div class="description">{{description}}</div>
+		<div class="meta-row">
+			<div class="keywords">{{keywords}}</div>
+			<div class="action-type">{{type}}</div>
+		</div>
+		<div class="action-row">
+			<div class="distance">
+				<!-- triangle-ruler -->
+				 &#128208;{{distance}}
+			</div>
+			<div class="target">
+				<!-- bullseye -->
+				 &#127919;{{target}}
+			</div>
+		</div>
+		{{#rollTotal() hasPowerRoll 1}}
+		<div class="stat-row">
+			<div class="roll-label">{{powerRoll}}:</div>
+			<span class="roll">2d10 + {{characteristic}}</span>
+		</div>
+		<div class="tiers">
+			<div class="tier">
+				<span class="range">≤ 11</span>
+				<span class="damage">{{tier1}}</span>
+			</div>
+			<div class="tier">
+				<span class="range">12–16</span>
+				<span class="damage">{{tier2}}</span>
+			</div>
+			<div class="tier">
+				<span class="range">17+</span>
+				<span class="damage">{{tier3}}</span>
+			</div>
+		</div>
+		{{/rollTotal() hasPowerRoll 1}}
+		{{#rollTotal() hasEffect 1}}
+		<div class="effect-block">
+			<div class="effect-label">Effect:</div>
+			<div class="effect-text">{{effect}}</div>
+		</div>
+		{{/rollTotal() hasEffect 1}}
 	</div>
 </rolltemplate>
 <script type="text/worker">
@@ -625,6 +675,52 @@
 			const tier = Math.max(1, Math.min(3, tierBase + tierMod));
 			finishRoll(rollId, { tier });
 		});
+	});
+
+	on('clicked:repeating_abilities:share', async (event) => {
+		const attributeNames = [
+			'ability_name', 'ability_cost', 'ability_description', 'ability_keywords',
+			'ability_type', 'ability_distance', 'ability_target', 'ability_trigger',
+			'has_power_roll', 'ability_characteristic',
+			'ability_tier_1', 'ability_tier_2', 'ability_tier_3', 'ability_effect',
+		];
+		const attrs = await getAttrsAsync(
+			attributeNames.map(x => `repeating_abilities_${x}`)
+		);
+		const id = event.sourceAttribute.split('_')[2];
+
+		const directMap = {
+			name: attrs.repeating_abilities_ability_name,
+			cost: attrs.repeating_abilities_ability_cost,
+			description: attrs.repeating_abilities_ability_description,
+			keywords: attrs.repeating_abilities_ability_keywords,
+			distance: attrs.repeating_abilities_ability_distance,
+			target: attrs.repeating_abilities_ability_target,
+			characteristic: attrs.repeating_abilities_ability_characteristic,
+			tier1: attrs.repeating_abilities_ability_tier_1,
+			tier2: attrs.repeating_abilities_ability_tier_2,
+			tier3: attrs.repeating_abilities_ability_tier_3,
+			effect: attrs.repeating_abilities_ability_effect,
+		};
+		const translateMap = {
+			type: attrs.repeating_abilities_ability_type,
+		};
+		const rollValueMap = {
+			hasPowerRoll: attrs.repeating_abilities_has_power_roll === 'on'
+				? 1 : 0,
+			hasEffect: attrs.repeating_abilities_ability_effect
+				? 1 : 0,
+		};
+		const roll = `&{template:ability} `
+			+ '{{powerRoll=^{power-roll}}} '
+			+ Object.entries(directMap)
+				.map(([key, value]) => `{{${key}=${value}}} `)
+			+ Object.entries(translateMap)
+				.map(([key, value]) => `{{${key}=^{${value}}}} `)
+			+ Object.entries(rollValueMap)
+				.map(([key, value]) => `{{${key}=[[${value}]]}} `);
+		console.log('ability values', roll);
+		startRoll(roll, ({ rollId }) => finishRoll(rollId));
 	});
 
 	/**
