@@ -541,6 +541,12 @@
 				 &#127919;{{target}}
 			</div>
 		</div>
+		{{#rollTotal() hasTrigger 1}}
+		<div class="effect-block">
+			<div class="effect-label">Trigger:</div>
+			<div class="effect-text">{{trigger}}</div>
+		</div>
+		{{/rollTotal() hasTrigger 1}}
 		{{#rollTotal() hasPowerRoll 1}}
 		<div class="stat-row">
 			<div class="roll-label">{{powerRoll}}:</div>
@@ -678,24 +684,28 @@
 	});
 
 	on('clicked:repeating_abilities:share', async (event) => {
-		const attributeNames = [
+		const abilityAttributeNames = [
 			'ability_name', 'ability_cost', 'ability_description', 'ability_keywords',
 			'ability_type', 'ability_distance', 'ability_target', 'ability_trigger',
 			'has_power_roll', 'ability_characteristic',
 			'ability_tier_1', 'ability_tier_2', 'ability_tier_3', 'ability_effect',
 		];
-		const attrs = await getAttrsAsync(
-			attributeNames.map(x => `repeating_abilities_${x}`)
-		);
-		const id = event.sourceAttribute.split('_')[2];
+		const attrs = await getAttrsAsync([
+			'resource_name',
+			...abilityAttributeNames.map(x => `repeating_abilities_${x}`),
+		]);
+		const resourceName = attrs.resource_name || getTranslationByKey('resource-name-placeholder');
 
 		const directMap = {
-			name: attrs.repeating_abilities_ability_name,
+			name: attrs.repeating_abilities_ability_cost && attrs.repeating_abilities_ability_cost !== '0'
+				? `${attrs.repeating_abilities_ability_name} (${attrs.repeating_abilities_ability_cost} ${resourceName})`
+				: attrs.repeating_abilities_ability_name,
 			cost: attrs.repeating_abilities_ability_cost,
 			description: attrs.repeating_abilities_ability_description,
 			keywords: attrs.repeating_abilities_ability_keywords,
 			distance: attrs.repeating_abilities_ability_distance,
 			target: attrs.repeating_abilities_ability_target,
+			trigger: attrs.repeating_abilities_ability_trigger,
 			characteristic: attrs.repeating_abilities_ability_characteristic,
 			tier1: attrs.repeating_abilities_ability_tier_1,
 			tier2: attrs.repeating_abilities_ability_tier_2,
@@ -703,9 +713,12 @@
 			effect: attrs.repeating_abilities_ability_effect,
 		};
 		const translateMap = {
-			type: attrs.repeating_abilities_ability_type,
+			type: attrs.repeating_abilities_ability_type || 'no-action',
 		};
 		const rollValueMap = {
+			hasTrigger: attrs.repeating_abilities_ability_type.includes('triggered')
+				&& attrs.repeating_abilities_ability_trigger
+				? 1 : 0,
 			hasPowerRoll: attrs.repeating_abilities_has_power_roll === 'on'
 				? 1 : 0,
 			hasEffect: attrs.repeating_abilities_ability_effect
