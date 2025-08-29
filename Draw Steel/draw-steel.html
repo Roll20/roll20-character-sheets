@@ -535,76 +535,96 @@
 	<div style="font-family: Menlo, Monaco, Consolas">This Draw Steel character sheet for Roll20 is an independent product published under the DRAW STEEL Creator License and is not affiliated with MCDM Productions, LLC. DRAW STEEL © 2024 MCDM Productions, LLC.</div>
 </div>
 <rolltemplate class="sheet-rolltemplate-powerroll">
-	<div class="powerroll-content">
-		<h1>{{name}}</h1>
-		{{#allprops() edgeBane tier}}
-		<div>{{key}}: {{value}}</div>
-		{{/allprops() edgeBane tier}}
-		{{#rollGreater() edgeBane 0}}
-		<div>Edge: {{edgeBane}}</div>
-		{{/rollGreater() edgeBane 0}}
-		{{#rollLess() edgeBane 0}}
-		<div>Bane: {{edgeBane}}</div>
-		{{/rollLess() edgeBane 0}}
-		{{#rollGreater() 2d10 18}}
-			<div class="powerroll-crit">Critical</div>
-		{{/rollGreater() 2d10 18}}
-		<div class="powerroll-tier">
-			Result: Tier {{computed::tier}}
-		</div>
+	<div class="header">
+		<span data-i18n="{{characteristic}}"></span> <span data-i18n="power-roll"></span>
+	</div>
+	<div class="powerroll-2d10">
+		<label>2d10:</label> {{2d10}}
+	</div>
+	<div class="powerroll-characteristic">
+		<label><span data-i18n="{{characteristic}}"></span>:</label> {{characteristicValue}}
+	</div>
+	{{#rollTotal() computed::isDoubleEdge 1}}
+	<div class="powerroll-edge-bane" data-i18n="double-edge"></div>
+	{{/rollTotal() computed::isDoubleEdge 1}}
+	{{#rollGreater() edgeBane 0}}
+	<div class="powerroll-edge-bane" data-i18n="edge"></div>
+	{{/rollGreater() edgeBane 0}}
+	{{#rollLess() edgeBane 0}}
+	<div class="powerroll-edge-bane" data-i18n="bane"></div>
+	{{/rollLess() edgeBane 0}}
+	{{#rollTotal() computed::isDoubleBane 1}}
+	<div class="powerroll-edge-bane" data-i18n="double-bane"></div>
+	{{/rollTotal() computed::isDoubleBane 1}}
+	{{#rollGreater() bonus 0}}
+	<div class="powerroll-bonus-penalty">
+		<label><span data-i18n="bonus"></span>:</label> {{bonus}}
+	</div>
+	{{/rollGreater() bonus 0}}
+	{{#rollLess() bonus 0}}
+	<div class="powerroll-bonus-penalty">
+		<label><span data-i18n="penalty"></span>:</label> {{bonus}}
+	</div>
+	{{/rollLess() bonus 0}}
+	{{#rollGreater() 2d10 18}}
+		<div class="powerroll-crit" data-i18n="critical-hit"></div>
+	{{/rollGreater() 2d10 18}}
+	<div class="powerroll-total">
+		<label><span data-i18n="power-roll-total"></span>:</label> {{total}}
+	</div>
+	<div class="powerroll-tier">
+		<label><span data-i18n="tier"></span>:</label> {{computed::tier}}
 	</div>
 </rolltemplate>
 <rolltemplate class="sheet-rolltemplate-ability">
-	<div class="template-container">
-		<div class="header">{{name}}</div>
-		<div class="description">{{description}}</div>
-		<div class="meta-row">
-			<div class="keywords">{{keywords}}</div>
-			<div class="action-type">{{type}}</div>
-		</div>
-		<div class="action-row">
-			<div class="distance">
-				<!-- triangle-ruler -->
-				 &#128208;{{distance}}
-			</div>
-			<div class="target">
-				<!-- bullseye -->
-				 &#127919;{{target}}
-			</div>
-		</div>
-		{{#rollTotal() hasTrigger 1}}
-		<div class="effect-block">
-			<div class="effect-label">Trigger:</div>
-			<div class="effect-text">{{trigger}}</div>
-		</div>
-		{{/rollTotal() hasTrigger 1}}
-		{{#rollTotal() hasPowerRoll 1}}
-		<div class="stat-row">
-			<div class="roll-label">{{powerRoll}}:</div>
-			<span class="roll">2d10 + {{characteristic}}</span>
-		</div>
-		<div class="tiers">
-			<div class="tier">
-				<span class="range">≤ 11</span>
-				<span class="damage">{{tier1}}</span>
-			</div>
-			<div class="tier">
-				<span class="range">12–16</span>
-				<span class="damage">{{tier2}}</span>
-			</div>
-			<div class="tier">
-				<span class="range">17+</span>
-				<span class="damage">{{tier3}}</span>
-			</div>
-		</div>
-		{{/rollTotal() hasPowerRoll 1}}
-		{{#rollTotal() hasEffect 1}}
-		<div class="effect-block">
-			<div class="effect-label">Effect:</div>
-			<div class="effect-text">{{effect}}</div>
-		</div>
-		{{/rollTotal() hasEffect 1}}
+	<div class="header">{{name}}</div>
+	<div class="description">{{description}}</div>
+	<div class="meta-row">
+		<div class="keywords">{{keywords}}</div>
+		<div class="action-type">{{type}}</div>
 	</div>
+	<div class="action-row">
+		<div class="distance">
+			<!-- triangle-ruler -->
+				&#128208;{{distance}}
+		</div>
+		<div class="target">
+			<!-- bullseye -->
+				&#127919;{{target}}
+		</div>
+	</div>
+	{{#rollTotal() hasTrigger 1}}
+	<div class="effect-block">
+		<div class="effect-label">^{trigger}:</div>
+		<div class="effect-text">{{trigger}}</div>
+	</div>
+	{{/rollTotal() hasTrigger 1}}
+	{{#rollTotal() hasPowerRoll 1}}
+	<div class="stat-row">
+		<div class="roll-label">{{powerRoll}}:</div>
+		<span class="roll">2d10 + {{characteristic}}</span>
+	</div>
+	<div class="tiers">
+		<div class="tier">
+			<span class="range">≤ 11</span>
+			<span class="damage">{{tier1}}</span>
+		</div>
+		<div class="tier">
+			<span class="range">12–16</span>
+			<span class="damage">{{tier2}}</span>
+		</div>
+		<div class="tier">
+			<span class="range">17+</span>
+			<span class="damage">{{tier3}}</span>
+		</div>
+	</div>
+	{{/rollTotal() hasPowerRoll 1}}
+	{{#rollTotal() hasEffect 1}}
+	<div class="effect-block">
+		<div class="effect-label">^{effect}:</div>
+		<div class="effect-text">{{effect}}</div>
+	</div>
+	{{/rollTotal() hasEffect 1}}
 </rolltemplate>
 <script type="text/worker">
 	function setActiveCharacterId(id) {
@@ -672,25 +692,45 @@
 
 	$20('.characteristic-input-group > label').on('click', async (e) => {
 		const characteristic = e.htmlAttributes['data-characteristic'];
-		const characteristicTranslation = getTranslationByKey(characteristic);
 		const attrs = await getAttrsAsync([characteristic]);
 		const characteristicValue = attrs[characteristic];
+		const characteristicTranslation = getTranslationByKey(characteristic) || characteristic;
+		const edgeOrBaneTranslation = getTranslationByKey('edge-or-bane') || 'edge-or-bane';
+		const noEdgeOrBaneTranslation = getTranslationByKey('no-edge-or-bane') || 'no-edge-or-bane';
+		const doubleEdgeTranslation = getTranslationByKey('double-edge') || 'double-edge';
+		const edgeTranslation = getTranslationByKey('edge') || 'edge';
+		const baneTranslation = getTranslationByKey('bane') || 'bane';
+		const doubleBaneTranslation = getTranslationByKey('double-bane') || 'double-bane';
+		const bonusOrPenaltyTranslation = getTranslationByKey('bonus-or-penalty') || 'bonus-or-penalty';
 		const roll = '&{template:powerroll} ' +
 			'[[ [[2d10cs>11cf<0]][2d10] ' +
-			` + [[${characteristicValue}[${characteristicTranslation}]]][${characteristicTranslation}] `+
-			' + [[?{Edge or Bane|None,0|Double Edge,0[Double Edge]|Edge,2[Edge]|Bane,-2[Bane]|Double Bane,0[Double Bane]}]][Edge or Bane] ' +
-			' + [[?{Bonus or Penalty|0}]][Bonus or Penalty] ' +
+			` + [[${characteristicValue}[${characteristicTranslation}]]][${characteristicTranslation}] ` +
+			' + [[?{' +
+				edgeOrBaneTranslation +
+				`|${noEdgeOrBaneTranslation},0` +
+				`|${doubleEdgeTranslation},0[${doubleEdgeTranslation}]` +
+				`|${edgeTranslation},2[${edgeTranslation}]` +
+				`|${baneTranslation},-2[${baneTranslation}]` +
+				`|${doubleBaneTranslation},0[${doubleBaneTranslation}]` +
+			`}]][${edgeOrBaneTranslation}] ` +
+			` + [[?{${bonusOrPenaltyTranslation}|0}]][${bonusOrPenaltyTranslation}] ` +
 			']] ' +
-			`{{name=${characteristicTranslation} Power Roll}} ` +
 			'{{2d10=$[[0]]}} ' +
-			'{{characteristic=$[[1]]}} ' +
+			'{{characteristicValue=$[[1]]}} ' +
 			'{{edgeBane=$[[2]]}} ' +
 			'{{bonus=$[[3]]}} ' +
 			'{{total=$[[4]]}} ' +
-			'{{tier=[[0]]}}'; // placeholder for computed value
+			`{{characteristic=${characteristic}}} ` +
+			`{{isDoubleEdge=[[0]]}} ` + // placeholder for computed value
+			`{{isDoubleBane=[[0]]}} ` + // placeholder for computed value
+			'{{tier=[[0]]}} '; // placeholder for computed value
 		console.log('roll', roll);
 		startRoll(roll, ({ rollId, results }) => {
 			console.log('roll results', results);
+			const isDoubleEdge = results.edgeBane.expression === `0[${doubleEdgeTranslation}]`
+				? 1 : 0;
+			const isDoubleBane = results.edgeBane.expression === `0[${doubleBaneTranslation}]`
+				? 1 : 0;
 			const tierBase = (() => {
 				if (results.total.result >= 17) {
 					return 3;
@@ -701,16 +741,16 @@
 			})();
 			const tierMod = (() => {
 				switch (results.edgeBane.expression) {
-					case '0[Double Edge]':
+					case `0[${doubleEdgeTranslation}]`:
 						return 1;
-					case '0[Double Bane]':
+					case `0[${doubleBaneTranslation}]`:
 						return -1;
 					default:
 						return 0;
 				}
 			})();
 			const tier = Math.max(1, Math.min(3, tierBase + tierMod));
-			finishRoll(rollId, { tier });
+			finishRoll(rollId, { isDoubleEdge, isDoubleBane, tier });
 		});
 	});
 
