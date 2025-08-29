@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.8.4] - 2025-08-28
+
+### Changed
+
+- Fix issue where Modifier Ancient: Damage was becoming 0+undefined+undefined+undefined+undefined+undefined.
+
 ## [1.8.3] - 2025-06-14
 
 ### Added
