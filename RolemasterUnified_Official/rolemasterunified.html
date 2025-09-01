@@ -1120,7 +1120,11 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
   
   Dp Available:
   <span class='dpinfo'></span>
-  Current Level: <span class='current_level'></span>
+
+  Current Level: <span class='current_level'></span> &rarr; <span class='new_level'></span>
+
+  <!-- hide these -->
+  <div style='display:none'> Next Level: <input name='comp_current_level'> <input name='comp_new_level'></div>
 </div>
 
 <div class='tabset'>
@@ -2167,7 +2171,7 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 </charmancer>
 
 <charmancer class="sheet-repeating-levelupreviewlistitem">
-  <span class='text'></span>
+  <span style="padding-left: 1em;" class='text'></span>
 </charmancer>
 
 <charmancer class="sheet-repeating-tpitem">
@@ -2367,6 +2371,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
 <div class='creaturerrs'>
   <span class='creatureheading'>RRs</span>
+   <span>Arcane</span> <span><span name='attr_rr_arcane_bonus'></span>
+                            <button type='action' data-rr='arcane' data-rrpretty='Arcane' class='editbutton rollbutton'
+                                name='act_rrroll'><span style="font-family:dicefontd10;font-size:150%;">0</span></button>
+          </span>
     <span>Channeling</span> <span><span name='attr_rr_channeling_bonus'></span>
                             <button type='action' data-rr='channeling' data-rrpretty='Channeling' class='editbutton rollbutton'
                                 name='act_rrroll'><span style="font-family:dicefontd10;font-size:150%;">0</span></button>
@@ -6469,7 +6477,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 75bc9167f8e2514c7ec1a9c73cc1f22677b9857b
+Revision 846a2ba9dffe0c2ac5a84ecb664f6c8ccd69628c
 
 
 <hr>
@@ -6546,6 +6554,18 @@ function parseNumberDefault(str, def) {
     return def;
   }
   return rv;
+}
+
+function mid3(a, b, c) {
+    // Checking for b
+    if ((a < b && b < c) || (c < b && b < a)) {
+        return b;
+    }
+    // Checking for a
+    else if ((b < a && a < c) || (c < a && a < b)) {
+        return a;
+    }
+    return c;
 }
 
 
@@ -10111,6 +10131,7 @@ console.log("RRs init\n");
       setAttrs(updates);
     });
   }
+  exports.updateAllRR = updateAllRR
 
   function updateRR(realm, values, updates) {
       let log = "";
@@ -10662,32 +10683,36 @@ function levelUpStart(_) {
     console.log(data);
 
     let previous_level = parseIntDefault(data.levelup?.values?.current_level, 0);
- 
-    getAttrsPending(["level", "xp", "xplevel", "dp_misc", "dp_used_misc"], (ev) => {
-	// If we are at any level but 0, we get 2 free statgains.
-	const level = parseIntDefault(ev.level, 0);
-	if (level > 0){
-	  showChoices(["levelup_statgain_free"]);
-	  // Create the list of options dynamically so we can add temp / pot
-	  updateStatgainList(['comp_statgain1', 'comp_statgain2']);
-	}
 
-	// New level
-	const newlevel = level + 1;
+    addPendingFunction("LevelUp: Get Fundamentals", () => {
+	getAttrsPending(["level", "xp", "xplevel", "dp_misc", "dp_used_misc"], (ev) => {
+	    // If we are at any level but 0, we get 2 free statgains.
+	    const level = parseIntDefault(ev.level, 0);
+	    if (level > 0){
+	    showChoices(["levelup_statgain_free"]);
+	    // Create the list of options dynamically so we can add temp / pot
+	    updateStatgainList(['comp_statgain1', 'comp_statgain2']);
+	    }
 
-	// Now the DP pain:
-	const dpmisc = miscBonusTotal(ev.dp_misc || "")[0];
-	const dpreceived = newlevel * 60 + dpmisc;
-	const dpspent = miscBonusTotal(ev.dp_used_misc || "")[0];
+	    // New level
+	    const newlevel = level + 1;
+
+	    // Now the DP pain:
+	    const dpmisc = miscBonusTotal(ev.dp_misc || "")[0];
+	    const dpreceived = newlevel * 60 + dpmisc;
+	    const dpspent = miscBonusTotal(ev.dp_used_misc || "")[0];
 	    /**/
-	const dpavil = Math.min(85, dpreceived - dpspent);
+	    const dpavil = Math.min(85, dpreceived - dpspent);
 
-	setAttrsPending({"current_level": level});
-	setCharmancerText({"dpinfo": `${dpavil} ` +
+	    setAttrs({"current_level": level, "new_level": newlevel});
+	    console.log({"current_level": level, "new_level": newlevel});
+	    setCharmancerText({"dpinfo": `${dpavil} ` +
 		`(= Total received ${dpreceived} ` +
-		` (Level ${newlevel} * 60) + ` +
-		`Other ${dpmisc}) - Previously spent ${dpspent} (Max of 85 per level)`})
- 
+		    ` (Level ${newlevel} * 60) + ` +
+		    `Other ${dpmisc}) - Previously spent ${dpspent} (Max of 85 per level)`,
+		  'current_level': level, 'new_level': newlevel})
+
+	});
     });
 
     let costs = {};
@@ -10930,14 +10955,17 @@ function levelUpStart(_) {
 
 /** Returns an object of the form:
   { "statabbr" : { "name": "stat", "count": N } } */
-function countStatGains(newlevel, values) {
-  console.log("Count stat gains")
-  let sgs = [] 
-    if (newlevel > 1) {
-      // the static stat gains
-      sgs.push(optionDecode(values.statgain1));
-      sgs.push(optionDecode(values.statgain2));
-    }
+function countStatGains(cmdata, newlevel) {
+  console.log("Count stat gains", cmdata, newlevel)
+  const values = cmdata.levelup.values;
+  console.log("values", values);
+  let sgs = [];
+  if (newlevel > 1) {
+    // the static stat gains
+    sgs.push(optionDecode(values.statgain1));
+    sgs.push(optionDecode(values.statgain2));
+    console.log(sgs);
+  }
   // Loaded stats gains: "repeating_-NuKyptdKgIo0GHZBX4k_statgain"
   // in data.levelup.repeating,
   for (let item in values) {
@@ -10983,7 +11011,7 @@ onCheck("mancerfinish:levelup", (ev) => {
 
   // Stats
   addPendingFunction("LevelupFinish: Statgains", () => {
-    let sgcount = countStatGains(newlevel, data.levelup.values);
+    let sgcount = countStatGains(getCharmancerData(), newlevel);
 
     for (sg in sgcount) {
       RMUStats.doStatGain(sg, sgcount[sg].count, levelstr);
@@ -11195,74 +11223,55 @@ onCheck("mancerfinish:levelup", (ev) => {
 
 function levelUpReview() {
   const cmdata = getCharmancerData();
-  let newlevel = -1;
-  pendingInfo();
+  let newlevel = cmdata.levelup.values.current_level + 1;
+  levelstr = `Level ${newlevel}`; 
 
-  console.log("LevelUpReview", cmdata);
+  const levelup = getLevelUpSummary(cmdata);
 
-  getAttrsPending(["level"], (ev) => {
-      const level = parseIntDefault(ev.level, 0);
-      newlevel = level + 1;
-      levelstr = `Level ${newlevel}`; 
+  for (const statgain in levelup.statgains) {
+    const sg = getTranslationByKey(statgain)
+    addRepeatingSection('levelupreviewstatgains', 'levelupreviewlistitem', (id) => {
+	const str = `${sg} (x${levelup.statgains[statgain].count})`;
+	setCharmancerText({[`${id} .text`]: str});
+    });
+  }
 
-      const levelup = getLevelUpSummary(cmdata, level);
-      console.log("Levelup", levelup)
 
-      for (const statgain in levelup.statgains) {
-	addRepeatingSection('levelupreviewstatgains', 'levelupreviewlistitem', (id) => {
-	  const str = `${sg} (x${sgcount[sg].count})`;
-	  setCharmancerText({[`${id} .text`]: str});
-	});
-
-      }
-      for (const skill in levelup.skills) {
-	const deved = levelup.skills[skill]
-	let transskill = getTranslationByKey(skill)
-	// deved is an array of each specialisation
-	for (const obj of deved) {
-	  addRepeatingSection('levelupreviewskills', 'levelupreviewlistitem', (id) => {
-	    const skillmsg = obj.specialisation ?
-		  `${transskill}: ${obj.specialisation} &rarr; +${obj.ranks} Ranks` :
-		  `${transskill} &rarr; +${obj.ranks} Ranks`
+  for (let skill in levelup.skills) {
+    const developed = levelup.skills[skill]
+    let transskill = getTranslationByKey(skill)
+    if (Array.isArray(developed)) {
+      // deved is an array of each specialisation
+      for (const obj of developed) {
+	addRepeatingSection('levelupreviewskills', 'levelupreviewlistitem', (id) => {
+	    const skillmsg = `${transskill}: ${obj.specialisation} &rarr; +${obj.ranks} Ranks`;
 	    setCharmancerText({[`${id} .text`]: skillmsg });
-	});
-	}
+	    });
       }
-  });
+    } else {
+      addRepeatingSection('levelupreviewskills', 'levelupreviewlistitem', (id) => {
+	setCharmancerText({[`${id} .text`]: `${transskill}: +${developed.ranks} Ranks`});
+      });
+    }
+  }
+
+  for (let spell in levelup.spelllists) {
+    const list = levelup.spelllists[spell];
+    addRepeatingSection('levelupreviewspelllists', 'levelupreviewlistitem', (id) => {
+	setCharmancerText({[`${id} .text`]: `${list.list}: ${list.ranks} Ranks`});
+    });
+  }
+
+  for (let tindex in levelup.talents) {
+    const talent = levelup.talents[tindex];
+    addRepeatingSection('levelupreviewtalents', 'levelupreviewlistitem', (id) => {
+	setCharmancerText({[`${id} .text`]: `${talent.talent} (Tier ${talent.tier})`});
+    });
+  }
+
 
 
   return;
-/*
-  addPendingFunction("LevelupReview: Talents", () => {
-      const values = cmdata.levelup.values;
-      for (const purchase in values) {
-	if (!purchase.endsWith("_talent")) {
-	  // Skip non-talents
-	  continue;
-	}
-	addRepeatingSection('levelupreviewtalents', 'levelupreviewlistitem', (id) => {
-	    const prefix = purchase.match(/^(.*)_talent/)[1];
-
-	    const fullname = values[purchase];
-	    const splitname = fullname.match(/^Talent:([^?]*)?/)
-	    const talentname = splitname[1];
-
-	    const tierstr = values[`${prefix}_tier`] || "Tier 1";
-	    const tier = tierstr.match(/^Tier (\d\d*)/)[1]
-
-	    const cost = '?'
-
-	    const str = `${talentname} - Tier ${tier} - ${cost} DP`;
-	    setCharmancerText({[`${id} .text`]: str});
-	});
-      }
-  });
-
-}-}*/
-  
-
-
-  checkPending();
 }
 
 
@@ -11270,11 +11279,13 @@ function levelUpReview() {
 
 /**/
 function getLevelUpSummary(cmdata) {
+  const level = cmdata.levelup.values.current_level + 1;
+
   const result = {}
   result.skills = {}
-  result.spelllists = {}
-  result.talents = {}
-  result.statgains = countStatGains(cmdata);
+  result.spelllists = []
+  result.talents = []
+  result.statgains = countStatGains(cmdata, level);
 
   const values = cmdata.levelup.values;
   for (const purchase in values) {
@@ -11285,15 +11296,36 @@ function getLevelUpSummary(cmdata) {
       continue;
     }
     if (purchase.includes("_talent_")) {
-      console.log("Talent pruchase")
+      if (purchase.endsWith("_talent")) {
+	// The main thing: (Need to remove the "Talent" and "?expansion"
+	const matches = /^(?:Talent:)([^?]*)/.exec(values[purchase]);
+	const name = matches[1];
+	const tierstr = values[purchase.replace(/_talent$/, "_tier")];
+	let tier = 1
+	if (tierstr) {
+	  tier = /Tier (\d*):/.exec(tierstr)[1];
+	}
+	result.talents.push({talent: name, tier: tier});	
+      }
     } else if (purchase.includes("spelllist")) {
-      console.log("Spell purchase");
+      // skip if not ranks
+      if (purchase.endsWith("_listranks") || purchase.endsWith("_listname")) {
+	continue;
+      }
+      const [ranks, cost] = optionDecodeIntPair(values[purchase]);
+      if (ranks == 0) {
+	continue;
+      }
+      // List name: 
+      const namekey = purchase.replace(/_cmranks/, "_listname");
+      const list = values[namekey];
+      result.spelllists.push({list: list, ranks: ranks})
     } else if (purchase.startsWith("tp")) {
-      console.log("TP Purchase");
+      console.log("Traing Package Purchase");
     } else if (purchase.startsWith("lasterror")) {
-      console.log("Error: Ignore");
+      /// Ignore
     } else if (purchase.startsWith("errorcount")) {
-      console.log("Error: Ignore");
+      /// Ignore
     } else {
       const value = values[purchase];
       if (typeof(value) != "string") {
@@ -11312,6 +11344,7 @@ function getLevelUpSummary(cmdata) {
 	const prefixkey = purchase.replace(/_cmskillranks$/, "_sheetprefix");
 	let prefix = values[prefixkey];
 	let skillname = purchase.match(/_cmskill_([^_]*)/)[1];
+	  // FIXME: Is this right?  Why here?
 	if (!prefix) {
 	  // New skill, generate the prefix
 	  let rowid = generateRowID();
@@ -11323,7 +11356,7 @@ function getLevelUpSummary(cmdata) {
 	}
 	result.skills[skillname].push({ specialisation: name,
 	      prefix: prefix, ranks: ranks})
-      } else {
+      } else if (purchase.startsWith("cmskill")) {
 	// Skill is encoded as 'cmskill<name>ranks'
 	console.log("Saving: ", purchase);
 	const skill = purchase.match(/^cmskill(.*)ranks$/)[1];
@@ -11331,6 +11364,8 @@ function getLevelUpSummary(cmdata) {
 	  result.skills[skill] = {}
 	}
 	result.skills[skill].ranks = ranks;
+      } else {
+	console.log("Ignoring not a skill: ", purchase);
       }
 
     }
@@ -15863,7 +15898,7 @@ function sizeFromNumeric(value) {
 			'ranged_penalty',
 			// Used depending on type: So get melee, missile and spell
 			'actionselect', 'aptrack',
-			'attackuseap', 'aptrack_melee', 'aptrack_missile', 'aptrack_spell',
+			'attackuseap',
 			'token_id'
 			], values => {
 		console.log('New attack: get attrs (with token)', values, ev);
@@ -17619,9 +17654,11 @@ creature.newCreature = function(name, jdata) {
   updates.fatigue = 0;
   updates.statuspenalty = 0;
 
-  updates.rr_channeling_bonus = cdata.Ch;
-  updates.rr_essence_bonus = cdata.Ess;
-  updates.rr_mentalism_bonus = cdata.Mnt;
+  updates.rr_channeling_bonus = parseIntDefault(cdata.Ch, 0);
+  updates.rr_essence_bonus = parseIntDefault(cdata.Ess, 0);
+  updates.rr_mentalism_bonus = parseIntDefault(cdata.Mnt, 0);
+  updates.rr_arcane_bonus = parseIntDefault(cdata.Arcane, mid3(updates.rr_channeling_bonus,
+          updates.rr_essence_bonus, updates.rr_mentalism_bonus));
   updates.rr_physical_bonus = cdata.Phy;
   updates.rr_fear_bonus = cdata.Fear;
 
@@ -17717,6 +17754,8 @@ creature.newCreature = function(name, jdata) {
     bar2_link: 'pp',
     cd_bar3_l: 'statuspenalty',
     bar3_link: 'statuspenalty',
+    cd_bar4_l: 'aptrack',
+    bar4_link: 'aptrack',
     showname: true,
     showplayers_name: true,
     width: 70,
@@ -17754,7 +17793,8 @@ creature.doAttack = function(ev) {
       `${basename}_attackname`,
       `${basename}_attackfumble`,
       `${basename}_attacksize`,
-			//'attackuseap', 'aptrack_melee', 'aptrack_missile', 'aptrack_spell',
+      'parrymod', 'othermod',
+      'actionselect', 'aptrack',
       'target_name',
       'target_db',
       'target_at',
@@ -17783,9 +17823,18 @@ creature.doAttack = function(ev) {
       cdata.targetcrit = parseIntDefault(values.target_crit, 0);
       cdata.statuseffect = parseIntDefault(values.statuseffect, 0);
       cdata.statuspenalty = parseIntDefault(values.statuspenalty, 0);
-      // FIXME:
-      cdata.parrymod = 0;
-      cdata.othermod = 0;
+      cdata.parrymod = parseIntDefault(values.parrymod, 0);
+      cdata.othermod = parseIntDefault(values.othermod, 0);
+      cdata.apused = parseIntDefault(values.aptrack, 0);
+      cdata.actionselect = values.actionselect;
+      if (values.actionselect == 'spell') {
+        cdata.attacktype = 'directed';
+      } else if (values.actionselect == 'missile') {
+        cdata.attacktype = 'missile';
+      } else {
+        cdata.attacktype = 'melee';
+      }
+      cdata.useap = cdata.apused ? true : false;
       console.log(cdata);
       attacks.startAttack(cdata);
     });
@@ -18564,6 +18613,7 @@ onCheck("sheet:opened", (_) => {
     });
 
     getAttrs(['sheetselect', 'version'], (sheet) => {
+	console.log(`Current Version: ${sheet.version} : Sheet type: ${sheet.sheetselect}`);
 	if (!sheet.sheetselect) {
 	  sheet.sheetselect = 'playersheet';
 	  setAttrs(sheet);
@@ -18572,18 +18622,16 @@ onCheck("sheet:opened", (_) => {
 	  RMUSkills.updateStatCache();
 	}
 
-	doVersionCheck(sheet.version || 1);
-
+	doVersionCheck(sheet.version || 1, sheet.sheetselect);
 
 	if (sheet.sheetselect == 'creaturesheet') {
-	  // FIXME: add a creature init call
 	  getAttrs(["defenses"], data => { creature.parseDefenses(data.defenses) });
 	}
     });
 
 });
 
-function doVersionCheck(version) {
+function doVersionCheck(version, sheettype) {
   const oldversion = version;
   if (version == 1) {
     addPendingFunction("Upgrade from 1 to 2", upgradeV1to2);
@@ -18633,12 +18681,28 @@ function doVersionCheck(version) {
     version = 10;
   }
 
+  if (version == 10) {
+    addPendingFunction("Upgrade to 11: Force RR recalc for Arcane", () => {
+	if (sheettype == 'creaturesheet') {
+	  getAttrsPending(["rr_channeling_bonus", "rr_essence_bonus", "rr_mentalism_bonus"], (rr) => {
+	      setAttrs({rr_arcane_bonus: mid3(parseIntDefault(rr.rr_channeling_bonus, 0),
+		      parseIntDefault(rr.rr_essence_bonus, 0), 
+		      parseIntDefault(rr.rr_mentalism_bonus, 0))});
+	  });
+	} else {
+	  rrs.updateAllRR();
+	}
+    });
+    version = 11;
+  }
 
   if (oldversion != version) {
     addPendingFunction(`Version update to ${version}`, () => {
 	setAttrsPending({version: version});
     });
   }
+
+  checkPending();
 
   addPendingFunction("Set default Token", () => {
       setDefaultToken({
@@ -18648,6 +18712,8 @@ function doVersionCheck(version) {
 	bar2_link: 'pp',
 	cd_bar3_l: 'statuspenalty',
 	bar3_link: 'statuspenalty',
+	cd_bar4_l: 'aptrack',
+	bar4_link: 'aptrack',
 	showname: true,
 	showplayers_name: true,
 	width: 70,
