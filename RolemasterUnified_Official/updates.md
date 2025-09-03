@@ -1,3 +1,20 @@
+# 2025-09-02
+
+- Allow Injury strings to start with "Injury: " to make pasting easier
+- Status:
+  - Add 'statuspercent'; Equal to (100 - statuspenalty).   Used so you
+    can have a penalty bar that goes down as PCs/NPCs get injured
+  - Add allpenalties; status effect + status penalty
+  - Add a little bar to show it.
+- Tokenbar: Bar3 now follows 'allpenalties'
+- Bump sheet version
+  - Force an update of penalties on load.
+- Support Arcane spell casting modifier
+
+# 2025-08-28
+
+- Fix attacks missing othermod/parrymod
+
 # 2025-08-26
 
 - Creatures
