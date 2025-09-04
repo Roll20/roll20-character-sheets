@@ -231,6 +231,7 @@ on("clicked:itch", function(event) {
 });
 
 // Asset value determines track length but has to be asset-value minus 3.
+// Effective value changes when stress is marked or unmarked — but that's handled in the mark/unmark handler
 
 on("change:repeating_assets:asset-value", function(e) {
 	log("change:repeating_assets:asset-value"); log(e);
@@ -240,60 +241,74 @@ on("change:repeating_assets:asset-value", function(e) {
 	log(rowprefix);
 	if ( typeof(e.newValue) !== "undefined" ) {
 		track = Number(e.newValue) - 3;
+		ats[rowprefix+"asset-value-effective"] = Number(e.newValue);
+	} else {
+		ats[rowprefix+"asset-value-effective"] = "";
 	}
 	ats[e.sourceAttribute + "-track"] = track;
-	log(ats);
-	setAttrs(ats);
-});
-
-// Effective value changes when stress is marked or unmarked — but that's handled in the mark/unmark handler
-
-// Lotta shit to initialize on all assets on open, just to make sure it's all in correct shape -- but we might not actually need this so I'm commenting it out for the nonce
-
-/*
-on("sheet:opened", function(e) {
-	var gets = [];
-	getSectionIDs("repeating_assets", function(ids) {
-		log("sheet:opened for repeating_assets - id list");
-		log(ids);
-		for(i = 0; i < ids.length; i++) {
-			gets[gets.length] = "repeating_assets_"+ids[i]+"_"+"asset-value";
-			for(j = 1; j <= 4; j++) {
-				gets[gets.length] = "repeating_assets_"+ids[i]+"_"+"toggle_stress"+j;
+	var gets = [rowprefix+'toggle_stress1',rowprefix+'toggle_stress2',rowprefix+'toggle_stress3',rowprefix+'toggle_stress4'];
+	getAttrs(gets, function(a) {
+		for(i = 1; i <= 4; i++) {
+			if ( i > track ) {
+				ats[rowprefix+'toggle_stress'+i] = 0; // If the track length has shortened, we must make sure that there are no hidden checkmarked boxes, therefore they must be force-unchecked.
+			} else {
+				var stresskey = rowprefix+"toggle_stress"+i; 
+				if ( typeof(a[stresskey]) !== "undefined" && a[stresskey] == 1 ) {
+					ats[rowprefix+"asset-value-effective"]--;
+				}
 			}
 		}
-		log(gets);
-		getAttrs(gets, function(got) {
-			log("got");
-			log(got);
-			ats = {};
-			for(i = 0; i < ids.length; i++) {
-				var track = 0;
-				var pre = "repeating_assets_"+ids[i]+"_";
-				var effective = 0;
-				var stress = 0;
-				var key = pre+"asset-value";
-				if ( typeof(got[key]) !== "undefined" && got[key] !== "" ) {
-					track = Number(got[key]) - 3;
-					effective = Number(got[key]);
-				}
-				ats[key + "-track"] = track;
-				for(j = 1; j <= 4; j++) {
-					skey = pre+"toggle_stress"+j;
-					log(got[skey]);
-					if ( typeof(got[skey]) !== "undefined" && got[skey] == "1" ) {
-						effective--; stress++;
-					}
-				}
-				ats[key + "-effective"] = effective;
-				ats[pre + "stress-marked"] = stress;
-			}
-			log(ats);
-			setAttrs(ats);
-		});
+		log(ats);
+		setAttrs(ats); // 
 	});
 });
-*/
+
+
+// Officer die size determines track length but has to be asset-value minus 3.
+// Effective size changes when stress is marked or unmarked — but that's handled in the mark/unmark handler, largely. Here, we just need to make sure we're adjusting effective value for the changed track length vs. marked stress. 
+
+on("change:repeating_officers:die1", function(e) {
+	log("change:repeating_officers:die1"); log(e);
+	var track = 0;
+	var ats = {};
+	var rowprefix = (e.sourceAttribute).slice(0,-4); // Strips off the 'die1'
+	log(rowprefix);
+	log(e);
+	if ( typeof(e.newValue) !== "undefined" ) {
+		track = Number(e.newValue);
+		ats[rowprefix+"die1-effective"] = Number(e.newValue);
+		track = Number(e.newValue);
+	} else {
+		ats[rowprefix+"die1-effective"] = "";
+	}
+	const twelve = [1,2,3,4,5,6,7,8,9,10,11,12];
+	var gets = [];
+	twelve.forEach( (entry) => {
+		gets[gets.length] = rowprefix+"toggle_stress"+entry;
+	});
+	log(gets);
+	getAttrs(gets, function(a) {
+		var deduct = 0;
+		for(i = 1; i <= 12; i++) {
+			if ( i > track ) {
+				ats[rowprefix+'toggle_stress'+i] = 0; // If the track length has shortened, we must make sure that there are no hidden checkmarked boxes, therefore they must be force-unchecked.
+			} else {
+				var stresskey = rowprefix+"toggle_stress"+i; 
+				if ( typeof(a[stresskey]) !== "undefined" && a[stresskey] == 1 ) {
+					deduct++;
+				}
+			}
+		}
+		var effective = track - deduct;
+		if ( effective < 6 ) { effective = 6; } else if ( effective == 7 ) { effective = 8; } else if ( effective == 9 ) { effective = 10; } else if ( effective == 11 ) { effective = 12; }
+		if ( ats[rowprefix+"die1-effective"] !== "" ) {
+			ats[rowprefix+"die1-effective"] = effective; // If it's blank, then it should be blank, not a number, so we respect this
+		}
+		log(effective);
+		log(ats);
+		setAttrs(ats);
+	});
+});
 
 // Skill roll selection
 
@@ -3191,6 +3206,7 @@ on("clicked:jaderoll", (info) => {
                       <div class="bottomline">
                         <!-- .text.golden+t("Stress")
                         -->
+                        <input class="hider" type="hidden" name="attr_die1-effective" value=""/>
                         <div class="text effective"><span>&nbsp;d</span><span name="attr_die1-effective"></span>
                         </div>
                         <div class="elastics">
