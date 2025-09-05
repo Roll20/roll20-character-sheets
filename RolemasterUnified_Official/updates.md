@@ -1,3 +1,7 @@
+# 2025-09-04
+
+- Force statuspercent_max to be 100.
+
 # 2025-09-02
 
 - Allow Injury strings to start with "Injury: " to make pasting easier
