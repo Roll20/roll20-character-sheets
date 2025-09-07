@@ -3,16 +3,23 @@ const getAttributeAbbreviation = (attribute: string): string => {
     return attribute;
   }
 
+  if (attribute.charAt(0) === "@") {
+    // If Attribute is @{...}. Remove the @{}
+    attribute = attribute.substring(2, attribute.length - 1);
+  }
+
   const abbreviation = attribute.substring(0, 3);
 
-  // Awareness first 3 letters are "awa" but abbreviation is "awr"
-  if (attribute === "awareness") {
+  // Abbreviation does not follow the first three letters of attribute name pattern
+  if (attribute === "awareness" || attribute === "coordination") {
     const key = getTranslationByKey(abbreviation);
 
     if (key) {
       return key;
     } else {
-      console.warn(`Key not found for awareness abbreviation: ${abbreviation}`);
+      console.warn(
+        `Key not found for ${attribute} abbreviation: ${abbreviation}`
+      );
     }
   }
 

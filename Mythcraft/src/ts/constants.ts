@@ -12,7 +12,7 @@ const attributes = [
 
 const action_points = ["coordination", "action_points_base"];
 const hit_points = ["endurance", "hit_points_base", "level"];
-const critical_range = ["critical_range", "luck", "critical_range_base"];
+const critical_attributes = ["critical_range", "luck", "critical_range_base"];
 // Defenses
 const armor_rating = ["armor_rating_base"];
 const anticipation = ["anticipation_base", "awareness"];

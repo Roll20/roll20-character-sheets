@@ -1,10 +1,10 @@
-.pc.grid.gap-6.p-2
+.pc.grid.gap-6.p-2.auto-rows-max
 	input(type="hidden"  name="attr_tab" value="main")
 	
 	.grid.gap-4
 		.flex.flex-wrap.flex-row.gap-4
 			.logo.grow-0
-				img(src='https://raw.githubusercontent.com/clevett/roll20-character-sheets/refs/heads/mythcraft-1.0/Mythcraft/Mythcraft-Logo-Badge-Textured-Black.png' alt="Mythcraft Logo" title="Mythcraft Logo")
+				img(src='https://raw.githubusercontent.com/quasireal-publishing/roll20-mythcraft/refs/heads/main/Mythcraft/src/imgs/Mythcraft-Logo-Badge-Textured-Black.png' alt="Mythcraft Logo" title="Mythcraft Logo")
 			.grid.gap-1.grow.bio
 				.grid.grid-flow-col.gap-2.name-row
 					+headerInput('character name')
@@ -21,10 +21,13 @@
 					each val in ['appearance']
 						+headerInput(val)
 		.grid.gap-2.grid-flow-col.auto-cols-min
-			each tab in ['main', 'combat', 'magic', 'talents', 'journal', ]
+			each tab in ['main', 'combat', 'magic', 'talents', 'journal', 'settings']
 				.grid.tab.relative
 					input(type="radio" name="attr_tab" value=tab checked=(!!tab === 'main'))
-					span(data-i18n=tab)
+					if tab === 'settings'
+						span.pictos.lowercase y
+					else
+						span(data-i18n=tab).capitalize
 
 
 	.grid.gap-6.main
@@ -34,16 +37,22 @@
 				each val in [ 'values', 'drive', 'quirk']
 					+headerInput(val)(class=`${val}`)
 			.grid.grid-flow-col.gap-2.background
-				each val in ['background', 'occupation tag']
+				each val in ['background', 'profession']
 					+headerInput(val)(class=`${val}`)
 
 		.grid.gap-2.grid-flow-col.items-center.content-start.attrs.relative
-			each val in coreAttributes
+			each val in combatAttributes
 				.circle.rounded-full.border.grid.justify-center.items-center.font-bold
 					+attributeRoll(shortName(val), `${val}`)
 					+numberInput(val)
 
 		.grid.grid-flow-cols.gap-4.content-start.p-2.relative.grid-cols-2
+			.grid.gap-6.content-start
+				+repeatingList('inventory', {display: ['name', 'qty', ], collapse: ['tags', "cost"]})
+				.grid.double-border-2.rounded-md.p-2.relative
+					+title('currency')
+					.grid.mt-1
+						+textarea("currency")
 			.grid.gap-6.content-start
 				.grid.double-border-2.rounded-md.p-2.relative.skills
 					+title('skills')
@@ -52,11 +61,6 @@
 							each val in ['name','attribute','bonus']
 								h3(data-i18n=val)
 					+repeatingSkills('skill')
-				+repeatingList('inventory', {display: ['name', 'qty', ], collapse: ['tags', "cost"]})
-				.grid.double-border-2.rounded-md.p-2.relative
-					+title('currency')
-					+textarea("currency")
-			.grid.gap-6.content-start
 				+repeatingList('favorites', {display: ['name', 'tags', ]})
 
 		
@@ -64,133 +68,137 @@
 		.grid.grid-flow-col.gap-2.hp-row
 			.grid.double-border-2.rounded-md.p-2.relative
 				+title("hp & shield")
-				.grid.grid-flow-col.gap-2.hp
+				.grid.grid-flow-col.gap-2.hp.mt-1
 					+numberInputWithMax("hp")
 					.grid.justify-center.items-center
 						+numberInput("shield")(class="text-center")
 						h3.text-center(data-i18n="shield")
 			.grid.double-border-2.rounded-md.p-2.relative
 				+title("death points")
-				+numberInputWithMax("death points")
+				.grid.mt-1
+					+numberInputWithMax("death points")
 			.grid.double-border-2.rounded-md.p-2.relative
-				+title("armor rating")
-				+numberInput("armor rating", 10)
+				+title("AR")
+				.grid.mt-1
+					+textInput("armor rating", 10)(class="text-center")
+					h3.text-center(data-i18n="armor rating")
 			.grid.double-border-2.rounded-md.p-2.relative
 				+title("speed")
-				+textInput("speed","20 ft")(class="text-center")
-		.grid.gap-2
-			.grid.grid-flow-col.gap-2.items-center
-				.grid.double-border-2.rounded-md.p-2.relative
-					+title("action points")
-					.grid.grid-flow-col.gap-2
-						.grid.justify-center.items-center
-							+numberInput("action points")
-							h3.text-center(data-i18n="current")
-						.grid.justify-center.items-center
-							+attrSpan("action points per round")(class="text-center")
-							h3.text-center(data-i18n="ap/round")
-				.grid.double-border-2.rounded-md.p-2.relative
-					+title("special action points")
-					+numberInputWithMax("special action points")
-				.grid.double-border-2.rounded-md.p-2.relative
-					+title("rerolls")
-					.grid.grid-flow-col.gap-2
-						.grid.justify-center.items-center
-							+numberInput("rerolls")
-							h3.text-center(data-i18n="current")
-						.grid.justify-center.items-center
-							+attrSpan("rerolls_max")(class="text-center")
-							h3.text-center(data-i18n="max")
+				.grid.mt-1
+					+textInput("speed","20")(class="text-center")
+					h3.text-center(data-i18n="ft")
+		.grid.grid.grid-flow-col.gap-2.items-center
+			.grid.double-border-2.rounded-md.p-2.relative
+				+title("action points")
+				.grid.grid-flow-col.gap-2.mt-1
+					.grid.justify-center.items-center
+						+numberInput("action points")
+						h3.text-center(data-i18n="current")
+					.grid.justify-center.items-center
+						+attrSpan("action points per round")(class="text-center")
+						h3.text-center(data-i18n="ap/round")
+			.grid.double-border-2.rounded-md.p-2.relative
+				+title("special action points")
+				.grid.mt-1
+				+numberInputWithMax("special action points")
+			.grid.double-border-2.rounded-md.p-2.relative
+				+title("luck points")
+				.grid.mt-1
+				+numberInputWithMax("luck points")
+			.grid.double-border-2.rounded-md.p-2.relative
+				+title("initiative")
+				.grid.mt-1
+					+numberInput("initiative bonus", 0)
+				.grid.justify-center.items-center.mt-1
+					+initiativeButton()
 
-		.grid.gap-1.justify-between.items-center.attrs
-			each val in combatAttributes
-				.grid.relative.justify-center.items-center
-					.circle.rounded-full.border.grid.justify-center.items-center.font-bold
-						+attributeRoll(shortName(val), `${val}`)
-						+numberInput(val)
-			div
-			each val in derivedAttributes
-				.grid.relative.justify-center.items-center(class=`${val}`)
-					.circle.rounded-full.border.grid.justify-center.items-center.font-bold
-						h3.text-center(data-i18n=shortName(val))
-						+attrSpan(val)(class="text-center")
-			.grid.relative.justify-center.items-center(class=`${val}`).rerolls
-				.circle.rounded-full.border.grid.justify-center.items-center.font-bold
-					h3.text-center(data-i18n="rerolls")
-					.grid.grid-flow-col.gap-2
-						span(name="attr_rerolls_max" class="text-center")
+		+combatAttributes()
 		
 		.grid.double-border-2.rounded-md.p-2.relative.attacks
 			+title("attacks & spellcasting")
-			+subheaders(["name", "apc", "attribute", "bonus", "damage", "damage type", "range"])
+			+subheaders(["name", "apc", "attribute", "bonus", "damage", "type", "range"])
 			.grid.gap-4
 				+repeatingAttacks()
 		.grid.gap-4.grid-flow-col.auto-cols-fr
 			.grid.gap-6.content-start
 				+repeatingList('reactive actions', {display: ['name', 'ap']})
 				+repeatingList('conditions', {display: ['name']})
-			.grid.gap-6.content-start
+			.grid.gap-6.content-start.auto-cols-fr
 				+repeatingList('favorites', {display: ['name', 'tags', ]})
+				+repeatingResources('trackables')
 
 
 	.grid.gap-6.magic
-		.grid.grid-flow-col.gap-4.mb-4
-			.grid.double-border-2.rounded-md.p-2.relative
-				+title("source / level")
-				.grid.grid-flow-col.gap-2.hp
-					.grid.justify-center.items-center
-						+textInput("source")(class="text-center")
-						h3.text-center(data-i18n="source")
-					.grid.justify-center.items-center
-						+numberInput("source level")(class="text-center")
-						h3.text-center(data-i18n="level")
-			.grid.double-border-2.rounded-md.p-2.relative
-				+title("spell points")
-				+numberInputWithMax("spell points")
-			.grid.double-border-2.rounded-md.p-2.relative
-				+title("spellcasting ability")
-				.grid.justify-center.items-center
-					select(name="attr_spellcasting_ability")
-						each val in coreAttributes
-							option(value=`@{${val}}` data-i18n=val)
-								val
-						
-		.grid.gap-6.items-center.spell-list
+		.grid.grid-flow-col.gap-2.points-source
+			.grid.gap-6.content-start
+				.grid.double-border-2.rounded-md.p-2.relative
+					+title("spell points")
+					.grid.mt-1
+						+numberInputWithMax("spell points")
+				.grid.grid-flow-col.gap-4
+					.grid.double-border-2.rounded-md.p-2.relative
+						+title("spellcasting ability")
+						.grid.justify-center.items-center.mt-1
+							select(name="attr_spellcasting_ability")
+								each val in coreAttributes
+									option(value=`@{${val}}` data-i18n=val)
+										val
+					input(type="hidden" name="attr_primary_source" value="arcane")
+					.grid.double-border-2.rounded-md.p-2.relative
+						+title("primary source")
+						.grid.justify-center.items-center.mt-1
+							select(name="attr_primary_source")
+								each val in magicSources
+									option(value=`${val}` data-i18n=val)
+									val
+					
 			.grid.double-border-2.rounded-md.content-start.p-2.source-magic.relative
-				.grid.grid-flow-col.items-center.justify-center.absolute.title
-					h2.px-2.text-center(data-i18n='source magic')
-					.grid.grid-flow-col.gap-2.source-sp
-						span
-							| ( 
-						+textInput('source magic sp')
-						span
-							| )
-						span
-							SP
-				+subheaders(['name', 'apc'])
-				+repeatingSection('source magic', {display: ['name', 'apc']})
+				+title('source')
+				+subheaders(['name', 'power level'])
+				fieldset(class=`repeating_sources`)
+					input(type="hidden" name="attr_link" value="")
+					.grid.gap-2.relative.repeating-grid
+						.grid.grid-flow-col.gap-2.displayed.custom-grid
+							+repeatingChatButton(attrName('source')).capitalize
+							+attrSpan('power level')(class="display ellipse text-center")
+						+editToggle()
+						+collapseToggle()
+						.collapsible.grid.gap-2
+							.description
+								span.display(name='attr_description')
+						.edit.grid.gap-2
+							.grid.gap-2.edit-grid
+								.grid.items-center.gap-2.grid-flow-col.col-auto-fr
+									h4(data-i18n='name')
+									select(name="attr_name")
+										each val in magicSources
+											option(value=`${val}` data-i18n=val).capitalize
+												val
+								.grid.justify-center.items-center
+									each val in ['power level']
+										+headerInput(val)
+							.description
+								+textarea('description')
 
+		.grid.gap-6.items-center.spell-list
 			.grid.double-border-2.rounded-md.p-2.relative.content-start.spells.spell-cards
 				+title('spells')
 				+repeatingSpellCards()
 	
 	.grid.gap-6.journal
-		.grid.rounded-md.p-2.relative
+		.grid.rounded-md.relative
 			+repeatingList('additional info', {display: ['name', "category"]})
 			
-		.grid.gap-4.grid-flow-col.auto-cols-fr
+		.grid.gap-2.grid-flow-col.auto-cols-fr
 			+repeatingList('location request contacts', {display: ['name']})
 
-			.grid.justify-center.gap-4.resources.w-full
-				.grid.double-border-2.rounded-md.p-2.relative.content-start.w-full.min-width-378
-					+title('resources')
-					fieldset(class="repeating_resources")
-						.grid.gap-2.grid-flow-col
-							+textInput('name')
-							+numberInputWithMax('value')
+			+repeatingResources('resources')
 
 		+repeatingList('journal', {display: ['name', 'date']})
 
-	.grid.gap-4.talents.grid-flow-col.talent-grid
+	.grid.gap-4.talents.grid-flow-col.talent-grid.auto-cols-fr
 		+repeatingList('talents', {display: ['name', "tags"], collapse: ['prerequisites'], favorite: true})
 		+repeatingList('abilities', {display: ['name', 'tags'], favorite: true})
+
+	.grid.gap-6.settings
+		+sheetSelect()

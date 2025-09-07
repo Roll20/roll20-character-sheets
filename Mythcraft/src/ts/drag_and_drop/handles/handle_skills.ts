@@ -6,9 +6,8 @@ const handle_skills = (page: CompendiumAttributes) => {
   update[`${row}_bonus`] = 1;
 
   if (typeof page.data.attribute === "string") {
-    update[`${row}_attribute_abbreviation`] = page.data.attribute.substring(
-      0,
-      3
+    update[`${row}_attribute_abbreviation`] = getAttributeAbbreviation(
+      page.data.attribute
     );
   }
 

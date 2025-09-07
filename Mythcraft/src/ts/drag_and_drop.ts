@@ -29,8 +29,10 @@ const handle_drop = () => {
         handle_conditions(page);
         break;
       case "Backgrounds":
-      case "Professions":
         handle_bop(page);
+        break;
+      case "Professions":
+        handle_profession(page);
         break;
       case "Equipment":
         handle_equipment(page);
@@ -40,6 +42,7 @@ const handle_drop = () => {
         break;
       case "Lineages":
         handle_lineage(page);
+        break;
       case "Skills":
         handle_skills(page);
         break;

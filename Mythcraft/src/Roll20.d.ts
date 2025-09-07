@@ -4,7 +4,7 @@
 declare type EventInfo = {
   newValue: string;
   previousValue: string;
-  removedInfo: string;
+  removedInfo?: { [key: string]: AttrValue };
   sourceAttribute: string;
   sourceType: string;
   triggerName: string;
@@ -14,8 +14,10 @@ declare type AttrValue = string | number | boolean;
 
 declare type Attrs = { [key: string]: AttrValue };
 
+declare type Attributes = string[];
+
 declare function getAttrs(
-  attributes: string[],
+  attributes: Attributes,
   callback?: (values: { [key: string]: string }) => void
 ): void;
 

@@ -19,12 +19,9 @@ const handle_spell = (page: CompendiumAttributes) => {
   const row = getRow("spells");
   const update = getUpdate(attrs, page, row);
 
-  if (page.data?.damage) {
-    const row = getRow("attacks");
-    const attackAttr = ["damage", "damage_type"];
-    const updateAttack = getUpdate(attackAttr, page, row);
-
-    console.log("Attack", updateAttack);
+  if (page.data.damage) {
+    update[`${row}_toggle_spell_attack`] = "on";
+    addSpellAttack(row, page);
   }
 
   if (page.data?.function_note) {
@@ -54,6 +51,10 @@ const handle_spell = (page: CompendiumAttributes) => {
   let tags = `${page.data.source} ${page.data.type}, ${page.data.function}`;
   if (page.data?.function_note) {
     tags += `, ${page.data.function_note}`;
+  }
+
+  if (page.data.source) {
+    update[`${row}_source`] = page.data.source.toString().toLowerCase();
   }
 
   update[`${row}_tags`] = tags;

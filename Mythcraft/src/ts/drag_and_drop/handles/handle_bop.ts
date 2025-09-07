@@ -10,5 +10,9 @@ const handle_bop = (page: CompendiumAttributes) => {
     update["occupation_tag"] = page.data.occupation;
   }
 
+  if (page.data.Category === "Professions") {
+    update["profession"] = page.name;
+  }
+
   setDropAttrs(update);
 };

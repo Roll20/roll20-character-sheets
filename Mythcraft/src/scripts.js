@@ -7,6 +7,17 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -54,13 +65,39 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var attackFieldsetAttributes = [
+    "name",
+    "damage",
+    "damage_type",
+    "range",
+    "tags",
+    "apc",
+    "description",
+];
+var addSpellAttack = function (row, page) {
+    var attackRow = getRow("attacks");
+    var update = getUpdate(attackFieldsetAttributes, page, attackRow);
+    update["".concat(attackRow, "_link")] = row;
+    getAttrs(["spellcasting_ability", "primary_source"], function (_a) {
+        var spellcasting_ability = _a.spellcasting_ability, primary_source = _a.primary_source;
+        update["".concat(attackRow, "_attribute")] = spellcasting_ability;
+        update["".concat(attackRow, "_attribute_abbreviation")] =
+            getAttributeAbbreviation(spellcasting_ability);
+        var rollFormula = getRollFormula(primary_source === page.data.source.toString().toLowerCase());
+        update["".concat(attackRow, "_roll_formula")] = rollFormula;
+        update["".concat(row, "_roll_formula")] = rollFormula;
+        update["".concat(row, "_link")] = attackRow;
+        setDropAttrs(update);
+    });
+    return attackRow;
+};
 var mentalAttributes = ["awareness", "intellect", "charisma"];
 var metaphysicAttributes = ["luck", "coordination"];
 var physicalAttributes = ["strength", "dexterity", "endurance"];
 var attributes = __spreadArray(__spreadArray(__spreadArray([], mentalAttributes, true), metaphysicAttributes, true), physicalAttributes, true);
 var action_points = ["coordination", "action_points_base"];
 var hit_points = ["endurance", "hit_points_base", "level"];
-var critical_range = ["critical_range", "luck", "critical_range_base"];
+var critical_attributes = ["critical_range", "luck", "critical_range_base"];
 var armor_rating = ["armor_rating_base"];
 var anticipation = ["anticipation_base", "awareness"];
 var fortitude = ["fortitude_base", "endurance"];
@@ -89,8 +126,10 @@ var handle_drop = function () {
                 handle_conditions(page);
                 break;
             case "Backgrounds":
-            case "Professions":
                 handle_bop(page);
+                break;
+            case "Professions":
+                handle_profession(page);
                 break;
             case "Equipment":
                 handle_equipment(page);
@@ -100,6 +139,7 @@ var handle_drop = function () {
                 break;
             case "Lineages":
                 handle_lineage(page);
+                break;
             case "Skills":
                 handle_skills(page);
                 break;
@@ -125,147 +165,38 @@ var handle_drop = function () {
         handle_drop();
     });
 });
-action_points.forEach(function (attr) {
-    on("change:".concat(attr), function () {
-        getAttrs(action_points, function (values) {
-            var _a = parseIntegers(values), coordination = _a.coordination, action_points_base = _a.action_points_base;
-            var action_points_per_round = action_points_base;
-            switch (coordination) {
-                case -1:
-                case -2:
-                    action_points_per_round = action_points_base - 1 || 0;
-                    break;
-                case -3:
-                    action_points_per_round = action_points_base - 2 || 0;
-                    break;
-                default:
-                    action_points_per_round =
-                        Math.ceil(coordination / 2) + action_points_base;
-                    break;
-            }
-            setAttrs({ action_points_per_round: action_points_per_round });
-        });
+["attacks", "spells", "reactive-actions"].forEach(function (fieldset) {
+    on("change:repeating_".concat(fieldset), function (event) {
+        updateLinkedAttribute(event);
     });
-});
-hit_points.forEach(function (attr) {
-    on("change:".concat(attr), function () {
-        getAttrs(hit_points, function (values) {
-            var _a = parseIntegers(values), endurance = _a.endurance, hit_points_base = _a.hit_points_base, level = _a.level;
-            var die_pips = 0;
-            var set_hit_points = 0;
-            if (endurance >= -2 && endurance <= 12) {
-                if (endurance === -3) {
-                    die_pips = 0;
-                    set_hit_points = 0;
-                }
-                else if (endurance >= -2 && endurance <= -1) {
-                    die_pips = 2;
-                    set_hit_points = 1;
-                }
-                else if (endurance >= 0 && endurance <= 2) {
-                    die_pips = 4;
-                    set_hit_points = 2;
-                }
-                else if (endurance >= 3 && endurance <= 5) {
-                    die_pips = 6;
-                    set_hit_points = 3;
-                }
-                else if (endurance >= 6 && endurance <= 8) {
-                    die_pips = 8;
-                    set_hit_points = 4;
-                }
-                else if (endurance >= 9 && endurance <= 11) {
-                    die_pips = 10;
-                    set_hit_points = 5;
-                }
-                else if (endurance >= 12) {
-                    die_pips = 12;
-                    set_hit_points = 6;
-                }
-            }
-            var hit_point_die = die_pips ? "".concat(level, "d").concat(die_pips) : 0;
-            var hit_die_formula = "".concat(hit_points_base, "+").concat(hit_point_die, "+").concat(level);
-            setAttrs({ hit_point_die: hit_point_die, hit_die_formula: hit_die_formula, set_hit_points: set_hit_points });
-        });
-    });
-});
-critical_range.forEach(function (attr) {
-    on("change:".concat(attr), function () {
-        getAttrs(critical_range, function (values) {
-            var _a = parseIntegers(values), luck = _a.luck, critical_range_base = _a.critical_range_base, critical_range = _a.critical_range;
-            if (luck < 0) {
-                setAttrs({
-                    critical_range: 0
-                });
-                return;
-            }
-            var range = critical_range_base;
-            if (luck >= 12) {
-                range = critical_range_base - 2;
-            }
-            else if (luck >= 6 && luck <= 11) {
-                range = critical_range_base - 1;
-            }
-            var cr = range < 16 ? 16 : range;
-            if (cr !== critical_range) {
-                setAttrs({
-                    critical_range: cr
-                });
-            }
-        });
-    });
-});
-on("change:luck", function () {
-    getAttrs(["luck"], function (values) {
-        var luck = parseInt(values.luck);
-        var attrs = {};
-        attrs.rerolls_max = Math.ceil(luck / 2) || 0;
-        if (luck < 0) {
-            attrs.luck_negative_modifier = luck;
+    on("remove:repeating_".concat(fieldset), function (_a) {
+        var _b;
+        var sourceAttribute = _a.sourceAttribute, removedInfo = _a.removedInfo;
+        var link = removedInfo["".concat(sourceAttribute, "_link")];
+        if (link) {
+            var update = (_b = {}, _b["".concat(link, "_link")] = "", _b);
+            setAttrs(update, { silent: true });
         }
-        else {
-            attrs.luck_negative_modifier = 0;
-        }
-        setAttrs(attrs);
     });
 });
-[anticipation, fortitude, logic, reflexes, willpower].forEach(function (scoreAttributes) {
-    scoreAttributes.forEach(function (attr) {
-        on("change:".concat(attr), function () {
-            getAttrs(scoreAttributes, function (values) {
-                var _a;
-                var sum = sumIntegers(Object.values(parseIntegers(values)));
-                var name = scoreAttributes
-                    .find(function (e) { return e.includes("base"); })
-                    .replace("_base", "");
-                setAttrs((_a = {}, _a[name] = sum, _a));
-            });
-        });
+["attacks", "skills"].forEach(function (fieldset) {
+    on("change:repeating_".concat(fieldset, ":attribute"), function (event) {
+        var _a;
+        var sourceAttribute = event.sourceAttribute, newValue = event.newValue;
+        var repeatingRow = getFieldsetRow(sourceAttribute);
+        var abbreviation = getAttributeAbbreviation(newValue);
+        setAttrs((_a = {}, _a["".concat(repeatingRow, "_attribute_abbreviation")] = abbreviation, _a));
     });
 });
-on("change:repeating_skills:attribute", function (event) {
-    var _a;
-    var sourceAttribute = event.sourceAttribute, newValue = event.newValue;
-    var repeatingRow = getFieldsetRow(sourceAttribute);
-    var attribute = newValue.substring(2, newValue.length - 1);
-    var abbreviation = getAttributeAbbreviation(attribute);
-    setAttrs((_a = {}, _a["".concat(repeatingRow, "_attribute_abbreviation")] = abbreviation, _a));
+["attacks", "inventory"].forEach(function (fieldset) {
+    on("change:repeating_".concat(fieldset, ":name"), function (event) {
+        updateLinkedAttribute(event);
+    });
 });
-var favoriteAttributes = ["name", "tags", "description"];
 ["abilities", "favorites", "talents"].forEach(function (fieldset) {
-    favoriteAttributes.forEach(function (attr) {
+    ["name", "tags", "description", "ap"].forEach(function (attr) {
         on("change:repeating_".concat(fieldset, ":").concat(attr), function (event) {
-            var newValue = event.newValue;
-            getAttrs(["repeating_".concat(fieldset, "_link")], function (values) {
-                var _a;
-                var favoriteRow = values["repeating_".concat(fieldset, "_link")];
-                if (favoriteRow) {
-                    var update = (_a = {},
-                        _a["".concat(favoriteRow, "_").concat(attr)] = newValue,
-                        _a);
-                    setAttrs(update, { silent: true });
-                }
-            });
+            updateLinkedAttribute(event);
         });
     });
     on("change:repeating_".concat(fieldset, ":toggle_favorite"), function (event) {
@@ -300,21 +231,299 @@ var favoriteAttributes = ["name", "tags", "description"];
         }
     });
 });
-["attacks", "inventory"].forEach(function (fieldset) {
-    on("change:repeating_".concat(fieldset, ":name"), function (event) {
-        var newValue = event.newValue;
-        getAttrs(["repeating_".concat(fieldset, "_link")], function (values) {
-            var _a;
-            var row = values["repeating_".concat(fieldset, "_link")];
-            if (row) {
-                var update = (_a = {},
-                    _a["".concat(row, "_name")] = newValue,
-                    _a);
-                setAttrs(update, { silent: true });
-            }
+action_points.forEach(function (attr) {
+    on("change:".concat(attr), function () {
+        updateActionPointsPerRound(action_points);
+    });
+});
+critical_attributes.forEach(function (attr) {
+    on("change:".concat(attr), function () {
+        updateCriticalRange(critical_attributes);
+    });
+});
+on("change:luck", function () {
+    updateLuck(["luck"]);
+});
+hit_points.forEach(function (attr) {
+    on("change:".concat(attr), function () {
+        updateHitPoints(hit_points);
+    });
+});
+on("change:primary_source", function (event) {
+    var newValue = event.newValue, previousValue = event.previousValue;
+    var section = "repeating_spells";
+    getSectionIDs(section, function (ids) {
+        var sourceMap = ids.map(function (id) { return "".concat(section, "_").concat(id, "_source"); });
+        var linksMap = ids.map(function (id) { return "".concat(section, "_").concat(id, "_link"); });
+        var formulasMap = ids.map(function (id) { return "".concat(section, "_").concat(id, "_roll_formula"); });
+        getAttrs(__spreadArray(__spreadArray(__spreadArray([], sourceMap, true), linksMap, true), formulasMap, true), function (v) {
+            var update = {};
+            formulasMap.forEach(function (e) {
+                if (v[e] === "{{description=@{description}}}") {
+                    return;
+                }
+                var rowId = getFieldsetRow(e);
+                var link = v["".concat(rowId, "_link")];
+                var source = v["".concat(rowId, "_source")];
+                var isPrimarySource = source === newValue;
+                var wasPrimarySource = source === previousValue;
+                if (wasPrimarySource || isPrimarySource) {
+                    var formula = getRollFormula(isPrimarySource);
+                    update["".concat(rowId, "_roll_formula")] = formula;
+                    if (link) {
+                        update["".concat(link, "_roll_formula")] = formula;
+                    }
+                    setAttrs(update, { silent: true });
+                }
+            });
         });
     });
 });
+on("change:repeating_spells:source", function (event) {
+    var sourceAttribute = event.sourceAttribute, newValue = event.newValue;
+    var repeatingRow = getFieldsetRow(sourceAttribute);
+    getAttrs(["primary_source"], function (values) {
+        var _a;
+        var isPrimarySource = values.primary_source === newValue;
+        setAttrs((_a = {},
+            _a["".concat(repeatingRow, "_roll_formula")] = getRollFormula(isPrimarySource),
+            _a));
+    });
+});
+on("change:repeating_spells:toggle_spell_attack", function (event) {
+    updateSpellRollFormula(event);
+});
+[
+    "attacks",
+    "spells",
+    "abilities",
+    "favorites",
+    "talents",
+    "reactive-actions",
+].forEach(function (fieldset) {
+    on("remove:repeating_".concat(fieldset), function (_a) {
+        var _b;
+        var sourceAttribute = _a.sourceAttribute, removedInfo = _a.removedInfo;
+        var link = removedInfo["".concat(sourceAttribute, "_link")];
+        if (link) {
+            var update = (_b = {}, _b["".concat(link, "_link")] = "", _b);
+            setAttrs(update, { silent: true });
+        }
+    });
+});
+on("change:repeating_actions:toggle_action_attack", function (event) {
+    updateCreatureAttackRollFormula(event);
+});
+["skills", "features", "actions", "reactions", "spells"].forEach(function (section) {
+    on("change:section_".concat(section), function (event) {
+        var newValue = event.newValue;
+        getAttrs(["creature_sections"], function (values) {
+            var sections = values.creature_sections
+                ? values.creature_sections.split(",")
+                : [];
+            if (newValue === "on" && !sections.includes(section)) {
+                sections.push(section);
+            }
+            else if (newValue !== "on" && sections.includes(section)) {
+                var index = sections.indexOf(section);
+                if (index > -1) {
+                    sections.splice(index, 1);
+                }
+            }
+            console.log(sections);
+            setAttrs({ creature_sections: sections.join(",") });
+        });
+    });
+});
+var getRollFormula = function (isPrimarySource, isSpellCard) {
+    if (isSpellCard) {
+        return "{{description=@{description}}}";
+    }
+    var abilityModifier = "@{spellcasting_ability}";
+    if (!isPrimarySource) {
+        abilityModifier = "ceil(".concat(abilityModifier, "/2)");
+    }
+    return "{{dice=[[1d20+".concat(abilityModifier, "[ability]+(@{bonus}[bonus])+(?{TA/TD|0})[tactical bonus]+(@{luck_negative_modifier}[negative luck modifier])cs>@{critical_range}]]}} {{damage=[Damage](~repeating_spells-roll_damage)}} {{description=@{description}}}");
+};
+var updateActionPointsPerRound = function (attributes) {
+    getAttrs(attributes, function (values) {
+        var _a = parseIntegers(values), coordination = _a.coordination, action_points_base = _a.action_points_base;
+        var action_points_per_round = action_points_base;
+        switch (coordination) {
+            case -1:
+            case -2:
+                action_points_per_round = action_points_base - 1 || 0;
+                break;
+            case -3:
+                action_points_per_round = action_points_base - 2 || 0;
+                break;
+            default:
+                action_points_per_round =
+                    Math.ceil(coordination / 2) + action_points_base;
+                break;
+        }
+        setAttrs({ action_points_per_round: action_points_per_round });
+    });
+};
+var updateCreatureAttackRollFormula = function (event) {
+    var _a, _b;
+    var sourceAttribute = event.sourceAttribute, newValue = event.newValue, sourceType = event.sourceType;
+    if (sourceType !== "player") {
+        return;
+    }
+    var row = getFieldsetRow(sourceAttribute);
+    var isAttack = newValue === "on";
+    if (isAttack) {
+        var update = (_a = {},
+            _a["".concat(row, "_roll_formula")] = "{{dice=[[1d20+(@{bonus})+(?{TA/TD|0}[tactical bonus])]]}} {{action=@{range} @{type}. @{bonus} vs @{defense} }} {{damage=[Damage](~repeating_actions-roll_damage)}}",
+            _a);
+        setAttrs(update);
+        return;
+    }
+    setAttrs((_b = {},
+        _b["".concat(row, "_roll_formula")] = "{{description=@{description}}}",
+        _b));
+};
+var updateCriticalRange = function (attributes) {
+    getAttrs(attributes, function (values) {
+        var _a = parseIntegers(values), luck = _a.luck, critical_range_base = _a.critical_range_base, critical_range = _a.critical_range;
+        if (luck < 0) {
+            setAttrs({
+                critical_range: 0
+            });
+            return;
+        }
+        var range = critical_range_base;
+        if (luck >= 12) {
+            range = critical_range_base - 2;
+        }
+        else if (luck >= 6 && luck <= 11) {
+            range = critical_range_base - 1;
+        }
+        var cr = range < 16 ? 16 : range;
+        if (cr !== critical_range) {
+            setAttrs({
+                critical_range: cr
+            });
+        }
+    });
+};
+var updateHitPoints = function (attributes) {
+    getAttrs(attributes, function (values) {
+        var _a = parseIntegers(values), endurance = _a.endurance, hit_points_base = _a.hit_points_base, level = _a.level;
+        var die_pips = 0;
+        var set_hit_points = 0;
+        if (endurance >= -2 && endurance <= 12) {
+            if (endurance === -3) {
+                die_pips = 0;
+                set_hit_points = 0;
+            }
+            else if (endurance >= -2 && endurance <= -1) {
+                die_pips = 2;
+                set_hit_points = 1;
+            }
+            else if (endurance >= 0 && endurance <= 2) {
+                die_pips = 4;
+                set_hit_points = 2;
+            }
+            else if (endurance >= 3 && endurance <= 5) {
+                die_pips = 6;
+                set_hit_points = 3;
+            }
+            else if (endurance >= 6 && endurance <= 8) {
+                die_pips = 8;
+                set_hit_points = 4;
+            }
+            else if (endurance >= 9 && endurance <= 11) {
+                die_pips = 10;
+                set_hit_points = 5;
+            }
+            else if (endurance >= 12) {
+                die_pips = 12;
+                set_hit_points = 6;
+            }
+        }
+        var hit_point_die = die_pips ? "".concat(level, "d").concat(die_pips) : 0;
+        var hit_die_formula = "".concat(hit_points_base, "+").concat(hit_point_die, "+").concat(level);
+        setAttrs({ hit_point_die: hit_point_die, hit_die_formula: hit_die_formula, set_hit_points: set_hit_points });
+    });
+};
+var updateLinkedAttribute = function (event) {
+    var sourceAttribute = event.sourceAttribute, newValue = event.newValue;
+    if (sourceAttribute.includes("link")) {
+        return;
+    }
+    var attr = getFieldsetAttr(sourceAttribute);
+    var fieldset = getFieldsetGroupName(sourceAttribute);
+    getAttrs(["repeating_".concat(fieldset, "_link")], function (values) {
+        var _a;
+        var linkedRow = values["repeating_".concat(fieldset, "_link")];
+        if (linkedRow) {
+            var update = (_a = {},
+                _a["".concat(linkedRow, "_").concat(attr)] = newValue,
+                _a);
+            setAttrs(update, { silent: true });
+        }
+    });
+};
+var updateLuck = function (attributes) {
+    getAttrs(attributes, function (values) {
+        var luck = parseInt(values.luck);
+        var attrs = {};
+        attrs.rerolls_max = Math.ceil(luck / 2) || 0;
+        if (luck < 0) {
+            attrs.luck_negative_modifier = luck;
+        }
+        else {
+            attrs.luck_negative_modifier = 0;
+        }
+        setAttrs(attrs);
+    });
+};
+var updateSpellRollFormula = function (event) {
+    var _a;
+    var sourceAttribute = event.sourceAttribute, newValue = event.newValue, sourceType = event.sourceType;
+    var row = getFieldsetRow(sourceAttribute);
+    var isSpellCard = newValue === "0";
+    if (sourceType !== "player") {
+        return;
+    }
+    if (isSpellCard) {
+        var formula = getRollFormula(undefined, isSpellCard);
+        setAttrs((_a = {},
+            _a["".concat(row, "_roll_formula")] = formula,
+            _a));
+        return;
+    }
+    if (!isSpellCard) {
+        getAttrs(["primary_source", "".concat(row, "_source")], function (_a) {
+            var _b;
+            var primary_source = _a.primary_source, values = __rest(_a, ["primary_source"]);
+            var isPrimarySource = primary_source === values["".concat(row, "_source")];
+            setAttrs((_b = {},
+                _b["".concat(row, "_roll_formula")] = getRollFormula(isPrimarySource, isSpellCard),
+                _b));
+        });
+        var attributes_1 = __spreadArray(__spreadArray([], attackFieldsetAttributes, true), ["source", "link"], false).map(function (attr) { return "".concat(row, "_").concat(attr); });
+        getAttrs(attributes_1, function (values) {
+            var data = {};
+            __spreadArray(__spreadArray([], attackFieldsetAttributes, true), ["source"], false).forEach(function (attr) {
+                data[attr] = values["".concat(row, "_").concat(attr)];
+            });
+            var link = values["".concat(row, "_link")];
+            if (!link) {
+                var data_1 = {};
+                __spreadArray(__spreadArray([], attackFieldsetAttributes, true), ["source"], false).forEach(function (attr) {
+                    data_1[attr] = values["".concat(row, "_").concat(attr)];
+                });
+                addSpellAttack(row, {
+                    name: values["".concat(row, "_name")],
+                    data: data_1
+                });
+            }
+        });
+    }
+};
 var _this = this;
 var versioningAttr = "latest_versioning_upgrade";
 on("sheet:opened", function () {
@@ -418,6 +627,9 @@ var handle_bop = function (page) {
         update["background"] = page.name;
         update["occupation_tag"] = page.data.occupation;
     }
+    if (page.data.Category === "Professions") {
+        update["profession"] = page.name;
+    }
     setDropAttrs(update);
 };
 var handle_conditions = function (page) {
@@ -460,18 +672,33 @@ var handle_lineage = function (page) {
         dropWarning("Error setting attributes: ".concat(e));
     }
 };
+var handle_profession = function (page) {
+    if (page.data.occupation) {
+        handle_bop(page);
+        return;
+    }
+    console.log(page);
+    var attrs = ["name", "description"];
+    var row = getRow("abilities");
+    var update = getUpdate(attrs, page, row);
+    if (page.data.profession) {
+        update["".concat(row, "_tags")] = page.data.profession;
+    }
+    console.log(update);
+    setDropAttrs(update);
+};
 var handle_skills = function (page) {
     var attrs = ["name", "category", "description", "attribute"];
     var row = getRow("skills");
     var update = getUpdate(attrs, page, row);
     update["".concat(row, "_bonus")] = 1;
     if (typeof page.data.attribute === "string") {
-        update["".concat(row, "_attribute_abbreviation")] = page.data.attribute.substring(0, 3);
+        update["".concat(row, "_attribute_abbreviation")] = getAttributeAbbreviation(page.data.attribute);
     }
     setDropAttrs(update);
 };
 var handle_spell = function (page) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
     var attrs = [
         "apc",
         "description",
@@ -490,33 +717,34 @@ var handle_spell = function (page) {
     ];
     var row = getRow("spells");
     var update = getUpdate(attrs, page, row);
-    if ((_a = page.data) === null || _a === void 0 ? void 0 : _a.damage) {
-        var row_1 = getRow("attacks");
-        var attackAttr = ["damage", "damage_type"];
-        var updateAttack = getUpdate(attackAttr, page, row_1);
-        console.log("Attack", updateAttack);
+    if (page.data.damage) {
+        update["".concat(row, "_toggle_spell_attack")] = "on";
+        addSpellAttack(row, page);
     }
-    if ((_b = page.data) === null || _b === void 0 ? void 0 : _b.function_note) {
+    if ((_a = page.data) === null || _a === void 0 ? void 0 : _a.function_note) {
         update["".concat(row, "_function")] = "".concat(page.data["function"], " (").concat(page.data.function_note, ")");
     }
-    if ((_c = page.data) === null || _c === void 0 ? void 0 : _c.liturgy_apc) {
+    if ((_b = page.data) === null || _b === void 0 ? void 0 : _b.liturgy_apc) {
         update["".concat(row, "_apc")] = "".concat(page.data.liturgy_apc, " (liturgy apc)");
     }
-    if ((_d = page.data) === null || _d === void 0 ? void 0 : _d.liturgy_spc) {
+    if ((_c = page.data) === null || _c === void 0 ? void 0 : _c.liturgy_spc) {
         update["".concat(row, "_spc")] = "".concat(page.data.liturgy_spc, " (liturgy spc)");
     }
-    if (((_e = page.data) === null || _e === void 0 ? void 0 : _e.requires) && ((_f = page.data) === null || _f === void 0 ? void 0 : _f.materials)) {
-        update["".concat(row, "_requires")] = "".concat((_g = page.data) === null || _g === void 0 ? void 0 : _g.requires, " (").concat(page.data.materials, ")");
+    if (((_d = page.data) === null || _d === void 0 ? void 0 : _d.requires) && ((_e = page.data) === null || _e === void 0 ? void 0 : _e.materials)) {
+        update["".concat(row, "_requires")] = "".concat((_f = page.data) === null || _f === void 0 ? void 0 : _f.requires, " (").concat(page.data.materials, ")");
     }
-    else if ((_h = page.data) === null || _h === void 0 ? void 0 : _h.requires) {
-        update["".concat(row, "_requires")] = "".concat((_j = page.data) === null || _j === void 0 ? void 0 : _j.requires);
+    else if ((_g = page.data) === null || _g === void 0 ? void 0 : _g.requires) {
+        update["".concat(row, "_requires")] = "".concat((_h = page.data) === null || _h === void 0 ? void 0 : _h.requires);
     }
-    else if ((_k = page.data) === null || _k === void 0 ? void 0 : _k.materials) {
-        update["".concat(row, "_requires")] = "".concat((_l = page.data) === null || _l === void 0 ? void 0 : _l.materials);
+    else if ((_j = page.data) === null || _j === void 0 ? void 0 : _j.materials) {
+        update["".concat(row, "_requires")] = "".concat((_k = page.data) === null || _k === void 0 ? void 0 : _k.materials);
     }
     var tags = "".concat(page.data.source, " ").concat(page.data.type, ", ").concat(page.data["function"]);
-    if ((_m = page.data) === null || _m === void 0 ? void 0 : _m.function_note) {
+    if ((_l = page.data) === null || _l === void 0 ? void 0 : _l.function_note) {
         tags += ", ".concat(page.data.function_note);
+    }
+    if (page.data.source) {
+        update["".concat(row, "_source")] = page.data.source.toString().toLowerCase();
     }
     update["".concat(row, "_tags")] = tags;
     setDropAttrs(update);
@@ -525,7 +753,20 @@ var handle_talent = function (page) {
     var attrs = ["name", "description", "level", "prerequisites"];
     var row = getRow("talents");
     var update = getUpdate(attrs, page, row);
-    update["".concat(row, "_tags")] = "".concat(page.data.stack, ", ").concat(page.data.track);
+    var tag = page.data.stack;
+    if (page.data.track) {
+        tag += ", ".concat(page.data.track);
+    }
+    update["".concat(row, "_tags")] = tag;
+    if (page.data.reactive) {
+        var reactiveRow = getRow("reactive-actions");
+        var reactiveAttrs = ["name", "description", "ap"];
+        var reactiveUpdate = getUpdate(reactiveAttrs, page, reactiveRow);
+        Object.assign(update, reactiveUpdate);
+        update["".concat(reactiveRow, "_toggle_edit")] = false;
+        update["".concat(reactiveRow, "_link")] = row;
+        update["".concat(row, "_link")] = reactiveRow;
+    }
     setDropAttrs(update);
 };
 var handle_weapon = function (page, attackRow, inventoryRow) {
@@ -575,14 +816,17 @@ var getAttributeAbbreviation = function (attribute) {
     if (attribute === "luck") {
         return attribute;
     }
+    if (attribute.charAt(0) === "@") {
+        attribute = attribute.substring(2, attribute.length - 1);
+    }
     var abbreviation = attribute.substring(0, 3);
-    if (attribute === "awareness") {
+    if (attribute === "awareness" || attribute === "coordination") {
         var key = getTranslationByKey(abbreviation);
         if (key) {
             return key;
         }
         else {
-            console.warn("Key not found for awareness abbreviation: ".concat(abbreviation));
+            console.warn("Key not found for ".concat(attribute, " abbreviation: ").concat(abbreviation));
         }
     }
     return abbreviation;
