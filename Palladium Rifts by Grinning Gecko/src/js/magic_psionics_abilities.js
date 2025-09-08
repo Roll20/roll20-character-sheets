@@ -112,7 +112,7 @@ async function updateMagicPsionicsLevels() {
     for (const id of ids) {
       const row = `repeating_${section}_${id}`;
       console.log("updateMagicPsionicsLevels", row);
-      await calculateDamage(`${row}_damage_modifier`);
+      // await calculateDamage(`${row}_damage_modifier`);
       await calculateDamage(`${row}_damage`);
       await calculatePercentage(`${row}_percentage`);
       await calculateRangeDuration(`${row}_range`);
@@ -131,9 +131,9 @@ const damageListeners = ABILITIES_REPEATERS.reduce((acc, cur) => {
   acc.push(`change:repeating_${cur}:damage_starting`);
   acc.push(`change:repeating_${cur}:damage_unit`);
   acc.push(`change:repeating_${cur}:damage_per_level`);
-  acc.push(`change:repeating_${cur}:damage_modifier_starting`);
-  acc.push(`change:repeating_${cur}:damage_modifier_unit`);
-  acc.push(`change:repeating_${cur}:damage_modifier_per_level`);
+  // acc.push(`change:repeating_${cur}:damage_modifier_starting`);
+  // acc.push(`change:repeating_${cur}:damage_modifier_unit`);
+  // acc.push(`change:repeating_${cur}:damage_modifier_per_level`);
   return acc;
 }, []).join(" ");
 
@@ -159,11 +159,12 @@ on(damageListeners, async (e) => {
   console.log("damageListeners", e);
   const [r, section, rowId] = e.sourceAttribute.split("_");
   let row;
-  if (section === "modifiers") {
-    row = `${r}_${section}_${rowId}_damage_modifier`;
-  } else {
-    row = `${r}_${section}_${rowId}_damage`;
-  }
+  // if (section === "modifiers") {
+  //   row = `${r}_${section}_${rowId}_damage_modifier`;
+  // } else {
+  //   row = `${r}_${section}_${rowId}_damage`;
+  // }
+  row = `${r}_${section}_${rowId}_damage`;
   await calculateDamage(row);
 });
 
