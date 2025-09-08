@@ -1,5 +1,70 @@
 # Changelog
 
+## [1.8.4] - 2025-08-28
+
+### Changed
+
+- Fix issue where Modifier Ancient: Damage was becoming 0+undefined+undefined+undefined+undefined+undefined.
+
+## [1.8.3] - 2025-06-14
+
+### Added
+
+- Add new modifier attributes to export.
+- Add Support & Request Thread button.
+
+### Changed
+
+- Fix Modifier damage unit on roll button.
+
+## [1.8.2] - 2025-05-22
+
+### Changed
+
+- Fix issue where new Modifiers damage field overwrites Ancient: Damage with 0.
+
+## [1.8.1] - 2025-05-28
+
+### Changed
+
+- Make Active Profile checkboxes look like radio buttons.
+
+## [1.8.0] - 2025-05-25
+
+### Added
+
+- Add "Refresh All Profiles" button.
+- Add Range, Duration, Frequency, Damage, DC, and Skill to Modifiers.
+- Add Frequency to Magic, Psionics.
+- Add rollable attribute checks to Profiles, including D20 + Attribute, D20 + Attribute Bonus, D20 Under Attribute, and D100 Under Attribute.
+
+### Changed
+
+- Fix issue where spell strength was not being calculated correctly.
+
+## [1.7.4] - 2025-03-30
+
+### Changed
+
+- Fix missing quote on "Output ISP/PPE/Damage usage to chat" attribute.
+
+## [1.7.3] - 2025-02-28
+
+### Changed
+
+- Fix import race condition that caused WPs and Combat Skills to be duplicated in the Modifier Picker.
+
+## [1.7.2] - 2025-02-28
+
+### Changed
+
+- Fix issue where importing an Ability/Magic/Psionic with `addtobonuses` would cause it to get added to the Modifier Picker twice.
+- Fix issue with Trust/Intimidate/Charm/Impress roll buttons not showing Success or Failure.
+- Add PE Bonus as an optional modifier to Disease save, since if it's a Magic Disease, the PE is already factored in.
+- Fix issue with Active Profile Curse save.
+- Add PE Bonus as an optional modifier to Fatigue and Pain saves.
+- Add PP Bonus as an optional modifier to Maintain Balance.
+
 ## [1.7.1] - 2025-02-14
 
 ### Changed

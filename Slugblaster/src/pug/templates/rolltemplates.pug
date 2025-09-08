@@ -1,0 +1,99 @@
+- const dices = Array.from(Array(10).keys(), (key) => `die${key + 1}`);
+
+rolltemplate.sheet-rolltemplate-slugblaster
+  .sheet-roll
+    .sheet-roll__header
+      span.sheet-roll__header--character_name {{ character }}
+      +tags(['trick'])
+        span.sheet-roll__header--trick(data-i18n='saying_check_it_and') says “Check It” and
+      +tags(['^disaster'])
+        span.sheet-roll__header--take-action(data-i18n='takes_action') takes action
+      +tags(['disaster'])
+        span.sheet-roll__header--take-action(data-i18n='luck_runs_out') runs out of luck
+
+    .sheet-roll__content
+      .sheet-roll__title {{ title }}
+      +tags(['subtitle'])
+        .sheet-roll__subtitle {{ subtitle }}
+      .sheet-roll__dice
+        each die in dices
+          +tags([die])
+            +displayDie(die)
+
+      +tags(['action'])
+        .sheet-roll__result
+          +rollFunction([`rollBetween() roll 6 6`])
+            | {{ roll }}
+            | &nbsp;
+            span.sheet-roll__result--label(data-i18n='roll_success') Success!
+            | &nbsp;
+            span(data-i18n='roll_success_description') You do it!
+
+          +rollFunction([`rollBetween() roll 4 5`])
+            | {{ roll }}
+            | &nbsp;
+            span.sheet-roll__result--label(data-i18n='roll_mixed_success') Mixed success.
+            | &nbsp;
+            span(data-i18n='roll_mixed_success_description') You do it, but there’s a problem.
+
+          +rollFunction([`rollBetween() roll 0 3`])
+            | {{ roll }}
+            | &nbsp;
+            span.sheet-roll__result--label(data-i18n='roll_failure') Failure.
+            | &nbsp;
+            span(data-i18n='roll_failure_description') You don’t do it, and there’s a problem.
+
+        .sheet-roll__modifiers
+          .sheet-roll__boosts
+            label(data-i18n='boosts') Boosts
+            span.sheet-roll__value {{ boosts }}
+          .sheet-roll__kicks
+            label(data-i18n='kicks') Kicks
+            span.sheet-roll__value {{ kicks }}
+
+          +tags(['^choose_dare'])
+            .sheet-roll__dares
+              label(data-i18n='dare') Dare
+              +tags(['plus_1d6'])
+                span(data-i18n='plus_1d6') +1d6
+              +tags(['plus_kick'])
+                span(data-i18n='plus_kick') 1 kick
+              +tags(['clear_trouble'])
+                span(data-i18n='clear_trouble') clear 1 trouble
+
+      +tags(['disaster'])
+        .sheet-roll__result
+          +rollFunction([`rollBetween() roll 6 6`])
+            | {{ roll }}
+            | &nbsp;
+            span.sheet-roll__result--label(data-i18n='roll_disaster_success') Easy street.
+            | &nbsp;
+            span(data-i18n='roll_disaster_success_description') Avoid disaster and mark 1 style.
+
+          +rollFunction([`rollBetween() roll 4 5`])
+            | {{ roll }}
+            | &nbsp;
+            span.sheet-roll__result--label(data-i18n='roll_disaster_mixed_success') Close call!
+            | &nbsp;
+            span(data-i18n='roll_disaster_mixed_success_description') Avoid disaster but mark 1 trouble.
+
+          +rollFunction([`rollBetween() roll 0 3`])
+            | {{ roll }}
+            | &nbsp;
+            span.sheet-roll__result--label(data-i18n='roll_disaster_failure') Disaster strikes!
+            | &nbsp;
+            span(data-i18n='roll_disaster_failure_description') Something really bad happens (page 147). Mark doom.
+
+rolltemplate.sheet-rolltemplate-slugcast
+  .sheet-roll
+    .sheet-roll__header
+      span.sheet-roll__header--character_name {{ character }}
+      span.sheet-roll__header--take-action(data-i18n='shares_with_the_class') shares with the class
+    .sheet-roll__content
+      .sheet-roll__title {{ title }}
+      .sheet-roll__subtitle {{ subtitle }}
+      .sheet-roll__broadcast
+        +rollFunction(["allprops() character title subtitle"])
+          .sheet-roll__broadcast-item
+            span.sheet-roll__broadcast--value= `{{value}}`
+            label.sheet-roll__broadcast--key= `{{key}}`
