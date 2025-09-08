@@ -2714,6 +2714,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     </div>
 
 
+     <div class='prop_pair'>
+      <span>Total Penalty:</span>
+      <div>
+        <span name='attr_allpenalties'></span><br>
+        <div>
+          
+          <input type="hidden" class="bar-value" name="attr_statuspercent" value="100">
+          <div class="bar-track"> <div class="bar-progress"></div> </div>
+        </div>
+      </div>
+    </div>
+
+
+
     <hr>
 
     <div class='prop_pair'>
@@ -3285,6 +3299,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
       <span>Status Penalty:</span>
       <span name='attr_statuspenalty'></span>
     </div>
+
+
+     <div class='prop_pair'>
+      <span>Total Penalty:</span>
+      <div>
+        <span name='attr_allpenalties'></span><br>
+        <div>
+          
+          <input type="hidden" class="bar-value" name="attr_statuspercent" value="100">
+          <div class="bar-track"> <div class="bar-progress"></div> </div>
+        </div>
+      </div>
+    </div>
+
 
 
     <hr>
@@ -6477,7 +6505,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 846a2ba9dffe0c2ac5a84ecb664f6c8ccd69628c
+Revision 24b4044016fe6b68384182bb154b2a67a5c9abb2
 
 
 <hr>
@@ -9558,6 +9586,14 @@ const subtlepenalties = {
     armorenc: 0, metalenc: 3,
     helmetlight: -25, helmetmedium: -50, helmetheavy: -75,
   },
+  "arcane": {
+    E: -80, F: -40, I:  -10, U: -20, A: 0,
+    nohand: -40, onehand: -10, twohands: 0,
+    novoice: -20, whisper: -10,normal: 0, shout: 10,
+    armorenc: 2, metalenc: 3,
+    helmetlight: 0, helmetmedium: 0, helmetheavy: 0,
+
+  },
 };
 
 const handNames = { nohand: "No Hands", onehand: "One Hand", twohands: "Two Hands" };
@@ -9591,6 +9627,8 @@ function getSubtlePenalty(realm, type, trickery, subtle, voice, hands, enc, meta
     realm = 'channeling';
   } else if (realm == 'Mentalism' || realm == 'mentalism') {
     realm = 'mentalism';
+  } else if (realm == 'Arcane' || realm == 'arcane') {
+    realm = 'arcane';
   } else {
     rmuerror("Unknown realm:", realm);
     realm = 'essence';
@@ -16652,6 +16690,7 @@ onCheck("clicked:newcombat", () => {
     getAttrs(["character_name"], (ev) => {
 	sendMessage(`${ev.character_name} prepares for battle`);
     });
+    actionsUpdateStatus();
 });
 
 // So this is our per AP stuff
@@ -16778,7 +16817,7 @@ function roundString(phases) {
 /***/
 function actionsUpdateStatus() {
   getAttrs(["character_name", "statusstagger", "statusstun75", "statusstun50", "statusstun25",
-	    "statuslist"], (status) => {
+	    "statuslist", "statuspenalty"], (status) => {
 	console.log(status);
 	let updates = {}
 
@@ -16789,19 +16828,28 @@ function actionsUpdateStatus() {
 
 	updates.statuseffect = 0;  // Default
 	updates.statusmessage = 'Okay';
+	let statuspenalty = parseIntDefault(status.statuspenalty, 0);
+	updates.allpenalties = statuspenalty;
 	if (statusstagger) {
 	  updates.statuseffect = 'staggered'
 	  updates.statusmessge = 'Staggered'
+	  updates.allpenalties =  -300;
 	} else if (statusstun75) {
 	  updates.statuseffect = -75;
 	  updates.statusmessage = 'Stun -75'
+	  updates.allpenalties = updates.statuseffect + statuspenalty;
 	} else if (statusstun50) {
 	  updates.statuseffect = -50;
 	  updates.statusmessage = 'Stun -50'
+	  updates.allpenalties = updates.statuseffect + statuspenalty;
 	} else if (statusstun25) {
 	  updates.statuseffect = -25;
 	  updates.statusmessage = 'Stun -25'
+	  updates.allpenalties = updates.statuseffect + statuspenalty;
 	}
+
+	updates.statuspercent = Math.max(100 + updates.allpenalties, 0);
+
 	VrmuSetAttrs(updates)
     });
 
@@ -17257,7 +17305,7 @@ function updatePenalties() {
       let total = parseIntDefault(ev.fatigue, 0) +
 	    parseIntDefault(ev.hppenalty, 0) +
 	    parseIntDefault(ev.injurypenalty, 0);
-      setAttrs({statuspenalty: total, bar3_value: total});
+      setAttrs({statuspenalty: total}, actionsUpdateStatus);
   });
 }
 
@@ -17752,8 +17800,8 @@ creature.newCreature = function(name, jdata) {
     bar1_link:'hp',
     cd_bar2_l: 'pp',
     bar2_link: 'pp',
-    cd_bar3_l: 'statuspenalty',
-    bar3_link: 'statuspenalty',
+    cd_bar3_l: 'allpenalties',
+    bar3_link: 'allpenalties',
     cd_bar4_l: 'aptrack',
     bar4_link: 'aptrack',
     showname: true,
@@ -18168,6 +18216,10 @@ onCheck("clicked:applyinjuryhack", () => {
 */
 injury.parseInjuryString = function (str) {
     let original = str;
+
+    // Kill the 'Injury: ' from pasting from Crit rolls
+    str = str.replace(/^Injury:\s*/, "");
+
     // So we may have multiple crits in the form of "Z<sev><type>:"
     //  Just squash them for now.  When we do immunities; we will
     //  need to handle them specifically.
@@ -18696,6 +18748,16 @@ function doVersionCheck(version, sheettype) {
     version = 11;
   }
 
+  if (version == 11) {
+    // Hoised to 13
+    version = 12;
+  }
+
+  if (version == 12) {
+    setAttrs({allpenalties: 0, statuspercent: 0, statuspercent_max: 100 });
+    version = 13;
+  }
+
   if (oldversion != version) {
     addPendingFunction(`Version update to ${version}`, () => {
 	setAttrsPending({version: version});
@@ -18703,24 +18765,6 @@ function doVersionCheck(version, sheettype) {
   }
 
   checkPending();
-
-  addPendingFunction("Set default Token", () => {
-      setDefaultToken({
-	cd_bar1_l: 'hp',
-	bar1_link:'hp',
-	cd_bar2_l: 'pp',
-	bar2_link: 'pp',
-	cd_bar3_l: 'statuspenalty',
-	bar3_link: 'statuspenalty',
-	cd_bar4_l: 'aptrack',
-	bar4_link: 'aptrack',
-	showname: true,
-	showplayers_name: true,
-	width: 70,
-	height: 70
-      });
-  });
-
 }
 
 /**
