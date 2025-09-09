@@ -116,5 +116,8 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Added Weapons and Armour to Ship's Locker
 - Added repeating row for custom power requirements to Ship tab
 
+### Version 1.1.08
+- Fixed Skills on Robot tab that were affecting modifiers on PC/NPC skills
+- 
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 
