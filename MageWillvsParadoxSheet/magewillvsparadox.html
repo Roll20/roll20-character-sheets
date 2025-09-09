@@ -165,7 +165,7 @@ When you concentrate for a long moment with your focus, you can alter reality wi
 On a success: the change happens as you intended.
 On a failure: the change fails and the GM adds 1 Paradox to the Scene.
 On a critical success: The change is successful, additionally, you gain 1 Quintessence (max 6)"
-value="&{template:us} {{name=@{character_name}}} {{roll_name=Arete}} {{willraw=[[ (1d20 * @{advantage}) + (1d12 * (1-@{advantage})) ]]}} {{pararaw=[[ (1d20 * @{disadvantage}) + (1d12 * (1-@{disadvantage})) ]]}} {{die1= $[[0]] + @{arete} + ?{Modifier|0} }} {{die2= $[[1]] }}">
+value="&{template:us} {{name=@{character_name}}} {{roll_name=Arete}} {{is_arete=1}} {{willraw=[[ (1d20 * @{advantage}) + (1d12 * (1-@{advantage})) ]]}} {{pararaw=[[ (1d20 * @{disadvantage}) + (1d12 * (1-@{disadvantage})) ]]}} {{die1= $[[0]] + @{arete} + ?{Modifier|0} }} {{die2= $[[1]] }}">
   Change Reality
 </button>
 
@@ -184,19 +184,32 @@ value="&{template:us} {{name=@{character_name}}} {{roll_name=Arete}} {{willraw=[
     <div class="sheet-magemoves-section">
         <div class="sheet-attr-box">
           <fieldset class="repeating_moves">
-            <label class="sheet-movename">Move</label>
+            <label class="sheet-movename"></label>
             <input type="text" name="attr_classmovename" style="width:100%;"/><br><br>
-            <label class="sheet-stat">Stat</label>
+
+            <!-- Checkbox to toggle roll button -->
+            
+            <input type="checkbox" name="attr_hasrollbutton" class="sheet-hasrollbutton"/>
+                <label>Has Roll Button</label><br>
+
+            <!-- Roll button container -->
+            <div class="sheet-move-rollbutton">
+                <label class="sheet-stat">Stat</label>
             <select name="attr_classmoves" class="sheet-moves">
-              <option value="@{physical}">Physical</option>
-              <option value="@{social}">Social</option>
-              <option value="@{mental}">Mental</option>
-              <option value="@{arete}">Arete</option>
-            </select>
-            <button type='roll' name="roll_move" value='&{template:us} {{name=@{character_name}}} {{roll_name=@{classmovename}}} {{willraw=[[ (1d20 * @{advantage}) + (1d12 * (1-@{advantage})) ]]}} {{pararaw=[[ (1d20 * @{disadvantage}) + (1d12 * (1-@{disadvantage})) ]]}}  {{die1= $[[0]] + @{classmoves} + ?{Modifier|0} }} {{die2= $[[1]] }}'> <span name="attr_classmovename"></span></button>
+                <option value="@{physical}">Physical</option>
+                <option value="@{social}">Social</option>
+                <option value="@{mental}">Mental</option>
+            </select><br>
+                <button type="roll" name="roll_move"
+                    value="&{template:us} {{name=@{character_name}}} {{roll_name=@{classmovename}}} {{willraw=[[ (1d20 * @{advantage}) + (1d12 * (1-@{advantage})) ]]}} {{pararaw=[[ (1d20 * @{disadvantage}) + (1d12 * (1-@{disadvantage})) ]]}} {{die1= $[[0]] + @{physical} + ?{Modifier|0} }} {{die2= $[[1]] }}">
+                    <span name="attr_classmovename"></span>
+                </button><br>
+            </div>
+
             <label class="sheet-desc">Description:</label>
-            <textarea rows="4" cols="50" name="attr_classmovedesc" ></textarea>
-          </fieldset>
+            <textarea rows="4" cols="50" name="attr_classmovedesc"></textarea>
+         </fieldset>
+
         </div>
     </div>
     
@@ -883,11 +896,11 @@ Spend 5 Experience to Advance.">Experience</label>
 
     <div class="rt-row will-row">
       <span class="rt-label">Will</span>
-      <span class="rt-value"><span class="inlinerollresult">{{die1}}</span></span>
+      <span class="rt-value">{{die1}}</span>
     </div>
     <div class="rt-row paradox-row">
       <span class="rt-label">Paradox</span>
-      <span class="rt-value"><span class="inlinerollresult">{{die2}}</span></span>
+      <span class="rt-value">{{die2}}</span>
     </div>
 
      <!--{{#rollGreater() die1 die2}}
@@ -896,10 +909,16 @@ Spend 5 Experience to Advance.">Experience</label>
 
     {{#rollLess() die1 die2}}
       <div class="rt-result paradox-result">Paradox: GM gains 1 Paradox</div>
-    {{/rollLess() die1 die2}}
+    {{/rollLess() die1 die2}}-->
+    
+    {{#rollTotal() willraw pararaw}}
+        <div class="rt-result critical">Critical!</div>
+    {{/rollTotal() willraw pararaw}}
 
-    {{#rollTotal() die1 die2}}
-      <div class="rt-result critical">Critical: Gain 1 Quintessence</div>
-    {{/rollTotal() die1 die2}}--> 
+    {{#is_arete}}
+        {{#rollTotal() willraw pararaw}}
+            <div class="rt-result critical">Gain 1 Quintessence</div>
+        {{/rollTotal() willraw pararaw}}
+    {{/is_arete}}
   </div>
 </rolltemplate>
