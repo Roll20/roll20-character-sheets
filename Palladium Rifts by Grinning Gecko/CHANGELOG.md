@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.8.5] - 2025-09-06
+
+### Changed
+
+- Fix issue where Possession roll button was not working.
+
 ## [1.8.4] - 2025-08-28
 
 ### Changed

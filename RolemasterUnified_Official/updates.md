@@ -1,3 +1,22 @@
+# 2025-09-09
+
+- Can now roll weapon fumbles direct from the sheet.
+- Remove the old Roll Crit buttons
+- Add `statuspercent200`; which ranges from 200 -> 0 as your penalties go down
+- Set sheet version to 14
+- Fix the light crossboX.
+- Fix rolling Y/Z criticals.
+- Layout improvements on the front tab - little boxes around all the things.
+- Dice icons:
+  - Fix layout to be consistent everywhere (finally)
+  - Use single style for all the dice icons
+  - Fix alignment of the dice on the skills page
+  - Little animation when you hover... because you can do that when sort
+    the other stuff.
+- Attacks:
+  - Move overlay to own file
+- Fix missing line break in rolltemplate.
+
 # 2025-09-04
 
 - Force statuspercent_max to be 100.
