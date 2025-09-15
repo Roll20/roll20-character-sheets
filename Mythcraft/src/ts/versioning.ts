@@ -8,7 +8,24 @@ on("sheet:opened", () => {
 });
 
 const versionOneOne = () => {
-  //placeholder for version 1.1
+  const fieldsToUpdate = ["repeating_attacks", "repeating_skills"];
+  fieldsToUpdate.forEach((fieldset) => {
+    getSectionIDs(fieldset, (ids) => {
+      const bonuses = ids.map((id) => `${fieldset}_${id}_bonus`);
+      getAttrs(bonuses, (values) => {
+        const updates: Attrs = {};
+        bonuses.forEach((bonus) => {
+          const modifier = bonus.replace("bonus", "modifier");
+          updates[modifier] = values[bonus] || "0";
+        });
+        setAttrs(updates);
+      });
+    });
+  });
+
+  getAttrs(["awareness", "initiative_bonus"], (v) => {
+    setAttrs({ initiative: v.initiative_bonus + v.awareness });
+  });
 };
 
 const versioning = async (version: number) => {
@@ -23,10 +40,10 @@ const versioning = async (version: number) => {
       versioning(1);
       updateMessage(1);
       break;
-    case version < 1.01:
-      updateMessage(1.01);
-      // versionOneOne();
-      versioning(1.01);
+    case version < 1.1:
+      updateMessage(1.1);
+      versionOneOne();
+      versioning(1.1);
       break;
     default:
       console.log(

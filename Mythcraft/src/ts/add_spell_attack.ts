@@ -21,9 +21,9 @@ const addSpellAttack = (row: string, page: CompendiumAttributes) => {
       update[`${attackRow}_attribute_abbreviation`] =
         getAttributeAbbreviation(spellcasting_ability);
 
-      const rollFormula = getRollFormula(
-        primary_source === page.data.source.toString().toLowerCase()
-      );
+      const isPrimarySource =
+        primary_source === page.data.source.toString().toLowerCase();
+      const rollFormula = getRollFormula(isPrimarySource);
 
       update[`${attackRow}_roll_formula`] = rollFormula;
 
@@ -31,7 +31,15 @@ const addSpellAttack = (row: string, page: CompendiumAttributes) => {
       update[`${row}_roll_formula`] = rollFormula;
       update[`${row}_link`] = attackRow;
 
-      setDropAttrs(update);
+      const attribute = spellcasting_ability.slice(2, -1);
+
+      getAttrs([attribute], (attrs) => {
+        const int = parseInteger(attrs[attribute]);
+        const bonus = isPrimarySource ? int : Math.ceil(int / 2);
+        update[`${attackRow}_bonus`] = bonus > 0 ? `+${bonus}` : `${bonus}`;
+
+        setDropAttrs(update);
+      });
     }
   );
 

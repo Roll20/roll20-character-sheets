@@ -23,8 +23,9 @@ const handle_drop = () => {
 
     switch (Category) {
       case "Creatures":
-      // resetRepeatingRows(repeatingSections);
-      // resetSkillList(page.data.skills);
+        // resetRepeatingRows(repeatingSections);
+        // resetSkillList(page.data.skills);
+        break;
       case "Conditions":
         handle_conditions(page);
         break;
