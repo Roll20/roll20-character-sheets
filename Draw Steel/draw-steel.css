@@ -877,7 +877,7 @@ label.sublabel {
 }
 
 .npc-skills-panel {
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: 1fr auto;
 	justify-items: start;
 	border-bottom: none;
 }
@@ -913,20 +913,31 @@ label.sublabel {
 	height: auto;
 }
 
-.npc-ability-card input[value="0"] ~ .npc-power-roll {
+.npc-ability-card input[name="attr_has_power_roll"]:not([value="on"]) ~ .npc-power-roll,
+.npc-ability-card input[name="attr_has_effect"]:not([value="on"]) ~ .npc-ability-effect,
+.npc-ability-card input[name="attr_has_special"]:not([value="on"]) ~ .npc-ability-special,
+.npc-ability-card input[name="attr_has_trait"]:not([value="on"]) ~ .npc-ability-trait,
+.npc-ability-card input[name="attr_has_malice"]:not([value="on"]) ~ .npc-ability-malice {
 	display:none;
 }
 
-.npc-ability-card input[value="1"] ~ .npc-power-roll {
+.npc-ability-card input[name="attr_has_power_roll"][value="on"] ~ .npc-power-roll,
+.npc-ability-card input[name="attr_has_effect"][value="on"] ~ .npc-ability-effect,
+.npc-ability-card input[name="attr_has_special"][value="on"] ~ .npc-ability-special,
+.npc-ability-card input[name="attr_has_trait"][value="on"] ~ .npc-ability-trait,
+.npc-ability-card input[name="attr_has_malice"][value="on"] ~ .npc-ability-malice {
 	display:block;
+}
+
+.npc-ability-card > div {
+	grid-column: 1 / -1
 }
 
 .npc-power-roll {
 	display: grid;
 	grid-template-columns: auto 1fr;
 	align-items: center;
-	grid-column-end: -1;
-	grid-column-start: 1;
+	grid-column: 1 / -1;
 	column-gap: 0.5em;
 }
 
@@ -938,7 +949,8 @@ label.npc-ability-edit {
 	top: -15px;
 }
 
-.charsheet input.npc-ability-edit:not(:checked) ~ div.ability-card, .charsheet input.npc-ability-edit:checked ~ div.npc-ability-card {
+.charsheet input.npc-ability-edit:not(:checked) ~ div.ability-card, 
+.charsheet input.npc-ability-edit:checked ~ div.npc-ability-card {
     display: none;
 }
 
@@ -1006,6 +1018,34 @@ input.npc-ability-edit {
 	grid-column-end: -1;
 }
 
+.npc-ability-card .npc-power-roll .power-roll-mods button[type="roll"]::before {
+  content: "k";
+  font-family: "dicefontd10";
+}
+
+.npc-ability-card .npc-power-roll .power-roll-mods button[type="roll"] {
+  margin-left: 0px;
+}
+
+.ability-toggle-group {
+	grid-column: 1 / -1;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.2em;
+	align-items: center;
+}
+
+.ability-toggle-group textarea {
+	width: 100%;
+	height: 50px;
+}
+
+.ability-toggle-group input:not(:checked) ~ textarea,
+.ability-toggle-group input:not(:checked) ~ div
+ {
+	display: none
+}
+
 /* Switches between Character and NPC Sheets */
 .charsheet .npc-checkbox:not(:checked) ~ .npc-sheet-body,
 .charsheet .npc-checkbox:checked ~ .sheet-body
@@ -1060,10 +1100,6 @@ input.npc-edit-toggle {
     display: none;
 } 
 
-.npc-ability-card .npc-power-roll .power-roll-mods button[type="roll"]::before {
-  content: "k";
-  font-family: "dicefontd10";
-}
 
 /* Dark Mode */
 .sheet-darkmode .characterviewer .charsheet label {
