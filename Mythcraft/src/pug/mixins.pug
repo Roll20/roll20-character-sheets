@@ -5,6 +5,15 @@
 - const shortName = name => name.length > 4 ? name.slice(0, 3) : name;
 
 include mixins/inputs.pug
+include mixins/buttons.pug
+include mixins/repeating_spell_cards.pug
+include mixins/repeating_attacks.pug
+include mixins/repeating_skills.pug
+include mixins/repeating_resources.pug
+
+include mixins/combat_attributes.pug
+
+include mixins/toggles.pug
 
 mixin textarea(name)
    textarea(name=`attr_${attrName(name)}` placeholder=name)
@@ -13,37 +22,41 @@ mixin attrSpan(name)
    - const attr = attrName(name)
    span(class!=attributes.class name=`attr_${attr}` title=`@{${attr}}`)
 
-include mixins/buttons.pug
-
 mixin headerInput(name, i18n)
    .grid.col-auto-fr.gap-1.grid-flow-col.items-center(class!=attributes.class)
-      h3(data-i18n=i18n ? i18n : name)
+      +h3Header(i18n ? i18n : name)
       +textInput(name)
 
-include mixins/repeating_spell_cards.pug
-include mixins/repeating_attacks.pug
-include mixins/repeating_skills.pug
-include mixins/repeating_resources.pug
+mixin editInput(name, i18n)
+   .grid.col-auto-fr.gap-1.grid-flow-col.items-center(class!=attributes.class)
+      +h4Header(i18n ? i18n : name)
+      +textInput(name)
+
+mixin textInputs(values)
+   .grid.gap-2.grid-flow-col(class!=attributes.class)
+      each val in values
+         +editInput(val)
+
+mixin h3Header(name, i18n)
+   h3.ellipse.text-center.capitalize(data-i18n=i18n ? i18n : name)
+
+mixin h4Header(name, i18n)
+   h4.ellipse.capitalize(data-i18n=i18n ? i18n : name)
 
 mixin subheaders(values)
    .grid.grid-flow-col.gap-2.mb-2.border-bottom.subheaders
       .grid.grid-flow-col.gap-2.custom-grid
          each val in values
-            h3.ellipse.text-center(data-i18n=val)
+            +h3Header(val)
 
 mixin title(name)
    .grid.gap-4.justify-center.absolute.title
-      h2.px-2.text-center(data-i18n=name)
-
-mixin textInputs(values)
-   .grid.gap-2.grid-flow-col(class!=attributes.class)
-      each val in values
-         +headerInput(val)
+      h2.px-2.text-center.capitalize(data-i18n=name)
 
 mixin headerSpan(values)
    each val in values
       .grid.gap-2.col-auto-fr.items-center.display-span(class!=attributes.class)
-         h4(data-i18n=val)
+         h4.capitalize(data-i18n=val)
          +attrSpan(val)(class="capitalize")
 
 mixin repeatingSection(name, values)
@@ -67,36 +80,34 @@ mixin repeatingSection(name, values)
          .edit.grid.gap-2
             .grid.gap-2.edit-grid
                each val in [...display, ...collapse]
-                  +headerInput(val)
+                  +editInput(val)
             .description
                +textarea('description')
 
 mixin repeatingList(name, values)
-   .grid.double-border-2.rounded-md.p-2.relative(class=dashedName(name)).content-start
+   .grid.solid-border-2.rounded-md.p-2.relative(class=dashedName(name)).content-start
       +title(name)
       +subheaders(values.display)
       +repeatingSection(name, values)
 
 
-mixin combatAttributes()
-   .grid.gap-1.justify-between.items-center.attrs
-      each val in combatAttributes
-         .grid.relative.justify-center.items-center(class=`${val}`)
-            .circle.rounded-full.border.grid.justify-center.items-center.font-bold
-               +attributeRoll(shortName(val), `${val}`)
-               +numberInput(val)
-      div
-      each val in derivedAttributes
-         .grid.relative.justify-center.items-center(class=`${val}`)
-            .circle.rounded-full.border.grid.justify-center.items-center.font-bold
-               h3.text-center(data-i18n=shortName(val))
-               +numberInput(val)
-               
 mixin sheetSelect()
-   .grid.gap-2.grid-flow-col.col-auto-fr
-      h2(data-i18n="character type")
-      .grid.gap-2.grid-flow-col
-         select(name="attr_sheet_type")
-            each val in sheetTypes
-               option(value=`${val}` data-i18n=val  selected=(!!val === 'pc'))
-                  val
+   .grid.gap-2.grid-flow-col
+      select(name="attr_sheet_type")
+         each val in sheetTypes
+            option(value=`${val}` data-i18n=val  selected=(!!val === 'pc'))
+               val
+
+mixin attributeSelect(name)
+   .grid.gap-2.grid-flow-col.col-auto-fr.items-center
+      +h4Header(name)
+      select(name=`attr_${attrName(name)}`)
+         option(value="0" data-i18n="none")
+         each val in combatAttributes
+            option(value=`@{${val}}` data-i18n=val)
+               val
+
+mixin switch(name)
+   label.switch(data-i18n-title=`toggle ${name}`)
+      input(type="checkbox" name=`attr_toggle_${attrName(name)}`)
+      span.slider

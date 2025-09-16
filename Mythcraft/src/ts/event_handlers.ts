@@ -1,3 +1,35 @@
+[anticipation, fortitude, logic, reflexes, willpower].forEach((attrs) => {
+  attrs.forEach((attr) => {
+    on(`change:${attr}`, () => {
+      updateDerivedAttribute(attrs);
+    });
+  });
+});
+
+initiative.forEach((attr) => {
+  on(`change:${attr}`, () => {
+    updateModifiedAttribute(initiative);
+  });
+});
+
+["modifier", "toggle_active", "attribute"].forEach((attribute) => {
+  on(`change:repeating_modifiers:${attribute}`, (event) => {
+    updateAttributeModifier(event);
+  });
+});
+
+on(`remove:repeating_modifiers`, (event) => {
+  const { sourceAttribute, removedInfo } = event;
+  if (
+    removedInfo[`${sourceAttribute}_modifier`] !== "" &&
+    removedInfo[`${sourceAttribute}_modifier`] !== "0" &&
+    removedInfo[`${sourceAttribute}_modifier`] !== undefined &&
+    removedInfo[`${sourceAttribute}_toggle_active`] === "on"
+  ) {
+    updateAttributeModifier(event);
+  }
+});
+
 ["attacks", "spells", "reactive-actions"].forEach((fieldset) => {
   on(`change:repeating_${fieldset}`, (event) => {
     updateLinkedAttribute(event);
@@ -16,12 +48,38 @@
 ["attacks", "skills"].forEach((fieldset) => {
   on(`change:repeating_${fieldset}:attribute`, (event) => {
     const { sourceAttribute, newValue } = event;
+
+    //This can happen when the attribute's value changes but we only want this event when the user selects a new attribute
+    if (!newValue) return;
+
     const repeatingRow = getFieldsetRow(sourceAttribute);
-
-    // Attribute will be @{...}. Remove the @{}
     const abbreviation = getAttributeAbbreviation(newValue);
-
     setAttrs({ [`${repeatingRow}_attribute_abbreviation`]: abbreviation });
+  });
+
+  ["attribute", "modifier"].forEach((attr) => {
+    on(`change:repeating_${fieldset}:${attr}`, (event) => {
+      const { sourceAttribute } = event;
+      const repeatingRow = getFieldsetRow(sourceAttribute);
+
+      getAttrs(
+        [`${repeatingRow}_attribute`, `${repeatingRow}_modifier`],
+        (values) => {
+          const attribute = sliceAttribute(values[`${repeatingRow}_attribute`]);
+          getAttrs([attribute], (v) => {
+            const attrs = {
+              attribute: v[attribute],
+              modifier: values[`${repeatingRow}_modifier`],
+            };
+            const integers = parseIntegers(attrs);
+            const sum = sumIntegers(Object.values(integers));
+            setAttrs({
+              [`${repeatingRow}_bonus`]: sum > 0 ? `+${sum}` : `${sum}`,
+            });
+          });
+        }
+      );
+    });
   });
 });
 
@@ -151,7 +209,7 @@ on("change:repeating_spells:source", (event) => {
   });
 });
 
-on("change:repeating_spells:toggle_spell_attack", (event) => {
+on("change:repeating_spells:toggle_attack", (event) => {
   updateSpellRollFormula(event);
 });
 
@@ -194,7 +252,6 @@ on("change:repeating_actions:toggle_action_attack", (event) => {
         }
       }
 
-      console.log(sections);
       setAttrs({ creature_sections: sections.join(",") });
     });
   });
