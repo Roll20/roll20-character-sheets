@@ -1,6 +1,7 @@
 const updateActionPointsPerRound = (attributes: Attributes) => {
   getAttrs(attributes, (values) => {
-    const { coordination, action_points_base } = parseIntegers(values);
+    const { coordination, action_points_base, action_points_modifier } =
+      parseIntegers(values);
     let action_points_per_round = action_points_base;
 
     switch (coordination) {
@@ -14,9 +15,11 @@ const updateActionPointsPerRound = (attributes: Attributes) => {
       default:
         // Action Points Per Round + half of the Coordination attribute
         action_points_per_round =
-          Math.ceil(coordination / 2) + action_points_base;
+          Math.floor(coordination / 2) + action_points_base;
         break;
     }
+
+    action_points_per_round += action_points_modifier || 0;
 
     setAttrs({ action_points_per_round });
   });
