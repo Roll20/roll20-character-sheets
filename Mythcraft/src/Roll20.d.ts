@@ -16,6 +16,8 @@ declare type Attrs = { [key: string]: AttrValue };
 
 declare type Attributes = string[];
 
+declare type Ids = string[];
+
 declare function getAttrs(
   attributes: Attributes,
   callback?: (values: { [key: string]: string }) => void
@@ -29,7 +31,7 @@ declare function setAttrs(
 
 declare function getSectionIDs(
   section_name: string,
-  callback: (values: string[]) => void
+  callback: (values: Ids) => void
 ): void;
 
 declare function generateRowID(): string;

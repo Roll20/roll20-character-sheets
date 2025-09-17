@@ -1,3 +1,14 @@
+const getAttributeInfo = (attr: string | number | boolean) => {
+  if (typeof attr === "string") {
+    return {
+      attribute: `@{${attr}}`,
+      abbreviation: getAttributeAbbreviation(attr),
+    };
+  }
+  console.warn(`Attribute is not a string: ${attr}`);
+  return { attribute: "", abbreviation: "" };
+};
+
 const handle_weapon = (
   page: CompendiumAttributes,
   attackRow: string,
@@ -8,6 +19,7 @@ const handle_weapon = (
     "cost",
     "damage_type",
     "damage",
+    "damage_attribute",
     "name",
     "range",
     "reload",
@@ -21,19 +33,29 @@ const handle_weapon = (
   const update = getUpdate(attrs, page, row);
 
   update[`${row}_category`] = page.data.Category;
-  update[`${row}_bonus`] = 0;
+  update[`${row}_modifier`] = page.data.modifier ?? 0;
   update[`${row}_link`] = inventoryRow;
 
-  if (typeof page.data.attribute === "string") {
-    update[`${row}_attribute`] = `@{${page.data.attribute}}`;
+  const setAttributeField = (
+    key: string,
+    value?: string | number | boolean
+  ) => {
+    if (!value) return;
+    const { attribute, abbreviation } = getAttributeInfo(value);
+    update[`${row}_${key}`] = attribute;
+    update[`${row}_${key}_abbreviation`] = abbreviation;
+  };
 
-    update[`${row}_attribute_abbreviation`] = getAttributeAbbreviation(
-      page.data.attribute
-    );
+  setAttributeField("attribute", page.data.attribute);
+
+  if (page.data.damage_attribute) {
+    setAttributeField("damage_attribute", page.data.damage_attribute);
   } else {
-    console.warn(
-      `Attribute is not a string: ${page.data.attribute}, ${page.data.name}`
-    );
+    setAttributeField("damage_attribute", page.data.attribute);
+  }
+
+  if (!page.data.attribute) {
+    update[`${row}_bonus`] = 0;
   }
 
   setDropAttrs(update);
