@@ -4468,6 +4468,7 @@ function setWeapons(id) {
     section_attribute('weapon', id, 'weapon_damage_chat_menu_npc'),
   ];
   getAttrs(fields, (v) => {
+    // console.log(`Change detected: ${fields}`);
     output.repeating_weapon_weapon_use = +v[section_attribute('weapon', id, 'weapon_use')] || 0;
     output.repeating_weapon_weapon_attack_type_flag = +v[section_attribute('weapon', id, 'weapon_attack_type_flag')] || 0;
     output.repeating_weapon_weapon_critdamage_flag = +v[section_attribute('weapon', id, 'weapon_critdamage_flag')] || 1;
@@ -4562,9 +4563,9 @@ function setEquipment(id) {
   ];
   const combined = [...nonRep, ...fields];
   getAttrs(combined, (v) => {
+    // console.log(`Change detected: ${fields}`);
     const equipTab = +v.equipment_tabs_type || 0;
     const equipType = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
-    clog(`equipType:${equipType}`);
     output.repeating_equipment_equipment_type = equipType <= 0 || equipTab === -1 ? 0 : equipType;
     output.repeating_equipment_equipment_magical = +v[section_attribute('equipment', id, 'equipment_magical')] || 0;
     output.repeating_equipment_equipment_show_type = +v[section_attribute('equipment', id, 'equipment_show_type')] || 0;
@@ -4607,6 +4608,7 @@ function setNWP(id) {
     section_attribute('nonweaponproficiencies', id, 'nwp_macro_text'),
   ];
   getAttrs(fields, (v) => {
+    // console.log(`Change detected: ${fields}`);
     output.repeating_nonweaponproficiencies_attribute = +v[section_attribute('nonweaponproficiencies', id, 'nwp_attribute')] || 0;
     output.repeating_nonweaponproficiencies_slots = +v[section_attribute('nonweaponproficiencies', id, 'nwp_slots')] || 0;
     output.repeating_nonweaponproficiencies_modifier = +v[section_attribute('nonweaponproficiencies', id, 'nwp_modifier')] || 0;
@@ -4621,8 +4623,11 @@ on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_ite
   const id = eventInfo.sourceAttribute.split('_')[2];
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
-  if (eventInfo.newValue !== eventInfo.previousValue) return;
+  // if (eventInfo.newValue !== eventInfo.previousValue) return;
   // test for new row name (ie no existing value)
+  console.log(`Change detected: new: ${eventInfo.newValue} previous:${eventInfo.previousValue}`);
+  if (eventInfo.previousValue !== undefined) return;
+
   if (eventInfo.sourceAttribute.includes('equipment_item')) {
     // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Setting default values.`);
     setEquipment(id);
