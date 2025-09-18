@@ -1,3 +1,10 @@
+/* Utility Classes */
+.grid-span-full {
+	grid-column-start: 1;
+	grid-column-end: -1
+}
+
+/* Main Sheet */
 .charsheet {
 	background-color: #eee;
 	padding: 1em;
@@ -866,6 +873,14 @@ label.sublabel {
 	grid-template-columns: repeat(5, 1fr);
 }
 
+.npc-characteristic-input-group > label {
+	cursor: pointer;
+}
+
+.npc-characteristic-input-group > input {
+	text-align: center;
+}
+
 .npc-stats-panel div {
 	display: flex;
 	flex-direction: column;
@@ -909,8 +924,73 @@ label.sublabel {
 }
 
 /* NPC Ability Card Styling */
-.npc-ability-card .ability-effect, .npc.ability-card .ability-trigger {
-	height: auto;
+
+.repcontainer[data-groupname="repeating_npcabilities"] {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-gap: 0.5em;
+}
+
+.npc-abilities-panel > .repcontainer[data-groupname="repeating_npcabilities"] > .repitem {
+	border: 1px solid #aaa;
+	border-radius: 5px;
+	background: #fff;
+	padding: 5px;
+}
+
+.npc-ability-card-display, .npc-ability-card-edit {
+	display: grid;
+	grid-template-columns: 30px repeat(4, 1fr) 30px;
+}
+
+input.npc-ability-edit-toggle {
+	right: 5px;
+	position: absolute;
+}
+
+.charsheet input.npc-ability-edit-toggle:not(:checked) ~ div.npc-ability-card-edit, 
+.charsheet input.npc-ability-edit-toggle:checked ~ div.npc-ability-card-display {
+    display: none;
+}
+
+.npc-ability-name {
+	grid-column-end: span 2;
+	grid-column-start: 2;
+	font-weight: bold;
+}
+
+.npc-ability-subtype-selector, .npc-ability-subtype {
+  grid-column-start: 4;
+  grid-column-end: span 2;
+  justify-self: right;
+  font-weight: bold;
+  
+}
+
+.npc-ability-solo-monster {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.npc-ability-solo-monster input {
+	grid-column-end: span 2;
+}
+
+.npc-ability-subtype-selector:not(:has(> option[value="solo-monster"]:checked)) ~ .npc-ability-solo-monster,
+.npc-ability-subtype-selector:not(:has(> option[value*="trait"]:checked)) ~ .npc-ability-trait,
+.npc-ability-subtype-selector:not(:has(> option[value*="malice"]:checked)) ~ .npc-ability-malice-cost,
+.npc-ability-subtype-selector:not(:has(> option[value*="ability"]:checked)) ~ .npc-ability-details {
+	display: none;
+}
+
+.npc-ability-card-edit textarea {
+	grid-column: 1/ -1;
+	height: 50px;
+}
+
+.npc-ability-type:has(> option[value*="triggered"]:checked) ~ .triggered-hide,
+.npc-ability-type:not(:has(> option[value*="triggered"]:checked)) ~ .triggered-show {
+	display: none;
 }
 
 .npc-ability-card input[name="attr_has_power_roll"]:not([value="on"]) ~ .npc-power-roll,
@@ -921,16 +1001,11 @@ label.sublabel {
 	display:none;
 }
 
-.npc-ability-card input[name="attr_has_power_roll"][value="on"] ~ .npc-power-roll,
 .npc-ability-card input[name="attr_has_effect"][value="on"] ~ .npc-ability-effect,
 .npc-ability-card input[name="attr_has_special"][value="on"] ~ .npc-ability-special,
 .npc-ability-card input[name="attr_has_trait"][value="on"] ~ .npc-ability-trait,
 .npc-ability-card input[name="attr_has_malice"][value="on"] ~ .npc-ability-malice {
 	display:block;
-}
-
-.npc-ability-card > div {
-	grid-column: 1 / -1
 }
 
 .npc-power-roll {
@@ -941,61 +1016,93 @@ label.sublabel {
 	column-gap: 0.5em;
 }
 
-label.npc-ability-edit {
-	font-family: "Pictos";
-	font-size: 1em;
-	left: 95%;
-	position: relative;
-	top: -15px;
+.npc-power-roll label.sublabel {
+	border: 1px solid black;
+	border-radius: 5px;
+	padding: 1px;
+	text-align: center;
+	margin: 4PX 0px 0px 0px;
 }
 
-.charsheet input.npc-ability-edit:not(:checked) ~ div.ability-card, 
-.charsheet input.npc-ability-edit:checked ~ div.npc-ability-card {
-    display: none;
+.npc-power-roll-tier-effect {
+	font-size: 1em;
+}
+
+.npc-ability-details:has([name="attr_has_power_roll"]:not(:checked)) > .npc-power-roll > .npc-power-roll-mods > :not(input[type="checkbox"]):not(label),
+.npc-ability-details:has([name="attr_has_power_roll"]:not(:checked)) > .npc-power-roll > :not(.npc-power-roll-mods) {
+	display: none;
 }
 
 .npc-abilities-panel {
 	padding-top: 5px;
 }
 
-.npc-abilities-panel > .repcontainer[data-groupname="repeating_abilities"] > .repitem {
-	border: 1px solid #aaa;
-	border-radius: 5px;
-	background: #fff;
-	padding: 5px;
-}
-
-.npc-ability-card {
-	display: grid;
-	grid-template-columns: 30px repeat(4, 1fr) 30px;
-}
-
-.npc-ability-card .ability-name {
-	grid-column-end: span 2;
-	grid-column-start: 2;
-}
-
-.npc-ability-card .ability-description {
-	grid-column-end: span 2;
-	grid-column-start: 4;
-	font-size: .9em;
-	font-style: inherit;
-	font-weight: bold;
-	justify-self: end;
-}
-
-.npc-ability-card .ability-type, .npc-ability-card .ability-keywords {
+.npc-abilities-panel .ability-distance,
+.npc-abilities-panel .ability-target {
 	font-size: 0.9em;
-	font-weight: normal;
 }
 
-.npc-ability-card input:not([value*="triggered"]) ~ span.npc-ability-trigger,
-.npc-ability-card input[value="no-action"] ~ span.ability-type {
+
+#npc-ability-subtype-selector:not([value*="villain"]):not([value*="signature"]) ~ .subtype-hide {
+	display: none;
+}
+
+#npc-ability-subtype-selector:not([value*="malice"]) ~ .malice-show {
+	display: none;
+}
+
+#npc-ability-subtype-selector:not([value="trait"]) ~ .trait-show,
+#npc-ability-subtype-selector[value="trait"] ~ .details-hide {
+	display: none;
+}
+
+#npc-ability-subtype-selector:not([value="solo-monster"]) ~ .solo-monster-show,
+#npc-ability-subtype-selector[value="solo-monster"] ~ .details-hide {
+	display: none;
+}
+
+
+.npc-ability-subtype.malice-show {
+	grid-column-start: 4;
+	grid-column-end: span 2;
+}
+
+.npc-ability-card-display input[name*="attr_has"]:not([value="on"]) + div {
+	display: none;
+}
+.npc-ability-card-display .npc-ability-effect, .npc-ability-card-display .npc-ability-trigger {
+	height: auto;
+}
+
+.npc-ability-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  font-size: 0.9em;
+}
+
+.npc-ability-keywords {
+
+}
+
+.npc-ability-type {
+	text-align: end;
+}
+
+.npc-ability-distance {
+	grid-column-start: 1;
+}
+
+.npc-ability-target {
+	text-align: end;
+}
+
+.npc-ability-card-display input:not([value*="triggered"]) ~ .npc-ability-trigger,
+.npc-ability-card-display input[value="no-action"] ~ .npc-ability-type {
 	display: none;
 }
 
 .npc-ability-trigger {
-	grid-column-end: span 6;
+
 }
 
 .npc-ability-button {
@@ -1008,22 +1115,19 @@ label.npc-ability-edit {
   border-radius: 5px;
 }
 
-input.npc-ability-edit {
-	right: 5px;
-	position: absolute;
-}
 
-.npc-ability-card > .ability-effect {
+
+.npc-ability-card-display > .ability-effect {
 	grid-column-start: 1;
 	grid-column-end: -1;
 }
 
-.npc-ability-card .npc-power-roll .power-roll-mods button[type="roll"]::before {
+.npc-ability-card-display .npc-power-roll .npc-power-roll-mods button[type="roll"]::before {
   content: "k";
   font-family: "dicefontd10";
 }
 
-.npc-ability-card .npc-power-roll .power-roll-mods button[type="roll"] {
+.npc-ability-card-display .npc-power-roll .npc-power-roll-mods button[type="roll"] {
   margin-left: 0px;
 }
 
@@ -1075,6 +1179,8 @@ input.npc-edit-toggle {
 	align-items: baseline;
 	justify-items: start;
 	font-size: .8em;
+	width: 350px;
+	margin-bottom: 10px;
 }
 
 .npc-edit-grid {
@@ -1086,13 +1192,13 @@ input.npc-edit-toggle {
 	grid-template-columns: 1fr 1fr;
 }
 
-.npc-edit-stats > input[type="text"] {
-	width: 3.5em;
+.charsheet .npc-edit-stats > input[type="text"],
+.charsheet .npc-edit-stats > input[type="number"] {
+	width: 4.5em;
 }
 
 .npc-edit-text {
-	grid-template-columns: auto 1fr auto 1fr;
-	grid-column-end: span 2;
+	grid-template-columns: auto 1fr;
 	grid-column-gap: 1em;
 }
 
