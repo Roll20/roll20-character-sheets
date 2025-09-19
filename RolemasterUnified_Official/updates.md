@@ -1,3 +1,54 @@
+# 2025-09-18
+
+- Fix stacking of the overlays
+- Show token marker otpsions corrently
+- Fix edit stats
+- Updated preview image.
+
+# 2025-09-16
+
+- First version of token markers
+  - Sheet options
+  - Random colours
+  - Trigger on status change.
+- Fix stacking of popups on main page
+- Add helper to get total number of bleeds
+- Add options for token makers
+- Add options for FX (doesn't do much)
+- Export to NPC now grabs spell lists.
+- Inventory (Stuff)
+  - Fix Helmet perception penalty trashing other modifiers
+  - Apply Armor DB
+  - Removed Armor DB & Perception penalties when you remove items
+  - Fix for armor losing it's encumberance.
+  - Add support for "Sets" Armor without a helmet
+  - Add armor material to edit window
+  - Correctly support mixed material encumberances (metal != non-metal)
+
+# 2025-09-11
+
+- Try and get the info popups working again.
+- fix spurious --> from the rolltemplates page
+
+# 2025-09-09
+
+- Can now roll weapon fumbles direct from the sheet.
+- Remove the old Roll Crit buttons
+- Add `statuspercent200`; which ranges from 200 -> 0 as your penalties go down
+- Set sheet version to 14
+- Fix the light crossboX.
+- Fix rolling Y/Z criticals.
+- Layout improvements on the front tab - little boxes around all the things.
+- Dice icons:
+  - Fix layout to be consistent everywhere (finally)
+  - Use single style for all the dice icons
+  - Fix alignment of the dice on the skills page
+  - Little animation when you hover... because you can do that when sort
+    the other stuff.
+- Attacks:
+  - Move overlay to own file
+- Fix missing line break in rolltemplate.
+
 # 2025-09-04
 
 - Force statuspercent_max to be 100.
