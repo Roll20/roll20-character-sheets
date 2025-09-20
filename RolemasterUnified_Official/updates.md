@@ -1,3 +1,10 @@
+# 2025-09-18
+
+- Fix stacking of the overlays
+- Show token marker otpsions corrently
+- Fix edit stats
+- Updated preview image.
+
 # 2025-09-16
 
 - First version of token markers
