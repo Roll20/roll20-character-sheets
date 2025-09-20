@@ -419,18 +419,20 @@
       </div>
 
       <!-- Getting Better HP -->
-      {{#rollGreater() labelhpcheck targethp}}
+      <!-- IF 6d10 ≥ current max HP → BETTER -->
+      {{#^rollLess() labelhpcheck targethp}}
         {{#labelhpcheck}}
           <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelhpcheck"></span>:<span>{{labelhpcheck}}</span></div>
           <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span data-i18n="labelhpgain"></span>:<span>{{labelhpgain}}</span></div>
         {{/labelhpcheck}}
-      {{/rollGreater() labelhpcheck targethp}}
-      {{#^rollGreater() labelhpcheck targethp}}
+      {{/^rollLess() labelhpcheck targethp}}
+      <!-- ELSE the roll of 6d10 is less than current max hp, so No Change -->
+      {{#rollLess() labelhpcheck targethp}}
         {{#labelhpcheck}}
           <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelhpcheck"></span>:<span>{{labelhpcheck}}</span></div>
           <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span></div>
         {{/labelhpcheck}}
-      {{/^rollGreater() labelhpcheck targethp}}
+      {{/rollLess() labelhpcheck targethp}}
 
       <!-- Getting Better DEBRIS -->
       {{#rollGreater() labeldebris 3}}
@@ -461,246 +463,211 @@
         {{/labeldebris}}
       {{/^rollGreater() labeldebris 3}}
 
-
       <!-- Getting Better ABILITIES -->
+      <!-- Inputs:
+  			target***   = current ability modifier (−3..+6)
+  			label***inc = d6 roll result (1–6)
+
+  			Rules:
+  			If target*** > 1 (i.e., +2..+6):
+  			• If roll < target*** → WORSE (−1)
+  			• If roll ≥ target***:
+  				– If target*** < +6 → BETTER (+1)
+  				– Else (target*** ≥ +6) → MAXED OUT, NO CHANGE
+  			If −3 ≤ target*** ≤ +1:
+  			• If roll ≥ 2 → BETTER (+1)
+  			• If roll = 1:
+  				– If target*** > −3 → WORSE (−1)
+  				– Else (target*** ≤ −3) → CAPPED AT -3, NO CHANGE
+
+  			Helper notes used here:
+  			rollGreater(A,B)  = A > B
+  			rollLess(A,B)     = A < B
+  			^rollLess(A,B)    = A ≥ B  (inverted)
+  			^rollGreater(A,B) = A ≤ B  (inverted)
+  		-->
 
       <!-- STRENGTH -->
-      <!-- the ABILITY is < 1 -->
-      {{#rollLess() targetstr 1}}
-        <!-- check roll. 2+ = BETTER. 1 = WORSE -->
-        {{#rollGreater() labelstrinc 1}}
-          <!-- BETTER +1 -->
-          {{#labelstrinc}}
+      <!-- IF current ability > 1 -->
+      {{#rollGreater() targetstr 1}}
+        <!-- IF roll < current ability → WORSE (−1) -->
+        {{#rollLess() labelstrinc targetstr}}
+          <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelstrinc"></span>:<span>{{labelstrinc}}</span></div>
+          <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span data-i18n="decrease">Decrease by</span><strong> -1</strong></div>
+        {{/rollLess() labelstrinc targetstr}}
+        <!-- ELSE (roll ≥ current ability) -->
+        {{#^rollLess() labelstrinc targetstr}}
+          <!-- IF current ability < +6 → BETTER (+1) -->
+          {{#rollLess() targetstr 6}}
             <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelstrinc"></span>:<span>{{labelstrinc}}</span></div>
-            <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span i18n="increase">Increase by</span><strong> +1</strong></div>
-          {{/labelstrinc}}
+            <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span data-i18n="increase">Increase by</span><strong> +1</strong></div>
+          {{/rollLess() targetstr 6}}
+          <!-- ELSE (current ability ≥ +6) → NO CHANGE -->
+          {{#^rollLess() targetstr 6}}
+            <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelstrinc"></span>:<span>{{labelstrinc}}</span></div>
+            <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-maximum-abbrv">Max +6</span></div>
+          {{/^rollLess() targetstr 6}}
+        {{/^rollLess() labelstrinc targetstr}}
+      {{/rollGreater() targetstr 1}}
+      <!-- ELSE (current ability ≤ 1) -->
+      {{#^rollGreater() targetstr 1}}
+        <!-- IF roll ≥ 2 → BETTER (+1) -->
+        {{#rollGreater() labelstrinc 1}}
+          <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelstrinc"></span>:<span>{{labelstrinc}}</span></div>
+          <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span data-i18n="increase">Increase by</span><strong> +1</strong></div>
         {{/rollGreater() labelstrinc 1}}
+        <!-- ELSE (roll = 1) → use Not Greater Than to catch ≤1 on a d6 -->
         {{#^rollGreater() labelstrinc 1}}
-          {{#rollGreater() labelstrinc -3}}
-            <!-- Worse -1 -->
-            {{#labelstrinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelstrinc"></span>:<span>{{labelstrinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span i18n="decrease">Decrease by</span><strong> -1</strong></div>
-            {{/labelstrinc}}
-          {{/rollGreater() labelstrinc -3}}
-          {{#^rollGreater() labelstrinc -3}}
-            <!-- NO CHANGE ie capped @ -3 -->
-            {{#labelstrinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelstrinc"></span>:<span>{{labelstrinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-minimum-abbrv">Min -3</span></div>
-            {{/labelstrinc}}
-          {{/^rollGreater() labelstrinc -3}}
+          <!-- IF current ability > −3 → WORSE (−1) -->
+          {{#rollGreater() targetstr -3}}
+            <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelstrinc"></span>:<span>{{labelstrinc}}</span></div>
+            <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span data-i18n="decrease">Decrease by</span><strong> -1</strong></div>
+          {{/rollGreater() targetstr -3}}
+          <!-- ELSE (current ability ≤ −3) → CAPPED AT -3, NO CHANGE -->
+          {{#^rollGreater() targetstr -3}}
+            <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelstrinc"></span>:<span>{{labelstrinc}}</span></div>
+            <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-minimum-abbrv">Min -3</span></div>
+          {{/^rollGreater() targetstr -3}}
         {{/^rollGreater() labelstrinc 1}}
-      {{/rollLess() targetstr 1}}
-
-      <!-- the ABILITY is > 1 -->
-      {{#^rollLess() targetstr 1}}
-        <!-- check roll. -->
-        <!-- is ability capped? -->
-        {{#rollLess() labelstrinc 6}}
-          <!-- BETTER +1 -->
-          {{#rollGreater() labelstrinc targetstr}}
-            {{#labelstrinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelstrinc"></span>:<span>{{labelstrinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span i18n="increase">Increase by</span><strong> +1</strong></div>
-            {{/labelstrinc}}
-          {{/rollGreater() labelstrinc targetstr}}
-          <!-- WORSE: -1 -->
-          {{#^rollGreater() labelstrinc targetstr}}
-            {{#labelstrinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelstrinc"></span>:<span>{{labelstrinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span i18n="decrease">Decrease by</span><strong> -1</strong></div>
-            {{/labelstrinc}}
-          {{/^rollGreater() labelstrinc targetstr}}
-        {{/rollLess() labelstrinc 6}}
-        {{#^rollLess() labelstrinc 6}}
-          <!-- NO CHANGE ie capped @ +6 -->
-            {{#labelstrinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelstrinc"></span>:<span>{{labelstrinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-maximum-abbrv">Max +6</span></div>
-            {{/labelstrinc}}
-        {{/^rollLess() labelstrinc 6}}
-      {{/^rollLess() targetstr 1}}
+      {{/^rollGreater() targetstr 1}}
 
       <!-- AGILITY -->
-      <!-- the ABILITY is < 1 -->
-      {{#rollLess() targetagi 1}}
-        <!-- check roll. 2+ = BETTER. 1 = WORSE -->
-        {{#rollGreater() labelagiinc 1}}
-          <!-- BETTER +1 -->
-          {{#labelagiinc}}
+      <!-- IF current ability > 1 -->
+      {{#rollGreater() targetagi 1}}
+        <!-- IF roll < current ability → WORSE (−1) -->
+        {{#rollLess() labelagiinc targetagi}}
+          <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelagiinc"></span>:<span>{{labelagiinc}}</span></div>
+          <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span data-i18n="decrease">Decrease by</span><strong> -1</strong></div>
+        {{/rollLess() labelagiinc targetagi}}
+        <!-- ELSE (roll ≥ current ability) -->
+        {{#^rollLess() labelagiinc targetagi}}
+          <!-- IF current ability < +6 → BETTER (+1) -->
+          {{#rollLess() targetagi 6}}
             <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelagiinc"></span>:<span>{{labelagiinc}}</span></div>
-            <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span i18n="increase">Increase by</span><strong> +1</strong></div>
-          {{/labelagiinc}}
-        {{/rollGreater() labelagiinc 1}}
-        {{#^rollGreater() labelagiinc 1}}
-          {{#rollGreater() labelagiinc -3}}
-            <!-- Worse -1 -->
-            {{#labelagiinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelagiinc"></span>:<span>{{labelagiinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span i18n="decrease">Decrease by</span><strong> -1</strong></div>
-            {{/labelagiinc}}
-          {{/rollGreater() labelagiinc -3}}
-          {{#^rollGreater() labelagiinc -3}}
-            <!-- NO CHANGE ie capped @ -3 -->
-            {{#labelagiinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelagiinc"></span>:<span>{{labelagiinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-minimum-abbrv">Min -3</span></div>
-            {{/labelagiinc}}
-          {{/^rollGreater() labelagiinc -3}}
-        {{/^rollGreater() labelagiinc 1}}
-      {{/rollLess() targetagi 1}}
-
-      <!-- the ABILITY is > 1 -->
-      {{#^rollLess() targetagi 1}}
-        <!-- check roll. -->
-        <!-- is ability capped? -->
-        {{#rollLess() labelagiinc 6}}
-          <!-- BETTER +1 -->
-          {{#rollGreater() labelagiinc targetagi}}
-            {{#labelagiinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelagiinc"></span>:<span>{{labelagiinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span i18n="increase">Increase by</span><strong> +1</strong></div>
-            {{/labelagiinc}}
-          {{/rollGreater() labelagiinc targetagi}}
-          <!-- WORSE: -1 -->
-          {{#^rollGreater() labelagiinc targetagi}}
-            {{#labelagiinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelagiinc"></span>:<span>{{labelagiinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span i18n="decrease">Decrease by</span><strong> -1</strong></div>
-            {{/labelagiinc}}
-          {{/^rollGreater() labelagiinc targetagi}}
-        {{/rollLess() labelagiinc 6}}
-        {{#^rollLess() labelagiinc 6}}
-          <!-- NO CHANGE ie capped @ +6 -->
-          {{#labelagiinc}}
+            <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span data-i18n="increase">Increase by</span><strong> +1</strong></div>
+          {{/rollLess() targetagi 6}}
+          <!-- ELSE (current ability ≥ +6) → NO CHANGE -->
+          {{#^rollLess() targetagi 6}}
             <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelagiinc"></span>:<span>{{labelagiinc}}</span></div>
             <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-maximum-abbrv">Max +6</span></div>
-          {{/labelagiinc}}
-        {{/^rollLess() labelagiinc 6}}
-      {{/^rollLess() targetagi 1}}
+          {{/^rollLess() targetagi 6}}
+        {{/^rollLess() labelagiinc targetagi}}
+      {{/rollGreater() targetagi 1}}
+      <!-- ELSE (current ability ≤ 1) -->
+      {{#^rollGreater() targetagi 1}}
+        <!-- IF roll ≥ 2 → BETTER (+1) -->
+        {{#rollGreater() labelagiinc 1}}
+          <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelagiinc"></span>:<span>{{labelagiinc}}</span></div>
+          <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span data-i18n="increase">Increase by</span><strong> +1</strong></div>
+        {{/rollGreater() labelagiinc 1}}
+        <!-- ELSE (roll = 1) -->
+        {{#^rollGreater() labelagiinc 1}}
+          <!-- IF current ability > −3 → WORSE (−1) -->
+          {{#rollGreater() targetagi -3}}
+            <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelagiinc"></span>:<span>{{labelagiinc}}</span></div>
+            <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span data-i18n="decrease">Decrease by</span><strong> -1</strong></div>
+          {{/rollGreater() targetagi -3}}
+          <!-- ELSE (current ability ≤ −3) → NO CHANGE -->
+          {{#^rollGreater() targetagi -3}}
+            <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelagiinc"></span>:<span>{{labelagiinc}}</span></div>
+            <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-minimum-abbrv">Min -3</span></div>
+          {{/^rollGreater() targetagi -3}}
+        {{/^rollGreater() labelagiinc 1}}
+      {{/^rollGreater() targetagi 1}}
 
       <!-- PRESENCE -->
-      <!-- the ABILITY is < 1 -->
-      {{#rollLess() targetpre 1}}
-        <!-- check roll. 2+ = BETTER. 1 = WORSE -->
-        {{#rollGreater() labelpreinc 1}}
-          <!-- BETTER +1 -->
-          {{#labelpreinc}}
+      <!-- IF current ability > 1 -->
+      {{#rollGreater() targetpre 1}}
+        <!-- IF roll < current ability → WORSE (−1) -->
+        {{#rollLess() labelpreinc targetpre}}
+          <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelpreinc"></span>:<span>{{labelpreinc}}</span></div>
+          <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span data-i18n="decrease">Decrease by</span><strong> -1</strong></div>
+        {{/rollLess() labelpreinc targetpre}}
+        <!-- ELSE (roll ≥ current ability) -->
+        {{#^rollLess() labelpreinc targetpre}}
+          <!-- IF current ability < +6 → BETTER (+1) -->
+          {{#rollLess() targetpre 6}}
             <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelpreinc"></span>:<span>{{labelpreinc}}</span></div>
-            <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span i18n="increase">Increase by</span><strong> +1</strong></div>
-          {{/labelpreinc}}
-        {{/rollGreater() labelpreinc 1}}
-        {{#^rollGreater() labelpreinc 1}}
-          {{#rollGreater() labelpreinc -3}}
-            <!-- Worse -1 -->
-            {{#labelpreinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelpreinc"></span>:<span>{{labelpreinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span i18n="decrease">Decrease by</span><strong> -1</strong></div>
-            {{/labelpreinc}}
-          {{/rollGreater() labelpreinc -3}}
-          {{#^rollGreater() labelpreinc -3}}
-            <!-- NO CHANGE ie capped @ -3 -->
-            {{#labelpreinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelpreinc"></span>:<span>{{labelpreinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-minimum-abbrv">Min -3</span></div>
-            {{/labelpreinc}}
-          {{/^rollGreater() labelpreinc -3}}
-        {{/^rollGreater() labelpreinc 1}}
-      {{/rollLess() targetpre 1}}
-
-      <!-- the ABILITY is > 1 -->
-      {{#^rollLess() targetpre 1}}
-        <!-- check roll. -->
-        <!-- is ability capped? -->
-        {{#rollLess() labelpreinc 6}}
-          <!-- BETTER +1 -->
-          {{#rollGreater() labelpreinc targetpre}}
-            {{#labelpreinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelpreinc"></span>:<span>{{labelpreinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span i18n="increase">Increase by</span><strong> +1</strong></div>
-            {{/labelpreinc}}
-          {{/rollGreater() labelpreinc targetpre}}
-          <!-- WORSE: -1 -->
-          {{#^rollGreater() labelpreinc targetpre}}
-            {{#labelpreinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelpreinc"></span>:<span>{{labelpreinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span i18n="decrease">Decrease by</span><strong> -1</strong></div>
-            {{/labelpreinc}}
-          {{/^rollGreater() labelpreinc targetpre}}
-        {{/rollLess() labelpreinc 6}}
-        {{#^rollLess() labelpreinc 6}}
-          <!-- NO CHANGE ie capped @ +6 -->
-          {{#labelpreinc}}
+            <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span data-i18n="increase">Increase by</span><strong> +1</strong></div>
+          {{/rollLess() targetpre 6}}
+          <!-- ELSE (current ability ≥ +6) → NO CHANGE -->
+          {{#^rollLess() targetpre 6}}
             <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelpreinc"></span>:<span>{{labelpreinc}}</span></div>
             <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-maximum-abbrv">Max +6</span></div>
-          {{/labelpreinc}}
-        {{/^rollLess() labelpreinc 6}}
-      {{/^rollLess() targetpre 1}}
+          {{/^rollLess() targetpre 6}}
+        {{/^rollLess() labelpreinc targetpre}}
+      {{/rollGreater() targetpre 1}}
+      <!-- ELSE (current ability ≤ 1) -->
+      {{#^rollGreater() targetpre 1}}
+        <!-- IF roll ≥ 2 → BETTER (+1) -->
+        {{#rollGreater() labelpreinc 1}}
+          <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelpreinc"></span>:<span>{{labelpreinc}}</span></div>
+          <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span data-i18n="increase">Increase by</span><strong> +1</strong></div>
+        {{/rollGreater() labelpreinc 1}}
+        <!-- ELSE (roll = 1) -->
+        {{#^rollGreater() labelpreinc 1}}
+          <!-- IF current ability > −3 → WORSE (−1) -->
+          {{#rollGreater() targetpre -3}}
+            <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelpreinc"></span>:<span>{{labelpreinc}}</span></div>
+            <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span data-i18n="decrease">Decrease by</span><strong> -1</strong></div>
+          {{/rollGreater() targetpre -3}}
+          <!-- ELSE (current ability ≤ −3) → NO CHANGE -->
+          {{#^rollGreater() targetpre -3}}
+            <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labelpreinc"></span>:<span>{{labelpreinc}}</span></div>
+            <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-minimum-abbrv">Min -3</span></div>
+          {{/^rollGreater() targetpre -3}}
+        {{/^rollGreater() labelpreinc 1}}
+      {{/^rollGreater() targetpre 1}}
 
       <!-- TOUGHNESS -->
-      <!-- the ABILITY is < 1 -->
-      {{#rollLess() targettou 1}}
-        <!-- check roll. 2+ = BETTER. 1 = WORSE -->
-        {{#rollGreater() labeltouinc 1}}
-          <!-- BETTER +1 -->
-          {{#labeltouinc}}
+      <!-- IF current ability > 1 -->
+      {{#rollGreater() targettou 1}}
+        <!-- IF roll < current ability → WORSE (−1) -->
+        {{#rollLess() labeltouinc targettou}}
+          <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labeltouinc"></span>:<span>{{labeltouinc}}</span></div>
+          <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span data-i18n="decrease">Decrease by</span><strong> -1</strong></div>
+        {{/rollLess() labeltouinc targettou}}
+        <!-- ELSE (roll ≥ current ability) -->
+        {{#^rollLess() labeltouinc targettou}}
+          <!-- IF current ability < +6 → BETTER (+1) -->
+          {{#rollLess() targettou 6}}
             <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labeltouinc"></span>:<span>{{labeltouinc}}</span></div>
-            <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span i18n="increase">Increase by</span><strong> +1</strong></div>
-          {{/labeltouinc}}
-        {{/rollGreater() labeltouinc 1}}
-        {{#^rollGreater() labeltouinc 1}}
-          {{#rollGreater() labeltouinc -3}}
-            <!-- Worse -1 -->
-            {{#labeltouinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labeltouinc"></span>:<span>{{labeltouinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span i18n="decrease">Decrease by</span><strong> -1</strong></div>
-            {{/labeltouinc}}
-          {{/rollGreater() labeltouinc -3}}
-          {{#^rollGreater() labeltouinc -3}}
-            <!-- NO CHANGE ie capped @ -3 -->
-            {{#labeltouinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labeltouinc"></span>:<span>{{labeltouinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-minimum-abbrv">Min -3</span></div>
-            {{/labeltouinc}}
-          {{/^rollGreater() labeltouinc -3}}
-        {{/^rollGreater() labeltouinc 1}}
-      {{/rollLess() targettou 1}}
-
-      <!-- the ABILITY is > 1 -->
-      {{#^rollLess() targettou 1}}
-        <!-- check roll. -->
-        <!-- is ability capped? -->
-        {{#rollLess() labeltouinc 6}}
-          <!-- BETTER +1 -->
-          {{#rollGreater() labeltouinc targettou}}
-            {{#labeltouinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labeltouinc"></span>:<span>{{labeltouinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span i18n="increase">Increase by</span><strong> +1</strong></div>
-            {{/labeltouinc}}
-          {{/rollGreater() labeltouinc targettou}}
-          <!-- WORSE: -1 -->
-          {{#^rollGreater() labeltouinc targettou}}
-            {{#labeltouinc}}
-              <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labeltouinc"></span>:<span>{{labeltouinc}}</span></div>
-              <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span i18n="decrease">Decrease by</span><strong> -1</strong></div>
-            {{/labeltouinc}}
-          {{/^rollGreater() labeltouinc targettou}}
-        {{/rollLess() labeltouinc 6}}
-        {{#^rollLess() labeltouinc 6}}
-          <!-- NO CHANGE ie capped @ +6 -->
-          {{#labeltouinc}}
+            <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span data-i18n="increase">Increase by</span><strong> +1</strong></div>
+          {{/rollLess() targettou 6}}
+          <!-- ELSE (current ability ≥ +6) → NO CHANGE -->
+          {{#^rollLess() targettou 6}}
             <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labeltouinc"></span>:<span>{{labeltouinc}}</span></div>
             <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-maximum-abbrv">Max +6</span></div>
-          {{/labeltouinc}}
-        {{/^rollLess() labeltouinc 6}}
-      {{/^rollLess() targettou 1}}
+          {{/^rollLess() targettou 6}}
+        {{/^rollLess() labeltouinc targettou}}
+      {{/rollGreater() targettou 1}}
+      <!-- ELSE (current ability ≤ 1) -->
+      {{#^rollGreater() targettou 1}}
+        <!-- IF roll ≥ 2 → BETTER (+1) -->
+        {{#rollGreater() labeltouinc 1}}
+          <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labeltouinc"></span>:<span>{{labeltouinc}}</span></div>
+          <div><span class="sheet-bold-text" data-i18n="getting-better-better-u">BETTER...</span><span data-i18n="increase">Increase by</span><strong> +1</strong></div>
+        {{/rollGreater() labeltouinc 1}}
+        <!-- ELSE (roll = 1) -->
+        {{#^rollGreater() labeltouinc 1}}
+          <!-- IF current ability > −3 → WORSE (−1) -->
+          {{#rollGreater() targettou -3}}
+            <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labeltouinc"></span>:<span>{{labeltouinc}}</span></div>
+            <div><span class="sheet-bold-text" data-i18n="getting-better-worse-u">WORSE...</span><span data-i18n="decrease">Decrease by</span><strong> -1</strong></div>
+          {{/rollGreater() targettou -3}}
+          <!-- ELSE (current ability ≤ −3) → NO CHANGE -->
+          {{#^rollGreater() targettou -3}}
+            <div class="sheet-aligns-right"><span class="sheet-bold-text" data-i18n="labeltouinc"></span>:<span>{{labeltouinc}}</span></div>
+            <div><span class="sheet-bold-text" data-i18n="getting-better-same-u">NO CHANGE...</span><span data-i18n="ability-minimum-abbrv">Min -3</span></div>
+          {{/^rollGreater() targettou -3}}
+        {{/^rollGreater() labeltouinc 1}}
+      {{/^rollGreater() targettou 1}}
 
       {{#allprops() name labelhpcheck labelhpgain labeldebris labelstrinc labelagiinc labelpreinc labeltouinc targethp targetstr targetagi targetpre targettou silver}}
-      <div>
-        <span>{{key}}</span>
-        <span>{{value}}</span>
-      </div>
+        <div>
+          <span>{{key}}</span>
+          <span>{{value}}</span>
+        </div>
       {{/allprops() name labelhpcheck labelhpgain labeldebris labelstrinc labelagiinc labelpreinc labeltouinc targethp targetstr targetagi targetpre targettou silver}}
     </div>
   </rolltemplate>
