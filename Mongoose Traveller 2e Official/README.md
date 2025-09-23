@@ -118,6 +118,9 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 
 ### Version 1.1.08
 - Fixed Skills on Robot tab that were affecting modifiers on PC/NPC skills
-- 
+
+### Version 1.1.09
+- Added custom Characteristics to NPC to allow values for Attitude, Influence, Power etc. to be captured
+
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 
