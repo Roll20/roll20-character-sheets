@@ -1,3 +1,26 @@
+# 2025-09-23
+
+- Creature Law (new upload)
+  - Fix level variance in listing
+  - Fix Variance in listings
+  - Fix variance in display
+- Banecroft (new upload)
+  - Adventure text uploaded
+  - Creatures updated to new standard
+  - First Tokens created
+- Validation
+  - Support Body,Head,Arms,Legs format for AT
+  - Validate attack sizes for creatures
+- Stuff: Fix error in itemmaterial not saving
+- Levelup: 
+  - Don't try and levelup current_level/new_level
+  - Spell lists show the group
+  - Recreate previous skill ranks correctly
+- Misc: Make one of the errors more verbose
+- Spells: Fix display of mixed armor penalties
+  - calculation was correct, display showed culmulative error
+- Create: fix highest message (@ixs)
+
 # 2025-09-18
 
 - Fix stacking of the overlays
