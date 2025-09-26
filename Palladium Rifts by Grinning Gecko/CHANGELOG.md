@@ -6,6 +6,7 @@
 
 - Add pop-out icons where roll buttons create a new dialog.
 - Add AGENTS.md for development guidelines.
+- Add hover background color to repeating items.
 
 ### Changed
 
