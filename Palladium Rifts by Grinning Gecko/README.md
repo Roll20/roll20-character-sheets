@@ -1,5 +1,22 @@
 # Palladium Rifts by Grinning Gecko
 
+## Checkout
+
+If you just want to work on this sheet without cloning the entire repo, do the following:
+
+```
+mkdir roll20-character-sheets
+cd roll20-character-sheets
+git init
+git remote add origin git@github.com:Roll20/roll20-character-sheets.git # or git@github.com:ggutenberg/roll20-rifts-imports.git if you're making pull requests for me to review.
+git config core.sparseCheckout true
+echo "--no-cone" >> .git/info/sparse-checkout
+echo "/Palladium Rifts by Grinning Gecko" >> .git/info/sparse-checkout
+git pull origin master
+```
+
+If you want to update your local copy, run `git pull origin master` again.
+
 ## Build
 
 This sheet makes use of the following:
