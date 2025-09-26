@@ -10,6 +10,7 @@
 ### Changed
 
 - Update README.md with checkout instructions.
+- Add "or not gunfire" to dodge penalty option.
 
 ## [1.8.5] - 2025-09-06
 
