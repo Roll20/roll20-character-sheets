@@ -1,4 +1,4 @@
-<input id="npc-checkbox" class="npc-checkbox" type="checkbox" />
+<input id="npc-checkbox" name="attr_is_npc" class="npc-checkbox" type="checkbox" />
 <label for="npc-checkbox" data-i18n="npc-toggle"></label>
 <div class="sheet-body">
 	<div class="border">
@@ -182,9 +182,9 @@
 			</div>
 		</div>
 		<div class="damage-mod-panel panel-dark">
-			<label>Immunity</label>
+			<label><span data-i18n="immunity"></span></label>
 			<input type="text" class="input-md" name="attr_immunity" />
-			<label>Weakness</label>
+			<label><span data-i18n="weakness"></span></label>
 			<input type="text" class="input-md" name="attr_weakness" />
 		</div>
 		<div class="resource-description-panel panel-dark">
@@ -698,16 +698,15 @@
 			<label for="import-minimize-checkbox" data-i18n="minimize-label"></label>
 		</div>
 		<div class="minimize-show">
-			<h5 data-i18n="import"</h5>
+			<h5 data-i18n="import"></h5>
 		</div>
 		<p>Paste the contents of the Forge Steel data export (*.ds-hero file) into the text box below, then click "Import".</p>
 		<p class="text-warning">This will overwrite attributes on this sheet. This cannot be undone.</p>
 		<textarea name="attr_forgesteel_json"></textarea>
 		<button type="action" name="act_import">Import</button>
 	</div>
-	<div style="font-family: Menlo, Monaco, Consolas">This Draw Steel character sheet for Roll20 is an independent product published under the DRAW STEEL Creator License and is not affiliated with MCDM Productions, LLC. DRAW STEEL © 2024 MCDM Productions, LLC.</div>
 </div>
-<div class="npc-sheet-body">
+<div class="npc-sheet-body panel-dark">
 	<label class="npc-edit-icon" for="npc-edit-toggle">p</label><input class="npc-edit-toggle" type="checkbox" id="npc-edit-toggle" />
 	<div class="npc-edit">
 		<div class="npc-edit-group npc-edit-text">
@@ -762,7 +761,7 @@
 				<option value="" data-i18n="never-whisper-roll" selected></option>
 				<option value="?{Whisper?|Public Roll,|Whisper Roll,/w gm }" data-i18n="query-whisper-roll"></option>
 				<option value="/w gm " data-i18n="always-whisper-roll"></option>
-            </select>	
+            		</select>	
 		</div>
 	</div>
 	<div class="npc-display">
@@ -849,7 +848,7 @@
 			</div>
 		</fieldset>
 	</div>
-	<div class="npc-abilities-panel">
+	<div class="npc-abilities-panel panel-dark">
 		<fieldset class="repeating_npcabilities">
 			<input class="npc-ability-edit-toggle" type="checkbox" id="npc-ability-edit-toggle" />
 			<div class="npc-ability-card-edit">
@@ -997,6 +996,7 @@
 			</div>
 		</fieldset>
 	</div>
+</div>
 <div class="disclaimer">
 	<span data-i18n="disclaimer"></span>
 </div>
@@ -1848,64 +1848,65 @@ const rollValueMap = {
 		const attrs = await getAttrsAsync([
 			'character_name',
 			'wtype',
-			...abilityAttributeNames.map(x => `repeating_abilities_${x}`),
+			...abilityAttributeNames.map(x => `repeating_npcabilities_${x}`),
 		]);
 		
 		const characterName = attrs.character_name;
 		const wtype = attrs.wtype;
 		let subtype = '';
 		
-		switch(attrs.repeating_abilities_ability_subtype) {
+		switch(attrs.repeating_npcabilities_ability_subtype) {
 			case 'signature-ability':
 			case 'villain-ability':
-				subtype = getTranslationByKey(attrs.repeating_abilities_ability_subtype) || '';
+				subtype = getTranslationByKey(attrs.repeating_npcabilities_ability_subtype) || '';
 				break;
 			case 'malice-ability':
 			case 'malice-trait':
-				subtype = attrs.repeating_abilities_ability_malice_cost + ' ' + getTranslationByKey('malice');
+				subtype = attrs.repeating_npcabilities_ability_malice_cost + ' ' + getTranslationByKey('malice');
 				break;
 		}
-		const type = attrs.repeating_abilities_ability_type === 'no-action' ? '' : getTranslationByKey(attrs.repeating_abilities_ability_type);
+		console.log('Type: ' + attrs.repeating_npcabilities_ability_type);
+		const type = attrs.repeating_npcabilities_ability_type === 'no-action' ? '' : getTranslationByKey(attrs.repeating_npcabilities_ability_type);
 		
 		const directMap = {
-			name: attrs.repeating_abilities_ability_name,
+			name: attrs.repeating_npcabilities_ability_name,
 			subtype: subtype,
-			trait: attrs.repeating_abilities_ability_trait || '',
+			trait: attrs.repeating_npcabilities_ability_trait || '',
 			type: type,
-			keywords: attrs.repeating_abilities_ability_keywords || '',
-			distance: attrs.repeating_abilities_ability_distance || '',
-			target: attrs.repeating_abilities_ability_target || '',
-			trigger: attrs.repeating_abilities_ability_trigger || '',
-			characteristic: attrs.repeating_abilities_ability_characteristic || '',
-			tier1: attrs.repeating_abilities_ability_tier_1 || '',
-			tier2: attrs.repeating_abilities_ability_tier_2 || '',
-			tier3: attrs.repeating_abilities_ability_tier_3 || '',
-			special: attrs.repeating_abilities_ability_special || '',
-			effect: attrs.repeating_abilities_ability_effect || '',
-			malprop: attrs.repeating_abilities_ability_malice || '',
-			malpropcost: attrs.repeating_abilities_ability_cost || '',
-			solo1name: attrs.repeating_abilities_ability_solo_1_name || '',
-			solo1text: attrs.repeating_abilities_ability_solo_1_text || '',
-			solo2name: attrs.repeating_abilities_ability_solo_2_name || '',
-			solo2text: attrs.repeating_abilities_ability_solo_2_text || '',
+			keywords: attrs.repeating_npcabilities_ability_keywords || '',
+			distance: attrs.repeating_npcabilities_ability_distance || '',
+			target: attrs.repeating_npcabilities_ability_target || '',
+			trigger: attrs.repeating_npcabilities_ability_trigger || '',
+			characteristic: attrs.repeating_npcabilities_ability_characteristic || '',
+			tier1: attrs.repeating_npcabilities_ability_tier_1 || '',
+			tier2: attrs.repeating_npcabilities_ability_tier_2 || '',
+			tier3: attrs.repeating_npcabilities_ability_tier_3 || '',
+			special: attrs.repeating_npcabilities_ability_special || '',
+			effect: attrs.repeating_npcabilities_ability_effect || '',
+			malprop: attrs.repeating_npcabilities_ability_malice || '',
+			malpropcost: attrs.repeating_npcabilities_ability_cost || '',
+			solo1name: attrs.repeating_npcabilities_ability_solo_1_name || '',
+			solo1text: attrs.repeating_npcabilities_ability_solo_1_text || '',
+			solo2name: attrs.repeating_npcabilities_ability_solo_2_name || '',
+			solo2text: attrs.repeating_npcabilities_ability_solo_2_text || '',
 		};
 		
 		const rollValueMap = {
-		    hasTrait: attrs.repeating_abilities_ability_subtype.includes('trait')
-				&& attrs.repeating_abilities_ability_trait
+		    hasTrait: attrs.repeating_npcabilities_ability_subtype.includes('trait')
+				&& attrs.repeating_npcabilities_ability_trait
 				? 1 : 0,
-			hasSolo: attrs.repeating_abilities_ability_subtype.includes('solo')
+			hasSolo: attrs.repeating_npcabilities_ability_subtype.includes('solo')
 				? 1 : 0,
-			hasTrigger: attrs.repeating_abilities_ability_type.includes('triggered')
-				&& attrs.repeating_abilities_ability_trigger
+			hasTrigger: attrs.repeating_npcabilities_ability_type.includes('triggered')
+				&& attrs.repeating_npcabilities_ability_trigger
 				? 1 : 0,
-			hasPowerRoll: attrs.repeating_abilities_has_power_roll === 'on'
+			hasPowerRoll: attrs.repeating_npcabilities_has_power_roll === 'on'
 				? 1 : 0,
-			hasSpecial: attrs.repeating_abilities_has_special === 'on'
+			hasSpecial: attrs.repeating_npcabilities_has_special === 'on'
 				? 1 : 0,
-			hasEffect: attrs.repeating_abilities_has_effect === 'on'
+			hasEffect: attrs.repeating_npcabilities_has_effect === 'on'
 				? 1 : 0,
-			hasMalprop: attrs.repeating_abilities_has_malice === 'on'
+			hasMalprop: attrs.repeating_npcabilities_has_malice === 'on'
 				? 1 : 0,
 		};
 		const roll = wtype + ` &{template:monsterability} `

@@ -6559,7 +6559,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision e4295d24baee7bde9d32235b4c46b457402d3f3b
+Revision 071aaeb51fba31488c8ccd15c39ed1f6dd9fb343
 
 
 <hr>
@@ -7766,7 +7766,7 @@ function miscBonusHighest(miscstr, lowest) {
 function miscAttrSet(attr, name, value) {
     let toget = attr;
     if (!attr.endsWith("_misc")) {
-	rmuerror("Use of default _misc on ", attr);
+	rmuerror("Use of default _misc on miscAttrSet ", attr, name, value);
 	toget = attr + "_misc";
     }
     getAttrsPending([toget], (ev) => {
@@ -7779,7 +7779,7 @@ function miscAttrSet(attr, name, value) {
 function miscAttrRemove(attr, name) {
     let toget = attr;
     if (!attr.endsWith("_misc")) {
-	rmuerror("Use of default _misc on ", attr);
+	rmuerror("Use of default _misc on miscAttrRemove ", attr, name, value);
 	toget = attr + "_misc";
     }
     getAttrsPending([toget], (ev) => {
@@ -7926,6 +7926,25 @@ function getSectionIDsPending(section, func) {
 	rmuasync --;
 	checkPending();
     });
+}
+
+function getSectionIDsListPending(sections, func) {
+  const res = [];
+  let waiting = 1; // Start at one to force something
+  rmuasync ++;
+
+  sections.forEach((section) => {
+    waiting ++;
+    getSectionIDs(section, (ids) => {
+      for (id of ids) {
+	res.push(section + "_" + id)
+      }
+      waiting --;
+      if (waiting == 0) { waiting = -99; func(res); rmuasync --; checkPending();  }
+    });
+  });
+  waiting --;
+  if (waiting == 0) { waiting = -99; func(res); rmuasync --; checkPending(); }
 }
 
 function getSectionIDsOrdered(sectionName, callback) {
@@ -8558,7 +8577,7 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
 	  console.log(statCache_);
 	  // FIXME: Should make this prettier
 	  miscAttrSet("scr_misc", "Realm Stat", statCache_.rs);
-	  if (donefn && typeof donefn === 'function') {
+	  if (donefn && typeof(donefn) === 'function') {
 	    donefn();
 	  }
 	});
@@ -8849,7 +8868,9 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
 	catForEachSkill(cat, func, () => {
 	  catcount --;
 	  if (catcount == 0) {
-	    donefn();
+	    if (donefn && typeof(donefn) == "function") {
+	      donefn();
+	    }
 	  }
 	});
     });
@@ -9368,11 +9389,11 @@ function _spellDoQuery(prevranks, listtype, filter, subtarget, cost, listranks) 
 	  }
 	}
 
-	addRepeatingSectionPending(`cmspelllistspell${subtarget}`, 'spelllist', `${subtarget}spelllist`,
+	addRepeatingSection(`cmspelllistspell${subtarget}`, 'spelllist', `${subtarget}spelllist`,
 	  (sectionname) => {
 	      cmPopulateListOptions(`${sectionname}_cmranks`, costarray,
 		  prevranks[list.name] || costarray[0]);
-	      setAttrsPending({[`${sectionname}_listname`]: list.name,
+	      setAttrs({[`${sectionname}_listname`]: list.name,
 		  [`${sectionname}_listranks`]: listranks[list.name]?.ranks || '-'});
 	    });
       }
@@ -9488,34 +9509,34 @@ onCheck("mancerchange:repeating_otherbaseownrealmspelllist", changeSkillPurchase
 function prepareGraceTrickery(gracebonus, trickerybonus) {
 
   getSectionIDsPending(`repeating_specializationgrace`, (graceids) => {
-    let toget = []
-    getSectionIDsPending(`repeating_specializationspelltrickery`, (trickeryids) => {
-	    for (const id of trickeryids) {
-	      const basename = `repeating_specializationspelltrickery_${id}`
-	      toget.push(basename + "_bonus");
-	      toget.push(basename + "_name");
-	    }
-	    for (const id of graceids) {
-	      const basename = `repeating_specializationgrace_${id}`
-	      toget.push(basename + "_bonus");
-	      toget.push(basename + "_name");
-	    }
-	    getAttrsPending(toget, (perks) => {
-		for (const id of graceids) {
-		  const basename = `repeating_specializationgrace_${id}`
-		  if (perks[basename + "_name"]) {
-		    gracebonus[perks[basename + "_name"]] = perks[basename + "_bonus"]
-		  }
+      let toget = []
+      getSectionIDsPending(`repeating_specializationspelltrickery`, (trickeryids) => {
+	  for (const id of trickeryids) {
+	    const basename = `repeating_specializationspelltrickery_${id}`
+	    toget.push(basename + "_bonus");
+	    toget.push(basename + "_name");
+	  }
+	  for (const id of graceids) {
+	    const basename = `repeating_specializationgrace_${id}`
+	    toget.push(basename + "_bonus");
+	    toget.push(basename + "_name");
+	  }
+	  getAttrsPending(toget, (perks) => {
+	      for (const id of graceids) {
+		const basename = `repeating_specializationgrace_${id}`
+		if (perks[basename + "_name"]) {
+		  gracebonus[perks[basename + "_name"]] = perks[basename + "_bonus"]
 		}
-		for (const id of trickeryids) {
-		  const basename = `repeating_specializationspelltrickery_${id}`
-		  if (perks[basename + "_name"]) {
-		    trickerybonus[perks[basename + "_name"]] = perks[basename + "_bonus"]
-		  }
+	      }
+	      for (const id of trickeryids) {
+		const basename = `repeating_specializationspelltrickery_${id}`
+		if (perks[basename + "_name"]) {
+		  trickerybonus[perks[basename + "_name"]] = perks[basename + "_bonus"]
 		}
-		console.log("Trickery & Grace", trickerybonus, gracebonus);
-	    });
-    });
+	      }
+	      console.log("Trickery & Grace", trickerybonus, gracebonus);
+	  });
+      });
   });
 }
 
@@ -9754,7 +9775,7 @@ function getSubtlePenalty(realm, type, trickery, subtle, voice, hands, enc, meta
       epen += encdelta * pentable.armorenc;
       log += ` -${epen}&nbsp;[(${enc} - ${metalenc} Non-metal Enc% * ${pentable.armorenc}]`;
       epen += metalenc * pentable.metalenc;
-      log += ` -${epen}&nbsp;[${metalenc} Metal Enc% * ${pentable.metalenc}]`;
+      log += ` -${metalenc * pentable.metalenc}&nbsp;[${metalenc} Metal Enc% * ${pentable.metalenc}]`;
     }
     // Now apply transcendance
     if (transcend && epen > 0) {
@@ -10744,35 +10765,80 @@ onCheck("page:levelupreview", levelUpReview);
  * results = { "riding": [prefix:'sss', category:animal, aname: 'riding', name:"Horse",ranks:7,bonus:44] .. };
  */
 function getSpecialisedSkillRanks(results) {
+  const sections = [];
+  const skilltocat = {}
+
   categories.forEach((cat) => {
       cat.skills.forEach((skill) => {
 	  if (!skill.dynamicspecializations) return;
 	  let prefix = `repeating_specialization${skill.aname}`
-	  getSectionIDs(prefix, (ids) => {
-	      if (ids.length == 0) return;
-	      let specskill = [];
-	      results[skill.aname] = specskill;
-	      ids.forEach(id => {
-		  let toget = [];
-		  toget.push(prefix + '_' + id + "_name");
-		  toget.push(prefix + '_' + id + "_ranks");
-		  toget.push(prefix + '_' + id + "_bonus");
-		  toget.push(prefix + '_' + id + "_usecount");
-		  toget.push(prefix + '_' + id + "_usecounttotal");
-		  getAttrs(toget, data => {
-		      specskill.push({
-			  category: cat.aname,
-			  id:id,
-			  prefix:prefix + '_' + id,
-			  aname:skill.aname,
-			  name:data[prefix + '_' + id + "_name"],
-			  bonus:data[prefix + '_' + id + "_bonus"],
-			  usecount:data[prefix + '_' + id + "_usecount"],
-			  usecounttotal:data[prefix + '_' + id + "_usecounttotal"],
-			  ranks:data[prefix + '_' + id+ "_ranks"]});
-		  });
-	      });
-	  });
+	  skilltocat[skill.aname] = cat;
+	  sections.push(prefix);
+      });
+  });
+
+  getSectionIDsListPending(sections, (prefixes) => {
+      const toget = [];
+      prefixes.forEach(prefix => {
+	  toget.push(prefix + "_name");
+	  toget.push(prefix + "_ranks");
+	  toget.push(prefix + "_bonus");
+	  toget.push(prefix + "_usecount");
+	  toget.push(prefix + "_usecounttotal");
+      });
+      getAttrsPending(toget, (attrs) => {
+	  for (prefix of prefixes) {
+	      let matches = prefix.match(/^repeating_specialization([^_]*)/);
+	      let skill = matches[1] || "Error";
+	      item = {
+		  aname: skill,
+		  category: skilltocat[skill].aname,
+		  name: attrs[prefix + "_name"],
+		  ranks: attrs[prefix + "_ranks"] || 0,
+		  bonus: attrs[prefix + "_bonus"] || 0,
+		  usecount: attrs[prefix + "_usecount"] || 0,
+		  usecounttotal: attrs[prefix + "_usecounttotal"] || 0,
+		  prefix: prefix,
+	      };
+	      if (!results[skill]) {
+		results[skill] = [];
+	      }
+	      results[skill].push(item)
+	  }
+      });
+  });
+}
+
+/**
+ * Gets the ranks that the character currently has in spell lists.
+ *
+ Returns in results (async)
+ Organ Arcana : {ranks: 2, prefix: 'repeating_spelllistspellotherbaseownrealm_-ozihd609zzaws1qrpev'}
+Sense Molding : {ranks: 12, prefix: 'repeating_spelllistspellownbase_-ovjjkh0a4-zn4izjdcw'}
+*/
+function getSpellListRanks(results) {
+  const spelltypes = [
+      'repeating_spelllistspellownbase',
+      'repeating_spelllistspellopen',
+      'repeating_spelllistspellclosed',
+      'repeating_spelllistspellotherbaseownrealm'];
+  getSectionIDsListPending(spelltypes, (listids) => {
+      console.log(listids)
+      let listtofetch = []
+      for (list of listids) {
+	listtofetch.push(list + '_name');
+	listtofetch.push(list + '_ranks');
+      }
+      getAttrsPending(listtofetch, (listdata) => {
+	console.log("list fetched", listdata);
+	for (list of listids) {
+	  let name = listdata[list + "_name"];
+	  results[name] = {
+	    ranks: listdata[list + "_ranks"],
+	    prefix: list,
+	  };
+	}
+	console.log("GetSpellListRaks done", results);
       });
   });
 }
@@ -10794,9 +10860,10 @@ function levelUpStart(_) {
 	    // If we are at any level but 0, we get 2 free statgains.
 	    const level = parseIntDefault(ev.level, 0);
 	    if (level > 0){
-	    showChoices(["levelup_statgain_free"]);
-	    // Create the list of options dynamically so we can add temp / pot
-	    updateStatgainList(['comp_statgain1', 'comp_statgain2']);
+	      showChoices(["levelup_statgain_free"]);
+	      // Create the list of options dynamically so we can add temp / pot
+	      // FIXME: This si not pending
+	      updateStatgainList(['comp_statgain1', 'comp_statgain2']);
 	    }
 
 	    // New level
@@ -10901,14 +10968,9 @@ function levelUpStart(_) {
 	      savedskills.push(prefix);
 	      continue;
 	    }
-	    if (!match || match.length < 2) {
-	      rmuerror("Coulnd't match regex against ", prefix, index);
-	      continue;
-	    }
 	  }
 	}
     });
-
 
     addPendingFunction('Levelup: Create specialisations from ranks', () => {
 	for (const skillname in specialisedranks) {
@@ -10922,7 +10984,7 @@ function levelUpStart(_) {
 		      const prefix = `${sectionname}_sheetprefix`;
 
 		      cmPopulateListOptions(rname, costarray, 0)
-		      setAttrsPending({[sname]: skill.name, [prefix] : skill.prefix});
+		      setAttrs({[sname]: skill.name, [prefix] : skill.prefix});
 		      let uses = skill.usecount || '-';
 		      let usestotal = skill.usecounttotal || '-';
 		      let ranks = skill.ranks || '-';
@@ -10937,63 +10999,19 @@ function levelUpStart(_) {
     });
 
 
-    addPendingFunction('Talents add', () => {
-      const data = getCharmancerData();
-      console.log("data.level.values.current_level");
-      if (previous_level !=  parseIntDefault(data.levelup?.values?.current_level, 0)) {
-	return;
-      }
-      for (obj of savedtalents) {
-	addRepeatingSection('added_talents', 'talent', (id) => {
-	    setCharmancerOptions(`${id}_talent`, "Category:Talent",
-		{ selected: data?.levelup?.data[obj] });
-	});
-      }
+   
+    const listRanks = {};
+
+    addPendingFunction("Levelup: DEBUGGG@!", () => {
+	console.log("Debug point!");
     });
 
-   
-    // FIXME: This is duplicated below.   I should make it function
-    const listRanks = {};
-    {
-      const spellRanks = {}
-      const listIdsToGet = [];
-      addPendingFunction('Levelup: Get Ranks for spells', () => {
-	// So two pieces here.  Get all the lists with ranks.  Put in an array indexed
-	// by spell name. 
-	// FIXME: This is in RMUSkills.lua, should sync
-	const spelltypes = ['spellownbase', 'spellopen', 'spellclosed', 'spellotherbaseownrealm'];
-	spelltypes.forEach(spelltype => {
-	    getSectionIDsPending('spelllist' + spelltype, (ids) => {
-	       ids.forEach(id => {
-		   listIdsToGet.push('repeating_spelllist' + spelltype + '_' + id + '_name');
-		   listIdsToGet.push('repeating_spelllist' + spelltype + '_' + id + '_ranks');
-	       });
-	    });
-	});
-      });
-      // Immediataly after the prior; now get the damn things
-      addPendingFunction("Levelup: Do the damn fetch", () => {
-	  getAttrsPending(listIdsToGet, (nr) => {
-	      // find all the _name and get the ranks from that.
-	      for (nameid in nr) {
-		if (!nameid.endsWith("_name")) {
-		  continue;
-		}
-		const ranksid = nameid.replace(/_name$/, "_ranks");
-		const prefix = nameid.replace(/_name$/, "");
-		// So we grabbed the name, now get the basename 
 
-		listRanks[nr[nameid]] = {
-		    ranks: nr[ranksid],
-		    prefix: prefix
-		}
-	      }
-	  });
-      });
-    }
+    addPendingFunction('Levelup: Spell List add', () => {
+	console.log("List Ranks is ", listRanks);
 
-    addPendingFunction('Spell List add', () => {
 	const data = getCharmancerData();
+	// FIXME: Already got the damn costws - don't need to get them again
 	getAttrsPending(["realm", "profession", "spellownbase_cost", 
 	  "spellopen_cost", "spellclosed_cost", "spellrestricted_cost",
 	  "spellarcane_cost"], (info) => {
@@ -11050,7 +11068,6 @@ function levelUpStart(_) {
 	  setCharmancerText(updates);
 	});
     });
-
         // Specialisations; get existing ones and ones from cultures page
     addPendingFunction('Levelup Init Done', () => {
 	console.log("****** Finished levelup function *****");});
@@ -11154,6 +11171,9 @@ onCheck("mancerfinish:levelup", (ev) => {
 	}
 	if (purchase.endsWith("_sheetprefix")) {
 	  // Handled later
+	  continue;
+	}
+	if (purchase === "current_level" || purchase === "new_level") {
 	  continue;
 	}
 
@@ -11287,9 +11307,11 @@ onCheck("mancerfinish:levelup", (ev) => {
   });
 
   addPendingFunction("LevelupFinish: Save DP / New Level", () => {
-      miscAttrSet("dp_used_misc", levelstr, dpspent);
       setAttrsPending({"level": newlevel});
-  })
+  });
+  addPendingFunction("LevelupFinish: Save DP Used", () => {
+      miscAttrSet("dp_used_misc", levelstr, dpspent);
+  });
 
   addPendingFunction("LevelupFinish: update all skills", RMUSkills.updateAllSkills);
   addPendingFunction("LevelupFinish: Set HP/PP", () => {
@@ -11332,6 +11354,7 @@ function levelUpReview() {
   levelstr = `Level ${newlevel}`; 
 
   const levelup = getLevelUpSummary(cmdata);
+  console.log("level up summary", levelup);
 
   for (const statgain in levelup.statgains) {
     const sg = getTranslationByKey(statgain)
@@ -11360,10 +11383,21 @@ function levelUpReview() {
     }
   }
 
+  const grouptopretty = { 
+    ownbase: "Own Base",
+    open: "Open",
+    closed: "Closed",
+    otherbaseownrealm: "Other Base (Own Realm)",
+    openother: "Open Other Realm",
+    closedother: "Closed Other Realm",
+    otherbaseother: "Other Base Other Realm",
+    arcane: "Arcane"
+  }
   for (let spell in levelup.spelllists) {
     const list = levelup.spelllists[spell];
+    let pretty = grouptopretty[list.group] || list.group;
     addRepeatingSection('levelupreviewspelllists', 'levelupreviewlistitem', (id) => {
-	setCharmancerText({[`${id} .text`]: `${list.list}: ${list.ranks} Ranks`});
+	setCharmancerText({[`${id} .text`]: `${list.list} (${pretty}): ${list.ranks} Ranks`});
     });
   }
 
@@ -11412,11 +11446,14 @@ function getLevelUpSummary(cmdata) {
 	}
 	result.talents.push({talent: name, tier: tier});	
       }
+
+    // Spell Lists
     } else if (purchase.includes("spelllist")) {
       // skip if not ranks
       if (purchase.endsWith("_listranks") || purchase.endsWith("_listname")) {
 	continue;
       }
+      console.log("List", purchase);
       const [ranks, cost] = optionDecodeIntPair(values[purchase]);
       if (ranks == 0) {
 	continue;
@@ -11424,7 +11461,13 @@ function getLevelUpSummary(cmdata) {
       // List name: 
       const namekey = purchase.replace(/_cmranks/, "_listname");
       const list = values[namekey];
-      result.spelllists.push({list: list, ranks: ranks})
+      const groupmatch = purchase.match(/_([a-zA-Z]*)spelllist_cmranks/);
+      let group = "Unknown";
+      if (groupmatch && groupmatch[1]) {
+	group = groupmatch[1];
+      }
+      result.spelllists.push({list: list, ranks: ranks, group: group})
+
     } else if (purchase.startsWith("tp")) {
       console.log("Traing Package Purchase");
     } else if (purchase.startsWith("lasterror")) {
@@ -11810,7 +11853,7 @@ RMUStats.createStatsFinalize = function(cmdata) {
 	let st = svals[str90];
 	st.temp = 90;
 	st.pot = Math.max(Math.min(st.pot + 10, 90), 100);
-	miscRawSetAbsolute(st.misc, `Raise hightest to ${st.temp} (Pot ${st.pot})`, st.temp);
+	miscRawSetAbsolute(st.misc, `Raise highest to ${st.temp} (Pot ${st.pot})`, st.temp);
 	console.log(`Raise ${str90} to 90`);
 	break;
       }
@@ -11822,7 +11865,7 @@ RMUStats.createStatsFinalize = function(cmdata) {
 	let st = svals[str85];
 	st.temp = 85;
 	st.pot = Math.max(Math.min(st.pot + 10, 85), 100);
-	miscRawSetAbsolute(st.misc, `Raise hightest to ${st.temp} (Pot ${st.pot})`, st.temp);
+	miscRawSetAbsolute(st.misc, `Raise highest to ${st.temp} (Pot ${st.pot})`, st.temp);
 	break;
       }
       case 'statgain':
@@ -14656,7 +14699,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	    }
 	    // If Armor need to make a %
 	    update.weight = `${update.weight}%`;
-	    update.itemmaterial = ia.inventoryaddarmormaterial;
+	    update.material = ia.inventoryaddarmormaterial;
 	  } else if (update.type == 'Shield') {
 	    system['Attacks Blocked'] = ia.inventoryaddshieldattacks;
 	    system['DB Bonus'] = ia.inventoryaddshielddb;
@@ -14739,7 +14782,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	    update.inventoryaddweaponmaterials = material.includes('s') ? 'on' : 'off';
 	    update.inventoryaddweaponmaterialm = material.includes('m') ? 'on' : 'off';
 	    update.inventoryaddweaponobbonus = parseIntDefault(sys.OB, 0);
-	    update.inventoryaddweaponskill = sys['Attack Skill'];
+	    update.inventoryaddweaponskill = sys['Attack Skill'] || "";
 	  }
 
 	  //
@@ -14750,7 +14793,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	    if (sys.AT) {
 	      update.inventoryaddarmorat = sys.AT;
 	    }
-	    update.inventoryaddarmormaterial = item[`${basename}_itemmaterial`];
+	    update.inventoryaddarmormaterial = item[`${basename}_itemmaterial`] || "metal";
 	    update.inventoryaddarmordbbonus = parseIntDefault(sys.DB, 0);
 	  }
 	  {//
@@ -14760,7 +14803,6 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	    if (sys['DB Bonus']) {
 	      update.inventoryaddshielddb = sys['DB Bonus'];
 	    }
-	    update.inventoryaddarmormaterial = 	item[`${basename}_itemmaterial`];
 	  }
 
 	  // Ideally this should be the same as the above function
