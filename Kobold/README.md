@@ -1,3 +1,3 @@
-# Medievo_-Oscuro
-Medievo Oscuro roll20-character-sheets.
-Puedes descargar los archivos para jugar a Medievo Oscuro en Roll20
+# Kobold
+Kobold Aventuras en Tzarkuhdea roll20-character-sheets.
+Puedes descargar los archivos para jugar a Kobold Aventuras en Tzarkuhdea en Roll20
