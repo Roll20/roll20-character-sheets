@@ -6,9 +6,18 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.7.0 [Screenshot](cof2e.png)
+v1.8.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.8.0_ (2025-08-31)
+
+- Prise en compte des capacités épiques dans le calcul des rangs dans la voie et des PV (propriété <kbd>epic:</kbd>).
+- Prise en compte des capacités épiques _Défense héroïque_ et _Mana épique_ dans le calcul de la DEF et des PM
+- Possibilité de compter le trésor en PO ou en PA.
+- Ajout d'une option dans la configuration _Token Mod_ pour appliquer une teinte au token quand le nombre de PV tombe au-dessous de sa valeur maximum.
+- Ajout d'un bouton pour copier la configuration par défaut depuis une fiche nommée PJBase.
+- Ajout d'une option dans les coups spéciaux des PNJ pour n'affecter que la prochaine attaque.
 
 ### Version _1.7.0_ (2025-07-27)
 

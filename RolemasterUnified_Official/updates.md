@@ -1,3 +1,126 @@
+# 2025-09-23
+
+- Creature Law (new upload)
+  - Fix level variance in listing
+  - Fix Variance in listings
+  - Fix variance in display
+- Banecroft (new upload)
+  - Adventure text uploaded
+  - Creatures updated to new standard
+  - First Tokens created
+- Validation
+  - Support Body,Head,Arms,Legs format for AT
+  - Validate attack sizes for creatures
+- Stuff: Fix error in itemmaterial not saving
+- Levelup: 
+  - Don't try and levelup current_level/new_level
+  - Spell lists show the group
+  - Recreate previous skill ranks correctly
+- Misc: Make one of the errors more verbose
+- Spells: Fix display of mixed armor penalties
+  - calculation was correct, display showed culmulative error
+- Create: fix highest message (@ixs)
+
+# 2025-09-18
+
+- Fix stacking of the overlays
+- Show token marker otpsions corrently
+- Fix edit stats
+- Updated preview image.
+
+# 2025-09-16
+
+- First version of token markers
+  - Sheet options
+  - Random colours
+  - Trigger on status change.
+- Fix stacking of popups on main page
+- Add helper to get total number of bleeds
+- Add options for token makers
+- Add options for FX (doesn't do much)
+- Export to NPC now grabs spell lists.
+- Inventory (Stuff)
+  - Fix Helmet perception penalty trashing other modifiers
+  - Apply Armor DB
+  - Removed Armor DB & Perception penalties when you remove items
+  - Fix for armor losing it's encumberance.
+  - Add support for "Sets" Armor without a helmet
+  - Add armor material to edit window
+  - Correctly support mixed material encumberances (metal != non-metal)
+
+# 2025-09-11
+
+- Try and get the info popups working again.
+- fix spurious --> from the rolltemplates page
+
+# 2025-09-09
+
+- Can now roll weapon fumbles direct from the sheet.
+- Remove the old Roll Crit buttons
+- Add `statuspercent200`; which ranges from 200 -> 0 as your penalties go down
+- Set sheet version to 14
+- Fix the light crossboX.
+- Fix rolling Y/Z criticals.
+- Layout improvements on the front tab - little boxes around all the things.
+- Dice icons:
+  - Fix layout to be consistent everywhere (finally)
+  - Use single style for all the dice icons
+  - Fix alignment of the dice on the skills page
+  - Little animation when you hover... because you can do that when sort
+    the other stuff.
+- Attacks:
+  - Move overlay to own file
+- Fix missing line break in rolltemplate.
+
+# 2025-09-04
+
+- Force statuspercent_max to be 100.
+
+# 2025-09-02
+
+- Allow Injury strings to start with "Injury: " to make pasting easier
+- Status:
+  - Add 'statuspercent'; Equal to (100 - statuspenalty).   Used so you
+    can have a penalty bar that goes down as PCs/NPCs get injured
+  - Add allpenalties; status effect + status penalty
+  - Add a little bar to show it.
+- Tokenbar: Bar3 now follows 'allpenalties'
+- Bump sheet version
+  - Force an update of penalties on load.
+- Support Arcane spell casting modifier
+
+# 2025-08-28
+
+- Fix attacks missing othermod/parrymod
+
+# 2025-08-26
+
+- Creatures
+  - Take AP penalties on attacks
+  - Arcane RRs for new creatures
+- Force RR update to get Arcane RRs for PCs
+- Sheet Load / Init
+  - On version check, pass in sheet version
+  - Make sure we check pending functions
+  - Version 11
+  - Old creatures, force arcane update
+- Levelup
+  - Save the current and new level.   Avoids lots of async code to fetch it many times
+  - Display as a hidden text entry.  So works with jumpgate and traditional.
+  - Skills are now resiliant to unexpected fields
+  - Add some space on the left of items.  So much prettier.
+  - Re-enable the levelup summary.
+    - ~700 lines of tests on this thing
+  - Summary now has:
+    - Skills
+    - Stat gains
+    - Talents
+    - Spell lists
+- Tests
+  - setCharmancerText is now emulated
+  - addRepeatingSection is now emulated
+  - Fix second countrStatGains test being ignored.
+
 # 2025-08-22
 
 - Emergency release to fix level up.
