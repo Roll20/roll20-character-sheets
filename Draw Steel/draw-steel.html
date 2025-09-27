@@ -1,14 +1,16 @@
+<div class="sheet-header">
+	<h1 class="title">
+		<img
+			src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Draw%20Steel/images/powered_by_draw_steel.webp"
+			alt="Powered By Draw Steel"
+			style="height: 60px"
+		/>
+	</h1>
+</div>
 <input id="npc-checkbox" name="attr_is_npc" class="npc-checkbox" type="checkbox" />
 <label for="npc-checkbox" data-i18n="npc-toggle"></label>
 <div class="sheet-body">
 	<div class="border">
-		<h1 class="title">
-			<img
-				src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Draw%20Steel/images/powered_by_draw_steel.webp"
-				alt="Powered By Draw Steel"
-				style="height: 60px"
-			/>
-		</h1>
 		<div class="header-panel">
 			<div class="profile-panel border">
 				<div class="name-input-group panel-dark">
@@ -1263,24 +1265,7 @@
 	}
 
 /**
-**Looking for Power Roll for Ability Card
-**/
-on("change:repeating_abilities:has_power_roll", function(event) {
-  const repeatingId = event.sourceAttribute.match(/repeating_abilities_[^_]+/)[0];
-  const sourceAttr = `${repeatingId}_has_power_roll`;
-  const targetAttr = `${repeatingId}_show_power_roll`;
-
-  getAttrs([sourceAttr], function(values) {
-    const show = values[sourceAttr] === "on" ? "1" : "0";
-    setAttrs({
-      [targetAttr]: show
-    });
-  });
-});
-
-
-/**
-**Characteristic Roll
+** Power Roll
 **/
 
 	async function rollPower(characteristic) {
@@ -1348,186 +1333,50 @@ on("change:repeating_abilities:has_power_roll", function(event) {
 		});
 	}
 
-	$20('.npc-characteristic-input-group > label').on('click', (e) => {
-		const characteristic = e.htmlAttributes['data-characteristic'];
-		rollPower(characteristic);
-	});
+/**
+** Feature Display 
+**/	
+
+	function featureDisplay(name, subtitle, description) {
+		const roll = `@{wtype}&{template:monsterability}` 
+			+ '{{charactername=@{character_name}}} ' 
+			+ '{{name=' + name + '}} ' 
+			+ '{{trait=' + description + '}} '
+			+ '{{subtype=' + subtitle + '}} '
+			+ '{{hasTrait=[[1]]}}';
+		console.log('Feature Display:', roll);
+		startRoll(roll, ({ rollId }) => finishRoll(rollId));
+	}
+
+/**
+** Build Ability Roll
+   constructs and executes rolls using the ability sharing roll template
+**/
+	function buildAbilityRoll(directMap, rollValueMap) {
 	
-	$20('.characteristic-input-group > label').on('click', (e) => {
-		const characteristic = e.htmlAttributes['data-characteristic'];
-		rollPower(characteristic);
-	});
-
-/**
-**Feature display
-**/
-on('clicked:repeating_classfeatures:classfeatureshare', async (event) => {
-  const attrs = await getAttrsAsync([
-    'repeating_classfeatures_classfeature_name',
-    'repeating_classfeatures_classfeature_description',
-  ]);
-
-  const directMap = {
-    name: attrs.repeating_classfeatures_classfeature_name || '',
-    effect: attrs.repeating_classfeatures_classfeature_description || '',
-  };
-
-  const rollValueMap = {
-    hasEffect: directMap.effect.trim() ? 1 : 0,
-  };
-
-  const roll = `&{template:ability} `
-    + Object.entries(directMap)
-        .map(([key, value]) => `{{${key}=${value}}} `)
-        .join('')
-    + Object.entries(rollValueMap)
-        .map(([key, value]) => `{{${key}=[[${value}]]}} `)
-        .join('');
-
-  console.log('classfeature values', roll);
-  startRoll(roll, ({ rollId }) => finishRoll(rollId));
-});
-
-on('clicked:repeating_ancestrytraits:ancfeatureshare', async (event) => {
-  const attrs = await getAttrsAsync([
-    'repeating_ancestrytraits_ancestrytrait_name',
-    'repeating_ancestrytraits_ancestrytrait_description',
-  ]);
-
-  const directMap = {
-    name: attrs.repeating_ancestrytraits_ancestrytrait_name || '',
-    effect: attrs.repeating_ancestrytraits_ancestrytrait_description || '',
-  };
-
-  const rollValueMap = {
-    hasEffect: directMap.effect.trim() ? 1 : 0,
-  };
-
-  const roll = `&{template:ability} `
-    + Object.entries(directMap)
-        .map(([key, value]) => `{{${key}=${value}}} `)
-        .join('')
-    + Object.entries(rollValueMap)
-        .map(([key, value]) => `{{${key}=[[${value}]]}} `)
-        .join('');
-
-  console.log('ancestrytrait values', roll);
-  startRoll(roll, ({ rollId }) => finishRoll(rollId));
-});
-
-on('clicked:repeating_perks:perkfeatureshare', async (event) => {
-  const attrs = await getAttrsAsync([
-    'repeating_perks_perk_name',
-    'repeating_perks_perk_description',
-  ]);
-
-  const directMap = {
-    name: attrs.repeating_perks_perk_name || '',
-    effect: attrs.repeating_perks_perk_description || '',
-  };
-
-  const rollValueMap = {
-    hasEffect: directMap.effect.trim() ? 1 : 0,
-  };
-
-  const roll = `&{template:ability} `
-    + Object.entries(directMap)
-        .map(([key, value]) => `{{${key}=${value}}} `)
-        .join('')
-    + Object.entries(rollValueMap)
-        .map(([key, value]) => `{{${key}=[[${value}]]}} `)
-        .join('');
-
-  console.log('perk values', roll);
-  startRoll(roll, ({ rollId }) => finishRoll(rollId));
-});
-
-on('clicked:repeating_titles:titlefeatureshare', async (event) => {
-  const attrs = await getAttrsAsync([
-    'repeating_titles_title_name',
-    'repeating_titles_title_description',
-  ]);
-
-  const directMap = {
-    name: attrs.repeating_titles_title_name || '',
-    effect: attrs.repeating_titles_title_description || '',
-  };
-
-  const rollValueMap = {
-    hasEffect: directMap.effect.trim() ? 1 : 0,
-  };
-
-  const roll = `&{template:ability} `
-    + Object.entries(directMap)
-        .map(([key, value]) => `{{${key}=${value}}} `)
-        .join('')
-    + Object.entries(rollValueMap)
-        .map(([key, value]) => `{{${key}=[[${value}]]}} `)
-        .join('');
-
-  console.log('title values', roll);
-  startRoll(roll, ({ rollId }) => finishRoll(rollId));
-});
-
-/**
-**Repeated Ability display
-**/
-	on('clicked:repeating_abilities:share', async (event) => {
-		const abilityAttributeNames = [
-			'ability_name', 'ability_cost', 'ability_description', 'ability_keywords',
-			'ability_type', 'ability_distance', 'ability_target', 'ability_trigger',
-			'has_power_roll', 'ability_characteristic',
-			'ability_tier_1', 'ability_tier_2', 'ability_tier_3', 'ability_effect',
-		];
-		const attrs = await getAttrsAsync([
-			'resource_name',
-			...abilityAttributeNames.map(x => `repeating_abilities_${x}`),
-		]);
-		const resourceName = attrs.resource_name || getTranslationByKey('resource-name-placeholder');
-
-		const directMap = {
-			name: attrs.repeating_abilities_ability_cost && attrs.repeating_abilities_ability_cost !== '0'
-				? `${attrs.repeating_abilities_ability_name} (${attrs.repeating_abilities_ability_cost} ${resourceName})`
-				: attrs.repeating_abilities_ability_name,
-			cost: attrs.repeating_abilities_ability_cost,
-			description: attrs.repeating_abilities_ability_description,
-			keywords: attrs.repeating_abilities_ability_keywords,
-			distance: attrs.repeating_abilities_ability_distance,
-			target: attrs.repeating_abilities_ability_target,
-			trigger: attrs.repeating_abilities_ability_trigger,
-			characteristic: attrs.repeating_abilities_ability_characteristic,
-			tier1: attrs.repeating_abilities_ability_tier_1,
-			tier2: attrs.repeating_abilities_ability_tier_2,
-			tier3: attrs.repeating_abilities_ability_tier_3,
-			effect: attrs.repeating_abilities_ability_effect,
+		const isDefined = (value) => {
+			// Exclude null, undefined, and empty strings
+			if (!value) return false;
+			// Specifically exclude the string '0' (for things like ability_cost = 0)
+			if (typeof value === 'string' && value.trim() === '0') return false;
+			return true;
 		};
-		const translateMap = {
-			type: attrs.repeating_abilities_ability_type || 'no-action',
-		};
-		const rollValueMap = {
-			hasTrigger: attrs.repeating_abilities_ability_type.includes('triggered')
-				&& attrs.repeating_abilities_ability_trigger
-				? 1 : 0,
-			hasPowerRoll: attrs.repeating_abilities_has_power_roll === 'on'
-				? 1 : 0,
-			hasEffect: attrs.repeating_abilities_ability_effect
-				? 1 : 0,
-			hasDistance: attrs.repeating_abilities_ability_distance
-				? 1 : 0,
-			hasTarget: attrs.repeating_abilities_ability_target
-				? 1 : 0,
-		};
-		const roll = `&{template:ability} `
+		
+		const roll = `@{wtype}&{template:monsterability} `
+			+ '{{charactername=@{character_name}}} ' 
 			+ '{{powerRoll=^{power-roll}}} '
 			+ Object.entries(directMap)
+				.filter(([key, value]) => isDefined(value))
 				.map(([key, value]) => `{{${key}=${value}}} `)
-			+ Object.entries(translateMap)
-				.map(([key, value]) => `{{${key}=^{${value}}}} `)
+				.join(' ')
 			+ Object.entries(rollValueMap)
-				.map(([key, value]) => `{{${key}=[[${value}]]}} `);
-		console.log('ability values', roll);
+				.filter(([key, value]) => value === 1)
+				.map(([key, value]) => `{{${key}=[[${value}]]}} `)
+				.join(' ');
 		startRoll(roll, ({ rollId }) => finishRoll(rollId));
-	});
+		return roll;
+	}
+	
 
 /**
 **Repeated Ability power roll
@@ -1610,51 +1459,7 @@ on('clicked:repeating_titles:titlefeatureshare', async (event) => {
   startRoll(roll, ({ rollId }) => finishRoll(rollId));
 	});
 
-	/**
-	**Melee Free Strike Display
-	**/
-	on('clicked:melee_share', async (event) => {
-	  const attributeNames = [
-		'melee_free_strike_name',
-		'melee_free_strike_keywords',
-		'melee_free_strike_distance',
-		'melee_free_strike_target',
-		'melee_free_strike_characteristic',
-		'melee_free_strike_tier_1',
-		'melee_free_strike_tier_2',
-		'melee_free_strike_tier_3'
-	  ];
 
-	  const attrs = await getAttrsAsync(attributeNames);
-
-	  const directMap = {
-		name: attrs.melee_free_strike_name,
-		keywords: attrs.melee_free_strike_keywords,
-		distance: attrs.melee_free_strike_distance,
-		target: attrs.melee_free_strike_target,
-		characteristic: attrs.melee_free_strike_characteristic,
-		tier1: attrs.melee_free_strike_tier_1,
-		tier2: attrs.melee_free_strike_tier_2,
-		tier3: attrs.melee_free_strike_tier_3
-	  };
-
-
-const rollValueMap = {
-  hasPowerRoll: '1',
-  hasDistance: '1',
-  hasTarget: '1',
-};
-	  const roll = `&{template:ability} `
-		+ '{{powerRoll=^{power-roll}}} '
-		+ '{{type=^{main-action}}} '
-		+ Object.entries(directMap)
-			.map(([key, value]) => `{{${key}=${value}}} `)
-	  + Object.entries(rollValueMap)
-	   .map(([key, value]) => `{{${key}=[[${value}]]}} `);
-
-	  console.log('Melee Free Strike roll:', roll);
-	  startRoll(roll, ({ rollId }) => finishRoll(rollId));
-	});
 
 	/**
 	**Melee Free Strike Power Roll
@@ -1715,55 +1520,10 @@ const rollValueMap = {
 		+ '{{type=^{main-action}}} '
 		+ Object.entries(directMap)
 			.map(([key, value]) => `{{${key}=${value}}} `)
-	  + Object.entries(rollValueMap)
-	   .map(([key, value]) => `{{${key}=[[${value}]]}} `);
+		+ Object.entries(rollValueMap)
+			.map(([key, value]) => `{{${key}=[[${value}]]}} `);
 
 	  console.log('Melee Free Strike power roll:', roll);
-	  startRoll(roll, ({ rollId }) => finishRoll(rollId));
-	});
-
-	/**
-	**Ranged Free Strike Display
-	**/
-	on('clicked:ranged_share', async (event) => {
-	  const attributeNames = [
-		'ranged_free_strike_name',
-		'ranged_free_strike_keywords',
-		'ranged_free_strike_distance',
-		'ranged_free_strike_target',
-		'ranged_free_strike_characteristic',
-		'ranged_free_strike_tier_1',
-		'ranged_free_strike_tier_2',
-		'ranged_free_strike_tier_3'
-	  ];
-
-	  const attrs = await getAttrsAsync(attributeNames);
-
-	  const directMap = {
-		name: attrs.ranged_free_strike_name,
-		keywords: attrs.ranged_free_strike_keywords,
-		distance: attrs.ranged_free_strike_distance,
-		target: attrs.ranged_free_strike_target,
-		characteristic: attrs.ranged_free_strike_characteristic,
-		tier1: attrs.ranged_free_strike_tier_1,
-		tier2: attrs.ranged_free_strike_tier_2,
-		tier3: attrs.ranged_free_strike_tier_3
-	  };
-
-const rollValueMap = {
-  hasPowerRoll: '1',
-  hasDistance: '1',
-  hasTarget: '1',
-};
-	  const roll = `&{template:ability} `
-		+ '{{powerRoll=^{power-roll}}} '
-		+ '{{type=^{main-action}}} '
-		+ Object.entries(directMap)
-			.map(([key, value]) => `{{${key}=${value}}} `)
-	  + Object.entries(rollValueMap)
-	   .map(([key, value]) => `{{${key}=[[${value}]]}} `);
-
-	  console.log('Ranged Free Strike roll:', roll);
 	  startRoll(roll, ({ rollId }) => finishRoll(rollId));
 	});
 
@@ -1833,97 +1593,276 @@ const rollValueMap = {
 	  startRoll(roll, ({ rollId }) => finishRoll(rollId));
 	});
 
-	/**
-	** Monster Abilities Share
-	**/
 	
-	on('clicked:repeating_npcabilities:share', async (event) => {
-		const abilityAttributeNames = [
-			'ability_name', 'ability_subtype', 'ability_malice_cost', 'ability_description', 'ability_keywords',
-			'ability_trait', 'ability_solo_1_name', 'ability_solo_1_text', 'ability_solo_2_name', 'ability_solo_2_text',
+/** 
+** Ability Sharing Handler
+**/
+
+	async function handleAbilityShare(prefix) {
+		// 1. Define all possible ability attributes across both player and NPC sections.
+		const allAbilityAttributeNames = [
+			'ability_name', 'ability_cost', 'ability_description', 'ability_keywords',
 			'ability_type', 'ability_distance', 'ability_target', 'ability_trigger',
-			'has_power_roll', 'ability_characteristic',	'ability_tier_1', 'ability_tier_2', 'ability_tier_3', 
-			'ability_effect', 'has_effect', 'ability_special', 'has_special', 'has_malice', 'ability_cost', 'ability_malice',
+			'has_power_roll', 'ability_characteristic',
+			'ability_tier_1', 'ability_tier_2', 'ability_tier_3', 'ability_effect',
+			'ability_subtype', 'ability_malice_cost', 'ability_trait',
+			'ability_solo_1_name', 'ability_solo_1_text', 'ability_solo_2_name', 'ability_solo_2_text',
+			'has_effect', 'ability_special', 'has_special', 'has_malice', 'ability_malice',
 		];
-		const attrs = await getAttrsAsync([
-			'character_name',
-			'wtype',
-			...abilityAttributeNames.map(x => `repeating_npcabilities_${x}`),
-		]);
+		// 2. Define the character-level attributes needed for both.
+		const globalAttrsToGet = prefix === 'repeating_abilities'
+			? ['resource_name'] // Player abilities need resource_name
+			: []; // Monster abilities need nothing
+			
+		// 3. Construct the full list of attributes to fetch.
+		const attrsToFetch = [
+			...globalAttrsToGet,
+			...allAbilityAttributeNames.map(x => `${prefix}_${x}`),
+		];
 		
-		const characterName = attrs.character_name;
-		const wtype = attrs.wtype;
+		const attrs = await getAttrsAsync(attrsToFetch);
+
+		// 4. Execute the custom logic (player or monster specific)
+		const { directMap, rollValueMap } = getAbilityMaps(attrs, prefix);
+		
+		// 5. Call the shared roll function
+		const roll = buildAbilityRoll(directMap, rollValueMap);
+
+		console.log(`${prefix}:`, roll);
+	}
+
+	// The custom logic function that contains the differences
+	function getAbilityMaps(attrs, prefix) {
+		let directMap = {};
+		let rollValueMap = {};
+		let translateMap = {};
 		let subtype = '';
+		let trait = '';
+		let hasTrait = 0;
 		
-		switch(attrs.repeating_npcabilities_ability_subtype) {
-			case 'signature-ability':
-			case 'villain-ability':
-				subtype = getTranslationByKey(attrs.repeating_npcabilities_ability_subtype) || '';
-				break;
-			case 'malice-ability':
-			case 'malice-trait':
-				subtype = attrs.repeating_npcabilities_ability_malice_cost + ' ' + getTranslationByKey('malice');
-				break;
+		if (prefix === "repeating_abilities") {
+			// PLAYER Ability Logic
+			const resourceName = attrs.resource_name || getTranslationByKey('resource-name-placeholder');
+			const cost = attrs[`${prefix}_ability_cost`];
+			subtype = cost && cost !== '0' ? `(${cost} ${resourceName})` : '';
+			
+			trait = attrs[`${prefix}_ability_description`];
+			hasTrait = 1;
+			hasEffect = attrs[`${prefix}_ability_effect`] ? 1 : 0;
+		} 
+		else {
+			// NPC Ability Logic
+			switch(attrs[`${prefix}_ability_subtype`]) {
+				case 'signature-ability':
+				case 'villain-ability':
+					subtype = getTranslationByKey(attrs[`${prefix}_ability_subtype`]) || '';
+					break;
+				case 'malice-ability':
+				case 'malice-trait':
+					subtype = attrs[`${prefix}_ability_malice_cost`] + ' ' + getTranslationByKey('malice');
+					break;
+			}
+			trait = attrs[`${prefix}_ability_trait`];
+			hasTrait = attrs[`${prefix}_ability_subtype`].includes('trait') && trait ? 1 : 0;
+			hasEffect = attrs[`${prefix}_has_effect`] === 'on' ? 1 : 0;
 		}
-		console.log('Type: ' + attrs.repeating_npcabilities_ability_type);
-		const type = attrs.repeating_npcabilities_ability_type === 'no-action' ? '' : getTranslationByKey(attrs.repeating_npcabilities_ability_type);
+
+		const type = attrs[`${prefix}_ability_type`] === 'no-action' ? '' : getTranslationByKey(attrs[`${prefix}_ability_type`]);
 		
-		const directMap = {
-			name: attrs.repeating_npcabilities_ability_name,
+		// Build the directMap - these will be transformed into a {{key=value}} format.
+		directMap = {
+			name: attrs[`${prefix}_ability_name`],
 			subtype: subtype,
-			trait: attrs.repeating_npcabilities_ability_trait || '',
-			type: type,
-			keywords: attrs.repeating_npcabilities_ability_keywords || '',
-			distance: attrs.repeating_npcabilities_ability_distance || '',
-			target: attrs.repeating_npcabilities_ability_target || '',
-			trigger: attrs.repeating_npcabilities_ability_trigger || '',
-			characteristic: attrs.repeating_npcabilities_ability_characteristic || '',
-			tier1: attrs.repeating_npcabilities_ability_tier_1 || '',
-			tier2: attrs.repeating_npcabilities_ability_tier_2 || '',
-			tier3: attrs.repeating_npcabilities_ability_tier_3 || '',
-			special: attrs.repeating_npcabilities_ability_special || '',
-			effect: attrs.repeating_npcabilities_ability_effect || '',
-			malprop: attrs.repeating_npcabilities_ability_malice || '',
-			malpropcost: attrs.repeating_npcabilities_ability_cost || '',
-			solo1name: attrs.repeating_npcabilities_ability_solo_1_name || '',
-			solo1text: attrs.repeating_npcabilities_ability_solo_1_text || '',
-			solo2name: attrs.repeating_npcabilities_ability_solo_2_name || '',
-			solo2text: attrs.repeating_npcabilities_ability_solo_2_text || '',
+			trait: attrs[`${prefix}_ability_trait`] || '',
+			type: type, 
+			keywords: attrs[`${prefix}_ability_keywords`] || '',
+			distance: attrs[`${prefix}_ability_distance`] || '',
+			target: attrs[`${prefix}_ability_target`] || '',
+			trigger: attrs[`${prefix}_ability_trigger`] || '',
+			characteristic: attrs[`${prefix}_ability_characteristic`] || '',
+			tier1: attrs[`${prefix}_ability_tier_1`] || '',
+			tier2: attrs[`${prefix}_ability_tier_2`] || '',
+			tier3: attrs[`${prefix}_ability_tier_3`] || '',
+			special: attrs[`${prefix}_ability_special`] || '',
+			effect: attrs[`${prefix}_ability_effect`] || '',
+			malprop: attrs[`${prefix}_ability_malice`] || '',
+			malpropcost: attrs[`${prefix}_ability_cost`] || '',
+			solo1name: attrs[`${prefix}_ability_solo_1_name`] || '',
+			solo1text: attrs[`${prefix}_ability_solo_1_text`] || '',
+			solo2name: attrs[`${prefix}_ability_solo_2_name`] || '',
+			solo2text: attrs[`${prefix}_ability_solo_2_text`] || '',
+		}	
+
+		//Build the rollValueMap - these will be transformed into a {{key=[[value]]}} format.
+		rollValueMap = {
+			hasTrait: hasTrait,
+			hasSolo: attrs[`${prefix}_ability_subtype`] && attrs[`${prefix}_ability_subtype`].includes('solo') ? 1 : 0,
+			hasTrigger: attrs[`${prefix}_ability_type`].includes('triggered') && attrs[`${prefix}_ability_trigger`] ? 1 : 0,
+			hasPowerRoll: attrs[`${prefix}_has_power_roll`] === 'on' ? 1 : 0,
+			hasSpecial: attrs[`${prefix}_has_special`] === 'on' ? 1 : 0,
+			hasEffect: hasEffect,
+			hasMalprop: attrs[`${prefix}_has_malice`] === 'on' ? 1 : 0,
 		};
-		
-		const rollValueMap = {
-		    hasTrait: attrs.repeating_npcabilities_ability_subtype.includes('trait')
-				&& attrs.repeating_npcabilities_ability_trait
-				? 1 : 0,
-			hasSolo: attrs.repeating_npcabilities_ability_subtype.includes('solo')
-				? 1 : 0,
-			hasTrigger: attrs.repeating_npcabilities_ability_type.includes('triggered')
-				&& attrs.repeating_npcabilities_ability_trigger
-				? 1 : 0,
-			hasPowerRoll: attrs.repeating_npcabilities_has_power_roll === 'on'
-				? 1 : 0,
-			hasSpecial: attrs.repeating_npcabilities_has_special === 'on'
-				? 1 : 0,
-			hasEffect: attrs.repeating_npcabilities_has_effect === 'on'
-				? 1 : 0,
-			hasMalprop: attrs.repeating_npcabilities_has_malice === 'on'
-				? 1 : 0,
-		};
-		const roll = wtype + ` &{template:monsterability} `
-			+ '{{charactername=' + characterName + '}} '
-			+ '{{powerRoll=^{power-roll}}} '
-			+ Object.entries(directMap)
-				.map(([key, value]) => `{{${key}=${value}}} `)
-			+ Object.entries(rollValueMap)
-				.map(([key, value]) => `{{${key}=[[${value}]]}} `);
-		console.log('ability values', roll);
-		startRoll(roll, ({ rollId }) => finishRoll(rollId));
+
+		return { directMap, rollValueMap };
+	}
+
+/** 
+** Event Listeners
+**/
+	
+// Characteristic Power Rolls
+	$20('.npc-characteristic-input-group > label').on('click', (e) => {
+		const characteristic = e.htmlAttributes['data-characteristic'];
+		rollPower(characteristic);
+	});
+	
+	$20('.characteristic-input-group > label').on('click', (e) => {
+		const characteristic = e.htmlAttributes['data-characteristic'];
+		rollPower(characteristic);
 	});
 	
 	
-	/**
-	** import start
-	**/
+// Share Player Repeated Ability
+	on('clicked:repeating_abilities:share', async (event) => {
+		handleAbilityShare('repeating_abilities');
+	});
+	
+// Share Monster Repeated Abilities
+	on('clicked:repeating_npcabilities:share', async (event) => {
+		handleAbilityShare("repeating_npcabilities");
+	});
+	
+//Melee Free Strike Display
+	on('clicked:melee_share', async (event) => {
+		const attributeNames = [
+			'melee_free_strike_name',
+			'melee_free_strike_keywords',
+			'melee_free_strike_distance',
+			'melee_free_strike_target',
+			'melee_free_strike_characteristic',
+			'melee_free_strike_tier_1',
+			'melee_free_strike_tier_2',
+			'melee_free_strike_tier_3'
+		];
+
+		const attrs = await getAttrsAsync(attributeNames);
+
+		const directMap = {
+			name: attrs.melee_free_strike_name,
+			keywords: attrs.melee_free_strike_keywords,
+			distance: attrs.melee_free_strike_distance,
+			target: attrs.melee_free_strike_target,
+			characteristic: attrs.melee_free_strike_characteristic,
+			tier1: attrs.melee_free_strike_tier_1,
+			tier2: attrs.melee_free_strike_tier_2,
+			tier3: attrs.melee_free_strike_tier_3
+		};
+
+		const rollValueMap = {
+			hasPowerRoll: 1,
+			hasDistance: 1,
+			hasTarget: 1,
+		};
+		
+		const roll = buildAbilityRoll(directMap, rollValueMap);
+		console.log('Melee Free Strike roll:', roll);
+	});
+
+// Ranged Free Strike Display
+	on('clicked:ranged_share', async (event) => {
+		const attributeNames = [
+			'ranged_free_strike_name',
+			'ranged_free_strike_keywords',
+			'ranged_free_strike_distance',
+			'ranged_free_strike_target',
+			'ranged_free_strike_characteristic',
+			'ranged_free_strike_tier_1',
+			'ranged_free_strike_tier_2',
+			'ranged_free_strike_tier_3'
+		];
+
+		const attrs = await getAttrsAsync(attributeNames);
+
+		const directMap = {
+			name: attrs.ranged_free_strike_name,
+			keywords: attrs.ranged_free_strike_keywords,
+			distance: attrs.ranged_free_strike_distance,
+			target: attrs.ranged_free_strike_target,
+			characteristic: attrs.ranged_free_strike_characteristic,
+			tier1: attrs.ranged_free_strike_tier_1,
+			tier2: attrs.ranged_free_strike_tier_2,
+			tier3: attrs.ranged_free_strike_tier_3
+		};
+
+		const rollValueMap = {
+			hasPowerRoll: 1,
+			hasDistance: 1,
+			hasTarget: 1,
+		};
+		
+		const roll = buildAbilityRoll(directMap, rollValueMap);
+		console.log('Ranged Free Strike roll:', roll);	  
+	});
+	
+// Share Class Features
+	on('clicked:repeating_classfeatures:classfeatureshare', async (event) => {
+		const attrs = await getAttrsAsync([
+			'repeating_classfeatures_classfeature_name',
+			'repeating_classfeatures_classfeature_description',
+		]);
+		const subtitle = getTranslationByKey('class-features');
+		featureDisplay(attrs.repeating_classfeatures_classfeature_name, subtitle, attrs.repeating_classfeatures_classfeature_description);
+	});
+
+// Share Ancestry Features
+	on('clicked:repeating_ancestrytraits:ancfeatureshare', async (event) => {
+		const attrs = await getAttrsAsync([
+			'repeating_ancestrytraits_ancestrytrait_name',
+			'repeating_ancestrytraits_ancestrytrait_description',
+		]);
+		const subtitle = getTranslationByKey('ancestry-traits');
+		featureDisplay(attrs.repeating_ancestrytraits_ancestrytrait_name, subtitle, attrs.repeating_ancestrytraits_ancestrytrait_description);
+	});
+
+// Share Perk Features
+	on('clicked:repeating_perks:perkfeatureshare', async (event) => {
+		const attrs = await getAttrsAsync([
+			'repeating_perks_perk_name',
+			'repeating_perks_perk_description',
+		]);
+		const subtitle = getTranslationByKey('perks');
+		featureDisplay(attrs.repeating_perks_perk_name, subtitle,attrs.repeating_perks_perk_description);
+	
+	});
+
+// Share Title Features 
+	on('clicked:repeating_titles:titlefeatureshare', async (event) => {
+		const attrs = await getAttrsAsync([
+			'repeating_titles_title_name',
+			'repeating_titles_title_description',
+		]);
+		const subtitle = getTranslationByKey('titles');
+		featureDisplay(attrs.repeating_titles_title_name, subtitle, attrs.repeating_titles_title_description);
+	});
+
+// Looking for Power Roll for Ability Card
+	on("change:repeating_abilities:has_power_roll", function(event) {
+		const repeatingId = event.sourceAttribute.match(/repeating_abilities_[^_]+/)[0];
+		const sourceAttr = `${repeatingId}_has_power_roll`;
+		const targetAttr = `${repeatingId}_show_power_roll`;
+		getAttrs([sourceAttr], function(values) {
+			const show = values[sourceAttr] === "on" ? "1" : "0";
+			setAttrs({
+				[targetAttr]: show
+			});
+		});
+	});
+
+
+/**
+** Import from Forge Steel Start
+**/
 	function flattenFeatures(features, level) {
 		const deepFeatureTypes = [
 			'Choice',
