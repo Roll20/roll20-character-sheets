@@ -6559,7 +6559,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 071aaeb51fba31488c8ccd15c39ed1f6dd9fb343
+Revision 431e011329e7d31f8f0255db42e76b5e7ce7755c
 
 
 <hr>
@@ -9417,7 +9417,7 @@ function _spellDoBaseListQuery(selectedbase, cost, previousranks) {
       continue;
     }
 
-    addRepeatingSectionPending("cmspelllistspellownbase", 'spelllist', "ownbasespelllist",
+    addRepeatingSection("cmspelllistspellownbase", 'spelllist', "ownbasespelllist",
 	(sectionname) => {
 		cmPopulateListOptions(`${sectionname}_cmranks`, costarray,
 		     previousranks[name] || costarray[0]);
@@ -10823,14 +10823,12 @@ function getSpellListRanks(results) {
       'repeating_spelllistspellclosed',
       'repeating_spelllistspellotherbaseownrealm'];
   getSectionIDsListPending(spelltypes, (listids) => {
-      console.log(listids)
       let listtofetch = []
       for (list of listids) {
 	listtofetch.push(list + '_name');
 	listtofetch.push(list + '_ranks');
       }
       getAttrsPending(listtofetch, (listdata) => {
-	console.log("list fetched", listdata);
 	for (list of listids) {
 	  let name = listdata[list + "_name"];
 	  results[name] = {
@@ -10838,7 +10836,6 @@ function getSpellListRanks(results) {
 	    prefix: list,
 	  };
 	}
-	console.log("GetSpellListRaks done", results);
       });
   });
 }
@@ -10998,9 +10995,25 @@ function levelUpStart(_) {
 	} 
     });
 
+    addPendingFunction('Talents add', () => {
+      const data = getCharmancerData();
+      console.log("data.level.values.current_level");
+      if (previous_level !=  parseIntDefault(data.levelup?.values?.current_level, 0)) {
+	return;
+      }
+      for (obj of savedtalents) {
+	addRepeatingSection('added_talents', 'talent', (id) => {
+	    setCharmancerOptions(`${id}_talent`, "Category:Talent",
+		{ selected: data?.levelup?.data[obj] });
+	});
+      }
+    });
 
    
     const listRanks = {};
+    addPendingFunction('Levelup: Get spell Ranks', () => {
+	getSpellListRanks(listRanks); 
+    });
 
     addPendingFunction("Levelup: DEBUGGG@!", () => {
 	console.log("Debug point!");
