@@ -3,8 +3,14 @@
   font-style: normal;
   font-weight: 400;
   src: local('Special Elite'), local('SpecialElite-Regular'),
-       url(https://fonts.gstatic.com/s/specialelite/v5/9-wW4zu3WNoD5Fjka35Jm4kzzdU71mzyRvKBGWbyScU.woff) format('woff');
+       url(https://faustiangames.com/wp-content/uploads/2025/09/specialelite.woff2) format('woff2'),
+       url(https://faustiangames.com/wp-content/uploads/2025/09/specialelite.woff) format('woff');
 }
+
+/* Optional: pane-specific styling hooks */
+.sheet-mage .sheet-mage { /* your existing class already used everywhere */ }
+.sheet-vampire .sheet-vampire { /* mirror style block if desired */ }
+
 
 .sheet-header {
   width: 100%;
@@ -56,18 +62,34 @@ li { list-style: none; }
 /* Attribute boxes */
 .charsheet .sheet-attr-box {
   padding:5px;
-  background-color:#000;
+  background:#0b0b0b;
   border:2px solid #452182;
   border-radius:5px;
 }
 .charsheet .sheet-attr-box input[type=text] {
-  width:35px;
+  width:100%;
   text-align:center;
   font-size:1.2em;
   font-weight:bold;
-  background-color:#000;
+  background:#0b0b0b;
   color:#ffffff;
   border:2px solid #452182;
+}
+
+.charsheet .sheet-attr-box input[type=text][name="attr_physical"] {
+    width: 35px;
+}
+
+.charsheet .sheet-attr-box input[type=text][name="attr_social"] {
+    width: 35px;
+}
+
+.charsheet .sheet-attr-box input[type=text][name="attr_mental"] {
+    width: 35px;
+}
+
+.charsheet .sheet-attr-box input[type=text][name="attr_arete"] {
+    width: 35px;
 }
 
 /*.charsheet .sheet-attr-box select { width:35px; }
@@ -89,7 +111,8 @@ li { list-style: none; }
   border: 2px solid #452182;
   border-radius: 5px;
   color: white;
-  background-color: #000;
+  background:#0b0b0b;
+  min-height: 80px;
 }
 
 
@@ -111,7 +134,9 @@ li { list-style: none; }
   border-radius:5px;
   padding:4px 8px;
   font-weight:bold;
-  display:block;                 /* stack vertically */
+  display:inline-block;                 /* stack vertically */
+  margin-left:6px;
+  vertical-align:middle;
 }
 .ui-dialog .charsheet button[type=roll]:hover {
   background-color:#5d2fa6 !important;   /* lighter on hover */
@@ -477,3 +502,174 @@ input.sheet-showhide:checked ~ .sheet-subbox { display:none; }
   text-shadow: 0 0 6px #FFD700;
   font-weight: bold;
 }
+
+/* ===== SHEET TYPE SWITCHER (Mage / Vampire) ===== */
+.charsheet .sheet-switcher {
+  display:flex; gap:0.5rem; align-items:center; margin:8px 0 10px;
+}
+.charsheet .sheet-tab {
+  appearance:none; width:0; height:0; margin:0; padding:0; border:0;
+  position:absolute; left:-9999px;
+}
+.charsheet .sheet-tab-label {
+  padding:4px 10px; border:1px solid #444; border-radius:6px; cursor:pointer;
+  background:#111; color:#ddd; user-select:none;
+}
+.charsheet .sheet-tab-mage:checked + .sheet-tab-label,
+.charsheet .sheet-tab-vampire:checked + .sheet-tab-label {
+  background:#222; color:#fff; border-color:#666;
+}
+
+/* Panes default hidden; radios must be before the panes in the DOM */
+.charsheet .sheet-pane { display:none; }
+
+/* When Mage tab is checked, show Mage pane; hide Vampire */
+.charsheet .sheet-tab-mage:checked ~ .sheet-mage { display:block; }
+.charsheet .sheet-tab-mage:checked ~ .sheet-vampire { display:none; }
+
+/* When Vampire tab is checked, show Vampire pane; hide Mage */
+.charsheet .sheet-tab-vampire:checked ~ .sheet-vampire { display:block; }
+.charsheet .sheet-tab-vampire:checked ~ .sheet-mage { display:none; }
+
+/* ===== Vampire visual theme hooks ===== */
+:root {
+  /* in case you want to reuse — Roll20 supports CSS vars */
+  --mage-accent: #452182;
+  --vamp-accent: #a81818;
+  --vamp-accent-dark: #6e1010;
+  --vamp-accent-light: #c22a2a;
+}
+
+/* Borders and boxes inside the Vampire pane */
+.charsheet .sheet-vampire .sheet-attr-box,
+.charsheet .sheet-vampire .sheet-vampire {
+  border-color: var(--vamp-accent);
+}
+
+/* Section title image already set — keep it, but tweak text color if desired */
+.charsheet .sheet-vampire .sheet-section-title {
+  color:#fff; /* stays white on your label image */
+}
+
+/* Roll buttons inside Vampire pane */
+.ui-dialog .charsheet .sheet-vampire button[type=roll] {
+  background-color: var(--vamp-accent);
+  border-color: var(--vamp-accent-dark);
+  color:#fff;
+}
+.ui-dialog .charsheet .sheet-vampire button[type=roll]:hover {
+  background-color: var(--vamp-accent-light) !important;
+}
+.ui-dialog .charsheet .sheet-vampire button[type=roll]:active {
+  background-color: var(--vamp-accent-dark) !important;
+}
+
+/* Inputs/textareas in Vampire pane */
+.charsheet .sheet-vampire .sheet-attr-box input[type=text],
+.charsheet .sheet-vampire .sheet-attr-box textarea,
+.charsheet .sheet-vampire .repitem textarea,
+.charsheet .sheet-vampire .sheet-box textarea {
+  border-color: var(--vamp-accent);
+  background-color:#0b0b0b;
+  color: white;
+  min-width: 100%;
+}
+
+.charsheet .sheet-vampire .sheet-attr-box input[type=text][name="attr_v_physical"]
+{
+    min-width:35px;
+    width:35px;
+}
+
+.charsheet .sheet-vampire .sheet-attr-box input[type=text][name="attr_v_social"]
+{
+    min-width:35px;
+    width:35px;
+}
+
+.charsheet .sheet-vampire .sheet-attr-box input[type=text][name="attr_v_mental"]
+{
+    min-width:35px;
+    width:35px;
+}
+
+.charsheet .sheet-vampire textarea {
+  background:#0b0b0b;
+  color:#f5f5f5;
+  border-color: var(--vamp-accent);
+}
+
+/* Base style for all hunger boxes */
+.charsheet input[type=checkbox].sheet-hunger {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--vamp-accent);
+  border-radius: 3px;
+  background: #000;
+  cursor: pointer;
+  position: relative;
+  margin: 2px;
+  font-weight: bold;
+}
+
+/* Default number (unchecked) */
+.charsheet input[type=checkbox].sheet-hunger::after {
+  color: #777;                /* gray when inactive */
+  font-size: 16px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Highlighted (checked) */
+.charsheet input[type=checkbox].sheet-hunger:checked::after {
+  color: #fff;                 /* bright white text */
+  text-shadow: 0 0 6px red;    /* glowing effect */
+}
+
+/*Generation */
+.charsheet input[name="attr_v_gen1"]::after { content:"+1";}
+.charsheet input[name="attr_v_gen1"]:checked::after { content: "+1"; }
+.charsheet input[name="attr_v_gen2"]::after { content:"+2";}
+.charsheet input[name="attr_v_gen2"]:checked::after { content: "+2"; }
+.charsheet input[name="attr_v_gen3"]::after { content:"+3";}
+.charsheet input[name="attr_v_gen3"]:checked::after { content: "+3"; }
+
+/* Hunger 1 */
+.charsheet input[name="attr_v_hunger1"]::after { content: "-3"; }
+.charsheet input[name="attr_v_hunger1"]:checked::after { content: "-3"; }
+
+/* Hunger 2 */
+.charsheet input[name="attr_v_hunger2"]::after { content: "-2"; }
+.charsheet input[name="attr_v_hunger2"]:checked::after { content: "-2"; }
+
+/* Hunger 3 */
+.charsheet input[name="attr_v_hunger3"]::after { content: "-1"; }
+.charsheet input[name="attr_v_hunger3"]:checked::after { content: "-1"; }
+
+/* Hunger 4 */
+.charsheet input[name="attr_v_hunger4"]::after { content: "0"; }
+.charsheet input[name="attr_v_hunger4"]:checked::after { content: "0"; }
+
+/* Hunger 5 */
+.charsheet input[name="attr_v_hunger5"]::after { content: "+1"; }
+.charsheet input[name="attr_v_hunger5"]:checked::after { content: "+1"; }
+
+/* Hunger 6 */
+.charsheet input[name="attr_v_hunger6"]::after { content: "+1"; }
+.charsheet input[name="attr_v_hunger6"]:checked::after { content: "+1"; }
+
+/* Hunger 7 */
+.charsheet input[name="attr_v_hunger7"]::after { content: "+2"; }
+.charsheet input[name="attr_v_hunger7"]:checked::after { content: "+2"; }
+
+/* Hunger 8 */
+.charsheet input[name="attr_v_hunger8"]::after { content: "+3"; }
+.charsheet input[name="attr_v_hunger8"]:checked::after { content: "+3"; }
+
+
+/* Header bar (if you want a slightly redder feel only for Vampire) */
+.charsheet .sheet-vampire .sheet-header { background-color:#0b0b0b; } /* subtle */
