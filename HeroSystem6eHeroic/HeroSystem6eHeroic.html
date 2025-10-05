@@ -23776,13 +23776,14 @@
 	
 	// Roll weapon damage
 	on("clicked:hiddenDamageRoll", function () {
-		getAttrs(["hiddenIsNormal", "hiddenIsContest", "hiddenIsPower", "hiddenIsAoE", "hiddenStunMod", "hiddenMessage", "optionHitLocationSystem", "optionKnockbackDice", "optionKnockdown", "whisperToGM", "character_title", "dingbat"], function(values) {
+		getAttrs(["hiddenIsNormal", "hiddenIsContest", "hiddenIsPower", "hiddenIsMental", "hiddenIsAoE", "hiddenStunMod", "hiddenMessage", "optionHitLocationSystem", "optionKnockbackDice", "optionKnockdown", "whisperToGM", "character_title", "dingbat"], function(values) {
 			var theRoll = values.whisperToGM||"";
-			let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
-			let isNormal = (values.hiddenIsNormal === "true") ? true : false;
-			let isContest = (values.hiddenIsContest === "true") ? true : false;
-			let isPower = (values.hiddenIsPower === "true") ? true : false;
-			let isAoE = (values.hiddenIsAoE === "true") ? true : false;
+			const useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
+			const isNormal = (values.hiddenIsNormal === "true") ? true : false;
+			const isContest = (values.hiddenIsContest === "true") ? true : false;
+			const isPower = (values.hiddenIsPower === "true") ? true : false;
+			const isMental = (values.hiddenIsMental === "true") ? true : false;
+			const isAoE = (values.hiddenIsAoE === "true") ? true : false;
 			let dmgType = (isContest || isPower) ? "ATTR" : (isNormal ? "STUN" : "BODY");
 			let otherDmgType = (isContest || isPower) ? "PIPS" : (isNormal ? "BODY" : "STUN");
 			let stunMod = Math.max(-2, Math.min(2, (parseInt(values.hiddenStunMod)||0)));
@@ -23792,7 +23793,7 @@
 			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
 			
 			// Optional if rollling for knockback
-			const doesKnockback = (values.optionKnockbackDice !== "0") ? true : false;
+			const doesKnockback = ((values.optionKnockbackDice !== "0") && (isMental === false) ) ? true : false;
 			const onlyKnockdown = (values.optionKnockdown === "1") ? true : false;
 			let knockbackRoll = rollKnockback(values.optionKnockbackDice||0);
 			let knockback = knockbackRoll.total;
@@ -23804,7 +23805,7 @@
 			
 			theRoll += "{{"+dmgType+"=[[@{hiddenDamage}]]}}";
 			
-			theRoll += "{{"+otherDmgType+"=[[0[See "+dmgType+(doesKnockback ? (" | KB "+knockbackRoll.result) :"")+"]]]}}";
+			theRoll += "{{"+otherDmgType+"=[[0[See "+dmgType+(doesKnockback ? (" ❖ KB "+knockbackRoll.result) :"")+"]]]}}";
 			
 			if (useHitLocations && !isContest & !isPower) {
 				theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
@@ -23832,11 +23833,11 @@
 						computed = convertStunToBody(results.results[dmgType].rolls);
 						knockback = computed - knockback;
 						if (knockback > 0) {
-							computed += (onlyKnockdown ? " ▼" : " ⚞"+2*knockback+"m⚟");
+							computed += (onlyKnockdown ? " ↓↓" : " ⚞"+2*knockback+"m⚟");
 						} else if (knockback === 0) {
-							computed += " ▼";
+							computed += " ↓↓";
 						} else {
-							computed += " ⬢";
+							computed += " •••";
 						}	
 					} else {
 						computed = convertStunToBody(results.results[dmgType].rolls);
@@ -23850,11 +23851,11 @@
 					computed = String(computed) + " (BODY×" + theSTUNMultiplier + ")";
 					if (doesKnockback) {
 						if (knockback > 0) {
-							computed += (onlyKnockdown ? " ▼" : " ⚞"+2*knockback+"m⚟");
+							computed += (onlyKnockdown ? " ↓↓" : " ⚞"+2*knockback+"m⚟");
 						} else if (knockback === 0) {
-							computed += " ▼";
+							computed += " ↓↓";
 						} else {
-							computed += " ⬢";
+							computed += " •••";
 						}
 					}
 				}
@@ -23980,6 +23981,9 @@
 			let theRangePenalty = parseInt(values.rangeOCVpenalty)||0;
 			let hasRangePenalty = true;
 			let targetPenalty = parseInt(values["targetOCVpenalty"])||0;
+			
+			// Mental attack?
+			attributes.hiddenIsMental = isMental ? "true" : "false";
 			
 			// Limit DCV mod.
 			dcvMod = Math.max(0, (Math.min(modLimit, dcvMod)) );
@@ -24321,7 +24325,10 @@
 			let targetPenalty = parseInt(values["targetOCVpenalty"])||0;
 			
 			// Add the weapon's base END cost to the maneuver's listed END.
-			let subtractENDAmt = parseInt(values["martialManeuverEndurance"+maneuverId])||0;	
+			let subtractENDAmt = parseInt(values["martialManeuverEndurance"+maneuverId])||0;
+			
+			// Mental attack?
+			attributes.hiddenIsMental = isMental ? "true" : "false";
 			
 			// Keep mod within reasonable limits.
 			dcvMod = Math.max(0, (Math.min(modLimit, dcvMod)) );
@@ -24623,6 +24630,9 @@
 			let dcvMod = parseInt(values.maneuverDCVmod)||0;
 			let ocvMod = parseInt(values.maneuverOCVmod)||0;
 			let targetPenalty = parseInt(values["targetOCVpenalty"])||0;
+			
+			// Strength attack isn't mental.
+			attributes.hiddenIsMental = "false";
 			
 			// Keep mod within reasonable limits.
 			dcvMod = Math.max(0, (Math.min(modLimit, dcvMod)) );
@@ -25929,8 +25939,8 @@
 		}
 		
 		if (version < 4.80) {
-			attributes["optionKnockbackDice"] = 0;
-			attributes["optionKnockdown"] = 1;
+			attributes["optionKnockbackDice"] = "0";
+			attributes["optionKnockdown"] = "1";
 			
 			version = 4.80;
 		}
