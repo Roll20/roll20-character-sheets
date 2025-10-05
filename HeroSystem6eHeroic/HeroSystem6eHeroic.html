@@ -16370,11 +16370,17 @@
 					<select name="attr_optionKnockbackDice">
 						<option value="0" selected>Never</option>
 						<option value="1">1d6</option>
-						<option value="2">2d6*</option>
+						<option value="2">2d6 ✶</option>
 						<option value="3">3d6</option>
 					</select>
 				</div>
-				<h1>Roll Knockback</h1>
+				<h1>Roll for</h1>
+				<div class="custom-select-option">
+					<select name="attr_optionKnockdown">
+						<option value="0">Knockback</option>
+						<option value="1" selected>Knockdown</option>
+					</select>
+				</div>
 			</div>
 			
 			<div class="item-options-row">
@@ -23770,7 +23776,7 @@
 	
 	// Roll weapon damage
 	on("clicked:hiddenDamageRoll", function () {
-		getAttrs(["hiddenIsNormal", "hiddenIsContest", "hiddenIsPower", "hiddenIsAoE", "hiddenStunMod", "hiddenMessage", "optionHitLocationSystem", "optionKnockbackDice", "whisperToGM", "character_title", "dingbat"], function(values) {
+		getAttrs(["hiddenIsNormal", "hiddenIsContest", "hiddenIsPower", "hiddenIsAoE", "hiddenStunMod", "hiddenMessage", "optionHitLocationSystem", "optionKnockbackDice", "optionKnockdown", "whisperToGM", "character_title", "dingbat"], function(values) {
 			var theRoll = values.whisperToGM||"";
 			let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
 			let isNormal = (values.hiddenIsNormal === "true") ? true : false;
@@ -23786,24 +23792,19 @@
 			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
 			
 			// Optional if rollling for knockback
-			let knockback = rollKnockback(values.optionKnockbackDice||0);
-			let doesKnockback = (knockback === 0) ? false : true;
+			const doesKnockback = (values.optionKnockbackDice !== "0") ? true : false;
+			const onlyKnockdown = (values.optionKnockdown === "1") ? true : false;
+			let knockbackRoll = rollKnockback(values.optionKnockbackDice||0);
+			let knockback = knockbackRoll.total;
 			
 			// Prepare damage message
 			theRoll += "&{template:custom"+ (isPower ? "-power" : "") + (isNormal ? "-normal" : "") + (isContest ? "-contest" : "") + "-damage} ";
 			theRoll += "{{title=@{character_name}"+dingbat+"@{character_title}}} ";
 			theRoll += "{{subtitle=" + values.hiddenMessage + (isContest ? " Strength Contest " : (isPower ? " Result " : " Damage ")) + "}} ";
 			
-			if (doesKnockback && (dmgType === "BODY")) {
-				// knockback = Math.max(0, results.results[dmgType].total - knockback);
-				// theRoll += "{{"+dmgType+"=[[@{hiddenDamage}]]"+(knockback > 0 ? " ⚞"+knockback+"⚟" : " ♟")+"}}";
-				// theRoll += "{{"+dmgType+"=[[@{hiddenDamage}]]"+fetchRollTotal(results.results[dmgType].total)+"}}";
-				theRoll += "{{"+dmgType+"=[[@{hiddenDamage}]]}}";
-			} else {
-				theRoll += "{{"+dmgType+"=[[@{hiddenDamage}]]}}";
-			}
+			theRoll += "{{"+dmgType+"=[[@{hiddenDamage}]]}}";
 			
-			theRoll += "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
+			theRoll += "{{"+otherDmgType+"=[[0[See "+dmgType+(doesKnockback ? (" | KB "+knockbackRoll.result) :"")+"]]]}}";
 			
 			if (useHitLocations && !isContest & !isPower) {
 				theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
@@ -23829,20 +23830,32 @@
 					// Convert dice roll to equivalent BODY damage.
 					if (doesKnockback) {
 						computed = convertStunToBody(results.results[dmgType].rolls);
-						knockback = Math.max(0, computed - knockback);
-						computed += (knockback > 0 ? " ⚞"+knockback+"⚟" : " •");
+						knockback = computed - knockback;
+						if (knockback > 0) {
+							computed += (onlyKnockdown ? " ▼" : " ⚞"+2*knockback+"m⚟");
+						} else if (knockback === 0) {
+							computed += " ▼";
+						} else {
+							computed += " ⬢";
+						}	
 					} else {
 						computed = convertStunToBody(results.results[dmgType].rolls);
 					}
 				} else {
 					if (doesKnockback) {
-						knockback = Math.max(0, computed - knockback);
+						knockback = computed - knockback;
 					}
 					computed *= theSTUNMultiplier;
 					
-					computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
+					computed = String(computed) + " (BODY×" + theSTUNMultiplier + ")";
 					if (doesKnockback) {
-						computed += (knockback > 0 ? " ⚞"+knockback+"⚟" : " •");
+						if (knockback > 0) {
+							computed += (onlyKnockdown ? " ▼" : " ⚞"+2*knockback+"m⚟");
+						} else if (knockback === 0) {
+							computed += " ▼";
+						} else {
+							computed += " ⬢";
+						}
 					}
 				}
 				
@@ -23868,16 +23881,26 @@
 	
 	
 	// Dice rolling function, which is done outside the usual Roll20 roll system for now.
+	// Dice rolling function, which is done outside the usual Roll20 roll system for now.
 	function rollDice(numberOfDice, numberOfSides) {
-		let result = 0;
+		var theOutput = new Object();
+		
+		let roll = 0;
+		let total = 0;
 		let diceRolls = parseInt(numberOfDice)||0;
 		let diceSides = parseInt(numberOfSides)||1;
+		let result = "";
 		
 		for (let i = 1; i <= diceRolls; i++) {
-			result += Math.floor(diceSides * Math.random()) + 1;
+			roll = Math.floor(diceSides * Math.random()) + 1;
+			result += (i===1 ? "" : "+") + String(roll);
+			total += roll;
 		}
 		
-		return result;
+		theOutput["total"] = total;
+		theOutput["result"] = result;
+		
+		return theOutput;
 	}
 
 
@@ -25907,6 +25930,7 @@
 		
 		if (version < 4.80) {
 			attributes["optionKnockbackDice"] = 0;
+			attributes["optionKnockdown"] = 1;
 			
 			version = 4.80;
 		}
