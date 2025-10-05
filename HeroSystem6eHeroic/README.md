@@ -164,7 +164,7 @@ To make a targeted attack select the radio button corresponding to desired focus
 
 *Knockdown and Knockback (Optional)*
 
-If your campaign uses the optional knockdown or knockback rules, Roll20 will roll knockback dice and subtract the total from the BODY damage done by the attack. The outcome appears after the calculated damage result. A distance from knockback, two down arrows for knockdown, and three dots for a null result. Hover over the calculated result to see the knockback roll. Note that knockback isn't rolled for mental damage.
+If your campaign uses the knockdown or knockback rules, Roll20 will roll knockback dice and subtract the total from the BODY damage done by the attack. The outcome appears after the calculated damage result. A distance (⚞10m⚟) for knockback, two down arrows (↓↓) for knockdown, and three dots (•••) for a null result. Hover over the calculated result to see the knockback roll. Note that knockback isn't rolled for mental damage.
 
 ![Knockdown](/HeroSystem6eHeroic/images/KnockdownChat.png)
 
