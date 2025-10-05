@@ -84,6 +84,43 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 ### Version 1.1.03
 - Added missing Telepathy expanding button
 - Fixed J-Drive tonnage
+- Fixed NPC armour and weapons
+
+### Version 1.1.04
+- Widened animal attribute fields
+- Added Equipment drag-and-drop block to NPC
+- Widened vehicle input fields
+- Widened weapon name field and narrowed DM to Str/Dex (rather than Strength/Dexterity)
+- Widened armour name field
+- Added 'delete' icons to weapons, armour and equipment
+- Fixed where some equipment has no description but has an 'Effect' instead, like base modules
+- Fixed bug in animal attacks where e.g. 2D+2 was not correctly parsed properly
+- Added some missing translations, more to do
+- Extended NPC to include species and age and editable name
+- Added 'standard' skills from PC tab to NPC tab (old skills are retained as 'Other Skills')
+- Added some extra equipment fields into equipment description for computers/software to show capability
+- Fixed spacecraft weapons resize column issue
+- Added traits to weapon description
+
+### Version 1.1.05
+- Added Monthly Salary to finances
+- Added Mod. to weapons for e.g. HUD or scopes or similar
+- Updated translation key for personal Armour for translations
+- Allow custom characteristics to be dragged to macro bar
+
+### Version 1.1.06
+- Added Robot tab to character sheet
+
+### Version 1.1.07
+- Added Skills to Robot tab
+- Added Weapons and Armour to Ship's Locker
+- Added repeating row for custom power requirements to Ship tab
+
+### Version 1.1.08
+- Fixed Skills on Robot tab that were affecting modifiers on PC/NPC skills
+
+### Version 1.1.09
+- Added custom Characteristics to NPC to allow values for Attitude, Influence, Power etc. to be captured
 
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 

@@ -690,6 +690,9 @@
   <div class="armor">
     <div class="equipment-title-and-encumbrance">
       <h2>Armadura</h2>
+    <div class="armor-note">
+      <label>Para somar melhorias de CA, use * antes do nome do item / efeito</label>
+    </div>
       <label
         >cn
         <input
@@ -701,6 +704,7 @@
         />
       </label>
     </div>
+
     <div class="equipment-grid">
       <span class="armor-name">Nome</span>
       <span class="armor-value">CA</span>
@@ -1469,35 +1473,68 @@
         });
     });
 
-    on("sheet:opened change:armorClassType change:repeating_armor:armorValue change:repeating_armor:armorWorn remove:repeating_armor", function () {
-      getAttrs(["armorClassType"], function (values) {
-          const armorClassType = values.armorClassType || "aac"; // Default para teste
-          getSectionIDs("repeating_armor", function (ids) {
-              let totalArmorValue = 0;
-              const attributesToGet = ids.reduce((acc, id) => {
-                  acc.push(`repeating_armor_${id}_armorValue`, `repeating_armor_${id}_armorWorn`);
-                  return acc;
-              }, []);
-              getAttrs(attributesToGet, function (itemValues) {
-                  ids.forEach((id) => {
-                      const armorValue = parseInt(itemValues[`repeating_armor_${id}_armorValue`]) || 0;
-                      const armorWorn = itemValues[`repeating_armor_${id}_armorWorn`] === "on";
-                      if (armorWorn) {
-                          totalArmorValue += armorValue;
-                      }
-                  });
-                  let ac = 0;
-                  if (armorClassType === "aac") {
-                      ac = 10 + totalArmorValue;
-                  } else if (armorClassType === "dac") {
-                      ac = 9 - totalArmorValue;
-                  }
-                  // Atualizar o atributo attr_ac
-                  setAttrs({ ac: ac });
-              });
-          });
-      });
+
+
+    on("sheet:opened change:armorClassType change:repeating_armor:armorValue change:repeating_armor:armorWorn change:repeating_armor:armorName remove:repeating_armor", function () {
+        getAttrs(["armorClassType"], function (values) {
+            const armorClassType = values.armorClassType || "aac";
+            getSectionIDs("repeating_armor", function (ids) {
+                if (ids.length === 0) {
+                    setAttrs({ ac: armorClassType === "aac" ? 10 : 9 });
+                    return;
+                }
+
+                let totalModifier = 0;
+                let acBase = armorClassType === "aac" ? -Infinity : Infinity;
+
+                const attributesToGet = ids.reduce((acc, id) => {
+                    acc.push(
+                        `repeating_armor_${id}_armorValue`,
+                        `repeating_armor_${id}_armorWorn`,
+                        `repeating_armor_${id}_armorName`
+                    );
+                    return acc;
+                }, []);
+
+                getAttrs(attributesToGet, function (itemValues) {
+                    ids.forEach((id) => {
+                        const worn = itemValues[`repeating_armor_${id}_armorWorn`] === "on";
+                        const name = itemValues[`repeating_armor_${id}_armorName`] || "";
+                        const value = parseInt(itemValues[`repeating_armor_${id}_armorValue`]) || 0;
+
+                        if (!worn) return;
+
+                        const isModifier = name.trim().startsWith("*");
+
+                        if (!isModifier) {
+                            if (armorClassType === "aac" && value > acBase) {
+                                acBase = value;
+                            } else if (armorClassType === "dac" && value < acBase) {
+                                acBase = value;
+                            }
+                        }
+
+                        if (isModifier) {
+                            totalModifier += value;
+                        }
+                    });
+
+                    if (acBase === -Infinity || acBase === Infinity) {
+                        acBase = armorClassType === "aac" ? 10 : 9;
+                    }
+
+                    const ac = armorClassType === "aac"
+                        ? acBase + totalModifier
+                        : acBase - totalModifier;
+
+                    setAttrs({ ac });
+                });
+            });
+        });
     });
+
+
+
 
     on("sheet:opened change:armorClassType", function () {
       getAttrs(["armorClassType"], function (values) {

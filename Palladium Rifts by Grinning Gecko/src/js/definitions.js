@@ -1569,7 +1569,7 @@ const SKILL_KEYS = [
   "description",
 ];
 
-const ABILITIES_REPEATERS = ["magic", "psionics", "powersabilities"];
+const ABILITIES_REPEATERS = ["magic", "psionics", "powersabilities", "modifiers"];
 
 const MAGIC_KEYS = REPEATING_BONUS_KEYS.concat([
   "name",
@@ -1592,6 +1592,9 @@ const MAGIC_KEYS = REPEATING_BONUS_KEYS.concat([
   "duration_starting",
   "duration_per_level",
   "duration_unit",
+  "frequency_starting",
+  "frequency_per_level",
+  "frequency_unit",
   "percentage_starting",
   "percentage_per_level",
   "addtobonuses",
@@ -1617,6 +1620,9 @@ const PSIONICS_KEYS = REPEATING_BONUS_KEYS.concat([
   "duration_starting",
   "duration_per_level",
   "duration_unit",
+  "frequency_starting",
+  "frequency_per_level",
+  "frequency_unit",
   "percentage_starting",
   "percentage_per_level",
   "addtobonuses",
@@ -1647,6 +1653,32 @@ const ABILITIES_KEYS = REPEATING_BONUS_KEYS.concat([
   "percentage_starting",
   "percentage_per_level",
   "addtobonuses",
+  "description",
+]);
+
+const MODIFIERS_KEYS = REPEATING_BONUS_KEYS.concat([
+  "name",
+  "range",
+  "damage",
+  "duration",
+  "percentage",
+  "range_starting",
+  "range_per_level",
+  "range_unit",
+  "damage_starting",
+  "damage_per_level",
+  "damage_unit",
+  "dc_starting",
+  "dc_per_level",
+  "dc_unit",
+  "duration_starting",
+  "duration_per_level",
+  "duration_unit",
+  "frequency_starting",
+  "frequency_per_level",
+  "frequency_unit",
+  "percentage_starting",
+  "percentage_per_level",
   "description",
 ]);
 
@@ -1728,7 +1760,7 @@ const SECTIONS = {
   wp: WP_KEYS.wp,
   wpmodern: WP_KEYS.wpmodern,
   skills: SKILL_KEYS,
-  modifiers: REPEATING_BONUS_KEYS,
+  modifiers: MODIFIERS_KEYS,
   magic: MAGIC_KEYS,
   psionics: PSIONICS_KEYS,
   movement: MOVEMENT_KEYS,

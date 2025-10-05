@@ -92,34 +92,40 @@
 
 <rolltemplate class="sheet-rolltemplate-check">
     <div class="container">
-        <div><h1>{{name}}{{#SkillName}} *for* {{SkillName}}{{/SkillName}}</h1></div>
+<!--        <div><h1>{{name}}{{#SkillName}} *for* {{SkillName}}{{/SkillName}}</h1></div> -->
+        <div><h1>{{name}}{{#SkillName}}<span class="tcat" data-i18n="for-l"> *for* </span> {{SkillName}}{{/SkillName}}</h1></div>
 		<div class="arrow-container"><div class="arrow-right"></div></div>
 		{{#Check}}
-			<div class="rowcolor"><span class="tcat">Check: </span>{{computed::Roll}}</div>
+			<div class="rowcolor"><span class="tcat" data-i18n="check-c">Check: </span>{{computed::Roll}}</div>
 			{{#rollLess() computed::Roll 7 }}
-				<div class="rowcolor"><span class="tcat">Result: </span>Failure</div>
+				<div class="rowcolor"><span class="tcat" data-i18n="result-c">Result: </span><span data-i18n="failure-c">Failure</span></div>
 			{{/rollLess() computed::Roll 7 }}
 			{{#rollBetween() computed::Roll 7 9}}
-				<div class="rowcolor"><span class="tcat">Result: </span>Partial Success</div>
+				<div class="rowcolor"><span class="tcat" data-i18n="result-c">Result: </span><span data-i18n="partial-success-c">Partial Success</span></div>
 			{{/rollBetween() computed::Roll 7 9}}
 			{{#rollBetween() computed::Roll 10 11}}
-				<div class="rowcolor"><span class="tcat">Result: </span>Success</div>
+				<div class="rowcolor"><span class="tcat" data-i18n="result-c">Result: </span><span data-i18n="success-c">Success!</span></div>
 			{{/rollBetween() computed::Roll 10 11}}
 			{{#rollGreater() computed::Roll 11}}
-				<div class="rowcolor"><span class="tcat">Result: </span>Success<span style="color: Red; font-weight: bold; margin-left: -4px" title="Hover over dice results to determine if DOUBLE SIXES - an Ultra Success! - has been rolled">*</span></div>
+				{{#rollGreater() computed::Doubles 0 }}
+					<div class="rowcolor"><span class="tcat" data-i18n="result-c">Result: </span><span style="color: Red; font-weight: bold;" data-i18n="ultra-success-c" >Ultra Success!</span></div>
+				{{/rollGreater() computed::Doubles 0 }}
+				{{#^rollGreater() computed::Doubles 0 }}
+					<div class="rowcolor"><span class="tcat" data-i18n="result-c">Result: </span><span data-i18n="success-c">Success!</span></div>
+				{{/^rollGreater() computed::Doubles 0 }}
 			{{/rollGreater() computed::Roll 11}}
 		{{/Check}}
 		{{#DL}}
 			<div class="rowcolor"><span class="tcat">DL: </span>{{DL}}</div>
 			{{#rollLess() computed::Roll DL }}
-				<div class="rowcolor"><span class="tcat">Result: </span>Failure</div>
+				<div class="rowcolor"><span class="tcat" data-i18n="result-c">Result: </span><span data-i18n="failure-c">Failure</span></div>
 			{{/rollLess() computed::Roll DL }}
 			{{#^rollLess() computed::Roll DL }}
-				<div class="rowcolor"><span class="tcat">Result: </span>Success!</div>
+				<div class="rowcolor"><span class="tcat" data-i18n="result-c">Result: </span><span data-i18n="success-c">Success!</span></div>
 			{{/^rollLess() computed::Roll DL }}
 		{{/DL}}
 		{{#Damage}}
-			<div class="rowcolor"><span class="tcat" data-i18n-title="possible damage">Damage: </span>{{Damage}}</div>
+			<div class="rowcolor"><span class="tcat" data-i18n="damage-c">Damage: </span>{{Damage}}</div>
 		{{/Damage}}
     </div>
 </rolltemplate>
@@ -173,15 +179,28 @@ on("clicked:forceful clicked:tactical clicked:creative clicked:reflexive", funct
 
 		//console.log("  Name: " + Name + " AttributeName " + AttributeName);
 
-		if (WarDie > 0) { WarDiceQuery = "?{WarDice|No, 0|Yes, 1}d6!!"; }
+		if (WarDie > 0) { WarDiceQuery = "+?{WarDice|No, 0|Yes, 1}d6!!"; }
 		
 		
-        const rollBase = "&{template:check} {{name=@{character_name} *for* " + AttributeName + "}} {{Check=[[1]]}} {{Roll=[[2d6+@{"+Name+"}+"+WarDiceQuery+"]]}}";
+        const rollBase = "&{template:check} {{name=@{character_name} *for* " + AttributeName + "}} {{Check=[[1]]}}  {{Doubles=[[0]]}} {{Roll=[[2d6+@{"+Name+"}"+WarDiceQuery+"]]}}";
 		//console.log("  rollBase = " + rollBase);
 
 	    startRoll(rollBase, rollResult => {
 		
 			//console.log(" Roll Dice " + rollResult.results.Roll.dice );
+			//console.log("  Roll Dice 1 " + rollResult.results.Roll.dice[0] );
+			//console.log("  Roll Dice 2 " + rollResult.results.Roll.dice[1] );
+			let Die1 = rollResult.results.Roll.dice[0];
+			let Die2 = rollResult.results.Roll.dice[1];
+			let computedDoubles = 0;
+			//console.log("  Die1 " + Die1 );
+			//console.log("  Die2 " + Die2 );
+			if ((Die1 === 6) && (Die2 === 6)) { computedDoubles = 1; console.log(" DOUBLES: 66 "); }
+			if ((Die1 === 5) && (Die2 === 5)) { computedDoubles = 0; console.log(" DOUBLES: 55 "); }
+			if ((Die1 === 4) && (Die2 === 4)) { computedDoubles = 0; console.log(" DOUBLES: 44 "); }
+			if ((Die1 === 3) && (Die2 === 3)) { computedDoubles = 0; console.log(" DOUBLES: 33 "); }
+			if ((Die1 === 2) && (Die2 === 2)) { computedDoubles = 0; console.log(" DOUBLES: 22 "); }
+			if ((Die1 === 1) && (Die2 === 1)) { computedDoubles = 0; console.log(" DOUBLES: 11 "); }
 			//console.log(" Roll Result " + rollResult.results.Roll.result );
 			//console.log(" Roll Expression " + rollResult.results.Roll.expression );
 			//console.log("  stringify: " + JSON.stringify(rollResult.results.Roll));
@@ -189,7 +208,8 @@ on("clicked:forceful clicked:tactical clicked:creative clicked:reflexive", funct
 			let numDice = rollResult.results.Roll.dice.length;
 			//console.log(" numDice: " + numDice);
 
-			let computed = rollResult.results.Roll.result; // Not altering total, just want to check if War Dice were used
+			let computed = rollResult.results.Roll.result; // Not altering total, just want to check if War Dice were used 
+			
 
 			if ((WarDie > 0) && (numDice == 3)) {
 				WarDie -= 1;
@@ -200,7 +220,10 @@ on("clicked:forceful clicked:tactical clicked:creative clicked:reflexive", funct
 			}
 
 			finishRoll(
-				rollResult.rollId
+				rollResult.rollId,
+				{
+					Doubles: computedDoubles
+				}
 			);
 		});
 
