@@ -4337,7 +4337,7 @@ damageMacro = (id) => {
   getAttrs(['toggle_auto_damage'], (v) => {
     const output = {};
     const autoDamage = +v.toggle_auto_damage;
-    clog(`auto damage toggle:${autoDamage}`);
+    // clog(`auto damage toggle:${autoDamage}`);
     // NOTE: these macros substitute the damage rolls for the chatmenu buttons directly to support crit logic
     const damageSmallMedium = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
     const damageLarge = ` vs LG [[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
@@ -4374,7 +4374,7 @@ damageMacro = (id) => {
 on(
   'change:repeating_weapon:weapon_name change:repeating_weapon:weapon_damagesmallmedium change:repeating_weapon:weapon_damagelarge change:repeating_weapon:weapon_critdamagesmallmedium change:repeating_weapon:weapon_critdamagelarge change:repeating_weapon:weapon_attackdmgbonus change:repeating_weapon:weapon_critdamage_flag',
   (eventInfo) => {
-    clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
     damageMacro(id);
   },
@@ -4619,13 +4619,13 @@ function setNWP(id) {
 
 // Set repeating attr values for new rows. Makes visible to API
 on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item change:repeating_nonweaponproficiencies:nwp_name', (eventInfo) => {
-  clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
   // if (eventInfo.newValue !== eventInfo.previousValue) return;
   // test for new row name (ie no existing value)
-  console.log(`Change detected: new: ${eventInfo.newValue} previous:${eventInfo.previousValue}`);
+  // console.log(`Change detected: new: ${eventInfo.newValue} previous:${eventInfo.previousValue}`);
   if (eventInfo.previousValue !== undefined) return;
 
   if (eventInfo.sourceAttribute.includes('equipment_item')) {
