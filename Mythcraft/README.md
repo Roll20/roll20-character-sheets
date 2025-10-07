@@ -2,9 +2,13 @@
 
 ## Necessary files
 
-For Roll20 the files you need are styles.css, sheet.html, preview.png, and sheet.json. All the others are optional. They are intended to be used by front-end developers with NPM and compiled languages.
+For Roll20 the files you need are styles.css, sheet.html, preview.png, and sheet.json. All the others are optional.
 
-## NPM
+## Source Files
+
+Source files can be found at [Quasireal Publishing Github](https://github.com/quasireal-publishing/roll20-mythcraft)
+
+### NPM
 
 This is a template uses [NPM](https://www.npmjs.com/get-npm) to develop character sheets.
 
