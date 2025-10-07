@@ -162,6 +162,12 @@ To make a targeted attack select the radio button corresponding to desired focus
 
 ![Hit Locations](/HeroSystem6eHeroic/images/HitLocationTable.png)
 
+*Knockdown and Knockback (Optional)*
+
+If your campaign uses the knockdown or knockback rules, Roll20 will roll knockback dice and subtract the total from the BODY damage done by the attack. The outcome appears after the calculated damage result: a distance (⚞10m⚟) for knockback, two down arrows (↓↓) for knockdown, and three dots (•••) for a null result. Hover over the calculated result to see the knockback roll. Note that knockback isn't rolled for mental damage.
+
+![Knockdown](/HeroSystem6eHeroic/images/KnockdownChat.png)
+
 # <a id="page-3">Page 3: Skills</a>
 
 ![Page 3](/HeroSystem6eHeroic/images/screenshot-03-scaled.png)
@@ -290,6 +296,10 @@ The last page of this sheet contains a number of gameplay or display options.
 
 &emsp; Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color. Font size seems to be just right or too small.
 
+### Roll for Knockback
+
+&emsp; If the campaign uses knockback rules select whether if it is for full knockback or only knockdown. The default is *never* and the standard knockdown roll is *2d6.* Lower power campaigns might opt for a knockback roll of *1d6* and higher power campaigns might use *3d6*.
+
 ### Whisper Rolls to GM
 
 &emsp; This dropdown offers three options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
@@ -378,6 +388,8 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 *First version by Villain In Glasses, August 1, 2021.*
 
 *Recent updates:*
+
+*Oct 5, 2025 added option to automatically roll for knockback (Version 4.80)*
 
 *May 8, 2025 added mental, power, and flash defense to armor (Version 4.70)*
 

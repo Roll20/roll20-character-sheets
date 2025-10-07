@@ -2066,6 +2066,143 @@
 <div class="disclaimer">
 	<span data-i18n="disclaimer"></span>
 </div>
+<!-- Power Roll Roll Template and Ability Template combined -->
+<rolltemplate class="sheet-rolltemplate-powerrollability">
+	<div class="sheet-roll-container">
+		<div class="character-name">
+			{{charactername}}
+		</div>
+		<div class="header">
+			{{name}}
+		</div>
+		<div class="subtype">
+			{{subtype}}
+		</div>
+		<div class="section">
+			{{#description}}
+			<div class="description">
+				{{description}}
+			</div>
+			{{/description}}
+			{{#rollTotal() hasTrait 1}}
+			<div class="trait">
+				{{trait}}
+			</div>
+			{{/rollTotal() hasTrait 1}}
+			{{#rollTotal() hasSolo 1}}
+			<div class="effect-block">
+				<div class="effect-label">{{solo1name}}</span>:</div>
+				<div class="effect-text">{{solo1text}}</div>
+			</div>
+			<div class="effect-block">
+				<div class="effect-label">{{solo2name}}</span>:</div>
+				<div class="effect-text">{{solo2text}}</div>
+			</div>
+			{{/rollTotal() hasSolo 1}}
+		</div>
+		<div class="meta-row">
+			<div class="keywords">{{keywords}}</div>
+			<div class="action-type">{{type}}</div>
+		</div>
+		<div class="action-row">
+			<div class="distance">
+			{{#distance}}
+				<!-- triangle-ruler -->
+				&#128208;{{distance}}
+				{{/distance}}
+			</div>
+			<div class="target">
+				{{#target}}
+				<!-- bullseye -->
+					&#127919;{{target}}
+				{{/target}}
+			</div>
+		</div>
+		{{#rollTotal() hasTrigger 1}}
+		<div class="effect-block">
+			<div class="effect-label"><span data-i18n="trigger"></span>:</div>
+			<div class="effect-text">{{trigger}}</div>
+		</div>
+		{{/rollTotal() hasTrigger 1}}
+		{{#rollTotal() hasPowerRoll 1}}
+		<div class="stat-row">
+			<div class="roll-label">{{powerRoll}}:</div>
+			<span class="roll-formula">2d10 + {{characteristic}}</span>
+		</div>
+		<div class="roll-column1">
+			<div class="powerroll-2d10">
+				<label>2d10:</label> {{2d10}}
+			</div>
+			<div class="powerroll-characteristic">
+				<label><span data-i18n="{{characteristic}}"></span>:</label> {{characteristicValue}}
+			</div>
+		</div>
+		{{#rollTotal() computed::isDoubleEdge 1}}
+		<div class="powerroll-edge-bane" data-i18n="double-edge"></div>
+		{{/rollTotal() computed::isDoubleEdge 1}}
+		{{#rollGreater() edgeBane 0}}
+		<div class="powerroll-edge-bane" data-i18n="edge"></div>
+		{{/rollGreater() edgeBane 0}}
+		{{#rollLess() edgeBane 0}}
+		<div class="powerroll-edge-bane" data-i18n="bane"></div>
+		{{/rollLess() edgeBane 0}}
+		{{#rollTotal() computed::isDoubleBane 1}}
+		<div class="powerroll-edge-bane" data-i18n="double-bane"></div>
+		{{/rollTotal() computed::isDoubleBane 1}}
+		{{#rollGreater() bonus 0}}
+		<div class="powerroll-bonus-penalty">
+			<label><span data-i18n="bonus"></span>:</label> {{bonus}}
+		</div>
+		{{/rollGreater() bonus 0}}
+		{{#rollLess() bonus 0}}
+		<div class="powerroll-bonus-penalty">
+			<label><span data-i18n="penalty"></span>:</label> {{bonus}}
+		</div>
+		{{/rollLess() bonus 0}}
+		{{#rollGreater() 2d10 18}}
+			<div class="powerroll-crit" data-i18n="critical-hit"></div>
+		{{/rollGreater() 2d10 18}}
+		<div class="roll-column2">
+			<div class="powerroll-total">
+				<label><span data-i18n="power-roll-total"></span>:</label> {{total}}
+			</div>
+			<div class="powerroll-tier">
+				<label><span data-i18n="tier"></span>:</label> {{computed::tier}}
+			</div>
+		</div>
+		<div class="tiers">
+			<span class="range">≤ 11</span>
+			<span class="damage">{{tier1}}</span>
+			<span class="range">12–16</span>
+			<span class="damage">{{tier2}}</span>
+			<span class="range">17+</span>
+			<span class="damage">{{tier3}}</span>
+		</div>
+		{{/rollTotal() hasPowerRoll 1}}
+		{{#rollTotal() hasSpecial 1}}
+		<div class="effect-block">
+			<div class="effect-label"><span data-i18n="special"></span>:</div>
+			<div class="effect-text">{{special}}</div>
+		</div>
+		{{/rollTotal() hasSpecial 1}}
+		{{#rollTotal() hasEffect 1}}
+		<div class="effect-block">
+			<div class="effect-label"><span data-i18n="effect"></span>:</div>
+			<div class="effect-text">{{effect}}</div>
+		</div>
+		{{/rollTotal() hasEffect 1}}
+		{{#rollTotal() hasMalprop 1}}
+		<div class="effect-block">
+			<div class="effect-label">{{malpropcost}}&nbsp;<span data-i18n="malice"></span>:</div>
+			<div class="effect-text">{{malprop}}</div>
+		</div>
+		{{/rollTotal() hasMalprop 1}}
+	</div>
+</div>
+<!-- Disclaimer -->
+<div class="disclaimer">
+	<span data-i18n="disclaimer"></span>
+</div>
 <!-- Power Roll Roll Template -->
 <rolltemplate class="sheet-rolltemplate-powerroll">
 	<div class="sheet-roll-container">
@@ -2480,6 +2617,89 @@
 		startRoll(roll, ({ rollId }) => finishRoll(rollId));
 		return roll;
 	}
+
+/**
+** Build ability when there is a Power Roll
+   constructs and executes rolls using the ability sharing roll template
+**/
+
+async function buildPowerRollAbility(characteristic, abilityName, directMap = {}, rollValueMap = {}) {
+	const attrs = await getAttrsAsync([characteristic]);
+	const characteristicValue = attrs[characteristic];
+
+	// Translations
+	const characteristicTranslation = getTranslationByKey(characteristic) || characteristic;
+	const powerRollTranslation = getTranslationByKey('power-roll') || 'Power Roll';
+	const edgeOrBaneTranslation = getTranslationByKey('edge-or-bane') || 'edge-or-bane';
+	const noEdgeOrBaneTranslation = getTranslationByKey('no-edge-or-bane') || 'no-edge-or-bane';
+	const doubleEdgeTranslation = getTranslationByKey('double-edge') || 'double-edge';
+	const edgeTranslation = getTranslationByKey('edge') || 'edge';
+	const baneTranslation = getTranslationByKey('bane') || 'bane';
+	const doubleBaneTranslation = getTranslationByKey('double-bane') || 'double-bane';
+	const bonusOrPenaltyTranslation = getTranslationByKey('bonus-or-penalty') || 'bonus-or-penalty';
+
+	const name = abilityName || `${characteristicTranslation} ${powerRollTranslation}`;
+
+	// Helper to exclude null/undefined/empty/"0"
+	const isDefined = (value) => {
+		if (!value) return false;
+		if (typeof value === 'string' && value.trim() === '0') return false;
+		return true;
+	};
+
+	// Build roll string
+	const roll = `@{wtype}&{template:powerrollability} ` +
+		'[[ [[2d10cs>11cf<0]][2d10] ' +
+		` + [[${characteristicValue}[${characteristicTranslation}]]][${characteristicTranslation}] ` +
+		' + [[?{' +
+			edgeOrBaneTranslation +
+			`|${noEdgeOrBaneTranslation},0` +
+			`|${doubleEdgeTranslation},0[${doubleEdgeTranslation}]` +
+			`|${edgeTranslation},2[${edgeTranslation}]` +
+			`|${baneTranslation},-2[${baneTranslation}]` +
+			`|${doubleBaneTranslation},0[${doubleBaneTranslation}]` +
+			`}]][${edgeOrBaneTranslation}] ` +
+			` + [[?{${bonusOrPenaltyTranslation}|0}]][${bonusOrPenaltyTranslation}] ` +
+		']] '
+		+ `{{charactername=@{character_name}}} `
+		+ `{{name=${name}}} `
+		+ `{{powerRoll=^{power-roll}}} `
+		+ `{{characteristic=${characteristic}}} `
+		+ `{{hasPowerRoll=[[1]]}} `
+		+ `{{2d10=$[[0]]}} `
+		+ `{{characteristicValue=$[[1]]}} `
+		+ `{{edgeBane=$[[2]]}} `
+		+ `{{bonus=$[[3]]}} `
+		+ `{{total=$[[4]]}} `
+		+ `{{isDoubleEdge=[[0]]}} `
+		+ `{{isDoubleBane=[[0]]}} `
+		+ `{{tier=[[0]]}} `
+		+ Object.entries(directMap)
+			.filter(([_, value]) => isDefined(value))
+			.map(([key, value]) => `{{${key}=${value}}} `)
+			.join(' ')
+		+ Object.entries(rollValueMap)
+			.filter(([_, value]) => value === 1)
+			.map(([key]) => `{{${key}=[[1]]}} `)
+			.join(' ');
+
+	startRoll(roll, ({ rollId, results }) => {
+		const isDoubleEdge = results.edgeBane.expression === `0[${doubleEdgeTranslation}]` ? 1 : 0;
+		const isDoubleBane = results.edgeBane.expression === `0[${doubleBaneTranslation}]` ? 1 : 0;
+
+		const tierBase = results.total.result >= 17 ? 3 : results.total.result >= 12 ? 2 : 1;
+		const tierMod = (() => {
+			switch (results.edgeBane.expression) {
+				case `0[${doubleEdgeTranslation}]`: return 1;
+				case `0[${doubleBaneTranslation}]`: return -1;
+				default: return 0;
+			}
+		})();
+		const tier = Math.max(1, Math.min(3, tierBase + tierMod));
+
+		finishRoll(rollId, { isDoubleEdge, isDoubleBane, tier });
+	});
+}
 	
 /** 
 ** Ability Sharing Handler
@@ -2521,6 +2741,46 @@
 		
 		// 5. Call the shared roll function
 		const roll = buildAbilityRoll(directMap, rollValueMap);
+
+		console.log(`${prefix}_${abilityPrefix}:`, roll);
+	}
+
+	async function handleAbilitySharePowerRoll(prefix, abilityPrefix,characteristic, abilityName) {
+		// 1. Define all possible ability attributes across both player and NPC sections.
+		const allAbilityAttributeNames = [
+			'name', 'cost', 'description', 'keywords',
+			'type', 'distance', 'target', 'trigger',
+			'characteristic', 'tier_1', 'tier_2', 'tier_3', 'effect',
+			'subtype', 'malice_cost', 'trait',
+			'solo_1_name', 'solo_1_text', 'solo_2_name', 'solo_2_text',
+			'special', 'malice',
+		];
+		
+		const allAbilityToggles = [
+			'has_power_roll', 'has_effect', 'has_special', 'has_malice',
+		];
+		
+		abPrefix = abilityPrefix ? `${abilityPrefix}_` : '';
+		
+		// 2. Define the character-level attributes needed for both.
+		const globalAttrsToGet = prefix === 'repeating_npcabilities'
+			? [] // Monster abilities need nothing
+			: ['resource_name']; // Player abilities need resource_name
+			
+		// 3. Construct the full list of attributes to fetch.
+		const attrsToFetch = [
+			...globalAttrsToGet,
+			...allAbilityAttributeNames.map(x => `${prefix}_${abPrefix}${x}`),
+			...allAbilityToggles.map(x => `${prefix}_${x}`),
+		];
+		
+		const attrs = await getAttrsAsync(attrsToFetch);
+		
+		// 4. Execute the custom logic (player or monster specific)
+		const { directMap, rollValueMap } = getAbilityMaps(attrs, prefix, abPrefix);
+		
+		// 5. Call the shared roll function
+		const roll = buildPowerRollAbility(characteristic, abilityName,directMap, rollValueMap);
 
 		console.log(`${prefix}_${abilityPrefix}:`, roll);
 	}
@@ -2641,7 +2901,7 @@
 			'repeating_moves_moves_name',
 			'repeating_moves_moves_characteristic',
 		]);
-		rollPower(attrs.repeating_moves_moves_characteristic, attrs.repeating_moves_moves_name);
+		handleAbilitySharePowerRoll('repeating_moves', 'moves',attrs.repeating_moves_moves_characteristic, attrs.repeating_moves_moves_name);
 	});
 
 /**
@@ -2652,7 +2912,7 @@
 			'repeating_maneuvers_maneuver_name',
 			'repeating_maneuvers_maneuver_characteristic',
 		]);
-		rollPower(attrs.repeating_maneuvers_maneuver_characteristic, attrs.repeating_maneuvers_maneuver_name);
+		handleAbilitySharePowerRoll('repeating_maneuvers', 'maneuver',attrs.repeating_maneuvers_maneuver_characteristic, attrs.repeating_maneuvers_maneuver_name);
 	});
 
 /**
@@ -2663,7 +2923,7 @@
 			'repeating_triggered_triggered_name',
 			'repeating_triggered_triggered_characteristic',
 		]);
-		rollPower(attrs.repeating_triggered_triggered_characteristic, attrs.repeating_triggered_triggered_name);
+		handleAbilitySharePowerRoll('repeating_triggered', 'triggered',attrs.repeating_triggered_triggered_characteristic, attrs.repeating_triggered_triggered_name);
 	});
 
 /**
@@ -2674,7 +2934,7 @@
 			'repeating_noaction_noaction_name',
 			'repeating_noaction_noaction_characteristic',
 		]);
-		rollPower(attrs.repeating_noaction_noaction_characteristic, attrs.repeating_noaction_noaction_name);
+		handleAbilitySharePowerRoll('repeating_noaction', 'noaction',attrs.repeating_noaction_noaction_characteristic, attrs.repeating_noaction_noaction_name);
 	});
 
 /**
@@ -2706,7 +2966,7 @@
 			'escape_grab_name',
 			'escape_grab_characteristic',
 		]);
-		rollPower(attrs.escape_grab_characteristic, attrs.escape_grab_name);
+		handleAbilitySharePowerRoll('escape_grab', '',attrs.escape_grab_characteristic, attrs.escape_grab_name);
 	});
 	
 /**
@@ -2822,7 +3082,7 @@
 			'knockback_name',
 			'knockback_characteristic',
 		]);
-		rollPower(attrs.knockback_characteristic, attrs.knockback_name);
+		handleAbilitySharePowerRoll('knockback', '',attrs.knockback_characteristic, attrs.knockback_name);
 	});
 
 /**
@@ -2833,7 +3093,7 @@
 			'grab_name',
 			'grab_characteristic',
 		]);
-		rollPower(attrs.grab_characteristic, attrs.grab_name);
+		handleAbilitySharePowerRoll('grab', '',attrs.grab_characteristic, attrs.grab_name);
 	});
 
 /**
@@ -2844,7 +3104,7 @@
 			'claw_dirt_name',
 			'claw_dirt_characteristic',
 		]);
-		rollPower(attrs.claw_dirt_characteristic, attrs.claw_dirt_name);
+		handleAbilitySharePowerRoll('claw_dirt', '',attrs.claw_dirt_characteristic, attrs.claw_dirt_name);
 	});
 
 /**
@@ -2855,7 +3115,7 @@
 			'jump_name',
 			'jump_characteristic',
 		]);
-		rollPower(attrs.jump_characteristic, attrs.jump_name);
+		handleAbilitySharePowerRoll('jump', '',attrs.jump_characteristic, attrs.jump_name);
 	});
 
 /**
@@ -2866,7 +3126,7 @@
 			'climb_creature_characteristic',
 			'climb_creature_name', 
 		]);
-		rollPower(attrs.climb_creature_characteristic,attrs.climb_creature_name);
+		handleAbilitySharePowerRoll('climb_creature', '',attrs.climb_creature_characteristic,attrs.climb_creature_name);
 	});
 
 // Share Perk Features
@@ -2917,7 +3177,7 @@
 			'repeating_abilities_ability_characteristic',
 			'repeating_abilities_ability_name', 
 		]);
-		rollPower(attrs.repeating_abilities_ability_characteristic,attrs.repeating_abilities_ability_name);
+		handleAbilitySharePowerRoll('repeating_abilities','ability',attrs.repeating_abilities_ability_characteristic,attrs.repeating_abilities_ability_name);
 	});
 
 // Share Monster Repeated Abilities
@@ -2934,7 +3194,7 @@
 
 	on('clicked:melee_power_roll_share', async (event) => {
 	  	const attrs = await getAttrsAsync(['melee_free_strike_characteristic','melee_free_strike_name']);
-		rollPower(attrs.melee_free_strike_characteristic, attrs.melee_free_strike_name);
+		handleAbilitySharePowerRoll('melee_free_strike', '',attrs.melee_free_strike_characteristic, attrs.melee_free_strike_name);
 	});
 
 // Ranged Free Strike Display
@@ -2945,7 +3205,7 @@
 // Ranged Free Strike Power Roll
 	on('clicked:ranged_power_roll_share', async (event) => {
 		const attrs = await getAttrsAsync(['ranged_free_strike_characteristic','ranged_free_strike_name']);
-		rollPower(attrs.ranged_free_strike_characteristic, attrs.ranged_free_strike_name);
+		handleAbilitySharePowerRoll('ranged_free_strike', '',attrs.ranged_free_strike_characteristic, attrs.ranged_free_strike_name);
 	});
 
 // Share Class Features
