@@ -1,3 +1,17 @@
+# 2025-10-04
+
+- Fix display of scaled hits.
+- Reenable base spells during levelup
+- Get rid of spell lists errors
+- Banecroft:
+  - Fix creatures defenses
+  - Fix Giant A<redacted> attacks
+- Fix template for spell lists to display notes
+- Arcane:
+ - Start on Arcanist list
+ - Costs for Arcanist & Evoker
+- Add Tap Addiction to sheet
+
 # 2025-09-23
 
 - Creature Law (new upload)
