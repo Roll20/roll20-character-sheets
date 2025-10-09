@@ -16678,7 +16678,6 @@ Heal [[1d6]] **Hit Points** to a character.
 					<div class="cell col4">
 						<input type="hidden" name="attr_total_weight" value="" />
 						<input type="text" style="font-weight: bold; text-align: center;" name="attr_total_weight_gravity" value="" readonly="readonly" title="Macro: @{NAME|total_weight_gravity}" />
-						<span name="attr_weight_system" class="inline"></span>
 					</div>
 					<div class="cell col5">
 						<div style="text-align: right; font-weight: bold;" class="popup">
@@ -20638,7 +20637,6 @@ Select the indent level of the spell. This is handy to help show the spell belon
 							<div class="cell col4">
 								<input type="hidden" name="attr_total_weight" value="" />
 								<input type="text" style="font-weight: bold; text-align: center;" name="attr_total_weight_gravity" value="" readonly="readonly" title="Macro: @{NAME|total_weight_gravity}" />
-								<span name="attr_weight_system" class="inline"></span>
 							</div>
 							<div class="cell col5">
 								<div style="text-align: right; font-weight: bold;" class="popup">
@@ -20654,6 +20652,28 @@ Select the indent level of the spell. This is handy to help show the spell belon
 								<input type="hidden" name="attr_grand_total_weight" />
 								<input type="text" style="font-weight: bold; text-align: center;" name="attr_grand_total_weight_display" value="0" readonly="readonly" title="Macro: @{NAME|grand_total_weight}" />
 
+							</div>					
+						</div> <!-- .row -->
+						<div class="row row-totals">
+							<div class="cell col0"></div>
+							<div class="cell col1"></div>
+							<div class="cell col2"></div>
+							<div class="cell col3"></div>
+							<div class="cell col4"></div>
+							<div class="cell col5">
+								<div style="text-align: right; font-weight: bold;" class="popup">
+									<span data-i18n="load-limit-label">Load Limit</span>:
+								</div>
+								<div class="tooltip">
+									<span data-i18n="vehicle-load-limit-tooltip">
+										Based on Load Stat on the main Vehicle tab converted to <span name="attr_weight_system"></span> and then modified gravity. Load: <span name="attr_vehicle_load" value="0"></span> tons.
+									</span>
+								</div>
+							</div>
+							<div class="cell col6">
+								<input type="hidden" name="attr_vehicle_load_weight" />
+								<input type="hidden" name="attr_vehicle_is_overloaded" value="0" />
+								<input type="text" style="font-weight: bold; text-align: center;" name="attr_vehicle_load_weight_display" value="0" readonly="readonly" title="Macro: @{NAME|attr_vehicle_load_weight_display}" />
 							</div>					
 						</div> <!-- .row -->
 					</div> <!-- .table -->
@@ -35558,14 +35578,14 @@ B378
 	});
 	
 	// Get Encumbrance Level:
-	on('change:total_weight change:weight change:basic_lift change:gravity change:use_metric', function (e) {
+	on('change:total_weight change:weight change:basic_lift change:gravity change:use_metric change:total_crew_weight', function (e) {
 		updateEncLevel();
 	});
 	
 	// factor in gravity difference
 	function updateEncLevel(callback) {
 	
-		getAttrs(['basic_lift', 'total_weight', 'gravity', 'weight', 'weight_system'], function (v) {
+		getAttrs(['basic_lift', 'total_weight', 'gravity', 'weight', 'weight_system', 'gurps_sheet_type', 'total_crew_weight'], function (v) {
 	
 			callback = callback || noop;
 	
@@ -35577,14 +35597,22 @@ B378
 	
 			let totalGravityWeightDisplay = "";
 	
-			let gravity = Number(v.gravity);
-	
-			let characterWeight = Number(v.weight);
+			const gravity = Number(v.gravity);
 
-			let weightSystem = String(v.weight_system);
+			const characterWeight = Number(v.weight);
+
+			const weightSystem = String(v.weight_system);
+
+			const gurpsSheetType = v.gurps_sheet_type || "standard";
+
+			const totalCrewWeight = Number(v.total_crew_weight) || 0;
 
 			// don't factor in grand total weight
 			let grandTotalWeight = characterWeight + totalWeight;
+
+			if (gurpsSheetType === "vehicle") {
+				grandTotalWeight += totalCrewWeight;
+			}
 	
 			// round to three decimal places
 			grandTotalWeight = Math.round(grandTotalWeight * 1000) / 1000;
@@ -35630,6 +35658,40 @@ B378
 			);
 	
 		});
+	}
+
+	// check for vehicle load weight changes
+	on("change:vehicle_load change:grand_total_weight change:weight_system", event => {
+
+		updateVehicleLoadWeight();
+
+	});
+
+	const updateVehicleLoadWeight = () => {
+
+		getAttrs(['vehicle_load', 'grand_total_weight', 'weight_system'], values => {
+
+			const vehicleLoad = Number(values.vehicle_load) || 0;
+
+			const grandTotalWeight = Number(values.grand_total_weight) || 0;
+
+			const weightSystem = String(values.weight_system) || "lbs";
+
+			// convert vehicleLoad tons to pounds
+			const vehicleLoadPounds = vehicleLoad * 2000;
+
+			let isOverLoaded = vehicleLoadPounds > grandTotalWeight;
+
+			const vehicleLoadPoundsDisplay = vehicleLoadPounds.toFixed(2) + " " + weightSystem;
+
+			setAttrs({
+				vehicle_load_weight: vehicleLoadPounds,
+				vehicle_load_weight_display: vehicleLoadPoundsDisplay,
+				vehicle_is_overloaded: isOverLoaded ? 1 : 0
+			});
+
+		});
+
 	}
 	
 	// Update the total cost of all items.
@@ -59618,7 +59680,7 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
-	on(`change:repeating_vehicle-crew-table:weight`, event => {
+	on(`change:repeating_vehicle-crew-table:weight change:repeating_vehicle-crew-table:on`, event => {
 
 		if (event.sourceType !== "player") {
 			return;
@@ -59636,7 +59698,10 @@ Characters with Skill: ${knowsSkill}`;
 
 			let totalWeight = 0;
 
-			let fields = ids.map(id => `repeating_vehicle-crew-table_${id}_weight`);
+			let fields = ids.flatMap(id => [
+                `repeating_vehicle-crew-table_${id}_weight`,
+                `repeating_vehicle-crew-table_${id}_on`
+            ]);
 
 			getAttrs(fields, values => {
 
@@ -59644,7 +59709,12 @@ Characters with Skill: ${knowsSkill}`;
 
 					let weight = Number(values[`repeating_vehicle-crew-table_${id}_weight`]) || 0;
 
-					totalWeight += weight;
+					let on = values[`repeating_vehicle-crew-table_${id}_on`] == "1";
+
+					if (on) {
+						// add weight to totalWeight
+						totalWeight += weight;
+					}
 
 				});
 
