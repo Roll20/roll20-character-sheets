@@ -1,0 +1,631 @@
+/* ====== TAB BUTTON STYLING ====== */
+.sheet-tabs input[type="radio"] {
+  /* Visually hide but keep functional for label toggling */
+  position: absolute;
+  left: -9999px;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+/* Labels container */
+.tab-labels {
+  display: flex;        /* horizontal tabs */
+  gap: 5px;
+  margin-bottom: 0;
+  position: relative;
+  z-index: 2; /* ensure labels sit above panels/floats */
+}
+
+/* Individual tab buttons */
+.tab-labels label {
+  flex: 1;              /* equal width */
+  text-align: center;
+  padding: 5px 10px;
+  background: #ddd;
+  border-radius: 5px 5px 0 0;
+  cursor: pointer;
+  border: 1px solid #aaa;
+  border-bottom: none;
+  font-weight: normal;
+}
+
+/* Highlight selected tab (sibling method) */
+#tab-main:checked ~ .tab-labels label[for="tab-main"],
+#tab-unique:checked ~ .tab-labels label[for="tab-unique"],
+#tab-battle:checked ~ .tab-labels label[for="tab-battle"] {
+  background: #bbb;
+  font-weight: bold;
+}
+/* Mirror highlight using :has() for extra robustness in preview */
+.sheet-tabs:has(#tab-main:checked) .tab-labels label[for="tab-main"],
+.sheet-tabs:has(#tab-unique:checked) .tab-labels label[for="tab-unique"],
+.sheet-tabs:has(#tab-battle:checked) .tab-labels label[for="tab-battle"] {
+  background: #bbb;
+  font-weight: bold;
+}
+
+/* ====== TAB CONTENT STYLING ====== */
+.sheet-tab-content {
+  display: none; /* hide all by default */
+  border: 1px solid #aaa;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 0 5px 5px 5px;
+  margin-top: -1px;
+  clear: both; /* ensure each tab starts below any floats */
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 120px; /* prevent 0-height when children float */
+  /* establish BFC so floats contribute to height */
+  overflow: auto;
+}
+
+/* keep the whole tab system as a stacking context */
+.sheet-tabs { position: relative; }
+.tab-views { display: block; width: 100%; }
+
+/* Show content for selected tab (sibling method) */
+#tab-main:checked ~ .sheet-tab-content.sheet-main,
+#tab-unique:checked ~ .sheet-tab-content.sheet-unique,
+#tab-battle:checked ~ .sheet-tab-content.sheet-battle {
+  display: block;
+}
+/* Also support a wrapper around the views for robustness */
+#tab-main:checked ~ .tab-views .sheet-tab-content.sheet-main { display: block; }
+#tab-unique:checked ~ .tab-views .sheet-tab-content.sheet-unique { display: block; }
+#tab-battle:checked ~ .tab-views .sheet-tab-content.sheet-battle { display: block; }
+
+/* Preview fallback: when a hash target is present, show that panel */
+.tab-views .sheet-tab-content:target { display: block !important; }
+/* Extra‑robust toggle using :has() (modern browsers). Helps if DOM changes. */
+.sheet-tabs:has(#tab-main:checked) .tab-views .sheet-tab-content.sheet-main { display: block; }
+.sheet-tabs:has(#tab-unique:checked) .tab-views .sheet-tab-content.sheet-unique { display: block; }
+.sheet-tabs:has(#tab-battle:checked) .tab-views .sheet-tab-content.sheet-battle { display: block; }
+
+/* Local preview helper: when JS adds .is-visible to a panel, force it shown */
+.tab-views .sheet-tab-content.is-visible {
+  display: block !important;
+  min-height: 120px;
+  outline: 2px dashed #9aa; /* debug: make the active panel visible */
+  background: #fafcff;      /* debug tint */
+}
+
+/* Debug safety: ensure containers themselves are visible */
+.sheet-tabs, .tab-views { display: block !important; }
+
+
+/* ====== Overview Block ===== */
+.overview-block {
+  padding: 0; /* remove border/padding from the outer wrapper */
+  margin-bottom: 20px;
+}
+
+.overview-block > .overview-columns {
+  border: 2px solid #444;
+  border-radius: 6px;
+  padding: 12px 18px;
+  background-color: #f9f9f9;
+}
+
+.overview-columns {
+  display: flex;
+  gap: 20px;
+}
+
+.overview-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.overview-column label {
+  font-weight: bold;
+  margin-bottom: 3px;
+  margin-top: 8px;
+}
+
+.hp-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 3px;
+}
+
+/* ====== Skills Block ====== */
+.skills-block {
+  border: 1px solid #999;
+  padding: 10px;
+  margin-bottom: 15px;
+  background-color: #f9f9f9;
+  width: 220px;
+  float: left;
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+
+.skills-block h2 {
+  margin-top: 0;
+  font-size: 16px;
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
+.skills-column {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skill {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skill button {
+  flex: 1;
+  margin-right: 5px;
+  padding: 3px 5px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.skill select {
+  width: 70px;
+  font-size: 14px;
+}
+
+/* ====== Personal Block ====== */
+.personal-block {
+  display: flex;
+  margin-top: 20px;
+  gap: 20px;
+}
+
+.personal-left {
+  width: 33%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.personal-left textarea {
+  height: 150px;
+  width: 100%;
+  resize: none;
+}
+
+.personal-right {
+  width: 66%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.personal-right input[type="text"],
+.personal-right input[type="number"] {
+  width: 50%;
+  box-sizing: border-box;
+}
+
+.downtime-tracker {
+  border: 1px solid #ccc;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.downtime-tracker input[type="number"] {
+  width: 25px;
+}
+
+.quick-guide { 
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.quick-columns {
+  display: flex;
+  gap: 20px;
+}
+
+.quick-column {
+  flex: 1;
+}
+
+/* ====== Inherent Powers ====== */
+.inherent-powers {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.inherent-powers h2 {
+  text-align: left;
+  margin-bottom: 10px;
+  font-size: 1.5em;
+}
+
+.inherent-powers > .power-cards {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.inherent-power {
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  padding: 10px;
+  flex: 0 1 31%;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+.inherent-power h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  text-align: center;
+  font-size: 1.2em;
+}
+
+.power-functions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 5px;
+}
+
+.range-movement {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.energy-points,
+.death-points {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.permanent-bonus,
+.roll-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+}
+
+.power-die {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.notes-attributes {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.range-type {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+input[type="number"],
+select,
+textarea {
+  font-size: 0.9em;
+}
+
+/* ===== Unique Powers Styles ===== */
+.unique-powers-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.power-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.inherent-power.unique-power {
+  width: 32%;
+  background-color: #f5f5f5; /* match inherent powers background */
+  padding: 10px;
+  border-radius: 5px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inherent-power.unique-power h3 input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.inherent-power.unique-power .power-functions label,
+.inherent-power.unique-power .range-type label {
+  margin-right: 8px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.inherent-power.unique-power .energy-points,
+.inherent-power.unique-power .range-movement {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+.inherent-power.unique-power .range-movement label {
+  margin-right: 4px;
+}
+
+.inherent-power.unique-power .permanent-bonus {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.inherent-power.unique-power button[type="roll"] {
+  margin-top: 5px;
+  align-self: flex-start;
+}
+
+.inherent-power.unique-power .notes-attributes textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sheet-unique .unique-power .support-pool {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* space between inputs and the "/" */
+}
+
+/* Support Pool same layout as Energy Points */
+.sheet-unique .unique-power .support-pool {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.sheet-unique .unique-power .support-pool input {
+  width: 40px; /* match Energy Points input width */
+  margin: 0;   /* remove any extra margin that stacks them */
+}
+
+/* ===== Unique Powers Support Pool Inline ===== */
+.sheet-unique .unique-power .support-pool {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* space between current, slash, max */
+}
+
+.sheet-unique .unique-power .support-pool input {
+  width: 40px; /* match energy points inputs */
+}
+
+/* Battle Tracker Block */
+.battle-tracker {
+  border: 1px solid #999;
+  padding: 10px;
+  margin: 15px 0;
+  background-color: #fdfdfd;
+  border-radius: 6px;
+}
+
+.battle-tracker h2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.free-action-label {
+  font-size: 14px;
+  margin-left: auto;
+}
+
+.battle-columns {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.battle-phase {
+  flex: 1;
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.battle-phase h3 {
+  margin-top: 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.battle-phase label {
+  display: block;
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+/* Free Action and Round alignment */
+.battle-action-round {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* space between Free Action and Round fields */
+  margin-bottom: 10px; /* spacing below this line */
+}
+
+.battle-action-round input[type="number"] {
+  width: 50px;
+  box-sizing: border-box;
+}
+
+/* Hero's Path checkboxes */
+.progression div[class^="lvl"] {
+  margin-bottom: 10px;
+}
+
+.progression div[class^="lvl"] label {
+  display: inline-block;  /* keep checkboxes on the same line */
+  margin-right: 12px;     /* spacing between each checkbox */
+  font-size: 13px;        /* match input label sizing */
+}
+
+.progression input[type="checkbox"] {
+  vertical-align: middle; /* aligns checkbox with label text */
+  margin-right: 4px;      /* space between box and label text */
+}
+
+.progression input[type="text"] {
+  width: 100%;            /* same width as previous perk inputs */
+  box-sizing: border-box;
+  margin-bottom: 4px;     /* spacing between perk field and checkboxes */
+}
+
+/* Hero's Path Checkbox Layout */
+.progression div[class^="lvl"] {
+  display: flex;
+  flex-wrap: wrap; /* allows wrapping if too wide */
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.progression div[class^="lvl"] label {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* space between label text and checkbox */
+  font-size: 12px;
+}
+
+.or-label {
+  font-weight: bold;
+  margin: 0 10px 0 0;
+  align-self: center;
+}
+/* Force all Hero's Path description boxes to 4x wider */
+textarea[name^="attr_lvl"][name$="_perk"] {
+    width: 400% !important;
+    max-width: none !important;
+    box-sizing: border-box;
+}
+
+/* Stop parent div from constraining width */
+div[style*="flex-grow: 1"] {
+    flex-grow: 0 !important;
+}
+
+/* Hide rows by default */
+#condition-row-2.condition-hidden,
+#condition-row-3.condition-hidden {
+  display: none !important;
+}
+
+/* Show/hide Row 2 */
+#show-condition-2:checked ~ #condition-row-2 {
+  display: flex !important;
+}
+#hide-condition-2:checked ~ #condition-row-2 {
+  display: none !important;
+}
+
+/* Show/hide Row 3 */
+#show-condition-3:checked ~ #condition-row-3 {
+  display: flex !important;
+}
+#hide-condition-3:checked ~ #condition-row-3 {
+  display: none !important;
+}
+
+/* Show Add Condition 3 only if Row 2 is visible */
+#show-condition-2:checked ~ .condition3-controls label[for="show-condition-3"] {
+  display: inline-block;
+}
+#hide-condition-2:checked ~ .condition3-controls label[for="show-condition-3"] {
+  display: none;
+}
+
+/* Show/Hide relevant Add/Remove labels for each row */
+.condition2-controls label[for="show-condition-2"] {
+  display: inline-block;
+}
+#show-condition-2:checked ~ .condition2-controls label[for="show-condition-2"] {
+  display: none; /* hide Add if already visible */
+}
+#show-condition-2:checked ~ .condition2-controls label[for="hide-condition-2"] {
+  display: inline-block; /* show Remove */
+}
+#hide-condition-2:checked ~ .condition2-controls label[for="hide-condition-2"] {
+  display: none; /* hide Remove if hidden */
+}
+
+.condition3-controls label[for="show-condition-3"] {
+  display: inline-block;
+}
+#show-condition-3:checked ~ .condition3-controls label[for="show-condition-3"] {
+  display: none;
+}
+#show-condition-3:checked ~ .condition3-controls label[for="hide-condition-3"] {
+  display: inline-block;
+}
+#hide-condition-3:checked ~ .condition3-controls label[for="hide-condition-3"] {
+  display: none;
+}
+
+/* Make the control containers shrink to fit their content */
+.condition2-controls,
+.condition3-controls {
+  display: inline-flex;   /* shrink to fit content */
+  gap: 5px;
+  width: auto;            /* don’t stretch full width */
+}
+
+/* Style toggle labels: only as wide as text */
+.condition-toggle-label {
+  background: #ddd;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85em;
+  user-select: none;
+  flex: none;             /* don’t grow */
+  width: auto;            /* size to text */
+  text-align: center;
+}
+.condition-toggle-label:hover {
+  background: #ccc;
+}
+
+/* Mobile adjustments - more general */
+@media (max-width: 600px) {
+  body, .sheet-wrapper, .sheet-container, table {
+    font-size: 16px !important; /* bigger text */
+    width: 100% !important;     /* stretch containers to fit screen */
+    overflow-x: auto !important; /* allow horizontal scrolling */
+  }
+
+  input, select, textarea {
+    width: 90% !important;  /* easier to tap */
+    font-size: 16px !important;
+  }
+}
