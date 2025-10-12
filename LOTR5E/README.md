@@ -1,3 +1,3 @@
-# Medievo_-Oscuro
-Medievo Oscuro roll20-character-sheets.
-Puedes descargar los archivos para jugar a Medievo Oscuro en Roll20
+# LOTR5E (NON OFICIAL)
+LOTR 5E Non official roll20-character-sheets.
+You can download the files or play it on Roll20
