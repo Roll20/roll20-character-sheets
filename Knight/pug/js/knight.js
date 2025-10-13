@@ -3346,7 +3346,7 @@ on('clicked:importKNPCG', () => {
     const dame = { score: 0, majeur: 0, mineur: 0 };
     const masque = { score: 0, majeur: 0, mineur: 0 };
     const lAspects = {
-      chair: chair, bête: bete, machine: machine, dame: dame, masque: masque,
+      0: chair, 1: bete, 2: machine, 3: dame, 4: masque,
     };
 
     const health = json.health || 0;
@@ -3369,9 +3369,9 @@ on('clicked:importKNPCG', () => {
 
     for (const keyA in aspects) {
       const result = aspects[keyA];
-      lAspects[result.name].score = result.score;
+      lAspects[keyA].score = result.score;
 
-      if (result.major === true) { lAspects[result.name].majeur = result.exceptional; } else { lAspects[result.name].mineur = result.exceptional; }
+      if (result.major === true) { lAspects[keyA].majeur = result.exceptional; } else { lAspects[keyA].mineur = result.exceptional; }
     }
 
     getSectionIDs('repeating_capacites', (idarray) => {
@@ -3419,9 +3419,9 @@ on('clicked:importKNPCG', () => {
       if (contact === true) {
         path = 'repeating_armeCaC_';
 
-        let raw = result.raw - lAspects.bête.mineur - lAspects.bête.majeur;
+        let raw = result.raw - lAspects[1].mineur - lAspects[1].majeur;
 
-        if (lAspects.bête.majeur > 0) { raw -= bete.score; }
+        if (lAspects[1].majeur > 0) { raw -= bete.score; }
 
         if (raw < 0) { raw = 0; }
 
@@ -3655,28 +3655,28 @@ on('clicked:importKNPCG', () => {
       diceInitiative = 0;
     }
 
-    defense = defense - lAspects.masque.majeur - lAspects.masque.mineur;
-    reaction = reaction - lAspects.machine.majeur - lAspects.machine.mineur;
+    defense = defense - lAspects[4].majeur - lAspects[4].mineur;
+    reaction = reaction - lAspects[2].majeur - lAspects[2].mineur;
 
     setAttrs({
       character_name: json.name,
       typePNJ: `${type} (${level})`,
 
-      chair: lAspects.chair.score,
-      chairPNJAE: lAspects.chair.mineur,
-      chairPNJAEMaj: lAspects.chair.majeur,
-      bete: lAspects['bête'].score,
-      betePNJAE: lAspects['bête'].mineur,
-      betePNJAEMaj: lAspects['bête'].majeur,
-      machine: lAspects.machine.score,
-      machinePNJAE: lAspects.machine.mineur,
-      machinePNJAEMaj: lAspects.machine.majeur,
-      dame: lAspects.dame.score,
-      damePNJAE: lAspects.dame.mineur,
-      damePNJAEMaj: lAspects.dame.majeur,
-      masque: lAspects.masque.score,
-      masquePNJAE: lAspects.masque.mineur,
-      masquePNJAEMaj: lAspects.masque.majeur,
+      chair: lAspects[0].score,
+      chairPNJAE: lAspects[0].mineur,
+      chairPNJAEMaj: lAspects[0].majeur,
+      bete: lAspects[1].score,
+      betePNJAE: lAspects[1].mineur,
+      betePNJAEMaj: lAspects[1].majeur,
+      machine: lAspects[2].score,
+      machinePNJAE: lAspects[2].mineur,
+      machinePNJAEMaj: lAspects[2].majeur,
+      dame: lAspects[3].score,
+      damePNJAE: lAspects[3].mineur,
+      damePNJAEMaj: lAspects[3].majeur,
+      masque: lAspects[4].score,
+      masquePNJAE: lAspects[4].mineur,
+      masquePNJAEMaj: lAspects[4].majeur,
 
       santePNJ: health,
       santePNJ_max: health,

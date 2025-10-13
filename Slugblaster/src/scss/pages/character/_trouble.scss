@@ -1,0 +1,88 @@
+.trouble {
+  $this: '.trouble';
+
+  input[name='attr_trouble'] {
+    &[value='0'],
+    &:not([value]) {
+      ~ #{$this}__checkbox--0 {
+        display: none;
+      }
+    }
+  }
+
+  &__track {
+    display: flex;
+    gap: $grid-gutter;
+    margin: $m-md;
+  }
+  &__checkbox {
+    display: grid;
+    font-size: 1rem;
+
+    input {
+      appearance: none;
+      outline: none;
+
+      width: 1.5rem;
+      aspect-ratio: 1;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-image: image('triangle.svg');
+      filter: var(--icon-filter);
+
+      &:checked {
+        background-image: image('triangle-filled.svg');
+      }
+    }
+
+    // move 0 slot to end
+    &--0 {
+      order: 1;
+      padding-left: $grid-gutter-col;
+      border-left: 2px solid $text-color;
+
+      input {
+        background-image: image('circle-x.svg');
+      }
+    }
+    &--4 {
+      margin-right: $m-lg;
+    }
+
+    &--8 {
+      input {
+        background-image: image('triangle-alert.svg');
+        &:checked {
+          background-image: image('triangle-alert-filled.svg');
+        }
+      }
+    }
+  }
+
+  // fill in previous radios
+  @each $selected in 1, 2, 3, 4, 5, 6, 7, 8 {
+    @each $fill in 8, 7, 6, 5, 4, 3, 2, 1 {
+      @if $fill < $selected {
+        input[name='attr_trouble'][value='#{$selected}'] {
+          ~ #{$this}__checkbox--#{$fill} input {
+            background-image: image('triangle-filled.svg');
+          }
+        }
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0 $grid-gutter-col;
+  }
+  &__action[type='action'] {
+    // &#{$this}--nope {
+    // background-color: transparent;
+    font-size: $font-h4;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding-inline: $p-sm;
+    white-space: nowrap;
+  }
+}

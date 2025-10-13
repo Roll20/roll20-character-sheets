@@ -13,12 +13,14 @@ const statAttrs = [
 const combatTechniques = {
 		"anderthalbhander":    { type: "melee",  ebe: -2,        "at-only": false },
 		"armbrust":            { type: "ranged", ebe: -5,        "at-only": true },
+		"bastardstaebe":       { type: "melee",  ebe: -2,        "at-only": false },
 		"belagerungswaffen":   { type: "ranged", ebe: undefined, "at-only": true },
 		"blasrohr":            { type: "ranged", ebe: -5,        "at-only": true },
 		"bogen":               { type: "ranged", ebe: -3,        "at-only": true },
 		"diskus":              { type: "ranged", ebe: -2,        "at-only": true },
 		"dolche":              { type: "melee",  ebe: -1,        "at-only": false },
 		"fechtwaffen":         { type: "melee",  ebe: -1,        "at-only": false },
+		"feuerwaffen":         { type: "ranged", ebe: -5,        "at-only": true },
 		"hiebwaffen":          { type: "melee",  ebe: -4,        "at-only": false },
 		"infanteriewaffen":    { type: "melee",  ebe: -3,        "at-only": false },
 		"kettenstabe":         { type: "melee",  ebe: -1,        "at-only": false },
@@ -115,6 +117,7 @@ const defaultValues = {
 	"atbasis": 5,
 
 	"AT_Anderthalbhander": 5,
+	"AT_bastardstaebe": 5,
 	"AT_dolche": 5,
 	"AT_fechtwaffen": 5,
 	"AT_hiebwaffen": 5,
@@ -139,6 +142,7 @@ const defaultValues = {
 	"pabasis": 5,
 
 	"PA_Anderthalbhander": 5,
+	"PA_bastardstaebe": 5,
 	"PA_dolche": 5,
 	"PA_fechtwaffen": 5,
 	"PA_hiebwaffen": 5,
@@ -181,7 +185,7 @@ const defaultValues = {
 	"AT_Blasrohr": 5,
 	"AT_Bogen": 5,
 	"AT_Diskus": 5,
-	"AT_peitsche": 5,
+	"AT_feuerwaffen": 5,
 	"AT_Schleuder": 5,
 	"AT_Wurfbeile": 5,
 	"AT_Wurfmesser": 5,
@@ -259,10 +263,13 @@ const defaultValues = {
 	"shield_tpkk": "13/3",
 	"shield_tp_roll": "1d6 + 1",
 
+	/// 
 	/// Encumbrance, Armour, Initiative
 	"BE": 0,
 	"be_at_mod": 0,
 	"be_pa_mod": 0,
+	"be_at_mod_hint": 0,
+	"be_pa_mod_hint": 0,
 	"BE_RG": 0,
 	"BE_RG_INI": 0,
 
@@ -296,23 +303,47 @@ const defaultValues = {
 	"wound_rb": 0,
 
 	// Regeneration
+	/// Astral Meditation
+	"reg_astralmeditation_conversion_target_auto": 1,
+	"reg_astralmeditation_limit_life_energy_soft_auto": 9,
+	"reg_astralmeditation_mod_skill_source": "Wert nicht ermittelbar",
+	"reg_astralmeditation_mod_skill_value": 0,
+	"reg_astralmeditation_roll": "&{template:reg-astralmeditation} {{setup=[[0]]}} {{conversiontarget=[[1]]}} {{impossible=[[0d1]]}}",
+	"reg_astralmeditation_set_full_roll": "&{template:reg-astralmeditation-set-full} {{maxconv=[[0]]}}",
+
+	/// Deep Breath
+	"reg_deepbreath_roll": "&{template:reg-deepbreath} {{charactername=@{character_name}}} {{au=[[12]]}} {{xh=[[0]]}} {{ox=[[0]]}} {{nonerequired=[[1]]}}",
+
+	/// Karmic Meditation
+	"reg_karmicmeditation_roll": "&{template:reg-karmicmeditation} {{ke=[[0]]}} {{kemax=[[0]]}} {{notrequired=[[0]]}}",
+
+	/// Relax
+	"reg_relax_duration_auto": 1,
+	"reg_relax_roll": "&{template:reg-relax} {{charactername=@{character_name}}} {{duration=[[1]]}} {{au=[[12]]}} {{ko=[[8]]}} {{nonerequired=[[1]]}}",
+
+	/// Rest
+	"reg_rest_duration_auto": 1,
+	"reg_rest_roll": "&{template:reg-rest} {{charactername=@{character_name}}} {{au=[[12]]}} {{xh=[[0]]}} {{xhmax=[[8]]}} {{ox=[[0]]}} {{oxmax=[[8]]}} {{rt=[[0]]}} {{nonerequired=[[1]]}}",
+
+	/// Sleep
 	"reg_sleep_le_ko": "@{KO} - 1d20",
-	"reg_sleep_le_fixed": "off",
+	"reg_sleep_le_fixed": -1,
 	"reg_sleep_le_mod_advantages_disadvantages": 0,
 	"reg_sleep_le_mod_food_restriction": 0,
 	"reg_sleep_ae_base": "1d6",
 	"reg_sleep_ae_in": "@{IN} - 1d20",
-	"reg_sleep_ae_fixed": "off",
-	"reg_sleep_ae_mod_advantages_disadvantages": 0,
+	"reg_sleep_ae_fixed": -1,
+	"reg_sleep_ae_factor_metal_sensitive_conscious_contact": 1,
 	"reg_sleep_ae_mod_special_skills": 0,
+	"reg_sleep_ae_mod_cuffed": 0,
 	"reg_sleep_ae_mod_food_restriction": 0,
 	"reg_sleep_ae_mod_homesickness": 0,
-	"reg_sleep_addiction_withdrawal_effect": "0",
+	"reg_sleep_addiction_withdrawal_effect": 0,
 	"reg_sleep_food_restriction_effect": 0,
 	"reg_sleep_mod_somnambulism": "0",
 	"reg_sleep_sleep_disorder_effect": "1d6 - 1",
 	"reg_sleep_sleep_disorder_trigger": "1d0",
-	"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{le=@{LE}}} {{lebase=[[1d6]]}} {{leko=[[@{KO} - 1d20]]}} {{leneu=[[0d1]]}} {{ae=@{AE}}} {{aebase=[[1d6]]}} {{aein=[[@{IN} - 1d20]]}} {{aeneu=[[0d1]]}} {{ke=@{KE}}} {{kebase=[[1d1]]}} {{keneu=[[0d1]]}}",
+	"reg_sleep_roll": "&{template:reg-sleep} {{charactername=@{character_name}}} {{duration=[[6]]}} {{le=[[12]]}} {{au=[[12]]}} {{xh=[[0]]}} {{ox=[[0]]}} {{ae=[[12]]}} {{ke=[[0]]}} {{rt=[[0]]}} {{nonerequired=[[1]]}}",
 
 	// Repeating sections
 	"repeating_conjuration-spells-myranor": {
@@ -352,12 +383,14 @@ Individual spell names are generally based on a/the short name. One of the excep
 const talents = [
 	't_ka_anderthalbhaender',
 	't_ka_armbrust',
+	't_ka_bastardstaebe',
 	't_ka_belagerungswaffen',
 	't_ka_blasrohr',
 	't_ka_bogen',
 	't_ka_diskus',
 	't_ka_dolche',
 	't_ka_fechtwaffen',
+	't_ka_feuerwaffen',
 	't_ka_hiebwaffen',
 	't_ka_infanteriewaffen',
 	't_ka_kettenstaebe',
@@ -380,6 +413,7 @@ const talents = [
 	't_ko_akrobatik',
 	't_ko_athletik',
 	't_ko_fliegen',
+	't_ko_freiesfliegen',
 	't_ko_gaukeleien',
 	't_ko_immanspiel',
 	't_ko_klettern',
@@ -510,6 +544,7 @@ const talents = [
 	't_h_feinmechanik',
 	't_h_feuersteinbearbeitung',
 	't_h_fleischer',
+	't_h_fluggeraetesteuern',
 	't_h_gerber',
 	't_h_glaskunst',
 	't_h_grobschmied',
@@ -629,6 +664,7 @@ const talents_ebe = [
 	't_ko_akrobatik',
 	't_ko_athletik',
 	't_ko_fliegen',
+	't_ko_freiesfliegen',
 	't_ko_gaukeleien',
 	't_ko_klettern',
 	't_ko_koerperbeherrschung',
@@ -1024,12 +1060,19 @@ const melee = [
 */
 // Regeneration buttons
 const reg = [
+	'reg_astralmeditation',
+	'reg_astralmeditation_set_full',
+	'reg_deepbreath',
+	'reg_karmicmeditation',
+	'reg_relax',
+	'reg_rest',
 	'reg_sleep'
 ];
 
-// Minimum regeneration per regeneration phase (sleep)
+// Minimum regeneration
 const regLimitLower = {
 	'le': 0,
+	'au': 0,
 	'ae': 0,
 	'ke': 0
 };
@@ -1052,12 +1095,14 @@ In the long run, all attributes should be migrated to the new ones.
 const talentsData = {
 	't_ka_anderthalbhaender': {'internal': "Anderthalbhander", 'ui': "Anderthalbhänder"},
 	't_ka_armbrust': {'internal': "armbrust", 'ui': "Armbrust"},
+	't_ka_bastardstaebe': {'internal': "bastardstaebe", 'ui': "Bastardstäbe"},
 	't_ka_belagerungswaffen': {'internal': "belagerungswaffen", 'ui': "Belagerungswaffen"},
 	't_ka_blasrohr': {'internal': "blasrohr", 'ui': "Blasrohr"},
 	't_ka_bogen': {'internal': "bogen", 'ui': "Bogen"},
 	't_ka_diskus': {'internal': "diskus", 'ui': "Diskus"},
 	't_ka_dolche': {'internal': "dolche", 'ui': "Dolche"},
 	't_ka_fechtwaffen': {'internal': "fechtwaffen", 'ui': "Fechtwaffen"},
+	't_ka_feuerwaffen': {'internal': "feuerwaffen", 'ui': "Feuerwaffen"},
 	't_ka_hiebwaffen': {'internal': "hiebwaffen", 'ui': "Hiebwaffen"},
 	't_ka_infanteriewaffen': {'internal': "infanteriewaffen", 'ui': "Infanteriewaffen"},
 	't_ka_kettenstaebe': {'internal': "kettenstabe", 'ui': "Kettenstäbe"},
@@ -1080,6 +1125,7 @@ const talentsData = {
 	't_ko_akrobatik': {'internal': "akrobatik", 'ui': "Akrobatik"},
 	't_ko_athletik': {'internal': "athletik", 'ui': "Athletik"},
 	't_ko_fliegen': {'internal': "fliegen", 'ui': "Fliegen"},
+	't_ko_freiesfliegen': {'internal': "freiesfliegen", 'ui': "Freies Fliegen"},
 	't_ko_gaukeleien': {'internal': "gaukeleien", 'ui': "Gaukeleien"},
 	't_ko_immanspiel': {'internal': "immanspiel", 'ui': "Immanspiel"},
 	't_ko_klettern': {'internal': "klettern", 'ui': "Klettern"},
@@ -1108,7 +1154,7 @@ const talentsData = {
 	't_ge_ueberzeugen': {'internal': "uberzeugen", 'ui': "Überzeugen"},
 	't_n_faehrtensuchen': {'internal': "fahrtensuchen", 'ui': "Fährtensuchen"},
 	't_n_fallenstellen': {'internal': "fallenstellen", 'ui': "Fallenstellen"},
-	't_n_fesseln': {'internal': "fesseln", 'ui': "Fesseln"},
+	't_n_fesseln': {'internal': "fesseln", 'ui': "Fesseln/Entfesseln"},
 	't_n_fischenangeln': {'internal': "fischen", 'ui': "Fischen/Angeln"},
 	't_n_orientierung': {'internal': "orientierung", 'ui': "Orientierung"},
 	't_n_wettervorhersage': {'internal': "wettervorhersage", 'ui': "Wettervorhersage"},
@@ -1210,7 +1256,8 @@ const talentsData = {
 	't_h_feinmechanik': {'internal': "feinmechanik", 'ui': "Feinmechanik"},
 	't_h_feuersteinbearbeitung': {'internal': "feuersteinbearbeitung", 'ui': "Feuersteinbearbeitung"},
 	't_h_fleischer': {'internal': "fleischer", 'ui': "Fleischer"},
-	't_h_gerber': {'internal': "gerber", 'ui': "Gerber"},
+	't_h_fluggeraetesteuern': {'internal': "fluggeraetesteuern", 'ui': "Fluggerätesteuern"},
+	't_h_gerber': {'internal': "gerber", 'ui': "Gerber/Kürschner"},
 	't_h_glaskunst': {'internal': "glaskunst", 'ui': "Glaskunst"},
 	't_h_grobschmied': {'internal': "grobschmied", 'ui': "Grobschmied"},
 	't_h_handel': {'internal': "handel", 'ui': "Handel"},
@@ -1235,7 +1282,7 @@ const talentsData = {
 	't_h_seefahrt': {'internal': "seefahrt", 'ui': "Seefahrt"},
 	't_h_seiler': {'internal': "seiler", 'ui': "Seiler"},
 	't_h_steinmetz': {'internal': "steinmetz", 'ui': "Steinmetz"},
-	't_h_steinschneider': {'internal': "steinschneider", 'ui': "Steinschneider"},
+	't_h_steinschneider': {'internal': "steinschneider", 'ui': "Steinschneider/Juwelier"},
 	't_h_stellmacher': {'internal': "stellmacher", 'ui': "Stellmacher"},
 	't_h_stoffefaerben': {'internal': "stoffefarben", 'ui': "Stoffefärben"},
 	't_h_taetowieren': {'internal': "tatowieren", 'ui': "Tätowieren"},
@@ -1720,6 +1767,7 @@ const effectiveEncumbrance = {
 	"t_ko_akrobatik":           { "value":  2, "type": "factor" },
 	"t_ko_athletik":            { "value":  2, "type": "factor" },
 	"t_ko_fliegen":             { "value":  1, "type": "factor" },
+	"t_ko_freiesfliegen":       { "value":  2, "type": "factor" },
 	"t_ko_gaukeleien":          { "value":  2, "type": "factor" },
 	"t_ko_klettern":            { "value":  2, "type": "factor" },
 	"t_ko_koerperbeherrschung": { "value":  2, "type": "factor" },
@@ -2329,7 +2377,7 @@ const meleeData = {
 		*/
 	},
 	'k_meisterliches_entwaffnen_parade_parierwaffe': {
-		'ui': 'Meisterliches Entwaffnen (Pairerwaffenparade)',
+		'ui': 'Meisterliches Entwaffnen (Parierwaffenparade)',
 		'typ': 'pa-parierwaffe',
 		'rollCount': 1,
 		'mod': '0',

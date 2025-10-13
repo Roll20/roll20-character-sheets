@@ -133,7 +133,7 @@ function buildMacros(macros, reuse, resultType) {
 				if (answer["val"].length < 1) {
 					valResult = false;
 				} else {
-					for (item of answer["val"]) {
+					for (let item of answer["val"]) {
 						if ( ["string", "object"].includes(typeof(item)) ) {
 							valResult = true;
 						} else {
@@ -160,7 +160,7 @@ function buildMacros(macros, reuse, resultType) {
 				result = true;
 			} else if (a.length > 0) {
 				var numValidObjs = 0;
-				for (answer of a) {
+				for (let answer of a) {
 					if (answerIsValid(answer) === true) {
 						numValidObjs += 1;
 					}
@@ -187,8 +187,8 @@ function buildMacros(macros, reuse, resultType) {
 			) {
 				if (answersIsValid(obj["macro"]["a"])) {
 					// Arrays need to be iterated and each item checked (could be an object)
-					for (answer of obj["macro"]["a"]) {
-						for (item of answer["val"]) {
+					for (let answer of obj["macro"]["a"]) {
+						for (let item of answer["val"]) {
 							if (typeof(item) === "object") {
 								console.log("nestedEntry:", item);
 								macroCalls = [...macroCalls, ...analyseObject(item, macro)];
@@ -204,7 +204,7 @@ function buildMacros(macros, reuse, resultType) {
 		}
 		function buildCalledMacrosList(macros) {
 			var calledMacrosList = {};
-			for (macro in macros) {
+			for (let macro in macros) {
 				// Add empty entry for new reuse macro
 				calledMacrosList[macro] = [];
 
@@ -219,8 +219,8 @@ function buildMacros(macros, reuse, resultType) {
 				// Objects are only allowed within the answers array
 				if (answersIsValid(macros[macro]["a"])) {
 					// Arrays need to be iterated and each item checked (could be an object)
-					for (answer of macros[macro]["a"]) {
-						for (item of answer["val"]) {
+					for (let answer of macros[macro]["a"]) {
+						for (let item of answer["val"]) {
 							if (typeof(item) === "object") {
 								// Expand the calledMacrosList using a recursive function.
 								// If analyseObject() does not return anything, that means that the current top-level reuse macro does not reference any other reuse macros.
@@ -236,7 +236,7 @@ function buildMacros(macros, reuse, resultType) {
 		}
 		function buildReuseNamesList(macros) {
 			var reuseNamesList = [];
-			for (macro in macros) {
+			for (let macro in macros) {
 				// Add reuse name to the list of known reuse names
 				reuseNamesList.push(macro);
 			}
@@ -249,20 +249,20 @@ function buildMacros(macros, reuse, resultType) {
 
 			var paths = [];
 			// Create starting points from the reuse names list
-			for (name of reuseNamesList) {
-				for (edge of edges) {
+			for (let name of reuseNamesList) {
+				for (let edge of edges) {
 					if (name === edge[0]) {
 						paths.push([ name, edge[1] ]);
 					}
 				}
 			}
 			// Iterate over all paths, including new ones added on the way
-			for (path of paths) {
+			for (let path of paths) {
 				// Next macro to call is the last macro of the path
 				var nextRef = path.slice(-1)[0];
 
 				// Iterate over all edges to find matching macros
-				for (edge of edges) {
+				for (let edge of edges) {
 					if (nextRef === edge[0]) {
 						// Matches lead to new paths
 						// Optimizing this to create new paths only if there is more than one matching edge will give headaches for keeping the outer loop running; it's not worth the hassle
@@ -301,10 +301,10 @@ function buildMacros(macros, reuse, resultType) {
 		console.log("reuseNamesList:", reuseNamesList, "calledMacrosList:", calledMacrosList);
 
 		// Remove references to undefined reuse names
-		for (macro in calledMacrosList) {
+		for (let macro in calledMacrosList) {
 			var toBeRemoved = [];
 			if (calledMacrosList[macro].length > 0) {
-				for (entry in calledMacrosList[macro]) {
+				for (let entry in calledMacrosList[macro]) {
 					if (reuseNamesList.includes(calledMacrosList[macro][entry]) === false) {
 						console.log("Reuse not found:", calledMacrosList[macro][entry]);
 						toBeRemoved.push(entry);
@@ -314,7 +314,7 @@ function buildMacros(macros, reuse, resultType) {
 			}
 			console.log("calledMacrosList[macro]:", calledMacrosList[macro], "toBeRemoved:", toBeRemoved);
 			if (toBeRemoved.length > 0) {
-				for (entry in toBeRemoved.reverse()) {
+				for (let entry in toBeRemoved.reverse()) {
 					calledMacrosList[macro].splice(toBeRemoved[entry], 1);
 				}
 			}
@@ -324,9 +324,9 @@ function buildMacros(macros, reuse, resultType) {
 		// Build tree
 		// Start: Create edges
 		var edges = [];
-		for (macro in calledMacrosList) {
+		for (let macro in calledMacrosList) {
 			if (calledMacrosList[macro].length > 0) {
-				for (entry in calledMacrosList[macro]) {
+				for (let entry in calledMacrosList[macro]) {
 					edges.push([ macro, calledMacrosList[macro][entry] ]);
 				}
 			}
@@ -336,14 +336,14 @@ function buildMacros(macros, reuse, resultType) {
 		// Check edges to self
 		{
 		var toBeRemoved = [];
-		for (edge in edges) {
+		for (let edge in edges) {
 			if (edges[edge][0] === edges[edge][1]) {
 				console.log("Loop detected:", edges[edge].join(' -> '));
 				results["noLoopedEdges"] = false;
 				toBeRemoved.push(edge);
 			}
 		}
-		for (entry in toBeRemoved.reverse()) {
+		for (let entry in toBeRemoved.reverse()) {
 			edges.splice(toBeRemoved[entry], 1);
 		}
 		if (toBeRemoved.length === 0) {
@@ -536,7 +536,7 @@ function buildMacros(macros, reuse, resultType) {
 		var result = "";
 		var lastAnswerIndex = answers.length - 1;
 		console.log("answers:", answers);
-		for (answer in answers) {
+		for (let answer in answers) {
 			console.log("answer:", answer, "currentAnswer:", answers[answer]);
 			answer = parseInt(answer);
 			var currentAnswer = answers[answer];
@@ -559,7 +559,7 @@ function buildMacros(macros, reuse, resultType) {
 
 			// Description: Array, only string elements are considered
 			if (Array.isArray(currentAnswer["desc"]) === true) {
-				for (part of currentAnswer["desc"]) {
+				for (let part of currentAnswer["desc"]) {
 					if (typeof(part) === "string") {
 						desc += part;
 					} else {
@@ -574,7 +574,7 @@ function buildMacros(macros, reuse, resultType) {
 
 			// Value: Array, strings or objects; objects are not checked for validity
 			if (Array.isArray(currentAnswer["val"]) === true) {
-				for (part of currentAnswer["val"]) {
+				for (let part of currentAnswer["val"]) {
 					if (typeof(part) === "string") {
 						val += part;
 					} else if (typeof(part) === "object") {
@@ -642,11 +642,11 @@ function buildMacros(macros, reuse, resultType) {
 			console.log(protectCount, protectParts, protectSplit);
 
 			var macroEscaped = [];
-			for (part of protectSplit) {
+			for (let part of protectSplit) {
 				macroEscaped.push(escaper(part));
 			}
 
-			for (part in protectParts) {
+			for (let part in protectParts) {
 				macroComplete += macroEscaped[part] + protectParts[part];
 			}
 			macroComplete += macroEscaped[macroEscaped.length -1];
@@ -657,12 +657,12 @@ function buildMacros(macros, reuse, resultType) {
 
 	// Build the macros
 	var result = [];
-	for (macro of macros) {
+	for (let macro of macros) {
 		result.push(buildMacro(macro, 0, reuse));
 	}
 	var structuredResult = [];
 
-	for (macro of result) {
+	for (let macro of result) {
 		// Get the name of the roll variable
 		var rollVarName = macro.slice(2, macro.search('='));
 

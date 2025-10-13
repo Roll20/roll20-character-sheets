@@ -1,7 +1,7 @@
 const versioningAttr = "latest_versioning_upgrade";
 
 on("sheet:opened", () => {
-  //setAttrs({ latest_versioning_upgrade: 2.5 }); used for testing versioning
+  // setAttrs({ latest_versioning_upgrade: 3.2 }); //used for testing versioning
   getAttrs([versioningAttr], (v) => {
     versioning(parseFloat(v[versioningAttr]) || 1);
   });
@@ -25,7 +25,10 @@ const renameSectionAttrTargetValue = (section, attribute) => {
       let update = {};
       map.forEach((e) => {
         const rowId = getReprowid(e);
-        update[`${rowId}_target_value`] = v[`${e}`] ? v[`${e}`] : 0;
+
+        if (v[`${e}`]) {
+          update[`${rowId}_target_value`] = v[`${e}`];
+        }
       });
       setAttrs(update);
     });
@@ -72,6 +75,39 @@ const versionTwoFiveThree = () => {
 
   renameSectionAttr("repeating_equipment", "equipment");
   renameSectionAttr("repeating_arms", "equipment");
+};
+
+const versionThreeTwoOne = () => {
+  const section = "repeating_passions";
+  getSectionIDs(section, (ids) => {
+    const map = ids.map((id) =>
+      ["name", "target_value"].map((e) => `${section}_${id}_${e}`)
+    );
+
+    map.forEach((e) => {
+      getAttrs(e, (v) => {
+        const name = v[`${e[0]}`];
+        const targetValue = v[`${e[1]}`];
+        if (targetValue === 0) {
+          getSectionIDs("repeating_passion", (oldIds) => {
+            const oldMap = oldIds.map((id) =>
+              ["name", "passion"].map((e) => `repeating_passion_${id}_${e}`)
+            );
+
+            oldMap.forEach((oldE) => {
+              getAttrs(oldE, (oldV) => {
+                if (oldV[`${oldE[0]}`] === name) {
+                  setAttrs({
+                    [`${e[1]}`]: oldV[`${oldE[1]}`],
+                  });
+                }
+              });
+            });
+          });
+        }
+      });
+    });
+  });
 };
 
 const versionThreeZero = () => {
@@ -183,6 +219,11 @@ const versioning = async (version) => {
       updateMessage(3.2);
       versionThreeTwo();
       versioning(3.2);
+      break;
+    case version < 3.21:
+      updateMessage(3.21);
+      versionThreeTwoOne();
+      versioning(3.21);
       break;
     default:
       console.log(

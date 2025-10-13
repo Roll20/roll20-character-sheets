@@ -1,7 +1,7 @@
 
-const agent_info_to_get=['character_id','hit_points', 'willpower_points', 'sanity_points', 'strength_score', 'constitution_score'
+const agent_info_to_get=['character_name','character_id','hit_points', 'willpower_points', 'sanity_points', 'strength_score', 'constitution_score'
     , 'dexterity_score', 'intelligence_score', 'power_score', 'charisma_score', 'violence_adapted',
-    'helplessness_adapted'];
+    'helplessness_adapted','reached_breaking_point'];
 
 on(`change:repeating_agents:name`, (eventInfo)=> {
     const id = eventInfo.sourceAttribute.split(`_`)[2];
@@ -10,27 +10,40 @@ on(`change:repeating_agents:name`, (eventInfo)=> {
         const update = {};
         
         const character_identification = values[`${repsecid}_name`] !== undefined ? values[`${repsecid}_name`] : ``;
-        update_repeating_agents(repsecid,character_identification);
+        update_repeating_agents(update,repsecid,character_identification);
         
     });
 });
 
-
-const update_repeating_agents = (repsecid,character_identification) => {
+const not_numeric_pass= ['character_name','character_id'];
+const adaptation_fields = ['violence_adapted','helplessness_adapted'];
+const update_repeating_agents = (update,repsecid,character_identification) => {
     var string = `&{template:pass-values}`;
+    //var string = `!`;
+    const rxGrab = /^0\[(.*)\]\s*$/;
     agent_info_to_get.forEach((field)=>{
-        string += `{{${field}=[[@{${character_identification}|${field}}]]}} `;
+        if (not_numeric_pass.includes(field)){
+            string += `{{${field}=[[0[@{${character_identification}|${field}}] ]]}}`;
+        }else{
+            string += `{{${field}=[[@{${character_identification}|${field}}]]}} `;
+        }
     });
     string+=`{{breaking_point=[[@{${character_identification}|breaking_point}]]}}`;
     string+=`{{breaking_point_max=[[@{${character_identification}|breaking_point_max}]]}}`;
     if (string === ``) {return;}
     startRoll(string,(results)=>{
         agent_info_to_get.forEach((field)=>{
-            update[`${repsecid}_${field}`] = results.results[field].result
+            if (not_numeric_pass.includes(field)){
+                update[`${repsecid}_${field}`] = results.results[field].expression.match(rxGrab)[1];
+            }else if (field === `reached_breaking_point`){
+                update[`${repsecid}_${field}`] = results.results[field].result==1 ? `yes` : `no`;
+            }else if (adaptation_fields.includes(field)){
+                update[`${repsecid}_${field}`] = results.results[field].result==1 ? `adapted` : `not adapted`;
+            }else{
+                update[`${repsecid}_${field}`] = results.results[field].result
+            }
         });
-        const bp=parseInt(results.results.breaking_point.result)||0;
-        const bpmax=parseInt(results.results.breaking_point_max.result)||0;
-        update[`${repsecid}_has_breaking_points`]=bp<bpmax;
+        
         setAttrs(update,{silent:true},()=>{
             console.info('update',update);
             console.log(`Updated ${repsecid} with ${character_identification}`);
@@ -45,16 +58,33 @@ on(`sheet:opened clicked:update_agents`,()=>{
             getSectionIDs(`agents`,(ids)=>{
                 var repsecids=[];
                 ids.forEach((id)=>{
-                    repsecids.push(`repeating_agents_${id}_character_id`);
+                    repsecids.push(`repeating_agents_${id}`);
                 });
                 
-                getAttrs(repsecids,(values)=>{
-                    repsecids.forEach( repsecid =>{
-                        const character_identification = values[`${repsecid}_character_id`];
-                        if (character_identification !== ``) {update_repeating_agents(repsecid,character_identification);}
-                    });
-                });
+// map repsecids to make it into an array containing for each repsecid <repsecid>_character_id and <repsecid>_name
+
+
+
+                getAttrs(
+                    repsecids.flatMap(repsecid => [`${repsecid}_name`, `${repsecid}_character_id`]),
+                    (values) => {
+                        repsecids.forEach(repsecid => {
+                            const update = {};
+                            const character_identification = get_character_identification(values, repsecid);
+                            if (character_identification !== ``) {
+                                update_repeating_agents(update, repsecid, character_identification);
+                            }
+                        });
+                    }
+                );
             });
         };
     });
 });
+
+const get_character_identification= (values,repsecid) => {
+    // FUTURE: Cannot use character_id as a key for an attribute only for abilities in roll20
+    const char_id=``;// values[`${repsecid}_character_id`];
+    const char_name=values[`${repsecid}_name`];
+    return char_id !== `` ? char_id : char_name;
+}

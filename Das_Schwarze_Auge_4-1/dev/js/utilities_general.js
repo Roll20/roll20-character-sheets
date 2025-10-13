@@ -147,7 +147,7 @@ function safeGetAttrs( attrsToGet, callback ) {
 			var badDef = [];
 			var errors = [0, 0];
 
-			for (req of attrsToGet) {
+			for (let req of attrsToGet) {
 			// Check for missing attributes and try setting a default value
 				if (!Object.hasOwn(attrs, req)) {
 					errors[0] += 1;
@@ -185,7 +185,7 @@ function safeSetAttrs( attrsToSet, options = "", callback = function() {}) {
 	var badDef = [];
 	var errors = 0;
 
-	for (req in attrsToSet) {
+	for (let req in attrsToSet) {
 	// Check existing attributes for undefined or NaN
 		if (
 			typeof attrsToSet[req] === 'undefined' ||

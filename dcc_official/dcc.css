@@ -294,6 +294,9 @@
   --gap-size-small: 10px;
   --gap-size-xsmall: 5px;
   --button-size-normal: 23px;
+  --lm-error-red: red;
+  --dm-error-red: red;
+  --error-red: var(--lm-error-red);
   color: var(--fontColor);
   font-family: var(--contentHeadFont);
 }
@@ -319,6 +322,7 @@
   --tertiary-color: #222;
   --roll-color: red;
   --background-color: #1f1f1f;
+  --error-red: var(--dm-error-red);
   color: var(--fontColor);
 }
 .sheet-rolltemplate-dcc.sheet-rolltemplate-darkmode .border__outline, .sheet-rolltemplate-dcc.sheet-rolltemplate-darkmode .border__decoration {
@@ -1191,37 +1195,6 @@
   font-size: 12px;
   content: "add";
 }
-.sheet-rolltemplate-dcc .sheet-toggle {
-  position: fixed;
-  top: 17px;
-  right: 30px;
-  z-index: 9997;
-  display: flex;
-  background: var(--background-color);
-  gap: 10px;
-}
-.sheet-rolltemplate-dcc .sheet-toggle .layout--flex {
-  align-items: center;
-  gap: 5px;
-}
-.sheet-rolltemplate-dcc .sheet-toggle:has(input[name=attr_is_npc]:checked) ~ .pc {
-  display: none;
-}
-.sheet-rolltemplate-dcc .sheet-toggle:not(:has(input[name=attr_is_npc]:checked)) ~ .npc {
-  display: none;
-}
-.sheet-rolltemplate-dcc .sheet-toggle .section-container:not(:last-child) {
-  display: flex;
-  align-items: center;
-}
-.sheet-rolltemplate-dcc .sheet-toggle .section-container:not(:last-child):after {
-  content: "";
-  width: 1px;
-  display: block;
-  background: var(--primary-color);
-  height: 15px;
-  margin-left: 10px;
-}
 .sheet-rolltemplate-dcc .userscript-roll {
   position: relative;
 }
@@ -1292,13 +1265,25 @@
 .sheet-rolltemplate-dcc .userscript-roll .sheet-critical:empty ~ .userscript-roll__critical, .sheet-rolltemplate-dcc .userscript-roll .sheet-critical:has(span:empty) ~ .userscript-roll__critical {
   display: none;
 }
+.sheet-rolltemplate-dcc .userscript-roll .sheet-success {
+  display: none;
+}
+.sheet-rolltemplate-dcc .userscript-roll .sheet-success:empty ~ .userscript-roll__success, .sheet-rolltemplate-dcc .userscript-roll .sheet-success:has(span:empty) ~ .userscript-roll__success {
+  display: none;
+}
 .sheet-rolltemplate-dcc .userscript-roll .sheet-fumble {
   display: none;
 }
 .sheet-rolltemplate-dcc .userscript-roll .sheet-fumble:empty ~ .userscript-roll__fumble, .sheet-rolltemplate-dcc .userscript-roll .sheet-fumble:has(span:empty) ~ .userscript-roll__fumble {
   display: none;
 }
-.sheet-rolltemplate-dcc .userscript-roll__critical, .sheet-rolltemplate-dcc .userscript-roll__fumble {
+.sheet-rolltemplate-dcc .userscript-roll .sheet-failure {
+  display: none;
+}
+.sheet-rolltemplate-dcc .userscript-roll .sheet-failure:empty ~ .userscript-roll__failure, .sheet-rolltemplate-dcc .userscript-roll .sheet-failure:has(span:empty) ~ .userscript-roll__failure {
+  display: none;
+}
+.sheet-rolltemplate-dcc .userscript-roll__critical, .sheet-rolltemplate-dcc .userscript-roll__fumble, .sheet-rolltemplate-dcc .userscript-roll__success, .sheet-rolltemplate-dcc .userscript-roll__failure {
   text-transform: uppercase;
   display: inline-block;
   font-size: 10px;
@@ -1307,17 +1292,17 @@
   margin-top: 5px;
   color: black;
 }
-.sheet-rolltemplate-dcc .userscript-roll__critical {
+.sheet-rolltemplate-dcc .userscript-roll__critical, .sheet-rolltemplate-dcc .userscript-roll__success {
   background: var(--overwritten-color);
 }
-.sheet-rolltemplate-dcc .userscript-roll__critical .inlinerollresult {
+.sheet-rolltemplate-dcc .userscript-roll__critical .inlinerollresult, .sheet-rolltemplate-dcc .userscript-roll__success .inlinerollresult {
   background-color: transparent;
   padding: 0;
   border: 0;
   font-size: 1em;
   pointer-events: none;
 }
-.sheet-rolltemplate-dcc .userscript-roll__fumble {
+.sheet-rolltemplate-dcc .userscript-roll__fumble, .sheet-rolltemplate-dcc .userscript-roll__failure {
   background: var(--roll-color);
 }
 .sheet-rolltemplate-dcc .userscript-roll .inlinerollresult[original-title*="computed value"], .sheet-rolltemplate-dcc .userscript-roll .inlinerollresult[title*="computed value"] {
@@ -1538,10 +1523,19 @@ body {
   --gap-size-small: 10px;
   --gap-size-xsmall: 5px;
   --button-size-normal: 23px;
+  --lm-error-red: red;
+  --dm-error-red: red;
+  --error-red: var(--lm-error-red);
   color: var(--fontColor);
   font-family: var(--contentHeadFont);
   color: var(--fontColor);
   font-size: 1rem;
+}
+body:has(.tab-content:first-child) .sheet-toggle {
+  position: sticky;
+  top: 40px;
+  justify-content: center;
+  margin-bottom: var(--gap-size-small);
 }
 body .ui-dialog {
   scrollbar-gutter: stable;
@@ -2438,6 +2432,19 @@ body .ui-dialog .tab-content .charsheet .interaction-control:not(:checked) + .co
 body .ui-dialog .tab-content .charsheet .locked + fieldset + .repcontainer + .repcontrol {
   display: none !important;
 }
+body .ui-dialog .tab-content .charsheet .roller:before {
+  content: "";
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet select {
+  color: inherit;
+}
+body .ui-dialog .tab-content .charsheet select option {
+  background-color: var(--backColor);
+}
+body .ui-dialog .tab-content .charsheet .input-label {
+  color: inherit;
+}
 body .ui-dialog .tab-content .charsheet::after {
   position: absolute;
   content: "";
@@ -3171,6 +3178,13 @@ body .ui-dialog .tab-content .charsheet .popup-container .popup-contents {
     opacity: 0;
   }
 }
+body .ui-dialog .tab-content .charsheet .mancer-subfield .flex-box :first-child {
+  flex: 0 0 auto;
+}
+body .ui-dialog .tab-content .charsheet .mancer-subfield .flex-box :not(:first-child) {
+  flex: 1 1 auto;
+  width: 0;
+}
 body .ui-dialog .tab-content .charsheet .class-table {
   display: grid;
   grid-template-rows: [header-start] auto [header-end];
@@ -3227,6 +3241,9 @@ body .ui-dialog .tab-content .charsheet .class-table .repcontainer,
 body .ui-dialog .tab-content .charsheet .class-table .repitem {
   display: contents;
 }
+body .ui-dialog .tab-content .charsheet .weapon-button-container {
+  margin-bottom: var(--gap-size-small);
+}
 body .ui-dialog .tab-content .charsheet .mancer-startup {
   display: grid;
 }
@@ -3274,6 +3291,26 @@ body .ui-dialog .tab-content .charsheet .mancer-spells .repcontainer[data-groupn
 body .ui-dialog .tab-content .charsheet .mancer-spells .repcontainer[data-groupname=repeating_mancer-spells] .repitem:has(.header-display:checked):not(:first-child) {
   margin-top: var(--half-gap);
 }
+body .ui-dialog .tab-content .charsheet .rollable-table-list .repitem {
+  display: flex;
+  justify-content: space-between;
+}
+body .ui-dialog .tab-content .charsheet .rollable-table-list .repitem button {
+  margin-right: auto;
+}
+body .ui-dialog .tab-content .charsheet .rollable-table-list .repcontrol {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .die-display {
+  gap: 0;
+}
+body .ui-dialog .tab-content .charsheet .die-display input {
+  width: 4ch;
+  box-sizing: content-box !important;
+}
+body .ui-dialog .tab-content .charsheet .warning {
+  background-color: var(--error-red) !important;
+}
 body .ui-dialog .tab-content .charsheet .sheet-toggle {
   position: fixed;
   top: 17px;
@@ -3283,33 +3320,42 @@ body .ui-dialog .tab-content .charsheet .sheet-toggle {
   background: var(--background-color);
   gap: 10px;
 }
+@media (max-width: 800px) {
+  body .ui-dialog .tab-content .charsheet .sheet-toggle {
+    position: fixed;
+    top: 43px;
+    justify-content: end;
+    width: 100%;
+    margin-bottom: var(--gap-size-small);
+  }
+}
 body .ui-dialog .tab-content .charsheet .sheet-toggle .layout--flex {
   align-items: center;
   gap: 5px;
 }
-body .ui-dialog .tab-content .charsheet .sheet-toggle:has(input[name=attr_is_npc]:checked) ~ .pc {
+body .ui-dialog .tab-content .charsheet .sheet-toggle:has(input[name=attr_is_npc]:checked) ~ .compendium-drop-target > .pc {
   display: none;
 }
-body .ui-dialog .tab-content .charsheet .sheet-toggle:not(:has(input[name=attr_is_npc]:checked)) ~ .npc {
+body .ui-dialog .tab-content .charsheet .sheet-toggle:not(:has(input[name=attr_is_npc]:checked)) ~ .compendium-drop-target > .npc {
   display: none;
 }
-body .ui-dialog .tab-content .charsheet .sheet-toggle .section-container:not(:last-child) {
+body .ui-dialog .tab-content .charsheet .sheet-toggle .section-container:not(:first-child) {
   display: flex;
   align-items: center;
 }
-body .ui-dialog .tab-content .charsheet .sheet-toggle .section-container:not(:last-child):after {
+body .ui-dialog .tab-content .charsheet .sheet-toggle .section-container:not(:first-child):before {
   content: "";
   width: 1px;
   display: block;
   background: var(--primary-color);
   height: 15px;
-  margin-left: 10px;
+  margin-right: 10px;
 }
 body .ui-dialog .tab-content .charsheet .kmodal--mancer__inner {
   width: clamp(300px, 80dvw, 600px);
   border-radius: 0;
   max-height: 80dvh;
-  background-color: #121212;
+  background-color: var(--backColor);
 }
 body .ui-dialog .tab-content .charsheet .mancer-button-wrapper {
   display: grid;
@@ -3512,9 +3558,22 @@ body .ui-dialog .tab-content .charsheet .section-container--defense .labelled-ed
   z-index: 0;
   position: absolute;
 }
+body .ui-dialog .tab-content .charsheet .section-container--defense .labelled-edit--hit-points-max {
+  justify-self: center;
+}
 body .ui-dialog .tab-content .charsheet .section-container--defense .labelled-edit--hit-points-max input, body .ui-dialog .tab-content .charsheet .section-container--defense .labelled-edit--hit-points-max span {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
+}
+body .ui-dialog .tab-content .charsheet .section-container--defense .labelled-edit--hit-die {
+  justify-self: center;
+}
+body .ui-dialog .tab-content .charsheet .section-container--defense .labelled-edit--hit-die input, body .ui-dialog .tab-content .charsheet .section-container--defense .labelled-edit--hit-die span {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+body .ui-dialog .tab-content .charsheet .section-container--defense .labelled-edit--hit-die input {
+  width: 42px;
 }
 body .ui-dialog .tab-content .charsheet .section-container--combat .labelled-edit__container {
   flex-grow: 1;
@@ -3533,6 +3592,69 @@ body .ui-dialog .tab-content .charsheet .section-container--combat .labelled-edi
   position: absolute;
   top: 0;
   left: 0;
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value] + .labelled-edit .labelled-edit__display--bonus:after {
+  height: auto;
+  background-color: transparent;
+  position: relative;
+  white-space: pre;
+  font-weight: bold;
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result + .labelled-edit .labelled-edit__container:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: calc(100% - 1px);
+  pointer-events: none;
+  border-bottom: 1px solid var(--primary-color);
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="1"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+1)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="2"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+2)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="3"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+3)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="4"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+4)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="5"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+5)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="6"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+6)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="7"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+7)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="8"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+8)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="9"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+9)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="10"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+10)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="11"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+11)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="12"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+12)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="13"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+13)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="14"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+14)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="15"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+15)";
+}
+body .ui-dialog .tab-content .charsheet .section-container--combat .deed-die-result[value="16"] + .labelled-edit .labelled-edit__display--bonus:after {
+  content: " (+16)";
 }
 body .ui-dialog .tab-content .charsheet .section--score,
 body .ui-dialog .tab-content .charsheet .section-container--score,
@@ -3771,8 +3893,165 @@ body .ui-dialog .tab-content .charsheet .section.section--misc .labelled-edit--m
 }
 body .ui-dialog .tab-content .charsheet .section.section--misc .luck {
   position: relative;
-  z-index: 999;
   grid-area: lucky-roll;
+  /*
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="0"]),
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw:not([value]))  {
+    .luck-score {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="1"]) {
+    .luck-score:not(.luck-score--1) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="2"]) {
+    .luck-score:not(.luck-score--2) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="3"]) {
+    .luck-score:not(.luck-score--3) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="4"]) {
+    .luck-score:not(.luck-score--4) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="5"]) {
+    .luck-score:not(.luck-score--5) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="6"]) {
+    .luck-score:not(.luck-score--6) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="7"]) {
+    .luck-score:not(.luck-score--7) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="8"]) {
+    .luck-score:not(.luck-score--8) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="9"]) {
+    .luck-score:not(.luck-score--9) {
+      display: none;
+    }
+  } 
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="10"]) {
+    .luck-score:not(.luck-score--10) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="11"]) {
+    .luck-score:not(.luck-score--11) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="12"]) {
+    .luck-score:not(.luck-score--12) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="13"]) {
+    .luck-score:not(.luck-score--13) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="14"]) {
+    .luck-score:not(.luck-score--14) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="15"]) {
+    .luck-score:not(.luck-score--15) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="16"]) {
+    .luck-score:not(.luck-score--16) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="17"]) {
+    .luck-score:not(.luck-score--17) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="18"]) {
+    .luck-score:not(.luck-score--18) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="19"]) {
+    .luck-score:not(.luck-score--19) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="20"]) {
+    .luck-score:not(.luck-score--20) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="21"]) {
+    .luck-score:not(.luck-score--21) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="22"]) {
+    .luck-score:not(.luck-score--22) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="23"]) {
+    .luck-score:not(.luck-score--23) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="24"]) {
+    .luck-score:not(.luck-score--24) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="25"]) {
+    .luck-score:not(.luck-score--25) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="26"]) {
+    .luck-score:not(.luck-score--26) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="27"]) {
+    .luck-score:not(.luck-score--27) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="28"]) {
+    .luck-score:not(.luck-score--28) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="29"]) {
+    .luck-score:not(.luck-score--29) {
+      display: none;
+    }
+  }
+  &:has(.labelled-edit--luck-max .labelled-edit__display--raw[value="30"]) {
+    .luck-score:not(.luck-score--30) {
+      display: none;
+    }
+  }
+  */
 }
 body .ui-dialog .tab-content .charsheet .section.section--misc .luck > .layout {
   display: grid;
@@ -3797,12 +4076,12 @@ body .ui-dialog .tab-content .charsheet .section.section--misc .luck__title {
   text-transform: capitalize;
   cursor: help;
 }
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck .labelled-edit--lucky-roll-max {
+body .ui-dialog .tab-content .charsheet .section.section--misc .luck .labelled-edit--luck-max {
   border-right-width: 1px;
-  border-top-width: 0;
+  border-top-width: 1px;
 }
 body .ui-dialog .tab-content .charsheet .section.section--misc .luck .labelled-edit--lucky-roll {
-  border-top-width: 0;
+  border-top-width: 1px;
 }
 body .ui-dialog .tab-content .charsheet .section.section--misc .luck .labelled-edit--luck {
   border-left-width: 1px;
@@ -3825,100 +4104,7 @@ body .ui-dialog .tab-content .charsheet .section.section--misc .luck .luck-score
   user-select: none;
   font-weight: bold;
 }
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:hover:not(:has(.labelled-edit--lucky-roll-max:hover)) .luck-score, body .ui-dialog .tab-content .charsheet .section.section--misc .luck:not(:hover) .luck-score {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="0"]) .luck-score, body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw:not([value])) .luck-score {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="1"]) .luck-score:not(.luck-score--1) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="2"]) .luck-score:not(.luck-score--2) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="3"]) .luck-score:not(.luck-score--3) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="4"]) .luck-score:not(.luck-score--4) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="5"]) .luck-score:not(.luck-score--5) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="6"]) .luck-score:not(.luck-score--6) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="7"]) .luck-score:not(.luck-score--7) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="8"]) .luck-score:not(.luck-score--8) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="9"]) .luck-score:not(.luck-score--9) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="10"]) .luck-score:not(.luck-score--10) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="11"]) .luck-score:not(.luck-score--11) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="12"]) .luck-score:not(.luck-score--12) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="13"]) .luck-score:not(.luck-score--13) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="14"]) .luck-score:not(.luck-score--14) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="15"]) .luck-score:not(.luck-score--15) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="16"]) .luck-score:not(.luck-score--16) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="17"]) .luck-score:not(.luck-score--17) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="18"]) .luck-score:not(.luck-score--18) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="19"]) .luck-score:not(.luck-score--19) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="20"]) .luck-score:not(.luck-score--20) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="21"]) .luck-score:not(.luck-score--21) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="22"]) .luck-score:not(.luck-score--22) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="23"]) .luck-score:not(.luck-score--23) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="24"]) .luck-score:not(.luck-score--24) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="25"]) .luck-score:not(.luck-score--25) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="26"]) .luck-score:not(.luck-score--26) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="27"]) .luck-score:not(.luck-score--27) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="28"]) .luck-score:not(.luck-score--28) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="29"]) .luck-score:not(.luck-score--29) {
-  display: none;
-}
-body .ui-dialog .tab-content .charsheet .section.section--misc .luck:has(.labelled-edit--lucky-roll-max .labelled-edit__display--raw[value="30"]) .luck-score:not(.luck-score--30) {
+body .ui-dialog .tab-content .charsheet .section.section--misc .luck:hover:not(:has(.labelled-edit--luck-max:hover)) .luck-score, body .ui-dialog .tab-content .charsheet .section.section--misc .luck:not(:hover) .luck-score {
   display: none;
 }
 body .ui-dialog .tab-content .charsheet .section.section--misc .labelled-edit--melee-attack {
@@ -3988,9 +4174,41 @@ body .ui-dialog .tab-content .charsheet .section-container--weapon .expanded .la
   font-size: var(--font-size-normal);
   font-weight: bold;
 }
-body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--weapon-type .labelled-edit__display,
-body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--two-handed .labelled-edit__display {
+body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--type .labelled-edit__display,
+body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--type .labelled-edit__value,
+body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--two-handed .labelled-edit__display,
+body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--two-handed .labelled-edit__value {
   text-transform: capitalize;
+}
+body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--type:has(.labelled-edit__display--raw[value=melee]) ~ .labelled-edit--range,
+body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--type:has(.labelled-edit__display--raw[value=""]) ~ .labelled-edit--range,
+body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--type:has(.labelled-edit__display--raw:not([value])) ~ .labelled-edit--range {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--type:has(.labelled-edit__display--raw:not([value=missile])) ~ .labelled-edit--ammunition {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--ammunition .labelled-edit__container {
+  max-width: 30px;
+}
+body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--notes {
+  margin-top: var(--gap-size-xsmall);
+  flex-direction: column;
+  align-items: flex-start;
+}
+body .ui-dialog .tab-content .charsheet .section-container--weapon .labelled-edit--notes .labelled-edit__container {
+  border: 1px solid var(--primary-color);
+  width: 100%;
+}
+body .ui-dialog .tab-content .charsheet .section-container--weapon .view .labelled-edit--notes .labelled-edit__container {
+  border: 0;
+}
+body .ui-dialog .tab-content .charsheet .section-container--weapon .view .labelled-edit--notes .labelled-edit__container * {
+  padding-left: 0;
+  padding-right: 0;
+}
+body .ui-dialog .tab-content .charsheet .section-container--weapon .view .labelled-edit--notes:has(.labelled-edit__display--raw:not([value])) {
+  display: none;
 }
 body .ui-dialog .tab-content .charsheet .headed-section--treasure {
   min-height: 100%;
@@ -4388,6 +4606,10 @@ body .ui-dialog .tab-content .charsheet .section-container--spells .headed-repea
 }
 body .ui-dialog .tab-content .charsheet .section-container--spells .collapsed .repcontainer {
   gap: 30px 10px;
+}
+body .ui-dialog .tab-content .charsheet .section-container--spells button[name=act_roll-pc-total-check] {
+  align-self: baseline;
+  line-height: normal;
 }
 body .ui-dialog .tab-content .charsheet .headed-section--notes {
   min-height: 100%;
@@ -4790,6 +5012,9 @@ body .ui-dialog .tab-content .charsheet .npc ::placeholder {
 body .ui-dialog .tab-content .charsheet .npc .npc__title {
   font-weight: bold;
 }
+body .ui-dialog .tab-content .charsheet .npc__hd .npc__title, body .ui-dialog .tab-content .charsheet .npc__ac .npc__title {
+  text-transform: uppercase;
+}
 body .ui-dialog .tab-content .charsheet .npc__name {
   margin-bottom: 1.5rem;
 }
@@ -4860,6 +5085,10 @@ body .ui-dialog .tab-content .charsheet .npc .npc__view .npc__fields .repitem sp
   font-size: 1rem;
   content: ")";
 }
+body .ui-dialog .tab-content .charsheet .npc .npc__view .npc__fields .repitem span:not(:last-child).npc__attribute--hp:after {
+  font-size: 1rem;
+  content: "hp)";
+}
 body .ui-dialog .tab-content .charsheet .npc .npc__view .npc__fields .repitem span:not(:last-child).npc__attribute--measured:after {
   font-size: 1rem;
   content: "’";
@@ -4905,6 +5134,14 @@ body .ui-dialog .tab-content .charsheet .npc .npc__view .npc__attribute--parenth
 body .ui-dialog .tab-content .charsheet .npc .npc__view .npc__attribute--parentheses:not(:empty):after {
   font-size: 1rem;
   content: ")";
+}
+body .ui-dialog .tab-content .charsheet .npc .npc__view .npc__attribute--hp:not(:empty):before {
+  font-size: 1rem;
+  content: "(";
+}
+body .ui-dialog .tab-content .charsheet .npc .npc__view .npc__attribute--hp:not(:empty):after {
+  font-size: 1rem;
+  content: "hp)";
 }
 body .ui-dialog .tab-content .charsheet .npc .npc__view .npc__attribute--separator:not(:empty) {
   cursor: default;
@@ -5186,7 +5423,7 @@ body .ui-dialog .tab-content .charsheet .icon-roller:before {
   content: "t" !important;
 }
 body .ui-dialog .tab-content .charsheet .colon:after {
-  content: ":";
+  content: ": ";
 }
 body .ui-dialog .tab-content .charsheet .bold {
   font-weight: bold;
@@ -5222,6 +5459,7 @@ body.sheet-darkmode {
   --tertiary-color: #222;
   --roll-color: red;
   --background-color: #1f1f1f;
+  --error-red: var(--dm-error-red);
   color: var(--fontColor);
 }
 body.sheet-darkmode .border__outline, body.sheet-darkmode .border__decoration {

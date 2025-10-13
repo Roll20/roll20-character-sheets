@@ -503,7 +503,7 @@
         return '-';
     }
     
-    function GetAttributeBonus(attribute, strRank, dexRank, bdyRank, prcRank, intRank, wilRank, chrRank) {
+    function GetAttributeBonus(attribute, strRank, dexRank, bdyRank, prcRank, intRank, wilRank, chrRank, aluRank) {
         switch (attribute) {
             case "str":
                 return strRank;
@@ -519,6 +519,9 @@
                 return wilRank;
             case "chr":
                 return chrRank;
+            case "alu":
+                debugger
+                return aluRank;
             default:
                 console.log('Invalid character attribute: ' + attribute);
                 return 0;
@@ -535,6 +538,7 @@
             case "int":
             case "wil":
             case "chr":
+            case "alu":
                 return menMod;
             default:
                 console.log('Invalid character attribute: ' + attribute);
@@ -804,10 +808,52 @@
         getAttrs(["BtyBase", "BtyBonus", "BtyRace"], function(values)
         {
             var total = Number(values.BtyBase) + Number(values.BtyBonus) + Number(values.BtyRace);
-            setAttrs({BtyTotal: Number(total)});
+            var rank = GetRank(total);
+
+            setAttrs({
+                BtyTotal: Number(total),
+                AluRank: Number(GetRank(total)),
+                AluDice: String(GetDice(rank))
+            });
+
+            UpdateSocialModifier();
+
+            updateAllSkills();
         });
     }
-        
+
+    function UpdateSocialModifier()
+    {
+        getAttrs(["AluTotal"], function(values)
+        {
+            var socialMod = GetSocialModifier(values.aluTotal);
+            setAttrs({SocialMod: Number(socialMod)});
+        });
+    }   
+
+    function GetSocialModifier(allure)
+    {
+        if(allure == 0) {
+            return "-3";
+        }
+        if(allure < 4) {
+            return "-2";
+        }
+        if(allure < 7) {
+            return "-1";
+        }
+        if(allure < 16) {
+            return "0";
+        }
+        if(allure < 19) {
+            return "+1";
+        }
+        if(allure < 22) {
+            return "+2";
+        }
+        return "+3";
+    }
+
     function UpdateLevel()
     {
         getAttrs(["MaxSaga"], function(values)
@@ -892,6 +938,7 @@
             'IntRank',
             'WilRank',
             'ChrRank',
+            'AluRank',
             'PhysMod',
             'MenMod',
             skillNameName,
@@ -913,7 +960,8 @@
                 values.PrcRank,
                 values.IntRank,
                 values.WilRank,
-                values.ChrRank
+                values.ChrRank,
+                values.AluRank
             );
     
             var conditionMod = GetConditionModifier(skillAttribute, values.PhysMod, values.MenMod);
@@ -2134,7 +2182,7 @@
             'IntRank',
             'WilRank',
             'ChrRank',
-            'AllureRank',
+            'AluRank',
             'PhysMod',
             'MenMod',
             skillNameName,
@@ -2171,7 +2219,7 @@
                 values.IntRank,
                 values.WilRank,
                 values.ChrRank,
-                values.AllureRank
+                values.AluRank
             );
     
             var conditionMod = GetConditionModifier(skillAttribute, values.PhysMod, values.MenMod);
@@ -3087,7 +3135,7 @@
                             </tr>
                             <tr>
                                 <th>
-                                    <h3>Beauty</h3>
+                                    <h3>Allure</h3>
                                 </th>
                                 <td class="sheet-cell-numeric">
                                     <input type="hidden" name="attr_BtyRace" value="0" />
@@ -3099,7 +3147,24 @@
                                 <td class="sheet-cell-numeric-readonly">
                                     <input type="number" name="attr_BtyTotal" value="0" class="sheet-totalfield" readonly />
                                 </td>
-                                <td class="sheet-beauty-table-spacer-cell"></td>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input type="number" name="attr_AluRank" value="0" readonly />
+                                </td>
+                                <td>
+                                    <input type="text" name="attr_AluDice" value="d1" readonly class="sheet-dice-field" />
+                                </td>
+                                <td class="sheet-button-cell">
+                                    <button type="roll"
+                                        value="&{template:roll} {{character=@{character_name}}} {{name=Allure Check}} {{roll=[[@{AluDice}@{MenMod}+?{Modifier|0}]]}}"></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Social Modifier:</th>
+                                <td colspan="2"></td>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input type="number" name="attr_SocialMod" value="0" readonly />
+                                </td>
+                                <td colspan="3"></td>
                             </tr>
                         </table>
                     </div>
@@ -3155,6 +3220,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3165,6 +3237,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3175,6 +3254,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3185,6 +3271,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3195,6 +3288,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3205,6 +3305,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3215,6 +3322,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3225,6 +3339,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3235,6 +3356,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3245,6 +3373,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3255,6 +3390,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3265,6 +3407,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3275,6 +3424,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3337,6 +3493,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3347,6 +3510,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3357,6 +3527,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3367,6 +3544,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3401,6 +3585,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3411,6 +3602,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3421,6 +3619,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3431,6 +3636,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3441,6 +3653,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3459,6 +3678,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3469,6 +3695,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3479,6 +3712,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3489,6 +3729,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                     </table>
@@ -3509,6 +3756,16 @@
                                             <th class="sheet-small-table-header">Rating</th>
                                         </tr>
                                         <tr>
+                                            <td class="sheet-skillname">Sorcery</td>
+                                            <td class="sheet-cell-numeric-readonly">1</td>
+                                            <td>
+                                                <select name="attr_Sorcery">
+                                                    <option value="0">---</option>
+                                                    <option value="1">Owned</option>
+                                                </select>
+                                            </td>
+                                        </tr>                                        
+                                        <tr>
                                             <td class="sheet-skillname">Black Magic</td>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td><select name="attr_BlackMagic">
@@ -3516,6 +3773,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3526,6 +3790,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3536,6 +3807,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3546,6 +3824,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3556,6 +3841,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3566,6 +3858,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3576,6 +3875,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3586,6 +3892,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                     </table>
@@ -3637,6 +3950,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3647,6 +3967,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3657,6 +3984,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3667,6 +4001,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -3677,6 +4018,13 @@
                                                     <option value="1">+1</option>
                                                     <option value="2">+2</option>
                                                     <option value="3">+3</option>
+                                                    <option value="4">+4</option>
+                                                    <option value="5">+5</option>
+                                                    <option value="6">+6</option>
+                                                    <option value="7">+7</option>
+                                                    <option value="8">+8</option>
+                                                    <option value="9">+9</option>
+                                                    <option value="10">+10</option>
                                                 </select></td>
                                         </tr>
                                         <tr>
@@ -8299,7 +8647,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-skillname">Glory</td>
+                                        <td class="sheet-skillname">Fame</td>
                                         <td class="sheet-cell-numeric-readonly">
                                             <input type="number" name="attr_Glory" value="0" readonly />%
                                         </td>

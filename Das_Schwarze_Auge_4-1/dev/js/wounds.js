@@ -33,7 +33,7 @@ function calculateWoundModifiers(values) {
 	// Input Sanitation
 	// Part 2: Check Values
 	var errors = 0;
-	for (property of requiredProperties) {
+	for (let property of requiredProperties) {
 		if (!DSAsane(values[property], "wound-box")) {
 			errors += 1;
 		}
@@ -65,16 +65,16 @@ function calculateWoundModifiers(values) {
 	var affectedParameters = ["AT", "PA", "FK", "IB", "MU", "IN", "KL", "FF", "GE", "KO", "KK", "GS"];
 	var wounds = {};
 
-	for (zone of zones) {
+	for (let zone of zones) {
 		wounds[zone] = 0;
-		for (woundCount of [1, 2, 3]) {
+		for (let woundCount of [1, 2, 3]) {
 			wounds[zone] += parseInt(values["wound_" + zone + woundCount]);
 		}
 	}
 
 	// Calculate final wound modifiers
-	for (param of affectedParameters) {
-		for (zone of zones) {
+	for (let param of affectedParameters) {
+		for (let zone of zones) {
 			woundModifiers[param] += wounds[zone] * woundEffects[param][zone];
 		}
 	}

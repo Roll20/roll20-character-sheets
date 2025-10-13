@@ -2,7 +2,6 @@
 <input class="toggle-sheet" type="hidden" name="attr_sheet_type" value="character" />
 <input class="faction" type="hidden" name="attr_faction"  />
 <input class="patron-faction" type="hidden" name="attr_patron_faction"  />
-<input type="hidden" name="attr_sheet_updated" />
 
 <div class="tabs">
     <div class="tab-page1"><button type="action"
@@ -39,7 +38,7 @@
             <option value="3">Advantage (+20)</option>
             <option value="2">Advantage (+10)</option>
             <option value="1">Advantage</option>
-            <option value="0" selected>Default</option>
+            <option value="0" selected>No Advantage</option>
             <option value="-1">Disadvantage</option>
             <option value="-2">Disadvantage (-10)</option>
             <option value="-3">Disadvantage (-20)</option>
@@ -493,12 +492,10 @@
                         <option value="logic">Logic</option>
                         <option value="lore">Lore</option>
                         <option value="medicae">Medicae</option>
-                        <option value="melee">Melee</option>
                         <option value="navigation">Navigation</option>
                         <option value="piloting">Piloting</option>
                         <option value="presence">Presence</option>
                         <option value="psychic_mastery">Psychic Mastery</option>
-                        <option value="ranged">Ranged</option>
                         <option value="rapport">Rapport</option>
                         <option value="reflexes">reflexes</option>
                         <option value="stealth">Stealth</option>
@@ -510,10 +507,37 @@
                         <span name="attr_specialisation_total" />
                     </button>
                 </fieldset>
-            </div>
 
-        </div>
-    </div>
+                <div class="grid col4-skills">
+                  <span class="label">Specialisation</span>
+                  <span class="label">Skill</span>
+                  <span class="label pullup">ADV <sub>(+5 each)</sub></span>
+                  <span class="label">Total</span>
+                </div>
+
+                <fieldset class="repeating_specialisations2" name="repeating_specialisations2">
+                  <select class="input" name="attr_specialisation2_name">
+                    <option value="Brawling">Brawling</option>
+                    <option value="One-handed">One-Handed</option>
+                    <option value="Two-handed">Two-Handed</option>
+                    <option value="Long Gun">Long Gun</option>
+                    <option value="Ordnance">Ordnance</option>
+                    <option value="Pistol">Pistols</option>
+                    <option value="Thrown">Thrown</option>
+                  </select>
+                  <select class="input" name="attr_specialisation2_skill">
+                    <option value="melee">Melee</option>
+                    <option value="ranged">Ranged</option>
+                  </select>
+                  <input type="number" name="attr_specialisation2_advances" />
+                  <input type="hidden" name="attr_specialisation2_total" value="0" />
+                  <button class="input" type="action" name="act_action" value="">
+                  <span name="attr_specialisation2_total" />
+                  </button>
+                </fieldset>
+            </div>
+          </div>
+      </div>
 
     <div class="grid col3 widegap">
         <div class="grid widegap">
@@ -689,7 +713,7 @@
             <span class="label">Traits</span>
         </div>
 
-        <fieldset class="repeating_weapons">
+        <fieldset class="repeating_weapons" name="repeating_weapons">
             <input class="weaponspec" type="hidden" name="attr_weapon_specialisation" />
             <input type="text" spellcheck="false" name="attr_weapon_name" />
             <select class="input" name="attr_weapon_specialisation">
@@ -1357,7 +1381,7 @@
             "char": "fel"
         },
         "reflexes": {
-            "name": "reflexes",
+            "name": "Reflexes",
             "char": "ag"
         },
         "stealth": {
@@ -1481,52 +1505,84 @@
                             let id = idarray3[i];
                             fields.push(`repeating_powers_${id}_power_specialisation`);
                         }
-                        getAttrs(skill_list.concat(fields), function(values) {
-                            let update = {};
-                            for (var i=0; i < idarray2.length; i++) {
+                        getSectionIDs("repeating_specialisations2", function(idarray4) {
+                          for (var i=0; i < idarray4.length; i++) {
+                              let id = idarray4[i];
+                              fields.push(`repeating_specialisations2_${id}_specialisation2_name`);
+                              fields.push(`repeating_specialisations2_${id}_specialisation2_skill`);
+                              fields.push(`repeating_specialisations2_${id}_specialisation2_advances`);
+                              fields.push(`repeating_specialisations2_${id}_specialisation2_total`);
+                          }
+                          getAttrs(skill_list.concat(fields), function(values) {
+                              let update = {};
+                              for (var i=0; i < idarray3.length; i++) {
+                                  let id3 = idarray3[i];
+                                  let spec = values[`repeating_powers_${id3}_power_specialisation`];
+                                  let psychic = parseInt(values["psychic_mastery"])||0;
+                                  update[`repeating_powers_${id3}_power_total`] = psychic;
+                              }
+                              for (var i=0; i < idarray.length; i++) {
+                                  let id = idarray[i];
+                                  let skill = values[`repeating_specialisations_${id}_specialisation_skill`];
+                                  let advances = parseInt(values[`repeating_specialisations_${id}_specialisation_advances`])||0;
+                                  let total = (parseInt(values[`${skill}`])||0) + advances * 5;
+                                  update[`repeating_specialisations_${id}_specialisation_total`] = total;
+
+                                  if (["melee","ranged"].includes(skill)) {
+                                      for (var i=0; i < idarray2.length; i++) {
+                                          let id2 = idarray2[i];
+                                          let spec = values[`repeating_weapons_${id2}_weapon_specialisation`];
+                                          if (spec == skill) {
+                                              update[`repeating_weapons_${id2}_weapon_total`] = total;
+                                          }
+                                      }
+                                  } else if (skill == "psychic_mastery") {
+                                      for (var i=0; i < idarray3.length; i++) {
+                                          let id3 = idarray3[i];
+                                          let spec = values[`repeating_powers_${id3}_power_specialisation`];
+                                          spec = spec.replace("Minor (", "").replace(")", "");
+                                          if (spec == skill) {
+                                              update[`repeating_powers_${id3}_power_total`] = total;
+                                          }
+                                      }
+                                  }
+                              }
+                              for (var i=0; i < idarray4.length; i++) {
+                                let id = idarray4[i];
+                                let name = values[`repeating_specialisations2_${id}_specialisation2_name`];
+                                let skill = values[`repeating_specialisations2_${id}_specialisation2_skill`];
+                                let advances = parseInt(values[`repeating_specialisations2_${id}_specialisation2_advances`])||0;
+                                let total = (parseInt(values[`${skill}`])||0) + advances * 5;
+                                update[`repeating_specialisations2_${id}_specialisation2_total`] = total;
+                              }
+
+                              for (var i=0; i < idarray2.length; i++) {
                                 let id2 = idarray2[i];
                                 let spec = values[`repeating_weapons_${id2}_weapon_specialisation`];
                                 let melee = parseInt(values["melee"])||0;
                                 let ranged = parseInt(values["ranged"])||0;
+                                for (var j=0; j < idarray4.length; j++) {
+                                  let id4 = idarray4[j];
+                                  let spec_name4 = values[`repeating_specialisations2_${id4}_specialisation2_name`];
+
+                                  if (spec_name4 == spec) {
+                                    let skill4 = values[`repeating_specialisations2_${id4}_specialisation2_skill`];
+                                    let advances4 = parseInt(values[`repeating_specialisations2_${id4}_specialisation2_advances`])||0;
+                                    let total = (parseInt(values[`${skill4}`])||0) + advances4 * 5;
+
+                                    melee = total;
+                                    ranged = total;
+                                  }
+                                }
+
                                 if (melee_list.includes(spec)) {
                                     update[`repeating_weapons_${id2}_weapon_total`] = melee;
                                 } else if (ranged_list.includes(spec)) {
                                     update[`repeating_weapons_${id2}_weapon_total`] = ranged;
                                 }
-                            }
-                            for (var i=0; i < idarray3.length; i++) {
-                                let id3 = idarray3[i];
-                                let spec = values[`repeating_powers_${id3}_power_specialisation`];
-                                let psychic = parseInt(values["psychic_mastery"])||0;
-                                update[`repeating_powers_${id3}_power_total`] = psychic;
-                            }
-                            for (var i=0; i < idarray.length; i++) {
-                                let id = idarray[i];
-                                let skill = values[`repeating_specialisations_${id}_specialisation_skill`];
-                                let advances = parseInt(values[`repeating_specialisations_${id}_specialisation_advances`])||0;
-                                let total = (parseInt(values[`${skill}`])||0) + advances * 5;
-                                update[`repeating_specialisations_${id}_specialisation_total`] = total;
-
-                                if (["melee","ranged"].includes(skill)) {
-                                    for (var i=0; i < idarray2.length; i++) {
-                                        let id2 = idarray2[i];
-                                        let spec = values[`repeating_weapons_${id2}_weapon_specialisation`];
-                                        if (spec == skill) {
-                                            update[`repeating_weapons_${id2}_weapon_total`] = total;
-                                        }
-                                    }
-                                } else if (skill == "psychic_mastery") {
-                                    for (var i=0; i < idarray3.length; i++) {
-                                        let id3 = idarray3[i];
-                                        let spec = values[`repeating_powers_${id3}_power_specialisation`];
-                                        spec = spec.replace("Minor (", "").replace(")", "");
-                                        if (spec == skill) {
-                                            update[`repeating_powers_${id3}_power_total`] = total;
-                                        }
-                                    }
-                                }
-                            }
-                            setAttrs(update);
+                              }
+                              setAttrs(update);
+                          });
                         });
                     });
                 });
@@ -1535,46 +1591,83 @@
     });
 
     on("change:repeating_specialisations", function(eventInfo) {
-        getSectionIDs("repeating_weapons", function(idarray) {
-            let fields = [];
-            for (var i=0; i < idarray.length; i++) {
-                let id = idarray[i];
-                fields.push(`repeating_weapons_${id}_weapon_specialisation`);
-            }
             getSectionIDs("repeating_powers", function(idarray2) {
+                let fields = [];
                 for (var i=0; i < idarray2.length; i++) {
                     let id = idarray2[i];
                     fields.push(`repeating_powers_${id}_power_specialisation`);
                 }
-                getAttrs(skill_list.concat(fields)
-                    .concat([
-                        "repeating_specialisations_specialisation_name",
-                        "repeating_specialisations_specialisation_skill",
-                        "repeating_specialisations_specialisation_advances"
-                    ]), function(values) {
-                        let update = {};
-                        let name = values["repeating_specialisations_specialisation_name"];
-                        let skill = values["repeating_specialisations_specialisation_skill"];
-                        let advances = parseInt(values["repeating_specialisations_specialisation_advances"])||0;
-                        let total = (parseInt(values[`${skill}`])||0) + advances * 5;
-                        update[`repeating_specialisations_specialisation_total`] = total;
+                getSectionIDs("repeating_specialisations", function(idarray4) {
+                  for (var i=0; i < idarray4.length; i++) {
+                      let id = idarray4[i];
+                      fields.push(`repeating_specialisations_${id}_specialisation_name`);
+                      fields.push(`repeating_specialisations_${id}_specialisation_skill`);
+                      fields.push(`repeating_specialisations_${id}_specialisation_advances`);
+                      fields.push(`repeating_specialisations_${id}_specialisation_total`);
+                  }
+                  getAttrs(skill_list.concat(fields)
+                      .concat([
+                          "repeating_specialisations_specialisation_name",
+                          "repeating_specialisations_specialisation_skill",
+                          "repeating_specialisations_specialisation_advances"
+                      ]), function(values) {
+                          let update = {};
+                          let name = values["repeating_specialisations_specialisation_name"];
+                          let skill = values["repeating_specialisations_specialisation_skill"];
+                          let advances = parseInt(values["repeating_specialisations_specialisation_advances"])||0;
+                          let total = (parseInt(values[`${skill}`])||0) + advances * 5;
+                          update[`repeating_specialisations_specialisation_total`] = total;
 
-                        for (var i=0; i < idarray.length; i++) {
-                            let id = idarray[i];
-                            let spec = values[`repeating_weapons_${id}_weapon_specialisation`];
-                            if (spec == name) {
-                                update[`repeating_weapons_${id}_weapon_total`] = total;
-                            }
+                          for (var i=0; i < idarray2.length; i++) {
+                              let id = idarray2[i];
+                              let spec = values[`repeating_powers_${id}_power_specialisation`];
+                              spec = spec.replace("Minor (", "").replace(")", "");
+                              if (spec == name) {
+                                  update[`repeating_powers_${id}_power_total`] = total;
+                              }
+                          }
+                          setAttrs(update);
+                  });
+              });
+            });
+        });
+
+    on("change:repeating_specialisations2", function(eventInfo) {
+      getSectionIDs("repeating_weapons", function(idarray) {
+          let fields = [];
+          for (var i=0; i < idarray.length; i++) {
+              let id = idarray[i];
+              fields.push(`repeating_weapons_${id}_weapon_specialisation`);
+          }
+          getSectionIDs("repeating_specialisations2", function(idarray4) {
+            for (var i=0; i < idarray4.length; i++) {
+                let id = idarray4[i];
+                fields.push(`repeating_specialisations2_${id}_specialisation2_name`);
+                fields.push(`repeating_specialisations2_${id}_specialisation2_skill`);
+                fields.push(`repeating_specialisations2_${id}_specialisation2_advances`);
+                fields.push(`repeating_specialisations2_${id}_specialisation2_total`);
+            }
+            getAttrs(skill_list.concat(fields)
+                .concat([
+                    "repeating_specialisations2_specialisation2_name",
+                    "repeating_specialisations2_specialisation2_skill",
+                    "repeating_specialisations2_specialisation2_advances"
+                ]), function(values) {
+                    let update = {};
+                    let name = values["repeating_specialisations2_specialisation2_name"];
+                    let skill = values["repeating_specialisations2_specialisation2_skill"];
+                    let advances = parseInt(values["repeating_specialisations2_specialisation2_advances"])||0;
+                    let total = (parseInt(values[`${skill}`])||0) + advances * 5;
+                    update[`repeating_specialisations2_specialisation2_total`] = total;
+
+                    for (var i=0; i < idarray.length; i++) {
+                        let id = idarray[i];
+                        let spec = values[`repeating_weapons_${id}_weapon_specialisation`];
+                        if (spec == name) {
+                            update[`repeating_weapons_${id}_weapon_total`] = total;
                         }
-                        for (var i=0; i < idarray2.length; i++) {
-                            let id = idarray2[i];
-                            let spec = values[`repeating_powers_${id}_power_specialisation`];
-                            spec = spec.replace("Minor (", "").replace(")", "");
-                            if (spec == name) {
-                                update[`repeating_powers_${id}_power_total`] = total;
-                            }
-                        }
-                        setAttrs(update);
+                    }
+                    setAttrs(update);
                 });
             });
         });
@@ -1602,6 +1695,14 @@
                     fields.push(`repeating_specialisations_${id}_specialisation_name`);
                     fields.push(`repeating_specialisations_${id}_specialisation_total`);
                 }
+              getSectionIDs("repeating_specialisations2", function(idarray5) {
+                  for (var i=0; i < idarray5.length; i++) {
+                      let id = idarray5[i];
+                      fields.push(`repeating_specialisations2_${id}_specialisation2_name`);
+                      fields.push(`repeating_specialisations2_${id}_specialisation2_skill`);
+                      fields.push(`repeating_specialisations2_${id}_specialisation2_advances`);
+                      fields.push(`repeating_specialisations2_${id}_specialisation2_total`);
+                  }
                 getAttrs(skill_list.concat(fields)
                     .concat(["str_bonus"]).concat(trigger_fields), function(values) {
                     let update = {};
@@ -1626,6 +1727,18 @@
                         test = test == 0 && melee_list.includes(spec) ? melee :
                             test == 0 && ranged_list.includes(spec) ? ranged :
                             test;
+
+                          for (var i=0; i < idarray5.length; i++) {
+                              let id = idarray5[i];
+                              let name = values[`repeating_specialisations2_${id}_specialisation2_name`];
+                              let advances = values[`repeating_specialisations2_${id}_specialisation2_advances`];
+                              let total = parseInt(values[`repeating_specialisations2_${id}_specialisation2_total`])||0;
+
+                              if (name == spec) {
+                                  test = total
+                                  break;
+                              }
+                          }
                     } else if (repeater == "repeating_powers") {
                         test = test == 0 ? psychic : test;
                     }
@@ -1638,6 +1751,7 @@
                     }
                     setAttrs(update);
                 });
+              });
             });
         });
     });
@@ -1666,7 +1780,7 @@
         });
     });
 
-    const repeating_list = ["repeating_specialisations","repeating_weapons",
+    const repeating_list = ["repeating_specialisations","repeating_specialisations2","repeating_weapons",
         "repeating_powers","repeating_npcskills","repeating_npcattacks"];
     repeating_list.forEach(trigger => {
         on(`clicked:${trigger}:action`, function(eventInfo) {
@@ -1674,6 +1788,11 @@
             let reroll = source ? source : "roll";
             let key = trigger.replace("repeating_", "");
             key = key.slice(0, key.length - 1);
+
+            if (key == 'specialisations') {
+              key = 'specialisation2';
+            }
+
             getAttrs(test_list.concat([
                     `${trigger}_${key}_name`,
                     `${trigger}_${key}_total`,
@@ -1867,411 +1986,6 @@
             {"value": "Trader Militant"}
         ]
     }
-
-
-
-    on("sheet:opened", function(eventInfo) {
-
-      let sheet_updated = false;
-      getAttrs([`sheet_updated`], function(values) {
-          let update = {};
-
-          if (values['sheet_updated']) {
-            sheet_updated = true;
-          } else {
-            update['sheet_updated'] = true;
-            setAttrs(update);
-          }
-      
-        if (sheet_updated) {
-            console.log('sheet already updated');
-            return;
-        }
-
-        getAttrs([
-        `skill_adv_athletics`,`skill_adv_awareness`,`skill_adv_dexterity`,`skill_adv_discipline`, 
-        `skill_adv_fortitude`,`skill_adv_intuition`,`skill_adv_linguistics`,`skill_adv_logic`,
-        `skill_adv_lore`,`skill_adv_medicae`,`skill_adv_melee`,`skill_adv_navigation`,`skill_adv_piloting`, `skill_adv_presence`,`skill_adv_psychic_mastery`,`skill_adv_ranged`, 
-        `skill_adv_rapport`,`skill_adv_reflexes`,`skill_adv_stealth`, `skill_adv_tech`
-        ], function(values) {
-
-          let update = {};
-          if (values['skill_adv_athletics']) {
-
-            update[`skill_advances_athletics`] = parseInt(values['skill_adv_athletics'])/5;
-            update[`skill_advances_awareness`] = parseInt(values['skill_adv_awareness'])/5;
-            update[`skill_advances_dexterity`] = parseInt(values['skill_adv_dexterity'])/5;
-            update[`skill_advances_discipline`] = parseInt(values['skill_adv_discipline'])/5;
-            update[`skill_advances_fortitude`] = parseInt(values['skill_adv_fortitude'])/5;
-            update[`skill_advances_intuition`] = parseInt(values['skill_adv_intuition'])/5;
-            update[`skill_advances_linguistics`] = parseInt(values['skill_adv_linguistics'])/5;
-            update[`skill_advances_logic`] = parseInt(values['skill_adv_logic'])/5;
-            update[`skill_advances_lore`] = parseInt(values['skill_adv_lore'])/5;
-            update[`skill_advances_medicae`] = parseInt(values['skill_adv_medicae'])/5;
-            update[`skill_advances_melee`] = parseInt(values['skill_adv_melee'])/5;
-            update[`skill_advances_navigation`] = parseInt(values['skill_adv_navigation'])/5;
-            update[`skill_advances_piloting`] = parseInt(values['skill_adv_piloting'])/5;
-            update[`skill_advances_presence`] = parseInt(values['skill_adv_presence'])/5;
-            update[`skill_advances_psychic_mastery`] = parseInt(values['skill_adv_psychic_mastery'])/5;
-            update[`skill_advances_ranged`] = parseInt(values['skill_adv_ranged'])/5;
-            update[`skill_advances_rapport`] = parseInt(values['skill_adv_rapport'])/5;
-            update[`skill_advances_reflexes`] = parseInt(values['skill_adv_reflexes'])/5;
-            update[`skill_advances_stealth`] = parseInt(values['skill_adv_stealth'])/5;
-            update[`skill_advances_tech`] = parseInt(values['skill_adv_tech'])/5;
-
-            update['skill_adv_athletics'] = '';
-            update['skill_adv_awareness'] = '';
-            update['skill_adv_dexterity'] = '';
-            update['skill_adv_discipline'] = '';
-            update['skill_adv_fortitude'] = '';
-            update['skill_adv_intuition'] = '';
-            update['skill_adv_linguistics'] = '';
-            update['skill_adv_logic'] = '';
-            update['skill_adv_lore'] = '';
-            update['skill_adv_medicae'] = '';;
-            update['skill_adv_melee'] = '';
-            update['skill_adv_navigation'] = '';;
-            update['skill_adv_piloting'] = '';
-            update['skill_adv_presence'] = '';
-            update['skill_adv_psychic_mastery'] = '';
-            update['skill_adv_ranged'] = '';
-            update['skill_adv_rapport'] = '';
-            update['skill_adv_reflexes'] = '';
-            update['skill_adv_stealth'] = '';
-            update['skill_adv_tech'] = '';
-
-            setAttrs(update);
-          }
-        });
-
-        for (let i = 1 ; i < 11 ; i++) {
-          getAttrs([`specialisation_name${i}`, `specialisation_skill${i}`, `skill_adv_specialisation_adv${i}`], function(values) {
-
-            let name = values[`specialisation_name${i}`];
-            let skill = values[`specialisation_skill${i}`];
-            let advances = parseInt(values[`skill_adv_specialisation_adv${i}`])/5;
-
-            let update = {};
-            if (name) {
-              let newrowid = generateRowID();
-
-              update["repeating_specialisations_" + newrowid + "_specialisation_skill"] = skill;
-              update["repeating_specialisations_" + newrowid + "_specialisation_name"] = name;
-              update["repeating_specialisations_" + newrowid + "_specialisation_advances"] = advances;
-    
-              update[`specialisation_name${i}`] = '';
-              update[`specialisation_skill${i}`] = '';
-              update[`skill_adv_specialisation_adv${i}`] = '';
-              setAttrs(update);
-            }
-          });
-        }
-
-        for (let i = 1 ; i < 12 ; i++) {
-          let contract_var = (i == 4) ? `contact${i}` : `contacts${i}`;
-          getAttrs([`faction${i}`, `infl${i}`, contract_var], function(values) {
-            
-            let faction = values[`faction${i}`];
-            let infl = values[`infl${i}`];
-            let contacts = (i == 4) ? values[`contact${i}`] : values[`contacts${i}`];
-
-            let update = {};
-
-            
-            if (faction) {
-              var newrowid = generateRowID();
-
-              update["repeating_influences_" + newrowid + "_influence_faction"] = faction;
-              update["repeating_influences_" + newrowid + "_influence_value"] = infl;
-              update["repeating_influences_" + newrowid + "_influence_contacts"] = contacts;
-
-              update[`faction${i}`] = '';
-              update[`infl${i}`] = '';
-              if (i == 4) {
-                update[`contact${i}`] = '';
-              } else {
-                update[`contacts${i}`] = '';
-              }
-              setAttrs(update);
-            }
-          });
-        }
-
-        for (let i = 1 ; i < 15 ; i++) {
-          getAttrs([`talent${i}`, `talent_effect${i}`], function(values) {
-            
-            let talent = values[`talent${i}`];
-            let talent_effect = values[`talent_effect${i}`];
-
-            let update = {};
-
-            
-
-            if (talent) {
-              var newrowid = generateRowID();
-
-              update["repeating_talents_" + newrowid + "_talent_name"] = talent;
-              update["repeating_talents_" + newrowid + "_talent_effect"] = talent_effect;
-
-              update[`talent${i}`] = '';
-              update[`talent_effect${i}`] = '';
-
-              setAttrs(update);
-            }
-
-          });
-        }
-
-        for (let i = 1 ; i < 7 ; i++) {
-          getAttrs([`wound_location${i}`, `wound_effect${i}`], function(values) {
-            
-            let location = values[`wound_location${i}`];
-            let effect = values[`wound_effect${i}`];
-
-            let update = {};
-
-            
-
-            if (location) {
-              var newrowid = generateRowID();
-
-              update["repeating_criticals_" + newrowid + "_critical_location"] = location;
-              update["repeating_criticals_" + newrowid + "_critical_effect"] = effect;
-
-              update[`wound_location${i}`] = '';
-              update[`wound_effect${i}`] = '';
-
-              setAttrs(update);
-            }
-
-          });
-        }
-
-        for (let i = 1 ; i < 10 ; i++) {
-          getAttrs([`weapon_name${i}`, `weapon_specialisation${i}`, `weapon_damage${i}`, `weapon_range${i}`, `weapon_mag${i}`, `weapon_traits${i}`, `weapon_enc${i}`], function(values) {
-            
-            let name = values[`weapon_name${i}`];
-            let specialisation = values[`weapon_specialisation${i}`];
-            let damage = (values[`weapon_damage${i}`]) ? values[`weapon_damage${i}`] : 0;
-            let range = values[`weapon_range${i}`];
-            let mag = values[`weapon_mag${i}`];
-            let traits = values[`weapon_traits${i}`];
-            let enc = values[`weapon_enc${i}`];
-
-            let update = {};
-
-            if (name) {
-              var newrowid = generateRowID();
-
-              update["repeating_weapons_" + newrowid + "_weapon_name"] = name;
-              update["repeating_weapons_" + newrowid + "_weapon_specialisation"] = specialisation;
-              update["repeating_weapons_" + newrowid + "_weapon_damage"] = damage;
-              update["repeating_weapons_" + newrowid + "_weapon_range"] = range;
-              update["repeating_weapons_" + newrowid + "_weapon_mag"] = mag;
-              update["repeating_weapons_" + newrowid + "_weapon_mag_max"] = mag;
-              update["repeating_weapons_" + newrowid + "_weapon_traits"] = traits;
-              update["repeating_weapons_" + newrowid + "_weapon_enc"] = enc;
-
-              update[`weapon_name${i}`] = '';
-              update[`weapon_specialisation${i}`] = '';
-              update[`weapon_damage${i}`] = '';
-              update[`weapon_range${i}`] = '';
-              update[`weapon_mag${i}`] = '';
-              update[`weapon_traits${i}`] = '';
-              update[`weapon_enc${i}`] = '';
-
-              setAttrs(update);
-            }
-
-
-          });
-        }
-
-        for (let i = 1 ; i < 8 ; i++) {
-          getAttrs([`armour_name${i}`, `armour_locations${i}`, `armour_armour${i}`, `armour_enc${i}`, `armour_traits${i}`], function(values) {
-            
-            let name = values[`armour_name${i}`];
-            let locations = values[`armour_locations${i}`];
-            let armour = values[`armour_armour${i}`];
-            let enc = values[`armour_enc${i}`];
-            let traits = values[`armour_traits${i}`];
-
-            let update = {};
-
-            if (name) {
-              var newrowid = generateRowID();
-
-              update["repeating_armour_" + newrowid + "_armour_name"] = name;
-              update["repeating_armour_" + newrowid + "_armour_locations"] = locations;
-              update["repeating_armour_" + newrowid + "_armour_value"] = armour;
-              update["repeating_armour_" + newrowid + "_armour_enc"] = enc;
-              update["repeating_armour_" + newrowid + "_armour_traits"] = traits;
-    
-              update[`armour_name${i}`] = '';
-              update[`armour_locations${i}`] = '';
-              update[`armour_armour${i}`] = '';
-              update[`armour_armour${i}`] = '';
-              update[`armour_enc${i}`] = '';
-              update[`armour_traits${i}`] = '';
-    
-              setAttrs(update);
-            }
-
-          });
-        }
-
-          getAttrs([`hit_location_armour1`, `hit_location_armour2`, `hit_location_armour3`, `hit_location_armour4`, `hit_location_armour5`, `hit_location_armour6`], function(values) {
-            
-            let head = values['hit_location_armour1'];
-            let larm = values['hit_location_armour2'];
-            let rarm = values['hit_location_armour3'];
-            let lleg = values['hit_location_armour4'];
-            let rleg = values['hit_location_armour5'];
-            let body = values['hit_location_armour6'];
-
-            let update = {};
-
-            if (head) {
-              update["head_armour"] = head;
-              update["larm_armour"] = larm;
-              update["rarm_armour"] = rarm;
-              update["lleg_armour"] = lleg;
-              update["rleg_armour"] = rleg;
-              update["body_armour"] = body;
-
-              update['hit_location_armour1'] = '';
-              update['hit_location_armour2'] = '';
-              update['hit_location_armour3'] = '';
-              update['hit_location_armour4'] = '';
-              update['hit_location_armour5'] = '';
-              update['hit_location_armour6'] = '';
-
-              setAttrs(update);
-            }
-
-          });
-
-          for (let i = 1 ; i < 8 ; i++) {
-            getAttrs([`psychic_name${i}`, `psychic_wr${i}`, `psychic_difficulty${i}`, `psychic_range${i}`, `psychic_target${i}`, `psychic_duration${i}`, `psychic_effect${i}`], function(values) {
-
-              let name = values[`psychic_name${i}`];
-              let wr = values[`psychic_wr${i}`];
-              let difficulty = (values[`psychic_difficulty${i}`]) ? values[`psychic_difficulty${i}`] : '';
-              let range = values[`psychic_range${i}`];
-              let target = values[`psychic_target${i}`];
-              let duration = values[`psychic_duration${i}`];
-              let effect = values[`psychic_effect${i}`];
-
-              let update = {};
-
-              if (name) {
-                var newrowid = generateRowID();
-
-                update["repeating_powers_" + newrowid + "_power_name"] = name;
-                update["repeating_powers_" + newrowid + "_power_specialisation"] = '';
-                update["repeating_powers_" + newrowid + "_power_damage_total"] = '';
-                update["repeating_powers_" + newrowid + "_power_wr"] = wr;
-                update["repeating_powers_" + newrowid + "_power_difficulty"] = difficulty;
-                update["repeating_powers_" + newrowid + "_power_range"] = range;
-                update["repeating_powers_" + newrowid + "_power_target"] = target;
-                update["repeating_powers_" + newrowid + "_power_duration"] = duration;
-                update["repeating_powers_" + newrowid + "_power_effect"] = effect;
-    
-                update[`psychic_name${i}`] = '';
-                update[`psychic_wr${i}`] = '';
-                update[`psychic_difficulty${i}`] = '';
-                update[`psychic_range${i}`] = '';
-                update[`psychic_target${i}`] = '';
-                update[`psychic_duration${i}`] = '';
-                update[`psychic_effect${i}`] = '';
-                setAttrs(update);
-              }
-
-            });
-          }
-
-            getAttrs([`patron_boons`], function(values) {
-
-              let boons = values[`patron_boons`];
-              if (boons) {
-                let boons_array = boons.split(" ");
-                let boons_count = boons_array.length;
-    
-                let update = {};
-    
-                for (let i = 0 ; i < boons_count ; i++) {
-                  if (boons_array[i]) {
-    
-                    let newrowid = generateRowID();
-    
-                    update["repeating_patronboons_" + newrowid + "_boon_name"] = boons_array[i];
-                    update["repeating_patronboons_" + newrowid + "_boon_effect"] = '';
-    
-                    update[`patron_boons`] = '';
-                    setAttrs(update);
-                  }
-                }  
-              }
-
-            });
-
-            getAttrs([`patron_liabilities`], function(values) {
-
-              let liabilities = values[`patron_liabilities`];
-              if (liabilities) {
-                let liabilities_array = liabilities.split(" ");
-                let liabilities_count = liabilities_array.length;
-
-                let update = {};
-
-                for (let i = 0 ; i < liabilities_count ; i++) {
-                  if (liabilities_array[i]) {
-
-                    let newrowid = generateRowID();
-
-                    update["repeating_patronliabilities_" + newrowid + "_liability_name"] = liabilities_array[i];
-                    update["repeating_patronliabilities_" + newrowid + "_liability_effect"] = '';
-
-                    update[`patron_liabilities`] = '';
-                    setAttrs(update);
-                  }
-                }
-              }
-
-            });
-
-          //repeating_patroninfluences
-          for (let i = 1 ; i < 12 ; i++) {
-            getAttrs([`patron_faction${i}`, `patron_infl${i}`, `patron_contacts${i}`, `patron_intel${i}`], function(values) {
-
-              let faction = values[`patron_faction${i}`];
-              let infl = values[`patron_infl${i}`];
-              let contacts = values[`patron_contacts${i}`];
-              let intel = values[`patron_intel${i}`];
-
-              let update = {};
-
-              if (faction) {
-                let newrowid = generateRowID();
-
-                update["repeating_patroninfluences_" + newrowid + "_influence_faction"] = faction;
-                update["repeating_patroninfluences_" + newrowid + "_influence_value"] = parseInt(infl);
-                update["repeating_patroninfluences_" + newrowid + "_influence_contacts"] = contacts;
-                update["repeating_patroninfluences_" + newrowid + "_influence_intel"] = intel;
-    
-                update[`patron_faction${i}`] = '';
-                update[`patron_infl${i}`] = '';
-                update[`patron_contacts${i}`] = '';
-                update[`patron_intel${i}`] = '';
-
-                setAttrs(update);
-              }
-
-            });
-            
-          }
-      });
-    });
 </script>
 
 <rolltemplate class="sheet-rolltemplate-imtest">

@@ -17,19 +17,18 @@ const arrays_drop={
 		"computer_science","craft_1","craft_1_name","craft_2","craft_2_name","criminology","demolitions","disguise","dodge","drive","firearms",
 		"first_aid","forensics","heavy_machinery","heavy_weapons","history","humint","law","medicine","melee_weapons","military_science_1",
 		"military_science_1_name","military_science_2","military_science_2_name","navigate","occult","persuade","pharmacy","pilot_1","pilot_1_name",
-		"pilot_2","pilot_","psychotherapy","ride","science_1","science_1_name","science_1","science_2_name","search","sigint",	"stealth","surgery",
+		"pilot_2","pilot_2_name","psychotherapy","ride","science_1","science_1_name","science_1","science_2_name","search","sigint",	"stealth","surgery",
 		"survival",	"swim","unarmed_combat","unnatural",
 		"armor_and_gear","personal_details_and_notes","motivations","bond_number"],
 	visible: ["accounting","alertness","anthropology","archeology","art_1","art_1_name","art_2","art_2_name","artillery","athletics","bureaucracy",
-		"computer_science","craft_1","craft_1_name","craft_2","craft_2_name","criminology","demolitions","disguise","dodge","drive","firearms",
-		"first_aid","forensics","heavy_machinery","heavy_weapons","history","humint","law","medicine","melee_weapons","military_science_1",
-		"military_science_1_name","military_science_2","military_science_2_name","navigate","occult","persuade","pharmacy","pilot_1","pilot_1_name",
-		"pilot_2","pilot_","psychotherapy","ride","science_1","science_1_name","science_1","science_2_name","search","sigint",	"stealth","surgery",
+		"computer_science","craft_1","craft_2","criminology","demolitions","disguise","dodge","drive","firearms","first_aid","forensics","heavy_machinery",
+		"heavy_weapons","history","humint","law","medicine","melee_weapons","military_science_1", "military_science_2","navigate","occult","persuade","pharmacy","pilot_1",
+		"pilot_2","psychotherapy","ride","science_1","science_1","search","sigint","stealth","surgery",
 		"survival",	"swim","unarmed_combat","unnatural"],
 	bond: ["name","bond_score"],
 	skill: ["name","rank"],
 	special_training:["name","skill_or_stat_used"],
-	weapon :["name", "skill_percent", "base_range", "damage", "armor_piercing", "lethality_percent", "ammo"],
+	weapon :["name", "skill_percent", "base_range", "damage", "armor_piercing", "lethality_percent", "ammo","ammo_total"],
 	rep: {bond: "repeating_bonds_",special: "repeating_special_",skill:"repeating_skills_",ritual:"repeating_rituals_",weapon:"repeating_weapons_"},
 }
 
@@ -240,8 +239,10 @@ const handleDragandDrop = () => {
 			return console.warn("Drag and drop returned  broken value");
 		}
 		const updateAttrsTot = {...updateAttrs, ...{drop_name:"", drop_data:"",drop_category:""}};
-		console.log(updateAttrsTot);
-		setAttrs(updateAttrsTot);
+		
+		setAttrs(updateAttrsTot,{silent:false},()=>{
+				console.info("Dropped Values:",updateAttrsTot);
+		});
 
 	});
 }

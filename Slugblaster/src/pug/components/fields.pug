@@ -1,0 +1,176 @@
+mixin hidden(field, value)
+  input(name=`attr_${field}`, type='hidden', value=value)&attributes(attributes)
+
+mixin field(field)
+  -
+    let { name, type, readonly, value, placeholder, min, max, size, selected, blockName } = field;
+    type = type || 'text';
+
+    if (value !== 0) value = value || null;
+
+    let id = name;
+    let klass = `${blockName}__${name} ${blockName}__input--${type}`;
+
+    let sizeKlass = size ? `el-input--${size}` : null;
+    let typeSizeKlass = size ? `el-input-${type}--${size}` : null;
+
+  case (type)
+    when 'action'
+      +action(field)
+
+    when 'hidden'
+      input(name=`attr_${name}`, type='hidden', value=value)&attributes(attributes)
+
+    when 'calculated'
+      - placeholder = placeholder || 0;
+      .el-calculated(class=sizeKlass)
+        .el-input(class=sizeKlass)
+          .el-input__wrapper
+            +span(field).el-input__inner
+
+    when 'select'
+      select(class=klass, name=`attr_${name}`, readonly=readonly)&attributes(attributes)
+        each option in field.options
+          - const isSelected = option.value === value || option.selected;
+          - const isHidden = option.hidden ? true : false;
+          - value = option.value || option.name;
+          option(data-i18n=option.name, hidden=isHidden, selected=isSelected, value=value)= option.text
+
+    when 'checkbox'
+    when 'radio'
+      - if (type === 'checkbox') value = value || 'on';
+      input(checked=selected, id=id, name=`attr_${name}`, type=type, value=value)&attributes(attributes)
+
+    when 'number'
+      - placeholder = placeholder || 0;
+      input(
+        inputmode='numeric',
+        max=max,
+        min=min,
+        name=`attr_${name}`,
+        pattern='[0-9]+',
+        placeholder=placeholder,
+        type=type,
+        value=value
+      )&attributes(attributes)
+
+    when 'textarea'
+      textarea(
+        class=klass,
+        data-i18n-placeholder=`placeholder_${name}`,
+        name=`attr_${name}`,
+        placeholder=placeholder,
+        readonly=readonly,
+        value=value
+      )&attributes(attributes)
+
+    when 'text'
+    default
+      input(
+        class=klass,
+        data-i18n-placeholder=`placeholder_${name}`,
+        id=id,
+        name=`attr_${name}`,
+        placeholder=placeholder,
+        readonly=readonly,
+        type=type,
+        value=value
+      )&attributes(attributes)
+
+mixin span(field)
+  - const klass = '';
+  - const dynamic_i18n = field.dynamic ? 'data-i18n-dynamic' : null;
+  span(class!=klass, data-i18n-dynamic=dynamic_i18n, name=`attr_${field.name}`)&attributes(attributes)
+
+mixin action(btn)
+  - let { name, label, type, blockName } = btn;
+  - let klass = `${blockName}__action ${blockName}--${name}`;
+  button(class=klass, name=`act_${name}`, type='action')&attributes(attributes)
+    +block('content', true)
+      span(class=`${blockName}__action--label`, data-i18n=name)= label
+
+mixin actiongroup(name, actions)
+  .action__group(class=`action__group--${name}`)
+    each btn in actions
+      +action(btn)
+
+mixin numcontrol(field)
+  - let { name } = field;
+  .numcontroller
+    button.numcontroller__decrease(name=`act_${name}-down`, type='action')
+      span.visually-hidden(data-i18n='step_down') Step Down
+      span.pictos _
+    +span(field).numcontroller__span
+    button.numcontroller__increase(name=`act_${name}-up`, type='action')
+      span.visually-hidden(data-i18n='step_up') Step Up
+      span.pictos &
+
+mixin el-inputs
+  //- case (type)
+    when 'el-select'
+      .el-select
+        .el-input(class=sizeKlass)
+          .el-input__wrapper
+            select.el-input__inner(name=`attr_${name}`, readonly=readonly, class=klass)&attributes(attributes)
+              each option in field.options
+                - const isSelected = option.value === value || option.selected;
+                - const isHidden = option.hidden ? true : false;
+                - value = option.value || option.name;
+                option(
+                  data-i18n=`opt_${option.name}`,
+                  value=value,
+                  selected=isSelected,
+                  hidden=isHidden
+                )= option.text
+
+    when 'el-textarea'
+      .el-textarea
+        textarea.el-textarea__inner(
+          name=`attr_${name}`,
+          value=value,
+          readonly=readonly,
+          data-i18n-placeholder=`placeholder_${name}`,
+          placeholder=placeholder,
+          class=klass
+        )&attributes(attributes)
+
+    when 'el-number'
+      - placeholder = placeholder || 0;
+      .el-input-number(class=typeSizeKlass)
+        unless size == 'simple'
+          button.el-input-number__decrease(name=`act_${name}-down`, type='action')
+            span.visually-hidden(data-i18n='step_down') Step Down
+            span.pictos _
+          button.el-input-number__increase(name=`act_${name}-up`, type='action')
+            span.visually-hidden(data-i18n='step_up') Step Up
+            span.pictos &
+        .el-input(class=sizeKlass)
+          .el-input__wrapper
+            input.el-input__inner(
+              name=`attr_${name}`,
+              type=type,
+              placeholder=placeholder,
+              readonly=readonly,
+              min=min,
+              max=max,
+              class=klass
+            )
+
+    when 'el-switch'
+      label.el-switch
+        input.el-switch__checkbox(name=`attr_${name}`, type='checkbox', readonly=readonly, class=klass)
+        .el-switch__inner
+
+    when 'el-text'
+      .el-input(class=sizeKlass)
+        .el-input__wrapper
+          input.el-input__inner(
+            name=`attr_${name}`,
+            id=id,
+            type=type,
+            value=value,
+            data-i18n-placeholder=`placeholder_${name}`,
+            placeholder=placeholder,
+            readonly=readonly,
+            class=klass
+          )&attributes(attributes)

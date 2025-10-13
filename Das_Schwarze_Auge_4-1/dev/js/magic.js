@@ -55,7 +55,7 @@ function replaceSpellStats(spellData, stats) {
 			const spellStatFreq = countStats(spellData["stats"]);
 
 			// Determine whether spell has potentially beneficial stat situation
-			for (stat of relevantStats){
+			for (let stat of relevantStats) {
 				if (spellStatFreq[stat] >= 2)
 				{
 					multiStat = stat;
@@ -73,7 +73,7 @@ function replaceSpellStats(spellData, stats) {
 			// Act only if the other stat is also better than the multi stat
 			if (otherStat === betterStat)
 			{
-				for (i in spellData["stats"])
+				for (let i in spellData["stats"])
 				{
 					if (spellData["stats"][i] === multiStat)
 					{
@@ -120,7 +120,7 @@ function replaceSpellStats(spellData, stats) {
 			}
 
 			// Replacement
-			for (stat in spellData["stats"])
+			for (let stat in spellData["stats"])
 			{
 				if (spellData["stats"][stat] === replacement["replaceable"])
 				{
@@ -156,7 +156,7 @@ function replaceSpellStats(spellData, stats) {
 			// Replacement
 			// Up to three stats might match, but only one can be replaced -> determine index to replace after iterating over all stats
 			let lowestStat = { "value": Infinity, "index": null };
-			for (stat in spellData["stats"])
+			for (let stat in spellData["stats"])
 			{
 				// Get values of replaceable stats at the index of the replaceable stat
 				if (replacement["replaceable"].includes(spellData["stats"][stat]))
@@ -313,7 +313,7 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 				let festeMatrix = v["v_festematrix"] === "0" ? false : true;
 				let spruchhemmung = v["n_spruchhemmung"] === "0" ? false : true;
 
-				for (roll of rolls)
+				for (let roll of rolls)
 				{
 					if (roll <= success)
 					{
@@ -334,7 +334,7 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 					criticality = -1;
 					festeMatrixSave = true;
 
-					for (roll of rolls)
+					for (let roll of rolls)
 					{
 						if (
 							(roll > success) &&
@@ -380,7 +380,7 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 			} else {
 				if (effTaW < 0)
 				{
-					for (roll in rolls)
+					for (let roll in rolls)
 					{
 						effRolls[roll] = rolls[roll] + Math.abs(effTaW);
 					}
@@ -388,7 +388,7 @@ on(spells.map(spell => "clicked:" + spell + "-action").join(" "), (info) => {
 				}
 
 				// TaP-Verbrauch für jeden Wurf
-				for (roll in effRolls)
+				for (let roll in effRolls)
 				{
 					TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
 				}

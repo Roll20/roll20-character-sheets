@@ -7402,7 +7402,13 @@ function calcDamageMod(v) {
         damage_mod_table_value = str + siz;
     }
 
-    const damage_mod_step = Math.ceil(damage_mod_table_value / 5) - 5 + damageModOther + damageModTemp;
+    var damage_mod_step = 0;
+    
+    if (damage_mod_table_value < 51) {
+        damage_mod_step = Math.ceil(damage_mod_table_value / 5) - 5 + damageModOther + damageModTemp;
+    } else {
+        damage_mod_step = Math.ceil((damage_mod_table_value - 50) / 10) + 5 + damageModOther + damageModTemp;
+    }
 
     return {
         damage_mod: damageModTable(damage_mod_step)
@@ -7616,8 +7622,8 @@ function calcMoveRate(v) {
     const moveRateOther = parseInt(v['movement_rate_other']) || 0;
     const moveRateTemp = parseInt(v['movement_rate_temp']) || 0;
     const core_value = moveRateSpecies + moveRateOther + moveRateTemp;
-    const moveAfterFatigue = applyMovementMod(core_value, fatigueTable[v['fatigue']]['movement']);
-    newAttrs['movement_rate'] = applyMovementMod(moveAfterFatigue, loadTable[v['encumbrance_load']]['movement']);
+    const moveAfterFatigue = applyMovementMod(core_value, fatigueTable[v['fatigue']]['movement'] || "+0");
+    newAttrs['movement_rate'] = applyMovementMod(moveAfterFatigue, loadTable[v['encumbrance_load']]['movement'] || "+0");
 
     return newAttrs;
 }
@@ -8169,7 +8175,7 @@ on('change:attribute_mode', function(event) {
 /* Fatigue */
 const fatigueTable = {
     /* fresh */ '9': { "skills": '0', "action_points": '0', "initiative": '0', "movement": "+0", "recovery": "-"},
-    /* winded */ '8': { "skills": '1', "action_points": '0', "initiative": '0', "movement": '-1', "recovery": .25},
+    /* winded */ '8': { "skills": '1', "action_points": '0', "initiative": '0', "movement": '+0', "recovery": .25},
     /* tired */ '7': { "skills": '1', "action_points": '0', "initiative": '0', "movement": '-1', "recovery": 3},
     /* wearied */ '6': { "skills": '2', "action_points": '0', "initiative": '-2', "movement": '-2', "recovery": 6},
     /* exhausted */ '5': { "skills": '2', "action_points": '-1', "initiative": '-4', "movement": '*.5', "recovery": 12},
@@ -8990,6 +8996,7 @@ on('change:repeating_skilledability:traits', function(event) {
 });
 /* Encumbrance */
 const loadTable = {
+    /* Old Default */ 'Normal': {"skills": '0', "movement": '+0'},
     /* Normal */ '0': {"skills": '0', "movement": '+0'},
     /* Burdened */ '1': {"skills": '1', "movement": '-2'},
     /* Overloaded */ '2': {"skills": '2', "movement": '*.5'},
@@ -11307,6 +11314,24 @@ function upgradeCharacter3Dot6() {
         });
     });
 }
+
+/**
+ * Make the changes needs to get a character sheet updated from 3.6+ to 3.8
+ */
+function upgradeCharacter3Dot8() {
+    console.log("Upgrading character to 3.8");
+
+    getAttrs(['fatigue', 'healing_rate'].concat(actionPointGetAttrs, initGetAttrs, moveRateGetAttrs, damageModGetAttrs), function(v) {
+        setAttrs({
+            "version": "3.8",
+            ...calcFatigue(v),
+            ...calcActionPoints(v),
+            ...calcInitiativeBonus(v),
+            ...calcMoveRate(v),
+            ...calcDamageMod(v)
+        });
+    });
+}
 const shipConditionTable = {
     "ship_shape": {
         "speed": "-",
@@ -11914,7 +11939,7 @@ function upgradeGeneric3Dot1() {
  * @param version the sheet version already parse to a float or 0 if not a valid float
  */
 function versioning(sheet_type, version) {
-    const latestVersion = '3.6';
+    const latestVersion = '3.8';
     if (!sheet_type) {
         sheet_type = "pc";
     }
@@ -11947,14 +11972,20 @@ function versioning(sheet_type, version) {
             upgradeCharacter3Dot4();
         }
         versioning(sheet_type, '3.4');
-    } else if (version < 3.6) { /* TODO change this when we next introduce a version that requires updating */
+    } else if (version < 3.6) {
         if (sheet_type === 'character' || sheet_type === 'pc' || sheet_type === 'creature' || sheet_type === 'spirit') {
             console.log("running character 3.6 update");
             upgradeCharacter3Dot6();
         }
         versioning(sheet_type, '3.6');
+    } else if (version < 3.8) { /* TODO change this when we next introduce a version that requires updating */
+        if (sheet_type === 'character' || sheet_type === 'pc' || sheet_type === 'creature' || sheet_type === 'spirit') {
+            console.log("running character 3.8 update");
+            upgradeCharacter3Dot8();
+        }
+        versioning(sheet_type, '3.8');
     } else {
-        setattr({"version": 3.6})
+        setAttrs({"version": 3.8})
     }
 }
 

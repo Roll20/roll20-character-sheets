@@ -104,7 +104,7 @@ on("change:repeating_conjuration-spells-myranor", function(info) {
 		];
 
 		var prefix = "repeating_conjuration-spells-myranor_" + trigger["rowID"] + "_";
-		for (attr of repeatingAttrs)
+		for (let attr of repeatingAttrs)
 		{
 			attrsToGet.push(prefix + attr);
 		}
@@ -192,7 +192,7 @@ on("change:repeating_conjuration-spells-myranor", function(info) {
 
 					if (doNothing === false)
 					{
-						for (statIndex in stats)
+						for (let statIndex in stats)
 						{
 							attrsToChange[prefix + "stat" + statIndex] = stats[statIndex];
 						}
@@ -263,7 +263,7 @@ on("clicked:repeating_conjuration-spells-myranor:spell-action", (info) => {
 		"v_festematrix",
 		"n_spruchhemmung"
 	];
-	for (attr of rowAttrs)
+	for (let attr of rowAttrs)
 	{
 		attrsToGet.push(
 			[
@@ -278,7 +278,7 @@ on("clicked:repeating_conjuration-spells-myranor:spell-action", (info) => {
 		// Shortening of result properties
 		const repeatingRegex = new RegExp(`${attrPrefix}_${triggerRow}_`);
 		var shortResults = {};
-		for (attr of attrsToGet)
+		for (let attr of attrsToGet)
 		{
 			// attrs from outside the repeating section are already short
 			if (!attr.match(repeatingRegex))
@@ -388,7 +388,7 @@ on("clicked:repeating_conjuration-spells-myranor:spell-action", (info) => {
 				let festeMatrix = v["v_festematrix"] === "0" ? false : true;
 				let spruchhemmung = v["n_spruchhemmung"] === "0" ? false : true;
 
-				for (roll of rolls)
+				for (let roll of rolls)
 				{
 					if (roll <= success)
 					{
@@ -409,7 +409,7 @@ on("clicked:repeating_conjuration-spells-myranor:spell-action", (info) => {
 					criticality = -1;
 					festeMatrixSave = true;
 
-					for (roll of rolls)
+					for (let roll of rolls)
 					{
 						if (
 							(roll > success) &&
@@ -455,7 +455,7 @@ on("clicked:repeating_conjuration-spells-myranor:spell-action", (info) => {
 			} else {
 				if (effTaW < 0)
 				{
-					for (roll in rolls)
+					for (let roll in rolls)
 					{
 						effRolls[roll] = rolls[roll] + Math.abs(effTaW);
 					}
@@ -463,7 +463,7 @@ on("clicked:repeating_conjuration-spells-myranor:spell-action", (info) => {
 				}
 
 				// TaP-Verbrauch für jeden Wurf
-				for (roll in effRolls)
+				for (let roll in effRolls)
 				{
 					TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
 				}

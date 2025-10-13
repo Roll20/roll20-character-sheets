@@ -4240,7 +4240,7 @@ function updateRoll(roll, diceJet, bonusJet, totalDegats, diceDegats, bonusDegat
 
   let vTCheneSculpte = 0;
 
-  if (conditions.bourreau || conditions.equilibre) {
+  if (conditions.bourreau) {
     tDegats = diceDegats.reduce((accumulateur, valeurCourante) => {
       let newV = +valeurCourante;
       if (newV <= 3) { newV = 4; }
@@ -4436,7 +4436,7 @@ function updateRoll(roll, diceJet, bonusJet, totalDegats, diceDegats, bonusDegat
     }
   }
 
-  if (conditions.devaste || conditions.equilibre) {
+  if (conditions.devaste) {
     tViolence = diceViolence.reduce((accumulateur, valeurCourante) => {
       let newV = valeurCourante;
       if (newV <= 3) { newV = 4; }

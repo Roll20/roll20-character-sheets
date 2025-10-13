@@ -14,6 +14,9 @@ function FKWgetType(typeRaw)
 		case '@{AT_Bogen}':
 			FKWtype = 'Bogen';
 			break;
+		case '@{AT_feuerwaffen}':
+			FKWtype = 'Feuerwaffen';
+			break;
 		case '@{AT_Schleuder}':
 			FKWtype = 'Schleuder';
 			break;
@@ -152,6 +155,7 @@ on(
 	"change:fkw_aktiv_schuetzentyp change:sf_scharfschutze_armbrust change:sf_meisterschutze_armbrust " +
 	"change:sf_scharfschutze_blasrohr change:sf_meisterschutze_blasrohr " +
 	"change:sf_scharfschutze_bogen change:sf_meisterschutze_bogen " +
+	"change:sf_scharfschutze_feuerwaffen change:sf_meisterschutze_feuerwaffen " +
 	"change:sf_scharfschutze_wurfbeile change:sf_meisterschutze_wurfbeile " +
 	"change:sf_scharfschutze_wurfmesser change:sf_meisterschutze_wurfmesser " +
 	"change:sf_scharfschutze_wurfspeere change:sf_meisterschutze_wurfspeere " +
@@ -234,6 +238,8 @@ on(
 				'sf_meisterschutze_blasrohr',
 				'sf_scharfschutze_bogen',
 				'sf_meisterschutze_bogen',
+				'sf_scharfschutze_feuerwaffen',
+				'sf_meisterschutze_feuerwaffen',
 				'sf_scharfschutze_schleuder',
 				'sf_meisterschutze_schleuder',
 				'sf_scharfschutze_wurfbeile',
@@ -450,6 +456,10 @@ on(
 							if(v.sf_scharfschutze_bogen == "1") {FKW.schuetze = 1;}
 							if(v.sf_meisterschutze_bogen == "1") {FKW.schuetze = 2;}
 							break;
+						case "Feuerwaffen":
+							if(v.sf_scharfschutze_feuerwaffen == "1") {FKW.schuetze = 1;}
+							if(v.sf_meisterschutze_feuerwaffen == "1") {FKW.schuetze = 2;}
+							break;
 						case "Schleuder":
 							if(v.sf_scharfschutze_schleuder == "1") {FKW.schuetze = 1;}
 							if(v.sf_meisterschutze_schleuder == "1") {FKW.schuetze = 2;}
@@ -611,7 +621,7 @@ on(
 
 					// Helligkeit
 					// absolute Dunkelheit immer "finsternis"
-					
+
 					if(FKR.licht != "nd")
 					{
 						var finsternis = 8;
@@ -919,6 +929,7 @@ on(
 								case "Belagerungswaffen":
 								case "Blasrohr":
 								case "Bogen":
+								case "Feuerwaffen":
 								case "Schleuder":
 									mods = 4;
 									break;
@@ -954,6 +965,7 @@ on(
 										case "Belagerungswaffen":
 										case "Blasrohr":
 										case "Bogen":
+										case "Feuerwaffen":
 										case "Schleuder":
 											mods = 4;
 											break;
@@ -1219,4 +1231,91 @@ on(
 		);
 	}
 );
+
+/* CRP for projectile subtraction */
+on("clicked:rc_attack-action", async (info) => {
+	var func = "Action Listener for Ranged Combat Roll Button";
+	var trigger = info["triggerName"].replace(/clicked:([^-]+)-action/, '$1');
+
+	let rollMacro = [
+		'@{gm_roll_opt}',
+		'&{template:DSA-Fernkampf-AT}',
+		'{{name=Fernkampfangriff}}',
+		'{{mod=[[(@{fkr_erschwernis_gesamt}) - (@{fkr_erschwernis_ansage_gesamt})]]}}',
+		'{{ansage=[[@{fkr_erschwernis_ansage_gesamt}]]}}',
+		'{{modansage=[[@{fkr_erschwernis_gesamt}]]}} {{wert=[[(@{FK_Aktiv})]]}}',
+		'{{eff_wert=[[(@{FK_Aktiv}) - (@{fkr_erschwernis_gesamt})]]}}',
+		'{{eff_wert_ohne_kampfgetuemmel=[[(@{FK_Aktiv}) - (@{fkr_erschwernis_ohne_kampfgetuemmel})]]}}',
+		'{{ZieleKampfgetuemmel=[[@{fkr_kampfgetuemmel_ziele}]]}}',
+		'{{wurf=[[1d20cs<@{cs_kampf_fk}cf>@{cf_kampf_fk}]]}}',
+		'{{pruefwurf=[[1d20cs<@{cs_kampf_fk}cf>@{cf_kampf_fk}]]}}'
+	];
+
+	safeGetAttrs(
+		[
+			'FKW_Aktiv1', 'FKWMunition1Anzahl',
+			'FKW_Aktiv2', 'FKWMunition2Anzahl',
+			'FKW_Aktiv3', 'FKWMunition3Anzahl',
+			'FKW_Aktiv4', 'FKWMunition4Anzahl'
+		], async function(values) {
+		let attrsToChange = {};
+
+		// Projectile subtraction
+		// rcw: ranged combat weapon
+		let rcwActive = 0;
+		let rcwAmmo = 0;
+
+		// Get active ranged combat weapon
+		if(values.FKW_Aktiv1 == "1") { rcwActive = 1; }
+		else if (values.FKW_Aktiv2 == "1") { rcwActive = 2; }
+		else if (values.FKW_Aktiv3 == "1") { rcwActive = 3; }
+		else if (values.FKW_Aktiv4 == "1") { rcwActive = 4; }
+
+		// Get ammo of active ranged combat weapon
+		switch(rcwActive)
+		{
+			case 0:
+				debugLog(func, 'Keine aktive Fernkampfwaffe gefunden, automatischer Munitionsverbrauch nicht möglich.');
+				break;
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+				rcwAmmo = parseInt(values[`FKWMunition${rcwActive}Anzahl`]);
+				break;
+		}
+
+		if (DSAsane(rcwAmmo, "non-negative int"))
+		{
+			if (rcwAmmo > 0)
+			{
+				rollMacro.push(`{{ammoRemaining=[[${rcwAmmo - 1}]]}}`);
+				rollMacro.push(`{{ammohint=[[0]]}}`);
+				attrsToChange[`FKWMunition${rcwActive}Anzahl`] = rcwAmmo - 1;
+			} else {
+				rollMacro.push(`{{ammoRemaining=[[0]]}}`);
+				rollMacro.push(`{{ammohint=[[1]]}}`);
+			}
+		} else {
+			debugLog(func, `'FKWMunition${rcwActive}Anzahl' enthält keinen gültigen Wert.`);
+			rollMacro.push(`{{ammohint=[[2]]}}`);
+		}
+
+		debugLog(func, rollMacro, attrsToChange);
+		safeSetAttrs(attrsToChange);
+
+		// Execute Roll
+		results = await startRoll(rollMacro.join(" "));
+		debugLog(func, "test: info:", info, "results:", results);
+
+		// Process Roll
+		let rollID = results.rollId;
+
+		finishRoll(
+			rollID,
+			{}
+		);
+	});
+});
+
 /* ranged combat calculator end */

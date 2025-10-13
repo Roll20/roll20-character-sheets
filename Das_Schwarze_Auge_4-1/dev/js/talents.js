@@ -90,7 +90,7 @@ function getTalentRollResults(results) {
 	{
 		let successes = 0;
 		let failures = 0;
-		for (roll of rolls)
+		for (let roll of rolls)
 		{
 			if (roll <= success)
 			{
@@ -122,7 +122,7 @@ function getTalentRollResults(results) {
 	} else {
 		if (effTaW < 0)
 		{
-			for (roll in rolls)
+			for (let roll in rolls)
 			{
 				effRolls[roll] = rolls[roll] + Math.abs(effTaW);
 			}
@@ -130,7 +130,7 @@ function getTalentRollResults(results) {
 		}
 
 		// TaP-Verbrauch für jeden Wurf
-		for (roll in effRolls)
+		for (let roll in effRolls)
 		{
 			TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
 		}

@@ -4,6 +4,22 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 03.14.00 (Build 36)
+
+- added brawl combat proficiency
+
+## 03.13.00 (Build 35)
+
+- added "Taint" of items that will add to shadow / scars and leads to miserable / ill-favoured rolls when >= hope / hope_max
+
+## 03.12.00 (Build 34)
+
+- added "Favoured" modifier for pc combat proficiencies to allow handling of specific cultural virtues (e.g. Hobbit Cultural Virtue Sure At The Mark)
+
+## 03.11.00 (Build 33)
+
+- fixed stance toggle attack bonus bug 
+
 ## 03.10.01 (Build 32)
 
 - fixed minor CSS layout bug 

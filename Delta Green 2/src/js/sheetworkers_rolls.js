@@ -712,8 +712,7 @@ const setAdvancedWeaponParametersAndInputNames=(repsecid, _parameters, _input_na
 	setAccessoriesParametersAndInputNames(repsecid, _parameters, _input_names);
 	setBlastRadiusParametersAndInputNames(repsecid, _parameters, _input_names);
 	setSelectiveFireParametersAndInputNames(repsecid, _parameters, _input_names);	
-
-}
+};
 
 const setRepeatingParametersAndInputNames=(section, id, _parameters, _input_names) => {
 	const repsecid = `repeating_${section}_${id}`;
@@ -740,9 +739,8 @@ const setRepeatingParametersAndInputNames=(section, id, _parameters, _input_name
 	} else {
         console.error(`Section ${section} not found`);
     }
-}
+};
 
-//levelup character
 
 const initializeRolls = () => {
     if (!_isInitialized) {
