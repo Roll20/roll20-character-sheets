@@ -1,3 +1,11 @@
+# 2025-10-14
+
+- Remove spurious ` in the sheet
+- Fix some dependances hiding some old updates
+- Fix "agibberish" -> gibberish
+- Allow attacks to not have the numeric size
+- Add table roller support for Spell failures
+
 # 2025-10-04
 
 - Fix display of scaled hits.

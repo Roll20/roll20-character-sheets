@@ -3358,7 +3358,7 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
           <span style="font-family:Pictos;">s</span>&nbsp;Lookup!</button>
       </div> <!-- end of content -->
     </div>
-    <!-- end of attackrollcrit overlay -->`
+    <!-- end of attackrollcrit overlay -->
 
 
 
@@ -6559,7 +6559,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 970113d8130099f7e1b243119c7ee670ee6f496c
+Revision e391f1770ba0538fdfe04e777a95b2b1f994d4a0
 
 
 <hr>
@@ -8258,7 +8258,7 @@ const skillrollresults = {
      unusualevent : "As you begin to summon your focus, you notice an unfamilliar darkness within yourself.  You enter a cleansing trance that lasts for an entire round.  If you succeed in your maneuver, treat as an Absolute Success.  If you fail, treat as an Absolute Failure.",
      partialsuccess : "You are distracted at a critical moment but receive half the normal benefit.  Or, if not in combat, you may abort and try again at +10.  Try switching to decaf.",
      success : "You are a paragon of self-control and receive full benefits of the maneuver for 1 round for every 20 you succeeded by (1 round for 101-120, 2 rounds for 121-140, etc), doubled for Adrenal Defense.",
-       absolutesuccess : "Wow!  You not only succeed but you have tapped intoa resevoir of strength within yourself.  As Success but you receive double benefits for the first round.",
+       absolutesuccess : "Wow!  You not only succeed but you have tapped into a resevoir of strength within yourself.  As Success but you receive double benefits for the first round.",
   },
   composition: {
     absolutefailure: "You artists types!  In a fit of anger you destroy any work you have already accomplished.  Your emotions get the better of you and you are at -25 to this sill until an Absolute Success is achieved.",
@@ -8286,7 +8286,7 @@ const skillrollresults = {
   },
   runes : {
 absolutefailure : "You accidentally cast the Rune (targetting yourself) upon trying to disipher it.  Lear to read without mumbling to yourself.",
-failure : "It is agibberish to you.  Until you improve your understanding (develop another rank in Runes), you may not try again.",
+failure : "It is all gibberish to you.  Until you improve your understanding (develop another rank in Runes), you may not try again.",
 unusualevent : "Yes!  Those marks are more than a spell, they contain a secret message!  Resolve the maneuver as normal.  It then takes you 1-10 hours of study (taken at your first opportunity) to conclude that you were mistaken…or were you?  (psst, GM…insert plot hook here).",
 partialsuccess : "You learn the idenity of the spell inscribed in the Rune, but cannot cast it.  You may try again after a good night's sleep but another Partial Success is treated as a Failure.",
 success : "Your mystical senses are at your beck.  You understand the Rune, identify the spell, and may cast it.  Life is good when things turn out like this.",
@@ -10185,6 +10185,80 @@ onCheck("clicked:uploadspelllist", (ev) => {
     });
 });
 
+/**
+ * Spell failure roll.
+ *
+ * Param is the short name:  4 letter realm, followed by type 
+ */
+const spellfailureinfo = [
+  { aname: "chanelem", realm: "Channeling", type: "Elemental", display:  "Channeling Elemental", },
+  { aname: "chanforce", realm: "Channeling", type: "Force", display:  "Channeling Force" },
+  { aname: "chaninfo", realm: "Channeling", type: "Informantional", display:  "Channeling Information" },
+  { aname: "chanutlity", realm: "Channeling", type: "Utility", display:  "Channeling Utility" },
+  { aname: "esselem", realm: "Essence", type: "Elemental", display:  "Essence Elemental" },
+  { aname: "essforce", realm: "Essence", type: "Force", display:  "Essence Force" },
+  { aname: "essinfo", realm: "Essence", type: "Informational", display:  "Essence Information" },
+  { aname: "essutlity", realm: "Essence", type: "Utility", display:  "Essence Utility" },
+  { aname: "mentelem", realm: "Mentalism", type: "Elemental", display:  "Mentalism Elemental" },
+  { aname: "mentforce", realm: "Mentalism", type: "Force", display:  "Mentalism Force" },
+  { aname: "mentinfo", realm: "Mentalism", type: "Informational", display:  "Mentalism Information" },
+  { aname: "mentutlity", realm: "Mentalism", type: "Utility", display:  "Mentalism Utility" },
+];
+function spellFailureRoll(type, mod, lookup) {
+  console.log(type, mod, lookup);
+  for (info of spellfailureinfo) {
+    if (type === info.aname) {
+      // found
+      console.log("FFF");
+      return spellFailureFromInfo(info, mod, lookup);
+    }
+  }
+  rmuerror(`Tried to do a spell failure for ${type}, could not be found`)
+}
+
+/**
+ * Main worder function.
+ */
+function spellFailureFromInfo(info, modifier, lookup) {
+  if (!info) { return false; }
+  if (typeof(lookup) != 'boolean') { return false; }
+  if (typeof(modifier) != 'number') { return false; }
+
+  console.log(info, modifier, lookup);
+
+  let template = "rmufumble";
+  let theroll = '1d100';
+  if (lookup) {
+    template = "rmufumblelookup";
+    theroll = modifier || 1;
+    if (theroll > 350) {
+      theroll = 350;
+    } else if (theroll < 1) {
+      theroll = 1;
+    }
+  } else {
+    if (modifier) {
+      theroll += ' + ' + modifier;
+    }
+  }
+
+  const rollstring = `@{whispertype} &{template:${template}}` +
+      "{\{who=@{character_name}}}" +
+      `{\{roll=[[${theroll}]]}}` +
+      "{\{type=[[0]]}}" +
+      "{\{rangemin=[[0]]}}" +
+      "{\{rangemax=[[0]]}}" +
+      "{\{result=[[0]]}}";
+  startRoll(rollstring, roll => {
+      dospellfailureompendiumlookup(info.realm, info.type, parseIntDefault(roll.results.roll.result, 1),
+	  (result) => {
+	      result.type = info.display;
+	      finishRoll(roll.rollId, result);
+	  }
+      );
+  });
+  return true;
+}
 
 
 
@@ -16287,12 +16361,14 @@ function sizeFromNumeric(value) {
 	console.log("Attack roll do roll");
 	getAttrs(["attackrollwhat", "attackrollcritlookup",
 		  "attackrollcriticalsev", "attackrollcriticaltype", "attackrollcriticalnumber",
-		  "attackrollfumbletypetype", "attackrollfumblemod", "attackrollfumblelookupvalue"],
+		  "attackrollfumbletypetype", "attackrollfumblemod", "attackrollfumblelookupvalue",
+		  "attackrollspellfailure"],
 	  (data) => {
 	    if (!data.attackrollwhat) {
 		rmuerror("Attack roll what was not set\n", data);
 		return;
 	    }
+	    console.log(data, data.attackrollwhat === 'spellfail', data.attackrollwhat)
 	    if (data.attackrollwhat === 'crittable') {
 		let rollvalue = undefined;
 		if (data.attackrollcritlookup === 'on') {
@@ -16310,7 +16386,16 @@ function sizeFromNumeric(value) {
 		} else {
 		    mod = parseIntDefault(data.attackrollfumblemod, 0);
 		}
-		fumbleRoll(data.attackrollfumbletypetype, mod, lookup);
+	    	fumbleRoll(data.attackrollfumbletypetype, mod, lookup);
+	    } else if (data.attackrollwhat === 'spellfail') {
+		console.log("Spell Failure roll");
+		let table = data.attackrollspellfailure;
+		let lookup = false;
+		if (data.attackrollcritlookup === 'on') {
+		    lookup = true;
+		}
+		spellFailureRoll(table, 0, lookup);
+
 	    } else {
 		console.log("Not implemented", data.attackrollwhat, data);	
 	    }
@@ -16666,6 +16751,41 @@ function dofumblecompendiumlookup(table, value, donefn) {
 		    rangemax: max,
 		    value: value,
 		    result: data.data[match]
+		});
+	    }
+	}
+    });
+}
+
+
+
+function dospellfailureompendiumlookup(realm, type, value, donefn) {
+    console.log(`Category:SpellFailure Realm:${realm} Type:${type}`)
+    getCompendiumQuery(`Category:SpellFailure Realm:${realm} Type:${type}`, (data) => {
+	console.log(data);
+	console.log(data[0]);
+	if (!data[0] || !data[0].data || !data[0].data.Category || data[0].data.Category != "SpellFailure") {
+	    console.log("Fetched Error:", data);
+	    sendMessage("Error fetching fumble data"); 
+	}
+	const results = JSON.parse(data[0].data['data-result']);
+	console.log("results is ", results, data[0].data['data-result']);
+	for (match of results) {
+	    
+	    console.log("match", match)
+	    const min = parseIntDefault(match.min, 0);
+	    const max = parseIntDefault(match.max, 10000)
+	    if (min === undefined) {
+		console.log(match, "-> undefined, skipping");
+		continue;
+	    }
+	    console.log("matching", value, min, max);
+	    if (value >= min && value <= max) {
+		donefn({
+		    rangemin: min,
+		    rangemax: max,
+		    value: value,
+		    result: match.result
 		});
 	    }
 	}
@@ -17797,6 +17917,24 @@ creature.parseAttackString = function(string) {
       extra: match[8] || false,
     }
   }
+
+  // Same as above, but don't require the numeric size (sizen)
+  //                       1.OB  2.Size       3.Attack type  4 []    5 > 6 >>  7. extra
+  match = string.match(/^(-?\d+)([A-Za][Ii]?)([a-z]*)(?:\[(\w*)])?(>)?(≫)?\s*(\(.*\))?$/);
+  if (match) {
+    return {
+      OB: match[1],
+      size: match[2],
+      sizen: sizeToNumeric(match[2]),
+      type: match[3] || false,
+      crit: match[4] || false,
+      nextround: match[5] ? true : false,
+      bonus: match[6] ? true : false,
+      extra: match[7] || false,
+    }
+  }
+
+
 
   //--> 28G(9)any 2 melee(2WF)
   //                             1,OB   2, Size      3.n     4. any melee          ?? >/>>
