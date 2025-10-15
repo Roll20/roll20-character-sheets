@@ -11,3 +11,4 @@ Non-official character sheet for *Dead of Night* (Spanish).
 
 Folder: `dead-of-night/`  
 Files: `sheet.html`, `sheet.css`, `sheet.json`, `preview.png`, `logo_don.png`
+ 
