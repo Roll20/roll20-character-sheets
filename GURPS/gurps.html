@@ -20046,7 +20046,15 @@ Select the indent level of the spell. This is handy to help show the spell belon
 					<div class="grid-vehicle-crew-table grid__align_center grid__gap_medium section-header summary-row">
 						<div class="grid-cell">&nbsp;</div>
 						<div class="grid-cell">&nbsp;</div>
-						<div class="grid-cell">&nbsp;</div>
+						<div class="grid-cell">
+							<div class="standard-tooltip">
+								<h4><span data-i18n="gravity-label">Gravity</span></h4>
+								<span class="tooltiptext">
+									<span data-i18n="vehicle-crew-gravity-tooltip"></span>
+								</span>
+							</div>
+							<input type="number" class="medium-width" value="1" min="0" name="attr_gravity" title="Macro: @{NAME|gravity}" />
+						</div>
 						<div class="grid-cell">
 							<div class="standard-tooltip">
 								<h4><span data-i18n="total-weight-label">Total Weight</span></h4>
@@ -20604,7 +20612,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 										<span data-i18n="gravity-label">Gravity</span><span>:</span>
 									</div>
 									<div class="tooltip">
-										<span data-i18n="gravity-tooltip">Standard gravity is based on 1G, earth normal.<br />If gravity is over 1G, then add <i>your</i> weight and encumbrance then multiply by Gravity - 1. Add this value to your encumbrance.<br />If gravity is less than 1G, multiply the weight of your gear by the Gravity value, this is your new encumbrance.<br />See B350.</span>
+										<span data-i18n="vehicle-loadout-gravity-tooltip"></span>
 									</div>
 								</div>
 								<div class="cell" style="width: 35px;">
@@ -20659,7 +20667,13 @@ Select the indent level of the spell. This is handy to help show the spell belon
 							<div class="cell col1"></div>
 							<div class="cell col2"></div>
 							<div class="cell col3"></div>
-							<div class="cell col4"></div>
+							<div class="cell col4">
+								<input type="hidden" name="attr_vehicle_is_overloaded" value="0" />
+								<input type="hidden" name="attr_vehicle_overloaded_message" />
+								<div class="vehicle-overloaded-message">
+									<span name="attr_vehicle_overloaded_message"></span>
+								</div>
+							</div>
 							<div class="cell col5">
 								<div style="text-align: right; font-weight: bold;" class="popup">
 									<span data-i18n="load-limit-label">Load Limit</span>:
@@ -35680,7 +35694,7 @@ B378
 			// convert vehicleLoad tons to pounds
 			const vehicleLoadPounds = vehicleLoad * 2000;
 
-			let isOverLoaded = vehicleLoadPounds > grandTotalWeight;
+			let isOverLoaded = grandTotalWeight > vehicleLoadPounds;
 
 			const vehicleLoadPoundsDisplay = vehicleLoadPounds.toFixed(2) + " " + weightSystem;
 
@@ -59722,6 +59736,46 @@ Characters with Skill: ${knowsSkill}`;
 					total_crew_weight: totalWeight
 				});
 
+			});
+
+		});
+
+	}
+
+	on("change:gravity", event => {
+
+		updateVehicleCrewGravity();
+
+	});
+
+	const updateVehicleCrewGravity = () => {
+
+		getAttrs(["total_crew_weight", "gravity"], values => {
+
+			let totalWeight = Number(values.total_crew_weight) || 0;
+
+			let gravity = Number(values.gravity) || 0;
+			let gravityWeight = totalWeight * gravity;
+
+			let totalGravityWeight = totalWeight;
+
+			if (gravity < 1) {
+	
+				totalGravityWeight = totalWeight * gravity;
+	
+			} else if (gravity > 1) {
+	
+				let gravityMod = (totalWeight) * (gravity - 1);
+	
+				totalGravityWeight = totalWeight + gravityMod;
+	
+			}
+
+			// round to two decimal places
+			totalGravityWeight = Math.round(totalGravityWeight * 100) / 100;
+
+			setAttrs({
+				total_crew_weight: totalGravityWeight
 			});
 
 		});
