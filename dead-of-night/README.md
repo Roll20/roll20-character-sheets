@@ -10,4 +10,4 @@ Non-official character sheet for *Dead of Night* (Spanish).
 - Rolls use Roll20’s **default** roll template (no external assets).
 
 Folder: `dead-of-night/`  
-Files: `Dead-of-Night.html`, `Dead-of-Night.css`, `sheet.json`, `preview.png`, `logo_don.png`
+Files: `sheet.html`, `sheet.css`, `sheet.json`, `preview.png`, `logo_don.png`
