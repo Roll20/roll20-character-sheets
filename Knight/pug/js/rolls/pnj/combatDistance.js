@@ -25,6 +25,9 @@ rollCombatDistancePNJ.forEach((button) => {
       'Masque',
       'MasquePNJAE',
       'MasquePNJAEMaj',
+      'Dame',
+      'DamePNJAE',
+      'DamePNJAEMaj',
       'capaciteFanMade',
       'attaqueOmbre',
     ];
@@ -174,6 +177,8 @@ rollCombatDistancePNJ.forEach((button) => {
     const vMachineAE = totalAspect(attrs, 'Machine');
     const vMasque = +attrs.Masque;
     const vMasqueAE = totalAspect(attrs, 'Masque');
+    const vDame = +attrs.Dame;
+    const vDameAE = totalAspect(attrs, 'Dame');
 
     let aspect = attrs[`${prefix}AspectPNJ`] || '0';
 
@@ -274,7 +279,7 @@ rollCombatDistancePNJ.forEach((button) => {
     }
 
     // GESTION DES EFFETS
-    const effets = getWeaponsEffectsPNJ(prefix, attrs, false, vChair, vMachine, vMachineAE, vMasque, vMasqueAE);
+    const effets = getWeaponsEffectsPNJ(prefix, attrs, false, vChair, vMachine, vMachineAE, vMasque, vMasqueAE, vDame, vDameAE);
 
     bDegats += Number(effets.bDegats);
     eASAssassin = effets.eASAssassin;

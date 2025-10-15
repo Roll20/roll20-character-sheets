@@ -1062,13 +1062,13 @@ const WP = {
   ],
   "w.p. pole arm": [
     { strike: 1, parry: 1 },
-    {},
+    { damage: 2 },
     { strike: 1, parry: 1, throw: 1 },
     {},
     {},
     { strike: 1, parry: 1 },
     {},
-    { throw: 1 },
+    { damage: 2, throw: 1 },
     { strike: 1, parry: 1 },
     {},
     {},
@@ -1375,6 +1375,7 @@ const WP_KEYS = {
     "level",
     "strike",
     "parry",
+    "damage",
     "disarm",
     "rof",
     "throw",
@@ -1499,6 +1500,12 @@ const COMBAT_KEYS = [
   "damage_range",
   "damage_range_single",
   "damage_range_burst",
+  "damage_range_1",
+  "damage_range_1_name",
+  "damage_range_2",
+  "damage_range_2_name",
+  "damage_range_3",
+  "damage_range_3_name",
   "critical",
   "knockout",
   "deathblow",
@@ -1510,11 +1517,12 @@ const COMBAT_KEYS = [
 ];
 const SAVE_KEYS_ATTRIBUTE_BONUSES = {
   me_bonus: ["psionics", "insanity"],
-  pe_bonus: ["magic", "lethalpoison", "nonlethalpoison", "disease", "drugs"],
+  pe_bonus: ["magic", "lethalpoison", "nonlethalpoison", "drugs"],
   pe_coma_bonus: ["comadeath"],
   perception_bonus: ["perceptioncheck"],
   none: [
     "pain",
+    "disease",
     "horrorfactor",
     "mindcontrol",
     "illusions",
@@ -1561,7 +1569,7 @@ const SKILL_KEYS = [
   "description",
 ];
 
-const ABILITIES_REPEATERS = ["magic", "psionics", "powersabilities"];
+const ABILITIES_REPEATERS = ["magic", "psionics", "powersabilities", "modifiers"];
 
 const MAGIC_KEYS = REPEATING_BONUS_KEYS.concat([
   "name",
@@ -1584,6 +1592,9 @@ const MAGIC_KEYS = REPEATING_BONUS_KEYS.concat([
   "duration_starting",
   "duration_per_level",
   "duration_unit",
+  "frequency_starting",
+  "frequency_per_level",
+  "frequency_unit",
   "percentage_starting",
   "percentage_per_level",
   "addtobonuses",
@@ -1609,6 +1620,9 @@ const PSIONICS_KEYS = REPEATING_BONUS_KEYS.concat([
   "duration_starting",
   "duration_per_level",
   "duration_unit",
+  "frequency_starting",
+  "frequency_per_level",
+  "frequency_unit",
   "percentage_starting",
   "percentage_per_level",
   "addtobonuses",
@@ -1639,6 +1653,32 @@ const ABILITIES_KEYS = REPEATING_BONUS_KEYS.concat([
   "percentage_starting",
   "percentage_per_level",
   "addtobonuses",
+  "description",
+]);
+
+const MODIFIERS_KEYS = REPEATING_BONUS_KEYS.concat([
+  "name",
+  "range",
+  "damage",
+  "duration",
+  "percentage",
+  "range_starting",
+  "range_per_level",
+  "range_unit",
+  "damage_starting",
+  "damage_per_level",
+  "damage_unit",
+  "dc_starting",
+  "dc_per_level",
+  "dc_unit",
+  "duration_starting",
+  "duration_per_level",
+  "duration_unit",
+  "frequency_starting",
+  "frequency_per_level",
+  "frequency_unit",
+  "percentage_starting",
+  "percentage_per_level",
   "description",
 ]);
 
@@ -1720,7 +1760,7 @@ const SECTIONS = {
   wp: WP_KEYS.wp,
   wpmodern: WP_KEYS.wpmodern,
   skills: SKILL_KEYS,
-  modifiers: REPEATING_BONUS_KEYS,
+  modifiers: MODIFIERS_KEYS,
   magic: MAGIC_KEYS,
   psionics: PSIONICS_KEYS,
   movement: MOVEMENT_KEYS,

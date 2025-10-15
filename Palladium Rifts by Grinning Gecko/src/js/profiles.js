@@ -21,15 +21,10 @@ async function updateActiveProfile(rowId) {
   await setAttrsAsync(attrs);
 }
 
-//   const a = await getAttrsAsync(["psionic_ability"]);
-//   const attrs = {};
-//   attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
-//     a["psionic_ability"];
-
 async function updateProfile(rowId) {
-  const bonusIds = (
-    await getAttrsAsync(["repeating_profiles_bonus_ids"])
-  ).repeating_profiles_bonus_ids.split(",");
+  const bonusIdsString = await getAttrsAsync([`repeating_profiles_${rowId}_bonus_ids`]);
+  console.log("bonusIdsString", bonusIdsString);
+  const bonusIds = bonusIdsString[`repeating_profiles_${rowId}_bonus_ids`].split(",");
   console.log(bonusIds);
   const bonusNameKeys = bonusIds.map((id) => `repeating_bonuses_${id}_name`);
   const a = await getAttrsAsync(bonusNameKeys);
@@ -38,6 +33,7 @@ async function updateProfile(rowId) {
     (acc, cur) => `${acc}     ✔︎${cur}`.trim(),
     ""
   );
+  console.log("names", bonusNameKeys, names);
   const globals = await getAttrsAsync(["psionic_ability"]);
   await setAttrsAsync({
     [`repeating_profiles_${rowId}_bonus_names`]: names,
@@ -49,6 +45,14 @@ async function updateProfile(rowId) {
   const isActive = await isDefault("profiles", rowId);
   if (isActive) {
     await updateActiveProfile(rowId);
+  }
+}
+
+async function updateAllProfiles() {
+  const rowIds = await getSectionIDsAsync("profiles");
+  console.log("updateAllProfiles", rowIds);
+  for (const rowId of rowIds) {
+    await updateProfile(rowId);
   }
 }
 
@@ -198,6 +202,11 @@ on("clicked:repeating_profiles:checkbonusids", async (e) => {
       : "0";
   }
   await setAttrsAsync(attrs);
+});
+
+on("clicked:updateprofiles", async (e) => {
+  console.log("clicked:updateprofiles", e);
+  await updateAllProfiles();
 });
 
 on(

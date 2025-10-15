@@ -1,172 +1,501 @@
-<div class="wrapper">
-    <input type="hidden" class="tabstoggle" name="attr_sheetTab" value="pilot"/>
-    <div>
-        <button type="action" name="act_pilot" class="tabs">Pilot</button>
-        <button type="action" name="act_mech" class="tabs">Mech</button>
+<input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="pilot" />
+<input type="hidden" name="attr_class" value="salvager" />
+<input type="hidden" name="attr_hp" value="10" />
+<input type="hidden" name="attr_hp_max" value="10" />
+<input type="hidden" name="attr_ap" value="5" />
+<input type="hidden" name="attr_ap_max" value="5" />
+<input type="hidden" name="attr_tp" value="0" />
+<input type="hidden" name="collapsedFields" value="" />
+
+<!-- Table for roll results -->
+<input type="hidden" name="attr_Core-Mechanic" value="" />
+
+<div class="roller-buttons-wrapper">
+    <button type="action" name="act_core_mechanic">Core Mechanic Roll</button>
+    <button type="action" name="act_group_initiative">Group Initiative Roll</button>
+    <button type="action" name="act_group_retreat">Group Retreat Roll</button>
+    <button type="action" name="act_critical_damage">Critical Damage Roll</button>
+    <button type="action" name="act_critical_injury">Critical Injury Roll</button>
+    <button type="action" name="act_reactor_overload">Reactor Overload Roll</button>
+    <button type="action" name="act_area_salvage">Area Salvage Roll</button>
+    <button type="action" name="act_mech_salvage">Mech Salvage Roll</button>
+</div>
+<div class="sheet-tabs-wrapper">
+    <button type="action" name="act_pilot">Pilot</button>
+    <button type="action" name="act_mech">Mech</button>
+    <button type="action" name="act_cargo">Cargo</button>
+    <!-- Action Points (AP) -->
+    <div class="sheet-ap">
+        <span>
+            <label data-label-tooltip="Your Pilot has a number of Ability Points (AP) which can be spent to activate their... Abilities!" for="ap_current">AP:</label>
+            <input type="number" name="attr_ap" id="ap_current" value="5" />
+        </span>
+        /
+        <span>
+            <label data-label-tooltip="Your Pilot's maximum AP. These are fully restored after a week of Downtime spent resting." for="ap_max">Max:</label>
+            <input type="number" name="attr_ap_max" id="ap_max" value="5" />
+        </span>
+    </div>
+</div>
+<div class="sheet-pilot sheet-stats">
+    <!-- Health Points (HP) -->
+    <div class="sheet-hp">
+        <span>
+            <label data-label-tooltip="HP or Hit Points are an abstract measure of how resilient your Pilot is. When your Pilot's HP hits zero, roll on the Critical Injury Table." for="hp_current">HP</label>
+            <input type="number" name="attr_hp" id="hp_current" value="10" />
+        </span>
+        /
+        <span>
+            <label data-label-tooltip="Your Pilot's maximum HP. HP can be fully restored following one week spent at a Tech 1-2 Med Bay during Downtime." for="hp_max">Max:</label>
+            <input type="number" name="attr_hp_max" id="hp_max" value="10" />
+        </span>
     </div>
 
-    <div class="pilot">
-        <h2>Pilot <button type="roll" value="&{template:roll}{{name=@{character_name}}}{{roll=[[1d20]]}}"></button></h2>
-        <div style="display: flex;">
-            <div class="twocolumns">
-                <div class="labels">
-                    <label>Callsign</label>
-                    <label>Background </label>
-                    <label>Ideal </label>
-                    <label>Flaw </label>
-                    <label>Keepsake </label>
-                    <label>Motto </label>
-                </div>
-                <div class="valuecolumn">
-                    <input type="text" name="attr_character_name">
-                    <input type="text" name="attr_background">
-                    <input type="text" name="attr_ideal">
-                    <input type="text" name="attr_flaw">
-                    <input type="text" name="attr_keepsake">
-                    <input type="text" name="attr_motto">
-                </div>
-            </div>
-
-            <div class="marginleft">
-                <h3>Stats</h3>
-                <div class="twocolumns">
-                    <div class="labels">
-                        <label>Health</label>
-                        <label>Ability Pts </label>
-                        <label>Stress </label>
-                    </div>
-                    <div class="valuecolumn">
-                        <input type="number" min="0" max="10" name="attr_health" value="10">
-                        <input type="number" min="0" max="5" name="attr_abilitypts" value="5">
-                        <input type="number" min="0" max="10" name="attr_stress" value="0">
+    <!-- Training Points (TP) -->
+    <div class="sheet-tp">
+        <span>
+            <label data-label-tooltip="Training Points, which can be spent to train new Abilities." for="tp">TP:</label>
+            <input type="number" name="attr_tp" id="tp" value="0" />
+        </span>
+    </div>
+</div>
+<div class="sheet-pilot">
+    <div class="sheet-column-left">
+        <h2>Pilot</h2>
+        <span>Statistics, abilities, and inventory for your Salvage Union Pilot.</span>
+        <img name="attr_character_avatar" alt="Pilot Avatar" id="pilot-avatar"/>
+        <div class="pilot-inline-attribute">
+            <label data-label-tooltip="Your pilot's role on the crew which enables them to take unique abilities." for="class">Class:</label>
+            <select name="attr_class" id="class">
+                <option value="salvager">Salvager</option>
+                <option value="hacker">Hacker</option>
+                <option value="engineer">Engineer</option>
+                <option value="hauler">Hauler</option>
+                <option value="scout">Scout</option>
+                <option value="soldier">Soldier</option>
+                <option value="cyborg">Cyborg</option>
+                <option value="fabricator">Fabricator</option>
+                <option value="union_rep">Union Rep</option>
+                <option value="smuggler">Smuggler</option>
+                <option value="ranger">Ranger</option>
+            </select>
+        </div>
+        <!-- Pilot Information Fields -->
+        <div class="pilot-inline-attribute">
+            <label data-label-tooltip="The name everyone in your crawler refers to your pilot as." for="pilot_callsign">Callsign:</label>
+            <input type="text" name="attr_callsign" id="pilot_callsign" />
+        </div>
+        <div class="pilot-inline-attribute">
+            <label data-label-tooltip="A phrase your pilot happens to be fond of using. Can be uttered as a free action or reaction to re-roll dice. See Pg. 19 in the Workshop Manual." for="pilot_motto">Motto:</label>
+            <input type="text" name="attr_motto" id="pilot_motto" />
+        </div>
+        <div class="pilot-inline-attribute">
+            <label data-label-tooltip="An item that is personal and important to your pilot. Can enable re-rolls, per Pg. 18 in the Workshop Manual." for="pilot_keepsake">Keepsake:</label>
+            <input type="text" name="attr_keepsake" id="pilot_keepsake" />
+        </div>
+        <div class="pilot-block-attribute">
+            <label data-label-tooltip="The appearance of your pilot, can include gender, pronouns, their look, clothing, and more." for="pilot_appearance">Appearance:</label>
+            <textarea name="attr_appearance" id="pilot_appearance"></textarea>
+        </div>
+        <div class="pilot-block-attribute">
+            <label data-label-tooltip="Where your pilot came from, or who they were before joining the Union Crawler." for="pilot_background">Background:</label>
+            <textarea name="attr_background" id="pilot_background"></textarea>
+        </div>
+    </div>
+    <div class="sheet-column-right">
+        <!-- Abilities -->
+        <div class="sheet-abilities">
+            <h3>Abilities</h3>
+            <fieldset class="repeating_abilities">
+                <input class="expand-control" type="hidden" name="attr_expand_item" value="1"/>
+                <input alt="Show/Hide" id="toggleCheckbox" class="toggle-checkbox" type="checkbox" name="attr_expand_item" value="1" checked="true"/>
+                <div class="sheet-ability">
+                    <span class="meta-system-name-collapsed" name="attr_ability_name"></span>
+                    <button class="show-ability-button meta-system-name-collapsed" type="action" name="act_show-ability">&#x1F4AC;</button>
+                    <div class="pilot-inline-attribute">
+                        <label data-label-tooltip="The name of your pilot's ability." for="ability_name">NAME:</label>
+                        <input type="text" name="attr_ability_name" id="ability_name" placeholder="Name"/>
+                        <button class="show-ability-button" type="action" name="act_show-ability">&#x1F4AC;</button>
                     </div>
                     <div>
-                        <label> of 10</label>
-                        <label> of 5</label>
-                        <label> of 10 </label>
+                        <label data-label-tooltip="The Description of your pilot's ability - list all the particulars here for easy reference." for="ability_description">DESCRIPTION:</label>
+                        <textarea name="attr_ability_description" placeholder="Description" id="ability_description"></textarea>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <h3>Weapons</h3>
-        <div class="weapon">
-            <label>Name</label>
-            <label>Range</label>
-            <label>Damage</label>
-        </div>
-        <div>
-            <fieldset class="repeating_weapons">
-                <div class="weapon">
-                    <input type="text" name="attr_weaponname" title="Name of the Weapon">
-                    <input type="text" name="attr_range" title="Range">
-                    <input type="text" name="attr_damage" title="Damage">
-                    <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{character_name}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
-                    </button>
+                    <div class="pilot-ability-stat-grid">
+                        <div>
+                            <label data-label-tooltip="The Action Point cost of your pilot's ability." for="ability_ap">AP:</label>
+                            <input type="number" name="attr_ability_ap" placeholder="AP Value" min="0" id="ability_ap"/>
+                        </div>
+                        <div>
+                            <label data-label-tooltip="The range of your pilot's ability. A 'far' ability can be used at Close range, and so on." for="ability_range">RANGE:</label>
+                            <select name="attr_ability_range" id="ability_range">
+                                <option value="N/A">N/A</option>
+                                <option value="Close">Close</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Long">Long</option>
+                                <option value="Far">Far</option>
+                            </select>
+                        </div>
+                        <div class="tooltip-slide">
+                            <label data-label-tooltip="The action's type - this will generally dictate how long something can take, or if it's always on, or if it's something you would do in your off hours." for="ability_actiontype">TYPE:</label>
+                            <select name="attr_ability_actiontype" id="ability_actiontype">
+                                <option value="Passive">Passive</option>
+                                <option value="Free">Free</option>
+                                <option value="Reaction">Reaction</option>
+                                <option value="Turn">Turn</option>
+                                <option value="Short">Short</option>
+                                <option value="Long">Long</option>
+                                <option value="Downtime">Downtime</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </fieldset>
         </div>
 
-        <h3>Inventory</h3>
-        <div>
-            <input type="text" name="attr_itemname1">
-            <input type="text" name="attr_itemname2">
-            <input type="text" name="attr_itemname3">
-            <input type="text" name="attr_itemname4">
-            <input type="text" name="attr_itemname5">
-            <input type="text" name="attr_itemname6">
-        </div>
-
-        <h3>Equipment</h3>
-        <fieldset class="repeating_equipment">
-            <textarea name="attr_equipment" class="textarea"></textarea>
-        </fieldset>
-
-        <h3>Abilities</h3>
-        <fieldset class="repeating_abilities">
-            <textarea name="attr_ability" class="textarea"></textarea>
-        </fieldset>
-
-    </div>
-
-    <div class="mech">
-        <h2>Mech <button type="roll" value="&{template:roll}{{name=@{mechname}}}{{roll=[[1d20]]}}"></button></h2>
-        <div style="display: flex;">
-            <div class="twocolumns">
-                <div class="labels">
-                    <label>Name</label>
-                    <label>System Slots </label>
-                    <label>Module Slots </label>
-                    <label>Chassis Type </label>
-                </div>
-                <div class="valuecolumn">
-                    <input type="text" name="attr_mechname">
-                    <input type="text" name="attr_system">
-                    <input type="text" name="attr_module">
-                    <input type="text" name="attr_chassis">
-                </div>
-            </div>
-
-            <div class="marginleft">
-                <h3>Stats</h3>
-                <div class="twocolumns">
-                    <div class="labels">
-                        <label>Structure</label>
-                        <label>Energy Pts </label>
-                        <label>Heat </label>
-                    </div>
-                    <div class="valuecolumn">
-                        <input type="number" min="0" name="attr_structure" value="10">
-                        <input type="number" min="0" name="attr_energy" value="10">
-                        <input type="number" min="0" max="10" name="attr_heat" value="0">
-                    </div>
+        <!-- Inventory -->
+        <div class="sheet-inventory">
+            <h3>Inventory</h3>
+            <fieldset class="repeating_inventory">
+                <input class="expand-control" type="hidden" name="attr_expand_item" value="1"/>
+                <input alt="Show/Hide" id="toggleCheckbox" class="toggle-checkbox" type="checkbox" name="attr_expand_item" value="1" checked="true"/>
+                <div class="sheet-inventory">
+                    <span class="meta-system-name-collapsed" name="attr_inventory_name"></span>
+                    <button class="meta-system-name-collapsed show-system-button" type="action" name="act_show-inventory">&#x1F4AC;</button>
+                    <span class="inventory-item">
+                        <div>
+                            <label data-label-tooltip="The name of the item in your pilot's inventory." for="inventoryName">Name:</label>
+                            <input id="inventoryName" type="text" name="attr_inventory_name" placeholder="Name"/>
+                            <button class="show-system-button" type="action" name="act_show-inventory">&#x1F4AC;</button>
+                        </div>
+                        <div>
+                            <label data-label-tooltip="Tags of you equipment that are handy for quick reference, such as type fo action or number of uses." for="tagsOfInventory">TAGS:</label>
+                            <input id="tagsOfInventory" type="text" name="attr_inventory_tags" placeholder="Action Type, Range, # of Uses" />
+                        </div>
+                        <div>
+                            <label data-label-tooltip="The quantity of the item in your pilot's inventory. Optional!" for="numberInInventory">Count:</label>
+                            <input id="numberInInventory" type="number" name="attr_inventory_count" placeholder="#" min="0"/>
+                        </div>
+                    </span>
                     <div>
-                        <label> of  <input type="number" min="0" name="attr_structure_max" value="10"></label>
-                        <label> of  <input type="number" min="0" name="attr_energy_max" value="10"></label>
-                        <label> of  <input type="number" min="0" name="attr_heat_max" value="10"> </label>
+                        <label data-label-tooltip="The description of the item in your pilot's inventory. Include details you'll need to remember later." for="inventoryItemDescription">Description:</label>
+                        <textarea id="inventoryItemDescription" name="attr_inventory_description" placeholder="Description"></textarea>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <h3>Weapons</h3>
-        <div class="weapon">
-            <label>Name</label>
-            <label>Range</label>
-            <label>Damage</label>
-        </div>
-        <div>
-            <fieldset class="repeating_mechweapons">
-                <div class="weapon">
-                    <input type="text" name="attr_weaponname" title="Name of the Weapon">
-                    <input type="text" name="attr_range" title="Range">
-                    <input type="text" name="attr_damage" title="Damage">
-                    <button type="roll" title="Fire the Weapon" value="&{template:weapon}{{callsign=@{mechname}}}{{range=@{range}}}{{weapon_name=@{weaponname}}}{{roll=[[1d20]]}}{{damage=@{damage}}}">
-                    </button>
                 </div>
             </fieldset>
         </div>
+    </div>
+</div>
+<div class="sheet-mech sheet-stats">
+    <!-- Structure Points (SP) -->
+    <div class="sheet-sp">
+        <span>
+            <label data-label-tooltip="Structure Points, an abstract representation of the resilience of your Pilot's Mech." for="sp">SP</label>
+            <input type="number" name="attr_sp" id="sp" value="" />
+        </span>
+        /
+        <span>
+            <label data-label-tooltip="The Mech's maximum Structure Points. These can be restored during Downtime or when repaired in the field." for="sp_max">Cap:</label>
+            <input type="number" name="attr_sp_max" id="sp_max" value="" />
+        </span>
+    </div>
 
-        <h3>Cargo</h3>
-        <fieldset class="repeating_cargo">
-            <textarea name="attr_cargo" class="textarea"></textarea>
-        </fieldset>
+    <!-- Energy Points (EP) -->
+    <div class="sheet-ep">
+        <span>
+            <label data-label-tooltip="Energy Points abstractly represent the energy output and efficiency of your Mechs reactor, as well as its stored power." for="ep">EP:</label>
+            <input type="number" name="attr_ep" id="ep" value="" />
+        </span>
+        /
+        <span>
+            <label  data-label-tooltip="Energy Points are restored uring Downtime or with specialized Systems and Modules." for="ep_max">Cap:</label>
+            <input type="number" name="attr_ep_max" id="ep_max" value="" />
+        </span>
+    </div>
 
-        <h3>Modules</h3>
-        <fieldset class="repeating_modules">
-            <textarea name="attr_module" class="textarea"></textarea>
-        </fieldset>
-
-        <h3>Systems</h3>
+    <!-- Heat -->
+    <div class="sheet-heat">
+        <span>
+            <label  data-label-tooltip="Heat is generated when your Pilot activates some Systems and Modules, or when the Reactor of your Mech is 'Pushed'." for="heat">HEAT:</label>
+            <input type="number" name="attr_heat" id="heat" value="" />
+        </span>
+        /
+        <span>
+            <label data-label-tooltip="If the Mech's Heat reaches the Heat Capacity (CAP), the reactor is at risk of overloading. Shutting down a Mech for an hour can dissipate Heat." for="heat_max">Cap:</label>
+            <input type="number" name="attr_heat_max" id="heat_max" value="" />
+        </span>
+    </div>
+</div>
+<div class="sheet-mech">
+    <div class="sheet-column-left">
+        <h2>Mech</h2>
+        <div class="sheet-chassis-info">
+            <div>
+                <label data-label-tooltip="The name of your Pilot's Mech. Like Felicity. Or Boomstick." for="mech_name">Name:</label>
+                <input type="text" name="attr_mech_name" id="mech_name" />
+            </div>
+        </div>
+        <img name="attr_character_token">
+        <h3>Chassis Stats</h3>
+        <div class="sheet-chassis-info">
+            <div>
+                <label data-label-tooltip="The Chassis is the Mech's 'Model,' and determines the Chassis Ability and core stats of the Mech." for="mech_chassis">Chassis:</label>
+                <input type="text" name="attr_mech_chassis" id="mech_chassis" />
+            </div>
+            <div>
+                <label data-label-tooltip="A Mech Pattern is a template of preset configurations for a Mech. You don't need one, but they're handy." for="mech_pattern">Pattern:</label>
+                <input type="text" name="attr_mech_pattern" id="mech_pattern" />
+            </div>
+            <div>
+                <label data-label-tooltip="A unique trademark of your Pilot's Mech. For example, their comms and sensor array could look like rabbit ears." for="mech_quirk">Quirk:</label>
+                <input type="text" name="attr_mech_quirk" id="mech_quirk" />
+            </div>
+        </div>
+        <div class="sheet-chassis-stats">
+            <div>
+                <label data-label-tooltip="A Mech can only install as many Systems as it has System Slots." for="mech_system_slots">System Slots:</label>
+                <input type="number" name="attr_mech_system_slots" id="mech_system_slots" />
+            </div>
+            <div>
+                <label data-label-tooltip="A Mech can only install as many Modules as it has Module Slots." for="mech_module_slots">Module Slots:</label>
+                <input type="number" name="attr_mech_module_slots" id="mech_module_slots" />
+            </div>
+            <div>
+                <label data-label-tooltip="The maximum amount of cargo this Mech can carry in its Cargo hold, which is represented on the next tab over." for="mech_cargo_cap">Cargo Cap.:</label>
+                <input type="number" name="attr_mech_cargo_cap" id="mech_cargo_cap" />
+            </div>
+            <div>
+                <label data-label-tooltip="A Mech's Tech Level broadly represents how advanced it is." for="mech_tech_level">Tech Level:</label>
+                <input type="number" name="attr_mech_tech_level" id="mech_tech_level" />
+            </div>
+            <div>
+                <label data-label-tooltip="Salvage Value represents the sum of a Mech, System, or Module's material components." for="mech_salvage_value">Salvage Value:</label>
+                <input type="number" name="attr_mech_salvage_value" id="mech_salvage_value" />
+            </div>
+        </div>
+        <div class="sheet-chassis-info">
+            <div class="mech-chassis-ability-block">
+                <label data-label-tooltip="Each Mech Chassis has a unique Ability specific to its design." for="mech_chassis_ability">Chassis Ability:</label>
+                <textarea name="attr_mech_chassis_ability" id="mech_chassis_ability">
+                </textarea>
+            </div>
+        </div>
+        <div class="sheet-chassis-info">
+            <div class="mech-appearance-block">
+                <label data-label-tooltip="While the Chassis is the stock form of the Mech, the Appearance is dictated by what its Pilot did to it to make it uniquely theirs." for="mech_appearance">Appearance:</label>
+                <textarea name="attr_mech_appearance" id="mech_appearance">
+                </textarea>
+            </div>
+        </div>
+    </div>
+    <div class="sheet-column-right">
+        <h3>Systems & Modules</h3>
         <fieldset class="repeating_systems">
-            <textarea name="attr_system" class="textarea"></textarea>
+            <input class="expand-control" type="hidden" name="attr_expand_item" value="1"/>
+            <input alt="Show/Hide" id="toggleCheckbox" class="toggle-checkbox" type="checkbox" name="attr_expand_item" value="1" checked="true"/>
+            <div class="sheet-systems">
+                <span class="meta-system-name-collapsed" name="attr_systems_name"></span><span class="dash-separator"> - </span><span class="system-or-module" name="attr_system_or_module"></span>
+                <button class="show-system-button meta-system-name-collapsed" type="action" name="act_show-system">&#x1F4AC;</button>
+                <div class="system-module-meta">
+                    <div class="systems-item">
+                        <label data-label-tooltip="Name of the system. e.g. Escape Hatch" for="systems_name">Name:</label>
+                        <input type="text" name="attr_systems_name"  id="systems_name" placeholder="Name"/>
+                        <select type="text" name="attr_system_or_module"  id="system_or_module">
+                            <option value="System">System</option>
+                            <option value="Module">Module</option>
+                        </select>
+                        <button class="show-system-button meta-system-name-collapsed" type="action" name="act_show-system">&#x1F4AC;</button>
+                    </div>
+                </div>
+                <div class="systems-item tags-and-ep">
+                    <div>
+                        <label data-label-tooltip="Tags for the system - descriptive tags that don't fit the other fields. Melee, Recommended, e.g." for="systems_tags">Tags:</label>
+                        <input type="text" name="attr_systems_tags"  id="systems_tags" placeholder="Tags - Melee, Salvaging e.g."/>
+                    </div>
+                    <div>
+                        <label data-label-tooltip="EP cost for using the system or module." for="systems_ep">EP:</label>
+                        <input type="number" name="attr_systems_ep"  id="systems_ep" placeholder="0"/>
+                    </div>
+                </div>
+                <div class="sheet-system-stats">
+                    <div>
+                        <label data-label-tooltip="Required Chassis Tech level to use this system or module." for="mech_system_tech_lvl">TECH LVL:</label>
+                        <input type="number" name="attr_mech_system_tech_lvl" id="mech_system_tech_lvl" />
+                    </div>
+                    <div>
+                        <label data-label-tooltip="Required slots to utilize this module or system on your chassis." for="mech_system_slots_req">SLOTS REQ.:</label>
+                        <input type="number" name="attr_mech_system_slots_req" id="mech_system_slots_req" />
+                    </div>
+                    <div class="tooltip-slide">
+                        <label data-label-tooltip="Sale value of this module or system." for="mech_system_salvage_value">SALVAGE VAL.:</label>
+                        <input type="number" name="attr_mech_system_salvage_value" id="mech_system_salvage_value" />
+                    </div>
+                </div>
+                <div>
+                    <label data-label-tooltip="Description of the module or system, including any actions, additional bonuses provided, or possible nuclear rammifications from use." for="mech_system_description">Description:</label>
+                    <textarea name="attr_mech_system_description" id="mech_system_description">
+                    </textarea>
+                </div>
+            </div>
         </fieldset>
     </div>
 </div>
 
-
+<div class="sheet-cargo sheet-stats">
+    <div class="sheet-hp sheet-cargo-stats">
+        <span>
+            <input type="hidden" name="attr_cargo_over" id="cargo_over"/>
+            <label data-label-tooltip="Your cargo load calculated from your current listed cargo.">LOAD:</label>
+            <span name="attr_cargo_total" class="cargo-count"></span>
+        </span>
+        /
+        <span>
+            <label data-label-tooltip="Your mech's cargo cap - the max capacity for what your mech can carry. Generally the total Salvage Value of cargo = how many slots it will take up." for="hp_max">MAX:</label>
+            <span name="attr_mech_cargo_cap"></span>
+        </span>
+    </div>
+</div>
+<div class="sheet-cargo">
+    <div class="cargo-wrapper">
+        <h2>Cargo</h2>
+        <fieldset class="repeating_cargo">
+            <div class="sheet-cargo-item">
+                <div class="cargo-item">
+                    <div>
+                        <label data-label-tooltip="The name of the piece of Cargo in your mech's cargo hold." for="cargoName">NAME:</label>
+                        <input id="cargoName" type="text" name="attr_cargo_name" placeholder="Cargo Name" value=""/>
+                    </div>
+                    <div>
+                        <label data-label-tooltip="The cargo slots taken up by the cargo. Mech chassis and parts' savlage value = the amount of slots it takes up." for="amountOfCargo">SLOTS:</label>
+                        <input id="amountOfCargo" type="number" name="attr_cargo_count" placeholder="#" min="0"/>
+                    </div>
+                    <div class="tooltip-slide">
+                        <label data-label-tooltip="The salvage value of the cargo in your mech's cargo hold." for="valueOfCargo">VALUE:</label>
+                        <input id="valueOfCargo" type="number" name="attr_cargo_value" placeholder="#" min="0"/>
+                    </div>
+                </div>
+                <div>
+                    <label class="cargo-description" data-label-tooltip="Description of the Cargo your mech is carrying." for="cargoItemDescription">DESCRIPTION:</label>
+                    <textarea id="cargoItemDescription" name="attr_cargo_description" placeholder="Description"></textarea>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>
+<rolltemplate class="sheet-rolltemplate-salvageunion">
+    <div class="sheet-template-container">
+        <h3>{{name}}</h3>
+        <div class="sheet-results">
+            <h4>Roll: {{roll1}}</h4>
+            <h4>{{{computed::roll1}}}</h4>
+        </div>
+    </div>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-salvageunion-ability">
+    <div class="sheet-template-container">
+        <h3>{{name}}</h3>
+        <div class="ability-roll-template-container">
+            <div>
+                <h4 class="ability-range">Range: {{Range}}</h4>
+            </div>
+            <div class="chevron-range-container">
+                <h4 class="ap-chevron">{{AP}} AP</h4>
+                <h4 class="action-type">&#x1F552;{{ActionType}}</h4> 
+            </div>
+            <div>
+                <h4 class="ability-description">{{Description}}</h4> 
+            </div>
+        </div>
+    </div>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-salvageunion-inventory">
+    <div class="sheet-template-container">
+        <div class="inventory-header">
+            <h3>{{name}}</h3>
+            <h4>{{Tags}}</h4>
+        </div>
+        <div class="inventory-roll-template-container">
+            <div class="roller-inventory-count">
+                <h4># in Inventory: {{InventoryCount}}</h4>
+            </div>
+            <div class="roller-inventory-description">
+                <h4>{{Description}}</h4> 
+            </div>
+        </div>
+    </div>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-salvageunion-systems">
+    <div class="sheet-template-container">
+        <div class="template-system-module-header">
+            <h3>{{name}}</h3>
+            <div>
+                <h4 title="Energy Point Cost" class="template-ep-chevron">{{EP}} EP</h4>
+                <h4>{{Type}}</h4>
+            </div>
+        </div>
+        <div class="template-system-module-body">
+            <div class="template-system-module-tags">
+                <h4 title="Tags" class="template-tags">{{Tags}}</h4>
+            </div>
+            <div class="system-module-meta">
+                <div class="template-system-module-techlvl">
+                    <h4 title="Tech Level">T{{TechLevel}}</h4>
+                </div>
+                <div class="template-system-module-slots">
+                    <h4 title="Slots Required">{{SlotsRequirement}}</h4>
+                </div>
+                <div class="template-system-module-sv">
+                    <h4 title="Salvage Value">{{SalvageValue}}</h4>
+                </div>
+            </div>
+            <div class="template-system-module-description">
+                <h4 title="Description">{{Description}}</h4> 
+            </div>
+        </div>
+    </div>
+</rolltemplate>
 <script type="text/worker">
-    const buttonlist = ["pilot","mech"];
+    on("change:repeating_cargo:cargo_count", function(eventInfo) {
+        getSectionIDs("repeating_cargo", function(ids) {
+            let totalCargoCount = 0;
+            let fieldsToGet = ids.map(id => `repeating_cargo_${id}_cargo_count`);
+    
+            getAttrs(fieldsToGet, function(values) {
+                ids.forEach(id => {
+                    let cargoCount = parseInt(values[`repeating_cargo_${id}_cargo_count`], 10) || 0;
+                    totalCargoCount += cargoCount;
+                });
+    
+                setAttrs({
+                    cargo_total: totalCargoCount
+                }, {}, function() {
+                    getAttrs(["cargo_total", "mech_cargo_cap"], function(values) {
+                        let cargoTotal = parseInt(values.cargo_total, 10) || 0;
+                        let mechCargoCap = parseInt(values.mech_cargo_cap, 10) || 0;
+                        let cargoOverMax = (cargoTotal > mechCargoCap) ? 1 : 0;
+            
+                        setAttrs({
+                            cargo_over: cargoOverMax
+                        });
+                    });
+                });
+            });
+        });
+    });
+    
+    on("change:mech_cargo_cap change:cargo_total", function() {
+        getAttrs(["cargo_total", "mech_cargo_cap"], function(values) {
+            let cargoTotal = parseInt(values.cargo_total, 10) || 0;
+            let mechCargoCap = parseInt(values.mech_cargo_cap, 10) || 0;
+            let cargoOverMax = (cargoTotal > mechCargoCap) ? 1 : 0;
+    
+            setAttrs({
+                cargo_over: cargoOverMax
+            });
+        });
+    });
+    
+    const buttonlist = ["pilot", "mech", "cargo"];
     buttonlist.forEach(button => {
         on(`clicked:${button}`, function() {
             setAttrs({
@@ -174,96 +503,315 @@
             });
         });
     });
+
+    const classData = {
+      "standardClasses": [
+        {"id": "salvager", "name": "Salvager"},
+        {"id": "hacker", "name": "Hacker"},
+        {"id": "engineer", "name": "Engineer"},
+        {"id": "hauler", "name": "Hauler"},
+        {"id": "scout", "name": "Scout"},
+        {"id": "soldier", "name": "Soldier"}
+      ],
+      "advancedClasses": [
+        {"id": "cyborg", "name": "Cyborg"},
+        {"id": "fabricator", "name": "Fabricator"},
+        {"id": "union_rep", "name": "Union Rep"},
+        {"id": "smuggler", "name": "Smuggler"},
+        {"id": "ranger", "name": "Ranger"}
+      ]
+    };
+    on('clicked:core_mechanic', () => {
+        startRoll("&{template:salvageunion} {{name=Core Mechanic Roll}} {{roll1=[[1d20]]}}", (results) => {
+            let total = results.results.roll1.result;
+            let computed;
+
+            // Define the custom result based on the roll
+            if (total == 20) {
+                computed = 'Nailed it: You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action. When dealing damage, you can choose to double it or pick another appropriate bonus effect.';
+            } else if (total >= 11 && total <= 19) {
+                computed = 'Success: You have achieved your goal without any compromises. When attacking, you hit the target and deal standard damage.';
+            } else if (total >= 6 && total <= 10) {
+                computed = 'Tough Choice: You succeed in your action, but at a cost. The Mediator gives you a Tough Choice with some kind of Setback attached. When attacking, you hit, but must make a Tough Choice';
+            } else if (total >= 2 && total <= 5) {
+                computed = 'Failure: You have failed at what you were attempting to do. You face a Setback of the Mediator\'s choice. When attacking, you miss the target.';
+            } else if (total == 1) {
+                computed = 'Cascade Failure: Something has gone terribly wrong. You suffer a severe consequence of the Mediator\'s choice. When attacking, you miss the target and suffer a Setback chosen by the Mediator.';
+            }
+
+            finishRoll(
+                results.rollId,
+                {
+                    'roll1': computed,
+                }
+            );
+        });
+    });
+    on('clicked:group_initiative', () => {
+        startRoll("&{template:salvageunion} {{name=Group Initiative Roll}} {{roll1=[[1d20]]}}", (results) => {
+            let total = results.results.roll1.result;
+            let computed;
+
+            if (total == 20) {
+                computed = 'You Shot First: Two Pilots chosen by the players act first. Play then passes to the NPC group and one NPC chosen by the Mediator acts next.';
+            } else if (total >= 11 && total <= 19) {
+                computed = 'Quickdraw: One Pilot chosen by the players acts first. Play then passes to the NPC group and one NPC chosen by the Mediator acts.';
+            } else if (total >= 6 && total <= 10) {
+                computed = 'Wait and See: One NPC chosen by the players acts first. Play then passes to the player group and one Pilot chosen by the players acts.';
+            } else if (total >= 2 && total <= 5) {
+                computed = 'Fumble: One NPC chosen by the Mediator acts first. Play then passes to the player group and one Pilot chosen by the players acts.';
+            } else if (total == 1) {
+                computed = 'Ambush:  Two NPCs chosen by the Mediator act first. Play then passes to the player group and one Pilot is chosen by the players to act next. ';
+            }
+
+            finishRoll(
+                results.rollId,
+                {
+                    'roll1': computed,
+                }
+            );
+        });
+    });
+    on('clicked:group_retreat', () => {
+        startRoll("&{template:salvageunion} {{name=Group Retreat Roll}} {{roll1=[[1d20]]}}", (results) => {
+            let total = results.results.roll1.result;
+            let computed;
+
+            if (total == 20) {
+                computed = 'Perfect Escape: : The group makes a perfect escape from the situation to any location of their choice within the Region Map and cannot be pursued.';
+            } else if (total >= 11 && total <= 19) {
+                computed = 'Escape: The group makes a safe escape from the situation to any adjacent location of their choice within the Map and cannot be pursued.';
+            } else if (total >= 6 && total <= 10) {
+                computed = 'Dangerous Escape: The group escapes to any adjacent location of their choice within the Region Map, but at a cost. They must make a Tough Choice related to the situation.';
+            } else if (total >= 2 && total <= 5) {
+                computed = 'Failed Escape: The group fails to retreat from the situation and are pinned down. They cannot retreat and must fight it out to the end.';
+            } else if (total == 1) {
+                computed = 'Disastrous Escape:  The group retreat to an adjacent location of their choice within the Region Map, but at a severe cost. They suffer a Severe Setback and may be pursued. ';
+            }
+
+            finishRoll(
+                results.rollId,
+                {
+                    'roll1': computed,
+                }
+            );
+        });
+    });
+    on('clicked:critical_damage', () => {
+        startRoll("&{template:salvageunion} {{name=Critical Damage Roll}} {{roll1=[[1d20]]}}", (results) => {
+            let total = results.results.roll1.result;
+            let computed;
+
+            if (total == 20) {
+                computed = 'Miraculous Survival: Your Mech is somehow Intact. It has 1 SP and is still fully operational. Your Pilot is unharmed.';
+            } else if (total >= 11 && total <= 19) {
+                computed = 'Core Damage: Your Mech Chassis is damaged and inoperable until repaired. All mounted Systems and Modules remain Intact. Your Pilot is reduced to 0 HP unless they have some means to escape the Mech.';
+            } else if (total >= 6 && total <= 10) {
+                computed = 'Module Destruction: A Module mounted on your Mech is destroyed. This is chosen by the Mediator or at random. Your Mech Chassis is damaged and inoperable until repaired. Your Pilot is unharmed.';
+            } else if (total >= 2 && total <= 5) {
+                computed = 'System Destruction: A System mounted on your Mech is destroyed. This is chosen by the Mediator or at random. Your Mech Chassis is damaged and inoperable until repaired. Your Pilot is unharmed.';
+            } else if (total == 1) {
+                computed = 'Catastrophic Damage: The Mech, as well as any mounted Systems and Modules as well as all Cargo, is destroyed. Your Pilot dies unless they have a means to escape the Mech.';
+            }
+
+            finishRoll(
+                results.rollId,
+                {
+                    'roll1': computed,
+                }
+            );
+        });
+    });
+    on('clicked:critical_injury', () => {
+        startRoll("&{template:salvageunion} {{name=Critical Injury Roll}} {{roll1=[[1d20]]}}", (results) => {
+            let total = results.results.roll1.result;
+            let computed;
+
+            if (total == 20) {
+                computed = 'Miraculous Survival: You survive against the odds. You have 1 HP, remain conscious and can act normally.';
+            } else if (total >= 11 && total <= 19) {
+                computed = 'Unconscious: You are stable at 0 HP, but unconscious and cannot move or take actions until you gain at least 1 HP. You will regain consciousness naturally in 1 hour and get back up with 1 HP.';
+            } else if (total >= 6 && total <= 10) {
+                computed = 'Minor Injury: You suffer a Minor Injury such as a sprain, burns, or minor concussion. Your Max HP is reduced by 1 until healed in a Tech 3 - 4 Med Bay. In addition, you are Unconscious. Apply the result of 11 - 19.';
+            } else if (total >= 2 && total <= 5) {
+                computed = 'Major Injury: You suffer a Major Injury such as permanent scarring, broken ribs, or internal injuries. Your Max HP is reduced by 2 until healed in a Tech 5 - 6 Med Bay. In addition, you are Unconscious. Apply the result of 11-19.';
+            } else if (total == 1) {
+                computed = 'Fatal Injury: Your Pilot suffers a fatal injury and dies.';
+            }
+
+            finishRoll(
+                results.rollId,
+                {
+                    'roll1': computed,
+                }
+            );
+        });
+    });
+    on('clicked:reactor_overload', () => {
+        startRoll("&{template:salvageunion} {{name=Reactor Overload Roll}} {{roll1=[[1d20]]}}", (results) => {
+            let total = results.results.roll1.result;
+            let computed;
+
+            if (total == 20) {
+                computed = 'Reactor Overdrive: Your Mech\'s reactor goes into overdrive. Your Mech can take any additional action this turn or Push their next roll within 10 minutes for free.';
+            } else if (total >= 11 && total <= 19) {
+                computed = 'Reactor Overheat: Your Mech\'s reactor has overheated. Your Mech shuts down and gains the Vulnerable Trait. Your Mech will re-activate at the end of your next turn. In addition, your Mech takes an amount of SP damage equal to your current Heat.';
+            } else if (total >= 6 && total <= 10) {
+                computed = 'Module Overload: One of your Mech\'s Modules chosen at random or by the Mediator is destroyed.';
+            } else if (total >= 2 && total <= 5) {
+                computed = 'System Overload: One of your Mech\'s Systems chosen at random or by the Mediator is destroyed.';
+            } else if (total == 1) {
+                computed = 'Reactor Overload: Your Mech\'s reactor goes into full meltdown and explodes. Your Mech, as well as any mounted Systems, Modules, and all Cargo, is destroyed in the explosion. Everything in Close Range of your Mech takes SP damage equal to your Mech\'s Maximum Heat Capacity. Your Pilot dies unless they have a means to escape. The area your Mech was in becomes Irradiated.';
+            }
+
+            finishRoll(
+                results.rollId,
+                {
+                    'roll1': computed,
+                }
+            );
+        });
+    });
+    on('clicked:area_salvage', () => {
+        startRoll("&{template:salvageunion} {{name=Area Salvage Roll}} {{roll1=[[1d20]]}}", (results) => {
+            let total = results.results.roll1.result;
+            let computed;
+
+            if (total == 20) {
+                computed = 'Jackpot: You find a Mech Chassis, System, or Module at the Tech Level of the area. It is in the Damaged Condition. This can be randomised or chosen by the Mediator.';
+            } else if (total >= 11 && total <= 19) {
+                computed = 'Winning: You find 3 Scrap of the Tech Level of the area.';
+            } else if (total >= 6 && total <= 10) {
+                computed = 'Not Bad: You find 2 Scrap of the Tech Level of the area.';
+            } else if (total >= 2 && total <= 5) {
+                computed = 'Better than Nothing: You find 1 Scrap of the Tech Level of the area.';
+            } else if (total == 1) {
+                computed = 'Nothing: You find nothing in this area.';
+            }
+
+            finishRoll(
+                results.rollId,
+                {
+                    'roll1': computed,
+                }
+            );
+        });
+    });
+    on('clicked:mech_salvage', () => {
+        startRoll("&{template:salvageunion} {{name=Mech Salvage Roll}} {{roll1=[[1d20]]}}", (results) => {
+            let total = results.results.roll1.result;
+            let computed;
+
+            if (total == 20) {
+                computed = 'Lions Share: You salvage the Mech Chassis, a System and a Module of your choice mounted on it. They both have the Damaged Condition. Anything else is considered destroyed.';
+            } else if (total >= 11 && total <= 19) {
+                computed = 'Meat and Potatoes: You salvage the Mech Chassis or a System or Module of your choice mounted on it. It has the Damaged Condition. Anything else is considered destroyed.';
+            } else if (total >= 6 && total <= 10) {
+                computed = 'Bits and Pieces: You salvage a System or Module of your choice mounted on the Mech. It has the Damaged Condition. Anything else is considered destroyed.';
+            } else if (total >= 2 && total <= 5) {
+                computed = 'Nuts and Bolts: You salvage half of the Salvage Value of the Mech Chassis in Scrap of its Tech Level, to a minimum of 1. Everything else is considered destroyed.';
+            } else if (total == 1) {
+                computed = 'Ashes and Dust: The Mech is unsalvageable: its Chassis, Systems and Modules are all considered destroyed.';
+            }
+
+            finishRoll(
+                results.rollId,
+                {
+                    'roll1': computed,
+                }
+            );
+        });
+    });
+
+    on("clicked:repeating_abilities:show-ability", function(eventInfo) {
+        const rowIdMatch = eventInfo.sourceAttribute.match(/repeating_abilities_(-[^_]+)_show-ability/);
+        if (rowIdMatch) {
+            const rowId = rowIdMatch[1];
+            const attributesToGet = [
+                `repeating_abilities_${rowId}_ability_name`,
+                `repeating_abilities_${rowId}_ability_ap`,
+                `repeating_abilities_${rowId}_ability_range`,
+                `repeating_abilities_${rowId}_ability_description`,
+                `repeating_abilities_${rowId}_ability_actiontype`
+            ];
+
+            getAttrs(attributesToGet, function(values) {
+                console.log(values);
+                const abilityName = values[`repeating_abilities_${rowId}_ability_name`] || 'N/A';
+                const abilityAp = values[`repeating_abilities_${rowId}_ability_ap`] || 'N/A';
+                const abilityRange = values[`repeating_abilities_${rowId}_ability_range`] || 'N/A';
+                const abilityDescription = values[`repeating_abilities_${rowId}_ability_description`] || 'N/A';
+                const abilityType = values[`repeating_abilities_${rowId}_ability_actiontype`] || 'N/A';
+                const rollExpression = `&{template:salvageunion-ability} {{name=${abilityName}}} {{AP=${abilityAp}}} {{Range=${abilityRange}}} {{ActionType=${abilityType}}} {{Description=${abilityDescription}}}`;
+                
+                startRoll(rollExpression, function(rollResults) {
+                    finishRoll(rollResults.rollId, {});
+                });
+            });
+        }
+    });
+
+    on("clicked:repeating_inventory:show-inventory", function(eventInfo) {
+        const rowIdMatch = eventInfo.sourceAttribute.match(/repeating_inventory_(-[^_]+)_show-inventory/);
+        if (rowIdMatch) {
+            const rowId = rowIdMatch[1];
+            const attributesToGet = [
+                `repeating_inventory_${rowId}_inventory_name`,
+                `repeating_inventory_${rowId}_inventory_count`,
+                `repeating_inventory_${rowId}_inventory_description`,
+                `repeating_inventory_${rowId}_inventory_tags`
+            ];
+
+            getAttrs(attributesToGet, function(values) {
+                console.log(values);
+                const inventoryName = values[`repeating_inventory_${rowId}_inventory_name`] || 'N/A';
+                const inventoryCount = values[`repeating_inventory_${rowId}_inventory_count`] || 'N/A';
+                const inventoryDescription = values[`repeating_inventory_${rowId}_inventory_description`] || 'N/A';
+                const inventoryTags = values[`repeating_inventory_${rowId}_inventory_tags`] || 'N/A';
+                const rollExpression = `&{template:salvageunion-inventory} {{name=${inventoryName}}} {{Tags=${inventoryTags}}} {{InventoryCount=${inventoryCount}}} {{Description=${inventoryDescription}}}`;
+                
+                startRoll(rollExpression, function(rollResults) {
+                    finishRoll(rollResults.rollId, {});
+                });
+            });
+        }
+    });
+
+    on("clicked:repeating_systems:show-system", function(eventInfo) {
+        const rowIdMatch = eventInfo.sourceAttribute.match(/repeating_systems_(-[^_]+)_show-system/);
+        if (rowIdMatch) {
+            const rowId = rowIdMatch[1];
+            const attributesToGet = [
+                `repeating_systems_${rowId}_systems_name`,
+                `repeating_systems_${rowId}_system_or_module`,
+                `repeating_systems_${rowId}_systems_ep`,
+                `repeating_systems_${rowId}_systems_tags`,
+                `repeating_systems_${rowId}_mech_system_tech_lvl`,
+                `repeating_systems_${rowId}_mech_system_slots_req`,
+                `repeating_systems_${rowId}_mech_system_salvage_value`,
+                `repeating_systems_${rowId}_mech_system_description`
+            ];
+
+            getAttrs(attributesToGet, function(values) {
+                console.log(values);
+                const systemName = values[`repeating_systems_${rowId}_systems_name`] || 'N/A';
+                const systemType = values[`repeating_systems_${rowId}_system_or_module`] || 'N/A';
+                const systemEP = values[`repeating_systems_${rowId}_systems_ep`] || '0';
+                const systemTags = values[`repeating_systems_${rowId}_systems_tags`] || 'N/A';
+                const systemTechLevel = values[`repeating_systems_${rowId}_mech_system_tech_lvl`] || 'N/A';
+                const systemSlotsReq = values[`repeating_systems_${rowId}_mech_system_slots_req`] || 'N/A';
+                const systemSalvageValue = values[`repeating_systems_${rowId}_mech_system_salvage_value`] || 'N/A';
+                const systemDescription = values[`repeating_systems_${rowId}_mech_system_description`] || 'N/A';
+                const rollExpression = `&{template:salvageunion-systems} {{name=${systemName}}} {{Type=${systemType}}} {{EP=${systemEP}}} {{Tags=${systemTags}}} {{TechLevel=${systemTechLevel}}} {{SlotsRequirement=${systemSlotsReq}}} {{SalvageValue=${systemSalvageValue}}} {{Description=${systemDescription}}}`;
+                
+                startRoll(rollExpression, function(rollResults) {
+                    finishRoll(rollResults.rollId, {});
+                });
+            });
+        }
+    });
 </script>
 
-<rolltemplate class="sheet-rolltemplate-weapon">
-    <table>
-        <tr>
-            <th>
-                {{callsign}} rolls an attack on range {{range}} with {{weapon_name}}
-            </th>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                {{#rollBetween() roll 20 20}}
-                <strong>Nailed it</strong> ({{roll}}) <br>
-                You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action. When dealing damage you double it.
-                {{/rollBetween() roll 20 20}}
 
-                {{#rollBetween() roll 11 19}}
-                Success ({{roll}}) - You’ve achieved your goal without any compromises. When attacking you hit the target and deal standard damage
-                {{/rollBetween() roll 11 19}}
 
-                {{#rollBetween() roll 6 10}}
-                Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence. When attacking you hit but something has
-                gone wrong.
-                {{/rollBetween() roll 6 10}}
 
-                {{#rollBetween() roll 2 5}}
-                Failure ({{roll}}) - You’ve failed at what you were attempting, and you’ll face a consequence of The Mediator’s choice. When attacking you miss the target.
-                {{/rollBetween() roll 2 5}}
-
-                {{#rollBetween() roll 1 1}}
-                Cascade Failure ({{roll}}) - You have not only failed, but something has gone terribly wrong. You will suffer a severe consequence of The Mediator’s choice. When attacking you miss the
-                target and something has gone wrong.
-                {{/rollBetween() roll 1 1}}
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Weapondamage: {{damage}}
-            </td>
-        </tr>
-    </table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-roll">
-    <table>
-        <tr>
-            <th>
-                {{name}} rolls
-            </th>
-        </tr>
-        <tr>
-            <td>
-                <div class="sheet-rolltemplate-spacer"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                {{#rollBetween() roll 20 20}}
-                <strong>Nailed it</strong> ({{roll}}) <br>
-                You have overcome the odds and managed an outstanding success. You may achieve an additional bonus of your choice to the action. When dealing damage you double it.
-                {{/rollBetween() roll 20 20}}
-
-                {{#rollBetween() roll 11 19}}
-                Success ({{roll}}) - You’ve achieved your goal without any compromises. When attacking you hit the target and deal standard damage
-                {{/rollBetween() roll 11 19}}
-
-                {{#rollBetween() roll 6 10}}
-                Tough Choice ({{roll}}) - You succeed in your action but at a cost. The Mediator will give you a tough choice with some kind of consequence. When attacking you hit but something has
-                gone wrong.
-                {{/rollBetween() roll 6 10}}
-
-                {{#rollBetween() roll 2 5}}
-                Failure ({{roll}}) - You’ve failed at what you were attempting, and you’ll face a consequence of The Mediator’s choice. When attacking you miss the target.
-                {{/rollBetween() roll 2 5}}
-
-                {{#rollBetween() roll 1 1}}
-                Cascade Failure ({{roll}}) - You have not only failed, but something has gone terribly wrong. You will suffer a severe consequence of The Mediator’s choice. When attacking you miss the
-                target and something has gone wrong.
-                {{/rollBetween() roll 1 1}}
-            </td>
-        </tr>
-    </table>
-</rolltemplate>

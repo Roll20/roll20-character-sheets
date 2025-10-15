@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable default-case */
 /* eslint-disable camelcase */
 /* eslint-disable prefer-destructuring */
@@ -795,11 +796,9 @@ on('clicked:distanceRangerLongbow', async (info) => {
   if (!pasEnergie) {
     finalRoll = await startRoll(exec.join(' '));
 
-    const tJet = finalRoll.results.jet.result;
     const rJet = finalRoll.results.jet.dice;
 
     const tBonus = finalRoll.results.bonus.result;
-    const tExploit = finalRoll.results.Exploit.result;
 
     const rDegats = finalRoll.results.degats.dice;
     const rViolence = finalRoll.results.violence.dice;
@@ -819,29 +818,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
     const computed = updateRoll(finalRoll, rJet, tBonus, tDegats, rDegats, bonusDegats, tViolence, rViolence, bonusViolence, conditions);
 
     finishRoll(finalRoll.rollId, computed);
-
-    if (tJet !== 0 && computed.basejet === tExploit) {
-      const exploitRoll = await startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`);
-      const rExploit = exploitRoll.results.jet.dice;
-      const exploitPairOrImpair = 0;
-
-      const jetExploit = rExploit.reduce((accumulateur, valeurCourante) => {
-        const vC = valeurCourante;
-        let nV = 0;
-
-        if (vC % 2 === exploitPairOrImpair) {
-          nV = 1;
-        }
-
-        return accumulateur + nV;
-      }, 0);
-
-      const exploitComputed = {
-        jet: jetExploit,
-      };
-
-      finishRoll(exploitRoll.rollId, exploitComputed);
-    }
+    await postRoll(computed, roll, jet, finalRoll, conditions);
 
     setAttrs({
       energiePJ: resultatEnergie,

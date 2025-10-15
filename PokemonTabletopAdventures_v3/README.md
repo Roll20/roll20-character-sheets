@@ -8,22 +8,114 @@ https://discord.gg/F24Ka8E
 
 ## To-Do:
 
+<details>
+  <summary><u>Expand for potential future to-do list</u></summary>
+
 Things we want to add to the character sheet, presented in no particular order of priority:
 
-- [X] Mobile support!
-  - [X] Set legacy to false
-  - [X] Refactor sheets to minimize overhead
-  - [X] Reasonable user experience on the Companion App
-  - [ ] Full "optimized for use" support for Companion App
-- [X] Support Dark Mode sheet
-- [X] Support Dark Mode roll templates
+- [ ] Automatically provide Dynamax moves, Z-Moves, and Tera Blast
+- [ ] Full "optimized for use" support for Companion App
 - [ ] Allow a second ability score to apply to skill checks
 - [ ] Allow formula calculations for the extra damage fields
 - [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
 
+</details>
 
 ## Changelog
 
+### Oct 6, 2025
+- Resolved an issue with incorrectly updating capture rolls when changing display modes
+- Updated skill templates to not mislabel capture rolls
+
+### Aug 16, 2025
+- Resolved an issue with capture rolls not adding all ball modifiers correctly
+
+### Jul 26, 2025
+- Resolved a few niggling issue with skills
+  - Sleight of Hand had a mismatch in attribute name for the selected ability modifier
+  - Engineering had the wrong value in the selected attribute drop-down selected by default
+
+### Jul 20, 2025
+- Added Collapse/Expand button for all skills, so a single click closes/opens them all
+- Added collapsing section for giving held items a description to prevent continuous cross-referencing
+- Added skill talent pips to the skill roll button
+- Moved ball selection back out of the capture configuration section
+- Updated the colour used for the highlighted skill and all skill totals in dark mode to have a better contrast
+
+### Jul 14, 2025
+- Added a collapsing section for skills
+- Fixed an issue where pokémon nature would affect trainer stats
+- Updated skill and capture pokémon visuals, for trainers only (for now)
+- Removed now-unneeded configuration page entry for skill attribute selection
+
+### Jun 28, 2025
+- Reinstated 1/combat frequency option to accommodate homebrew
+
+### May 11, 2025
+- Updated move frequency options to match the updated rules
+
+### Apr 13, 2025
+- Added a range output to the various move roll templates
+
+### Jan 28, 2025
+- Updated the Hybrid Character to allow entering the advanced class level
+
+### Jan 18, 2025
+- Resolved an issue with the repeating sections not showing the edit controls when appropriate
+
+<details>
+  <summary><u>Expand for 2024 Changes</u></summary>
+
+### Nov 27, 2024
+- Removed scrollbars from the collapsing sections
+
+### Nov 17, 2024
+- Added a new roll template used by skills that has a more streamlined appearance
+- Added a new toggle button at the top of the sheet to toggle between skill roll templates, that defaults to the existing style
+- Added transitions for all collapsible sections of the sheet to make it more pleasing to use
+- Added collapsing sections for all areas of the sheet's character page
+
+### Apr 10, 2024
+- Added support for collapsing the character avatar/stat grid section to show only the stat grid when collapsed
+- Resolved a small issue with the background when the sheet scrolled sideways for the mobile app
+
+### Apr 5, 2024
+- Added support for collapsing the entire trainer features section
+- Added support for showing the character avatar in the stat grid section
+- Improved visibility of section headers
+
+</details>
+
+<details>
+  <summary><u>Expand for 2023 Changes</u></summary>
+
+### Sep 23, 2023
+- Added an Advanced Class section to the Hybrid sheet's character details section
+
+### Feb 22, 2023
+- It's the Form Changes update!
+  - Added Terastallization, Dynamax/Gigantamax, Mega Evolution, and 3 fully customizable form changes
+  - Sheet auto changes type to selected type, for forms that have one
+  - Sheet automatically adds stats to your own, if you supply stats (auto +3 defenses for Tera)
+  - Stat changes and notes show up on main page
+  - Dynamax changes your height, weight, move speed, and optionally HP
+  - Descriptions in the configuration page for what each form change does and how to configure it
+  - Form changes start as not enabled. Check to enable configuration and add button to activate.
+  - Buttons for each form change appear on the character page, in the top right
+  - Most form references are read-only from the main page, except for notes
+  - The type used for STAB (and sheet color) is abstracted from type1/type2 to active_type1/active_type2
+
+### Feb 14, 2023
+- Gave the attack rolls some love, as befitting the day of the year.
+  - Updated the scatter selection to change the attack rolls, so that lower-hit moves aren't rolling many sets of dice
+  - Added support for scatter attacks that hit up to 10 times
+  - Clarified the intent of each scatter type selection by explicitly stating how many hits are in each roll
+
+</details>
+
+<details>
+  <summary><u>Expand for 2022 Changes</u></summary>
+  
 ### Aug 11, 2022
 - Implemented the ability to change the background and roll template colours for class and origin features, accessible to Trainer and Hybrid character types
 
@@ -69,6 +161,11 @@ Current mobile bugs that I'm pretty sure are roll20 bugs:
 - HP updates seem to clear out the _max value sometimes?
 - Stat in parenthesis for skill checks doesn't populate
 - The roll20 dice font is not available
+
+</details>
+
+<details>
+  <summary><u>Expand for 2021 Changes</u></summary>
 
 ### Jul 17th, 2021
 - Added a level field to the `hybrid` _(or Pokémon (Character Class))_ character type.
@@ -161,6 +258,11 @@ Current mobile bugs that I'm pretty sure are roll20 bugs:
 - Added a quick roll button that rolls a move without any query boxes for temporary modifiers or effectiveness, rolling with +0/+0/Neutral values
 - Streamlined move displays to show the configuration only when desired via a collapsible control
 
+</details>
+
+<details>
+<summary><u>Expand for 2020 Changes</u></summary>
+
 ### Dec 12, 2020
 
 - Migrated the character sheet style attributes to new fields
@@ -248,3 +350,5 @@ Current mobile bugs that I'm pretty sure are roll20 bugs:
 ### Sept 16, 2020
 
 - Initial Commit
+
+</details>

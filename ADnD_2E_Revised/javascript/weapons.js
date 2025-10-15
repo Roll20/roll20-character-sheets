@@ -1706,7 +1706,7 @@ WEAPONS_TABLE['shield-rush'].push({
     'noProf': true,
     'size': 'M/L',
     'type': 'B',
-    'speed': 0,
+    'speed': 3,
     'small-medium': '1d3',
     'large': '1d3',
     'book': ['The Complete Fighter\'s Handbook'],
@@ -1760,7 +1760,7 @@ WEAPONS_TABLE['scythe'].push({
     'speed': 8,
     'small-medium': '1d6+1',
     'large': '1d8',
-    'book': ['The Complete Priest\'s Handbook','The Complete Ranger\'s Handbook'],
+    'book': ['The Complete Priest\'s Handbook','The Complete Ranger\'s Handbook','The Complete Druid\'s Handbook'],
     'category': ['Melee']
 });
 //endregion

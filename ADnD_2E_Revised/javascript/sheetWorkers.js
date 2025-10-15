@@ -7,6 +7,9 @@ const INFO = 2;
 const WARNING = 3;
 const ERROR = 4;
 
+const ERRATA_FIELD = 'errata';
+const PSIONICS_HANDBOOK = 'The Complete Psionics Handbook';
+
 const BOOK_FIELDS = [
     'book-phb','book-tcfhb','book-tcthb','book-tcprhb','book-tcwhb','book-psionics',
     'book-tom','book-aaeg',
@@ -22,6 +25,38 @@ const LEVEL_FIELDS = {
     'level-class4': 'class4',
     'level-class5': 'class5',
 };
+
+const THAC0_FORMULAS = {
+    'warrior':    l => 21-l,
+    'wizard':     l => 21-Math.ceil(l/3),
+    'priest':     l => 22-(Math.ceil(l/3)*2),
+    'rogue':      l => 21-Math.ceil(l/2),
+    'psionicist': l => 21-Math.ceil(l/2),
+}
+
+const SPELL_LEVEL_REQUIREMENT = {
+    'Wizard': {
+        '1': 1,
+        '2': 3,
+        '3': 5,
+        '4': 7,
+        '5': 9,
+        '6': 12,
+        '7': 14,
+        '8': 16,
+        '9': 18,
+    },
+    'Priest': {
+        '1': 1,
+        '2': 3,
+        '3': 5,
+        '4': 7,
+        '5': 9,
+        '6': 11,
+        '7': 14,
+        'q': 10,
+    }
+}
 
 const SCHOOL_SPELLS_AND_MAGIC = 'school-spells-and-magic';
 const SCHOOL_FIELDS = [SCHOOL_SPELLS_AND_MAGIC];
@@ -67,45 +102,42 @@ const capitalizeFirst = function (s) {
 }
 
 const displaySize = function(size) {
-    if (typeof size !== 'string')
+    if (typeof size !== 'string' || size.length === 0)
         return '';
 
-    size = size.toLowerCase();
-    switch (size) {
-        case 't':
-        case 'tiny': return 'Tiny';
-        case 's':
-        case 'small': return 'Small';
-        case 'm':
-        case 'medium': return 'Medium';
-        case 'l':
-        case 'large': return 'Large';
-        case 'h':
-        case 'huge': return 'Huge';
-        case 'g':
-        case 'gargantuan': return 'Gargantuan';
+    let sizeLetter = size.charAt(0).toLowerCase();
+    switch (sizeLetter) {
+        case 't': return 'Tiny';
+        case 's': return 'Small';
+        case 'm': return 'Medium';
+        case 'l': return 'Large';
+        case 'h': return 'Huge';
+        case 'g': return 'Gargantuan';
         default: return capitalizeFirst(size);
     }
 }
 
 const sizeToInt = function(size) {
-    size = displaySize(size);
-    switch (size) {
-        case 'Tiny': return 0;
-        case 'Small': return 1;
-        case 'Medium': return 2;
-        case 'Large': return 3;
-        case 'Huge': return 4;
-        case 'Gargantuan': return 5;
+    if (typeof size !== 'string' || size.length === 0)
+        return '';
+
+    let sizeLetter = size.charAt(0).toLowerCase();
+    switch (sizeLetter) {
+        case 't': return 0;
+        case 's': return 1;
+        case 'm': return 2;
+        case 'l': return 3;
+        case 'h': return 4;
+        case 'g': return 5;
     }
 }
 
 const displayWeaponType = function (type) {
-    if (typeof type !== 'string')
+    if (typeof type !== 'string' || type.length === 0)
         return '';
 
-    type = type.toLowerCase();
-    switch (type) {
+    let typeLetter = type.toLowerCase();
+    switch (typeLetter) {
         case 's': return 'Slashing';
         case 'p': return 'Piercing';
         case 'b': return 'Bludgeoning';
@@ -132,7 +164,7 @@ const conditionalLog = function (bool, msg) {
 }
 
 const extractQueryResult = async function(query){//Sends a message to query the user for some behavior, returns the selected option.
-    let queryRoll = await startRoll(`!{{query=[[0[response=${query}]]]}}`);
+    let queryRoll = await startRoll(`!{{query=[[0[response=${query}] ]]}}`);
     finishRoll(queryRoll.rollId);
     return queryRoll.results.query.expression.replace(/^.+?response=|\]$/g,'');
 };
@@ -195,43 +227,66 @@ const isRollValid = function (rollExpression, field) {
     return true;
 }
 
+const getClassesWithLevels = function(values) {
+    let result = {};
+    Object.entries(LEVEL_FIELDS).forEach(([levelField, classField]) => {
+        let levelValue = parseInt(values[levelField]);
+        if (isNaN(levelValue) || levelValue < 1) {
+            return;
+        }
+        result[levelField] = {level: levelValue, className: values[classField]}
+        switch (levelField.slice(-1)) {
+            case "1": result[levelField].classGroup = 'warrior'; break;
+            case "2": result[levelField].classGroup = 'wizard'; break;
+            case "3": result[levelField].classGroup = 'priest'; break;
+            case "4": result[levelField].classGroup = 'rogue'; break;
+            case "5": result[levelField].classGroup = 'psionicist'; break;
+        }
+    });
+    return result;
+}
+
+const getClassSuggestionOptions = function (values) {
+    return Object.entries(getClassesWithLevels(values)).map(([levelField,classProperties]) => {
+        // remove comma as it breaks query format
+        let className = classProperties.className.replaceAll(/[,|]/g,'');
+        className = className ? className : `${levelField}`;
+        return `${className} level ${classProperties.level},${levelField}`;
+    }).join('|');
+}
+
 const LEVEL_CLASS_REGEX = /@\{level-class[1-5]}/g;
-const checkClassLevel = async function(values, rollExpression) {
+const checkClassLevel = async function(formulaField, values, rollExpression) {
     await keepContextRoll();
-    let result = {rollExpression: rollExpression};
     let match = rollExpression.match(LEVEL_CLASS_REGEX);
     if (!match)
-        return result; // There is no scaling
+        return rollExpression; // There is no scaling
 
     let levelsInExpression = new Set(match);
     if (levelsInExpression.size > 1)
-        return result; // The user presumably knows what he is doing
+        return rollExpression; // More than one level-class present. The user presumably knows what he is doing
 
-    let levelsWithValues = Object.keys(LEVEL_FIELDS).filter(level => values[level]);
-    if (levelsWithValues.length === 0)
-        return result; // The user has not set levels in any fields
+    let classesWithLevels = getClassesWithLevels(values);
+    let levelsWithValue = Object.keys(classesWithLevels);
+    if (levelsWithValue.length === 0)
+        return rollExpression; // The user has not set levels in any fields
 
-    let [levelInExpression] = levelsInExpression;
+    let [levelInExpression] = levelsInExpression; // first element from set
     let levelInExpressionNoBrackets = levelInExpression.replace(/[@{}]/g, '');
-    if (levelsWithValues.length === 1) {
-        if (levelInExpressionNoBrackets === levelsWithValues[0]) {
-            return result;
+    if (levelsWithValue.length === 1) {
+        if (levelInExpressionNoBrackets === levelsWithValue[0]) {
+            return rollExpression;
         } else {
-            result.rollExpression = rollExpression.replaceAll(levelInExpressionNoBrackets, levelsWithValues[0]);
-            return result;
+            return  rollExpression.replaceAll(levelInExpressionNoBrackets, classesWithLevels[0]);
         }
     } else {
-        let suggestedClasses = levelsWithValues.map(l => `${values[LEVEL_FIELDS[l]].replaceAll(',', '')} (${l}),${l}`)
-            .join('|');
-        let query = values[levelInExpressionNoBrackets]
-            ? `?{Please confirm the class to use|${suggestedClasses}}`
-            : `?{${levelInExpressionNoBrackets} has no value. Please select the class to use|${suggestedClasses}}`;
+        let suggestedClasses = getClassSuggestionOptions(values);
+        let query = parseInt(values[levelInExpressionNoBrackets])
+            ? `?{Macro [${formulaField}]: Please confirm the class to use|${suggestedClasses}}`
+            : `?{Macro [${formulaField}]: ${levelInExpressionNoBrackets} has no value. Please select the class to use|${suggestedClasses}}`;
 
-        result.func = async function() {
-            let field = await extractQueryResult(query);
-            return rollExpression.replaceAll(levelInExpressionNoBrackets, field);
-        };
-        return result;
+        let field = await extractQueryResult(query);
+        return rollExpression.replaceAll(levelInExpressionNoBrackets, field);
     }
 }
 
@@ -244,15 +299,19 @@ const calculateFormula = function(formulaField, calculatedField, doCheckClassLev
 
         let valueToSet = {};
         if (doCheckClassLevel) {
-            let result = await checkClassLevel(values, rollExpression);
-            if (result.func)
-                valueToSet[formulaField] = rollExpression = await result.func();
-            else
-                valueToSet[formulaField] = rollExpression = result.rollExpression;
+            let updatedRollExpression = await checkClassLevel(formulaField, values, rollExpression);
+            if (rollExpression !== updatedRollExpression) {
+                valueToSet[formulaField] = rollExpression = updatedRollExpression;
+            }
         }
 
-        valueToSet[calculatedField] = await extractRollResult(rollExpression);
-        setAttrs(valueToSet);
+        if (calculatedField) {
+            valueToSet[calculatedField] = await extractRollResult(rollExpression);
+        }
+
+        if (Object.keys(valueToSet).length > 0) {
+            setAttrs(valueToSet);
+        }
     });
 }
 
@@ -274,6 +333,16 @@ const getActiveSettings = function (settingFields, values) {
         .filter(Boolean)
         .filter(book => book !== '0');
     return new Set(settings);
+}
+
+const isBookActive = function (books, obj) {
+    let activeBooks = getActiveSettings(BOOK_FIELDS, books);
+    console.log(activeBooks);
+    if (typeof obj === 'string') {
+        return activeBooks.has(obj);
+    }
+
+    return false
 }
 
 const isBookInactive = function (books, obj) {
@@ -374,7 +443,7 @@ const repeatingCalculateRemainingRecursive = function (tail, accumulator, result
 //#endregion
 
 //#region Generic Setup functions
-function setupStaticCalculateTotal(totalField, fieldsToSum, maxValue) {
+const setupStaticCalculateTotal = function(totalField, fieldsToSum) {
     let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
     on(onChange, function () {
         getAttrs(fieldsToSum, function (values) {
@@ -383,9 +452,6 @@ function setupStaticCalculateTotal(totalField, fieldsToSum, maxValue) {
                 total += parseInt(values[field]) || 0;
             });
 
-            if (!isNaN(maxValue))
-                total = Math.min(total, maxValue);
-
             setAttrs({
                 [totalField]: total
             });
@@ -393,16 +459,14 @@ function setupStaticCalculateTotal(totalField, fieldsToSum, maxValue) {
     });
 }
 
-function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToSum, repeatingName, maxValue) {
+function setupRepeatingRowCalculateTotal(repeatingName, repeatingFieldsToSum, repeatingTotalField) {
     let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
-    let allFields = [...repeatingFieldsToSum];
-    allFields.push(repeatingTotalField);
     on(`${onChange} remove:repeating_${repeatingName}`, function(eventInfo){
         if (eventInfo.removedInfo)
             return;
 
         TAS.repeating(repeatingName)
-            .fields(allFields)
+            .fields([...repeatingFieldsToSum, repeatingTotalField])
             .tap(function(rowSet) {
                 let rowId = parseSourceAttribute(eventInfo).rowId;
                 let row = rowSet[rowId];
@@ -410,9 +474,6 @@ function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToS
                 repeatingFieldsToSum.forEach(column => {
                     total += row.I[column];
                 });
-
-                if (!isNaN(maxValue))
-                    total = Math.min(total, maxValue);
 
                 row[repeatingTotalField] = total;
             })
@@ -430,7 +491,7 @@ on('clicked:hide-toast', function(eventInfo) {
 
 //#region Ability Scores logic
 // Ability Score Parser function
-const EXCEPTIONAL_STRENGHT_REGEX = /18[\[(]([0-9]{1,3})[\])]/; // Ie. 18[65], 18(65)
+const EXCEPTIONAL_STRENGTH_REGEX = /18[\[(]([0-9]{1,3})[\])]/; // Ie. 18[65], 18(65)
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     if (abilityScoreString === '') {
         return defaultValue;
@@ -442,7 +503,7 @@ function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     }
 
     if (isStrength) {
-        let exceptionalMatch = abilityScoreString.match(EXCEPTIONAL_STRENGHT_REGEX);
+        let exceptionalMatch = abilityScoreString.match(EXCEPTIONAL_STRENGTH_REGEX);
         if (exceptionalMatch !== null) {
             let exceptionalStrNumber = parseInt(exceptionalMatch[1]);
             if (1 <= exceptionalStrNumber && exceptionalStrNumber <= 50) {
@@ -531,36 +592,36 @@ on('change:dexterity change:aim change:balance', function() {
             return;
         }
 
-        let aim = getLookupValue(aimRaw, '');
-        let balance = getLookupValue(balanceRaw, '');
+        let aim = getLookupValue(aimRaw, dexterity);
+        let balance = getLookupValue(balanceRaw, dexterity);
 
         let dexnotes;
         let dex2notes;
         let standardRules = false;
         if (aimRaw === '' && balanceRaw === '') {
-            dexnotes = '';
+            dexnotes = dexterityTable['dexnotes'][dexterity];
             dex2notes = '';
             standardRules = true;
         } else {
-            dexnotes = aim === 0 ? 'INVALID AIM' : '';
-            dex2notes = balance === 0 ? 'INVALID BALANCE' : '';
+            dexnotes = aim === 0 ? 'INVALID AIM' : dexterityTable['dexnotes'][aim];
+            dex2notes = balance === 0 ? 'INVALID BALANCE' : dexterityTable['dexnotes'][balance];
         }
 
         assignAttributes(dexterity, aim, balance, dexnotes, dex2notes, standardRules);
 
         function assignAttributes(dexterity, aim, balance, dexnotes, dex2notes, standardRules) {
             setAttrs({
-                ppd: dexterityTable['aim-pickpocket'][aim] || dexterityTable['dex-pickpocket'][dexterity],
-                old: dexterityTable['aim-openlocks'][aim] || dexterityTable['dex-openlocks'][dexterity],
-                rtd: dexterityTable['dex-findtraps'][dexterity],
-                msd: dexterityTable['balance-movesilently'][balance] || dexterityTable['dex-movesilently'][dexterity],
-                hsd: dexterityTable['dex-hideinshadows'][dexterity],
-                cwd: standardRules ? '0' : dexterityTable['balance-climbwalls'][balance] || dexterityTable['dex-climbwalls'][dexterity],
-                tud: standardRules ? '0' : dexterityTable['dex-tunneling'][dexterity],
-                ebd: standardRules ? '0' : dexterityTable['dex-escapebonds'][dexterity],
-                dexreact: dexterityTable['dexreact'][getLookupValue(balance, dexterity)],
-                dexmissile: dexterityTable['dexmissile'][getLookupValue(aim, dexterity)],
-                dexdefense: dexterityTable['dexdefense'][getLookupValue(balance, dexterity)],
+                ppd: dexterityTable['pickpocket'][aim],
+                old: dexterityTable['openlocks'][aim],
+                rtd: dexterityTable['findtraps'][aim],
+                msd: dexterityTable['movesilently'][balance],
+                hsd: dexterityTable['hideinshadows'][balance],
+                cwd: standardRules ? '0' : dexterityTable['climbwalls'][balance],
+                tud: dexterityTable['tunneling'][dexterity],
+                ebd: dexterityTable['escapebonds'][dexterity],
+                dexreact: dexterityTable['dexreact'][balance],
+                dexmissile: dexterityTable['dexmissile'][aim],
+                dexdefense: dexterityTable['dexdefense'][balance],
                 dexnotes: dexnotes,
                 dex2notes: dex2notes,
             });
@@ -667,20 +728,28 @@ on('change:intelligence change:reason change:knowledge', function() {
 });
 
 // Set sub-attributes based on Wisdom, Intuition, and Willpower
-function parseWisBonus(abilityScore) {
-    if (abilityScore < 13) {
-        return {
-            '1st': 0,
-            '2nd': 0,
-            '3rd': 0,
-            '4th': 0,
-            '5th': 0,
-            '6th': 0,
-            '7th': 0,
-            'wisbonus': wisdomTable['wisbonus'][abilityScore],
-            'wisbonus-prime': wisdomTable['wisbonus'][abilityScore],
-            'wisbonus-extra': wisdomTable['wisbonus'][abilityScore],
-        };
+async function parseWisBonus(abilityScore, wisdom) {
+    let bonus = {
+        '1st': 0,
+        '2nd': 0,
+        '3rd': 0,
+        '4th': 0,
+        '5th': 0,
+        '6th': 0,
+        '7th': 0,
+        'wind': 0,
+        'wisbonus': '—',
+        'wisbonus-prime': '—',
+        'wisbonus-extra': '—',
+    };
+    if (abilityScore < 13 && wisdom < 13) {
+        await keepContextRoll();
+        return bonus;
+    }
+
+    let answer = await extractQueryResult('?{Priests get bonus spells from high Wisdom (but not Paladins and Rangers). Do you play a priest?|My character is a priest,true|My character is a different class,false}');
+    if (answer !== 'true') {
+        return bonus;
     }
 
     // Combine all spell levels into one string
@@ -690,7 +759,7 @@ function parseWisBonus(abilityScore) {
     }
 
     // Count instances of each spell level
-    let bonus = {
+    bonus = {
         '1st': (bonusString.match(/1st/g) || []).length,
         '2nd': (bonusString.match(/2nd/g) || []).length,
         '3rd': (bonusString.match(/3rd/g) || []).length,
@@ -698,18 +767,28 @@ function parseWisBonus(abilityScore) {
         '5th': (bonusString.match(/5th/g) || []).length,
         '6th': (bonusString.match(/6th/g) || []).length,
         '7th': (bonusString.match(/7th/g) || []).length,
+        'wind': wisdomTable['wisdom-wind'][wisdom],
     };
 
     // Generate bonus prime and bonus extra strings
-    bonus['wisbonus-prime'] = wisdomTable['wisbonus-prime'][abilityScore];
-    bonus['wisbonus-extra'] = wisdomTable['wisbonus-extra'][abilityScore];
+    function format(bonus, key) {
+        if (bonus[key] === 0) {
+            return '';
+        }
+        if (bonus[key] === 1) {
+            return key
+        }
+        return `${bonus[key]}x${key}`;
+    }
+    bonus['wisbonus-prime'] = [format(bonus, '1st'), format(bonus, '2nd'), format(bonus, '3rd'), format(bonus, '4th')].filter(Boolean).join(', ');
+    bonus['wisbonus-extra'] = [format(bonus, '5th'), format(bonus, '6th'), format(bonus, '7th')].filter(Boolean).join(', ');
     bonus['wisbonus'] = [bonus['wisbonus-prime'], bonus['wisbonus-extra']].filter(Boolean).join(', ');
 
     return bonus;
 }
 
 on('change:wisdom change:intuition change:willpower', function() {
-    getAttrs(['wisdom','intuition','willpower'], function(values) {
+    getAttrs(['wisdom','intuition','willpower'], async function (values) {
         let wisdomRaw = values.wisdom.replace(/\s+/g, '');
         let intuitionRaw = values.intuition.replace(/\s+/g, '');
         let willpowerRaw = values.willpower.replace(/\s+/g, '');
@@ -721,7 +800,7 @@ on('change:wisdom change:intuition change:willpower', function() {
 
         let bonusSpells;
         if (wisdom === 0) {
-            bonusSpells = parseWisBonus(0);
+            bonusSpells = await parseWisBonus(0, 0);
             assignAttributes(0, 0, 0, bonusSpells, wisdomTable['wisimmune'][0], wisdomTable['wisimmune'][0], wisdomTable['wisnotes'][0], wisdomTable['wisnotes'][0]);
             return;
         }
@@ -749,34 +828,35 @@ on('change:wisdom change:intuition change:willpower', function() {
             for (let i = willpower; i > 18; i--) {
                 wisImmuneArray.push(wisdomTable['wisimmune'][i]);
             }
-            let slicePoint = Math.round(wisImmuneArray.length/2);
+            let slicePoint = Math.round(wisImmuneArray.length / 2);
             wisimm1 = wisImmuneArray.slice(0, slicePoint).filter(Boolean).join(', ');
             wisimm2 = wisImmuneArray.slice(slicePoint).filter(Boolean).join(', ');
         }
-        bonusSpells = parseWisBonus(willpower);
+        bonusSpells = await parseWisBonus(intuition, wisdom);
 
         assignAttributes(wisdom, intuition, willpower, bonusSpells, wisimm1, wisimm2, wisnotes, wis2notes);
 
         function assignAttributes(wisdom, intuition, willpower, bonusSpells, wisimm1, wisimm2, wisnotes, wis2notes) {
-            setAttrs({
-                wisdef: wisdomTable['wisdef'][willpower],
-                wisbonus: bonusSpells['wisbonus'],
-                'wisbonus-prime': bonusSpells['wisbonus-prime'],
-                'wisbonus-extra': bonusSpells['wisbonus-extra'],
-                wisfail: wisdomTable['wisfail'][intuition],
-                wisimm: wisimm1,
-                wisimm1: wisimm1,
-                wisimm2: wisimm2,
-                wisnotes: wisnotes,
-                wis2notes: wis2notes,
-                'spell-priest-level1-wisdom': bonusSpells['1st'],
-                'spell-priest-level2-wisdom': bonusSpells['2nd'],
-                'spell-priest-level3-wisdom': bonusSpells['3rd'],
-                'spell-priest-level4-wisdom': bonusSpells['4th'],
-                'spell-priest-level5-wisdom': bonusSpells['5th'],
-                'spell-priest-level6-wisdom': bonusSpells['6th'],
-                'spell-priest-level7-wisdom': bonusSpells['7th'],
-            });
+            let newValue = {};
+            newValue['wisdef'] = wisdomTable['wisdef'][willpower];
+            newValue['wisbonus'] = bonusSpells['wisbonus'];
+            newValue['wisbonus-prime'] = bonusSpells['wisbonus-prime'];
+            newValue['wisbonus-extra'] = bonusSpells['wisbonus-extra'];
+            newValue['wisfail'] = wisdomTable['wisfail'][intuition];
+            newValue['wisimm'] = wisimm1;
+            newValue['wisimm1'] = wisimm1;
+            newValue['wisimm2'] = wisimm2;
+            newValue['wisnotes'] = wisnotes;
+            newValue['wis2notes'] = wis2notes;
+            newValue['spell-priest-level1-wisdom'] = bonusSpells['1st'];
+            newValue['spell-priest-level2-wisdom'] = bonusSpells['2nd'];
+            newValue['spell-priest-level3-wisdom'] = bonusSpells['3rd'];
+            newValue['spell-priest-level4-wisdom'] = bonusSpells['4th'];
+            newValue['spell-priest-level5-wisdom'] = bonusSpells['5th'];
+            newValue['spell-priest-level6-wisdom'] = bonusSpells['6th'];
+            newValue['spell-priest-level7-wisdom'] = bonusSpells['7th'];
+            newValue['wisdom-wind'] = bonusSpells['wind'];
+            setAttrs(newValue);
         }
     });
 });
@@ -827,17 +907,20 @@ on('change:charisma change:leadership change:appearance', function() {
 
 on('clicked:opendoor-check', function (eventInfo){
    getAttrs(['opendoor'], async function (values){
-       let match = values.opendoor.match(/(\d+)\((\d+)\)/);
        let rollBuilder = new RollTemplateBuilder('2Echeck');
        rollBuilder.push('character=@{character_name}','checkroll=[[1d20cs1cf20]]','color=blue','success=The door swings open!');
-       if (!match) {
-           rollBuilder.push('checkvs=Open Doors Check','checktarget=[[@{opendoor}]]','fail=The door stays shut, but you can try again.');
-           return printRoll(rollBuilder.string());
+
+       let checkTarget;
+       let match = values.opendoor.match(/(\d+)\((\d+)\)/);
+       if (match) {
+           checkTarget = await extractQueryResult(`?{What kind of door?|Heavy / Stuck door,${match[1]}|Locked / Barred / Magical door,${match[2]}}`);
+       } else {
+           checkTarget = '@{opendoor}';
        }
-       let target = await extractQueryResult(`?{What kind of door?|Normal door,${match[1]}|Locked / Barred / Magical door,${match[2]}}`);
-       rollBuilder.push(`checktarget=[[${target}]]`);
-       if (target === match[1]) {
-           rollBuilder.push('checkvs=Open Normal Doors Check','fail=The door stays shut, but you can try again.');
+       rollBuilder.push(`checktarget=[[${checkTarget}+(@{misc-mod})]]`);
+
+       if (!match || checkTarget === match[1]) {
+           rollBuilder.push('checkvs=Open Heavy/Stuck Doors Check','fail=The door stays shut, but you can try again with a cumulative -1 penalty for each try.');
        } else {
            rollBuilder.push('checkvs=Open Locked/Barred/Magically Held Doors Check','fail=The door stays shut. No further attempts can be made by @{character_name}.');
        }
@@ -846,7 +929,114 @@ on('clicked:opendoor-check', function (eventInfo){
 });
 //#endregion
 
+//#region Saving throws autofill
+on('clicked:saving-throws-character', function (eventInfo) {
+    const ravenloftTab = 'tab2';
+    getAttrs([ravenloftTab, ...Object.entries(LEVEL_FIELDS).flat()], async function (values) {
+        let classesWithLevels = getClassesWithLevels(values);
+        let numberOfClasses = Object.keys(classesWithLevels).length;
+        if (numberOfClasses === 0) {
+            return showToast(ERROR,'Saving throws not updated','All class levels were 0. Please set your class levels on the Character->Info->Details tab');
+        } else if (numberOfClasses > 1) {
+            let characterType = await extractQueryResult('?{Are you a Multi-class or Dual-class?|Multi-class|Dual-class}');
+            if (characterType === 'Dual-class') {
+                let classSuggestionOptions = getClassSuggestionOptions(values);
+                let activeClass = await extractQueryResult(`?{Which class is your current active class?|${classSuggestionOptions}}`);
+                let restrictionsLifted = Object.entries(classesWithLevels)
+                    .every(([levelField,classProperties]) => levelField === activeClass || classesWithLevels[activeClass].level > classProperties.level);
+                if (!restrictionsLifted) {
+                    Object.keys(classesWithLevels).forEach(key => key === activeClass || delete classesWithLevels[key])
+                }
+            }
+        }
+
+        // Ensure all levels are below 21 to keep within index
+        Object.values(classesWithLevels).forEach(classProperties => Math.min(classProperties.level,21));
+
+        let classInfo = Object.values(classesWithLevels).map(cp => `• ${capitalizeFirst(cp.classGroup)} level: ${cp.level}`).join('\n');
+        let toastObject = getToastObject(SUCCESS,'Saving throw updated',`Character saving throws updated based on the following class(es):\n${classInfo}`);
+        let newValue = {...toastObject};
+        newValue['partar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['paralyzePoisonDeath'][cp.level]));
+        newValue['poitar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['paralyzePoisonDeath'][cp.level]));
+        newValue['deatar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['paralyzePoisonDeath'][cp.level]));
+        newValue['rodtar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['rodStaffWand'][cp.level]));
+        newValue['statar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['rodStaffWand'][cp.level]));
+        newValue['wantar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['rodStaffWand'][cp.level]));
+        newValue['pettar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['petrificationPolymorph'][cp.level]));
+        newValue['poltar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['petrificationPolymorph'][cp.level]));
+        newValue['breathtar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['breath'][cp.level]));
+        newValue['sptar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['spell'][cp.level]));
+        if (values[ravenloftTab] === '2') {
+            newValue['ftar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['fear'][cp.level]));
+            newValue['horrtar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['horror'][cp.level]));
+            newValue['madtar'] = Math.min(...Object.values(classesWithLevels).map(cp => SAVING_THROWS[cp.classGroup]['madness'][cp.level]));
+        }
+
+        setAttrs(newValue);
+    });
+});
+
+on('clicked:saving-throws-monster', function (eventInfo) {
+    getAttrs(['hitdice','monsterhpextra','monsterintelligence'], async function (values) {
+        let hitDice = parseInt(values['hitdice']) || 0;
+        let monsterExtraHp = parseInt(values['monsterhpextra']) || 0
+        let intelligentLevel = hitDice + Math.ceil(monsterExtraHp / 4);
+
+        let monsterInt = parseInt(values['monsterintelligence']);
+        if (isNaN(monsterInt)) {
+            await keepContextRoll();
+            return showToast(ERROR, 'Monster Intelligence Missing', 'Monster Intelligence must be set to calculate saving throws.');
+        } else if (monsterInt < 1) {
+            intelligentLevel = Math.ceil(intelligentLevel / 2);
+        }
+
+        hitDice = Math.min(hitDice, 21);
+        intelligentLevel = Math.min(intelligentLevel, 21);
+
+        let intro = 'Monsters get the best saving throws from all classes.'
+        let classes = [];
+        if (await extractQueryResult(`?{${intro} Can the monster fight (Warrior)?|Yes|No}`) === 'Yes') {
+            classes.push('warrior');
+        }
+        if (await extractQueryResult(`?{${intro} Can the monster cast wizard spells (Wizard)?|Yes|No}`) === 'Yes') {
+            classes.push('wizard');
+        }
+        if (await extractQueryResult(`?{${intro} Can the monster cast priest spells (Priest)?|Yes|No}`) === 'Yes') {
+            classes.push('priest');
+        }
+        if (await extractQueryResult(`?{${intro} Can the monster use rogue skills (Rogue)?|Yes|No}`) === 'Yes') {
+            classes.push('rogue');
+        }
+        if (await extractQueryResult(`?{${intro} Can the monster use Psionic powers (Psionicist)?|Yes|No}`) === 'Yes') {
+            classes.push('psionicist');
+        }
+
+        let classInfo = classes.map(className => `• ${capitalizeFirst(className)} level: ${intelligentLevel}`).join('\n');
+        if (hitDice !== intelligentLevel) {
+            classInfo += `\nPoison and Death saves are based on level: ${hitDice}`;
+        }
+        let toastObject = getToastObject(SUCCESS,'Saving throw updated',`Monster saving throws updated based on the following class(es):\n${classInfo}`);
+        let newValue = {...toastObject};
+        newValue['monpartar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['paralyzePoisonDeath'][intelligentLevel]));
+        newValue['monpoitar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['paralyzePoisonDeath'][hitDice]));
+        newValue['mondeatar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['paralyzePoisonDeath'][hitDice]));
+        newValue['monrodtar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['rodStaffWand'][intelligentLevel]));
+        newValue['monstatar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['rodStaffWand'][intelligentLevel]));
+        newValue['monwantar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['rodStaffWand'][intelligentLevel]));
+        newValue['monpettar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['petrificationPolymorph'][intelligentLevel]));
+        newValue['monpoltar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['petrificationPolymorph'][intelligentLevel]));
+        newValue['monbretar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['breath'][intelligentLevel]));
+        newValue['monspetar'] = Math.min(...classes.map(className => SAVING_THROWS[className]['spell'][intelligentLevel]));
+
+        setAttrs(newValue);
+    })
+});
+//#endregion
+
 const CALCULATION_FIELDS = [
+    { formulaField: 'rogue-level-base',      calculatedField: 'rogue-level-total'},
+    { formulaField: 'level-wizard'},
+    { formulaField: 'level-priest'},
     { formulaField: 'thac0-base',            calculatedField: 'thac0-base-calc' },
     // Proficiencies
     { formulaField: 'weapprof-slots-total',  calculatedField: 'weapprof-slots-total-calc' },
@@ -860,6 +1050,7 @@ const CALCULATION_FIELDS = [
 ];
 CALCULATION_FIELDS.forEach(({formulaField, calculatedField}) => {
     on(`change:${formulaField}`, function (eventInfo) {
+        console.log(eventInfo);
         if (isSheetWorkerUpdate(eventInfo))
             return;
 
@@ -925,7 +1116,7 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
 
             console.log(`Summing started by section ${repeatingName}. Fieldname ${fieldName}`);
             console.time('Summing time');
-            let levelsCopy = [...sections];
+            let levelsCopy = structuredClone(sections);
             let accumulator = 0;
 
             recursiveSpellSum(levelsCopy, accumulator, oldField, newField, resultFieldName);
@@ -934,10 +1125,10 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
 }
 
 function setupCalculateRemaining(totalField, sumField, remainingField) {
-    on(`change:${totalField} change:${sumField}`, function () {
+    on(`change:${totalField} change:${sumField}`, function (eventInfo) {
         getAttrs([totalField, sumField], function (values) {
-            let intTotal = parseInt(values[totalField]);
-            let intSum = parseInt(values[sumField]);
+            let intTotal = parseInt(values[totalField]) || 0;
+            let intSum = parseInt(values[sumField]) || 0;
 
             console.log(`Setting ${remainingField} with value from ${totalField}: ${intTotal} and ${sumField}: ${intSum}`);
 
@@ -959,9 +1150,9 @@ const PRIEST_SPHERES = [
     'Chaos','Law','Numbers','Thought','Time','Travelers','War','Wards'
 ];
 
-const primarySphereRegex = new RegExp(PRIEST_SPHERES.join('|'), 'gi');
-const noElementalRegex = new RegExp(PRIEST_SPHERES.filter(s => s !== ELEMENTAL).join('|'), 'gi');
-const elementalRegex = /Earth|Air|Fire|Water/gi
+const PRIMARY_SPHERE_REGEX = new RegExp(PRIEST_SPHERES.join('|'), 'gi');
+const NO_ELEMENTAL_REGEX = new RegExp(PRIEST_SPHERES.filter(s => s !== ELEMENTAL).join('|'), 'gi');
+const ELEMENTAL_REGEX = /Earth|Air|Fire|Water/gi
 
 function parseSpheres(spheresStrings, regex) {
     let spheres = new Set();
@@ -975,12 +1166,15 @@ function parseSpheres(spheresStrings, regex) {
 
 const getSpellSchools = function (spell, books) {
     let schoolRules = getActiveSettings(SCHOOL_FIELDS, books);
+    //return spell['school'] + `%NEWLINE%S&M: (${spell[SCHOOL_SPELLS_AND_MAGIC]})`;
     return schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
-        ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
-        : spell['school'];
+         ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
+         : spell['school'];
 }
 
 const getSpellSpheres = function (spell, sphereRules) {
+    // return spell['sphere'] + `%NEWLINE%Druid: ${spell['sphere-druids']}%NEWLINE%Necro: ${spell['sphere-necromancers']}%NEWLINE%S&M: ${spell[SPHERE_SPELLS_AND_MAGIC]}`
+
     if (sphereRules.has(SPHERE_SPELLS_AND_MAGIC))
         return spell[SPHERE_SPELLS_AND_MAGIC] || spell['sphere'];
 
@@ -995,7 +1189,7 @@ function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, 
 
     let spheres = getSpellSpheres(spell, optionalSpheres);
 
-    let primarySpellSpheres = spheres.match(noElementalRegex) || [];
+    let primarySpellSpheres = spheres.match(NO_ELEMENTAL_REGEX) || [];
     let isAvailable = primarySpellSpheres.some(sphere => availableSpheres.has(sphere));
     if (isAvailable)
         return true;
@@ -1007,7 +1201,7 @@ function isSpellAvailable(spellName, spell, availableSpheres, elementalSpheres, 
         return false;
 
     if (spheres.includes(`${ELEMENTAL} (`))
-        return spheres.match(elementalRegex).some((element) => elementalSpheres.has(element))
+        return spheres.match(ELEMENTAL_REGEX).some((element) => elementalSpheres.has(element))
 
     // The player and the spell has the elemental sphere (without any sub elements)
     // Currently only 'Commune With Nature' in the revised Player's Handbook (1995) has this property
@@ -1032,8 +1226,8 @@ function setupAddPriestSpell(postfix) {
                 knownSpells.add(row.S[field]);
                 return knownSpells;
             }, new Set(), function (knownSpells,_,attrSet){
-                let primarySpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), primarySphereRegex);
-                let elementalSpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), elementalRegex);
+                let primarySpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), PRIMARY_SPHERE_REGEX);
+                let elementalSpheres = parseSpheres(sphereFields.map(aField => attrSet.S[aField]), ELEMENTAL_REGEX);
 
                 if (primarySpheres.size < 1) {
                     showToast(WARNING, 'No spheres found', `No valid spheres found. Please write or select some spheres`);
@@ -1163,8 +1357,41 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
 }
 //#endregion
 
+//#region Wizard and Priest Dispel Magic button
+on('clicked:dispel-setup-wiz', function (eventInfo) {
+    dispelRoll(eventInfo, '[[@{level-wizard}]]')
+});
+
+on('clicked:dispel-setup-pri', function (eventInfo) {
+    dispelRoll(eventInfo, '[[@{level-priest}]]')
+});
+
+function dispelRoll(eventInfo, classLevel) {
+    getAttrs(['tab11','wtype'], async function (values) {
+        let visibility = "";
+        console.log(values['tab11'], values['wtype']);
+        if (values['tab11'] === '2' && values['wtype'].startsWith('/w gm')) {
+            visibility = '/w gm ';
+        } else {
+            visibility = await extractQueryResult(`?{Are dispel rolls public or only to GM?|Public, |GM only,/w gm }`);
+        }
+
+        let rollBuilder = new RollTemplateBuilder('2Edefault');
+        rollBuilder.push('name=Dispel Roll',`desc=@{character_name} dispels effects and potions of level [[1d20+${classLevel}-11]] and below`, `desc1=[Roll again](~@{character_name}|dispel)`, 'align1=center', 'color=dark-blue');
+
+        let roll = visibility + rollBuilder.string();
+
+        let newValue = {};
+        newValue['dispel-macro'] = roll;
+        setAttrs(newValue);
+
+        await printRoll(roll);
+    });
+}
+//#endregion
+
 //#region Wizard and Priest spells and Powers setup
-function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFields) {
+function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
     if (!spellsTable[section])
         return;
 
@@ -1177,13 +1404,24 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
         let levelField = isPriest ? 'level-priest' : 'level-wizard';
         let className = isPriest ? 'Priest' : 'Wizard';
 
-        getAttrs([...BOOK_FIELDS, ...optionalRulesFields, levelField], function(books) {
+        getAttrs([...BOOK_FIELDS, ...optionalRulesFields, levelField, ERRATA_FIELD], function(books) {
             if (bookInactiveShowToast(books, spell))
                 return;
 
+            let effect = spell['effect'];
+            if (spell['psionics'] && isBookActive(books, PSIONICS_HANDBOOK)) {
+                effect += `}}{{psionics=${spell['psionics']}`;
+            }
+            if (spell['special-conditions']) {
+                spell['special-conditions'].forEach(condition => {
+                    effect += `}}{{${condition}=1`;
+                });
+            }
+
+
             let spellInfo = {
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-                [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level'], className),
+                [`repeating_spells-${section}_spell-level`]        : displaySpellLevel(spell['level'], className),
                 [`repeating_spells-${section}_spell-school`]       : getSpellSchools(spell, books),
                 [`repeating_spells-${section}_spell-components`]   : spell['components'],
                 [`repeating_spells-${section}_spell-range`]        : spell['range'],
@@ -1194,13 +1432,13 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
                 [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
                 [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
                 [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-                [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
+                [`repeating_spells-${section}_spell-reference`]    : displayReference(spell, books),
                 [`repeating_spells-${section}_spell-subtlety`]     : spell['subtlety'] || '',
                 [`repeating_spells-${section}_spell-sensory`]      : spell['sensory'] || '',
                 [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
                 [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
                 [`repeating_spells-${section}_spell-crit-size`]    : spell['crit-size'] || '',
-                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
+                [`repeating_spells-${section}_spell-effect`]       : effect
             };
 
             if (isPriest) {
@@ -1208,8 +1446,7 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
                 spellInfo[`repeating_spells-${section}_spell-sphere`] = getSpellSpheres(spell, sphereRules);
             }
             if (!books[levelField].trim()) {
-                let classLevel = capitalizeFirst(levelField.replace('level-', ''));
-                let toast = getToastObject(INFO, `Set ${classLevel} caster level`, 'Almost every spell requires a caster level to calculate its effect. Without it most spells will fail and show and error in the chat');
+                let toast = getToastObject(INFO, `Set ${className} caster level`, 'Almost every spell requires a caster level to calculate its effect. Without it most spells will fail and show and error in the chat');
                 Object.assign(spellInfo, toast);
             }
 
@@ -1218,26 +1455,25 @@ function setupAutoFillSpellInfo(section, spellsTable, levelFunc, optionalRulesFi
     });
 }
 
-
-let wizardSpellLevelsSections = [
+const WIZARD_SPELL_LEVELS_SECTIONS = [
     {level: '1', sections: ['', '2', '3', 'wiz1']},
     {level: '2', sections: ['4', '5', '6', 'wiz2']},
     {level: '3', sections: ['7', '8', '9', 'wiz3']},
     {level: '4', sections: ['10', '11', '12', 'wiz4']},
-    {level: '5', sections: ['70', '71', '72', 'wiz5']}, //... legacy naming convention
+    {level: '5', sections: ['70', '71', '72', 'wiz5']}, // legacy naming convention
     {level: '6', sections: ['13', '14', '15', 'wiz6']},
     {level: '7', sections: ['16', '17', '18', 'wiz7']},
     {level: '8', sections: ['19', '20', '21', 'wiz8']},
     {level: '9', sections: ['22', '23', '24', 'wiz9']},
     {level: '10', sections: ['25', '26', '27', 'wiz10']},
-    {level: '11', sections: ['52', '53', '54', 'wiz11']}, //... legacy naming convention
+    {level: '11', sections: ['52', '53', '54', 'wiz11']}, // legacy naming convention
     {level: '12', sections: ['55', '56', '57', 'wiz12']},
     {level: '13', sections: ['58', '59', '60', 'wiz13']},
     {level: '14', sections: ['61', '62', '63', 'wiz14']},
     {level: '15', sections: ['64', '65', '66', 'wiz15']},
 ];
 
-let priestSpellLevelsSections = [
+const PRIEST_SPELL_LEVELS_SECTIONS = [
     {level: '1', sections: ['28', '29', '30', 'pri1']},
     {level: '2', sections: ['31', '32', '33', 'pri2']},
     {level: '3', sections: ['34', '35', '36', 'pri3']},
@@ -1254,8 +1490,20 @@ const displaySpellLevel = function(level, className) {
         : `Level ${level} ${className}`;
 }
 
+const displayReference = function(spell, books) {
+    let reference = `${spell['book']} ${spell['reference']}`
+    if (spell['book-compendium'])
+        reference += `\n${spell['book-compendium']}`;
+
+    let activeSettings = getActiveSettings([ERRATA_FIELD], books);
+    if (activeSettings.has(ERRATA_FIELD) && spell['errata'])
+        reference += `\n${spell['errata']}`;
+
+    return reference;
+}
+
 // --- Start setup Spell Slots --- //
-wizardSpellLevelsSections.forEach(spellLevel => {
+WIZARD_SPELL_LEVELS_SECTIONS.forEach(spellLevel => {
     let prefix = `spell-level${spellLevel.level}`;
     setupStaticCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-specialist`, `${prefix}-misc`]);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
@@ -1266,14 +1514,14 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, wizardSpells, displaySpellLevel, SCHOOL_FIELDS);
+        setupAutoFillSpellInfo(lastSection, wizardSpells, SCHOOL_FIELDS);
         setupSpellCrit(lastSection);
     }
 });
-setupAutoFillSpellInfo('wizmonster', wizardSpells, displaySpellLevel, SCHOOL_FIELDS);
+setupAutoFillSpellInfo('wizmonster', wizardSpells, SCHOOL_FIELDS);
 setupSpellCrit('wizmonster');
 
-priestSpellLevelsSections.forEach(spellLevel => {
+PRIEST_SPELL_LEVELS_SECTIONS.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
     setupStaticCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-wisdom`, `${prefix}-misc`]);
     setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
@@ -1284,43 +1532,125 @@ priestSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, priestSpells, displaySpellLevel, SPHERE_FIELDS);
+        setupAutoFillSpellInfo(lastSection, priestSpells, SPHERE_FIELDS);
         setupSpellCrit(lastSection);
         if (lastSection !== 'priq') {
             setupAddPriestSpell(lastSection);
         }
     }
 });
-setupAutoFillSpellInfo('primonster', priestSpells, displaySpellLevel, SPHERE_FIELDS);
+setupAutoFillSpellInfo('primonster', priestSpells, SPHERE_FIELDS);
 setupSpellCrit('primonster');
 // --- End setup Spell Slots --- //
 
 // --- Start setup Spell Points, Arc, and Wind --- //
-let wizardSpellPoints = 'spell-points';
-let arc = 'total-arc';
-let allWizardSpellSections = wizardSpellLevelsSections.flatMap(sl => sl.sections);
-setupStaticCalculateTotal(`${wizardSpellPoints}-total`, [`${wizardSpellPoints}-lvl`, `${wizardSpellPoints}-spc`, `${wizardSpellPoints}-int`]);
-setupRepeatingSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${wizardSpellPoints}-sum`, true);
-setupRepeatingSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`, true);
-setupCalculateRemaining(`${wizardSpellPoints}-total`, `${wizardSpellPoints}-sum`, `${wizardSpellPoints}-remaining`);
-setupCalculateRemaining(arc, `${arc}-sum`, `${arc}-remaining`);
+const WIZARD_SPELL_POINTS = 'spell-points';
+const TOTAL_ARC = 'total-arc';
+const ALL_WIZARD_SPELL_SECTIONS = WIZARD_SPELL_LEVELS_SECTIONS.flatMap(sl => sl.sections);
+setupStaticCalculateTotal(`${WIZARD_SPELL_POINTS}-total`, [`${WIZARD_SPELL_POINTS}-lvl`, `${WIZARD_SPELL_POINTS}-spc`, `${WIZARD_SPELL_POINTS}-int`]);
+setupRepeatingSpellSumming(ALL_WIZARD_SPELL_SECTIONS, WIZARD_SPELL_POINTS, 'spell-points', `${WIZARD_SPELL_POINTS}-sum`, true);
+setupRepeatingSpellSumming(ALL_WIZARD_SPELL_SECTIONS, 'arc', 'spell-arc', `${TOTAL_ARC}-sum`, true);
+setupCalculateRemaining(`${WIZARD_SPELL_POINTS}-total`, `${WIZARD_SPELL_POINTS}-sum`, `${WIZARD_SPELL_POINTS}-remaining`);
+setupCalculateRemaining(TOTAL_ARC, `${TOTAL_ARC}-sum`, `${TOTAL_ARC}-remaining`);
+on('change:spell-points-int-enabled change:intelligence', function (eventInfo) {
+    getAttrs(['spell-points-int-enabled', 'intelligence'], function (values) {
+        let newValue = {'spell-points-int': 0}
+        if (values['spell-points-int-enabled'] !== '1') {
+            return setAttrs(newValue);
+        }
+        let intelligence = getLookupValue(values['intelligence'], 0);
+        newValue['spell-points-int'] = intelligenceTable['spell-points-int'][intelligence];
+        setAttrs(newValue);
+    });
+});
 
-let priestSpellPoints = 'spell-points-priest';
-let wind = 'total-wind';
-let allPriestSpellSections = priestSpellLevelsSections.flatMap(sl => sl.sections);
-setupStaticCalculateTotal(`${priestSpellPoints}-total`, [`${priestSpellPoints}-lvl`, `${priestSpellPoints}-wis`]);
-setupRepeatingSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${priestSpellPoints}-sum`, true);
-setupRepeatingSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`, true);
-setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
-setupCalculateRemaining(wind, `${wind}-sum`, `${wind}-remaining`);
+const PRIEST_SPELL_POINTS = 'spell-points-priest';
+const TOTAL_WIND = 'total-wind';
+const ALL_PRIEST_SPELL_SECTIONS = PRIEST_SPELL_LEVELS_SECTIONS.flatMap(sl => sl.sections);
+setupStaticCalculateTotal(`${PRIEST_SPELL_POINTS}-total`, [`${PRIEST_SPELL_POINTS}-lvl`, `${PRIEST_SPELL_POINTS}-wis`]);
+setupStaticCalculateTotal(TOTAL_WIND, ['level-wind', 'wisdom-wind']);
+setupRepeatingSpellSumming(ALL_PRIEST_SPELL_SECTIONS, PRIEST_SPELL_POINTS, 'spell-points', `${PRIEST_SPELL_POINTS}-sum`, true);
+setupRepeatingSpellSumming(ALL_PRIEST_SPELL_SECTIONS, 'wind', 'spell-wind', `${TOTAL_WIND}-sum`, true);
+setupCalculateRemaining(`${PRIEST_SPELL_POINTS}-total`, `${PRIEST_SPELL_POINTS}-sum`, `${PRIEST_SPELL_POINTS}-remaining`);
+setupCalculateRemaining(TOTAL_WIND, `${TOTAL_WIND}-sum`, `${TOTAL_WIND}-remaining`);
+let PRIEST_SPELL_POINTS_WIS = 'spell-points-priest-wis';
+on('change:spell-points-priest-wis-enabled change:wisdom change:level-priest', function (eventInfo) {
+    getAttrs(['spell-points-priest-wis-enabled', 'wisdom', 'level-priest'], async function (values) {
+        await keepContextRoll();
+        let newValue = {};
+        newValue[PRIEST_SPELL_POINTS_WIS] = 0;
+        if (values['spell-points-priest-wis-enabled'] !== '1') {
+            return setAttrs(newValue);
+        }
+        let wisdom = getLookupValue(values['wisdom'], 0);
+        if (wisdom < 13) {
+            return setAttrs(newValue);
+        }
+        if (wisdom === 13) {
+            newValue[PRIEST_SPELL_POINTS_WIS] = 4;
+            return setAttrs(newValue);
+        }
+        if (wisdom === 14) {
+            newValue[PRIEST_SPELL_POINTS_WIS] = 8;
+            return setAttrs(newValue);
+        }
+
+        let level = 1;
+        if (values['level-priest'] === '') {
+            return showToast(INFO, 'Set Priest caster level', 'The Priest\'s level is needed to calculate bonus Spell Points from high Wisdom.');
+        } else {
+            level = await extractRollResult(values['level-priest']);
+        }
+        if (isNaN(level) || level < 0) {
+            level = 1;
+        }
+        let spellPoints = 0;
+        if (wisdom === 15) {
+            spellPoints = level < 3 ? 8 : 15;
+        } else if (wisdom === 16) {
+            spellPoints = level < 3 ? 8 : 20;
+        } else if (wisdom === 17) {
+            if (1 <= level && level <= 2) {
+                spellPoints = 8;
+            } else if (3 <= level && level <= 4) {
+                spellPoints = 20;
+            } else {
+                spellPoints = 30;
+            }
+        } else if (wisdom === 18) {
+            if (1 <= level && level <= 2) {
+                spellPoints = 8;
+            } else if (3 <= level && level <= 4) {
+                spellPoints = 20;
+            } else if (5 <= level && level <= 6) {
+                spellPoints = 30;
+            } else {
+                spellPoints = 45;
+            }
+        } else if (wisdom >= 19) {
+            if (1 <= level && level <= 2) {
+                spellPoints = 12;
+            } else if (3 <= level && level <= 4) {
+                spellPoints = 25;
+            } else if (5 <= level && level <= 6) {
+                spellPoints = 45;
+            } else {
+                spellPoints = 60;
+            }
+        }
+
+        newValue[PRIEST_SPELL_POINTS_WIS] = spellPoints;
+        setAttrs(newValue);
+    });
+});
 // --- End setup Spell Points, Arc, and Wind --- //
 
 // --- Start setup reset buttons --- //
 //tab6 = wizard levels
 //tab7 = priest levels
-setupSpellSlotsReset('reset-spent-slots-wiz', 'tab6', wizardSpellLevelsSections, allWizardSpellSections);
-let allPriestSectionsExceptQuest = priestSpellLevelsSections.slice(0, -1).flatMap(sl => sl.sections);
-setupSpellSlotsReset('reset-spent-slots-pri', 'tab7', priestSpellLevelsSections, allPriestSectionsExceptQuest);
+setupSpellSlotsReset('reset-spent-slots-wiz', 'tab6', WIZARD_SPELL_LEVELS_SECTIONS, ALL_WIZARD_SPELL_SECTIONS);
+let allPriestSectionsExceptQuest = PRIEST_SPELL_LEVELS_SECTIONS.slice(0, -1).flatMap(sl => sl.sections);
+setupSpellSlotsReset('reset-spent-slots-pri', 'tab7', PRIEST_SPELL_LEVELS_SECTIONS, allPriestSectionsExceptQuest);
 // --- End setup reset buttons --- //
 
 // --- Start setup Granted Powers --- //
@@ -1333,72 +1663,161 @@ setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 // --- End setup Granted Powers --- //
 //#endregion
 
+on(`clicked:secret-door-check`, async function (eventInfo) {
+    console.log(eventInfo);
+    let rollBuilder = new RollTemplateBuilder('2Echeck');
+    rollBuilder.push('character=@{character_name}','color=green','checkroll=[[1d6cs1cf6]]');
+
+    let doorType = await extractQueryResult(`?{Is the door Concealed (normal door hidden by a curtain or carpet) or Secret (built into the wall, sliding bookcase, requires special mechanism to open)?|Concealed|Secret}`);
+    if (doorType === 'Concealed') {
+        rollBuilder.push('checkvs=Find Concealed Door','checktarget=[[6]]', 'success=You find the concealed door!');
+        return printRoll(`/w gm ${rollBuilder.string()}`);
+    }
+
+    rollBuilder.push('checkvs=Find Secret Door', 'fail=After 10 minutes of searching the 20-foot section of the wall you find nothing. You cannot try again, but other characters can.');
+    let infoModifier = await extractQueryResult(`?{Have the character seen the door in operation? Do they only need to find the opening mechanism?|+0 [Door is secret]|+1 [Character knows of the door]}`);
+    if (infoModifier === '+0 [Door is secret]') {
+        rollBuilder.push('success=After 10 minutes of searching the 20-foot section of the wall you find the secret door including the opening mechanism! (Except in very rare cases where another check is needed to find the mechanism).');
+    } else {
+        rollBuilder.push('success=After 10 minutes of searching the 20-foot section of the wall you find the mechanism for the secret door!');
+    }
+    rollBuilder.push(`checktarget=[[@{secret-door-base}+(@{secret-door-race})+(${infoModifier})+(@{misc-mod})]]`);
+
+    return printRoll(`/w gm ${rollBuilder.string()}`);
+});
+
 //#region Rogue skills
 // --- Start setup Rogue skills total --- //
-let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
-let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
-rogueStandardSkills.forEach(skill => {
-    setupStaticCalculateTotal(`${skill}t-hidden`, rogueStandardColumns.map(column => `${skill}${column}`));
-    setupStaticCalculateTotal(`${skill}t`, [`${skill}t-hidden`], 95);
-    setupStaticCalculateTotal(`${skill}noarmort`, [`${skill}t-hidden`, `${skill}noarmorb`], 95);
-    setupStaticCalculateTotal(`${skill}armort`, [`${skill}t-hidden`, `${skill}armorp`], 95);
+const ROGUE_STANDARD_SKILLS = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
+const ROGUE_EXTRA_SKILLS = ['dm', 'di', 'br', 'tu', 'eb', 'fd', 'ap'];
+const ROGUE_SKILL_COLUMNS = ['b', 'r', 'd', 'k', 'a', 'm', 'l'];
+ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS).forEach(skill => {
+    setupStaticCalculateTotal(`${skill}t`, ROGUE_SKILL_COLUMNS.map(column => `${skill}${column}`));
 });
-
-// Setup custom rogue skills total
-setupRepeatingRowCalculateTotal('crt-hidden', rogueStandardColumns.map(column => `cr${column}`), 'customrogue');
-setupRepeatingRowCalculateTotal('crt', ['crt-hidden'], 'customrogue', 95);
-setupRepeatingRowCalculateTotal('crnoarmort', ['crt-hidden', 'crnoarmorb'], 'customrogue', 95);
-setupRepeatingRowCalculateTotal('crarmort', ['crt-hidden', 'crarmorp'], 'customrogue', 95);
+setupRepeatingRowCalculateTotal('customrogue', ROGUE_SKILL_COLUMNS.map(column => `cr${column}`), 'crt');
 // --- End setup Rogue skills total --- //
 
-//Rogue armor modifier auto fill
-on('change:armorname', function(eventInfo) {
-    let armor = rogueArmor[eventInfo.newValue];
-    if (armor === undefined)
-        return;
-
-    let armorModifiers = {
-        'pparmorp': armor['Pick Pockets'],
-        'olarmorp': armor['Open Locks'] || '-0',
-        'rtarmorp': armor['Find/Remove Traps'] || '-0',
-        'msarmorp': armor['Move Silently'] || '-0',
-        'hsarmorp': armor['Hide in Shadows'] || '-0',
-        'dnarmorp': armor['Detect Noise'],
-        'cwarmorp': armor['Climb Walls'],
-    };
-    setAttrs(armorModifiers);
-});
-//Rogue Custom Skills level sum
-on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
-
+//Rogue sum skill points
+let rogueLevelAttributes = ROGUE_STANDARD_SKILLS.concat(ROGUE_EXTRA_SKILLS).map(skill => skill+'l');
+on(`${rogueLevelAttributes.map(s => 'change:'+s).join(' ')} change:rogue-level-total change:repeating_customrogue:crl remove:repeating_customrogue`, function(){
     TAS.repeating('customrogue')
-        .attrs('newskill')
+        .attrs([...rogueLevelAttributes, 'all-thief-points-remain', 'rogue-level-total'])
         .fields('crl')
-        .reduce(function(m,r){
-            m.crl+=(r.I.crl);
-            return m;
-        },{crl:0},function(m,r,a){
-            a.newskill=m.crl;
+        .reduce(function (memo, row, attrSet, id, rowSet) {
+            memo += row.I['crl'];
+            return memo;
+        }, 0, function(memo, rowSet, attrSet) {
+            rogueLevelAttributes.forEach(attr => {
+                memo += attrSet.I[attr];
+            })
+            attrSet.I['all-thief-points-remain'] = attrSet.I['rogue-level-total'] - memo;
         })
         .execute();
 });
-// --- End setup Rogue skills total --- //
+
+//Rogue armor modifier auto fill
+const ARMOR_NUMBER_REGEX = /armorname(\d{0,2})$/;
+on('change:armorname change:armorname2 change:repeating_hench4:armorname22', function(eventInfo) {
+    let armor = ROGUE_ARMOR[eventInfo.newValue];
+    if (armor === undefined)
+        return;
+
+    let row = '';
+    let parse = parseSourceAttribute(eventInfo);
+    if (parse.rowId) {
+        row = `repeating_${parse.section}_${parse.rowId}_`;
+    }
+    let armorNumber = parse.attribute.match(ARMOR_NUMBER_REGEX)[1];
+
+    let armorModifiers = {};
+    armorModifiers[`${row}ppa${armorNumber}`]= armor['Pick Pockets'] || '0';
+    armorModifiers[`${row}ola${armorNumber}`]= armor['Open Locks'] || '0';
+    armorModifiers[`${row}rta${armorNumber}`]= armor['Find/Remove Traps'] || '0';
+    armorModifiers[`${row}msa${armorNumber}`]= armor['Move Silently'] || '0';
+    armorModifiers[`${row}hsa${armorNumber}`]= armor['Hide in Shadows'] || '0';
+    armorModifiers[`${row}dna${armorNumber}`]= armor['Detect Noise'] || '0';
+    armorModifiers[`${row}cwa${armorNumber}`]= armor['Climb Walls'] || '0';
+    armorModifiers[`${row}bra${armorNumber}`]= armor['Bribe'] || '0';
+    armorModifiers[`${row}tua${armorNumber}`]= armor['Tunneling'] || '0';
+    armorModifiers[`${row}eba${armorNumber}`]= armor['Escape bonds'] || '0';
+    console.log(armorModifiers);
+    setAttrs(armorModifiers);
+});
+
+on('clicked:rt', async function (eventInfo){
+    console.log(eventInfo);
+    let rollBuilder = new RollTemplateBuilder('2Echeck');
+    rollBuilder.push('character=@{character_name}', 'checkroll=[[1d100cs<1cf>96]]%');
+
+    let skill = await extractQueryResult(`?{Find or Removing Trap?|Find Traps|Remove Traps|Remove Invisible/Magical Traps}`);
+    if (skill === 'Find Traps') {
+        rollBuilder.push('checkvs=Find Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you find the trap and knows its general principle but not exact nature.', 'fail=After [[1d10]] round(s) you find nothing.\nYou can try again at next level.');
+    } else if (skill === 'Remove Traps') {
+        rollBuilder.push('checkvs=Remove Traps\n(in @{armorname})', 'checktarget=[[{@{rtt}+(@{misc-mod}),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
+    } else if (skill === 'Remove Invisible/Magical Traps') {
+        rollBuilder.push('checkvs=Remove Invisible/Magical Traps\n(in @{armorname})', 'checktarget=[[{floor((@{rtt}+(@{misc-mod}))/2),95}kl1]]%', 'success=After [[1d10]] round(s) you disarm the trap.', 'fail=After [[1d10]] round(s) the trap stays armed.\nYou can try again at next level.', 'fumble=After [[1d10]] round(s) the trap is accidentally triggered and you suffer the consequences!');
+    }
+
+    return printRoll(`/w gm ${rollBuilder.string()}`);
+});
+
+on('clicked:ms clicked:hs', function (eventInfo){
+    getAttrs(['rogue-ranger'], async function (values) {
+        let skill = eventInfo.triggerName.replace('clicked:', '');
+        let rollBuilder = new RollTemplateBuilder('2Echeck');
+        rollBuilder.push('character=@{character_name}','checkroll=[[1d100cs<1cf>[[@{rogue-ranger}+1]] ]]%');
+
+        if (skill ==='ms') {
+            rollBuilder.push('success=You are silent. Movement rate reduced to 1/3 of normal. Opponents get -2 to surprise roll from silence and another -2 if you are unseen.', 'fail=You are not silent. Movement rate reduced to 1/3 of normal.');
+        } else if (skill === 'hs') {
+            rollBuilder.push('success=You are hidden while remaining virtually motionless. (Small careful movements: drawing a weapon, uncork a potion, etc. is allowed). You cannot be detected by Infravision. Magic that reveal invisible objects can reveal you.', 'fail=You are not hidden.');
+        }
+
+        // The player is a rogue, so no check for surroundings
+        if (values['rogue-ranger'] === "95") {
+            let skillName = skill === 'ms' ? 'checkvs=Move Silently\n(in @{armorname})' : 'checkvs=Hide in Shadows\n(in @{armorname})';
+            rollBuilder.push(skillName, `checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
+            return printRoll(`/w gm ${rollBuilder.string()}`);
+        }
+
+        let surroundings = await extractQueryResult(`?{What are your surroundings?|Natural (woodland / forest / plains),Natural|Non-natural (crypt / city street / indoor / underground),Non-natural}`);
+        let displaySurrounding = `*${surroundings} surroundings*`;
+        let skillName = skill === 'ms' ? `checkvs=Move Silently\n${displaySurrounding}\n(in @{armorname})` : `checkvs=Hide in Shadows\n${displaySurrounding}\n(in @{armorname})`;
+        if (surroundings === 'Natural') {
+            rollBuilder.push(skillName, `checktarget=[[{@{${skill}t}+(@{misc-mod}),@{rogue-ranger}}kl1]]%`);
+        } else {
+            rollBuilder.push(skillName, `checktarget=[[{floor((@{${skill}t}+(@{misc-mod}))/2),@{rogue-ranger}}kl1]]%`);
+        }
+
+        return printRoll(`/w gm ${rollBuilder.string()}`);
+    });
+});
+
+on('clicked:repeating_customrogue:cr-dm', function (eventInfo) {
+    let parse = parseSourceAttribute(eventInfo);
+    let row = `repeating_customrogue_${parse.rowId}`;
+    getAttrs(['character_name'], async function (values) {
+        let rollBuilder = new RollTemplateBuilder('2Edefault');
+        rollBuilder.push('subtitle=for @{character_name}', 'color=dark-purple');
+        rollBuilder.push(`name=@{${values.character_name}|${row}_customskill}\n(in @{armorname})`);
+        rollBuilder.push(`[Secret by DM](~@{character_name}|${row}_cr)=`);
+        rollBuilder.push(`desc=You try to use @{${values.character_name}|${row}_customskill}...`);
+        console.log(rollBuilder.string());
+
+        return printRoll(`/w gm ${rollBuilder.string()}`);
+    });
+});
 //#endregion
 
 //#region Weapons tab logic and autofil
-//Used in version.js
-const updateNonprofPenalty = function () {
-    getAttrs(['nonprof-penalty'], function(values) {
-        let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
-        let famil = Math.floor(nonprof / 2)
-        setAttrs({
-            ['nonprof-penalty']: nonprof,
-            ['famil-penalty']: famil
-        },{silent:true});
-    });
-}
 on('change:nonprof-penalty', function (eventInfo){
-    updateNonprofPenalty();
+    let nonprofRaw = parseInt(eventInfo.newValue) || 0;
+    let nonprof = Math.abs(nonprofRaw) * -1;
+    let famil = Math.floor(nonprof / 2)
+    setAttrs({
+        ['nonprof-penalty']: nonprof,
+        ['famil-penalty']: famil
+    },{silent:true});
 });
 
 on('change:thac0-base-calc', function(eventInfo) {
@@ -1429,7 +1848,7 @@ async function selectVersion(foundObjects, values, comparer, objectName) {
         return;
     }
 
-    let isPlayersOption = values[PLAYERS_OPTION_FIELD] === '2';
+    let isPlayersOption = values[WEAPONS_PLAYERS_OPTION_FIELD] === '2';
     let isAllEqual = activeObjects.every(o => comparer(o, activeObjects[0], isPlayersOption));
     if (isAllEqual) {
         await keepContextRoll();
@@ -1446,10 +1865,8 @@ async function selectVersion(foundObjects, values, comparer, objectName) {
 
 function combineBooks(activeObjects, comparer, isPlayersOptions) {
     // Copying fields from active object to avoid side effects being saved permanently
-    let copyActiveObjects = activeObjects.map(e => {
-        return {...e}
-    });
-    let copyArray = [...copyActiveObjects];
+    let copyActiveObjects = structuredClone(activeObjects);
+    let copyArray = [...copyActiveObjects]; // intentionally use shallow copy to keep references the same
 
     copyActiveObjects.forEach(activeObject => {
         copyArray.forEach((copyObject, i) => {
@@ -1469,13 +1886,13 @@ function combineBooks(activeObjects, comparer, isPlayersOptions) {
 }
 
 //#region Weapons autofill
-const PLAYERS_OPTION_FIELD = 'tab81';
+const WEAPONS_PLAYERS_OPTION_FIELD = 'tab81';
 function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, category) {
     if (!weaponName)
         return;
 
     weaponName = weaponName.toLowerCase();
-    let fields = [...BOOK_FIELDS, PLAYERS_OPTION_FIELD, thac0Field].filter(Boolean);
+    let fields = [...BOOK_FIELDS, WEAPONS_PLAYERS_OPTION_FIELD, thac0Field].filter(Boolean);
     getAttrs(fields, async function (values) {
         let bonus = 0;
         let baseWeapons = WEAPONS_TABLE[weaponName]
@@ -1484,8 +1901,9 @@ function setWeaponWithBonus(weaponName, setWeaponFunc, comparer, thac0Field, cat
             if (!match)
                 return;
 
-            let baseWeaponName = weaponName.replace(match[0], ' ').trim();
-            baseWeapons = WEAPONS_TABLE[baseWeaponName];
+            let baseWeaponName1 = weaponName.replace(match[0], '');
+            let baseWeaponName2 = weaponName.replace(match[0], ' ').trim();
+            baseWeapons = WEAPONS_TABLE[baseWeaponName1] || WEAPONS_TABLE[baseWeaponName2];
             if (!baseWeapons)
                 return;
 
@@ -1552,13 +1970,13 @@ on('change:repeating_weapons:weaponname', function(eventInfo) {
 //melee damage autofill
 on('change:repeating_weapons-damage:weaponname1', function(eventInfo) {
     let comparer = function (weapon1, weapon2, isPlayersOption) {
-        let fisk = ['small-medium','large'];
+        let compareFields = ['small-medium','large'];
         if (isPlayersOption) {
-            fisk.push('size');
-            fisk.push('type');
-            fisk.push('knockdown');
+            compareFields.push('size');
+            compareFields.push('type');
+            compareFields.push('knockdown');
         }
-        return fisk.every(f => weapon1[f] === weapon2[f])
+        return compareFields.every(f => weapon1[f] === weapon2[f])
     }
     let rowId = parseSourceAttribute(eventInfo).rowId;
     let setWeaponFunc = function (weapon) {
@@ -1631,7 +2049,7 @@ on('change:repeating_ammo:ammoname', function(eventInfo) {
 });
 
 //Follower weapons
-function setupFollowerWeaponsAutoFill(repeating, sections) {
+function setupFollowerWeaponsAutoFill(repeating, weaponSections) {
     let comparer = function (weapon1, weapon2, isPlayersOption) {
         let comparerFields = ['rof','small-medium','large','range','speed'];
         if (isPlayersOption) {
@@ -1640,20 +2058,20 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
         return comparerFields.every(f => weapon1[f] === weapon2[f]) && _.isEqual(new Set(weapon1['type'].split('/')), new Set(weapon2['type'].split('/')));
     }
 
-    sections.forEach(section => {
+    weaponSections.forEach(weaponSection => {
         let changePrefix = repeating ? `repeating_${repeating}:` : '';
-        on(`change:${changePrefix}weaponnamehench${section}`, function(eventInfo) {
+        on(`change:${changePrefix}weaponnamehench${weaponSection}`, function(eventInfo) {
             let repeatingRowPrefix = repeating ? `repeating_${repeating}_${parseSourceAttribute(eventInfo).rowId}_` : '';
             let setWeaponFunc = function (weapon) {
                 let weaponInfo = {};
-                weaponInfo[`${repeatingRowPrefix}attacknumhench${section}`] = weapon['rof'] || '1';
-                weaponInfo[`${repeatingRowPrefix}attackadjhench${section}`] = weapon['bonus'];
-                weaponInfo[`${repeatingRowPrefix}damadjhench${section}`]    = weapon['bonus'];
-                weaponInfo[`${repeatingRowPrefix}damsmhench${section}`]     = weapon['small-medium'];
-                weaponInfo[`${repeatingRowPrefix}damlhench${section}`]      = weapon['large'];
-                weaponInfo[`${repeatingRowPrefix}rangehench${section}`]     = weapon['range'] || weapon['reach'] || 'Melee';
-                weaponInfo[`${repeatingRowPrefix}weaptypehench${section}`]  = weapon['type'];
-                weaponInfo[`${repeatingRowPrefix}weapspeedhench${section}`] = weapon['speed'];
+                weaponInfo[`${repeatingRowPrefix}attacknumhench${weaponSection}`] = weapon['rof'] || '1';
+                weaponInfo[`${repeatingRowPrefix}attackadjhench${weaponSection}`] = weapon['bonus'];
+                weaponInfo[`${repeatingRowPrefix}damadjhench${weaponSection}`]    = weapon['bonus'];
+                weaponInfo[`${repeatingRowPrefix}damsmhench${weaponSection}`]     = weapon['small-medium'];
+                weaponInfo[`${repeatingRowPrefix}damlhench${weaponSection}`]      = weapon['large'];
+                weaponInfo[`${repeatingRowPrefix}rangehench${weaponSection}`]     = weapon['range'] || weapon['reach'] || 'Melee';
+                weaponInfo[`${repeatingRowPrefix}weaptypehench${weaponSection}`]  = weapon['type'];
+                weaponInfo[`${repeatingRowPrefix}weapspeedhench${weaponSection}`] = weapon['speed'];
 
                 setAttrs(weaponInfo);
             };
@@ -1662,23 +2080,62 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
     });
 }
 
-const followerWeapons = [
-    {repeating: '',       sections: ['',    '001', '002']},
-    {repeating: 'hench',  sections: ['003', '004', '005']},
-    {repeating: '',       sections: ['006', '007', '008']},
-    {repeating: 'hench2', sections: ['009', '010', '011']},
-    {repeating: '',       sections: ['012', '013', '014']},
-    {repeating: 'hench3', sections: ['015', '016', '017']},
-    {repeating: '',       sections: ['018', '019', '020']},
-    {repeating: 'hench4', sections: ['021', '022', '023']},
-    {repeating: '',       sections: ['024', '025', '026']},
-    {repeating: 'hench5', sections: ['027', '028', '029']},
-    {repeating: '',       sections: ['030', '031', '032']},
-    {repeating: 'hench6', sections: ['033', '034', '035']},
+function setupFollowerThac0AndSavingThrowsAutoFill(classGroup, repeating, weaponSections, index) {
+    if (index === null) {
+        return;
+    }
+    let changePrefix = repeating ? `repeating_${repeating}:` : '';
+    on(`change:${changePrefix}henchlvl${index}`, function(eventInfo) {
+        if (doEarlyReturn(eventInfo, [`henchlvl${index}`]))
+            return;
+
+        let levelInt = parseInt(eventInfo.newValue);
+        if (isNaN(levelInt) || levelInt < 0)
+            return;
+
+        let thac0 = THAC0_FORMULAS[classGroup](Math.max(levelInt,1)); // Ensure THAC0 does not go above 20
+        let repeatingRowPrefix = repeating ? `repeating_${repeating}_${parseSourceAttribute(eventInfo).rowId}_` : '';
+
+        let toastObject = getToastObject(SUCCESS, 'Updated THAC0 and Saving throws', `Updated THAC0 and Saving throws to match a single class ${capitalizeFirst(classGroup)} at level ${levelInt}`);
+        let newValue = {...toastObject};
+        newValue[`${repeatingRowPrefix}thac0hench${weaponSections[0]}`] = thac0;
+        newValue[`${repeatingRowPrefix}thac0hench${weaponSections[1]}`] = thac0;
+        newValue[`${repeatingRowPrefix}thac0hench${weaponSections[2]}`] = thac0;
+
+        levelInt = Math.min(levelInt,21); // Ensure we stay inside index
+        newValue[`${repeatingRowPrefix}hench${index}partar`] = SAVING_THROWS[classGroup]['paralyzePoisonDeath'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}poitar`] = SAVING_THROWS[classGroup]['paralyzePoisonDeath'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}deatar`] = SAVING_THROWS[classGroup]['paralyzePoisonDeath'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}rodtar`] = SAVING_THROWS[classGroup]['rodStaffWand'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}statar`] = SAVING_THROWS[classGroup]['rodStaffWand'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}wantar`] = SAVING_THROWS[classGroup]['rodStaffWand'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}pettar`] = SAVING_THROWS[classGroup]['petrificationPolymorph'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}poltar`] = SAVING_THROWS[classGroup]['petrificationPolymorph'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}bretar`] = SAVING_THROWS[classGroup]['breath'][levelInt]
+        newValue[`${repeatingRowPrefix}hench${index}spetar`] = SAVING_THROWS[classGroup]['spell'][levelInt]
+
+        setAttrs(newValue);
+    });
+}
+
+const FOLLOWERS = [
+    {classGroup: 'warrior', repeating: '',       weaponSections: ['',    '001', '002'], index: ''},
+    {classGroup: 'warrior', repeating: 'hench',  weaponSections: ['003', '004', '005'], index: '1'},
+    {classGroup: 'wizard',  repeating: '',       weaponSections: ['006', '007', '008'], index: '2'},
+    {classGroup: 'wizard',  repeating: 'hench2', weaponSections: ['009', '010', '011'], index: '22'},
+    {classGroup: 'priest',  repeating: '',       weaponSections: ['012', '013', '014'], index: '3'},
+    {classGroup: 'priest',  repeating: 'hench3', weaponSections: ['015', '016', '017'], index: '33'},
+    {classGroup: 'rogue',   repeating: '',       weaponSections: ['018', '019', '020'], index: '4'},
+    {classGroup: 'rogue',   repeating: 'hench4', weaponSections: ['021', '022', '023'], index: '44'},
+    {classGroup: 'psionicist',   repeating: '',       weaponSections: ['024', '025', '026'], index: '5'},
+    {classGroup: 'psionicist',   repeating: 'hench5', weaponSections: ['027', '028', '029'], index: '55'},
+    {classGroup: 'animal',  repeating: '',       weaponSections: ['030', '031', '032'], index: null},
+    {classGroup: 'animal',  repeating: 'hench6', weaponSections: ['033', '034', '035'], index: null},
 ];
 
-followerWeapons.forEach(fw => {
-    setupFollowerWeaponsAutoFill(fw.repeating, fw.sections);
+FOLLOWERS.forEach(fw => {
+    setupFollowerWeaponsAutoFill(fw.repeating, fw.weaponSections);
+    setupFollowerThac0AndSavingThrowsAutoFill(fw.classGroup, fw.repeating, fw.weaponSections, fw.index)
 });
 
 // Monster weapons
@@ -1689,7 +2146,7 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo) {
         return comparerFields.every(f => weapon1[f] === weapon2[f]);
     }
     let setWeaponFunc = function (weapon) {
-        if (weapon['bonusInt'] > 1) {
+        if (weapon['bonusInt'] > 0) {
             weapon['small-medium'] += weapon['bonus'];
             weapon['large'] += weapon['bonus'];
             weapon['thac0'] = weapon['thac0'] - weapon['bonusInt'];
@@ -1709,55 +2166,222 @@ on('change:repeating_monsterweapons:weaponname', function(eventInfo) {
 });
 //#endregion
 
-on('clicked:grenade-miss', async function (eventInfo) {
-    getAttrs(['character_name'], async function(values) {
-        let characterName = values['character_name'];
+on('clicked:grenade-miss', function(eventInfo) {
+    getAttrs(['tab11'], async function(values) {
+        let templateVisibility = '';
+        let rollVisibility = '/em';
+        if (values['tab11'] === '2') {
+            templateVisibility = '@{wtype}';
+            rollVisibility = '@{wtype}';
+        }
+
         let rollBuilder = new RollTemplateBuilder('2Egrenademiss');
-        let grenade = await extractQueryResult('?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison|Other}');
+        const query = '?{What grenade have been thrown?'.concat(
+            '|Acid',
+            '|Holy water',
+            '|Oil (lit)',
+            '|Poison',
+            '|Boulder',
+            '|--------',
+            '|Fire Seed missile',
+            '|Ice Knife',
+            '|Melf’s Minute Meteor',
+            '|Otiluke’s Freezing Sphere - Globe of cold',
+            '|Produce Flame',
+            '|Puffball',
+            '|Sol’s Searing Orb',
+            '|Other',
+            '}'
+        );
+        let grenade = await extractQueryResult(query);
         switch (grenade) {
-            case 'Acid':       rollBuilder.push('name=Acid','aoe=[[1]]','aoesplash=[[1+6]]',`hitdmg=[Damage](~${characterName}|acid-hit)`,`splashdmg=[Damage](~${characterName}|acid-splash)`); break;
-            case 'Holy water': rollBuilder.push('name=Holy water','aoe=[[1]]','aoesplash=[[1+6]]',`hitdmg=[Damage](~${characterName}|holy-water-hit)`,`splashdmg=[Damage](~${characterName}|holy-water-splash)`); break;
-            case 'Oil (lit)':  rollBuilder.push('name=Oil (lit)','aoe=[[3]]','aoesplash=[[3+6]]',`hitdmg=[Round 1](~${characterName}|oil-lit-hit1) [Round 2](~${characterName}|oil-lit-hit2)`,`splashdmg=[Damage](~${characterName}|oil-lit-splash)`); break;
-            case 'Poison':     rollBuilder.push('name=Poison','aoe=[[1]]','aoesplash=[[1+6]]','hitdmg=Special','splashdmg=Special'); break;
+            case 'Acid': {
+                rollBuilder.push(
+                    'name=Acid',
+                    'aoe=[[1]]',
+                    'aoesplash=[[1+6]]',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;2d4&rbrack;&rbrack; acid damage using their Acid! &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1&rbrack;&rbrack; acid damage using their Acid! &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Holy water': {
+                rollBuilder.push(
+                    'name=Holy water',
+                    'aoe=[[1]]',
+                    'aoesplash=[[1+6]]',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1d6+1&rbrack;&rbrack; damage using their Holy water! &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;2&rbrack;&rbrack; damage using their Holy water! &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Oil (lit)': {
+                rollBuilder.push(
+                    'name=Oil (lit)',
+                    'aoe=[[3]]',
+                    'aoesplash=[[3+6]]',
+                    `hitdmg=[Round 1](\`${rollVisibility} rolls &lbrack;&lbrack;2d6&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Direct Hit, first round&#41;) [Round 2]({rollVisibility}\`$ rolls &lbrack;&lbrack;1d6&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Direct Hit, second round&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1d3&rbrack;&rbrack; fire damage using their Oil &#40;lit&#41;! &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Poison': {
+                rollBuilder.push(
+                    'name=Poison',
+                    'aoe=[[1]]',
+                    'aoesplash=[[1+6]]',
+                    `hitdmg=[Special](\`${rollVisibility} affects the target creature with Poison! Consult DMG p. 101 for the effect. &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Special](\`${rollVisibility} affects the target creature with Poison! Consult DMG p. 101 for the effect. &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Boulder': {
+                let damage = await extractQueryResult('?{Direct Hit damage|3d10}');
+                rollBuilder.push(
+                    'name=Boulder',
+                    'aoe=[[2]]',
+                    'aoesplash=[[2]]',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage using their Boulder! &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage, minus the distance the boulder has bounced in feet since it first hit the ground, using their Boulder! &#40;Scatter&#41;)`,
+                    'bounce=[[3d10]]'
+                );
+                break;
+            }
+            case '--------': return;
+            case 'Fire Seed missile': {
+                rollBuilder.push(
+                    'name=Fire Seed missile',
+                    'aoe=[[10]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} causes creatures failing a save vs. spell &lbrack;&lbrack;2d8&rbrack;&rbrack; fire damage &#40;one-half damage if a saving throw vs. spell is successful&#41; using their Fire Seed missile! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break
+            }
+            case 'Ice Knife': {
+                rollBuilder.push(
+                    'name=Ice Knife',
+                    'aoe=[[10]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} causes creatures failing a save vs. paralyzation to suffer &lbrack;&lbrack;1d4&rbrack;&rbrack; cold damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of numbness using their Ice Knife! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Melf’s Minute Meteor': {
+                rollBuilder.push(
+                    'name=Melf’s Minute Meteor',
+                    'aoe=[[1]]',
+                    'aoesplash=[[6]]',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1d4&rbrack;&rbrack; fire damage using their Melf’s Minute Meteor! &#40;Direct Hit&#41;)`,
+                    `splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1&rbrack;&rbrack; fire damage using their Melf’s Minute Meteor! &#40;Splash&#41;)`
+                );
+                break;
+            }
+            case 'Otiluke’s Freezing Sphere - Globe of cold': {
+                rollBuilder.push(
+                    'name=Otiluke’s Freezing Sphere (Globe of cold)',
+                    'aoe=[[20]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} causes creatures failing a save vs. spell &lbrack;&lbrack;6d6&rbrack;&rbrack; cold damage &#40;one-half damage if a saving throw vs. spell is successful&#41; using their Otiluke’s Freezing Sphere - Globe of cold! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Produce Flame': {
+                rollBuilder.push(
+                    'name=Produce Flame',
+                    'aoe=[[3]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;1d4+1&rbrack;&rbrack; fire damage using their Produce Flame! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Puffball': {
+                rollBuilder.push(
+                    'name=Puffball',
+                    'aoe=[[10]]',
+                    'aoesplash=',
+                    `hitdmg=[Effect](\`${rollVisibility} causes creatures failing a save vs. poison to be unable to attack and lose all Dexterity bonuses to Armor Class and saving throws using their Puffball! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
+            case 'Sol’s Searing Orb': {
+                rollBuilder.push(
+                    'name=Sol’s Searing Orb',
+                    'aoe=[[6]]',
+                    'aoesplash=',
+                    `hitdmg=[Damage](\`${rollVisibility} causes normal creatures failing a saving throw vs. spell &lbrack;&lbrack;3d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d3&rbrack;&rbrack; rounds of blindness. Or causes undead &lbrack;&lbrack;6d6&rbrack;&rbrack; fire damage and &lbrack;&lbrack;1d6&rbrack;&rbrack; rounds of blindness. All victims are allowed a saving throw vs. spell, with success indicating half damage and no blindness. Using their Sol’s Searing Orb! &#40;Direct Hit&#41;)`,
+                    'splashdmg='
+                );
+                break;
+            }
             case 'Other': {
-                let name   = await extractQueryResult('?{Grenade name}');
-                let aoe    = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
-                let damage = await extractQueryResult('?{Direct damage|1d6}');
+                let name = await extractQueryResult('?{Grenade name}');
+                let aoe = await extractQueryResult('?{Area of effect (Diameter in feet)|1}');
+                let damage = await extractQueryResult('?{Direct Hit damage|1d6}');
                 let splash = await extractQueryResult('?{Splash damage|1d3}');
+                splash = splash.trim();
 
-                let customGrenade = {}
-                customGrenade['custom-grenade-name'] = name;
-                customGrenade['custom-grenade-hit'] = damage;
-                customGrenade['custom-grenade-splash'] = splash;
-                setAttrs(customGrenade);
+                let escapedName = name.replaceAll('(','&#40;')
+                    .replaceAll(')','&#41;')
+                    .replaceAll('[','&lbrack;')
+                    .replaceAll(']','&rbrack;');
 
-                rollBuilder.push(`name=${name}`,`aoe=[[${aoe}]]`,`aoesplash=[[${aoe}+6]]`,`hitdmg=[Damage](~${characterName}|custom-grenade-hit)`,`splashdmg=[Damage](~${characterName}|custom-grenade-splash)`);
+                rollBuilder.push(
+                    `name=${name}`,
+                    `aoe=[[${aoe}]]`,
+                    `aoesplash=[[${aoe}+6]]`,
+                    `hitdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${damage}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Direct Hit&#41;)`,
+                );
+
+                if (splash === '' || splash === '0') {
+                    rollBuilder.push('splashdmg=');
+                } else {
+                    rollBuilder.push(`splashdmg=[Damage](\`${rollVisibility} rolls &lbrack;&lbrack;${splash}&rbrack;&rbrack; damage using their ${escapedName}! &#40;Splash&#41;)`);
+                }
             }
         }
-        let distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
-        rollBuilder.push('direction=[[1d10]]', `distancename=${distanceName}`);
-        switch (distanceName) {
-            case 'Short': rollBuilder.push('distance=[[1d6]]'); break;
-            case 'Medium': rollBuilder.push('distance=[[1d10]]'); break;
-            case 'Long': rollBuilder.push('distance=[[2d10]]'); break;
+
+        let distanceName;
+        switch (grenade) {
+            case 'Fire Seed missile':
+            case 'Melf’s Minute Meteor':
+            case 'Produce Flame':
+            case 'Sol’s Searing Orb':
+                distanceName = 'Short';
+                break;
+            default:
+                distanceName = await extractQueryResult('?{How far was it thrown?|Short|Medium|Long}');
         }
+        rollBuilder.push('direction=[[1d10]]', `distancename=${distanceName}`);
+        let distanceRoll;
+        switch (distanceName) {
+            case 'Short':  distanceRoll='1d6cs1cf6'; break;
+            case 'Medium': distanceRoll='1d10cs1cf10'; break;
+            case 'Long':   distanceRoll='2d10cs1cf10'; break;
+        }
+        if (grenade === 'Boulder') {
+            distanceRoll = distanceRoll + '*2';
+        }
+        rollBuilder.push(`distance=[[${distanceRoll}]]`);
         rollBuilder.push('hit=[[0]]','splash=[[0]]');
-        let finalRollText = rollBuilder.string();
+        let finalRollText = `${templateVisibility} ${rollBuilder.string()}`;
         console.log(finalRollText);
         startRoll(finalRollText, function (roll) {
-            console.log(roll);
             let computedRolls = {
                 hit: 0,
                 splash: 0
             };
 
             // See if monster is within direct hit
-            if (roll.results.distance.result <= roll.results.aoe.result / 2) {
+            if (roll.results.aoe && roll.results.distance.result <= roll.results.aoe.result / 2) {
                 computedRolls.hit = 1;
-            } else if (roll.results.distance.result <= roll.results.aoesplash.result / 2) {
+            } else if (roll.results.aoesplash && roll.results.distance.result <= roll.results.aoesplash.result / 2) {
                 computedRolls.splash = 1;
             }
-            console.log(computedRolls);
             finishRoll(roll.rollId, computedRolls);
         });
     });
@@ -1779,11 +2403,11 @@ on('clicked:repeating_weapons-damage:crit2', function(eventInfo) {
         ? values[prefix+'damsm']
         : values[prefix+'daml'];
     let damageAdjFunc = (values) => [
-        `(${values[prefix+'damadj']})`,
-        `({${values[prefix+'specialist-damage']},${values[prefix+'mastery-damage']}}kh1)`,
-        `((@{strengthdmg})*${values[prefix+'strbonus1']})`,
-        `((@{dexmissile})*${values[prefix+'dexbonus1']})`,
-        '(@{temp-damadj})',
+        `([[(@{strengthdmg})*${values[prefix+'strbonus1']}]] [Strength])`,
+        `([[(@{dexmissile})*${values[prefix+'dexbonus1']}]] [Dexterity])`,
+        `([[{${values[prefix+'specialist-damage']},${values[prefix+'mastery-damage']}}kh1]] [Proficiency])`,
+        `(${values[prefix+'damadj']} [Dmg Adj])`,
+        '(@{temp-damadj} [Temp buff])',
         '(@{misc-mod})'
     ].join('+');
 
@@ -1804,11 +2428,11 @@ on('clicked:repeating_ammo:crit2', function (eventInfo) {
         ? values[prefix+'damsm2']
         : values[prefix+'daml2'];
     let damageAdjFunc = (values) => [
-        `(${values[prefix+'damadj2']})`,
-        `((@{strengthdmg})*${values[prefix+'strbonus3']})`,
-        `((@{dexmissile})*${values[prefix+'dexbonus3']})`,
-        `({${values[prefix+'specialist-damage2']},${values[prefix+'mastery-damage2']}}kh1)`,
-        '(@{temp-damadj})',
+        `([[(@{strengthdmg})*${values[prefix+'strbonus3']}]] [Strength])`,
+        `([[(@{dexmissile})*${values[prefix+'dexbonus3']}]] [Dexterity])`,
+        `([[{${values[prefix+'specialist-damage2']},${values[prefix+'mastery-damage2']}}kh1]] [Proficiency])`,
+        `(${values[prefix+'damadj2']} [Dmg Adj])`,
+        '(@{temp-damadj} [Temp buff])',
         '(@{misc-mod})'
     ].join('+');
 
@@ -1818,12 +2442,12 @@ on('clicked:repeating_ammo:crit2', function (eventInfo) {
 const SPELL_HITS_REGEX = /\((\dd\d\+?\d?|\d) hit/i;
 
 async function debugSeverity(severityDice) {
-    return false
+    return true
         ? parseInt(await extractQueryResult('?{Debug severity|1}'))
         : await extractRollResult(severityDice);
 }
 
-function lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set) {
+function lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set, severityDice) {
     let effect;
     let additionalHit = {};
     if (severityRoll < 4) {
@@ -1841,7 +2465,7 @@ function lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType,
     }
 
     critEffectExplanations(effect, set);
-    effect = `[[${severityRoll}]]: ${effect}`;
+    effect = `${severityDice}&#61;[[${severityRoll}]]: ${effect}`;
     return {
         effect: effect,
         additionalLocations: additionalHit.locations
@@ -1856,7 +2480,7 @@ async function recursiveAdditionalHit(additionalLocations, iteration, additional
     let additionalLocation = additionalLocations.find(l => additionalLocationRoll <= l.chance);
     let displayAdditionalLocationRoll = additionalLocations.length === 1
         ? ''
-        :`(1d100:${additionalLocationRoll})`;
+        :`(1d100&#61;[[${additionalLocationRoll}]])`;
     let severityRoll = await debugSeverity(severityDice);
     let generalLocation = additionalLocation.general;
     let specificLocation = additionalLocation.specific;
@@ -1869,8 +2493,8 @@ async function recursiveAdditionalHit(additionalLocations, iteration, additional
         specificLocation = 'Tail';
         locationNote = SPELL_CRIT_13_EFFECT_TABLE[targetType]['Tail'].note;
     }
-    let effectObj = lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set);
-    let displayAdditionalEffect = `Location ${iteration}, ${additionalString} hit, hitting **${specificLocation}** ${locationNote} ${displayAdditionalLocationRoll}=${effectObj.effect}`;
+    let effectObj = lookupEffect(severityRoll, spellTypeTable, generalLocation, targetType, set, severityDice);
+    let displayAdditionalEffect = `Location ${iteration}, ${additionalString} hit, hitting the **${specificLocation}** ${locationNote} ${displayAdditionalLocationRoll}=${effectObj.effect}`;
     rollBuilder.push(displayAdditionalEffect);
 
     return await recursiveAdditionalHit(effectObj.additionalLocations, iteration, additionalString+' additional', severityDice, boolObj, spellTypeTable, targetType, rollBuilder, set);
@@ -2055,15 +2679,16 @@ function setupSpellCrit(section) {
                 '|Major 2d4 (Max. potential damage is less than target max hp),2d4' +
                 '|Severe 2d6 (Max. potential damage is less than twice target max hp),2d6' +
                 '|Mortal 2d8 (Max. potential damage is twice or more target max hp),2d8}');
+            let severityName;
             switch (severityDice) { // optional to add this
-                case '1d6': rollBuilder.push(`severity=Minor`); break;
-                case '2d4': rollBuilder.push(`severity=Major`); break;
-                case '2d6': rollBuilder.push(`severity=Severe`); break;
-                case '2d8': rollBuilder.push(`severity=Mortal`); break;
+                case '1d6': severityName='Minor'; break;
+                case '2d4': severityName='Major'; break;
+                case '2d6': severityName='Severe'; break;
+                case '2d8': severityName='Mortal'; break;
             }
 
             if (hits > 0 && errors.length === 0)
-                rollBuilder.push(`hits=Hitting ${hitDice}[[${hits}]] location${hits > 1 ? 's':''} and rolling ${severityDice} for effect`);
+                rollBuilder.push(`hits=Hitting ${hitDice}[[${hits}]] location${hits > 1 ? 's':''} and causing **${severityName}** effect (rolling ${severityDice})`);
             else
                 rollBuilder.push(`hits=Cannot show effects due to missing fields: ${errors.join(', ')}`);
 
@@ -2084,8 +2709,8 @@ function setupSpellCrit(section) {
                     let severityRoll = await debugSeverity(severityDice);
                     let displayLocationRoll = attackType === 'Called Shot'
                         ? ''
-                        : `(${locationDice}:${locationRoll})`;
-                    let {effect, additionalLocations} = lookupEffect(severityRoll, spellTypeTable, locationObject.general, targetType, set);
+                        : `(${locationDice}&#61;[[${locationRoll}]])`;
+                    let {effect, additionalLocations} = lookupEffect(severityRoll, spellTypeTable, locationObject.general, targetType, set, severityDice);
                     let displayEffect = `Location ${i+1} hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll}=${effect}`;
                     rollBuilder.push(displayEffect);
 
@@ -2233,19 +2858,20 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
             }
         }
 
+        let severityName;
         let severityDice;
         const sizeDiff = sizeToInt(weaponSize) - sizeToInt(targetSize);
         if (sizeDiff < 0) {
-            rollBuilder.push(`severity=Minor`);
+            severityName='Minor';
             severityDice = '1d6';
         } else if (sizeDiff === 0) {
-            rollBuilder.push(`severity=Major`);
+            severityName='Major';
             severityDice = '2d4';
         } else if (sizeDiff === 1) {
-            rollBuilder.push(`severity=Severe`);
+            severityName='Severe';
             severityDice = '2d6';
         } else if (sizeDiff > 1) {
-            rollBuilder.push(`severity=Mortal`);
+            severityName='Mortal';
             severityDice = '2d8';
         }
         let severityRoll = await extractRollResult(severityDice);
@@ -2264,8 +2890,8 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
 
             let displayLocationRoll = attackType === 'Called Shot'
                 ? ''
-                : `(${locationDice}:${locationRoll})`;
-            rollBuilder.push(`Hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll} and rolling ${severityDice} for effect=[[${severityRoll}]]: ${critEffect}`);
+                : `(${locationDice}&#61;[[${locationRoll}]])`;
+            rollBuilder.push(`Hitting the **${locationObject.specific}** ${locationNote} ${displayLocationRoll} and causing **${severityName}** effect (rolling ${severityDice})=${severityDice}&#61;[[${severityRoll}]]: ${critEffect}`);
             critEffectExplanations(critEffect, set);
         } else {
             errors.push('weapon type');
@@ -2284,7 +2910,7 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
                 rollBuilder.push(`multiplier=(Double)`);
                 damage = `(${weaponDamage})*2`;
             }
-            rollBuilder.push(`damage=[[${damage}+[[${damageAdjFunc(values)}]] ]]`);
+            rollBuilder.push(`damage=[[${damage}+${damageAdjFunc(values)} ]]`);
         }
 
         if (errors.length > 0)
@@ -2306,11 +2932,10 @@ function weaponPoCritTemplate(prefix, fields, nameFunc, baseDamageFunc, damageAd
 
 //#region Proficiencies
 //Weapon proficiency slots
-const updateWeaponProfsRemaining = () => repeatingCalculateRemaining('weaponprofs', ['weapprofnum'], 'weapprof-slots-total-calc', 'weapprof-slots-remain');
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprof-slots-total-calc', function(eventInfo) {
     if (doEarlyReturn(eventInfo, ['weapprofnum']))
         return;
-    updateWeaponProfsRemaining();
+    repeatingCalculateRemaining('weaponprofs', ['weapprofnum'], 'weapprof-slots-total-calc', 'weapprof-slots-remain');
 });
 //Weapon proficiency autofill
 on('change:repeating_weaponprofs:weapprofname', function(eventInfo) {
@@ -2340,7 +2965,7 @@ NONWEAPON_PROFICIENCY_SECTIONS.forEach(({section, nameField, slotsField, ability
             return;
         }
 
-        let sectionsCopy = [...NONWEAPON_PROFICIENCY_SECTIONS];
+        let sectionsCopy = structuredClone(NONWEAPON_PROFICIENCY_SECTIONS);
         getAttrs(['prof-slots-total-calc'], function (values) {
             let accumulator = values['prof-slots-total-calc'];
             repeatingCalculateRemainingRecursive(sectionsCopy, accumulator, 'prof-slots-remain');
@@ -2527,43 +3152,278 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
             a.D[2]['stored-gear-weight-total']=(m.allgearweight-m.mountgearweight);
         })
         .execute();
-})
+});
 
-on('change:repeating_scrolls:scroll', async function (eventInfo) {
-    if (!eventInfo.newValue)
-        return;
+//#region Scroll
+const getScrollSpells = function (scrollName) {
+    if (!scrollName)
+        return null;
 
-    let spellName = eventInfo.newValue.replace('Scroll of ', '');
+    let spellName = scrollName.replace(/ scroll$/, '');
     let wizardSpell = wizardSpells['wizmonster'][spellName];
     let priestSpell = priestSpells['primonster'][spellName];
     if (!wizardSpell && !priestSpell)
-        return
+        return null;
 
-    let spell;
-    let spellClass;
-    if (wizardSpell && priestSpell) {
-        spellClass = await extractQueryResult(`?{Is ${eventInfo.newValue} a Wizard or Priest scroll?|Wizard|Priest}`);
-        spell = spellClass === 'Wizard' ? wizardSpell : priestSpell;
-    } else if (wizardSpell) {
-        spell = wizardSpell;
-        spellClass = 'Wizard';
-    } else {
-        spell = priestSpell;
-        spellClass = 'Priest';
+    return {wizardSpell, priestSpell}
+}
+
+const getScrollCasterClassAndLevel = async function (spLevelMatch, scrollName, scrollSpells) {
+    if (spLevelMatch) {
+        if (spLevelMatch[1].match(/wizard/i)) {
+            return {
+                casterClass: 'Wizard',
+                casterLevel: '@{level-class2}',
+            }
+        }
+        if (spLevelMatch[1].match(/priest/i)) {
+            return {
+                casterClass: 'Priest',
+                casterLevel: '@{level-class3}',
+            }
+        }
     }
 
-    getAttrs([...BOOK_FIELDS, ...SCHOOL_FIELDS, ...SPHERE_FIELDS], async function(books) {
-        if (bookInactiveShowToast(books, spell))
+    if (!scrollSpells) {
+        return null
+    }
+
+    let {wizardSpell, priestSpell} = scrollSpells;
+    if (wizardSpell && priestSpell) {
+        let casterClass = await extractQueryResult(`?{Is '${scrollName}' a Wizard or Priest scroll?|Wizard|Priest}`);
+        return {
+            casterClass: casterClass,
+            casterLevel: casterClass === 'Wizard' ? '@{level-class2}' : '@{level-class3}',
+        }
+    }
+    if (wizardSpell) {
+        return {
+            casterClass: 'Wizard',
+            casterLevel: '@{level-class2}',
+        }
+    }
+    if (priestSpell) {
+        return {
+            casterClass: 'Priest',
+            casterLevel: '@{level-class3}',
+        }
+    }
+
+    return null
+}
+
+const getScrollSpellLevelRequirement = function (spLevelMatch, scrollSpells, casterClass) {
+    if (spLevelMatch) {
+        let spellLevelMatch = spLevelMatch[1].match(/\d+/);
+        if (spellLevelMatch) {
+            let spellLevel = spellLevelMatch[0];
+            if (spellLevel.match(/^[1-7]$/)) { // Handle spells in the normal range for both classes
+                return SPELL_LEVEL_REQUIREMENT[casterClass][spellLevel];
+            }
+            if (spellLevel.match(/^[8-9]$/) && casterClass === 'Wizard') { // Handle high level wizard spells
+                return SPELL_LEVEL_REQUIREMENT[casterClass][spellLevel];
+            }
+        }
+
+        if (spLevelMatch[1].match(/quest/i) && casterClass === 'Priest') { // Handle quest spells
+            return SPELL_LEVEL_REQUIREMENT[casterClass]['q'];
+        }
+    }
+
+    if (!scrollSpells) {
+        return null
+    }
+
+    let {wizardSpell, priestSpell} = scrollSpells;
+    if (wizardSpell && priestSpell) {
+        let spellLevel = casterClass === 'Wizard' ? wizardSpell.level : priestSpell.level;
+        return SPELL_LEVEL_REQUIREMENT[casterClass][spellLevel];
+    }
+    if (wizardSpell) {
+        return SPELL_LEVEL_REQUIREMENT[casterClass][wizardSpell.level];
+    }
+    if (priestSpell) {
+        return SPELL_LEVEL_REQUIREMENT[casterClass][priestSpell.level]
+    }
+
+    return null
+}
+
+const getCasterFailureInfo = function (failureSystem, levelRequirement, casterLevel) {
+    let casterFailure = '';
+    let casterSingleClass = false;
+    if (failureSystem.includes('spell-level')) {
+        casterFailure = `{(${levelRequirement}-(${casterLevel}))*5,0}kh1`;
+        casterSingleClass = failureSystem === 'spell-level';
+    } else if (failureSystem.includes('casting-level')) {
+        casterFailure = `{((@{scroll-level})-(${casterLevel}))*5,0}kh1`;
+        casterSingleClass = failureSystem === 'casting-level';
+    }
+    return {casterFailure, casterSingleClass};
+}
+
+
+const getScrollRogueFailureInfo = function (failureSystem) {
+    let rogueClass;
+    let rogueFailure = '';
+    let rogueSingleClass = false;
+
+    if (failureSystem.includes('thief')) {
+        rogueClass = 'Thief';
+        rogueFailure = `100-({0,@{level-class4}}>10*75)`;
+        rogueSingleClass = failureSystem === 'thief';
+    } else if (failureSystem.includes('bard')) {
+        rogueClass = 'Bard';
+        rogueFailure = `100-({0,@{level-class4}}>10*85)`;
+        rogueSingleClass = failureSystem === 'bard';
+    }
+    return {
+        rogueClass: rogueClass,
+        rogueFailure: rogueFailure,
+        rogueSingleClass: rogueSingleClass,
+    };
+}
+
+
+on('change:scroll-failure-system', function (eventInfo) {
+    let failureSystem = eventInfo.newValue;
+    if (!failureSystem)
+        return;
+
+    // Handle the static values without any validation
+    if (failureSystem === 'custom') {
+        return;
+    } else if (failureSystem === 'disabled') {
+        TAS.repeating('scrolls')
+            .field('scroll-failure')
+            .each(function (row) {
+                row['scroll-failure'] =  '0';
+            })
+            .execute();
+        return;
+    }
+
+    getSectionIDs('scrolls', function (ids) {
+        let fullFieldNames = ['level-class2','level-class3','level-class4']
+        ids.forEach(id => fullFieldNames.push(`repeating_scrolls_${id}_scroll`,`repeating_scrolls_${id}_scroll-macro`));
+        getAttrs(fullFieldNames, async function (values) {
+            await keepContextRoll();
+
+            // Validate that the correct fields are filled out before proceeding
+            let wizardLevel = parseInt(values['level-class2']) || 0;
+            let priestLevel = parseInt(values['level-class3']) || 0;
+            let rogueLevel = parseInt(values['level-class4']) || 0;
+
+            if (failureSystem.includes('level') && !wizardLevel && !priestLevel &&
+                (failureSystem.includes('thief') || failureSystem.includes('bard')) && !rogueLevel) {
+                return showToast(WARNING, 'Missing Class levels', `You have no Wizard, Priest, or Rogue levels in the fields @{level-class2}, @{level-class3}, or @{level-class4}. Either the Wizard or Priest, and Rogue fields must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
+            }
+
+            if (failureSystem.includes('level') && !wizardLevel && !priestLevel) {
+                return showToast(WARNING, 'Missing Wizard/Priest level', `You have no Wizard or Priest levels in the fields @{level-class2} or @{level-class3}. Either of these fields must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
+            }
+
+            if ((failureSystem.includes('thief') || failureSystem.includes('bard')) && !rogueLevel) {
+                return showToast(WARNING, 'Missing Rogue level', `You have no Rogue level in the field @{level-class4}. This field must be filled out for spell failure to be calculated correctly.\n\nGo to the tab Character Sheet -> Info -> Details and fill out the 'Class' and 'Level' fields.`);
+            }
+
+            let newValues = {};
+            let unhandledScrolls = [];
+            let {rogueClass, rogueFailure, rogueSingleClass} = getScrollRogueFailureInfo(failureSystem);
+
+            // Set new failure chance for each scroll
+            for (let id of ids) {
+                if (rogueSingleClass) {
+                    newValues[`repeating_scrolls_${id}_scroll-failure`] = `${rogueFailure} [${rogueClass}]`;
+                    continue;
+                }
+
+                let scrollName = values[`repeating_scrolls_${id}_scroll`];
+                let scrollMacro = values[`repeating_scrolls_${id}_scroll-macro`];
+
+                let scrollSpells = getScrollSpells(scrollName);
+                let spLevelMatch = scrollMacro.match(/\{\{splevel=(.*?)}} *\{\{/);
+
+                let casterClassAndLevel = await getScrollCasterClassAndLevel(spLevelMatch, scrollName, scrollSpells);
+                if (!casterClassAndLevel) {
+                    unhandledScrolls.push(scrollName);
+                    continue;
+                }
+
+                let {casterClass, casterLevel} = casterClassAndLevel;
+                let levelRequirement = getScrollSpellLevelRequirement(spLevelMatch, scrollSpells, casterClass);
+                if (!levelRequirement && failureSystem.includes('spell-level')) {
+                    unhandledScrolls.push(scrollName);
+                    continue;
+                }
+
+                let {casterFailure, casterSingleClass} = getCasterFailureInfo(failureSystem, levelRequirement, casterLevel);
+
+                let spellFailure;
+                if (casterSingleClass) {
+                    spellFailure = `${casterFailure} [${casterClass}]`;
+                } else if (failureSystem.includes('best')) {
+                    spellFailure = `{[[${casterFailure}]] [${casterClass}], [[${rogueFailure}]] [${rogueClass}]}kl1`;
+                } else if (failureSystem.includes('select')) {
+                    casterFailure = casterFailure
+                        .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                        .replaceAll(',', '&#44;');
+                    rogueFailure = rogueFailure
+                        .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                        .replaceAll(',','&#44;');
+                    spellFailure = `?{Cast ${scrollName} as a ${casterClass} or a ${rogueClass}?|${casterClass},${casterFailure} [${casterClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
+                }
+
+                newValues[`repeating_scrolls_${id}_scroll-failure`] = spellFailure;
+            }
+
+            if (unhandledScrolls.length > 0) {
+                let toastObject = getToastObject(WARNING, 'Unhandled Scrolls', `Could not determine spell failure chance for the following scrolls. Please update them manually:\n* ${unhandledScrolls.join('\n* ')}`);
+                Object.assign(newValues, toastObject);
+            }
+
+            setAttrs(newValues);
+        })
+    });
+});
+
+on('change:repeating_scrolls:scroll', async function (eventInfo) {
+    let scrollName = eventInfo.newValue;
+    let scrollSpells = getScrollSpells(scrollName);
+    if (!scrollSpells)
+        return;
+
+    let spell;
+    let casterClass;
+    let casterLevel;
+
+    let {wizardSpell, priestSpell} = scrollSpells;
+    if (wizardSpell && priestSpell) {
+        casterClass = await extractQueryResult(`?{Is '${scrollName}' a Wizard or Priest scroll?|Wizard|Priest}`);
+        spell = casterClass === 'Wizard' ? wizardSpell : priestSpell;
+        casterLevel = casterClass === 'Wizard' ? '@{level-class2}' : '@{level-class3}';
+    } else if (wizardSpell) {
+        casterClass = 'Wizard';
+        spell = wizardSpell;
+        casterLevel = '@{level-class2}';
+    } else {
+        casterClass = 'Priest';
+        spell = priestSpell;
+        casterLevel = '@{level-class3}'
+    }
+
+    getAttrs([...BOOK_FIELDS, ...SCHOOL_FIELDS, ...SPHERE_FIELDS, 'scroll-failure-system'], async function(values) {
+        if (bookInactiveShowToast(values, spell))
             return
 
         let parse = parseSourceAttribute(eventInfo);
 
         let rollBuilder = new RollTemplateBuilder('2Espell');
         rollBuilder.push(`title=@{scroll}\n(Casting level @{scroll-level})`);
-        rollBuilder.push(`splevel=${displaySpellLevel(spell.level, spellClass)}`);
-        rollBuilder.push(`school=${getSpellSchools(spell, books)}`);
-        if (spellClass === 'Priest') {
-            let sphereRules = getActiveSettings(SPHERE_FIELDS, books);
+        rollBuilder.push(`splevel=${displaySpellLevel(spell.level, casterClass)}`);
+        rollBuilder.push(`school=${getSpellSchools(spell, values)}`);
+        if (casterClass === 'Priest') {
+            let sphereRules = getActiveSettings(SPHERE_FIELDS, values);
             rollBuilder.push(`sphere=${getSpellSpheres(spell, sphereRules)}`);
         }
         rollBuilder.push(`range=${spell['range']}`);
@@ -2579,35 +3439,62 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         rollBuilder.push(`crit=${spell['crit-size'] || ''}`);
         rollBuilder.push(`damage=${spell['damage']}`);
         rollBuilder.push(`damagetype=${spell['damage-type']}`);
+        rollBuilder.push(`healing=${spell['healing']}`);
         rollBuilder.push(`reference=${spell['reference']}, ${spell['book']}`);
         rollBuilder.push(`materials=${spell['materials'] ? 'Included in the scroll.' : ''}`);
         rollBuilder.push('checkroll=[[1d100]]%');
         rollBuilder.push('checktarget=[[@{scroll-failure}]]%');
         rollBuilder.push('fail=DM roll for Magical Spell Failure');
+        rollBuilder.push('character=@{character_name}');
         rollBuilder.push(`effects=${spell['effect']}`);
+        if (spell['psionics'] && isBookActive(books, PSIONICS_HANDBOOK)) {
+            rollBuilder.push(`psionics=${spell['psionics']}`);
+        }
+        if (spell['special-conditions']) {
+            spell['special-conditions'].forEach(condition => {
+                rollBuilder.push(`${condition}=1`)
+            });
+        }
 
         let scrollMacro = rollBuilder.string();
         scrollMacro = scrollMacro.replaceAll('[[@{level-wizard}]]','[[@{scroll-level}]]')
             .replaceAll('[[@{level-priest}]]', '[[@{scroll-level}]]');
 
         let recommendedMinimumLevel;
-
-        let spellLevel = parseInt(spell.level);
-        if (isNaN(spellLevel)) {
+        let levelRequirement = SPELL_LEVEL_REQUIREMENT[casterClass][spell.level];
+        if (levelRequirement < 6) {
             recommendedMinimumLevel = 6;
-        } else if (spellLevel <= 3) {
-            recommendedMinimumLevel = 6;
-        } else if (spellLevel === 4 || spellLevel === 5) {
-            recommendedMinimumLevel = spellLevel*2;
-        } else if (spellLevel === 6 && spellClass === 'Priest') {
-            recommendedMinimumLevel = spellLevel*2;
-        } else if (spellLevel >= 6) {
-            recommendedMinimumLevel = spellLevel*2+1
+        } else {
+            recommendedMinimumLevel = levelRequirement+1;
         }
 
-        let scribeLevel = await extractQueryResult(`?{At what level is ${eventInfo.newValue} scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}}`);
+        let scribeLevel = await extractQueryResult(`?{At what level is ${scrollName} scribed? (Recommended minimum is ${recommendedMinimumLevel}th level)|${recommendedMinimumLevel}}`);
 
-        let spellFailure = await extractQueryResult(`?{What is the risk of spell failure for ${eventInfo.newValue}? (If you do not use this rule, set the value to 0)|0}`);
+        let failureSystem = values['scroll-failure-system'];
+
+        let {casterFailure, casterSingleClass} = getCasterFailureInfo(failureSystem, levelRequirement, casterLevel);
+        let {rogueClass, rogueFailure, rogueSingleClass} = getScrollRogueFailureInfo(failureSystem);
+
+        let spellFailure;
+        if (failureSystem === '' || failureSystem === 'disabled') {
+            spellFailure = '0';
+        } else if (failureSystem === 'custom') {
+            spellFailure = await extractQueryResult(`?{What is the risk of spell failure for ${scrollName}?|0}`);
+        } else if (rogueSingleClass) {
+            spellFailure = `${rogueFailure} [${rogueClass}]`;
+        } else if (casterSingleClass) {
+            spellFailure = `${casterFailure} [${casterClass}]`;
+        } else if (failureSystem.includes('best')) {
+            spellFailure = `{[[${casterFailure}]] [${casterClass}], [[${rogueFailure}]] [${rogueClass}]}kl1`;
+        } else if (failureSystem.includes('select')) {
+            casterFailure = casterFailure
+                .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                .replaceAll(',', '&#44;');
+            rogueFailure = rogueFailure
+                .replaceAll(/(?<!class\d|level)}/g,'&#125;')
+                .replaceAll(',','&#44;');
+            spellFailure = `?{Cast ${scrollName} as a ${casterClass} or a ${rogueClass}?|${casterClass},${casterFailure} [${casterClass}]|${rogueClass},${rogueFailure} [${rogueClass}]}`;
+        }
 
         let scrollInfo = {
             [`repeating_scrolls_${parse.rowId}_scroll-speed`]: spell['cast-time'],
@@ -2620,6 +3507,7 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
     });
 });
 //#endregion
+//#endregion
 
 on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_gem`, function(eventInfo) {
     if (doEarlyReturn(eventInfo, ['gemvalue', 'gemqty']))
@@ -2629,22 +3517,21 @@ on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_g
 
 //#region Psionic
 // Psionic tabs, control hidden or visible options
-const setPsionicDisciplineVisibility = function(newValue) {
-    let elements = $20('.sheet-section-psionics option.sheet-hidden');
-    if (newValue === "1") {
-        elements.addClass('sheet-show');
-    } else {
-        elements.removeClass('sheet-show');
-    }
-}
-on('change:tab8 sheet:opened', function (eventInfo) {
-    if (eventInfo.newValue)
-        return setPsionicDisciplineVisibility(eventInfo.newValue);
-
-    getAttrs(['tab8'], function (values) {
-        setPsionicDisciplineVisibility(values['tab8']);
+const PSIONIC_SKILLS_AND_POWERS_FIELD = 'tab8';
+on(`change:${PSIONIC_SKILLS_AND_POWERS_FIELD} sheet:opened`, function (eventInfo) {
+    getAttrs([PSIONIC_SKILLS_AND_POWERS_FIELD], function (values) {
+        let elements = $20('.sheet-section-psionics option.sheet-hidden');
+        if (values[PSIONIC_SKILLS_AND_POWERS_FIELD] === "1") {
+            elements.addClass('sheet-show');
+        } else {
+            elements.removeClass('sheet-show');
+        }
     })
 });
+
+setupStaticCalculateTotal('constitution-psi', ['constitution','psion-con-mod']);
+setupStaticCalculateTotal('intelligence-psi', ['intelligence','psion-int-mod']);
+setupStaticCalculateTotal('wisdom-psi', ['wisdom','psion-wis-mod']);
 
 const PSIONIC_CORE_SECTIONS = [
     { discipline: 'Telepathic',      section: 'psion-telepathy',            name: 'psiontelepathic',    macro: 'psiontelepathic-macro',         number: '',   cost_number: '20' },
@@ -2721,7 +3608,12 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`discipline=${displayDiscipline}`);
             macroBuilder.push(`tier=${tier}`);
             let attribute = power['attribute'];
-            attribute = attribute.startsWith("@") ? attribute.substring(2,attribute.length-1) : 'Affected'
+            let attributeMatch = attribute.match(/^@{(\w+).*}/);
+            if (attributeMatch) {
+                attribute = attributeMatch[1];
+            } else {
+                attribute = 'Affected';
+            }
             let modifier = power['modifier'] === '0' ? '' : power['modifier'];
             macroBuilder.push(`powerscoretext=${attribute} ${modifier}`.trim());
             macroBuilder.push(`initial=@{PSP-cost${cost_number}}`);
@@ -2736,17 +3628,16 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             macroBuilder.push(`prep=${prep}`);
             macroBuilder.push(`prereq=${power['prerequisites']}`);
             macroBuilder.push(`reference=${power['reference']}, ${power['book']}`)
-            let powerRoll = `[[1d20cf20-(@{psionic-mod${number}})]]`;
-            if (power['roll-override']) {
-                powerRoll = `[${power['roll-override']}](~${values.character_name}|repeating_${section}_${parse.rowId}_action-check-dm)`;
+            macroBuilder.push(`powerroll=[[1d20cf20]]`);
+            if (power['secret-by-dm']) {
+                macroBuilder.push('secret=true');
             }
-            macroBuilder.push(`powerroll=${powerRoll}`);
             let powerScore = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
             if (power['context-modifier']) {
                 powerScore += `+(${power['context-modifier']})`;
             }
-            macroBuilder.push(`powerscore=[[${powerScore}]]`);
-            macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})]]`)
+            macroBuilder.push(`powerscore=[[${powerScore}+(@{misc-mod})]]`);
+            macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})+(@{misc-mod})]]`)
             macroBuilder.push(`powerscoreeffect=${power['power-score']}`);
             macroBuilder.push(`20effect=${power['20']}`);
             macroBuilder.push(`1effect=${power['1']}`);
@@ -2769,7 +3660,11 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 
     on(`clicked:repeating_${section}:action-check clicked:repeating_${section}:action-check-dm`, function (eventInfo) {
         let parse = parseSourceAttribute(eventInfo);
-        getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], function (values) {
+        getAttrs([`repeating_${section}_${macro}`,
+            `repeating_${section}_powerscore-nomod${number}`,
+            `repeating_${section}_powerscore-mod${number}`,
+            'psion-armor-penalty'
+        ], function (values) {
             let displayDiscipline = discipline;
             let tier = name.includes('science') ? 'Science' : 'Devotion';
             let fullMacro = values[`repeating_${section}_${macro}`];
@@ -2794,18 +3689,33 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
             if (match) macroBuilder.push(match[1]);
             else macroBuilder.push(`tier=${tier}`);
 
+            match = fullMacro.match(/\{\{(powerscoretext=.*?)}} *\{\{/);
+            if (match) macroBuilder.push(match[1]);
+            else {
+                let attribute = values[`repeating_${section}_powerscore-nomod${number}`];;
+                let attributeMatch = attribute.match(/^@{(\w+).*}/);
+                if (attributeMatch) {
+                    attribute = attributeMatch[1];
+                } else {
+                    attribute = 'Affected';
+                }
+                let modifier = values[`repeating_${section}_powerscore-mod${number}`];
+                modifier = modifier === '0' ? '' : modifier;
+                macroBuilder.push(`powerscoretext=${attribute} ${modifier}`.trim());
+            }
+
             match = fullMacro.match(/\{\{(powerroll=\[\[.*?]])}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
-            else macroBuilder.push(`powerroll=[[1d20cf20-(@{psionic-mod${number}})]]`);
+            else macroBuilder.push(`powerroll=[[1d20cf20]]`);
 
             let powerScore = `@{powerscore-nomod${number}}+(@{powerscore-mod${number}})+(@{psion-armor-penalty})`;
             match = fullMacro.match(/\{\{(powerscore=\[\[.*?]])}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
-            else macroBuilder.push(`powerscore=[[${powerScore}]]`);
+            else macroBuilder.push(`powerscore=[[${powerScore}+(@{misc-mod})]]`);
 
             match = fullMacro.match(/\{\{(powerscoreenhanced=\[\[.*?]])}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
-            else macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})]]`);
+            else macroBuilder.push(`powerscoreenhanced=[[${powerScore}+(@{powerscore-enhanced})+(@{misc-mod})]]`);
 
             match = fullMacro.match(/\{\{(powerscoreeffect=.*?)}} *\{\{/);
             if (match) macroBuilder.push(match[1]);
@@ -2837,6 +3747,12 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
         getAttrs([`repeating_${section}_${macro}`, 'psion-armor-penalty'], function (values) {
             let macroValue = values[`repeating_${section}_${macro}`];
 
+            let isSecret = macroValue.match(/\{\{(secret=true)}}/);
+            let powerRollMatch = macroValue.match(/\{\{(powerroll=.*?)}} *\{\{/);
+            if (isSecret && powerRollMatch) {
+                macroValue = macroValue.replace(powerRollMatch[1], `powerroll=[Secret by DM](~@{character_name}|repeating_${section}_${parse.rowId}_action-check-dm)`)
+            }
+
             rollPsionicTemplate(macroValue, parse.rowId, values);
         });
     });
@@ -2844,7 +3760,6 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
     let rollPsionicTemplate = async function(macroValue, rowId, values) {
         let repeating = `repeating_${section}_${rowId}`;
         macroValue = macroValue.replaceAll(`${name}`,`${repeating}_${name}`)
-            .replaceAll(`psionic-mod${number}`,`${repeating}_psionic-mod${number}`)
             .replaceAll(`powerscore-nomod${number}`,`${repeating}_powerscore-nomod${number}`)
             .replaceAll(`powerscore-mod${number}`,`${repeating}_powerscore-mod${number}`)
             .replaceAll(`powerscore-enhanced`,`${repeating}_powerscore-enhanced`)
@@ -2880,14 +3795,22 @@ PSIONIC_CORE_SECTIONS.forEach(({section, name, macro, number, cost_number, disci
 //#endregion
 
 // Show / Hide buttons for various repeating sections
-const REPEATING_SECTIONS = [
+const FOLDABLE_REPEATING_SECTIONS = [
+    ...WIZARD_SPELL_LEVELS_SECTIONS.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
+    'spells-wizmonster',
+    ...PRIEST_SPELL_LEVELS_SECTIONS.map(e => e.sections[e.sections.length-1]).map(e => `spells-${e}`),
+    'spells-primonster',
     ...PSIONIC_CORE_SECTIONS.map(e => e.section),
+    'potions',
+    'dusts',
+    'magic-items',
+    'wands',
     'scrolls',
 ];
-REPEATING_SECTIONS.forEach(section => {
+FOLDABLE_REPEATING_SECTIONS.forEach(section => {
    on(`clicked:repeating_${section}:show clicked:repeating_${section}:hide`, function (eventInfo) {
        let parse = parseSourceAttribute(eventInfo);
-       $20(`div[data-reprowid=${parse.rowId}] .sheet-hidden`).toggleClass('sheet-show');
+       $20(`div[data-reprowid=${parse.rowId}] .sheet-hidden.sheet-fold`).toggleClass('sheet-show');
    });
 });
 

@@ -719,7 +719,7 @@ NONWEAPON_PROFICIENCIES_TABLE['Dwarf Runes (Dwarf)'].push({
 });
 NONWEAPON_PROFICIENCIES_TABLE['Endurance (Dwarf)'] = [];
 NONWEAPON_PROFICIENCIES_TABLE['Endurance (Dwarf)'].push({
-    'slots': 1,
+    'slots': 0,
     'abilityScore': '@{Constitution}',
     'modifier': 0,
     'classes': '',

@@ -8,9 +8,7 @@ import {
     getSkillDisplayName
 } from './skills'
 import {
-    skillsList,
-    tieredSkillsBasic,
-    tieredSkills
+    skillsList
 } from './domain/skills/skills-list'
 
 const sheetOpened = () => {
@@ -86,11 +84,7 @@ const skillXPChanged = ({
 
         skillAttributesToSet[skillLevel] = calculateSkillLevel(Number(newValue), values.learning_speed)
 
-        const skillData = getSkill(
-            skillNameLookupKey,
-            skillAttributesToSet[skillLevel],
-            tieredSkills.includes(skillNameLookupKey)
-        )
+        const skillData = getSkill(skillNameLookupKey)
 
         skillAttributesToSet["repeating_skills_" + skillId + "skill_tnc"] = skillData.targetNumber + "/" + skillData.complexity
         skillAttributesToSet["repeating_skills_" + skillId + "target_number"] = skillData.targetNumber
@@ -237,11 +231,6 @@ const migrateFrom2To3 = () => {
 
                 if (skillFirstName in skillsList) {
                     skillData = skillsList[skillFirstName]
-                } else if (skillFirstName in tieredSkillsBasic) {
-                    skillData = tieredSkillsBasic[skillFirstName]
-                } else if (skillFirstName.substring(0, skillFirstName.length - 1) in tieredSkillsBasic) {
-                    skillData = tieredSkillsBasic[skillFirstName.substring(0, skillFirstName.length - 1)]
-                    parsedSkillName = parsedSkillName.substring(0, parsedSkillName.length - 1)
                 } else {
                     console.error("Unable to migrate skill data. Old values are: " + JSON.stringify(oldSkillValues))
                     skillsUpdated++
