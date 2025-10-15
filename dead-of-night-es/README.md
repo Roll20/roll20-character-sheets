@@ -9,6 +9,6 @@ Non-official character sheet for *Dead of Night* (Spanish).
 - Notes and repeating “Bad Habits”.
 - Rolls use Roll20’s **default** roll template (no external assets).
 
-Folder: `dead-of-night/`  
+Folder: `dead-of-night-es/`  
 Files: `sheet.html`, `sheet.css`, `sheet.json`, `preview.png`, `logo_don.png`
  
