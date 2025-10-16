@@ -4,7 +4,7 @@
 
 > [!WARNING]
 > Submission Checklist
-> Failure to complete this checklist in its entirety will result in your Pull Request being dismissed. If you have any questions, please feel free to create an issue.
+> Failure to complete this checklist in its entirety will result in your Pull Request being dismissed. _Deleting parts of this template it with your own counts as failure to complete it_. If you have any questions, please feel free to create an issue.
 
 > [!NOTE]
 > Draft Pull Requests
