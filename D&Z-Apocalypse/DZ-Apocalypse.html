@@ -1534,24 +1534,33 @@
               <input class="sheet-inputchar" type="text" step="0.01" value="0" name="attr_pb" readonly />
             </div>
             <h4>Prof. Bonus</h4>
+            <select name="attr_nopb" style="position: absolute;width: 20px!important;top: -9px;left: -9px;">
+                <option value="1">✔</option>
+                <option value="0">✘</option>
+              </select>
           </div>
         </div>
 
-        <script id="✓ - CALC : Proficiency Bonus" type="text/worker">
-          on("sheet:opened change:level", function () {
-            getAttrs(["level"], function (values) {
-              const level = parseInt(values.level, 10) || 1;
-              let pb = 2;
+<script id="✓ - CALC : Proficiency Bonus" type="text/worker">
+  on("sheet:opened change:level change:nopb", function () {
+    getAttrs(["level","nopb"], function (values) {
+      const enabled = (String(values.nopb ?? "").toLowerCase() === "1") ||
+                      (String(values.nopb ?? "").toLowerCase() === "on");
 
-              if (level >= 17) pb = 6;
-              else if (level >= 13) pb = 5;
-              else if (level >= 9) pb = 4;
-              else if (level >= 5) pb = 3;
+      if (!enabled) { setAttrs({ pb: 0 }); return; }
 
-              setAttrs({ pb });
-            });
-          });
-        </script>
+      const level = parseInt(values.level, 10) || 1;
+      let pb = 2;
+      if (level >= 17) pb = 6;
+      else if (level >= 13) pb = 5;
+      else if (level >= 9) pb = 4;
+      else if (level >= 5) pb = 3;
+
+      setAttrs({ pb });
+    });
+  });
+</script>
+
 
         <!-- EXHAUSTION -->
         <div class="sheet-standardbox sheet-standardbox42">
