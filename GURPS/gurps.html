@@ -18284,9 +18284,13 @@ Select the indent level of the spell. This is handy to help show the spell belon
 					<div class="grid-item">
 						<label>
 							<div class="standard-tooltip">
-								<b><span data-i18n="load-label">Load</span></b>
+								<input type="hidden" name="attr_vehicle_is_overloaded" value="0" />
+								<input type="hidden" name="attr_vehicle_overloaded_load_label_message" value="" />
+								<b><span class="vehicle-overloaded" data-i18n="load-label">Load</span></b>
 								<span class="tooltiptext">
 									<span data-i18n="vehicle-load-tooltip">The weight, in tons, of occupants and cargo the vehicle can carry, including the operator. B463.</span>
+									<input type="hidden" name="attr_vehicle_is_overloaded" value="0" />
+									<span name="attr_vehicle_overloaded_load_label_message" class="vehicle-overloaded"></span>
 								</span>
 							</div>
 						</label>
@@ -18365,7 +18369,8 @@ Select the indent level of the spell. This is handy to help show the spell belon
 						<input type="number" name="attr_vehicle_loaded_weight" value="0" title="Macro: @{NAME|vehicle_loaded_weight}" />
 					</div>
 					<div class="grid-item">
-						<input type="number" name="attr_vehicle_load" value="0" title="Macro: @{NAME|vehicle_load}" />
+						<input type="hidden" name="attr_vehicle_is_overloaded" value="0" />
+						<input type="number" class="vehicle-overloaded" name="attr_vehicle_load" value="0" title="Macro: @{NAME|vehicle_load}" />
 					</div>
 					<div class="grid-item">
 						<input type="text" name="attr_vehicle_cargo_capacity" value="0" readonly="readonly" title="Macro: @{NAME|vehicle_cargo_capacity}" />
@@ -19918,7 +19923,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 						<div class="grid-cell">
 							<div class="standard-tooltip">
 								<h4><span data-i18n="abbreviation-control-label">CTL</span></h4>
-								<span class="tooltiptext move-left">
+								<span class="tooltiptext move-far-left">
 									<span data-i18n="vehicle-crew-control-roll-tooltip">If checked, the skill roll is a vehicle control roll, the results will updated to reflect the roll type.</span>
 								</span>
 							</div>
@@ -19972,7 +19977,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 								</label>
 							</div>
 							<div class="grid-cell">
-								<button type="action" name="act_skillroll" class="button-roll-template btn ui-draggable" value="@{roll}&amp;{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{showNotes=[[0]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{rollModifier=@{crew_roll_modifier}}} {{rollModifierSummary=@{crew_roll_modifier_summary}}} {{popupModifier=@{popup_modifier}}} {{useModTool=[[1]]}} {{displayRollModifierSummary=[[1]]}}"></button>
+								<button type="action" name="act_skillroll" class="button-roll-template btn ui-draggable" value="@{roll}&amp;{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Skill Roll}} {{isControlRoll=@{is_control_roll}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{showNotes=[[0]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{rollModifier=@{crew_roll_modifier}}} {{rollModifierSummary=@{crew_roll_modifier_summary}}} {{popupModifier=@{popup_modifier}}} {{useModTool=[[1]]}} {{displayRollModifierSummary=[[1]]}}"></button>
 							</div>
 						</div>
 
@@ -20667,16 +20672,11 @@ Select the indent level of the spell. This is handy to help show the spell belon
 							<div class="cell col1"></div>
 							<div class="cell col2"></div>
 							<div class="cell col3"></div>
-							<div class="cell col4">
-								<input type="hidden" name="attr_vehicle_is_overloaded" value="0" />
-								<input type="hidden" name="attr_vehicle_overloaded_message" />
-								<div class="vehicle-overloaded-message">
-									<span name="attr_vehicle_overloaded_message"></span>
-								</div>
-							</div>
+							<div class="cell col4"></div>
 							<div class="cell col5">
 								<div style="text-align: right; font-weight: bold;" class="popup">
-									<span data-i18n="load-limit-label">Load Limit</span>:
+									<input type="hidden" name="attr_vehicle_overloaded_message" />
+									<span data-i18n="load-limit-label">Load Limit</span><span name="attr_vehicle_overloaded_message" class="vehicle-overloaded-message"></span>:
 								</div>
 								<div class="tooltip">
 									<span data-i18n="vehicle-load-limit-tooltip">
@@ -35696,12 +35696,27 @@ B378
 
 			let isOverLoaded = grandTotalWeight > vehicleLoadPounds;
 
-			const vehicleLoadPoundsDisplay = vehicleLoadPounds.toFixed(2) + " " + weightSystem;
+			let vehicleOverloadedDisplayMessage = "";
+
+			let vehicleOverLoadedLoadLabelMessage = "";
+
+			if (isOverLoaded) {
+
+				//get the percentage that vehicle is overloaded by.
+				const overloadPercentage = ((grandTotalWeight - vehicleLoadPounds) / vehicleLoadPounds) * 100;
+
+				vehicleOverloadedDisplayMessage = " (+" + overloadPercentage.toFixed(0) + "%)";
+				vehicleOverLoadedLoadLabelMessage = " (Overloaded by +" + overloadPercentage.toFixed(0) + "%)";
+			}
+
+			const vehicleLoadPoundsDisplay = vehicleLoadPounds.toFixed(0) + " " + weightSystem;
 
 			setAttrs({
 				vehicle_load_weight: vehicleLoadPounds,
 				vehicle_load_weight_display: vehicleLoadPoundsDisplay,
-				vehicle_is_overloaded: isOverLoaded ? 1 : 0
+				vehicle_is_overloaded: isOverLoaded ? 1 : 0,
+				vehicle_overloaded_message: vehicleOverloadedDisplayMessage,
+				vehicle_overloaded_load_label_message: vehicleOverLoadedLoadLabelMessage
 			});
 
 		});
@@ -46137,13 +46152,13 @@ B378
 	
 				crippled = Math.floor(hitPoints / divisor) + 1;
 	
-				let updates = {
-					repeating_hitlocation_crippled: crippled
-				};
-	
-				setAttrs(updates, { silent: true });
-	
 			}
+
+			let updates = {
+				repeating_hitlocation_crippled: crippled
+			};
+
+			setAttrs(updates, { silent: true });
 	
 		});
 	}
@@ -54059,10 +54074,12 @@ Characters with Skill: ${knowsSkill}`;
 
 		on(`clicked:${button}`, async (event) => {
 
-			console.log("skillroll");
-
 			const source = event.triggerName ?? "";
 
+			console.log("skillroll");
+
+			console.log("source: ", source);
+			
 			if (source.includes("repeating_skills")) {
 
 				await rollRepeatingSkillRoll(event);
@@ -54401,6 +54418,12 @@ Characters with Skill: ${knowsSkill}`;
 		"skill_roll_trait_summary",	
 	];
 
+	const globalVehicleControlSkillFields = [
+		"vehicle_handling",
+		"vehicle_stability_rating",
+		"vehicle_tight_turn_penalty",	
+	];
+
 	const skillFields = [
 		"name",
 		"tl",
@@ -54436,6 +54459,7 @@ Characters with Skill: ${knowsSkill}`;
 		"level",
 		"notes",
 		"show_notes",
+		"is_control_roll",
 	];
 
 	const getRepeatingSkillsRollData = async (section, rowId) => {
@@ -54624,6 +54648,8 @@ Characters with Skill: ${knowsSkill}`;
 
 		let globalValues = await getAttrsAsync(globalSkillFields);
 
+		const globalVehicleValues = await getAttrsAsync(globalVehicleControlSkillFields);
+
 		let values = await getAttrsAsync(fields);
 
 		// get all the values we need
@@ -54635,6 +54661,8 @@ Characters with Skill: ${knowsSkill}`;
 
 		let level = values[`${section}_${rowId}_level`] ?? "10";
 
+		const isControlRoll =  values[`${section}_${rowId}_is_control_roll`] == "1" ?? false;
+
 		let notes = values[`${section}_${rowId}_notes`] ?? "";
 		notes = notes.replace(/\n/g, '\\n');
 
@@ -54645,6 +54673,30 @@ Characters with Skill: ${knowsSkill}`;
 		let skillRollMaxNineValue = globalValues[`skill_roll_max_nine_value`] ?? "100";
 
 		let skillRollTraitSummary = globalValues[`skill_roll_trait_summary`] ?? "";
+
+		let controlSkillModifier = 0;
+
+		if (isControlRoll) {
+			const vehicleHandling = parseInt(globalVehicleValues[`vehicle_handling`] ) || 0;
+			const vehicleStabilityRating = parseInt(globalVehicleValues[`vehicle_stability_rating`] ) || 0;
+			const vehicleTightTurnPenalty = parseInt(globalVehicleValues[`vehicle_tight_turn_penalty`] ) || 0;
+
+			controlSkillModifier = vehicleHandling + vehicleTightTurnPenalty;
+
+			if (vehicleHandling > 0) {
+				skillRollTraitSummary += `\nVehicle Handling Mod: +${vehicleHandling}.`;
+			} else if (vehicleHandling < 0) {
+				skillRollTraitSummary += `\nVehicle Handling Mod: ${vehicleHandling}.`;
+			}
+
+			if (vehicleTightTurnPenalty < 0) {
+				skillRollTraitSummary += `\nVehicle Turn Penalty: ${vehicleTightTurnPenalty}.`;
+			}
+
+			// Add stability rating to notes
+			notes += `\nStability Rating: ${vehicleStabilityRating}.`;
+
+		}
 
 		let rollDataArray = [];
 
@@ -59561,6 +59613,46 @@ Characters with Skill: ${knowsSkill}`;
 				});
 			}
 
+		});
+
+	}
+
+	on("change:repeating_vehicle-hit-location-table:divisor", event => {
+
+		if (event.sourceType !== "player") {
+			return;
+		}
+
+		updateVehicleLocationHitPointsThreshold();
+		
+	});
+
+	function updateVehicleLocationHitPointsThreshold() {
+
+		let fields = [
+			"vehicle_hit_points_max",
+			"repeating_vehicle-hit-location-table_divisor"
+		];
+	
+		getAttrs(fields, values => {
+	
+			let hitPoints = Number(values.vehicle_hit_points_max);
+	
+			let divisor = Number(values["repeating_vehicle-hit-location-table_divisor"]);
+	
+			let disabledAt = 0;
+	
+			if (divisor > 1) {
+	
+				disabledAt = Math.floor(hitPoints / divisor) + 1;
+			}
+
+			let updates = {};
+	
+			updates["repeating_vehicle-hit-location-table_disabled"] = disabledAt;
+	
+			setAttrs(updates, { silent: true });
+	
 		});
 
 	}
