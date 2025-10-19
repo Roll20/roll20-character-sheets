@@ -11,7 +11,7 @@
 		<div class="character-mode"><button type="action" name="act_cyberware" >CYBERWARE</button></div>
 		<div class="character-mode"><button type="action" name="act_netrunning" >NETRUNNING</button></div>
 		<div class="character-mode"><button type="action" name="act_journal" >JOURNAL</button></div>
-		<div class="character-mode"><button type="roll" name="roll_initiative" value="&{template:initiative} {{name=Initiative}} {{roll=[[d10+@{Reflex} &{tracker}]]}}">ROLL INITIATIVE</button></div>
+		<div class="character-mode"><button type="roll" name="roll_initiative" value="&{template:initiative} {{name=Initiative}} {{roll=[[d10+@{Reflex}+@{initiative_modifier} &{tracker}]]}}">ROLL INITIATIVE</button></div>
 		<div><button type="action" name="act_settings" >SETTINGS</button></div>
 	</div>
 	<input type='hidden' class='sheet-tabstoggle' name='attr_sheetTab'  value='character'  />
@@ -84,6 +84,11 @@
 					<div class="bg-white skill-rank"><input type="number" name="attr_rankOperator" placeholder="0"/></div>
 					<div class="bg-white skill-name">Moto (Nomad)</div>
 					<div class="bg-white skill-rank"><input type="number" name="attr_rankMoto" placeholder="0"/></div>
+				</div>
+
+				<div class="flex-table">
+					<div class="bg-black-2 skill-name">Initiative Modifier</div>
+					<div class="bg-white skill-rank"><input type="number" name="attr_initiative_modifier" value="0"/></div>
 				</div>
 			</div>
 
@@ -906,7 +911,11 @@
 					<div class="flex-table">
 						<button type="roll" name="roll_weapon_dmg" style="display: none;" value="@{DMG}"></button>
 						<input type="hidden" name="attr_WeaponMod" value="@{Total_Melee}">
-						<div class="bg-white weapon-name"><button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button> <input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here..."></div>
+						<div class="bg-white weapon-name">
+							<button name="roll_aimed_shot" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{aimed_shot=1}}  {{roll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1d10]]}}" title="Aimed Shot">⌖</button>
+							<button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button>
+							<input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here...">
+						</div>
 						<div class="bg-white weapon-type">
 							<select name="attr_Weapontype" class="Weapontype">
 								<option value="-" selected>(Select Type)</option>
@@ -1610,6 +1619,13 @@
 					</button>
 				</div>
 			</div>
+
+			<div class="option">
+				<div class="settings-title">AIMED SHOT PENALTY</div>
+				<div class='settings-text'>
+					<input type="number" name="attr_aimed_shot_penalty" value="-8" />
+				</div>
+			</div>
 		</div>
 
 	</div>
@@ -1700,7 +1716,10 @@
 					<div class="flex-table">
 						<button type="roll" name="roll_weapon_dmg" style="display: none;" value="@{DMG}"></button>
 						<input type="hidden" name="attr_WeaponMod" value="@{Total_Melee}">
-						<div class="bg-white weapon-name"><button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button> <input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here..."></div>
+						<div class="bg-white weapon-name">
+							<button name="roll_aimed_shot" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{aimed_shot=1}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1d10]]}}" title="Aimed Shot">⌖</button>
+							<button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button>
+							<input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here..."></div>
 						<div class="bg-white weapon-type">
 							<select name="attr_Weapontype" class="Weapontype">
 								<option value="Brawling">Brawling</option>
@@ -2411,21 +2430,21 @@
 	<div class="sheet-template-container normal">
 		<div class="sheet-template-header"><span>{{roll}}</span></div>
 		<div class="sheet-template-row-subhead"><span>{{rollname}}</span></div>
-		<div class="sheet-template-row">{{weapontype}}</div>
+		<div class="sheet-template-row">{{weapontype}}{{#aimed_shot}} - Aimed Shot{{/aimed_shot}}</div>
 	</div>
 	{{/^rollWasFumble() roll}} {{/^rollWasCrit() roll}}
 	{{#rollWasCrit() roll}}
 	<div class="sheet-template-container crit">
 		<div class="sheet-template-header"><span>{{critroll}}</span></div>
 		<div class="sheet-template-row-subhead">{{rollname}}</div>
-		<div class="sheet-template-row">{{weapontype}}</div>
+		<div class="sheet-template-row">{{weapontype}}{{#aimed_shot}} - Aimed Shot{{/aimed_shot}}</div>
 	</div>
 	{{/rollWasCrit() roll}}
 	{{#rollWasFumble() roll}}
 	<div class="sheet-template-container fail">
 		<div class="sheet-template-header"><span>{{failroll}}</span></div>
 		<div class="sheet-template-row-subhead">{{rollname}}</div>
-		<div class="sheet-template-row">{{weapontype}}</div>
+		<div class="sheet-template-row">{{weapontype}}{{#aimed_shot}} - Aimed Shot{{/aimed_shot}}</div>
 	</div>
 	{{/rollWasFumble() roll}}
 
