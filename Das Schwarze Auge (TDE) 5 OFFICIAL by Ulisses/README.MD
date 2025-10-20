@@ -6,6 +6,10 @@
 
 ## Changelog
 
+### v1.6.1 (10/12/2025)
+
+* Minor Bugfix
+
 ### v1.6.0 (12/02/2023)
 
 * Support for Optolith character import
