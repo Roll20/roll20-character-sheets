@@ -1,3 +1,16 @@
+# 2025-10-21
+
+- Injuries:
+  - Ignore spaces in the injury string
+- Misc: Add support for prefix search
+- Skills:
+  - Add backend support for Character Companion Specialised skills
+- Banecroft:
+  - Fix an NPC weapon
+  - Fix an NPC spell list
+  - Update creatures on maps
+- Arcane: Spirits update
+
 # 2025-10-14
 
 - Remove spurious ` in the sheet

@@ -6559,7 +6559,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision e391f1770ba0538fdfe04e777a95b2b1f994d4a0
+Revision b123d1d6a01d6d00a55d6fb3684bc0052468cd58
 
 
 <hr>
@@ -7763,6 +7763,17 @@ function miscBonusHighest(miscstr, lowest) {
     return [highest, hstr]
 }
 
+// Finds a message with the appropriate prefix.
+function miscMessagePrefix(miscstr, prefix) {
+    if (typeof(miscstr) !== 'string' || miscstr === '') {
+	return false;
+    }
+    const misc = JSON.parse(miscstr);
+    return miscRawMessagePrefix(misc, prefix);
+}
+
+
+
 function miscAttrSet(attr, name, value) {
     let toget = attr;
     if (!attr.endsWith("_misc")) {
@@ -7822,6 +7833,18 @@ function miscRawSetAbsolute(misc, name, absolute) {
 function miscRawMessage(misc, message) {
     misc.push({ message: message });
     return misc
+}
+
+// Finds a message with the appropriate prefix.
+function miscRawMessagePrefix(misc, prefix) {
+    for (const obj of misc) {
+	if (obj.message && typeof(obj.message) === 'string' &&
+		obj.message.startsWith(prefix)) {
+	    // Return it
+	    return obj.message
+	}
+    }
+    return false;
 }
 
 function miscRawToString(misc) {
@@ -8502,7 +8525,7 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
 	for (let c = 0; c < categories.length ; c ++){
 	  let tr = categories[c].display;
 	  cache[tr] = categories[c]
-	}	
+	}
 	getCatByDisplayNameCache_ = cache;
       }
       return getCatByDisplayNameCache_[skillname]
@@ -8515,7 +8538,7 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
 	let cache = {};
 	for (const c of categories) {
 	  cache[c.display] = c
-	}	
+	}
 	getCatByDisplayNameCacheNoTrans_ = cache;
       }
       return getCatByDisplayNameCacheNoTrans_[skillname]
@@ -8595,10 +8618,10 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
 	updateAllSkills();
     });
 
-    
+
     // Handler for updating a single stat
     // So when a 'strength' changes, update the bonus
-    on(statfullnames.map(stat => "change:" + stat).join(" "), (ev) => {
+    onCheck(statfullnames.map(stat => "change:" + stat).join(" "), (ev) => {
 	const val = parseInt(ev.newValue) || 0;
 	const stat = getStatFromAName(ev.triggerName);
 	let logmessage = stat.display + ":\n";
@@ -8654,13 +8677,76 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
       updateCategory(cat, statCache_);
     }
 
+    // Returns an object
+    //    rankbonus: Rank bonus
+    //    ranks: Number of ranks
+    //	  log: string to append to log
+    //    specializationbonus:
+    //	  specializationranks: (Effective specialisation ranks)
+    function getSkillRanksBonus(ranksMisc, pbonus, isExpertise) {
+      const rv = {}
+
+      // So we need to know if there is a specialisation.
+      const hasSpecialization = miscMessagePrefix(ranksMisc, "Specialization:")
+
+      // If there is, we need to subtrack one rank from the normal
+      // ranks when calculating and then multiply that by 50.
+      let [ranks, rlog] = miscBonusTotal(ranksMisc, rankIndent);
+      let sstring = "";
+      if (hasSpecialization) {
+	ranks --;
+	sstring = " - Specialized"
+      }
+      const rankbonus = rmuGetSkillBonus(ranks, isExpertise);
+      let bonus = rankbonus;
+      let log = `${F(bonus)} Rank bonus (${ranks} Ranks${sstring})\n`
+
+      if (pbonus > 0) {
+	const effectiveranks = (ranks > 30) ? 30 : ranks;
+	const pbonusbonus = effectiveranks * pbonus;
+	bonus += pbonusbonus;
+	if (pbonus == 1) {
+	  log += `${effectiveranks} proficiency bonus\n`;
+	} else {
+	  log += `${effectiveranks * pbonus} proficiency bonus (${effectiveranks} ranks * ${pbonus})\n`;
+	}
+      }
+      rv.ranks = ranks;
+      rv.rankbonus = bonus;
+
+      if (hasSpecialization) {
+	let specranks = Math.round(ranks * 1.5);
+	const specrankbonus = rmuGetSkillBonus(specranks, isExpertise);
+	let specbonus = specrankbonus;
+	log = `${F(specbonus)} Specialised bonus (${specranks})\n`
+	if (pbonus > 0) {
+	  const effectiveranks = (specranks > 30) ? 30 : specranks;
+	  const pbonusbonus = effectiveranks * pbonus;
+	  specbonus += pbonusbonus;
+	  if (pbonus == 1) {
+	    log += `${effectiveranks} proficiency bonus\n`;
+	  } else {
+	    log += `${effectiveranks * pbonus} proficiency bonus (${effectiveranks} ranks * ${pbonus})\n`;
+	  }
+	}
+
+	rv.specializedranks = specranks;
+	rv.specializedbonus = specbonus;
+      }
+
+
+      rv.log = log;
+      return rv;
+    }
+    RMUSkills.getSkillRanksBonus = getSkillRanksBonus;
+
     function updateSkill(skill, catbonus, catlog) {
       const aname = skill.aname;
       getAttrs([aname + "_ranks_misc", aname + "_pbonus", aname + "_misc", aname + "_ranks"], (attrs) => {
 	updates = {};
 	let bonus = 0;
 	let log = skill.display + ":\n";
-	
+
 	bonus += catbonus;
 	log += catlog;
 
@@ -8683,29 +8769,17 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
 	  addPendingFunction("Update specialisations", () => { updateSpecializations(skill, pbonus, bonus, log); });
 	} else if (skill.dynamicspecializations) {
 	  addPendingFunction("Update Dynamic", () => { updateDynamicSpecializations(skill, pbonus, bonus, log); });
-	} else { 
-	  const [ranks, rlog] = miscBonusTotal(attrs[aname + '_ranks_misc'], rankIndent);
-	  bonus += rmuGetSkillBonus(ranks, skill.expertise)
-	  log += `${rmuGetSkillBonus(ranks, skill.expertise)} Rank bonus (${ranks} Ranks)\n`;
-	  log += rlog;
+	} else {
+	  const bonuses = RMUSkills.getSkillRanksBonus(attrs[aname + '_ranks_misc'],
+		      pbonus, skill.expertise || false);
+	  log += bonuses.log;
 
-	  if (pbonus > 0) {
-	    const effectiveranks = (ranks > 30) ? 30 : ranks;
-	    const pbonusbonus = effectiveranks * pbonus;
-	    bonus += pbonusbonus;
-	    if (pbonus == 1) {
-	      log += `${effectiveranks} proficiency bonus\n`;
-	    } else {
-	      log += `${effectiveranks * pbonus} proficiency bonus (${effectiveranks} ranks * ${pbonus})\n`;
-	    }
-	  }
-
-	  if (ranks != 0) {
-	    updates[aname + "_ranks"] = ranks;
+	  if (bonuses.ranks != 0) {
+	    updates[aname + "_ranks"] = bonuses.ranks;
 	  } else if (attrs[aname + "_ranks"] && attrs[name + "_ranks"] != "")  {
 	    updates[aname + "_ranks"] = " "; // So there is something there; so set space
 	  }
-	  updates[aname + "_bonus"] = bonus;
+	  updates[aname + "_bonus"] = bonus +  bonuses.rankbonus;
 	}
 	// Always update the info field.
 	updates[aname + "_info"] = log;
@@ -8844,14 +8918,13 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
     on('clicked:specializationsave', ev => {
       getAttrs(['specialization_change_aname', 'specialization_change_index',
 	       'specialization_change_name'], data => {
-	       console.log(data)
-	let key = data['specialization_change_aname'] + 'specialization' + 
+	let key = data['specialization_change_aname'] + 'specialization' +
 	data['specialization_change_index'] + '_name';
-	setAttrs({ [key] : data.specialization_change_name, 'toggleskillchange': 'false' }); 
+	setAttrs({ [key] : data.specialization_change_name, 'toggleskillchange': 'false' });
       });
     })
     on('clicked:specializationcancel', ev => {
-      setAttrs({'toggleskillchange': 'false' }); 
+      setAttrs({'toggleskillchange': 'false' });
     });
 
 
@@ -8926,7 +8999,7 @@ onCheck('change:repeating_favorite:favskill', (ev) => {
 RMUSkills.updateFavoriteSKillsDefault = function(attrname) {
       setAttrs({[`${attrname}_ranks`]: '?', [`${attrname}_bonus`]: '?'});
       return;
-  
+
 }
 
 RMUSkills.updateFavoriteSkillSpecialisation = function(skillname, attrname) {
@@ -8970,7 +9043,7 @@ RMUSkills.updateFavoriteSkillSpecialisation = function(skillname, attrname) {
 
 RMUSkills.startSkillRoll = function(prefix, usemod = false) {
   getAttrs([
-	  prefix + '_name', prefix + '_favskill', prefix + '_bonus', 
+	  prefix + '_name', prefix + '_favskill', prefix + '_bonus',
 	  'character_name', 'statuspenalty',
 	  'statuseffect'],
       (cdata) => {
@@ -9255,7 +9328,7 @@ RMUSkills.updateFavoriteSkill = function(skillname, basename) {
     }
     let toget = [`${skill.aname}_ranks`, `${skill.aname}_bonus`];
     getAttrs(toget, (attrs) => {
-	setAttrs({ 
+	setAttrs({
 	    [`${basename}_ranks`]: attrs[`${skill.aname}_ranks`] || '-',
 	    [`${basename}_bonus`]: attrs[`${skill.aname}_bonus`]});
     });
@@ -18647,6 +18720,7 @@ injury.parseInjuryString = function (str) {
 
     // Kill the 'Injury: ' from pasting from Crit rolls
     str = str.replace(/^Injury:\s*/, "");
+    str = str.replace(/\s+/g, "");
 
     // So we may have multiple crits in the form of "Z<sev><type>:"
     //  Just squash them for now.  When we do immunities; we will
