@@ -631,7 +631,7 @@
 
 							<label>2d10</label>
 							<span>+</span>
-							<span class="power-roll-characteristic" name="attr_ability_characteristic" ></span>
+							<span class="power-roll-characteristic" data-i18n-dynamic name="attr_ability_characteristic" ></span>
 						</div>
 						<label class="sublabel">≤ 11</label>
 						<span class="power-roll-tier-effect" name="attr_ability_tier_1" ></span>
@@ -963,7 +963,7 @@
 							</button>
 							<label>2d10</label>
 							<span>+</span>
-							<span class="power-roll-characteristic" name="attr_maneuver_characteristic" ></span>
+							<span class="power-roll-characteristic" data-i18n-dynamic name="attr_maneuver_characteristic" ></span>
 						</div>
 						<label class="sublabel">≤ 11</label>
 						<span class="power-roll-tier-effect" name="attr_maneuver_tier_1" ></span>
@@ -1068,7 +1068,7 @@
 					<div class="ability-card card-edit">
 						<input type="text" class="ability-name" data-i18n-placeholder="ability-name" name="attr_grab_name" value="Grab" />
 						<div class="ability-cost-input-group"></div>
-						<div class="ability-details">
+						<div class="ability-details grid-span-full">
 							<input type="text" class="ability-description" data-i18n-placeholder="ability-description" name="attr_grab_description" />
 							<input type="text" class="ability-keywords" data-i18n-placeholder="keywords" name="attr_grab_keywords" value="Melee, Weapon" />
 							<input type="hidden" name="attr_grab_type" value="maneuver" />
@@ -1099,7 +1099,7 @@
 							<textarea class="ability-effect grid-span-full" data-i18n-placeholder="effect" name="attr_grab_effect">Effect: You can usually target only creatures of your size or smaller. If your Might score is 2 or higher, you can target any creature with a size equal to or less than your Might score. Unless otherwise indicated, a creature can grab only one creature at a time.</textarea>
 						</div>
 					</div>
-					<div class="ability-card">
+					<div class="ability-card card-display">
 						<button type="action" data-i18n-title="ability-share" name="act_grab_share">
 							<!-- speech balloon -->
 							&#128172;
@@ -1140,6 +1140,7 @@
 					<input type="hidden" name="attr_escape_grab_type" value="maneuver" />
 					<input type="hidden" class="ability-distance" data-i18n-placeholder="distance" name="attr_escape_grab_distance" value="Self" />
 					<input type="hidden" class="ability-target" data-i18n-placeholder="self" name="attr_escape_grab_target" value="Self" />
+					<input type="hidden" data-i18n-placeholder="self" name="attr_escape_grab_has_power_roll" value="on" />
 					<input type="hidden" class="power-roll-tier-effect" name="attr_escape_grab_tier_1" value="No effect." />
 					<input type="hidden" class="power-roll-tier-effect" name="attr_escape_grab_tier_2" value="You can escape the grab, but if you do, a creature who has you grabbed can make a melee free strike against you before you are no longer grabbed." />
 					<input type="hidden" class="power-roll-tier-effect" name="attr_escape_grab_tier_3" value="You are no longer grabbed." />
@@ -1898,7 +1899,7 @@
 							</button>
 							<label>2d10</label>
 							<span>+</span>
-							<span class="power-roll-characteristic" name="attr_moves_characteristic" ></span>
+							<span class="power-roll-characteristic" data-i18n-dynamic name="attr_moves_characteristic" ></span>
 						</div>
 						<label class="sublabel">≤ 11</label>
 						<span class="power-roll-tier-effect" name="attr_moves_tier_1" ></span>
@@ -2312,7 +2313,11 @@
 				<input type="hidden" name="attr_has_power_roll" />
 				<div class="power-roll">
 					<div class="power-roll-mods">
-						<button type="roll" data-i18n-title="power-roll-button-tooltip" value="@{wtype} &{template:simpleroll} {{rolltitle=^{power-roll}}} {{roll=[[ [[2d10cs>11cf<0]][2d10]  + [[@{ability_characteristic}]] ]]}} {{name=@{ability_name}}} {{hasTier=[[1]]}} {{charactername=@{character_name}}}"></button>
+						<button type="action" data-i18n-title="power-roll-share" name="act_power-roll-share">
+							<!-- Dice pic -->
+							<img src="https://game-icons.net/icons/ffffff/000000/1x1/skoll/d10.svg" alt="Roll Dice" style="width:32px; height:32px;">
+							<img src="https://game-icons.net/icons/ffffff/000000/1x1/skoll/d10.svg" alt="Roll Dice" style="width:32px; height:32px;"> 
+						</button>
 						<label>2d10</label>
 						<span>+</span>
 						<span class="power-roll-characteristic" name="attr_ability_characteristic" ></span>
@@ -2707,7 +2712,7 @@
 </rolltemplate>
 <!-- Sheet Workers -->
 <script type="text/worker">
-	
+	// Sheet version used to deal with major changes
 	const version = "1"; 
 
 	function setActiveCharacterId(id) {
@@ -2787,97 +2792,77 @@
     });
 
 /**
-** Power Roll
-**/
-	async function rollPower(characteristic, abilityName) {
-		const attrs = await getAttrsAsync([characteristic]);
-		const characteristicValue = attrs[characteristic];
-		const characteristicTranslation = getTranslationByKey(characteristic) || characteristic;
-		const powerRollTranslation = getTranslationByKey('power-roll') || 'Power Roll';
-		const edgeOrBaneTranslation = getTranslationByKey('edge-or-bane') || 'edge-or-bane';
-		const noEdgeOrBaneTranslation = getTranslationByKey('no-edge-or-bane') || 'no-edge-or-bane';
-		const doubleEdgeTranslation = getTranslationByKey('double-edge') || 'double-edge';
-		const edgeTranslation = getTranslationByKey('edge') || 'edge';
-		const baneTranslation = getTranslationByKey('bane') || 'bane';
-		const doubleBaneTranslation = getTranslationByKey('double-bane') || 'double-bane';
-		const bonusOrPenaltyTranslation = getTranslationByKey('bonus-or-penalty') || 'bonus-or-penalty';
-		const name = abilityName ? abilityName : characteristicTranslation + ` ` + powerRollTranslation;
-		const roll = '&{template:powerroll} ' +
-			'[[ [[2d10cs>11cf<0]][2d10] ' +
-			` + [[${characteristicValue}[${characteristicTranslation}]]][${characteristicTranslation}] ` +
-			' + [[?{' +
-				edgeOrBaneTranslation +
-				`|${noEdgeOrBaneTranslation},0` +
-				`|${doubleEdgeTranslation},0[${doubleEdgeTranslation}]` +
-				`|${edgeTranslation},2[${edgeTranslation}]` +
-				`|${baneTranslation},-2[${baneTranslation}]` +
-				`|${doubleBaneTranslation},0[${doubleBaneTranslation}]` +
-				`}]][${edgeOrBaneTranslation}] ` +
-				` + [[?{${bonusOrPenaltyTranslation}|0}]][${bonusOrPenaltyTranslation}] ` +
-			']] ' +
-			'{{2d10=$[[0]]}} ' +
-			'{{characteristicValue=$[[1]]}} ' +
-			'{{edgeBane=$[[2]]}} ' +
-			'{{bonus=$[[3]]}} ' +
-			'{{total=$[[4]]}} ' +
-			`{{name=${name}}} ` +
-			`{{characteristic=${characteristic}}} ` +
-			`{{isDoubleEdge=[[0]]}} ` +
-			`{{isDoubleBane=[[0]]}} ` +
-			'{{tier=[[0]]}} ' +
-			'{{charactername=@{character_name}}} ';
-		console.log('roll', roll);
-		startRoll(roll, ({ rollId, results }) => {
-			console.log('roll results', results);
-			const isDoubleEdge = results.edgeBane.expression === `0[${doubleEdgeTranslation}]`
-				? 1 : 0;
-			const isDoubleBane = results.edgeBane.expression === `0[${doubleBaneTranslation}]`
-				? 1 : 0;
-			const tierBase = (() => {
-				if (results.total.result >= 17) {
-					return 3;
-				}
-				return results.total.result >= 12
-					? 2
-					: 1;
-			})();
-			const tierMod = (() => {
-				switch (results.edgeBane.expression) {
-					case `0[${doubleEdgeTranslation}]`:
-						return 1;
-					case `0[${doubleBaneTranslation}]`:
-						return -1;
-					default:
-						return 0;
-				}
-			})();
-			const tier = Math.max(1, Math.min(3, tierBase + tierMod));
-			finishRoll(rollId, { isDoubleEdge, isDoubleBane, tier });
-		});
+ ** Roll Template Functions
+ **/
+ 
+	const ROLLTEMPLATES = { 
+		DISPLAY:     'monsterability',
+		POWERROLL:   'powerroll',
+		ABILITYROLL: 'powerrollability',
+		SIMPLE:      'simpleroll',
 	}
-
-/**
-** Feature Display 
-**/	
-
-	function featureDisplay(name, subtitle, description) {
-		const roll = `@{wtype}&{template:monsterability}` 
-			+ '{{charactername=@{character_name}}} ' 
-			+ '{{name=' + name + '}} ' 
-			+ '{{trait=' + description + '}} '
-			+ '{{subtype=' + subtitle + '}} '
-			+ '{{hasTrait=[[1]]}}';
-		console.log('Feature Display:', roll);
-		startRoll(roll, ({ rollId }) => finishRoll(rollId));
-	}
-
-/**
-** Build Ability Roll
-   constructs and executes rolls using the ability sharing roll template
-**/
-
-	function buildAbilityRoll(directMap, rollValueMap) {
-	
+	/** 
+	 ** Builds and executes a roll using the rolltemplate
+	 ** @param {string}        templateName   The template to be used for the roll
+	 ** @param {Array<Object>} directMap      A dictionary of rolltemplate keys and their values.
+	 ** @param {Array<Object>} rollValueMap   A dictionary of rolltemplate keys and their values that will be added as inline rolls.
+	 ** @param {boolean}       isPowerRoll    (optional) True if the roll will contain a power roll 
+	 **/
+	async function buildRoll (templateName, directMap, rollValueMap, isPowerRoll = false) {
+		console.log('~~~ buildRoll ~~~');
+		
+		// Check that we have the bare minimum information needed for a roll
+		if (!templateName || !directMap) {
+			console.log('Could not build roll: missing data');
+			return;
+		}
+		// Setup the template for the roll
+		const template = `@{wtype}&{template:${templateName}} {{charactername=@{character_name}}} `;
+		
+		let powerroll = '';
+		
+		// Check if we need to add the extra information for a power roll.
+		if (isPowerRoll && rollValueMap) {
+			if (rollValueMap.characteristicValue.length < 1) {
+				console.log('Could not build roll: no characteristic value specified');
+				return;
+			}
+			const STATNAMES = ['might', 'agility', 'reason', 'intuition', 'presence'];
+			
+			const characteristicTranslation = getTranslationByKey(directMap.characteristic) || directMap.characteristic;
+			const powerRollTranslation = getTranslationByKey('power-roll') || 'Power Roll';
+			const edgeOrBaneTranslation = getTranslationByKey('edge-or-bane') || 'edge-or-bane';
+			const noEdgeOrBaneTranslation = getTranslationByKey('no-edge-or-bane') || 'no-edge-or-bane';
+			const doubleEdgeTranslation = getTranslationByKey('double-edge') || 'double-edge';
+			const edgeTranslation = getTranslationByKey('edge') || 'edge';
+			const baneTranslation = getTranslationByKey('bane') || 'bane';
+			const doubleBaneTranslation = getTranslationByKey('double-bane') || 'double-bane';
+			const bonusOrPenaltyTranslation = getTranslationByKey('bonus-or-penalty') || 'bonus-or-penalty';
+			const name = !directMap.name ? '{{name=' + characteristicTranslation + ` ` + powerRollTranslation + '}} ': '';
+			powerroll = '[[ [[2d10cs>11cf<0]][2d10] ' +
+						` + [[${rollValueMap.characteristicValue}[${characteristicTranslation}]]][${characteristicTranslation}] ` +
+						' + [[?{' +
+							edgeOrBaneTranslation +
+							`|${noEdgeOrBaneTranslation},0` +
+							`|${doubleEdgeTranslation},0[${doubleEdgeTranslation}]` +
+							`|${edgeTranslation},2[${edgeTranslation}]` +
+							`|${baneTranslation},-2[${baneTranslation}]` +
+							`|${doubleBaneTranslation},0[${doubleBaneTranslation}]` +
+							`}]][${edgeOrBaneTranslation}] ` +
+							` + [[?{${bonusOrPenaltyTranslation}|0}]][${bonusOrPenaltyTranslation}] ` +
+						']] ' +
+						'{{2d10=$[[0]]}} ' +
+						'{{edgeBane=$[[2]]}} ' +
+						'{{bonus=$[[3]]}} ' +
+						'{{total=$[[4]]}} ' +
+						`{{isDoubleEdge=[[0]]}} ` +
+						`{{isDoubleBane=[[0]]}} ` +
+						'{{tier=[[0]]}} ' +
+						name;
+						
+		}
+		
+		// Helper function to trim empty values from the roll.
 		const isDefined = (value) => {
 			// Exclude null, undefined, and empty strings
 			if (!value) return false;
@@ -2886,109 +2871,100 @@
 			return true;
 		};
 		
-		const roll = `@{wtype}&{template:monsterability} `
-			+ '{{charactername=@{character_name}}} ' 
-			+ '{{powerRoll=^{power-roll}}} '
-			+ Object.entries(directMap)
-				.filter(([key, value]) => isDefined(value))
-				.map(([key, value]) => `{{${key}=${value}}} `)
-				.join(' ')
-			+ Object.entries(rollValueMap)
-				.filter(([key, value]) => value === 1)
-				.map(([key, value]) => `{{${key}=[[${value}]]}} `)
-				.join(' ');
-		startRoll(roll, ({ rollId }) => finishRoll(rollId));
-		return roll;
+		// Build the roll. Starts with the template and powerroll, then adds the directMap entries and the rollValueMap entries. 
+		const roll = template +
+					 powerroll +
+					 Object.entries(directMap)
+					 .filter(([key, value]) => value)
+					 .map(([key, value]) => `{{${key}=${value}}} `)
+					 .join(' ') +
+					 Object.entries(rollValueMap)
+					 .filter(([key, value]) => value === 1 || key === 'characteristicValue')
+					 .map(([key, value]) => `{{${key}=[[${value}]]}} `)
+					 .join(' ');
+		
+		if (isPowerRoll) {
+			// If we are making a power roll we need to make extra calculations to determine the tier result.
+			const doubleEdgeTranslation = getTranslationByKey('double-edge') || 'double-edge';
+			const doubleBaneTranslation = getTranslationByKey('double-bane') || 'double-bane';
+			
+			startRoll(roll, ({ rollId, results }) => {
+				console.log('roll results', results);
+				// Set for toggles for Double Edge and Double Bane 
+				const isDoubleEdge = results.edgeBane.expression === `0[${doubleEdgeTranslation}]`
+					? 1 : 0;
+				const isDoubleBane = results.edgeBane.expression === `0[${doubleBaneTranslation}]`
+					? 1 : 0;
+					
+				// Calculate the Tier result from the roll 2-11, 12-16, 17-20
+				const tierBase = (() => {
+					if (results.total.result >= 17) {
+						return 3;
+					}
+					return results.total.result >= 12
+						? 2
+						: 1;
+				})();
+				const tierMod = (() => {
+					switch (results.edgeBane.expression) {
+						case `0[${doubleEdgeTranslation}]`:
+							return 1;
+						case `0[${doubleBaneTranslation}]`:
+							return -1;
+						default:
+							return 0;
+					}
+				})();
+				// Adjust the Tier result if Double Edge/Bane
+				const tier = Math.max(1, Math.min(3, tierBase + tierMod));
+				finishRoll(rollId, { isDoubleEdge, isDoubleBane, tier });
+			});
+		} else {
+			// Simple roll for everything else.
+			startRoll(roll, ({ rollId }) => finishRoll(rollId));
+		}
+	}
+	
+	/**
+	 ** Basic Power Roll
+	 ** Constructs and rolls a power roll using the powerroll template
+	 ** @param {string} characteristic  The characteristic to use for the roll.
+	 ** @param {string} abilityName     (optional) The name of the ability invoking the roll. 
+	 **/
+	async function rollPower(characteristic) {
+		console.log("~~~ rollPower ~~~");
+		// Get the characteristic and populate the translations for use in the roll.
+		const attrs = await getAttrsAsync([characteristic]);
+		const characteristicValue = attrs[characteristic];
+		
+		buildRoll(ROLLTEMPLATES.POWERROLL, {characteristic},{characteristicValue}, true);
 	}
 
-/**
-** Build ability when there is a Power Roll
-   constructs and executes rolls using the ability sharing roll template
-**/
-
-async function buildPowerRollAbility(characteristic, abilityName, directMap = {}, rollValueMap = {}) {
-	const attrs = await getAttrsAsync([characteristic]);
-	const characteristicValue = attrs[characteristic];
-
-	// Translations
-	const characteristicTranslation = getTranslationByKey(characteristic) || characteristic;
-	const powerRollTranslation = getTranslationByKey('power-roll') || 'Power Roll';
-	const edgeOrBaneTranslation = getTranslationByKey('edge-or-bane') || 'edge-or-bane';
-	const noEdgeOrBaneTranslation = getTranslationByKey('no-edge-or-bane') || 'no-edge-or-bane';
-	const doubleEdgeTranslation = getTranslationByKey('double-edge') || 'double-edge';
-	const edgeTranslation = getTranslationByKey('edge') || 'edge';
-	const baneTranslation = getTranslationByKey('bane') || 'bane';
-	const doubleBaneTranslation = getTranslationByKey('double-bane') || 'double-bane';
-	const bonusOrPenaltyTranslation = getTranslationByKey('bonus-or-penalty') || 'bonus-or-penalty';
-
-	const name = abilityName || `${characteristicTranslation} ${powerRollTranslation}`;
-
-	// Helper to exclude null/undefined/empty/"0"
-	const isDefined = (value) => {
-		if (!value) return false;
-		if (typeof value === 'string' && value.trim() === '0') return false;
-		return true;
-	};
-
-	// Build roll string
-	const roll = `@{wtype}&{template:powerrollability} ` +
-		'[[ [[2d10cs>11cf<0]][2d10] ' +
-		` + [[${characteristicValue}[${characteristicTranslation}]]][${characteristicTranslation}] ` +
-		' + [[?{' +
-			edgeOrBaneTranslation +
-			`|${noEdgeOrBaneTranslation},0` +
-			`|${doubleEdgeTranslation},0[${doubleEdgeTranslation}]` +
-			`|${edgeTranslation},2[${edgeTranslation}]` +
-			`|${baneTranslation},-2[${baneTranslation}]` +
-			`|${doubleBaneTranslation},0[${doubleBaneTranslation}]` +
-			`}]][${edgeOrBaneTranslation}] ` +
-			` + [[?{${bonusOrPenaltyTranslation}|0}]][${bonusOrPenaltyTranslation}] ` +
-		']] '
-		+ `{{charactername=@{character_name}}} `
-		+ `{{name=${name}}} `
-		+ `{{powerRoll=^{power-roll}}} `
-		+ `{{characteristic=${characteristic}}} `
-		+ `{{hasPowerRoll=[[1]]}} `
-		+ `{{2d10=$[[0]]}} `
-		+ `{{characteristicValue=$[[1]]}} `
-		+ `{{edgeBane=$[[2]]}} `
-		+ `{{bonus=$[[3]]}} `
-		+ `{{total=$[[4]]}} `
-		+ `{{isDoubleEdge=[[0]]}} `
-		+ `{{isDoubleBane=[[0]]}} `
-		+ `{{tier=[[0]]}} `
-		+ Object.entries(directMap)
-			.filter(([_, value]) => isDefined(value))
-			.map(([key, value]) => `{{${key}=${value}}} `)
-			.join(' ')
-		+ Object.entries(rollValueMap)
-			.filter(([_, value]) => value === 1)
-			.map(([key]) => `{{${key}=[[1]]}} `)
-			.join(' ');
-
-	startRoll(roll, ({ rollId, results }) => {
-		const isDoubleEdge = results.edgeBane.expression === `0[${doubleEdgeTranslation}]` ? 1 : 0;
-		const isDoubleBane = results.edgeBane.expression === `0[${doubleBaneTranslation}]` ? 1 : 0;
-
-		const tierBase = results.total.result >= 17 ? 3 : results.total.result >= 12 ? 2 : 1;
-		const tierMod = (() => {
-			switch (results.edgeBane.expression) {
-				case `0[${doubleEdgeTranslation}]`: return 1;
-				case `0[${doubleBaneTranslation}]`: return -1;
-				default: return 0;
-			}
-		})();
-		const tier = Math.max(1, Math.min(3, tierBase + tierMod));
-
-		finishRoll(rollId, { isDoubleEdge, isDoubleBane, tier });
-	});
-}
+	/**
+	 ** Displays a feature using the monsterability template
+	 ** @param {string} name         The feature's name.
+	 ** @param {string} subtitle     A subtitle for the feature, usually the source (Class, Perk, etc).
+	 ** @param {string} description  The feature's description.
+	 **/	
+	
+	function featureDisplay(name, subtitle, description) {
+		console.log('~~~ featureDisplay ~~~');
+		const roll = `@{wtype}&{template:monsterability}` 
+			+ '{{charactername=@{character_name}}} ' 
+			+ '{{name=' + name + '}} ' 
+			+ '{{trait=' + description + '}} '
+			+ '{{subtype=' + subtitle + '}} '
+			+ '{{hasTrait=[[1]]}}';
+		startRoll(roll, ({ rollId }) => finishRoll(rollId));
+	}
 	
 /** 
 ** Ability Sharing Handler
 **/
 
-	async function handleAbilityShare(prefix, abilityPrefix) {
+	async function handleAbilityShare(prefix, abilityPrefix, isPowerRoll = false) {
+		console.log('~~~ handleAbilityShare ~~~', prefix, abilityPrefix, isPowerRoll);
+		
 		// 1. Define all possible ability attributes across both player and NPC sections.
 		const allAbilityAttributeNames = [
 			'name', 'cost', 'description', 'keywords',
@@ -2996,23 +2972,27 @@ async function buildPowerRollAbility(characteristic, abilityName, directMap = {}
 			'characteristic', 'tier_1', 'tier_2', 'tier_3', 'effect',
 			'subtype', 'malice_cost', 'trait',
 			'solo_1_name', 'solo_1_text', 'solo_2_name', 'solo_2_text',
-			'special', 'malice',
+			'special', 'malice', 'spend', 'custom',
 		];
 		
 		const allAbilityToggles = [
 			'has_power_roll', 'has_effect', 'has_special', 'has_malice',
+			'has_spend', 'has_custom',
 		];
 		
-		abPrefix = abilityPrefix ? `${abilityPrefix}_` : '';
+		const abPrefix = abilityPrefix ? `${abilityPrefix}_` : '';
 		
 		// 2. Define the character-level attributes needed for both.
 		const globalAttrsToGet = prefix === 'repeating_npcabilities'
 			? [] // Monster abilities need nothing
 			: ['resource_name']; // Player abilities need resource_name
 			
+		const characteristics = isPowerRoll ? ['might', 'agility', 'reason', 'intuition', 'presence'] : [];
+				
 		// 3. Construct the full list of attributes to fetch.
 		const attrsToFetch = [
 			...globalAttrsToGet,
+			...characteristics,
 			...allAbilityAttributeNames.map(x => `${prefix}_${abPrefix}${x}`),
 			...allAbilityToggles.map(x => `${prefix}_${x}`),
 		];
@@ -3023,53 +3003,13 @@ async function buildPowerRollAbility(characteristic, abilityName, directMap = {}
 		const { directMap, rollValueMap } = getAbilityMaps(attrs, prefix, abPrefix);
 		
 		// 5. Call the shared roll function
-		const roll = buildAbilityRoll(directMap, rollValueMap);
+		const template = isPowerRoll ? ROLLTEMPLATES.ABILITYROLL : ROLLTEMPLATES.DISPLAY;
+		const roll = buildRoll(template, directMap, rollValueMap, isPowerRoll);
 
-		console.log(`${prefix}_${abilityPrefix}:`, roll);
-	}
-
-	async function handleAbilitySharePowerRoll(prefix, abilityPrefix,characteristic, abilityName) {
-		// 1. Define all possible ability attributes across both player and NPC sections.
-		const allAbilityAttributeNames = [
-			'name', 'cost', 'description', 'keywords',
-			'type', 'distance', 'target', 'trigger',
-			'characteristic', 'tier_1', 'tier_2', 'tier_3', 'effect',
-			'subtype', 'malice_cost', 'trait',
-			'solo_1_name', 'solo_1_text', 'solo_2_name', 'solo_2_text',
-			'special', 'malice',
-		];
-		
-		const allAbilityToggles = [
-			'has_power_roll', 'has_effect', 'has_special', 'has_malice',
-		];
-		
-		abPrefix = abilityPrefix ? `${abilityPrefix}_` : '';
-		
-		// 2. Define the character-level attributes needed for both.
-		const globalAttrsToGet = prefix === 'repeating_npcabilities'
-			? [] // Monster abilities need nothing
-			: ['resource_name']; // Player abilities need resource_name
-			
-		// 3. Construct the full list of attributes to fetch.
-		const attrsToFetch = [
-			...globalAttrsToGet,
-			...allAbilityAttributeNames.map(x => `${prefix}_${abPrefix}${x}`),
-			...allAbilityToggles.map(x => `${prefix}_${x}`),
-		];
-		
-		const attrs = await getAttrsAsync(attrsToFetch);
-		
-		// 4. Execute the custom logic (player or monster specific)
-		const { directMap, rollValueMap } = getAbilityMaps(attrs, prefix, abPrefix);
-		
-		// 5. Call the shared roll function
-		const roll = buildPowerRollAbility(characteristic, abilityName,directMap, rollValueMap);
-
-		console.log(`${prefix}_${abilityPrefix}:`, roll);
 	}
 
 	/**
-	 * Craetes the attribute maps needed to build an ability sharing roll.
+	 * Creates the attribute maps needed to build an ability sharing roll.
 	 * @param {Array<Object>} Character and ability attributes.
 	 * @param {string} The name of the repeating ability (e.g "repeating_abilities").
 	 * @param {string} The prefix used for the for the attribute (e.g "ability").
@@ -3078,6 +3018,8 @@ async function buildPowerRollAbility(characteristic, abilityName, directMap = {}
 	 *    the second contains inline rolls. 
 	 */
 	function getAbilityMaps(attrs, prefix, abilityPrefix) {
+		console.log('~~~ getAbilityMaps ~~~');
+		
 		let directMap = {};
 		let rollValueMap = {};
 		let translateMap = {};
@@ -3086,6 +3028,8 @@ async function buildPowerRollAbility(characteristic, abilityName, directMap = {}
 		let hasTrait = 0;
 		let characteristic = '';
 		let description = '';
+		let powerroll = '';
+		let characteristicValue = '';
 		
 		if (prefix === 'repeating_npcabilities') {
 			// NPC Ability Logic
@@ -3099,10 +3043,11 @@ async function buildPowerRollAbility(characteristic, abilityName, directMap = {}
 					subtype = attrs[`${prefix}_${abilityPrefix}malice_cost`] + ' ' + getTranslationByKey('malice');
 					break;
 			}
-			characteristic = attrs[`${prefix}_${abilityPrefix}characteristic`] || '';
+			characteristic = 'modifiers';
 			trait = attrs[`${prefix}_${abilityPrefix}trait`] || '';
 			hasTrait = attrs[`${prefix}_${abilityPrefix}subtype`].includes('trait') && trait ? 1 : 0;
 			hasEffect = attrs[`${prefix}_has_effect`] === 'on' ? 1 : 0;
+			characteristicValue = attrs[`${prefix}_${abilityPrefix}characteristic`];
 		} else {
 			// PLAYER Ability Logic
 			const resourceName = attrs.resource_name || getTranslationByKey('resource-name-placeholder');
@@ -3112,9 +3057,14 @@ async function buildPowerRollAbility(characteristic, abilityName, directMap = {}
 			description = attrs[`${prefix}_${abilityPrefix}description`] || '';
 			hasTrait = 1;
 			hasEffect = attrs[`${prefix}_${abilityPrefix}effect`] ? 1 : 0;
+			characteristicValue = attrs[attrs[`${prefix}_${abilityPrefix}characteristic`]];
 		}
 		
-
+		if (attrs[`${prefix}_has_power_roll`] === 'on') {
+			powerroll = getTranslationByKey('power-roll');
+		}
+		
+		
 		const type = attrs[`${prefix}_${abilityPrefix}type`] === 'no-action' ? '' : getTranslationByKey(attrs[`${prefix}_${abilityPrefix}type`]);
 		
 		// Build the directMap - these will be transformed into a {{key=value}} format.
@@ -3140,6 +3090,7 @@ async function buildPowerRollAbility(characteristic, abilityName, directMap = {}
 			solo1text: attrs[`${prefix}_${abilityPrefix}solo_1_text`] || '',
 			solo2name: attrs[`${prefix}_${abilityPrefix}solo_2_name`] || '',
 			solo2text: attrs[`${prefix}_${abilityPrefix}solo_2_text`] || '',
+			powerRoll: powerroll,
 		}	
 
 		//Build the rollValueMap - these will be transformed into a {{key=[[value]]}} format.
@@ -3151,375 +3102,150 @@ async function buildPowerRollAbility(characteristic, abilityName, directMap = {}
 			hasSpecial: attrs[`${prefix}_has_special`] === 'on' ? 1 : 0,
 			hasEffect: hasEffect,
 			hasMalprop: attrs[`${prefix}_has_malice`] === 'on' ? 1 : 0,
+			characteristicValue: characteristicValue || 0,
 		};
 
 		return { directMap, rollValueMap };
 	}
-
-/**
-**Repeated Maneuvers display
-**/
-	on('clicked:repeating_maneuvers:share', async (event) => {
-		handleAbilityShare('repeating_maneuvers', 'maneuver');
-	});
-
-/**
-**Repeated Triggered display
-**/
-	on('clicked:repeating_triggered:share', async (event) => {
-		handleAbilityShare('repeating_triggered', 'triggered');
-	});
-
-/**
-**Repeated No Action display
-**/
-	on('clicked:repeating_noaction:share', async (event) => {
-		handleAbilityShare('repeating_noaction', 'noaction');
-	});
-
-/**
-**Repeated Moves display
-**/
-	on('clicked:repeating_moves:share', async (event) => {
-		handleAbilityShare('repeating_moves', 'moves');
-	});
-
-/**
-**Repeated Moves Power Roll
-**/
-	on('clicked:repeating_moves:power-roll-share', async (event) => {
-		const attrs = await getAttrsAsync([
-			'repeating_moves_moves_name',
-			'repeating_moves_moves_characteristic',
-		]);
-		handleAbilitySharePowerRoll('repeating_moves', 'moves',attrs.repeating_moves_moves_characteristic, attrs.repeating_moves_moves_name);
-	});
-
-/**
-**Repeated Maneuvers power roll
-**/
-	on('clicked:repeating_maneuvers:power-roll-share', async (event) => {
-		const attrs = await getAttrsAsync([
-			'repeating_maneuvers_maneuver_name',
-			'repeating_maneuvers_maneuver_characteristic',
-		]);
-		handleAbilitySharePowerRoll('repeating_maneuvers', 'maneuver',attrs.repeating_maneuvers_maneuver_characteristic, attrs.repeating_maneuvers_maneuver_name);
-	});
-
-/**
-**Repeated Triggered power roll
-**/
-	on('clicked:repeating_triggered:power-roll-share', async (event) => {
-		const attrs = await getAttrsAsync([
-			'repeating_triggered_triggered_name',
-			'repeating_triggered_triggered_characteristic',
-		]);
-		handleAbilitySharePowerRoll('repeating_triggered', 'triggered',attrs.repeating_triggered_triggered_characteristic, attrs.repeating_triggered_triggered_name);
-	});
-
-/**
-**Repeated No Action power roll
-**/
-	on('clicked:repeating_noaction:power-roll-share', async (event) => {
-		const attrs = await getAttrsAsync([
-			'repeating_noaction_noaction_name',
-			'repeating_noaction_noaction_characteristic',
-		]);
-		handleAbilitySharePowerRoll('repeating_noaction', 'noaction',attrs.repeating_noaction_noaction_characteristic, attrs.repeating_noaction_noaction_name);
-	});
-
-/**
-**Knockback Display
-**/
-	on('clicked:knockback_share', async (event) => {
-		handleAbilityShare('knockback', '');
-	});
-
-/**
-**Grab Display
-**/
-	on('clicked:grab_share', async (event) => {
-		handleAbilityShare('grab', '');
-	});
-
-/**
-**Escape Grab Display
-**/
-	on('clicked:escape_grab_share', async (event) => {
-		handleAbilityShare('escape_grab', '');
-	});
-
-/**
-** Escape Grab Power Roll
-**/
-	on('clicked:escape_grab_power_roll_share', async (event) => {
-		const attrs = await getAttrsAsync([
-			'escape_grab_name',
-			'escape_grab_characteristic',
-		]);
-		handleAbilitySharePowerRoll('escape_grab', '',attrs.escape_grab_characteristic, attrs.escape_grab_name);
-	});
 	
 /**
-**Claw Dirt Display
-**/
-	on('clicked:claw_dirt_share', async (event) => {
-		handleAbilityShare('claw_dirt', '');
-	});
+ ** Event Handlers 
+ **/
+ 
+	// Handlers for repeating sections
+	// Maps the repeating section name to its 'type' argument
+	const repeatingHandlers = {
+		'maneuvers': 'maneuver',
+		'triggered': 'triggered',
+		'noaction': 'noaction',
+		'moves': 'moves',
+		'abilities': 'ability',
+		'npcabilities': 'ability'
+	};
 
-/**
-**Advance Display
-**/
-	on('clicked:advance_share', async (event) => {
-		handleAbilityShare('advance', '');
-	});
-
-/**
-**Disengage Display
-**/
-	on('clicked:disengage_share', async (event) => {
-		handleAbilityShare('disengage', '');
-	});
-
-/**
-**Ride Display
-**/
-	on('clicked:ride_share', async (event) => {
-		handleAbilityShare('ride', '');
-	});
-
-/**
-**Jump Display
-**/
-	on('clicked:jump_share', async (event) => {
-		handleAbilityShare('jump', '');
-	});
-
-/**
-**Climb Other Creatures Display
-**/
-	on('clicked:climb_creature_share', async (event) => {
-		handleAbilityShare('climb_creature', '');
-	});
-
-/**
-**Charge Display
-**/
-	on('clicked:charge_share', async (event) => {
-		handleAbilityShare('charge', '');
-	});
-
-/**
-**Defend Display
-**/
-	on('clicked:defend_share', async (event) => {
-		handleAbilityShare('defend', '');
-	});
-
-/**
-**Heal Display
-**/
-	on('clicked:heal_share', async (event) => {
-		handleAbilityShare('heal', '');
-	});
-
-/**
-**Aid Attack Display
-**/
-	on('clicked:aid_attack_share', async (event) => {
-		handleAbilityShare('aid_attack', '');
-	});
-
-/**
-**Catch Breath Display
-**/
-	on('clicked:catch_breath_share', async (event) => {
-		handleAbilityShare('catch_breath', '');
-	});
-
-/**
-**Hide Display
-**/
-	on('clicked:hide_share', async (event) => {
-		handleAbilityShare('hide', '');
-	});
-
-/**
-**Search Display
-**/
-	on('clicked:search_share', async (event) => {
-		handleAbilityShare('search', '');
-	});
-
-/**
-**Stand up Display
-**/
-	on('clicked:standup_share', async (event) => {
-		handleAbilityShare('standup', '');
-	});
-
-/**
-**Use Consumable Display
-**/
-	on('clicked:consumable_share', async (event) => {
-		handleAbilityShare('consumable', '');
-	});
-
-/**
-**Knockback Power Roll
-**/
-	on('clicked:knockback_power_roll_share', async (event) => {
-		const attrs = await getAttrsAsync([
-			'knockback_name',
-			'knockback_characteristic',
-		]);
-		handleAbilitySharePowerRoll('knockback', '',attrs.knockback_characteristic, attrs.knockback_name);
-	});
-
-/**
-**Grab Power Roll
-**/
-	on('clicked:grab_power_roll_share', async (event) => {
-		const attrs = await getAttrsAsync([
-			'grab_name',
-			'grab_characteristic',
-		]);
-		handleAbilitySharePowerRoll('grab', '',attrs.grab_characteristic, attrs.grab_name);
-	});
-
-/**
-**Claw Dirt Power Roll
-**/
-	on('clicked:claw_dirt_power_roll_share', async (event) => {
-		const attrs = await getAttrsAsync([
-			'claw_dirt_name',
-			'claw_dirt_characteristic',
-		]);
-		handleAbilitySharePowerRoll('claw_dirt', '',attrs.claw_dirt_characteristic, attrs.claw_dirt_name);
-	});
-
-/**
-**Jump Power Roll
-**/
-	on('clicked:jump_power_roll_share', async (event) => {
-		const attrs = await getAttrsAsync([
-			'jump_name',
-			'jump_characteristic',
-		]);
-		handleAbilitySharePowerRoll('jump', '',attrs.jump_characteristic, attrs.jump_name);
-	});
-
-/**
-**Climb Other Creature Power Roll
-**/
-	on('clicked:climb_creature_power_roll_share', async (event) => {
-		const attrs = await getAttrsAsync([
-			'climb_creature_characteristic',
-			'climb_creature_name', 
-		]);
-		handleAbilitySharePowerRoll('climb_creature', '',attrs.climb_creature_characteristic,attrs.climb_creature_name);
-	});
-
-/** 
-** Event Listeners
-**/
+	for (const [section, type] of Object.entries(repeatingHandlers)) {
+		const repeatingSection = `repeating_${section}`;
 	
-// Characteristic Power Rolls
+		// Share button
+		on(`clicked:${repeatingSection}:share`, async (event) => {
+			handleAbilityShare(repeatingSection, type);
+		});
+    
+		// Power roll button
+		on(`clicked:${repeatingSection}:power-roll-share`, async (event) => {
+			handleAbilityShare(repeatingSection, type, true);
+        });
+	}	
+
+	// Handlers for simple, non-repeating actions
+	// Maps the action name to a boolean indicating if it has a power roll
+	const simpleActionHandlers = {
+		'knockback': true,
+		'grab': true,
+		'escape_grab': true,
+		'claw_dirt': true,
+		'jump': true,
+		'climb_creature': true,
+		'advance': false,
+		'disengage': false,
+		'ride': false,
+		'charge': false,
+		'defend': false,
+		'heal': false,
+		'aid_attack': false,
+		'catch_breath': false,
+		'hide': false,
+		'search': false,
+		'standup': false,
+		'consumable': false
+	};
+
+	for (const [action, hasPowerRoll] of Object.entries(simpleActionHandlers)) {
+		// Share button (all actions have this)
+		on(`clicked:${action}_share`, async (event) => {
+			handleAbilityShare(action, '');
+		});
+
+		// Power roll button (only if hasPowerRoll is true)
+		if (hasPowerRoll) {
+			on(`clicked:${action}_power_roll_share`, async (event) => {
+				handleAbilityShare(action, '', true);
+			});
+		}
+	}
+
+	// Handlers for free strikes (special mapping)
+	// Maps the button trigger name to the ability name
+	const freeStrikeHandlers = {
+		'melee': 'melee_free_strike',
+		'ranged': 'ranged_free_strike'
+	};
+
+	for (const [trigger, ability] of Object.entries(freeStrikeHandlers)) {
+		// Share button
+		on(`clicked:${trigger}_share`, async (event) => {
+			handleAbilityShare(ability, '');
+		});
+		
+		// Power roll button
+		on(`clicked:${trigger}_power_roll_share`, async (event) => {
+			handleAbilityShare(ability, '', true);
+		});
+	}
+    
+	// Characteristic Power Rolls
 	$20('.npc-characteristic-input-group > label').on('click', (e) => {
 		const characteristic = e.htmlAttributes['data-characteristic'];
 		rollPower(characteristic);
 	});
-	
+		
 	$20('.characteristic-input-group > label').on('click', (e) => {
 		const characteristic = e.htmlAttributes['data-characteristic'];
 		rollPower(characteristic);
 	});
+
+	// Configuration map for feature sharing
+	// Maps the trigger event to its specific attribute names and translation key
+	const featureShareHandlers = {
+		'repeating_classfeatures:classfeatureshare': {
+			section: 'classfeatures',
+			field: 'classfeature',
+			transKey: 'class-features'
+		},
+		'repeating_ancestrytraits:ancfeatureshare': {
+			section: 'ancestrytraits',
+			field: 'ancestrytrait',
+			transKey: 'ancestry-traits'
+		},
+		'repeating_perks:perkfeatureshare': {
+			section: 'perks',
+			field: 'perk',
+			transKey: 'perks'
+		},
+		'repeating_titles:titlefeatureshare': {
+			section: 'titles',
+			field: 'title',
+			transKey: 'titles'
+		}
+	};
+
+	// Loop through the map and create a generic listener for each
+	for (const [trigger, config] of Object.entries(featureShareHandlers)) {
+		
+		on(`clicked:${trigger}`, async (event) => {
+			// Dynamically build the attribute names from the config
+			const nameAttr = `repeating_${config.section}_${config.field}_name`;
+			const descAttr = `repeating_${config.section}_${config.field}_description`;
+
+			const attrs = await getAttrsAsync([nameAttr, descAttr]);
+			const subtitle = getTranslationByKey(config.transKey);
+
+			// Use bracket notation to access the attribute values dynamically
+			featureDisplay(attrs[nameAttr], subtitle, attrs[descAttr]);
+		});
+	}
 	
-	
-// Share Player Repeated Ability
-	on('clicked:repeating_abilities:share', async (event) => {
-		handleAbilityShare('repeating_abilities','ability');
-	});
-
-// Repeated Ability power roll
-	on('clicked:repeating_abilities:power-roll-share', async (event) => {
-		const attrs = await getAttrsAsync([
-			'repeating_abilities_ability_characteristic',
-			'repeating_abilities_ability_name', 
-		]);
-		handleAbilitySharePowerRoll('repeating_abilities','ability',attrs.repeating_abilities_ability_characteristic,attrs.repeating_abilities_ability_name);
-	});
-
-// Share Monster Repeated Abilities
-	on('clicked:repeating_npcabilities:share', async (event) => {
-		handleAbilityShare('repeating_npcabilities', 'ability');
-	});
-	
-//Melee Free Strike Display
-	on('clicked:melee_share', async (event) => {
-		handleAbilityShare('melee_free_strike', '');
-	});
-	
-// Melee Free Strike Power Roll
-
-	on('clicked:melee_power_roll_share', async (event) => {
-	  	const attrs = await getAttrsAsync(['melee_free_strike_characteristic','melee_free_strike_name']);
-		handleAbilitySharePowerRoll('melee_free_strike', '',attrs.melee_free_strike_characteristic, attrs.melee_free_strike_name);
-	});
-
-// Ranged Free Strike Display
-	on('clicked:ranged_share', async (event) => {
-		handleAbilityShare('ranged_free_strike', ''); 
-	});
-
-// Ranged Free Strike Power Roll
-	on('clicked:ranged_power_roll_share', async (event) => {
-		const attrs = await getAttrsAsync(['ranged_free_strike_characteristic','ranged_free_strike_name']);
-		handleAbilitySharePowerRoll('ranged_free_strike', '',attrs.ranged_free_strike_characteristic, attrs.ranged_free_strike_name);
-	});
-
-// Share Class Features
-	on('clicked:repeating_classfeatures:classfeatureshare', async (event) => {
-		const attrs = await getAttrsAsync([
-			'repeating_classfeatures_classfeature_name',
-			'repeating_classfeatures_classfeature_description',
-		]);
-		const subtitle = getTranslationByKey('class-features');
-		featureDisplay(attrs.repeating_classfeatures_classfeature_name, subtitle, attrs.repeating_classfeatures_classfeature_description);
-	});
-
-// Share Ancestry Features
-	on('clicked:repeating_ancestrytraits:ancfeatureshare', async (event) => {
-		const attrs = await getAttrsAsync([
-			'repeating_ancestrytraits_ancestrytrait_name',
-			'repeating_ancestrytraits_ancestrytrait_description',
-		]);
-		const subtitle = getTranslationByKey('ancestry-traits');
-		featureDisplay(attrs.repeating_ancestrytraits_ancestrytrait_name, subtitle, attrs.repeating_ancestrytraits_ancestrytrait_description);
-	});
-
-// Share Perk Features
-	on('clicked:repeating_perks:perkfeatureshare', async (event) => {
-		const attrs = await getAttrsAsync([
-			'repeating_perks_perk_name',
-			'repeating_perks_perk_description',
-		]);
-		const subtitle = getTranslationByKey('perks');
-		featureDisplay(attrs.repeating_perks_perk_name, subtitle,attrs.repeating_perks_perk_description);
-	
-	});
-
-// Share Title Features 
-	on('clicked:repeating_titles:titlefeatureshare', async (event) => {
-		const attrs = await getAttrsAsync([
-			'repeating_titles_title_name',
-			'repeating_titles_title_description',
-		]);
-		const subtitle = getTranslationByKey('titles');
-		featureDisplay(attrs.repeating_titles_title_name, subtitle, attrs.repeating_titles_title_description);
-	});
-
-// Looking for Power Roll for Ability Card
+/*// Looking for Power Roll for Ability Card
 	on("change:repeating_abilities:has_power_roll", function(event) {
 		const repeatingId = event.sourceAttribute.match(/repeating_abilities_[^_]+/)[0];
 		const sourceAttr = `${repeatingId}_has_power_roll`;
@@ -3531,7 +3257,7 @@ async function buildPowerRollAbility(characteristic, abilityName, directMap = {}
 			});
 		});
 	});
-
+*/
 // Winded Calculation
 	on("change:stamina_max sheet:opened", function() {  
 		getAttrs(["stamina_max"], function(values) {
@@ -3683,7 +3409,15 @@ async function buildPowerRollAbility(characteristic, abilityName, directMap = {}
 		const usage = abilityData.type.usage;
 		const config = ABILITY_TYPE_MAP[usage] || ABILITY_TYPE_MAP.default;
 		const id = generateRowID();
-
+		const cost = abilityData.cost === 'signature' ? abilityData.cost : parseInt(abilityData.cost) || 0;
+		
+		let subtype = 'normal-ability';
+		if (cost === 'signature') {
+			subtype = 'signature-ability';
+		} else if (cost > 0) {
+			subtype = 'heroic-ability';
+		}
+		
 		// 2. Extract and format primary data fields.
 		const distanceInfo = abilityData.distance?.[0];
 		const distance = distanceInfo ? `${distanceInfo.type} ${distanceInfo.value || ''}`.trim() : '';
@@ -3701,6 +3435,7 @@ async function buildPowerRollAbility(characteristic, abilityName, directMap = {}
 			[`repeating_${config.section}_${id}_${config.prefix}_name`]: abilityData.name,
 			[`repeating_${config.section}_${id}_${config.prefix}_description`]: abilityData.description,
 			[`repeating_${config.section}_${id}_${config.prefix}_type`]: config.type,
+			[`repeating_${config.section}_${id}_${config.prefix}_subtype`]: subtype,
 			[`repeating_${config.section}_${id}_${config.prefix}_keywords`]: abilityData.keywords.join(', '),
 			[`repeating_${config.section}_${id}_${config.prefix}_trigger`]: abilityData.type.trigger ?? '',
 			[`repeating_${config.section}_${id}_${config.prefix}_distance`]: distance,
