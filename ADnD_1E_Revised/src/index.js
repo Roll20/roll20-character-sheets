@@ -2207,6 +2207,31 @@ const setWeaponsUpdate = (current_version, final_version) => {
   });
 };
 
+// One-time update: sets all weapons default values
+const setNWPUpdate = (current_version, final_version) => {
+  getSectionIDs('nonweaponproficiencies', (idArray) => {
+    const output = {};
+    const fields = [];
+    _.each(idArray, (id) => {
+      fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_attribute'));
+      fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_slots'));
+      fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_modifier'));
+      fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_macro_text'));
+    });
+    getAttrs(fields, (v) => {
+      _.each(idArray, (id) => {
+        output[`repeating_nonweaponproficiencies_${id}_attribute`] = +v[section_attribute('nonweaponproficiencies', id, 'nwp_attribute')] || 0;
+        output[`repeating_nonweaponproficiencies_${id}_slots`] = +v[section_attribute('nonweaponproficiencies', id, 'nwp_slots')] || 0;
+        output[`repeating_nonweaponproficiencies_${id}_modifier`] = +v[section_attribute('nonweaponproficiencies', id, 'nwp_modifier')] || 0;
+        output[`repeating_nonweaponproficiencies_${id}_macro_text`] = v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] || 0;
+      });
+      output.sheet_version = current_version;
+      clog(`VERSION UPDATE: setNWPUpdate completed`);
+      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+    });
+  });
+};
+
 // One-time update: migrate Weapon weight and cost to repeating_equipment
 const clearWeaponsWeightCost = () => {
   // clear old weapon weight and cost values
@@ -2529,6 +2554,8 @@ versionator = (current_version, final_version) => {
     initMacroUpdate(1.656, final_version);
   } else if (current_version < 1.658) {
     updateCriticalDamageMacro(1.658, final_version);
+  } else if (current_version < 1.659) {
+    setNWPUpdate(1.66, final_version);
     // all updates completed
   } else if (current_version < final_version) {
     setAttrs({
@@ -2542,7 +2569,7 @@ versionator = (current_version, final_version) => {
 // Versioning
 on('sheet:opened', () => {
   // SET LATEST VERSION HERE. needs to be => the last update made in versionator
-  const final_version = 1.658;
+  const final_version = 1.66;
   getAttrs(['sheet_version', 'old_character'], (v) => {
     const output = {};
     let current_version = float(v.sheet_version);
@@ -4310,7 +4337,7 @@ damageMacro = (id) => {
   getAttrs(['toggle_auto_damage'], (v) => {
     const output = {};
     const autoDamage = +v.toggle_auto_damage;
-    clog(`auto damage toggle:${autoDamage}`);
+    // clog(`auto damage toggle:${autoDamage}`);
     // NOTE: these macros substitute the damage rolls for the chatmenu buttons directly to support crit logic
     const damageSmallMedium = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
     const damageLarge = ` vs LG [[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
@@ -4347,7 +4374,7 @@ damageMacro = (id) => {
 on(
   'change:repeating_weapon:weapon_name change:repeating_weapon:weapon_damagesmallmedium change:repeating_weapon:weapon_damagelarge change:repeating_weapon:weapon_critdamagesmallmedium change:repeating_weapon:weapon_critdamagelarge change:repeating_weapon:weapon_attackdmgbonus change:repeating_weapon:weapon_critdamage_flag',
   (eventInfo) => {
-    clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
     damageMacro(id);
   },
@@ -4441,6 +4468,7 @@ function setWeapons(id) {
     section_attribute('weapon', id, 'weapon_damage_chat_menu_npc'),
   ];
   getAttrs(fields, (v) => {
+    // console.log(`Change detected: ${fields}`);
     output.repeating_weapon_weapon_use = +v[section_attribute('weapon', id, 'weapon_use')] || 0;
     output.repeating_weapon_weapon_attack_type_flag = +v[section_attribute('weapon', id, 'weapon_attack_type_flag')] || 0;
     output.repeating_weapon_weapon_critdamage_flag = +v[section_attribute('weapon', id, 'weapon_critdamage_flag')] || 1;
@@ -4535,9 +4563,9 @@ function setEquipment(id) {
   ];
   const combined = [...nonRep, ...fields];
   getAttrs(combined, (v) => {
+    // console.log(`Change detected: ${fields}`);
     const equipTab = +v.equipment_tabs_type || 0;
     const equipType = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
-    clog(`equipType:${equipType}`);
     output.repeating_equipment_equipment_type = equipType <= 0 || equipTab === -1 ? 0 : equipType;
     output.repeating_equipment_equipment_magical = +v[section_attribute('equipment', id, 'equipment_magical')] || 0;
     output.repeating_equipment_equipment_show_type = +v[section_attribute('equipment', id, 'equipment_show_type')] || 0;
@@ -4571,14 +4599,35 @@ function setEquipment(id) {
   });
 }
 
+function setNWP(id) {
+  const output = {};
+  const fields = [
+    section_attribute('nonweaponproficiencies', id, 'nwp_attribute'),
+    section_attribute('nonweaponproficiencies', id, 'nwp_slots'),
+    section_attribute('nonweaponproficiencies', id, 'nwp_modifier'),
+    section_attribute('nonweaponproficiencies', id, 'nwp_macro_text'),
+  ];
+  getAttrs(fields, (v) => {
+    // console.log(`Change detected: ${fields}`);
+    output.repeating_nonweaponproficiencies_attribute = +v[section_attribute('nonweaponproficiencies', id, 'nwp_attribute')] || 0;
+    output.repeating_nonweaponproficiencies_slots = +v[section_attribute('nonweaponproficiencies', id, 'nwp_slots')] || 0;
+    output.repeating_nonweaponproficiencies_modifier = +v[section_attribute('nonweaponproficiencies', id, 'nwp_modifier')] || 0;
+    output.repeating_nonweaponproficiencies_macro_text = v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] || 0;
+    setAttrs(output, {silent: true});
+  });
+}
+
 // Set repeating attr values for new rows. Makes visible to API
-on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item', (eventInfo) => {
+on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item change:repeating_nonweaponproficiencies:nwp_name', (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
-  if (eventInfo.newValue !== eventInfo.previousValue) return;
+  // if (eventInfo.newValue !== eventInfo.previousValue) return;
   // test for new row name (ie no existing value)
+  // console.log(`Change detected: new: ${eventInfo.newValue} previous:${eventInfo.previousValue}`);
+  if (eventInfo.previousValue !== undefined) return;
+
   if (eventInfo.sourceAttribute.includes('equipment_item')) {
     // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Setting default values.`);
     setEquipment(id);
@@ -4586,6 +4635,10 @@ on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_ite
   if (eventInfo.sourceAttribute.includes('weapon_name')) {
     // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Setting default values.`);
     setWeapons(id);
+  }
+  if (eventInfo.sourceAttribute.includes('nwp_name')) {
+    // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Setting default values.`);
+    setNWP(id);
   }
 });
 
@@ -7006,36 +7059,36 @@ class StrengthAdjustmentTable {
   constructor() {
     // MeleeAttackBonus, MeleeDamageBonus, EncumbranceBonus, MinorStrengthCheck, MinorStrengthCheck(locked), MajorStrengthCheck
     this.strength_dict = {
-      3: new StrengthCheck(-3, -1, -350, 15, 0, 0),
-      4: new StrengthCheck(-2, -1, -250, 15, 0, 0),
-      5: new StrengthCheck(-2, -1, -250, 15, 0, 0),
-      6: new StrengthCheck(-1, 0, -150, 15, 0, 0),
-      7: new StrengthCheck(-1, 0, -150, 15, 0, 0),
-      8: new StrengthCheck(0, 0, 0, 30, 0, 1),
-      9: new StrengthCheck(0, 0, 0, 30, 0, 1),
-      10: new StrengthCheck(0, 0, 0, 30, 0, 2),
-      11: new StrengthCheck(0, 0, 0, 30, 0, 2),
-      12: new StrengthCheck(0, 0, 100, 30, 0, 4),
-      13: new StrengthCheck(0, 0, 100, 30, 0, 4),
-      14: new StrengthCheck(0, 0, 200, 30, 0, 7),
-      15: new StrengthCheck(0, 0, 200, 30, 0, 7),
-      16: new StrengthCheck(0, 1, 350, 50, 0, 10),
-      17: new StrengthCheck(1, 1, 500, 50, 0, 13),
+      3: new StrengthCheck(-3, -1, -350, 1, 0, 0),
+      4: new StrengthCheck(-2, -1, -250, 1, 0, 0),
+      5: new StrengthCheck(-2, -1, -250, 1, 0, 0),
+      6: new StrengthCheck(-1, 0, -150, 1, 0, 0),
+      7: new StrengthCheck(-1, 0, -150, 1, 0, 0),
+      8: new StrengthCheck(0, 0, 0, 2, 0, 1),
+      9: new StrengthCheck(0, 0, 0, 2, 0, 1),
+      10: new StrengthCheck(0, 0, 0, 2, 0, 2),
+      11: new StrengthCheck(0, 0, 0, 2, 0, 2),
+      12: new StrengthCheck(0, 0, 100, 2, 0, 4),
+      13: new StrengthCheck(0, 0, 100, 2, 0, 4),
+      14: new StrengthCheck(0, 0, 200, 2, 0, 7),
+      15: new StrengthCheck(0, 0, 200, 2, 0, 7),
+      16: new StrengthCheck(0, 1, 350, 3, 0, 10),
+      17: new StrengthCheck(1, 1, 500, 3, 0, 13),
       18: {
-        None: new StrengthCheck(1, 2, 750, 50, 0, 16),
-        '01-50': new StrengthCheck(1, 3, 1000, 50, 0, 20),
-        '51-75': new StrengthCheck(2, 3, 1250, 70, 0, 25),
-        '76-90': new StrengthCheck(2, 4, 1500, 70, 0, 30),
-        '91-99': new StrengthCheck(2, 5, 2000, 70, 15, 35),
-        '00': new StrengthCheck(3, 6, 3000, 85, 30, 40),
+        None: new StrengthCheck(1, 2, 750, 3, 0, 16),
+        '01-50': new StrengthCheck(1, 3, 1000, 3, 0, 20),
+        '51-75': new StrengthCheck(2, 3, 1250, 4, 0, 25),
+        '76-90': new StrengthCheck(2, 4, 1500, 4, 0, 30),
+        '91-99': new StrengthCheck(2, 5, 2000, 4, 1, 35),
+        '00': new StrengthCheck(3, 6, 3000, 5, 2, 40),
       },
-      19: new StrengthCheck(3, 7, 4500, 90, 50, 50),
-      20: new StrengthCheck(3, 8, 5000, 90, 50, 60),
-      21: new StrengthCheck(4, 9, 6000, 90, 70, 70),
-      22: new StrengthCheck(4, 10, 7500, 90, 70, 80),
-      23: new StrengthCheck(5, 11, 9000, 90, 85, 90),
-      24: new StrengthCheck(6, 12, 12000, 95, 87, 100),
-      25: new StrengthCheck(7, 14, 15000, 95, 90, 100),
+      19: new StrengthCheck(3, 7, 4500, 7, 3, 50),
+      20: new StrengthCheck(3, 8, 5000, 7, 3, 60),
+      21: new StrengthCheck(4, 9, 6000, 9, 4, 70),
+      22: new StrengthCheck(4, 10, 7500, 11, 4, 80),
+      23: new StrengthCheck(5, 11, 9000, 11, 5, 90),
+      24: new StrengthCheck(6, 12, 12000, 19, 7, 100),
+      25: new StrengthCheck(7, 14, 15000, 23, 9, 100),
     };
   }
 
@@ -7503,10 +7556,66 @@ intelligenceCalcs = () => {
   getAttrs(['intelligence', 'bonuslanguages', 'race'], (values) => {
     const output = {};
     const stat_int = parseValues(values, 'intelligence', 'int');
-    // set bonus languages if human
     const race_value = parseValues(values, 'race', 'str');
+    let tableBonus = +AT_INT.getEntry(stat_int).getBonusLanguages();
     if (/human/gi.test(race_value)) {
-      output.bonuslanguages = AT_INT.getEntry(stat_int).getBonusLanguages();
+      // bonus language INT table data is given for humans
+      output.bonuslanguages = tableBonus;
+    } else if (/dwarf/gi.test(race_value) || /gnome/gi.test(race_value) || /orc/gi.test(race_value)) {
+      // dwarf, gnome, and half-orc are capped at 2
+      output.bonuslanguages = Math.min(tableBonus, 2);
+    } else if (/half-elf/gi.test(race_value) || /halfling/gi.test(race_value) || /hobbit/gi.test(race_value)) {
+      // half-elf or halfling gain +1 for every point above 16
+      if (tableBonus <= 5) {
+        tableBonus = 0;
+      } else if (tableBonus === 6) {
+        tableBonus = 1;
+      } else if (tableBonus === 7) {
+        tableBonus = 2;
+      } else if (tableBonus === 8) {
+        tableBonus = 3;
+      } else if (tableBonus === 9) {
+        tableBonus = 4;
+      } else if (tableBonus === 10) {
+        tableBonus = 5;
+      } else if (tableBonus === 11) {
+        tableBonus = 6;
+      } else if (tableBonus === 12) {
+        tableBonus = 7;
+      } else if (tableBonus === 13) {
+        tableBonus = 8;
+      } else if (tableBonus >= 14) {
+        tableBonus = 9;
+      }
+      output.bonuslanguages = tableBonus;
+    } else if (/elf/gi.test(race_value)) {
+      // elf +1 for every point above 15
+      if (tableBonus <= 4) {
+        tableBonus = 0;
+      } else if (tableBonus === 5) {
+        tableBonus = 1;
+      } else if (tableBonus == 6) {
+        tableBonus = 2;
+      } else if (tableBonus === 7) {
+        tableBonus = 3;
+      } else if (tableBonus === 8) {
+        tableBonus = 4;
+      } else if (tableBonus === 9) {
+        tableBonus = 5;
+      } else if (tableBonus === 10) {
+        tableBonus = 6;
+      } else if (tableBonus === 11) {
+        tableBonus = 7;
+      } else if (tableBonus === 12) {
+        tableBonus = 8;
+      } else if (tableBonus === 13) {
+        tableBonus = 9;
+      } else if (tableBonus >= 14) {
+        tableBonus = 10;
+      }
+      output.bonuslanguages = tableBonus;
+    } else {
+      output.bonuslanguages = 0;
     }
     output.knowspell = AT_INT.getEntry(stat_int).getKnowSpell();
     output.minspells = AT_INT.getEntry(stat_int).getMinSpells();

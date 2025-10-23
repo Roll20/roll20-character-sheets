@@ -80,6 +80,15 @@ let updateAttack = (attackId, modifiers) => {
     const dgtTotalAttk = attackId + "_degats";
     const atqTotalAttk = attackId + "_atq-total";
     getAttrs([bbaAttr, atqCaracAttr, atqModAttr, atqMod2Attr, dgtBaseAttr, dgtCaracAttr, dgtBonusAttr, "for_mod", "dex_mod"], function (values) {
+        let atkAttrs = {
+            bba: values[bbaAttr],
+            atqCarac: values[atqCaracAttr],
+            atqMod: values[atqModAttr],
+            atqMod2: values[atqMod2Attr],
+            dgtBase: values[dgtBaseAttr],
+            dgtCarac: values[dgtCaracAttr],
+            dgtBonus: values[dgtBonusAttr],
+        }
         const bba = parseInt(values[bbaAttr]) || 0;
         const atqCarac = values[atqCaracAttr];
         const atqMod = parseInt(values[atqModAttr]) || 0;
@@ -113,7 +122,7 @@ let updateAttack = (attackId, modifiers) => {
             atqBonus = "-" + atqBonus;
         }
         let degats = dgtBase + " + " + degatsBonus;
-        let rollValue = getRollFromModifiers(modifiers);
+        let rollValue = updateRoll(atkAttrs,modifiers);
         let update = {};
         update[dgtTotalAttk] = degats;
         update[atqTotalAttk] = atqBonus;
@@ -124,10 +133,32 @@ let updateAttack = (attackId, modifiers) => {
     });
 }
 
-let getRollFromModifiers = (modifiers) => {
+let updateRoll = (atk_attrs,modifiers) => {
+    console.log(atk_attrs);
     let baseRoll = `&{template:attack} {{titre=^{rolltemplate.attack.with} @{name}}} {{subtitle=@{character_name}}}`;
-    let attackRoll = "1d20+@{bba}[BAB]+@{atq-carac-val}[Caracteristic]+@{atq-bonus}[Enhancement Bonus]+@{atq-bonus-2}[Misc Bonus]";
-    let damageRoll = "@{dgt-base}[Base Damage]+@{dgt-carac-val}[Caracteristic]+@{dgt-bonus}[Enhancement Bonus]";
+
+    let attackRoll = "1d20";
+    if(atk_attrs.bba){
+        attackRoll+= "+@{bba}[BAB]"
+    }
+    if(atk_attrs.atqCarac){
+        attackRoll+= "+@{atq-carac-val}[Caracteristic]";
+    }
+    if(atk_attrs.atqMod){
+        attackRoll+= "+@{atq-bonus}[Enhancement Bonus]";
+    }
+    if(atk_attrs.atqMod2){
+        attackRoll+= "+@{atq-bonus-2}[Misc Bonus]";
+    }
+
+    let damageRoll = "@{dgt-base}[Base Damage]";
+    if(atk_attrs.dgtCarac){
+        damageRoll+= "+@{dgt-carac-val}[Caracteristic]";
+    }
+    if(atk_attrs.dgtBonus){
+        damageRoll+= "+@{dgt-bonus}[Enhancement Bonus]";
+    }
+
     for(let modifier of modifiers){
         if(modifier.enabled !== "on" || (!modifier.attack_mod && !modifier.damage_mod)){
             continue;

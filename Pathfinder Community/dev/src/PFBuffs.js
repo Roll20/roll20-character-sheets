@@ -745,7 +745,7 @@ function updateBuffTotal (col, rows, v, setter) {
 		if(col==='cmd' && bonuses.dodge!==0) {
 			TAS.info('column is CMD, setting buffsFFcmdOnlyTemp to dodge buff:'+bonuses.dodge);
 			let buffsFFcmdOnlyTemp = bonuses.dodge;
-			setter['buff_ffCMD-nododge'] = buffsFFcmdOnlyTemp;
+			setter['buff_ffCMD-nododge'] = buffsFFcmdOnlyTemp || 0;
 			TAS.info('buff_ffCMD-nododge now set same as dodge buff:'+buffsFFcmdOnlyTemp);
 		}
 

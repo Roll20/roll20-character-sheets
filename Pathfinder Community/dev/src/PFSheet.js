@@ -502,6 +502,9 @@ function migrate(oldversion, callback, errorCallback) {
       if (oldversion < 1.826) {
         PFMacros.checkAbilityType2();
       }
+      if (oldversion < 1.829) {
+        PFAttacks.recalculate(null, null, oldversion);
+      }
     }
   } catch (err) {
     TAS.error('PFSheet.migrate', err);
@@ -681,7 +684,7 @@ export function checkForUpdate(forceRecalc) {
         currVer = parseFloat(v.PFSheet_Version, 10) || 0,
         setUpgradeFinished = function () {
           SWUtils.setWrapper(
-            {recalc1: 0, migrate1: 0, is_newsheet: 0, character_sheet: 'Pathinder_Neceros v' + String(PFConst.version), PFSheet_Version: String(PFConst.version.toFixed(3))},
+            {recalc1: 0, migrate1: 0, is_newsheet: 0, character_sheet: 'Pathfinder_Neceros v' + String(PFConst.version), PFSheet_Version: String(PFConst.version.toFixed(3))},
             PFConst.silentParams,
             function () {
               if (currVer < 1.17) {

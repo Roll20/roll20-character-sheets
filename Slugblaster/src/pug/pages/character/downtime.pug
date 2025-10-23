@@ -1,0 +1,76 @@
+mixin makeDowntimeFieldset(fieldset)
+  - const { downtime } = data.character;
+  - const beats = downtime.beats[fieldset.name];
+  +panel({ name: fieldset.name, title: fieldset.title }).downtime
+    +block('content')
+      +editorblock(fieldset.name)
+        +block('edit')
+          +hidden("personality")
+          each field in beats
+            if field.type === "checkbox"
+              label(class=field.blockName, for=field.name)
+                +field(field)
+                span(data-i18n=field.name)= field.label
+            else
+              -
+                const checkbox = structuredClone(field)
+                checkbox.type = 'checkbox'
+                checkbox.name = `${checkbox.name}_checkbox`
+              .beats__custom(class=field.blockName)
+                label(for=checkbox.name)
+                  +field(checkbox)
+                +field(field)
+
+        +block('view')
+          each field in beats
+            if field.type === "checkbox"
+              +hidden(field.name)
+              span(data-i18n=field.name)= field.label
+            else
+              +hidden(`${field.name}_checkbox`)
+              +span(field)
+
+  //- if fieldset.name === "personality-arc"
+    +blob({ name: fieldset.name})
+      +block('content')
+        +repeating(fieldset.name)
+          - const { broadcast, repeating } = downtime;
+          - const [check, name, cost, desc, result] = repeating;
+          +block('edit')
+            .row.downtime__edit
+              //- each field in hidden
+                +field(field)
+              each field in repeating
+                - const hideLabel = ['downtime_check', 'downtime_name'].includes(field.name);
+                - const divClass = field.span ? `col-${field.span}` : '';
+                - const labelClass = hideLabel ? 'visually-hidden' : null;
+
+                .downtime__field(class=`${field.name} ${divClass}`)
+                  unless field.type === "checkbox"
+                    +field(field)
+                    label(class=labelClass, data-i18n=field.name, for=field.name)= field.label
+                  else
+                    label(for=field.name)
+                      +field(field)
+                      span(class=labelClass, data-i18n=field.name)= field.label
+
+          +block('view')
+            +bubble({ name: 'downtime', broadcast })
+              +block('header')
+                .downtime__view
+                  label.downtime__check
+                    +field(check).checkbox--scribble
+                    +span(name).downtime__name
+                  +span(cost).downtime__cost
+
+              +block('content')
+                +span(result)
+                label(data-i18n=result.name)= result.label
+                +span(desc)
+                label(data-i18n=desc.name)= desc.label
+
+          +block('delete')
+            +span(name).downtime__name
+
+each section in data.character.downtime.sections
+  +makeDowntimeFieldset(section)
