@@ -3,7 +3,7 @@
 
 
 	<div class="nav">
-		<input type="hidden" class="mooktoggle" name="attr_mooksheet_flag" value='0' />
+		<input type="hidden" class="mooktoggle" name="attr_mooksheet_flag" value="0" />
 
 		<div class="character-mode"><button type="action" name="act_character" >CHARACTER</button></div>
 		<div class="mook-mode"><button type="action" name="act_mook" >MOOK</button></div>
@@ -86,7 +86,8 @@
 					<div class="bg-white skill-rank"><input type="number" name="attr_rankMoto" placeholder="0"/></div>
 				</div>
 
-				<div class="flex-table">
+				<input type="hidden" class="settings-toggle-show-initiative-modifier" name="attr_initiative_modifier_flag" value="0" />
+				<div class="flex-table initiative-modifier">
 					<div class="bg-black-2 skill-name">Initiative Modifier</div>
 					<div class="bg-white skill-rank"><input type="number" name="attr_initiative_modifier" value="0"/></div>
 				</div>
@@ -912,7 +913,8 @@
 						<button type="roll" name="roll_weapon_dmg" style="display: none;" value="@{DMG}"></button>
 						<input type="hidden" name="attr_WeaponMod" value="@{Total_Melee}">
 						<div class="bg-white weapon-name">
-							<button name="roll_aimed_shot" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{aimed_shot=1}}  {{roll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1d10]]}}" title="Aimed Shot">⌖</button>
+							<input type="hidden" class="settings-toggle-show-aimed-shot-button" name="attr_aimed_shot_flag" value="0" />
+							<button name="roll_aimed_shot" type="roll" class="txt-btn aimed-shot-icon" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{aimed_shot=1}}  {{roll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1d10]]}}" title="Aimed Shot">⌖</button>
 							<button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button>
 							<input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here...">
 						</div>
@@ -1603,31 +1605,66 @@
 	</div>
 
 	<div class="settings">
-
-		<div class="nav">
-			<div><button class="options" type="action" name="act_resetbase" >RESET BASE SKILLS</button></div>
-			<div><button class="options" type="action" name="act_newcharacter" >TOGGLE STAT/SKILLPOINT TRACKER</button></div>
-		</div>
-
 		<div class="my-settings">
-			<div class="option">
-				<div class="settings-title">ENABLE MOOK SHEET</div>
-				<div class='settings-checkbox'>
-					<input type="hidden" class="mooktoggle" name="attr_mooksheet_flag" value=0/>
-					<button type="action" name="act_mooksheet" class="mooktoggle">
-						<span class="checked">✓</span>
-					</button>
+
+			<div class="settings-row">
+				<h3>CHARACTER SHEET OPTIONS</h3>
+				<div class="nav">
+					<div><button class="options" type="action" name="act_resetbase" >RESET BASE SKILLS</button></div>
+					<div><button class="options" type="action" name="act_newcharacter" >TOGGLE STAT/SKILLPOINT TRACKER</button></div>
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">ENABLE MOOK SHEET</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="mooktoggle" name="attr_mooksheet_flag" value="0" />
+							<button type="action" name="act_mooksheet" class="mooktoggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">SHOW INITIATIVE MODIFIER</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="settings-toggle settings-toggle-show-initiative-modifier" name="attr_initiative_modifier_flag" value="0" />
+							<button type="action" name="act_initiative_modifier" class="settings-toggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
 
-			<div class="option">
-				<div class="settings-title">AIMED SHOT PENALTY</div>
-				<div class='settings-text'>
-					<input type="number" name="attr_aimed_shot_penalty" value="-8" />
+			<div class="settings-row">
+				<h3>AIMED SHOT OPTIONS</h3>
+				<div class="settings-help">
+					When enabled, an aimed shot button is displayed next to the "Attack" button for each weapon.
+					The button will be displayed as a crosshair icon that looks like this: "<span class="aimed-shot-icon">⌖</span>".
+				</div>
+				<div class="settings-option">
+					<div class="settings-title settings-title-show-aimed" name="title_show_aimed_button">SHOW AIMED SHOT BUTTON</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="settings-toggle settings-toggle-show-aimed-shot-button" name="attr_aimed_shot_flag" value="0" />
+							<button type="action" name="act_aimed_shot" class="settings-toggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">AIMED SHOT PENALTY</div>
+					<div class="settings-value">
+						<div class="settings-number">
+							<input type="number" name="attr_aimed_shot_penalty" value="-8" />
+						</div>
+					</div>
 				</div>
 			</div>
+
 		</div>
-
 	</div>
 
 	<div class="mook">
@@ -1717,7 +1754,8 @@
 						<button type="roll" name="roll_weapon_dmg" style="display: none;" value="@{DMG}"></button>
 						<input type="hidden" name="attr_WeaponMod" value="@{Total_Melee}">
 						<div class="bg-white weapon-name">
-							<button name="roll_aimed_shot" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{aimed_shot=1}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1d10]]}}" title="Aimed Shot">⌖</button>
+							<input type="hidden" class="settings-toggle-show-aimed-shot-button" name="attr_aimed_shot_flag" value="0" />
+							<button name="roll_aimed_shot" type="roll" class="txt-btn aimed-shot-icon" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{aimed_shot=1}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1d10]]}}" title="Aimed Shot">⌖</button>
 							<button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button>
 							<input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here..."></div>
 						<div class="bg-white weapon-type">
@@ -3231,7 +3269,10 @@
 		});
 	});
 
-	const toggleList = ["cbaudio","lefteye","righteye","rightarm","leftarm","neurallink","rightleg","leftleg","mooksheet"];
+	const toggleList = [
+		"cbaudio","lefteye","righteye","rightarm","leftarm","neurallink","rightleg","leftleg","mooksheet",
+		"initiative_modifier"
+	];
 	toggleList.forEach(function(button) {
 		on(`clicked:${button}`, function() {
 			const flag = `${button}_flag`;
@@ -3239,6 +3280,22 @@
 				setAttrs({
 					[flag]: v[flag] !== "1" ? "1" : "0"
 				});
+			});
+		});
+	});
+	on('clicked:aimed_shot', function() {
+		getAttrs(['aimed_shot_flag'], function(v) {
+			const flag_value = v['aimed_shot_flag'] !== "1" ? "1" : "0";
+			setAttrs({
+				['aimed_shot_flag']: flag_value
+			});
+
+			getSectionIDs("repeating_weapons", function(idarray) {
+				const output = {};
+				idarray.forEach(id => {
+					output[`repeating_weapons_${id}_aimed_shot_flag`] = flag_value;
+				});
+				setAttrs(output);
 			});
 		});
 	});
