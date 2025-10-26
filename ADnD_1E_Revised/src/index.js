@@ -2569,7 +2569,7 @@ versionator = (current_version, final_version) => {
 // Versioning
 on('sheet:opened', () => {
   // SET LATEST VERSION HERE. needs to be => the last update made in versionator
-  const final_version = 1.66;
+  const final_version = 1.67;
   getAttrs(['sheet_version', 'old_character'], (v) => {
     const output = {};
     let current_version = float(v.sheet_version);
