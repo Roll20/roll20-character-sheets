@@ -3129,7 +3129,7 @@
 		// 2. Define the character-level attributes needed for both.
 		const globalAttrsToGet = prefix === 'repeating_npcabilities'
 			? [] // Monster abilities need nothing
-			: ['resource_name']; // Player abilities need resource_name
+			: ['resource_name','kit_melee_damage_1','kit_melee_damage_2','kit_melee_damage_3','kit_ranged_damage_1','kit_ranged_damage_2','kit_ranged_damage_3' ]; // Player abilities need resource names and kit damage info
 			
 		const characteristics = isPowerRoll ? ['might', 'agility', 'reason', 'intuition', 'presence'] : [];
 				
@@ -3208,8 +3208,28 @@
 			powerroll = getTranslationByKey('power-roll');
 		}
 		
+		const melee = getTranslationByKey('melee');
+		const ranged = getTranslationByKey('ranged');
+		const weapon = getTranslationByKey('weapon');
+		const abilityKeywords = attrs[`${prefix}_${abilityPrefix}keywords`].split(',').map(item => item.trim());
+		const kit = [];
+		if (abilityKeywords.includes(weapon)) {
+			if (abilityKeywords.includes(melee)) {
+				kit.push(parseInt(attrs['kit_melee_damage_1']));
+				kit.push(parseInt(attrs['kit_melee_damage_2']));
+				kit.push(parseInt(attrs['kit_melee_damage_3']));
+			} else if (abilityKeywords.includes(ranged)) {
+				kit.push(parseInt(attrs['kit_ranged_damage_1']));
+				kit.push(parseInt(attrs['kit_ranged_damage_2']));
+				kit.push(parseInt(attrs['kit_ranged_damage_3']));
+			}
+		}
+			
+		
 		
 		const type = attrs[`${prefix}_${abilityPrefix}type`] === 'no-action' ? '' : getTranslationByKey(attrs[`${prefix}_${abilityPrefix}type`]);
+		// check keywords for damage calculation
+		
 		
 		// Build the directMap - these will be transformed into a {{key=value}} format.
 		directMap = {
@@ -3223,9 +3243,9 @@
 			target: attrs[`${prefix}_${abilityPrefix}target`] || '',
 			trigger: attrs[`${prefix}_${abilityPrefix}trigger`] || '',
 			characteristic: characteristic,
-			tier1: attrs[`${prefix}_${abilityPrefix}tier_1`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_1`]) : '',
-			tier2: attrs[`${prefix}_${abilityPrefix}tier_2`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_2`]) : '',
-			tier3: attrs[`${prefix}_${abilityPrefix}tier_3`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_3`]) : '',
+			tier1: attrs[`${prefix}_${abilityPrefix}tier_1`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_1`], kit[0] || 0) : '',
+			tier2: attrs[`${prefix}_${abilityPrefix}tier_2`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_2`], kit[1] || 0)  : '',
+			tier3: attrs[`${prefix}_${abilityPrefix}tier_3`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_3`], kit[2] || 0) : '',
 			special: attrs[`${prefix}_${abilityPrefix}special`] || '',
 			effect: attrs[`${prefix}_${abilityPrefix}effect`] || '',
 			malprop: attrs[`${prefix}_${abilityPrefix}malice`] || '',
@@ -3288,19 +3308,13 @@
 			P: { macro: '@{presence}',  title: presence},
 		};
 		
-		console.log(tierEffect);
 		// Split the tier effect at the semi colon.
 		const parts = tierEffect.split(';');
-		console.log('parts',parts);
 		// The first element of parts should contain the damage. The second should have effects, if anything. 
 		// Split the damage section it using spaces to get the individual elements.
 		const damageSection = parts[0].split(' ');
 		const effectSection = parts.length > 1 ? '; ' + parts[1] : '';
-		console.log('damageSection',damageSection);
-		console.log('effectSection',effectSection);
-		
 		const damageBase = parseInt(damageSection[0]);
-		console.log('damageBase',damageBase);
 		
 		// If the first element is not a number we aren't dealing with a form we can calculate. 
 		if (!damageBase) {
@@ -3326,8 +3340,9 @@
 		}
 		if (kit) {
 			//Add Kit Damage
+			kitTrans = getTranslationByKey('kit');
 			damageCalc.push('+');
-			damageCalc.push(kit + '[^{kit}]');
+			damageCalc.push(kit + '[' + kitTrans + ']');
 		}
 		
 		if (other) {
