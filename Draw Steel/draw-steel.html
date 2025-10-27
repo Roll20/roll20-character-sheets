@@ -3183,7 +3183,7 @@
 	 ** @param {string} tierEffect  The name of the repeating ability (e.g "repeating_abilities").
 	 ** @returns {string}           Altered tier effect for roll template
 	 **/
-	function damageCalculation(tierEffect, keyword) {
+	function damageCalculation(tierEffect, kit = 0, other = 0) {
 		console.log('~~~ damageCalculation ~~~');
 	
 		if (!tierEffect) {
@@ -3210,32 +3210,53 @@
 		console.log(tierEffect);
 		// Split the tier effect at the semi colon.
 		const parts = tierEffect.split(';');
-		
+		console.log('parts',parts);
 		// The first element of parts should contain the damage. The second should have effects, if anything. 
 		// Split the damage section it using spaces to get the individual elements.
 		const damageSection = parts[0].split(' ');
 		const effectSection = parts.length > 1 ? '; ' + parts[1] : '';
+		console.log('damageSection',damageSection);
+		console.log('effectSection',effectSection);
 		
 		const damageBase = parseInt(damageSection[0]);
+		console.log('damageBase',damageBase);
 		
 		// If the first element is not a number we aren't dealing with a form we can calculate. 
 		if (!damageBase) {
 			return tierEffect;
 		}
 		
+		let damageType = [];
+		let damageCalc = [];
 		// Since the first element is the base damage, if the second should is a '+' the third should be the characteristic.
 		if (damageSection[1] === '+') {
 			if (damageSection[2] in charMap) {
 				damageSection[2] = charMap[damageSection[2]].macro + `[${charMap[damageSection[2]].title}]`;
+				damageType = damageSection.slice(3);
+				damageCalc = damageSection.slice(0,3);
+				console.log('damageType and Calc',damageType, damageCalc);
+		
 			} else {
 				return tierEffect;
 			}
+		} else {
+			damageType = damageSection.slice(1);
+			damageCalc.push(damageSection[0]);
+		}
+		if (kit) {
+			//Add Kit Damage
+			damageCalc.push('+');
+			damageCalc.push(kit + '[^{kit}]');
 		}
 		
+		if (other) {
+			//Add Other Damage
+		}
 		// rebuild the tier effect String
 		const newTierEffect = '[[' +
-			damageSection.join(' ') 
+			damageCalc.join(' ') 
 			+ ']]' 
+			+ damageType.join(' ')
 			+ effectSection;
 			
 		return newTierEffect;
