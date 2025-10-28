@@ -2668,7 +2668,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     </div>
 
     <div class='prop_pair'>
-      <span><b>Hits</b></span>
+      <span>
+        <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span> <span name='attr_hp_info' class='stat_info'></span> 
+        <b>Hits (HP)</b>
+      </span>
       <span>
         <input type='number' name='attr_hp'> / <span name='attr_hp_max'></span><br>
       </span>
@@ -3618,7 +3621,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     </div>
 
     <div class='prop_pair'>
-      <span><b>Hits</b></span>
+      <span>
+        <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span> <span name='attr_hp_info' class='stat_info'></span> 
+        <b>Hits (HP)</b>
+      </span>
       <span>
         <input type='number' name='attr_hp'> / <span name='attr_hp_max'></span><br>
       </span>
@@ -6539,6 +6545,9 @@ This is not for usual use. </p>
 <button type="roll" class='tokenaction' name="roll_initiative" value="@{initiative_action}">initiative</button>
 <input type="hidden" name="attr_initiative_action">
 <button type="action" style="-toby-display:none;" name="act_initiative-action">initiative</button>
+<button type="roll" class='tokenaction' name="roll_target" value="@{target_action}">target</button>
+<input type="hidden" name="attr_target_action">
+<button type="action" style="-toby-display:none;" name="act_target-action">target</button>
 
 
 <hr>
@@ -6559,7 +6568,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision b123d1d6a01d6d00a55d6fb3684bc0052468cd58
+Revision b3f99272102505a6d97d305927a099116c2dc84e
 
 
 <hr>
@@ -7624,7 +7633,7 @@ function F(num) {
 }
 
 /**
- * Returns the bonus for a particualr name in a misctr
+ * Returns the bonus for a particular name in a misctr
  */
 function miscBonusGet(miscstr, name) {
     if (typeof(miscstr) != 'string' || miscstr == '') {
@@ -7772,7 +7781,15 @@ function miscMessagePrefix(miscstr, prefix) {
     return miscRawMessagePrefix(misc, prefix);
 }
 
-
+// Finds a bonus with the appropriate prefix
+// Returns {} ->
+function miscBonusPrefix(miscstr, prefix) {
+    if (typeof(miscstr) !== 'string' || miscstr === '') {
+	return {};
+    }
+    const misc = JSON.parse(miscstr);
+    return miscRawBonusPrefix(misc, prefix);
+}
 
 function miscAttrSet(attr, name, value) {
     let toget = attr;
@@ -7845,6 +7862,18 @@ function miscRawMessagePrefix(misc, prefix) {
 	}
     }
     return false;
+}
+
+// Finds a message with the appropriate prefix.
+function miscRawBonusPrefix(misc, prefix) {
+    for (const obj of misc) {
+	if (obj.name && typeof(obj.name) === 'string' &&
+		obj.name.startsWith(prefix)) {
+	    // Return it
+	    return obj
+	}
+    }
+    return {};
 }
 
 function miscRawToString(misc) {
@@ -8139,7 +8168,7 @@ let RMURaces = {};
 	"pr_misc", "qu_misc", "re_misc", "sd_misc", "st_misc",
         "rr_channeling_misc", "rr_essence_misc", "rr_mentalim_misc",
         "rr_fear_misc", "rr_physical_misc",
-        "endurance_misc", "bodydevelopment_misc",
+        "endurance_misc", "hp_misc",
 	"bmr_misc", "dp_misc"
       ], (miscdata) => {
 
@@ -8153,7 +8182,7 @@ let RMURaces = {};
 
 	// data-stats
 	for (stat in racedata["data-stats"])  {
-	  // get the shortname
+	    // get the shortname
 	  const sname = RMUStats.getStatAbbrFromName(stat)
 	  doMiscSet(sname + "_misc", racedata['data-stats'][stat]);
 	}
@@ -8166,7 +8195,7 @@ let RMURaces = {};
 	{
 	  const health = racedata['data-health'];
 	  doMiscSet("endurance_misc", health.Endurance || 0);
-	  doMiscSet("bodydevelopment_misc", health["Base Hits"]);
+	  doMiscSet("hp_misc", health["Base Hits"]);
 	  // FIXME setAttr correct call
 	  updates.recovery_multiplier = health["Recovery Mult"];
       }
@@ -17352,7 +17381,7 @@ function doTurn() {
       updates.currentphasedisplay = roundString(currentphase);
 
       VrmuSetAttrs(updates, ()=> {
-	  sendEOTMessage(`${name} completes their turn (Round ${round} / Phase ${relativephase})`);
+	  sendEOTMessage(`${name} completes their turn (Round ${updates.currentphasedisplay})`)
 	  actionsUpdateStatus();
 	  updatetokenmarkers();
       });
@@ -17465,23 +17494,38 @@ const fatigueResults = {
 
 onCheck("change:hppenalty change:injurypenalty change:fatigue", updatePenalties);
 
-onCheck("change:bodydevelopment_bonus change:powerdevelopment_bonus", (x) => {
-    getAttrs(['bodydevelopment_bonus', 'hp', 'pp', 'powerdevelopment_bonus', 'hits'], (ev) => {
+onCheck("change:bodydevelopment_bonus change:powerdevelopment_bonus", updateHPPP);
+
+function updateHPPP(x) {
+    getAttrs(['bodydevelopment_bonus', 'hp', 'pp', 'powerdevelopment_bonus', 'hits',
+	  'hp_misc'], (ev) => {
 	let update = {}
+	let hplog = "Hit Points\n"
+	let hp = 0;
+
+        {
+	  let [mtot, mlog] = miscBonusTotal(ev.hp_misc);
+	  hplog += mlog
+	  hp += mtot;
+	}
+	let bdbonus = parseIntDefault(ev.bodydevelopment_bonus, 0)
+	hp += bdbonus;
+	hplog += `${bdbonus}  Body Development`;
 	// Creatures use 'hits'; Use that instead of bodydevelopement
-	let hp = ev.bodydevelopment_bonus;
-	let pp = ev.powerdevelopment_bonus;
 	if (ev.hits) {
 	  hp = ev.hits
 	}
 	update.hp_max = hp;
+	update.hp_info = hplog;
+
+	let pp = ev.powerdevelopment_bonus;
 	if (pp < 0) {
 	  pp = 0;
 	}
 	update.pp_max = pp
 	setAttrs(update, { silent:true });
     });
-});
+}
 
 // Update the endurance modifier
 onCheck("change:bodydevelopment_bonus change:endurance_misc change:mentalfocus_bonus", (_) => {
@@ -19268,6 +19312,11 @@ function doVersionCheck(version, sheettype) {
     version = 14;
   }
 
+  if (version == 14) {
+    addPendingFunction("Upgrade to V15: Fix racial HP bonus", upgradeV14to15HPFix)
+    version = 15;
+  }
+
   if (oldversion != version) {
     addPendingFunction(`Version update to ${version}`, () => {
 	setAttrsPending({version: version});
@@ -19438,9 +19487,35 @@ function upgradeV6to7() {
       });
     });
   });
-
-
 }
+
+// So I was adding the racial bonus to body development.
+// frewfrux pointed out this is wrong: This means you get
+// racial bonus to Endurance
+function upgradeV14to15HPFix() {
+  getAttrsPending(["hp_misc", "bodydevelopment_misc"], (data) => {
+      console.log("Data for upgrade", data)
+      let res = miscBonusPrefix(data.bodydevelopment_misc, "Racial");
+      if (res && res.name) {
+	// Found it: Lets delete it
+	let updates = {}
+	updates.bodydevelopment_misc = miscBonusRemove(data.bodydevelopment_misc, res.name);
+
+	// Now add to the HP misc
+	let hpms = miscRawGetFromString(data.hp_misc);
+	hpms.push(res);
+	updates.hp_misc = miscRawToString(hpms);
+	console.log(updates)
+	setAttrsPending(updates);
+
+	// After we are done; do these
+	addPendingFunction("Post V15 Upgrade; Update All Skills", RMUSkills.updateAllSkills);
+	addPendingFunction("Post V15 Upgrade; Update HP", updateHPPP);
+	addPendingFunction("Post V15 Upgrade; Update Endurance", updateEnduranceBonus);
+      }
+  });
+}
+
 
 
 
@@ -19625,7 +19700,8 @@ const actionCalls = [
 	'ap➙melee_action',
 	'ap➙missile_action', 'ap➙clear_action', 'ap➙spell_action',
 	'ap➙perception_action', 'ap➙concentration_action', 'ap➙free_action',
-	'ap➙status_action', 'end turn_action', "initiative_action"];
+	'ap➙status_action', 'end turn_action', "initiative_action",
+	'target_action'];
 onCheck("sheet:opened change:character_name", (_) => {
   getAttrs(['character_name',...actionCalls],(attributes) => {
     const setObj = actionCalls.reduce((m,attr) => {
@@ -19699,7 +19775,11 @@ onCheck("clicked:ap➙status-action", (ev) => { actionStatus(ev); });
 onCheck("clicked:ap➙clear-action", (ev) => { actionClear(); });
 
 onCheck("clicked:end turn-action", (ev) => {
-  doTurn();
+    doTurn();
+});
+onCheck("clicked:target-action", (_) => {
+    console.log("Target action clicked");
+    attacks.getTargetData('target');
 });
 
 onCheck("clicked:initiative-action", (ev) => {
