@@ -3763,6 +3763,7 @@
 		TEXT: 'Text',
 		ABILITY: 'Ability',
 		CLASS_ABILITY: 'Class Ability',
+		CHARACTERISTIC_BONUS: 'Characteristic Bonus',
 	};
 
 	/**
@@ -3832,6 +3833,23 @@
 			.map(({ damageType, amount }) => `${damageType} ${amount}`)
 			.join(', ');
 	};
+	
+	/**
+	 * Calculates characteristics by summing its base value and bonuses 
+	 * from features.
+	 * @param {Array<Object>} features - The character's list of features.
+	 * @param {string} statName - The name of the characteristic to calculate (e.g., 'Agility').
+	 * @param {number} baseValue - The starting base value for the characteristic.
+	 * @returns {number} The calculated total for the characteristic.
+	 */
+	const calculateCharacteristic = (features, statName, baseValue = 0) => {
+		// Sum bonuses from features of type 'Bonus' that match the stat name.
+		const bonusFromFeatures = features
+			.filter(f => f.type === FEATURE_TYPES.CHARACTERISTIC_BONUS && f.data.characteristic === statName)
+			.reduce((sum, f) => sum + f.data.value, 0);
+		
+		return baseValue + bonusFromFeatures;
+	};
 
 	/**
 	 * Extracts and joins selected skills from a specific skill group.
@@ -3887,11 +3905,11 @@
 			// Primary characteristics (attributes).
 			const characteristics = characterClass.characteristics;
 			const findCharacteristic = (name) => characteristics.find(c => c.characteristic === name)?.value || 0;
-			const might = findCharacteristic('Might');
-			const agility = findCharacteristic('Agility');
-			const reason = findCharacteristic('Reason');
-			const intuition = findCharacteristic('Intuition');
-			const presence = findCharacteristic('Presence');
+			const might = calculateCharacteristic(allFeatures, 'Might', findCharacteristic('Might'));
+			const agility = calculateCharacteristic(allFeatures, 'Agility', findCharacteristic('Agility'));
+			const reason = calculateCharacteristic(allFeatures, 'Reason', findCharacteristic('Reason'));
+			const intuition = calculateCharacteristic(allFeatures, 'Intuition', findCharacteristic('Intuition'));
+			const presence = calculateCharacteristic(allFeatures, 'Presence', findCharacteristic('Presence'));
 
 
 			// 3. DERIVED & COMBAT STATISTICS
