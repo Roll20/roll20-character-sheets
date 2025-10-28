@@ -1,3 +1,26 @@
+# 2025-10-28
+
+- Add target to token actions
+- Races.js -> Galvinise it first.
+- Add a HP Info box
+- Sheet version updated to 15
+  - Move Racial Hits bonus to hp_misc
+  - Fixes issue where characters got Racial Hits as a bonus to Endurance.
+    - Thanks @frewfrux for the report!
+  - Force update to udpate Endurance, body dev and hp
+- Add hp_info & display it
+- Creation: Save HP in base hits
+- Fix display of current phase when ending a turn
+  - Thanks @saramund for the report!
+
+## Compendium:
+
+- Banecroft:  Add descriptions to the heros and BBEG
+- Arcane:
+  - Knacks for Arcanist & Archmage: All professions have knacks & costs now
+  - Fix Witchblade base lists to remove warnings
+  - Arcane: Places of power nearly done
+
 # 2025-10-21
 
 - Injuries:
