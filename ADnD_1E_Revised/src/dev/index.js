@@ -2569,7 +2569,7 @@ versionator = (current_version, final_version) => {
 // Versioning
 on('sheet:opened', () => {
   // SET LATEST VERSION HERE. needs to be => the last update made in versionator
-  const final_version = 1.66;
+  const final_version = 1.67;
   getAttrs(['sheet_version', 'old_character'], (v) => {
     const output = {};
     let current_version = float(v.sheet_version);
@@ -2916,6 +2916,8 @@ on('change:repeating_equipment:equipment_carried_select change:repeating_equipme
     // jumps to equip type tab unless Show All or same equip type tab
     output.equipment_tabs_type = typeTab !== -1 && isType ? thisType : typeTab;
     // jumps to carry type tab unless Show All or same carry type tab
+    const testCarrySelected = carriedTab === -1 || carriedTab === thisCarriedSelect ? -1 : thisCarriedSelect;
+    console.log(`Change detected: testCarrySelected:${testCarrySelected}`);
     output.equipment_tabs_carry = carriedTab === -1 || carriedTab === thisCarriedSelect ? -1 : thisCarriedSelect;
     setAttrs(output);
   });
@@ -2923,7 +2925,7 @@ on('change:repeating_equipment:equipment_carried_select change:repeating_equipme
 
 // Equipment Tabs hide/show Rows
 on('change:equipment_tabs_type change:equipment_tabs_carry change:repeating_equipment:equipment_magical', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  clog(`Change Detected:${eventInfo.sourceAttribute}`);
   getSectionIDs('repeating_equipment', (idArray) => {
     const fields = [];
     _.each(idArray, (id) => {
@@ -2941,11 +2943,12 @@ on('change:equipment_tabs_type change:equipment_tabs_carry change:repeating_equi
         const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 0; // 0, 1, 2
         // CSS to hide/show the repeating row based on typeTab and/or carriedTab
         if (typeTab === -1 || typeTab === thisType || (typeTab === 3 && isMagical)) {
+          output[section_attribute('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
           return (output[section_attribute('equipment', id, 'equipment_show_type')] = 1);
         } else {
+          output[section_attribute('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
           output[section_attribute('equipment', id, 'equipment_show_type')] = 0;
         }
-        output[section_attribute('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
       });
       setAttrs(output);
     });
@@ -3471,8 +3474,8 @@ function createAttack(id) {
       output[`repeating_weapon_${newID}_weapon_range`] = v[`repeating_equipment_${id}_equipment_weapon_range`];
       output[`repeating_weapon_${newID}_weapon_quantity`] = +v[`repeating_equipment_${id}_equipment_quantity`] || 0;
       output[`repeating_weapon_${newID}_weapon_notes`] = v[`repeating_equipment_${id}_equipment_description`];
-      setAttrs(output, {silent: true});
-      damageMacro(newID);
+      // set new row with equip values then set attack defaults and damage macros
+      setAttrs(output, {silent: true}, setWeapons(id), damageMacro(newID));
     },
   );
 }
