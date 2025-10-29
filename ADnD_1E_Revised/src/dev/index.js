@@ -2569,7 +2569,7 @@ versionator = (current_version, final_version) => {
 // Versioning
 on('sheet:opened', () => {
   // SET LATEST VERSION HERE. needs to be => the last update made in versionator
-  const final_version = 1.67;
+  const final_version = 1.68;
   getAttrs(['sheet_version', 'old_character'], (v) => {
     const output = {};
     let current_version = float(v.sheet_version);
@@ -3716,6 +3716,7 @@ on('change:caster_class1_name change:caster_class2_name change:caster_class1_lev
   setSpellsCasterClass();
 });
 
+// Set/Update Caster Class and level
 on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_class', (eventInfo) => {
   // console.log(`sourceType:${eventInfo.sourceType}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
@@ -3735,6 +3736,25 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
       output[section_attribute('spells', id, 'spell_caster_class_level')] = +v.caster_class2_level || 0;
       output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
     }
+    setAttrs(output, {silent: true});
+  });
+});
+
+// Set Spell's Level for new spells based on Spell level Tab
+on('change:repeating_spells:spell_name', (eventInfo) => {
+  // console.log(`sourceType:${eventInfo.sourceType}`);
+  // test if API is creating the repeating row and bail
+  if (eventInfo.sourceType !== 'player') return;
+  const id = eventInfo.sourceAttribute.split('_')[2];
+  getAttrs([`repeating_spells_${id}_spell_level`, 'spell_tabs'], (v) => {
+    const output = {};
+    const levelTab = +v.spell_tabs || 0;
+    const thisSpellLevel = v[section_attribute('spells', id, 'spell_level')];
+    // console.log(`Change detected: Spell Tab:${levelTab} Spell Lvl:${thisSpellLevel}`);
+    // test if Spell Tab is set to 'All' or if this Spell's Lvl has already been set
+    if (levelTab === -1 || thisSpellLevel != '?') return;
+    // set this spell's lvl to the current tab
+    output[`repeating_spells_${id}_spell_level`] = levelTab;
     setAttrs(output, {silent: true});
   });
 });
