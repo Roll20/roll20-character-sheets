@@ -3670,7 +3670,7 @@ on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_cla
     const levelTab = +v.spell_tabs || 0;
     const thisLevel = v.repeating_spells_spell_level;
     // jumps to spell level tab unless Show All or same level tab
-    output.spell_tabs = thisLevel >= 0 && levelTab !== thisLevel ? thisLevel : levelTab;
+    output.spell_tabs = levelTab >= 0 && levelTab !== thisLevel ? thisLevel : levelTab;
     // jumps to caster class tab unless Show All or same caster tab
     output.spell_caster_tabs = casterTab !== -1 && thisCaster <= 1 ? 0 : 1;
     setAttrs(output);
