@@ -7944,7 +7944,7 @@ on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use chang
   weaponInUse();
 });
 
-// sort
+// sort repeating rows
 on('clicked:spell-sort-alphabetical', function (eventInfo) {
   console.log(`Change detected: Sorting Spells`);
   getSectionIDs('repeating_spells', (idArray) => {
