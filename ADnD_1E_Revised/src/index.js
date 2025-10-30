@@ -7944,7 +7944,7 @@ on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use chang
   weaponInUse();
 });
 
-// sort Spells Alphabetically
+// sort
 on('clicked:spell-sort-alphabetical', function (eventInfo) {
   console.log(`Change detected: Sorting Spells`);
   getSectionIDs('repeating_spells', (idArray) => {
@@ -7956,28 +7956,73 @@ on('clicked:spell-sort-alphabetical', function (eventInfo) {
     idArray.forEach((id) => {
       fields.push(section_attribute('spells', id, 'spell_name'));
     });
-    getAttrs(['spell_sort_direction', ...fields], (v) => {
-      // current sort direction (0 = Asc, 1 = Desc)
-      let currentDirection = +v.spell_sort_direction || 0;
-      let newDirection = currentDirection === 0 ? 1 : 0;
-
+    getAttrs([...fields], (v) => {
       const spells = idArray.map((id) => ({
         id,
         name: (v[section_attribute('spells', id, 'spell_name')] || '').trim(),
       }));
 
-      // Sorting logic based on newDirection (0 = Asc, 1 = Desc)
       spells.sort((a, b) => {
-        const comparison = a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
-        // If '0' (Asc), use natural comparison (1); if '1' (Desc), reverse it (-1)
-        return newDirection === 0 ? comparison : comparison * -1;
+        return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
       });
 
       // Apply the new order
       const order = spells.map((s) => `${s.id}`);
       setSectionOrder('spells', order);
-      output.spell_sort_direction = newDirection;
-      console.log(`Reordered repeating_spells (${newDirection}):`, spells);
+      console.log(`Reordered repeating_spells:`, spells);
+
+      setAttrs(output, {silent: true});
+    });
+  });
+});
+
+on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', function (eventInfo) {
+  console.log(`Change detected: Sorting Equipment`);
+  getSectionIDs('repeating_equipment', (idArray) => {
+    // No repeating entries found... bail
+    if (!idArray.length) return;
+    const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
+    const output = {};
+    const fields = [];
+    // grab attrs needed for sorting
+    idArray.forEach((id) => {
+      fields.push(section_attribute('equipment', id, 'equipment_item'));
+      fields.push(section_attribute('equipment', id, 'equipment_location'));
+    });
+    getAttrs([...fields], (v) => {
+      const equipment = idArray.map((id) => ({
+        id,
+        name: (v[section_attribute('equipment', id, 'equipment_item')] || '').trim(),
+        location: (v[section_attribute('equipment', id, 'equipment_location')] || '').trim(),
+      }));
+
+      if (buttonClicked === 'equipment-sort-alphabetical') {
+        equipment.sort((a, b) => {
+          // Standard alphabetical sort by equipment name
+          return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+        });
+      } else if (buttonClicked === 'equipment-sort-location') {
+        equipment.sort((a, b) => {
+          // 1. Compare by location first
+          const locationComparison = a.location.localeCompare(b.location, undefined, {sensitivity: 'base'});
+
+          // If locations are different (non-zero result), return the location comparison
+          if (locationComparison !== 0) {
+            return locationComparison;
+          }
+
+          // 2. If locations are the same (locationComparison is 0), then compare by equipment name
+          return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+        });
+      }
+
+      // Only apply the new order if a recognized sort button was clicked
+      if (buttonClicked === 'equipment-sort-alphabetical' || buttonClicked === 'equipment-sort-location') {
+        // Apply the new order
+        const order = equipment.map((s) => `${s.id}`);
+        setSectionOrder('equipment', order);
+        console.log(`Reordered repeating_equipment:`, equipment);
+      }
 
       setAttrs(output, {silent: true});
     });
