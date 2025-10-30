@@ -67,6 +67,7 @@
           </h5>
           <ul>
             <h5>Latest</h5>
+            <li>Added an alphabetical sort option to spells. Button will toggle A-Z or Z-A.</li>
             <li>Update to Spells; adding new spells will automatically set the Spell's level based on the current Spell Level tab selected. example; If the current Spell Tab is set to show "3rd" level spells and a new spell is added "+", entering a spell name will trigger the sheet to set the Spell's level to "3". If the tab is set to "All" or if the Spell's level has already been set, the Spell's level will not be changed. If the spell is added using an API mod, the Spell's level will not be changed.</li>
             <li>"Spell Lvl" is now shown with the Spell Name and #Memorized/Prepared. Hidden when the Spell details is expanded.</li>
             <li>Made a correction with the Spell Level Tab behavior when editing a Spell's Level while showing "All" levels. Tab would incorrectly change the Spell Level Tab to match the new Spell Level. Expected behavior is to stay on "All".</li>
@@ -4307,7 +4308,11 @@
             <input type="checkbox" name="attr_toggle_show_memorized" title="@{toggle_show_memorized}" value="1">
           </label>
           <label class="right">
-            <button type="action" name="act_sortspellsalphabetcially" title="Sort rows alphabetically.">Sort A-Z</button>
+            <button type="action" name="act_spell-sort-alphabetical" title="Sort rows alphabetically.">
+              <input type="checkbox" class="hidden sort-direction" name="attr_spell_sort_direction" value="1" checked/>
+              <span class="sort-a-z">Sort A-Z</span>
+              <span class="sort-z-a">Sort Z-A</span>
+            </button>
           </label>
         </div>
         <div class="spell-tabs">
@@ -13467,22 +13472,22 @@ weaponInUse = () => {
     const fields = [];
     const weaponsInUse = [];
     // Array to store weapons with inUse === 1
-    idArray.forEach((rowID) => {
-      fields.push(section_attribute('weapon', rowID, 'weapon_name'));
-      fields.push(section_attribute('weapon', rowID, 'weapon_use'));
-      fields.push(section_attribute('weapon', rowID, 'weapon_speed'));
-      fields.push(section_attribute('weapon', rowID, 'weapon_misc'));
+    idArray.forEach((id) => {
+      fields.push(section_attribute('weapon', id, 'weapon_name'));
+      fields.push(section_attribute('weapon', id, 'weapon_use'));
+      fields.push(section_attribute('weapon', id, 'weapon_speed'));
+      fields.push(section_attribute('weapon', id, 'weapon_misc'));
     });
     getAttrs(fields, (v) => {
-      idArray.forEach((rowID) => {
-        const inUse = +v[section_attribute('weapon', rowID, 'weapon_use')] || 0;
+      idArray.forEach((id) => {
+        const inUse = +v[section_attribute('weapon', id, 'weapon_use')] || 0;
         if (inUse === 0) return;
-        const name = v[section_attribute('weapon', rowID, 'weapon_name')];
+        const name = v[section_attribute('weapon', id, 'weapon_name')];
         // default to 0 if empty otherwise grab the first integer entered
-        const speedStr = v[section_attribute('weapon', rowID, 'weapon_speed')] || '0';
+        const speedStr = v[section_attribute('weapon', id, 'weapon_speed')] || '0';
         const speed = parseInt(speedStr.match(/\d+/)?.[0]) || 0;
-        const misc = v[section_attribute('weapon', rowID, 'weapon_misc')];
-        weaponsInUse.push({rowID, name, inUse, speed, misc});
+        const misc = v[section_attribute('weapon', id, 'weapon_misc')];
+        weaponsInUse.push({id, name, inUse, speed, misc});
       });
 
       // Find fastest(ie lowest) speed factor
@@ -13514,34 +13519,43 @@ on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use chang
   weaponInUse();
 });
 
-/* Sort Basic Spells Sheetworker */
-on('clicked:sortspellsalphabetcially', function (eventInfo) {
-  console.log(`Change detected: Sort Spells A-Z`);
-  getSectionIDs('repeating_spells', (ids) => {
+// sort Spells Alphabetically
+on('clicked:spell-sort-alphabetical', function (eventInfo) {
+  console.log(`Change detected: Sorting Spells`);
+  getSectionIDs('repeating_spells', (idArray) => {
     // No repeating entries found... bail
-    if (!ids.length) return;
-
-    // Build a list of all attributes to fetch
+    if (!idArray.length) return;
+    const output = {};
     const fields = [];
-    ids.forEach((id) => {
-      fields.push(`repeating_spells_${id}_spell_name`);
+    // grab attrs needed for sorting
+    idArray.forEach((id) => {
+      fields.push(section_attribute('spells', id, 'spell_name'));
     });
+    getAttrs(['spell_sort_direction', ...fields], (v) => {
+      // current sort direction (0 = Asc, 1 = Desc)
+      let currentDirection = +v.spell_sort_direction || 0;
+      let newDirection = currentDirection === 0 ? 1 : 0;
 
-    getAttrs([...fields], (v) => {
-      const spells = ids.map((id) => ({
+      const spells = idArray.map((id) => ({
         id,
-        name: (v[`repeating_spells_${id}_spell_name`] || '').trim(),
+        name: (v[section_attribute('spells', id, 'spell_name')] || '').trim(),
       }));
 
-      // A-Z Sorting logic
-      spells.sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity: 'base'}));
+      // Sorting logic based on newDirection (0 = Asc, 1 = Desc)
+      spells.sort((a, b) => {
+        const comparison = a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+        // If '0' (Asc), use natural comparison (1); if '1' (Desc), reverse it (-1)
+        return newDirection === 0 ? comparison : comparison * -1;
+      });
 
       // Apply the new order
       const order = spells.map((s) => `${s.id}`);
       setSectionOrder('spells', order);
-      console.log(`Reordered repeating_spells:`, spells);
+      output.spell_sort_direction = newDirection;
+      console.log(`Reordered repeating_spells (${newDirection}):`, spells);
+
+      setAttrs(output, {silent: true});
     });
   });
 });
-/* End of Sort Basic Spells Sheetworker */
 </script>

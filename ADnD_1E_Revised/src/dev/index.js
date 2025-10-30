@@ -7897,22 +7897,22 @@ weaponInUse = () => {
     const fields = [];
     const weaponsInUse = [];
     // Array to store weapons with inUse === 1
-    idArray.forEach((rowID) => {
-      fields.push(section_attribute('weapon', rowID, 'weapon_name'));
-      fields.push(section_attribute('weapon', rowID, 'weapon_use'));
-      fields.push(section_attribute('weapon', rowID, 'weapon_speed'));
-      fields.push(section_attribute('weapon', rowID, 'weapon_misc'));
+    idArray.forEach((id) => {
+      fields.push(section_attribute('weapon', id, 'weapon_name'));
+      fields.push(section_attribute('weapon', id, 'weapon_use'));
+      fields.push(section_attribute('weapon', id, 'weapon_speed'));
+      fields.push(section_attribute('weapon', id, 'weapon_misc'));
     });
     getAttrs(fields, (v) => {
-      idArray.forEach((rowID) => {
-        const inUse = +v[section_attribute('weapon', rowID, 'weapon_use')] || 0;
+      idArray.forEach((id) => {
+        const inUse = +v[section_attribute('weapon', id, 'weapon_use')] || 0;
         if (inUse === 0) return;
-        const name = v[section_attribute('weapon', rowID, 'weapon_name')];
+        const name = v[section_attribute('weapon', id, 'weapon_name')];
         // default to 0 if empty otherwise grab the first integer entered
-        const speedStr = v[section_attribute('weapon', rowID, 'weapon_speed')] || '0';
+        const speedStr = v[section_attribute('weapon', id, 'weapon_speed')] || '0';
         const speed = parseInt(speedStr.match(/\d+/)?.[0]) || 0;
-        const misc = v[section_attribute('weapon', rowID, 'weapon_misc')];
-        weaponsInUse.push({rowID, name, inUse, speed, misc});
+        const misc = v[section_attribute('weapon', id, 'weapon_misc')];
+        weaponsInUse.push({id, name, inUse, speed, misc});
       });
 
       // Find fastest(ie lowest) speed factor
@@ -7944,33 +7944,42 @@ on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use chang
   weaponInUse();
 });
 
-/* Sort Basic Spells Sheetworker */
-on('clicked:sortspellsalphabetcially', function (eventInfo) {
-  console.log(`Change detected: Sort Spells A-Z`);
-  getSectionIDs('repeating_spells', (ids) => {
+// sort Spells Alphabetically
+on('clicked:spell-sort-alphabetical', function (eventInfo) {
+  console.log(`Change detected: Sorting Spells`);
+  getSectionIDs('repeating_spells', (idArray) => {
     // No repeating entries found... bail
-    if (!ids.length) return;
-
-    // Build a list of all attributes to fetch
+    if (!idArray.length) return;
+    const output = {};
     const fields = [];
-    ids.forEach((id) => {
-      fields.push(`repeating_spells_${id}_spell_name`);
+    // grab attrs needed for sorting
+    idArray.forEach((id) => {
+      fields.push(section_attribute('spells', id, 'spell_name'));
     });
+    getAttrs(['spell_sort_direction', ...fields], (v) => {
+      // current sort direction (0 = Asc, 1 = Desc)
+      let currentDirection = +v.spell_sort_direction || 0;
+      let newDirection = currentDirection === 0 ? 1 : 0;
 
-    getAttrs([...fields], (v) => {
-      const spells = ids.map((id) => ({
+      const spells = idArray.map((id) => ({
         id,
-        name: (v[`repeating_spells_${id}_spell_name`] || '').trim(),
+        name: (v[section_attribute('spells', id, 'spell_name')] || '').trim(),
       }));
 
-      // A-Z Sorting logic
-      spells.sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity: 'base'}));
+      // Sorting logic based on newDirection (0 = Asc, 1 = Desc)
+      spells.sort((a, b) => {
+        const comparison = a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+        // If '0' (Asc), use natural comparison (1); if '1' (Desc), reverse it (-1)
+        return newDirection === 0 ? comparison : comparison * -1;
+      });
 
       // Apply the new order
       const order = spells.map((s) => `${s.id}`);
       setSectionOrder('spells', order);
-      console.log(`Reordered repeating_spells:`, spells);
+      output.spell_sort_direction = newDirection;
+      console.log(`Reordered repeating_spells (${newDirection}):`, spells);
+
+      setAttrs(output, {silent: true});
     });
   });
 });
-/* End of Sort Basic Spells Sheetworker */
