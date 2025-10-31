@@ -8,6 +8,9 @@
 		/>
 	</h1>
 	<label>Initiative:</label><button type="roll" value="@{wtype} &amp;{template:simpleroll} {{rolltitle=1d10}} {{roll=[[ [[1d10]][1d10]]]}} {{name=Initiative}} {{charactername=@{character_name}}}" title="Roll 1d10" class="btn ui-draggable"></button>
+	<button class="startcombat-button" type="action" data-i18n-title="startcombat" name="act_startcombat">Start Combat</button>
+	<button class="endcombat-button" type="action" data-i18n-title="endcombat" name="act_endcombat">End Combat</button>
+	<button class="respite-button" type="action" data-i18n-title="respite" name="act_respite">Respite</button>
 	<label class="sheet-options-checkbox-label" for="sheet-options-checkbox">y</label>
 	<input id="sheet-options-checkbox" class="sheet-options-checkbox" type="checkbox" />
 	<div class="sheet-panel sheet-options-toggle">
@@ -194,6 +197,10 @@
 			<div class="movement-input-group">
 				<input type="number" class="input-md" name="attr_stability" title="Macro: @{NAME|stability}" />
 				<label class="sublabel" data-i18n="stability"></label>
+			</div>
+			<div class="movement-input-group">
+				<input type="number" class="input-md" name="attr_forcemove" title="Macro: @{NAME|forcemove}" />
+				<label class="sublabel" data-i18n="forcemove"></label>
 			</div>
 		</div>
 		<!-- Stamina --> 
@@ -597,6 +604,8 @@
 								  <option value="intuition" data-i18n="intuition"></option>
 								  <option value="presence" data-i18n="presence"></option>
 								</select>
+								<input type="checkbox" name="attr_has_damage" />
+								<label data-i18n="damage"></label>
 							</div>
 							<label class="sublabel">≤ 11</label>
 							<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_1" />
@@ -899,6 +908,29 @@
 							<div class="ability-effect grid-span-full">
 								<label><span data-i18n="effect"></span>:</label>
 								<span class="ability-effect" name="attr_heal_effect"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Convert Main Action -->
+				<div class="standard-abilities-item">
+					<input type="hidden" class="ability-name" data-i18n-placeholder="convert" name="attr_convert_name" value="Convert" />
+					<input type="hidden" class="ability-keywords" data-i18n-placeholder="convert-keywords" name="attr_convert_keywords" value="" />
+					<input type="hidden" name="attr_convert_type" value="Main Action" />
+					<input type="hidden" class="ability-effect" name="attr_convert_effect" value="You can convert your main action into a maneuver or a move action, allowing you to take two maneuvers or move actions on your turn." />
+					
+					<div class="ability-card card-display">
+						<button type="action" class="ability-share-button" data-i18n-title="ability-share" name="act_convert_share">
+							<!-- speech balloon -->
+							&#128172;
+						</button>
+						<span class="ability-name" data-i18n-placeholder="Convert" name="attr_convert_name"></span>
+						<div class="ability-details grid-span-full">
+							<span class="ability-keywords" data-i18n-placeholder="convert" name="attr_convert_keywords"></span>
+							<span class="ability-type" data-i18n="main-action"></span>
+							<div class="ability-effect grid-span-full">
+								<label><span data-i18n="effect"></span>:</label>
+								<span class="ability-effect" name="attr_convert_effect"></span>
 							</div>
 						</div>
 					</div>
@@ -2331,6 +2363,14 @@
 				<label data-i18n="save-ends"></label>
 			</div>
 		</fieldset>
+		<div class="savethrow-input-group">
+			<p>Save Ends = 6 or higher at the end of your turn removes the effect</p>
+			<label>1d10:</label><button type="roll" value="@{wtype} &amp;{template:simpleroll} {{rolltitle=1d10}} {{roll=[[ [[1d10]][1d10]]]}} {{name=Saving throw: rolling a 6 or higher removes effect}} {{charactername=@{character_name}}}" title="Roll 1d10" class="btn ui-draggable"></button>
+		</div>
+		<div class="bleed-dying-input-group">
+			<p>Bleeding or Dying:</p>
+			<label>1d6 + level:</label><button type="roll" value="@{wtype} &amp;{template:simpleroll} {{rolltitle=1d6+@{level}}} {{roll=[[1d6[1d6] + @{level}[level]]]}} {{name=Bleeding or Dying}} {{charactername=@{character_name}}}" title="Roll 1d6 + level" class="btn ui-draggable"></button>
+		</div>
 	</div>
 	<!-- NPC Abilities -->
 	<div class="npc-abilities-panel">
@@ -3423,6 +3463,7 @@
 		'charge': false,
 		'defend': false,
 		'heal': false,
+		'convert': false,
 		'aid_attack': false,
 		'catch_breath': false,
 		'hide': false,
@@ -3565,6 +3606,59 @@
 				"potency_strong": highest,
 				"potency_average": highest - 1,
 				"potency_weak": highest - 2,
+			});
+		});
+	}
+
+// Start Combat Calculation
+	on("clicked:startcombat", function() {
+		calculateStartCombat();
+	});
+
+	function calculateStartCombat() {
+		console.log('~~~ calculateStartCombat ~~~');
+		getAttrs(["victories"], function(values) {
+			let victories = parseInt(values.victories)||0;
+			setAttrs({                            
+				"resource": victories			
+			});
+		});
+	}
+
+// End Combat Calculation
+	on("clicked:endcombat", function() {
+		calculateEndCombat();
+	});
+
+	function calculateEndCombat() {
+		console.log('~~~ calculateEndCombat ~~~');
+		getAttrs(["resource", "surges"], function(values) {
+			let resource = parseInt(values.resource)||0;
+			let surges = parseInt(values.surges)||0;
+			setAttrs({                            
+				"resource": 0,
+				"surges": 0			
+			});
+		});
+	}
+
+// Respite Calculation
+	on("clicked:respite", function() {
+		calculateRespite();
+	});
+
+	function calculateRespite() {
+		console.log('~~~ calculateRespite ~~~');
+		getAttrs(["stamina_max", "recoveries_max", "victories", "experience"], function(values) {
+			let stamina_max = parseInt(values.stamina_max)||0;
+			let recoveries_max = parseInt(values.recoveries_max)||0;
+			let victories = parseInt(values.victories)||0;
+			let experience = parseInt(values.experience)||0;
+			setAttrs({                            
+				"stamina": stamina_max,
+				"recoveries": recoveries_max,
+				"experience": experience + victories,
+				"victories": 0,
 			});
 		});
 	}
