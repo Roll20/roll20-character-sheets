@@ -7496,7 +7496,7 @@ class ThiefSkillsDexAdjustmentTable {
     };
   }
   getEntry(str_value) {
-    return this.dexterity_dict[getValidVariable(str_value, 'dexterity', 9, 18)];
+    return this.dexterity_dict[getValidVariable(str_value, 'dexterity', 9, 25)];
   }
 }
 
@@ -7722,7 +7722,7 @@ charismaCalcs = () => {
   });
 };
 
-thiefSkillsDexCalcs = () => {
+thiefSkillsDexCalcs = (autofill_thief_dex) => {
   getAttrs(['dexterity'], (values) => {
     const output = {};
     //get dexterity value and look up table data
@@ -7732,16 +7732,16 @@ thiefSkillsDexCalcs = () => {
     const findRemoveTraps = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getFindRemoveTraps();
     const moveSilently = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getMoveSilently();
     const hideInShadows = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getHideInShadows();
-    output.pickpockets_ability_mod = pickPockets;
-    output.openlocks_ability_mod = openLocks;
-    output.findtraps_ability_mod = findRemoveTraps;
-    output.movequietly_ability_mod = moveSilently;
-    output.hideinshadows_ability_mod = hideInShadows;
+    output.pickpockets_ability_mod = autofill_thief_dex === 1 ? pickPockets : 0;
+    output.openlocks_ability_mod = autofill_thief_dex === 1 ? openLocks : 0;
+    output.findtraps_ability_mod = autofill_thief_dex === 1 ? findRemoveTraps : 0;
+    output.movequietly_ability_mod = autofill_thief_dex === 1 ? moveSilently : 0;
+    output.hideinshadows_ability_mod = autofill_thief_dex === 1 ? hideInShadows : 0;
     setAttrs(output);
   });
 };
 
-thiefSkillsRacialCalcs = () => {
+thiefSkillsRacialCalcs = (autofill_thief_race) => {
   getAttrs(['thief_race_selected'], (values) => {
     const output = {};
     //get racial value from select and look up table data
@@ -7755,14 +7755,14 @@ thiefSkillsRacialCalcs = () => {
     const climbWalls = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getClimbWalls();
     const readLanguages = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getReadLanguages();
 
-    output.pickpockets_racial_mod = pickPockets;
-    output.openlocks_racial_mod = openLocks;
-    output.findtraps_racial_mod = findRemoveTraps;
-    output.movequietly_racial_mod = moveSilently;
-    output.hideinshadows_racial_mod = hideInShadows;
-    output.hearnoise_racial_mod = hearNoise;
-    output.climbwalls_racial_mod = climbWalls;
-    output.readlanguages_racial_mod = readLanguages;
+    output.pickpockets_racial_mod = autofill_thief_race === 1 ? pickPockets : 0;
+    output.openlocks_racial_mod = autofill_thief_race === 1 ? openLocks : 0;
+    output.findtraps_racial_mod = autofill_thief_race === 1 ? findRemoveTraps : 0;
+    output.movequietly_racial_mod = autofill_thief_race === 1 ? moveSilently : 0;
+    output.hideinshadows_racial_mod = autofill_thief_race === 1 ? hideInShadows : 0;
+    output.hearnoise_racial_mod = autofill_thief_race === 1 ? hearNoise : 0;
+    output.climbwalls_racial_mod = autofill_thief_race === 1 ? climbWalls : 0;
+    output.readlanguages_racial_mod = autofill_thief_race === 1 ? readLanguages : 0;
 
     setAttrs(output);
   });
@@ -7772,9 +7772,7 @@ thiefSkillsRacialCalcs = () => {
 on('change:autofill_thief_dex change:dexterity', (eventInfo) => {
   getAttrs(['autofill_thief_dex'], (v) => {
     const autofill_thief_dex = +v.autofill_thief_dex;
-    //bail out if not enabled
-    if (autofill_thief_dex === 0) return;
-    thiefSkillsDexCalcs();
+    thiefSkillsDexCalcs(autofill_thief_dex);
   });
 });
 
@@ -7807,16 +7805,14 @@ on('change:race change:autofill_thief_race change:thief_race_selected', (eventIn
   getAttrs(['race', 'autofill_thief_race'], (v) => {
     const output = {};
     const autofill_thief_race = +v.autofill_thief_race;
-    // bail out if not enabled
-    if (autofill_thief_race === 0) return;
 
     // check attr_race for a match to the race selector
-    const race = v.race || 'human';
+    const race = (v.race || 'human').trim();
     if (triggerAttr === 'autofill_thief_race' || triggerAttr === 'race') {
       output.thief_race_selected = matchRaceName(race);
     }
     setAttrs(output, {silent: true});
-    thiefSkillsRacialCalcs();
+    thiefSkillsRacialCalcs(autofill_thief_race);
   });
 });
 
