@@ -5107,212 +5107,225 @@ on(
       if (!autocalcFill) return;
       const classLinked = +v.thief_class_selected || 1;
       let levelSelected = +v.thief_level || 0;
-      const class1Name = v.class || '';
-      const class2Name = v.secondclass || '';
-      const class3Name = v.thirdclass || '';
+      const class1Name = (v.class || '').trim();
+      const class2Name = (v.secondclass || '').trim();
+      const class3Name = (v.thirdclass || '').trim();
+      const setThiefSkills = (levelSelected) => {
+        if (levelSelected === 0) {
+          output.pickpockets_base = 0;
+          output.openlocks_base = 0;
+          output.findtraps_base = 0;
+          output.movequietly_base = 0;
+          output.hideinshadows_base = 0;
+          output.hearnoise_base = 0;
+          output.climbwalls_base = 0;
+          output.readlanguages_base = 0;
+        }
+        if (levelSelected === 1) {
+          output.pickpockets_base = 30;
+          output.openlocks_base = 25;
+          output.findtraps_base = 20;
+          output.movequietly_base = 15;
+          output.hideinshadows_base = 10;
+          output.hearnoise_base = 10;
+          output.climbwalls_base = 85;
+          output.readlanguages_base = 0;
+        }
+        if (levelSelected === 2) {
+          output.pickpockets_base = 35;
+          output.openlocks_base = 29;
+          output.findtraps_base = 25;
+          output.movequietly_base = 21;
+          output.hideinshadows_base = 15;
+          output.hearnoise_base = 10;
+          output.climbwalls_base = 86;
+          output.readlanguages_base = 0;
+        }
+        if (levelSelected === 3) {
+          output.pickpockets_base = 40;
+          output.openlocks_base = 33;
+          output.findtraps_base = 30;
+          output.movequietly_base = 27;
+          output.hideinshadows_base = 20;
+          output.hearnoise_base = 15;
+          output.climbwalls_base = 87;
+          output.readlanguages_base = 0;
+        }
+        if (levelSelected === 4) {
+          output.pickpockets_base = 45;
+          output.openlocks_base = 37;
+          output.findtraps_base = 35;
+          output.movequietly_base = 33;
+          output.hideinshadows_base = 25;
+          output.hearnoise_base = 15;
+          output.climbwalls_base = 88;
+          output.readlanguages_base = 20;
+        }
+        if (levelSelected === 5) {
+          output.pickpockets_base = 50;
+          output.openlocks_base = 42;
+          output.findtraps_base = 40;
+          output.movequietly_base = 40;
+          output.hideinshadows_base = 31;
+          output.hearnoise_base = 20;
+          output.climbwalls_base = 90;
+          output.readlanguages_base = 25;
+        }
+        if (levelSelected === 6) {
+          output.pickpockets_base = 55;
+          output.openlocks_base = 47;
+          output.findtraps_base = 45;
+          output.movequietly_base = 47;
+          output.hideinshadows_base = 37;
+          output.hearnoise_base = 20;
+          output.climbwalls_base = 92;
+          output.readlanguages_base = 30;
+        }
+        if (levelSelected === 7) {
+          output.pickpockets_base = 60;
+          output.openlocks_base = 52;
+          output.findtraps_base = 50;
+          output.movequietly_base = 55;
+          output.hideinshadows_base = 43;
+          output.hearnoise_base = 25;
+          output.climbwalls_base = 94;
+          output.readlanguages_base = 35;
+        }
+        if (levelSelected === 8) {
+          output.pickpockets_base = 65;
+          output.openlocks_base = 57;
+          output.findtraps_base = 55;
+          output.movequietly_base = 62;
+          output.hideinshadows_base = 49;
+          output.hearnoise_base = 25;
+          output.climbwalls_base = 96;
+          output.readlanguages_base = 40;
+        }
+        if (levelSelected === 9) {
+          output.pickpockets_base = 70;
+          output.openlocks_base = 62;
+          output.findtraps_base = 60;
+          output.movequietly_base = 70;
+          output.hideinshadows_base = 56;
+          output.hearnoise_base = 30;
+          output.climbwalls_base = 98;
+          output.readlanguages_base = 45;
+        }
+        if (levelSelected === 10) {
+          output.pickpockets_base = 80;
+          output.openlocks_base = 67;
+          output.findtraps_base = 65;
+          output.movequietly_base = 78;
+          output.hideinshadows_base = 63;
+          output.hearnoise_base = 30;
+          output.climbwalls_base = 99;
+          output.readlanguages_base = 50;
+        }
+        if (levelSelected === 11) {
+          output.pickpockets_base = 90;
+          output.openlocks_base = 72;
+          output.findtraps_base = 70;
+          output.movequietly_base = 86;
+          output.hideinshadows_base = 70;
+          output.hearnoise_base = 35;
+          output.climbwalls_base = 99.1;
+          output.readlanguages_base = 55;
+        }
+        if (levelSelected === 12) {
+          output.pickpockets_base = 100;
+          output.openlocks_base = 77;
+          output.findtraps_base = 75;
+          output.movequietly_base = 94;
+          output.hideinshadows_base = 77;
+          output.hearnoise_base = 35;
+          output.climbwalls_base = 99.2;
+          output.readlanguages_base = 60;
+        }
+        if (levelSelected === 13) {
+          output.pickpockets_base = 105;
+          output.openlocks_base = 82;
+          output.findtraps_base = 80;
+          output.movequietly_base = 99;
+          output.hideinshadows_base = 85;
+          output.hearnoise_base = 40;
+          output.climbwalls_base = 99.3;
+          output.readlanguages_base = 65;
+        }
+        if (levelSelected === 14) {
+          output.pickpockets_base = 110;
+          output.openlocks_base = 87;
+          output.findtraps_base = 85;
+          output.movequietly_base = 99;
+          output.hideinshadows_base = 93;
+          output.hearnoise_base = 40;
+          output.climbwalls_base = 99.4;
+          output.readlanguages_base = 70;
+        }
+        if (levelSelected === 15) {
+          output.pickpockets_base = 115;
+          output.openlocks_base = 92;
+          output.findtraps_base = 90;
+          output.movequietly_base = 99;
+          output.hideinshadows_base = 99;
+          output.hearnoise_base = 50;
+          output.climbwalls_base = 99.5;
+          output.readlanguages_base = 75;
+        }
+        if (levelSelected === 16) {
+          output.pickpockets_base = 125;
+          output.openlocks_base = 97;
+          output.findtraps_base = 95;
+          output.movequietly_base = 99;
+          output.hideinshadows_base = 99;
+          output.hearnoise_base = 50;
+          output.climbwalls_base = 99.6;
+          output.readlanguages_base = 80;
+        }
+        if (levelSelected === 17) {
+          output.pickpockets_base = 125;
+          output.openlocks_base = 99;
+          output.findtraps_base = 99;
+          output.movequietly_base = 99;
+          output.hideinshadows_base = 99;
+          output.hearnoise_base = 55;
+          output.climbwalls_base = 99.7;
+          output.readlanguages_base = 80;
+        }
+        if (levelSelected > 17) {
+          output.pickpockets_base = 125;
+          output.openlocks_base = 99;
+          output.findtraps_base = 99;
+          output.movequietly_base = 99;
+          output.hideinshadows_base = 99;
+          output.hearnoise_base = 55;
+          output.climbwalls_base = 99.7;
+          output.readlanguages_base = 80;
+        }
+      };
       // sync enabled?
       // check for selected class and use that class level unless changed
       if (syncClass === 1) {
         if (classLinked === 1) {
-          // clog(`Linked Class is: ${class1Name} Current Level:${v.level}`);
           classSelected = matchClassName(class1Name);
           levelSelected = +v.level;
-          output.thief_level = levelSelected;
-        }
-        if (classLinked === 2) {
-          // clog(`Linked Class is: ${class2Name} Current Level:${v.level_2}`);
+          clog(`Linked Class is: ${class1Name} ${classSelected} Current Level:${v.level}`);
+          output.thief_level = classSelected === 4 ? levelSelected : 0;
+          setThiefSkills(levelSelected);
+        } else if (classLinked === 2) {
           classSelected = matchClassName(class2Name);
           levelSelected = +v.level_2;
-          output.thief_level = levelSelected;
-        }
-        if (classLinked === 3) {
-          // clog(`Linked Class is: ${class3Name} Current Level:${v.level_3}`);
+          clog(`Linked Class is: ${class2Name} ${classSelected} Current Level:${v.level_2}`);
+          output.thief_level = classSelected === 4 ? levelSelected : 0;
+          setThiefSkills(levelSelected);
+        } else if (classLinked === 3) {
           classSelected = matchClassName(class3Name);
           levelSelected = +v.level_3;
-          output.thief_level = levelSelected;
+          clog(`Linked Class is: ${class3Name} ${classSelected} Current Level:${v.level_3}`);
+          output.thief_level = classSelected === 4 ? levelSelected : 0;
+          setThiefSkills(levelSelected);
         }
-      }
-      if (levelSelected === 0) return;
-      // set Base by level
-      if (levelSelected === 1) {
-        output.pickpockets_base = 30;
-        output.openlocks_base = 25;
-        output.findtraps_base = 20;
-        output.movequietly_base = 15;
-        output.hideinshadows_base = 10;
-        output.hearnoise_base = 10;
-        output.climbwalls_base = 85;
-        output.readlanguages_base = 0;
-      }
-      if (levelSelected === 2) {
-        output.pickpockets_base = 35;
-        output.openlocks_base = 29;
-        output.findtraps_base = 25;
-        output.movequietly_base = 21;
-        output.hideinshadows_base = 15;
-        output.hearnoise_base = 10;
-        output.climbwalls_base = 86;
-        output.readlanguages_base = 0;
-      }
-      if (levelSelected === 3) {
-        output.pickpockets_base = 40;
-        output.openlocks_base = 33;
-        output.findtraps_base = 30;
-        output.movequietly_base = 27;
-        output.hideinshadows_base = 20;
-        output.hearnoise_base = 15;
-        output.climbwalls_base = 87;
-        output.readlanguages_base = 0;
-      }
-      if (levelSelected === 4) {
-        output.pickpockets_base = 45;
-        output.openlocks_base = 37;
-        output.findtraps_base = 35;
-        output.movequietly_base = 33;
-        output.hideinshadows_base = 25;
-        output.hearnoise_base = 15;
-        output.climbwalls_base = 88;
-        output.readlanguages_base = 20;
-      }
-      if (levelSelected === 5) {
-        output.pickpockets_base = 50;
-        output.openlocks_base = 42;
-        output.findtraps_base = 40;
-        output.movequietly_base = 40;
-        output.hideinshadows_base = 31;
-        output.hearnoise_base = 20;
-        output.climbwalls_base = 90;
-        output.readlanguages_base = 25;
-      }
-      if (levelSelected === 6) {
-        output.pickpockets_base = 55;
-        output.openlocks_base = 47;
-        output.findtraps_base = 45;
-        output.movequietly_base = 47;
-        output.hideinshadows_base = 37;
-        output.hearnoise_base = 20;
-        output.climbwalls_base = 92;
-        output.readlanguages_base = 30;
-      }
-      if (levelSelected === 7) {
-        output.pickpockets_base = 60;
-        output.openlocks_base = 52;
-        output.findtraps_base = 50;
-        output.movequietly_base = 55;
-        output.hideinshadows_base = 43;
-        output.hearnoise_base = 25;
-        output.climbwalls_base = 94;
-        output.readlanguages_base = 35;
-      }
-      if (levelSelected === 8) {
-        output.pickpockets_base = 65;
-        output.openlocks_base = 57;
-        output.findtraps_base = 55;
-        output.movequietly_base = 62;
-        output.hideinshadows_base = 49;
-        output.hearnoise_base = 25;
-        output.climbwalls_base = 96;
-        output.readlanguages_base = 40;
-      }
-      if (levelSelected === 9) {
-        output.pickpockets_base = 70;
-        output.openlocks_base = 62;
-        output.findtraps_base = 60;
-        output.movequietly_base = 70;
-        output.hideinshadows_base = 56;
-        output.hearnoise_base = 30;
-        output.climbwalls_base = 98;
-        output.readlanguages_base = 45;
-      }
-      if (levelSelected === 10) {
-        output.pickpockets_base = 80;
-        output.openlocks_base = 67;
-        output.findtraps_base = 65;
-        output.movequietly_base = 78;
-        output.hideinshadows_base = 63;
-        output.hearnoise_base = 30;
-        output.climbwalls_base = 99;
-        output.readlanguages_base = 50;
-      }
-      if (levelSelected === 11) {
-        output.pickpockets_base = 90;
-        output.openlocks_base = 72;
-        output.findtraps_base = 70;
-        output.movequietly_base = 86;
-        output.hideinshadows_base = 70;
-        output.hearnoise_base = 35;
-        output.climbwalls_base = 99.1;
-        output.readlanguages_base = 55;
-      }
-      if (levelSelected === 12) {
-        output.pickpockets_base = 100;
-        output.openlocks_base = 77;
-        output.findtraps_base = 75;
-        output.movequietly_base = 94;
-        output.hideinshadows_base = 77;
-        output.hearnoise_base = 35;
-        output.climbwalls_base = 99.2;
-        output.readlanguages_base = 60;
-      }
-      if (levelSelected === 13) {
-        output.pickpockets_base = 105;
-        output.openlocks_base = 82;
-        output.findtraps_base = 80;
-        output.movequietly_base = 99;
-        output.hideinshadows_base = 85;
-        output.hearnoise_base = 40;
-        output.climbwalls_base = 99.3;
-        output.readlanguages_base = 65;
-      }
-      if (levelSelected === 14) {
-        output.pickpockets_base = 110;
-        output.openlocks_base = 87;
-        output.findtraps_base = 85;
-        output.movequietly_base = 99;
-        output.hideinshadows_base = 93;
-        output.hearnoise_base = 40;
-        output.climbwalls_base = 99.4;
-        output.readlanguages_base = 70;
-      }
-      if (levelSelected === 15) {
-        output.pickpockets_base = 115;
-        output.openlocks_base = 92;
-        output.findtraps_base = 90;
-        output.movequietly_base = 99;
-        output.hideinshadows_base = 99;
-        output.hearnoise_base = 50;
-        output.climbwalls_base = 99.5;
-        output.readlanguages_base = 75;
-      }
-      if (levelSelected === 16) {
-        output.pickpockets_base = 125;
-        output.openlocks_base = 97;
-        output.findtraps_base = 95;
-        output.movequietly_base = 99;
-        output.hideinshadows_base = 99;
-        output.hearnoise_base = 50;
-        output.climbwalls_base = 99.6;
-        output.readlanguages_base = 80;
-      }
-      if (levelSelected === 17) {
-        output.pickpockets_base = 125;
-        output.openlocks_base = 99;
-        output.findtraps_base = 99;
-        output.movequietly_base = 99;
-        output.hideinshadows_base = 99;
-        output.hearnoise_base = 55;
-        output.climbwalls_base = 99.7;
-        output.readlanguages_base = 80;
-      }
-      if (levelSelected > 17) {
-        output.pickpockets_base = 125;
-        output.openlocks_base = 99;
-        output.findtraps_base = 99;
-        output.movequietly_base = 99;
-        output.hideinshadows_base = 99;
-        output.hearnoise_base = 55;
-        output.climbwalls_base = 99.7;
-        output.readlanguages_base = 80;
+      } else {
+        setThiefSkills(levelSelected);
       }
       setAttrs(output);
     });
@@ -5910,7 +5923,7 @@ function matchClassName(name) {
     return 1;
   } else if (/fighter|paladin|ranger|bard|cavalier|barbarian/.test(lowerCaseName)) {
     return 2;
-  } else if (/magic-user|illusionist|magic|mage/.test(lowerCaseName)) {
+  } else if (/magic-user|illusionist|magic|mage|wizard/.test(lowerCaseName)) {
     return 3;
   } else if (/thief|assassin|rogue|thief-acrobat|acrobat/.test(lowerCaseName)) {
     return 4;
@@ -5981,9 +5994,9 @@ on(
         const classLinked = +v.class_selected || 1;
         let levelSelected = +v.matrix_level || 0;
         let classSelected = +v.matrix_class || 0;
-        const class1Name = v.class || '';
-        const class2Name = v.secondclass || '';
-        const class3Name = v.thirdclass || '';
+        const class1Name = (v.class || '').trim();
+        const class2Name = (v.secondclass || '').trim();
+        const class3Name = (v.thirdclass || '').trim();
         const hitdiceSelected = +v.matrix_hitdice || 0;
         const fighter5Selected = +v.toggle_fighter5 || 0;
         // sync enabled?
