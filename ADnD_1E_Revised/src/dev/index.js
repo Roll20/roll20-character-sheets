@@ -5918,7 +5918,7 @@ on('change:matrix_class', (eventInfo) => {
 
 // match class name to core class & return # for hit table lookup
 function matchClassName(name) {
-  const lowerCaseName = name.toLowerCase();
+  const lowerCaseName = name.trim().toLowerCase();
   if (/cleric|druid|monk/.test(lowerCaseName)) {
     return 1;
   } else if (/fighter|paladin|ranger|bard|cavalier|barbarian/.test(lowerCaseName)) {
@@ -7778,7 +7778,7 @@ on('change:autofill_thief_dex change:dexterity', (eventInfo) => {
 
 // match class name to core class & return # for hit table lookup
 function matchRaceName(name) {
-  const lowerCaseName = name.toLowerCase();
+  const lowerCaseName = name.trim().toLowerCase();
   if (/human/.test(lowerCaseName)) {
     return 1;
   } else if (/dwarf/.test(lowerCaseName)) {
