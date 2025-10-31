@@ -5098,7 +5098,7 @@ on('change:thiefmisc2_base change:thiefmisc2_racial_mod change:thiefmisc2_abilit
 on(
   'change:thief_level change:autofill_thief change:sync_thief_class change:thief_class_selected change:class change:secondclass change:thirdclass change:level change:level_2 change:level_3',
   (eventInfo) => {
-    clog(`Thief Autofill Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Thief Autofill Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['thief_level', 'autofill_thief', 'sync_thief_class', 'thief_class_selected', 'class', 'secondclass', 'thirdclass', 'level', 'level_2', 'level_3'], (v) => {
       const output = {};
       const autocalcFill = +v.autofill_thief || 0;
