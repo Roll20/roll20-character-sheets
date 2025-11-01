@@ -3677,7 +3677,6 @@ on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_cla
   });
 });
 
-// Spell Caster Class Name/Level fill-in
 setSpellsCasterClass = () => {
   getSectionIDs('repeating_spells', (idArray) => {
     const output = {};
@@ -3711,19 +3710,27 @@ setSpellsCasterClass = () => {
   });
 };
 
+// Update ALL Spells to match new Caster and/or Level
 on('change:caster_class1_name change:caster_class2_name change:caster_class1_level change:caster_class2_level', (eventInfo) => {
   // clog(`spell changed by who:${eventInfo.sourceType}`);
   setSpellsCasterClass();
 });
 
-// Set/Update Caster Class and level
+// Set Caster Class and level for THIS Spell based on Caster Tab
 on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_class', (eventInfo) => {
   // console.log(`sourceType:${eventInfo.sourceType}`);
+  // test if API is creating the repeating row and bail
+  if (eventInfo.sourceType !== 'player') return;
+  const previousValue = eventInfo.previousValue;
+  const trigger = eventInfo.sourceAttribute.split('_').slice(3).join('_');
   const id = eventInfo.sourceAttribute.split('_')[2];
-  getAttrs([`repeating_spells_${id}_spell_caster_class`, 'caster_class1_name', 'caster_class1_level', 'caster_class2_name', 'caster_class2_level'], (v) => {
+  const newSpell = previousValue === undefined && trigger === 'spell_name' ? 1 : 0;
+  getAttrs([`repeating_spells_${id}_spell_caster_class`, 'caster_class1_name', 'caster_class1_level', 'caster_class2_name', 'caster_class2_level', 'spell_caster_tabs'], (v) => {
     const output = {};
-    const thisClass = +v[section_attribute('spells', id, 'spell_caster_class')] || 0;
-    // console.log(`thisClass: ${thisClass} id: ${id}`);
+    const casterTab = +v.spell_caster_tabs || 0; // 0, 1, -1
+    let thisClass = +v[section_attribute('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
+    // test for New and not on All tab
+    if (newSpell === 1 && casterTab !== -1) thisClass = casterTab === 0 ? 1 : 2;
     if (thisClass === 0) {
       output[section_attribute('spells', id, 'spell_caster_class_name')] = '';
       output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
@@ -3740,20 +3747,19 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
   });
 });
 
-// Set Spell's Level for new spells based on Spell level Tab
+// Set Spell's Level for new spells based selected Spell level Tab
 on('change:repeating_spells:spell_name', (eventInfo) => {
   // console.log(`sourceType:${eventInfo.sourceType}`);
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
   const id = eventInfo.sourceAttribute.split('_')[2];
-  getAttrs([`repeating_spells_${id}_spell_level`, 'spell_tabs'], (v) => {
+  getAttrs([`repeating_spells_${id}_spell_level`, `repeating_spells_${id}_spell_caster_class`, 'spell_tabs', 'spell_caster_tabs'], (v) => {
     const output = {};
     const levelTab = +v.spell_tabs || 0;
-    const thisSpellLevel = v[section_attribute('spells', id, 'spell_level')];
-    // console.log(`Change detected: Spell Tab:${levelTab} Spell Lvl:${thisSpellLevel}`);
+    const thisSpellLevel = v[section_attribute('spells', id, 'spell_level')] || 0;
+    console.log(`Change detected: [Setting Spell Level based on Spell Tab] SpellTab:${levelTab} ThisSpellLvl:${thisSpellLevel}`);
     // test if Spell Tab is set to 'All' or if this Spell's Lvl has already been set
     if (levelTab === -1 || thisSpellLevel != '?') return;
-    // set this spell's lvl to the current tab
     output[`repeating_spells_${id}_spell_level`] = levelTab;
     setAttrs(output, {silent: true});
   });
