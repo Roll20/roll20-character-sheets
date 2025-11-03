@@ -7966,47 +7966,65 @@ on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use chang
   weaponInUse();
 });
 
+// utility function to grab row order
+const getSectionIDsOrdered = function (sectionName, callback) {
+  getAttrs([`_reporder_${sectionName}`], function (v) {
+    getSectionIDs(sectionName, function (idArray) {
+      let reporderArray = v[`_reporder_${sectionName}`] ? v[`_reporder_${sectionName}`].toLowerCase().split(',') : [],
+        ids = [...new Set(reporderArray.filter((x) => idArray.includes(x)).concat(idArray))];
+      callback(ids);
+    });
+  });
+};
+
 // sort repeating rows
 on('clicked:spell-sort-alphabetical', function (eventInfo) {
   console.log(`Change detected: Sorting Spells`);
-  getSectionIDs('repeating_spells', (idArray) => {
-    // No repeating entries found... bail
-    if (!idArray.length) return;
-    const output = {};
-    const fields = [];
-    // grab attrs needed for sorting
-    idArray.forEach((id) => {
-      fields.push(section_attribute('spells', id, 'spell_name'));
-    });
-    getAttrs([...fields], (v) => {
-      const spells = idArray.map((id) => ({
-        id,
-        name: (v[section_attribute('spells', id, 'spell_name')] || '').trim(),
-      }));
-
-      spells.sort((a, b) => {
-        return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+  const sectionName = 'repeating_spells';
+  // needed to grab current/previous order
+  getSectionIDsOrdered(sectionName, function (ids) {
+    getSectionIDs(sectionName, (idArray) => {
+      // Bail out IF 0 repeating entries
+      if (!idArray.length) return;
+      const fields = [];
+      // grab any attrs used for sorting
+      idArray.forEach((id) => {
+        fields.push(section_attribute('spells', id, 'spell_name'));
       });
+      getAttrs([...fields], (v) => {
+        const output = {};
+        const spells = idArray.map((id) => ({
+          id,
+          name: (v[section_attribute('spells', id, 'spell_name')] || '').trim(),
+        }));
 
-      // Apply the new order
-      const order = spells.map((s) => `${s.id}`);
-      setSectionOrder('spells', order);
-      console.log(`Reordered repeating_spells:`, spells);
+        spells.sort((a, b) => {
+          return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+        });
 
-      setAttrs(output, {silent: true});
+        // new sort order
+        const order = spells.map((s) => `${s.id}`);
+
+        // previous order/state. Can this be used to 'Undo' AZ sort?
+        output.spells_previous_order_array = [`${ids}`];
+        console.log(ids);
+        // set new sort order after grabbing current/previous order
+        setAttrs(output, {silent: true}, setSectionOrder('spells', order));
+        console.log(`Reordered ${sectionName}:`, spells);
+      });
     });
   });
 });
 
 on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', function (eventInfo) {
   console.log(`Change detected: Sorting Equipment`);
-  getSectionIDs('repeating_equipment', (idArray) => {
-    // No repeating entries found... bail
+  const sectionName = 'repeating_equipment';
+  getSectionIDs(sectionName, (idArray) => {
+    // Bail out IF 0 repeating entries
     if (!idArray.length) return;
     const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
-    const output = {};
     const fields = [];
-    // grab attrs needed for sorting
+    // grab any attrs used for sorting
     idArray.forEach((id) => {
       fields.push(section_attribute('equipment', id, 'equipment_item'));
       fields.push(section_attribute('equipment', id, 'equipment_location'));
@@ -8045,8 +8063,14 @@ on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', functi
         setSectionOrder('equipment', order);
         console.log(`Reordered repeating_equipment:`, equipment);
       }
-
-      setAttrs(output, {silent: true});
     });
   });
+});
+
+on('clicked:spell-sort-undo', (eventInfo) => {
+  console.log(`Change detected: Undo last Sort`);
+  // eventInfo.sourceAttribute is the full name (including repeating ID) of the attribute
+  // eventInfo.previousValue is the original value of the attribute that triggered this event, before being changed.
+  // eventInfo.newValue is the current value of the attribute that triggered this event, having been changed.
+  // eventInfo.triggerName is the full name of the action button attribute.
 });
