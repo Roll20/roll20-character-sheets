@@ -162,7 +162,7 @@
 				</div>
 				</div>
 			<div class="dashboard-recoveries minimize-ignore">
-				<div class="dashboard-stat-group">
+				<div class="dashboard-stat-group recovery-input-group">
 					<label data-characteristic="recoveries" data-i18n="recoveries">Recoveries</label>
 					<input type="number" name="attr_recoveries" title="Macro: @{NAME|recoveries}" />			
 				</div>
@@ -604,15 +604,57 @@
 								  <option value="intuition" data-i18n="intuition"></option>
 								  <option value="presence" data-i18n="presence"></option>
 								</select>
-								<input type="checkbox" name="attr_has_damage" />
-								<label data-i18n="damage"></label>
+								<input type="checkbox" name="attr_has_potency" />
+								<label data-i18n="potency"></label>
 							</div>
-							<label class="sublabel">≤ 11</label>
-							<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_1" />
-							<label class="sublabel">12-16</label>
-							<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_2" />
-							<label class="sublabel">17+</label>
-							<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_3" />
+							<div class="tier-row tier-1">
+								<label class="sublabel">≤ 11</label>
+								<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_1" />
+								<div class="potency-tier-1">
+									<select class="ability-type" name="attr_potency_characteristic">
+									  <option value="" ></option>
+									  <option value="M" data-i18n="M" selected></option>
+									  <option value="A" data-i18n="A"></option>
+									  <option value="R" data-i18n="R"></option>
+									  <option value="I" data-i18n="I"></option>
+									  <option value="P" data-i18n="P"></option>
+									</select>
+									&lt;1
+									<input type="text" class="power-roll-tier-effect" name="attr_potency_tier_1" />
+								</div>
+							</div>
+							<div class="tier-row tier-2">
+								<label class="sublabel">12-16</label>
+								<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_2" />
+								<div class="potency-tier-2">
+									<select class="ability-type" name="attr_potency_characteristic">
+									  <option value="" ></option>
+									  <option value="M" data-i18n="M" selected></option>
+									  <option value="A" data-i18n="A"></option>
+									  <option value="R" data-i18n="R"></option>
+									  <option value="I" data-i18n="I"></option>
+									  <option value="P" data-i18n="P"></option>
+									</select>
+									&lt;2
+									<input type="text" class="power-roll-tier-effect" name="attr_potency_tier_2" />
+								</div>
+							</div>
+							<div class="tier-row tier-3">
+								<label class="sublabel">17+</label>
+								<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_3" />
+								<div class="potency-tier-3">
+									<select class="ability-type" name="attr_potency_characteristic">
+									  <option value="" ></option>
+									  <option value="M" data-i18n="M" selected></option>
+									  <option value="A" data-i18n="A"></option>
+									  <option value="R" data-i18n="R"></option>
+									  <option value="I" data-i18n="I"></option>
+									  <option value="P" data-i18n="P"></option>
+									</select>
+									&lt;3
+									<input type="text" class="power-roll-tier-effect" name="attr_potency_tier_3" />
+								</div>
+							</div>
 						</div>
 						<div class="ability-toggle-group">
 							<input type="checkbox" name="attr_has_effect" />
@@ -3146,6 +3188,10 @@
 	}
 
 	/**
+	 ** Simple Roll to display Recovery use
+	 **/
+
+	/**
 	 ** Displays a feature using the monsterability template
 	 ** @param {string} name         The feature's name.
 	 ** @param {string} subtitle     A subtitle for the feature, usually the source (Class, Perk, etc).
@@ -3514,6 +3560,27 @@
 	$20('.characteristic-input-group > label').on('click', (e) => {
 		const characteristic = e.htmlAttributes['data-characteristic'];
 		rollPower(characteristic);
+	});
+	
+	// Recovery Simple Roll
+	function calculateRecoverySpent() {
+		console.log('~~~ calculateRecoverySpent ~~~');
+		getAttrs(["stamina_max", "recovery_amount", "stamina", "recoveries"], function(values) {
+			let stamina_max = parseInt(values.stamina_max)||0;
+			let recovery_amount = parseInt(values.recovery_amount)||0;
+			let stamina = parseInt(values.stamina)||0;
+			let stamina_set = Math.min(stamina_max, stamina + recovery_amount);
+			let recoveries = parseInt(values.recoveries)||0;
+			let recoveries_set = Math.max(recoveries - 1,0);
+			setAttrs({
+				"stamina": stamina_set,
+				"recoveries": recoveries_set
+			});
+		});
+	}
+
+	$20('.recovery-input-group > label').on('click', (e) => {
+		calculateRecoverySpent();
 	});
 
 	// Configuration map for feature sharing
