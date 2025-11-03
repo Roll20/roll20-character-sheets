@@ -3725,12 +3725,14 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
   const trigger = eventInfo.sourceAttribute.split('_').slice(3).join('_');
   const id = eventInfo.sourceAttribute.split('_')[2];
   const newSpell = previousValue === undefined && trigger === 'spell_name' ? 1 : 0;
-  getAttrs([`repeating_spells_${id}_spell_caster_class`, 'caster_class1_name', 'caster_class1_level', 'caster_class2_name', 'caster_class2_level', 'spell_caster_tabs'], (v) => {
+  getAttrs(['repeating_spells_spell_caster_class', 'caster_class1_name', 'caster_class1_level', 'caster_class2_name', 'caster_class2_level', 'spell_caster_tabs'], (v) => {
     const output = {};
-    const casterTab = +v.spell_caster_tabs || 0; // 0, 1, -1
+    const casterTab = +v.spell_caster_tabs || -1; // 0, 1, -1
     let thisClass = +v[section_attribute('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
     // test for New and not on All tab
+    console.log(`Change detected:PRE-CHECK CasterTab:${casterTab} thisClass:${thisClass}`);
     if (newSpell === 1 && casterTab !== -1) thisClass = casterTab === 0 ? 1 : 2;
+    console.log(`Change detected:POST-CHECK CasterTab:${casterTab} thisClass:${thisClass}`);
     if (thisClass === 0) {
       output[section_attribute('spells', id, 'spell_caster_class_name')] = '';
       output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
@@ -3753,7 +3755,7 @@ on('change:repeating_spells:spell_name', (eventInfo) => {
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
   const id = eventInfo.sourceAttribute.split('_')[2];
-  getAttrs([`repeating_spells_${id}_spell_level`, `repeating_spells_${id}_spell_caster_class`, 'spell_tabs', 'spell_caster_tabs'], (v) => {
+  getAttrs([`repeating_spells_${id}_spell_level`, 'spell_tabs'], (v) => {
     const output = {};
     const levelTab = +v.spell_tabs || 0;
     const thisSpellLevel = v[section_attribute('spells', id, 'spell_level')] || 0;
