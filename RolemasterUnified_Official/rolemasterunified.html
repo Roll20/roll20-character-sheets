@@ -3922,7 +3922,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     <b>Defensive Bonus</b>
 
     <div class='prop_pair'>
-	<span class='prop_prop_plan'>Base (qu)</span>
+	<span class='prop_prop_plan'>
+	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+	    <span name='attr_db_info' class='stat_info'></span>
+            Base DB</span>
 	    <span class='prop_value' name='attr_db_qu'></span>
 	<span class='prop_prop_plain'>Shield</span>
 	    <span class='prop_value'>
@@ -6437,6 +6440,12 @@ Uses (Lvl/Total) <span name='attr_traps_usecount'></span> / <span name='attr_tra
         <li><span name='attr_lasterror3'></span></li>
       </ul>
 
+    <p><b>Options:</b><br>
+      Token Markers (<span style="font-family: monospace;">option_usetokenmarkers</span>: <span name='attr_option_usetokenmarkers'>(default)</span><br>
+      Use FX (<span style="font-family: monospace;">option_usefx</span>): <span name='attr_option_usefx'>(default)</span><br>
+      DB Quickness Multiplier (<span style="font-family: monospace;">option_dbqumultiplier</span>): <span name='attr_option_dbqumultiplier'>(default)</span><br>
+      Dodge Running Bonus (<span style="font-family: monospace;">option_dodgerunningbonus</span>): <span name='attr_option_dodgerunningbonus'>(default)</span>
+
     <h3>Recalculate</h3>
 
     <p>You should never need these, but if something doesn't look right, it may help.</p>
@@ -6568,7 +6577,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 085e17656b771c1fe809d51229eb1dee9d420d31
+Revision 34f6a649a30d03e49238b2be69fb6beb70fbbfce
 
 
 <hr>
@@ -8729,6 +8738,7 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
       const rankbonus = rmuGetSkillBonus(ranks, isExpertise);
       let bonus = rankbonus;
       let log = `${F(bonus)} Rank bonus (${ranks} Ranks${sstring})\n`
+      log += rlog;
 
       if (pbonus > 0) {
 	const effectiveranks = (ranks > 30) ? 30 : ranks;
@@ -13996,7 +14006,6 @@ frontpage.updateDB = function () {
 		  console.log("dooing update", ev);
     var updates = {};
     const db_extra = miscBonusTotal(ev.db_misc || "")[0];
-    console.log("db_extra", db_extra, ev.db_misc)
     const dbmiscmod = parseIntDefault(ev.dbmod, 0);
     const basedb = +ev.qu * 3 + db_extra + dbmiscmod;
     updates.db_base = basedb;
@@ -14493,7 +14502,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	getAttrsPending(toget, (stuff) => {
 	    let updates = {};
 	    updates.db_misc = miscBonusRemoveFilter(stuff.db_misc, (item) => {
-		return !item.name.startsWith("Armor DB Bonus");
+		return !item.name.startsWith("Armor DB Bonus (");
 	    });
 
 
@@ -18779,8 +18788,9 @@ injury.parseInjuryString = function (str) {
 
     getAttrs(["character_name", "hp", "injurypenalty", "fatigue", "bleedlist", "currentphase",
 		"statusstagger", "statusstun75", "statusstun50", "statusstun25",
-		"critresist", "critimmune",
-		"grapplestatus"], (cdata) => {
+		"critresist", "critimmune", "grapplestatus",
+		"option_usefx"
+		], (cdata) => {
 	console.log("data for creature", cdata);
 	// Pull the fields out.  If we modify save to updates
 	// as well.  So anything changed will be in updates.
@@ -18819,6 +18829,7 @@ injury.parseInjuryString = function (str) {
 	// FIXME: Error handle on this
 	let bl = cdata.bleedlist ? JSON.parse(cdata.bleedlist) : [];
 
+	let fxhavebleed = 0;
 
 	for (let subinjury of injuryarray) {
 	    if (subinjury == "") {
@@ -18979,6 +18990,11 @@ injury.parseInjuryString = function (str) {
 	if (updates.hp) {
 	    RMUSkills.uses('bodydevelopment');
 	}
+
+	// Did we have a bleed?  If so trigger the bleed explosidn
+//	startRoll(`/fx bubbling-blood @{selected|${cdata.character_name}}`,
+//		    (x) => finishRoll(x.rollId,x));
+
 
 	// Update the status as soon as the injury is applied.
 	VrmuSetAttrs(updates, () => {
