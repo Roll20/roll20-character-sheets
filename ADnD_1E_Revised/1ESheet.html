@@ -4259,8 +4259,13 @@
           </label>
           <span class="inline-label right">
             <label>
-              <button type="action" name="act_spell-sort-alphabetical" title="Sort rows alphabetically.">
+              <button type="action" name="act_spell-sort-alphabetical" title="Sort rows by spell names alphabetically.">
                 <span class="nowrap">Sort A-Z</span>
+              </button>
+            </label>
+            <label>
+              <button type="action" name="act_spell-sort-level" title="Sort rows by level and spell names alphabetically.">
+                <span class="nowrap">Sort Lvl A-Z</span>
               </button>
             </label>
             <input type="hidden" name="attr_spells_previous_order_array" value="" />
@@ -9250,6 +9255,7 @@ on('change:caster_class1_name change:caster_class2_name change:caster_class1_lev
 });
 
 // Set Caster Class and level for THIS Spell based on Caster Tab
+// TODO - CHECK IF MULTI-CASTER, IF NOT, JUST SET TO CAST CLASS 1
 on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_class', (eventInfo) => {
   // console.log(`sourceType:${eventInfo.sourceType}`);
   // test if API is creating the repeating row and bail
@@ -9258,28 +9264,36 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
   const trigger = eventInfo.sourceAttribute.split('_').slice(3).join('_');
   const id = eventInfo.sourceAttribute.split('_')[2];
   const newSpell = previousValue === undefined && trigger === 'spell_name' ? 1 : 0;
-  getAttrs(['repeating_spells_spell_caster_class', 'caster_class1_name', 'caster_class1_level', 'caster_class2_name', 'caster_class2_level', 'spell_caster_tabs'], (v) => {
-    const output = {};
-    const casterTab = +v.spell_caster_tabs || -1; // 0, 1, -1
-    let thisClass = +v[section_attribute('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
-    // test for New and not on All tab
-    console.log(`Change detected:PRE-CHECK CasterTab:${casterTab} thisClass:${thisClass}`);
-    if (newSpell === 1 && casterTab !== -1) thisClass = casterTab === 0 ? 1 : 2;
-    console.log(`Change detected:POST-CHECK CasterTab:${casterTab} thisClass:${thisClass}`);
-    if (thisClass === 0) {
-      output[section_attribute('spells', id, 'spell_caster_class_name')] = '';
-      output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
-    } else if (thisClass === 1) {
-      output[section_attribute('spells', id, 'spell_caster_class_name')] = v.caster_class1_name;
-      output[section_attribute('spells', id, 'spell_caster_class_level')] = +v.caster_class1_level || 0;
-      output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
-    } else if (thisClass === 2) {
-      output[section_attribute('spells', id, 'spell_caster_class_name')] = v.caster_class2_name;
-      output[section_attribute('spells', id, 'spell_caster_class_level')] = +v.caster_class2_level || 0;
-      output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
-    }
-    setAttrs(output, {silent: true});
-  });
+  getAttrs(
+    ['repeating_spells_spell_caster_class', 'caster_class1_name', 'caster_class1_level', 'caster_class2_name', 'caster_class2_level', 'spell_caster_tabs', 'toggle_caster2'],
+    (v) => {
+      const output = {};
+      const caster2 = +v.toggle_caster2 || 0;
+      const casterTab = +v.spell_caster_tabs || -1; // 0, 1, -1
+      let thisClass = +v[section_attribute('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
+      // test for New and not on All tab
+      console.log(`Change detected:PRE-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+      if (caster2 === 0) {
+        if (newSpell === 1 && casterTab !== -1) thisClass = casterTab === 0 ? 1 : 2;
+      } else {
+        thisClass = 1;
+      }
+      console.log(`Change detected:POST-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+      if (thisClass === 0) {
+        output[section_attribute('spells', id, 'spell_caster_class_name')] = '';
+        output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
+      } else if (thisClass === 1) {
+        output[section_attribute('spells', id, 'spell_caster_class_name')] = v.caster_class1_name;
+        output[section_attribute('spells', id, 'spell_caster_class_level')] = +v.caster_class1_level || 0;
+        output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
+      } else if (thisClass === 2) {
+        output[section_attribute('spells', id, 'spell_caster_class_name')] = v.caster_class2_name;
+        output[section_attribute('spells', id, 'spell_caster_class_level')] = +v.caster_class2_level || 0;
+        output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
+      }
+      setAttrs(output, {silent: true});
+    },
+  );
 });
 
 // Set Spell's Level for new spells based selected Spell level Tab
@@ -13513,7 +13527,7 @@ const getSectionIDsOrdered = function (sectionName, callback) {
 };
 
 // sort repeating rows
-on('clicked:spell-sort-alphabetical', function (eventInfo) {
+on('clicked:spell-sort-alphabetical clicked:spell-sort-level', function (eventInfo) {
   console.log(`Change detected: Sorting Spells`);
   const sectionName = 'repeating_spells';
   // needed to grab current/previous order
@@ -13522,30 +13536,57 @@ on('clicked:spell-sort-alphabetical', function (eventInfo) {
       // Bail out IF 0 repeating entries
       if (!idArray.length) return;
       const fields = [];
+      const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
       // grab any attrs used for sorting
       idArray.forEach((id) => {
+        fields.push(section_attribute('spells', id, 'spell_caster_class'));
+        fields.push(section_attribute('spells', id, 'spell_level'));
         fields.push(section_attribute('spells', id, 'spell_name'));
       });
       getAttrs([...fields], (v) => {
         const output = {};
         const spells = idArray.map((id) => ({
           id,
+          casterClass: v[section_attribute('spells', id, 'spell_caster_class')] || 0,
+          level: v[section_attribute('spells', id, 'spell_level')], // can be '?'
           name: (v[section_attribute('spells', id, 'spell_name')] || '').trim(),
         }));
 
-        spells.sort((a, b) => {
-          return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
-        });
+        const getLevelValue = (level) => {
+          if (level === '?') return -1;
+          return level || 0;
+        };
+
+        // SORT LOGIC
+        if (buttonClicked === 'spell-sort-alphabetical') {
+          spells.sort((a, b) => {
+            // sort by spell name A-Z
+            return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+          });
+        } else if (buttonClicked === 'spell-sort-level') {
+          // sort by Caster Class, then level 0-9, then by spell name A-Z
+          spells.sort((a, b) => {
+            const aLevel = getLevelValue(a.level);
+            const bLevel = getLevelValue(b.level);
+            return (
+              a.casterClass - b.casterClass ||
+              aLevel - bLevel || // Sort using the new values
+              a.name.localeCompare(b.name, undefined, {sensitivity: 'base'})
+            );
+          });
+        }
 
         // new sort order
         const order = spells.map((s) => `${s.id}`);
 
-        // previous order/state. Can this be used to 'Undo' AZ sort?
-        output.spells_previous_order_array = [`${ids}`];
+        // save previous order/state for 'Undo'
+        output.spells_previous_order_array = ids.join(',');
+        console.log(`Natural Order has been saved.`);
         console.log(ids);
-        // set new sort order after grabbing current/previous order
+
+        // set new sort order
         setAttrs(output, {silent: true}, setSectionOrder('spells', order));
-        console.log(`Reordered ${sectionName}:`, spells);
+        console.log(`${buttonClicked} Reordered ${sectionName}:`, spells);
       });
     });
   });
@@ -13557,8 +13598,8 @@ on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', functi
   getSectionIDs(sectionName, (idArray) => {
     // Bail out IF 0 repeating entries
     if (!idArray.length) return;
-    const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
     const fields = [];
+    const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
     // grab any attrs used for sorting
     idArray.forEach((id) => {
       fields.push(section_attribute('equipment', id, 'equipment_item'));
@@ -13602,11 +13643,15 @@ on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', functi
   });
 });
 
+// restores natural order
 on('clicked:spell-sort-undo', (eventInfo) => {
   console.log(`Change detected: Undo last Sort`);
-  // eventInfo.sourceAttribute is the full name (including repeating ID) of the attribute
-  // eventInfo.previousValue is the original value of the attribute that triggered this event, before being changed.
-  // eventInfo.newValue is the current value of the attribute that triggered this event, having been changed.
-  // eventInfo.triggerName is the full name of the action button attribute.
+  getAttrs(['spells_previous_order_array'], (v) => {
+    const order = v.spells_previous_order_array;
+    if (!order || typeof order !== 'string') return;
+    const naturalOrder = order.split(',');
+    console.log(`Natural Order:${naturalOrder}`);
+    setSectionOrder('spells', naturalOrder);
+  });
 });
 </script>
