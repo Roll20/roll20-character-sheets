@@ -163,19 +163,19 @@
 				</div>
 			<div class="dashboard-recoveries minimize-ignore">
 				<div class="dashboard-stat-group recovery-input-group">
-					<label data-characteristic="recoveries" data-i18n="recoveries">Recoveries</label>
+					<label data-characteristic="recoveries" data-i18n="recoveries" data-i18n-title="recoveries-tooltip">Recoveries</label>
 					<input type="number" name="attr_recoveries" title="Macro: @{NAME|recoveries}" />			
 				</div>
 			</div>
 			<div class="dashboard-resource minimize-ignore"> 
-				<div class="dashboard-stat-group">
-					<label data-characteristic="resource" data-i18n="resource">Heroic Resource</label>
+				<div class="dashboard-stat-group resource-input-group">
+					<label data-characteristic="resource" data-i18n="resource" data-i18n-title="resource-tooltip">Heroic Resource</label>
 					<input type="number" name="attr_resource" title="Macro: @{NAME|resource}" />
 				</div>
 			</div>
 			<div class="dashboard-surges minimize-ignore">
-				<div class="dashboard-stat-group">
-					<label data-characteristic="surges" data-i18n="surges">Surges</label>
+				<div class="dashboard-stat-group surges-input-group">
+					<label data-characteristic="surges" data-i18n="surges" data-i18n-title="surges-tooltip">Surges</label>
 					<input type="number" name="attr_surges" title="Macro: @{NAME|surges}" />
 				</div>
 			</div>
@@ -619,7 +619,7 @@
 									  <option value="I" data-i18n="I"></option>
 									  <option value="P" data-i18n="P"></option>
 									</select>
-									&lt;1
+									&lt; [weak]
 									<input type="text" class="power-roll-tier-effect" name="attr_potency_tier_1" />
 								</div>
 							</div>
@@ -635,7 +635,7 @@
 									  <option value="I" data-i18n="I"></option>
 									  <option value="P" data-i18n="P"></option>
 									</select>
-									&lt;2
+									&lt; [average]
 									<input type="text" class="power-roll-tier-effect" name="attr_potency_tier_2" />
 								</div>
 							</div>
@@ -651,7 +651,7 @@
 									  <option value="I" data-i18n="I"></option>
 									  <option value="P" data-i18n="P"></option>
 									</select>
-									&lt;3
+									&lt; [strong]
 									<input type="text" class="power-roll-tier-effect" name="attr_potency_tier_3" />
 								</div>
 							</div>
@@ -3189,7 +3189,61 @@
 
 	/**
 	 ** Simple Roll to display Recovery use
+         ** And adjust automatically in sheet
 	 **/
+	async function rollRecovery() {
+		console.log("~~~ rollRecovery ~~~");
+		// Get the recovery amount and populate the translations for use in the roll.
+		const attrs = await getAttrsAsync(['recovery_amount']);
+		const recovery_amount = attrs.recovery_amount;
+		
+		buildRoll(ROLLTEMPLATES.SIMPLE, { name: "Recovery", rolltitle: "Stamina Gain", roll: `[[${recovery_amount}]]` }, {} );
+	}
+
+	function calculateRecoverySpent() {
+		console.log('~~~ calculateRecoverySpent ~~~');
+		getAttrs(["stamina_max", "recovery_amount", "stamina", "recoveries"], function(values) {
+			let stamina_max = parseInt(values.stamina_max)||0;
+			let recovery_amount = parseInt(values.recovery_amount)||0;
+			let stamina = parseInt(values.stamina)||0;
+			let stamina_set = Math.min(stamina_max, stamina + recovery_amount);
+			let recoveries = parseInt(values.recoveries)||0;
+			let recoveries_set = Math.max(recoveries - 1,0);
+			setAttrs({
+				"stamina": stamina_set,
+				"recoveries": recoveries_set
+			});
+		});
+	}
+
+	/**
+	 ** Simple Roll to display Heroic Resource gain
+         ** And adjust automatically in sheet
+	 **/
+	async function rollResource() {
+		console.log("~~~ rollResource ~~~");
+		// Get the resource name.
+		const attrs = await getAttrsAsync(['resource_name']);
+		const resource_name = attrs.resource_name;
+		
+		buildRoll(ROLLTEMPLATES.SIMPLE, { name: "@{resource_name} Gain", rolltitle: "@{resource_name}", roll: `[[?{Type d3 or number|0}]]` }, {} );
+	}
+
+	/**
+	 ** Simple Roll to apply Surges
+         ** And adjust automatically in sheet
+	 **/
+	async function rollSurges() {
+		console.log("~~~ rollSurges ~~~");
+		const attrs = await getAttrsAsync(["might", "agility", "reason", "intuition", "presence"]);
+			let highest = 0;
+			for(const val of Object.values(attrs)) {
+				const num = parseInt(val) || 0;
+				highest = Math.max(highest, num);
+			}
+		
+		buildRoll(ROLLTEMPLATES.SIMPLE, { name: "Using Surges", rolltitle: "Surges", roll: `?{Choose|Damage,&quest;{How many&quest;&verbar;1&comma;[[1*${highest}]] additional damage&verbar;2&comma;[[2*${highest}]] additional damage&verbar;3&comma;[[3*${highest}]] additional damage&rcub;|Potency,2 surges used to increase potency by 1}` }, {} );
+	}
 
 	/**
 	 ** Displays a feature using the monsterability template
@@ -3563,24 +3617,22 @@
 	});
 	
 	// Recovery Simple Roll
-	function calculateRecoverySpent() {
-		console.log('~~~ calculateRecoverySpent ~~~');
-		getAttrs(["stamina_max", "recovery_amount", "stamina", "recoveries"], function(values) {
-			let stamina_max = parseInt(values.stamina_max)||0;
-			let recovery_amount = parseInt(values.recovery_amount)||0;
-			let stamina = parseInt(values.stamina)||0;
-			let stamina_set = Math.min(stamina_max, stamina + recovery_amount);
-			let recoveries = parseInt(values.recoveries)||0;
-			let recoveries_set = Math.max(recoveries - 1,0);
-			setAttrs({
-				"stamina": stamina_set,
-				"recoveries": recoveries_set
-			});
-		});
-	}
 
 	$20('.recovery-input-group > label').on('click', (e) => {
+		rollRecovery();
 		calculateRecoverySpent();
+	});
+
+	// Heroic Resource Simple Roll
+
+	$20('.resource-input-group > label').on('click', (e) => {
+		rollResource();
+	});
+
+	// Surges Simple Roll
+
+	$20('.surges-input-group > label').on('click', (e) => {
+		rollSurges();
 	});
 
 	// Configuration map for feature sharing
