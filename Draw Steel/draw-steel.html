@@ -7,6 +7,10 @@
 			style="height: 60px"
 		/>
 	</h1>
+	<label>Initiative:</label><button type="roll" value="@{wtype} &amp;{template:simpleroll} {{rolltitle=1d10}} {{roll=[[ [[1d10]][1d10]]]}} {{name=Initiative}} {{charactername=@{character_name}}}" title="Roll 1d10" class="btn ui-draggable"></button>
+	<button class="startcombat-button" type="action" data-i18n-title="startcombat" name="act_startcombat">Start Combat</button>
+	<button class="endcombat-button" type="action" data-i18n-title="endcombat" name="act_endcombat">End Combat</button>
+	<button class="respite-button" type="action" data-i18n-title="respite" name="act_respite">Respite</button>
 	<label class="sheet-options-checkbox-label" for="sheet-options-checkbox">y</label>
 	<input id="sheet-options-checkbox" class="sheet-options-checkbox" type="checkbox" />
 	<div class="sheet-panel sheet-options-toggle">
@@ -27,6 +31,7 @@
 			<h5 data-i18n="import"></h5>
 			<p>Paste the contents of the Forge Steel data export (*.ds-hero file) into the text box below, then click "Import".</p>
 			<p class="text-warning">This will overwrite attributes on this sheet. This cannot be undone.</p>
+			<p class="text-warning">The import feature is a work in progress. Check for mistakes.</p>
 			<textarea name="attr_forgesteel_json"></textarea>
 			<button type="action" name="act_import">Import Player</button>
 			<button type="action" name="act_importmonster">Import Monster</button>
@@ -157,20 +162,20 @@
 				</div>
 				</div>
 			<div class="dashboard-recoveries minimize-ignore">
-				<div class="dashboard-stat-group">
-					<label data-characteristic="recoveries" data-i18n="recoveries">Recoveries</label>
+				<div class="dashboard-stat-group recovery-input-group">
+					<label data-characteristic="recoveries" data-i18n="recoveries" data-i18n-title="recoveries-tooltip">Recoveries</label>
 					<input type="number" name="attr_recoveries" title="Macro: @{NAME|recoveries}" />			
 				</div>
 			</div>
 			<div class="dashboard-resource minimize-ignore"> 
-				<div class="dashboard-stat-group">
-					<label data-characteristic="resource" data-i18n="resource">Heroic Resource</label>
+				<div class="dashboard-stat-group resource-input-group">
+					<label data-characteristic="resource" data-i18n="resource" data-i18n-title="resource-tooltip">Heroic Resource</label>
 					<input type="number" name="attr_resource" title="Macro: @{NAME|resource}" />
 				</div>
 			</div>
 			<div class="dashboard-surges minimize-ignore">
-				<div class="dashboard-stat-group">
-					<label data-characteristic="surges" data-i18n="surges">Surges</label>
+				<div class="dashboard-stat-group surges-input-group">
+					<label data-characteristic="surges" data-i18n="surges" data-i18n-title="surges-tooltip">Surges</label>
 					<input type="number" name="attr_surges" title="Macro: @{NAME|surges}" />
 				</div>
 			</div>
@@ -192,6 +197,10 @@
 			<div class="movement-input-group">
 				<input type="number" class="input-md" name="attr_stability" title="Macro: @{NAME|stability}" />
 				<label class="sublabel" data-i18n="stability"></label>
+			</div>
+			<div class="movement-input-group">
+				<input type="number" class="input-md" name="attr_forcemove" title="Macro: @{NAME|forcemove}" />
+				<label class="sublabel" data-i18n="forcemove"></label>
 			</div>
 		</div>
 		<!-- Stamina --> 
@@ -284,6 +293,16 @@
 					<label data-i18n="save-ends"></label>
 				</div>
 			</fieldset>
+			<div class="savethrow-input-group">
+				<p>Save Ends = </p>
+				<input type="text" class="input-md" name="attr_savethrow" data-i18n-placeholder="savethrow-placeholder" />
+				<p> or higher at the end of your turn removes the effect </p>
+				<label>1d10:</label><button type="roll" value="@{wtype} &amp;{template:simpleroll} {{rolltitle=1d10}} {{roll=[[ [[1d10]][1d10]]]}} {{name=Saving throw: rolling a @{savethrow} or higher removes effect}} {{charactername=@{character_name}}}" title="Roll 1d10" class="btn ui-draggable"></button>
+			</div>
+			<div class="bleed-dying-input-group">
+				<p>Bleeding or Dying:</p>
+				<label>1d6 + level:</label><button type="roll" value="@{wtype} &amp;{template:simpleroll} {{rolltitle=1d6+@{level}}} {{roll=[[1d6[1d6] + @{level}[level]]]}} {{name=Bleeding or Dying}} {{charactername=@{character_name}}}" title="Roll 1d6 + level" class="btn ui-draggable"></button>
+			</div>
 		</div>		
 	</div>
 	<!-- Biography Panel-->
@@ -585,13 +604,46 @@
 								  <option value="intuition" data-i18n="intuition"></option>
 								  <option value="presence" data-i18n="presence"></option>
 								</select>
+								<input type="hidden" name="attr_has_potency" />
+								<!--
+								<label data-i18n="potency"></label>
+								<select class="ability-type" name="attr_ability_potency_characteristic">
+									  <option value="" ></option>
+									  <option value="M" data-i18n="M" selected></option>
+									  <option value="A" data-i18n="A"></option>
+									  <option value="R" data-i18n="R"></option>
+									  <option value="I" data-i18n="I"></option>
+									  <option value="P" data-i18n="P"></option>
+								</select>
+								-->
 							</div>
-							<label class="sublabel">≤ 11</label>
-							<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_1" />
-							<label class="sublabel">12-16</label>
-							<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_2" />
-							<label class="sublabel">17+</label>
-							<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_3" />
+							<div class="tier-row tier-1">
+								<label class="sublabel">≤ 11</label>
+								<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_1" />
+								<div class="potency-tier-1">
+									<span name="attr_ability_potency_characteristic"></span>
+									&lt; [weak]
+									<input type="text" class="power-roll-tier-effect" name="attr_potency_tier_1" />
+								</div>
+							</div>
+							<div class="tier-row tier-2">
+								<label class="sublabel">12-16</label>
+								<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_2" />
+								<div class="potency-tier-2">
+									<span name="attr_ability_potency_characteristic"></span>
+									&lt; [average]
+									<input type="text" class="power-roll-tier-effect" name="attr_ability_potency_tier_2" />
+								</div>
+							</div>
+							<div class="tier-row tier-3">
+								<label class="sublabel">17+</label>
+								<input type="text" class="power-roll-tier-effect" name="attr_ability_tier_3" />
+								<div class="potency-tier-3">
+									<span name="attr_ability_potency_characteristic"></span>
+									&lt; [strong]
+									<input type="text" class="power-roll-tier-effect" name="attr_potency_tier_3" />
+								</div>
+							</div>
 						</div>
 						<div class="ability-toggle-group">
 							<input type="checkbox" name="attr_has_effect" />
@@ -887,6 +939,29 @@
 							<div class="ability-effect grid-span-full">
 								<label><span data-i18n="effect"></span>:</label>
 								<span class="ability-effect" name="attr_heal_effect"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Convert Main Action -->
+				<div class="standard-abilities-item">
+					<input type="hidden" class="ability-name" data-i18n-placeholder="convert" name="attr_convert_name" value="Convert" />
+					<input type="hidden" class="ability-keywords" data-i18n-placeholder="convert-keywords" name="attr_convert_keywords" value="" />
+					<input type="hidden" name="attr_convert_type" value="Main Action" />
+					<input type="hidden" class="ability-effect" name="attr_convert_effect" value="You can convert your main action into a maneuver or a move action, allowing you to take two maneuvers or move actions on your turn." />
+					
+					<div class="ability-card card-display">
+						<button type="action" class="ability-share-button" data-i18n-title="ability-share" name="act_convert_share">
+							<!-- speech balloon -->
+							&#128172;
+						</button>
+						<span class="ability-name" data-i18n-placeholder="Convert" name="attr_convert_name"></span>
+						<div class="ability-details grid-span-full">
+							<span class="ability-keywords" data-i18n-placeholder="convert" name="attr_convert_keywords"></span>
+							<span class="ability-type" data-i18n="main-action"></span>
+							<div class="ability-effect grid-span-full">
+								<label><span data-i18n="effect"></span>:</label>
+								<span class="ability-effect" name="attr_convert_effect"></span>
 							</div>
 						</div>
 					</div>
@@ -2319,6 +2394,14 @@
 				<label data-i18n="save-ends"></label>
 			</div>
 		</fieldset>
+		<div class="savethrow-input-group">
+			<p>Save Ends = 6 or higher at the end of your turn removes the effect</p>
+			<label>1d10:</label><button type="roll" value="@{wtype} &amp;{template:simpleroll} {{rolltitle=1d10}} {{roll=[[ [[1d10]][1d10]]]}} {{name=Saving throw: rolling a 6 or higher removes effect}} {{charactername=@{character_name}}}" title="Roll 1d10" class="btn ui-draggable"></button>
+		</div>
+		<div class="bleed-dying-input-group">
+			<p>Bleeding or Dying:</p>
+			<label>1d6 + level:</label><button type="roll" value="@{wtype} &amp;{template:simpleroll} {{rolltitle=1d6+@{level}}} {{roll=[[1d6[1d6] + @{level}[level]]]}} {{name=Bleeding or Dying}} {{charactername=@{character_name}}}" title="Roll 1d6 + level" class="btn ui-draggable"></button>
+		</div>
 	</div>
 	<!-- NPC Abilities -->
 	<div class="npc-abilities-panel">
@@ -3094,6 +3177,64 @@
 	}
 
 	/**
+	 ** Simple Roll to display Recovery use
+         ** And adjust automatically in sheet
+	 **/
+	async function rollRecovery() {
+		console.log("~~~ rollRecovery ~~~");
+		// Get the recovery amount and populate the translations for use in the roll.
+		const attrs = await getAttrsAsync(['recovery_amount']);
+		const recovery_amount = attrs.recovery_amount;
+		
+		buildRoll(ROLLTEMPLATES.SIMPLE, { name: "Recovery", rolltitle: "Stamina Gain", roll: `[[${recovery_amount}]]` }, {} );
+	}
+
+	function calculateRecoverySpent() {
+		console.log('~~~ calculateRecoverySpent ~~~');
+		getAttrs(["stamina_max", "recovery_amount", "stamina", "recoveries"], function(values) {
+			let stamina_max = parseInt(values.stamina_max)||0;
+			let recovery_amount = parseInt(values.recovery_amount)||0;
+			let stamina = parseInt(values.stamina)||0;
+			let stamina_set = Math.min(stamina_max, stamina + recovery_amount);
+			let recoveries = parseInt(values.recoveries)||0;
+			let recoveries_set = Math.max(recoveries - 1,0);
+			setAttrs({
+				"stamina": stamina_set,
+				"recoveries": recoveries_set
+			});
+		});
+	}
+
+	/**
+	 ** Simple Roll to display Heroic Resource gain
+         ** And adjust automatically in sheet
+	 **/
+	async function rollResource() {
+		console.log("~~~ rollResource ~~~");
+		// Get the resource name.
+		const attrs = await getAttrsAsync(['resource_name']);
+		const resource_name = attrs.resource_name;
+		
+		buildRoll(ROLLTEMPLATES.SIMPLE, { name: "@{resource_name} Gain", rolltitle: "@{resource_name}", roll: `[[?{Type d3 or number|0}]]` }, {} );
+	}
+
+	/**
+	 ** Simple Roll to apply Surges
+         ** And adjust automatically in sheet
+	 **/
+	async function rollSurges() {
+		console.log("~~~ rollSurges ~~~");
+		const attrs = await getAttrsAsync(["might", "agility", "reason", "intuition", "presence"]);
+			let highest = 0;
+			for(const val of Object.values(attrs)) {
+				const num = parseInt(val) || 0;
+				highest = Math.max(highest, num);
+			}
+		
+		buildRoll(ROLLTEMPLATES.SIMPLE, { name: "Using Surges", rolltitle: "Surges", roll: `?{Choose|Damage,&quest;{How many&quest;&verbar;1&comma;[[1*${highest}]] additional damage&verbar;2&comma;[[2*${highest}]] additional damage&verbar;3&comma;[[3*${highest}]] additional damage&rcub;|Potency,2 surges used to increase potency by 1}` }, {} );
+	}
+
+	/**
 	 ** Displays a feature using the monsterability template
 	 ** @param {string} name         The feature's name.
 	 ** @param {string} subtitle     A subtitle for the feature, usually the source (Class, Perk, etc).
@@ -3411,6 +3552,7 @@
 		'charge': false,
 		'defend': false,
 		'heal': false,
+		'convert': false,
 		'aid_attack': false,
 		'catch_breath': false,
 		'hide': false,
@@ -3461,6 +3603,25 @@
 	$20('.characteristic-input-group > label').on('click', (e) => {
 		const characteristic = e.htmlAttributes['data-characteristic'];
 		rollPower(characteristic);
+	});
+	
+	// Recovery Simple Roll
+	
+	$20('.recovery-input-group > label').on('click', (e) => {
+		rollRecovery();
+		calculateRecoverySpent();
+	});
+
+	// Heroic Resource Simple Roll
+
+	$20('.resource-input-group > label').on('click', (e) => {
+		rollResource();
+	});
+
+	// Surges Simple Roll
+
+	$20('.surges-input-group > label').on('click', (e) => {
+		rollSurges();
 	});
 
 	// Configuration map for feature sharing
@@ -3553,6 +3714,59 @@
 				"potency_strong": highest,
 				"potency_average": highest - 1,
 				"potency_weak": highest - 2,
+			});
+		});
+	}
+
+// Start Combat Calculation
+	on("clicked:startcombat", function() {
+		calculateStartCombat();
+	});
+
+	function calculateStartCombat() {
+		console.log('~~~ calculateStartCombat ~~~');
+		getAttrs(["victories"], function(values) {
+			let victories = parseInt(values.victories)||0;
+			setAttrs({                            
+				"resource": victories			
+			});
+		});
+	}
+
+// End Combat Calculation
+	on("clicked:endcombat", function() {
+		calculateEndCombat();
+	});
+
+	function calculateEndCombat() {
+		console.log('~~~ calculateEndCombat ~~~');
+		getAttrs(["resource", "surges"], function(values) {
+			let resource = parseInt(values.resource)||0;
+			let surges = parseInt(values.surges)||0;
+			setAttrs({                            
+				"resource": 0,
+				"surges": 0			
+			});
+		});
+	}
+
+// Respite Calculation
+	on("clicked:respite", function() {
+		calculateRespite();
+	});
+
+	function calculateRespite() {
+		console.log('~~~ calculateRespite ~~~');
+		getAttrs(["stamina_max", "recoveries_max", "victories", "experience"], function(values) {
+			let stamina_max = parseInt(values.stamina_max)||0;
+			let recoveries_max = parseInt(values.recoveries_max)||0;
+			let victories = parseInt(values.victories)||0;
+			let experience = parseInt(values.experience)||0;
+			setAttrs({                            
+				"stamina": stamina_max,
+				"recoveries": recoveries_max,
+				"experience": experience + victories,
+				"victories": 0,
 			});
 		});
 	}
