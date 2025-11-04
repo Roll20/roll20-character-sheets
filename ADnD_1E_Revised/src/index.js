@@ -3717,7 +3717,6 @@ on('change:caster_class1_name change:caster_class2_name change:caster_class1_lev
 });
 
 // Set Caster Class and level for THIS Spell based on Caster Tab
-// TODO - CHECK IF MULTI-CASTER, IF NOT, JUST SET TO CAST CLASS 1
 on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_class', (eventInfo) => {
   // console.log(`sourceType:${eventInfo.sourceType}`);
   // test if API is creating the repeating row and bail
@@ -3733,14 +3732,16 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
       const caster2 = +v.toggle_caster2 || 0;
       const casterTab = +v.spell_caster_tabs || -1; // 0, 1, -1
       let thisClass = +v[section_attribute('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
-      // test for New and not on All tab
-      console.log(`Change detected:PRE-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+      // console.log(`Change detected:PRE-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+      // TODO still need to check this logic
+      // check if Caster2 is hidden
       if (caster2 === 0) {
+        // test for New and not on All tab
         if (newSpell === 1 && casterTab !== -1) thisClass = casterTab === 0 ? 1 : 2;
       } else {
         thisClass = 1;
       }
-      console.log(`Change detected:POST-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+      // console.log(`Change detected:POST-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
       if (thisClass === 0) {
         output[section_attribute('spells', id, 'spell_caster_class_name')] = '';
         output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
@@ -3768,7 +3769,7 @@ on('change:repeating_spells:spell_name', (eventInfo) => {
     const output = {};
     const levelTab = +v.spell_tabs || 0;
     const thisSpellLevel = v[section_attribute('spells', id, 'spell_level')] || 0;
-    console.log(`Change detected: [Setting Spell Level based on Spell Tab] SpellTab:${levelTab} ThisSpellLvl:${thisSpellLevel}`);
+    // console.log(`Change detected: [Setting Spell Level based on Spell Tab] SpellTab:${levelTab} ThisSpellLvl:${thisSpellLevel}`);
     // test if Spell Tab is set to 'All' or if this Spell's Lvl has already been set
     if (levelTab === -1 || thisSpellLevel != '?') return;
     output[`repeating_spells_${id}_spell_level`] = levelTab;
@@ -7990,7 +7991,7 @@ const getSectionIDsOrdered = function (sectionName, callback) {
 
 // sort repeating rows
 on('clicked:spell-sort-alphabetical clicked:spell-sort-level', function (eventInfo) {
-  console.log(`Change detected: Sorting Spells`);
+  // console.log(`Change detected: Sorting Spells`);
   const sectionName = 'repeating_spells';
   // needed to grab current/previous order
   getSectionIDsOrdered(sectionName, function (ids) {
@@ -8043,76 +8044,91 @@ on('clicked:spell-sort-alphabetical clicked:spell-sort-level', function (eventIn
 
         // save previous order/state for 'Undo'
         output.spells_previous_order_array = ids.join(',');
-        console.log(`Natural Order has been saved.`);
-        console.log(ids);
+        // console.log(`Previous Order has been saved.`);
+        // console.log(ids);
 
         // set new sort order
         setAttrs(output, {silent: true}, setSectionOrder('spells', order));
-        console.log(`${buttonClicked} Reordered ${sectionName}:`, spells);
+        // console.log(`${buttonClicked} Reordered ${sectionName}:`, spells);
       });
     });
   });
 });
 
+// restores previous order
+on('clicked:spell-sort-undo', (eventInfo) => {
+  // console.log(`Change detected: Undo last Sort`);
+  getAttrs(['spells_previous_order_array'], (v) => {
+    const order = v.spells_previous_order_array;
+    if (!order || typeof order !== 'string') return;
+    const previousOrder = order.split(',');
+    // console.log(`Previous Order:${previousOrder}`);
+    setSectionOrder('spells', previousOrder);
+  });
+});
+
 on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', function (eventInfo) {
-  console.log(`Change detected: Sorting Equipment`);
+  // console.log(`Change detected: Sorting Equipment`);
   const sectionName = 'repeating_equipment';
-  getSectionIDs(sectionName, (idArray) => {
-    // Bail out IF 0 repeating entries
-    if (!idArray.length) return;
-    const fields = [];
-    const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
-    // grab any attrs used for sorting
-    idArray.forEach((id) => {
-      fields.push(section_attribute('equipment', id, 'equipment_item'));
-      fields.push(section_attribute('equipment', id, 'equipment_location'));
-    });
-    getAttrs([...fields], (v) => {
-      const equipment = idArray.map((id) => ({
-        id,
-        name: (v[section_attribute('equipment', id, 'equipment_item')] || '').trim(),
-        location: (v[section_attribute('equipment', id, 'equipment_location')] || '').trim(),
-      }));
+  // needed to grab current/previous order
+  getSectionIDsOrdered(sectionName, function (ids) {
+    getSectionIDs(sectionName, (idArray) => {
+      // Bail out IF 0 repeating entries
+      if (!idArray.length) return;
+      const fields = [];
+      const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
+      // grab any attrs used for sorting
+      idArray.forEach((id) => {
+        fields.push(section_attribute('equipment', id, 'equipment_item'));
+        fields.push(section_attribute('equipment', id, 'equipment_location'));
+      });
+      getAttrs([...fields], (v) => {
+        const output = {};
+        const equipment = idArray.map((id) => ({
+          id,
+          name: (v[section_attribute('equipment', id, 'equipment_item')] || '').trim(),
+          location: (v[section_attribute('equipment', id, 'equipment_location')] || '').trim(),
+        }));
 
-      if (buttonClicked === 'equipment-sort-alphabetical') {
-        equipment.sort((a, b) => {
-          // Standard alphabetical sort by equipment name
-          return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
-        });
-      } else if (buttonClicked === 'equipment-sort-location') {
-        equipment.sort((a, b) => {
-          // 1. Compare by location first
-          const locationComparison = a.location.localeCompare(b.location, undefined, {sensitivity: 'base'});
-
-          // If locations are different (non-zero result), return the location comparison
-          if (locationComparison !== 0) {
-            return locationComparison;
-          }
-
-          // 2. If locations are the same (locationComparison is 0), then compare by equipment name
-          return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
-        });
-      }
-
-      // Only apply the new order if a recognized sort button was clicked
-      if (buttonClicked === 'equipment-sort-alphabetical' || buttonClicked === 'equipment-sort-location') {
+        if (buttonClicked === 'equipment-sort-alphabetical') {
+          equipment.sort((a, b) => {
+            // sort by equipment name A-Z
+            return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+          });
+        } else if (buttonClicked === 'equipment-sort-location') {
+          equipment.sort((a, b) => {
+            // 1. Compare by location first
+            const locationComparison = a.location.localeCompare(b.location, undefined, {sensitivity: 'base'});
+            // If locations are different (non-zero result), return the location comparison
+            if (locationComparison !== 0) {
+              return locationComparison;
+            }
+            // 2. If locations are the same (locationComparison is 0), then compare by equipment name
+            return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+          });
+        }
         // Apply the new order
         const order = equipment.map((s) => `${s.id}`);
-        setSectionOrder('equipment', order);
-        console.log(`Reordered repeating_equipment:`, equipment);
-      }
+        // save previous order/state for 'Undo'
+        output.equipment_previous_order_array = ids.join(',');
+        // console.log(`Previous Order has been saved.`);
+        // console.log(ids);
+        // set new sort order
+        setAttrs(output, {silent: true}, setSectionOrder('equipment', order));
+        // console.log(`${buttonClicked} Reordered ${sectionName}:`, equipment);
+      });
     });
   });
 });
 
-// restores natural order
-on('clicked:spell-sort-undo', (eventInfo) => {
-  console.log(`Change detected: Undo last Sort`);
-  getAttrs(['spells_previous_order_array'], (v) => {
-    const order = v.spells_previous_order_array;
+// restores previous order
+on('clicked:equipment-sort-undo', (eventInfo) => {
+  // console.log(`Change detected: Undo last Sort`);
+  getAttrs(['equipment_previous_order_array'], (v) => {
+    const order = v.equipment_previous_order_array;
     if (!order || typeof order !== 'string') return;
-    const naturalOrder = order.split(',');
-    console.log(`Natural Order:${naturalOrder}`);
-    setSectionOrder('spells', naturalOrder);
+    const previousOrder = order.split(',');
+    // console.log(`Previous Order:${previousOrder}`);
+    setSectionOrder('equipment', previousOrder);
   });
 });
