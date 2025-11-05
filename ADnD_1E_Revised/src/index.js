@@ -3617,7 +3617,7 @@ on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs chan
     getAttrs(['spell_tabs', 'toggle_show_memorized', 'spell_caster_tabs', 'toggle_caster2', ...fields], (v) => {
       const output = {};
       const memorizedOnly = +v.toggle_show_memorized || 0;
-      const casterTab = +v.spell_caster_tabs || 0; // -1, 0, 1
+      const casterTab = +v.spell_caster_tabs; // -1, 0, 1
       const hideCaster2 = +v.toggle_caster2 || 0;
       const levelTab = +v.spell_tabs || 0;
       _.each(idArray, (id) => {
@@ -3663,10 +3663,8 @@ on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_cla
   if (eventInfo.sourceType !== 'player') return;
   getAttrs(['repeating_spells_spell_level', 'repeating_spells_spell_caster_class', 'spell_caster_tabs', 'spell_tabs'], (v) => {
     const output = {};
-    // 0, 1, -1
-    const casterTab = +v.spell_caster_tabs || 0;
-    // 0, 1, 2
-    const thisCaster = +v.repeating_spells_spell_caster_class || 0;
+    const casterTab = +v.spell_caster_tabs; // 0, 1, -1
+    const thisCaster = +v.repeating_spells_spell_caster_class || 0; // 0, 1, 2
     const levelTab = +v.spell_tabs || 0;
     const thisLevel = v.repeating_spells_spell_level;
     // jumps to spell level tab unless Show All or same level tab
@@ -3730,18 +3728,17 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
     (v) => {
       const output = {};
       const caster2 = +v.toggle_caster2 || 0;
-      const casterTab = +v.spell_caster_tabs || -1; // 0, 1, -1
+      const casterTab = +v.spell_caster_tabs; // 0, 1, -1
       let thisClass = +v[section_attribute('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
-      // console.log(`Change detected:PRE-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
-      // TODO still need to check this logic
-      // check if Caster2 is hidden
+      console.log(`Change detected:PRE-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+      // Caster Class 2 is enabled
       if (caster2 === 0) {
         // test for New and not on All tab
         if (newSpell === 1 && casterTab !== -1) thisClass = casterTab === 0 ? 1 : 2;
       } else {
         thisClass = 1;
       }
-      // console.log(`Change detected:POST-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+      console.log(`Change detected:POST-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
       if (thisClass === 0) {
         output[section_attribute('spells', id, 'spell_caster_class_name')] = '';
         output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
