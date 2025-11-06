@@ -5360,11 +5360,11 @@ saveparalysispoisondeathCalc = (migrate) => {
     ],
     (v) => {
       const output = {};
-      const baseSaveparalysispoisondeath = +v.saveparalysispoisondeath_base || 0;
-      const racialSaveparalysispoisondeath = +v.saveparalysispoisondeath_racial_mod || 0;
-      const abilitySaveparalysispoisondeath = +v.saveparalysispoisondeath_ability_mod || 0;
-      const miscSaveparalysispoisondeath = +v.saveparalysispoisondeath_misc_mod || 0;
-      const tempSaveparalysispoisondeath = +v.saveparalysispoisondeath_temp_mod || 0;
+      const baseSaveparalysispoisondeath = +v.saveparalysispoisondeath_base;
+      const racialSaveparalysispoisondeath = +v.saveparalysispoisondeath_racial_mod;
+      const abilitySaveparalysispoisondeath = +v.saveparalysispoisondeath_ability_mod;
+      const miscSaveparalysispoisondeath = +v.saveparalysispoisondeath_misc_mod;
+      const tempSaveparalysispoisondeath = +v.saveparalysispoisondeath_temp_mod;
       const oldSave = +v.saveparalysispoisondeath || 0;
       const newSave = int(
         baseSaveparalysispoisondeath + racialSaveparalysispoisondeath + abilitySaveparalysispoisondeath + miscSaveparalysispoisondeath + tempSaveparalysispoisondeath,
@@ -5397,11 +5397,11 @@ savepetrificationpolymorphCalc = (migrate) => {
     ],
     (v) => {
       const output = {};
-      const baseSavepetrificationpolymorph = +v.savepetrificationpolymorph_base || 0;
-      const racialSavepetrificationpolymorph = +v.savepetrificationpolymorph_racial_mod || 0;
-      const abilitySavepetrificationpolymorph = +v.savepetrificationpolymorph_ability_mod || 0;
-      const miscSavepetrificationpolymorph = +v.savepetrificationpolymorph_misc_mod || 0;
-      const tempSavepetrificationpolymorph = +v.savepetrificationpolymorph_temp_mod || 0;
+      const baseSavepetrificationpolymorph = +v.savepetrificationpolymorph_base;
+      const racialSavepetrificationpolymorph = +v.savepetrificationpolymorph_racial_mod;
+      const abilitySavepetrificationpolymorph = +v.savepetrificationpolymorph_ability_mod;
+      const miscSavepetrificationpolymorph = +v.savepetrificationpolymorph_misc_mod;
+      const tempSavepetrificationpolymorph = +v.savepetrificationpolymorph_temp_mod;
       const oldSave = +v.savepetrificationpolymorph || 0;
       const newSave = int(
         baseSavepetrificationpolymorph + racialSavepetrificationpolymorph + abilitySavepetrificationpolymorph + miscSavepetrificationpolymorph + tempSavepetrificationpolymorph,
@@ -5434,11 +5434,11 @@ saverodsstaveswandsCalc = (migrate) => {
     ],
     (v) => {
       const output = {};
-      const baseSaverodsstaveswands = +v.saverodsstaveswands_base || 0;
-      const racialSaverodsstaveswands = +v.saverodsstaveswands_racial_mod || 0;
-      const abilitySaverodsstaveswands = +v.saverodsstaveswands_ability_mod || 0;
-      const miscSaverodsstaveswands = +v.saverodsstaveswands_misc_mod || 0;
-      const tempSaverodsstaveswands = +v.saverodsstaveswands_temp_mod || 0;
+      const baseSaverodsstaveswands = +v.saverodsstaveswands_base;
+      const racialSaverodsstaveswands = +v.saverodsstaveswands_racial_mod;
+      const abilitySaverodsstaveswands = +v.saverodsstaveswands_ability_mod;
+      const miscSaverodsstaveswands = +v.saverodsstaveswands_misc_mod;
+      const tempSaverodsstaveswands = +v.saverodsstaveswands_temp_mod;
       const oldSave = +v.saverodsstaveswands || 0;
       const newSave = int(baseSaverodsstaveswands + racialSaverodsstaveswands + abilitySaverodsstaveswands + miscSaverodsstaveswands + tempSaverodsstaveswands);
       // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
@@ -5462,11 +5462,11 @@ savebreathweaponsCalc = (migrate) => {
     ['savebreathweapons', 'savebreathweapons_base', 'savebreathweapons_racial_mod', 'savebreathweapons_ability_mod', 'savebreathweapons_misc_mod', 'savebreathweapons_temp_mod'],
     (v) => {
       const output = {};
-      const baseSavebreathweapons = +v.savebreathweapons_base || 0;
-      const racialSavebreathweapons = +v.savebreathweapons_racial_mod || 0;
-      const abilitySavebreathweapons = +v.savebreathweapons_ability_mod || 0;
-      const miscSavebreathweapons = +v.savebreathweapons_misc_mod || 0;
-      const tempSavebreathweapons = +v.savebreathweapons_temp_mod || 0;
+      const baseSavebreathweapons = +v.savebreathweapons_base;
+      const racialSavebreathweapons = +v.savebreathweapons_racial_mod;
+      const abilitySavebreathweapons = +v.savebreathweapons_ability_mod;
+      const miscSavebreathweapons = +v.savebreathweapons_misc_mod;
+      const tempSavebreathweapons = +v.savebreathweapons_temp_mod;
       const oldSave = +v.savebreathweapons || 0;
       const newSave = int(baseSavebreathweapons + racialSavebreathweapons + abilitySavebreathweapons + miscSavebreathweapons + tempSavebreathweapons);
       // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
@@ -5488,11 +5488,11 @@ savebreathweaponsCalc = (migrate) => {
 savespellsCalc = (migrate) => {
   getAttrs(['savespells', 'savespells_base', 'savespells_racial_mod', 'savespells_ability_mod', 'savespells_misc_mod', 'savespells_temp_mod'], (v) => {
     const output = {};
-    const baseSavespells = +v.savespells_base || 0;
-    const racialSavespells = +v.savespells_racial_mod || 0;
-    const abilitySavespells = +v.savespells_ability_mod || 0;
-    const miscSavespells = +v.savespells_misc_mod || 0;
-    const tempSavespells = +v.savespells_temp_mod || 0;
+    const baseSavespells = +v.savespells_base;
+    const racialSavespells = +v.savespells_racial_mod;
+    const abilitySavespells = +v.savespells_ability_mod;
+    const miscSavespells = +v.savespells_misc_mod;
+    const tempSavespells = +v.savespells_temp_mod;
     const oldSave = +v.savespells || 0;
     const newSave = int(baseSavespells + racialSavespells + abilitySavespells + miscSavespells + tempSavespells);
     // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
@@ -5514,11 +5514,11 @@ savespellsCalc = (migrate) => {
 savemiscCalc = () => {
   getAttrs(['savemisc', 'savemisc_base', 'savemisc_racial_mod', 'savemisc_ability_mod', 'savemisc_misc_mod', 'savemisc_temp_mod'], (v) => {
     const output = {};
-    const baseSavemisc = +v.savemisc_base || 0;
-    const racialSavemisc = +v.savemisc_racial_mod || 0;
-    const abilitySavemisc = +v.savemisc_ability_mod || 0;
-    const miscSavemisc = +v.savemisc_misc_mod || 0;
-    const tempSavemisc = +v.savemisc_temp_mod || 0;
+    const baseSavemisc = +v.savemisc_base;
+    const racialSavemisc = +v.savemisc_racial_mod;
+    const abilitySavemisc = +v.savemisc_ability_mod;
+    const miscSavemisc = +v.savemisc_misc_mod;
+    const tempSavemisc = +v.savemisc_temp_mod;
     const newSave = int(baseSavemisc + racialSavemisc + abilitySavemisc + miscSavemisc + tempSavemisc);
     output.savemisc = newSave;
     setAttrs(output, {silent: true});
@@ -5528,11 +5528,11 @@ savemiscCalc = () => {
 savemisc1Calc = () => {
   getAttrs(['savemisc1', 'savemisc1_base', 'savemisc1_racial_mod', 'savemisc1_ability_mod', 'savemisc1_misc_mod', 'savemisc1_temp_mod'], (v) => {
     const output = {};
-    const baseSavemisc1 = +v.savemisc1_base || 0;
-    const racialSavemisc1 = +v.savemisc1_racial_mod || 0;
-    const abilitySavemisc1 = +v.savemisc1_ability_mod || 0;
-    const miscSavemisc1 = +v.savemisc1_misc_mod || 0;
-    const tempSavemisc1 = +v.savemisc1_temp_mod || 0;
+    const baseSavemisc1 = +v.savemisc1_base;
+    const racialSavemisc1 = +v.savemisc1_racial_mod;
+    const abilitySavemisc1 = +v.savemisc1_ability_mod;
+    const miscSavemisc1 = +v.savemisc1_misc_mod;
+    const tempSavemisc1 = +v.savemisc1_temp_mod;
     // const oldSave = +v.savemisc1 || 0;
     const newSave = int(baseSavemisc1 + racialSavemisc1 + abilitySavemisc1 + miscSavemisc1 + tempSavemisc1);
     output.savemisc1 = newSave;
@@ -5543,11 +5543,11 @@ savemisc1Calc = () => {
 savemisc2Calc = () => {
   getAttrs(['savemisc2', 'savemisc2_base', 'savemisc2_racial_mod', 'savemisc2_ability_mod', 'savemisc2_misc_mod', 'savemisc2_temp_mod'], (v) => {
     const output = {};
-    const baseSavemisc2 = +v.savemisc2_base || 0;
-    const racialSavemisc2 = +v.savemisc2_racial_mod || 0;
-    const abilitySavemisc2 = +v.savemisc2_ability_mod || 0;
-    const miscSavemisc2 = +v.savemisc2_misc_mod || 0;
-    const tempSavemisc2 = +v.savemisc2_temp_mod || 0;
+    const baseSavemisc2 = +v.savemisc2_base;
+    const racialSavemisc2 = +v.savemisc2_racial_mod;
+    const abilitySavemisc2 = +v.savemisc2_ability_mod;
+    const miscSavemisc2 = +v.savemisc2_misc_mod;
+    const tempSavemisc2 = +v.savemisc2_temp_mod;
     // const oldSave = +v.savemisc1 || 0;
     const newSave = int(baseSavemisc2 + racialSavemisc2 + abilitySavemisc2 + miscSavemisc2 + tempSavemisc2);
     output.savemisc2 = newSave;
