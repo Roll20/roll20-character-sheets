@@ -38,13 +38,16 @@
       <input type="checkbox" class="announcements-show" name="attr_show_announcements" value="1" data-i18n-title="close-announcements" title="Close Announcements" />
       <span class="announcements-exit" data-i18n-title="close">*</span><br>
       <h3 data-i18n="latest-announcements">Latest Announcements</h3>
-      <span class="footer">12/6/24</span>
+      <span class="footer">3/27/25</span>
       <ol>
-        <strong>v1.9</strong>
+        <strong>v1.92</strong>
+        <li>Added a validation check to the character name field. Character names that include ')', ']', '}', or '|' will be flagged with an error. These are reserved characters that can cause problems with roll macros and sheetworker processing. Simply omit these problematic characters and/or substitute with a non-special character. Close and reopen the sheet to ensure the name has been set.</li>
+        <li>Minor adjustments; Willpower/Experience layout. Fixed alignment and hover state for the Artifact dice pool images. Changed the background for the roll template header and the left-aligned the dice type labels.</li>
+        <strong>v1.91</strong>
         <li>Note about character names; Including non-alpha-numeric characters 'may' break sheet rolls/macros. Specifically ')', ']', '}', or '|'. Underscores, dashes, and apostrophes should be fine.</li>
         <li>Changed the artifact dice checkboxes to a drop-down selector.</li>
         <li>Minor adjustments for translations.</li>
-        <li>Fixed a bug introduced in the last update (major appologies!) that could cause Strength to keep reseting to 0 unless set on the monster tab first. Collaterally, the other abilities were capped according to strength. The sheet logic should now be fixed to properly handle PC strength and Monster strength when switching tabs.</li>
+        <li>Fixed a bug introduced in the last update (major apologies!) that could cause Strength to keep resetting to 0 unless set on the monster tab first. Collaterally, the other abilities were capped according to strength. The sheet logic should now be fixed to properly handle PC strength and Monster strength when switching tabs.</li>
         <li>Small cosmetic change to the Willpower checkboxes and Ability background image.</li>
         <li>Fixed a bug where PC Strength could get switched to '7' when moving between the PC and Monster tab.</li>
         <li>Push your rolls without the API! The sheet's rolls have been updated with CRP(custom roll parsing). You can now roll your dice pool and push them directly from the chat window without having to manually adjust the pool and re-rolling. (thank you Richard for letting me mangle your MYZ CRP code for this.)</li>
@@ -81,7 +84,7 @@
           <li>Fixed a bug where spell subtitle2 text could be included with subsequent rolls from the dice pool unless the pool was manually cleared.</li>
           <li>Reputation total(age+mod) is now seen on the sheet button.</li>
           <li>Updated the Artifact dice images in the dice pool.</li>
-          <li>Artifact dice rolled will now show the actual # rolled, supperimposed over the # of successes. Prior to this change, Artifact dice results would show the # rolled up to the first success(ie 6+), then only show the #of success. This could be a confusing.</li>
+          <li>Artifact dice rolled will now show the actual # rolled, superimposed over the # of successes. Prior to this change, Artifact dice results would show the # rolled up to the first success(ie 6+), then only show the #of success. This could be a confusing.</li>
           <strong>v1.853</strong>
           <li>Added a couple Sheet Background options in settings. note: Darkmode overrides this option.</li>
           <strong>v1.852</strong>
@@ -120,7 +123,7 @@
           <li>Removed an errant extra space that was pushing the last Misc+/- modifier to a new line in the roll template.</li>
           <strong>v1.80</strong>
           <li>More dark mode attention.</li>
-          <li>Updated sheet images in preperation for supporting dark mode.</li>
+          <li>Updated sheet images in preparation for supporting dark mode.</li>
           <strong>v1.79</strong>
           <li>Fixed title text for the repeating_mount attributes. (thanks JohanR)</li>
           <li>Fixed Skill sorting for non-english translations.(tnx Spat)</li>
@@ -173,7 +176,7 @@
           <li>Bug fix: shield shove/parry rolls were erroneously including strength as gear dice.</li>
           <li>Optimized the css that reduces the opacity of damage skulls above the attribute's max value. Purely cosmetic.</li>
           <strong>v1.63</strong>
-          <li>Added a toggleable 2nd row to each skill.</li>
+          <li>Added a toggle-able 2nd row to each skill.</li>
           <li>Added Artifact dice, Misc Skill modifier, and Notes to each skill.</li>
           <li>Updated the roll template for skill rolls.</li>
           <li>Added Misc Skill modifier to strength-based monster skills.</li>
@@ -210,7 +213,11 @@
         <!--Monster Stats-->
         <div class="monster monster-stat1">
           <div class="header-top monster-stats-box1">
-            <input class="input-number header-h1" type="text" name="attr_character_name" value="" title="@{character_name}" data-i18n-placeholder="monster-name" placeholder="Monster's Name/Type" />
+            <input type="checkbox" name="attr_character_name_error" class="hidden error" value="1" />
+            <label>
+              <input class="input-number header-h1" type="text" name="attr_character_name" value="" data-i18n-placeholder="monster-name" placeholder="Monster's Name/Type" />
+              <span class="custom-tooltip" data-i18n="character-name"></span>
+            </label>
           </div>
           <div class="column-header-bottom monster-stats-box2">
             <span data-i18n="move">Move</span>
@@ -500,7 +507,11 @@
             <span class="label" data-i18n="kin">Kin</span>
           </div>
           <div class="heading-box2">
-            <input class="input" type="text" name="attr_character_name" value="" data-i18n-title="character-name" title="@{character_name} | NOTE: Including non-alpha-numeric characters 'may' break sheet rolls/macros. Specifically ')', ']', '}', or '|'. Underscores, dashes, and apostrophes should be fine." />
+            <input type="checkbox" name="attr_character_name_error" class="hidden error" value="1" />
+            <label>
+              <input class="input" type="text" name="attr_character_name" value="" />
+              <span class="custom-tooltip" data-i18n="character-name"></span>
+            </label>
           </div>
           <div class="heading-box3">
             <span class="label" data-i18n="profession">Profession</span>
@@ -2896,7 +2907,7 @@
       <div class="box toggle-monster-only character-willpower">
         <div class="willpower-grid">
           <div class="willpower-box1 header-top">
-            <h1 data-i18n="willpower-u" style="margin-left: 3em;">WILLPOWER</h1>
+            <h1 data-i18n="willpower-u">WILLPOWER</h1>
           </div>
           <div class="willpower-box2">
             <button class="reset" type="action" name="act_reset" data-i18n-title="no-willpower" title="No Willpower"></button><span></span>
@@ -4331,14 +4342,14 @@
     </div>
     <!-- ALLPROPS-->
     <div class="template-grid">
-      {{#allprops() character_name name character_id name_link subtitle subtitle2 imageInsert imageInsertFood imageInsertWater imageInsertArrows imageInsertTorches free-text free-text-center free-text-right footer attribute-die-one attribute-die-two attribute-die-three attribute-die-four attribute-die-five attribute-die-six attribute-die-seven attribute-die-eight attribute-die-nine attribute-die-ten attribute-die-eleven attribute-die-twelve skill-die-one skill-die-two skill-die-three skill-die-four skill-die-five skill-die-six skill-die-seven skill-die-eight skill-die-nine skill-die-ten negative-die-one negative-die-two negative-die-three gear-die-one gear-die-two gear-die-three gear-die-four gear-die-five gear-die-six gear-die-seven gear-die-eight gear-die-nine gear-die-ten gear-die-eleven gear-die-twelve artifact-die-eight artifact-die-ocho artifact-die-ten artifact-die-twelve attribute-roll-one attribute-roll-two attribute-roll-three attribute-roll-four attribute-roll-five attribute-roll-six attribute-roll-seven attribute-roll-eight attribute-roll-nine attribute-roll-ten attribute-roll-eleven attribute-roll-twelve skill-roll-one skill-roll-two skill-roll-three skill-roll-four skill-roll-five skill-roll-six skill-roll-seven skill-roll-eight skill-roll-nine skill-roll-ten negative-roll-one negative-roll-two negative-roll-three gear-roll-one gear-roll-two gear-roll-three gear-roll-four gear-roll-five gear-roll-six gear-roll-seven gear-roll-eight gear-roll-nine gear-roll-ten gear-roll-eleven gear-roll-twelve artifact-roll-eight artifact-roll-ocho artifact-roll-ten artifact-roll-twelve consumable-die-zero consumable-die-six consumable-die-eight d66-die-one d66-roll-one d66-die-two d66-roll-two consumable-die-ten consumable-die-twelve consumable-roll-zero consumable-roll-six consumable-roll-eight consumable-roll-ten consumable-roll-twelve push-query weapon-bonus weapon-bonus-max weapon-bonus-misc weapon-damage weapon-damage-misc attack-features weapon-grip weapon-range weapon-features attack-description spell-rank caster-rank spell-willpower spell-range spell-duration spell-ingredients spell-ingredients-included spell-grimoire spell-description current-willpower basePL armor1-equipped armor1-name armor1-rating armor1-rating-max armor1-rating-total armor1-rating-misc armor2-equipped armor2-name armor2-rating armor2-rating-max armor2-rating-misc armor2-rating-total armor3-equipped armor3-name armor3-rating armor3-rating-max armor3-rating-misc armor3-rating-total armor4-equipped armor4-name armor4-rating armor4-rating-max armor4-rating-misc armor4-rating-total shield1-name shield1-base shield1-skill shield1-bonus shield1-bonus-max shield1-bonus-misc skill-base skill-skill skill-bonus-misc-skill skill-bonus-misc-gear skill-notes dice-label-flag pride-flag consumable-flag push pushroll successes failures gearfails}}
+      {{#allprops() character_name name character_id name_link subtitle subtitle2 imageInsert imageInsertFood imageInsertWater imageInsertArrows imageInsertTorches free-text free-text-center free-text-right footer attribute-die-one attribute-die-two attribute-die-three attribute-die-four attribute-die-five attribute-die-six attribute-die-seven attribute-die-eight attribute-die-nine attribute-die-ten attribute-die-eleven attribute-die-twelve skill-die-one skill-die-two skill-die-three skill-die-four skill-die-five skill-die-six skill-die-seven skill-die-eight skill-die-nine skill-die-ten negative-die-one negative-die-two negative-die-three gear-die-one gear-die-two gear-die-three gear-die-four gear-die-five gear-die-six gear-die-seven gear-die-eight gear-die-nine gear-die-ten gear-die-eleven gear-die-twelve artifact-die-eight artifact-die-ocho artifact-die-ten artifact-die-twelve attribute-roll-one attribute-roll-two attribute-roll-three attribute-roll-four attribute-roll-five attribute-roll-six attribute-roll-seven attribute-roll-eight attribute-roll-nine attribute-roll-ten attribute-roll-eleven attribute-roll-twelve skill-roll-one skill-roll-two skill-roll-three skill-roll-four skill-roll-five skill-roll-six skill-roll-seven skill-roll-eight skill-roll-nine skill-roll-ten negative-roll-one negative-roll-two negative-roll-three gear-roll-one gear-roll-two gear-roll-three gear-roll-four gear-roll-five gear-roll-six gear-roll-seven gear-roll-eight gear-roll-nine gear-roll-ten gear-roll-eleven gear-roll-twelve artifact-roll-eight artifact-roll-ocho artifact-roll-ten artifact-roll-twelve consumable-die-zero consumable-die-six consumable-die-eight d66-die-one d66-roll-one d66-die-two d66-roll-two consumable-die-ten consumable-die-twelve consumable-roll-zero consumable-roll-six consumable-roll-eight consumable-roll-ten consumable-roll-twelve weapon-bonus weapon-bonus-max weapon-bonus-misc weapon-damage weapon-damage-misc attack-features weapon-grip weapon-range weapon-features attack-description spell-rank caster-rank spell-willpower spell-range spell-duration spell-ingredients spell-ingredients-included spell-grimoire spell-description current-willpower basePL armor1-equipped armor1-name armor1-rating armor1-rating-max armor1-rating-total armor1-rating-misc armor2-equipped armor2-name armor2-rating armor2-rating-max armor2-rating-misc armor2-rating-total armor3-equipped armor3-name armor3-rating armor3-rating-max armor3-rating-misc armor3-rating-total armor4-equipped armor4-name armor4-rating armor4-rating-max armor4-rating-misc armor4-rating-total shield1-name shield1-base shield1-skill shield1-bonus shield1-bonus-max shield1-bonus-misc skill-base skill-skill skill-bonus-misc-skill skill-bonus-misc-gear skill-notes dice-label-flag pride-flag consumable-flag push pushroll successes failures gearfails}}
       <div class="template-grid-item template-span-half">
         <span>**{{key}}**:</span>
       </div>
       <div class="template-grid-item template-span-2nd-half">
         <span>{{value}}</span>
       </div>
-      {{/allprops() character_name name character_id name_link subtitle subtitle2 imageInsert imageInsertFood imageInsertWater imageInsertArrows imageInsertTorches free-text free-text-center free-text-right footer attribute-die-one attribute-die-two attribute-die-three attribute-die-four attribute-die-five attribute-die-six attribute-die-seven attribute-die-eight attribute-die-nine attribute-die-ten attribute-die-eleven attribute-die-twelve skill-die-one skill-die-two skill-die-three skill-die-four skill-die-five skill-die-six skill-die-seven skill-die-eight skill-die-nine skill-die-ten negative-die-one negative-die-two negative-die-three gear-die-one gear-die-two gear-die-three gear-die-four gear-die-five gear-die-six gear-die-seven gear-die-eight gear-die-nine gear-die-ten gear-die-eleven gear-die-twelve artifact-die-eight artifact-die-ocho artifact-die-ten artifact-die-twelve attribute-roll-one attribute-roll-two attribute-roll-three attribute-roll-four attribute-roll-five attribute-roll-six attribute-roll-seven attribute-roll-eight attribute-roll-nine attribute-roll-ten attribute-roll-eleven attribute-roll-twelve skill-roll-one skill-roll-two skill-roll-three skill-roll-four skill-roll-five skill-roll-six skill-roll-seven skill-roll-eight skill-roll-nine skill-roll-ten negative-roll-one negative-roll-two negative-roll-three gear-roll-one gear-roll-two gear-roll-three gear-roll-four gear-roll-five gear-roll-six gear-roll-seven gear-roll-eight gear-roll-nine gear-roll-ten gear-roll-eleven gear-roll-twelve artifact-roll-eight artifact-roll-ocho artifact-roll-ten artifact-roll-twelve consumable-die-zero consumable-die-six consumable-die-eight d66-die-one d66-roll-one d66-die-two d66-roll-two consumable-die-ten consumable-die-twelve consumable-roll-zero consumable-roll-six consumable-roll-eight consumable-roll-ten consumable-roll-twelve push-query weapon-bonus weapon-bonus-max weapon-bonus-misc weapon-damage weapon-damage-misc attack-features weapon-grip weapon-range weapon-features attack-description spell-rank caster-rank spell-willpower spell-range spell-duration spell-ingredients spell-ingredients-included spell-grimoire spell-description current-willpower basePL armor1-equipped armor1-name armor1-rating armor1-rating-max armor1-rating-total armor1-rating-misc armor2-equipped armor2-name armor2-rating armor2-rating-max armor2-rating-misc armor2-rating-total armor3-equipped armor3-name armor3-rating armor3-rating-max armor3-rating-misc armor3-rating-total armor4-equipped armor4-name armor4-rating armor4-rating-max armor4-rating-misc armor4-rating-total shield1-name shield1-base shield1-skill shield1-bonus shield1-bonus-max shield1-bonus-misc skill-base skill-skill skill-bonus-misc-skill skill-bonus-misc-gear skill-notes dice-label-flag pride-flag consumable-flag push pushroll successes failures gearfails}}
+      {{/allprops() character_name name character_id name_link subtitle subtitle2 imageInsert imageInsertFood imageInsertWater imageInsertArrows imageInsertTorches free-text free-text-center free-text-right footer attribute-die-one attribute-die-two attribute-die-three attribute-die-four attribute-die-five attribute-die-six attribute-die-seven attribute-die-eight attribute-die-nine attribute-die-ten attribute-die-eleven attribute-die-twelve skill-die-one skill-die-two skill-die-three skill-die-four skill-die-five skill-die-six skill-die-seven skill-die-eight skill-die-nine skill-die-ten negative-die-one negative-die-two negative-die-three gear-die-one gear-die-two gear-die-three gear-die-four gear-die-five gear-die-six gear-die-seven gear-die-eight gear-die-nine gear-die-ten gear-die-eleven gear-die-twelve artifact-die-eight artifact-die-ocho artifact-die-ten artifact-die-twelve attribute-roll-one attribute-roll-two attribute-roll-three attribute-roll-four attribute-roll-five attribute-roll-six attribute-roll-seven attribute-roll-eight attribute-roll-nine attribute-roll-ten attribute-roll-eleven attribute-roll-twelve skill-roll-one skill-roll-two skill-roll-three skill-roll-four skill-roll-five skill-roll-six skill-roll-seven skill-roll-eight skill-roll-nine skill-roll-ten negative-roll-one negative-roll-two negative-roll-three gear-roll-one gear-roll-two gear-roll-three gear-roll-four gear-roll-five gear-roll-six gear-roll-seven gear-roll-eight gear-roll-nine gear-roll-ten gear-roll-eleven gear-roll-twelve artifact-roll-eight artifact-roll-ocho artifact-roll-ten artifact-roll-twelve consumable-die-zero consumable-die-six consumable-die-eight d66-die-one d66-roll-one d66-die-two d66-roll-two consumable-die-ten consumable-die-twelve consumable-roll-zero consumable-roll-six consumable-roll-eight consumable-roll-ten consumable-roll-twelve weapon-bonus weapon-bonus-max weapon-bonus-misc weapon-damage weapon-damage-misc attack-features weapon-grip weapon-range weapon-features attack-description spell-rank caster-rank spell-willpower spell-range spell-duration spell-ingredients spell-ingredients-included spell-grimoire spell-description current-willpower basePL armor1-equipped armor1-name armor1-rating armor1-rating-max armor1-rating-total armor1-rating-misc armor2-equipped armor2-name armor2-rating armor2-rating-max armor2-rating-misc armor2-rating-total armor3-equipped armor3-name armor3-rating armor3-rating-max armor3-rating-misc armor3-rating-total armor4-equipped armor4-name armor4-rating armor4-rating-max armor4-rating-misc armor4-rating-total shield1-name shield1-base shield1-skill shield1-bonus shield1-bonus-max shield1-bonus-misc skill-base skill-skill skill-bonus-misc-skill skill-bonus-misc-gear skill-notes dice-label-flag pride-flag consumable-flag push pushroll successes failures gearfails}}
     </div>
   </div>
 </rolltemplate>
@@ -4382,6 +4393,31 @@
 
   const stats = ['strength', 'agility', 'wits', 'empathy'];
 
+  // Character Name Validation
+  const isAlphaNumericWithSpaces = (attr) => {
+    // Check for alpha-numeric characters and spaces
+    if (/^[a-zA-Z0-9\s]+$/.test(attr)) {
+      return true;
+    }
+    // Check for specific characters that can break a macro
+    // can we substitute with an html special?
+    if (/[)|\}\|\]]/.test(attr)) {
+      return false;
+    }
+    return true;
+  };
+
+  // Validate character name for illegal characters
+  const nameChanged = (name, attr) => {
+    const output = {};
+    // validate input
+    const isText = isAlphaNumericWithSpaces(attr);
+    // clog(`Valid Input?: ${isText}`);
+    // write to a hidden checkbox in html ie 'X_error', CSS to style
+    output[`${name}_error`] = isText === true ? 0 : 1;
+    setAttrs(output, {silent: true});
+  };
+
   /* version tracking */
   const newAnnouncement = (old_version, new_version, show_announcement) => {
     const setter = {};
@@ -4407,7 +4443,7 @@
     // set the sheet version you are upgrading sheet to,
     // and set show_announcement to 1 if you want to force an announcement to be shown.
     // don't set a code_version; we use the switch below for that.
-    const new_version = 1.9;
+    const new_version = 1.92;
     const show_announcement = 0;
     if (!old_version) old_version = 0;
     switch (true) {
@@ -4420,8 +4456,12 @@
         clog('Updating to version 1.77');
         update_to_1_77(old_version);
         break;
+      case old_version >= 1.77 && old_version < 1.92:
+        clog('Updating to version 1.92');
+        update_to_1_92(old_version);
+        break;
       default:
-        // if reach this, all codeversion upgrades are complete
+        // all codeversion upgrades are complete
         // can run your recalculate function to show announcements
         newAnnouncement(old_version, new_version, show_announcement);
     }
@@ -4442,7 +4482,7 @@
         if (v[key]) setter[key] = v[value];
       });
 
-      // MUST set the version to a specific value here, the one where the sheet was updated like this.
+      // set the version
       const current_version = 1.71;
       setter.version = current_version;
       setAttrs(setter, {silent: true}, versionator(current_version));
@@ -4454,11 +4494,22 @@
   const update_to_1_77 = (old_version) => {
     const setter = {};
     localRollMacro();
-    // MUST set the version to a specific value here, the one where the sheet was updated like this.
-    const current_version = 1.9;
+    // set the version
+    const current_version = 1.77;
     setter.version = current_version;
     setAttrs(setter, {silent: true}, versionator(current_version));
     clog('Updating localized rolls to match the dice pool roller.');
+  };
+
+  // character_name validation check
+  const update_to_1_92 = (old_version) => {
+    const setter = {};
+    nameChanged();
+    // set the version
+    const current_version = 1.92;
+    setter.version = current_version;
+    setAttrs(setter, {silent: true}, versionator(current_version));
+    clog('Checking character_name for invalid characters.');
   };
 
   on('sheet:opened', () => {
@@ -4770,7 +4821,7 @@
       let pc = int(v.strength_pc);
       let monster = int(v.strength_monster);
       let forceupdate = 0;
-      clog(`MONSTER/PC STRENGTH SWAP --- tab:${tab} str:${str} pc:${pc} monster:${monster}`);
+      // clog(`MONSTER/PC STRENGTH SWAP --- tab:${tab} str:${str} pc:${pc} monster:${monster}`);
       // check if character existed before strength_pc or _monster stats were introduced.
       if (str > 0) {
         if (pc === 0 || monster === 0) forceupdate = 1;
@@ -5377,7 +5428,6 @@
         const trigger = {name: values.current_preset},
           attributes = {
             character_name: values.character_name || 'Unknown',
-            character_id: values.character_id || 0,
           },
           roll = {
             name: values.current_preset || 'Roll',
@@ -6242,7 +6292,6 @@
   on('sheet:opened', function () {
     // clog('Translation of query text complete.');
     setAttrs({
-      translation_push_query: `${getTranslationByKey('push-query')}`,
       translation_whisper_macro_query: `?{${getTranslationByKey('whisper-macro')}|${getTranslationByKey('no')},|${getTranslationByKey('yes')},/w gm |}`,
       translation_whisper_api_macro_query: `?{${getTranslationByKey('whisper-macro')}|${getTranslationByKey('no')},!forl |${getTranslationByKey('yes')},!wforl |}`,
     });
@@ -6647,6 +6696,14 @@
         setAttrs(output, {silent: true});
         finishRoll(roll.rollId);
       });
+    });
+  });
+
+  on('change:character_name', (eventInfo) => {
+    getAttrs(['character_name'], (v) => {
+      const attr = v[`${eventInfo.sourceAttribute}`];
+      const name = `${eventInfo.sourceAttribute}`;
+      nameChanged(name, attr);
     });
   });
 </script>

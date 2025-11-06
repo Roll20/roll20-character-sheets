@@ -72,9 +72,9 @@
       </label>
       <label class="input-label"><span data-i18n="enhancement automation"></span>
         <select class="underlined input-label__input" name="attr_enhancement_query" title="@{enhancement_query}">
-          <option value="off" data-i18n="off" selected="">
+          <option value="off" data-i18n="off">
           </option>
-          <option value="on" data-i18n="on">
+          <option value="on" data-i18n="on" selected="">
           </option>
         </select>
       </label>
@@ -572,23 +572,23 @@
       <button class="repcontrol-button repcontrol-button--edit" name="act_edit-injury" data-i18n-title="edit section" type="action">
       </button>
       <div class="input-label input-label--button">
-        <button class="roller" name="roll_movement_dice" data-i18n="movement dice" role="heading" aria-level="5" value="@{movement_dice_action}" type="roll">
+        <button class="has-label has-label--capitalize roller" name="roll_movement_dice" data-i18n="movement dice" role="heading" aria-level="5" value="@{movement_dice_action}" type="roll">
         </button>
-        <input class="underlined input-label__input" name="attr_movement_dice" type="number" readonly="" value="1" title="@{movement_dice}"/>
+        <input class="underlined input-label__input" name="attr_movement_dice" type="number" value="1" title="@{movement_dice}"/>
       </div>
       <button name="act_movement-dice-action" hidden="" type="action">
       </button>
       <input name="attr_movement_dice_action" type="hidden" title="@{movement_dice_action}"/>
       <div class="input-label input-label--button">
-        <button class="roller" name="roll_defense" role="heading" data-i18n="defense roll" aria-level="5" value="@{defense_action}" type="roll">
+        <button class="has-label has-label--capitalize roller" name="roll_defense" role="heading" data-i18n="defense roll" aria-level="5" value="@{defense_action}" type="roll">
         </button>
-        <input class="underlined input-label__input" name="attr_defense" type="number" readonly="" value="1" title="@{defense}"/>
+        <input class="underlined input-label__input" name="attr_defense" type="number" value="1" title="@{defense}"/>
       </div>
       <button name="act_defense-action" hidden="" type="action">
       </button>
       <input name="attr_defense_action" type="hidden" title="@{defense_action}"/>
       <div class="input-label input-label--button initiative-label">
-        <button class="roller" name="roll_pc_initiative" data-i18n="initiative" role="heading" aria-level="5" value="@{pc_initiative_action}" type="roll">
+        <button class="has-label has-label--capitalize roller" name="roll_pc_initiative" data-i18n="initiative" role="heading" aria-level="5" value="@{pc_initiative_action}" type="roll">
         </button>
         <button name="act_pc-initiative-action" hidden="" type="action">
         </button>
@@ -1015,37 +1015,25 @@
                 </option>
                 <option value="query" data-i18n="query">
                 </option>
-                <option value="academics" data-i18n="academics">
+                <option value="legend" data-i18n="legend">
                 </option>
-                <option value="athletics" data-i18n="athletics">
+                <option value="intellect" data-i18n="intellect">
                 </option>
-                <option value="close combat" data-i18n="close combat">
+                <option value="cunning" data-i18n="cunning">
                 </option>
-                <option value="culture" data-i18n="culture">
+                <option value="resolve" data-i18n="resolve">
                 </option>
-                <option value="empathy" data-i18n="empathy">
+                <option value="might" data-i18n="might">
                 </option>
-                <option value="firearms" data-i18n="firearms">
+                <option value="dexterity" data-i18n="dexterity">
                 </option>
-                <option value="integrity" data-i18n="integrity">
+                <option value="stamina" data-i18n="stamina">
                 </option>
-                <option value="leadership" data-i18n="leadership">
+                <option value="presence" data-i18n="presence">
                 </option>
-                <option value="medicine" data-i18n="medicine">
+                <option value="manipulation" data-i18n="manipulation">
                 </option>
-                <option value="occult" data-i18n="occult">
-                </option>
-                <option value="persuasion" data-i18n="persuasion">
-                </option>
-                <option value="pilot" data-i18n="pilot">
-                </option>
-                <option value="science" data-i18n="science">
-                </option>
-                <option value="subterfuge" data-i18n="subterfuge">
-                </option>
-                <option value="survival" data-i18n="survival">
-                </option>
-                <option value="technology" data-i18n="technology">
+                <option value="composure" data-i18n="composure">
                 </option>
               </select>
             </div>
@@ -2256,11 +2244,11 @@
     <div class="upper-blur"></div>
     <div class="lower-blur"></div>
     <div class="content">
-      <div class="header">{{#title}}
+      <div class="header">{{^continuation}}{{#title}}
         <h3 class="title">{{title}}</h3>{{/title}}{{#attribute}}
         <h4>{{attribute}}</h4>{{/attribute}}{{#skill}}{{#attribute}}
         <h4 class="amp">&</h4>{{/attribute}}
-        <h4>{{skill}}</h4>{{/skill}}{{^continuation}}{{#character_name}}{{#character_id}}
+        <h4>{{skill}}</h4>{{/skill}}{{#character_name}}{{#character_id}}
         <h4 class="character_name">[{{character_name}}](http://journal.roll20.net/character/{{character_id}})</h4>{{/character_id}}{{^character_id}}
         <h4 class="character_name">{{character_name}}</h4>{{/character_id}}{{/character_name}}{{/continuation}}
       </div>{{#vs}}
@@ -2333,6 +2321,14 @@ kFuncs.version = version;
 	*/
 let debugMode = false;
 kFuncs.debugMode = debugMode;
+/**
+	* A boolean flag that tells the script whether to output verbose logs of what is being done or not when {@link debugMode} is enabled.
+ * @memberof Variables
+	* @var
+	* @type {boolean}
+	*/
+let verboseMode = false;
+kFuncs.verboseMode = verboseMode;
 const funcs = {};
 kFuncs.funcs = funcs;
 const updateHandlers = {};
@@ -2341,8 +2337,8 @@ const initialSetups = {};
 const allHandlers = {};
 const addFuncs = {};
 
-const kscaffoldJSVersion = '1.0.0';
-const kscaffoldPUGVersion = '1.0.0';
+const kscaffoldJSVersion = '2.7.2';
+const kscaffoldPUGVersion = '2.7.0';
 /**
  * Defines the rollstring that rolls made using k.startRoll begin with. Defaults to "&{template:default}".
  * @memberof Variables
@@ -2502,7 +2498,6 @@ kFuncs.capitalize = capitalize;
  * }
  */
 const extractQueryResult = async function(query){
-	debug('entering extractQueryResult');
   const rollObj = {
     query:`[[0[response=?{${query}}]]]`
   };
@@ -2585,10 +2580,10 @@ kFuncs.debug = debug;
  * @param {attributesProxy} attributes - The attributes object that must have a value for the reporder for each section.
  * @param {object[]} sections - Object containing the IDs for the repeating sections, indexed by repeating section name.
  */
-const orderSections = function(attributes,sections){
+const orderSections = function(attributes,sections,casc){
   Object.keys(sections).forEach((section)=>{
     attributes.attributes[`_reporder_${section}`] = commaArray(attributes[`_reporder_${section}`]);
-    sections[section] = orderSection(attributes.attributes[`_reporder_${section}`],sections[section]);
+    sections[section] = orderSection(attributes.attributes[`_reporder_${section}`],sections[section],attributes,section,casc);
   });
 };
 kFuncs.orderSections = orderSections;
@@ -2598,10 +2593,26 @@ kFuncs.orderSections = orderSections;
  * @memberof Utilities
  * @param {string[]} repOrder - Array of IDs in the order they are in on the sheet.
  * @param {string[]} IDs - Array of IDs to be ordered. Aka the default ID Array passed to the getSectionIDs callback
+ * @param {AttributesProxy} [attributes] - The Kscaffold attributes object
+ * @param {string} [section] - the name of the section being ordered. If section and attributes are passed, will return an ordered array that does not include IDs for rows that do not exist.
+ * @param {object} [casc] - the object describing the default state of the sheet.
  * @returns {string[]} - The ordered id array
  */
-const orderSection = function(repOrder,IDs=[]){
-  const idArr = [...repOrder.filter(v => v),...IDs.filter(id => !repOrder.includes(id.toLowerCase()))];
+const orderSection = function(repOrder,IDs=[], attributes, section,casc){
+  const idArr = [...repOrder.filter(v => v),...IDs.filter(id => !repOrder.includes(id.toLowerCase()))]
+    .filter(id => {
+      const testAttr = Object.keys(casc).find(a => a.toLowerCase().startsWith(`attr_${section}_${id}`));
+      const testName = testAttr?.replace(/attr_/,'');
+      const idName = testName?.replace(/\$x/,id);
+      return (!section && !casc) ||
+        (
+          idName && 
+          (
+            attributes.attributes.hasOwnProperty(idName) ||
+            attributes.updates.hasOwnProperty(idName)
+          )
+        );
+    });
   return idArr;
 };
 kFuncs.orderSection = orderSection;
@@ -2738,328 +2749,599 @@ const kReceive = function({trigger,attributes,sections,casc}) {
 };
 funcs.kReceive = kReceive;/*jshint esversion: 11, laxcomma:true, eqeqeq:true*/
 /*jshint -W014,-W084,-W030,-W033*/
-
+/**
+ * Detailed descriptions of the arguments that are passed to functions registered with the K-scaffold.
+ * @namespace Sheetworkers.Function Arguments
+ */
+/**
+ * An object that stores the rowID information for each repeating section on the sheet.
+ * @name sections
+ * @memberof Function Arguments
+ * @var
+ * @property {string[]} repeating_section_name - The row IDs of a given repeating section. The repeating section name is used **with** the `repeating_` prefix (e.g. `sections['repeating_weapons']`).
+ */
+/**
+ * Object that stores the default trigger information for all attributes. Indexed by attribute, button name, or fieldset name prefixed with `attr_`, `act_`, or `fieldset_` respectively.
+ * @name casc
+ * @memberof Function Arguments
+ * @var
+ */
+/**
+ * Object describing the attribute that is currently being worked on. In addition to the properties described here, the properties from the Roll20 event will also be present if the attribute was the original event. Additional properties may be present if you specified them when creating the input for the attribute.
+ * @name trigger
+ * @memberof Function Arguments
+ * @var
+ * @property {string} name - The full name of the attribute.
+ * @property {string[]} triggeredFuncs - Array of function names that will be called when this attribute is worked on.
+ * @property {string} calculation - The name of the function that is used to calculate the value of this attribute.
+ * @property {string} formula - The macro syntax formula to use to calculate this attributes value.
+ * @property {string[]} affects - Array of attribute names that this attribute might affect.
+ * @property {string[]} addFuncs - Functions that are called when the add row button is clicked for a customControlFieldset.
+ * @property {string} listener - What function was used to listen for changes to this attribute. Unless you have decided to implement your own event handling, this should always be `"accessSheet"`.
+ * @property {string} type - What type of thing this trigger is for (e.g. number, action).
+ */
 //# Attribute Obj Proxy handler
-const createAttrProxy = function(attrs,sections,casc){
-  //creates a proxy for the attributes object so that values can be worked with more easily.
-  const getCascObj = function(event){
-    const eventName = event.triggerName || event.sourceAttribute;
-    let typePrefix = eventName.startsWith('clicked:') ?
-      'act_' :
-      event.removedInfo ?
-      'fieldset_' :
-      'attr_';
-    let cascName = `${typePrefix}${eventName.replace(/(?:removed?|clicked):/,'')}`;
-    let cascObj = casc[cascName];
-    k.debug({[cascName]:cascObj});
-    if(event && cascObj){
-      Object.assign(cascObj,event);
-      if(event.originalRollId){
-        cascObj.rollData = RE.unescape(event.originalRollId);
+/**
+	* A representation of the sheet's attributes. This is a proxy for the actual object and will keep track of original values and updates that have been applied. Calling an attribute directly on the attributes value will return it's current value coerced into a number if it is numeric. Setting a property on the attributes object will add it the list of updates which will be applied the next time the `set()` method is called on attributes.
+  * @name attributes
+  * @memberof Function Arguments
+  * @var
+  * @property {object} attributes - The raw original data of the character sheet.
+  * @property {object} updates - The raw data that will be saved to the character sheet once all operations have been completed.
+  * @property {function} set - Method to apply changes to the character sheet. This is called automatically at the end of the scaffold's event handling. Needs to be called manually if inside an asynchronous function, such as when using the startRoll sheetworker (or any of the scaffold aliases for startRoll). The method uses object destructuring syntax for the arguments it takes.
+  * @property {boolean} [set.vocal=false] - Whether the set is done silently or not. Should almost always be left at false. `attributes.set({vocal:true})`
+  * @property {function} [set.callback] - Callback function to be invoked once the setAttrs is complete. `attributes.set({callback(){/*do a thing}})`
+  * @property {any} attribute_name - Name of any attribute whose data from the character sheet you want to access. Will only return a value if the attribute was defined using the scaffold's pug mixins (e.g. +input). If the value of the attribute is numerical (e.g. `"5"`), it will be returned as a number. You can also apply changes by simply assigning a value to an attribute name (e.g. `attributes.character_name = 'New Character'`).
+  * @property {object} repOrders - Object showing the ordered arrays for the _reporder_ attributes for each repeating section. Indexed by repeating section name
+  * @property {object[]} repeating_section_name - Name of a repeating section whose data you want to access (e.g. `attributes.repeating_weapons`). The data will be returned as an array with objects describing each row in the order they are on the sheet. Objects are indexed by rowID as well. Mutating array methods are replaced by the `sort` and `move` methods. Non mutating array methods can be used as normal.
+  * @property {string} repeating_section_name._section - the name of the repeating section. Used internally by the scaffold. Readonly.
+  * @property {function} move - Method for reordering rows.
+  * @property {number|string} move.startingPosition - the row id or position index for the row you want to move.
+  * @property {number} move.destination - The position in the section where you want the row to be moved to. If the position is greater than the length of the section, the row will be moved to the last position. If the position is negative, it will be moved to the start of the section.
+  * @property {boolean} [move.silent=false] - Whether the reordering should trigger setSectionOrder or not.
+  * @property {function} sort - Alias for the default Array.sort method. Functions as the default sort method, but has an optional second argument.
+  * @property {function} sort.callback - The function to use for determining the sort order. See the [Array.sort documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort) for details.
+  * @property {boolean} [sort.silent=false] - Whether to apply the sort to the display of the repeating section.
+  * @property {function} create - Method for creating a new row in a repeating section. Arguments for this method can be in any order. A row will not actually be created unless data is assigned to at least one attribute of the row, either at creation or later. Returns the object representing the new row.
+  * @property {string} [create.custom] - Custom text that replaces the starting characters of the rowID
+  * @property {object} [create.data] - what to set the attribute values of the row to. If not provided, the row object will be created, but no row will be created on the sheet until data is specified.
+  * @property {object} repeating_section_name.rowID_or_Index - Returns the object describing a row in a repeating section specified by row ID or indexed position. (e.g. `attributes.repeating_weapons[0]` returns the data for the first row in the weapons section)
+  * * @property {object} repeating_section_name.rowID_or_Index._id - The id of the row. Readonly.
+  * * @property {object} repeating_section_name.rowID_or_Index._section - The repeating section the row belongs to. Readonly.
+  * @property {any} repeating_section_name.rowID_or_Index.attribute_name - functions as an attribute_name call on the base attributes object. (e.g. `attributes['repeating_weapons_-jJ2soils_name']` is equivalent to `attributes.repeating_weapons['-jJ2soils'].name`).
+  * @type {object}
+	*/
+  const createAttrProxy = function(attrs,sections,casc){
+    //creates a proxy for the attributes object so that values can be worked with more easily.
+    const getCascObj = function(event){
+      const eventName = event.triggerName || event.sourceAttribute;
+      let typePrefix = eventName.startsWith('clicked:') ?
+        'act_' :
+        event.removedInfo ?
+        'fieldset_' :
+        'attr_';
+      let cascName = `${typePrefix}${eventName.replace(/(?:removed?|clicked):/,'')}`;
+      let cascObj = casc[cascName];
+      if(kFuncs.verboseMode){
+        debug({[cascName]:cascObj});
       }
-    }
-    return cascObj || {};
-  };
-  
-  const triggerFunctions = function(obj){
-    if(obj.triggeredFuncs && obj.triggeredFuncs.length){
-      debug(`triggering functions for ${obj.name}`);
-      obj.triggeredFuncs && obj.triggeredFuncs.forEach(func=>funcs[func] ? 
-        funcs[func]({trigger:obj,attributes,sections,casc}) :
-        debug(`!!!Warning!!! no function named ${func} found. Triggered function not called for ${obj.name}`,true));
-    }
-  };
-  
-  const initialFunction = function(obj){
-    if(obj.initialFunc){
-      debug(`initial functions for ${obj.name}`);
-      funcs[obj.initialFunc] ?
-        funcs[obj.initialFunc]({trigger:obj,attributes,sections}) :
-        debug(`!!!Warning!!! no function named ${obj.initialFunc} found. Initial function not called for ${obj.name}`,true);
-    }
-  };
-  const alwaysFunctions = function(trigger){
-    Object.values(allHandlers).forEach((handler)=>{
-      handler({trigger,attributes,sections,casc});
-    });
-  };
-  const processChange = function({event,trigger}){
-    if(event && !trigger){
-      debug(`${event.sourceAttribute} change detected. No trigger found`);
-      return;
-    }
-    if(!attributes || !sections || !casc){
-      debug(`!!! Insufficient arguments || attributes > ${!!attributes} | sections > ${!!sections} | casc > ${!!casc} !!!`);
-      return;
-    }
-    debug({trigger});
-    if(event){
-      debug('checking for initial & always functions');
-      if(Array.isArray(trigger.affects)){
-        attributes.queue.push(...trigger.affects);
-      }
-      alwaysFunctions(trigger,attributes,sections,casc);//Functions that should be run for all events.
-      initialFunction(trigger,attributes,sections,casc);//functions that should only be run if the attribute was the thing changed by the user
-
-    }
-    if(trigger){
-      debug(`processing ${trigger.name}`);
-      triggerFunctions(trigger,attributes,sections,casc);
-      if(!event){
-        // Handle autocalc formula
-        if(trigger.formula){
-          attributes[trigger.name] = parseKFormula({trigger,attributes,sections,casc});
-        }
-        // handle calculation of element
-        if(
-          trigger.calculation &&
-          funcs[trigger.calculation]
-        ){
-          attributes[trigger.name] = funcs[trigger.calculation]({trigger,attributes,sections,casc});
-        }else if(trigger.calculation && !funcs[trigger.calculation]){
-          debug(`K-Scaffold Error: No function named ${trigger.calculation} found`);
+      if(event && cascObj){
+        Object.assign(cascObj,event);
+        if(event.originalRollId){
+          cascObj.rollData = RE.unescape(event.originalRollId);
         }
       }
-    }
-    attributes.set();
-  };
-  const attrTarget = {
-    updates:{},
-    attributes:{...attrs},
-    repOrders:{},
-    queue: [],
-    casc:{},
-    alwaysFunctions,
-    processChange,
-    triggerFunctions,
-    initialFunction,
-    getCascObj
-  };
-  const attrHandler = {
-    get:function(obj,prop){//gets the most value of the attribute.
-      //If it is a repeating order, returns the array, otherwise returns the update value or the original value
-      if(prop === 'toJSON'){
-        return () => ({...obj.attributes,...obj.updates});
-      } else if(prop === 'set'){
-        return function(){
-          let {callback,vocal} = arguments[0] ? arguments[0] : {};
-          if(sections && casc && attributes.queue.length){
-            const triggerName = attributes.queue.shift();
-            const trigger = getCascObj({sourceAttribute:triggerName});
-            processChange({trigger,attributes,sections,casc});
-          }else{
-            debug({updates:obj.updates});
-            const trueCallback = Object.keys(obj.repOrders).length ?
-              function(){
-                Object.entries(obj.repOrders).forEach(([section,order])=>{
-                  _setSectionOrder(section,order)
-                });
-                callback && callback();
-              }:
-              callback;
-            Object.keys(obj.updates).forEach((key)=>obj.attributes[key] = obj.updates[key]);
-            const update = obj.updates;
-            obj.updates = {};
-            set(update,vocal,trueCallback);
+      return cascObj || {};
+    };
+    
+    const triggerFunctions = function(obj){
+      if(obj.triggeredFuncs && obj.triggeredFuncs.length){
+        if(kFuncs.verboseMode){
+          debug(`triggering functions for ${obj.name}`);
+        }
+        obj.triggeredFuncs && obj.triggeredFuncs.forEach(func=>funcs[func] ? 
+          funcs[func]({trigger:obj,attributes,sections,casc}) :
+          debug(`!!!Warning!!! no function named ${func} found. Triggered function not called for ${obj.name}`,true));
+      }
+    };
+    
+    const initialFunction = function(obj){
+      if(obj.initialFunc){
+        if(kFuncs.verboseMode){
+          debug(`initial functions for ${obj.name}`);
+        }
+        funcs[obj.initialFunc] ?
+          funcs[obj.initialFunc]({trigger:obj,attributes,sections}) :
+          debug(`!!!Warning!!! no function named ${obj.initialFunc} found. Initial function not called for ${obj.name}`,true);
+      }
+    };
+    const alwaysFunctions = function(trigger){
+      Object.values(allHandlers).forEach((handler)=>{
+        handler({trigger,attributes,sections,casc});
+      });
+    };
+    const processChange = function({event,trigger}){
+      if(event && !trigger){
+        debug(`${event.sourceAttribute} change detected. No trigger found`);
+        return;
+      }
+      if(!attributes || !sections || !casc){
+        debug(`!!! Insufficient arguments || attributes > ${!!attributes} | sections > ${!!sections} | casc > ${!!casc} !!!`);
+        return;
+      }
+      if(kFuncs.verboseMode){
+        debug({trigger});
+      }
+      if(event){
+        if(Array.isArray(trigger.affects)){
+          attributes.queue.push(...trigger.affects);
+        }
+        alwaysFunctions(trigger,attributes,sections,casc);//Functions that should be run for all events.
+        initialFunction(trigger,attributes,sections,casc);//functions that should only be run if the attribute was the thing changed by the user
+  
+      }
+      if(trigger){
+        triggerFunctions(trigger,attributes,sections,casc);
+        if(!event){
+          // Handle autocalc formula
+          if(trigger.formula){
+            attributes[trigger.name] = parseKFormula({trigger,attributes,sections,casc});
+          }
+          // handle calculation of element
+          if(
+            trigger.calculation &&
+            funcs[trigger.calculation]
+          ){
+            attributes[trigger.name] = funcs[trigger.calculation]({trigger,attributes,sections,casc});
+          }else if(trigger.calculation && !funcs[trigger.calculation]){
+            debug(`K-Scaffold Error: No function named ${trigger.calculation} found`);
           }
         }
-      }else if(Object.keys(obj).some(key=>key===prop)){ 
-        return Reflect.get(...arguments)
-      }else{
-        let retValue;
-        switch(true){
-          case obj.repOrders.hasOwnProperty(prop):
-            retValue = obj.repOrders[prop];
-            break;
-          case obj.updates.hasOwnProperty(prop):
-            retValue = obj.updates[prop];
-            break;
-          default:
-            retValue = obj.attributes[prop];
-            break;
-        }
-        let cascRef = `attr_${prop.replace(/(repeating_[^_]+_)[^_]+/,'$1\$X')}`;
-        let numRetVal = +retValue;
-        if(!Number.isNaN(numRetVal) && retValue !== ''){
-          retValue = numRetVal;
-        }else if(cascades[cascRef] && (typeof cascades[cascRef].defaultValue === 'number' || cascades[cascRef].type === 'number')){
-          retValue = cascades[cascRef].defaultValue;
-        }
-        return retValue;
       }
-    },
-    set:function(obj,prop,value){
-      //Sets the value. Also verifies that the value is a valid attribute value
-      //e.g. not undefined, null, or NaN
-      if(value || value===0 || value===''){
-        if(/reporder|^repeating_[^_]+$/.test(prop)){
-          let section = prop.replace(/_reporder_/,'');
-          obj.repOrders[section] = value;
-        }else if(`${obj.attributes}` !== `${value}` || 
-          (obj.updates[prop] && `${obj.updates}` !== `${value}`)
+      attributes.set();
+    };
+    const attrTarget = {
+      updates:{},
+      attributes:{...attrs},
+      repOrders:{},
+      queue: [],
+      casc:{},
+      alwaysFunctions,
+      processChange,
+      triggerFunctions,
+      initialFunction,
+      getCascObj
+    };
+    const repeatObjects = {};
+    const repeatTargetObjects = {};
+    const repeatHandler = {
+      get:function(obj,prop){
+        const row = `${obj._section}_${obj._id}`;
+        if(prop === '_isProxy'){
+          return true;
+        }
+        if(prop === 'toJSON'){
+          return () => {
+            return Object.keys(obj).reduce((o,k) => {
+              o[k] = attributes[`${row}_${k}`];
+              return o;
+            },{_id: obj._id,_section: obj._section});
+          }
+        }
+        if(prop === 'remove'){
+          return function(){
+            delete attributes[obj._section][obj._id];
+          }
+        }
+        return obj[prop];
+      },
+      set: function(obj,prop,value){
+        if(prop === '_id' || prop === '_section'){
+          throw new Error(`!!!Warning: cannot change the id or section of a repeating object!!!`);
+        }else if( prop === '_index'){
+          throw new Error(`!!!Warning: Cannot reorder sections by setting the _index. Sort the repeating array or use k.setSectionOrder!!!`);
+        }
+        const fullRef = `${obj._section}_${obj._id}_${prop}`;
+        attributes[fullRef] = value;
+        obj[prop] = value;
+      }
+    };
+    const repeatArrHandler = {
+      get(arr,prop){
+        prop = typeof prop === 'string' ?
+          prop.replace(/^\$/,'') :
+          prop;
+        if(prop === '_isProxy'){
+          return true;
+        }
+        if(
+          prop === 'fill' ||
+          prop === 'shift' ||
+          prop === 'pop' ||
+          prop === 'unshift' ||
+          prop === 'splice'
         ){
-          if(sections && casc){
-            const trigger = getCascObj({sourceAttribute:prop});
-            if(Array.isArray(trigger.affects)){
-              attributes.queue.push(...trigger.affects);
+          throw new Error(`The ${prop} method is not allowed on section arrays`);
+        }
+        if(prop === 'create'){
+          return function(){
+            const argArray = [...arguments];
+            const custom = argArray.find(e => typeof e === 'string');
+            const data = argArray.find(e => typeof e === 'object' && !Array.isArray(e));
+  
+            const row = _generateRowID(arr._section,sections,custom);
+            const id = row.replace(/repeating_[^_]+_/,'');
+            arr[id] = createRepeatObj(arr._section,id);
+            arr.push(arr[id]);
+            if(data){
+              Object.entries(data).forEach(([key,value]) => {
+                if(arr[id].hasOwnProperty(key)){
+                  arr[id][key] = value;
+                }else{
+                  debug(`!!!Warning: no input exists in ${obj._section} for the attribute "${key}"!!!`);
+                }
+              });
+            }
+            return arr[id];
+          }
+        }
+        if(prop === 'move'){
+          return function(){
+            const ref = arguments[0];
+            const targ = arguments[1];
+            const vocal = !arguments[2]
+            // TODO: add protection for missing arguments
+            let id;
+            let index;
+            if(sections[arr._section].includes(ref)){
+              id = ref;
+              index = sections[arr._section].indexOf(id);
+            }else if(!Number.isNaN(ref)){
+              index = ref;
+              id = sections[arr._section][index];
+            }
+            if(
+              !Number.isNaN(index) &&
+              id &&
+              !Number.isNaN(targ)
+            ){
+              const obj = arr.splice(index,1);
+              arr.splice(targ,0,obj);
+              sections[arr._section].splice(index,1);
+              sections[arr._section].splice(targ,0,id);
+              if(vocal){
+                _setSectionOrder(arr._section,sections[arr._section]);
+              }
             }
           }
-          obj.updates[prop] = value;
         }
-      }else{
-        debug(`!!!Warning: Attempted to set ${prop} to an invalid value:${value}; value not stored!!!`);
+        if(prop === 'sort'){
+          return function(){
+            const callback = arguments[0];
+            const vocal = !arguments[1];
+            sections[arr._section].sort((a,b) => {
+              const aObj = arr[a];
+              const bObj = arr[b];
+              const sortResult = callback(aObj,bObj);
+              return sortResult;
+            });
+            arr.sort((a,b) => {
+              const aIndex = sections[arr._section].indexOf(a._id);
+              const bIndex = sections[arr._section].indexOf(b._id);
+              return aIndex - bIndex;
+            });
+            // if not a silent sort, then apply the reordered section to the sheet via setSectionOrder
+            if(vocal){
+              _setSectionOrder(arr._section,sections[arr._section]);
+            }
+            return arr;
+          }
+        }
+        if(arr[prop] || Number.isNaN(prop)){
+          return Reflect.get(...arguments);
+        }
+        if(sections[arr._section].includes(prop)){
+          arr[prop] = createRepeatObj(arr._section,prop);
+          arr.push(arr[prop]);
+          return arr[prop];
+        }
+      },
+      set(obj,prop,value){
+        if(prop === 'section'){
+          throw new Error('!!!Warning: Section property of a repeating section is readonly!!!')
+        }
+      },
+      deleteProperty(arr,prop){
+        if(
+          !prop.startsWith('_') &&
+          arr[prop] &&
+          arr[prop]._isProxy
+        ){
+          let id;
+          let index;
+          if(typeof prop === 'string' && prop.startsWith('-')){
+            id = prop;
+            index = sections[arr._section].indexOf(id);
+          }else{
+            index = prop;
+            id = arr[index]._id;
+          }
+          delete arr[id];
+          arr.splice(index,1);
+          sections[arr._section].splice(index,1);
+          const row = `${arr._section}_${id}`;
+          removeRepeatingRow(row);
+        }
       }
-      return true;
-    },
-    deleteProperty(obj,prop){
-      //removes the property from the original attributes, updates, and the reporders
-      Object.keys(obj).forEach((key)=>{
-        delete obj[key][prop.toLowerCase()];
-      });
+    };
+    const createRepeatObj = (prop,id) => {
+      const row = `${prop}_${id}`;
+      const fields = repeatingSectionDetails.find(o => o.section === prop).fields;
+      const retObj = fields.reduce((o,field) => {
+        o[field] = attributes[`${row}_${field}`];
+        return o;
+      },{_id:id,_section: prop})
+      repeatTargetObjects[prop] = repeatTargetObjects[prop] || {};
+      repeatTargetObjects[prop][id] = retObj;
+      return new Proxy(retObj,repeatHandler);
     }
+    const attrHandler = {
+      get:function(obj,prop){//gets the most value of the attribute.
+        if(prop === '_isProxy'){
+          return true;
+        }
+        if(prop === 'toJSON'){
+          return () => ({...obj.attributes,...obj.updates});
+        }else if(prop === 'set'){
+          return function(){
+            let {callback,vocal} = arguments[0] ? arguments[0] : {};
+            if(sections && casc && attributes.queue.length){
+              const triggerName = attributes.queue.shift();
+              const trigger = getCascObj({sourceAttribute:triggerName});
+              processChange({trigger,attributes,sections,casc});
+            }else{
+              if(kFuncs.verboseMode){
+                debug({updates:obj.updates});
+              }
+              const trueCallback = Object.keys(obj.repOrders).length ?
+                function(){
+                  Object.entries(obj.repOrders).forEach(([section,order])=>{
+                    _setSectionOrder(section,order)
+                  });
+                  callback && callback();
+                }:
+                callback;
+              Object.keys(obj.updates).forEach((key)=>obj.attributes[key] = obj.updates[key]);
+              const update = obj.updates;
+              obj.updates = {};
+              set(update,vocal,trueCallback);
+            }
+          }
+        }else if(/^repeating_[^_]+$/.test(prop)){
+          // if it's been lazy loaded, use it
+          if(!repeatObjects[prop]){
+            // otherwise lazy load it
+            const baseArr = [];
+            baseArr._section = prop;
+            repeatObjects[prop] = new Proxy(sections[prop].reduce((arr,id,i) => {
+              const rowObj = createRepeatObj(prop,id,i);
+              arr.push(rowObj);
+              arr[id] = rowObj;
+              return arr;
+            },baseArr),repeatArrHandler);
+          }
+          return repeatObjects[prop];
+        }else if(Object.keys(obj).some(key=>key===prop)){ 
+          return Reflect.get(...arguments)
+        }else{
+          let retValue;
+          switch(true){
+            case obj.repOrders.hasOwnProperty(prop):
+              retValue = obj.repOrders[prop];
+              break;
+            case obj.updates.hasOwnProperty(prop):
+              retValue = obj.updates[prop];
+              break;
+            default:
+              retValue = obj.attributes[prop];
+              break;
+          }
+          let cascRef = `attr_${prop.replace(/(repeating_[^_]+_)[^_]+/,'$1\$X')}`.toLowerCase();
+          let numRetVal = +retValue;
+          if(!Number.isNaN(numRetVal) && retValue !== ''){
+            retValue = numRetVal;
+          }else if(cascades[cascRef] && (typeof cascades[cascRef].defaultValue === 'number' || cascades[cascRef].type === 'number')){
+            retValue = cascades[cascRef].defaultValue;
+          }
+          return retValue;
+        }
+      },
+      set:function(obj,prop,value){
+        //Sets the value. Also verifies that the value is a valid attribute value
+        //e.g. not undefined, null, or NaN
+        if(value || value===0 || value===''){
+          if(/reporder/.test(prop)){
+            let section = prop.replace(/_reporder_/,'');
+            obj.repOrders[section] = value;
+          }else if(`${obj.attributes}` !== `${value}` || 
+            (obj.updates[prop] && `${obj.updates}` !== `${value}`)
+          ){
+            if(sections && casc){
+              let trigger = getCascObj({sourceAttribute:prop});
+              if(!trigger.name){
+                Object.assign(casc,expandCascade(cascades,sections));
+                trigger = getCascObj({sourceAttribute:prop});
+              }
+              if(Array.isArray(trigger.affects)){
+                attributes.queue.push(...trigger.affects);
+              }
+            }
+            const repRx = /^(repeating_[^_]+)_([^_]+)_(.+)$/;
+            if(repRx.test(prop)){
+              const [,section,rowID,field] = prop.match(repRx);
+              if(repeatObjects[section]){
+                repeatObjects[section][rowID] = repeatObjects[section][rowID] || createRepeatObj(section,rowID);
+                repeatTargetObjects[section][rowID][field] = value;
+              }
+            }
+            obj.updates[prop] = value;
+          }
+        }else{
+          debug(`!!!Warning: Attempted to set ${prop} to an invalid value:${value}; value not stored!!!`);
+        }
+        return true;
+      },
+      deleteProperty(obj,prop){
+        //removes the property from the original attributes, updates, and the reporders
+        Object.keys(obj).forEach((key)=>{
+          delete obj[key][prop.toLowerCase()];
+        });
+      }
+    };
+    const attributes = new Proxy(attrTarget,attrHandler);
+    return attributes;
   };
-  const attributes = new Proxy(attrTarget,attrHandler);
-  return attributes;
-};
-
-/**
- * Function that registers a function for being called via the funcs object. Returns true if the function was successfully registered, and false if it could not be registered for any reason.
- * @memberof Utilities
- * @param {object} funcObj - Object with keys that are names to register functions under and values that are functions.
- * @param {object} optionsObj - Object that contains options to use for this registration.
- * @param {string[]} optionsObj.type - Array that contains the types of specialized functions that apply to the functions being registered. Valid types are `"opener"`, `"updater"`, and `"default"`. `"default"` is always used, and never needs to be passed.
- * @returns {boolean} - True if the registration succeeded, false if it failed.
- * @example
- * //Basic Registration
- * const myFunc = function({trigger,attributes,sections,casc}){};
- * k.registerFuncs({myFunc});
- * 
- * //Register a function to run on sheet open
- * const openFunc = function({trigger,attributes,sections,casc}){};
- * k.registerFuncs({openFunc},{type:['opener']})
- * 
- * //Register a function to run on all events
- * const allFunc = function({trigger,attributes,sections,casc}){};
- * k.registerFuncs({allFunc},{type:['all']})
- */
-const registerFuncs = function(funcObj,optionsObj = {}){
-  if(typeof funcObj !== 'object' || typeof optionsObj !== 'object'){
-    debug(`!!!! K-scaffold error: Improper arguments to register functions !!!!`);
-    return false;
-  }
-  const typeArr = optionsObj.type ? ['default',...optionsObj.type] : ['default'];
-  const typeSwitch = {
-    'opener':openHandlers,
-    'updater':updateHandlers,
-    'new':initialSetups,
-    'all':allHandlers,
-    'default':funcs
+  
+  /**
+   * Function that registers a function for being called via the funcs object. Returns true if the function was successfully registered, and false if it could not be registered for any reason.
+   * @memberof Utilities
+   * @param {object} funcObj - Object with keys that are names to register functions under and values that are functions.
+   * @param {object} optionsObj - Object that contains options to use for this registration.
+   * @param {string[]} optionsObj.type - Array that contains the types of specialized functions that apply to the functions being registered. Valid types are `"opener"`, `"updater"`, and `"default"`. `"default"` is always used, and never needs to be passed.
+   * @returns {boolean} - True if the registration succeeded, false if it failed.
+   * @example
+   * //Basic Registration
+   * const myFunc = function({trigger,attributes,sections,casc}){};
+   * k.registerFuncs({myFunc});
+   * 
+   * //Register a function to run on sheet open
+   * const openFunc = function({trigger,attributes,sections,casc}){};
+   * k.registerFuncs({openFunc},{type:['opener']})
+   * 
+   * //Register a function to run on all events
+   * const allFunc = function({trigger,attributes,sections,casc}){};
+   * k.registerFuncs({allFunc},{type:['all']})
+   */
+  const registerFuncs = function(funcObj,optionsObj = {}){
+    if(typeof funcObj !== 'object' || typeof optionsObj !== 'object'){
+      debug(`!!!! K-scaffold error: Improper arguments to register functions !!!!`);
+      return false;
+    }
+    const typeArr = optionsObj.type ? ['default',...optionsObj.type] : ['default'];
+    const typeSwitch = {
+      'opener':openHandlers,
+      'updater':updateHandlers,
+      'new':initialSetups,
+      'all':allHandlers,
+      'default':funcs
+    };
+    let setState;
+    Object.entries(funcObj).map(([prop,value])=>{
+      typeArr.forEach((type)=>{
+        if(typeSwitch[type][prop]){
+          debug(`!!! Duplicate function name for ${prop} as ${type}!!!`);
+          setState = false;
+        }else if(typeof value === 'function'){
+          typeSwitch[type][prop] = value;
+          setState = setState !== false ? true : false;
+        }else{
+          debug(`!!! K-scaffold error: Function registration requires a function. Invalid value to register as ${type} !!!`);
+          setState = false;
+        }
+      });
+    });
+    return setState;
   };
-  let setState;
-  Object.entries(funcObj).map(([prop,value])=>{
-    typeArr.forEach((type)=>{
-      if(typeSwitch[type][prop]){
-        debug(`!!! Duplicate function name for ${prop} as ${type}!!!`);
-        setState = false;
-      }else if(typeof value === 'function'){
-        typeSwitch[type][prop] = value;
-        setState = setState !== false ? true : false;
+  kFuncs.registerFuncs = registerFuncs;
+  
+  /**
+   * Function that sets up the action calls used in the roller mixin.
+   * @memberof Sheetworkers
+   * @param {object} attributes - The attribute values of the character
+   * @param {object[]} sections - All the repeating section IDs
+   */
+  const setActionCalls = function({attributes,sections}){
+    actionAttributes.forEach((base)=>{
+      let [section,,field] = k.parseTriggerName(base);
+      let fieldAction = field.replace(/_/g,'-');
+      if(section){
+        sections[section].forEach((id)=>{
+          attributes[`${section}_${id}_${field}`] = `%{${attributes.character_name}|${section}_${id}_${fieldAction}}`;
+        });
       }else{
-        debug(`!!! K-scaffold error: Function registration requires a function. Invalid value to register as ${type} !!!`);
-        setState = false;
+        attributes[`${field}`] = `%{${attributes.character_name}|${fieldAction}}`;
       }
     });
-  });
-  return setState;
-};
-kFuncs.registerFuncs = registerFuncs;
-
-/**
- * Function that sets up the action calls used in the roller mixin.
- * @memberof Sheetworkers
- * @param {object} attributes - The attribute values of the character
- * @param {object[]} sections - All the repeating section IDs
- */
-const setActionCalls = function({attributes,sections}){
-  actionAttributes.forEach((base)=>{
-    let [section,,field] = k.parseTriggerName(base);
-    let fieldAction = field.replace(/_/g,'-');
-    if(section){
-      sections[section].forEach((id)=>{
-        attributes[`${section}_${id}_${field}`] = `%{${attributes.character_name}|${section}_${id}_${fieldAction}}`;
-      });
+  };
+  funcs.setActionCalls = setActionCalls;
+  kFuncs.setActionCalls = setActionCalls;
+  
+  
+  /**
+   * Function that reduces Roll20 macro syntax formulas down to their calculated value.
+   * @memberof Sheetworkers
+   * @param {object} attributes - The attribute values of the character
+   * @param {object[]} sections - All the repeating section IDs
+   */
+  const parseKFormula = ({trigger,attributes,sections,casc}) => {
+    const [baseSection,rowID,attrName] = parseTriggerName(trigger.name);
+    const repeatBlockRx = baseSection ?
+      /(@{repeating_.+?_\$X_.+?})/g :
+      /={([^)]*repeating_[^_]+[^)]*)}=/g;
+    let mutFormula = trigger.formula;
+    mutFormula = mutFormula.replace(repeatBlockRx,(match,repeatMacro) => {
+      const [section] = repeatMacro.match(/repeating_[^_]+/);
+      const idArray = baseSection ?
+        [rowID] :
+        sections[section];
+      return idArray.map(id => {
+          return `(${repeatMacro.replace(/repeating_[^_]+?_[^_]+?_([^}]+)/g,`${section}_${id}_$1`)})`;
+        }).join(
+          trigger.type === 'number' ?
+            ' + ' :
+            ''
+        );
+    });
+    mutFormula = parseMacro(mutFormula,attributes)
+      .replace(/@{.+?}/g,'0');
+    const mathKeys = ['floor','ceil','round','abs'];
+    mathKeys.forEach(func => mutFormula = mutFormula.replace(new RegExp(`${func}\\(`,'g'),`Math.${func}(`));
+    const mathRx = new RegExp(`Math\\.(?:${mathKeys.join('|')})`,'g');
+    let noAlphaStr = mutFormula
+      .replace(mathRx,'');
+    return trigger.type !== 'text' ?
+      (
+        !noAlphaStr.match(/[a-z]/i) ?
+          eval(mutFormula) :
+          undefined
+      ) :
+      mutFormula;
+  };
+  funcs.parseKFormula = parseKFormula;
+  kFuncs.parseKFormula = parseKFormula;
+  
+  /**
+   * Function to call a function previously registered to the funcs object. May not be used that much in actual sheets, but very useful when writing unit tests for your sheet. Either returns the function or null if no function exists.
+   * @memberof Sheetworkers
+   * @param {string} funcName - The name of the function to invoke.
+   * @param {...any} args - The arguments to call the function with.
+   * @returns {function|null}
+   * @example
+   * //Call myFunc with two arguments
+   * k.callFunc('myFunc','an argument','another argument');
+   */
+  const callFunc = function(funcName,...args){
+    if(funcs[funcName]){
+      if(kFuncs.verboseMode){
+        debug(`calling ${funcName}`);
+      }
+      return funcs[funcName](...args);
     }else{
-      attributes[`${field}`] = `%{${attributes.character_name}|${fieldAction}}`;
+      debug(`Invalid function name: ${funcName}`);
+      return null;
     }
-  });
-};
-funcs.setActionCalls = setActionCalls;
-kFuncs.setActionCalls = setActionCalls;
-
-
-/**
- * Function that reduces Roll20 macro syntax formulas down to their calculated value.
- * @memberof Sheetworkers
- * @param {object} attributes - The attribute values of the character
- * @param {object[]} sections - All the repeating section IDs
- */
-const parseKFormula = ({trigger,attributes,sections,casc}) => {
-  const [baseSection,rowID,attrName] = parseTriggerName(trigger.name);
-  const repeatBlockRx = baseSection ?
-    /(@{repeating_.+?_\$X_.+?})/g :
-    /={([^)]*repeating_[^_]+[^)]*)}=/g;
-  let mutFormula = trigger.formula;
-  mutFormula = mutFormula.replace(repeatBlockRx,(match,repeatMacro) => {
-    const [section] = repeatMacro.match(/repeating_[^_]+/);
-    const idArray = baseSection ?
-      [rowID] :
-      sections[section];
-    return idArray.map(id => {
-        return `(${repeatMacro.replace(/repeating_[^_]+?_[^_]+?_([^}]+)/g,`${section}_${id}_$1`)})`;
-      }).join(
-        trigger.type === 'number' ?
-          ' + ' :
-          ''
-      );
-  });
-  mutFormula = parseMacro(mutFormula,attributes)
-    .replace(/@{.+?}/g,'0');
-  const mathKeys = ['floor','ceil','round','abs'];
-  mathKeys.forEach(func => mutFormula = mutFormula.replace(new RegExp(`${func}\\(`,'g'),`Math.${func}(`));
-  const mathRx = new RegExp(`Math\\.(?:${mathKeys.join('|')})`,'g');
-  let noAlphaStr = mutFormula
-    .replace(mathRx,'');
-  return trigger.type !== 'text' ?
-    (
-      !noAlphaStr.match(/[a-z]/i) ?
-        eval(mutFormula) :
-        undefined
-    ) :
-    mutFormula;
-};
-funcs.parseKFormula = parseKFormula;
-kFuncs.parseKFormula = parseKFormula;
-
-/**
- * Function to call a function previously registered to the funcs object. May not be used that much in actual sheets, but very useful when writing unit tests for your sheet. Either returns the function or null if no function exists.
- * @memberof Sheetworkers
- * @param {string} funcName - The name of the function to invoke.
- * @param {...any} args - The arguments to call the function with.
- * @returns {function|null}
- * @example
- * //Call myFunc with two arguments
- * k.callFunc('myFunc','an argument','another argument');
- */
-const callFunc = function(funcName,...args){
-  if(funcs[funcName]){
-    debug(`calling ${funcName}`);
-    return funcs[funcName](...args);
-  }else{
-    debug(`Invalid function name: ${funcName}`);
-    return null;
-  }
-};
-kFuncs.callFunc = callFunc;/**@namespace Sheetworkers */
+  };
+  kFuncs.callFunc = callFunc;/**@namespace Sheetworkers */
 /*jshint esversion: 11, laxcomma:true, eqeqeq:true*/
 /*jshint -W014,-W084,-W030,-W033*/
 //Sheet Updaters and styling functions
@@ -3070,14 +3352,20 @@ const updateSheet = function(){
   log('updating sheet');
   getAllAttrs({props:['debug_mode',...baseGet],callback:(attributes,sections,casc)=>{
     kFuncs.debugMode = kFuncs.debugMode || !!attributes.debug_mode;
-    debug({sheet_version:attributes.sheet_version});
+    if(kFuncs.verboseMode){
+      debug({sheet_version:attributes.sheet_version});
+    }
     if(!attributes.sheet_version){
       Object.entries(initialSetups).forEach(([funcName,handler])=>{
         if(typeof funcs[funcName] === 'function'){
-          debug(`running ${funcName}`);
+          if(kFuncs.verboseMode){
+            debug(`running ${funcName}`);
+          }
           funcs[funcName]({attributes,sections,casc});
         }else{
-          debug(`!!!Warning!!! no function named ${funcName} found. Initial sheet setup not performed.`);
+          if(kFuncs.verboseMode){
+            debug(`!!!Warning!!! no function named ${funcName} found. Initial sheet setup not performed.`);
+          }
         }
       });
     }else{
@@ -3087,13 +3375,19 @@ const updateSheet = function(){
         }
       });
     }
-    k.debug({openHandlers});
+    if(kFuncs.verboseMode){
+      debug({openHandlers});
+    }
     Object.entries(openHandlers).forEach(([funcName,func])=>{
       if(typeof funcs[funcName] === 'function'){
-        debug(`running ${funcName}`);
+        if(kFuncs.verboseMode){
+          debug(`running ${funcName}`);
+        }
         funcs[funcName]({attributes,sections,casc});
       }else{
-        debug(`!!!Warning!!! no function named ${funcName} found. Sheet open handling not performed.`);
+        if(kFuncs.verboseMode){
+          debug(`!!!Warning!!! no function named ${funcName} found. Sheet open handling not performed.`);
+        }
       }
     });
     setActionCalls({attributes,sections});
@@ -3106,7 +3400,9 @@ const updateSheet = function(){
 kFuncs.updateSheet = updateSheet;
 
 const initialSetup = function(attributes,sections){
-  debug('Initial sheet setup');
+  if(kFuncs.verboseMode){
+    debug('Initial sheet setup');
+  }
 };
 
 /**
@@ -3119,8 +3415,10 @@ const initialSetup = function(attributes,sections){
  * on('change:an_attribute',k.accessSheet);
  */
 const accessSheet = function(event){
-  debug({funcs:Object.keys(funcs)});
-  debug({event});
+  if(kFuncs.verboseMode){
+    debug({funcs:Object.keys(funcs)});
+    debug({event});
+  }
   getAllAttrs({callback:(attributes,sections,casc)=>{
     let trigger = attributes.getCascObj(event,casc);
     attributes.processChange({event,trigger,attributes,sections,casc});
@@ -3142,6 +3440,7 @@ const expandCascade = function(cascade,sections){
     return memo;
   },{});
 };
+kFuncs.expandCascade = (sections) => expandCascade(cascades,sections);
 
 const expandRepeating = function(memo,key,cascade,sections){
   key.replace(/((?:attr|act)_)(repeating_[^_]+)_[^_]+?_(.+)/,(match,type,section,field)=>{
@@ -3210,7 +3509,11 @@ const _setSectionOrder = function(section,order){
   let trueSection = section.replace(/repeating_/,'');
   setSectionOrder(trueSection,order);
 };
-kFuncs.setSectionOrder = _setSectionOrder;
+// deprecation warning added to setSectionOrder
+kFuncs.setSectionOrder = (section,order) => {
+  debug('###Deprecation: It is recommended to use the "move" method of the nested section info feature of the attributes object instead of setSectionOrder');
+  _setSectionOrder(section,order);
+};
 
 /**
  * Alias for [removeRepeatingRow](https://wiki.roll20.net/Sheet_Worker_Scripts#removeRepeatingRow.28_RowID_.29) that also removes the row from the current object of attribute values and array of section IDs to ensure that erroneous updates are not issued.
@@ -3232,7 +3535,6 @@ kFuncs.setSectionOrder = _setSectionOrder;
  * })
  */
 const _removeRepeatingRow = function(row,attributes,sections){
-  debug(`removing ${row}`);
   Object.keys(attributes.attributes).forEach((key)=>{
     if(key.startsWith(row)){
       delete attributes[key];
@@ -3240,6 +3542,7 @@ const _removeRepeatingRow = function(row,attributes,sections){
   });
   let [,section,rowID] = row.match(/(repeating_[^_]+)_(.+)/,'');
   sections[section] = sections[section].filter((id)=>id!==rowID);
+  delete attributes[section][rowID];
   removeRepeatingRow(row);
 };
 kFuncs.removeRepeatingRow = _removeRepeatingRow;
@@ -3291,7 +3594,7 @@ const getAllAttrs = function({props=baseGet,sectionDetails=repeatingSectionDetai
     getAttrs([...props,...repeats],(values)=>{
       const casc = expandCascade(cascades,sections);
       const attributes = createAttrProxy(values,sections,casc);
-      orderSections(attributes,sections);
+      orderSections(attributes,sections,casc);
       callback(attributes,sections,casc);
     })
   });
@@ -3407,7 +3710,10 @@ const _generateRowID = function(section,sections,customText){
   sections[section].push(rowID);
   return `${section}_${rowID}`;
 };
-kFuncs.generateRowID = _generateRowID;
+kFuncs.generateRowID = (section,sections,customText) => {
+  debug('###Deprecation: It is recommended to use the "create" method of the nested section info feature of the attributes object instead of k.generateRowID');
+  return _generateRowID(section,sections,customText);
+};
 
 /**
  * An alias for [Roll20's getTranslationByKey](https://wiki.roll20.net/Sheet_Worker_Scripts#getTranslationByKey.28.5Bkey.5D.29) that also supports data-i18n-vars syntax replacement and returns the translation key if no value is found instead of `false`.
@@ -3436,9 +3742,7 @@ kFuncs.getTranslationByKey = _getTranslationByKey;
  */
 const assembleRoll = (rollObj,rollStart = kFuncs.defaultRollStart) => {
   return Object.entries(rollObj).reduce((str,[field,content])=>{
-    return str += content ?
-      ` {{${field}=${content}}}` :
-      '';
+    return str += ` {{${field}=${content ?? ''}}}`;
   },`${rollStart}`);
 };
 
@@ -3488,7 +3792,9 @@ kFuncs.baseGet = baseGet;
 
 const registerEventHandlers = function(){
   on('sheet:opened',updateSheet);
-  debug({funcKeys:Object.keys(funcs),funcs});
+  if(kFuncs.verboseMode){
+    debug({funcKeys:Object.keys(funcs),funcs});
+  }
   //Roll20 change and click listeners
   Object.entries(listeners).forEach(([event,funcName])=>{
     if(funcs[funcName]){
@@ -3512,7 +3818,6 @@ const addItem = function(event){
   getAllAttrs({
     callback:(attributes,sections,casc) => {
       let row = _generateRowID(section,sections);
-      debug({row});
       attributes[`${row}_name`] = '';
       setActionCalls({attributes,sections});
       const trigger = cascades[`fieldset_repeating_${section}`];
@@ -3700,7 +4005,7 @@ const orderComplex = function({section,attributes,sections}){
 		}
 		return memo;
 	},masterIDs);
-	attributes[section] = sections[section];
+	k.setSectionOrder(section,sections[section]);
 };
 
 const getChildIndex = function(memo,section,id,attributes,detailAdd){
@@ -3855,10 +4160,15 @@ const checkSectionContents = function(sectionDetails,section,sections,attributes
 };
 
 const populateInitiativeSkills = (attributes,sections) => {
+	const duplicateCheck = [];
   const optionsArray = sections['repeating_skill']
     .filter(id => id)
     .reduce((arr,id) => {
-      arr.push({value:id.toLowerCase(),label:getTranslationByKey(attributes[`repeating_skill_${id}_name`])});
+			const skillName = getTranslationByKey(attributes[`repeating_skill_${id}_name`]);
+      if(!duplicateCheck.includes(skillName)) { 
+				arr.push({value:id.toLowerCase(),label:skillName});
+				duplicateCheck.push(skillName);
+			}
       return arr;
     },[{value:'',label:getTranslationByKey('select one')}]);
 	populateListOptions({elemSelector:'#initiative-skill-select',optionsArray});
@@ -3947,8 +4257,10 @@ const addSubsection = async function(event){
 	let [section,rowID,button] = k.parseClickTrigger(event.triggerName);
 	let type = button.replace(/add-/,'');
 	let newID = generateRowID();
-	k.getAllAttrs({props:[],callback:(attributes,sections,casc)=>{
-		addSystemSubSection({type,newID,section,attributes,sections,casc});
+	k.getAllAttrs({callback:(attributes,sections,casc)=>{
+		addSystemSubSection({type,newID,section,attributes,sections,casc,masterID:rowID});
+    k.setActionCalls({attributes,sections});
+		attributes.set();
 	}})
 };
 k.registerFuncs({addSubsection});
@@ -3962,7 +4274,7 @@ const addChildSection = function(attributes,sections,section,rowID,type,newID){
 	}
 	let triggerPos = sections[section].indexOf(rowID);
 	sections[section].splice(triggerPos,0,newID);
-	attributes[section] = sections[section];
+	k.setSectionOrder(section,sections[section]);
 	attributes.set();
 };
 
@@ -4023,6 +4335,7 @@ const addRow = function(section){
 			});
 			orderComplex({section,attributes,sections});
 		}
+		k.setActionCalls({attributes,sections});
 		attributes.set();
 	}});
 };
@@ -4041,7 +4354,6 @@ const editSection = function(section){
 	Rolls
 */
 const singleAttributeRoll = function(event){
-	debugger;
 	let [,,button] = k.parseClickTrigger(event.triggerName);
 	let field = button.replace(/-action$/,'').replace(/-/g,'_');
 	k.getAllAttrs({
@@ -4173,7 +4485,7 @@ const buildQuery = async function(prompt,options,attributes,sections){
 
 const assemblePool = async function(skillDice,attributeDice){
 	const baseDice = k.value(skillDice)+k.value(attributeDice);
-	const additionalDice = await k.extractQueryResult(`${getTranslationByKey('additional dice query')}|${[...Array(Math.max(0,10 - baseDice) + 1).keys()].map(k=>k).join('|')}|`);
+	const additionalDice = await k.extractQueryResult(`${getTranslationByKey('additional dice query')}|${[...Array(13).keys()].map(k=>k).join('|')}|`);
 	return [[...Array(baseDice + (+additionalDice)).keys()].map((n)=>{
 		return `{{roll_${n+1}=[[1d10cs>@{target_number}cf<1cf>@{again}]]}}`;
 	}).join(' ').trim() || '{{roll_1=^{no dice available}}}',+additionalDice];
@@ -4196,7 +4508,6 @@ const confirmRoll = function(attributes,{skillName,skillDice,attributeName,attri
 		promptLookup = promptLookup.replace(/\s+(?:and|with) \{\{addDice\}\} additional dice/,'');
 	}
 	k.debug({promptLookup});
-	debugger;
 	let prompt = getTranslationByKey(promptLookup);
 	
 	const rollDetails = {[skillName]:skillDice,[attributeName]:attributeDice,enhancements,addDice};
@@ -4239,6 +4550,9 @@ const executeRoll = async function(attributes,reusableMessage,message,accumulato
 			return m;
 		},'');
 		let newMessage = `@{template_start} ${reusableMessage} ${pool} {{continuation=true}}`;
+		if(/initiative/.test(message)){
+			newMessage+= '{{title=initiative}}';
+		}
 		executeRoll(attributes,reusableMessage,newMessage,accumulator);
 	}else{
 		computeObj.finished = 1;
@@ -4251,7 +4565,7 @@ const executeRoll = async function(attributes,reusableMessage,message,accumulato
 		}
 	}
 	finishRoll(roll.rollId,computeObj);
-	if(/initiative/.test(message)){
+	if(/initiative/.test(message) && computeObj.hasOwnProperty('successes')){
 		startRoll(`![[${computeObj.successes}&{tracker}]]`,(r) => finishRoll(r.rollId));
 	}
 };
@@ -4341,13 +4655,6 @@ const clearChildItems = function(event){
 			}else if(/injury|calling|deed/.test(section)){
 				//cleanUpSection(attributes,sections,section,masterID);
 			}
-			//The below is a temporary fix for display issues associated with setSectionOrder
-			let clearID = attributes.attributes[`_reporder_${section}`].find(id=>Object.keys(attributes.attributes).some((attr)=>attr.startsWith(`${section}_${id}`)));
-			if(clearID){
-				
-				attributes[`${section}_${clearID}_display_state`] = attributes[`${section}_${clearID}_display_state`];
-				attributes.set();
-			}
 		}
 	});
 };
@@ -4394,7 +4701,7 @@ const rollPCInitiative = async function ({ trigger, attributes, sections, casc }
 
   let confirm;
   if (attributes.enhancement_query === 'on' || attributes.difficulty_query === 'on') {
-    confirm = await confirmRoll(attributes, { skillName: `^{${field.replace(/_/g, ' ')}}`, skillDice: attributes[field], enhancements, addDice });
+    confirm = await confirmRoll(attributes, { skillName: `^{${attributes[`${skillRow}_name`].replace(/_/g, ' ')}}`, skillDice, enhancements, addDice });
   } else {
     confirm = await k.pseudoQuery(1);
   }
@@ -4618,10 +4925,10 @@ const handleCompendiumDrop = function(event){
         origBlock:data,
         attributes,sections,casc,
         callback:async (lookupObj)=>{
-          debugger;
           k.debug({'threat data':data});
           await processDropData({data:lookupObj,attributes,sections,casc});
           k.debug('Drop processing complete');
+          k.setActionCalls({attributes,sections});
           attributes.set({attributes,sections,casc});
         }
       });
@@ -4884,11 +5191,9 @@ const dropSkill = async function(lookupKey,arr,attributes,sections,casc){
       delete itemObj['dot_rating'];
     }
     if(sectionName === 'birthright' && itemObj.unique_knack){
-      debugger;
       itemObj['data-cs-knack'] = parseContent(itemObj.unique_knack);
     }
   });
-  debugger;
   return dropEquipment(lookupKey,arr,attributes,sections,casc);
 };/**
  * Object containing the categories and which drop functions to call for each of them.
@@ -4904,6 +5209,7 @@ const repeatProcessors = {
   Callings: dropGenericSection,
   Knacks: dropChildItem,
   Purviews: dropGenericSection,
+  Boons: dropChildItem,
   'antagonist-segments': dropGenericSection,
   'special-rules':dropGenericSection,
   skill:dropSkill,
@@ -4911,12 +5217,14 @@ const repeatProcessors = {
 };/**
  * Logic for adding the system specific subsections
  */
-const addSystemSubSection = ({type,newID,section,attributes,sections}) => {
+const addSystemSubSection = ({type,newID,section,attributes,sections,masterID}) => {
 	if(/birthright/.test(type)){
 		addBirthright(attributes,type,newID);
 	}else{
-		addChildSection(attributes,sections,section,newID,type,newID)
+		const rowID = masterID || newID;
+		addChildSection(attributes,sections,section,rowID,type,newID)
 	}
+	k.setSectionOrder(section,sections[section]);
 }
 
 const addBirthright = function(attributes,type,newID){
@@ -5057,95 +5365,111 @@ k.registerFuncs({showSupplements},{type:['opener']});const rollClash = async fun
 		callback:async (attributes,sections)=>{
 			let [section,rowID,] = k.parseClickTrigger(event.triggerName);
 			const masterID = attributes[`${section}_${rowID}_master_id`];
-			let skillRef;
-			let attributeRef;
-			let skillName;
 			if(attributes[`${section}_${rowID}_clash_stat_2`] === 'select'){
+				await k.pseudoQuery();
 				return;
 			}
-			switch(attributes[`${section}_${rowID}_clash_stat_1`]){
-				case 'query':
-					skillRef = await buildQuery('skill query','repeating_skill',attributes,sections)
-					break;
-				case 'select':
-					skillRef = sections.repeating_skill.find((id)=>attributes[`repeating_skill_${id}_name`] === 'integrity');
-					skillRef = `repeating_skill_${skillRef}_rating`;
-					break;
-				default:
-					skillRef = sections.repeating_skill.find((id)=>attributes[`repeating_skill_${id}_name`] === attributes[`${section}_${rowID}_clash_stat_1`]);
-					if(!skillRef){
-						const attributeNames = systemDefaults[attributes.system].attributes;
-						k.debug({attributeNames});
-						skillRef = [...attributeNames,'legend'].find((attr)=>attr === attributes[`${section}_${rowID}_clash_stat_1`]);
-						skillName = `^{${skillRef}}`;
-						skillRef = skillRef === 'legend' ?
-							'legend_max' :
-							skillRef;
-					}else{
-						skillRef = `repeating_skill_${skillRef}_rating`;
-					}
-					break;
-			}
-			if(!skillRef){
+			const assembleObj = {
+				skillRef:'',
+				skillName:'',
+				attributeRef:'',
+				attributeName: ''
+			};
+			const constructRefObj = async (n) =>{
+				const prefix = n === 1 ? 'skill' : 'attribute';
+
+				switch(attributes[`${section}_${rowID}_clash_stat_${n}`]){
+					case 'query':
+						const queryOption = n === 1 ?
+							'repeating_skill' :
+							systemDefaults[attributes.system].clashStats.map(a => `${k.capitalize(k.getTranslationByKey(a))},${a}`);
+						assembleObj[`${prefix}Ref`] = await buildQuery(`${prefix} query`,queryOption,attributes,sections);
+						assembleObj[`${prefix}Name`] = assembleObj[`${prefix}Ref`].startsWith('repeating') ? 
+							`^{${
+								attributes[assembleObj[`${prefix}Ref`].replace(/rating/,'name')]
+							}}` :
+							`^{${assembleObj[`${prefix}Ref`]}}`;
+						break;
+					case 'rating':
+						await k.pseudoQuery();
+						assembleObj[`${prefix}Ref`] = `${section}_${masterID}_rating_max`;
+						assembleObj[`${prefix}Name`] = '^{rating}';
+						if(attributes.legend_max > attributes[assembleObj[`${prefix}Ref`]]){
+							assembleObj[`${prefix}Ref`] = 'legend_max'
+							assembleObj[`${prefix}Name`] = '^{legend}';
+						}
+						break;
+					case 'select':
+						await k.pseudoQuery();
+						assembleObj[`${prefix}Ref`] = sections.repeating_skill.find((id)=>attributes[`repeating_skill_${id}_name`] === 'integrity');
+						assembleObj[`${prefix}Name`] = `^{${attributes[`repeating_skill_${assembleObj[`${prefix}Ref`]}_name`]}}`;
+						assembleObj[`${prefix}Ref`] = `repeating_skill_${assembleObj[`${prefix}Ref`]}_rating`;
+						break;
+
+					default:
+						await k.pseudoQuery();
+						if(attributes[`${section}_${rowID}_clash_stat_${n}`] === 'legend'){
+							assembleObj[`${prefix}Ref`] = 'legend_max';
+							
+						}else if(systemDefaults[attributes.system].attributes.includes(attributes[`${section}_${rowID}_clash_stat_${n}`])){
+							assembleObj[`${prefix}Ref`] = attributes[`${section}_${rowID}_clash_stat_${n}`];
+							assembleObj[`${prefix}Name`] = `^{${attributes[`${section}_${rowID}_clash_stat_${n}`]}}`;
+						}else{
+							assembleObj[`${prefix}Ref`] = sections.repeating_skill.find((id)=>attributes[`repeating_skill_${id}_name`] === attributes[`${section}_${rowID}_clash_stat_${n}`]);
+							assembleObj[`${prefix}Name`] = `^{${attributes[`repeating_skill_${assembleObj[`${prefix}Ref`]}_name`]}}`;
+							assembleObj[`${prefix}Ref`] = `repeating_skill_${assembleObj[`${prefix}Ref`]}_rating`;
+						}
+						break;
+				}
+			};
+			await constructRefObj(1);
+			if(!assembleObj.skillRef){
+				await k.pseudoQuery();
 				return;
 			}
-			switch(attributes[`${section}_${rowID}_clash_stat_2`]){
-				case 'rating':
-					attributeRef = `${section}_${masterID}_rating_max`;
-					k.debug({attributeRef});
-					break;
-				case 'query':
-					debugger;
-					attributeRef = await buildQuery('attribute query',systemDefaults[attributes.system].clashStats,attributes,sections);
-					break;
-				default:
-					attributeRef = attributes[`${section}_${rowID}_clash_stat_2`]
-					break;
-			}
-			if(!attributeRef){
+			await constructRefObj(2);
+			if(!assembleObj.attributeRef){
+				await k.pseudoQuery();
 				return;
 			}
-			skillName = skillName || `^{${attributes[skillRef.replace(/rating/,'name')]}}`;
-			let attributeName = attributeRef.startsWith('repeating') ? '^{rating}' : `^{${attributeRef}}`;
+			let {attributeRef,skillRef,skillName,attributeName} = assembleObj;
+
 			let skillPool = attributes[skillRef];
-			if(attributes[`${section}_${rowID}_clash_stat_2`] === 'rating' && attributes.legend_max > attributes[attributeRef]){
-				attributeRef = 'legend';
-				attributeName = '^{legend}';
-			}
-			let attributePool = attributeRef === 'legend' ? attributes[`${attributeRef}_max`] : attributes[attributeRef];
+			let attributePool = attributes[attributeRef];
 			let [pool,addDice] = await assemblePool(skillPool,attributePool);
 			let enhancements = 0;
 			if(attributes.enhancement_query === 'on'){
-				enhancements = await k.extractQueryResult(getTranslationByKey('Do you have any enhancements'));
+				enhancements = await k.extractQueryResult(k.getTranslationByKey('Do you have any enhancements'));
 				enhancements = k.value(enhancements);
 			}else{
 				await k.pseudoQuery('');
 			}
 			let [message,reusableMessage] = await assembleMessage(attributes,pool,skillName,attributeName,attributes[`${section}_${rowID}_name`],enhancements);
 			if(section === 'repeating_purview'){
+				await k.pseudoQuery();
 				const vsRef = `${section}_${rowID}_clash_stat`
 				let vsMessage = '';
 				if(attributes[`${vsRef}_1`] !== 'select'){
+					await k.pseudoQuery();
 					vsMessage += attributes[`${vsRef}_1`];
 				}
 				if(attributes[`${vsRef}_2`] !== 'select'){
+					await k.pseudoQuery();
 					vsMessage += ` & ${attributes[`${vsRef}_2`]}`
 				}
 				message += `{{vs=${vsMessage}}}`;
 			}
 			const confirmObject = {
-				skillName:/\^\{/.test(skillRef) ?
-					skillRef.replace(/\^\{|\}/g,'') :
-					`@{${skillRef}}`,
+				skillName,
 				skillDice:skillPool,
-				attributeName:`@{${attributeRef}}`,
+				attributeName,
 				attributeDice:attributePool,
 				enhancements,
 				addDice
 			};
 			let confirm = await confirmRoll(attributes,confirmObject);
 			if(k.value(confirm)){
-				executeRoll(attributes,reusableMessage,message);
+				await executeRoll(attributes,reusableMessage,message);
 			}
 		}
 	});

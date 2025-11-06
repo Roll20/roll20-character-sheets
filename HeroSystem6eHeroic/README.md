@@ -26,6 +26,8 @@ The number of skills (50 general skills, up to 12 combat skills, 9 maneuvers, an
 
 &emsp; [Page 6: Options](#page-6)
 
+&emsp; [Vehicles](#vehicles)
+
 &emsp; [Mod Support](#mods)
 
 &emsp; [Tokens](#tokens)
@@ -87,21 +89,25 @@ The default roll for Perception is equal to the character's Intelligence Roll. P
 
 ![Page 2](/HeroSystem6eHeroic/images/screenshot-02-scaled.png)
 
-The Gear page provides space for most of a character's physical goods (weapons, armor, and equipment) as well as a section of common and martial combat maneuvers.
+The Gear page provides space for most of a character's attacks, defenses, and equipment (physical goods or equivalent powers) as well as a section for common and martial combat maneuvers.
 
 Along the top is an accounting of your carried weight and DCV and movement penalties. The Endurance cost is accounted for automatically when taking a Post-Segment 12 recovery. Each value is read-only except "DCV Modifier." Use this field to account for skill levels or items that might reduce or enhance your DCV (see the note on current DCV in the token section below).
 
 ![Encumbrance](/HeroSystem6eHeroic/images/encumbrance.png)
 
-To the right of encumbrance bar you will find OCV* and DCV*. These combat values represent the character's OCV and DCV after the modifiers applied by the most recent maneuver. If the last action was use of a mental power, these values represent OMCV and DMCV. One exception are roll modifiers. These will not be applied to OCV* and DCV* due limitations of Roll20's roll actions.
+To the right of the encumbrance bar you will find OCV* and DCV*. These combat values represent the character's OCV and DCV after the modifiers applied by the most recent maneuver. If the action was a mental power, these values represent OMCV and DMCV. Roll modifiers are not applied to OCV* and DCV* due limitations of Roll20's roll actions.
 
 ![Ephemeral CVs](/HeroSystem6eHeroic/images/ephemeralCVs.png)
 
-The sheet includes space for four suits or pieces of armor (plus four more accessible via the "A/B" set button). If PD/ED are left at 0, then Total Defense will be automatically calculated when you click Roll. Although this sheet is designed for the simpler armor activation approach, there is a field for hit locations if your GM chooses to use that system.
+The sheet includes space for four defenses (plus four more accessible via the "A/B" set button). 
 
 ![Armor Table](/HeroSystem6eHeroic/images/armor.png)
 
-Click the "Roll" button to roll armor activation. A message like the one shown below will be sent to the chat window. If ACT is set to NA, and locations are filled then the second message will appear.
+The *Defense* entry space is actually a button that brings up a worksheet in which you can enter values for PD, ED, power defense, mental defense, and flash defense. The sheet will use these values to create a summary of these defenses for display in the parent table.
+
+![Armor Worksheet](/HeroSystem6eHeroic/images/armorWorksheet.png)
+
+Use the "Roll" button to send an item's critical information to the chat window. If ACT is not *NA* Roll20 will make an activation roll. If the option to use the hit location system is active, Roll20 will also display locations.
 
 ![Armor Activation Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat.png)![Armor Activation Alternate Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat2.png)
 
@@ -109,7 +115,12 @@ The weapons section contains space for five weapons (or spells or abilities with
 
 ![Weapons Table B](/HeroSystem6eHeroic/images/weapons.png)
 
-With the Weapon Worksheet open, begin by entering a weapon's base damage (the shield works the same way). HS6eH will attempt to translate entered damage to a valid HERO damage dice string, meaning some combination of xd6, +d3, +1, and -1 for killing damage and xd6 and +d3 for normal damage (if "Normal Damage" is checked). The resulting dice value appears on the right under "Results." Next, set the weapon's minimum strength value and the strength the character actually applies. If strength improves damage, check "DMG Enhanced by STR." Generally one only adds increments of +5 STR over the minimum since +5 STR = + 1 DC (damage class). Using less than a character's maximum strength may mean saving END costs. Note that typically a weapon's damage class can only be doubled via strength and skill enhancements, but this may be overridden with the option "Weapon Damage limited to 2x Base Damage." Combat Skill Levels can increase damage as well at a cost of +2 CSLs = + 1 DC. These may be entered either in the worksheet or, more conveniently for play, adjusted from the Weapons Table.
+With the Weapon Worksheet open, begin by entering a weapon's base damage. HS6eH will attempt to translate entered damage to a valid HERO damage dice string, meaning some combination of xd6, +d3, +1, and -1 for killing damage and xd6 and +d3 for normal damage (*Damage Type* of *Normal* or *Power*). The resulting dice string will appear on the right under "Results."
+
+> [!TIP]
+> A weapon with damage type *power* will use the violet power template for attack rolls and damage. Potentially useful for special weapons or weapon-like adjustment powers.
+
+Next, set the weapon's minimum strength value and the strength the character actually uses. If strength improves damage, check "DMG Enhanced by STR." Generally one only adds increments of +5 STR over the minimum since +5 STR = + 1 DC (damage class). Using less than a character's maximum strength may mean saving END costs. Note that typically a weapon's damage class can only be doubled via strength and skill enhancements, but this may be overridden with the option "Weapon Damage limited to 2x Base Damage." Combat Skill Levels can increase damage as well at a cost of +2 CSLs = + 1 DC. These may be entered either in the worksheet or, more conveniently for play, adjusted from the Weapons Table.
 
 ![Weapon Worksheet](/HeroSystem6eHeroic/images/weaponWorksheet.png)
 
@@ -151,6 +162,12 @@ To make a targeted attack select the radio button corresponding to desired focus
 
 ![Hit Locations](/HeroSystem6eHeroic/images/HitLocationTable.png)
 
+*Knockdown and Knockback (Optional)*
+
+If your campaign uses the knockdown or knockback rules, Roll20 will roll knockback dice and subtract the total from the BODY damage done by the attack. The outcome appears after the calculated damage result: a distance (⚞10m⚟) for knockback, two down arrows (↓↓) for knockdown, and three dots (•••) for a null result. Hover over the calculated result to see the knockback roll. Note that knockback isn't rolled for mental damage.
+
+![Knockdown](/HeroSystem6eHeroic/images/KnockdownChat.png)
+
 # <a id="page-3">Page 3: Skills</a>
 
 ![Page 3](/HeroSystem6eHeroic/images/screenshot-03-scaled.png)
@@ -167,7 +184,7 @@ Skill Enhancers, when purchased (checked), reduce the cost of relevant knowledge
 
 ![Page 4](/HeroSystem6eHeroic/images/screenshot-04-scaled.png)
 
-The Power page can accommodate twenty powers. The top and bottom sections have different color schemes for organizational purposes, but are otherwise the same. A health status bar occupies the upper right corner of the sheet along with a range table and limited selection of standard maneuvers (to be expanded in a future update). Each section displays one power in its fully expanded form, which is activated by clicking on the power's name. The up and down arrow widgets will move the power accordingly, swapping positions with the upper or lower power.
+The Power page can accommodate twenty powers. The top and bottom sections have different color schemes for organizational purposes, but are otherwise the same. A health status indicator bar occupies the upper right corner of the sheet along with a range table and limited selection of standard maneuvers (to be expanded in a future update). Each section displays one power in its fully expanded form, which is activated by clicking on the power's name. The up and down arrow widgets will move the power accordingly, swapping positions with the upper or lower power.
 
 HS6eH calculates a power's character and endurance costs from the base cost provided and advantages and limitations entered. A power framework is treated as its own entry as shown in the figure below. The second power "Ice Bolts" belongs to the Multipower as a Variable Slot. The "AF" in "Reduced AF" refers to *autofire,* which is an advantage chosen for this particular power that increases the cost of Reduced Endurance.
 
@@ -197,96 +214,128 @@ The only trick to the Complications section is to remember that points gained fr
 
 ![Page 6](/HeroSystem6eHeroic/images/screenshot-06-scaled.png)
 
-The last page of this sheet contains a number of options.
+The last page of this sheet contains a number of gameplay or display options.
 
 #### Character Options:
 
 ### Use Characteristic Maximums
 
-If checked, character point costs are doubled above the standard Hero System maximums.
+&emsp; If checked, character point costs are doubled above the standard Hero System maximums.
 
 ### Literacy Costs Character Points
 
-If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
+&emsp; If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
 
 ### More Combat Skills; Fewer Languages
 
-This option adds five more combat skill slots at the cost of five language slots. Any skills hidden by this option are not counted as purchased skills.
+&emsp; This option adds five more combat skill slots at the cost of five language slots. Any skills hidden by this option are not counted as purchased skills.
 
 ### Takes No Stun
 
-This option is commonly used for automaton-type characters that cannot be stunned and do not use END.
+&emsp; This option is commonly used for automaton-type characters that cannot be stunned and do not use END.
 
 ### Untiring
 
-Similarly, Untiring is a more limited form of *Takes No STUN* where the character does not pay END costs for strength.
+&emsp; Similarly, Untiring is a more limited form of *Takes No STUN* where the character does not pay END costs for strength.
 
 ### Super-heroic Campaign Endurance 
 
-If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
+&emsp; If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
 
 ### Weapon Damage Limited to 2x Base Damage
 
-Most heroic-level campaigns cap enhanced weapon damages. Uncheck this to remove the cap.
+&emsp; Most heroic-level campaigns cap enhanced weapon damages. Uncheck this to remove the cap.
 
 ### Choose d6-1 over d3 when Adjusted Damage is ambiguous
 
-HERO damage tables often contain a choice between xd6+d3 or (x+1)d6-1. The latter is slightly better on paper, but some players prefer the former.
+&emsp; HERO damage tables often contain a choice between xd6+d3 or (x+1)d6-1. The latter is slightly better on paper, but some players prefer the former.
 
 ### Carry all Gear Sets
 
-If checked, carried weight includes both A and B sets of weapons and armor. This option essentially declares whether a character has a single kit or two kits.
+&emsp; If checked, carried weight includes both A and B sets of weapons and armor. This option essentially declares whether a character has a single kit or two kits.
+
+### Use Vehicle Attributes
+
+&emsp; This option changes the *Characteristics* page and the Health Status Indicators. See the [Vehicles](#vehicles) section below.
 
 ## Gameplay Options:
 
 ### Display Degree of Success
 
-By default this is checked, showing the amount a roll succeeded or failed by. In the case of attacks it will show the DCV that you are able to hit. Unchecking this will instead show a Base Chance for skills, and the total OCV bonus for attacks, followed by a Roll line that will show the results of 3d6 roll. This doesn't affect anything rules wise, just a preference on how players would want to see the details of their rolls.
+&emsp; By default this is checked, showing the amount a roll succeeded or failed by. In the case of attacks it will show the DCV that you are able to hit. Unchecking this will instead show a Base Chance for skills, and the total OCV bonus for attacks, followed by a Roll line that will show the results of 3d6 roll. This doesn't affect anything rules wise, just a preference on how players would want to see the details of their rolls.
 
 ### Use Hit Location System
 
-Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
+&emsp; Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
 ### Health Reset Buttons reset Combat Choices
 
-When checked a reset returns maneuver and targeting selections to their default states.
+&emsp; When checked a reset returns maneuver and targeting selections to their default states.
 
 ### Health Reset Buttons reset applied CSLs
 
-Similarly, here a reset also returns applied Combat Skill Levels to zero.
+&emsp; Similarly, here a reset also returns applied Combat Skill Levels to zero.
 
 ### Attack and Power Buttons Apply END Costs
 
-If checked, these buttons will subtract an attack or power's endurance cost once from a character's current END in addition to their normal effects.
+&emsp; If checked, these buttons will subtract an attack or power's endurance cost once from a character's current END in addition to their normal effects.
 
 ### Show Power Descriptions in Chat
 
-Uncheck if you would like to tidy up powers in the chat area.
+&emsp; Uncheck if you would like to tidy up powers in the chat area.
 
 ### Show Tally Bar
 
-Uncheck to hide the Tally Bar.
+&emsp; Uncheck to hide the Tally Bar.
 
 ### Tally Net CP instead of Spent CP
 
-If you prefer an accounting only of spent character points, uncheck this option. This method is more in keeping with 6th Edition sources.
+&emsp; If you prefer an accounting only of spent character points, uncheck this option. This method is more in keeping with 6th Edition sources.
 
 ### Name-Title Separator 
 
-Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color. Font size seems to be just right or too small.
+&emsp; Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color. Font size seems to be just right or too small.
+
+### Roll for Knockback
+
+&emsp; If the campaign uses knockback rules select whether if it is for full knockback or only knockdown. The default is *never* and the standard knockdown roll is *2d6.* Lower power campaigns might opt for a knockback roll of *1d6* and higher power campaigns might use *3d6*.
 
 ### Whisper Rolls to GM
 
-This dropdown offers three options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
+&emsp; This dropdown offers three options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
 
 ![Delete Option](/HeroSystem6eHeroic/images/OptionDelete.png)
 
 ### Activate Item Delete Mode. Deactivate to complete Deletion
 
-This option activates or deactivates the line item deletion mode for gear, skills, powers, talents, and complications. Select whichever items you would like to remove. These items will not be deleted until you deactivate the mode. You may abandon your selections and abort the mode by either pressing one of the *reset* buttons or by closing the character sheet.
+&emsp; This option activates or deactivates the line item deletion mode for gear, skills, powers, talents, and complications. Select whichever items you would like to remove. These items will not be deleted until you deactivate the mode. You may abandon your selections and abort the mode by either pressing one of the *reset* buttons or by closing the character sheet.
 
 >[!CAUTION]
 > Use of the Delete Mode may lead to unwanted data loss. Deleted items are not recoverable.
+
+# <a id="vehicles">Vehicles</a>
+
+![Vehicles](/HeroSystem6eHeroic/images/vehicle-sheet-scaled.png)
+
+The "Use Vehicle Attributes" option reconfigures the first page for use with vehicle characters. This option adds the *Size* attribute, which determines secondary characteristics like length, mass, and the OCV bonus to hit the vehicle (*OCV+*). Size also adds to strength, reflected in the strength modifier. Many characteristics like *CON*, *INT*, *EGO*, and *PRE* aren't used for vehicles and are hidden (but not deleted).
+
+This configuration has four tailored power sections that would commonly used by vehicles: two movement powers (propulsion systems) and two endurance reserves (power systems).
+
+![Propulsion](/HeroSystem6eHeroic/images/VehiclePropulsion.png)
+
+Note that HERO System vehicles typically start with 12 m of *Running* and 4 m of *Swimming*. Since most vehicles add modifiers to or buy back these attributes, this sheet assumes zero for each and refunds the character 14 points.
+
+![MorePropulsion](/HeroSystem6eHeroic/images/VehiclePropulsionMore.png)
+
+The *More* button reveals inputs for advantage and limitation values as well as the option to add endurance costs. In the example above we noted "Costs END (-1/2)" in the text box, but didn't enter "0.5" as a limitation. This is not necessary because the selection of "Full END" automatically applied this limitation.
+
+If a propulsion system is part of a multipower, which would be entered on the Powers page, change the *Single Power* selection to *Variable Slot* or *Fixed Slot* as appropriate.
+
+![Reserves](/HeroSystem6eHeroic/images/VehiclePower.png)
+
+The primary and auxiliary endurance reserves replace the *END* and *STUN* attributes in the Health Status Indicator (as *END* and *AUX*). Endurance costs will be subtracted from one of these two attributes, selected by the adjacent radio buttons as shown below.
+
+![VehicleHealth](/HeroSystem6eHeroic/images/HealthStatusVehicle.png)
 
 # <a id="mods">Mod Support</a>
 
@@ -300,13 +349,15 @@ The utility mod HeroSystem6eHeroic_HDImporter (available in the quick install me
 
 ### HERO Roller
 
-If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. Version 1.3.1 of Hero Roller adds support for HS6eH attribute names. 
+If you would like more flexibility in creating macros you might consider adding [Hero Roller](https://wiki.roll20.net/Script:HeroRoller) to your game. Version 1.3.0 of Hero Roller adds support for HS6eH attribute names.
 
 # <a id="tokens">Tokens</a>
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
 
-Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes *currentDCV,* *currentBODY,* and *currentEND* these should automatically be coupled with their maximum values. The hidden attribute *currentDCV* is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty + DCV Modifier.
+Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes *CurrentDCV,* *CurrentBODY,* and *CurrentEND* these should automatically be coupled with their maximum values. The hidden attribute *currentDCV* is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty + DCV Modifier.
+
+Vehicles do not have *STUN* and don't use the *END* attribute. For vehicles, I suggest using *CurrentPrimaryEND* and *CurrentAuxiliaryEND*, which point to the two vehicle endurance reserves.
 
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
 
@@ -335,6 +386,19 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
 *First version by Villain In Glasses, August 1, 2021.*
+
 *Recent updates:*
+
+*Oct 5, 2025 added option to automatically roll for knockback (Version 4.80)*
+
+*May 8, 2025 added mental, power, and flash defense to armor (Version 4.70)*
+
+*March 7, 2025 adds Mental as a weapon damage type (Version 4.50).*
+
+*February 5, 2025 adds vehicle support (Version 4.40).*
+
+*January 25, 2025 adds damage type (killing, normal, and power) to the weapon worksheet (Version 4.10).*
+
 *January 3, 2025 to represent the sheet as of Version 4.02.*
-*November 21, 2024 to represent the sheet as of Version 3.81 and updated support in Hero Roller 1.3.1.*
+
+*November 21, 2024 to represent the sheet as of Version 3.81 and updated support in Hero Roller 1.3.0.*

@@ -10,13 +10,21 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-v3.19.0 [Screenshot](coc_v2.png)
+v3.21.0 [Screenshot](coc_v2.png)
 
 # Notes de version
 
+## v3.21.0 (2025-08-12)
+
+- Libellé _Attaque magique_ paramétrable (attribut ATKMAG_desc à modifier manuellement dans l'onglet _Attributes and Abilities_)
+
+## v3.20.0 (2025-01-25)
+
+- Compatibilité des jets de chat avec le dark-mode Roll20
+
 ## v3.19.0 (2024-08-24)
 
-- Gestion des capacités avec nomre d'utilisations limitées
+- Gestion des capacités avec nombre d'utilisations limitées
   - Configuration dans l'onglet Capacités
   - Décompte d'utilisation, message d'alerte de dépassement, bouton de rechargement
   - Chargement automatique à l'import d'un profil

@@ -117,6 +117,12 @@
     margin: 0;
 }
 
+.charsheet input[disabled]:hover,
+.charsheet input[disabled]:hover::-webkit-outer-spin-button,
+.charsheet input[disabled]:hover::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
 .charsheet input[type=number]{
     -moz-appearance: textfield;
 }
@@ -188,6 +194,14 @@
 
 .tab-content .charsheet {
   padding: 0;
+}
+
+.tab-content .charsheet .linear-background {
+  background-image: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent 90%);
+}
+
+.sheet-darkmode .tab-content .charsheet .linear-background {
+  background-image: linear-gradient(to top, rgba(255, 255, 255, 0.3), transparent 90%);
 }
 
 /* background toggle */
@@ -444,7 +458,7 @@
 /* hide costs all tabs*/
 .charsheet input[type='checkbox'].toggle-costs:checked ~ .background .equipment-columns {
   grid-template-columns:
-    3.5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em, 7em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(3em, 5em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(1em, 4em) 0;
+    3.5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em, 7em) minmax(1em, 3em) minmax(3.5em, 5em) 0.5em minmax(1em, 3em) minmax(3em, 5em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(1em, 4em) 0;
 }
 
 /* hide costs Armor tab specific */
@@ -452,7 +466,7 @@
 .charsheet .toggle-costs:checked ~ .background .equipment-display-type[value='2'] ~ .repcontainer .equipment-columns {
   display: grid;
   grid-template-columns:
-    3.5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em, 7em) minmax(3em, 5em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(1em, 4em);
+    3.5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em, 7em) minmax(3.5em, 5em) minmax(3em, 5em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(1em, 4em);
 }
 
 /* prevent interaction until an armor type is chosen */
@@ -512,22 +526,24 @@
 }
 
 /*choose to hit table*/
-.charsheet input[type='checkbox'].toggle-to-hit-table ~ .matrix-box,
-.charsheet input[type='checkbox'].toggle-to-hit-table ~ .thac0-box,
-.charsheet input[type='checkbox'].toggle-to-hit-table ~ .repcontainer[data-groupname='repeating_weapon'] .repitem .matrix-box,
-.charsheet input[type='checkbox'].toggle-to-hit-table ~ .repcontainer[data-groupname='repeating_weapon'] .repitem .thac0-box {
+.charsheet .toggle-to-hit-table ~ .subheader .matrix-box,
+.charsheet .toggle-to-hit-table ~ .sect .matrix-box,
+.charsheet .toggle-to-hit-table ~ .subheader .thac0-box,
+.charsheet .toggle-to-hit-table ~ .sect .thac0-box {
   display: none;
+  opacity: 1;
 }
 
-.charsheet input[type='checkbox'].toggle-to-hit-table:not(:checked) ~ .matrix-box,
-.charsheet input[type='checkbox'].toggle-to-hit-table:not(:checked) ~ .repcontainer[data-groupname='repeating_weapon'] .repitem .matrix-box {
+.charsheet .toggle-to-hit-table:not(:checked) ~ .subheader .matrix-box,
+.charsheet .toggle-to-hit-table:not(:checked) ~ .sect .matrix-box,
+.charsheet .toggle-to-hit-table:checked ~ .subheader .thac0-box,
+.charsheet .toggle-to-hit-table:checked ~ .sect .thac0-box {
   display: inline-flex;
-  position: absolute;
 }
 
-.charsheet input[type='checkbox'].toggle-to-hit-table:checked ~ .thac0-box,
-.charsheet input[type='checkbox'].toggle-to-hit-table:checked ~ .repcontainer[data-groupname='repeating_weapon'] .repitem .thac0-box {
-  display: inline-flex;
+.charsheet .toggle-to-hit-table:not(:checked) ~ .sect .matrix-class.matrix-box,
+.charsheet .toggle-to-hit-table:checked ~ .sect .matrix-class.thac0-box {
+  display: grid;
 }
 
 /* indicates an input error */
@@ -553,14 +569,6 @@
   position: absolute;
 }
 
-.charsheet .background .wrapper .weapons-box .sect .toggle-input-attention:checked ~ details summary .subheader.label-matrix,
-.charsheet .background .wrapper .weapons-box .sect .toggle-input-attention:checked ~ details summary .material-icons,
-.charsheet .background .wrapper .weapons-box .sect .toggle-input-attention:checked ~ details summary .material-icons::before,
-.charsheet .background .wrapper .weapons-box .sect .toggle-input-attention:checked ~ details summary .material-icons::after {
-  color: crimson;
-  opacity: 1;
-}
-
 /* encumbrance warning */
 .charsheet input[type='checkbox'].toggle-input-attention:checked + label .material-icons {
   display: block;
@@ -570,7 +578,7 @@
 /* matrix warning */
 .charsheet input[type='checkbox'].toggle-input-attention:checked + .material-icons {
   display: block;
-  margin: -21px 0 0 -7px;
+  margin: 9px 0 0 -16px;
   opacity: 1;
 }
 
@@ -789,6 +797,7 @@ summary::-webkit-details-marker {
   font-size: var(--text-med);
 }
 
+.charsheet input.sect-show:hover + span.material-icons::before,
 .charsheet input.toggle-npc:hover + span.material-icons.custom-btn-nav::before,
 .charsheet details summary:hover > span.material-icons.gear-nav::before,
 /* works with new .top-row change*/
@@ -802,9 +811,11 @@ summary::-webkit-details-marker {
   z-index: 999;
 }
 
+.charsheet input.sect-show + span.material-icons::before,
 .charsheet input.toggle-npc + span.material-icons::before,
 .charsheet details summary span.material-icons::before {
   content: 'settings';
+  cursor: pointer;
   font-size: var(--text-med);
   line-height: normal;
   opacity: 0.5;
@@ -942,16 +953,14 @@ summary::-webkit-details-marker {
   cursor: default;
   margin: -1px -1px 0 -1px;
   text-align: center;
-  width: 100%;
+  width: calc(100% + 2px);
 }
 
-.charsheet .background .wrapper .sect .column-header span,
-.charsheet .background .wrapper .section .column-header span {
+.charsheet .background .wrapper .sect .column-header span {
   color: var(--color-white1);
 }
 
-.sheet-darkmode .background .wrapper .sect .column-header span,
-.sheet-darkmode .background .wrapper .section .column-header span {
+.sheet-darkmode .background .wrapper .sect .column-header span {
   color: var(--color-white2);
 }
 
@@ -1035,6 +1044,7 @@ summary::-webkit-details-marker {
 .charsheet label:has(> input[type='checkbox']) {
   margin: auto;
   max-width: fit-content;
+  position: relative;
 }
 
 .charsheet .inline-label {
@@ -1101,32 +1111,7 @@ summary::-webkit-details-marker {
   margin: 0 0 2px -1px;
 }
 
-.charsheet .label-matrix {
-  font-size: var(--text-xl);
-  font-weight: var(--text-wt400);
-  opacity: 0.75;
-}
-
-.charsheet details.matrix-box[open] summary,
-.charsheet details.thac0-box[open] summary {
-  align-items: baseline;
-  column-gap: 3px;
-  display: flex;
-  flex-wrap: nowrap;
-  min-width: 0;
-  position: relative;
-  white-space: nowrap;
-}
-
-.charsheet .label-matrix::before {
-  display: inline-flex;
-  font-size: var(--text-xl);
-  margin: 0 2px 0 0;
-  opacity: 0.75;
-}
-
-.charsheet .weapons-box .sect details.matrix-box summary span.material-icons.grid:first-child::after,
-.charsheet .weapons-box .sect details.thac0-box summary span.material-icons.grid:first-child::after {
+.charsheet .material-icons.grid::after {
   content: 'view_module';
   display: inline-flex;
   font-size: inherit;
@@ -1135,15 +1120,8 @@ summary::-webkit-details-marker {
   vertical-align: middle;
 }
 
-.charsheet .weapons-box .sect details.matrix-box summary span.material-icons.grid:first-child::before,
-.charsheet .weapons-box .sect details.thac0-box summary span.material-icons.grid:first-child::before {
+.charsheet .material-icons.grid::before {
   content: '';
-}
-
-.charsheet summary:hover .label-matrix::before,
-.charsheet summary:hover .label-matrix {
-  color: var(--link-hover);
-  opacity: 1;
 }
 
 .charsheet .top-header {
@@ -1538,7 +1516,7 @@ section.npc-box.statblock3 .image-avatar {
   display: inherit;
 }
 
-/* needs important to overide inline style added by roll20 */
+/* needs important to override inline style added by roll20 */
 .charsheet input[type='hidden'].toggle-avatar[value="1"] ~ .image-avatar,
 .charsheet input[type='hidden'].toggle-avatar[value="2"] ~ .image-avatar {
   background-image: none !important;
@@ -1677,7 +1655,7 @@ section.npc-box.statblock3 .image-avatar {
   }
 
   .charsheet input[value='1'].toggle-npc ~ .background .weapons-box .matrix-box,
-  .charsheet input[value='1'].toggle-npc ~ .background .weapons-box thac0-box,
+  .charsheet input[value='1'].toggle-npc ~ .background .weapons-box .thac0-box,
   .charsheet input[value='1'].toggle-npc ~ .background .weapons-box label,
   .charsheet input[value='1'].toggle-npc ~ .background .weapons-box .to-hit-adj-box h4,
   .charsheet input[value='1'].toggle-npc ~ .background .weapons-box .to-hit-adj-box span span {
@@ -1688,8 +1666,13 @@ section.npc-box.statblock3 .image-avatar {
     margin-bottom: 0 !important;
   }
 
-  .charsheet input[value='1'].toggle-npc ~ .background .weapons-box .matrix-box,
-  .charsheet input[value='1'].toggle-npc ~ .background .weapons-box thac0-box {
+  .charsheet .toggle-npc ~ .background .weapons-box .matrix-box,
+  .charsheet .toggle-npc ~ .background .weapons-box .thac0-box {
+    display: none;
+  }
+
+  .charsheet input[value='1'].toggle-npc:checked ~ .background .weapons-box .matrix-box,
+  .charsheet input[value='1'].toggle-npc:checked ~ .background .weapons-box .thac0-box {
     display: contents;
   }
 
@@ -2164,7 +2147,7 @@ section.npc-box.statblock3 .image-avatar {
   display: grid;
   grid-template-columns: 0.75fr 1fr 1fr 1fr 3em .5em 5em;
   justify-items: right;
-  padding: 2px;
+  padding: 4px;
 }
 
 .charsheet input[value='0'].weapon-type-toggle ~ .top-row .weapons-row1 .hide-if-melee,
@@ -2222,7 +2205,8 @@ section.npc-box.statblock3 .image-avatar {
 .charsheet .background .wrapper .weapons-row2 > details {
   border: none;
   margin: auto;
-  width: 6.25em;
+  max-width: 7em;
+  min-width: 6em;
 }
 
 .charsheet .background .wrapper .weapons-row1 label.repeating-name {
@@ -2281,7 +2265,8 @@ section.npc-box.statblock3 .image-avatar {
   height: auto;
   margin: 0 0 0 -3em;
   max-width: none;
-  min-height: 2em;
+  min-height: 2.5em;
+  min-width: 55%;
   opacity: 1;
   overflow: hidden;
   padding: 2px 2px 2px 0;
@@ -2294,6 +2279,8 @@ section.npc-box.statblock3 .image-avatar {
 .charsheet .background .wrapper .weapons-row2 .toggle-critdamage textarea {
   overflow: hidden;
   resize: none;
+  border-color: #000;
+  background-color: revert;
 }
 
 .charsheet .weapons-row2 > details[open] input {
@@ -2303,8 +2290,8 @@ section.npc-box.statblock3 .image-avatar {
 
 .charsheet .toggle-critdamage:not(:checked) ~ .background .wrapper span.weapons-row2.center summary .custom-btn-nav + input,
 .charsheet .toggle-critdamage:not(:checked) ~ .background .wrapper span.weapons-row2.center summary .custom-btn-nav ~ button {
-  margin: 0 -7px 0 -2px;
-  width: calc(100% + 3px);
+  width: 100%;
+  margin-inline: -1px;
 }
 
 .charsheet .background .wrapper .two-inputs-over-label {
@@ -2323,23 +2310,9 @@ section.npc-box.statblock3 .image-avatar {
   left: 3.75em;
 }
 
-.charsheet .wrapper .matrix-box,
-.charsheet .wrapper .thac0-box {
-  display: inline-flex;
+.charsheet .toggle-to-hit-table ~ .sect label,
+.charsheet .thief-class label {
   justify-content: center;
-  margin: -1.25em 0 0 0.75em;
-  position: absolute;
-}
-
-details[open].matrix-box,
-details[open].thac0-box {
-  background-color: var(--color-white3);
-  color: initial;
-  margin: 0 0 0 1em;
-  min-width: 445px;
-  position: absolute;
-  width: 85%;
-  z-index: 3;
 }
 
 .charsheet .saves-class {
@@ -2358,32 +2331,99 @@ details[open].thac0-box {
 
 .charsheet .thief-class {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin: -20px 0 5px auto;
+  grid-template-columns: 1fr 6em 1fr 1fr;
+  margin: -1.5em .5em .5em auto;
   position: relative;
-  width: 50%;
-  z-index: 1;
+  width: 80%;
+  z-index: 2;
 }
 
-.charsheet .matrix-class {
-  display: grid;
-  grid-template-columns: auto minmax(8em, 1fr) 3fr 8em;
-  grid-template-rows: 1.5em 2em;
-  margin: 4px auto 2px auto;
-  position: relative;
-  width: 75%;
-  z-index: 1;
+.charsheet .toggle-sync-class:checked ~ .thief-class {
+  grid-template-columns: 1fr 1fr 1fr 6em 1fr 1fr;
 }
 
-.charsheet .thac0-box .matrix-class {
-  grid-template-columns: 0.75fr minmax(8em, 2fr) 3fr 8em;
+.charsheet .settings label:has(> input[type='checkbox']),
+.charsheet .saves-class label:has(> input[type='checkbox']),
+.charsheet .matrix-class label:has(> span + input[type='checkbox']),
+.charsheet .thief-class label:has(> input[type='checkbox']) {
+  margin-right: 0;
 }
 
-.charsheet input[type='checkbox'].toggle-matrixhd:checked ~ .matrix-level {
+.charsheet .background .wrapper input[type="checkbox"].toggle-matrix-autofill:not(:checked) ~ .matrix-class {
+  display: flex;
+  justify-self: left;
+}
+
+.charsheet .wrapper .toggle-matrix-autofill:not(:checked) ~ .matrix-class .inline-label ~ * {
   display: none;
 }
 
-.charsheet input[type='checkbox'].toggle-matrixhd:not(:checked) ~ .matrix-hd {
+.charsheet .toggle-sync-class:not(:checked) ~ .matrix-class .show-sync-class,
+.charsheet .toggle-sync-class:checked ~ .matrix-class .show-when-not-synced,
+.charsheet .toggle-sync-class:not(:checked) ~ .thief-class .show-sync-class,
+.charsheet .toggle-sync-class:checked ~ .thief-class .show-when-not-synced {
+  display: none;
+}
+
+.charsheet .toggle-sync-class:not(:checked) ~ .matrix-class .show-when-not-synced,
+.charsheet .toggle-sync-class:checked ~ .matrix-class .show-sync-class,
+.charsheet .toggle-sync-class:not(:checked) ~ .thief-class .show-when-not-synced,
+.charsheet .toggle-sync-class:checked ~ .thief-class .show-sync-class {
+  display: flex;
+}
+
+.charsheet .toggle-sync-class:not(:checked) ~ .matrix-class {
+  display: grid;
+  grid-template-columns: 1fr 5em 2fr 2fr;
+  grid-template-rows: 1.2em 2em;
+  position: relative;
+  row-gap: 2px;
+}
+
+.charsheet .toggle-sync-class:checked ~ .matrix-class {
+  display: grid;
+  grid-template-columns: 1fr 7em 1fr 5em 2fr auto;
+  grid-template-rows: 1.2em 2em;
+  position: relative;
+  row-gap: 2px;
+}
+
+.charsheet .toggle-sync-class:not(:checked) + input[value='2'].toggle-fighter5 ~ .matrix-class {
+  display: grid;
+  grid-template-columns: 1fr 5em 2fr 5em 2fr;
+}
+
+.charsheet .toggle-sync-class:checked + input[value='2'].toggle-fighter5 ~ .matrix-class {
+  display: grid;
+  grid-template-columns: 1fr 7em 1fr 5em 2fr 5em auto;
+}
+
+.charsheet .class-selected ~ .show-none,
+.charsheet .class-selected ~ .show-class1-name,
+.charsheet .class-selected ~ .show-class2-name,
+.charsheet .class-selected ~ .show-class3-name,
+.charsheet .class-selected ~ .show-monster-name {
+  display: none;
+}
+
+.charsheet .class-selected[value="0"] ~ .show-none,
+.charsheet .class-selected[value="1"] ~ .show-class1-name,
+.charsheet .class-selected[value="2"] ~ .show-class2-name,
+.charsheet .class-selected[value="3"] ~ .show-class3-name,
+.charsheet .class-selected[value="4"] ~ .show-monster-name {
+  display: block;
+}
+
+.charsheet .matrix-class .fighter5 {
+  display: none;
+}
+
+.charsheet input[value='2'].toggle-fighter5 ~ .matrix-class .fighter5 {
+  display: flex;
+}
+
+.charsheet .toggle-matrixhd:not(:checked) ~ .matrix-class .matrix-hd,
+.charsheet .toggle-matrixhd:checked ~ .matrix-class .matrix-level {
   display: none;
 }
 
@@ -2426,9 +2466,8 @@ details[open].thac0-box {
   display: grid;
   justify-items: center;
   padding: 0 2px 0 2px;
-
   grid-template-columns:
-    3.5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em, 7em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(3em, 5em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(1em, 4em) minmax(1em, 4em);
+    3.5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em, 7em) minmax(3.5em, 5em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(3em, 5em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(1em, 4em) minmax(1em, 4em);
 }
 
 /* Armor tab specific */
@@ -2436,9 +2475,8 @@ details[open].thac0-box {
 .charsheet .background input[type='hidden'].equipment-display-type[value='2'] ~ .repcontainer .equipment-columns {
   display: grid;
   padding: 0 2px 0 2px;
-
   grid-template-columns:
-    3.5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em, 7em) minmax(3em, 5em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(1em, 4em) minmax(1em, 4em);
+    3.5em minmax(7em, 2fr) minmax(4em, 1fr) minmax(3em, 7em) minmax(3.5em, 5em) minmax(3em, 5em) minmax(1em, 3em) 0.5em minmax(1em, 3em) minmax(1em, 4em) minmax(1em, 4em);
 }
 
 .charsheet span.equipment-columns.column-header {
@@ -2673,7 +2711,7 @@ details[open].thac0-box {
 .charsheet .nonweapon-proficiencies-row1 {
   align-items: center;
   display: grid;
-  grid-template-columns: 3.5em 2fr 2fr 1fr 4em 4em;
+  grid-template-columns: 3.5em 2fr 2fr 1fr 4em 4em 4em;
   justify-items: center;
   padding: 0 2px 2px 2px;
 }
@@ -3275,6 +3313,7 @@ details[open].thac0-box {
   width: 100%;
 }
 
+.charsheet .wrapper select.readonly,
 .charsheet input[disabled],
 .charsheet select[disabled],
 .charsheet textarea[disabled],
@@ -3289,6 +3328,7 @@ details[open].thac0-box {
   color: initial;
   cursor: default;
 }
+
 
 .charsheet .wrapper input.readonly,
 .charsheet .wrapper .readonly-span {
@@ -3306,6 +3346,7 @@ details[open].thac0-box {
   text-align: center;
 }
 
+.sheet-darkmode .tab-content .charsheet .background .wrapper select.readonly,
 .sheet-darkmode .tab-content .charsheet .background .wrapper input.readonly,
 .sheet-darkmode .tab-content .charsheet .background .wrapper .readonly-span {
   background-color: var(--color-darkgrey1);
@@ -4002,6 +4043,7 @@ details[open].thac0-box {
 
 .charsheet input[type='checkbox'].sect-show {
   border: none;
+  cursor: pointer;
   height: 1.5em;
   max-width: 14em;
   opacity: 0 !important;
@@ -4015,35 +4057,30 @@ details[open].thac0-box {
   min-width: 97%;
 }
 
+.charsheet .wrapper label:has(input[type='checkbox']):hover span,
 .charsheet .wrapper input[type='checkbox'].sect-show:hover,
 .charsheet .wrapper input[type='checkbox'].sect-show:hover + div,
 .charsheet .wrapper input[type='checkbox'].sect-show:hover + div span,
+.charsheet .wrapper input[type='checkbox'].sect-show:hover + span + span,
 .charsheet .wrapper input[type='checkbox'].sect-show:hover + span,
 .charsheet .wrapper input[type='checkbox'].sect-show:hover + b,
 .charsheet .background .wrapper details:hover summary :first-child,
-.charsheet .wrapper details[open] summary :first-child,
-.charsheet .wrapper .sect details.matrix-box:hover summary span.label-matrix,
-.charsheet .wrapper .sect details.matrix-box:hover summary span.label-matrix + span.material-icons::before,
-.charsheet .wrapper .sect details.matrix-box:hover summary,
-.charsheet .wrapper .sect details.thac0-box:hover summary span.label-matrix,
-.charsheet .wrapper .sect details.thac0-box:hover summary {
+.charsheet .wrapper details[open] summary :first-child {
   background-color: transparent;
   color: var(--link-hover);
   opacity: 1;
 }
 
+.sheet-darkmode .background .wrapper label:has(input[type='checkbox']):hover span,
 .sheet-darkmode .background .wrapper input[type='checkbox'].sect-show:hover,
 .sheet-darkmode .background .wrapper input[type='checkbox'].sect-show:hover + div,
 .sheet-darkmode .background .wrapper input[type='checkbox'].sect-show:hover + div span,
 .sheet-darkmode .background .wrapper input[type='checkbox'].sect-show:hover + span,
+.sheet-darkmode .background .wrapper input[type='checkbox'].sect-show:hover + span + span,
 .sheet-darkmode .background .wrapper input[type='checkbox'].sect-show:hover + b,
 .sheet-darkmode .background .wrapper details:hover summary :first-child,
 .sheet-darkmode .background .wrapper details[open] summary :first-child,
-.sheet-darkmode .background .wrapper .sect details.matrix-box:hover summary span.label-matrix,
-.sheet-darkmode .background .wrapper .sect details.matrix-box:hover summary span.label-matrix + span.material-icons::before,
-.sheet-darkmode .background .wrapper .sect details.matrix-box:hover summary,
-.sheet-darkmode .background .wrapper .sect details.thac0-box:hover summary span.label-matrix,
-.sheet-darkmode .background .wrapper .sect details.thac0-box:hover summary,
+.sheet-darkmode .background .wrapper input[type='checkbox'].sect-show:hover + span.material-icons::before,
 .sheet-darkmode .background .wrapper input[type='checkbox'].sect-show:hover + span + span.material-icons::before,
 .sheet-darkmode .background .wrapper input[type='checkbox'].sect-show:hover + div + span.material-icons::before,
 .sheet-darkmode .background .wrapper input:hover + span.material-icons.custom-btn-nav::before,
@@ -4051,20 +4088,6 @@ details[open].thac0-box {
 .sheet-darkmode .background .wrapper .top-row ~ details[open] summary > span.material-icons.gear-nav::before,
 .sheet-darkmode .background .wrapper details summary:hover > span.material-icons.custom-btn-nav::before {
   color: var(--dark-accent);
-}
-
-.charsheet input[type='checkbox'].toggle-to-hit-table:not(:checked) ~ .matrix-box[open] summary ~ div label {
-  color: initial;
-}
-
-.charsheet .sect details[open].matrix-box summary + div.matrix-class select option:nth-child(even),
-.charsheet .sect details[open].thac0-box summary + div.matrix-class select option:nth-child(even) {
-  background-color: var(--color-lightgrey2);
-}
-
-.charsheet .sect details[open].matrix-box summary + div.matrix-class select option:nth-child(odd),
-.charsheet .sect details[open].thac0-box summary + div.matrix-class select option:nth-child(odd) {
-  background-color: transparent;
 }
 
 .charsheet input[type='checkbox'].sect-show:checked + span,
@@ -4078,13 +4101,10 @@ details[open].thac0-box {
 }
 
 /*used with hidden checkbox to hide elements*/
-.charsheet .sect-show:not(:checked) ~ .sect,
-.charsheet .sect-show:not(:checked) ~ .section {
+.charsheet .sect-show:not(:checked) ~ .sect {
   display: none;
 }
 
-.charsheet .sect details.matrix-box summary span.material-icons::before,
-.charsheet .sect details.thac0-box summary span.material-icons::before,
 .charsheet input[type='checkbox'].sect-show + span + span.material-icons::before,
 .charsheet input[type='checkbox'].sect-show + div + span.material-icons::before {
   content: 'arrow_right';
@@ -4107,29 +4127,37 @@ details[open].thac0-box {
   content: 'menu_open';
 }
 
-.charsheet .announcements input[type='checkbox'].sect-show,
+.charsheet .announcements input[type='checkbox'].sect-show {
+  height: 24px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 24px;
+  z-index: 1;
+}
+
 .charsheet .announcements input[type='checkbox'].sect-show:checked ~ .material-icons {
   height: 20px;
   position: absolute;
   right: 0;
   top: 0;
   width: 20px;
+  z-index: 0;
 }
 
 .charsheet .announcements input[type='checkbox'].sect-show:checked ~ .material-icons::before {
   content: 'close';
   font-size: 15px;
   font-weight: bold;
-  margin-top: 0;
-  opacity: .5;
-  position: relative;
-  top: -5px;
+  transition: none;
+}
+
+.charsheet .announcements input[type='checkbox'].sect-show:checked:hover ~ .material-icons::before {
+  transform: none;
 }
 
 .charsheet .armor-box input[type='checkbox'].sect-show + span + span.material-icons::before,
 .charsheet .personal-attributes-box input[type='checkbox'].sect-show + span + span.material-icons::before,
-.charsheet .weapons-box .sect details.matrix-box summary span.material-icons::before,
-.charsheet .weapons-box .sect details.thac0-box summary span.material-icons::before,
 .charsheet .class-details input[type='checkbox'].sect-show + span + span.material-icons::before,
 .charsheet .armor-details input[type='checkbox'].sect-show + span + span.material-icons::before,
 .charsheet .saves-columns input[type='checkbox'].sect-show + span + span.material-icons::before,
@@ -4175,8 +4203,6 @@ details[open].thac0-box {
   z-index: 3;
 }
 
-.charsheet .sect details[open].matrix-box summary span.material-icons::before,
-.charsheet .sect details[open].thac0-box summary span.material-icons::before,
 .charsheet input[type='checkbox'].sect-show:checked + span + span.material-icons::before,
 .charsheet input[type='checkbox'].sect-show:checked + div + span.material-icons::before {
   content: 'arrow_drop_down';
@@ -4343,12 +4369,12 @@ details[open].thac0-box {
   border: none;
 }
 
-.sheet-rolltemplate-attacks .sheet-row:nth-child(odd),
+/* .sheet-rolltemplate-attacks .sheet-row:nth-child(odd), */
 .sheet-rolltemplate-general .sheet-row:nth-child(odd) {
   background-color: var(--color-white3);
 }
 
-.sheet-rolltemplate-darkmode.sheet-rolltemplate-attacks .sheet-row:nth-child(odd),
+/* .sheet-rolltemplate-darkmode.sheet-rolltemplate-attacks .sheet-row:nth-child(odd), */
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-general .sheet-row:nth-child(odd) {
   background-color: var(--color-black1);
   color: var(--color-white3);
@@ -4572,8 +4598,8 @@ details[open].thac0-box {
   min-width: 1.1em;
 }
 
-.sheet-rolltemplate-attacks span.sheet-ToHit span.inlinerollresult,
-.sheet-rolltemplate-attacks-table span.sheet-ToHit span.inlinerollresult {
+.sheet-rolltemplate-attacks span.sheet-ToHit span.inlinerollresult.showtip,
+.sheet-rolltemplate-attacks-table span.sheet-ToHit span.inlinerollresult.showtip {
   background-color: #fef68e;
   border: none;
   font-family: monospace;
@@ -4623,11 +4649,10 @@ details[open].thac0-box {
   display: inline-flex;
 }
 
-.sheet-rolltemplate-attacks .inlinerollresult,
-.sheet-rolltemplate-attacks span.inlinerollresult.inlinerollresult,
-.sheet-rolltemplate-general .inlinerollresult,
-.sheet-rolltemplate-general span.inlinerollresult.inlinerollresult,
-.sheet-rolltemplate-general .sheet-row span.inlinerollresult.inlinerollresult {
+.sheet-rolltemplate-attacks .sheet-row span.inlinerollresult.inlinerollresult,
+.sheet-rolltemplate-general .sheet-row span.inlinerollresult.inlinerollresult,
+.sheet-rolltemplate-attacks .sheet-row.sheet-all-props span.inlinerollresult.inlinerollresult,
+.sheet-rolltemplate-general .sheet-row.sheet-all-props span.inlinerollresult.inlinerollresult {
   background-color: #fef68e;
   color: #000;
   display: inline-block;

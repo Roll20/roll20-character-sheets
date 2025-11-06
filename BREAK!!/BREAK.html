@@ -69,7 +69,7 @@
 						</div>
 					</div>
 					<div>
-						<input type="hidden" name="attr_might_total" />
+						<input type="hidden" name="attr_might_total" value="6" />
 						<div>
 							<div class="sheet-statButtons">
 								<button type="action" name="act_might" class="sheet-attributeButton">
@@ -168,7 +168,7 @@
 						</div>
 					</div>
 					<div>
-						<input type="hidden" name="attr_deftness_total" />
+						<input type="hidden" name="attr_deftness_total" value="6" />
 						<div>
 							<div class="sheet-statButtons">
 								<button type="action" name="act_deftness" class="sheet-attributeButton">
@@ -267,7 +267,7 @@
 						</div>
 					</div>
 					<div>
-						<input type="hidden" name="attr_grit_total" />
+						<input type="hidden" name="attr_grit_total" value="6" />
 						<div>
 							<div class="sheet-statButtons">
 								<button type="action" name="act_grit" class="sheet-attributeButton">
@@ -366,7 +366,7 @@
 						</div>
 					</div>
 					<div>
-						<input type="hidden" name="attr_insight_total" />
+						<input type="hidden" name="attr_insight_total" value="6" />
 						<div>
 							<div class="sheet-statButtons">
 								<button type="action" name="atc_insight" class="sheet-attributeButton" >
@@ -465,7 +465,7 @@
 						</div>
 					</div>
 					<div>
-						<input type="hidden" name="attr_aura_total" />
+						<input type="hidden" name="attr_aura_total" value="6" />
 						<div>
 							<div class="sheet-statButtons">
 								<button type="action" name="act_aura" class="sheet-attributeButton">
@@ -764,7 +764,7 @@
 						<input type="checkbox" name="attr_quirk_fold" class="sheet-arrow sheet-rightFloat" checked />
 						<span class="sheet-rightFloat"></span>
 						<div class="sheet-flexGrow sheet-flexEnd">
-							<button type="roll" name="roll_quirk" value="@{rollWhisperType} &{template:infos} {{charName=@{character_name}}} {{rollName=Quirk}} {{infos=@{quirk_notes}}}"></button>
+							<button type="roll" name="roll_quirk" value="@{rollWhisperType} &{template:infos} {{charName=@{character_name}}} {{rollName=@{quirk}}} {{infos=@{quirk_notes}}}"></button>
 						</div>
 					</div>
 					<input type="hidden" name="attr_quirk_fold" class="sheet-arrow" />
@@ -779,7 +779,7 @@
 								<input type="checkbox" name="attr_ability_fold" class="sheet-arrow sheet-rightFloat" checked />
 								<span class="sheet-rightFloat"></span>
 								<div class="sheet-flexGrow sheet-flexEnd">
-									<button type="roll" name="roll_ability" value="@{rollWhisperType} &{template:infos} {{charName=@{character_name}}} {{rollName=Ability}} {{infos=@{ability_notes}}}"></button>
+									<button type="roll" name="roll_ability" value="@{rollWhisperType} &{template:infos} {{charName=@{character_name}}} {{rollName=@{ability_name}}} {{infos=@{ability_notes}}}"></button>
 								</div>
 							</div>
 							<input type="hidden" name="attr_ability_fold" class="sheet-arrow" />
@@ -796,7 +796,7 @@
 								<input type="checkbox" name="attr_socialBond_fold" class="sheet-arrow sheet-rightFloat" checked />
 								<span class="sheet-rightFloat"></span>
 								<div class="sheet-flexGrow sheet-flexEnd">
-									<button type="roll" name="roll_socialBond" value="@{rollWhisperType} &{template:infos} {{charName=@{character_name}}} {{rollName=Social Bond}} {{infos=@{socialBond_notes}}}"></button>
+									<button type="roll" name="roll_socialBond" value="@{rollWhisperType} &{template:infos} {{charName=@{character_name}}} {{rollName=bond with @{socialBond_name}}} {{infos=@{socialBond_notes}}}"></button>
 								</div>
 							</div>
 							<input type="hidden" name="attr_socialBond_fold" class="sheet-arrow" />
@@ -1817,4 +1817,32 @@
 		});
 	});
 
+	function getNextXp(rank) {
+		const level_xp = [0, 6, 12, 24, 36, 48, 72, 96, 132, 168];
+		var next_xp = 0;
+		var increase = 36;
+		if (rank >= 0 && rank < level_xp.length) {
+			next_xp = level_xp[rank];
+		} else if (rank < 0) {
+			next_xp = 0;
+		} else {
+			next_xp = 168;
+			for (var i = 10; i <= rank; i++) {
+				increase += 12 * Math.floor((i + 2 - 10) / 3);
+			}
+			next_xp += (36 * (rank - 10)) + increase;
+		}
+
+		return next_xp;
+	}
+
+	on("change:rank", function(eventInfos) {
+		const rank = parseInt(eventInfos.newValue);
+		var output = {};
+
+		output["xp_next"] = getNextXp(rank);
+		console.log(eventInfos, output);
+
+		setAttrs(output, {silent: false});
+	});
 </script>

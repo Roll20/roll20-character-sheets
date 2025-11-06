@@ -1,5 +1,5 @@
 /* ###############################################  Earthdawn.css  ###################################################################*/
-/*v3.4 relesed 2025 01 12*/
+/*v3.49 20250803*/
 
 /* ############################################ CSS Instruction ######################################################################### */
 
@@ -331,7 +331,6 @@ input.sheet-HideSpinners {
   -moz-appearance:  textfield;
 }
 
-
 textarea.sheet-details {
   height:     100px;
   resize:     vertical;
@@ -534,11 +533,11 @@ display:inline-block;
 }
 
 
-
+.sheet-testTarget:not([value=""])~.sheet-HideIfNotEmpty,
 .sheet-testTarget:not([value="None"])~.sheet-HideIfNotNone,
 .sheet-testTarget:not([value="PD1: @{target|Target|token_id}"])~.sheet-HideIfNotPD1,
 .sheet-testTarget:not([value="MD1: @{target|Target|token_id}"])~.sheet-HideIfNotMD1,
-.sheet-testTarget:not([value="PD1: @{target|Target|token_id}"])~.sheet-HideIfNotSD1,
+.sheet-testTarget:not([value="SD1: @{target|Target|token_id}"])~.sheet-HideIfNotSD1,
 .sheet-testTarget:not([value="Ask: ?{Target Number|0}"])~.sheet-HideIfNotAsk,
 .sheet-testTarget:not([value="Ask: PD: ?{Target Number, maybe relative to PD|0}"])~.sheet-HideIfNotAskPD,
 .sheet-testTarget:not([value="Ask: MD: ?{Target Number, maybe relative to MD|0}"])~.sheet-HideIfNotAskMD,
@@ -570,7 +569,17 @@ display:inline-block;
 .sheet-testStrainAdvanced[value="0"]+.sheet-HideIfFixed,
 .sheet-testStrainAdvanced[value="Variable"]~span .sheet-HideIfVariable,
 .sheet-testEmpty[value=""]+.sheet-HideIfEmpty,
+.sheet-testEmpty[value=""]+.sheet-HideIfNoneOrEmpty,
+.sheet-testEmpty[value="None"]+.sheet-HideIfNoneOrEmpty,
 .sheet-testEmpty:not([value=""])+.sheet-HideIfNotEmpty,
+.sheet-testEmpty[value=""]~.sheet-HideIfEmpty,
+.sheet-testEmpty[value=""]~.sheet-HideIfNoneOrEmpty,
+.sheet-testEmpty[value="None"]~.sheet-HideIfNoneOrEmpty,
+.sheet-testEmpty:not([value=""])~.sheet-HideIfNotEmpty,
+.sheet-testEmpty[value=""]~span .sheet-HideIfEmpty,
+.sheet-testEmpty[value=""]~span .sheet-HideIfNoneOrEmpty,
+.sheet-testEmpty[value="None"]~span .sheet-HideIfNoneOrEmpty,
+.sheet-testEmpty:not([value=""])~span .sheet-HideIfNotEmpty,
 .sheet-testNPC[value="-1"]~div div:not(.sheet-ShowIfObject,.repcontainer,.repitem,.repcontrol), /*For Objects, everything is hidden, except what is flagged to be shown)*/
 .sheet-testNPC[value="-1"]~div:not(.sheet-ShowIfObject), /*For Objects, everything is hidden, except what is flagged to be shown)*/
 .sheet-testNPC[value="-1"]~div .sheet-HideIfObject,
@@ -704,6 +713,18 @@ input[type="number"]:disabled.sheet-hidden,     /* Need this bit of extra specif
   opacity: 0.5;
 }
 
+
+.sheet-testNum:not([value="0"])~ .sheet-UnHideIfNotZero,
+.sheet-testNum:not([value="0"])~span .sheet-UnHideIfNotZero,
+.sheet-testNum:not([value="0"])~div .sheet-UnHideIfNotZero,
+.sheet-testEmpty[value=""]~.sheet-UnHideIfEmpty,
+.sheet-testEmpty[value=""]~.sheet-UnHideIfNoneOrEmpty,
+.sheet-testEmpty[value="None"]~.sheet-UnHideIfNoneOrEmpty,
+.sheet-testEmpty:not([value=""])~.sheet-UnHideIfNotEmpty,
+.sheet-testEmpty[value=""]~span .sheet-UnHideIfEmpty,
+.sheet-testEmpty[value=""]~span .sheet-UnHideIfNoneOrEmpty,
+.sheet-testEmpty[value="None"]~span .sheet-UnHideIfNoneOrEmpty,
+.sheet-testEmpty:not([value=""])~span .sheet-UnHideIfNotEmpty,
 .sheet-testSpecial[value*=", Recovery"]~ .sheet-UnHideIfRecovery,
 .sheet-testSpecial[value*=", Knockdown ,"]~ .sheet-UnHideIfKnockdown,
 .sheet-testSpecial[value*=", Corrupt Karma ,"]~ .sheet-UnHideIfCorruptKarma,
@@ -713,6 +734,7 @@ input[type="number"]:disabled.sheet-hidden,     /* Need this bit of extra specif
 .sheet-testRaceMax[value="HomeBrew"]~div .sheet-UnHideIfCreature,
 .sheet-testCloseChecked:checked+.sheet-UnHideIfCloseChecked,
 .sheet-testChecked:checked~.sheet-UnHideIfChecked,
+.sheet-testChecked:checked~span .sheet-UnHideIfChecked,
 .sheet-testDSPPath[value^="Path"]+.sheet-UnHideIfDSPPath,
 .sheet-testNum:not([value="0"])+.sheet-UnHideIfNotZero,
 .sheet-testNum:not([value="0"])+.sheet-testNum+.sheet-UnHideIfNotZero,
@@ -1018,10 +1040,6 @@ flex-direction: column;
   width:        100%;
 }
 
-/*JBF@JBF useful ???*/
-.sheet-w50 {
-  width:        100%;
-}
 
 .sheet-w30 {
   display:      inline-block;
@@ -1070,11 +1088,7 @@ flex-direction: column;
   padding-right:  5em;
 }
 
-.sheet-w7 {
-  display:        inline-block;
-  min-width:      7em;
-  padding-right:  0em;
-}
+
 
 /*JBF */
 .sheet-numShorter    {  width:   2em   !important  }
@@ -1127,10 +1141,12 @@ width:   16em   !important
 
 .charsheet input[type="number"].sheet-Bigger,
  .sheet-Bigger {
-  font-size:  200%;
+  font-size:  190%;
   width:      2em;
   text-align: center ;
 }
+
+
 .sheet-small {
 /*transform: scale(0.8); *//*better results ?*/
 font-size : x-small;
@@ -1251,7 +1267,7 @@ input[type="number"].sheet-attrCostsGreen {
 .charsheet input[type="number"].sheet-buffRight {
   vertical-align: top;
   padding:        0px;
-  margin-top:     0px;
+  margin-top:     1px;
   margin-bottom:  0px;
 }
 
@@ -1267,7 +1283,7 @@ input[type="number"].sheet-attrCostsGreen {
 
 
 .charsheet b.sheet-buffSignRight{
-  margin-right:   -4px;
+  margin-right:   -2px;
   margin-left:   -2px;
 }
 
@@ -1279,7 +1295,7 @@ input[type="number"].sheet-attrCostsGreen {
 }
 
 .charsheet b.sheet-buffSignLeft {
-  margin-right: -15px;
+  margin-right: -18px;
   margin-left:   -2px;
 }
 
@@ -1287,7 +1303,7 @@ input[type="number"].sheet-attrCostsGreen {
   text-align:   right;
   margin-left:    0px;
   margin-right:  -8px;
-  width:        1.8em;
+  width:        2em;
 }
 
 .sheet-buffRight::-webkit-inner-spin-button,
@@ -1397,7 +1413,7 @@ span:hover .sheet-buffRight{
   opacity:        1;
   overflow:       hidden;
   max-width:      280px;
-  min-width:      60px;
+  min-width:      50px;
 }
 
 .sheet-header-modbox {
@@ -1611,7 +1627,6 @@ margin:    1%;
   align-items:      center;
   justify-content:  center;
   height:           50px;
-  width:            50px;
   position:         relative;
 }
 
@@ -1630,7 +1645,6 @@ margin:    1%;
   bottom:     0px;
   left:       0px;
   height:    50px;
-  width:     50px;
   opacity:    0.2;
   z-index:      1;
 }
@@ -2924,6 +2938,16 @@ fieldset+.repcontainer .repitem .sheet-filter-box {
   display:    none;
 }
 
+/*3.41 Trying a homemade rep_add*/
+ .repcontrol_add{
+  display:none !important;
+  opacity:0;
+}
+
+
+
+
+
 /*Hides the garbage bin and reordering controls if the repeatingsection is in not Edit Mode*/
 .ui-dialog .charsheet .sheet-testRepEditMode:not(:checked)~.repcontainer.editmode .repitem .itemcontrol
 {
@@ -2959,7 +2983,12 @@ fieldset.repeating_weapons+.repcontainer .repitem {
 
 
 /* Decide which specific repitems to display.  */
-/*Talents Filter*/
+/*Talents Action Filter*/
+input.sheet-tabMain[value="2"]~  input.sheet-tabActionFilter[value="All"]~div   fieldset+.repcontainer>.repitem input.sheet-ActionFilter      ~.sheet-filter-box2, /*filter-box2 hides all in the Combat tab*/
+input.sheet-tabMain[value="2"]~  input.sheet-tabActionFilter[value="Simple"]~div   fieldset+.repcontainer>.repitem input.sheet-ActionFilter[value="Simple"]      ~.sheet-filter-box2, /*filter-box2 hides all in the Combat tab*/
+input.sheet-tabMain[value="2"]~  input.sheet-tabActionFilter[value="Standard"]~div   fieldset+.repcontainer>.repitem input.sheet-ActionFilter[value="Standard"]      ~.sheet-filter-box2, /*filter-box2 hides all in the Combat tab*/
+input.sheet-tabMain[value="2"]~  input.sheet-tabActionFilter[value="Free"]~div   fieldset+.repcontainer>.repitem input.sheet-ActionFilter[value="Free"]      ~.sheet-filter-box2, /*filter-box2 hides all in the Combat tab*/
+/*Talents Type Filter*/
 input.sheet-tabMain[value="3"]~div .sheet-section-talents~div  fieldset+.repcontainer>.repitem input.sheet-talentType2:placeholder-shown~.sheet-filter-box2, /*filter-box2 only hides when on the Talents tab. Always display undefined*/
 input.sheet-tabMain[value="3"]~div .sheet-section-talents~div input.sheet-tabTalentsFilter[value="D1"]~ fieldset+.repcontainer>.repitem input.sheet-talentType[value*="D1"]~.sheet-filter-box2, /*filter-box2 only hides when on the Talents tab*/
 input.sheet-tabMain[value="3"]~div .sheet-section-talents~div input.sheet-tabTalentsFilter[value="D1"]~ fieldset+.repcontainer>.repitem input.sheet-talentType[value*="TO1"]~.sheet-filter-box2, /*filter-box2 only hides when on the Talents tab*/
@@ -3016,10 +3045,12 @@ input.sheet-tabMain[value="6"]~div fieldset.repeating_talents+.repcontainer>.rep
   display:  inline-block;
   border:   none; /*JBF*/
 }
-/*JBF@JBF@CD : For Skills, Knacks and Talents, in overview, everything is displayed, and in Combat, only the checked ones)*/
 
+
+input.sheet-tabMain[value="2"]~  input.sheet-tabActionFilter~div   fieldset+.repcontainer>.repitem input.sheet-ActionFilter      ~.sheet-filter-box2, /*filter-box2 hides all in the Combat tab*/
 input.sheet-tabMain[value="3"]~div .sheet-section-talents~div fieldset+.repcontainer>.repitem input.sheet-talentType+.sheet-filter-box2 /*filter-box2 only hides when on the Talents tab*/
-{  display:  none;
+{
+  display:  none;
 }
 
 /* ########################################### End Filterboxes ####################################################### */
@@ -3126,7 +3157,10 @@ input.sheet-tabAdjust[value="1"]~.sheet-section-adjustments-common,
 input.sheet-tabAdjust[value="2"]~.sheet-section-adjustments-maneuvers,
 input.sheet-tabAdjust[value="3"]~.sheet-section-adjustments-advanced,
 input.sheet-tabAdjust[value="4"]~.sheet-section-adjustments-release ,
-input.sheet-tabAdjust[value="5"]~.sheet-section-adjustments-help {
+input.sheet-tabAdjust[value="5"]~.sheet-section-adjustments-help,
+input.sheet-tabAdjust[value="6"]~.sheet-section-adjustments-export,
+input.sheet-tabAdjust[value="7"]~.sheet-section-adjustments-import
+ {
   max-height: 999999px;
   max-width:  999999px;
   visibility: visible;

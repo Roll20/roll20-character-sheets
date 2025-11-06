@@ -68,12 +68,17 @@ function setClassName(id, callback, eventInfo) {
             clBase = v['race'];
           } else if (v[clbasisField] === '@{npc-hd-num}') {
             clBase = v['race'];
+            // added "Other" value="(0*(@{level}))" on Cl-Basis selector since "N/A" option uses value="0"
+          } else if (v[clbasisField] === '(0*(@{level}))') {
+            // if Class-name has been set by the user, prevent it from being overwritten when recalculating
+            if (v[prefix + 'class-name'] != 'undefined') {
+              clBase = v[prefix + 'class-name'];
+              setter[prefix + 'CL-basis-mod'] = 0;
+            } else {
+              clBase = '';
+            }
           } else if (parseInt(v[clbasisField], 10) === 0) {
             clBase = '';
-          }
-          //used "(0*(@{level}))" as the value of the "other" basis selector since "0" was already used for N/A
-          else if (v[clbasisField] === '(0*(@{level}))') {
-            clBase = ' ';
           } else {
             match = v[prefix + 'CL-basis'].match(/\d+/);
             if (match) {

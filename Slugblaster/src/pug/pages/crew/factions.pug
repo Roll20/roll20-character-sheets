@@ -1,0 +1,43 @@
+mixin makeFactionFieldset(fieldset)
+  - const { factions } = data.crew;
+  +panel({ name: fieldset.name, title: fieldset.title }).faction
+    +block('content')
+      +repeating(fieldset.name)
+        - const { broadcast, hidden, repeating } = factions;
+        - const [name, relationship, desc] = repeating;
+        +block('edit')
+          .row.faction__edit
+            each field in hidden
+              +field(field)
+            each field in repeating
+              - const hideLabel = ['faction_check'].includes(field.name);
+              - const divClass = field.span ? `col-${field.span}` : '';
+              - const labelClass = hideLabel ? 'visually-hidden' : null;
+
+              .faction__field(class=`${field.name} ${divClass}`)
+                unless field.type === "checkbox"
+                  +field(field)
+                  label(class=labelClass, data-i18n=field.name, for=field.name)= field.label
+                else
+                  label(for=field.name)
+                    +field(field)
+                    span(class=labelClass, data-i18n=field.name)= field.label
+
+        +block('view')
+          +bubble({ name: 'faction', broadcast })
+            +block('header')
+              .faction__view
+                +span(relationship).faction__relationship
+                +span(name).faction__name
+
+            +block('content')
+              //- +span(result)
+              //- label(data-i18n=result.name)= result.label
+              +span(desc)
+              label(data-i18n=desc.name)= desc.label
+
+        +block('delete')
+          +span(name).faction__name
+
+each section in data.crew.factions.sections
+  +makeFactionFieldset(section)

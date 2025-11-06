@@ -7,6 +7,9 @@ const INFO = 2;
 const WARNING = 3;
 const ERROR = 4;
 
+const ERRATA_FIELD = 'errata';
+const PSIONICS_HANDBOOK = 'The Complete Psionics Handbook';
+
 const BOOK_FIELDS = [
     'book-phb','book-tcfhb','book-tcthb','book-tcprhb','book-tcwhb','book-psionics',
     'book-tom','book-aaeg',
@@ -330,6 +333,16 @@ const getActiveSettings = function (settingFields, values) {
         .filter(Boolean)
         .filter(book => book !== '0');
     return new Set(settings);
+}
+
+const isBookActive = function (books, obj) {
+    let activeBooks = getActiveSettings(BOOK_FIELDS, books);
+    console.log(activeBooks);
+    if (typeof obj === 'string') {
+        return activeBooks.has(obj);
+    }
+
+    return false
 }
 
 const isBookInactive = function (books, obj) {
@@ -1153,12 +1166,15 @@ function parseSpheres(spheresStrings, regex) {
 
 const getSpellSchools = function (spell, books) {
     let schoolRules = getActiveSettings(SCHOOL_FIELDS, books);
+    //return spell['school'] + `%NEWLINE%S&M: (${spell[SCHOOL_SPELLS_AND_MAGIC]})`;
     return schoolRules.has(SCHOOL_SPELLS_AND_MAGIC)
-        ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
-        : spell['school'];
+         ? spell[SCHOOL_SPELLS_AND_MAGIC] || spell['school']
+         : spell['school'];
 }
 
 const getSpellSpheres = function (spell, sphereRules) {
+    // return spell['sphere'] + `%NEWLINE%Druid: ${spell['sphere-druids']}%NEWLINE%Necro: ${spell['sphere-necromancers']}%NEWLINE%S&M: ${spell[SPHERE_SPELLS_AND_MAGIC]}`
+
     if (sphereRules.has(SPHERE_SPELLS_AND_MAGIC))
         return spell[SPHERE_SPELLS_AND_MAGIC] || spell['sphere'];
 
@@ -1341,6 +1357,39 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
 }
 //#endregion
 
+//#region Wizard and Priest Dispel Magic button
+on('clicked:dispel-setup-wiz', function (eventInfo) {
+    dispelRoll(eventInfo, '[[@{level-wizard}]]')
+});
+
+on('clicked:dispel-setup-pri', function (eventInfo) {
+    dispelRoll(eventInfo, '[[@{level-priest}]]')
+});
+
+function dispelRoll(eventInfo, classLevel) {
+    getAttrs(['tab11','wtype'], async function (values) {
+        let visibility = "";
+        console.log(values['tab11'], values['wtype']);
+        if (values['tab11'] === '2' && values['wtype'].startsWith('/w gm')) {
+            visibility = '/w gm ';
+        } else {
+            visibility = await extractQueryResult(`?{Are dispel rolls public or only to GM?|Public, |GM only,/w gm }`);
+        }
+
+        let rollBuilder = new RollTemplateBuilder('2Edefault');
+        rollBuilder.push('name=Dispel Roll',`desc=@{character_name} dispels effects and potions of level [[1d20+${classLevel}-11]] and below`, `desc1=[Roll again](~@{character_name}|dispel)`, 'align1=center', 'color=dark-blue');
+
+        let roll = visibility + rollBuilder.string();
+
+        let newValue = {};
+        newValue['dispel-macro'] = roll;
+        setAttrs(newValue);
+
+        await printRoll(roll);
+    });
+}
+//#endregion
+
 //#region Wizard and Priest spells and Powers setup
 function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
     if (!spellsTable[section])
@@ -1355,9 +1404,20 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
         let levelField = isPriest ? 'level-priest' : 'level-wizard';
         let className = isPriest ? 'Priest' : 'Wizard';
 
-        getAttrs([...BOOK_FIELDS, ...optionalRulesFields, levelField], function(books) {
+        getAttrs([...BOOK_FIELDS, ...optionalRulesFields, levelField, ERRATA_FIELD], function(books) {
             if (bookInactiveShowToast(books, spell))
                 return;
+
+            let effect = spell['effect'];
+            if (spell['psionics'] && isBookActive(books, PSIONICS_HANDBOOK)) {
+                effect += `}}{{psionics=${spell['psionics']}`;
+            }
+            if (spell['special-conditions']) {
+                spell['special-conditions'].forEach(condition => {
+                    effect += `}}{{${condition}=1`;
+                });
+            }
+
 
             let spellInfo = {
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
@@ -1372,13 +1432,13 @@ function setupAutoFillSpellInfo(section, spellsTable, optionalRulesFields) {
                 [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
                 [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
                 [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-                [`repeating_spells-${section}_spell-reference`]    : `${spell['reference']}, ${spell['book']}`,
+                [`repeating_spells-${section}_spell-reference`]    : displayReference(spell, books),
                 [`repeating_spells-${section}_spell-subtlety`]     : spell['subtlety'] || '',
                 [`repeating_spells-${section}_spell-sensory`]      : spell['sensory'] || '',
                 [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
                 [`repeating_spells-${section}_spell-knockdown`]    : spell['knockdown'] || '',
                 [`repeating_spells-${section}_spell-crit-size`]    : spell['crit-size'] || '',
-                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
+                [`repeating_spells-${section}_spell-effect`]       : effect
             };
 
             if (isPriest) {
@@ -1428,6 +1488,18 @@ const displaySpellLevel = function(level, className) {
     return level === 'q'
         ? 'Quest Spell Priest'
         : `Level ${level} ${className}`;
+}
+
+const displayReference = function(spell, books) {
+    let reference = `${spell['book']} ${spell['reference']}`
+    if (spell['book-compendium'])
+        reference += `\n${spell['book-compendium']}`;
+
+    let activeSettings = getActiveSettings([ERRATA_FIELD], books);
+    if (activeSettings.has(ERRATA_FIELD) && spell['errata'])
+        reference += `\n${spell['errata']}`;
+
+    return reference;
 }
 
 // --- Start setup Spell Slots --- //
@@ -2370,7 +2442,7 @@ on('clicked:repeating_ammo:crit2', function (eventInfo) {
 const SPELL_HITS_REGEX = /\((\dd\d\+?\d?|\d) hit/i;
 
 async function debugSeverity(severityDice) {
-    return false
+    return true
         ? parseInt(await extractQueryResult('?{Debug severity|1}'))
         : await extractRollResult(severityDice);
 }
@@ -3373,7 +3445,16 @@ on('change:repeating_scrolls:scroll', async function (eventInfo) {
         rollBuilder.push('checkroll=[[1d100]]%');
         rollBuilder.push('checktarget=[[@{scroll-failure}]]%');
         rollBuilder.push('fail=DM roll for Magical Spell Failure');
+        rollBuilder.push('character=@{character_name}');
         rollBuilder.push(`effects=${spell['effect']}`);
+        if (spell['psionics'] && isBookActive(books, PSIONICS_HANDBOOK)) {
+            rollBuilder.push(`psionics=${spell['psionics']}`);
+        }
+        if (spell['special-conditions']) {
+            spell['special-conditions'].forEach(condition => {
+                rollBuilder.push(`${condition}=1`)
+            });
+        }
 
         let scrollMacro = rollBuilder.string();
         scrollMacro = scrollMacro.replaceAll('[[@{level-wizard}]]','[[@{scroll-level}]]')

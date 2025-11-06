@@ -1,35 +1,44 @@
 class HtmlWorkerScriptPlugin {
   apply(compiler) {
-    compiler.hooks.compilation.tap('HtmlWorkerScriptPlugin', (compilation) => {
-      // Hook into HtmlWebpackPlugin's emit stage
-      const HtmlWebpackPlugin = compiler.options.plugins.find((plugin) => plugin.constructor.name === 'HtmlWebpackPlugin');
+    compiler.hooks.thisCompilation.tap('HtmlWorkerScriptPlugin', (compilation) => {
+      compilation.hooks.processAssets.tap(
+        {
+          name: 'HtmlWorkerScriptPlugin',
+          stage: compilation.constructor.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE,
+        },
+        (assets) => {
+          const htmlAsset = assets['index.html'];
+          const jsAsset = assets['index.js'];
 
-      if (HtmlWebpackPlugin) {
-        HtmlWebpackPlugin.constructor.getHooks(compilation).beforeEmit.tapAsync('HtmlWorkerScriptPlugin', (data, callback) => {
-          console.log('HtmlWorkerScriptPlugin modifying HTML asset');
-          const jsAsset = compilation.assets['index.js'];
-
-          if (jsAsset) {
-            const jsCode = jsAsset.source();
-            // Append inline script to the end of the html
-            data.html += `\n<script type="text/worker">${jsCode}</script>`;
-
-            // Replace placeholders and clean up
-            const currentDate = new Date().toUTCString();
-            data.html = data.html.replace('$$CURRENTRELEASEDATE$$', currentDate);
-
-            if (process.env.NODE_ENV === 'production') {
-              data.html = data.html.replace(/^\s*<!--DEVELOPMENT CODE\. NOT READY FOR PRODUCTION YET-->\s*\r?\n?/gm, '');
-            }
-          } else {
-            console.error('HtmlWorkerScriptPlugin: JavaScript asset not found.');
+          if (!htmlAsset || !jsAsset) {
+            console.warn('HtmlWorkerScriptPlugin: Required assets missing (index.html or index.js)');
+            return;
           }
 
-          callback(null, data);
-        });
-      } else {
-        console.error('HtmlWorkerScriptPlugin: HtmlWebpackPlugin not found.');
-      }
+          const htmlSource = htmlAsset.source().toString();
+          const jsSource = jsAsset.source().toString();
+
+          // Inject the script at the end of the html
+          let updatedHtml = htmlSource + `\n<script type="text/worker">${jsSource}</script>`;
+
+          // Replace placeholder
+          const currentDate = new Date().toUTCString();
+          updatedHtml = updatedHtml.replace('$$CURRENTRELEASEDATE$$', currentDate);
+
+          // Strip dev warning in prod
+          if (process.env.NODE_ENV === 'production') {
+            updatedHtml = updatedHtml.replace(/^\s*<!--DEVELOPMENT CODE\. NOT READY FOR PRODUCTION YET-->\s*\r?\n?/gm, '');
+          }
+
+          // Replace index.html asset with modified version
+          compilation.updateAsset('index.html', {
+            source: () => updatedHtml,
+            size: () => Buffer.byteLength(updatedHtml, 'utf8'),
+          });
+
+          console.log('\x1b[33m%s\x1b[0m', '✓ HtmlWorkerScriptPlugin: Worker script injected');
+        },
+      );
     });
   }
 }
