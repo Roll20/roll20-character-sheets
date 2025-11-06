@@ -1,6 +1,7 @@
 <div class='main'>
 
 
+
 	<div class="nav">
 		<input type="hidden" class="mooktoggle" name="attr_mooksheet_flag" value="0" />
 
@@ -1643,7 +1644,7 @@
 					The button will be displayed as a crosshair icon that looks like this: "<span class="aimed-shot-icon">⌖</span>".
 				</div>
 				<div class="settings-option">
-					<div class="settings-title settings-title-show-aimed" name="title_show_aimed_button">SHOW AIMED SHOT BUTTON</div>
+					<div class="settings-title">SHOW AIMED SHOT BUTTON</div>
 					<div class="settings-value">
 						<div class="settings-checkbox">
 							<input type="hidden" class="settings-toggle settings-toggle-show-aimed-shot-button" name="attr_aimed_shot_flag" value="0" />
@@ -1658,6 +1659,48 @@
 					<div class="settings-value">
 						<div class="settings-number">
 							<input type="number" name="attr_aimed_shot_penalty" value="-8" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="settings-row">
+				<h3>ARMOR PENALTY</h3>
+				<div class="settings-help">
+					By default the Armor Penalty applies to REF, DEX and MOVE. You can change this behavior by selecting not to apply the armor penalty per stat, 
+					which then allows you to set that stat manually. The penantly will be applied when these settings are enabled or when the Head or Body armor 
+					penalty is changed. The REF and DEX stats can be reduced to below 0, but the MOVE stat cannot.
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">APPLY TO REF</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="settings-toggle" name="attr_armor_penalty_ref_flag" value="1" />
+							<button type="action" name="act_armor_penalty_ref" class="settings-toggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">APPLY TO DEX</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="settings-toggle" name="attr_armor_penalty_dex_flag" value="1" />
+							<button type="action" name="act_armor_penalty_dex" class="settings-toggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">APPLY TO MOVE</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="settings-toggle" name="attr_armor_penalty_move_flag" value="1" />
+							<button type="action" name="act_armor_penalty_move" class="settings-toggle">
+								<span class="checked">✓</span>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -2714,29 +2757,56 @@
 			});
 	});
 
-	on("change:Dexterity_max change:HeadPenalty change:BodyPenalty", function() {
-		getAttrs([
-			"HeadPenalty",
-			"BodyPenalty",
-			"Dexterity_max",
-			"Reflex_max",
-			"Movement_max"
-			], function(values) {
+	const armor_penalty_triggers = [
+		"HeadPenalty",
+		"BodyPenalty",
+		"armor_penalty_ref_flag",
+		"armor_penalty_dex_flag",
+		"armor_penalty_move_flag"
+	];
+	armor_penalty_triggers.forEach(function(trigger) {
+		on(`change:${trigger}`, function() {
+			getAttrs([
+				"HeadPenalty",
+				"BodyPenalty",
+				"Reflex_max",
+				"Dexterity_max",
+				"Movement_max",
+				"armor_penalty_ref_flag",
+				"armor_penalty_dex_flag",
+				"armor_penalty_move_flag"
+				], function(values) {
 
-				const headpen = Math.abs(parseInt(values.HeadPenalty))||0;
-				const bodypen = Math.abs(parseInt(values.BodyPenalty))||0;
-				const DEX = parseInt(values.Dexterity_max);
-				const REF = parseInt(values.Reflex_max);
-				const MOVE = parseInt(values.Movement_max);
+					const headpen = Math.abs(parseInt(values.HeadPenalty))||0;
+					const bodypen = Math.abs(parseInt(values.BodyPenalty))||0;
+					const DEX = parseInt(values.Dexterity_max);
+					const REF = parseInt(values.Reflex_max);
+					const MOVE = parseInt(values.Movement_max);
 
-				var maxpenalty = Math.max(headpen,bodypen)||0;
+					var maxpenalty = Math.max(headpen,bodypen)||0;
 
-				setAttrs({
-					"Dexterity" : DEX - maxpenalty,
-					"Reflex" : REF - maxpenalty,
-					"Movement" : MOVE - maxpenalty
-				});
-			});
+					let update_attrs = {};
+
+					if (values.armor_penalty_ref_flag == 1) {
+						update_attrs.Reflex = REF - maxpenalty;
+					}
+
+					if (values.armor_penalty_dex_flag == 1) {
+						update_attrs.Dexterity = DEX - maxpenalty;
+					}
+
+					if (values.armor_penalty_move_flag == 1) {
+						update_attrs.Movement = MOVE - maxpenalty;
+						if (update_attrs.Movement < 0)
+						{
+							update_attrs.Movement = 0
+						}
+					}
+
+					setAttrs(update_attrs);
+				}
+			);
+		});
 	});
 
 	// Creating a list of Program Names and details
@@ -3270,7 +3340,7 @@
 
 	const toggleList = [
 		"cbaudio","lefteye","righteye","rightarm","leftarm","neurallink","rightleg","leftleg","mooksheet",
-		"initiative_modifier"
+		"initiative_modifier", "armor_penalty_ref", "armor_penalty_dex", "armor_penalty_move"
 	];
 	toggleList.forEach(function(button) {
 		on(`clicked:${button}`, function() {
