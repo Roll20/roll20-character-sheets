@@ -1,7 +1,6 @@
 
 
 
-
 <rolltemplate class="sheet-rolltemplate-rmu">
   <div class='sheet-rolltemplate-rmurollbox'>
     <em>{{actor}} {{verb}} {{action}}:</em><br>
@@ -2668,7 +2667,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     </div>
 
     <div class='prop_pair'>
-      <span><b>Hits</b></span>
+      <span>
+        <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span> <span name='attr_hp_info' class='stat_info'></span> 
+        <b>Hits (HP)</b>
+      </span>
       <span>
         <input type='number' name='attr_hp'> / <span name='attr_hp_max'></span><br>
       </span>
@@ -3618,7 +3620,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     </div>
 
     <div class='prop_pair'>
-      <span><b>Hits</b></span>
+      <span>
+        <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span> <span name='attr_hp_info' class='stat_info'></span> 
+        <b>Hits (HP)</b>
+      </span>
       <span>
         <input type='number' name='attr_hp'> / <span name='attr_hp_max'></span><br>
       </span>
@@ -3916,7 +3921,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     <b>Defensive Bonus</b>
 
     <div class='prop_pair'>
-	<span class='prop_prop_plan'>Base (qu)</span>
+	<span class='prop_prop_plan'>
+	    <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+	    <span name='attr_db_info' class='stat_info'></span>
+            Base DB</span>
 	    <span class='prop_value' name='attr_db_qu'></span>
 	<span class='prop_prop_plain'>Shield</span>
 	    <span class='prop_value'>
@@ -6431,6 +6439,12 @@ Uses (Lvl/Total) <span name='attr_traps_usecount'></span> / <span name='attr_tra
         <li><span name='attr_lasterror3'></span></li>
       </ul>
 
+    <p><b>Options:</b><br>
+      Token Markers (<span style="font-family: monospace;">option_usetokenmarkers</span>: <span name='attr_option_usetokenmarkers'>(default)</span><br>
+      Use FX (<span style="font-family: monospace;">option_usefx</span>): <span name='attr_option_usefx'>(default)</span><br>
+      DB Quickness Multiplier (<span style="font-family: monospace;">option_dbqumultiplier</span>): <span name='attr_option_dbqumultiplier'>(default)</span><br>
+      Dodge Running Bonus (<span style="font-family: monospace;">option_dodgerunningbonus</span>): <span name='attr_option_dodgerunningbonus'>(default)</span>
+
     <h3>Recalculate</h3>
 
     <p>You should never need these, but if something doesn't look right, it may help.</p>
@@ -6539,6 +6553,9 @@ This is not for usual use. </p>
 <button type="roll" class='tokenaction' name="roll_initiative" value="@{initiative_action}">initiative</button>
 <input type="hidden" name="attr_initiative_action">
 <button type="action" style="-toby-display:none;" name="act_initiative-action">initiative</button>
+<button type="roll" class='tokenaction' name="roll_target" value="@{target_action}">target</button>
+<input type="hidden" name="attr_target_action">
+<button type="action" style="-toby-display:none;" name="act_target-action">target</button>
 
 
 <hr>
@@ -6559,7 +6576,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision e391f1770ba0538fdfe04e777a95b2b1f994d4a0
+Revision 34f6a649a30d03e49238b2be69fb6beb70fbbfce
 
 
 <hr>
@@ -7624,7 +7641,7 @@ function F(num) {
 }
 
 /**
- * Returns the bonus for a particualr name in a misctr
+ * Returns the bonus for a particular name in a misctr
  */
 function miscBonusGet(miscstr, name) {
     if (typeof(miscstr) != 'string' || miscstr == '') {
@@ -7763,6 +7780,25 @@ function miscBonusHighest(miscstr, lowest) {
     return [highest, hstr]
 }
 
+// Finds a message with the appropriate prefix.
+function miscMessagePrefix(miscstr, prefix) {
+    if (typeof(miscstr) !== 'string' || miscstr === '') {
+	return false;
+    }
+    const misc = JSON.parse(miscstr);
+    return miscRawMessagePrefix(misc, prefix);
+}
+
+// Finds a bonus with the appropriate prefix
+// Returns {} ->
+function miscBonusPrefix(miscstr, prefix) {
+    if (typeof(miscstr) !== 'string' || miscstr === '') {
+	return {};
+    }
+    const misc = JSON.parse(miscstr);
+    return miscRawBonusPrefix(misc, prefix);
+}
+
 function miscAttrSet(attr, name, value) {
     let toget = attr;
     if (!attr.endsWith("_misc")) {
@@ -7822,6 +7858,30 @@ function miscRawSetAbsolute(misc, name, absolute) {
 function miscRawMessage(misc, message) {
     misc.push({ message: message });
     return misc
+}
+
+// Finds a message with the appropriate prefix.
+function miscRawMessagePrefix(misc, prefix) {
+    for (const obj of misc) {
+	if (obj.message && typeof(obj.message) === 'string' &&
+		obj.message.startsWith(prefix)) {
+	    // Return it
+	    return obj.message
+	}
+    }
+    return false;
+}
+
+// Finds a message with the appropriate prefix.
+function miscRawBonusPrefix(misc, prefix) {
+    for (const obj of misc) {
+	if (obj.name && typeof(obj.name) === 'string' &&
+		obj.name.startsWith(prefix)) {
+	    // Return it
+	    return obj
+	}
+    }
+    return {};
 }
 
 function miscRawToString(misc) {
@@ -8116,7 +8176,7 @@ let RMURaces = {};
 	"pr_misc", "qu_misc", "re_misc", "sd_misc", "st_misc",
         "rr_channeling_misc", "rr_essence_misc", "rr_mentalim_misc",
         "rr_fear_misc", "rr_physical_misc",
-        "endurance_misc", "bodydevelopment_misc",
+        "endurance_misc", "hp_misc",
 	"bmr_misc", "dp_misc"
       ], (miscdata) => {
 
@@ -8130,7 +8190,7 @@ let RMURaces = {};
 
 	// data-stats
 	for (stat in racedata["data-stats"])  {
-	  // get the shortname
+	    // get the shortname
 	  const sname = RMUStats.getStatAbbrFromName(stat)
 	  doMiscSet(sname + "_misc", racedata['data-stats'][stat]);
 	}
@@ -8143,7 +8203,7 @@ let RMURaces = {};
 	{
 	  const health = racedata['data-health'];
 	  doMiscSet("endurance_misc", health.Endurance || 0);
-	  doMiscSet("bodydevelopment_misc", health["Base Hits"]);
+	  doMiscSet("hp_misc", health["Base Hits"]);
 	  // FIXME setAttr correct call
 	  updates.recovery_multiplier = health["Recovery Mult"];
       }
@@ -8502,7 +8562,7 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
 	for (let c = 0; c < categories.length ; c ++){
 	  let tr = categories[c].display;
 	  cache[tr] = categories[c]
-	}	
+	}
 	getCatByDisplayNameCache_ = cache;
       }
       return getCatByDisplayNameCache_[skillname]
@@ -8515,7 +8575,7 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
 	let cache = {};
 	for (const c of categories) {
 	  cache[c.display] = c
-	}	
+	}
 	getCatByDisplayNameCacheNoTrans_ = cache;
       }
       return getCatByDisplayNameCacheNoTrans_[skillname]
@@ -8595,10 +8655,10 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
 	updateAllSkills();
     });
 
-    
+
     // Handler for updating a single stat
     // So when a 'strength' changes, update the bonus
-    on(statfullnames.map(stat => "change:" + stat).join(" "), (ev) => {
+    onCheck(statfullnames.map(stat => "change:" + stat).join(" "), (ev) => {
 	const val = parseInt(ev.newValue) || 0;
 	const stat = getStatFromAName(ev.triggerName);
 	let logmessage = stat.display + ":\n";
@@ -8654,13 +8714,77 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
       updateCategory(cat, statCache_);
     }
 
+    // Returns an object
+    //    rankbonus: Rank bonus
+    //    ranks: Number of ranks
+    //	  log: string to append to log
+    //    specializationbonus:
+    //	  specializationranks: (Effective specialisation ranks)
+    function getSkillRanksBonus(ranksMisc, pbonus, isExpertise) {
+      const rv = {}
+
+      // So we need to know if there is a specialisation.
+      const hasSpecialization = miscMessagePrefix(ranksMisc, "Specialization:")
+
+      // If there is, we need to subtrack one rank from the normal
+      // ranks when calculating and then multiply that by 50.
+      let [ranks, rlog] = miscBonusTotal(ranksMisc, rankIndent);
+      let sstring = "";
+      if (hasSpecialization) {
+	ranks --;
+	sstring = " - Specialized"
+      }
+      const rankbonus = rmuGetSkillBonus(ranks, isExpertise);
+      let bonus = rankbonus;
+      let log = `${F(bonus)} Rank bonus (${ranks} Ranks${sstring})\n`
+      log += rlog;
+
+      if (pbonus > 0) {
+	const effectiveranks = (ranks > 30) ? 30 : ranks;
+	const pbonusbonus = effectiveranks * pbonus;
+	bonus += pbonusbonus;
+	if (pbonus == 1) {
+	  log += `${effectiveranks} proficiency bonus\n`;
+	} else {
+	  log += `${effectiveranks * pbonus} proficiency bonus (${effectiveranks} ranks * ${pbonus})\n`;
+	}
+      }
+      rv.ranks = ranks;
+      rv.rankbonus = bonus;
+
+      if (hasSpecialization) {
+	let specranks = Math.round(ranks * 1.5);
+	const specrankbonus = rmuGetSkillBonus(specranks, isExpertise);
+	let specbonus = specrankbonus;
+	log = `${F(specbonus)} Specialised bonus (${specranks})\n`
+	if (pbonus > 0) {
+	  const effectiveranks = (specranks > 30) ? 30 : specranks;
+	  const pbonusbonus = effectiveranks * pbonus;
+	  specbonus += pbonusbonus;
+	  if (pbonus == 1) {
+	    log += `${effectiveranks} proficiency bonus\n`;
+	  } else {
+	    log += `${effectiveranks * pbonus} proficiency bonus (${effectiveranks} ranks * ${pbonus})\n`;
+	  }
+	}
+
+	rv.specializedranks = specranks;
+	rv.specializedbonus = specbonus;
+      }
+
+
+      rv.log = log;
+      return rv;
+    }
+    RMUSkills.getSkillRanksBonus = getSkillRanksBonus;
+
     function updateSkill(skill, catbonus, catlog) {
       const aname = skill.aname;
       getAttrs([aname + "_ranks_misc", aname + "_pbonus", aname + "_misc", aname + "_ranks"], (attrs) => {
 	updates = {};
 	let bonus = 0;
 	let log = skill.display + ":\n";
-	
+
 	bonus += catbonus;
 	log += catlog;
 
@@ -8683,29 +8807,17 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
 	  addPendingFunction("Update specialisations", () => { updateSpecializations(skill, pbonus, bonus, log); });
 	} else if (skill.dynamicspecializations) {
 	  addPendingFunction("Update Dynamic", () => { updateDynamicSpecializations(skill, pbonus, bonus, log); });
-	} else { 
-	  const [ranks, rlog] = miscBonusTotal(attrs[aname + '_ranks_misc'], rankIndent);
-	  bonus += rmuGetSkillBonus(ranks, skill.expertise)
-	  log += `${rmuGetSkillBonus(ranks, skill.expertise)} Rank bonus (${ranks} Ranks)\n`;
-	  log += rlog;
+	} else {
+	  const bonuses = RMUSkills.getSkillRanksBonus(attrs[aname + '_ranks_misc'],
+		      pbonus, skill.expertise || false);
+	  log += bonuses.log;
 
-	  if (pbonus > 0) {
-	    const effectiveranks = (ranks > 30) ? 30 : ranks;
-	    const pbonusbonus = effectiveranks * pbonus;
-	    bonus += pbonusbonus;
-	    if (pbonus == 1) {
-	      log += `${effectiveranks} proficiency bonus\n`;
-	    } else {
-	      log += `${effectiveranks * pbonus} proficiency bonus (${effectiveranks} ranks * ${pbonus})\n`;
-	    }
-	  }
-
-	  if (ranks != 0) {
-	    updates[aname + "_ranks"] = ranks;
+	  if (bonuses.ranks != 0) {
+	    updates[aname + "_ranks"] = bonuses.ranks;
 	  } else if (attrs[aname + "_ranks"] && attrs[name + "_ranks"] != "")  {
 	    updates[aname + "_ranks"] = " "; // So there is something there; so set space
 	  }
-	  updates[aname + "_bonus"] = bonus;
+	  updates[aname + "_bonus"] = bonus +  bonuses.rankbonus;
 	}
 	// Always update the info field.
 	updates[aname + "_info"] = log;
@@ -8844,14 +8956,13 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
     on('clicked:specializationsave', ev => {
       getAttrs(['specialization_change_aname', 'specialization_change_index',
 	       'specialization_change_name'], data => {
-	       console.log(data)
-	let key = data['specialization_change_aname'] + 'specialization' + 
+	let key = data['specialization_change_aname'] + 'specialization' +
 	data['specialization_change_index'] + '_name';
-	setAttrs({ [key] : data.specialization_change_name, 'toggleskillchange': 'false' }); 
+	setAttrs({ [key] : data.specialization_change_name, 'toggleskillchange': 'false' });
       });
     })
     on('clicked:specializationcancel', ev => {
-      setAttrs({'toggleskillchange': 'false' }); 
+      setAttrs({'toggleskillchange': 'false' });
     });
 
 
@@ -8926,7 +9037,7 @@ onCheck('change:repeating_favorite:favskill', (ev) => {
 RMUSkills.updateFavoriteSKillsDefault = function(attrname) {
       setAttrs({[`${attrname}_ranks`]: '?', [`${attrname}_bonus`]: '?'});
       return;
-  
+
 }
 
 RMUSkills.updateFavoriteSkillSpecialisation = function(skillname, attrname) {
@@ -8970,7 +9081,7 @@ RMUSkills.updateFavoriteSkillSpecialisation = function(skillname, attrname) {
 
 RMUSkills.startSkillRoll = function(prefix, usemod = false) {
   getAttrs([
-	  prefix + '_name', prefix + '_favskill', prefix + '_bonus', 
+	  prefix + '_name', prefix + '_favskill', prefix + '_bonus',
 	  'character_name', 'statuspenalty',
 	  'statuseffect'],
       (cdata) => {
@@ -9255,7 +9366,7 @@ RMUSkills.updateFavoriteSkill = function(skillname, basename) {
     }
     let toget = [`${skill.aname}_ranks`, `${skill.aname}_bonus`];
     getAttrs(toget, (attrs) => {
-	setAttrs({ 
+	setAttrs({
 	    [`${basename}_ranks`]: attrs[`${skill.aname}_ranks`] || '-',
 	    [`${basename}_bonus`]: attrs[`${skill.aname}_bonus`]});
     });
@@ -13894,7 +14005,6 @@ frontpage.updateDB = function () {
 		  console.log("dooing update", ev);
     var updates = {};
     const db_extra = miscBonusTotal(ev.db_misc || "")[0];
-    console.log("db_extra", db_extra, ev.db_misc)
     const dbmiscmod = parseIntDefault(ev.dbmod, 0);
     const basedb = +ev.qu * 3 + db_extra + dbmiscmod;
     updates.db_base = basedb;
@@ -14391,7 +14501,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	getAttrsPending(toget, (stuff) => {
 	    let updates = {};
 	    updates.db_misc = miscBonusRemoveFilter(stuff.db_misc, (item) => {
-		return item.name.startsWith("Armor DB Bonus");
+		return !item.name.startsWith("Armor DB Bonus (");
 	    });
 
 
@@ -14484,7 +14594,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	    });
 
 	    // Adjust due to perception penalty
-	    updates.db_misc = miscBonusSet(stuff.db_misc, `Armor DB Bonus (${armordbname})`, armordb);
+	    updates.db_misc = miscBonusSet(updates.db_misc, `Armor DB Bonus (${armordbname})`, armordb);
 	    updates.perception_misc = miscBonusSet(stuff.perception_misc,
 		    "Armor Perception Penalty", percept);
 	    updates.perception_penalty = percept;
@@ -17279,7 +17389,7 @@ function doTurn() {
       updates.currentphasedisplay = roundString(currentphase);
 
       VrmuSetAttrs(updates, ()=> {
-	  sendEOTMessage(`${name} completes their turn (Round ${round} / Phase ${relativephase})`);
+	  sendEOTMessage(`${name} completes their turn (Round ${updates.currentphasedisplay})`)
 	  actionsUpdateStatus();
 	  updatetokenmarkers();
       });
@@ -17392,23 +17502,38 @@ const fatigueResults = {
 
 onCheck("change:hppenalty change:injurypenalty change:fatigue", updatePenalties);
 
-onCheck("change:bodydevelopment_bonus change:powerdevelopment_bonus", (x) => {
-    getAttrs(['bodydevelopment_bonus', 'hp', 'pp', 'powerdevelopment_bonus', 'hits'], (ev) => {
+onCheck("change:bodydevelopment_bonus change:powerdevelopment_bonus", updateHPPP);
+
+function updateHPPP(x) {
+    getAttrs(['bodydevelopment_bonus', 'hp', 'pp', 'powerdevelopment_bonus', 'hits',
+	  'hp_misc'], (ev) => {
 	let update = {}
+	let hplog = "Hit Points\n"
+	let hp = 0;
+
+        {
+	  let [mtot, mlog] = miscBonusTotal(ev.hp_misc);
+	  hplog += mlog
+	  hp += mtot;
+	}
+	let bdbonus = parseIntDefault(ev.bodydevelopment_bonus, 0)
+	hp += bdbonus;
+	hplog += `${bdbonus}  Body Development`;
 	// Creatures use 'hits'; Use that instead of bodydevelopement
-	let hp = ev.bodydevelopment_bonus;
-	let pp = ev.powerdevelopment_bonus;
 	if (ev.hits) {
 	  hp = ev.hits
 	}
 	update.hp_max = hp;
+	update.hp_info = hplog;
+
+	let pp = ev.powerdevelopment_bonus;
 	if (pp < 0) {
 	  pp = 0;
 	}
 	update.pp_max = pp
 	setAttrs(update, { silent:true });
     });
-});
+}
 
 // Update the endurance modifier
 onCheck("change:bodydevelopment_bonus change:endurance_misc change:mentalfocus_bonus", (_) => {
@@ -18647,6 +18772,7 @@ injury.parseInjuryString = function (str) {
 
     // Kill the 'Injury: ' from pasting from Crit rolls
     str = str.replace(/^Injury:\s*/, "");
+    str = str.replace(/\s+/g, "");
 
     // So we may have multiple crits in the form of "Z<sev><type>:"
     //  Just squash them for now.  When we do immunities; we will
@@ -18661,8 +18787,9 @@ injury.parseInjuryString = function (str) {
 
     getAttrs(["character_name", "hp", "injurypenalty", "fatigue", "bleedlist", "currentphase",
 		"statusstagger", "statusstun75", "statusstun50", "statusstun25",
-		"critresist", "critimmune",
-		"grapplestatus"], (cdata) => {
+		"critresist", "critimmune", "grapplestatus",
+		"option_usefx"
+		], (cdata) => {
 	console.log("data for creature", cdata);
 	// Pull the fields out.  If we modify save to updates
 	// as well.  So anything changed will be in updates.
@@ -18701,6 +18828,7 @@ injury.parseInjuryString = function (str) {
 	// FIXME: Error handle on this
 	let bl = cdata.bleedlist ? JSON.parse(cdata.bleedlist) : [];
 
+	let fxhavebleed = 0;
 
 	for (let subinjury of injuryarray) {
 	    if (subinjury == "") {
@@ -18861,6 +18989,11 @@ injury.parseInjuryString = function (str) {
 	if (updates.hp) {
 	    RMUSkills.uses('bodydevelopment');
 	}
+
+	// Did we have a bleed?  If so trigger the bleed explosidn
+//	startRoll(`/fx bubbling-blood @{selected|${cdata.character_name}}`,
+//		    (x) => finishRoll(x.rollId,x));
+
 
 	// Update the status as soon as the injury is applied.
 	VrmuSetAttrs(updates, () => {
@@ -19194,6 +19327,11 @@ function doVersionCheck(version, sheettype) {
     version = 14;
   }
 
+  if (version == 14) {
+    addPendingFunction("Upgrade to V15: Fix racial HP bonus", upgradeV14to15HPFix)
+    version = 15;
+  }
+
   if (oldversion != version) {
     addPendingFunction(`Version update to ${version}`, () => {
 	setAttrsPending({version: version});
@@ -19364,9 +19502,35 @@ function upgradeV6to7() {
       });
     });
   });
-
-
 }
+
+// So I was adding the racial bonus to body development.
+// frewfrux pointed out this is wrong: This means you get
+// racial bonus to Endurance
+function upgradeV14to15HPFix() {
+  getAttrsPending(["hp_misc", "bodydevelopment_misc"], (data) => {
+      console.log("Data for upgrade", data)
+      let res = miscBonusPrefix(data.bodydevelopment_misc, "Racial");
+      if (res && res.name) {
+	// Found it: Lets delete it
+	let updates = {}
+	updates.bodydevelopment_misc = miscBonusRemove(data.bodydevelopment_misc, res.name);
+
+	// Now add to the HP misc
+	let hpms = miscRawGetFromString(data.hp_misc);
+	hpms.push(res);
+	updates.hp_misc = miscRawToString(hpms);
+	console.log(updates)
+	setAttrsPending(updates);
+
+	// After we are done; do these
+	addPendingFunction("Post V15 Upgrade; Update All Skills", RMUSkills.updateAllSkills);
+	addPendingFunction("Post V15 Upgrade; Update HP", updateHPPP);
+	addPendingFunction("Post V15 Upgrade; Update Endurance", updateEnduranceBonus);
+      }
+  });
+}
+
 
 
 
@@ -19551,7 +19715,8 @@ const actionCalls = [
 	'ap➙melee_action',
 	'ap➙missile_action', 'ap➙clear_action', 'ap➙spell_action',
 	'ap➙perception_action', 'ap➙concentration_action', 'ap➙free_action',
-	'ap➙status_action', 'end turn_action', "initiative_action"];
+	'ap➙status_action', 'end turn_action', "initiative_action",
+	'target_action'];
 onCheck("sheet:opened change:character_name", (_) => {
   getAttrs(['character_name',...actionCalls],(attributes) => {
     const setObj = actionCalls.reduce((m,attr) => {
@@ -19625,7 +19790,11 @@ onCheck("clicked:ap➙status-action", (ev) => { actionStatus(ev); });
 onCheck("clicked:ap➙clear-action", (ev) => { actionClear(); });
 
 onCheck("clicked:end turn-action", (ev) => {
-  doTurn();
+    doTurn();
+});
+onCheck("clicked:target-action", (_) => {
+    console.log("Target action clicked");
+    attacks.getTargetData('target');
 });
 
 onCheck("clicked:initiative-action", (ev) => {
