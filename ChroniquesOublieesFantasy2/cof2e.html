@@ -1,9 +1,8 @@
 <div class="cofmain">
-
   <!-- Nouvelle version fiche -->
-  <input type="hidden" name="attr_verfdp" value="1.9.0">
+  <input type="hidden" name="attr_verfdp" value="1.10.0">
   <!-- Version courante fiche -->
-  <input type="hidden" name="attr_version" value="1.9.0">
+  <input type="hidden" name="attr_version" value="1.10.0">
   <!-- Mode debug -->
   <input type="hidden" name="attr_debug_mode" value="0">
 
@@ -14,7 +13,9 @@
   <!-- Jets -->
   <input type="hidden" name="attr_devol" value="d4">
   <input type="hidden" name="attr_last_rolls" value="">
+  <input type="hidden" name="attr_last_maneuver" value="">
   <input type="hidden" name="attr_usure_check" value="">
+  <input type="hidden" name="attr_next_roll" value="">
 
   <!-- Buffs caracs PJ -->
   <input type="hidden" name="attr_agi_buff" value="0">
@@ -87,7 +88,7 @@
   <input type="hidden" name="attr_rang_voie9" value="0">
 
   <input type="hidden" name="attr_rang_cavalier" value="0">
-  
+    
   <!-- COFantasy MOD interaction -->
   <input type="hidden" name="attr_script_title" value="">
   <input type="hidden" name="attr_cofantasy" value="">
@@ -100,6 +101,10 @@
   <input type="hidden" name="attr_max_actions4_label" value="">
   <input type="hidden" name="attr_max_actions5_label" value="">
 
+  <!-- Rolls -->
+  <input type="hidden" name="attr_d20roll" value="">
+
+  <!-- PVIG = pv first in dropdown -->
   <input type="hidden" name="attr_PVIG" value="0">
   <input type="hidden" name="attr_PVIG_max" value="0">
 
@@ -113,9 +118,25 @@
     <div>
       <img
         class="logo"
-        title="Version 1.9.0 - 28/09/2025"
+        title="Version 1.10.0 - 31/10/2025"
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesOublieesFantasy2/cof2e_logo.jpg"
       />
+      <input type="hidden" class="d20roll-btns" name="attr_cfg_d20roll" value="0">
+      <div class="d20roll-btns d-flex m2">
+        <input type="hidden" class="d20-toggle" name="attr_d20roll" value="1d20"/>
+        <div>
+          <span>Jet :</span>&nbsp;
+          <button type="action" class="img-btn d20roll_db" name="act_d20roll_db-btn">
+            <span class="img-btn">&</span>&nbsp;Dé bonus
+          </button>
+          <button type="action" class="img-btn d20roll_1d" name="act_d20roll_1d-btn">
+            Normal
+          </button>
+          <button type="action" class="img-btn d20roll_dm" name="act_d20roll_dm-btn">
+            <span class="img-btn">_</span>&nbsp;Dé malus
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Token -->
@@ -221,14 +242,29 @@
         <div class="identity-row">
           <div><strong>Type</strong></div>
           <div>
-            <input type="text" name="attr_creature" title="@{creature}" value="">
+            <input type="text" name="attr_creature" list="creature-type" title="@{creature}" value="">
+            <datalist id="creature-type">
+              <option>Créature vivante</option>
+              <option>Créature humanoïde</option>
+              <option>Créature végétative</option>
+              <option>Créature non vivante</option>
+            </datalist>
           </div>
         </div>
 
         <div class="identity-row">
           <div><strong>Taille</strong></div>
           <div>
-            <input type="text" name="attr_taille" title="@{taille}" value="">
+            <input type="text" name="attr_taille" list="size-list" title="@{taille}" value="">
+            <datalist id="size-list">
+              <option>Minuscule</option>
+              <option>Très petite</option>
+              <option>Petite</option>
+              <option>Moyenne</option>
+              <option>Grande</option>
+              <option>Enorme</option>
+              <option>Colossale</option>
+            </datalist>
           </div>
         </div>
 
@@ -254,7 +290,7 @@
           </button>
           <input type="hidden" name="attr_checkup-btn" value="">
           <button type="action" class="hidden" name="act_checkup-btn"/>
-          <button type="roll" class="flat-btn img-btn" name="roll_checkup" value="@{checkup-btn}">
+          <button type="roll" class="flat-btn img-btn" name="roll_checkup" title="%{checkup-btn} Etat du personnage" value="@{checkup-btn}">
             <span class="img-btn align-self-center">Y</span>
           </button>
         </div>
@@ -274,6 +310,7 @@
   <!-- Fiches -->
   <div class="cofsheet">
     <input type="hidden" class="cof-type-toggle" name="attr_sheet_type" value="pc"/> 
+    <button type="action" class="hidden" name="act_pc_actions-btn"></button>
     <button type="action" class="hidden" name="act_pc_menus-btn"></button>
     <button type="action" class="hidden" name="act_npc_menus-btn"></button>
    
@@ -302,12 +339,12 @@
               <h4>
                 <input type="hidden" name="attr_caract_select-btn" value="">
                 <button type="action" class="hidden" name="act_caract_select-btn"/>
-                <button type="roll" class="flat-btn img-btn" name="roll_caractselect" value="@{caract_select-btn}">
+                <button type="roll" class="flat-btn img-btn" name="roll_caractselect" title="%{caract_select-btn} Choix d'une caractéristique" value="@{caract_select-btn}">
                   Carac
                 </button>
                 <input type="hidden" name="attr_caract_menu-btn" value="">
                 <button type="action" class="hidden" name="act_caract_menu-btn"/>
-                <button type="roll" class="flat-btn img-btn" name="roll_caractmenu" value="@{caract_menu-btn}">
+                <button type="roll" class="flat-btn img-btn" name="roll_caractmenu" title="%{caract_menu-btn} Menu des caractéristiques" value="@{caract_menu-btn}">
                   <span class="img-btn">l</span>
                 </button>
               </h4>
@@ -625,7 +662,13 @@
           <div class="attacks">
 
             <div class="attack">
-              <h4>Combat</h4>
+              <h4>
+                Combat
+                <input type="hidden" class="attack-maneuvers" name="attr_manoeuvre" value="0">
+                <button type="action" class="flat-btn img-btn attack-maneuvers" name="act_maneuver-btn" title="@{manoeuvre} Manoeuvres (L)">
+                  <span class="img-btn">e</span>
+                </button>
+              </h4>
               <h4>Base</h4>
               <h4>Mod.</h4>
               <h4>Div.</h4>
@@ -723,6 +766,33 @@
               <div class="centered bordered">
                 <input type="hidden" name="attr_atkmag" value="1">
                 <span name="attr_atkmag" title="@{atkmag}"></span>
+              </div>
+            </div>
+
+            <!-- DEPLACEMENT, SENS -->
+            <h4 class="m2">Déplacement, Sens</h4>
+
+            <div class="speed">
+              <div class="block-title">Déplacement</div>
+              <div class="bordered">
+                <input type="hidden" name="attr_vitesse_cases" value="7" />
+                <input type="hidden" name="attr_vitesse_pas" value="35" />
+                <input type="number" class="two-digits" name="attr_vitesse" title="@{vitesse} Vitesse de déplacement&#10;1 case = 1,5m = 5 pas" value="10">&nbsp;m&nbsp;
+                (cases : <span name="attr_vitesse_cases" title="Vitesse en cases"></span>,
+                pas : <span name="attr_vitesse_pas" title="Vitesse en pas"></span>)
+              </div>
+            </div>
+
+            <div class="speed">
+              <div class="block-title">Sens</div>
+              <div class="bordered">
+                <div class="d-flex">
+                  &nbsp;<input type="text" name="attr_sens" list="senses-list" title="@{sens}" placeholder="Sens spéciaux">
+                  <datalist id="senses-list">
+                    <option>Lumière des étoiles</option>
+                    <option title="portée 30 m">Vision dans le noir</option>
+                  </datalist>
+                </div>
               </div>
             </div>
 
@@ -1092,7 +1162,8 @@
           <div class="dmred">
             <div class="block-title">RD</div>
             <div class="bordered">
-              <input type="text" name="attr_rd" title="@{rd} Réduction des DM" value="">
+              <input type="hidden" name="attr_rrdm">
+              <span name="attr_rrdm" title="@{rrdm} Réductions et Résistances aux DM"></span>
             </div>
           </div>
 
@@ -1104,6 +1175,7 @@
           <button type="action" name="act_pc_attacks-btn" class="sub-tab tab-btn pc-attacks-btn">ATTAQUES</button>
           <button type="action" name="act_pc_otact-btn" class="sub-tab tab-btn pc-otact-btn">OPTIONS</button>
           <button type="action" name="act_pc_hands-btn" class="sub-tab tab-btn pc-hands-btn">EN MAIN</button>
+          <button type="action" name="act_pc_resdm-btn" class="sub-tab tab-btn pc-resdm-btn">RESISTANCES</button>
         </div>
       
         <hr>
@@ -1125,7 +1197,7 @@
               <h4>CRIT.</h4>
               <h4>DM</h4>
               <h4>PORTEE</h4>
-              <h4>SPECIAL</h4>
+              <!--<h4>SPECIAL</h4>-->
             </div>
 
             <fieldset class="repeating_armes">
@@ -1137,13 +1209,15 @@
                   <button type="action" class="hidden" name="act_attack-btn">
                     <span class="d20-btn">t</span>
                   </button>
-                  <button type="roll" class="flat-btn" name="roll_attack" value="@{attack-btn}"/>
+                  <button type="roll" class="flat-btn" name="roll_attack" title="%{repeating_armes_ID_attack-btn} Jet d'attaque" value="@{attack-btn}"/>
                 </div>
                 <div class="d-flex d-flex-middle bordered">
                   <input type="hidden" name="attr_arme-label" value="">
                   <input type="hidden" class="arme-label" name="attr_arme-showlbl" value="0">
                   <span class="align-self-center arme-label" name="attr_arme-label"></span>&nbsp;
                   <input type="text" name="attr_arme-nom" title="@{arme-nom}" placeholder="Arme/attaque" value="">
+                  <span class="align-self-center">2M&nbsp;:&nbsp;</span>
+                  <input type="checkbox" name="attr_arme-2m" title="@{arme-2m} Arme à deux mains" value="1">
                 </div>
                 <div class="d-flex d-flex-middle bordered">
                   <select class="select-md" name="attr_arme-atk" title="@{arme-atk} Score d'attaque">
@@ -1153,14 +1227,13 @@
                     <option value="atkmag">MAGIE</option>
                   </select>
                   &nbsp;<span class="align-self-center">+</span>&nbsp;
-                  <input type="number" name="attr_arme-atkdiv" title="@{arme-atkdiv} Bonus divers" value="">
+                  <input type="number" class="two-digits" name="attr_arme-atkdiv" title="@{arme-atkdiv} Bonus divers" value="">
                   <input type="hidden" name="attr_arme-buffatk" value="0">
                 </div>
                 <div class="d-flex d-flex-middle bordered">
                   <input type="number" class="two-digits" name="attr_arme-crit" title="@{arme-crit} Seuil de Critique" value="20" min="16" max="20">
                 </div>
                 <div class="d-flex d-flex-middle bordered">
-                  <input type="checkbox" name="attr_arme-2m" title="@{arme-2m} Arme à deux mains" value="1">
                   <input type="text" name="attr_arme-dm" title="@{arme-dm} Dé(s) de DM&#10;Séparer les dés de DM à une main et deux mais par un / pour les armes polyvalentes" placeholder="1d8, 2d6..." value="">
                   <select class="select-xxs" name="attr_arme-dmtype" title="@{arme-dmtype} Type de dommages">
                     <optgroup label="Physiques">
@@ -1202,15 +1275,12 @@
                     <option value="@{vol}">VOL</option>
                   </select>
                   &nbsp;<span class="align-self-center">+</span>&nbsp;
-                  <input type="number" name="attr_arme-dmdiv" title="@{arme-dmdiv} Bonus DM divers" value="0">
+                  <input type="number" class="two-digits" name="attr_arme-dmdiv" title="@{arme-dmdiv} Bonus DM divers" value="0">
                   <input type="hidden" name="attr_arme-buffdm" value="0">
                 </div>
                 <div class="d-flex d-flex-middle bordered">
                   <input type="text" name="attr_arme-portee" title="@{arme-portee}" value="">
                   <input type="hidden" name="attr_arme-portees" value="">
-                </div>
-                <div class="d-flex d-flex-middle bordered">
-                  <textarea class="one-row" name="attr_arme-special" title="@{arme-special}" placeholder="Effet spécial..."></textarea>
                   <button type="action" class="flat-btn img-btn float-right" name="act_armeopt-btn">
                     <span class="img-btn">y</span>
                   </button>
@@ -1221,6 +1291,12 @@
               <input type="hidden" name="attr_arme-gearid" value=""/>
               <input type="hidden" class="cof-wopt-toggle" name="attr_armeopt" value="0"/>
               <div class="weapon-opt">
+                <div class="weapon-special">
+                  <div></div>
+                  <div class="bordered">
+                    <textarea class="one-row" name="attr_arme-special" title="@{arme-special}" placeholder="Effet spécial..."></textarea>
+                  </div>
+                </div>
                 <div class="weapon-option">
                   <div>
                   </div>
@@ -1236,10 +1312,10 @@
                     <input class="two-digits" type="number" name="attr_arme-usure" title="@{arme-usure} Usure">
                   </div>
                   <div class="bordered">
-                    <input type="checkbox" name="attr_arme-active" title="@{arme-active} Attaque active" value="1" checked>
-                    <input type="text" name="attr_arme-atkmods" placeholder="Modificateurs d'attaque" title="@{arme-atkmods} Modificateurs séparés par des virgules&#10; deBonus: avec dé bonus&#10; deMalus: avec dé malus&#10; auto: réussite automatique&#10; choc: peut faire des attaques non léthales sans malus&#10; explodeMax: dés de dégâts explosifs&#10; pasDeDmg: l'attaque ne fait pas de DM&#10; poudre: arme à poudre&#10; reroll1: relance les 1 sur les dés de DM (:1 = une seule fois)&#10; tempDmg: fait toujours des attaques non léthales&#10; zone: sort de zone&#10; magie: bonus att.+DM&#10; magieAtt: bonus att.&#10; magieDmg: bonus DM&#10; affutee: critiques améliorés&#10; fleau: bonus DM contre créature&#10; element: bonus DM élémentaires/substance" value="">
+                    <input type="text" name="attr_arme-atkmods" placeholder="Modificateurs d'attaque" title="@{arme-atkmods} Modificateurs séparés par des virgules&#10; deBonus: avec dé bonus&#10; deMalus: avec dé malus&#10; auto: réussite automatique&#10; choc: peut faire des attaques non léthales sans malus&#10; explodeMax: dés de dégâts explosifs&#10; pasDeDmg: l'attaque ne fait pas de DM&#10; poudre: arme à poudre&#10; reroll1: relance les 1 sur les dés de DM (:1 = une seule fois)&#10; tempDmg: fait toujours des attaques non léthales&#10; zone: sort de zone&#10; magie: bonus att.+DM&#10; magieAtt: bonus att.&#10; magieDmg: bonus DM&#10; affutee: critiques améliorés&#10; fleau: bonus DM contre créature&#10; element: bonus DM élémentaires/substance&#10; manoeuvres: attaques spéciales" value="">
                   </div>
                   <div class="bordered">
+                    <input type="checkbox" name="attr_arme-active" title="@{arme-active} Attaque active" value="1" checked>
                     <textarea class="one-row" name="attr_arme-options" placeholder="Options d'attaque" title="@{arme-options} Options d'attaque"></textarea>
                   </div>
 
@@ -1413,7 +1489,7 @@
                   <input type="hidden" name="attr_main_princ-btn" value="">
                   <button type="action" class="hidden" name="act_main_princ-btn"/>
                   <input type="hidden" class="pc-hand" name="attr_main_princ_btn" value="0">
-                  <button type="roll" class="flat-btn" name="roll_main_princ" value="@{main_princ-btn}"/>
+                  <button type="roll" class="flat-btn" name="roll_main_princ" title="%{main_princ-btn} Attaque main principale" value="@{main_princ-btn}"/>
                 </div>
 
                 <div class="block-title">
@@ -1433,7 +1509,7 @@
                   <input type="hidden" name="attr_main_autre-btn" value="">
                   <button type="action" class="hidden" name="act_main_autre-btn"/>
                   <input type="hidden" class="pc-hand" name="attr_main_autre_btn" value="0">
-                  <button type="roll" class="flat-btn" name="roll_main_autre" value="@{main_autre-btn}"/>
+                  <button type="roll" class="flat-btn" name="roll_main_autre" title="%{main_autre-btn} Attaque main secondaire" value="@{main_autre-btn}"/>
                 </div>
 
                 <div class="block-title">
@@ -1455,6 +1531,23 @@
                 <span>&nbsp;En selle</span>
               </div>
 
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Réductions & Résistances DM -->
+        <div class="pc-resdm-subtab">
+
+          <div class="sheet-2colrow">
+
+            <div class="sheet-col">
+              <textarea name="attr_rd" title="@{rd}" placeholder="Réductions des DM..."></textarea>
+            </div>
+            
+            <div class="sheet-col">
+              <textarea name="attr_resdm" title="@{resdm}" placeholder="Résistances aux DM..."></textarea>
             </div>
 
           </div>
@@ -1520,7 +1613,7 @@
                       <span class="rank-title" name="attr_voie1-t1"></span>
                       <input type="hidden" name="attr_v1r1-btn" value="">
                       <button type="action" class="hidden" name="act_v1r1-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v1r1" value="@{v1r1-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v1r1" title="%{v1r1-btn}" value="@{v1r1-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1541,7 +1634,7 @@
                       <span class="rank-title" name="attr_voie1-t2"></span>
                       <input type="hidden" name="attr_v1r2-btn" value="">
                       <button type="action" class="hidden" name="act_v1r2-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v1r2" value="@{v1r2-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v1r2" title="%{v1r2-btn}" value="@{v1r2-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1562,7 +1655,7 @@
                       <span class="rank-title" name="attr_voie1-t3"></span>
                       <input type="hidden" name="attr_v1r3-btn" value="">
                       <button type="action" class="hidden" name="act_v1r3-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v1r3" value="@{v1r3-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v1r3" title="%{v1r3-btn}" value="@{v1r3-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1583,7 +1676,7 @@
                       <span class="rank-title" name="attr_voie1-t4"></span>
                       <input type="hidden" name="attr_v1r4-btn" value="">
                       <button type="action" class="hidden" name="act_v1r4-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v1r4" value="@{v1r4-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v1r4" title="%{v1r4-btn}" value="@{v1r4-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1604,7 +1697,7 @@
                       <span class="rank-title" name="attr_voie1-t5"></span>
                       <input type="hidden" name="attr_v1r5-btn" value="">
                       <button type="action" class="hidden" name="act_v1r5-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v1r5" value="@{v1r5-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v1r5" title="%{v1r5-btn}" value="@{v1r5-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1639,7 +1732,7 @@
                       <span class="rank-title" name="attr_voie2-t1"></span>
                       <input type="hidden" name="attr_v2r1-btn" value="">
                       <button type="action" class="hidden" name="act_v2r1-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v2r1" value="@{v2r1-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v2r1" title="%{v2r1-btn}" value="@{v2r1-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1660,7 +1753,7 @@
                       <span class="rank-title" name="attr_voie2-t2"></span>
                       <input type="hidden" name="attr_v2r2-btn" value="">
                       <button type="action" class="hidden" name="act_v2r2-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v2r2" value="@{v2r2-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v2r2" title="%{v2r2-btn}" value="@{v2r2-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1681,7 +1774,7 @@
                       <span class="rank-title" name="attr_voie2-t3"></span>
                       <input type="hidden" name="attr_v2r3-btn" value="">
                       <button type="action" class="hidden" name="act_v2r3-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v2r3" value="@{v2r3-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v2r3" title="%{v2r3-btn}" value="@{v2r3-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1702,7 +1795,7 @@
                       <span class="rank-title" name="attr_voie2-t4"></span>
                       <input type="hidden" name="attr_v2r4-btn" value="">
                       <button type="action" class="hidden" name="act_v2r4-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v2r4" value="@{v2r4-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v2r4" title="%{v2r4-btn}" value="@{v2r4-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1723,7 +1816,7 @@
                       <span class="rank-title" name="attr_voie2-t5"></span>
                       <input type="hidden" name="attr_v2r5-btn" value="">
                       <button type="action" class="hidden" name="act_v2r5-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v2r5" value="@{v2r5-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v2r5" title="%{v2r5-btn}" value="@{v2r5-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1758,7 +1851,7 @@
                       <span class="rank-title" name="attr_voie3-t1"></span>
                       <input type="hidden" name="attr_v3r1-btn" value="">
                       <button type="action" class="hidden" name="act_v3r1-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v3r1" value="@{v3r1-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v3r1" title="%{v3r1-btn}" value="@{v3r1-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1779,7 +1872,7 @@
                       <span class="rank-title" name="attr_voie3-t2"></span>
                       <input type="hidden" name="attr_v3r2-btn" value="">
                       <button type="action" class="hidden" name="act_v3r2-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v3r2" value="@{v3r2-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v3r2" title="%{v3r2-btn}" value="@{v3r2-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1800,7 +1893,7 @@
                       <span class="rank-title" name="attr_voie3-t3"></span>
                       <input type="hidden" name="attr_v3r3-btn" value="">
                       <button type="action" class="hidden" name="act_v3r3-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v3r3" value="@{v3r3-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v3r3" title="%{v3r3-btn}" value="@{v3r3-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1821,7 +1914,7 @@
                       <span class="rank-title" name="attr_voie3-t4"></span>
                       <input type="hidden" name="attr_v3r4-btn" value="">
                       <button type="action" class="hidden" name="act_v3r4-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v3r4" value="@{v3r4-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v3r4" title="%{v3r4-btn}" value="@{v3r4-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1842,7 +1935,7 @@
                       <span class="rank-title" name="attr_voie3-t5"></span>
                       <input type="hidden" name="attr_v3r5-btn" value="">
                       <button type="action" class="hidden" name="act_v3r5-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v3r5" value="@{v3r5-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v3r5" title="%{v3r5-btn}" value="@{v3r5-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1882,7 +1975,7 @@
                       <span class="rank-title" name="attr_voie4-t1"></span>
                       <input type="hidden" name="attr_v4r1-btn" value="">
                       <button type="action" class="hidden" name="act_v4r1-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v4r1" value="@{v4r1-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v4r1" title="%{v4r1-btn}" value="@{v4r1-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1903,7 +1996,7 @@
                       <span class="rank-title" name="attr_voie4-t2"></span>
                       <input type="hidden" name="attr_v4r2-btn" value="">
                       <button type="action" class="hidden" name="act_v4r2-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v4r2" value="@{v4r2-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v4r2" title="%{v4r2-btn}" value="@{v4r2-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1924,7 +2017,7 @@
                       <span class="rank-title" name="attr_voie4-t3"></span>
                       <input type="hidden" name="attr_v4r3-btn" value="">
                       <button type="action" class="hidden" name="act_v4r3-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v4r3" value="@{v4r3-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v4r3" title="%{v4r3-btn}" value="@{v4r3-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1945,7 +2038,7 @@
                       <span class="rank-title" name="attr_voie4-t4"></span>
                       <input type="hidden" name="attr_v4r4-btn" value="">
                       <button type="action" class="hidden" name="act_v4r4-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v4r4" value="@{v4r4-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v4r4" title="%{v4r4-btn}" value="@{v4r4-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -1966,7 +2059,7 @@
                       <span class="rank-title" name="attr_voie4-t5"></span>
                       <input type="hidden" name="attr_v4r5-btn" value="">
                       <button type="action" class="hidden" name="act_v4r5-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v4r5" value="@{v4r5-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v4r5" title="%{v4r5-btn}" value="@{v4r5-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2001,7 +2094,7 @@
                       <span class="rank-title" name="attr_voie5-t1"></span>
                       <input type="hidden" name="attr_v5r1-btn" value="">
                       <button type="action" class="hidden" name="act_v5r1-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v5r1" value="@{v5r1-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v5r1" title="%{v5r1-btn}" value="@{v5r1-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2022,7 +2115,7 @@
                       <span class="rank-title" name="attr_voie5-t2"></span>
                       <input type="hidden" name="attr_v5r2-btn" value="">
                       <button type="action" class="hidden" name="act_v5r2-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v5r2" value="@{v5r2-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v5r2" title="%{v5r2-btn}" value="@{v5r2-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2043,7 +2136,7 @@
                       <span class="rank-title" name="attr_voie5-t3"></span>
                       <input type="hidden" name="attr_v5r3-btn" value="">
                       <button type="action" class="hidden" name="act_v5r3-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v5r3" value="@{v5r3-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v5r3" title="%{v5r3-btn}" value="@{v5r3-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2064,7 +2157,7 @@
                       <span class="rank-title" name="attr_voie5-t4"></span>
                       <input type="hidden" name="attr_v5r4-btn" value="">
                       <button type="action" class="hidden" name="act_v5r4-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v5r4" value="@{v5r4-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v5r4" title="%{v5r4-btn}" value="@{v5r4-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2085,7 +2178,7 @@
                       <span class="rank-title" name="attr_voie5-t5"></span>
                       <input type="hidden" name="attr_v5r5-btn" value="">
                       <button type="action" class="hidden" name="act_v5r5-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v5r5" value="@{v5r5-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v5r5" title="%{v5r5-btn}" value="@{v5r5-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2120,7 +2213,7 @@
                       <span class="rank-title" name="attr_voie6-t1"></span>
                       <input type="hidden" name="attr_v6r1-btn" value="">
                       <button type="action" class="hidden" name="act_v6r1-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v6r1" value="@{v6r1-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v6r1" title="%{v6r1-btn}" value="@{v6r1-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2141,7 +2234,7 @@
                       <span class="rank-title" name="attr_voie6-t2"></span>
                       <input type="hidden" name="attr_v6r2-btn" value="">
                       <button type="action" class="hidden" name="act_v6r2-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v6r2" value="@{v6r2-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v6r2" title="%{v6r2-btn}" value="@{v6r2-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2162,7 +2255,7 @@
                       <span class="rank-title" name="attr_voie6-t3"></span>
                       <input type="hidden" name="attr_v6r3-btn" value="">
                       <button type="action" class="hidden" name="act_v6r3-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v6r3" value="@{v6r3-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v6r3" title="%{v6r3-btn}" value="@{v6r3-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2183,7 +2276,7 @@
                       <span class="rank-title" name="attr_voie6-t4"></span>
                       <input type="hidden" name="attr_v6r4-btn" value="">
                       <button type="action" class="hidden" name="act_v6r4-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v6r4" value="@{v6r4-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v6r4" title="%{v6r4-btn}" value="@{v6r4-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2204,7 +2297,7 @@
                       <span class="rank-title" name="attr_voie6-t5"></span>
                       <input type="hidden" name="attr_v6r5-btn" value="">
                       <button type="action" class="hidden" name="act_v6r5-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v6r5" value="@{v6r5-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v6r5" title="%{v6r5-btn}" value="@{v6r5-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2244,7 +2337,7 @@
                       <span class="rank-title" name="attr_voie7-t1"></span>
                       <input type="hidden" name="attr_v7r1-btn" value="">
                       <button type="action" class="hidden" name="act_v7r1-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v7r1" value="@{v7r1-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v7r1" title="%{v7r1-btn}" value="@{v7r1-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2265,7 +2358,7 @@
                       <span class="rank-title" name="attr_voie7-t2"></span>
                       <input type="hidden" name="attr_v7r2-btn" value="">
                       <button type="action" class="hidden" name="act_v7r2-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v7r2" value="@{v7r2-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v7r2" title="%{v7r2-btn}" value="@{v7r2-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2286,7 +2379,7 @@
                       <span class="rank-title" name="attr_voie7-t3"></span>
                       <input type="hidden" name="attr_v7r3-btn" value="">
                       <button type="action" class="hidden" name="act_v7r3-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v7r3" value="@{v7r3-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v7r3" title="%{v7r3-btn}" value="@{v7r3-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2307,7 +2400,7 @@
                       <span class="rank-title" name="attr_voie7-t4"></span>
                       <input type="hidden" name="attr_v7r4-btn" value="">
                       <button type="action" class="hidden" name="act_v7r4-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v7r4" value="@{v7r4-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v7r4" title="%{v7r4-btn}" value="@{v7r4-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2328,7 +2421,7 @@
                       <span class="rank-title" name="attr_voie7-t5"></span>
                       <input type="hidden" name="attr_v7r5-btn" value="">
                       <button type="action" class="hidden" name="act_v7r5-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v7r5" value="@{v7r5-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v7r5" title="%{v7r5-btn}" value="@{v7r5-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2363,7 +2456,7 @@
                       <span class="rank-title" name="attr_voie8-t1"></span>
                       <input type="hidden" name="attr_v8r1-btn" value="">
                       <button type="action" class="hidden" name="act_v8r1-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v8r1" value="@{v8r1-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v8r1" title="%{v8r1-btn}" value="@{v8r1-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2384,7 +2477,7 @@
                       <span class="rank-title" name="attr_voie8-t2"></span>
                       <input type="hidden" name="attr_v8r2-btn" value="">
                       <button type="action" class="hidden" name="act_v8r2-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v8r2" value="@{v8r2-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v8r2" title="%{v8r2-btn}" value="@{v8r2-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2405,7 +2498,7 @@
                       <span class="rank-title" name="attr_voie8-t3"></span>
                       <input type="hidden" name="attr_v8r3-btn" value="">
                       <button type="action" class="hidden" name="act_v8r3-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v8r3" value="@{v8r3-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v8r3" title="%{v8r3-btn}" value="@{v8r3-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2426,7 +2519,7 @@
                       <span class="rank-title" name="attr_voie8-t4"></span>
                       <input type="hidden" name="attr_v8r4-btn" value="">
                       <button type="action" class="hidden" name="act_v8r4-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v8r4" value="@{v8r4-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v8r4" title="%{v8r4-btn}" value="@{v8r4-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2447,7 +2540,7 @@
                       <span class="rank-title" name="attr_voie8-t5"></span>
                       <input type="hidden" name="attr_v8r5-btn" value="">
                       <button type="action" class="hidden" name="act_v8r5-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v8r5" value="@{v8r5-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v8r5" title="%{v8r5-btn}" value="@{v8r5-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2482,7 +2575,7 @@
                       <span class="rank-title" name="attr_voie9-t1"></span>
                       <input type="hidden" name="attr_v9r1-btn" value="">
                       <button type="action" class="hidden" name="act_v9r1-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v9r1" value="@{v9r1-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v9r1" title="%{v9r1-btn}" value="@{v9r1-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2503,7 +2596,7 @@
                       <span class="rank-title" name="attr_voie9-t2"></span>
                       <input type="hidden" name="attr_v9r2-btn" value="">
                       <button type="action" class="hidden" name="act_v9r2-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v9r2" value="@{v9r2-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v9r2" title="%{v9r2-btn}" value="@{v9r2-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2524,7 +2617,7 @@
                       <span class="rank-title" name="attr_voie9-t3"></span>
                       <input type="hidden" name="attr_v9r3-btn" value="">
                       <button type="action" class="hidden" name="act_v9r3-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v9r3" value="@{v9r3-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v9r3" title="%{v9r3-btn}" value="@{v9r3-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2545,7 +2638,7 @@
                       <span class="rank-title" name="attr_voie9-t4"></span>
                       <input type="hidden" name="attr_v9r4-btn" value="">
                       <button type="action" class="hidden" name="act_v9r4-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v9r4" value="@{v9r4-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v9r4" title="%{v9r4-btn}" value="@{v9r4-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2566,7 +2659,7 @@
                       <span class="rank-title" name="attr_voie9-t5"></span>
                       <input type="hidden" name="attr_v9r5-btn" value="">
                       <button type="action" class="hidden" name="act_v9r5-btn">
-                      <button type="roll" class="flat-btn img-btn" name="roll_v9r5" value="@{v9r5-btn}">
+                      <button type="roll" class="flat-btn img-btn" name="roll_v9r5" title="%{v9r5-btn}" value="@{v9r5-btn}">
                         <span class="img-btn">w</span>
                       </button>
                     </div>
@@ -2583,6 +2676,11 @@
         </div>
 
         <!-- Fiche PJ, Onglet Capacités, Mode Edition -->
+        <datalist id="abilities-freqs">
+          <option value="combat"></option>
+          <option value="jour"></option>
+          <option value="aventure"></option>
+        </datalist>
         <div class="abilities-edit">
           <div class="d-flex d-flex-between">
             <div>
@@ -2616,7 +2714,7 @@
                 <textarea name="attr_voie1-1" title="@{voie1-1}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v1r1_use_max" title="@{v1r1_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v1r1_freq" title="@{v1r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v1r1_freq" title="@{v1r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text"  name="attr_v1r1_param" title="@{v1r1_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2633,7 +2731,7 @@
                 <textarea name="attr_voie1-2" title="@{voie1-2}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v1r2_use_max" title="@{v1r2_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v1r2_freq" title="@{v1r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v1r2_freq" title="@{v1r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v1r2_param" title="@{v1r2_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2650,7 +2748,7 @@
                 <textarea name="attr_voie1-3" title="@{voie1-3}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v1r3_use_max" title="@{v1r3_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v1r3_freq" title="@{v1r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v1r3_freq" title="@{v1r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v1r3_param" title="@{v1r3_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2667,7 +2765,7 @@
                 <textarea name="attr_voie1-4" title="@{voie1-4}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v1r4_use_max" title="@{v1r4_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v1r4_freq" title="@{v1r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v1r4_freq" title="@{v1r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v1r4_param" title="@{v1r4_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2684,7 +2782,7 @@
                 <textarea name="attr_voie1-5" title="@{voie1-5}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v1r5_use_max" title="@{v1r5_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v1r5_freq" title="@{v1r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v1r5_freq" title="@{v1r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v1r5_param" title="@{v1r5_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2712,7 +2810,7 @@
                 <textarea name="attr_voie2-1" title="@{voie2-1}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v2r1_use_max" title="@{v2r1_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v2r1_freq" title="@{v2r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v2r1_freq" title="@{v2r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v2r1_param" title="@{v2r1_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2729,7 +2827,7 @@
                 <textarea name="attr_voie2-2" title="@{voie2-2}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v2r2_use_max" title="@{v2r2_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v2r2_freq" title="@{v2r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v2r2_freq" title="@{v2r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v2r2_param" title="@{v2r2_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2746,7 +2844,7 @@
                 <textarea name="attr_voie2-3" title="@{voie2-3}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v2r3_use_max" title="@{v2r3_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v2r3_freq" title="@{v2r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v2r3_freq" title="@{v2r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v2r3_param" title="@{v2r3_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2763,7 +2861,7 @@
                 <textarea name="attr_voie2-4" title="@{voie2-4}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v2r4_use_max" title="@{v2r4_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v2r4_freq" title="@{v2r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v2r4_freq" title="@{v2r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v2r4_param" title="@{v2r4_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2780,7 +2878,7 @@
                 <textarea name="attr_voie2-5" title="@{voie2-5}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v2r5_use_max" title="@{v2r5_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v2r5_freq" title="@{v2r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v2r5_freq" title="@{v2r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v2r5_param" title="@{v2r5_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2808,7 +2906,7 @@
                 <textarea name="attr_voie3-1" title="@{voie3-1}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v3r1_use_max" title="@{v3r1_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v3r1_freq" title="@{v3r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v3r1_freq" title="@{v3r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v3r1_param" title="@{v3r1_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2825,7 +2923,7 @@
                 <textarea name="attr_voie3-2" title="@{voie3-2}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v3r2_use_max" title="@{v3r2_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v3r2_freq" title="@{v3r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v3r2_freq" title="@{v3r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v3r2_param" title="@{v3r2_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2842,7 +2940,7 @@
                 <textarea name="attr_voie3-3" title="@{voie3-3}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v3r3_use_max" title="@{v3r3_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v3r3_freq" title="@{v3r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v3r3_freq" title="@{v3r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v3r3_param" title="@{v3r3_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2859,7 +2957,7 @@
                 <textarea name="attr_voie3-4" title="@{voie3-4}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v3r4_use_max" title="@{v3r4_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v3r4_freq" title="@{v3r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v3r4_freq" title="@{v3r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v3r4_param" title="@{v3r4_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2876,7 +2974,7 @@
                 <textarea name="attr_voie3-5" title="@{voie3-5}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v3r5_use_max" title="@{v3r5_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v3r5_freq" title="@{v3r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v3r5_freq" title="@{v3r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v3r5_param" title="@{v3r5_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2908,7 +3006,7 @@
                 <textarea name="attr_voie4-1" title="@{voie4-1}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v4r1_use_max" title="@{v4r1_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v4r1_freq" title="@{v4r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v4r1_freq" title="@{v4r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v4r1_param" title="@{v4r1_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2925,7 +3023,7 @@
                 <textarea name="attr_voie4-2" title="@{voie4-2}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v4r2_use_max" title="@{v4r2_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v4r2_freq" title="@{v4r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v4r2_freq" title="@{v4r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v4r2_param" title="@{v4r2_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2942,7 +3040,7 @@
                 <textarea name="attr_voie4-3" title="@{voie4-3}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v4r3_use_max" title="@{v4r3_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v4r3_freq" title="@{v4r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v4r3_freq" title="@{v4r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v4r3_param" title="@{v4r3_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2959,7 +3057,7 @@
                 <textarea name="attr_voie4-4" title="@{voie4-4}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v4r4_use_max" title="@{v4r4_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v4r4_freq" title="@{v4r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v4r4_freq" title="@{v4r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v4r4_param" title="@{v4r4_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -2976,7 +3074,7 @@
                 <textarea name="attr_voie4-5" title="@{voie4-5}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v4r5_use_max" title="@{v4r5_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v4r5_freq" title="@{v4r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v4r5_freq" title="@{v4r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v4r5_param" title="@{v4r5_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3004,7 +3102,7 @@
                 <textarea name="attr_voie5-1" title="@{voie5-1}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v5r1_use_max" title="@{v5r1_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v5r1_freq" title="@{v5r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v5r1_freq" title="@{v5r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v5r1_param" title="@{v5r1_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3021,7 +3119,7 @@
                 <textarea name="attr_voie5-2" title="@{voie5-2}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v5r2_use_max" title="@{v5r2_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v5r2_freq" title="@{v5r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v5r2_freq" title="@{v5r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v5r2_param" title="@{v5r2_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3038,7 +3136,7 @@
                 <textarea name="attr_voie5-3" title="@{voie5-3}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v5r3_use_max" title="@{v5r3_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v5r3_freq" title="@{v5r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v5r3_freq" title="@{v5r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v5r3_param" title="@{v5r3_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3055,7 +3153,7 @@
                 <textarea name="attr_voie5-4" title="@{voie5-4}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v5r4_use_max" title="@{v5r4_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v5r4_freq" title="@{v5r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v5r4_freq" title="@{v5r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v5r4_param" title="@{v5r4_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3072,7 +3170,7 @@
                 <textarea name="attr_voie5-5" title="@{voie5-5}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v5r5_use_max" title="@{v5r5_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v5r5_freq" title="@{v5r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v5r5_freq" title="@{v5r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v5r5_param" title="@{v5r5_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3100,7 +3198,7 @@
                 <textarea name="attr_voie6-1" title="@{voie6-1}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v6r1_use_max" title="@{v6r1_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v6r1_freq" title="@{v6r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v6r1_freq" title="@{v6r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v6r1_param" title="@{v6r1_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3117,7 +3215,7 @@
                 <textarea name="attr_voie6-2" title="@{voie6-2}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v6r2_use_max" title="@{v6r2_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v6r2_freq" title="@{v6r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v6r2_freq" title="@{v6r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v6r2_param" title="@{v6r2_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3134,7 +3232,7 @@
                 <textarea name="attr_voie6-3" title="@{voie6-3}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v6r3_use_max" title="@{v6r3_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v6r3_freq" title="@{v6r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v6r3_freq" title="@{v6r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v6r3_param" title="@{v6r3_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3151,7 +3249,7 @@
                 <textarea name="attr_voie6-4" title="@{voie6-4}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v6r4_use_max" title="@{v6r4_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v6r4_freq" title="@{v6r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v6r4_freq" title="@{v6r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v6r4_param" title="@{v6r4_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3168,7 +3266,7 @@
                 <textarea name="attr_voie6-5" title="@{voie6-5}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v6r5_use_max" title="@{v6r5_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v6r5_freq" title="@{v6r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v6r5_freq" title="@{v6r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v6r5_param" title="@{v6r5_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3200,7 +3298,7 @@
                 <textarea name="attr_voie7-1" title="@{voie7-1}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v7r1_use_max" title="@{v7r1_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v7r1_freq" title="@{v7r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v7r1_freq" title="@{v7r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v7r1_param" title="@{v7r1_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3217,7 +3315,7 @@
                 <textarea name="attr_voie7-2" title="@{voie7-2}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v7r2_use_max" title="@{v7r2_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v7r2_freq" title="@{v7r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v7r2_freq" title="@{v7r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v7r2_param" title="@{v7r2_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3234,7 +3332,7 @@
                 <textarea name="attr_voie7-3" title="@{voie7-3}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v7r3_use_max" title="@{v7r3_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v7r3_freq" title="@{v7r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v7r3_freq" title="@{v7r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v7r3_param" title="@{v7r3_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3251,7 +3349,7 @@
                 <textarea name="attr_voie7-4" title="@{voie7-4}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v7r4_use_max" title="@{v7r4_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v7r4_freq" title="@{v7r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v7r4_freq" title="@{v7r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v7r4_param" title="@{v7r4_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3268,7 +3366,7 @@
                 <textarea name="attr_voie7-5" title="@{voie7-5}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v7r5_use_max" title="@{v7r5_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v7r5_freq" title="@{v7r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v7r5_freq" title="@{v7r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v7r5_param" title="@{v7r5_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3296,7 +3394,7 @@
                 <textarea name="attr_voie8-1" title="@{voie8-1}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v8r1_use_max" title="@{v8r1_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v8r1_freq" title="@{v8r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v8r1_freq" title="@{v8r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v8r1_param" title="@{v8r1_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3313,7 +3411,7 @@
                 <textarea name="attr_voie8-2" title="@{voie8-2}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v8r2_use_max" title="@{v8r2_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v8r2_freq" title="@{v8r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v8r2_freq" title="@{v8r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v8r2_param" title="@{v8r2_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3330,7 +3428,7 @@
                 <textarea name="attr_voie8-3" title="@{voie8-3}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v8r3_use_max" title="@{v8r3_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v8r3_freq" title="@{v8r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v8r3_freq" title="@{v8r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v8r3_param" title="@{v8r3_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3347,7 +3445,7 @@
                 <textarea name="attr_voie8-4" title="@{voie8-4}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v8r4_use_max" title="@{v8r4_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v8r4_freq" title="@{v8r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v8r4_freq" title="@{v8r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v8r4_param" title="@{v8r4_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3364,7 +3462,7 @@
                 <textarea name="attr_voie8-5" title="@{voie8-5}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v8r5_use_max" title="@{v8r5_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v8r5_freq" title="@{v8r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v8r5_freq" title="@{v8r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v8r5_param" title="@{v8r5_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3392,7 +3490,7 @@
                 <textarea name="attr_voie9-1" title="@{voie9-1}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v9r1_use_max" title="@{v9r1_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v9r1_freq" title="@{v9r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v9r1_freq" title="@{v9r1_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v9r1_param" title="@{v9r1_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3409,7 +3507,7 @@
                 <textarea name="attr_voie9-2" title="@{voie9-2}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v9r2_use_max" title="@{v9r2_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v9r2_freq" title="@{v9r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v9r2_freq" title="@{v9r2_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v9r2_param" title="@{v9r2_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3426,7 +3524,7 @@
                 <textarea name="attr_voie9-3" title="@{voie9-3}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v9r3_use_max" title="@{v9r3_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v9r3_freq" title="@{v9r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v9r3_freq" title="@{v9r3_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v9r3_param" title="@{v9r3_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3443,7 +3541,7 @@
                 <textarea name="attr_voie9-4" title="@{voie9-4}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v9r4_use_max" title="@{v9r4_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v9r4_freq" title="@{v9r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v9r4_freq" title="@{v9r4_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v9r4_param" title="@{v9r4_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3460,7 +3558,7 @@
                 <textarea name="attr_voie9-5" title="@{voie9-5}" placeholder="Description"></textarea>
                 <div class="d-flex">
                   <input type="number" name="attr_v9r5_use_max" title="@{v9r5_use_max} Nombre d'utilisations maximum" value="">
-                  <input type="text"  name="attr_v9r5_freq" title="@{v6r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
+                  <input type="text" list="abilities-freqs" name="attr_v9r5_freq" title="@{v6r5_freq} Fréquence d'utilisation" placeholder="Par combat, par jour..." value="">
                 </div>
                 <div class="d-flex">
                   <input type="text" name="attr_v9r5_param" title="@{v9r5_param} Paramètre de capacité" placeholder="Paramètre de capacité" value="">
@@ -3511,7 +3609,7 @@
                 <button class="hidden" type="action" name="act_roll-btn">
                   <span class="d20-btn">t</span>
                 </button>
-                <button type="roll" class="flat-btn" name="roll_roll" value="@{roll-btn}"/>
+                <button type="roll" class="flat-btn" name="roll_roll" title="%{repeating_rolls_ID_roll-btn}" value="@{roll-btn}"/>
               </div>
 
               <div class="d-flex d-flex-middle bordered">
@@ -4640,6 +4738,9 @@
                     <input type="text" name="attr_res-desc" title="@{res-desc}" placeholder="Nom de la ressource" value="">
                     Nombre :
                     <input type="number" class="two-digits" name="attr_res-val" title="@{res-val}" value="1">
+                    <button type="action" class="flat-btn img-btn" name="act_resconso-btn" title="Utiliser un consommable">
+                      <span class="img-btn">-</span>
+                    </button>
                   </div>
   
                   <div class="d-flex">
@@ -4796,6 +4897,10 @@
               <li class="config-check">
                 <input type="checkbox" name="attr_cfg_pts_capas" value="1">
                 <span>Contrôle des points de capacités</span>
+              </li>
+              <li class="config-check">
+                <input type="checkbox" name="attr_cfg_cible" value="1">
+                <span>Attaques ciblées</span>
               </li>
             </ul>
 
@@ -5060,8 +5165,7 @@
                   <option value="dark">Sombre</option>
                 </select>
               </li>
-              <li>
-                Contenu 
+              <li>Contenu
                 <ul>
                   <li class="config-check">
                     <input type="checkbox" name="attr_cfg_1attack_roll" value="1">
@@ -5077,6 +5181,18 @@
                   </li>
                 </ul>
               </li>
+              <li>Dé bonus/Dé malus
+                <ul>
+                  <li class="config-check">
+                    <input type="checkbox" name="attr_cfg_d20roll" value="1">
+                    <span>Boutons</span>
+                  </li>
+                  <li class="config-check">
+                    <input type="checkbox" name="attr_cfg_d20roll" value="2">
+                    <span>Demander</span>
+                  </li>
+                </ul>
+              </li>
             </ul>
     
             <details>
@@ -5085,7 +5201,7 @@
               </summary>
               <ul class="pc-configs">
                 <li>
-                  <div class="pc-configs">
+                  <div class="pc-configs first-rank">
                     <span name="attr_voie1nom"></span>
                     <div class="d-flex">
                       <input type="number" name="attr_v1br" title="@{v1br}" value="1">
@@ -5094,7 +5210,7 @@
                   </div>
                 </li>
                 <li>
-                  <div class="pc-configs">
+                  <div class="pc-configs first-rank">
                     <span name="attr_voie2nom"></span>
                     <div class="d-flex">
                       <input type="number" name="attr_v2br" title="@{v2br}" value="1">
@@ -5103,7 +5219,7 @@
                   </div>
                 </li>
                 <li>
-                  <div class="pc-configs">
+                  <div class="pc-configs first-rank">
                     <span name="attr_voie3nom"></span>
                     <div class="d-flex">
                       <input type="number" name="attr_v3br" title="@{v3br}" value="1">
@@ -5112,7 +5228,7 @@
                   </div>
                 </li>
                 <li>
-                  <div class="pc-configs">
+                  <div class="pc-configs first-rank">
                     <span name="attr_voie4nom"></span>
                     <div class="d-flex">
                       <input type="number" name="attr_v4br" title="@{v4br}" value="1">
@@ -5121,7 +5237,7 @@
                   </div>
                 </li>
                 <li>
-                  <div class="pc-configs">
+                  <div class="pc-configs first-rank">
                     <span name="attr_voie5nom"></span>
                     <div class="d-flex">
                       <input type="number" name="attr_v5br" title="@{v5br}" value="1">
@@ -5130,7 +5246,7 @@
                   </div>
                 </li>
                 <li>
-                  <div class="pc-configs">
+                  <div class="pc-configs first-rank">
                     <span name="attr_voie6nom"></span>
                     <div class="d-flex">
                       <input type="number" name="attr_v6br" title="@{v6br}" value="1">
@@ -5139,7 +5255,7 @@
                   </div>
                 </li>
                 <li>
-                  <div class="pc-configs">
+                  <div class="pc-configs first-rank">
                     <span name="attr_voie7nom"></span>
                     <div class="d-flex">
                       <input type="number" name="attr_v7br" title="@{v7br}" value="4">
@@ -5148,7 +5264,7 @@
                   </div>
                 </li>
                 <li>
-                  <div class="pc-configs">
+                  <div class="pc-configs first-rank">
                     <span name="attr_voie8nom"></span>
                     <div class="d-flex">
                       <input type="number" name="attr_v8br" title="@{v8br}" value="4">
@@ -5157,7 +5273,7 @@
                   </div>
                 </li>
                 <li>
-                  <div class="pc-configs">
+                  <div class="pc-configs first-rank">
                     <span name="attr_voie9nom"></span>
                     <div class="d-flex">
                       <input type="number" name="attr_v9br" title="@{v9br}" value="1">
@@ -5428,6 +5544,30 @@
               <li>
                 <details>
                   <summary>
+                    <strong>Version 1.10.0</strong> (2025-10-31)
+                  </summary>
+                  <ul>
+                    <li>Réinitialisation des capacités utilisées par combat / par jour en cas de récupération rapide ou complète</li>
+                    <li>Réinitialisation des PM maximum ec cas de récupération complète</li>
+                    <li>Ajout d'un sous-onglet pour les RD et Résistances aux DM sur la fiche de PJ</li>
+                    <li>Ajout d'une section dépliante pour les RD et Résistances aux DM sur la fiche de PNJ</li>
+                    <li>Ajout d'attributs vitesse pour les déplacements</li>
+                    <li>Prise en charge des valeurs de buffs qui changent à certains rangs dans une voie</li>
+                    <li>Prise en charge des manoeuvres spéciales dans les jets d'attaque</li>
+                    <li>Ajout de listes de tailles et de type de créatures sur la fiche de PNJ</li>
+                    <li>Ajout d'une option pour cibler un token lors d'un jet d'attaque</li>
+                    <li>Effacement de l'option tactique choisie après un jet d'attaque</li>
+                    <li>Ajout d'une macro <em>pc_actions-btn</em> pour une liste d'actions dans le chat</li>
+                    <li>Prise en charge des ressources consommables de type <em>soins</em></li>
+                    <li>Ajout d'un bouton <em>Consommable</em> à la liste des ressources</li>
+                    <li>Ajout du nombre d'utilisations par jour/combat aux capacités de PNJ</li>
+                  </ul>
+                </details>
+              </li>
+
+              <li>
+                <details>
+                  <summary>
                     <strong>Version 1.9.0</strong> (2025-09-28)
                   </summary>
                   <ul>
@@ -5658,12 +5798,12 @@
             <h4>
               <input type="hidden" name="attr_caract_select-btn" value="">
               <button type="action" class="hidden" name="act_caract_select-btn"/>
-              <button type="roll" class="flat-btn img-btn" name="roll_caractselect" value="@{caract_select-btn}">
+              <button type="roll" class="flat-btn img-btn" name="roll_caractselect" title="%{caract_select-btn} Choix d'une caractéristique" value="@{caract_select-btn}">
                 Caractéristiques
               </button>
               <input type="hidden" name="attr_caract_menu-btn" value="">
               <button type="action" class="hidden" name="act_caract_menu-btn"/>
-              <button type="roll" class="flat-btn img-btn" name="roll_caractmenu" value="@{caract_menu-btn}">
+              <button type="roll" class="flat-btn img-btn" name="roll_caractmenu" title="%{caract_menu-btn} Menu des caractéristiques" value="@{caract_menu-btn}">
                 <span class="img-btn">l</span>
               </button>
             </h4>
@@ -5765,6 +5905,13 @@
                 </div>
               </div>
 
+              <div class="npc-trait">
+                <div class="block-title">Vitesse</div>
+                <div class="bordered">
+                  <input type="number" name="attr_vitesse" title="@{vitesse} Déplacement" value="">&nbsp;m
+                </div>
+              </div>
+
             </div>
 
           
@@ -5821,7 +5968,18 @@
                   <span>RD</span>
                 </div>
                 <div class="bordered">
-                  <textarea name="attr_rd" class="one-row" title="@{rd}" value=""></textarea>
+                  <details>
+                    <summary>
+                      <input type="hidden" name="attr_rrdm">
+                      <span name="attr_rrdm"></span>
+                    </summary>
+                    <div class="d-flex m2">
+                      <textarea class="one-row" name="attr_rd" title="@{rd}" placeholder="Réductions DM..."></textarea>
+                    </div>
+                    <div class="d-flex m2">
+                      <textarea class="one-row" name="attr_resdm" title="@{resdm}" placeholder="Résistances aux DM..."></textarea>
+                    </div>
+                  </details>
                 </div>
               </div>
 
@@ -5833,7 +5991,7 @@
             <button type="action" class="flat-btn img-btn" name="act_description-btn">
               <h4 class="img-btn">Description</h4>
             </button>
-            <textarea name="attr_pnj_desc" class="large" title="@{pnj_desc}"></textarea>  
+            <textarea name="attr_pnj_desc" class="x-large" title="@{pnj_desc}"></textarea>  
           </div>
   
         </div>
@@ -5864,7 +6022,7 @@
               <h4>CRIT.</h4>
               <h4>DM</h4>
               <h4>PORTEE</h4>
-              <h4>SPECIAL</h4>
+              <!--<h4>SPECIAL</h4>-->
             </div>
   
             <input type="hidden" name="attr_pnjatk">
@@ -5879,7 +6037,7 @@
                   <button type="action" class="hidden" name="act_npcatk-btn">
                     <span class="d20-btn">t</span>
                   </button>
-                  <button type="roll" class="flat-btn" name="roll_npcatk" value="@{npcatk-btn}" />
+                  <button type="roll" class="flat-btn" name="roll_npcatk" title="%{repeating_npcarmes_ID_npcatk-btn}" value="@{npcatk-btn}" />
                 </div>
                 <div class="d-flex d-flex-middle bordered">
                   <input type="hidden" name="attr_arme-label" value="">
@@ -5888,11 +6046,12 @@
                   <input type="text" name="attr_arme-nom" title="@{arme-nom}" placeholder="Arme/attaque" value="">
                 </div>
                 <div class="d-flex d-flex-middle bordered">
+                  <span class="align-self-center">Att*&nbsp;:&nbsp;</span>
                   <input type="checkbox" name="attr_arme-multi" title="@{arme-multi} Attaques multiples" value="1">&nbsp;
-                  <select class="select-xs" name="attr_arme-roll" title="@{arme-roll} Type de jet">
-                    <option value="1d20" selected>No - Normal</option>
-                    <option value="2d20kh1">Db - Dé bonus</option>
-                    <option value="2d20kl1">Dm - Dé malus</option>
+                  <select class="select-md" name="attr_arme-roll" title="@{arme-roll} Type de jet">
+                    <option value="1d20" selected>Normal</option>
+                    <option value="2d20kh1">Dé bonus</option>
+                    <option value="2d20kl1">Dé malus</option>
                   </select>&nbsp;
                   <input type="number" class="two-digits" name="attr_arme-atk" title="@{arme-atk} Bonus d'attaque" value="">
                 </div>
@@ -5940,9 +6099,6 @@
                 </div>
                 <div class="d-flex d-flex-middle bordered">
                   <input type="text" name="attr_arme-portee" title="@{arme-portee}" value="">
-                </div>
-                <div class="d-flex d-flex-middle bordered">
-                  <textarea class="one-row" name="attr_arme-special" title="@{arme-special}" placeholder="Effet, capacités spéciales..."></textarea>
                   <button type="action" class="flat-btn img-btn float-right" name="act_armeopt-btn">
                     <span class="img-btn">y</span>
                   </button>
@@ -5952,6 +6108,12 @@
   
               <input type="hidden" class="cof-wopt-toggle" name="attr_armeopt" value="0"/>
               <div class="weapon-opt">
+                <div class="weapon-special">
+                  <div></div>
+                  <div class="bordered">
+                    <textarea class="one-row" name="attr_arme-special" title="@{arme-special}" placeholder="Effet, capacités spéciales..."></textarea>
+                  </div>
+                </div>
                 <div class="weapon-option">
                   <div></div>
                   <div class="bordered">
@@ -6014,7 +6176,7 @@
 
             <div class="sheet-col">
 
-              <h4>Attaque groupée</h4>
+              <h4>Attaque groupée (MJ)</h4>
 
               <div class="npc-tactic">
                 <div>
@@ -6147,6 +6309,7 @@
                   <span class="img-btn">l</span>
                 </button>
               </h4>
+              <h4>UTILISATIONS</h4>
               <h4>DESCRIPTION</h4>
             </div>
   
@@ -6157,16 +6320,29 @@
                 <div>
                   <input type="hidden" name="attr_npcroll-btn" value="">
                   <button type="action" class="hidden" name="act_npcroll-btn"/>
-                  <button type="roll" class="flat-btn img-btn" name="roll_npcroll" value="@{npcroll-btn}">
+                  <button type="roll" class="flat-btn img-btn" name="roll_npcroll" title="%{repeating_npcrolls_ID_npcroll-btn}" value="@{npcroll-btn}">
                     <span class="img-btn img-btn-lg">w</span>
                   </button>
                 </div>
   
-                <div class="bordered">
+                <div class="bordered d-flex">
                   <input type="text" name="attr_npcroll-name" title="@{npcroll-name}" placeholder="Nom de la capacité" value="">
                 </div>
+
+                <div class="bordered d-flex">
+                  <input type="number" name="attr_npcroll-uses" title="@{npcroll-uses} Nombre d'utilisations" value="">
+                  /
+                  <input type="number" name="attr_npcroll-max" title="@{npcroll-max} Nombre d'utilisations max"value="">
+                  &nbsp;
+                  <input type="text" list="npcroll-freqs" name="attr_npcroll-freq" title="@{npcroll-freq} Fréquence d'utilisation" placeholder="Par ..." value="">
+                  <datalist id="npcroll-freqs">
+                    <option value="combat"></option>
+                    <option value="jour"></option>
+                  </datalist>
+
+                </div>
   
-                <div class="bordered">
+                <div class="bordered d-flex">
                   <textarea class="one-row" name="attr_npcroll-desc" title="@{npcroll-desc}" placeholder="Description de la capacité"></textarea>
                 </div>
   
@@ -6345,6 +6521,11 @@
                 <span>Un seul jet d'attaque</span>
               </li>
               
+              <li class="config-check">
+                <input type="checkbox" name="attr_cfg_cible" value="1">
+                <span>Attaques ciblées</span>
+              </li>
+
             </ul>
 
             <h4>Règles optionnelles</h4>
@@ -7047,6 +7228,20 @@
     | <span class="sheet-rt sheet-rt-roll">{{broll}}</span>
     {{/broll}}
   </div>
+  {{#tohit}}
+  {{#^rollLess() roll tohit}}
+  <div class="sheet-rt sheet-rt-text sheet-rt-centered">
+    <span>Contre *{{target}}* :</span>
+    <span class="sheet-rt sheet-rt-hit">SUCCÈS !</span>
+  </div>
+  {{/^rollLess() roll tohit}}
+  {{#rollLess() roll tohit}}
+  <div class="sheet-rt sheet-rt-text sheet-rt-centered">
+    <span>Contre *{{target}}* :</span>
+    <span class="sheet-rt sheet-rt-miss">ÉCHEC !</span>
+  </div>
+  {{/rollLess() roll tohit}}
+  {{/tohit}}
   {{/roll}}
   {{#powder}}
     {{#rollWasFumble() roll}}
@@ -7150,6 +7345,11 @@
       {{/rollTotal() computed::brollf 1}}
     {{/broll}}
   {{/roll}}
+  {{#heal}}
+  <div class="sheet-rt sheet-rt-roll">
+    <span class="sheet-rt sheet-rt-roll">{{heal}} PV récupérés</span>
+  </div>
+  {{/heal}}
   {{#text}}
   <div class="sheet-rt sheet-rt-text">
     <span class="sheet-rt-{{textclass}}">{{text}}</span>
@@ -7199,7 +7399,7 @@
 
 /**
  * COF2e Sheet Worker
- * v1.8.0
+ * v1.10.0
  */
 
 const SWData = {
@@ -7222,7 +7422,40 @@ const SWData = {
       "cfg_atk_diff",
       "cfg_usure",
       "cfg_use_fear"
-    ]
+    ],
+    tokens: {
+      size: 70,
+      target: {
+        def: "[[@{target|def}]]",
+        name: "@{target|token_name}",
+      },
+      PC: {
+        bar1: "",
+        bar1_link: "pm",
+        bar2: "",
+        bar2_link: "def", 
+        bar3: "",
+        bar3_link: "pv",
+        bar4: "",
+        bar4_link: "vitesse_cases",
+      },
+      NPC: {
+        bar1: "",
+        bar1_link: "", 
+        bar2: "",
+        bar2_link: "def",
+        bar3: "@{pv}",
+        bar3_link: "",
+        bar4: "",
+        bar4_link: "vitesse_cases"
+      }
+    }
+  },
+  emojis: {
+    "atkcac":   "&#9876;&#65039;",  // crossed-swords
+    "atktir":   "&#127993;",        // bow and arrow
+    "atkmag":   "&#129668;",        // magic wand
+    "actions":  "&#128262;",        // bright
   },
   SHEET_TYPE: {
     PC: "pc",
@@ -7603,6 +7836,61 @@ const SWData = {
         "def_cond",
         "def_buff",
         "def_action"
+      ],
+      maneuvers: [
+        { 
+          name: "Distraire (CHA:{{cha}})",
+          mod: "{{cha}}",
+          effect: `La cible subit un malus de ‑10 à tous ses tests de PER et ‑5 en DEF pendant 1 round.
+          Elle est considérée comme surprise pour les attaques sournoises`
+        },
+        { 
+          name: "Gêner",
+          mod: "-",
+          effect: `Au choix, la cible est ralentie (une seule action M ou A) ou elle subit ‑5 en attaque pendant 1 round.`
+        },
+        { 
+          name: "Repousser",
+          mod: "-",
+          effect: `La cible recule de [FOR attaquant + 3] mètres et l’attaquant occupe le terrain libéré.
+          Si la cible est acculée (mur, précipice, adversaire), elle perd autant en DEF pour 1 round.
+          Cette action peut être précédée d’un déplacement de 10 m en direction de la cible.`
+        },
+        { 
+          name: "Bloquer",
+          mod: "-5",
+          effect: `La cible est immobilisée pendant 1 round (dé malus en attaque et pas de déplacement).
+          Contre une créature de NC inférieur au niveau de l’attaquant, ce dernier peut maintenir sa prise à chaque round qui suit en emportant un test opposé de FOR (action limitée, modifiée en cas de différence de taille).`
+        },
+        { 
+          name: "Désarmer",
+          mod: "-5",
+          effect: `La cible laisse tomber son arme au sol. 
+          Elle peut la ramasser avant tout le monde en sacrifiant son prochain tour (elle n’agira pas).`
+        },
+        { 
+          name: "Aveugler",
+          mod: "-5",
+          effect: `La cible est aveuglée pendant 1 round (‑5 en attaque au contact et en DEF, ‑10 contre une cible à distance).`
+        },
+        {
+          name: "Renverser",
+          mod: "-5",
+          effect: `La cible est renversée (‑5 en DEF et action d’attaque pour se relever). 
+          Cette action peut être précédée d’un déplacement de 10 m en direction de la cible.`
+        },
+        { 
+          name: "Renverser (quad.:-10)",
+          mod: "-10",
+          effect: `La cible est renversée (‑5 en DEF et action d’attaque pour se relever). 
+          Cette action peut être précédée d’un déplacement de 10 m en direction de la cible.`
+        },
+        { 
+          name: "Etourdir",
+          mod: "-10",
+          effect: `La cible est étourdie pendant 1 round (pas d’action et ‑5 en DEF). 
+          Si cette manoeuvre est réussie contre une cible surprise de NC inférieur au niveau de l’attaquant, elle doit réussir un test de CON difficulté 10 (15 si l’attaquant utilise une arme contondante) ou être assommée (inconsciente) pour 1d6 min.`
+        },
       ]
     },
     BUFFS: {
@@ -8625,6 +8913,88 @@ const SWData = {
 // =================
 
 /**
+ * Async/Await functions
+ * https://github.com/onyxring/orcsAsync/blob/master/orcsAsync.min.js
+ */
+function isRunningOnServer() { return self.dispatchEvent == undefined; }
+function setActiveCharacterId(charId){
+    var oldAcid=getActiveCharacterId();
+    var msg={"id":"0", "type":"setActiveCharacter", "data":charId};
+    
+    if(isRunningOnServer()==false){ //if in a browser, use "dispatchEvent" to process the message
+        var ev = new CustomEvent("message");
+        ev.data=msg; 
+        self.dispatchEvent(ev);
+    }else{ //otherwise, use the API (server) message processor, "onmessage"
+        self.onmessage({data:msg});
+    }
+    return oldAcid; //return what the value used to be, so calling code can be a little cleaner 
+} 
+var _sIn=setInterval;
+setInterval=function(callback, timeout){
+    var acid=getActiveCharacterId();
+    _sIn(
+        function(){
+            var prevAcid=setActiveCharacterId(acid);
+            callback();
+            setActiveCharacterId(prevAcid);
+        }
+    ,timeout);
+}
+var _sto=setTimeout
+setTimeout=function(callback, timeout){
+    var acid=getActiveCharacterId();
+    _sto(
+        function(){
+            var prevAcid=setActiveCharacterId(acid);
+            callback();
+            setActiveCharacterId(prevAcid);
+        }
+    ,timeout);
+}
+async function getAttrsAsync(props){
+    var acid=getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs 
+    var prevAcid=null;               //local variable defined here, because it needs to be shared across the promise callbacks defined below
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);  //in case the activeCharacterId has changed, restore it to what we were expecting and save the current value to restore later
+            try{
+                getAttrs(props,(values)=>{  resolve(values); }); 
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid); //restore activeCharcterId to what it was when the promise first ran
+    });
+}
+//use the same pattern for each of the following...
+async function setAttrsAsync(propObj, options){
+    var acid=getActiveCharacterId(); 
+    var prevAcid=null;               
+    return new Promise((resolve,reject)=>{
+            prevAcid=setActiveCharacterId(acid);  
+            try{
+                setAttrs(propObj,options,(values)=>{ resolve(values); });
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid); 
+    });
+}
+
+async function getSectionIDsAsync(sectionName){
+    var acid = getActiveCharacterId(); 
+    var prevAcid=null;               
+    return new Promise((resolve,reject)=>{
+            prevAcid = setActiveCharacterId(acid);  
+            try{
+                getSectionIDs(sectionName,(values)=>{ resolve(values); });
+            }
+            catch{ reject(); }
+    }).finally(()=>{
+        setActiveCharacterId(prevAcid); 
+    });
+}
+
+/**
 * Convert to integer
 * @param {string} value - value to cast
 * @param {number} onError - default value on error
@@ -9035,7 +9405,21 @@ function getSectionIDsOrdered(sectionName, callback) {
       callback(ids);
     });
   });
-};
+}
+
+/**
+ * Return ordered array of row ids for a repeating section
+ * @param {string} sectionName - repeating section name (repeating_ prefix optional)
+ * @returns string[]
+ */
+async function getSectionIDsOrderedAsync(sectionName) {
+  if (!sectionName.startsWith("repeating_"))
+    sectionName = "repeating_" + sectionName;
+  const values = await getAttrsAsync([`_reporder_${sectionName}`]);
+  const idArray = await getSectionIDsAsync(sectionName);
+  const reporderArray = values[`_reporder_${sectionName}`] ? values[`_reporder_${sectionName}`].toLowerCase().split(',') : [];
+  return [...new Set(reporderArray.filter(x => idArray.includes(x)).concat(idArray))];
+}
 
 class Repeating {
 
@@ -9093,17 +9477,18 @@ class Repeating {
 
 /**
  * @typedef MsgOptions
- * @property {string} title - Title of the message
- * @property {string} template - Name of roll template
- * @property {string} whisper - Target for whispered message 
- * @property {number} rollTN - Target number for special roll effect
- * @property {boolean} critical - Use critical effect
- * @property {integer} crit - Critical value threshold
- * @property {boolean} fumble - Use fumble effect
- * @property {object} usure - Has usure effects
- * @property {string} usure.attackId - Row id of repeating attack item
- * @property {string} usure.name - Weapon name
- * @property {integer} usure.value - Current usure value
+ * @property {string}   title           - Title of the message
+ * @property {string}   template        - Name of roll template
+ * @property {string}   whisper         - Target for whispered message 
+ * @property {number}   rollTN          - Target number for special roll effect
+ * @property {boolean}  critical        - Use critical effect
+ * @property {integer}  crit            - Critical value threshold
+ * @property {boolean}  fumble          - Use fumble effect
+ * @property {object}   usure           - Has usure effects
+ * @property {string}   usure.attackId  - Row id of repeating attack item
+ * @property {string}   usure.name      - Weapon name
+ * @property {integer}  usure.value     - Current usure value
+ * @property {string}   nextRoll        - Next chat roll command
  */
 
 /**
@@ -9143,7 +9528,7 @@ function diceRoll(roll) {
   } else {
     max = roll.dice[0];
   }
-  if (roll.expression.includes("2d20kl1"))
+  if (roll.expression && roll.expression.includes("2d20kl1"))
     return min;
   return max;
 }
@@ -9154,7 +9539,8 @@ function diceRoll(roll) {
  */
 function sendChatCmd(chatCmd) {
   startRoll(chatCmd, roll => {
-    console.log(chatCmd)
+    if (chatCmd.startsWith("!"))
+      console.log(chatCmd)
     finishRoll(roll.rollId);
   });
 }
@@ -9183,6 +9569,13 @@ function sendChatMsg(msg, options) {
       updates.set("last_rolls", last_rolls);
 
     const computed = {};
+
+    if (roll.results.roll) {
+      const rx = "\\[(" + SWData.PC.COMBAT.maneuvers.map(mn => mn.name.split(" ")[0]).join("|") + ")\\]\\)";
+      const match = roll.results.roll.expression.match(rx);
+      if (match)
+        updates.set("last_maneuver", `${ cleanText(match[1]) }~${roll.rollId}`); // make it unique
+    }
 
     // check TN
     const rollTN = intval(options.rollTN);
@@ -9235,6 +9628,10 @@ function sendChatMsg(msg, options) {
           updates.set("usure_check", JSON.stringify({ attack: attackId, name, usure, roll: roll.results.usure.result }));
       }
     }
+
+    // additional chat roll
+    if (strval(options.nextRoll) !== "")
+      updates.set("next_roll", `${ options.nextRoll }~${ roll.rollId }`);
 
     if (updates.size > 0)
       setAttrs(Object.fromEntries(updates));
@@ -9329,22 +9726,68 @@ function addValues(values) {
 }
 
 /**
+ * Return die expression with cf/cs options
+ * @param {string} dice - Die roll
+ * @param {{ cf: number, cs: number }} options - Critical failure/success target numbers
+ * @returns {string}
+ */
+function rollCfCs(dice, options = {}) {
+  const { cf, cs } = { cf: 1, cs: 20, ...options };
+  return dice + `cf${cf}cs${cs}`;
+}
+
+/**
  * Return the die roll formula for type
  * @param {string} type - Type of d20 roll
  * @param {number} [weakened=0] - Has weakened condition
+ * @param {{cf: number, cs: number }} [cfcs={}] - Critical failure/success target numbers
  * @returns - {string}
  */
-function dieRoll(type, weakened = 0) {
+function dieRoll(type, weakened = 0, cfcs = {}) {
   let roll = "";
-  switch (type) {
+  switch (strval(type)) {
     case "S":
-      roll = (weakened === 1) ? "1d20" : "2d20kh1";
+      roll = (weakened === 1) ? rollCfCs("1d20", cfcs) : rollCfCs("2d20kh1", cfcs);
       break;
     case "H":
-      roll = (weakened === 1) ? "2d20kh1" : "{2d20kh1, 0d20+10}kh1";
+      roll = (weakened === 1) ? rollCfCs("2d20kh1", cfcs) : "{" + rollCfCs("2d20kh1", cfcs) + ", 0d0 + 10}kh1";
       break;
     default:
-      roll = (weakened === 1) ? "2d20kl1" : "1d20";
+      roll = (weakened === 1) ? rollCfCs("2d20kl1", cfcs) : rollCfCs("1d20", cfcs);
+      break;
+  }
+  return roll;
+}
+
+/**
+ * Return the actual d20 roll
+ * @param {string} base - Base d20 roll
+ * @param {string} d20Roll - Type of roll selected
+ * @param {{cf: number, cs: number }} [cfcs={}] - Critical failure/success target numbers
+ * @returns {string}
+ */
+function d20Roll(base, d20Roll, cfcs = {}) {
+  let roll = base;
+  switch (roll) {
+    case "1d20":
+    case rollCfCs("1d20"):
+      if (d20Roll !== "1d20")
+        return rollCfCs(d20Roll, cfcs);
+      break;
+    case "2d20kh1":
+    case rollCfCs("2d20kh1"):
+      if (d20Roll === "2d20kl1")
+        return rollCfCs("1d20", cfcs);
+      break;
+    case "2d20kl1":
+    case rollCfCs("2d20kl1"):
+      if (d20Roll === "2d20kh1")
+        return rollCfCs("1d20", cfcs);
+      break;
+    case "{2d20kh1, 0d0 + 10}kh1":
+    case "{" + rollCfCs("2d20kh1") +", 0d0 + 10}kh1":
+      if (d20Roll === "2d20kl1")
+        return rollCfCs("2d20kh1", cfcs);
       break;
   }
   return roll;
@@ -9808,7 +10251,8 @@ function replaceDevol(expr) {
 on("change:sheet_type", function() {
   getAttrs([ "sheet_type" ], function(value) {
     const sheet_type = strval(value.sheet_type);
-    if (!sheet_type) return;
+    if (!sheet_type) 
+      return;
 
     Object.values(SWData.SHEET_TYPE).forEach(type => {
       if (type === sheet_type) {
@@ -9818,6 +10262,25 @@ on("change:sheet_type", function() {
       }
     })
 
+  });
+});
+
+/**
+ * Change d20 roll
+ */
+[ "1d", "db", "dm" ].forEach(button => {
+  on(`clicked:d20roll_${button}-btn`, function() {
+    const d20roll = ({ "1d": "1d20", db: "2d20kh1", dm: "2d20kl1" })[button];
+    setAttrs({ d20roll });
+  });
+});
+
+on("change:cfg_d20roll", function() {
+  getAttrs([ "cfg_d20roll" ], function(values) {
+    const d20roll = intval(values.cfg_d20roll) === 2
+    ? "?{Jet ?|Normal,1d20|Dé bonus,2d20kh1|Dé malus,2d20kl1}"
+    : "1d20";
+    setAttrs({ d20roll });
   });
 });
 
@@ -9838,7 +10301,7 @@ on("change:sheet_type", function() {
 /**
  * Change subtabs
  */
-[ "attacks", "otact", "hands" ].forEach(button => {
+[ "attacks", "otact", "hands", "resdm" ].forEach(button => {
   on(`clicked:pc_${button}-btn`, function() {
     setAttrs({ pc_subtab1: button });
   });
@@ -10536,7 +10999,8 @@ SWData.PC.STATS.forEach(stat => {
       ...fearConditionsAttrs(),
       ...luckButtonAttrs(),
       ...defGearAttrs, 
-      "def_action",,
+      "def_action",
+      "d20roll",
       "allcaracs_desc", "allcaracs_buff"
     ], function(values) {
       // Play FX !
@@ -10553,7 +11017,8 @@ SWData.PC.STATS.forEach(stat => {
       const shadow = shadowValue(values);
       
       // Roll ability
-      const [ roll, mod, test ] = Object.keys(values);
+      const [ kroll, mod, test ] = Object.keys(values);
+      const roll = d20Roll(strval(values[kroll]), strval(values.d20roll));
       const isNPC = strval(values.sheet_type) === SWData.SHEET_TYPE.NPC;
       const statMod = ` *(${ displayMod(values[isNPC ? mod : test]) })*`;
       const armure_eqp = intval(values.armure_eqp);
@@ -10566,7 +11031,7 @@ SWData.PC.STATS.forEach(stat => {
       const defAction = intval(values.def_action);
       const text = defAction !== 0 ? `+ [[${defAction}]] Défense ${ defAction === 5 ? "totale" : "partielle" }` : "";
       const allRolls = allRollsBuff(values, "caracs");
-      const carac = `[[@{${roll}}[Dé] + @{${short}${ isNPC ? "" : "_test" }}[Bonus ${short.toUpperCase()}]${allRolls}${shadow.malus}${fear}${armor_malus}${shield_malus}${helmet_malus} ]] `;
+      const carac = `[[${roll}[Dé] + @{${short}${ isNPC ? "" : "_test" }}[Bonus ${short.toUpperCase()}]${allRolls}${shadow.malus}${fear}${armor_malus}${shield_malus}${helmet_malus} ]] `;
       const chatMsg = rollTemplate({
         lsub: "Test",
         rsub: capitalize(stat) + statMod,
@@ -10629,33 +11094,73 @@ SWData.PC.COMBAT.attacks.forEach(attk => {
   on(`clicked:${attack}-btn`, function () {
     getAttrs([
       attack,
-      "cfg_1attack_roll", "cfg_shadow", "pc",
+      "cfg_1attack_roll", "cfg_cible",
+      "cfg_d20roll", "d20roll",
+      "cfg_shadow", "pc",
       "condition_affaibli", "condition_immobilise",
-      ...luckButtonAttrs()
+      ...luckButtonAttrs(),
+      "manoeuvre", "cha"
       ], function (values) {
       const atkBonus = `${ displayMod(values[attack]) }`;
-      const useOneRoll = boolval(values.cfg_1attack_roll);
+      const useOneRoll = intval(values.cfg_d20roll) === 0
+      ? boolval(values.cfg_1attack_roll)
+      : true;
       const weakened = intval(values.condition_affaibli);
       const restrained = intval(values.condition_immobilise);
-      const hasMalusDie = (weakened === 1) || (restrained === 1);
-      const roll = hasMalusDie ? "2d20kl1" : "1d20";
+      const withMalusDie = (weakened === 1) || (restrained === 1);
+      let roll = withMalusDie ? rollCfCs("2d20kl1") : rollCfCs("1d20");
+      roll = d20Roll(roll, strval(values.d20roll));
       const tags = [];
       let shadow = shadowValue(values);
       if (shadow.value > 0)
         tags.push(shadow.tag);
-      const atkRoll = `[[${roll}cs20cf1[Dé] + @{${attack}}[Bonus]${shadow.malus} ]]`;
+      const maneuvers = (boolval(values.manoeuvre) && [ "atkcac", "atktir" ].includes(attack)) 
+      ? maneuversRollQuery(intval(values.cha)) 
+      : "";
+      const atkRoll = `[[${roll}[Dé] + @{${attack}}[Bonus]${shadow.malus}${maneuvers} ]]`;
       const atkProps = {
         lsub: "Attaque",
         rsub: `${description} *(${atkBonus})*`,
         roll: atkRoll,
         broll: "",
-        chance: addLuckButton(values)
+        chance: addLuckButton(values),
+        tohit: "",
+        target: ""
       };
+      
       if (roll === "1d20" && !useOneRoll)
         atkProps.broll = atkRoll;
+      
+      if (boolval(values.cfg_cible)) {
+        atkProps.tohit = SWData.settings.tokens.target.def;
+        atkProps.target = SWData.settings.tokens.target.name;
+      }
+      
       const chatMsg = rollTemplate(atkProps, { tags });
       sendChatMsg(chatMsg);
     });
+  });
+});
+
+/** 
+ * Enable / Disable attack maneuvers
+ */
+on("clicked:maneuver-btn", function() {
+  getAttrs([ "manoeuvre" ], function (values) {
+    const manoeuvre = 1 - intval(values.manoeuvre);
+    setAttrs({ manoeuvre });
+  });
+});
+
+/**
+ * On speed/m change, compute feet & square speed
+ */
+on("change:vitesse", function () {
+  getAttrs([ "vitesse" ], function(values) {
+    const vitesse = numval(values.vitesse);
+    const vitesse_cases = Math.ceil(vitesse / 1.5);
+    const vitesse_pas = vitesse_cases * 5;
+    setAttrs({ vitesse_pas, vitesse_cases });
   });
 });
 
@@ -10843,14 +11348,18 @@ on("clicked:drecup-btn", function() {
     "drecup",
     "niveau",
     "vol",
-    "pv",               
-    "pv_max",
+    "pv", "pv_max",
+    "pm", "pm_max",
     "cfg_highfan",
     "cfg_use_drniv",
     "cfg_use_dronly",
     "last_rolls",
   ];
-  getAttrs(recupAttrs, function(values) {
+  const owned = allPathRanks("rankOwned");
+  const abilities = allPathRanks("rankName");
+  const uses = allPathRanks("rankUseMax");
+  const freqs = allPathRanks("rankUseFreq");
+  getAttrs([ ...recupAttrs, ...owned, ...abilities, ...uses, ...freqs ], function(values) {
     const lsub = "Jet";
     let rsub = "Récupération";
     const highFan = boolval(values.cfg_highfan);
@@ -10882,6 +11391,23 @@ on("clicked:drecup-btn", function() {
       return;
     }
 
+    const pm = intval(values.pm);
+    const pmMax = intval(values.pm_max);
+
+    const combat = [];
+    const daily = [];
+    freqs.filter(attr => strval(values[attr]) !== "").forEach(attr => {
+      const vr = attr.split("_")[0];
+      if (!boolval(values[abilityInfo(vr).rankOwned]))
+        return;
+      const name = strval(values[abilityInfo(vr).rankName]);
+      const uses = numval(values[abilityInfo(vr).rankUseMax]);
+      if ([ "combat", "rencontre" ].includes(cleanText(values[attr])))
+        combat.push({ reset: abilityInfo(vr).rankUse, name, uses });
+      if ([ "jour", "journee", "repos long" ].includes(cleanText(values[attr])))
+        daily.push({ reset: abilityInfo(vr).rankUse, name, uses });
+    });
+
     const recups = [ "Rapide", "Complète" ];
     if (effort !== "")
       recups.push(effort);
@@ -10897,20 +11423,30 @@ on("clicked:drecup-btn", function() {
       if (!drOnly) {
         bLevel = addLevel ? level : Math.ceil(level / 2);
         bRecup = `+ ${bLevel}[Niveau${ addLevel ? "" : "/2" }] `;
-      }
+      }  
+      let text = `${dr} DR restants`;
+      if (typeRecup === 2 && pmMax > 0)
+        text = `${ pmMax - pm } PM récupérés, ` + text;
       let recup;
+      let resetAbilities;
       if (typeRecup === 3) {
         rsub = effort;
         recup = `[[${rolls[0]} + 1d10 + @{vol}[VOL] ]]`;
       } else {
         rsub += " *" + (typeRecup === 1 ? "Rapide" : "Complète") + "*"
         recup = `[[${dRecup}[DR] ${bRecup}]] PV récupérés`;
+        if (typeRecup === 1)
+          resetAbilities = combat;
+        else
+          resetAbilities = combat.concat(daily);
+        if (resetAbilities.length > 0)
+          text += "\n" + resetAbilities.map(a => `${a.name} : ${a.uses} ${ a.uses <= 1 ? "utilisation" : "utilisations" }`).join("\n");
       }
       let chatMsg = {
         lsub,
         rsub,
         roll: recup,
-        text: `${dr} DR restants`
+        text
       };
       if (typeRecup === 3 && rolls.length > 1)
         chatMsg = { ...chatMsg, broll: `[[${rolls[1]} + 1d10 + @{vol}[VOL] ]]` };
@@ -10921,7 +11457,11 @@ on("clicked:drecup-btn", function() {
         if (typeRecup !== 3) {
           pv += roll.results.roll.result;
           updates.set("pv", Math.min(pv, pvMax));
+          updates.set("PVIG", Math.min(pv, pvMax));
         }
+        if (typeRecup === 2 && pmMax > 0)
+          updates.set("pm", pmMax);
+        resetAbilities.forEach(ability => updates.set(ability.reset, 0));
         setAttrs(Object.fromEntries(updates));
       });
     });
@@ -10970,7 +11510,7 @@ function updateDef(eventInfo) {
  */
 function updateEquiped(attribute) {
   processAllGear([ "on", "nom", "props" ], function(gearIds, allGears) {
-    const section = "repeating_equipement";
+    const section = "equipement";
     const defense = attribute.replace("_eqp", "");
     getAttrs([ attribute, defense, ...allGears ], function(values) {
       const equiped = intval(values[attribute]);
@@ -10990,7 +11530,7 @@ function updateEquiped(attribute) {
 
       // un-equip all armor | shields
       gears.keys().forEach(id => {
-        updates.set(`${section}_${id}_equip-on`, 0);
+        updates.set(rptAttr(section, "equip-on", id), 0);
       });
 
       // equip armor | shield | helmet with def bonus
@@ -11002,7 +11542,7 @@ function updateEquiped(attribute) {
             equipId = id;
         });
         if (equipId !== "")
-          updates.set(`${section}_${equipId}_equip-on`, 1);
+          updates.set(rptAttr(section, "equip-on", equipId), 1);
       }
 
       if (updates.size > 0)
@@ -11278,7 +11818,9 @@ function insertRolls(text, options = {}) {
     return "";
   
   const { pathNames = [], isNPC = false, companionOf = "" } = options;
-  const devol = `@{${ isNPC ? companionOf + "|" : "" }devol}`;
+  if (isNPC && companionOf !== "")
+    companionOf += "|";
+  const devol = `@{${ isNPC ? companionOf : "" }devol}`;
   
   // Search for " [#d4° + XXX] " or " [#dE + XXX] "
   matchRegExp(text, /([ ]*)\[([1-9])d(4°|E)[ ]*\+[ ]*(AGI|CON|FOR|PER|CHA|INT|VOL|rang voie [1-9])\]([ ]*)/gm).forEach(result => {
@@ -11307,8 +11849,12 @@ function insertRolls(text, options = {}) {
   });
 
   // Search for " [XXX] "
-  matchRegExp(text, /([ ]+)\[(AGI|CON|FOR|PER|CHA|INT|VOL)\]([ ]+)/gm).forEach(result => {
+  matchRegExp(text, /([ ]+)\[(AGI|CON|FOR|PER|CHA|INT|VOL|NIV|NIVEAU|NC|NOM)\]([ ]+)/gm).forEach(result => {
     let [ matched, sb, ability, sa ] = result;
+    if (ability === "NIV")
+      ability = "niveau";
+    if (ability === "NOM")
+      ability = "character_name";
     const replace = `${sb}[[@{${ability.toLowerCase()}}]]${sa}`;
     text = text.replace(matched, replace);
   });
@@ -11316,7 +11862,7 @@ function insertRolls(text, options = {}) {
   // Search for "... #d# +/- X..."
   matchRegExp(text, /([0-9]+[dD][0-9]+)([ ]*[\+\-]*[ ]*[0-9]*)?/gm).forEach(result => {
     const [ matched, dice, mod ] = result;
-    const replace = `[[${dice}${ mod.trim() || "" }]] `;
+    const replace = `[[${dice}${ strval(mod).trim() }]] `;
     text = text.replace(matched, replace);
   });
   
@@ -11332,15 +11878,15 @@ on("change:repeating_armes:arme-nom clicked:renum_atk-btn", function(eventInfo) 
   if (!renumber)
     atkId = strval(eventInfo.triggerName.split("_")[2]);
   getSectionIDsOrdered("repeating_armes", function (rowIds) {
-    const labels = rowIds.map(id => `repeating_armes_${id}_arme-label`);
+    const labels = rowIds.map(id => rptAttr("armes", "arme-label", id));
     getAttrs([ "character_name", "max_attack_label", "scriptVersion", ...labels ], function (values) {
       const updates = new Map();
 
       if (!renumber) {
         // display attack options row if script detected
-        updates.set("repeating_armes_armeopt", hasMODScript(values) ? 1 : 0);
+        updates.set(rptAttr("armes", "armeopt"), hasMODScript(values) ? 1 : 0);
         // update roll button linked attribute
-        const atkBtn = `repeating_armes_${atkId}_attack-btn`;
+        const atkBtn = rptAttr("armes", "attack-btn", atkId);
         updates.set(atkBtn, `%{${ strval(values.character_name) }|${atkBtn}}`);
       }
       
@@ -11365,9 +11911,10 @@ on("change:repeating_armes:arme-nom clicked:renum_atk-btn", function(eventInfo) 
  */
 on("clicked:repeating_armes:armeopt-btn clicked:repeating_npcarmes:armeopt-btn", function(eventInfo) {
   const { section } = rptInfo(eventInfo.triggerName);
-  getAttrs([`repeating_${section}_armeopt`], function(values) {
-    const option = 1 - intval(values[`repeating_${section}_armeopt`]);
-    setAttrs({ [`repeating_${section}_armeopt`]: option });
+  const toggle = rptAttr(section, "armeopt");
+  getAttrs([ toggle ], function(values) {
+    const option = 1 - intval(values[toggle]);
+    setAttrs({ [toggle]: option });
   });
 });
 
@@ -11422,10 +11969,9 @@ function isThrown(type) {
  * @returns {boolean}
  */
 function useCriticalHit(values, npc = "") {
-  const section = `repeating_${npc}armes_arme-`;
   const useCritTable = boolval(values.cfg_tbl_crit);
-  const attack = (npc === "npc") ? "atkcac" : strval(values[section + "atk"]);
-  const dmType = strval(values[section + "dmtype"]);
+  const attack = (npc === "npc") ? "atkcac" : strval(values[rptAttr(`${npc}armes`, "arme-atk")]);
+  const dmType = strval(values[rptAttr(`${npc}armes`, "arme-dmtype")]);
   return useCritTable && isCombat(attack) && (SWData.ATTACKS.CS[dmType]);
 }
 
@@ -11436,7 +11982,7 @@ function useCriticalHit(values, npc = "") {
  * @returns {string}
  */
 function criticalHit(values, npc = "") {
-  const dmType = strval(values[`repeating_${npc}armes_arme-dmtype`]);
+  const dmType = strval(values[rptAttr(`${npc}armes`, "arme-dmtype")]);
   const critDie = strval(values.cfg_tbl_critdie, "20");
   const roll = critDie === "20b" ? Math.max(getRandom(20), getRandom(20)) : getRandom(numval(critDie));
   const effect = SWData.ATTACKS.CS[dmType][roll - 1];
@@ -11452,7 +11998,7 @@ function criticalHit(values, npc = "") {
  */
 function useFumbleTable(values, npc = "") {
   const useFumbleTable = boolval(values.cfg_tbl_fumble);
-  const attack = (npc === "npc") ? "atkcac" : strval(values["repeating_armes_arme-atk"]);
+  const attack = (npc === "npc") ? "atkcac" : strval(values[rptAttr("armes", "arme-atk")]);
   return useFumbleTable && isCombat(attack);
 }
 
@@ -11479,6 +12025,22 @@ function rangeWithUnits(portee, extra = 0) {
 }
 
 /**
+ * Return the roll query for maneuvers
+ * @param {number} cha - CHA stat value
+ * @returns {string}
+ */
+function maneuversRollQuery(cha) {
+  const maneuvers = SWData.PC.COMBAT.maneuvers.map(mn => {
+    const [ title ] = mn.name.split(" ");
+    mn.name = mn.name.replace("{{cha}}", cha);
+    mn.name += mn.name.includes("(") ? "" : " (" + mn.mod + ")";
+    mn.mod = mn.mod.replace("{{cha}}", cha);
+    return `${mn.name},[[${ mn.mod === "-" ? "0" : mn.mod }]][${title}]`;
+  }).join("|");
+  return " +(?{Manoeuvre ?|Aucune,0|" + maneuvers + "})";
+}
+
+/**
  * Roll an attack in chat
  */
 on("clicked:repeating_armes:attack-btn", function(eventInfo) {
@@ -11486,21 +12048,10 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
   const section = "repeating_armes_arme-"
   const thrown = "repeating_armes_jet-"
   const attackAttrs = [
-    "nom",
-    "atk",
-    "atkdiv",
-    "crit",
-    "2m",
-    "dm",
-    "dmtype",
-    "bonus",
-    "dmdiv",
-    "portee",
-    "special",
-    "atktype",
-    "atkmods",
-    "options",
-    "usure"
+    "nom", "atk", "atkdiv", "crit", "2m",
+    "dm", "dmtype", "bonus", "dmdiv",
+    "portee", "special",
+    "atktype", "atkmods", "options", "usure"
   ];
   const sitModAttrs = [
     "couvert",
@@ -11511,12 +12062,13 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
   getAttrs([
     "scriptVersion",
     "character_name",
-    "cfg_1attack_roll",
+    "cfg_1attack_roll", "cfg_cible",
+    "cfg_d20roll", "d20roll",
     "cfg_crit_diff", "cfg_tbl_crit", "cfg_tbl_fumble",
     "cfg_use_ammo", "cfg_usure",
     "cfg_lowfan", "cfg_shadow", "pc",
     "atkcac", "atktir", "atkmag",
-    "agi_dsup", "per_dsup",
+    "agi_dsup", "per_dsup", "cha",
     "bouclier_eqp",
     "condition_affaibli", "condition_immobilise",
     ...fearConditionsAttrs(),
@@ -11525,13 +12077,16 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
     "en_selle",
     ...luckButtonAttrs(),
     ...sitModAttrs.map(a => `modsit_${a}`),
-    ...attackAttrs.map(a => `${section}${a}`),
-    ...[ "resid", "nbre" ].map(a => `${thrown}${a}`),
+    ...attackAttrs.map(a => rptAttr("armes", `arme-${a}`)),
+    ...[ "resid", "nbre" ].map(a => rptAttr("armes", `jet-${a}`)),
     "dm_buff_list", "allattacks_buff", "allattacks_desc"
   ], function (values) {
     
     // general options
-    const useOneRoll = boolval(values.cfg_1attack_roll);
+    //const useOneRoll = boolval(values.cfg_1attack_roll);
+    const useOneRoll = intval(values.cfg_d20roll) === 0
+    ? boolval(values.cfg_1attack_roll)
+    : true;
     const useCritDiff = intval(values.cfg_crit_diff);
     const useAmmo = boolval(values.cfg_use_ammo);
     const useWear = boolval(values.cfg_usure);
@@ -11669,7 +12224,9 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
     let bRoll = !withMalusDie;
     if (isRanged(atk, portee) && modContact === 1)
       roll = "2d20kl1";
-    if (modifiers.includes("debonus") && !modifiers.includes("demalus")) {
+    const hasBonusDie = modifiers.includes("debonus");
+    const hasMalusDie = modifiers.includes("demalus");
+    if (hasBonusDie && !hasMalusDie) {
       switch(roll) {
         case "2d20kl1":
           roll = "1d20";
@@ -11680,7 +12237,7 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
           break;
       }
     }
-    if (modifiers.includes("demalus") && !modifiers.includes("debonus")) {
+    if (hasMalusDie && !hasBonusDie) {
       switch(roll) {
         case "1d20":
           roll = "2d20kl1";
@@ -11691,6 +12248,7 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
           break;
       }
     }
+
     if (bRoll && useOneRoll)
       bRoll = false;
     
@@ -11708,10 +12266,17 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
     // Valeur d'Ombre
     const shadow = shadowValue(values);
 
+    // Manoeuvres
+    const maneuvers = modifiers.includes("manoeuvres") ? maneuversRollQuery(intval(values.cha)) : "";
+
     // Attack roll
     let attack = "";
+    if (!hasMalusDie && !hasBonusDie)
+      roll = d20Roll(roll, strval(values.d20roll), { cf: fumble, cs: `>${crit}` });
+    else
+      roll = rollCfCs(roll, { cf: fumble, cs: `>${crit}` });
     if (atk !== "0")
-      attack = `[[${roll}cs>${crit}cf${fumble}[Dé] + @{${atk}}[Bonus]${magicHit}${fear}${shadow.malus} + ${atkdiv}[Divers]${allAtkBuffs}${tacticBonus}${modSit} ]]`;
+      attack = `[[${roll}[Dés] + @{${atk}}[Bonus]${magicHit}${fear}${shadow.malus} + ${atkdiv}[Divers]${allAtkBuffs}${tacticBonus}${modSit}${maneuvers} ]]`;
     
     // Damage roll
     let [ dm, ...dmextra ] = strval(values[section + "dm"]).split(" ");
@@ -11774,7 +12339,17 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
       buffDM = replaceDevol(buffDM);
       if (buffName.charAt(0) === "?") {
         buffName = buffName.slice(1).trim();
-        buffDM = `?{${buffName}|Non,0|Oui,${buffDM}}`;
+        const delim = "&";
+        let moreDM = buffDM;
+        buffDM = buffDM.split(delim)[0];
+        let buffMore = "";
+        while (moreDM.includes(delim)) {
+          const [ dm, ...dms ] = moreDM.split(delim).slice(1);
+          const [ label, value ] = dm.split("=").map(v => v.trim());
+          buffMore += `|${label},${value}`;
+          moreDM = [ ...dms ].join(delim);
+        }
+        buffDM = `?{${buffName} (DM)|Non,0|Oui,${buffDM}${buffMore}}`;
       }
       const matched = buffDM.match(/\[(.+)\]/);
       if (matched) {
@@ -11887,7 +12462,9 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
       crithit: "",
       critfail: "",
       fumbletest: "",
-      fumble: ""
+      fumble: "",
+      tohit: "",
+      target: ""
     };
 
     if (roll === "1d20" && bRoll)
@@ -11903,14 +12480,14 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
       }
     }
 
-    if(rollOptions.critical) {
+    if (rollOptions.critical) {
       atkProps.critsuccess = "[[0]]";
       atkProps.crithit = critHit;
       if (atkProps.broll !== "")
         atkProps.bcritsuccess = "[[0]]";
     }
 
-    if(rollOptions.fumble) {
+    if (rollOptions.fumble) {
       atkProps.critfail = "[[0]]";
       const stat = isRanged(atk, portee) ? "per" : "agi";
       const stat_dsup = `@{${stat}_dsup}`;
@@ -11919,16 +12496,24 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
       atkProps.fumble = fumbleEffect;
     }
 
+    if (boolval(values.cfg_cible)) {
+      atkProps.tohit = SWData.settings.tokens.target.def;
+      atkProps.target = SWData.settings.tokens.target.name;
+    }
+
     const chatMsg = rollTemplate(atkProps, { tags: allTags });
     sendChatMsg(chatMsg, rollOptions);
     
+    if (tactics > 0)
+      setAttrs({ tactique: "0" });
+
     if (useAmmo && resourceId !== "") {
       const resVal = rptAttr("ressources", "res-val", resourceId);
       getAttrs([ resVal ], function(values) {
         const munitions = Math.max(0, intval(values[resVal]) - resourceNbr);
         setAttrs({ [resVal]: munitions });
       });
-    }    
+    }
   });
 });
 
@@ -11947,7 +12532,7 @@ on("change:usure_check", function() {
       let { attack, name, usure, roll } = objval(check);
       if (attack !== "") {
         usure = Math.max(0, usure - 1);
-        updates.set(`repeating_armes_${attack}_arme-usure`, usure);
+        updates.set(rptAttr("armes", "arme-usure", attack), usure);
         if (roll > usure) {
           sendChatMsg(rollTemplate({
             lsub: "Usure",
@@ -11968,13 +12553,30 @@ on("change:usure_check", function() {
 });
 
 /**
+ * Display effects of last maneuver used
+ */
+on("change:last_maneuver", function () {
+  getAttrs([ "last_maneuver" ], function(values) {
+    const [ maneuver ] = strval(values.last_maneuver).split("~");
+    const found = SWData.PC.COMBAT.maneuvers.find(mn => maneuver === cleanText(mn.name.split(" ")[0]));
+    if (found) {
+      sendChatMsg(rollTemplate({
+        lsub: "Manoeuvre",
+        rsub: found.name.split(" ")[0],
+        text: found.effect,
+      }), { whisper: "gm" });
+    }
+  });
+});
+
+/**
  * Return the fully qualified name of attack attribute for gear id, if any
  * @param {string} data - in hand data (main_princ | main_autre value)
  * @returns {string}
  */
 function getWeaponGearAttr(data) {
   const [ label, weaponId ] = strval(data).split("~");
-  return intval(label) > 0 ? `repeating_armes_${weaponId}_arme-gearid` : "";
+  return intval(label) > 0 ? rptAttr("armes", "arme-gearid", weaponId) : "";
 }
 
 /**
@@ -12006,17 +12608,17 @@ on("change:main_princ change:main_autre", function(eventInfo) {
     const hasShield = boolval(values.bouclier_eqp);
     
     const updates = new Map();
-
+    
     if (offWeaponGear !== "") {
       const equipId = strval(values[offWeaponGear]);
       if (equipId !== "")
-        updates.set(`repeating_equipement_${equipId}_equip-on`, 0);
+        updates.set(rptAttr("equipement", "equip-on", equipId), 0);
     }
     
     if (onWeaponGear !== "") {
       const equipId = strval(values[onWeaponGear]);
       if (equipId !== "")
-        updates.set(`repeating_equipement_${equipId}_equip-on`, 1);
+        updates.set(rptAttr("equipement", "equip-on", equipId), 1);
     }
 
     const [ rowId, twoHands ] = inHand.split("~").splice(1);
@@ -12051,7 +12653,7 @@ on("clicked:main_princ-btn clicked:main_autre-btn", function (eventInfo) {
     const [ rowId ] = strval(values[hand]).split("~").slice(1);
     if (!rowId)
       return;
-    const attack = `%{${charName}|repeating_armes_${rowId}_attack-btn}`;
+    const attack = `%{${charName}|${ rptAttr("armes", "attack-btn", rowId) }`;
     sendChatCmd(attack);
   });
 });
@@ -12097,6 +12699,17 @@ function paramByRank(description, path, values, abilityProps) {
   }
   return description;
 }
+
+/**
+ * Send an additional roll to chat
+ */
+on("change:next_roll", function () {
+  getAttrs([ "next_roll" ], function(values) {
+    const [ chatCmd ] = strval(values.next_roll).split("~");
+    if (chatCmd)
+      sendChatCmd(chatCmd);
+  });
+});
 
 /**
  * Display ability text with inline rolls
@@ -12222,6 +12835,24 @@ function actionAbility(path, rank) {
     if (alert !== "" && alertCSS === "")
       text += "\n" + alert
 
+    // Do another roll
+    let nextRoll = "";
+    if (hasProp(abilityProps, "roll")) {
+      const search = [
+        { atk: "atkcac", alias: "contact" },
+        { atk: "atktir", alias: "distance" },
+        { atk: "atkmag", alias: "magie" }
+      ];
+      let roll = getProp(abilityProps, "roll");
+      search.forEach(s => {
+        if (cleanText(roll).includes(s.alias))
+          roll = s.atk;
+        if (roll === s.atk)
+          roll += "-btn";
+      });
+      nextRoll = `%{${charName}|${roll}}`;
+    }
+
     // send to chat
     const rollProps = {
       lsub: `${pathName} - ${rank}`,
@@ -12233,21 +12864,15 @@ function actionAbility(path, rank) {
       rollProps.alertclass = alertCSS;
     }
     const chatMsg = rollTemplate(rollProps, { tags: allTags });
-    sendChatMsg(chatMsg);
+    sendChatMsg(chatMsg, { nextRoll });
     
     // Update usages
     if (maxUses > 0 && nbUsed <= maxUses)
       updates.set(used, nbUsed);
-    
+
     // Update attributes
     if (updates.size > 0)
       setAttrs(Object.fromEntries(updates));
-
-    // Do another roll
-    if (hasProp(abilityProps, "roll")) {
-      const chatCmd = `%{${charName}|${ getProp(abilityProps, "roll")}}`;
-      sendChatCmd(chatCmd);
-    }
 
   });
 }
@@ -12257,15 +12882,12 @@ function actionAbility(path, rank) {
  * @param {number} path - Path #
  */
 function setRank(path) {
-  rankAttrs = [
-    ...seq(5).map(rank => abilityInfo({ path, rank }).rankOwned),
-    ...seq(5).map(rank => abilityInfo({ path, rank }).rankName)
-  ];
+  const rankAttrs = seq(5).map(rank => abilityInfo({ path, rank }).rankOwned);
   getAttrs(rankAttrs, function (values) {
     let rank = 0;
-    Object.keys(values).filter(a => !a.startsWith("voie")).forEach(ability => {
+    rankAttrs.forEach(ability => {
       const owned = intval(values[ability]);
-      const hasRank = intval(ability.charAt(ability.length - 1)) * owned;
+      const hasRank = abilityInfo(ability).rank * owned;
       if (hasRank > rank)
         rank = hasRank;
     });
@@ -12294,6 +12916,35 @@ function updateAllRanks(path) {
     if (cleanText(names[path - 1], false) === "cavalier")
       updates.rang_cavalier = rank;
     setAttrs(updates);
+  });
+}
+
+/**
+ * Update the voieN_buff_xxx attribute value based on rank
+ * Update the buffs_voies attribute with the list of buff attribute names
+ * @param {number} path - path number changed
+ */
+function updateBuffsByRank(path) {
+  const rankProps = seq(5).map(rank => abilityInfo({ path, rank }).rankProps);
+  getAttrs([ `rang_voie${path}`, "buffs_voies", ...rankProps ], function(values) {
+    const rank = intval(values[`rang_voie${path}`]);
+    rankProps.filter(a => strval(values[a]) !== "").forEach(props => {
+      values[props].split("\n").filter(prop => prop.startsWith("buff:")).forEach(prop => {
+        const value = prop.split(":")[1].replace(/\s+/g, " ");
+        let [ attr, ...buffs ] = value.split(" ");
+        if (attr === "")
+          return;
+        buffs = buffs.join(" ");
+        try {
+          const byRank = JSON.parse(buffs.trim());
+          const buffAttr = `voie${path}_buff_${ attr.trim() }`;
+          const buffByRank = rank > 0 ? byRank[rank - 1] : 0;
+          const buffs_voies = JSON.parse(strval(values.buffs_voies, "{}"));
+          buffs_voies[buffAttr] = buffByRank;
+          setAttrs({ buffs_voies: JSON.stringify(buffs_voies) });
+        } catch (e) { }
+      });
+    });
   });
 }
 
@@ -12529,6 +13180,7 @@ seq(9).forEach(path => {
   // Update all ranks attribute
   on(`change:rang_voie${path} change:${ abilityInfo({ path }).rankBase }`, function () {
     updateAllRanks(path);
+    updateBuffsByRank(path);
   });
 
   on(`change:${ abilityInfo({ path }).pathName }`, function () {
@@ -12687,7 +13339,7 @@ on("change:repeating_rolls:roll-nom change:repeating_npcrolls:npcroll-name", fun
   const [ section, rollId, btName ] = strval(eventInfo.triggerName).split("_").slice(1);
   getAttrs([ "character_name" ], function(values) {
     const charName = strval(values.character_name);
-    const rollBtn = `repeating_${section}_${rollId}_${ btName.split("-")[0] }-btn`;
+    const rollBtn = rptAttr(section, `${ btName.split("-")[0] }-btn`, rollId);
     setAttrs({ [rollBtn]: `%{${charName}|${rollBtn}}` })
   });
 });
@@ -12710,7 +13362,7 @@ function statRollQuery() {
 on("clicked:repeating_rolls:roll-btn", function() {
   const section = "repeating_rolls_roll-";
   const statsAttrs = SWData.PC.STATS.map(stat => `${ shorten(stat) }_test`);
-  const rollAttrs = rptAttrs(section.split("_")[1], [
+  const rollAttrs = rptAttrs(rptInfo(section).section, [
     "nom",
     "cmd",
     "type",
@@ -12727,6 +13379,7 @@ on("clicked:repeating_rolls:roll-btn", function() {
     [
       "rangs_voies", "noms_voies",
       "condition_affaibli",
+      "cfg_d20roll", "d20roll",
       "cfg_shadow", "pc",
       "allcaracs_desc", "allcaracs_buff",
       ...fearConditionsAttrs(),
@@ -12738,7 +13391,7 @@ on("clicked:repeating_rolls:roll-btn", function() {
     const rollName = strval(values[section + "nom"]);
     let type = strval(values[section + "type"]);
     let carac = strval(values[section + "carac"]);
-    let path = intval(values[section + "voie"]);
+    const rankInPath = intval(values[section + "voie"]);
     const bonus = intval(values[section + "bonus"]);
     let rollCmd = strval(values[section + "cmd"]);
 
@@ -12751,7 +13404,7 @@ on("clicked:repeating_rolls:roll-btn", function() {
     .filter(a => a.includes("-t"))
     .find(a => cleanText(strval(values[a]), true) === cleanText(rollName));
     if (abilityMatch) {
-      path = abilityMatch.charAt(4);
+      const path = abilityMatch.charAt(4);
       const rank = abilityMatch.charAt(abilityMatch.length - 1);
       abilityDesc = strval(values[abilityInfo({ path, rank }).rankDesc]);
       abilityProps = strval(values[abilityInfo({ path, rank }).rankProps]);
@@ -12786,7 +13439,7 @@ on("clicked:repeating_rolls:roll-btn", function() {
       mark = "rang ";
     else
       mark = "+";
-    const rollBonus = carac !== "?" ? ` *(${mark}${ intval(values[carac.slice(2, 2 + 3 + 5)]) + (ranks[path - 1] || 0) + bonus })*` : "";
+    const rollBonus = carac !== "?" ? ` *(${mark}${ intval(values[carac.slice(2, 2 + 3 + 5)]) + (ranks[rankInPath - 1] || 0) + bonus })*` : "";
 
     let lsub = "Capacité";
     let text = "";
@@ -12795,6 +13448,10 @@ on("clicked:repeating_rolls:roll-btn", function() {
       text = insertRolls(rollCmd, { pathNames: names });
       let carTip = "";
       // d20
+      if (type === "1d20")
+        type = d20Roll(type, strval(values.d20roll));
+      else
+        type = rollCfCs(type);
       rollCmd = `${type}[Dés]`;
       // + Carac
       if (carac !== "") {
@@ -12806,8 +13463,8 @@ on("clicked:repeating_rolls:roll-btn", function() {
         rollCmd += ` + (${carac})${carTip}`;
       }
       // + Rang
-      if (path > 0) {
-        rollCmd += ` + (${ranks[path - 1]})[Rang ${names[path - 1]}]`;
+      if (rankInPath > 0) {
+        rollCmd += ` + (${ranks[rankInPath - 1]})[Rang ${names[rankInPath - 1]}]`;
       }
       // + Bonus
       if (bonus !== 0)
@@ -12853,7 +13510,8 @@ SWData.PC.SKILLS.forEach(skill => {
       ...skillAttrs,
       ...statsAttrs,
       "condition_affaibli",
-      "pc", "cfg_shadow", "cfg_1skill_roll",
+      "pc", "cfg_shadow", 
+      "cfg_1skill_roll", "cfg_d20roll", "d20roll",
       "allcaracs_desc", "allcaracs_buff",
       ...fearConditionsAttrs(),
       ...luckButtonAttrs()
@@ -12879,10 +13537,15 @@ SWData.PC.SKILLS.forEach(skill => {
         rollCmd = "2d20kl1";
       }
 
-      rollCmd += "cs20cf1[Dés]";
-
       // Single roll
-      const useOneRoll = boolval(values.cfg_1skill_roll);
+      const useOneRoll = intval(values.cfg_d20roll) === 0
+      ? boolval(values.cfg_1skill_roll)
+      : true;
+
+      if (rollCmd === "1d20")
+        rollCmd = d20Roll(rollCfCs(rollCmd), strval(values.d20roll));
+
+      rollCmd += "[Dés]"
 
       let carTip = "";
       if (caracBonus === "?") {
@@ -12904,7 +13567,7 @@ SWData.PC.SKILLS.forEach(skill => {
       rollCmd = "[[" + rollCmd + " ]]";
 
       let broll = "";
-      if (rollCmd.includes("1d20") && !useOneRoll)
+      if (rollCmd.startsWith("[[1d20") && !useOneRoll)
         broll = rollCmd;
 
       // Send to chat
@@ -12977,37 +13640,52 @@ on("change:repeating_buffs remove:repeating_buffs", function () {
  * @param {string} attribute - attribute name 
  */
 function parseBuffList(attribute) {
-  getAttrs([ `${attribute}_buff_list`, ...SWData.PC.BUFFS.From, "noms_voies" ], function(values) {
+  getAttrs([ 
+    `${attribute}_buff_list`,
+    ...SWData.PC.BUFFS.From,
+    "noms_voies",
+    "buffs_voies"
+  ], function(values) {
     const [ buff ] = Object.keys(values);
     const buffList = strval(values[buff]).split("; ");
     const allRanks = getPathRanks(values.rangs_voies);
+    let pathBuffs;
+    try {
+      pathBuffs = JSON.parse(strval(values.buffs_voies, "{}"));
+    } catch (e) { }
     let buffTotal = 0;
     buffList.forEach(buff => {
-      if (buff.trim() === "")
+      buff = buff.trim();
+      if (buff === "")
         return;
       let value = 0;
-      const expression = strval(buff.split(":")[1]).trim();
-      const attrBuff = SWData.PC.BUFFS.From.find(a => `[${a}]` === expression.toLowerCase());
-      if (attrBuff) {
-        value = intval(values[attrBuff]);
+      let expression = strval(buff.split(":")[1]).trim();
+      if (pathBuffs && Object.keys(pathBuffs).map(k => `[${k}]`).includes(expression)) {
+        expression = expression.replace("[", "").replace("]", "");
+        value = pathBuffs[expression] || 0;
       } else {
-        let result = expression.match(/\[rang[ ]*voie[ ]*([1-9])\][ ]*\+?[ ]*([0-9]*)?/i);
-        if (!result)
-          result = expression.match(/\[rang[ ]*(.*)\][ ]*\+?[ ]*([0-9]*)?/i);
-        if (result) {
-          const [ matched, path, bonus ] = result;
-          let pathNumber = intval(path);
-          if (pathNumber === 0) {
-            pathNumber = findPathByName("rang " + path, getPathNames(values.noms_voies));
-          }
-          if (matched && pathNumber > 0)
-            value = allRanks[pathNumber - 1];
-          if (bonus)
-            value += intval(bonus);
+        const attrBuff = SWData.PC.BUFFS.From.find(a => `[${a}]` === expression.toLowerCase());
+        if (attrBuff) {
+          value = intval(values[attrBuff]);
         } else {
-          value = intval(expression);
+          let result = expression.match(/\[rang[ ]*voie[ ]*([1-9])\][ ]*\+?[ ]*([0-9]*)?/i);
+          if (!result)
+            result = expression.match(/\[rang[ ]*(.*)\][ ]*\+?[ ]*([0-9]*)?/i);
+          if (result) {
+            const [ matched, path, bonus ] = result;
+            let pathNumber = intval(path);
+            if (pathNumber === 0) {
+              pathNumber = findPathByName("rang " + path, getPathNames(values.noms_voies));
+            }
+            if (matched && pathNumber > 0)
+              value = allRanks[pathNumber - 1];
+            if (bonus)
+              value += intval(bonus);
+          } else {
+            value = intval(expression);
+          }
         }
-      } 
+      }
       buffTotal += value;
     });
     setAttrs({ [`${attribute}_buff`]: buffTotal });
@@ -13061,7 +13739,7 @@ on("clicked:multibuff-btn", function () {
       });
       const askBuff = [];
       multiBuffs.forEach(v => {
-        if (v.ids.length > 1)
+        if (v.ids.length > 0)
           askBuff.push(v.name);
       });
       if (askBuff.length === 0)
@@ -13069,8 +13747,11 @@ on("clicked:multibuff-btn", function () {
       ask([ "Buff ?", "Aucun", ...askBuff.sort() ], function(selected, choices) {
         if (selected < 2)
           return;
+        const [ kbuff ] = [ ...multiBuffs ].find(([ k, v]) => v.name === choices[selected - 1]);
+        if (!kbuff)
+          return;
         const updates = {};
-        buffIds = multiBuffs.get(choices[selected - 1]).forEach(id => {
+        buffIds = multiBuffs.get(kbuff).ids.forEach(id => {
           const rptOn = rptAttr(section, "buff-on", id);
           updates[rptOn] = 1 - intval(values[rptOn]);
         });
@@ -13393,9 +14074,9 @@ function isWeapon(props, filter = "") {
 function getDefGear(values, rowIds, type = "armors") {
   const gears = new Map();
   rowIds.forEach(rowId => {
-    const equiped = intval(values[`repeating_equipement_${rowId}_equip-on`]);
-    const name = strval(values[`repeating_equipement_${rowId}_equip-nom`]);
-    const props = strval(values[`repeating_equipement_${rowId}_equip-props`]);
+    const equiped = intval(values[rptAttr("equipement", "equip-on", rowId)]);
+    const name = strval(values[rptAttr("equipement", "equip-nom", rowId)]);
+    const props = strval(values[rptAttr("equipement", "equip-props", rowId)]);
     if (type === "armors" && isArmor(name, props))
       gears.set(rowId, { name, equiped, props });
     if (type === "shields" && isShield(name, props))
@@ -13446,9 +14127,9 @@ function getHelmets(values, rowIds) {
 function getWeapons(values, rowIds, filter = "") {
   const gears = new Map();
   rowIds.forEach(rowId => {
-    const equiped = intval(values[`repeating_equipement_${rowId}_equip-on`]);
-    const name = strval(values[`repeating_equipement_${rowId}_equip-nom`]);
-    const props = strval(values[`repeating_equipement_${rowId}_equip-props`]);
+    const equiped = intval(values[rptAttr("equipement", "equip-on", rowId)]);
+    const name = strval(values[rptAttr("equipement", "equip-nom", rowId)]);
+    const props = strval(values[rptAttr("equipement", "equip-props", rowId)]);
     if (isWeapon(props, filter))
       gears.set(rowId, { name, equiped, props });
   });
@@ -13474,7 +14155,7 @@ function processAllAttacks(section, attributes, callback) {
     const allAttacks = [];
     rowIds.forEach(rowId => {
       attributes.forEach(attribute => {
-        allAttacks.push(`repeating_${section}_${rowId}_arme-${attribute}`);
+        allAttacks.push(rptAttr(section, `arme-${attribute}`, rowId));
       });
     });
     callback(rowIds, allAttacks);
@@ -13492,7 +14173,7 @@ function processAllGear(attributes, callback) {
     const allGears = [];
     rowIds.forEach(rowId => {
       attributes.forEach(attribute => {
-        allGears.push(`repeating_${section}_${rowId}_equip-${attribute}`);
+        allGears.push(rptAttr(section, `equip-${attribute}`, rowId));
       });
     });
     callback(rowIds, allGears);
@@ -13545,6 +14226,7 @@ on("clicked:repeating_equipement:equipshow-btn", function () {
     const props = strval(values[rptAttr(section, "equip-props")]);
     if (detail === "" && props === "")
       return
+
     const chatMsg = [
       "title=Equipement",
       `subtitle=${ qty > 1 ? `${qty} x ` : "" }${name}`,
@@ -13775,7 +14457,7 @@ on(changeEvent([
     "atk",
     "atkid",
     "predicats"
-  ].map(a => `repeating_equipement_equip-${a}`);
+  ].map(a => rptAttr("equipement", `equip-${a}`));
   getAttrs([ "cfg_usure", ...gearAttrs ], function(values) {
     const usure = boolval(values.cfg_usure);
     const [ name, detail, props, atk, atkid, pred ] = Object.keys(values).slice(1);
@@ -13792,7 +14474,7 @@ on(changeEvent([
     if (eventInfo.sourceAttribute.endsWith("equip-atk") && !hasAttack) {
       if (attackId) {
         removeRepeatingRow(`repeating_armes_${attackId}`);
-        setAttrs({ ["repeating_equipement_equip-atkid"]: "" });
+        setAttrs({ [rptAttr("equipement", "equip-atkid")]: "" });
       }
       return;
     }
@@ -13840,8 +14522,8 @@ on(changeEvent([
           thrownId = generateRowID();
       }
 
-      attributes.set("repeating_equipement_equip-atkid", attackId);
-      const rowId = "repeating_armes_" + attackId + "_arme-";
+      attributes.set(rptAttr("equipement", "equip-atkid"), attackId);
+      const rowId = rptAttr("armes", "arme-", attackId);
       attributes.set(rowId + "nom", equipment);
       const atk = attackRow.has("portee") ? "atktir" : "atkcac";
       attributes.set(rowId + "atk", atk);
@@ -13937,14 +14619,12 @@ on("clicked:profequip-btn", function() {
     const [ profile ] = strval(values.profil).split("/");
     if (profile === "")
       return;
-
-    loadBaseGear(profile);
+    ask(`Ajouter l'équipement de base pour ${profile} ?`, function(answer) {
+      if (answer === 2)
+        loadBaseGear(profile);
+    });
   });
 });
-
-function repeating(section, list, prefix = "") {
-  return new Map(list.map(attribute => [ attribute, `repeating_${section}_${prefix}${attribute}` ]));
-}
 
 /**
  * On set resource = ammo
@@ -14024,6 +14704,43 @@ on("change:repeating_ressources:res-val", function(eventInfo) {
 });
 
 /**
+ * On click of consumable button
+ */
+on("clicked:repeating_ressources:resconso-btn", function () {
+  const section = "ressources";
+  getAttrs(rptAttrs(section, [ "res-desc", "res-val", "res-props" ]), function (values) {
+    const updates = new Map();
+    const value = intval(values[rptAttr(section, "res-val")]);
+    if (value === 0)
+      return;
+    updates.set(rptAttr(section, "res-val"), value - 1);
+    let text = "";
+    let heal = "";
+    const rsub = strval(values[rptAttr(section, "res-desc")]);
+    const props = strval(values[rptAttr(section, "res-props")]);
+    const type = getProp(props, "type");
+    if (type.toLowerCase().startsWith("soins")) {
+      let [ ...roll ] = type.trim().split(" ").slice(1);
+      if (roll.length === 0)
+        roll.push("1d4°");
+      heal = insertRolls(roll.join(" "));
+    }
+
+    if (heal !== "" || text !== "") {
+      const chatMsg = rollTemplate({
+        lsub: "Consommable",
+        rsub,
+        heal,
+        text
+      });
+      sendChatMsg(chatMsg);
+    }
+
+    setAttrs(Object.fromEntries(updates));
+  });
+});
+
+/**
  * Rebuild all ranks in path
  */
 function rebuildRanks() {
@@ -14060,35 +14777,50 @@ function rebuildRanks() {
 /**
  * Link attacks to gears (by name)
  */
-function linkAttacks() {
+async function linkAttacks() {
+  // attack rows
+  const atkIds = await getSectionIDsAsync("armes");
+  const allAttacks = [];
+  atkIds.forEach(id => {
+    [ "nom", "atktype", "gearid" ].forEach(attr => {
+      allAttacks.push(rptAttr("armes", `arme-${attr}`, id));
+    });
+  });
+
+  // gear rows
+  const gearIds = await getSectionIDsAsync("equipement");
+  const allGears = gearIds.map(id => rptAttr("equipement", "equip-nom", id));
+
+  getAttrs([ ...allAttacks, ...allGears ], function (values) {
+    const links = new Map();
+    atkIds.forEach(id => {
+      const type = strval(values[rptAttr("armes", "arme-atktype", id)]);
+      if ([ "sort", "naturel" ].includes(type))
+        return;
+      const nom = strval(values[rptAttr("armes", "arme-nom", id)]);
+      const gear = allGears.find(gear => cleanText(nom, false).includes(cleanText(strval(values[gear]), false)));
+      if (gear) {
+        const gearId = rptInfo(gear).rowId;
+        if (gearId)
+          links.set(rptAttr("armes", "arme-gearid", id), gearId);
+      }
+    });
+    if (links.size > 0)
+      setAttrs(Object.fromEntries(links));
+  });
+
+  /*
   getSectionIDs("armes", atkIds => {
     getSectionIDs("equipement", gearIds => {
       const allAttacks = [];
       atkIds.forEach(id => {
         [ "nom", "atktype", "gearid" ].forEach(attr => {
-          allAttacks.push(`repeating_armes_${id}_arme-${attr}`);
+          allAttacks.push(rptAttr("armes", `arme-${attr}`, id));
         });
       });
-      const allGears = gearIds.map(id => `repeating_equipement_${id}_equip-nom`);
-      getAttrs([ ...allAttacks, ...allGears ], function (values) {
-        const links = new Map();
-        atkIds.forEach(id => {
-          const type = strval(values[`repeating_armes_${id}_arme-atktype`]);
-          if ([ "sort", "naturel" ].includes(type))
-            return;
-          const nom = strval(values[`repeating_armes_${id}_arme-nom`]);
-          const gear = allGears.find(gear => cleanText(nom, false).includes(cleanText(strval(values[gear]), false)));
-          if (gear) {
-            const gearId = rptInfo(gear).rowId;
-            if (gearId)
-              links.set(`repeating_armes_${id}_arme-gearid`, gearId);
-          }
-        });
-        if (links.size > 0)
-          setAttrs(Object.fromEntries(links));
-      });
+      const allGears = gearIds.map(id => rptAttr("equipement", "equip-nom", id));
     });
-  });
+  });*/
 }
 
 /**
@@ -14120,6 +14852,9 @@ on("clicked:appearance-btn clicked:description-btn", function() {
  */
 on("clicked:def_config-btn", function() {
   const allConfigs = [
+    "cfg_pvmax_auto",
+    "cfg_pts_capas",
+    "cfg_cible",
     "voies_456",
     "voies_789",
     "use_skills",
@@ -14147,6 +14882,8 @@ on("clicked:def_config-btn", function() {
     "pcmax_force",
     "pmmax_force",
     "cfg_1attack_roll",
+    "cfg_1skill_roll",
+    "cfg_d20roll",
     "cfg_luck_btn",
     "$tresor_monnaie",
   ];
@@ -14205,7 +14942,7 @@ on("clicked:reset_all-btn", function() {
   rebuildBuffValues(e);
   rebuildCustom(e);
   ask("Lier attaques et équipements ?", function(answer) {
-    if (answer === 1)
+    if (answer === 2)
       linkAttacks();
   });
 });
@@ -14439,34 +15176,91 @@ on("clicked:helpdoc-btn", function() {
  * Return CSS style for chat menu buttons
  * @param {string|string[]} color - PC color name | [ bckg, text ] color array
  * @param {object} [font={}] - font properties object
- * @param {{}} [extraCSS={}] - extra properties object
+ * @param {object} [extraCSS={}] - extra properties object
+ * @param {object} [attributes={}] - extra attributes object
  * @returns {string}
  */
-function menuButton(color, font = {}, extraCSS = {}) {
+function menuButton(color, font = {}, extraCSS = {}, attributes = {}) {
+  
   color = color || "default";
-  font = { size: "0.8rem", weight: "bold", ...font };
   let backColor, textColor;
   if (Array.isArray(color))
     [ backColor, textColor = "white" ] = color;
   else
     [ backColor, textColor ] = SWData.COLORS[color];
+  if (Object.keys(extraCSS).includes("color")) {
+    textColor = extraCSS.color;
+    delete extraCSS.color;
+  }
+  if (Object.keys(extraCSS).includes("background-color")) {
+    backColor = extraCSS["background-color"];
+    delete extraCSS["background-color"];
+  }
+
+  font = { size: "0.8rem", weight: "bold", ...font };
+  
+  let border = "none";
+  let radius = "3px";
+  if (Object.keys(extraCSS).includes("border")) {
+    border = extraCSS.border;
+    delete extraCSS.border;
+  }
+  if (Object.keys(extraCSS).includes("border-radius")) {
+    radius = extraCSS["border-radius"];
+    delete extraCSS["border-radius"];
+  }
+
+  let padding = "2px";
+  if (Object.keys(extraCSS).includes("padding")) {
+    padding = extraCSS.padding;
+    delete extraCSS.padding;
+  }
+
+  let margin = "1px";
+  if (Object.keys(extraCSS).includes("margin")) {
+    margin = extraCSS.margin;
+    delete extraCSS.margin;
+  }
+  
+  const buttonTitle = (attributes.title) ? ` title=\"${attributes.title}\"` : "";
+
   let buttonClass = "";
   if (extraCSS.class) {
     buttonClass = ` class=\"${extraCSS.class}\"`;
     delete extraCSS.class;
   }
+  
   const props = Object.keys(extraCSS).map(prop => `${prop}: ${ extraCSS[prop] }`);
-  return `\"${buttonClass} style=\"` + [
-    "border: none",
-    "border-radius: 3px",
+  return `\"${buttonTitle}${buttonClass} style=\"` + [
+    `border: ${border}`,
+    `border-radius: ${radius}`,
     `background-color: ${backColor}`,
     `color: ${textColor}`,
-    "padding: 2px",
-    "margin: 1px",
+    `padding: ${padding}`,
+    `margin: ${margin}`,
     `font-size: ${font.size}`,
     `font-weight: ${font.weight}`,
     ...props
   ].join("; ");
+}
+
+/**
+ * Return CSS style for chat outline menu buttons
+ * @param {string} color - PC color name
+ * @param {object} [font={}] - font properties object
+ * @param {object} [extraCSS={}] - extra properties object
+ * @param {object} [attributes={}] - extra attributes object
+ * @returns {string}
+ */
+function menuButtonOutline(color, font = {}, extraCSS = {}, attributes = {}) {
+  if (!Object.keys(SWData.COLORS).includes(color))
+    color = "default";
+  const reverse = [ "whitesmoke", SWData.COLORS[color][0] ];
+  return menuButton(reverse, font, {
+    border: `1px ${ reverse[1] } solid`,
+    color: "#333",
+    ...extraCSS
+  }, attributes);
 }
 
 /**
@@ -14568,30 +15362,43 @@ on("clicked:etats_menu-btn", function() {
  * @param {string} [npc=""] - PC ("") or NPC ("npc") attacks
  */
 function attackRollsMenu(npc = "") {
-  const section = `repeating_${npc}armes`;
-  getSectionIDsOrdered(section, function (rowIds) {
-    const attackNames = rowIds.map(rowId => `${section}_${rowId}_arme-nom`);
+  const section = `${npc}armes`;
+  getSectionIDsOrdered("repeating_" + section, function (rowIds) {
+    const attackNames = rowIds.map(rowId => rptAttr(section, "arme-nom", rowId));
+    const atkType = rowIds.map(rowId => rptAttr(section, "arme-atk", rowId));
+    const atkRange = rowIds.map(rowId => rptAttr(section, "arme-portee", rowId));
     const attackBtn = (npc === "") ? "attack" : "npcatk";
-    getAttrs([ "character_name", "couleur_pj", ...attackNames ], function (values) {
+    getAttrs([
+      "character_name",
+      "couleur_pj",
+      ...attackNames,
+      ...atkType,
+      ...atkRange
+    ], function (values) {
       const charName = strval(values.character_name);
-      const color = strval(values.couleur_pj);
+      const color = strval(values.couleur_pj, "default");
       if (npc === "npc") {
         if (attackNames.length === 0)
           return;
         if (attackNames.length === 1) {
-          const action = `%{${charName}|repeating_npcarmes_${ rowIds[0] }_npcatk-btn}`;
+          const action = `%{${charName}|${ rptAttr("npcarmes", "npcatk-btn", rowIds[0]) }}`;
           sendChatCmd(action);
         } else {
-          const attackSelect = rowIds.map((rowId,ix) => values[`${section}_${rowId}_arme-nom`] + `,${ix + 1}`);
+          const attackSelect = rowIds.map((rowId,ix) => values[rptAttr(section, "arme-nom", rowId)] + `,${ix + 1}`);
           ask([ "Attaque ?", ...attackSelect ], (attack) => {
-            const action = `%{${charName}|repeating_npcarmes_${ rowIds[attack - 1] }_npcatk-btn}`;
+            const action = `%{${charName}|${ rptAttr("npcarmes", "npcatk-btn", rowIds[attack - 1]) }}`;
             sendChatCmd(action);
           });
         }
       } else {
-        const button = menuButton(color, {}, { padding: "0px 5px;" });
-        const chatMsg = rowIds.map((rowId, ix) => `${ix + 1}. ${values[`${section}_${rowId}_arme-nom`]}=[Jet](~${charName}|${section}_${rowId}_${attackBtn}-btn${button})`);
-        if (chatMsg === 0)
+        const button = menuButtonOutline(color, {}, { padding: "0px 5px;" });
+        const chatMsg = rowIds.map((rowId, ix) => {
+          const type = strval(values[rptAttr(section, "arme-atk", rowId)]);
+          const range = strval(values[rptAttr(section, "arme-portee", rowId)]);
+          const emoji = type === "atkmag" ? SWData.emojis.atkmag : isRanged(type, range) ? SWData.emojis.atktir : SWData.emojis.atkcac;
+          return `${ix + 1}. ${ values[rptAttr(section, "arme-nom", rowId)] }=[${emoji}](~${charName}|${ rptAttr(section, attackBtn + "-btn", rowId) }${button})`;
+        });
+        if (chatMsg === "")
           return;
         sendChatMsg([
           `title=${charName}`,
@@ -14646,17 +15453,27 @@ on("clicked:abilities_menu-btn", function () {
  */
 seq(9).forEach(path => {
   on(`clicked:voie${path}_menu-btn`, function () {
-    const abilities = seq(5).map(rank => `voie${path}-t${rank}`);
-    getAttrs([ "character_name", "couleur_pj", "rangs_voies", "noms_voies", ...abilities ], function (values) {
+    const abilities = seq(5).map(rank => abilityInfo({ path, rank }).rankName);
+    const spells = seq(5).map(rank => abilityInfo({ path, rank }).rankSpell);
+    getAttrs([
+      "character_name",
+      "couleur_pj",
+      "rangs_voies",
+      "noms_voies",
+      ...abilities,
+      ...spells
+    ], function (values) {
       const charName = strval(values.character_name);
-      const color = strval(values.couleur_pj);
+      const color = strval(values.couleur_pj, "default");
       const pathRank = intval(strval(values.rangs_voies).split(",")[path - 1]);
       const pathName = strval(strval(values.noms_voies).split("|")[path -1]);
       const chatMsg = seq(5).reduce((result, rank) => {
         if (rank <= pathRank) {
-          const abilityName = values[`voie${path}-t${rank}`];
-          const button = menuButton(color, {}, { padding: "0px 5px;" });
-          result.push(`${abilityName}=[Jet](~${charName}|v${path}r${rank}-btn${button})`);
+          const abilityName = values[abilityInfo({ path, rank }).rankName];
+          const spell = boolval(values[abilityInfo({ path, rank }).rankSpell]);
+          const emoji = spell ? SWData.emojis.atkmag : SWData.emojis.actions;
+          const button = menuButtonOutline(color, {}, { padding: "0px 5px;" });
+          result.push(`${abilityName}=[${emoji}](~${charName}|v${path}r${rank}-btn${button})`);
         }
         return result;
       }, []);
@@ -14686,9 +15503,9 @@ function abilityRollsMenu(npc = "") {
     const rollNames = rowIds.map(rowId => `${section}_${rowId}_${rollNameAttr}`);
     getAttrs([ "character_name", "couleur_pj", ...rollNames ], function (values) {
       const charName = strval(values.character_name);
-      const color = strval(values.couleur_pj);
-      const button = menuButton(color, {}, { padding: "0px 5px;" });
-      const chatMsg = rowIds.map((rowId, ix) => `${ix + 1}. ${values[`${section}_${rowId}_${rollNameAttr}`]}=[Jet](~${charName}|${section}_${rowId}_${npc}roll-btn${button})`);
+      const color = strval(values.couleur_pj, "default");
+      const button = menuButtonOutline(color, {}, { padding: "0px 5px;" });
+      const chatMsg = rowIds.map((rowId, ix) => `${ix + 1}. ${values[`${section}_${rowId}_${rollNameAttr}`]}=[${ SWData.emojis.actions }](~${charName}|${section}_${rowId}_${npc}roll-btn${button})`);
       if (chatMsg.length === 0)
         return;
       sendChatMsg([
@@ -14704,6 +15521,9 @@ function abilityRollsMenu(npc = "") {
   });
 }
 
+/**
+ * Ability rolls menu
+ */
 on("clicked:rolls_menu-btn", function () {
   abilityRollsMenu();
 });
@@ -14765,6 +15585,165 @@ on("clicked:pc_menus-btn", function () {
 });
 
 /**
+ * Display a PC actions menu
+ */
+on("clicked:pc_actions-btn", async function() {
+
+  // weapons
+  const weaponRpt = "armes";
+  const weaponIds = await getSectionIDsOrderedAsync(weaponRpt);
+  //console.log(weaponIds)
+  const attackNames = weaponIds.map(id => rptAttr(weaponRpt, "arme-nom", id));
+  const atkType = weaponIds.map(id => rptAttr(weaponRpt, "arme-atk", id));
+  const atkRange = weaponIds.map(id => rptAttr(weaponRpt, "arme-portee", id));
+
+  // abilities
+  const allRankNames = [];
+  const allRankSpells = [];
+  const allRankProps = [];
+  seq(9).forEach((path) => {
+    seq(5).forEach((rank) => {
+      allRankNames.push(abilityInfo({ path, rank }).rankName);
+      allRankSpells.push(abilityInfo({ path, rank }).rankSpell);
+      allRankProps.push(abilityInfo({ path, rank }).rankProps);
+    });
+  });
+
+  // rolls
+  const rollRpt = "rolls";
+  let rollIds = await getSectionIDsOrderedAsync(rollRpt);
+  const rollNames = rollIds.map(id => rptAttr(rollRpt, "roll-nom", id));
+
+  // buffs
+  const buffRpt = "buffs";
+  let buffIds = await getSectionIDsOrderedAsync(buffRpt);
+  const buffTemp = buffIds.map(id => rptAttr(buffRpt, "buff-temp", id));
+
+  getAttrs([
+    "character_name", "couleur_pj",
+    "cfg_d20roll", "d20roll",
+    ...attackNames, ...atkType, ...atkRange,
+    "rangs_voies", "noms_voies",
+    ...allRankNames, ...allRankSpells, ...allRankProps,
+    ...rollNames,
+    ...buffTemp,
+    "use_skills"
+  ], function (values) {
+
+    /**
+     * Build extra properties & CSS for chat menu outline buttons
+     * @param {object} css - CSS properties
+     * @param {object} attrs - Extra button attributes
+     * @returns {string}
+     */
+    const button = (css = {}, attrs = {}) => menuButtonOutline(color, {}, { padding: "0px 5px", ...css }, attrs);
+
+    const charName = strval(values.character_name);
+    const color = strval(values.couleur_pj, "default");
+    const d20Roll = numval(values.cfg_d20roll);
+    const chatMsg = [];
+    
+    // Stats
+    const stats = SWData.PC.STATS.map(stat => {
+      const short = shorten(stat);
+      const button = menuButton(color, {}, { width: "2rem", ["text-align"]: "center" });
+      return `[${short.toUpperCase()}](~${charName}|${short}-btn${button})`;
+    }).join(" ");
+    chatMsg.push("Caractéristiques=" + stats);
+
+    // Attacks
+    const attacks = SWData.PC.COMBAT.attacks.map((attack) => {
+      const emoji = SWData.emojis[attack[0]];
+      return `[${emoji}](~${charName}|${ attack[0] }-btn${ button({}, { title: attack[2] }) })`;
+    }).join(" ");
+    chatMsg.push("Attaques=" + attacks);
+
+    // Weapons
+    const weapons = weaponIds.map((id) => {
+      const type = strval(values[rptAttr(weaponRpt, "arme-atk", id)]);
+      const range = strval(values[rptAttr(weaponRpt, "arme-portee", id)]);
+      const emoji = type === "atkmag" ? SWData.emojis.atkmag : isRanged(type, range) ? SWData.emojis.atktir : SWData.emojis.atkcac;
+      return `[${emoji}](~${charName}|${ rptAttr(weaponRpt, "attack-btn", id) }${ button() }) ${ values[rptAttr(weaponRpt, "arme-nom", id)] }`;
+    }).join("\n");
+    if (weapons.length > 0)
+      chatMsg.push("Armes=" + weapons);
+
+    // Abilities
+    const pathRanks = strval(values.rangs_voies).split(",");
+    const pathNames = strval(values.noms_voies).split("|");
+    pathNames.forEach((pathName, ix) => {
+      const pathRank = intval(pathRanks[ix])
+      if (pathRank === 0)
+        return;
+      const path = ix + 1;
+      const abilities = seq(pathRank).reduce((all, rank) => {
+        const name = strval(values[abilityInfo({ path, rank }).rankName]);
+        const spell = boolval(values[abilityInfo({ path, rank }).rankSpell]);
+        const props = strval(values[abilityInfo({ path, rank }).rankProps]);
+        const active = (hasProp(props, "action") || hasProp(props, "roll"));  
+        let action = "";
+        const rollIdx = rollNames.findIndex(r => cleanText(values[r]) === cleanText(name));
+        if (!active && rollIdx > -1) {
+          const [ roll ] = rollNames.splice(rollIdx, 1);
+          rollIds = rollIds.filter(id => id !== rptInfo(roll).rowId);
+          const rollBtn = rptAttr(rollRpt, "roll-btn", rptInfo(roll).rowId);
+          action = ` [${ SWData.emojis.actions }](~${charName}|${rollBtn}${ button() })`;
+        } else {
+          const emoji = spell ? SWData.emojis.atkmag : SWData.emojis.actions;
+          action = (spell || active)
+          ? ` [${emoji}](~${charName}|${ abilityInfo({ path, rank }).rankOwned }-btn${ button() })`
+          : "";
+        }
+        if (action !== "")
+          all.push(action + name);
+        return all;
+      }, []).join("\n");
+      if (abilities)
+        chatMsg.push(pathName + "=" + abilities);
+    });
+
+    // Rolls
+    const rolls = rollIds.map((id) => `[${SWData.emojis.actions}](~${charName}|${ rptAttr(rollRpt, "roll-btn", id) }${ button() }) ${ values[rptAttr(rollRpt, "roll-nom", id)] }` ).join("\n");
+    if (rolls.length > 0)
+      chatMsg.push("Autres capacités=" + rolls);
+
+    // Buffs
+    const buffs = buffIds.filter((id) => boolval(values[rptAttr(buffRpt, "buff-temp", id)]));
+    if (buffs.length > 0)
+      chatMsg.push(`Buffs=[Choix](~${charName}|multibuff-btn${menuButton(color, {}, { padding: "0px 5px;" })})`);
+
+    // Skills
+    if (boolval(values.use_skills)) {
+      chatMsg.push(`Compétences=[Choix](~${charName}|skills_menu-btn${menuButton(color, {}, { padding: "0px 5px;" })})`);
+    }
+
+    // Roll type
+    let desc = "";
+    if (d20Roll === 1) {
+      const roll = strval(values.d20roll);
+      const activeBt = button({ "font-style": "italic" });
+      desc = [
+        `[Dé Malus](~${charName}|d20roll_dm-btn${ roll === "2d20kl1" ? activeBt : button() })`,
+        `[Normal](~${charName}|d20roll_1d-btn${ roll === "1d20" ? activeBt : button() })`,
+        `[Dé Bonus](~${charName}|d20roll_db-btn${ roll === "2d20kh1" ? activeBt : button() })`
+      ].join("&nbsp;");
+    }
+
+    // Send all
+    sendChatMsg([
+      `title=${charName}`,
+      "subtitle=Actions",
+      "color=" + color,
+      "desc=" + desc,
+      ...chatMsg
+    ], {
+      template: "custom",
+      whisper: "\"" + charName + "\""
+    });
+  });
+});
+
+/**
  * Return object held in hand
  * @param {string} hand - main_ attribute suffix (princ|autre)
  * @param {object} values - Roll20 getAttrs() object
@@ -14792,7 +15771,7 @@ function holding(hand, values) {
       break;
     default:
       const [ atkId ] = inHand.split("~").splice(1);
-      holding = strval(values[`repeating_armes_${atkId}_arme-nom`]);
+      holding = strval(values[rptAttr("armes", "arme-nom", atkId)]);
       break;
   }
   return holding;
@@ -14976,11 +15955,28 @@ on("clicked:defsup-btn", function() {
 });
 
 /**
+ * Re-format damage reductions & damage resistances
+ */
+on("change:rd change:resdm sheet:opened", function() {
+  getAttrs([ "rd", "resdm" ], function (values) {
+    const rd = strval(values.rd),
+          resdm = strval(values.resdm);
+    let rrdm = "";
+    if (rd.length > 0)
+      rrdm += rd.split("\n").join(", ");
+    if (resdm.length > 0)
+      rrdm += ( rrdm !== "" ? ", " : "" ) + "DM " + resdm.split("\n").join(" + ") + " ÷ 2";
+    if (rrdm.length > 0)
+      setAttrs({ rrdm });
+  });
+});
+
+/**
  * Set NPC attack score
  */
 on("change:pnjatk", function() {
   getSectionIDs("npcarmes", function(rowIds) {
-    const attacks = rowIds.map(id => `repeating_npcarmes_${id}_arme-atk`);
+    const attacks = rowIds.map(id => rptAttr("npcarmes", "arme-atk", id));
     getAttrs([ "pnjatk", ...attacks ], function(values) {
       const npcAtk = intval(values.pnjatk);
       const updates = new Map();
@@ -15004,15 +16000,15 @@ on("change:repeating_npcarmes:arme-nom clicked:renum_npcatk-btn", function(event
   if (!renumber)
     atkId = strval(eventInfo.triggerName.split("_")[2]);
   getSectionIDsOrdered("repeating_npcarmes", function (rowIds) {
-    const labels = rowIds.map(id => `repeating_npcarmes_${id}_arme-label`);
+    const labels = rowIds.map(id => rptAttr("npcarmes", "arme-label", id));
     getAttrs([ "character_name", "max_attack_label", "scriptVersion", ...labels ], function (values) {
       const updates = new Map();
 
       if (!renumber) {
         // display attack options row if script detected
-        updates.set("repeating_npcarmes_armeopt", hasMODScript(values) ? 1 : 0);
+        updates.set(rptAttr("npcarmes", "armeopt"), hasMODScript(values) ? 1 : 0);
         // update roll button linked attribute
-        const atkBtn = `repeating_npcarmes_${atkId}_npcatk-btn`;
+        const atkBtn = rptAttr("npcarmes", "npcatk-btn", atkId);
         updates.set(atkBtn, `%{${ strval(values.character_name) }|${atkBtn}}`);
       }
             
@@ -15062,7 +16058,7 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
     ...seq(3).map(t => `cspec${t}_dm`),
   ];
   getAttrs([
-    "cfg_1attack_roll", "cfg_lowfan",
+    "cfg_1attack_roll", "cfg_cible", "cfg_lowfan",
     "cfg_crit_diff", "cfg_tbl_crit", "cfg_tbl_critdie", "cfg_tbl_fumble",
     "character_name", "niveau", "compagnon",
     "atkgroup", "nbgroup", "pnj_tact",
@@ -15150,6 +16146,7 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
         tactBonus = ` + ([[${tactBonus}]])[${name}]`;
       if (tactDM !== "")
         extraDM.push(` + [[${tactDM}]] ${name}`);
+      resetValues.set("pnj_tact", 0);
     }
 
     let specRoll = 0;
@@ -15195,14 +16192,13 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
         resetValues.set("pnj_spec", 0);
     }
 
-
     let multiAttacks = 1;
     if (useMulti === 1) {
       const result = name.match(/\(([0-9]*)[ ]*attaques\)/);
       if (result) {
         [ multiAttacks ] = result.slice(1);
       }
-      if (intval(multiAttacks) <= 0 )
+      if (intval(multiAttacks) <= 0)
         multiAttacks = 1;
     }
 
@@ -15308,7 +16304,6 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
     // Fumble table
     rollOptions.fumble = useFumbleTable(values, "npc");
     const fumbleEffect = rollOptions.fumble ? fumbleRoll(values) : "";
-
     
     // Check special effect on die roll
     let rollEffect = "";
@@ -15349,7 +16344,9 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
         crithit: "",
         critfail: "",
         fumbletest: "",
-        fumble: ""
+        fumble: "",
+        tohit: "",
+        target: ""
       };
       
       if(rollOptions.critical) {
@@ -15364,6 +16361,11 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
         const stat_mod = `@{${stat}}[${ stat.toUpperCase() }]`;
         chatAtk.fumbletest = `[[${stat_dsup} + ${stat_mod} ]]`;
         chatAtk.fumble = fumbleEffect;
+      }
+
+      if (boolval(values.cfg_cible)) {
+        chatAtk.tohit = SWData.settings.tokens.target.def;
+        chatAtk.target = SWData.settings.tokens.target.name;
       }
 
       if(extraDM.length > 0)
@@ -15403,7 +16405,8 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
  */
 on("clicked:repeating_npcrolls:npcroll-btn", function() {
   const section = "repeating_npcrolls_npcroll-";
-  getAttrs([ "compagnon", `${section}name`, `${section}desc` ], function (values) {
+  const rollAttrs = [ "name", "uses", "max", "freq", "desc" ].map(a => `${section}${a}`);
+  getAttrs([ "compagnon", ...rollAttrs ], function (values) {
     const companionOf = strval(values.compagnon);
     let name = strval(values[section + "name"], "Capacité");
     const action = name.match(/ \((G|M|A|L)\)[ ]*$/);
@@ -15412,11 +16415,34 @@ on("clicked:repeating_npcrolls:npcroll-btn", function() {
       name = name.replace(action[0], "");
       actionType = " - " + action[1];
     }
-    const text = insertRolls(strval(values[section + "desc"]), { isNPC: true, companionOf });
+
+    let text = "";
+    let alert = "";
+    let alertCSS = "";
+    const maxUses = numval(values[section + "max"]);
+    const freq = strval(values[section + "freq"]);
+    if (freq !== "" && maxUses !== 0) {
+      let nbUsed = numval(values[section + "uses"]) + 1;
+      if (nbUsed > maxUses) {
+        text = "";
+        alert = `Nombre d'utilisations par ${freq} atteint`;
+        alertCSS = "fumble";
+      } else {
+        alert = `Utilisée ${nbUsed} fois`;
+        alertCSS = "secondary";
+      }
+      setAttrs({ [`${section}uses`]: Math.min(nbUsed, maxUses) });
+    }
+
+    if (text === "")
+      text = insertRolls(strval(values[section + "desc"]), { isNPC: true, companionOf });
+
     const chatMsg = rollTemplate({
       lsub: "Capacité" + actionType,
       rsub: capitalize(name),
-      text
+      text,
+      alert,
+      alertclass: alertCSS
     });
     sendChatMsg(chatMsg);
   });
@@ -15539,7 +16565,7 @@ function importNPCAttack(sbLine, npcAttrs) {
   if (special !== "")
     special = " + " + special;
   
-  const rowId = `repeating_npcarmes_${generateRowID()}_arme-`;
+  const rowId = rptAttr("npcarmes", "arme-", generateRowID());
   npcAttrs.set(rowId + "nom", name);
   npcAttrs.set(rowId + "roll", "1d20");
   npcAttrs.set(rowId + "atk", bonus);
@@ -15630,7 +16656,7 @@ function statBlockFromPDF(statblock) {
       if (match) {
         const type = strval(match[1]);
         if (type !== "")
-          npcAttrs.set("creature", "CRÉATURE " + type);
+          npcAttrs.set("creature", "Créature " + type.toLowerCase());
       }
 
       // size
@@ -15638,7 +16664,7 @@ function statBlockFromPDF(statblock) {
       if (match) {
         const taille = strval(match[1]);
         if (taille !== "")
-          npcAttrs.set("taille", taille);
+          npcAttrs.set("taille", taille.toLowerCase());
       }
 
       // défense
@@ -15693,7 +16719,7 @@ function statBlockFromPDF(statblock) {
   }
 
   abilities.forEach(ability => {
-    const rowId = `repeating_npcrolls_${generateRowID()}_npcroll-`;
+    const rowId = rptAttr("npcrolls", "npcroll-", generateRowID());
     let name = strval(ability.name);
     name = name !== "" ? name.charAt(0).toUpperCase() + name.substring(1) : name;
     let description = strval(ability.description);
@@ -15853,7 +16879,7 @@ function migrateCOF1Sheet(sheetType, verCOF1) {
     ];
     atkIds.forEach(id => {
       oldAtkAttrs.map(a => a.split(":")[0]).forEach(attr => {
-        oldAtks.push(`repeating_${section}_${id}_arme${attr}`);
+        oldAtks.push(rptAttr(section, `arme${attr}`, id));
       });
     });
 
@@ -15922,14 +16948,14 @@ function migrateCOF1Sheet(sheetType, verCOF1) {
             return;
           if (!newAttr)
             newAttr = oldAttr;
-          const oldValue = strval(values[`repeating_armes_${id}_arme${oldAttr}`]);
+          const oldValue = strval(values[rptAttr("armes", `arme${oldAttr}`,id)]);
           const newValue = migrateCOF1Value(oldAttr, oldValue);
-          migrated.set(`repeating_${section}_${id}_arme-${newAttr}`, newValue);
+          migrated.set(rptAttr(section, `arme-${newAttr}`,id), newValue);
           if (oldAttr === "nom")
             chatMsg.push(`Attaque n° ${ix + 1}=${oldValue}`);
         });
-        const dm = strval(values[`repeating_armes_${id}_armedmnbde`], "1")+"d"+strval(values[`repeating_armes_${id}_armedmde`], "4");
-        migrated.set(`repeating_${section}_${id}_arme-dm`, dm);
+        const dm = strval(values[rptAttr("armes", "armedmnbde", id)], "1")+"d"+strval(values[rptAttr("armes", "armedmde", id)], "4");
+        migrated.set(rptAttr(section, "arme-dm", id), dm);
       });
   
       migrated.set("version_max", "v" + verCOF1);
@@ -16037,12 +17063,12 @@ function loadAttackLists(section) {
       const otherHand = strval(values.main_autre);
       const shield = boolval(values.bouclier_eqp);
       rowIds.forEach(id => {
-        const type = strval(values[`repeating_${section}_${id}_arme-atktype`]);
+        const type = strval(values[rptAttr(section, "arme-atktype", id)]);
         if (type === "sort")
           return;
-        const label = strval(values[`repeating_${section}_${id}_arme-label`], "999");
-        const name = strval(values[`repeating_${section}_${id}_arme-nom`]);
-        const twoHands = intval(values[`repeating_${section}_${id}_arme-2m`]);
+        const label = strval(values[rptAttr(section, "arme-label", id)], "999");
+        const name = strval(values[rptAttr(section, "arme-nom", id)]);
+        const twoHands = intval(values[rptAttr(section, "arme-2m", id)]);
         attackList.push({
           label: name,
           value: `${label}~${id}~${twoHands}`,
@@ -16201,7 +17227,7 @@ function updateActionButtons(options) {
         return;
       const updates = new Map();
       rowIds.forEach(rowId => {
-        const atkBtn = `repeating_${section}_${rowId}_${button}`;
+        const atkBtn = rptAttr(section, button, rowId);
         updates.set(atkBtn, `%{${charName}|${atkBtn}}`);
       });
       if (updates.size > 0)
@@ -16373,7 +17399,7 @@ on("change:pvig_max", function(eventInfo) {
  * On clicking token adjust buttons (TokenMod)
  */
 on("clicked:token_min-btn clicked:token_max-btn clicked:token_siz-btn clicked:token_def-btn", function(eventInfo) {
-  getAttrs([ "sheet_type", "character_name", "pm_max" ], function(values) {
+  getAttrs([ "sheet_type", "character_name", "pm_max", "taille" ], function(values) {
     const bt = strval(eventInfo.triggerName.split("_")[1]);
     const resize = strval(({
       "min-btn": "0.9",
@@ -16385,14 +17411,23 @@ on("clicked:token_min-btn clicked:token_max-btn clicked:token_siz-btn clicked:to
     if (resize !== "") {
       props = { scale: "*" + resize };
     } else {
-      props = { bar2_link: "def" };
+      const tk = SWData.settings.tokens;
+      Object.entries(tk[strval(values.sheet_type)]).forEach(([k, v]) => {
+        if (v !== "pm" || intval(values.pm_max) > 0)
+          props[k] = v;
+      });
       if (isNPC) {
-        props = { ...props, bar3_link: "", bar3: "@{PVIG}" };
-      } else {
-        props = { ...props, bar3_link: "PVIG" };
+        let tokenSize;
+        const size = strval(values.taille);
+        if (size !== "") {
+          tokenSize = ({
+            "Minuscule": tk.size * 0.5, "Très petite": tk.size * 0.5,
+            "Petite": tk.size, "Moyenne": tk.size,
+            "Grande": tk.size * 2, "Énorme": tk.size * 3, "Colossale": tk.size * 4
+          })[size] || 70;
+        }
+        props = { ...props, width: tokenSize, height: tokenSize };
       }
-      if (!isNPC && intval(values.pm_max) > 0)
-        props = { ...props, bar1_link: "pm" };
     }
     sendChatCmd(tokenMod(strval(values.character_name), props));
   });
