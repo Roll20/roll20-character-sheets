@@ -1,3 +1,362 @@
+# 2025-11-04
+
+The where-did-november-come-from release.
+
+- Show DB info for calculation
+- New game options
+  - Reduce DB bonus to 1x Qu instead of 3x
+  - Only use running Ranks for partial/full dodge
+- Display options on status pages
+
+# 2025-10-30
+
+- Fix issue where items were not being filtered out correctly on updating inventory.
+  - Filter pattern was reversed.  Thanks to @alpinecowboy2.
+
+# 2025-10-28
+
+- Add target to token actions
+- Races.js -> Galvinise it first.
+- Add a HP Info box
+- Sheet version updated to 15
+  - Move Racial Hits bonus to hp_misc
+  - Fixes issue where characters got Racial Hits as a bonus to Endurance.
+    - Thanks @frewfrux for the report!
+  - Force update to udpate Endurance, body dev and hp
+- Add hp_info & display it
+- Creation: Save HP in base hits
+- Fix display of current phase when ending a turn
+  - Thanks @saramund for the report!
+
+## Compendium:
+
+- Banecroft:  Add descriptions to the heros and BBEG
+- Arcane:
+  - Knacks for Arcanist & Archmage: All professions have knacks & costs now
+  - Fix Witchblade base lists to remove warnings
+  - Arcane: Places of power nearly done
+
+# 2025-10-21
+
+- Injuries:
+  - Ignore spaces in the injury string
+- Misc: Add support for prefix search
+- Skills:
+  - Add backend support for Character Companion Specialised skills
+- Banecroft:
+  - Fix an NPC weapon
+  - Fix an NPC spell list
+  - Update creatures on maps
+- Arcane: Spirits update
+
+# 2025-10-14
+
+- Remove spurious ` in the sheet
+- Fix some dependances hiding some old updates
+- Fix "agibberish" -> gibberish
+- Allow attacks to not have the numeric size
+- Add table roller support for Spell failures
+
+# 2025-10-04
+
+- Fix display of scaled hits.
+- Reenable base spells during levelup
+- Get rid of spell lists errors
+- Banecroft:
+  - Fix creatures defenses
+  - Fix Giant A<redacted> attacks
+- Fix template for spell lists to display notes
+- Arcane:
+ - Start on Arcanist list
+ - Costs for Arcanist & Evoker
+- Add Tap Addiction to sheet
+
+# 2025-09-23
+
+- Creature Law (new upload)
+  - Fix level variance in listing
+  - Fix Variance in listings
+  - Fix variance in display
+- Banecroft (new upload)
+  - Adventure text uploaded
+  - Creatures updated to new standard
+  - First Tokens created
+- Validation
+  - Support Body,Head,Arms,Legs format for AT
+  - Validate attack sizes for creatures
+- Stuff: Fix error in itemmaterial not saving
+- Levelup: 
+  - Don't try and levelup current_level/new_level
+  - Spell lists show the group
+  - Recreate previous skill ranks correctly
+- Misc: Make one of the errors more verbose
+- Spells: Fix display of mixed armor penalties
+  - calculation was correct, display showed culmulative error
+- Create: fix highest message (@ixs)
+
+# 2025-09-18
+
+- Fix stacking of the overlays
+- Show token marker otpsions corrently
+- Fix edit stats
+- Updated preview image.
+
+# 2025-09-16
+
+- First version of token markers
+  - Sheet options
+  - Random colours
+  - Trigger on status change.
+- Fix stacking of popups on main page
+- Add helper to get total number of bleeds
+- Add options for token makers
+- Add options for FX (doesn't do much)
+- Export to NPC now grabs spell lists.
+- Inventory (Stuff)
+  - Fix Helmet perception penalty trashing other modifiers
+  - Apply Armor DB
+  - Removed Armor DB & Perception penalties when you remove items
+  - Fix for armor losing it's encumberance.
+  - Add support for "Sets" Armor without a helmet
+  - Add armor material to edit window
+  - Correctly support mixed material encumberances (metal != non-metal)
+
+# 2025-09-11
+
+- Try and get the info popups working again.
+- fix spurious --> from the rolltemplates page
+
+# 2025-09-09
+
+- Can now roll weapon fumbles direct from the sheet.
+- Remove the old Roll Crit buttons
+- Add `statuspercent200`; which ranges from 200 -> 0 as your penalties go down
+- Set sheet version to 14
+- Fix the light crossboX.
+- Fix rolling Y/Z criticals.
+- Layout improvements on the front tab - little boxes around all the things.
+- Dice icons:
+  - Fix layout to be consistent everywhere (finally)
+  - Use single style for all the dice icons
+  - Fix alignment of the dice on the skills page
+  - Little animation when you hover... because you can do that when sort
+    the other stuff.
+- Attacks:
+  - Move overlay to own file
+- Fix missing line break in rolltemplate.
+
+# 2025-09-04
+
+- Force statuspercent_max to be 100.
+
+# 2025-09-02
+
+- Allow Injury strings to start with "Injury: " to make pasting easier
+- Status:
+  - Add 'statuspercent'; Equal to (100 - statuspenalty).   Used so you
+    can have a penalty bar that goes down as PCs/NPCs get injured
+  - Add allpenalties; status effect + status penalty
+  - Add a little bar to show it.
+- Tokenbar: Bar3 now follows 'allpenalties'
+- Bump sheet version
+  - Force an update of penalties on load.
+- Support Arcane spell casting modifier
+
+# 2025-08-28
+
+- Fix attacks missing othermod/parrymod
+
+# 2025-08-26
+
+- Creatures
+  - Take AP penalties on attacks
+  - Arcane RRs for new creatures
+- Force RR update to get Arcane RRs for PCs
+- Sheet Load / Init
+  - On version check, pass in sheet version
+  - Make sure we check pending functions
+  - Version 11
+  - Old creatures, force arcane update
+- Levelup
+  - Save the current and new level.   Avoids lots of async code to fetch it many times
+  - Display as a hidden text entry.  So works with jumpgate and traditional.
+  - Skills are now resiliant to unexpected fields
+  - Add some space on the left of items.  So much prettier.
+  - Re-enable the levelup summary.
+    - ~700 lines of tests on this thing
+  - Summary now has:
+    - Skills
+    - Stat gains
+    - Talents
+    - Spell lists
+- Tests
+  - setCharmancerText is now emulated
+  - addRepeatingSection is now emulated
+  - Fix second countrStatGains test being ignored.
+
+# 2025-08-22
+
+- Emergency release to fix level up.
+- Disable the levelup summary which was most... broken.
+
+# 2025-08-21
+
+- Fix parrymod and other(ob)mod for creatures
+- Show aptrack (the AP box) in the 4th box
+
+# 2025-08-19
+
+- Display bonus when using 2 handed weapons
+- Add RRs for Arcane
+- Creature Skill roll updates
+  - Use the specific table when we can
+- New UI for critical rolls.
+
+# 2025-08-12
+
+So after a short vacation... updates again!
+
+- DB:
+  - Add a DB Modifier - straight DB addtion (about 20 people have asked for
+        this, sorry it was so slow).
+  - Automatically update the DB Defense mode when it updates
+  - Autoamtically update DB when other fields change too
+- Update some specialisations for new books
+- Directed Spells use AP correctly when attacking
+- AP tracker displays (mirrors on Spell page)
+- New combat clears the 'free used' button
+- Automatically load missiles when using AP track.
+- Option for 2 handed weapons - add +10 bonus for them
+- After attack options - do things automatically after you attack
+  - Do nothing
+  - Clear AP
+  - Clear AP & End turn
+
+Known issues:
+- Specialised skills are not showing correctly in levelup
+- Refresh target isn't working correctly
+
+# 2025-07-22
+
+- Fix potential bug creating characters not using custom races.
+- Optmise race creation; so it's like 400 times faster.
+    - Single get and set
+    - Don't call multiple requests
+    - Correctly nest pending calls
+- First version of PC -> NPC generation.
+- PC token setting attempt #863.
+- Reorg some of the code to make it easier to find things.
+- Dont' trigger potential race conditions updating proficiency bonuses.
+
+# 2025-07-17
+
+Thursday updates?  A very weird Tuesday
+
+- Remove the old Race name translations.  Unused.
+- Custom Race support.
+
+# 2025-07-10
+
+The Thursday little bug edition
+
+- Fix old 'condole.log' problem with ranged weapons (alpinecowboy)
+- Fix ranged weapon penalties applying to everything (!)
+- Fix partial block not being set (Major Havoc & others)
+- Enable Primary/Secondary attack token actions
+- Enable End Turn token action
+
+# 2025-07-08
+
+- Use ISO 8601 for dates.
+- Action tracking improvements
+   - Use a drop down instead of multiple actions
+   - Use a single AP track
+   - Many more actions
+   - Up to 20(!) phasee support
+- Add token actions for AP tracking
+- Creature data update
+- Investigate Beacon -> no go
+
+# 2025-7-1
+
+Pre-Birthday release!
+
+- Fix versioning past version 7
+- Fucus -> Focus
+- Mental Fatigue/Endurance:
+  - Calculate the value
+  - Add a die roll button
+- Update feats of strength
+- Async (Internal)
+  - Add a warning if code double calls the async procedures.
+  - Discover there are literally hundreds of places it's called.. *sigh*
+- Inventory:
+  - More async of methods to make sure we don't double call
+- Attacks:
+  - Make one attacks update async
+- Skill updates all linear now (no double calls, should be faster)
+- Update DB is now async
+- Errors
+  - Keep an error count, and fix formating of last errors.
+- Arcane realm stat
+- Basic TP support
+- Creatures now set fields bars correctly:
+ - Green: HP
+ - Blue: PP
+ - Red: Status (total penalty)
+- Tracker can now target creatures (not super useful yet)
+
+# 2025-6-24
+
+- Fix Training Packages title
+- Make training package tab actually clickable
+- Generate correct list of levelup skills for levelup summary.
+
+# 2025-6-17
+
+- Fix a bug with Critscaling sometimes corrupting the critical
+- Move pack carried up a bit
+- Powerlevel change selector: Fix the event handler to work
+- Make onCheck more specific about changed values
+- Fix DB not updating after encumberance or shield change
+- Charactermancer: Fix some cultures not toggling the specialisation
+- Kill the old purchase.js which was still being loaded!?
+  - Removes a whole pile of the load time errors.
+
+# 2025-6-3
+
+- Attacks Edit
+   - Restore the attack table correctly
+   - Option for attack crit scaling
+   - Be more liberal in letting attack edits.
+- Encumberance:
+   - Move to single % encumberance, not 5 increments
+   - Fix problem with negative weight allowance.
+   - Update weight when items are deleted always
+- DB
+   - Fix issue with partial block - hopefully for real this time
+   - Include parry in DB
+   - Add enhanced and restricted parry
+   - Placeholders for Flatfoot and Surprised
+   - Update when encumberance penalty changes.
+- Add support for manually adding description only talents
+- Add a space for unusual events
+- Fix a typo arkness -> darkness
+- Fix for creatures display for level, level variance and size
+- Internal
+  - Ignore more stuff
+- Add placeholder for called shots and parry mods.
+- Show last 3 errors
+- Add ability for attacks to adjust criticals up and down
+- Creature Law:
+  - Fix layout of inline creatures in Creature Law
+- Attacks/Targetting
+  - Don't fetch tokenid, it's not useful
+  - Refresh based on name
+- Creatures
+  - Publish perception as a special skill for creatures
+  - Placeholder for power level scaling.
+
 # 2025-5-27
 
 - Update weapons to match current Creature Law

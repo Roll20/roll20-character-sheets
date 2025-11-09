@@ -1,0 +1,14 @@
+# TODO
+* inventory (consumables/trinkets/treasures)
+## Discord
+* https://discord.com/channels/1264403896634445875/1264403896634445877
+## JSON instructions
+* {
+  "html": "draw-steel.html",
+  "css": "draw-steel.css",
+  "authors": "Primal Zed",
+  "roll20userID": "2322441",
+  "preview": "preview.png",
+  "instructions": "For [Draw Steel by MCDM](https://www.mcdmproductions.com/)\nThis Draw Steel character sheet for Roll20 is an independent product published under the DRAW STEEL Creator License and is not affiliated with MCDM Productions, LLC. DRAW STEEL © 2024 MCDM Productions, LLC.",
+	"legacy": false
+}

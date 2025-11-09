@@ -59,13 +59,24 @@
         <div class="sect announcements">
           <input type="checkbox" class="sect-show" name="attr_toggle_announcements" value="1" title="Open to read about important sheet changes." checked /><span class="material-icons"></span>
           <h4>Important Sheet Announcements</h4>
-          <h5 class="right two-columns">
+          <h5 class="right two-columns span-all">
             <span class="left">
               <span>v<span name="attr_sheet_version">
             </span>
-            <span class="right"> • 2/23/25'</span>
+            <span class="right"> • 10/25/25'</span>
           </h5>
           <ul>
+            <h5>Latest</h5>
+            <li>Updated the 'Equipment|Weapon|+Add' button to set all default weapon values for the attack row instead of just those synced from the Equipment's row. Fixes default hit-table info not being posted to chat (unless the selector was manually set) if the attack was created using the Equipment button.</li>
+            <li>Added a very subtle linear-gradient background(top transparent to bottom light gray) to a few sections to help introduce a little contrast between sections.</li>
+            <li>Fixed Equipment tabs for Carried|Not Carried|Mount|All not filtering.</li>
+
+            <h5>Previous</h5>
+            <li>Updated sheetworker logic used when creating new repeating rows. Allows API mods to detect the default values.</li>
+            <li>Updated the NWP title-text, inverting the +/- appropriately so it makes sense. Added an additional option in the NWP row dropdown to include a "vs Base" (which will give a roll-time query to enter a base/target value) to accommodate anyone that is using OA's version of NWP.</li>
+            <li>Open Doors changed from percentage roll to d6 (or larger die for demi-god level STR values).</li>
+            <li>Added additional logic to auto-fill bonus languages as per PHB. Previously the sheet only auto-filled Humans. This update will only effect new characters going forward. @{bonuslanguages} will remain unchanged for existing characters unless Race or INT are changed.</li>
+            <li>Added setting the NWP default values using sheetworkers upon row creation to help with API attribute recognition. ie ScriptCards. Also added a "Val." column to show the current value of the Ability selected.</li>
             <li>Added a "Magical" column and checkbox to equipment. Check this box if an item has magical properties. Items that are checked will also be displayed when the "Magic" tab is selected regardless of their type category.</li>
             <li>Added options to autofill Thief Skills racial and Dex modifiers.</li>
             <li>Added an option to the Thief Skills to sync to a class. Base value will continue to auto-adjust whenever the class level changes.</li>
@@ -707,7 +718,7 @@
       <input type="hidden" name="attr_armorshield_cost" value="0" />
       <input type="hidden" name="attr_armorhelmet_cost" value="0" />
 
-      <div class="sect border">
+      <div class="sect border linear-background">
         <span class="armor-columns column-header">
           <span>Armor Type</span>
           <span title="Only worn items are included in the AC calculations below.">In Use</span>
@@ -1438,12 +1449,12 @@
           </label>
           <input type="text" class="width-fill" name="attr_encumbrancebonus" title="@{encumbrancebonus} | Weight Allowance in gp. Keep this value as gp even if the sheet is using the lbs option." value="0" />
           <label class="inline-label">
-            <button class="dice-button text-only" type="roll" name="attr_minorstrengthfeat-roll" title="%{selected|minorstrengthfeat-roll} | Minor Strength Feat" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Open Doors}} {{roll_low=[[ 1d100cs ]]%}} {{roll_target=[[ @{minorstrengthfeat} ]]}} {{locked_doors=[Open a Locked Door?](~@{character_id}|minorstrengthfeat_locked-roll) You have a [[@{selected|minorstrengthfeat_locked}]]% chance to force open a locked, barred, magically held, or wizard locked door. Fighter's only.}}">
+            <button class="dice-button text-only" type="roll" name="attr_minorstrengthfeat-roll" title="%{selected|minorstrengthfeat-roll} | Minor Strength Feat" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Open Doors}} {{roll_low=[[ ?{Open Door die|1d6 [STR<=18],1d6 |1d8 [STR = 19 or 20],1d8 |1d10 [STR = 21],1d10 |1d12 [STR = 22 or 23],1d12 |1d12 [STR = 24],1d20 |2d12 [STR = 25],2d12}cs ]]}} {{roll_target=[[ @{minorstrengthfeat} ]]}} {{locked_doors=You have a chance ([[@{selected|minorstrengthfeat_locked}]] in 6) to force open a locked, barred, magically held, or wizard locked door. Fighter's only. note: Roll will use a larger die for STR 24 or 25.}} {{[Open a Locked Door?](~@{character_id}|minorstrengthfeat_locked-roll)}}">
               <span>Open Doors</span>
             </button>
           </label>
           <span class="two-columns">
-            <label class="label-percent">
+            <label>
               <input type="text" class="width-smallest" name="attr_minorstrengthfeat" title="@{minorstrengthfeat} | Minor Strength Feat: uses the highest # from STR table." value="0">
             </label>
             <input type="checkbox" class="hidden exceptional" name="attr_exceptional_strength_flag" value="1" />
@@ -1451,7 +1462,7 @@
               <span name="attr_minorstrengthfeat_locked"></span>
             </sup>
             <input type="hidden" name="attr_minorstrengthfeat_locked" value="0" />
-            <button class="hidden" type="roll" name="attr_minorstrengthfeat_locked-roll" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Open Locked Door}} {{roll_low=[[ 1d100cs ]]% }} {{roll_target=[[ @{minorstrengthfeat_locked} ]]%}}"></button>
+            <button class="hidden" type="roll" name="attr_minorstrengthfeat_locked-roll" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Open Locked Door}} {{roll_low=[[ ?{Locked, Barred, or Magically Held Door die|1d6 [STR = 18(91-100) or 19-23],1d6 |1d8 [STR = 24],1d8 |1d10 [STR = 25],1d10}cs ]] }} {{roll_target=[[ @{minorstrengthfeat_locked} ]]}}"></button>
           </span>
           <label class="inline-label">
             <button class="dice-button text-only" type="roll" name="attr_majorstrengthfeat-roll" title="%{selected|majorstrengthfeat-roll} | Major Strength Feat" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Bend Bars/Lift Gates}} {{roll_low=[[1d100cs]]%}} {{roll_target=[[ @{majorstrengthfeat}]]%}}">
@@ -1474,7 +1485,7 @@
           <label>
             <span class="stack-text">Add. Lang.</span>
           </label>
-          <input type="text" class="width-smaller" name="attr_bonuslanguages" title="@{bonuslanguages} | Auto-filled for humans. Manual entry required for demi-humans." value="0" />
+          <input type="text" class="width-smaller" name="attr_bonuslanguages" title="@{bonuslanguages} | Auto-filled based on Race and INT (see PHB)." value="0" />
           <label class="inline-label">
             <button class="dice-button text-only" type="roll" name="attr_knowspell-roll" title="%{selected|knowspell-roll}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Chance to Know Spell}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{knowspell} ]]%}}"><span>Know Spell</span></button>
           </label>
@@ -1657,7 +1668,7 @@
         </span>
       </div>
       <!-- Movement -->
-      <div class="sect border">
+      <div class="sect border linear-background">
         <span class="subheader center width-fill">Speed and Movement</span>
         <span class="basemove-columns column-header">
           <span class="span-five">Adjusted Speed</span>
@@ -2706,7 +2717,7 @@
       </div>
       <span class="material-icons"></span>
       <!-- Weapon Proficiency -->
-      <div class="weapons-proficiency-box border sect hide-as-npc">
+      <div class="weapons-proficiency-box border sect hide-as-npc linear-background">
         <h4 class="inline-label">Weapon Proficiency:</h4>
         <label>
           <span class="stack-text-wide">Initial # of Weapons:</span>
@@ -3478,7 +3489,7 @@
           </div>
         </fieldset>
       </div>
-      <div class="sect four-columns">
+      <div class="sect four-columns linear-background">
         <div class="capacity-box">
           <textarea class="height-fill" name="attr_itemnotes" title="@{itemnotes}" placeholder="Equipment Notes"></textarea>
         </div>
@@ -3548,7 +3559,7 @@
         <textarea class="height-tall" name="attr_wealthNotes" title="@{wealthNotes}" placeholder="Wealth Notes"></textarea>
       </div>
       <!--Carrying Capacity-->
-      <div class="span-all border sect">
+      <div class="span-all border sect linear-background">
         <span class="subheader center width-fill">Carrying Capacity</span>
         <div class="capacity-box-loads column-header">
           <span class="span-three">Strength Adj.</span>
@@ -3772,18 +3783,19 @@
           <span></span>
           <span>Proficiency</span>
           <span>Short Description</span>
-          <span>Attribute</span>
-          <span>Slots</span>
+          <span>Attribute/Base</span>
+          <span>Val.</span>
           <span>Adj.</span>
+          <span>Slots</span>
         </span>
         <fieldset class="repeating_nonweaponproficiencies">
           <span class="top-row nonweapon-proficiencies-row1 border-top-half">
-            <button class="dice-button" type="roll" name="attr_nwp_roll" title="%{repeating_nonweaponproficiencies_$X_nwp_roll} |&#10;* Very easy proficiency = +3 modifier &#10;* Easy proficiency = +1 modifier &#10;* Normal proficiency = no modifier &#10;* Hard proficiency = -1 modifier &#10;* Very hard proficiency = -2 modifier &#10;* Extremely hard proficiency = -3 modifier" value="@{nwp_macro_text}"></button>
+            <button class="dice-button" type="roll" name="attr_nwp_roll" title="%{repeating_nonweaponproficiencies_$X_nwp_roll} |&#10;* Very easy proficiency = -3 modifier &#10;* Easy proficiency = -1 modifier &#10;* Normal proficiency = no modifier &#10;* Hard proficiency = +1 modifier &#10;* Very hard proficiency = +2 modifier &#10;* Extremely hard proficiency = +3 modifier" value="@{nwp_macro_text}"></button>
             <label class="repeating-name">
               <input type="text" name="attr_nwp_name" title="@{repeating_nonweaponproficiencies_$X_nwp_name}" placeholder="Proficiency Name" />
             </label>
             <textarea class="height-short" name="attr_nwp_short_description" title="@{repeating_nonweaponproficiencies_$X_nwp_short_description}" placeholder="Short Description"></textarea>
-            <select class="width-medium" name="attr_nwp_attribute" title="%{repeating_nonweaponproficiencies_$X_nwp_attribute}">
+            <select name="attr_nwp_attribute" title="Select an applicable NWP Attribute or 'vs Base' for a roll-time query.|%{repeating_nonweaponproficiencies_$X_nwp_attribute}">
               <option value="0" selected>None</option>
               <option value="@{strength}">STR</option>
               <option value="@{dexterity}">DEX</option>
@@ -3792,9 +3804,11 @@
               <option value="@{wisdom}">WIS</option>
               <option value="@{charisma}">CHA</option>
               <option value="@{comeliness}" class="toggle-comeliness">COM</option>
+              <option value="?{vs Base Value|20}">vs Base</option>
             </select>
-            <input class="width-small" type="text" name="attr_nwp_slots" title="@{repeating_nonweaponproficiencies_$X_nwp_slots}" value="0" />
+            <input class="width-small" type="number" name="attr_nwp_attribute_value" value="(@{nwp_attribute})" title="%{repeating_nonweaponproficiencies_$X_nwp_attribute_value}" disabled />
             <input class="width-small" type="text" name="attr_nwp_modifier" title="@{repeating_nonweaponproficiencies_$X_nwp_modifier}" value="0" />
+            <input class="width-small" type="text" name="attr_nwp_slots" title="@{repeating_nonweaponproficiencies_$X_nwp_slots}" value="0" />
           </span>
           <details class="border-bottom-half">
             <summary>
