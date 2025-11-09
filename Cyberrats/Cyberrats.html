@@ -2330,24 +2330,6 @@
         </div>
       {{/range}}
       
-      
-      {{#armUpgrades}}
-        <!-- {{#fuseDie}} -->
-        <div class="sheet-armUpgrades">
-          <h4>Fuse die rolled a = {{fuseDie}}</h4>
-           You have {{armUpgrades}} upgrades.
-
-          {{#rollGreater() fuseDie armUpgrades}}
-            <h5>Fuse is safe</h5>
-          {{/rollGreater() fuseDie armUpgrades}}
-
-          {{#^rollGreater() fuseDie armUpgrades}}
-            <h5>Fuse blows, armament disabled</h5>
-          {{/^rollGreater() fuseDie armUpgrades}}
-           
-        </div>
-      <!-- {{/fuseDie}} -->
-      {{/armUpgrades}}
 
 </rolltemplate>
 
@@ -2589,6 +2571,7 @@
     {{/rollBetween() roll 5 6}}
   </div>
   {{#details}}<div class="details">{{details}}</div>{{/details}}
+  <div class="armament-reminder"><small><em>Did you use an armament? If so, check your fuse!</em></small></div>
 </rolltemplate>
 
 
@@ -3266,30 +3249,14 @@ on("clicked:repeating_arm:rollarm", function(eventInfo) {
       "repeating_arm_upgrades",
       "repeating_arm_harm",
     ], function(values) {
-          console.log(values);
           if(!values.repeating_arm_rangetext) {
             values.repeating_arm_rangetext = "";
           }
           
-          console.log(values.repeating_arm_upgrades);
-         // Do we have at least one upgrade? If not, don't show the fuse die at all.
-         if(values.repeating_arm_upgrades > 0) {
-         
-                startRoll(`&{template:weapon} {{title=Armament}} {{name=@{character_name}}} {{description=${values.repeating_arm_weapontext}}} {{weaponname=${values.repeating_arm_armname}}} {{harm=${values.repeating_arm_harm}}} {{range=${values.repeating_arm_rangetext}}} {{fuseDie=[[1d6]]}} {{armUpgrades=[[${values.repeating_arm_upgrades}]]}} `, (results) => {
-                finishRoll(
-                    results.rollId,
-                    {
-                    }
-                );
-          });
-
-         }
-          else {
       startRoll(`&{template:weapon} {{title=Armament}} {{name=@{character_name}}} {{description=${values.repeating_arm_weapontext}}}  {{weaponname=${values.repeating_arm_armname}}} {{harm=${values.repeating_arm_harm}}} {{range=${values.repeating_arm_rangetext}}}`,(results) => {
           finishRoll(results.rollId, {});
         }
       );
-    }
   });
 });
 
