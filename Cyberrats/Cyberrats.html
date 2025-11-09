@@ -91,6 +91,7 @@
   </section>
 
   <input class="hidden sheet-briny" name="attr_briny" type="checkbox">
+  <input class="hidden sheet-space" name="attr_space" type="checkbox">
   <section class="conditions">
     <div class="title">
       <h2>Conditions</h2>
@@ -137,7 +138,7 @@
             </div>
         </div>
         
-        <div class="conds brinycond">
+        <div class="conds brinyorspacecond">
             <div class="cond">
                <label for="attr_burn">Burning?
                  <input name="attr_burn" type="number" min="0" value="0">
@@ -149,6 +150,14 @@
             <div class="cond">
                <label for="attr_immobilized">Immobilized?
                <input name="attr_immobilized" type="checkbox"></label>
+            </div>
+        </div>
+        
+        <div class="conds spacecond">
+            <div class="cond">
+               <label for="attr_damaged">Damaged?
+                 <input name="attr_damaged" type="checkbox">
+               </label>
             </div>
         </div>
          
@@ -164,11 +173,6 @@
             </div>
         </div> 
         
-        <div class="conds">
-            <div class="cond">
-               <input name="attr_blank3" type="text">
-            </div>
-        </div> 
       </div>
   </section>
 
@@ -506,7 +510,20 @@
       <h3>Mech</h3>
         <div class="centerme">
           <input spellcheck="false" style="width:10em;" class="header-input" list="mechtypes" name="attr_character_mechtype" type="text">
-          <textarea class="maxwidth" spellcheck="false" value="Tug" name="attr_mechtug">Tug</textarea>
+          <div class="mech-abilities">
+            <div class="mech-ability-section">
+              <label>Tug:</label>
+              <textarea spellcheck="false" value="" name="attr_mechtug">Tug</textarea>
+            </div>
+            <div class="mech-ability-divider"></div>
+            <div class="mech-ability-section">
+              <div class="mshop-header">
+                <input type="checkbox" class="mshop-toggle" name="attr_mshop_enabled" value="1">
+                <label>M-shop captstone:</label>
+              </div>
+              <textarea spellcheck="false" name="attr_mechmshop"></textarea>
+            </div>
+          </div>
           <!-- Todo: we could auto populate tug based on mechtype change -->
         </div>
       <div class="mechStuff">
@@ -516,11 +533,11 @@
                 <fieldset class="repeating_Subs">
                     <span class="subspan">
                         <label>Type:</label>
-                        <select>
-                          <option value="Shoulder">Locomotion</option>
-                          <option value="Shoulder">Power Source</option>
+                        <select name="attr_subtype">
+                          <option value="Locomotion">Locomotion</option>
+                          <option value="Power Source">Power Source</option>
                           <option value="Shoulder">Shoulder</option>
-                          <option value="Shoulder">Undercarriage</option>
+                          <option value="Undercarriage">Undercarriage</option>
                         </select>
                         
                         <button type="roll" class="d6" name="roll_mun" value="&{template:powers} {{title=Subsystem}} {{name=@{character_name}}} {{description=@{subtext}}} {{powerName=@{subnamerep}}}"></button>
@@ -2742,6 +2759,60 @@ function getSubRoomDetails(room) {
   }
 }
 
+function getMechTug(mechType) {
+  switch(mechType) {
+    case "Beatbox":
+      return "You can spend Diesel as SP.";
+    case "Boomwagon":
+      return "Munition slots in your loadout can hold munitions or armaments. That is, you could have 6 armaments and 0 munitions, instead of the usual limit of 3 of each. Additionally, if you start your turn without any Diesel, you may take an additional action. If you are part of a supermech, the entire supermech must not have diesel. Each of your munitions with the \"blow a fuse\" condition can only activate if you have an unblown fuse to blow.";
+    case "Dynamo":
+      return "Cycle: Gain [2] Diesel, then increase this amount by 1 for the remainder of the mission.";
+    case "The Frog":
+      return "You have a hopper, a big, unfillable void in your gut. As an action, you can attempt to Gobble a close creature smaller than yourself. This is an automatic action if the creature is willing. Gobbled creatures are stored in The Frog's belly and are considered to be carried and isolated from all non-gobbled creatures. They are considered Weakened when harming the frog from the inside. The frog can store a max of [2] creatures. Mechs cannot be stored inside the frog, they are too big. The frog can open its mouth without spending an action, allowing all gobbled creatures out. Gobbled creatures can spend an action to force the pilot to make an Attribute test of their (the gobbled creature's) choice. On a failure, the gobbled creature escapes. There are no other failure or mixed success consequences.\r\nUpgrade cost 2: You may pull a mounted Operative directly into The Frog's belly, dismounting them in the process.";
+    case "The Germinator":
+      return "At the start of your turn, you may choose another mech at Close range. They gain Cycle: Gain [1] <Diesel>. If you choose the same mech multiple times, this effect stacks.";
+    case "Hotbox":
+      return "Hotbox has to constantly monitor Heat. Many of its powers and armaments generate Heat when used. Certain abilities can only be used in specific Heat ranges. General armaments and munitions can be used in any Heat range, and generate 1 Heat. If a pilot exceeds maximum Heat, the mech cannot take any actions.\r\nAny stacks of Burn applied to the mech increase Heat instead of damaging SP.";
+    case "The Juggler":
+      return "You gain additional Soak equal to the number of enemies you have Taunted.";
+    case "Leftovers":
+      return "You can consume fuel drops as health drops. Additionally, your mech can equip [2] powers that your pilot knows. These powers run off of Biotech and can be used while mounted. These powers do not occupy slots in the existing mech loadout.";
+    case "The Predatower":
+      return "Deal double Harm to creatures you have carried, moved, or immobilized this turn.";
+    case "Spider":
+      return "Egg Drop: As an automatic action, set down an egg sac in your location. When you do, start a 2-clock for that egg. Any creature forcibly moved into an egg sac becomes Immobilized and Dazed until the end of the ENEMY PHASE, destroying the egg sac. As an automatic action, you may pop (destroy) an egg sac, pulling all Near creatures Close to it. When the 2-clock fills up, the egg cracks and splits, revealing a still-damp hatchling. Each hatchling has 1 HP and Cycle: deal X Harm to one Close enemy, where X is the number of hatchlings. You can move all hatchlings one range band as a single automatic action.";
+    default:
+      return "";
+  }
+}
+
+function getMechMshop(mechType) {
+  switch(mechType) {
+    case "Beatbox":
+      return "You gain Stereo Select. Start each mission modeless and gain Cycle: switch to a new mode. The modes are Volume: All your armaments gain the Arc tag. Bass: All your armaments gain the Shred tag. Treble: Your armaments deal 1 True Harm before other effects. Subs: All of your armaments gain the Slowing keyword. That's right, you must switch modes each round!";
+    case "Boomwagon":
+      return "When you would blow a fuse on one of your armaments for any reason other than this ability, instead mark a 2-clock. When this clock fills, blow a fuse and clear the clock. Supermech armaments aren't yours!";
+    case "Dynamo":
+      return "Increase your starting Diesel by your Sly score. Additionally, add your lowest Attribute to the fuse die whenever you roll it.";
+    case "The Frog":
+      return "On your turn, you can spend 2 points of Biotech to apply one of the following effects to all creatures you have Gobbled: Deal 1 True Harm, Recover 1 HP, Recover 1 Biotech. This is not an action.";
+    case "The Germinator":
+      return "Whenever you restore <Diesel> to yourself or another mech, increase the <Diesel> gained by your lowest Attribute.";
+    case "Hotbox":
+      return "On your turn, you may spend 1 fuel to shift up or down one temperature zone. Your Heat changes by the smallest amount necessary to move into the new zone. You may do this as often as you'd like. This is not an action.";
+    case "The Juggler":
+      return "Gain Soak equal to your lowest Attribute.";
+    case "Leftovers":
+      return "The first Power or Munition you use on your turn each round does not cost any Biotech or Diesel.";
+    case "The Predatower":
+      return "On your turn, you may spend 1 <Biotech> to roll a die. If you roll less than or equal to your highest Attribute, gain 2 <Diesel>. You may do this as often as you'd like. This is not an action.";
+    case "Spider":
+      return "At the start of each mission, gain a number of chits equal to your Cyber score. At any point before or after a roll, you can give yourself or a Close ally 1 chit to increase that roll by 1.";
+    default:
+      return "";
+  }
+}
+
 function getRoomDetails(room, isBriny, isHoneycomb) {
 // Defense should show up for the main room only and only in BB expansion. Better would be to refactor to isMainRoom but here we are.
   return getRawRoomDetails(room) + (isBriny ?  !isHoneycomb ? `\r\nCurrent Defense: 0` : "" : "");
@@ -2755,7 +2826,7 @@ function getRawRoomDetails(room) {
       return `Unlocks the Augury powers for purchase by any Operative`;
 
   case Rooms.Clinic:
-      return `Injured Operatives can be healed by any Operative(s) spending 2 Scrip during downtime. Each time any Operative uses the Clinic, the cost increases by 1 Scrip.\r\nCurrent cost:`;
+      return `Injured Operatives can be healed by any Operative(s) spending 2 Scrip during downtime. Each time any Operative uses the Clinic, the cost increases by 1 Scrip.\r\nCurrent cost: 2`;
 
   case Rooms.Debt_House:
       return `All Operatives on the primary mission roll an extra d6 for Scrip.`;
@@ -3354,6 +3425,18 @@ on("change:repeating_adversaries:adversaryname", function(eventInfo) {
   });
 });
 
+// Mech type change - autocomplete Tug and M-shop abilities
+on("change:character_mechtype", function(eventInfo) {
+  const mechType = eventInfo.newValue;
+  const tugText = getMechTug(mechType);
+  const mshopText = getMechMshop(mechType);
+  
+  setAttrs({
+    "mechtug": tugText,
+    "mechmshop": mshopText
+  });
+});
+
 on("change:repeating_powers:equipped", function(eventInfo) {
   console.log(eventInfo);
   const changeval = eventInfo.newValue === "on" ? 1 : -1;
@@ -3725,7 +3808,7 @@ on("clicked:drops", function() {
 
 // Reset after each mission
 on("clicked:reset", function() {
-  getAttrs(["hp_max", "resetpowers", "biotech_max", "barrier_max", "soak_max", "shard_max", "mech_diesel_max", "mech_shard_max", "mech_SP_max", "mech_soak_max"], (values) => {
+  getAttrs(["hp_max", "resetpowers", "biotech_max", "barrier_max", "soak_max", "shard_max", "mech_diesel_max", "mech_shard_max", "mech_SP_max", "mech_soak_max", "smash"], (values) => {
     // Set HP to max HP
     // Set Biotech to max Biotech
     const hp = values.hp_max;
@@ -3737,6 +3820,7 @@ on("clicked:reset", function() {
     const msh = values.mech_shard_max;
     const msp = values.mech_SP_max;
     const msk = values.mech_soak_max;
+    const smashVal = values.smash;
     setAttrs({
       "hp" : hp,
       "biotech" : bt,
@@ -3746,7 +3830,8 @@ on("clicked:reset", function() {
       "mech_diesel" : md,
       "mech_shard" : msh,
       "mech_SP" : msp,
-      "mech_soak": msk
+      "mech_soak": msk,
+      "heat": smashVal
     });
     
     // Unuse all drones
