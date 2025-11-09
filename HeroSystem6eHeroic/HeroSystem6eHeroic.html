@@ -16367,6 +16367,24 @@
 			
 			<div class="item-options-row">
 				<div class="custom-select-option">
+					<select name="attr_optionKnockbackDice">
+						<option value="0" selected>Never</option>
+						<option value="1">1d6</option>
+						<option value="2">2d6 ✶</option>
+						<option value="3">3d6</option>
+					</select>
+				</div>
+				<h1>Roll for</h1>
+				<div class="custom-select-option">
+					<select name="attr_optionKnockdown">
+						<option value="0">Knockback</option>
+						<option value="1" selected>Knockdown</option>
+					</select>
+				</div>
+			</div>
+			
+			<div class="item-options-row">
+				<div class="custom-select-option">
 					<select name="attr_whisperToGM">
 						<option value="" selected>Never</option>
 						<option value="/w GM ">Always</option>
@@ -16395,7 +16413,7 @@
 			
 			<div class="item-version-information">
 				<!-- Update version before release. -->
-				<input type="text" value="4.73" name="attr_version" title="@{version}" readonly tabindex="-1"/>
+				<input type="text" value="4.80" name="attr_version" title="@{version}" readonly tabindex="-1"/>
 			</div>
 		</div>
 		
@@ -16516,7 +16534,7 @@
 <input type="hidden" name="attr_hiddenIsMental"  value="false"/>
 <input type="hidden" name="attr_hiddenIsAoE" value="false"/>
 <input type="hidden" name="attr_hiddenStunMod"  value="0"/>
-<input type="hidden" name="attr_hiddenMessage"  value="Test"/>
+<input type="hidden" name="attr_hiddenMessage"  value="0"/>
 
 <!-- Hidden variables for clean power dice strings -->
 <input type="hidden" name="attr_hiddenPowerDice01"  value="0"/>
@@ -23069,35 +23087,38 @@
 		return theHitLocation;
 	}
 	
+	
 	function convertStunToBody(diceRolls) {
-		let computed = 0;
-					
+		let body = 0;
+		let coin = 0;
+		
 		for(let groupOfDice of diceRolls) {
-			if (groupOfDice.sides == 3) {
+			if (groupOfDice.sides === 3) {
 				// calculate normal damage of d3 dice.
 				for (let element of groupOfDice.results) {
 						if (element === 3) {
-						computed = computed+1;
+							body += 1;
 						} else if (element === 2) {
-						computed = computed + Math.floor(Math.random()*2); // Flip a coin. 0 or 1 BODY corresponding to a '3' or '4' on a d6.
+							coin = Math.floor(Math.random()*2);
+							body += coin; // Flip a coin. 0 or 1 BODY corresponding to a '3' or '4' on a d6.
 					} else {
-						computed = computed+0; // Add nothing.
+						// Add nothing. 
 					}
 				} 
-			} else if (groupOfDice.sides == 6) {
+			} else if (groupOfDice.sides === 6) {
 				// calculate normal damage of d6 dice.
 				for (let element of groupOfDice.results) {
 					if (element === 1) {
-						computed = computed+0; // Add nothing.
 					} else if (element === 6) {
-						computed = computed+2;
+						body += 2;
 					} else {
-						computed = computed+1;
+						body += 1;
 					}
 				}
 			}
 		}
-		return computed;
+		
+		return body;
 	}
 	
 	
@@ -23755,13 +23776,14 @@
 	
 	// Roll weapon damage
 	on("clicked:hiddenDamageRoll", function () {
-		getAttrs(["hiddenIsNormal", "hiddenIsContest", "hiddenIsPower", "hiddenIsAoE", "hiddenStunMod", "hiddenMessage", "optionHitLocationSystem", "whisperToGM", "character_title", "dingbat"], function(values) {
+		getAttrs(["hiddenIsNormal", "hiddenIsContest", "hiddenIsPower", "hiddenIsMental", "hiddenIsAoE", "hiddenStunMod", "hiddenMessage", "optionHitLocationSystem", "optionKnockbackDice", "optionKnockdown", "whisperToGM", "character_title", "dingbat"], function(values) {
 			var theRoll = values.whisperToGM||"";
-			let useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
-			let isNormal = (values.hiddenIsNormal === "true") ? true : false;
-			let isContest = (values.hiddenIsContest === "true") ? true : false;
-			let isPower = (values.hiddenIsPower === "true") ? true : false;
-			let isAoE = (values.hiddenIsAoE === "true") ? true : false;
+			const useHitLocations = (values.optionHitLocationSystem === "on") ? true : false;
+			const isNormal = (values.hiddenIsNormal === "true") ? true : false;
+			const isContest = (values.hiddenIsContest === "true") ? true : false;
+			const isPower = (values.hiddenIsPower === "true") ? true : false;
+			const isMental = (values.hiddenIsMental === "true") ? true : false;
+			const isAoE = (values.hiddenIsAoE === "true") ? true : false;
 			let dmgType = (isContest || isPower) ? "ATTR" : (isNormal ? "STUN" : "BODY");
 			let otherDmgType = (isContest || isPower) ? "PIPS" : (isNormal ? "BODY" : "STUN");
 			let stunMod = Math.max(-2, Math.min(2, (parseInt(values.hiddenStunMod)||0)));
@@ -23770,12 +23792,20 @@
 			let theSTUNMultiplier = Math.floor(Math.random()*3 + 1);
 			const dingbat = ((values.character_title).replace(/\s/g, '') != '') ? (" "+values.dingbat+" ") : "";
 			
+			// Optional if rollling for knockback
+			const doesKnockback = ((values.optionKnockbackDice !== "0") && (isMental === false) ) ? true : false;
+			const onlyKnockdown = (values.optionKnockdown === "1") ? true : false;
+			let knockbackRoll = rollKnockback(values.optionKnockbackDice||0);
+			let knockback = knockbackRoll.total;
+			
+			// Prepare damage message
 			theRoll += "&{template:custom"+ (isPower ? "-power" : "") + (isNormal ? "-normal" : "") + (isContest ? "-contest" : "") + "-damage} ";
 			theRoll += "{{title=@{character_name}"+dingbat+"@{character_title}}} ";
 			theRoll += "{{subtitle=" + values.hiddenMessage + (isContest ? " Strength Contest " : (isPower ? " Result " : " Damage ")) + "}} ";
 			
 			theRoll += "{{"+dmgType+"=[[@{hiddenDamage}]]}}";
-			theRoll += "{{"+otherDmgType+"=[[0[See "+dmgType+"]]]}}";
+			
+			theRoll += "{{"+otherDmgType+"=[[0[See "+dmgType+(doesKnockback ? (" ❖ KB "+knockbackRoll.result) :"")+"]]]}}";
 			
 			if (useHitLocations && !isContest & !isPower) {
 				theRoll += " {{HITLOC=[[@{targetHitRoll}]]}}";
@@ -23799,12 +23829,38 @@
 				
 				if (isPower || isContest || isNormal) {
 					// Convert dice roll to equivalent BODY damage.
-					computed = convertStunToBody(results.results[dmgType].rolls);
+					if (doesKnockback) {
+						computed = convertStunToBody(results.results[dmgType].rolls);
+						knockback = computed - knockback;
+						if (knockback > 0) {
+							computed += (onlyKnockdown ? " ↓↓" : " ⚞"+2*knockback+"m⚟");
+						} else if (knockback === 0) {
+							computed += " ↓↓";
+						} else {
+							computed += " •••";
+						}	
+					} else {
+						computed = convertStunToBody(results.results[dmgType].rolls);
+					}
 				} else {
+					if (doesKnockback) {
+						knockback = computed - knockback;
+					}
 					computed *= theSTUNMultiplier;
-					computed = String(computed) + " (BODY x" + theSTUNMultiplier + ")";
+					
+					computed = String(computed) + " (BODY×" + theSTUNMultiplier + ")";
+					if (doesKnockback) {
+						if (knockback > 0) {
+							computed += (onlyKnockdown ? " ↓↓" : " ⚞"+2*knockback+"m⚟");
+						} else if (knockback === 0) {
+							computed += " ↓↓";
+						} else {
+							computed += " •••";
+						}
+					}
 				}
 				
+				theResult[dmgType] = results.results[dmgType].total;
 				theResult[otherDmgType] = computed;
 				
 				if (useHitLocations && !isContest) {
@@ -23815,6 +23871,38 @@
 			});
 		});
 	});
+
+
+	// Roll knockback distance, which is done prior to invoking damage rolls.
+	function rollKnockback(knockbackDice) {
+		let numberOfDice = Math.max(Math.min(knockbackDice, 3), 0);
+		
+		return rollDice(knockbackDice, 6);
+	}
+	
+	
+	// Dice rolling function, which is done outside the usual Roll20 roll system for now.
+	// Dice rolling function, which is done outside the usual Roll20 roll system for now.
+	function rollDice(numberOfDice, numberOfSides) {
+		var theOutput = new Object();
+		
+		let roll = 0;
+		let total = 0;
+		let diceRolls = parseInt(numberOfDice)||0;
+		let diceSides = parseInt(numberOfSides)||1;
+		let result = "";
+		
+		for (let i = 1; i <= diceRolls; i++) {
+			roll = Math.floor(diceSides * Math.random()) + 1;
+			result += (i===1 ? "" : "+") + String(roll);
+			total += roll;
+		}
+		
+		theOutput["total"] = total;
+		theOutput["result"] = result;
+		
+		return theOutput;
+	}
 
 
 	// Roll attack for Weapon XX.
@@ -23837,7 +23925,7 @@
 	});
 	
 	
-	// Function for handling standard maneuver weapon attacks.
+	// Activate standard maneuver weapon attacks.
 	function weaponAttack(weaponId) {
 		getAttrs(["weaponName"+weaponId, "weaponDamageType"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponOCV"+weaponId, "weaponStrength"+weaponId, , "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "weaponCSL"+weaponId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverOCVmod", "variableOCVmod", "checkBrace", "checkSet", "strengthNet", "currentDCV", "velocity", "hiddenBasicDamage", "dingbat", "ocvNet", "targetOCVpenalty", "variableOCVmod"], function(values) {
 			var theRoll = values.whisperToGM||"";
@@ -23893,6 +23981,9 @@
 			let theRangePenalty = parseInt(values.rangeOCVpenalty)||0;
 			let hasRangePenalty = true;
 			let targetPenalty = parseInt(values["targetOCVpenalty"])||0;
+			
+			// Mental attack?
+			attributes.hiddenIsMental = isMental ? "true" : "false";
 			
 			// Limit DCV mod.
 			dcvMod = Math.max(0, (Math.min(modLimit, dcvMod)) );
@@ -24171,7 +24262,7 @@
 	}
 	
 	
-	// Function for handling martial maneuver weapon attack XX.
+	// Activate martial maneuver weapon attack XX.
 	function weaponMartialAttack(weaponId, maneuverId) {
 		getAttrs(["weaponName"+weaponId, "weaponDamageType"+weaponId, "weaponStunMod"+weaponId, "weaponEndurance"+weaponId, "weaponAreaEffect"+weaponId, "weaponRangeMod"+weaponId, "hiddenWeaponSign"+weaponId, "weaponAdjustedDC"+weaponId, "hiddenWeaponDamage"+weaponId, "weaponOCV"+weaponId, "weaponDC"+weaponId, "weaponDamage"+weaponId, "weaponStrength"+weaponId,  "weaponStrengthMin"+weaponId, "weaponEnhancedByStr"+weaponId, "weaponAdvantage"+weaponId, "martialManeuverCSLmod"+maneuverId, "hiddenMartialManeuverDamage"+maneuverId, "martialManeuverNormal"+maneuverId, "martialManeuverPhase"+maneuverId, "martialManeuverEffect"+maneuverId, "martialManeuverStunMod"+maneuverId, "martialManeuverStrMod"+maneuverId, "martialManeuverOCVmod"+maneuverId, "martialManeuverDCVmod"+maneuverId, "martialManeuverRNGmod"+maneuverId, "martialManeuverOCV"+maneuverId,"martialManeuverDCV"+maneuverId, "martialManeuverDC"+maneuverId, "martialManeuverName"+maneuverId, "martialManeuverEndurance"+maneuverId, "martialManeuverType"+maneuverId, "optionAutoSubtractEND", "optionHitLocationSystem", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "checkBrace", "checkSet", "strengthNet", "currentDCV", "velocity", "hiddenBasicDamage", "dingbat", "ocvNet", "targetOCVpenalty"], 
 		function(values) {
@@ -24234,7 +24325,10 @@
 			let targetPenalty = parseInt(values["targetOCVpenalty"])||0;
 			
 			// Add the weapon's base END cost to the maneuver's listed END.
-			let subtractENDAmt = parseInt(values["martialManeuverEndurance"+maneuverId])||0;	
+			let subtractENDAmt = parseInt(values["martialManeuverEndurance"+maneuverId])||0;
+			
+			// Mental attack?
+			attributes.hiddenIsMental = isMental ? "true" : "false";
 			
 			// Keep mod within reasonable limits.
 			dcvMod = Math.max(0, (Math.min(modLimit, dcvMod)) );
@@ -24496,7 +24590,7 @@
 	});
 	
 	
-	// Roll attack and damage dice for Weapon XX.
+	// Invoke basic attack.
 	on(`clicked:attackStrength`, (info) => {
 		
 		getAttrs(["hiddenBasicDamage", "hiddenBasicEndurance", "optionAutoSubtractEND", "optionHitLocationSystem", "optionD6MinusOne", "optionWeaponDamageCap", "whisperToGM", "character_title", "displayDegreeOfSuccess", "rangeToTarget", "rangeOCVpenalty", "maneuverSelection", "maneuverDCVmod", "maneuverOCVmod", "variableOCVmod", "maneuverDamageCSL", "checkBrace", "checkSet", "strengthNet", "currentDCV", "velocity", "maneuverDCLimit", "dingbat", "ocvNet", "targetOCVpenalty"], function(values) {
@@ -24536,6 +24630,9 @@
 			let dcvMod = parseInt(values.maneuverDCVmod)||0;
 			let ocvMod = parseInt(values.maneuverOCVmod)||0;
 			let targetPenalty = parseInt(values["targetOCVpenalty"])||0;
+			
+			// Strength attack isn't mental.
+			attributes.hiddenIsMental = "false";
 			
 			// Keep mod within reasonable limits.
 			dcvMod = Math.max(0, (Math.min(modLimit, dcvMod)) );
@@ -25841,8 +25938,11 @@
 			version = 4.65;
 		}
 		
-		if (version < 4.73) {
-			version = 4.73;
+		if (version < 4.80) {
+			attributes["optionKnockbackDice"] = "0";
+			attributes["optionKnockdown"] = "1";
+			
+			version = 4.80;
 		}
 		
 		if (version != origVersion) {
