@@ -3,8 +3,14 @@
   font-style: normal;
   font-weight: 400;
   src: local('Special Elite'), local('SpecialElite-Regular'),
-       url(https://fonts.gstatic.com/s/specialelite/v5/9-wW4zu3WNoD5Fjka35Jm4kzzdU71mzyRvKBGWbyScU.woff) format('woff');
+       url(https://faustiangames.com/wp-content/uploads/2025/09/specialelite.woff2) format('woff2'),
+       url(https://faustiangames.com/wp-content/uploads/2025/09/specialelite.woff) format('woff');
 }
+
+/* Optional: pane-specific styling hooks */
+.sheet-mage .sheet-mage { /* your existing class already used everywhere */ }
+.sheet-vampire .sheet-vampire { /* mirror style block if desired */ }
+
 
 .sheet-header {
   width: 100%;
@@ -23,7 +29,7 @@
 
 /* Base */
 li { list-style: none; }
-.charsheet { background-color:#452182; }
+.charsheet { background-color:#070707; }
 .charsheet .sheet-maindiv { background-color:#070707; }
 
 /* Labels & headings */
@@ -56,18 +62,34 @@ li { list-style: none; }
 /* Attribute boxes */
 .charsheet .sheet-attr-box {
   padding:5px;
-  background-color:#000;
+  background:#0b0b0b;
   border:2px solid #452182;
   border-radius:5px;
 }
 .charsheet .sheet-attr-box input[type=text] {
-  width:35px;
+  width:100%;
   text-align:center;
   font-size:1.2em;
   font-weight:bold;
-  background-color:#000;
+  background:#0b0b0b;
   color:#ffffff;
   border:2px solid #452182;
+}
+
+.charsheet .sheet-attr-box input[type=text][name="attr_physical"] {
+    width: 35px;
+}
+
+.charsheet .sheet-attr-box input[type=text][name="attr_social"] {
+    width: 35px;
+}
+
+.charsheet .sheet-attr-box input[type=text][name="attr_mental"] {
+    width: 35px;
+}
+
+.charsheet .sheet-attr-box input[type=text][name="attr_arete"] {
+    width: 35px;
 }
 
 /*.charsheet .sheet-attr-box select { width:35px; }
@@ -89,7 +111,8 @@ li { list-style: none; }
   border: 2px solid #452182;
   border-radius: 5px;
   color: white;
-  background-color: #000;
+  background:#0b0b0b;
+  min-height: 80px;
 }
 
 
@@ -111,13 +134,25 @@ li { list-style: none; }
   border-radius:5px;
   padding:4px 8px;
   font-weight:bold;
-  display:block;                 /* stack vertically */
+  display:inline-block;                 /* stack vertically */
+  margin-left:6px;
+  vertical-align:middle;
 }
 .ui-dialog .charsheet button[type=roll]:hover {
   background-color:#5d2fa6 !important;   /* lighter on hover */
 }
 .ui-dialog .charsheet button[type=roll]:active {
   background-color:#32185e !important;   /* darker on press */
+}
+
+/* Hide the roll button container by default */
+.sheet-move-rollbutton {
+  display: none;
+}
+
+/* Show it only if the checkbox is checked */
+input.sheet-hasrollbutton:checked ~ .sheet-move-rollbutton {
+  display: block;
 }
 
 /* “Mage” box border */
@@ -175,10 +210,20 @@ input.sheet-showhide:checked ~ .sheet-subbox { display:none; }
   display:block;
 }
 
-/* Two-column layout (multi-column flow) */
+.sheet-block {
+  /* These help if you ever switch to columns; harmless for grid */
+  break-inside: avoid;
+  page-break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+}
+
+/* Prefer ~420px columns; Roll20 will give you 1 or 2 depending on width */
 .charsheet .sheet-columns {
-  column-count:2;      /* two columns */
-  column-gap:16px;     /* space between columns */
+  column-width: 420px;
+  column-gap: 16px;
+}
+@media (max-width: 856px) {
+  .charsheet .sheet-columns { column-width: auto; column-count: 1; }
 }
 
 /* Force second column to start at “Sphere” */
@@ -201,11 +246,6 @@ input.sheet-showhide:checked ~ .sheet-subbox { display:none; }
   page-break-inside:avoid;
 }
 
-/* One-column fallback for smaller dialogs (optional) */
-@media (max-width: 900px) {
-  .charsheet .sheet-columns { column-count:1; }
-}
-
 /* Utility clearfix */
 .sheet-cf:before, .sheet-cf:after { content:" "; display:table; }
 .sheet-cf:after { clear:both; }
@@ -220,6 +260,8 @@ input.sheet-showhide:checked ~ .sheet-subbox { display:none; }
   box-sizing:border-box;
   border:2px solid #452182;
   border-radius:5px;
+  background-color:#0b0b0b;
+  color: white;
 }
 
 /* hide the section by default */
@@ -245,6 +287,14 @@ input.sheet-showhide:checked ~ .sheet-subbox { display:none; }
 /* when the checkbox is checked, hide it */
 .sheet-toggle-name:checked ~ .sheet-name-section {
   display: none;
+}
+
+.sheet-gear-section {
+    display: block;
+}
+
+.sheet-toggle-gear:checked ~ .sheet-gear-section {
+    display: none;
 }
 
 /* show the section by default */
@@ -414,12 +464,12 @@ input.sheet-showhide:checked ~ .sheet-subbox { display:none; }
 
 /* Header */
 .sheet-rolltemplate-us .sheet-rt-header {
-  font-size: 1.5em !important
-  padding: 10px 5px 5px !important
-  color: #FFD700 !important/* gold for header */
+  font-size: 1.5em !important;
+  padding: 10px 5px 5px !important;
+  color: #FFD700 !important;/* gold for header */
 }
 .sheet-rolltemplate-us .sheet-rt-subtitle {
-  font-size: 0.9em;
+  font-size: 0.8em;
   color: #8A2BE2; /* purple for subtitle */
   margin-top: 2px;
   border-bottom: 1px solid rgba(255,255,255,0.15);
@@ -466,4 +516,243 @@ input.sheet-showhide:checked ~ .sheet-subbox { display:none; }
   color: #FFD700;
   text-shadow: 0 0 6px #FFD700;
   font-weight: bold;
+}
+
+/* ===== SHEET TYPE SWITCHER (Mage / Vampire) — TABS ===== */
+.charsheet .sheet-switcher {
+  display: contents;
+  align-items: flex-end;
+  gap: 6px;
+  margin: 10px 0 0;
+  flex-wrap: wrap;
+}
+
+/* hide radios but keep them functional */
+.charsheet .sheet-tab {
+  appearance: none; width: 0; height: 0; margin: 0; padding: 0; border: 0;
+  position: absolute; left: -9999px;
+}
+
+/* tab look — force inline and non-fullwidth against Roll20 defaults */
+.charsheet .sheet-tab-label {
+  display: inline-flex !important;
+  width: auto !important;
+  max-width: none !important;
+  white-space: nowrap;
+  align-items: center;
+  padding: 6px 14px;
+  margin: 0;                      /* spacing comes from .sheet-switcher gap */
+  border: 1px solid #444;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: #111;
+  color: #ddd;
+  cursor: pointer;
+  user-select: none;
+  line-height: 1.2;
+  vertical-align: bottom;
+}
+
+/* active tab */
+.charsheet .sheet-tab-mage:checked + .sheet-tab-label,
+.charsheet .sheet-tab-vampire:checked + .sheet-tab-label {
+  background: #222;
+  color: #fff;
+  border-color: #666;
+  position: relative;
+}
+
+/* blend active tab into the pane */
+.charsheet .sheet-tab-mage:checked + .sheet-tab-label::after,
+.charsheet .sheet-tab-vampire:checked + .sheet-tab-label::after {
+  content: "";
+  position: absolute;
+  left: -1px; right: -1px; bottom: -1px;
+  height: 1px;
+  background: #070707;            /* matches your .sheet-maindiv background */
+}
+
+/* slim rail under tabs */
+.charsheet .sheet-tab-rail {
+  height: 1px;
+  background: #444;
+  margin: 0 0 10px 0;
+}
+
+/* panes / visibility (same logic you already had) */
+.charsheet .sheet-pane { display: none; }
+.charsheet .sheet-tab-mage:checked ~ .sheet-mage { display: block; }
+.charsheet .sheet-tab-mage:checked ~ .sheet-vampire { display: none; }
+.charsheet .sheet-tab-vampire:checked ~ .sheet-vampire { display: block; }
+.charsheet .sheet-tab-vampire:checked ~ .sheet-mage { display: none; }
+
+/* ===== Vampire visual theme hooks ===== */
+:root {
+  /* in case you want to reuse — Roll20 supports CSS vars */
+  --mage-accent: #452182;
+  --vamp-accent: #a81818;
+  --vamp-accent-dark: #6e1010;
+  --vamp-accent-light: #c22a2a;
+}
+
+/* Borders and boxes inside the Vampire pane */
+.charsheet .sheet-vampire .sheet-attr-box,
+.charsheet .sheet-vampire .sheet-vampire {
+  border-color: var(--vamp-accent);
+}
+
+/* Section title image already set — keep it, but tweak text color if desired */
+.charsheet .sheet-vampire .sheet-section-title {
+  color:#fff; /* stays white on your label image */
+}
+
+/* Roll buttons inside Vampire pane */
+.ui-dialog .charsheet .sheet-vampire button[type=roll] {
+  background-color: var(--vamp-accent);
+  border-color: var(--vamp-accent-dark);
+  color:#fff;
+}
+.ui-dialog .charsheet .sheet-vampire button[type=roll]:hover {
+  background-color: var(--vamp-accent-light) !important;
+}
+.ui-dialog .charsheet .sheet-vampire button[type=roll]:active {
+  background-color: var(--vamp-accent-dark) !important;
+}
+
+/* Inputs/textareas in Vampire pane */
+.charsheet .sheet-vampire .sheet-attr-box input[type=text],
+.charsheet .sheet-vampire .sheet-attr-box textarea,
+.charsheet .sheet-vampire .repitem textarea,
+.charsheet .sheet-vampire .sheet-box textarea {
+  border-color: var(--vamp-accent);
+  background-color:#0b0b0b;
+  color: white;
+  min-width: 100%;
+}
+
+.charsheet .sheet-vampire .sheet-attr-box input[type=text][name="attr_v_physical"]
+{
+    min-width:35px;
+    width:35px;
+}
+
+.charsheet .sheet-vampire .sheet-attr-box input[type=text][name="attr_v_social"]
+{
+    min-width:35px;
+    width:35px;
+}
+
+.charsheet .sheet-vampire .sheet-attr-box input[type=text][name="attr_v_mental"]
+{
+    min-width:35px;
+    width:35px;
+}
+
+/* “Mage” box border */
+.sheet-vampire {
+  border:2px solid var(--vamp-accent);
+  border-radius:5px;
+  padding:6px;
+}
+
+.charsheet .sheet-vampire textarea {
+  background:#0b0b0b;
+  color:#f5f5f5;
+  border-color: var(--vamp-accent);
+}
+
+/* Base style for all hunger boxes */
+.charsheet input[type=checkbox].sheet-hunger {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--vamp-accent);
+  border-radius: 3px;
+  background: #000;
+  cursor: pointer;
+  position: relative;
+  margin: 2px;
+  font-weight: bold;
+}
+
+/* Default number (unchecked) */
+.charsheet input[type=checkbox].sheet-hunger::after {
+  color: #777;                /* gray when inactive */
+  font-size: 16px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Highlighted (checked) */
+.charsheet input[type=checkbox].sheet-hunger:checked::after {
+  color: #fff;                 /* bright white text */
+  text-shadow: 0 0 6px red;    /* glowing effect */
+}
+
+/*Generation */
+.charsheet input[name="attr_v_gen1"]::after { content:"+1";}
+.charsheet input[name="attr_v_gen1"]:checked::after { content: "+1"; }
+.charsheet input[name="attr_v_gen2"]::after { content:"+2";}
+.charsheet input[name="attr_v_gen2"]:checked::after { content: "+2"; }
+.charsheet input[name="attr_v_gen3"]::after { content:"+3";}
+.charsheet input[name="attr_v_gen3"]:checked::after { content: "+3"; }
+
+/* Hunger 1 */
+.charsheet input[name="attr_v_hunger1"]::after { content: "-3"; }
+.charsheet input[name="attr_v_hunger1"]:checked::after { content: "-3"; }
+
+/* Hunger 2 */
+.charsheet input[name="attr_v_hunger2"]::after { content: "-2"; }
+.charsheet input[name="attr_v_hunger2"]:checked::after { content: "-2"; }
+
+/* Hunger 3 */
+.charsheet input[name="attr_v_hunger3"]::after { content: "-1"; }
+.charsheet input[name="attr_v_hunger3"]:checked::after { content: "-1"; }
+
+/* Hunger 4 */
+.charsheet input[name="attr_v_hunger4"]::after { content: "0"; }
+.charsheet input[name="attr_v_hunger4"]:checked::after { content: "0"; }
+
+/* Hunger 5 */
+.charsheet input[name="attr_v_hunger5"]::after { content: "+1"; }
+.charsheet input[name="attr_v_hunger5"]:checked::after { content: "+1"; }
+
+/* Hunger 6 */
+.charsheet input[name="attr_v_hunger6"]::after { content: "+1"; }
+.charsheet input[name="attr_v_hunger6"]:checked::after { content: "+1"; }
+
+/* Hunger 7 */
+.charsheet input[name="attr_v_hunger7"]::after { content: "+2"; }
+.charsheet input[name="attr_v_hunger7"]:checked::after { content: "+2"; }
+
+/* Hunger 8 */
+.charsheet input[name="attr_v_hunger8"]::after { content: "+3"; }
+.charsheet input[name="attr_v_hunger8"]:checked::after { content: "+3"; }
+
+
+/* Header bar (if you want a slightly redder feel only for Vampire) */
+.charsheet .sheet-vampire .sheet-header { background-color:#0b0b0b; } /* subtle */
+
+/* layout */
+.sheet-hunger-row { display:flex; gap:6px; }
+
+/* hide the native radio, style the span as the box */
+.sheet-hunger input[type=radio] { position:absolute; opacity:0; }
+.sheet-hunger span {
+  display:inline-block;
+  min-width:28px; text-align:center;
+  padding:4px 6px; border:2px solid var(--vamp-accent);
+  border-radius:4px;
+  background:#0b0b0b; color:#fff; font-weight:bold;
+  user-select:none; cursor:pointer;
+}
+
+/* highlight when selected */
+.sheet-hunger input[type=radio]:checked + span {
+  background: var(--vamp-accent);
+  border-color: var(--vamp-accent-dark);
+  box-shadow: 0 0 6px rgba(162, 24, 24, 0.6);
 }
