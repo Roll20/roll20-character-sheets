@@ -1,8 +1,8 @@
 <div class="cofmain">
   <!-- Nouvelle version fiche -->
-  <input type="hidden" name="attr_verfdp" value="1.10.0">
+  <input type="hidden" name="attr_verfdp" value="1.11.0">
   <!-- Version courante fiche -->
-  <input type="hidden" name="attr_version" value="1.10.0">
+  <input type="hidden" name="attr_version" value="1.11.0">
   <!-- Mode debug -->
   <input type="hidden" name="attr_debug_mode" value="0">
 
@@ -118,7 +118,7 @@
     <div>
       <img
         class="logo"
-        title="Version 1.10.0 - 31/10/2025"
+        title="Version 1.11.0 - 11/11/2025"
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesOublieesFantasy2/cof2e_logo.jpg"
       />
       <input type="hidden" class="d20roll-btns" name="attr_cfg_d20roll" value="0">
@@ -831,6 +831,8 @@
             <div class="hits hit">
 
               <div class="block-title centered">
+                <button class="hidden" type="action" name="act_recovery_fast-btn"></button>
+                <button class="hidden" type="action" name="act_recovery_full-btn"></button>
                 <button class="flat-btn img-btn" type="action" name="act_drecup-btn">
                   <span>DR</span>
                 </button>
@@ -1418,12 +1420,13 @@
 
               <div class="pc-tactic">
                 <div class="d-flex">
-                  <input type="radio" name="attr_tactique" value="4">
+                  <input type="checkbox" name="attr_tactautre" value="1">
                   <input type="text" class="align-self-center" name="attr_tactname" placeholder="Autre tactique" value="">
                 </div>
                 <div class="d-flex">
                   <input type="number" class="align-self-center" name="attr_tactdiv" value="0">
-                  <span class="align-self-center">DM :&nbsp;</span>
+                  &nbsp;<input type="checkbox" name="attr_tactroll" title="@{tactroll} Avec dé bonus" value="1">
+                  &nbsp;<input type="checkbox" name="attr_tactroll" title="@{tactroll} Avec dé malus" value="2">
                   <input type="text" class="w-auto align-self-center" name="attr_tactdmdiv" placeholder="DM supplémentaires" value="">
                 </div>
               </div>
@@ -5544,6 +5547,22 @@
               <li>
                 <details>
                   <summary>
+                    <strong>Version 1.11.0</strong> (2025-11-11)
+                  </summary>
+                  <ul>
+                    <li>Correction DM x 2 si le seuil de critique est inférieur à 20</li>
+                    <li>Ajout de boutons <em>Récupérations</em> et <em>Soins</em> au menu d'actions du PJ</li>
+                    <li>Ajout d'une mention pour les manoeuvres avec modificateur de tailles</li>
+                    <li>Ajout du jet opposé sur l'utilisation d'une manoeuvre</li>
+                    <li>Ajout de champs pour les scores d'attaque au contact (jet de manoeuvre opposé) et magique aux fiches de PNJ</li>
+                    <li>Possibilité de combiner les options tactiques avec une option spécifique au PJ</li>
+                  </ul>
+                </details>
+              </li>
+
+              <li>
+                <details>
+                  <summary>
                     <strong>Version 1.10.0</strong> (2025-10-31)
                   </summary>
                   <ul>
@@ -6572,7 +6591,37 @@
 
             </ul>
 
+            <h4 title="@{atkbase_pnj} Utiliser les scores de base">
+              Attaques&nbsp;
+              <input type="checkbox" name="attr_atkbase_pnj" value="1">
+            </h4>
+            
+            <ul>
+
+              <li>
+                <div class="npc-configs m2">
+                  <div>Combat</div>
+                  <div class="d-flex">
+                    : <input type="number" class="two-digits" name="attr_atkcac_pnj" title="@{atkcac_pnj} Bonus d'attaque au contact">
+                    <input type="hidden" name="attr_atkcac">
+                  </div>
+                </div>
+              </li>
+
+              <li>
+                <div class="npc-configs m2">
+                  <div>Magique</div>
+                  <div class="d-flex">
+                    : <input type="number" class="two-digits" name="attr_atkmag_pnj" title="@{atkmag_pnj} Bonus d'attaque magique">
+                    <input type="hidden" name="attr_atkmag">                    
+                  </div>
+                </div>
+              </li>
+
+            </ul>
+
             <h4>Défense</h4>
+
             <ul>
 
               <li>
@@ -6594,6 +6643,13 @@
               </li>
 
             </ul>
+
+          </div>
+
+          <div class="sheet-col">
+
+            <h4>Compétences</h4>
+            <textarea class="large" name="attr_pnj_comp" title="@{pnj_comp}" placeholder="XXX: +bonus Nom de la compétence" value=""></textarea>
 
             <h4>Compagnon</h4>
             <ul>
@@ -6644,13 +6700,6 @@
               </li>
               
             </ul>
-
-          </div>
-
-          <div class="sheet-col">
-
-            <h4>Compétences</h4>
-            <textarea class="large" name="attr_pnj_comp" title="@{pnj_comp}" placeholder="XXX: +bonus Nom de la compétence" value=""></textarea>
 
           </div>
 
@@ -7232,12 +7281,18 @@
   {{#^rollLess() roll tohit}}
   <div class="sheet-rt sheet-rt-text sheet-rt-centered">
     <span>Contre *{{target}}* :</span>
+    {{#rollTotal() opposed 1}}
+    <span>{{tohit}}</span><br>
+    {{/rollTotal() opposed 1}}
     <span class="sheet-rt sheet-rt-hit">SUCCÈS !</span>
   </div>
   {{/^rollLess() roll tohit}}
   {{#rollLess() roll tohit}}
   <div class="sheet-rt sheet-rt-text sheet-rt-centered">
     <span>Contre *{{target}}* :</span>
+    {{#rollTotal() opposed 1}}
+    <span>{{tohit}}</span><br>
+    {{/rollTotal() opposed 1}}
     <span class="sheet-rt sheet-rt-miss">ÉCHEC !</span>
   </div>
   {{/rollLess() roll tohit}}
@@ -7399,7 +7454,7 @@
 
 /**
  * COF2e Sheet Worker
- * v1.10.0
+ * v1.11.0
  */
 
 const SWData = {
@@ -7427,6 +7482,7 @@ const SWData = {
       size: 70,
       target: {
         def: "[[@{target|def}]]",
+        opposed: "[[1d20[Dé] + @{target|atkcac}[Att. Contact Cible] ]]",
         name: "@{target|token_name}",
       },
       PC: {
@@ -7456,6 +7512,7 @@ const SWData = {
     "atktir":   "&#127993;",        // bow and arrow
     "atkmag":   "&#129668;",        // magic wand
     "actions":  "&#128262;",        // bright
+    "heal":     "&#129505;",        // red heart
   },
   SHEET_TYPE: {
     PC: "pc",
@@ -7850,20 +7907,20 @@ const SWData = {
           effect: `Au choix, la cible est ralentie (une seule action M ou A) ou elle subit ‑5 en attaque pendant 1 round.`
         },
         { 
-          name: "Repousser",
+          name: "Repousser°",
           mod: "-",
           effect: `La cible recule de [FOR attaquant + 3] mètres et l’attaquant occupe le terrain libéré.
           Si la cible est acculée (mur, précipice, adversaire), elle perd autant en DEF pour 1 round.
           Cette action peut être précédée d’un déplacement de 10 m en direction de la cible.`
         },
         { 
-          name: "Bloquer",
+          name: "Bloquer°",
           mod: "-5",
           effect: `La cible est immobilisée pendant 1 round (dé malus en attaque et pas de déplacement).
           Contre une créature de NC inférieur au niveau de l’attaquant, ce dernier peut maintenir sa prise à chaque round qui suit en emportant un test opposé de FOR (action limitée, modifiée en cas de différence de taille).`
         },
         { 
-          name: "Désarmer",
+          name: "Désarmer°",
           mod: "-5",
           effect: `La cible laisse tomber son arme au sol. 
           Elle peut la ramasser avant tout le monde en sacrifiant son prochain tour (elle n’agira pas).`
@@ -7874,19 +7931,19 @@ const SWData = {
           effect: `La cible est aveuglée pendant 1 round (‑5 en attaque au contact et en DEF, ‑10 contre une cible à distance).`
         },
         {
-          name: "Renverser",
+          name: "Renverser°",
           mod: "-5",
           effect: `La cible est renversée (‑5 en DEF et action d’attaque pour se relever). 
           Cette action peut être précédée d’un déplacement de 10 m en direction de la cible.`
         },
         { 
-          name: "Renverser (quad.:-10)",
+          name: "Renverser° (quad.:-10)",
           mod: "-10",
           effect: `La cible est renversée (‑5 en DEF et action d’attaque pour se relever). 
           Cette action peut être précédée d’un déplacement de 10 m en direction de la cible.`
         },
         { 
-          name: "Etourdir",
+          name: "Etourdir°",
           mod: "-10",
           effect: `La cible est étourdie pendant 1 round (pas d’action et ‑5 en DEF). 
           Si cette manoeuvre est réussie contre une cible surprise de NC inférieur au niveau de l’attaquant, elle doit réussir un test de CON difficulté 10 (15 si l’attaquant utilise une arme contondante) ou être assommée (inconsciente) pour 1d6 min.`
@@ -9173,6 +9230,36 @@ function parseNameValue(data, delim = ":") {
 }
 
 /**
+ * Clean text from non printable characters
+ * @param {string} text - text to clean
+ * @param {boolean} stripSurrogatesAndFormats - clean more
+ * @returns {string}
+ * @see https://stackoverflow.com/questions/11598786/how-to-replace-non-printable-unicode-characters-javascript
+ */
+function stripNonPrintable(text, stripSurrogatesAndFormats) {
+    // strip control chars. optionally, keep surrogates and formats
+    if(stripSurrogatesAndFormats) {
+      text = text.replace(/\p{C}/gu, '');
+    } else {
+      text = text.replace(/\p{Cc}/gu, '');
+      text = text.replace(/\p{Co}/gu, '');
+      text = text.replace(/\p{Cn}/gu, '');
+    }
+
+    // other common tasks are to normalize newlines and other whitespace
+
+    // normalize newline
+    text = text.replace(/\n\r/g, '\n');
+    text = text.replace(/\p{Zl}/gu, '\n');
+    text = text.replace(/\p{Zp}/gu, '\n');
+
+    // normalize space
+    text = text.replace(/\p{Zs}/gu, ' ');
+
+    return text;
+}
+
+/**
  * Clean-up text
  * @param {string} t - text to cleanup (multiple spaces & accents)
  * @param {boolean} [clearTags=true] - also remove COF2 tags (action types & spells)
@@ -9572,9 +9659,9 @@ function sendChatMsg(msg, options) {
 
     if (roll.results.roll) {
       const rx = "\\[(" + SWData.PC.COMBAT.maneuvers.map(mn => mn.name.split(" ")[0]).join("|") + ")\\]\\)";
-      const match = roll.results.roll.expression.match(rx);
-      if (match)
-        updates.set("last_maneuver", `${ cleanText(match[1]) }~${roll.rollId}`); // make it unique
+      const matched = roll.results.roll.expression.match(rx);
+      if (matched)
+        updates.set("last_maneuver", `${ cleanText(matched[1]) }~${roll.rollId}`); // make it unique
     }
 
     // check TN
@@ -9790,6 +9877,8 @@ function d20Roll(base, d20Roll, cfcs = {}) {
         return rollCfCs("2d20kh1", cfcs);
       break;
   }
+  if (roll === "1d20")
+    roll = rollCfCs("1d20", cfcs);
   return roll;
 }
 
@@ -10249,18 +10338,21 @@ function replaceDevol(expr) {
  * Change identity heading
  */
 on("change:sheet_type", function() {
-  getAttrs([ "sheet_type" ], function(value) {
-    const sheet_type = strval(value.sheet_type);
-    if (!sheet_type) 
+  getAttrs([ "sheet_type" ], function(values) {
+    const sheetType = strval(values.sheet_type);
+    if (!sheetType) 
       return;
 
     Object.values(SWData.SHEET_TYPE).forEach(type => {
-      if (type === sheet_type) {
+      if (type === sheetType) {
         showArea(`identity-${type}`);
       } else {
         hideArea(`identity-${type}`);
       }
-    })
+    });
+
+    if (sheetType === SWData.SHEET_TYPE.NPC)
+      setAttrs({ atkcac: 0, atkmag: 0 });
 
   });
 });
@@ -10660,6 +10752,10 @@ SWData.PC.COMBAT.attacks.forEach(attk => {
   ];
   on(changeEvent(changed), function(eventInfo) {
     getAttrs(changed, function(values) {
+      const sheetType = strval(values.sheet_type);
+      delete values.sheet_type;
+      if (sheetType === SWData.SHEET_TYPE.NPC)
+        return;
       const score = addValues(values);
       logAndSet({ [attack]: score }, logTitle(eventInfo));
     });
@@ -10989,9 +11085,7 @@ SWData.PC.STATS.forEach(stat => {
       "casque", "casque_eqp"
     ];
     getAttrs([
-      `${short}_dsup`,
-      short,
-      `${short}_test`,
+      `${short}_dsup`, short, `${short}_test`,
       "sheet_type",
       "notif_fx",
       "condition_affaibli",
@@ -11001,7 +11095,7 @@ SWData.PC.STATS.forEach(stat => {
       ...defGearAttrs, 
       "def_action",
       "d20roll",
-      "allcaracs_desc", "allcaracs_buff"
+      "allcaracs_desc", "allcaracs_buff",
     ], function(values) {
       // Play FX !
       const fxValue = strval(values.notif_fx);
@@ -11021,13 +11115,17 @@ SWData.PC.STATS.forEach(stat => {
       const roll = d20Roll(strval(values[kroll]), strval(values.d20roll));
       const isNPC = strval(values.sheet_type) === SWData.SHEET_TYPE.NPC;
       const statMod = ` *(${ displayMod(values[isNPC ? mod : test]) })*`;
+      
       const armure_eqp = intval(values.armure_eqp);
       const armure_malus = intval(values.armure_malus) * armure_eqp;
+      
       const bouclier_eqp = intval(values.bouclier_eqp);
       const bouclier_malus = intval(values.bouclier_malus) * bouclier_eqp;
+      
       const armor_malus = short === "agi" ? ` - ${armure_malus}[Malus armure]` : "";
       const shield_malus = (short === "agi" && boolval(values.cfg_bouclier_malus)) ? ` - ${bouclier_malus}[Malus bouclier]` : "";
       const helmet_malus = short === "per" ? helmetMalus(values) : "";
+
       const defAction = intval(values.def_action);
       const text = defAction !== 0 ? `+ [[${defAction}]] Défense ${ defAction === 5 ? "totale" : "partielle" }` : "";
       const allRolls = allRollsBuff(values, "caracs");
@@ -11125,14 +11223,21 @@ SWData.PC.COMBAT.attacks.forEach(attk => {
         broll: "",
         chance: addLuckButton(values),
         tohit: "",
+        opposed: "",
         target: ""
       };
       
-      if (roll === "1d20" && !useOneRoll)
+      if (roll.startsWith("1d20") && !useOneRoll)
         atkProps.broll = atkRoll;
       
       if (boolval(values.cfg_cible)) {
-        atkProps.tohit = SWData.settings.tokens.target.def;
+        if (maneuvers === "") {
+          atkProps.tohit = SWData.settings.tokens.target.def;
+        } 
+        else {
+          atkProps.tohit = SWData.settings.tokens.target.opposed;
+          atkProps.opposed = "[[1]]";
+        }
         atkProps.target = SWData.settings.tokens.target.name;
       }
       
@@ -11338,16 +11443,19 @@ on("change:pv change:pvig", function (eventInfo) {
   });
 });
 
+function recovery(typeRecup) {
+
+}
+
 /**
  * On Recup button click
  */
-on("clicked:drecup-btn", function() {
-  const recupAttrs = [ 
-    "dr",
-    "dr_max",
-    "drecup",
-    "niveau",
-    "vol",
+on("clicked:drecup-btn clicked:recovery_fast-btn clicked:recovery_full-btn", function(eventInfo) {
+  const recoveryBtn = strval(eventInfo.triggerName).split(":")[1];
+  const typeRecup = [ "fast", "full" ].findIndex(b => recoveryBtn === `recovery_${b}-btn`);
+  const recupAttrs = [
+    "dr", "dr_max", "drecup",
+    "niveau", "vol",
     "pv", "pv_max",
     "pm", "pm_max",
     "cfg_highfan",
@@ -11408,11 +11516,11 @@ on("clicked:drecup-btn", function() {
         daily.push({ reset: abilityInfo(vr).rankUse, name, uses });
     });
 
-    const recups = [ "Rapide", "Complète" ];
-    if (effort !== "")
-      recups.push(effort);
-
-    ask([ "Récupération ?", ...recups ], (typeRecup) => {
+    /**
+     * Perform recovery or push self
+     * @param {number} typeRecup - recovery type 1=fast, 2=full, 3=push 
+     */
+    const recovery = (typeRecup) => {
       if (typeRecup !== 2 && dr > 0)
         dr -= 1;
       const dRecup = `${ (typeRecup === 1 || drMax === 0) ? "d" : "" }${values.drecup}`;
@@ -11464,8 +11572,18 @@ on("clicked:drecup-btn", function() {
         resetAbilities.forEach(ability => updates.set(ability.reset, 0));
         setAttrs(Object.fromEntries(updates));
       });
-    });
+    }
 
+    if (typeRecup >= 0) {
+      recovery(typeRecup + 1);
+      return;
+    }
+
+    const recups = [ "Rapide", "Complète" ];
+    if (effort !== "")
+      recups.push(effort);
+
+    ask([ "Récupération ?", ...recups ], recovery);
   });
 });
 
@@ -12072,7 +12190,8 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
     "bouclier_eqp",
     "condition_affaibli", "condition_immobilise",
     ...fearConditionsAttrs(),
-    "tactique", "tactname", "tactdiv", "tactdmdiv",
+    "tactique",
+    "tactautre", "tactroll", "tactname", "tactdiv", "tactdmdiv",
     "noms_voies", "rangs_voies",
     "en_selle",
     ...luckButtonAttrs(),
@@ -12092,8 +12211,10 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
     const useWear = boolval(values.cfg_usure);
     const shieldUsed = boolval(values.bouclier_eqp);
     const tactics = intval(values.tactique);
+    const tactOther = boolval(values.tactautre);
     const tactName = strval(values.tactname, "Option tactique");
     const tactBM = intval(values.tactdiv);
+    const tactRoll = intval(values.tactroll);
     const tactDM = strval(values.tactdmdiv);
     const weakened = intval(values.condition_affaibli);
     const restrained = intval(values.condition_immobilise);
@@ -12188,12 +12309,16 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
         tacticBonus = ` -7[${atkTitle}]`;
         extraDM.push(` + [[2@{devol}]] ${atkTitle}`);
         break;
-      case 4:
-        if (tactBM !== 0)
-          tacticBonus = ` + (${tactBM})[${tactName}]`;
-        if (tactDM !== "")
-          extraDM.push(` + ([[${ replaceDevol(tactDM) }]]) ${tactName}`);
-        break;
+    }
+    if (tactOther) {
+      if (tactBM !== 0)
+          tacticBonus += ` + (${tactBM})[${tactName}]`;
+      if (tactDM !== "")
+        extraDM.push(` + ([[${ replaceDevol(tactDM) }]]) ${tactName}`);
+      if (tactRoll === 1)
+        modifiers.push("debonus");
+      if (tactRoll === 2)
+        modifiers.push("demalus");
     }
 
     // Build situational modifiers
@@ -12218,7 +12343,7 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
       crit = Math.max(16, crit - 1);
     }
 
-    // Determine normal or malus die roll
+    // Determine normal or bonus / malus die roll
     const withMalusDie = (weakened === 1) || (restrained === 1);
     let roll = withMalusDie ? "2d20kl1" : "1d20";
     let bRoll = !withMalusDie;
@@ -12467,7 +12592,7 @@ on("clicked:repeating_armes:attack-btn", function(eventInfo) {
       target: ""
     };
 
-    if (roll === "1d20" && bRoll)
+    if (roll.startsWith("1d20") && bRoll)
       atkProps.broll = attack;
 
     if(extraDM.length > 0)
@@ -12560,10 +12685,14 @@ on("change:last_maneuver", function () {
     const [ maneuver ] = strval(values.last_maneuver).split("~");
     const found = SWData.PC.COMBAT.maneuvers.find(mn => maneuver === cleanText(mn.name.split(" ")[0]));
     if (found) {
+      const name = found.name.split(" ")[0];
+      let text = found.effect;
+      if (name.endsWith("°"))
+        text = "*-5 / +5 par différence de taille*\n" + text;
       sendChatMsg(rollTemplate({
         lsub: "Manoeuvre",
-        rsub: found.name.split(" ")[0],
-        text: found.effect,
+        rsub: name.replace("°", ""),
+        text,
       }), { whisper: "gm" });
     }
   });
@@ -13879,6 +14008,20 @@ seq(9).forEach(path => {
 });
 
 /**
+ * On inserting PDF text to import - clean it
+ */
+on("change:voie_pdf", function() {
+  getAttrs([ "voie_pdf" ], function(values) {
+    let text = strval(values.voie_pdf);
+    if (text === "")
+      return;
+    const stripped = [];
+    text.split("\n").forEach(l => stripped.push(stripNonPrintable(l)));
+    setAttrs({ voie_pdf: stripped.join("\n")});
+  });
+});
+
+/**
  * Recalculate total encumbrance
  */
 function encumbrance() {
@@ -14713,10 +14856,11 @@ on("clicked:repeating_ressources:resconso-btn", function () {
     const value = intval(values[rptAttr(section, "res-val")]);
     if (value === 0)
       return;
-    updates.set(rptAttr(section, "res-val"), value - 1);
+    const remaining = value - 1;
+    updates.set(rptAttr(section, "res-val"), remaining);
     let text = "";
     let heal = "";
-    const rsub = strval(values[rptAttr(section, "res-desc")]);
+    const rsub = capitalize(strval(values[rptAttr(section, "res-desc")]));
     const props = strval(values[rptAttr(section, "res-props")]);
     const type = getProp(props, "type");
     if (type.toLowerCase().startsWith("soins")) {
@@ -14724,6 +14868,7 @@ on("clicked:repeating_ressources:resconso-btn", function () {
       if (roll.length === 0)
         roll.push("1d4°");
       heal = insertRolls(roll.join(" "));
+      text = `Reste ${remaining} ${ rsub.toLowerCase() }`;
     }
 
     if (heal !== "" || text !== "") {
@@ -15592,7 +15737,6 @@ on("clicked:pc_actions-btn", async function() {
   // weapons
   const weaponRpt = "armes";
   const weaponIds = await getSectionIDsOrderedAsync(weaponRpt);
-  //console.log(weaponIds)
   const attackNames = weaponIds.map(id => rptAttr(weaponRpt, "arme-nom", id));
   const atkType = weaponIds.map(id => rptAttr(weaponRpt, "arme-atk", id));
   const atkRange = weaponIds.map(id => rptAttr(weaponRpt, "arme-portee", id));
@@ -15619,14 +15763,21 @@ on("clicked:pc_actions-btn", async function() {
   let buffIds = await getSectionIDsOrderedAsync(buffRpt);
   const buffTemp = buffIds.map(id => rptAttr(buffRpt, "buff-temp", id));
 
+  // resources
+  const resRpt = "ressources";
+  let resIds = await getSectionIDsOrderedAsync(resRpt);
+  const resDesc = resIds.map(id => rptAttr(resRpt, "res-desc", id));
+  const resProps = resIds.map(id => rptAttr(resRpt, "res-props", id));
+  const resVals = resIds.map(id => rptAttr(resRpt, "res-val", id));
+
   getAttrs([
     "character_name", "couleur_pj",
-    "cfg_d20roll", "d20roll",
     ...attackNames, ...atkType, ...atkRange,
     "rangs_voies", "noms_voies",
     ...allRankNames, ...allRankSpells, ...allRankProps,
     ...rollNames,
     ...buffTemp,
+    ...resDesc, ...resProps, ...resVals,
     "use_skills"
   ], function (values) {
 
@@ -15640,7 +15791,6 @@ on("clicked:pc_actions-btn", async function() {
 
     const charName = strval(values.character_name);
     const color = strval(values.couleur_pj, "default");
-    const d20Roll = numval(values.cfg_d20roll);
     const chatMsg = [];
     
     // Stats
@@ -15717,17 +15867,24 @@ on("clicked:pc_actions-btn", async function() {
       chatMsg.push(`Compétences=[Choix](~${charName}|skills_menu-btn${menuButton(color, {}, { padding: "0px 5px;" })})`);
     }
 
-    // Roll type
-    let desc = "";
-    if (d20Roll === 1) {
-      const roll = strval(values.d20roll);
-      const activeBt = button({ "font-style": "italic" });
-      desc = [
-        `[Dé Malus](~${charName}|d20roll_dm-btn${ roll === "2d20kl1" ? activeBt : button() })`,
-        `[Normal](~${charName}|d20roll_1d-btn${ roll === "1d20" ? activeBt : button() })`,
-        `[Dé Bonus](~${charName}|d20roll_db-btn${ roll === "2d20kh1" ? activeBt : button() })`
-      ].join("&nbsp;");
-    }
+    // Recovery + Healing
+    let desc = "Récup. " + [ "fast", "full" ].map(r => {
+      const recup = ({ fast: "Rapide", full: "Complète" })[r];
+      return `[${recup}](~${charName}|recovery_${r}-btn${ button({ "font-weight": "bolder" }) })`;
+    }).join("&nbsp;");
+
+    desc += resIds
+    .filter(id => {
+      const type = getProp(strval(values[rptAttr(resRpt, "res-props", id)]), "type");
+      const onHand = numval(values[rptAttr(resRpt, "res-val", id)]);
+      return type.toLowerCase() === "soins" && onHand > 0;
+    })
+    .map(id => {
+      const onHand = numval(values[rptAttr(resRpt, "res-val", id)]);
+      const resBtn = rptAttr(resRpt, "resconso-btn", id);
+      const title = onHand + " " + values[rptAttr(resRpt, "res-desc", id)];
+      return `[${ SWData.emojis.heal }](~${charName}|${resBtn}${ button({}, { title }) })`;
+    }).join("&nbsp;");
 
     // Send all
     sendChatMsg([
@@ -16044,6 +16201,7 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
     "dmdiv",
     "portee",
     "special",
+    "atktype",
     "atkmods",
     "options",
     "seuil",
@@ -16062,8 +16220,9 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
     "cfg_crit_diff", "cfg_tbl_crit", "cfg_tbl_critdie", "cfg_tbl_fumble",
     "character_name", "niveau", "compagnon",
     "atkgroup", "nbgroup", "pnj_tact",
+    "atkbase_pnj", "atkcac", "atkmag",
     ...specials,
-    ...attackAttrs
+    ...attackAttrs,
   ], function (values) {
     const useOneRoll = boolval(values.cfg_1attack_roll);
     const useCritDiff = intval(values.cfg_crit_diff);
@@ -16072,6 +16231,9 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
     companionOf = companionOf !== "" ? companionOf + "|" : "";
     const group = intval(values.atkgroup);
     const groupNb = intval(values.nbgroup);
+    const atkBase = boolval(values.atkbase_pnj);
+    const atkCac = intval(values.atkcac);
+    const atkMag = intval(values.atkmag);
     const name = capitalize(strval(values[section + "nom"], "Attaque"));
     const useMulti = intval(values[section + "multi"]);
     let roll = strval(values[section + "roll"]);
@@ -16079,6 +16241,7 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
     const portee = strval(values[section + "portee"]);
     const range = (portee !== "") ? ` *(${ rangeWithUnits(portee) })*` : "";
     const crit = intval(values[section + "crit"], 20);
+    const atkType = strval(values[section + "atktype"]);
     const atkMods = strval(values[section + "atkmods"]).split(",").map(mod => mod.trim().toLowerCase());
 
     const resetValues = new Map();
@@ -16202,18 +16365,22 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
         multiAttacks = 1;
     }
 
+    let atkBonus = strval(atk, "0");
+    if (atkBase && atkType !== "")
+      atkBonus = "(" + (atkType === "sort" ? `${atkMag}` : `${atkCac}` ) + "+" + atkBonus + ")";
+
     const attacks = [];
-    if (atk !== "0" && atkgrp[0].nb !== 4) {
+    if (!atkMods.includes("auto") && atkgrp[0].nb !== 4) {
       // (grouped ?) attack
-      attacks.push(`[[${roll}cs>${crit}cf1[Dé] + ${atk}[Bonus]${atkgrp[0].bonus}${tactBonus}${specBonus} ]]`);
+      attacks.push(`[[${roll}cs>${crit}cf1[Dé] + ${atkBonus}[Bonus]${atkgrp[0].bonus}${tactBonus}${specBonus} ]]`);
     } else {
       // auto-hit
       attacks.push(autoHit);
     }
     // second grouped attack ?
     if (atkgrp.length === 2) {
-      if (atk !== "0" && atkgrp[1].nb !== 4) {
-        attacks.push(`[[${roll}cs>${crit}cf1[Dé] + ${atk}[Bonus]${atkgrp[1].bonus}${tactBonus}${specBonus} ]]`);
+      if (!atkMods.includes("auto") && atkgrp[1].nb !== 4) {
+        attacks.push(`[[${roll}cs>${crit}cf1[Dé] + ${atkBonus}[Bonus]${atkgrp[1].bonus}${tactBonus}${specBonus} ]]`);
       } else {
         attacks.push(autoHit);
       }
@@ -16373,8 +16540,11 @@ on("clicked:repeating_npcarmes:npcatk-btn", function() {
 
       // process grouped attacks
       if (atkgrp[ix].nb < 4) {
-        if (!useOneRoll && roll === "1d20")
-          chatAtk = { ...chatAtk, broll: attack, brolleffect: rollEffect, bcritsuccess: "[[0]]" };
+        if (!useOneRoll && roll === "1d20") {
+          const broll = attack === autoHit ? "" : attack;
+          const brolleffect = attack === autoHit ? "" : rollEffect;
+          chatAtk = { ...chatAtk, broll, brolleffect, bcritsuccess: "[[0]]" };
+        }
       } else {
         chatAtk.save = 0;
       }
@@ -16445,6 +16615,18 @@ on("clicked:repeating_npcrolls:npcroll-btn", function() {
       alertclass: alertCSS
     });
     sendChatMsg(chatMsg);
+  });
+});
+
+/**
+ * Set NPC attack scores
+ */
+on("change:atkbase_pnj change:atkcac_pnj change:atkmag_pnj", function() {
+  getAttrs([ "atkbase_pnj", "atkcac_pnj", "atkmag_pnj" ], function (values) {
+    const base = numval(values.atkbase_pnj);
+    const atkcac = numval(values.atkcac_pnj) * base;
+    const atkmag = numval(values.atkmag_pnj) * base;
+    setAttrs({ atkcac, atkmag });
   });
 });
 
@@ -16986,7 +17168,7 @@ function migrateLog(log, newVer, text) {
 /**
  * Migrate to Version 1.3.0
  * @param {string} sheetType - type of sheet
- * @param {object} curVer - semantic version parts
+ * @param {{ major: number, minor: number, patch: number }} curVer - semantic version parts
  * @returns {void}
  * 
  * Update xxx_base caracteristics attributes with xxx values
@@ -17010,15 +17192,35 @@ function migrateSheetToV1_3(sheetType, curVer = { major: 1, minor: 2, patch: 0 }
 }
 
 /**
+ * Migrate to Version 1.11.0
+ * @param {string} sheetType - type of sheet
+ * @param {{ major: number, minor: number, patch: number }} curVer - semantic version parts
+ */
+function migrateSheetToV1_11(sheetType, curVer = { major: 1, minor: 10, patch: 0 }) {
+  const updates = new Map();
+
+  if (sheetType === SWData.SHEET_TYPE.NPC) {
+    updates.set("atkcac", 0);
+    updates.set("atkmag", 0);
+  }
+
+  setAttrs(Object.fromEntries(updates));
+};
+
+/**
  * Apply sheet migrations
  * @param {string} sheetType - character sheet type
  * @param {object} curVer - current version
  * @returns {void}
  */
 function migrateSheet(sheetType, curVer) {
+  
   if (curVer.major === 1 && curVer.minor < 3)
     migrateSheetToV1_3(sheetType, curVer);
-  
+
+  if (curVer.major === 1 && curVer.minor < 11)
+    migrateSheetToV1_11(sheetType, curVer);
+
   return;
 }
 
