@@ -4697,7 +4697,11 @@ const processDropData = function({data, attributes, sections, casc,sectionsToQue
     'Internal-modules':genericDrop,
     Upgrades:upgradeDrop,
     Component:componentDrop,
-    Abilities:genericDrop
+    Abilities:genericDrop,
+    "Rollable Tables": tableDrop,
+    "Rollable":tableDrop,
+    "rollable":tableDrop,
+    "rollable tables":tableDrop
   };
   section = section ? `${section}_` : '';
   if(/Ships|Hostiles|Vehicles|NPCs/.test(data.Category)){
@@ -5125,6 +5129,63 @@ const componentDrop = function(lookupKey,arr,attributes,sections,casc,sectionsTo
     .replace(/s$/,'');
   attributes['menu_tab'] = `nav-tabs-menu--${attributes.sheet_type}`;
   return true;
+}/**
+ * Generic drop function for repeating sections that don't need any special processing.
+ * @param {string} lookupKey - The section name
+ * @param {object[]} arr - Array of data to parse
+ * @param {attributesProxy} attributes - The attributes for the character
+ * @param {object} sections - The object with keys equal to repeating section names and values of arrays of repeating ids
+ * @param {object} casc - The cascade object
+ * @param {array} sectionsToQuery - sections that need further user input before drop completes
+ */
+const tableDrop = async function (lookupKey, arr, attributes, sections, casc, sectionsToQuery) {
+  const data = arr[0];
+  const predefinedHandlers = {
+    "Panic Responses": panicCompendiumResponse,
+    "Stress Responses": stressCompendiumResponse,
+    "Neurological Distortion Disorder": NDDResponse
+  };
+  if (predefinedHandlers[data['data-cs-name']]) {
+    await k.pseudoQuery();
+    predefinedHandlers[data['data-cs-name']]({ attributes, sections, casc, data });
+  } else {
+    const die = data['data-dice'].replace(/stress|resolve/g, (match) => attributes[match]);
+    await rollTable(die, data['data-cs-name'], data['data-table'], attributes, sections, casc);
+  }
+};
+
+const rollTable = async function (die, tableName, table, attributes, sections, casc) {
+  die = die.replace(/d66/g,'[[d6]][[d6]]');
+  const rollObj = {
+    title: tableName,
+    tableResult: `[[${die}[computed result]]]`,
+  };
+  const [roll, computeObj] = await executeRoll({ rollObj, attributes, sections, customString: '@{template_start}' });
+  const tableIndex = Math.max(0, Math.min(table.length - 1, roll.results.tableResult.result));
+  const numResult = roll.results.tableResult.result;
+  const result = table.find(o => (new RegExp(`≤?${numResult}\\+?`)).test(`${o.die}`));
+  let conditionName
+  if(result.label){
+    conditionName = result.label.toLowerCase();
+    computeObj.tableResult = `${conditionName.toUpperCase()} ${result.response}`;
+  }else{
+    computeObj.tableResult = Object
+      .entries(result)
+      .reduce((t,[key,value]) => {
+        if(key !== 'die'){
+          t.push(`${key}: ${value}`)
+        }
+        return t;
+      },[])
+      .join('\n');
+  }
+  finishRoll(roll.rollId, computeObj);
+  return [computeObj.tableResult,conditionName,result.response];
+}
+
+const NDDResponse = async function ({ attributes, sections, casc, data }) {
+  const days = Math.max(0,+(await k.extractQueryResult(`${k.getTranslationByKey('NDD Prompt')}`)) - 1);
+  rollTable(`1d6 + ${days}`,data['data-cs-name'],data['data-table'],attributes,sections,casc);
 }
   /**
  * Switches the active state of all row IDs to be appropriate to their state. Only a single row should have an active state.
