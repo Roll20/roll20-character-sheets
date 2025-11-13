@@ -1,18 +1,20 @@
 <script type="text/worker">
-    // Sheet version for migration purposes
-    const SHEET_VERSION = "2.2.0";
-
     on("sheet:opened", function () {
-        updateAllSkills();
         performMigrations();
+
+        updateAllAttributes();
+        updateAllSkills();
     });
+
+    // Latest sheet version - used for migration purposes
+    const SHEET_VERSION = "2.2.0";
 
     function performMigrations() {
         getAttrs(["SheetVersion", "HpConverted"], function (values) {
-            let currentVersion = values.SheetVersion || "0.0.0";
+            let sheetCurrentVersion = values.SheetVersion || "0.0.0";
             const hpConverted = values.HpConverted;
 
-            console.log(`Current sheet version: ${currentVersion}, Target version: ${SHEET_VERSION}`);
+            console.log(`Current sheet version: ${sheetCurrentVersion}, Target version: ${SHEET_VERSION}`);
 
             // Special case: If HpConverted exists but no SheetVersion, this is a converted legacy sheet
             if (!values.SheetVersion && (hpConverted === "converted" || hpConverted === "conversion not needed")) {
@@ -20,18 +22,18 @@
                 setAttrs({
                     SheetVersion: "2.0.0"
                 });
-                currentVersion = "2.0.0";
+                sheetCurrentVersion = "2.0.0";
             }
 
             // Only run migrations if we need to upgrade
-            if (needsMigration(currentVersion, SHEET_VERSION)) {
+            if (needsMigration(sheetCurrentVersion, SHEET_VERSION)) {
                 console.log("Running migrations...");
 
                 // Run migrations in order based on version
-                if (isVersionOlderThan(currentVersion, "2.0.0")) {
+                if (isVersionOlderThan(sheetCurrentVersion, "2.0.0")) {
                     migrateTo_2_0_0();
                 }
-                if (isVersionOlderThan(currentVersion, "2.2.0")) {
+                if (isVersionOlderThan(sheetCurrentVersion, "2.2.0")) {
                     migrateTo_2_2_0();
                 }
 
@@ -264,85 +266,375 @@
         return diceTable[rank] || "";
     }
 
-    on("change:strbase change:strbonus", function () {
-        updateStrength();
+    // Helper function to generate race summary from modifiers
+    on("change:race", function () {
+        getAttrs(["Race"], function (values) {
+            // Get race data from lookup table, with defaults for missing races
+            const raceData = RACE_DATA[values.Race] || {};
+
+            // Extract racial modifiers with defaults
+            const {
+                strengthModifier = 0,
+                dexterityModifier = 0,
+                bodyModifier = 0,
+                perceptionModifier = 0,
+                intelligenceModifier = 0,
+                willpowerModifier = 0,
+                charismaModifier = 0,
+                beautyModifier = 0,
+                racialMovement = 3,
+                racialUnarmedRank = 3,
+                visionType = "",
+                soulPoints = 10
+            } = raceData;
+
+            // Update all racial attributes in a single batch call
+            setAttrs({
+                RaceMvmt: racialMovement,
+                Vision: visionType,
+                SoulPoints: soulPoints,
+                RaceUnarmedRank: racialUnarmedRank,
+                StrRace: strengthModifier,
+                DexRace: dexterityModifier,
+                BdyRace: bodyModifier,
+                PrcRace: perceptionModifier,
+                IntRace: intelligenceModifier,
+                WilRace: willpowerModifier,
+                ChrRace: charismaModifier,
+                BtyRace: beautyModifier,
+                RaceSummary: generateRaceSummary(values.Race, raceData)
+            });
+
+            updateAllAttributes();
+            updateUnarmed();
+        });
     });
 
-    on("change:dmgmodbonus", function () {
-        updateDmgMod();
-    });
+    function generateRaceSummary(raceName, raceData) {
+        const {
+            strengthModifier = 0,
+            dexterityModifier = 0,
+            bodyModifier = 0,
+            perceptionModifier = 0,
+            intelligenceModifier = 0,
+            willpowerModifier = 0,
+            charismaModifier = 0,
+            beautyModifier = 0,
+            racialMovement = 3,
+            racialUnarmedRank = 3,
+            visionType = "",
+            soulPoints = 10
+        } = raceData;
 
-    on("change:dexbase change:dexbonus", function () {
-        updateDexterity();
-    });
+        // Extract race display name from existing summaries
+        const raceDisplayNames = {
+            ogre: "Bogkroll (Ogre)",
+            troll: "Bogkroll (Troll)",
+            highelf: "Eldrynn (High)",
+            halfelf: "Eldrynn (Half-Elf)",
+            shadow: "Eldrynn (Shadow)",
+            dungoblin: "Goblin (Dungoblin)",
+            knocker: "Goblin (Knocker)",
+            mungreel: "Goblin (Mungreel)",
+            dark: "Kai Eldrynn (Dark)",
+            halfdark: "Kai Eldrynn (Half-Dark-Elf)",
+            kuthalan: "Kuthalan (Reaver)",
+            mhentep: "Mhen Tep (Grimalkin)",
+            minotaur: "Minotaur (Broman)",
+            highdwarf: "Mongru (High Dwarf)",
+            paledwarf: "Mongru (Pale Dwarf)",
+            stonedwarf: "Mongru (Stone Dwarf)",
+            nephilim: "Nephilim (Watcher)",
+            darkorc: "Org (Dark Orc)",
+            halforc: "Org (Half-Orc)",
+            orc: "Org (Orc)",
+            sharpheen: "Sharpheen (Lizard Kin)",
+            mulpheen: "Sharpheen (Mulpheen)",
+            skog: "Skog (Beastkin)",
+            halfskog: "Skog (Half-Brute)",
+            tarkanys: "Tarkanys (Ratkin)",
+            bloodtark: "Tarkanys (Blood Tark)",
+            human: "Terran (Human)",
+            mutant: "Vatagi (Mutant)"
+        };
 
-    on("change:defmodbonus", function () {
-        updateDefMod();
-    });
+        const displayName = raceDisplayNames[raceName] || "Unknown Race";
+        let summary = displayName + ":";
 
-    on("change:initmodbonus", function () {
-        updateInitMod();
-    });
+        // Add attribute modifiers
+        const modifiers = [];
+        if (strengthModifier !== 0) modifiers.push((strengthModifier > 0 ? "+" : "") + strengthModifier + " Str");
+        if (dexterityModifier !== 0) modifiers.push((dexterityModifier > 0 ? "+" : "") + dexterityModifier + " Dex");
+        if (bodyModifier !== 0) modifiers.push((bodyModifier > 0 ? "+" : "") + bodyModifier + " Bdy");
+        if (perceptionModifier !== 0) modifiers.push((perceptionModifier > 0 ? "+" : "") + perceptionModifier + " Prc");
+        if (intelligenceModifier !== 0)
+            modifiers.push((intelligenceModifier > 0 ? "+" : "") + intelligenceModifier + " Int");
+        if (willpowerModifier !== 0) modifiers.push((willpowerModifier > 0 ? "+" : "") + willpowerModifier + " Wil");
+        if (charismaModifier !== 0) modifiers.push((charismaModifier > 0 ? "+" : "") + charismaModifier + " Chr");
+        if (beautyModifier !== 0) modifiers.push((beautyModifier > 0 ? "+" : "") + beautyModifier + " Bty");
 
-    on("change:mvmtbonus", function () {
-        updateMvmt();
-    });
+        if (modifiers.length > 0) {
+            summary += " " + modifiers.join(", ") + ".";
+        } else {
+            // Handle races with no attribute modifiers
+            summary += " No attribute modifiers.";
+        }
 
-    on("change:bdybase change:bdybonus", function () {
-        updateBody();
-    });
+        // Add special abilities
+        const specials = [];
+        if (racialMovement !== 3) specials.push("Movement " + racialMovement);
+        if (racialUnarmedRank !== 3) {
+            const unarmedDice = getDice(racialUnarmedRank);
+            specials.push("Unarmed " + unarmedDice);
+        }
+        if (soulPoints !== 10) specials.push(soulPoints + " Soul Points");
+        if (visionType) {
+            // Add "Vision" suffix for most types, except special ones
+            const visionText =
+                visionType === "Chromatic/Astral Sight" || visionType === "Infravision" || visionType === "Dark Sight"
+                    ? visionType
+                    : visionType + " Vision";
+            specials.push(visionText);
+        }
 
-    on("change:toughbonus", function () {
-        updateToughness();
-    });
+        if (specials.length > 0) {
+            summary += " " + specials.join(", ") + ".";
+        }
 
-    on("change:prcbase change:prcbonus", function () {
-        updatePerception();
-    });
+        return summary;
+    }
 
-    on("change:shotdmgmodbonus", function () {
-        updateShotDmgMod();
-    });
-
-    on("change:rgbonus", function () {
-        updateRange();
-    });
-
-    on("change:intbase change:intbonus", function () {
-        updateIntelligence();
-    });
-
-    on("change:speffbonus", function () {
-        updateSpellEffect();
-    });
-
-    on("change:wilbase change:wilbonus", function () {
-        updateWillpower();
-    });
-
-    on("change:mendefbonus", function () {
-        updateMenDefMod();
-    });
-
-    on("change:fortbonus", function () {
-        updateFortitude();
-    });
-
-    on("change:chrbase change:chrbonus", function () {
-        updateCharisma();
-    });
-
-    on("change:socialbonus", function () {
-        updateSocialPool();
-    });
-
-    on("change:btybase change:btybonus", function () {
-        updateBeauty();
-    });
-
-    on("change:maxsaga", function () {
-        updateLevel();
-    });
+    // Race data lookup table - defines racial modifiers and special attributes
+    const RACE_DATA = {
+        ogre: {
+            strengthModifier: 4,
+            dexterityModifier: -2,
+            bodyModifier: 1,
+            intelligenceModifier: -2,
+            charismaModifier: -1,
+            racialMovement: 2,
+            racialUnarmedRank: 6,
+            visionType: "Twilight"
+        },
+        troll: {
+            strengthModifier: 4,
+            dexterityModifier: -2,
+            bodyModifier: 1,
+            intelligenceModifier: -2,
+            charismaModifier: -1,
+            racialMovement: 2,
+            racialUnarmedRank: 6,
+            visionType: "Dark Sight"
+        },
+        highelf: {
+            strengthModifier: -2,
+            dexterityModifier: 1,
+            bodyModifier: -2,
+            perceptionModifier: 1,
+            intelligenceModifier: 1,
+            willpowerModifier: 1,
+            beautyModifier: 2,
+            visionType: "Twilight"
+        },
+        halfelf: {
+            strengthModifier: -1,
+            bodyModifier: -1,
+            perceptionModifier: 1,
+            intelligenceModifier: 1,
+            beautyModifier: 1,
+            visionType: "Twilight"
+        },
+        shadow: {
+            strengthModifier: -2,
+            dexterityModifier: 1,
+            bodyModifier: -2,
+            perceptionModifier: 1,
+            intelligenceModifier: 1,
+            willpowerModifier: 1,
+            beautyModifier: 2,
+            visionType: "Dark Sight"
+        },
+        dungoblin: {
+            strengthModifier: -1,
+            dexterityModifier: 1,
+            perceptionModifier: 1,
+            charismaModifier: -1,
+            racialMovement: 4,
+            visionType: "Twilight"
+        },
+        knocker: {
+            strengthModifier: -2,
+            dexterityModifier: 2,
+            perceptionModifier: 1,
+            charismaModifier: -1,
+            racialMovement: 4,
+            visionType: "Dark Sight"
+        },
+        mungreel: {
+            strengthModifier: -2,
+            dexterityModifier: 2,
+            perceptionModifier: 1,
+            charismaModifier: -1,
+            racialMovement: 4,
+            visionType: "Dark Sight"
+        },
+        dark: {
+            strengthModifier: -1,
+            dexterityModifier: 1,
+            bodyModifier: -1,
+            perceptionModifier: 1,
+            intelligenceModifier: 1,
+            willpowerModifier: 1,
+            charismaModifier: -2,
+            beautyModifier: 2,
+            visionType: "Dark Sight"
+        },
+        halfdark: {
+            bodyModifier: -1,
+            perceptionModifier: 1,
+            intelligenceModifier: 1,
+            willpowerModifier: 1,
+            charismaModifier: -2,
+            beautyModifier: 1,
+            visionType: "Twilight"
+        },
+        kuthalan: {
+            bodyModifier: 2,
+            perceptionModifier: 2,
+            willpowerModifier: -1,
+            charismaModifier: -3,
+            visionType: "Infravision"
+        },
+        mhentep: {
+            strengthModifier: -1,
+            dexterityModifier: 2,
+            bodyModifier: -1,
+            perceptionModifier: 2,
+            willpowerModifier: -2,
+            racialMovement: 4,
+            visionType: "Twilight"
+        },
+        minotaur: {
+            strengthModifier: 3,
+            dexterityModifier: -1,
+            bodyModifier: 2,
+            perceptionModifier: -2,
+            intelligenceModifier: -2,
+            racialUnarmedRank: 5,
+            visionType: "Twilight"
+        },
+        highdwarf: {
+            strengthModifier: 2,
+            dexterityModifier: -1,
+            bodyModifier: 1,
+            charismaModifier: -2,
+            racialMovement: 2,
+            visionType: "Dark Sight"
+        },
+        paledwarf: {
+            strengthModifier: 2,
+            dexterityModifier: -1,
+            bodyModifier: 1,
+            charismaModifier: -2,
+            racialMovement: 2,
+            visionType: "Dark Sight"
+        },
+        stonedwarf: {
+            strengthModifier: 2,
+            dexterityModifier: -1,
+            bodyModifier: 1,
+            charismaModifier: -2,
+            racialMovement: 2,
+            visionType: "Dark Sight"
+        },
+        nephilim: {
+            strengthModifier: 1,
+            perceptionModifier: 1,
+            willpowerModifier: -2,
+            visionType: "Chromatic/Astral Sight"
+        },
+        darkorc: {
+            strengthModifier: 2,
+            bodyModifier: 1,
+            intelligenceModifier: -1,
+            charismaModifier: -2,
+            racialUnarmedRank: 5,
+            visionType: "Dark Sight"
+        },
+        halforc: {
+            strengthModifier: 2,
+            charismaModifier: -1,
+            racialUnarmedRank: 4,
+            visionType: "Twilight"
+        },
+        orc: {
+            strengthModifier: 1,
+            bodyModifier: 1,
+            intelligenceModifier: -1,
+            charismaModifier: -1,
+            racialUnarmedRank: 4,
+            visionType: "Dark Sight"
+        },
+        sharpheen: {
+            strengthModifier: 2,
+            bodyModifier: 1,
+            intelligenceModifier: -1,
+            charismaModifier: -2,
+            racialUnarmedRank: 4,
+            visionType: "Infravision"
+        },
+        mulpheen: {
+            strengthModifier: 2,
+            bodyModifier: 1,
+            intelligenceModifier: -1,
+            charismaModifier: -2,
+            racialUnarmedRank: 4,
+            visionType: "Infravision"
+        },
+        skog: {
+            strengthModifier: 2,
+            bodyModifier: 1,
+            perceptionModifier: 2,
+            intelligenceModifier: -1,
+            willpowerModifier: -2,
+            charismaModifier: -2,
+            racialUnarmedRank: 4,
+            visionType: "Twilight"
+        },
+        halfskog: {
+            strengthModifier: 1,
+            bodyModifier: 1,
+            intelligenceModifier: -1,
+            charismaModifier: -1,
+            racialUnarmedRank: 4,
+            visionType: "Chromatic"
+        },
+        tarkanys: {
+            strengthModifier: -2,
+            dexterityModifier: 2,
+            perceptionModifier: 2,
+            charismaModifier: -2,
+            racialMovement: 4,
+            visionType: "Dark Sight"
+        },
+        bloodtark: {
+            strengthModifier: 2,
+            dexterityModifier: -2,
+            perceptionModifier: 2,
+            charismaModifier: -2,
+            racialUnarmedRank: 5,
+            visionType: "Dark Sight"
+        },
+        human: {
+            visionType: "Chromatic",
+            soulPoints: 12
+        },
+        mutant: {
+            racialUnarmedRank: 4,
+            visionType: "Dark Sight",
+            soulPoints: 8
+        }
+    };
 
     on("change:class", function () {
         getAttrs(["Class", "ClassSI", "SpiritInf"], function (values) {
@@ -364,292 +656,244 @@
         });
     });
 
-    on("change:race", function () {
-        getAttrs(["Race"], function (values) {
-            let mv = 3;
-            let un = 3;
-            let str = 0;
-            let dex = 0;
-            let bdy = 0;
-            let prc = 0;
-            let int = 0;
-            let wil = 0;
-            let chr = 0;
-            let bty = 0;
-            let vis = "";
-            let soul = 10;
+    /* LEVEL AND SAGA POINTS */
 
-            switch (values.Race) {
-                case "ogre":
-                    str = 4;
-                    dex = -2;
-                    bdy = 1;
-                    int = -2;
-                    chr = -1;
-                    mv = 2;
-                    un = 6;
-                    vis = "Twilight";
-                    break;
-                case "troll":
-                    str = 4;
-                    dex = -2;
-                    bdy = 1;
-                    int = -2;
-                    chr = -1;
-                    mv = 2;
-                    un = 6;
-                    vis = "Dark Sight";
-                    break;
-                case "highelf":
-                    str = -2;
-                    dex = 1;
-                    bdy = -2;
-                    prc = 1;
-                    int = 1;
-                    wil = 1;
-                    bty = 2;
-                    vis = "Twilight";
-                    break;
-                case "halfelf":
-                    str = -1;
-                    bdy = -1;
-                    prc = 1;
-                    int = 1;
-                    bty = 1;
-                    vis = "Twilight";
-                    break;
-                case "shadow":
-                    str = -2;
-                    dex = 1;
-                    bdy = -2;
-                    prc = 1;
-                    int = 1;
-                    wil = 1;
-                    bty = 2;
-                    vis = "Dark Sight";
-                    break;
-                case "dungoblin":
-                    str = -1;
-                    dex = 1;
-                    prc = 1;
-                    chr = -1;
-                    mv = 4;
-                    vis = "Twilight";
-                    break;
-                case "knocker":
-                    str = -2;
-                    dex = 2;
-                    prc = 1;
-                    chr = -1;
-                    mv = 4;
-                    vis = "Dark Sight";
-                    break;
-                case "mungreel":
-                    str = -2;
-                    dex = 2;
-                    prc = 1;
-                    chr = -1;
-                    mv = 4;
-                    vis = "Dark Sight";
-                    break;
-                case "dark":
-                    str = -1;
-                    dex = 1;
-                    bdy = -1;
-                    prc = 1;
-                    int = 1;
-                    wil = 1;
-                    chr = -2;
-                    bty = 2;
-                    vis = "Dark Sight";
-                    break;
-                case "halfdark":
-                    bdy = -1;
-                    prc = 1;
-                    int = 1;
-                    wil = 1;
-                    chr = -2;
-                    bty = 1;
-                    vis = "Twilight";
-                    break;
-                case "kuthalan":
-                    bdy = 2;
-                    prc = 2;
-                    wil = -1;
-                    chr = -3;
-                    vis = "Infravision";
-                    break;
-                case "mhentep":
-                    str = -1;
-                    dex = 2;
-                    bdy = -1;
-                    prc = 2;
-                    wil = -2;
-                    mv = 4;
-                    vis = "Twilight";
-                    break;
-                case "minotaur":
-                    str = 3;
-                    dex = -1;
-                    bdy = 2;
-                    prc = -2;
-                    int = -2;
-                    un = 5;
-                    vis = "Twilight";
-                    break;
-                case "highdwarf":
-                    str = 2;
-                    dex = -1;
-                    bdy = 1;
-                    chr = -2;
-                    mv = 2;
-                    vis = "Dark Sight";
-                    break;
-                case "paledwarf":
-                    str = 2;
-                    dex = -1;
-                    bdy = 1;
-                    chr = -2;
-                    mv = 2;
-                    vis = "Dark Sight";
-                    break;
-                case "stonedwarf":
-                    str = 2;
-                    dex = -1;
-                    bdy = 1;
-                    chr = -2;
-                    mv = 2;
-                    vis = "Dark Sight";
-                    break;
-                case "nephilim":
-                    str = 1;
-                    prc = 1;
-                    wil = -2;
-                    vis = "Chromatic / Astral Sight";
-                    break;
-                case "darkorc":
-                    str = 2;
-                    bdy = 1;
-                    int = -1;
-                    chr = -2;
-                    un = 5;
-                    vis = "Dark Sight";
-                    break;
-                case "halforc":
-                    str = 2;
-                    chr = -1;
-                    un = 4;
-                    vis = "Twilight";
-                    break;
-                case "orc":
-                    str = 1;
-                    bdy = 1;
-                    int = -1;
-                    chr = -1;
-                    un = 4;
-                    vis = "Dark Sight";
-                    break;
-                case "sharpheen":
-                    str = 2;
-                    bdy = 1;
-                    int = -1;
-                    chr = -2;
-                    un = 4;
-                    vis = "Infravision";
-                    break;
-                case "mulpheen":
-                    str = 2;
-                    bdy = 1;
-                    int = -1;
-                    chr = -2;
-                    un = 4;
-                    vis = "Infravision";
-                    break;
-                case "skog":
-                    str = 2;
-                    bdy = 1;
-                    prc = 2;
-                    int = -1;
-                    wil = -2;
-                    chr = -2;
-                    un = 4;
-                    vis = "Twilight";
-                    break;
-                case "halfskog":
-                    str = 1;
-                    bdy = 1;
-                    int = -1;
-                    chr = -1;
-                    un = 4;
-                    vis = "Chromatic";
-                    break;
-                case "tarkanys":
-                    str = -2;
-                    dex = 2;
-                    prc = 2;
-                    chr = -2;
-                    mv = 4;
-                    vis = "Dark Sight";
-                    break;
-                case "bloodtark":
-                    str = 2;
-                    dex = -2;
-                    prc = 2;
-                    chr = -2;
-                    un = 5;
-                    vis = "Dark Sight";
-                    break;
-                case "human":
-                    vis = "Chromatic";
-                    soul = 12;
-                    break;
-                case "mutant":
-                    un = 4;
-                    vis = "Dark Sight";
-                    soul = 8;
-                    break;
+    on("change:maxsaga", function () {
+        updateLevel();
+    });
+
+    function updateLevel() {
+        getAttrs(["MaxSaga"], function (values) {
+            setAttrs({ Level: getLevel(values.MaxSaga) });
+            setAttrs({ NextLevelSaga: getSagaPointsForNextLevel(values.MaxSaga) });
+        });
+    }
+
+    function getLevel(saga) {
+        // Find the current level based on saga points
+        for (let i = 0; i < LEVEL_THRESHOLDS.length; i++) {
+            if (saga < LEVEL_THRESHOLDS[i]) {
+                // index 0 = level 1
+                const level = i + 1;
+                return level;
             }
-            setAttrs({ RaceMvmt: mv });
-            setAttrs({ Vision: vis });
-            setAttrs({ SoulPoints: soul });
+        }
+        return 100; // Max level (when saga >= 31000)
+    }
 
-            setAttrs({ RaceUnarmedRank: un });
-            updateUnarmed();
+    function getSagaPointsForNextLevel(saga) {
+        // Find the next level threshold that hasn't been reached yet
+        for (let i = 0; i < LEVEL_THRESHOLDS.length; i++) {
+            if (saga < LEVEL_THRESHOLDS[i]) {
+                return LEVEL_THRESHOLDS[i];
+            }
+        }
+        return "-"; // Max level reached (level 100)
+    }
 
-            setAttrs({ StrRace: str });
-            updateStrength();
+    // Saga point thresholds for each level (index 0 = level 1, index 1 = level 2, etc.)
+    const LEVEL_THRESHOLDS = [
+        16,
+        37,
+        60,
+        85,
+        115,
+        150,
+        190,
+        235,
+        285,
+        340, // Levels 1-10
+        400,
+        465,
+        535,
+        610,
+        690,
+        775,
+        865,
+        960,
+        1060,
+        1165, // Levels 11-20
+        1275,
+        1390,
+        1510,
+        1635,
+        1765,
+        1900,
+        2040,
+        2185,
+        2335,
+        2490, // Levels 21-30
+        2650,
+        2815,
+        2985,
+        3160,
+        3340,
+        3525,
+        3715,
+        3910,
+        4105,
+        4300, // Levels 31-40
+        4495,
+        4690,
+        4890,
+        5095,
+        5300,
+        5500,
+        5700,
+        5900,
+        6100,
+        6400, // Levels 41-50
+        6700,
+        7000,
+        7300,
+        7600,
+        7900,
+        8200,
+        8500,
+        8800,
+        9100,
+        9500, // Levels 51-60
+        9900,
+        10300,
+        10700,
+        11100,
+        11500,
+        11900,
+        12300,
+        12700,
+        13100,
+        13600, // Levels 61-70
+        14100,
+        14600,
+        15100,
+        15600,
+        16100,
+        16600,
+        17100,
+        17600,
+        18100,
+        18700, // Levels 71-80
+        19200,
+        19800,
+        20400,
+        21000,
+        21600,
+        22200,
+        22800,
+        23400,
+        24000,
+        24700, // Levels 81-90
+        25400,
+        26100,
+        26800,
+        27500,
+        28200,
+        28900,
+        29600,
+        30300,
+        31000 // Levels 91-99
+    ];
 
-            setAttrs({ DexRace: dex });
-            updateDexterity();
+    on("change:physmod change:menmod", function () {
+        updateAllSkills();
+    });
 
-            setAttrs({ BdyRace: bdy });
-            updateBody();
+    /* STRENGTH */
 
-            setAttrs({ PrcRace: prc });
-            updatePerception();
+    on("change:strbase change:strbonus", function () {
+        updateStrength();
+    });
 
-            setAttrs({ IntRace: int });
-            updateIntelligence();
-
-            setAttrs({ WilRace: wil });
-            updateWillpower();
-
-            setAttrs({ ChrRace: chr });
-            updateCharisma();
-
-            setAttrs({ BtyRace: bty });
-            updateBeauty();
+    on("change:dmgmodbonus", function () {
+        getAttrs(["StrTotal", "DmgModBonus"], function (values) {
+            updateDamageModifier(Number(values.StrTotal), Number(values.DmgModBonus));
         });
     });
 
-    function getDmgMod(str) {
+    on("change:strhitmodbonus", function () {
+        getAttrs(["StrTotal", "StrHitModBonus"], function (values) {
+            updateStrengthHitModifier(Number(values.StrTotal), Number(values.StrHitModBonus));
+        });
+    });
+
+    on("change:strblockmodbonus", function () {
+        getAttrs(["StrTotal", "StrBlockModBonus"], function (values) {
+            updateStrengthBlockModifier(Number(values.StrTotal), Number(values.StrBlockModBonus));
+        });
+    });
+
+    function updateStrength() {
+        getAttrs(
+            ["StrBase", "StrBonus", "StrRace", "DmgModBonus", "StrHitModBonus", "StrBlockModBonus"],
+            function (values) {
+                let total = Number(values.StrBase) + Number(values.StrBonus) + Number(values.StrRace);
+                total = Math.max(1, Math.min(total, 100));
+                const rank = getRank(total);
+
+                setAttrs({
+                    StrTotal: total,
+                    StrRank: rank,
+                    StrDice: getDice(rank)
+                });
+
+                const damageModifierBonus = Number(values.DmgModBonus);
+                updateDamageModifier(total, damageModifierBonus);
+
+                const strengthHitModifierBonus = Number(values.StrHitModBonus);
+                updateStrengthHitModifier(total, strengthHitModifierBonus);
+
+                const strengthBlockModifierBonus = Number(values.StrBlockModBonus);
+                updateStrengthBlockModifier(total, strengthBlockModifierBonus);
+
+                updateAllSkills();
+            }
+        );
+    }
+
+    function updateDamageModifier(strength, damageModifierBonus) {
+        const baseDamageModifier = calculateDamageModifier(strength);
+        const totalDamageModifier = baseDamageModifier + damageModifierBonus;
+
+        setAttrs({
+            DmgModBase: baseDamageModifier,
+            DmgModTotal: totalDamageModifier
+        });
+
+        updateAllWeaponDmgMods();
+    }
+
+    function updateStrengthHitModifier(strength, strengthHitAndBlockModifierBonus) {
+        const baseStrengthHitModifier = calculateStrengthToHitAndBlockModifier(strength);
+        const totalStrengthHitModifier = baseStrengthHitModifier + strengthHitAndBlockModifierBonus;
+
+        setAttrs({
+            StrHitModBase: baseStrengthHitModifier,
+            StrHitModTotal: totalStrengthHitModifier
+        });
+    }
+
+    function updateStrengthBlockModifier(strength, strengthHitAndBlockModifierBonus) {
+        const baseStrengthBlockModifier = calculateStrengthToHitAndBlockModifier(strength);
+        const totalStrengthBlockModifier = baseStrengthBlockModifier + strengthHitAndBlockModifierBonus;
+
+        setAttrs({
+            StrBlockModBase: baseStrengthBlockModifier,
+            StrBlockModTotal: totalStrengthBlockModifier
+        });
+    }
+
+    function calculateDamageModifier(str) {
         if (str <= 3) return Math.min(-3, 4 - str);
         if (str >= 80) return 33;
         if (str >= 15) return Math.floor((str - 13) / 2);
         return 0;
     }
 
-    function getWtAllow(str) {
+    function calculateStrengthToHitAndBlockModifier(strength) {
+        return calculateSharedToHitModifier(strength);
+    }
+
+    function calculateWeightAllowance(str) {
         if (str <= 3) return "vl";
         if (str <= 9) return "l";
         if (str <= 14) return "m/2vl";
@@ -659,22 +903,176 @@
         return "vh/2vh";
     }
 
-    function getDefMod(dex) {
-        if (dex <= 3) return Math.min(-3, 4 - dex);
-        if (dex >= 80) return 8;
-        if (dex >= 15) return Math.floor(dex / 10);
+    /* DEXTERITY */
+
+    on("change:dexbase change:dexbonus", function () {
+        updateDexterity();
+    });
+
+    on("change:defmodbonus", function () {
+        getAttrs(["DexTotal", "DefModBonus"], function (values) {
+            updateDefenceModifier(Number(values.DexTotal), Number(values.DefModBonus));
+        });
+    });
+
+    on("change:dexhitmodbonus", function () {
+        getAttrs(["DexTotal", "DexHitModBonus"], function (values) {
+            updateDexterityHitModifier(Number(values.DexTotal), Number(values.DexHitModBonus));
+        });
+    });
+
+    on("change:initmodbonus", function () {
+        getAttrs(["DexTotal", "InitModBonus"], function (values) {
+            updateDexterityInitiativeModifier(Number(values.DexTotal), Number(values.InitModBonus));
+        });
+    });
+
+    on("change:mvmtbonus", function () {
+        getAttrs(["DexTotal", "RaceMvmt", "MvmtBonus"], function (values) {
+            updateMovement(Number(values.DexTotal), Number(values.RaceMvmt), Number(values.MvmtBonus));
+        });
+    });
+
+    function updateDexterity() {
+        getAttrs(
+            ["DexBase", "DexBonus", "DexRace", "DefModBonus", "DexHitModBonus", "InitModBonus", "RaceMvmt", "MvmtBonus"],
+            function (values) {
+                let total = Number(values.DexBase) + Number(values.DexBonus) + Number(values.DexRace);
+                total = Math.max(1, Math.min(total, 100));
+                const rank = getRank(total);
+
+                setAttrs({
+                    DexTotal: total,
+                    DexRank: rank,
+                    DexDice: getDice(rank)
+                });
+
+                const defModBonus = Number(values.DefModBonus);
+                updateDefenceModifier(total, defModBonus);
+
+                const dexHitModBonus = Number(values.DexHitModBonus);
+                updateDexterityHitModifier(total, dexHitModBonus);
+
+                const dexInitModBonus = Number(values.InitModBonus);
+                updateDexterityInitiativeModifier(total, dexInitModBonus);
+
+                const raceMvmt = Number(values.RaceMvmt);
+                const mvmtBonus = Number(values.MvmtBonus);
+                updateMovement(total, raceMvmt, mvmtBonus);
+
+                updateAllSkills();
+            }
+        );
+    }
+
+    function updateDefenceModifier(dexterity, defenceModifierBonus) {
+        const defenseModifier = calculateDefenseModifier(dexterity);
+
+        setAttrs({
+            DefModBase: defenseModifier,
+            DefModTotal: defenseModifier + defenceModifierBonus
+        });
+    }
+
+    function updateDexterityHitModifier(dexterity, dexterityHitInitModifierBonus) {
+        const baseDexterityHitModifier = calculateToHitAndInitiativeModifier(dexterity);
+        const totalDexterityHitModifier = baseDexterityHitModifier + dexterityHitInitModifierBonus;
+
+        setAttrs({
+            DexHitModBase: baseDexterityHitModifier,
+            DexHitModTotal: totalDexterityHitModifier
+        });
+    }
+
+    function updateDexterityInitiativeModifier(dexterity, dexterityHitInitModifierBonus) {
+        const baseDexterityInitModifier = calculateToHitAndInitiativeModifier(dexterity);
+        const totalDexterityInitModifier = baseDexterityInitModifier + dexterityHitInitModifierBonus;
+
+        setAttrs({
+            InitModBase: baseDexterityInitModifier,
+            InitModTotal: totalDexterityInitModifier
+        });
+    }
+
+    function updateMovement(dexTotal, raceMvmt, mvmtBonus) {
+        const movement = raceMvmt + calculateMovementModifier(dexTotal) + mvmtBonus;
+
+        setAttrs({
+            Mvmt: movement,
+            RunMvmt: movement * 2
+        });
+    }
+
+    function calculateDefenseModifier(dexterity) {
+        // Defense modifier uses the same calculation as to-hit modifier
+        return calculateSharedToHitModifier(dexterity);
+    }
+
+    function calculateToHitAndInitiativeModifier(dexterity) {
+        // To hit and initiative modifier uses the same calculation as to-hit modifier
+        return calculateSharedToHitModifier(dexterity);
+    }
+
+    function calculateMovementModifier(dexterity) {
+        if (dexterity <= 3) return -1;
+        if (dexterity >= 60) return 5;
+        if (dexterity >= 50) return 4;
+        if (dexterity >= 15) return Math.floor(dexterity / 10);
         return 0;
     }
 
-    function getMvMod(dex) {
-        if (dex <= 3) return -1;
-        if (dex >= 60) return 5;
-        if (dex >= 50) return 4;
-        if (dex >= 15) return Math.floor(dex / 10);
-        return 0;
+    /* BODY */
+
+    on("change:bdybase change:bdybonus", function () {
+        updateBody();
+    });
+
+    on("change:toughbonus", function () {
+        getAttrs(["BdyTotal", "ToughBonus"], function (values) {
+            updateToughness(Number(values.BdyTotal), Number(values.ToughBonus));
+        });
+    });
+
+    function updateBody() {
+        getAttrs(["BdyBase", "BdyBonus", "BdyRace", "HPAdj", "MaxHP", "ToughBonus"], function (values) {
+            let total = Number(values.BdyBase) + Number(values.BdyBonus) + Number(values.BdyRace);
+            total = Math.max(1, Math.min(total, 100));
+            const rank = getRank(total);
+
+            setAttrs({
+                BdyTotal: total,
+                BdyRank: rank,
+                BdyDice: getDice(rank),
+                BdySave: calculateBodySave(total)
+            });
+
+            const toughBonus = Number(values.ToughBonus);
+            updateToughness(total, toughBonus);
+            updateAllSkills();
+
+            const prevHPAdj = Number(values.HPAdj);
+            const newHPAdj = calculateHPAdjustment(total);
+            const prevMaxHP = Number(values.MaxHP);
+
+            setAttrs({
+                HPAdj: newHPAdj,
+                MaxHP: newHPAdj - prevHPAdj + prevMaxHP
+            });
+        });
     }
 
-    function getToughness(bdy) {
+    function updateToughness(bdyTotal, toughBonus) {
+        const t = calculateToughness(bdyTotal);
+
+        setAttrs({
+            ToughBase: t,
+            ToughTotal: t + toughBonus
+        });
+
+        updateTotalArmorRating();
+    }
+
+    function calculateToughness(bdy) {
         if (bdy <= 17) return 0;
         if (bdy <= 21) return bdy - 17;
         if (bdy <= 26) return Math.floor((bdy - 13) / 2);
@@ -685,7 +1083,7 @@
         return 18;
     }
 
-    function getHPAdj(bdy) {
+    function calculateHPAdjustment(bdy) {
         if (bdy <= 14) return 0;
         if (bdy == 15) return 1;
         if (bdy == 16) return 3;
@@ -712,7 +1110,7 @@
         return 276;
     }
 
-    function getBodySave(bdy) {
+    function calculateBodySave(bdy) {
         if (bdy <= 15) return 18;
         if (bdy <= 17) return 17;
         if (bdy <= 19) return 16;
@@ -728,25 +1126,216 @@
         return 6;
     }
 
-    function getShotDmg(prc) {
+    function updateTotalArmorRating() {
+        getAttrs(
+            [
+                "HelmetAR",
+                "AmuletAR",
+                "CloakAR",
+                "PauldronsAR",
+                "ClothingAR",
+                "TorsoAR",
+                "BracersAR",
+                "GlovesAR",
+                "BeltAR",
+                "GreavesAR",
+                "BootsAR",
+                "RingAR",
+                "Ring2AR",
+                "OtherAR",
+                "Other2AR",
+                "ToughTotal"
+            ],
+            function (values) {
+                const totalArmorRating =
+                    Number(values.HelmetAR) +
+                    Number(values.AmuletAR) +
+                    Number(values.CloakAR) +
+                    Number(values.PauldronsAR) +
+                    Number(values.ClothingAR) +
+                    Number(values.TorsoAR) +
+                    Number(values.BracersAR) +
+                    Number(values.GlovesAR) +
+                    Number(values.BeltAR) +
+                    Number(values.GreavesAR) +
+                    Number(values.BootsAR) +
+                    Number(values.RingAR) +
+                    Number(values.Ring2AR) +
+                    Number(values.OtherAR) +
+                    Number(values.Other2AR) +
+                    Number(values.ToughTotal);
+                setAttrs({ TotalAR: totalArmorRating });
+            }
+        );
+    }
+
+    /* PERCEPTION */
+
+    on("change:prcbase change:prcbonus", function () {
+        updatePerception();
+    });
+
+    on("change:shotdmgmodbonus", function () {
+        getAttrs(["PrcTotal", "ShotDmgModBonus"], function (values) {
+            updateShotDmgMod(Number(values.PrcTotal), Number(values.ShotDmgModBonus));
+        });
+    });
+
+    on("change:prchitmodbonus", function () {
+        getAttrs(["PrcTotal", "PrcHitModBonus"], function (values) {
+            updatePerceptionHitModifier(Number(values.PrcTotal), Number(values.PrcHitModBonus));
+        });
+    });
+
+    on("change:rgbonus", function () {
+        getAttrs(["PrcTotal", "RgBonus"], function (values) {
+            updateRange(Number(values.PrcTotal), Number(values.RgBonus));
+        });
+    });
+
+    function updatePerception() {
+        getAttrs(["PrcBase", "PrcBonus", "PrcRace", "ShotDmgModBonus", "RgBonus", "PrcHitModBonus"], function (values) {
+            let total = Number(values.PrcBase) + Number(values.PrcBonus) + Number(values.PrcRace);
+            total = Math.max(1, Math.min(total, 100));
+            const rank = getRank(total);
+
+            setAttrs({
+                PrcTotal: total,
+                PrcRank: rank,
+                PrcDice: getDice(rank)
+            });
+
+            const shotDmgModBonus = Number(values.ShotDmgModBonus);
+            updateShotDmgMod(total, shotDmgModBonus);
+
+            const rgBonus = Number(values.RgBonus);
+            updateRange(total, rgBonus);
+
+            const prcHitModBonus = Number(values.PrcHitModBonus);
+            updatePerceptionHitModifier(total, prcHitModBonus);
+
+            updateAllSkills();
+        });
+    }
+
+    function updateShotDmgMod(prcTotal, shotDmgModBonus) {
+        const dmg = calculateShotDamageModifier(prcTotal);
+
+        setAttrs({
+            ShotDmgModBase: dmg,
+            ShotDmgModTotal: dmg + shotDmgModBonus
+        });
+
+        updateAllWeaponDmgMods();
+    }
+
+    function updateRange(prcTotal, rgBonus) {
+        const rg = calculateRangeModifier(prcTotal);
+
+        setAttrs({
+            RgBase: rg,
+            RgTotal: rg + rgBonus
+        });
+    }
+
+    function updatePerceptionHitModifier(perception, perceptionHitModifierBonus) {
+        const basePerceptionHitModifier = calculateToHitModifier(perception);
+        const totalPerceptionHitModifier = basePerceptionHitModifier + perceptionHitModifierBonus;
+
+        setAttrs({
+            PrcHitModBase: basePerceptionHitModifier,
+            PrcHitModTotal: totalPerceptionHitModifier
+        });
+    }
+
+    function calculateShotDamageModifier(prc) {
         if (prc >= 78) return 22;
         if (prc >= 15) return Math.floor((prc - 12) / 3);
         return 0;
     }
 
-    function getRange(prc) {
+    function calculateToHitModifier(perception) {
+        return calculateSharedToHitModifier(perception);
+    }
+
+    function calculateRangeModifier(prc) {
         if (prc >= 80) return 8;
         if (prc >= 15) return Math.floor(prc / 10);
         return 0;
     }
 
-    function getSpellEffect(int) {
+    /* INTELLIGENCE */
+
+    on("change:intbase change:intbonus", function () {
+        updateIntelligence();
+    });
+
+    on("change:speffbonus", function () {
+        getAttrs(["IntTotal", "SpEffBonus"], function (values) {
+            updateSpellEffect(Number(values.IntTotal), Number(values.SpEffBonus));
+        });
+    });
+
+    on("change:intcastmodbonus", function () {
+        getAttrs(["IntTotal", "IntCastModBonus"], function (values) {
+            updateIntelligenceCastModifier(Number(values.IntTotal), Number(values.IntCastModBonus));
+        });
+    });
+
+    function updateIntelligence() {
+        getAttrs(["IntBase", "IntBonus", "IntRace", "SpEffBonus", "IntCastModBonus"], function (values) {
+            let total = Number(values.IntBase) + Number(values.IntBonus) + Number(values.IntRace);
+            total = Math.max(1, Math.min(total, 100));
+            const rank = getRank(total);
+
+            setAttrs({
+                IntTotal: total,
+                IntRank: rank,
+                IntDice: getDice(rank),
+                SpellTime: determineSpellTime(total),
+                SpText: determineSpellTimeText(total),
+                Langs: calculateNumberOfFluentTongues(total)
+            });
+
+            const spEffBonus = Number(values.SpEffBonus);
+            updateSpellEffect(total, spEffBonus);
+
+            const intCastModBonus = Number(values.IntCastModBonus);
+            updateIntelligenceCastModifier(total, intCastModBonus);
+
+            updateAllSkills();
+        });
+    }
+
+    function updateSpellEffect(intTotal, spEffBonus) {
+        const se = calculateSpellEffectModifier(intTotal);
+
+        setAttrs({
+            SpEffBase: se,
+            SpEffTotal: se + spEffBonus
+        });
+    }
+
+    function updateIntelligenceCastModifier(intTotal, castModBonus) {
+        const baseCastModifier = calculateCastModifier(intTotal);
+
+        setAttrs({
+            IntCastModBase: baseCastModifier,
+            IntCastModTotal: baseCastModifier + castModBonus
+        });
+    }
+
+    function calculateCastModifier(intelligence) {
+        return calculateSharedToHitModifier(intelligence);
+    }
+
+    function calculateSpellEffectModifier(int) {
         if (int >= 80) return 8;
         if (int >= 15) return Math.floor(int / 10);
         return 0;
     }
 
-    function getSpellTime(int) {
+    function determineSpellTime(int) {
         if (int <= 3) return "";
         if (int <= 6) return "d4";
         if (int <= 9) return "d12";
@@ -763,7 +1352,7 @@
         return "d4";
     }
 
-    function getSpellTimeText(int) {
+    function determineSpellTimeText(int) {
         if (int <= 3) return "";
         if (int <= 6) return "years";
         if (int <= 14) return "months";
@@ -771,7 +1360,7 @@
         return "days";
     }
 
-    function getLangs(int) {
+    function calculateNumberOfFluentTongues(int) {
         if (int <= 3) return 0;
         if (int <= 11) return 1;
         if (int <= 14) return 2;
@@ -779,227 +1368,281 @@
         return Math.floor(int / 10 + 2);
     }
 
-    function getFortitude(wil) {
+    /* WILLPOWER */
+
+    on("change:wilbase change:wilbonus", function () {
+        updateWillpower();
+    });
+
+    on("change:mendefbonus", function () {
+        getAttrs(["WilTotal", "MenDefBonus"], function (values) {
+            updateMenDefMod(Number(values.WilTotal), Number(values.MenDefBonus));
+        });
+    });
+
+    on("change:fortbonus", function () {
+        getAttrs(["WilTotal", "FortBonus"], function (values) {
+            updateFortitude(Number(values.WilTotal), Number(values.FortBonus));
+        });
+    });
+
+    function updateWillpower() {
+        getAttrs(["WilBase", "WilBonus", "WilRace", "ManaAdj", "MaxMana", "MenDefBonus", "FortBonus"], function (values) {
+            let total = Number(values.WilBase) + Number(values.WilBonus) + Number(values.WilRace);
+            total = Math.max(1, Math.min(total, 100));
+            const rank = getRank(total);
+
+            setAttrs({
+                WilTotal: total,
+                WilRank: rank,
+                WilDice: getDice(rank)
+            });
+
+            const menDefBonus = Number(values.MenDefBonus);
+            updateMenDefMod(total, menDefBonus);
+
+            const fortBonus = Number(values.FortBonus);
+            updateFortitude(total, fortBonus);
+
+            updateAllSkills();
+
+            const prevManaAdj = Number(values.ManaAdj);
+            const newManaAdj = calculateManaAdjustment(total);
+            const prevMaxMana = Number(values.MaxMana);
+
+            setAttrs({
+                ManaAdj: newManaAdj,
+                MaxMana: newManaAdj - prevManaAdj + prevMaxMana
+            });
+        });
+    }
+
+    function updateMenDefMod(wilTotal, menDefBonus) {
+        const mdef = calculateMentalDefenseModifier(wilTotal);
+
+        setAttrs({
+            MenDefBase: mdef,
+            MenDefTotal: mdef + menDefBonus
+        });
+    }
+
+    function updateFortitude(wilTotal, fortBonus) {
+        const f = calculateFortitude(wilTotal);
+
+        setAttrs({
+            FortBase: f,
+            FortTotal: f + fortBonus
+        });
+    }
+
+    function calculateMentalDefenseModifier(willpower) {
+        // Mental defense modifier uses the same calculation as to-hit modifier
+        return calculateSharedToHitModifier(willpower);
+    }
+
+    function calculateFortitude(wil) {
         if (wil >= 80) return 33;
         if (wil >= 15) return Math.floor((wil - 13) / 2);
         return 0;
     }
 
-    function getSocialPool(chr) {
+    function calculateManaAdjustment(wil) {
+        // Mana adjustment uses the same calculation as HP adjustment
+        if (wil <= 14) return 0;
+        if (wil == 15) return 1;
+        if (wil == 16) return 3;
+        if (wil == 17) return 6;
+        if (wil == 18) return 10;
+        if (wil == 19) return 15;
+        if (wil <= 21) return 21;
+        if (wil <= 23) return 28;
+        if (wil <= 25) return 36;
+        if (wil <= 27) return 45;
+        if (wil <= 30) return 55;
+        if (wil <= 33) return 66;
+        if (wil <= 36) return 78;
+        if (wil <= 39) return 91;
+        if (wil <= 42) return 105;
+        if (wil <= 46) return 120;
+        if (wil <= 50) return 136;
+        if (wil <= 54) return 153;
+        if (wil <= 58) return 171;
+        if (wil <= 62) return 190;
+        if (wil <= 67) return 210;
+        if (wil <= 72) return 231;
+        if (wil <= 77) return 253;
+        return 276;
+    }
+
+    /* CHARISMA */
+
+    on("change:chrbase change:chrbonus", function () {
+        updateCharisma();
+    });
+
+    on("change:socialbonus", function () {
+        getAttrs(["ChrTotal", "SocialBonus"], function (values) {
+            updateSocialPool(Number(values.ChrTotal), Number(values.SocialBonus));
+        });
+    });
+
+    function updateCharisma() {
+        getAttrs(["ChrBase", "ChrBonus", "ChrRace", "SocialBonus"], function (values) {
+            let total = Number(values.ChrBase) + Number(values.ChrBonus) + Number(values.ChrRace);
+            total = Math.max(1, Math.min(total, 100));
+            const rank = getRank(total);
+
+            setAttrs({
+                ChrTotal: total,
+                ChrRank: rank,
+                ChrDice: getDice(rank),
+                RepBonus: calculateReputationBonus(total)
+            });
+
+            const socialBonus = Number(values.SocialBonus);
+            updateSocialPool(total, socialBonus);
+
+            updateAllSkills();
+        });
+    }
+
+    function updateSocialPool(chrTotal, socialBonus) {
+        const sp = calculateSocialPool(chrTotal);
+
+        setAttrs({
+            SocialBase: sp,
+            SocialPool: sp + socialBonus
+        });
+    }
+
+    function calculateSocialPool(chr) {
         if (chr <= 30) return Math.max(0, Math.floor(chr / 15));
         return Math.min(Math.floor((chr + 10) / 20), 4);
     }
 
-    function getRepBonus(chr) {
+    function calculateReputationBonus(chr) {
         if (chr >= 80) return 40;
         if (chr >= 15) return Math.floor(chr / 10) * 5;
         return 0;
     }
 
-    function getLevel(saga) {
-        if (saga < 16) return 1;
-        if (saga < 37) return 2;
-        if (saga < 60) return 3;
-        if (saga < 85) return 4;
-        if (saga < 115) return 5;
-        if (saga < 150) return 6;
-        if (saga < 190) return 7;
-        if (saga < 235) return 8;
-        if (saga < 285) return 9;
-        if (saga < 340) return 10;
-        if (saga < 400) return 11;
-        if (saga < 465) return 12;
-        if (saga < 535) return 13;
-        if (saga < 610) return 14;
-        if (saga < 690) return 15;
-        if (saga < 775) return 16;
-        if (saga < 865) return 17;
-        if (saga < 960) return 18;
-        if (saga < 1060) return 19;
-        if (saga < 1165) return 20;
-        if (saga < 1275) return 21;
-        if (saga < 1390) return 22;
-        if (saga < 1510) return 23;
-        if (saga < 1635) return 24;
-        if (saga < 1765) return 25;
-        if (saga < 1900) return 26;
-        if (saga < 2040) return 27;
-        if (saga < 2185) return 28;
-        if (saga < 2335) return 29;
-        if (saga < 2490) return 30;
-        if (saga < 2650) return 31;
-        if (saga < 2815) return 32;
-        if (saga < 2985) return 33;
-        if (saga < 3160) return 34;
-        if (saga < 3340) return 35;
-        if (saga < 3525) return 36;
-        if (saga < 3715) return 37;
-        if (saga < 3910) return 38;
-        if (saga < 4105) return 39;
-        if (saga < 4300) return 40;
-        if (saga < 4495) return 41;
-        if (saga < 4690) return 42;
-        if (saga < 4890) return 43;
-        if (saga < 5095) return 44;
-        if (saga < 5300) return 45;
-        if (saga < 5500) return 46;
-        if (saga < 5700) return 47;
-        if (saga < 5900) return 48;
-        if (saga < 6100) return 49;
-        if (saga < 6400) return 50;
-        if (saga < 6700) return 51;
-        if (saga < 7000) return 52;
-        if (saga < 7300) return 53;
-        if (saga < 7600) return 54;
-        if (saga < 7900) return 55;
-        if (saga < 8200) return 56;
-        if (saga < 8500) return 57;
-        if (saga < 8800) return 58;
-        if (saga < 9100) return 59;
-        if (saga < 9500) return 60;
-        if (saga < 9900) return 61;
-        if (saga < 10300) return 62;
-        if (saga < 10700) return 63;
-        if (saga < 11100) return 64;
-        if (saga < 11500) return 65;
-        if (saga < 11900) return 66;
-        if (saga < 12300) return 67;
-        if (saga < 12700) return 68;
-        if (saga < 13100) return 69;
-        if (saga < 13600) return 70;
-        if (saga < 14100) return 71;
-        if (saga < 14600) return 72;
-        if (saga < 15100) return 73;
-        if (saga < 15600) return 74;
-        if (saga < 16100) return 75;
-        if (saga < 16600) return 76;
-        if (saga < 17100) return 77;
-        if (saga < 17600) return 78;
-        if (saga < 18100) return 79;
-        if (saga < 18700) return 80;
-        if (saga < 19200) return 81;
-        if (saga < 19800) return 82;
-        if (saga < 20400) return 83;
-        if (saga < 21000) return 84;
-        if (saga < 21600) return 85;
-        if (saga < 22200) return 86;
-        if (saga < 22800) return 87;
-        if (saga < 23400) return 88;
-        if (saga < 24000) return 89;
-        if (saga < 24700) return 90;
-        if (saga < 25400) return 91;
-        if (saga < 26100) return 92;
-        if (saga < 26800) return 93;
-        if (saga < 27500) return 94;
-        if (saga < 28200) return 95;
-        if (saga < 28900) return 96;
-        if (saga < 29600) return 97;
-        if (saga < 30300) return 98;
-        if (saga < 31000) return 99;
-        return 100;
+    /* ALLURE */
+
+    on("change:btybase change:btybonus", function () {
+        updateAllure();
+    });
+
+    on("change:socialmodbonus", function () {
+        getAttrs(["BtyTotal", "SocialModBonus"], function (values) {
+            updateSocialModifier(Number(values.BtyTotal), Number(values.SocialModBonus));
+        });
+    });
+
+    on("change:aluinfluencebonus", function () {
+        getAttrs(["BtyTotal", "AluInfluenceBonus"], function (values) {
+            updateAllureInfluence(Number(values.BtyTotal), Number(values.AluInfluenceBonus));
+        });
+    });
+
+    function updateAllure() {
+        getAttrs(["BtyBase", "BtyBonus", "BtyRace", "AluInfluenceBonus", "SocialModBonus"], function (values) {
+            let total = Number(values.BtyBase) + Number(values.BtyBonus) + Number(values.BtyRace);
+            total = Math.max(1, Math.min(total, 100));
+            const rank = getRank(total);
+
+            setAttrs({
+                BtyTotal: total,
+                AluRank: rank,
+                AluDice: getDice(rank)
+            });
+
+            const aluInfluenceBonus = Number(values.AluInfluenceBonus);
+            updateAllureInfluence(total, aluInfluenceBonus);
+
+            const socialModBonus = Number(values.SocialModBonus);
+            updateSocialModifier(total, socialModBonus);
+
+            updateAllSkills();
+        });
     }
 
-    function getSagaPointsForNextLevel(saga) {
-        if (saga < 16) return 16;
-        if (saga < 37) return 37;
-        if (saga < 60) return 60;
-        if (saga < 85) return 85;
-        if (saga < 115) return 115;
-        if (saga < 150) return 150;
-        if (saga < 190) return 190;
-        if (saga < 235) return 235;
-        if (saga < 285) return 285;
-        if (saga < 340) return 340;
-        if (saga < 400) return 400;
-        if (saga < 465) return 465;
-        if (saga < 535) return 535;
-        if (saga < 610) return 610;
-        if (saga < 690) return 690;
-        if (saga < 775) return 775;
-        if (saga < 865) return 865;
-        if (saga < 960) return 960;
-        if (saga < 1060) return 1060;
-        if (saga < 1165) return 1165;
-        if (saga < 1275) return 1275;
-        if (saga < 1390) return 1390;
-        if (saga < 1510) return 1510;
-        if (saga < 1635) return 1635;
-        if (saga < 1765) return 1765;
-        if (saga < 1900) return 1900;
-        if (saga < 2040) return 2040;
-        if (saga < 2185) return 2185;
-        if (saga < 2335) return 2335;
-        if (saga < 2490) return 2490;
-        if (saga < 2650) return 2650;
-        if (saga < 2815) return 2815;
-        if (saga < 2985) return 2985;
-        if (saga < 3160) return 3160;
-        if (saga < 3340) return 3340;
-        if (saga < 3525) return 3525;
-        if (saga < 3715) return 3715;
-        if (saga < 3910) return 3910;
-        if (saga < 4105) return 4105;
-        if (saga < 4300) return 4300;
-        if (saga < 4495) return 4495;
-        if (saga < 4690) return 4690;
-        if (saga < 4890) return 4890;
-        if (saga < 5095) return 5095;
-        if (saga < 5300) return 5300;
-        if (saga < 5500) return 5500;
-        if (saga < 5700) return 5700;
-        if (saga < 5900) return 5900;
-        if (saga < 6100) return 6100;
-        if (saga < 6400) return 6400;
-        if (saga < 6700) return 6700;
-        if (saga < 7000) return 7000;
-        if (saga < 7300) return 7300;
-        if (saga < 7600) return 7600;
-        if (saga < 7900) return 7900;
-        if (saga < 8200) return 8200;
-        if (saga < 8500) return 8500;
-        if (saga < 8800) return 8800;
-        if (saga < 9100) return 9100;
-        if (saga < 9500) return 9500;
-        if (saga < 9900) return 9900;
-        if (saga < 10300) return 10300;
-        if (saga < 10700) return 10700;
-        if (saga < 11100) return 11100;
-        if (saga < 11500) return 11500;
-        if (saga < 11900) return 11900;
-        if (saga < 12300) return 12300;
-        if (saga < 12700) return 12700;
-        if (saga < 13100) return 13100;
-        if (saga < 13600) return 13600;
-        if (saga < 14100) return 14100;
-        if (saga < 14600) return 14600;
-        if (saga < 15100) return 15100;
-        if (saga < 15600) return 15600;
-        if (saga < 16100) return 16100;
-        if (saga < 16600) return 16600;
-        if (saga < 17100) return 17100;
-        if (saga < 17600) return 17600;
-        if (saga < 18100) return 18100;
-        if (saga < 18700) return 18700;
-        if (saga < 19200) return 19200;
-        if (saga < 19800) return 19800;
-        if (saga < 20400) return 20400;
-        if (saga < 21000) return 21000;
-        if (saga < 21600) return 21600;
-        if (saga < 22200) return 22200;
-        if (saga < 22800) return 22800;
-        if (saga < 23400) return 23400;
-        if (saga < 24000) return 24000;
-        if (saga < 24700) return 24700;
-        if (saga < 25400) return 25400;
-        if (saga < 26100) return 26100;
-        if (saga < 26800) return 26800;
-        if (saga < 27500) return 27500;
-        if (saga < 28200) return 28200;
-        if (saga < 28900) return 28900;
-        if (saga < 29600) return 29600;
-        if (saga < 30300) return 30300;
-        if (saga < 31000) return 31000;
-        return "-";
+    function updateSocialModifier(allureTotal, socialModBonus) {
+        const baseSocialMod = calculateSocialModifier(allureTotal);
+
+        setAttrs({
+            SocialModBase: baseSocialMod,
+            SocialModTotal: baseSocialMod + socialModBonus
+        });
+    }
+
+    function updateAllureInfluence(allureTotal, influenceBonus) {
+        const baseInfluence = calculateInfluence(allureTotal);
+
+        setAttrs({
+            AluInfluenceBase: baseInfluence,
+            AluInfluenceTotal: baseInfluence + influenceBonus
+        });
+    }
+
+    function calculateInfluence(allure) {
+        if (allure <= 3) return -10;
+        if (allure <= 6) return -5;
+        if (allure >= 80) return 40;
+        if (allure >= 15) return Math.floor(allure / 10) * 5;
+        return 0;
+    }
+
+    function calculateSocialModifier(allure) {
+        if (allure < 2) {
+            return -3;
+        }
+        if (allure < 4) {
+            return -2;
+        }
+        if (allure < 7) {
+            return -1;
+        }
+        if (allure < 16) {
+            return 0;
+        }
+        if (allure < 20) {
+            return 1;
+        }
+        if (allure < 30) {
+            return 2;
+        }
+        if (allure < 40) {
+            return 3;
+        }
+        if (allure < 50) {
+            return 4;
+        }
+        return 5;
+    }
+
+    /* SHARED ATTRIBUTE FUNCTIONS */
+
+    function updateAllAttributes() {
+        updateStrength();
+        updateDexterity();
+        updateBody();
+        updatePerception();
+        updateIntelligence();
+        updateWillpower();
+        updateCharisma();
+        updateAllure();
+    }
+
+    function calculateSharedToHitModifier(score) {
+        // Shared modifier calculation: -3 for 1, -2 for 2, -1 for 3, 0 for 4-14, +1 for 15-19, +2 for 20-29, +3 for 30-39, etc.
+        if (score <= 1) return -3;
+        if (score === 2) return -2;
+        if (score === 3) return -1;
+        if (score <= 14) return 0;
+        if (score <= 19) return 1;
+        // For 20+: 20-29→2, 30-39→3, 40-49→4, etc.
+        if (score <= 100) return Math.floor(score / 10);
+        return 10;
     }
 
     function getAttributeBonus(attribute, strRank, dexRank, bdyRank, prcRank, intRank, wilRank, chrRank, aluRank) {
@@ -1042,303 +1685,6 @@
                 console.warn("Invalid character attribute: " + attribute);
                 return 0;
         }
-    }
-
-    function updateStrength() {
-        getAttrs(["StrBase", "StrBonus", "StrRace"], function (values) {
-            const total = Number(values.StrBase) + Number(values.StrBonus) + Number(values.StrRace);
-            const rank = getRank(total);
-            setAttrs({ StrTotal: total });
-            setAttrs({ StrRank: rank });
-            setAttrs({ StrDice: getDice(rank) });
-            updateDmgMod();
-            setAttrs({ WtAllow: getWtAllow(total) });
-            updateAllSkills();
-        });
-    }
-
-    function updateDmgMod() {
-        getAttrs(["StrTotal", "DmgModBonus"], function (values) {
-            const dmg = getDmgMod(values.StrTotal);
-            setAttrs({ DmgModBase: Number(dmg) });
-            setAttrs({ DmgModTotal: Number(dmg) + Number(values.DmgModBonus) });
-            updateAllWeaponDmgMods();
-        });
-    }
-
-    function updateDexterity() {
-        getAttrs(["DexBase", "DexBonus", "DexRace"], function (values) {
-            const total = Number(values.DexBase) + Number(values.DexBonus) + Number(values.DexRace);
-            const rank = getRank(total);
-            setAttrs({ DexTotal: Number(total) });
-            setAttrs({ DexRank: Number(getRank(total)) });
-            setAttrs({ DexDice: String(getDice(rank)) });
-            updateDefMod();
-            updateInitMod();
-            updateMvmt();
-            updateAllSkills();
-        });
-    }
-
-    function updateDefMod() {
-        getAttrs(["DexTotal", "DefModBonus"], function (values) {
-            const def = getDefMod(values.DexTotal);
-            setAttrs({ DefModBase: Number(def) });
-            setAttrs({ DefModTotal: Number(def) + Number(values.DefModBonus) });
-        });
-    }
-
-    function updateInitMod() {
-        getAttrs(["DexTotal", "InitModBonus"], function (values) {
-            const init = getDefMod(values.DexTotal);
-            setAttrs({ InitModBase: Number(init) });
-            setAttrs({ InitModTotal: Number(init) + Number(values.InitModBonus) });
-        });
-    }
-
-    function updateMvmt() {
-        getAttrs(["DexTotal", "RaceMvmt", "MvmtBonus"], function (values) {
-            const mv = Number(values.RaceMvmt) + Number(getMvMod(values.DexTotal)) + Number(values.MvmtBonus);
-            setAttrs({ Mvmt: mv });
-            setAttrs({ RunMvmt: Number(mv * 2) });
-        });
-    }
-
-    function updateBody() {
-        getAttrs(["BdyBase", "BdyBonus", "BdyRace", "HPAdj", "MaxHP"], function (values) {
-            const total = Number(values.BdyBase) + Number(values.BdyBonus) + Number(values.BdyRace);
-            const rank = getRank(total);
-            setAttrs({ BdyTotal: Number(total) });
-            setAttrs({ BdyRank: Number(getRank(total)) });
-            setAttrs({ BdyDice: String(getDice(rank)) });
-            setAttrs({ BdySave: getBodySave(total) });
-            updateToughness();
-            updateAllSkills();
-
-            const prevHPAdj = values.HPAdj;
-            const newHPAdj = getHPAdj(total);
-            setAttrs({ HPAdj: Number(newHPAdj) });
-            const prevMaxHP = values.MaxHP;
-            setAttrs({
-                MaxHP: Number(Number(newHPAdj) - Number(prevHPAdj) + Number(prevMaxHP))
-            });
-        });
-    }
-
-    function updateToughness() {
-        getAttrs(["BdyTotal", "ToughBonus"], function (values) {
-            const t = getToughness(values.BdyTotal);
-            setAttrs({ ToughBase: Number(t) });
-            setAttrs({ ToughTotal: Number(t) + Number(values.ToughBonus) });
-            updateAR();
-        });
-    }
-
-    function updateAR() {
-        getAttrs(
-            [
-                "HelmetAR",
-                "AmuletAR",
-                "CloakAR",
-                "PauldronsAR",
-                "ClothingAR",
-                "TorsoAR",
-                "BracersAR",
-                "GlovesAR",
-                "BeltAR",
-                "GreavesAR",
-                "BootsAR",
-                "RingAR",
-                "Ring2AR",
-                "OtherAR",
-                "Other2AR",
-                "ToughTotal"
-            ],
-            function (values) {
-                const x =
-                    Number(values.HelmetAR) +
-                    Number(values.AmuletAR) +
-                    Number(values.CloakAR) +
-                    Number(values.PauldronsAR) +
-                    Number(values.ClothingAR) +
-                    Number(values.TorsoAR) +
-                    Number(values.BracersAR) +
-                    Number(values.GlovesAR) +
-                    Number(values.BeltAR) +
-                    Number(values.GreavesAR) +
-                    Number(values.BootsAR) +
-                    Number(values.RingAR) +
-                    Number(values.Ring2AR) +
-                    Number(values.OtherAR) +
-                    Number(values.Other2AR) +
-                    Number(values.ToughTotal);
-                setAttrs({ TotalAR: x });
-            }
-        );
-    }
-
-    function updatePerception() {
-        getAttrs(["PrcBase", "PrcBonus", "PrcRace"], function (values) {
-            const total = Number(values.PrcBase) + Number(values.PrcBonus) + Number(values.PrcRace);
-            const rank = getRank(total);
-            setAttrs({ PrcTotal: Number(total) });
-            setAttrs({ PrcRank: Number(getRank(total)) });
-            setAttrs({ PrcDice: String(getDice(rank)) });
-            updateShotDmgMod();
-            updateRange();
-            updateAllSkills();
-        });
-    }
-
-    function updateShotDmgMod() {
-        getAttrs(["PrcTotal", "ShotDmgModBonus"], function (values) {
-            const dmg = getShotDmg(values.PrcTotal);
-            setAttrs({ ShotDmgModBase: Number(dmg) });
-            setAttrs({ ShotDmgModTotal: Number(dmg) + Number(values.ShotDmgModBonus) });
-            updateAllWeaponDmgMods();
-        });
-    }
-
-    function updateRange() {
-        getAttrs(["PrcTotal", "RgBonus"], function (values) {
-            const rg = getRange(values.PrcTotal);
-            setAttrs({ RgBase: Number(rg) });
-            setAttrs({ RgTotal: Number(rg) + Number(values.RgBonus) });
-        });
-    }
-
-    function updateIntelligence() {
-        getAttrs(["IntBase", "IntBonus", "IntRace"], function (values) {
-            const total = Number(values.IntBase) + Number(values.IntBonus) + Number(values.IntRace);
-            const rank = getRank(total);
-            setAttrs({ IntTotal: Number(total) });
-            setAttrs({ IntRank: Number(getRank(total)) });
-            setAttrs({ IntDice: String(getDice(rank)) });
-            updateSpellEffect();
-            setAttrs({ SpellTime: getSpellTime(total) });
-            setAttrs({ SpText: getSpellTimeText(total) });
-            setAttrs({ Langs: getLangs(total) });
-            updateAllSkills();
-        });
-    }
-
-    function updateSpellEffect() {
-        getAttrs(["IntTotal", "SpEffBonus"], function (values) {
-            const se = getSpellEffect(values.IntTotal);
-            setAttrs({ SpEffBase: Number(se) });
-            setAttrs({ SpEffTotal: Number(se) + Number(values.SpEffBonus) });
-        });
-    }
-
-    function updateWillpower() {
-        getAttrs(["WilBase", "WilBonus", "WilRace", "ManaAdj", "MaxMana"], function (values) {
-            const total = Number(values.WilBase) + Number(values.WilBonus) + Number(values.WilRace);
-            const rank = getRank(total);
-            setAttrs({ WilTotal: Number(total) });
-            setAttrs({ WilRank: Number(getRank(total)) });
-            setAttrs({ WilDice: String(getDice(rank)) });
-            updateMenDefMod();
-            updateFortitude();
-            updateAllSkills();
-
-            const prevManaAdj = values.ManaAdj;
-            const newManaAdj = getHPAdj(total);
-            setAttrs({ ManaAdj: Number(newManaAdj) });
-            const prevMaxMana = values.MaxMana;
-            setAttrs({
-                MaxMana: Number(Number(newManaAdj) - Number(prevManaAdj) + Number(prevMaxMana))
-            });
-        });
-    }
-
-    function updateMenDefMod() {
-        getAttrs(["WilTotal", "MenDefBonus"], function (values) {
-            const mdef = getDefMod(values.WilTotal);
-            setAttrs({ MenDefBase: Number(mdef) });
-            setAttrs({ MenDefTotal: Number(mdef) + Number(values.MenDefBonus) });
-        });
-    }
-
-    function updateFortitude() {
-        getAttrs(["WilTotal", "FortBonus"], function (values) {
-            const f = getFortitude(values.WilTotal);
-            setAttrs({ FortBase: Number(f) });
-            setAttrs({ FortTotal: Number(f) + Number(values.FortBonus) });
-        });
-    }
-
-    function updateCharisma() {
-        getAttrs(["ChrBase", "ChrBonus", "ChrRace"], function (values) {
-            const total = Number(values.ChrBase) + Number(values.ChrBonus) + Number(values.ChrRace);
-            const rank = getRank(total);
-            setAttrs({ ChrTotal: Number(total) });
-            setAttrs({ ChrRank: Number(getRank(total)) });
-            setAttrs({ ChrDice: String(getDice(rank)) });
-            updateSocialPool();
-            setAttrs({ RepBonus: getRepBonus(total) });
-            updateAllSkills();
-        });
-    }
-
-    function updateSocialPool() {
-        getAttrs(["ChrTotal", "SocialBonus"], function (values) {
-            const sp = getSocialPool(values.ChrTotal);
-            setAttrs({ SocialBase: Number(sp) });
-            setAttrs({ SocialPool: Number(sp) + Number(values.SocialBonus) });
-        });
-    }
-
-    function updateBeauty() {
-        getAttrs(["BtyBase", "BtyBonus", "BtyRace"], function (values) {
-            const total = Number(values.BtyBase) + Number(values.BtyBonus) + Number(values.BtyRace);
-            const rank = getRank(total);
-
-            setAttrs({
-                BtyTotal: Number(total),
-                AluRank: Number(getRank(total)),
-                AluDice: String(getDice(rank))
-            });
-
-            updateSocialModifier();
-
-            updateAllSkills();
-        });
-    }
-
-    function updateSocialModifier() {
-        getAttrs(["BtyTotal"], function (values) {
-            const socialMod = getSocialModifier(values.BtyTotal);
-            setAttrs({ SocialMod: Number(socialMod) });
-        });
-    }
-
-    function getSocialModifier(allure) {
-        if (allure == 0) {
-            return "-3";
-        }
-        if (allure < 4) {
-            return "-2";
-        }
-        if (allure < 7) {
-            return "-1";
-        }
-        if (allure < 16) {
-            return "0";
-        }
-        if (allure < 19) {
-            return "+1";
-        }
-        if (allure < 22) {
-            return "+2";
-        }
-        return "+3";
-    }
-
-    function updateLevel() {
-        getAttrs(["MaxSaga"], function (values) {
-            setAttrs({ Level: getLevel(values.MaxSaga) });
-            setAttrs({ NextLevelSaga: getSagaPointsForNextLevel(values.MaxSaga) });
-        });
     }
 
     on("change:unarmed", function () {
@@ -1641,27 +1987,52 @@
 
     function updateUnarmed() {
         getAttrs(["Unarmed", "RaceUnarmedRank", "Race"], function (values) {
-            setAttrs({ UnarmedHit: Number(values.Unarmed) });
-            const rk = Math.max(0, Number(values.Unarmed) - 2);
-            setAttrs({ UnarmedRank: rk });
-            const rank = Number(values.RaceUnarmedRank) + Number(rk);
-            setAttrs({ UnarmedDmg: getDice(rank) });
+            const baseRank = Math.max(0, Number(values.Unarmed) - 2);
+            const rank = Number(values.RaceUnarmedRank) + Number(baseRank);
+            const unarmedDamage = getDice(rank);
+            const unarmedDisplayName = getUnarmedDisplayName(Number(values.Unarmed));
 
-            setAttrs({ AltUnarmedName: "" });
-            setAttrs({ AltUnarmedHit: Number(values.Unarmed) });
-            setAttrs({ AltUnarmedRank: rk });
-            setAttrs({ AltUnarmedDmg: getDice(rank) });
+            let racialUnarmedAttackName = "";
+            let racialUnarmedAttackDamage = getDice(rank);
 
             if (values.Race == "mungreel") {
-                setAttrs({ AltUnarmedName: "Blade Teeth" });
-                setAttrs({ AltUnarmedRank: Number(rk) + 3 });
-                setAttrs({ AltUnarmedDmg: getDice(Number(rank) + 3) });
+                racialUnarmedAttackName = "Blade Teeth";
+                racialUnarmedAttackDamage = "d12!";
+            } else if (values.Race == "mhentep") {
+                racialUnarmedAttackName = "Claws";
+                racialUnarmedAttackDamage = unarmedDamage + "+3";
+            } else {
+                // Most races don't have special unarmed abilities
+                racialUnarmedAttackName = "None";
             }
-            if (values.Race == "mhentep") {
-                setAttrs({ AltUnarmedName: "Claws" });
-                setAttrs({ AltUnarmedDmg: String(getDice(rank)) + String("+3") });
-            }
+
+            // Update all attributes in a single call
+            setAttrs({
+                UnarmedHit: Number(values.Unarmed),
+                UnarmedRank: baseRank,
+                UnarmedDmg: unarmedDamage,
+                UnarmedDisplayName: unarmedDisplayName,
+                RacialUnarmedName: racialUnarmedAttackName,
+                RacialUnarmedDmg: racialUnarmedAttackDamage
+            });
         });
+    }
+
+    function getUnarmedDisplayName(unarmedValue) {
+        const unarmedNames = {
+            0: "Unarmed: Basic",
+            1: "Unarmed: Fighter (+1)",
+            2: "Unarmed: Brawler (+2)",
+            3: "Unarmed: Martial Arts (+3)",
+            4: "Unarmed: Martial Arts (+4)",
+            5: "Unarmed: Martial Arts (+5)",
+            6: "Unarmed: Champion (+6)",
+            7: "Unarmed: Champion (+7)",
+            8: "Unarmed: Master (+8)",
+            9: "Unarmed: Master (+9)",
+            10: "Unarmed: Grand Master (+10)"
+        };
+        return unarmedNames[unarmedValue] || "Unarmed: Basic";
     }
 
     on("change:honorrep change:corruptrep", function () {
@@ -1796,7 +2167,6 @@
 <div class="sheet-demon-gate-charsheet">
     <div class="sheet-background-flex-layout">
         <div class="sheet-background-column-fixed-left"></div>
-
         <div class="sheet-background-column-grow">
             <input
                 type="radio"
@@ -1821,6 +2191,7 @@
             <span class="sheet-tab sheet-tab7">Reputation</span>
             <input type="radio" class="sheet-tab sheet-tab8" name="attr_core-tab" value="8" title="Notes" />
             <span class="sheet-tab sheet-tab8">Notes</span>
+
             <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------  Attributes Tab  -----------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------ -->
@@ -1943,6 +2314,11 @@
                                 <td>
                                     <input type="text" class="sheet-input-wide sheet-input-full" name="attr_AltRace" />
                                 </td>
+                            </tr>
+                            <tr>
+                                <th colspan="2" class="sheet-cell-right">
+                                    <span class="sheet-info" name="attr_RaceSummary"></span>
+                                </th>
                             </tr>
                         </table>
                     </div>
@@ -2256,10 +2632,6 @@
                         </table>
                     </div>
 
-                    <!-------------->
-                    <!--Attributes-->
-                    <!-------------->
-
                     <div class="sheet-column-grow">
                         <h1 class="sheet-vertical-margin">Attributes</h1>
 
@@ -2279,7 +2651,7 @@
                                     <h3>Strength</h3>
                                 </th>
                                 <td class="sheet-cell-numeric">
-                                    <input type="number" name="attr_StrBase" value="0" min="0" max="100" />
+                                    <input type="number" name="attr_StrBase" value="3" min="1" max="100" />
                                 </td>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_StrBonus" value="0" min="-100" max="100" />
@@ -2333,6 +2705,44 @@
                                 <td colspan="3"></td>
                             </tr>
                             <tr>
+                                <th>Hit Modifier:</th>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input type="number" name="attr_StrHitModBase" value="0" readonly />
+                                </td>
+                                <td class="sheet-cell-numeric">
+                                    <input type="number" name="attr_StrHitModBonus" value="0" />
+                                </td>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input
+                                        type="number"
+                                        name="attr_StrHitModTotal"
+                                        value="0"
+                                        class="sheet-totalfield"
+                                        readonly
+                                    />
+                                </td>
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr>
+                                <th>Block Modifier:</th>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input type="number" name="attr_StrBlockModBase" value="0" readonly />
+                                </td>
+                                <td class="sheet-cell-numeric">
+                                    <input type="number" name="attr_StrBlockModBonus" value="0" />
+                                </td>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input
+                                        type="number"
+                                        name="attr_StrBlockModTotal"
+                                        value="0"
+                                        class="sheet-totalfield"
+                                        readonly
+                                    />
+                                </td>
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr>
                                 <th>Weight Allowance:</th>
                                 <td colspan="2"></td>
                                 <td class="sheet-cell-numeric">
@@ -2364,7 +2774,7 @@
                                     <h3>Dexterity</h3>
                                 </th>
                                 <td class="sheet-cell-numeric">
-                                    <input type="number" name="attr_DexBase" value="0" min="0" max="100" />
+                                    <input type="number" name="attr_DexBase" value="3" min="1" max="100" />
                                 </td>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_DexBonus" value="0" min="-100" max="100" />
@@ -2410,6 +2820,25 @@
                                     <input
                                         type="number"
                                         name="attr_DefModTotal"
+                                        value="0"
+                                        class="sheet-totalfield"
+                                        readonly
+                                    />
+                                </td>
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr>
+                                <th>Hit Modifier:</th>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input type="number" name="attr_DexHitModBase" value="0" readonly />
+                                </td>
+                                <td class="sheet-cell-numeric">
+                                    <input type="number" name="attr_DexHitModBonus" value="0" />
+                                </td>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input
+                                        type="number"
+                                        name="attr_DexHitModTotal"
                                         value="0"
                                         class="sheet-totalfield"
                                         readonly
@@ -2480,7 +2909,7 @@
                                     <h3>Body</h3>
                                 </th>
                                 <td class="sheet-cell-numeric">
-                                    <input type="number" name="attr_BdyBase" value="0" min="0" max="100" />
+                                    <input type="number" name="attr_BdyBase" value="3" min="1" max="100" />
                                 </td>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_BdyBonus" value="0" min="-100" max="100" />
@@ -2566,7 +2995,7 @@
                                     <h3>Perception</h3>
                                 </th>
                                 <td class="sheet-cell-numeric">
-                                    <input type="number" name="attr_PrcBase" value="0" min="0" max="100" />
+                                    <input type="number" name="attr_PrcBase" value="3" min="1" max="100" />
                                 </td>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_PrcBonus" value="0" min="-100" max="100" />
@@ -2620,6 +3049,25 @@
                                 <td colspan="3"></td>
                             </tr>
                             <tr>
+                                <th>Hit Modifier:</th>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input type="number" name="attr_PrcHitModBase" value="0" readonly />
+                                </td>
+                                <td class="sheet-cell-numeric">
+                                    <input type="number" name="attr_PrcHitModBonus" value="0" />
+                                </td>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input
+                                        type="number"
+                                        name="attr_PrcHitModTotal"
+                                        value="0"
+                                        class="sheet-totalfield"
+                                        readonly
+                                    />
+                                </td>
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr>
                                 <th>Range Modifier:</th>
                                 <td class="sheet-cell-numeric-readonly">
                                     <input type="number" name="attr_RgBase" value="0" readonly />
@@ -2656,7 +3104,7 @@
                                     <h3>Intelligence</h3>
                                 </th>
                                 <td class="sheet-cell-numeric">
-                                    <input type="number" name="attr_IntBase" value="0" min="0" max="100" />
+                                    <input type="number" name="attr_IntBase" value="3" min="1" max="100" />
                                 </td>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_IntBonus" value="0" min="-100" max="100" />
@@ -2710,6 +3158,25 @@
                                 <td colspan="3"></td>
                             </tr>
                             <tr>
+                                <th>Cast Modifier:</th>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input type="number" name="attr_IntCastModBase" value="0" readonly />
+                                </td>
+                                <td class="sheet-cell-numeric">
+                                    <input type="number" name="attr_IntCastModBonus" value="0" />
+                                </td>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input
+                                        type="number"
+                                        name="attr_IntCastModTotal"
+                                        value="0"
+                                        class="sheet-totalfield"
+                                        readonly
+                                    />
+                                </td>
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr>
                                 <th>Spell Time:</th>
                                 <td></td>
                                 <td class="sheet-cell-numeric-readonly">
@@ -2746,7 +3213,7 @@
                                     <h3>Willpower</h3>
                                 </th>
                                 <td class="sheet-cell-numeric">
-                                    <input type="number" name="attr_WilBase" value="0" min="0" max="100" />
+                                    <input type="number" name="attr_WilBase" value="3" min="1" max="100" />
                                 </td>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_WilBonus" value="0" min="-100" max="100" />
@@ -2837,7 +3304,7 @@
                                     <h3>Charisma</h3>
                                 </th>
                                 <td class="sheet-cell-numeric">
-                                    <input type="number" name="attr_ChrBase" value="0" min="0" max="100" />
+                                    <input type="number" name="attr_ChrBase" value="3" min="1" max="100" />
                                 </td>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_ChrBonus" value="0" min="-100" max="100" />
@@ -2894,7 +3361,7 @@
                             </tr>
                         </table>
 
-                        <!--Beauty-->
+                        <!--Allure-->
                         <table class="sheet-vertical-margin">
                             <tr>
                                 <th class="sheet-small-table-header sheet-header-column">Attribute</th>
@@ -2908,11 +3375,11 @@
                                     <h3>Allure</h3>
                                 </th>
                                 <td class="sheet-cell-numeric">
-                                    <input type="hidden" name="attr_BtyRace" value="0" />
-                                    <input type="number" name="attr_BtyBase" value="0" min="0" max="100" />
+                                    <input type="number" name="attr_BtyBase" value="3" min="1" max="100" />
                                 </td>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_BtyBonus" value="0" min="-100" max="100" />
+                                    <input type="hidden" name="attr_BtyRace" value="0" />
                                 </td>
                                 <td class="sheet-cell-numeric-readonly">
                                     <input
@@ -2944,9 +3411,39 @@
                             </tr>
                             <tr>
                                 <th>Social Modifier:</th>
-                                <td colspan="2"></td>
                                 <td class="sheet-cell-numeric-readonly">
-                                    <input type="number" name="attr_SocialMod" value="0" readonly />
+                                    <input type="number" name="attr_SocialModBase" value="0" readonly />
+                                </td>
+                                <td class="sheet-cell-numeric">
+                                    <input type="number" name="attr_SocialModBonus" value="0" />
+                                </td>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input
+                                        type="number"
+                                        name="attr_SocialModTotal"
+                                        value="0"
+                                        class="sheet-totalfield"
+                                        readonly
+                                    />
+                                </td>
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr>
+                                <th>Influence:</th>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input type="number" name="attr_AluInfluenceBase" value="0" readonly />
+                                </td>
+                                <td class="sheet-cell-numeric">
+                                    <input type="number" name="attr_AluInfluenceBonus" value="0" />
+                                </td>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input
+                                        type="number"
+                                        name="attr_AluInfluenceTotal"
+                                        value="0"
+                                        class="sheet-totalfield"
+                                        readonly
+                                    />
                                 </td>
                                 <td colspan="3"></td>
                             </tr>
@@ -3257,7 +3754,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="3">* = As Rating</td>
+                                            <td colspan="3" class="sheet-info sheet-cell-right">* = As Rating</td>
                                         </tr>
                                     </table>
                                 </div>
@@ -5392,7 +5889,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <input type="text" name="attr_u1" value="Basic Unarmed" readonly />
+                                    <input type="text" name="attr_UnarmedDisplayName" value="Unarmed: Basic" readonly />
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button
@@ -5404,6 +5901,23 @@
                                     <button
                                         type="roll"
                                         value="&{template:damage} {{character=@{character_name}}} {{damageType=Unarmed}} {{damage=[[(@{UnarmedDmg}+@{UnarmedDmgBonus}+@{DmgModTotal}+?{Modifier|0})*?{Multiplier|1}]]}}"
+                                    ></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="text" name="attr_AltUnarmedName" value="Alternate Unarmed" readonly />
+                                </td>
+                                <td class="sheet-button-cell">
+                                    <button
+                                        type="roll"
+                                        value="&{template:attack} {{character=@{character_name}}} {{attackType=@{AltUnarmedName}}} {{roll=[[d20+@{AltUnarmedHit}@{PhysMod}+@{AltUnarmedHitBonus}+?{Modifier|0}]]}} {{actions=?{Actions|1}}}"
+                                    ></button>
+                                </td>
+                                <td class="sheet-button-cell">
+                                    <button
+                                        type="roll"
+                                        value="&{template:damage} {{character=@{character_name}}} {{damageType=@{AltUnarmedName}}} {{damage=[[(@{AltUnarmedDmg}+@{AltUnarmedDmgBonus}+@{DmgModTotal}+?{Modifier|0})*?{Multiplier|1}]]}}"
                                     ></button>
                                 </td>
                             </tr>
@@ -5846,6 +6360,7 @@
             <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------  Gear Tab  -----------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+
             <div class="sheet-section-gear">
                 <div class="sheet-flex-section">
                     <div class="sheet-column-grow">
@@ -5864,7 +6379,9 @@
                                 <th class="sheet-small-table-header">Hit</th>
                             </tr>
                             <tr>
-                                <td class="sheet-read-only-field sheet-skillname">Basic Unarmed</td>
+                                <td class="sheet-read-only-field">
+                                    <input type="text" name="attr_UnarmedDisplayName" value="Unarmed: Basic" readonly />
+                                </td>
                                 <td>
                                     <input
                                         type="number"
@@ -5921,7 +6438,7 @@
                                 <td class="sheet-button-cell">
                                     <button
                                         type="roll"
-                                        value="&{template:damage} {{character=@{character_name}}} {{damageType=@{Unarmed}}} {{damage=[[(@{UnarmedDmg}+@{UnarmedDmgBonus}+@{DmgModTotal}+?{Modifier|0})*?{Multiplier|1}]]}}"
+                                        value="&{template:damage} {{character=@{character_name}}} {{damageType=Unarmed}} {{damage=[[(@{UnarmedDmg}+@{UnarmedDmgBonus}+@{DmgModTotal}+?{Modifier|0})*?{Multiplier|1}]]}}"
                                     ></button>
                                 </td>
                             </tr>
@@ -5984,6 +6501,74 @@
                                     <button
                                         type="roll"
                                         value="&{template:damage} {{character=@{character_name}}} {{damageType=@{AltUnarmedName}}} {{damage=[[(@{AltUnarmedDmg}+@{AltUnarmedDmgBonus}+@{DmgModTotal}+?{Modifier|0})*?{Multiplier|1}]]}}"
+                                    ></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="sheet-small-table-header">Name</th>
+                                <th class="sheet-small-table-header">Hit Bonus</th>
+                                <th class="sheet-small-table-header">Specialization</th>
+                                <th class="sheet-small-table-header">Hit</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="text" name="attr_RacialUnarmedName" value="Racial Unarmed" readonly />
+                                </td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        name="attr_RacialUnarmedHitBonus"
+                                        value="0"
+                                        class="sheet-numeric-wide"
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        name="attr_RacialUnarmedHit"
+                                        value="0"
+                                        readonly
+                                        class="sheet-numeric-wide"
+                                    />
+                                </td>
+                                <td class="sheet-button-cell">
+                                    <button
+                                        type="roll"
+                                        value="&{template:attack} {{character=@{character_name}}} {{attackType=@{RacialUnarmedName}}} {{roll=[[d20+@{RacialUnarmedHit}@{PhysMod}+@{RacialUnarmedHitBonus}+?{Modifier|0}]]}} {{actions=?{Actions|1}}}"
+                                    ></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="sheet-small-table-header">Accessory</th>
+                                <th class="sheet-small-table-header">Bonus Dmg</th>
+                                <th class="sheet-small-table-header">Damage</th>
+                                <th class="sheet-small-table-header">Dmg</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="text" name="attr_RacialUnarmedAccessory" value="" />
+                                </td>
+                                <td>
+                                    <input
+                                        type="text"
+                                        name="attr_RacialUnarmedDmgBonus"
+                                        value="0"
+                                        class="sheet-text-centred"
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        type="text"
+                                        name="attr_RacialUnarmedDmg"
+                                        value="d6!"
+                                        class="sheet-dice-field"
+                                        readonly
+                                    />
+                                </td>
+                                <td class="sheet-button-cell">
+                                    <button
+                                        type="roll"
+                                        value="&{template:damage} {{character=@{character_name}}} {{damageType=@{RacialUnarmedName}}} {{damage=[[(@{RacialUnarmedDmg}+@{RacialUnarmedDmgBonus}+@{DmgModTotal}+?{Modifier|0})*?{Multiplier|1}]]}}"
                                     ></button>
                                 </td>
                             </tr>
@@ -7168,6 +7753,7 @@
             <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------  Mystic Tab  ----------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+
             <div class="sheet-section-mystic">
                 <h1 class="sheet-spacer-top-margin">Religion</h1>
 
@@ -8967,9 +9553,11 @@
                     </div>
                 </div>
             </div>
+
             <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------  Abilities Tab  --------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+
             <div class="sheet-section-abilities">
                 <div class="sheet-flex-section">
                     <div class="sheet-column-grow">
@@ -9201,6 +9789,7 @@
             <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------  Reputation Tab  --------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+
             <div class="sheet-section-reputation">
                 <div class="sheet-flex-section">
                     <div class="sheet-column-grow">
@@ -9407,6 +9996,7 @@
             <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------  Notes Tab  ----------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+
             <div class="sheet-section-notes">
                 <div class="sheet-flex-section">
                     <div class="sheet-column-grow">
@@ -9475,12 +10065,12 @@
                 </div>
             </div>
         </div>
-
         <div class="sheet-background-column-fixed-right"></div>
     </div>
     <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------  Roll Templates  --------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------ -->
+
     <rolltemplate class="sheet-rolltemplate-text">
         <div class="sheet-template-container">
             <div class="sheet-template-box">
