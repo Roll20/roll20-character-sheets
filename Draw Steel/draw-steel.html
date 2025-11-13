@@ -4223,13 +4223,32 @@
 			const disengage = calculateCombatStat(allFeatures, 'Disengage', 1);
 			const stability = calculateCombatStat(allFeatures, 'Stability', 0);
 
-			const stamina_max = allFeatures
-				.filter(f => f.type === FEATURE_TYPES.BONUS && f.data.field === 'Stamina')
-				.reduce((sum, f) => sum + (f.data.value + ((level - 1) * f.data.valuePerLevel)), 0);
-
+			// --- Stamina & Recoveries (including Kit stats) ---
+			// 1) Base stamina from Bonus features (class, ancestry, etc.)
+			const staminaFromBonuses = allFeatures
+			    .filter(f => f.type === FEATURE_TYPES.BONUS && f.data.field === 'Stamina')
+			    .reduce((sum, f) => {
+			        const base = Number(f.data.value) || 0;
+			        const perLevel = Number(f.data.valuePerLevel) || 0;
+			        return sum + base + ((level - 1) * perLevel);
+			    }, 0);
+			
+			// 2) Stamina from Kits (KitStats), using the highest equipped kit value
+			//    This mirrors how calculateCombatStat uses KIT_STATS for Speed/Stability.
+			const staminaFromKits = Math.max(
+			    0, // avoid -Infinity if no kits
+			    ...allFeatures
+			        .filter(f => f.type === FEATURE_TYPES.KIT_STATS)
+			        .map(f => Number(f.stamina) || 0)
+			);
+			
+			// 3) Final maximum Stamina
+			const stamina_max = staminaFromBonuses + staminaFromKits;
+			
 			const recoveries_max = allFeatures
-				.filter(f => f.type === FEATURE_TYPES.BONUS && f.data.field === 'Recoveries')
-				.reduce((sum, f) => sum + f.data.value, 0);
+			    .filter(f => f.type === FEATURE_TYPES.BONUS && f.data.field === 'Recoveries')
+			    .reduce((sum, f) => sum + (Number(f.data.value) || 0), 0);
+
 				
 			const immunity = getDamageModifiers(allFeatures, level, 'Immunity');
 			const weakness = getDamageModifiers(allFeatures, level, 'Weakness');
