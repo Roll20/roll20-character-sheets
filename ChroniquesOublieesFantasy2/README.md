@@ -6,9 +6,18 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.10.0 [Screenshot](cof2e.png)
+v1.11.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.11.0_ (2025-11-11)
+
+- Correction DM x 2 si le seuil de critique est inférieur à 20
+- Ajout de boutons _Récupérations_ et _Soins_ au menu d'actions du PJ
+- Ajout d'une mention pour les manoeuvres avec modificateur de taille
+- Ajout du jet opposé sur l'utilisation d'une manoeuvre
+- Ajout de champs pour les scores d'attaque au contact (jet de manoeuvre opposé) et magique aux fiches de PNJ
+- Possibilité de combiner les options tactiques avec une option spécifique au PJ
 
 ### Version _1.10.0_ (2025-10-31)
 
