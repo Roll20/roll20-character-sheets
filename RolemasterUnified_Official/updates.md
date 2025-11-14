@@ -1,3 +1,99 @@
+# 2025-11-04
+
+The where-did-november-come-from release.
+
+- Show DB info for calculation
+- New game options
+  - Reduce DB bonus to 1x Qu instead of 3x
+  - Only use running Ranks for partial/full dodge
+- Display options on status pages
+
+# 2025-10-30
+
+- Fix issue where items were not being filtered out correctly on updating inventory.
+  - Filter pattern was reversed.  Thanks to @alpinecowboy2.
+
+# 2025-10-28
+
+- Add target to token actions
+- Races.js -> Galvinise it first.
+- Add a HP Info box
+- Sheet version updated to 15
+  - Move Racial Hits bonus to hp_misc
+  - Fixes issue where characters got Racial Hits as a bonus to Endurance.
+    - Thanks @frewfrux for the report!
+  - Force update to udpate Endurance, body dev and hp
+- Add hp_info & display it
+- Creation: Save HP in base hits
+- Fix display of current phase when ending a turn
+  - Thanks @saramund for the report!
+
+## Compendium:
+
+- Banecroft:  Add descriptions to the heros and BBEG
+- Arcane:
+  - Knacks for Arcanist & Archmage: All professions have knacks & costs now
+  - Fix Witchblade base lists to remove warnings
+  - Arcane: Places of power nearly done
+
+# 2025-10-21
+
+- Injuries:
+  - Ignore spaces in the injury string
+- Misc: Add support for prefix search
+- Skills:
+  - Add backend support for Character Companion Specialised skills
+- Banecroft:
+  - Fix an NPC weapon
+  - Fix an NPC spell list
+  - Update creatures on maps
+- Arcane: Spirits update
+
+# 2025-10-14
+
+- Remove spurious ` in the sheet
+- Fix some dependances hiding some old updates
+- Fix "agibberish" -> gibberish
+- Allow attacks to not have the numeric size
+- Add table roller support for Spell failures
+
+# 2025-10-04
+
+- Fix display of scaled hits.
+- Reenable base spells during levelup
+- Get rid of spell lists errors
+- Banecroft:
+  - Fix creatures defenses
+  - Fix Giant A<redacted> attacks
+- Fix template for spell lists to display notes
+- Arcane:
+ - Start on Arcanist list
+ - Costs for Arcanist & Evoker
+- Add Tap Addiction to sheet
+
+# 2025-09-23
+
+- Creature Law (new upload)
+  - Fix level variance in listing
+  - Fix Variance in listings
+  - Fix variance in display
+- Banecroft (new upload)
+  - Adventure text uploaded
+  - Creatures updated to new standard
+  - First Tokens created
+- Validation
+  - Support Body,Head,Arms,Legs format for AT
+  - Validate attack sizes for creatures
+- Stuff: Fix error in itemmaterial not saving
+- Levelup: 
+  - Don't try and levelup current_level/new_level
+  - Spell lists show the group
+  - Recreate previous skill ranks correctly
+- Misc: Make one of the errors more verbose
+- Spells: Fix display of mixed armor penalties
+  - calculation was correct, display showed culmulative error
+- Create: fix highest message (@ixs)
+
 # 2025-09-18
 
 - Fix stacking of the overlays

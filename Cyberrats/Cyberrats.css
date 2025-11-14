@@ -7,7 +7,7 @@
 
 /* This is a clever way to redefine our grid area if mech isn't present. Must keep the two aligned or we get nasty spaces! */
 input.sheet-space:not(:checked) ~ div > main {
-    grid-template-rows:  40px 230px 220px 300px 1fr 1fr 1fr 1fr;
+    grid-template-rows:  40px auto auto 300px auto auto auto auto;
  grid-template-areas:
                       "settings    settings     settings    settings"
                       "header      header       header      header"
@@ -22,10 +22,11 @@ input.sheet-space:not(:checked) ~ div > main {
 main {
   display: grid;
   width: 800px;
-  height: 1660px;
+  min-height: 1660px;
+  height: auto;
   grid-gap: 4px;
   grid-template-columns: 240px 10px 240px 260px;
-  grid-template-rows:  40px 230px 220px 300px 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows:  40px auto auto 300px auto auto auto auto auto auto;
   grid-template-areas:
                       "settings    settings     settings    settings"
                       "header      header       header      header"
@@ -113,7 +114,9 @@ section {
 .header {
   grid-area: header;
   background-color: #e8e8e9 !important;
-  flex-direction: column;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 
 section.empty {
@@ -311,7 +314,15 @@ input.heat-color[value="Cold"] ~ .heatlevel {
   border: 1px solid black;
 }
 
-input.sheet-briny:not(:checked) + section.conditions div .brinycond {
+input.sheet-briny:not(:checked) + input.sheet-space + section.conditions div .brinycond {
+  display: none;
+}
+
+input.sheet-briny:not(:checked) + input.sheet-space:not(:checked) + section.conditions div .spacecond {
+  display: none;
+}
+
+input.sheet-briny:not(:checked) + input.sheet-space:not(:checked) + section.conditions div .brinyorspacecond {
   display: none;
 }
 
@@ -388,17 +399,26 @@ textarea.textnotes {
 
 
 .header-left {
-  align-self: flex-end;
-  width: 70%;
-  margin-bottom: 2px;
+  flex: 0 0 auto;
 }
 
 .header-left.empty {
-  flex-grow: 1;
+  flex: 0 0 auto;
+}
+
+.header-left-wrapper {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
 }
 
 .header-right {
-  width: 30%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .mainbase .header-right {
@@ -755,6 +775,65 @@ input.cost {
     flex-direction: column;
     align-self: center;
     align-items: center;
+}
+
+.mech-abilities {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.mech-ability-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.mech-ability-section label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+.mech-ability-section .mshop-header {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 5px;
+}
+
+.mech-ability-section .mshop-header label {
+    margin-bottom: 0;
+}
+
+.mech-ability-section input[type="checkbox"].mshop-toggle {
+    margin: 0;
+    width: auto;
+}
+
+.mech-ability-section textarea {
+    width: 100%;
+    min-height: 60px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.mech-ability-section:has(input[type="checkbox"]:not(:checked)) textarea {
+    opacity: 0.5;
+    pointer-events: none;
+    background-color: #f5f5f5;
+}
+
+.mech-ability-divider {
+    width: 2px;
+    background-color: rgba(0, 0, 0, 0.4);
+    align-self: center;
+    height: 70px;
+    flex-shrink: 0;
 }
 
 
@@ -1450,14 +1529,30 @@ input.baselocked:checked ~ input, input.baselocked:checked ~ textarea {
   display: none;
 }
 
-              /* Toggle between briny input and reuglar */
+              /* Toggle between briny, space, and regular inputs */
 /* This specificity trick saved us from having to create 16 hidden checkboxes.  */
 /* Also lost an hour becuase didn't realize JQuery is ONLY available in dev server but c'est la vie. */
+
+/* Hide core buildings when either briny or space is checked */
 input.sheet-briny:checked ~ div.basesheet > div.mainbase > section > input.corebuildings {
   display: none;
 }
 
+input.sheet-space:checked ~ div.basesheet > div.mainbase > section > input.corebuildings {
+  display: none;
+}
+
+/* Hide briny buildings when briny is not checked OR when space is checked */
 input.sheet-briny:not(:checked) ~ div.basesheet > div.mainbase > section > input.brinybuildings {
+  display: none;
+}
+
+input.sheet-space:checked ~ div.basesheet > div.mainbase > section > input.brinybuildings {
+  display: none;
+}
+
+/* Hide space buildings when space is not checked */
+input.sheet-space:not(:checked) ~ div.basesheet > div.mainbase > section > input.spacebuildings {
   display: none;
 }
 
@@ -1908,7 +2003,7 @@ div.centerbtn {
       "results  results"
       "details details";
     grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto  1fr 1fr;
+    grid-template-rows: auto auto auto auto;
     grid-column-gap: 3px;
 }
 
@@ -1930,12 +2025,14 @@ div.centerbtn {
   display: flex;
   justify-content: center;
   text-align: center;
+  margin-bottom: 0;
 }
 
 .sheet-rolltemplate-attributeroll .sheet-reprecussion {
   color: red;
   font-size: 1.2em;
   margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .sheet-rolltemplate-attributeroll .sheet-success {
@@ -2042,9 +2139,19 @@ div.centerbtn {
   grid-column: span 2;
   font-size: .9em;
   grid-area: details;
-  margin-top: auto;
+  margin-top: 5px;
   letter-spacing: -0.4px;
   text-align: center;
+}
+
+.sheet-rolltemplate-attributeroll .sheet-armament-reminder {
+  grid-column: span 2;
+  font-size: 0.75em;
+  text-align: center;
+  margin-top: 8px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  color: #666;
 }
 
 
