@@ -1,4 +1,4 @@
-/* COF2e v1.9.0 */
+/* COF2e v1.11.0 */
 
 @import url('https://fonts.googleapis.com/css?family=Merriweather+Sans&display=swap');
 
@@ -116,13 +116,17 @@ summary h4 {
 }
 
 /* Redefine Roll20 repeating sections buttons */
-.charsheet .repcontrol button.repcontrol_edit,
-.charsheet .repcontrol button.repcontrol_add {
+.charsheet .repcontrol button.repcontrol_add,
+.charsheet .repcontrol button.repcontrol_edit {
   border-radius: 5px;
   margin: 5px;
   padding-top: 0px;
   padding-bottom: 0px;
-  font-size: small;
+}
+
+.charsheet .repcontrol button.repcontrol_add:hover,
+.charsheet .repcontrol button.repcontrol_edit:hover {
+  color: var(--cof-click);
 }
 
 button[type="roll"] {
@@ -350,7 +354,6 @@ div.path div.block-title {
 
 .d-flex-between {
   justify-content: space-between;
-  /*align-content: space-between;*/
 }
 
 .d-flex-middle {
@@ -395,6 +398,15 @@ div.path div.block-title {
 .cofmain input[value="0"].has-script .weapon span.has-script,
 .cofmain input[value="0"].has-script + div.ammos {
   display: none;
+}
+
+.cofmain input[value="0"].d20roll-btns + div.d20roll-btns,
+.cofmain input[value="2"].d20roll-btns + div.d20roll-btns {
+  display: none;
+}
+
+.cofmain input[value="1"].d20roll-btns + div.d20roll-btns {
+  display: block;
 }
 
 /* Identity layout */
@@ -471,7 +483,10 @@ input[value="npc"] ~ button[name="roll_checkup"] {
 }
 
 /* Sheet tabs & sub-tabs */
-.tab-btn {
+.tab-btn,
+.d20roll_1d,
+.d20roll_db,
+.d20roll_dm {
   border: none;
   margin-top: 5px;
 }
@@ -499,6 +514,7 @@ input[value="0"].pc-skills-btn ~ button.pc-skills-btn {
 .pc-version-tab,
 .pc-attacks-subtab,
 .pc-otact-subtab,
+.pc-resdm-subtab,
 .pc-hands-subtab,
 .pc-rolls-subtab,
 .pc-master-subtab,
@@ -520,6 +536,7 @@ input[value="0"].pc-skills-btn ~ button.pc-skills-btn {
 .tabs-toggle[value="attacks"] ~ div .pc-attacks-btn,
 .tabs-toggle[value="otact"] ~ div .pc-otact-btn,
 .tabs-toggle[value="hands"] ~ div .pc-hands-btn,
+.tabs-toggle[value="resdm"] ~ div .pc-resdm-btn,
 .tabs-toggle[value="abilities"] ~ div .pc-abilities-btn,
 .tabs-toggle[value="rolls"] ~ div .pc-rolls-btn,
 .tabs-toggle[value="master"] ~ div .pc-master-btn,
@@ -542,11 +559,19 @@ input[value="0"].pc-skills-btn ~ button.pc-skills-btn {
   background-color: var(--cof-hilite); 
 }
 
+.d20-toggle[value="1d20"] ~ div .d20roll_1d,
+.d20-toggle[value="2d20kh1"] ~ div .d20roll_db,
+.d20-toggle[value="2d20kl1"] ~ div .d20roll_dm {
+  color: white; 
+  background-color: var(--cof-hilite); 
+}
+
 /* Show the selected tab */
 .tabs-toggle[value="main"] ~ div.pc-main-tab,
 .tabs-toggle[value="attacks"] ~ div.pc-attacks-subtab,
 .tabs-toggle[value="otact"] ~ div.pc-otact-subtab,
 .tabs-toggle[value="hands"] ~ div.pc-hands-subtab,
+.tabs-toggle[value="resdm"] ~ div.pc-resdm-subtab,
 .tabs-toggle[value="abilities"] ~ div.pc-abilities-tab,
 .tabs-toggle[value="rolls"] ~ div.pc-rolls-subtab,
 .tabs-toggle[value="master"] ~ div.pc-master-subtab,
@@ -650,20 +675,17 @@ div.change-view {
 }
 
 .pc-attributes .trait details.trait-detail summary,
-/* .pc-luck-rd .luck details.trait-detail summary, */
 .pc-buffs-subtab summary.buffs-detail {
   list-style: none;
 }
 
 .pc-attributes .trait details.trait-detail summary:hover,
-/* .pc-luck-rd .luck details.trait-detail summary:hover, */
 .pc-buffs-subtab summary.buffs-detail:hover {
   color: orange;
   font-weight: bold;
 }
 
 .pc-attributes .trait details[open].trait-detail,
-/* .pc-luck-rd .luck details[open].trait-detail, */
 .pc-attributes .trait span.trait-detail {
   font-size: xx-small;
 }
@@ -671,6 +693,13 @@ div.change-view {
 .pc-attributes .attack {
   display: grid;
   grid-template-columns: 3fr 1fr 2.5fr 1fr 1fr;
+  gap: 2px;
+  padding: 2px;
+}
+
+.pc-attributes .speed {
+  display: grid;
+  grid-template-columns: 3fr 5.7fr;
   gap: 2px;
   padding: 2px;
 }
@@ -788,6 +817,7 @@ input[type="hidden"][value="1"].has-buff + .has-buff {
 .pc-attacks-subtab,
 .pc-otact-subtab,
 .pc-hands-subtab,
+.pc-resdm-subtab,
 .pc-rolls-subtab,
 .pc-master-subtab,
 .pc-skills-subtab,
@@ -798,8 +828,7 @@ input[type="hidden"][value="1"].has-buff + .has-buff {
 
 .pc-attacks .weapon {
   display: grid;
-  /*grid-template-columns: 25px 3fr 3fr 1fr 4.5fr 1fr 3.5fr;*/
-  grid-template-columns: 25px 3fr 2.75fr 1fr 4.25fr 1fr 4fr;
+  grid-template-columns: 25px 5fr 2.5fr 1fr 4fr 1fr;
   gap: 2px;
   margin-bottom: 2px;
 }
@@ -815,10 +844,17 @@ input[type="hidden"][value="1"].has-buff + .has-buff {
 }
 
 .pc-attacks .weapon-option,
-.npc-attacks .weapon-option {
+.pc-attacks .weapon-special,
+.npc-attacks .weapon-option,
+.npc-attacks .weapon-special {
   display: grid;
   gap: 2px;
   margin-bottom: 2px;
+}
+
+.pc-attacks .weapon-special,
+.npc-attacks .weapon-special {
+  grid-template-columns: 25px 1fr;
 }
 
 .pc-attacks .weapon-option {
@@ -889,12 +925,19 @@ input[value="0"].spell-concentration-show ~ button.spell-concentration {
   display: none;
 }
 
+button.attack-maneuvers,
 button.spell-concentration {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
 }
 
+button.attack-maneuvers span,
+button.spell-concentration span {
+  font-weight: bolder;
+}
+
+.pc-main-tab input[value="1"].attack-maneuvers ~ button.attack-maneuvers,
 .pc-abilities-tab input[value="1"].spell-concentration ~ button.spell-concentration {
   background-color: orange;
 }
@@ -1081,6 +1124,19 @@ input[value="0"].show-paths-4to9 ~ div.abilities {
   gap: 2px;
 }
 
+.pc-config-tab div.pc-configs.first-rank {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  gap: 2px;
+}
+
+.pc-config-tab div.pc-configs.first-rank span {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .pc-config-tab li.force-max input.force-max:checked ~ input.two-digits {
   border: 1px dotted var(--cof-dark);
 }
@@ -1171,14 +1227,14 @@ input[value="0"].show-paths-4to9 ~ div.abilities {
 
 .npc-attacks .weapon {
   display: grid;
-  grid-template-columns: 25px 3.5fr 2fr 1fr 3fr 1fr 5fr;
+  grid-template-columns: 25px 4.5fr 3fr 1fr 3fr 1fr;
   gap: 2px;
   margin-bottom: 2px;
 }
 
 .npc-abilities .npc-ability {
   display: grid;
-  grid-template-columns: 25px 4fr 8fr;
+  grid-template-columns: 25px 1fr 0.75fr 2fr;
   gap: 2px;
   margin-bottom: 2px;
 }
@@ -1317,6 +1373,10 @@ textarea.migration {
   padding: 5px;
 }
 
+.sheet-rolltemplate-cof2 .sheet-rt-centered {
+  text-align: center;
+}
+
 .sheet-rolltemplate-cof2 .sheet-rt-text span > a.userscript-chat-button:hover {
   color: orange;
 }
@@ -1326,6 +1386,27 @@ textarea.migration {
   color: whitesmoke;
   border-radius: 5px;
   padding: 2px;
+}
+
+.sheet-rolltemplate-cof2 .sheet-rt-hit,
+.sheet-rolltemplate-cof2 .sheet-rt-miss {
+  display: inline-block;
+  background-color: whitesmoke;
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 2px;
+  font-size: 1.1em;
+}
+
+.sheet-rolltemplate-cof2 .sheet-rt-hit {
+  border-color: #198754;
+  color: #198754;
+}
+
+.sheet-rolltemplate-cof2 .sheet-rt-miss {
+  border-color: #dc3545;
+  color: #dc3545;
 }
 
 .sheet-rolltemplate-cof2 .inlinerollresult {

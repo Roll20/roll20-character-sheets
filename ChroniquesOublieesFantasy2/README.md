@@ -6,9 +6,35 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.9.0 [Screenshot](cof2e.png)
+v1.11.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.11.0_ (2025-11-11)
+
+- Correction DM x 2 si le seuil de critique est inférieur à 20
+- Ajout de boutons _Récupérations_ et _Soins_ au menu d'actions du PJ
+- Ajout d'une mention pour les manoeuvres avec modificateur de taille
+- Ajout du jet opposé sur l'utilisation d'une manoeuvre
+- Ajout de champs pour les scores d'attaque au contact (jet de manoeuvre opposé) et magique aux fiches de PNJ
+- Possibilité de combiner les options tactiques avec une option spécifique au PJ
+
+### Version _1.10.0_ (2025-10-31)
+
+- Raz des capacités utilisées par combat / par jour en cas de récupération rapide ou complète
+- Raz des PM maximum en cas de récupération complète
+- Ajout d'un sous-onglet pour les RD et Résistances aux DM sur la fiche de PJ
+- Ajout d'une section dépliante pour les RD et Résistances aux DM sur la fiche de PNJ
+- Ajout d'attributs vitesse pour les déplacements
+- Prise en charge des valeurs de buffs qui changent à certains rangs dans une voie
+- Prise en charge des manoeuvres spéciales dans les jets d'attaque
+- Ajout de listes de tailles et de type de créatures sur la fiche de PNJ
+- Ajout d'une option pour cibler un token lors d'un jet d'attaque
+- Effacement de l'option tactique choisie après un jet d'attaque
+- Ajout d'un bouton caché à utiliser en [macro](https://stephaned68.github.io/COF2e/pc-tech#menus-et-macros) pour un menu des actions du personnage dans le chat
+- Prise en charge de ressources consommables de type `soins`
+- Ajout d'un bouton _Consommable_ à la liste des ressources
+- Ajout du nombre d'utilisations par jour/combat aux capacités de PNJ
 
 ### Version _1.9.0_ (2025-09-28)
 

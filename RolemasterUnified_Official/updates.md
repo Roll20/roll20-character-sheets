@@ -1,3 +1,18 @@
+# 2025-11-04
+
+The where-did-november-come-from release.
+
+- Show DB info for calculation
+- New game options
+  - Reduce DB bonus to 1x Qu instead of 3x
+  - Only use running Ranks for partial/full dodge
+- Display options on status pages
+
+# 2025-10-30
+
+- Fix issue where items were not being filtered out correctly on updating inventory.
+  - Filter pattern was reversed.  Thanks to @alpinecowboy2.
+
 # 2025-10-28
 
 - Add target to token actions
