@@ -3038,7 +3038,7 @@
 		SIMPLE:      'simpleroll',
 	}
 	/** 
-	 ** Builds and executes a roll using the rolltemplate
+	 ** Processes two sources of information and constructs the roll string used by Roll20. Then it executes the roll.	 
 	 ** @param {string}        templateName   The template to be used for the roll
 	 ** @param {Array<Object>} directMap      A dictionary of rolltemplate keys and their values.
 	 ** @param {Array<Object>} rollValueMap   A dictionary of rolltemplate keys and their values that will be added as inline rolls.
@@ -3279,7 +3279,7 @@
 		// 2. Define the character-level attributes needed for both.
 		const globalAttrsToGet = prefix === 'repeating_npcabilities'
 			? [] // Monster abilities need nothing
-			: ['resource_name','kit_melee_damage_1','kit_melee_damage_2','kit_melee_damage_3','kit_ranged_damage_1','kit_ranged_damage_2','kit_ranged_damage_3' ]; // Player abilities need resource names and kit damage info
+			: ['resource_name','kit_melee_damage_1','kit_melee_damage_2','kit_melee_damage_3','kit_ranged_damage_1','kit_ranged_damage_2','kit_ranged_damage_3', 'mag_psi_dam', 'sanct_weap' ]; // Player abilities need resource names and kit damage info
 			
 		const characteristics = isPowerRoll ? ['might', 'agility', 'reason', 'intuition', 'presence'] : [];
 				
@@ -3363,6 +3363,7 @@
 		const weapon = getTranslationByKey('weapon');
 		const abilityKeywords = attrs[`${prefix}_${abilityPrefix}keywords`] ? attrs[`${prefix}_${abilityPrefix}keywords`].split(',').map(item => item.trim()) : '';
 		const kit = [];
+		let otherdamage = "";
 		if (abilityKeywords.includes(weapon)) {
 			if (abilityKeywords.includes(melee)) {
 				kit.push(parseInt(attrs['kit_melee_damage_1']));
@@ -3373,7 +3374,23 @@
 				kit.push(parseInt(attrs['kit_ranged_damage_2']));
 				kit.push(parseInt(attrs['kit_ranged_damage_3']));
 			}
+			if (attrs['sanct_weap']) {
+				const sanctweaptrans = getTranslationByKey('sanct-weap');
+				otherdamage = otherdamage + '+' + attrs['sanct_weap'] + `[${sanctweaptrans}]`;
+			}				
 		}
+		if (attrs['mag_psi_dam']) {
+			const psionic = getTranslationByKey('psionic');
+			const magic = getTranslationByKey('magic');
+			
+			if (abilityKeywords.includes(psionic)) {
+				otherdamage = otherdamage + '+' + attrs['mag_psi_dam'] + `[${psionic}]`;
+			}
+			else if (abilityKeywords.includes(magic)) {
+				otherdamage = otherdamage + '+' + attrs['mag_psi_dam'] + `[${magic}]`;
+			}
+		}
+		
 			
 		
 		
@@ -3393,9 +3410,9 @@
 			target: attrs[`${prefix}_${abilityPrefix}target`] || '',
 			trigger: attrs[`${prefix}_${abilityPrefix}trigger`] || '',
 			characteristic: characteristic,
-			tier1: attrs[`${prefix}_${abilityPrefix}tier_1`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_1`], kit[0] || 0) : '',
-			tier2: attrs[`${prefix}_${abilityPrefix}tier_2`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_2`], kit[1] || 0)  : '',
-			tier3: attrs[`${prefix}_${abilityPrefix}tier_3`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_3`], kit[2] || 0) : '',
+			tier1: attrs[`${prefix}_${abilityPrefix}tier_1`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_1`], kit[0] || 0, otherdamage) : '',
+			tier2: attrs[`${prefix}_${abilityPrefix}tier_2`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_2`], kit[1] || 0, otherdamage)  : '',
+			tier3: attrs[`${prefix}_${abilityPrefix}tier_3`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_3`], kit[2] || 0, otherdamage) : '',
 			special: attrs[`${prefix}_${abilityPrefix}special`] || '',
 			effect: attrs[`${prefix}_${abilityPrefix}effect`] || '',
 			malprop: attrs[`${prefix}_${abilityPrefix}malice`] || '',
@@ -3496,7 +3513,7 @@
 		}
 		
 		if (other) {
-			//Add Other Damage
+			damageCalc.push(other);
 		}
 		// rebuild the tier effect String
 		const newTierEffect = '[[' +
