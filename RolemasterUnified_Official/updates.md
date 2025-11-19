@@ -1,3 +1,9 @@
+# 2025-11-07
+
+- Add more details on Initialive rolls
+- Add table roller to creature sheets
+- More details for modified quickness bonuses
+
 # 2025-11-04
 
 The where-did-november-come-from release.

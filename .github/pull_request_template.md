@@ -42,6 +42,7 @@ If you are submitting a new sheet to the repository, please fill in any empty sp
 
 - [ ] I have followed the [Character Sheets Standards](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository) when building this sheet.
 - [ ] I have authorization from the game's publisher to make this an official sheet on Roll20 with their name attached.
+- [ ] (Official Sheets Only) The game's publisher has reached out to [licensing@roll20.net](mailto:licensing@roll20.net) to confirm they are aware of and supporting this sheet as an official sheet with their name attached.
 
 Select EXACTLY One:
 - [ ] This game is a traditionally published game.

@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 
 <!--
-v3.49 20250803
+v3.50 20251116
 
 
 Character Sheet For Earthdawn Developped by JBF (Discord/Facebook Jiboux Faure) v2.
@@ -4391,7 +4391,7 @@ Largerly using material from the work on the Official FASA version of Chris Dick
                       <span class="sheet-HideIfNotCloseChecked">
                         <input name="attr_T_LinksGetValue" class="sheet-hidden sheet-testCloseChecked" type="checkbox" checked value="">
                         <span class="sheet-HideIfCloseChecked sheet-stepSpan sheet-bordered-bottom"> <!--Free Talent, Link Existing, Rank is readonly-->
-                          <input name="attr_T_LinkValue" readonly value="0" min="0" class="sheet-Big sheet-numShorter sheet-HideSpinners" title="@{repeating_talents_X_T_LinkValue}:   Characters Base Rank in this talent."  type="number"  >
+                          <input name="attr_T_Rank" readonly value="0" min="0" class="sheet-Big sheet-numShorter sheet-HideSpinners" title="@{repeating_talents_X_T_LinkValue}:   Characters Base Rank in this talent."  type="number"  >
                           <span title="@{repeating_talents_X_T_Rank-Adjust}:   Adjustments to the use of this talent that increases effective rank like Thread Items.">
                             <input name="attr_T_Rank-Adjust" type="hidden" class="sheet-redGreen" value="0">
                             <b class="sheet-buffSignRight sheet-buffSmall">+</b>
@@ -13434,7 +13434,7 @@ Largerly using material from the work on the Official FASA version of Chris Dick
 <!-- WORKERS -->
 <script type="text/worker">
 
-var SheetVersion=3.49;
+var SheetVersion=3.50;
 
 // This is Test code to see if worker threads are active (working).   If wt-test1 changes, change wt-test2. if wt-test2 does not update, sheetworkers are not working.
 on("change:wt-test1", function ocwttest1() {
@@ -15691,7 +15691,7 @@ var repRanks = function fnrepRanks( eventInfo ,code, sil) {
           let link = 0, link2 = 0, vals = {}, val;
           for ( let i = 0; i < linkInArray.length; ++i ) {
             if( repeatSection( 3, linkInArray[ i ]).toUpperCase() == "DSP" && values[ strog ] == "Free" )
-              link2 += getInt(values2, linkInArray [ i ]);  //for Free Talents Discipline links are summed in the Rank, not in the LinkedValue
+              link2 += getInt(values2, linkInArray [ i ]);  //for Free Talents Discipline links are summed in the Rank, not in the LinkValue
             else
               link += getInt(values2, linkInArray [ i ]);
           };
@@ -17325,12 +17325,17 @@ on("change:damage-stun change:damage-unc-rating", fn( UpdateDamageMax)  );
   on("clicked:newday", fn(function ocNewDay() {
     'use strict';
     try{
-    getAttrs([ "Karma_max","Karma", "Recovery-Tests","Recovery-Tests_max", "Misc-KarmaRitual", "working-Circle","Karma-Modifier" ,"KarmaRitual-Rank","DP","DP_max","IsQuestor","Misc-DPRitual"], function(values) {
+    getAttrs([ "Karma_max","Karma", "Recovery-Tests","Recovery-Tests_max", "Misc-KarmaRitual", "working-Circle","Karma-Modifier" ,"KarmaRitual-Rank","DP","DP_max","IsQuestor","Misc-DPRitual","Wounds","Damage","Misc-NewDayRecoveryOffset","Misc-NewDayKarmaOffset"], function(values) {
       let vals = {};
       let ritual =getInt(values, "Misc-KarmaRitual"),
-      dpritual=getInt(values, "Misc-DPRitual");
-      //Function Refills Recovery Tests to Max
-      vals["Recovery-Tests"] =  Math.max (getInt(values,"Recovery-Tests"),getInt(values,"Recovery-Tests_max"));
+      dpritual=getInt(values, "Misc-DPRitual"),
+      curewound=(getInt(values,"Damage")<=0 && getInt(values,"Wounds")>0);
+      //Function Refills Recovery Tests to Max with Offset and taking into account curing a Wound
+      vals["Recovery-Tests"] =  Math.max (getInt(values,"Recovery-Tests"),getInt(values,"Recovery-Tests_max")) -getInt(values,"Misc-NewDayRecoveryOffset");
+      if(curewound){
+        vals["Recovery-Tests"]-=1;
+        vals["Wounds"]=getInt(values,"Wounds")-1;
+      }
       switch( dpritual )
       {
         case 0 : break; // 0 : No DP with NewDay Ritual
@@ -17349,6 +17354,7 @@ on("change:damage-stun change:damage-unc-rating", fn( UpdateDamageMax)  );
         case -4 : vals["Karma"] = Math.min (getInt(values,"Karma_max"),getInt(values,"Karma")+getInt(values,"KarmaRitual-Rank")); break; //For ED3, Create a Karma Ritual Talent (with T_Type)
         default : vals["Karma"] = Math.min (getInt(values,"Karma_max"),getInt(values,"Karma")+getInt(values,"Misc-KarmaRitual")); //Homerule : refill fixed per day
       }
+      vals["Karma"]-=getInt(values,"Misc-NewDayKarmaOffset");
       setAttrsLog(vals);
     });
   } catch( err ) { errlog( "Earthdawn:ocNewDay() error caught: " + err  ); }
@@ -20128,6 +20134,44 @@ else if( fromSheetVersion < 3.49 ) {
 
 } // End ver 3.49
 
+else if( fromSheetVersion < 3.50 ) {
+  toSheetVersion = 3.50;
+
+  var newNotes = "Earthdawn by FASA Character Sheet version: " + toSheetVersion + " by Chris Dickey and JB Faure .\n"
+  // Note: Put update stuff here.
+  + "Access the WIKI by pressing the red '?' button at the top right of the character name. "
+  + "New Day is now curing your wounds ( As RAW : 1 per Newday, If Damage=0 , Costs 1 Recovery) .\n"
+  + "Your Creation Ranks are now saved in the Journal for future reference .\n"
+  //+ "A new function to import from Steps. Thanks Lars !!!.\n"
+
+
+  + notes;
+  // Comment this line out if not to change tab to force release notes visible.
+  showNotes = (showNotes === -1) ? -1 : 1;
+
+
+    let i,pre,newflags="";
+    let getV=[];
+
+
+        getAttrs( getV , function gaUpdateCharacterSheet(values) {
+          'use strict';
+
+
+
+  if( Object.keys(vals).length > 0 )    // If the code above just changed some values, do those before making the recursive call.
+  setAttrsLog( vals, undefined , function fnUpdateCharactersheetSetAttrsLog( vals ) {
+    'use strict';
+    updateCharactersheet( newSheetVersion, toSheetVersion, origSheetVersion, recurse + 1, values, showNotes, newNotes, newflags);        // Recursively call this routine to do any subsequent updates.
+  });
+  else{
+    updateCharactersheet( newSheetVersion, toSheetVersion, origSheetVersion, recurse + 1, values, showNotes, newNotes, newflags);        // Recursively call this routine to do any subsequent updates.
+  }
+});
+
+} // End ver 3.50
+
+
     else  {
 
       vals[ "edition_max" ] = newSheetVersion.toString();
@@ -21499,7 +21543,7 @@ on("change:attrib-dex-increases change:attrib-str-increases change:attrib-tou-in
 
 on("clicked:endcreation_post", fn(function ocEndAndPost() {
   'use strict';
-  getAttrs([ "Per-Step","LP-Calc", "Spells-Costs", "NPC" ,"Karma_max" , "Recovery-Tests_max" , "DP_max"], function(values) {
+  getAttrs([ "Per-Step","LP-Calc", "Spells-Costs", "NPC" ,"Karma_max" , "Recovery-Tests_max" , "DP_max", "LP-Summary","record-journal"], function(values) {
     let vals = {};
     // vals["show_tips"] = values["NPC"]=="0"? "1" :"0";
     vals[ "tab" ] = values["NPC"]=="0"? "11" :"1";
@@ -21513,6 +21557,7 @@ on("clicked:endcreation_post", fn(function ocEndAndPost() {
     vals["Damage"]=0;
     vals["Wounds"]=0;
     vals["Wounds_max"]=8;
+    vals["record-journal"]=values["record-journal"] + "\n*********************** Ranks at Creation stored in the Creation Offset ***********\n" + values["LP-Summary"];
 
     vals["Recovery-Tests"]=values["Recovery-Tests_max"];
     setAttrsLog(vals);
@@ -21522,11 +21567,12 @@ on("clicked:endcreation_post", fn(function ocEndAndPost() {
 
 on("clicked:set_lp_offset", fn(function ocSetLPOffset() {
   'use strict';
-  getAttrs([ "LP-Current","LP-Total", "LP-Calc"], function(values) {
+  getAttrs([ "LP-Current","LP-Total", "LP-Calc", "LP-Summary","record-journal"], function(values) {
     let vals = {};
 
     vals["LP-CreationOffset"]=getInt(values,"LP-Current")-getInt(values,"LP-Total")+getInt(values,"LP-Calc");
     vals["LP-CreationOffset-Spells"]=0;
+    vals["record-journal"]=values["record-journal"] +"\n*********************** Ranks at Creation stored in the Creation Offset ***********\n" + values["LP-Summary"];
     setAttrsLog(vals);
   });
 })); //End ocEndCreationAndPost
@@ -25091,7 +25137,7 @@ var updateKnackSummary = function fnupdateKnackSummary() {
       for( let i = 0; i < tarray.length; i++) {
         attarray.push( buildPre( "T", tarray[ i ] ) + "Rank");
         attarray.push( buildPre( "T", tarray[ i ] ) + "Type");
-        attarray.push( buildPre( "T", tarray[ i ] ) + "LinkedValue");
+        attarray.push( buildPre( "T", tarray[ i ] ) + "LinkValue");
         attarray.push( buildPre( "T", tarray[ i ] ) + "Name");
       }
       getSectionIDsOrdered("repeating_discipline", function gsIdRepeatingTalents(darray) {
@@ -25184,7 +25230,9 @@ var updateKnackSummary = function fnupdateKnackSummary() {
 
                 for( let i = 0; i < tarray.length; i++){
                   pre=buildPre( "T", tarray[ i ] );
-                  let rk= ((values[ pre + "Type"] =="Free") ? values[ pre + "LinkedValue"] :  values[ pre + "Rank"])||"0";
+//                  let rk= ((values[ pre + "Type"] =="Free") ? values[ pre + "LinkValue"] :  values[ pre + "Rank"])||"0";
+                  let rk= getInt(values,pre+"Rank");
+
                   entry={ "name": safeString( values[pre + "Name"] ).replace(/[\(\[].*[\)\]]/g,"").trim().replace("\'","’")||"" , "rank" : rk };
                   charray.push(entry);
                   let ty=values[pre+"Type"];
