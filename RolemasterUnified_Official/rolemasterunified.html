@@ -1,6 +1,7 @@
 
 
 
+
 <rolltemplate class="sheet-rolltemplate-rmu">
   <div class='sheet-rolltemplate-rmurollbox'>
     <em>{{actor}} {{verb}} {{action}}:</em><br>
@@ -50,7 +51,7 @@
 <rolltemplate class="sheet-rolltemplate-rmuinit">
   <div class='sheet-rolltemplate-rmurollbox sheet-rolltemplate-rmuinitbox'>
     {{actor}} rolls Initialive:<br>
-      {{total}} = {{bonus}} + {{roll}}
+      {{total}} = {{bonus}}&nbsp;[Bonus] + {{roll}}&nbsp;[Roll]
       {{#rollLess() maneuver 0}}
       + {{maneuver}}&nbsp;[Maneuver Penalty / 10]
       {{/rollLess() maneuver 0}}
@@ -2784,6 +2785,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
 
 
+
+
+      <button class='fancybuttoninline fancybutton' type='action' name='act_rollfumble'>
+          <span style="font-family:Pictos Three;">l</span>Table Roll</button>
 
 </div>
 
@@ -6576,7 +6581,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 34f6a649a30d03e49238b2be69fb6beb70fbbfce
+Revision bae02186cfc8b6621fb0746a3ff139b92ec71f39
 
 
 <hr>
@@ -14001,15 +14006,29 @@ frontpage.updateDB = function () {
   getAttrsPending(["qu", "db_misc", "running_bonus", "running_ranks",
 		  "shield_bonus", "shield_ranks", "dbmod",
 		  "shield_type_bonus", "shield_type_nattacks",
-		  "encumberance_penalty"], (ev) => {
-		  console.log("dooing update", ev);
+		  "encumberance_penalty",
+		  "option_dbqumultiplier", "option_dodgerunningbonus"], (ev) => {
+    console.log("DB Update", ev);
     var updates = {};
+  
+    // First check for our two options and set
+    const optionqumiltiplier = parseIntDefault(ev.option_dbqumultiplier, 3)
+    // True if set and set to 'ranks'
+    const optiondodgeranks = (ev.option_dodgerunningbonus && ev.option_dodgerunningbonus == 'ranks') ?
+	true : false;
+
     const db_extra = miscBonusTotal(ev.db_misc || "")[0];
     const dbmiscmod = parseIntDefault(ev.dbmod, 0);
-    const basedb = +ev.qu * 3 + db_extra + dbmiscmod;
+    const basedb = +ev.qu * optionqumiltiplier + db_extra + dbmiscmod;
     updates.db_base = basedb;
     const encump = parseIntDefault(ev.encumberance_penalty, 0);
     updates.db_qu = basedb;
+
+    updates.db_info = `${F(ev.qu) * optionqumiltiplier}  Quickness * ${optionqumiltiplier}\n` +
+	  `${F(dbmiscmod)}  DB Misc Mod\n` +
+	  `${F(db_extra)}  DB Extta\n` +
+	  `${T(basedb)}  Base DB`;
+
 
     
     const runningranks = parseIntDefault(ev.running_ranks, 0);
@@ -14038,7 +14057,9 @@ frontpage.updateDB = function () {
 				     `${T(updates.db_passivedodgemissile)}`;
     }
 
-    const running_bonus = +ev.running_bonus;
+    const running_bonus = (optiondodgeranks) ? 
+		RMUSkills.getSkillBonus(runningranks, false) :
+		+ev.running_bonus;
     {
       const partial_dodge_bonus = Math.max(0, Math.floor(running_bonus / 2 + encump));
       const partial_dodge_bonus_missile = Math.floor(partial_dodge_bonus / 2);
@@ -18990,9 +19011,8 @@ injury.parseInjuryString = function (str) {
 	    RMUSkills.uses('bodydevelopment');
 	}
 
-	// Did we have a bleed?  If so trigger the bleed explosidn
-//	startRoll(`/fx bubbling-blood @{selected|${cdata.character_name}}`,
-//		    (x) => finishRoll(x.rollId,x));
+	startRoll(`/fx bubbling-blood`,
+		    (x) => { finishRoll(x.rollId,x)});
 
 
 	// Update the status as soon as the injury is applied.

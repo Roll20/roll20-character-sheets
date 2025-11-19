@@ -83,6 +83,8 @@ A character sheet, at a minimum requires four files in an appropriately named su
 
 All contributions to this repository must meet the minimum requirements outlined in [this article](https://help.roll20.net/hc/en-us/articles/360037773453). We additionally reccomend requesting approvals from a sheet's original author if you are submitting any large overhauls to actively-maintained sheets. This will speed up your approval process.
 
+If you are submitting a new sheet that is officially supported by the game's publisher, please ask that the publisher reach out to us at [licensing@roll20.net](mailto:licensing@roll20.net) to confirm they are aware of and supporting this sheet as an official sheet with their name attached, before submitting your PR.
+
 ### Release Cadence
 
 Pull Requests are reviewed *at least* weekly by 00:00 UTC on Thursdays, although cadence is often more frequent. 
