@@ -8,7 +8,6 @@
         <img name="attr_character_avatar" class="sheet-chara-avatar"/>
       </div>
     </div>
-      
     <!-- 캐릭터 속성 섹션 -->
     <div class="sheet-col sheet-section-info">
       <div class="sheet-fatality">
@@ -466,7 +465,7 @@
 
 <!-- 시트워커 -->
 <script type="text/worker">
-  // 함수
+// 함수
 const calculateBarPercentage = (current, max) => {
   if (!current || !max || max <= 0) return 0;
   return Math.max(0, Math.min(100, (current / max) * 100));
@@ -485,12 +484,14 @@ const set_debuf = (hp,hpmax,san,sanmax) => {
     hpStatus = "건강함";
   } else if (hpCurrent === 1) {
     hpStatus = "빈사: 행동 불능";
-  } else if (hpCurrent < hpMax / 4) {
+  } else if (hpCurrent < hpMax / 4) { // 2(값)~24%
     hpStatus = "치명상: 행동 페널티";
-  } else if (hpCurrent >= hpMax * 0.5) {
-    hpStatus = "경미한 부상";
-  } else if (hpCurrent >= 2) {
+  } else if (hpCurrent < hpMax * 0.5) { // 25%~49%
     hpStatus = "심한 부상";
+  } else if (hpCurrent < hpMax * 0.75) { // 50%~74%
+    hpStatus = "부상";
+  } else if (hpCurrent < hpMax) { // 75%~99%
+    hpStatus = "경미한 부상";
   } else {
     hpStatus = "신체 상태";
   }
@@ -503,11 +504,13 @@ const set_debuf = (hp,hpmax,san,sanmax) => {
     sanStatus = "정신 상태";
   } else if (sanCurrent >= sanMax) {
     sanStatus = "평이함";
-  } else if (sanCurrent < sanMax / 4) {
+  } else if (sanCurrent < sanMax * 0.25) { // 0%~24%
     sanStatus = "극도의 스트레스 상태: 상해 또는 자해";
-  } else if (sanCurrent <= sanMax * 0.75) {
+  } else if (sanCurrent < sanMax * 0.5) { // 25%~49%
+    sanStatus = "스트레스 반응";
+  } else if (sanCurrent <= sanMax * 0.75) { // 25%~74%
     sanStatus = "긴장 상태";
-  } else if (sanCurrent < sanMax) {
+  } else if (sanCurrent < sanMax) { // 75%~99%
     sanStatus = "심란함";
   } else {
     sanStatus = "정신 상태";
@@ -544,5 +547,6 @@ on("sheet:opened change:hp_injury change:hp_max change:hp", function () {
     });
   });
 });
+
 
 </script>
