@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const {minify} = require('html-minifier');
+const {minify} = require('html-minifier-terser');
 const chokidar = require('chokidar');
 const argv = require('minimist')(process.argv.slice(2));
 
@@ -28,7 +28,7 @@ function copyDevJs() {
 }
 
 // --- Main bundle function ---
-function bundle() {
+async function bundle() {
   const jsPath = isProduction ? prodJsInput : devJsOutput;
 
   try {
@@ -37,7 +37,7 @@ function bundle() {
     let injectedHTML;
 
     if (isProduction) {
-      const minifiedHTML = minify(html, {
+      const minifiedHTML = await minify(html, {
         collapseWhitespace: true,
         minifyJS: true,
         removeComments: true,
