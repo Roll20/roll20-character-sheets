@@ -1,0 +1,131 @@
+//- @pugdoc
+  name: textInput
+  description: A text input widget
+  arguments:
+    - {string} name - The attribute name. Do not prefix with 'attr_'
+    - {string} value - The default value the input is filled with
+mixin textInput(name, value='')
+  input(class!=attributes.class name=`attr_${name}` placeholder!=attributes.placeholder type='text' value=value)
+
+//- @pugdoc
+  name: textLabelled
+  description: A text input widget preceeded with a label
+  arguments:
+    - {string} name - The attribute name. Do not prefix with 'attr_'
+    - {string} label - The displayed label
+    - {string} id - The `id` input attribute (and the `for` label attribute)
+    - {string} value - The default value
+mixin textLabelled(name, label, id, value='')
+  label(for=id)&attributes(attributes).textLabelled
+    span!= label
+    +textInput(name, value)(id=id)
+
+//- @pugdoc
+  name: numberInput
+  description: A number input widget
+  arguments:
+    - {string} name - The attribute name. Do not prefix with 'attr_'
+    - {string} value - The default value the input is filled with
+mixin numberInput(name, value='')
+  input(class!=attributes.class name=`attr_${name}` readonly!=attributes.readonly placeholder!=attributes.placeholder type='number' value=value)
+
+//- @pugdoc
+  name: numberLabeled
+  description: a number widget preceeded with a label
+  arguments:
+    - {string} name - The attribute name. Do not prefix with 'attr_'
+    - {string} label - The displayed label
+    - {string} id - The `id` inpu attribute (and the `for` label attribute)
+    - {string} value - The default value
+mixin numberLabelled(name, label, id, value='')
+  label(for=id)&attributes(attributes).textLabelled
+    span!= label
+    +numberInput(name, value)(id=id)
+
+//- @pugdoc
+  name: textareaInput
+  description: A textarea widget
+  arguments:
+    - {string} name - The attribute name. Do not prefix with 'attr_'
+    - {string} value - The default value the input is filled with
+mixin textareaInput(name, value='')
+  textarea(id!=attributes.id class!=attributes.class name=`attr_${name}` placeholder!=attributes.placeholder)= value
+
+mixin textareaLabelled(name, label, id, value='')
+  label(for=id)&attributes(attributes).textareaLabelled
+    span!= label
+    +textareaInput(name, value)(id=id)
+
+//- @pugdoc
+  name: hiddenInput
+  description: A hidden text input widget
+  arguments:
+    - {string} name - The attribute name. Do not prefix with 'attr_'
+    - {string} value - The default value the input is filled with
+mixin hiddenInput(name, value='')
+  input(class!=attributes.class name=`attr_${name}` type='hidden' value=value)
+
+//- @pugdoc
+  name: rollButton
+  description: A roll button, used to execute dice rolls
+  arguments:
+    - {string} name - The button name. Do not prefix with 'roll_'
+    - {string} value - The dice roll value in roll20 standard format
+mixin rollButton(name, value='')
+  button(class!=`roll ${attributes.class}` name=`roll_${name}` type='roll' value!=value)
+
+//- @pugdoc
+  name: rollButton
+  description: An action button, used to execute dice rolls with complex logic
+  arguments:
+    - {string} name - The button name. Do not prefix with 'act_'
+    - {string} value - The dice roll value in roll20 standard format
+mixin actButton(name, value='')
+  button(class!=attributes.class name=`act_${name}` type='action' value!=value)
+
+//- @pugdoc
+  name: cbButton
+  description: A checkbox widget
+  arguments:
+    - {string} name - The widget name. Do not prefix with 'attr_'
+    - {string} label - The widget label, displayed right after the button
+    - {string} value - The attribute value when the cb is checked
+mixin cbButton(name, label, value='')
+  label
+    input(name=`attr_${name}` value=value type='checkbox')
+    span(title=label)!= label
+
+//- @pugdoc
+  name: rdButton
+  description: A radio widget
+  arguments:
+    - {string} name - The widget name. Do not prefix with 'attr_'
+    - {string} label - The widget label, displayed right after the button
+    - {string} value - The attribute value when the rd is checked
+mixin rdButton(name, label, value='')
+  label
+    input(name=`attr_${name}`, value=value, type='radio')
+    span(title=label)
+
+//- @pugdoc
+  name: select
+  description: a simple dropdown list
+  arguments:
+    - {string} name - The widget name. Do not prefix with 'attr_'
+    - {string} defaultOption - The default option label. If present, the associated value is an empty string.
+mixin select(name, defaultOption=null, ro=false)
+  select(name=`attr_${name}` readonly!=ro)
+    if defaultOption
+      option(value='', selected)!= defaultOption
+    if block
+      block
+
+mixin optgroup(label='')
+  option(class='optgroup' disabled)!= `&nbsp;&nbsp;${label}`
+
+//- Specific mixins
+//- @pugdoc
+mixin navRadio(name, title, value='')
+  label.navRadio
+    input(class!=attributes.class, name=`attr_${name}`, type='radio', value=value, attributes.checked)
+    span(title=title)

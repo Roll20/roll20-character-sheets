@@ -108,6 +108,25 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Updated translation key for personal Armour for translations
 - Allow custom characteristics to be dragged to macro bar
 
+### Version 1.1.06
+- Added Robot tab to character sheet
+
+### Version 1.1.07
+- Added Skills to Robot tab
+- Added Weapons and Armour to Ship's Locker
+- Added repeating row for custom power requirements to Ship tab
+
+### Version 1.1.08
+- Fixed Skills on Robot tab that were affecting modifiers on PC/NPC skills
+
+### Version 1.1.09
+- Added custom Characteristics to NPC to allow values for Attitude, Influence, Power etc. to be captured
+
+### Version 1.1.10
+- Fixed rounding error on carry capacity
+- Addition of Ship's Ledger
+- Addition of highly detailed Ship Combat tab (with help from Roll20 member and superstar TrooperSJP)
+- Fix to Robot parsing on drag'n'drop
 
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 

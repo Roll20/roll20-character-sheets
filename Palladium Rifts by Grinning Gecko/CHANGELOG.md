@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.8.6] - 2025-09-24
+
+### Added
+
+- Add pop-out icons where roll buttons create a new dialog.
+- Add AGENTS.md for development guidelines.
+- Add hover background color to repeating items.
+
+### Changed
+
+- Update README.md with checkout instructions.
+
+## [1.8.5] - 2025-09-06
+
+### Changed
+
+- Fix issue where Possession roll button was not working.
+
+## [1.8.4] - 2025-08-28
+
+### Changed
+
+- Fix issue where Modifier Ancient: Damage was becoming 0+undefined+undefined+undefined+undefined+undefined.
+
 ## [1.8.3] - 2025-06-14
 
 ### Added
