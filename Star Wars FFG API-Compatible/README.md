@@ -133,5 +133,5 @@ Added Species/Career/Specialization data from many of the more recent books.
 			Separatist Commander	-  Collapse of the Republic
 			Ship Captain			-  Dawn of Rebellion
 	
-6.5.0 Updates
+6.5.1 Updates
 Moved sheet icons to ibb.co to prevent circumvent the UK blocking imgur.com
