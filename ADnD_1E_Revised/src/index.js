@@ -2898,7 +2898,6 @@ on(
 // type/carry should jump to follow selector unless set to Show All or matches the type/carry tab
 // carried_select/carried sync are used for weight calcs
 on('change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_type change:repeating_equipment:equipment_carried_select', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   const source = `${eventInfo.sourceAttribute}`;
   const pattern = /equipment_type/; // parses the event text
@@ -2924,7 +2923,7 @@ on('change:repeating_equipment:equipment_carried_select change:repeating_equipme
 
 // Equipment Tabs hide/show Rows
 on('change:equipment_tabs_type change:equipment_tabs_carry change:repeating_equipment:equipment_magical', (eventInfo) => {
-  clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   getSectionIDs('repeating_equipment', (idArray) => {
     const fields = [];
     _.each(idArray, (id) => {
@@ -4601,9 +4600,11 @@ function setEquipment(id) {
   const combined = [...nonRep, ...fields];
   getAttrs(combined, (v) => {
     // console.log(`Change detected: ${fields}`);
-    const equipTab = +v.equipment_tabs_type;
+    const equipTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
     const equipType = +v[section_attribute('equipment', id, 'equipment_type')];
-    output.repeating_equipment_equipment_type = equipType <= 0 || equipTab === -1 ? 0 : equipType;
+    // output.repeating_equipment_equipment_type = equipType <= 0 || equipTab === -1 ? 0 : equipType;
+    // Set Equipment type for new rows based on selected Type Tab
+    output.repeating_equipment_equipment_type = equipTab !== -1 ? equipTab : equipType;
     output.repeating_equipment_equipment_magical = +v[section_attribute('equipment', id, 'equipment_magical')];
     output.repeating_equipment_equipment_show_type = +v[section_attribute('equipment', id, 'equipment_show_type')];
     output.repeating_equipment_equipment_current = +v[section_attribute('equipment', id, 'equipment_current')];
@@ -4660,7 +4661,7 @@ on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_ite
   const id = eventInfo.sourceAttribute.split('_')[2];
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
-  // if (eventInfo.newValue !== eventInfo.previousValue) return;
+
   // test for new row name (ie no existing value)
   // console.log(`Change detected: new: ${eventInfo.newValue} previous:${eventInfo.previousValue}`);
   if (eventInfo.previousValue !== undefined) return;
