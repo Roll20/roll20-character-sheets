@@ -33,6 +33,7 @@
   on("clicked:export", async (e) => {
     console.log("export", e);
     const attrs = {};
+    attrs.h2h = await getRepeatingRowsAsync("h2h");
     attrs.wp = await getRepeatingRowsAsync("wp");
     attrs.wpmodern = await getRepeatingRowsAsync("wpmodern");
     attrs.skills = await getRepeatingRowsAsync("skills");
@@ -57,7 +58,7 @@
     const attrs = data.reduce((acc, row) => {
       const rowId = generateRowID();
       Object.entries(row).forEach(([key, val]) => {
-        if (parseInt(val) == 0) {
+        if (parseInt(val) == 0 || val == "") {
           return;
         }
         acc[`repeating_${section}_${rowId}_${key}`] = val;
@@ -91,13 +92,17 @@
 
   on("clicked:import", async (e) => {
     console.log("import", e);
-    await setAttrsAsync({ importexportstatus: "Importing core..." });
+    await setAttrsAsync({
+      importexportstatus: "Importing core...",
+      importing: "1",
+    });
     const a = await getAttrsAsync(["importexport"]);
     const data = JSON.parse(a.importexport);
     console.log(data);
     // importAll(data);
     // return;
     await setAttrsAsync(data.core);
+    await setRepeatingRowsAsync("h2h", data.h2h);
     await setRepeatingRowsAsync("wp", data.wp);
     await setRepeatingRowsAsync("wpmodern", data.wpmodern);
     await setRepeatingRowsAsync("skills", data.skills);
@@ -111,6 +116,7 @@
     await setAttrsAsync({
       importexportstatus:
         "Done importing, but triggered events are probably still running. To be sure open your browser console and when the logging stops, the import is really done.",
+      importing: "",
     });
   });
 })();
@@ -118,5 +124,24 @@
 on("sheet:opened", async (e) => {
   console.log("sheet:opened", e);
   await setAttrsAsync({ debug: "0" });
+  // await migrateAttributes();
+});
+
+on("clicked:migrate", async (e) => {
+  console.log("clicked:migrate", e);
   await migrateAttributes();
 });
+
+// $20("button.test").on("mouseenter", (e) => {
+//   console.log(e);
+// });
+
+// on("clicked:test", async (e) => {
+//   console.log("test");
+//   const acid = getActiveCharacterId();
+//   const attrs = findObjs({
+//     _type: "attribute",
+//     _characterid: acid,
+//   });
+//   console.log(acid, attrs);
+// });

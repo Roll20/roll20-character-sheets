@@ -1,0 +1,57 @@
+include pug/mixins.pug
+include pug/constants.pug
+
+//- Hidden translated attributes
+div
+	each val in attributes
+		- const abbr = val.substring(0,3)
+		- const capitalized = val.charAt(0).toUpperCase() + val.slice(1)
+		input(type="hidden", name=`attr_attribute_query_${abbr}`, value=`+ @{${val}_mod}[${capitalized}]]]}} {{attribute= + ${abbr.toUpperCase()}}}`)
+	input(type="hidden", name="attr_attribute_query", value="?{Attribute|Strength,+ @{strength_mod}[Strength]]]&#125;&#125; {{attribute= + STR&#125;&#125;|Dexterity,+ @{dexterity_mod}[Dexterity]]]&#125;&#125; {{attribute= + DEX&#125;&#125;|Constitution,+ @{constitution_mod}[Constitution]]]&#125;&#125; {{attribute= + CON&#125;&#125;|Intelligence,+ @{intelligence_mod}[Intelligence]]]&#125;&#125; {{attribute= + INT&#125;&#125;|Wisdom,+ @{wisdom_mod}[Wisdom]]]&#125;&#125; {{attribute= + WIS&#125;&#125;|Charisma,+ @{charisma_mod}[Charisma]]]&#125;&#125; {{attribute= + CHA&#125;&#125;}")
+	input(type="hidden", name="attr_burst_query", value="?{Burst|Yes,+ 2[Burst]|No,&#32;}")
+	input(type="hidden", name="attr_extra_hp_query", value!="?{Extra hit points? Enter 2 for Warrior|0}[Bonus]")
+	input(type="hidden", name="attr_modifier_query", value="+ ?{Modifier|0}[Mod]")
+	input(type="hidden", name="attr_proficient_query", value="?{Proficient|Yes, @{npc_skills}|No, 0}[Skill]")
+	input(type="hidden", name="attr_skill_name_query", value="?{Skill name|Skill}")
+	input(type="hidden", name="attr_translation_numdice", value="Number of dice")
+
+input(type="hidden", name="attr_edit_mode", value="1").editmode
+input(type="hidden", name="attr_npc", value="0").npc-input
+input(type="hidden", name="attr_tab", value="character")
+input(type="hidden", name="attr_system", value="revised")
+
+each val in subSystems
+	input(type="hidden", name=`attr_subsystem_${val}`, value="")
+
+include pug/header.pug
+include pug/settings.pug
+include pug/tabs.pug
+
+.character.content.halfgrid
+	include pug/character.pug
+.ship.content
+	include pug/ship.pug
+.vehicle.content
+	include pug/vehicle.pug
+.npc.content
+	include pug/npc.pug
+.drones.content
+	include pug/drones.pug
+.mount.content
+	include pug/mount.pug
+
+.footer.flex-between
+	span(name="attr_character_sheet")
+
+|
+|
+include pug/rolltemplate.pug
+|
+|
+script(type="text/worker")
+	|	(function () {
+	|	"use strict";
+	include:uglify-es workers.js
+	|	})();
+|
+

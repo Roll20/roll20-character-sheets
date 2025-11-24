@@ -1,10 +1,16 @@
 # MERP Roll20 Character Sheet
 
-Middle Earth Role Playing (MERP) has often been described as a simplified version of **Rolemaster**, the flagship game of Iron Crown Enterprises by compressing the wealth of options of Rolemaster down to a few professions and spell lists. In similar vein, the massive volume of charts have been truncated in variety and size. 
+Middle Earth Role Playing (MERP) has often been described as a simplified version of **Rolemaster**, the flagship game of Iron Crown Enterprises. It condenses the wealth of options of Rolemaster down to a few professions and spell lists. In similar vein, the massive volume of charts have been truncated in variety and size. 
 
-Nevertheless, this Roll20 character sheet for MERP contains quite a few automatic calculations and cascading effects. This brief documents is an attempt to shed some light on those. For further details, please consult the rule book and the source code of the sheet.  
+Despite the simplification, this Roll20 character sheet for MERP contains quite a few automatic calculations and cascading effects. This brief documents is an attempt to shed some light on those. For further details, please consult the rule book and the source code of the sheet.  
 
 This sheet in its organization and content is mostly based on the second U.S. edition from 1986. Currently, the only inclusion of house rules is placeholder for stride modifier as the movement rate would have been difficult to modify without side effects.
+
+### Contributing to the project
+
+This open-source project welcomes contributions. Bear in mind, however, there may be more to MERP than Third Age Eriador. Before making a pull-request to Roll20 master, make sure to leave room for custom choices. 
+
+If you want a completely automatized character sheet with all options integrated as drop-down menus and built-in tables, you could perhaps publish it as its own character sheet. 
 
 
 ## Personal Sheet
@@ -57,7 +63,7 @@ All the stats default to value 50 for a new character. This is only for convenie
 
 The upper limit for a stat is 102 and lower limit is 0. The changes in stat values or bonuses cascade automatically through-out the sheet.
 
-### Special abilities and languages
+### Injuries, Special abilities and languages
 
 These are merely for book-keeping without any automatic mechanisms attached.
 

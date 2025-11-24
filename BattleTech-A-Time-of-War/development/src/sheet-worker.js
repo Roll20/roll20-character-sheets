@@ -1,5 +1,5 @@
 import {
-    calculateAbilityScore,
+    calculateAttributeScore,
     linkedAttributeDisplayNames
 } from './attributes'
 import {
@@ -8,9 +8,7 @@ import {
     getSkillDisplayName
 } from './skills'
 import {
-    skillsList,
-    tieredSkillsBasic,
-    tieredSkills
+    skillsList
 } from './domain/skills/skills-list'
 
 const sheetOpened = () => {
@@ -43,7 +41,17 @@ const recalculateSkills = () => {
 }
 
 // calculate stat values when XP amount changes
-on("change:strength_xp change:body_xp change:reflex_xp change:dexterity_xp change:intelligence_xp change:will_xp change:charisma_xp change:edge_xp", calculateAbilityScore)
+on("change:strength_xp change:body_xp change:reflex_xp change:dexterity_xp change:intelligence_xp change:will_xp change:charisma_xp change:edge_xp", ({
+    sourceAttribute,
+    newValue
+}) => {
+    const attributes = calculateAttributeScore(sourceAttribute, newValue)
+
+    const set = {}
+    set[attributes.name] = attributes.value
+    set[attributes.linkName] = attributes.linkValue
+    setAttrs(set, {}, recalculateSkills)
+})
 
 on("change:repeating_skills:skill change:repeating_skills:sub_skill", _ => {
     getAttrs(["repeating_skills_skill_xp", ], ({
@@ -72,15 +80,11 @@ const skillXPChanged = ({
         const skillNameLookupKey = skillName.split("_")[0]
         const subSkill = values[subSkillAttrName]
 
-        let skillAttributesToSet = {}
+        const skillAttributesToSet = {}
 
         skillAttributesToSet[skillLevel] = calculateSkillLevel(Number(newValue), values.learning_speed)
 
-        const skillData = getSkill(
-            skillNameLookupKey,
-            skillAttributesToSet[skillLevel],
-            tieredSkills.includes(skillNameLookupKey)
-        )
+        const skillData = getSkill(skillNameLookupKey)
 
         skillAttributesToSet["repeating_skills_" + skillId + "skill_tnc"] = skillData.targetNumber + "/" + skillData.complexity
         skillAttributesToSet["repeating_skills_" + skillId + "target_number"] = skillData.targetNumber
@@ -227,11 +231,6 @@ const migrateFrom2To3 = () => {
 
                 if (skillFirstName in skillsList) {
                     skillData = skillsList[skillFirstName]
-                } else if (skillFirstName in tieredSkillsBasic) {
-                    skillData = tieredSkillsBasic[skillFirstName]
-                } else if (skillFirstName.substring(0, skillFirstName.length - 1) in tieredSkillsBasic) {
-                    skillData = tieredSkillsBasic[skillFirstName.substring(0, skillFirstName.length - 1)]
-                    parsedSkillName = parsedSkillName.substring(0, parsedSkillName.length - 1)
                 } else {
                     console.error("Unable to migrate skill data. Old values are: " + JSON.stringify(oldSkillValues))
                     skillsUpdated++

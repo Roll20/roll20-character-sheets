@@ -1,18 +1,54 @@
 ///<reference path="constants.ts"/>
 ///<reference path="util.ts"/>
 
+const fillAdventurerClassStats = (
+  label: string
+): Record<string, number | string | boolean> => {
+  const { partialPsychic, partialWarrior, partialExpert } =
+    autofillData.classes;
+  let data = { class_ability: "" } as Record<string, number | string | boolean>;
+  const fillPartialClassStats = (
+    keyName: string,
+    partialData:
+      | typeof partialExpert
+      | typeof partialPsychic
+      | typeof partialWarrior
+  ) => {
+    if (label.includes(keyName)) {
+      data = {
+        ...partialData,
+        class_ability: `${data.class_ability}${partialData.class_ability}\n`,
+      };
+    }
+  };
+  fillPartialClassStats("expert", partialExpert);
+  fillPartialClassStats("psychic", partialPsychic);
+  fillPartialClassStats("warrior", partialWarrior);
+  return data;
+};
+
 /* Autofill stuff */
-const fillClassStats = () => {
-    getAttrs(["class", "class_ability", "attack_bonus"], v => {
-        const label = v.class && reverseClasses[v.class ? v.class.toLowerCase() : ""];
-        if (label && autofillData.classes.hasOwnProperty(label)) {
-            const data = Object.assign({}, autofillData.classes[label as keyof typeof autofillData.classes]);
-            Object.keys(data).forEach(key => {
-                if (!(["", "0"].includes(`${v[key]}`))) delete data[key as keyof typeof data];
-            });
-            mySetAttrs(data, v);
-        }
+const fillClassStats = <T extends keyof typeof autofillData.classes>() => {
+  getAttrs(["class", "class_ability", "attack_bonus"], (v) => {
+    const label =
+      v.class && reverseClasses[v.class ? v.class.toLowerCase() : ""];
+    if (!label) return;
+    let data = {};
+    if (label.startsWith("adventurer")) {
+      data = fillAdventurerClassStats(label);
+    } else if (autofillData.classes.hasOwnProperty(label)) {
+      data = Object.assign(
+        {},
+        autofillData.classes[label as keyof typeof autofillData.classes]
+      );
+    }
+    Object.keys(data).forEach((key) => {
+      if (!["", "0"].includes(`${v[key]}`)) {
+        delete data[key as keyof typeof data];
+      }
     });
+    mySetAttrs(data, v);
+  });
 };
 const getShipMultiplier = (shipClass: string) => {
     if ((shipClass || "").toLowerCase() === "frigate") return 2;

@@ -258,7 +258,11 @@ function mergeAndAddObjects(data) {
   data.forEach((obj) => {
     for (let [key, value] of Object.entries(obj)) {
       if (result[key]) {
-        result[key] += value;
+        if (key === "critical" || key === "knockout" || key === "deathblow") {
+          result[key] = result[key] > value ? value : result[key];
+        } else {
+          result[key] += value;
+        }
       } else {
         result[key] = value;
       }
@@ -279,4 +283,101 @@ async function getSectionIDsOrderedAsync(sectionName) {
     ),
   ];
   return ids;
+}
+
+/**
+ * Add a token {attack} times to the Turn Tracker in order against other tokens.
+ * Requires API script access.
+ * For use on an action button.
+ *
+ * [[d20+@{selected|repeating_profiles_-MibcwHG5hZXUJn6A7OG_initiative} &{tracker}]]
+ */
+async function palladiumAddToTurnTracker(initKey, attacksKey) {
+  const { [initKey]: init, [attacksKey]: attacks } = await getAttrsAsync([
+    initKey,
+    attacksKey,
+  ]);
+  if (!attacks) {
+    const noAttacksMessage = await startRoll(
+      `@{opt_whisper}&{template:custom} {{color=red}} {{title=@{selected|character_name} has no attacks with the Active Profile.}}`
+    );
+    finishRoll(noAttacksMessage.rollId);
+    return;
+  }
+  const initString = init > 0 ? `+${init}` : `${init}`;
+  const roll = await startRoll(
+    `@{opt_whisper}&{template:initiative} {{title=@{selected|character_name} rolls initiative!}} {{diceroll=[[1d20]]}} {{modifier=${initString}}}`
+  );
+  console.log(roll);
+  const computed = roll.results.diceroll.result + init;
+  console.log(computed);
+  finishRoll(roll.rollId, {
+    diceroll: computed,
+  });
+  // Add 20 to the roll if a nat20 is rolled. Simplest way to bump the roll to the top of the turn order.
+  const nat20bonus = roll.results.diceroll.result === 20 ? 20 : 0;
+  const computedWithNat20 = computed + nat20bonus;
+  const addToTracker = await startRoll(
+    `@{opt_whisper}&{template:custom} {{title=@{selected|character_name} added to Turn Tracker}} ${
+      nat20bonus === 20
+        ? "{{Natural 20!=20 points added to initiative roll!}}"
+        : ""
+    } {{Initiative=[[[[${computedWithNat20}]] &{tracker}]]}}`
+  );
+  finishRoll(addToTracker.rollId);
+  // https://app.roll20.net/forum/post/6817409/multiple-initiative-values-for-a-single-character/?pageforid=6817748#post-6817748
+  const dupeTracker = await startRoll(`!dup-turn ${attacks}`);
+  finishRoll(dupeTracker.rollId);
+}
+
+/**
+ * Determines if a repeating section change event is a new row.
+ * Requires the repeating section to have a `rowid` attribute.
+ * Note that when a new row is added the
+ *
+ * @param {*} e Roll20 change event object.
+ * @returns bool
+ */
+async function isNewRow(e) {
+  const [r, section, rowId, attr] = e.sourceAttribute.split("_");
+  const rowPrefix = `${r}_${section}_${rowId}`;
+  const a = await getAttrsAsync([`${rowPrefix}_rowid`]);
+  if (a[`${rowPrefix}_rowid`].length === 0) {
+    await setAttrsAsync(
+      { [`${rowPrefix}_rowid`]: `${r}_${section}_${rowId}` },
+      { silent: true }
+    );
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Sets generic defaults when a new row is created.
+ *
+ * @param {*} e Roll20 change event object.
+ */
+async function setRowDefaults(e, setAttrsOptions) {
+  console.log("setRowDefaults", e, setAttrsOptions);
+  const [r, section, rowId, attr] = e.sourceAttribute.split("_");
+  const rowPrefix = `${r}_${section}_${rowId}`;
+  const row = await getAttrsAsync([
+    `${rowPrefix}_levelacquired`,
+    `${rowPrefix}_level`,
+  ]);
+  const a = await getAttrsAsync(["character_level"]);
+  console.log("setRowDefaults", row, a);
+  // Loose comparison because it could be 1 or "1".
+  if (
+    row[`${rowPrefix}_levelacquired`] == 1 &&
+    row[`${rowPrefix}_level`] == 1 &&
+    a["character_level"] > 1
+  ) {
+    const attrs = {
+      [`${rowPrefix}_levelacquired`]: a["character_level"],
+      [`${rowPrefix}_level`]: 1,
+    };
+    console.log("setRowDefaults character_level > 1", attrs);
+    await setAttrsAsync(attrs, setAttrsOptions);
+  }
 }

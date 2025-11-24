@@ -1,0 +1,244 @@
+//- Element shortcut mixins
+- let htmlformat;
+mixin input(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	- obj.name = replaceSpaces(obj.name);
+	- obj.title = obj.title || attrTitle(obj.name);
+	- obj.name = `attr_${obj.name}`;
+	input&attributes(obj)
+//-End Mixin
+mixin radioGroup(objArray)
+	each obj in objArray
+		- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+		- obj.type='radio';
+		+input(obj)
+//-End Mixin
+mixin textarea(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	- obj.name = replaceSpaces(obj.name);
+	- obj.title = obj.title || attrTitle(obj.name);
+	- obj.name = `attr_${obj.name}`;
+	textarea&attributes(obj)
+//-End Mixin
+mixin option(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	- obj['data-i18n'] = obj['data-i18n'] || obj.value;
+	option&attributes(obj)
+//-End Mixin
+mixin select(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	- obj.name = replaceSpaces(obj.name);
+	- obj.title = obj.title || attrTitle(obj.name);
+	- obj.name = `attr_${obj.name}`;
+	select&attributes(obj)
+		if block
+			block
+		else
+			-htmlformat;
+			+option({value:'empty select, PEBKAC',selected:true})
+//-End Mixin
+mixin span(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	if obj.name
+		- obj.name = replaceSpaces(obj.name);
+		- obj.title = obj.title || attrTitle(obj.name);
+		- obj.name = `attr_${obj.name}`;
+	span&attributes(obj)
+		block
+//-End Mixin
+mixin datalist(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	datalist&attributes(obj)
+		block
+//-End Mixin
+mixin div(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	if obj.name
+		- obj.name = replaceSpaces(obj.name);
+		- obj.title = obj.title || attrTitle(obj.name);
+		- obj.name = `attr_${obj.name}`;
+	div&attributes(obj)
+		block
+//-End Mixin
+mixin h1(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	h1&attributes(obj)
+		block
+//-End Mixin
+mixin h2(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	h2&attributes(obj)
+		block
+//-End Mixin
+mixin h3(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	h3&attributes(obj)
+		block
+//-End Mixin
+mixin h4(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	h4&attributes(obj)
+		block
+//-End Mixin
+mixin h5(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	h5&attributes(obj)
+		block
+//-End Mixin
+mixin p(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	p&attributes(obj)
+		block
+//-End Mixin
+mixin button(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	- obj.name = replaceSpaces(obj.name);
+	- obj.title = obj.title || `%{${obj.name}}`;
+	if obj.type === 'action'
+		- obj.name = `act_${obj.name}`;
+	else
+		- obj.type = 'roll';
+		- obj.name = `roll_${obj.name}`;
+	button&attributes(obj)
+		block
+//-End Mixin
+mixin action(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	- obj.type = 'action';
+	+button(obj)
+		block
+//- End Mixin
+mixin roller(obj)
+	- obj.class = obj.class ? `${replaceProblems(obj.class)} roller` : 'roller';
+	+action(obj)
+mixin section(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	section&attributes(obj)
+		block
+//-End Mixin
+mixin main(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	main&attributes(obj)
+		block
+//-End Mixin
+mixin header(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	header&attributes(obj)
+		block
+//-End Mixin
+mixin footer(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	footer&attributes(obj)
+		block
+//-End Mixin
+mixin details(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	details&attributes(obj)
+		block
+//-End Mixin
+mixin summary(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	summary&attributes(obj)
+		block
+//-End Mixin
+mixin label(obj)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	label&attributes(obj)
+		block
+//-End Mixin
+mixin repeating_section(name,header,columnArr,id)
+	- htmlformat;
+	section(class=`repeating-${name} active-section` id=`${(id||name).replace(/\s+/g,'-')}`)
+		if header
+			- htmlformat;
+			h4(data-i18n=header)
+		if columnArr
+			.repeat-columns
+				each head in columnArr
+					h5(data-i18n=head)
+		fieldset(class=`repeating_${name}`)
+			block
+mixin fieldset(name)
+	- name = name.replace(/\s+([^\s])/,'$1');
+	fieldset(class=`repeating_${name}`)
+		block
+//-End Mixin
+mixin pseudo-button(label,inputObj)
+	- inputObj.class = inputObj.class ? replaceProblems(inputObj.class) : undefined;
+	- hiddenObj = inputObj;
+	- hiddenObj.type = 'hidden';
+	+input(hiddenObj)
+	label.pseudo-button
+		span(data-i18n=label)
+		+input(inputObj)
+//-End Mixin
+mixin button-label(label,inputObj,buttonObj,divObj)
+	- divObj.class = divObj.class ? replaceProblems(divObj.class) : undefined;
+	- inputObj.class = inputObj.class ? replaceProblems(inputObj.class) : undefined;
+	- buttonObj.class = buttonObj.class ? replaceProblems(buttonObj.class) : undefined;
+	- inputObj.name = inputObj.name.replace(/\s+/g,'_');
+	- buttonObj.name = buttonObj.name.replace(/\s+/g,'_');
+	.input-label&attributes(divObj)
+		+input(inputObj)
+		+button(buttonObj)
+//-End Mixin
+mixin select-label(label,inputObj,divObj,spanObj)
+	if divObj
+		- divObj.class = divObj.class ? replaceProblems(divObj.class) : undefined;
+	if inputObj
+		- inputObj.class = inputObj.class ? replaceProblems(inputObj.class) : undefined;
+	if spanObj
+		- spanObj.class = spanObj.class ? replaceProblems(spanObj.class) : undefined;
+	label.input-label&attributes(divObj)
+		- inputObj.name = inputObj.name.replace(/\s+/g,'_');
+		+select(inputObj)
+			block
+		span(data-i18n=label)&attributes(spanObj)
+//-End Mixin
+mixin input-label(label,inputObj,divObj,spanObj)
+	if divObj
+		- divObj.class = divObj.class ? replaceProblems(divObj.class) : undefined;
+	if inputObj
+		- inputObj.class = inputObj.class ? replaceProblems(inputObj.class) : undefined;
+	if spanObj
+		- spanObj.class = spanObj.class ? replaceProblems(spanObj.class) : undefined;
+	label.input-label&attributes(divObj)
+		- inputObj.name = inputObj.name.replace(/\s+/g,'_');
+		+input(inputObj)
+		span(data-i18n=label)&attributes(spanObj)
+//-End Mixin
+mixin dual-input-label(label,inputArr,divObj)
+	if divObj
+		- divObj.class = divObj.class ? replaceProblems(divObj.class) : undefined;
+	.dual.input-label&attributes(divObj)
+		each inputObj,i in inputArr
+			if inputObj
+				- inputObj.class = inputObj.class ? replaceProblems(inputObj.class) : undefined;
+			- inputObj.name = inputObj.name.replace(/\s+/g,'_');
+			+input(inputObj)
+			if i<1
+				- htmlformat;
+				span(class='slash h2')='/'
+				- htmlformat;
+		span(data-i18n=label)
+//-End Mixin
+mixin headedTextarea(obj,header)
+	.headed-textarea&attributes(attributes)
+		+h4({'data-i18n':header})
+		+textarea(obj)
+//-End Mixin
+mixin script()
+	script(type='text/worker')
+		block
+//-End Mixin
+mixin pseudoControl(name)
+	- obj.class = obj.class ? replaceProblems(obj.class) : undefined;
+	+div({class:`pseudo-control ${obj.class||''}`}).pseudo-control
+		button(type='action' class='repcontrol_add' name=`act_add_${name}`)
+//- Functions
+- const attrTitle = (string) => `@{${string.replace(/_max$/,'|max')}}`;
+- const buttonTitle = (string) => `%{${string}}`;
+- const replaceSpaces = (string) => string.replace(/\s+/g,'_');
+- const replaceProblems = (string) => string.replace(/[\(\)\[\]\|\/\\]/g,'-');
+- const repeatAttrTitle = (section,attr) => `@{repeating_${section}_$X_${replaceSpaces(attr).replace(/_max$/,'|max')}}`;
+- const repeatButtonTitle = (section,attr) => `%{repeating_${section}_$X_${replaceSpaces(attr||'roll')}}`;

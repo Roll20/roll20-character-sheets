@@ -1,8 +1,228 @@
 # Changelog
 
-## [1.2.0]
+## [1.8.6] - 2025-09-24
 
 ### Added
+
+- Add pop-out icons where roll buttons create a new dialog.
+- Add AGENTS.md for development guidelines.
+- Add hover background color to repeating items.
+
+### Changed
+
+- Update README.md with checkout instructions.
+
+## [1.8.5] - 2025-09-06
+
+### Changed
+
+- Fix issue where Possession roll button was not working.
+
+## [1.8.4] - 2025-08-28
+
+### Changed
+
+- Fix issue where Modifier Ancient: Damage was becoming 0+undefined+undefined+undefined+undefined+undefined.
+
+## [1.8.3] - 2025-06-14
+
+### Added
+
+- Add new modifier attributes to export.
+- Add Support & Request Thread button.
+
+### Changed
+
+- Fix Modifier damage unit on roll button.
+
+## [1.8.2] - 2025-05-22
+
+### Changed
+
+- Fix issue where new Modifiers damage field overwrites Ancient: Damage with 0.
+
+## [1.8.1] - 2025-05-28
+
+### Changed
+
+- Make Active Profile checkboxes look like radio buttons.
+
+## [1.8.0] - 2025-05-25
+
+### Added
+
+- Add "Refresh All Profiles" button.
+- Add Range, Duration, Frequency, Damage, DC, and Skill to Modifiers.
+- Add Frequency to Magic, Psionics.
+- Add rollable attribute checks to Profiles, including D20 + Attribute, D20 + Attribute Bonus, D20 Under Attribute, and D100 Under Attribute.
+
+### Changed
+
+- Fix issue where spell strength was not being calculated correctly.
+
+## [1.7.4] - 2025-03-30
+
+### Changed
+
+- Fix missing quote on "Output ISP/PPE/Damage usage to chat" attribute.
+
+## [1.7.3] - 2025-02-28
+
+### Changed
+
+- Fix import race condition that caused WPs and Combat Skills to be duplicated in the Modifier Picker.
+
+## [1.7.2] - 2025-02-28
+
+### Changed
+
+- Fix issue where importing an Ability/Magic/Psionic with `addtobonuses` would cause it to get added to the Modifier Picker twice.
+- Fix issue with Trust/Intimidate/Charm/Impress roll buttons not showing Success or Failure.
+- Add PE Bonus as an optional modifier to Disease save, since if it's a Magic Disease, the PE is already factored in.
+- Fix issue with Active Profile Curse save.
+- Add PE Bonus as an optional modifier to Fatigue and Pain saves.
+- Add PP Bonus as an optional modifier to Maintain Balance.
+
+## [1.7.1] - 2025-02-14
+
+### Changed
+
+- Only copy attributes from Modifiers to the Profile Picker if they have a value.
+- Remove Perception from Saving Throws in the Active Profile.
+- Fix issue where importing would set the Level Acquired to the current character level.
+
+## [1.7.0] - 2025-02-08
+
+### Added
+
+- Add Damage to Ancient Weapon Proficiencies (applies to Pole Arm and Whip).
+- Add hideable YouTube tutorial link.
+- Output error message to chat when TT is clicked if the Active Profile has no attacks.
+- Add nameable Modern Damage 1, 2, and 3 to Modifiers and Profiles for extra damage types.
+
+### Changed
+
+- Add 20 to Turn Tracker initiative when a Natural 20 is rolled.
+- Fix some grid layout issues in Modifiers and Profiles.
+
+## [1.6.1] - 2025-01-27
+
+### Added
+
+- Add roll buttons to punch and kick damage.
+- Add kick damage to Supernatural Strength.
+- Add Ammo tracker to Profile tab.
+
+### Changed
+
+- Move Perception from Saving Throws to beside Initiative.
+- Active Profile columns now fill the width.
+- Fix issue where damage that rolls into the next layer now outputs the correct layer name.
+- Alternating colors on repeating rows, except in the Modifier Picker.
+- Fix issue where using a `+` in a skill modifier dialog would cause the roll to be 0.
+
+## [1.6.0] - 2022-04-18
+
+### Added
+
+- Add calculated Movement section to profiles.
+- Add option to whisper rolls to GM.
+- Add WP Paired to ancient and modern.
+- Add Drunken Style Kung Fu and Mystic Drunken Style.
+- Add 'actions' to duration/frequency units.
+- Add whitespace to the bottom of the sheet to make it easier to add rows.
+
+### Changed
+
+- Fix issue where PS Type wasn't showing up in Active Profile.
+- Fix issue where 'Giant Robotic' displays for PS Type when it should be 'Robotic'.
+- Roll template fixes for dark mode.
+- Layout fixes.
+- Make Modern WP level read-only.
+- Separate dice and unit on ability/magic/psionic damage summary row.
+
+## [1.5.0] - 2022-03-13
+
+### Added
+
+- `Level Acquired` for Skills, Hand to Hand, and Weapon Proficiencies. Current level calculation is done based on that value and the current character level.
+
+### Changed
+
+- Fix for a change in dark mode.
+- Fix `Migrate` button.
+- Fix issue where adding custom Weapon Proficiencies would break the process that runs when the Character Level is changed, and prevent Skills/Abilities/etc. from updating.
+- Fix issue where sometimes Skills/Weapon Proficiencies would auto-adjust their level when opening the sheet.
+- Improve alignment between headings and values in Weapon Proficiencies, Abilities, Magic, and Psionics.
+- Add `from Active Profile` to reset ISP/PPE buttons.
+- Fix issue with broken roll templates on certain checks (Despair, Mind Control, etc.).
+
+## [1.4.0] - 2022-03-02
+
+### Added
+
+- Add "Output ISP/PPE/Damage usage to chat" option.
+- Display level alongside modifier name in Modifier Picker list.
+- Add Battleram, Bombard, and Space Fighter combats to the Hand to Hand & RPA Combat selector.
+- Add styles for dark mode.
+- Add "Show Armor warnings when damage is taken on last layer" option.
+
+### Changed
+
+- Fix issue where adding a modifier duplicated it in the Modifier Picker.
+- Fix issue where remaining armor output was displaying the pre-damage amount.
+- Fix issue where activating/deactivating a top-level Armor wasn't always modifying the Active Armor section.
+- Fix issue where clicking Reset MDC on a top-level Armor didn't update the Active Armor.
+
+### Removed
+
+- Remove extraneous Break Fall in a couple of places.
+
+## [1.3.0] - 2022-01-11
+
+### Added
+
+- Add roll templates for damage, casting spell, and using psionic.
+- Add optional `successtext` to skill roll template.
+- Add Break Fall to bonuses.
+
+### Changed
+
+- Move Modern Strike: Pulse to Strike: Single bonus.
+- Added Migrate button instead of auto-migrating on sheet load.
+- Output PPE/ISP/MDC to chat when an amount is deducted from the sheet using the action buttons.
+
+## [1.2.0] - 2021-10-15
+
+### Added
+
+- Prompt for gunfire dodge penalty if option is enabled
+- Add hand-to-hand selector and calculator
+- Add RPA Combat selector and calculator
+- Add "Racial" and "Other" skill categories
+- Add Break Fall defense bonus
+- Add Body Block/Tackle, Leg Hook, and Backward Sweep Kick bonuses
+- Global Active Profile and Active Armor section
+- Add "ly" (Light Years) to distance units
+- Add number of actions as title attribute for range attacks
+- Add initiative roll button that adds to turn tracker, Palladium style (requires `dup-turn` API script)
+- Add option to include IQ bonus on skill-based abilities
+
+### Changed
+
+- Fix issue with absolute value calculation in profile
+- Change "WPs" tab to "Combat Skills"
+- Move Combat section above Attributes section in profile
+- Change `currentmdc` and `basemdc` armor attributes to `mdc` and `mdc_max` respectively, including migration
+- Change readonly spans from `overflow:scroll` to `overflow:auto` to get rid of the non-functional scrollbars on Windows
+- Moved all instructions to the Options tab and updated them / made them more thorough
+- Reorganized Ancient and Modern bonus sections
+- Fix text on `strike: burst` roll
+- Make Disease save a roll query
+- Fix issue with skills not updating when character level changes
+- Fix issue with export of units (range, damage, dc, duration)
+- Prompt for additional modifier on range disarm
+- Styling changes/fixes
 
 ## [1.1.0] - 2021-09-06
 

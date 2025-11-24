@@ -10,13 +10,111 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-3.9.2 [Screenshot](coc_v2.png)
+v3.21.0 [Screenshot](coc_v2.png)
 
 # Notes de version
 
+## v3.21.0 (2025-08-12)
+
+- Libellé _Attaque magique_ paramétrable (attribut ATKMAG_desc à modifier manuellement dans l'onglet _Attributes and Abilities_)
+
+## v3.20.0 (2025-01-25)
+
+- Compatibilité des jets de chat avec le dark-mode Roll20
+
+## v3.19.0 (2024-08-24)
+
+- Gestion des capacités avec nombre d'utilisations limitées
+  - Configuration dans l'onglet Capacités
+  - Décompte d'utilisation, message d'alerte de dépassement, bouton de rechargement
+  - Chargement automatique à l'import d'un profil
+- Boutons gain/perte de PV
+
+## v3.18.0 (2024-06-24)
+
+- Migration de la fiche en CSE
+- Ajout de zones rétractables/extensibles
+  - Dans l'onglet Capacités
+  - Dans l'onglet Equipements
+- Correction de bugs mineurs dans les fonctions d'import de profil et statblock
+
+## v3.17.1 (2024-06-03)
+
+- Fix des bugs Roll20 (styles CSS in-line, sheet.json)
+- Pas de modification fonctionnelle
+
+## v3.17.0 (2024-05-01)
+
+- Fiche de personnage
+  - Modification de l'onglet "Capacités", avec 3 sous-onglets
+    - Jets de capacités
+    - Traits
+    - Buffs
+
+## v3.16.1 (2023-10-22)
+
+- Correction du nom des jets de INT, PER et CHA de la fiche de PNJ
+
+## v3.16.0 (2023-09-10)
+
+- Import de profil
+
+  - Ajout base attaques, DV, INIT à l'import de profil
+  - Ajout armes / équipement à l'import de profil
+  - Calcul PV et PC niveau 1
+
+- Correction bug de création d'une attaque via les propriétés d'équipement (prise en compte ATD:xxx)
+- Ajout messages d'aide sur les BUFFs et les propriétés d'équipements
+
+## v3.15.0 (2023-04-30)
+
+- Suppression du calcul automatique des PV par niveau
+- Ajout onglet Version avec notes et log
+- Améliorations cosmétiques mineures
+
+## v3.14.0 (2023-02-11)
+
+- Ajout des compteurs génériques 2 & 3
+
+  Les valeurs des compteurs sont chargées dans des attributs nommés 'cptr_xxx' ou 'xxx' est l'abréviation du compteur
+
+## v3.13.0 (2022-10-31)
+
+- Ajout d'une section Notes de Version sur l'onglet Configuration
+- Modification cosmétique des boutons +Add, Modify et Done des sections répétables
+
+## v3.12.0 (2022-04-10)
+
+Modification cosmétique
+
+Un bug de "sanitization" de Roll20 élimine les éléments HTML optgroup permettant de séparer les options par types dans les listes dépliantes (élements HTML select). Une solution de contournement a été implémentée en utilisant une option 'disabled' avec un style CSS.
+
+Ces séparateurs d'options sont par exemple utilisés dans les listes dépliantes des dés de dommages pour distinguer les DM normaux des DM sans limites.
+
+## v3.11.0 (2022-01-16)
+
+Nouvelles fonctionnalités
+
+- Possibilité de sélectionner le mod de test (mod carac + buff/debuff) dans les bonus aux DM des attaques
+- Possibilité d'afficher le token du personnage dans les jets de dés de la fiche
+
+## v3.10.1 (2021-12-18)
+
+Corrections de bugs
+
+- Dysfonctionnement des boutons d'états préjudiciables
+- Libellé du modificateur d'attaque persistant après avoir été annulé
+- Meilleur support des modificateurs de DM sous formes de jets de dés
+- Mauvais affichage en cas de sélection du setting Surhumains
+- Affichage de la version de la fiche sur l'onglet Configuration
+
+## v3.10.0 (2021-11-12)
+
+- Ajout du token par défaut sur la fiche de personnage
+
 ## v3.9.2 (2021-04-27)
 
-- Correction d'un bug sur le titre de la capacité de rang 4 de la voie n°2
+- Correction d'un bug sur le titre de la capacité de rang 2 de la voie n°4
 - Correction du calcul du rang dans une voie : la case doit être cochée et soit le titre soit le texte de la capacité doit être renseigné
 
 ## v3.9.1 (2021-04-25)

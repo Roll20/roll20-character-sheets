@@ -1,5 +1,5 @@
 <!---Mutants n Masterminds 3E Official Sheet by Green Ronin, sheet authors Richard Tran and Scott Casey
-  v1.0 -- Initial release
+  v1.02 -- Initial release
   ---> 
 <input type="hidden" name="attr_op_animation" value="on">
 <input type="hidden" name="attr_op_bleach" value="0">
@@ -1152,8 +1152,8 @@
 
     <div class="card header"></div>
     <div class="container-section section-details">
-        <input class="identity-name" type="text" name="attr_identity_name" maxlength="24" placeholder="Real Identity">
-        <input class="alias-name" type="text" name="attr_character_name" maxlength="18" placeholder="Alias">
+        <input class="identity-name" type="text" name="attr_identity_name" placeholder="Real Identity">
+        <input class="alias-name" type="text" name="attr_character_name" placeholder="Alias">
         <!-- <div class="section-biography">
           <input class="hero-concept" type="text" name="attr_hero-concept" placeholder="Hero Concept">
           <input class="hero-origin" type="text" name="attr_hero-origin" placeholder="Origin">
@@ -1725,6 +1725,7 @@
           <fieldset class="repeating_equipment">
             <input class="controller" type="hidden" name="attr_element_type" value="menu">
             <input type="hidden" name="attr_label">
+            <input type="hidden" name="attr_descriptor">
             <input type="hidden" name="attr_crit" value="20">
             <input type="hidden" name="attr_damage" value="0">
             <input type="hidden" name="attr_afflictions_type">
@@ -1762,6 +1763,7 @@
           <fieldset class="repeating_vehicles">
             <input class="controller" type="hidden" name="attr_element_type" value="menu">
             <input type="hidden" name="attr_label">
+            <input type="hidden" name="attr_descriptor">
             <input type="hidden" name="attr_crit" value="20">
             <input type="hidden" name="attr_damage" value="0">
             <input type="hidden" name="attr_afflictions_type">
@@ -1798,6 +1800,7 @@
           <fieldset class="repeating_headquarters">
             <input class="controller" type="hidden" name="attr_element_type" value="menu">
             <input type="hidden" name="attr_label">
+            <input type="hidden" name="attr_descriptor">
             <input type="hidden" name="attr_crit" value="20">
             <input type="hidden" name="attr_damage" value="0">
             <input type="hidden" name="attr_afflictions_type">
@@ -2379,7 +2382,7 @@
   // If its in a repeating section, make sure its in repeating_section_details. 
   // Make sure its in the cascade
   //# Script Variables #
-  const version = 0.2;
+  const version = 1.02;
   //Object that defines how the attributes affect each other
   const abilities = ['strength','stamina','agility','dexterity','fighting','intellect','awareness','presence'];
   const defenses = ['dodge','parry','fortitude','toughness','will'];
@@ -2971,12 +2974,12 @@
     },
     */
     {
-      section:'repeating_movement',
-      fields:['speedtype','speedrank', 'speedhour', 'speedround']
-    },
-    {
       section:'repeating_powers',
       fields:['label','descriptor','cost','activated','dynpool','rank_total','rank','rankBonus','rankCost','action','range','duration','action','damage','aoe','defense','check','description','element_type','master_row','attack_fx','combat','attack_rank','attack_mod','damage','check','crit', 'afflictions_1']
+    },
+    {
+      section:'repeating_movement',
+      fields:['speedtype','speedrank', 'speedhour', 'speedround']
     },
     {
       section:'repeating_equipment',
@@ -3296,7 +3299,6 @@
       if(Array.isArray(statblock)){
         statblock = statblock[0];
       }
-      debug({statblock});
       await clearSections();
       if(statblock.minions){
         let minions = !Array.isArray(statblock.minions.character) ? [{...statblock.minions.character}] : [...statblock.minions.character];
@@ -3307,12 +3309,13 @@
         if(statblock[parser]){
           let arrRef = Object.keys(statblock[parser])[0];
           if(statblock[parser][arrRef]){
-            debug(`parsing statblock[${parser}][${arrRef}]`);
+            if(!Array.isArray(statblock[parser][arrRef])){
+              statblock[parser][arrRef] = [statblock[parser][arrRef]];
+            }
             parsers[parser](statblock[parser][arrRef],setObj,powerNames);
           }
         }
       });
-      debug({setObj});
       set(setObj);
     /*}catch(err){
       //Maybe add chat output to this effect as well.
@@ -3611,8 +3614,12 @@
     setObj[`${row}_size`] = (obj.size._name||'').toLowerCase();
     setObj[`${row}_cost`] = obj.powerpoints._value||'';
     if(obj.powers){
-      debug({row,type,obj});
-      obj.powers.power.forEach((obj)=>parseGeneralPower(rowID,'gen_power',type,obj,setObj,powerNames));
+      if(obj.powers.power){
+        if(!Array.isArray(obj.powers.power)){
+          obj.powers.power = [obj.powers.power];
+        }
+        obj.powers.power.forEach((obj)=>parseGeneralPower(rowID,'gen_power',type,obj,setObj,powerNames));
+      }
     }
   };
   const stripOrderInfo = function(string){
@@ -3644,3 +3651,7 @@
   log(`Sheet Loaded`);
   
 </script>
+
+
+
+

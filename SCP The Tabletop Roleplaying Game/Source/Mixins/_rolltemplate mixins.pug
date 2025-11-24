@@ -1,0 +1,45 @@
+//-Roll Template Mixins to be included in Sheet files
+mixin rolltemplate(name)
+	rolltemplate(class=`sheet-rolltemplate-${name}`)
+		+templateHelperFunction({func:'rollTotal',invert:true,values:'computed::finished 0'})
+			div(class=`sheet-template ${name}{{#security_level}} level-{{security_level}}{{/security_level}}{{#continuation}} {{continuation}}{{/continuation}}{{#first}} first{{/first}} finished`)
+				block
+		+templateHelperFunction({func:'rollBetween',values:'computed::finished 0 0'})
+			div(class=`sheet-template ${name}{{#security_level}} level-{{security_level}}{{/security_level}}{{#continuation}} {{continuation}}{{/continuation}}{{#first}} first{{/first}}`)
+				block
+//- End Mixin
+mixin characterLink()
+	+templateConditionalDisplay('continuation',true)
+		+templateConditionalDisplay('name')
+			h3.sheet-roll_name.color-cond {{name}}
+		+templateConditionalDisplay('character_name')
+			+templateConditionalDisplay('character_id')
+				h4.character_name.color-cond [{{character_name}}](http://journal.roll20.net/character/{{character_id}})
+			+templateConditionalDisplay('character_id',true)
+				h4.character_name.color-cond {{character_name}}
+//-End mixin
+mixin templateBase(name)
+	- name = name.replace(/\s+/g,'_');
+	+rolltemplate(name)
+		+characterLink()
+		block
+//-End mixin
+mixin templateConditionalDisplay(fieldBool,invert)
+	!=`{{${invert ? '^' : '#'}${fieldBool}}}`
+	-format;
+	block
+	!=`{{/${fieldBool}}}`
+	- format;
+//- End mixin
+mixin templateHelperFunction(helperObj)
+	!=`{{${helperObj.invert ? '#^':'#'}${helperObj.func ? `${helperObj.func}() `:''}${helperObj.values ? `${helperObj.values}` : ''}}}`
+	-format;
+	block
+	!=`{{/${(helperObj.invert) ? '^' : ''}${helperObj.func ? `${helperObj.func}() `:''}${helperObj.values}}}`
+	- format;
+//- End Mixin
+mixin templateField(name)
+	!= `${templateField(name)}`
+	-format;
+//- End Mixin
+- const templateField = name => `{{${name}}}`;

@@ -1,0 +1,435 @@
+include anatomy/anatomy_mixins.pug
+include anatomy/fate_mixins.pug
+include anatomy/traits_mixin.pug
+include anatomy/skills_list.pug
+
+.sheet-roll-tab
+  .sheet-section-header
+    span(name="attr_rolling_title")
+    span &nbsp; Roll
+  .sheet-section-body
+    // Left column
+    .sheet-column-left
+      .sheet-roll-header Roll Type
+      .sheet-obstacle
+        select.sheet-handwritten.sheet-roll-type(name="attr_rolling_type")
+          option(value="independent") Independent
+          option(value="versus") Versus
+          option(value="disposition") Disposition
+        input.sheet-rolling-type-flag(
+          name="attr_rolling_type" 
+          type="hidden"
+        ) 
+        span.sheet-ob.sheet-independent Against Ob
+        span.sheet-versus Versus
+        input.sheet-independent.sheet-versus.sheet-handwritten(
+          value!="1"
+          name="attr_rolling_obstacle"
+          type="number"
+        )
+        span.sheet-versus dice
+        span.sheet-disposition Added to
+        select.sheet-handwritten.sheet-disposition(name="attr_rolling_disposition_ability")
+          option(value="will") Will
+          option(value="health") Health
+          option(value="nature") Nature
+      .sheet-roll-header The Grind
+        .sheet-reference-text (DH pg. 55; SG pg. 39, 48)
+      .sheet-grind-turns
+        input.sheet-handwritten(
+          value!="1"
+          name="attr_rolling_grind"
+          type="number"
+        )
+        .sheet-grind-turns-label turn(s) of the grind
+      input.sheet-condition-exhausted-flag(
+        name="attr_exhausted" 
+        type="hidden"
+      )
+      .sheet-exhausted-warning
+        .sheet-reference-text Instinct is not free when exhausted (+1 Ob)
+      // Rolled skill
+      .sheet-roll-skills
+        include roll_skills.pug
+      input.sheet-bl-flag(
+        name="attr_beginners_luck_roll" 
+        type="hidden"
+      )
+      .sheet-beginners-luck 
+        .sheet-roll-header Beginner's Luck & Nature
+          .sheet-reference-text (DH pg. 59, 66)
+        input.sheet-afraid-flag(
+          name="attr_afraid" 
+          type="hidden"
+        )
+        .sheet-afraid-warning.sheet-reference-text Afraid: cannot use beginner's luck
+        select.sheet-handwritten.sheet-bl-select(name="attr_rolling_bl_select")
+          option(value="health") Health
+          option(value="will") Will
+          option(value="nature") Nature
+        input.sheet-bl-attribute-flag(
+          name="attr_rolling_bl_select" 
+          type="hidden"
+        )
+        .sheet-bl-health
+          .sheet-abilities
+           +ability("Health", "health", 6)
+        .sheet-bl-will 
+          .sheet-abilities
+           +ability("Will", "will", 6)
+        .sheet-bl-nature
+          select.sheet-handwritten.sheet-nature-within-without(name="attr_rolling_bl_nature_within")
+            option(value="within") Within
+            option(value="outside") Outside
+          .sheet-abilities
+            .sheet-skill-name
+              div Nature
+            .sheet-nature-rating
+              input.sheet-handwritten(
+                value!="1"
+                name="attr_taxed_nature"
+                type="number"
+              )
+              .sheet-slash /
+              input.sheet-handwritten(
+                value!="1"
+                name="attr_nature"
+                type="number"
+              )
+            .sheet-advancement
+              input.sheet-advancement-flag(
+                name="attr_nature"
+                type="hidden"
+              )
+              .sheet-pass.sheet-pip-container
+                input.sheet-pip-value-flag(
+                  name="attr_nature_pass"
+                  type="hidden"
+                )
+                div <strong>P</strong>:
+                +zeroPip("nature_pass")
+                each _, i in Array(7)
+                  +pip("nature_pass", i).sheet-hidden
+              .sheet-fail.sheet-pip-container
+                input.sheet-pip-value-flag(
+                  name="attr_nature_fail"
+                  type="hidden"
+                )
+                div <strong>F</strong>:
+                +zeroPip("nature_fail")
+                each _, i in Array(7)
+                  +pip("nature_fail", i).sheet-hidden
+      .sheet-roll-header Trait
+        .sheet-reference-text (DH pg. 79)
+      input.sheet-hidden-angry-flag(
+        name="attr_angry" 
+        type="hidden"
+      )
+      .sheet-reference-text.sheet-angry-warning Angry: cannot use beneficial traits
+      select.sheet-handwritten.sheet-trait-selector(name="attr_rolling_trait")
+      input.sheet-hidden-trait-flag(
+        name="attr_rolling_trait" 
+        type="hidden"
+      )
+      select.sheet-handwritten.sheet-trait-usage(name="attr_rolling_trait_option")
+        option(value="forme") For me (+1D)
+        option(value="againstme") For against me (-1D)
+        option(value="opponent") For my opponent (vs +2D)
+      .sheet-traits
+        .sheet-table-header
+          .sheet-trait-name-header Trait name
+          .sheet-trait-level-header Trait level
+          .sheet-trait-uses-and-checks
+            .sheet-trait-uses-header Beneficial uses
+            .sheet-trait-check-header Checks
+        +traits()
+
+    // Center column
+    .sheet-column-center
+      .sheet-roll-header Persona
+        .sheet-reference-text (DH pg. 67; SG pg. 88)
+      +persona()
+      .sheet-persona
+        input.sheet-handwritten(
+          value!="0"
+          name="attr_rolling_persona"
+          type="number"
+        )
+        span Persona spent (+1D)
+      .sheet-channel-natur-option
+        input.sheet-handwritten(
+          name="attr_rolling_channel_nature" 
+          type="checkbox"
+        )
+        span Channel Nature
+      input.sheet-hidden-channel-nature-flag(
+        name="attr_rolling_channel_nature" 
+        type="hidden"
+      )
+      .sheet-channel-nature
+        .sheet-skill-name
+          div Nature
+        .sheet-nature-rating
+          input.sheet-handwritten(name="attr_taxed_nature", type="number")
+          .sheet-slash /
+          input.sheet-handwritten(name="attr_nature", type="number")
+        select.sheet-handwritten.sheet-nature-within-without(name="attr_rolling_nature_within")
+          option(value="within") Within
+          option(value="outside") Outside
+      .sheet-roll-header Help & aid 
+        .sheet-reference-text (DH pg. 65, 73; SG pg. 37)
+      .sheet-roll-help
+        input.sheet-handwritten(
+          value!="0"
+          name="attr_rolling_help" 
+          type="number"
+        )
+        .sheet-roll-help-label Help
+        .sheet-reference-text (Ability, skill, or nature; not afraid)
+      input.sheet-grind-flag(
+        name="attr_rolling_grind" 
+        type="hidden"
+      )
+      .sheet-instinct-help-warning 
+        .sheet-reference-text Instinct can only be helped by nature, instinct, or wise.
+      input.sheet-rolling-type-flag(
+        name="attr_rolling_type" 
+        type="hidden"
+      )
+      .sheet-roll-synergy
+        input.sheet-handwritten(
+          value!="0"
+          name="attr_rolling_synergy" 
+          type="number"
+        )
+        span Synergy
+        span.sheet-reference-text (DH pg. 87)
+      .sheet-roll-aid
+        input.sheet-handwritten(
+          value!="0"
+          name="attr_rolling_aid" 
+          type="number"
+        )
+        span Aid
+        span.sheet-reference-text (DH pg. 77)
+      .sheet-roll-header Additional dice
+      .sheet-gear-or-supplies
+        input.sheet-handwritten(
+          value!="0"
+          name="attr_rolling_gearetal"
+          type="number"
+        )
+        .sheet-gear-or-supplies-label Gear, supplies, focus, materials, or sacramentals
+      .sheet-other-dice
+        input.sheet-handwritten(
+          value!="0"
+          name="attr_rolling_otherdice"
+          type="number"
+        )
+        .sheet-other-dice-label other dice
+      .sheet-other-successes
+        input.sheet-handwritten(
+          value!="0"
+          name="attr_rolling_othersuccesses"
+          type="number"
+        )
+        .sheet-other-dice-label other successes
+      .sheet-roll-header Conditions
+        .sheet-reference-text (SG pg. 46)
+      input.sheet-condition-fresh-flag(
+        name="attr_fresh" 
+        type="hidden"
+      )
+      .sheet-roll-fresh +1D for fresh
+      input.sheet-condition-injured-flag(
+        name="attr_injured" 
+        type="hidden"
+      )
+      .sheet-roll-injured -1D for injured
+      input.sheet-condition-sick-flag(
+        name="attr_sick" 
+        type="hidden"
+      )
+      .sheet-roll-sick -1D for sick
+      input.sheet-rolling-type-flag(
+        name="attr_rolling_type" 
+        type="hidden"
+      )
+      .sheet-roll-hungry-and-thirsty
+        input(
+          name="attr_rolling_hnt"
+          type="checkbox"
+        )
+        .sheet-hnt-label -1S for anyone Hungry & Thirsty
+      .sheet-roll-exhausted
+        input(
+          name="attr_rolling_exhausted"
+          type="checkbox"
+        )
+        .sheet-exhausted-label -1S for anyone Exhausted
+
+    // Right column
+    .sheet-column-right
+      .sheet-roll-header Rolling
+      .sheet-rolling-body
+        .sheet-dice-total
+          input.sheet-rolling-type-flag(
+            name="attr_rolling_type" 
+            type="hidden"
+          )
+          span.sheet-handwritten(name="attr_rolling_dice", value!="0")
+          .sheet-handwritten D
+          .sheet-independent
+            div &nbsp; vs
+            .sheet-handwritten Ob
+            input.sheet-handwritten(name="attr_rolling_obstacle", value!="0", type="number")
+          .sheet-versus 
+            div &nbsp; vs &nbsp;
+            input.sheet-handwritten(name="attr_rolling_obstacle", value!="0", type="number")
+            .sheet-handwritten D
+          .sheet-disposition
+            span &nbsp; added to &nbsp;
+            span.sheet-handwritten(name="attr_rolling_disposition_ability")
+        button(type="action", name="act_skillcheck").sheet-roll-button Roll
+      .sheet-roll-header After rolling
+        .sheet-reference-text (DH pg. 77; SG pg. 87, 88)
+      input.sheet-hidden-angry-flag(
+        name="attr_angry"
+        type="hidden"
+      )
+      .sheet-reference-text.sheet-angry-warning Angry: cannot use wises
+      .sheet-roll-header
+        input(
+          name="attr_rolling_deeper_understanding"
+          type="checkbox"
+        )
+        span Deeper Understanding
+      input.sheet-du-wise-flag(
+        value!="0"
+        name="attr_rolling_deeper_understanding" 
+        type="hidden"
+      )
+      .sheet-deeper-understanding
+        .sheet-fate
+          +fate()
+        select.sheet-handwritten.sheet-du-wise-selector(name="attr_rolling_du_wise")
+        input.sheet-du-wise-flag(
+          value!="0"
+          name="attr_rolling_du_wise" 
+          type="hidden"
+        )
+        each i in [1, 2, 3, 4]
+          div(class="sheet-wise-" + i)
+            .sheet-wise-xp-section
+              input(
+                value!="1"
+                name="attr_wise" + i + "_fate" 
+                type="checkbox"
+              )
+              .sheet-wise-label Fate
+                .sheet-reference-text Gaining Wisdom
+            button(type="roll", value="&{template:deeperunderstanding} {{charName=@{character_name}}} {{result=[[1d6>4]]}}").sheet-roll-button Roll D.U.
+      input.sheet-luck-flag(
+        value!="0"
+        name="attr_rolling_luck" 
+        type="hidden"
+      )
+      .sheet-roll-header
+        input(
+          name="attr_rolling_luck"
+          type="checkbox"
+        )
+        span Luck
+      .sheet-luck
+        .sheet-fate
+          +fate()
+        .sheet-luck-sixes
+          input.sheet-handwritten.sheet-luck-dice(
+            value!="0"
+            name="attr_rolling_luck_dice" 
+            type="number"
+          )
+          .sheet-luck-label six(es)
+          button(type="roll", value="&{template:luck} {{numDice=@{rolling_luck_dice}}} {{charName=@{character_name}}} {{result=[[@{rolling_luck_dice}d6>4!]]}}").sheet-roll-button Roll Luck
+      .sheet-roll-header
+        input.sheet-handwritten(
+          name="attr_rolling_of_course"
+          type="checkbox"
+        )
+        span Of Course!
+      input.sheet-of-course-flag(
+        value!="0"
+        name="attr_rolling_of_course" 
+        type="hidden"
+      )
+      .sheet-of-course
+        .sheet-persona
+          +persona()
+        select.sheet-handwritten.sheet-oc-wise-selector(name="attr_rolling_oc_wise")
+        input.sheet-oc-wise-flag(
+          value!="0"
+          name="attr_rolling_oc_wise" 
+          type="hidden"
+        )
+        each i in [1, 2, 3, 4]
+          div(class="sheet-wise-" + i)
+            .sheet-section
+              .sheet-wise-xp-section
+                input(
+                  value!="1"
+                  name="attr_wise" + i + "_persona" 
+                  type="checkbox"
+                )
+                .sheet-wise-label Persona
+                  .sheet-reference-text Gaining Wisdom
+              .sheet-failed-dice
+                input.sheet-handwritten(
+                  value!="0"
+                  name="attr_rolling_failed_dice"
+                  type="number"
+                )
+                .sheet-failed-dice-label failed dice
+            button(type="roll", value="&{template:ofcourse} {{numDice=@{rolling_failed_dice}}} {{charName=@{character_name}}} {{result=[[@{rolling_failed_dice}d6>4]]}}").sheet-roll-button Roll Of Course!
+      .sheet-roll-header Advancement
+      ul.sheet-advancement
+        input.sheet-tax-nature-flag(
+          name="attr_rolling_nature_within" 
+          type="hidden"
+        )
+        input.sheet-bl-tax-nature-flag(
+          name="attr_rolling_bl_nature_within" 
+          type="hidden"
+        )
+        input.sheet-synergy-flag(
+          name="attr_rolling_synergy" 
+          type="hidden"
+        )
+        input.sheet-aid-flag(
+          name="attr_rolling_aid" 
+          type="hidden"
+        )
+        input.sheet-gaining-wisdom-flag(
+          name="attr_rolling_gaining_wisdom" 
+          type="hidden"
+        )
+        input.sheet-sick-flag(
+          name="attr_sick" 
+          type="hidden"
+        )
+        input.sheet-grind-flag(
+          name="attr_rolling_grind" 
+          type="hidden"
+        )
+        input.sheet-rolling-type-flag(
+          name="attr_rolling_type" 
+          type="hidden"
+        ) 
+        li.sheet-advancement-item.sheet-pass-or-fail Mark pass or fail
+        .sheet-reference-text.sheet-sick-warning Sick: do not log tests
+        li.sheet-advancement-item.sheet-tax-nature Tax Nature (if applicable)
+        li.sheet-advancement-item.sheet-gaining-wisdom Gaining Wisdom
+          span.sheet-reference-text (DH pg. 78)
+        li.sheet-advancement-item.sheet-grind Advance the grind
+        li.sheet-advancement-item.sheet-synergy Mark Synergy
+        li.sheet-advancement-item.sheet-aid Mark Aid
+        li.sheet-advancement-item Success or failure

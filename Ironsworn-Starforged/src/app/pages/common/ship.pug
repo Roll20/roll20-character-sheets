@@ -34,10 +34,11 @@ mixin shipPage(sheetType)
     input(type='radio' name=`attr_${sheetType}_page` class='ship hide-element' value='8')
     div.ship.showhide
       .ship-grid
-        .asset
-          - const starship = assets.Assets.find(obj => { return obj.Name === 'Starship' })
+        .asset.surface
+          - const commandVehicle = assets.find(obj => { return obj.Name === 'Command Vehicle' })
+          - const starship = commandVehicle.Assets.find(obj => { return obj.Name === 'Starship' })
           +assetTemplate(starship, { classes: 'visible', standalone: true })
-        .ship-category-info
+        .ship-category-info.surface
           if sheetType === 'character'
             .boarded
               +btn({
@@ -52,7 +53,7 @@ mixin shipPage(sheetType)
           h3.i18n-text(data-i18n='impacts')=translation['impacts']
           .info
             - const shipImpacts = [impacts.find(obj => { return obj.title === 'ship' })]
-            +impacts(shipImpacts, {character: true})
+            +impacts(shipImpacts, {character: true, noContainer: true})
           h3.i18n-text(data-i18n='passengers')=translation['passengers']
           .info
             fieldset.repeating_ship-passengers
@@ -73,13 +74,15 @@ mixin shipPage(sheetType)
         .ship-category-modules
           h3.i18n-text(data-i18n='ship-modules')=translation['ship-modules']
           fieldset.repeating_module-assets
-            - var assetsArray = assets.Assets.filter(obj => { return obj.Category === 'Module' })
-            .asset
+            - var assetsArray = assets.find(obj => obj["Name"] == 'Module' ).Assets
+            .asset.surface
               +genericAssetBuilder(assetsArray, 'moduleList')
+              +customAssets
 
         .ship-category-support-vehicles
           h3.i18n-text(data-i18n='ship-support-vehicles')=translation['ship-support-vehicles']
           fieldset.repeating_support-vehicle-assets
-            - var assetsArray = assets.Assets.filter(obj => { return obj.Category === 'Support Vehicle' })
-            .asset
+            - var assetsArray = assets.find(obj => obj["Name"] == 'Support Vehicle' ).Assets
+            .asset.surface
               +genericAssetBuilder(assetsArray, 'supportVehiclesList')
+              +customAssets

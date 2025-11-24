@@ -1,4 +1,4 @@
-<input  name="attr_version" type="hidden" value="2.42">
+<input  name="attr_version" type="hidden" value="2.44">
 
 <input class="toggle" name="attr_sheettype" type="hidden" value="0">
 
@@ -8,10 +8,11 @@
 <input class="selector-switch force" name="attr_forceswitch" type="checkbox" value="1">
 <input class="selector-switch background" name="attr_backgroundswitch" type="checkbox" value="1">
 <input class="selector-switch equipment" name="attr_equipmentswitch" type="checkbox" value="1">
+<input checked="checked" class="selector-switch armor_dex_pen" name="attr_attr_armor_dex_pen_switch" type="checkbox">
 <input checked="checked" class="selector-switch cptracker" name="attr_cpswitch" type="checkbox" value="1">
 <input checked="checked" class="selector-switch credittracker" name="attr_creditswitch" type="checkbox" value="1">
 <input class="selector-switch credittotal" name="attr_credittotalswitch" type="checkbox" value="1">
-
+<input class="selector-switch cptotal" name="attr_cptotalswitch" type="checkbox" value="1">
 
 <div class="master-container">
 
@@ -28,6 +29,7 @@
   <div class="main-container sheettype-title npc right"><h2>NPC Sheet</h2></div>
   <div class="main-container sheettype-title ship right"><h2>Starship</h2></div>
   <div class="main-container sheettype-title shop-inventory right"><h2>Container/Shop</h2></div>
+  <div class="main-container sheettype-title vehicle right"><h2>Vehicle</h2></div>
 
 
   <!--  LOGO and dice images -->
@@ -52,6 +54,7 @@
             <option value="1">NPC</option>
             <option value="2">Starship</option>
             <option value="3">Container</option>
+            <option value="4">Vehicle</option>
           </select>
         </div>
 
@@ -103,6 +106,10 @@
         <div class="input-row top-row bold">
           <span>Show Credit Summary Value, instead of manual credit?</span>
           <input name="attr_credittotalswitch" type="checkbox" value="1">
+        </div>
+        <div class="input-row top-row bold">
+          <span>Show Character Point Summary Value, instead of manual character point?</span>
+          <input name="attr_cptotalswitch" type="checkbox" value="1">
         </div>
       </div>
 
@@ -165,8 +172,9 @@
           <!---On char creation everyone starts with 1 FP --->
           <label>Dark Side Points <input class="p60" min="0" name="attr_darkSidePoints" type="number"
                                          value="0"/></label>
-          <label>Character Points <input class="p60" min="0" name="attr_characterPoints" type="number"
+          <label class="cptotal-hide">Character Points <input class="cptotal-hide" min="0" name="attr_characterPoints" type="number"
                                          value="0"/></label> <!---On char creation everyone starts with 5 CP --->
+          <label class="cptotal" title="Go to the 'Character Point Summary'-section to edit your total">Character Points <span class="num" min="0" name="attr_cp_spent"></span></label>
           <div class="flex-box flex-row-nowrap wound-row">
             <label class="wound">Wound Level</label>
             <select class="mediumselect wound" name="attr_WoundLevel">
@@ -179,7 +187,14 @@
               <option value="5">Mortally Wounded</option>
             </select>
           </div>
-
+          
+          <div class="cell cell-dice">
+            <label class="current_dex_penalty" title="This is the current dex penalty, update manually from your armor">Armor Dexterity penalty?<input name="attr_curr_armor_dex_pen" type="number" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>D+<input name="attr_curr_armor_dex_penPip"type="number" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+            <select class="smallselect" name="attr_curr_armor_dex_pen_switch">
+              <option selected="selected" value="No">No</option>
+              <option value="Yes">Yes</option>
+            </select></label>
+          </div>
         </div>
         <div class="sheet-col">
           <table class="custom-roll-table">
@@ -194,9 +209,9 @@
               <th>Initiative</th>
               <td>
                 <button class="d6-dice rollmod" name="roll_init" type="roll"
-                        value="&{template:black} {{name=Initiative}} {{Roll=[[(@{perception} + @{initiative} -@{WoundMod} + @{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{perceptionpip} + @{initiativepip} + ?{Other Mods(pip)|0} + 1d6@{wilddie} &{tracker}]]}}"></button>
+                        value="&{template:black} {{name=Initiative}} {{Roll=[[(@{perception} + @{initiative} -@{WoundMod} + @{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{perceptionpip} + @{initiativepip} + ?{Other Mods(pip)|0} + 1d6@{wilddie} &{tracker}]]}}"></button>
                 <button class="d6-dice rollmod-no" name="roll_initnomod" type="roll"
-                        value="&{template:black} {{name=Initiative}} {{Roll=[[(@{perception} + @{initiative} -@{WoundMod} + @{Force_Up} -1)d6cf0cs7 + @{perceptionpip} + @{initiativepip} + 1d6@{wilddie} &{tracker}]]}}"></button>
+                        value="&{template:black} {{name=Initiative}} {{Roll=[[(@{perception} + @{initiative} -@{WoundMod} + @{Force_Up} + @{numactions} -1)d6cf0cs7 + @{perceptionpip} + @{initiativepip} + 1d6@{wilddie} &{tracker}]]}}"></button>
               </td>
               <td></td>
             </tr>
@@ -236,6 +251,29 @@
                   <span class="redtxt">(GM)</span></button>
               </td>
             </tr>
+            <tr>
+              <th>Number of actions <em title="The number of power active is subtracted from all roll as a Multiple Action Penalty."></em></th>
+              <td>
+                <select class="smallselect" name="attr_numactions"
+                        title="The number of power active is subtracted from all roll as a Multiple Action Penalty. Above Force Pain doesn't need to be added">
+                  <option selected="selected" value="0">1</option>
+                  <option value="-1">2</option>
+                  <option value="-2">3</option>
+                  <option value="-3">4</option>
+                  <option value="-4">5</option>
+                  <option value="-5">6</option>
+                  <option value="-6">7</option>
+                  <option value="-7">8</option>
+                  <option value="-8">9</option>
+                  <option value="-9">10</option>
+                  <option value="-10">11</option> 
+                  <option value="-11">12</option>
+                  <option value="-12">13</option>
+                  <option value="-13">14</option>
+                  <option value="-14">15</option>                    
+                </select>
+              </td>
+            </tr>
           </table>
         </div>
       </div>
@@ -265,12 +303,12 @@
                                                            min="0" name="attr_initiativepip" type="number"
                                                            value="0"></label>
           <button class="d6-dice rollmod-no" name="roll_init_n" type="roll"
-                  value="&{template:black} {{name=Initiative}} {{Roll=[[(@{perception} + @{initiative} -@{WoundMod} + @{Force_Up} -1)d6cf0cs7 + @{perceptionpip} + @{initiativepip} + 1d6@{wilddie} &{tracker}]]}}">
+                  value="&{template:black} {{name=Initiative}} {{Roll=[[(@{perception} + @{initiative} -@{WoundMod} + @{Force_Up} + @{numactions} -1)d6cf0cs7 + @{perceptionpip} + @{initiativepip} + 1d6@{wilddie} &{tracker}]]}}">
             Initiative
           </button>
 
           <button class="d6-dice rollmod" name="roll_init_n" type="roll"
-                  value="&{template:black} {{name=Initiative}} {{Roll=[[(@{perception} + @{initiative} -@{WoundMod} + @{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{perceptionpip} + @{initiativepip} + ?{Other Mods(pip)|0} + 1d6@{wilddie} &{tracker}]]}}">
+                  value="&{template:black} {{name=Initiative}} {{Roll=[[(@{perception} + @{initiative} -@{WoundMod} + @{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{perceptionpip} + @{initiativepip} + ?{Other Mods(pip)|0} + 1d6@{wilddie} &{tracker}]]}}">
             Initiative
           </button>
           <button class="d6-dice" name="roll_customroll_n" type="roll"
@@ -302,10 +340,10 @@
 
           <div id="attributes-dex" class="attributes">
             <div class="attribute">
-              <button type="roll" name="roll_dexterity" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Dexterity}} {{Roll=[[(@{dexterity} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{dexteritypip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_dexterity-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Dexterity}} {{Roll=[[(@{dexterity} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{dexteritypip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-              <button type="roll" name="roll_dexterity" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Dexterity}} {{Roll=[[(@{dexterity} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{dexteritypip} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_dexterity-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Dexterity}} {{Roll=[[(@{dexterity} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{dexteritypip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_dexterity" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Dexterity}} {{Roll=[[(@{dexterity} - @{dexMod} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{dexteritypip}  - @{dexPipMod} + ?{Other Mods(pip)|0} + 1d6@{wilddie} ]]}}"></button>
+              <button type="roll" name="roll_dexterity-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Dexterity}} {{Roll=[[(@{dexterity} - @{dexMod} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{dexteritypip} - @{dexPipMod} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_dexterity" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Dexterity}} {{Roll=[[(@{dexterity} - @{dexMod} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{dexteritypip} - @{dexPipMod} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_dexterity-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Dexterity}} {{Roll=[[(@{dexterity} - @{dexMod} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{dexteritypip} - @{dexPipMod} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
               <label class="unified-dice unified-dice-text">Dexterity</label>
               <input type="number" name="attr_dexterity" value="3" min="0" required="required" class="unified-dice unified-dice-input"/>
               <div class="unified-dice unified-dice-middle">D+</div>
@@ -314,10 +352,10 @@
 
             <fieldset class="repeating_dexskills">
             <div class="skill">
-              <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{dexskillname}}} {{Roll=[[(@{dexskilldice} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{dexskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{dexskillname}}} {{Roll=[[(@{dexskilldice} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{dexskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-              <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{dexskillname}}} {{Roll=[[(@{dexskilldice} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{dexskillpip} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{dexskillname}}} {{Roll=[[(@{dexskilldice} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{dexskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{dexskillname}}} {{Roll=[[(@{dexskilldice} - @{dexMod} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{dexskillpip} - @{dexPipMod} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{dexskillname}}} {{Roll=[[(@{dexskilldice} - @{dexMod} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{dexskillpip} - @{dexPipMod} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{dexskillname}}} {{Roll=[[(@{dexskilldice} - @{dexMod} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{dexskillpip} - @{dexPipMod} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{dexskillname}}} {{Roll=[[(@{dexskilldice} - @{dexMod} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{dexskillpip}  - @{dexPipMod} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
               <label class="unified-dice unified-dice-text">
                 <input type="text" name="attr_dexskillname" list="dexskills">
               </label>
@@ -330,10 +368,10 @@
 
           <div id="attributes-know" class="attributes">
             <div class="attribute">
-              <button type="roll" name="roll_knowledge" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Knowledge}} {{Roll=[[(@{knowledge} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{knowledgepip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_knowledge-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Knowledge}} {{Roll=[[(@{knowledge} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{knowledgepip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-              <button type="roll" name="roll_knowledge" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Knowledge}} {{Roll=[[(@{knowledge} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{knowledgepip} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_knowledge-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Knowledge}} {{Roll=[[(@{knowledge} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{knowledgepip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_knowledge" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Knowledge}} {{Roll=[[(@{knowledge} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{knowledgepip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_knowledge-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Knowledge}} {{Roll=[[(@{knowledge} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{knowledgepip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_knowledge" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Knowledge}} {{Roll=[[(@{knowledge} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{knowledgepip} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_knowledge-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Knowledge}} {{Roll=[[(@{knowledge} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{knowledgepip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
               <label class="unified-dice unified-dice-text">Knowledge</label>
               <input type="number" name="attr_knowledge" value="3" min="0" required="required" class="unified-dice unified-dice-input"/>
               <div class="unified-dice unified-dice-middle">D+</div>
@@ -342,10 +380,10 @@
 
             <fieldset class="repeating_knowskills">
               <div class="skill">
-                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{knowskillname}}} {{Roll=[[(@{knowskilldice} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{knowskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{knowskillname}}} {{Roll=[[(@{knowskilldice} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{knowskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{knowskillname}}} {{Roll=[[(@{knowskilldice} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{knowskillpip} + 1d6@{wilddie}]]}}"></button>
-                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{knowskillname}}} {{Roll=[[(@{knowskilldice} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{knowskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{knowskillname}}} {{Roll=[[(@{knowskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{knowskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{knowskillname}}} {{Roll=[[(@{knowskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{knowskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{knowskillname}}} {{Roll=[[(@{knowskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{knowskillpip} + 1d6@{wilddie}]]}}"></button>
+                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{knowskillname}}} {{Roll=[[(@{knowskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{knowskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
                 <label class="unified-dice unified-dice-text">
                   <input type="text" name="attr_knowskillname" list="knowskills">
                 </label>
@@ -358,10 +396,10 @@
 
           <div id="attributes-mech" class="attributes">
             <div class="attribute">
-              <button type="roll" name="roll_mechanical" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Mechanical}} {{Roll=[[(@{mechanical} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{mechanicalpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_mechanical-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Mechanical}} {{Roll=[[(@{mechanical} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{mechanicalpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-              <button type="roll" name="roll_mechanical" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Mechanical}} {{Roll=[[(@{mechanical} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{mechanicalpip} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_mechanical-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Mechanical}} {{Roll=[[(@{mechanical} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{mechanicalpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_mechanical" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Mechanical}} {{Roll=[[(@{mechanical} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{mechanicalpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_mechanical-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Mechanical}} {{Roll=[[(@{mechanical} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{mechanicalpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_mechanical" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Mechanical}} {{Roll=[[(@{mechanical} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{mechanicalpip} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_mechanical-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Mechanical}} {{Roll=[[(@{mechanical} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{mechanicalpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
               <label class="unified-dice unified-dice-text">Mechanical</label>
               <input type="number" name="attr_mechanical" value="3" min="0" required="required" class="unified-dice unified-dice-input"/>
               <div class="unified-dice unified-dice-middle">D+</div>
@@ -370,10 +408,10 @@
 
             <fieldset class="repeating_mechskills">
               <div class="skill">
-                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{mechskillname}}} {{Roll=[[(@{mechskilldice} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{mechskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{mechskillname}}} {{Roll=[[(@{mechskilldice} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{mechskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{mechskillname}}} {{Roll=[[(@{mechskilldice} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{mechskillpip} + 1d6@{wilddie}]]}}"></button>
-                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{mechskillname}}} {{Roll=[[(@{mechskilldice} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{mechskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{mechskillname}}} {{Roll=[[(@{mechskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{mechskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{mechskillname}}} {{Roll=[[(@{mechskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{mechskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{mechskillname}}} {{Roll=[[(@{mechskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{mechskillpip} + 1d6@{wilddie}]]}}"></button>
+                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{mechskillname}}} {{Roll=[[(@{mechskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{mechskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
                 <label class="unified-dice unified-dice-text">
                   <input type="text" name="attr_mechskillname" list="mechskills">
                 </label>
@@ -389,10 +427,10 @@
 
           <div id="attributes-perc" class="attributes">
             <div class="attribute">
-              <button type="roll" name="roll_perception" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Perception}} {{Roll=[[(@{perception} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{perceptionpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_perception-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Perception}} {{Roll=[[(@{perception} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{perceptionpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-              <button type="roll" name="roll_perception" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Perception}} {{Roll=[[(@{perception} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{perceptionpip} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_perception-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Perception}} {{Roll=[[(@{perception} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{perceptionpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_perception" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Perception}} {{Roll=[[(@{perception} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{perceptionpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_perception-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Perception}} {{Roll=[[(@{perception} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{perceptionpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_perception" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Perception}} {{Roll=[[(@{perception} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{perceptionpip} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_perception-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Perception}} {{Roll=[[(@{perception} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{perceptionpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
               <label class="unified-dice unified-dice-text">Perception</label>
               <input type="number" name="attr_perception" value="3" min="0" required="required" class="unified-dice unified-dice-input"/>
               <div class="unified-dice unified-dice-middle">D+</div>
@@ -401,13 +439,13 @@
 
             <fieldset class="repeating_perckills">
               <div class="skill">
-                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{perckillname}}} {{Roll=[[(@{perckilldice} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{perckillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{perckillname}}} {{Roll=[[(@{perckilldice} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{perckillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{perckillname}}} {{Roll=[[(@{perckilldice} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{perckillpip} + 1d6@{wilddie}]]}}"></button>
-                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{perckillname}}} {{Roll=[[(@{perckilldice} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{perckillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{perckillname}}} {{Roll=[[(@{perckilldice} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{perckillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{perckillname}}} {{Roll=[[(@{perckilldice} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{perckillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{perckillname}}} {{Roll=[[(@{perckilldice} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{perckillpip} + 1d6@{wilddie}]]}}"></button>
+                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{perckillname}}} {{Roll=[[(@{perckilldice} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{perckillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
                 <!-- Perception attribute is misspelt, do not change unless a stat-migrating sheet-worker is created -->
                 <label class="unified-dice unified-dice-text">
-                  <input type="text" name="attr_perckillname" list="perskills">
+                  <input type="text" name="attr_perckillname" list="perckills">
                 </label>
                 <input type="number" name="attr_perckilldice" value="3" min="0" required="required" class="unified-dice unified-dice-input"/>
                 <div class="unified-dice-middle">D+</div>
@@ -418,10 +456,10 @@
 
           <div id="attributes-str" class="attributes">
             <div class="attribute">
-              <button type="roll" name="roll_strength" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Strength}} {{Roll=[[(@{strength} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{strengthpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_strength-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Strength}} {{Roll=[[(@{strength} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{strengthpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-              <button type="roll" name="roll_strength" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Strength}} {{Roll=[[(@{strength} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{strengthpip} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_strength-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Strength}} {{Roll=[[(@{strength} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{strengthpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_strength" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Strength}} {{Roll=[[(@{strength} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{strengthpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_strength-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Strength}} {{Roll=[[(@{strength} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{strengthpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_strength" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Strength}} {{Roll=[[(@{strength} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{strengthpip} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_strength-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Strength}} {{Roll=[[(@{strength} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{strengthpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
               <label class="unified-dice unified-dice-text">Strength</label>
               <input type="number" name="attr_strength" value="3" min="0" required="required" class="unified-dice unified-dice-input"/>
               <div class="unified-dice unified-dice-middle">D+</div>
@@ -430,10 +468,10 @@
 
             <fieldset class="repeating_strskills">
               <div class="skill">
-                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{strskillname}}} {{Roll=[[(@{strskilldice} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{strskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{strskillname}}} {{Roll=[[(@{strskilldice} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{strskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{strskillname}}} {{Roll=[[(@{strskilldice} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{strskillpip} + 1d6@{wilddie}]]}}"></button>
-                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{strskillname}}} {{Roll=[[(@{strskilldice} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{strskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{strskillname}}} {{Roll=[[(@{strskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{strskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{strskillname}}} {{Roll=[[(@{strskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{strskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{strskillname}}} {{Roll=[[(@{strskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{strskillpip} + 1d6@{wilddie}]]}}"></button>
+                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{strskillname}}} {{Roll=[[(@{strskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{strskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
                 <label class="unified-dice unified-dice-text">
                   <input type="text" name="attr_strskillname" list="strskills">
                 </label>
@@ -446,10 +484,10 @@
 
           <div id="attributes-tech" class="attributes">
             <div class="attribute">
-              <button type="roll" name="roll_technical" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Technical}} {{Roll=[[(@{technical} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{technicalpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_technical-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Technical}} {{Roll=[[(@{technical} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{technicalpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-              <button type="roll" name="roll_technical" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Technical}} {{Roll=[[(@{technical} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{technicalpip} + 1d6@{wilddie}]]}}"></button>
-              <button type="roll" name="roll_technical-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Technical}} {{Roll=[[(@{technical} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{technicalpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_technical" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Technical}} {{Roll=[[(@{technical} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{technicalpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_technical-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Technical}} {{Roll=[[(@{technical} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{technicalpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" name="roll_technical" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Technical}} {{Roll=[[(@{technical} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{technicalpip} + 1d6@{wilddie}]]}}"></button>
+              <button type="roll" name="roll_technical-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Technical}} {{Roll=[[(@{technical} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{technicalpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
               <label class="unified-dice unified-dice-text">Technical</label>
               <input type="number" name="attr_technical" value="3" min="0" required="required" class="unified-dice unified-dice-input"/>
               <div class="unified-dice unified-dice-middle">D+</div>
@@ -458,10 +496,10 @@
 
             <fieldset class="repeating_techskills">
               <div class="skill">
-                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{techskillname}}} {{Roll=[[(@{techskilldice} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{techskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{techskillname}}} {{Roll=[[(@{techskilldice} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs7 + @{techskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{techskillname}}} {{Roll=[[(@{techskilldice} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{techskillpip} + 1d6@{wilddie}]]}}"></button>
-                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{techskillname}}} {{Roll=[[(@{techskilldice} -@{WoundMod} +@{Force_Up} -1)d6cf0cs7 + @{techskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{techskillname}}} {{Roll=[[(@{techskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{techskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{techskillname}}} {{Roll=[[(@{techskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs7 + @{techskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button type="roll" name="roll_skill" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{techskillname}}} {{Roll=[[(@{techskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{techskillpip} + 1d6@{wilddie}]]}}"></button>
+                <button type="roll" name="roll_skill-w" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{techskillname}}} {{Roll=[[(@{techskilldice} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs7 + @{techskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
                 <label class="unified-dice unified-dice-text">
                   <input type="text" name="attr_techskillname"  list="techskills">
                 </label>
@@ -484,6 +522,7 @@
         <div class="weapon sheet-row">
           <div class="cell cell-name">Weapon</div>
           <div class="cell cell-dice">Attack</div>
+          <div class="cell cell-dice">Parry</div>
           <div class="cell cell-dice">Damage</div>
           <div class="cell cell-4">
             <div>Range</div>
@@ -502,10 +541,17 @@
             </div>
             <div class="cell cell-dice">
               <input name="attr_weaponskill" type="number" min="0" value="1" required="required" class="unified-dice unified-dice-input"/>D+<input name="attr_weaponskillpip" type="number" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
-              <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs0 + @{weaponskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-              <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 + @{weaponskillpip} + 1d6@{wilddie}]]}}"></button>
-              <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs0 + @{weaponskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-              <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 + @{weaponskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs0 + @{weaponskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+              <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 + @{weaponskillpip} + 1d6@{wilddie}]]}}"></button>
+              <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs0 + @{weaponskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 + @{weaponskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+            </div>
+            <div class="cell cell-dice">
+              <input name="attr_weaponparryskill" type="number" min="0" value="1" required="required" class="unified-dice unified-dice-input"/>D+<input name="attr_weaponparryskillpip" type="number" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+              <button name="roll_weaponparry" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponparryskill} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs0 + @{weaponskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+              <button name="roll_weaponparry" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponparryskill} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 + @{weaponparryskillpip} + 1d6@{wilddie}]]}}"></button>
+              <button name="roll_weaponparry" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponparryskill} -@{WoundMod} +@{Force_Up} + @{numactions} + ?{Dice mods|0} -1)d6cf0cs0 + @{weaponparryskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_weaponparry" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponparryskill} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 + @{weaponparryskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
             </div>
             <div class="cell cell-dice">
               <input name="attr_damagedice" type="number" value="1" min="0" required="required" class="unified-dice unified-dice-input"/>D+<input name="attr_damagepip" type="number" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
@@ -525,10 +571,11 @@
 
       <div class="overflow-auto">
         <div class="armor sheet-row">
-          <div class="cell cell-name">Armor</div>
+          <div class="cell cell-name">Armor    </div>
           <div class="cell cell-dice">Physical <span class="physical"></span></div>
           <div class="cell cell-dice">Energy <span class="energy"></span></div>
           <div class="cell cell-2">Str</div>
+          <div class="cell cell-dice">Dex Penalty</div>
           <div class="cell cell-4">Other</div>
         </div>
 
@@ -559,6 +606,9 @@
               <button name="roll_dmg_soak_str" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Damage Soak (Strength Only)}} {{Roll=[[(@{strength} + ?{Dice mods|0} - 1)d6cf0cs0 +@{strengthpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
               <button name="roll_dmg_soak_str" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Damage Soak (Strength Only)}} {{Roll=[[(@{strength} - 1)d6cf0cs0 +@{strengthpip} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
             </div>
+            <div class="cell cell-dice">
+              <input name="attr_armor_dex_pen" type="number" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>D+<input name="attr_armor_dex_penPip" type="number" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+            </div>
             <div class="cell cell-4">
               <label class="unified-dice unified-dice-text" style="width: 100%;">
                 <input name="attr_armor_other" type="text"/>
@@ -580,11 +630,11 @@
 
           <div id="force-control" class="force attributes">
             <div class="attribute">
-              <button name="roll_force_control" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Force:Control}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} +?{Dice mods|0} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"></button>
-              <button name="roll_force_control-w" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Force:Control}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} +?{Dice mods|0} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_force_control" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Force:Control}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} + @{numactions} +?{Dice mods|0} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"></button>
+              <button name="roll_force_control-w" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Force:Control}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} + @{numactions} +?{Dice mods|0} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
 
-              <button name="roll_force_control" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Force:Control}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod}  +1d6@{wilddie}]]}}"></button>
-              <button name="roll_force_control-w" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Force:Control}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod}  +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_force_control" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Force:Control}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod}  +1d6@{wilddie}]]}}"></button>
+              <button name="roll_force_control-w" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Force:Control}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod}  +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
               <label class="unified-dice unified-dice-text">Control</label>
               <input type="number" name="attr_control" min="0" value="0" required="required" class="unified-dice unified-dice-input"/>
               <div class="unified-dice unified-dice-middle">D+</div>
@@ -593,10 +643,10 @@
 
             <fieldset class="repeating_controlpowers">
               <div class="skill">
-                <button name="roll_force_control_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{controlpowername} (Control)}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} +?{Dice mods|0} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"></button>
-                <button name="roll_force_control_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{controlpowername} (Control)}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} +?{Dice mods|0} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-                <button name="roll_force_control_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{controlpowername} (Control)}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod} +1d6@{wilddie}]]}}"></button>
-                <button name="roll_force_control_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{controlpowername} (Control)}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button name="roll_force_control_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{controlpowername} (Control)}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} + @{numactions} +?{Dice mods|0} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"></button>
+                <button name="roll_force_control_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{controlpowername} (Control)}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} + @{numactions} +?{Dice mods|0} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button name="roll_force_control_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{controlpowername} (Control)}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod} +1d6@{wilddie}]]}}"></button>
+                <button name="roll_force_control_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{controlpowername} (Control)}} {{Roll=[[(@{control} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 +@{controlpip} +@{Force_EmptinessMod} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
                 <label class="unified-dice unified-dice-text">
                   <input name="attr_controlpowername" type="text" list="forcecontrol" />
                 </label>
@@ -607,11 +657,11 @@
 
           <div id="force-sense" class="force attributes">
             <div class="attribute">
-              <button name="roll_force_control" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Force:Sense}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} +?{Dice mods|0} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"></button>
-              <button name="roll_force_control-w" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Force:Sense}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} +?{Dice mods|0} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_force_control" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Force:Sense}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} + @{numactions} +?{Dice mods|0} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"></button>
+              <button name="roll_force_control-w" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Force:Sense}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} + @{numactions} +?{Dice mods|0} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
 
-              <button name="roll_force_sense" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Force:Sense}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod}  +1d6@{wilddie}]]}}"></button>
-              <button name="roll_force_sense-w" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Force:Sense}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod}  +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_force_sense" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Force:Sense}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod}  +1d6@{wilddie}]]}}"></button>
+              <button name="roll_force_sense-w" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Force:Sense}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod}  +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
               <label class="unified-dice unified-dice-text">Sense</label>
               <input type="number" name="attr_sense" min="0" value="0" required="required" class="unified-dice unified-dice-input"/>
               <div class="unified-dice unified-dice-middle">D+</div>
@@ -620,10 +670,10 @@
 
             <fieldset class="repeating_sensepowers">
               <div class="skill">
-                <button name="roll_force_sense_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{sensepowername} (Sense)}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} +?{Dice mods|0} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"></button>
-                <button name="roll_force_sense_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{sensepowername} (Sense)}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} +?{Dice mods|0} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-                <button name="roll_force_sense_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{sensepowername} (Sense)}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod} +1d6@{wilddie}]]}}"></button>
-                <button name="roll_force_sense_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{sensepowername} (Sense)}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button name="roll_force_sense_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{sensepowername} (Sense)}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} + @{numactions} +?{Dice mods|0} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"></button>
+                <button name="roll_force_sense_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{sensepowername} (Sense)}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} + @{numactions} +?{Dice mods|0} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button name="roll_force_sense_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{sensepowername} (Sense)}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod} +1d6@{wilddie}]]}}"></button>
+                <button name="roll_force_sense_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{sensepowername} (Sense)}} {{Roll=[[(@{sense} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 +@{sensepip} +@{Force_EmptinessMod} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
                 <label class="unified-dice unified-dice-text">
                   <input name="attr_sensepowername" type="text" list="forcesense" />
                 </label>
@@ -634,11 +684,11 @@
 
           <div id="force-alter" class="force attributes">
             <div class="attribute">
-              <button name="roll_force_alter" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Force:Alter}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} +?{Dice mods|0} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"></button>
-              <button name="roll_force_alter-w" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Force:Alter}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} +?{Dice mods|0} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_force_alter" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Force:Alter}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} + @{numactions} +?{Dice mods|0} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"></button>
+              <button name="roll_force_alter-w" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Force:Alter}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} + @{numactions} +?{Dice mods|0} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
 
-              <button name="roll_force_alter" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Force:Alter}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod}  +1d6@{wilddie}]]}}"></button>
-              <button name="roll_force_alter-w" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Force:Alter}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod}  +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_force_alter" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Force:Alter}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod}  +1d6@{wilddie}]]}}"></button>
+              <button name="roll_force_alter-w" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Force:Alter}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod}  +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
               <label class="unified-dice unified-dice-text">Alter</label>
               <input type="number" name="attr_alter" min="0" value="0" required="required" class="unified-dice unified-dice-input"/>
               <div class="unified-dice unified-dice-middle">D+</div>
@@ -647,10 +697,10 @@
 
             <fieldset class="repeating_alterpowers">
               <div class="skill">
-                <button name="roll_force_alter_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{alterpowername} (Alter)}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} +?{Dice mods|0} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"></button>
-                <button name="roll_force_alter_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{alterpowername} (Alter)}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} +?{Dice mods|0} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-                <button name="roll_force_alter_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{alterpowername} (Alter)}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod} +1d6@{wilddie}]]}}"></button>
-                <button name="roll_force_alter_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{alterpowername} (Alter)}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button name="roll_force_alter_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=@{alterpowername} (Alter)}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} + @{numactions} +?{Dice mods|0} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"></button>
+                <button name="roll_force_alter_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{alterpowername} (Alter)}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} + @{numactions} +?{Dice mods|0} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+                <button name="roll_force_alter_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=@{alterpowername} (Alter)}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod} +1d6@{wilddie}]]}}"></button>
+                <button name="roll_force_alter_p" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=@{alterpowername} (Alter)}} {{Roll=[[(@{alter} -@{WoundMod} +@{Force_Up} + @{numactions} -1)d6cf0cs0 +@{alterpip} +@{Force_EmptinessMod} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
                 <label class="unified-dice unified-dice-text">
                   <input name="attr_alterpowername" type="text" list="forcealter" />
                 </label>
@@ -700,7 +750,8 @@
       <div>
         <div class="weapon sheet-row">
           <div class="cell cell-name">Lightsaber combat</div>
-          <div class="cell cell-dice">Attack</div>
+          <div class="cell cell-dice">Lightsaber attack skill</div>
+          <div class="cell cell-dice">Lightsaber parry skill</div>
           <div class="cell cell-dice">Damage</div>
         </div>
 
@@ -712,10 +763,17 @@
           </div>
           <div class="cell cell-dice">
             <input name="attr_lightsaberskilldice" type="number" min="0" value="0" class="unified-dice unified-dice-input"/>D+<input name="attr_lightsaberskillpip" type="number" value="0" min="0" max="2" class="unified-dice unified-dice-pip"/>
-            <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod"                       value=      "&{template:swd6} {{name=Attack: @{lightsaberskill}}} {{Roll=[[(@{lightsaberskilldice} - @{WoundMod} + @{Force_Up} + @{sense} + ?{Dice mods|0} - 1)d6cf0cs0 + @{lightsaberskillpip} + @{sensepip} + @{Force_EmptinessMod} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
-            <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no"                    value=      "&{template:swd6} {{name=Attack: @{lightsaberskill}}} {{Roll=[[(@{lightsaberskilldice} - @{WoundMod} + @{Force_Up} + @{sense} - 1                 )d6cf0cs0 + @{lightsaberskillpip} + @{sensepip} + @{Force_EmptinessMod}                        + 1d6@{wilddie}]]}}"></button>
-            <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide"    value="/w gm &{template:swd6} {{name=Attack: @{lightsaberskill}}} {{Roll=[[(@{lightsaberskilldice} - @{WoundMod} + @{Force_Up} + @{sense} + ?{Dice mods|0} - 1)d6cf0cs0 + @{lightsaberskillpip} + @{sensepip} + @{Force_EmptinessMod} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
-            <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Attack: @{lightsaberskill}}} {{Roll=[[(@{lightsaberskilldice} - @{WoundMod} + @{Force_Up} + @{sense} - 1                 )d6cf0cs0 + @{lightsaberskillpip} + @{sensepip} + @{Force_EmptinessMod}                        + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+            <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod"                       value=      "&{template:swd6} {{name=Attack: @{lightsaberskill}}} {{Roll=[[(@{lightsaberskilldice} - @{WoundMod} + @{Force_Up} + @{numactions} + @{sense} + ?{Dice mods|0} - 1)d6cf0cs0 + @{lightsaberskillpip} + @{sensepip} + @{Force_EmptinessMod} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+            <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no"                    value=      "&{template:swd6} {{name=Attack: @{lightsaberskill}}} {{Roll=[[(@{lightsaberskilldice} - @{WoundMod} + @{Force_Up} + @{numactions} + @{sense} - 1                 )d6cf0cs0 + @{lightsaberskillpip} + @{sensepip} + @{Force_EmptinessMod}                        + 1d6@{wilddie}]]}}"></button>
+            <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide"    value="/w gm &{template:swd6} {{name=Attack: @{lightsaberskill}}} {{Roll=[[(@{lightsaberskilldice} - @{WoundMod} + @{Force_Up} + @{numactions} + @{sense} + ?{Dice mods|0} - 1)d6cf0cs0 + @{lightsaberskillpip} + @{sensepip} + @{Force_EmptinessMod} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+            <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Attack: @{lightsaberskill}}} {{Roll=[[(@{lightsaberskilldice} - @{WoundMod} + @{Force_Up} + @{numactions} + @{sense} - 1                 )d6cf0cs0 + @{lightsaberskillpip} + @{sensepip} + @{Force_EmptinessMod}                        + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+          </div>
+        <div class="cell cell-dice">
+            <input name="attr_lightsaberparryskilldice" type="number" min="0" value="0" class="unified-dice unified-dice-input"/>D+<input name="attr_lightsaberparryskillpip" type="number" value="0" min="0" max="2" class="unified-dice unified-dice-pip"/>
+            <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod"                       value=      "&{template:swd6} {{name=Attack: @{lightsaberskill}}} {{Roll=[[(@{lightsaberparryskilldice} - @{WoundMod} + @{Force_Up} + @{numactions} + @{sense} + ?{Dice mods|0} - 1)d6cf0cs0 + @{lightsaberskillpip} + @{sensepip} + @{Force_EmptinessMod} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+            <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no"                    value=      "&{template:swd6} {{name=Attack: @{lightsaberskill}}} {{Roll=[[(@{lightsaberparryskilldice} - @{WoundMod} + @{Force_Up} + @{numactions} + @{sense} - 1                 )d6cf0cs0 + @{lightsaberskillpip} + @{sensepip} + @{Force_EmptinessMod}                        + 1d6@{wilddie}]]}}"></button>
+            <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide"    value="/w gm &{template:swd6} {{name=Attack: @{lightsaberskill}}} {{Roll=[[(@{lightsaberparryskilldice} - @{WoundMod} + @{Force_Up} + @{numactions} + @{sense} + ?{Dice mods|0} - 1)d6cf0cs0 + @{lightsaberskillpip} + @{sensepip} + @{Force_EmptinessMod} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+            <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Attack: @{lightsaberskill}}} {{Roll=[[(@{lightsaberparryskilldice} - @{WoundMod} + @{Force_Up} + @{numactions} + @{sense} - 1                 )d6cf0cs0 + @{lightsaberskillpip} + @{sensepip} + @{Force_EmptinessMod}                        + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
           </div>
           <div class="cell cell-dice">
             <input name="attr_lightsaberdamagedice" type="number" value="0" min="0" class="unified-dice unified-dice-input"/>D+<input name="attr_lightsaberdamagepip" type="number" value="0" min="0" max="2" class="unified-dice unified-dice-pip"/>
@@ -845,18 +903,18 @@
             <span>Era</span>
             <input name="attr_current_era_name" type="text">
           </div>
-          <div class="flex-row">
+   <!--       <div class="flex-row">
             <span>Reproduction</span>
             <input name="attr_current_era_reproduction" type="text">
-          </div>
-          <div class="flex-row">
+          </div> -->
+    <!--      <div class="flex-row">
             <span>New-Old-Stock</span>
             <input name="attr_current_era_new_old" type="text">
           </div>
-          <div class="flex-row">
-            <span>Restored</span>
+          <div class="flex-row"> -->
+     <!--       <span>Restored</span>
             <input name="attr_current_era_price_restored" type="text">
-          </div>
+          </div> -->
           <div class="flex-row">
             <span>Used</span>
             <input name="attr_current_era_price_used" type="text">
@@ -867,26 +925,38 @@
       <div class="perf wborder">
         <h3>Performance</h3>
         <div class="perf-block">
-          <div class="flex-grow wborder" style="margin-right: 7px;">
-            <label class="medium">Crew Station:</label>
-            <input class="medium" name="attr_crew_station_performance" type="text">
-          </div>
-          <div class="flex-grow">
-            <label>Maneuverability:</label>
-            <input class="medium" name="attr_maneuverability" type="text">
-          </div>
-          <div class="flex-grow">
-            <label>Move (<abbr title="Space Unit">Space</abbr>)</label>
-            <input class="medium" name="attr_ship_space" type="text">
-          </div>
-          <div class="flex-grow">
-            <label>Move (<abbr title="Atmosphere (Ground Unit)">Atm.</abbr>)</label>
-            <input class="medium" name="attr_ship_ground" type="text">
-          </div>
-          <div class="flex-grow">
-            <label>Speed (<abbr title="Atmosphere (km/h)">Atm.</abbr>)</label>
-            <input class="medium" name="attr_ship_athmosphere" type="text">
-          </div>
+            <div class="flex-col wborder" style="margin-right: 7px;">
+                <label class="medium">Crew Station:</label>
+                <input class="medium" name="attr_crew_station_performance" type="text">
+                <label class="medium">Pilot Skill</label>
+                <div>
+                        <input type="number" name="attr_pilot_skill" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+                        <div class="unified-dice unified-dice-middle">D+</div>
+                        <input type="number" name="attr_pilotskillpip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+                        <button type="roll" name="roll_pilot_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Pilot Skill}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[((@{pilot_skill} + ?{Dice mods|0} -1)d6cf0cs7 + @{pilotskillpip} + ?{Other Mods(pip)|0} +  (1d6@{wilddie}))]]}}"></button>
+                </div>
+            </div>
+           <div class="flex-row">    
+                <div class="perf-grid">
+                    <label>Maneuverability:</label>
+                    <label>Move (<abbr title="Space Unit">Space</abbr>)</label>
+                    <label>Move (<abbr title="Atmosphere (Ground Unit)">Atm.</abbr>)</label>
+                    <label>Speed (kmh) (<abbr title="Atmosphere (km/h)">Atm.</abbr>)</label>
+                    
+                    <div>
+                        <input type="number" name="attr_maneuverability" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+                        <div class="unified-dice unified-dice-middle">D+</div>
+                        <input type="number" name="attr_maneuverabilitypip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+                        <button type="roll" name="roll_maneuverability" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Maneuverability}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[((@{maneuverability} + ?{Dice mods|0})d6cf0cs7 + @{maneuverabilitypip} + ?{Other Mods(pip)|0})]]}}"></button>
+                        <button type="roll"  name="roll_man_pilot" class="d6-dice" value="&{template:swd6} {{name=Piloting + Maneuverability}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[((@{pilot_skill} + @{maneuverability} + ?{Dice mods|0} - 1)d6cf0cs7 + @{pilotskillpip} + @{maneuverabilitypip} + ?{Other Mods(pip)|0} +  (1d6@{wilddie}))]]}}">P+M</button>
+                    </div>
+                  
+                    
+                    <input class="40px" name="attr_ship_space" type="number">
+                    <input class="mediumnumber" name="attr_ship_ground" type="number">
+                    <input class="mediumnumber" name="attr_ship_athmosphere" type="number">
+                </div>
+            </div>
         </div>
       </div>
 
@@ -896,25 +966,60 @@
           <div class="wborder">
             <label>Crew Station</label>
             <input class="medium" name="attr_crew_station_sensors" type="text">
+            <label class="medium">Sensors Skill</label>
+                <div>
+                        <input type="number" name="attr_sensor_skill" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+                        <div class="unified-dice unified-dice-middle">D+</div>
+                        <input type="number" name="attr_sensorskillpip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+                        <button type="roll" name="roll_sensor_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Sensors Skill}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[((@{sensor_skill} + ?{Dice mods|0} -1)d6cf0cs7 + @{sensorskillpip} + ?{Other Mods(pip)|0} +  (1d6@{wilddie}))]]}}"></button>
+                </div>
           </div>
           <div class="grid">
-            <div></div><!-- empty placeholder in the grid-->
-            <span>Search</span>
-            <span>Scan</span>
-            <span>Passive</span>
-            <span>Focus</span>
-
+            <div></div>
             <span>Range</span>
-            <input class="40px" name="attr_sensor_search" type="number"/>
-            <input class="40px" name="attr_sensor_scan" type="number"/>
-            <input class="40px" name="attr_sensor_passive" type="number"/>
-            <input class="40px" name="attr_sensor_focus" type="number"/>
-
             <span>Sensitivity</span>
-            <input class="40px" name="attr_sensor_search_max" type="number"/>
-            <input class="40px" name="attr_sensor_scan_max" type="number"/>
-            <input class="40px" name="attr_sensor_passive_max" type="number"/>
-            <input class="40px" name="attr_sensor_focus_max" type="number"/>
+            <span>Passive</span>
+            <span>
+                <input class="number" name="attr_sensor_passive_range" type="number"/>
+            </span>
+            <span>
+                <input type="number" name="attr_sensor_passive" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+                <div class="unified-dice unified-dice-middle">D+</div>
+                <input type="number" name="attr_sensor_passivepip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+                <button type="roll" name="roll_sensor_passive" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Sensors Passive}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{sensor_passive} + ?{Dice mods|0})d6cf0cs7 + ?{Other Mods(pip)|0}]]}}"></button>
+            </span>
+            <span>Scan</span>
+            <span>
+                <input class="number" name="attr_sensor_scan_range" type="number"/>
+            </span>
+            <span>
+                <input type="number" name="attr_sensor_scan" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+                <div class="unified-dice unified-dice-middle">D+</div>
+                <input type="number" name="attr_sensor_scanpip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+                <button type="roll" name="roll_sensor_scan" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Sensors Scan}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{sensor_scan} + ?{Dice mods|0})d6cf0cs7 + ?{Other Mods(pip)|0}]]}}"></button>
+            </span>
+            <span>Search</span>
+            <span>
+                <input class="40px" name="attr_sensor_search_range" type="number"/>
+            </span>
+            <span>
+                <input type="number" name="attr_sensor_search" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+                <div class="unified-dice unified-dice-middle">D+</div>
+                <input type="number" name="attr_sensor_searchpip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+                <button type="roll" name="roll_sensor_search" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Sensors Search}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{sensor_search} + ?{Dice mods|0})d6cf0cs7 + ?{Other Mods(pip)|0}]]}}"></button>
+            </span>
+
+
+            <span>Focus</span>
+            <span>
+                <input type="number" name="attr_sensor_focus_range" type="number"/>
+            </span>
+            <span>
+                <input type="number" name="attr_sensor_focus" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+                <div class="unified-dice unified-dice-middle">D+</div>
+                <input type="number" name="attr_sensor_focuspip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+                <button type="roll" name="roll_sensor_focus" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Sensors Focus}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{sensor_focus} + ?{Dice mods|0})d6cf0cs7 + ?{Other Mods(pip)|0}]]}}"></button>
+            </span>
           </div>
         </div>
       </div>
@@ -922,53 +1027,72 @@
       <div class="hyperdrive wborder">
         <h3>Hyperdrive System</h3>
         <div class="flex-row">
-          <div class="wborder crew">
-            <label>Crew Station</label>
-            <input class="medium" name="attr_crew_station_hyperdrive" type="text">
-          </div>
+
           <div class="hyper-grid">
-            <label>Astrogation System</label>
-            <label>Hyperdrive Integration</label>
+            <label>Nav Computer</label>
+            <label>Astromech</label>
+            <label>Jump Capacity (jumps)</label>
             <label>Hyperdrive Rating</label>
+            <label>Backup Rating</label>
 
             <input name="attr_astrogation_system" type="text">
-            <input name="attr_hyperdrive_integration" type="text">
-            <input name="attr_hyperdrive_rating" type="text">
-
-            <label>Astromech</label>
-            <label>Jump Route Capacity</label>
-            <label>Kilo-Parsecs / Hour</label>
-
             <input name="attr_astromech" type="text">
-            <input name="attr_jump_capacity" type="text">
-            <input name="attr_parsec_speed" type="text">
+            <input name="attr_jump_capacity" type="number">
+            <input name="attr_hyperdrive_rating" type="text">
+            <input name="attr_backup_rating" type="text">
           </div>
         </div>
 
       </div>
 
-      <div class="consume wborder flex-box flex-row-nowrap flex-gap">
+     <!-- <div class="consume wborder flex-box flex-row-nowrap flex-gap">
           <label>Consumables:</label>
           <input name="attr_ship_consumables" type="text">
 
           <label>Max:</label>
           <input name="attr_ship_consumables_max" type="text">
-      </div>
+      </div> -->
 
       <div class="dura wborder">
-        <label>Durability:</label>
-        <label>Hull:</label>
-        <label>Shields:</label>
-        <div>
-          <input name="attr_ship_durability" type="text">
+          <h3>Shields and Hull</h3>
+        <div class="flex-row">
+        <div class="wborder crew">
+            <label>Crew Station</label>
+            <input class="medium" name="attr_crew_station_shields" type="text">
         </div>
+        <div class="dura-grid">
+        <label>Hull</label>
         <div>
-          <input name="attr_ship_hull" type="text">
+            <input type="number" name="attr_hull" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+            <div class="unified-dice unified-dice-middle">D+</div>
+            <input type="number" name="attr_hullpip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+            <button type="roll" name="roll_hull" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Hull}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{hull} + ?{Dice mods|0} - 1)d6cf0cs7 + @{hullpip} + ?{Other Mods(pip)|0} + (1d6@{wilddie})]]}}"></button>
         </div>
+        <label>Shields</label>
         <div>
-          <input name="attr_ship_shields" type="text">
+            <input type="number" name="attr_shield" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+            <div class="unified-dice unified-dice-middle">D+</div>
+            <input type="number" name="attr_shieldpip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+            <button type="roll" name="roll_shield" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Shield}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{shield} + ?{Dice mods|0})d6cf0cs7 + @{shieldpip} + ?{Other Mods(pip)|0}]]}}"></button>
+        
+        </div>
+
+        <label>Shield Skill</label>
+        <div>
+            <input type="number" name="attr_shield_skill" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+            <div class="unified-dice unified-dice-middle">D+</div>
+            <input type="number" name="attr_shieldskillpip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+            <button type="roll" name="roll_shield" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Shield skill roll}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{shield_skill} + ?{Dice mods|0} - 1)d6cf0cs7 + @{shieldskillpip} + ?{Other Mods(pip)|0} +  (1d6@{wilddie})]]}}"></button>
+        
+        </div>
+        <label>Hull + Shields</label>
+        <div>
+            <button type="roll" name="roll_durability" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Hull and Shields}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{hull} + @{shield} + ?{Dice mods|0} - 1)d6cf0cs7 + @{hullpip} + @{shieldpip} + ?{Other Mods(pip)|0} + (1d6@{wilddie})]]}}"></button>
         </div>
       </div>
+      </div>
+    </div>
+
     </div>
 
     <!-- --------------------------------------------------- Ship Weapons ------------------------------------------ -->
@@ -989,6 +1113,10 @@
           <div class="flex-box flex-row-nowrap flex-gap">
             <div class="flex-box flex-row-nowrap"><label>Crew</label> <input name="attr_weapon_crew" type="text" value=""></div>
             <div class="flex-box flex-row-nowrap"><label>Skill</label> <input name="attr_weapon_skill" type="text" value=""></div> 
+          </div>
+          <div class="flex-box flex-row-nowrap flex-gap">
+            <div class="flex-box flex-row-nowrap"><label>Ammo</label> <input name="attr_weapon_ammo" type="text" value=""></div>
+            <div class="flex-box flex-row-nowrap"><label>Notes</label> <input name="attr_weapon_notes" type="text" value=""></div> 
           </div>
         </div>
 
@@ -1014,17 +1142,24 @@
             <input class="mediumnumber" name="attr_weapon_range_atmosphere" type="number" value=""> /
             <input class="mediumnumber" name="attr_weapon_range_atmosphere_l" type="number" value="">
           </div>
+          <label>Gunnery Skill</label>
+          <div>
+            <input class="mediumnumber" name="attr_weapon_gunnery_skill" type="number" value="0"> D+
+            <input class="mediumnumber" name="attr_weapon_gunnery_skill_pip" type="number" value="0">
+            <button class="d6-dice" name="roll_ship_wpn_skill" type="roll" value="&{template:swd6} {{name=Weapon: @{weapon_name} Gunnery Skill}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{weapon_gunnery_skill} + ?{Dice mods|0} - 1)d6cf0cs0 + @{weapon_gunnery_skill_pip} + ?{Other mods (pip)|0} + (1d6@{wilddie})]]}}">SKL</button>
+          </div>
           <label>Fire Control</label>
           <div>
             <input class="mediumnumber" name="attr_weapon_fire_control" type="number" value="0"> D+
             <input class="mediumnumber" name="attr_weapon_fire_control_pip" type="number" value="0">
-            <button class="d6-dice" name="roll_ship_wpn_attack" type="roll" value="&{template:swd6} {{name=Weapon: @{weapon_name} Attack}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{weapon_fire_control} + ?{Dice mods|0} - 1)d6cf0cs0 + @{weapon_fire_control_pip} + ?{Other mods (pip)|0} + (1d6@{wilddie})]] damage}}">ATK</button>
+            <button class="d6-dice" name="roll_ship_wpn_fc" type="roll" value="&{template:swd6} {{name=Weapon: @{weapon_name} Fire Control}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{weapon_fire_control} + ?{Dice mods|0})d6cf0cs0 + @{weapon_fire_control_pip} + ?{Other mods (pip)|0}]]}}">FC</button>
+            <button class="d6-dice" name="roll_ship_wpn_attack" type="roll" value="&{template:swd6} {{name=Weapon: @{weapon_name} Fire Control}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{weapon_gunnery_skill} + @{weapon_fire_control} + ?{Dice mods|0} - 1)d6cf0cs0 + @{weapon_gunnery_skill_pip} + @{weapon_fire_control_pip} + ?{Other mods (pip)|0} + (1d6@{wilddie})]]}}">ATK</button>
           </div>
           <label>Damage</label>
           <div>
             <input class="mediumnumber" name="attr_weapon_damage" type="number" value="3"> D+
             <input class="mediumnumber" name="attr_weapon_damage_pip" type="number" value="0">
-            <button class="d6-dice" name="roll_ship_wpn_dmg" type="roll" value="&{template:swd6} {{name=Weapon: @{weapon_name} Damage }} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{weapon_damage} - 1)d6cf0cs0 + @{weapon_damage_pip} +(1d6@{wilddie})]] damage}}">DMG</button>
+            <button class="d6-dice" name="roll_ship_wpn_dmg" type="roll" value="&{template:swd6} {{name=Weapon: @{weapon_name} Damage }} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{weapon_damage} + ?{Dice mods|0} - 1)d6cf0cs0 + @{weapon_damage_pip} + ?{Other mods (pip)|0} +(1d6@{wilddie})]] damage}}">DMG</button>
           </div>
         </div>
       </fieldset>
@@ -1047,17 +1182,28 @@
       <div class="other flex-box flex-row-nowrap flex-gap">
         <span class="bold">Crew:</span>
         <input class="mediumnumber" name="attr_ship_crew" type="number">
+        
+        <span class="bold">Skeleton:</span>
+        <input class="mediumnumber" name="attr_ship_skel_crew" type="number">
+        <span class="bold">+</span>
+        <input class="mediumnumber" name="attr_ship_skel_diff" type="number">
+        
+        <span class="bold">Gunners:</span>
+        <input class="mediumnumber" name="attr_ship_gunners" type="number">
+        
 
+      </div>
+      
+      <div class="other flex-box flex-row-nowrap flex-gap">
+        <span class="bold">Passengers:</span>
+        <input class="mediumnumber" name="attr_ship_passangers" type="number">
+        
         <span class="bold">Skill:</span>
         <input name="attr_ship_skill" type="text">
-
-        <span class="bold">Passangers:</span>
-        <input class="mediumnumber" name="attr_ship_passangers" type="number">
       </div>
       <div class="other flex-box flex-row-nowrap flex-gap">
-        <span class="bold">Hyperdrive Multipiler:<input name="attr_hyperdrive_multi" class="p90" type="text"></span>
-        <span class="bold">Hyperdrive Backup:<input name="attr_hyperdrive_backup" type="text"></span>
-        <span class="bold">Nav Computer:<input name="attr_nav_computer" type="text"></span>
+        <span class="bold">Current Consumables:<input name="attr_consumables" class="p90" type="text"></span>
+        <span class="bold">Max Consumables:<input name="attr_consumables_max" type="text"></span>
       </div>
     </div>
 
@@ -1066,17 +1212,234 @@
     <div class="section ship">
       <div class="sheet-2colrow">
         <div class="sheet-col"><!-- Vehicle -->
-          <h3>Vehicle</h3>
-          <input class="skilltext" name="attr_vehiclename" type="text"/>
-          <textarea name="attr_vehicle"></textarea>
+          <h3>Notes</h3>
+          <textarea name="attr_notes"></textarea>
         </div>
         <div class="sheet-col"><!-- Starship -->
-          <h3>Starship</h3>
-          <input class="skilltext" name="attr_starshipname" type="text"/>
-          <textarea name="attr_starship"></textarea>
+          <h3>Ship Equipment</h3>
+          <textarea name="attr_starshipequip"></textarea>
         </div>
       </div>
     </div>
+
+<!-- ------------------------------------------------- Vehicle Core info ------------------------------------------ -->
+
+    <div class="section vehicle vehicleheader">
+      <span class="bold">Vehicle:<input name="attr_vehicle_name" type="text"></span>
+      <span class="bold">Scale:<input name="attr_vehicle_scale" type="text"></span>
+      <span class="bold">Length:<input name="attr_vehicle_length" type="text"></span>
+    </div>
+
+    <div class="section vehicle vehicleblock">
+      <div class="price wborder">
+        <h3>Pricing</h3>
+        <label>Introduction Era</label>
+        <div class="priceblock wborder">
+          <div class="flex-row">
+            <span>Era</span>
+            <input name="attr_intro_era_name" type="text">
+          </div>
+          <div class="flex-row">
+            <span>New</span>
+            <input name="attr_intro_era_price_new" type="text">
+          </div>
+          <div class="flex-row">
+            <span>Used</span>
+            <input name="attr_intro_era_price_used" type="text">
+          </div>
+        </div>
+        <label>Current Era:</label>
+        <div class="priceblock wborder">
+          <div class="flex-row">
+            <span>Era</span>
+            <input name="attr_current_era_name" type="text">
+          </div>
+
+          <div class="flex-row">
+            <span>Used</span>
+            <input name="attr_current_era_price_used" type="text">
+          </div>
+        </div>
+      </div>
+
+      <div class="perf wborder">
+        <h3>Performance</h3>
+        <div class="perf-block">
+            <div class="flex-col wborder" style="margin-right: 7px;">
+                <label class="medium">Crew Station:</label>
+                <input class="medium" name="attr_crew_station_performance" type="text">
+                <label class="medium">Pilot Skill</label>
+                <div>
+                        <input type="number" name="attr_pilot_skill" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+                        <div class="unified-dice unified-dice-middle">D+</div>
+                        <input type="number" name="attr_pilotskillpip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+                        <button type="roll" name="roll_pilot_skill" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Pilot Skill}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[((@{pilot_skill} + ?{Dice mods|0} -1)d6cf0cs7 + @{pilotskillpip} + ?{Other Mods(pip)|0} +  (1d6@{wilddie}))]]}}"></button>
+                </div>
+            </div>
+           <div class="flex-row">    
+                <div class="perf-grid">
+                    <label>Maneuverability:</label>
+                    <label>Move (<abbr title="Atmosphere (Ground Unit)">Atm.</abbr>)</label>
+                    <label>Speed (kmh) (<abbr title="Atmosphere (km/h)">Atm.</abbr>)</label>
+                    
+                    <div>
+                        <input type="number" name="attr_maneuverability" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+                        <div class="unified-dice unified-dice-middle">D+</div>
+                        <input type="number" name="attr_maneuverabilitypip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+                        <button type="roll" name="roll_maneuverability" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Maneuverability}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[((@{maneuverability} + ?{Dice mods|0})d6cf0cs7 + @{maneuverabilitypip} + ?{Other Mods(pip)|0})]]}}"></button>
+                        <button type="roll"  name="roll_man_pilot" class="d6-dice" value="&{template:swd6} {{name=Piloting + Maneuverability}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[((@{pilot_skill} + @{maneuverability} + ?{Dice mods|0} - 1)d6cf0cs7 + @{maneuverabilitypip} + ?{Other Mods(pip)|0} +  (1d6@{wilddie}))]]}}">P+M</button>
+                    </div>
+                    <input class="mediumnumber" name="attr_ship_ground" type="number">
+                    <input class="mediumnumber" name="attr_ship_athmosphere" type="number">
+                </div>
+            </div>
+        </div>
+      </div>
+
+     <!-- <div class="consume wborder flex-box flex-row-nowrap flex-gap">
+          <label>Consumables:</label>
+          <input name="attr_ship_consumables" type="text">
+
+          <label>Max:</label>
+          <input name="attr_ship_consumables_max" type="text">
+      </div> -->
+
+      <div class="dura wborder">
+          <h3>Body</h3>
+        <div class="flex-row">
+        <div class="wborder crew">
+            <label>Crew Station</label>
+            <input class="medium" name="attr_crew_station_shields" type="text">
+        </div>
+        <div class="dura-grid">
+        <label>Body</label>
+        <div>
+            <input type="number" name="attr_hull" value="0" min="0" required="required" class="unified-dice unified-dice-input"/>
+            <div class="unified-dice unified-dice-middle">D+</div>
+            <input type="number" name="attr_hullpip" value="0" min="0" max="2" required="required" class="unified-dice unified-dice-pip"/>
+            <button type="roll" name="roll_hull" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Hull}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{hull} + ?{Dice mods|0} - 1)d6cf0cs7 + @{hullpip} + ?{Other Mods(pip)|0} + (1d6@{wilddie})]]}}"></button>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    </div>
+
+    <!-- --------------------------------------------------- Vehicle Weapons ------------------------------------------ -->
+
+    <div class="section vehicle">
+      <label>Vehicle Weapons</label>
+
+      <fieldset class="repeating_vehicleweapon">
+        <div class="weapon-info flex-box flex-col-nowrap">
+          <div class="flex-box flex-row-nowrap flex-gap">
+            <div class="name flex-box flex-row-nowrap"><label>Name</label> <input name="attr_weapon_name" type="text" placeholder="Name"></div>
+            <div class="flex-box flex-row-nowrap"><label>Scale</label> <input name="attr_weapon_scale" type="text" value=""></div>
+          </div>
+          <div class="flex-box flex-row-nowrap flex-gap">
+            <div class="flex-box flex-row-nowrap"><label>Fire Arc</label> <input name="attr_weapon_arc" type="text" value=""></div>
+            <div class="flex-box flex-row-nowrap"><label>Location</label> <input name="attr_weapon_location" type="text" value=""></div>
+          </div>
+          <div class="flex-box flex-row-nowrap flex-gap">
+            <div class="flex-box flex-row-nowrap"><label>Crew</label> <input name="attr_weapon_crew" type="text" value=""></div>
+            <div class="flex-box flex-row-nowrap"><label>Skill</label> <input name="attr_weapon_skill" type="text" value=""></div> 
+          </div>
+          <div class="flex-box flex-row-nowrap flex-gap">
+            <div class="flex-box flex-row-nowrap"><label>Ammo</label> <input name="attr_weapon_ammo" type="text" value=""></div>
+            <div class="flex-box flex-row-nowrap"><label>Notes</label> <input name="attr_weapon_notes" type="text" value=""></div> 
+          </div>
+        </div>
+
+        <div class="weapon-grid">
+          <label></label>
+          <div>
+            <abbr title="Point Blank (Very Easy)" class="range">PB</abbr> -
+            <abbr title="Short Range (Easy)" class="range">S</abbr> /
+            <abbr title="Medium Range (Moderate)" class="range">M</abbr> /
+            <abbr title="Long Range (Hard)" class="range">L</abbr>
+          </div>
+          <label>Space Range</label>
+          <div>
+            <input class="mediumnumber" name="attr_weapon_range_space_pb" type="number" value=""> -
+            <input class="mediumnumber" name="attr_weapon_range_space_s" type="number" value=""> /
+            <input class="mediumnumber" name="attr_weapon_range_space" type="number" value=""> /
+            <input class="mediumnumber" name="attr_weapon_range_space_l" type="number" value="">
+          </div>
+          <label>Atmosphere Range</label>
+          <div>
+            <input class="mediumnumber" name="attr_weapon_range_atmosphere_pb" type="number" value=""> -
+            <input class="mediumnumber" name="attr_weapon_range_atmosphere_s" type="number" value=""> /
+            <input class="mediumnumber" name="attr_weapon_range_atmosphere" type="number" value=""> /
+            <input class="mediumnumber" name="attr_weapon_range_atmosphere_l" type="number" value="">
+          </div>
+          <label>Gunnery Skill</label>
+          <div>
+            <input class="mediumnumber" name="attr_weapon_gunnery_skill" type="number" value="0"> D+
+            <input class="mediumnumber" name="attr_weapon_gunnery_skill_pip" type="number" value="0">
+            <button class="d6-dice" name="roll_ship_wpn_skill" type="roll" value="&{template:swd6} {{name=Weapon: @{weapon_name} Gunnery Skill}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{weapon_gunnery_skill} + ?{Dice mods|0} - 1)d6cf0cs0 + @{weapon_gunnery_skill_pip} + ?{Other mods (pip)|0} + (1d6@{wilddie})]]}}">SKL</button>
+          </div>
+          <label>Fire Control</label>
+          <div>
+            <input class="mediumnumber" name="attr_weapon_fire_control" type="number" value="0"> D+
+            <input class="mediumnumber" name="attr_weapon_fire_control_pip" type="number" value="0">
+            <button class="d6-dice" name="roll_ship_wpn_fc" type="roll" value="&{template:swd6} {{name=Weapon: @{weapon_name} Fire Control}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{weapon_fire_control} + ?{Dice mods|0})d6cf0cs0 + @{weapon_fire_control_pip} + ?{Other mods (pip)|0}]]}}">FC</button>
+            <button class="d6-dice" name="roll_ship_wpn_attack" type="roll" value="&{template:swd6} {{name=Weapon: @{weapon_name} Fire Control}} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{weapon_gunnery_skill} + @{weapon_fire_control} + ?{Dice mods|0} - 1)d6cf0cs0 + @{weapon_gunnery_skill_pip} + @{weapon_fire_control_pip} + ?{Other mods (pip)|0} + (1d6@{wilddie})]]}}">ATK</button>
+          </div>
+          <label>Damage</label>
+          <div>
+            <input class="mediumnumber" name="attr_weapon_damage" type="number" value="3"> D+
+            <input class="mediumnumber" name="attr_weapon_damage_pip" type="number" value="0">
+            <button class="d6-dice" name="roll_ship_wpn_dmg" type="roll" value="&{template:swd6} {{name=Weapon: @{weapon_name} Damage }} {{subtitle=Ship: @{ship_name} }} {{Roll=[[(@{weapon_damage} + ?{Dice mods|0} - 1)d6cf0cs0 + @{weapon_damage_pip} + ?{Other mods (pip)|0} +(1d6@{wilddie})]] damage}}">DMG</button>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- ------------------------------------------------- Unused ship stats --------------------------------------- -->
+
+    <div class="section vehicle flex-box flex-col-nowrap">
+      <h3>Other Ship Stats</h3>
+      <div class="other flex-box flex-row-nowrap flex-gap" style="height: 30px;">
+        <span class="bold">Craft:</span>
+        <input name="attr_ship_craft" type="text">
+
+        <span class="bold">Type:</span>
+        <input name="attr_ship_type" type="text">
+
+        <span class="bold cargo">Cargo Capacity:</span>
+        <input name="attr_ship_cargo_capacity" class="p90" type="text">
+      </div>
+      <div class="other flex-box flex-row-nowrap flex-gap">
+        <span class="bold">Crew:</span>
+        <input class="mediumnumber" name="attr_ship_crew" type="number">
+
+        <span class="bold">Skill:</span>
+        <input name="attr_ship_skill" type="text">
+
+        <span class="bold">Passengers:</span>
+        <input class="mediumnumber" name="attr_ship_passangers" type="number">
+      </div>
+      <div class="other flex-box flex-row-nowrap flex-gap">
+        <span class="bold">Current Consumables:<input name="attr_consumables" class="p90" type="text"></span>
+        <span class="bold">Max Consumables:<input name="attr_consumables_max" type="text"></span>
+      </div>
+    </div>
+
+    <!-- -----------------------------------------------Generic Ship&Vehicle section ------------------------------- -->
+
+    <div class="section vehicle">
+      <div class="sheet-2colrow">
+        <div class="sheet-col"><!-- Vehicle -->
+          <h3>Notes</h3>
+          <textarea name="attr_vehiclenotes"></textarea>
+        </div>
+        <div class="sheet-col"><!-- Starship -->
+          <h3>Cargo</h3>
+          <textarea name="attr_cargonotes"></textarea>
+        </div>
+      </div>
+    </div>
+
 
     <!-- ------------------------------------------------------- Footer -------------------------------------------- -->
 
@@ -1091,6 +1454,8 @@
 
 <input name="attr_Force_EmptinessMod" type="hidden" value="0">
 <input name="attr_WoundMod" type="hidden" value="0">
+<input name="attr_dexMod" type="hidden" value="0">
+<input name="attr_dexPipMod" type="hidden" value="0">
 <input name="attr_credit_spent" type="hidden" value="0">
 
 <!-- ----------------------------------  Datalist ------------------------------------------------------------------ -->
@@ -1102,48 +1467,39 @@
   <option value="Bowcaster">Bowcaster</option>
   <option value="Bows">Bows</option>
   <option value="Brawling Parry">Brawling Parry</option>
-  <option value="Contortions">Contortions</option>
   <option value="Dancing">Dancing</option>
   <option value="Dodge">Dodge</option>
   <option value="Firearms">Firearms</option>
   <option value="Grenade">Grenade</option>
   <option value="Lightsaber">Lightsaber</option>
+  <option value="Martial Arts">Martial Arts</option>  
   <option value="Melee Combat">Melee Combat</option>
   <option value="Melee Parry">Melee Parry</option>
   <option value="Missile Weapon">Missile Weapon</option>
+  <option value="Musical Instrument">Musical Instrument</option>
   <option value="Pick Pocket">Pick Pocket</option>
   <option value="Running">Running</option>
-  <option value="Shockball Fling">Shockball Fling</option>
-  <option value="Shockball Scoop">Shockball Scoop</option>
-  <option value="Slingshot">Slingshot</option>
   <option value="Thrown Weapons">Thrown Weapons</option>
   <option value="Vehicle Blasters">Vehicle Blasters</option>
-  <option value="Wedsphere">Wedsphere</option>
 </datalist>
 <datalist id="knowskills">
-  <option value="Accounting">Accounting</option>
   <option value="Agriculture">Agriculture</option>
   <option value="Alien Species">Alien Species</option>
   <option value="Artist">Artist</option>
   <option value="Brainwashing">Brainwashing</option>
   <option value="Bureaucracy">Bureaucracy</option>
-  <option value="Business Administration">Business Administration</option>
   <option value="Business">Business</option>
   <option value="Culinary Arts">Culinary Arts</option>
   <option value="Cultures">Cultures</option>
-  <option value="Drink Mixology">Drink Mixology</option>
   <option value="Economics">Economics</option>
-  <option value="Home Economics">Home Economics</option>
   <option value="Intimidation">Intimidation</option>
   <option value="Languages">Languages</option>
   <option value="Law Enforcement">Law Enforcement</option>
   <option value="Military History">Military History</option>
   <option value="Planetary Systems">Planetary Systems</option>
-  <option value="Shockball">Shockball</option>
   <option value="Streetwise">Streetwise</option>
   <option value="Survival">Survival</option>
   <option value="Tactics">Tactics</option>
-  <option value="Traffic Control">Traffic Control</option>
   <option value="Torture">Torture</option>
   <option value="Value">Value</option>
   <option value="Willpower">Willpower</option>
@@ -1152,32 +1508,31 @@
   <option value="Airship Operation">Airship Operation</option>
   <option value="Aquatic Ship Operation">Aquatic Ship Operation</option>
   <option value="Archaic Starship Piloting">Archaic Starship Piloting</option>
-  <option value="Astrogation Calculating">Astrogation Calculating</option>
+  <option value="Astrogation Calculating">Astrogation</option>
   <option value="Beast Handling">Beast Handling</option>
   <option value="Beast Riding">Beast Riding</option>
   <option value="Capital Ship Gunnery">Capital Ship Gunnery</option>
   <option value="Capital Ship Piloting">Capital Ship Piloting</option>
   <option value="Capital Ship Shields">Capital Ship Shields</option>
   <option value="Ground Vehicle Operation">Ground Vehicle Operation</option>
-  <option value="Holorecorder Operation">Holorecorder Operation</option>
-  <option value="Household Appliance Operation">Household Appliance Operation</option>
   <option value="Hover Vehicle Operation">Hover Vehicle Operation</option>
   <option value="Jet Pack Operation">Jet Pack Operation</option>
+  <option value="Jet Pack Operation">Jet Pack / Rocket Pack Operation</option>
   <option value="Machinery Operation">Machinery Operation</option>
-  <option value="Musical Instrument">Musical Instrument</option>
   <option value="Powersuit Operation">Powersuit Operation</option>
   <option value="Repulsorlift Operation">Repulsorlift Operation</option>
   <option value="Sailed Nautical Vessel Operation">Sailed Nautical Vessel Operation</option>
-  <option value="Sensors Operation">Sensors Operation</option>
+  <option value="Sensors Operation">Sensors</option>
   <option value="Space Transports">Space Transports</option>
   <option value="Starfighter Piloting">Starfighter Piloting</option>
+  <option value="Starship Piloting">Starship Piloting</option>
   <option value="Starship Gunnery">Starship Gunnery</option>
   <option value="Starship Shields">Starship Shields</option>
   <option value="Swoop Operation">Swoop Operation</option>
   <option value="Undersea Vehicle Operation">Undersea Vehicle Operation</option>
   <option value="Walker Operation">Walker Operation</option>
 </datalist>
-<datalist id="perskills">
+<datalist id="perckills">
   <option value="Bargain">Bargain</option>
   <option value="Command">Command</option>
   <option value="Con">Con</option>
@@ -1193,17 +1548,13 @@
 </datalist>
 <datalist id="strskills">
   <option value="Brawling">Brawling</option>
-  <option value="Cleaning">Cleaning</option>
   <option value="Climbing/Jumping">Climbing/Jumping</option>
-  <option value="Digging">Digging</option>
   <option value="Stamina">Stamina</option>
   <option value="Swimming">Swimming</option>
 </datalist>
 <datalist id="techskills">
   <option value="(A)Aquatic Vehicle Engineering">(A)Aquatic Vehicle Engineering</option>
   <option value="Aquatic Vehicle Repair">Aquatic Vehicle Repair</option>
-  <option value="Archaic Gun Repair">Archaic Gun Repair</option>
-  <option value="Armor Design">Armor Design</option>
   <option value="Armor Repair">Armor Repair</option>
   <option value="(A)Armor Engneering">(A)Armor Engneering</option>
   <option value="(A)Battle Station Engineering">(A)Battle Station Engineering</option>
@@ -1214,10 +1565,8 @@
   <option value="Blaster Repair">Blaster Repair</option>
   <option value="(A)Blaster Engineering">(A)Blaster Engineering</option>
   <option value="Bowcaster Repair">Bowcaster Repair</option>
-  <option value="Bow Repair Repairing">Bow Repair Repairing</option>
   <option value="(A)Capital Ship Engineering">(A)Capital Ship Engineering</option>
   <option value="Capital Ship Repair">Capital Ship Repair</option>
-  <option value="Communications Repair">Communications Repair</option>
   <option value="(A)Computer Engineering">(A)Computer Engineering</option>
   <option value="Computer Programming/Repair">Computer Programming/Repair</option>
   <option value="Construction">Construction</option>
@@ -1231,33 +1580,22 @@
   <option value="First Aid">First Aid</option>
   <option value="(A)Ground Vehicle Engineering">(A)Ground Vehicle Engineering</option>
   <option value="Ground Vehicle Repair">Ground Vehicle Repair</option>
-  <option value="Holorecorder Repair">Holorecorder Repair</option>
   <option value="(A)Hover Vehicle Engineering">(A)Hover Vehicle Engineering</option>
   <option value="Hover Vehicle Repair">Hover Vehicle Repair</option>
-  <option value="(A)Jet Pack Engineering">(A)Jet Pack Engineering</option>
-  <option value="Jet Pack Repair">Jet Pack Repair</option>
   <option value="Lightsaber Repair">Lightsaber Repair</option>
   <option value="Machinery Repair">Machinery Repair</option>
   <option value="(A) Medicine">(A) Medicine</option>
-  <option value="Melee Weapon Construction">Melee Weapon Construction</option>
-  <option value="Melee Weapon Repair">Melee Weapon Repair</option>
-  <option value="Musical Instrument Repair">Musical Instrument Repair</option>
-  <option value="Powersuit Repair">Powersuit Repair</option>
-  <option value="Prosthetic Design">Prosthetic Design</option>
-  <option value="Prosthetic Repair">Prosthetic Repair</option>
   <option value="(A)Repulsorlift Engineering">(A)Repulsorlift Engineering</option>
   <option value="Repulsorlift Repair">Repulsorlift Repair</option>
   <option value="Rocket Pack Repair">Rocket Pack Repair</option>
   <option value="Sailed Nautical Vessel Repair">Sailed Nautical Vessel Repair</option>
-  <option value="Security Bypassing">Security Bypassing</option>
+  <option value="Security">Security</option>
   <option value="(A)Space Transports Engineering">(A)Space Transports Engineering</option>
   <option value="Space Transports Repair">Space Transports Repair</option>
   <option value="(A)Starfighter Engineering">(A)Starfighter Engineering</option>
   <option value="Starfighter Repair">Starfighter Repair</option>
   <option value="(A)Starship Weapon Engineering">(A)Starship Weapon Engineering</option>
   <option value="Starship Weapon Repair">Starship Weapon Repair</option>
-  <option value="(A)Swoop Engineering">(A)Swoop Engineering</option>
-  <option value="Swoop Repair">Swoop Repair</option>
   <option value="(A)Walker Engineering">(A)Walker Engineering</option>
   <option value="Walker Repair">Walker Repair</option>
 </datalist>
@@ -1929,62 +2267,81 @@ const repeatingSum = (destination, section, fields, multiplier = 1) => {
 
 on("change:painresist change:woundlevel", function() {
    getAttrs(["WoundLevel", "PainResist","WoundMod"], function(values) {
-	if(values.WoundLevel == "0"){
-		var update = {};
-		update.WoundMod = "0";
-		setAttrs(update);
-	}
-	else if(values.WoundLevel == "1"){
-		var update = {};
-		update.WoundMod = "1";
-		setAttrs(update);
-	}
-	else if(values.WoundLevel == "2"){
-		if(values.PainResist == "true"){
-			var update = {};
-			update.WoundMod = "1";
-			setAttrs(update);
-		} else {
-		  var update = {};
-			update.WoundMod = "2";
-			setAttrs(update);
-		}
-	}
-	else if(values.WoundLevel == "5"){
-		if(values.PainResist == "true"){
-			var update = {};
-			update.WoundMod = "1";
-			setAttrs(update);
-		} else {
-			var update = {};
-			update.WoundMod = "5";
-			setAttrs(update);
-		}
-	}
+  if(values.WoundLevel == "0"){
+    var update = {};
+    update.WoundMod = "0";
+    setAttrs(update);
+  }
+  else if(values.WoundLevel == "1"){
+    var update = {};
+    update.WoundMod = "1";
+    setAttrs(update);
+  }
+  else if(values.WoundLevel == "2"){
+    if(values.PainResist == "true"){
+      var update = {};
+      update.WoundMod = "1";
+      setAttrs(update);
+    } else {
+      var update = {};
+      update.WoundMod = "2";
+      setAttrs(update);
+    }
+  }
+  else if(values.WoundLevel == "5"){
+    if(values.PainResist == "true"){
+      var update = {};
+      update.WoundMod = "1";
+      setAttrs(update);
+    } else {
+      var update = {};
+      update.WoundMod = "5";
+      setAttrs(update);
+    }
+  }
    });
 });
 
 on("change:force_emptiness change:darksidepoints", function() {
    getAttrs(["Force_Emptiness","darkSidePoints"], function(values) {
-		let v_Force_Emptiness = values.Force_Emptiness;
-		let v_Force_EmptinessMod = 0;
-		let v_darkSidePoints = parseInt(values.darkSidePoints)||0;
+    let v_Force_Emptiness = values.Force_Emptiness;
+    let v_Force_EmptinessMod = 0;
+    let v_darkSidePoints = parseInt(values.darkSidePoints)||0;
 
-		if(v_Force_Emptiness == "true"){
-			v_Force_EmptinessMod = 6 - v_darkSidePoints;
-		}
-		setAttrs({
-			Force_EmptinessMod:v_Force_EmptinessMod
-		});
+    if(v_Force_Emptiness == "true"){
+      v_Force_EmptinessMod = 6 - v_darkSidePoints;
+    }
+    setAttrs({
+      "Force_EmptinessMod":v_Force_EmptinessMod
+    });
    });
 });
 
 on("change:repeating_credittable remove:repeating_credittable", function() {
-	repeatingSum("credit_spent","credittable","credit_amount");
+  repeatingSum("credit_spent","credittable","credit_amount");
 });
 
-on("change:repeating_cptable change:repeating_cptable", function() {
-	repeatingSum("cp_spent", "cptable","cp_amount");
+on("change:repeating_cptable remove:repeating_cptable", function() {
+  repeatingSum("cp_spent", "cptable","cp_amount");
 });
 
+on("change:curr_armor_dex_pen_switch change:curr_armor_dex_pen change:curr_armor_dex_penpip sheet:opened", function() {
+   getAttrs(["curr_armor_dex_pen_switch", "curr_armor_dex_pen","curr_armor_dex_penPip"], function(values) {
+    let v_pen_switch = values.curr_armor_dex_pen_switch;
+    output = {};
+    if (v_pen_switch === "Yes"){
+      output.dexMod = parseInt(values.curr_armor_dex_pen)||0;
+      output.dexPipMod = parseInt(values.curr_armor_dex_penPip)||0;
+    } else {
+    
+      output.dexMod = 0;
+      output.dexPipMod = 0;
+    }
+    setAttrs(output);
+   });
+});
 </script>
+
+
+
+

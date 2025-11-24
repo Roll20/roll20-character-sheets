@@ -30,103 +30,80 @@ async function setWpRow(section, name, keyPrefix, level) {
   const attrs = {};
   const levelBonuses = WP[name.toLowerCase()].slice(0, level);
   const totalBonuses = mergeAndAddObjects(levelBonuses);
+  /**
+   * These values shouldn't be accumulated.
+   */
+  const nonActions = ["name", "level", "levelacquired"];
   WP_KEYS[section].forEach((action) => {
-    if (action == "name") return; // kick out on name
+    if (nonActions.includes(action)) {
+      return;
+    }
     const key = `${keyPrefix}_${action}`;
     attrs[key] = action in totalBonuses ? totalBonuses[action] : 0;
   });
-  attrs[`${keyPrefix}_level`] = level;
   await setAttrsAsync(attrs);
 }
 
-async function setWp({
-  section,
-  wpName,
-  newCharacterLevel,
-  oldCharacterLevel,
-  newWpLevel,
-  rowId,
-}) {
-  console.log("setWp", {
-    section,
-    wpName,
-    newCharacterLevel,
-    oldCharacterLevel,
-    newWpLevel,
-    rowId,
-  });
-  const keyPrefix = rowId
-    ? `repeating_${section}_${rowId}`
-    : `repeating_${section}`;
-  if (newWpLevel) {
-    await setWpRow(section, wpName, keyPrefix, newWpLevel);
-  } else if (!rowId) {
-    await setWpRow(section, wpName, keyPrefix, newCharacterLevel);
+async function setWp({ section, rowId, rowPrefix }) {
+  const attrKeys = [
+    `${rowPrefix}_name`,
+    `${rowPrefix}_levelacquired`,
+    `character_level`,
+  ];
+  const a = await getAttrsAsync(attrKeys);
+  console.log(a);
+  const level = +a[`character_level`] - +a[`${rowPrefix}_levelacquired`] + 1;
+  await setAttrsAsync({ [`${rowPrefix}_level`]: level }, { silent: true });
+
+  const lowerCaseName = a[`${rowPrefix}_name`].toLowerCase();
+  if (Object.keys(WP).includes(lowerCaseName)) {
+    // pre-defined WP
+    await setWpRow(section, lowerCaseName, rowPrefix, level);
   } else {
-    const a = await getAttrsAsync([`${keyPrefix}_level`]);
-    const oldWpLevel = a[`${keyPrefix}_level`];
-    if (oldCharacterLevel) {
-      const delta = oldCharacterLevel - oldWpLevel;
-      if (delta != 0) {
-        newWpLevel = newCharacterLevel - delta;
-        await setWpRow(section, wpName, keyPrefix, newWpLevel);
-      } else {
-        await setWpRow(section, wpName, keyPrefix, newCharacterLevel);
-      }
-    } else {
-      await setWpRow(section, wpName, keyPrefix, newCharacterLevel);
-    }
+    // user-defined
+    await addModifierToBonusesAsync(section, rowId);
   }
+  await addWpToBonuses(section, rowId, lowerCaseName);
 }
 
-async function updateWeaponProficiencies(
-  section,
-  newCharacterLevel,
-  oldCharacterLevel
-) {
+on("change:repeating_wp change:repeating_wpmodern", async (e) => {
+  console.log("change:repeating_wp change:repeating_wpmodern", e);
+  const sourceParts = e.sourceAttribute.split("_");
+  const [r, section, rowId] = sourceParts;
+  const rowPrefix = `${r}_${section}_${rowId}`;
+
+  const isNew = await isNewRow(e);
+  if (isNew) {
+    await setRowDefaults(e, { silent: true });
+  }
+  console.log("isNew", isNew);
+
+  // Exit if the sheetworker was doing something other than increasing the level.
+  if (e.sourceType === "sheetworker" && !isNew && !e.sourceAttribute.endsWith("_level")) {
+    return;
+  }
+  // Exit if only the name was changed.
+  if (!isNew && e.sourceAttribute.endsWith("_name")) {
+    return;
+  }
+  // Exit if no attribute was changed and it's the row itself.
+  if (sourceParts.length < 4) {
+    return;
+  }
+
+  await setWp({ section, rowId, rowPrefix });
+});
+
+/**
+ * This is called by the level up function.
+ * @param {*} section
+ */
+async function updateWeaponProficiencies(section) {
   const ids = await getSectionIDsAsync(section);
   const attrNames = ids.map((id) => `repeating_${section}_${id}_name`);
   const a = await getAttrsAsync(attrNames);
   for (rowId of ids) {
-    await setWp({
-      section,
-      wpName: a[`repeating_${section}_${rowId}_name`].toLowerCase(),
-      newCharacterLevel,
-      oldCharacterLevel,
-      rowId,
-    });
+    const rowPrefix = `repeating_${section}_${rowId}`;
+    await setWp({ section, rowId, rowPrefix });
   }
 }
-
-async function updateWeaponProficiency(section, source, newWpLevel) {
-  const ids = await getSectionIDsAsync(section);
-  const rowId = ids.find(
-    (id) => `repeating_${section}_${id}_level`.toLowerCase() == source
-  );
-  const a = await getAttrsAsync([`repeating_${section}_${rowId}_name`]);
-  const wpName = a[`repeating_${section}_${rowId}_name`];
-  await setWp({ section, wpName, newWpLevel, rowId });
-  await addWpToBonuses(section, rowId, wpName);
-}
-
-on("change:repeating_wp:level change:repeating_wpmodern:level", async (e) => {
-  const section = e.sourceAttribute.split("_")[1];
-  await updateWeaponProficiency(section, e.sourceAttribute, e.newValue);
-});
-
-on("change:repeating_wp:name change:repeating_wpmodern:name", async (e) => {
-  console.log("change:repeating_wp:name change:repeating_wpmodern:name", e);
-  const [r, section, rowId, attr] = e.sourceAttribute.split("_");
-  const wpName = e.newValue.toLowerCase();
-  const wpLevelKey = `${r}_${section}_${rowId}_level`;
-  setAttrs({ [`${r}_${section}_${rowId}_rowid`]: `${r}_${section}_${rowId}` });
-  const a = await getAttrsAsync(["character_level", wpLevelKey]);
-  if (Boolean(a[wpLevelKey]) && +a[wpLevelKey] != 0) {
-    await setWp({ section, wpName, rowId, newWpLevel: a[wpLevelKey] });
-    await addWpToBonuses(section, rowId, wpName);
-  } else {
-    const attrs = {};
-    attrs[`${r}_${section}_${rowId}_level`] = a.character_level;
-    await setAttrsAsync(attrs);
-  }
-});

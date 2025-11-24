@@ -692,14 +692,20 @@
                 <div class="sheet-input-field"
                      style="width:695px;margin-top:8px;padding-top:10px;background-color:#FFA319">
                     <span style="font-size:large">Inventory</span><br>
+                    <div>                
+                        <table>
+                            <tbody>
+                                <tr class="inventory-table-header">
+                                    <th>Item</th>
+                                    <th>Location</th>
+                                    <th>Weight (kg)</th>
+                                    <th>Data</th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <fieldset class="repeating_inventory">
                         <table class="sheet-section-table2">
-                            <tr>
-                                <th>Item</th>
-                                <th>Location</th>
-                                <th>Weight (kg)</th>
-                                <th>Data</th>
-                            </tr>
                             <tr>
                                 <td>
                                     <input style="width:200px;" type="text" name="attr_item">
@@ -783,100 +789,88 @@ const CHARISMA_LINK = "charisma_link";
 const EDGE_LINK = "edge_link";
 
 const linkedAttributeDisplayNames = {
-    STRENGTH_LINK: "STR",
-    BODY_LINK: "BOD",
-    REFLEX_LINK: "RFL",
-    DEXTERITY_LINK: "DEX",
-    INTELLIGENCE_LINK: "INT",
-    WILL_LINK: "WIL",
-    CHARISMA_LINK: "CHA",
-    EDGE_LINK: "EDG",
+    [STRENGTH_LINK]: "STR",
+    [BODY_LINK]: "BOD",
+    [REFLEX_LINK]: "RFL",
+    [DEXTERITY_LINK]: "DEX",
+    [INTELLIGENCE_LINK]: "INT",
+    [WILL_LINK]: "WIL",
+    [CHARISMA_LINK]: "CHA",
+    [EDGE_LINK]: "EDG",
 };
 
-const calculateAbilityScore = ({
-    sourceAttribute,
-    newValue
-}) => {
-    if (typeof newValue !== "number") {
-        console.error("Expected numerical value for attribute [ " + sourceAttribute + " ] but got [ " + newValue + " ]");
+const calculateAttributeScore = (attributeXPName, attributeXP) => {
+    const attributeXPAsNumber = parseInt(attributeXP);
+
+    if (isNaN(attributeXPAsNumber)) {
+        console.error("Expected numerical value for attribute [ " + attributeXPName + " ] but got [ " + attributeXP + " ]");
         return undefined
     }
 
-    const attributeValue = Math.floor(newValue / 100);
+    const attributeValue = Math.floor(attributeXPAsNumber / 100);
     const attributeLinkedValue = calculateLinkedAttributeValue(attributeValue);
 
-    let attribute;
-
-    switch (sourceAttribute) {
+    switch (attributeXPName) {
         case STRENGTH_XP:
-            attribute = {
+            return {
                 name: "strength",
                 value: attributeValue,
                 linkName: STRENGTH_LINK,
                 linkValue: attributeLinkedValue,
-            };
-            break
+            }
         case BODY_XP:
-            attribute = {
+            return {
                 name: "body",
                 value: attributeValue,
                 linkName: BODY_LINK,
                 linkValue: attributeLinkedValue,
-            };
-            break
+            }
         case REFLEX_XP:
-            attribute = {
+            return {
                 name: "reflex",
                 value: attributeValue,
                 linkName: REFLEX_LINK,
                 linkValue: attributeLinkedValue,
-            };
-            break
+            }
         case DEXTERITY_XP:
-            attribute = {
+            return {
                 name: "dexterity",
                 value: attributeValue,
                 linkName: DEXTERITY_LINK,
                 linkValue: attributeLinkedValue,
-            };
-            break
+            }
         case INTELLIGENCE_XP:
-            attribute = {
+            return {
                 name: "intelligence",
                 value: attributeValue,
                 linkName: INTELLIGENCE_LINK,
                 linkValue: attributeLinkedValue,
-            };
-            break
+            }
         case WILL_XP:
-            attribute = {
+            return {
                 name: "will",
                 value: attributeValue,
                 linkName: WILL_LINK,
                 linkValue: attributeLinkedValue,
-            };
-            break
+            }
         case CHARISMA_XP:
-            attribute = {
+            return {
                 name: "charisma",
                 value: attributeValue,
                 linkName: CHARISMA_LINK,
                 linkValue: attributeLinkedValue,
-            };
-            break
+            }
         case EDGE_XP:
-            attribute = {
+            return {
                 name: "edge",
                 value: attributeValue,
                 linkName: EDGE_LINK,
                 linkValue: attributeLinkedValue,
-            };
-            break
+            }
         default:
-            console.error("unknown attribute type passed in to basic attribute on change function");
+            console.error("unknown attributeData type passed in to basic attributeData on change function");
+            return undefined
     }
-
-    return attribute
 };
 
 const calculateLinkedAttributeValue = attribute => {
@@ -956,6 +950,15 @@ const skillsList = {
             "archery": "Archery",
         },
     },
+    "art": {
+        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK, ],
+        "targetNumber": 9,
+        "complexity": "CA",
+        "subSkills": true,
+        "displayName": {
+            "art": "Art",
+        },
+    },
     "artillery": {
         "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK, ],
         "targetNumber": 8,
@@ -981,6 +984,15 @@ const skillsList = {
         "subSkills": false,
         "displayName": {
             "climbing": "Climbing",
+        },
+    },
+    "computers": {
+        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK, ],
+        "targetNumber": 9,
+        "complexity": "CA",
+        "subSkills": false,
+        "displayName": {
+            "computers": "Computers",
         },
     },
     "communications": {
@@ -1067,6 +1079,15 @@ const skillsList = {
             "gunnery_turret": "Gunnery/Turret",
         },
     },
+    "interest": {
+        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK, ],
+        "targetNumber": 9,
+        "complexity": "CA",
+        "subSkills": true,
+        "displayName": {
+            "interest": "Interest",
+        },
+    },
     "interrogation": {
         "linkedAttributes": [WILL_LINK, CHARISMA_LINK, ],
         "targetNumber": 9,
@@ -1103,6 +1124,15 @@ const skillsList = {
             "leadership": "Leadership",
         },
     },
+    "martial": {
+        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK, ],
+        "targetNumber": 8,
+        "complexity": "SA",
+        "subSkills": false,
+        "displayName": {
+            "martial_arts": "Martial Arts",
+        },
+    },
     "medtech": {
         "linkedAttributes": [INTELLIGENCE_LINK, ],
         "targetNumber": 7,
@@ -1111,6 +1141,15 @@ const skillsList = {
         "displayName": {
             "medtech_general": "MedTech/General",
             "medtech_veterinary": "MedTech/Veterinary",
+        },
+    },
+    "melee": {
+        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK, ],
+        "targetNumber": 8,
+        "complexity": "SA",
+        "subSkills": false,
+        "displayName": {
+            "melee_weapons": "Melee Weapons",
         },
     },
     "navigation": {
@@ -1159,6 +1198,17 @@ const skillsList = {
             "piloting_rail_vehicle": "Piloting/Rail Vehicle",
             "piloting_sea_vehicle": "Piloting/Sea Vehicle",
             "piloting_spacecraft": "Piloting/Spacecraft",
+        },
+    },
+    "prestidigitation": {
+        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK, ],
+        "targetNumber": 8,
+        "complexity": "SA",
+        "subSkills": false,
+        "displayName": {
+            "prestidigitation_pick_pocket": "Prestidigitation/Pick Pocket",
+            "prestidigitation_quickdraw": "Prestidigitation/Quickdraw",
+            "prestidigitation_sleight_of_hand": "Prestidigitation/Sleight of Hand",
         },
     },
     "protocol": {
@@ -1349,133 +1399,6 @@ const skillsList = {
     },
 };
 
-const tieredSkillsBasic = {
-    "art": {
-        "linkedAttributes": [DEXTERITY_LINK, ],
-        "targetNumber": 8,
-        "complexity": "CB",
-        "subSkills": true,
-        "displayName": {
-            "art": "Art",
-        },
-    },
-    "computers": {
-        "linkedAttributes": [INTELLIGENCE_LINK, ],
-        "targetNumber": 8,
-        "complexity": "CB",
-        "subSkills": false,
-        "displayName": {
-            "computers": "Computers",
-        },
-    },
-    "interest": {
-        "linkedAttributes": [INTELLIGENCE_LINK, ],
-        "targetNumber": 8,
-        "complexity": "CB",
-        "subSkills": true,
-        "displayName": {
-            "interest": "Interest",
-        },
-    },
-    "martial": {
-        "linkedAttributes": [REFLEX_LINK, ],
-        "targetNumber": 7,
-        "complexity": "SB",
-        "subSkills": false,
-        "displayName": {
-            "martial_arts": "Martial Arts",
-        },
-    },
-    "melee": {
-        "linkedAttributes": [DEXTERITY_LINK, ],
-        "targetNumber": 7,
-        "complexity": "SB",
-        "subSkills": false,
-        "displayName": {
-            "melee_weapons": "Melee Weapons",
-        },
-    },
-    "prestidigitation": {
-        "linkedAttributes": [DEXTERITY_LINK, ],
-        "targetNumber": 7,
-        "complexity": "SB",
-        "subSkills": false,
-        "displayName": {
-            "prestidigitation_pick_pocket": "Prestidigitation/Pick Pocket",
-            "prestidigitation_quickdraw": "Prestidigitation/Quickdraw",
-            "prestidigitation_sleight_of_hand": "Prestidigitation/Sleight of Hand",
-        },
-    },
-};
-
-const tieredSkillsAdvanced = {
-    "art": {
-        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK, ],
-        "targetNumber": 9,
-        "complexity": "CA",
-        "subSkills": true,
-        "displayName": {
-            "art": "Art",
-        },
-    },
-    "computers": {
-        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK, ],
-        "targetNumber": 9,
-        "complexity": "CA",
-        "subSkills": false,
-        "displayName": {
-            "computers": "Computers",
-        },
-    },
-    "interest": {
-        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK, ],
-        "targetNumber": 9,
-        "complexity": "CA",
-        "subSkills": true,
-        "displayName": {
-            "interest": "Interest",
-        },
-    },
-    "martial": {
-        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK, ],
-        "targetNumber": 8,
-        "complexity": "SA",
-        "subSkills": false,
-        "displayName": {
-            "martial_arts": "Martial Arts",
-        },
-    },
-    "melee": {
-        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK, ],
-        "targetNumber": 8,
-        "complexity": "SA",
-        "subSkills": false,
-        "displayName": {
-            "melee_weapons": "Melee Weapons",
-        },
-    },
-    "prestidigitation": {
-        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK, ],
-        "targetNumber": 8,
-        "complexity": "SA",
-        "subSkills": false,
-        "displayName": {
-            "prestidigitation_pick_pocket": "Prestidigitation/Pick Pocket",
-            "prestidigitation_quickdraw": "Prestidigitation/Quickdraw",
-            "prestidigitation_sleight_of_hand": "Prestidigitation/Sleight of Hand",
-        },
-    },
-};
-
-const tieredSkills = [
-    "art",
-    "computers",
-    "interest",
-    "martial",
-    "melee",
-    "prestidigitation",
-];
-
 const calculateSkillLevel = (skillXP, learningSpeedModifier) => {
     const learningSpeedPercentageModifier = 1 + 0.2 * learningSpeedModifier;
 
@@ -1514,16 +1437,8 @@ const getSkillDisplayName = (skill, skillDisplayNameKey, subSkill) => {
     return skill.displayName[skillDisplayNameKey]
 };
 
-const getSkill = (skillName, skillLevel, tieredSkill) => {
-    if (tieredSkill) {
-        if (skillLevel <= 3) {
-            return tieredSkillsBasic[skillName]
-        } else {
-            return tieredSkillsAdvanced[skillName]
-        }
-    } else {
-        return skillsList[skillName]
-    }
+const getSkill = (skillName) => {
+  return skillsList[skillName]
 };
 
 const sheetOpened = () => {
@@ -1556,7 +1471,17 @@ const recalculateSkills = () => {
 };
 
 // calculate stat values when XP amount changes
-on("change:strength_xp change:body_xp change:reflex_xp change:dexterity_xp change:intelligence_xp change:will_xp change:charisma_xp change:edge_xp", calculateAbilityScore);
+on("change:strength_xp change:body_xp change:reflex_xp change:dexterity_xp change:intelligence_xp change:will_xp change:charisma_xp change:edge_xp", ({
+    sourceAttribute,
+    newValue
+}) => {
+    const attributes = calculateAttributeScore(sourceAttribute, newValue);
+
+    const set = {};
+    set[attributes.name] = attributes.value;
+    set[attributes.linkName] = attributes.linkValue;
+    setAttrs(set, {}, recalculateSkills);
+});
 
 on("change:repeating_skills:skill change:repeating_skills:sub_skill", _ => {
     getAttrs(["repeating_skills_skill_xp", ], ({
@@ -1585,15 +1510,11 @@ const skillXPChanged = ({
         const skillNameLookupKey = skillName.split("_")[0];
         const subSkill = values[subSkillAttrName];
 
-        let skillAttributesToSet = {};
+        const skillAttributesToSet = {};
 
         skillAttributesToSet[skillLevel] = calculateSkillLevel(Number(newValue), values.learning_speed);
 
-        const skillData = getSkill(
-            skillNameLookupKey,
-            skillAttributesToSet[skillLevel],
-            tieredSkills.includes(skillNameLookupKey)
-        );
+        const skillData = getSkill(skillNameLookupKey);
 
         skillAttributesToSet["repeating_skills_" + skillId + "skill_tnc"] = skillData.targetNumber + "/" + skillData.complexity;
         skillAttributesToSet["repeating_skills_" + skillId + "target_number"] = skillData.targetNumber;
@@ -1738,11 +1659,6 @@ const migrateFrom2To3 = () => {
 
                 if (skillFirstName in skillsList) {
                     skillData = skillsList[skillFirstName];
-                } else if (skillFirstName in tieredSkillsBasic) {
-                    skillData = tieredSkillsBasic[skillFirstName];
-                } else if (skillFirstName.substring(0, skillFirstName.length - 1) in tieredSkillsBasic) {
-                    skillData = tieredSkillsBasic[skillFirstName.substring(0, skillFirstName.length - 1)];
-                    parsedSkillName = parsedSkillName.substring(0, parsedSkillName.length - 1);
                 } else {
                     console.error("Unable to migrate skill data. Old values are: " + JSON.stringify(oldSkillValues));
                     skillsUpdated++;

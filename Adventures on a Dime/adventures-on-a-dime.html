@@ -1,4 +1,5 @@
 <input type="hidden" name="attr_sheet" value="character">
+<input type="hidden" name="attr_sheet_version">
 
 <div class="header">
   <ul>
@@ -123,7 +124,7 @@
               <input type="text" name="attr_tool_3" placeholder="Tool 3" data-i18n-placeholder="tool-3">
               <input type="text" name="attr_tool_4" placeholder="Tool 4" data-i18n-placeholder="tool-4">
               <input type="text" name="attr_weapon" placeholder="Weapon" data-i18n-placeholder="weapon">
-              <input type="text" name="attr_packed lunch" placeholder="Packed Lunch"
+              <input type="text" name="attr_packed_lunch" placeholder="Packed Lunch"
                 data-i18n-placeholder="packed-lunch">
               <input type="text" name="attr_money" placeholder="Money" data-i18n-placeholder="money">
               <input type="text" name="attr_light_source" placeholder="Light Source"
@@ -340,13 +341,15 @@
 </rolltemplate>
 
 <script type="text/worker">
+  const GLOBAL_SHEET_VERSION = "1.3";
   // Autofill characteristics
   const characteristics = {
-    cunning:   { d4: 'Foolish', d6: 'Cautious', d8: 'Resourceful', d10: 'Sly',         d12: 'Devious'},
-    vigour:    { d4: 'Frail',   d6: 'Healthy',  d8: 'Fit',         d10: 'Hardy',       d12: 'Enduring'},
-    willpower: { d4: 'Fearful', d6: 'Present',  d8: 'Confident',   d10: 'Charismatic', d12: 'Heroic'}
+    cunning:   { d4: 'Foolish', d6: 'Cautious', d8: 'Resourceful', d10: 'Sly', d12: 'Devious'},
+    vigour:    { d4: 'Reckless', d6: 'Capable',  d8: 'Adept', d10: 'Diligent', d12: 'Relentless'},
+    willpower: { d4: 'Fearful', d6: 'Present',  d8: 'Confident', d10: 'Inspiring', d12: 'Enthralling'}
   };
-  Object.keys(characteristics).forEach(characteristic => {
+  const GLOBAL_CHARACTERISTICS_KEYS = Object.keys(characteristics)
+  GLOBAL_CHARACTERISTICS_KEYS.forEach(characteristic => {
     on(`change:${characteristic}_base`, function(event) {
       const value = event.newValue;
       const newCharacteristic = characteristics[characteristic][value.toLowerCase()];
@@ -374,6 +377,26 @@
         }
       });
     }
+
+    const bases = GLOBAL_CHARACTERISTICS_KEYS.map(characteristic => `${characteristic}_base`);
+    const currents = GLOBAL_CHARACTERISTICS_KEYS.map(characteristic => `${characteristic}_current`);
+
+    getAttrs(["sheet_version", ...bases, ...currents], (values) => {
+      const update = {}
+      let {sheet_version} = values;
+      sheet_version = sheet_version === "" ? "1.2" : sheet_version;
+
+      if (sheet_version !== GLOBAL_SHEET_VERSION) {
+        switch (sheet_version) {
+          case "1.2":
+            [...bases,...currents].forEach(characteristic => {
+              update[characteristic] = values[characteristic].toUpperCase();
+            })
+            update.sheet_version = "1.3";
+        }
+      }
+      setAttrs(update);
+    })
   })
 
   // Toggle the hidden input to display the correct contents

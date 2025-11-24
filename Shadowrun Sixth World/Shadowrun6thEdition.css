@@ -8,11 +8,33 @@ GLOBALS
   box-sizing: border-box;
   font-family: sans-serif; }
 
-  .charsheet button {
+/* Drag and Drop */
+.drop-zone {
+  display: none;
+  z-index: -1;
+}
+.active-drop-target > .drop-zone {
+  display: flex;
+  position: fixed;
+  z-index: 5;
+  background: rgb(128, 128, 128, .7);
+  color: white;
+  font-size: largest;
+  top: 45px;
+  bottom: 0px;
+  left: 20px;
+  right: 30px;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.charsheet button {
   background-image: none !important;
   font-size: 0.8em !important;
   text-shadow: none !important; }
-  .charsheet button[type='roll'], button[type='action'] {
+.charsheet button[type='roll'], .charsheet button[type='action'] {
+    white-space: nowrap;
     font-size: 1em;
     margin: 0px !important;
     padding: 1px 2px !important;
@@ -22,19 +44,31 @@ GLOBALS
     border-radius: 0.25em !important;
     border-right: 0.02em solid #333333 !important;
     border-style: outset !important; }
-  .charsheet button[name='roll_range_weapon'], button[name='roll_soak'], button[name='roll_defense'], button[name='roll_melee_weapon'], button[name='roll_spell'], button[name='roll_preparation'], button[name='roll_drain'], button[name='roll_ritual'], button[name='roll_conjuring'], button[name='roll_matrix_attack_rating'], button[name='roll_matrix_defense_rating'], button[name='roll_matrix_device_rating'], button[name='roll_matrix_attack'], button[name='roll_matrix_sleaze'], button[name='roll_matrix_data_processing'], button[name='roll_matrix_firewall'], button[name='roll_fade'] {
-    color: #460141; }
-  .charsheet button[specname=''] {
+/*
+.charsheet button[name='act_range_weapon'], button[name='act_soak'], button[name='act_defense'], button[name='act_melee_weapon'], button[name='act_spell'], button[name='act_preparation'], button[name='act_drain'], button[name='act_ritual'], button[name='act_conjuring'], button[name='act_matrix_attack_rating'], button[name='act_matrix_defense_rating'], button[name='act_matrix_device_rating'], button[name='act_matrix_attack'], button[name='act_matrix_sleaze'], button[name='act_matrix_data_processing'], button[name='act_matrix_firewall'], button[name='act_fade'],
+.charsheet button[name='roll_range_weapon'], button[name='roll_soak'], button[name='roll_defense'], button[name='roll_melee_weapon'], button[name='roll_spell'], button[name='roll_preparation'], button[name='roll_drain'], button[name='roll_ritual'], button[name='roll_conjuring'], button[name='roll_matrix_attack_rating'], button[name='roll_matrix_defense_rating'], button[name='roll_matrix_device_rating'], button[name='roll_matrix_attack'], button[name='roll_matrix_sleaze'], button[name='roll_matrix_data_processing'], button[name='roll_matrix_firewall'], button[name='roll_fade'],
+*/
+.charsheet button[name^="act_"], .charsheet button[name$="_chat"],
+.charsheet button[name^="roll_"] {
+    color: #460141 !important; }
+.charsheet button[specname=''] {
     display: none !important; }
-  .charsheet button:before {
+.charsheet button:before {
     display: none; }
-  .charsheet button:hover, button:focus, button:active {
+.charsheet button:hover, button:focus, button:active {
     font-weight: bold !important; }
-  .charsheet button > span {
+.charsheet button > span {
     display: block !important;
     overflow: hidden !important;
-    text-overflow: ellipsis !important;
     width: 100% !important; }
+
+.charsheet .nuyen {
+  font-size: 1.5em !important;
+  vertical-align: middle; }
+
+.shots {
+  text-align: center !important;
+}
 
 img.shadowrun-logo {
   display: block !important;
@@ -42,6 +76,162 @@ img.shadowrun-logo {
   margin-right: auto !important;
   width: 100% !important;
 }
+
+
+/* =============================== *
+ *         [Object] Modal          *
+ * =============================== */
+.modal {
+  opacity: 0;
+  visibility: hidden;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  text-align: left;
+  background: rgba(0,0,0, .9);
+  transition: opacity .25s ease;
+}
+.modal__bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  cursor: pointer;
+}
+.modal-state {
+  display: none;
+}
+.modal-state:checked + .modal {
+  opacity: 1;
+  visibility: visible;
+  display: inline;
+}
+.modal-state:checked + .modal .modal__inner {
+  top: 0;
+}
+.modal__inner {
+  transition: top .25s ease;
+  position: absolute;
+  top: -20%;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+  margin: auto;
+  overflow: auto;
+  background: #fff;
+  border-radius: 5px;
+  padding: 1em 2em;
+  height: 50%;
+}
+.modal__close {
+  position: absolute;
+  right: 1em;
+  top: 1em;
+  width: 1.1em;
+  height: 1.1em;
+  cursor: pointer;
+}
+.modal__close:after,
+.modal__close:before {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 1.5em;
+  background: #ccc;
+  display: block;
+  transform: rotate(45deg);
+  left: 50%;
+  margin: -3px 0 0 -1px;
+  top: 0;
+}
+.modal__close:hover:after,
+.modal__close:hover:before {
+  background: #aaa;
+}
+.modal__close:before {
+  transform: rotate(-45deg);
+}
+@media screen and (max-width: 768px) {
+    .modal__inner {
+    width: 90%;
+    height: 90%;
+    box-sizing: border-box;
+  }
+}
+/* =============================== *
+ *       End [Object] Modal        *
+ * =============================== */
+
+
+
+
+
+/*vvv Thanks to Scott C. for the sticky sheet tabs and images on tabs examples! vvv*/
+ul.nav-tabs.nav{
+    position:sticky;
+    top:0;
+    background-color:white;
+    z-index:9999;
+}
+
+.sheet-darkmode .characterviewer label {
+  color: black;
+}
+
+.sheet-darkmode .characterviewer > ul.nav-tabs > li.active > a[data-tab="charsheet"],
+.sheet-darkmode .characterviewer > ul.nav-tabs > li > a[data-tab="charsheet"]:hover {
+  color: transparent;
+  text-decoration: none;
+}
+
+.sheet-darkmode ul.nav-tabs.nav {
+  position:sticky;
+  top:0;
+  background-color: var(--dark-surface1);
+  z-index:9999;
+}
+
+.sheet-darkmode .pc {
+  background-color: var(--dark-surface1);
+}
+
+.sheet-darkmode .footer {
+  color: var(--dark-primarytext);
+}
+
+.sheet-darkmode .npc .h2, .sheet-darkmode #SR6WE .tabs h2 {
+  color: #460141;
+}
+
+.sheet-darkmode .sheetform {
+  background-color: var(--dark-surface1);
+}
+
+.sheet-darkmode .pc {
+  background-color: #ffffff;
+}
+
+.sheet-darkmode #SR6WE .tabs h1 {
+  color: #460141;
+}
+
+.characterviewer > ul.nav-tabs a[data-tab="charsheet"]{
+    background-image: url('https://s3.amazonaws.com/files.d20.io/images/252927179/dk_gNz7UgJ3tNkDrGfmxTg/max.png?1635547712');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: transparent;
+    text-decoration: none;
+}
+
+a[data-tab="charsheet"] {
+    box-shadow: 0 0 5px white;
+}
+/*^^^ Thanks to Scott C. for the sticky sheet tabs and images on tabs examples! ^^^*/
 
 .charsheet .row:before,
 .charsheet .row:after {
@@ -93,6 +283,9 @@ img.shadowrun-logo {
 
 .charsheet span {
   word-break: break-word !important; }
+
+.charsheet span[name='attr_notes'] {
+  white-space: pre-wrap; }
 
 .charsheet textarea {
   border-radius: 2px !important;
@@ -176,7 +369,7 @@ input:checked + .slider:before {
 /* MIXIN
   ============================= */
 /***** TABS FOR SHEETS *****/
-.tabs button[type='action'] {
+.tabs button[type='action']:not(.icon) {
   background-color: #333 !important;
   border-radius: 2px !important;
   border: 1px solid #000 !important;
@@ -186,11 +379,14 @@ input:checked + .slider:before {
   font-weight: bolder !important;
   text-transform: capitalize !important;
   padding: 5px !important; }
-  .tabs button[type='action'].pictos, .tabs .cc-row button[type='action'][name*='shots'], .cc-row .tabs button[type='action'][name*='shots'], .tabs .cc-row button[type='action'][name='act_reload'], .cc-row .tabs button[type='action'][name='act_reload'], .tabs .cc-row button[type='action'][name='act_primary_ammo'], .cc-row .tabs button[type='action'][name='act_primary_ammo'], .tabs .repcontrol button[type='action'].repcontrol_edit:after, .repcontrol .tabs button[type='action'].repcontrol_edit:after,
-  .tabs .repcontrol button[type='action'].repcontrol_add:after,
-  .repcontrol .tabs button[type='action'].repcontrol_add:after, .tabs .itemcontrol button[type='action'].repcontrol_del, .itemcontrol .tabs button[type='action'].repcontrol_del {
+.tabs button[type='action'].pictos, .tabs .cc-row button[type='action'][name*='shots'], .cc-row .tabs button[type='action'][name*='shots'], .tabs .cc-row button[type='action'][name='act_reload'], .cc-row .tabs button[type='action'][name='act_reload'], .tabs .cc-row button[type='action'][name='act_primary_ammo'], .cc-row .tabs button[type='action'][name='act_primary_ammo'], .tabs .repcontrol button[type='action'].repcontrol_edit:after, .repcontrol .tabs button[type='action'].repcontrol_edit:after,
+.tabs .repcontrol button[type='action'].repcontrol_add:after,
+.repcontrol .tabs button[type='action'].repcontrol_add:after, .tabs .itemcontrol button[type='action'].repcontrol_del, .itemcontrol .tabs button[type='action'].repcontrol_del {
     text-transform: lowercase !important; }
-.tabs button[type='roll'] {
+.tabs button[name='d6'], 
+.tabs button[name='act_d6'],
+.d6 {
+  width: auto !important;
   background: none !important;
   text-shadow: 1px 1px 2px black, 0 0 25px #460141, 0 0 5px #460141 !important;
   border: none !important;
@@ -198,7 +394,17 @@ input:checked + .slider:before {
   font-family: 'dicefontd6' !important;
   font-size: 2.5em !important;
   vertical-align: middle; }
-.tabs button[type='roll']:hover {
+.tabs button[name='act_extended_start'] {
+  width: auto !important;
+  background: none !important;
+  text-shadow: 1px 1px 2px black, 0 0 25px #460141, 0 0 5px #460141 !important;
+  border: none !important;
+  color: #fff !important;
+  font-family: 'Pictos' !important;
+  font-size: 2.5em !important;
+  vertical-align: middle; }
+.tabs button[type='roll']:hover,
+.tabs button[type='action']:hover {
   text-shadow: 1px 1px 2px black, 0 0 25px #460141, 0 0 5px #460141 !important; }
 .tabs h2 {
   font-size: 1em !important;
@@ -237,18 +443,23 @@ input:checked + .slider:before {
 input.toggle {
   position: absolute !important;
   opacity: 0 !important;
-  z-index: 2 !important; }
+  z-index: 2 !important;
+  top: 5px; }
 
 .pc input.settings-toggle,
 .pc input.settings-flag,
 .pc input.collapse-flag,
-.pc input[type='radio'] {
+.pc input[type='radio'],
+input[type='radio'].tab-switch {
   position: relative !important;
   opacity: 0 !important;
   z-index: 2 !important; }
 
 .npc div.repeating input[name='attr_flag'] + span {
-  opacity: .5 !important; }
+  opacity: .5 !important;
+  position: absolute;
+  top: 3px;
+  left: 1px; }
 .npc div.repeating input[name='attr_flag']:checked + span {
   opacity: 1 !important; }
 .npc div.repeating input[name='attr_flag']:checked ~ .settings {
@@ -258,12 +469,20 @@ input.toggle {
 .pc div.repeating-container div.repitem, .pc div.repeating-container div.repitem input[type='text'], .pc div.repeating-container div.repitem input[type='number'], .pc div.skill-box label > input, .pc div.skill-box input[name='attr_skill'], .pc div.matrix div.programs div.repitem, .pc div.matrix div.devices div.repitem {
   border-bottom: 1px solid #333 !important; }
 
-.center {
+.center, sheet-center {
   text-align: center !important; }
-.left {
+.left, sheet-left {
   text-align: left !important; }
-.right {
+.right, sheet-right {
   text-align: right !important; }
+.bold {
+  font-weight: bold; }
+.fleft {
+  float: left !important; }
+.fright {
+  float: right !important; }
+.purple {
+  color: #460141 !important; }
 
 select.attribute-select option:nth-of-type(1n+5) {
   color: #460141 !important; }
@@ -273,13 +492,13 @@ select.limit-select option:nth-of-type(1n+5) {
   color: #460141 !important; }
 
 /*:+:+:+: MATRIX DEVICE :+:+:+:*/
-div.matrix-device button[name*='Attack']:hover {
+div.matrix-device button[name*='ttack']:hover {
   color: #cc0701 !important; }
-div.matrix-device button[name*='Sleaze']:hover {
+div.matrix-device button[name*='leaze']:hover {
   color: #007bfc !important; }
-div.matrix-device button[name*='Data']:hover {
+div.matrix-device button[name*='ata']:hover {
   color: #88dd04 !important; }
-div.matrix-device button[name*='Firewall']:hover {
+div.matrix-device button[name*='irewall']:hover {
   color: #f88703 !important; }
 div.matrix-device input[type='radio'] {
   position: relative !important;
@@ -316,7 +535,7 @@ div.matrix-device .matrixFirewall {
 /************************** START OF THE PC SHEET *************************************/
 /*************************************************************************************/
 .pc {
-  background-color: #fff !important;
+  background-color: #fff;
   background-size: cover !important;
   border: 3px solid !important;
   box-shadow: inset 0px 0px 3px 1px #040404 !important;
@@ -327,14 +546,18 @@ div.matrix-device .matrixFirewall {
 #SR6WE .pc button > span:hover,
 #SR6WE .pc label > button[type='roll']:hover,
 #SR6WE .pc .repeat-box button[type='roll']:hover,
+#SR6WE .pc label > button[type='action']:hover,
+#SR6WE .pc .repeat-box button[type='action']:hover,
 #SR6WE .pc button[data-i18n='default']:hover,
 #SR6WE .npc .attribute button:hover,
 #SR6WE .npc button > h2:hover,
 #SR6WE .npc button > span:hover,
 #SR6WE .npc label > button[type='roll']:hover,
 #SR6WE .npc .repeat-box button[type='roll']:hover,
+#SR6WE .npc label > button[type='action']:hover,
+#SR6WE .npc .repeat-box button[type='action']:hover,
 #SR6WE .npc button[data-i18n='default']:hover {
-  color: #fff !important;
+  color: #fff;
   text-shadow: 1px 1px 2px black, 0 0 25px #460141, 0 0 5px #460141; }
 #SR6WE .pc .con-track button[type='action']:hover,
 #SR6WE .npc .con-track button[type='action']:hover {
@@ -343,7 +566,7 @@ div.matrix-device .matrixFirewall {
 
 .pc h1 {
   background-color: #460141 !important;
-  color: #fff !important;
+  color: #fff;
   font-size: 1em !important;
   letter-spacing: 2px !important;
   line-height: 20px !important;
@@ -377,7 +600,7 @@ div.matrix-device .matrixFirewall {
 
 #SR6WE .tabs h1 {
   background-color: transparent !important;
-  color: #000 !important;
+  color: #000;
   display: inline-block !important;
   font-size: 1em !important;
   letter-spacing: 2px !important;
@@ -474,13 +697,13 @@ div.matrix-device .matrixFirewall {
 
 #SR6WE .pc .tabs .header-navtabs {
   display: grid !important;
-  grid-template-columns: 1fr 2.5em 2.5em repeat(10, 5em) !important;
+  grid-template-columns: 1fr 2.5em 2.5em 2.5em repeat(10, 5em) !important;
   vertical-align: middle;
   width: 100% !important;
   right: 0px !important; }
 
 #SR6WE .pc .tabs .header-navtabs button {
-  width: 5em !important;
+  width: 5em;
   position: relative !important;
   right: 0px !important; }
 
@@ -501,6 +724,8 @@ div.matrix-device .matrixFirewall {
   .pc input.collapse-flag + span,
   .pc input[type='radio'] + span {
     font-family: 'pictos' !important; }
+  .npc input.settings-flag:checked + span,
+  .npc input.collapse-flag:checked + span,
   .pc input.settings-toggle:checked + span,
   .pc input.settings-flag:checked + span,
   .pc input.collapse-flag:checked + span,
@@ -529,7 +754,8 @@ div.matrix-device .matrixFirewall {
     clear: both;
     border-top-right-radius: 10px;
     border-top-left-radius: 0px; }
-  #SR6WE div.border-box button[type='roll'] {
+  #SR6WE div.border-box button[type='roll'],
+  #SR6WE div.border-box button[type='action'] {
     font-size: 0.8em;
     font-weight: bold !important; }
   #SR6WE div.border-box div.pc-box {
@@ -539,7 +765,8 @@ div.matrix-device .matrixFirewall {
     display: inline-grid !important;
     padding: 1% 0.5% !important;
     margin-bottom: 0px !important; }
-    .pc div.repeating-container div.repitem button[type='roll'] {
+    .pc div.repeating-container div.repitem button[type='roll'],
+    .pc div.repeating-container div.repitem button[type='action'] {
       text-align: left !important; }
     .pc div.repeating-container div.repitem input:nth-of-type(1n+2) {
       text-align: center !important; }
@@ -568,10 +795,9 @@ div.matrix-device .matrixFirewall {
       text-align: center !important; }
   .pc div.static {
     margin-right: 0.5% !important; }
-    .pc div.static div.border-box,
-    .pc div.static div.border-box .pc-box {
-      border-top-right-radius: 0px !important;
-      border-top-left-radius: 10px !important; }
+  .pc div.static div.border-box,
+  .pc div.static div.border-box .pc-box {
+    border-top-right-radius: 0px !important; }
   .pc div.core {
     .pc div.core div.armor-buttons {
       display: inline-block !important;
@@ -579,7 +805,8 @@ div.matrix-device .matrixFirewall {
       line-height: 20px !important;
       margin-left: 1% !important;
       width: 35% !important; }
-      .pc div.core div.armor-buttons button[type='roll'] {
+      .pc div.core div.armor-buttons button[type='roll'],
+      .pc div.core div.armor-buttons button[type='action'] {
         margin-right: -5px !important; }
       .pc div.core div.armor-buttons button[name='roll_defense'] {
         background-color: #555 !important;
@@ -682,6 +909,70 @@ div.matrix-device .matrixFirewall {
 
 
 
+/***** EFFECTS *****/
+.pc div.attributes-effects div.repitem {
+  display: grid;
+  grid-template-columns: 1.5em auto 5em 5em 1em 1em; }
+.pc div.attributes-effects div.headers {
+  display: grid;
+  grid-template-columns: 2em auto 5em 5em 1em 1em; }
+.pc div.attributes-effects div.repitem .settings {
+  grid-column: 1 / 7;
+  display: grid;
+  grid-template-columns: 1.2em auto 5em 5em 1em 1em; }
+
+.pc div.attributes-effects div.repitem label[data-i18n-title='notes'],
+.pc div.attributes-effects div.repitem h3[data-i18n='notes'],
+.pc div.attributes-effects div.repitem div.collapse,
+.pc div.attributes-effects div.repitem label[data-i18n-title='modifications'],
+.pc div.attributes-effects div.repitem h3[data-i18n='modifications'] {
+  grid-column: 1 / 7; }
+.pc div.attributes-effects div.repitem input.collapse-flag {
+  grid-area: 1 / 5 / 1 / 6; }
+.pc div.attributes-effects div.repitem input.collapse-flag + span.pictos, .pc div.attributes-effects div.repitem .settings-toggle input[type='checkbox'].collapse-flag + span, .settings-toggle .pc div.attributes-effects div.repitem input[type='checkbox'].collapse-flag + span,
+.pc div.attributes-effects div.repitem .settings-flag input[type='checkbox'].collapse-flag + span,
+.settings-flag .pc div.attributes-effects div.repitem input[type='checkbox'].collapse-flag + span, .pc div.attributes-effects div.repitem .flag-primary + div > input.collapse-flag + span, .pc div.attributes-effects div.repitem .repcontrol input.collapse-flag + span.repcontrol_edit:after, .repcontrol .pc div.attributes-effects div.repitem input.collapse-flag + span.repcontrol_edit:after,
+.pc div.attributes-effects div.repitem .repcontrol input.collapse-flag + span.repcontrol_add:after,
+.repcontrol .pc div.attributes-effects div.repitem input.collapse-flag + span.repcontrol_add:after, .pc div.attributes-effects div.repitem .itemcontrol input.collapse-flag + span.repcontrol_del, .itemcontrol .pc div.attributes-effects div.repitem input.collapse-flag + span.repcontrol_del {
+  grid-area: 1 / 5 / 1 / 6; }
+.pc div.attributes-effects div.repitem input.settings-flag,
+.pc div.attributes-effects div.repitem input.settings-flag + span.pictos,
+.pc div.attributes-effects div.repitem .settings-toggle input[type='checkbox'].settings-flag + span,
+.settings-toggle .pc div.attributes-effects div.repitem input[type='checkbox'].settings-flag + span,
+.pc div.attributes-effects div.repitem .settings-flag input[type='checkbox'].settings-flag + span,
+.settings-flag .pc div.attributes-effects div.repitem input[type='checkbox'].settings-flag + span,
+.pc div.attributes-effects div.repitem .flag-primary + div > input.settings-flag + span,
+.pc div.attributes-effects div.repitem .repcontrol input.settings-flag + span.repcontrol_edit:after,
+.repcontrol .pc div.attributes-effects div.repitem input.settings-flag + span.repcontrol_edit:after,
+.pc div.attributes-effects div.repitem .repcontrol input.settings-flag + span.repcontrol_add:after,
+.repcontrol .pc div.attributes-effects div.repitem input.settings-flag + span.repcontrol_add:after,
+.pc div.attributes-effects div.repitem .itemcontrol input.settings-flag + span.repcontrol_del,
+.itemcontrol .pc div.attributes-effects div.repitem input.settings-flag + span.repcontrol_del {
+  grid-area: 1 / 6 / 1 / 7; }
+
+
+  /* Active Button */
+#SR6WE div.repcontainer div.repitem input[name^='attr_active'] {
+  top: 0;
+  margin: 7px 0px 0px 5px; }
+#SR6WE div.repcontainer div.repitem input[name^='attr_active']:not(:checked) + span.pictos {
+  top: 0;
+  height: 15px;
+  padding: 0px 16px 20px 4px;
+  border-radius: 10px;
+  color: red;
+  border: red solid 1px;
+  opacity: 1 !important;}
+#SR6WE div.repcontainer div.repitem input[name^='attr_active']:checked + span.pictos {
+  top: 0;
+  height: 15px;
+  padding: 0px 4px 20px 4px;
+  border-radius: 10px;
+  box-shadow: green 0px 1px 5px 2px;
+  color: green; }
+
+
+
 /***** SKILLS *****/
   .pc div.skill-box h2:nth-of-type(1n+2) {
     text-align: center; }
@@ -719,9 +1010,9 @@ div.matrix-device .matrixFirewall {
     .pc div.skill-box div.row-long h3:nth-of-type(1n+2) {
       text-align: center; }
 
-/*** Skills ***/
-  .pc div.skill-box div.skills-active div.repitem {
-    grid-template-columns: 1fr 3em 3em 5em 1em 1em; }
+/*** SKILLS ***/
+    .pc div.skill-box div.skills-active div.repitem {
+      grid-template-columns: 1fr 3em 3em 5em 1em 1em; }
     .pc div.skill-box div.skills-active div.repitem label[data-i18n-title='notes'],
     .pc div.skill-box div.skills-active div.repitem h3[data-i18n='notes'],
     .pc div.skill-box div.skills-active div.repitem div.collapse {
@@ -760,7 +1051,11 @@ div.matrix-device .matrixFirewall {
       display: none; }
     /* hide the button after the button hider if the hider has no content (empty attribute) */
     #SR6WE .pc div.skill-box div.skills-active div.repitem div.buttons span.skill-button-hider:empty + button[name='roll_spec'],
-    #SR6WE .pc div.skill-box div.skills-active div.repitem div.buttons span.skill-button-hider:empty + button[name='roll_expert'] {
+    #SR6WE .pc div.skill-box div.skills-active div.repitem div.buttons span.skill-button-hider:empty + button[name='roll_expert'], 
+    #SR6WE .pc div.skill-box div.skills-active div.repitem div.buttons span.skill-button-hider:empty + button[name='act_spec'],
+    #SR6WE .pc div.skill-box div.skills-active div.repitem div.buttons span.skill-button-hider:empty + button[name='act_expert'],
+    #SR6WE .npc div.pc-box div.repitem input.skill-button-hider[value=""] + button[name='act_spec'],
+    #SR6WE .npc div.pc-box div.repitem input.skill-button-hider[value=""] + button[name='act_expert'] {
       display: none; }
 
     #SR6WE .pc div.skill-box div.skills-active div.repitem div.buttons button.skill_spec span.skill_spec, span.skill_spec, h2.skill_spec {
@@ -826,6 +1121,27 @@ div.matrix-device .matrixFirewall {
     background-color: #460141 !important;
     border-bottom: 2px solid #040404 !important; }
 
+  /* Primary Button For Repeating Sections */
+#SR6WE div.repcontainer div.repitem input[name^='attr_primary'] {
+  top: 0;
+  margin: 7px 0px 0px 5px; }
+#SR6WE div.repcontainer div.repitem input[name^='attr_primary']:not(:checked) + span.pictos {
+  top: 0;
+  height: 15px;
+  padding: 0px 16px 20px 4px;
+  border-radius: 10px;
+  color: red;
+  border: red solid 1px;
+  opacity: 1 !important;}
+#SR6WE div.repcontainer div.repitem input[name^='attr_primary']:checked + span.pictos {
+  top: 0;
+  height: 15px;
+  padding: 0px 4px 20px 4px;
+  border-radius: 10px;
+  box-shadow: green 0px 1px 5px 2px;
+  color: green; }
+
+
   /* Ranged Specific */
 .pc div.arms div.weapons div.weapon-range div.headers {
   grid-template-columns: 1.5em 9em 2em 2em 1.5em 1.5em 1.5em 1.5em 1.5em 2.5em 1em 1em !important; }
@@ -860,46 +1176,38 @@ div.matrix-device .matrixFirewall {
 .pc div.arms div.weapons div.weapon-range div.repitem div.settings {
   grid-column: 1 / 13 !important;
   grid-template-columns: 1.3em 9em 2em 2em 1.5em 1.5em 1.5em 1.5em 1.5em 2.5em 1em 1em !important; }
+.pc div.arms div.weapons div.weapon-range div.repitem button.range_weapon {
+  z-index: 2; }
 
-  /* Ranged Primary Button */
-#SR6WE div.repcontainer div.repitem input[name^='attr_primary'] {
-  top: 0;
-  margin: 7px 0px 0px 5px; }
-#SR6WE div.repcontainer div.repitem input[name^='attr_primary']:not(:checked) + span.pictos {
-  top: 0;
-  height: 15px;
-  padding: 0px 16px 20px 4px;
-  border-radius: 10px;
-  color: red;
-  border: red solid 1px;
-  opacity: 1 !important;}
-#SR6WE div.repcontainer div.repitem input[name^='attr_primary']:checked + span.pictos {
-  top: 0;
-  height: 15px;
-  padding: 0px 4px 20px 4px;
-  border-radius: 10px;
-  box-shadow: green 0px 1px 5px 2px;
-  color: green; }
+#SR6WE .pc div.arms div.weapons div.weapon-range div.repitem input[name='attr_singleshot'][value='0'] ~ select[name='attr_default_mode'] option[data-i18n='singleshot'],
+#SR6WE .pc div.arms div.weapons div.weapon-range div.repitem input[name='attr_semiauto'][value='0'] ~ select[name='attr_default_mode'] option[data-i18n='semiauto'],
+#SR6WE .pc div.arms div.weapons div.weapon-range div.repitem input[name='attr_burst'][value='0'] ~ select[name='attr_default_mode'] option[data-i18n='burstfire'],
+#SR6WE .pc div.arms div.weapons div.weapon-range div.repitem input[name='attr_burstwide'][value='0'] ~ select[name='attr_default_mode'] option[data-i18n='burstwide'],
+#SR6WE .pc div.arms div.weapons div.weapon-range div.repitem input[name='attr_fullauto'][value='0'] ~ select[name='attr_default_mode'] option[data-i18n='fullauto'],
+#SR6WE .pc div.arms div.weapons div.weapon-range div.repitem input[name='attr_other'][value='0'] ~ select[name='attr_default_mode'] option[data-i18n='other'] {
+  display: none;
+  background-color: gray; }
+
 
 
 
   /* Melee Specific */
 .pc div.arms div.weapons div.weapon-melee div.headers {
-  grid-template-columns: 13.25em 3em 3em 1.25em 1.25em 1.25em 1.25em 1.25em 1em 1em !important; }
+  grid-template-columns: 1.5em 11.75em 3em 3em 1.25em 1.25em 1.25em 1.25em 1.25em 1em 1em !important; }
 .pc div.arms div.weapons div.weapon-melee div.repitem {
-  grid-template-columns: 13.25em 3em 3em 1.25em 1.25em 1.25em 1.25em 1.25em 1em 1em !important; }
+  grid-template-columns: 1.5em 11.75em 3em 3em 1.25em 1.25em 1.25em 1.25em 1.25em 1em 1em !important; }
 .pc div.arms div.weapons div.weapon-melee div.repitem label[data-i18n-title='notes'],
 .pc div.arms div.weapons div.weapon-melee div.repitem h3[data-i18n='notes'],
 .pc div.arms div.weapons div.weapon-melee div.repitem div.collapse {
   grid-column: 1 / 11 !important; }
 .pc div.arms div.weapons div.weapon-melee div.repitem input.collapse-flag {
-  grid-area: 1 / 9 / 1 / 10 !important; }
+  grid-area: 1 / 10 / 1 / 11 !important; }
 .pc div.arms div.weapons div.weapon-melee div.repitem input.collapse-flag + span.pictos, .pc div.arms div.weapons div.weapon-melee div.repitem .settings-toggle input[type='checkbox'].collapse-flag + span, .settings-toggle .pc div.arms div.weapons div.weapon-melee div.repitem input[type='checkbox'].collapse-flag + span,
 .pc div.arms div.weapons div.weapon-melee div.repitem .settings-flag input[type='checkbox'].collapse-flag + span,
 .settings-flag .pc div.arms div.weapons div.weapon-melee div.repitem input[type='checkbox'].collapse-flag + span, .pc div.arms div.weapons div.weapon-melee div.repitem .flag-primary + div > input.collapse-flag + span, .pc div.arms div.weapons div.weapon-melee div.repitem .repcontrol input.collapse-flag + span.repcontrol_edit:after, .repcontrol .pc div.arms div.weapons div.weapon-melee div.repitem input.collapse-flag + span.repcontrol_edit:after,
 .pc div.arms div.weapons div.weapon-melee div.repitem .repcontrol input.collapse-flag + span.repcontrol_add:after,
 .repcontrol .pc div.arms div.weapons div.weapon-melee div.repitem input.collapse-flag + span.repcontrol_add:after, .pc div.arms div.weapons div.weapon-melee div.repitem .itemcontrol input.collapse-flag + span.repcontrol_del, .itemcontrol .pc div.arms div.weapons div.weapon-melee div.repitem input.collapse-flag + span.repcontrol_del {
-  grid-area: 1 / 9 / 1 / 10 !important; }
+  grid-area: 1 / 10 / 1 / 11 !important; }
 .pc div.arms div.weapons div.weapon-melee div.repitem input.settings-flag,
 .pc div.arms div.weapons div.weapon-melee div.repitem input.settings-flag + span.pictos,
 .pc div.arms div.weapons div.weapon-melee div.repitem .settings-toggle input[type='checkbox'].settings-flag + span,
@@ -913,13 +1221,20 @@ div.matrix-device .matrixFirewall {
 .repcontrol .pc div.arms div.weapons div.weapon-melee div.repitem input.settings-flag + span.repcontrol_add:after,
 .pc div.arms div.weapons div.weapon-melee div.repitem .itemcontrol input.settings-flag + span.repcontrol_del,
 .itemcontrol .pc div.arms div.weapons div.weapon-melee div.repitem input.settings-flag + span.repcontrol_del {
-  grid-area: 1 / 10 / 1 / 11 !important; }
+  grid-area: 1 / 11 / 1 / 12 !important; }
 .pc div.arms div.weapons div.weapon-melee div.repitem div.settings {
-  grid-column: 1 / 11 !important;
-  grid-template-columns: 13.25em 3em 3em 1.25em 1.25em 1.25em 1.25em 1.25em 1em 1em !important; }
+  grid-column: 1 / 12 !important;
+  grid-template-columns: 1.5em 11.75em 3em 3em 1.25em 1.25em 1.25em 1.25em 1.25em 1em 1em !important; }
+
+
 
 
   /* Grenade Specific */
+.pc div.arms div.weapons div.weapon-grenade input[name='attr_dicepool']:not([value='0']) ~ button.no-dicepool {
+  display: none; }
+.pc div.arms div.weapons div.weapon-grenade input[name='attr_dicepool'][value='0'] ~ button.dicepool {
+  display: none; }
+
 .pc div.arms div.weapons div.weapon-grenade div.headers {
   grid-template-columns: 11.25em 3em 3em 3em 3em 3em 1em 1em !important; }
 .pc div.arms div.weapons div.weapon-grenade div.repitem {
@@ -1040,42 +1355,74 @@ div.matrix-device .matrixFirewall {
     display: grid !important;
     grid-template-columns: 1fr 5em 5em 1em 1em !important; }
   .pc div.augs div.repitem {
+    width: 100%;
+    display: grid;
     grid-template-columns: 1fr 5em 5em 1em 1em !important; }
-    .pc div.augs div.repitem label[data-i18n-title='notes'],
-    .pc div.augs div.repitem h3[data-i18n='notes'],
-    .pc div.augs div.repitem label[data-i18n-title='modifications'],
-    .pc div.augs div.repitem h3[data-i18n='modifications'],
-    .pc div.augs div.repitem div.collapse {
-      grid-column: 1 / 6 !important; }
-    .pc div.augs div.repitem input.collapse-flag {
-      grid-area: 1/1/1 / 5 !important;
-      position: absolute !important;
-      width: 100% !important; }
-    .pc div.augs div.repitem input.collapse-flag + span.pictos, .pc div.augs div.repitem .settings-toggle input[type='checkbox'].collapse-flag + span, .settings-toggle .pc div.augs div.repitem input[type='checkbox'].collapse-flag + span,
-    .pc div.augs div.repitem .settings-flag input[type='checkbox'].collapse-flag + span,
-    .settings-flag .pc div.augs div.repitem input[type='checkbox'].collapse-flag + span, .pc div.augs div.repitem .flag-primary + div > input.collapse-flag + span, .pc div.augs div.repitem .repcontrol input.collapse-flag + span.repcontrol_edit:after, .repcontrol .pc div.augs div.repitem input.collapse-flag + span.repcontrol_edit:after,
-    .pc div.augs div.repitem .repcontrol input.collapse-flag + span.repcontrol_add:after,
-    .repcontrol .pc div.augs div.repitem input.collapse-flag + span.repcontrol_add:after, .pc div.augs div.repitem .itemcontrol input.collapse-flag + span.repcontrol_del, .itemcontrol .pc div.augs div.repitem input.collapse-flag + span.repcontrol_del {
-      grid-area: 1 / 4 / 1 / 5 !important; }
-    .pc div.augs div.repitem input.settings-flag,
-    .pc div.augs div.repitem input.settings-flag + span.pictos,
-    .pc div.augs div.repitem .settings-toggle input[type='checkbox'].settings-flag + span,
-    .settings-toggle .pc div.augs div.repitem input[type='checkbox'].settings-flag + span,
-    .pc div.augs div.repitem .settings-flag input[type='checkbox'].settings-flag + span,
-    .settings-flag .pc div.augs div.repitem input[type='checkbox'].settings-flag + span,
-    .pc div.augs div.repitem .flag-primary + div > input.settings-flag + span,
-    .pc div.augs div.repitem .repcontrol input.settings-flag + span.repcontrol_edit:after,
-    .repcontrol .pc div.augs div.repitem input.settings-flag + span.repcontrol_edit:after,
-    .pc div.augs div.repitem .repcontrol input.settings-flag + span.repcontrol_add:after,
-    .repcontrol .pc div.augs div.repitem input.settings-flag + span.repcontrol_add:after,
-    .pc div.augs div.repitem .itemcontrol input.settings-flag + span.repcontrol_del,
-    .itemcontrol .pc div.augs div.repitem input.settings-flag + span.repcontrol_del {
-      grid-area: 1 / 5 / 1 / 6 !important; }
-    .pc div.augs div.repitem input[name='attr_augementation'] {
-      text-align: left !important; }
-    .pc div.augs div.repitem div.settings {
-      grid-column: 1 / 6 !important;
-      grid-template-columns: 1fr 5em 5em 1em 1em !important; }
+
+  .pc div.augs div.repitem div.settings {
+    grid-column: 1 / 6 !important;
+    grid-template-columns: 1fr 5em 5em 1em 1em !important;
+    font-size: 12px; }
+
+  .pc div.augs div.repitem div.settings div.row1 {
+    grid-column: 1 / 6;
+    grid-column-gap: 1% !important;
+    grid-row-gap: 1% !important;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 5em 5em 1em 1em !important; }
+  .pc div.augs div.repitem div.settings div.row2 {
+    grid-column: 1 / 6;
+    grid-column-gap: 1% !important;
+    grid-row-gap: 1% !important;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr !important; }
+  .pc div.augs div.repitem div.settings div.row3 {
+    grid-column: 1 / 6;
+    grid-column-gap: 1% !important;
+    grid-row-gap: 1% !important;
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1em auto !important; }
+
+  .pc div.augs div.repitem input[name="attr_has_rating"][value="0"] ~ span.has_rating {
+    display: none; }
+  .pc div.augs div.repitem input[name="attr_has_rating"]:not([value="0"]) ~ span.no_rating {
+    display: none; }
+
+  .pc div.augs div.repitem label[data-i18n-title='notes'],
+  .pc div.augs div.repitem h3[data-i18n='notes'],
+  .pc div.augs div.repitem label[data-i18n-title='modifications'],
+  .pc div.augs div.repitem h3[data-i18n='modifications'],
+  .pc div.augs div.repitem div.collapse {
+    grid-column: 1 / 6 !important; }
+  .pc div.augs div.repitem input.collapse-flag {
+    grid-area: 1/1/1 / 5 !important;
+    position: absolute !important;
+    width: 100% !important; }
+  .pc div.augs div.repitem input.collapse-flag + span.pictos, .pc div.augs div.repitem .settings-toggle input[type='checkbox'].collapse-flag + span, .settings-toggle .pc div.augs div.repitem input[type='checkbox'].collapse-flag + span,
+  .pc div.augs div.repitem .settings-flag input[type='checkbox'].collapse-flag + span,
+  .settings-flag .pc div.augs div.repitem input[type='checkbox'].collapse-flag + span, .pc div.augs div.repitem .flag-primary + div > input.collapse-flag + span, .pc div.augs div.repitem .repcontrol input.collapse-flag + span.repcontrol_edit:after, .repcontrol .pc div.augs div.repitem input.collapse-flag + span.repcontrol_edit:after,
+  .pc div.augs div.repitem .repcontrol input.collapse-flag + span.repcontrol_add:after,
+  .repcontrol .pc div.augs div.repitem input.collapse-flag + span.repcontrol_add:after, .pc div.augs div.repitem .itemcontrol input.collapse-flag + span.repcontrol_del, .itemcontrol .pc div.augs div.repitem input.collapse-flag + span.repcontrol_del {
+    grid-area: 1 / 4 / 1 / 5 !important; }
+  .pc div.augs div.repitem input.settings-flag,
+  .pc div.augs div.repitem input.settings-flag + span.pictos,
+  .pc div.augs div.repitem .settings-toggle input[type='checkbox'].settings-flag + span,
+  .settings-toggle .pc div.augs div.repitem input[type='checkbox'].settings-flag + span,
+  .pc div.augs div.repitem .settings-flag input[type='checkbox'].settings-flag + span,
+  .settings-flag .pc div.augs div.repitem input[type='checkbox'].settings-flag + span,
+  .pc div.augs div.repitem .flag-primary + div > input.settings-flag + span,
+  .pc div.augs div.repitem .repcontrol input.settings-flag + span.repcontrol_edit:after,
+  .repcontrol .pc div.augs div.repitem input.settings-flag + span.repcontrol_edit:after,
+  .pc div.augs div.repitem .repcontrol input.settings-flag + span.repcontrol_add:after,
+  .repcontrol .pc div.augs div.repitem input.settings-flag + span.repcontrol_add:after,
+  .pc div.augs div.repitem .itemcontrol input.settings-flag + span.repcontrol_del,
+  .itemcontrol .pc div.augs div.repitem input.settings-flag + span.repcontrol_del {
+    grid-area: 1 / 5 / 1 / 6 !important; }
+  .pc div.augs div.repitem input[name='attr_augementation'] {
+    text-align: left !important; }
 
 
 
@@ -1136,6 +1483,33 @@ div.matrix-device .matrixFirewall {
         text-align: center !important; }
 
     /***** SPELLS *****/
+    /* Hide Effect Types and Damage Type for non-combat spells and "None" option for Combat spells */
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category'][value='Combat'] ~ div.settings div.row option[data-i18n='none'], 
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category']:not([value='Combat']) ~ div.settings div.row option[data-i18n='directcombat'], 
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category']:not([value='Combat']) ~ div.settings div.row option[data-i18n='directcombatarea'], 
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category']:not([value='Combat']) ~ div.settings div.row option[data-i18n='indirectcombat'], 
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category']:not([value='Combat']) ~ div.settings div.row option[data-i18n='indirectcombatarea'], 
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category']:not([value='Combat']) ~ div.settings div.row h3[data-i18n='damage_type'], 
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category']:not([value='Combat']) ~ div.settings div.row select[name='attr_damage'] {
+      display: none !important; }
+
+    /* Hide Effect Types for non-illusion spells and "None" option for Illusion spells */
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category'][value='Illusion'] ~ div.settings div.row option[data-i18n='none'],
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category']:not([value='Illusion']) ~ div.settings div.row option[data-i18n='singlesense'],
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category']:not([value='Illusion']) ~ div.settings div.row option[data-i18n='multisense'] {
+      display: none !important; }
+
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category'][value='Combat'] ~ div.settings div.row h3[data-i18n='damage_type'], 
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category'][value='Combat'] ~ div.settings div.row select[name='attr_damage'] {
+      display: inline !important; }
+
+    /* Hide spell buttons so only one displays */
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category'][value='Combat'] ~ button[name*='act_noncombatspell'], 
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_category']:not([value='Combat']) ~ button[name^='act_spell'], 
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_range']:not([value='LOS (A)']) ~ button[name$='aoe'],
+    .pc div.magic div.spellsFormulas div.repitem input[name='attr_range'][value='LOS (A)'] ~ button:not([name$='aoe']) {
+      display: none !important; }
+
     .pc div.magic div.spellsFormulas div.repitem {
       grid-template-columns: 30% 1.5fr 1.5fr 2fr 2em 1em 1em !important; }
       .pc div.magic div.spellsFormulas div.repitem label[data-i18n-title='notes'],
@@ -1312,8 +1686,11 @@ div.matrix-device .matrixFirewall {
     .pc div.magic div.powers-conjuring div.summon-spirit-button {
       width: 100%;
       display: inline-grid;
-      grid-template-columns: 1fr 10em 1fr;
+      grid-template-columns: 1fr 10em 2em 2.75em 1fr;
     }
+
+    .pc div.magic div.powers-conjuring div.summon-spirit-button label[data-i18n-title='asrep'] {
+      padding-top: 3px; }
 
     .pc div.magic div.powers-conjuring div.headers, 
     .pc div.magic div.powers-conjuring div.repitem div.settings div.spirit-top, 
@@ -1434,40 +1811,57 @@ div.matrix-device .matrixFirewall {
       grid-template-columns: 1fr 3em 1em 1em !important; }
     .pc div.magic div.powers-meta div.repitem {
       grid-template-columns: 1fr 3em 1em 1em !important; }
-      .pc div.magic div.powers-meta div.repitem label[data-i18n-title='notes'],
-      .pc div.magic div.powers-meta div.repitem h3[data-i18n='notes'],
-      .pc div.magic div.powers-meta div.repitem label[data-i18n-title='modifications'],
-      .pc div.magic div.powers-meta div.repitem h3[data-i18n='modifications'],
-      .pc div.magic div.powers-meta div.repitem div.collapse {
-        grid-column: 1 / 5 !important; }
-      .pc div.magic div.powers-meta div.repitem input.collapse-flag {
-        grid-area: 1 / 1 / 1 / 4 !important;
-        position: absolute !important;
-        width: 100% !important; }
-      .pc div.magic div.powers-meta div.repitem input.collapse-flag + span.pictos, .pc div.magic div.powers-meta div.repitem .settings-toggle input[type='checkbox'].collapse-flag + span, .settings-toggle .pc div.magic div.powers-meta div.repitem input[type='checkbox'].collapse-flag + span,
-      .pc div.magic div.powers-meta div.repitem .settings-flag input[type='checkbox'].collapse-flag + span,
-      .settings-flag .pc div.magic div.powers-meta div.repitem input[type='checkbox'].collapse-flag + span, .pc div.magic div.powers-meta div.repitem .flag-primary + div > input.collapse-flag + span, .pc div.magic div.powers-meta div.repitem .repcontrol input.collapse-flag + span.repcontrol_edit:after, .repcontrol .pc div.magic div.powers-meta div.repitem input.collapse-flag + span.repcontrol_edit:after,
-      .pc div.magic div.powers-meta div.repitem .repcontrol input.collapse-flag + span.repcontrol_add:after,
-      .repcontrol .pc div.magic div.powers-meta div.repitem input.collapse-flag + span.repcontrol_add:after, .pc div.magic div.powers-meta div.repitem .itemcontrol input.collapse-flag + span.repcontrol_del, .itemcontrol .pc div.magic div.powers-meta div.repitem input.collapse-flag + span.repcontrol_del {
-        grid-area: 1 / 3 / 1 / 4 !important; }
-      .pc div.magic div.powers-meta div.repitem input.settings-flag,
-      .pc div.magic div.powers-meta div.repitem input.settings-flag + span.pictos,
-      .pc div.magic div.powers-meta div.repitem .settings-toggle input[type='checkbox'].settings-flag + span,
-      .settings-toggle .pc div.magic div.powers-meta div.repitem input[type='checkbox'].settings-flag + span,
-      .pc div.magic div.powers-meta div.repitem .settings-flag input[type='checkbox'].settings-flag + span,
-      .settings-flag .pc div.magic div.powers-meta div.repitem input[type='checkbox'].settings-flag + span,
-      .pc div.magic div.powers-meta div.repitem .flag-primary + div > input.settings-flag + span,
-      .pc div.magic div.powers-meta div.repitem .repcontrol input.settings-flag + span.repcontrol_edit:after,
-      .repcontrol .pc div.magic div.powers-meta div.repitem input.settings-flag + span.repcontrol_edit:after,
-      .pc div.magic div.powers-meta div.repitem .repcontrol input.settings-flag + span.repcontrol_add:after,
-      .repcontrol .pc div.magic div.powers-meta div.repitem input.settings-flag + span.repcontrol_add:after,
-      .pc div.magic div.powers-meta div.repitem .itemcontrol input.settings-flag + span.repcontrol_del,
-      .itemcontrol .pc div.magic div.powers-meta div.repitem input.settings-flag + span.repcontrol_del {
-        grid-area: 1 / 4 / 1 / 5 !important; }
-      .pc div.magic div.powers-meta div.repitem div.settings {
-        grid-column: 1 / 5 !important;
-        grid-template-columns: 1fr 3em 1em 1em !important; }
+    .pc div.magic div.powers-meta div.repitem label[data-i18n-title='notes'],
+    .pc div.magic div.powers-meta div.repitem h3[data-i18n='notes'],
+    .pc div.magic div.powers-meta div.repitem label[data-i18n-title='modifications'],
+    .pc div.magic div.powers-meta div.repitem h3[data-i18n='modifications'],
+    .pc div.magic div.powers-meta div.repitem div.collapse {
+      grid-column: 1 / 5 !important; }
+    .pc div.magic div.powers-meta div.repitem input.collapse-flag {
+      grid-area: 1 / 1 / 1 / 4 !important;
+      position: absolute !important;
+      width: 100% !important; }
+    .pc div.magic div.powers-meta div.repitem input.collapse-flag + span.pictos, .pc div.magic div.powers-meta div.repitem .settings-toggle input[type='checkbox'].collapse-flag + span, .settings-toggle .pc div.magic div.powers-meta div.repitem input[type='checkbox'].collapse-flag + span,
+    .pc div.magic div.powers-meta div.repitem .settings-flag input[type='checkbox'].collapse-flag + span,
+    .settings-flag .pc div.magic div.powers-meta div.repitem input[type='checkbox'].collapse-flag + span, .pc div.magic div.powers-meta div.repitem .flag-primary + div > input.collapse-flag + span, .pc div.magic div.powers-meta div.repitem .repcontrol input.collapse-flag + span.repcontrol_edit:after, .repcontrol .pc div.magic div.powers-meta div.repitem input.collapse-flag + span.repcontrol_edit:after,
+    .pc div.magic div.powers-meta div.repitem .repcontrol input.collapse-flag + span.repcontrol_add:after,
+    .repcontrol .pc div.magic div.powers-meta div.repitem input.collapse-flag + span.repcontrol_add:after, .pc div.magic div.powers-meta div.repitem .itemcontrol input.collapse-flag + span.repcontrol_del, .itemcontrol .pc div.magic div.powers-meta div.repitem input.collapse-flag + span.repcontrol_del {
+      grid-area: 1 / 3 / 1 / 4 !important; }
+    .pc div.magic div.powers-meta div.repitem input.settings-flag,
+    .pc div.magic div.powers-meta div.repitem input.settings-flag + span.pictos,
+    .pc div.magic div.powers-meta div.repitem .settings-toggle input[type='checkbox'].settings-flag + span,
+    .settings-toggle .pc div.magic div.powers-meta div.repitem input[type='checkbox'].settings-flag + span,
+    .pc div.magic div.powers-meta div.repitem .settings-flag input[type='checkbox'].settings-flag + span,
+    .settings-flag .pc div.magic div.powers-meta div.repitem input[type='checkbox'].settings-flag + span,
+    .pc div.magic div.powers-meta div.repitem .flag-primary + div > input.settings-flag + span,
+    .pc div.magic div.powers-meta div.repitem .repcontrol input.settings-flag + span.repcontrol_edit:after,
+    .repcontrol .pc div.magic div.powers-meta div.repitem input.settings-flag + span.repcontrol_edit:after,
+    .pc div.magic div.powers-meta div.repitem .repcontrol input.settings-flag + span.repcontrol_add:after,
+    .repcontrol .pc div.magic div.powers-meta div.repitem input.settings-flag + span.repcontrol_add:after,
+    .pc div.magic div.powers-meta div.repitem .itemcontrol input.settings-flag + span.repcontrol_del,
+    .itemcontrol .pc div.magic div.powers-meta div.repitem input.settings-flag + span.repcontrol_del {
+      grid-area: 1 / 4 / 1 / 5 !important; }
+    .pc div.magic div.powers-meta div.repitem div.settings {
+      grid-column: 1 / 5 !important;
+      grid-template-columns: 1fr 3em 1em 1em !important; }
+      
+    .pc div.magic div.powers-meta div.mage-setup .row1 {
+      display: inline-grid;
+      grid-template-columns: .5em 8em 1.5em 6em 3em 1.5em 5em;
+      margin-top: 2px; }
+    .pc div.magic div.powers-meta div.mage-setup .row1 label input {
+      width: 2em; }
+    .pc div.magic div.powers-meta div.mage-setup .row1 h3[data-i18n='initiategrade'] {
+      margin-top: -2px; }
 
+    .pc div.magic div.powers-meta div.mage-setup .row2 {
+      display: inline-grid;
+      grid-template-columns: .5em 4em 12em 1em 4em 9em; }
+/*    
+      .pc div.magic div.powers-meta div.mage-setup input[name='attr_magic_ar'] ~ label {
+        position: relative;
+        top: 5px; }
+*/
 
 
 /*** MATRIX ****/
@@ -1475,9 +1869,15 @@ div.matrix-device .matrixFirewall {
     color: #040404 !important; }
 
   #SR6WE .pc div.matrix div.cyberdeck div.row-matrix-combat-stats {
-    margin: 0px 5px 5px 5px;
+    margin: 0px 5px 0px 5px;
     display: grid;
     grid-template-columns: .5fr 1fr .5fr 1fr .5fr 1fr .5fr; }
+
+  #SR6WE .pc div.matrix div.cyberdeck div.row-matrix-soak {
+    margin: 0px 5px 0px 5px;
+    display: grid;
+    padding-bottom: 5px;
+    grid-template-columns: .5fr 1fr .5fr 1fr .5fr; }
 
   #SR6WE .pc div.matrix div.cyberdeck div.row-matrix-combat-stats label {
     margin-top: 5px;
@@ -1512,7 +1912,7 @@ div.matrix-device .matrixFirewall {
     display: grid !important;
     grid-template-columns: 1fr 4em 4em 1em 1em !important; }
 
-  #SR6WE .pc div.matrix div.devices div.repitem span[name='attr_device'] {
+  #SR6WE .pc div.matrix div.devices div.repitem span[name='attr_name'] {
    text-align: left; }
   #SR6WE .pc div.matrix div.devices div.repitem span[name='attr_device_rating'] {
    text-align: center; }
@@ -1625,7 +2025,7 @@ div.matrix-device .matrixFirewall {
     text-align: center; }
   #SR6WE .pc div.matrix div.devices div.settings div.rows div.row1 input {
     width: 2em; }
-  #SR6WE .pc div.matrix div.devices div.settings div.rows div.row1 input[name='attr_device'] {
+  #SR6WE .pc div.matrix div.devices div.settings div.rows div.row1 input[name='attr_name'] {
     width: 246px; }
 
   #SR6WE .pc div.matrix div.devices div.settings div.rows div.row2{
@@ -1679,6 +2079,7 @@ div.matrix-device .matrixFirewall {
   #SR6WE .pc div.matrix div.devices div.repitem label[data-i18n-title='modifications'],
   #SR6WE .pc div.matrix div.devices div.repitem h3[data-i18n='modifications'],
   #SR6WE .pc div.matrix div.devices div.repitem div.collapse {
+    grid-area: 2 / 1 / 2 / 5 !important;
     width: 100% !important; }
   #SR6WE .pc div.matrix div.devices div.repitem input.collapse-flag {
     grid-area: 1 / 4 / 1 / 5 !important;
@@ -1770,7 +2171,7 @@ div.matrix-device .matrixFirewall {
     padding-bottom: 3px;
     width: 100%;
     display: inline-grid;
-    grid-template-columns: 1fr 10em 1fr;
+    grid-template-columns: 1fr 10em 1fr 10em 1fr;
   }
 
   #SR6WE .pc div.matrix div.complex-forms-rolls button, 
@@ -1821,18 +2222,20 @@ div.matrix-device .matrixFirewall {
 
   #SR6WE .pc div.matrix div.complex-forms div.repitem span.hide-roll-button {
     display: none; }
-  #SR6WE .pc div.matrix div.complex-forms div.repitem span.show-name {
+  #SR6WE .pc div.matrix div.complex-forms div.repitem span.show-name,
+  #SR6WE .pc div.matrix div.complex-forms div.repitem button.show-name {
     font-weight: bold;
     display: none; }
-  #SR6WE .pc div.matrix div.complex-forms div.repitem span.hide-roll-button:empty ~ button[name='roll_complex_form'] {
+  #SR6WE .pc div.matrix div.complex-forms div.repitem span.hide-roll-button:empty ~ button[name='act_complexform'] {
     display: none !important; }
-  #SR6WE .pc div.matrix div.complex-forms div.repitem span.hide-roll-button:empty ~ span.show-name {
+  #SR6WE .pc div.matrix div.complex-forms div.repitem span.hide-roll-button:empty ~ span.show-name,
+  #SR6WE .pc div.matrix div.complex-forms div.repitem span.hide-roll-button:empty ~ button.show-name {
     display: inherit; }
 
 
   /*  Matrix  Submersion  */
   #SR6WE .pc div.matrix div.submersion div.submersion-headers {
-    margin-bottom: -5px;
+    margin-bottom: 3px;
     align-items: center;
     padding: 0px 20px 0px 0px;
     grid-gap: 5px;
@@ -1883,26 +2286,26 @@ div.matrix-device .matrixFirewall {
   /*  Matrix sprites Echoes  */
   #SR6WE .pc div.matrix div.sprites div.headers {
     display: grid;
-    grid-template-columns: 11px 2em 10em 2em 1fr 1em 1em;
+    grid-template-columns: 11px 2em 10em 3em 2em 2em 1fr 1em 1em;
     margin-bottom: 0px; }
 
   #SR6WE .pc div.matrix div.sprites div.repitem {
     display: grid;
-    grid-template-columns: 11px 2em 10em 2em 1fr; }
+    grid-template-columns: 11px 2em 10em 2em 2em 1fr; }
   #SR6WE .pc div.matrix div.sprites div.repitem label[data-i18n-title='notes'],
   #SR6WE .pc div.matrix div.sprites div.repitem h3[data-i18n='notes'],
   #SR6WE .pc div.matrix div.sprites div.repitem div.collapse,
   #SR6WE .pc div.matrix div.sprites div.repitem label[data-i18n-title='modifications'],
   #SR6WE .pc div.matrix div.sprites div.repitem h3[data-i18n='modifications'] {
-    grid-column: 1 / 8; }
+    grid-column: 1 / 10; }
   #SR6WE .pc div.matrix div.sprites div.repitem input.collapse-flag {
-    grid-area: 1 / 6 / 1 / 7; }
+    grid-area: 1 / 8 / 1 / 9; }
   #SR6WE .pc div.matrix div.sprites div.repitem input.collapse-flag + span.pictos, #SR6WE .pc div.matrix div.sprites div.repitem .settings-toggle input[type='checkbox'].collapse-flag + span, #SR6WE .settings-toggle .pc div.matrix div.sprites div.repitem input[type='checkbox'].collapse-flag + span,
   #SR6WE .pc div.matrix div.sprites div.repitem .settings-flag input[type='checkbox'].collapse-flag + span,
   #SR6WE .settings-flag .pc div.matrix div.sprites div.repitem input[type='checkbox'].collapse-flag + span, #SR6WE .pc div.matrix div.sprites div.repitem .flag-primary + div > input.collapse-flag + span, #SR6WE .pc div.matrix div.sprites div.repitem .repcontrol input.collapse-flag + span.repcontrol_edit:after, #SR6WE .repcontrol .pc div.matrix div.sprites div.repitem input.collapse-flag + span.repcontrol_edit:after,
   #SR6WE .pc div.matrix div.sprites div.repitem .repcontrol input.collapse-flag + span.repcontrol_add:after,
   #SR6WE .repcontrol .pc div.matrix div.sprites div.repitem input.collapse-flag + span.repcontrol_add:after, #SR6WE .pc div.matrix div.sprites div.repitem .itemcontrol input.collapse-flag + span.repcontrol_del, #SR6WE .itemcontrol .pc div.matrix div.sprites div.repitem input.collapse-flag + span.repcontrol_del {
-    grid-area: 1 / 6 / 1 / 7; }
+    grid-area: 1 / 8 / 1 / 9; }
   #SR6WE .pc div.matrix div.sprites div.repitem input.settings-flag,
   #SR6WE .pc div.matrix div.sprites div.repitem input.settings-flag + span.pictos,
   #SR6WE .pc div.matrix div.sprites div.repitem .settings-toggle input[type='checkbox'].settings-flag + span,
@@ -1916,14 +2319,14 @@ div.matrix-device .matrixFirewall {
   #SR6WE .repcontrol .pc div.matrix div.sprites div.repitem input.settings-flag + span.repcontrol_add:after,
   #SR6WE .pc div.matrix div.sprites div.repitem .itemcontrol input.settings-flag + span.repcontrol_del,
   #SR6WE .itemcontrol .pc div.matrix div.sprites div.repitem input.settings-flag + span.repcontrol_del {
-    grid-area: 1 / 7 / 1 / 8; }
+    grid-area: 1 / 9 / 1 / 10; }
   #SR6WE .pc div.matrix div.sprites div.repitem div.row {
-    grid-column: 1 / 8;
+    grid-column: 1 / 10;
     padding-left: 0px; }
   #SR6WE .pc div.matrix div.sprites div.repitem div.settings {
     margin-left: 0px;
-    grid-column: 1 / 7;
-    grid-template-columns: 2em 10em 2em 1fr; }
+    grid-column: 1 / 9;
+    grid-template-columns: 2em 10em 2em 2em 2em 1fr; }
 
 
 
@@ -1977,10 +2380,10 @@ div.htab input[type='radio'] {
   margin-right: -80px !important;
   top: 4px !important;
   width: 80px !important; }
-  div.htab input[type='radio'] + h1 {
-    color: #9a9a9a !important; }
-  div.htab input[type='radio']:hover ~ h1, div.htab input[type='radio']:checked ~ h1 {
-    color: #fff !important; }
+div.htab input[type='radio'] + h1 {
+  color: #9a9a9a !important; }
+div.htab input[type='radio']:hover ~ h1, div.htab input[type='radio']:checked ~ h1 {
+  color: #fff !important; }
 
 /***** BOXES FOR DIFFERENT PC SECTIONS *****/
 .pc-box {
@@ -2026,7 +2429,8 @@ h2[data-i18n='nuyen'], h3[data-i18n='nuyen'] {
   
 
 /***** CORE COMBAT INFO *****/
-.core-combat button[type='roll'] {
+.core-combat button[type='roll'],
+.core-combat button[type='action'] {
   font-size: 0.9em !important;
   text-align: left !important; }
 .core-combat h2, .core-combat h3 {
@@ -2048,27 +2452,47 @@ h2[data-i18n='nuyen'], h3[data-i18n='nuyen'] {
 .cc-row {}
   .cc-row button[type='action'] {
     font-family: fontello !important; }
-  .cc-row button[name*='primary_ammo'] { }
+
   /** The x# after ammo button **/
   .cc-row button[type='action'] > span {
     display: inline !important;
     margin-left: 0px !important; }
-    .cc-row button[type='action'] > span:before {
+
+  .cc-row button[type='action'] > span[name='attr_shots_fired']:before {
       content: 'x' !important; }
-  .cc-row button[name*='shots'], .cc-row button[name='act_reload'], .cc-row button[name='act_primary_ammo'] {
+
+  .cc-row button[name*='shots'], 
+  .cc-row button[name='act_reload'] {
     border-bottom: 2px solid #666 !important;
     border-bottom-right-radius: 2px !important;
     border-color: #aaa !important;
     border-radius: 5px !important;
     border-right: 3px solid #999 !important;
-    border-style: outset !important; }
+    border-style: outset !important;
+    display: flex;
+    align-items: center; }
+
+  .cc-row button[name='act_primary_ammo'] {
+    border-bottom: 2px solid #666 !important;
+    border-bottom-right-radius: 2px !important;
+    border-color: #aaa !important;
+    border-radius: 5px !important;
+    border-right: 3px solid #999 !important;
+    border-style: outset !important;
+    display: flex;
+    align-items: center;
+    width: 3.5em; }
+
   .cc-row button[name*='shots_remove'] {
     transform: rotate(180deg) !important;
     /* IE 9 */
     -ms-transform: rotate(180deg) !important;
     /* Safari 3-8 */
     -webkit-transform: rotate(180deg) !important; }
+
+
   .cc-row button[type='roll'] > span,
+  .cc-row button[type='action'] > span,
   .cc-row h3 + span {
     display: inline-block !important;
     margin-left: 1% !important; }
@@ -2096,11 +2520,99 @@ h2[data-i18n='nuyen'], h3[data-i18n='nuyen'] {
     grid-template-columns: 16em 1fr 3em 3em 1.5em 1.5em 1.5em 1.5em 1.5em !important; }
   div.primary-range-row2 {
     display: grid !important;
-    grid-template-columns: auto 1fr 2em 4em 2em 1em 3.5em 3.5em 2em !important; }
+    grid-template-columns: 11em 4px 8em 4px 1.3em 3.1em 1.3em 1.6em 2.1em 1.5em !important;
+    align-items: center;
+  }
+  div.primary-range-mods {
+    display: grid;
+    grid-template-columns: 1fr 1.5em;
+    max-height: 10em;
+  }
+  div.primary-range-mods label.mods-flag, div.primary-range-mods span.mods-flag {
+    grid-area: 1 / 2 / 1 / 3;
+    z-index: 0;
+    padding-left: 4px;
+    padding-top: 0px;
+    font-size: large;
+  }
+  div.primary-range-mods input.mods-flag {
+    grid-area: 1 / 1 / 1 / 3;
+    z-index: 1;
+    opacity: 0%;
+    display: inline;
+  }
+  div.primary-range-mods h2.mods-list-label {
+    grid-area: 1 / 1 / 1 / 2;
+  }
+  div.primary-range-mods div.modal div.mods-title {
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    font-size: large;
+  }
+
+
+
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem {
+  display: grid;
+  grid-template-columns: 1.5em auto 5em 5em 1em 1em; }
+.pc div.core-combat div.primary-range-mods div.headers {
+  display: grid;
+  grid-template-columns: 2em auto 5em 5em 1em 1em; }
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem .settings {
+  grid-column: 1 / 7;
+  display: grid;
+  grid-template-columns: 1.2em auto 5em 5em 1em 1em; }
+
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem label[data-i18n-title='notes'],
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem h3[data-i18n='notes'],
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem div.collapse,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem label[data-i18n-title='modifications'],
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem h3[data-i18n='modifications'] {
+  grid-column: 1 / 7; }
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input.collapse-flag {
+  grid-area: 1 / 5 / 1 / 6; }
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input.collapse-flag + span.pictos,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem .settings-toggle input[type='checkbox'].collapse-flag + span,
+.settings-toggle .pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input[type='checkbox'].collapse-flag + span,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem .settings-flag input[type='checkbox'].collapse-flag + span,
+.settings-flag .pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input[type='checkbox'].collapse-flag + span,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem .flag-primary + div > input.collapse-flag + span,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem .repcontrol input.collapse-flag + span.repcontrol_edit:after,
+.repcontrol .pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input.collapse-flag + span.repcontrol_edit:after,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem .repcontrol input.collapse-flag + span.repcontrol_add:after,
+.repcontrol .pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input.collapse-flag + span.repcontrol_add:after,
+.pc div.core-combat div.primary-range-mods div.repeating_weapon-mods div.repitem .itemcontrol input.collapse-flag + span.repcontrol_del,
+.itemcontrol .pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input.collapse-flag + span.repcontrol_del {
+  grid-area: 1 / 5 / 1 / 6; }
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input.settings-flag,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input.settings-flag + span.pictos,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem .settings-toggle input[type='checkbox'].settings-flag + span,
+.settings-toggle .pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input[type='checkbox'].settings-flag + span,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem .settings-flag input[type='checkbox'].settings-flag + span,
+.settings-flag .pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input[type='checkbox'].settings-flag + span,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem .flag-primary + div > input.settings-flag + span,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem .repcontrol input.settings-flag + span.repcontrol_edit:after,
+.repcontrol .pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input.settings-flag + span.repcontrol_edit:after,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem .repcontrol input.settings-flag + span.repcontrol_add:after,
+.repcontrol .pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input.settings-flag + span.repcontrol_add:after,
+.pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem .itemcontrol input.settings-flag + span.repcontrol_del,
+.itemcontrol .pc div.core-combat div.primary-range-mods  div.modal div.repeating-container div.repitem input.settings-flag + span.repcontrol_del {
+  grid-area: 1 / 6 / 1 / 7; }
+
+
+
+
+  div.primary-range input[name='attr_primary_range_weapon_split_dicepool'][value='2'] ~ button[name='act_primary_range_weapon'] {
+    display: none; }
+  div.primary-range input[name='attr_primary_range_weapon_split_dicepool'][value='0'] ~ button[name='act_primary_range_weapon_split_pool_2'] {
+    display: none; }
+  
 
   #SR6WE .pc div.primary-range-row2 input[name='attr_primary_range_weapon_mode_singleshot'][value='0'] ~ select[name='attr_primary_range_weapon_mode'] option[data-i18n='singleshot'],
   #SR6WE .pc div.primary-range-row2 input[name='attr_primary_range_weapon_mode_semiauto'][value='0'] ~ select[name='attr_primary_range_weapon_mode'] option[data-i18n='semiauto'],
   #SR6WE .pc div.primary-range-row2 input[name='attr_primary_range_weapon_mode_burst'][value='0'] ~ select[name='attr_primary_range_weapon_mode'] option[data-i18n='burstfire'],
+  #SR6WE .pc div.primary-range-row2 input[name='attr_primary_range_weapon_mode_burstwide'][value='0'] ~ select[name='attr_primary_range_weapon_mode'] option[data-i18n='burstwide'],
   #SR6WE .pc div.primary-range-row2 input[name='attr_primary_range_weapon_mode_fullauto'][value='0'] ~ select[name='attr_primary_range_weapon_mode'] option[data-i18n='fullauto'],
   #SR6WE .pc div.primary-range-row2 input[name='attr_primary_range_weapon_mode_other'][value='0'] ~ select[name='attr_primary_range_weapon_mode'] option[data-i18n='other'] {
     display: none;
@@ -2108,15 +2620,21 @@ h2[data-i18n='nuyen'], h3[data-i18n='nuyen'] {
 
 
 
+
+
 /***** Armor Display *****/
   div.armor-info {
     display: grid !important;
     width: 100% !important;
-    grid-template-columns: 1fr 7em 3em 7em 3em 7em 1fr !important; }
+    grid-template-columns: 1fr 7em 1fr 7em 1fr 7em 1fr 7em 1fr !important; }
   div.magic-defense {
     display: grid !important;
     width: 100% !important;
     grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr !important; }
+  div.matrix-defense {
+    display: grid !important;
+    width: 100% !important;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr auto 1fr !important; }
   div.armor-resists {
     display: grid !important;
     grid-template-columns: .2fr .2fr .2fr .2fr .2fr !important; }
@@ -2157,7 +2675,9 @@ h2[data-i18n='nuyen'], h3[data-i18n='nuyen'] {
   vertical-align: top !important;
   width: 48% !important; }
 #SR6WE .attr-col button[type='roll'], 
+#SR6WE .attr-col button[type='action'],
 #SR6WE .npc .attribute button[type='roll'], 
+#SR6WE .npc .attribute button[type='action'], 
 #SR6WE .npc .rows button[type='roll'], 
 #SR6WE .npc .rows button[type='action'] {
   border-bottom: 1px solid #000;
@@ -2170,13 +2690,21 @@ h2[data-i18n='nuyen'], h3[data-i18n='nuyen'] {
   text-align: right;
   width: 30%; }
 #SR6WE .npc .attribute button[type='roll'], 
+#SR6WE .npc .attribute button[type='action'], 
 #SR6WE .npc .npc-roll-rows button[type='roll'],
+#SR6WE .npc .npc-roll-rows button[type='action'],
 #SR6WE .npc .rows button[type='roll'],
 #SR6WE .npc .rows button[type='action'] {
   background-color: white;
   font-size: 1em;
   text-align: center;
   width: unset; }
+#SR6WE .npc .rows .repitem button[type='action'][name='act_skill'],
+#SR6WE .npc .rows .repitem button[type='action'][name='act_spriteskill'],
+#SR6WE .npc .rows .repitem button[type='action'][name='act_spiritskill'],
+#SR6WE .npc .rows .repitem button[name='roll_power'],
+#SR6WE .npc .rows .repitem button[name='roll_npc_knowledge'] {
+  margin-left: 15px !important; }
 .attr-col button > span {
   font-weight: bold !important; }
 .attr-col input[type='number'] {
@@ -2191,7 +2719,8 @@ h2[data-i18n='nuyen'], h3[data-i18n='nuyen'] {
   margin-left: -7% !important; }
 .attr-col-right {
   width: 50% !important; }
-.attr-col-right button[type='roll'] {
+.attr-col-right button[type='roll'],
+.attr-col-right button[type='action']{
   margin-right: 0px !important;
   width: 50% !important; }
 .attr-col-right .attr-ini input[type='number'] {
@@ -2323,7 +2852,7 @@ h2[data-i18n='nuyen'], h3[data-i18n='nuyen'] {
   .squares div {
     background-color: transparent !important;
     border-right: none !important;
-    left: 85% !important;
+    left: 81% !important;
     margin-bottom: -20px !important;
     position: relative !important;
     top: -15px !important; }
@@ -2352,6 +2881,8 @@ h2[data-i18n='nuyen'], h3[data-i18n='nuyen'] {
   background-color: transparent !important; }
 
 /***** MAKE CONDITION SQUARES APPEAR & DISPPEAR *****/
+.hex-hider[value='6'] ~ input[type='radio']:nth-child(1n+14),
+.hex-hider[value='7'] ~ input[type='radio']:nth-child(1n+17),
 .hex-hider[value='8'] ~ input[type='radio']:nth-child(1n+19),
 .hex-hider[value='9'] ~ input[type='radio']:nth-child(1n+21),
 .hex-hider[value='10'] ~ input[type='radio']:nth-child(1n+24),
@@ -2363,6 +2894,23 @@ h2[data-i18n='nuyen'], h3[data-i18n='nuyen'] {
 .hex-hider[value='16'] ~ input[type='radio']:nth-child(1n+38),
 .hex-hider[value='17'] ~ input[type='radio']:nth-child(1n+40),
 .hex-hider[value='18'] ~ input[type='radio']:nth-child(1n+42),
+
+.hex-hider[value='19'] ~ input[type='radio']:nth-child(1n+50),
+
+.hex-hider[value='20'] ~ input[type='radio']:nth-child(1n+53),
+.hex-hider[value='21'] ~ input[type='radio']:nth-child(1n+55),
+.hex-hider[value='22'] ~ input[type='radio']:nth-child(1n+57),
+.hex-hider[value='23'] ~ input[type='radio']:nth-child(1n+60),
+.hex-hider[value='24'] ~ input[type='radio']:nth-child(1n+62),
+.hex-hider[value='25'] ~ input[type='radio']:nth-child(1n+64),
+.hex-hider[value='26'] ~ input[type='radio']:nth-child(1n+67),
+.hex-hider[value='27'] ~ input[type='radio']:nth-child(1n+69),
+.hex-hider[value='28'] ~ input[type='radio']:nth-child(1n+71),
+.hex-hider[value='29'] ~ input[type='radio']:nth-child(1n+71),
+
+
+.hex-hider[value='6'] ~ div:nth-child(1n+14),
+.hex-hider[value='7'] ~ div:nth-child(1n+17),
 .hex-hider[value='8'] ~ div:nth-child(1n+19),
 .hex-hider[value='9'] ~ div:nth-child(1n+24),
 .hex-hider[value='10'] ~ div:nth-child(1n+24),
@@ -2373,9 +2921,23 @@ h2[data-i18n='nuyen'], h3[data-i18n='nuyen'] {
 .hex-hider[value='15'] ~ div:nth-child(1n+38),
 .hex-hider[value='16'] ~ div:nth-child(1n+38),
 .hex-hider[value='17'] ~ div:nth-child(1n+38),
-.hex-hider[value='18'] ~ div:nth-child(1n+48) {
+.hex-hider[value='18'] ~ div:nth-child(1n+45), 
+.hex-hider[value='19'] ~ div:nth-child(1n+45), 
+.hex-hider[value='20'] ~ div:nth-child(1n+45), 
+.hex-hider[value='21'] ~ div:nth-child(1n+52), 
+.hex-hider[value='22'] ~ div:nth-child(1n+52), 
+.hex-hider[value='23'] ~ div:nth-child(1n+52), 
+.hex-hider[value='24'] ~ div:nth-child(1n+58), 
+.hex-hider[value='25'] ~ div:nth-child(1n+58), 
+.hex-hider[value='26'] ~ div:nth-child(1n+58), 
+.hex-hider[value='27'] ~ div:nth-child(1n+66), 
+.hex-hider[value='28'] ~ div:nth-child(1n+66), 
+.hex-hider[value='29'] ~ div:nth-child(1n+66) 
+{
   display: none !important; }
 
+.hex-hider[value='6'] ~ input[type='radio']:nth-child(1n+14) + span,
+.hex-hider[value='7'] ~ input[type='radio']:nth-child(1n+17) + span,
 .hex-hider[value='8'] ~ input[type='radio']:nth-child(1n+19) + span,
 .hex-hider[value='9'] ~ input[type='radio']:nth-child(1n+21) + span,
 .hex-hider[value='10'] ~ input[type='radio']:nth-child(1n+24) + span,
@@ -2386,7 +2948,22 @@ h2[data-i18n='nuyen'], h3[data-i18n='nuyen'] {
 .hex-hider[value='15'] ~ input[type='radio']:nth-child(1n+36) + span,
 .hex-hider[value='16'] ~ input[type='radio']:nth-child(1n+38) + span,
 .hex-hider[value='17'] ~ input[type='radio']:nth-child(1n+40) + span,
-.hex-hider[value='18'] ~ input[type='radio']:nth-child(1n+42) + span {
+.hex-hider[value='18'] ~ input[type='radio']:nth-child(1n+42) + span,
+
+.hex-hider[value='19'] ~ input[type='radio']:nth-child(1n+46) + span,
+
+.hex-hider[value='20'] ~ input[type='radio']:nth-child(1n+48) + span,
+.hex-hider[value='21'] ~ input[type='radio']:nth-child(1n+50) + span,
+.hex-hider[value='22'] ~ input[type='radio']:nth-child(1n+53) + span,
+.hex-hider[value='23'] ~ input[type='radio']:nth-child(1n+55) + span,
+.hex-hider[value='24'] ~ input[type='radio']:nth-child(1n+57) + span,
+.hex-hider[value='25'] ~ input[type='radio']:nth-child(1n+60) + span,
+.hex-hider[value='26'] ~ input[type='radio']:nth-child(1n+62) + span,
+.hex-hider[value='27'] ~ input[type='radio']:nth-child(1n+64) + span,
+.hex-hider[value='28'] ~ input[type='radio']:nth-child(1n+67) + span,
+.hex-hider[value='29'] ~ input[type='radio']:nth-child(1n+69) + span,
+.hex-hider[value='30'] ~ input[type='radio']:nth-child(1n+71) + span
+{
   opacity: 0 !important; }
 
 /***** CONDITION MONITOR FOOTERS *****/
@@ -2522,81 +3099,124 @@ input.skill-select[type='checkbox'] {
 /***** LIFESTYLES *****/
   /***** LIFESTYLE SETTINGS *****/
   /***** LIFESTYLE DISPLAY *****/
-  .lifestyle {
-    }
-  .lifestyle h3:nth-of-type(2) {
-    margin-right: 1% !important; }
-  .lifestyle input[type='text'] {
-    background-color: transparent !important; }
-  .lifestyle input[type='text'][name='attr_birth_name'] {
-     width: 14em; }
-  .lifestyle input[type='text']:hover, .lifestyle input[type='text']:focus {
-    background-color: #d2d1cd !important; }
-  .lifestyle textarea {
-    min-height: 30px !important;
-    margin: 0px 0px 0px 0px !important; }
-  .lifestyle .display-flag:checked ~ span:nth-of-type(1),
-  .lifestyle .display-flag ~ span:nth-of-type(1n+2) {
-    display: none !important; }
-  .lifestyle .display-flag:checked ~ span:nth-of-type(1n+2) {
-    display: inherit !important; }
+div.lifestyle .sins-headers {
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: 27% 8% 1fr 1.5em !important;
+}
 
-  .lifestyle .sins-headers {
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: 27% 8% 1fr 1.5em !important;
-  }
+div.lifestyle .sins-headers h3[data-i18n='rtg'] {
+  text-align: center; }
 
-  .lifestyle .display {
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: 35% 1fr 1.5em !important;
-  }
+div.lifestyle div.repitem {
+  width: 100%;
+  display: inline-grid !important;
+  grid-template-columns: 27% 8% 1fr 1.5em; }
 
-  .lifestyle div.display .display-row {
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: 70% 30% !important;
-    font-weight: bold !important;
-  }
+div.lifestyle div.repitem div.settings {
+  grid-column: 1 / 5; }
 
-  .lifestyle div.collapsible {
-    padding-left: 0em !important;
-    word-wrap: break-word !important;
-  }
+div.lifestyle div.repitem span.collapsible {
+  grid-area: 1 / 3 / 1 / 5;
+  padding-left: 5px !important; }
 
-  .lifestyle div.itemcontrol button.repcontrol_del {
-    right: -2px;
-    top: -3px; }
+div.lifestyle div.repitem div.settings {
+  width: 100% !important;
+  display: inline-grid;
+  grid-template-columns: 1fr 1.5em 9em; }
+
+div.lifestyle div.repitem div.settings h3,
+div.lifestyle div.repitem div.settings h3 + textarea {
+  grid-column: 1 / 5; }
+
+div.lifestyle div.repitem input.settings-flag,
+div.lifestyle div.repitem input.settings-flag + span {
+  grid-area: 1 / 4 / 1 / 5;
+  text-align: right;
+  height: 1.5em; }
+
+div.lifestyle div.settings input[name='attr_rating'] {
+  width: 2em; }
+
+.lifestyle span.collapsible {
+  padding-left: 0em !important;
+  word-wrap: break-word !important;
+}
+
+.lifestyle div.itemcontrol button.repcontrol_del {
+  right: -2px;
+  top: -3px; }
 
 
+
+div.social div.pc-box div.row-long.heat-rep-asrep {
+  width: 100%;
+  display: inline-grid;
+  grid-template-columns: 1fr 5em 2em 2em 5em 2em 2em 5em 2em 1fr; }
+div.social div.pc-box div.row-long.heat-rep-asrep h2 {
+  text-align: right; }
+div.social div.pc-box div.row-long.heat-rep-asrep input[type='number'] {
+  text-align: center;
+  margin-left: 5px;
+  width: 2em; }
 
 /***** CONTACTS *****/
 div.contacts div.pc-box div.row-long {
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 4em 5em 3em 1.5em 1.5em; }
-div.contacts div.pc-box div.repeating-contacts {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1.5em 1.5em; }
+  display: inline-grid;
+  grid-template-columns: 1fr 4.25em 5em 4em 1.5em 1.5em; }
 
 div.contacts div.pc-box div.repitem {
-  display: inline-grid !important; }
-
-div.contacts div.pc-box div.repitem div.display {
-  width: 100% !important;
   display: inline-grid !important;
+  width: 100% !important;
   grid-template-columns: 1fr 5em 4em 2em 1.5em 1.5em; }
 
-div.contacts div.pc-box div.repitem div.settings div {
+div.contacts div.pc-box div.repitem div.settings,
+div.contacts div.pc-box div.repitem div.collapsible {
+  grid-column: 1 / 8; }
+
+div.contacts div.pc-box div.repitem div.settings {
   width: 100% !important;
   display: inline-grid;
-  grid-template-columns: 1fr 4em 4em 4em 1em 1em; }
+  grid-template-columns: 14.75em 5em 4em 4em 1.5em 1.5em; }
+
+div.contacts div.pc-box div.repitem div.settings input[name='attr_name'] {
+  width: 14em; }
 
 div.contacts div.pc-box input.settings-toggle[value="settings"] ~ div.display {
   display: none !important;
 }
+
+.contacts .display-flag, .social-box .display-flag {
+  position: absolute !important;
+  top: 0px !important;
+  width: 90% !important;
+  height: unset !important; }
+
+#SR6WE .pc div.contacts div.pc-box div.repitem input.collapse-flag + span.pictos, #SR6WE .pc div.contacts div.pc-box div.repitem .settings-toggle input[type='checkbox'].collapse-flag + span, #SR6WE .settings-toggle .pc div.contacts div.pc-box div.repitem input[type='checkbox'].collapse-flag + span,
+#SR6WE .pc div.contacts div.pc-box div.repitem .settings-flag input[type='checkbox'].collapse-flag + span,
+#SR6WE .settings-flag .pc div.contacts div.pc-box div.repitem input[type='checkbox'].collapse-flag + span, #SR6WE .pc div.contacts div.pc-box div.repitem .flag-primary + div > input.collapse-flag + span, #SR6WE .pc div.contacts div.pc-box div.repitem .repcontrol input.collapse-flag + span.repcontrol_edit:after, #SR6WE .repcontrol .pc div.contacts div.pc-box div.repitem input.collapse-flag + span.repcontrol_edit:after,
+#SR6WE .pc div.contacts div.pc-box div.repitem .repcontrol input.collapse-flag + span.repcontrol_add:after,
+#SR6WE .repcontrol .pc div.contacts div.pc-box div.repitem input.collapse-flag + span.repcontrol_add:after, #SR6WE .pc div.contacts div.pc-box div.repitem .itemcontrol input.collapse-flag + span.repcontrol_del, #SR6WE .itemcontrol .pc div.contacts div.pc-box div.repitem input.collapse-flag + span.repcontrol_del {
+  grid-area: 1 / 6 / 1 / 7 !important; }
+#SR6WE .pc div.contacts div.pc-box div.repitem input.settings-flag,
+#SR6WE .pc div.contacts div.pc-box div.repitem input.settings-flag + span.pictos,
+#SR6WE .pc div.contacts div.pc-box div.repitem .settings-toggle input[type='checkbox'].settings-flag + span,
+#SR6WE .settings-toggle .pc div.contacts div.pc-box div.repitem input[type='checkbox'].settings-flag + span,
+#SR6WE .pc div.contacts div.pc-box div.repitem .settings-flag input[type='checkbox'].settings-flag + span,
+#SR6WE .settings-flag .pc div.contacts div.pc-box div.repitem input[type='checkbox'].settings-flag + span,
+#SR6WE .pc div.contacts div.pc-box div.repitem .flag-primary + div > input.settings-flag + span,
+#SR6WE .pc div.contacts div.pc-box div.repitem .repcontrol input.settings-flag + span.repcontrol_edit:after,
+#SR6WE .repcontrol .pc div.contacts div.pc-box div.repitem input.settings-flag + span.repcontrol_edit:after,
+#SR6WE .pc div.contacts div.pc-box div.repitem .repcontrol input.settings-flag + span.repcontrol_add:after,
+#SR6WE .repcontrol .pc div.contacts div.pc-box div.repitem input.settings-flag + span.repcontrol_add:after,
+#SR6WE .pc div.contacts div.pc-box div.repitem .itemcontrol input.settings-flag + span.repcontrol_del,
+#SR6WE .itemcontrol .pc div.contacts div.pc-box div.repitem input.settings-flag + span.repcontrol_del {
+  grid-area: 1 / 7 / 1 / 8 !important; }
+
+div.contacts div.pc-box input.settings-flag,
+div.contacts div.pc-box input.settings-flag > span {
+    grid-area: 1 / 7 / 1 / 8; }
 
 div.contacts div[data-groupname='repeating_contacts'] div.repitem button[name='contact_chat'] {
   top: 1px;
@@ -2904,17 +3524,121 @@ div.contacts div.repitem div.itemcontrol button.repcontrol_del {
 
 
 /***** Notes Section *****/
+.notes .border-box {
+  border-top-right-radius: 0px !important;
+}
 .notes .pc-box {
   min-height: 800px !important; }
 .notes-col {
   display: inline-block;
   vertical-align: top;
-  width: 90%; }
+  width: 100%; }
 .notes-col textarea {
   margin-top: 8px;
   height: 785px !important;
-  width: 111% !important; }
+  width: 100% !important; }
+.notes .pc-notes {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+  resize: none !important; }
 
+div.notes-logs .rows .row-long.headers {
+  display: inline-grid;
+  grid-template-columns: .5em 6em 1fr 6em 3em;
+  width: 100%;
+}
+
+div.notes-logs .rows .row-long.headers2 {
+  display: inline-grid;
+  grid-template-columns: .5em 6em 6em 6em 6em 2em;
+  width: 100%;
+}
+
+div.notes-logs .rows div.repitem div.sess-info {
+  display: grid;
+  grid-template-columns: 0em 6em 1fr 6em 3em;
+  width: 100%; }
+div.notes-logs .rows div.repitem div.sess-awards {
+  display: grid;
+  grid-template-columns: 0em 6em 6em 6em 6em 2em;
+  width: 100%;
+  text-align: center; }
+
+
+div.notes-logs .rows div.repitem input.settings-flag[value='on'] .settings {
+  display: inline-grid !important;
+  margin-bottom: 2% !important; }
+
+div.notes-logs .rows div.repitem input.collapse-flag[value='on'] .collapse {
+  display: inline-grid !important;
+  margin-bottom: 2% !important; }
+
+div.notes-logs .rows div.repitem .settings div.sess-info {
+  display: inline-grid;
+  grid-template-columns: 0em 6em 1fr 6em 2em; 
+  width: 100%; }
+div.notes-logs .rows div.repitem .settings div.sess-awards {
+  display: inline-grid;
+  grid-template-columns: 0em 5em 7em 6em 6em 2em; 
+  width: 100%; }
+
+.notes-logs textarea {
+  height: 75px !important;
+  width: 100% !important; }
+
+
+div.notes-logs .rows div.repitem input.collapse-flag {
+  grid-area: 1 / 6 / 1 / 7; }
+div.notes-logs .rows div.repitem input.collapse-flag + span.pictos, div.notes-logs .rows div.repitem .settings-toggle input[type='checkbox'].collapse-flag + span, .settings-toggle div.notes-logs .rows div.repitem input[type='checkbox'].collapse-flag + span,
+div.notes-logs .rows div.repitem .settings-flag input[type='checkbox'].collapse-flag + span,
+.settings-flag div.notes-logs .rows div.repitem input[type='checkbox'].collapse-flag + span, div.notes-logs .rows div.repitem .flag-primary + div > input.collapse-flag + span, div.notes-logs .rows div.repitem .repcontrol input.collapse-flag + span.repcontrol_edit:after, .repcontrol div.notes-logs .rows div.repitem input.collapse-flag + span.repcontrol_edit:after,
+div.notes-logs .rows div.repitem .repcontrol input.collapse-flag + span.repcontrol_add:after,
+.repcontrol div.notes-logs .rows div.repitem input.collapse-flag + span.repcontrol_add:after, div.notes-logs .rows div.repitem .itemcontrol input.collapse-flag + span.repcontrol_del, .itemcontrol div.notes-logs .rows div.repitem input.collapse-flag + span.repcontrol_del {
+  grid-area: 1 / 6 / 1 / 7; }
+div.notes-logs .rows div.repitem input.settings-flag,
+div.notes-logs .rows div.repitem input.settings-flag + span.pictos,
+div.notes-logs .rows div.repitem .settings-toggle input[type='checkbox'].settings-flag + span,
+.settings-toggle div.notes-logs .rows div.repitem input[type='checkbox'].settings-flag + span,
+div.notes-logs .rows div.repitem .settings-flag input[type='checkbox'].settings-flag + span,
+.settings-flag div.notes-logs .rows div.repitem input[type='checkbox'].settings-flag + span,
+div.notes-logs .rows div.repitem .flag-primary + div > input.settings-flag + span,
+div.notes-logs .rows div.repitem .repcontrol input.settings-flag + span.repcontrol_edit:after,
+.repcontrol div.notes-logs .rows div.repitem input.settings-flag + span.repcontrol_edit:after,
+div.notes-logs .rows div.repitem .repcontrol input.settings-flag + span.repcontrol_add:after,
+.repcontrol div.notes-logs .rows div.repitem input.settings-flag + span.repcontrol_add:after,
+div.notes-logs .rows div.repitem .itemcontrol input.settings-flag + span.repcontrol_del,
+.itemcontrol div.notes-logs .rows div.repitem input.settings-flag + span.repcontrol_del {
+  grid-area: 1 / 7 / 1 / 8; }
+
+div.notes-changelog div.changelog {
+  overflow-x: scroll;
+  overflow-y: scroll;
+  height: 790px;
+  margin-top: 5px; }
+
+div.notes-changelog div.changelog h1 {
+  text-align: center;
+  margin-bottom: 10px; }
+
+div.notes-changelog div.changelog .changelog-entry {
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: underline; }
+
+div.notes-changelog div.changelog span.bullet {
+  background: none !important;
+  text-shadow: 1px 1px 2px black, 0 0 25px #460141, 0 0 5px #460141 !important;
+  border: none !important;
+  color: #fff !important;
+  font-family: 'dicefontd6' !important;
+  font-size: 1.5em !important;
+  margin-right: 6px;
+  position: relative;
+  top: 1px; }
+
+div.notes-changelog div.changelog ul {
+  list-style-type: none;
+  margin-left: 15px; }
 
 /***** Rolls Section *****/
 
@@ -2924,22 +3648,49 @@ div.contacts div.repitem div.itemcontrol button.repcontrol_del {
 .rolls-col {
   width: 100%;
   display: inline-block; }
-.rolls .pc-box .rolls-col .rolls-matrix {
+.rolls-matrix {
   width: 100%;
   display: grid;
   grid-column-gap: 5px;
   grid-row-gap: 2px;
   grid-template-columns: 32% 32% 32%; }
-.rolls .pc-box .rolls-col .rolls-matrix h1,
-.rolls .pc-box .rolls-col .rolls-matrix h2 {
+.rolls-matrix h1,
+.rolls-matrix h2,
+.rolls-matrix hr {
   grid-column: 1 / 4; }
-.rolls .pc-box .rolls-col h3[data-i18n="rollbuttonsdisclaimer"] {
+.rolls-col h3[data-i18n="rollbuttonsdisclaimer"] {
   line-height: 15px;
   font-weight: bolder;
   color: #555 !important;
   text-transform: unset !important;
   grid-column: 1 / 4; }
+.rolls-matrix label {
+  grid-column: 1 / 4; }
 
+.rolls-matrix span.full-width {
+  grid-column: 1 / 4; }
+.rolls-matrix span.full-width label {
+  grid-column: unset; }
+
+/* Hides illegal matrix actions when the checkbox is unchecked */
+.rolls-matrix input[type="hidden"][name$="display_illegal_matrix_actions"][value="0"] ~ .illegal,
+.rolls-matrix input[type="hidden"][name$="display_illegal_matrix_actions"][value="0"] ~ .illegal > span{
+  display: none !important;
+}
+
+/* hides user and admin matrix actions when "Access Level Filter" is set to "Outsider" */
+.rolls-matrix input[type="hidden"][name$="access_level_filter"][value="outsider"] ~ .user:not(.outsider),
+.rolls-matrix input[type="hidden"][name$="access_level_filter"][value="outsider"] ~ .user:not(.outsider) > span,
+.rolls-matrix input[type="hidden"][name$="access_level_filter"][value="outsider"] ~ .admin:not(.outsider),
+.rolls-matrix input[type="hidden"][name$="access_level_filter"][value="outsider"] ~ .admin:not(.outsider) > span {
+  display: none !important;
+}
+
+/* hides admin matrix actions when "Access Level Filter" is set to "User" */
+.rolls-matrix input[type="hidden"][name$="access_level_filter"][value="user"] ~ .admin:not(.user),
+.rolls-matrix input[type="hidden"][name$="access_level_filter"][value="user"] ~ .admin:not(.user) > span {
+  display: none !important;
+}
 
 .npc-roll-rows .rolls-col .rolls-matrix span.matrix-action,
 .rolls .pc-box .rolls-col .rolls-matrix span.matrix-action {
@@ -2961,7 +3712,6 @@ div.contacts div.repitem div.itemcontrol button.repcontrol_del {
 .npc-roll-rows .rolls-col .rolls-matrix .illegal > span:hover,
 .rolls .pc-box .rolls-col .rolls-matrix .illegal > span:hover {
   text-shadow: 1px 1px 2px red, 0 0 25px #460141, 0 0 5px #460141 !important; }
-
 
 
 /* Misc Rolls */
@@ -3014,15 +3764,57 @@ div.contacts div.repitem div.itemcontrol button.repcontrol_del {
   margin: 3px 0px !important;
   opacity: 0.1 !important; }
 
-.op-col label {
+.op-col-left label {
   margin-bottom: 2% !important;
-  width: 55% !important; }
+  width: 84% !important; }
+
+.op-col-right label {
+  margin-bottom: 2% !important;
+  width: 63% !important; }
 
 .options input[type='checkbox'] {
   height: 15px !important;
   margin-left: 5% !important;
   opacity: 1 !important;
   width: 15px !important; }
+
+.options div.importer {
+  position: relative;
+  top: 110px; }
+
+.options .importer .collapse-flag {
+  position: relative;
+  top: 55px;
+  opacity: 0 !important;
+  margin-left: 0px !important; }
+
+.options .importer span.pictos {
+  position: relative;
+  z-index: 0;
+  left: -17px;
+  top: 55px; }
+
+.options .importer .importer-input textarea {
+  position: relative;
+  top: -20px;
+  left: 4%;
+  width: 96%; }
+
+.options .importer .importer-input .import-button {
+  position: relative !important;
+  bottom: -30px !important;
+  right: -90% !important;
+  z-index: 1; }
+
+.options .importer span.importer-feedback {
+  position: relative;
+  top: -25px;
+  white-space: break-spaces;
+  font-size: 10px;
+  font-weight: bold;
+  color: red; }
+
+
 
 /***** EDGE & MATRIX CONDITION HEXAGONS *****/
 .edg-hex input[type='checkbox'],
@@ -3039,7 +3831,7 @@ div.contacts div.repitem div.itemcontrol button.repcontrol_del {
   display: inline-block !important;
   margin: 5.77px 0 !important;
   position: relative !important;
-  background-color: #222 !important;
+  background-color: #460141 !important;
   height: 11.55px !important;
   width: 20px !important; }
 
@@ -3053,12 +3845,12 @@ div.contacts div.repitem div.itemcontrol button.repcontrol_del {
 
 .hexagon:before {
   bottom: 100% !important;
-  border-bottom: 5.77px solid #222 !important; }
+  border-bottom: 5.77px solid #460141 !important; }
 
 .hexagon:after {
   top: 100% !important;
   width: 0 !important;
-  border-top: 5.77px solid #222 !important; }
+  border-top: 5.77px solid #460141 !important; }
 
 .edg-hex input[type='checkbox']:checked ~ .hexagon,
 .con-hex input[type='radio']:checked ~ .hexagon,
@@ -3078,15 +3870,15 @@ div.contacts div.repitem div.itemcontrol button.repcontrol_del {
 .edg-hex input[type='checkbox']:checked + .hexagon,
 .con-hex input[type='radio'] + .hexagon,
 .con-hex input[type='radio']:checked + .hexagon {
-  background-color: #222 !important; }
+  background-color: #460141 !important; }
 
 .edg-hex input[type='checkbox']:checked + .hexagon:before,
 .con-hex input[type='radio']:checked + .hexagon:before {
-  border-bottom-color: #222 !important; }
+  border-bottom-color: #460141 !important; }
 
 .edg-hex input[type='checkbox']:checked + .hexagon:after,
 .con-hex input[type='radio']:checked + .hexagon:after {
-  border-top-color: #222 !important; }
+  border-top-color: #460141 !important; }
 
 /***** MAKE HEXES APPEAR & DISAPPEAR *****/
 /*
@@ -3228,8 +4020,13 @@ span.d6 {
   /*:+:+:+: NPC BODY :+:+:+:*/
   /*:+:+:+: NPC TEXT BOXES AND REPEATING SECTIONS :+:+:+:*/
   /*:+:+:+: NPC MATRIX :+:+:+:*/
-input[name="attr_stats_toggle"][value="settings"] ~ .body .toggle-display {
+input[name="attr_stats_toggle"][value="settings"] ~ .body .toggle-display,
+input[name="attr_stats_toggle"][value="settings"] ~ .border-box .body .toggle-display,
+.npc div.border-box div.pc-box div.column div.rows.grunt.show-stun {
   display: none !important; }
+
+.npc input[name="attr_show_stun"][value="show_stun"] ~ div.border-box div.pc-box div.column div.rows.grunt.show-stun {
+  display: inline !important; }
 
 .npc {
   background-color: rgb(231, 230, 229);
@@ -3296,7 +4093,8 @@ input[name="attr_stats_toggle"][value="settings"] ~ .body .toggle-display {
   font-weight: bold;
   color: #460141; }
 
-#SR6WE .npc div.tabs button[type='roll'] {
+#SR6WE .npc div.tabs button[type='roll'],
+#SR6WE .npc div.tabs button[type='action'] {
   padding-bottom: 10px !important;
   vertical-align: middle; }
 #SR6WE .npc div.tabs .switch input[type='checkbox'] + span {
@@ -3358,7 +4156,7 @@ input[name="attr_stats_toggle"][value="settings"] ~ .body .toggle-display {
 .npc div.rows h3 {
   display: inline; }
 .npc div.rows input[type='number'] {
-  width: 3em; }
+  width: 2em; }
 .npc div.rows span.tiny-span {
   margin: 0px 1%; }
 .npc div.repeating button {
@@ -3451,7 +4249,8 @@ input[name="attr_stats_toggle"][value="settings"] ~ .body .toggle-display {
   background-color: #460141 !important;
   border-bottom: 2px solid #040404 !important; }
 
-.npc .body div.repitem button[name='roll_range_weapon'] > span {
+.npc .body div.repitem button[name='roll_range_weapon'] > span,
+.npc .body div.repitem button[name='act_range_weapon'] > span {
   text-align: left; }
 
 /* Melee Specific */
@@ -3577,6 +4376,23 @@ input[name="attr_stats_toggle"][value="settings"] ~ .body .toggle-display {
 .npc .body div.weapon-range div.repitem div.settings input[name='attr_firing_modes'] {
   width: 13em; }
 
+
+.npc .body div.weapon-range input[name='attr_dicepool'][value='0'] ~ button.dicepool,
+.npc .body div.weapon-melee input[name='attr_dicepool'][value='0'] ~ button.dicepool {
+  display: none;
+}
+.npc .body div.weapon-range input[name='attr_dicepool']:not([value='0']) ~ button.no-dicepool,
+.npc .body div.weapon-melee input[name='attr_dicepool']:not([value='0']) ~ button.no-dicepool {
+  display: none;
+}
+
+input[name='attr_sheet_type'][value='spirit'] ~ .npc .body div.spirit.weapon-range .atk-dp-mod,
+input[name='attr_sheet_type'][value='vehicle'] ~ .npc .body div.vehicle.weapon-range .atk-dp-mod,
+input[name='attr_sheet_type'][value='spirit'] ~ .npc .body div.spirit.weapon-melee .atk-dp-mod,
+input[name='attr_sheet_type'][value='vehicle'] ~ .npc .body div.vehicle.weapon-melee .atk-dp-mod {
+  display: none;
+}
+
 .npc .body div.weapon-range,
 .npc .body div.weapon-melee {
 width: 100% !important; }
@@ -3660,6 +4476,24 @@ width: 100% !important; }
 
 
     /*:+:+:+: SPELLS :+:+:+:*/
+
+/* hide the old npcspells repeating section for awhile, eventually we'll delete it */
+.npc div.spells div.repitem input[name='attr_category'][value='Combat'] ~ button[name*='act_npcnoncombatspell'], 
+.npc div.spells div.repitem input[name='attr_category']:not([value='Combat']) ~ button[name^='act_npcspell'], 
+.npc div.spells div.repitem input[name='attr_range']:not([value$='(A)']) ~ button[name*='aoe'],
+.npc div.spells div.repitem input[name='attr_range'][value$='(A)'] ~ button:not([name*='aoe']) {
+  display: none;
+}
+.npc div.spells input[name='attr_dicepool'][value='0'] ~ button.dicepool {
+  display: none;
+}
+.npc div.spells input[name='attr_dicepool']:not([value='0']):not([value='']) ~ button.no-dicepool {
+  display: none;
+}
+
+.npc div.hidden.hidden.hidden {
+  display: none !important; }
+
 .npc div.spells div.repitem div.settings {
   grid-column: 1 / 9 !important; }
 
@@ -3742,12 +4576,63 @@ width: 100% !important; }
 
 
     /*:+:+:+: COMPLEX FORMS :+:+:+:*/
-.npc div.end div.forms div.settings {
+#SR6WE .npc div.end div.forms div.repitem,
+#SR6WE .npc div.end div.forms div.rows.headers {
+  display: grid;
+  grid-template-columns: 4em 14em 10em 10em 3em 1fr;
+  grid-column-gap: .5%; }
+
+#SR6WE .npc div.forms div.rows h2 {
+  display: inline;
+  font-size: 1.1em;
+  line-height: unset;
+  font-weight: normal;
+  text-decoration: none; }
+#SR6WE .npc div.forms div.rows h2.name, 
+#SR6WE .npc div.forms div.rows h2.duration, 
+#SR6WE .npc div.forms div.rows h2.skill {
+  text-align: left !important; }
+
+#SR6WE .npc div.end div.forms input[name="attr_flag"] + span {
+  top: 1px;
+  left: unset;
+  margin-left: auto;
+  margin-right: auto; }
+#SR6WE .npc div.end div.forms .dice {
+  padding-top: 2px;
+  margin-left: 25px;
+  margin-right: auto; }
+#SR6WE .npc div.end div.forms span.fade_value {
+  text-align: center; }
+
+#SR6WE .npc div.end div.forms button[name='roll_complex_form'] {
+  text-align: left;
+  margin-left: 0px; }
+
+#SR6WE .npc div.end div.forms div.settings {
+  grid-column: 1 / 7;
+  width: 100%;
+  display: grid;
   grid-column-gap: 0.2%;
-  grid-template-columns: 3em 1fr 7em 8em 3em; }
-.npc div.end div.forms label[data-i18n-title='notes'] {
+  grid-template-columns: 4em 14em 10em 10em 3em; }
+#SR6WE .npc div.end div.forms label[data-i18n-title='notes'] {
   grid-column: 1 / 6; }
 
+#SR6WE .npc div.end div.forms div.repitem span.hide-roll-button {
+  display: none; }
+#SR6WE .npc div.end div.forms div.repitem span.show-name,
+#SR6WE .npc div.end div.forms div.repitem button.show-name {
+  font-weight: bold;
+  display: none; }
+#SR6WE .npc div.end div.forms div.repitem span.hide-roll-button:empty ~ button[name='act_complexform'] {
+  display: none !important; }
+#SR6WE .npc div.end div.forms div.repitem span.hide-roll-button:empty ~ span.show-name,
+#SR6WE .npc div.end div.forms div.repitem span.hide-roll-button:empty ~ button.show-name {
+  display: inherit; }
+#SR6WE .npc div.end div.forms div.repitem span[name='attr_dice']:empty ~ button[name$=dice] {
+  display: none; }
+#SR6WE .npc div.end div.forms div.repitem span[name='attr_dice']:not(:empty) ~ button:not([name$=dice]) {
+  display: none; }
 
 
     /*:+:+:+: IC :+:+:+:*/
@@ -3998,13 +4883,197 @@ width: 100% !important; }
   display: inline-block; }
 
 
-.npc div.matrix-device div.npc-roll-rows {
+.npc div.matrix div.npc-roll-rows {
   display: inline-grid;
   grid-template-columns: auto;
-  grid-row-gap: 5%; }
-.npc div.matrix-device div.npc-roll-rows .rolls-matrix {
+  grid-row-gap: 1%; }
+.npc div.matrix div.npc-roll-rows .rolls-matrix {
   display: inline-grid;
   grid-template-columns: auto auto auto; }
+
+
+
+/**************************************************************************
+                           MATRIX ENCOUNTER TRACKER
+**************************************************************************/
+.gm-helper {
+  background-color: rgb(231, 230, 229);
+  border-radius: 3px;
+  color: #000;
+  margin-top: -20px;
+  min-height: 800px;
+  padding: 10px 10px;
+  width: 760px; }
+.gm-helper button {
+  background: rgb(231, 230, 229);
+  color: #464041; }
+.gm-helper button:hover, .gm-helper button:focus {
+  border-color: #460141;
+  color: #460141;
+  font-weight: bold; }
+.gm-helper h1, .gm-helper h2, .gm-helper h3, .gm-helper h4, .gm-helper label {
+  color: #460141; }
+.gm-helper h1 {
+  line-height: unset;
+  font-size: 1.1em; }
+.gm-helper h2 {
+  font-size: 1em;
+  text-transform: capitalize; }
+.gm-helper h3 {
+  font-size: 0.85em; }
+.gm-helper input[type='radio'] {
+  opacity: 1; }
+.gm-helper input[type='text']:placeholder-shown, .gm-helper input[type='number']:placeholder-shown {
+  border: 1px dotted #460141; }
+.gm-helper input.toggle:checked + span {
+  color: #460141; }
+.gm-helper textarea, .gm-helper select {
+  color: #000;
+  background-color: rgb(210, 209, 205); }
+
+#SR6WE .gm-helper .border-box {
+  margin-top: 3px; }
+#SR6WE .gm-helper .header-nav {
+  display: grid;
+  grid-template-columns: 1.5em auto 2em 2em 1fr auto auto;
+  grid-column-gap: 5px;
+  width: 100%;
+  height: 30px;
+  align-items: center;
+  margin: 0px 0px 6px 0px; }
+#SR6WE .gm-helper .header-nav button[name='act_extended_start'],
+#SR6WE .gm-helper .header-nav button[name='act_d6'] {
+  font-size: 2em !important;
+  border: none !important;
+  padding-top: 7px !important;
+}
+
+#SR6WE .gm-helper button[type='roll'],
+#SR6WE .gm-helper button[type='action'] {
+  padding-bottom: 10px !important;
+  vertical-align: middle; }
+
+#SR6WE .gm-helper input[name='attr_stats_toggle']:checked + span {
+  color: #460141; }
+
+
+#SR6WE .gm-helper .os-tracker div.headers {
+  width: 100%;
+  display: grid;
+  grid-column-gap: 5px;
+  grid-template-columns: 1em 1fr 7em 7em 1em 1em; }
+#SR6WE .gm-helper .os-tracker {
+  width: 100%;
+  grid-column-gap: 5px;
+  display: grid; }
+#SR6WE .gm-helper .os-tracker div.repitem {
+  margin-bottom: 0px;
+  width: 100% !important;
+  display: grid !important;
+  grid-column-gap: 5px;
+  grid-template-columns: 1em 1fr 7em 7em 1em 1em; }
+#SR6WE .gm-helper .os-tracker div.settings {
+  grid-column: 1 / 7;
+  width: 100%;
+  display: grid;
+  grid-column-gap: 3px;
+  grid-template-columns: 1em 1fr 7em 7em 1em 1em; }
+#SR6WE .gm-helper .os-tracker div.settings label[data-i18n-title='notes'] {
+  width: 99%;
+  grid-column: 1 / 7; }
+
+#SR6WE .gm-helper .os-tracker input.settings-toggle:checked ~ settings {
+  display: grid; }
+#SR6WE .gm-helper .os-tracker input.settings-toggle + span {
+  color: #460141;
+  opacity: .5; }
+#SR6WE .gm-helper .os-tracker input.settings-toggle:checked + span {
+  opacity: 1; }
+
+#SR6WE .gm-helper .os-tracker input.collapse-flag:checked ~ div.collapse {
+  display: inherit; }
+#SR6WE .gm-helper .os-tracker input.collapse-flag + span {
+  color: #460141;
+  opacity: .5; }
+#SR6WE .gm-helper .os-tracker input.collapse-flag:checked + span {
+  opacity: 1; }
+#SR6WE .gm-helper .os-tracker div.collapse {
+  padding-left: 5px;
+  grid-column: 1 / 7; }
+
+#SR6WE .gm-helper .os-tracker .os-control-btn {
+  border: none !important;
+  padding: unset !important;
+  font-size: 16px !important;
+  vertical-align: top;
+}
+  
+#SR6WE .gm-helper button[name='act_add_to_os_tracker'] {
+  padding-bottom: 0px !important;
+}
+
+#SR6WE .gm-helper .os-tracker div.repitem {
+  border-bottom: 1px solid #333 !important; }
+
+#SR6WE .gm-helper .os-tracker div.repcontrol {
+  width: 100%;
+  display: grid !important;
+  grid-column-gap: 3px;
+  grid-template-columns: 3em 3em 1fr; }
+
+#SR6WE .gm-helper input[name='attr_stats_toggle'],
+#SR6WE .gm-helper input[name='attr_stats_toggle'] + span.pictos,
+#SR6WE .gm-helper .settings-toggle input[type='checkbox'][name='attr_stats_toggle'] + span,
+#SR6WE .gm-helper .settings-flag input[type='checkbox'][name='attr_stats_toggle'] + span,
+#SR6WE .gm-helper .flag-primary + div > input[name='attr_stats_toggle'] + span,
+#SR6WE .gm-helper .itemcontrol input[name='attr_stats_toggle'] + span.repcontrol_del,
+#SR6WE .itemcontrol .gm-helper input[name='attr_stats_toggle'] + span.repcontrol_del {
+  grid-area: 1 / 1 / 1 / 2;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  font-size: 1.75em; }
+
+
+#SR6WE .gm-helper div.os-tracker .repcontrol button.repcontrol_edit:after,
+#SR6WE .gm-helper div.os-tracker .repcontrol button.repcontrol_add:after {
+  position: absolute !important; }
+#SR6WE .gm-helper div.os-tracker .repcontrol button.repcontrol_edit:after {
+  left: 80px; }
+#SR6WE .gm-helper div.os-tracker .repcontrol button.repcontrol_add:after {
+  left: 55px; }
+
+#SR6WE .gm-helper .os-tracker div.repitem input.collapse-flag + span.pictos, 
+#SR6WE .gm-helper .os-tracker div.repitem .settings-toggle input[type='checkbox'].collapse-flag + span, 
+#SR6WE .gm-helper .os-tracker div.repitem .settings-flag input[type='checkbox'].collapse-flag + span,
+#SR6WE .gm-helper .os-tracker div.repitem .flag-primary + div > input.collapse-flag + span, 
+#SR6WE .gm-helper .os-tracker div.repitem .repcontrol input.collapse-flag + span.repcontrol_edit:after, 
+#SR6WE .gm-helper .os-tracker div.repitem .repcontrol input.collapse-flag + span.repcontrol_add:after,
+#SR6WE .gm-helper .os-tracker div.repitem .itemcontrol input.collapse-flag + span.repcontrol_del {
+  grid-area: 1 / 5 / 1 / 6 !important; }
+#SR6WE .gm-helper .os-tracker div.repitem input.collapse-flag {
+  grid-area: 1 / 5 / 1 / 6 !important;
+  opacity: 0; 
+  z-index: 2; }
+
+#SR6WE .gm-helper .os-tracker div.repitem input.settings-toggle + span.pictos,
+#SR6WE .gm-helper .os-tracker div.repitem .settings-toggle input[type='checkbox'].settings-flag + span,
+#SR6WE .gm-helper .os-tracker div.repitem .settings-flag input[type='checkbox'].settings-flag + span,
+#SR6WE .gm-helper .os-tracker div.repitem .flag-primary + div > input.settings-flag + span,
+#SR6WE .gm-helper .os-tracker div.repitem .repcontrol input.settings-flag + span.repcontrol_edit:after,
+#SR6WE .gm-helper .os-tracker div.repitem .repcontrol input.settings-flag + span.repcontrol_add:after,
+#SR6WE .gm-helper .os-tracker div.repitem .itemcontrol input.settings-flag + span.repcontrol_del {
+  grid-area: 1 / 6 / 1 / 7 !important; }
+#SR6WE .gm-helper .os-tracker div.repitem input.settings-toggle {
+  grid-area: 1 / 6 / 1 / 7 !important;
+  opacity: 0; 
+  z-index: 2; }
+
+
+
+
+
+
 
 /**************************************************************************/
 /***************** PC & NPC SHEET SHOW & HIDE SETTINGS *******************/
@@ -4019,6 +5088,7 @@ width: 100% !important; }
 .optional-flag[value='0'] + .attr-header,
 .category + div, 
 .category + div + div, .npc, .pc, .arms, .augs, .core, .gear, .options, .social, .vehicle, .notes, .rolls, 
+.attributes-active, .attributes-effects,
 .skills-active, .skills-knowledge, .skills-language, 
 .magic-spells, .magic-preps, .magic-rituals,
 .powers-adept, .powers-meta, .powers-conjuring,
@@ -4033,7 +5103,10 @@ input.settings-toggle[value='display'] ~ div.settings,
 input.settings-toggle[value='display'] ~ div.settings-grid, input.settings-toggle[value='display'] ~ .settings, .hide-magic, .hide-spirit, .hide-resonance, 
 div.weapon-range, div.weapon-melee, div.weapon-grenade,
 div.rolls-matrix, div.rolls-misc,
+div.notes-notes, div.notes-logs, div.notes-changelog,
 .grunt, .spirit, .host, .sprite, 
+input[name='attr_sheet_type'][value='host'] ~ .npc .matrix.body.matrix-device, 
+input[name='attr_sheet_type'][value='sprite'] ~ .npc .matrix.body.matrix-device, 
 input[name='attr_flag_special'][value='mundane'] ~ div.npc .hide-magic, 
 input[name='attr_flag_special'][value='mundane'] ~ div.npc .hide-spirit,
 input[name='attr_flag_special'][value='mundane'] ~ div.npc .hide-resonance,
@@ -4074,10 +5147,12 @@ input[name='attr_weapon_range'][value='melee'] ~ h2[data-i18n='ammo'],
 input[name='attr_weapon_range'][value='melee'] ~ label[data-i18n-title='modes'],
 input[name='attr_weapon_range'][value='melee'] ~ label[data-i18n-title='recoil'],
 input[name='attr_weapon_range'][value='melee'] ~ label[data-i18n-title='ammo'],
-input[name='attr_weapon_range'][value='melee'] ~ span {
+input[name='attr_weapon_range'][value='melee'] ~ span,
+.gm-helper {
   display: none !important; }
 
 .display-flag:checked ~ .collapsible .desc, 
+.attributes-toggle[value='attributes'] ~ .attributes-active, .attributes-toggle[value='effects'] ~ .attributes-effects, 
 .skills-toggle[value='active'] ~ .skills-active, .skills-toggle[value='knowledge'] ~ .skills-knowledge, .skills-toggle[value='language'] ~ .skills-language, 
 .magic-toggle[value='spells'] ~ .magic-spells, .magic-toggle[value='preps'] ~ .magic-preps, .magic-toggle[value='rituals'] ~ .magic-rituals, 
 .powers-toggle[value='adept'] ~ .powers-adept, .powers-toggle[value='meta'] ~ .powers-meta, .powers-toggle[value='conjuring'] ~ .powers-conjuring, 
@@ -4098,7 +5173,10 @@ input[name='attr_sheet_type'][value='sprite'] ~ .npc .attribute.sprite,
 input[name='attr_sheet_type'][value='vehicle'] ~ .npc .attribute.vehicle {
   display: inline-grid !important; }
 input.tab-switch[value='matrix'] ~ .rolls-matrix,
-input.tab-switch[value='misc'] ~ .rolls-misc {
+input.tab-switch[value='misc'] ~ .rolls-misc,
+input.tab-switch[value='notes'] ~ .notes-notes,
+input.tab-switch[value='logs'] ~ .notes-logs,
+input.tab-switch[value='changelog'] ~ .notes-changelog {
   display: grid !important; }
 .pictos, .settings-toggle input[type='checkbox'] + span,
 .settings-flag input[type='checkbox'] + span, .flag-primary + div > span, .cc-row button[name*='shots'], .cc-row button[name='act_reload'], .cc-row button[name='act_primary_ammo'], .repcontrol .repcontrol_edit:after,
@@ -4108,7 +5186,12 @@ input.tab-switch[value='misc'] ~ .rolls-misc {
 .display-flag:checked ~ .collapsible .desc-lifestyle, 
 .optional-flag:not([value='0']) + .optional, 
 .npc div.mid div.column, 
-input[name='attr_sheet_type']:not([value='pc']) ~ .npc,
+input[name='attr_sheet_type'][value='grunt'] ~ .npc,
+input[name='attr_sheet_type'][value='spirit'] ~ .npc,
+input[name='attr_sheet_type'][value='host'] ~ .npc,
+input[name='attr_sheet_type'][value='sprite'] ~ .npc,
+input[name='attr_sheet_type'][value='spirit'] ~ .npc,
+input[name='attr_sheet_type'][value='vehicle'] ~ .npc,
 input[name='attr_sheet_type'][value='pc'] ~ .pc,
 .options_toggle[value='arms'] ~ .arms, 
 .options_toggle[value='augs'] ~ .augs, 
@@ -4122,6 +5205,8 @@ input[name='attr_sheet_type'][value='pc'] ~ .pc,
 .options_toggle[value='notes'] ~ .notes, 
 .options_toggle[value='rolls'] ~ .rolls, 
 input[name='attr_stats_toggle'][value='settings'] ~ .border-box .attribute .settings,
+input[name='attr_stats_toggle'][value='settings'] ~ .border-box .body .column .rows .settings,
+input[name='attr_stats_toggle'][value='settings'] ~ .border-box .body .textrow .settings, 
 input[name='attr_stats_toggle'][value='settings'] ~ .body .column .settings,
 input[name='attr_stats_toggle'][value='settings'] ~ .body .textrow .settings, 
 input[name='attr_stats_toggle'][value='settings'] ~ .settings,
@@ -4145,16 +5230,19 @@ input[name='attr_sheet_type'][value='spirit'] ~ .npc .header-nav .spirit,
 input[name='attr_sheet_type'][value='host'] ~ .npc .rows.host,
 input[name='attr_sheet_type'][value='host'] ~ .npc .textrow.host, 
 input[name='attr_sheet_type'][value='host'] ~ .npc .header-nav .host, 
+input[name='attr_sheet_type'][value='host'] ~ .npc .matrix, 
 input[name='attr_sheet_type'][value='sprite'] ~ .npc .rows.sprite,
 input[name='attr_sheet_type'][value='sprite'] ~ .npc .textrow.sprite, 
 input[name='attr_sheet_type'][value='sprite'] ~ .npc .header-nav .sprite, 
+input[name='attr_sheet_type'][value='sprite'] ~ .npc .matrix, 
 input[name='attr_sheet_type'][value='vehicle'] ~ .npc .rows.vehicle,
 input[name='attr_sheet_type'][value='vehicle'] ~ .npc .textrow.vehicle, 
 input[name='attr_sheet_type'][value='vehicle'] ~ .npc .header-nav .vehicle, 
+input[name='attr_sheet_type'][value='vehicle'] ~ .npc .matrix,
+input[name='attr_sheet_type'][value='gm_helper'] ~ .gm-helper,
 input[name='attr_flag_matrix'][value='matrix'] ~ div.matrix,
 .static {
   display: inline-block !important; }
-
 
 /**********************************/
 /*          Power Button          */
@@ -4168,16 +5256,16 @@ input[name='attr_flag_matrix'][value='matrix'] ~ div.matrix,
   height: 15px;
   padding: 0px 4px 20px 4px;
   border-radius: 10px;
-  color: red;
-  border: red solid 1px;
+  color: #333;
+  border: #333 solid 1px;
   opacity: 1 !important;}
 #SR6WE div.repcontainer div.repitem input[name^='attr_powered_on']:checked + span.pictos {
   top: 0;
   height: 15px;
   padding: 0px 4px 20px 4px;
   border-radius: 10px;
-  box-shadow: green 0px 1px 5px 2px;
-  color: green; }
+  box-shadow: #79016f 0px 1px 5px 2px;
+  color: #79016f; }
 
 #SR6WE div.repcontainer div.repitem input[name^='attr_powered_on']:not(:checked) ~ button, 
 #SR6WE div.repcontainer div.repitem input[name^='attr_powered_on']:not(:checked) ~ button > span, 
@@ -4326,29 +5414,49 @@ div.footer img {
 /********************************************************************************************************/
 /******************************************* Roll template **********************************************/
 /********************************************************************************************************/
+.goat,
+.sheet-rolltemplate-rolls-computed .sheet-nott .inlinerollresult {
+  pointer-events: none;
+}
+.sheet-rolltemplate-rolls-computed span.sheet-left {
+  float: left;
+  text-align: left; }
+.sheet-rolltemplate-rolls-computed span.sheet-right {
+  float: right;
+  text-align: right; }
+.sheet-rolltemplate-rolls-computed span.sheet-left a {
+  padding: 0px 3px; }
+.sheet-rolltemplate-rolls-computed span.sheet-right a {
+  padding: 0px 5px; }
+
 .sheet-rolltemplate-multirow a[href^="!"],
 .sheet-rolltemplate-quality a[href^="!"],
 .sheet-rolltemplate-rolls a[href^="!"],
+.sheet-rolltemplate-rolls-computed a[href^="!"],
 .sheet-rolltemplate-contact a[href^="!"],
 .sheet-rolltemplate-multirow a[href^="~"],
 .sheet-rolltemplate-quality a[href^="~"],
 .sheet-rolltemplate-rolls a[href^="~"],
+.sheet-rolltemplate-rolls-computed a[href^="~"],
 .sheet-rolltemplate-contact a[href^="~"] {
   background-color: #460141; }
 
 .sheet-rolltemplate-multirow div.sheet-template-body,
 .sheet-rolltemplate-quality div.sheet-template-body,
 .sheet-rolltemplate-rolls div.sheet-template-body,
+.sheet-rolltemplate-rolls-computed div.sheet-template-body,
 .sheet-rolltemplate-contact div.sheet-template-body {
+  background-image: url('https://s3.amazonaws.com/files.d20.io/images/269006169/gmV2tN1n_RkkzWPqRTci0w/max.png?1644019060');
+  background-repeat: round;
   border: 2px solid #000 !important;
   border-radius: 3px 3px 3px 3px !important; }
 
 .sheet-rolltemplate-multirow .sheet-template-header,
 .sheet-rolltemplate-quality .sheet-template-header,
 .sheet-rolltemplate-rolls .sheet-template-header,
+.sheet-rolltemplate-rolls-computed .sheet-template-header,
 .sheet-rolltemplate-contact .sheet-template-header {
-/*  background-color: #431714 !important; */
-  background-color: #460141 !important;
+  background-color: #46014195 !important;
   border: 1px solid #000 !important;
   border-bottom: 2px solid #000 !important;
   box-shadow: inset 0px 0px 3px 1px #000 !important;
@@ -4364,6 +5472,7 @@ div.footer img {
 .sheet-rolltemplate-multirow .sheet-template-header span,
 .sheet-rolltemplate-quality .sheet-template-header span,
 .sheet-rolltemplate-rolls .sheet-template-header span,
+.sheet-rolltemplate-rolls-computed .sheet-template-header span,
 .sheet-rolltemplate-contact .sheet-template-header span {
   font-family: 'tahoma' !important;
   font-size: 0.5em !important;
@@ -4371,9 +5480,17 @@ div.footer img {
   font-variant: normal !important;
   letter-spacing: 1px !important; }
 
+.sheet-rolltemplate-rolls-computed .sheet-template-header .inlinerollresult {
+  font-family: 'tahoma' !important;
+  font-size: 1em !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  letter-spacing: 1px !important; }
+
 .sheet-rolltemplate-multirow .sheet-template-row,
 .sheet-rolltemplate-quality .sheet-template-row,
 .sheet-rolltemplate-rolls .sheet-template-row,
+.sheet-rolltemplate-rolls-computed .sheet-template-row,
 .sheet-rolltemplate-contact .sheet-template-row {
   color: #fff !important;
   text-align: center !important;
@@ -4384,15 +5501,101 @@ div.footer img {
   font-family: 'helvetica' !important;
   padding: 5px 5px 3px 5px !important; }
 
+
+.sheet-rolltemplate-rolls-computed .sheet-template-row.sheet-tip {
+  line-height: .6em !important; 
+  text-align: right !important;}
+.sheet-rolltemplate-rolls-computed .sheet-template-row .sheet-tip {
+  font-size: .6em !important;
+  line-height: 1.25em !important; }
+
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-weapon-info,
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-npcweapon-info {
+  font-size: 1em !important;
+  line-height: 1.25em !important;
+  font-weight: bold;
+  display: grid;
+  grid-column-gap: 1px;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-weapon-info span.sheet-weap-dv {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-weapon-info span.sheet-weap-dv > span {
+  justify-content: center;
+  align-content: center;
+  display: grid;
+  height: 100%;
+  font-size: 1.5em;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-weapon-info span.sheet-weap-melee {
+  grid-column: 2 / 4;
+  grid-row: 1 / 2;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-weapon-info span.sheet-weap-mode {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-weapon-info span.sheet-weap-ammo {
+  grid-column: 3 / 4;
+  grid-row: 1 / 2;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-weapon-info span.sheet-weap-ars {
+  grid-column: 2 / 4;
+  grid-row: 2 / 3;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-weapon-info span.sheet-weap-skill {
+  grid-column: 1 / 2;
+  grid-row: 3 / 4;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-weapon-info span.sheet-weap-attr {
+  grid-column: 2 / 3;
+  grid-row: 3 / 4;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-weapon-info span.sheet-weap-spec {
+  grid-column: 3 / 4;
+  grid-row: 3 / 4;
+}
+
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-npcweapon-info {
+  font-size: 1.5em;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-npcweapon-info span.sheet-weap-dv {
+  grid-column: 1 / 2;
+  grid-row: 1 / 3;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-npcweapon-info span.sheet-weap-dv > span {
+  justify-content: center;
+  align-content: center;
+  display: grid;
+  height: 100%;
+  font-size: 1.5em;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-npcweapon-info span.sheet-weap-melee {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-npcweapon-info span.sheet-weap-mode {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+.sheet-rolltemplate-rolls-computed div.sheet-template-row div.sheet-npcweapon-info span.sheet-weap-ars {
+  grid-column: 3 / 4;
+  grid-row: 1 / 2;
+}
+
+
 .sheet-rolltemplate-multirow .sheet-template-row:nth-child(2n+0),
 .sheet-rolltemplate-quality .sheet-template-row:nth-child(2n+0),
 .sheet-rolltemplate-rolls .sheet-template-row:nth-child(2n+0),
+.sheet-rolltemplate-rolls-computed .sheet-template-row:nth-child(2n+0),
 .sheet-rolltemplate-contact .sheet-template-row:nth-child(2n+0) {
   background-color: #1c1c1c !important; }
 
 .sheet-rolltemplate-multirow .sheet-template-row.sheet-split,
 .sheet-rolltemplate-quality .sheet-template-row.sheet-split,
 .sheet-rolltemplate-rolls .sheet-template-row.sheet-split,
+.sheet-rolltemplate-rolls-computed .sheet-template-row.sheet-split,
 .sheet-rolltemplate-contact .sheet-template-row.sheet-split {
   font-size: 14px;
   width: 96%;
@@ -4403,22 +5606,25 @@ div.footer img {
 .sheet-rolltemplate-multirow .inlinerollresult,
 .sheet-rolltemplate-quality .inlinerollresult,
 .sheet-rolltemplate-rolls .inlinerollresult,
+.sheet-rolltemplate-rolls-computed .inlinerollresult,
 .sheet-rolltemplate-contact .inlinerollresult {
   display: inline-block !important;
   color: #fff !important;
-  font-size: 25px !important;
+  font-size: 20px !important;
   background-color: transparent !important;
   border: none !important; }
 
 .sheet-rolltemplate-multirow .sheet-template-row span.sheet-red,
 .sheet-rolltemplate-quality .sheet-template-row span.sheet-red,
 .sheet-rolltemplate-rolls .sheet-template-row span.sheet-red,
+.sheet-rolltemplate-rolls-computed .sheet-template-row span.sheet-red,
 .sheet-rolltemplate-contact .sheet-template-row span.sheet-red {
   -webkit-text-stroke: .25px red; }
 
 .sheet-rolltemplate-multirow .sheet-template-row span.sheet-green,
 .sheet-rolltemplate-quality .sheet-template-row span.sheet-green,
 .sheet-rolltemplate-rolls .sheet-template-row span.sheet-green,
+.sheet-rolltemplate-rolls-computed .sheet-template-row span.sheet-green,
 .sheet-rolltemplate-contact .sheet-template-row span.sheet-green {
   -webkit-text-stroke: .25px green; }
 
@@ -4431,6 +5637,9 @@ div.footer img {
 .sheet-rolltemplate-rolls .inlinerollresult.fullfail,
 .sheet-rolltemplate-rolls .inlinerollresult.fullcrit,
 .sheet-rolltemplate-rolls .inlinerollresult.importantroll,
+.sheet-rolltemplate-rolls-computed .inlinerollresult.fullfail,
+.sheet-rolltemplate-rolls-computed .inlinerollresult.fullcrit,
+.sheet-rolltemplate-rolls-computed .inlinerollresult.importantroll,
 .sheet-rolltemplate-contact .inlinerollresult.fullfail,
 .sheet-rolltemplate-contact .inlinerollresult.fullcrit,
 .sheet-rolltemplate-contact .inlinerollresult.importantroll {
@@ -4439,18 +5648,21 @@ div.footer img {
 .sheet-rolltemplate-multirow .inlinerollresult.fullfail,
 .sheet-rolltemplate-quality .inlinerollresult.fullfail,
 .sheet-rolltemplate-rolls .inlinerollresult.fullfail,
+.sheet-rolltemplate-rolls-computed .inlinerollresult.fullfail,
 .sheet-rolltemplate-contact .inlinerollresult.fullfail {
   color: #FCD116 !important; }
 
 .sheet-rolltemplate-multirow .inlinerollresult.fullcrit,
 .sheet-rolltemplate-quality .inlinerollresult.fullcrit,
 .sheet-rolltemplate-rolls .inlinerollresult.fullcrit,
+.sheet-rolltemplate-rolls-computed .inlinerollresult.fullcrit,
 .sheet-rolltemplate-contact .inlinerollresult.fullcrit {
   color: #fff !important; }
 
 .sheet-rolltemplate-multirow .sheet-template-desc,
 .sheet-rolltemplate-quality .sheet-template-desc,
 .sheet-rolltemplate-rolls .sheet-template-desc,
+.sheet-rolltemplate-rolls-computed .sheet-template-desc,
 .sheet-rolltemplate-contact .sheet-template-desc {
   white-space: normal;
   font-size: 0.8em !important; }
@@ -4458,8 +5670,40 @@ div.footer img {
 .sheet-rolltemplate-multirow span.sheet-template-desc .inlinerollresult,
 .sheet-rolltemplate-quality span.sheet-template-desc .inlinerollresult,
 .sheet-rolltemplate-rolls span.sheet-template-desc .inlinerollresult,
-.sheet-rolltemplate-contact span.sheet-template-desc .inlinerollresult {
+.sheet-rolltemplate-rolls-computed span.sheet-template-desc .inlinerollresult,
+.sheet-rolltemplate-contact span.sheet-template-desc .inlinerollresult,
+.sheet-rolltemplate-rolls-computed .sheet-intervals-hitstotal .inlinerollresult,
+.sheet-rolltemplate-rolls-computed .sheet-intervals-hitstotal {
   font-size: 14px !important; }
+
+.sheet-rolltemplate-rolls-computed .sheet-template-body {
+  background-color: rgb(28, 28, 28); }
+
+.sheet-rolltemplate-rolls-computed .sheet-split span.sheet-split_pool_dicepool,
+.sheet-rolltemplate-rolls-computed .sheet-split span.sheet-split_pool_dicepool .inlinerollresult {
+  font-size: 11px !important; }
+
+.sheet-rolltemplate-rolls-computed .sheet-split span.sheet-split_pool_results,
+.sheet-rolltemplate-rolls-computed .sheet-split span.sheet-split_pool_results .inlinerollresult {
+  font-size: 18px !important; }
+
+.sheet-rolltemplate-rolls-computed .sheet-split .sheet-wilddice,
+.sheet-rolltemplate-rolls-computed .sheet-split .sheet-wilddice .inlinerollresult {
+  font-size: 12px !important; }
+  
+.sheet-rolltemplate-rolls-computed .sheet-split .sheet-glitch {
+  font-size: 16px !important;
+  font-weight: bold !important; }
+
+.sheet-rolltemplate-rolls-computed .sheet-split .sheet-critglitch {
+  font-size: 16px !important;
+  font-weight: bold !important; }
+
+.sheet-rolltemplate-rolls-computed .sheet-split .sheet-glitchspan {
+  width: 95%; }
+  
+.sheet-rolltemplate-rolls-computed span.sheet-pictos {
+  font-family: 'pictos' !important; }
 
 /********************************************************************************************************/
 /*******************************         FireFox             *******************************************/
@@ -4505,3 +5749,8 @@ input[type=number] {
 .charsheet.lang-fr .skill-box h3:first-child {
   margin-right: 51% !important;
   width: 20% !important; }
+
+/* This is where dark mode changes will be */
+body.sheet-darkmode .charsheet .pc, 
+body.sheet-darkmode .charsheet .npc {
+  }

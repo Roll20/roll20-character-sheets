@@ -1,5 +1,235 @@
 Change Log
 ==============================================
+**2025-11-13 ** v.92 Chuz (James Culp)
+	Added Patterncraft to skills
+**2025-07-15 ** v.91 Chuz (James Culp)
+	Bugfix - Minor bugfixes
+**2025-07-11 ** v.91 Karovex
+	Added 'fade_compiling_modifier' to support the Sprite Conduit echo bonus
+	Added 'sprite_resist_dv_modifier' to suppor the Technoshaman compiling DV reduction
+	Added Sprite levels 11-15
+	Added New Sprite Types (Assassin, Defender, Modular, Music, Primal)
+	Added CM and OS trackers per sprite
+	Added Register Sprite macro chain
+	Bugfix - While Compiling a Sprite, the 'Resist Fade' macro will now roll the proper stats (Willpower+Charisma instead of Willpower+Logic)
+**2025-03-16 ** v.90 Chuz (James Culp)
+	Added i18n values for translating many placeholders and some other labels throughout the Player facing sheet.  Thanks to Talon_Zorch for his hard work translating the sheet on Crowdin and compiling the list for me to add.
+**2024-10-11 ** v.88 Chuz (James Culp)
+	Added lwa spirits from Shadows In Focus: That Old Voodoo to the Spirit NPC sheet.  (Agwe, Azaca, Damballah, Erzulie, Ghede, Legba, Obatala, Ogoun and Shango)
+**2024-06-05 ** v.87 Chuz (James Culp)
+	Bugfix - Found an issue with imports where items would be dropped mysteriously.  This affected anything that was in a repeating list and was tied to unique ids within Roll20.  Added another check to prevent duplicate ids.
+**2024-03-03 ** v.86 Chuz (James Culp)
+	Bugfix - Essence Mod works again
+	Added Omega, Exoware and Gammaware to Augmentation grade drop downs and essence calculations.  They do not however add the bad luck quality or extra condition monitor boxes when selected.
+**2023-09-04 ** v.85 Chuz (James Culp)
+	New Feature - GM Helper sheet, added extended test and d6 roll buttons so GMs can roll from the sheet if needed.
+	Bugfix - PC Vehicles tab, handling mod was only reflected on the onroad handling value not the offroad value when settings mode was turned off.
+	Bugfix - GM Helper sheet, incrementing OS using the + button was doing strange things, this has been fixed.
+**2023-07-10 ** v.84 Chuz (James Culp)
+	Bugfix - AoE Spells weren't adding the right amount of drain for 12m and 14m
+	Bugfix - Attribute+Attribute selections were missing Strength
+	New Feature - skill mods in the repeating skill list now should update those skills everywhere in the sheet.
+	Bugfix - Sprint rolls now include -1 skill modifier if the PC doesn't have an Athletics skill.  Also added a function to resynch the hidden skill attributes any time a skill name is changed (via the drop down changing) or a skill is deleted.
+	Bugfix - Fixed the increment button on the OS Tracker it now adds 1 instead of concatenating a 1 after the other digits sometimes.
+**2023-06-15 ** v.83 Chuz (James Culp)
+	New Feature - Beginning work on the GM Helper sheet, step 1 add an OS Tracker.  I'm open to suggestions for other helpful GM tools to include in this sheet in the usual venues (Discord, Patreon, Roll20 DMs)
+	New Feature - GMs rejoice, select a token on the board and click the "Track Selected" button on the GM Helper character sheet to add the selected character's name and A/S/D/F to the tracker.
+**2023-05-30 ** v.82 Chuz (James Culp)
+	Update - Added Hack & Slash Matrix Actions to the Rolls Pane -> Matrix Roll Buttons
+	New Feature - Added Matrix Roll Buttons Legality Filter, this allows you to hide illegal actions.  For pcs without a matrix persona or that are worried about OS
+	New Feature - Added Matrix Roll Buttons Access Level Filter, this allows you to hide actions that are not usable at a particular Matrix Access Level (outsider/user/admin)
+**2023-05-22 ** v.81 Chuz (James Culp)
+	Bugfix - More weapon dicepool tweaks
+	New Feature - NPC->Spirits made spirits awakened and now display the spells section for them.  Dicepool does not auto-update when spirit force changes, that is an exercise for the user.
+	New Feature - Added Critter Powers drag and drop from the compendium for spirits and grunts.
+**2023-05-18 ** v.80 Chuz (James Culp)
+	Bugfix - PC Qualities were always showing up as Negative regardless of the actual type.
+	Bugfix - PC->Spells Ranges of Touch were showing up as LOS.
+	Bugfix - PC/NPC Defense rolls throwing an error for the armor_rating, updated PC sheets to use defense_rating so they match NPC sheets.
+**2023-05-01 ** v.79 Chuz (James Culp)
+	New Feature - Added Resonance and Level to the sprite skill rolls attribute options
+	New Feature - Added Magic and Force to the spirit skill rolls attribute options
+	New Feature - Added Magic AR to combat spell roll templates
+	New Feature - PC Added DR to Defense rolls template
+	New Feature - NPC Added Universal Dicepool Adjustment (@{uda}) for GMs that with to add a dicepool penalty/bonus to all rolls the NPC makes.
+	Bugfix - Fix to Grunts dicepool bug.
+**2023-03-20 ** v.77 Chuz (James Culp)
+	Bugfix - (?) Trying to fix some dicepool bugs on NPC and Vehicle sheets tied to grunt groups.
+	Bugfix - Vehicle physical and matrix condition monitors weren't updating right on drag and drop
+**2023-03-13 ** v.76 Chuz (James Culp)
+	Bugfix</b> - Fixed Spirit Astral initiative dice had been reduced to mere metahumanity levels, they've been returned to their previous exceptionalism.
+**2023-03-06 ** v.75 Chuz (James Culp)
+	New Feature - PC-Magic-Conjuring Added Astral Reputation and added AsRep to Summon Spirit button output
+	New Feature - Added Heat, Reputation and AsRep to the Social Pane
+	Added Drag and Drop support for Gear-Ammunition-Grenades Gear-Ammunition-Rockets to place them in the Arms-Grenades section instead of Gear
+	Added Grenade dicepool calculations
+**2023-02-27 ** v.74 Chuz (James Culp)
+	Fix for matrix device stats on drag and drop for NPCs
+	Fix for Sprite drag and drop issue
+	NPCs->Grunts added a stun monitor and flag to display it (it is hidden by default)
+**2023-02-23 ** v.73 Chuz (James Culp)
+	Bugfix - PC Initiatives - Fixed a condition where if a dice mod is set and then the initiative base is changed it keeps adding the dice mod repeatedly.
+**2023-02-20 ** v.72 Chuz (James Culp)
+	Added Magic and Resonance to attribute roll buttons as additional options in the drop down
+	Updated NPC Technomancer Complex Forms
+	Updated NPC Drag&Drop for Spells to attempt to auto-populate the dicepool
+	NPC Complex forms display changes
+	NPC Complex forms roll buttons for no dicepool defined (uses attr_skill + resonance), dicepool defined (uses the dicepool) or description only (skill empty)
+	Update - The old NPCspells repeating data should be retained just in case, for now.
+	Bugfix - Updated calls to geneerateRowID to use a work around to prevent them (hopefully) from duplicating an already existing ID which caused drag and drop items to sometimes not apply properly, causing symptoms like drag and drop NPCs without all of their skills, attacks, or some other repeating item. Or even weirder once a Skill that got overwritten so it had a Specialization from another skill that wasn't there.
+**2023-02-13 ** v.71 Chuz (James Culp)
+	Added essence calculations for drag and drop (and others) allowing for Essence Base to be "Rating x #.##", also Grade calculations now.
+	Added drag and drop for Augmentations
+	Converted NPC Spell roll buttons to use the newer PC style
+	Converted NPC Attack (ranged and melee) buttons to use the new roll buttons
+	Converted NPC Attack (ranged and melee) buttons to use the new roll template weapon info block
+	Updated Matrix Roll buttons to include inline opposed roll buttons.  To use these the target's token must be selected.
+	Converted Grunt skill buttons to new style
+	Converted Vehicle Autosoft roll buttons to the newer PC style
+	Converted NPC attribute roll buttons to the newer PC style
+	Converted NPC Initiative and Defense button blocks to the newer PC style
+	Began adding weapon information as it's own section in the attack Roll Templates
+	Added weapon info to Ranged attack Roll Templates
+	Added weapon info to Ranged (Burst Fire Wide) attack Roll Templates
+	Added weapon info to Melee attack Roll Templates
+	Began adding tooltips at the bottom of Roll Templates.
+**2023-02-06 ** v.70 Chuz (James Culp)
+	Bugfix - PC Condition Monitor boxes broke if the maximum value was below 8.  Changed the minimum to 6 which is 0 body with Neoteny so should be unattainable.
+**2023-01-17 ** v.69 Chuz (James Culp)
+	Add Contacts drag and drop capability, you can now drag ANY NPC from the compendium and their name and description will be added to your contacts, also loyalty, connections and favors if the NPC has those attributes (currently none do)
+	NPCs->Powers text added for all NPCs not just Awakened
+	NPCs->Weaknesses text added for all NPCs
+	NPCs->Spirits added Weaknesses to the Spirts sheet auto-generation code.
+	Bugfix PCs->Armor didn't update DR when deleting armor entries
+**2023-01-05 ** v.68 Chuz (James Culp)
+	BugFix - drag and drop QSR Combat spells
+	New Feature - Sprite drag and drop
+	Bugfix - Sprite sheet matrix_max
+	New Feature - Complex Forms drag and drop
+	Bugfix - PC -> Modifications - changing astral_initiative_dice_mod was doing strange things to the astral initiative dice.  This has been fixed but if your character ended up with a messed up astral_initiative_dice amount look in "Attributes & Abilities" for "astral_initiative_dice" and change it to the correct ammount.
+**2022-12-12 ** v.67 Chuz (James Culp)
+	Update PC -> Magic -> Meta Tradition Hermeticism now displays as "Hermeticism (Logic)" and Shamanism now displays as "Shamanism (Charisma)" for clarity
+	Bugfix NPC -> Vehicles - fixed vehicle/drone default actions
+	New Feature - added alternate melee/ranged roll buttons on npc sheets.  If there's no dicepool set the alternate button prompts for skill and attribute values.
+	New Feature - PC sheet Weapon Mods now allows JSON imports via Notes field.
+**2022-12-05 ** v.66 Chuz (James Culp)
+	New Feature - Added modifiers for primary_range_weapon_close_mod, primary_range_weapon_near_mod, primary_range_weapon_medium_mod, primary_range_weapon_far_mod, primary_range_weapon_extreme_mod, primary_range_weapon_damage_mod, primary_range_weapon_dicepool_mod for changing the ARs at various ranges and the damage for the primary weapon.
+	New Feature - Added modifiers for single_shot_penalty_mod, semi_auto_penalty_mod, burst_fire_penalty_mod, burst_wide_penalty_mod, full_auto_penalty_mod for changing the AR penalties for firing modes.
+	New Feature - Primary Weapon Mods section that allows a list of mods to be added and turned on/off to apply bonuses/penalties to ARs, DV, dicepool (not reflected in listed dicepool) and firing mode penalties. Upon changing primary ranged weapon, mods will be disabled, if the weapon has the "Has Mods" checkbox checked the screen will switch to the Mod selection screen.
+	New Feature - Added Blood and the various Insect spirits from Street Wyrd
+	New Feature - Updated spirits to allow my templates to have more than one melee or ranged attack.
+	Update - There are now a maximum of 30 physical and 21 stun condition monitor boxes for PCs, these numbers should exceed the current theoretical maximums.
+	Bugfix - Skill name for multi-word skills wasn't being formatted properly.
+	Bugfix - At some point NPC -> Vehicle DR input and button disappeared, they've been found and replaced
+**2022-11-21 ** v.65 Chuz (James Culp)
+	Bugfix - PC Weapon skills weren't applying the -1 unskilled penalty to some skills, this has been updated however users will need to update the skill to something else and back to trigger the data change.
+	Bugfix - PC Sheet imported from Genesis in a non-English language had many problems mostly related to skills.  I believe I've fixed these issues please report any new ones
+	Bugfix - NPC Spell roll template issue where if drain was under 2 it added "Drain: 2" at the bottom of the description.
+**2022-11-14 ** v.64 Chuz (James Culp)
+	Bugfix - PC Judge Intentions wasn't updating on Willpower changes.
+**2022-11-06 ** v.63 Chuz (James Culp)
+	New Feature - PC Attribute roll buttons now prompt for a second attribute or custom dice modifier for those occasions when the DM says Roll Reaction+Intuition instead of Roll Defense
+	Bugfix - PC Defense, Direct Magic Defense and Indirect Magic Defense roll buttons didn't include Wound Penalties (defense pretended to but didn't apply the penalty)
+**2022-10-24 ** v.62 Chuz (James Culp)
+	New Feature - PC->Matrix->ASDF Roll buttons now include more options to combine them with.  None, Custom, mind attributes and ASDF.
+	New Feature - NPCs now have updated ASDF roll buttons as well!
+	New Feature - NPCs now have the newer version of the d6's roll button and the new Extended Tests capability.
+	New Feature - Added Extended Tests capabilities.
+**2022-09-20 ** v.61 Chuz (James Culp)
+	Bugfix - NPC->Spells were missing the Limited duration, added it.
+	Bugfix - Charactersheet Tab - removed the underline.
+	Bugfix - Updated Matrix Rolls trained prompt to say "Trained" instead of "No" (which made no sense)
+**2022-09-13 ** v.60 Chuz (James Culp)
+	Bugfix - PC->Rolls->Matrix actions including cracking were not using the Cracking skill rating but whatever the rating of the last updated skill was.  Fixed the bug causing this and loading the sheet the first time should update the attr_cracking value to be correct again.
+**2022-08-30 ** v.59 Chuz (James Culp)
+	Bugfix - Non-PC sheets were broken anywhere that a textarea (notes style) entry existed you couldn't display it to add or edit the values.
+	New Feature - character_name sanitization.  Sometimes we want to use names with characters that will break roll buttons and other parts of the sheet.  This replaces the bad characters with an asterisk *
+**2022-08-16 ** v.58 Chuz (James Culp)
+	New Feature - Added the ability to change the ammo type in use on Core->Primary Ranged with the AR and DV changes applied.  Default will be Standard.
+	New Feature - Added split rolls for Burst Fire Wide firing mode on the Core->Primary Ranged weapons.  This splits the dicepool (on odd pools the left roll Atk 1 gets the extra die).  If Wild Dice are toggled on a prompt will appear for each attack.  Glitches are calculated for each attack separately.
+**2022-08-08 ** v.57 Chuz (James Culp)
+	Bugfix - Updated mouseover text for Metamagics to indicate they are repeating metamagic not repeating powers
+	Bugfix - Updated Non-PC sheets to have Matrix AR, Matrix DR, Matrix Soak and Biofeedback Soak buttons as appropriate in the Defenses Pane
+	New Feature - Some updates to the Magic->Meta tab to clean up the layout and put a Magic AR button there as well.
+	Bugfix - Fixed some weirdness with Social->Sins and Social->Contacts pane styles.
+	Bugfix - (not really a bug) updated the color for the Edge and Matrix Condition Monitor hexes to be the purple everything else is.	
+	New Feature - Added Matrix Soak and Biofeedback Soak buttons to Core Pane and Matrix Pane
+	New Feature - Added Damage Type to Combat spells in Magic->Spells pane, the Damage Type selector will disappear for non-combat spells.
+	New Feature - Updated Effect Type to hide values that make no sense (i.e. Single Sense / Multi Sense for anything but Illusion spells and The 4 combat options for any non-combat spells)
+	New Feature - Updated Spells to make it so the pop-up prompts for Amp-Up and Increase Area ONLY pop up when the spell is of the right type.  Only Combat spells get "Amp Up" prompts, Only "LOS (A)" spells get "Increase Area" prompts.  The "Agony" spell is by definition LOS but acts like LOS (A) in that it can be extended to multiple targets, you will want to enter it as LOS (A) there may be other similar spells.
+	New Feature - Added Notes->Updates Pane to display most recent changes.  The sheet will automatically open to this page if changes are made to functionality that need to be highlighted.
+	New Feature - Added the Primary button to Arms->Melee weapons with the same functionality as the Arms->Ranged weapons have.
+	New Feature - Arms->Ranged now have a Default Firing mode selection.  This will be the selected firing mode when you initially set this weapon to primary, or if you change this while it's the primary weapon it will set the firing mode on the primary weapon as well.
+**2022-08-04 ** v.56 Chuz (James Culp)
+	Bugfix - There were 10 repeating sections that didn't use "name" for the name field.  Fixed this to make other automated tasks easier to achieve in the future.
+	New Feature - added Composure roll button to Grunts
+	Bugfix - Cleaned up non-PC sheets to show condition monitors better (including the max)
+	Bugfix - Fixed how display of matrix device and matrix roll buttons work.
+	New Feature - normalized the styling on non-PC sheets a little bit to help mark separate sections better.
+	New Feature - Added Logs section under the Notes Pane for keeping track of missions and rewards.  This is purely for note taking purposes and isn't automated anywhere.
+**2022-07-26 ** v.55 Chuz (James Culp)
+	Bugfix - Imports choked if the character in Genesis has a lifestyle that is not associated with a specific SIN, the code is more forgiving for this now.
+	New Feature - Added Edge Roll buttons to most PC sheet roll buttons on the sheet.  These can be toggled on/off via the check box in the Options Pane if you don't want them for your character/campaign.
+	Bugfix - There was an extraneous } character on the D6 roll button, it has been nullified.
+	Bugfix - Minor style changes to Options Pane and main rolls-computed roll template.
+	Bugfix - fixed css on PC matrix devices so the notes expand the full width when displayed.
+	Update - Due to changes in the latest CRB printing, matrix device initiative bonuses have been verified to be a dice bonus, updated initiatives to reflect that.
+	Bugfix - Found an error condition where an item (program for example) with an on/off switch that was using modifications when deleted, even when turned off reversed the modifications causing data issues.
+	Bugfix - Fixed mistyped attribute names in the modifications whitelist astral_initiative_dice_mod, matrix_initiative_dice_mod, cold_sim_initiative_dice_mod and hot_sim_initiative_dice_mod modifiers should now work in modifications boxes.  The mouseover titles have been fixed as well.
+	Bugfix - NPC Wound modifiers are now correctly applying per TWO boxes of damage, per CRB pg.203.
+**2022-07-22 ** v.54 Chuz (James Culp)
+	New Feature - Added Notes imports to all repeating sections with a notes field except Sprites and Spirits (players should really be using separate character sheets for these)
+**2022-07-20 ** v.53 Chuz (James Culp)
+	New Feature - Quality of life addition, newlines and spacing put in notes fields should be preserved when displaying the notes.
+	New Feature - Added Resist Toxin button to the Core Combat Info Pane
+	Bugfix - Fixed the annoying bug that caused the Initiative roll button to not display properly
+	New Feature - Added Matrix Noise field on the PC Rolls Pane that is included as a negative modifier in the roll buttons found there
+**2022-06-08 ** v.52 Chuz (James Culp)
+	Bugfix - The query for the reason the D6 is being rollw wasn't showing in the roll template.
+	New Feature - Added an Effects tab in the Attributes Pane.  This is where a runner can track what effects they commonly have, handy for mages that always cast Increase Attribute, or drug using street sams for example.  This also includes the Modifications advanced feature (**USE AT YOUR OWN RISK**) that turns on and off with the toggles.
+**2022-03-15 ** v.51 Chuz (James Culp)
+	Bugfix - Sprites -> update power/skills now updated when sprite type or level are changed.
+	Bugfix - NPCs had a maximum essence of 6, HMHVV victims can have >6 essence.
+	New Feature - actually got in in v.50 - Damage Compensators are now supported as advanced modifications using 'damage_compensator: x' where 'x' is the level of damage compensators.
+	New Feature - actually got in in v.50 - Resist Pain (per the spell) can be applied to wounds if advanced modifications are on, currently you can add it as a quality -> Modification 'resist_pain: x' where 'x' is the number of hits (wound penalties ignored)
+	Bugfix - Fixed text color for some text on the NPC sheets in darkmode.
+	Bugfix - Fixed maximum of 4 on npc initiative dice (should be 5)
+	Updated Matrix Roll buttons in the Rolls tab to "Training Level?" because it now also includes an option for Untrained (-1 dicepool)
+	Bugfix/New Feature - NPC->Host Sheet now prompts for alternate attributes when rolling the Attack, Sleaze, Data Processing and Firewall attribute buttons at the top of the sheet.
+	Bugfix - NPC sheets made a few dark mode fixes.
+**2022-03-08 ** v.50 Chuz (James Culp)
+	Bugfix - updated spirit sheet to default to having the "Reset" toggle on since the majority of the time having it on is the right choice.
+	Bugfix - updated spirits with Engulf and Elemental Attack close/ranged attacks listed even though they are optional power to now state the optional power is required in the notes.  This is a gentle reminder to players/GMs since the alternative is the player/GM having to add the attacks every time a spirit is summoned.
+	Added resist_pain modification attribute.  This attribute when set to a positive value will modify wound penalties per the spell in the CRB pg.137.
+	Added damage_compensator attribute to affect optimal reduction in wound penalties based on the rating of the damage compensators
+	Added a prompt to the D6 roller to query the reason for the roll, if the user just hits ENTER it defaults to D6
+	Updated styles a little to make dark mode not quite so broken.
+	Enabled Rerolls and Bump 4's functionality on the d6 roll button to see if anyone hates it.
+	Added custom description imports from Genesis, if the player has spent the time to manually add the custom descriptions in Genesis, now they don't have to do it again for the character sheet.
+	Added handling of Genesis exports of primary armor.
+**2022-02-22 ** v.49 Chuz (James Culp)
+	Added the ability to import character data from the RPG Framework Genesis character generator. (see official Roll20 thread notes)
+**2021-11-23 ** v.48 Chuz (James Culp)
+	Bugfix - Removing Technomancer echos with modifications didn't update things correctly.
+	Bugfix - Replaced translation "Rotarcraft" with correct "Rotorcraft"
+	Added Modifications functionality to Magic->Adept->Powers
+	Added Modifications functionality to Magic->Meta->Metamagics
+	Added Modifications functionality to Technomancer->Complex Forms
+**2021-11-09 ** v.47 Chuz (James Culp)
+	Bugfix - Technomancer Complex Forms with no roll were displaying oddly.  This has been fixed, now the roll button that shows up will show the fade and notes section.
+**2021-11-04 ** v.46 Chuz (James Culp)
+	Fix for spells not displaying hits
+**2021-11-02 ** v.45 Chuz (James Culp)
+	Update to the roll-template preparing for future features
+	Updated rolls so mouseover showing the actual dice rolled are red for 1's (2's for bad luck) and green for 5's and 6's instead of the previous only 1's and 6's being colored.
+	Add SR Title to "Character Sheet" tab
+	Make Bio & Info, Character Sheet and Attributes & Abilities tabs stay in view as the sheet is scrolled.	Modified Notes tab to have an automatic scrollbar and removed the expand widget since it did nothing.
+	Modified Notes tab to have an automatic scrollbar and removed the expand widget since it did nothing.
+	Added matrix_overclock attribute which can be put in the Modifications box for a program which will cause the Matrix Rolls on the Rolls tab automatically add 2 dice, one of which is the wild die to rolls.  If added via the Matrix->Programs->Modifications when the Program is toggled off/on it will turn the effect off/on.  Valid values 1|0.  This will also indicate in the header of the rolls-computed roll template the +2 dicepool bonus.
+**2021-10-26 ** v.44 Chuz (James Culp)
+	Bugfix returned notes to the roll template outputs for PC roll buttons in repeating sections.
+**2021-10-11 ** v.43 Chuz (James Culp)
+	Added roll post-processing to PC sheet buttons.  This includes a new way to handle Wild Dice and glitch/crit glitch detection.
 **2021-09-21 ** v.42 Chuz (James Culp)
 	Removed Firing Modes from Arms->Ranged because it did nothing in that section.
 	Moved "Primary" selector outside the settings area so it's easier to select a primary weapon.
@@ -134,7 +364,6 @@ Change Log
 	PC-Matrix-Technomancer (formerly PC-Matrix-Complex Forms) created
 	New section now holds Complex Forms tab and submersion tab
 	Added Submersion tab with Resist Fade button (for compiling), submersion level, echoes and sprites
-
 **2021-03-29** v.25 Chuz (James Culp)
 	Fixed Matrix ASDF indicator bubbles so 0 doesn't light up all 10 indicators
 	Started changes for NPC sheets.
@@ -151,7 +380,6 @@ Change Log
 	DR, I/ID, AC, CM and Move (from npc stat blocks) are now represented along with common rolls (DR, Defense and Soak)	
 	Some more style updates to npc sheets
 	Updated some of the variables and layouts of the areas below Bonuses, Modifier and Options (still not ready for use really)
-
 **2021-03-22** v.24 Chuz (James Culp)
 	Beginning v.24
 	Rearranged player/character names, toggles and navigation buttons in header - still tweaking layout
@@ -173,7 +401,6 @@ Change Log
 	Started in on Complex Forms
 	Updated Matrix -> Complex Forms section
 	When selecting a skill, have the correct default attribute auto-selected
-
 **2021-03-15** v.23 Chuz (James Culp)
 	Made sheet work with current roll20 "enhanced" code that has been partially rolled back Changed 
 	Condition Monitors -> Settings -> Pain Tolerance to a select so it's obvious whether pc is selecting Low, High or none 
@@ -181,7 +408,6 @@ Change Log
 	Added Mod field for skills to allow skill rolls to have bonuses added. Does not add to the actual skill dicepool just affects the skill roller. 
 	Fixed Initiatives (Meat, Astral, Matrix x3) to now apply mods, dice mods and Config->Temp mods correctly. 
 	Added Magic AR that auto calculates when logic/charisma, tradition or magic change to the Magic -> Meta box
-
 **2021-03-08** v.22 Chuz (James Culp)
 	Add Defense roll-button and DR roll-button to Core->Combat Info tab
 	Updated Skills to split Skills and Knowledge/Languages into separate tabs
@@ -192,32 +418,25 @@ Change Log
 	Bugfix Essence Mod not allowing a zero value
 	Bugfix Removed roll query from flat attribute rolls
 	Bugfix Added Athletics skill to ranged weapons
-	
+
 **2021-03-03** Chuz (James Culp)
 	Included in roll20 repository for one-click access
-
 **2021-02-28** Chuz (James Culp)
 	Updated Social Tab, Contacts and SINs
 	Changed the header Shadowrun logo to a smaller version, this may change again depending on feedback.
-
 **2021-02-27** Chuz (James Culp)
 	Updated Vehicle tab, players can document the basic stats for their vehicles here, no roll buttons included yet.
-
 **2021-02-24** Chuz (James Culp)
 	Tuned Magic->Spells display and dice roller
-
 **2021-02-21** Chuz (James Culp)
 	Added automated DR and resistance updates to Core Combat Info from Arms->Armor tab
-
 **2021-02-15** Chuz (James Culp)
 	Updated Core Combat Info->Primary Ranged Weapon section to display the new weapon data better
 	Updated Core Combat Info->Armor section, now it's a soak damage button (body), Defense Rating box and Resists.  Still need to make the info update as armor is added in Arms->Armor
-
 **2021-02-08 - 2021-02-14** Chuz (James Culp)
 	Updated Arms->Armor
 	Added "Modifications" text area to Augs and Gear for future functionality.
 	Updated Core Combat Info->Primary Melee Weapon section to display the new data
-
 **2021-01-16 - 2021-02-07** Chuz (James Culp)
 	Revamped Weapons->Melee to remove unused fields (Reach, AP, etc) and add range blocks and Specialization and Expertise checkboxes.
 	Added functionality so if Close Combat skill rating is changed it updates the dice roller for melee weapons that use that skill.
@@ -225,23 +444,18 @@ Change Log
 	Revamped Weapons->Range to remove unused fields
 	Added functionality so if Firearms skill rating is changed it updates the dice roller for ranged weapons that use that skill.
 	Added dicepool to Weapons->Range display
-
 **2021-01-11 - 2021-01-15** Chuz (James Culp)
 	Updated repeating items formatting
 	Updated repeating items to make specialization and expertise buttons 15 characters if the actual display name is greater than 15
-
 **2021-01-09 - 2021-01-10** Chuz (James Culp)
 	Updated how Essence is displayed (breaks down aug cost and allows for manual modifications (critter effects that drain essence for example))
 	Updated how movement was being displayed, rules are now 10m base and sprint is 15m + results of an Athletics+Agility check)
 	Added Expertise to the skills section, having problems figuring out how to make the specialization and expertise roll buttons hide when there isn't a value for them.
-
 **2021-01-07** Chuz (James Culp)
 	Fixed Augmentations section and made it automatically update essence when augs are added/removed
 	Removed some (but not all) mentions of limits since they don't exist in 6th world.
-
 **2021-01-06** Chuz (James Culp)
 	Fixed Skills section to work properly now
-
 **2020-11-11** Chuz (James Culp)
     Pulled the branch sr6v2 previously worked on by clevett
 	Created this CHANGELOG

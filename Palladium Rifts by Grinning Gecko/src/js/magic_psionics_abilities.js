@@ -1,8 +1,26 @@
 on("clicked:repeating_magic:usespell", async (e) => {
   console.log(e);
-  const a = await getAttrsAsync(["repeating_magic_ppecost", "currentppe"]);
+  const a = await getAttrsAsync([
+    "repeating_magic_ppecost",
+    "currentppe",
+    "repeating_magic_name",
+    "character_name",
+    "outputusage",
+  ]);
   console.log(a);
-  await setAttrsAsync({ currentppe: a.currentppe - a.repeating_magic_ppecost });
+  const newppe = a.currentppe - a.repeating_magic_ppecost;
+  await setAttrsAsync({ currentppe: newppe });
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    const chat = await startRoll(
+      `@{opt_whisper}&{template:castspell} {{character_name=${
+        a["character_name"]
+      }}} {{spent=${a["repeating_magic_ppecost"]}}} {{name=${
+        a[`repeating_magic_name`]
+      }}} {{remaining=${newppe}}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:resetppe", async (e) => {
@@ -12,11 +30,27 @@ on("clicked:resetppe", async (e) => {
 
 on("clicked:repeating_psionics:usepsionic", async (e) => {
   console.log(e);
-  const a = await getAttrsAsync(["repeating_psionics_ispcost", "currentisp"]);
+  const a = await getAttrsAsync([
+    "repeating_psionics_ispcost",
+    "repeating_psionics_name",
+    "currentisp",
+    "character_name",
+    "outputusage",
+  ]);
   console.log(a);
-  await setAttrsAsync({
-    currentisp: a.currentisp - a.repeating_psionics_ispcost,
-  });
+  const newisp = a.currentisp - a.repeating_psionics_ispcost;
+  await setAttrsAsync({ currentisp: newisp });
+  const outputUsage = Boolean(Number(a.outputusage));
+  if (outputUsage) {
+    const chat = await startRoll(
+      `@{opt_whisper}&{template:usepsionic} {{character_name=${
+        a["character_name"]
+      }}} {{spent=${a["repeating_psionics_ispcost"]}}} {{name=${
+        a[`repeating_psionics_name`]
+      }}} {{remaining=${newisp}}}`
+    );
+    finishRoll(chat.rollId);
+  }
 });
 
 on("clicked:resetisp", async (e) => {
@@ -69,7 +103,6 @@ async function calculateDamage(row) {
     }
     damage += `+${perLevel}`.repeat(a.character_level - 1);
   }
-  damage += ` ${unit}`;
   await setAttrsAsync({ [row]: damage });
 }
 
@@ -79,6 +112,7 @@ async function updateMagicPsionicsLevels() {
     for (const id of ids) {
       const row = `repeating_${section}_${id}`;
       console.log("updateMagicPsionicsLevels", row);
+      // await calculateDamage(`${row}_damage_modifier`);
       await calculateDamage(`${row}_damage`);
       await calculatePercentage(`${row}_percentage`);
       await calculateRangeDuration(`${row}_range`);
@@ -97,6 +131,9 @@ const damageListeners = ABILITIES_REPEATERS.reduce((acc, cur) => {
   acc.push(`change:repeating_${cur}:damage_starting`);
   acc.push(`change:repeating_${cur}:damage_unit`);
   acc.push(`change:repeating_${cur}:damage_per_level`);
+  // acc.push(`change:repeating_${cur}:damage_modifier_starting`);
+  // acc.push(`change:repeating_${cur}:damage_modifier_unit`);
+  // acc.push(`change:repeating_${cur}:damage_modifier_per_level`);
   return acc;
 }, []).join(" ");
 
@@ -121,7 +158,13 @@ const rangeDurationFrequencyDcListeners = ABILITIES_REPEATERS.reduce(
 on(damageListeners, async (e) => {
   console.log("damageListeners", e);
   const [r, section, rowId] = e.sourceAttribute.split("_");
-  const row = `${r}_${section}_${rowId}_damage`;
+  let row;
+  // if (section === "modifiers") {
+  //   row = `${r}_${section}_${rowId}_damage_modifier`;
+  // } else {
+  //   row = `${r}_${section}_${rowId}_damage`;
+  // }
+  row = `${r}_${section}_${rowId}_damage`;
   await calculateDamage(row);
 });
 
@@ -152,6 +195,10 @@ on(
   change:repeating_psionics:addtobonuses",
   async (e) => {
     console.log("change:repeating_powersabilities:addtobonuses", e);
+    // Exit if the change is coming from the sheetworker (ex. import).
+    if (e.sourceType === "sheetworker") {
+      return;
+    }
     const [r, section, rowId] = e.sourceAttribute.split("_");
     const enabled = Boolean(Number(e.newValue));
     if (enabled) {
@@ -166,7 +213,8 @@ on(
 on(
   "change:repeating_powersabilities:dc \
   change:repeating_magic:dc \
-  change:repeating_psionics:dc",
+  change:repeating_psionics:dc \
+  change:repeating_modifiers:dc",
   async (e) => {
     const [r, section, rowId] = e.sourceAttribute.split("_");
     const prefix = `${r}_${section}_${rowId}`;

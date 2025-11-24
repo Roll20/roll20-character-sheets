@@ -1,1 +1,1 @@
-Hoja de personaje para el juego Tierras Quebradas de T&T Ediciones. Cualquier sugerencia/incidencia, contactar conmigo al siguiente email elfonochasis@gmail.com  usando el siguiente asunto para facilitar la gestión: [Roll20][Nombre del juego] Asunto
+Hoja de personaje para el juego Ragnarok 3 edici&oacute;n de T&T Ediciones. Cualquier sugerencia/incidencia, contactar conmigo al siguiente email elfonochasis@gmail.com  usando el siguiente asunto para facilitar la gesti&oacute;n: [Roll20][Nombre del juego] Asunto

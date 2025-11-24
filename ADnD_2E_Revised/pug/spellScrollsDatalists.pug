@@ -1,0 +1,38 @@
+-
+    function getScrollName(spellName) {
+        return `${spellName} scroll`
+    }
+    function getDisplayLevel(spell) {
+        switch (spell.level) {
+            case"1": return "1st level";
+            case"2": return "2nd level";
+            case"3": return "3rd level";
+            case"q": return "Quest Spell";
+            default: return `${spell.level}th level`
+        }
+    }
+    function getLabel(spell, type) {
+        let label = [`${getDisplayLevel(spell)} ${type}`, spell.category];
+        if (spell.book !== "PHB")
+            label.push(spell.book);
+
+        return label.filter(Boolean).join(', ');
+    }
+datalist(id=`scroll-spells`)
+    each spell, spellName in wizardSpells['wizmonster']
+        option(value!=getScrollName(spellName))= getLabel(spell, 'Wizard')
+    each spell, spellName in priestSpells['primonster']
+        option(value!=getScrollName(spellName))= getLabel(spell, 'Priest')
+
+- let processedSpells = new Set()
+datalist(id=`scroll-spells-ff`)
+    each spell, spellName in wizardSpells['wizmonster']
+        if processedSpells.has(spellName)
+            - continue
+        - processedSpells.add(spellName)
+        option(value!=getScrollName(spellName))
+    each spell, spellName in priestSpells['primonster']
+        if processedSpells.has(spellName)
+            - continue
+        - processedSpells.add(spellName)
+        option(value!=getScrollName(spellName))

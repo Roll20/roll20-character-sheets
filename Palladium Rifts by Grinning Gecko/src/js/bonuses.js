@@ -94,14 +94,17 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
     rowIds.forEach((rowId) => {
       const rowFieldAbs = a[`repeating_bonuses_${rowId}_${field}_abs`];
       if (Boolean(Number(rowFieldAbs)) == true) {
-        rowFieldValue = a[`repeating_bonuses_${rowId}_mod_${field}`];
-        fieldAbsValue =
-          fieldAbsValue > rowFieldValue ? fieldAbsValue : rowFieldValue;
+        rowFieldValue = +a[`repeating_bonuses_${rowId}_mod_${field}`];
+        fieldAbsValue = +(fieldAbsValue > rowFieldValue
+          ? fieldAbsValue
+          : rowFieldValue);
       }
     });
     if (fieldAbsValue) {
       // compare the modified absolute value against the original attribute
-      const coreValue = (await getAttrsAsync([field]))[field];
+      // const coreValue = (await getAttrsAsync([field]))[field];
+      const { [field]: rawCoreValue } = await getAttrsAsync([field]);
+      const coreValue = +rawCoreValue;
       const newValue = coreValue > fieldAbsValue ? coreValue : fieldAbsValue;
       const attr = {
         [`${destinationPrefix}_mod_${field}`]: newValue,
@@ -116,6 +119,8 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
         base = `${destinationPrefix}_mod_ma_bonus`;
       } else if (field == "charmimpress") {
         base = `${destinationPrefix}_mod_pb_bonus`;
+      } else if (field == "spellstrength") {
+        base = `base_spellstrength`;
       }
       await repeatingSumAsync(
         rsaDestinations,
@@ -149,6 +154,12 @@ async function combineBonuses(rowIds, destinationPrefix) {
       `${destinationPrefix}_damage_range`,
       `${destinationPrefix}_damage_range_single`,
       `${destinationPrefix}_damage_range_burst`,
+      `${destinationPrefix}_damage_range_1`,
+      `${destinationPrefix}_damage_range_1_name`,
+      `${destinationPrefix}_damage_range_2`,
+      `${destinationPrefix}_damage_range_2_name`,
+      `${destinationPrefix}_damage_range_3`,
+      `${destinationPrefix}_damage_range_3_name`,
     ],
     section: "bonuses",
     fields: [
@@ -159,6 +170,12 @@ async function combineBonuses(rowIds, destinationPrefix) {
       "damage_range",
       "damage_range_single",
       "damage_range_burst",
+      "damage_range_1",
+      "damage_range_1_name",
+      "damage_range_2",
+      "damage_range_2_name",
+      "damage_range_3",
+      "damage_range_3_name",
     ],
     filter: rowIds,
   });
@@ -191,6 +208,7 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "initiative",
     "pull",
     "roll",
+    "breakfall",
     "strike_range",
     "strike_range_single",
     "strike_range_burst",
@@ -210,6 +228,9 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "dodge_motion",
     "dodge_underwater",
     "flipthrow",
+    "tackle",
+    "leghook",
+    "backwardsweepkick",
   ];
 
   const ppExtras = ["disarm", "entangle"];
@@ -298,6 +319,59 @@ async function combineBonuses(rowIds, destinationPrefix) {
       );
     }
   );
+
+  await updateMovement(destinationPrefix);
+}
+
+async function updateMovement(destinationPrefix) {
+  console.log("updateMovement", destinationPrefix);
+  const {
+    [`${destinationPrefix}_mod_spd`]: spd,
+    [`${destinationPrefix}_mod_spdfly`]: spdfly,
+    [`${destinationPrefix}_attacks`]: attacks,
+  } = await getAttrsAsync([
+    `${destinationPrefix}_mod_spd`,
+    `${destinationPrefix}_mod_spdfly`,
+    `${destinationPrefix}_attacks`,
+  ]);
+  console.log(spd, spdfly, attacks);
+  const run_ft_second = +spd;
+  const fly_ft_second = +spdfly;
+  const apm = +attacks;
+  const run_m_second = run_ft_second / 3.28084;
+  const fly_m_second = fly_ft_second / 3.28084;
+  const attrs = {
+    [`${destinationPrefix}_run_mph`]: Math.round(
+      (run_ft_second * 60 * 60) / 5280
+    ),
+    [`${destinationPrefix}_run_ft_melee`]: run_ft_second * 15,
+    [`${destinationPrefix}_run_ft_action`]: Math.round(
+      (run_ft_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_run_m_melee`]: Math.round(run_m_second * 15),
+    [`${destinationPrefix}_run_m_action`]: Math.round(
+      (run_m_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_run_kmh`]: Math.round(
+      (run_m_second * 60 * 60) / 1000
+    ),
+    [`${destinationPrefix}_fly_mph`]: Math.round(
+      (fly_ft_second * 60 * 60) / 5280
+    ),
+    [`${destinationPrefix}_fly_ft_melee`]: fly_ft_second * 15,
+    [`${destinationPrefix}_fly_ft_action`]: Math.round(
+      (fly_ft_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_fly_m_melee`]: Math.round(fly_m_second * 15),
+    [`${destinationPrefix}_fly_m_action`]: Math.round(
+      (fly_m_second * 15) / (apm || 1)
+    ),
+    [`${destinationPrefix}_fly_kmh`]: Math.round(
+      (fly_m_second * 60 * 60) / 1000
+    ),
+  };
+  console.log(attrs);
+  await setAttrsAsync(attrs);
 }
 
 async function removeBonusSelectionsRowAsync(bonusRowId) {
@@ -348,36 +422,64 @@ on("change:repeating_bonusselections:enabled", async (e) => {
   await outputSelectedBonusIds();
 });
 
-async function insertSelection(name, bonusRowId) {
-  console.log("insertSelection", name, bonusRowId);
+async function insertSelection(name, bonusRowId, level) {
+  console.log("insertSelection", name, bonusRowId, level);
   const selectionRowId = generateRowID();
   const attrs = {};
   attrs[`repeating_bonusselections_${selectionRowId}_bonus_id`] = bonusRowId;
-  attrs[`repeating_bonusselections_${selectionRowId}_name`] = name;
+  attrs[
+    `repeating_bonusselections_${selectionRowId}_name`
+  ] = `${name} (${level})`;
   attrs[`repeating_bonuses_${bonusRowId}_selection_id`] = selectionRowId;
   console.log(attrs);
   await setAttrsAsync(attrs);
 }
 
-async function updateSelection(name, selectionRowId) {
-  console.log("updateSelection", name, selectionRowId);
+async function updateSelection(name, selectionRowId, level) {
+  console.log("updateSelection", name, selectionRowId, level);
   const attrs = {};
-  attrs[`repeating_bonusselections_${selectionRowId}_name`] = name;
+  attrs[
+    `repeating_bonusselections_${selectionRowId}_name`
+  ] = `${name} (${level})`;
   await setAttrsAsync(attrs);
 }
 
-on("change:repeating_bonuses:name", async (e) => {
-  console.log("change:repeating_bonuses:name", e);
-  const [r, section, rowId] = e.sourceAttribute.split("_");
-  const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
-  const a = await getAttrsAsync([selectionIdKey]);
-  console.log(a);
-  if (a[selectionIdKey]) {
-    await updateSelection(e.newValue, a[selectionIdKey]);
-  } else {
-    await insertSelection(e.newValue, rowId);
+const pendingInserts = new Set(); // Track rows being inserted to prevent duplicates
+on(
+  "change:repeating_bonuses:name \
+  change:repeating_bonuses:level",
+  async (e) => {
+    console.log("change:repeating_bonuses:name/level", e);
+
+    const [r, section, rowId] = e.sourceAttribute.split("_");
+    if (!rowId) return;
+
+    const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
+    const levelKey = `repeating_bonuses_${rowId}_level`;
+    const nameKey = `repeating_bonuses_${rowId}_name`;
+
+    const a = await getAttrsAsync([selectionIdKey, levelKey, nameKey]);
+
+    console.log(`Processed for ${rowId}:`, e.triggerName, a);
+
+    if (!a[nameKey] || !a[levelKey]) {
+      return; // Ensure both values exist before proceeding
+    }
+
+    if (a[selectionIdKey]) {
+      await updateSelection(a[nameKey], a[selectionIdKey], a[levelKey]);
+    } else {
+      if (!pendingInserts.has(rowId)) {
+        pendingInserts.add(rowId);
+        console.log(`Inserting selection for row ${rowId}`);
+        await insertSelection(a[nameKey], rowId, a[levelKey]);
+        pendingInserts.delete(rowId); // Remove from pending after insertion
+      } else {
+        console.log(`Skipping duplicate insert for row ${rowId}`);
+      }
+    }
   }
-});
+);
 
 on("change:repeating_profiles:name", async (e) => {
   console.log("change:repeating_profiles:name", e);

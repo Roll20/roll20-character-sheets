@@ -1,0 +1,230 @@
+mixin hiddenInput(name)
+  input(type='hidden' name=`comp_${name}`)
+
+mixin lpSteps(showCancel=true)
+  ol.steps.lp-steps
+    if showCancel
+      li
+        button.exit(type='action' name='act_cancel' data-i18n='cancel-u') CANCEL
+  if showCancel
+    .topbar-holder
+
+mixin cancelPrompt()
+  .choice.cancel-prompt
+    p.label(data-i18n='charmancer-cancel-heading') Where would you like to go, Traveler?
+    button.warning(type='cancel' value='lp-cancel' data-i18n='cancel_charactermancer') Discard and exit
+    button(type='action' name='act_continue')
+      span(data-i18n='continue-charmancer') Continue Charactermancer
+    p.warning
+      span(data-i18n='charmancer-discard-warning')
+        | Discard and Exit will discard all choices you&rsquo;ve made in Charactermancer and let you edit your character sheet directly.
+
+mixin bottomBar(nav={}, dialog=false, firstTab=false, lastTab=false)
+  .bottombar
+    if firstTab
+      button.prev(type='cancel' value='lp-cancel' data-i18n='opt-out-u') OPT OUT
+    else if !dialog
+      if(nav.back.action)
+        button.prev(type='action' name=`${nav.back.name}` data-i18n='back') Back
+      else
+        button.prev(type=`${nav.back.type}` value=`${nav.back.value}` data-i18n='back') Back
+    button.jump(type='button' data-scroll='#top' data-i18n='back-to-top') Back to Top
+    if dialog
+      button.next(type='action' name='act_lp-spellchoice_back' data-i18n='accept') Accept
+    else if lastTab
+      button.next.choice.apply_changes(type='finish' value='lp-mancer' data-i18n='apply-changes') Apply Changes
+    else
+      if(nav.next.action)
+        button.next(type='action' name=`${nav.next.name}` data-i18n='next') Next
+      else
+        button.next(type=`${nav.next.type}` value=`${nav.next.value}` data-i18n='next') Next
+
+mixin multiclass(level)
+  .row
+    div(style='display: inline;')
+      div(class=`class${level}_selector`)
+        select.multiclass_select(name=`comp_class${level}` style='width: 85%;' value='')
+          option(value='' data-i18n='choose') Choose
+      .levels-message
+        span(class=`class${level}_update`)
+        input.addinglevel(type='number' name=`comp_class${level}_addlevel` min='0' max='19')
+        span(class=`class${level}_tot`)
+    .levels-hp-row
+      h2(data-i18n='hp-u') HP
+      input(type='number' name=`comp_class${level}_addhp`)
+      input.hp-flag(type='hidden' name=`comp_class${level}_hp_flag` value='average')
+      div(class=`class${level}_rollhp` style='display: inline;')
+        button(type='roll' name=`roll_class${level}_rollhp` value='' title='You must input a level increase to this class' data-i18n='roll') Roll
+      div(class=`class${level}_averagehp` style='display: inline;')
+        button(type='roll' name=`roll_class${level}_averagehp` value='' title='' data-i18n='average') Average
+      input.hpbylevel-toggle(type='checkbox' name='comp_hpbyLevel')
+      span.collapse 9
+      div(class=`class${level}_by-levels`)
+    div
+      h3(class=`class${level}_features_title choice` style='display: inline;' data-i18n='charmancer-class-features:') Class Features: 
+      button.mancer_info(type='action' name=`act_class${level}`) i
+      div(class=`class${level}_features`)
+      div(class=`subclass${level}_name`)
+      div(class=`subclass${level}_warning`)
+      div(class=`subclass${level}_selector`)
+        select(class=`choice subclass${level}` name=`comp_class${level}_subclass`)
+          option(value='' data-i18n='choose') Choose
+    div
+      h3(class=`subclass${level}_features_title choice` style='display: inline;' data-i18n='charmancer-subclass-features:') Subclass Features: 
+      button.mancer_info(type='action' name=`act_class${level}_subclass`) i
+      div(class=`subclass${level}_features`)
+
+charmancer.sheet-charmancer-lp-welcome
+  .charmancer.container
+    +lpSteps(false)
+    .logos
+      span.charmancer-logo
+      span.compendium-logo
+    p.label(data-i18n='charmancer-welcome-lp') Welcome to the Charactermancer Level Up!
+    p(data-i18n='charmancer-leveler-what-is-lp')
+      | Look at you, with all that experience. Now it&apos;s time to claim your reward. You&apos;ll walk through the step-by-step process to make a few decisions, and your character will be at the next level in no time. Changes are saved as you move through the process, but if you change your mind, you&apos;ll need to revisit the steps and choices that come after.
+    p.label(data-i18n='charmancer-compendium') Your Compendium Awaits.
+    p(data-i18n='charmancer-compendium-detail-lp')
+      | The Charactermancer currently supports Dungeons &amp; Dragons 5th Edition SRD, Player&apos;s Handbook, and Guildmasters&apos; Guide to Ravnica. Xanathar&apos;s Guide to everything will be supported in the coming weeks. You can add the Player&apos;s Handbook and Guildmasters&apos; Guide to Ravnica to your compendium in the Marketplace, or the game owner can share their compendium with everyone in the game.
+    p.label(data-i18n='get-started') Get started by clicking &quot;Next&quot;.
+    +bottomBar({next: {type:'back', value: 'lp-levels'}}, false, true)
+    +cancelPrompt()
+    each name in ['spellinfo', 'previous_abilities', 'previous_attributes', 'previous_proficiencies', 'previous_repeating', 'lp-race', 'lp-subrace', 'lp-background']
+      +hiddenInput(name)
+
+charmancer.sheet-charmancer-lp-levels
+  .charmancer.container
+    +lpSteps()
+    div(style='width: 100%;')
+      p(data-i18n='charmancer-leveler-level-info1')
+        | Your existing class levels have been pre-populated for you. By default your primary class has been set to be increased by one level. You can change how many levels to increase below, as well as adding a new multiclass.
+      p(data-i18n='charmancer-leveler-level-info2')
+        | In each class section you&apos;ll have the option to take the average number of hit points or to roll randomly, choose class features for the levels you&apos;re advancing, and choose your subclass if appropriate.
+    div(style='width: 100%; font-weight: bold;')
+      .levels_message
+    .choices.levels-multiclass
+      input.lock-custom-class(type='hidden' name='comp_lockcustomclass')
+      input.hide-multiclass(type='hidden' name='comp_multiclass' min='0' max='3')
+      input(type='hidden' name='comp_multiclass_initial' min='0' max='3')
+      .row.class1_container
+        .custom_warning
+          span(data-i18n='charmancer-leveler-custom-class-warning') The Level Up tool does not support custom classes at this time.
+        div
+          .class1_selector
+            select(name='comp_class1' value='')
+          .levels-message
+            span.class1_update
+            input.addinglevel(type='number' name='comp_class1_addlevel' min='0' max='19' value='1')
+            span.class1_tot
+        .levels-hp-row
+          h2(data-i18n='hp-u') HP
+          input(type='number' name='comp_class1_addhp')
+          input.hp-flag(type='hidden' name='comp_class1_hp_flag' value='average')
+          .class1_rollhp(style='display: inline;')
+            button(type='roll' name='roll_class1_rollhp' value='' title='' data-i18n='roll') Roll
+          .class1_averagehp(style='display: inline;')
+            button(type='roll' name='roll_class1_averagehp' value='' title='' data-i18n='average') Average
+          input.hpbylevel-toggle(type='checkbox' name='comp_hpbyLevel')
+          span.collapse 9
+          .class1_by-levels
+        .class_features_container
+          h3.class1_features_title.choice(style='display: inline;' data-i18n='charmancer-class-features:') Class Features: 
+          button.mancer_info(type='action' name='act_class1') i
+          .class1_features
+          .subclass1_name
+          .subclass1_warning
+          .subclass1_selector
+            select.choice.subclass1(name='comp_class1_subclass')
+              option(value='' data-i18n='choose') Choose
+        .subclass_features_container
+          h3.subclass1_features_title.choice(style='display: inline;' data-i18n='charmancer-subclass-features:') Subclass Features: 
+          button.mancer_info(type='action' name='act_class1_subclass') i
+          .subclass1_features
+      +multiclass(2)
+      +multiclass(3)
+      +multiclass(4)
+      div
+        .multiclass_message
+        button(type='action' name='act_multiclass_add') +
+        button(type='action' name='act_multiclass_remove') -
+    .info
+      .sheet-compendium-page.sheet-levels-info(accept='Rules:Classes')
+    +bottomBar({back: {type:'back', value: 'lp-welcome'}, next: {type:'back', value: 'lp-choices'}})
+    +cancelPrompt()
+    each name in ['characterlevel', 'class1', 'class1_subclass', 'class1_currentlevel', 'class1_classlevel', 'class1_hitdie', 'class2', 'class2_subclass', 'class2_currentlevel', 'class2_classlevel', 'class2_hitdie', 'class3', 'class3_subclass', 'class3_currentlevel', 'class3_classlevel', 'class3_hitdie', 'class4', 'class4_subclass', 'class4_currentlevel', 'class4_classlevel', 'class4_hitdie', 'asi', 'spells']
+      +hiddenInput(name)
+
+charmancer.sheet-charmancer-lp-choices
+  .charmancer.container
+    +lpSteps()
+    .choices
+    .info
+      .sheet-compendium-page.sheet-class-info(accept='Rules:Classes')
+    +bottomBar({back: {type:'back', value: 'lp-levels'}, next: {action: true, name: 'act_lp-choices_next'}})
+    +cancelPrompt()
+
+charmancer.sheet-charmancer-lp-asi
+  .charmancer.container
+    +lpSteps()
+    span.spinner-toggle
+    .spinnerloader
+    .choices
+    .info
+      .sheet-compendium-page.sheet-class-info(accept='Rules:Ability Scores')
+    +bottomBar({back: {type:'back', value: 'lp-choices'}, next: {action: true, name: 'act_lp-asi_next'}})
+    +cancelPrompt()
+
+charmancer.sheet-charmancer-lp-spells
+  .charmancer.container
+    +lpSteps()
+    span.pagelock(style='display: none')
+    .choices.spellslide
+      p.instructions(data-i18n='charmancer-leveler-spells-info')
+        | Listed here are the current spells your character already knows. If you gained access to more spells during your advancement you will be able to select them below. Check next to the spells you wish to learn. The Charactermancer will help you pick the right number of spells and from the correct list. If your class has the option to swap out spells, you can do so by unselecting currently known spells which will allow you to select new ones in their place.
+      p.spells-summary
+      .cantripinfo
+    .info.spellslide
+      .sheet-compendium-page.sheet-spells-info(accept='Rules:Spells')
+    +bottomBar({back: {action: true, name: 'act_lp-spells_back'}, next: {type: 'back', value: 'lp-summary'}})
+    +cancelPrompt()
+    each name in ['knowncantrips', 'knownspells', 'newcantrips', 'newspells', 'replace']
+      +hiddenInput(name)
+
+charmancer.sheet-charmancer-lp-summary
+  .charmancer.container
+    +lpSteps()
+    .lp-summary.summary-container
+      .before
+        h2(data-i18n='before-leveling') Before Leveling
+        div
+      .after
+        h2(data-i18n='after-leveling') After Leveling
+        div
+    .summary-container
+      .summary
+        p.label(data-i18n='features') Features
+        .feature_info
+      .summary
+        p.label(data-i18n='feats')
+        .feat_info
+      .summary
+        p.label(data-i18n='spells') Spells
+        .spell_info
+        .choice.returnblock.spells_button
+          span(data-i18n='return-to:') Return to: 
+          button.step(type='back' value='l1-spells' data-i18n='spells-u') SPELLS
+    +bottomBar({back: {action: true, name: 'act_lp-summary_back'}}, false, false, true)
+    +cancelPrompt()
+
+charmancer.sheet-charmancer-lp-spellchoice
+  .charmancer.container
+    +lpSteps()
+    span.pagelock(style='display: none')
+    .choices.spellslide
+      p.instructions
+    .info.spellslide
+      .sheet-compendium-page.sheet-spells-info(accept='Rules:Spells')
+    +bottomBar({}, true)
+    +cancelPrompt()
+    each name in ['source', 'valid', 'newcantrips', 'newspells']
+      +hiddenInput(name)

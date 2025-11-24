@@ -13,6 +13,7 @@
   --tcl-light: #ffffd7;
   --tch-light: #0087ff;
   --hlr-light: #ffea81b3;
+  --bbg-light: #fff5aa; 
 	/* dark theme */
   --bgs-dark: #1c1c1cf1;
   --bgd-dark: #af8700; /* always keep section titles the same background */
@@ -23,11 +24,10 @@
   --tcl-dark: #e4e4e4;
   --tch-dark: #0087ff;
   --hlr-dark: #484845b3;
+  --bbg-dark: #1c1c1cf1;
 }
 
-.themeactivator[value="light"] ~ div.character,
-.themeactivator[value="light"] ~ div.inventory,
-.themeactivator[value="light"] ~ div.settings {
+body {
   --background-sheet: var(--bgs-light);
   --background-dark: var(--bgd-light); /* TODO rename variable, unclear now */
   --background-input: var(--bgi-light);
@@ -37,11 +37,11 @@
   --textcolor-light: var(--tcl-light);
   --textcolor-highlight: var(--tch-light);
   --highlight-row: var(--hlr-light);
+  --button-background: var(--bbg-light);
 }
 
-.themeactivator[value="dark"] ~ div.character,
-.themeactivator[value="dark"] ~ div.inventory,
-.themeactivator[value="dark"] ~ div.settings  {
+/* VTT dark mode styling (from previous dark theme) */
+body.sheet-darkmode  {
   --background-sheet: var(--bgs-dark);
   --background-dark: var(--bgd-dark); /* TODO rename variable, unclear now */
   --background-input: var(--bgi-dark);
@@ -51,10 +51,48 @@
   --textcolor-light: var(--tcl-dark);
   --textcolor-highlight: var(--tch-dark);
   --highlight-row: var(--hlr-dark);
+  --button-background: var(--bbg-dark);
 }
 
-.themeactivator[value="dark"] ~ div img {
+body.sheet-darkmode ~ div img {
 	filter: invert(100%);
+}
+
+body.sheet-darkmode .unmounted-display img,
+body.sheet-darkmode .mounted-display img {
+	filter: invert(85%);
+}
+
+body.sheet-darkmode .sheetform {
+	background-color: transparent;
+}
+
+body.sheet-darkmode .characterviewer {
+	/* background-image: none; */
+	background-image: url(https://github.com/olafvantol/roll20-character-sheets/blob/4850f0511913bbe0a9b0fdb6e58a7f83f53d1d3d/HarnMaster3_v2/holmgang_by_noiseman433_d2xrib.jpg?raw=true); 
+	background-blend-mode: color-burn;
+	background-color: #000000cc;
+}
+
+body.sheet-darkmode .nav-tabs {
+	background-color: transparent;
+}
+
+body.sheet-darkmode .characterviewer .nav-tabs>li>a {
+	background-color: #ffffff21;
+}
+
+body.sheet-darkmode h3 {
+	color: var(--textcolor-dark);
+}
+
+body.sheet-darkmode button.btn {
+	filter: invert(1);
+}
+
+body.sheet-darkmode .sectionwrapper label,
+body.sheet-darkmode .sectionwrapper input {
+	color: var(--tcd-light);
 }
 
 /* coloring some elements outside the basis character sheet */ 
@@ -77,9 +115,12 @@
 	background-color: var(--bgs-light);
 }
 
+/* end color schemes */
+
 .charsheet {
 	margin-left: 13px;
 }
+
 
 /*Configure the tab buttons*/
 
@@ -94,16 +135,17 @@
 	/* margin-right: 2em;  prevent overlap with edit button */
 }
 
-.tab-buttons > button {
+.ui-dialog .charsheet .tab-buttons > button {
   position: absolute; /* Position them relative to the browser window */
   left: -155px; /* Position them outside of the screen */
   transition: 0.3s; /* Add transition on hover */
   padding: 15px 5px; /* 15px padding */
   width: 130px; /* Set a specific width */
-  font-size: 20px; /* Increase font size */
+  font-size: 1.5em; /* Increase font size */
   /* color: white; White text color */
   border-radius: 0 5px 5px 0; /* Rounded corners on the top right and bottom right side */
-  background-color: #fff5aa;
+  background-color: var(--button-background);
+  color: var(--textcolor-dark);
   text-align: right;
   border-color: #CCC;
 }
@@ -112,7 +154,7 @@
    font-family: pictos;
 }
 
-.tab-buttons > button:hover {
+.ui-dialog .charsheet .tab-buttons > button:hover {
   left: -55px; /* On mouse-over, make the elements appear as they should */
 }
 
@@ -140,6 +182,14 @@
 
 .settings {
 	min-height: 700px;
+}
+
+/* highlight the button for selected tab */
+
+.tabshighlight[value="character"] ~ #chartab,
+.tabshighlight[value="inventory"] ~ #inventab,
+.tabshighlight[value="settings"] ~ #settingstab {
+	background-color: var(--background-dark);
 }
 
 /* show the selected tab */
@@ -461,18 +511,25 @@ input[type="hidden"].showhorse[value="0"] ~ .inven-personal {
 .weapons-grid,
 .weapons-grid .repcontainer > .repitem {
    display: grid;
-   grid-template-columns: 8.5em 1em repeat(3, 2.2em) repeat(2, 2.7em) repeat(5, 2.2em) 2.7em 2.7em 2.3em 2.5em 2.3em 2.2em 1fr;
+   grid-template-columns: repeat(4, 2.1em) 1em repeat(3, 2.2em) repeat(2, 2.7em) repeat(5, 2.2em) 2.7em 2.7em 2.3em 2.5em 2.3em 2.2em 1fr;
    align-items: center;	
    align-content: baseline;	
+}
+
+.weapon-label {
+    grid-column: span 4;
 }
 
 .missileweapons-grid,
 .missileweapons-grid .repcontainer > .repitem {
    display: grid;
-   grid-template-columns: 8.5em 1.5em 1.5em 2.2em 2.5em repeat(4, 4.5em 2.5em 2.5em 2.2em) 1fr;
+   grid-template-columns: repeat(4, 3em) 2em 2em 2.2em 2.5em repeat(4, 4.5em 2.5em 2.5em 2.2em) 4em;
    align-items: center;	
    align-content: baseline;	
-   font-size: 12px;
+}
+
+.mw-extraranges {
+	display: contents;
 }
 
 .magic-grid,
@@ -571,6 +628,11 @@ input[type="hidden"].showsinglepiety[value="0"] ~ .piety-grid .repcontainer > .r
    align-content: center;   
 }
 
+.armourareawrapper  {
+	display:contents;
+}
+
+
 .legacyarmor-grid {
 	grid-column: span 12;
 	display: grid;
@@ -637,7 +699,8 @@ empty rule for notegrid, use this for additional styling if desired
    margin-right: auto;
    box-sizing: border-box;
    display: block;
-   width: 98%;   
+   width: 98%;
+   color: var(--textcolor-dark);
 }
 
 .injuryrollbutton-grid {
@@ -656,12 +719,10 @@ empty rule for notegrid, use this for additional styling if desired
 
 .charsheet .repcontainer,
 .charsheet .repcontrol  {
+	display: grid;
 	grid-column: 1/-1;
 }
 
-button.repcontrol_edit {
-    grid-column: -1;
-}
 
 /* support div to prevent grid issues with some exceptions */
 .wrapper {
@@ -702,16 +763,52 @@ button.repcontrol_edit {
 
 /* overwrite some roll20 default styling */
 
+
+body {
+	font-size: 12px;
+}
+
 .ui-dialog .charsheet label,
 .ui-dialog .charsheet input,
 .ui-dialog .charsheet select {
 	margin-bottom: 0px;
 	color: var(--textcolor-dark);
+	background-color: var(--background-input);
+}
+
+.tab-content p {
+	font-size: 1em;
+}
+
+.charsheet input[type=checkbox] {
+	height: 1.5em;
+    width: 1.5em;
+}
+
+.charsheet h2 {
+	font-size: 2em;
+	line-height: 3em;
+}
+
+.characterviewer .charsheet label {
+	font-weight: normal;
+	font-size: 1em;
 }
 
 .ui-dialog .charsheet label {
     width: auto;
 }
+
+.ui-dialog .charsheet button {
+	font-size: 1em;
+}
+
+label, input, button, select, textarea {
+    font-size: 1em;
+    font-weight: normal;
+    /* line-height: 18px; */
+}
+
 
 /* Headers */
 
@@ -736,7 +833,7 @@ h1.tab-header {
 }
 
 h2.tab-header {
-	margin-top: -130px;
+	margin-top: -155px;
 }
 
 .skill-section-title {
@@ -760,10 +857,6 @@ h2.tab-header {
 	border-bottom: 2px black solid;
 	color: var(--textcolor-dark);
 	text-transform: uppercase;
-}
-
-.missileweapons-grid > .skill-header {
-    font-size: smaller;
 }
 
 .armorprotection > .skill-header {
@@ -848,33 +941,22 @@ input.piety-label[readonly] {
 	border-width: 1px;
 	background-color: var(--background-grid);
 	text-transform: uppercase;
-    font-size: smaller;
     font-family: 'Roboto Slab', serif;
     font-weight: normal;
 }
 
 .armorprotection-grid label {
 	text-transform: uppercase;
-    font-size: smaller;
     font-family: 'Roboto Slab', serif;
     font-weight: normal;	
 }
 
-.combat-grid label,
-.load-grid label,
-.penalties-grid label,
-.horsecombat-grid label,
-.horseload-grid label,
-.horsepenalties-grid label,
-.settingsgroup label {
-	font-size: small;
-}
-
-.personal-grid label,
-.family-grid label,
-.physical-grid label,
-.horseattribs-grid label {
-	height:26px;
+.characterviewer .charsheet .personal-grid label,
+.characterviewer .charsheet .family-grid label,
+.characterviewer .charsheet .physical-grid label,
+.characterviewer .charsheet .horseattribs-grid label {
+	height:2.7em;
+	font-size: 0.8em;
 }
 
 .physical-grid label,
@@ -886,7 +968,7 @@ input.piety-label[readonly] {
 .ui-dialog .charsheet .attribs-grid input,
 .ui-dialog .charsheet .horseattribs-grid input{
 	width: 2.5em;
-	font-size: 15px;
+	font-size: 1.1em;
 }
 
 .attribs-grid label,
@@ -997,6 +1079,11 @@ input[type="hidden"].showupgradenotification[value="0"] ~ div.newversion-notifca
 	display: none;
 }
 
+#horsespeed {
+	/* style the background for the select dropdown */
+	background-color: var(--background-sheet);
+}
+
 /* VARIOUS STYLING */
 
 .charsheet .avatarbanner {
@@ -1049,16 +1136,39 @@ button.buttonaslink {
 	cursor: pointer;
 }
 
+/* replace default roll buttons with d10 to be in line with Harn */
+
+.ui-dialog .charsheet button[type=roll]::before {
+	font-family: dicefontd10;
+    content: 'A';
+}
+
+
 /* Development roll button */
-.charactersheet button[type=roll].skilldev-button::before {
+.ui-dialog .charsheet button[type=roll].skilldev-button::before,
+body.sheet-darkmode .ui-dialog .charsheet button[type=roll].skilldev-button::before {
 	font-family: 'Pictos';
 	content: '{ ';
 }
 
+/* push back buttons when in edit mode for repeating sections (otherwise the delete button doesn't always show) */
+
+div.editmode .ui-draggable {
+    z-index: -1;
+}
+
 /* Add to turn tracker button */
-.charactersheet button[type=roll].turnorder-button::before {
+.ui-dialog .charsheet button[type=roll].turnorder-button::before,
+body.sheet-darkmode .ui-dialog .charsheet button[type=roll].turnorder-button::before {
 	font-family: 'Pictos';
 	content: 't ';
+}
+
+/* improve legibility default roll button dark mode */
+
+body.sheet-darkmode .ui-dialog .charsheet button[type=roll]::before {
+	font-family: dicefontd10;
+    content: 'A';
 }
 
 /* center text in number inputs AND value backed spans */
@@ -1166,10 +1276,40 @@ button.dismissnotification {
 
 /* ROLL TEMPLATES */
 
+/* RT colour schemes */
+.sheet-rolltemplate-custom .sheet-container.sheet-color-harn {
+  --header-bg-color: #a27800;
+  --header-text-color: #FFF;
+  --main-text-color:#586e75;
+  --content-bg-color: #fdf6e3;
+  --custom-border-color: #a27800;
+  --highlight-text-color: #0087ff;
+  --highlight-row-bg: #ffffd7;
+  --even-row-bg: #eee8d5;
+}
+
+ .sheet-rolltemplate-custom.sheet-rolltemplate-darkmode .sheet-container.sheet-color-harn {
+  --header-bg-color: #6c71c4;
+  --header-text-color: #FFF;
+  --main-text-color:#93a1a1;
+  --content-bg-color: #002b36;
+  --custom-border-color: #6c71c4;
+  --highlight-text-color: #0087ff;
+  --highlight-row-bg: #002b36;
+  --even-row-bg: #073642;
+}
+
+/* VTT dark mode support (make roll results legible) */
+
+.sheet-rolltemplate-custom .sheet-container .sheet-value {
+	color: var(--dark-primarytext);
+}
+
+/* other RT styling and layout */
+
 .sheet-rolltemplate-custom .sheet-container {
   width: 100%;	
   border: 1px solid;
-  /* by default, the border is the same color as the header. You can change this here, e.g. to black */
   border-color: var(--custom-border-color);
 }
 
@@ -1198,38 +1338,14 @@ button.dismissnotification {
   padding: 0.2em;
 }
 .sheet-rolltemplate-custom .sheet-subtitle {
-  font-size:.9em;
+  font-size:0.9em;
 }
 
-/* example colors */
-.sheet-rolltemplate-custom .sheet-container {
-  /* this is the default color */
-  --header-bg-color: rgba(112,32,130,1);
-  --header-text-color: #FFF;
-  --content-bg-color: #FFF;
-  --custom-border-color: #000;
-}
-.sheet-rolltemplate-custom .sheet-container.sheet-color-red {
-  --header-bg-color: #F00;
-}
-.sheet-rolltemplate-custom .sheet-container.sheet-color-green {
-  --header-bg-color: #0F0;
-  --header-text-color: #000;
-}
-
-.sheet-rolltemplate-custom .sheet-container.sheet-color-harn {
-  --header-bg-color: #a27800;
-  --header-text-color: #FFF;
-  --content-bg-color: #FFFAF0;
-  --custom-border-color: #00000000;
-  --highlight-text-color: #0087ff;
-  --highlight-row-bg: #ffffd7;
-}
 
 /* Allprops part */
 .sheet-rolltemplate-custom .sheet-content {
   display: grid;
-  /* background: #FFF; */
+  color: var(--main-text-color);
   background-color: var(--content-bg-color);
   /* Header formatting - modify the column layout below */
   grid-template-columns: auto auto;
@@ -1292,7 +1408,7 @@ button.dismissnotification {
 .sheet-rolltemplate-custom .sheet-crit-failure {
     grid-column: span 2;
 	border: 2px solid #990000;
-    background-color: #CC0000 !important;
+    background-color: #dc322f !important;
 	color: #FFF;
     text-align: center;
     font-weight: bold;
@@ -1314,7 +1430,7 @@ button.dismissnotification {
 /* Make even-numbered rows grey */
 .sheet-rolltemplate-custom .sheet-content :nth-child(4n+3),
 .sheet-rolltemplate-custom .sheet-content :nth-child(4n) {
-  background:#EEE;
+  background: var(--even-row-bg);
 }
 
 /* Description field */
@@ -1322,5 +1438,355 @@ button.dismissnotification {
   grid-column: span 2;
   padding: 5px;
   text-align: center;
+  font-weight: bold;
 }
 
+/* MOBILE browser (not roll20 app) styling */
+
+@media only screen and (orientation:portrait) and (min-resolution: 192dpi) and (min-width: 490px) {
+	body {
+		font-size: 36px; /* enlarge font on high-dpi mobile devices */
+	}	
+}
+
+@media only screen and (orientation:portrait) and (min-resolution: 192dpi),
+only screen and (max-width: 480px) {
+
+/* keep the roll20 navbar at the top, space buttons for fingers 
+ul.nav-tabs.nav{
+    position:sticky;
+    top:0;
+    z-index:9999;
+}
+*/
+
+ul.nav.nav-tabs > li > a {
+    padding: 1em 0.7em;
+}
+
+/* hide avatar banner, not enough screen space on mobile */
+.charsheet .avatarbanner {
+	display: none;
+}
+/* change sheet tabs navigation for touch use */
+.tab-buttons {
+	top: 0px;
+	margin-left: auto;
+    width: fit-content;
+	width: 99%;
+}
+
+.ui-dialog .charsheet .tab-buttons > button {
+	position: static;
+	width: 25%;
+	transition: none;
+	margin: 0 5px;
+	font-size: 1.2em;
+	padding: 1em 0.2em;
+    width: fit-content;
+	border-radius: 5px;
+}
+
+.character, .inventory, .settings {
+	margin-top: 0px;
+}
+
+/* make tab headers more compact for small screen */
+h2.tab-header {
+    margin-top: 0px;
+	float: left;
+	margin-left: 50px;
+}
+
+h1.tab-header {
+    padding-bottom: 1em;
+	float: right;
+	margin-right: 50px;
+}
+
+/* adjust some styling for smaller screens */
+.skill-section-title {
+	padding: 0px;
+}
+
+.charsheet label {
+    padding: 0.2em 3px;
+}
+
+.ui-dialog .charsheet .attribs-grid input, .ui-dialog .charsheet .horseattribs-grid input {
+    padding: 0.18em 3px;
+}
+
+.section-title-half {
+	grid-column: 1 / span 12;
+    display: flex;
+}
+
+.ui-dialog .charsheet label, .ui-dialog .charsheet input, .ui-dialog .charsheet select {
+	height: auto;
+    padding: 0.2em 3px;
+}
+
+/* layout all content in one column */
+
+.character-grid {
+  grid-template-rows: repeat(23, auto);
+}
+
+.inventory-grid {
+  grid-template-rows: repeat(10, auto);
+}
+
+.personal {
+  grid-column-start: 1;
+  grid-column-end: 13;
+}
+
+.physical {
+  grid-column-start: 1;
+  grid-column-end: 13;
+  grid-row: 2;
+}
+
+.attribs {
+  grid-column-start: 1;
+  grid-column-end: 13;
+  grid-row: 3;
+
+}
+
+.family {
+  grid-column-start: 1;
+  grid-column-end: 13;
+  grid-row: 4;
+
+}
+
+.skills {
+  grid-column: span 12;
+}
+
+.combat {
+  grid-column: 1 / span 12;
+  grid-row: 13;
+}
+
+.load {
+  grid-column: 1 / span 6;	
+  grid-row: 14;
+}
+
+.penalties {
+	grid-column: 7 / span 6;
+	grid-row: 14;
+}
+
+.armorprotection {
+	grid-column: span 12;
+	grid-row: 15;
+}
+
+.injuries {
+	grid-column: span 12;
+	grid-row: 16;
+}
+
+.carriedweapons {
+  grid-column: 1 / span 12;
+  grid-row: 17;  
+}
+
+.carriedmissileweapons {
+  grid-column: 1 / span 12;
+  grid-row: 18;
+}
+
+.magic {
+  grid-column: 1 / span 12;
+}
+
+.piety {
+  grid-column: 1 / span 12;	
+  grid-row: 24;
+}
+
+.basichorseinfo {
+  grid-column: 1 / span 12;
+  height: fit-content;
+  align-content: center;
+}
+
+.horseattribs {
+  grid-column: 1 / span 6;
+}
+
+.horseabilities {
+  grid-column: 7 / span 6;
+}
+
+.horsecombat {
+  grid-column: 1 / span 12;
+}
+
+.horseload {
+  grid-column: 1 / span 6;
+  grid-row: 6;
+}
+
+.horseap  {
+  grid-column: 1 / span 12;
+}
+
+.horseinjuries {
+  grid-column: 1 / span 12;
+}
+
+.horseattacks {
+  grid-column: 1 / span 12;
+  grid-row: 5;
+}
+
+.horsepenalties {
+  grid-column: 7 / span 6;
+  grid-row: 6;
+}
+
+.inven-weapons {
+  grid-column: 1 / span 12;	
+}
+
+.inven-missileweapons {
+  grid-column: 1 / span 12;	
+}
+
+.inven-armor {
+  grid-column: 1 / span 12;	
+}
+
+.inven-personal {
+  grid-column: 1 / span 12;
+  grid-row: 4;
+}
+
+
+.inven-horse {
+  grid-column: 1 / span 12;
+  grid-row: 5;
+}
+
+.inven-horsearmor {
+  grid-column: 1 / span 12;	
+}
+
+.inven-moneypersonal {
+  grid-column: 1 / span 12;	
+  grid-row: 7;
+}
+
+.inven-moneybank {
+	grid-column: 1 / span 12;
+	grid-row: 8;
+}
+
+.inven-moneygroup {
+	grid-column:1 / span 12;
+  grid-row: 9;	
+}
+
+.inven-notes {
+	grid-column: 1 / span 12;
+  grid-row: 10;
+}
+
+.settingsgroup {
+	grid-column: span 12;
+	display: grid;
+    grid-template-columns: 1fr 2em;
+	align-content: baseline;
+	grid-row-gap: 5px;
+} 
+/* Adjust some sub grids for small screen */
+
+.personal-grid, .family-grid { 
+	grid-template-columns: 30% 1fr;
+}
+
+.bhigrid {
+	grid-template-columns: auto 1fr;
+}
+
+.horsecombat-grid {
+    grid-template-columns: repeat (2, 1fr 3em 2.5em);
+}
+
+.missileweapons-grid,
+.missileweapons-grid .repcontainer > .repitem {
+   display: grid;
+   grid-template-columns: 1fr repeat(12, 2.1em);
+   align-items: center;	
+   align-content: baseline;	
+   font-size: 1em;
+}
+
+.weapons-grid, .weapons-grid .repcontainer > .repitem {
+    grid-template-columns: repeat(12, 1fr);
+}
+
+.weapon-note {
+	    grid-column: 1 / span 12;
+}
+
+.armorinvengrid, .armorinvengrid .repcontainer > .repitem {
+    display: grid;
+    grid-template-columns: 1fr 2.5em 2.5em repeat(5, 2em);
+    align-items: center;
+    align-content: baseline;
+}
+
+.repitem > .width-2col {
+	/* adjust 2 column width for weapon notes in mobile view */ 
+	grid-column: span 4;
+}
+
+.armourareawrapper,
+.mw-extraranges, 
+.invensectionwrapper,
+.armorinvengrid .repitem > .sectionarmourhead,
+.armorinvengrid .repitem > .sectionarmourarms,
+.armorinvengrid .repitem > .sectionarmourtorso,
+.armorinvengrid .repitem > .sectionarmourlegs {
+	display:none;
+}
+
+.magic-grid, .magic-grid .repcontainer > .repitem {
+    grid-template-columns: 1fr 1fr 5px repeat(3, 1.8em) 3em repeat(3, 2em) 2em;
+	margin-bottom: 1em;
+}
+
+/* other minor styling tweaks */
+
+.characterviewer .charsheet .personal-grid label,
+.characterviewer .charsheet .family-grid label,
+.characterviewer .charsheet .physical-grid label,
+.characterviewer .charsheet .horseattribs-grid label,
+.personal-input {
+    height: 1.75em;
+}
+
+/* additional spacing for touch */
+
+.skills-grid, .weapons-grid, .missileweapons-grid, .magic-grid, .moneygrid {
+	row-gap: 0.5em;
+}
+
+.repcontainer > .repitem {
+	margin: 0.5em 0;
+}
+
+.ui-dialog .charsheet .repcontrol_edit, .ui-dialog .charsheet .repcontrol_add {
+    float: right;
+    height: auto;
+    padding: 1em 0px;
+}
+
+}
