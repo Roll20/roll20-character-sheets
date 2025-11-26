@@ -744,19 +744,33 @@ on("change:class", (eventinfo) => {
 })
 
 //********* SET ROLL EVENT LISTENERS *********/
+
+// Helper function to grab player input
+const getRegularQuery = async (v) => {
+    const strCheckType = getTranslationByKey('check_type')
+    const strCheckStandard = getTranslationByKey('check_standard')
+    const strCheckAdvantage = getTranslationByKey('check_advantage')
+    const strCheckDisadvantage = getTranslationByKey('check_disadvantage')
+    const strModifier = getTranslationByKey('modifier')
+
+    let rollBase = `! {{query1=[[?{${strCheckType}|${strCheckStandard},1d12|${strCheckAdvantage},2d12kh1|${strCheckDisadvantage},2d12kl1};?{${strModifier}|${v}}]]}}`;
+        queryRoll = await startRoll(rollBase);
+    finishRoll(queryRoll.rollId); // you can just let this time out if you want - we're done with it
+    let queryResponse = queryRoll.results.query1.expression.split(";");
+    let tmp = parseInt(queryResponse[1]);
+    queryResponse[1] = tmp>=0 ? "+" + tmp : tmp;
+    return queryResponse;
+};
+
 regular.forEach((s) => {
-    on(`clicked:${s}`, () => {
-        getAttrs([s], values => {
+    on(`clicked:${s}`, async () => {
+        getAttrs([s], async (values) => {
             let v = parseInt(values[s])
             if(v >= 0) v = "+" + v
 
-            const strCheckType = getTranslationByKey('check_type')
-            const strCheckStandard = getTranslationByKey('check_standard')
-            const strCheckAdvantage = getTranslationByKey('check_advantage')
-            const strCheckDisadvantage = getTranslationByKey('check_disadvantage')
-            const strModifier = getTranslationByKey('modifier')
-
-            startRoll(`&{template:check} {{character=@{character_name}}} {{name=${s}}} {{roll=[[?{${strCheckType}|${strCheckStandard}, 1d12|${strCheckAdvantage}, 2d12kh1|${strCheckDisadvantage}, 2d12kl1}?{${strModifier}|${v}}]]}}`, (checkResult) => {
+            const rollQuery = await getRegularQuery(v)
+            const rollStr = rollQuery[0] + rollQuery[1]
+            startRoll(`&{template:check} {{character=@{character_name}}} {{name=${s}}} {{roll=[[${rollStr}]]}}`, (checkResult) => {
                 let modifier = checkResult.results.roll.dice[0]
                 let expression = checkResult.results.roll.expression
                 if(expression.startsWith("2d12kl1")){
@@ -780,27 +794,45 @@ regular.forEach((s) => {
 })
 
 //********* ATTACK **********/
+
+// Helper function to grab player input
+const getAttackQuery = async (v, lastDefense) => {
+    const strCheckType = getTranslationByKey('check_type')
+    const strCheckStandard = getTranslationByKey('check_standard')
+    const strCheckAdvantage = getTranslationByKey('check_advantage')
+    const strCheckDisadvantage = getTranslationByKey('check_disadvantage')
+    const strModifier = getTranslationByKey('modifier')
+    const strDefense = getTranslationByKey("opponents-defense")    
+    
+    let rollBase = `! {{query1=[[?{${strCheckType}|${strCheckStandard},1d12|${strCheckAdvantage},2d12kh1|${strCheckDisadvantage},2d12kl1};?{${strModifier}|${v}};?{${strDefense}|${lastDefense}}]]}}`;
+        queryRoll = await startRoll(rollBase);
+    finishRoll(queryRoll.rollId); // you can just let this time out if you want - we're done with it
+    let queryResponse = queryRoll.results.query1.expression.split(";");
+    let tmp = parseInt(queryResponse[1]);
+    queryResponse[1] = tmp>=0 ? "+" + tmp : tmp;
+    tmp = parseInt(queryResponse[2]);
+    queryResponse[2] = tmp>=0 ? "+" + tmp : tmp;
+    
+    return queryResponse;
+};
+
 on("clicked:attack", () => {
-    getAttrs(["attack", "last_opponent_defense"], values => {
+    getAttrs(["attack", "last_opponent_defense"], async values => {
         let v = parseInt(values["attack"])
         if(v >= 0) v = "+" + v
+
         let lastDefense = values["last_opponent_defense"] || "+0"
+        const rollQuery = await getAttackQuery(v, lastDefense)
+        const rollStr = rollQuery[0] + rollQuery[1] + rollQuery[2]
+        setAttrs({
+            last_opponent_defense: rollQuery[2]
+        })
 
-        const strCheckType = getTranslationByKey('check-type')
-        const strCheckStandard = getTranslationByKey('check-standard')
-        const strCheckAdvantage = getTranslationByKey('check-advantage')
-        const strCheckDisadvantage = getTranslationByKey('check-disadvantage')
-        const strModifier = getTranslationByKey('modifier')
-        const strDefense = getTranslationByKey("opponents-defense")
-
-        startRoll(`&{template:attack} {{character=@{character_name}}} {{random_index=[[[{1d6}]]]}} {{name=attack}} {{damage=[[@{dread}]]}} {{roll=[[?{${strCheckType}|${strCheckStandard}, 1d12|${strCheckAdvantage}, 2d12kh1|${strCheckDisadvantage}, 2d12kl1}?{${strModifier}|${v}}?{${strDefense}|${lastDefense}}]]}} {{hint=[[0]]}}`, (checkResult) => {
+        startRoll(`&{template:attack} {{character=@{character_name}}} {{random_index=[[[{1d6}]]]}} {{name=attack}} {{damage=[[@{dread}]]}} {{roll=[[${rollStr}]]}} {{hint=[[0]]}}`, (checkResult) => {
             let modifier = checkResult.results.roll.dice[0]
             let expression = checkResult.results.roll.expression
             let expressionParts = expression.split(/([+-])/)
-            lastDefense = (expressionParts[expressionParts.length - 2]+expressionParts[expressionParts.length - 1])
-            setAttrs({
-                last_opponent_defense: lastDefense,
-            })
+            
             if(expression.startsWith("2d12kl1")){
                 if(modifier > checkResult.results.roll.dice[1]) modifier = checkResult.results.roll.dice[1]
             }
