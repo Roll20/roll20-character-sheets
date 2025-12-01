@@ -2897,34 +2897,36 @@ on(
 
 // type/carry should jump to follow selector unless set to Show All or matches the type/carry tab
 // carried_select/carried sync are used for weight calcs
-on('change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_type change:repeating_equipment:equipment_carried_select', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  const id = eventInfo.sourceAttribute.split('_')[2];
-  const source = `${eventInfo.sourceAttribute}`;
-  const pattern = /equipment_type/; // parses the event text
-  const isType = pattern.test(source); // boolean for equipment_type change
-  const fields = [section_attribute('equipment', id, 'equipment_type'), section_attribute('equipment', id, 'equipment_carried_select')];
-  getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', ...fields], (v) => {
-    const output = {};
-    const carriedTab = +v.equipment_tabs_carry; // 1, 0, 2, -1
-    const typeTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
-    const thisType = +v[section_attribute('equipment', id, 'equipment_type')]; // 0, 1, 2, 3, 4
-    const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')]; // 0, 1, 2
-    // Weight calcs use equipment_carried so keep them synced
-    output[section_attribute('equipment', id, 'equipment_carried')] = thisCarriedSelect === 1 ? 1 : 0;
-    // jumps to equip type tab unless Show All or same equip type tab
-    output.equipment_tabs_type = typeTab !== -1 && isType ? thisType : typeTab;
-    // jumps to carry type tab unless Show All or same carry type tab
-    const testCarrySelected = carriedTab === -1 || carriedTab === thisCarriedSelect ? -1 : thisCarriedSelect;
-    console.log(`Change detected: testCarrySelected:${testCarrySelected}`);
-    output.equipment_tabs_carry = carriedTab === -1 || carriedTab === thisCarriedSelect ? -1 : thisCarriedSelect;
-    setAttrs(output);
-  });
-});
+on(
+  'change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_type change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_magical',
+  (eventInfo) => {
+    const id = eventInfo.sourceAttribute.split('_')[2];
+    const source = `${eventInfo.sourceAttribute}`;
+    const pattern = /equipment_type/; // parses the event text
+    const isType = pattern.test(source); // boolean for equipment_type change
+    const fields = [section_attribute('equipment', id, 'equipment_type'), section_attribute('equipment', id, 'equipment_carried_select')];
+    getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', ...fields], (v) => {
+      const output = {};
+      const carriedTab = +v.equipment_tabs_carry; // 1, 0, 2, -1
+      const typeTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
+      const thisType = +v[section_attribute('equipment', id, 'equipment_type')]; // 0, 1, 2, 3, 4
+      const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')]; // 0, 1, 2
+      // Weight calcs use equipment_carried so keep them synced
+      output[section_attribute('equipment', id, 'equipment_carried')] = thisCarriedSelect === 1 ? 1 : 0;
+      // jumps to equip type tab unless Show All or same equip type tab
+      output.equipment_tabs_type = typeTab !== -1 && isType ? thisType : typeTab;
+      // jumps to carry type tab unless Show All or same carry type tab
+      const testCarrySelected = carriedTab === -1 || carriedTab === thisCarriedSelect ? -1 : thisCarriedSelect;
+      console.log(`Change detected: testCarrySelected:${testCarrySelected}`);
+      output.equipment_tabs_carry = carriedTab === -1 || carriedTab === thisCarriedSelect ? -1 : thisCarriedSelect;
+      setAttrs(output);
+    });
+  },
+);
 
 // Equipment Tabs hide/show Rows
-on('change:equipment_tabs_type change:equipment_tabs_carry change:repeating_equipment:equipment_magical', (eventInfo) => {
-  clog(`Change Detected:${eventInfo.sourceAttribute}`);
+on('change:equipment_tabs_type change:equipment_tabs_carry', (eventInfo) => {
+  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   getSectionIDs('repeating_equipment', (idArray) => {
     const fields = [];
     _.each(idArray, (id) => {
@@ -4601,10 +4603,12 @@ function setEquipment(id) {
   const combined = [...nonRep, ...fields];
   getAttrs(combined, (v) => {
     // console.log(`Change detected: ${fields}`);
-    const equipTab = +v.equipment_tabs_type;
+    const equipTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
     const equipType = +v[section_attribute('equipment', id, 'equipment_type')];
-    output.repeating_equipment_equipment_type = equipType <= 0 || equipTab === -1 ? 0 : equipType;
-    output.repeating_equipment_equipment_magical = +v[section_attribute('equipment', id, 'equipment_magical')];
+    // output.repeating_equipment_equipment_type = equipType <= 0 || equipTab === -1 ? 0 : equipType;
+    // Set Equipment type for new rows based on selected Type Tab
+    output.repeating_equipment_equipment_type = equipTab !== -1 ? equipTab : equipType;
+    output.repeating_equipment_equipment_magical = equipType === 3 || equipTab === 3 ? 1 : +v[section_attribute('equipment', id, 'equipment_magical')];
     output.repeating_equipment_equipment_show_type = +v[section_attribute('equipment', id, 'equipment_show_type')];
     output.repeating_equipment_equipment_current = +v[section_attribute('equipment', id, 'equipment_current')];
     output.repeating_equipment_equipment_current_max = +v[section_attribute('equipment', id, 'equipment_current_max')];
@@ -4660,7 +4664,7 @@ on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_ite
   const id = eventInfo.sourceAttribute.split('_')[2];
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
-  // if (eventInfo.newValue !== eventInfo.previousValue) return;
+
   // test for new row name (ie no existing value)
   // console.log(`Change detected: new: ${eventInfo.newValue} previous:${eventInfo.previousValue}`);
   if (eventInfo.previousValue !== undefined) return;
