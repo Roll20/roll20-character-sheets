@@ -34,6 +34,7 @@ table
         th Knockdown
         th Category
         th Book
+        th Printing
     - let processedWeapons = new Set()
     - let keys = Object.keys(data).sort()
     each key in keys
@@ -53,10 +54,15 @@ table
         - let smallColor     = weaponList.every( (ele,i,arr) => ele['small-medium'] === arr[0]['small-medium']) ? "white" : "orange"
         - let largeColor     = weaponList.every( (ele,i,arr) => ele.large === arr[0].large) ? "white" : "orange"
         - let categoryColor  = weaponList.every( (ele,i,arr) => ele.category.join() === arr[0].category.join() ) ? "white" : "orange"
-        each book in booksPriority
-            - let weapon = weaponList.find(w => w.book.includes(book))
+        each priority in booksPriority
+            - let weapon = weaponList.find(w => w.book.includes(priority.book))
             if !weapon
                 - continue
+            - let rangeColor
+            if priority.book.startsWith('Player\'s Option:')
+                - rangeColor = weaponList.filter(w => w.book.some(b => b.startsWith('Player\'s Option:'))).every((ele,i,arr) => ele.range === arr[0].range) ? "white" : "orange"
+            else
+                 - rangeColor = weaponList.filter(w => w.book.some(b => !b.startsWith('Player\'s Option:'))).every((ele,i,arr) => ele.range === arr[0].range) ? "white" : "orange"
             tr
                 td(style=`background-color:${nameColor}`) #{weapon.name}
                 td(style=`background-color:${groupColor}`) #{weapon.group}
@@ -67,12 +73,13 @@ table
                 td(style=`background-color:${speedColor}`) #{weapon.speed}
                 td #{weapon.reach}
                 td(style=`background-color:${rofColor}`) #{weapon.rof}
-                td #{weapon.range}
+                td(style=`background-color:${rangeColor}`) #{weapon.range}
                 td(style=`background-color:${strengthColor}`) #{weapon.strength}
                 td(style=`background-color:${smallColor}`) #{weapon['small-medium']}
                 td(style=`background-color:${largeColor}`) #{weapon.large}
                 td #{weapon.knockdown}
                 td(style=`background-color:${categoryColor}`) #{weapon.category.join(', ')}
-                td #{book}
+                td #{priority.book === 'PHB' ? 'Player\'s Handbook' : priority.book}
+                td #{priority.print}
         tr
             td &nbsp;

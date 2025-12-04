@@ -1,0 +1,81 @@
+.components {
+  $this: '.components';
+
+  &__content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $grid-gutter;
+  }
+
+  &__component {
+    &--header {
+      font-weight: 900;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    &--track {
+      display: flex;
+      gap: 0 $grid-gutter-col;
+      align-items: center;
+      justify-content: center;
+
+      // fill in previous radios
+      @each $selected in 1, 2, 3 {
+        @each $fill in 3, 2, 1 {
+          @if $fill < $selected {
+            .component__value[value='#{$selected}'] {
+              ~ .component__checkbox--#{$fill} input {
+                background-image: image('circle-filled.svg');
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.component {
+  $this: '.component';
+  &__checkbox {
+    display: grid;
+    font-size: 1rem;
+
+    input {
+      appearance: none;
+      outline: none;
+
+      width: 1.5rem;
+      aspect-ratio: 1;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-image: image('circle.svg');
+      filter: var(--icon-filter);
+
+      &:checked {
+        background-image: image('circle-filled.svg');
+      }
+    }
+
+    &--0 {
+      padding-right: $grid-gutter-col;
+      border-right: 2px solid $text-color;
+
+      input {
+        background-image: image('circle-x.svg');
+        &:checked {
+          background-image: image('circle-x.svg');
+        }
+      }
+    }
+  }
+  &__value {
+    &[value='0'],
+    &:not([value]) {
+      ~ #{$this}__checkbox--0 {
+        background-image: image('circle-x.svg') !important;
+      }
+    }
+  }
+}

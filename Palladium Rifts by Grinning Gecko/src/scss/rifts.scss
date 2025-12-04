@@ -115,6 +115,7 @@ a {
 .withoutavatars {
   .sheet-rolltemplate-strike,
   .sheet-rolltemplate-goe,
+  .sheet-rolltemplate-loe,
   .sheet-rolltemplate-skill,
   .sheet-rolltemplate-initiative,
   .sheet-rolltemplate-custom,
@@ -125,6 +126,7 @@ a {
 /* Smaller margins - remove these if you want the huge default left margin */
 .sheet-rolltemplate-strike,
 .sheet-rolltemplate-goe,
+.sheet-rolltemplate-loe,
 .sheet-rolltemplate-skill,
 .sheet-rolltemplate-initiative,
 .sheet-rolltemplate-custom {
@@ -227,14 +229,42 @@ a {
       }
     }
   }
+  .opt_dodge_penalty[value="0"] ~ main#megaverse,
+  .opt_dodge_penalty:not([value]) ~ main#megaverse,
+  .opt_dodge_penalty[value=""] ~ main#megaverse {
+    button[type="roll"].dodge-pop-out span {
+      display: none;
+    }
+  }
   main#megaverse {
     button[type="roll"].no-dice::before {
       content: "";
     }
 
-    button.action-roll::before {
+    button[type="roll"].pop-out::before,
+    button[type="roll"].dodge-pop-out::before {
       font-family: "dicefontd20";
       content: "t";
+    }
+
+    button[type="roll"].pop-out,
+    button[type="roll"].dodge-pop-out {
+      font-family: 'Pictos';
+      
+      span {
+        font-size: .8em;
+        padding-left: .2em;
+        display: inline-block;
+      }
+    }
+
+    // button.action-roll::beforebutton[type="roll"].pop-out::before {
+    //   font-family: "dicefontd20";
+    //   content: "t";
+    // }
+
+    .youtube-toggle[value="1"] ~ .youtube-link {
+      display: none;
     }
 
     h4 {
@@ -255,6 +285,25 @@ a {
 
     textarea[readonly] {
       @include readonly;
+    }
+
+    .repitem details summary:hover,
+    .repcontainer[data-groupname="repeating_armor"] .repitem:hover,
+    .repcontainer[data-groupname="repeating_ammo"] .repitem:hover {
+      background-color: #ab43dd !important;
+    }
+
+    .repitem:nth-child(odd):not(.picker *) {
+      // background-color: #222;
+      opacity: 0.7;
+
+      &:has(details.info[open]) {
+        opacity: 1;
+      }
+    }
+
+    .repitem:nth-child(even):not(.picker *) {
+      background-color: #a9a9a9;
     }
 
     details {
@@ -468,7 +517,7 @@ a {
     .modifiers-attributes {
       display: grid;
       gap: 1rem;
-      grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
       align-items: start;
       margin-top: 0.5rem;
 
@@ -493,6 +542,11 @@ a {
           .bonus-type-container {
             label {
               grid-template-columns: 1fr 1rem 5rem 4rem;
+
+              > div {
+                display:grid;
+                grid-template-columns: auto auto;
+              }
             }
           }
         }
@@ -502,13 +556,14 @@ a {
     .bonus-ps-container {
       display: grid;
       gap: 0.5rem;
-      grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
 
       label {
         display: grid;
         align-items: center;
         gap: 0.5rem;
-        grid-template-columns: 6.5rem 6rem 1fr;
+        grid-template-columns: 6.5rem minmax(6rem, auto) 6.5rem 4rem;
+        // grid-template-columns: auto auto auto auto;
 
         &.select {
           select {
@@ -520,7 +575,15 @@ a {
           width: 6rem;
         }
 
-        span {
+        > span {
+          @include center;
+
+          &[name^="attr_"] {
+            @include readonly;
+          }
+        }
+
+        > label span {
           @include center;
 
           &[name^="attr_"] {
@@ -533,7 +596,7 @@ a {
     .bonus-type-container {
       display: grid;
       gap: 1rem;
-      grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
       // grid-template-columns: 1fr 1fr 1fr 1fr;
 
       &.attributes {
@@ -562,6 +625,11 @@ a {
         gap: 0.2rem;
         grid-template-columns: 1fr 5rem;
         width: 100%;
+
+        > div {
+          display:grid;
+          grid-template-columns: auto auto;
+        }
 
         span {
           @include center;
@@ -667,7 +735,7 @@ a {
       .wp {
         .heading,
         .values {
-          grid-template-columns: minmax(16rem, 1fr) 5rem 5rem 5rem 5rem 5rem 5rem 5rem 5rem 1fr;
+          grid-template-columns: minmax(16rem, 1fr) 5rem 5rem 5rem 5rem 5rem 5rem 5rem 5rem 5rem 1fr;
         }
       }
 
@@ -691,7 +759,8 @@ a {
         grid-template-columns: 4rem 1fr 7rem 10rem 10rem 10rem;
       }
 
-      .repeating_armor-inner {
+      .repeating_armor-inner,
+      .repeating_ammo-inner {
         display: grid;
         gap: 0.5rem;
         grid-template-columns: 4rem 1fr 7rem 10rem 10rem 10rem;
@@ -736,6 +805,41 @@ a {
       color: $picker-color;
     }
 
+    .radio-style {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      margin: 0 auto; /* Centers horizontally */
+    }
+    
+    .radio-style input {
+      display: none; /* Hide native checkbox */
+    }
+    
+    .radio-style .checkmark {
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      border: 2px solid #555;
+      display: inline-block;
+      margin-right: 8px;
+      position: relative;
+      box-sizing: border-box;
+    }
+    
+    .radio-style input:checked + .checkmark::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 8px;
+      height: 8px;
+      background-color: #555;
+      border-radius: 50%;
+    }    
+
     .profile-builder {
       display: grid;
       gap: 0.5rem;
@@ -751,18 +855,18 @@ a {
         }
 
         .bonus-ps-container {
-          grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
         }
 
         .bonus-type-container {
-          grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
 
           &.attributes {
-            grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
             > label {
               display: grid;
               gap: 0.5rem;
-              grid-template-columns: 4rem 4rem 4rem 4rem;
+              grid-template-columns: 4rem 4rem 4rem 4rem 4rem;
 
               input[type="number"],
               input[type="text"] {
@@ -846,7 +950,7 @@ a {
       .spells-list {
         display: grid;
         gap: 0.5rem;
-        grid-template-columns: 2.5rem minmax(16rem, 1fr) 5rem 6rem 8rem 5rem 4rem 4rem 6rem 4rem 4rem 6rem 4rem;
+        grid-template-columns: 2.5rem minmax(16rem, 1fr) 5rem 6rem 8rem 10rem 5rem 4rem 4rem 6rem 4rem 4rem 6rem 4rem;
       }
     }
 
@@ -855,7 +959,16 @@ a {
       .psionics-list {
         display: grid;
         gap: 0.5rem;
-        grid-template-columns: 2.5rem minmax(16rem, 1fr) 6rem 8rem 5rem 4rem 4rem 6rem 4rem 4rem 5rem 4rem;
+        grid-template-columns: 2.5rem minmax(16rem, 1fr) 6rem 8rem 10rem 5rem 4rem 4rem 6rem 4rem 4rem 5rem 4rem;
+      }
+    }
+
+    .modifiers {
+      .heading,
+      .abilities-list {
+        display: grid;
+        gap: 0.5rem;
+        grid-template-columns: 2.5rem minmax(16rem, 1fr) 6rem 8rem 10rem 5rem 4rem 4rem 6rem 4rem 4rem 4rem;
       }
     }
 
@@ -1065,8 +1178,6 @@ img.logo {
 }
 
 .charsheet
-  .powersabilities
-  .repcontainer[data-groupname="repeating_powersabilities"]
   .repitem
   .ability-details,
 .charsheet
@@ -1202,6 +1313,18 @@ body.sheet-darkmode {
         }
       }
 
+      .radio-style .checkmark {
+        border: 2px solid #fff;
+      }
+      
+      .radio-style input:checked + .checkmark::after {
+        background-color: #fff;
+      }
+
+      .repitem:nth-child(even):not(.picker *) {
+        background-color: #222;
+      }
+
       .ss-2c {
         border-color: #444;
       }
@@ -1229,6 +1352,13 @@ body.sheet-darkmode {
         hr {
           border-color: #444;
           background-color: #444;
+        }
+
+        > div {
+          span[name^="attr_"] {
+            background-color: #444;
+            border-color: #555;
+          }
         }
 
         label {

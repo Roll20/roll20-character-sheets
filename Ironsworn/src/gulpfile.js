@@ -4,6 +4,7 @@ const gulp = require('gulp')
 
 const args = process.argv.splice(3, process.argv.length - 3);
 const lang = args.length > 1 && args[0] == '--lang' ? args[1] : undefined;
+const i18n = lang ? require(`../translations/${lang}.json`) : undefined
 
 gulp.task('css', () => {
   return gulp.src('./app/Ironsworn.styl')
@@ -28,8 +29,6 @@ gulp.task('watch', gulp.series(['css', 'html'], () => {
 gulp.task('build', gulp.series(['css', 'html']))
 
 gulp.task('test-html', () => {
-  const i18n = lang ? require(`../translations/${lang}.json`) : undefined
-
   return gulp.src('./test/Ironsworn.pug')
     .pipe(pug({
       pretty: true,
@@ -47,7 +46,7 @@ gulp.task('test-rt', () => {
   return gulp.src('./test/test-roll-templates.pug')
     .pipe(pug({
       pretty: true,
-      locals: { translations: require('../translation.json'), fs: require('fs') }
+      locals: { translations: require('../translation.json'), fs: require('fs'), i18n }
     }))
     .pipe(gulp.dest('./test'))
 })

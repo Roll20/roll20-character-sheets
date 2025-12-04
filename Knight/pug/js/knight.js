@@ -11,239 +11,316 @@
 on('change:armure', async (newArmure) => {
   const armureName = newArmure.newValue;
 
-  const dArmureModif = listDonneesArmures.map((a) => `${armureName}-${a}-modif`);
-  const dArmureActuel = listDonneesArmures.map((a) => `${armureName}-${a}-actuel`);
+  let newAttrs = {};
 
-  let listAttrs = ['warmaster150PG', 'warmaster250PG'];
-  listAttrs = listAttrs.concat(dArmureModif, dArmureActuel);
+  if (armureName === 'personnalise') {
+    const dArmureActuel = listDonneesArmures.map((a) => `${armureName}-${a}-actuel`);
+    const dArmureMax = listDonneesArmures.map((a) => `${armureName}-${a}-max`);
+    const listAttrs = ['slotTetePersonnalise', 'slotTorsePersonnalise', 'slotBDPersonnalise', 'slotBGPersonnalise', 'slotJDPersonnalise', 'slotJGPersonnalise'].concat(dArmureActuel, dArmureMax);
 
-  const attrs = await getAttrsAsync(listAttrs);
+    const attrs = await getAttrsAsync(listAttrs);
+    const armureActuel = +attrs[`${armureName}-armure-actuel`] || 0;
+    const energieActuel = +attrs[`${armureName}-energie-actuel`] || 0;
+    const armor = +attrs[`${armureName}-armure-max`] || 0;
+    const cdf = +attrs[`${armureName}-cdf-max`] || 0;
+    const energie = +attrs[`${armureName}-energie-max`] || 0;
+    const sTete = +attrs.slotTetePersonnalise || 0;
+    const sTorse = +attrs.slotTorsePersonnalise || 0;
+    const sBD = +attrs.slotBDPersonnalise || 0;
+    const sBG = +attrs.slotBGPersonnalise || 0;
+    const sJG = +attrs.slotJGPersonnalise || 0;
+    const sJD = +attrs.slotJDPersonnalise || 0;
 
-  const warmaster150 = +attrs.warmaster150PG;
-  const warmaster250 = +attrs.warmaster250PG;
+    newAttrs = {
+      armurePJ: armureActuel,
+      armurePJ_max: armor,
+      armurePJModif: 0,
+      energiePJ: energieActuel,
+      energiePJ_max: energie,
+      energiePJModif: 0,
+      cdfPJ: cdf,
+      cdfPJ_max: cdf,
+      cdfPJModif: 0,
+      barbarianGoliath: 0,
+      berserkIlluminationBeaconA: 0,
+      berserkIlluminationTorchA: 0,
+      berserkIlluminationProjectorA: 0,
+      berserkIlluminationLighthouseA: 0,
+      berserkIlluminationLanternA: 0,
+      berserkRageA: 0,
+      shamanNbreTotem: 0,
+      shamanAscension: 0,
+      sorcererMMVolNuee: 0,
+      sorcererMMPhase: 0,
+      sorcererMMEtirement: 0,
+      sorcererMMCorpMetal: 0,
+      sorcererMMCorpFluide: 0,
+      sorcererMMPMGuerre: 0,
+      sorcererMM250PG: 0,
+      warlockForward: 0,
+      warlockRecord: 0,
+      warlockRewind: 0,
+      warmasterImpFPersonnel: 0,
+      warmasterImpGPersonnel: 0,
+      warriorSoldierA: 0,
+      warriorHunterA: 0,
+      warriorScholarA: 0,
+      warriorHeraldA: 0,
+      warriorScoutA: 0,
+      MALShamanNbreTotem: 0,
+      MALWarriorSoldierA: 0,
+      MALWarriorHunterA: 0,
+      MALWarriorScholarA: 0,
+      MALWarriorHeraldA: 0,
+      MALWarriorScoutA: 0,
+      MALWarmasterImpFPersonnel: 0,
+      MALWarmasterImpGPersonnel: 0,
+      MALRogueGhost: 0,
+      rogueGhost: 0,
+      bardChangeling: 0,
+      MALBarbarianGoliath: 0,
+      slotTeteMax: sTete,
+      slotTorseMax: sTorse,
+      slotJGMax: sJG,
+      slotJDMax: sJD,
+      slotBGMax: sBG,
+      slotBDMax: sBD,
+    };
+  } else {
+    const dArmureModif = listDonneesArmures.map((a) => `${armureName}-${a}-modif`);
+    const dArmureActuel = listDonneesArmures.map((a) => `${armureName}-${a}-actuel`);
 
-  const armureActuel = +attrs[`${armureName}-armure-actuel`] || 0;
-  const energieActuel = +attrs[`${armureName}-energie-actuel`] || 0;
+    let listAttrs = ['warmaster150PG', 'warmaster250PG'];
+    listAttrs = listAttrs.concat(dArmureModif, dArmureActuel);
 
-  const armureModif = +attrs[`${armureName}-armure-modif`] || 0;
-  const energieModif = +attrs[`${armureName}-energie-modif`] || 0;
-  const cdfModif = +attrs[`${armureName}-cdf-modif`] || 0;
+    const attrs = await getAttrsAsync(listAttrs);
 
-  const armurePJMax = +dataArmure[armureName].armureMax || 0;
-  const energiePJMax = +dataArmure[armureName].energieMax || 0;
-  const cdfPJMax = +dataArmure[armureName].cdfMax || 0;
+    const warmaster150 = +attrs.warmaster150PG;
+    const warmaster250 = +attrs.warmaster250PG;
 
-  let totalArmure = 0;
-  let totalEnergie = 0;
-  let totalCdf = 0;
+    const armureActuel = +attrs[`${armureName}-armure-actuel`] || 0;
+    const energieActuel = +attrs[`${armureName}-energie-actuel`] || 0;
 
-  totalArmure = armurePJMax + armureModif;
-  totalCdf = cdfPJMax + cdfModif;
+    const armureModif = +attrs[`${armureName}-armure-modif`] || 0;
+    const energieModif = +attrs[`${armureName}-energie-modif`] || 0;
+    const cdfModif = +attrs[`${armureName}-cdf-modif`] || 0;
 
-  if (armureName === 'warmaster') totalEnergie = energiePJMax + warmaster150 + warmaster250 + energieModif;
-  else { totalEnergie = energiePJMax + energieModif; }
+    const armurePJMax = +dataArmure[armureName].armureMax || 0;
+    const energiePJMax = +dataArmure[armureName].energieMax || 0;
+    const cdfPJMax = +dataArmure[armureName].cdfMax || 0;
 
-  let sTete = 0;
-  let sBG = 0;
-  let sTorse = 0;
-  let sJG = 0;
-  let sBD = 0;
-  let sJD = 0;
+    let totalArmure = 0;
+    let totalEnergie = 0;
+    let totalCdf = 0;
 
-  switch (armureName) {
-    case 'barbarian':
-      sTete = 5;
-      sBG = 5;
-      sTorse = 8;
-      sJG = 5;
-      sBD = 5;
-      sJD = 5;
-      break;
-    case 'bard':
-      sTete = 5;
-      sBG = 5;
-      sTorse = 8;
-      sJG = 5;
-      sBD = 5;
-      sJD = 5;
-      break;
-    case 'berserk':
-      sTete = 6;
-      sBG = 6;
-      sTorse = 10;
-      sJG = 6;
-      sBD = 6;
-      sJD = 6;
-      break;
-    case 'druid':
-      sTete = 5;
-      sBG = 5;
-      sTorse = 8;
-      sJG = 5;
-      sBD = 5;
-      sJD = 5;
-      break;
-    case 'monk':
-      sTete = 7;
-      sBG = 8;
-      sTorse = 10;
-      sJG = 6;
-      sBD = 8;
-      sJD = 6;
-      break;
-    case 'necromancer':
-      sTete = 12;
-      sBG = 12;
-      sTorse = 12;
-      sJG = 12;
-      sBD = 12;
-      sJD = 12;
-      break;
-    case 'paladin':
-      sTete = 7;
-      sBG = 7;
-      sTorse = 10;
-      sJG = 7;
-      sBD = 7;
-      sJD = 7;
-      break;
-    case 'priest':
-      sTete = 5;
-      sBG = 5;
-      sTorse = 8;
-      sJG = 5;
-      sBD = 5;
-      sJD = 5;
-      break;
-    case 'psion':
-      sTete = 7;
-      sBG = 10;
-      sTorse = 12;
-      sJG = 7;
-      sBD = 10;
-      sJD = 7;
-      break;
-    case 'ranger':
-      sTete = 4;
-      sBG = 4;
-      sTorse = 6;
-      sJG = 4;
-      sBD = 4;
-      sJD = 4;
-      break;
-    case 'rogue':
-      sTete = 5;
-      sBG = 5;
-      sTorse = 8;
-      sJG = 5;
-      sBD = 5;
-      sJD = 5;
-      break;
-    case 'shaman':
-      sTete = 5;
-      sBG = 5;
-      sTorse = 8;
-      sJG = 5;
-      sBD = 5;
-      sJD = 5;
-      break;
-    case 'sorcerer':
-      sTete = 7;
-      sBG = 8;
-      sTorse = 10;
-      sJG = 6;
-      sBD = 8;
-      sJD = 6;
-      break;
-    case 'warlock':
-      sTete = 5;
-      sBG = 8;
-      sTorse = 8;
-      sJG = 5;
-      sBD = 8;
-      sJD = 5;
-      break;
-    case 'warmaster':
-      sTete = 5;
-      sBG = 5;
-      sTorse = 8;
-      sJG = 5;
-      sBD = 5;
-      sJD = 5;
-      break;
-    case 'warrior':
-      sTete = 7;
-      sBG = 10;
-      sTorse = 12;
-      sJG = 7;
-      sBD = 10;
-      sJD = 7;
-      break;
-    case 'wizard':
-      sTete = 5;
-      sBG = 5;
-      sTorse = 8;
-      sJG = 5;
-      sBD = 5;
-      sJD = 5;
-      break;
+    totalArmure = armurePJMax + armureModif;
+    totalCdf = cdfPJMax + cdfModif;
+
+    if (armureName === 'warmaster') totalEnergie = energiePJMax + warmaster150 + warmaster250 + energieModif;
+    else { totalEnergie = energiePJMax + energieModif; }
+
+    let sTete = 0;
+    let sBG = 0;
+    let sTorse = 0;
+    let sJG = 0;
+    let sBD = 0;
+    let sJD = 0;
+
+    switch (armureName) {
+      case 'barbarian':
+        sTete = 5;
+        sBG = 5;
+        sTorse = 8;
+        sJG = 5;
+        sBD = 5;
+        sJD = 5;
+        break;
+      case 'bard':
+        sTete = 5;
+        sBG = 5;
+        sTorse = 8;
+        sJG = 5;
+        sBD = 5;
+        sJD = 5;
+        break;
+      case 'berserk':
+        sTete = 6;
+        sBG = 6;
+        sTorse = 10;
+        sJG = 6;
+        sBD = 6;
+        sJD = 6;
+        break;
+      case 'druid':
+        sTete = 5;
+        sBG = 5;
+        sTorse = 8;
+        sJG = 5;
+        sBD = 5;
+        sJD = 5;
+        break;
+      case 'monk':
+        sTete = 7;
+        sBG = 8;
+        sTorse = 10;
+        sJG = 6;
+        sBD = 8;
+        sJD = 6;
+        break;
+      case 'necromancer':
+        sTete = 12;
+        sBG = 12;
+        sTorse = 12;
+        sJG = 12;
+        sBD = 12;
+        sJD = 12;
+        break;
+      case 'paladin':
+        sTete = 7;
+        sBG = 7;
+        sTorse = 10;
+        sJG = 7;
+        sBD = 7;
+        sJD = 7;
+        break;
+      case 'priest':
+        sTete = 5;
+        sBG = 5;
+        sTorse = 8;
+        sJG = 5;
+        sBD = 5;
+        sJD = 5;
+        break;
+      case 'psion':
+        sTete = 7;
+        sBG = 10;
+        sTorse = 12;
+        sJG = 7;
+        sBD = 10;
+        sJD = 7;
+        break;
+      case 'ranger':
+        sTete = 4;
+        sBG = 4;
+        sTorse = 6;
+        sJG = 4;
+        sBD = 4;
+        sJD = 4;
+        break;
+      case 'rogue':
+        sTete = 5;
+        sBG = 5;
+        sTorse = 8;
+        sJG = 5;
+        sBD = 5;
+        sJD = 5;
+        break;
+      case 'shaman':
+        sTete = 5;
+        sBG = 5;
+        sTorse = 8;
+        sJG = 5;
+        sBD = 5;
+        sJD = 5;
+        break;
+      case 'sorcerer':
+        sTete = 7;
+        sBG = 8;
+        sTorse = 10;
+        sJG = 6;
+        sBD = 8;
+        sJD = 6;
+        break;
+      case 'warlock':
+        sTete = 5;
+        sBG = 8;
+        sTorse = 8;
+        sJG = 5;
+        sBD = 8;
+        sJD = 5;
+        break;
+      case 'warmaster':
+        sTete = 5;
+        sBG = 5;
+        sTorse = 8;
+        sJG = 5;
+        sBD = 5;
+        sJD = 5;
+        break;
+      case 'warrior':
+        sTete = 7;
+        sBG = 10;
+        sTorse = 12;
+        sJG = 7;
+        sBD = 10;
+        sJD = 7;
+        break;
+      case 'wizard':
+        sTete = 5;
+        sBG = 5;
+        sTorse = 8;
+        sJG = 5;
+        sBD = 5;
+        sJD = 5;
+        break;
+    }
+
+    newAttrs = {
+      armurePJ: armureActuel,
+      armurePJ_max: totalArmure,
+      armurePJModif: armureModif,
+      energiePJ: energieActuel,
+      energiePJ_max: totalEnergie,
+      energiePJModif: energieModif,
+      cdfPJ: totalCdf,
+      cdfPJ_max: totalCdf,
+      cdfPJModif: cdfModif,
+      barbarianGoliath: 0,
+      berserkIlluminationBeaconA: 0,
+      berserkIlluminationTorchA: 0,
+      berserkIlluminationProjectorA: 0,
+      berserkIlluminationLighthouseA: 0,
+      berserkIlluminationLanternA: 0,
+      berserkRageA: 0,
+      shamanNbreTotem: 0,
+      shamanAscension: 0,
+      sorcererMMVolNuee: 0,
+      sorcererMMPhase: 0,
+      sorcererMMEtirement: 0,
+      sorcererMMCorpMetal: 0,
+      sorcererMMCorpFluide: 0,
+      sorcererMMPMGuerre: 0,
+      sorcererMM250PG: 0,
+      warlockForward: 0,
+      warlockRecord: 0,
+      warlockRewind: 0,
+      warmasterImpFPersonnel: 0,
+      warmasterImpGPersonnel: 0,
+      warriorSoldierA: 0,
+      warriorHunterA: 0,
+      warriorScholarA: 0,
+      warriorHeraldA: 0,
+      warriorScoutA: 0,
+      MALShamanNbreTotem: 0,
+      MALWarriorSoldierA: 0,
+      MALWarriorHunterA: 0,
+      MALWarriorScholarA: 0,
+      MALWarriorHeraldA: 0,
+      MALWarriorScoutA: 0,
+      MALWarmasterImpFPersonnel: 0,
+      MALWarmasterImpGPersonnel: 0,
+      MALRogueGhost: 0,
+      rogueGhost: 0,
+      bardChangeling: 0,
+      MALBarbarianGoliath: 0,
+      slotTeteMax: sTete,
+      slotTorseMax: sTorse,
+      slotJGMax: sJG,
+      slotJDMax: sJD,
+      slotBGMax: sBG,
+      slotBDMax: sBD,
+    };
   }
-
-  const newAttrs = {
-    armurePJ: armureActuel,
-    armurePJ_max: totalArmure,
-    armurePJModif: armureModif,
-    energiePJ: energieActuel,
-    energiePJ_max: totalEnergie,
-    energiePJModif: energieModif,
-    cdfPJ: totalCdf,
-    cdfPJ_max: totalCdf,
-    cdfPJModif: cdfModif,
-    barbarianGoliath: 0,
-    berserkIlluminationBeaconA: 0,
-    berserkIlluminationTorchA: 0,
-    berserkIlluminationProjectorA: 0,
-    berserkIlluminationLighthouseA: 0,
-    berserkIlluminationLanternA: 0,
-    berserkRageA: 0,
-    shamanNbreTotem: 0,
-    shamanAscension: 0,
-    sorcererMMVolNuee: 0,
-    sorcererMMPhase: 0,
-    sorcererMMEtirement: 0,
-    sorcererMMCorpMetal: 0,
-    sorcererMMCorpFluide: 0,
-    sorcererMMPMGuerre: 0,
-    sorcererMM250PG: 0,
-    warlockForward: 0,
-    warlockRecord: 0,
-    warlockRewind: 0,
-    warmasterImpFPersonnel: 0,
-    warmasterImpGPersonnel: 0,
-    warriorSoldierA: 0,
-    warriorHunterA: 0,
-    warriorScholarA: 0,
-    warriorHeraldA: 0,
-    warriorScoutA: 0,
-    MALShamanNbreTotem: 0,
-    MALWarriorSoldierA: 0,
-    MALWarriorHunterA: 0,
-    MALWarriorScholarA: 0,
-    MALWarriorHeraldA: 0,
-    MALWarriorScoutA: 0,
-    MALWarmasterImpFPersonnel: 0,
-    MALWarmasterImpGPersonnel: 0,
-    MALRogueGhost: 0,
-    rogueGhost: 0,
-    bardChangeling: 0,
-    MALBarbarianGoliath: 0,
-    slotTeteMax: sTete,
-    slotTorseMax: sTorse,
-    slotJGMax: sJG,
-    slotJDMax: sJD,
-    slotBGMax: sBG,
-    slotBDMax: sBD,
-  };
 
   await setAttrsAsync(newAttrs);
 });
@@ -265,15 +342,41 @@ on('change:fichePNJ', async (newSheet) => {
   await setAttrsAsync(update);
 });
 
+const listDonneesSlots = ['slotTete', 'slotTorse', 'slotBD', 'slotBG', 'slotJD', 'slotJG'];
+
+listDonneesSlots.forEach((data) => {
+  on(`change:${data}Personnalise sheet:opened`, async () => {
+    const attrs = await getAttrsAsync([`${data}Personnalise`, 'armure']);
+    const armure = attrs.armure;
+
+    if (armure !== 'personnalise') return;
+
+    const value = +attrs[`${data}Personnalise`];
+    const nValue = {};
+
+    nValue[`${data}Max`] = value;
+
+    await setAttrsAsync(nValue);
+  });
+});
+
 const listDonneesArmures = ['armure', 'energie', 'cdf'];
 
 listDonneesArmures.forEach((data) => {
   on(`change:${data}pj sheet:opened`, async () => {
-    const attrs = await getAttrsAsync([`${data}PJ`, 'armure']);
+    const attrs = await getAttrsAsync([`${data}PJ`, `${data}PJ_max`, 'armure']);
     const armure = attrs.armure;
-
+    const max = +attrs[`${data}PJ_max`];
     const nValue = {};
-    nValue[`${armure}-${data}-actuel`] = +attrs[`${data}PJ`];
+    let actuel = +attrs[`${data}PJ`];
+
+    if (actuel > max) {
+      actuel = max;
+      nValue[`${data}PJ`] = actuel;
+    }
+    nValue[`${armure}-${data}-actuel`] = actuel;
+
+    if (armure === 'personnalise') nValue[`${armure}-${data}-max`] = max;
 
     await setAttrsAsync(nValue);
   });
@@ -281,6 +384,8 @@ listDonneesArmures.forEach((data) => {
   on(`change:${data}pjmodif sheet:opened`, async () => {
     const attrs = await getAttrsAsync([`${data}PJModif`, 'armure']);
     const armure = attrs.armure;
+
+    if (armure === 'personnalise') return;
 
     const nValue = {};
     nValue[`${armure}-${data}-modif`] = +attrs[`${data}PJModif`];
@@ -930,9 +1035,9 @@ on('change:fichePNJ change:armure change:tir change:savoir change:technique chan
 
   if (fiche !== 0) { return; }
 
-  const armure = +attrs.armure;
+  const armure = attrs.armure;
 
-  const aspect = +attrs.machine;
+  const aspect = attrs.machine;
 
   const car1 = +attrs.tir;
   const car2 = +attrs.savoir;
@@ -3241,7 +3346,7 @@ on('clicked:importKNPCG', () => {
     const dame = { score: 0, majeur: 0, mineur: 0 };
     const masque = { score: 0, majeur: 0, mineur: 0 };
     const lAspects = {
-      chair: chair, bête: bete, machine: machine, dame: dame, masque: masque,
+      0: chair, 1: bete, 2: machine, 3: dame, 4: masque,
     };
 
     const health = json.health || 0;
@@ -3264,9 +3369,9 @@ on('clicked:importKNPCG', () => {
 
     for (const keyA in aspects) {
       const result = aspects[keyA];
-      lAspects[result.name].score = result.score;
+      lAspects[keyA].score = result.score;
 
-      if (result.major === true) { lAspects[result.name].majeur = result.exceptional; } else { lAspects[result.name].mineur = result.exceptional; }
+      if (result.major === true) { lAspects[keyA].majeur = result.exceptional; } else { lAspects[keyA].mineur = result.exceptional; }
     }
 
     getSectionIDs('repeating_capacites', (idarray) => {
@@ -3314,9 +3419,9 @@ on('clicked:importKNPCG', () => {
       if (contact === true) {
         path = 'repeating_armeCaC_';
 
-        let raw = result.raw - lAspects.bête.mineur - lAspects.bête.majeur;
+        let raw = result.raw - lAspects[1].mineur - lAspects[1].majeur;
 
-        if (lAspects.bête.majeur > 0) { raw -= bete.score; }
+        if (lAspects[1].majeur > 0) { raw -= bete.score; }
 
         if (raw < 0) { raw = 0; }
 
@@ -3550,28 +3655,28 @@ on('clicked:importKNPCG', () => {
       diceInitiative = 0;
     }
 
-    defense = defense - lAspects.masque.majeur - lAspects.masque.mineur;
-    reaction = reaction - lAspects.machine.majeur - lAspects.machine.mineur;
+    defense = defense - lAspects[4].majeur - lAspects[4].mineur;
+    reaction = reaction - lAspects[2].majeur - lAspects[2].mineur;
 
     setAttrs({
       character_name: json.name,
       typePNJ: `${type} (${level})`,
 
-      chair: lAspects.chair.score,
-      chairPNJAE: lAspects.chair.mineur,
-      chairPNJAEMaj: lAspects.chair.majeur,
-      bete: lAspects['bête'].score,
-      betePNJAE: lAspects['bête'].mineur,
-      betePNJAEMaj: lAspects['bête'].majeur,
-      machine: lAspects.machine.score,
-      machinePNJAE: lAspects.machine.mineur,
-      machinePNJAEMaj: lAspects.machine.majeur,
-      dame: lAspects.dame.score,
-      damePNJAE: lAspects.dame.mineur,
-      damePNJAEMaj: lAspects.dame.majeur,
-      masque: lAspects.masque.score,
-      masquePNJAE: lAspects.masque.mineur,
-      masquePNJAEMaj: lAspects.masque.majeur,
+      chair: lAspects[0].score,
+      chairPNJAE: lAspects[0].mineur,
+      chairPNJAEMaj: lAspects[0].majeur,
+      bete: lAspects[1].score,
+      betePNJAE: lAspects[1].mineur,
+      betePNJAEMaj: lAspects[1].majeur,
+      machine: lAspects[2].score,
+      machinePNJAE: lAspects[2].mineur,
+      machinePNJAEMaj: lAspects[2].majeur,
+      dame: lAspects[3].score,
+      damePNJAE: lAspects[3].mineur,
+      damePNJAEMaj: lAspects[3].majeur,
+      masque: lAspects[4].score,
+      masquePNJAE: lAspects[4].mineur,
+      masquePNJAEMaj: lAspects[4].majeur,
 
       santePNJ: health,
       santePNJ_max: health,
@@ -3743,4 +3848,68 @@ on('change:chevaliersHerauts', () => {
   update.equilibreBalance = 0;
 
   setAttrsAsync(update);
+});
+
+on('change:codexFM4', async (eventInfo) => {
+  if (eventInfo.newValue !== '0') return;
+
+  const update = {};
+  const listEffect = ['boost', 'cdf', 'immobilisation', 'intimidanteHumain', 'intimidanteAnatheme', 'retourFlamme', 'sansArmure'];
+  const listPrefix = ['pS', 'pSC', 'mE', 'mEC'];
+
+  for (const p of listPrefix) {
+    listEffect.forEach((e) => {
+      update[`${p}${e}`] = 0;
+    });
+  }
+
+  await getSectionIDs('repeating_armeCaC', (idarray) => {
+    _.each(idarray, (currentID, i) => {
+      listEffect.forEach((e) => {
+        update[`repeating_armeCaC_${currentID}_${e}`] = 0;
+      });
+    });
+  });
+
+  await getSectionIDs('repeating_armeDist', (idarray) => {
+    _.each(idarray, (currentID, i) => {
+      listEffect.forEach((e) => {
+        update[`repeating_armeDist_${currentID}_${e}`] = 0;
+      });
+    });
+  });
+
+  await getSectionIDs('repeating_armeDistVehicule', (idarray) => {
+    _.each(idarray, (currentID, i) => {
+      listEffect.forEach((e) => {
+        update[`repeating_armeDistVehicule_${currentID}_${e}`] = 0;
+      });
+    });
+  });
+
+  await getSectionIDs('repeating_armeDruidLion', (idarray) => {
+    _.each(idarray, (currentID, i) => {
+      listEffect.forEach((e) => {
+        update[`repeating_armeDruidLion_${currentID}_${e}`] = 0;
+      });
+    });
+  });
+
+  await getSectionIDs('repeating_armeMALDruidLion', (idarray) => {
+    _.each(idarray, (currentID, i) => {
+      listEffect.forEach((e) => {
+        update[`repeating_armeMALDruidLion_${currentID}_${e}`] = 0;
+      });
+    });
+  });
+
+  await getSectionIDs('repeating_armeAutre', (idarray) => {
+    _.each(idarray, (currentID, i) => {
+      listEffect.forEach((e) => {
+        update[`repeating_armeAutre_${currentID}_${e}`] = 0;
+      });
+    });
+
+    setAttrsAsync(update);
+  });
 });

@@ -1,8 +1,90 @@
 # Blades in the Dark Character Sheet
 
-This is the (compressed) source code for the Blades in the Dark character sheet on Roll20. The pug/sass code used to generate it can be found [here](https://github.com/joesinghaus/Blades-in-the-Dark). If you want to hack the sheet for your own Blades hack, a more hackable version and instructions for hacking can be found [here](https://github.com/joesinghaus/Blades-template).
+This is the source code for the Blades in the Dark character sheet on Roll20. 
+
+Blades in the Dark source code is currently maintained by Evil Hat. Please contact Evil Hat at [feedback@evilhat.com](mailto:feedback@evilhat.com)  if you have changes you want to see made and we'll consider working that into our official support!
+
+If you want to hack the sheet for your own Blades hack, a more hackable (earlier) version and instructions for hacking can be found [here](https://github.com/joesinghaus/Blades-template). Build command: `./build.js` (requires node, with pug and sass installed via npm).
 
 ## Changelog
+
+### 3.11
+General
+- Made sure the "type in the ability name and it will automatically fill in the description" feature functions inclusive of new ability versions resulting from enabled Deep Cuts modules.
+- Added the deep cuts module toggles to sheet.json so GMs can set those defaults when initially creating their game (thus ensuring individual players don't have to go in and activate them all themselves on each sheet)
+- Implemented new Stranger playbook from Deep Cuts
+
+Deep Cuts Factions
+- Added setting toggle for factions module to gear menu
+- Display modestly reconfigures itself when toggling the module.
+- Codework done to switch between two different faction list data objects depending on whether or not the DC Factions module is activated.
+- For DC factions, got the districts Citizenry list to split into new Citizens vs Nobility/Bosses lists
+- Added Deep Cuts factions: Tangletown, Covenant, Unity Commission, Rowan House, Strangford House, Ironworks Labor, Void Divers, Ragskulla, Sparkrunners, Unchained, Strangers
+- Added "Other" faction area for ad hoc creation of factions that don't fit any other category
+- Reworked the display of the Faction sheet in general (both with and without DC) to give it some more pleasant flexibility rather than having hard (invisible) grid structure vertically.
+
+Deep Cuts Action Module
+- Added setting toggle for action module to gear menu
+- Changed position options on action rolls to remove Controlled when the Action module is active. (In the module, you do not roll if the current position is Controlled.)
+- Changed subtitle and instructional text on roll display for Push (aka Resist) rolls when the Action module is active
+- Created an "Edge" field underneath the actions & attributes that displays when Action module is active.
+- Removed the "push yourself" option from the "Bonus Die" box when the action module is active.
+- Characters abilities given DC alts when Action is active: Ambush, Bodyguard, Daredevil, Expertise, Foresight, Ghost Mind, Iron Will, Mastermind, Savage, Scout, Trust in Me
+- Crew abilities given DC alts when Action is active: Blood Brothers, Bound in Darkness, Synchronized. 
+- Crew turf claim given DC alt when Action is active: Informants
+
+Deep Cuts Advancement Module
+- Added setting toggle for advancement module to gear menu
+- Implemented setting to set the advancement clocks sizes at 4, 6, or 8 segments (default 6)
+- Removed XP tracker Above the Character Special Abilities when module active
+- Removed XP trackers next to Insight, Prowess, and Resolve when module active
+- Replaced XP triggers (below the special abilities) with Deep Cuts versions when module active
+- Added XP clocks in XP section, along with instructions, when module active
+- Removed XP tracker above the Crew Special Abilities when module active
+- Added XP clocks in Crew XP section when module active
+
+Deep Cuts Downtime Module
+- Added setting toggle for downtime module to gear menu
+- Added a 4-tick Debt clock to all playbook sheets, to the right of the vice/purveyor area, "north" from healing and coin area. When the Downtime module is active, the "indulge vice" button disappears at the debt clock takes up its space.
+- Character abilities affected by module given alternatives: Connected, Functioning Vice, Vigorous, Physicker, and Sinister Guile.
+- Crew abilities affected by module given alternatives: No Traces, Patron, and Slippery.
+- Implemented function to handle swapping certain crew Claims in response to the Downtime module being active; used for Warehouse claims.
+- Increased size of crew vaults when in Downtime Module mode; ensured that current balance is reflected in new vault config when switching the module on/off.
+- Added a "bank" field, right underneath vaults, to display when in Downtime Module mode
+- Added "Ward Boss" field for both standard and deep cuts modes
+- Made a debt clock appear next to Ward Boss when the downtime module is active
+- Changed all crew upgrades to have a coin cost when in Downtime Module mode
+
+Deep Cuts Harm Module
+- Added setting toggle for harm module to gear menu
+- Supported reconfig of Harm area when module active
+- Harm share button (bell) reimplemented for active module context
+- Character abilities affected by module given alternatives: Vigorous, Tough as Nails.
+- Implemented settings toggle to give a second level 3 harm entry area (to support Tough as Nails alt)
+- Crew abilities affected by module given alternatives: Anointed.
+- Changed display of crew's harm-tracking displays to match Deep Cuts when module active.
+
+Deep Cuts Innovations
+- Added setting toggle for innovations to gear menu
+- Enabled adding of Prichard Camera, Slugger Pistol, Spiritbane Charm, Arclighter & Glimmer, and Slugger Rifle by enabling Innovations mod. 
+- Renamed "Throwing Knives" to "Thrown Weapon" for Deep Cuts matching. Will persist as "Thrown Weapon" for standard, because this is largely cosmetic.
+
+Deep Cuts Load Module
+- Added setting toggle for load module to gear menu
+- Added ability to override the default Load values when load module is active (swapping out the override controls for the non-module defaults)
+- Changed Load choices To: Discreet: 4 (no heavy items) Conspicuous: 6 when module active
+- Character abilities affected by module given alternatives: Mule.
+- Separated list of normal items, heavy items, and playbook items when module active.
+- Changed all crew Rigging options to match Deep Cuts version when module active.
+
+
+### 3.10
+
+* Added Dark Mode support
+* Added Crew playbooks for City of Red Waters:
+	* Emcees
+	* River
+	* Roots
 
 ### 3.9
 

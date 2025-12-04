@@ -1,0 +1,27 @@
+
+//- Load the data about attributes that existed before the k-scaffold transition
+- arm5.updates = {preKScaffoldData: require("./source/updates/updates.js").preKScaffoldData};
+//- Forcefully register those attributes into k-scaffold internals, so that k-scaffold
+//- exposes them in the `attributes` object it passes to update functions
+//- without actually creating attributes in the sheet: old sheets will have the data,
+//- new sheets won't
+-
+    arm5.updates.preKScaffoldData.attributes.forEach(obj => {
+        varObjects.cascades[`attr_${obj.name}`] =
+        {
+            ...obj,
+            affects: [],
+            triggeredFuncs: []
+        };
+    });
+    arm5.updates.preKScaffoldData.sections.forEach(obj => { varObjects.repeatingSectionDetails.push(obj); })
+
+//- Use a hidden attribute holder to store the RowID of the alert that currently blocks the update system
+//- When an update errors out, it won't retry until this alert ceases to exist
++hidden({name:"update_error_rowid"})
+
+//- Schedule our update file to be added in th <script> tag of the sheet
++module()
+    | 
+    include updates.sheet.js
+    | 

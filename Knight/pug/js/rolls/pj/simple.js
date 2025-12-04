@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable default-case */
 /* eslint-disable camelcase */
 /* eslint-disable max-len */
@@ -15,11 +16,13 @@ on('clicked:simple clicked:simpleRogue', async (info) => {
     'caracteristique4',
     'discretion',
     ODValue.discretion,
+    'equilibreBalance',
   ];
 
   attributs = attributs.concat(listBase, listArmure, listArmureLegende);
 
   const attrs = await getAttrsAsync(attributs);
+  const equilibre = +attrs.equilibreBalance;
 
   const armure = attrs.armure;
   const armureL = attrs.armureLegende;
@@ -159,38 +162,19 @@ on('clicked:simple clicked:simpleRogue', async (info) => {
   bonus = bonus.concat(ODMALShaman);
   bonus = bonus.concat(ODMALWarrior);
 
-  exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
-  exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
-  exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
-
   if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
 
-  startRoll(exec.join(' '), (results) => {
-    const tJet = results.results.jet.result;
-    const tBonus = results.results.tBonus.result;
-    const tExploit = results.results.Exploit.result;
+  const bonusTotal = bonus.reduce((accumulateur, valeurCourante) => parseInt(accumulateur, 10) + parseInt(valeurCourante, 10), 0);
+  const stringRoll = `{{jet=[[ [[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s]]}}`;
+  exec.push(stringRoll);
+  exec.push('{{basejet=[[0]]}}');
+  exec.push(`{{tBonus=[[${bonusTotal}]]}}`);
+  const finalRoll = await startRoll(exec.join(' '));
+  const computed = computeSimpleRoll(finalRoll, bonusTotal);
 
-    const total = tJet + tBonus;
-
-    finishRoll(
-      results.rollId,
-      {
-        jet: total,
-      },
-    );
-
-    if (tJet !== 0 && tJet === tExploit) {
-      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
-        const tExploit2 = exploit.results.jet.result;
-
-        finishRoll(
-          exploit.rollId,
-          {
-            jet: tExploit2,
-          },
-        );
-      });
-    }
+  finishRoll(finalRoll.rollId, computed);
+  await postRoll(computed, roll, stringRoll, finalRoll, {
+    equilibre,
   });
 });
 
@@ -206,11 +190,13 @@ on('clicked:simplePriest', async (info) => {
     'caracteristique4',
     'discretion',
     ODValue.discretion,
+    'equilibreBalance',
   ];
 
   attributs = attributs.concat(listBase, listArmureLegende);
 
   const attrs = await getAttrsAsync(attributs);
+  const equilibre = +attrs.equilibreBalance;
 
   const armureL = attrs.armureLegende;
 
@@ -299,7 +285,7 @@ on('clicked:simplePriest', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -332,36 +318,17 @@ on('clicked:simplePriest', async (info) => {
 
   if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
 
-  exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
-  exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
-  exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
+  const bonusTotal = bonus.reduce((accumulateur, valeurCourante) => parseInt(accumulateur, 10) + parseInt(valeurCourante, 10), 0);
+  const stringRoll = `{{jet=[[ [[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s]]}}`;
+  exec.push(stringRoll);
+  exec.push('{{basejet=[[0]]}}');
+  exec.push(`{{tBonus=[[${bonusTotal}]]}}`);
+  const finalRoll = await startRoll(exec.join(' '));
+  const computed = computeSimpleRoll(finalRoll, bonusTotal);
 
-  startRoll(exec.join(' '), (results) => {
-    const tJet = results.results.jet.result;
-    const tBonus = results.results.tBonus.result;
-    const tExploit = results.results.Exploit.result;
-
-    const total = tJet + tBonus;
-
-    finishRoll(
-      results.rollId,
-      {
-        jet: total,
-      },
-    );
-
-    if (tJet !== 0 && tJet === tExploit) {
-      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
-        const tExploit2 = exploit.results.jet.result;
-
-        finishRoll(
-          exploit.rollId,
-          {
-            jet: tExploit2,
-          },
-        );
-      });
-    }
+  finishRoll(finalRoll.rollId, computed);
+  await postRoll(computed, roll, stringRoll, finalRoll, {
+    equilibre,
   });
 });
 
@@ -468,7 +435,7 @@ on('clicked:simplePsionPuppet clicked:simplePsionDiscord', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -639,7 +606,7 @@ on('clicked:simpleRangerVision', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -807,7 +774,7 @@ on('clicked:simpleShamanImpregnation', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -969,7 +936,7 @@ on('clicked:simpleMALShamanImpregnation', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -1131,7 +1098,7 @@ on('clicked:simpleSorcererEtirement', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);
@@ -1309,7 +1276,7 @@ on('clicked:pilotage', async (info) => {
     if (hasArmure) { OD += C4OD; }
   }
 
-  const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const armorBonus = await getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(armorBonus.exec);
   cRoll = cRoll.concat(armorBonus.cRoll);
@@ -1320,7 +1287,7 @@ on('clicked:pilotage', async (info) => {
   ODShaman = ODShaman.concat(armorBonus.ODShaman);
   ODWarrior.push(armorBonus.ODWarrior);
 
-  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = await getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
   exec = exec.concat(MALBonus.exec);
   cRoll = cRoll.concat(MALBonus.cRoll);

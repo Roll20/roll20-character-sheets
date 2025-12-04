@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Version 2.2
+
+- Réécriture du code de la fiche
+- Ajout des périodes HdB manquantes
+- Ajout des dates et des ères pour les périodes d'incarnation
+- Bug graphique sur la template lors d'un jet de Vécu principal de simulacre
+
 ## Version 2.1
 
 - Ajout des Selenim

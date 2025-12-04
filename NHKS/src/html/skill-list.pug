@@ -1,0 +1,228 @@
+//
+  CREATED by      Gorthian
+  Version			    v2.0 HF1
+  Letzte Änderung	2023-10-14
+  GitHub			    https://github.com/Gorthian/Roll20_NHKS_CharacterSheet
+  Wiki			      https://github.com/Gorthian/Roll20_NHKS_CharacterSheet/wiki
+  Bugs & Issues	  https://github.com/Gorthian/Roll20_NHKS_CharacterSheet/issues
+
+// Variablen
+-
+  //- Liste der verfügbaren Fertigkeiten
+  var skills = [
+    {name:'acrobatic', isroleskill:0 ,attributes:['dexterity']},
+    {name:'athletic', isroleskill:0 ,attributes:['strength','stamina']},
+    {name:'dodge', isroleskill:0 ,attributes:['dexterity']},
+    {name:'boats', isroleskill:0 ,attributes:['knowledge','dexterity']},
+    {name:'persuade', isroleskill:0 ,attributes:['coolness','strength']},
+    {name:'computers', isroleskill:0 ,attributes:['knowledge']},
+    {name:'firstaid', isroleskill:0 ,attributes:['knowledge']},
+    {name:'extremesport', isroleskill:0 ,attributes:['strength','stamina','dexterity']},
+    {name:'slideofhand', isroleskill:0 ,attributes:['dexterity']},
+    {name:'aircrafts', isroleskill:0 ,attributes:['knowledge','dexterity']},
+    {name:'vehicles', isroleskill:0 ,attributes:['knowledge','dexterity']},
+    {name:'improvisation', isroleskill:0 ,attributes:['knowledge','strength','coolness','stamina','chi','dexterity']},
+    {name:'climbing', isroleskill:0 ,attributes:['strength','stamina','dexterity']},
+    {name:'contacts', isroleskill:0 ,attributes:['knowledge','coolness']},
+    {name:'mechanic', isroleskill:0 ,attributes:['knowledge']},
+    {name:'stealth', isroleskill:0 ,attributes:['dexterity']},
+    {name:'perception', isroleskill:0 ,attributes:['chi']},
+    {name:'languages', isroleskill:0 ,attributes:['knowledge','coolness']},
+    {name:'searching', isroleskill:0 ,attributes:['knowledge','chi']},
+    {name:'hiding', isroleskill:0 ,attributes:['knowledge','dexterity']},
+  ]
+
+//
+  ********************************
+  * START SRC/HTML/SKILL-LIST.pug
+  ********************************
+
+div(class="sheet-skill-list")
+  h1
+    span(data-i18n='skills')
+  div(class="sheet-skill-entry")
+    div(class="sheet-skill-name sheet-label")
+      span(data-i18n='skill')
+    div(class="sheet-skill-attribute sheet-label")
+      span(data-i18n='attribute')
+    div(class="sheet-skill-value sheet-label")
+      span(data-i18n='skill-value-actor')
+    div(class="sheet-skill-value sheet-label")
+      span(data-i18n='is-role-skill')
+    div(class="sheet-skill-value sheet-label")
+      span(data-i18n='skill-value-role')
+  
+  each skill in skills
+    div(class="sheet-skill-entry")
+        div(class="sheet-skill-name")
+            button(type='action' name='act_skill-'+skill.name)
+                span(data-i18n=skill.name)
+        div(class="sheet-skill-attribute")
+            select(name='attr_skill-'+skill.name+'-attribute' readonly='')
+                each attribute in skill.attributes
+                    option(value=attribute data-i18n=attribute+'-short')
+        div(class="sheet-skill-value")
+            input(type='number' name='attr_skill-'+skill.name)
+        div(class="sheet-skill-value")
+            input(type='checkbox' name='attr_skill-'+skill.name+'-is-role-skill' value='1')
+        div(class="sheet-skill-value")
+            input(type='number' name='attr_skill-'+skill.name+'-role' readonly='')
+  
+  //- Rollenfertigkeiten
+  h1
+    span(data-i18n='role-skills')
+  div(class="sheet-skill-entry")
+    div(class="sheet-skill-name sheet-label")
+      span(data-i18n='skill')
+    div(class="sheet-skill-attribute sheet-label")
+      span(data-i18n='attribute')
+    div(class="sheet-skill-value sheet-label")
+      span(data-i18n='skill-value-role')    
+    div(class="sheet-label")
+      | &nbsp;
+  fieldset(class="repeating_roleskills")
+    div(class="sheet-skill-entry")
+      div(class="sheet-skill-name")
+        input(type="text" name="attr_roleskills-name")      
+      div(class="sheet-skill-attribute")
+        select(name='attr_roleskills-attribute' readonly='')
+          option(value='knowledge' data-i18n='knowledge-short')
+          option(value='strength' data-i18n='strength-short')
+          option(value='coolness' data-i18n='coolness-short')
+          option(value='stamina' data-i18n='stamina-short')
+          option(value='chi' data-i18n='chi-short')
+          option(value='dexterity' data-i18n='dexterity-short')
+      div(class="sheet-skill-value")
+        input(type='number' name='attr_roleskills-role' value="4" readonly='readonly')
+      div
+        button(type='action' name='act_roleskill' style="width:90%;")
+          | Roll
+  
+  //- Kampffertigkeiten
+  h1
+    span(data-i18n='combat')
+  .sheet-combat-entry
+    .sheet-label
+      span(data-i18n='attack')
+    .sheet-label
+      span(data-i18n='parry')
+    .sheet-label
+      span(data-i18n='skill-value-actor')
+    .sheet-label
+      span(data-i18n='is-role-skill')
+    .sheet-label
+      span(data-i18n='skill-value-role')
+  .sheet-combat-entry
+    .sheet-combat-attack
+      button(type='action' name='act_combat-melee-small')
+        span(data-i18n='melee-small')
+    .sheet-combat-parry
+      button(type='action' name='act_combat-melee-small-parry')
+        span(data-i18n='parry')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-melee-small')
+    .sheet-combat-value
+      input(type='checkbox' name='attr_skill-melee-small-is-role-skill' value='1')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-melee-small-role' readonly='')
+  .sheet-combat-entry
+    .sheet-combat-attack
+      button(type='action' name='act_combat-melee-medium')
+        span(data-i18n='melee-medium')
+    .sheet-combat-parry
+      button(type='action' name='act_combat-melee-medium-parry')
+        span(data-i18n='parry')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-melee-medium')
+    .sheet-combat-value
+      input(type='checkbox' name='attr_skill-melee-medium-is-role-skill' value='1')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-melee-medium-role' readonly='')
+  .sheet-combat-entry
+    .sheet-combat-attack
+      button(type='action' name='act_combat-melee-big')
+        span(data-i18n='melee-big')
+    .sheet-combat-parry
+      button(type='action' name='act_combat-melee-big-parry')
+        span(data-i18n='parry')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-melee-big')
+    .sheet-combat-value
+      input(type='checkbox' name='attr_skill-melee-big-is-role-skill' value='1')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-melee-big-role' readonly='')
+  .sheet-combat-entry
+    .sheet-combat-attack
+      button(type='action' name='act_combat-pistols')
+        span(data-i18n='pistols')
+    .sheet-combat-parry
+    .sheet-combat-value
+      input(type='number' name='attr_skill-pistols')
+    .sheet-combat-value
+      input(type='checkbox' name='attr_skill-pistols-is-role-skill' value='1')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-pistols-role' readonly='')
+  .sheet-combat-entry
+    .sheet-combat-attack
+      button(type='action' name='act_combat-rifles')
+        span(data-i18n='rifles')
+    .sheet-combat-parry
+    .sheet-combat-value
+      input(type='number' name='attr_skill-rifles')
+    .sheet-combat-value
+      input(type='checkbox' name='attr_skill-rifles-is-role-skill' value='1')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-rifles-role' readonly='')
+  .sheet-combat-entry
+    .sheet-combat-attack
+      button(type='action' name='act_combat-heavy-weapons')
+        span(data-i18n='heavy-weapons')
+    .sheet-combat-parry
+    .sheet-combat-value
+      input(type='number' name='attr_skill-heavy-weapons')
+    .sheet-combat-value
+      input(type='checkbox' name='attr_skill-heavy-weapons-is-role-skill' value='1')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-heavy-weapons-role' readonly='')
+  .sheet-combat-entry
+    .sheet-combat-attack
+      button(type='action' name='act_combat-melee-misc')
+        span(data-i18n='melee-misc')
+    .sheet-combat-parry
+      button(type='action' name='act_combat-melee-misc-parry')
+        span(data-i18n='parry')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-melee-misc')
+    .sheet-combat-value
+      input(type='checkbox' name='attr_skill-melee-misc-is-role-skill' value='1')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-melee-misc-role' readonly='')
+  .sheet-combat-entry
+    .sheet-combat-attack
+      button(type='action' name='act_combat-ranged-misc')
+        span(data-i18n='ranged-misc')
+    .sheet-combat-parry
+    .sheet-combat-value
+      input(type='number' name='attr_skill-ranged-misc')
+    .sheet-combat-value
+      input(type='checkbox' name='attr_skill-ranged-misc-is-role-skill' value='1')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-ranged-misc-role' readonly='')
+  .sheet-combat-entry
+    .sheet-combat-attack
+      button(type='action' name='act_combat-unarmed')
+        span(data-i18n='unarmed')
+    .sheet-combat-parry
+      button(type='action' name='act_combat-unarmed-parry')
+        span(data-i18n='parry')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-unarmed')
+    .sheet-combat-value
+      input(type='checkbox' name='attr_skill-unarmed-is-role-skill' value='1')
+    .sheet-combat-value
+      input(type='number' name='attr_skill-unarmed-role' readonly='')
+
+//
+  ********************************
+  * ENDE SRC/HTML/SKILL-LIST.pug
+  ********************************

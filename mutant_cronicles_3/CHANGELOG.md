@@ -14,6 +14,16 @@ If you have any issue, you can contact me through a private message in my Roll20
 - Repercussion range does not include the Unskilled modifier.
 
 
+## [1.1.2] - October 2022
+
+### Added
+
+- Added a [HELP.md](https://github.com/Roll20/roll20-character-sheets/tree/master/mutant_cronicles_3/HELP.md) file to the repository in case the help buttons break again.
+
+### Fixed
+
+- Help buttons, i.e. "?", now send text properly to chat. A fake roll was added to the button parameters to fix the issue.
+
 ## [1.1.1] - July 2021
 
 ### Changed

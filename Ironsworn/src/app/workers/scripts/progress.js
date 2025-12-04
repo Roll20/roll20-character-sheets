@@ -30,23 +30,23 @@ function getCurrentProgress(progressValues) {
   return total
 }
 
-function updateProgressValues(newValue, progressStrings) {
+function updateProgressValues(type, newValue, progressStrings) {
   let progressNumber = 0
   for (; newValue > 0;) {
     let updateValue = (newValue < 4) ? newValue : 4
     let attNumber = progressStrings[progressNumber]
     setAttrs({
-      ['repeating_progress_' + 'progress_' + attNumber]: updateValue
+      [`repeating_${type}_progress_${attNumber}`]: updateValue
     })
     newValue = newValue - updateValue
     progressNumber++
   }
 }
 
-function updateProgress(mark, progressArray, progressStrings) {
+function updateProgress(type, mark, progressArray, progressStrings) {
   let newValue = mark + getCurrentProgress(progressArray)
   let finalValue = (newValue < 40) ? newValue : 40
-  updateProgressValues(finalValue, progressStrings)
+  updateProgressValues(type, finalValue, progressStrings)
 }
 
 function chosenDifficulty(rank) {
@@ -98,7 +98,7 @@ on('change:repeating_progress:mark_progress change:repeating_vow:mark_progress c
       ]
       const rank = parseInt(attrValues[`repeating_${type}_rank`])
       const mark = chosenDifficulty(rank)
-      updateProgress(mark, progress, progressStrings)
+      updateProgress(type, mark, progress, progressStrings)
     });
 });
 

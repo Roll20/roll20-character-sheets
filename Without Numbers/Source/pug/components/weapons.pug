@@ -1,0 +1,75 @@
+.section
+    +sectionheader("show_weapons", "WEAPONS")
+    .weapons
+        input(type="hidden", name="attr_show_weapon_details", value="1").input-details
+        fieldset.repeating_weapons
+            .show-chevron
+                +collapseChevron()
+                each val in ["api", "attack_display", "damage_display"]
+                    input(type="hidden", name=`attr_weapon_${val}`, value="")
+                button(type="roll", name="roll_Attack", value!="&{template:swn-attack} {{system=@{system}}} {{charname=@{character_name}}} {{title=@{weapon_name}}}  {{attack=[[1d20 + @{attack_bonus}[AB] + @{weapon_attack}[Weapon AB] + [[{{@{weapon_skill_bonus},-1}>0}*(@{weapon_skill_bonus}+2) - 2]][Skill] + @{weapon_attribute_mod}[Attribute] @{weapon_burst} @{modifier_query}]]}} {{damage=[[@{weapon_damage} + @{weapon_attribute_mod}[Attribute] + @{weapon_skill_to_damage}[Skill] @{weapon_burst}]]}} {{burst=[[0@{weapon_burst}]]}} @{weapon_shock} {{range=@{weapon_range}}} @{weapon_use_ammo} {{mod=[[0 @{modifier_query}]]}} {{desc=@{weapon_description}}} @{weapon_api}").invisible-button.display
+                .display
+                    span.name.ellipsis.space-after
+                        span(name="attr_weapon_name").space-after
+                        span(name="attr_weapon_attack_display")
+                    span
+                        | (
+                        span(name="attr_weapon_damage_display")
+                        input(type="hidden", name="attr_weapon_range", value="").hide-empty
+                        span , #[span(data-i18n="RANGE")]:&nbsp;#[span(name="attr_weapon_range")]
+                        | )
+                    input(type="hidden", name="attr_weapon_use_ammo", value="0").hider
+                    span
+                        | . #[span(data-i18n="AMMO")]:&nbsp;
+                        input(type="number", name="attr_weapon_ammo").inline-input
+                        | &nbsp;/&nbsp;
+                        span(name="attr_weapon_ammo_max")
+                    .details
+                        .grid.gap-1.grid-flow-col.cwn
+                            each val in ["trauma_die", "trauma_rating", "cost"]
+                                span #[span(data-i18n=val.toUpperCase()).font-bold]: #[span(name=`attr_weapon_${val}`)]
+                        span(name="attr_weapon_description")
+                .edit.flex-wrap.grey-box-bordered
+                    +text-input("weapon_name", "NAME").grow.name.ellipsis
+                    +text-input("weapon_attack", "AB")(type="number", value="0").ab.center
+                    +fake-text-input("SKILL").skills-either.weapon-skill.center
+                        select(name="attr_weapon_skill_bonus")
+                            each val in skills.combatRevised
+                                +combatSkillList(val,"shoot").swn.cwn
+                            each val in skills.combatSkills
+                                +combatSkillList(val, "shoot").wwn
+                            option.psionics(value="@{skill_telekinesis}", data-i18n="TELEKINESIS")
+                            option(value="0", data-i18n="NONE")
+                    +text-input("weapon_skill_bonus", "SKILL_AB").weapon-skill.neither.center
+                    +fake-text-input("ATTRIBUTE").attribute.center
+                        select(name="attr_weapon_attribute_mod")
+                            each attr in attributes
+                                option(value=`@{${attr}_mod}`, data-i18n=`${attr.slice(0, 3).toUpperCase()}`)
+                            option(value=`@{str_dex_mod}`, data-i18n=`STR_DEX`)
+                    +fake-text-input("BURST").burst.center.swn
+                        select(name="attr_weapon_burst")
+                            option(value="", data-i18n="NO", selected)
+                            option(value="@{burst_query}", data-i18n="ASK")
+                            option(value="+ 2[Burst]", data-i18n="ALWAYS")
+                    +text-input("weapon_damage", "DAMAGE")(value="0").damage.grow.center
+                    +fake-text-input("+SKILL").skill-to-damage.center
+                        input(type="checkbox", name="attr_weapon_skill_to_damage", value="@{weapon_skill_bonus}")
+                    .text-input.shock-damage.center
+                        input(type="text", name="attr_weapon_shock_damage", value="0")
+                        label.label
+                            input(type="checkbox", name="attr_weapon_shock", value!="{{shock=[[@{weapon_shock_damage} + @{weapon_attribute_mod}[Attribute] + @{weapon_skill_to_damage}[Skill]]] ^{SHOCK_DAMAGE_AGAINST_AC_LEQ} @{weapon_shock_ac}!}}")
+                            span(data-i18n="SHOCK")
+                    +text-input("weapon_shock_ac", "SHOCK_AC")(type="number", value="10").shock-ac.center
+                    +text-input("weapon_range", "RANGE").range.grow.center
+                    +text-input-duo("weapon_ammo", "weapon_ammo_max", "", {value: "0"}).ammo.center
+                        label.label
+                            input(type="checkbox", name="attr_weapon_use_ammo", value!="{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]] / @{weapon_ammo|max}}}")
+                            span(data-i18n="AMMO")
+                    +text-input("weapon_encumbrance", "ENC")(type="number", value="0").enc.center
+                    .grid.grid-flow-col.gap-1.cwn
+                        each val in ["trauma_die", "trauma_rating", "cost"]
+                            +text-input(`weapon_${val}`, val.toUpperCase()).trauma.center
+                    .w-full
+                        .table-header.rep-grid
+                            .weapon-description(data-i18n="DESCRIPTION")
+                        textarea(name="attr_weapon_description", data-i18n-placeholder="DESCRIPTION")

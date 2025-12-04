@@ -20,28 +20,41 @@ table
         th Name
         th Spheres
         th Book
+        th Printing
+    - let druidPrint = booksPriority.find(p => p.book === "The Complete Druid's Handbook").print
+    - let necroPrint = booksPriority.find(p => p.book === "The Complete Book of Necromancers").print
+    - let poPrint = booksPriority.find(p => p.book === "Player's Option: Spells & Magic").print
     each levelObject, level in data
         each spell, spellName in levelObject
-            if (!spell['sphere-druids'] && !spell['sphere-necromancers'] && !spell['sphere-spells-and-magic'])
+            if spellName.includes('Reverse')
                 - continue
-            tr
-                td #{spellName}
-                td #{spell.sphere}
-                td #{spell.book}
-            if (spell['sphere-druids'])
+            each priority in booksPriority
+                if (spell.book !== priority.book)
+                    - continue
+                if (!spell['sphere-druids'] && !spell['sphere-necromancers'] && !spell['sphere-spells-and-magic'])
+                    - continue
                 tr
                     td #{spellName}
-                    td #{spell.sphere + spell['sphere-druids']}
-                    td The Complete Druid's Handbook
-            if (spell['sphere-necromancers'])
+                    td #{spell.sphere}
+                    td #{spell.book === 'PHB' ? 'Player\'s Handbook' : spell.book}
+                    td #{priority.print}
+                if (spell['sphere-druids'])
+                    tr
+                        td #{spellName}
+                        td #{spell.sphere + spell['sphere-druids']}
+                        td The Complete Druid's Handbook
+                        td #{druidPrint}
+                if (spell['sphere-necromancers'])
+                    tr
+                        td #{spellName}
+                        td #{spell.sphere + spell['sphere-necromancers']}
+                        td The Complete Book of Necromancers
+                        td #{necroPrint}
+                if (spell['sphere-spells-and-magic'])
+                    tr
+                        td #{spellName}
+                        td #{spell['sphere-spells-and-magic']}
+                        td Player's Option: Spells & Magic
+                        td #{poPrint}
                 tr
-                    td #{spellName}
-                    td #{spell.sphere + spell['sphere-necromancers']}
-                    td The Complete Book of Necromancers
-            if (spell['sphere-spells-and-magic'])
-                tr
-                    td #{spellName}
-                    td #{spell['sphere-spells-and-magic']}
-                    td Player's Option: Spells & Magic
-            tr
-                td &emsp;
+                    td &emsp;

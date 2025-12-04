@@ -24,6 +24,9 @@ rollCombatPNJContact.forEach((button) => {
       'Masque',
       'MasquePNJAE',
       'MasquePNJAEMaj',
+      'Dame',
+      'DamePNJAE',
+      'DamePNJAEMaj',
       'capaciteFanMade',
       'attaqueOmbre',
     ];
@@ -228,6 +231,8 @@ rollCombatPNJContact.forEach((button) => {
     const vMachineAE = totalAspect(attrs, 'Machine');
     const vMasque = +attrs.Masque;
     const vMasqueAE = totalAspect(attrs, 'Masque');
+    const vDame = +attrs.Dame;
+    const vDameAE = totalAspect(attrs, 'Dame');
 
     const aBase = attrs[`${prefix}AspectPNJ`] || '0';
     let aspect = '0';
@@ -303,7 +308,7 @@ rollCombatPNJContact.forEach((button) => {
 
     // GESTION DES EFFETS
 
-    const rEffets = getWeaponsEffectsPNJ(prefix, attrs, addChair, vChair, vMachine, vMachineAE, vMasque, vMasqueAE);
+    const rEffets = getWeaponsEffectsPNJ(prefix, attrs, addChair, vChair, vMachine, vMachineAE, vMasque, vMasqueAE, vDame, vDameAE);
 
     firstExec = firstExec.concat(rEffets.firstExec);
     exec = exec.concat(rEffets.exec);

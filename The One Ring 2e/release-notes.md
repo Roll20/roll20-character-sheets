@@ -4,6 +4,65 @@ This is a rewrite based on the early 2e (basic) and 1e edition that also include
 
 # Release History
 
+## 03.14.00 (Build 36)
+
+- added brawl combat proficiency
+
+## 03.13.00 (Build 35)
+
+- added "Taint" of items that will add to shadow / scars and leads to miserable / ill-favoured rolls when >= hope / hope_max
+
+## 03.12.00 (Build 34)
+
+- added "Favoured" modifier for pc combat proficiencies to allow handling of specific cultural virtues (e.g. Hobbit Cultural Virtue Sure At The Mark)
+
+## 03.11.00 (Build 33)
+
+- fixed stance toggle attack bonus bug 
+
+## 03.10.01 (Build 32)
+
+- fixed minor CSS layout bug 
+
+## 03.10.00 (Build 31)
+
+- fixed minor CSS layout bug 
+
+## 03.09.00 (Build 30)
+
+- added dark theme configurable for pc + adv sheets
+- fixed Firefox rolltemplate layout bug
+- fixed several CSS bugs
+
+## 03.08.00 (Build 29)
+
+- added dark theme 
+
+## 03.07.00 (Build 28)
+
+- added third adversary weapon
+
+## 03.06.00 (Build 27)
+
+- fixed missing checkboxes stance parry, shield parry, other parry
+
+## 03.05.01 (Build 26)
+
+- fixed translation bugs
+
+## 03.05.00 (Build 25)
+
+- added "Daunted" modifier
+
+## 03.04.00 (Build 24)
+
+- added bonus modifier to useful items
+- added whisper mode pc and npc
+
+## 03.03.00 (Build 23)
+
+- added Useful item
+
 ## 03.02.00 (Build 22)
 
 - target attacks calculate priercing blow correctly

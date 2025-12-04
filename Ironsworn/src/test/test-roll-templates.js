@@ -12,18 +12,31 @@ $(document).ready(() => {
   rollSpecs.filter(_ => _.display === undefined || _.display).forEach(spec => {
     const template = rollTemplates[spec.templateId];
 
-    // we want to check that roll values are formatted correctly (i.e. [[value]]),
-    // but they must appear with their value when rendering the template,
-    // so we store them aside and replace the [[value]] with value in the spec values.
+    // preprocess values
     const rollValues = {};
     for (const name in spec.values) {
-      const value = spec.values[name];
+      let value = spec.values[name];
+
+      // we want to check that roll values are formatted correctly (i.e. [[value]]),
+      // but they must appear with their value when rendering the template,
+      // so we store them aside and replace the "[[value]]" with "value" in the spec values.
       if (value.startsWith('[[') && value.endsWith(']]') && value.indexOf(' ') == -1) {
         const numericValue = Number.parseInt(value.substring(2, value.length - 2)).valueOf();
         rollValues[name] = numericValue;
 
         const rollType = numericValue == 1 ? 'fullfail' : (numericValue == 6 || numericValue == 10) ? 'fullcrit' : '';
         spec.values[name] = `<span class="inlinerollresult showtip tipsy-n-right ${rollType}">${rollValues[name]}</span>`;
+
+      } else {
+        // localize values (currently roll20 does not localize inline rolls)
+        for (const group of value.matchAll(/\^{(.+?)}/g)) {
+          const i18nValue = i18next.t(group[1], '');
+          if (i18nValue) {
+            value = value.replace(group[0], i18nValue);
+          }
+        }
+
+        spec.values[name] = value;
       }
     }
 
@@ -124,11 +137,13 @@ $(document).ready(() => {
             }
           }
         }
+
       }
     });
 
     const container = $(`<div class="sheet-rolltemplate-${spec.templateId}" style="margin-bottom: 10px"></div>`)
       .append(Mustache.render(template, { ...spec.values, ...computedValues }, undefined, { escape: _ => _ }));
+    localize(container);
     $('#rolls').append(container);
   });
 });

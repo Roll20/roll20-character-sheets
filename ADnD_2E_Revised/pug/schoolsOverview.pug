@@ -20,18 +20,27 @@ table
         th Name
         th Schools
         th Book
+        th Printing
+    - let poPrint = booksPriority.find(p => p.book === "Player's Option: Spells & Magic").print
     each levelObject, level in data
         each spell, spellName in levelObject
-            if (!spell['school-spells-and-magic'])
+            if spellName.includes('Reverse')
                 - continue
-            tr
-                td #{spellName}
-                td #{spell.school}
-                td #{spell.book}
-            if (spell['school-spells-and-magic'])
+            each priority in booksPriority
+                if (spell.book !== priority.book)
+                    - continue
+                if (!spell['school-spells-and-magic'])
+                    - continue
                 tr
                     td #{spellName}
-                    td #{spell['school-spells-and-magic']}
-                    td Player's Option: Spells & Magic
-            tr
-                td &emsp;
+                    td #{spell.school}
+                    td #{spell.book === 'PHB' ? 'Player\'s Handbook' : spell.book}
+                    td #{priority.print}
+                if (spell['school-spells-and-magic'])
+                    tr
+                        td #{spellName}
+                        td #{spell['school-spells-and-magic']}
+                        td Player's Option: Spells & Magic
+                        td #{poPrint}
+                tr
+                    td &emsp;

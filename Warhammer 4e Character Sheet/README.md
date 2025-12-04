@@ -21,13 +21,13 @@ Please report issues on Github or Discord : Justi#7934
 ///// ============ Main Features ============ /////  
 
 
-- Mainhand / Offhand / Ranged with active weapon selection system. with integrated integated Skill, Talent & Quality mechanics. 
+- Mainhand / Offhand / Ranged active weapon selection system, inc Dual Wield. Integrated Skill, Talent & Item Quality mechanics. 
 
-- Combat Roll Modifier Quick Menu dropdown for Melee and Ranged, mod calculator with dymanic situation (Def Stance/Called Shot/Reach/Size/xVsy/Prone) and talent +SL/lvl integration (Stirke to Stun/Infighter/Fury..). Talent trigger's will onyl show if learned.
+- Combat Roll Modifier Quick Menu dropdown for Melee and Ranged, mod calculator with dynamic situation (Def Stance/Called Shot/Reach/Size/xVsy/Prone) and talent +SL/lvl integration (Strike to Stun/Infighter/Fury..). Trigger's will only show if learned.
 
-- Skill system, Basic / Advanced Skill List is fully implemented. 
+- Skill system, Basic / Advanced Skill List is fully implemented.
 
-- Talent system, all Core+++ official talent integrated into roll system. Add SL to all outcome and automatically add up for total outcome. Integrated into sheet Charactistics, Carry Weigth etc, and Movement Rolls from the Action bar and and Quick menu's.
+- Talent system, all Core+++ official talent integrated into roll system. Add SL to all outcome and automatically add up for total outcome. Integrated into sheet Characteristics, Carry Weight etc. Movement Roll Dropdown and and Quick menu's.
 
 - Item Qualities system, Weapons, Armor and Damage absorption system with Qualities, Enc, AP, Durable, Damage, Damage point & Talent integration. 
 
@@ -35,9 +35,9 @@ Please report issues on Github or Discord : Justi#7934
 
 - Roll Tables for Critical / Oops / Mutations (TEW extended tables) / Miscast & Wrath of the God integrated, also traggerable from clicky buttons in the roll template output when they occur.  
 
-- Magic system with separate Magic/Channeling types, all 8 colors, Witch, Dark, Chaos and a Misc for custom spell Lores. includes Spell book system, with core book spell/blessing/miracle name list, plus optional custom spell names. Intgrated core spell talent modifiers (like, atheryic attunement and instinctive diction) and including miscast management and clickies in the roll template output. Additionally, advantage can be disabled for spells in the settings tab, allowing for seamless integration the Unofficial Grimoire rules (@ https://pdfcoffee.com/unofficial-grimoire-12-pdf-pdf-free.html).
+- Magic system with separate Magic/Channeling types, all 8 colors, Witch, Dark, Chaos and a Misc for custom spell Lore's. includes Spell book system, with core book spell/blessing/miracle name list, plus optional custom spell names. Integrated core spell talent modifiers (like, atheryic attunement and instinctive diction) and including miscast management and clicky's in the roll template output. Additionally, advantage can be disabled for spells in the settings tab, allowing for seamless integration the Unofficial Grimoire rules (@ https://pdfcoffee.com/unofficial-grimoire-12-pdf-pdf-free.html).
 
-- Full combat Advantage & Condition Tracking, per core rules. Tracked by sheet attribute and integrated to automatically modify roll tamplate output and all Roll Target displays across all core / skill / weapons and magic tabs. Including Group Advantage rule option to disable roll intregation!
+- Full combat Advantage & Condition Tracking, per core rules. Tracked by sheet attribute and integrated to automatically modify roll tamplate output and all Roll Target displays across all core / skill / weapons and magic tabs. Including Group Advantage rule option to disable roll integration!
 
 - Inventory: Full Encumbrance Management system, with integrated Over encumbrance modifiers (-move/Agi), and Container & Vehicle Management section (TEW compatible) . 
 
@@ -60,11 +60,11 @@ Please report issues on Github or Discord : Justi#7934
 - Weapons/Spells Target fields, display the final roll target including all variables calculated by the sheet at that moment, e.g. CHAR + SKILL + MOD + ADVANTAGE - CONDITIONS. 
 - On Weapons ensure you select the corresponding skill (e.g. Melee Basic, Melee Parrying, Ranged Bow, Ranged Black powder etc), and that the correct skill is learned with advance points in it. 
 - Themes, see setting tab for various theme which change the look of the char sheet overall. Including Empire/Dwarf & Elf themes. 
-- Extended Channeling Test (spell book tab, Arcane Spells only), set Accu Ext SL to 0 before beginning a new Channeling action. Increment with Success level of roll until finished. Allows easy tracking of CN v Accu Ext SL for all players. 
+- Extended Channeling Test (spell book tab, Arcane Spells only), set Accu Ext SL to 0 before beginning a new Channeling action. Increment with Success level of roll until finished. Allows easy tracking of CN v Accu Ext SL for all players. Now includes auto Accu Ext SL calculation and rest after casting.
 - NPC tab is intended of quick persistent and contained NPC creation without the need for full character sheets for each of them. With template integration, semi featured with contained Name / Characteristic / Condition / Advantage integration and up to 5 weapons & spells for each NPC, and a collapsible notes section. Good for GMs and players. (I would still recommend separate character sheet for actual NPC bosses/major characters).  
 - Condition Tracking integration into roll template. Option to choose between Advantage +xx showing only on all combat rolls and all (new default v1.3) non-situational roll modifying conditions (e.g. Broken, Fatigued Stunned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too.  
 
-This sheet has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens v4 @ https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0.zip // UiA Edition @ https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0%20(UiA).zip
+This sheet has TokenMod integrated (TokenMod API needs to be installed in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens v4 @ https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0.zip // UiA Edition @ https://github.com/Djjus/Vault/raw/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset4.0%20(UiA).zip
 
 Condition effects are currently hard coded as follows (updated June 15th 2021): 
 
@@ -80,6 +80,228 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
  
 ///// ============ Change Log ============ /////  
+
+Mar 22nd 2025 v1.76
+
+- New High Elf Player's Guide support, including Yenlui and Talents for HE career's.
+- New Sword-dancing casting support, adds new spellbook page for Sword-dancing spells. And added to Quick Cast menu.
+- New High Magic (Qhaysh) added to list of Arcane Magic types, and channeling. And added to Quick Cast menu.
+- Simple Yenlui implementation for records only.
+- Added another 4 (total 8 now) Arcane Lore to talent's to support HE caster's learning all 8 colors.
+- Enhanced Spellbook/Arcane spells tab to support High Magic spell features, ie Sacrafice and Multi Wind spells. For record only, no logic to support this mechanic yet.
+- Creature Trait list added, found in the Talent Tab. Intended for Monsters/NPCs and special conditions.
+- Fixed Offhand weapon not adding Strike Might Blow dmg in the roll template.
+- Fixed skill test rolls showing the Drunk modifier when it wasnt actually applying to them.
+- Fixed Frenzy not always adding extra dmg to Melee attacks correctly
+- Fixed Entangle not working to Melee mainhand attacks
+
+
+Feb 19th 2025 v1.75c
+
+- Fixed alignment issue with coin swap buttons, which was not fixed last update.
+
+
+Feb 14th 2025 v1.75b
+
+- Fixed alignment issue with coin swap buttons
+- Fixed Weapon settings Magical Effects textarea sizing
+- Fixed Spell Quickbar header spacing
+- Fixed problem with Wounds calc not being correct if Larger the Average sized and changes to SB/TB/WPB where made. Only Race change will automatically reset Size and recalculate wounds.
+- Updated Sheet.json to add some of the recent custom setting defaults
+
+
+Feb 13th 2025 v1.75a
+
+- Translated sheet to Roll20 CSE Sanitization standard. No changes to layout or look.
+- Fixed problem with Dual wield Situational Bonuses showing in DW rolls when Custom Roll outcome was active on weapons.
+
+
+Jan 20th 2025 v1.75
+
+- Add Cantor Talent from Heart of Glass/Ubersreik Adventures 1, situational test bonus for entertain singing.
+- Add Chanty Talent from Sea of Claws, situational test bonus for entertain singing.
+- Fix Master of Disguise Talent, now shows situational test bonus for entertain acting.
+
+
+Jan 10th 2025 v1.74d
+
+- Fix for the sheet background and images sometimes not working in roll20. Sheet Assets moved to prevent url encoding problem.
+- Fix issue prevent Race field to show on new sheets.
+
+
+Jan 4th 2025 v1.74c
+
+- New Custom Critical Wounds rules, which can be configured in the settings tab. Allows for changing of the static crit dmg wounds from the core crit tables. There are 3 customization options, 2 are add or replace normal dmg with a custom dmg die (e.g. 1d10, 1d10!, etc), and the 3rd a custom rule which will take the Tens die of the critical roll as crit dmg wounds, and if the roll is a dubs crit it triggers a Ulrics Furt Die (exploding 10). This is intended to add options for WFRP4e to simulate other crit dmg models like the popular WFRP2e feature Ulric's Fury.
+- New Custom Combat Rules, which can be configured in the settings tab. One for Twohanded weapons, changes Strike Mighty Blow to add another +1 dmg per lvl (total +2 per lvl) for all 2h melee weapons, and adds Twohanded Quality makes a Defender suffer -1 SL to his opposed melee test when attacked by a 2h weapon, unless he dodges which is not a melee test. And another for Melee defensive talents, which disables stacking of melee defensive talents, changes reversal test SL bonus when defending with melee parry weapons only (not including shields), and riposte test SL bonus removed. This allow for a alternate combat model which is a bit more gritty with less def SL stacking and makes 2h a bit more viable.
+- Fix NPC crit rolls not always working. Also fully compatible with the new crit wound options.
+- Fix Char Roll showing when it should not.
+- Fix multiple fields showing incorrectly with new character sheets until certain values are set.
+
+
+Dec 14th 2024 v1.74b
+
+- New Custom Race option added to Race dropdown menu, will allow entering owna Custom Race name. See setting's tab for Custom Race Stating Characteristics Modifier, this allows the Char Roll to generate starting Charactistics for the Customer Race.reset to menu by clicking the X.
+- Fix issue with Dual Wield trigger checkbox not showing correctly in Declare Actions section.
+- Fix issue with impact/damaging not showing on Attack rolls with Size modifier Large Vs Small.
+- Fix mixed up Impact/Impale checkboxes on the NPC pages.
+- Fix Dangerous Quality fumble sometimes not showing when test Unit or 10s Die is 9.
+- Fix Warpstone Quality now only triggered on crit again.
+- Resolved some issues with dulpicate crit translations.
+- Cleaned up minor CSS file errors.
+
+
+Dec 14th 2024 v1.74a
+
+- Fix for Conditions not working
+
+
+Dec 12th 2024 v1.74
+
+- New Dwarf Player's Guide Talents, to support the new Dwarf career's. Talents with direct roll modifier are integrated, but some of the indirect ones are manually applied by the GM/players. Including new attack mode Whirlwind of Death. These Talents are intended for Dwarfs only, but sheet will allow any race to use them (at GM discretion).
+- New Grudges, option to switch between Goals or Grudges recording on the Background Tab. Dwarf Race PCs automatically switch to Grudges, but can be changed back manually if desired.
+- New Characteristics Auto Roller for new characters, for every officially supported Race. This will only show if Starting WeaponSkill and Fellowship are empty, like at PC creation.
+- All talent based situational SL modifiers (Grey ones) now have mouse over labels with their RAW test text added. To aid GM/player to determine if they should be added to the roll. 
+- Reworked the Weapon Quality configuration boxes, added more linear layout and alphabetized. New added are, Entangle to Melee weapon Qualities. And Crewed and Salvo to Ranged weapon Qualities.
+- Magic/Melee/Range Quickbar rework, new pop out buttons under the Combat Actions section. Declared Attack Options, e.g. Charge/Defensive/Called Shot/Frenzy/DW/Disarm etc, have all been moved to Declare Attack Options. Players must click these to enable talents add automatically to the Roll outcome. This simulates how Talent based Special Action options have to be called before attacking. 
+- Dual Wield is no longer a situational bonus, its now been moved in the Declared Attack Options section of the Melee Quickbar. Brining all these types of special attack actions into one place.
+- Distracted now correctly applies to all test rolls.
+- Warpstone Quality changed to the EiS version.
+
+
+Oct  9th 2024 v1.73a
+
+- Optimized sheet code and the reduced overall size by ~5%
+- Fixed not being able to use certain symbols in the character name without breaking sheet functionality, e.g.: " (). Some still don't work, e.g.: | {}
+- PC & NPC RT clicky button code unified, should resolve some odd issues
+- Allow Endurance test when Unconscious
+- Added Critical Damage Rules Houserule 3 to default settings options (outside the game)
+- Fixed Enc Penalty not applying to Agility correctly
+
+
+Oct  1st 2024 v1.73
+
+- Add Distracted (-20 all tests) to the condition bar, but as this is not technically a condition it adds its modifier separately from normal conditions. Similar to Drunk.
+- Removed condition limit of -30
+
+
+July 25th 2024 v1.72c
+
+- Critical Damage Rules Houserule 3#: Changed spells RT crit button, will now Default to Elemental table on the drop down menu.
+
+
+June 28th 2024 v1.72b
+
+- Fix issue with Failed Melee test not showing Dual Wield and Furious Assault text and follow up buttons. They now display irrelevant of roll outcome.
+- Recorrected Minor Miscast Rapture, from 1d10 to 1 bleed condition.
+
+
+May 29th 2024 v1.72a
+
+- New Crit tables now work as normal with Strike to Injure (UiA version).
+
+
+May 25th 2024 v1.72
+
+- Adding new optional Crit tables suitable for Unarmed/undamaging and Elemental/Magic Damage types to compliment the standard Up in arms Crit tables. Adding flavor and a non-leathal option for certian situations. This new option can be activated by select new Crit Rule: Houserule #3 in the setting tab. When enabled clicking crit roll button will have show a new dropdown to choose between Weapon(Default), Unarmed and Elemental crit tables. 
+
+These tables where created by my long time awesome & grumpy WFRP GM, Marve.
+
+
+Mar 29th 2024 v1.71
+
+- Fixed Menacing Talent, it now adds +2SL per lvl if the roll is a success, and +1SL per lvl if the roll fails. It is now a non-situational bonus adding directly to the SL result to reflect RAW rules more closely.
+
+
+February 4th 2024 v1.7
+
+- Added first iteration of Vehicle & Enterprise sheet page modes. These allow you too create sheets to record various values and information associated with these. As per rule additions from various source books UiA,SoC,EiS and Enterprise rules from Achieves of the Empire III. Further rolls (ie traveling etc) info may be added in a later update. Weapons will not be included on Vehicle sheets due to requiring the character statistic and skill to fire etc.
+
+Fixes
+- Fixed Drilled Talent costing double the intended XP, ie 200 instead of 100 xp per lvl
+- Fixed issue with Spell casting where changing the Accu Ext SL modifier during the roll in the pop out window would not change the actual spell outcome as indented, but used the existing sheet Accu Ext SL field value instead. It will now overwrite dynamically.
+- Fixed problem with Custom Spells/miracles names not showing correctly on the Quick spell drop down list.
+
+
+July 8th 2023 v1.66a
+
+- Fixed Legs plate amror penalty when modified with pracitcal quality. It will now reduce the -20 pen to stealth to -10, instead of to 0.
+
+
+June 30nd 2023 v1.66
+
+- Added Practical Quality option tick box to all Mail/Plate Armor, this will reduce all penalties by -10 on the given armor piece and update the penalties boxes accordingly.
+- Corrected issue on Armor Tab where Shield Durability was adding to AP on the hit locations display to the right.
+
+
+June 22nd 2023 v1.65c
+
+- Added the Norse Race (Sea of Claws), same attribute as humans with default size average.
+- Fixed some rolls not working under certain conditions.
+- Fixed some failed roll Talent modifier text not displaying correctly. eg - You may Reverse Dice
+
+
+February 28th 2023 v1.65b
+
+- Fixed Talent Nobleblood test +SL text during leadership rolls, now correctly dislays as situational bonus SL.
+
+
+February 14th 2023 v1.65a
+
+- Fixed some skill rolls not always working due to new Besmirched condition bug
+- Fixed NPC fumble/crit not working from the combat text clicky
+- Fixed Talent integration description il8n tags
+- Fixed Channelling so no long removes SL from the Ext Accu SL pool when failing the roll
+
+
+December 20th 2022 v1.65
+
+- Added Ranged Weapons to be equipable in Mainhand/Offhand. This allows ranged offhand, and mixing with Melee inclding Dualwield Ranged.
+- Ranged weapons now have Two-handed weapon option to support full Main/Off hand functionality.
+- Added a new quick weapon selector at the bottom of Combat actions section for all Mainhand/Offhand and Rangd weapons. Once Weapons are added in the Weapons tab they will show on the selector.
+- Added "Master And Commander" Talent (from C7 Sea of Claws) to the Talent list, with integrated Leadrship SL bonus support.
+- Implemented Besmirched Condition effects, when besmirched Characters will get -2 SL to tests rolled with Fellowship Skill.
+- Added Warpstone & ZZAP! Weapon Qualities for skaven weapons (from C7 Horned Rat Companion) to both Melee and Ranged Weapons, and apporpriate effects in roll output for Main PC & NPCs.
+- Various bug fixes
+
+
+December 12th 2022 v1.64a
+
+- Fixed Blather talent not adding to AutoXP.
+- Fixed VsSize Melee modifier not adding +10 to Melee attack Modifiers when vs larger targets then yourself.
+
+
+November 4th 2022 v1.64
+
+- Added Spell/Pray (Magic) Drop-down Assist: this is similar to the Melee/Ranged ones. Its shows all learned spells Petty/Arcance from the spellbook, or blessings/miracles, in a collapsable menu with lore  channeling, Accu SL and Cast buttons for Quick access to those buttons under Combat actions.
+
+- Fix Accurate Mod reset
+- Fix Deadeye shot bonus not applying
+- Fix Characteristics Auto XP bug
+- Optimized NPC weapon switch code
+- Added visable RT Overcast popup info list when casting non-damage spells
+
+
+October 31st 2022 v1.63
+
+- New setting switch for Optional Fumble/Oops Rules by FighterChimp on Ratcatcher Guild Discord @ https://discord.com/channels/449845411344154634/449846068356710412/611069939654066177. These are somewhat similar to Core, but with better descriptions which are more adaptable to melee/ranged/magic. Matter of preference for GM.
+
+- Fixed Fast Shot not showing in Ranged assist drop-down window when above LVL 1.
+- Fixed XP not adding for Fast Shot Talent.
+
+
+October 8th 2022 v1.62
+
+- NPC Tab - Weapon Qualities & Combat Talent support added. Similar to PC weapons, it adds cog setting button next to NPC weapons to configure qualities. A limited set of optional talents have been added and will add SL modifiers. Also adds offhand penalty on the Opp Weapon if it not the same as the Atk Weapon, modified by Melee Parry/Ambidextrous as appropriate. Changes do slow down this Tab a little, recommend configuring NPC then minimize and use minibutton for combat.
+
+- Added mouse over popup Overcast Table in the roll output for Spell cast rolls next the "SL Effect".
+- Fixed Aethyric Attunement and Wizard robes +SL not adding to Channelling roll when rolled from the Skill Tab.
+- Fixed Furious Assault +SL not adding to the final result in the roll outcome when initiated from the Furious Assault roll template mini button.
+- Fixed issue with Melee Bonus re-applying after a hit in certain circumstances. Bonus Value was not being cleared from the Weapons Tab.
+
+September 24th 2022 v1.61
+
+- Updated Armor Tab - There is now 3 (Light/Medium/Heavy) Equip/unequip buttons at the top of the tab. This allows quicker equiping and unequiping of armor for players. Also all Equip/Unequip and Worn/Unworn actions in this tab now automatally activate or disable the corresponding armor penatlies. 
+
 
 August 22th 2022 v1.6b
 
@@ -533,9 +755,6 @@ Dec 24 2019
  
 Future release wish list : 
 
-
-- NPC tab update - Quailities
-- Integrate Besmirched condition
-
+- TBA
 
 Enjoy. 

@@ -1,27 +1,19 @@
 ﻿each levelObject, level in data
     datalist(id=`${level}-spells`)
         each spell, spellName in levelObject
-            - let category = spell.category || ''
+            - label = [spell.category]
+            if spell.book !== 'PHB'
+                - label.push(spell.book)
             if level.endsWith('monster')
                 - let displayLevel
                 case spell.level
-                    when '1': - displayLevel = `${spell.level}st level`
-                    when '2': - displayLevel = `${spell.level}nd level`
-                    when '3': - displayLevel = `${spell.level}rd level`
+                    when '1': - displayLevel = `1st level`
+                    when '2': - displayLevel = `2nd level`
+                    when '3': - displayLevel = `3rd level`
                     when 'q': - displayLevel = `Quest Spell`
                     default:  - displayLevel = `${spell.level}th level`
-
-                if (category)
-                    - displayLevel += `, ${category}`
-                if (spell.book !== 'PHB')
-                    - displayLevel += `, ${spell.book}`
-                option(value!=spellName)= displayLevel
-            else
-                if (spell.book !== 'PHB')
-                    if (category)
-                        - category += ', '
-                    - category += `${spell.book}`
-                option(value!=spellName)= category
+                - label.unshift(displayLevel)
+            option(value!=spellName)= label.filter(Boolean).join(', ')
 
 each levelObject, level in data
     datalist(id=`${level}-spells-ff`)

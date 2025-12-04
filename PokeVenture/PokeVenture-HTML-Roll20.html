@@ -1,0 +1,1773 @@
+<script type="text/worker">
+    // Stat Bonus calc
+
+    //  defense
+    on('change:vitality change:defense_mod',function(eventInfo){
+
+    });
+
+    //  special defense
+    on('change:vitality change:special_mod',function(eventInfo){
+
+    });
+    
+    on("change:hp sheet:opened", function() {
+  getAttrs(["hp","hp_base","hp_max","hp_rank","pain","pain_mod","pain_max"], function(values) {
+    let hp = parseInt(values.hp)
+    let hp_base = parseInt(values.hp_base)
+    let hp_rank = parseInt(values.hp_rank)
+    let pain = parseInt(values.pain)
+    let pain_mod = parseInt(values.pain_mod)
+    let hp_max = hp_base + (hp_rank * 2)
+    let pain_max = pain + pain_mod
+    
+    if (hp > Math.floor(hp_max / 2)) {
+      setAttrs({pain: 0})
+    } else if (hp <= Math.floor(hp_max / 2) && hp !== 1) {
+      setAttrs({pain: 2})
+    } else if (hp === 1) {
+      setAttrs({pain: 4})
+    }
+  }); // This closes the getAttrs() function
+}); // This closes the on() function
+
+</script>
+    
+</script>
+
+
+<script type="text/worker">
+        // Listen for changes to the paralysis checkbox and any dexterity-related attributes
+        on("change:is_paralyzed change:dexterity change:dexteritymod change:dexterity_bonus change:dexterity_rank change:carbos sheet:opened", function(eventInfo) {
+            
+            // Get all the values we need
+            getAttrs(["is_paralyzed", "dexterity", "dexteritymod", "dexterity_bonus", "dexterity_rank", "carbos"], function(values) {
+                
+                // Check if paralyzed checkbox is checked
+                const isParalyzed = values.is_paralyzed === "1" || values.is_paralyzed === "on";
+                
+                let paraValue;
+                
+                if (isParalyzed) {
+                    // Calculate the full dexterity value
+                    const dexterity = parseInt(values.dexterity) || 0;
+                    const dexteritymod = parseInt(values.dexteritymod) || 0;
+                    const dexterity_bonus = parseInt(values.dexterity_bonus) || 0;
+                    const dexterity_rank = parseInt(values.dexterity_rank) || 0;
+                    const carbos = parseInt(values.carbos) || 0;
+                    
+                    // Perform the calculation: dexterity + dexteritymod + (dexterity_bonus * 2) + dexterity_rank + carbos
+                    const totalDex = dexterity + dexteritymod + (dexterity_bonus * 2) + dexterity_rank + carbos;
+                    
+                    // Divide by 2 and round up
+                    paraValue = Math.ceil(totalDex / 2);
+                } else {
+                    // If not paralyzed, use the original value (or set to 0/null as needed)
+                    paraValue = 0 || 0; // You can adjust this default behavior
+                }
+                
+                // Update the para_dex attribute
+                setAttrs({
+                    para_dex: paraValue
+                });
+            });
+        });
+        
+        // Automatic STAB (Same Type Attack Bonus) Calculator with Debug
+// Place this in your sheet worker section
+
+on('change:repeating_moves:move_type change:type_1 change:type_2 sheet:opened', function(eventInfo) {
+    console.log('STAB Calculator triggered:', eventInfo.sourceAttribute);
+    
+    // Get the repeating section ID if this was triggered by a move change
+    let rowId;
+    if (eventInfo.sourceAttribute && eventInfo.sourceAttribute.includes('repeating_moves')) {
+        rowId = eventInfo.sourceAttribute.split('_')[2];
+        console.log('Updating single move with rowId:', rowId);
+    }
+    
+    if (rowId) {
+        // Update just this specific move
+        updateMoveSTAB(rowId);
+    } else {
+        // Update all moves (when character types change)
+        console.log('Updating all moves due to type change');
+        getSectionIDs('repeating_moves', function(idArray) {
+            console.log('Found move IDs:', idArray);
+            idArray.forEach(function(id) {
+                updateMoveSTAB(id);
+            });
+        });
+    }
+});
+
+function updateMoveSTAB(rowId) {
+    const movePrefix = `repeating_moves_${rowId}_`;
+    console.log('Processing move with prefix:', movePrefix);
+    
+    getAttrs(['type_1', 'type_2', `${movePrefix}move_type`], function(values) {
+        console.log('Retrieved values:', values);
+        
+        const characterType1 = values.type_1 ? values.type_1.toLowerCase() : null;
+        const characterType2 = values.type_2 ? values.type_2.toLowerCase() : null;
+        const moveType = values[`${movePrefix}move_type`] ? values[`${movePrefix}move_type`].toLowerCase() : null;
+        
+        console.log('Processed types - Char1:', characterType1, 'Char2:', characterType2, 'Move:', moveType);
+        
+        let stabBonus = 0;
+        
+        // Check if move type matches either character type
+        if (moveType && moveType !== '-' && moveType !== 'trainer' &&
+            (moveType === characterType1 || moveType === characterType2)) {
+            stabBonus = 3;
+            console.log('STAB match found! Setting bonus to 3');
+        } else {
+            console.log('No STAB match, bonus remains 0');
+        }
+        
+        // Set the calculated STAB value
+        const updateObj = {};
+        updateObj[`${movePrefix}move_stab_auto`] = stabBonus;
+        
+        console.log('Setting attributes:', updateObj);
+        setAttrs(updateObj);
+    });
+}
+    </script>
+
+
+<rolltemplate class="sheet-rolltemplate-PMD">
+    <div class="sheet-roll-container">
+
+        {{#name}}
+        <div class="sheet-roll-row">
+
+            {{#character}}
+            <span class="sheet-roll-small sheet-roll-grey">{{character}}</span>
+            {{/character}}
+
+            <span class="sheet-roll-name"> {{name}} </span>
+
+            {{#skill1}}
+            <span class="sheet-roll-small sheet-roll-grey"> {{skill1}} {{#skill2}} + {{skill2}} {{#skill3}} + {{skill3}} {{/skill3}} {{/skill2}}</span>
+            {{/skill1}}
+
+            {{#target}}
+            <span class="sheet-roll-small sheet-roll-grey">{{target}}</span>
+            {{/target}}
+
+        </div>
+        {{/name}}
+
+        {{#rollGreater() pool 0}}
+        <div class="sheet-roll-row">
+            {{#type}}
+            <span class="sheet-roll-type">{{type}}{{#cat}} | {{cat}}{{/cat}}</span>
+            {{/type}}
+
+            <span class="sheet-roll-value">{{roll}}</span>
+
+            {{#pool}}
+            <span class="sheet-roll-small sheet-roll-pool">{{pool}} Dice</span>
+            {{/pool}}
+        </div>
+        {{/rollGreater() pool 0}}
+
+        {{#description}}
+        <div class="sheet-roll-row">
+            <span class="sheet-roll-description">{{description}}</span>
+        </div>
+        {{/description}}
+
+    </div>
+</rolltemplate>
+
+<input type="hidden" name="attr_sheet_version"  value="v2.0.0" />
+
+<input type="hidden" name="attr_STRENGTH_calc"  value="@{strength} + @{strengthmod} + (@{strength_bonus} * 2) + @{strength_rank} + @{protein}" disabled="true"/>
+<input type="hidden" name="attr_Endurance_calc" value="@{endurance} + @{endurancemod} + (@{endurance_bonus} * 2) + @{endurance_rank} + @{iron}" disabled="true"/>
+<input type="hidden" name="attr_SPECIAL_calc"  value="@{special} + @{specialmod} + (@{special_bonus} * 2)  + @{special_rank} + @{calcium}" disabled="true"/>
+<input type="hidden" name="attr_SPIRIT_calc"   value="@{spirit} + @{spiritmod} + (@{spirit_bonus} * 2) + @{spirit_rank} + @{zinc}" disabled="true"/>
+<input type="hidden" name="attr_DEXTERITY_calc"   value="@{dexterity} + @{dexteritymod} + (@{dexterity_bonus} * 2) + @{dexterity_rank} + @{carbos}" disabled="true"/>
+
+<input type="hidden" name="attr_frame_calc"   value="@{frame} + @{frame_bonus}" disabled="true"/>
+<input type="hidden" name="attr_intellect_calc"   value="@{intellect} + @{intellect_bonus}" disabled="true"/>
+<input type="hidden" name="attr_beauty_calc"   value="@{beauty} + @{beauty_bonus}" disabled="true"/>
+<input type="hidden" name="attr_clever_calc"   value="@{clever} + @{clever_bonus}" disabled="true"/>
+<input type="hidden" name="attr_cute_calc"   value="@{cute} + @{cute_bonus}" disabled="true"/>
+
+<input type="hidden" name="attr_defense"   value="@{DEF} + @{DEF_bonus}" disabled="true"/>
+<input type="hidden" name="attr_Spiritense"   value="@{SPIRIT} + @{SPIRIT_bonus}" disabled="true"/>
+<input type="hidden" name="attr_Spiritense_option"   value="@{DEXTERITY} + @{attr_Spiritense_mod}" disabled="true"/>
+
+<input type='hidden' name='attr_set_Spiritense' value='0' />
+
+<input type="hidden" name="attr_para_dex"  disabled="true"/>
+
+<input type="hidden" name="attr_hitc_calc"   value="8 + (@{DEXTERITY_calc}) + (@{evasion} * 4)" disabled="true"/>
+
+<input type="hidden" name="attr_hp_calc"   value="@{hp_base} + (@{hp_rank} * 2) + (@{hpup} * 2)" disabled="true"/>
+
+<input type="hidden" name="attr_crit0"   value="1d20" disabled="true"/>
+<input type="hidden" name="attr_crit1"   value="1d20cs>18" disabled="true"/>
+<input type="hidden" name="attr_crit2"   value="1d20cs>11" disabled="true"/>
+<input type="hidden" name="attr_crit3"   value="1d20cs>1" disabled="true"/>
+
+<input type="hidden" name="attr_move_stab_auto" disabled="true"/>
+
+
+<input type="hidden" name="attr_move_generic_calc" value="@{generic_attribute} + @{generic_specialty}" />
+
+<input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+
+<input type="hidden" class="contest-toggle" name="attr_rank_contest"  value="0" />
+
+<input type="hidden" name="attr_rank"   value="@{Rank}" />
+
+<div class="sheet-wrapper">
+    <input type="hidden" class="type-toggle" name="attr_type_1" value="trainer" />
+    <input type="hidden" class="type2-toggle" name="attr_type_2" value="trainer" />
+
+    <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+    <input type="hidden" class="PMD-toggle" name="attr_PMD_mode" value="0" />
+    <div class='sheet-toggle-header'>
+        <div class='sheet-toggle'>
+            <input type="radio" name="attr_whisper" title="GM rolls" value="/w gm" />
+            <span>GM</span>
+        </div>
+        <div class='sheet-toggle'>
+            <input type="radio" name="attr_whisper" title="Public rolls " value=" " checked/>
+            <span>Public</span>
+        </div>
+    </div>
+    <input type="hidden" class='sheet-view' name="attr_viewTab" value='0' />
+    <div class='sheet-tab-core'>
+        <!----------------------------------------------------
+            Character Header (Name, Rank, etc.)
+        ----------------------------------------------------->
+        <input type="hidden" class="type-toggle" name="attr_type_1" value="trainer" />
+        <div class="section character-header">
+            <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+                <strong><span name="attr_character_name" style="display:inline-block;font-size:2.2em;width:300px;"></span></strong>
+                <span class="field-labeled" style="width:100px;text-align:center;margin-left:40px;">
+                    <select name="attr_rank" title="@{rank}" >
+                                <option value="4">Starter</option>
+                                <option value="6">Beginner</option>
+                                <option value="8">Amateur</option>
+                                <option value="10">Ace</option>
+                                <option value="12">Pro</option>
+                                <option value="14">Elite</option>
+                                <option value="16">Master</option>
+                            </select>
+                    <span>Battle Rank</span>
+                </span>
+                <span class="creature-toggle-wrapper">
+                    <input type="hidden" class="creature-toggle" name="attr_creature_mode"  value="0" />
+                    <input type="checkbox" name="attr_creature_mode"  value="1" title="Trainer or Pokemon" >
+                    <img class="sheet-trainer-only" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/Trainer-Icon.png" />
+                    <img class="sheet-pokemon-only" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/Pokeball-Min-Icon.png" />
+                </span>
+        </div>
+
+        <!----------------------------------------------------
+            Character Info
+        ----------------------------------------------------->
+
+        <div class="section character-info">
+            <div class="grid">
+                <div class="left-col" >
+                    <input type="hidden" class="creature-toggle" name="attr_creature_mode"  value="0" />
+                    <input type="hidden" name="attr_PMD_mode" class="PMD-toggle" value="0" />
+                    <div style="margin-bottom:5px;" class="sheet-trainer-only">
+                        <span class="field-labeled" style="width:100%;">
+                            <input type="text" name="attr_concept" title="@{concept}"  />
+                            <span>Concept</span>
+                        </span>
+                    </div>
+                    <div style="margin-bottom:5px;" class="sheet-pokemon-only">
+                        <span class="field-labeled" style="width:160px;">
+                            <input type="text" name="attr_species" title="@{species}" />
+                            <span>Species</span>
+                        </span>
+                        <span class="field-labeled" style="width:100px" >
+                            <select name="attr_type_1" title="@{type_1}" >
+                                <option value="trainer">-</option>
+                                <option value="normal">Normal</option>
+                                <option value="bug">Bug</option>
+                                <option value="dark">Dark</option>
+                                <option value="dragon">Dragon</option>
+                                <option value="electric">Electric</option>
+                                <option value="fairy">Fairy</option>
+                                <option value="fighting">Fighting</option>
+                                <option value="fire">Fire</option>
+                                <option value="flying">Flying</option>
+                                <option value="ghost">Ghost</option>
+                                <option value="grass">Grass</option>
+                                <option value="ground">Ground</option>
+                                <option value="ice">Ice</option>
+                                <option value="poison">Poison</option>
+                                <option value="psychic">Psychic</option>
+                                <option value="rock">Rock</option>
+                                <option value="steel">Steel</option>
+                                <option value="water">Water</option>
+                            </select>
+                            <span>Type</span>
+                        </span>
+                        <span class="field-labeled" style="width:100px" >
+                            <select name="attr_type_2" title="@{type_2}" >
+                                <option value="trainer">-</option>
+                                <option value="normal">Normal</option>
+                                <option value="bug">Bug</option>
+                                <option value="dark">Dark</option>
+                                <option value="dragon">Dragon</option>
+                                <option value="electric">Electric</option>
+                                <option value="fairy">Fairy</option>
+                                <option value="fighting">Fighting</option>
+                                <option value="fire">Fire</option>
+                                <option value="flying">Flying</option>
+                                <option value="ghost">Ghost</option>
+                                <option value="grass">Grass</option>
+                                <option value="ground">Ground</option>
+                                <option value="ice">Ice</option>
+                                <option value="poison">Poison</option>
+                                <option value="psychic">Psychic</option>
+                                <option value="rock">Rock</option>
+                                <option value="steel">Steel</option>
+                                <option value="water">Water</option>
+                            </select>
+                            <span>Type</span>
+                        </span>
+                    </div>
+                    <div style="margin-bottom:5px;" >
+                        <input type="hidden" class="creature-toggle" name="attr_creature_mode"   value="0" />
+                        <span class="field-labeled" style="width:120px;">
+                            <input type="text" name="attr_gender" title="@{gender}" style="text-align:center" />
+                            <span>Gender</span>
+                        </span>
+                        <span class="field-labeled" style="width:100px">
+                            <select name="attr_character_nature" title="@{character_nature}" >
+                                <option value="Adamant">Adamant</option>
+                                <option value="Bashful">Bashful</option>
+                                <option value="Bold">Bold</option>
+                                <option value="Brave">Brave</option>
+                                <option value="Calm">Calm</option>
+                                <option value="Careful">Careful</option>
+                                <option value="Docile">Docile</option>
+                                <option value="Gentle">Gentle</option>
+                                <option value="Hardy">Hardy</option>
+                                <option value="Hasty">Hasty</option>
+                                <option value="Impish">Impish</option>
+                                <option value="Jolly">Jolly</option>
+                                <option value="Lax">Lax</option>
+                                <option value="Lonely">Lonely</option>
+                                <option value="Mild">Mild</option>
+                                <option value="Modest">Modest</option>
+                                <option value="Naive">Naive</option>
+                                <option value="Naughty">Naughty</option>
+                                <option value="Quiet">Quiet</option>
+                                <option value="Quirky">Quirky</option>
+                                <option value="Rash">Rash</option>
+                                <option value="Relaxed">Relaxed</option>
+                                <option value="Sassy">Sassy</option>
+                                <option value="Serious">Serious</option>
+                                <option value="Timid">Timid</option>
+                            </select>
+                            <span >Nature</span>
+                        </span>
+                        <span class="field-labeled sheet-trainer-only" style="width:70px;text-align:center">
+                            <input type="number" name="attr_age" title="@{age}" />
+                            <span>Age</span>
+                        </span>
+                    </div>
+                    <div class="sheet-trainer-only" style="margin-bottom:5px;" >
+                        <span class="field-labeled" style="width:100px;text-align:center">
+                            <input type="number" name="attr_money" title="@{money}" />
+                            <span>Money</span>
+                        </span>
+                        <span class="field-labeled" style="width:100px;text-align:center">
+                            <input type="number" name="attr_cheer" title="@{cheer}" />
+                            <span>Cheer Points</span>
+                        </span>
+                    </div>
+                    <div class="sheet-pokemon-only sheet-PMD-only" style="margin-bottom:5px;" >
+                        <span class="field-labeled" style="width:100px;text-align:center">
+                            <input type="number" name="attr_money" title="@{money}"  />
+                            <span>Apples</span>
+                        </span>
+                    </div>
+                    <div style="margin-bottom:5px;" class="sheet-pokemon-only">
+                        <span class="field-labeled" style="width:120px;">
+                            <input type="text" name="attr_size" title="@{size}" style="text-align:center" />
+                            <span>Size</span>
+                        </span>
+                        <span class="field-labeled" style="width:120px;">
+                            <input type="text" name="attr_weight" title="@{weight}" style="text-align:center" />
+                            <span>Weight</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="sheet-right-col" >
+                    <input type="hidden" class="creature-toggle" name="attr_creature_mode"   value="0" />
+                    <div class="pokemon-only">
+                        <div>
+                            <span class="field-labeled" style="width:170px;text-align:center">
+                                <input  type="text" name="attr_ability" title="@{ability}" />
+                                <span>Ability</span>
+                            </span>
+                            <button type="roll" name="roll_ability_chance" 
+                            value="@{whisper} &{template:PMD} {{name= @{ability} }} {{character= @{character_name} }} {{description= @{ability_descr} }}"></button>
+                        </div>
+                        <div>
+                            <textarea name="attr_ability_descr" title="@{ability_descr}" style="height:75px; margin-bottom:0px;"></textarea>
+                        </div>
+                    </div>
+                    <div class="trainer-only">
+                        <div style="margin-bottom:10px">
+                            <span class="party-pokeball">
+                                <input type="hidden" class="pokeball-state" name="attr_pokemon_slot_1_state"  value="0" />
+                                <input type="radio" name="attr_pokemon_slot_1_state" title="@{pokemon_slot_1_state}" class="pokeball-state-locked" value="0"/>
+                                <input type="radio" name="attr_pokemon_slot_1_state" title="@{pokemon_slot_1_state}" class="pokeball-state-closed" value="1"/>
+                                <input type="radio" name="attr_pokemon_slot_1_state" title="@{pokemon_slot_1_state}" class="pokeball-state-opened" value="2"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-closed.png" title="Closed" class="pokeball-state-closed"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-opened.png" title="Opened" class="pokeball-state-opened"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-locked.png" title="Locked" class="pokeball-state-locked"/>
+                                <input type="text" name="attr_pokemon_slot_1" />
+                            </span>
+                            <span class="party-pokeball">
+                                <input type="hidden" class="pokeball-state" name="attr_pokemon_slot_2_state" value="0" />
+                                <input type="radio" name="attr_pokemon_slot_2_state" title="@{pokemon_slot_2_state}" class="pokeball-state-locked" value="0"/>
+                                <input type="radio" name="attr_pokemon_slot_2_state" title="@{pokemon_slot_2_state}" class="pokeball-state-closed" value="1"/>
+                                <input type="radio" name="attr_pokemon_slot_2_state" title="@{pokemon_slot_2_state}" class="pokeball-state-opened" value="2"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-closed.png" title="Closed" class="pokeball-state-closed"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-opened.png" title="Opened" class="pokeball-state-opened"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-locked.png" title="Locked" class="pokeball-state-locked"/>
+                                <input type="text" name="attr_pokemon_slot_2" />
+                            </span>
+                        </div>
+                        <div style="margin-bottom:10px">
+                            <span class="party-pokeball">
+                                <input type="hidden" class="pokeball-state" name="attr_pokemon_slot_3_state" value="0" />
+                                <input type="radio" name="attr_pokemon_slot_3_state" title="@{pokemon_slot_3_state}" class="pokeball-state-locked" value="0"/>
+                                <input type="radio" name="attr_pokemon_slot_3_state" title="@{pokemon_slot_3_state}" class="pokeball-state-closed" value="1"/>
+                                <input type="radio" name="attr_pokemon_slot_3_state" title="@{pokemon_slot_3_state}" class="pokeball-state-opened" value="2"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-closed.png" title="Closed" class="pokeball-state-closed"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-opened.png" title="Opened" class="pokeball-state-opened"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-locked.png" title="Locked" class="pokeball-state-locked"/>
+                                <input type="text" name="attr_pokemon_slot_3" />
+                            </span>
+                            <span class="party-pokeball">
+                                <input type="hidden" class="pokeball-state" name="attr_pokemon_slot_4_state" value="0" />
+                                <input type="radio" name="attr_pokemon_slot_4_state" title="@{pokemon_slot_4_state}" class="pokeball-state-locked" value="0"/>
+                                <input type="radio" name="attr_pokemon_slot_4_state" title="@{pokemon_slot_4_state}" class="pokeball-state-closed" value="1"/>
+                                <input type="radio" name="attr_pokemon_slot_4_state" title="@{pokemon_slot_4_state}" class="pokeball-state-opened" value="2"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-closed.png" title="Closed" class="pokeball-state-closed"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-opened.png" title="Opened" class="pokeball-state-opened"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-locked.png" title="Locked" class="pokeball-state-locked"/>
+                                <input type="text" name="attr_pokemon_slot_4" />
+                            </span>
+                        </div>
+                        <div style="margin-bottom:0px">
+                            <span class="party-pokeball">
+                                <input type="hidden" class="pokeball-state" name="attr_pokemon_slot_5_state" value="0" />
+                                <input type="radio" name="attr_pokemon_slot_5_state" title="@{pokemon_slot_5_state}" class="pokeball-state-locked" value="0"/>
+                                <input type="radio" name="attr_pokemon_slot_5_state" title="@{pokemon_slot_5_state}" class="pokeball-state-closed" value="1"/>
+                                <input type="radio" name="attr_pokemon_slot_5_state" title="@{pokemon_slot_5_state}" class="pokeball-state-opened" value="2"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-closed.png" title="Closed" class="pokeball-state-closed"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-opened.png" title="Opened" class="pokeball-state-opened"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-locked.png" title="Locked" class="pokeball-state-locked"/>
+                                <input type="text" name="attr_pokemon_slot_5" />
+                            </span>
+                            <span class="party-pokeball">
+                                <input type="hidden" class="pokeball-state" name="attr_pokemon_slot_6_state" value="0" />
+                                <input type="radio" name="attr_pokemon_slot_6_state" title="@{pokemon_slot_6_state}" class="pokeball-state-locked" value="0"/>
+                                <input type="radio" name="attr_pokemon_slot_6_state" title="@{pokemon_slot_6_state}" class="pokeball-state-closed" value="1"/>
+                                <input type="radio" name="attr_pokemon_slot_6_state" title="@{pokemon_slot_6_state}" class="pokeball-state-opened" value="2"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-closed.png" title="Closed" class="pokeball-state-closed"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-opened.png" title="Opened" class="pokeball-state-opened"/>
+                                <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/pokeball-state-locked.png" title="Locked" class="pokeball-state-locked"/>
+                                <input type="text" name="attr_pokemon_slot_6" />
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!----------------------------------------------------
+            Pokemon Weaknesses
+        ----------------------------------------------------->
+        
+        
+        
+        <script type="text/worker">
+// Pokemon Type Effectiveness Auto-Calculator
+// This script automatically calculates weaknesses, resistances, and immunities based on selected types
+
+// Type effectiveness chart - attacking type vs defending type
+// 2 = super effective, 0.5 = not very effective, 0 = no effect, 1 = normal
+const typeChart = {
+    normal:    { rock: 0.5, ghost: 0, steel: 0.5 },
+    fire:      { fire: 0.5, water: 0.5, grass: 2, ice: 2, bug: 2, rock: 0.5, dragon: 0.5, steel: 2 },
+    water:     { fire: 2, water: 0.5, grass: 0.5, ground: 2, rock: 2, dragon: 0.5 },
+    electric:  { water: 2, electric: 0.5, grass: 0.5, ground: 0, flying: 2, dragon: 0.5 },
+    grass:     { fire: 0.5, water: 2, grass: 0.5, poison: 0.5, flying: 0.5, bug: 0.5, rock: 2, ground: 2, steel: 0.5, dragon: 0.5 },
+    ice:       { fire: 0.5, water: 0.5, grass: 2, ice: 0.5, ground: 2, flying: 2, dragon: 2, steel: 0.5 },
+    fighting:  { normal: 2, ice: 2, poison: 0.5, psychic: 0.5, bug: 0.5, rock: 2, ghost: 0, dark: 2, steel: 2, flying: 0.5, fairy: 0.5 },
+    poison:    { grass: 2, poison: 0.5, ground: 0.5, rock: 0.5, ghost: 0.5, steel: 0, fairy: 2 },
+    ground:    { fire: 2, electric: 2, grass: 0.5, poison: 2, flying: 0, bug: 0.5, rock: 2, steel: 2 },
+    flying:    { electric: 0.5, grass: 2, ice: 0.5, fighting: 2, bug: 2, rock: 0.5, steel: 0.5 },
+    psychic:   { fighting: 2, poison: 2, psychic: 0.5, dark: 0, steel: 0.5 },
+    bug:       { fire: 0.5, grass: 2, fighting: 0.5, poison: 0.5, flying: 0.5, psychic: 2, ghost: 0.5, dark: 2, steel: 0.5, fairy: 0.5 },
+    rock:      { fire: 2, ice: 2, fighting: 0.5, ground: 0.5, flying: 2, bug: 2, steel: 0.5 },
+    ghost:     { normal: 0, psychic: 2, ghost: 2, dark: 0.5 },
+    dragon:    { dragon: 2, steel: 0.5, fairy: 0 },
+    dark:      { fighting: 0.5, psychic: 2, ghost: 2, dark: 0.5, fairy: 0.5 },
+    steel:     { fire: 0.5, water: 0.5, electric: 0.5, ice: 2, rock: 2, steel: 0.5, fairy: 2 },
+    fairy:     { fire: 0.5, poison: 0.5, fighting: 2, dragon: 2, dark: 2, steel: 0.5 }
+};
+
+// Function to calculate type effectiveness for a defending Pokemon
+function calculateTypeEffectiveness(defendingType1, defendingType2) {
+    // Convert types to lowercase to match the typeChart keys (if needed)
+    const defType1 = defendingType1 ? defendingType1.toLowerCase() : null;
+    const defType2 = defendingType2 ? defendingType2.toLowerCase() : null;
+    
+    // Initialize arrays for different effectiveness levels
+    const weaknesses = [];      // 2x damage (or 4x for dual weakness)
+    const resistances = [];     // 0.5x damage (or 0.25x for dual resistance)
+    const immunities = [];      // 0x damage
+    const superWeaknesses = []; // 4x damage (dual type weakness)
+    const superResistances = [];// 0.25x damage (dual type resistance)
+    
+    // Get all possible attacking types
+    const allTypes = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 
+                     'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 
+                     'dragon', 'dark', 'steel', 'fairy'];
+    
+    allTypes.forEach(attackingType => {
+        let effectiveness1 = 1; // Default neutral effectiveness
+        let effectiveness2 = 1; // Default neutral effectiveness
+        
+        // Check effectiveness against first type - FIXED: properly handle 0 values
+        if (defType1 && defType1 !== 'trainer' && typeChart[attackingType]) {
+            effectiveness1 = typeChart[attackingType][defType1] !== undefined ? typeChart[attackingType][defType1] : 1;
+        }
+        
+        // Check effectiveness against second type (if exists) - FIXED: properly handle 0 values
+        if (defType2 && defType2 !== 'trainer' && typeChart[attackingType]) {
+            effectiveness2 = typeChart[attackingType][defType2] !== undefined ? typeChart[attackingType][defType2] : 1;
+        }
+        
+        // Calculate combined effectiveness
+        const totalEffectiveness = effectiveness1 * effectiveness2;
+        
+        // Categorize based on total effectiveness
+        if (totalEffectiveness === 0) {
+            immunities.push(attackingType);
+        } else if (totalEffectiveness === 0.25) {
+            superResistances.push(attackingType);
+        } else if (totalEffectiveness === 0.5) {
+            resistances.push(attackingType);
+        } else if (totalEffectiveness === 2) {
+            weaknesses.push(attackingType);
+        } else if (totalEffectiveness === 4) {
+            superWeaknesses.push(attackingType);
+        }
+    });
+    
+    return {
+        immunities,
+        superResistances,
+        resistances,
+        weaknesses,
+        superWeaknesses
+    };
+}
+
+// Function to format type lists for display
+function formatTypeList(types) {
+    if (types.length === 0) return 'None';
+    return types.map(type => type.charAt(0).toUpperCase() + type.slice(1)).join(', ');
+}
+
+// Main function to update weakness/resistance fields
+function updateTypeEffectiveness() {
+    getAttrs(['type_1', 'type_2'], function(values) {
+        const type1 = values.type_1;
+        const type2 = values.type_2;
+        
+        // Skip calculation if no types are selected or if trainer is selected
+        if (!type1 || type1 === 'trainer') {
+            setAttrs({
+                weakness: 'None',
+                resistance: 'None',
+                immunity: 'None'
+            });
+            return;
+        }
+        
+        // Calculate effectiveness
+        const effectiveness = calculateTypeEffectiveness(type1, type2);
+        
+        // For debugging - show what we found
+        let debugInfo = `Type1:${type1} Type2:${type2} Imm:${effectiveness.immunities.length}`;
+        
+        // Format weakness string
+        let weaknessText = 'None';
+        if (effectiveness.superWeaknesses.length > 0) {
+            weaknessText = formatTypeList(effectiveness.superWeaknesses) + ' (4x)';
+            if (effectiveness.weaknesses.length > 0) {
+                weaknessText += ', ' + formatTypeList(effectiveness.weaknesses) + ' (2x)';
+            }
+        } else if (effectiveness.weaknesses.length > 0) {
+            weaknessText = formatTypeList(effectiveness.weaknesses);
+        }
+        
+        // Format resistance string
+        let resistanceText = 'None';
+        if (effectiveness.superResistances.length > 0) {
+            resistanceText = formatTypeList(effectiveness.superResistances) + ' (0.25x)';
+            if (effectiveness.resistances.length > 0) {
+                resistanceText += ', ' + formatTypeList(effectiveness.resistances) + ' (0.5x)';
+            }
+        } else if (effectiveness.resistances.length > 0) {
+            resistanceText = formatTypeList(effectiveness.resistances);
+        }
+        
+        // Format immunity string
+        const immunityText = formatTypeList(effectiveness.immunities);
+        
+        // Update the sheet attributes - temporarily show debug info in immunity field
+        setAttrs({
+    weakness: weaknessText,
+    resistance: resistanceText,
+    immunity: immunityText  // Remove the debug info
+});
+
+    });
+}
+
+// Event listeners for type changes
+on('change:type_1 change:type_2 sheet:opened', function(eventInfo) {
+    updateTypeEffectiveness();
+});
+
+// Additional event listener for creature mode changes to clear fields when switching to trainer
+on('change:creature_mode', function(eventInfo) {
+    getAttrs(['creature_mode'], function(values) {
+        // If switching to trainer mode, clear the type effectiveness fields
+        if (values.creature_mode === "0") {
+            setAttrs({
+                weakness: 'None',
+                resistance: 'None',
+                immunity: 'None'
+            });
+        } else {
+            // If switching to Pokemon mode, recalculate
+            updateTypeEffectiveness();
+        }
+    });
+});
+</script>
+        
+        
+        
+        
+        <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+        <div class="section resistance pokemon-only">
+                <div class="field-labeled" style="width:100%;margin-bottom:2px;">
+                    <input type="text" name="attr_weakness" title="@{weakness}" placeholder="None" readonly />
+                    <span>Weakness +6 Damage</span>
+                </div>
+                <div class="field-labeled" style="width:100%;margin-bottom:2px;">
+                    <input type="text" name="attr_resistance" title="@{resistance}" placeholder="None" readonly />
+                    <span>Resistance -6 Damage</span>
+                </div>
+                <div class="field-labeled" style="width:100%;margin-bottom:2px;">
+                    <input type="text" name="attr_immunity" title="@{immunity}" placeholder="None" readonly />
+                    <span>Immunity - No Damage</span>
+                </div>
+        </div>
+        
+        <!----------------------------------------------------
+            Attributes
+        ----------------------------------------------------->
+        <div class="section attributes">
+            <div class="grid">
+                <div class="left">
+                    <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+                    <div class="attribute-row">
+                        <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+                        <div class="battle strength">
+                            <label>Strength</label>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_strength" title="@{strength}" value="1" />
+                                <span title="">Base</span>
+                            </span>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_strength_rank" title="@{STRENGTH_rank}" value="0" />
+                                <span title="">Rank Up</span>
+                            </span>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_strength_bonus" title="@{strength_bonus}" min="-6" value="0" max="6" />
+                                <span title="">Temp</span>
+                            </span>
+                        </div>
+                        <div class="battle mod">
+                            <label>Str+</label>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_strengthmod" title="@{strengthmod}" value="0"  />
+                                <span title="">Base +</span>
+                            </span>
+                        </div>
+                        <div class="battle endurance">
+                            <label>Endurance</label>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_endurance" title="@{endurance}" value="1" />
+                                <span title="">Base</span>
+                            </span>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_endurance_rank" title="@{endurance_rank}" value="0" />
+                                <span title="">Rank Up</span>
+                            </span>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_endurance_bonus" title="@{endurance_bonus}" min="-6" value="0" max="6" />
+                                <span title="">Temp</span>
+                            </span>
+                        </div>
+                        <div class="battle mod">
+                            <label>End+</label>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_endurancemod" title="@{endurancemod}" value="0"  />
+                                <span title="">Base +</span>
+                            </span>
+                        </div>
+                        <div class="battle special">
+                            <label>Special</label>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_SPECIAL" title="@{SPECIAL}" value="1" />
+                                <span title="">Base</span>
+                            </span>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_SPECIAL_rank" title="@{SPECIAL_rank}" value="0" />
+                                <span title="">Rank Up</span>
+                            </span>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_SPECIAL_bonus" title="@{SPECIAL_bonus}" min="-6" value="0" max="6" />
+                                <span title="">Temp</span>
+                            </span>
+                        </div>
+                        <div class="battle mod">
+                            <label>Spe+</label>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_specialmod" title="@{specialmod}" value="0"  />
+                                <span title="">Base +</span>
+                            </span>
+                        </div>
+                        <div class="battle spirit">
+                            <label>Spirit</label>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_SPIRIT" title="@{SPIRIT}" value="1" />
+                                <span title="">Base</span>
+                            </span>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_SPIRIT_rank" title="@{SPIRIT_rank}" value="0" />
+                                <span title="">Rank Up</span>
+                            </span>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_SPIRIT_bonus" title="@{SPIRIT_bonus}" min="-6" value="0" max="6" />
+                                <span title="">Temp</span>
+                            </span>
+                        </div>
+                        <div class="battle mod">
+                            <label>Spirit+</label>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_spiritmod" title="@{spiritmod}" value="0"  />
+                                <span title="">Base +</span>
+                            </span>
+                        </div>
+                        <div class="battle dexterity">
+                            <label>Dexterity</label>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_DEXTERITY" title="@{DEXTERITY}" value="1" />
+                                <span title="">Base</span>
+                            </span>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_DEXTERITY_rank" title="@{DEXTERITY_rank}" value="0" />
+                                <span title="">Rank Up</span>
+                            </span>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_DEXTERITY_bonus" title="@{DEXTERITY_bonus}" min="-6" value="0" max="6" />
+                                <span title="">Temp</span>
+                            </span>
+                        </div>
+                        <div class="battle mod">
+                            <label>Dex+</label>
+                            <span class="field-labeled">
+                                <input type="number" name="attr_dexteritymod" title="@{dexteritymod}" value="0"  />
+                                <span title="">Base +</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="attribute-row">
+                        <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+                        <div class="battle trainer-only" style="visibility:hidden;">
+                            <label></label>
+                            <span class="field-labeled"></span>
+                            <span class="field-labeled"></span>
+                            <span class="field-labeled"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="right">
+                    <div class="hp-will">
+                        <strong style="display:inline-block;width:48px;text-align:center;">HP</strong>
+                        <span class="field-labeled" >
+                            <input type="number" name="attr_hp" title="@{hp}" min="0" value="0" />
+                            <span title="">Current</span>
+                        </span>
+                        <strong>/</strong>
+                        <span class="field-labeled">
+                            <input type="number" name="attr_hp_max" title="@{hp_max}" value="@{hp_calc}" disabled="true" />
+                            <span title="">Total</span>
+                        </span>
+                    </div>
+                    <div class="hp-will">
+                        <span class="field-labeled">
+                            <input type="number" name="attr_hp_rank" title="@{hp_rank}" value="0" />
+                            <span title="">Rank Up</span>
+                        </span>
+                        <strong>         </strong>
+                        <span class="field-labeled">
+                            <input type="number" name="attr_hp_base" title="@{hp_base}" min="0" value="5" />
+                            <span title="">Base</span>
+                        </span>
+                    </div>
+                      <br>
+                    <div class="hp-will">
+                        <strong style="display:inline-block;width:120px;text-align:right;">Hit Chance</strong>
+                        <span class="field-labeled" >
+                            <input type="number" name="attr_hitc" title="@{hitc}" value="@{hitc_calc} - @{para_dex}" disabled="true"/>
+                            <span title="">Current</span>
+                        </span>
+                    </div>
+                    <div class="hp-will">
+                        <strong style="display:inline-block;width:120px;text-align:right;">EP</strong>
+                        <span class="field-labeled" >
+                            <input type="number" name="attr_exp" title="@{exp}" min="0" value="0" />
+                            <span title="">Unspent</span>
+                        </span>
+                        <strong>/</strong>
+                        <span class="field-labeled">
+                            <input type="number" name="attr_exp_max" title="@{exp_max}" min="0" value="0" />
+                            <span title="">Spent</span>
+                        </span>
+                    </div>
+                    <div class="hp-will">
+                        <strong style="display:inline-block;width:120px;text-align:right;">Evasion</strong>
+                        <span class="field-labeled" >
+                            <input type="number" name="attr_evasion" title="@{evasion}" min="0" value="0" />
+                            <span title="">Current</span>
+                        </span>
+                    </div>
+                     <div class="hp-will">
+                        <strong style="display:inline-block;width:120px;text-align:right;">Accuracy</strong>
+                        <span class="field-labeled" >
+                            <input type="number" name="attr_accuracy" title="@{accuracy}" min="0" value="0" />
+                            <span title="">Current</span>
+                        </span>
+                    </div>
+                    <div class="hp-will">
+                        <strong style="display:inline-block;width:120px;text-align:right;">Exhaustion</strong>
+                        <span class="field-labeled" >
+                            <input type="number" name="attr_exhaustion" title="@{exhaustion}" min="0" value="0" />
+                            <span title="">Current</span>
+                        </span>
+                    </div>
+                    <div class="hp-will">
+                        <strong style="display:inline-block;width:40px;">Pain</strong>
+                        <span class="field-labeled" >
+                            <input type="number" name="attr_pain" title="@{pain}" min="0" value="0" />
+                            <span title="">current</span>
+                        </span>
+                         <strong>/</strong>
+                        <span class="field-labeled">
+                            <input type="number" name="attr_pain_max" title="@{pain_max}" value="@{pain} + @{pain_mod}" disabled="true"/>
+                            <span title="">Max</span>
+                        </span>
+                        <span class="field-labeled">
+                            <input type="number" name="attr_pain_mod" title="@{pain_mod}" min="0" value="0" />
+                            <span title="">Mod</span>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="sheet-bonuses">
+                    <div>
+                        <!-- Initiative -->
+                        <div>
+                            <span style="display:inline-block;width:160px">
+                                <span style="display:inline-block;width:100%">
+                                    <strong>Dexterity</strong>
+                                </span>
+                            </span>
+                            <span style="display:inline-block;width:120px">
+                                <span class="field-labeled"  style="display:inline-block;width:50px">
+                                    <input type="number" name="attr_initiative_calc" title="@{initiative_calc}" value="(@{dexterity_calc})+@{initiative_mod}-@{para_dex}" disabled="true" />
+                                    <span title="">Total</span>
+                                </span>
+                                <span class="field-labeled" style="display:inline-block;width:60px">
+                                    <input type="number" name="attr_initiative_mod" title="@{initiative_mod}" value="0"  />
+                                    <span title="">Mod</span>
+                                </span>
+                            </span>
+                            <span style="display:inline-block;width:110px">
+                                <button type="roll" name="roll_initiative" value="@{whisper} &{template:default} {{name= Initiative }} {{character= @{character_name} }} {{roll=[[(@{initiative_calc}) + (1d20/100) &{tracker}]]}}">Initiative</button>
+                            </span>
+                        </div>
+                        <!-- Evade -->
+                        <div>
+                            <span style="display:inline-block;width:160px">
+                                <strong>Dexterity + 1d20</strong>
+                            </span>
+                            <span style="display:inline-block;width:120px">
+                                <span class="field-labeled"  style="display:inline-block;width:50px">
+                                    <input type="number" name="attr_evade_calc" title="@{evade_calc}" value="(@{dexterity_calc}) + @{evade_mod} - @{exhaustion} - @{para_dex}" disabled="true"/>
+                                    <span title="">Total</span>
+                                </span>
+                                <span class="field-labeled" style="display:inline-block;width:60px">
+                                    <input type="number" name="attr_evade_mod" title="@{evade_mod}" value="0"  />
+                                    <span title="">Mod</span>
+                                </span>
+                            </span>
+                            <span style="display:inline-block;width:110px">
+                               <button type="roll" name="roll_evade"
+                            value="@{whisper} &{template:default} {{name= Dodge}} {{character= @{character_name} }} {{roll= [[1d20+@{evade_calc}]]}}">Dodge</button>
+                            </span>
+                        </div> 
+
+                        <!-- Clash -->
+                        <div>
+                            <span style="display:inline-block;width:160px">
+                                <select name="attr_clash_attribute" value="@{strength_calc}" title="@{clash_attribute}" style="width:auto" >
+                                    <option value="@{strength_calc}">Strength</option>
+                                    <option value="@{special_calc}">Special</option>
+                                </select>
+                                <strong>+ 1d20</strong>
+                            </span>
+                            <span style="display:inline-block;width:120px">
+                                <span class="field-labeled sheet-field-readonly"  style="display:inline-block;width:50px">
+                                    <input type="number" name="attr_clash_calc" title="@{clash_calc}" value="@{clash_attribute} + @{clash_mod} - @{exhaustion}" disabled="true"/>
+                                    <span title="">Total</span>
+                                </span>
+                                <span class="field-labeled " style="display:inline-block;width:60px">
+                                    <input type="number" name="attr_clash_mod" title="@{clash_mod}" value="0"  />
+                                    <span title="">Mod</span>
+                                </span>
+                            </span>
+                            <span style="display:inline-block;width:110px">
+                               <button type="roll" name="roll_clash"
+                            value="@{whisper} &{template:default}{{character= @{character_name} }}{{name= Clash }}{{roll= [[1d20+(@{clash_calc})]]}}">Clash</button>
+                            </span>
+                        </div>
+                    </div>
+                    <div style="box-sizing: border-box;-webkit-box-sizing: border-box;">
+                        <!-- Defenses -->
+                        <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+                        <div>
+                            <strong>Endurance + </strong>
+                            <span class="field-labeled" style="display:inline-block;width:100px;text-align:center">
+                                <input type="number" name="attr_defense_mod" title="@{defense_mod}"  value="0" />
+                                <span title="">Def Mod</span>
+                            </span>
+                            <strong>→</strong>
+                            <span class="field-labeled sheet-field-readonly" style="display:inline-block;width:70px;text-align:center">
+                                <input type="number" name="attr_defense_calc" title="@{defense_calc}" value="@{endurance_calc}+@{defense_mod}" disabled="true"/>
+                                <span title="">Def</span>
+                            </span>
+                        </div>
+
+                        <input type="hidden" class="options-toggle" name="attr_options_mode" value="0" />
+                        <div class="no-options">
+                            <strong>Spirit + </strong>
+                            <span class="field-labeled" style="display:inline-block;width:100px;text-align:center">
+                                <input type="number" name="attr_spdefense_mod" title="@{spdefense_mod}"  value="0"  />
+                                <span title="">Sp.Def Mod</span>
+                            </span>
+                            <strong>→</strong>
+                            <span class="field-labeled sheet-field-readonly no-options" style="display:inline-block;width:70px;text-align:center">
+                                <input type="number" name="attr_spdefense_calc" title="@{spdefense_calc}" value="@{spirit_calc}+@{spdefense_mod}" disabled="true"/>
+                                <span title="">Sp.Def</span>
+                            </span>
+                        </div>
+                        <div class="use-options">
+                            <strong>Insight + </strong>
+                            <span class="field-labeled" style="display:inline-block;width:100px;text-align:center">
+                                <input type="number" name="attr_spdefense_mod" title="@{spdefense_mod}"  value="0"  />
+                                <span title="">Sp.Def Mod</span>
+                            </span>
+                            <strong>→</strong>
+                            <span class="field-labeled sheet-field-readonly" style="display:inline-block;width:70px;text-align:center">
+                                <input type="number" name="attr_spdefense_option_calc" title="@{spdefense_option_calc}" value="@{insight_calc}+@{spdefense_mod}" disabled="true"/>
+                                <span title="">Sp.Def</span>
+                            </span>
+                        </div>
+
+                        <div style="height:10px;"></div>
+                        
+                        <div class="sheet-trainer-only">
+                            <span class="field-labeled sheet-field-readonly" style="display:inline-block;width:120px;text-align:center">
+                                    <select name="attr_pokeball_current" title="@{pokeball_current}">
+                                            <option value="0">Pokeball (0)</option>
+                                            <option value="4">Great Ball (4)</option>
+                                            <option value="8">Ultra Ball (8)</option>
+                                            <option value="15">Dive Ball (15)</option>
+                                            <option value="18">Dream Ball (18)</option>
+                                            <option value="12">Dusk Ball (12)</option>
+                                            <option value="18">Fast Ball (18)</option>
+                                            <option value="0">Friend Ball (0)</option>
+                                            <option value="0">Heal Ball (0)</option>
+                                            <option value="12">Heavy Ball (12)</option>
+                                            <option value="0">Level Ball (X)</option>
+                                            <option value="42">Love Ball (42)</option>
+                                            <option value="18">Lure Ball (18)</option>
+                                            <option value="0">Luxury Ball (0)</option>
+                                            <option value="18">Moon Ball (18)</option>
+                                            <option value="12">Nest Ball (12)</option>
+                                            <option value="15">Net Ball (15)</option>
+                                            <option value="0">Premier Ball (0)</option>
+                                            <option value="24">Quick Ball (24)</option>
+                                            <option value="15">Repeat Ball (15)</option>
+                                            <option value="0">Timer Ball (X)</option>
+                                    </select>
+                                    <span title="">Pokeball</span>
+                            </span>
+                            <strong>+ Mod</strong>
+                            <span style="display:inline-block;width:70px">
+                            <button type="roll" style="display: block; width: auto ; margin: 3px auto;padding: 3px 20px;"
+                                value="@{whisper} &{template:default}{{name= Pokeball Seal Check}}{{character= @{character_name} }} {{Variable Bonus= ?{Variable Bonus|0}}}  {{roll= [[1d20 + @{pokeball_current} - @{pain_max} + ?{Variable Bonus}]]}}">Catch</button>
+                            </span>
+                        </div>
+                        <div class="conditions-row">
+                            <strong style="display:inline-block;width:80px">Confused</strong>
+                            <input type="checkbox" name="attr_is_confused" title="@{is_confused}" />
+                            <strong style="display:inline-block;width:80px">Infatuated</strong>
+                            <input type="checkbox" name="attr_is_infatuated" title="@{is_infatuated}" />
+                        </div>
+                        <div class="conditions-row">
+                            <strong style="display:inline-block;width:80px">Flinched</strong>
+                            <input type="checkbox" name="attr_is_flinched" title="@{is_flinched}" />
+                            <strong style="display:inline-block;width:80px">Disabled</strong>
+                            <input type="checkbox" name="attr_is_disabled" title="@{is_disabled}" />
+                        </div>
+                        <div class="conditions-row">
+                            <strong style="display:inline-block;width:80px">Asleep</strong>
+                            <input type="checkbox" name="attr_is_asleep" title="@{is_asleep}" />
+                             <strong style="display:inline-block;width:80px">Burned</strong>
+                            <input type="checkbox" name="attr_is_burned" title="@{is_burned}" value="1/2 Physical Damage" />
+                        </div>
+                        <div class="conditions-row">
+                            <strong style="display:inline-block;width:80px">Frostbitten</strong>
+                            <input type="checkbox" name="attr_is_frostbitten" title="@{is_frostbitten}" value="1/2 Special Damage" />
+                            <strong style="display:inline-block;width:80px">Paralyzed</strong>
+                            <input type="checkbox" name="attr_is_paralyzed" title="@{is_paralyzed}" />
+                        </div>
+                        <div class="conditions-row">
+                            <strong style="display:inline-block;width:80px">Poisoned</strong>
+                            <input type="checkbox" name="attr_is_poisoned" title="@{is_poisoned}" />
+                            <strong style="display:inline-block;width:80px">B. Poisoned</strong>
+                            <input type="checkbox" name="attr_is_badlypoisoned" title="@{is_badlypoisoned}" />
+                        </div>
+                    </div>
+            </div>
+            
+            
+            
+            <div class="sheet-bonuses">
+                        <!-- Generic Rolls -->
+                        <div class="generic-roll">
+                            <strong>Generic Roll:</strong>
+                                <span class="field-labeled" style="width:100px">
+                                    <select name="attr_generic_attribute" title="@{generic_attribute}">
+                                        <option value="0">-</option>
+                                        <option value="@{strength_calc}">Strength</option>
+                                        <option value="@{endurance_calc}">Endurance</option>
+                                        <option value="@{special_calc}">Special</option>
+                                        <option value="@{spirit_calc}">Spirit</option>
+                                        <option value="@{dexterity_calc}">Dexterity</option>
+                                    </select>
+                                    <span title="">Attribute</span>
+                                </span>
+                                <strong>+</strong>
+                                <span class="field-labeled" style="width:100px">
+                                    <select name="attr_generic_specialty" title="@{generic_specialty}">
+                                        <option value="0">-</option>
+                                        <option value="@{Athletics}">Athletics</option>
+                                            <option value="@{Finesse}">Finesse</option>
+                                            <option value="@{deception}">Deception</option>
+                                            <option value="@{science}">Science</option>
+                                            <option value="@{nature}">Nature</option>
+                                            <option value="@{channel}">Channel</option>
+                                            <option value="@{performance}">Performance</option>
+                                            <option value="@{intimidation}">Intimidation</option>
+                                            <option value="@{medicine}">Medicine</option>
+                                            <option value="@{insight}">Insight</option>
+                                            <option value="@{alert}">Alert</option>
+                                            <option value="@{stealth}">Stealth</option>
+                                            <option value="@{empathy}">Empathy</option>
+                                            <option value="@{lore}">Lore</option>
+                                            <option value="@{custom}">Custom</option>
+                                    </select>
+                                    <span title="">Skill</span>
+                                </span>
+                                <strong>+ Mod</strong>
+                                <button type="roll" name="roll_generic" 
+                                value="@{whisper} &{template:default}{{character= @{character_name}}}{{name= Generic Roll }}{{roll=[[1d20+(@{move_generic_calc}) - @{pain_max}]] }}">Roll</button>
+                        </div>
+                            <span>
+                                <button type="roll" style="display: inline-block; width: auto ; margin: 0 auto;padding: 3px 20px;"
+                                value="@{whisper} &{template:default}{{name= Luck Die }}{{character= @{character_name}}}{{roll=[[1d20]]}}">Luck Die</button>
+                            </span>
+                    </div>
+        </div>
+
+
+
+<!----------------------------------------------------
+            Pokemon Attitude
+        ----------------------------------------------------->
+        <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+        <div class="section attitudes sheet-pokemon-only">
+            <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+            <span class="PMD-swap-wrapper">
+                <input type="hidden" name="attr_PMD_mode" class="PMD-toggle" value="0" />
+                <input type="checkbox" name="attr_PMD_mode"  value="1" title="Core or PMD" />
+                <img class="PMD-only" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/PMD-Badge-Icon.png" />
+                <img class="Core-only" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pokerole_v2/images/Pokeball-Min-Icon.png" />
+            </span>
+            <div class="sheet-attitude-grid" style="background:#26b7b4;border-radius:10px; padding: 5px 0px;">
+                <input type="hidden" name="attr_PMD_mode" class="PMD-toggle" value="0" />
+                <div class="Core-only sheet-attitude-grid" style="width:45%;margin:0 auto;">
+                    <div style="display:inline-block;">
+                        <label style="display:block;text-align:center">Happiness</label>
+                        <span class="field-labeled" style="display:block;width:100px;margin:0 auto;text-align:center">
+                            <input type="number" name="attr_happiness" title="@{happiness}" min="0" value="2" max="5" />
+                        </span>
+                    </div>
+                    <div style="display:inline-block;">
+                        <label style="display:block;text-align:center">Loyalty</label>
+                        <span class="field-labeled" style="display:block;width:100px;margin:0 auto;text-align:center">
+                            <input type="number" name="attr_loyalty" title="@{loyalty}" min="0" value="2" max="5" />
+                        </span>
+                    </div>
+                    <div style="display:inline-block;">
+                        <label style="display:block;text-align:center">Beautiful</label>
+                        <span class="field-labeled" style="display:block;width:100px;margin:0 auto;text-align:center">
+                            <input type="number" name="attr_Beautiful" title="@{Beautiful}" min="0" value="0" max="5" />
+                        </span>
+                    </div>
+                    <div style="display:inline-block;">
+                        <label style="display:block;text-align:center">Clever</label>
+                        <span class="field-labeled" style="display:block;width:100px;margin:0 auto;text-align:center">
+                            <input type="number" name="attr_Clever" title="@{Clever}" min="0" value="0" max="5" />
+                        </span>
+                    </div>
+                    <div style="display:inline-block;">
+                        <label style="display:block;text-align:center">Cool</label>
+                        <span class="field-labeled" style="display:block;width:100px;margin:0 auto;text-align:center">
+                            <input type="number" name="attr_Cool" title="@{Cool}" min="0" value="0" max="5" />
+                        </span>
+                    </div>
+                    <div style="display:inline-block;">
+                        <label style="display:block;text-align:center">Cute</label>
+                        <span class="field-labeled" style="display:block;width:100px;margin:0 auto;text-align:center">
+                            <input type="number" name="attr_Cute" title="@{Cute}" min="0" value="0" max="5" />
+                        </span>
+                    </div>
+                    <div style="display:inline-block;">
+                        <label style="display:block;text-align:center">Tough</label>
+                        <span class="field-labeled" style="display:block;width:100px;margin:0 auto;text-align:center">
+                            <input type="number" name="attr_Tough" title="@{Tough}" min="0" value="0" max="5" />
+                        </span>
+                    </div>
+                    <div style="display:inline-block;">
+                         <input type="text" name="attr_extra_custom_name2" title="@{extra_custom_name2}" placeholder="Custom" style="margin-left:10px;text-align:center;width:80px;border:none;border-bottom:2px;" />
+                        <span class="field-labeled" style="display:block;width:100px;margin:0 auto;text-align:center">
+                            <input type="number" name="attr_extra_custom_2" title="@{extra_custom_2}" min="0" value="0" max="5" />
+                        </span>
+                    </div>
+                </div>
+                
+
+                <div class="PMD-only sheet-attitude-grid" style="width:70%;margin:0 auto;">
+                    <div style="display:inline-block;">
+                        <label style="display:block;text-align:center">Logic</label>
+                        <span class="field-labeled" style="display:block;width:100px;margin:0 auto;text-align:center">
+                            <input type="number" name="attr_logic" title="@{logic}" min="0" value="2" max="5" />
+                        </span>
+                    </div>
+                    <div style="display:inline-block;">
+                        <label style="display:block;text-align:center">Instinct</label>
+                        <span class="field-labeled" style="display:block;width:100px;margin:0 auto;text-align:center">
+                            <input type="number" name="attr_instinct" title="@{instinct}" min="0" value="2" max="5" />
+                        </span>
+                    </div>
+                    <div style="display:inline-block;">
+                        <label style="display:block;text-align:center">Primal</label>
+                        <span class="field-labeled" style="display:block;width:100px;margin:0 auto;text-align:center">
+                            <input type="number" name="attr_primal" title="@{primal}" min="0" value="2" max="5" />
+                        </span>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+        
+
+
+
+
+
+        <!----------------------------------------------------
+            Skills
+        ----------------------------------------------------->
+        <div class="section skills">
+            <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+            <div class="skills-main">
+                <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+                <div class="skills-col">
+                    <label ></label>
+                </div>
+                <div class="skills-col">
+                    <label >Skills</label>
+                </div>
+                <div class="skills-col">
+                    <label ></label>
+                </div>
+            </div>
+
+            <div class="skills-sub">
+                <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+                <div class="skills-col">
+                    <div>
+                        <strong>Athletics</strong>
+                        <input type="number" name="attr_athletics" title="@{athletics}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Finesse</strong>
+                        <input type="number" name="attr_finesse" title="@{finesse}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Deception</strong>
+                        <input type="number" name="attr_deception" title="@{deception}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Science</strong>
+                        <input type="number" name="attr_science" title="@{science}" min="0" value="0" max="10" />
+                    </div>
+                     <div>
+                        <strong>Nature</strong>
+                        <input type="number" name="attr_nature" title="@{nature}" min="0" value="0" max="10" />
+                    </div>
+                </div>
+                <div class="skills-col">
+                    <div>
+                        <strong>Channel</strong>
+                        <input type="number" name="attr_channel" title="@{channel}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Performance</strong>
+                        <input type="number" name="attr_performance" title="@{performance}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Intimidation</strong>
+                        <input type="number" name="attr_intimidation" title="@{intimidation}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Medicine</strong>
+                        <input type="number" name="attr_medicine" title="@{medicine}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Insight</strong>
+                        <input type="number" name="attr_insight" title="@{insight}" min="0" value="0" max="10" />
+                    </div>
+                </div>
+                <div class="skills-col">
+                    <div>
+                        <strong>Alert</strong>
+                        <input type="number" name="attr_alert" title="@{alert}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Stealth</strong>
+                        <input type="number" name="attr_stealth" title="@{stealth}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Empathy</strong>
+                        <input type="number" name="attr_empathy" title="@{empathy}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Lore</strong>
+                        <input type="number" name="attr_lore" title="@{lore}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <input type="text" name="attr_extra_custom_name" title="@{extra_custom_name}" placeholder="Custom" style="margin-left:20px;text-align:right;width:80px;border:none;border-bottom:2px;" />
+                        <input type="number" name="attr_custom" title="@{custom}" min="0" value="0" max="10" />
+                    </div>
+                </div>
+            </div>
+
+            <input type="hidden" class="contest-toggle" name="attr_rank_contest"  value="0" />
+            <div class="skills-title trainer-only contest-mode">
+                <div>
+                    <label>Notoriety Skills</label>
+                </div>
+            </div>
+            <div class="skills-contest trainer-only contest-mode">
+                <div class="skills-col">
+                    <div>
+                        <strong>Connections</strong>
+                        <input type="number" name="attr_connections" title="@{connections}" min="0" value="0" max="5" />
+                    </div>
+                </div>
+                <div class="skills-col">
+                    <div>
+                        <strong>Fame</strong>
+                        <input type="number" name="attr_fame" title="@{fame}" min="0" value="0" max="5" />
+                    </div>
+                </div>
+                <div class="skills-col">
+                    <div>
+                        <strong>Sponsors</strong>
+                        <input type="number" name="attr_sponsors" title="@{sponsors}" min="0" value="0" max="5" />
+                    </div>
+                </div>
+                <div class="skills-col">
+                    <div>
+                        <strong>Supporters</strong>
+                        <input type="number" name="attr_supporters" title="@{supporters}" min="0" value="0" max="5" />
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+         <div class="section skills">
+            <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+            <div class="skills-main">
+                <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+                <div class="skills-col pokemon-only">
+                    <label ></label>
+                </div>
+                <div class="skills-col pokemon-only">
+                    <label >Vitamins</label>
+                </div>
+                <div class="skills-col pokemon-only">
+                    <label ></label>
+                </div>
+            </div>
+
+            <div class="skills-sub">
+                <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+                <div class="skills-col pokemon-only">
+                    <div>
+                        <strong>Calcium</strong>
+                        <input type="number" name="attr_calcium" title="@{calcium}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Carbos</strong>
+                        <input type="number" name="attr_carbos" title="@{carbos}" min="0" value="0" max="10" />
+                    </div>
+                </div>
+                <div class="skills-col pokemon-only">
+                    <div>
+                        <strong>HP UP</strong>
+                        <input type="number" name="attr_hpup" title="@{hpup}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Iron</strong>
+                        <input type="number" name="attr_iron" title="@{iron}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>PP UP</strong>
+                        <input type="number" name="attr_ppup" title="@{ppup}" min="0" value="0" max="10" />
+                    </div>
+                </div>
+                <div class="skills-col pokemon-only">
+                    <div>
+                        <strong>Protein</strong>
+                        <input type="number" name="attr_protein" title="@{protein}" min="0" value="0" max="10" />
+                    </div>
+                    <div>
+                        <strong>Zinc</strong>
+                        <input type="number" name="attr_zinc" title="@{zinc}" min="0" value="0" max="10" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!----------------------------------------------------
+            Inventory
+        ----------------------------------------------------->
+        <div class="section inventory">
+            <div class="inventory-divide">
+                <div class="inventory-small">
+                    <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+                    <div class="inventory-potions trainer-only" style="margin-bottom:3px;">
+                        <div>
+                            <label style="display: inline-block ; width: 80px;text-align:center">Potion</label>
+                            <strong>x</strong>
+                            <span class="field-labeled" style="width:70px">
+                                <input type="number" name="attr_potion_count" title="@{potion_count}" min="0" value="0"  />
+                                <span>Count</span>
+                            </span>
+                            <span class="field-labeled" style="width:70px">
+                                <input type="number" name="attr_potion_use_max" title="@{potion_use_max}" value="4" disabled="true"    />
+                                <span>HP Restored</span>
+                            </span>
+                        </div>
+                        <div>
+                            <label style="display: inline-block ; width: 80px;text-align:center">Super Potion</label>
+                            <strong>x</strong>
+                            <span class="field-labeled" style="width:70px">
+                                <input type="number" name="attr_superPotion_count" title="@{superPotion_count}" min="0" value="0" />
+                                <span>Count</span>
+                            </span>
+                            <span class="field-labeled" style="width:70px">
+                                <input type="number" name="attr_superPotion_use_max" title="@{superPotion_use_max}" value="12" disabled="true"  />
+                                <span>HP Restored</span>
+                            </span>
+                        </div>
+                        <div>
+                            <label style="display: inline-block ; width: 80px;text-align:center">Hyper Potion</label>
+                            <strong>x</strong>
+                            <span class="field-labeled" style="width:70px">
+                                <input type="number" name="attr_hyperPotion_count" title="@{hyperPotion_count}" min="0" value="0"  />
+                                <span>Count</span>
+                            </span>
+                            <span class="field-labeled" style="width:70px">
+                                <input type="number" name="attr_hyperPotion_use_max" title="@{hyperPotion_use_max}" value="24" disabled="true"  />
+                                <span>HP Restored</span>
+                            </span>
+                        </div>
+                    </div>
+                    <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+                    <input type="hidden" name="attr_PMD_mode" class="PMD-toggle" value="0" />
+                    <div class="PMD-gear Core-only pokemon-only">
+                        <label class="header">Gear</label>
+                        <div>
+                            <span class="field-labeled" style="display:block">
+                                <input type="text" name="attr_heldItem" title="@{heldItem}"  />
+                                <span>Held Item</span>
+                            </span>
+                        </div>
+                        <div>
+                            <span class="field-labeled" style="display:block">
+                                <input type="text" name="attr_accessory1" title="@{accessory1}" />
+                                <span>Accessory</span>
+                            </span>
+                            <span class="field-labeled" style="display:block">
+                                <input type="text" name="attr_accessory2" title="@{accessory2}"  />
+                                <span>Accessory</span>
+                            </span>
+                            <span class="field-labeled" style="display:block">
+                                <input type="text" name="attr_accessory3"  title="@{accessory3}" />
+                                <span>Accessory</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="PMD-gear PMD-only">
+                        <label class="header">Gear</label>
+                        <div>
+                            <span class="field-labeled" style="display:block">
+                                <input type="text" name="attr_heldItem" title="@{heldItem}"  />
+                                <span>Held Item</span>
+                            </span>
+                        </div>
+                        <div>
+                            <span class="field-labeled" style="display:block">
+                                <input type="text" name="attr_accessory1" title="@{accessory1}" />
+                                <span>Garment</span>
+                            </span>
+                            <span class="field-labeled" style="display:block">
+                                <input type="text" name="attr_accessory2" title="@{accessory2}"  />
+                                <span>Garment</span>
+                            </span>
+                            <span class="field-labeled" style="display:block">
+                                <input type="text" name="attr_accessory3"  title="@{accessory3}" />
+                                <span>Garment</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="inventory-quick trainer-only">
+                        <label class="header">Trainer Specialties</label>
+                        <div>
+                            <fieldset class="repeating_quick-items" name="repeating_quick-items">
+                                <div class="quick-item">
+                                    <input type="number" name="attr_specialties_count" class="specialties-count" min="0" value="1"/>
+                                    <button type="roll" name="roll_specialties_chance" 
+                            value="@{whisper} &{template:default} {{character= @{character_name} }} {{Trainer Speciality= @{specialties} }}"></button>
+                               <textarea name="attr_specialties" title="@{specialties}" style="height: 30px;" style="width: 310px;"></textarea>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+                <div class="inventory-large">
+                    <label class="header">Bag</label>
+                    <div>
+                        <fieldset class="repeating_inventory" name="repeating_inventory">
+                            <div class="inventory-item">
+                                <input type="number" name="attr_inventory_item_count" class="item-count" min="0" value="1"/>
+                                <button type="roll" name="roll_bag_chance" 
+                            value="@{whisper} &{template:default} {{character= @{character_name} }} {{Item Description= @{notes2} }}"></button>
+                               <textarea name="attr_notes2" title="@{notes2}" style="height: 30px;" style="width: 310px;"></textarea>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+            <div class="achievements-divide">
+                <input type="hidden" class="creature-toggle" name="attr_creature_mode" value="0" />
+                <div class="inventory-badges trainer-only">
+                    <label class="header">Badges</label>
+                    <fieldset class="repeating_badges">
+                        <span class="field-labeled" style="width:160px;">
+                            <input type="text" name="attr_badge"/>
+                        </span>
+                    </fieldset>
+                </div>
+                <div class="inventory-badges pokemon-only">
+                    <label class="header">Ribbons & Awards</label>
+                    <fieldset class="repeating_awards">
+                        <span class="field-labeled">
+                            <input type="text" name="attr_award"/>
+                        </span>
+                    </fieldset>
+                </div>
+                <div class="inventory-notes">
+                    <label class="header">Notes & Achievements</label>
+                    <div class="textflex">
+                        <textarea name="attr_notes" title="@{notes}"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!----------------------------------------------------
+            Move
+        ----------------------------------------------------->
+        <div class="section moves">
+            <label class="header">Moves</label>
+            <fieldset class="repeating_moves">
+    <div class="move-item">
+        <span class="move-known-wrapper">
+            <input type="checkbox" name="attr_move_known" title="Move Known">
+            <span></span>
+        </span>
+        <input type="hidden" name="attr_move_accuracy_calc" value="@{rank} + @{move_accuracy_mod} + (@{accuracy} * 2)" disabled=true />
+        <input type="hidden" name="attr_move_damage_calc" value="@{move_damage_attribute} + @{move_power} + @{move_flatmod} + @{move_stab_auto}" />
+        <input type="hidden" name="attr_move_stab_auto" value="0" />
+                    <div class="move-header">
+                        <input type="hidden" name="attr_move_display_mode" class="move-display-toggle" value="0" />
+                        <div class="move-edit">
+                            <span class="field-labeled" style="width:200px">
+                                <input type="text" name="attr_move_name"  />
+                                <span>Move Name</span>
+                            </span>
+                            <span class="field-labeled" style="width:auto" >
+                                <select class="move-type" name="attr_move_type">
+                                    <option>-</option>
+                                    <option>Normal</option>
+                                    <option>Bug</option>
+                                    <option>Dark</option>
+                                    <option>Dragon</option>
+                                    <option>Electric</option>
+                                    <option>Fairy</option>
+                                    <option>Fighting</option>
+                                    <option>Fire</option>
+                                    <option>Flying</option>
+                                    <option>Ghost</option>
+                                    <option>Grass</option>
+                                    <option>Ground</option>
+                                    <option>Ice</option>
+                                    <option>Poison</option>
+                                    <option>Psychic</option>
+                                    <option>Rock</option>
+                                    <option>Steel</option>
+                                    <option>Water</option>
+                                </select> 
+                                <span>Type</span>
+                            </span>
+                            <span class="field-labeled" style="width:auto" >
+                                <select class="move_cat"name="attr_move_category">
+                                    <option>Physical</option>
+                                    <option>Special</option>
+                                    <option>Support</option>
+                                </select> 
+                                <span>Category</span>
+                            </span>
+                            <span class="field-labeled" style="width:180px">
+                                <select name="attr_move_target" style="width:100%">
+                                    <option>-</option>
+                                        <option>User</option>
+                                        <option>Single Ally</option>
+                                        <option>User & Allies</option>
+                                        <option>Single Target</option>
+                                        <option>Random Foe</option>
+                                        <option>Multiple Targets</option>
+                                        <option>Area</option>
+                                        <option>Battlefield</option>
+                                   
+                                </select>
+                                <span>Target</span>
+                            </span> 
+                            <span class="move-edit-toggle-wrapper">
+                                <input type="hidden" name="attr_move_display_mode" class="move-display-toggle" value="0"/>
+                                <input type="checkbox" name="attr_move_display_mode" value="1" /><p style="display:inline;"> Lock</p>
+                                <img class="move-edit" src="">
+                                <img class="move-display" src="">
+                            </span>
+                        </div>
+                        <div class="move-display">
+                            <span class="field-labeled" style="width:200px;">
+                                <span class="move-name" name="attr_move_name"  ></span>
+                                <span>Move Name</span>
+                            </span>
+                            <span class="field-labeled" style="width:120px;">
+                                <span class="move-type" name="attr_move_type" ></span>
+                                <span>Type</span>
+                            </span>
+                            <span class="field-labeled" style="width:120px;">
+                                <span class="move_cat" name="attr_move_category" ></span>
+                                <span>Category</span>
+                            </span>
+                            <span class="field-labeled" style="width:200px;">
+                                <span type="text" name="attr_move_target" ></span>
+                                <span>Target</span>
+                            </span> 
+                            <span class="move-edit-toggle-wrapper">
+                                <input type="hidden" name="attr_move_display_mode" class="move-display-toggle" value="0"/>
+                                <input type="checkbox" name="attr_move_display_mode" value="1"  title="Lock"/>
+                                <img class="move-edit" src="">
+                                <img class="move-display" src="">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="move-body">
+                        <input type="hidden" name="attr_move_display_mode" class="move-display-toggle" value="0" />
+                        <div class="move-edit">
+                            <div>
+                                <label style="display:inline-block;width:70px">Accuracy</label>
+                                </span><strong>Battle Rank + </strong><span class="field-labeled">
+                                    <select name="attr_move_accuracy_crit" value="@{crit0}" >
+                                        <option value="@{crit0}">Crit-Up 0</option>
+                                            <option value="@{crit1}">Crit-Up 1</option>
+                                            <option value="@{crit2}">Crit-Up 2</option>
+                                            <option value="@{crit3}">Crit-Up 3</option>
+                                    </select>
+                                </span>
+                                <span class="field-labeled">
+                                <strong>+</strong>
+                                <span class="field-labeled" style="width: 70px; text-align:center" >
+                                    <input type="number" name="attr_move_accuracy_mod" value="0"/>
+                                    <span>Flat Mod</span>
+                                </span>
+                            </div>
+                            <div>
+                                <label style="display:inline-block;width:70px">Damage</label>
+                                <span>
+                                    <span class="field-labeled" >
+                                        <select name="attr_move_damage_attribute" value="0">
+                                            <option value="0">-</option>
+                                            <option value="@{strength_calc}">Strength</option>
+                                            <option value="@{special_calc}">Special</option>
+                                            <option value="@{endurance_calc}">Endurance</option>
+                                            <option value="@{spirit_calc}">Spirit</option>
+                                            <option value="@{dexterity_calc}">Dexterity</option>
+                                        </select> 
+                                        <span></span>
+                                    </span>
+                                    <strong>+</strong>
+                                    <span class="field-labeled" style="width:70px;text-align:center" >
+                                        <input type="number" name="attr_move_power" min="0" value="0"  />
+                                        <span>Power</span>
+                                    </span>
+                                    <strong>+</strong>
+                                    <span class="field-labeled" style="width:70px;text-align:center" >
+                                        <input type="number" name="attr_move_flatmod" min="0" value="0"  />
+                                        <span>Flat Mod</span>
+                                    </span>
+                                </span>
+                            </div>
+                            <div>
+                               <div class="hp-will">
+                        <strong style="display:inline-block;width:120px;text-align:right;">Power Points</strong>
+                        <span class="field-labeled" >
+                            <input type="number" name="attr_ppcurrent" title="@{ppcurrent} "min="0" value="0" max="50" />
+                            <span title="">Current</span>
+                        </span>
+                        <strong>/</strong>
+                        <span class="field-labeled">
+                            <input type="number" name="attr_pp_max" title="@{pp_max}" min="0" value="0" max="50"/>
+                            <span title="">Max</span>
+                        </span>
+                    </div>
+                            <div>
+                                <textarea name="attr_move_description" style="height:65px"></textarea>
+                            </div>
+                            </div>
+
+                        </div>
+                        <div class="move-display">
+                            <div>
+                                <div style="display:inline-block;margin-right:5px">
+                                    <span style="font-size:10pt;font-weight:bolder;margin-right:10px;">Accuracy: </span>
+                                    <button type="roll" name="roll_move_accuracy" 
+                                    value="@{whisper} &{template:default}{{character= @{character_name} }}{{name= @{move_name} Accuracy }}{{target= @{move_target} }}{{roll=[[@{move_accuracy_crit}+@{move_accuracy_calc} - @{pain_max}]] }}{{description= @{move_description} }}" ></button>
+                                </div>
+                                <div style="display:inline-block;margin-right:5px">
+                                    <span style="font-size:10pt;font-weight:bolder;margin-right:10px;">Damage: </span>
+                                    <button type="roll" name="roll_move_damage" 
+value="@{whisper} &{template:default}{{character= @{character_name} }}{{name= @{move_name} Damage }}{{type=@{move_type}}}{{category= @{move_category} }} {{roll=[[@{move_power}+(@{move_power}d6>6f<2) + @{move_damage_attribute} + @{move_flatmod} + @{move_stab_auto} ]] }} {{Extra Base Power=[[(?{Extra Base Power?|0}d6>6f<2) + ?{Extra Base Power?|0}]] }} {{Burned?= @{is_burned} }} {{Frostbitten?= @{is_frostbitten} }}" ></button>
+                                <span class="field-labeled" style="width:70px;text-align:center" >
+                                        <input type="number" name="attr_move_power" min="0" value="0"  />
+                                        <span>Power</span>
+                                    </span>
+                                </div>
+                                <div style="display:inline-block;margin-right:5px">
+                                    <span style="font-size:10pt;font-weight:bolder;margin-right:10px;">Power Points: </span>
+                                    <span class="field-labeled" style="width:70px">
+                                         <input type="number" name="attr_ppcurrent" title="@{ppcurrent}" min="0" value="0" max="50" />
+                                        <span>Current</span>
+                                    </span>
+                                    <strong>/</strong>
+                                     <span class="field-labeled" style="width:70px">
+                                         <input type="number" name="attr_pp_max" title="@{pp_max}" min="0" value="0" max="50" />
+                                        <span>Max</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div style="border-top:1px solid black;margin-top:5px;padding:5px;">
+                                <span class="sheet-move-descr" name="attr_move_description"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div class='sheet-tab-settings'>
+        <div>
+            <label><input type='checkbox' name='attr_creature_mode' value='0' /> Trainer sheet</label>
+        </div>
+        <div>
+            <label><input type='checkbox' name='attr_creature_mode' value='1' /> Pokemon sheet</label>
+        </div>
+        <div>
+            <label><input type='checkbox' name='attr_creature_mode' value='1' /> Pokemon sheet</label>
+        </div>
+    </div>
+</div>
