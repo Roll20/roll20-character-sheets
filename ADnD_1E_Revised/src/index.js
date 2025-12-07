@@ -293,7 +293,9 @@ const section_attribute = (section, id, field) => `repeating_${section}_${id}_${
 // do stuff. ie geSectionIDs, getAttrs, all the various calculations
 // then end the worker
 //  output.sheet_version = current_version;
-//  setAttrs(output, {silent: true}, versionator(current_version, final_version));
+//  setAttrs(output, {silent: true}, () => {
+//    versionator(current_version, final_version);
+//  });
 // don't forget any close brackets for getattrs, etc.
 //  };
 // END
@@ -320,7 +322,9 @@ const dmgSwap = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: dmgSwap completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -340,7 +344,9 @@ const maxSwap = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: maxSwap completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -370,7 +376,9 @@ const nwpMacroUpdate = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: nwpMacroUpdate completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -448,7 +456,9 @@ const weaponNameFix = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: weaponNameFix completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -513,7 +523,9 @@ const spellNameFix = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: spellNameFix completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -552,7 +564,9 @@ const equipmentNameFix = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: equipmentNameFix completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -600,7 +614,9 @@ const abilityNameFix = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: abilityNameFix completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -655,7 +671,9 @@ const nwpNameFix = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: nwpNameFix completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -731,7 +749,9 @@ const macroColorUpdate = (current_version, final_version) => {
               }
             });
             output.sheet_version = current_version;
-            setAttrs(output, {silent: true}, versionator(current_version, final_version));
+            setAttrs(output, {silent: true}, () => {
+              versionator(current_version, final_version);
+            });
           });
         });
       });
@@ -755,6 +775,9 @@ autoCalcAbilityRows = (current_version, final_version) => {
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: autoCalcAbilityRows completed`);
   setAttrs(output, versionator(current_version, final_version));
+  setAttrs(output, () => {
+    versionator(current_version, final_version);
+  });
 };
 
 // One-time update: Auto Calc Save rows
@@ -768,7 +791,9 @@ autoCalcSaveRows = (current_version, final_version) => {
   savespellsCalc(migrate);
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: autoCalcSaveRows(migrate) completed`);
-  setAttrs(output, {silent: true}, versionator(current_version, final_version));
+  setAttrs(output, {silent: true}, () => {
+    versionator(current_version, final_version);
+  });
 };
 
 // One-time update: Auto Calc Thief rows
@@ -788,7 +813,9 @@ autoCalcThiefRows = (current_version, final_version) => {
   thiefmisc2Calc();
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: autoCalcThiefRows(migrate) completed`);
-  setAttrs(output, {silent: true}, versionator(current_version, final_version));
+  setAttrs(output, {silent: true}, () => {
+    versionator(current_version, final_version);
+  });
 };
 
 // Remove @{weapon_whisper_to_hit}
@@ -809,7 +836,9 @@ const removeWhisper = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: removeWhisper completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -935,7 +964,9 @@ const weaponMacroUpdate = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: weaponMacroUpdate completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -997,7 +1028,9 @@ const abilityMacroUpdate = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: abilityMacroUpdate completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -1035,7 +1068,9 @@ const nwpMacroUpdate2 = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: nwpMacroUpdate2 completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -1081,7 +1116,9 @@ const spellsMacroUpdate = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: spellsMacroUpdate completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -1111,7 +1148,9 @@ const equipmentMacroUpdate = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: equipmentMacroUpdate completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -1184,7 +1223,9 @@ const updateRange = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: updateRange completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -1207,7 +1248,9 @@ const updateAttackTypeMacro = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: updateAttackTypeMacro completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -1224,7 +1267,9 @@ const monsterHD = (current_version, final_version) => {
     output.monsterHD = monsterHD_value;
     output.sheet_version = current_version;
     clog(`VERSION UPDATE: monsterHD completed`);
-    setAttrs(output, {silent: true}, versionator(current_version, final_version));
+    setAttrs(output, {silent: true}, () => {
+      versionator(current_version, final_version);
+    });
   });
 };
 
@@ -1256,7 +1301,9 @@ const clearArmorOther = (current_version, final_version) => {
   output.armorother5_bulk = 0;
   output.armorother6_bulk = 0;
   clog(`VERSION UPDATE: clearArmorOther completed`);
-  setAttrs(output, {silent: true}, versionator(current_version, final_version));
+  setAttrs(output, {silent: true}, () => {
+    versionator(current_version, final_version);
+  });
 };
 
 // combines all Armor Details attrs and their row id's
@@ -2071,7 +2118,9 @@ const migrateArmorDetails = (current_version, final_version) => {
   syncArmorToEquipment(null, null, row_removed, migrate);
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: migrateArmorDetails completed`);
-  setAttrs(output, {silent: true}, versionator(current_version, final_version));
+  setAttrs(output, {silent: true}, () => {
+    versionator(current_version, final_version);
+  });
 };
 
 // One-time update: sets all equipment default values
@@ -2120,7 +2169,9 @@ const setEquipmentUpdate = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: setEquipmentUpdate completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -2231,7 +2282,9 @@ const setWeaponsUpdate = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: setWeaponsUpdate completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -2256,7 +2309,9 @@ const setNWPUpdate = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: setNWPUpdate completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -2391,7 +2446,9 @@ const migrateWeaponWtCost = (current_version, final_version) => {
   migrateWeaponWtCostFunction();
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: migrateWeaponWtCost completed`);
-  setAttrs(output, {silent: true}, versionator(current_version, final_version));
+  setAttrs(output, {silent: true}, () => {
+    versionator(current_version, final_version);
+  });
 };
 
 // One-time update:  checks and sets equipment-gear but the value was set out-of-range
@@ -2411,7 +2468,9 @@ const setEquipmentType = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: setEquipmentType completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -2421,7 +2480,9 @@ const migrateSetSpellsCasterClass = (current_version, final_version) => {
   setSpellsCasterClass();
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: migrateSetSpellsCasterClass completed`);
-  setAttrs(output, {silent: true}, versionator(current_version, final_version));
+  setAttrs(output, {silent: true}, () => {
+    versionator(current_version, final_version);
+  });
 };
 
 // One-time update: ensures warning flag is correct
@@ -2431,7 +2492,9 @@ const recalcAC = (current_version, final_version) => {
   calcAC(recalc);
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: recalcAC completed`);
-  setAttrs(output, {silent: true}, versionator(current_version, final_version));
+  setAttrs(output, {silent: true}, () => {
+    versionator(current_version, final_version);
+  });
 };
 
 // One-time update: initiative macro subtitle fix
@@ -2440,7 +2503,9 @@ const initMacroUpdate = (current_version, final_version) => {
   output.init_macro_text = '';
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: recalcAC completed`);
-  setAttrs(output, {silent: true}, versionator(current_version, final_version));
+  setAttrs(output, {silent: true}, () => {
+    versionator(current_version, final_version);
+  });
 };
 
 // One-time update: add parenthesis to critical damage macro-text
@@ -2463,7 +2528,9 @@ const updateCriticalDamageMacro = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: updateCriticalDamageMacro completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+      setAttrs(output, {silent: true}, () => {
+        versionator(current_version, final_version);
+      });
     });
   });
 };
@@ -2504,7 +2571,7 @@ const newSheet = () => {
   });
 };
 
-// One-time update: set equipment_sync_armor_flag
+// One-time update: set repeating_equipment_equipment_sync_armor_flag
 const updateSyncArmorFlag = (current_version, final_version) => {
   getSectionIDs('repeating_equipment', (idArray) => {
     const fields = [];
@@ -2513,44 +2580,40 @@ const updateSyncArmorFlag = (current_version, final_version) => {
     });
     getAttrs([...armorRowIDs, ...fields], (v) => {
       const output = {};
-      let isMatch = '';
-      const unarmored0_ID = v.unarmored_row_id.toString();
-      const armortype1_ID = v.armortype1_row_id.toString();
-      const armortype2_ID = v.armortype2_row_id.toString();
-      const armorshield_ID = v.armorshield_row_id.toString();
-      const armorhelmet_ID = v.armorhelmet_row_id.toString();
-      const armorother1_ID = v.armorother1_row_id.toString();
-      const armorother2_ID = v.armorother2_row_id.toString();
-      const armorother3_ID = v.armorother3_row_id.toString();
-      const armorother4_ID = v.armorother4_row_id.toString();
-      const armorother5_ID = v.armorother5_row_id.toString();
-      const armorother6_ID = v.armorother6_row_id.toString();
-      const array = [
-        unarmored0_ID,
-        armortype1_ID,
-        armortype2_ID,
-        armorshield_ID,
-        armorhelmet_ID,
-        armorother1_ID,
-        armorother2_ID,
-        armorother3_ID,
-        armorother4_ID,
-        armorother5_ID,
-        armorother6_ID,
-      ].map((str) => (str ? str.toString().toLowerCase() : '0'));
+      // #of repeating rows to check
+      let pendingUpdates = idArray.length;
+      // run version update only after all rows have been checked
+      const checkForCompletion = () => {
+        pendingUpdates--;
+        if (pendingUpdates === 0) {
+          output.sheet_version = current_version;
+          clog(`VERSION UPDATE: updateSyncArmorFlag completed`);
+          setAttrs(output, {silent: true}, () => {
+            versionator(current_version, final_version);
+          });
+        }
+      };
+
+      // finish if no rows
+      if (idArray.length === 0) {
+        checkForCompletion();
+        return;
+      }
+
+      // check each row
       _.each(idArray, (id) => {
         const type = v[section_attribute('equipment', id, 'equipment_armor_type')];
-        isMatch = array.includes(id) ? 1 : 0;
-        if (type !== 99 && isMatch) {
-          clog(`updateSyncArmorFlag - match:${isMatch} type:${type}`);
-          output[section_attribute('equipment', id, 'equipment_sync_armor_flag')] = 1;
-        } else {
-          clog(`updateSyncArmorFlag - NO match:${isMatch} type:${type}`);
-        }
+        testArmorRowIDs(id, (isMatch) => {
+          if (type !== 99 && isMatch) {
+            clog(`updateSyncArmorFlag - match from testArmorRowIDs():${isMatch} type:${type}`);
+            output[section_attribute('equipment', id, 'equipment_sync_armor_flag')] = 1;
+          } else {
+            clog(`updateSyncArmorFlag - NO match:${isMatch} type:${type}`);
+            output[section_attribute('equipment', id, 'equipment_sync_armor_flag')] = 0;
+          }
+          checkForCompletion();
+        });
       });
-      output.sheet_version = current_version;
-      clog(`VERSION UPDATE: updateSyncArmorFlag completed`);
-      setAttrs(output, {silent: true}, versionator(current_version, final_version));
     });
   });
 };
