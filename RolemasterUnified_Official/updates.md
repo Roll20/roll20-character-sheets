@@ -1,3 +1,7 @@
+# 2025-12-?
+
+- Add XP on journal item add with XP
+
 # 2025-12-02
 
 The post thanksgiving feast release
