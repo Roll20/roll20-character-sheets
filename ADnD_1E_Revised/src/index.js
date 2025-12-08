@@ -774,7 +774,6 @@ autoCalcAbilityRows = (current_version, final_version) => {
   stat_functions();
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: autoCalcAbilityRows completed`);
-  setAttrs(output, versionator(current_version, final_version));
   setAttrs(output, () => {
     versionator(current_version, final_version);
   });
@@ -859,7 +858,14 @@ const migrateHP = (current_version, final_version) => {
     }
     output.sheet_version = current_version;
     clog(`VERSION UPDATE: migrate HP completed`);
-    setAttrs(output, {silent: true}, versionator(current_version, final_version), calcHP());
+    setAttrs(
+      output,
+      {silent: true},
+      () => {
+        versionator(current_version, final_version);
+      },
+      calcHP(),
+    );
   });
 };
 
@@ -899,7 +905,14 @@ const migrateAC = (current_version, final_version) => {
     }
     output.sheet_version = current_version;
     clog(`VERSION UPDATE: Migrate AC completed`);
-    setAttrs(output, {silent: true}, versionator(current_version, final_version), calcAC(recalc));
+    setAttrs(
+      output,
+      {silent: true},
+      () => {
+        versionator(current_version, final_version);
+      },
+      calcAC(recalc),
+    );
   });
 };
 
@@ -1315,8 +1328,8 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
     let newID = '';
     let id_low = id;
     id_low = id_low !== null ? id.toLowerCase() : id_low;
-    clog(`syncArmorToEquipment - ${id_low === null ? `Sync ${attr} with existing row` : 'Create a New Armor Details row from repeating_equipment'}`);
-    clog(`syncArmorToEquipment - row_removed?:${row_removed ? 'Row removed' : 'Row not removed'}`);
+    clog(`syncArmorToEquipment - id_low:${id_low} ${id_low === null ? `Sync ${attr} from Armor Details` : 'Sync from repeating_equipment'}`);
+    clog(`syncArmorToEquipment - row_removed?:${row_removed} ${row_removed ? 'Row removed' : 'Row not removed'}`);
     const unarmored0_ID = v.unarmored_row_id.toString();
     const armortype1_ID = v.armortype1_row_id.toString();
     const armortype2_ID = v.armortype2_row_id.toString();
@@ -1341,8 +1354,6 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
       armorother5_ID,
       armorother6_ID,
     ].map((str) => (str ? str.toString().toLowerCase() : '0'));
-    clog(`syncArmorToEquipment - idArray:`);
-    console.log(idArray);
 
     function matchAttr(attrToCheck) {
       const arrays = {unarmoredAttrs, armor1Attrs, armor2Attrs, shieldAttrs, helmetAttrs, other1Attrs, other2Attrs, other3Attrs, other4Attrs, other5Attrs, other6Attrs};
@@ -1354,7 +1365,7 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
     if (matchingArray) {
       clog(`syncArmorToEquipment - Match found for ${attrToCheck} in:${matchingArray}`);
     } else {
-      clog(`syncArmorToEquipment - SOMETHING WENT WRONG - No match found for attribute:${attrToCheck}`);
+      clog(`syncArmorToEquipment - No match found for attribute:${attrToCheck} (null = repeating_equipment removed)`);
     }
     const armor0 = v.unarmored.trim();
     const armor1 = v.armortype.trim();
@@ -1454,10 +1465,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
           } else {
             output.unarmored_carried = +v.unarmored_carried;
           }
-          clog(`syncArmorToEquipment - row_removed:${row_removed} - ID Exists. Deleted from Armor Detail unarmored:${newID}`);
+          clog(`syncArmorToEquipment - Armor Details removed - ID Exists. Deleted from Armor Detail unarmored:${newID}`);
         }
-      } else {
-        // null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
+      } else if (matchingArray === null && row_removed) {
+        // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
         output.unarmored_row_id = 0;
         output.unarmored_worn = 1;
         output.unarmored = '';
@@ -1467,7 +1478,7 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
         output.unarmored_weight = 0;
         output.unarmored_cost = 0;
         output.unarmored_carried = 1;
-        clog(`syncArmorToEquipment - row_removed:${row_removed} - NO name and/or NO ID. Deleted from Equipment unarmored:${newID}`);
+        clog(`syncArmorToEquipment - Armor Details removed - NO name and/or NO ID. Deleted from Equipment unarmored:${newID}`);
       }
     }
     if (matchingArray === 'armor1Attrs' || id_low === idArray[1] || migrate) {
@@ -1525,10 +1536,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armortype_weight = 0;
           output.armortype_cost = 0;
           output.armortype_carried = 1;
-          clog(`syncArmorToEquipment - row_removed:${row_removed} - Armor Details row has been reset for armor1:${newID}`);
+          clog(`syncArmorToEquipment - Armor Details row removed. Resetting armor1:${newID}`);
         }
-      } else {
-        // null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
+      } else if (matchingArray === null && row_removed) {
+        // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
         output.armortype1_row_id = 0;
         output.armortype_worn = 0;
         output.armortype = '';
@@ -1539,7 +1550,7 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
         output.armortype_weight = 0;
         output.armortype_cost = 0;
         output.armortype_carried = 1;
-        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for for armor1`);
+        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for armor1`);
       }
     }
     if (matchingArray === 'armor2Attrs' || id_low === idArray[2] || migrate) {
@@ -1597,10 +1608,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armortype2_weight = 0;
           output.armortype2_cost = 0;
           output.armortype2_carried = 1;
-          clog(`syncArmorToEquipment - row_removed:${row_removed} - Armor Details row has been reset for armor2:${newID}`);
+          clog(`syncArmorToEquipment - Armor Details row removed. Resetting armor2:${newID}`);
         }
-      } else {
-        // null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
+      } else if (matchingArray === null && row_removed) {
+        // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
         output.armortype2_row_id = 0;
         output.armortype2_worn = 0;
         output.armortype2 = '';
@@ -1611,7 +1622,7 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
         output.armortype2_weight = 0;
         output.armortype2_cost = 0;
         output.armortype2_carried = 1;
-        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for for armor2`);
+        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for armor2`);
       }
     }
     if (matchingArray === 'shieldAttrs' || id_low === idArray[3] || migrate) {
@@ -1672,10 +1683,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorshield_weight = 0;
           output.armorshield_cost = 0;
           output.armorshield_carried = 1;
-          clog(`syncArmorToEquipment - row_removed:${row_removed} - Armor Details row has been reset for shield:${newID}`);
+          clog(`syncArmorToEquipment - Armor Details row removed. Resetting shield:${newID}`);
         }
-      } else {
-        // null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
+      } else if (matchingArray === null && row_removed) {
+        // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
         output.armorshield_row_id = 0;
         output.armorshield_worn = 0;
         output.armorshield = '';
@@ -1687,7 +1698,7 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
         output.armorshield_weight = 0;
         output.armorshield_cost = 0;
         output.armorshield_carried = 1;
-        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for for shield`);
+        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for shield`);
       }
     }
     if (matchingArray === 'helmetAttrs' || id_low === idArray[4] || migrate) {
@@ -1741,10 +1752,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorhelmet_weight = 0;
           output.armorhelmet_cost = 0;
           output.armorhelmet_carried = 1;
-          clog(`syncArmorToEquipment - row_removed:${row_removed} - Armor Details row has been reset for helmet:${newID}`);
+          clog(`syncArmorToEquipment - Armor Details row removed. Resetting helmet:${newID}`);
         }
-      } else {
-        // null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
+      } else if (matchingArray === null && row_removed) {
+        // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
         output.armorhelmet_row_id = 0;
         output.armorhelmet_worn = 0;
         output.armorhelmet = '';
@@ -1755,7 +1766,7 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
         output.armorhelmet_weight = 0;
         output.armorhelmet_cost = 0;
         output.armorhelmet_carried = 1;
-        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for for helmet`);
+        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for helmet`);
       }
     }
     if (matchingArray === 'other1Attrs' || id_low === idArray[5] || migrate) {
@@ -1801,10 +1812,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother_magic = 0;
           output.armorother_mod = 0;
           output.armorother_bulk = 0;
-          clog(`syncArmorToEquipment - row_removed:${row_removed} - Armor Details row has been reset for other1:${newID}`);
+          clog(`syncArmorToEquipment - Armor Details row removed. Resetting other1:${newID}`);
         }
-      } else {
-        // null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
+      } else if (matchingArray === null && row_removed) {
+        // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
         output.armorother1_row_id = 0;
         output.armorother_worn = 0;
         output.armorother = '';
@@ -1813,7 +1824,7 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
         output.armorother_magic = 0;
         output.armorother_mod = 0;
         output.armorother_bulk = 0;
-        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for for other1`);
+        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other1`);
       }
     }
     if (matchingArray === 'other2Attrs' || id_low === idArray[6] || migrate) {
@@ -1858,10 +1869,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother2_magic = 0;
           output.armorother2_mod = 0;
           output.armorother2_bulk = 0;
-          clog(`syncArmorToEquipment - row_removed:${row_removed} - Armor Details row has been reset for other2:${newID}`);
+          clog(`syncArmorToEquipment - Armor Details row removed. Resetting other2:${newID}`);
         }
-      } else {
-        // null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
+      } else if (matchingArray === null && row_removed) {
+        // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
         output.armorother2_row_id = 0;
         output.armorother2_worn = 0;
         output.armorother2 = '';
@@ -1870,7 +1881,7 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
         output.armorother2_magic = 0;
         output.armorother2_mod = 0;
         output.armorother2_bulk = 0;
-        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for for other2`);
+        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other2`);
       }
     }
     if (matchingArray === 'other3Attrs' || id_low === idArray[7] || migrate) {
@@ -1916,10 +1927,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother3_magic = 0;
           output.armorother3_mod = 0;
           output.armorother3_bulk = 0;
-          clog(`syncArmorToEquipment - row_removed:${row_removed} - Armor Details row has been reset for other3:${newID}`);
+          clog(`syncArmorToEquipment - Armor Details row removed. Resetting other3:${newID}`);
         }
-      } else {
-        // null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
+      } else if (matchingArray === null && row_removed) {
+        // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
         output.armorother3_row_id = 0;
         output.armorother3_worn = 0;
         output.armorother3 = '';
@@ -1928,7 +1939,7 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
         output.armorother3_magic = 0;
         output.armorother3_mod = 0;
         output.armorother3_bulk = 0;
-        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for for other3`);
+        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other3`);
       }
     }
     if (matchingArray === 'other4Attrs' || id_low === idArray[8] || migrate) {
@@ -1974,10 +1985,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother4_magic = 0;
           output.armorother4_mod = 0;
           output.armorother4_bulk = 0;
-          clog(`syncArmorToEquipment - row_removed:${row_removed} - Armor Details row has been reset for other4:${newID}`);
+          clog(`syncArmorToEquipment - Armor Details row removed. Resetting other4:${newID}`);
         }
-      } else {
-        // null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
+      } else if (matchingArray === null && row_removed) {
+        // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
         output.armorother4_row_id = 0;
         output.armorother4_worn = 0;
         output.armorother4 = '';
@@ -1986,7 +1997,7 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
         output.armorother4_magic = 0;
         output.armorother4_mod = 0;
         output.armorother4_bulk = 0;
-        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for for other4`);
+        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other4`);
       }
     }
     if (matchingArray === 'other5Attrs' || id_low === idArray[9] || migrate) {
@@ -2032,10 +2043,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother5_magic = 0;
           output.armorother5_mod = 0;
           output.armorother5_bulk = 0;
-          clog(`syncArmorToEquipment - row_removed:${row_removed} - Armor Details row has been reset for other5:${newID}`);
+          clog(`syncArmorToEquipment - Armor Details row removed. Resetting other5:${newID}`);
         }
-      } else {
-        // null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
+      } else if (matchingArray === null && row_removed) {
+        // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
         output.armorother5_row_id = 0;
         output.armorother5_worn = 0;
         output.armorother5 = '';
@@ -2044,7 +2055,7 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
         output.armorother5_magic = 0;
         output.armorother5_mod = 0;
         output.armorother5_bulk = 0;
-        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for for other5`);
+        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other5`);
       }
     }
     if (matchingArray === 'other6Attrs' || id_low === idArray[10] || migrate) {
@@ -2090,10 +2101,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother6_magic = 0;
           output.armorother6_mod = 0;
           output.armorother6_bulk = 0;
-          clog(`syncArmorToEquipment - row_removed:${row_removed} - Armor Details row has been reset for other6:${newID}`);
+          clog(`syncArmorToEquipment - Armor Details row removed. Resetting other6:${newID}`);
         }
-      } else {
-        // null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
+      } else if (matchingArray === null && row_removed) {
+        // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
         output.armorother6_row_id = 0;
         output.armorother6_worn = 0;
         output.armorother6 = '';
@@ -2102,11 +2113,11 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
         output.armorother6_magic = 0;
         output.armorother6_mod = 0;
         output.armorother6_bulk = 0;
-        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for for other6`);
+        clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other6`);
       }
     }
-    // setAttrs(output, armorDetailsRowidArray(id_low), calcAC());
-    setAttrs(output, {silent: true}, armorDetailsRowidArray(id_low), calcAC());
+    // setAttrs(output, armorDetailsRowidArray(id_low), calcAC);
+    setAttrs(output, {silent: true}, armorDetailsRowidArray(id_low), calcAC);
   });
 }
 
@@ -2435,7 +2446,7 @@ const migrateWeaponWtCostFunction = () => {
           }
         });
         // zero out weapon row weight and cost with clearWeaponsWeightCost()
-        setAttrs(output, {silent: true}, clearWeaponsWeightCost());
+        setAttrs(output, {silent: true}, clearWeaponsWeightCost);
       });
     });
   });
@@ -2941,7 +2952,7 @@ on(
       output.heavy_load = heavy;
       output.very_heavy_load = veryHeavy;
       output.max_load = max + 1;
-      setAttrs(output, {silent: true}, setCurrentEncumbranceFlag());
+      setAttrs(output, {silent: true}, setCurrentEncumbranceFlag);
     });
   },
 );
@@ -3102,144 +3113,125 @@ on('change:equipment_tabs_type change:equipment_tabs_carry', (eventInfo) => {
 
 const removeEmptyArmorRows = () => {
   getSectionIDs('repeating_equipment', (idArray) => {
-    const fieldnames = idArray.reduce((fields, id) => [...fields, `repeating_equipment_${id}_equipment_armor_type`], []);
-    getAttrs(['armordetails_array', ...armorRowIDs, ...fieldnames], (v) => {
-      const output = {};
-      const unarmored0_ID = v.unarmored_row_id.toString();
-      const armortype1_ID = v.armortype1_row_id.toString();
-      const armortype2_ID = v.armortype2_row_id.toString();
-      const armorshield_ID = v.armorshield_row_id.toString();
-      const armorhelmet_ID = v.armorhelmet_row_id.toString();
-      const armorother1_ID = v.armorother1_row_id.toString();
-      const armorother2_ID = v.armorother2_row_id.toString();
-      const armorother3_ID = v.armorother3_row_id.toString();
-      const armorother4_ID = v.armorother4_row_id.toString();
-      const armorother5_ID = v.armorother5_row_id.toString();
-      const armorother6_ID = v.armorother6_row_id.toString();
-      const armorDetailsArray = [
-        unarmored0_ID,
-        armortype1_ID,
-        armortype2_ID,
-        armorshield_ID,
-        armorhelmet_ID,
-        armorother1_ID,
-        armorother2_ID,
-        armorother3_ID,
-        armorother4_ID,
-        armorother5_ID,
-        armorother6_ID,
-      ].map((str) => (str ? str.toString().toLowerCase() : '0'));
-      clog(`removeEmptyArmorRows`);
-      console.log(armorDetailsArray);
-      _.each(idArray, (id) => {
-        // this id is the trigger
-        const type = +v[`repeating_equipment_${id}_equipment_armor_type`];
-        clog(`Change Detected Armor Type:${type}`);
-        // Armor Type not selected
-        if (type === 99) return;
-        // Find Armor Details row position where the id matches in armorDetailsArray
-        const matchingIndices = armorDetailsArray
-          .map((element, index) => {
-            // Check if an array element is equal to the id
-            if (element === id) {
-              // If there's a match, return the corresponding Armor Details row number
-              return `${Math.floor(index) + 1}`;
-            }
-            // If there's no match, return null
-            return null;
-          })
-          .filter((index) => index !== null);
-        // Do stuff only when there are multiple matches
-        if (matchingIndices.length > 1) {
-          rowType = type + 1; // aligns Armor type with actual the Actual Armor Details row
-          console.log(`matchingIndices: ${matchingIndices} id:${id} type:${rowType}`);
-          // Create a new array of Armor Details row index positions with multiple matches
-          const indicesWithMultipleMatches = matchingIndices;
-          // Convert indicesWithMultipleMatches array to a comma-separated string
-          const indicesString = indicesWithMultipleMatches.join(',');
-          // Create a new variable called "removeRows" with values that don't equal "rowType"
-          const removeRows = indicesString.split(',').filter((value) => value !== String(rowType));
-          // Log the resulting array (should only be 1 match, but could be up to 10)
-          console.log(`removeRows: ${removeRows}`);
-          // Further filter removeRows and save the value at index 0 to removeRow
-          const removeRow = removeRows.length > 0 ? removeRows[0] : null;
-          // Log the final result
-          console.log(`removeRow: ${removeRow}`);
-          // Use removeRow to delete the old Armor Details row
+    const output = {};
+    const fields = [];
+    _.each(idArray, (id) => {
+      fields.push(section_attribute('equipment', id, 'equipment_armor_type'));
+    });
+    getAttrs(fields, (v) => {
+      generateArmorDetailsArray((armorDetailsArray) => {
+        clog(`armorDetailsArray:`);
+        console.log(armorDetailsArray);
+        _.each(idArray, (id) => {
+          // this id is the trigger
+          const type = +v[`repeating_equipment_${id}_equipment_armor_type`];
+          // Armor Type not selected
+          if (type === 99) return;
+          clog(`removeEmptyArmorRows - Armor Type:${type}`);
+          // Find Armor Details row position where the id matches in armorDetailsArray
+          const matchingIndices = armorDetailsArray
+            .map((element, index) => {
+              // Check if an array element is equal to the id
+              if (element === id) {
+                // If there's a match, return the corresponding Armor Details row number
+                return `${Math.floor(index) + 1}`;
+              }
+              // If there's no match, return null
+              return null;
+            })
+            .filter((index) => index !== null);
+          // Do stuff only when there are multiple matches
+          if (matchingIndices.length > 1) {
+            rowType = type + 1; // aligns Armor type with actual the Actual Armor Details row
+            clog(`removeEmptyArmorRows - matchingIndices: ${matchingIndices} id:${id} type:${rowType}`);
+            // Create a new array of Armor Details row index positions with multiple matches
+            const indicesWithMultipleMatches = matchingIndices;
+            // Convert indicesWithMultipleMatches array to a comma-separated string
+            const indicesString = indicesWithMultipleMatches.join(',');
+            // Create a new variable called "removeRows" with values that don't equal "rowType"
+            const removeRows = indicesString.split(',').filter((value) => value !== String(rowType));
+            // Log the resulting array (should only be a single match)
+            clog(`removeEmptyArmorRows - Matching rows: ${removeRows}`);
+            // Further filter removeRows and save the value at index 0 to removeRow
+            const removeRow = removeRows.length > 0 ? removeRows[0] : null;
+            // Log the final result
+            clog(`removeEmptyArmorRows - removeRow at index: ${removeRow}`);
+            // Use removeRow to delete the old Armor Details row
 
-          switch (removeRow) {
-            case '1':
-              output.unarmored = '';
-              output.unarmored_worn = 0;
-              output.unarmored_row_id = 0;
-              clog(`>> DELETE/RESET ROW 0 - Unarmored <<`);
-              break;
-            case '2':
-              output.armortype = '';
-              output.armortype_worn = 0;
-              output.armortype_row_id = 0;
-              clog(`>> DELETE/RESET ROW 1 - Armor 1 <<`);
-              break;
-            case '3':
-              output.armortype2 = '';
-              output.armortype2_worn = 0;
-              output.armortype2_row_id = 0;
-              clog(`>> DELETE/RESET ROW 2 - Armor 2 <<`);
-              break;
-            case '4':
-              output.armorshield = '';
-              output.armorshield_worn = 0;
-              output.armorshield_row_id = 0;
-              clog(`>> DELETE/RESET ROW 3 - Shield <<`);
-              break;
-            case '5':
-              output.armorhelmet = '';
-              output.armorhelmet_worn = 0;
-              output.armorhelmet_row_id = 0;
-              clog(`>> DELETE/RESET ROW 4 - Helmet <<`);
-              break;
-            case '6':
-              output.armorother = '';
-              output.armorother_worn = 0;
-              output.armorother_row_id = 0;
-              clog(`>> DELETE/RESET ROW 5 - Other <<`);
-              break;
-            case '7':
-              output.armorother2 = '';
-              output.armorother2_worn = 0;
-              output.armorother2_row_id = 0;
-              clog(`>> DELETE/RESET ROW 6 - Other 2 <<`);
-              break;
-            case '8':
-              output.armorother3 = '';
-              output.armorother3_worn = 0;
-              output.armorother3_row_id = 0;
-              clog(`>> DELETE/RESET ROW 7 - Other 3 <<`);
-              break;
-            case '9':
-              output.armorother4 = '';
-              output.armorother4_worn = 0;
-              output.armorother4_row_id = 0;
-              clog(`>> DELETE/RESET ROW 8 - Other 4 <<`);
-              break;
-            case '10':
-              output.armorother5 = '';
-              output.armorother5_worn = 0;
-              output.armorother5_row_id = 0;
-              clog(`>> DELETE/RESET ROW 9 - Other 5 <<`);
-              break;
-            case '11':
-              output.armorother6 = '';
-              output.armorother6_worn = 0;
-              output.armorother6_row_id = 0;
-              clog(`>> DELETE/RESET ROW 10 - Other 6 <<`);
-              break;
-            default:
-              clog(`>> NOTHING TO DELETE/RESET <<`);
+            switch (removeRow) {
+              case '1':
+                output.unarmored = '';
+                output.unarmored_worn = 0;
+                output.unarmored_row_id = 0;
+                clog(`>> DELETE/RESET ROW 0 - Unarmored <<`);
+                break;
+              case '2':
+                output.armortype = '';
+                output.armortype_worn = 0;
+                output.armortype_row_id = 0;
+                clog(`>> DELETE/RESET ROW 1 - Armor 1 <<`);
+                break;
+              case '3':
+                output.armortype2 = '';
+                output.armortype2_worn = 0;
+                output.armortype2_row_id = 0;
+                clog(`>> DELETE/RESET ROW 2 - Armor 2 <<`);
+                break;
+              case '4':
+                output.armorshield = '';
+                output.armorshield_worn = 0;
+                output.armorshield_row_id = 0;
+                clog(`>> DELETE/RESET ROW 3 - Shield <<`);
+                break;
+              case '5':
+                output.armorhelmet = '';
+                output.armorhelmet_worn = 0;
+                output.armorhelmet_row_id = 0;
+                clog(`>> DELETE/RESET ROW 4 - Helmet <<`);
+                break;
+              case '6':
+                output.armorother = '';
+                output.armorother_worn = 0;
+                output.armorother_row_id = 0;
+                clog(`>> DELETE/RESET ROW 5 - Other <<`);
+                break;
+              case '7':
+                output.armorother2 = '';
+                output.armorother2_worn = 0;
+                output.armorother2_row_id = 0;
+                clog(`>> DELETE/RESET ROW 6 - Other 2 <<`);
+                break;
+              case '8':
+                output.armorother3 = '';
+                output.armorother3_worn = 0;
+                output.armorother3_row_id = 0;
+                clog(`>> DELETE/RESET ROW 7 - Other 3 <<`);
+                break;
+              case '9':
+                output.armorother4 = '';
+                output.armorother4_worn = 0;
+                output.armorother4_row_id = 0;
+                clog(`>> DELETE/RESET ROW 8 - Other 4 <<`);
+                break;
+              case '10':
+                output.armorother5 = '';
+                output.armorother5_worn = 0;
+                output.armorother5_row_id = 0;
+                clog(`>> DELETE/RESET ROW 9 - Other 5 <<`);
+                break;
+              case '11':
+                output.armorother6 = '';
+                output.armorother6_worn = 0;
+                output.armorother6_row_id = 0;
+                clog(`>> DELETE/RESET ROW 10 - Other 6 <<`);
+                break;
+              default:
+                clog(`>> NOTHING TO DELETE/RESET <<`);
+            }
           }
-        }
+        });
+        setAttrs(output);
       });
-      setAttrs(output);
     });
   });
 };
@@ -3256,7 +3248,7 @@ on(armorDetailslisteners, (eventInfo) => {
   const attrNew = eventInfo.newValue;
   const row_removed = 0;
   clog(
-    `armorDetailslisteners - ${attrPrev === undefined ? `New Row Detected. Adding new repeating_equipment ${attr}:${attrNew}.` : `Syncing ${attr} with existing repeating_equipment Armor.`}`,
+    `armorDetailslisteners - ${attrPrev === undefined ? `New Row Detected. Adding new repeating_equipment ${attr}:${attrNew}.` : `Sync ${attr} with existing repeating_equipment Armor.`}`,
   );
   getAttrs(armorAttrs, (v) => {
     const output = {};
@@ -3630,7 +3622,9 @@ function fillArmorDetails(id, callback) {
       }
       // Once done, call the provided callback
       if (callback) callback();
-      setAttrs(output, calcAC(recalc));
+      setAttrs(output, () => {
+        calcAC(recalc);
+      });
     },
   );
 }
@@ -3675,8 +3669,7 @@ function createAttack(id) {
   );
 }
 
-// checks repeating_equipment id against Armor Detail's ids
-function testArmorRowIDs(id, callback) {
+function generateArmorDetailsArray(callback) {
   getAttrs(armorRowIDs, (v) => {
     const unarmored0_ID = v.unarmored_row_id.toString();
     const armortype1_ID = v.armortype1_row_id.toString();
@@ -3702,10 +3695,19 @@ function testArmorRowIDs(id, callback) {
       armorother5_ID,
       armorother6_ID,
     ].map((str) => (str ? str.toString().toLowerCase() : '0'));
+    // Check if callback is a function before calling it
+    if (typeof callback === 'function') {
+      callback(idArray);
+    }
+  });
+}
+
+// checks repeating_equipment id against Armor Detail's ids
+function testArmorRowIDs(id, callback) {
+  generateArmorDetailsArray((idArray) => {
     let isMatch = '';
     isMatch = idArray.includes(id) ? 1 : 0;
-    clog(`testArmorRowIDs - id:${id} isMatch?:${isMatch}\n ${!isMatch ? 'No match found in armorDetailsArray' : 'Match found in armorDetailsArray:'}`);
-    console.log(idArray);
+    clog(`testArmorRowIDs - isMatch?: ${isMatch} for id:${id}\n ${!isMatch ? 'No match found in armorDetailsArray' : 'Match found in armorDetailsArray:'}`);
     // Check if callback is a function before calling it
     if (typeof callback === 'function') {
       callback(isMatch, idArray);
@@ -3719,7 +3721,12 @@ armorDetailsRowidArray = (id) => {
   testArmorRowIDs(id, (result, armorDetailsArray) => {
     output.armordetails_array = [`${armorDetailsArray}`];
     clog(`armorDetailsRowidArray - id:${id}`);
-    setAttrs(output, {silent: true});
+    setAttrs(output, {silent: true}, () => {
+      generateArmorDetailsArray((idArray) => {
+        console.log(`armorDetailsRowidArray - has been updated.`);
+        console.log(idArray);
+      });
+    });
   });
 };
 
@@ -3789,9 +3796,9 @@ on('clicked:repeating_equipment:addattack', (eventInfo) => {
 on('remove:repeating_equipment', (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2].toLowerCase();
   const row_removed = 1;
-  // console.log({event: 'remove:repeating_equipment', eventInfo, id});
+  console.log({event: 'remove:repeating_equipment', eventInfo, id});
   // Pass a callback function to handle the result and armorDetailsArray
-  testArmorRowIDs(id, (result, armorDetailsArray) => {
+  testArmorRowIDs(id, (result) => {
     if (result) {
       syncArmorToEquipment(id, null, row_removed);
     }
@@ -4171,7 +4178,7 @@ on('change:dual_pen_primary change:dual_pen_secondary change:dexterity', (eventI
     const secondary_mod = Math.min(0, dex_mod - 4);
     output.dual_pen_primary = primary_mod;
     output.dual_pen_secondary = secondary_mod;
-    setAttrs(output, {silent: true}, syncDualPen());
+    setAttrs(output, {silent: true}, syncDualPen);
   });
 });
 
@@ -8260,7 +8267,9 @@ on('clicked:spell-sort-alphabetical clicked:spell-sort-level', function (eventIn
         // console.log(ids);
 
         // set new sort order
-        setAttrs(output, {silent: true}, setSectionOrder('spells', order));
+        setAttrs(output, {silent: true}, () => {
+          setSectionOrder('spells', order);
+        });
         // console.log(`${buttonClicked} Reordered ${sectionName}:`, spells);
       });
     });
@@ -8326,7 +8335,9 @@ on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', functi
         // console.log(`Previous Order has been saved.`);
         // console.log(ids);
         // set new sort order
-        setAttrs(output, {silent: true}, setSectionOrder('equipment', order));
+        setAttrs(output, {silent: true}, () => {
+          setSectionOrder('equipment', order);
+        });
         // console.log(`${buttonClicked} Reordered ${sectionName}:`, equipment);
       });
     });
