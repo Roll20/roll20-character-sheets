@@ -285,6 +285,15 @@ const other6Attrs = ['armorother6_worn', 'armorother6', 'armorother6_ac', 'armor
 // used in getSectionIds to separate a repeating attribute names into 3 components
 const section_attribute = (section, id, field) => `repeating_${section}_${id}_${field}`;
 
+// async helper - allows async/await calls
+const setAttrsAsync = (output, options = {}) => {
+  return new Promise((resolve) => {
+    setAttrs(output, options, () => {
+      resolve();
+    });
+  });
+};
+
 // VERSIONATOR example
 // use blankUpdateTemplate below as a guide to add updates to versionator.
 // const blankUpdateTemplate = (current_version, final_version) => {
@@ -8133,12 +8142,10 @@ on('change:character_avatar change:sheet_image change:sheet_image_url', (eventIn
 on('clicked:postimage', async (eventInfo) => {
   portraitUrlCalc();
   const roll_string = `?{Display the portrait image?|YES,@{sheet_image_src}|NO,&nbsp;}`;
-
-  // Await the entire roll sequence to ensure it completes before proceeding
   await new Promise((resolve) => {
     startRoll(roll_string, (roll) => {
       finishRoll(roll.rollId);
-      resolve(); // Resolve the promise once finishRoll is called
+      resolve();
     });
   });
 });
