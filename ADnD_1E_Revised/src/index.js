@@ -285,23 +285,6 @@ const other6Attrs = ['armorother6_worn', 'armorother6', 'armorother6_ac', 'armor
 // used in getSectionIds to separate a repeating attribute names into 3 components
 const section_attribute = (section, id, field) => `repeating_${section}_${id}_${field}`;
 
-// async helper - allows async/await calls
-const setAttrsAsync = (output, options = {}) => {
-  return new Promise((resolve) => {
-    setAttrs(output, options, () => {
-      resolve();
-    });
-  });
-};
-
-const getAttrsAsync = (attrs) => {
-  return new Promise((resolve) => {
-    getAttrs(attrs, (v) => {
-      resolve(v);
-    });
-  });
-};
-
 // fixes attribute name conflict
 const dmgSwap = (current_version, final_version) => {
   // copy DmgBonus value to AttackDmgBonus
@@ -2990,20 +2973,22 @@ function setCurrentMovement() {
   });
 }
 
-on('change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', async (eventInfo) => {
-  clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  clog('Current Base Movement has been re-calculated');
-  const v = await getAttrsAsync(['movement']);
-  const output = {};
-  const recalc = 0;
-  // only extract an integer from movement
-  const movement = +v.movement.toString().replace(/[^0-9]/g, '');
-  output.movement_heavy = Math.max(movement - 3, 0);
-  output.movement_load = Math.max(movement - 6, 0);
-  output.movement_max = Math.max(movement - 9, 0);
-  await setAttrsAsync(output, {silent: true});
-  setCurrentMovement();
-  calcAC(recalc);
+on('change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', (eventInfo) => {
+  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog('Current Base Movement has been re-calculated');
+  getAttrs(['movement'], (v) => {
+    const output = {};
+    const recalc = 0;
+    // only extract an integer from movement
+    const movement = +v.movement.toString().replace(/[^0-9]/g, '');
+    output.movement_heavy = Math.max(movement - 3, 0);
+    output.movement_load = Math.max(movement - 6, 0);
+    output.movement_max = Math.max(movement - 9, 0);
+    setAttrs(output, {silent: true}, () => {
+      setCurrentMovement();
+      calcAC(recalc);
+    });
+  });
 });
 
 // Bulk Calcs
@@ -4309,63 +4294,15 @@ calcAC = (recalc) => {
   // clog('Armor re-calculated');
   getAttrs(
     [
-      'armorclass',
-      'armorclass_mod',
-      'armorclass_magic',
-      'armorbonus',
-      'armorbonus_toggle',
-      'armorbonus_inverted',
-      'unarmored_worn',
-      'armortype_worn',
-      'armortype2_worn',
-      'armorshield_worn',
-      'armorhelmet_worn',
-      'armorother_worn',
-      'armorother2_worn',
-      'armorother3_worn',
-      'armorother4_worn',
-      'armorother5_worn',
-      'armorother6_worn',
-      'unarmored_base',
-      'armortype_base',
-      'armortype2_base',
-      'armorshield_base',
-      'armorother_base',
-      'armorother2_base',
-      'armorother3_base',
-      'armorother4_base',
-      'armorother5_base',
-      'armorother6_base',
-      'unarmored_ac',
-      'armortype_ac',
-      'armortype2_ac',
-      'armorshield_ac',
-      'armorhelmet_ac',
-      'armorother_ac',
-      'armorother2_ac',
-      'armorother3_ac',
-      'armorother4_ac',
-      'armorother5_ac',
-      'armorother6_ac',
-      'armortype_magic',
-      'armortype2_magic',
-      'armorshield_magic',
-      'armorhelmet_magic',
-      'armorother_magic',
-      'armorother2_magic',
-      'armorother3_magic',
-      'armorother4_magic',
-      'armorother5_magic',
-      'armorother6_magic',
-      'armorshield_mod',
-      'armorother_mod',
-      'armorother2_mod',
-      'armorother3_mod',
-      'armorother4_mod',
-      'armorother5_mod',
-      'armorother6_mod',
-      'autocalc_ac',
+      armorAttrs,
       'armor_rating_flag',
+      'armorbonus',
+      'armorbonus_inverted',
+      'armorbonus_toggle',
+      'armorclass',
+      'armorclass_magic',
+      'armorclass_mod',
+      'autocalc_ac',
       'current_encumbrance_move',
       'sync_ac_flag',
     ],
