@@ -294,20 +294,13 @@ const setAttrsAsync = (output, options = {}) => {
   });
 };
 
-// VERSIONATOR example
-// use blankUpdateTemplate below as a guide to add updates to versionator.
-// const blankUpdateTemplate = (current_version, final_version) => {
-// have this line up near the start
-//  const output = {};
-// do stuff. ie geSectionIDs, getAttrs, all the various calculations
-// then end the worker
-//  output.sheet_version = current_version;
-//  setAttrs(output, {silent: true}, () => {
-//    versionator(current_version, final_version);
-//  });
-// don't forget any close brackets for getattrs, etc.
-//  };
-// END
+const getAttrsAsync = (attrs) => {
+  return new Promise((resolve) => {
+    getAttrs(attrs, (v) => {
+      resolve(v);
+    });
+  });
+};
 
 // fixes attribute name conflict
 const dmgSwap = (current_version, final_version) => {
@@ -2997,19 +2990,20 @@ function setCurrentMovement() {
   });
 }
 
-on('change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  getAttrs(['movement'], (v) => {
-    // clog('Current Base Movement has been re-calculated');
-    const output = {};
-    const recalc = 0;
-    // only extract an integer from movement
-    const movement = +v.movement.toString().replace(/[^0-9]/g, '');
-    output.movement_heavy = Math.max(movement - 3, 0);
-    output.movement_load = Math.max(movement - 6, 0);
-    output.movement_max = Math.max(movement - 9, 0);
-    setAttrs(output, {silent: true}, setCurrentMovement(), calcAC(recalc));
-  });
+on('change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', async (eventInfo) => {
+  clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  clog('Current Base Movement has been re-calculated');
+  const v = await getAttrsAsync(['movement']);
+  const output = {};
+  const recalc = 0;
+  // only extract an integer from movement
+  const movement = +v.movement.toString().replace(/[^0-9]/g, '');
+  output.movement_heavy = Math.max(movement - 3, 0);
+  output.movement_load = Math.max(movement - 6, 0);
+  output.movement_max = Math.max(movement - 9, 0);
+  await setAttrsAsync(output, {silent: true});
+  setCurrentMovement();
+  calcAC(recalc);
 });
 
 // Bulk Calcs
