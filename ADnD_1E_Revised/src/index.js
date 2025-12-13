@@ -3868,29 +3868,28 @@ on(
 // sync armor button - fill armor details row with repeating attr values
 // IF the row already exists, but is then moved to a new row,
 // removeEmptyArmorRows will test for duplicates and reset old row
-on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_armor_type', (eventInfo) => {
+on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_armor_type', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2].toLowerCase();
   const trigger = eventInfo.sourceAttribute.split('_').slice(3).join('_').toLowerCase();
-  getAttrs([`repeating_equipment_${id}_equipment_armor_type`, `repeating_equipment_${id}_equipment_sync_armor_flag`], (v) => {
-    const output = {};
-    const synced = +v[`repeating_equipment_${id}_equipment_sync_armor_flag`];
-    const type = +v[`repeating_equipment_${id}_equipment_armor_type`];
-    clog(`${trigger} - id:${id} type:${type} synced:${synced}`);
-    if (trigger === 'addarmor' && type !== 99) {
-      // callback to run removeEmptyArmorRows()
-      fillArmorDetails(id, () => {
-        removeEmptyArmorRows();
-      });
-      output[`repeating_equipment_${id}_equipment_sync_armor_flag`] = 1;
-    }
-    if (trigger === 'equipment_armor_type' && synced === 1) {
-      // callback to run removeEmptyArmorRows()
-      fillArmorDetails(id, () => {
-        removeEmptyArmorRows();
-      });
-    }
-    setAttrs(output, {silent: true});
-  });
+  const v = await getAttrsAsync([`repeating_equipment_${id}_equipment_armor_type`, `repeating_equipment_${id}_equipment_sync_armor_flag`]);
+  const output = {};
+  const synced = +v[`repeating_equipment_${id}_equipment_sync_armor_flag`];
+  const type = +v[`repeating_equipment_${id}_equipment_armor_type`];
+  clog(`${trigger} - id:${id} type:${type} synced:${synced}`);
+  if (trigger === 'addarmor' && type !== 99) {
+    // callback to run removeEmptyArmorRows()
+    fillArmorDetails(id, () => {
+      removeEmptyArmorRows();
+    });
+    output[`repeating_equipment_${id}_equipment_sync_armor_flag`] = 1;
+  }
+  if (trigger === 'equipment_armor_type' && synced === 1) {
+    // callback to run removeEmptyArmorRows()
+    fillArmorDetails(id, () => {
+      removeEmptyArmorRows();
+    });
+  }
+  await setAttrsAsync(output, {silent: true});
 });
 
 on('clicked:repeating_equipment:addattack', (eventInfo) => {
