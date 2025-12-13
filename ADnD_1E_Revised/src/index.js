@@ -143,7 +143,7 @@ const isAlphaNumericWithSpaces = (attr) => {
 };
 
 // Number Validation
-const numbersOnly = (attr) => {
+const numbersOnly = async (attr) => {
   // numbers and/or - + symbols before number are allowed
   // add a `(?:\.[0-9]+)?` after the `[0-9]+` bit if decimals are allowed
   return /^[-+]?[0-9]+$/.test(attr) ? 1 : 0;
@@ -179,46 +179,41 @@ on('change:character_name', async (eventInfo) => {
 // Validate input for +/- adjustment
 on(
   'change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:repeating_equipment:equipment_armor_mod change:repeating_equipment:equipment_armor_magic, change:hitpoints_1_class, change:hitpoints_2_class, change:hitpoints_3_class',
-  (eventInfo) => {
+  async (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
-    getAttrs(
-      [
-        'armortype_magic',
-        'armortype2_magic',
-        'armorshield_magic',
-        'armorhelmet_magic',
-        'armorother_magic',
-        'armorother2_magic',
-        'armorother3_magic',
-        'armorother4_magic',
-        'armorother5_magic',
-        'armorother6_magic',
-        'armorshield_mod',
-        'armorother_mod',
-        'armorother2_mod',
-        'armorother3_mod',
-        'armorother4_mod',
-        'armorother5_mod',
-        'armorother6_mod',
-        `repeating_equipment_${id}_equipment_armor_magic`,
-        `repeating_equipment_${id}_equipment_armor_mod`,
-        'hitpoints_1_class',
-        'hitpoints_2_class',
-        'hitpoints_3_class',
-      ],
-      (v) => {
-        const output = {};
-        const attr = v[`${eventInfo.sourceAttribute}`];
-        // validate input
-        const isNumber = numbersOnly(attr);
-        // clog(`NUMBER?: ${isNumber}`);
-        // write to a hidden checkbox in html ie 'X_error', CSS to style
-        output[`${eventInfo.sourceAttribute}_error`] = isNumber;
-        // output[`${eventInfo.sourceAttribute}`] = isNumber === 0 ? 0 : attr;
-        setAttrs(output, {silent: true});
-      },
-    );
+    const v = await getAttrsAsync([
+      'armortype_magic',
+      'armortype2_magic',
+      'armorshield_magic',
+      'armorhelmet_magic',
+      'armorother_magic',
+      'armorother2_magic',
+      'armorother3_magic',
+      'armorother4_magic',
+      'armorother5_magic',
+      'armorother6_magic',
+      'armorshield_mod',
+      'armorother_mod',
+      'armorother2_mod',
+      'armorother3_mod',
+      'armorother4_mod',
+      'armorother5_mod',
+      'armorother6_mod',
+      `repeating_equipment_${id}_equipment_armor_magic`,
+      `repeating_equipment_${id}_equipment_armor_mod`,
+      'hitpoints_1_class',
+      'hitpoints_2_class',
+      'hitpoints_3_class',
+    ]);
+    const output = {};
+    const attr = v[`${eventInfo.sourceAttribute}`];
+    // validate input
+    const isNumber = await numbersOnly(attr);
+    // clog(`NUMBER?: ${isNumber}`);
+    // write to a hidden checkbox in html ie 'X_error', CSS to style
+    output[`${eventInfo.sourceAttribute}_error`] = isNumber;
+    await setAttrsAsync(output, {silent: true});
   },
 );
 
