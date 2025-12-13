@@ -3734,77 +3734,63 @@ function fillArmorDetails(id, callback) {
   );
 }
 
-function createAttack(id) {
+async function createAttack(id) {
+  const v = await getAttrsAsync([
+    `repeating_equipment_${id}_equipment_item`,
+    `repeating_equipment_${id}_equipment_weapon_type`,
+    `repeating_equipment_${id}_equipment_weapon_speed`,
+    `repeating_equipment_${id}_equipment_weapon_length`,
+    `repeating_equipment_${id}_equipment_weapon_space`,
+    `repeating_equipment_${id}_equipment_weapon_misc`,
+    `repeating_equipment_${id}_equipment_weapon_damagesmallmedium`,
+    `repeating_equipment_${id}_equipment_weapon_damagelarge`,
+    `repeating_equipment_${id}_equipment_weapon_attackdmgtype`,
+    `repeating_equipment_${id}_equipment_weapon_rateoffire`,
+    `repeating_equipment_${id}_equipment_weapon_range`,
+    `repeating_equipment_${id}_equipment_quantity`,
+    `repeating_equipment_${id}_equipment_description`,
+  ]);
   const output = {};
-  getAttrs(
-    [
-      `repeating_equipment_${id}_equipment_item`,
-      `repeating_equipment_${id}_equipment_weapon_type`,
-      `repeating_equipment_${id}_equipment_weapon_speed`,
-      `repeating_equipment_${id}_equipment_weapon_length`,
-      `repeating_equipment_${id}_equipment_weapon_space`,
-      `repeating_equipment_${id}_equipment_weapon_misc`,
-      `repeating_equipment_${id}_equipment_weapon_damagesmallmedium`,
-      `repeating_equipment_${id}_equipment_weapon_damagelarge`,
-      `repeating_equipment_${id}_equipment_weapon_attackdmgtype`,
-      `repeating_equipment_${id}_equipment_weapon_rateoffire`,
-      `repeating_equipment_${id}_equipment_weapon_range`,
-      `repeating_equipment_${id}_equipment_quantity`,
-      `repeating_equipment_${id}_equipment_description`,
-    ],
-    (v) => {
-      const newID = generateUniqueRowID();
-      // clog(`Creating a new attack newID:${newID}`);
-      output[`repeating_weapon_${newID}_weapon_name`] = v[`repeating_equipment_${id}_equipment_item`];
-      output[`repeating_weapon_${newID}_weapon_type`] = +v[`repeating_equipment_${id}_equipment_weapon_type`];
-      output[`repeating_weapon_${newID}_weapon_speed`] = v[`repeating_equipment_${id}_equipment_weapon_speed`];
-      output[`repeating_weapon_${newID}_weapon_length`] = v[`repeating_equipment_${id}_equipment_weapon_length`];
-      output[`repeating_weapon_${newID}_weapon_space`] = v[`repeating_equipment_${id}_equipment_weapon_space`];
-      output[`repeating_weapon_${newID}_weapon_misc`] = v[`repeating_equipment_${id}_equipment_weapon_misc`];
-      output[`repeating_weapon_${newID}_weapon_damagesmallmedium`] = v[`repeating_equipment_${id}_equipment_weapon_damagesmallmedium`];
-      output[`repeating_weapon_${newID}_weapon_damagelarge`] = v[`repeating_equipment_${id}_equipment_weapon_damagelarge`];
-      output[`repeating_weapon_${newID}_weapon_attackdmgtype`] = v[`repeating_equipment_${id}_equipment_weapon_attackdmgtype`];
-      output[`repeating_weapon_${newID}_weapon_rateoffire`] = v[`repeating_equipment_${id}_equipment_weapon_rateoffire`];
-      output[`repeating_weapon_${newID}_weapon_range`] = v[`repeating_equipment_${id}_equipment_weapon_range`];
-      output[`repeating_weapon_${newID}_weapon_quantity`] = +v[`repeating_equipment_${id}_equipment_quantity`] || 0;
-      output[`repeating_weapon_${newID}_weapon_notes`] = v[`repeating_equipment_${id}_equipment_description`];
-      // set new row with equip values then set attack defaults and damage macros
-      setAttrs(output, {silent: true}, setWeapons(id), damageMacro(newID));
-    },
-  );
+  const newID = generateUniqueRowID();
+  // clog(`Creating a new attack newID:${newID}`);
+  output[`repeating_weapon_${newID}_weapon_name`] = v[`repeating_equipment_${id}_equipment_item`];
+  output[`repeating_weapon_${newID}_weapon_type`] = +v[`repeating_equipment_${id}_equipment_weapon_type`];
+  output[`repeating_weapon_${newID}_weapon_speed`] = v[`repeating_equipment_${id}_equipment_weapon_speed`];
+  output[`repeating_weapon_${newID}_weapon_length`] = v[`repeating_equipment_${id}_equipment_weapon_length`];
+  output[`repeating_weapon_${newID}_weapon_space`] = v[`repeating_equipment_${id}_equipment_weapon_space`];
+  output[`repeating_weapon_${newID}_weapon_misc`] = v[`repeating_equipment_${id}_equipment_weapon_misc`];
+  output[`repeating_weapon_${newID}_weapon_damagesmallmedium`] = v[`repeating_equipment_${id}_equipment_weapon_damagesmallmedium`];
+  output[`repeating_weapon_${newID}_weapon_damagelarge`] = v[`repeating_equipment_${id}_equipment_weapon_damagelarge`];
+  output[`repeating_weapon_${newID}_weapon_attackdmgtype`] = v[`repeating_equipment_${id}_equipment_weapon_attackdmgtype`];
+  output[`repeating_weapon_${newID}_weapon_rateoffire`] = v[`repeating_equipment_${id}_equipment_weapon_rateoffire`];
+  output[`repeating_weapon_${newID}_weapon_range`] = v[`repeating_equipment_${id}_equipment_weapon_range`];
+  output[`repeating_weapon_${newID}_weapon_quantity`] = +v[`repeating_equipment_${id}_equipment_quantity`] || 0;
+  output[`repeating_weapon_${newID}_weapon_notes`] = v[`repeating_equipment_${id}_equipment_description`];
+  // set new row with equip values then set attack defaults and damage macros
+  await setAttrsAsync(output, {silent: true});
+  setWeapons(id);
+  damageMacro(newID);
 }
 
-function generateArmorDetailsArray(callback) {
-  getAttrs(armorRowIDs, (v) => {
-    const unarmored0_ID = v.unarmored_row_id.toString();
-    const armortype1_ID = v.armortype1_row_id.toString();
-    const armortype2_ID = v.armortype2_row_id.toString();
-    const armorshield_ID = v.armorshield_row_id.toString();
-    const armorhelmet_ID = v.armorhelmet_row_id.toString();
-    const armorother1_ID = v.armorother1_row_id.toString();
-    const armorother2_ID = v.armorother2_row_id.toString();
-    const armorother3_ID = v.armorother3_row_id.toString();
-    const armorother4_ID = v.armorother4_row_id.toString();
-    const armorother5_ID = v.armorother5_row_id.toString();
-    const armorother6_ID = v.armorother6_row_id.toString();
-    const idArray = [
-      unarmored0_ID,
-      armortype1_ID,
-      armortype2_ID,
-      armorshield_ID,
-      armorhelmet_ID,
-      armorother1_ID,
-      armorother2_ID,
-      armorother3_ID,
-      armorother4_ID,
-      armorother5_ID,
-      armorother6_ID,
-    ].map((str) => (str ? str.toString().toLowerCase() : '0'));
-    // Check if callback is a function before calling it
-    if (typeof callback === 'function') {
-      callback(idArray);
-    }
-  });
+async function generateArmorDetailsArray(callback) {
+  const v = await getAttrsAsync(armorRowIDs);
+  const idArray = [
+    (unarmored0_ID = v.unarmored_row_id.toString()),
+    (armortype1_ID = v.armortype1_row_id.toString()),
+    (armortype2_ID = v.armortype2_row_id.toString()),
+    (armorshield_ID = v.armorshield_row_id.toString()),
+    (armorhelmet_ID = v.armorhelmet_row_id.toString()),
+    (armorother1_ID = v.armorother1_row_id.toString()),
+    (armorother2_ID = v.armorother2_row_id.toString()),
+    (armorother3_ID = v.armorother3_row_id.toString()),
+    (armorother4_ID = v.armorother4_row_id.toString()),
+    (armorother5_ID = v.armorother5_row_id.toString()),
+    (armorother6_ID = v.armorother6_row_id.toString()),
+  ].map((str) => (str ? str.toString().toLowerCase() : '0'));
+  // Check if callback is a function before calling it
+  if (typeof callback === 'function') {
+    callback(idArray);
+  }
 }
 
 // checks repeating_equipment id against Armor Detail's ids
