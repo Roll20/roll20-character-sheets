@@ -3774,37 +3774,25 @@ function createAttack(id) {
   );
 }
 
-function generateArmorDetailsArray(callback) {
-  getAttrs(armorRowIDs, (v) => {
-    const unarmored0_ID = v.unarmored_row_id.toString();
-    const armortype1_ID = v.armortype1_row_id.toString();
-    const armortype2_ID = v.armortype2_row_id.toString();
-    const armorshield_ID = v.armorshield_row_id.toString();
-    const armorhelmet_ID = v.armorhelmet_row_id.toString();
-    const armorother1_ID = v.armorother1_row_id.toString();
-    const armorother2_ID = v.armorother2_row_id.toString();
-    const armorother3_ID = v.armorother3_row_id.toString();
-    const armorother4_ID = v.armorother4_row_id.toString();
-    const armorother5_ID = v.armorother5_row_id.toString();
-    const armorother6_ID = v.armorother6_row_id.toString();
-    const idArray = [
-      unarmored0_ID,
-      armortype1_ID,
-      armortype2_ID,
-      armorshield_ID,
-      armorhelmet_ID,
-      armorother1_ID,
-      armorother2_ID,
-      armorother3_ID,
-      armorother4_ID,
-      armorother5_ID,
-      armorother6_ID,
-    ].map((str) => (str ? str.toString().toLowerCase() : '0'));
-    // Check if callback is a function before calling it
-    if (typeof callback === 'function') {
-      callback(idArray);
-    }
-  });
+async function generateArmorDetailsArray(callback) {
+  const v = await getAttrsAsync(armorRowIDs);
+  const idArray = [
+    (unarmored0_ID = v.unarmored_row_id.toString()),
+    (armortype1_ID = v.armortype1_row_id.toString()),
+    (armortype2_ID = v.armortype2_row_id.toString()),
+    (armorshield_ID = v.armorshield_row_id.toString()),
+    (armorhelmet_ID = v.armorhelmet_row_id.toString()),
+    (armorother1_ID = v.armorother1_row_id.toString()),
+    (armorother2_ID = v.armorother2_row_id.toString()),
+    (armorother3_ID = v.armorother3_row_id.toString()),
+    (armorother4_ID = v.armorother4_row_id.toString()),
+    (armorother5_ID = v.armorother5_row_id.toString()),
+    (armorother6_ID = v.armorother6_row_id.toString()),
+  ].map((str) => (str ? str.toString().toLowerCase() : '0'));
+  // Check if callback is a function before calling it
+  if (typeof callback === 'function') {
+    callback(idArray);
+  }
 }
 
 // checks repeating_equipment id against Armor Detail's ids
