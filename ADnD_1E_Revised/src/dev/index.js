@@ -3217,128 +3217,126 @@ on('change:equipment_tabs_type change:equipment_tabs_carry', async (eventInfo) =
   await setAttrsAsync(output);
 });
 
-const removeEmptyArmorRows = () => {
-  getSectionIDs('repeating_equipment', (idArray) => {
-    const output = {};
-    const fields = [];
+const removeEmptyArmorRows = async () => {
+  const idArray = await getSectionIDsAsync('repeating_equipment');
+  const output = {};
+  const fields = [];
+  _.each(idArray, (id) => {
+    fields.push(section_attribute('equipment', id, 'equipment_armor_type'));
+  });
+  const v = await getAttrsAsync(fields);
+  generateArmorDetailsArray((armorDetailsArray) => {
+    clog(`removeEmptyArmorRows - armorDetailsArray:`);
+    console.log(armorDetailsArray);
     _.each(idArray, (id) => {
-      fields.push(section_attribute('equipment', id, 'equipment_armor_type'));
-    });
-    getAttrs(fields, (v) => {
-      generateArmorDetailsArray((armorDetailsArray) => {
-        clog(`removeEmptyArmorRows - armorDetailsArray:`);
-        console.log(armorDetailsArray);
-        _.each(idArray, (id) => {
-          // this id is the trigger
-          const type = +v[`repeating_equipment_${id}_equipment_armor_type`];
-          // Armor Type not selected
-          if (type === 99) return;
-          clog(`removeEmptyArmorRows - Armor Type:${type}`);
-          // Find Armor Details row position where the id matches in armorDetailsArray
-          const matchingIndices = armorDetailsArray
-            .map((element, index) => {
-              // Check if an array element is equal to the id
-              if (element === id) {
-                // If there's a match, return the corresponding Armor Details row number
-                return `${Math.floor(index) + 1}`;
-              }
-              // If there's no match, return null
-              return null;
-            })
-            .filter((index) => index !== null);
-          // Do stuff only when there are multiple matches
-          if (matchingIndices.length > 1) {
-            rowType = type + 1; // aligns Armor type with actual the Actual Armor Details row
-            clog(`removeEmptyArmorRows - matchingIndices: [${matchingIndices}] id:${id} type:${rowType}`);
-            // Create a new array of Armor Details row index positions with multiple matches
-            const indicesWithMultipleMatches = matchingIndices;
-            // Convert indicesWithMultipleMatches array to a comma-separated string
-            const indicesString = indicesWithMultipleMatches.join(',');
-            // Create a new variable called "removeRows" with values that don't equal "rowType"
-            const removeRows = indicesString.split(',').filter((value) => value !== String(rowType));
-            // Log the resulting array (should only be a single match)
-            clog(`removeEmptyArmorRows - matching rows: ${removeRows}`);
-            // Further filter removeRows and save the value at index 0 to removeRow
-            const removeRow = removeRows.length > 0 ? removeRows[0] : null;
-            // Log the final result
-            clog(`removeEmptyArmorRows - removeRow at index: ${removeRow}`);
-            // Use removeRow to delete the old Armor Details row
-
-            switch (removeRow) {
-              case '1':
-                output.unarmored = '';
-                output.unarmored_worn = 0;
-                output.unarmored_row_id = 0;
-                clog(`>> DELETE/RESET ROW 0 - Unarmored <<`);
-                break;
-              case '2':
-                output.armortype = '';
-                output.armortype_worn = 0;
-                output.armortype_row_id = 0;
-                clog(`>> DELETE/RESET ROW 1 - Armor 1 <<`);
-                break;
-              case '3':
-                output.armortype2 = '';
-                output.armortype2_worn = 0;
-                output.armortype2_row_id = 0;
-                clog(`>> DELETE/RESET ROW 2 - Armor 2 <<`);
-                break;
-              case '4':
-                output.armorshield = '';
-                output.armorshield_worn = 0;
-                output.armorshield_row_id = 0;
-                clog(`>> DELETE/RESET ROW 3 - Shield <<`);
-                break;
-              case '5':
-                output.armorhelmet = '';
-                output.armorhelmet_worn = 0;
-                output.armorhelmet_row_id = 0;
-                clog(`>> DELETE/RESET ROW 4 - Helmet <<`);
-                break;
-              case '6':
-                output.armorother = '';
-                output.armorother_worn = 0;
-                output.armorother_row_id = 0;
-                clog(`>> DELETE/RESET ROW 5 - Other <<`);
-                break;
-              case '7':
-                output.armorother2 = '';
-                output.armorother2_worn = 0;
-                output.armorother2_row_id = 0;
-                clog(`>> DELETE/RESET ROW 6 - Other 2 <<`);
-                break;
-              case '8':
-                output.armorother3 = '';
-                output.armorother3_worn = 0;
-                output.armorother3_row_id = 0;
-                clog(`>> DELETE/RESET ROW 7 - Other 3 <<`);
-                break;
-              case '9':
-                output.armorother4 = '';
-                output.armorother4_worn = 0;
-                output.armorother4_row_id = 0;
-                clog(`>> DELETE/RESET ROW 8 - Other 4 <<`);
-                break;
-              case '10':
-                output.armorother5 = '';
-                output.armorother5_worn = 0;
-                output.armorother5_row_id = 0;
-                clog(`>> DELETE/RESET ROW 9 - Other 5 <<`);
-                break;
-              case '11':
-                output.armorother6 = '';
-                output.armorother6_worn = 0;
-                output.armorother6_row_id = 0;
-                clog(`>> DELETE/RESET ROW 10 - Other 6 <<`);
-                break;
-              default:
-                clog(`>> NOTHING TO DELETE/RESET <<`);
-            }
+      // this id is the trigger
+      const type = +v[`repeating_equipment_${id}_equipment_armor_type`];
+      // Armor Type not selected
+      if (type === 99) return;
+      clog(`removeEmptyArmorRows - Armor Type:${type}`);
+      // Find Armor Details row position where the id matches in armorDetailsArray
+      const matchingIndices = armorDetailsArray
+        .map((element, index) => {
+          // Check if an array element is equal to the id
+          if (element === id) {
+            // If there's a match, return the corresponding Armor Details row number
+            return `${Math.floor(index) + 1}`;
           }
-        });
-        setAttrs(output);
-      });
+          // If there's no match, return null
+          return null;
+        })
+        .filter((index) => index !== null);
+      // Do stuff only when there are multiple matches
+      if (matchingIndices.length > 1) {
+        rowType = type + 1; // aligns Armor type with actual the Actual Armor Details row
+        clog(`removeEmptyArmorRows - matchingIndices: [${matchingIndices}] id:${id} type:${rowType}`);
+        // Create a new array of Armor Details row index positions with multiple matches
+        const indicesWithMultipleMatches = matchingIndices;
+        // Convert indicesWithMultipleMatches array to a comma-separated string
+        const indicesString = indicesWithMultipleMatches.join(',');
+        // Create a new variable called "removeRows" with values that don't equal "rowType"
+        const removeRows = indicesString.split(',').filter((value) => value !== String(rowType));
+        // Log the resulting array (should only be a single match)
+        clog(`removeEmptyArmorRows - matching rows: ${removeRows}`);
+        // Further filter removeRows and save the value at index 0 to removeRow
+        const removeRow = removeRows.length > 0 ? removeRows[0] : null;
+        // Log the final result
+        clog(`removeEmptyArmorRows - removeRow at index: ${removeRow}`);
+        // Use removeRow to delete the old Armor Details row
+
+        switch (removeRow) {
+          case '1':
+            output.unarmored = '';
+            output.unarmored_worn = 0;
+            output.unarmored_row_id = 0;
+            clog(`>> DELETE/RESET ROW 0 - Unarmored <<`);
+            break;
+          case '2':
+            output.armortype = '';
+            output.armortype_worn = 0;
+            output.armortype_row_id = 0;
+            clog(`>> DELETE/RESET ROW 1 - Armor 1 <<`);
+            break;
+          case '3':
+            output.armortype2 = '';
+            output.armortype2_worn = 0;
+            output.armortype2_row_id = 0;
+            clog(`>> DELETE/RESET ROW 2 - Armor 2 <<`);
+            break;
+          case '4':
+            output.armorshield = '';
+            output.armorshield_worn = 0;
+            output.armorshield_row_id = 0;
+            clog(`>> DELETE/RESET ROW 3 - Shield <<`);
+            break;
+          case '5':
+            output.armorhelmet = '';
+            output.armorhelmet_worn = 0;
+            output.armorhelmet_row_id = 0;
+            clog(`>> DELETE/RESET ROW 4 - Helmet <<`);
+            break;
+          case '6':
+            output.armorother = '';
+            output.armorother_worn = 0;
+            output.armorother_row_id = 0;
+            clog(`>> DELETE/RESET ROW 5 - Other <<`);
+            break;
+          case '7':
+            output.armorother2 = '';
+            output.armorother2_worn = 0;
+            output.armorother2_row_id = 0;
+            clog(`>> DELETE/RESET ROW 6 - Other 2 <<`);
+            break;
+          case '8':
+            output.armorother3 = '';
+            output.armorother3_worn = 0;
+            output.armorother3_row_id = 0;
+            clog(`>> DELETE/RESET ROW 7 - Other 3 <<`);
+            break;
+          case '9':
+            output.armorother4 = '';
+            output.armorother4_worn = 0;
+            output.armorother4_row_id = 0;
+            clog(`>> DELETE/RESET ROW 8 - Other 4 <<`);
+            break;
+          case '10':
+            output.armorother5 = '';
+            output.armorother5_worn = 0;
+            output.armorother5_row_id = 0;
+            clog(`>> DELETE/RESET ROW 9 - Other 5 <<`);
+            break;
+          case '11':
+            output.armorother6 = '';
+            output.armorother6_worn = 0;
+            output.armorother6_row_id = 0;
+            clog(`>> DELETE/RESET ROW 10 - Other 6 <<`);
+            break;
+          default:
+            clog(`>> NOTHING TO DELETE/RESET <<`);
+        }
+      }
     });
+    setAttrsAsync(output);
   });
 };
 
