@@ -3160,26 +3160,26 @@ on(
 // carried_select/carried sync are used for weight calcs
 on(
   'change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_type change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_magical',
-  (eventInfo) => {
+  async (eventInfo) => {
     const id = eventInfo.sourceAttribute.split('_')[2];
     const source = `${eventInfo.sourceAttribute}`;
     const pattern = /equipment_type/; // parses the event text
     const isType = pattern.test(source); // boolean for equipment_type change
     const fields = [section_attribute('equipment', id, 'equipment_type'), section_attribute('equipment', id, 'equipment_carried_select')];
-    getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', ...fields], (v) => {
-      const output = {};
-      const carriedTab = +v.equipment_tabs_carry; // 1, 0, 2, -1
-      const typeTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
-      const thisType = +v[section_attribute('equipment', id, 'equipment_type')]; // 0, 1, 2, 3, 4
-      const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')]; // 0, 1, 2
-      // Weight calcs use equipment_carried so keep them synced
-      output[section_attribute('equipment', id, 'equipment_carried')] = thisCarriedSelect === 1 ? 1 : 0;
-      // jumps to equip type tab unless Show All or same equip type tab
-      output.equipment_tabs_type = typeTab !== -1 && isType ? thisType : typeTab;
-      // jumps to carry type tab unless Show All or same carry type tab
-      output.equipment_tabs_carry = carriedTab === -1 || carriedTab === thisCarriedSelect ? -1 : thisCarriedSelect;
-      setAttrs(output);
-    });
+    const v = await getAttrsAsync(['equipment_tabs_type', 'equipment_tabs_carry', ...fields]);
+    await setAttrsAsync(output, {silent: true});
+    const output = {};
+    const carriedTab = +v.equipment_tabs_carry; // 1, 0, 2, -1
+    const typeTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
+    const thisType = +v[section_attribute('equipment', id, 'equipment_type')]; // 0, 1, 2, 3, 4
+    const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')]; // 0, 1, 2
+    // Weight calcs use equipment_carried so keep them synced
+    output[section_attribute('equipment', id, 'equipment_carried')] = thisCarriedSelect === 1 ? 1 : 0;
+    // jumps to equip type tab unless Show All or same equip type tab
+    output.equipment_tabs_type = typeTab !== -1 && isType ? thisType : typeTab;
+    // jumps to carry type tab unless Show All or same carry type tab
+    output.equipment_tabs_carry = carriedTab === -1 || carriedTab === thisCarriedSelect ? -1 : thisCarriedSelect;
+    await setAttrsAsync(output);
   },
 );
 
