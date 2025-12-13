@@ -135,7 +135,7 @@ const isAlphaNumericWithSpaces = (attr) => {
   if (/^[a-zA-Z0-9\s]+$/.test(attr)) {
     return true;
   }
-  // Check for specific characters that can break a macro
+  // Check for specific characters '), |, or }' that can break a macro
   if (/[)|\}]/.test(attr)) {
     return false;
   }
@@ -163,18 +163,17 @@ const generateUniqueRowID = () => {
 };
 
 // Validate character name for illegal characters
-on('change:character_name', (eventInfo) => {
+on('change:character_name', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  getAttrs(['character_name'], (v) => {
-    const output = {};
-    const attr = v[`${eventInfo.sourceAttribute}`];
-    // validate input
-    const isText = isAlphaNumericWithSpaces(attr);
-    // clog(`Valid Input?: ${isText}`);
-    // write to a hidden checkbox in html ie 'X_error', CSS to style
-    output[`${eventInfo.sourceAttribute}_error`] = isText;
-    setAttrs(output, {silent: true});
-  });
+  const v = await getAttrsAsync(['character_name']);
+  const output = {};
+  const attr = v[`${eventInfo.sourceAttribute}`];
+  // validate input
+  const isText = await isAlphaNumericWithSpaces(attr);
+  // clog(`Valid Input?: ${isText}`);
+  // write to a hidden checkbox in html ie 'X_error', CSS to style
+  output[`${eventInfo.sourceAttribute}_error`] = isText;
+  await setAttrsAsync(output, {silent: true});
 });
 
 // Validate input for +/- adjustment
