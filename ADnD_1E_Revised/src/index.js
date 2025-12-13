@@ -4808,6 +4808,7 @@ const repeatingNWPAll = [...repeatingNWPNumber, ...repeatingNWPString];
 async function setWeapons(id) {
   // create an array of the repeating attrs
   const fields = repeatingWeaponAll.map((field) => section_attribute('weapon', id, field));
+  // console.log(`setWeapons - Change detected: id: ${id}`);
   const v = await getAttrsAsync(fields);
   const output = {};
   // set the number-based attrs
@@ -4829,7 +4830,7 @@ async function setEquipment(id) {
   // create an array of the repeating attrs
   const fields = repeatingEquipmentAll.map((field) => section_attribute('equipment', id, field));
   const combined = [...nonRep, ...fields];
-  console.log(`setEquipment - Change detected: id: ${id}`);
+  // console.log(`setEquipment - Change detected: id: ${id}`);
   const v = await getAttrsAsync(combined);
   const output = {};
   const equipTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
@@ -4856,12 +4857,12 @@ async function setEquipment(id) {
     output[fullAttrName] = v[fullAttrName];
   }
   await setAttrsAsync(output, {silent: true});
-  clog(`setEquipment - default values have been set.`);
+  // clog(`setEquipment - default values have been set.`);
 }
 
 async function setNWP(id) {
   const fields = repeatingNWPAll.map((field) => section_attribute('nonweaponproficiencies', id, field));
-  console.log(`setNWP - Change detected: id: ${id}`);
+  // console.log(`setNWP - Change detected: id: ${id}`);
   const v = await getAttrsAsync(fields);
   const output = {};
   // set the number-based attrs
@@ -4875,31 +4876,31 @@ async function setNWP(id) {
     output[fullAttrName] = v[fullAttrName];
   }
   await setAttrsAsync(output, {silent: true});
-  clog(`setNWP - default values have been set.`);
+  // clog(`setNWP - default values have been set.`);
 }
 
 // Set repeating attr values for new rows. Makes visible to API
 on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item change:repeating_nonweaponproficiencies:nwp_name', async (eventInfo) => {
-  clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
 
   // test for new row name (ie no existing value)
-  console.log(`Change detected: new: ${eventInfo.newValue} previous:${eventInfo.previousValue}`);
+  // console.log(`Change detected: new: ${eventInfo.newValue} previous:${eventInfo.previousValue}`);
   if (eventInfo.previousValue !== undefined) return;
 
   if (eventInfo.sourceAttribute.includes('equipment_item')) {
     await setEquipment(id);
-    clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Default values have been set.`);
+    // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Default values have been set.`);
   }
   if (eventInfo.sourceAttribute.includes('weapon_name')) {
     await setWeapons(id);
-    clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Default values have been set.`);
+    // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Default values have been set.`);
   }
   if (eventInfo.sourceAttribute.includes('nwp_name')) {
     await setNWP(id);
-    clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Default values have been set.`);
+    // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Default values have been set.`);
   }
 });
 
