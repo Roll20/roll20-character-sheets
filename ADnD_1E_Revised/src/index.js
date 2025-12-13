@@ -3184,35 +3184,37 @@ on(
 );
 
 // Equipment Tabs hide/show Rows
-on('change:equipment_tabs_type change:equipment_tabs_carry', (eventInfo) => {
+on('change:equipment_tabs_type change:equipment_tabs_carry', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  getSectionIDs('repeating_equipment', (idArray) => {
-    const fields = [];
-    _.each(idArray, (id) => {
-      fields.push(section_attribute('equipment', id, 'equipment_type'));
-      fields.push(section_attribute('equipment', id, 'equipment_carried_select'));
-      fields.push(section_attribute('equipment', id, 'equipment_magical'));
-    });
-    getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', 'equipment_magical', ...fields], (v) => {
-      const output = {};
-      const typeTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
-      const carriedTab = +v.equipment_tabs_carry; // 1, 0, 2, -1
-      _.each(idArray, (id) => {
-        const isMagical = +v[section_attribute('equipment', id, 'equipment_magical')]; // checkbox
-        const thisType = +v[section_attribute('equipment', id, 'equipment_type')]; // 0, 1, 2, 3, 4
-        const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')]; // 0, 1, 2
-        // CSS to hide/show the repeating row based on typeTab and/or carriedTab
-        if (typeTab === -1 || typeTab === thisType || (typeTab === 3 && isMagical)) {
-          output[section_attribute('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
-          return (output[section_attribute('equipment', id, 'equipment_show_type')] = 1);
-        } else {
-          output[section_attribute('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
-          output[section_attribute('equipment', id, 'equipment_show_type')] = 0;
-        }
-      });
-      setAttrs(output);
-    });
+  const idArray = await getSectionIDsAsync('repeating_equipment');
+  const output = {};
+  const fields = [];
+  _.each(idArray, (id) => {
+    fields.push(section_attribute('equipment', id, 'equipment_type'));
+    fields.push(section_attribute('equipment', id, 'equipment_carried_select'));
+    fields.push(section_attribute('equipment', id, 'equipment_magical'));
   });
+  const v = await getAttrsAsync(['equipment_tabs_type', 'equipment_tabs_carry', 'equipment_magical', ...fields]);
+  idArray.forEach((id) => {
+    const currentValue = +v[section_attribute('section', id, 'attribute')];
+    output[section_attribute('section', id, 'attribute')] = currentValue;
+  });
+  const typeTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
+  const carriedTab = +v.equipment_tabs_carry; // 1, 0, 2, -1
+  _.each(idArray, (id) => {
+    const isMagical = +v[section_attribute('equipment', id, 'equipment_magical')]; // checkbox
+    const thisType = +v[section_attribute('equipment', id, 'equipment_type')]; // 0, 1, 2, 3, 4
+    const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')]; // 0, 1, 2
+    // CSS to hide/show the repeating row based on typeTab and/or carriedTab
+    if (typeTab === -1 || typeTab === thisType || (typeTab === 3 && isMagical)) {
+      output[section_attribute('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
+      return (output[section_attribute('equipment', id, 'equipment_show_type')] = 1);
+    } else {
+      output[section_attribute('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
+      output[section_attribute('equipment', id, 'equipment_show_type')] = 0;
+    }
+  });
+  await setAttrsAsync(output);
 });
 
 const removeEmptyArmorRows = () => {
