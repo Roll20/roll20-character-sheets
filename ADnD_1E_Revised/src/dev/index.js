@@ -3768,7 +3768,7 @@ async function createAttack(id) {
   output[`repeating_weapon_${newID}_weapon_notes`] = v[`repeating_equipment_${id}_equipment_description`];
   // set new row with equip values then set attack defaults and damage macros
   await setAttrsAsync(output, {silent: true});
-  setWeapons(id);
+  await setWeapons(id);
   damageMacro(newID);
 }
 
@@ -4705,8 +4705,7 @@ on('change:toggle_auto_damage change:toggle_critdamage', (eventInfo) => {
   });
 });
 
-function setWeapons(id) {
-  const output = {};
+async function setWeapons(id) {
   const fields = [
     section_attribute('weapon', id, 'weapon_use'),
     section_attribute('weapon', id, 'weapon_attack_type'),
@@ -4762,63 +4761,63 @@ function setWeapons(id) {
     section_attribute('weapon', id, 'weapon_critdamagelarge_npc_chat_menu'),
     section_attribute('weapon', id, 'weapon_damage_chat_menu_npc'),
   ];
-  getAttrs(fields, (v) => {
-    // console.log(`Change detected: ${fields}`);
-    output.repeating_weapon_weapon_use = +v[section_attribute('weapon', id, 'weapon_use')];
-    output.repeating_weapon_weapon_attack_type_flag = +v[section_attribute('weapon', id, 'weapon_attack_type_flag')];
-    output.repeating_weapon_weapon_critdamage_flag = +v[section_attribute('weapon', id, 'weapon_critdamage_flag')];
-    output.repeating_weapon_weapon_prof_pen = +v[section_attribute('weapon', id, 'weapon_prof_pen')];
-    output.repeating_weapon_weapon_range_error = +v[section_attribute('weapon', id, 'weapon_range_error')];
-    output.repeating_weapon_weapon_tohitacadj = +v[section_attribute('weapon', id, 'weapon_tohitacadj')];
-    output.repeating_weapon_weapon_attack_type = +v[section_attribute('weapon', id, 'weapon_attack_type')];
-    output.repeating_weapon_weapon_dual = v[section_attribute('weapon', id, 'weapon_dual')];
-    output.repeating_weapon_weapon_whisper_to_hit = v[section_attribute('weapon', id, 'weapon_whisper_to_hit')];
-    output.repeating_weapon_weapon_whisper_to_hit_select = +v[section_attribute('weapon', id, 'weapon_whisper_to_hit_select')];
-    output.repeating_weapon_weapon_dual_pen = +v[section_attribute('weapon', id, 'weapon_dual_pen')];
-    output.repeating_weapon_weapon_backstab_var = +v[section_attribute('weapon', id, 'weapon_backstab_var')];
-    output.repeating_weapon_weapon_tohitbonus = +v[section_attribute('weapon', id, 'weapon_tohitbonus')];
-    output.repeating_weapon_weapon_magicbonus = +v[section_attribute('weapon', id, 'weapon_magicbonus')];
-    output.repeating_weapon_weapon_prof = +v[section_attribute('weapon', id, 'weapon_prof')];
-    output.repeating_weapon_weapon_backstab = +v[section_attribute('weapon', id, 'weapon_backstab')];
-    output.repeating_weapon_weapon_backstab_bonus = +v[section_attribute('weapon', id, 'weapon_backstab_bonus')];
-    output.repeating_weapon_weapon_backstab_mult = +v[section_attribute('weapon', id, 'weapon_backstab_mult')];
-    output.repeating_weapon_weapon_attackdmgbonus = +v[section_attribute('weapon', id, 'weapon_attackdmgbonus')];
-    output.repeating_weapon_weapon_num_attacks = +v[section_attribute('weapon', id, 'weapon_num_attacks')];
-    output.repeating_weapon_weapon_quantity = +v[section_attribute('weapon', id, 'weapon_quantity')];
-    output.repeating_weapon_weapon_ammo = +v[section_attribute('weapon', id, 'weapon_ammo')];
-    output.repeating_weapon_weapon_ammo_max = +v[section_attribute('weapon', id, 'weapon_ammo_max')];
-    output.repeating_weapon_weapon_weight = +v[section_attribute('weapon', id, 'weapon_weight')];
-    output.repeating_weapon_weapon_cost = +v[section_attribute('weapon', id, 'weapon_cost')];
-    output.repeating_weapon_weapon_range_short = +v[section_attribute('weapon', id, 'weapon_range_short')];
-    output.repeating_weapon_weapon_range_medium = +v[section_attribute('weapon', id, 'weapon_range_medium')];
-    output.repeating_weapon_weapon_range_long = +v[section_attribute('weapon', id, 'weapon_range_long')];
-    output.repeating_weapon_weapon_length = v[section_attribute('weapon', id, 'weapon_length')];
-    output.repeating_weapon_weapon_space = v[section_attribute('weapon', id, 'weapon_space')];
-    output.repeating_weapon_weapon_speed = v[section_attribute('weapon', id, 'weapon_speed')];
-    output.repeating_weapon_weapon_misc = v[section_attribute('weapon', id, 'weapon_misc')];
-    output.repeating_weapon_weapon_thac_adj0 = +v[section_attribute('weapon', id, 'weapon_thac_adj0')];
-    output.repeating_weapon_weapon_thac_adj1 = +v[section_attribute('weapon', id, 'weapon_thac_adj1')];
-    output.repeating_weapon_weapon_thac_adj2 = +v[section_attribute('weapon', id, 'weapon_thac_adj2')];
-    output.repeating_weapon_weapon_thac_adj3 = +v[section_attribute('weapon', id, 'weapon_thac_adj3')];
-    output.repeating_weapon_weapon_thac_adj4 = +v[section_attribute('weapon', id, 'weapon_thac_adj4')];
-    output.repeating_weapon_weapon_thac_adj5 = +v[section_attribute('weapon', id, 'weapon_thac_adj5')];
-    output.repeating_weapon_weapon_thac_adj6 = +v[section_attribute('weapon', id, 'weapon_thac_adj6')];
-    output.repeating_weapon_weapon_thac_adj7 = +v[section_attribute('weapon', id, 'weapon_thac_adj7')];
-    output.repeating_weapon_weapon_thac_adj8 = +v[section_attribute('weapon', id, 'weapon_thac_adj8')];
-    output.repeating_weapon_weapon_thac_adj9 = +v[section_attribute('weapon', id, 'weapon_thac_adj9')];
-    output.repeating_weapon_weapon_thac_adj10 = +v[section_attribute('weapon', id, 'weapon_thac_adj10')];
-    output.repeating_weapon_weapon_macro_text = v[section_attribute('weapon', id, 'weapon_macro_text')];
-    output.repeating_weapon_weapon_damagesmallmedium_chat_menu = v[section_attribute('weapon', id, 'weapon_damagesmallmedium_chat_menu')];
-    output.repeating_weapon_weapon_damagelarge_chat_menu = v[section_attribute('weapon', id, 'weapon_damagelarge_chat_menu')];
-    output.repeating_weapon_weapon_damagesmallmedium_npc_chat_menu = v[section_attribute('weapon', id, 'weapon_damagesmallmedium_npc_chat_menu')];
-    output.repeating_weapon_weapon_damagelarge_npc_chat_menu = v[section_attribute('weapon', id, 'weapon_damagelarge_npc_chat_menu')];
-    output.repeating_weapon_weapon_critdamagesmallmedium_chat_menu = v[section_attribute('weapon', id, 'weapon_critdamagesmallmedium_chat_menu')];
-    output.repeating_weapon_weapon_critdamagelarge_chat_menu = v[section_attribute('weapon', id, 'weapon_critdamagelarge_chat_menu')];
-    output.repeating_weapon_weapon_critdamagesmallmedium_npc_chat_menu = v[section_attribute('weapon', id, 'weapon_critdamagesmallmedium_npc_chat_menu')];
-    output.repeating_weapon_weapon_critdamagelarge_npc_chat_menu = v[section_attribute('weapon', id, 'weapon_critdamagelarge_npc_chat_menu')];
-    output.repeating_weapon_weapon_damage_chat_menu_npc = v[section_attribute('weapon', id, 'weapon_damage_chat_menu_npc')];
-    setAttrs(output, {silent: true});
-  });
+  console.log(`setWeapons - Change detected: id: ${id}`);
+  const v = await getAttrsAsync(fields);
+  const output = {};
+  output[section_attribute('weapon', id, 'weapon_use')] = +v[section_attribute('weapon', id, 'weapon_use')];
+  output[section_attribute('weapon', id, 'weapon_attack_type_flag')] = +v[section_attribute('weapon', id, 'weapon_attack_type_flag')];
+  output[section_attribute('weapon', id, 'weapon_critdamage_flag')] = +v[section_attribute('weapon', id, 'weapon_critdamage_flag')];
+  output[section_attribute('weapon', id, 'weapon_prof_pen')] = +v[section_attribute('weapon', id, 'weapon_prof_pen')];
+  output[section_attribute('weapon', id, 'weapon_range_error')] = +v[section_attribute('weapon', id, 'weapon_range_error')];
+  output[section_attribute('weapon', id, 'weapon_tohitacadj')] = v[section_attribute('weapon', id, 'weapon_tohitacadj')];
+  output[section_attribute('weapon', id, 'weapon_attack_type')] = +v[section_attribute('weapon', id, 'weapon_attack_type')];
+  output[section_attribute('weapon', id, 'weapon_dual')] = v[section_attribute('weapon', id, 'weapon_dual')];
+  output[section_attribute('weapon', id, 'weapon_whisper_to_hit')] = v[section_attribute('weapon', id, 'weapon_whisper_to_hit')];
+  output[section_attribute('weapon', id, 'weapon_whisper_to_hit_select')] = +v[section_attribute('weapon', id, 'weapon_whisper_to_hit_select')];
+  output[section_attribute('weapon', id, 'weapon_dual_pen')] = +v[section_attribute('weapon', id, 'weapon_dual_pen')];
+  output[section_attribute('weapon', id, 'weapon_backstab_var')] = +v[section_attribute('weapon', id, 'weapon_backstab_var')];
+  output[section_attribute('weapon', id, 'weapon_tohitbonus')] = +v[section_attribute('weapon', id, 'weapon_tohitbonus')];
+  output[section_attribute('weapon', id, 'weapon_magicbonus')] = +v[section_attribute('weapon', id, 'weapon_magicbonus')];
+  output[section_attribute('weapon', id, 'weapon_prof')] = +v[section_attribute('weapon', id, 'weapon_prof')];
+  output[section_attribute('weapon', id, 'weapon_backstab')] = +v[section_attribute('weapon', id, 'weapon_backstab')];
+  output[section_attribute('weapon', id, 'weapon_backstab_bonus')] = +v[section_attribute('weapon', id, 'weapon_backstab_bonus')];
+  output[section_attribute('weapon', id, 'weapon_backstab_mult')] = +v[section_attribute('weapon', id, 'weapon_backstab_mult')];
+  output[section_attribute('weapon', id, 'weapon_attackdmgbonus')] = +v[section_attribute('weapon', id, 'weapon_attackdmgbonus')];
+  output[section_attribute('weapon', id, 'weapon_num_attacks')] = +v[section_attribute('weapon', id, 'weapon_num_attacks')];
+  output[section_attribute('weapon', id, 'weapon_quantity')] = +v[section_attribute('weapon', id, 'weapon_quantity')];
+  output[section_attribute('weapon', id, 'weapon_ammo')] = +v[section_attribute('weapon', id, 'weapon_ammo')];
+  output[section_attribute('weapon', id, 'weapon_ammo_max')] = +v[section_attribute('weapon', id, 'weapon_ammo_max')];
+  output[section_attribute('weapon', id, 'weapon_weight')] = +v[section_attribute('weapon', id, 'weapon_weight')];
+  output[section_attribute('weapon', id, 'weapon_cost')] = +v[section_attribute('weapon', id, 'weapon_cost')];
+  output[section_attribute('weapon', id, 'weapon_range_short')] = +v[section_attribute('weapon', id, 'weapon_range_short')];
+  output[section_attribute('weapon', id, 'weapon_range_medium')] = +v[section_attribute('weapon', id, 'weapon_range_medium')];
+  output[section_attribute('weapon', id, 'weapon_range_long')] = +v[section_attribute('weapon', id, 'weapon_range_long')];
+  output[section_attribute('weapon', id, 'weapon_length')] = v[section_attribute('weapon', id, 'weapon_length')];
+  output[section_attribute('weapon', id, 'weapon_space')] = v[section_attribute('weapon', id, 'weapon_space')];
+  output[section_attribute('weapon', id, 'weapon_speed')] = v[section_attribute('weapon', id, 'weapon_speed')];
+  output[section_attribute('weapon', id, 'weapon_misc')] = v[section_attribute('weapon', id, 'weapon_misc')];
+  output[section_attribute('weapon', id, 'weapon_thac_adj0')] = +v[section_attribute('weapon', id, 'weapon_thac_adj0')];
+  output[section_attribute('weapon', id, 'weapon_thac_adj1')] = +v[section_attribute('weapon', id, 'weapon_thac_adj1')];
+  output[section_attribute('weapon', id, 'weapon_thac_adj2')] = +v[section_attribute('weapon', id, 'weapon_thac_adj2')];
+  output[section_attribute('weapon', id, 'weapon_thac_adj3')] = +v[section_attribute('weapon', id, 'weapon_thac_adj3')];
+  output[section_attribute('weapon', id, 'weapon_thac_adj4')] = +v[section_attribute('weapon', id, 'weapon_thac_adj4')];
+  output[section_attribute('weapon', id, 'weapon_thac_adj5')] = +v[section_attribute('weapon', id, 'weapon_thac_adj5')];
+  output[section_attribute('weapon', id, 'weapon_thac_adj6')] = +v[section_attribute('weapon', id, 'weapon_thac_adj6')];
+  output[section_attribute('weapon', id, 'weapon_thac_adj7')] = +v[section_attribute('weapon', id, 'weapon_thac_adj7')];
+  output[section_attribute('weapon', id, 'weapon_thac_adj8')] = +v[section_attribute('weapon', id, 'weapon_thac_adj8')];
+  output[section_attribute('weapon', id, 'weapon_thac_adj9')] = +v[section_attribute('weapon', id, 'weapon_thac_adj9')];
+  output[section_attribute('weapon', id, 'weapon_thac_adj10')] = +v[section_attribute('weapon', id, 'weapon_thac_adj10')];
+  output[section_attribute('weapon', id, 'weapon_macro_text')] = v[section_attribute('weapon', id, 'weapon_macro_text')];
+  output[section_attribute('weapon', id, 'weapon_damagesmallmedium_chat_menu')] = v[section_attribute('weapon', id, 'weapon_damagesmallmedium_chat_menu')];
+  output[section_attribute('weapon', id, 'weapon_damagelarge_chat_menu')] = v[section_attribute('weapon', id, 'weapon_damagelarge_chat_menu')];
+  output[section_attribute('weapon', id, 'weapon_damagesmallmedium_npc_chat_menu')] = v[section_attribute('weapon', id, 'weapon_damagesmallmedium_npc_chat_menu')];
+  output[section_attribute('weapon', id, 'weapon_damagelarge_npc_chat_menu')] = v[section_attribute('weapon', id, 'weapon_damagelarge_npc_chat_menu')];
+  output[section_attribute('weapon', id, 'weapon_critdamagesmallmedium_chat_menu')] = v[section_attribute('weapon', id, 'weapon_critdamagesmallmedium_chat_menu')];
+  output[section_attribute('weapon', id, 'weapon_critdamagelarge_chat_menu')] = v[section_attribute('weapon', id, 'weapon_critdamagelarge_chat_menu')];
+  output[section_attribute('weapon', id, 'weapon_critdamagesmallmedium_npc_chat_menu')] = v[section_attribute('weapon', id, 'weapon_critdamagesmallmedium_npc_chat_menu')];
+  output[section_attribute('weapon', id, 'weapon_critdamagelarge_npc_chat_menu')] = v[section_attribute('weapon', id, 'weapon_critdamagelarge_npc_chat_menu')];
+  output[section_attribute('weapon', id, 'weapon_damage_chat_menu_npc')] = v[section_attribute('weapon', id, 'weapon_damage_chat_menu_npc')];
+  await setAttrsAsync(output, {silent: true});
 }
 
 function setEquipment(id) {
@@ -4917,14 +4916,14 @@ function setNWP(id) {
 }
 
 // Set repeating attr values for new rows. Makes visible to API
-on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item change:repeating_nonweaponproficiencies:nwp_name', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item change:repeating_nonweaponproficiencies:nwp_name', async (eventInfo) => {
+  clog(`Change Detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
 
   // test for new row name (ie no existing value)
-  // console.log(`Change detected: new: ${eventInfo.newValue} previous:${eventInfo.previousValue}`);
+  console.log(`Change detected: new: ${eventInfo.newValue} previous:${eventInfo.previousValue}`);
   if (eventInfo.previousValue !== undefined) return;
 
   if (eventInfo.sourceAttribute.includes('equipment_item')) {
@@ -4932,8 +4931,8 @@ on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_ite
     setEquipment(id);
   }
   if (eventInfo.sourceAttribute.includes('weapon_name')) {
-    // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Setting default values.`);
     setWeapons(id);
+    clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Setting default values.`);
   }
   if (eventInfo.sourceAttribute.includes('nwp_name')) {
     // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Setting default values.`);
