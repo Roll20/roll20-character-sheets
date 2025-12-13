@@ -20,12 +20,12 @@ function isRunningOnServer() {
 }
 
 function setActiveCharacterId(charId) {
-  var oldAcid = getActiveCharacterId();
-  var msg = {id: '0', type: 'setActiveCharacter', data: charId};
+  let oldAcid = getActiveCharacterId();
+  let msg = {id: '0', type: 'setActiveCharacter', data: charId};
 
   if (isRunningOnServer() == false) {
     //if in a browser, use "dispatchEvent" to process the message
-    var ev = new CustomEvent('message');
+    let ev = new CustomEvent('message');
     ev.data = msg;
     self.dispatchEvent(ev);
   } else {
@@ -35,29 +35,29 @@ function setActiveCharacterId(charId) {
   return oldAcid; //return what the value used to be, so calling code can be a little cleaner
 }
 
-var _sIn = setInterval;
+let _sIn = setInterval;
 setInterval = function (callback, timeout) {
-  var acid = getActiveCharacterId();
+  let acid = getActiveCharacterId();
   _sIn(function () {
-    var prevAcid = setActiveCharacterId(acid);
+    let prevAcid = setActiveCharacterId(acid);
     callback();
     setActiveCharacterId(prevAcid);
   }, timeout);
 };
 
-var _sto = setTimeout;
+let _sto = setTimeout;
 setTimeout = function (callback, timeout) {
-  var acid = getActiveCharacterId();
+  let acid = getActiveCharacterId();
   _sto(function () {
-    var prevAcid = setActiveCharacterId(acid);
+    let prevAcid = setActiveCharacterId(acid);
     callback();
     setActiveCharacterId(prevAcid);
   }, timeout);
 };
 
 function getAttrsAsync(props) {
-  var acid = getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs
-  var prevAcid = null; //local variable defined here, because it needs to be shared across the promise callbacks defined below
+  let acid = getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs
+  let prevAcid = null; //local variable defined here, because it needs to be shared across the promise callbacks defined below
   return new Promise((resolve, reject) => {
     prevAcid = setActiveCharacterId(acid); //in case the activeCharacterId has changed,
     // restore it to what we were expecting and save the current value to restore later
@@ -74,8 +74,8 @@ function getAttrsAsync(props) {
 }
 
 function setAttrsAsync(propObj, options) {
-  var acid = getActiveCharacterId();
-  var prevAcid = null;
+  let acid = getActiveCharacterId();
+  let prevAcid = null;
   return new Promise((resolve, reject) => {
     prevAcid = setActiveCharacterId(acid);
     try {
@@ -91,8 +91,8 @@ function setAttrsAsync(propObj, options) {
 }
 
 function getSectionIDsAsync(sectionName) {
-  var acid = getActiveCharacterId();
-  var prevAcid = null;
+  let acid = getActiveCharacterId();
+  let prevAcid = null;
   return new Promise((resolve, reject) => {
     prevAcid = setActiveCharacterId(acid);
     try {
@@ -106,7 +106,6 @@ function getSectionIDsAsync(sectionName) {
     setActiveCharacterId(prevAcid);
   });
 }
-
 //-------------------------------------------------------------------------------------
 
 // GiGs custom handling for number type and logs
