@@ -2867,29 +2867,27 @@ on('change:is_npc', async (eventInfo) => {
   await setAttrsAsync(output, {silent: true});
 });
 
-const sumEquipmentCost = () => {
-  getSectionIDs('repeating_equipment', (idArray) => {
-    const output = {};
-    const fields = [];
-    _.each(idArray, (id) => {
-      fields.push(concatRepAttrName('equipment', id, 'equipment_quantity'));
-      fields.push(concatRepAttrName('equipment', id, 'equipment_cost'));
-    });
-    getAttrs(fields, (v) => {
-      const equipmentCosts = [];
-      _.each(idArray, (id) => {
-        const quantity = +v[concatRepAttrName('equipment', id, 'equipment_quantity')] || 0;
-        let cost = +v[concatRepAttrName('equipment', id, 'equipment_cost')] || 0;
-        // costs
-        cost = quantity > 0 ? cost * quantity : 0;
-        equipmentCosts.push(cost);
-      });
-      const total_equipment_cost = equipmentCosts.reduce((sum, cost) => sum + cost, 0);
-      output.total_equipment_cost = total_equipment_cost.toFixed(2);
-      output.total_cost = total_equipment_cost.toFixed(2);
-      setAttrs(output, {silent: true});
-    });
+const sumEquipmentCost = async () => {
+  const idArray = await getSectionIDsAsync('repeating_equipment');
+  const output = {};
+  const fields = [];
+  _.each(idArray, (id) => {
+    fields.push(concatRepAttrName('equipment', id, 'equipment_quantity'));
+    fields.push(concatRepAttrName('equipment', id, 'equipment_cost'));
   });
+  const v = await getAttrsAsync(fields);
+  const equipmentCosts = [];
+  _.each(idArray, (id) => {
+    const quantity = +v[concatRepAttrName('equipment', id, 'equipment_quantity')];
+    let cost = +v[concatRepAttrName('equipment', id, 'equipment_cost')];
+    // costs
+    cost = quantity > 0 ? cost * quantity : 0;
+    equipmentCosts.push(cost);
+  });
+  const total_equipment_cost = equipmentCosts.reduce((sum, cost) => sum + cost, 0);
+  output.total_equipment_cost = total_equipment_cost.toFixed(2);
+  output.total_cost = total_equipment_cost.toFixed(2);
+  await setAttrsAsync(output, {silent: true});
 };
 
 const sumEquipmentWeight = () => {
