@@ -2850,11 +2850,9 @@ on(
 );
 
 on('change:abilities_info_show change:toggle_exceptional change:strength', (eventInfo) => {
-  getAttrs(['strength'], (v) => {
-    const output = {};
-    output.exceptional_strength_flag = 1;
-    setAttrs(output, {silent: true});
-  });
+  const output = {};
+  output.exceptional_strength_flag = 1;
+  setAttrs(output, {silent: true});
 });
 
 // PC or NPC sheet role
