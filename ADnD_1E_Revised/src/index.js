@@ -2721,7 +2721,7 @@ const updateSyncArmorFlag = (current_version, final_version) => {
 };
 
 // versioning routine to handle attribute changes
-versionator = (current_version, final_version) => {
+versionator = async (current_version, final_version) => {
   if (current_version < 0.1) {
     dmgSwap(0.1, final_version);
   } else if (current_version < 1.2) {
@@ -2805,31 +2805,30 @@ versionator = (current_version, final_version) => {
     updateSyncArmorFlag(1.69, final_version);
     // all updates completed
   } else if (current_version < final_version) {
-    setAttrs({
-      sheet_version: final_version,
-    });
+    output.sheet_version = final_version;
+    setAttrsAsync(output, {silent: true});
   } else if (current_version === final_version) {
     // check if new sheet and set abilities
     newSheet();
   }
 };
+
 // Versioning
-on('sheet:opened', () => {
+on('sheet:opened', async () => {
   // SET LATEST VERSION HERE. needs to be => the last update made in versionator
   const final_version = 1.69;
-  getAttrs(['sheet_version', 'old_character'], (v) => {
-    const output = {};
-    let current_version = float(v.sheet_version);
-    // prevent new sheets from stepping through versionator
-    if (+v.old_character === 0 && current_version === 0) {
-      // clog(`New Sheet:${v.old_character}`);
-      current_version = final_version;
-      output.sheet_version = final_version;
-      setAttrs(output, {silent: true});
-    }
-    clog(`Current sheet data version:${current_version}, Sheet code version:${final_version}`);
-    versionator(current_version, final_version);
-  });
+  const v = await getAttrsAsync(['sheet_version', 'old_character']);
+  const output = {};
+  let current_version = float(v.sheet_version);
+  // prevent new sheets from stepping through versionator
+  if (+v.old_character === 0 && current_version === 0) {
+    // clog(`New Sheet:${v.old_character}`);
+    current_version = final_version;
+    output.sheet_version = final_version;
+  }
+  await setAttrsAsync(output, {silent: true});
+  clog(`Current sheet data version:${current_version}, Sheet code version:${final_version}`);
+  versionator(current_version, final_version);
 });
 
 // Exceptional
