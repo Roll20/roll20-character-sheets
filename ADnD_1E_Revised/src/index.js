@@ -2856,16 +2856,15 @@ on('change:abilities_info_show change:toggle_exceptional change:strength', (even
 });
 
 // PC or NPC sheet role
-on('change:is_npc', (eventInfo) => {
-  getAttrs(['is_npc', 'toggle_npc'], (v) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    const output = {};
-    const isNPC = +v.is_npc;
-    let toggleNPC = +v.toggle_npc;
-    toggleNPC = isNPC === 0 ? 0 : 1;
-    output.toggle_npc = toggleNPC;
-    setAttrs(output, {silent: true});
-  });
+on('change:is_npc', async (eventInfo) => {
+  const v = await getAttrsAsync(['is_npc', 'toggle_npc']);
+  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  const output = {};
+  const isNPC = +v.is_npc;
+  let toggleNPC = +v.toggle_npc;
+  toggleNPC = isNPC === 0 ? 0 : 1;
+  output.toggle_npc = toggleNPC;
+  await setAttrsAsync(output, {silent: true});
 });
 
 const sumEquipmentCost = () => {
