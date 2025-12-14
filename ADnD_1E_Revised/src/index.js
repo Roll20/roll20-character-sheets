@@ -2890,57 +2890,102 @@ const sumEquipmentCost = async () => {
   await setAttrsAsync(output, {silent: true});
 };
 
-const sumEquipmentWeight = () => {
-  getSectionIDs('repeating_equipment', (idArray) => {
-    const output = {};
-    const fields = [];
-    _.each(idArray, (id) => {
-      fields.push(concatRepAttrName('equipment', id, 'equipment_type'));
-      fields.push(concatRepAttrName('equipment', id, 'equipment_armor_type'));
-      fields.push(concatRepAttrName('equipment', id, 'equipment_location'));
-      fields.push(concatRepAttrName('equipment', id, 'equipment_weight'));
-      fields.push(concatRepAttrName('equipment', id, 'equipment_quantity'));
-      fields.push(concatRepAttrName('equipment', id, 'equipment_carried'));
-      fields.push(concatRepAttrName('equipment', id, 'equipment_carried_select'));
-    });
-    getAttrs(['total_coin_weight', ...fields], (v) => {
-      const weaponWeights = [];
-      const armorWeights = [];
-      const totalEquipmentWeights = [];
-      _.each(idArray, (id) => {
-        const type = +v[concatRepAttrName('equipment', id, 'equipment_type')];
-        // const armorType = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')];
-        // const location = v[concatRepAttrName('equipment', id, 'equipment_location')];
-        // Weight calcs use equipment_carried
-        let carried = 0;
-        const carriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')];
-        output[concatRepAttrName('equipment', id, 'equipment_carried')] = carriedSelect === 1 ? 1 : 0;
-        carried = carriedSelect === 1 ? 1 : 0;
-        const quantity = +v[concatRepAttrName('equipment', id, 'equipment_quantity')] || 0;
-        let weight = +v[concatRepAttrName('equipment', id, 'equipment_weight')] || 0;
-        let weaponWeight = 0;
-        let armorWeight = 0;
-        weight = weight * quantity * carried;
-        if (type === 1) weaponWeight = weight;
-        if (type === 2) armorWeight = weight;
-        weaponWeights.push(weaponWeight);
-        armorWeights.push(armorWeight);
-        totalEquipmentWeights.push(weight);
-      });
-      const totalWeaponWeight = weaponWeights.reduce((sum, weaponWeight) => sum + weaponWeight, 0);
-      const totalArmorWeight = armorWeights.reduce((sum, armorWeight) => sum + armorWeight, 0);
-      const totalEquipmentWeight = totalEquipmentWeights.reduce((sum, weight) => sum + weight, 0);
-      const total_equipment_weight_adjusted = totalEquipmentWeight - totalArmorWeight - totalWeaponWeight;
-      // conversion for coin lbs weight outside this function
-      const total_weight = Math.round(float(v.total_coin_weight) + float(totalEquipmentWeight));
-      output.total_weapon_weight = totalWeaponWeight.toFixed(2);
-      output.total_armor_weight = totalArmorWeight.toFixed(2);
-      output.total_equipment_weight = totalEquipmentWeight.toFixed(2);
-      output.total_equipment_weight_adjusted = total_equipment_weight_adjusted.toFixed(2);
-      output.total_weight = total_weight;
-      setAttrs(output, {silent: true});
-    });
+const sumEquipmentWeight = async () => {
+  const idArray = await getSectionIDsAsync('repeating_equipment');
+  const output = {};
+  const fields = [];
+  _.each(idArray, (id) => {
+    fields.push(concatRepAttrName('equipment', id, 'equipment_type'));
+    fields.push(concatRepAttrName('equipment', id, 'equipment_weight'));
+    fields.push(concatRepAttrName('equipment', id, 'equipment_quantity'));
+    fields.push(concatRepAttrName('equipment', id, 'equipment_carried'));
+    fields.push(concatRepAttrName('equipment', id, 'equipment_carried_select'));
   });
+  const v = await getAttrsAsync(fields);
+  const weaponWeights = [];
+  const armorWeights = [];
+  const totalEquipmentWeights = [];
+  _.each(idArray, (id) => {
+    const type = +v[concatRepAttrName('equipment', id, 'equipment_type')];
+    // Weight calcs use equipment_carried
+    let carried = 0;
+    const carriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')];
+    output[concatRepAttrName('equipment', id, 'equipment_carried')] = carriedSelect === 1 ? 1 : 0;
+    carried = carriedSelect === 1 ? 1 : 0;
+    const quantity = +v[concatRepAttrName('equipment', id, 'equipment_quantity')];
+    let weight = +v[concatRepAttrName('equipment', id, 'equipment_weight')];
+    let weaponWeight = 0;
+    let armorWeight = 0;
+    weight = weight * quantity * carried;
+    if (type === 1) weaponWeight = weight;
+    if (type === 2) armorWeight = weight;
+    weaponWeights.push(weaponWeight);
+    armorWeights.push(armorWeight);
+    totalEquipmentWeights.push(weight);
+  });
+  const totalWeaponWeight = weaponWeights.reduce((sum, weaponWeight) => sum + weaponWeight, 0);
+  const totalArmorWeight = armorWeights.reduce((sum, armorWeight) => sum + armorWeight, 0);
+  const totalEquipmentWeight = totalEquipmentWeights.reduce((sum, weight) => sum + weight, 0);
+  const total_equipment_weight_adjusted = totalEquipmentWeight - totalArmorWeight - totalWeaponWeight;
+  // conversion for coin lbs weight outside this function
+  const total_weight = Math.round(float(v.total_coin_weight) + float(totalEquipmentWeight));
+  output.total_weapon_weight = totalWeaponWeight.toFixed(2);
+  output.total_armor_weight = totalArmorWeight.toFixed(2);
+  output.total_equipment_weight = totalEquipmentWeight.toFixed(2);
+  output.total_equipment_weight_adjusted = total_equipment_weight_adjusted.toFixed(2);
+  output.total_weight = total_weight;
+  await setAttrsAsync(output, {silent: true});
+
+  // getSectionIDs('repeating_equipment', (idArray) => {
+  //   const output = {};
+  //   const fields = [];
+  //   _.each(idArray, (id) => {
+  //     fields.push(concatRepAttrName('equipment', id, 'equipment_type'));
+  //     fields.push(concatRepAttrName('equipment', id, 'equipment_armor_type'));
+  //     fields.push(concatRepAttrName('equipment', id, 'equipment_location'));
+  //     fields.push(concatRepAttrName('equipment', id, 'equipment_weight'));
+  //     fields.push(concatRepAttrName('equipment', id, 'equipment_quantity'));
+  //     fields.push(concatRepAttrName('equipment', id, 'equipment_carried'));
+  //     fields.push(concatRepAttrName('equipment', id, 'equipment_carried_select'));
+  //   });
+  //   getAttrs(['total_coin_weight', ...fields], (v) => {
+  //     const weaponWeights = [];
+  //     const armorWeights = [];
+  //     const totalEquipmentWeights = [];
+  //     _.each(idArray, (id) => {
+  //       const type = +v[concatRepAttrName('equipment', id, 'equipment_type')];
+  //       // const armorType = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')];
+  //       // const location = v[concatRepAttrName('equipment', id, 'equipment_location')];
+  //       // Weight calcs use equipment_carried
+  //       let carried = 0;
+  //       const carriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')];
+  //       output[concatRepAttrName('equipment', id, 'equipment_carried')] = carriedSelect === 1 ? 1 : 0;
+  //       carried = carriedSelect === 1 ? 1 : 0;
+  //       const quantity = +v[concatRepAttrName('equipment', id, 'equipment_quantity')] || 0;
+  //       let weight = +v[concatRepAttrName('equipment', id, 'equipment_weight')] || 0;
+  //       let weaponWeight = 0;
+  //       let armorWeight = 0;
+  //       weight = weight * quantity * carried;
+  //       if (type === 1) weaponWeight = weight;
+  //       if (type === 2) armorWeight = weight;
+  //       weaponWeights.push(weaponWeight);
+  //       armorWeights.push(armorWeight);
+  //       totalEquipmentWeights.push(weight);
+  //     });
+  //     const totalWeaponWeight = weaponWeights.reduce((sum, weaponWeight) => sum + weaponWeight, 0);
+  //     const totalArmorWeight = armorWeights.reduce((sum, armorWeight) => sum + armorWeight, 0);
+  //     const totalEquipmentWeight = totalEquipmentWeights.reduce((sum, weight) => sum + weight, 0);
+  //     const total_equipment_weight_adjusted = totalEquipmentWeight - totalArmorWeight - totalWeaponWeight;
+  //     // conversion for coin lbs weight outside this function
+  //     const total_weight = Math.round(float(v.total_coin_weight) + float(totalEquipmentWeight));
+  //     output.total_weapon_weight = totalWeaponWeight.toFixed(2);
+  //     output.total_armor_weight = totalArmorWeight.toFixed(2);
+  //     output.total_equipment_weight = totalEquipmentWeight.toFixed(2);
+  //     output.total_equipment_weight_adjusted = total_equipment_weight_adjusted.toFixed(2);
+  //     output.total_weight = total_weight;
+  //     setAttrs(output, {silent: true});
+  //   });
+  // });
 };
 
 // Equipment Cost Calcs
