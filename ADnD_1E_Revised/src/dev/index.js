@@ -3040,7 +3040,7 @@ on(
 );
 
 // Movement Calcs
-async function setCurrentMovement() {
+const setCurrentMovement = async () => {
   const v = await getAttrsAsync(['current_encumbrance_move', 'movement']);
   const output = {};
   // clog('Movement Rates have been re-calculated');
@@ -3065,7 +3065,7 @@ async function setCurrentMovement() {
   output.movement_known = adjustedMove * 5;
   output.movement_run = adjustedMove * 10;
   await setAttrsAsync(output, {silent: true});
-}
+};
 
 on('change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', async (eventInfo) => {
   // clog('Current Base Movement has been re-calculated');
