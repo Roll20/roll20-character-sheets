@@ -2890,6 +2890,26 @@ const sumEquipmentCost = async () => {
   await setAttrsAsync(output, {silent: true});
 };
 
+// Equipment Cost Calcs
+on('change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_cost remove:repeating_equipment', (eventInfo) => {
+  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  sumEquipmentCost();
+});
+
+// Coin Weight
+const sumCoinWeight = async () => {
+  const v = await getAttrsAsync(['pp', 'gp', 'ep', 'sp', 'cp', 'toggle_lbs']);
+  const output = {};
+  const toggleLbs = +v.toggle_lbs;
+  const lbsConversion = toggleLbs ? 10 : 1;
+  const totalCoinCount = float(v.pp) + float(v.gp) + float(v.ep) + float(v.sp) + float(v.cp);
+  const totalCoinWeight = (totalCoinCount / lbsConversion).toFixed(2);
+  output.total_coin_weight = totalCoinWeight;
+  await setAttrsAsync(output, {silent: true});
+  // clog(`sumCoinWeight - total_coin_weight:${totalCoinWeight} has been calculated.`);
+};
+
+// Equipment Weight Calcs
 const sumEquipmentWeight = async () => {
   const idArray = await getSectionIDsAsync('repeating_equipment');
   const output = {};
@@ -2901,8 +2921,8 @@ const sumEquipmentWeight = async () => {
     fields.push(concatRepAttrName('equipment', id, 'equipment_carried'));
     fields.push(concatRepAttrName('equipment', id, 'equipment_carried_select'));
   });
+  await sumCoinWeight();
   const v = await getAttrsAsync(['total_coin_weight', ...fields]);
-  console.log(`sumEquipmentWeight - Change detected: v:${v}`);
   const weaponWeights = [];
   const armorWeights = [];
   const totalEquipmentWeights = [];
@@ -2937,106 +2957,85 @@ const sumEquipmentWeight = async () => {
   output.total_equipment_weight_adjusted = total_equipment_weight_adjusted.toFixed(2);
   output.total_weight = total_weight;
   await setAttrsAsync(output, {silent: true});
+  // clog(`sumEquipmentWeight - triggering setEncumbranceThresholds`);
+  setEncumbranceThresholds();
 };
 
-// Equipment Cost Calcs
-on('change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_cost remove:repeating_equipment', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  sumEquipmentCost();
-});
-
-// Equipment Weight Calcs
-on(
-  'change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_armor_worn remove:repeating_equipment change:toggle_lbs',
-  (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    sumEquipmentWeight();
-  },
-);
-
-// Coin Weight
-on('change:pp change:gp change:ep change:sp change:cp change:toggle_lbs', async (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  const v = await getAttrsAsync(['pp', 'gp', 'ep', 'sp', 'cp', 'toggle_lbs']);
-  const output = {};
-  const lbsConversion = +(v.toggle_lbs || 0) ? 10 : 1;
-  output.total_coin_weight = (Math.round((float(v.pp) + float(v.gp) + float(v.ep) + float(v.sp) + float(v.cp)) / 1) / lbsConversion).toFixed(2);
-  await setAttrsAsync(output, {silent: true});
-  sumEquipmentWeight();
-});
-
 // Encumbrance Calcs
-function setCurrentEncumbranceFlag() {
-  getAttrs(['normal_load_adjusted', 'heavy_load', 'very_heavy_load', 'total_weight', 'autocalc_movement_flag', 'current_bulk', 'current_encumbrance_move'], (v) => {
-    // clog('Current Encumbrance flag has been re-calculated');
-    const output = {};
-    const autocalc_movement_flag = +v.autocalc_movement_flag;
-    const normal_load_adjusted = +v.normal_load_adjusted || 0;
-    const heavy_load = +v.heavy_load || 0;
-    const very_heavy_load = +v.very_heavy_load || 0;
-    const total_weight = +v.total_weight || 0;
-    const current_bulk = +v.current_bulk;
-    let currentEncumbrance = 0;
+const setEncumbranceThresholds = async () => {
+  const v = await getAttrsAsync(['encumbrancebonus', 'toggle_lbs']);
+  const output = {};
+  const useLbs = +v.toggle_lbs;
+  const lbsConversion = useLbs ? 0.1 : 1;
+  const normal = 350 * lbsConversion;
+  const encumbranceBonus = +v.encumbrancebonus;
+  const encumbranceBonusLbs = float(encumbranceBonus * lbsConversion);
+  const thisBonus = useLbs ? encumbranceBonusLbs : encumbranceBonus;
+  const normalAdjusted = normal + thisBonus;
+  const heavy = normalAdjusted + normal;
+  const veryHeavy = heavy + normal;
+  const max = veryHeavy;
+  output.encumbrancebonus_lbs = encumbranceBonusLbs;
+  output.normal_load = normal;
+  output.normal_load_adjusted = normalAdjusted;
+  output.heavy_load = heavy;
+  output.very_heavy_load = veryHeavy;
+  output.max_load = max + 1;
+  await setAttrsAsync(output, {silent: true});
+  // clog('setEncumbranceThresholds - Encumbrance has been re-calculated. triggering setCurrentEncumbranceFlag');
+  setCurrentEncumbranceFlag();
+};
 
-    if (total_weight <= normal_load_adjusted) {
-      output.current_encumbrance_label = 'Unencumbered';
-      currentEncumbrance = 0;
-      output.current_encumbrance = currentEncumbrance;
-      // Bail out of IF unless auto-calc movement is enabled
-      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : v.current_encumbrance_move;
-      // clog('===== Carrying Capacity is Unencumbered =====');
-    } else if (total_weight > normal_load_adjusted && total_weight <= heavy_load) {
-      output.current_encumbrance_label = 'Heavy';
-      currentEncumbrance = 1;
-      output.current_encumbrance = currentEncumbrance;
-      // Bail out of IF unless auto-calc movement is enabled
-      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : v.current_encumbrance_move;
-      // clog('===== Carrying Capacity is Heavy =====');
-    } else if (total_weight > heavy_load && total_weight <= very_heavy_load) {
-      output.current_encumbrance_label = 'Very Heavy';
-      currentEncumbrance = 2;
-      output.current_encumbrance = currentEncumbrance;
-      // Bail out of IF unless auto-calc movement is enabled
-      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : v.current_encumbrance_move;
-      // clog('===== Carrying Capacity is Very Heavy =====');
-    } else {
-      output.current_encumbrance_label = 'Encumbered';
-      // no DEX Bonus to AC
-      currentEncumbrance = 3;
-      output.current_encumbrance = currentEncumbrance;
-      // Bail out of IF unless auto-calc movement is enabled
-      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : v.current_encumbrance_move;
-      // clog('===== Carrying Capacity is Encumbered =====');
-    }
-    setAttrs(output);
-  });
-}
+const setCurrentEncumbranceFlag = async () => {
+  const v = await getAttrsAsync(['normal_load_adjusted', 'heavy_load', 'very_heavy_load', 'total_weight', 'autocalc_movement_flag', 'current_bulk', 'current_encumbrance_move']);
+  const output = {};
+  const autocalc_movement_flag = +v.autocalc_movement_flag;
+  const normal_load_adjusted = +v.normal_load_adjusted;
+  const heavy_load = +v.heavy_load;
+  const very_heavy_load = +v.very_heavy_load;
+  const total_weight = +v.total_weight;
+  const current_bulk = +v.current_bulk;
+  let currentEncumbrance = 0;
+
+  if (total_weight <= normal_load_adjusted) {
+    output.current_encumbrance_label = 'Unencumbered';
+    currentEncumbrance = 0;
+    output.current_encumbrance = currentEncumbrance;
+    // Bail out of IF unless auto-calc movement is enabled
+    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move;
+    // clog('===== Carrying Capacity is Unencumbered =====');
+  } else if (total_weight > normal_load_adjusted && total_weight <= heavy_load) {
+    output.current_encumbrance_label = 'Heavy';
+    currentEncumbrance = 1;
+    output.current_encumbrance = currentEncumbrance;
+    // Bail out of IF unless auto-calc movement is enabled
+    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move;
+    // clog('===== Carrying Capacity is Heavy =====');
+  } else if (total_weight > heavy_load && total_weight <= very_heavy_load) {
+    output.current_encumbrance_label = 'Very Heavy';
+    currentEncumbrance = 2;
+    output.current_encumbrance = currentEncumbrance;
+    // Bail out of IF unless auto-calc movement is enabled
+    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move;
+    // clog('===== Carrying Capacity is Very Heavy =====');
+  } else {
+    output.current_encumbrance_label = 'Encumbered';
+    // no DEX Bonus to AC
+    currentEncumbrance = 3;
+    output.current_encumbrance = currentEncumbrance;
+    // Bail out of IF unless auto-calc movement is enabled
+    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move;
+    // clog('===== Carrying Capacity is Encumbered =====');
+  }
+  await setAttrsAsync(output, {silent: true});
+  // clog('setCurrentEncumbranceFlag - Current Encumbrance flag has been re-calculated');
+};
 
 on(
-  'sheet:opened change:encumbrancebonus change:normal_load change:total_weight change:autocalc_movement_flag change:current_bulk change:encumbrancebonus_lbs change:toggle_lbs',
+  'change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_armor_worn remove:repeating_equipment change:pp change:gp change:ep change:sp change:cp change:encumbrancebonus change:normal_load change:current_bulk change:toggle_lbs',
   (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(['encumbrancebonus', 'toggle_lbs'], (v) => {
-      // clog('Encumbrance has been re-calculated');
-      const output = {};
-      const useLbs = +(v.toggle_lbs || 0);
-      const lbsConversion = useLbs ? 0.1 : 1;
-      const normal = 350 * lbsConversion;
-      const encumbranceBonus = +v.encumbrancebonus || 0;
-      const encumbranceBonusLbs = float(encumbranceBonus * lbsConversion);
-      const thisBonus = useLbs ? encumbranceBonusLbs : encumbranceBonus;
-      const normalAdjusted = normal + thisBonus;
-      const heavy = normalAdjusted + normal;
-      const veryHeavy = heavy + normal;
-      const max = veryHeavy;
-      output.encumbrancebonus_lbs = encumbranceBonusLbs;
-      output.normal_load = normal;
-      output.normal_load_adjusted = normalAdjusted;
-      output.heavy_load = heavy;
-      output.very_heavy_load = veryHeavy;
-      output.max_load = max + 1;
-      setAttrs(output, {silent: true}, setCurrentEncumbranceFlag);
-    });
+    // clog(`Event Listener:${eventInfo.sourceAttribute} - triggering sumEquipmentWeight`);
+    sumEquipmentWeight();
   },
 );
 
