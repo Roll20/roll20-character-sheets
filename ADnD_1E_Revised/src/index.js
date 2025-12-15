@@ -3032,7 +3032,7 @@ const setCurrentEncumbranceFlag = async () => {
 };
 
 on(
-  'change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_armor_worn remove:repeating_equipment change:pp change:gp change:ep change:sp change:cp change:encumbrancebonus change:normal_load change:current_bulk change:toggle_lbs',
+  'change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_armor_worn remove:repeating_equipment change:pp change:gp change:ep change:sp change:cp change:encumbrancebonus change:normal_load change:toggle_lbs',
   (eventInfo) => {
     // clog(`Event Listener:${eventInfo.sourceAttribute} - triggering sumEquipmentWeight`);
     sumEquipmentWeight();
@@ -3084,7 +3084,7 @@ on('change:movement change:current_encumbrance change:current_encumbrance_move c
 });
 
 // Bulk Calcs
-async function setCurrentBulk() {
+const setCurrentBulk = async () => {
   const v = await getAttrsAsync([
     'unarmored_bulk',
     'armortype_bulk',
@@ -3097,17 +3097,17 @@ async function setCurrentBulk() {
     'armorshield_carried',
   ]);
   const output = {};
-  const {unarmored_worn} = v;
-  const {armortype_worn} = v;
-  const {armortype2_worn} = v;
-  const {armorshield_worn} = v;
-  const {armorshield_carried} = v;
+  const unarmored_worn = +v.unarmored_worn;
+  const armortype_worn = +v.armortype_worn;
+  const armortype2_worn = +v.armortype2_worn;
+  const armorshield_worn = +v.armorshield_worn;
+  const armorshield_carried = +v.armorshield_carried;
   // shield bulk s/b considered even if it's just carried
   const armorShieldWornOrCarried = Math.max(armorshield_worn, armorshield_carried);
-  const unarmored_bulk = v.unarmored_bulk * unarmored_worn;
-  const armortype_bulk = v.armortype_bulk * armortype_worn;
-  const armortype2_bulk = v.armortype2_bulk * armortype2_worn;
-  const armorshield_bulk = v.armorshield_bulk * armorShieldWornOrCarried;
+  const unarmored_bulk = +v.unarmored_bulk * unarmored_worn;
+  const armortype_bulk = +v.armortype_bulk * armortype_worn;
+  const armortype2_bulk = +v.armortype2_bulk * armortype2_worn;
+  const armorshield_bulk = +v.armorshield_bulk * armorShieldWornOrCarried;
   const armorBulk = Math.max(unarmored_bulk, armortype_bulk, armortype2_bulk, armorshield_bulk);
   switch (armorBulk) {
     case 0:
@@ -3129,8 +3129,10 @@ async function setCurrentBulk() {
     default:
       clog(`>> failure in bulk calculation <<`);
   }
-  await setAttrsAsync(output);
-}
+  await setAttrsAsync(output, {silent: true});
+  // clog(`setCurrentBulk - triggering sumEquipmentWeight`);
+  sumEquipmentWeight();
+};
 
 on(
   'change:unarmored_bulk change:armortype_bulk change:armortype2_bulk change:armorshield_bulk change:armorhelmet_bulk change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorshield_carried remove:repeating_equipment',
