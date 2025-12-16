@@ -3878,9 +3878,9 @@ on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs chan
   const hideCaster2 = +v.toggle_caster2;
   const levelTab = +v.spell_tabs;
   _.each(idArray, (id) => {
-    const thisMemorizedOnly = +v[concatRepAttrName('spells', id, 'spell_memorized')] || 0;
+    const thisMemorizedOnly = +v[concatRepAttrName('spells', id, 'spell_memorized')];
     const thisCaster = +v[concatRepAttrName('spells', id, 'spell_caster_class')]; // 0, 1, 2
-    const thisLevel = +v[concatRepAttrName('spells', id, 'spell_level')] || 0;
+    const thisLevel = v[concatRepAttrName('spells', id, 'spell_level')]; // can be '?'
     output[concatRepAttrName('spells', id, 'spell_show_memorized')] = memorizedOnly === 1 && thisMemorizedOnly > 0 ? 1 : 0;
     output[concatRepAttrName('spells', id, 'spell_show_all')] = memorizedOnly === 1 ? 0 : 1;
     // show THIS spell if spell level and spell tab match
@@ -3916,12 +3916,13 @@ on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs chan
 on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_class', async (eventInfo) => {
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
-  const v = await getAttrsAsync(['repeating_spells_spell_level', 'repeating_spells_spell_caster_class', 'spell_caster_tabs', 'spell_tabs']);
+  const id = eventInfo.sourceAttribute.split('_')[2];
+  const v = await getAttrsAsync([`repeating_spells_${id}_spell_level`, `repeating_spells_${id}_spell_caster_class`, 'spell_caster_tabs', 'spell_tabs']);
   const output = {};
   const casterTab = +v.spell_caster_tabs; // 0, 1, -1
-  const thisCaster = +v.repeating_spells_spell_caster_class; // 0, 1, 2
+  const thisCaster = +v[concatRepAttrName('spells', id, 'spell_caster_class')]; // 0, 1, 2
+  const thisLevel = v[concatRepAttrName('spells', id, 'spell_level')]; // can be '?'
   const levelTab = +v.spell_tabs;
-  const thisLevel = v.repeating_spells_spell_level;
   // jumps to spell level tab unless Show All or same level tab
   output.spell_tabs = levelTab >= 0 && levelTab !== thisLevel ? thisLevel : levelTab;
   // jumps to caster class tab unless Show All or same caster tab
@@ -3929,47 +3930,51 @@ on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_cla
   await setAttrsAsync(output, {silent: true});
 });
 
-setSpellsCasterClass = () => {
-  getSectionIDs('repeating_spells', (idArray) => {
-    const output = {};
-    const nonRep = ['caster_class1_name', 'caster_class2_name', 'caster_class1_level', 'caster_class2_level'];
-    const fields = [];
-    _.each(idArray, (id) => {
-      fields.push(concatRepAttrName('spells', id, 'spell_caster_class'));
-    });
-    const combined = [...nonRep, ...fields];
-    getAttrs(combined, (v) => {
-      _.each(idArray, (id) => {
-        const thisClass = +v[concatRepAttrName('spells', id, 'spell_caster_class')];
-        if (thisClass === 0) {
-          output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = '';
-          output[concatRepAttrName('spells', id, 'spell_caster_class')] = thisClass;
-          // clog(`thisClass 0:${thisClass}`);
-        } else if (thisClass === 1) {
-          output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = v.caster_class1_name;
-          output[concatRepAttrName('spells', id, 'spell_caster_class_level')] = +v.caster_class1_level || 0;
-          output[concatRepAttrName('spells', id, 'spell_caster_class')] = thisClass;
-          // clog(`thisClass 1:${thisClass}`);
-        } else if (thisClass === 2) {
-          output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = v.caster_class2_name;
-          output[concatRepAttrName('spells', id, 'spell_caster_class_level')] = +v.caster_class2_level || 0;
-          output[concatRepAttrName('spells', id, 'spell_caster_class')] = thisClass;
-          // clog(`thisClass 2:${thisClass}`);
-        }
-      });
-      setAttrs(output, {silent: true});
-    });
+setSpellsCasterClass = async () => {
+  const idArray = await getSectionIDsAsync('repeating_spells');
+  const output = {};
+  const fields = [];
+  _.each(idArray, (id) => {
+    fields.push(concatRepAttrName('spells', id, 'spell_caster_class'));
   });
+  const v = await getAttrsAsync(['caster_class1_name', 'caster_class2_name', 'caster_class1_level', 'caster_class2_level', ...fields]);
+  const caster1Name = v.caster_class1_name;
+  const caster2Name = v.caster_class2_name;
+  const caster1Level = +v.caster_class1_level;
+  const caster2Level = +v.caster_class2_level;
+  _.each(idArray, (id) => {
+    const thisClass = +v[concatRepAttrName('spells', id, 'spell_caster_class')];
+    switch (thisClass) {
+      case 0:
+        output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = '';
+        // clog(`thisClass 0:${thisClass}`);
+        break;
+      case 1:
+        output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = caster1Name;
+        output[concatRepAttrName('spells', id, 'spell_caster_class_level')] = caster1Level;
+        // clog(`thisClass 1:${thisClass}`);
+        break;
+      case 2:
+        output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = caster2Name;
+        output[concatRepAttrName('spells', id, 'spell_caster_class_level')] = caster2Level;
+        // clog(`thisClass 2:${thisClass}`);
+        break;
+      default:
+        clog(`Error: spell_caster_class value not recognized.`);
+        break;
+    }
+  });
+  await setAttrsAsync(output, {silent: true});
 };
 
 // Update ALL Spells to match new Caster and/or Level
-on('change:caster_class1_name change:caster_class2_name change:caster_class1_level change:caster_class2_level', (eventInfo) => {
+on('change:caster_class1_name change:caster_class2_name change:caster_class1_level change:caster_class2_level', async (eventInfo) => {
   // clog(`spell changed by who:${eventInfo.sourceType}`);
-  setSpellsCasterClass();
+  await setSpellsCasterClass();
 });
 
 // Set Caster Class and level for THIS Spell based on Caster Tab
-on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_class', (eventInfo) => {
+on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_class', async (eventInfo) => {
   // console.log(`sourceType:${eventInfo.sourceType}`);
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
@@ -3977,55 +3982,69 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
   const trigger = eventInfo.sourceAttribute.split('_').slice(3).join('_');
   const id = eventInfo.sourceAttribute.split('_')[2];
   const newSpell = previousValue === undefined && trigger === 'spell_name' ? 1 : 0;
-  getAttrs(
-    ['repeating_spells_spell_caster_class', 'caster_class1_name', 'caster_class1_level', 'caster_class2_name', 'caster_class2_level', 'spell_caster_tabs', 'toggle_caster2'],
-    (v) => {
-      const output = {};
-      const caster2 = +v.toggle_caster2;
-      const casterTab = +v.spell_caster_tabs; // 0, 1, -1
-      let thisClass = +v[concatRepAttrName('spells', id, 'spell_caster_class')]; // 0, 1, 2
-      console.log(`Change detected:PRE-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
-      // Caster Class 2 is enabled
-      if (caster2 === 0) {
-        // test for New and not on All tab
-        if (newSpell === 1 && casterTab !== -1) thisClass = casterTab === 0 ? 1 : 2;
-      } else {
-        thisClass = 1;
-      }
-      console.log(`Change detected:POST-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
-      if (thisClass === 0) {
-        output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = '';
-        output[concatRepAttrName('spells', id, 'spell_caster_class')] = thisClass;
-      } else if (thisClass === 1) {
-        output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = v.caster_class1_name;
-        output[concatRepAttrName('spells', id, 'spell_caster_class_level')] = +v.caster_class1_level || 0;
-        output[concatRepAttrName('spells', id, 'spell_caster_class')] = thisClass;
-      } else if (thisClass === 2) {
-        output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = v.caster_class2_name;
-        output[concatRepAttrName('spells', id, 'spell_caster_class_level')] = +v.caster_class2_level || 0;
-        output[concatRepAttrName('spells', id, 'spell_caster_class')] = thisClass;
-      }
-      setAttrs(output, {silent: true});
-    },
-  );
+  const v = await getAttrsAsync([
+    `repeating_spells_${id}_spell_caster_class`,
+    'caster_class1_name',
+    'caster_class1_level',
+    'caster_class2_name',
+    'caster_class2_level',
+    'spell_caster_tabs',
+    'toggle_caster2',
+  ]);
+  const output = {};
+  const caster1Name = v.caster_class1_name;
+  const caster2Name = v.caster_class2_name;
+  const caster1Level = +v.caster_class1_level;
+  const caster2Level = +v.caster_class2_level;
+  const showCaster2 = +v.toggle_caster2;
+  const casterTab = +v.spell_caster_tabs; // 0, 1, -1
+  let thisClass = +v[concatRepAttrName('spells', id, 'spell_caster_class')]; // 0, 1, 2
+  // console.log(`Change detected:PRE-CHECK Hide Caster2:${showCaster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+  // Caster Class 2 is enabled
+  if (showCaster2 === 0) {
+    // tests for New and that it's not on the All tab
+    if (newSpell === 1 && casterTab !== -1) thisClass = casterTab === 0 ? 1 : 2;
+  } else if (showCaster2 === 1) {
+    thisClass = 1;
+  }
+  // console.log(`Change detected:POST-CHECK Hide Caster2:${showCaster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+  switch (thisClass) {
+    case 0:
+      output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = '';
+      // clog(`Set Caster Class to N/A`);
+      break;
+    case 1:
+      output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = caster1Name;
+      output[concatRepAttrName('spells', id, 'spell_caster_class_level')] = caster1Level;
+      // clog(`Set Caster Class to ${caster1Name}`);
+      break;
+    case 2:
+      output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = caster2Name;
+      output[concatRepAttrName('spells', id, 'spell_caster_class_level')] = caster2Level;
+      // clog(`Set Caster Class to ${caster2Name}`);
+      break;
+    default:
+      clog(`Error: spell_caster_class value not recognized.`);
+      break;
+  }
+  await setAttrsAsync(output, {silent: true});
 });
 
 // Set Spell's Level for new spells based selected Spell level Tab
-on('change:repeating_spells:spell_name', (eventInfo) => {
+on('change:repeating_spells:spell_name', async (eventInfo) => {
   // console.log(`sourceType:${eventInfo.sourceType}`);
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
   const id = eventInfo.sourceAttribute.split('_')[2];
-  getAttrs([`repeating_spells_${id}_spell_level`, 'spell_tabs'], (v) => {
-    const output = {};
-    const levelTab = +v.spell_tabs;
-    const thisSpellLevel = v[concatRepAttrName('spells', id, 'spell_level')] || 0;
-    // console.log(`Change detected: [Setting Spell Level based on Spell Tab] SpellTab:${levelTab} ThisSpellLvl:${thisSpellLevel}`);
-    // test if Spell Tab is set to 'All' or if this Spell's Lvl has already been set
-    if (levelTab === -1 || thisSpellLevel != '?') return;
-    output[`repeating_spells_${id}_spell_level`] = levelTab;
-    setAttrs(output, {silent: true});
-  });
+  const v = await getAttrsAsync([`repeating_spells_${id}_spell_level`, 'spell_tabs']);
+  const output = {};
+  const levelTab = +v.spell_tabs;
+  const thisSpellLevel = v[concatRepAttrName('spells', id, 'spell_level')]; // can be '?'
+  // console.log(`Change detected: [Setting Spell Level based on Spell Tab] SpellTab:${levelTab} ThisSpellLvl:${thisSpellLevel}`);
+  // test if Spell Tab is set to 'All' or if this Spell's Lvl has already been set
+  if (levelTab === -1 || thisSpellLevel != '?') return;
+  output[`repeating_spells_${id}_spell_level`] = levelTab;
+  await setAttrsAsync(output, {silent: true});
 });
 
 // ToHitACadj Toggle
