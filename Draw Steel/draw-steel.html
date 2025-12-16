@@ -22,6 +22,11 @@
 					<option value="/w gm " data-i18n="always-whisper-roll"></option>
 				</select>	
 			</div>
+			<div class="sheet-panel-box">
+				<h4><span data-i18n="damage-autocalc">Damage Calculator</span></h4>
+				<label for="options-calculate-damage" data-i18n="options-calculate-damage">Automatically Calculate Damage:</label>
+				<input id="options-calculate-damage" name="attr_options_calculate_damage" type="checkbox" value="1" />
+			</div>
 		</div>
 		<div class="sheet-panel-box">
 			<h5 data-i18n="import"></h5>
@@ -3066,7 +3071,7 @@
 <!-- Sheet Workers -->
 <script type="text/worker">
 	// Sheet version used to deal with major changes
-	const version = "1.2"; 
+	const version = "1.3"; 
 
 	function setActiveCharacterId(id) {
 		const ocid = getActiveCharacterId();
@@ -3455,6 +3460,7 @@
 			...characteristics,
 			...allAbilityAttributeNames.map(x => `${prefix}_${abPrefix}${x}`),
 			...allAbilityToggles.map(x => `${prefix}_${x}`),
+			'options_calculate_damage',
 		];
 		
 		const attrs = await getAttrsAsync(attrsToFetch);
@@ -3530,31 +3536,42 @@
 		const abilityKeywords = attrs[`${prefix}_${abilityPrefix}keywords`] ? attrs[`${prefix}_${abilityPrefix}keywords`].split(',').map(item => item.trim()) : '';
 		const kit = [];
 		let otherdamage = "";
-		if (abilityKeywords.includes(weapon)) {
-			if (abilityKeywords.includes(melee)) {
-				kit.push(parseInt(attrs['kit_melee_damage_1']));
-				kit.push(parseInt(attrs['kit_melee_damage_2']));
-				kit.push(parseInt(attrs['kit_melee_damage_3']));
-			} else if (abilityKeywords.includes(ranged)) {
-				kit.push(parseInt(attrs['kit_ranged_damage_1']));
-				kit.push(parseInt(attrs['kit_ranged_damage_2']));
-				kit.push(parseInt(attrs['kit_ranged_damage_3']));
+		let tier1 = "", tier2 = "", tier3 = "";
+		
+		if (attrs['options_calculate_damage'] === "1" && attrs[`${prefix}_${abilityPrefix}tier_1`] && attrs[`${prefix}_${abilityPrefix}tier_2`] && attrs[`${prefix}_${abilityPrefix}tier_3`]) {
+			if (abilityKeywords.includes(weapon)) {
+				if (abilityKeywords.includes(melee)) {
+					kit.push(parseInt(attrs['kit_melee_damage_1']));
+					kit.push(parseInt(attrs['kit_melee_damage_2']));
+					kit.push(parseInt(attrs['kit_melee_damage_3']));
+				} else if (abilityKeywords.includes(ranged)) {
+					kit.push(parseInt(attrs['kit_ranged_damage_1']));
+					kit.push(parseInt(attrs['kit_ranged_damage_2']));
+					kit.push(parseInt(attrs['kit_ranged_damage_3']));
+				}
+				if (attrs['sanct_weap']) {
+					const sanctweaptrans = getTranslationByKey('sanct-weap');
+					otherdamage = otherdamage + '+' + attrs['sanct_weap'] + `[${sanctweaptrans}]`;
+				}				
 			}
-			if (attrs['sanct_weap']) {
-				const sanctweaptrans = getTranslationByKey('sanct-weap');
-				otherdamage = otherdamage + '+' + attrs['sanct_weap'] + `[${sanctweaptrans}]`;
-			}				
-		}
-		if (attrs['mag_psi_dam']) {
-			const psionic = getTranslationByKey('psionic');
-			const magic = getTranslationByKey('magic');
-			
-			if (abilityKeywords.includes(psionic)) {
-				otherdamage = otherdamage + '+' + attrs['mag_psi_dam'] + `[${psionic}]`;
+			if (attrs['mag_psi_dam']) {
+				const psionic = getTranslationByKey('psionic');
+				const magic = getTranslationByKey('magic');
+				
+				if (abilityKeywords.includes(psionic)) {
+					otherdamage = otherdamage + '+' + attrs['mag_psi_dam'] + `[${psionic}]`;
+				}
+				else if (abilityKeywords.includes(magic)) {
+					otherdamage = otherdamage + '+' + attrs['mag_psi_dam'] + `[${magic}]`;
+				}
 			}
-			else if (abilityKeywords.includes(magic)) {
-				otherdamage = otherdamage + '+' + attrs['mag_psi_dam'] + `[${magic}]`;
-			}
+			tier1 = damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_1`], kit[0] || 0, otherdamage);
+			tier2 = damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_2`], kit[1] || 0, otherdamage);
+			tier3 = damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_3`], kit[2] || 0, otherdamage);
+		} else {
+			tier1 = attrs[`${prefix}_${abilityPrefix}tier_1`] || '';
+			tier2 = attrs[`${prefix}_${abilityPrefix}tier_2`] || '';
+			tier3 = attrs[`${prefix}_${abilityPrefix}tier_3`] || '';
 		}
 		
 			
@@ -3576,9 +3593,9 @@
 			target: attrs[`${prefix}_${abilityPrefix}target`] || '',
 			trigger: attrs[`${prefix}_${abilityPrefix}trigger`] || '',
 			characteristic: characteristic,
-			tier1: attrs[`${prefix}_${abilityPrefix}tier_1`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_1`], kit[0] || 0, otherdamage) : '',
-			tier2: attrs[`${prefix}_${abilityPrefix}tier_2`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_2`], kit[1] || 0, otherdamage)  : '',
-			tier3: attrs[`${prefix}_${abilityPrefix}tier_3`] ? damageCalculation(attrs[`${prefix}_${abilityPrefix}tier_3`], kit[2] || 0, otherdamage) : '',
+			tier1: tier1,
+			tier2: tier2,
+			tier3: tier3,
 			special: attrs[`${prefix}_${abilityPrefix}special`] || '',
 			effect: attrs[`${prefix}_${abilityPrefix}effect`] || '',
 			pre_effect: attrs[`${prefix}_${abilityPrefix}pre_effect`] || '',
@@ -4872,7 +4889,20 @@
 			});
 		});
 	}
+	
+	const setNewOptions = () => {
+		console.log('~~~ setNewOptions ~~~');
+		const fieldArray = ['options_calculate_damage'];
 		
+		getAttrs(fieldArray, function(values) {
+			let newOptions = {
+				options_calculate_damage: '1',
+			}
+			
+			setAttrs(newOptions);
+		});
+	}
+	
 	on('sheet:opened',  async () => { 
 		console.log('****** Draw Steel Sheet Opened ******\nLatest Version:', version);
 		
@@ -4886,6 +4916,9 @@
 				
 				// Convert  repeating Modifiers (v1.2)
 				convertRepeatingKits();
+				
+				// Set new Damage Calculation option (v1.3)
+				setNewOptions();
 				
 				//Sets the sheet's new version
 				setAttrs({
