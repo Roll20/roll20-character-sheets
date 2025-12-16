@@ -1,3 +1,7 @@
+# 2025-12-16
+
+- Make spells on Other Realm & Arcane clickable
+
 # 2025-12-11
 
 - Add option to allow overcasting anytime. (Sheet version 17)
