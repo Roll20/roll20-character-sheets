@@ -130,7 +130,7 @@ const replaceSet = (attr, set) => {
 };
 
 // Character Name Validation
-const isAlphaNumericWithSpaces = (attr) => {
+const isAlphaNumericWithSpaces = async (attr) => {
   // Check for alpha-numeric characters and spaces
   if (/^[a-zA-Z0-9\s]+$/.test(attr)) {
     return true;
@@ -2636,39 +2636,38 @@ const updateCriticalDamageMacro = (current_version, final_version) => {
 };
 
 // Check and set Ability defaults to 8 on new sheets
-const newSheet = () => {
-  getAttrs(['hitdice', 'armorclass', 'strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'old_character'], (v) => {
-    const output = {};
-    const testOldChar = +v.old_character || 0;
-    if (testOldChar === 1) return;
-    const testHitdice = +v.hitdice;
-    const testAC = +v.armorclass;
-    const testStr = +v.strength;
-    const testInt = +v.intelligence;
-    const testWis = +v.wisdom;
-    const testDex = +v.dexterity;
-    const testCon = +v.constitution;
-    const testCha = +v.charisma;
-    // new sheets will have all abilities '10' by default
-    // defaults will then be set to '8' default
-    const testAbility = testStr + testInt + testWis + testDex + testCon + testCha;
-    // clog(`~~~~~~ Average Ability detected: ${testAbility}, Hit Dice: ${testHitdice}, AC: ${testAC}`);
-    if (testHitdice === 0 && testAC === 10 && testAbility === 60) {
-      // clog(`~~~~~~ NEW SHEET DETECTED old_character:${testOldChar}, Ability Defaults set to "8".`);
-      output.strength = testStr === 10 ? 8 : testStr;
-      output.intelligence = testInt === 10 ? 8 : testInt;
-      output.wisdom = testWis === 10 ? 8 : testWis;
-      output.dexterity = testDex === 10 ? 8 : testDex;
-      output.constitution = testCon === 10 ? 8 : testCon;
-      output.charisma = testCha === 10 ? 8 : testCha;
-      output.old_character = 1;
-      stat_functions();
-    } else {
-      // clog(`~~~~~~ OLD SHEET DETECTED old_character:${testOldChar}`);
-      output.old_character = 1;
-    }
-    setAttrs(output, {silent: true});
-  });
+const newSheet = async () => {
+  const v = await getAttrsAsync(['hitdice', 'armorclass', 'strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'old_character']);
+  const output = {};
+  const testOldChar = +v.old_character;
+  if (testOldChar === 1) return;
+  const testHitdice = +v.hitdice;
+  const testAC = +v.armorclass;
+  const testStr = +v.strength;
+  const testInt = +v.intelligence;
+  const testWis = +v.wisdom;
+  const testDex = +v.dexterity;
+  const testCon = +v.constitution;
+  const testCha = +v.charisma;
+  // new sheets will have all abilities '10' by default
+  // defaults will then be set to '8' default
+  const testAbility = testStr + testInt + testWis + testDex + testCon + testCha;
+  // clog(`~~~~~~ Average Ability detected: ${testAbility}, Hit Dice: ${testHitdice}, AC: ${testAC}`);
+  if (testHitdice === 0 && testAC === 10 && testAbility === 60) {
+    // clog(`~~~~~~ NEW SHEET DETECTED old_character:${testOldChar}, Ability Defaults set to "8".`);
+    output.strength = testStr === 10 ? 8 : testStr;
+    output.intelligence = testInt === 10 ? 8 : testInt;
+    output.wisdom = testWis === 10 ? 8 : testWis;
+    output.dexterity = testDex === 10 ? 8 : testDex;
+    output.constitution = testCon === 10 ? 8 : testCon;
+    output.charisma = testCha === 10 ? 8 : testCha;
+    output.old_character = 1;
+    stat_functions();
+  } else {
+    // clog(`~~~~~~ OLD SHEET DETECTED old_character:${testOldChar}`);
+    output.old_character = 1;
+  }
+  await setAttrsAsync(output, {silent: true});
 };
 
 // One-time update: set repeating_equipment_equipment_sync_armor_flag
@@ -2689,6 +2688,7 @@ const updateSyncArmorFlag = async (current_version, final_version) => {
 
   // check all rows and wait for ALL to finish
   // map the ID array to an array of Promises (the async checks)
+  // necessary because of the async function in the loop
   const updatePromises = idArray.map(async (id) => {
     const type = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')];
     // Await the asynchronous test
@@ -2791,14 +2791,14 @@ versionator = async (current_version, final_version) => {
   } else if (current_version < 1.659) {
     setNWPUpdate(1.66, final_version);
   } else if (current_version < 1.681) {
-    updateSyncArmorFlag(1.69, final_version);
+    await updateSyncArmorFlag(1.69, final_version);
     // all updates completed
   } else if (current_version < final_version) {
     output.sheet_version = final_version;
-    setAttrsAsync(output, {silent: true});
+    await setAttrsAsync(output, {silent: true});
   } else if (current_version === final_version) {
     // check if new sheet and set abilities
-    newSheet();
+    await newSheet();
   }
 };
 
@@ -3861,57 +3861,55 @@ on('clicked:addturnundead2', (eventInfo) => {
 });
 
 // Spell Tabs and Memorized toggle
-on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs change:toggle_caster2', (eventInfo) => {
+on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs change:toggle_caster2', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  getSectionIDs('repeating_spells', (idArray) => {
-    const fields = [];
-    _.each(idArray, (id) => {
-      fields.push(concatRepAttrName('spells', id, 'spell_memorized'));
-      fields.push(concatRepAttrName('spells', id, 'spell_show_all'));
-      fields.push(concatRepAttrName('spells', id, 'spell_level'));
-      fields.push(concatRepAttrName('spells', id, 'spell_caster_class'));
-    });
-    getAttrs(['spell_tabs', 'toggle_show_memorized', 'spell_caster_tabs', 'toggle_caster2', ...fields], (v) => {
-      const output = {};
-      const memorizedOnly = +v.toggle_show_memorized;
-      const casterTab = +v.spell_caster_tabs; // -1, 0, 1
-      const hideCaster2 = +v.toggle_caster2;
-      const levelTab = +v.spell_tabs;
-      _.each(idArray, (id) => {
-        const thisMemorizedOnly = +v[concatRepAttrName('spells', id, 'spell_memorized')] || 0;
-        const thisCaster = +v[concatRepAttrName('spells', id, 'spell_caster_class')]; // 0, 1, 2
-        const thisLevel = +v[concatRepAttrName('spells', id, 'spell_level')] || 0;
-        output[concatRepAttrName('spells', id, 'spell_show_memorized')] = memorizedOnly === 1 && thisMemorizedOnly > 0 ? 1 : 0;
-        output[concatRepAttrName('spells', id, 'spell_show_all')] = memorizedOnly === 1 ? 0 : 1;
-        // show THIS spell if spell level and spell tab match
-        if (levelTab === -1 || levelTab === thisLevel) {
-          // one caster: ignore caster tabs and show THIS spell
-          if (hideCaster2 === 1) {
-            output[concatRepAttrName('spells', id, 'spell_show')] = 1;
-            // multi-caster: continue using caster tabs
-          } else if (hideCaster2 === 0) {
-            // caster tab is All or spell class is 'n/a': show THIS spell
-            if (casterTab === -1 || thisCaster === 0) {
-              output[concatRepAttrName('spells', id, 'spell_show')] = 1;
-              // caster tab is caster1 and spell is caster1: show THIS spell
-            } else if (casterTab === 0 && thisCaster === 1) {
-              output[concatRepAttrName('spells', id, 'spell_show')] = 1;
-              // caster tab is caster2 and spell is caster2: show THIS spell
-            } else if (casterTab === 1 && thisCaster === 2) {
-              output[concatRepAttrName('spells', id, 'spell_show')] = 1;
-              // hide THIS spell
-            } else {
-              output[concatRepAttrName('spells', id, 'spell_show')] = 0;
-            }
-          }
-          // hide THIS spell if it does not match spell level tab selected
+  const idArray = await getSectionIDsAsync('repeating_spells');
+  const output = {};
+  const fields = [];
+  _.each(idArray, (id) => {
+    fields.push(concatRepAttrName('spells', id, 'spell_memorized'));
+    fields.push(concatRepAttrName('spells', id, 'spell_show_all'));
+    fields.push(concatRepAttrName('spells', id, 'spell_level'));
+    fields.push(concatRepAttrName('spells', id, 'spell_caster_class'));
+  });
+  const v = await getAttrsAsync(['spell_tabs', 'toggle_show_memorized', 'spell_caster_tabs', 'toggle_caster2', ...fields]);
+  const memorizedOnly = +v.toggle_show_memorized;
+  const casterTab = +v.spell_caster_tabs; // -1, 0, 1
+  const hideCaster2 = +v.toggle_caster2;
+  const levelTab = +v.spell_tabs;
+  _.each(idArray, (id) => {
+    const thisMemorizedOnly = +v[concatRepAttrName('spells', id, 'spell_memorized')] || 0;
+    const thisCaster = +v[concatRepAttrName('spells', id, 'spell_caster_class')]; // 0, 1, 2
+    const thisLevel = +v[concatRepAttrName('spells', id, 'spell_level')] || 0;
+    output[concatRepAttrName('spells', id, 'spell_show_memorized')] = memorizedOnly === 1 && thisMemorizedOnly > 0 ? 1 : 0;
+    output[concatRepAttrName('spells', id, 'spell_show_all')] = memorizedOnly === 1 ? 0 : 1;
+    // show THIS spell if spell level and spell tab match
+    if (levelTab === -1 || levelTab === thisLevel) {
+      // one caster: ignore caster tabs and show THIS spell
+      if (hideCaster2 === 1) {
+        output[concatRepAttrName('spells', id, 'spell_show')] = 1;
+        // multi-caster: continue using caster tabs
+      } else if (hideCaster2 === 0) {
+        // caster tab is All or spell class is 'n/a': show THIS spell
+        if (casterTab === -1 || thisCaster === 0) {
+          output[concatRepAttrName('spells', id, 'spell_show')] = 1;
+          // caster tab is caster1 and spell is caster1: show THIS spell
+        } else if (casterTab === 0 && thisCaster === 1) {
+          output[concatRepAttrName('spells', id, 'spell_show')] = 1;
+          // caster tab is caster2 and spell is caster2: show THIS spell
+        } else if (casterTab === 1 && thisCaster === 2) {
+          output[concatRepAttrName('spells', id, 'spell_show')] = 1;
+          // hide THIS spell
         } else {
           output[concatRepAttrName('spells', id, 'spell_show')] = 0;
         }
-      });
-      setAttrs(output);
-    });
+      }
+      // hide THIS spell if it does not match spell level tab selected
+    } else {
+      output[concatRepAttrName('spells', id, 'spell_show')] = 0;
+    }
   });
+  await setAttrsAsync(output, {silent: true});
 });
 
 // Spell Tabs level change sync
