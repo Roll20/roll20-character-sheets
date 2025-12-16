@@ -3913,21 +3913,20 @@ on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs chan
 });
 
 // Spell Tabs level change sync
-on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_class', (eventInfo) => {
+on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_class', async (eventInfo) => {
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
-  getAttrs(['repeating_spells_spell_level', 'repeating_spells_spell_caster_class', 'spell_caster_tabs', 'spell_tabs'], (v) => {
-    const output = {};
-    const casterTab = +v.spell_caster_tabs; // 0, 1, -1
-    const thisCaster = +v.repeating_spells_spell_caster_class; // 0, 1, 2
-    const levelTab = +v.spell_tabs;
-    const thisLevel = v.repeating_spells_spell_level;
-    // jumps to spell level tab unless Show All or same level tab
-    output.spell_tabs = levelTab >= 0 && levelTab !== thisLevel ? thisLevel : levelTab;
-    // jumps to caster class tab unless Show All or same caster tab
-    output.spell_caster_tabs = casterTab !== -1 && thisCaster <= 1 ? 0 : 1;
-    setAttrs(output);
-  });
+  const v = await getAttrsAsync(['repeating_spells_spell_level', 'repeating_spells_spell_caster_class', 'spell_caster_tabs', 'spell_tabs']);
+  const output = {};
+  const casterTab = +v.spell_caster_tabs; // 0, 1, -1
+  const thisCaster = +v.repeating_spells_spell_caster_class; // 0, 1, 2
+  const levelTab = +v.spell_tabs;
+  const thisLevel = v.repeating_spells_spell_level;
+  // jumps to spell level tab unless Show All or same level tab
+  output.spell_tabs = levelTab >= 0 && levelTab !== thisLevel ? thisLevel : levelTab;
+  // jumps to caster class tab unless Show All or same caster tab
+  output.spell_caster_tabs = casterTab !== -1 && thisCaster <= 1 ? 0 : 1;
+  await setAttrsAsync(output, {silent: true});
 });
 
 setSpellsCasterClass = () => {
