@@ -5303,11 +5303,12 @@ on(
   (eventInfo) => {
     // clog(`Thief Autofill Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['thief_level', 'autofill_thief', 'sync_thief_class', 'thief_class_selected', 'class', 'secondclass', 'thirdclass', 'level', 'level_2', 'level_3'], (v) => {
-      const output = {};
       const autocalcFill = +v.autofill_thief;
-      const syncClass = +v.sync_thief_class;
       // bail out if auto-fill is not enabled.
       if (!autocalcFill) return;
+
+      const output = {};
+      const syncClass = +v.sync_thief_class;
       const classLinked = +v.thief_class_selected;
       let levelSelected = +v.thief_level || 0;
       const class1Name = (v.class || '').trim();
@@ -5792,10 +5793,11 @@ on('change:savemisc2_base change:savemisc2_racial_mod change:savemisc2_ability_m
 on('change:saves_class change:saves_level change:autofill_saves', (eventInfo) => {
   clog(`Saves Autofill Change Detected:${eventInfo.sourceAttribute}`);
   getAttrs(['saves_class', 'saves_level', 'autofill_saves'], (v) => {
-    const output = {};
     const autocalcFill = +v.autofill_saves;
     // bail out if auto-fill is not enabled.
     if (!autocalcFill) return;
+
+    const output = {};
     const classSelected = +v.saves_class;
     const levelSelected = +v.saves_level || 0;
     clog(`Class:${classSelected} Level:${levelSelected}`);
@@ -6138,10 +6140,11 @@ function matchClassName(name) {
 // THAC0
 function calcThac0() {
   getAttrs(['thac00', 'autofill_matrix'], (v) => {
-    const output = {};
     const autocalcFill = +v.autofill_matrix;
     // bail out if auto-fill is not enabled.
     if (!autocalcFill) return;
+
+    const output = {};
     const baseThac0 = +v.thac00;
     output[`thac0-10`] = baseThac0 + 10;
     output[`thac0-9`] = baseThac0 + 9;
@@ -6189,11 +6192,12 @@ on(
         'level_3',
       ],
       (v) => {
-        const output = {};
         const autocalcFill = +v.autofill_matrix;
-        const syncClass = +v.sync_matrix_class;
         // bail out if auto-fill is not enabled.
         if (!autocalcFill) return;
+
+        const output = {};
+        const syncClass = +v.sync_matrix_class;
         const classLinked = +v.class_selected;
         let levelSelected = +v.matrix_level || 0;
         let classSelected = +v.matrix_class;
@@ -7218,10 +7222,11 @@ on(
 
 on('sheet:opened change:thac0 change:thac00 change:autofill_matrix', (eventInfo) => {
   getAttrs(['attack_matrix_flag', 'matrix_class', 'thac0', 'thac1', 'thac2', 'thac00', 'thac01', 'thac02', 'autofill_matrix'], (v) => {
-    const output = {};
     const autocalcFill = +v.autofill_matrix;
     // bail out if auto-fill is not enabled.
     if (!autocalcFill) return;
+
+    const output = {};
     const attack_matrix_flag = +v.attack_matrix_flag;
     const matrix_class = +v.matrix_class;
     if (attack_matrix_flag === 0 || matrix_class > 0) {
