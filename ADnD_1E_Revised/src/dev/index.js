@@ -3914,8 +3914,9 @@ on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs chan
 
 // Spell Tabs level change sync
 on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_class', async (eventInfo) => {
-  // test if API is creating the repeating row and bail
+  // if API || sheetworker is creating the row: bail out
   if (eventInfo.sourceType !== 'player') return;
+
   const id = eventInfo.sourceAttribute.split('_')[2];
   const v = await getAttrsAsync([`repeating_spells_${id}_spell_level`, `repeating_spells_${id}_spell_caster_class`, 'spell_caster_tabs', 'spell_tabs']);
   const output = {};
@@ -3976,11 +3977,12 @@ on('change:caster_class1_name change:caster_class2_name change:caster_class1_lev
 // Set Caster Class and level for THIS Spell based on Caster Tab
 on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_class', async (eventInfo) => {
   // console.log(`sourceType:${eventInfo.sourceType}`);
-  // test if API is creating the repeating row and bail
+  // if API || sheetworker is creating the row: bail out
   if (eventInfo.sourceType !== 'player') return;
+
+  const id = eventInfo.sourceAttribute.split('_')[2];
   const previousValue = eventInfo.previousValue;
   const trigger = eventInfo.sourceAttribute.split('_').slice(3).join('_');
-  const id = eventInfo.sourceAttribute.split('_')[2];
   const newSpell = previousValue === undefined && trigger === 'spell_name' ? 1 : 0;
   const v = await getAttrsAsync([
     `repeating_spells_${id}_spell_caster_class`,
@@ -3999,15 +4001,13 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
   const showCaster2 = +v.toggle_caster2;
   const casterTab = +v.spell_caster_tabs; // 0, 1, -1
   let thisClass = +v[concatRepAttrName('spells', id, 'spell_caster_class')]; // 0, 1, 2
-  // console.log(`Change detected:PRE-CHECK Hide Caster2:${showCaster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+
   // Caster Class 2 is enabled
   if (showCaster2 === 0) {
     // tests for New and that it's not on the All tab
     if (newSpell === 1 && casterTab !== -1) thisClass = casterTab === 0 ? 1 : 2;
-  } else if (showCaster2 === 1) {
-    thisClass = 1;
   }
-  // console.log(`Change detected:POST-CHECK Hide Caster2:${showCaster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+
   switch (thisClass) {
     case 0:
       output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = '';
@@ -4033,8 +4033,9 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
 // Set Spell's Level for new spells based selected Spell level Tab
 on('change:repeating_spells:spell_name', async (eventInfo) => {
   // console.log(`sourceType:${eventInfo.sourceType}`);
-  // test if API is creating the repeating row and bail
+  // if API || sheetworker is creating the row: bail out
   if (eventInfo.sourceType !== 'player') return;
+
   const id = eventInfo.sourceAttribute.split('_')[2];
   const v = await getAttrsAsync([`repeating_spells_${id}_spell_level`, 'spell_tabs']);
   const output = {};
@@ -4846,14 +4847,13 @@ async function setNWP(id) {
 // Set repeating attr values for new rows. Makes visible to API
 on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item change:repeating_nonweaponproficiencies:nwp_name', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  const id = eventInfo.sourceAttribute.split('_')[2];
-  // test if API is creating the repeating row and bail
+  // if API || sheetworker is creating the row: bail out
   if (eventInfo.sourceType !== 'player') return;
 
-  // test for new row name (ie no existing value)
-  // console.log(`Change detected: new: ${eventInfo.newValue} previous:${eventInfo.previousValue}`);
+  // test for a new row name (ie no existing value)
   if (eventInfo.previousValue !== undefined) return;
 
+  const id = eventInfo.sourceAttribute.split('_')[2];
   if (eventInfo.sourceAttribute.includes('equipment_item')) {
     await setEquipment(id);
     // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Default values have been set.`);
