@@ -4651,41 +4651,40 @@ on(
 );
 
 // Creates the chat menu buttons or auto rolls damage with the attack based on settings
-damageMacro = (id) => {
-  getAttrs(['toggle_auto_damage'], (v) => {
-    const output = {};
-    const autoDamage = +v.toggle_auto_damage;
-    // clog(`auto damage toggle:${autoDamage}`);
-    // NOTE: these macros substitute the damage rolls for the chatmenu buttons directly to support crit logic
-    const damageSmallMedium = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
-    const damageLarge = ` vs LG [[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
-    const damageSmallMediumNpc = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
-    const damageLargeNPC = ` vs LG [[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
-    const damageSmallMediumCrit = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
-    const damageLargeCrit = ` vs LG [[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
-    const damageSmallMediumNpcCrit = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}}`;
-    const damageLargeNpcCrit = ` vs LG [[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
-    if (autoDamage === 0) {
-      output[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_roll)`;
-      output[`repeating_weapon_${id}_weapon_damagelarge_chat_menu`] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_roll)`;
-      output[`repeating_weapon_${id}_weapon_damagesmallmedium_npc_chat_menu`] = `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_npc_roll)`;
-      output[`repeating_weapon_${id}_weapon_damagelarge_npc_chat_menu`] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_npc_roll)`;
-      output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_chat_menu`] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_roll)`;
-      output[`repeating_weapon_${id}_weapon_critdamagelarge_chat_menu`] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_roll)`;
-      output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`] = `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_roll)`;
-      output[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_npc_roll)`;
-    } else {
-      output[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`] = damageSmallMedium;
-      output[`repeating_weapon_${id}_weapon_damagelarge_chat_menu`] = damageLarge;
-      output[`repeating_weapon_${id}_weapon_damagesmallmedium_npc_chat_menu`] = damageSmallMediumNpc;
-      output[`repeating_weapon_${id}_weapon_damagelarge_npc_chat_menu`] = damageLargeNPC;
-      output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_chat_menu`] = damageSmallMediumCrit;
-      output[`repeating_weapon_${id}_weapon_critdamagelarge_chat_menu`] = damageLargeCrit;
-      output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`] = damageSmallMediumNpcCrit;
-      output[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`] = damageLargeNpcCrit;
-    }
-    setAttrs(output, {silent: true});
-  });
+damageMacro = async (id) => {
+  const v = await getAttrsAsync(['toggle_auto_damage']);
+  const output = {};
+  const autoDamage = +v.toggle_auto_damage;
+  // clog(`auto damage toggle:${autoDamage}`);
+  // NOTE: these macros substitute the damage rolls for the chatmenu buttons directly to support crit logic
+  const damageSmallMedium = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+  const damageLarge = ` vs LG [[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+  const damageSmallMediumNpc = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+  const damageLargeNPC = ` vs LG [[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+  const damageSmallMediumCrit = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+  const damageLargeCrit = ` vs LG [[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+  const damageSmallMediumNpcCrit = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}}`;
+  const damageLargeNpcCrit = ` vs LG [[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
+  if (autoDamage === 0) {
+    output[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_roll)`;
+    output[`repeating_weapon_${id}_weapon_damagelarge_chat_menu`] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_roll)`;
+    output[`repeating_weapon_${id}_weapon_damagesmallmedium_npc_chat_menu`] = `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_npc_roll)`;
+    output[`repeating_weapon_${id}_weapon_damagelarge_npc_chat_menu`] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_npc_roll)`;
+    output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_chat_menu`] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_roll)`;
+    output[`repeating_weapon_${id}_weapon_critdamagelarge_chat_menu`] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_roll)`;
+    output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`] = `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_roll)`;
+    output[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_npc_roll)`;
+  } else {
+    output[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`] = damageSmallMedium;
+    output[`repeating_weapon_${id}_weapon_damagelarge_chat_menu`] = damageLarge;
+    output[`repeating_weapon_${id}_weapon_damagesmallmedium_npc_chat_menu`] = damageSmallMediumNpc;
+    output[`repeating_weapon_${id}_weapon_damagelarge_npc_chat_menu`] = damageLargeNPC;
+    output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_chat_menu`] = damageSmallMediumCrit;
+    output[`repeating_weapon_${id}_weapon_critdamagelarge_chat_menu`] = damageLargeCrit;
+    output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`] = damageSmallMediumNpcCrit;
+    output[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`] = damageLargeNpcCrit;
+  }
+  await setAttrsAsync(output, {silent: true});
 };
 
 // Ensures Chat Menu Buttons have updated Damage Rolls
