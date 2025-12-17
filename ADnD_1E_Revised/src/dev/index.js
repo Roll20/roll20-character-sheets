@@ -4263,21 +4263,21 @@ function syncDualPen() {
   });
 }
 
-on('change:repeating_weapon:weapon_dual', (eventInfo) => {
+on('change:repeating_weapon:weapon_dual', async (eventInfo) => {
+  const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
-  getAttrs(['dual_pen_primary', 'dual_pen_secondary', 'repeating_weapon_weapon_dual'], (v) => {
-    // clog('this weapon attack Type has been re-calculated');
-    const primary = +v.dual_pen_primary || 0;
-    const secondary = +v.dual_pen_secondary || 0;
-    const attack_type = v.repeating_weapon_weapon_dual;
-    let handed_mod = 0;
-    if (attack_type === 'Normal') handed_mod = 0;
-    else if (attack_type === 'Primary') handed_mod = primary;
-    else if (attack_type === 'Secondary') handed_mod = secondary;
-    const thispenalty = Math.min(0, handed_mod);
-    output.repeating_weapon_weapon_dual_pen = thispenalty;
-    setAttrs(output, {silent: true});
-  });
+  const v = await getAttrsAsync(['dual_pen_primary', 'dual_pen_secondary', `repeating_weapon_${id}_weapon_dual`]);
+  clog('this weapon attack Type has been re-calculated');
+  const primary = +v.dual_pen_primary;
+  const secondary = +v.dual_pen_secondary;
+  const attack_type = v[`repeating_weapon_${id}_weapon_dual`];
+  let handed_mod = 0;
+  if (attack_type === 'Normal') handed_mod = 0;
+  else if (attack_type === 'Primary') handed_mod = primary;
+  else if (attack_type === 'Secondary') handed_mod = secondary;
+  const thispenalty = Math.min(0, handed_mod);
+  output[`repeating_weapon_${id}_weapon_dual_pen`] = thispenalty;
+  await setAttrsAsync(output, {silent: true});
 });
 
 // Weapon Dual-Wield Calc Penalty
