@@ -4238,31 +4238,6 @@ on('change:repeating_weapon:weapon_backstab_flag', async (eventInfo) => {
   await setAttrsAsync(output, {silent: true});
 });
 
-function syncDualPen() {
-  getSectionIDs('repeating_weapon', (idArray) => {
-    const output = {};
-    const fields = [];
-    _.each(idArray, (id) => {
-      fields.push(concatRepAttrName('weapon', id, 'weapon_dual'));
-    });
-    getAttrs(['dual_pen_primary', 'dual_pen_secondary', ...fields], (v) => {
-      // clog('Weapon Attack Type has been re-calculated');
-      const primary = +v.dual_pen_primary || 0;
-      const secondary = +v.dual_pen_secondary || 0;
-      _.each(idArray, (id) => {
-        const attack_type = v[concatRepAttrName('weapon', id, 'weapon_dual')];
-        let handed_mod = 0;
-        if (attack_type === 'Normal') handed_mod = 0;
-        else if (attack_type === 'Primary') handed_mod = primary;
-        else if (attack_type === 'Secondary') handed_mod = secondary;
-        const thispenalty = Math.min(0, handed_mod);
-        output[concatRepAttrName('weapon', id, 'weapon_dual_pen')] = thispenalty;
-      });
-      setAttrs(output, {silent: true});
-    });
-  });
-}
-
 on('change:repeating_weapon:weapon_dual', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
@@ -4280,30 +4255,53 @@ on('change:repeating_weapon:weapon_dual', async (eventInfo) => {
   await setAttrsAsync(output, {silent: true});
 });
 
-// Weapon Dual-Wield Calc Penalty
-on('change:dual_pen_primary change:dual_pen_secondary change:dexterity', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  getAttrs(['dexterity'], (v) => {
-    // clog('Weapon Attack Type has been re-calculated');
-    const output = {};
-    const dex = +v.dexterity || 0;
-    let dex_mod = 0;
-    if (dex < 6) {
-      dex_mod = Math.max(-3, dex - 6);
-      // clog(`low dex penalty: ${dex_mod}`);
-    } else if (dex >= 18) {
-      dex_mod = Math.min(5, Math.floor(dex / 3) - 3);
-      // clog(`very high dex penalty: ${dex_mod}`);
-    } else if (dex > 15) {
-      dex_mod = dex - 15;
-      // clog(`high dex penalty: ${dex_mod}`);
-    }
-    const primary_mod = Math.min(0, dex_mod - 2);
-    const secondary_mod = Math.min(0, dex_mod - 4);
-    output.dual_pen_primary = primary_mod;
-    output.dual_pen_secondary = secondary_mod;
-    setAttrs(output, {silent: true}, syncDualPen);
+async function syncDualPen() {
+  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const output = {};
+  const fields = [];
+  _.each(idArray, (id) => {
+    fields.push(concatRepAttrName('weapon', id, 'weapon_dual'));
   });
+  const v = await getAttrsAsync(['dual_pen_primary', 'dual_pen_secondary', ...fields]);
+  // clog('Weapon Attack Type has been re-calculated');
+  const primary = +v.dual_pen_primary;
+  const secondary = +v.dual_pen_secondary;
+  _.each(idArray, (id) => {
+    const attack_type = v[concatRepAttrName('weapon', id, 'weapon_dual')];
+    let handed_mod = 0;
+    if (attack_type === 'Normal') handed_mod = 0;
+    else if (attack_type === 'Primary') handed_mod = primary;
+    else if (attack_type === 'Secondary') handed_mod = secondary;
+    const thispenalty = Math.min(0, handed_mod);
+    output[concatRepAttrName('weapon', id, 'weapon_dual_pen')] = thispenalty;
+  });
+  await setAttrsAsync(output);
+}
+
+// Weapon Dual-Wield Calc Penalty
+on('change:dual_pen_primary change:dual_pen_secondary change:dexterity', async (eventInfo) => {
+  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  const v = await getAttrsAsync(['dexterity']);
+  // clog('Weapon Attack Type has been re-calculated');
+  const output = {};
+  const dex = +v.dexterity;
+  let dex_mod = 0;
+  if (dex < 6) {
+    dex_mod = Math.max(-3, dex - 6);
+    // clog(`low dex penalty: ${dex_mod}`);
+  } else if (dex >= 18) {
+    dex_mod = Math.min(5, Math.floor(dex / 3) - 3);
+    // clog(`very high dex penalty: ${dex_mod}`);
+  } else if (dex > 15) {
+    dex_mod = dex - 15;
+    // clog(`high dex penalty: ${dex_mod}`);
+  }
+  const primary_mod = Math.min(0, dex_mod - 2);
+  const secondary_mod = Math.min(0, dex_mod - 4);
+  output.dual_pen_primary = primary_mod;
+  output.dual_pen_secondary = secondary_mod;
+  await setAttrsAsync(output, {silent: true});
+  syncDualPen();
 });
 
 // Weapon Range: Parse Ranges
