@@ -4421,7 +4421,7 @@ on('change:sync_hp_flag change:hitpoints change:hitpoints_max change:hitpoints_1
 calcAC = async (recalc) => {
   // clog('Armor re-calculated');
   const v = await getAttrsAsync([
-    armorAttrs,
+    ...armorAttrs,
     'armor_rating_flag',
     'armorbonus',
     'armorbonus_inverted',
@@ -4441,23 +4441,23 @@ calcAC = async (recalc) => {
   const armorClass = +v.armorclass;
   const syncAcFlag = +v.sync_ac_flag;
   const armorRatingFlag = +v.armor_rating_flag;
-  const armorShield_mod = +v.armorshield_mod * -1 || 0;
-  const armorOther_mod = +v.armorother_mod * -1 || 0;
-  const armorOther2_mod = +v.armorother2_mod * -1 || 0;
-  const armorOther3_mod = +v.armorother3_mod * -1 || 0;
-  const armorOther4_mod = +v.armorother4_mod * -1 || 0;
-  const armorOther5_mod = +v.armorother5_mod * -1 || 0;
-  const armorOther6_mod = +v.armorother6_mod * -1 || 0;
-  const armorType_magic = +v.armortype_magic * -1 || 0;
-  const armorType2_magic = +v.armortype2_magic * -1 || 0;
-  const armorShield_magic = +v.armorshield_magic * -1 || 0;
-  const armorHelmet_magic = +v.armorhelmet_magic * -1 || 0;
-  const armorOther_magic = +v.armorother_magic * -1 || 0;
-  const armorOther2_magic = +v.armorother2_magic * -1 || 0;
-  const armorOther3_magic = +v.armorother3_magic * -1 || 0;
-  const armorOther4_magic = +v.armorother4_magic * -1 || 0;
-  const armorOther5_magic = +v.armorother5_magic * -1 || 0;
-  const armorOther6_magic = +v.armorother6_magic * -1 || 0;
+  const armorShield_mod = +v.armorshield_mod * -1;
+  const armorOther_mod = +v.armorother_mod * -1;
+  const armorOther2_mod = +v.armorother2_mod * -1;
+  const armorOther3_mod = +v.armorother3_mod * -1;
+  const armorOther4_mod = +v.armorother4_mod * -1;
+  const armorOther5_mod = +v.armorother5_mod * -1;
+  const armorOther6_mod = +v.armorother6_mod * -1;
+  const armorType_magic = +v.armortype_magic * -1;
+  const armorType2_magic = +v.armortype2_magic * -1;
+  const armorShield_magic = +v.armorshield_magic * -1;
+  const armorHelmet_magic = +v.armorhelmet_magic * -1;
+  const armorOther_magic = +v.armorother_magic * -1;
+  const armorOther2_magic = +v.armorother2_magic * -1;
+  const armorOther3_magic = +v.armorother3_magic * -1;
+  const armorOther4_magic = +v.armorother4_magic * -1;
+  const armorOther5_magic = +v.armorother5_magic * -1;
+  const armorOther6_magic = +v.armorother6_magic * -1;
   const unarmored_worn = +v.unarmored_worn;
   const armorType_worn = +v.armortype_worn;
   const armorType2_worn = +v.armortype2_worn;
@@ -4470,9 +4470,9 @@ calcAC = async (recalc) => {
   const armorOther5_worn = +v.armorother5_worn;
   const armorOther6_worn = +v.armorother6_worn;
   // check encumbrance/bulk for DEX penalty
-  const current_encumbrance_move = +v.current_encumbrance_move || 0;
-  let armorBonusToggle = +v.armorbonus_toggle || 0;
-  let armorBonus = +v.armorbonus || 0;
+  const current_encumbrance_move = +v.current_encumbrance_move;
+  let armorBonusToggle = +v.armorbonus_toggle;
+  let armorBonus = +v.armorbonus;
   let encumbranceConditionFlag = 0;
   // encumbered and has a DEX bonus
   if (current_encumbrance_move === 3 && armorBonus < 0) {
@@ -4481,9 +4481,9 @@ calcAC = async (recalc) => {
     encumbranceConditionFlag = 1;
     // toggle off DEX only if there is a DEX bonus
   } else if (armorBonus < 0) {
-    armorBonus = +v.armorbonus * armorBonusToggle || 0;
+    armorBonus = +v.armorbonus * armorBonusToggle;
   } else {
-    armorBonus = +v.armorbonus || 0;
+    armorBonus = +v.armorbonus;
   }
   output.encumbrance_flag = encumbranceConditionFlag;
   const unarmored_base = +v.unarmored_base;
@@ -4492,22 +4492,22 @@ calcAC = async (recalc) => {
   const armorShield_base = +v.armorshield_base;
   const armorOther_base = +v.armorother_base;
   // must do the extra checks on these to ensure they are bonuses and not flat AC|AR values
-  const armorOther2_base = v.armorother2_base >= 0 ? 0 : -Math.abs(v.armorother2_base) || 0;
-  const armorOther3_base = v.armorother3_base >= 0 ? 0 : -Math.abs(v.armorother3_base) || 0;
-  const armorOther4_base = v.armorother4_base >= 0 ? 0 : -Math.abs(v.armorother4_base) || 0;
-  const armorOther5_base = v.armorother5_base >= 0 ? 0 : -Math.abs(v.armorother5_base) || 0;
-  const armorOther6_base = v.armorother6_base >= 0 ? 0 : -Math.abs(v.armorother6_base) || 0;
+  const armorOther2_base = v.armorother2_base >= 0 ? 0 : -Math.abs(v.armorother2_base);
+  const armorOther3_base = v.armorother3_base >= 0 ? 0 : -Math.abs(v.armorother3_base);
+  const armorOther4_base = v.armorother4_base >= 0 ? 0 : -Math.abs(v.armorother4_base);
+  const armorOther5_base = v.armorother5_base >= 0 ? 0 : -Math.abs(v.armorother5_base);
+  const armorOther6_base = v.armorother6_base >= 0 ? 0 : -Math.abs(v.armorother6_base);
   const unarmored_ac = +v.unarmored_ac;
   const armorType_ac = +v.armortype_ac;
   const armorType2_ac = +v.armortype2_ac;
   const armorShield_ac = +v.armorshield_ac;
   const armorOther_ac = +v.armorother_ac;
   // must do the extra checks on these to ensure they are bonuses and not flat AC|AR values
-  const armorOther2_ac = v.armorother2_ac >= 0 ? 0 : -Math.abs(v.armorother2_ac) || 0;
-  const armorOther3_ac = v.armorother3_ac >= 0 ? 0 : -Math.abs(v.armorother3_ac) || 0;
-  const armorOther4_ac = v.armorother4_ac >= 0 ? 0 : -Math.abs(v.armorother4_ac) || 0;
-  const armorOther5_ac = v.armorother5_ac >= 0 ? 0 : -Math.abs(v.armorother5_ac) || 0;
-  const armorOther6_ac = v.armorother6_ac >= 0 ? 0 : -Math.abs(v.armorother6_ac) || 0;
+  const armorOther2_ac = v.armorother2_ac >= 0 ? 0 : -Math.abs(v.armorother2_ac);
+  const armorOther3_ac = v.armorother3_ac >= 0 ? 0 : -Math.abs(v.armorother3_ac);
+  const armorOther4_ac = v.armorother4_ac >= 0 ? 0 : -Math.abs(v.armorother4_ac);
+  const armorOther5_ac = v.armorother5_ac >= 0 ? 0 : -Math.abs(v.armorother5_ac);
+  const armorOther6_ac = v.armorother6_ac >= 0 ? 0 : -Math.abs(v.armorother6_ac);
   const armorType_baseValue = armorType_worn ? armorType_base : 10;
   const armorType2_baseValue = armorType2_worn ? armorType2_base : 10;
   const armorShield_baseValue = armorShield_worn ? armorShield_base : 0;
@@ -4641,20 +4641,14 @@ calcAC = async (recalc) => {
 };
 
 on(
-  'change:armor_details_show change:armor_rating_flag change:sync_ac_flag change:autocalc_ac change:unarmored change:armortype change:armortype2 change:armorshield change:armorhelmet change:armorother change:armorother2 change:armorother3 change:armorother4 change:armorother5 change:armorother6 change:armorclass_mod change:armorclass_magic change:armorbonus change:armorbonus_toggle change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorother_worn change:armorother2_worn change:armorother3_worn change:armorother4_worn change:armorother5_worn change:armorother6_worn change:armortype_base change:armortype2_base change:armorshield_base change:armorother_base change:armorother2_base change:armorother3_base change:armorother4_base change:armorother5_base change:armorother6_base change:unarmored_base change:armortype_ac change:armortype2_ac change:armorshield_ac change:armorhelmet_ac change:armorother_ac change:armorother2_ac change:armorother3_ac change:armorother4_ac change:armorother5_ac change:armorother6_ac change:unarmored_ac change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic',
+  'change:armor_details_show change:armor_rating_flag change:sync_ac_flag change:autocalc_ac change:unarmored change:armortype change:armortype2 change:armorshield change:armorhelmet change:armorother change:armorother2 change:armorother3 change:armorother4 change:armorother5 change:armorother6 change:armorclass_mod change:armorclass_magic change:armorbonus change:armorbonus_toggle change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorother_worn change:armorother2_worn change:armorother3_worn change:armorother4_worn change:armorother5_worn change:armorother6_worn change:armortype_base change:armortype2_base change:armorshield_base change:armorother_base change:armorother2_base change:armorother3_base change:armorother4_base change:armorother5_base change:armorother6_base change:unarmored_base change:armortype_ac change:armortype2_ac change:armorshield_ac change:armorhelmet_ac change:armorother_ac change:armorother2_ac change:armorother3_ac change:armorother4_ac change:armorother5_ac change:armorother6_ac change:unarmored_ac change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic clicked:calcac',
   (eventInfo) => {
     // const thisEvent = eventInfo.sourceAttribute === undefined ? 'sheet opened' : eventInfo.sourceAttribute;
-    const recalc = 0;
-    // clog(`AC change detected by: ${eventInfo.sourceType}`);
+    const triggerEvent = eventInfo.triggerName;
+    const recalc = triggerEvent === 'clicked:calcac' ? 1 : 0;
     calcAC(recalc);
   },
 );
-
-on('clicked:calcac', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  const recalc = 1;
-  calcAC(recalc);
-});
 
 // Creates the chat menu buttons or auto rolls damage with the attack based on settings
 damageMacro = (id) => {
