@@ -4390,27 +4390,26 @@ on('change:repeating_weapon:weapon_attack_type', async (eventInfo) => {
 });
 
 // HP Calcs
-calcHP = () => {
+calcHP = async () => {
   // clog('HP re-calculated');
-  getAttrs(['hitpoints', 'hitpoints_max', 'sync_hp_flag', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class'], (v) => {
-    const output = {};
-    const syncHpFlag = +v.sync_hp_flag;
-    const hitPointsMax = +v.hitpoints_max || 0;
-    const hitpoints_1_class = Math.max(0, +v.hitpoints_1_class || 0);
-    const hitpoints_2_class = Math.max(0, +v.hitpoints_2_class || 0);
-    const hitpoints_3_class = Math.max(0, +v.hitpoints_3_class || 0);
-    const class1 = hitpoints_1_class !== 0 ? 1 : 0;
-    const class2 = hitpoints_2_class !== 0 ? 1 : 0;
-    const class3 = hitpoints_3_class !== 0 ? 1 : 0;
-    const numberOfClasses = class1 + class2 + class3;
-    const totalClassHP = int(hitpoints_1_class + hitpoints_2_class + hitpoints_3_class);
-    const totalHP = float(totalClassHP / numberOfClasses).toFixed(2);
-    output.hitpoints_class_total = totalClassHP;
-    output.hp_quotient = numberOfClasses;
-    output.hitpoints_total = totalHP;
-    output.hitpoints_max = syncHpFlag === 1 ? int(totalHP) : hitPointsMax;
-    setAttrs(output, {silent: true});
-  });
+  const v = await getAttrsAsync(['hitpoints', 'hitpoints_max', 'sync_hp_flag', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class']);
+  const output = {};
+  const syncHpFlag = +v.sync_hp_flag;
+  const hitPointsMax = +v.hitpoints_max;
+  const hitpoints_1_class = Math.max(0, +v.hitpoints_1_class);
+  const hitpoints_2_class = Math.max(0, +v.hitpoints_2_class);
+  const hitpoints_3_class = Math.max(0, +v.hitpoints_3_class);
+  const class1 = hitpoints_1_class !== 0 ? 1 : 0;
+  const class2 = hitpoints_2_class !== 0 ? 1 : 0;
+  const class3 = hitpoints_3_class !== 0 ? 1 : 0;
+  const numberOfClasses = class1 + class2 + class3;
+  const totalClassHP = int(hitpoints_1_class + hitpoints_2_class + hitpoints_3_class);
+  const totalHP = float(totalClassHP / numberOfClasses).toFixed(2);
+  output.hitpoints_class_total = totalClassHP;
+  output.hp_quotient = numberOfClasses;
+  output.hitpoints_total = totalHP;
+  output.hitpoints_max = syncHpFlag === 1 ? int(totalHP) : hitPointsMax;
+  await setAttrsAsync(output, {silent: true});
 };
 
 on('change:sync_hp_flag change:hitpoints change:hitpoints_max change:hitpoints_1_class change:hitpoints_2_class change:hitpoints_3_class', (eventInfo) => {
