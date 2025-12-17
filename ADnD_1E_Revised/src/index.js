@@ -4151,25 +4151,36 @@ on('change:repeating_weapon:weapon_whisper_to_hit_select', async (eventInfo) => 
 });
 
 // Weapon Proficiency Toggle
-on('change:repeating_weapon:weapon_prof_flag change:weapon_proficiency_initial change:weapon_proficiency_added_per_level change:weapon_proficiency_penalty', (eventInfo) => {
+on('change:weapon_proficiency_initial change:weapon_proficiency_added_per_level change:weapon_proficiency_penalty', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  getSectionIDs('repeating_weapon', (idArray) => {
-    const fields = [];
-    _.each(idArray, (id) => {
-      fields.push(`repeating_weapon_${id}_weapon_prof_flag`);
-    });
-    getAttrs(['weapon_proficiency_penalty', ...fields], (v) => {
-      // clog('Weapon Proficiency has been re-calculated');
-      const output = {};
-      _.each(idArray, (id) => {
-        const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`];
-        const thispenalty = +v.weapon_proficiency_penalty || 0;
-        output[`repeating_weapon_${id}_weapon_prof`] = thispenalty;
-        output[`repeating_weapon_${id}_weapon_prof_pen`] = thisflag === 0 ? '0' : thispenalty;
-      });
-      setAttrs(output, {silent: true});
-    });
+  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const output = {};
+  const fields = [];
+  _.each(idArray, (id) => {
+    fields.push(`repeating_weapon_${id}_weapon_prof_flag`);
   });
+  const v = await getAttrsAsync(['weapon_proficiency_penalty', ...fields]);
+  const thispenalty = +v.weapon_proficiency_penalty;
+  _.each(idArray, (id) => {
+    const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`];
+    output[`repeating_weapon_${id}_weapon_prof`] = thispenalty;
+    output[`repeating_weapon_${id}_weapon_prof_pen`] = thisflag === 0 ? '0' : thispenalty;
+  });
+  await setAttrsAsync(output, {silent: true});
+  // clog('Weapon Proficiency has been re-calculated');
+});
+
+on('change:repeating_weapon:weapon_prof_flag', async (eventInfo) => {
+  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  const id = eventInfo.sourceAttribute.split('_')[2];
+  const output = {};
+  const v = await getAttrsAsync(['weapon_proficiency_penalty', `repeating_weapon_${id}_weapon_prof_flag`]);
+  const thispenalty = +v.weapon_proficiency_penalty;
+  const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`];
+  output[`repeating_weapon_${id}_weapon_prof`] = thispenalty;
+  output[`repeating_weapon_${id}_weapon_prof_pen`] = thisflag === 0 ? '0' : thispenalty;
+  await setAttrsAsync(output, {silent: true});
+  // clog('Weapon Proficiency has been re-calculated');
 });
 
 // Weapon Backstab Toggle
