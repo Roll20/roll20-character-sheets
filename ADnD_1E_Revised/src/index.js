@@ -4184,36 +4184,58 @@ on('change:repeating_weapon:weapon_prof_flag', async (eventInfo) => {
 });
 
 // Weapon Backstab Toggle
-on('change:repeating_weapon:weapon_backstab_flag change:backstab change:backstab_bonus change:toggle_thief_skills', (eventInfo) => {
+on('change:backstab change:backstab_bonus change:toggle_thief_skills', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  getSectionIDs('repeating_weapon', (idArray) => {
-    const fields = [];
-    _.each(idArray, (id) => {
-      fields.push(`repeating_weapon_${id}_weapon_backstab_flag`);
-    });
-    getAttrs(['backstab', 'backstab_bonus', 'toggle_thief_skills', ...fields], (v) => {
-      const output = {};
-      const thiefSkills = +v.toggle_thief_skills;
-      const thisMult = +v.backstab;
-      const thisBonus = +v.backstab_bonus || 0;
-      _.each(idArray, (id) => {
-        const thisFlag = +v[`repeating_weapon_${id}_weapon_backstab_flag`];
-        if (thiefSkills === 0) {
-          output[`repeating_weapon_${id}_weapon_backstab_var`] = thisFlag === 0 ? 0 : `+${thisBonus}`;
-          output[`repeating_weapon_${id}_weapon_backstab_bonus`] = thisFlag === 0 ? 0 : thisBonus;
-          output[`repeating_weapon_${id}_weapon_backstab`] = thisFlag === 0 ? 1 : `x${thisMult}`;
-          output[`repeating_weapon_${id}_weapon_backstab_mult`] = thisFlag === 0 ? 1 : thisMult;
-        }
-        if (thiefSkills === 1) {
-          output[`repeating_weapon_${id}_weapon_backstab_var`] = 0;
-          output[`repeating_weapon_${id}_weapon_backstab_bonus`] = 0;
-          output[`repeating_weapon_${id}_weapon_backstab`] = 1;
-          output[`repeating_weapon_${id}_weapon_backstab_mult`] = 1;
-        }
-      });
-      setAttrs(output, {silent: true});
-    });
+  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const output = {};
+  const fields = [];
+  _.each(idArray, (id) => {
+    fields.push(`repeating_weapon_${id}_weapon_backstab_flag`);
   });
+  const v = await getAttrsAsync(['backstab', 'backstab_bonus', 'toggle_thief_skills', ...fields]);
+  const thiefSkills = +v.toggle_thief_skills;
+  const thisMult = +v.backstab;
+  const thisBonus = +v.backstab_bonus;
+  _.each(idArray, (id) => {
+    const thisFlag = +v[`repeating_weapon_${id}_weapon_backstab_flag`];
+    if (thiefSkills === 0) {
+      output[`repeating_weapon_${id}_weapon_backstab_var`] = thisFlag === 0 ? 0 : `+${thisBonus}`;
+      output[`repeating_weapon_${id}_weapon_backstab_bonus`] = thisFlag === 0 ? 0 : thisBonus;
+      output[`repeating_weapon_${id}_weapon_backstab`] = thisFlag === 0 ? 1 : `x${thisMult}`;
+      output[`repeating_weapon_${id}_weapon_backstab_mult`] = thisFlag === 0 ? 1 : thisMult;
+    }
+    if (thiefSkills === 1) {
+      output[`repeating_weapon_${id}_weapon_backstab_var`] = 0;
+      output[`repeating_weapon_${id}_weapon_backstab_bonus`] = 0;
+      output[`repeating_weapon_${id}_weapon_backstab`] = 1;
+      output[`repeating_weapon_${id}_weapon_backstab_mult`] = 1;
+    }
+  });
+  await setAttrsAsync(output, {silent: true});
+});
+
+on('change:repeating_weapon:weapon_backstab_flag', async (eventInfo) => {
+  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  const id = eventInfo.sourceAttribute.split('_')[2];
+  const output = {};
+  const v = await getAttrsAsync(['backstab', 'backstab_bonus', 'toggle_thief_skills', `repeating_weapon_${id}_weapon_backstab_flag`]);
+  const thiefSkills = +v.toggle_thief_skills;
+  const thisMult = +v.backstab;
+  const thisBonus = +v.backstab_bonus;
+  const thisFlag = +v[`repeating_weapon_${id}_weapon_backstab_flag`];
+  if (thiefSkills === 0) {
+    output[`repeating_weapon_${id}_weapon_backstab_var`] = thisFlag === 0 ? 0 : `+${thisBonus}`;
+    output[`repeating_weapon_${id}_weapon_backstab_bonus`] = thisFlag === 0 ? 0 : thisBonus;
+    output[`repeating_weapon_${id}_weapon_backstab`] = thisFlag === 0 ? 1 : `x${thisMult}`;
+    output[`repeating_weapon_${id}_weapon_backstab_mult`] = thisFlag === 0 ? 1 : thisMult;
+  }
+  if (thiefSkills === 1) {
+    output[`repeating_weapon_${id}_weapon_backstab_var`] = 0;
+    output[`repeating_weapon_${id}_weapon_backstab_bonus`] = 0;
+    output[`repeating_weapon_${id}_weapon_backstab`] = 1;
+    output[`repeating_weapon_${id}_weapon_backstab_mult`] = 1;
+  }
+  await setAttrsAsync(output, {silent: true});
 });
 
 function syncDualPen() {
