@@ -4651,10 +4651,15 @@ on(
 );
 
 // Creates the chat menu buttons or auto rolls damage with the attack based on settings
-damageMacro = async (id) => {
-  const v = await getAttrsAsync(['toggle_auto_damage']);
+damageMacro = async (id, passedAutoDamage) => {
+  let autoDamage;
+  if (passedAutoDamage === undefined || passedAutoDamage === null) {
+    const v = await getAttrsAsync(['toggle_auto_damage']);
+    autoDamage = +v.toggle_auto_damage;
+  } else {
+    autoDamage = passedAutoDamage;
+  }
   const output = {};
-  const autoDamage = +v.toggle_auto_damage;
   // clog(`auto damage toggle:${autoDamage}`);
   // NOTE: these macros substitute the damage rolls for the chatmenu buttons directly to support crit logic
   const damageSmallMedium = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
@@ -4663,7 +4668,7 @@ damageMacro = async (id) => {
   const damageLargeNPC = ` vs LG [[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
   const damageSmallMediumCrit = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
   const damageLargeCrit = ` vs LG [[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
-  const damageSmallMediumNpcCrit = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]}}`;
+  const damageSmallMediumNpcCrit = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
   const damageLargeNpcCrit = ` vs LG [[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
   if (autoDamage === 0) {
     output[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_roll)`;
@@ -4684,47 +4689,41 @@ damageMacro = async (id) => {
     output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`] = damageSmallMediumNpcCrit;
     output[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`] = damageLargeNpcCrit;
   }
-  await setAttrsAsync(output, {silent: true});
+  return output;
 };
 
 // Ensures Chat Menu Buttons have updated Damage Rolls
 on(
   'change:repeating_weapon:weapon_name change:repeating_weapon:weapon_damagesmallmedium change:repeating_weapon:weapon_damagelarge change:repeating_weapon:weapon_critdamagesmallmedium change:repeating_weapon:weapon_critdamagelarge change:repeating_weapon:weapon_attackdmgbonus change:repeating_weapon:weapon_critdamage_flag',
-  (eventInfo) => {
+  async (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
-    damageMacro(id);
+    const output = await damageMacro(id);
+    await setAttrsAsync(output, {silent: true});
   },
 );
 
-on('change:toggle_critdamage', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  getSectionIDs('repeating_weapon', (idArray) => {
-    const output = {};
-    const fields = [];
-    _.each(idArray, (id) => {
-      fields.push(concatRepAttrName('weapon', id, 'weapon_critdamage_flag'));
-    });
-    getAttrs(fields, (v) => {
-      idArray.forEach((id) => {
-        const currentValue = +v[concatRepAttrName('weapon', id, 'weapon_critdamage_flag')];
-        output[concatRepAttrName('weapon', id, 'weapon_critdamage_flag')] = 1 - currentValue;
-      });
-      setAttrs(output);
-    });
+on('change:toggle_critdamage change:toggle_auto_damage', async (eventInfo) => {
+  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const fields = idArray.map((id) => concatRepAttrName('weapon', id, 'weapon_critdamage_flag'));
+  const v = await getAttrsAsync(['toggle_auto_damage', ...fields]);
+  const output = {};
+  const autoDamage = +v.toggle_auto_damage;
+  // Map IDs to Promises that return objects
+  const damagePromises = idArray.map(async (id) => {
+    const attrName = concatRepAttrName('weapon', id, 'weapon_critdamage_flag');
+    const currentValue = +v[attrName];
+    output[attrName] = 1 - currentValue;
+    // Get the macro changes for this ID
+    return await damageMacro(id, autoDamage);
   });
-});
-
-on('change:toggle_auto_damage change:toggle_critdamage', (eventInfo) => {
-  clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  getSectionIDs('repeating_weapon', (idArray) => {
-    const fields = [];
-    getAttrs(fields, (v) => {
-      idArray.forEach((id) => {
-        damageMacro(id);
-      });
-    });
+  // Resolve all promises
+  const results = await Promise.all(damagePromises);
+  // Merge all returned damageMacro objects into output
+  results.forEach((macroChanges) => {
+    Object.assign(output, macroChanges);
   });
+  await setAttrsAsync(output, {silent: true});
 });
 
 // repeating attrs by value type
