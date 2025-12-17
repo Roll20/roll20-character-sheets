@@ -4066,53 +4066,88 @@ on(
 );
 
 // Matrix or THAC0 Toggle for repeating_weapon
-on('change:toggle_to_hit_table change:repeating_weapon:weapon_name change:repeating_weapon:weapon_whisper_to_hit_select', (eventInfo) => {
+on('change:toggle_to_hit_table', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  getSectionIDs('repeating_weapon', (idArray) => {
-    const fields = [];
-    _.each(idArray, (id) => {
-      fields.push(`repeating_weapon_${id}_weapon_whisper_to_hit_select`);
-      fields.push(`repeating_weapon_${id}_weapon_whisper_to_hit`);
-    });
-    getAttrs(['toggle_to_hit_table', ...fields], (v) => {
-      const output = {};
-      const flag = +v.toggle_to_hit_table;
-
-      _.each(idArray, (id) => {
-        let thishitTableSelect = +v[`repeating_weapon_${id}_weapon_whisper_to_hit_select`];
-        let thishitTableMacro = v[`repeating_weapon_${id}_weapon_whisper_to_hit`];
-        const noMacro = '&nbsp;';
-        const matrixMacro =
-          '%NEWLINE%/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10to0=ToHit:[[ @{thac-10} ]]|[[ @{thac-9} ]]|[[ @{thac-8} ]]|[[ @{thac-7} ]]|[[ @{thac-6} ]]|[[ @{thac-5} ]]|[[ @{thac-4} ]]|[[ @{thac-3} ]]|[[ @{thac-2} ]]|[[ @{thac-1} ]]|[[ @{thac0} ]]}} {{ToHitAC1to10=ToHit:[[ @{thac0} ]]|[[ @{thac1} ]]|[[ @{thac2} ]]|[[ @{thac3} ]]|[[ @{thac4} ]]|[[ @{thac5} ]]|[[ @{thac6} ]]|[[ @{thac7} ]]|[[ @{thac8} ]]|[[ @{thac9} ]]|[[ @{thac10} ]] }}';
-        const thac0Macro =
-          '%NEWLINE%/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10to0=ToHit:[[ @{thac0-10} ]]|[[ @{thac0-9} ]]|[[ @{thac0-8} ]]|[[ @{thac0-7} ]]|[[ @{thac0-6} ]]|[[ @{thac0-5} ]]|[[ @{thac0-4} ]]|[[ @{thac0-3} ]]|[[ @{thac0-2} ]]|[[ @{thac0-1} ]]|[[ @{thac00} ]]}} {{ToHitAC1to10=ToHit:[[ @{thac00} ]]|[[ @{thac01} ]]|[[ @{thac02} ]]|[[ @{thac03} ]]|[[ @{thac04} ]]|[[ @{thac05} ]]|[[ @{thac06} ]]|[[ @{thac07} ]]|[[ @{thac08} ]]|[[ @{thac09} ]]|[[ @{thac010} ]] }}';
-
-        if (thishitTableSelect === 2) {
-          thishitTableMacro = noMacro;
-          thishitTableSelect = 2;
-        } else if (thishitTableSelect === 0) {
-          if (flag === 0) {
-            thishitTableMacro = matrixMacro;
-            thishitTableSelect = 0;
-          } else if (flag === 1) {
-            thishitTableMacro = thac0Macro;
-            thishitTableSelect = 1;
-          }
-        } else if (thishitTableSelect === 1) {
-          if (flag === 0) {
-            thishitTableMacro = matrixMacro;
-            thishitTableSelect = 0;
-          } else if (flag === 1) {
-            thishitTableMacro = thac0Macro;
-            thishitTableSelect = 1;
-          }
-        }
-        output[`repeating_weapon_${id}_weapon_whisper_to_hit`] = thishitTableMacro;
-        output[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] = thishitTableSelect;
-      });
-      setAttrs(output, {silent: true});
-    });
+  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const output = {};
+  const fields = [];
+  _.each(idArray, (id) => {
+    fields.push(`repeating_weapon_${id}_weapon_whisper_to_hit_select`);
+    fields.push(`repeating_weapon_${id}_weapon_whisper_to_hit`);
   });
+  const v = await getAttrsAsync(['toggle_to_hit_table', ...fields]);
+  const flag = +v.toggle_to_hit_table;
+  _.each(idArray, (id) => {
+    let thishitTableSelect = +v[`repeating_weapon_${id}_weapon_whisper_to_hit_select`];
+    let thishitTableMacro = +v[`repeating_weapon_${id}_weapon_whisper_to_hit`];
+    const noMacro = '&nbsp;';
+    const matrixMacro =
+      '%NEWLINE%/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10to0=ToHit:[[ @{thac-10} ]]|[[ @{thac-9} ]]|[[ @{thac-8} ]]|[[ @{thac-7} ]]|[[ @{thac-6} ]]|[[ @{thac-5} ]]|[[ @{thac-4} ]]|[[ @{thac-3} ]]|[[ @{thac-2} ]]|[[ @{thac-1} ]]|[[ @{thac0} ]]}} {{ToHitAC1to10=ToHit:[[ @{thac0} ]]|[[ @{thac1} ]]|[[ @{thac2} ]]|[[ @{thac3} ]]|[[ @{thac4} ]]|[[ @{thac5} ]]|[[ @{thac6} ]]|[[ @{thac7} ]]|[[ @{thac8} ]]|[[ @{thac9} ]]|[[ @{thac10} ]] }}';
+    const thac0Macro =
+      '%NEWLINE%/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10to0=ToHit:[[ @{thac0-10} ]]|[[ @{thac0-9} ]]|[[ @{thac0-8} ]]|[[ @{thac0-7} ]]|[[ @{thac0-6} ]]|[[ @{thac0-5} ]]|[[ @{thac0-4} ]]|[[ @{thac0-3} ]]|[[ @{thac0-2} ]]|[[ @{thac0-1} ]]|[[ @{thac00} ]]}} {{ToHitAC1to10=ToHit:[[ @{thac00} ]]|[[ @{thac01} ]]|[[ @{thac02} ]]|[[ @{thac03} ]]|[[ @{thac04} ]]|[[ @{thac05} ]]|[[ @{thac06} ]]|[[ @{thac07} ]]|[[ @{thac08} ]]|[[ @{thac09} ]]|[[ @{thac010} ]] }}';
+
+    if (thishitTableSelect === 2) {
+      thishitTableMacro = noMacro;
+      thishitTableSelect = 2;
+    } else if (thishitTableSelect === 0) {
+      if (flag === 0) {
+        thishitTableMacro = matrixMacro;
+        thishitTableSelect = 0;
+      } else if (flag === 1) {
+        thishitTableMacro = thac0Macro;
+        thishitTableSelect = 1;
+      }
+    } else if (thishitTableSelect === 1) {
+      if (flag === 0) {
+        thishitTableMacro = matrixMacro;
+        thishitTableSelect = 0;
+      } else if (flag === 1) {
+        thishitTableMacro = thac0Macro;
+        thishitTableSelect = 1;
+      }
+    }
+    output[`repeating_weapon_${id}_weapon_whisper_to_hit`] = thishitTableMacro;
+    output[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] = thishitTableSelect;
+  });
+  await setAttrsAsync(output, {silent: true});
+});
+
+on('change:repeating_weapon:weapon_whisper_to_hit_select', async (eventInfo) => {
+  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  const id = eventInfo.sourceAttribute.split('_')[2];
+  const output = {};
+  const v = await getAttrsAsync(['toggle_to_hit_table', `repeating_weapon_${id}_weapon_whisper_to_hit_select`, `repeating_weapon_${id}_weapon_whisper_to_hit`]);
+  const flag = +v.toggle_to_hit_table;
+  let thishitTableSelect = +v[`repeating_weapon_${id}_weapon_whisper_to_hit_select`];
+  let thishitTableMacro = +v[`repeating_weapon_${id}_weapon_whisper_to_hit`];
+  const noMacro = '&nbsp;';
+  const matrixMacro =
+    '%NEWLINE%/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10to0=ToHit:[[ @{thac-10} ]]|[[ @{thac-9} ]]|[[ @{thac-8} ]]|[[ @{thac-7} ]]|[[ @{thac-6} ]]|[[ @{thac-5} ]]|[[ @{thac-4} ]]|[[ @{thac-3} ]]|[[ @{thac-2} ]]|[[ @{thac-1} ]]|[[ @{thac0} ]]}} {{ToHitAC1to10=ToHit:[[ @{thac0} ]]|[[ @{thac1} ]]|[[ @{thac2} ]]|[[ @{thac3} ]]|[[ @{thac4} ]]|[[ @{thac5} ]]|[[ @{thac6} ]]|[[ @{thac7} ]]|[[ @{thac8} ]]|[[ @{thac9} ]]|[[ @{thac10} ]] }}';
+  const thac0Macro =
+    '%NEWLINE%/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10to0=ToHit:[[ @{thac0-10} ]]|[[ @{thac0-9} ]]|[[ @{thac0-8} ]]|[[ @{thac0-7} ]]|[[ @{thac0-6} ]]|[[ @{thac0-5} ]]|[[ @{thac0-4} ]]|[[ @{thac0-3} ]]|[[ @{thac0-2} ]]|[[ @{thac0-1} ]]|[[ @{thac00} ]]}} {{ToHitAC1to10=ToHit:[[ @{thac00} ]]|[[ @{thac01} ]]|[[ @{thac02} ]]|[[ @{thac03} ]]|[[ @{thac04} ]]|[[ @{thac05} ]]|[[ @{thac06} ]]|[[ @{thac07} ]]|[[ @{thac08} ]]|[[ @{thac09} ]]|[[ @{thac010} ]] }}';
+  if (thishitTableSelect === 2) {
+    thishitTableMacro = noMacro;
+    thishitTableSelect = 2;
+  } else if (thishitTableSelect === 0) {
+    if (flag === 0) {
+      thishitTableMacro = matrixMacro;
+      thishitTableSelect = 0;
+    } else if (flag === 1) {
+      thishitTableMacro = thac0Macro;
+      thishitTableSelect = 1;
+    }
+  } else if (thishitTableSelect === 1) {
+    if (flag === 0) {
+      thishitTableMacro = matrixMacro;
+      thishitTableSelect = 0;
+    } else if (flag === 1) {
+      thishitTableMacro = thac0Macro;
+      thishitTableSelect = 1;
+    }
+  }
+  output[`repeating_weapon_${id}_weapon_whisper_to_hit`] = thishitTableMacro;
+  output[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] = thishitTableSelect;
+  await setAttrsAsync(output, {silent: true});
 });
 
 // Weapon Proficiency Toggle
