@@ -4305,8 +4305,7 @@ on('change:dual_pen_primary change:dual_pen_secondary change:dexterity', async (
 });
 
 // Weapon Range: Parse Ranges
-calcRange = (id) => {
-  const output = {};
+calcRange = async (id) => {
   const fields = [
     concatRepAttrName('weapon', id, 'weapon_range'),
     concatRepAttrName('weapon', id, 'weapon_range_short'),
@@ -4315,59 +4314,59 @@ calcRange = (id) => {
     concatRepAttrName('weapon', id, 'weapon_attack_type'),
     concatRepAttrName('weapon', id, 'weapon_range_error'),
   ];
-  getAttrs(fields, (v) => {
-    // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
-    const thisType = +v[concatRepAttrName('weapon', id, 'weapon_attack_type')];
-    if (thisType === 0 || thisType === 2) return;
-    let thisRange = v[concatRepAttrName('weapon', id, 'weapon_range')];
-    // remove quotes to prevent NaN (ie distance indicators)
-    thisRange = thisRange.replace(/'/g, '');
-    thisRange = thisRange.replace(/"/g, '');
-    // parse ranges
-    const thisRangeArray = thisRange.split('/').join(',').split(' ').join(',').split('-').join(',').split(',');
-    // clog(`thisRangeArray: ${thisRangeArray}`);
-    const thisRangeShort = Number(thisRangeArray[0]);
-    let thisRangeMedium = Number(thisRangeArray[1]);
-    let thisRangeLong = Number(thisRangeArray[2]);
+  const v = await getAttrsAsync(fields);
+  const output = {};
+  // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
+  const thisType = +v[concatRepAttrName('weapon', id, 'weapon_attack_type')];
+  if (thisType === 0 || thisType === 2) return;
+  let thisRange = v[concatRepAttrName('weapon', id, 'weapon_range')];
+  // remove quotes to prevent NaN (ie distance indicators)
+  thisRange = thisRange.replace(/'/g, '');
+  thisRange = thisRange.replace(/"/g, '');
+  // parse ranges
+  const thisRangeArray = thisRange.split('/').join(',').split(' ').join(',').split('-').join(',').split(',');
+  // clog(`thisRangeArray: ${thisRangeArray}`);
+  const thisRangeShort = Number(thisRangeArray[0]);
+  let thisRangeMedium = Number(thisRangeArray[1]);
+  let thisRangeLong = Number(thisRangeArray[2]);
 
-    // clog(`Attack is Ranged. repeating_weapon_weapon_attack_type = ${thisType}`);
+  // clog(`Attack is Ranged. repeating_weapon_weapon_attack_type = ${thisType}`);
 
-    // if only a single number is entered, make it Long ie Manticore spikes
-    if (thisRangeArray.length === 1 && thisRangeShort >= 0 && !thisRangeMedium && !thisRangeLong) {
-      thisRangeMedium = thisRangeShort;
-      thisRangeLong = thisRangeShort;
-    }
-    // clog(`thisRangeShort: ${thisRangeShort} |thisRangeMedium: ${thisRangeMedium} |thisRangeLong: ${thisRangeLong}`);
+  // if only a single number is entered, make it Long ie Manticore spikes
+  if (thisRangeArray.length === 1 && thisRangeShort >= 0 && !thisRangeMedium && !thisRangeLong) {
+    thisRangeMedium = thisRangeShort;
+    thisRangeLong = thisRangeShort;
+  }
+  // clog(`thisRangeShort: ${thisRangeShort} |thisRangeMedium: ${thisRangeMedium} |thisRangeLong: ${thisRangeLong}`);
 
-    // check to see if range is in the proper format.
-    if (Number.isNaN(thisRangeShort)) {
-      output[concatRepAttrName('weapon', id, 'weapon_range_short')] = 0;
-      output[concatRepAttrName('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
-      // clog(`WARNING: Field is not in the proper format.`);
-    } else {
-      output[concatRepAttrName('weapon', id, 'weapon_range_short')] = thisRangeShort;
-    }
-    if (Number.isNaN(thisRangeMedium)) {
-      output[concatRepAttrName('weapon', id, 'weapon_range_medium')] = 0;
-      output[concatRepAttrName('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
-      // clog(`WARNING: Field is not in the proper format.`);
-    } else {
-      output[concatRepAttrName('weapon', id, 'weapon_range_medium')] = thisRangeMedium;
-    }
-    if (Number.isNaN(thisRangeLong)) {
-      output[concatRepAttrName('weapon', id, 'weapon_range_long')] = 0;
-      output[concatRepAttrName('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
-      // clog(`WARNING: Field is not in the proper format.`);
-    } else {
-      output[concatRepAttrName('weapon', id, 'weapon_range_long')] = thisRangeLong;
-    }
-    if (!Number.isNaN(thisRangeShort) && !Number.isNaN(thisRangeMedium) && !Number.isNaN(thisRangeLong)) {
-      output[concatRepAttrName('weapon', id, 'weapon_range_error')] = 1;
-    } else {
-      // clog(`Value did not parse.`);
-    }
-    setAttrs(output, {silent: true});
-  });
+  // check to see if range is in the proper format.
+  if (Number.isNaN(thisRangeShort)) {
+    output[concatRepAttrName('weapon', id, 'weapon_range_short')] = 0;
+    output[concatRepAttrName('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
+    // clog(`WARNING: Field is not in the proper format.`);
+  } else {
+    output[concatRepAttrName('weapon', id, 'weapon_range_short')] = thisRangeShort;
+  }
+  if (Number.isNaN(thisRangeMedium)) {
+    output[concatRepAttrName('weapon', id, 'weapon_range_medium')] = 0;
+    output[concatRepAttrName('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
+    // clog(`WARNING: Field is not in the proper format.`);
+  } else {
+    output[concatRepAttrName('weapon', id, 'weapon_range_medium')] = thisRangeMedium;
+  }
+  if (Number.isNaN(thisRangeLong)) {
+    output[concatRepAttrName('weapon', id, 'weapon_range_long')] = 0;
+    output[concatRepAttrName('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
+    // clog(`WARNING: Field is not in the proper format.`);
+  } else {
+    output[concatRepAttrName('weapon', id, 'weapon_range_long')] = thisRangeLong;
+  }
+  if (!Number.isNaN(thisRangeShort) && !Number.isNaN(thisRangeMedium) && !Number.isNaN(thisRangeLong)) {
+    output[concatRepAttrName('weapon', id, 'weapon_range_error')] = 1;
+  } else {
+    // clog(`Value did not parse.`);
+  }
+  await setAttrsAsync(output, {silent: true});
 };
 
 on('change:repeating_weapon:weapon_range change:repeating_weapon:weapon_attack_type', (eventInfo) => {
