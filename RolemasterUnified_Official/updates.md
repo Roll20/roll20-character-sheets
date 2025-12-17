@@ -1,6 +1,7 @@
-# 2025-12-16
+# 2025-12-18
 
 - Make spells on Other Realm & Arcane clickable
+- Add restricted parry option.
 
 # 2025-12-11
 
