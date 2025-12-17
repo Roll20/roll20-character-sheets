@@ -4053,9 +4053,10 @@ on(
   'change:repeating_weapon:weapon_tohitacadj_flag change:repeating_weapon:weapon_thac_adj0 change:repeating_weapon:weapon_thac_adj1 change:repeating_weapon:weapon_thac_adj2 change:repeating_weapon:weapon_thac_adj3 change:repeating_weapon:weapon_thac_adj4 change:repeating_weapon:weapon_thac_adj5 change:repeating_weapon:weapon_thac_adj6 change:repeating_weapon:weapon_thac_adj7 change:repeating_weapon:weapon_thac_adj8 change:repeating_weapon:weapon_thac_adj9 change:repeating_weapon:weapon_thac_adj10',
   async (eventInfo) => {
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-    const v = await getAttrsAsync(['repeating_weapon_weapon_ToHitACadj_flag', 'repeating_weapon_weapon_ToHitACadj']);
+    const id = eventInfo.sourceAttribute.split('_')[2];
+    const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_ToHitACadj_flag`, `repeating_weapon_${id}_weapon_ToHitACadj`]);
     const output = {};
-    const thisflag = +v.repeating_weapon_weapon_ToHitACadj_flag;
+    const thisflag = +v[`repeating_weapon_${id}_weapon_ToHitACadj_flag`];
     output.repeating_weapon_weapon_ToHitACadj =
       thisflag === 1
         ? '{{ToHitACadj2to10=HitAdj:[[ @{weapon_thac_adj0} ]]|[[ @{weapon_thac_adj1} ]]|[[ @{weapon_thac_adj2} ]]|[[ @{weapon_thac_adj3} ]]|[[ @{weapon_thac_adj4} ]]|[[ @{weapon_thac_adj5} ]]|[[ @{weapon_thac_adj6} ]]|[[ @{weapon_thac_adj7} ]]|[[ @{weapon_thac_adj8} ]]|[[ @{weapon_thac_adj9} ]]|[[ @{weapon_thac_adj10} ]] }}'
