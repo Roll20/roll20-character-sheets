@@ -4376,17 +4376,17 @@ on('change:repeating_weapon:weapon_range change:repeating_weapon:weapon_attack_t
 });
 
 // set flag for css to show/hide fields according to weapon type
-on('change:repeating_weapon:weapon_attack_type', (eventInfo) => {
+on('change:repeating_weapon:weapon_attack_type', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  getAttrs(['repeating_weapon_weapon_attack_type', 'repeating_weapon_weapon_attack_type_flag'], (v) => {
-    const output = {};
-    const currentType = +v.repeating_weapon_weapon_attack_type;
-    const currentTypeFlag = +v.repeating_weapon_weapon_attack_type_flag;
-    if (currentType !== currentTypeFlag) {
-      output.repeating_weapon_weapon_attack_type_flag = currentType;
-    }
-    setAttrs(output, {silent: true});
-  });
+  const id = eventInfo.sourceAttribute.split('_')[2];
+  const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_attack_type`, `repeating_weapon_${id}_weapon_attack_type_flag`]);
+  const output = {};
+  const currentType = +v[`repeating_weapon_${id}_weapon_attack_type`];
+  const currentTypeFlag = +v[`repeating_weapon_${id}_weapon_attack_type_flag`];
+  if (currentType !== currentTypeFlag) {
+    output[`repeating_weapon_${id}_weapon_attack_type_flag`] = currentType;
+  }
+  await setAttrsAsync(output, {silent: true});
 });
 
 // HP Calcs
