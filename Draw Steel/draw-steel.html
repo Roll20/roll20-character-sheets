@@ -3978,6 +3978,7 @@
 	function unpackFeature(feature, level) {
 		switch (feature.type) {
 			case 'Choice':
+			case 'Perk':
 				return feature.data.selected;
 			case 'Domain':
 				// A domain provides both a "DomainChoice" feature and its level-based features.
@@ -4048,9 +4049,10 @@
 				flattenedFeatures.push(currentFeature);
 			}
 		}
-
+		console.log(flattenedFeatures);
 		return flattenedFeatures;
 	}
+	
 	/**
 	 * Removes all rows from a given repeating section.
 	 * @param {string} sectionName The name of the section (e.g., 'abilities', 'modifiers').
@@ -4204,7 +4206,7 @@
 		// Sum bonuses from features of type 'Bonus' that match the stat name.
 		const bonusFromFeatures = features
 			.filter(f => f.type === FEATURE_TYPES.BONUS && f.data.field === statName)
-			.reduce((sum, f) => sum + f.data.field.value, 0);
+			.reduce((sum, f) => sum + f.data.value, 0);
 
 		// Find the highest bonus from all equipped kits for this stat.
 		const bonusFromKits = Math.max(
@@ -4213,7 +4215,7 @@
 				.filter(f => f.type === FEATURE_TYPES.KIT_STATS)
 				.map(f => f[statName.toLowerCase()] || 0)
 		);
-
+		console.log(statName + ':' + baseValue + ' ' + bonusFromFeatures + ' ' + bonusFromKits);
 		return baseValue + bonusFromFeatures + bonusFromKits;
 	};
 
@@ -4272,6 +4274,39 @@
 			.join(', ');
 	};
 
+	const extractAncestryFeatures = (data) => {
+		const features = data.features;
+		let result = [];
+	
+		features.forEach(feature => {
+			// Handle "Silver Tongue" style nested features
+			if (feature.type === "Multiple Features") {
+				feature.data.features.forEach(subFeature => {
+					// We only want the text-based description, not the Skill Choice placeholder
+					if (subFeature.type === "Text") {
+						result.push({
+							id: subFeature.id,
+							name: subFeature.name,
+							description: subFeature.description
+						});
+					}
+				});
+			}
+	
+			// Handle the user-selected traits (Beast Legs, Prehensile Tail)
+			if (feature.type === "Choice" && feature.data.selected) {
+				feature.data.selected.forEach(selection => {
+					result.push({
+						id: selection.id,
+						name: selection.name,
+						description: selection.description
+					});
+				});
+			}
+		});
+		console.log(result);
+		return result;
+	};
 
 	// --- Main Event Listener ---
 
@@ -4396,10 +4431,14 @@
 
 			// Process perks, ancestry traits, features, and abilities.
 			const perks = allFeatures
-				.filter(f => f.type === FEATURE_TYPES.PERK)
-				.reduce((acc, f) => { /* ... perk processing logic ... */ return acc; }, {});
-				
-			const ancestryFeatures = ancestry.features
+				.filter(f => f.id.startsWith('perk-') && f.type === FEATURE_TYPES.TEXT)
+				.reduce((acc, f) => { 
+					const id = generateRowID();
+					acc[`repeating_perks_${id}_perk_name`] = f.name;
+					acc[`repeating_perks_${id}_perk_description`] = f.description;
+					return acc;return acc; }, {});
+			
+			const ancestryFeatures = extractAncestryFeatures(data.ancestry)
 				.filter(f => f.description)
 				.reduce((acc, f) => {
 					const id = generateRowID();
@@ -4409,7 +4448,7 @@
 				}, {});
 				
 			const classFeatures = allFeatures
-				.filter(f => f.type === FEATURE_TYPES.TEXT)
+				.filter(f => f.type === FEATURE_TYPES.TEXT && (!f.id.startsWith('perk-') && !f.id.startsWith(ancestry.name.toLowerCase())))
 				.reduce((acc, f) => {
 					const id = generateRowID();
 					acc[`repeating_classfeatures_${id}_classfeature_name`] = f.name;
