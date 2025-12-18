@@ -4915,47 +4915,38 @@ on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_ite
 });
 
 // Auto-generates a repeating row as a placeholder
-on('sheet:opened', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  getSectionIDs('repeating_weapon', (weaponID) => {
-    getSectionIDs('repeating_ability', (abilityID) => {
-      getSectionIDs('repeating_nonweaponproficiencies', (nwpID) => {
-        getSectionIDs('repeating_equipment', (equipmentID) => {
-          getSectionIDs('repeating_spells', (spellsID) => {
-            const output = {};
-            const weaponRows = weaponID.length;
-            const abilityRows = abilityID.length;
-            const nwpRows = nwpID.length;
-            const equipmentRows = equipmentID.length;
-            const spellsRows = spellsID.length;
-            if (weaponRows === 0) {
-              const newrowid = generateUniqueRowID();
-              output[`repeating_weapon_${newrowid}_weapon_value`] = 1;
-            }
-            if (abilityRows === 0) {
-              const newrowid = generateUniqueRowID();
-              output[`repeating_ability_${newrowid}_ability_value`] = 1;
-            }
-            if (nwpRows === 0) {
-              const newrowid = generateUniqueRowID();
-              output[`repeating_nonweaponproficiencies_${newrowid}_nwp_value`] = 1;
-            }
-            if (equipmentRows === 0) {
-              const newrowid = generateUniqueRowID();
-              output[`repeating_equipment_${newrowid}_equipment_value`] = 1;
-            }
-            if (spellsRows === 0) {
-              const newrowid = generateUniqueRowID();
-              output[`repeating_spells_${newrowid}_spell_value`] = 1;
-            } else {
-              return;
-            }
-            setAttrs(output, {silent: true});
-          });
-        });
-      });
-    });
-  });
+on('sheet:opened', async (eventInfo) => {
+  clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  const output = {};
+  const weaponRows = await getSectionIDsAsync('repeating_weapon');
+  const abilityRows = await getSectionIDsAsync('repeating_ability');
+  const nwpRows = await getSectionIDsAsync('repeating_nonweaponproficiencies');
+  const equipmentRows = await getSectionIDsAsync('repeating_equipment');
+  const spellsRows = await getSectionIDsAsync('repeating_spells');
+
+  if (weaponRows.length === 0) {
+    const newrowid = generateUniqueRowID();
+    output[`repeating_weapon_${newrowid}_weapon_value`] = 1;
+  }
+  if (abilityRows.length === 0) {
+    const newrowid = generateUniqueRowID();
+    output[`repeating_ability_${newrowid}_ability_value`] = 1;
+  }
+  if (nwpRows.length === 0) {
+    const newrowid = generateUniqueRowID();
+    output[`repeating_nonweaponproficiencies_${newrowid}_nwp_value`] = 1;
+  }
+  if (equipmentRows.length === 0) {
+    const newrowid = generateUniqueRowID();
+    output[`repeating_equipment_${newrowid}_equipment_value`] = 1;
+  }
+  if (spellsRows.length === 0) {
+    const newrowid = generateUniqueRowID();
+    output[`repeating_spells_${newrowid}_spell_value`] = 1;
+  } else {
+    return;
+  }
+  setAttrsAsync(output, {silent: true});
 });
 
 // Reset Macros to default
