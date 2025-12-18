@@ -4258,19 +4258,16 @@ on('change:repeating_weapon:weapon_dual', async (eventInfo) => {
 async function syncDualPen() {
   const idArray = await getSectionIDsAsync('repeating_weapon');
   const output = {};
-  const fields = [];
-  _.each(idArray, (id) => {
-    fields.push(concatRepAttrName('weapon', id, 'weapon_dual'));
-  });
+  const fields = idArray.flatMap((id) => [concatRepAttrName('weapon', id, 'weapon_critdamage_flag'), concatRepAttrName('weapon', id, 'weapon_critdamage_mult')]);
+  // const fields = idArray.map((id) => concatRepAttrName('weapon', id, 'weapon_dual'));
   const v = await getAttrsAsync(['dual_pen_primary', 'dual_pen_secondary', ...fields]);
   // clog('Weapon Attack Type has been re-calculated');
-  const primary = +v.dual_pen_primary;
-  const secondary = +v.dual_pen_secondary;
+  const primary = +v.dual_pen_primary || 0;
+  const secondary = +v.dual_pen_secondary || 0;
   _.each(idArray, (id) => {
     const attack_type = v[concatRepAttrName('weapon', id, 'weapon_dual')];
     let handed_mod = 0;
-    if (attack_type === 'Normal') handed_mod = 0;
-    else if (attack_type === 'Primary') handed_mod = primary;
+    if (attack_type === 'Primary') handed_mod = primary;
     else if (attack_type === 'Secondary') handed_mod = secondary;
     const thispenalty = Math.min(0, handed_mod);
     output[concatRepAttrName('weapon', id, 'weapon_dual_pen')] = thispenalty;
@@ -4827,77 +4824,70 @@ const repeatingNWPString = ['nwp_attribute', 'nwp_attribute_value', 'nwp_macro_t
 const repeatingNWPAll = [...repeatingNWPNumber, ...repeatingNWPString];
 
 async function setWeapons(id) {
-  // create an array of the repeating attrs
   const fields = repeatingWeaponAll.map((field) => concatRepAttrName('weapon', id, field));
   // console.log(`setWeapons - Change detected: id: ${id}`);
   const v = await getAttrsAsync(fields);
-  const output = {};
-  // set the number-based attrs
-  for (const field of repeatingWeaponNumber) {
+  const output = repeatingWeaponAll.reduce((accumulator, field) => {
     const fullAttrName = concatRepAttrName('weapon', id, field);
-    output[fullAttrName] = +v[fullAttrName];
-  }
-  // set the string-based attrs
-  for (const field of repeatingWeaponString) {
-    const fullAttrName = concatRepAttrName('weapon', id, field);
-    output[fullAttrName] = v[fullAttrName];
-  }
+    rawValue = v[fullAttrName];
+    // number or string?
+    if (repeatingWeaponNumber.includes(field)) {
+      accumulator[fullAttrName] = +rawValue || 0;
+    } else {
+      accumulator[fullAttrName] = rawValue || '';
+    }
+    return accumulator;
+  }, {});
   await setAttrsAsync(output, {silent: true});
   // clog(`setWeapons - default values have been set.`);
 }
 
 async function setEquipment(id) {
   const nonRep = ['equipment_tabs_type', 'equipment_tabs_carry'];
-  // create an array of the repeating attrs
   const fields = repeatingEquipmentAll.map((field) => concatRepAttrName('equipment', id, field));
   const combined = [...nonRep, ...fields];
-  // console.log(`setEquipment - Change detected: id: ${id}`);
   const v = await getAttrsAsync(combined);
-  const output = {};
-  const equipTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
-  const equipType = +v[concatRepAttrName('equipment', id, 'equipment_type')];
+  const equipTab = +v.equipment_tabs_type || 0;
+  const equipTypeAttr = concatRepAttrName('equipment', id, 'equipment_type');
+  const equipType = +v[equipTypeAttr] || 0;
 
-  // set the number-based attrs
-  for (const field of repeatingEquipmentNumber) {
+  const output = repeatingEquipmentAll.reduce((accumulator, field) => {
     const fullAttrName = concatRepAttrName('equipment', id, field);
-    // Set Equipment type for new rows based on selected Type Tab
-    if (field === 'equipment_type' || field === 'equipment_magical') {
+    const rawValue = v[fullAttrName];
+    // number or string?
+    if (repeatingEquipmentNumber.includes(field)) {
       if (field === 'equipment_type') {
-        output[fullAttrName] = equipTab !== -1 ? equipTab : equipType;
-      }
-      if (field === 'equipment_magical') {
-        output[fullAttrName] = equipType === 3 || equipTab === 3 ? 1 : +v[fullAttrName];
+        accumulator[fullAttrName] = equipTab !== -1 ? equipTab : equipType;
+      } else if (field === 'equipment_magical') {
+        accumulator[fullAttrName] = equipType === 3 || equipTab === 3 ? 1 : +rawValue || 0;
+      } else {
+        accumulator[fullAttrName] = +rawValue || 0;
       }
     } else {
-      output[fullAttrName] = +v[fullAttrName];
+      accumulator[fullAttrName] = rawValue || '';
     }
-  }
-  // set the string-based attrs
-  for (const field of repeatingEquipmentString) {
-    const fullAttrName = concatRepAttrName('equipment', id, field);
-    output[fullAttrName] = v[fullAttrName];
-  }
+    return accumulator;
+  }, {});
   await setAttrsAsync(output, {silent: true});
-  // clog(`setEquipment - default values have been set.`);
 }
 
 async function setNWP(id) {
   const fields = repeatingNWPAll.map((field) => concatRepAttrName('nonweaponproficiencies', id, field));
-  // console.log(`setNWP - Change detected: id: ${id}`);
   const v = await getAttrsAsync(fields);
-  const output = {};
-  // set the number-based attrs
-  for (const field of repeatingNWPNumber) {
+
+  const output = repeatingNWPAll.reduce((accumulator, field) => {
     const fullAttrName = concatRepAttrName('nonweaponproficiencies', id, field);
-    output[fullAttrName] = +v[fullAttrName];
-  }
-  // set the string-based attrs
-  for (const field of repeatingNWPString) {
-    const fullAttrName = concatRepAttrName('nonweaponproficiencies', id, field);
-    output[fullAttrName] = v[fullAttrName];
-  }
+    const rawValue = v[fullAttrName];
+    // number or string?
+    if (repeatingNWPNumber.includes(field)) {
+      accumulator[fullAttrName] = +rawValue || 0;
+    } else {
+      // Fallback to empty string if the value is null/undefined
+      accumulator[fullAttrName] = rawValue || '';
+    }
+    return accumulator;
+  }, {});
   await setAttrsAsync(output, {silent: true});
-  // clog(`setNWP - default values have been set.`);
 }
 
 // Set repeating attr values for new rows. Makes visible to API
