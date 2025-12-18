@@ -3861,6 +3861,9 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     <div class='smallattrs'>
       <span>Parry</span>
         <span><input type='number' name='attr_parrymod' min="0" step="1"></span>
+      <span class='span2'><label for='restrictedparrytoggle' class='plainlabel'>Restricted?</label>
+        <input type='checkbox' name='attr_restrictedparry' id='restrictedparrytoggle'>
+      </span>
       <span>Attack Mod</span>
         <span><input type='number' name='attr_othermod' step='1'></span>
       <span>DB Mod</span>
@@ -6654,7 +6657,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 5656a2fbc2c74c6603b0e94e6dceb860211ee194
+Revision 9bb8529468cbd998b2665c0f0b28e26555c60215
 
 
 <hr>
@@ -10039,7 +10042,8 @@ function spellGenerateMesssage(spelltype, result, casterlevel) {
  * One for every level for 0-20, then event 5 after that up to 90 (hello treasure law).
  */
 let spellcastevents = [];
-["ownbase", "open", "closed", "otherbaseownrealm", "openother"].forEach((listtype) => {
+["ownbase", "open", "closed", "otherbaseownrealm", "openother",
+  "closedother", "otherbaseother", "arcane"].forEach((listtype) => {
     for (let i = 1 ; i <= 20 ; i ++) {
       spellcastevents.push(`clicked:repeating_spelllistspell${listtype}:castspell${i}`);
     }
@@ -16119,7 +16123,6 @@ function sizeFromNumeric(value) {
     //      - cdata.statuspenalty = values.statuspenalty || 0;
     //      - cdata.extracrit = <CritType><number>  (number is relative crit type)
 
-    //		
     // Results are:
     //	    - attackresult -> "Hit/Miss/Fumble"
     //	    - finalroll -> Either the UM if a fumble, else the modified attack roll
@@ -16319,6 +16322,7 @@ function sizeFromNumeric(value) {
 	return scale;
     }
 
+    //      - cdata.restrictedparry = true || falsey
     attacks.startAttack = function(cdata) {
 	let attackmoddescription = '';
 	let attackmod = 0;
@@ -16397,7 +16401,12 @@ function sizeFromNumeric(value) {
 	    attackmod += cdata.statuseffect;
 	}
 
-	if (cdata.parrymod > 0) {
+	if (cdata.restrictedparry && cdata.parrymod > 0) {
+	    const hparry = Math.floor(parseIntDefault(cdata.parrymod, 0) / 2)
+	    attackmoddescription += ` -${hparry}&nbsp;` +
+			`[Parry (Restricted: ${cdata.parrymod} / 2)]`;
+	    attackmod -= hparry;
+	} else if (cdata.parrymod > 0) {
 	    attackmoddescription += ` -${cdata.parrymod}&nbsp;[Parry]`;
 	    attackmod -= cdata.parrymod;
 	}
@@ -16487,7 +16496,7 @@ function sizeFromNumeric(value) {
 			'statuspenalty', 'statuseffect',
 			'target_name', 'target_db', 'target_at',
 			'target_size', 'target_crit',
-			'parrymod', 'othermod',
+			'parrymod', 'othermod', 'restrictedparry',
 			// Ranged Penalty from armor
 			'ranged_penalty',
 			// Used depending on type: So get melee, missile and spell
@@ -16532,6 +16541,7 @@ function sizeFromNumeric(value) {
 		cdata.apused = parseIntDefault(values.aptrack, 0);
 		cdata.ranged_penalty = parseIntDefault(values.ranged_penalty, 0);
 		cdata.actionselect = values.actionselect || 'nothing';
+		cdata.restrictedparry = values.restrictedparry == 'on' ? true : false;
 		attacks.startAttack(cdata);
 	});
     }
