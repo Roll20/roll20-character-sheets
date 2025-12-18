@@ -4916,7 +4916,7 @@ on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_ite
 
 // Auto-generates a repeating row as a placeholder
 on('sheet:opened', async (eventInfo) => {
-  clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   const output = {};
   const weaponRows = await getSectionIDsAsync('repeating_weapon');
   const abilityRows = await getSectionIDsAsync('repeating_ability');
@@ -4950,103 +4950,84 @@ on('sheet:opened', async (eventInfo) => {
 });
 
 // Reset Macros to default
-on('clicked:resetallmacros clicked:resetequipmentmacros clicked:resetweaponsmacros clicked:resetabilitiesmacros clicked:resetnwpsmacros clicked:resetspellsmacros', (eventInfo) => {
-  const eventTrigger = eventInfo.triggerName;
-  // Use a regular expression to match and capture the word after "clicked:"
-  const match = eventTrigger.match(/clicked:(\w+)/);
-  // Check if there is a match and extract the captured word
-  const clickedWord = match ? match[1] : null;
-  // clog(`Change Detected:${JSON.stringify(eventInfo)}`);
-  // clog(`reset macros detected: ${clickedWord}`);
-  getSectionIDs('repeating_equipment', (idequipment) => {
-    getSectionIDs('repeating_weapon', (idweapons) => {
-      getSectionIDs('repeating_ability', (idabilities) => {
-        getSectionIDs('repeating_nonweaponproficiencies', (idnwps) => {
-          getSectionIDs('repeating_spells', (idspells) => {
-            const output = {};
-            const attrsEquipment = [];
-            const attrsWeapon = [];
-            const attrsAbility = [];
-            const attrsNWP = [];
-            const attrsSpells = [];
-            _.each(idequipment, (itemid) => {
-              attrsEquipment.push(`repeating_equipment_${itemid}_equipment_macro_text`);
-            });
-            _.each(idweapons, (itemid) => {
-              attrsWeapon.push(`repeating_weapon_${itemid}_weapon_macro_text`);
-            });
-            _.each(idabilities, (itemid) => {
-              attrsAbility.push(`repeating_ability_${itemid}_ability_macro_text`);
-            });
-            _.each(idnwps, (itemid) => {
-              attrsNWP.push(`repeating_nonweaponproficiencies_${itemid}_nwp_macro_text`);
-            });
-            _.each(idspells, (itemid) => {
-              attrsSpells.push(`repeating_spells_${itemid}_spell_macro_text`);
-            });
-
-            if (clickedWord === 'resetallmacros') {
-              output.surprise_macro_text = '';
-              output.surprise_others_macro_text = '';
-              output.init_macro_text = '';
-              _.each(idequipment, (id) => {
-                output[`repeating_equipment_${id}_equipment_macro_text`] = '';
-                // clog(`macro reset completed on: ${attrsEquipment}`);
-              });
-              _.each(idweapons, (id) => {
-                output[`repeating_weapon_${id}_weapon_macro_text`] = '';
-                // clog(`macro reset completed on: ${attrsWeapon}`);
-              });
-              _.each(idabilities, (id) => {
-                output[`repeating_ability_${id}_ability_macro_text`] = '';
-                // clog(`macro reset completed on: ${attrsAbility}`);
-              });
-              _.each(idnwps, (id) => {
-                output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = '';
-                // clog(`macro reset completed on: ${attrsNWP}`);
-              });
-              _.each(idspells, (id) => {
-                output[`repeating_spells_${id}_spell_macro_text`] = '';
-                // clog(`macro reset completed on: ${attrsSpells}`);
-              });
-            }
-            if (clickedWord === 'resetequipmentmacros') {
-              _.each(idequipment, (id) => {
-                output[`repeating_equipment_${id}_equipment_macro_text`] = '';
-                // clog(`macro reset completed on: ${attrsEquipment}`);
-              });
-            }
-            if (clickedWord === 'resetweaponsmacros') {
-              _.each(idweapons, (id) => {
-                output[`repeating_weapon_${id}_weapon_macro_text`] = '';
-                // clog(`macro reset completed on: ${attrsWeapon}`);
-              });
-            }
-            if (clickedWord === 'resetabilitiesmacros') {
-              _.each(idabilities, (id) => {
-                output[`repeating_ability_${id}_ability_macro_text`] = '';
-                // clog(`macro reset completed on: ${attrsAbility}`);
-              });
-            }
-            if (clickedWord === 'resetnwpsmacros') {
-              _.each(idnwps, (id) => {
-                output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = '';
-                // clog(`macro reset completed on: ${attrsNWP}`);
-              });
-            }
-            if (clickedWord === 'resetspellsmacros') {
-              _.each(idspells, (id) => {
-                output[`repeating_spells_${id}_spell_macro_text`] = '';
-                // clog(`macro reset completed on: ${attrsSpells}`);
-              });
-            }
-            setAttrs(output, {silent: true});
-          });
-        });
+on(
+  'clicked:resetallmacros clicked:resetequipmentmacros clicked:resetweaponsmacros clicked:resetabilitiesmacros clicked:resetnwpsmacros clicked:resetspellsmacros',
+  async (eventInfo) => {
+    const eventTrigger = eventInfo.triggerName;
+    const match = eventTrigger.match(/clicked:(\w+)/);
+    // Check if there is a match and extract the captured word
+    const clickedWord = match ? match[1] : null;
+    // clog(`Change Detected:${JSON.stringify(eventInfo)}`);
+    clog(`reset macros detected: ${clickedWord}`);
+    const output = {};
+    if (clickedWord === 'resetallmacros') {
+      output.surprise_macro_text = '';
+      output.surprise_others_macro_text = '';
+      output.init_macro_text = '';
+      const idArrayEquipment = await getSectionIDsAsync('repeating_equipment');
+      _.each(idArrayEquipment, (id) => {
+        output[`repeating_equipment_${id}_equipment_macro_text`] = '';
+        clog(`macro reset completed on: ${id} Equipment`);
       });
-    });
-  });
-});
+      const idArrayWeapons = await getSectionIDsAsync('repeating_weapon');
+      _.each(idArrayWeapons, (id) => {
+        output[`repeating_weapon_${id}_weapon_macro_text`] = '';
+        clog(`macro reset completed on: ${id} Weapon`);
+      });
+      const idArrayAbilities = await getSectionIDsAsync('repeating_ability');
+      _.each(idArrayAbilities, (id) => {
+        output[`repeating_ability_${id}_ability_macro_text`] = '';
+        clog(`macro reset completed on: ${id} Ability`);
+      });
+      const idArrayNWPs = await getSectionIDsAsync('repeating_nonweaponproficiencies');
+      _.each(idArrayNWPs, (id) => {
+        output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = '';
+        clog(`macro reset completed on: ${id} NWP`);
+      });
+      const idArraySpells = await getSectionIDsAsync('repeating_spells');
+      _.each(idArraySpells, (id) => {
+        output[`repeating_spells_${id}_spell_macro_text`] = '';
+        clog(`macro reset completed on: ${id} Spells`);
+      });
+    }
+    if (clickedWord === 'resetequipmentmacros') {
+      const idArrayEquipment = await getSectionIDsAsync('repeating_equipment');
+      _.each(idArrayEquipment, (id) => {
+        output[`repeating_equipment_${id}_equipment_macro_text`] = '';
+        clog(`macro reset completed on: ${id} Equipment`);
+      });
+    }
+    if (clickedWord === 'resetweaponsmacros') {
+      const idArrayWeapons = await getSectionIDsAsync('repeating_weapon');
+      _.each(idArrayWeapons, (id) => {
+        output[`repeating_weapon_${id}_weapon_macro_text`] = '';
+        clog(`macro reset completed on: ${id} Weapon`);
+      });
+    }
+    if (clickedWord === 'resetabilitiesmacros') {
+      const idArrayAbilities = await getSectionIDsAsync('repeating_ability');
+      _.each(idArrayAbilities, (id) => {
+        output[`repeating_ability_${id}_ability_macro_text`] = '';
+        clog(`macro reset completed on: ${id} Ability`);
+      });
+    }
+    if (clickedWord === 'resetnwpsmacros') {
+      const idArrayNWPs = await getSectionIDsAsync('repeating_nonweaponproficiencies');
+      _.each(idArrayNWPs, (id) => {
+        output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = '';
+        clog(`macro reset completed on: ${id} NWP`);
+      });
+    }
+    if (clickedWord === 'resetspellsmacros') {
+      const idArraySpells = await getSectionIDsAsync('repeating_spells');
+      _.each(idArraySpells, (id) => {
+        output[`repeating_spells_${id}_spell_macro_text`] = '';
+        clog(`macro reset completed on: ${id} Spells`);
+      });
+    }
+    setAttrsAsync(output, {silent: true});
+  },
+);
 
 // Thief Calcs
 pickpocketsCalc = (migrate) => {
@@ -5058,7 +5039,7 @@ pickpocketsCalc = (migrate) => {
     const magicPickpockets = +v.pickpockets_magic || 0;
     const oldSkill = +v.pickpockets || 0;
     const newSkill = Math.max(0, int(basePickpockets + racialPickpockets + abilityPickpockets + magicPickpockets));
-    // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
+    clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
     if (migrate === 1) {
       if (oldSkill >= 0 && newSkill === 0) {
         output.pickpockets_base = oldSkill;
