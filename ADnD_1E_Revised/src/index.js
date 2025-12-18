@@ -963,10 +963,10 @@ const migrateAC = (current_version, final_version) => {
   getAttrs(['armorclass', 'armortype_ac', 'armorclass_total', 'armorbonus', 'armorshield'], (v) => {
     const output = {};
     const recalc = 0;
-    let armorClass = +v.armorclass;
+    let armorClass = +v.armorclass || 0;
     const armorBonus = -Math.abs(v.armorbonus) || 0;
     const armorClassTotal = +v.armorclass_total || 0;
-    const armortypeAC = +v.armortype_ac;
+    const armortypeAC = +v.armortype_ac || 0;
     const armorShield = v.armorshield;
     clog(`armorShield:${armorShield} armorClassTotal:${armorClassTotal} armorBonus:${armorBonus} armortypeAC:${armortypeAC} armorClass:${armorClass}`);
     // older sheet will have default value for armortypeAC and armorClassTotal.  AC s/b better than 10
@@ -1273,7 +1273,7 @@ const updateRange = (current_version, final_version) => {
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
         // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
-        const thisType = +v[concatRepAttrName('weapon', id, 'weapon_attack_type')];
+        const thisType = +v[concatRepAttrName('weapon', id, 'weapon_attack_type')] || 0;
         if (thisType === 0 || thisType === 2) return;
         let thisRange = v[concatRepAttrName('weapon', id, 'weapon_range')];
         // remove quotes to prevent NaN (ie distance indicators)
@@ -1500,17 +1500,17 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.unarmored_row_id = newID;
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base;
-          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
-          if (+v.unarmored_worn === 1 && +v.unarmored_carried === 0) {
+          if ((+v.unarmored_worn || 0) === 1 && (+v.unarmored_carried || 0) === 0) {
             output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
             output.unarmored_carried = 1;
           } else {
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
           }
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.unarmored_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.unarmored_cost || 0;
@@ -1521,17 +1521,17 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.unarmored_row_id = newID.toLowerCase();
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base;
-          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
-          if (+v.unarmored_worn === 1 && +v.unarmored_carried === 0) {
+          if ((+v.unarmored_worn || 0) === 1 && (+v.unarmored_carried || 0) === 0) {
             output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
             output.unarmored_carried = 1;
           } else {
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
           }
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.unarmored_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.unarmored_cost || 0;
@@ -1541,18 +1541,18 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
       } else if (unarmored0_ID === idArray[0]) {
         // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
         output.unarmored_row_id = 0;
-        output.unarmored_worn = +v.unarmored_worn;
+        output.unarmored_worn = +v.unarmored_worn || 0;
         output.unarmored = '';
-        output.unarmored_ac = +v.unarmored_ac;
-        output.unarmored_base = +v.unarmored_base;
-        output.unarmored_bulk = +v.unarmored_bulk;
+        output.unarmored_ac = +v.unarmored_ac || 0;
+        output.unarmored_base = +v.unarmored_base || 0;
+        output.unarmored_bulk = +v.unarmored_bulk || 0;
         output.unarmored_weight = +v.unarmored_weight || 0;
         output.unarmored_cost = +v.unarmored_cost || 0;
         // armor in use ie 'worn', should always be considered as carried
-        if (+v.unarmored_worn === 1 && +v.unarmored_carried === 0) {
+        if ((+v.unarmored_worn || 0) === 1 && (+v.unarmored_carried || 0) === 0) {
           output.unarmored_carried = 1;
         } else {
-          output.unarmored_carried = +v.unarmored_carried;
+          output.unarmored_carried = +v.unarmored_carried || 0;
         }
         clog(`syncArmorToEquipment - Armor Details removed - ID Exists. Deleted from Armor Detail unarmored:${newID}`);
       }
@@ -1579,18 +1579,18 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armortype1_row_id = newID;
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 1;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armortype.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype_magic || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk;
+          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
-          if (+v.armortype_worn === 1 && +v.armortype_carried === 0) {
+          if ((+v.armortype_worn || 0) === 1 && (+v.armortype_carried || 0) === 0) {
             output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
             output.armortype_carried = 1;
           } else {
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
           }
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
@@ -1601,13 +1601,13 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armortype1_row_id = newID.toLowerCase();
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 1;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armortype.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype_magic || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk;
-          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried;
+          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
+          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -1651,18 +1651,18 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armortype2_row_id = newID;
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype2_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype2_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armortype2.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype2_magic || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk;
+          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
-          if (+v.armortype2_worn === 1 && +v.armortype2_carried === 0) {
+          if ((+v.armortype2_worn || 0) === 1 && (+v.armortype2_carried || 0) === 0) {
             output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
             output.armortype2_carried = 1;
           } else {
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
           }
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
@@ -1673,13 +1673,13 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armortype2_row_id = newID.toLowerCase();
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype2_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype2_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armortype2.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype2_magic || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk;
-          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried;
+          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
+          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -1723,19 +1723,19 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorshield_row_id = newID;
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 3;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorshield_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorshield_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorshield.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorshield_magic;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = v.armorshield_mod;
-          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk;
+          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
-          if (+v.armorshield_worn === 1 && +v.armorshield_carried === 0) {
+          if ((+v.armorshield_worn || 0) === 1 && (+v.armorshield_carried || 0) === 0) {
             output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
             output.armorshield_carried = 1;
           } else {
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
           }
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
@@ -1746,14 +1746,14 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorshield_row_id = newID.toLowerCase();
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 3;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorshield_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorshield_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorshield.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorshield_magic;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = v.armorshield_mod;
-          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk;
-          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried;
+          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
+          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -1799,16 +1799,16 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorhelmet_row_id = newID;
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 4;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorhelmet_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorhelmet_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorhelmet_magic;
           // armor in use ie 'worn', should always be considered as carried
-          if (+v.armorhelmet_worn === 1 && +v.armorhelmet_carried === 0) {
+          if ((+v.armorhelmet_worn || 0) === 1 && (+v.armorhelmet_carried || 0) === 0) {
             output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
             output.armorhelmet_carried = 1;
           } else {
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
           }
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
@@ -1819,11 +1819,11 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorhelmet_row_id = newID.toLowerCase();
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 4;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorhelmet_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorhelmet_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorhelmet_magic;
-          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried;
+          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -1867,10 +1867,10 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother1_row_id = newID;
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 5;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorother.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
@@ -1882,10 +1882,10 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother1_row_id = newID.toLowerCase();
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 5;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorother.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -1925,10 +1925,10 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother2_row_id = newID;
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 6;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother2_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother2_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorother2.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
@@ -1939,10 +1939,10 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother2_row_id = newID.toLowerCase();
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 6;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother2_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother2_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorother2.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -1982,10 +1982,10 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother3_row_id = newID;
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 7;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother3_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother3_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorother3.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
@@ -1997,10 +1997,10 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother3_row_id = newID.toLowerCase();
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 7;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother3_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother3_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorother3.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -2040,10 +2040,10 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother4_row_id = newID;
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 8;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother4_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother4_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorother4.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
@@ -2055,10 +2055,10 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother4_row_id = newID.toLowerCase();
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 8;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother4_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother4_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorother4.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -2098,10 +2098,10 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother5_row_id = newID;
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 9;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother5_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother5_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorother5.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
@@ -2113,10 +2113,10 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother5_row_id = newID.toLowerCase();
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 9;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother5_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother5_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorother5.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -2156,10 +2156,10 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother6_row_id = newID;
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 10;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother6_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother6_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorother6.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
@@ -2171,10 +2171,10 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
           output.armorother6_row_id = newID.toLowerCase();
           output[`repeating_equipment_${newID}_equipment_type`] = 2;
           output[`repeating_equipment_${newID}_equipment_armor_type`] = 10;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother6_worn;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother6_worn || 0;
           output[`repeating_equipment_${newID}_equipment_item`] = v.armorother6.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base;
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -2249,22 +2249,22 @@ const setEquipmentUpdate = (current_version, final_version) => {
     });
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
-        output[concatRepAttrName('equipment', id, 'equipment_type')] = +v[concatRepAttrName('equipment', id, 'equipment_type')];
+        output[concatRepAttrName('equipment', id, 'equipment_type')] = +v[concatRepAttrName('equipment', id, 'equipment_type')] || 0;
         output[concatRepAttrName('equipment', id, 'equipment_current')] = +v[concatRepAttrName('equipment', id, 'equipment_current')] || 0;
         output[concatRepAttrName('equipment', id, 'equipment_current_max')] = +v[concatRepAttrName('equipment', id, 'equipment_current_max')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_carried_select')] = +v[concatRepAttrName('equipment', id, 'equipment_carried')]; // setting to carried to preserve existing value
-        output[concatRepAttrName('equipment', id, 'equipment_carried')] = +v[concatRepAttrName('equipment', id, 'equipment_carried')];
+        output[concatRepAttrName('equipment', id, 'equipment_carried_select')] = +v[concatRepAttrName('equipment', id, 'equipment_carried')] || 0; // setting to carried to preserve existing value
+        output[concatRepAttrName('equipment', id, 'equipment_carried')] = +v[concatRepAttrName('equipment', id, 'equipment_carried')] || 0;
         output[concatRepAttrName('equipment', id, 'equipment_quantity')] = +v[concatRepAttrName('equipment', id, 'equipment_quantity')] || 0;
         output[concatRepAttrName('equipment', id, 'equipment_quantity_max')] = +v[concatRepAttrName('equipment', id, 'equipment_quantity_max')] || 0;
         output[concatRepAttrName('equipment', id, 'equipment_weight')] = +v[concatRepAttrName('equipment', id, 'equipment_weight')] || 0;
         output[concatRepAttrName('equipment', id, 'equipment_cost')] = +v[concatRepAttrName('equipment', id, 'equipment_cost')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_armor_type')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')];
-        output[concatRepAttrName('equipment', id, 'equipment_armor_worn')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_worn')];
-        output[concatRepAttrName('equipment', id, 'equipment_armor_ac')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_ac')];
-        output[concatRepAttrName('equipment', id, 'equipment_armor_base')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_base')];
+        output[concatRepAttrName('equipment', id, 'equipment_armor_type')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')] || 0;
+        output[concatRepAttrName('equipment', id, 'equipment_armor_worn')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_worn')] || 0;
+        output[concatRepAttrName('equipment', id, 'equipment_armor_ac')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_ac')] || 0;
+        output[concatRepAttrName('equipment', id, 'equipment_armor_base')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_base')] || 0;
         output[concatRepAttrName('equipment', id, 'equipment_armor_magic')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_magic')] || 0;
         output[concatRepAttrName('equipment', id, 'equipment_armor_mod')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_mod')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_armor_bulk')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_bulk')];
+        output[concatRepAttrName('equipment', id, 'equipment_armor_bulk')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_bulk')] || 0;
         output[concatRepAttrName('equipment', id, 'equipment_macro_text')] = v[concatRepAttrName('equipment', id, 'equipment_macro_text')];
       });
       output.sheet_version = current_version;
@@ -2332,10 +2332,10 @@ const setWeaponsUpdate = (current_version, final_version) => {
     });
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
-        output[`repeating_weapon_${id}_weapon_attack_type`] = +v[concatRepAttrName('weapon', id, 'weapon_attack_type')];
+        output[`repeating_weapon_${id}_weapon_attack_type`] = +v[concatRepAttrName('weapon', id, 'weapon_attack_type')] || 0;
         output[`repeating_weapon_${id}_weapon_dual`] = v[concatRepAttrName('weapon', id, 'weapon_dual')];
         output[`repeating_weapon_${id}_weapon_whisper_to_hit`] = v[concatRepAttrName('weapon', id, 'weapon_whisper_to_hit')];
-        output[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] = +v[concatRepAttrName('weapon', id, 'weapon_whisper_to_hit_select')];
+        output[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] = +v[concatRepAttrName('weapon', id, 'weapon_whisper_to_hit_select')] || 0;
         output[`repeating_weapon_${id}_weapon_dual_pen`] = +v[concatRepAttrName('weapon', id, 'weapon_dual_pen')] || 0;
         output[`repeating_weapon_${id}_weapon_backstab_var`] = +v[concatRepAttrName('weapon', id, 'weapon_backstab_var')] || 0;
         output[`repeating_weapon_${id}_weapon_tohitbonus`] = +v[concatRepAttrName('weapon', id, 'weapon_tohitbonus')] || 0;
@@ -2405,7 +2405,7 @@ const setNWPUpdate = (current_version, final_version) => {
         output[`repeating_nonweaponproficiencies_${id}_attribute`] = v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_attribute')];
         output[`repeating_nonweaponproficiencies_${id}_slots`] = +v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_slots')] || 0;
         output[`repeating_nonweaponproficiencies_${id}_modifier`] = +v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_modifier')] || 0;
-        output[`repeating_nonweaponproficiencies_${id}_macro_text`] = v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')] || 0;
+        output[`repeating_nonweaponproficiencies_${id}_macro_text`] = v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')];
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: setNWPUpdate completed`);
@@ -2561,7 +2561,7 @@ const setEquipmentType = (current_version, final_version) => {
     });
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
-        const equipType = +v[concatRepAttrName('equipment', id, 'equipment_type')];
+        const equipType = +v[concatRepAttrName('equipment', id, 'equipment_type')] || 0;
         if (equipType >= 0) return;
         output[concatRepAttrName('equipment', id, 'equipment_type')] = 0;
         clog(`equipType -1:${equipType} reset to Gear`);
@@ -2639,16 +2639,16 @@ const updateCriticalDamageMacro = (current_version, final_version) => {
 const newSheet = async () => {
   const v = await getAttrsAsync(['hitdice', 'armorclass', 'strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'old_character']);
   const output = {};
-  const testOldChar = +v.old_character;
+  const testOldChar = +v.old_character || 0;
   if (testOldChar === 1) return;
-  const testHitdice = +v.hitdice;
-  const testAC = +v.armorclass;
-  const testStr = +v.strength;
-  const testInt = +v.intelligence;
-  const testWis = +v.wisdom;
-  const testDex = +v.dexterity;
-  const testCon = +v.constitution;
-  const testCha = +v.charisma;
+  const testHitdice = +v.hitdice || 0;
+  const testAC = +v.armorclass || 0;
+  const testStr = +v.strength || 0;
+  const testInt = +v.intelligence || 0;
+  const testWis = +v.wisdom || 0;
+  const testDex = +v.dexterity || 0;
+  const testCon = +v.constitution || 0;
+  const testCha = +v.charisma || 0;
   // new sheets will have all abilities '10' by default
   // defaults will then be set to '8' default
   const testAbility = testStr + testInt + testWis + testDex + testCon + testCha;
@@ -2690,7 +2690,7 @@ const updateSyncArmorFlag = async (current_version, final_version) => {
   // map the ID array to an array of Promises (the async checks)
   // necessary because of the async function in the loop
   const updatePromises = idArray.map(async (id) => {
-    const type = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')];
+    const type = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')] || 0;
     // Await the asynchronous test
     const {isMatch} = await testArmorRowIDs(id);
     const flagName = concatRepAttrName('equipment', id, 'equipment_sync_armor_flag');
@@ -2810,7 +2810,7 @@ on('sheet:opened', async () => {
   const output = {};
   let current_version = float(v.sheet_version);
   // prevent new sheets from stepping through versionator
-  if (+v.old_character === 0 && current_version === 0) {
+  if ((+v.old_character || 0) === 0 && current_version === 0) {
     // clog(`New Sheet:${v.old_character}`);
     current_version = final_version;
     output.sheet_version = final_version;
@@ -2826,7 +2826,7 @@ on(
   async (eventInfo) => {
     const v = await getAttrsAsync(['intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'comeliness', 'toggle_exceptional']);
     const output = {};
-    const toggle_exceptional = +v.toggle_exceptional;
+    const toggle_exceptional = +v.toggle_exceptional || 0;
     if (toggle_exceptional === 1) return;
     output.exceptional_intelligence_flag = 1;
     output.exceptional_wisdom_flag = 1;
@@ -2849,8 +2849,8 @@ on('change:is_npc', async (eventInfo) => {
   const v = await getAttrsAsync(['is_npc', 'toggle_npc']);
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   const output = {};
-  const isNPC = +v.is_npc;
-  let toggleNPC = +v.toggle_npc;
+  const isNPC = +v.is_npc || 0;
+  let toggleNPC = +v.toggle_npc || 0;
   toggleNPC = isNPC === 0 ? 0 : 1;
   output.toggle_npc = toggleNPC;
   await setAttrsAsync(output, {silent: true});
@@ -2867,8 +2867,8 @@ const sumEquipmentCost = async () => {
   const v = await getAttrsAsync(fields);
   const equipmentCosts = [];
   _.each(idArray, (id) => {
-    const quantity = +v[concatRepAttrName('equipment', id, 'equipment_quantity')];
-    let cost = +v[concatRepAttrName('equipment', id, 'equipment_cost')];
+    const quantity = +v[concatRepAttrName('equipment', id, 'equipment_quantity')] || 0;
+    let cost = +v[concatRepAttrName('equipment', id, 'equipment_cost')] || 0;
     // costs
     cost = quantity > 0 ? cost * quantity : 0;
     equipmentCosts.push(cost);
@@ -2889,7 +2889,7 @@ on('change:repeating_equipment:equipment_quantity change:repeating_equipment:equ
 const sumCoinWeight = async () => {
   const v = await getAttrsAsync(['pp', 'gp', 'ep', 'sp', 'cp', 'toggle_lbs']);
   const output = {};
-  const toggleLbs = +v.toggle_lbs;
+  const toggleLbs = +v.toggle_lbs || 0;
   const lbsConversion = toggleLbs ? 10 : 1;
   const totalCoinCount = float(v.pp) + float(v.gp) + float(v.ep) + float(v.sp) + float(v.cp);
   const totalCoinWeight = (totalCoinCount / lbsConversion).toFixed(2);
@@ -2915,16 +2915,16 @@ const sumEquipmentWeight = async () => {
   const weaponWeights = [];
   const armorWeights = [];
   const totalEquipmentWeights = [];
-  const totalCoinWeight = +v.total_coin_weight;
+  const totalCoinWeight = +v.total_coin_weight || 0;
   _.each(idArray, (id) => {
-    const type = +v[concatRepAttrName('equipment', id, 'equipment_type')];
+    const type = +v[concatRepAttrName('equipment', id, 'equipment_type')] || 0;
     // Weight calcs use equipment_carried
     let carried = 0;
-    const carriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')];
+    const carriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')] || 0;
     output[concatRepAttrName('equipment', id, 'equipment_carried')] = carriedSelect === 1 ? 1 : 0;
     carried = carriedSelect === 1 ? 1 : 0;
-    const quantity = +v[concatRepAttrName('equipment', id, 'equipment_quantity')];
-    let weight = +v[concatRepAttrName('equipment', id, 'equipment_weight')];
+    const quantity = +v[concatRepAttrName('equipment', id, 'equipment_quantity')] || 0;
+    let weight = +v[concatRepAttrName('equipment', id, 'equipment_weight')] || 0;
     let weaponWeight = 0;
     let armorWeight = 0;
     weight = weight * quantity * carried;
@@ -2954,10 +2954,10 @@ const sumEquipmentWeight = async () => {
 const setEncumbranceThresholds = async () => {
   const v = await getAttrsAsync(['encumbrancebonus', 'toggle_lbs']);
   const output = {};
-  const useLbs = +v.toggle_lbs;
+  const useLbs = +v.toggle_lbs || 0;
   const lbsConversion = useLbs ? 0.1 : 1;
   const normal = 350 * lbsConversion;
-  const encumbranceBonus = +v.encumbrancebonus;
+  const encumbranceBonus = +v.encumbrancebonus || 0;
   const encumbranceBonusLbs = float(encumbranceBonus * lbsConversion);
   const thisBonus = useLbs ? encumbranceBonusLbs : encumbranceBonus;
   const normalAdjusted = normal + thisBonus;
@@ -2978,12 +2978,12 @@ const setEncumbranceThresholds = async () => {
 const setCurrentEncumbranceFlag = async () => {
   const v = await getAttrsAsync(['normal_load_adjusted', 'heavy_load', 'very_heavy_load', 'total_weight', 'autocalc_movement_flag', 'current_bulk', 'current_encumbrance_move']);
   const output = {};
-  const autocalc_movement_flag = +v.autocalc_movement_flag;
-  const normal_load_adjusted = +v.normal_load_adjusted;
-  const heavy_load = +v.heavy_load;
-  const very_heavy_load = +v.very_heavy_load;
-  const total_weight = +v.total_weight;
-  const current_bulk = +v.current_bulk;
+  const autocalc_movement_flag = +v.autocalc_movement_flag || 0;
+  const normal_load_adjusted = +v.normal_load_adjusted || 0;
+  const heavy_load = +v.heavy_load || 0;
+  const very_heavy_load = +v.very_heavy_load || 0;
+  const total_weight = +v.total_weight || 0;
+  const current_bulk = +v.current_bulk || 0;
   let currentEncumbrance = 0;
 
   if (total_weight <= normal_load_adjusted) {
@@ -2991,21 +2991,21 @@ const setCurrentEncumbranceFlag = async () => {
     currentEncumbrance = 0;
     output.current_encumbrance = currentEncumbrance;
     // Bail out of IF unless auto-calc movement is enabled
-    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move;
+    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
     // clog('===== Carrying Capacity is Unencumbered =====');
   } else if (total_weight > normal_load_adjusted && total_weight <= heavy_load) {
     output.current_encumbrance_label = 'Heavy';
     currentEncumbrance = 1;
     output.current_encumbrance = currentEncumbrance;
     // Bail out of IF unless auto-calc movement is enabled
-    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move;
+    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
     // clog('===== Carrying Capacity is Heavy =====');
   } else if (total_weight > heavy_load && total_weight <= very_heavy_load) {
     output.current_encumbrance_label = 'Very Heavy';
     currentEncumbrance = 2;
     output.current_encumbrance = currentEncumbrance;
     // Bail out of IF unless auto-calc movement is enabled
-    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move;
+    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
     // clog('===== Carrying Capacity is Very Heavy =====');
   } else {
     output.current_encumbrance_label = 'Encumbered';
@@ -3013,7 +3013,7 @@ const setCurrentEncumbranceFlag = async () => {
     currentEncumbrance = 3;
     output.current_encumbrance = currentEncumbrance;
     // Bail out of IF unless auto-calc movement is enabled
-    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move;
+    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
     // clog('===== Carrying Capacity is Encumbered =====');
   }
   await setAttrsAsync(output, {silent: true});
@@ -3035,7 +3035,7 @@ const setCurrentMovement = async () => {
   // clog('Movement Rates have been re-calculated');
   // only extract an integer from movement
   const movement = +v.movement.toString().replace(/[^0-9]/g, '');
-  const current_encumbrance_move = +v.current_encumbrance_move;
+  const current_encumbrance_move = +v.current_encumbrance_move || 0;
   let adjustedMove = 0;
   if (current_encumbrance_move === 0) {
     adjustedMove = movement;
@@ -3063,7 +3063,7 @@ on('change:movement change:current_encumbrance change:current_encumbrance_move c
   const output = {};
   const recalc = 0;
   // only extract an integer from movement
-  const movement = +v.movement.toString().replace(/[^0-9]/g, '');
+  const movement = +v.movement.toString().replace(/[^0-9]/g, '') || 0;
   output.movement_heavy = Math.max(movement - 3, 0);
   output.movement_load = Math.max(movement - 6, 0);
   output.movement_max = Math.max(movement - 9, 0);
@@ -3086,17 +3086,17 @@ const setCurrentBulk = async () => {
     'armorshield_carried',
   ]);
   const output = {};
-  const unarmored_worn = +v.unarmored_worn;
-  const armortype_worn = +v.armortype_worn;
-  const armortype2_worn = +v.armortype2_worn;
-  const armorshield_worn = +v.armorshield_worn;
-  const armorshield_carried = +v.armorshield_carried;
+  const unarmored_worn = +v.unarmored_worn || 0;
+  const armortype_worn = +v.armortype_worn || 0;
+  const armortype2_worn = +v.armortype2_worn || 0;
+  const armorshield_worn = +v.armorshield_worn || 0;
+  const armorshield_carried = +v.armorshield_carried || 0;
   // shield bulk s/b considered even if it's just carried
   const armorShieldWornOrCarried = Math.max(armorshield_worn, armorshield_carried);
-  const unarmored_bulk = +v.unarmored_bulk * unarmored_worn;
-  const armortype_bulk = +v.armortype_bulk * armortype_worn;
-  const armortype2_bulk = +v.armortype2_bulk * armortype2_worn;
-  const armorshield_bulk = +v.armorshield_bulk * armorShieldWornOrCarried;
+  const unarmored_bulk = (+v.unarmored_bulk || 0) * unarmored_worn;
+  const armortype_bulk = (+v.armortype_bulk || 0) * armortype_worn;
+  const armortype2_bulk = (+v.armortype2_bulk || 0) * armortype2_worn;
+  const armorshield_bulk = (+v.armorshield_bulk || 0) * armorShieldWornOrCarried;
   const armorBulk = Math.max(unarmored_bulk, armortype_bulk, armortype2_bulk, armorshield_bulk);
   switch (armorBulk) {
     case 0:
@@ -3144,10 +3144,10 @@ on(
     const v = await getAttrsAsync(['equipment_tabs_type', 'equipment_tabs_carry', ...fields]);
     await setAttrsAsync(output, {silent: true});
     const output = {};
-    const carriedTab = +v.equipment_tabs_carry; // 1, 0, 2, -1
-    const typeTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
-    const thisType = +v[concatRepAttrName('equipment', id, 'equipment_type')]; // 0, 1, 2, 3, 4
-    const thisCarriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')]; // 0, 1, 2
+    const carriedTab = +v.equipment_tabs_carry || 0; // 1, 0, 2, -1
+    const typeTab = +v.equipment_tabs_type || 0; // 0, 1, 2, 3, 4, -1
+    const thisType = +v[concatRepAttrName('equipment', id, 'equipment_type')] || 0; // 0, 1, 2, 3, 4
+    const thisCarriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')] || 0; // 0, 1, 2
     // Weight calcs use equipment_carried so keep them synced
     output[concatRepAttrName('equipment', id, 'equipment_carried')] = thisCarriedSelect === 1 ? 1 : 0;
     // jumps to equip type tab unless Show All or same equip type tab
@@ -3171,15 +3171,15 @@ on('change:equipment_tabs_type change:equipment_tabs_carry', async (eventInfo) =
   });
   const v = await getAttrsAsync(['equipment_tabs_type', 'equipment_tabs_carry', 'equipment_magical', ...fields]);
   idArray.forEach((id) => {
-    const currentValue = +v[concatRepAttrName('section', id, 'attribute')];
+    const currentValue = +v[concatRepAttrName('section', id, 'attribute')] || 0;
     output[concatRepAttrName('section', id, 'attribute')] = currentValue;
   });
-  const typeTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
-  const carriedTab = +v.equipment_tabs_carry; // 1, 0, 2, -1
+  const typeTab = +v.equipment_tabs_type || 0; // 0, 1, 2, 3, 4, -1
+  const carriedTab = +v.equipment_tabs_carry || 0; // 1, 0, 2, -1
   _.each(idArray, (id) => {
-    const isMagical = +v[concatRepAttrName('equipment', id, 'equipment_magical')]; // checkbox
-    const thisType = +v[concatRepAttrName('equipment', id, 'equipment_type')]; // 0, 1, 2, 3, 4
-    const thisCarriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')]; // 0, 1, 2
+    const isMagical = +v[concatRepAttrName('equipment', id, 'equipment_magical')] || 0; // checkbox
+    const thisType = +v[concatRepAttrName('equipment', id, 'equipment_type')] || 0; // 0, 1, 2, 3, 4
+    const thisCarriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')] || 0; // 0, 1, 2
     // CSS to hide/show the repeating row based on typeTab and/or carriedTab
     if (typeTab === -1 || typeTab === thisType || (typeTab === 3 && isMagical)) {
       output[concatRepAttrName('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
@@ -3208,7 +3208,7 @@ const removeEmptyArmorRows = async () => {
   console.log(armorDetailsArray);
   _.each(idArray, (id) => {
     // this id is the trigger
-    const type = +v[`repeating_equipment_${id}_equipment_armor_type`];
+    const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
     // Armor Type not selected
     if (type === 99) return;
     clog(`removeEmptyArmorRows - Armor Type:${type}`);
@@ -3342,8 +3342,8 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
       output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       clog(`Creating a new repeating_equipment row for unarmored: ${newID}`);
@@ -3357,11 +3357,11 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 1;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armortype.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk;
-      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried;
+      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
       output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
@@ -3376,11 +3376,11 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 2;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armortype2.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype2_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk;
-      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried;
+      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
       output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
@@ -3395,12 +3395,12 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 3;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorshield.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base || 0;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorshield_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorshield_mod || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk;
-      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried;
+      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
       output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
@@ -3415,9 +3415,9 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 4;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorhelmet_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
       output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
@@ -3432,8 +3432,8 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 5;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -3448,8 +3448,8 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 6;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother2.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -3464,8 +3464,8 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 7;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother3.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -3480,8 +3480,8 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 8;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother4.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -3496,8 +3496,8 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 9;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother5.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -3512,8 +3512,8 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 10;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother6.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
@@ -3543,15 +3543,15 @@ async function fillArmorDetails(id) {
   ]);
   const output = {};
   const recalc = 0;
-  const type = +v[`repeating_equipment_${id}_equipment_armor_type`];
+  const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
   const item = v[`repeating_equipment_${id}_equipment_item`];
-  const worn = +v[`repeating_equipment_${id}_equipment_armor_worn`];
-  const ac = +v[`repeating_equipment_${id}_equipment_armor_ac`];
-  const base = +v[`repeating_equipment_${id}_equipment_armor_base`];
+  const worn = +v[`repeating_equipment_${id}_equipment_armor_worn`] || 0;
+  const ac = +v[`repeating_equipment_${id}_equipment_armor_ac`] || 0;
+  const base = +v[`repeating_equipment_${id}_equipment_armor_base`] || 0;
   const magic = +v[`repeating_equipment_${id}_equipment_armor_magic`] || 0;
   const mod = +v[`repeating_equipment_${id}_equipment_armor_mod`] || 0;
-  const bulk = +v[`repeating_equipment_${id}_equipment_armor_bulk`];
-  let carriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`];
+  const bulk = +v[`repeating_equipment_${id}_equipment_armor_bulk`] || 0;
+  let carriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
   const weight = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
   const cost = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
   // armor in use ie 'worn', should always be considered as carried
@@ -3720,7 +3720,7 @@ async function createAttack(id) {
   const newID = generateUniqueRowID();
   // clog(`Creating a new attack newID:${newID}`);
   output[`repeating_weapon_${newID}_weapon_name`] = v[`repeating_equipment_${id}_equipment_item`];
-  output[`repeating_weapon_${newID}_weapon_type`] = +v[`repeating_equipment_${id}_equipment_weapon_type`];
+  output[`repeating_weapon_${newID}_weapon_type`] = +v[`repeating_equipment_${id}_equipment_weapon_type`] || 0;
   output[`repeating_weapon_${newID}_weapon_speed`] = v[`repeating_equipment_${id}_equipment_weapon_speed`];
   output[`repeating_weapon_${newID}_weapon_length`] = v[`repeating_equipment_${id}_equipment_weapon_length`];
   output[`repeating_weapon_${newID}_weapon_space`] = v[`repeating_equipment_${id}_equipment_weapon_space`];
@@ -3814,8 +3814,8 @@ on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_ar
   const trigger = eventInfo.sourceAttribute.split('_').slice(3).join('_').toLowerCase();
   const v = await getAttrsAsync([`repeating_equipment_${id}_equipment_armor_type`, `repeating_equipment_${id}_equipment_sync_armor_flag`]);
   const output = {};
-  const synced = +v[`repeating_equipment_${id}_equipment_sync_armor_flag`];
-  const type = +v[`repeating_equipment_${id}_equipment_armor_type`];
+  const synced = +v[`repeating_equipment_${id}_equipment_sync_armor_flag`] || 0;
+  const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
   clog(`${trigger} - id:${id} type:${type} synced:${synced}`);
   if (trigger === 'addarmor' && type !== 99) {
     await fillArmorDetails(id);
@@ -3873,13 +3873,13 @@ on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs chan
     fields.push(concatRepAttrName('spells', id, 'spell_caster_class'));
   });
   const v = await getAttrsAsync(['spell_tabs', 'toggle_show_memorized', 'spell_caster_tabs', 'toggle_caster2', ...fields]);
-  const memorizedOnly = +v.toggle_show_memorized;
-  const casterTab = +v.spell_caster_tabs; // -1, 0, 1
-  const hideCaster2 = +v.toggle_caster2;
-  const levelTab = +v.spell_tabs;
+  const memorizedOnly = +v.toggle_show_memorized || 0;
+  const casterTab = +v.spell_caster_tabs || 0; // -1, 0, 1
+  const hideCaster2 = +v.toggle_caster2 || 0;
+  const levelTab = +v.spell_tabs || 0;
   _.each(idArray, (id) => {
-    const thisMemorizedOnly = +v[concatRepAttrName('spells', id, 'spell_memorized')];
-    const thisCaster = +v[concatRepAttrName('spells', id, 'spell_caster_class')]; // 0, 1, 2
+    const thisMemorizedOnly = +v[concatRepAttrName('spells', id, 'spell_memorized')] || 0;
+    const thisCaster = +v[concatRepAttrName('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
     const thisLevel = v[concatRepAttrName('spells', id, 'spell_level')]; // can be '?'
     output[concatRepAttrName('spells', id, 'spell_show_memorized')] = memorizedOnly === 1 && thisMemorizedOnly > 0 ? 1 : 0;
     output[concatRepAttrName('spells', id, 'spell_show_all')] = memorizedOnly === 1 ? 0 : 1;
@@ -3920,10 +3920,10 @@ on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_cla
   const id = eventInfo.sourceAttribute.split('_')[2];
   const v = await getAttrsAsync([`repeating_spells_${id}_spell_level`, `repeating_spells_${id}_spell_caster_class`, 'spell_caster_tabs', 'spell_tabs']);
   const output = {};
-  const casterTab = +v.spell_caster_tabs; // 0, 1, -1
-  const thisCaster = +v[concatRepAttrName('spells', id, 'spell_caster_class')]; // 0, 1, 2
+  const casterTab = +v.spell_caster_tabs || 0; // 0, 1, -1
+  const thisCaster = +v[concatRepAttrName('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
   const thisLevel = v[concatRepAttrName('spells', id, 'spell_level')]; // can be '?'
-  const levelTab = +v.spell_tabs;
+  const levelTab = +v.spell_tabs || 0;
   // jumps to spell level tab unless Show All or same level tab
   output.spell_tabs = levelTab >= 0 && levelTab !== thisLevel ? thisLevel : levelTab;
   // jumps to caster class tab unless Show All or same caster tab
@@ -3941,10 +3941,10 @@ setSpellsCasterClass = async () => {
   const v = await getAttrsAsync(['caster_class1_name', 'caster_class2_name', 'caster_class1_level', 'caster_class2_level', ...fields]);
   const caster1Name = v.caster_class1_name;
   const caster2Name = v.caster_class2_name;
-  const caster1Level = +v.caster_class1_level;
-  const caster2Level = +v.caster_class2_level;
+  const caster1Level = +v.caster_class1_level || 0;
+  const caster2Level = +v.caster_class2_level || 0;
   _.each(idArray, (id) => {
-    const thisClass = +v[concatRepAttrName('spells', id, 'spell_caster_class')];
+    const thisClass = +v[concatRepAttrName('spells', id, 'spell_caster_class')] || 0;
     switch (thisClass) {
       case 0:
         output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = '';
@@ -3996,11 +3996,11 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
   const output = {};
   const caster1Name = v.caster_class1_name;
   const caster2Name = v.caster_class2_name;
-  const caster1Level = +v.caster_class1_level;
-  const caster2Level = +v.caster_class2_level;
-  const showCaster2 = +v.toggle_caster2;
-  const casterTab = +v.spell_caster_tabs; // 0, 1, -1
-  let thisClass = +v[concatRepAttrName('spells', id, 'spell_caster_class')]; // 0, 1, 2
+  const caster1Level = +v.caster_class1_level || 0;
+  const caster2Level = +v.caster_class2_level || 0;
+  const showCaster2 = +v.toggle_caster2 || 0;
+  const casterTab = +v.spell_caster_tabs || 0; // 0, 1, -1
+  let thisClass = +v[concatRepAttrName('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
 
   // Caster Class 2 is enabled
   if (showCaster2 === 0) {
@@ -4039,7 +4039,7 @@ on('change:repeating_spells:spell_name', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const v = await getAttrsAsync([`repeating_spells_${id}_spell_level`, 'spell_tabs']);
   const output = {};
-  const levelTab = +v.spell_tabs;
+  const levelTab = +v.spell_tabs || 0;
   const thisSpellLevel = v[concatRepAttrName('spells', id, 'spell_level')]; // can be '?'
   // console.log(`Change detected: [Setting Spell Level based on Spell Tab] SpellTab:${levelTab} ThisSpellLvl:${thisSpellLevel}`);
   // test if Spell Tab is set to 'All' or if this Spell's Lvl has already been set
@@ -4056,7 +4056,7 @@ on(
     const id = eventInfo.sourceAttribute.split('_')[2];
     const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_ToHitACadj_flag`, `repeating_weapon_${id}_weapon_ToHitACadj`]);
     const output = {};
-    const thisflag = +v[`repeating_weapon_${id}_weapon_ToHitACadj_flag`];
+    const thisflag = +v[`repeating_weapon_${id}_weapon_ToHitACadj_flag`] || 0;
     output.repeating_weapon_weapon_ToHitACadj =
       thisflag === 1
         ? '{{ToHitACadj2to10=HitAdj:[[ @{weapon_thac_adj0} ]]|[[ @{weapon_thac_adj1} ]]|[[ @{weapon_thac_adj2} ]]|[[ @{weapon_thac_adj3} ]]|[[ @{weapon_thac_adj4} ]]|[[ @{weapon_thac_adj5} ]]|[[ @{weapon_thac_adj6} ]]|[[ @{weapon_thac_adj7} ]]|[[ @{weapon_thac_adj8} ]]|[[ @{weapon_thac_adj9} ]]|[[ @{weapon_thac_adj10} ]] }}'
@@ -4076,10 +4076,10 @@ on('change:toggle_to_hit_table', async (eventInfo) => {
     fields.push(`repeating_weapon_${id}_weapon_whisper_to_hit`);
   });
   const v = await getAttrsAsync(['toggle_to_hit_table', ...fields]);
-  const flag = +v.toggle_to_hit_table;
+  const flag = +v.toggle_to_hit_table || 0;
   _.each(idArray, (id) => {
-    let thishitTableSelect = +v[`repeating_weapon_${id}_weapon_whisper_to_hit_select`];
-    let thishitTableMacro = +v[`repeating_weapon_${id}_weapon_whisper_to_hit`];
+    let thishitTableSelect = +v[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] || 0;
+    let thishitTableMacro = +v[`repeating_weapon_${id}_weapon_whisper_to_hit`] || 0;
     const noMacro = '&nbsp;';
     const matrixMacro =
       '%NEWLINE%/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10to0=ToHit:[[ @{thac-10} ]]|[[ @{thac-9} ]]|[[ @{thac-8} ]]|[[ @{thac-7} ]]|[[ @{thac-6} ]]|[[ @{thac-5} ]]|[[ @{thac-4} ]]|[[ @{thac-3} ]]|[[ @{thac-2} ]]|[[ @{thac-1} ]]|[[ @{thac0} ]]}} {{ToHitAC1to10=ToHit:[[ @{thac0} ]]|[[ @{thac1} ]]|[[ @{thac2} ]]|[[ @{thac3} ]]|[[ @{thac4} ]]|[[ @{thac5} ]]|[[ @{thac6} ]]|[[ @{thac7} ]]|[[ @{thac8} ]]|[[ @{thac9} ]]|[[ @{thac10} ]] }}';
@@ -4117,9 +4117,9 @@ on('change:repeating_weapon:weapon_whisper_to_hit_select', async (eventInfo) => 
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
   const v = await getAttrsAsync(['toggle_to_hit_table', `repeating_weapon_${id}_weapon_whisper_to_hit_select`, `repeating_weapon_${id}_weapon_whisper_to_hit`]);
-  const flag = +v.toggle_to_hit_table;
-  let thishitTableSelect = +v[`repeating_weapon_${id}_weapon_whisper_to_hit_select`];
-  let thishitTableMacro = +v[`repeating_weapon_${id}_weapon_whisper_to_hit`];
+  const flag = +v.toggle_to_hit_table || 0;
+  let thishitTableSelect = +v[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] || 0;
+  let thishitTableMacro = +v[`repeating_weapon_${id}_weapon_whisper_to_hit`] || 0;
   const noMacro = '&nbsp;';
   const matrixMacro =
     '%NEWLINE%/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10to0=ToHit:[[ @{thac-10} ]]|[[ @{thac-9} ]]|[[ @{thac-8} ]]|[[ @{thac-7} ]]|[[ @{thac-6} ]]|[[ @{thac-5} ]]|[[ @{thac-4} ]]|[[ @{thac-3} ]]|[[ @{thac-2} ]]|[[ @{thac-1} ]]|[[ @{thac0} ]]}} {{ToHitAC1to10=ToHit:[[ @{thac0} ]]|[[ @{thac1} ]]|[[ @{thac2} ]]|[[ @{thac3} ]]|[[ @{thac4} ]]|[[ @{thac5} ]]|[[ @{thac6} ]]|[[ @{thac7} ]]|[[ @{thac8} ]]|[[ @{thac9} ]]|[[ @{thac10} ]] }}';
@@ -4160,9 +4160,9 @@ on('change:weapon_proficiency_initial change:weapon_proficiency_added_per_level 
     fields.push(`repeating_weapon_${id}_weapon_prof_flag`);
   });
   const v = await getAttrsAsync(['weapon_proficiency_penalty', ...fields]);
-  const thispenalty = +v.weapon_proficiency_penalty;
+  const thispenalty = +v.weapon_proficiency_penalty || 0;
   _.each(idArray, (id) => {
-    const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`];
+    const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`] || 0;
     output[`repeating_weapon_${id}_weapon_prof`] = thispenalty;
     output[`repeating_weapon_${id}_weapon_prof_pen`] = thisflag === 0 ? '0' : thispenalty;
   });
@@ -4175,8 +4175,8 @@ on('change:repeating_weapon:weapon_prof_flag', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
   const v = await getAttrsAsync(['weapon_proficiency_penalty', `repeating_weapon_${id}_weapon_prof_flag`]);
-  const thispenalty = +v.weapon_proficiency_penalty;
-  const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`];
+  const thispenalty = +v.weapon_proficiency_penalty || 0;
+  const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`] || 0;
   output[`repeating_weapon_${id}_weapon_prof`] = thispenalty;
   output[`repeating_weapon_${id}_weapon_prof_pen`] = thisflag === 0 ? '0' : thispenalty;
   await setAttrsAsync(output, {silent: true});
@@ -4193,11 +4193,11 @@ on('change:backstab change:backstab_bonus change:toggle_thief_skills', async (ev
     fields.push(`repeating_weapon_${id}_weapon_backstab_flag`);
   });
   const v = await getAttrsAsync(['backstab', 'backstab_bonus', 'toggle_thief_skills', ...fields]);
-  const thiefSkills = +v.toggle_thief_skills;
-  const thisMult = +v.backstab;
-  const thisBonus = +v.backstab_bonus;
+  const thiefSkills = +v.toggle_thief_skills || 0;
+  const thisMult = +v.backstab || 0;
+  const thisBonus = +v.backstab_bonus || 0;
   _.each(idArray, (id) => {
-    const thisFlag = +v[`repeating_weapon_${id}_weapon_backstab_flag`];
+    const thisFlag = +v[`repeating_weapon_${id}_weapon_backstab_flag`] || 0;
     if (thiefSkills === 0) {
       output[`repeating_weapon_${id}_weapon_backstab_var`] = thisFlag === 0 ? 0 : `+${thisBonus}`;
       output[`repeating_weapon_${id}_weapon_backstab_bonus`] = thisFlag === 0 ? 0 : thisBonus;
@@ -4219,10 +4219,10 @@ on('change:repeating_weapon:weapon_backstab_flag', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
   const v = await getAttrsAsync(['backstab', 'backstab_bonus', 'toggle_thief_skills', `repeating_weapon_${id}_weapon_backstab_flag`]);
-  const thiefSkills = +v.toggle_thief_skills;
-  const thisMult = +v.backstab;
-  const thisBonus = +v.backstab_bonus;
-  const thisFlag = +v[`repeating_weapon_${id}_weapon_backstab_flag`];
+  const thiefSkills = +v.toggle_thief_skills || 0;
+  const thisMult = +v.backstab || 0;
+  const thisBonus = +v.backstab_bonus || 0;
+  const thisFlag = +v[`repeating_weapon_${id}_weapon_backstab_flag`] || 0;
   if (thiefSkills === 0) {
     output[`repeating_weapon_${id}_weapon_backstab_var`] = thisFlag === 0 ? 0 : `+${thisBonus}`;
     output[`repeating_weapon_${id}_weapon_backstab_bonus`] = thisFlag === 0 ? 0 : thisBonus;
@@ -4243,8 +4243,8 @@ on('change:repeating_weapon:weapon_dual', async (eventInfo) => {
   const output = {};
   const v = await getAttrsAsync(['dual_pen_primary', 'dual_pen_secondary', `repeating_weapon_${id}_weapon_dual`]);
   clog('this weapon attack Type has been re-calculated');
-  const primary = +v.dual_pen_primary;
-  const secondary = +v.dual_pen_secondary;
+  const primary = +v.dual_pen_primary || 0;
+  const secondary = +v.dual_pen_secondary || 0;
   const attack_type = v[`repeating_weapon_${id}_weapon_dual`];
   let handed_mod = 0;
   if (attack_type === 'Normal') handed_mod = 0;
@@ -4281,7 +4281,7 @@ on('change:dual_pen_primary change:dual_pen_secondary change:dexterity', async (
   const v = await getAttrsAsync(['dexterity']);
   // clog('Weapon Attack Type has been re-calculated');
   const output = {};
-  const dex = +v.dexterity;
+  const dex = +v.dexterity || 0;
   let dex_mod = 0;
   if (dex < 6) {
     dex_mod = Math.max(-3, dex - 6);
@@ -4314,7 +4314,7 @@ calcRange = async (id) => {
   const v = await getAttrsAsync(fields);
   const output = {};
   // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
-  const thisType = +v[concatRepAttrName('weapon', id, 'weapon_attack_type')];
+  const thisType = +v[concatRepAttrName('weapon', id, 'weapon_attack_type')] || 0;
   if (thisType === 0 || thisType === 2) return;
   let thisRange = v[concatRepAttrName('weapon', id, 'weapon_range')];
   // remove quotes to prevent NaN (ie distance indicators)
@@ -4378,8 +4378,8 @@ on('change:repeating_weapon:weapon_attack_type', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_attack_type`, `repeating_weapon_${id}_weapon_attack_type_flag`]);
   const output = {};
-  const currentType = +v[`repeating_weapon_${id}_weapon_attack_type`];
-  const currentTypeFlag = +v[`repeating_weapon_${id}_weapon_attack_type_flag`];
+  const currentType = +v[`repeating_weapon_${id}_weapon_attack_type`] || 0;
+  const currentTypeFlag = +v[`repeating_weapon_${id}_weapon_attack_type_flag`] || 0;
   if (currentType !== currentTypeFlag) {
     output[`repeating_weapon_${id}_weapon_attack_type_flag`] = currentType;
   }
@@ -4391,8 +4391,8 @@ calcHP = async () => {
   // clog('HP re-calculated');
   const v = await getAttrsAsync(['hitpoints', 'hitpoints_max', 'sync_hp_flag', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class']);
   const output = {};
-  const syncHpFlag = +v.sync_hp_flag;
-  const hitPointsMax = +v.hitpoints_max;
+  const syncHpFlag = +v.sync_hp_flag || 0;
+  const hitPointsMax = +v.hitpoints_max || 0;
   const hitpoints_1_class = Math.max(0, +v.hitpoints_1_class);
   const hitpoints_2_class = Math.max(0, +v.hitpoints_2_class);
   const hitpoints_3_class = Math.max(0, +v.hitpoints_3_class);
@@ -4430,46 +4430,46 @@ calcAC = async (recalc) => {
     'current_encumbrance_move',
     'sync_ac_flag',
   ]);
-  const autoCalcAcFlag = +v.autocalc_ac;
+  const autoCalcAcFlag = +v.autocalc_ac || 0;
   if (autoCalcAcFlag + recalc === 0) return;
   // RecalcAC button overrides sync checkbox = continue
   // Or sync is on and an armor change detected = continue
   const output = {};
-  const armorClass = +v.armorclass;
-  const syncAcFlag = +v.sync_ac_flag;
-  const armorRatingFlag = +v.armor_rating_flag;
-  const armorShield_mod = +v.armorshield_mod * -1;
-  const armorOther_mod = +v.armorother_mod * -1;
-  const armorOther2_mod = +v.armorother2_mod * -1;
-  const armorOther3_mod = +v.armorother3_mod * -1;
-  const armorOther4_mod = +v.armorother4_mod * -1;
-  const armorOther5_mod = +v.armorother5_mod * -1;
-  const armorOther6_mod = +v.armorother6_mod * -1;
-  const armorType_magic = +v.armortype_magic * -1;
-  const armorType2_magic = +v.armortype2_magic * -1;
-  const armorShield_magic = +v.armorshield_magic * -1;
-  const armorHelmet_magic = +v.armorhelmet_magic * -1;
-  const armorOther_magic = +v.armorother_magic * -1;
-  const armorOther2_magic = +v.armorother2_magic * -1;
-  const armorOther3_magic = +v.armorother3_magic * -1;
-  const armorOther4_magic = +v.armorother4_magic * -1;
-  const armorOther5_magic = +v.armorother5_magic * -1;
-  const armorOther6_magic = +v.armorother6_magic * -1;
-  const unarmored_worn = +v.unarmored_worn;
-  const armorType_worn = +v.armortype_worn;
-  const armorType2_worn = +v.armortype2_worn;
-  const armorShield_worn = +v.armorshield_worn;
-  const armorHelmet_worn = +v.armorhelmet_worn;
-  const armorOther_worn = +v.armorother_worn;
-  const armorOther2_worn = +v.armorother2_worn;
-  const armorOther3_worn = +v.armorother3_worn;
-  const armorOther4_worn = +v.armorother4_worn;
-  const armorOther5_worn = +v.armorother5_worn;
-  const armorOther6_worn = +v.armorother6_worn;
+  const armorClass = +v.armorclass || 0;
+  const syncAcFlag = +v.sync_ac_flag || 0;
+  const armorRatingFlag = +v.armor_rating_flag || 0;
+  const armorShield_mod = (+v.armorshield_mod || 0) * -1;
+  const armorOther_mod = (+v.armorother_mod || 0) * -1;
+  const armorOther2_mod = (+v.armorother2_mod || 0) * -1;
+  const armorOther3_mod = (+v.armorother3_mod || 0) * -1;
+  const armorOther4_mod = (+v.armorother4_mod || 0) * -1;
+  const armorOther5_mod = (+v.armorother5_mod || 0) * -1;
+  const armorOther6_mod = (+v.armorother6_mod || 0) * -1;
+  const armorType_magic = (+v.armortype_magic || 0) * -1;
+  const armorType2_magic = (+v.armortype2_magic || 0) * -1;
+  const armorShield_magic = (+v.armorshield_magic || 0) * -1;
+  const armorHelmet_magic = (+v.armorhelmet_magic || 0) * -1;
+  const armorOther_magic = (+v.armorother_magic || 0) * -1;
+  const armorOther2_magic = (+v.armorother2_magic || 0) * -1;
+  const armorOther3_magic = (+v.armorother3_magic || 0) * -1;
+  const armorOther4_magic = (+v.armorother4_magic || 0) * -1;
+  const armorOther5_magic = (+v.armorother5_magic || 0) * -1;
+  const armorOther6_magic = (+v.armorother6_magic || 0) * -1;
+  const unarmored_worn = +v.unarmored_worn || 0;
+  const armorType_worn = +v.armortype_worn || 0;
+  const armorType2_worn = +v.armortype2_worn || 0;
+  const armorShield_worn = +v.armorshield_worn || 0;
+  const armorHelmet_worn = +v.armorhelmet_worn || 0;
+  const armorOther_worn = +v.armorother_worn || 0;
+  const armorOther2_worn = +v.armorother2_worn || 0;
+  const armorOther3_worn = +v.armorother3_worn || 0;
+  const armorOther4_worn = +v.armorother4_worn || 0;
+  const armorOther5_worn = +v.armorother5_worn || 0;
+  const armorOther6_worn = +v.armorother6_worn || 0;
   // check encumbrance/bulk for DEX penalty
-  const current_encumbrance_move = +v.current_encumbrance_move;
-  let armorBonusToggle = +v.armorbonus_toggle;
-  let armorBonus = +v.armorbonus;
+  const current_encumbrance_move = +v.current_encumbrance_move || 0;
+  let armorBonusToggle = +v.armorbonus_toggle || 0;
+  let armorBonus = +v.armorbonus || 0;
   let encumbranceConditionFlag = 0;
   // encumbered and has a DEX bonus
   if (current_encumbrance_move === 3 && armorBonus < 0) {
@@ -4478,27 +4478,27 @@ calcAC = async (recalc) => {
     encumbranceConditionFlag = 1;
     // toggle off DEX only if there is a DEX bonus
   } else if (armorBonus < 0) {
-    armorBonus = +v.armorbonus * armorBonusToggle;
+    armorBonus = (+v.armorbonus || 0) * armorBonusToggle;
   } else {
-    armorBonus = +v.armorbonus;
+    armorBonus = +v.armorbonus || 0;
   }
   output.encumbrance_flag = encumbranceConditionFlag;
-  const unarmored_base = +v.unarmored_base;
-  const armorType_base = +v.armortype_base;
-  const armorType2_base = +v.armortype2_base;
-  const armorShield_base = +v.armorshield_base;
-  const armorOther_base = +v.armorother_base;
+  const unarmored_base = +v.unarmored_base || 0;
+  const armorType_base = +v.armortype_base || 0;
+  const armorType2_base = +v.armortype2_base || 0;
+  const armorShield_base = +v.armorshield_base || 0;
+  const armorOther_base = +v.armorother_base || 0;
   // must do the extra checks on these to ensure they are bonuses and not flat AC|AR values
   const armorOther2_base = v.armorother2_base >= 0 ? 0 : -Math.abs(v.armorother2_base);
   const armorOther3_base = v.armorother3_base >= 0 ? 0 : -Math.abs(v.armorother3_base);
   const armorOther4_base = v.armorother4_base >= 0 ? 0 : -Math.abs(v.armorother4_base);
   const armorOther5_base = v.armorother5_base >= 0 ? 0 : -Math.abs(v.armorother5_base);
   const armorOther6_base = v.armorother6_base >= 0 ? 0 : -Math.abs(v.armorother6_base);
-  const unarmored_ac = +v.unarmored_ac;
-  const armorType_ac = +v.armortype_ac;
-  const armorType2_ac = +v.armortype2_ac;
-  const armorShield_ac = +v.armorshield_ac;
-  const armorOther_ac = +v.armorother_ac;
+  const unarmored_ac = +v.unarmored_ac || 0;
+  const armorType_ac = +v.armortype_ac || 0;
+  const armorType2_ac = +v.armortype2_ac || 0;
+  const armorShield_ac = +v.armorshield_ac || 0;
+  const armorOther_ac = +v.armorother_ac || 0;
   // must do the extra checks on these to ensure they are bonuses and not flat AC|AR values
   const armorOther2_ac = v.armorother2_ac >= 0 ? 0 : -Math.abs(v.armorother2_ac);
   const armorOther3_ac = v.armorother3_ac >= 0 ? 0 : -Math.abs(v.armorother3_ac);
@@ -4652,7 +4652,7 @@ damageMacro = async (id, passedAutoDamage) => {
   let autoDamage;
   if (passedAutoDamage === undefined || passedAutoDamage === null) {
     const v = await getAttrsAsync(['toggle_auto_damage']);
-    autoDamage = +v.toggle_auto_damage;
+    autoDamage = +v.toggle_auto_damage || 0;
   } else {
     autoDamage = passedAutoDamage;
   }
@@ -4705,11 +4705,11 @@ on('change:toggle_critdamage change:toggle_auto_damage', async (eventInfo) => {
   const fields = idArray.map((id) => concatRepAttrName('weapon', id, 'weapon_critdamage_flag'));
   const v = await getAttrsAsync(['toggle_auto_damage', ...fields]);
   const output = {};
-  const autoDamage = +v.toggle_auto_damage;
+  const autoDamage = +v.toggle_auto_damage || 0;
   // Map IDs to Promises that return objects
   const damagePromises = idArray.map(async (id) => {
     const attrName = concatRepAttrName('weapon', id, 'weapon_critdamage_flag');
-    const currentValue = +v[attrName];
+    const currentValue = +v[attrName] || 0;
     output[attrName] = 1 - currentValue;
     // Get the macro changes for this ID
     return await damageMacro(id, autoDamage);
@@ -5349,13 +5349,13 @@ on(
   (eventInfo) => {
     // clog(`Thief Autofill Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['thief_level', 'autofill_thief', 'sync_thief_class', 'thief_class_selected', 'class', 'secondclass', 'thirdclass', 'level', 'level_2', 'level_3'], (v) => {
-      const autocalcFill = +v.autofill_thief;
+      const autocalcFill = +v.autofill_thief || 0;
       // bail out if auto-fill is not enabled.
       if (!autocalcFill) return;
 
       const output = {};
-      const syncClass = +v.sync_thief_class;
-      const classLinked = +v.thief_class_selected;
+      const syncClass = +v.sync_thief_class || 0;
+      const classLinked = +v.thief_class_selected || 0;
       let levelSelected = +v.thief_level || 0;
       const class1Name = (v.class || '').trim();
       const class2Name = (v.secondclass || '').trim();
@@ -5557,19 +5557,19 @@ on(
       if (syncClass === 1) {
         if (classLinked === 1) {
           classSelected = matchClassName(class1Name);
-          levelSelected = +v.level;
+          levelSelected = +v.level || 0;
           clog(`Linked Class is: ${class1Name} ${classSelected} Current Level:${v.level}`);
           output.thief_level = classSelected === 4 ? levelSelected : 0;
           setThiefSkills(levelSelected);
         } else if (classLinked === 2) {
           classSelected = matchClassName(class2Name);
-          levelSelected = +v.level_2;
+          levelSelected = +v.level_2 || 0;
           clog(`Linked Class is: ${class2Name} ${classSelected} Current Level:${v.level_2}`);
           output.thief_level = classSelected === 4 ? levelSelected : 0;
           setThiefSkills(levelSelected);
         } else if (classLinked === 3) {
           classSelected = matchClassName(class3Name);
-          levelSelected = +v.level_3;
+          levelSelected = +v.level_3 || 0;
           clog(`Linked Class is: ${class3Name} ${classSelected} Current Level:${v.level_3}`);
           output.thief_level = classSelected === 4 ? levelSelected : 0;
           setThiefSkills(levelSelected);
@@ -5595,11 +5595,11 @@ saveparalysispoisondeathCalc = (migrate) => {
     ],
     (v) => {
       const output = {};
-      const baseSaveparalysispoisondeath = +v.saveparalysispoisondeath_base;
-      const racialSaveparalysispoisondeath = +v.saveparalysispoisondeath_racial_mod;
-      const abilitySaveparalysispoisondeath = +v.saveparalysispoisondeath_ability_mod;
-      const miscSaveparalysispoisondeath = +v.saveparalysispoisondeath_misc_mod;
-      const tempSaveparalysispoisondeath = +v.saveparalysispoisondeath_temp_mod;
+      const baseSaveparalysispoisondeath = +v.saveparalysispoisondeath_base || 0;
+      const racialSaveparalysispoisondeath = +v.saveparalysispoisondeath_racial_mod || 0;
+      const abilitySaveparalysispoisondeath = +v.saveparalysispoisondeath_ability_mod || 0;
+      const miscSaveparalysispoisondeath = +v.saveparalysispoisondeath_misc_mod || 0;
+      const tempSaveparalysispoisondeath = +v.saveparalysispoisondeath_temp_mod || 0;
       const oldSave = +v.saveparalysispoisondeath || 0;
       const newSave = int(
         baseSaveparalysispoisondeath + racialSaveparalysispoisondeath + abilitySaveparalysispoisondeath + miscSaveparalysispoisondeath + tempSaveparalysispoisondeath,
@@ -5632,11 +5632,11 @@ savepetrificationpolymorphCalc = (migrate) => {
     ],
     (v) => {
       const output = {};
-      const baseSavepetrificationpolymorph = +v.savepetrificationpolymorph_base;
-      const racialSavepetrificationpolymorph = +v.savepetrificationpolymorph_racial_mod;
-      const abilitySavepetrificationpolymorph = +v.savepetrificationpolymorph_ability_mod;
-      const miscSavepetrificationpolymorph = +v.savepetrificationpolymorph_misc_mod;
-      const tempSavepetrificationpolymorph = +v.savepetrificationpolymorph_temp_mod;
+      const baseSavepetrificationpolymorph = +v.savepetrificationpolymorph_base || 0;
+      const racialSavepetrificationpolymorph = +v.savepetrificationpolymorph_racial_mod || 0;
+      const abilitySavepetrificationpolymorph = +v.savepetrificationpolymorph_ability_mod || 0;
+      const miscSavepetrificationpolymorph = +v.savepetrificationpolymorph_misc_mod || 0;
+      const tempSavepetrificationpolymorph = +v.savepetrificationpolymorph_temp_mod || 0;
       const oldSave = +v.savepetrificationpolymorph || 0;
       const newSave = int(
         baseSavepetrificationpolymorph + racialSavepetrificationpolymorph + abilitySavepetrificationpolymorph + miscSavepetrificationpolymorph + tempSavepetrificationpolymorph,
@@ -5669,11 +5669,11 @@ saverodsstaveswandsCalc = (migrate) => {
     ],
     (v) => {
       const output = {};
-      const baseSaverodsstaveswands = +v.saverodsstaveswands_base;
-      const racialSaverodsstaveswands = +v.saverodsstaveswands_racial_mod;
-      const abilitySaverodsstaveswands = +v.saverodsstaveswands_ability_mod;
-      const miscSaverodsstaveswands = +v.saverodsstaveswands_misc_mod;
-      const tempSaverodsstaveswands = +v.saverodsstaveswands_temp_mod;
+      const baseSaverodsstaveswands = +v.saverodsstaveswands_base || 0;
+      const racialSaverodsstaveswands = +v.saverodsstaveswands_racial_mod || 0;
+      const abilitySaverodsstaveswands = +v.saverodsstaveswands_ability_mod || 0;
+      const miscSaverodsstaveswands = +v.saverodsstaveswands_misc_mod || 0;
+      const tempSaverodsstaveswands = +v.saverodsstaveswands_temp_mod || 0;
       const oldSave = +v.saverodsstaveswands || 0;
       const newSave = int(baseSaverodsstaveswands + racialSaverodsstaveswands + abilitySaverodsstaveswands + miscSaverodsstaveswands + tempSaverodsstaveswands);
       // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
@@ -5697,11 +5697,11 @@ savebreathweaponsCalc = (migrate) => {
     ['savebreathweapons', 'savebreathweapons_base', 'savebreathweapons_racial_mod', 'savebreathweapons_ability_mod', 'savebreathweapons_misc_mod', 'savebreathweapons_temp_mod'],
     (v) => {
       const output = {};
-      const baseSavebreathweapons = +v.savebreathweapons_base;
-      const racialSavebreathweapons = +v.savebreathweapons_racial_mod;
-      const abilitySavebreathweapons = +v.savebreathweapons_ability_mod;
-      const miscSavebreathweapons = +v.savebreathweapons_misc_mod;
-      const tempSavebreathweapons = +v.savebreathweapons_temp_mod;
+      const baseSavebreathweapons = +v.savebreathweapons_base || 0;
+      const racialSavebreathweapons = +v.savebreathweapons_racial_mod || 0;
+      const abilitySavebreathweapons = +v.savebreathweapons_ability_mod || 0;
+      const miscSavebreathweapons = +v.savebreathweapons_misc_mod || 0;
+      const tempSavebreathweapons = +v.savebreathweapons_temp_mod || 0;
       const oldSave = +v.savebreathweapons || 0;
       const newSave = int(baseSavebreathweapons + racialSavebreathweapons + abilitySavebreathweapons + miscSavebreathweapons + tempSavebreathweapons);
       // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
@@ -5723,11 +5723,11 @@ savebreathweaponsCalc = (migrate) => {
 savespellsCalc = (migrate) => {
   getAttrs(['savespells', 'savespells_base', 'savespells_racial_mod', 'savespells_ability_mod', 'savespells_misc_mod', 'savespells_temp_mod'], (v) => {
     const output = {};
-    const baseSavespells = +v.savespells_base;
-    const racialSavespells = +v.savespells_racial_mod;
-    const abilitySavespells = +v.savespells_ability_mod;
-    const miscSavespells = +v.savespells_misc_mod;
-    const tempSavespells = +v.savespells_temp_mod;
+    const baseSavespells = +v.savespells_base || 0;
+    const racialSavespells = +v.savespells_racial_mod || 0;
+    const abilitySavespells = +v.savespells_ability_mod || 0;
+    const miscSavespells = +v.savespells_misc_mod || 0;
+    const tempSavespells = +v.savespells_temp_mod || 0;
     const oldSave = +v.savespells || 0;
     const newSave = int(baseSavespells + racialSavespells + abilitySavespells + miscSavespells + tempSavespells);
     // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
@@ -5749,11 +5749,11 @@ savespellsCalc = (migrate) => {
 savemiscCalc = () => {
   getAttrs(['savemisc', 'savemisc_base', 'savemisc_racial_mod', 'savemisc_ability_mod', 'savemisc_misc_mod', 'savemisc_temp_mod'], (v) => {
     const output = {};
-    const baseSavemisc = +v.savemisc_base;
-    const racialSavemisc = +v.savemisc_racial_mod;
-    const abilitySavemisc = +v.savemisc_ability_mod;
-    const miscSavemisc = +v.savemisc_misc_mod;
-    const tempSavemisc = +v.savemisc_temp_mod;
+    const baseSavemisc = +v.savemisc_base || 0;
+    const racialSavemisc = +v.savemisc_racial_mod || 0;
+    const abilitySavemisc = +v.savemisc_ability_mod || 0;
+    const miscSavemisc = +v.savemisc_misc_mod || 0;
+    const tempSavemisc = +v.savemisc_temp_mod || 0;
     const newSave = int(baseSavemisc + racialSavemisc + abilitySavemisc + miscSavemisc + tempSavemisc);
     output.savemisc = newSave;
     setAttrs(output, {silent: true});
@@ -5763,11 +5763,11 @@ savemiscCalc = () => {
 savemisc1Calc = () => {
   getAttrs(['savemisc1', 'savemisc1_base', 'savemisc1_racial_mod', 'savemisc1_ability_mod', 'savemisc1_misc_mod', 'savemisc1_temp_mod'], (v) => {
     const output = {};
-    const baseSavemisc1 = +v.savemisc1_base;
-    const racialSavemisc1 = +v.savemisc1_racial_mod;
-    const abilitySavemisc1 = +v.savemisc1_ability_mod;
-    const miscSavemisc1 = +v.savemisc1_misc_mod;
-    const tempSavemisc1 = +v.savemisc1_temp_mod;
+    const baseSavemisc1 = +v.savemisc1_base || 0;
+    const racialSavemisc1 = +v.savemisc1_racial_mod || 0;
+    const abilitySavemisc1 = +v.savemisc1_ability_mod || 0;
+    const miscSavemisc1 = +v.savemisc1_misc_mod || 0;
+    const tempSavemisc1 = +v.savemisc1_temp_mod || 0;
     // const oldSave = +v.savemisc1 || 0;
     const newSave = int(baseSavemisc1 + racialSavemisc1 + abilitySavemisc1 + miscSavemisc1 + tempSavemisc1);
     output.savemisc1 = newSave;
@@ -5778,11 +5778,11 @@ savemisc1Calc = () => {
 savemisc2Calc = () => {
   getAttrs(['savemisc2', 'savemisc2_base', 'savemisc2_racial_mod', 'savemisc2_ability_mod', 'savemisc2_misc_mod', 'savemisc2_temp_mod'], (v) => {
     const output = {};
-    const baseSavemisc2 = +v.savemisc2_base;
-    const racialSavemisc2 = +v.savemisc2_racial_mod;
-    const abilitySavemisc2 = +v.savemisc2_ability_mod;
-    const miscSavemisc2 = +v.savemisc2_misc_mod;
-    const tempSavemisc2 = +v.savemisc2_temp_mod;
+    const baseSavemisc2 = +v.savemisc2_base || 0;
+    const racialSavemisc2 = +v.savemisc2_racial_mod || 0;
+    const abilitySavemisc2 = +v.savemisc2_ability_mod || 0;
+    const miscSavemisc2 = +v.savemisc2_misc_mod || 0;
+    const tempSavemisc2 = +v.savemisc2_temp_mod || 0;
     // const oldSave = +v.savemisc1 || 0;
     const newSave = int(baseSavemisc2 + racialSavemisc2 + abilitySavemisc2 + miscSavemisc2 + tempSavemisc2);
     output.savemisc2 = newSave;
@@ -5839,12 +5839,12 @@ on('change:savemisc2_base change:savemisc2_racial_mod change:savemisc2_ability_m
 on('change:saves_class change:saves_level change:autofill_saves', (eventInfo) => {
   clog(`Saves Autofill Change Detected:${eventInfo.sourceAttribute}`);
   getAttrs(['saves_class', 'saves_level', 'autofill_saves'], (v) => {
-    const autocalcFill = +v.autofill_saves;
+    const autocalcFill = +v.autofill_saves || 0;
     // bail out if auto-fill is not enabled.
     if (!autocalcFill) return;
 
     const output = {};
-    const classSelected = +v.saves_class;
+    const classSelected = +v.saves_class || 0;
     const levelSelected = +v.saves_level || 0;
     clog(`Class:${classSelected} Level:${levelSelected}`);
     // do saves per class and level here
@@ -6161,7 +6161,7 @@ on('change:saves_class change:saves_level change:autofill_saves', (eventInfo) =>
 on('change:matrix_class', (eventInfo) => {
   getAttrs(['matrix_class'], (v) => {
     const output = {};
-    const classSelected = +v.matrix_class;
+    const classSelected = +v.matrix_class || 0;
     output.toggle_matrixhd = classSelected === 5 ? 1 : 0;
     setAttrs(output, {silent: true});
   });
@@ -6186,12 +6186,12 @@ function matchClassName(name) {
 // THAC0
 function calcThac0() {
   getAttrs(['thac00', 'autofill_matrix'], (v) => {
-    const autocalcFill = +v.autofill_matrix;
+    const autocalcFill = +v.autofill_matrix || 0;
     // bail out if auto-fill is not enabled.
     if (!autocalcFill) return;
 
     const output = {};
-    const baseThac0 = +v.thac00;
+    const baseThac0 = +v.thac00 || 0;
     output[`thac0-10`] = baseThac0 + 10;
     output[`thac0-9`] = baseThac0 + 9;
     output[`thac0-8`] = baseThac0 + 8;
@@ -6238,41 +6238,41 @@ on(
         'level_3',
       ],
       (v) => {
-        const autocalcFill = +v.autofill_matrix;
+        const autocalcFill = +v.autofill_matrix || 0;
         // bail out if auto-fill is not enabled.
         if (!autocalcFill) return;
 
         const output = {};
-        const syncClass = +v.sync_matrix_class;
-        const classLinked = +v.class_selected;
+        const syncClass = +v.sync_matrix_class || 0;
+        const classLinked = +v.class_selected || 0;
         let levelSelected = +v.matrix_level || 0;
-        let classSelected = +v.matrix_class;
+        let classSelected = +v.matrix_class || 0;
         const class1Name = (v.class || '').trim();
         const class2Name = (v.secondclass || '').trim();
         const class3Name = (v.thirdclass || '').trim();
         const hitdiceSelected = +v.matrix_hitdice || 0;
-        const fighter5Selected = +v.toggle_fighter5;
+        const fighter5Selected = +v.toggle_fighter5 || 0;
         // sync enabled?
         // check for selected class and use that class level unless changed
         if (syncClass === 1) {
           if (classLinked === 1) {
             // clog(`Linked Class is: ${class1Name} Current Level:${v.level}`);
             classSelected = matchClassName(class1Name);
-            levelSelected = +v.level;
+            levelSelected = +v.level || 0;
             output.matrix_level = levelSelected;
             output.matrix_class = classSelected;
           }
           if (classLinked === 2) {
             // clog(`Linked Class is: ${class2Name} Current Level:${v.level_2}`);
             classSelected = matchClassName(class2Name);
-            levelSelected = +v.level_2;
+            levelSelected = +v.level_2 || 0;
             output.matrix_level = levelSelected;
             output.matrix_class = classSelected;
           }
           if (classLinked === 3) {
             // clog(`Linked Class is: ${class3Name} Current Level:${v.level_3}`);
             classSelected = matchClassName(class3Name);
-            levelSelected = +v.level_3;
+            levelSelected = +v.level_3 || 0;
             output.matrix_level = levelSelected;
             output.matrix_class = classSelected;
           }
@@ -7268,23 +7268,23 @@ on(
 
 on('sheet:opened change:thac0 change:thac00 change:autofill_matrix', (eventInfo) => {
   getAttrs(['attack_matrix_flag', 'matrix_class', 'thac0', 'thac1', 'thac2', 'thac00', 'thac01', 'thac02', 'autofill_matrix'], (v) => {
-    const autocalcFill = +v.autofill_matrix;
+    const autocalcFill = +v.autofill_matrix || 0;
     // bail out if auto-fill is not enabled.
     if (!autocalcFill) return;
 
     const output = {};
-    const attack_matrix_flag = +v.attack_matrix_flag;
-    const matrix_class = +v.matrix_class;
+    const attack_matrix_flag = +v.attack_matrix_flag || 0;
+    const matrix_class = +v.matrix_class || 0;
     if (attack_matrix_flag === 0 || matrix_class > 0) {
       // clog(`attack_matrix_flag:${attack_matrix_flag} matrix_class:${matrix_class}`);
       output.attack_matrix_flag = 0;
     } else {
-      const thac0 = +v.thac0;
-      const thac1 = +v.thac1;
-      const thac2 = +v.thac2;
-      const thac00 = +v.thac00;
-      const thac01 = +v.thac01;
-      const thac02 = +v.thac02;
+      const thac0 = +v.thac0 || 0;
+      const thac1 = +v.thac1 || 0;
+      const thac2 = +v.thac2 || 0;
+      const thac00 = +v.thac00 || 0;
+      const thac01 = +v.thac01 || 0;
+      const thac02 = +v.thac02 || 0;
       const toHitIsDefaultValue = thac0 + thac1 + thac2;
       const thac0IsDefaultValue = thac00 + thac01 + thac02;
       // clog(`toHitIsDefaultValue:${toHitIsDefaultValue} thac0IsDefaultValue:${thac0IsDefaultValue}`);
@@ -8025,7 +8025,7 @@ thiefSkillsRacialCalcs = (autofill_thief_race) => {
 // Thief Skills Dex Calculations
 on('change:autofill_thief_dex change:dexterity', (eventInfo) => {
   getAttrs(['autofill_thief_dex'], (v) => {
-    const autofill_thief_dex = +v.autofill_thief_dex;
+    const autofill_thief_dex = +v.autofill_thief_dex || 0;
     thiefSkillsDexCalcs(autofill_thief_dex);
   });
 });
@@ -8058,7 +8058,7 @@ on('change:race change:autofill_thief_race change:thief_race_selected', (eventIn
   const triggerAttr = eventInfo.sourceAttribute;
   getAttrs(['race', 'autofill_thief_race'], (v) => {
     const output = {};
-    const autofill_thief_race = +v.autofill_thief_race;
+    const autofill_thief_race = +v.autofill_thief_race || 0;
 
     // check attr_race for a match to the race selector
     const race = (v.race || 'human').trim();
@@ -8110,7 +8110,7 @@ on('change:charisma change:comeliness', (eventInfo) => {
 portraitUrlCalc = () => {
   getAttrs(['character_avatar', 'sheet_image', 'sheet_image_url'], (v) => {
     const output = {};
-    const whichImage = +v.sheet_image;
+    const whichImage = +v.sheet_image || 0;
     // roll20 urls includes extra meta after the image extension
     const avatarURL = (function getAvatarUrl(url) {
       // check url for common image extension
