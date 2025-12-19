@@ -7703,52 +7703,49 @@ on('change:psionic_ability_strength_max change:psionic_attack change:psionic_def
   await setAttrsAsync(output, {silent: true});
 });
 
-weaponInUse = () => {
-  getSectionIDs('repeating_weapon', (idArray) => {
-    const output = {};
-    const fields = [];
-    const weaponsInUse = [];
-    // Array to store weapons with inUse === 1
-    idArray.forEach((id) => {
-      fields.push(concatRepAttrName('weapon', id, 'weapon_name'));
-      fields.push(concatRepAttrName('weapon', id, 'weapon_use'));
-      fields.push(concatRepAttrName('weapon', id, 'weapon_speed'));
-      fields.push(concatRepAttrName('weapon', id, 'weapon_misc'));
-    });
-    getAttrs(fields, (v) => {
-      idArray.forEach((id) => {
-        const inUse = +v[concatRepAttrName('weapon', id, 'weapon_use')] || 0;
-        if (inUse === 0) return;
-        const name = v[concatRepAttrName('weapon', id, 'weapon_name')];
-        // default to 0 if empty otherwise grab the first integer entered
-        const speedStr = v[concatRepAttrName('weapon', id, 'weapon_speed')] || '0';
-        const speed = parseInt(speedStr.match(/\d+/)?.[0]) || 0;
-        const misc = v[concatRepAttrName('weapon', id, 'weapon_misc')];
-        weaponsInUse.push({id, name, inUse, speed, misc});
-      });
+weaponInUse = async () => {
+  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const output = {};
+  const weaponsInUse = [];
+  // Array to store weapons with inUse === 1
+  const fields = idArray.flatMap((id) => [
+    concatRepAttrName('weapon', id, 'weapon_name'),
+    concatRepAttrName('weapon', id, 'weapon_use'),
+    concatRepAttrName('weapon', id, 'weapon_speed'),
+    concatRepAttrName('weapon', id, 'weapon_misc'),
+  ]);
+  const v = await getAttrsAsync(fields);
+  idArray.forEach((id) => {
+    const inUse = +v[concatRepAttrName('weapon', id, 'weapon_use')] || 0;
+    if (inUse === 0) return;
 
-      // Find fastest(ie lowest) speed factor
-      if (weaponsInUse.length > 0) {
-        let lowestSpeedWeapon = weaponsInUse[0];
-        weaponsInUse.forEach((weapon) => {
-          if (weapon.speed < lowestSpeedWeapon.speed) {
-            lowestSpeedWeapon = weapon;
-          }
-        });
-        // set global attr with lowest speed weapon/attack
-        const {name, speed, misc} = lowestSpeedWeapon;
-        // console.log(`Lowest speed weapon - name: ${name}, speed: ${speed}, misc: ${misc}`);
-        output.weapon_in_use = name;
-        output.weapon_in_use_speed = speed;
-        output.weapon_in_use_misc = misc;
-      } else {
-        output.weapon_in_use = '';
-        output.weapon_in_use_speed = '';
-        output.weapon_in_use_misc = '';
-      }
-      setAttrs(output, {silent: true});
-    });
+    const name = v[concatRepAttrName('weapon', id, 'weapon_name')];
+    // default to 0 if empty otherwise grab the first integer entered
+    const speedStr = +v[concatRepAttrName('weapon', id, 'weapon_speed')] || '0';
+    const speed = parseInt(speedStr.match(/\d+/)?.[0]) || 0;
+    const misc = v[concatRepAttrName('weapon', id, 'weapon_misc')];
+    weaponsInUse.push({id, name, inUse, speed, misc});
   });
+  // Find fastest(ie lowest) speed factor
+  if (weaponsInUse.length > 0) {
+    let lowestSpeedWeapon = weaponsInUse[0];
+    weaponsInUse.forEach((weapon) => {
+      if (weapon.speed < lowestSpeedWeapon.speed) {
+        lowestSpeedWeapon = weapon;
+      }
+    });
+    // set global attr with lowest speed weapon/attack
+    const {name, speed, misc} = lowestSpeedWeapon;
+    // console.log(`Lowest speed weapon - name: ${name}, speed: ${speed}, misc: ${misc}`);
+    output.weapon_in_use = name;
+    output.weapon_in_use_speed = speed;
+    output.weapon_in_use_misc = misc;
+  } else {
+    output.weapon_in_use = '';
+    output.weapon_in_use_speed = '';
+    output.weapon_in_use_misc = '';
+  }
+  await setAttrsAsync(output, {silent: true});
 };
 
 on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use change:repeating_weapon:weapon_speed change:repeating_weapon:weapon_misc', (eventInfo) => {
