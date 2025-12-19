@@ -1,6 +1,16 @@
-# 2025-12-?
+# 2025-12-18
+
+- Make spells on Other Realm & Arcane clickable
+- Add restricted parry option.
+
+# 2025-12-11
+
+- Add option to allow overcasting anytime. (Sheet version 17)
+
+# 2025-12-04
 
 - Add XP on journal item add with XP
+- Fix for spells target numbers using traditional target numbers.
 
 # 2025-12-02
 
