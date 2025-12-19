@@ -5376,216 +5376,203 @@ on(
     skillKeys.forEach((key, i) => {
       output[key] = statValues[i];
     });
-    await setAttrsAsync(output);
+    await setAttrsAsync(output, {silent: true});
   },
 );
 
 // Save Calcs
-saveparalysispoisondeathCalc = (migrate) => {
-  getAttrs(
-    [
-      'saveparalysispoisondeath',
-      'saveparalysispoisondeath_base',
-      'saveparalysispoisondeath_racial_mod',
-      'saveparalysispoisondeath_ability_mod',
-      'saveparalysispoisondeath_misc_mod',
-      'saveparalysispoisondeath_temp_mod',
-    ],
-    (v) => {
-      const output = {};
-      const baseSaveparalysispoisondeath = +v.saveparalysispoisondeath_base || 0;
-      const racialSaveparalysispoisondeath = +v.saveparalysispoisondeath_racial_mod || 0;
-      const abilitySaveparalysispoisondeath = +v.saveparalysispoisondeath_ability_mod || 0;
-      const miscSaveparalysispoisondeath = +v.saveparalysispoisondeath_misc_mod || 0;
-      const tempSaveparalysispoisondeath = +v.saveparalysispoisondeath_temp_mod || 0;
-      const oldSave = +v.saveparalysispoisondeath || 0;
-      const newSave = int(
-        baseSaveparalysispoisondeath + racialSaveparalysispoisondeath + abilitySaveparalysispoisondeath + miscSaveparalysispoisondeath + tempSaveparalysispoisondeath,
-      );
-      // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
-      if (migrate === 1) {
-        if (oldSave <= 20 && newSave === 20) {
-          output.saveparalysispoisondeath_base = oldSave;
-          // clog('Old saveparalysispoisondeath copied to Base/Class column');
-        } else {
-          output.saveparalysispoisondeath = newSave;
-        }
-      } else {
-        output.saveparalysispoisondeath = newSave;
-      }
-      setAttrs(output, {silent: true});
-    },
+saveparalysispoisondeathCalc = async (migrate) => {
+  const v = await getAttrsAsync([
+    'saveparalysispoisondeath',
+    'saveparalysispoisondeath_base',
+    'saveparalysispoisondeath_racial_mod',
+    'saveparalysispoisondeath_ability_mod',
+    'saveparalysispoisondeath_misc_mod',
+    'saveparalysispoisondeath_temp_mod',
+  ]);
+  const output = {};
+  const baseSaveparalysispoisondeath = +v.saveparalysispoisondeath_base || 0;
+  const racialSaveparalysispoisondeath = +v.saveparalysispoisondeath_racial_mod || 0;
+  const abilitySaveparalysispoisondeath = +v.saveparalysispoisondeath_ability_mod || 0;
+  const miscSaveparalysispoisondeath = +v.saveparalysispoisondeath_misc_mod || 0;
+  const tempSaveparalysispoisondeath = +v.saveparalysispoisondeath_temp_mod || 0;
+  const oldSave = +v.saveparalysispoisondeath || 0;
+  const newSave = int(
+    baseSaveparalysispoisondeath + racialSaveparalysispoisondeath + abilitySaveparalysispoisondeath + miscSaveparalysispoisondeath + tempSaveparalysispoisondeath,
   );
+  // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
+  if (migrate === 1) {
+    if (oldSave <= 20 && newSave === 20) {
+      output.saveparalysispoisondeath_base = oldSave;
+      // clog('Old saveparalysispoisondeath copied to Base/Class column');
+    } else {
+      output.saveparalysispoisondeath = newSave;
+    }
+  } else {
+    output.saveparalysispoisondeath = newSave;
+  }
+  await setAttrsAsync(output, {silent: true});
 };
 
-savepetrificationpolymorphCalc = (migrate) => {
-  getAttrs(
-    [
-      'savepetrificationpolymorph',
-      'savepetrificationpolymorph_base',
-      'savepetrificationpolymorph_racial_mod',
-      'savepetrificationpolymorph_ability_mod',
-      'savepetrificationpolymorph_misc_mod',
-      'savepetrificationpolymorph_temp_mod',
-    ],
-    (v) => {
-      const output = {};
-      const baseSavepetrificationpolymorph = +v.savepetrificationpolymorph_base || 0;
-      const racialSavepetrificationpolymorph = +v.savepetrificationpolymorph_racial_mod || 0;
-      const abilitySavepetrificationpolymorph = +v.savepetrificationpolymorph_ability_mod || 0;
-      const miscSavepetrificationpolymorph = +v.savepetrificationpolymorph_misc_mod || 0;
-      const tempSavepetrificationpolymorph = +v.savepetrificationpolymorph_temp_mod || 0;
-      const oldSave = +v.savepetrificationpolymorph || 0;
-      const newSave = int(
-        baseSavepetrificationpolymorph + racialSavepetrificationpolymorph + abilitySavepetrificationpolymorph + miscSavepetrificationpolymorph + tempSavepetrificationpolymorph,
-      );
-      // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
-      if (migrate === 1) {
-        if (oldSave <= 20 && newSave === 20) {
-          output.savepetrificationpolymorph_base = oldSave;
-          // clog('Old savepetrificationpolymorph copied to Base/Class column');
-        } else {
-          output.savepetrificationpolymorph = newSave;
-        }
-      } else {
-        output.savepetrificationpolymorph = newSave;
-      }
-      setAttrs(output, {silent: true});
-    },
+savepetrificationpolymorphCalc = async (migrate) => {
+  const v = await getAttrsAsync([
+    'savepetrificationpolymorph',
+    'savepetrificationpolymorph_base',
+    'savepetrificationpolymorph_racial_mod',
+    'savepetrificationpolymorph_ability_mod',
+    'savepetrificationpolymorph_misc_mod',
+    'savepetrificationpolymorph_temp_mod',
+  ]);
+  const output = {};
+  const baseSavepetrificationpolymorph = +v.savepetrificationpolymorph_base || 0;
+  const racialSavepetrificationpolymorph = +v.savepetrificationpolymorph_racial_mod || 0;
+  const abilitySavepetrificationpolymorph = +v.savepetrificationpolymorph_ability_mod || 0;
+  const miscSavepetrificationpolymorph = +v.savepetrificationpolymorph_misc_mod || 0;
+  const tempSavepetrificationpolymorph = +v.savepetrificationpolymorph_temp_mod || 0;
+  const oldSave = +v.savepetrificationpolymorph || 0;
+  const newSave = int(
+    baseSavepetrificationpolymorph + racialSavepetrificationpolymorph + abilitySavepetrificationpolymorph + miscSavepetrificationpolymorph + tempSavepetrificationpolymorph,
   );
+  // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
+  if (migrate === 1) {
+    if (oldSave <= 20 && newSave === 20) {
+      output.savepetrificationpolymorph_base = oldSave;
+      // clog('Old savepetrificationpolymorph copied to Base/Class column');
+    } else {
+      output.savepetrificationpolymorph = newSave;
+    }
+  } else {
+    output.savepetrificationpolymorph = newSave;
+  }
+  await setAttrsAsync(output, {silent: true});
 };
 
-saverodsstaveswandsCalc = (migrate) => {
-  getAttrs(
-    [
-      'saverodsstaveswands',
-      'saverodsstaveswands_base',
-      'saverodsstaveswands_racial_mod',
-      'saverodsstaveswands_ability_mod',
-      'saverodsstaveswands_misc_mod',
-      'saverodsstaveswands_temp_mod',
-    ],
-    (v) => {
-      const output = {};
-      const baseSaverodsstaveswands = +v.saverodsstaveswands_base || 0;
-      const racialSaverodsstaveswands = +v.saverodsstaveswands_racial_mod || 0;
-      const abilitySaverodsstaveswands = +v.saverodsstaveswands_ability_mod || 0;
-      const miscSaverodsstaveswands = +v.saverodsstaveswands_misc_mod || 0;
-      const tempSaverodsstaveswands = +v.saverodsstaveswands_temp_mod || 0;
-      const oldSave = +v.saverodsstaveswands || 0;
-      const newSave = int(baseSaverodsstaveswands + racialSaverodsstaveswands + abilitySaverodsstaveswands + miscSaverodsstaveswands + tempSaverodsstaveswands);
-      // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
-      if (migrate === 1) {
-        if (oldSave <= 20 && newSave === 20) {
-          output.saverodsstaveswands_base = oldSave;
-          // clog('Old saverodsstaveswands copied to Base/Class column');
-        } else {
-          output.saverodsstaveswands = newSave;
-        }
-      } else {
-        output.saverodsstaveswands = newSave;
-      }
-      setAttrs(output, {silent: true});
-    },
-  );
+saverodsstaveswandsCalc = async (migrate) => {
+  const v = await getAttrsAsync([
+    'saverodsstaveswands',
+    'saverodsstaveswands_base',
+    'saverodsstaveswands_racial_mod',
+    'saverodsstaveswands_ability_mod',
+    'saverodsstaveswands_misc_mod',
+    'saverodsstaveswands_temp_mod',
+  ]);
+  const output = {};
+  const baseSaverodsstaveswands = +v.saverodsstaveswands_base || 0;
+  const racialSaverodsstaveswands = +v.saverodsstaveswands_racial_mod || 0;
+  const abilitySaverodsstaveswands = +v.saverodsstaveswands_ability_mod || 0;
+  const miscSaverodsstaveswands = +v.saverodsstaveswands_misc_mod || 0;
+  const tempSaverodsstaveswands = +v.saverodsstaveswands_temp_mod || 0;
+  const oldSave = +v.saverodsstaveswands || 0;
+  const newSave = int(baseSaverodsstaveswands + racialSaverodsstaveswands + abilitySaverodsstaveswands + miscSaverodsstaveswands + tempSaverodsstaveswands);
+  // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
+  if (migrate === 1) {
+    if (oldSave <= 20 && newSave === 20) {
+      output.saverodsstaveswands_base = oldSave;
+      // clog('Old saverodsstaveswands copied to Base/Class column');
+    } else {
+      output.saverodsstaveswands = newSave;
+    }
+  } else {
+    output.saverodsstaveswands = newSave;
+  }
+  await setAttrsAsync(output, {silent: true});
 };
 
-savebreathweaponsCalc = (migrate) => {
-  getAttrs(
-    ['savebreathweapons', 'savebreathweapons_base', 'savebreathweapons_racial_mod', 'savebreathweapons_ability_mod', 'savebreathweapons_misc_mod', 'savebreathweapons_temp_mod'],
-    (v) => {
-      const output = {};
-      const baseSavebreathweapons = +v.savebreathweapons_base || 0;
-      const racialSavebreathweapons = +v.savebreathweapons_racial_mod || 0;
-      const abilitySavebreathweapons = +v.savebreathweapons_ability_mod || 0;
-      const miscSavebreathweapons = +v.savebreathweapons_misc_mod || 0;
-      const tempSavebreathweapons = +v.savebreathweapons_temp_mod || 0;
-      const oldSave = +v.savebreathweapons || 0;
-      const newSave = int(baseSavebreathweapons + racialSavebreathweapons + abilitySavebreathweapons + miscSavebreathweapons + tempSavebreathweapons);
-      // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
-      if (migrate === 1) {
-        if (oldSave <= 20 && newSave === 20) {
-          output.savebreathweapons_base = oldSave;
-          // clog('Old savebreathweapons copied to Base/Class column');
-        } else {
-          output.savebreathweapons = newSave;
-        }
-      } else {
-        output.savebreathweapons = newSave;
-      }
-      setAttrs(output, {silent: true});
-    },
-  );
+savebreathweaponsCalc = async (migrate) => {
+  const v = await getAttrsAsync([
+    'savebreathweapons',
+    'savebreathweapons_base',
+    'savebreathweapons_racial_mod',
+    'savebreathweapons_ability_mod',
+    'savebreathweapons_misc_mod',
+    'savebreathweapons_temp_mod',
+  ]);
+  const output = {};
+  const baseSavebreathweapons = +v.savebreathweapons_base || 0;
+  const racialSavebreathweapons = +v.savebreathweapons_racial_mod || 0;
+  const abilitySavebreathweapons = +v.savebreathweapons_ability_mod || 0;
+  const miscSavebreathweapons = +v.savebreathweapons_misc_mod || 0;
+  const tempSavebreathweapons = +v.savebreathweapons_temp_mod || 0;
+  const oldSave = +v.savebreathweapons || 0;
+  const newSave = int(baseSavebreathweapons + racialSavebreathweapons + abilitySavebreathweapons + miscSavebreathweapons + tempSavebreathweapons);
+  // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
+  if (migrate === 1) {
+    if (oldSave <= 20 && newSave === 20) {
+      output.savebreathweapons_base = oldSave;
+      // clog('Old savebreathweapons copied to Base/Class column');
+    } else {
+      output.savebreathweapons = newSave;
+    }
+  } else {
+    output.savebreathweapons = newSave;
+  }
+  await setAttrsAsync(output, {silent: true});
 };
 
-savespellsCalc = (migrate) => {
-  getAttrs(['savespells', 'savespells_base', 'savespells_racial_mod', 'savespells_ability_mod', 'savespells_misc_mod', 'savespells_temp_mod'], (v) => {
-    const output = {};
-    const baseSavespells = +v.savespells_base || 0;
-    const racialSavespells = +v.savespells_racial_mod || 0;
-    const abilitySavespells = +v.savespells_ability_mod || 0;
-    const miscSavespells = +v.savespells_misc_mod || 0;
-    const tempSavespells = +v.savespells_temp_mod || 0;
-    const oldSave = +v.savespells || 0;
-    const newSave = int(baseSavespells + racialSavespells + abilitySavespells + miscSavespells + tempSavespells);
-    // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
-    if (migrate === 1) {
-      if (oldSave <= 20 && newSave === 20) {
-        output.savespells_base = oldSave;
-        // clog('Old savespells copied to Base/Class column');
-      } else {
-        output.savespells = newSave;
-      }
+savespellsCalc = async (migrate) => {
+  const v = await getAttrsAsync(['savespells', 'savespells_base', 'savespells_racial_mod', 'savespells_ability_mod', 'savespells_misc_mod', 'savespells_temp_mod']);
+  const output = {};
+  const baseSavespells = +v.savespells_base || 0;
+  const racialSavespells = +v.savespells_racial_mod || 0;
+  const abilitySavespells = +v.savespells_ability_mod || 0;
+  const miscSavespells = +v.savespells_misc_mod || 0;
+  const tempSavespells = +v.savespells_temp_mod || 0;
+  const oldSave = +v.savespells || 0;
+  const newSave = int(baseSavespells + racialSavespells + abilitySavespells + miscSavespells + tempSavespells);
+  // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
+  if (migrate === 1) {
+    if (oldSave <= 20 && newSave === 20) {
+      output.savespells_base = oldSave;
+      // clog('Old savespells copied to Base/Class column');
     } else {
       output.savespells = newSave;
-      // clog('Save row calculated');
     }
-    setAttrs(output, {silent: true});
-  });
+  } else {
+    output.savespells = newSave;
+    // clog('Save row calculated');
+  }
+  await setAttrsAsync(output, {silent: true});
 };
 
-savemiscCalc = () => {
-  getAttrs(['savemisc', 'savemisc_base', 'savemisc_racial_mod', 'savemisc_ability_mod', 'savemisc_misc_mod', 'savemisc_temp_mod'], (v) => {
-    const output = {};
-    const baseSavemisc = +v.savemisc_base || 0;
-    const racialSavemisc = +v.savemisc_racial_mod || 0;
-    const abilitySavemisc = +v.savemisc_ability_mod || 0;
-    const miscSavemisc = +v.savemisc_misc_mod || 0;
-    const tempSavemisc = +v.savemisc_temp_mod || 0;
-    const newSave = int(baseSavemisc + racialSavemisc + abilitySavemisc + miscSavemisc + tempSavemisc);
-    output.savemisc = newSave;
-    setAttrs(output, {silent: true});
-  });
+savemiscCalc = async () => {
+  const v = await getAttrsAsync(['savemisc', 'savemisc_base', 'savemisc_racial_mod', 'savemisc_ability_mod', 'savemisc_misc_mod', 'savemisc_temp_mod']);
+  const output = {};
+  const baseSavemisc = +v.savemisc_base || 0;
+  const racialSavemisc = +v.savemisc_racial_mod || 0;
+  const abilitySavemisc = +v.savemisc_ability_mod || 0;
+  const miscSavemisc = +v.savemisc_misc_mod || 0;
+  const tempSavemisc = +v.savemisc_temp_mod || 0;
+  const newSave = int(baseSavemisc + racialSavemisc + abilitySavemisc + miscSavemisc + tempSavemisc);
+  output.savemisc = newSave;
+  await setAttrsAsync(output, {silent: true});
 };
 
-savemisc1Calc = () => {
-  getAttrs(['savemisc1', 'savemisc1_base', 'savemisc1_racial_mod', 'savemisc1_ability_mod', 'savemisc1_misc_mod', 'savemisc1_temp_mod'], (v) => {
-    const output = {};
-    const baseSavemisc1 = +v.savemisc1_base || 0;
-    const racialSavemisc1 = +v.savemisc1_racial_mod || 0;
-    const abilitySavemisc1 = +v.savemisc1_ability_mod || 0;
-    const miscSavemisc1 = +v.savemisc1_misc_mod || 0;
-    const tempSavemisc1 = +v.savemisc1_temp_mod || 0;
-    // const oldSave = +v.savemisc1 || 0;
-    const newSave = int(baseSavemisc1 + racialSavemisc1 + abilitySavemisc1 + miscSavemisc1 + tempSavemisc1);
-    output.savemisc1 = newSave;
-    setAttrs(output, {silent: true});
-  });
+savemisc1Calc = async () => {
+  const v = await getAttrsAsync(['savemisc1', 'savemisc1_base', 'savemisc1_racial_mod', 'savemisc1_ability_mod', 'savemisc1_misc_mod', 'savemisc1_temp_mod']);
+  const output = {};
+  const baseSavemisc1 = +v.savemisc1_base || 0;
+  const racialSavemisc1 = +v.savemisc1_racial_mod || 0;
+  const abilitySavemisc1 = +v.savemisc1_ability_mod || 0;
+  const miscSavemisc1 = +v.savemisc1_misc_mod || 0;
+  const tempSavemisc1 = +v.savemisc1_temp_mod || 0;
+  // const oldSave = +v.savemisc1 || 0;
+  const newSave = int(baseSavemisc1 + racialSavemisc1 + abilitySavemisc1 + miscSavemisc1 + tempSavemisc1);
+  output.savemisc1 = newSave;
+  await setAttrsAsync(output, {silent: true});
 };
 
-savemisc2Calc = () => {
-  getAttrs(['savemisc2', 'savemisc2_base', 'savemisc2_racial_mod', 'savemisc2_ability_mod', 'savemisc2_misc_mod', 'savemisc2_temp_mod'], (v) => {
-    const output = {};
-    const baseSavemisc2 = +v.savemisc2_base || 0;
-    const racialSavemisc2 = +v.savemisc2_racial_mod || 0;
-    const abilitySavemisc2 = +v.savemisc2_ability_mod || 0;
-    const miscSavemisc2 = +v.savemisc2_misc_mod || 0;
-    const tempSavemisc2 = +v.savemisc2_temp_mod || 0;
-    // const oldSave = +v.savemisc1 || 0;
-    const newSave = int(baseSavemisc2 + racialSavemisc2 + abilitySavemisc2 + miscSavemisc2 + tempSavemisc2);
-    output.savemisc2 = newSave;
-    setAttrs(output, {silent: true});
-  });
+savemisc2Calc = async () => {
+  const v = await getAttrsAsync(['savemisc2', 'savemisc2_base', 'savemisc2_racial_mod', 'savemisc2_ability_mod', 'savemisc2_misc_mod', 'savemisc2_temp_mod']);
+  const output = {};
+  const baseSavemisc2 = +v.savemisc2_base || 0;
+  const racialSavemisc2 = +v.savemisc2_racial_mod || 0;
+  const abilitySavemisc2 = +v.savemisc2_ability_mod || 0;
+  const miscSavemisc2 = +v.savemisc2_misc_mod || 0;
+  const tempSavemisc2 = +v.savemisc2_temp_mod || 0;
+  // const oldSave = +v.savemisc1 || 0;
+  const newSave = int(baseSavemisc2 + racialSavemisc2 + abilitySavemisc2 + miscSavemisc2 + tempSavemisc2);
+  output.savemisc2 = newSave;
+  await setAttrsAsync(output, {silent: true});
 };
 
 on(
