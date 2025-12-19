@@ -7647,34 +7647,33 @@ on('change:charisma change:comeliness', (eventInfo) => {
   charismaCalcs();
 });
 
-portraitUrlCalc = () => {
-  getAttrs(['character_avatar', 'sheet_image', 'sheet_image_url'], (v) => {
-    const output = {};
-    const whichImage = +v.sheet_image || 0;
-    // roll20 urls includes extra meta after the image extension
-    const avatarURL = (function getAvatarUrl(url) {
-      // check url for common image extension
-      const extensions = /(\.png|\.jpg|\.gif)/i;
-      const match = url.match(extensions);
-      // trim excess after extension
-      if (match) {
-        return url.slice(0, match.index + match[0].length);
-      }
-      return url;
-    })(v.character_avatar);
+portraitUrlCalc = async () => {
+  const v = await getAttrsAsync(['character_avatar', 'sheet_image', 'sheet_image_url']);
+  const output = {};
+  const whichImage = +v.sheet_image || 0;
+  // roll20 urls includes extra meta after the image extension
+  const avatarURL = (function getAvatarUrl(url) {
+    // check url for common image extension
+    const extensions = /(\.png|\.jpg|\.gif)/i;
+    const match = url.match(extensions);
+    // trim excess after extension
+    if (match) {
+      return url.slice(0, match.index + match[0].length);
+    }
+    return url;
+  })(v.character_avatar);
 
-    const sheetURL = v.sheet_image_url || avatarURL;
-    if (whichImage === 0) {
-      output.sheet_image_src = sheetURL;
-    }
-    if (whichImage === 1) {
-      output.sheet_image_src = avatarURL;
-    }
-    if (whichImage === 2) {
-      output.sheet_image_src = '';
-    }
-    setAttrs(output, {silent: true});
-  });
+  const sheetURL = v.sheet_image_url || avatarURL;
+  if (whichImage === 0) {
+    output.sheet_image_src = sheetURL;
+  }
+  if (whichImage === 1) {
+    output.sheet_image_src = avatarURL;
+  }
+  if (whichImage === 2) {
+    output.sheet_image_src = '';
+  }
+  await setAttrsAsync(output, {silent: true});
 };
 
 on('change:character_avatar change:sheet_image change:sheet_image_url', (eventInfo) => {
