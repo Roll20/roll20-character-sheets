@@ -7523,50 +7523,47 @@ charismaCalcs = async () => {
   await setAttrs(output, {silent: true});
 };
 
-thiefSkillsDexCalcs = (autofill_thief_dex) => {
-  getAttrs(['dexterity'], (values) => {
-    const output = {};
-    //get dexterity value and look up table data
-    const stat_dex = parseValues(values, 'dexterity', 'int');
-    const pickPockets = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getPickPockets();
-    const openLocks = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getOpenLocks();
-    const findRemoveTraps = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getFindRemoveTraps();
-    const moveSilently = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getMoveSilently();
-    const hideInShadows = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getHideInShadows();
-    output.pickpockets_ability_mod = autofill_thief_dex === 1 ? pickPockets : 0;
-    output.openlocks_ability_mod = autofill_thief_dex === 1 ? openLocks : 0;
-    output.findtraps_ability_mod = autofill_thief_dex === 1 ? findRemoveTraps : 0;
-    output.movequietly_ability_mod = autofill_thief_dex === 1 ? moveSilently : 0;
-    output.hideinshadows_ability_mod = autofill_thief_dex === 1 ? hideInShadows : 0;
-    setAttrs(output);
-  });
+thiefSkillsDexCalcs = async (autofill_thief_dex) => {
+  const values = await getAttrsAsync(['dexterity']);
+  const output = {};
+  //get dexterity value and look up table data
+  const stat_dex = await parseValues(values, 'dexterity', 'int');
+  const pickPockets = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getPickPockets();
+  const openLocks = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getOpenLocks();
+  const findRemoveTraps = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getFindRemoveTraps();
+  const moveSilently = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getMoveSilently();
+  const hideInShadows = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getHideInShadows();
+  output.pickpockets_ability_mod = autofill_thief_dex === 1 ? pickPockets : 0;
+  output.openlocks_ability_mod = autofill_thief_dex === 1 ? openLocks : 0;
+  output.findtraps_ability_mod = autofill_thief_dex === 1 ? findRemoveTraps : 0;
+  output.movequietly_ability_mod = autofill_thief_dex === 1 ? moveSilently : 0;
+  output.hideinshadows_ability_mod = autofill_thief_dex === 1 ? hideInShadows : 0;
+  await setAttrsAsync(output);
 };
 
-thiefSkillsRacialCalcs = (autofill_thief_race) => {
-  getAttrs(['thief_race_selected'], (values) => {
-    const output = {};
-    //get racial value from select and look up table data
-    const stat_dex = parseValues(values, 'thief_race_selected', 'int');
-    const pickPockets = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getPickPockets();
-    const openLocks = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getOpenLocks();
-    const findRemoveTraps = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getFindRemoveTraps();
-    const moveSilently = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getMoveSilently();
-    const hideInShadows = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getHideInShadows();
-    const hearNoise = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getHearNoise();
-    const climbWalls = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getClimbWalls();
-    const readLanguages = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getReadLanguages();
+thiefSkillsRacialCalcs = async (autofill_thief_race) => {
+  const values = await getAttrsAsync(['thief_race_selected']);
+  const output = {};
+  //get racial value from select and look up table data
+  const stat_dex = await parseValues(values, 'thief_race_selected', 'int');
+  const pickPockets = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getPickPockets();
+  const openLocks = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getOpenLocks();
+  const findRemoveTraps = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getFindRemoveTraps();
+  const moveSilently = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getMoveSilently();
+  const hideInShadows = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getHideInShadows();
+  const hearNoise = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getHearNoise();
+  const climbWalls = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getClimbWalls();
+  const readLanguages = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getReadLanguages();
 
-    output.pickpockets_racial_mod = autofill_thief_race === 1 ? pickPockets : 0;
-    output.openlocks_racial_mod = autofill_thief_race === 1 ? openLocks : 0;
-    output.findtraps_racial_mod = autofill_thief_race === 1 ? findRemoveTraps : 0;
-    output.movequietly_racial_mod = autofill_thief_race === 1 ? moveSilently : 0;
-    output.hideinshadows_racial_mod = autofill_thief_race === 1 ? hideInShadows : 0;
-    output.hearnoise_racial_mod = autofill_thief_race === 1 ? hearNoise : 0;
-    output.climbwalls_racial_mod = autofill_thief_race === 1 ? climbWalls : 0;
-    output.readlanguages_racial_mod = autofill_thief_race === 1 ? readLanguages : 0;
-
-    setAttrs(output);
-  });
+  output.pickpockets_racial_mod = autofill_thief_race === 1 ? pickPockets : 0;
+  output.openlocks_racial_mod = autofill_thief_race === 1 ? openLocks : 0;
+  output.findtraps_racial_mod = autofill_thief_race === 1 ? findRemoveTraps : 0;
+  output.movequietly_racial_mod = autofill_thief_race === 1 ? moveSilently : 0;
+  output.hideinshadows_racial_mod = autofill_thief_race === 1 ? hideInShadows : 0;
+  output.hearnoise_racial_mod = autofill_thief_race === 1 ? hearNoise : 0;
+  output.climbwalls_racial_mod = autofill_thief_race === 1 ? climbWalls : 0;
+  output.readlanguages_racial_mod = autofill_thief_race === 1 ? readLanguages : 0;
+  await setAttrsAsync(output);
 };
 
 // Thief Skills Dex Calculations
