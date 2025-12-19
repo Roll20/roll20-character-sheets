@@ -7597,21 +7597,18 @@ function matchRaceName(name) {
 }
 
 // Thief Skills Racial Calculations
-on('change:race change:autofill_thief_race change:thief_race_selected', (eventInfo) => {
+on('change:race change:autofill_thief_race change:thief_race_selected', async (eventInfo) => {
   const triggerAttr = eventInfo.sourceAttribute;
-  getAttrs(['race', 'autofill_thief_race'], (v) => {
-    const output = {};
-    const autofill_thief_race = +v.autofill_thief_race || 0;
-
-    // check attr_race for a match to the race selector
-    const race = (v.race || 'human').trim();
-    if (triggerAttr === 'autofill_thief_race' || triggerAttr === 'race') {
-      output.thief_race_selected = matchRaceName(race);
-    }
-    setAttrs(output, {silent: true}, () => {
-      thiefSkillsRacialCalcs(autofill_thief_race);
-    });
-  });
+  const v = await getAttrsAsync(['race', 'autofill_thief_race']);
+  const output = {};
+  const autofill_thief_race = +v.autofill_thief_race || 0;
+  // check attr_race for a match to the race selector
+  const race = (v.race || 'human').trim();
+  if (triggerAttr === 'autofill_thief_race' || triggerAttr === 'race') {
+    output.thief_race_selected = matchRaceName(race);
+  }
+  await setAttrsAsync(output, {silent: true});
+  thiefSkillsRacialCalcs(autofill_thief_race);
 });
 
 // Strength Calculations
