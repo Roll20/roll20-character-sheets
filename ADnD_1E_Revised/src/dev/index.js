@@ -5741,36 +5741,35 @@ async function matchClassName(name) {
 }
 
 // THAC0
-function calcThac0() {
-  getAttrs(['thac00', 'autofill_matrix'], (v) => {
-    const autocalcFill = +v.autofill_matrix || 0;
-    // bail out if auto-fill is not enabled.
-    if (!autocalcFill) return;
+async function calcThac0() {
+  const v = await getAttrsAsync(['thac00', 'autofill_matrix']);
+  const autocalcFill = +v.autofill_matrix || 0;
+  // bail out if auto-fill is not enabled.
+  if (!autocalcFill) return;
 
-    const output = {};
-    const baseThac0 = +v.thac00 || 0;
-    output[`thac0-10`] = baseThac0 + 10;
-    output[`thac0-9`] = baseThac0 + 9;
-    output[`thac0-8`] = baseThac0 + 8;
-    output[`thac0-7`] = baseThac0 + 7;
-    output[`thac0-6`] = baseThac0 + 6;
-    output[`thac0-5`] = baseThac0 + 5;
-    output[`thac0-4`] = baseThac0 + 4;
-    output[`thac0-3`] = baseThac0 + 3;
-    output[`thac0-2`] = baseThac0 + 2;
-    output[`thac0-1`] = baseThac0 + 1;
-    output.thac01 = baseThac0 - 1;
-    output.thac02 = baseThac0 - 2;
-    output.thac03 = baseThac0 - 3;
-    output.thac04 = baseThac0 - 4;
-    output.thac05 = baseThac0 - 5;
-    output.thac06 = baseThac0 - 6;
-    output.thac07 = baseThac0 - 7;
-    output.thac08 = baseThac0 - 8;
-    output.thac09 = baseThac0 - 9;
-    output.thac010 = baseThac0 - 10;
-    setAttrs(output, {silent: true});
-  });
+  const output = {};
+  const baseThac0 = +v.thac00 || 0;
+  output[`thac0-10`] = baseThac0 + 10;
+  output[`thac0-9`] = baseThac0 + 9;
+  output[`thac0-8`] = baseThac0 + 8;
+  output[`thac0-7`] = baseThac0 + 7;
+  output[`thac0-6`] = baseThac0 + 6;
+  output[`thac0-5`] = baseThac0 + 5;
+  output[`thac0-4`] = baseThac0 + 4;
+  output[`thac0-3`] = baseThac0 + 3;
+  output[`thac0-2`] = baseThac0 + 2;
+  output[`thac0-1`] = baseThac0 + 1;
+  output.thac01 = baseThac0 - 1;
+  output.thac02 = baseThac0 - 2;
+  output.thac03 = baseThac0 - 3;
+  output.thac04 = baseThac0 - 4;
+  output.thac05 = baseThac0 - 5;
+  output.thac06 = baseThac0 - 6;
+  output.thac07 = baseThac0 - 7;
+  output.thac08 = baseThac0 - 8;
+  output.thac09 = baseThac0 - 9;
+  output.thac010 = baseThac0 - 10;
+  await setAttrsAsync(output, {silent: true});
 }
 
 // Attack Matrix Autofill To-Hit table
