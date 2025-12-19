@@ -5621,325 +5621,98 @@ on('change:savemisc2_base change:savemisc2_racial_mod change:savemisc2_ability_m
 });
 
 // Saves Autofill Base Column
-on('change:saves_class change:saves_level change:autofill_saves', (eventInfo) => {
-  clog(`Saves Autofill Change Detected:${eventInfo.sourceAttribute}`);
-  getAttrs(['saves_class', 'saves_level', 'autofill_saves'], (v) => {
-    const autocalcFill = +v.autofill_saves || 0;
-    // bail out if auto-fill is not enabled.
-    if (!autocalcFill) return;
+on('change:saves_class change:saves_level change:autofill_saves', async (eventInfo) => {
+  const v = await getAttrsAsync(['saves_class', 'saves_level', 'autofill_saves']);
+  const autofillSaves = +v.autofill_saves || 0;
+  if (!autofillSaves) return;
 
-    const output = {};
-    const classSelected = +v.saves_class || 0;
-    const levelSelected = +v.saves_level || 0;
-    clog(`Class:${classSelected} Level:${levelSelected}`);
-    // do saves per class and level here
-    if (classSelected === 0) return;
-    // Cleric
-    if (classSelected === 1) {
-      if (levelSelected === 0) {
-        // clog('Need to choose a class level greater than 0 to continue.');
-      } else if (levelSelected < 4) {
-        output.saveparalysispoisondeath_base = 10;
-        output.savepetrificationpolymorph_base = 13;
-        output.saverodsstaveswands_base = 14;
-        output.savebreathweapons_base = 16;
-        output.savespells_base = 15;
-      } else if (levelSelected < 7) {
-        output.saveparalysispoisondeath_base = 9;
-        output.savepetrificationpolymorph_base = 12;
-        output.saverodsstaveswands_base = 13;
-        output.savebreathweapons_base = 15;
-        output.savespells_base = 14;
-      } else if (levelSelected < 10) {
-        output.saveparalysispoisondeath_base = 7;
-        output.savepetrificationpolymorph_base = 10;
-        output.saverodsstaveswands_base = 11;
-        output.savebreathweapons_base = 13;
-        output.savespells_base = 12;
-      } else if (levelSelected < 13) {
-        output.saveparalysispoisondeath_base = 6;
-        output.savepetrificationpolymorph_base = 9;
-        output.saverodsstaveswands_base = 10;
-        output.savebreathweapons_base = 12;
-        output.savespells_base = 11;
-      } else if (levelSelected < 16) {
-        output.saveparalysispoisondeath_base = 5;
-        output.savepetrificationpolymorph_base = 8;
-        output.saverodsstaveswands_base = 9;
-        output.savebreathweapons_base = 11;
-        output.savespells_base = 10;
-      } else if (levelSelected < 19) {
-        output.saveparalysispoisondeath_base = 4;
-        output.savepetrificationpolymorph_base = 7;
-        output.saverodsstaveswands_base = 8;
-        output.savebreathweapons_base = 10;
-        output.savespells_base = 9;
-      } else if (levelSelected >= 19) {
-        output.saveparalysispoisondeath_base = 2;
-        output.savepetrificationpolymorph_base = 5;
-        output.saverodsstaveswands_base = 6;
-        output.savebreathweapons_base = 8;
-        output.savespells_base = 7;
-      }
-    }
-    // Druid
-    if (classSelected === 2) {
-      if (levelSelected === 0) {
-        // clog('Need to choose a class level greater than 0 to continue.');
-      } else if (levelSelected < 4) {
-        output.saveparalysispoisondeath_base = 10;
-        output.savepetrificationpolymorph_base = 13;
-        output.saverodsstaveswands_base = 14;
-        output.savebreathweapons_base = 16;
-        output.savespells_base = 15;
-      } else if (levelSelected < 7) {
-        output.saveparalysispoisondeath_base = 9;
-        output.savepetrificationpolymorph_base = 12;
-        output.saverodsstaveswands_base = 13;
-        output.savebreathweapons_base = 15;
-        output.savespells_base = 14;
-      } else if (levelSelected < 10) {
-        output.saveparalysispoisondeath_base = 7;
-        output.savepetrificationpolymorph_base = 10;
-        output.saverodsstaveswands_base = 11;
-        output.savebreathweapons_base = 13;
-        output.savespells_base = 12;
-      } else if (levelSelected < 13) {
-        output.saveparalysispoisondeath_base = 6;
-        output.savepetrificationpolymorph_base = 9;
-        output.saverodsstaveswands_base = 10;
-        output.savebreathweapons_base = 12;
-        output.savespells_base = 11;
-      } else if (levelSelected < 16) {
-        output.saveparalysispoisondeath_base = 5;
-        output.savepetrificationpolymorph_base = 8;
-        output.saverodsstaveswands_base = 9;
-        output.savebreathweapons_base = 11;
-        output.savespells_base = 10;
-      } else if (levelSelected >= 16) {
-        output.saveparalysispoisondeath_base = 5;
-        output.savepetrificationpolymorph_base = 8;
-        output.saverodsstaveswands_base = 9;
-        output.savebreathweapons_base = 11;
-        output.savespells_base = 10;
-      }
-    }
-    // Fighter, Paladin, or Ranger or Other 0-lvl Types
-    if (classSelected === 3 || classSelected === 8) {
-      if (levelSelected === 0) {
-        output.saveparalysispoisondeath_base = 16;
-        output.savepetrificationpolymorph_base = 17;
-        output.saverodsstaveswands_base = 18;
-        output.savebreathweapons_base = 20;
-        output.savespells_base = 19;
-      } else if (levelSelected < 3) {
-        output.saveparalysispoisondeath_base = 14;
-        output.savepetrificationpolymorph_base = 15;
-        output.saverodsstaveswands_base = 16;
-        output.savebreathweapons_base = 17;
-        output.savespells_base = 17;
-      } else if (levelSelected < 5) {
-        output.saveparalysispoisondeath_base = 13;
-        output.savepetrificationpolymorph_base = 14;
-        output.saverodsstaveswands_base = 15;
-        output.savebreathweapons_base = 16;
-        output.savespells_base = 16;
-      } else if (levelSelected < 7) {
-        output.saveparalysispoisondeath_base = 11;
-        output.savepetrificationpolymorph_base = 12;
-        output.saverodsstaveswands_base = 13;
-        output.savebreathweapons_base = 13;
-        output.savespells_base = 14;
-      } else if (levelSelected < 9) {
-        output.saveparalysispoisondeath_base = 10;
-        output.savepetrificationpolymorph_base = 11;
-        output.saverodsstaveswands_base = 12;
-        output.savebreathweapons_base = 12;
-        output.savespells_base = 13;
-      } else if (levelSelected < 11) {
-        output.saveparalysispoisondeath_base = 8;
-        output.savepetrificationpolymorph_base = 9;
-        output.saverodsstaveswands_base = 10;
-        output.savebreathweapons_base = 9;
-        output.savespells_base = 11;
-      } else if (levelSelected < 13) {
-        output.saveparalysispoisondeath_base = 7;
-        output.savepetrificationpolymorph_base = 8;
-        output.saverodsstaveswands_base = 9;
-        output.savebreathweapons_base = 8;
-        output.savespells_base = 10;
-      } else if (levelSelected < 15) {
-        output.saveparalysispoisondeath_base = 5;
-        output.savepetrificationpolymorph_base = 6;
-        output.saverodsstaveswands_base = 7;
-        output.savebreathweapons_base = 5;
-        output.savespells_base = 8;
-      } else if (levelSelected < 17) {
-        output.saveparalysispoisondeath_base = 4;
-        output.savepetrificationpolymorph_base = 5;
-        output.saverodsstaveswands_base = 6;
-        output.savebreathweapons_base = 4;
-        output.savespells_base = 7;
-      } else if (levelSelected >= 17) {
-        output.saveparalysispoisondeath_base = 3;
-        output.savepetrificationpolymorph_base = 4;
-        output.saverodsstaveswands_base = 5;
-        output.savebreathweapons_base = 4;
-        output.savespells_base = 6;
-      }
-    }
-    // Magic-User or Illusionist
-    if (classSelected === 4) {
-      if (levelSelected === 0) {
-        // clog('Need to choose a class level greater than 0 to continue.');
-      } else if (levelSelected < 6) {
-        output.saveparalysispoisondeath_base = 14;
-        output.savepetrificationpolymorph_base = 13;
-        output.saverodsstaveswands_base = 11;
-        output.savebreathweapons_base = 15;
-        output.savespells_base = 12;
-      } else if (levelSelected < 11) {
-        output.saveparalysispoisondeath_base = 13;
-        output.savepetrificationpolymorph_base = 11;
-        output.saverodsstaveswands_base = 9;
-        output.savebreathweapons_base = 13;
-        output.savespells_base = 10;
-      } else if (levelSelected < 16) {
-        output.saveparalysispoisondeath_base = 11;
-        output.savepetrificationpolymorph_base = 9;
-        output.saverodsstaveswands_base = 7;
-        output.savebreathweapons_base = 11;
-        output.savespells_base = 8;
-      } else if (levelSelected < 21) {
-        output.saveparalysispoisondeath_base = 10;
-        output.savepetrificationpolymorph_base = 7;
-        output.saverodsstaveswands_base = 5;
-        output.savebreathweapons_base = 9;
-        output.savespells_base = 6;
-      } else if (levelSelected >= 21) {
-        output.saveparalysispoisondeath_base = 8;
-        output.savepetrificationpolymorph_base = 5;
-        output.saverodsstaveswands_base = 3;
-        output.savebreathweapons_base = 7;
-        output.savespells_base = 4;
-      }
-    }
-    // Thief
-    if (classSelected === 5) {
-      if (levelSelected === 0) {
-        // clog('Need to choose a class level greater than 0 to continue.');
-      } else if (levelSelected < 5) {
-        output.saveparalysispoisondeath_base = 13;
-        output.savepetrificationpolymorph_base = 12;
-        output.saverodsstaveswands_base = 14;
-        output.savebreathweapons_base = 16;
-        output.savespells_base = 15;
-      } else if (levelSelected < 9) {
-        output.saveparalysispoisondeath_base = 12;
-        output.savepetrificationpolymorph_base = 11;
-        output.saverodsstaveswands_base = 12;
-        output.savebreathweapons_base = 15;
-        output.savespells_base = 13;
-      } else if (levelSelected < 13) {
-        output.saveparalysispoisondeath_base = 11;
-        output.savepetrificationpolymorph_base = 10;
-        output.saverodsstaveswands_base = 10;
-        output.savebreathweapons_base = 14;
-        output.savespells_base = 11;
-      } else if (levelSelected < 17) {
-        output.saveparalysispoisondeath_base = 10;
-        output.savepetrificationpolymorph_base = 9;
-        output.saverodsstaveswands_base = 8;
-        output.savebreathweapons_base = 13;
-        output.savespells_base = 9;
-      } else if (levelSelected < 21) {
-        output.saveparalysispoisondeath_base = 9;
-        output.savepetrificationpolymorph_base = 8;
-        output.saverodsstaveswands_base = 6;
-        output.savebreathweapons_base = 12;
-        output.savespells_base = 7;
-      } else if (levelSelected >= 21) {
-        output.saveparalysispoisondeath_base = 8;
-        output.savepetrificationpolymorph_base = 7;
-        output.saverodsstaveswands_base = 4;
-        output.savebreathweapons_base = 11;
-        output.savespells_base = 5;
-      }
-    }
-    // Monk
-    if (classSelected === 6) {
-      if (levelSelected === 0) {
-        // clog('Need to choose a class level greater than 0 to continue.');
-      } else if (levelSelected < 5) {
-        output.saveparalysispoisondeath_base = 13;
-        output.savepetrificationpolymorph_base = 12;
-        output.saverodsstaveswands_base = 14;
-        output.savebreathweapons_base = 16;
-        output.savespells_base = 15;
-      } else if (levelSelected < 9) {
-        output.saveparalysispoisondeath_base = 12;
-        output.savepetrificationpolymorph_base = 11;
-        output.saverodsstaveswands_base = 12;
-        output.savebreathweapons_base = 15;
-        output.savespells_base = 13;
-      } else if (levelSelected < 13) {
-        output.saveparalysispoisondeath_base = 11;
-        output.savepetrificationpolymorph_base = 10;
-        output.saverodsstaveswands_base = 10;
-        output.savebreathweapons_base = 14;
-        output.savespells_base = 11;
-      } else if (levelSelected < 17) {
-        output.saveparalysispoisondeath_base = 10;
-        output.savepetrificationpolymorph_base = 9;
-        output.saverodsstaveswands_base = 8;
-        output.savebreathweapons_base = 13;
-        output.savespells_base = 9;
-      } else if (levelSelected >= 17) {
-        output.saveparalysispoisondeath_base = 9;
-        output.savepetrificationpolymorph_base = 8;
-        output.saverodsstaveswands_base = 6;
-        output.savebreathweapons_base = 12;
-        output.savespells_base = 7;
-      }
-    }
-    // Assassin
-    if (classSelected === 7) {
-      if (levelSelected === 0) {
-        // clog('Need to choose a class level greater than 0 to continue.');
-      } else if (levelSelected < 5) {
-        output.saveparalysispoisondeath_base = 13;
-        output.savepetrificationpolymorph_base = 12;
-        output.saverodsstaveswands_base = 14;
-        output.savebreathweapons_base = 16;
-        output.savespells_base = 15;
-      } else if (levelSelected < 9) {
-        output.saveparalysispoisondeath_base = 12;
-        output.savepetrificationpolymorph_base = 11;
-        output.saverodsstaveswands_base = 12;
-        output.savebreathweapons_base = 15;
-        output.savespells_base = 13;
-      } else if (levelSelected < 13) {
-        output.saveparalysispoisondeath_base = 11;
-        output.savepetrificationpolymorph_base = 10;
-        output.saverodsstaveswands_base = 10;
-        output.savebreathweapons_base = 14;
-        output.savespells_base = 11;
-      } else if (levelSelected < 16) {
-        output.saveparalysispoisondeath_base = 10;
-        output.savepetrificationpolymorph_base = 9;
-        output.saverodsstaveswands_base = 8;
-        output.savebreathweapons_base = 13;
-        output.savespells_base = 9;
-      } else if (levelSelected >= 16) {
-        output.saveparalysispoisondeath_base = 10;
-        output.savepetrificationpolymorph_base = 9;
-        output.saverodsstaveswands_base = 8;
-        output.savebreathweapons_base = 13;
-        output.savespells_base = 9;
-      }
-    }
-    setAttrs(output);
+  const classID = +v.saves_class || 0;
+  if (!classID) return;
+
+  const saveKeys = ['saveparalysispoisondeath_base', 'savepetrificationpolymorph_base', 'saverodsstaveswands_base', 'savebreathweapons_base', 'savespells_base'];
+
+  // lvl is the UPPER LIMIT
+  // lvl 99 acts as a catch-all.
+  const tables = {
+    assassin: [
+      {lvl: 5, s: [13, 12, 14, 16, 15]},
+      {lvl: 9, s: [12, 11, 12, 15, 13]},
+      {lvl: 13, s: [11, 10, 10, 14, 11]},
+      {lvl: 16, s: [10, 9, 8, 13, 9]},
+      {lvl: 99, s: [10, 9, 8, 13, 9]},
+    ],
+    cleric: [
+      {lvl: 4, s: [10, 13, 14, 16, 15]},
+      {lvl: 7, s: [9, 12, 13, 15, 14]},
+      {lvl: 10, s: [7, 10, 11, 13, 12]},
+      {lvl: 13, s: [6, 9, 10, 12, 11]},
+      {lvl: 16, s: [5, 8, 9, 11, 10]},
+      {lvl: 19, s: [4, 7, 8, 10, 9]},
+      {lvl: 99, s: [2, 5, 6, 8, 7]},
+    ],
+    druid: [
+      {lvl: 4, s: [10, 13, 14, 16, 15]},
+      {lvl: 7, s: [9, 12, 13, 15, 14]},
+      {lvl: 10, s: [7, 10, 11, 13, 12]},
+      {lvl: 13, s: [6, 9, 10, 12, 11]},
+      {lvl: 15, s: [5, 8, 9, 11, 10]},
+      {lvl: 99, s: [5, 8, 9, 11, 10]},
+    ],
+    fighter: [
+      {lvl: 1, s: [16, 17, 18, 20, 19]}, // Level 0 case
+      {lvl: 3, s: [14, 15, 16, 17, 17]},
+      {lvl: 5, s: [13, 14, 15, 16, 16]},
+      {lvl: 7, s: [11, 12, 13, 13, 14]},
+      {lvl: 9, s: [10, 11, 12, 12, 13]},
+      {lvl: 11, s: [8, 9, 10, 9, 11]},
+      {lvl: 13, s: [7, 8, 9, 8, 10]},
+      {lvl: 15, s: [5, 6, 7, 5, 8]},
+      {lvl: 17, s: [4, 5, 6, 4, 7]},
+      {lvl: 99, s: [3, 4, 5, 4, 6]},
+    ],
+    magicuser: [
+      {lvl: 6, s: [14, 13, 11, 15, 12]},
+      {lvl: 11, s: [13, 11, 9, 13, 10]},
+      {lvl: 16, s: [11, 9, 7, 11, 8]},
+      {lvl: 21, s: [10, 7, 5, 9, 6]},
+      {lvl: 99, s: [8, 5, 3, 7, 4]},
+    ],
+    thief: [
+      {lvl: 5, s: [13, 12, 14, 16, 15]},
+      {lvl: 9, s: [12, 11, 12, 15, 13]},
+      {lvl: 13, s: [11, 10, 10, 14, 11]},
+      {lvl: 17, s: [10, 9, 8, 13, 9]},
+      {lvl: 21, s: [9, 8, 6, 12, 7]},
+      {lvl: 99, s: [8, 7, 4, 11, 5]},
+    ],
+  };
+
+  // Map Class IDs to the correct Table data
+  const classMap = {
+    1: tables.cleric,
+    2: tables.druid, // Druid (modified if lvl >=16 in your logic)
+    3: tables.fighter,
+    4: tables.magicuser,
+    5: tables.thief,
+    6: tables.thief, // Monk
+    7: tables.assassin, // Assassin
+    8: tables.fighter, // Paladin/Ranger
+  };
+
+  const selectedTable = classMap[classID];
+  if (!selectedTable) return;
+
+  // Find the correct row based on level
+  const level = +v.saves_level || 0;
+  // .find() returns the first element where the condition is true
+  const row = selectedTable.find((entry) => level < entry.lvl) || selectedTable[selectedTable.length - 1];
+
+  const output = {};
+  saveKeys.forEach((key, index) => {
+    output[key] = row.s[index];
   });
+  await setAttrsAsync(output);
+  // clog(`Base SAVES: Class ${classID}, Level ${level}. Values: ${JSON.stringify(output)}`);
 });
 
 // toggle monster HD selector
