@@ -5775,1050 +5775,1047 @@ async function calcThac0() {
 // Attack Matrix Autofill To-Hit table
 on(
   'change:matrix_class change:matrix_level change:matrix_hitdice change:autofill_matrix change:sync_matrix_class change:toggle_fighter5 change:class_selected change:class change:secondclass change:thirdclass change:level change:level_2 change:level_3',
-  (eventInfo) => {
+  async (eventInfo) => {
     // clog(`Matrix Autofill Change Detected:${eventInfo.sourceAttribute}`);
-    getAttrs(
-      [
-        'matrix_class',
-        'matrix_level',
-        'matrix_hitdice',
-        'autofill_matrix',
-        'toggle_fighter5',
-        'sync_matrix_class',
-        'class_selected',
-        'class',
-        'secondclass',
-        'thirdclass',
-        'level',
-        'level_2',
-        'level_3',
-      ],
-      (v) => {
-        const autocalcFill = +v.autofill_matrix || 0;
-        // bail out if auto-fill is not enabled.
-        if (!autocalcFill) return;
+    const v = await getAttrsAsync([
+      'matrix_class',
+      'matrix_level',
+      'matrix_hitdice',
+      'autofill_matrix',
+      'toggle_fighter5',
+      'sync_matrix_class',
+      'class_selected',
+      'class',
+      'secondclass',
+      'thirdclass',
+      'level',
+      'level_2',
+      'level_3',
+    ]);
+    const autocalcFill = +v.autofill_matrix || 0;
+    // bail out if auto-fill is not enabled.
+    if (!autocalcFill) return;
 
-        const output = {};
-        const syncClass = +v.sync_matrix_class || 0;
-        const classLinked = +v.class_selected || 0;
-        let levelSelected = +v.matrix_level || 0;
-        let classSelected = +v.matrix_class || 0;
-        const class1Name = (v.class || '').trim();
-        const class2Name = (v.secondclass || '').trim();
-        const class3Name = (v.thirdclass || '').trim();
-        const hitdiceSelected = +v.matrix_hitdice || 0;
-        const fighter5Selected = +v.toggle_fighter5 || 0;
-        // sync enabled?
-        // check for selected class and use that class level unless changed
-        if (syncClass === 1) {
-          if (classLinked === 1) {
-            // clog(`Linked Class is: ${class1Name} Current Level:${v.level}`);
-            classSelected = matchClassName(class1Name);
-            levelSelected = +v.level || 0;
-            output.matrix_level = levelSelected;
-            output.matrix_class = classSelected;
-          }
-          if (classLinked === 2) {
-            // clog(`Linked Class is: ${class2Name} Current Level:${v.level_2}`);
-            classSelected = matchClassName(class2Name);
-            levelSelected = +v.level_2 || 0;
-            output.matrix_level = levelSelected;
-            output.matrix_class = classSelected;
-          }
-          if (classLinked === 3) {
-            // clog(`Linked Class is: ${class3Name} Current Level:${v.level_3}`);
-            classSelected = matchClassName(class3Name);
-            levelSelected = +v.level_3 || 0;
-            output.matrix_level = levelSelected;
-            output.matrix_class = classSelected;
-          }
-        }
-        // clog('Ready to autofill attack matrix.');
-        if (classSelected === 0) return;
-        // clerics table
-        if (classSelected === 1) {
-          if (levelSelected === 0) {
-            // clog('Need to choose a class level greater than 0 to continue.');
-          } else if (levelSelected < 4) {
-            output[`thac-10`] = 25;
-            output[`thac-9`] = 24;
-            output[`thac-8`] = 23;
-            output[`thac-7`] = 22;
-            output[`thac-6`] = 21;
-            output[`thac-5`] = 20;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 20;
-            output[`thac-2`] = 20;
-            output[`thac-1`] = 20;
-            output.thac00 = 20;
-            output.thac0 = 20;
-            output.thac1 = 19;
-            output.thac2 = 18;
-            output.thac3 = 17;
-            output.thac4 = 16;
-            output.thac5 = 15;
-            output.thac6 = 14;
-            output.thac7 = 13;
-            output.thac8 = 12;
-            output.thac9 = 11;
-            output.thac10 = 10;
-          } else if (levelSelected < 7) {
-            output[`thac-10`] = 23;
-            output[`thac-9`] = 22;
-            output[`thac-8`] = 21;
-            output[`thac-7`] = 20;
-            output[`thac-6`] = 20;
-            output[`thac-5`] = 20;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 20;
-            output[`thac-2`] = 20;
-            output[`thac-1`] = 19;
-            output.thac00 = 18;
-            output.thac0 = 18;
-            output.thac1 = 17;
-            output.thac2 = 16;
-            output.thac3 = 15;
-            output.thac4 = 14;
-            output.thac5 = 13;
-            output.thac6 = 12;
-            output.thac7 = 11;
-            output.thac8 = 10;
-            output.thac9 = 9;
-            output.thac10 = 8;
-          } else if (levelSelected < 10) {
-            output[`thac-10`] = 21;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 20;
-            output[`thac-7`] = 20;
-            output[`thac-6`] = 20;
-            output[`thac-5`] = 20;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 19;
-            output[`thac-2`] = 18;
-            output[`thac-1`] = 17;
-            output.thac00 = 16;
-            output.thac0 = 16;
-            output.thac1 = 15;
-            output.thac2 = 14;
-            output.thac3 = 13;
-            output.thac4 = 12;
-            output.thac5 = 11;
-            output.thac6 = 10;
-            output.thac7 = 9;
-            output.thac8 = 8;
-            output.thac9 = 7;
-            output.thac10 = 6;
-          } else if (levelSelected < 13) {
-            output[`thac-10`] = 20;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 20;
-            output[`thac-7`] = 20;
-            output[`thac-6`] = 20;
-            output[`thac-5`] = 19;
-            output[`thac-4`] = 18;
-            output[`thac-3`] = 17;
-            output[`thac-2`] = 16;
-            output[`thac-1`] = 15;
-            output.thac00 = 14;
-            output.thac0 = 14;
-            output.thac1 = 13;
-            output.thac2 = 12;
-            output.thac3 = 11;
-            output.thac4 = 10;
-            output.thac5 = 9;
-            output.thac6 = 8;
-            output.thac7 = 7;
-            output.thac8 = 6;
-            output.thac9 = 5;
-            output.thac10 = 4;
-          } else if (levelSelected < 16) {
-            output[`thac-10`] = 20;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 20;
-            output[`thac-7`] = 19;
-            output[`thac-6`] = 18;
-            output[`thac-5`] = 17;
-            output[`thac-4`] = 16;
-            output[`thac-3`] = 15;
-            output[`thac-2`] = 14;
-            output[`thac-1`] = 13;
-            output.thac00 = 12;
-            output.thac0 = 12;
-            output.thac1 = 11;
-            output.thac2 = 10;
-            output.thac3 = 9;
-            output.thac4 = 8;
-            output.thac5 = 7;
-            output.thac6 = 6;
-            output.thac7 = 5;
-            output.thac8 = 4;
-            output.thac9 = 3;
-            output.thac10 = 2;
-          } else if (levelSelected < 19) {
-            output[`thac-10`] = 20;
-            output[`thac-9`] = 19;
-            output[`thac-8`] = 18;
-            output[`thac-7`] = 17;
-            output[`thac-6`] = 16;
-            output[`thac-5`] = 15;
-            output[`thac-4`] = 14;
-            output[`thac-3`] = 13;
-            output[`thac-2`] = 12;
-            output[`thac-1`] = 11;
-            output.thac00 = 10;
-            output.thac0 = 10;
-            output.thac1 = 9;
-            output.thac2 = 8;
-            output.thac3 = 7;
-            output.thac4 = 6;
-            output.thac5 = 5;
-            output.thac6 = 4;
-            output.thac7 = 3;
-            output.thac8 = 2;
-            output.thac9 = 1;
-            output.thac10 = 0;
-          } else if (levelSelected >= 19) {
-            output[`thac-10`] = 19;
-            output[`thac-9`] = 18;
-            output[`thac-8`] = 17;
-            output[`thac-7`] = 16;
-            output[`thac-6`] = 15;
-            output[`thac-5`] = 14;
-            output[`thac-4`] = 13;
-            output[`thac-3`] = 12;
-            output[`thac-2`] = 11;
-            output[`thac-1`] = 10;
-            output.thac00 = 9;
-            output.thac0 = 9;
-            output.thac1 = 8;
-            output.thac2 = 7;
-            output.thac3 = 6;
-            output.thac4 = 5;
-            output.thac5 = 4;
-            output.thac6 = 3;
-            output.thac7 = 2;
-            output.thac8 = 1;
-            output.thac9 = 0;
-            output.thac10 = -1;
-          }
-          output.attack_matrix_flag = 0;
-        }
-        // fighters table
-        if (classSelected === 2 || classSelected === 6) {
-          if (levelSelected === 0) {
-            output[`thac-10`] = 26;
-            output[`thac-9`] = 25;
-            output[`thac-8`] = 24;
-            output[`thac-7`] = 23;
-            output[`thac-6`] = 22;
-            output[`thac-5`] = 21;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 20;
-            output[`thac-2`] = 20;
-            output[`thac-1`] = 20;
-            output.thac00 = 20;
-            output.thac0 = 20;
-            output.thac1 = 20;
-            output.thac2 = 19;
-            output.thac3 = 18;
-            output.thac4 = 17;
-            output.thac5 = 16;
-            output.thac6 = 15;
-            output.thac7 = 14;
-            output.thac8 = 13;
-            output.thac9 = 12;
-            output.thac10 = 11;
-          } else if (levelSelected < 3) {
-            output[`thac-10`] = 25 - fighter5Selected;
-            output[`thac-9`] = 24 - fighter5Selected;
-            output[`thac-8`] = 23 - fighter5Selected;
-            output[`thac-7`] = 22 - fighter5Selected;
-            output[`thac-6`] = 21 - fighter5Selected; //20
-            output[`thac-5`] = 20; //20
-            output[`thac-4`] = 20; //20
-            output[`thac-3`] = 20; //20
-            output[`thac-2`] = 20; //20
-            output[`thac-1`] = 20; //20
-            output.thac00 = 20 - fighter5Selected;
-            output.thac0 = 20 - fighter5Selected; //19
-            output.thac1 = 19 - fighter5Selected;
-            output.thac2 = 18 - fighter5Selected;
-            output.thac3 = 17 - fighter5Selected;
-            output.thac4 = 16 - fighter5Selected;
-            output.thac5 = 15 - fighter5Selected;
-            output.thac6 = 14 - fighter5Selected;
-            output.thac7 = 13 - fighter5Selected;
-            output.thac8 = 12 - fighter5Selected;
-            output.thac9 = 11 - fighter5Selected;
-            output.thac10 = 10 - fighter5Selected;
-          } else if (levelSelected < 5) {
-            output[`thac-10`] = 23 - fighter5Selected;
-            output[`thac-9`] = 22 - fighter5Selected;
-            output[`thac-8`] = 21 - fighter5Selected; //20
-            output[`thac-7`] = 20; //20
-            output[`thac-6`] = 20; //20
-            output[`thac-5`] = 20; //20
-            output[`thac-4`] = 20; //20
-            output[`thac-3`] = 20; //20
-            output[`thac-2`] = 20 - fighter5Selected; //19
-            output[`thac-1`] = 19 - fighter5Selected;
-            output.thac00 = 18 - fighter5Selected;
-            output.thac0 = 18 - fighter5Selected;
-            output.thac1 = 17 - fighter5Selected;
-            output.thac2 = 16 - fighter5Selected;
-            output.thac3 = 15 - fighter5Selected;
-            output.thac4 = 14 - fighter5Selected;
-            output.thac5 = 13 - fighter5Selected;
-            output.thac6 = 12 - fighter5Selected;
-            output.thac7 = 11 - fighter5Selected;
-            output.thac8 = 10 - fighter5Selected;
-            output.thac9 = 9 - fighter5Selected;
-            output.thac10 = 8 - fighter5Selected;
-          } else if (levelSelected < 7) {
-            output[`thac-10`] = 21 - fighter5Selected; //20
-            output[`thac-9`] = 20; //20
-            output[`thac-8`] = 20; //20
-            output[`thac-7`] = 20; //20
-            output[`thac-6`] = 20; //20
-            output[`thac-5`] = 20; //20
-            output[`thac-4`] = 20 - fighter5Selected; //19
-            output[`thac-3`] = 19 - fighter5Selected;
-            output[`thac-2`] = 18 - fighter5Selected;
-            output[`thac-1`] = 17 - fighter5Selected;
-            output.thac00 = 16 - fighter5Selected;
-            output.thac0 = 16 - fighter5Selected;
-            output.thac1 = 15 - fighter5Selected;
-            output.thac2 = 14 - fighter5Selected;
-            output.thac3 = 13 - fighter5Selected;
-            output.thac4 = 12 - fighter5Selected;
-            output.thac5 = 11 - fighter5Selected;
-            output.thac6 = 10 - fighter5Selected;
-            output.thac7 = 9 - fighter5Selected;
-            output.thac8 = 8 - fighter5Selected;
-            output.thac9 = 7 - fighter5Selected;
-            output.thac10 = 6 - fighter5Selected;
-          } else if (levelSelected < 9) {
-            output[`thac-10`] = 20; //20
-            output[`thac-9`] = 20; //20
-            output[`thac-8`] = 20; //20
-            output[`thac-7`] = 20; //20
-            output[`thac-6`] = 20 - fighter5Selected; //19
-            output[`thac-5`] = 19 - fighter5Selected;
-            output[`thac-4`] = 18 - fighter5Selected;
-            output[`thac-3`] = 17 - fighter5Selected;
-            output[`thac-2`] = 16 - fighter5Selected;
-            output[`thac-1`] = 15 - fighter5Selected;
-            output.thac00 = 14 - fighter5Selected;
-            output.thac0 = 14 - fighter5Selected;
-            output.thac1 = 13 - fighter5Selected;
-            output.thac2 = 12 - fighter5Selected;
-            output.thac3 = 11 - fighter5Selected;
-            output.thac4 = 10 - fighter5Selected;
-            output.thac5 = 9 - fighter5Selected;
-            output.thac6 = 8 - fighter5Selected;
-            output.thac7 = 7 - fighter5Selected;
-            output.thac8 = 6 - fighter5Selected;
-            output.thac9 = 5 - fighter5Selected;
-            output.thac10 = 4 - fighter5Selected;
-          } else if (levelSelected < 11) {
-            output[`thac-10`] = 20; //20
-            output[`thac-9`] = 20; //20
-            output[`thac-8`] = 20 - fighter5Selected; //19
-            output[`thac-7`] = 19 - fighter5Selected;
-            output[`thac-6`] = 18 - fighter5Selected;
-            output[`thac-5`] = 17 - fighter5Selected;
-            output[`thac-4`] = 16 - fighter5Selected;
-            output[`thac-3`] = 15 - fighter5Selected;
-            output[`thac-2`] = 14 - fighter5Selected;
-            output[`thac-1`] = 13 - fighter5Selected;
-            output.thac00 = 12 - fighter5Selected;
-            output.thac0 = 12 - fighter5Selected;
-            output.thac1 = 11 - fighter5Selected;
-            output.thac2 = 10 - fighter5Selected;
-            output.thac3 = 9 - fighter5Selected;
-            output.thac4 = 8 - fighter5Selected;
-            output.thac5 = 7 - fighter5Selected;
-            output.thac6 = 6 - fighter5Selected;
-            output.thac7 = 5 - fighter5Selected;
-            output.thac8 = 4 - fighter5Selected;
-            output.thac9 = 3 - fighter5Selected;
-            output.thac10 = 2 - fighter5Selected;
-          } else if (levelSelected < 13) {
-            output[`thac-10`] = 20 - fighter5Selected; //19
-            output[`thac-9`] = 19 - fighter5Selected;
-            output[`thac-8`] = 18 - fighter5Selected;
-            output[`thac-7`] = 17 - fighter5Selected;
-            output[`thac-6`] = 16 - fighter5Selected;
-            output[`thac-5`] = 15 - fighter5Selected;
-            output[`thac-4`] = 14 - fighter5Selected;
-            output[`thac-3`] = 13 - fighter5Selected;
-            output[`thac-2`] = 12 - fighter5Selected;
-            output[`thac-1`] = 11 - fighter5Selected;
-            output.thac00 = 10 - fighter5Selected;
-            output.thac0 = 10 - fighter5Selected;
-            output.thac1 = 9 - fighter5Selected;
-            output.thac2 = 8 - fighter5Selected;
-            output.thac3 = 7 - fighter5Selected;
-            output.thac4 = 6 - fighter5Selected;
-            output.thac5 = 5 - fighter5Selected;
-            output.thac6 = 4 - fighter5Selected;
-            output.thac7 = 3 - fighter5Selected;
-            output.thac8 = 2 - fighter5Selected;
-            output.thac9 = 1 - fighter5Selected;
-            output.thac10 = 0 - fighter5Selected;
-          } else if (levelSelected < 15) {
-            output[`thac-10`] = 18 - fighter5Selected;
-            output[`thac-9`] = 17 - fighter5Selected;
-            output[`thac-8`] = 16 - fighter5Selected;
-            output[`thac-7`] = 15 - fighter5Selected;
-            output[`thac-6`] = 14 - fighter5Selected;
-            output[`thac-5`] = 13 - fighter5Selected;
-            output[`thac-4`] = 12 - fighter5Selected;
-            output[`thac-3`] = 11 - fighter5Selected;
-            output[`thac-2`] = 10 - fighter5Selected;
-            output[`thac-1`] = 9 - fighter5Selected;
-            output.thac00 = 8 - fighter5Selected;
-            output.thac0 = 8 - fighter5Selected;
-            output.thac1 = 7 - fighter5Selected;
-            output.thac2 = 6 - fighter5Selected;
-            output.thac3 = 5 - fighter5Selected;
-            output.thac4 = 4 - fighter5Selected;
-            output.thac5 = 3 - fighter5Selected;
-            output.thac6 = 2 - fighter5Selected;
-            output.thac7 = 1 - fighter5Selected;
-            output.thac8 = 0 - fighter5Selected;
-            output.thac9 = -1 - fighter5Selected;
-            output.thac10 = -2 - fighter5Selected;
-          } else if (levelSelected < 17) {
-            output[`thac-10`] = 16 - fighter5Selected;
-            output[`thac-9`] = 15 - fighter5Selected;
-            output[`thac-8`] = 14 - fighter5Selected;
-            output[`thac-7`] = 13 - fighter5Selected;
-            output[`thac-6`] = 12 - fighter5Selected;
-            output[`thac-5`] = 11 - fighter5Selected;
-            output[`thac-4`] = 10 - fighter5Selected;
-            output[`thac-3`] = 9 - fighter5Selected;
-            output[`thac-2`] = 8 - fighter5Selected;
-            output[`thac-1`] = 7 - fighter5Selected;
-            output.thac00 = 6 - fighter5Selected;
-            output.thac0 = 6 - fighter5Selected;
-            output.thac1 = 5 - fighter5Selected;
-            output.thac2 = 4 - fighter5Selected;
-            output.thac3 = 3 - fighter5Selected;
-            output.thac4 = 2 - fighter5Selected;
-            output.thac5 = 1 - fighter5Selected;
-            output.thac6 = 0 - fighter5Selected;
-            output.thac7 = -1 - fighter5Selected;
-            output.thac8 = -2 - fighter5Selected;
-            output.thac9 = -3 - fighter5Selected;
-            output.thac10 = -4 - fighter5Selected;
-          } else if (levelSelected >= 17) {
-            output[`thac-10`] = 14 - fighter5Selected;
-            output[`thac-9`] = 13 - fighter5Selected;
-            output[`thac-8`] = 12 - fighter5Selected;
-            output[`thac-7`] = 11 - fighter5Selected;
-            output[`thac-6`] = 10 - fighter5Selected;
-            output[`thac-5`] = 9 - fighter5Selected;
-            output[`thac-4`] = 8 - fighter5Selected;
-            output[`thac-3`] = 7 - fighter5Selected;
-            output[`thac-2`] = 6 - fighter5Selected;
-            output[`thac-1`] = 5 - fighter5Selected;
-            output.thac00 = 4 - fighter5Selected;
-            output.thac0 = 4 - fighter5Selected;
-            output.thac1 = 3 - fighter5Selected;
-            output.thac2 = 2 - fighter5Selected;
-            output.thac3 = 1 - fighter5Selected;
-            output.thac4 = 0 - fighter5Selected;
-            output.thac5 = -1 - fighter5Selected;
-            output.thac6 = -2 - fighter5Selected;
-            output.thac7 = -3 - fighter5Selected;
-            output.thac8 = -4 - fighter5Selected;
-            output.thac9 = -5 - fighter5Selected;
-            output.thac10 = -6 - fighter5Selected;
-          }
-          output.attack_matrix_flag = 0;
-        }
-        // magic-users table
-        if (classSelected === 3) {
-          if (levelSelected === 0) {
-            // clog('Need to choose a class level greater than 0 to continue.');
-          } else if (levelSelected < 6) {
-            output[`thac-10`] = 26;
-            output[`thac-9`] = 25;
-            output[`thac-8`] = 24;
-            output[`thac-7`] = 23;
-            output[`thac-6`] = 22;
-            output[`thac-5`] = 21;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 20;
-            output[`thac-2`] = 20;
-            output[`thac-1`] = 20;
-            output.thac00 = 20;
-            output.thac0 = 20;
-            output.thac1 = 20;
-            output.thac2 = 19;
-            output.thac3 = 18;
-            output.thac4 = 17;
-            output.thac5 = 16;
-            output.thac6 = 15;
-            output.thac7 = 14;
-            output.thac8 = 13;
-            output.thac9 = 12;
-            output.thac10 = 11;
-          } else if (levelSelected < 11) {
-            output[`thac-10`] = 24;
-            output[`thac-9`] = 23;
-            output[`thac-8`] = 22;
-            output[`thac-7`] = 21;
-            output[`thac-6`] = 20;
-            output[`thac-5`] = 20;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 20;
-            output[`thac-2`] = 20;
-            output[`thac-1`] = 20;
-            output.thac00 = 19;
-            output.thac0 = 19;
-            output.thac1 = 18;
-            output.thac2 = 17;
-            output.thac3 = 16;
-            output.thac4 = 15;
-            output.thac5 = 14;
-            output.thac6 = 13;
-            output.thac7 = 12;
-            output.thac8 = 11;
-            output.thac9 = 10;
-            output.thac10 = 9;
-          } else if (levelSelected < 16) {
-            output[`thac-10`] = 21;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 20;
-            output[`thac-7`] = 20;
-            output[`thac-6`] = 20;
-            output[`thac-5`] = 20;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 19;
-            output[`thac-2`] = 18;
-            output[`thac-1`] = 17;
-            output.thac00 = 16;
-            output.thac0 = 16;
-            output.thac1 = 15;
-            output.thac2 = 14;
-            output.thac3 = 13;
-            output.thac4 = 12;
-            output.thac5 = 11;
-            output.thac6 = 10;
-            output.thac7 = 9;
-            output.thac8 = 8;
-            output.thac9 = 7;
-            output.thac10 = 6;
-          } else if (levelSelected < 21) {
-            output[`thac-10`] = 20;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 20;
-            output[`thac-7`] = 20;
-            output[`thac-6`] = 19;
-            output[`thac-5`] = 18;
-            output[`thac-4`] = 17;
-            output[`thac-3`] = 16;
-            output[`thac-2`] = 15;
-            output[`thac-1`] = 14;
-            output.thac00 = 13;
-            output.thac0 = 13;
-            output.thac1 = 12;
-            output.thac2 = 11;
-            output.thac3 = 10;
-            output.thac4 = 9;
-            output.thac5 = 8;
-            output.thac6 = 7;
-            output.thac7 = 6;
-            output.thac8 = 5;
-            output.thac9 = 4;
-            output.thac10 = 3;
-          } else if (levelSelected >= 21) {
-            output[`thac-10`] = 20;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 19;
-            output[`thac-7`] = 18;
-            output[`thac-6`] = 17;
-            output[`thac-5`] = 16;
-            output[`thac-4`] = 15;
-            output[`thac-3`] = 14;
-            output[`thac-2`] = 13;
-            output[`thac-1`] = 12;
-            output.thac00 = 11;
-            output.thac0 = 11;
-            output.thac1 = 10;
-            output.thac2 = 9;
-            output.thac3 = 8;
-            output.thac4 = 7;
-            output.thac5 = 6;
-            output.thac6 = 5;
-            output.thac7 = 4;
-            output.thac8 = 3;
-            output.thac9 = 2;
-            output.thac10 = 1;
-          }
-          output.attack_matrix_flag = 0;
-        }
-        // thieves table
-        if (classSelected === 4) {
-          if (levelSelected === 0) {
-            // clog('Need to choose a class level greater than 0 to continue.');
-          } else if (levelSelected < 5) {
-            output[`thac-10`] = 26;
-            output[`thac-9`] = 25;
-            output[`thac-8`] = 24;
-            output[`thac-7`] = 23;
-            output[`thac-6`] = 22;
-            output[`thac-5`] = 21;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 20;
-            output[`thac-2`] = 20;
-            output[`thac-1`] = 20;
-            output.thac00 = 20;
-            output.thac0 = 20;
-            output.thac1 = 20;
-            output.thac2 = 19;
-            output.thac3 = 18;
-            output.thac4 = 17;
-            output.thac5 = 16;
-            output.thac6 = 15;
-            output.thac7 = 14;
-            output.thac8 = 13;
-            output.thac9 = 12;
-            output.thac10 = 11;
-          } else if (levelSelected < 9) {
-            output[`thac-10`] = 24;
-            output[`thac-9`] = 23;
-            output[`thac-8`] = 22;
-            output[`thac-7`] = 21;
-            output[`thac-6`] = 20;
-            output[`thac-5`] = 20;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 20;
-            output[`thac-2`] = 20;
-            output[`thac-1`] = 20;
-            output.thac00 = 19;
-            output.thac0 = 19;
-            output.thac1 = 18;
-            output.thac2 = 17;
-            output.thac3 = 16;
-            output.thac4 = 15;
-            output.thac5 = 14;
-            output.thac6 = 13;
-            output.thac7 = 12;
-            output.thac8 = 11;
-            output.thac9 = 10;
-            output.thac10 = 9;
-          } else if (levelSelected < 13) {
-            output[`thac-10`] = 21;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 20;
-            output[`thac-7`] = 20;
-            output[`thac-6`] = 20;
-            output[`thac-5`] = 20;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 19;
-            output[`thac-2`] = 18;
-            output[`thac-1`] = 17;
-            output.thac00 = 16;
-            output.thac0 = 16;
-            output.thac1 = 15;
-            output.thac2 = 14;
-            output.thac3 = 13;
-            output.thac4 = 12;
-            output.thac5 = 11;
-            output.thac6 = 10;
-            output.thac7 = 9;
-            output.thac8 = 8;
-            output.thac9 = 7;
-            output.thac10 = 6;
-          } else if (levelSelected < 17) {
-            output[`thac-10`] = 20;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 20;
-            output[`thac-7`] = 20;
-            output[`thac-6`] = 20;
-            output[`thac-5`] = 19;
-            output[`thac-4`] = 18;
-            output[`thac-3`] = 17;
-            output[`thac-2`] = 16;
-            output[`thac-1`] = 15;
-            output.thac00 = 14;
-            output.thac0 = 14;
-            output.thac1 = 13;
-            output.thac2 = 12;
-            output.thac3 = 11;
-            output.thac4 = 10;
-            output.thac5 = 9;
-            output.thac6 = 8;
-            output.thac7 = 7;
-            output.thac8 = 6;
-            output.thac9 = 5;
-            output.thac10 = 4;
-          } else if (levelSelected < 21) {
-            output[`thac-10`] = 20;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 20;
-            output[`thac-7`] = 19;
-            output[`thac-6`] = 18;
-            output[`thac-5`] = 17;
-            output[`thac-4`] = 16;
-            output[`thac-3`] = 15;
-            output[`thac-2`] = 14;
-            output[`thac-1`] = 13;
-            output.thac00 = 12;
-            output.thac0 = 12;
-            output.thac1 = 11;
-            output.thac2 = 10;
-            output.thac3 = 9;
-            output.thac4 = 8;
-            output.thac5 = 7;
-            output.thac6 = 6;
-            output.thac7 = 5;
-            output.thac8 = 4;
-            output.thac9 = 3;
-            output.thac10 = 2;
-          } else if (levelSelected >= 21) {
-            output[`thac-10`] = 20;
-            output[`thac-9`] = 19;
-            output[`thac-8`] = 18;
-            output[`thac-7`] = 17;
-            output[`thac-6`] = 16;
-            output[`thac-5`] = 15;
-            output[`thac-4`] = 14;
-            output[`thac-3`] = 13;
-            output[`thac-2`] = 12;
-            output[`thac-1`] = 11;
-            output.thac00 = 10;
-            output.thac0 = 10;
-            output.thac1 = 9;
-            output.thac2 = 8;
-            output.thac3 = 7;
-            output.thac4 = 6;
-            output.thac5 = 5;
-            output.thac6 = 4;
-            output.thac7 = 3;
-            output.thac8 = 2;
-            output.thac9 = 1;
-            output.thac10 = 0;
-          }
-          output.attack_matrix_flag = 0;
-        }
-        // monsters table
-        if (classSelected === 5) {
-          if (hitdiceSelected === 0) {
-            // clog('Need to select HD to continue.');
-          } else if (hitdiceSelected === 1) {
-            output[`thac-10`] = 26;
-            output[`thac-9`] = 25;
-            output[`thac-8`] = 24;
-            output[`thac-7`] = 23;
-            output[`thac-6`] = 22;
-            output[`thac-5`] = 21;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 20;
-            output[`thac-2`] = 20;
-            output[`thac-1`] = 20;
-            output.thac00 = 20;
-            output.thac0 = 20;
-            output.thac1 = 20;
-            output.thac2 = 19;
-            output.thac3 = 18;
-            output.thac4 = 17;
-            output.thac5 = 16;
-            output.thac6 = 15;
-            output.thac7 = 14;
-            output.thac8 = 13;
-            output.thac9 = 12;
-            output.thac10 = 11;
-          } else if (hitdiceSelected === 2) {
-            output[`thac-10`] = 25;
-            output[`thac-9`] = 24;
-            output[`thac-8`] = 23;
-            output[`thac-7`] = 22;
-            output[`thac-6`] = 21;
-            output[`thac-5`] = 20;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 20;
-            output[`thac-2`] = 20;
-            output[`thac-1`] = 20;
-            output.thac00 = 20;
-            output.thac0 = 20;
-            output.thac1 = 19;
-            output.thac2 = 18;
-            output.thac3 = 17;
-            output.thac4 = 16;
-            output.thac5 = 15;
-            output.thac6 = 14;
-            output.thac7 = 13;
-            output.thac8 = 12;
-            output.thac9 = 11;
-            output.thac10 = 10;
-          } else if (hitdiceSelected === 3) {
-            output[`thac-10`] = 24;
-            output[`thac-9`] = 23;
-            output[`thac-8`] = 22;
-            output[`thac-7`] = 21;
-            output[`thac-6`] = 20;
-            output[`thac-5`] = 20;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 20;
-            output[`thac-2`] = 20;
-            output[`thac-1`] = 20;
-            output.thac00 = 19;
-            output.thac0 = 19;
-            output.thac1 = 18;
-            output.thac2 = 17;
-            output.thac3 = 16;
-            output.thac4 = 15;
-            output.thac5 = 14;
-            output.thac6 = 13;
-            output.thac7 = 12;
-            output.thac8 = 11;
-            output.thac9 = 10;
-            output.thac10 = 9;
-          } else if (hitdiceSelected === 4) {
-            output[`thac-10`] = 23;
-            output[`thac-9`] = 22;
-            output[`thac-8`] = 21;
-            output[`thac-7`] = 20;
-            output[`thac-6`] = 20;
-            output[`thac-5`] = 20;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 20;
-            output[`thac-2`] = 20;
-            output[`thac-1`] = 19;
-            output.thac00 = 18;
-            output.thac0 = 18;
-            output.thac1 = 17;
-            output.thac2 = 16;
-            output.thac3 = 15;
-            output.thac4 = 14;
-            output.thac5 = 13;
-            output.thac6 = 12;
-            output.thac7 = 11;
-            output.thac8 = 10;
-            output.thac9 = 9;
-            output.thac10 = 8;
-          } else if (hitdiceSelected === 5) {
-            output[`thac-10`] = 21;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 20;
-            output[`thac-7`] = 20;
-            output[`thac-6`] = 20;
-            output[`thac-5`] = 20;
-            output[`thac-4`] = 20;
-            output[`thac-3`] = 19;
-            output[`thac-2`] = 18;
-            output[`thac-1`] = 17;
-            output.thac00 = 16;
-            output.thac0 = 16;
-            output.thac1 = 15;
-            output.thac2 = 14;
-            output.thac3 = 13;
-            output.thac4 = 12;
-            output.thac5 = 11;
-            output.thac6 = 10;
-            output.thac7 = 9;
-            output.thac8 = 8;
-            output.thac9 = 7;
-            output.thac10 = 6;
-          } else if (hitdiceSelected === 6) {
-            output[`thac-10`] = 20;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 20;
-            output[`thac-7`] = 20;
-            output[`thac-6`] = 20;
-            output[`thac-5`] = 20;
-            output[`thac-4`] = 19;
-            output[`thac-3`] = 18;
-            output[`thac-2`] = 17;
-            output[`thac-1`] = 16;
-            output.thac00 = 15;
-            output.thac0 = 15;
-            output.thac1 = 14;
-            output.thac2 = 13;
-            output.thac3 = 12;
-            output.thac4 = 11;
-            output.thac5 = 10;
-            output.thac6 = 9;
-            output.thac7 = 8;
-            output.thac8 = 7;
-            output.thac9 = 6;
-            output.thac10 = 5;
-          } else if (hitdiceSelected === 7) {
-            output[`thac-10`] = 20;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 20;
-            output[`thac-7`] = 20;
-            output[`thac-6`] = 19;
-            output[`thac-5`] = 18;
-            output[`thac-4`] = 17;
-            output[`thac-3`] = 16;
-            output[`thac-2`] = 15;
-            output[`thac-1`] = 14;
-            output.thac00 = 13;
-            output.thac0 = 13;
-            output.thac1 = 12;
-            output.thac2 = 11;
-            output.thac3 = 10;
-            output.thac4 = 9;
-            output.thac5 = 8;
-            output.thac6 = 7;
-            output.thac7 = 6;
-            output.thac8 = 5;
-            output.thac9 = 4;
-            output.thac10 = 3;
-          } else if (hitdiceSelected === 8) {
-            output[`thac-10`] = 20;
-            output[`thac-9`] = 20;
-            output[`thac-8`] = 20;
-            output[`thac-7`] = 19;
-            output[`thac-6`] = 18;
-            output[`thac-5`] = 17;
-            output[`thac-4`] = 16;
-            output[`thac-3`] = 15;
-            output[`thac-2`] = 14;
-            output[`thac-1`] = 13;
-            output.thac00 = 12;
-            output.thac0 = 12;
-            output.thac1 = 11;
-            output.thac2 = 10;
-            output.thac3 = 9;
-            output.thac4 = 8;
-            output.thac5 = 7;
-            output.thac6 = 6;
-            output.thac7 = 5;
-            output.thac8 = 4;
-            output.thac9 = 3;
-            output.thac10 = 2;
-          } else if (hitdiceSelected === 9) {
-            output[`thac-10`] = 20;
-            output[`thac-9`] = 19;
-            output[`thac-8`] = 18;
-            output[`thac-7`] = 17;
-            output[`thac-6`] = 16;
-            output[`thac-5`] = 15;
-            output[`thac-4`] = 14;
-            output[`thac-3`] = 13;
-            output[`thac-2`] = 12;
-            output[`thac-1`] = 11;
-            output.thac00 = 10;
-            output.thac0 = 10;
-            output.thac1 = 9;
-            output.thac2 = 8;
-            output.thac3 = 7;
-            output.thac4 = 6;
-            output.thac5 = 5;
-            output.thac6 = 4;
-            output.thac7 = 3;
-            output.thac8 = 2;
-            output.thac9 = 1;
-            output.thac10 = 0;
-          } else if (hitdiceSelected === 10) {
-            output[`thac-10`] = 19;
-            output[`thac-9`] = 18;
-            output[`thac-8`] = 17;
-            output[`thac-7`] = 16;
-            output[`thac-6`] = 15;
-            output[`thac-5`] = 14;
-            output[`thac-4`] = 13;
-            output[`thac-3`] = 12;
-            output[`thac-2`] = 11;
-            output[`thac-1`] = 10;
-            output.thac00 = 9;
-            output.thac0 = 9;
-            output.thac1 = 8;
-            output.thac2 = 7;
-            output.thac3 = 6;
-            output.thac4 = 5;
-            output.thac5 = 4;
-            output.thac6 = 3;
-            output.thac7 = 2;
-            output.thac8 = 1;
-            output.thac9 = 0;
-            output.thac10 = -1;
-          } else if (hitdiceSelected === 11) {
-            output[`thac-10`] = 18;
-            output[`thac-9`] = 17;
-            output[`thac-8`] = 16;
-            output[`thac-7`] = 15;
-            output[`thac-6`] = 14;
-            output[`thac-5`] = 13;
-            output[`thac-4`] = 12;
-            output[`thac-3`] = 11;
-            output[`thac-2`] = 10;
-            output[`thac-1`] = 9;
-            output.thac00 = 8;
-            output.thac0 = 8;
-            output.thac1 = 7;
-            output.thac2 = 6;
-            output.thac3 = 5;
-            output.thac4 = 4;
-            output.thac5 = 3;
-            output.thac6 = 2;
-            output.thac7 = 1;
-            output.thac8 = 0;
-            output.thac9 = -1;
-            output.thac10 = -2;
-          } else if (hitdiceSelected === 12) {
-            output[`thac-10`] = 17;
-            output[`thac-9`] = 16;
-            output[`thac-8`] = 15;
-            output[`thac-7`] = 14;
-            output[`thac-6`] = 13;
-            output[`thac-5`] = 12;
-            output[`thac-4`] = 11;
-            output[`thac-3`] = 10;
-            output[`thac-2`] = 9;
-            output[`thac-1`] = 8;
-            output.thac00 = 7;
-            output.thac0 = 7;
-            output.thac1 = 6;
-            output.thac2 = 5;
-            output.thac3 = 4;
-            output.thac4 = 3;
-            output.thac5 = 2;
-            output.thac6 = 1;
-            output.thac7 = 0;
-            output.thac8 = -1;
-            output.thac9 = -2;
-            output.thac10 = -3;
-          }
-          output.attack_matrix_flag = 0;
-        }
-        // NO CLASS found when Sync is enabled: Reset table
-        if (classSelected === 99) {
-          clog('Error: Class not recognized or class name is empty.');
-          output[`thac-10`] = 20;
-          output[`thac-9`] = 20;
-          output[`thac-8`] = 20;
-          output[`thac-7`] = 20;
-          output[`thac-6`] = 20;
-          output[`thac-5`] = 20;
-          output[`thac-4`] = 20;
-          output[`thac-3`] = 20;
-          output[`thac-2`] = 20;
-          output[`thac-1`] = 20;
-          output.thac00 = 20;
-          output.thac0 = 20;
-          output.thac1 = 20;
-          output.thac2 = 20;
-          output.thac3 = 20;
-          output.thac4 = 20;
-          output.thac5 = 20;
-          output.thac6 = 20;
-          output.thac7 = 20;
-          output.thac8 = 20;
-          output.thac9 = 20;
-          output.thac10 = 20;
-          output.attack_matrix_flag = 0;
-        }
-        setAttrs(output, {silent: true});
-        calcThac0();
-      },
-    );
+    const output = {};
+    const syncClass = +v.sync_matrix_class || 0;
+    const classLinked = +v.class_selected || 0;
+    let levelSelected = +v.matrix_level || 0;
+    let classSelected = +v.matrix_class || 0;
+    const class1Name = (v.class || '').trim();
+    const class2Name = (v.secondclass || '').trim();
+    const class3Name = (v.thirdclass || '').trim();
+    const hitdiceSelected = +v.matrix_hitdice || 0;
+    const fighter5Selected = +v.toggle_fighter5 || 0;
+    // sync enabled?
+    // check for selected class and use that class level unless changed
+    if (syncClass === 1) {
+      if (classLinked === 1) {
+        // clog(`Linked Class is: ${class1Name} Current Level:${v.level}`);
+        classSelected = await matchClassName(class1Name);
+        levelSelected = +v.level || 0;
+        output.matrix_level = levelSelected;
+        output.matrix_class = classSelected;
+      }
+      if (classLinked === 2) {
+        // clog(`Linked Class is: ${class2Name} Current Level:${v.level_2}`);
+        classSelected = await matchClassName(class2Name);
+        levelSelected = +v.level_2 || 0;
+        output.matrix_level = levelSelected;
+        output.matrix_class = classSelected;
+      }
+      if (classLinked === 3) {
+        // clog(`Linked Class is: ${class3Name} Current Level:${v.level_3}`);
+        classSelected = await matchClassName(class3Name);
+        levelSelected = +v.level_3 || 0;
+        output.matrix_level = levelSelected;
+        output.matrix_class = classSelected;
+      }
+    }
+    // clog('Ready to autofill attack matrix.');
+    if (classSelected === 0) return;
+
+    // clerics table
+    if (classSelected === 1) {
+      if (levelSelected === 0) {
+        clog('Choose a class level greater than 0 to continue.');
+      } else if (levelSelected < 4) {
+        output[`thac-10`] = 25;
+        output[`thac-9`] = 24;
+        output[`thac-8`] = 23;
+        output[`thac-7`] = 22;
+        output[`thac-6`] = 21;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 20;
+        output[`thac-2`] = 20;
+        output[`thac-1`] = 20;
+        output.thac00 = 20;
+        output.thac0 = 20;
+        output.thac1 = 19;
+        output.thac2 = 18;
+        output.thac3 = 17;
+        output.thac4 = 16;
+        output.thac5 = 15;
+        output.thac6 = 14;
+        output.thac7 = 13;
+        output.thac8 = 12;
+        output.thac9 = 11;
+        output.thac10 = 10;
+      } else if (levelSelected < 7) {
+        output[`thac-10`] = 23;
+        output[`thac-9`] = 22;
+        output[`thac-8`] = 21;
+        output[`thac-7`] = 20;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 20;
+        output[`thac-2`] = 20;
+        output[`thac-1`] = 19;
+        output.thac00 = 18;
+        output.thac0 = 18;
+        output.thac1 = 17;
+        output.thac2 = 16;
+        output.thac3 = 15;
+        output.thac4 = 14;
+        output.thac5 = 13;
+        output.thac6 = 12;
+        output.thac7 = 11;
+        output.thac8 = 10;
+        output.thac9 = 9;
+        output.thac10 = 8;
+      } else if (levelSelected < 10) {
+        output[`thac-10`] = 21;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 20;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 19;
+        output[`thac-2`] = 18;
+        output[`thac-1`] = 17;
+        output.thac00 = 16;
+        output.thac0 = 16;
+        output.thac1 = 15;
+        output.thac2 = 14;
+        output.thac3 = 13;
+        output.thac4 = 12;
+        output.thac5 = 11;
+        output.thac6 = 10;
+        output.thac7 = 9;
+        output.thac8 = 8;
+        output.thac9 = 7;
+        output.thac10 = 6;
+      } else if (levelSelected < 13) {
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 20;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 19;
+        output[`thac-4`] = 18;
+        output[`thac-3`] = 17;
+        output[`thac-2`] = 16;
+        output[`thac-1`] = 15;
+        output.thac00 = 14;
+        output.thac0 = 14;
+        output.thac1 = 13;
+        output.thac2 = 12;
+        output.thac3 = 11;
+        output.thac4 = 10;
+        output.thac5 = 9;
+        output.thac6 = 8;
+        output.thac7 = 7;
+        output.thac8 = 6;
+        output.thac9 = 5;
+        output.thac10 = 4;
+      } else if (levelSelected < 16) {
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 19;
+        output[`thac-6`] = 18;
+        output[`thac-5`] = 17;
+        output[`thac-4`] = 16;
+        output[`thac-3`] = 15;
+        output[`thac-2`] = 14;
+        output[`thac-1`] = 13;
+        output.thac00 = 12;
+        output.thac0 = 12;
+        output.thac1 = 11;
+        output.thac2 = 10;
+        output.thac3 = 9;
+        output.thac4 = 8;
+        output.thac5 = 7;
+        output.thac6 = 6;
+        output.thac7 = 5;
+        output.thac8 = 4;
+        output.thac9 = 3;
+        output.thac10 = 2;
+      } else if (levelSelected < 19) {
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 19;
+        output[`thac-8`] = 18;
+        output[`thac-7`] = 17;
+        output[`thac-6`] = 16;
+        output[`thac-5`] = 15;
+        output[`thac-4`] = 14;
+        output[`thac-3`] = 13;
+        output[`thac-2`] = 12;
+        output[`thac-1`] = 11;
+        output.thac00 = 10;
+        output.thac0 = 10;
+        output.thac1 = 9;
+        output.thac2 = 8;
+        output.thac3 = 7;
+        output.thac4 = 6;
+        output.thac5 = 5;
+        output.thac6 = 4;
+        output.thac7 = 3;
+        output.thac8 = 2;
+        output.thac9 = 1;
+        output.thac10 = 0;
+      } else if (levelSelected >= 19) {
+        output[`thac-10`] = 19;
+        output[`thac-9`] = 18;
+        output[`thac-8`] = 17;
+        output[`thac-7`] = 16;
+        output[`thac-6`] = 15;
+        output[`thac-5`] = 14;
+        output[`thac-4`] = 13;
+        output[`thac-3`] = 12;
+        output[`thac-2`] = 11;
+        output[`thac-1`] = 10;
+        output.thac00 = 9;
+        output.thac0 = 9;
+        output.thac1 = 8;
+        output.thac2 = 7;
+        output.thac3 = 6;
+        output.thac4 = 5;
+        output.thac5 = 4;
+        output.thac6 = 3;
+        output.thac7 = 2;
+        output.thac8 = 1;
+        output.thac9 = 0;
+        output.thac10 = -1;
+      }
+      output.attack_matrix_flag = 0;
+    }
+    // fighters table
+    if (classSelected === 2 || classSelected === 6) {
+      if (levelSelected === 0) {
+        output[`thac-10`] = 26;
+        output[`thac-9`] = 25;
+        output[`thac-8`] = 24;
+        output[`thac-7`] = 23;
+        output[`thac-6`] = 22;
+        output[`thac-5`] = 21;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 20;
+        output[`thac-2`] = 20;
+        output[`thac-1`] = 20;
+        output.thac00 = 20;
+        output.thac0 = 20;
+        output.thac1 = 20;
+        output.thac2 = 19;
+        output.thac3 = 18;
+        output.thac4 = 17;
+        output.thac5 = 16;
+        output.thac6 = 15;
+        output.thac7 = 14;
+        output.thac8 = 13;
+        output.thac9 = 12;
+        output.thac10 = 11;
+      } else if (levelSelected < 3) {
+        output[`thac-10`] = 25 - fighter5Selected;
+        output[`thac-9`] = 24 - fighter5Selected;
+        output[`thac-8`] = 23 - fighter5Selected;
+        output[`thac-7`] = 22 - fighter5Selected;
+        output[`thac-6`] = 21 - fighter5Selected; //20
+        output[`thac-5`] = 20; //20
+        output[`thac-4`] = 20; //20
+        output[`thac-3`] = 20; //20
+        output[`thac-2`] = 20; //20
+        output[`thac-1`] = 20; //20
+        output.thac00 = 20 - fighter5Selected;
+        output.thac0 = 20 - fighter5Selected; //19
+        output.thac1 = 19 - fighter5Selected;
+        output.thac2 = 18 - fighter5Selected;
+        output.thac3 = 17 - fighter5Selected;
+        output.thac4 = 16 - fighter5Selected;
+        output.thac5 = 15 - fighter5Selected;
+        output.thac6 = 14 - fighter5Selected;
+        output.thac7 = 13 - fighter5Selected;
+        output.thac8 = 12 - fighter5Selected;
+        output.thac9 = 11 - fighter5Selected;
+        output.thac10 = 10 - fighter5Selected;
+      } else if (levelSelected < 5) {
+        output[`thac-10`] = 23 - fighter5Selected;
+        output[`thac-9`] = 22 - fighter5Selected;
+        output[`thac-8`] = 21 - fighter5Selected; //20
+        output[`thac-7`] = 20; //20
+        output[`thac-6`] = 20; //20
+        output[`thac-5`] = 20; //20
+        output[`thac-4`] = 20; //20
+        output[`thac-3`] = 20; //20
+        output[`thac-2`] = 20 - fighter5Selected; //19
+        output[`thac-1`] = 19 - fighter5Selected;
+        output.thac00 = 18 - fighter5Selected;
+        output.thac0 = 18 - fighter5Selected;
+        output.thac1 = 17 - fighter5Selected;
+        output.thac2 = 16 - fighter5Selected;
+        output.thac3 = 15 - fighter5Selected;
+        output.thac4 = 14 - fighter5Selected;
+        output.thac5 = 13 - fighter5Selected;
+        output.thac6 = 12 - fighter5Selected;
+        output.thac7 = 11 - fighter5Selected;
+        output.thac8 = 10 - fighter5Selected;
+        output.thac9 = 9 - fighter5Selected;
+        output.thac10 = 8 - fighter5Selected;
+      } else if (levelSelected < 7) {
+        output[`thac-10`] = 21 - fighter5Selected; //20
+        output[`thac-9`] = 20; //20
+        output[`thac-8`] = 20; //20
+        output[`thac-7`] = 20; //20
+        output[`thac-6`] = 20; //20
+        output[`thac-5`] = 20; //20
+        output[`thac-4`] = 20 - fighter5Selected; //19
+        output[`thac-3`] = 19 - fighter5Selected;
+        output[`thac-2`] = 18 - fighter5Selected;
+        output[`thac-1`] = 17 - fighter5Selected;
+        output.thac00 = 16 - fighter5Selected;
+        output.thac0 = 16 - fighter5Selected;
+        output.thac1 = 15 - fighter5Selected;
+        output.thac2 = 14 - fighter5Selected;
+        output.thac3 = 13 - fighter5Selected;
+        output.thac4 = 12 - fighter5Selected;
+        output.thac5 = 11 - fighter5Selected;
+        output.thac6 = 10 - fighter5Selected;
+        output.thac7 = 9 - fighter5Selected;
+        output.thac8 = 8 - fighter5Selected;
+        output.thac9 = 7 - fighter5Selected;
+        output.thac10 = 6 - fighter5Selected;
+      } else if (levelSelected < 9) {
+        output[`thac-10`] = 20; //20
+        output[`thac-9`] = 20; //20
+        output[`thac-8`] = 20; //20
+        output[`thac-7`] = 20; //20
+        output[`thac-6`] = 20 - fighter5Selected; //19
+        output[`thac-5`] = 19 - fighter5Selected;
+        output[`thac-4`] = 18 - fighter5Selected;
+        output[`thac-3`] = 17 - fighter5Selected;
+        output[`thac-2`] = 16 - fighter5Selected;
+        output[`thac-1`] = 15 - fighter5Selected;
+        output.thac00 = 14 - fighter5Selected;
+        output.thac0 = 14 - fighter5Selected;
+        output.thac1 = 13 - fighter5Selected;
+        output.thac2 = 12 - fighter5Selected;
+        output.thac3 = 11 - fighter5Selected;
+        output.thac4 = 10 - fighter5Selected;
+        output.thac5 = 9 - fighter5Selected;
+        output.thac6 = 8 - fighter5Selected;
+        output.thac7 = 7 - fighter5Selected;
+        output.thac8 = 6 - fighter5Selected;
+        output.thac9 = 5 - fighter5Selected;
+        output.thac10 = 4 - fighter5Selected;
+      } else if (levelSelected < 11) {
+        output[`thac-10`] = 20; //20
+        output[`thac-9`] = 20; //20
+        output[`thac-8`] = 20 - fighter5Selected; //19
+        output[`thac-7`] = 19 - fighter5Selected;
+        output[`thac-6`] = 18 - fighter5Selected;
+        output[`thac-5`] = 17 - fighter5Selected;
+        output[`thac-4`] = 16 - fighter5Selected;
+        output[`thac-3`] = 15 - fighter5Selected;
+        output[`thac-2`] = 14 - fighter5Selected;
+        output[`thac-1`] = 13 - fighter5Selected;
+        output.thac00 = 12 - fighter5Selected;
+        output.thac0 = 12 - fighter5Selected;
+        output.thac1 = 11 - fighter5Selected;
+        output.thac2 = 10 - fighter5Selected;
+        output.thac3 = 9 - fighter5Selected;
+        output.thac4 = 8 - fighter5Selected;
+        output.thac5 = 7 - fighter5Selected;
+        output.thac6 = 6 - fighter5Selected;
+        output.thac7 = 5 - fighter5Selected;
+        output.thac8 = 4 - fighter5Selected;
+        output.thac9 = 3 - fighter5Selected;
+        output.thac10 = 2 - fighter5Selected;
+      } else if (levelSelected < 13) {
+        output[`thac-10`] = 20 - fighter5Selected; //19
+        output[`thac-9`] = 19 - fighter5Selected;
+        output[`thac-8`] = 18 - fighter5Selected;
+        output[`thac-7`] = 17 - fighter5Selected;
+        output[`thac-6`] = 16 - fighter5Selected;
+        output[`thac-5`] = 15 - fighter5Selected;
+        output[`thac-4`] = 14 - fighter5Selected;
+        output[`thac-3`] = 13 - fighter5Selected;
+        output[`thac-2`] = 12 - fighter5Selected;
+        output[`thac-1`] = 11 - fighter5Selected;
+        output.thac00 = 10 - fighter5Selected;
+        output.thac0 = 10 - fighter5Selected;
+        output.thac1 = 9 - fighter5Selected;
+        output.thac2 = 8 - fighter5Selected;
+        output.thac3 = 7 - fighter5Selected;
+        output.thac4 = 6 - fighter5Selected;
+        output.thac5 = 5 - fighter5Selected;
+        output.thac6 = 4 - fighter5Selected;
+        output.thac7 = 3 - fighter5Selected;
+        output.thac8 = 2 - fighter5Selected;
+        output.thac9 = 1 - fighter5Selected;
+        output.thac10 = 0 - fighter5Selected;
+      } else if (levelSelected < 15) {
+        output[`thac-10`] = 18 - fighter5Selected;
+        output[`thac-9`] = 17 - fighter5Selected;
+        output[`thac-8`] = 16 - fighter5Selected;
+        output[`thac-7`] = 15 - fighter5Selected;
+        output[`thac-6`] = 14 - fighter5Selected;
+        output[`thac-5`] = 13 - fighter5Selected;
+        output[`thac-4`] = 12 - fighter5Selected;
+        output[`thac-3`] = 11 - fighter5Selected;
+        output[`thac-2`] = 10 - fighter5Selected;
+        output[`thac-1`] = 9 - fighter5Selected;
+        output.thac00 = 8 - fighter5Selected;
+        output.thac0 = 8 - fighter5Selected;
+        output.thac1 = 7 - fighter5Selected;
+        output.thac2 = 6 - fighter5Selected;
+        output.thac3 = 5 - fighter5Selected;
+        output.thac4 = 4 - fighter5Selected;
+        output.thac5 = 3 - fighter5Selected;
+        output.thac6 = 2 - fighter5Selected;
+        output.thac7 = 1 - fighter5Selected;
+        output.thac8 = 0 - fighter5Selected;
+        output.thac9 = -1 - fighter5Selected;
+        output.thac10 = -2 - fighter5Selected;
+      } else if (levelSelected < 17) {
+        output[`thac-10`] = 16 - fighter5Selected;
+        output[`thac-9`] = 15 - fighter5Selected;
+        output[`thac-8`] = 14 - fighter5Selected;
+        output[`thac-7`] = 13 - fighter5Selected;
+        output[`thac-6`] = 12 - fighter5Selected;
+        output[`thac-5`] = 11 - fighter5Selected;
+        output[`thac-4`] = 10 - fighter5Selected;
+        output[`thac-3`] = 9 - fighter5Selected;
+        output[`thac-2`] = 8 - fighter5Selected;
+        output[`thac-1`] = 7 - fighter5Selected;
+        output.thac00 = 6 - fighter5Selected;
+        output.thac0 = 6 - fighter5Selected;
+        output.thac1 = 5 - fighter5Selected;
+        output.thac2 = 4 - fighter5Selected;
+        output.thac3 = 3 - fighter5Selected;
+        output.thac4 = 2 - fighter5Selected;
+        output.thac5 = 1 - fighter5Selected;
+        output.thac6 = 0 - fighter5Selected;
+        output.thac7 = -1 - fighter5Selected;
+        output.thac8 = -2 - fighter5Selected;
+        output.thac9 = -3 - fighter5Selected;
+        output.thac10 = -4 - fighter5Selected;
+      } else if (levelSelected >= 17) {
+        output[`thac-10`] = 14 - fighter5Selected;
+        output[`thac-9`] = 13 - fighter5Selected;
+        output[`thac-8`] = 12 - fighter5Selected;
+        output[`thac-7`] = 11 - fighter5Selected;
+        output[`thac-6`] = 10 - fighter5Selected;
+        output[`thac-5`] = 9 - fighter5Selected;
+        output[`thac-4`] = 8 - fighter5Selected;
+        output[`thac-3`] = 7 - fighter5Selected;
+        output[`thac-2`] = 6 - fighter5Selected;
+        output[`thac-1`] = 5 - fighter5Selected;
+        output.thac00 = 4 - fighter5Selected;
+        output.thac0 = 4 - fighter5Selected;
+        output.thac1 = 3 - fighter5Selected;
+        output.thac2 = 2 - fighter5Selected;
+        output.thac3 = 1 - fighter5Selected;
+        output.thac4 = 0 - fighter5Selected;
+        output.thac5 = -1 - fighter5Selected;
+        output.thac6 = -2 - fighter5Selected;
+        output.thac7 = -3 - fighter5Selected;
+        output.thac8 = -4 - fighter5Selected;
+        output.thac9 = -5 - fighter5Selected;
+        output.thac10 = -6 - fighter5Selected;
+      }
+      output.attack_matrix_flag = 0;
+    }
+    // magic-users table
+    if (classSelected === 3) {
+      if (levelSelected === 0) {
+        clog('Choose a class level greater than 0 to continue.');
+      } else if (levelSelected < 6) {
+        output[`thac-10`] = 26;
+        output[`thac-9`] = 25;
+        output[`thac-8`] = 24;
+        output[`thac-7`] = 23;
+        output[`thac-6`] = 22;
+        output[`thac-5`] = 21;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 20;
+        output[`thac-2`] = 20;
+        output[`thac-1`] = 20;
+        output.thac00 = 20;
+        output.thac0 = 20;
+        output.thac1 = 20;
+        output.thac2 = 19;
+        output.thac3 = 18;
+        output.thac4 = 17;
+        output.thac5 = 16;
+        output.thac6 = 15;
+        output.thac7 = 14;
+        output.thac8 = 13;
+        output.thac9 = 12;
+        output.thac10 = 11;
+      } else if (levelSelected < 11) {
+        output[`thac-10`] = 24;
+        output[`thac-9`] = 23;
+        output[`thac-8`] = 22;
+        output[`thac-7`] = 21;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 20;
+        output[`thac-2`] = 20;
+        output[`thac-1`] = 20;
+        output.thac00 = 19;
+        output.thac0 = 19;
+        output.thac1 = 18;
+        output.thac2 = 17;
+        output.thac3 = 16;
+        output.thac4 = 15;
+        output.thac5 = 14;
+        output.thac6 = 13;
+        output.thac7 = 12;
+        output.thac8 = 11;
+        output.thac9 = 10;
+        output.thac10 = 9;
+      } else if (levelSelected < 16) {
+        output[`thac-10`] = 21;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 20;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 19;
+        output[`thac-2`] = 18;
+        output[`thac-1`] = 17;
+        output.thac00 = 16;
+        output.thac0 = 16;
+        output.thac1 = 15;
+        output.thac2 = 14;
+        output.thac3 = 13;
+        output.thac4 = 12;
+        output.thac5 = 11;
+        output.thac6 = 10;
+        output.thac7 = 9;
+        output.thac8 = 8;
+        output.thac9 = 7;
+        output.thac10 = 6;
+      } else if (levelSelected < 21) {
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 20;
+        output[`thac-6`] = 19;
+        output[`thac-5`] = 18;
+        output[`thac-4`] = 17;
+        output[`thac-3`] = 16;
+        output[`thac-2`] = 15;
+        output[`thac-1`] = 14;
+        output.thac00 = 13;
+        output.thac0 = 13;
+        output.thac1 = 12;
+        output.thac2 = 11;
+        output.thac3 = 10;
+        output.thac4 = 9;
+        output.thac5 = 8;
+        output.thac6 = 7;
+        output.thac7 = 6;
+        output.thac8 = 5;
+        output.thac9 = 4;
+        output.thac10 = 3;
+      } else if (levelSelected >= 21) {
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 19;
+        output[`thac-7`] = 18;
+        output[`thac-6`] = 17;
+        output[`thac-5`] = 16;
+        output[`thac-4`] = 15;
+        output[`thac-3`] = 14;
+        output[`thac-2`] = 13;
+        output[`thac-1`] = 12;
+        output.thac00 = 11;
+        output.thac0 = 11;
+        output.thac1 = 10;
+        output.thac2 = 9;
+        output.thac3 = 8;
+        output.thac4 = 7;
+        output.thac5 = 6;
+        output.thac6 = 5;
+        output.thac7 = 4;
+        output.thac8 = 3;
+        output.thac9 = 2;
+        output.thac10 = 1;
+      }
+      output.attack_matrix_flag = 0;
+    }
+    // thieves table
+    if (classSelected === 4) {
+      if (levelSelected === 0) {
+        clog('Choose a class level greater than 0 to continue.');
+      } else if (levelSelected < 5) {
+        output[`thac-10`] = 26;
+        output[`thac-9`] = 25;
+        output[`thac-8`] = 24;
+        output[`thac-7`] = 23;
+        output[`thac-6`] = 22;
+        output[`thac-5`] = 21;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 20;
+        output[`thac-2`] = 20;
+        output[`thac-1`] = 20;
+        output.thac00 = 20;
+        output.thac0 = 20;
+        output.thac1 = 20;
+        output.thac2 = 19;
+        output.thac3 = 18;
+        output.thac4 = 17;
+        output.thac5 = 16;
+        output.thac6 = 15;
+        output.thac7 = 14;
+        output.thac8 = 13;
+        output.thac9 = 12;
+        output.thac10 = 11;
+      } else if (levelSelected < 9) {
+        output[`thac-10`] = 24;
+        output[`thac-9`] = 23;
+        output[`thac-8`] = 22;
+        output[`thac-7`] = 21;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 20;
+        output[`thac-2`] = 20;
+        output[`thac-1`] = 20;
+        output.thac00 = 19;
+        output.thac0 = 19;
+        output.thac1 = 18;
+        output.thac2 = 17;
+        output.thac3 = 16;
+        output.thac4 = 15;
+        output.thac5 = 14;
+        output.thac6 = 13;
+        output.thac7 = 12;
+        output.thac8 = 11;
+        output.thac9 = 10;
+        output.thac10 = 9;
+      } else if (levelSelected < 13) {
+        output[`thac-10`] = 21;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 20;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 19;
+        output[`thac-2`] = 18;
+        output[`thac-1`] = 17;
+        output.thac00 = 16;
+        output.thac0 = 16;
+        output.thac1 = 15;
+        output.thac2 = 14;
+        output.thac3 = 13;
+        output.thac4 = 12;
+        output.thac5 = 11;
+        output.thac6 = 10;
+        output.thac7 = 9;
+        output.thac8 = 8;
+        output.thac9 = 7;
+        output.thac10 = 6;
+      } else if (levelSelected < 17) {
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 20;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 19;
+        output[`thac-4`] = 18;
+        output[`thac-3`] = 17;
+        output[`thac-2`] = 16;
+        output[`thac-1`] = 15;
+        output.thac00 = 14;
+        output.thac0 = 14;
+        output.thac1 = 13;
+        output.thac2 = 12;
+        output.thac3 = 11;
+        output.thac4 = 10;
+        output.thac5 = 9;
+        output.thac6 = 8;
+        output.thac7 = 7;
+        output.thac8 = 6;
+        output.thac9 = 5;
+        output.thac10 = 4;
+      } else if (levelSelected < 21) {
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 19;
+        output[`thac-6`] = 18;
+        output[`thac-5`] = 17;
+        output[`thac-4`] = 16;
+        output[`thac-3`] = 15;
+        output[`thac-2`] = 14;
+        output[`thac-1`] = 13;
+        output.thac00 = 12;
+        output.thac0 = 12;
+        output.thac1 = 11;
+        output.thac2 = 10;
+        output.thac3 = 9;
+        output.thac4 = 8;
+        output.thac5 = 7;
+        output.thac6 = 6;
+        output.thac7 = 5;
+        output.thac8 = 4;
+        output.thac9 = 3;
+        output.thac10 = 2;
+      } else if (levelSelected >= 21) {
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 19;
+        output[`thac-8`] = 18;
+        output[`thac-7`] = 17;
+        output[`thac-6`] = 16;
+        output[`thac-5`] = 15;
+        output[`thac-4`] = 14;
+        output[`thac-3`] = 13;
+        output[`thac-2`] = 12;
+        output[`thac-1`] = 11;
+        output.thac00 = 10;
+        output.thac0 = 10;
+        output.thac1 = 9;
+        output.thac2 = 8;
+        output.thac3 = 7;
+        output.thac4 = 6;
+        output.thac5 = 5;
+        output.thac6 = 4;
+        output.thac7 = 3;
+        output.thac8 = 2;
+        output.thac9 = 1;
+        output.thac10 = 0;
+      }
+      output.attack_matrix_flag = 0;
+    }
+    // monsters table
+    if (classSelected === 5) {
+      if (hitdiceSelected === 0) {
+        // clog('Need to select HD to continue.');
+      } else if (hitdiceSelected === 1) {
+        output[`thac-10`] = 26;
+        output[`thac-9`] = 25;
+        output[`thac-8`] = 24;
+        output[`thac-7`] = 23;
+        output[`thac-6`] = 22;
+        output[`thac-5`] = 21;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 20;
+        output[`thac-2`] = 20;
+        output[`thac-1`] = 20;
+        output.thac00 = 20;
+        output.thac0 = 20;
+        output.thac1 = 20;
+        output.thac2 = 19;
+        output.thac3 = 18;
+        output.thac4 = 17;
+        output.thac5 = 16;
+        output.thac6 = 15;
+        output.thac7 = 14;
+        output.thac8 = 13;
+        output.thac9 = 12;
+        output.thac10 = 11;
+      } else if (hitdiceSelected === 2) {
+        output[`thac-10`] = 25;
+        output[`thac-9`] = 24;
+        output[`thac-8`] = 23;
+        output[`thac-7`] = 22;
+        output[`thac-6`] = 21;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 20;
+        output[`thac-2`] = 20;
+        output[`thac-1`] = 20;
+        output.thac00 = 20;
+        output.thac0 = 20;
+        output.thac1 = 19;
+        output.thac2 = 18;
+        output.thac3 = 17;
+        output.thac4 = 16;
+        output.thac5 = 15;
+        output.thac6 = 14;
+        output.thac7 = 13;
+        output.thac8 = 12;
+        output.thac9 = 11;
+        output.thac10 = 10;
+      } else if (hitdiceSelected === 3) {
+        output[`thac-10`] = 24;
+        output[`thac-9`] = 23;
+        output[`thac-8`] = 22;
+        output[`thac-7`] = 21;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 20;
+        output[`thac-2`] = 20;
+        output[`thac-1`] = 20;
+        output.thac00 = 19;
+        output.thac0 = 19;
+        output.thac1 = 18;
+        output.thac2 = 17;
+        output.thac3 = 16;
+        output.thac4 = 15;
+        output.thac5 = 14;
+        output.thac6 = 13;
+        output.thac7 = 12;
+        output.thac8 = 11;
+        output.thac9 = 10;
+        output.thac10 = 9;
+      } else if (hitdiceSelected === 4) {
+        output[`thac-10`] = 23;
+        output[`thac-9`] = 22;
+        output[`thac-8`] = 21;
+        output[`thac-7`] = 20;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 20;
+        output[`thac-2`] = 20;
+        output[`thac-1`] = 19;
+        output.thac00 = 18;
+        output.thac0 = 18;
+        output.thac1 = 17;
+        output.thac2 = 16;
+        output.thac3 = 15;
+        output.thac4 = 14;
+        output.thac5 = 13;
+        output.thac6 = 12;
+        output.thac7 = 11;
+        output.thac8 = 10;
+        output.thac9 = 9;
+        output.thac10 = 8;
+      } else if (hitdiceSelected === 5) {
+        output[`thac-10`] = 21;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 20;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 20;
+        output[`thac-3`] = 19;
+        output[`thac-2`] = 18;
+        output[`thac-1`] = 17;
+        output.thac00 = 16;
+        output.thac0 = 16;
+        output.thac1 = 15;
+        output.thac2 = 14;
+        output.thac3 = 13;
+        output.thac4 = 12;
+        output.thac5 = 11;
+        output.thac6 = 10;
+        output.thac7 = 9;
+        output.thac8 = 8;
+        output.thac9 = 7;
+        output.thac10 = 6;
+      } else if (hitdiceSelected === 6) {
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 20;
+        output[`thac-6`] = 20;
+        output[`thac-5`] = 20;
+        output[`thac-4`] = 19;
+        output[`thac-3`] = 18;
+        output[`thac-2`] = 17;
+        output[`thac-1`] = 16;
+        output.thac00 = 15;
+        output.thac0 = 15;
+        output.thac1 = 14;
+        output.thac2 = 13;
+        output.thac3 = 12;
+        output.thac4 = 11;
+        output.thac5 = 10;
+        output.thac6 = 9;
+        output.thac7 = 8;
+        output.thac8 = 7;
+        output.thac9 = 6;
+        output.thac10 = 5;
+      } else if (hitdiceSelected === 7) {
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 20;
+        output[`thac-6`] = 19;
+        output[`thac-5`] = 18;
+        output[`thac-4`] = 17;
+        output[`thac-3`] = 16;
+        output[`thac-2`] = 15;
+        output[`thac-1`] = 14;
+        output.thac00 = 13;
+        output.thac0 = 13;
+        output.thac1 = 12;
+        output.thac2 = 11;
+        output.thac3 = 10;
+        output.thac4 = 9;
+        output.thac5 = 8;
+        output.thac6 = 7;
+        output.thac7 = 6;
+        output.thac8 = 5;
+        output.thac9 = 4;
+        output.thac10 = 3;
+      } else if (hitdiceSelected === 8) {
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 20;
+        output[`thac-8`] = 20;
+        output[`thac-7`] = 19;
+        output[`thac-6`] = 18;
+        output[`thac-5`] = 17;
+        output[`thac-4`] = 16;
+        output[`thac-3`] = 15;
+        output[`thac-2`] = 14;
+        output[`thac-1`] = 13;
+        output.thac00 = 12;
+        output.thac0 = 12;
+        output.thac1 = 11;
+        output.thac2 = 10;
+        output.thac3 = 9;
+        output.thac4 = 8;
+        output.thac5 = 7;
+        output.thac6 = 6;
+        output.thac7 = 5;
+        output.thac8 = 4;
+        output.thac9 = 3;
+        output.thac10 = 2;
+      } else if (hitdiceSelected === 9) {
+        output[`thac-10`] = 20;
+        output[`thac-9`] = 19;
+        output[`thac-8`] = 18;
+        output[`thac-7`] = 17;
+        output[`thac-6`] = 16;
+        output[`thac-5`] = 15;
+        output[`thac-4`] = 14;
+        output[`thac-3`] = 13;
+        output[`thac-2`] = 12;
+        output[`thac-1`] = 11;
+        output.thac00 = 10;
+        output.thac0 = 10;
+        output.thac1 = 9;
+        output.thac2 = 8;
+        output.thac3 = 7;
+        output.thac4 = 6;
+        output.thac5 = 5;
+        output.thac6 = 4;
+        output.thac7 = 3;
+        output.thac8 = 2;
+        output.thac9 = 1;
+        output.thac10 = 0;
+      } else if (hitdiceSelected === 10) {
+        output[`thac-10`] = 19;
+        output[`thac-9`] = 18;
+        output[`thac-8`] = 17;
+        output[`thac-7`] = 16;
+        output[`thac-6`] = 15;
+        output[`thac-5`] = 14;
+        output[`thac-4`] = 13;
+        output[`thac-3`] = 12;
+        output[`thac-2`] = 11;
+        output[`thac-1`] = 10;
+        output.thac00 = 9;
+        output.thac0 = 9;
+        output.thac1 = 8;
+        output.thac2 = 7;
+        output.thac3 = 6;
+        output.thac4 = 5;
+        output.thac5 = 4;
+        output.thac6 = 3;
+        output.thac7 = 2;
+        output.thac8 = 1;
+        output.thac9 = 0;
+        output.thac10 = -1;
+      } else if (hitdiceSelected === 11) {
+        output[`thac-10`] = 18;
+        output[`thac-9`] = 17;
+        output[`thac-8`] = 16;
+        output[`thac-7`] = 15;
+        output[`thac-6`] = 14;
+        output[`thac-5`] = 13;
+        output[`thac-4`] = 12;
+        output[`thac-3`] = 11;
+        output[`thac-2`] = 10;
+        output[`thac-1`] = 9;
+        output.thac00 = 8;
+        output.thac0 = 8;
+        output.thac1 = 7;
+        output.thac2 = 6;
+        output.thac3 = 5;
+        output.thac4 = 4;
+        output.thac5 = 3;
+        output.thac6 = 2;
+        output.thac7 = 1;
+        output.thac8 = 0;
+        output.thac9 = -1;
+        output.thac10 = -2;
+      } else if (hitdiceSelected === 12) {
+        output[`thac-10`] = 17;
+        output[`thac-9`] = 16;
+        output[`thac-8`] = 15;
+        output[`thac-7`] = 14;
+        output[`thac-6`] = 13;
+        output[`thac-5`] = 12;
+        output[`thac-4`] = 11;
+        output[`thac-3`] = 10;
+        output[`thac-2`] = 9;
+        output[`thac-1`] = 8;
+        output.thac00 = 7;
+        output.thac0 = 7;
+        output.thac1 = 6;
+        output.thac2 = 5;
+        output.thac3 = 4;
+        output.thac4 = 3;
+        output.thac5 = 2;
+        output.thac6 = 1;
+        output.thac7 = 0;
+        output.thac8 = -1;
+        output.thac9 = -2;
+        output.thac10 = -3;
+      }
+      output.attack_matrix_flag = 0;
+    }
+    // NO CLASS found when Sync is enabled: Reset table
+    if (classSelected === 99) {
+      clog('Error: Class not recognized or class name is empty.');
+      output[`thac-10`] = 20;
+      output[`thac-9`] = 20;
+      output[`thac-8`] = 20;
+      output[`thac-7`] = 20;
+      output[`thac-6`] = 20;
+      output[`thac-5`] = 20;
+      output[`thac-4`] = 20;
+      output[`thac-3`] = 20;
+      output[`thac-2`] = 20;
+      output[`thac-1`] = 20;
+      output.thac00 = 20;
+      output.thac0 = 20;
+      output.thac1 = 20;
+      output.thac2 = 20;
+      output.thac3 = 20;
+      output.thac4 = 20;
+      output.thac5 = 20;
+      output.thac6 = 20;
+      output.thac7 = 20;
+      output.thac8 = 20;
+      output.thac9 = 20;
+      output.thac10 = 20;
+      output.attack_matrix_flag = 0;
+    }
+    await setAttrsAsync(output, {silent: true});
+    calcThac0();
   },
 );
 
