@@ -7384,149 +7384,143 @@ const parseValues = (values, stat, type = 'int') => {
 };
 
 // Ability Row Calculations
-strengthCalcs = () => {
-  getAttrs(['strength', 'exceptionalstrength'], (values) => {
-    const output = {};
-    const stat_str = parseValues(values, 'strength', 'int');
-    let stat_str_per = parseValues(values, 'exceptionalstrength');
-    // Special check for perfect strength
-    if (parseValues(values, 'exceptionalstrength', 'str') === '00') stat_str_per = 100;
-    output.exceptionalstrength = stat_str_per;
-    output.meleebonus = (AT_STR.getStrengthValue('Attack', stat_str, stat_str_per) <= 0 ? '' : '+') + AT_STR.getStrengthValue('Attack', stat_str, stat_str_per);
-    output.dmgbonus = (AT_STR.getStrengthValue('Damage', stat_str, stat_str_per) <= 0 ? '' : '+') + AT_STR.getStrengthValue('Damage', stat_str, stat_str_per);
-    output.majorstrengthfeat = AT_STR.getStrengthValue('Major', stat_str, stat_str_per);
-    output.minorstrengthfeat = AT_STR.getStrengthValue('Minor', stat_str, stat_str_per);
-    output.minorstrengthfeat_locked = AT_STR.getStrengthValue('Minor', stat_str, stat_str_per, true);
-    output.encumbrancebonus = (AT_STR.getStrengthValue('Encumbrance', stat_str, stat_str_per) <= 0 ? '' : '+') + AT_STR.getStrengthValue('Encumbrance', stat_str, stat_str_per);
-    setAttrs(output);
-  });
+strengthCalcs = async () => {
+  const values = await getAttrsAsync(['strength', 'exceptionalstrength']);
+  const output = {};
+  const stat_str = await parseValues(values, 'strength', 'int');
+  let stat_str_per = await parseValues(values, 'exceptionalstrength');
+  // Special check for perfect strength
+  if ((await parseValues(values, 'exceptionalstrength', 'str')) === '00') stat_str_per = 100;
+  output.exceptionalstrength = stat_str_per;
+  output.meleebonus = (AT_STR.getStrengthValue('Attack', stat_str, stat_str_per) <= 0 ? '' : '+') + AT_STR.getStrengthValue('Attack', stat_str, stat_str_per);
+  output.dmgbonus = (AT_STR.getStrengthValue('Damage', stat_str, stat_str_per) <= 0 ? '' : '+') + AT_STR.getStrengthValue('Damage', stat_str, stat_str_per);
+  output.majorstrengthfeat = AT_STR.getStrengthValue('Major', stat_str, stat_str_per);
+  output.minorstrengthfeat = AT_STR.getStrengthValue('Minor', stat_str, stat_str_per);
+  output.minorstrengthfeat_locked = AT_STR.getStrengthValue('Minor', stat_str, stat_str_per, true);
+  output.encumbrancebonus = (AT_STR.getStrengthValue('Encumbrance', stat_str, stat_str_per) <= 0 ? '' : '+') + AT_STR.getStrengthValue('Encumbrance', stat_str, stat_str_per);
+  await setAttrsAsync(output);
 };
 
-intelligenceCalcs = () => {
-  getAttrs(['intelligence', 'bonuslanguages', 'race'], (values) => {
-    const output = {};
-    const stat_int = parseValues(values, 'intelligence', 'int');
-    const race_value = parseValues(values, 'race', 'str');
-    let tableBonus = +AT_INT.getEntry(stat_int).getBonusLanguages();
-    if (/human/gi.test(race_value)) {
-      // bonus language INT table data is given for humans
-      output.bonuslanguages = tableBonus;
-    } else if (/dwarf/gi.test(race_value) || /gnome/gi.test(race_value) || /orc/gi.test(race_value)) {
-      // dwarf, gnome, and half-orc are capped at 2
-      output.bonuslanguages = Math.min(tableBonus, 2);
-    } else if (/half-elf/gi.test(race_value) || /halfling/gi.test(race_value) || /hobbit/gi.test(race_value)) {
-      // half-elf or halfling gain +1 for every point above 16
-      if (tableBonus <= 5) {
-        tableBonus = 0;
-      } else if (tableBonus === 6) {
-        tableBonus = 1;
-      } else if (tableBonus === 7) {
-        tableBonus = 2;
-      } else if (tableBonus === 8) {
-        tableBonus = 3;
-      } else if (tableBonus === 9) {
-        tableBonus = 4;
-      } else if (tableBonus === 10) {
-        tableBonus = 5;
-      } else if (tableBonus === 11) {
-        tableBonus = 6;
-      } else if (tableBonus === 12) {
-        tableBonus = 7;
-      } else if (tableBonus === 13) {
-        tableBonus = 8;
-      } else if (tableBonus >= 14) {
-        tableBonus = 9;
-      }
-      output.bonuslanguages = tableBonus;
-    } else if (/elf/gi.test(race_value)) {
-      // elf +1 for every point above 15
-      if (tableBonus <= 4) {
-        tableBonus = 0;
-      } else if (tableBonus === 5) {
-        tableBonus = 1;
-      } else if (tableBonus == 6) {
-        tableBonus = 2;
-      } else if (tableBonus === 7) {
-        tableBonus = 3;
-      } else if (tableBonus === 8) {
-        tableBonus = 4;
-      } else if (tableBonus === 9) {
-        tableBonus = 5;
-      } else if (tableBonus === 10) {
-        tableBonus = 6;
-      } else if (tableBonus === 11) {
-        tableBonus = 7;
-      } else if (tableBonus === 12) {
-        tableBonus = 8;
-      } else if (tableBonus === 13) {
-        tableBonus = 9;
-      } else if (tableBonus >= 14) {
-        tableBonus = 10;
-      }
-      output.bonuslanguages = tableBonus;
-    } else {
-      output.bonuslanguages = 0;
+intelligenceCalcs = async () => {
+  const values = await getAttrsAsync(['intelligence', 'bonuslanguages', 'race']);
+  const output = {};
+  const stat_int = await parseValues(values, 'intelligence', 'int');
+  const race_value = await parseValues(values, 'race', 'str');
+  let tableBonus = +AT_INT.getEntry(stat_int).getBonusLanguages();
+  if (/human/gi.test(race_value)) {
+    // bonus language INT table data is given for humans
+    output.bonuslanguages = tableBonus;
+  } else if (/dwarf/gi.test(race_value) || /gnome/gi.test(race_value) || /orc/gi.test(race_value)) {
+    // dwarf, gnome, and half-orc are capped at 2
+    output.bonuslanguages = Math.min(tableBonus, 2);
+  } else if (/half-elf/gi.test(race_value) || /halfling/gi.test(race_value) || /hobbit/gi.test(race_value)) {
+    // half-elf or halfling gain +1 for every point above 16
+    if (tableBonus <= 5) {
+      tableBonus = 0;
+    } else if (tableBonus === 6) {
+      tableBonus = 1;
+    } else if (tableBonus === 7) {
+      tableBonus = 2;
+    } else if (tableBonus === 8) {
+      tableBonus = 3;
+    } else if (tableBonus === 9) {
+      tableBonus = 4;
+    } else if (tableBonus === 10) {
+      tableBonus = 5;
+    } else if (tableBonus === 11) {
+      tableBonus = 6;
+    } else if (tableBonus === 12) {
+      tableBonus = 7;
+    } else if (tableBonus === 13) {
+      tableBonus = 8;
+    } else if (tableBonus >= 14) {
+      tableBonus = 9;
     }
-    output.knowspell = AT_INT.getEntry(stat_int).getKnowSpell();
-    output.minspells = AT_INT.getEntry(stat_int).getMinSpells();
-    output.maxspells = AT_INT.getEntry(stat_int).getMaxSpells();
-    setAttrs(output, {silent: true});
-  });
-};
-
-wisdomCalcs = () => {
-  getAttrs(['wisdom'], (values) => {
-    const output = {};
-    const stat_wis = parseValues(values, 'wisdom', 'int');
-    output.mentalsavebonus = (AT_WIS.getEntry(stat_wis).getMentalSaveBonus() <= 0 ? '' : '+') + AT_WIS.getEntry(stat_wis).getMentalSaveBonus();
-    output.spellbonus = AT_WIS.getEntry(stat_wis).getSpellBonus();
-    output.spellfailure = AT_WIS.getEntry(stat_wis).getSpellFailure();
-    setAttrs(output, {silent: true});
-  });
-};
-
-dexterityCalcs = () => {
-  getAttrs(['dexterity'], (values) => {
-    const output = {};
-    const stat_dex = parseValues(values, 'dexterity', 'int');
-    const surpriseBon = AT_DEX.getEntry(stat_dex).getSurpriseBonus();
-    const surprisebonus_add_sign = (-1 * surpriseBon <= 0 ? '' : '+') + -1 * surpriseBon;
-    output.surprisebonus = AT_DEX.getEntry(stat_dex).getSurpriseBonus();
-    output.surprisebonus_inverted = surprisebonus_add_sign;
-    output.rangedbonus = (AT_DEX.getEntry(stat_dex).getRangedBonus() <= 0 ? '' : '+') + AT_DEX.getEntry(stat_dex).getRangedBonus();
-    output.armorbonus = (AT_DEX.getEntry(stat_dex).getArmorBonus() <= 0 ? '' : '+') + AT_DEX.getEntry(stat_dex).getArmorBonus();
-    setAttrs(output);
-  });
-};
-
-constitutionCalcs = () => {
-  getAttrs(['constitution', 'class', 'secondclass', 'thirdclass'], (values) => {
-    const output = {};
-    const stat_con = parseValues(values, 'constitution', 'int');
-    // check classes for FRP otherwise cap at HP bonus at +2
-    const classes = [values.class, values.secondclass, values.thirdclass];
-    if (/fighter/gi.test(classes) || /paladin/gi.test(classes) || /ranger/gi.test(classes)) {
-      // clog(`${classes.join(' ')} class. Using expanded HP bonus.`);
-      output.hitpointbonus = (AT_CON.getEntry(stat_con).getHitpointBonus() <= 0 ? '' : '+') + AT_CON.getEntry(stat_con).getHitpointBonus();
-    } else {
-      output.hitpointbonus = (Math.min(AT_CON.getEntry(stat_con).getHitpointBonus(), 2) <= 0 ? '' : '+') + Math.min(AT_CON.getEntry(stat_con).getHitpointBonus(), 2);
+    output.bonuslanguages = tableBonus;
+  } else if (/elf/gi.test(race_value)) {
+    // elf +1 for every point above 15
+    if (tableBonus <= 4) {
+      tableBonus = 0;
+    } else if (tableBonus === 5) {
+      tableBonus = 1;
+    } else if (tableBonus == 6) {
+      tableBonus = 2;
+    } else if (tableBonus === 7) {
+      tableBonus = 3;
+    } else if (tableBonus === 8) {
+      tableBonus = 4;
+    } else if (tableBonus === 9) {
+      tableBonus = 5;
+    } else if (tableBonus === 10) {
+      tableBonus = 6;
+    } else if (tableBonus === 11) {
+      tableBonus = 7;
+    } else if (tableBonus === 12) {
+      tableBonus = 8;
+    } else if (tableBonus === 13) {
+      tableBonus = 9;
+    } else if (tableBonus >= 14) {
+      tableBonus = 10;
     }
-    output.systemshock = AT_CON.getEntry(stat_con).getSystemShock();
-    output.resurrectionsurvival = AT_CON.getEntry(stat_con).getResurrectionSurvival();
-    setAttrs(output);
-  });
+    output.bonuslanguages = tableBonus;
+  } else {
+    output.bonuslanguages = 0;
+  }
+  output.knowspell = AT_INT.getEntry(stat_int).getKnowSpell();
+  output.minspells = AT_INT.getEntry(stat_int).getMinSpells();
+  output.maxspells = AT_INT.getEntry(stat_int).getMaxSpells();
+  await setAttrsAsync(output, {silent: true});
 };
 
-charismaCalcs = () => {
-  getAttrs(['charisma'], (values) => {
-    const output = {};
-    const stat_cha = parseValues(values, 'charisma', 'int');
-    output.maximumhenchmen = AT_CHA.getEntry(stat_cha).MaximumHenchmen();
-    output.loyaltybonus = (AT_CHA.getEntry(stat_cha).getLoyaltyBonus() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getLoyaltyBonus();
-    output.reactionbonus = (AT_CHA.getEntry(stat_cha).getReactionBonus() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getReactionBonus();
-    output.comeliness_cha_adj = (AT_CHA.getEntry(stat_cha).getComeliness() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getComeliness();
-    setAttrs(output, {silent: true});
-  });
+wisdomCalcs = async () => {
+  const values = await getAttrsAsync(['wisdom']);
+  const output = {};
+  const stat_wis = await parseValues(values, 'wisdom', 'int');
+  output.mentalsavebonus = (AT_WIS.getEntry(stat_wis).getMentalSaveBonus() <= 0 ? '' : '+') + AT_WIS.getEntry(stat_wis).getMentalSaveBonus();
+  output.spellbonus = AT_WIS.getEntry(stat_wis).getSpellBonus();
+  output.spellfailure = AT_WIS.getEntry(stat_wis).getSpellFailure();
+  await setAttrsAsync(output, {silent: true});
+};
+
+dexterityCalcs = async () => {
+  const values = await getAttrsAsync(['dexterity']);
+  const output = {};
+  const stat_dex = await parseValues(values, 'dexterity', 'int');
+  const surpriseBon = AT_DEX.getEntry(stat_dex).getSurpriseBonus();
+  const surprisebonus_add_sign = (-1 * surpriseBon <= 0 ? '' : '+') + -1 * surpriseBon;
+  output.surprisebonus = AT_DEX.getEntry(stat_dex).getSurpriseBonus();
+  output.surprisebonus_inverted = surprisebonus_add_sign;
+  output.rangedbonus = (AT_DEX.getEntry(stat_dex).getRangedBonus() <= 0 ? '' : '+') + AT_DEX.getEntry(stat_dex).getRangedBonus();
+  output.armorbonus = (AT_DEX.getEntry(stat_dex).getArmorBonus() <= 0 ? '' : '+') + AT_DEX.getEntry(stat_dex).getArmorBonus();
+  await setAttrsAsync(output);
+};
+
+constitutionCalcs = async () => {
+  const values = await getAttrsAsync(['constitution', 'class', 'secondclass', 'thirdclass']);
+  const output = {};
+  const stat_con = await parseValues(values, 'constitution', 'int');
+  // check classes for FRP otherwise cap at HP bonus at +2
+  const classes = [values.class, values.secondclass, values.thirdclass];
+  if (/fighter/gi.test(classes) || /paladin/gi.test(classes) || /ranger/gi.test(classes)) {
+    // clog(`${classes.join(' ')} class. Using expanded HP bonus.`);
+    output.hitpointbonus = (AT_CON.getEntry(stat_con).getHitpointBonus() <= 0 ? '' : '+') + AT_CON.getEntry(stat_con).getHitpointBonus();
+  } else {
+    output.hitpointbonus = (Math.min(AT_CON.getEntry(stat_con).getHitpointBonus(), 2) <= 0 ? '' : '+') + Math.min(AT_CON.getEntry(stat_con).getHitpointBonus(), 2);
+  }
+  output.systemshock = AT_CON.getEntry(stat_con).getSystemShock();
+  output.resurrectionsurvival = AT_CON.getEntry(stat_con).getResurrectionSurvival();
+  await setAttrsAsync(output);
+};
+
+charismaCalcs = async () => {
+  const values = await getAttrsAsync(['charisma']);
+  const output = {};
+  const stat_cha = await parseValues(values, 'charisma', 'int');
+  output.maximumhenchmen = AT_CHA.getEntry(stat_cha).MaximumHenchmen();
+  output.loyaltybonus = (AT_CHA.getEntry(stat_cha).getLoyaltyBonus() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getLoyaltyBonus();
+  output.reactionbonus = (AT_CHA.getEntry(stat_cha).getReactionBonus() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getReactionBonus();
+  output.comeliness_cha_adj = (AT_CHA.getEntry(stat_cha).getComeliness() <= 0 ? '' : '+') + AT_CHA.getEntry(stat_cha).getComeliness();
+  await setAttrs(output, {silent: true});
 };
 
 thiefSkillsDexCalcs = (autofill_thief_dex) => {
