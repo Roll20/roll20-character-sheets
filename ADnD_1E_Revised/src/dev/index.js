@@ -7567,11 +7567,10 @@ thiefSkillsRacialCalcs = async (autofill_thief_race) => {
 };
 
 // Thief Skills Dex Calculations
-on('change:autofill_thief_dex change:dexterity', (eventInfo) => {
-  getAttrs(['autofill_thief_dex'], (v) => {
-    const autofill_thief_dex = +v.autofill_thief_dex || 0;
-    thiefSkillsDexCalcs(autofill_thief_dex);
-  });
+on('change:autofill_thief_dex change:dexterity', async (eventInfo) => {
+  const v = await getAttrsAsync(['autofill_thief_dex']);
+  const autofill_thief_dex = +v.autofill_thief_dex || 0;
+  await thiefSkillsDexCalcs(autofill_thief_dex);
 });
 
 // match class name to core class & return # for hit table lookup
