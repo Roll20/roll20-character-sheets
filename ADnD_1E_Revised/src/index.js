@@ -5716,13 +5716,12 @@ on('change:saves_class change:saves_level change:autofill_saves', async (eventIn
 });
 
 // toggle monster HD selector
-on('change:matrix_class', (eventInfo) => {
-  getAttrs(['matrix_class'], (v) => {
-    const output = {};
-    const classSelected = +v.matrix_class || 0;
-    output.toggle_matrixhd = classSelected === 5 ? 1 : 0;
-    setAttrs(output, {silent: true});
-  });
+on('change:matrix_class', async (eventInfo) => {
+  const v = await getAttrsAsync(['matrix_class']);
+  const output = {};
+  const classSelected = +v.matrix_class || 0;
+  output.toggle_matrixhd = classSelected === 5 ? 1 : 0;
+  await setAttrsAsync(output, {silent: true});
 });
 
 // match class name to core class & return # for hit table lookup
