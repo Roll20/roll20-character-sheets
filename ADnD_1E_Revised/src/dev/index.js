@@ -7683,7 +7683,7 @@ on('change:character_avatar change:sheet_image change:sheet_image_url', (eventIn
 
 // uses CRP to auto-update link with sheet_image_src
 on('clicked:postimage', async (eventInfo) => {
-  portraitUrlCalc();
+  await portraitUrlCalc();
   const roll_string = `?{Display the portrait image?|YES,@{sheet_image_src}|NO,&nbsp;}`;
   await new Promise((resolve) => {
     startRoll(roll_string, (roll) => {
@@ -7694,14 +7694,13 @@ on('clicked:postimage', async (eventInfo) => {
 });
 
 // psionic calcs
-on('change:psionic_ability_strength_max change:psionic_attack change:psionic_defense', (eventInfo) => {
-  getAttrs(['psionic_ability_strength_max'], (v) => {
-    const output = {};
-    const strengthMax = v.psionic_ability_strength_max;
-    output.psionic_attack_max = float(strengthMax / 2).toFixed(1);
-    output.psionic_defense_max = float(strengthMax / 2).toFixed(1);
-    setAttrs(output, {silent: true});
-  });
+on('change:psionic_ability_strength_max change:psionic_attack change:psionic_defense', async (eventInfo) => {
+  const v = await getAttrsAsync(['psionic_ability_strength_max']);
+  const output = {};
+  const strengthMax = +v.psionic_ability_strength_max || 0;
+  output.psionic_attack_max = float(strengthMax / 2).toFixed(1);
+  output.psionic_defense_max = float(strengthMax / 2).toFixed(1);
+  await setAttrsAsync(output, {silent: true});
 });
 
 weaponInUse = () => {
