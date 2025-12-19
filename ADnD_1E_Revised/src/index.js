@@ -5725,7 +5725,7 @@ on('change:matrix_class', async (eventInfo) => {
 });
 
 // match class name to core class & return # for hit table lookup
-function matchClassName(name) {
+async function matchClassName(name) {
   const lowerCaseName = name.trim().toLowerCase();
   if (/cleric|druid|monk/.test(lowerCaseName)) {
     return 1;
