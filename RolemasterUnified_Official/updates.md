@@ -1,3 +1,42 @@
+# 2025-12-18
+
+- Make spells on Other Realm & Arcane clickable
+- Add restricted parry option.
+
+# 2025-12-11
+
+- Add option to allow overcasting anytime. (Sheet version 17)
+
+# 2025-12-04
+
+- Add XP on journal item add with XP
+- Fix for spells target numbers using traditional target numbers.
+
+# 2025-12-02
+
+The post thanksgiving feast release
+
+- Add Journal version 1.  Track events in the game
+- Add support for Journal calculated XP
+  - new option to enable at character creation
+- Add support for xp variations (Game option)
+  - RMU
+  - Milestone (1 xp -> 1 level)
+  - RMSS / RM2
+  - OSE 1k/2k variants; great for people wanting to do quick conversions
+- Add support for fixed RR bonuses: 50 + 2 * level (Game Option)
+- Spell casting for creatures (just the list click)
+- CSS fixes:
+   - Fix some missing ; in rules
+   - Work with newer VNU
+   - Filter out oklab errors
+
+# 2025-11-07
+
+- Add more details on Initiative rolls
+- Add table roller to creature sheets
+- More details for modified quickness bonuses
+
 # 2025-11-04
 
 The where-did-november-come-from release.
@@ -7,6 +46,7 @@ The where-did-november-come-from release.
   - Reduce DB bonus to 1x Qu instead of 3x
   - Only use running Ranks for partial/full dodge
 - Display options on status pages
+- Add stat roll counter (from $redacted)
 
 # 2025-10-30
 

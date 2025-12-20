@@ -6,9 +6,17 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.11.0 [Screenshot](cof2e.png)
+v1.12.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.12.0_ (2025-11-30)
+
+- Sélection d'un jet sec, de capacité ou de compétence au clic sur une caractéristique
+- Plus d'insertion automatique d'inline-roll [[ ]] dans le texte d'une capacité si ce dernier en comporte déjà
+- Effacement de la liaison entre une ligne d'arme et de munition quand le type d'attaque n'est pas _trait_
+- Pas d'affichage des champs fréquence d'utilisation pour les capacités dont le nombre d'utilisation maximum est 0
+- Ajout gestion des Points de Chance à la fiche de PNJ
 
 ### Version _1.11.0_ (2025-11-11)
 
