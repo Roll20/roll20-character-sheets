@@ -235,6 +235,9 @@
                         <input type="hidden" class="skilledit" name="attr_skilledit" value="0" />
                         <input type="checkbox" name="attr_skilledit" />
                         <input type="text" name="attr_skillname" value="">
+                        <button type="action" name="act_share" class="btn-share">
+                            <div></div>
+                        </button>
                         <div class="sheet-auto-expand">
                             <span name="attr_skilldescription"></span>
                             <textarea class="skill-description" name="attr_skilldescription" rows="4"></textarea>
@@ -379,6 +382,9 @@
                         <input type="hidden" class="skilledit" name="attr_skilledit" value="0" />
                         <input type="checkbox" name="attr_skilledit" />
                         <input type="text" name="attr_skillname" value="">
+                        <button type="action" name="act_share" class="btn-share">
+                            <div></div>
+                        </button>
                         <div class="sheet-auto-expand">
                             <span name="attr_skilldescription"></span>
                             <textarea class="skill-description" name="attr_skilldescription" rows="4"></textarea>
@@ -761,6 +767,19 @@
     </div>
 </rolltemplate>
 
+<rolltemplate class="sheet-rolltemplate-description">
+    <div class="template-container {{sheet_type}}">
+        <h2><span>{{name}}</span><i> ({{character}})</i></h2>
+        <div class="results check">
+            <ul>
+                <li>
+                    <h4>{{description}}</h4>
+                </li>
+            </ul>
+        </div>
+    </div>
+</rolltemplate>
+
 <rolltemplate class="sheet-rolltemplate-hidden">
     <div class="sheet-template-container" style="display: none;"></div>
 </rolltemplate>
@@ -774,6 +793,19 @@ buttonlist.forEach(button => {
         setAttrs({
             sheetTab: button
         })
+    })
+})
+
+//********* SKILL SHARE **********/
+on("clicked:repeating_skills:share", function(eventinfo) {
+    const rowId = eventinfo.sourceAttribute.split("_")[2]
+    getAttrs([`repeating_skills_${rowId}_skillname`, `repeating_skills_${rowId}_skilldescription`, "character_name"], async (values) => {
+        const skillName = values[`repeating_skills_${rowId}_skillname`] || "Unnamed Skill"
+        const skillDescription = values[`repeating_skills_${rowId}_skilldescription`] || "No description."
+        const characterName = values["character_name"] || "Unknown Character"
+        
+        const roll = await startRoll(`&{template:description} {{name=${skillName}}} {{character=${characterName}}} {{description=${skillDescription}}} {{ignore=[[0]]}}`);
+        finishRoll(roll.rollId);
     })
 })
 
