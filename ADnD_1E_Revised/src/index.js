@@ -55,6 +55,9 @@ setTimeout = function (callback, timeout) {
   }, timeout);
 };
 
+// A simple helper to use your setTimeout as a promise
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 function getAttrsAsync(props) {
   let acid = getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs
   let prevAcid = null; //local variable defined here, because it needs to be shared across the promise callbacks defined below
@@ -387,7 +390,7 @@ const other5Attrs = ['armorother5_worn', 'armorother5', 'armorother5_ac', 'armor
 const other6Attrs = ['armorother6_worn', 'armorother6', 'armorother6_ac', 'armorother6_base', 'armorother6_magic', 'armorother6_mod'];
 
 // concatenates repeating attribute names
-const concatRepAttrName = (section, id, field) => `repeating_${section}_${id}_${field}`;
+const concatRepAttrName = (sectionName, id, field) => `repeating_${sectionName}_${id}_${field}`;
 
 // fixes attribute name conflict
 const dmgSwap = (current_version, final_version) => {
@@ -2672,7 +2675,7 @@ const newSheet = async () => {
 
 // One-time update: set repeating_equipment_equipment_sync_armor_flag
 const updateSyncArmorFlag = async (current_version, final_version) => {
-  const idArray = await getSectionIDsAsync('repeating_equipment');
+  const idArray = await getSectionIDsAsync('equipment');
   const fieldsToGet = idArray.map((id) => concatRepAttrName('equipment', id, 'equipment_armor_type'));
   const v = await getAttrsAsync([...armorRowIDs, ...fieldsToGet]);
   const output = {};
@@ -2857,7 +2860,7 @@ on('change:is_npc', async (eventInfo) => {
 });
 
 const sumEquipmentCost = async () => {
-  const idArray = await getSectionIDsAsync('repeating_equipment');
+  const idArray = await getSectionIDsAsync('equipment');
   const output = {};
   const fields = [];
   _.each(idArray, (id) => {
@@ -2900,7 +2903,7 @@ const sumCoinWeight = async () => {
 
 // Equipment Weight Calcs
 const sumEquipmentWeight = async () => {
-  const idArray = await getSectionIDsAsync('repeating_equipment');
+  const idArray = await getSectionIDsAsync('equipment');
   const output = {};
   const fields = [];
   _.each(idArray, (id) => {
@@ -3161,7 +3164,7 @@ on(
 // Equipment Tabs hide/show Rows
 on('change:equipment_tabs_type change:equipment_tabs_carry', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  const idArray = await getSectionIDsAsync('repeating_equipment');
+  const idArray = await getSectionIDsAsync('equipment');
   const output = {};
   const fields = [];
   _.each(idArray, (id) => {
@@ -3170,10 +3173,6 @@ on('change:equipment_tabs_type change:equipment_tabs_carry', async (eventInfo) =
     fields.push(concatRepAttrName('equipment', id, 'equipment_magical'));
   });
   const v = await getAttrsAsync(['equipment_tabs_type', 'equipment_tabs_carry', 'equipment_magical', ...fields]);
-  idArray.forEach((id) => {
-    const currentValue = +v[concatRepAttrName('section', id, 'attribute')] || 0;
-    output[concatRepAttrName('section', id, 'attribute')] = currentValue;
-  });
   const typeTab = +v.equipment_tabs_type || 0; // 0, 1, 2, 3, 4, -1
   const carriedTab = +v.equipment_tabs_carry || 0; // 1, 0, 2, -1
   _.each(idArray, (id) => {
@@ -3193,7 +3192,7 @@ on('change:equipment_tabs_type change:equipment_tabs_carry', async (eventInfo) =
 });
 
 const removeEmptyArmorRows = async () => {
-  const idArray = await getSectionIDsAsync('repeating_equipment');
+  const idArray = await getSectionIDsAsync('equipment');
   clog(`removeEmptyArmorRows`);
   const output = {};
   const fields = [];
@@ -3863,7 +3862,7 @@ on('clicked:addturnundead2', (eventInfo) => {
 // Spell Tabs and Memorized toggle
 on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs change:toggle_caster2', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  const idArray = await getSectionIDsAsync('repeating_spells');
+  const idArray = await getSectionIDsAsync('spells');
   const output = {};
   const fields = [];
   _.each(idArray, (id) => {
@@ -3932,7 +3931,7 @@ on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_cla
 });
 
 setSpellsCasterClass = async () => {
-  const idArray = await getSectionIDsAsync('repeating_spells');
+  const idArray = await getSectionIDsAsync('spells');
   const output = {};
   const fields = [];
   _.each(idArray, (id) => {
@@ -4068,7 +4067,7 @@ on(
 // Matrix or THAC0 Toggle for repeating_weapon
 on('change:toggle_to_hit_table', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const idArray = await getSectionIDsAsync('weapon');
   const output = {};
   const fields = [];
   _.each(idArray, (id) => {
@@ -4153,7 +4152,7 @@ on('change:repeating_weapon:weapon_whisper_to_hit_select', async (eventInfo) => 
 // Weapon Proficiency Toggle
 on('change:weapon_proficiency_initial change:weapon_proficiency_added_per_level change:weapon_proficiency_penalty', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const idArray = await getSectionIDsAsync('weapon');
   const output = {};
   const fields = [];
   _.each(idArray, (id) => {
@@ -4186,7 +4185,7 @@ on('change:repeating_weapon:weapon_prof_flag', async (eventInfo) => {
 // Weapon Backstab Toggle
 on('change:backstab change:backstab_bonus change:toggle_thief_skills', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const idArray = await getSectionIDsAsync('weapon');
   const output = {};
   const fields = [];
   _.each(idArray, (id) => {
@@ -4256,7 +4255,7 @@ on('change:repeating_weapon:weapon_dual', async (eventInfo) => {
 });
 
 async function syncDualPen() {
-  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const idArray = await getSectionIDsAsync('weapon');
   const output = {};
   const fields = idArray.flatMap((id) => [concatRepAttrName('weapon', id, 'weapon_critdamage_flag'), concatRepAttrName('weapon', id, 'weapon_critdamage_mult')]);
   // const fields = idArray.map((id) => concatRepAttrName('weapon', id, 'weapon_dual'));
@@ -4701,7 +4700,7 @@ on(
 );
 
 on('change:toggle_critdamage change:toggle_auto_damage', async (eventInfo) => {
-  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const idArray = await getSectionIDsAsync('weapon');
   const fields = idArray.map((id) => concatRepAttrName('weapon', id, 'weapon_critdamage_flag'));
   const v = await getAttrsAsync(['toggle_auto_damage', ...fields]);
   const output = {};
@@ -4918,11 +4917,11 @@ on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_ite
 on('sheet:opened', async (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   const output = {};
-  const weaponRows = await getSectionIDsAsync('repeating_weapon');
-  const abilityRows = await getSectionIDsAsync('repeating_ability');
-  const nwpRows = await getSectionIDsAsync('repeating_nonweaponproficiencies');
-  const equipmentRows = await getSectionIDsAsync('repeating_equipment');
-  const spellsRows = await getSectionIDsAsync('repeating_spells');
+  const weaponRows = await getSectionIDsAsync('weapon');
+  const abilityRows = await getSectionIDsAsync('ability');
+  const nwpRows = await getSectionIDsAsync('nonweaponproficiencies');
+  const equipmentRows = await getSectionIDsAsync('equipment');
+  const spellsRows = await getSectionIDsAsync('spells');
 
   if (weaponRows.length === 0) {
     const newrowid = generateUniqueRowID();
@@ -4964,62 +4963,62 @@ on(
       output.surprise_macro_text = '';
       output.surprise_others_macro_text = '';
       output.init_macro_text = '';
-      const idArrayEquipment = await getSectionIDsAsync('repeating_equipment');
+      const idArrayEquipment = await getSectionIDsAsync('equipment');
       _.each(idArrayEquipment, (id) => {
         output[`repeating_equipment_${id}_equipment_macro_text`] = '';
         clog(`macro reset completed on: ${id} Equipment`);
       });
-      const idArrayWeapons = await getSectionIDsAsync('repeating_weapon');
+      const idArrayWeapons = await getSectionIDsAsync('weapon');
       _.each(idArrayWeapons, (id) => {
         output[`repeating_weapon_${id}_weapon_macro_text`] = '';
         clog(`macro reset completed on: ${id} Weapon`);
       });
-      const idArrayAbilities = await getSectionIDsAsync('repeating_ability');
+      const idArrayAbilities = await getSectionIDsAsync('ability');
       _.each(idArrayAbilities, (id) => {
         output[`repeating_ability_${id}_ability_macro_text`] = '';
         clog(`macro reset completed on: ${id} Ability`);
       });
-      const idArrayNWPs = await getSectionIDsAsync('repeating_nonweaponproficiencies');
+      const idArrayNWPs = await getSectionIDsAsync('nonweaponproficiencies');
       _.each(idArrayNWPs, (id) => {
         output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = '';
         clog(`macro reset completed on: ${id} NWP`);
       });
-      const idArraySpells = await getSectionIDsAsync('repeating_spells');
+      const idArraySpells = await getSectionIDsAsync('spells');
       _.each(idArraySpells, (id) => {
         output[`repeating_spells_${id}_spell_macro_text`] = '';
         clog(`macro reset completed on: ${id} Spells`);
       });
     }
     if (clickedWord === 'resetequipmentmacros') {
-      const idArrayEquipment = await getSectionIDsAsync('repeating_equipment');
+      const idArrayEquipment = await getSectionIDsAsync('equipment');
       _.each(idArrayEquipment, (id) => {
         output[`repeating_equipment_${id}_equipment_macro_text`] = '';
         clog(`macro reset completed on: ${id} Equipment`);
       });
     }
     if (clickedWord === 'resetweaponsmacros') {
-      const idArrayWeapons = await getSectionIDsAsync('repeating_weapon');
+      const idArrayWeapons = await getSectionIDsAsync('weapon');
       _.each(idArrayWeapons, (id) => {
         output[`repeating_weapon_${id}_weapon_macro_text`] = '';
         clog(`macro reset completed on: ${id} Weapon`);
       });
     }
     if (clickedWord === 'resetabilitiesmacros') {
-      const idArrayAbilities = await getSectionIDsAsync('repeating_ability');
+      const idArrayAbilities = await getSectionIDsAsync('ability');
       _.each(idArrayAbilities, (id) => {
         output[`repeating_ability_${id}_ability_macro_text`] = '';
         clog(`macro reset completed on: ${id} Ability`);
       });
     }
     if (clickedWord === 'resetnwpsmacros') {
-      const idArrayNWPs = await getSectionIDsAsync('repeating_nonweaponproficiencies');
+      const idArrayNWPs = await getSectionIDsAsync('nonweaponproficiencies');
       _.each(idArrayNWPs, (id) => {
         output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = '';
         clog(`macro reset completed on: ${id} NWP`);
       });
     }
     if (clickedWord === 'resetspellsmacros') {
-      const idArraySpells = await getSectionIDsAsync('repeating_spells');
+      const idArraySpells = await getSectionIDsAsync('spells');
       _.each(idArraySpells, (id) => {
         output[`repeating_spells_${id}_spell_macro_text`] = '';
         clog(`macro reset completed on: ${id} Spells`);
@@ -7704,7 +7703,7 @@ on('change:psionic_ability_strength_max change:psionic_attack change:psionic_def
 });
 
 weaponInUse = async () => {
-  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const idArray = await getSectionIDsAsync('weapon');
   const output = {};
   const weaponsInUse = [];
   // Array to store weapons with inUse === 1
@@ -7753,161 +7752,246 @@ on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use chang
   weaponInUse();
 });
 
-// utility function to grab row order
-const getSectionIDsOrdered = function (sectionName, callback) {
-  getAttrs([`_reporder_${sectionName}`], function (v) {
-    getSectionIDs(sectionName, function (idArray) {
-      let reporderArray = v[`_reporder_${sectionName}`] ? v[`_reporder_${sectionName}`].toLowerCase().split(',') : [],
-        ids = [...new Set(reporderArray.filter((x) => idArray.includes(x)).concat(idArray))];
-      callback(ids);
-    });
-  });
-};
+// async version of getSectionIDsOrdered
+async function getSectionIDsOrderedAsync(sectionName) {
+  const idArray = await getSectionIDsAsync(sectionName);
+  const v = await getAttrsAsync([`_reporder_repeating_${sectionName}`]);
+  const reporderStr = v[`_reporder_repeating_${sectionName}`] || '';
+  const reporderArray = reporderStr ? reporderStr.split(',') : [];
+  // Ensure we are only using IDs that actually exist in the current idArray
+  const validReporder = reporderArray.filter((id) => idArray.includes(id.toLowerCase()));
+  const ids = [...new Set([...validReporder, ...idArray])];
+  return ids;
+}
 
 // sort repeating rows
-on('clicked:spell-sort-alphabetical clicked:spell-sort-level', function (eventInfo) {
-  // console.log(`Change detected: Sorting Spells`);
-  const sectionName = 'repeating_spells';
-  // needed to grab current/previous order
-  getSectionIDsOrdered(sectionName, function (ids) {
-    getSectionIDs(sectionName, (idArray) => {
-      // Bail out IF 0 repeating entries
-      if (!idArray.length) return;
-      const fields = [];
-      const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
-      // grab any attrs used for sorting
-      idArray.forEach((id) => {
-        fields.push(concatRepAttrName('spells', id, 'spell_caster_class'));
-        fields.push(concatRepAttrName('spells', id, 'spell_level'));
-        fields.push(concatRepAttrName('spells', id, 'spell_name'));
-      });
-      getAttrs([...fields], (v) => {
-        const output = {};
-        const spells = idArray.map((id) => ({
-          id,
-          casterClass: v[concatRepAttrName('spells', id, 'spell_caster_class')] || 0,
-          level: v[concatRepAttrName('spells', id, 'spell_level')], // can be '?'
-          name: (v[concatRepAttrName('spells', id, 'spell_name')] || '').trim(),
-        }));
+on('clicked:spell-sort-alphabetical clicked:spell-sort-level', async (eventInfo) => {
+  const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
+  // clog(`Change detected: Sorting Spells ${buttonClicked}`);
+  const v = await getAttrsAsync(['spells_sheet_busy']);
+  // Exit if already sorting
+  if (+v.spells_sheet_busy === 1) return;
+  // flag as busy on sheet
+  await setAttrsAsync({spells_sheet_busy: 1});
 
-        const getLevelValue = (level) => {
-          if (level === '?') return -1;
-          return level || 0;
-        };
+  try {
+    const sectionName = 'spells';
+    // needed to grab current/previous order
+    const ids = await getSectionIDsOrderedAsync(sectionName);
+    const idArray = await getSectionIDsAsync(sectionName);
+    if (idArray.length > 0) {
+      // grab attrs used for sorting
+      const fields = idArray.flatMap((id) => [
+        concatRepAttrName('spells', id, 'spell_caster_class'),
+        concatRepAttrName('spells', id, 'spell_level'),
+        concatRepAttrName('spells', id, 'spell_name'),
+      ]);
+      const v = await getAttrsAsync(fields);
+      const output = {};
+      const spells = idArray.map((id) => ({
+        id,
+        casterClass: v[concatRepAttrName('spells', id, 'spell_caster_class')] || 0,
+        level: v[concatRepAttrName('spells', id, 'spell_level')], // can be '?'
+        name: (v[concatRepAttrName('spells', id, 'spell_name')] || '').trim(),
+      }));
 
-        // SORT LOGIC
-        if (buttonClicked === 'spell-sort-alphabetical') {
-          spells.sort((a, b) => {
-            // sort by spell name A-Z
-            return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
-          });
-        } else if (buttonClicked === 'spell-sort-level') {
-          // sort by Caster Class, then level 0-9, then by spell name A-Z
-          spells.sort((a, b) => {
-            const aLevel = getLevelValue(a.level);
-            const bLevel = getLevelValue(b.level);
-            return (
-              a.casterClass - b.casterClass ||
-              aLevel - bLevel || // Sort using the new values
-              a.name.localeCompare(b.name, undefined, {sensitivity: 'base'})
-            );
-          });
-        }
+      const getLevelValue = (level) => {
+        if (level === '?') return -1;
+        return level || 0;
+      };
 
-        // new sort order
-        const order = spells.map((s) => `${s.id}`);
-
-        // save previous order/state for 'Undo'
-        output.spells_previous_order_array = ids.join(',');
-        // console.log(`Previous Order has been saved.`);
-        // console.log(ids);
-
-        // set new sort order
-        setAttrs(output, {silent: true}, () => {
-          setSectionOrder('spells', order);
+      // sort logic
+      if (buttonClicked === 'spell-sort-alphabetical') {
+        // sort by spell name A-Z
+        spells.sort((a, b) => {
+          return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
         });
-        // console.log(`${buttonClicked} Reordered ${sectionName}:`, spells);
-      });
-    });
-  });
-});
-
-// restores previous order
-on('clicked:spell-sort-undo', (eventInfo) => {
-  // console.log(`Change detected: Undo last Sort`);
-  getAttrs(['spells_previous_order_array'], (v) => {
-    const order = v.spells_previous_order_array;
-    if (!order || typeof order !== 'string') return;
-    const previousOrder = order.split(',');
-    // console.log(`Previous Order:${previousOrder}`);
-    setSectionOrder('spells', previousOrder);
-  });
-});
-
-on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', function (eventInfo) {
-  // console.log(`Change detected: Sorting Equipment`);
-  const sectionName = 'repeating_equipment';
-  // needed to grab current/previous order
-  getSectionIDsOrdered(sectionName, function (ids) {
-    getSectionIDs(sectionName, (idArray) => {
-      // Bail out IF 0 repeating entries
-      if (!idArray.length) return;
-      const fields = [];
-      const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
-      // grab any attrs used for sorting
-      idArray.forEach((id) => {
-        fields.push(concatRepAttrName('equipment', id, 'equipment_item'));
-        fields.push(concatRepAttrName('equipment', id, 'equipment_location'));
-      });
-      getAttrs([...fields], (v) => {
-        const output = {};
-        const equipment = idArray.map((id) => ({
-          id,
-          name: (v[concatRepAttrName('equipment', id, 'equipment_item')] || '').trim(),
-          location: (v[concatRepAttrName('equipment', id, 'equipment_location')] || '').trim(),
-        }));
-
-        if (buttonClicked === 'equipment-sort-alphabetical') {
-          equipment.sort((a, b) => {
-            // sort by equipment name A-Z
-            return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
-          });
-        } else if (buttonClicked === 'equipment-sort-location') {
-          equipment.sort((a, b) => {
-            // 1. Compare by location first
-            const locationComparison = a.location.localeCompare(b.location, undefined, {sensitivity: 'base'});
-            // If locations are different (non-zero result), return the location comparison
-            if (locationComparison !== 0) {
-              return locationComparison;
-            }
-            // 2. If locations are the same (locationComparison is 0), then compare by equipment name
-            return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
-          });
-        }
-        // Apply the new order
-        const order = equipment.map((s) => `${s.id}`);
-        // save previous order/state for 'Undo'
-        output.equipment_previous_order_array = ids.join(',');
-        // console.log(`Previous Order has been saved.`);
-        // console.log(ids);
-        // set new sort order
-        setAttrs(output, {silent: true}, () => {
-          setSectionOrder('equipment', order);
+      } else if (buttonClicked === 'spell-sort-level') {
+        // sort by Caster Class, then level 0-9, then by spell name A-Z
+        spells.sort((a, b) => {
+          const aLevel = getLevelValue(a.level);
+          const bLevel = getLevelValue(b.level);
+          return (
+            a.casterClass - b.casterClass ||
+            aLevel - bLevel || // Sort using the new values
+            a.name.localeCompare(b.name, undefined, {sensitivity: 'base'})
+          );
         });
-        // console.log(`${buttonClicked} Reordered ${sectionName}:`, equipment);
-      });
-    });
-  });
+      }
+
+      // new sort order
+      const order = spells.map((s) => `${s.id}`);
+      setSectionOrder('spells', order);
+
+      // give sheet time to render rows
+      if (order.length > 35) {
+        await sleep(100);
+      } else {
+        await sleep(20);
+      }
+
+      // ensure the ids being saved are unique (no case mismatches)
+      const uniquePreviousIds = [...new Set(ids.map((id) => id.toLowerCase()))];
+      // save previous order/state for 'Undo'
+      output.spells_previous_order_array = uniquePreviousIds.join(',');
+
+      await setAttrsAsync(output, {silent: true});
+      // clog(`Sort complete. Previous order saved.`);
+      // console.log(spells);
+    }
+  } catch (error) {
+    console.error('Sort failed', error);
+  } finally {
+    await setAttrsAsync({spells_sheet_busy: 0});
+    // clog(`Sheet busy flag cleared.`);
+  }
 });
 
-// restores previous order
-on('clicked:equipment-sort-undo', (eventInfo) => {
-  // console.log(`Change detected: Undo last Sort`);
-  getAttrs(['equipment_previous_order_array'], (v) => {
-    const order = v.equipment_previous_order_array;
-    if (!order || typeof order !== 'string') return;
-    const previousOrder = order.split(',');
-    // console.log(`Previous Order:${previousOrder}`);
-    setSectionOrder('equipment', previousOrder);
-  });
+on('clicked:spell-sort-undo', async (eventInfo) => {
+  // clog(`Change detected: Undo last Sort`);
+  const v = await getAttrsAsync(['spells_sheet_busy']);
+  // Exit if already sorting
+  if (+v.spells_sheet_busy === 1) return;
+  // flag as busy on sheet
+  await setAttrsAsync({spells_sheet_busy: 1});
+
+  try {
+    const sectionName = 'spells';
+    const [v, currentIDs] = await Promise.all([getAttrsAsync(['spells_previous_order_array']), getSectionIDsAsync(sectionName)]);
+    const savedOrderStr = v.spells_previous_order_array || '';
+    // exit if no 'Undo'
+    if (!savedOrderStr) {
+      // clog('No undo history found.');
+    } else {
+      const currentSet = new Set(currentIDs.map((id) => id.toLowerCase()));
+      // Filter and ensure uniqueness again just in case
+      const validOrder = [
+        ...new Set(
+          savedOrderStr
+            .split(',')
+            .map((id) => id.toLowerCase())
+            .filter((id) => currentSet.has(id)),
+        ),
+      ];
+      // clog(`Restoring order for ${validOrder.length} rows.`);
+      setSectionOrder(sectionName, validOrder);
+      // Done. Clearing Undo.
+      await setAttrsAsync({spells_previous_order_array: ''}, {silent: true});
+    }
+  } catch (error) {
+    console.error('Undo failed', error);
+  } finally {
+    await setAttrsAsync({spells_sheet_busy: 0});
+    // clog(`Undo process finished. Sheet unlocked.`);
+  }
+});
+
+on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', async (eventInfo) => {
+  const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
+  // clog(`Change detected: Sorting Equipment ${buttonClicked}`);
+  const v = await getAttrsAsync(['equipment_sheet_busy']);
+  // Exit if already sorting
+  if (+v.equipment_sheet_busy === 1) return;
+  // flag as busy on sheet
+  await setAttrsAsync({equipment_sheet_busy: 1});
+
+  try {
+    const sectionName = 'equipment';
+    // needed to grab current/previous order
+    const ids = await getSectionIDsOrderedAsync(sectionName);
+    const idArray = await getSectionIDsAsync(sectionName);
+    if (idArray.length > 0) {
+      // grab attrs used for sorting
+      const fields = idArray.flatMap((id) => [concatRepAttrName('equipment', id, 'equipment_item'), concatRepAttrName('equipment', id, 'equipment_location')]);
+      const v = await getAttrsAsync(fields);
+      const output = {};
+      const equipment = idArray.map((id) => ({
+        id,
+        name: (v[concatRepAttrName('equipment', id, 'equipment_item')] || '').trim(),
+        location: (v[concatRepAttrName('equipment', id, 'equipment_location')] || '').trim(),
+      }));
+
+      // sort logic
+      if (buttonClicked === 'equipment-sort-alphabetical') {
+        // sort by equipment name A-Z
+        equipment.sort((a, b) => {
+          return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+        });
+      } else if (buttonClicked === 'equipment-sort-location') {
+        // location first
+        equipment.sort((a, b) => {
+          const locationComparison = a.location.localeCompare(b.location, undefined, {sensitivity: 'base'});
+          // If locations are different (non-zero result), return the location comparison
+          if (locationComparison !== 0) {
+            return locationComparison;
+          }
+          // If locations are the same (locationComparison is 0), then compare by equipment name
+          return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+        });
+      }
+
+      // new sort order
+      const order = equipment.map((s) => s.id);
+      setSectionOrder(sectionName, order);
+
+      // give sheet time to render rows
+      if (order.length > 35) {
+        await sleep(100);
+      } else {
+        await sleep(20);
+      }
+      // ensure the ids being saved are unique (no case mismatches)
+      const uniquePreviousIds = [...new Set(ids.map((id) => id.toLowerCase()))];
+      // save previous order/state for 'Undo'
+      output.equipment_previous_order_array = uniquePreviousIds.join(',');
+
+      await setAttrsAsync(output, {silent: true});
+      // clog(`Sort complete. Previous order saved.`);
+      // console.log(equipment);
+    }
+  } catch (error) {
+    console.error('Sort failed', error);
+  } finally {
+    await setAttrsAsync({equipment_sheet_busy: 0});
+    // clog(`Sheet busy flag cleared.`);
+  }
+});
+
+on('clicked:equipment-sort-undo', async (eventInfo) => {
+  // clog(`Change detected: Undo last Sort`);
+  const v = await getAttrsAsync(['equipment_sheet_busy']);
+  // Exit if already sorting
+  if (+v.equipment_sheet_busy === 1) return;
+  // flag as busy on sheet
+  await setAttrsAsync({equipment_sheet_busy: 1});
+
+  try {
+    const sectionName = 'equipment';
+    const [v, currentIDs] = await Promise.all([getAttrsAsync(['equipment_previous_order_array']), getSectionIDsAsync(sectionName)]);
+    const savedOrderStr = v.equipment_previous_order_array || '';
+    // exit if no 'Undo'
+    if (!savedOrderStr) {
+      // clog('No undo history found.');
+    } else {
+      const currentSet = new Set(currentIDs.map((id) => id.toLowerCase()));
+      // Filter and ensure uniqueness again just in case
+      const validOrder = [
+        ...new Set(
+          savedOrderStr
+            .split(',')
+            .map((id) => id.toLowerCase())
+            .filter((id) => currentSet.has(id)),
+        ),
+      ];
+      // clog(`Restoring order for ${validOrder.length} rows.`);
+      setSectionOrder(sectionName, validOrder);
+      // Done. Clearing Undo.
+      await setAttrsAsync({equipment_previous_order_array: ''}, {silent: true});
+    }
+  } catch (error) {
+    console.error('Undo failed', error);
+  } finally {
+    await setAttrsAsync({equipment_sheet_busy: 0});
+    // clog(`Undo process finished. Sheet unlocked.`);
+  }
 });
