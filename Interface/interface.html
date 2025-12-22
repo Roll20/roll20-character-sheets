@@ -2172,63 +2172,84 @@
 // ===================================================
 
     const rolls = [
-        ["endurance", "CARRURE"],
-        ["force_brute", "CARRURE"],
-        ["robustesse", "CARRURE"],
-        ["agilite_corporelle", "AGILITE"],
-        ["precision", "AGILITE"],
-        ["reflexe", "AGILITE"],
-        ["acuite_sensorielle", "PERCEPTION"],
-        ["sixieme_sens", "PERCEPTION"],
-        ["vigilance", "PERCEPTION"],
-        ["decision", "MENTAL"],
-        ["determination", "MENTAL"],
-        ["equilibre_mental", "MENTAL"],
-        ["creativite", "INTELLECT"],
-        ["erudition", "INTELLECT"],
-        ["logique", "INTELLECT"],
-        ["aura", "CHARISME"],
-        ["communication_expressive", "CHARISME"],
-        ["persuasion", "CHARISME"]
+    ["endurance", "CARRURE"],
+    ["force_brute", "CARRURE"],
+    ["robustesse", "CARRURE"],
+    ["agilite_corporelle", "AGILITE"],
+    ["precision", "AGILITE"],
+    ["reflexe", "AGILITE"],
+    ["acuite_sensorielle", "PERCEPTION"],
+    ["sixieme_sens", "PERCEPTION"],
+    ["vigilance", "PERCEPTION"],
+    ["decision", "MENTAL"],
+    ["determination", "MENTAL"],
+    ["equilibre_mental", "MENTAL"],
+    ["creativite", "INTELLECT"],
+    ["erudition", "INTELLECT"],
+    ["logique", "INTELLECT"],
+    ["aura", "CHARISME"],
+    ["communication_expressive", "CHARISME"],
+    ["persuasion", "CHARISME"]
     ];
 
     rolls.forEach(([talent, competence]) => {
         const baseName = `roll-${talent}-${competence}`;
-        
-        // Jet VIRTUEL
-        on(`clicked:${baseName}`, async (event) => {
+
+        on(`clicked:${baseName}`, async () => {
             handleRoll(talent, competence, false);
         });
 
-        // Jet PHYSIQUE
-        on(`clicked:${baseName}-phy`, async (event) => {
+        on(`clicked:${baseName}-phy`, async () => {
             handleRoll(talent, competence, true);
         });
     });
 
-    async function handleRoll(talent, competence, isPhysique = false) {
-        const jetExpression = isPhysique ? "@{rollphysique}[Résultat dés physiques]" : "1d100[Jet]";
+    function getChanceDestin(seuil) {
+        const s = parseInt(seuil) || 0;
 
-        const roll = await startRoll(`@{gm} &{template:itd} {{jet=oui}} {{token=@{ctoken}}} {{title=^{attr-${talent}}}} {{subheader=@{character_name}}} {{nom=@{character_name}}} {{competence=@{${competence}}}} {{talent=@{${talent}}}} {{malus_etat=@{total_malus}}} {{destin=@{destin}}} {{seuil=[[@{${competence}}[Compétence]+@{${talent}}[Talent] @{rollmodifier}[Modificateur]-@{total_malus}[Blessures et Stress]]]}} {{result=[[${jetExpression}]]}}`);
+        if (s <= 10) return 1.00;   // 0-10  => 100%
+        if (s <= 20) return 0.90;   // 11-20 => 90%
+        if (s <= 30) return 0.80;   // 21-30 => 80%
+        if (s <= 40) return 0.70;   // 31-40 => 70%
+        if (s <= 50) return 0.60;   // 41-50 => 60%
+        if (s <= 60) return 0.50;   // 51-60 => 50%
+        if (s <= 70) return 0.30;   // 61-70 => 30%
+        if (s <= 80) return 0.10;   // 71-80 => 10%
+        return 0.05;                // 81-100 (et au-delà) => 5%
+    }
+
+    async function handleRoll(talent, competence, isPhysique = false) {
+        const jetExpression = isPhysique
+            ? "@{rollphysique}[Résultat dés physiques]"
+            : "1d100[Jet]";
+
+        const roll = await startRoll(
+            `@{gm} &{template:itd} {{jet=oui}} {{token=@{ctoken}}} {{title=^{attr-${talent}}}} {{subheader=@{character_name}}} {{nom=@{character_name}}} {{competence=@{${competence}}}} {{talent=@{${talent}}}} {{malus_etat=@{total_malus}}} {{destin=@{destin}}} {{seuil=[[@{${competence}}[Compétence]+@{${talent}}[Talent] @{rollmodifier}[Modificateur]-@{total_malus}[Blessures et Stress]]]}} {{result=[[${jetExpression}]]}}`
+        );
 
         const { seuil, result } = roll.results;
 
-        getAttrs(["gain_destin", "destin"], function(values) {
+        getAttrs(["gain_destin", "destin"], function (values) {
             let destin = parseInt(values["destin"]) || 0;
             const bonus = parseInt(values["gain_destin"]) || 5;
-            
+
             const margeNaturelle = Math.floor((seuil.result - result.result) / 10);
 
             let jetCorrige = result.result;
             let margeCorrigee = margeNaturelle;
 
             if (margeNaturelle >= 0) {
+                // Succès naturel
                 destin = 0;
             } else {
-                const chanceUtilisationDestin = 0.9;
+                const chanceUtilisationDestin = getChanceDestin(seuil.result);
 
                 if (Math.random() < chanceUtilisationDestin && result.result >= 10) {
-                    jetCorrige = Math.max(10, result.result - destin);
+                    // ✅ Plafonnement : seuil + destin ne doit jamais dépasser 80
+                    const plafond = 80;
+                    const destinEffectif = Math.max(0, Math.min(destin, plafond - seuil.result));
+
+                    jetCorrige = Math.max(10, result.result - destinEffectif);
                     margeCorrigee = Math.floor((seuil.result - jetCorrige) / 10);
 
                     if (margeCorrigee >= 0) {
@@ -2247,7 +2268,7 @@
                 roll: margeCorrigee
             };
 
-            setAttrs({ "destin": destin });
+            setAttrs({ destin });
             finishRoll(roll.rollId, computeObj);
         });
     }
@@ -2257,11 +2278,26 @@
 // ===================================================
 
     const combatRolls = [
-    { name: "cac",      attr: "CAC",      score: "score_cac",      consequence: "~critique_cac" },
-    { name: "distance", attr: "DISTANCE", score: "score_distance", consequence: "~critique_distance" },
-    { name: "verbal",   attr: "VERBAL",   score: "score_verbal",   consequence: "~critique_verbal" },
-    { name: "matrice",  attr: "MATRICE",  score: "score_matrice",  consequence: "~critique_verbal" } // à adapter si tu crées un ~critique_matrice
+        { name: "cac",      attr: "CAC",      score: "score_cac",      consequence: "~critique_cac" },
+        { name: "distance", attr: "DISTANCE", score: "score_distance", consequence: "~critique_distance" },
+        { name: "verbal",   attr: "VERBAL",   score: "score_verbal",   consequence: "~critique_verbal" },
+        { name: "matrice",  attr: "MATRICE",  score: "score_matrice",  consequence: "~critique_verbal" } // à adapter si tu crées un ~critique_matrice
     ];
+
+    // Chances de déclenchement du destin selon le seuil
+    function getChanceDestin(seuil) {
+        const s = parseInt(seuil) || 0;
+
+        if (s <= 10) return 1.00;   // 0-10  => 100%
+        if (s <= 20) return 0.90;   // 11-20 => 90%
+        if (s <= 30) return 0.80;   // 21-30 => 80%
+        if (s <= 40) return 0.70;   // 31-40 => 70%
+        if (s <= 50) return 0.60;   // 41-50 => 60%
+        if (s <= 60) return 0.50;   // 51-60 => 50%
+        if (s <= 70) return 0.30;   // 61-70 => 30%
+        if (s <= 80) return 0.10;   // 71-80 => 10%
+        return 0.05;                // 81-100 (et au-delà) => 5%
+    }
 
     // On boucle sur les versions "auto" et "phy"
     combatRolls.forEach(({ name, attr, score, consequence }) => {
@@ -2269,27 +2305,46 @@
             const rollName = `roll-${name}${suffix}`;
             const isPhysique = suffix === "-phy";
 
-            on(`clicked:${rollName}`, async (event) => {
-                const resultExpr = isPhysique ? "@{rollphysique}[Résultat dés physiques]" : "1d100[Jet]";
+            on(`clicked:${rollName}`, async () => {
+                const resultExpr = isPhysique
+                    ? "@{rollphysique}[Résultat dés physiques]"
+                    : "1d100[Jet]";
 
-                const roll = await startRoll(`@{gm} &{template:itd} {{combat=oui}} {{show_degat=oui}} {{title=^{attr-${attr}}}} {{token=@{ctoken}}} {{subheader=@{character_name}}} {{roll=[[0[resultat]]]}} {{seuil=[[@{${score}}[Compétence] @{rollmodifier}[Modificateur]-@{total_malus}[Blessures et Stress]]]}} {{result=[[${resultExpr}]]}} {{arme1=[@{nom_arme_1}](~weapon_dmg_1)}} {{arme2=[@{nom_arme_2}](~weapon_dmg_2)}} {{arme3=[@{nom_arme_3}](~weapon_dmg_3)}} {{arme_maxi_1=[@{nom_arme_1}](~weapon_dmg_maxi_1)}} {{arme_maxi_2=[@{nom_arme_2}](~weapon_dmg_maxi_2)}} {{arme_maxi_3=[@{nom_arme_3}](~weapon_dmg_maxi_3)}} {{consequence=[Conséquence... ](${consequence})}}`);
+                const roll = await startRoll(
+                    `@{gm} &{template:itd} {{combat=oui}} {{show_degat=oui}} {{title=^{attr-${attr}}}} {{token=@{ctoken}}} {{subheader=@{character_name}}} ` +
+                    `{{roll=[[0[resultat]]]}} ` +
+                    `{{seuil=[[@{${score}}[Compétence] @{rollmodifier}[Modificateur]-@{total_malus}[Blessures et Stress]]]}} ` +
+                    `{{result=[[${resultExpr}]]}} ` +
+                    `{{arme1=[@{nom_arme_1}](~weapon_dmg_1)}} {{arme2=[@{nom_arme_2}](~weapon_dmg_2)}} {{arme3=[@{nom_arme_3}](~weapon_dmg_3)}} ` +
+                    `{{arme_maxi_1=[@{nom_arme_1}](~weapon_dmg_maxi_1)}} {{arme_maxi_2=[@{nom_arme_2}](~weapon_dmg_maxi_2)}} {{arme_maxi_3=[@{nom_arme_3}](~weapon_dmg_maxi_3)}} ` +
+                    `{{consequence=[Conséquence... ](${consequence})}}`
+                );
 
                 const { seuil, result } = roll.results;
 
-                getAttrs(["destin"], function(values) {
+                getAttrs(["destin", "gain_destin"], function(values) {
                     let destin = parseInt(values["destin"]) || 0;
+                    const bonus = parseInt(values["gain_destin"]) || 5;
 
                     const margeNaturelle = Math.floor((seuil.result - result.result) / 10);
                     let jetCorrige = result.result;
                     let marge = margeNaturelle;
 
                     if (margeNaturelle >= 0) {
+                        // Succès naturel
                         destin = 0;
                     } else {
-                        const chanceUtilisationDestin = 0.9;
+                        // Chance de déclenchement du destin selon le seuil
+                        const chanceUtilisationDestin = getChanceDestin(seuil.result);
+
                         if (Math.random() < chanceUtilisationDestin && result.result >= 10) {
-                            jetCorrige = Math.max(10, result.result - destin);
+                            // ✅ Plafonnement : seuil + destin (effectif) ne doit jamais dépasser 80
+                            const plafond = 80;
+                            const destinEffectif = Math.max(0, Math.min(destin, plafond - seuil.result));
+
+                            jetCorrige = Math.max(10, result.result - destinEffectif);
                             marge = Math.floor((seuil.result - jetCorrige) / 10);
+
                             if (marge >= 0) {
                                 jetCorrige = seuil.result;
                                 destin = 0;
@@ -2306,7 +2361,7 @@
                         roll: marge
                     };
 
-                    setAttrs({ "destin": destin });
+                    setAttrs({ destin });
                     finishRoll(roll.rollId, computeObj);
                 });
             });
