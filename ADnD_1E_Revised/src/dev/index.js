@@ -15,11 +15,11 @@
 //      setAttrsAsync
 //      getSectionIDsAsync
 //
-function isRunningOnServer() {
+const isRunningOnServer = () => {
   return self.dispatchEvent == undefined;
-}
+};
 
-function setActiveCharacterId(charId) {
+const setActiveCharacterId = (charId) => {
   let oldAcid = getActiveCharacterId();
   let msg = {id: '0', type: 'setActiveCharacter', data: charId};
 
@@ -33,7 +33,7 @@ function setActiveCharacterId(charId) {
     self.onmessage({data: msg});
   }
   return oldAcid; //return what the value used to be, so calling code can be a little cleaner
-}
+};
 
 let _sIn = setInterval;
 setInterval = function (callback, timeout) {
@@ -58,7 +58,7 @@ setTimeout = function (callback, timeout) {
 // A simple helper to use your setTimeout as a promise
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function getAttrsAsync(props) {
+const getAttrsAsync = (props) => {
   let acid = getActiveCharacterId(); //save the current activeCharacterID in case it has changed when the promise runs
   let prevAcid = null; //local variable defined here, because it needs to be shared across the promise callbacks defined below
   return new Promise((resolve, reject) => {
@@ -74,9 +74,9 @@ function getAttrsAsync(props) {
   }).finally(() => {
     setActiveCharacterId(prevAcid); //restore activeCharacterId to what it was when the promise first ran
   });
-}
+};
 
-function setAttrsAsync(propObj, options) {
+const setAttrsAsync = (propObj, options) => {
   let acid = getActiveCharacterId();
   let prevAcid = null;
   return new Promise((resolve, reject) => {
@@ -91,9 +91,9 @@ function setAttrsAsync(propObj, options) {
   }).finally(() => {
     setActiveCharacterId(prevAcid);
   });
-}
+};
 
-function getSectionIDsAsync(sectionName) {
+const getSectionIDsAsync = (sectionName) => {
   let acid = getActiveCharacterId();
   let prevAcid = null;
   return new Promise((resolve, reject) => {
@@ -108,7 +108,7 @@ function getSectionIDsAsync(sectionName) {
   }).finally(() => {
     setActiveCharacterId(prevAcid);
   });
-}
+};
 //-------------------------------------------------------------------------------------
 
 // GiGs custom handling for number type and logs
@@ -221,42 +221,42 @@ on(
 );
 
 // Global Variables
-let armorDetailsRowidArray;
-let autoCalcAbilityRows = '';
-let autoCalcSaveRows = '';
-let autoCalcThiefRows = '';
-let calcAC = '';
-let calcHP = '';
-let calcRange = '';
-let charismaCalcs = '';
-let climbwallsCalc = '';
-let constitutionCalcs = '';
-let damageMacro = '';
-let dexterityCalcs = '';
-let findtrapsCalc = '';
-let hearnoiseCalc = '';
-let hideinshadowsCalc = '';
-let intelligenceCalcs = '';
-let movequietlyCalc = '';
-let openlocksCalc = '';
-let pickpocketsCalc = '';
-let readlanguagesCalc = '';
-let savebreathweaponsCalc = '';
-let savemisc1Calc = '';
-let savemisc2Calc = '';
-let savemiscCalc = '';
-let saveparalysispoisondeathCalc = '';
-let savepetrificationpolymorphCalc = '';
-let saverodsstaveswandsCalc = '';
-let savespellsCalc = '';
-let setSpellsCasterClass = '';
-let strengthCalcs = '';
-let thiefmisc1Calc = '';
-let thiefmisc2Calc = '';
-let thiefmiscCalc = '';
-let versionator = '';
-let weaponInUse = '';
-let wisdomCalcs = '';
+// let armorDetailsRowidArray;
+// let autoCalcAbilityRows = '';
+// let autoCalcSaveRows = '';
+// let autoCalcThiefRows = '';
+// let calcAC = '';
+// let calcHP = '';
+// let calcRange = '';
+// let charismaCalcs = '';
+// let climbwallsCalc = '';
+// let constitutionCalcs = '';
+// let damageMacro = '';
+// let dexterityCalcs = '';
+// let findtrapsCalc = '';
+// let hearnoiseCalc = '';
+// let hideinshadowsCalc = '';
+// let intelligenceCalcs = '';
+// let movequietlyCalc = '';
+// let openlocksCalc = '';
+// let pickpocketsCalc = '';
+// let readlanguagesCalc = '';
+// let savebreathweaponsCalc = '';
+// let savemisc1Calc = '';
+// let savemisc2Calc = '';
+// let savemiscCalc = '';
+// let saveparalysispoisondeathCalc = '';
+// let savepetrificationpolymorphCalc = '';
+// let saverodsstaveswandsCalc = '';
+// let savespellsCalc = '';
+// let setSpellsCasterClass = '';
+// let strengthCalcs = '';
+// let thiefmisc1Calc = '';
+// let thiefmisc2Calc = '';
+// let thiefmiscCalc = '';
+// let versionator = '';
+// let weaponInUse = '';
+// let wisdomCalcs = '';
 
 const armorRowIDs = [
   'unarmored_row_id',
@@ -861,7 +861,7 @@ const stat_functions = () => {
   charismaCalcs();
 };
 
-autoCalcAbilityRows = (current_version, final_version) => {
+const autoCalcAbilityRows = (current_version, final_version) => {
   const output = {};
   stat_functions();
   output.sheet_version = current_version;
@@ -872,7 +872,7 @@ autoCalcAbilityRows = (current_version, final_version) => {
 };
 
 // One-time update: Auto Calc Save rows
-autoCalcSaveRows = (current_version, final_version) => {
+const autoCalcSaveRows = (current_version, final_version) => {
   const output = {};
   const migrate = 1;
   saveparalysispoisondeathCalc(migrate);
@@ -888,7 +888,7 @@ autoCalcSaveRows = (current_version, final_version) => {
 };
 
 // One-time update: Auto Calc Thief rows
-autoCalcThiefRows = (current_version, final_version) => {
+const autoCalcThiefRows = (current_version, final_version) => {
   const output = {};
   const migrate = 1;
   pickpocketsCalc(migrate);
@@ -1414,7 +1414,7 @@ const clearArmorOther = (current_version, final_version) => {
 // combines all Armor Details attrs and their row id's
 const armorIDsAndAttrs = armorAttrs.concat(armorRowIDs);
 // sync armor changes between Armor Details and repeating_equipment
-async function syncArmorToEquipment(id, attr, row_removed, migrate) {
+const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
   const v = await getAttrsAsync(armorIDsAndAttrs);
   const output = {};
   let newID = '';
@@ -2211,7 +2211,7 @@ async function syncArmorToEquipment(id, attr, row_removed, migrate) {
   await setAttrsAsync(output, {silent: true});
   await armorDetailsRowidArray(id_low);
   calcAC();
-}
+};
 
 // One-time update:  migrate Armor Details to repeating_equipment
 const migrateArmorDetails = (current_version, final_version) => {
@@ -3524,7 +3524,7 @@ on(armorDetailslisteners, async (eventInfo) => {
 });
 
 // sets Armor Details row from repeating_equipment
-async function fillArmorDetails(id) {
+const fillArmorDetails = async (id) => {
   clog(`fillArmorDetails - id passed:${id}`);
   const v = await getAttrsAsync([
     `repeating_equipment_${id}_equipment_armor_type`,
@@ -3697,9 +3697,9 @@ async function fillArmorDetails(id) {
   }
   await setAttrsAsync(output, {silent: true});
   calcAC(recalc);
-}
+};
 
-async function createAttack(id) {
+const createAttack = async (id) => {
   const v = await getAttrsAsync([
     `repeating_equipment_${id}_equipment_item`,
     `repeating_equipment_${id}_equipment_weapon_type`,
@@ -3735,9 +3735,9 @@ async function createAttack(id) {
   await setAttrsAsync(output, {silent: true});
   await setWeapons(id);
   damageMacro(newID);
-}
+};
 
-async function generateArmorDetailsArray() {
+const generateArmorDetailsArray = async () => {
   const v = await getAttrsAsync(armorRowIDs);
   const idArray = [
     (unarmored0_ID = v.unarmored_row_id.toString()),
@@ -3753,10 +3753,10 @@ async function generateArmorDetailsArray() {
     (armorother6_ID = v.armorother6_row_id.toString()),
   ].map((str) => (str ? str.toString().toLowerCase() : '0'));
   return idArray;
-}
+};
 
 // checks repeating_equipment id against Armor Detail's ids
-async function testArmorRowIDs(id) {
+const testArmorRowIDs = async (id) => {
   const armorDetailsArray = await generateArmorDetailsArray();
   let isMatch = '';
   isMatch = armorDetailsArray.includes(id) ? 1 : 0;
@@ -3765,9 +3765,9 @@ async function testArmorRowIDs(id) {
     isMatch: isMatch,
     armorDetailsArray: armorDetailsArray,
   };
-}
+};
 
-armorDetailsRowidArray = async (id) => {
+const armorDetailsRowidArray = async (id) => {
   const output = {};
   const {isMatch, armorDetailsArray} = await testArmorRowIDs(id);
   output.armordetails_array = [`${armorDetailsArray}`];
@@ -3930,7 +3930,7 @@ on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_cla
   await setAttrsAsync(output, {silent: true});
 });
 
-setSpellsCasterClass = async () => {
+const setSpellsCasterClass = async () => {
   const idArray = await getSectionIDsAsync('spells');
   const output = {};
   const fields = [];
@@ -4254,7 +4254,7 @@ on('change:repeating_weapon:weapon_dual', async (eventInfo) => {
   await setAttrsAsync(output, {silent: true});
 });
 
-async function syncDualPen() {
+const syncDualPen = async () => {
   const idArray = await getSectionIDsAsync('weapon');
   const output = {};
   const fields = idArray.flatMap((id) => [concatRepAttrName('weapon', id, 'weapon_critdamage_flag'), concatRepAttrName('weapon', id, 'weapon_critdamage_mult')]);
@@ -4272,7 +4272,7 @@ async function syncDualPen() {
     output[concatRepAttrName('weapon', id, 'weapon_dual_pen')] = thispenalty;
   });
   await setAttrsAsync(output);
-}
+};
 
 // Weapon Dual-Wield Calc Penalty
 on('change:dual_pen_primary change:dual_pen_secondary change:dexterity', async (eventInfo) => {
@@ -4301,7 +4301,7 @@ on('change:dual_pen_primary change:dual_pen_secondary change:dexterity', async (
 });
 
 // Weapon Range: Parse Ranges
-calcRange = async (id) => {
+const calcRange = async (id) => {
   const fields = [
     concatRepAttrName('weapon', id, 'weapon_range'),
     concatRepAttrName('weapon', id, 'weapon_range_short'),
@@ -4386,7 +4386,7 @@ on('change:repeating_weapon:weapon_attack_type', async (eventInfo) => {
 });
 
 // HP Calcs
-calcHP = async () => {
+const calcHP = async () => {
   // clog('HP re-calculated');
   const v = await getAttrsAsync(['hitpoints', 'hitpoints_max', 'sync_hp_flag', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class']);
   const output = {};
@@ -4414,7 +4414,7 @@ on('change:sync_hp_flag change:hitpoints change:hitpoints_max change:hitpoints_1
 });
 
 // AC Calcs
-calcAC = async (recalc) => {
+const calcAC = async (recalc) => {
   // clog('Armor re-calculated');
   const v = await getAttrsAsync([
     ...armorAttrs,
@@ -4647,7 +4647,7 @@ on(
 );
 
 // Creates the chat menu buttons or auto rolls damage with the attack based on settings
-damageMacro = async (id, passedAutoDamage) => {
+const damageMacro = async (id, passedAutoDamage) => {
   let autoDamage;
   if (passedAutoDamage === undefined || passedAutoDamage === null) {
     const v = await getAttrsAsync(['toggle_auto_damage']);
@@ -4822,7 +4822,7 @@ const repeatingNWPNumber = ['nwp_slots', 'nwp_modifier'];
 const repeatingNWPString = ['nwp_attribute', 'nwp_attribute_value', 'nwp_macro_text'];
 const repeatingNWPAll = [...repeatingNWPNumber, ...repeatingNWPString];
 
-async function setWeapons(id) {
+const setWeapons = async (id) => {
   const fields = repeatingWeaponAll.map((field) => concatRepAttrName('weapon', id, field));
   // console.log(`setWeapons - Change detected: id: ${id}`);
   const v = await getAttrsAsync(fields);
@@ -4839,9 +4839,9 @@ async function setWeapons(id) {
   }, {});
   await setAttrsAsync(output, {silent: true});
   // clog(`setWeapons - default values have been set.`);
-}
+};
 
-async function setEquipment(id) {
+const setEquipment = async (id) => {
   const nonRep = ['equipment_tabs_type', 'equipment_tabs_carry'];
   const fields = repeatingEquipmentAll.map((field) => concatRepAttrName('equipment', id, field));
   const combined = [...nonRep, ...fields];
@@ -4868,9 +4868,9 @@ async function setEquipment(id) {
     return accumulator;
   }, {});
   await setAttrsAsync(output, {silent: true});
-}
+};
 
-async function setNWP(id) {
+const setNWP = async (id) => {
   const fields = repeatingNWPAll.map((field) => concatRepAttrName('nonweaponproficiencies', id, field));
   const v = await getAttrsAsync(fields);
 
@@ -4887,7 +4887,7 @@ async function setNWP(id) {
     return accumulator;
   }, {});
   await setAttrsAsync(output, {silent: true});
-}
+};
 
 // Set repeating attr values for new rows. Makes visible to API
 on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item change:repeating_nonweaponproficiencies:nwp_name', async (eventInfo) => {
@@ -5029,7 +5029,7 @@ on(
 );
 
 // Thief Calcs
-pickpocketsCalc = async (migrate) => {
+const pickpocketsCalc = async (migrate) => {
   const v = await getAttrsAsync(['pickpockets', 'pickpockets_base', 'pickpockets_racial_mod', 'pickpockets_ability_mod', 'pickpockets_magic']);
   const output = {};
   const basePickpockets = +v.pickpockets_base || 0;
@@ -5052,7 +5052,7 @@ pickpocketsCalc = async (migrate) => {
   setAttrsAsync(output, {silent: true});
 };
 
-openlocksCalc = async (migrate) => {
+const openlocksCalc = async (migrate) => {
   const v = await getAttrsAsync(['openlocks', 'openlocks_base', 'openlocks_racial_mod', 'openlocks_ability_mod', 'openlocks_magic']);
   const output = {};
   const baseOpenlocks = +v.openlocks_base || 0;
@@ -5075,7 +5075,7 @@ openlocksCalc = async (migrate) => {
   setAttrsAsync(output, {silent: true});
 };
 
-findtrapsCalc = async (migrate) => {
+const findtrapsCalc = async (migrate) => {
   const v = await getAttrsAsync(['findtraps', 'findtraps_base', 'findtraps_racial_mod', 'findtraps_ability_mod', 'findtraps_magic']);
   const output = {};
   const baseFindtraps = +v.findtraps_base || 0;
@@ -5098,7 +5098,7 @@ findtrapsCalc = async (migrate) => {
   setAttrsAsync(output, {silent: true});
 };
 
-movequietlyCalc = async (migrate) => {
+const movequietlyCalc = async (migrate) => {
   const v = await getAttrsAsync(['movequietly', 'movequietly_base', 'movequietly_racial_mod', 'movequietly_ability_mod', 'movequietly_magic']);
   const output = {};
   const baseMovequietly = +v.movequietly_base || 0;
@@ -5121,7 +5121,7 @@ movequietlyCalc = async (migrate) => {
   setAttrsAsync(output, {silent: true});
 };
 
-hideinshadowsCalc = async (migrate) => {
+const hideinshadowsCalc = async (migrate) => {
   const v = await getAttrsAsync(['hideinshadows', 'hideinshadows_base', 'hideinshadows_racial_mod', 'hideinshadows_ability_mod', 'hideinshadows_magic']);
   const output = {};
   const baseHideinshadows = +v.hideinshadows_base || 0;
@@ -5144,7 +5144,7 @@ hideinshadowsCalc = async (migrate) => {
   setAttrsAsync(output, {silent: true});
 };
 
-hearnoiseCalc = async (migrate) => {
+const hearnoiseCalc = async (migrate) => {
   const v = await getAttrsAsync(['hearnoise', 'hearnoise_base', 'hearnoise_racial_mod', 'hearnoise_ability_mod', 'hearnoise_magic']);
   const output = {};
   const baseHearnoise = +v.hearnoise_base || 0;
@@ -5167,7 +5167,7 @@ hearnoiseCalc = async (migrate) => {
   setAttrsAsync(output, {silent: true});
 };
 
-climbwallsCalc = async (migrate) => {
+const climbwallsCalc = async (migrate) => {
   const v = await getAttrsAsync(['climbwalls', 'climbwalls_base', 'climbwalls_racial_mod', 'climbwalls_ability_mod', 'climbwalls_magic']);
   const output = {};
   let baseClimbwalls = +v.climbwalls_base || 0;
@@ -5196,7 +5196,7 @@ climbwallsCalc = async (migrate) => {
   setAttrsAsync(output, {silent: true});
 };
 
-readlanguagesCalc = async (migrate) => {
+const readlanguagesCalc = async (migrate) => {
   const v = await getAttrsAsync(['readlanguages', 'readlanguages_base', 'readlanguages_racial_mod', 'readlanguages_ability_mod', 'readlanguages_magic']);
   const output = {};
   const baseReadlanguages = +v.readlanguages_base || 0;
@@ -5219,7 +5219,7 @@ readlanguagesCalc = async (migrate) => {
   setAttrsAsync(output, {silent: true});
 };
 
-thiefmiscCalc = async () => {
+const thiefmiscCalc = async () => {
   const v = await getAttrsAsync(['thiefmisc', 'thiefmisc_base', 'thiefmisc_racial_mod', 'thiefmisc_ability_mod', 'thiefmisc_magic']);
   const output = {};
   const baseThiefmisc = +v.thiefmisc_base || 0;
@@ -5232,7 +5232,7 @@ thiefmiscCalc = async () => {
   setAttrsAsync(output, {silent: true});
 };
 
-thiefmisc1Calc = async () => {
+const thiefmisc1Calc = async () => {
   const v = await getAttrsAsync(['thiefmisc1', 'thiefmisc1_base', 'thiefmisc1_racial_mod', 'thiefmisc1_ability_mod', 'thiefmisc1_magic']);
   const output = {};
   const baseThiefmisc1 = +v.thiefmisc1_base || 0;
@@ -5245,7 +5245,7 @@ thiefmisc1Calc = async () => {
   setAttrsAsync(output, {silent: true});
 };
 
-thiefmisc2Calc = async () => {
+const thiefmisc2Calc = async () => {
   const v = await getAttrsAsync(['thiefmisc2', 'thiefmisc2_base', 'thiefmisc2_racial_mod', 'thiefmisc2_ability_mod', 'thiefmisc2_magic']);
   const output = {};
   const baseThiefmisc2 = +v.thiefmisc2_base || 0;
@@ -5380,7 +5380,7 @@ on(
 );
 
 // Save Calcs
-saveparalysispoisondeathCalc = async (migrate) => {
+const saveparalysispoisondeathCalc = async (migrate) => {
   const v = await getAttrsAsync([
     'saveparalysispoisondeath',
     'saveparalysispoisondeath_base',
@@ -5413,7 +5413,7 @@ saveparalysispoisondeathCalc = async (migrate) => {
   await setAttrsAsync(output, {silent: true});
 };
 
-savepetrificationpolymorphCalc = async (migrate) => {
+const savepetrificationpolymorphCalc = async (migrate) => {
   const v = await getAttrsAsync([
     'savepetrificationpolymorph',
     'savepetrificationpolymorph_base',
@@ -5446,7 +5446,7 @@ savepetrificationpolymorphCalc = async (migrate) => {
   await setAttrsAsync(output, {silent: true});
 };
 
-saverodsstaveswandsCalc = async (migrate) => {
+const saverodsstaveswandsCalc = async (migrate) => {
   const v = await getAttrsAsync([
     'saverodsstaveswands',
     'saverodsstaveswands_base',
@@ -5477,7 +5477,7 @@ saverodsstaveswandsCalc = async (migrate) => {
   await setAttrsAsync(output, {silent: true});
 };
 
-savebreathweaponsCalc = async (migrate) => {
+const savebreathweaponsCalc = async (migrate) => {
   const v = await getAttrsAsync([
     'savebreathweapons',
     'savebreathweapons_base',
@@ -5508,7 +5508,7 @@ savebreathweaponsCalc = async (migrate) => {
   await setAttrsAsync(output, {silent: true});
 };
 
-savespellsCalc = async (migrate) => {
+const savespellsCalc = async (migrate) => {
   const v = await getAttrsAsync(['savespells', 'savespells_base', 'savespells_racial_mod', 'savespells_ability_mod', 'savespells_misc_mod', 'savespells_temp_mod']);
   const output = {};
   const baseSavespells = +v.savespells_base || 0;
@@ -5533,7 +5533,7 @@ savespellsCalc = async (migrate) => {
   await setAttrsAsync(output, {silent: true});
 };
 
-savemiscCalc = async () => {
+const savemiscCalc = async () => {
   const v = await getAttrsAsync(['savemisc', 'savemisc_base', 'savemisc_racial_mod', 'savemisc_ability_mod', 'savemisc_misc_mod', 'savemisc_temp_mod']);
   const output = {};
   const baseSavemisc = +v.savemisc_base || 0;
@@ -5546,7 +5546,7 @@ savemiscCalc = async () => {
   await setAttrsAsync(output, {silent: true});
 };
 
-savemisc1Calc = async () => {
+const savemisc1Calc = async () => {
   const v = await getAttrsAsync(['savemisc1', 'savemisc1_base', 'savemisc1_racial_mod', 'savemisc1_ability_mod', 'savemisc1_misc_mod', 'savemisc1_temp_mod']);
   const output = {};
   const baseSavemisc1 = +v.savemisc1_base || 0;
@@ -5560,7 +5560,7 @@ savemisc1Calc = async () => {
   await setAttrsAsync(output, {silent: true});
 };
 
-savemisc2Calc = async () => {
+const savemisc2Calc = async () => {
   const v = await getAttrsAsync(['savemisc2', 'savemisc2_base', 'savemisc2_racial_mod', 'savemisc2_ability_mod', 'savemisc2_misc_mod', 'savemisc2_temp_mod']);
   const output = {};
   const baseSavemisc2 = +v.savemisc2_base || 0;
@@ -5724,7 +5724,7 @@ on('change:matrix_class', async (eventInfo) => {
 });
 
 // match class name to core class & return # for hit table lookup
-async function matchClassName(name) {
+const matchClassName = async (name) => {
   const lowerCaseName = name.trim().toLowerCase();
   if (/cleric|druid|monk/.test(lowerCaseName)) {
     return 1;
@@ -5737,10 +5737,10 @@ async function matchClassName(name) {
   } else {
     return 99;
   }
-}
+};
 
 // THAC0
-async function calcThac0() {
+const calcThac0 = async () => {
   const v = await getAttrsAsync(['thac00', 'autofill_matrix']);
   const autocalcFill = +v.autofill_matrix || 0;
   // bail out if auto-fill is not enabled.
@@ -5769,7 +5769,7 @@ async function calcThac0() {
   output.thac09 = baseThac0 - 9;
   output.thac010 = baseThac0 - 10;
   await setAttrsAsync(output, {silent: true});
-}
+};
 
 // Attack Matrix Autofill To-Hit table
 on(
@@ -6851,7 +6851,7 @@ on('change:thac00', (eventInfo) => {
 });
 
 // Auto-fill Abilities
-function getValidVariable(str_value, string_type, lower_bound, higher_bound) {
+const getValidVariable = (str_value, string_type, lower_bound, higher_bound) => {
   if (str_value < lower_bound) {
     console.log(`Error: ${string_type} value is not a number or out of range. [${str_value}].\\nDefaulting to ${lower_bound}.`);
     return lower_bound;
@@ -6862,7 +6862,7 @@ function getValidVariable(str_value, string_type, lower_bound, higher_bound) {
   }
   // Keep value between lowerbound and higherbound.
   return Math.min(Math.max(str_value, lower_bound), higher_bound);
-}
+};
 
 // Strength Table Entry
 class StrengthCheck {
@@ -7383,7 +7383,7 @@ const parseValues = (values, stat, type = 'int') => {
 };
 
 // Ability Row Calculations
-strengthCalcs = async () => {
+const strengthCalcs = async () => {
   const values = await getAttrsAsync(['strength', 'exceptionalstrength']);
   const output = {};
   const stat_str = await parseValues(values, 'strength', 'int');
@@ -7400,7 +7400,7 @@ strengthCalcs = async () => {
   await setAttrsAsync(output);
 };
 
-intelligenceCalcs = async () => {
+const intelligenceCalcs = async () => {
   const values = await getAttrsAsync(['intelligence', 'bonuslanguages', 'race']);
   const output = {};
   const stat_int = await parseValues(values, 'intelligence', 'int');
@@ -7471,7 +7471,7 @@ intelligenceCalcs = async () => {
   await setAttrsAsync(output, {silent: true});
 };
 
-wisdomCalcs = async () => {
+const wisdomCalcs = async () => {
   const values = await getAttrsAsync(['wisdom']);
   const output = {};
   const stat_wis = await parseValues(values, 'wisdom', 'int');
@@ -7481,7 +7481,7 @@ wisdomCalcs = async () => {
   await setAttrsAsync(output, {silent: true});
 };
 
-dexterityCalcs = async () => {
+const dexterityCalcs = async () => {
   const values = await getAttrsAsync(['dexterity']);
   const output = {};
   const stat_dex = await parseValues(values, 'dexterity', 'int');
@@ -7494,7 +7494,7 @@ dexterityCalcs = async () => {
   await setAttrsAsync(output);
 };
 
-constitutionCalcs = async () => {
+const constitutionCalcs = async () => {
   const values = await getAttrsAsync(['constitution', 'class', 'secondclass', 'thirdclass']);
   const output = {};
   const stat_con = await parseValues(values, 'constitution', 'int');
@@ -7511,7 +7511,7 @@ constitutionCalcs = async () => {
   await setAttrsAsync(output);
 };
 
-charismaCalcs = async () => {
+const charismaCalcs = async () => {
   const values = await getAttrsAsync(['charisma']);
   const output = {};
   const stat_cha = await parseValues(values, 'charisma', 'int');
@@ -7522,7 +7522,7 @@ charismaCalcs = async () => {
   await setAttrs(output, {silent: true});
 };
 
-thiefSkillsDexCalcs = async (autofill_thief_dex) => {
+const thiefSkillsDexCalcs = async (autofill_thief_dex) => {
   const values = await getAttrsAsync(['dexterity']);
   const output = {};
   //get dexterity value and look up table data
@@ -7540,7 +7540,7 @@ thiefSkillsDexCalcs = async (autofill_thief_dex) => {
   await setAttrsAsync(output);
 };
 
-thiefSkillsRacialCalcs = async (autofill_thief_race) => {
+const thiefSkillsRacialCalcs = async (autofill_thief_race) => {
   const values = await getAttrsAsync(['thief_race_selected']);
   const output = {};
   //get racial value from select and look up table data
@@ -7573,7 +7573,7 @@ on('change:autofill_thief_dex change:dexterity', async (eventInfo) => {
 });
 
 // match class name to core class & return # for hit table lookup
-function matchRaceName(name) {
+const matchRaceName = (name) => {
   const lowerCaseName = name.trim().toLowerCase();
   if (/human/.test(lowerCaseName)) {
     return 1;
@@ -7593,7 +7593,7 @@ function matchRaceName(name) {
   } else {
     return 0;
   }
-}
+};
 
 // Thief Skills Racial Calculations
 on('change:race change:autofill_thief_race change:thief_race_selected', async (eventInfo) => {
@@ -7646,7 +7646,7 @@ on('change:charisma change:comeliness', (eventInfo) => {
   charismaCalcs();
 });
 
-portraitUrlCalc = async () => {
+const portraitUrlCalc = async () => {
   const v = await getAttrsAsync(['character_avatar', 'sheet_image', 'sheet_image_url']);
   const output = {};
   const whichImage = +v.sheet_image || 0;
@@ -7702,7 +7702,7 @@ on('change:psionic_ability_strength_max change:psionic_attack change:psionic_def
   await setAttrsAsync(output, {silent: true});
 });
 
-weaponInUse = async () => {
+const weaponInUse = async () => {
   const idArray = await getSectionIDsAsync('weapon');
   const output = {};
   const weaponsInUse = [];
@@ -7753,7 +7753,7 @@ on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use chang
 });
 
 // async version of getSectionIDsOrdered
-async function getSectionIDsOrderedAsync(sectionName) {
+const getSectionIDsOrderedAsync = async (sectionName) => {
   const idArray = await getSectionIDsAsync(sectionName);
   const v = await getAttrsAsync([`_reporder_repeating_${sectionName}`]);
   const reporderStr = v[`_reporder_repeating_${sectionName}`] || '';
@@ -7762,7 +7762,7 @@ async function getSectionIDsOrderedAsync(sectionName) {
   const validReporder = reporderArray.filter((id) => idArray.includes(id.toLowerCase()));
   const ids = [...new Set([...validReporder, ...idArray])];
   return ids;
-}
+};
 
 // sort repeating rows
 on('clicked:spell-sort-alphabetical clicked:spell-sort-level', async (eventInfo) => {
