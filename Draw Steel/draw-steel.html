@@ -249,7 +249,7 @@
 		<div class="resource-panel">
 			<div class="resource-name-input-group">
 				<input type="text" class="input-md" name="attr_resource_name" data-i18n-placeholder="resource-name-placeholder"  title="Macro: @{NAME|resource_name}" />
-				<label>1d3:</label><button type="roll" value="@{wtype} &amp;{template:simpleroll} {{rolltitle=1d3}} {{roll=[[ [[1d3]][1d3]]]}} {{name=@{resource_name}}} {{charactername=@{character_name}}}" data-i18n-title="roll-d3-tooltip"></button>
+				<label>Amount:</label><input type="text" class="input-md" name="attr_resource_amount" placeholder="1d3"  title="Macro: @{NAME|resource_amount}" />
 			</div>
 		</div>
 		<!-- Surges -->
@@ -4296,10 +4296,10 @@
 		let result = [];
 	
 		features.forEach(feature => {
-			// Handle "Silver Tongue" style nested features
+			// Handle nested features
 			if (feature.type === "Multiple Features") {
 				feature.data.features.forEach(subFeature => {
-					// We only want the text-based description, not the Skill Choice placeholder
+					// We only want the text-based description
 					if (subFeature.type === "Text") {
 						result.push({
 							id: subFeature.id,
@@ -4310,7 +4310,7 @@
 				});
 			}
 	
-			// Handle the user-selected traits (Beast Legs, Prehensile Tail)
+			// Handle the selected traits
 			if (feature.type === "Choice" && feature.data.selected) {
 				feature.data.selected.forEach(selection => {
 					result.push({
@@ -4373,7 +4373,8 @@
 
 			// 3. DERIVED & COMBAT STATISTICS
 			// ------------------------------
-			const potency_strong = Math.max(might, agility, reason, intuition, presence);
+			//Potency can be calculated by the helper function later
+			//const potency_strong = Math.max(might, agility, reason, intuition, presence);
 			
 			const sizeObject = allFeatures.find(f => f.type === FEATURE_TYPES.SIZE)?.data.size ?? { value: 1, mod: 'M' };
 			const size = `${sizeObject.value}${sizeObject.mod ?? ''}`;
@@ -4382,25 +4383,52 @@
 			const speed = calculateCombatStat(allFeatures, 'Speed', baseSpeed);
 			const disengage = calculateCombatStat(allFeatures, 'Disengage', 1);
 			const stability = calculateCombatStat(allFeatures, 'Stability', 0);
-
+			const wealth = calculateCombatStat(allFeatures, 'Wealth', state.wealth);
+			const renown = calculateCombatStat(allFeatures, 'Renown', state.renown);
+			
+			// Stamina 
 			const stamina_max = allFeatures
 				.filter(f => f.type === FEATURE_TYPES.BONUS && f.data.field === 'Stamina')
 				.reduce((sum, f) => sum + (f.data.value + ((level - 1) * f.data.valuePerLevel)), 0);
-
+				
+			const stamina = parseInt(stamina_max) - parseInt(state.staminaDamage);
+			
+			// Recoveries
 			const recoveries_max = allFeatures
 				.filter(f => f.type === FEATURE_TYPES.BONUS && f.data.field === 'Recoveries')
 				.reduce((sum, f) => sum + f.data.value, 0);
 				
+			const recoveries = parseInt(recoveries_max) - parseInt(state.recoveriesUsed)	
+			
 			const immunity = getDamageModifiers(allFeatures, level, 'Immunity');
 			const weakness = getDamageModifiers(allFeatures, level, 'Weakness');
+			
 			const resource_name = allFeatures.find(f => f.type === FEATURE_TYPES.HEROIC_RESOURCE)?.name ?? '';
-
+			const resource = allFeatures.find(f => f.type === FEATURE_TYPES.HEROIC_RESOURCE)?.value ?? '';
+			const resource_amount = allFeatures
+				.find(f => f.type === FEATURE_TYPES.HEROIC_RESOURCE).data.gains
+				.find(f => f.tag === "start").value ?? '1d3'; 
+			const resource_description = allFeatures
+				.find(f => f.type === FEATURE_TYPES.HEROIC_RESOURCE).data.gains
+				.map(i => `+${i.value}: ${i.trigger}`)
+				.join('\n');
 
 			// 4. BIOGRAPHICAL INFORMATION
 			// ---------------------------
-			const incidentOption = career.incitingIncidents.options
-				.find(opt => opt.id === career.incitingIncidents.selectedID);
-			const career_incident = incidentOption ? `${incidentOption.name}\n${incidentOption.description}` : '';
+			let careertext = '';
+			for (feature of career.features) {
+				if (feature.type.includes("Choice")) {
+					careertext = careertext + `${feature.name}: ${feature.data.selected.join(', ')}\n`;
+				} else if (feature.type === "Perk") {
+					careertext = careertext + `${feature.name}: ${feature.data.selected[0].name}\n`;
+				} else {
+					careertext = careertext + `${feature.name}: +${feature.data.value}\n`;
+				}	
+			}
+			const career_benefit = careertext;
+			
+			
+			const career_incident = career.incitingIncidents.selected ? `${career.incitingIncidents.selected.name}\n${career.incitingIncidents.selected.description}` : '';
 
 
 			// 5. SKILLS & LANGUAGES
@@ -4499,8 +4527,8 @@
 				subclass,
 				victories: state.victories,
 				level,
-				wealth: state.wealth,
-				renown: state.renown,
+				wealth,
+				renown,
 				experience: state.xp,
 				// Characteristics
 				might,
@@ -4509,23 +4537,30 @@
 				intuition,
 				presence,
 				// Derived Stats
-				potency_strong,
-				potency_average: potency_strong - 1,
-				potency_weak: potency_strong - 2,
+				//potency_strong,
+				//potency_average: potency_strong - 1,
+				//potency_weak: potency_strong - 2,
 				size,
 				speed,
 				disengage,
 				stability,
+				stamina,
 				stamina_max,
 				stamina_winded: Math.floor(stamina_max / 2),
 				stamina_dead: -Math.floor(stamina_max / 2),
+				recoveries,
 				recoveries_max,
 				recovery_amount: Math.floor(stamina_max / 3),
+				surges: state.surges,
 				immunity,
 				weakness,
+				resource,
 				resource_name,
-				surge_damage: potency_strong,
+				resource_amount,
+				resource_description,
+				//surge_damage: potency_strong,
 				// Biography
+				career_benefit,
 				career_incident,
 				complication: complication?.name ?? '',
 				complication_benefit: complication?.features[0]?.description ?? '',
@@ -4543,7 +4578,7 @@
 				skills_intrigue,
 				skills_lore,
 				languages,
-				// Spread in repeating section data
+				// Spread in kits and repeating section data
 				...kits,
 				...perks,
 				...ancestryFeatures,
@@ -4567,6 +4602,10 @@
 
 			// Set the new attributes on the character sheet.
 			await setAttrsAsync(newAttrs);
+			
+			//Last bit of character sheet setup
+			calculateWinded();
+			calculateSurgePotency();
 			
 			console.log('Character import successful!', newAttrs);
 
