@@ -184,7 +184,7 @@
                 </div>
                 <div class="non-creeper">
                     <h2 data-i18n="adversary-actions">Actions</h2>
-                    <span name="attr_actions">1</span>
+                    <span name="attr_adversary_actions">1</span>
                 </div>
                 <div class="keywords"><span name="attr_keywords">-</span></div>
             </div>
@@ -235,6 +235,9 @@
                         <input type="hidden" class="skilledit" name="attr_skilledit" value="0" />
                         <input type="checkbox" name="attr_skilledit" />
                         <input type="text" name="attr_skillname" value="">
+                        <button type="action" name="act_share" class="btn-share">
+                            <div></div>
+                        </button>
                         <div class="sheet-auto-expand">
                             <span name="attr_skilldescription"></span>
                             <textarea class="skill-description" name="attr_skilldescription" rows="4"></textarea>
@@ -379,6 +382,9 @@
                         <input type="hidden" class="skilledit" name="attr_skilledit" value="0" />
                         <input type="checkbox" name="attr_skilledit" />
                         <input type="text" name="attr_skillname" value="">
+                        <button type="action" name="act_share" class="btn-share">
+                            <div></div>
+                        </button>
                         <div class="sheet-auto-expand">
                             <span name="attr_skilldescription"></span>
                             <textarea class="skill-description" name="attr_skilldescription" rows="4"></textarea>
@@ -642,11 +648,11 @@
     </div>
     <!--********* FOOTER **********-->
     <div class="footer">
-        <span>Character Sheet (v.<span name="attr_version"></span>) by </span><a href="https://github.com/blaze-sanecki/LandOfEem">Blaze Sanecki</a>, made with a blessing from <span>by Ben Costa & James Parks</span> - creators of the <a href="https://landofeem.com/"><b>Land of Eem</b></a>.
+        <span>Character Sheet (v.<span name="attr_version"></span>) by </span><a href="https://ko-fi.com/blazesanecki/">Blaze Sanecki</a>, made with a blessing from <span>by Ben Costa & James Parks</span> - creators of the <a href="https://landofeem.com/"><b>Land of Eem</b></a>.
     </div>
 </div>
 <!--********* HIDDEN ATTRIBUTES **********-->
-<input type="hidden" name="attr_version" value="2.0.0" />
+<input type="hidden" name="attr_version" value="2.1.0" />
 <!--********* ROLL TEMPLATES **********-->
 <rolltemplate class="sheet-rolltemplate-attack">
     <div class="template-container {{sheet_type}}">
@@ -761,6 +767,19 @@
     </div>
 </rolltemplate>
 
+<rolltemplate class="sheet-rolltemplate-description">
+    <div class="template-container {{sheet_type}}">
+        <h2><span>{{name}}</span><i> ({{character}})</i></h2>
+        <div class="results check">
+            <ul>
+                <li>
+                    <h4>{{description}}</h4>
+                </li>
+            </ul>
+        </div>
+    </div>
+</rolltemplate>
+
 <rolltemplate class="sheet-rolltemplate-hidden">
     <div class="sheet-template-container" style="display: none;"></div>
 </rolltemplate>
@@ -774,6 +793,19 @@ buttonlist.forEach(button => {
         setAttrs({
             sheetTab: button
         })
+    })
+})
+
+//********* SKILL SHARE **********/
+on("clicked:repeating_skills:share", function(eventinfo) {
+    const rowId = eventinfo.sourceAttribute.split("_")[2]
+    getAttrs([`repeating_skills_${rowId}_skillname`, `repeating_skills_${rowId}_skilldescription`, "character_name"], async (values) => {
+        const skillName = values[`repeating_skills_${rowId}_skillname`] || "Unnamed Skill"
+        const skillDescription = values[`repeating_skills_${rowId}_skilldescription`] || "No description."
+        const characterName = values["character_name"] || "Unknown Character"
+        
+        const roll = await startRoll(`&{template:description} {{sheet_type=@{sheet_type}}} {{name=${skillName}}} {{character=${characterName}}} {{description=${skillDescription}}} {{ignore=[[0]]}}`);
+        finishRoll(roll.rollId);
     })
 })
 
