@@ -25,12 +25,10 @@
     <!-- ATTACK ROLLS (only if NOT dmgonly) -->
     <!-- ========================================================= -->
 
-    {{^norollnodamage}} 
-    {{^withdmg}}
-    {{^dmgonly}} 
-     <!-- ------------------------- -->
-      {{#rollGreater() roll 0}}
-      <!-- ------------------------- -->
+    {{^norollnodamage}} {{^withdmg}} {{^dmgonly}}
+    <!-- ------------------------- -->
+    {{#rollGreater() roll 0}}
+    <!-- ------------------------- -->
     <!-- ------------------------- -->
     <!-- STANDARD (only if no adv/dis) -->
     <!-- ------------------------- -->
@@ -76,26 +74,23 @@
       <div class="sheet-roll">{{roll2}}</div>
       {{/rollTotal() roll1 roll2}}
     </div>
-    {{/disadvantage}} 
+    {{/disadvantage}}
     <!-- ------------------------- -->
     <!-- ------------------------- -->
-     {{/rollGreater() roll 0}} 
-     <!-- ------------------------- -->
-  {{/dmgonly}} 
-   {{/withdmg}}
-  {{/norollnodamage}}  
-<!-- ------------------------- -->
+    {{/rollGreater() roll 0}}
+    <!-- ------------------------- -->
+    {{/dmgonly}} {{/withdmg}} {{/norollnodamage}}
+    <!-- ------------------------- -->
 
     <!-- ========================================================= -->
     <!-- DAMAGES (only if dmgonly) + MANUAL CRIT (critical=[[0/1]]) -->
     <!-- NOTE: critical MUST be an inline roll in the button:
     <!--       {{critical=[[?{Critical hit?|No,0|Yes,1}]]}} -->
     <!-- ========================================================= -->
-      {{^norollnodamage}}  
-      {{^standard}}
-       <!-- ------------------------- -->
-        {{#rollGreater() dmg1 0}}
-         <!-- ------------------------- -->
+    {{^norollnodamage}} {{^standard}}
+    <!-- ------------------------- -->
+    {{#rollGreater() dmg1 0}}
+    <!-- ------------------------- -->
     <div class="sheet-template-dmg">
       <!-- ------------------------- -->
       <!-- TWO DAMAGES -->
@@ -131,12 +126,11 @@
       </div>
       {{/^rollGreater() dmg2 0}}
     </div>
-     <!-- ------------------------- -->
-    {{/rollGreater() dmg1 0}}  
-     <!-- ------------------------- -->
-    {{/standard}}
-    {{/norollnodamage}} 
- <!-- ------------------------- -->
+    <!-- ------------------------- -->
+    {{/rollGreater() dmg1 0}}
+    <!-- ------------------------- -->
+    {{/standard}} {{/norollnodamage}}
+    <!-- ------------------------- -->
     <!-- ========================================================= -->
     <!-- SAVE -->
     <!-- ========================================================= -->
@@ -150,42 +144,41 @@
     <!-- ========================================================= -->
     <!-- EXTRA BUTTON (only if NOT dmgonly AND NOT nodmg AND desc) -->
     <!-- ========================================================= -->
-      {{#rollGreater() dmg1 0}} {{^norollnodamage}} {{^dmgonly}} {{^nodmg}} {{#desc}}
+    {{#rollGreater() dmg1 0}} {{^norollnodamage}} {{^dmgonly}} {{^nodmg}} {{#desc}}
+    <div class="sheet-borderbottom">
     <div class="sheet-extra-button sheet-doublecolumn sheet-doublebutton">{{button}}{{buttoncrit}}</div>
-    {{/desc}} {{/nodmg}} {{/dmgonly}} 
-    {{/norollnodamage}} {{/rollGreater() dmg1 0}}
+    </div>
+    {{/desc}} {{/nodmg}} {{/dmgonly}} {{/norollnodamage}} {{/rollGreater() dmg1 0}}
 
     <!-- ========================================================= -->
     <!-- DESCRIPTION -->
     <!-- ========================================================= -->
-       {{^withdmg}}
-       {{#norollnodamage}}
-           <div id="DESCRIPTION" class="sheet-template-rolls sheet-template-rolls3" style="border-top:none!important;">
+    {{^withdmg}} {{#norollnodamage}}
+    <div id="DESCRIPTION" class="sheet-template-rolls sheet-template-rolls3" style="border-top: none !important">
       <div class="sheet-description"><b>Description</b> : {{description}}</div>
     </div>
-         {{/norollnodamage}}
-
-         {{^norollnodamage}} 
-    {{#description}}
+    {{/norollnodamage}} {{^norollnodamage}} {{#description}}
     <div id="DESCRIPTION" class="sheet-template-rolls sheet-template-rolls3">
       <div class="sheet-description"><b>Description</b> : {{description}}</div>
     </div>
-    {{/description}}
-      {{/norollnodamage}}
-      {{/withdmg}}
+    {{/description}} {{/norollnodamage}} {{/withdmg}}
   </div>
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-levelup-description">
+
   <div class="sheet-template-header sheet-bloc-header">
+       
     <!-- ========================================================= -->
     <!-- HEADER -->
     <!-- ========================================================= -->
+      <div class="sheet-header-bloc">
     {{#name}}
     <span class="sheet-headerstyle1">{{name}}</span>
     {{/name}} {{#source}}
     <span class="sheet-headerstyle2">{{source}}</span>
     {{/source}}
+        </div>
 
     <!-- ========================================================= -->
     <!-- DESCRIPTION -->
@@ -207,13 +200,19 @@
 
 <div class="sheet-charsheet">
   <!-- CHARNAME -->
-  <div class="sheet-main-header-charactername">
+  <div class="sheet-player-display sheet-main-header-charactername">
+    <input type="text" placeholder="Character Name" data-i18n-placeholder="character-name-placeholder" name="attr_character_name" />
+    <input type="text" placeholder="Destiny" data-i18n-placeholder="destiny-placeholder" name="attr_destiny" />
+  </div>
+
+  <!-- CHARNAME -->
+  <div class="sheet-npc-display sheet-main-header-charactername">
     <input type="text" placeholder="Character Name" data-i18n-placeholder="character-name-placeholder" name="attr_character_name" />
     <input type="text" placeholder="Destiny" data-i18n-placeholder="destiny-placeholder" name="attr_destiny" />
   </div>
 
   <!-- ----- HEADER -----  -->
-  <div class="sheet-main-header">
+  <div class="sheet-player-display sheet-main-header">
     <!-- ----- IMAGE -----  -->
     <div class="sheet-main-image"></div>
 
@@ -364,6 +363,58 @@
         </div>
       </div>
 
+<script id="✓ SYNC : GLOBAL MENUS" type="text/worker">
+  const PAIRS = [
+    ["global-privacy-status", "global-privacy-status2", "&nbsp;", true],
+    ["global-advantage-status", "global-advantage-status2", "standard", true],
+    ["npcornot-status", "npcornot-status2", "player", false]
+  ];
+
+  const setupPair = (A, B, def, symmetric) => {
+
+    on(`change:${A}`, () => {
+      getAttrs([A, B], v => {
+        const a = (v[A] ?? def) || def;
+        const b = (v[B] ?? def) || def;
+        if (a !== b) {
+          setAttrs({ [B]: a }, { silent: true });
+        }
+      });
+    });
+
+    on(`change:${B}`, () => {
+      getAttrs([A, B], v => {
+        const a = (v[A] ?? def) || def;
+        const b = (v[B] ?? def) || def;
+        if (a !== b) {
+          if (symmetric) {
+            setAttrs({ [A]: b }, { silent: true });
+          } else {
+            setAttrs({ [A]: b });
+          }
+        }
+      });
+    });
+  };
+
+  PAIRS.forEach(([a, b, def, symmetric]) => setupPair(a, b, def, symmetric));
+
+  on("sheet:opened", () => {
+    const all = PAIRS.flatMap(([a, b]) => [a, b]);
+    getAttrs(all, v => {
+      const updates = {};
+      PAIRS.forEach(([A, B, def]) => {
+        const a = v[A] || "";
+        const b = v[B] || "";
+        const val = a || b || def;
+        updates[A] = val;
+        updates[B] = val;
+      });
+      setAttrs(updates, { silent: true });
+    });
+  });
+</script>
+
       <!-- ----- SHEET TYPE -----  -->
       <div class="sheet-main-menu-roll sheet-standardbox sheet-standardbox2">
         <!-- -->
@@ -376,8 +427,117 @@
     </div>
   </div>
 
+  <!-- ----- HEADER BLOC RIGHT -----  -->
+  <div class="sheet-npc-display sheet-header-display1 sheet-standardbox sheet-standardbox2">
+    <div class="sheet-oneline">
+      <!-- HEADER BLOC 3 -->
+      <div class="sheet-main-header-size">
+        <h4 class="sheet-left" data-i18n="ac-label">AC</h4>
+        <input type="text" placeholder="0" data-i18n-placeholder="0-placeholder" name="attr_ac" />
+
+        <h4 class="sheet-left" data-i18n="speed-label">Speed</h4>
+        <input type="text" placeholder="0" data-i18n-placeholder="0-placeholder" name="attr_speed" />
+
+        <h4 class="sheet-left" data-i18n="challenge-label">Challenge</h4>
+        <input type="text" placeholder="-" name="attr_challenge" />
+
+        <h4 class="sheet-left" data-i18n="xp-label">XP</h4>
+        <input type="text" placeholder="-" name="attr_npcxp" />
+      </div>
+
+      <div class="sheet-main-header-size sheet-main-header-size2">
+        <h4 class="sheet-left" data-i18n="proficiency-label">Proficiency</h4>
+        <input type="text" value="0" name="attr_pb2" />
+
+        <h4 class="sheet-left" data-i18n="maneuveursdc-label">Maneuvers DC</h4>
+        <input type="text" value="0" name="attr_maneuversdc" />
+        </div>
+      </div>
+    </div>
+
+  <!-- ----- MENU2 -----  -->
+  <div class="sheet-npc-display sheet-main-menu sheet-main-menu4">
+    <!-- ----- ROLL PRIVACY -----  -->
+    <div class="sheet-main-menu-privacy sheet-triplecolumn sheet-standardbox sheet-standardbox2">
+      <!-- -->
+      <div class="sheet-button-holder">
+        <!-- -->
+        <input id="public" class="sheet-globalprivacy" type="radio" value="&nbsp;" name="attr_global-privacy-status2" checked />
+        <label for="public" data-i18n="pc-label">PC</label>
+        <!-- -->
+      </div>
+      <!-- -->
+      <div class="sheet-button-holder">
+        <!-- -->
+        <input id="to-gm" class="sheet-globalprivacy" type="radio" value="/w gm" name="attr_global-privacy-status2" />
+        <label for="to-gm" data-i18n="gm-label">GM</label>
+        <!-- -->
+      </div>
+      <!-- -->
+      <div class="sheet-button-holder">
+        <!-- -->
+        <input id="private" class="sheet-globalprivacy" type="radio" value="/me" name="attr_global-privacy-status2" />
+        <label for="private" data-i18n="pv-label">PV</label>
+        <!-- -->
+      </div>
+    </div>
+
+    <!-- ----- ROLL STATUT -----  -->
+    <div class="sheet-main-menu-statut sheet-triplecolumn sheet-standardbox sheet-standardbox2">
+      <!-- -->
+      <div class="sheet-button-holder">
+        <!-- -->
+        <input id="advantage" class="input-colored2" type="radio" value="advantage" name="attr_global-advantage-status2" />
+        <label for="advantage" data-i18n="adv-label">ADV</label>
+        <!-- -->
+      </div>
+      <!-- -->
+      <div class="sheet-button-holder">
+        <!-- -->
+        <input id="standard" class="input-colored1" type="radio" value="standard" name="attr_global-advantage-status2" checked />
+        <label for="standard" data-i18n="std-label">STD</label>
+        <!-- -->
+      </div>
+      <!-- -->
+      <div class="sheet-button-holder">
+        <!-- -->
+        <input id="disadvantage" class="input-colored2" type="radio" value="disadvantage" name="attr_global-advantage-status2" />
+        <label for="disadvantage" data-i18n="dis-label">DIS</label>
+        <!-- -->
+      </div>
+    </div>
+
+    <!-- ----- SHEET TYPE -----  -->
+    <div class="sheet-main-menu-npcornot sheet-standardbox sheet-standardbox2">
+      <!-- -->
+      <div class="sheet-button-holder">
+        <!-- -->
+        <input id="player" class="input-colored2" type="radio" value="player" name="attr_npcornot-status2" checked />
+        <label for="player"><span class="material-symbols-outlined"> accessibility </span></label>
+        <!-- -->
+      </div>
+      <!-- -->
+      <div class="sheet-button-holder">
+        <!-- -->
+        <input id="npc" class="input-colored1" type="radio" value="npc" name="attr_npcornot-status2" />
+        <label for="npc"><span class="material-symbols-outlined"> chess_knight </span></label>
+        <!-- -->
+      </div>
+    </div>
+
+    <!-- ----- SHEET TYPE -----  -->
+    <div class="sheet-main-menu-roll sheet-standardbox sheet-standardbox2">
+      <!-- -->
+      <div class="sheet-button-holder">
+        <!-- -->
+        <button type="roll" class="sheet-reallyspecialbutton sheet-button-roll" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{name=Custom}} {{charactername=@{character_name}}} {{category=A&S}} {{@{global-advantage-status}=1}} {{roll=[[?{Roll}]]}} {{roll1=[[?{Roll}]]}} {{roll2=[[?{Roll}]]}}"></button>
+        <!-- -->
+      </div>
+    </div>
+  </div>
+
   <!-- ----- MENU -----  -->
-  <div class="sheet-main-menu">
+  <div class="sheet-player-display sheet-main-menu">
     <!-- ----- TRUE MENU -----  -->
     <div class="sheet-main-menu-mainone sheet-standardbox sheet-standardbox2">
       <div class="sheet-oneline">
@@ -415,36 +575,91 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <script id="✓ CALC : Display Page" type="text/worker">
-      on("sheet:opened change:changepage", function () {
-        getAttrs(["changepage"], function (values) {
+<script id="✓ CALC : Display NPC/Player + Pages" type="text/worker">
+  const PAGE_MAP = {
+    "sheet-character": "sheet-character-display",
+    "sheet-spells": "sheet-spells-display",
+    "sheet-maneuvers": "sheet-maneuvers-display",
+    "sheet-admin": "sheet-admin-display",
+    "sheet-features": "sheet-features-display",
+    "sheet-inventaire": "sheet-inventaire-display",
+    "sheet-combats": "sheet-combats-display",
+    "sheet-background": "sheet-background-display",
+    "sheet-character-npc": "sheet-character-npc-display",
+    "sheet-admin-npc": "sheet-admin-npc-display",
+    "sheet-background-npc": "sheet-background-npc-display"
+  };
 
-          const selectedPage = values.changepage || "sheet-character";
+  const ALL_PAGE_CLASSES = Object.values(PAGE_MAP).join(", .");
 
-          const pageMap = {
-            "sheet-character": "sheet-character-display",
-            "sheet-spells": "sheet-spells-display",
-            "sheet-maneuvers": "sheet-maneuvers-display",
-            "sheet-admin": "sheet-admin-display",
-            "sheet-features": "sheet-features-display",
-            "sheet-inventaire": "sheet-inventaire-display",
-            "sheet-combats": "sheet-combats-display",
-            "sheet-background": "sheet-background-display"
-          };
+  const applyType = (type) => {
+    if (type === "npc") {
+      $20(".sheet-npc-display").removeClass("sheet-hidden");
+      $20(".sheet-player-display").addClass("sheet-hidden");
+    } else {
+      $20(".sheet-player-display").removeClass("sheet-hidden");
+      $20(".sheet-npc-display").addClass("sheet-hidden");
+    }
+  };
 
-          Object.keys(pageMap).forEach(pageKey => {
-            const element = $20(`.${pageMap[pageKey]}`);
-            if (selectedPage === pageKey) {
-              element.removeClass("sheet-hidden");
-            } else {
-              element.addClass("sheet-hidden");
-            }
-          });
+  const applyPage = (pageKey) => {
+    const pageClass = PAGE_MAP[pageKey] || PAGE_MAP["sheet-character"];
+    $20(`.${ALL_PAGE_CLASSES}`).addClass("sheet-hidden");
+    $20(`.${pageClass}`).removeClass("sheet-hidden");
+  };
 
-        });
-      });
-    </script>
+  on("sheet:opened", () => {
+    getAttrs(["npcornot-status", "changepage"], v => {
+      const type = v["npcornot-status"] || "player";
+      const page = v["changepage"] || (type === "npc" ? "sheet-character-npc" : "sheet-character");
+      applyType(type);
+      applyPage(page);
+    });
+  });
+
+  on("change:npcornot-status", () => {
+    getAttrs(["npcornot-status"], v => {
+      const type = v["npcornot-status"] || "player";
+      const desiredPage = type === "npc" ? "sheet-character-npc" : "sheet-character";
+      setAttrs({ changepage: desiredPage }, { silent: true });
+      applyType(type);
+      applyPage(desiredPage);
+    });
+  });
+
+  on("change:changepage", () => {
+    getAttrs(["npcornot-status", "changepage"], v => {
+      const type = v["npcornot-status"] || "player";
+      const page = v["changepage"] || (type === "npc" ? "sheet-character-npc" : "sheet-character");
+      applyType(type);
+      applyPage(page);
+    });
+  });
+</script>
+
+
+
+  <!-- ----- MENU -----  -->
+  <div class="sheet-npc-display sheet-main-menu sheet-main-menu3">
+    <!-- ----- TRUE MENU -----  -->
+    <div class="sheet-main-menu-mainone sheet-main-menu-mainone2 sheet-standardbox sheet-standardbox2">
+      <div class="sheet-oneline">
+        <div class="sheet-online">
+          <input type="radio" value="sheet-character-npc" name="attr_changepage" checked />
+          <label class="radio-button" data-i18n="character-label">Character</label>
+        </div>
+        <div class="sheet-online">
+          <input type="radio" value="sheet-background-npc" name="attr_changepage" />
+          <label class="radio-button" data-i18n="notes-label">Notes</label>
+        </div>
+        <div class="sheet-online">
+          <input type="radio" value="sheet-admin-npc" name="attr_changepage" />
+          <label class="radio-button"><span class="material-symbols-outlined">manufacturing</span></label>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ----- ADMIN -----  -->
@@ -562,7 +777,133 @@
         </div>
       </div>
 
-       <div class="sheet-standardbox sheet-standardbox2">
+      <div class="sheet-standardbox sheet-standardbox2">
+        <h4 class="sheet-minititles2" style="grid-column: 1/-1" data-i18n="roll-label">Roll</h4>
+
+        <div class="sheet-oneline">
+          <h3 data-i18n="critical-label">Critical</h3>
+          <input type="number" name="attr_criticalrange" value="20" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ----- ADMIN -----  -->
+  <div class="sheet-admin-npc-display sheet-hidden">
+    <!-- ----- ADMIN LEFT -----  -->
+    <div class="sheet-adminleft">
+      <!-- ----- GLOBAL BONUSES -----  -->
+      <div class="sheet-standardbox sheet-standardbox2">
+        <h4 class="sheet-minititles2" style="grid-column: 1/-1" data-i18n="global-label">Global</h4>
+        <div class="sheet-oneline">
+          <h3 data-i18n="global-ability-bonus-label">Global Ability Bonus</h3>
+          <input type="number" value="0" name="attr_global-ability-bonus" />
+          <h3 data-i18n="global-skill-bonus-label">Global Skill Bonus</h3>
+          <input type="number" value="0" name="attr_global-skill-bonus" />
+          <h3 data-i18n="global-passive-bonus-label">Global Passive Bonus</h3>
+          <input type="number" value="0" name="attr_global-passive-bonus" />
+          <h3 data-i18n="global-save-bonus-label">Global Save Bonus</h3>
+          <input type="number" value="0" name="attr_global-save-bonus" />
+        </div>
+      </div>
+
+      <!-- ----- SPECIFICITIES -----  -->
+      <div class="sheet-standardbox sheet-standardbox2">
+        <h4 class="sheet-minititles2" style="grid-column: 1/-1" data-i18n="specificities-label">Specificities</h4>
+        <div class="sheet-oneline">
+          <h3 data-i18n="spells-points-activated-label">Spells Points Activated</h3>
+          <input type="checkbox" value="1" name="attr_spellpoints" />
+        </div>
+      </div>
+
+      <!-- ----- SPECIFICITIES -----  -->
+      <div class="sheet-standardbox sheet-standardbox2">
+        <h4 class="sheet-minititles2" style="grid-column: 1/-1" data-i18n="inventory-label">Inventory</h4>
+        <div class="sheet-oneline">
+          <h3 data-i18n="weight-of-coins-label">Weight of coins</h3>
+          <input type="checkbox" value="1" name="attr_weightofcoins" />
+        </div>
+      </div>
+
+      <!-- ----- ABILITY BONUSES ----- -->
+      <div class="sheet-standardbox sheet-standardbox2">
+        <h4 class="sheet-minititles2" style="grid-column: 1/-1" data-i18n="ability-bonuses-label">Ability Bonuses</h4>
+
+        <div class="sheet-oneline">
+          <h3 data-i18n="strength-bonus-label">Strength Bonus</h3>
+          <input type="number" value="0" name="attr_strength-ability-bonus" />
+
+          <h3 data-i18n="dexterity-bonus-label">Dexterity Bonus</h3>
+          <input type="number" value="0" name="attr_dexterity-ability-bonus" />
+
+          <h3 data-i18n="constitution-bonus-label">Constitution Bonus</h3>
+          <input type="number" value="0" name="attr_constitution-ability-bonus" />
+
+          <h3 data-i18n="intelligence-bonus-label">Intelligence Bonus</h3>
+          <input type="number" value="0" name="attr_intelligence-ability-bonus" />
+
+          <h3 data-i18n="wisdom-bonus-label">Wisdom Bonus</h3>
+          <input type="number" value="0" name="attr_wisdom-ability-bonus" />
+
+          <h3 data-i18n="charisma-bonus-label">Charisma Bonus</h3>
+          <input type="number" value="0" name="attr_charisma-ability-bonus" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ----- ADMIN LEFT -----  -->
+    <div class="sheet-adminright">
+      <!-- ----- SKILLS BONUSES -----  -->
+      <div class="sheet-standardbox sheet-standardbox2">
+        <h4 class="sheet-minititles2" style="grid-column: 1/-1" data-i18n="skills-bonuses-label">Skills Bonuses</h4>
+
+        <div class="sheet-oneline">
+          <h3 data-i18n="acrobatics-label">Acrobatics</h3>
+          <input type="number" name="attr_acrobatics_bonus" value="0" />
+          <h3 data-i18n="animal-handling-label">Animal Handling</h3>
+          <input type="number" name="attr_animalhandling_bonus" value="0" />
+          <h3 data-i18n="arcana-label">Arcana</h3>
+          <input type="number" name="attr_arcana_bonus" value="0" />
+          <h3 data-i18n="athletics-label">Athletics</h3>
+          <input type="number" name="attr_athletics_bonus" value="0" />
+          <h3 data-i18n="culture-label">Culture</h3>
+          <input type="number" name="attr_culture_bonus" value="0" />
+          <h3 data-i18n="deception-label">Deception</h3>
+          <input type="number" name="attr_deception_bonus" value="0" />
+          <h3 data-i18n="engineering-label">Engineering</h3>
+          <input type="number" name="attr_engineering_bonus" value="0" />
+          <h3 data-i18n="history-label">History</h3>
+          <input type="number" name="attr_history_bonus" value="0" />
+          <h3 data-i18n="insight-label">Insight</h3>
+          <input type="number" name="attr_insight_bonus" value="0" />
+          <h3 data-i18n="intimidation-label">Intimidation</h3>
+          <input type="number" name="attr_intimidation_bonus" value="0" />
+          <h3 data-i18n="investigation-label">Investigation</h3>
+          <input type="number" name="attr_investigation_bonus" value="0" />
+          <h3 data-i18n="medicine-label">Medicine</h3>
+          <input type="number" name="attr_medicine_bonus" value="0" />
+          <h3 data-i18n="nature-label">Nature</h3>
+          <input type="number" name="attr_nature_bonus" value="0" />
+          <h3 data-i18n="perception-label">Perception</h3>
+          <input type="number" name="attr_perception_bonus" value="0" />
+          <h3 data-i18n="performance-label">Performance</h3>
+          <input type="number" name="attr_performance_bonus" value="0" />
+          <h3 data-i18n="persuasion-label">Persuasion</h3>
+          <input type="number" name="attr_persuasion_bonus" value="0" />
+          <h3 data-i18n="religion-label">Religion</h3>
+          <input type="number" name="attr_religion_bonus" value="0" />
+          <h3 data-i18n="sleight-of-hand-label">Sleight of Hand</h3>
+          <input type="number" name="attr_sleightofhand_bonus" value="0" />
+          <h3 data-i18n="stealth-label">Stealth</h3>
+          <input type="number" name="attr_stealth_bonus" value="0" />
+          <h3 data-i18n="survival-label">Survival</h3>
+          <input type="number" name="attr_survival_bonus" value="0" />
+          <h3 data-i18n="vehicles-label">Vehicles</h3>
+          <input type="number" name="attr_vehicles_bonus" value="0" />
+        </div>
+      </div>
+
+      <div class="sheet-standardbox sheet-standardbox2">
         <h4 class="sheet-minititles2" style="grid-column: 1/-1" data-i18n="roll-label">Roll</h4>
 
         <div class="sheet-oneline">
@@ -668,7 +1009,7 @@
                     <span class="sheet-cogs-icon">y</span>
                   </div>
 
-                  <input style="grid-column: 1/-1" class="sheet-left" type="text" value="-" name="attr_features-source" />
+                  <input style="grid-column: 1/-1" class="sheet-left" type="text" placeholder="-" name="attr_features-source" />
                   <textarea style="grid-column: 1/-1" type="text" value="-" name="attr_features-description"></textarea>
                 </div>
 
@@ -689,7 +1030,7 @@
                   </div>
 
                   <input class="sheet-hidden sheet-description-hideshow" type="checkbox" name="attr_sheet-description-hideshow" />
-                  <span style="grid-column: 1/-1" class="sheet-left" type="text" value="-" name="attr_features-source"></span>
+                  <span style="grid-column: 1/-1" class="sheet-left" type="text" placeholder="-" name="attr_features-source"></span>
                   <textarea class="sheet-description-hideshow-div" style="grid-column: 1/-1" type="text" value="-" name="attr_features-description" readonly></textarea>
                 </div>
               </div>
@@ -1124,24 +1465,23 @@
     </div>
   </div>
 
-<script id="✓ CALC : A&S Damages Button Links" type="text/worker">
-  const section = "attacksandspells";
-  const rep = `repeating_${section}`;
+  <script id="✓ CALC : A&S Damages Button Links" type="text/worker">
+    const section = "attacksandspells";
+    const rep = `repeating_${section}`;
 
-  const updateButtons = () => {
-    getSectionIDs(section, ids => {
-      const updates = {};
-      ids.forEach(id => {
-        updates[`${rep}_${id}_attacksorspell-button`] = `[Damages](~${id}__show-attackorspell-damages)`;
-        updates[`${rep}_${id}_attacksorspell-crit-button`] = `[C](~${id}__show-attackorspell-crit-damages)`;
+    const updateButtons = () => {
+      getSectionIDs(section, ids => {
+        const updates = {};
+        ids.forEach(id => {
+          updates[`${rep}_${id}_attacksorspell-button`] = `[Damages](~${id}__show-attackorspell-damages)`;
+          updates[`${rep}_${id}_attacksorspell-crit-button`] = `[C](~${id}__show-attackorspell-crit-damages)`;
+        });
+        setAttrs(updates, { silent: true });
       });
-      setAttrs(updates, { silent: true });
-    });
-  };
+    };
 
-  on(`sheet:opened change:${rep} remove:${rep}`, updateButtons);
-</script>
-
+    on(`sheet:opened change:${rep} remove:${rep}`, updateButtons);
+  </script>
 
   <!-- ----- COMBAT -----  -->
   <div class="sheet-combats-display sheet-hidden">
@@ -1164,12 +1504,12 @@
             <input class="sheet-hidden sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
 
             <div class="sheet-attacksandspells">
-              <button style="max-height: 18px !important" type="roll" class="sheet-button-attack" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{name=@{attacksorspell-name}}} {{charactername=@{character_name}}} {{category=A&S}} {{@{attacks_toogle}=1}} {{@{global-advantage-status}=1}} {{roll=[[1d20cs@{criticalrange}+@{attacksorspell-atkb}+[[@{attacks_expertisedice}]]]]}} {{roll1=[[1d20cs@{criticalrange}+@{attacksorspell-atkb}+[[@{attacks_expertisedice}]]]]}} {{roll2=[[1d20cs@{criticalrange}+@{attacksorspell-atkb}+[[@{attacks_expertisedice}]]]]}} {{description=@{attacksorspell-description}}} {{buttoncrit=@{attacksorspell-crit-button}}} {{button=@{attacksorspell-button}}} {{desc=1}} {{dmg1=[[@{attacksorspell-dmg}]]}} {{dmg1crit=[[@{attacksorspell-dmg}]]}} {{dmg1type=@{attacksorspell-type}}} {{dmg2=[[@{attacksorspell-dmg2}]]}} {{dmg2crit=[[@{attacksorspell-dmg2}]]}} {{dmg2type=@{attacksorspell-type2}}}"></button>
+              <button style="max-height: 18px !important" type="roll" class="sheet-button-attack" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{name=@{attacksorspell-name}}} {{charactername=@{character_name}}} {{category=A&S}} {{@{attacks_toogle}=1}} {{@{global-advantage-status}=1}} {{roll=[[1d20cs@{criticalrange}+@{pb}+@{attacksorspell-atkb}+[[@{attacks_expertisedice}]]]]}} {{roll1=[[1d20cs@{criticalrange}+@{pb}+@{attacksorspell-atkb}+[[@{attacks_expertisedice}]]]]}} {{roll2=[[1d20cs@{criticalrange}+@{pb}+@{attacksorspell-atkb}+[[@{attacks_expertisedice}]]]]}} {{description=@{attacksorspell-description}}} {{buttoncrit=@{attacksorspell-crit-button}}} {{button=@{attacksorspell-button}}} {{desc=1}} {{dmg1=[[@{attacksorspell-dmg}]]}} {{dmg1crit=[[@{attacksorspell-dmg}]]}} {{dmg1type=@{attacksorspell-type}}} {{dmg2=[[@{attacksorspell-dmg2}]]}} {{dmg2crit=[[@{attacksorspell-dmg2}]]}} {{dmg2type=@{attacksorspell-type2}}}"></button>
               <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="[Damages](~show-attackorspell-damages)" name="attr_attacksorspell-button" />
               <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="[C](~show-attackorspell-crit-damages)" name="attr_attacksorspell-crit-button" />
-               <button type="roll" class="sheet-hidden" name="roll_show-attackorspell-damages" value="@{global-privacy-status} &{template:levelup} {{name=Damages}} {{charactername=@{attacksorspell-name}}} {{category=A&S}} {{dmgonly=1}} {{critical=[[0]]}} {{dmg1=[[@{attacksorspell-dmg}]]}} {{dmg1type=@{attacksorspell-type}}} {{dmg2=[[@{attacksorspell-dmg2}]]}} {{dmg2type=@{attacksorspell-type2}}}"></button>
+              <button type="roll" class="sheet-hidden" name="roll_show-attackorspell-damages" value="@{global-privacy-status} &{template:levelup} {{name=Damages}} {{charactername=@{attacksorspell-name}}} {{category=A&S}} {{dmgonly=1}} {{critical=[[0]]}} {{dmg1=[[@{attacksorspell-dmg}]]}} {{dmg1type=@{attacksorspell-type}}} {{dmg2=[[@{attacksorspell-dmg2}]]}} {{dmg2type=@{attacksorspell-type2}}}"></button>
               <button type="roll" class="sheet-hidden" name="roll_show-attackorspell-crit-damages" value="@{global-privacy-status} &{template:levelup} {{name=Critical Damages}} {{charactername=@{attacksorspell-name}}} {{category=A&S}} {{dmgonly=1}} {{critical=[[1]]}} {{dmg1=[[@{attacksorspell-dmg}]]}} {{dmg1crit=[[@{attacksorspell-dmg}]]}} {{dmg1type=@{attacksorspell-type}}} {{dmg2=[[@{attacksorspell-dmg2}]]}} {{dmg2crit=[[@{attacksorspell-dmg2}]]}} {{dmg2type=@{attacksorspell-type2}}}"></button>
-             
+
               <input class="sheet-left" type="text" placeholder="Name" data-i18n-placeholder="name-placeholder" name="attr_attacksorspell-name" style="grid-column: 2/4" />
               <input type="number" step="1" value="0" name="attr_attacksorspell-atkb" />
 
@@ -1209,7 +1549,7 @@
             <div class="sheet-attacksandspells sheet-cogs-hideshow-div1" style="margin-top: -10px">
               <h4 data-i18n="nbsp-label">&nbsp;</h4>
               <h4 class="sheet-left" data-i18n="action-type-label">Action Type</h4>
-              <h4 data-i18n="roll-type-label">Roll Type</h4>
+              <h4 data-i18n="roll-type-label">R.Type</h4>
               <h4 data-i18n="exp-label">EXP</h4>
               <h4 data-i18n="dmg-label">DMG</h4>
               <h4 data-i18n="dmg-type-label">DMG Type</h4>
@@ -1225,7 +1565,7 @@
       <div class="sheet-standardbox sheet-standardbox2">
         <h4 class="sheet-minititles2 sheet-main-titlestatistics" data-i18n="actions-label">Actions</h4>
         <div class="sheet-oneline">
-          <div class="sheet-actions">
+          <div class="sheet-actions" style="    margin-bottom: -5px;">
             <h4 data-i18n="type-label">Type</h4>
             <h4 class="sheet-left" data-i18n="name-label">Name</h4>
             <h4 data-i18n="nbsp-label">&nbsp;</h4>
@@ -1354,7 +1694,7 @@
       <div class="sheet-main-initiative sheet-standardbox sheet-standardbox2">
         <div class="sheet-oneline">
           <div class="sheet-button-div-holder">
-            <button type="roll" class="sheet-button-description" name="roll_initiative" value="@{global-privacy-status} &{template:levelup} {{name=Initiative}} {{roll=[[1d20+@{initiative-total}&{tracker}]]}} {{charactername=@{character_name}}} {{standard=1}} {{category=Ability}}"></button>
+            <button type="roll" class="sheet-button-description" name="roll_initiative" value="@{global-privacy-status} &{template:levelup} {{name=Initiative}} {{roll=[[1d20+@{pb}+@{initiative-total}&{tracker}]]}} {{charactername=@{character_name}}} {{standard=1}} {{category=Ability}}"></button>
             <h3 data-i18n="initiative-label">Initiative</h3>
           </div>
           <input type="number" value="0" name="attr_initiative-total" readonly />
@@ -1517,7 +1857,7 @@
     </div>
   </div>
 
-  <!-- ----- AREA -----  -->
+  <!-- ----- CHARACTER -----  -->
   <div class="sheet-maingrid-area sheet-character-display sheet-hidden">
     <!-- ----- BLOC LEFT-----  -->
     <div class="sheet-maingrid-area-left">
@@ -1530,13 +1870,13 @@
             <div class="sheet-main-body sheet-standardbox sheet-standardbox1">
               <div class="sheet-oneline sheet-oneline2">
                 <div class="sheet-button-div-holder">
-                  <button type="roll" class="sheet-button-description" name="roll_str" value="@{global-privacy-status} &{template:levelup} {{name=Strength}} {{roll=[[1d20+@{strength-bonus}+@{global-ability-bonus}+@{strength-ability-bonus}]]}} {{roll1=[[1d20+@{strength-bonus}+@{global-ability-bonus}+@{strength-ability-bonus}]]}} {{roll2=[[1d20+@{strength-bonus}+@{global-ability-bonus}+@{strength-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+                  <button type="roll" class="sheet-button-description" name="roll_str" value="@{global-privacy-status} &{template:levelup} {{name=Strength}} {{roll=[[1d20+@{pb}+@{strength-bonus}+@{global-ability-bonus}+@{strength-ability-bonus}]]}} {{roll1=[[1d20+@{pb}+@{strength-bonus}+@{global-ability-bonus}+@{strength-ability-bonus}]]}} {{roll2=[[1d20+@{pb}+@{strength-bonus}+@{global-ability-bonus}+@{strength-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
                   <h4 data-i18n="str-label">STR</h4>
                 </div>
                 <div class="sheet-main-statistics-strength sheet-general-hideshow-div1">
                   <input class="sheet-maincolor sheet-inputchar" type="number" value="10" name="attr_strength" />
                 </div>
-                <input class="sheet-inputchar2" type="number" value="0" name="attr_strength-bonus" readonly />
+                <span class="sheet-caracteristicsbonus" type="number" value="0" name="attr_strength-bonus"></span>
               </div>
             </div>
 
@@ -1544,13 +1884,13 @@
             <div class="sheet-main-body sheet-standardbox sheet-standardbox1">
               <div class="sheet-oneline sheet-oneline2">
                 <div class="sheet-button-div-holder">
-                  <button type="roll" class="sheet-button-description" name="roll_dex" value="@{global-privacy-status} &{template:levelup} {{name=Dexterity}} {{roll=[[1d20+@{dexterity-bonus}+@{global-ability-bonus}+@{dexterity-ability-bonus}]]}} {{roll1=[[1d20+@{dexterity-bonus}+@{global-ability-bonus}+@{dexterity-ability-bonus}]]}} {{roll2=[[1d20+@{dexterity-bonus}+@{global-ability-bonus}+@{dexterity-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+                  <button type="roll" class="sheet-button-description" name="roll_dex" value="@{global-privacy-status} &{template:levelup} {{name=Dexterity}} {{roll=[[1d20+@{pb}+@{dexterity-bonus}+@{global-ability-bonus}+@{dexterity-ability-bonus}]]}} {{roll1=[[1d20+@{pb}+@{dexterity-bonus}+@{global-ability-bonus}+@{dexterity-ability-bonus}]]}} {{roll2=[[1d20+@{pb}+@{dexterity-bonus}+@{global-ability-bonus}+@{dexterity-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
                   <h4 data-i18n="dex-label">DEX</h4>
                 </div>
                 <div class="sheet-main-statistics-dexterity sheet-general-hideshow-div1">
                   <input class="sheet-maincolor sheet-inputchar" type="number" value="10" name="attr_dexterity" />
                 </div>
-                <input class="sheet-inputchar2" type="number" value="0" name="attr_dexterity-bonus" readonly />
+                <span class="sheet-caracteristicsbonus" type="number" value="0" name="attr_dexterity-bonus"></span>
               </div>
             </div>
 
@@ -1558,13 +1898,13 @@
             <div class="sheet-main-body sheet-standardbox sheet-standardbox1">
               <div class="sheet-oneline sheet-oneline2">
                 <div class="sheet-button-div-holder">
-                  <button type="roll" class="sheet-button-description" name="roll_con" value="@{global-privacy-status} &{template:levelup} {{name=Constitution}} {{roll=[[1d20+@{constitution-bonus}+@{global-ability-bonus}+@{constitution-ability-bonus}]]}} {{roll1=[[1d20+@{constitution-bonus}+@{global-ability-bonus}+@{constitution-ability-bonus}]]}} {{roll2=[[1d20+@{constitution-bonus}+@{global-ability-bonus}+@{constitution-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+                  <button type="roll" class="sheet-button-description" name="roll_con" value="@{global-privacy-status} &{template:levelup} {{name=Constitution}} {{roll=[[1d20+@{pb}+@{constitution-bonus}+@{global-ability-bonus}+@{constitution-ability-bonus}]]}} {{roll1=[[1d20+@{pb}+@{constitution-bonus}+@{global-ability-bonus}+@{constitution-ability-bonus}]]}} {{roll2=[[1d20+@{pb}+@{constitution-bonus}+@{global-ability-bonus}+@{constitution-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
                   <h4 data-i18n="con-label">CON</h4>
                 </div>
                 <div class="sheet-main-statistics-constitution sheet-general-hideshow-div1">
                   <input class="sheet-maincolor sheet-inputchar" type="number" value="10" name="attr_constitution" />
                 </div>
-                <input class="sheet-inputchar2" type="number" value="0" name="attr_constitution-bonus" readonly />
+                <span class="sheet-caracteristicsbonus" type="number" value="0" name="attr_constitution-bonus"></span>
               </div>
             </div>
 
@@ -1572,13 +1912,13 @@
             <div class="sheet-main-body sheet-standardbox sheet-standardbox1">
               <div class="sheet-oneline sheet-oneline2">
                 <div class="sheet-button-div-holder">
-                  <button type="roll" class="sheet-button-description" name="roll_int" value="@{global-privacy-status} &{template:levelup} {{name=Intelligence}} {{roll=[[1d20+@{intelligence-bonus}+@{global-ability-bonus}+@{intelligence-ability-bonus}]]}} {{roll1=[[1d20+@{intelligence-bonus}+@{global-ability-bonus}+@{intelligence-ability-bonus}]]}} {{roll2=[[1d20+@{intelligence-bonus}+@{global-ability-bonus}+@{intelligence-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+                  <button type="roll" class="sheet-button-description" name="roll_int" value="@{global-privacy-status} &{template:levelup} {{name=Intelligence}} {{roll=[[1d20+@{pb}+@{intelligence-bonus}+@{global-ability-bonus}+@{intelligence-ability-bonus}]]}} {{roll1=[[1d20+@{pb}+@{intelligence-bonus}+@{global-ability-bonus}+@{intelligence-ability-bonus}]]}} {{roll2=[[1d20+@{pb}+@{intelligence-bonus}+@{global-ability-bonus}+@{intelligence-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
                   <h4 data-i18n="int-label">INT</h4>
                 </div>
                 <div class="sheet-main-statistics-intelligence sheet-general-hideshow-div1">
                   <input class="sheet-maincolor sheet-inputchar" type="number" value="10" name="attr_intelligence" />
                 </div>
-                <input class="sheet-inputchar2" type="number" value="0" name="attr_intelligence-bonus" readonly />
+                <span class="sheet-caracteristicsbonus" type="number" value="0" name="attr_intelligence-bonus"></span>
               </div>
             </div>
 
@@ -1586,13 +1926,13 @@
             <div class="sheet-main-body sheet-standardbox sheet-standardbox1">
               <div class="sheet-oneline sheet-oneline2">
                 <div class="sheet-button-div-holder">
-                  <button type="roll" class="sheet-button-description" name="roll_wis" value="@{global-privacy-status} &{template:levelup} {{name=Wisdom}} {{roll=[[1d20+@{wisdom-bonus}+@{global-ability-bonus}+@{wisdom-ability-bonus}]]}} {{roll1=[[1d20+@{wisdom-bonus}+@{global-ability-bonus}+@{wisdom-ability-bonus}]]}} {{roll2=[[1d20+@{wisdom-bonus}+@{global-ability-bonus}+@{wisdom-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+                  <button type="roll" class="sheet-button-description" name="roll_wis" value="@{global-privacy-status} &{template:levelup} {{name=Wisdom}} {{roll=[[1d20+@{pb}+@{wisdom-bonus}+@{global-ability-bonus}+@{wisdom-ability-bonus}]]}} {{roll1=[[1d20+@{pb}+@{wisdom-bonus}+@{global-ability-bonus}+@{wisdom-ability-bonus}]]}} {{roll2=[[1d20+@{pb}+@{wisdom-bonus}+@{global-ability-bonus}+@{wisdom-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
                   <h4 data-i18n="wis-label">WIS</h4>
                 </div>
                 <div class="sheet-main-statistics-wisdom sheet-general-hideshow-div1">
                   <input class="sheet-maincolor sheet-inputchar" type="number" value="10" name="attr_wisdom" />
                 </div>
-                <input class="sheet-inputchar2" type="number" value="0" name="attr_wisdom-bonus" readonly />
+                <span class="sheet-caracteristicsbonus" type="number" value="0" name="attr_wisdom-bonus"></span>
               </div>
             </div>
 
@@ -1600,13 +1940,13 @@
             <div class="sheet-main-body sheet-standardbox sheet-standardbox1">
               <div class="sheet-oneline sheet-oneline2">
                 <div class="sheet-button-div-holder">
-                  <button type="roll" class="sheet-button-description" name="roll_cha" value="@{global-privacy-status} &{template:levelup} {{name=Charisma}} {{roll=[[1d20+@{charisma-bonus}+@{global-ability-bonus}+@{charisma-ability-bonus}]]}} {{roll1=[[1d20+@{charisma-bonus}+@{global-ability-bonus}+@{charisma-ability-bonus}]]}} {{roll2=[[1d20+@{charisma-bonus}+@{global-ability-bonus}+@{charisma-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+                  <button type="roll" class="sheet-button-description" name="roll_cha" value="@{global-privacy-status} &{template:levelup} {{name=Charisma}} {{roll=[[1d20+@{pb}+@{charisma-bonus}+@{global-ability-bonus}+@{charisma-ability-bonus}]]}} {{roll1=[[1d20+@{pb}+@{charisma-bonus}+@{global-ability-bonus}+@{charisma-ability-bonus}]]}} {{roll2=[[1d20+@{pb}+@{charisma-bonus}+@{global-ability-bonus}+@{charisma-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
                   <h4 data-i18n="cha-label">CHA</h4>
                 </div>
                 <div class="sheet-main-statistics-charisma sheet-general-hideshow-div1">
                   <input class="sheet-maincolor sheet-inputchar" type="number" value="10" name="attr_charisma" />
                 </div>
-                <input class="sheet-inputchar2" type="number" value="0" name="attr_charisma-bonus" readonly />
+                <span class="sheet-caracteristicsbonus" type="number" value="0" name="attr_charisma-bonus"></span>
               </div>
             </div>
           </div>
@@ -1633,18 +1973,20 @@
           </div>
         </div>
 
-        <script id="STATS : PROFICIENCY BONUS CALCULATION" type="text/worker">
-          const calcPB = lvl => {
-            lvl = parseInt(lvl,10) || 0;
-            return Math.floor((lvl - 1) / 4) + 2;
-          };
+<script id="STATS : PROFICIENCY BONUS CALCULATION" type="text/worker">
+  const calcPB = lvl => {
+    lvl = parseInt(lvl,10) || 0;
+    return Math.floor((lvl - 1) / 4) + 2;
+  };
 
-          on("change:level sheet:opened", () => {
-            getAttrs(["level"], v => {
-              setAttrs({ pb: calcPB(v.level) });
-            });
-          });
-        </script>
+  on("change:level change:pb2 sheet:opened", () => {
+    getAttrs(["level","pb2"], v => {
+      const pb2 = parseInt(v.pb2,10) || 0;
+      const pb = pb2 > 0 ? pb2 : calcPB(v.level);
+      setAttrs({ pb });
+    });
+  });
+</script>
 
         <!-- ----- INSPIRATION -----  -->
         <div class="sheet-main-inspiration sheet-standardbox sheet-standardbox2">
@@ -1664,7 +2006,7 @@
               <input type="checkbox" value="1" name="attr_saving_str_active" />
               <input type="number" step="1" value="0" name="attr_saving_str_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_save_str" value="@{global-privacy-status} &{template:levelup} {{name=Strength Save}} {{roll=[[1d20+@{saving_str_value}+@{savestrength_expertisedice}]]}} {{roll1=[[1d20+@{saving_str_value}+@{savestrength_expertisedice}]]}} {{roll2=[[1d20+@{saving_str_value}+@{savestrength_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_save_str" value="@{global-privacy-status} &{template:levelup} {{name=Strength Save}} {{roll=[[1d20+@{pb}+@{saving_str_value}+@{savestrength_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{saving_str_value}+@{savestrength_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{saving_str_value}+@{savestrength_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
                 <h4 data-i18n="savenbspstrength-label">Save&nbsp;Strength</h4>
               </div>
               <select name="attr_savestrength_expertisedice">
@@ -1683,7 +2025,7 @@
               <input type="checkbox" value="1" name="attr_saving_dex_active" />
               <input type="number" step="1" value="0" name="attr_saving_dex_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_save_dex" value="@{global-privacy-status} &{template:levelup} {{name=Dexterity Save}} {{roll=[[1d20+@{saving_dex_value}+@{savedexterity_expertisedice}]]}} {{roll1=[[1d20+@{saving_dex_value}+@{savedexterity_expertisedice}]]}} {{roll2=[[1d20+@{saving_dex_value}+@{savedexterity_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_save_dex" value="@{global-privacy-status} &{template:levelup} {{name=Dexterity Save}} {{roll=[[1d20+@{pb}+@{saving_dex_value}+@{savedexterity_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{saving_dex_value}+@{savedexterity_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{saving_dex_value}+@{savedexterity_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
                 <h4 data-i18n="savenbspdexterity-label">Save&nbsp;Dexterity</h4>
               </div>
               <select name="attr_savedexterity_expertisedice">
@@ -1702,7 +2044,7 @@
               <input type="checkbox" value="1" name="attr_saving_con_active" />
               <input type="number" step="1" value="0" name="attr_saving_con_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_save_con" value="@{global-privacy-status} &{template:levelup} {{name=Constitution Save}} {{roll=[[1d20+@{saving_con_value}+@{saveconstitution_expertisedice}]]}} {{roll1=[[1d20+@{saving_con_value}+@{saveconstitution_expertisedice}]]}} {{roll2=[[1d20+@{saving_con_value}+@{saveconstitution_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_save_con" value="@{global-privacy-status} &{template:levelup} {{name=Constitution Save}} {{roll=[[1d20+@{pb}+@{saving_con_value}+@{saveconstitution_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{saving_con_value}+@{saveconstitution_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{saving_con_value}+@{saveconstitution_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
                 <h4 data-i18n="savenbspconstitution-label">Save&nbsp;Constitution</h4>
               </div>
               <select name="attr_saveconstitution_expertisedice">
@@ -1721,7 +2063,7 @@
               <input type="checkbox" value="1" name="attr_saving_int_active" />
               <input type="number" step="1" value="0" name="attr_saving_int_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_save_int" value="@{global-privacy-status} &{template:levelup} {{name=Intelligence Save}} {{roll=[[1d20+@{saving_int_value}+@{saveintelligence_expertisedice}]]}} {{roll1=[[1d20+@{saving_int_value}+@{saveintelligence_expertisedice}]]}} {{roll2=[[1d20+@{saving_int_value}+@{saveintelligence_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_save_int" value="@{global-privacy-status} &{template:levelup} {{name=Intelligence Save}} {{roll=[[1d20+@{pb}+@{saving_int_value}+@{saveintelligence_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{saving_int_value}+@{saveintelligence_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{saving_int_value}+@{saveintelligence_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
                 <h4 data-i18n="savenbspintelligence-label">Save&nbsp;Intelligence</h4>
               </div>
               <select name="attr_saveintelligence_expertisedice">
@@ -1740,7 +2082,7 @@
               <input type="checkbox" value="1" name="attr_saving_wis_active" />
               <input type="number" step="1" value="0" name="attr_saving_wis_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_save_wis" value="@{global-privacy-status} &{template:levelup} {{name=Wisdom Save}} {{roll=[[1d20+@{saving_wis_value}+@{savewisdom_expertisedice}]]}} {{roll1=[[1d20+@{saving_wis_value}+@{savewisdom_expertisedice}]]}} {{roll2=[[1d20+@{saving_wis_value}+@{savewisdom_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_save_wis" value="@{global-privacy-status} &{template:levelup} {{name=Wisdom Save}} {{roll=[[1d20+@{pb}+@{saving_wis_value}+@{savewisdom_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{saving_wis_value}+@{savewisdom_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{saving_wis_value}+@{savewisdom_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
                 <h4 data-i18n="savenbspwisdom-label">Save&nbsp;Wisdom</h4>
               </div>
               <select name="attr_savewisdom_expertisedice">
@@ -1759,7 +2101,7 @@
               <input type="checkbox" value="1" name="attr_saving_cha_active" />
               <input type="number" step="1" value="0" name="attr_saving_cha_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_save_cha" value="@{global-privacy-status} &{template:levelup} {{name=Charisma Save}} {{roll=[[1d20+@{saving_cha_value}+@{savecharisma_expertisedice}]]}} {{roll1=[[1d20+@{saving_cha_value}+@{savecharisma_expertisedice}]]}} {{roll2=[[1d20+@{saving_cha_value}+@{savecharisma_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_save_cha" value="@{global-privacy-status} &{template:levelup} {{name=Charisma Save}} {{roll=[[1d20+@{pb}+@{saving_cha_value}+@{savecharisma_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{saving_cha_value}+@{savecharisma_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{saving_cha_value}+@{savecharisma_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
                 <h4 data-i18n="savenbspcharisma-label">Save&nbsp;Charisma</h4>
               </div>
               <select name="attr_savecharisma_expertisedice">
@@ -2021,7 +2363,7 @@
                   <input type="text" class="sheet-hidden" name="attr_proficiency-value" />
 
                   <div class="sheet-cogs-container sheet-button-div-holder">
-                    <button type="roll" class="sheet-button-hammer" name="roll_tools" value="@{global-privacy-status} &{template:levelup} {{name=@{proficiency-name}}} {{roll=[[1d20+@{proficiency-value}+@{proficiency_expertisedice}]]}} {{roll1=[[1d20+@{proficiency-value}+@{proficiency_expertisedice}]]}} {{roll2=[[1d20+@{proficiency-value}+@{proficiency_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Tools}}"></button>
+                    <button type="roll" class="sheet-button-hammer" name="roll_tools" value="@{global-privacy-status} &{template:levelup} {{name=@{proficiency-name}}} {{roll=[[1d20+@{pb}+@{proficiency-value}+@{proficiency_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{proficiency-value}+@{proficiency_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{proficiency-value}+@{proficiency_expertisedice}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Tools}}"></button>
                     <span class="sheet-cogs-icon">x</span>
                   </div>
 
@@ -2654,7 +2996,7 @@
               </select>
               <input type="number" step="1" value="1" name="attr_acrobatics_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_acrobatics" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Acrobatics}} {{roll=[[1d20+@{acrobatics_value}+@{acrobatics_expertisedice}]]}} {{roll1=[[1d20+@{acrobatics_value}+@{acrobatics_expertisedice}]]}} {{roll2=[[1d20+@{acrobatics_value}+@{acrobatics_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_acrobatics" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Acrobatics}} {{roll=[[1d20+@{pb}+@{acrobatics_value}+@{acrobatics_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{acrobatics_value}+@{acrobatics_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{acrobatics_value}+@{acrobatics_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="acrobatics-label">Acrobatics</h4>
               </div>
               <input type="text" value="" name="attr_acrobatics_text" />
@@ -2683,7 +3025,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_animalhandling_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_animalhandling" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Animal Handling}} {{roll=[[1d20+@{animalhandling_value}+@{animalhandling_expertisedice}]]}} {{roll1=[[1d20+@{animalhandling_value}+@{animalhandling_expertisedice}]]}} {{roll2=[[1d20+@{animalhandling_value}+@{animalhandling_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_animalhandling" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Animal Handling}} {{roll=[[1d20+@{pb}+@{animalhandling_value}+@{animalhandling_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{animalhandling_value}+@{animalhandling_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{animalhandling_value}+@{animalhandling_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="animal-handling-label">Animal Handling</h4>
               </div>
               <input type="text" value="" name="attr_animalhandling_text" />
@@ -2712,7 +3054,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_arcana_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_arcana" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Arcana}} {{roll=[[1d20+@{arcana_value}+@{arcana_expertisedice}]]}} {{roll1=[[1d20+@{arcana_value}+@{arcana_expertisedice}]]}} {{roll2=[[1d20+@{arcana_value}+@{arcana_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_arcana" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Arcana}} {{roll=[[1d20+@{pb}+@{arcana_value}+@{arcana_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{arcana_value}+@{arcana_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{arcana_value}+@{arcana_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="arcana-label">Arcana</h4>
               </div>
               <input type="text" value="" name="attr_arcana_text" />
@@ -2741,7 +3083,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_athletics_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_athletics" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Athletics}} {{roll=[[1d20+@{athletics_value}+@{athletics_expertisedice}]]}} {{roll1=[[1d20+@{athletics_value}+@{athletics_expertisedice}]]}} {{roll2=[[1d20+@{athletics_value}+@{athletics_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_athletics" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Athletics}} {{roll=[[1d20+@{pb}+@{athletics_value}+@{athletics_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{athletics_value}+@{athletics_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{athletics_value}+@{athletics_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="athletics-label">Athletics</h4>
               </div>
               <input type="text" value="" name="attr_athletics_text" />
@@ -2770,7 +3112,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_culture_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_culture" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Culture}} {{roll=[[1d20+@{culture_value}+@{culture_expertisedice}]]}} {{roll1=[[1d20+@{culture_value}+@{culture_expertisedice}]]}} {{roll2=[[1d20+@{culture_value}+@{culture_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_culture" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Culture}} {{roll=[[1d20+@{pb}+@{culture_value}+@{culture_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{culture_value}+@{culture_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{culture_value}+@{culture_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="culture-label">Culture</h4>
               </div>
               <input type="text" value="" name="attr_culture_text" />
@@ -2799,7 +3141,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_deception_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_deception" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Deception}} {{roll=[[1d20+@{deception_value}+@{deception_expertisedice}]]}} {{roll1=[[1d20+@{deception_value}+@{deception_expertisedice}]]}} {{roll2=[[1d20+@{deception_value}+@{deception_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_deception" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Deception}} {{roll=[[1d20+@{pb}+@{deception_value}+@{deception_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{deception_value}+@{deception_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{deception_value}+@{deception_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="deception-label">Deception</h4>
               </div>
               <input type="text" value="" name="attr_deception_text" />
@@ -2828,7 +3170,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_engineering_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_engineering" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Engineering}} {{roll=[[1d20+@{engineering_value}+@{engineering_expertisedice}]]}} {{roll1=[[1d20+@{engineering_value}+@{engineering_expertisedice}]]}} {{roll2=[[1d20+@{engineering_value}+@{engineering_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_engineering" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Engineering}} {{roll=[[1d20+@{pb}+@{engineering_value}+@{engineering_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{engineering_value}+@{engineering_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{engineering_value}+@{engineering_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="engineering-label">Engineering</h4>
               </div>
               <input type="text" value="" name="attr_engineering_text" />
@@ -2857,7 +3199,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_history_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_history" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=History}} {{roll=[[1d20+@{history_value}+@{history_expertisedice}]]}} {{roll1=[[1d20+@{history_value}+@{history_expertisedice}]]}} {{roll2=[[1d20+@{history_value}+@{history_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_history" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=History}} {{roll=[[1d20+@{pb}+@{history_value}+@{history_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{history_value}+@{history_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{history_value}+@{history_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="history-label">History</h4>
               </div>
               <input type="text" value="" name="attr_history_text" />
@@ -2886,7 +3228,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_insight_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_insight" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Insight}} {{roll=[[1d20+@{insight_value}+@{insight_expertisedice}]]}} {{roll1=[[1d20+@{insight_value}+@{insight_expertisedice}]]}} {{roll2=[[1d20+@{insight_value}+@{insight_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_insight" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Insight}} {{roll=[[1d20+@{pb}+@{insight_value}+@{insight_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{insight_value}+@{insight_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{insight_value}+@{insight_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="insight-label">Insight</h4>
               </div>
               <input type="text" value="" name="attr_insight_text" />
@@ -2915,7 +3257,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_intimidation_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_intimidation" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Intimidation}} {{roll=[[1d20+@{intimidation_value}+@{intimidation_expertisedice}]]}} {{roll1=[[1d20+@{intimidation_value}+@{intimidation_expertisedice}]]}} {{roll2=[[1d20+@{intimidation_value}+@{intimidation_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_intimidation" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Intimidation}} {{roll=[[1d20+@{pb}+@{intimidation_value}+@{intimidation_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{intimidation_value}+@{intimidation_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{intimidation_value}+@{intimidation_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="intimidation-label">Intimidation</h4>
               </div>
               <input type="text" value="" name="attr_intimidation_text" />
@@ -2944,7 +3286,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_investigation_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_investigation" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Investigation}} {{roll=[[1d20+@{investigation_value}+@{investigation_expertisedice}]]}} {{roll1=[[1d20+@{investigation_value}+@{investigation_expertisedice}]]}} {{roll2=[[1d20+@{investigation_value}+@{investigation_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_investigation" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Investigation}} {{roll=[[1d20+@{pb}+@{investigation_value}+@{investigation_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{investigation_value}+@{investigation_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{investigation_value}+@{investigation_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="investigation-label">Investigation</h4>
               </div>
               <input type="text" value="" name="attr_investigation_text" />
@@ -2973,7 +3315,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_medicine_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_medicine" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Medicine}} {{roll=[[1d20+@{medicine_value}+@{medicine_expertisedice}]]}} {{roll1=[[1d20+@{medicine_value}+@{medicine_expertisedice}]]}} {{roll2=[[1d20+@{medicine_value}+@{medicine_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_medicine" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Medicine}} {{roll=[[1d20+@{pb}+@{medicine_value}+@{medicine_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{medicine_value}+@{medicine_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{medicine_value}+@{medicine_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="medicine-label">Medicine</h4>
               </div>
               <input type="text" value="" name="attr_medicine_text" />
@@ -3002,7 +3344,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_nature_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_nature" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Nature}} {{roll=[[1d20+@{nature_value}+@{nature_expertisedice}]]}} {{roll1=[[1d20+@{nature_value}+@{nature_expertisedice}]]}} {{roll2=[[1d20+@{nature_value}+@{nature_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_nature" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Nature}} {{roll=[[1d20+@{pb}+@{nature_value}+@{nature_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{nature_value}+@{nature_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{nature_value}+@{nature_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="nature-label">Nature</h4>
               </div>
               <input type="text" value="" name="attr_nature_text" />
@@ -3031,7 +3373,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_perception_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_perception" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Perception}} {{roll=[[1d20+@{perception_value}+@{perception_expertisedice}]]}} {{roll1=[[1d20+@{perception_value}+@{perception_expertisedice}]]}} {{roll2=[[1d20+@{perception_value}+@{perception_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_perception" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Perception}} {{roll=[[1d20+@{pb}+@{perception_value}+@{perception_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{perception_value}+@{perception_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{perception_value}+@{perception_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="perception-label">Perception</h4>
               </div>
               <input type="text" value="" name="attr_perception_text" />
@@ -3060,7 +3402,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_performance_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_performance" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Performance}} {{roll=[[1d20+@{performance_value}+@{performance_expertisedice}]]}} {{roll1=[[1d20+@{performance_value}+@{performance_expertisedice}]]}} {{roll2=[[1d20+@{performance_value}+@{performance_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_performance" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Performance}} {{roll=[[1d20+@{pb}+@{performance_value}+@{performance_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{performance_value}+@{performance_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{performance_value}+@{performance_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="performance-label">Performance</h4>
               </div>
               <input type="text" value="" name="attr_performance_text" />
@@ -3089,7 +3431,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_persuasion_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_persuasion" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Persuasion}} {{roll=[[1d20+@{persuasion_value}+@{persuasion_expertisedice}]]}} {{roll1=[[1d20+@{persuasion_value}+@{persuasion_expertisedice}]]}} {{roll2=[[1d20+@{persuasion_value}+@{persuasion_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_persuasion" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Persuasion}} {{roll=[[1d20+@{pb}+@{persuasion_value}+@{persuasion_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{persuasion_value}+@{persuasion_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{persuasion_value}+@{persuasion_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="persuasion-label">Persuasion</h4>
               </div>
               <input type="text" value="" name="attr_persuasion_text" />
@@ -3118,7 +3460,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_religion_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_religion" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Religion}} {{roll=[[1d20+@{religion_value}+@{religion_expertisedice}]]}} {{roll1=[[1d20+@{religion_value}+@{religion_expertisedice}]]}} {{roll2=[[1d20+@{religion_value}+@{religion_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_religion" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Religion}} {{roll=[[1d20+@{pb}+@{religion_value}+@{religion_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{religion_value}+@{religion_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{religion_value}+@{religion_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="religion-label">Religion</h4>
               </div>
               <input type="text" value="" name="attr_religion_text" />
@@ -3147,7 +3489,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_sleightofhand_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_sleightofhand" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Sleight of Hand}} {{roll=[[1d20+@{sleightofhand_value}+@{sleightofhand_expertisedice}]]}} {{roll1=[[1d20+@{sleightofhand_value}+@{sleightofhand_expertisedice}]]}} {{roll2=[[1d20+@{sleightofhand_value}+@{sleightofhand_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_sleightofhand" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Sleight of Hand}} {{roll=[[1d20+@{pb}+@{sleightofhand_value}+@{sleightofhand_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{sleightofhand_value}+@{sleightofhand_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{sleightofhand_value}+@{sleightofhand_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="sleight-of-hand-label">Sleight of Hand</h4>
               </div>
               <input type="text" value="" name="attr_sleightofhand_text" />
@@ -3176,7 +3518,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_stealth_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_survival" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Survival}} {{roll=[[1d20+@{survival_value}+@{survival_expertisedice}]]}} {{roll1=[[1d20+@{survival_value}+@{survival_expertisedice}]]}} {{roll2=[[1d20+@{survival_value}+@{survival_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_survival" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Survival}} {{roll=[[1d20+@{pb}+@{survival_value}+@{survival_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{survival_value}+@{survival_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{survival_value}+@{survival_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="stealth-label">Stealth</h4>
               </div>
               <input type="text" value="" name="attr_stealth_text" />
@@ -3205,7 +3547,7 @@
               </select>
               <input type="number" step="0.01" value="1" name="attr_survival_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_survival" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Survival}} {{roll=[[1d20+@{survival_value}+@{survival_expertisedice}]]}} {{roll1=[[1d20+@{survival_value}+@{survival_expertisedice}]]}} {{roll2=[[1d20+@{survival_value}+@{survival_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_survival" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Survival}} {{roll=[[1d20+@{pb}+@{survival_value}+@{survival_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{survival_value}+@{survival_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{survival_value}+@{survival_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="survival-label">Survival</h4>
               </div>
               <input type="text" value="" name="attr_survival_text" />
@@ -3234,7 +3576,7 @@
               </select>
               <input type="number" step="1" value="1" name="attr_vehicles_value" readonly />
               <div class="sheet-button-div-holder">
-                <button type="roll" class="sheet-button-description" name="roll_vehicles" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Vehicles}} {{roll=[[1d20+@{vehicles_value}+@{vehicles_expertisedice}]]}} {{roll1=[[1d20+@{vehicles_value}+@{vehicles_expertisedice}]]}} {{roll2=[[1d20+@{vehicles_value}+@{vehicles_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <button type="roll" class="sheet-button-description" name="roll_vehicles" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=Vehicles}} {{roll=[[1d20+@{pb}+@{vehicles_value}+@{vehicles_expertisedice}]]}} {{roll1=[[1d20+@{pb}+@{vehicles_value}+@{vehicles_expertisedice}]]}} {{roll2=[[1d20+@{pb}+@{vehicles_value}+@{vehicles_expertisedice}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
                 <h4 data-i18n="vehicles-label">Vehicles</h4>
               </div>
               <input type="text" value="" name="attr_vehicles_text" />
@@ -3251,57 +3593,418 @@
           </div>
         </div>
 
-        <script id="✓ CALC : Skill Values" type="text/worker">
-          const STATMAP={
-            "STR":"strength-bonus",
-            "DEX":"dexterity-bonus",
-            "CON":"constitution-bonus",
-            "INT":"intelligence-bonus",
-            "WIS":"wisdom-bonus",
-            "CHA":"charisma-bonus"
-          };
+<script id="✓ CALC : Skill Values" type="text/worker">
+  const STATMAP={
+    "STR":"strength-bonus",
+    "DEX":"dexterity-bonus",
+    "CON":"constitution-bonus",
+    "INT":"intelligence-bonus",
+    "WIS":"wisdom-bonus",
+    "CHA":"charisma-bonus"
+  };
 
-          const SKILLS=[
-            "acrobatics","animalhandling","arcana","athletics","culture","deception","engineering","history",
-            "insight","intimidation","investigation","medicine","nature","perception","performance","persuasion",
-            "religion","sleightofhand","stealth","survival","vehicles"
-          ];
+  const SKILLS=[
+    "acrobatics","animalhandling","arcana","athletics","culture","deception","engineering","history",
+    "insight","intimidation","investigation","medicine","nature","perception","performance","persuasion",
+    "religion","sleightofhand","stealth","survival","vehicles"
+  ];
 
-          const STATS=[
-            "strength-bonus","dexterity-bonus","constitution-bonus",
-            "intelligence-bonus","wisdom-bonus","charisma-bonus",
-            "pb","global-skill-bonus"
-          ];
+  const STATS=[
+    "strength-bonus","dexterity-bonus","constitution-bonus",
+    "intelligence-bonus","wisdom-bonus","charisma-bonus",
+    "pb","global-skill-bonus"
+  ];
 
-          SKILLS.forEach(skill=>{
-            const selector=`${skill}_proficiency_selector`;
-            const active=`${skill}_active`;
-            const text=`${skill}_text`;
-            const bonus=`${skill}_bonus`;
-            const value=`${skill}_value`;
+  const fmt=n=>{
+    n=parseInt(n,10)||0;
+    if(n>0) return `(+${n})`;
+    if(n<0) return `(${n})`;
+    return `(0)`;
+  };
 
-            on(
-              `sheet:opened change:${selector} change:${active} change:${text} change:${bonus} ` +
-              STATS.map(s=>`change:${s}`).join(" "),
-              function(){
-                const attributes=[selector,active,text,bonus,...STATS];
-                getAttrs(attributes,function(v){
-                  const stat=v[selector];
-                  const base=STATMAP[stat] ? parseInt(v[STATMAP[stat]])||0 : 0;
-                  const activeBonus = parseInt(v[active]||0,10) ? parseInt(v.pb||0,10) : 0;
-                  const adminBonus  = parseInt(v[bonus]||0);
-                  const globalBonus = parseInt(v["global-skill-bonus"]||0);
+  const calcFixedSkill=skill=>{
+    const selector=`${skill}_proficiency_selector`;
+    const active=`${skill}_active`;
+    const text=`${skill}_text`;
+    const bonus=`${skill}_bonus`;
+    const value=`${skill}_value`;
 
-                  const total = base + activeBonus + adminBonus + globalBonus;
+    const attributes=[selector,active,text,bonus,...STATS];
 
-                  setAttrs({ [value]: total });
-                });
-              }
-            );
-          });
-        </script>
+    getAttrs(attributes,v=>{
+      const stat=v[selector];
+      const base=STATMAP[stat] ? (parseInt(v[STATMAP[stat]],10)||0) : 0;
+      const activeBonus=(parseInt(v[active]||0,10) ? (parseInt(v.pb,10)||0) : 0);
+      const adminBonus=(parseInt(v[bonus],10)||0);
+      const globalBonus=(parseInt(v["global-skill-bonus"],10)||0);
+
+      const total=base+activeBonus+adminBonus+globalBonus;
+      setAttrs({ [value]: total });
+    });
+  };
+
+  const calcRepeatingCustom=()=>{
+    getSectionIDs("repeating_skills",ids=>{
+      if(!ids || !ids.length) return;
+
+      const attrs=[...STATS];
+      ids.forEach(id=>{
+        attrs.push(
+          `repeating_skills_${id}_custom_proficiency_selector`,
+          `repeating_skills_${id}_custom_active`,
+          `repeating_skills_${id}_custom_text`,
+          `repeating_skills_${id}_custom_bonus`,
+          `repeating_skills_${id}_custom_value`
+        );
+      });
+
+      getAttrs(attrs,v=>{
+        const pb=(parseInt(v.pb,10)||0);
+        const globalBonus=(parseInt(v["global-skill-bonus"],10)||0);
+
+        const updates={};
+
+        ids.forEach(id=>{
+          const sel=v[`repeating_skills_${id}_custom_proficiency_selector`];
+          const active=v[`repeating_skills_${id}_custom_active`];
+          const adminBonus=(parseInt(v[`repeating_skills_${id}_custom_bonus`],10)||0);
+
+          const baseAttr=STATMAP[sel];
+          const base=baseAttr ? (parseInt(v[baseAttr],10)||0) : 0;
+
+          const activeBonus=(parseInt(active||0,10) ? pb : 0);
+          const total=base+activeBonus+adminBonus+globalBonus;
+
+          updates[`repeating_skills_${id}_custom_value`]=total;
+          updates[`repeating_skills_${id}_custom_value_display`]=fmt(total);
+        });
+
+        setAttrs(updates);
+      });
+    });
+  };
+
+  SKILLS.forEach(skill=>{
+    const selector=`${skill}_proficiency_selector`;
+    const active=`${skill}_active`;
+    const text=`${skill}_text`;
+    const bonus=`${skill}_bonus`;
+
+    on(
+      `sheet:opened change:${selector} change:${active} change:${text} change:${bonus} `+
+      STATS.map(s=>`change:${s}`).join(" "),
+      ()=>calcFixedSkill(skill)
+    );
+  });
+
+  on(
+    `sheet:opened change:repeating_skills remove:repeating_skills `+
+    STATS.map(s=>`change:${s}`).join(" "),
+    ()=>calcRepeatingCustom()
+  );
+</script>
+
       </div>
     </div>
+  </div>
+
+  <!-- ----- CHARACTER -----  -->
+  <div class="sheet-character-npc-display sheet-hidden">
+    <!-- ----- ABI8LITIES -----  -->
+    <div class="sheet-main-mainblocstat2 sheet-standardbox sheet-standardbox2">
+      <div class="sheet-oneline2" style="gap: 10px !important; margin: -5px 0px 0px 0px !important; grid-template-columns: repeat(6, 1fr); width: calc(100% - 3px) !important">
+        <!-- STR -->
+        <div class="sheet-oneline sheet-oneline2">
+          <div class="sheet-button-div-holder">
+            <button type="roll" class="sheet-button-description" name="roll_str" value="@{global-privacy-status} &{template:levelup} {{name=Strength}} {{roll=[[1d20+@{pb}+@{strength-bonus}+@{global-ability-bonus}+@{strength-ability-bonus}]]}} {{roll1=[[1d20+@{pb}+@{strength-bonus}+@{global-ability-bonus}+@{strength-ability-bonus}]]}} {{roll2=[[1d20+@{pb}+@{strength-bonus}+@{global-ability-bonus}+@{strength-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+            <h4 data-i18n="str-label">STR</h4>
+          </div>
+          <div class="sheet-main-statistics-strength sheet-general-hideshow-div1">
+            <input class="sheet-maincolor sheet-inputchar" type="number" value="10" name="attr_strength" />
+          </div>
+          <span class="sheet-caracteristicsbonus" type="number" value="0" name="attr_strength-bonus"></span>
+        </div>
+
+        <!-- DEX -->
+        <div class="sheet-oneline sheet-oneline2">
+          <div class="sheet-button-div-holder">
+            <button type="roll" class="sheet-button-description" name="roll_dex" value="@{global-privacy-status} &{template:levelup} {{name=Dexterity}} {{roll=[[1d20+@{pb}+@{dexterity-bonus}+@{global-ability-bonus}+@{dexterity-ability-bonus}]]}} {{roll1=[[1d20+@{pb}+@{dexterity-bonus}+@{global-ability-bonus}+@{dexterity-ability-bonus}]]}} {{roll2=[[1d20+@{pb}+@{dexterity-bonus}+@{global-ability-bonus}+@{dexterity-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+            <h4 data-i18n="dex-label">DEX</h4>
+          </div>
+          <div class="sheet-main-statistics-dexterity sheet-general-hideshow-div1">
+            <input class="sheet-maincolor sheet-inputchar" type="number" value="10" name="attr_dexterity" />
+          </div>
+          <span class="sheet-caracteristicsbonus" type="number" value="0" name="attr_dexterity-bonus"></span>
+        </div>
+
+        <!-- CON -->
+        <div class="sheet-oneline sheet-oneline2">
+          <div class="sheet-button-div-holder">
+            <button type="roll" class="sheet-button-description" name="roll_con" value="@{global-privacy-status} &{template:levelup} {{name=Constitution}} {{roll=[[1d20+@{pb}+@{constitution-bonus}+@{global-ability-bonus}+@{constitution-ability-bonus}]]}} {{roll1=[[1d20+@{pb}+@{constitution-bonus}+@{global-ability-bonus}+@{constitution-ability-bonus}]]}} {{roll2=[[1d20+@{pb}+@{constitution-bonus}+@{global-ability-bonus}+@{constitution-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+            <h4 data-i18n="con-label">CON</h4>
+          </div>
+          <div class="sheet-main-statistics-constitution sheet-general-hideshow-div1">
+            <input class="sheet-maincolor sheet-inputchar" type="number" value="10" name="attr_constitution" />
+          </div>
+          <input class="sheet-caracteristicsbonus" type="number" value="0" name="attr_constitution-bonus"></span>
+        </div>
+
+        <!-- INT -->
+        <div class="sheet-oneline sheet-oneline2">
+          <div class="sheet-button-div-holder">
+            <button type="roll" class="sheet-button-description" name="roll_int" value="@{global-privacy-status} &{template:levelup} {{name=Intelligence}} {{roll=[[1d20+@{pb}+@{intelligence-bonus}+@{global-ability-bonus}+@{intelligence-ability-bonus}]]}} {{roll1=[[1d20+@{pb}+@{intelligence-bonus}+@{global-ability-bonus}+@{intelligence-ability-bonus}]]}} {{roll2=[[1d20+@{pb}+@{intelligence-bonus}+@{global-ability-bonus}+@{intelligence-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+            <h4 data-i18n="int-label">INT</h4>
+          </div>
+          <div class="sheet-main-statistics-intelligence sheet-general-hideshow-div1">
+            <input class="sheet-maincolor sheet-inputchar" type="number" value="10" name="attr_intelligence" />
+          </div>
+          <span class="sheet-caracteristicsbonus" type="number" value="0" name="attr_intelligence-bonus"></span>
+        </div>
+
+        <!-- WIS -->
+        <div class="sheet-oneline sheet-oneline2">
+          <div class="sheet-button-div-holder">
+            <button type="roll" class="sheet-button-description" name="roll_wis" value="@{global-privacy-status} &{template:levelup} {{name=Wisdom}} {{roll=[[1d20+@{pb}+@{wisdom-bonus}+@{global-ability-bonus}+@{wisdom-ability-bonus}]]}} {{roll1=[[1d20+@{pb}+@{wisdom-bonus}+@{global-ability-bonus}+@{wisdom-ability-bonus}]]}} {{roll2=[[1d20+@{pb}+@{wisdom-bonus}+@{global-ability-bonus}+@{wisdom-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+            <h4 data-i18n="wis-label">WIS</h4>
+          </div>
+          <div class="sheet-main-statistics-wisdom sheet-general-hideshow-div1">
+            <input class="sheet-maincolor sheet-inputchar" type="number" value="10" name="attr_wisdom" />
+          </div>
+          <span class="sheet-caracteristicsbonus" type="number" value="0" name="attr_wisdom-bonus"></span>
+        </div>
+
+        <!-- CHA -->
+        <div class="sheet-oneline sheet-oneline2">
+          <div class="sheet-button-div-holder">
+            <button type="roll" class="sheet-button-description" name="roll_cha" value="@{global-privacy-status} &{template:levelup} {{name=Charisma}} {{roll=[[1d20+@{pb}+@{charisma-bonus}+@{global-ability-bonus}+@{charisma-ability-bonus}]]}} {{roll1=[[1d20+@{pb}+@{charisma-bonus}+@{global-ability-bonus}+@{charisma-ability-bonus}]]}} {{roll2=[[1d20+@{pb}+@{charisma-bonus}+@{global-ability-bonus}+@{charisma-ability-bonus}]]}} {{charactername=@{character_name}}} {{@{global-advantage-status}=1}} {{category=Ability}}"></button>
+            <h4 data-i18n="cha-label">CHA</h4>
+          </div>
+          <div class="sheet-main-statistics-charisma sheet-general-hideshow-div1">
+            <input class="sheet-maincolor sheet-inputchar" type="number" value="10" name="attr_charisma" />
+          </div>
+          <span class="sheet-caracteristicsbonus" type="number" value="0" name="attr_charisma-bonus"></span>
+        </div>
+      </div>
+    </div>
+
+     <!-- ----- SKILLS ----- -->
+        <div class="sheet-main-skills2 sheet-standardbox sheet-standardbox2">
+          <h4 class="sheet-minititles2" style="grid-column: 1/-1" data-i18n="skills-label">Skills</h4>
+          <div class="sheet-oneline">
+
+            <fieldset class="repeating_skills">
+            <!-- Custom -->
+            <div class="sheet-main-skills-custom">
+              <input type="checkbox" value="1" name="attr_custom_active" />
+              <select name="attr_custom_proficiency_selector">
+                <option value="" selected>-</option>
+                <option value="STR">STR</option>
+                <option value="DEX">DEX</option>
+                <option value="CON">CON</option>
+                <option value="INT">INT</option>
+                <option value="WIS">WIS</option>
+                <option value="CHA">CHA</option>
+              </select>
+              <input type="number" step="1" value="1" name="attr_custom_value" readonly />
+                <button type="roll" class="sheet-button-description" name="roll_custom" value="@{global-privacy-status} {{@{global-advantage-status}=1}} &{template:levelup} {{name=@{custom-name}}} {{roll=[[1d20+@{pb}+@{custom_value}+@{custom_bonus}]]}} {{roll1=[[1d20+@{pb}+@{custom_value}+@{custom_bonus}]]}} {{roll2=[[1d20+@{pb}+@{custom_value}+@{custom_bonus}]]}} {{charactername=@{character_name}}} {{category=Skill}}"></button>
+                <input class="sheet-left" type="text" placeholder="-" name="attr_custom-name"/>
+              <input class="sheet-specialtext" type="text" value="" name="attr_custom_text" />
+              <input type="number" value="0" name="attr_custom_bonus" />
+            </div>
+            </fieldset>
+
+          </div>
+        </div>
+
+            <!-- ----- PROFICIENCIES -----  -->
+        <div class="sheet-main-proficiencies2">
+          <div class="sheet-standardbox sheet-standardbox2">
+            <h4 class="sheet-minititles2" data-i18n="misc-label">Misc</h4>
+            <div class="sheet-oneline">
+              <fieldset class="repeating_proficiencies">
+                <input class="sheet-hidden sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
+                <div class="sheet-proficiencies1 sheet-cogs-hideshow-div1">
+                  <input class="sheet-left" type="text" placeholder="Source" data-i18n-placeholder="source-placeholder" name="attr_proficiency-source" />
+                  <input class="sheet-left" type="text" placeholder="Name" data-i18n-placeholder="name-placeholder" name="attr_proficiency-name" />
+                  <div class="sheet-cogs-container">
+                    <input class="sheet-cogs-input sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
+                    <span class="sheet-cogs-icon">y</span>
+                  </div>
+                </div>
+
+                <div class="sheet-proficiencies3 sheet-cogs-hideshow-div2">
+                  <input class="sheet-hidden sheet-description-hideshow" type="checkbox" name="attr_sheet-description-hideshow" checked />
+
+                  <span type="text" name="attr_proficiency-source"></span>
+                  <span type="text" name="attr_proficiency-name" style="height: auto !important;"></span>
+
+                  <div class="sheet-cogs-container sheet-button-div-holder">
+                    <button type="roll" class="sheet-button-description" name="roll_proficiency" value="@{global-privacy-status} &{template:levelup-description} {{name=@{proficiency-source}}} {{charactername=@{character_name}}} {{category=Proficiencies}} {{source=@{proficiency-name}}}"></button>
+                    <span class="sheet-cogs-icon">w</span>
+                  </div>
+
+                  <div class="sheet-cogs-container">
+                    <input class="sheet-cogs-input sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
+                    <span class="sheet-cogs-icon">y</span>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+
+         <!-- ----- TRAITS -----  -->
+         <div class="sheet-main-categoryfeatures sheet-standardbox sheet-standardbox2">
+        <h4 class="sheet-minititles2 sheet-main-characterstatusupgrades" data-i18n="features-traits-label">Features & Traits</h4>
+
+        <div class="sheet-standardbox sheet-standardbox1">
+          <div class="sheet-oneline">
+            <fieldset class="repeating_features-traits">
+              <input class="sheet-hidden sheet-filter-row" type="checkbox" value="0" name="attr_sheet-filter-row" />
+
+              <div class="sheet-filter-row-div">
+                <input class="sheet-hidden sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
+
+                <div class="sheet-features-traits sheet-cogs-hideshow-div1">
+                  <input class="sheet-left" type="text" placeholder="Name" data-i18n-placeholder="name-placeholder" name="attr_features-names" />
+                  <div class="sheet-cogs-container">
+                    <input class="sheet-cogs-input sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
+                    <span class="sheet-cogs-icon">y</span>
+                  </div>
+
+                  <input style="grid-column: 1/-1" class="sheet-left" type="text" placeholder="-" name="attr_features-source" />
+                  <textarea style="grid-column: 1/-1" type="text" value="-" name="attr_features-description"></textarea>
+                </div>
+
+                <div class="sheet-features-traits2 sheet-cogs-hideshow-div2">
+                  <div class="sheet-button-div-holder">
+                    <input class="sheet-cogs-input sheet-description-hideshow" type="checkbox" name="attr_sheet-description-hideshow" />
+                    <span class="sheet-left" type="text" placeholder="Name" name="attr_features-names"></span>
+                  </div>
+
+                  <div class="sheet-cogs-container sheet-button-div-holder">
+                    <button type="roll" class="sheet-button-description" name="roll_features_description" value="@{global-privacy-status} &amp;{template:levelup-description} {{name=@{features-names}}} {{category=Description}} {{source=@{features-source}}} {{description=@{features-description}}}"></button>
+                    <span class="sheet-cogs-icon">w</span>
+                  </div>
+
+                  <div class="sheet-cogs-container">
+                    <input class="sheet-cogs-input sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
+                    <span class="sheet-cogs-icon">y</span>
+                  </div>
+
+                  <input class="sheet-hidden sheet-description-hideshow" type="checkbox" name="attr_sheet-description-hideshow" />
+                  <span style="grid-column: 1/-1" class="sheet-left" type="text" placeholder="-" name="attr_features-source"></span>
+                  <textarea class="sheet-description-hideshow-div" style="grid-column: 1/-1" type="text" value="-" name="attr_features-description" readonly></textarea>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+
+            <!-- ----- ACTIONS -----  -->
+      <div class="sheet-standardbox sheet-standardbox2">
+        <h4 class="sheet-minititles2 sheet-main-titlestatistics" data-i18n="actions-label">Actions</h4>
+        <div class="sheet-oneline">
+          <div class="sheet-actions" style="    margin-bottom: -5px;">
+            <h4 data-i18n="type-label">Type</h4>
+            <h4 class="sheet-left" data-i18n="name-label">Name</h4>
+            <h4 data-i18n="nbsp-label">&nbsp;</h4>
+          </div>
+
+          <!-- FIELDSET ACTIONS -->
+          <fieldset class="repeating_actions">
+            <input class="sheet-hidden sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
+
+            <div class="sheet-actions">
+              <input type="text" placeholder="-" name="attr_attacksorspell-globaltype" style="border: none" />
+              <input class="sheet-left" type="text" placeholder="Name" data-i18n-placeholder="name-placeholder" name="attr_attacksorspell-name" />
+
+              <div class="sheet-cogs-container">
+                <input class="sheet-cogs-input sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
+                <span class="sheet-cogs-icon">y</span>
+              </div>
+            </div>
+
+            <textarea class="sheet-cogs-hideshow-div1" type="text" placeholder="Description" data-i18n-placeholder="description-placeholder" name="attr_attacksorspell-description"></textarea>
+          </fieldset>
+        </div>
+      </div>
+
+        <!-- ----- ATTACK & SPELLCASTING -----  -->
+      <div class="sheet-standardbox sheet-standardbox2">
+        <h4 class="sheet-minititles2 sheet-main-titlestatistics" data-i18n="attacks-spells-label">Attacks & Spells</h4>
+        <div class="sheet-oneline">
+          <div class="sheet-attacksandspells">
+            <h4 data-i18n="nbsp-label">&nbsp;</h4>
+            <h4 class="sheet-left" style="grid-column: 2/4" data-i18n="name-label">Name</h4>
+            <h4 data-i18n="atk-b-label">ATK B.</h4>
+            <h4 data-i18n="dmg-label">DMG</h4>
+            <h4 data-i18n="dmg-type-label">DMG Type</h4>
+            <h4 data-i18n="nbsp-label">&nbsp;</h4>
+          </div>
+
+          <!-- FIELDSET ATTACKS AND SPELLCASTINGS -->
+          <fieldset class="repeating_attacksandspells">
+            <input class="sheet-hidden sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
+
+            <div class="sheet-attacksandspells">
+              <button style="max-height: 18px !important" type="roll" class="sheet-button-attack" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{name=@{attacksorspell-name}}} {{charactername=@{character_name}}} {{category=A&S}} {{@{attacks_toogle}=1}} {{@{global-advantage-status}=1}} {{roll=[[1d20cs@{criticalrange}+@{attacksorspell-atkb}+[[@{attacks_expertisedice}]]]]}} {{roll1=[[1d20cs@{criticalrange}+@{attacksorspell-atkb}+[[@{attacks_expertisedice}]]]]}} {{roll2=[[1d20cs@{criticalrange}+@{attacksorspell-atkb}+[[@{attacks_expertisedice}]]]]}} {{description=@{attacksorspell-description}}} {{buttoncrit=@{attacksorspell-crit-button}}} {{button=@{attacksorspell-button}}} {{desc=1}} {{dmg1=[[@{attacksorspell-dmg}]]}} {{dmg1crit=[[@{attacksorspell-dmg}]]}} {{dmg1type=@{attacksorspell-type}}} {{dmg2=[[@{attacksorspell-dmg2}]]}} {{dmg2crit=[[@{attacksorspell-dmg2}]]}} {{dmg2type=@{attacksorspell-type2}}}"></button>
+              <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="[Damages](~show-attackorspell-damages)" name="attr_attacksorspell-button" />
+              <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="[C](~show-attackorspell-crit-damages)" name="attr_attacksorspell-crit-button" />
+              <button type="roll" class="sheet-hidden" name="roll_show-attackorspell-damages" value="@{global-privacy-status} &{template:levelup} {{name=Damages}} {{charactername=@{attacksorspell-name}}} {{category=A&S}} {{dmgonly=1}} {{critical=[[0]]}} {{dmg1=[[@{attacksorspell-dmg}]]}} {{dmg1type=@{attacksorspell-type}}} {{dmg2=[[@{attacksorspell-dmg2}]]}} {{dmg2type=@{attacksorspell-type2}}}"></button>
+              <button type="roll" class="sheet-hidden" name="roll_show-attackorspell-crit-damages" value="@{global-privacy-status} &{template:levelup} {{name=Critical Damages}} {{charactername=@{attacksorspell-name}}} {{category=A&S}} {{dmgonly=1}} {{critical=[[1]]}} {{dmg1=[[@{attacksorspell-dmg}]]}} {{dmg1crit=[[@{attacksorspell-dmg}]]}} {{dmg1type=@{attacksorspell-type}}} {{dmg2=[[@{attacksorspell-dmg2}]]}} {{dmg2crit=[[@{attacksorspell-dmg2}]]}} {{dmg2type=@{attacksorspell-type2}}}"></button>
+
+              <input class="sheet-left" type="text" placeholder="Name" data-i18n-placeholder="name-placeholder" name="attr_attacksorspell-name" style="grid-column: 2/4" />
+              <input type="number" step="1" value="0" name="attr_attacksorspell-atkb" />
+
+              <input type="text" value="0" value="" name="attr_attacksorspell-dmg" />
+              <input type="text" placeholder="-" name="attr_attacksorspell-type" />
+
+              <div class="sheet-cogs-container">
+                <input class="sheet-cogs-input sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
+                <span class="sheet-cogs-icon">y</span>
+              </div>
+            </div>
+
+            <div class="sheet-attacksandspells" style="margin-top: -2px !important; margin-bottom: 8px !important">
+              <h4 data-i18n="nbsp-label">&nbsp;</h4>
+
+              <input class="sheet-left" type="text" placeholder="-" name="attr_attacksorspell-globaltype" />
+
+              <select name="attr_attacks_toogle">
+                <option value="standard" selected data-i18n="standard-option">Standard</option>
+                <option value="nodmg" data-i18n="no-dmg-option">No DMG</option>
+                <option value="dmgonly" data-i18n="dmg-only-option">DMG Only</option>
+              </select>
+
+              <select name="attr_attacks_expertisedice">
+                <option value="0" selected="">-</option>
+                <option value="1d4">d4</option>
+                <option value="1d6">d6</option>
+                <option value="1d8">d8</option>
+                <option value="1d10">d10</option>
+                <option value="1d12">d12</option>
+                <option value="1d20">d20</option>
+              </select>
+              <input type="text" value="0" name="attr_attacksorspell-dmg2" />
+              <input type="text" placeholder="-" name="attr_attacksorspell-type2" />
+            </div>
+
+            <div class="sheet-attacksandspells sheet-cogs-hideshow-div1" style="margin-top: -10px">
+              <h4 data-i18n="nbsp-label">&nbsp;</h4>
+              <h4 class="sheet-left" data-i18n="action-type-label">Action Type</h4>
+              <h4 data-i18n="roll-type-label">R.Type</h4>
+              <h4 data-i18n="exp-label">EXP</h4>
+              <h4 data-i18n="dmg-label">DMG</h4>
+              <h4 data-i18n="dmg-type-label">DMG Type</h4>
+              <h4 data-i18n="nbsp-label">&nbsp;</h4>
+            </div>
+
+            <textarea class="sheet-cogs-hideshow-div1" type="text" placeholder="Description" data-i18n-placeholder="description-placeholder" name="attr_attacksorspell-description"></textarea>
+          </fieldset>
+        </div>
+      </div>
   </div>
 
   <!-- ----- SPELLS -----  -->
@@ -3677,14 +4380,14 @@
                       <textarea placeholder="e.g. 1/2 of normal damages" data-i18n-placeholder="eg-1-2-of-normal-damages-placeholder" name="attr_talent-saveeffects"></textarea>
                     </div>
 
-                    <div class="sheet-talent-card-line0" style="grid-template-columns: 71px 1fr;">
-                       <h4 data-i18n="roll-type-label-2">Roll Type:</h4>
-                    <select name="attr_attacks_tooglespell">
-                <option value="withroll" data-i18n="with-roll-option">With Roll</option>
-                <option value="norollnodamage" data-i18n="only-desc-option">Only Desc.</option>
-                <option value="withdmg" selected data-i18n="dmg-only-option">DMG Only</option>
-              </select>
-               </div>
+                    <div class="sheet-talent-card-line0" style="grid-template-columns: 71px 1fr">
+                      <h4 data-i18n="roll-type-label-2">R.Type:</h4>
+                      <select name="attr_attacks_tooglespell">
+                        <option value="withroll" data-i18n="with-roll-option">With Roll</option>
+                        <option value="norollnodamage" data-i18n="only-desc-option">Only Desc.</option>
+                        <option value="withdmg" selected data-i18n="dmg-only-option">DMG Only</option>
+                      </select>
+                    </div>
 
                     <div class="sheet-talent-card-line0">
                       <h4 data-i18n="description-label">Description:</h4>
@@ -3697,7 +4400,12 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Cantrips}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}} {{description=@{talent-description}}}"></button>
+                        <button
+                          type="roll"
+                          class="sheet-button-description"
+                          name="roll_talent"
+                          value="@{global-privacy-status} &{template:levelup} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Cantrips}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}} {{description=@{talent-description}}}"
+                        ></button>
                         <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
                         <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
@@ -3843,7 +4551,7 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 1}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 1}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
                         <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
                         <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
@@ -3988,7 +4696,7 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 2}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 2}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
                         <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
                         <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
@@ -4135,7 +4843,7 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 3}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 3}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
                         <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
                         <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
@@ -4280,7 +4988,7 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 4}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 4}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
                         <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
                         <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
@@ -4425,7 +5133,7 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 5}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 5}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
                         <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
                         <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
@@ -4567,7 +5275,7 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 6}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 6}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
                         <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
                         <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
@@ -4707,7 +5415,7 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 7}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 7}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
                         <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
                         <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
@@ -4847,7 +5555,7 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 8}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 8}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
                         <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
                         <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
@@ -4987,7 +5695,7 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 9}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 9}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
                         <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
                         <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
@@ -5521,20 +6229,6 @@ A creature that is shoved off of a precipice is propelled off of whatever it is 
       </div>
     </div>
 
-    <!-- ----- INSPIRATION HEADER -----  -->
-    <div class="sheet-background-header sheet-standardbox sheet-standardbox2">
-      <div class="sheet-oneline">
-        <div class="sheet-triplecolumn">
-          <h4 data-i18n="source-of-inspiration-label">Source of Inspiration</h4>
-          <h4 data-i18n="inspiration-feature-label">Inspiration Feature</h4>
-          <h4 data-i18n="fulfillment-feature-label">Fulfillment Feature</h4>
-          <input type="text" placeholder="-" name="attr_character_source-inspiration" />
-          <input type="text" placeholder="-" name="attr_character_inspiration-feature" />
-          <input type="text" placeholder="-" name="attr_character_fulfillment-feature" />
-        </div>
-      </div>
-    </div>
-
     <div class="sheet-background-area">
       <!--  -->
       <div class="sheet-background-vertical-art">
@@ -5591,5 +6285,21 @@ A creature that is shoved off of a precipice is propelled off of whatever it is 
     </div>
   </div>
 
-  <div class="sheet-bottom-background sheet-hidden"></div>
-</div>
+  <!-- ----- BACKGROUND -----  -->
+  <div class="sheet-background-npc-display sheet-hidden">
+
+      <!-- ----- GENERAL  NOTES -----  -->
+      <div class="sheet-background-generalnotes2">
+        <div class="sheet-standardbox sheet-standardbox2">
+          <h4 class="sheet-minititles2" data-i18n="general-notes-label">General Notes</h4>
+          <div class="sheet-oneline">
+            <textarea class="sheet-left" name="attr_background-generalnotes" style="height: 350px;"></textarea>
+          </div>
+        </div>
+      </div>
+      <!--  -->
+    </div>
+  
+  <h4 class="sheet-credits">Level Up: Advanced 5th Edition 2026 Official Character Sheet ordered by EN Publishing created by Spirito & Yojojoman with the help of the community.</h4>
+  </div>
+
