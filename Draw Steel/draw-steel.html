@@ -3334,11 +3334,10 @@
 	async function rollResource() {
 		console.log("~~~ rollResource ~~~");
 		// Get the resource name and resource amount.
-		const attrs = await getAttrsAsync(['resource', 'resource_name']);
+		const attrs = await getAttrsAsync(['resource', 'resource_name', 'resource_amount']);
 		const resource_name = attrs.resource_name;
 		const resource = parseInt(attrs.resource) || 0;
-
-                const rollQuery = `[[?{d3 or number|0}]]`;
+		const rollQuery = attrs.resource_amount ? `[[${attrs.resource_amount}]]` : `[[?{d3 or number|0}]]`;
 
 		const rollTemplate = `@{wtype}&{template:${ROLLTEMPLATES.SIMPLE}} {{charactername=@{character_name}}} {{name=${resource_name} Gain}} {{rolltitle=${resource_name}}} {{roll=${rollQuery}}}`;
 
@@ -3818,6 +3817,7 @@
 	// Heroic Resource Simple Roll
 
 	$20('.resource-input-group > label').on('click', (e) => {
+		console.log("click");
 		rollResource();
 	});
 
@@ -4528,7 +4528,7 @@
 					const id = generateRowID();
 					acc[`repeating_perks_${id}_perk_name`] = f.name;
 					acc[`repeating_perks_${id}_perk_description`] = f.description;
-					return acc;return acc; }, {});
+					return acc; }, {});
 			
 			const ancestryFeatures = extractAncestryFeatures(data.ancestry)
 				.filter(f => f.description)
