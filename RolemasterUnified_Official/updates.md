@@ -1,3 +1,18 @@
+# 2025-12-29
+
+So last update of the year. I will need a new updates file.
+
+- Get the active token id when rolling initiative
+- Add field to set token id manually
+- Add blood spurt effect if token ID is set.
+- Add rmuSafe, a wrapper around the set/get calls that audits the fields
+- Add internal support for PP multipliers.
+- Test Framework
+  - Reset pending in tests
+  - Handle callbacks in setAttr
+  - Test for PP Multipliers
+  - Verboseness so people can check pending if needed
+
 # 2025-12-18
 
 - Make spells on Other Realm & Arcane clickable

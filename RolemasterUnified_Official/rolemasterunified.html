@@ -6552,6 +6552,12 @@ bleed and penalties you need side and  location.  A Z ends the list.<p>
 
 <hr>
 
+<h3>Tokens</h3>
+
+<p>Active Token ID: <input type="text" name="attr_activetokenid"></p>
+
+<hr>
+
 <h3>Custom Spell List</h3>
 
 <p>Upload a custom spell list to your character.
@@ -6657,7 +6663,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 9bb8529468cbd998b2665c0f0b28e26555c60215
+Revision cd73435668ffd609d3ba89ff83a5a91f09bd258f
 
 
 <hr>
@@ -8197,15 +8203,24 @@ function checkPending() {
   }
 }
 
-function pendingInfo() {
+function pendingInfo(verbose = false) {
   console.log(`Pending level is ${rmuasync} with ${pendingList.length} queued: Nested ${rmuasyncnested}`);
+  if (verbose && pendingList.length > 0) {
+    pendingList.forEach((item) => {
+      console.log(`   ${item.name}`);
+    });
+  }
   return pendingList.length;
 }
 
-function pendingReset() {
-  console.log("Pending reset");
+function pendingReset(verbose = true) {
+  if (verbose) {
+    console.log("Pending reset");
+  }
   if (rmuasync) {
-    console.log(`Pending reset: ${rmuasync} with ${pendingList.length} queued`);
+    if (verbose) {
+      console.log(`Pending reset: ${rmuasync} with ${pendingList.length} queued`);
+    }
     rmuasync = 0;
     rmuasyncnested = false;
     pendingList = [];
@@ -8239,6 +8254,109 @@ onCheck("clicked:resetworkers", () => {
   pendingReset();
 });
 
+
+
+/**/
+
+const knownproperties = {
+  // Character properties
+  character_name : { type : "string", readonly: true },
+  level : { type: "number", derived : true },
+  pp : { type : "number" },
+  realm : { type : "string" },
+  scr_misc : { type : "misc" },
+  hp: { type: "number" },
+  hp_misc: { type: "misc" },
+  hits: { type: "number" }, 
+
+  // Skills: FIXME: Should autogen this list
+  transcendence_bonus : { type : "number", derived: true },
+  powerdevelopment_bonus: { type: "number", derived: true },
+  bodydevelopment_bonus : { type: "number", derived: true },
+
+  // What is this?
+  castingmiscmod : { type: "number", derived: true },
+
+
+  // Magic/Spellcasting
+  castingvoice: { type: "string" },
+  castingpreprounds: { type: "number" },
+  castingsubtle: { type: "string" },
+  castinghands: { type: "string" },
+  pp_multiplier : { type: "number" },
+
+  // AP
+  castinguseap: { type: "string" },
+  aptrack: { type: "number" },
+  actionselect: { type: "string" },
+
+  // Equipment related
+  armorencmetal: { type: "number" },
+  armorenc: { type: "number" },
+
+  // Maneuver Penalty / Status penalty
+  statuspenalty: { type: "number" },
+  statuseffect: { type: "string" },
+
+  // Options
+  option_fixedrrbase: { type: "string" },
+  option_allownoprepovercast: { type: "string" },
+
+  // Roll20 Meta Stuff
+  selectedcharacterid: { type: "string" },
+};
+
+
+function validateAttributes(attrs) {
+  let erred = false;
+  for (const [key, value] in attrs) {
+    if (knownproperties[key]) {
+      const prop = knownproperties[key];
+      if (typeof(value) != prop.type) {
+	rmuerror("Property type is not valid (expected, got)",
+		key, prop.type, typeof(value), value);
+	erred = true
+      }
+    } else {
+      rmuerror("Unknown property", key)
+      erred = true;
+    }
+  }
+  return !erred;
+}
+
+
+function rmuGetAttrsPending(toget, handler) {
+  validateAttributes(toget);
+  
+  return getAttrsPending(toget,handler);
+}
+
+function rmuSetAttrsPending(toset, handler) {
+  validateAttributes(toset);
+
+  return setAttrsPending(toset, handler);
+}
+
+function VrmuSetAttrs(arg, fn) {
+  console.log(arg);
+  return rmuSetAttrs(arg, fn);
+}
+
+function rmuGetAttrs(toget, handler) {
+  validateAttributes(toget);
+  
+  return getAttrs(toget,handler);
+}
+
+function rmuSetAttrs(toset, handler) {
+  validateAttributes(toset);
+
+  return setAttrs(toset, handler);
+}
+
+
+/**/
 
 
 let RMURaces = {};
@@ -8333,11 +8451,6 @@ let RMURaces = {};
 /** vim: set sw=2 sts=2 : */
 
 
-
-function VsetAttrs(arg, fn) {
-  console.log(arg);
-  return rmuSetAttrs(arg, fn);
-}
 
 function VrmuSetAttrs(arg, fn) {
   console.log(arg);
@@ -8752,7 +8865,7 @@ function lookupSkillResult(skill, skillinfo, umroll, total) {
 	update[stat.aname + "_info"] = logmessage;
 	// Update local cache
 	statCache_[stat.abbr] = statBonus;
-	//setAttrs(update);
+	setAttrs(update);
     });
 
     function updateAllSkills() {
@@ -13200,7 +13313,7 @@ function createWeaponsFinalize(profession, p, s, t, q) {
   let qcost = costs["combattraining4_cost"];
   update[stripWeaponGroupName(q) + "_cost"] = qcost;
 
-  VsetAttrs(update);
+  setAttrs(update);
 }
 
 function knackupdatetotals() {
@@ -14717,12 +14830,13 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 
 	let armordb = 0;
 	let armordbname = "None";
+	let pp_multiplier = 1; // Default multiplier
+
 	getAttrsPending(toget, (stuff) => {
 	    let updates = {};
 	    updates.db_misc = miscBonusRemoveFilter(stuff.db_misc, (item) => {
 		return !item.name.startsWith("Armor DB Bonus (");
 	    });
-
 
 	    let atinfo = miscBonusHighest(stuff.base_at_misc || "", 1);
 	    // Set default AT to base_at everywhere.
@@ -14754,6 +14868,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 		// Look for magic fields:
 		//  - AT
 		//  - attack table
+		//  - ppmultiplier
 		if (json.AT) {
 		  let db = parseIntDefault(json.DB, 0);
 		  switch (json.Subtype) {
@@ -14807,6 +14922,12 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 		if (json['Attack Table']) {
 		  RMUInventory.updateWeapon(name, json);
 		}
+		if (json['PP Multiplier']) {
+		  let newmul = parseNumberDefault(json['PP Multiplier'])
+		  if (newmul > pp_multiplier) {
+		    pp_multiplier = newmul;
+		  }
+		}
 		percept += parseIntDefault(json['Perception Penalty'], 0);
 		rangedpenalty += parseIntDefault(json['Ranged Penalty'], 0);
 		maneuver_penalty += parseIntDefault(json['Maneuver Penalty'], 0);
@@ -14819,6 +14940,7 @@ RMUInventory.itemfields = [ "itemname", "itemweight", "itemcount", "itemsystem",
 	    updates.perception_penalty = percept;
 	    updates.ranged_penalty = rangedpenalty;
 	    updates.maneuver_penalty = maneuver_penalty;
+	    updates.pp_multiplier = pp_multiplier;
 
 	    console.log("equipment update", updates);
 	    setAttrsPending(updates, () => {
@@ -16122,6 +16244,7 @@ function sizeFromNumeric(value) {
     //	    - cdata.attackmoddescription = Description of the above
     //      - cdata.statuspenalty = values.statuspenalty || 0;
     //      - cdata.extracrit = <CritType><number>  (number is relative crit type)
+    //	    - cdata.targettokenid = Token ID of the target, (optional, string)
 
     // Results are:
     //	    - attackresult -> "Hit/Miss/Fumble"
@@ -16567,7 +16690,7 @@ function sizeFromNumeric(value) {
 
     onCheck('clicked:rmuattacktargetdelete', (ev) => {
 	    console.log("Target delete");
-	    VsetAttrs({target_at: 1,
+	    setAttrs({target_at: 1,
 		    target_name: 'Foe',
 		    target_db: 0,
 		    target_size: 5,
@@ -16579,6 +16702,7 @@ function sizeFromNumeric(value) {
 	
 	const roll_string = "@{whispertype} &{template:rmuattacktarget} [[1d20]]  " +
 	    "{\{who=@{character_name}}} " +
+	    `{\{targettokenid=[[0[@${whom}|token_id}] ]]}} ` +
 	    `{\{targetname=[[0[@{${whom}|character_name}] ]]}} ` +
 	    `{\{targetsize=[[0[@{${whom}|size}] ]]}} ` +
 	    `{\{targetathead=[[0[@{${whom}|at_head}] ]]}} ` +
@@ -16591,6 +16715,7 @@ function sizeFromNumeric(value) {
 	    `{\{targetcritred=[[0[@{${whom}|critreduction}] ]]}} ` +
 	    "";
 	startRoll(roll_string, roll => {
+		const target_tokenid = attacks.getDataFromRoll(roll.results.targettokenid.expression);
 		const tsize = attacks.getDataFromRoll(roll.results.targetsize.expression);
 		const tname = attacks.getDataFromRoll(roll.results.targetname.expression);
 		const athead = attacks.getDataFromRoll(roll.results.targetathead.expression);
@@ -16610,7 +16735,8 @@ function sizeFromNumeric(value) {
 			target_name: tname,
 			target_db: db,
 			target_size: sizeToNumeric(tsize),
-			target_crit: critred};
+			target_crit: critred,
+			target_tokenid: target_tokenid};
 		if (prefix != "") {
 		    attrs = Object.keys(attrs).reduce((a, c) => 
 			    (a[`${prefix}${c}`] = attrs[c], a), {});
@@ -17799,11 +17925,12 @@ const fatigueResults = {
 
 onCheck("change:hppenalty change:injurypenalty change:fatigue", updatePenalties);
 
-onCheck("change:bodydevelopment_bonus change:powerdevelopment_bonus", updateHPPP);
+onCheck("change:bodydevelopment_bonus change:powerdevelopment_bonus change:pp_multiplier",
+	    updateHPPP);
 
-function updateHPPP(x) {
+function updateHPPP(_) {
     getAttrs(['bodydevelopment_bonus', 'hp', 'pp', 'powerdevelopment_bonus', 'hits',
-	  'hp_misc'], (ev) => {
+	  'hp_misc', 'pp_multiplier'], (ev) => {
 	let update = {}
 	let hplog = "Hit Points\n"
 	let hp = 0;
@@ -17827,6 +17954,14 @@ function updateHPPP(x) {
 	if (pp < 0) {
 	  pp = 0;
 	}
+	if (ev.pp_multiplier) {
+	  let mul = Number.parseFloat(ev.pp_multiplier);
+	  if (!Number.isNaN(mul) && mul > 0) {
+	    // So it's valid
+	    pp = Math.floor(mul * pp);
+	  }
+	}
+
 	update.pp_max = pp
 	setAttrs(update, { silent:true });
     });
@@ -18086,9 +18221,22 @@ function doRollInitiative() {
       '{\{actor=@{character_name} }} ' +
       '{\{bonus=@{initiative} }} ' +
       '{\{total=$[[2]]}} {\{roll=$[[0]]}} ' +
-      '{\{maneuver=$[[1]] }}',
+      '{\{maneuver=$[[1]] }}' +
+      '{\{activetokenid=[[0[@{selected|token_id}] ]]}} ' +
+      '{\{selectedcharacterid=[[0[@{selected|character_id}] ]]}}',
       (roll) => {
 	finishRoll(roll.rollId, {});
+	const activetokenid = attacks.getDataFromRoll(roll.results.activetokenid.expression);
+	const selectedcharacterid = attacks.getDataFromRoll(roll.results.selectedcharacterid.expression);
+	const mycharacterid = getActiveCharacterId()
+	// So are we the selected token?  If so, update the token id
+	console.log("Selected Char ID/My Char ID/Active Token ID",selectedcharacterid, mycharacterid, activetokenid)
+	if (selectedcharacterid === mycharacterid && activetokenid && activetokenid.length > 1) {
+	  // w00t: save it
+	  rmuSetAttrs({ activetokenid : activetokenid });
+	  console.log("My tokenid is", activetokenid);
+	}
+
   });
 }
 
@@ -18961,6 +19109,8 @@ const injury = {}
 
 // Maps the critical table to the critical encoding.
 // Hits are not covered, nor is the description field
+// T is for the Token Id
+// H is for hits
 injury.criticalmaps = {
     P : 'P' /* Ijury penalty */,
     F: 'F' /* Fatigue */,
@@ -19049,7 +19199,7 @@ injury.updateInjuryString = function(hits, critical, attacker, result) {
 
 /** The result is in "ev.originalRollId".  I wish I was joking */
 onCheck("clicked:applyattackresult", (ev) => {
-    console.log("Apply Attack result triggered", ev);
+	console.log("Apply Attack result triggered", ev);
 	let str = ev.originalRollId;
 	injury.parseInjuryString(str);
 });
@@ -19085,7 +19235,8 @@ injury.parseInjuryString = function (str) {
     getAttrs(["character_name", "hp", "injurypenalty", "fatigue", "bleedlist", "currentphase",
 		"statusstagger", "statusstun75", "statusstun50", "statusstun25",
 		"critresist", "critimmune", "grapplestatus",
-		"option_usefx"
+		"option_usefx",
+		"activetokenid", // Maagic hackery
 		], (cdata) => {
 	console.log("data for creature", cdata);
 	// Pull the fields out.  If we modify save to updates
@@ -19287,9 +19438,11 @@ injury.parseInjuryString = function (str) {
 	    RMUSkills.uses('bodydevelopment');
 	}
 
-	startRoll(`/fx bubbling-blood`,
+	// I should queue up the effects and trigger them
+	if (cdata.activetokenid && cdata.activetokenid.length > 1) {
+	    startRoll(`/fx bubbling-blood ${cdata.activetokenid}`,
 		    (x) => { finishRoll(x.rollId,x)});
-
+	}
 
 	// Update the status as soon as the injury is applied.
 	VrmuSetAttrs(updates, () => {
@@ -19509,6 +19662,8 @@ onCheck("sheet:opened", (_) => {
     console.log("Sheet Load");
     pendingInfo();
     pendingReset();
+
+    messageHackery()
 
     Edit.hideEdit();
     setAttrs({inventoryaddshow: 'off', toggletalentshow: 'off'});
@@ -19854,6 +20009,12 @@ function upgradeV15to16XPProgression() {
 }
 
 
+
+function messageHackery() {
+
+  console.log("Message Hacker", postMessage)
+  console.log("Character ID", getActiveCharacterId());
+}
 
 // vim: set sw=2 sts=2 syn=javascript :
 
