@@ -7638,7 +7638,7 @@ const weaponInUse = async () => {
 };
 
 on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use change:repeating_weapon:weapon_speed change:repeating_weapon:weapon_misc', (eventInfo) => {
-  clog(eventInfo.sourceAttribute);
+  // clog(eventInfo.sourceAttribute);
   weaponInUse();
 });
 
