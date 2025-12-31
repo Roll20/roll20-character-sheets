@@ -7594,8 +7594,14 @@ on('change:psionic_ability_strength_max change:psionic_attack change:psionic_def
 const weaponInUse = async () => {
   const idArray = await getSectionIDsAsync('weapon');
   const output = {};
+  if (!idArray || idArray.length === 0) {
+    await setAttrsAsync({silent: true});
+    output.weapon_in_use = '';
+    output.weapon_in_use_speed = '';
+    output.weapon_in_use_misc = '';
+    return;
+  }
   const weaponsInUse = [];
-  // Array to store weapons with inUse === 1
   const fields = idArray.flatMap((id) => [
     concatRepAttrName('weapon', id, 'weapon_name'),
     concatRepAttrName('weapon', id, 'weapon_use'),
@@ -7604,30 +7610,25 @@ const weaponInUse = async () => {
   ]);
   const v = await getAttrsAsync(fields);
   idArray.forEach((id) => {
-    const inUse = +v[concatRepAttrName('weapon', id, 'weapon_use')] || 0;
-    if (inUse === 0) return;
-
-    const name = v[concatRepAttrName('weapon', id, 'weapon_name')];
-    // default to 0 if empty otherwise grab the first integer entered
-    const speedStr = +v[concatRepAttrName('weapon', id, 'weapon_speed')] || '0';
-    const speed = parseInt(speedStr.match(/\d+/)?.[0]) || 0;
-    const misc = v[concatRepAttrName('weapon', id, 'weapon_misc')];
-    weaponsInUse.push({id, name, inUse, speed, misc});
+    const inUse = parseInt(v[concatRepAttrName('weapon', id, 'weapon_use')]) || 0;
+    // Logic: Only process if the weapon is actually checked 'on'
+    if (inUse === 1) {
+      const name = v[concatRepAttrName('weapon', id, 'weapon_name')] || 'Unknown';
+      const rawSpeed = String(v[concatRepAttrName('weapon', id, 'weapon_speed')] || '0');
+      const speedMatch = rawSpeed.match(/\d+/);
+      const speed = speedMatch ? parseInt(speedMatch[0]) : 0;
+      const misc = v[concatRepAttrName('weapon', id, 'weapon_misc')] || '';
+      // clog(`Processing ID:${id} - Name:${name}, Speed:${speed}`);
+      weaponsInUse.push({id, name, inUse, speed, misc});
+    }
   });
-  // Find fastest(ie lowest) speed factor
   if (weaponsInUse.length > 0) {
-    let lowestSpeedWeapon = weaponsInUse[0];
-    weaponsInUse.forEach((weapon) => {
-      if (weapon.speed < lowestSpeedWeapon.speed) {
-        lowestSpeedWeapon = weapon;
-      }
-    });
-    // set global attr with lowest speed weapon/attack
-    const {name, speed, misc} = lowestSpeedWeapon;
-    // console.log(`Lowest speed weapon - name: ${name}, speed: ${speed}, misc: ${misc}`);
-    output.weapon_in_use = name;
-    output.weapon_in_use_speed = speed;
-    output.weapon_in_use_misc = misc;
+    // Sort by speed ascending and take the first one (lowest speed)
+    weaponsInUse.sort((a, b) => a.speed - b.speed);
+    const lowest = weaponsInUse[0];
+    output.weapon_in_use = lowest.name;
+    output.weapon_in_use_speed = lowest.speed;
+    output.weapon_in_use_misc = lowest.misc;
   } else {
     output.weapon_in_use = '';
     output.weapon_in_use_speed = '';
@@ -7637,7 +7638,7 @@ const weaponInUse = async () => {
 };
 
 on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use change:repeating_weapon:weapon_speed change:repeating_weapon:weapon_misc', (eventInfo) => {
-  // clog(eventInfo.sourceAttribute);
+  clog(eventInfo.sourceAttribute);
   weaponInUse();
 });
 
