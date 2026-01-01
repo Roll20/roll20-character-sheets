@@ -1,4 +1,4 @@
-/* utilities general begin */
+/* utilities_general start */
 // wird verwendet um aus dem Attributsnamen einer repeating section die Row-ID zu ermitteln
 function extractRowId(attributeId) {
 		return attributeId.match("repeating_[a-zA-Z]*_([-a-zA-Z0-9]*)_.*")[1];
@@ -248,4 +248,4 @@ function roundDecimals (num, digits) {
 	num = parseFloat(num.toFixed(digits));
 	return num;
 }
-/* utilities general end */
+/* utilities_general end */
