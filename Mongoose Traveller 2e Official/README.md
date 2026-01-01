@@ -128,5 +128,9 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Addition of highly detailed Ship Combat tab (with help from Roll20 member and superstar TrooperSJP)
 - Fix to Robot parsing on drag'n'drop
 
+### Version 1.1.11
+- Added STR modifier when weapon range is 'Melee' as per rules
+- Added repeating groups under all ship sheet components to allow for extended/custom/2300AD entries
+- 
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 

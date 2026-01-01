@@ -249,7 +249,7 @@
 		<div class="resource-panel">
 			<div class="resource-name-input-group">
 				<input type="text" class="input-md" name="attr_resource_name" data-i18n-placeholder="resource-name-placeholder"  title="Macro: @{NAME|resource_name}" />
-				<label>1d3:</label><button type="roll" value="@{wtype} &amp;{template:simpleroll} {{rolltitle=1d3}} {{roll=[[ [[1d3]][1d3]]]}} {{name=@{resource_name}}} {{charactername=@{character_name}}}" data-i18n-title="roll-d3-tooltip"></button>
+				<label class="sublabel" for="attr_resource_amount" data-i18n="resource-amount">Amount</label><input type="text" id="attr_resource_amount" class="input-md" name="attr_resource_amount" placeholder="1d3"  title="Macro: @{NAME|resource_amount}" />
 			</div>
 		</div>
 		<!-- Surges -->
@@ -3995,6 +3995,7 @@
 	function unpackFeature(feature, level) {
 		switch (feature.type) {
 			case 'Choice':
+			case 'Perk':
 				return feature.data.selected;
 			case 'Domain':
 				// A domain provides both a "DomainChoice" feature and its level-based features.
@@ -4065,9 +4066,10 @@
 				flattenedFeatures.push(currentFeature);
 			}
 		}
-
+		console.log(flattenedFeatures);
 		return flattenedFeatures;
 	}
+	
 	/**
 	 * Removes all rows from a given repeating section.
 	 * @param {string} sectionName The name of the section (e.g., 'abilities', 'modifiers').
@@ -4221,7 +4223,7 @@
 		// Sum bonuses from features of type 'Bonus' that match the stat name.
 		const bonusFromFeatures = features
 			.filter(f => f.type === FEATURE_TYPES.BONUS && f.data.field === statName)
-			.reduce((sum, f) => sum + f.data.field.value, 0);
+			.reduce((sum, f) => sum + f.data.value, 0);
 
 		// Find the highest bonus from all equipped kits for this stat.
 		const bonusFromKits = Math.max(
@@ -4230,7 +4232,7 @@
 				.filter(f => f.type === FEATURE_TYPES.KIT_STATS)
 				.map(f => f[statName.toLowerCase()] || 0)
 		);
-
+		console.log(statName + ':' + baseValue + ' ' + bonusFromFeatures + ' ' + bonusFromKits);
 		return baseValue + bonusFromFeatures + bonusFromKits;
 	};
 
@@ -4289,6 +4291,39 @@
 			.join(', ');
 	};
 
+	const extractAncestryFeatures = (data) => {
+		const features = data.features;
+		let result = [];
+	
+		features.forEach(feature => {
+			// Handle nested features
+			if (feature.type === "Multiple Features") {
+				feature.data.features.forEach(subFeature => {
+					// We only want the text-based description
+					if (subFeature.type === "Text") {
+						result.push({
+							id: subFeature.id,
+							name: subFeature.name,
+							description: subFeature.description
+						});
+					}
+				});
+			}
+	
+			// Handle the selected traits
+			if (feature.type === "Choice" && feature.data.selected) {
+				feature.data.selected.forEach(selection => {
+					result.push({
+						id: selection.id,
+						name: selection.name,
+						description: selection.description
+					});
+				});
+			}
+		});
+		console.log(result);
+		return result;
+	};
 
 	// --- Main Event Listener ---
 
@@ -4338,7 +4373,8 @@
 
 			// 3. DERIVED & COMBAT STATISTICS
 			// ------------------------------
-			const potency_strong = Math.max(might, agility, reason, intuition, presence);
+			//Potency can be calculated by the helper function later
+			//const potency_strong = Math.max(might, agility, reason, intuition, presence);
 			
 			const sizeObject = allFeatures.find(f => f.type === FEATURE_TYPES.SIZE)?.data.size ?? { value: 1, mod: 'M' };
 			const size = `${sizeObject.value}${sizeObject.mod ?? ''}`;
@@ -4347,25 +4383,52 @@
 			const speed = calculateCombatStat(allFeatures, 'Speed', baseSpeed);
 			const disengage = calculateCombatStat(allFeatures, 'Disengage', 1);
 			const stability = calculateCombatStat(allFeatures, 'Stability', 0);
-
+			const wealth = calculateCombatStat(allFeatures, 'Wealth', state.wealth);
+			const renown = calculateCombatStat(allFeatures, 'Renown', state.renown);
+			
+			// Stamina 
 			const stamina_max = allFeatures
 				.filter(f => f.type === FEATURE_TYPES.BONUS && f.data.field === 'Stamina')
 				.reduce((sum, f) => sum + (f.data.value + ((level - 1) * f.data.valuePerLevel)), 0);
-
+				
+			const stamina = parseInt(stamina_max) - parseInt(state.staminaDamage);
+			
+			// Recoveries
 			const recoveries_max = allFeatures
 				.filter(f => f.type === FEATURE_TYPES.BONUS && f.data.field === 'Recoveries')
 				.reduce((sum, f) => sum + f.data.value, 0);
 				
+			const recoveries = parseInt(recoveries_max) - parseInt(state.recoveriesUsed)	
+			
 			const immunity = getDamageModifiers(allFeatures, level, 'Immunity');
 			const weakness = getDamageModifiers(allFeatures, level, 'Weakness');
+			
 			const resource_name = allFeatures.find(f => f.type === FEATURE_TYPES.HEROIC_RESOURCE)?.name ?? '';
-
+			const resource = allFeatures.find(f => f.type === FEATURE_TYPES.HEROIC_RESOURCE)?.value ?? '';
+			const resource_amount = allFeatures
+				.find(f => f.type === FEATURE_TYPES.HEROIC_RESOURCE).data.gains
+				.find(f => f.tag === "start").value ?? '1d3'; 
+			const resource_description = allFeatures
+				.find(f => f.type === FEATURE_TYPES.HEROIC_RESOURCE).data.gains
+				.map(i => `+${i.value}: ${i.trigger}`)
+				.join('\n');
 
 			// 4. BIOGRAPHICAL INFORMATION
 			// ---------------------------
-			const incidentOption = career.incitingIncidents.options
-				.find(opt => opt.id === career.incitingIncidents.selectedID);
-			const career_incident = incidentOption ? `${incidentOption.name}\n${incidentOption.description}` : '';
+			let careertext = '';
+			for (feature of career.features) {
+				if (feature.type.includes("Choice")) {
+					careertext = careertext + `${feature.name}: ${feature.data.selected.join(', ')}\n`;
+				} else if (feature.type === "Perk") {
+					careertext = careertext + `${feature.name}: ${feature.data.selected[0].name}\n`;
+				} else {
+					careertext = careertext + `${feature.name}: +${feature.data.value}\n`;
+				}	
+			}
+			const career_benefit = careertext;
+			
+			
+			const career_incident = career.incitingIncidents.selected ? `${career.incitingIncidents.selected.name}\n${career.incitingIncidents.selected.description}` : '';
 
 
 			// 5. SKILLS & LANGUAGES
@@ -4413,10 +4476,14 @@
 
 			// Process perks, ancestry traits, features, and abilities.
 			const perks = allFeatures
-				.filter(f => f.type === FEATURE_TYPES.PERK)
-				.reduce((acc, f) => { /* ... perk processing logic ... */ return acc; }, {});
-				
-			const ancestryFeatures = ancestry.features
+				.filter(f => f.id.startsWith('perk-') && f.type === FEATURE_TYPES.TEXT)
+				.reduce((acc, f) => { 
+					const id = generateRowID();
+					acc[`repeating_perks_${id}_perk_name`] = f.name;
+					acc[`repeating_perks_${id}_perk_description`] = f.description;
+					return acc;return acc; }, {});
+			
+			const ancestryFeatures = extractAncestryFeatures(data.ancestry)
 				.filter(f => f.description)
 				.reduce((acc, f) => {
 					const id = generateRowID();
@@ -4426,7 +4493,7 @@
 				}, {});
 				
 			const classFeatures = allFeatures
-				.filter(f => f.type === FEATURE_TYPES.TEXT)
+				.filter(f => f.type === FEATURE_TYPES.TEXT && (!f.id.startsWith('perk-') && !f.id.startsWith(ancestry.name.toLowerCase())))
 				.reduce((acc, f) => {
 					const id = generateRowID();
 					acc[`repeating_classfeatures_${id}_classfeature_name`] = f.name;
@@ -4460,8 +4527,8 @@
 				subclass,
 				victories: state.victories,
 				level,
-				wealth: state.wealth,
-				renown: state.renown,
+				wealth,
+				renown,
 				experience: state.xp,
 				// Characteristics
 				might,
@@ -4470,23 +4537,30 @@
 				intuition,
 				presence,
 				// Derived Stats
-				potency_strong,
-				potency_average: potency_strong - 1,
-				potency_weak: potency_strong - 2,
+				//potency_strong,
+				//potency_average: potency_strong - 1,
+				//potency_weak: potency_strong - 2,
 				size,
 				speed,
 				disengage,
 				stability,
+				stamina,
 				stamina_max,
 				stamina_winded: Math.floor(stamina_max / 2),
 				stamina_dead: -Math.floor(stamina_max / 2),
+				recoveries,
 				recoveries_max,
 				recovery_amount: Math.floor(stamina_max / 3),
+				surges: state.surges,
 				immunity,
 				weakness,
+				resource,
 				resource_name,
-				surge_damage: potency_strong,
+				resource_amount,
+				resource_description,
+				//surge_damage: potency_strong,
 				// Biography
+				career_benefit,
 				career_incident,
 				complication: complication?.name ?? '',
 				complication_benefit: complication?.features[0]?.description ?? '',
@@ -4504,7 +4578,7 @@
 				skills_intrigue,
 				skills_lore,
 				languages,
-				// Spread in repeating section data
+				// Spread in kits and repeating section data
 				...kits,
 				...perks,
 				...ancestryFeatures,
@@ -4528,6 +4602,10 @@
 
 			// Set the new attributes on the character sheet.
 			await setAttrsAsync(newAttrs);
+			
+			//Last bit of character sheet setup
+			calculateWinded();
+			calculateSurgePotency();
 			
 			console.log('Character import successful!', newAttrs);
 
