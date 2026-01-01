@@ -1,4 +1,4 @@
-/* magic_myranor begin */
+/* magic_myranor start */
 
 /*
 	isNameAutomatic
