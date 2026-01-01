@@ -203,6 +203,15 @@ function DSAsane (value, type) {
 				sane = false;
 			}
 			break;
+		case "non-zero stat":
+			// GS, WS
+			// Must be number or parseInt()-able number
+			// Must be integer in range [1, 99]
+			if (!limitedIntValid(value, 1, 99)) {
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
+				sane = false;
+			}
+			break;
 		case "wound-box":
 			// Checkbox with wound value (active: 1, inactive: 0)
 			// Must be number or parseInt()-able number
