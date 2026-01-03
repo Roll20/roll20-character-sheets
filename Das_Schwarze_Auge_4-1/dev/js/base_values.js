@@ -436,6 +436,32 @@ on(attrsAE.map(attr => "change:" + attr).join(" ").toLowerCase(),
 		});
 });
 
+/* KE ('Karmaenergie', Karmic Energy) */
+const attrsKE = [
+	'KEGrundW',
+	'KEZugeK',
+];
+Object.freeze(attrsKE);
+
+on(attrsKE.map(attr => "change:" + attr).join(" ").toLowerCase(),
+	function() {
+		const caller = "Action Listener for Karmic Energy";
+		safeGetAttrs(
+			attrsKE, function(v) {
+				let attrsToChange = { "KE_max": parseInt(v["KEGrundW"]) + parseInt(v["KEZugeK"]) };
+
+				for (attr in attrsToChange)
+				{
+					if (!DSAsane(attrsToChange[attr], "non-negative int"))
+					{
+						delete attrsToChange[attr];
+						debugLog(caller, `${attr} ließ sich nicht berechnen. Erhaltene Attribute: ${JSON.stringify(v)}.`);
+					}
+				}
+				safeSetAttrs(attrsToChange);
+		});
+});
+
 /* MR ('Magieresistenz', Resistance against Magic) */
 const attrsMR = [
 	'MU_Basis',
@@ -785,14 +811,6 @@ function calculateAEBase(values) {
 
 	return AE;
 }
-
-on("change:kegrundw change:kezugek", function(eventInfo) {
-		safeGetAttrs(["kegrundw", "kezugek"], function(v) {
-				safeSetAttrs({
-						"KE_max": +v.kegrundw + +v.kezugek
-				});
-		});
-});
 
 on("change:ap_gesamt change:ap_ausgegeben", function(eventInfo) {
 		safeGetAttrs(["ap_gesamt", "ap_ausgegeben"], function(v) {
