@@ -730,35 +730,45 @@ on(attrsWS.map(attr => "change:" + attr).join(" ").toLowerCase(),
 		});
 });
 
-// Astral Energy: Base value
+/* Calculate Astral Energy base value
+This function calculates the base amount of astral energy available just from the stats and a special skill ("Gefäß der Sterne", Vessel of the Stars).
+
+* Input: Object with numerical stats and state of special skill
+* Output: Nothing (= error) or number
+
+*/
 function calculateAEBase(values) {
-	var func = "calculateAEBase";
+	const caller = "calculateAEBase";
+
+	// Boilerplate
+	let AE = getDefaultValue("AE");
 
 	// Input Sanitation
-	// Part 1: Check Requirements
-	var requiredProperties = ["MU", "IN", "CH", "sf_gefaess_der_sterne"];
-	var reqCheck = checkRequiredProperties(requiredProperties, values);
+	/// Check Requirements
+	const requiredProperties = ["MU", "IN", "CH", "sf_gefaess_der_sterne"];
+	const reqCheck = checkRequiredProperties(requiredProperties, values);
 
 	if (reqCheck["errors"] > 0) {
-		debugLog(func, "Error:", func, "stopped due to missing properties in input. Nothing returned. Missing properties:", reqCheck["missing"].toString());
+		debugLog(caller, `Error: Stopped due to missing properties in input. Nothing returned. Missing properties: ${reqCheck["missing"].join(", ")}.`);
 		return;
 	}
 
-	// Input Sanitation
-	// Part 2: Check Values
-	if (!DSAsane(values["MU"], "stat")
-	|| !DSAsane(values["IN"], "stat")
-	|| !DSAsane(values["CH"], "stat")
-	) {
-		debugLog(func, "One or more stats are not sane. Stopping.");
+	/// Check Values
+	if (
+		!DSAsane(values["MU"], "stat")
+		|| !DSAsane(values["IN"], "stat")
+		|| !DSAsane(values["CH"], "stat")
+	)
+	{
+		debugLog(caller, "One or more stats are not sane. Stopping.");
 		return;
 	}
 
 	// Preparation for calculation
-	var MU = parseInt(values["MU"]);
-	var IN = parseInt(values["IN"]);
-	var CH = parseInt(values["CH"]);
-	var GdS = 0;
+	const MU = parseInt(values["MU"]);
+	const IN = parseInt(values["IN"]);
+	const CH = parseInt(values["CH"]);
+	let GdS = 0;
 
 	if (values["sf_gefaess_der_sterne"] === "0") {
 		GdS = 0;
@@ -767,14 +777,13 @@ function calculateAEBase(values) {
 	}
 
 	// AE calculation
-	var AE = 0;
 	if (GdS === 0) {
 		AE = DSAround((MU + IN + CH) / 2);
 	} else {
-		AE = DSAround(CH + (MU + IN) / 2);
+		AE = DSAround(((MU + IN) / 2) + CH);
 	}
 
-		return AE;
+	return AE;
 }
 
 on("change:kegrundw change:kezugek", function(eventInfo) {
