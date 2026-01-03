@@ -756,6 +756,32 @@ on(attrsWS.map(attr => "change:" + attr).join(" ").toLowerCase(),
 		});
 });
 
+/* AP ('Abenteuerpunkte', Adventure Points) */
+const attrsAP = [
+	'AP_gesamt',
+	'AP_ausgegeben',
+];
+Object.freeze(attrsAP);
+
+on(attrsAP.map(attr => "change:" + attr).join(" ").toLowerCase(),
+	function() {
+		const caller = "Action Listener for Wound Threshold";
+		safeGetAttrs(
+			attrsAP, function(v) {
+				let attrsToChange = { "AP_verfuegbar": parseInt(v["AP_gesamt"]) - parseInt(v["AP_ausgegeben"]) };
+
+				for (attr in attrsToChange)
+				{
+					if (!DSAsane(attrsToChange[attr], "int"))
+					{
+						delete attrsToChange[attr];
+						debugLog(caller, `${attr} ließ sich nicht berechnen. Erhaltene Attribute: ${JSON.stringify(v)}.`);
+					}
+				}
+				safeSetAttrs(attrsToChange);
+		});
+});
+
 /* Calculate Astral Energy base value
 This function calculates the base amount of astral energy available just from the stats and a special skill ("Gefäß der Sterne", Vessel of the Stars).
 
@@ -811,12 +837,4 @@ function calculateAEBase(values) {
 
 	return AE;
 }
-
-on("change:ap_gesamt change:ap_ausgegeben", function(eventInfo) {
-		safeGetAttrs(["ap_gesamt", "ap_ausgegeben"], function(v) {
-				safeSetAttrs({
-						ap_verfuegbar: +v.ap_gesamt - +v.ap_ausgegeben
-				});
-		});
-});
 /* base_values end */
