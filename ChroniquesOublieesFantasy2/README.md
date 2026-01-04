@@ -6,9 +6,19 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.12.0 [Screenshot](cof2e.png)
+v1.13.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.13.0_ (2026-01-04)
+
+- Prise en charge de l'action _Aider_ (script MOD SetChatAttr nécessaire)
+- Ajout de 4 compétences personnalisées optionnelles
+- Ajout d'un champ pour le score d'attaque à distance de base à la fiche de PNJ
+- Ajout d'un champ Genre à la fiche de PNJ
+- Mise à jour automatique des PV en cas d'utilisation d'un consommable de soins
+- Gestion des effets prolongés des attaques et capacités
+- Prise en charge du script MOD AddCustomTurn pour les effets prolongés
 
 ### Version _1.12.0_ (2025-11-30)
 
