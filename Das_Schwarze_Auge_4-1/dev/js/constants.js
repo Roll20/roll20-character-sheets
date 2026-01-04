@@ -65,6 +65,8 @@ const defaultValues = {
 	"KO": 8,
 	"KK": 8,
 	"GS": 8,
+	"GE_mod_advantages_disadvantages": 0,
+	"GS_mod_advantages_disadvantages": 0,
 
 	"LE": 12,
 	"legrundw": 12,

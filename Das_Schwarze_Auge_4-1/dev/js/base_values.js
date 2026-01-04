@@ -138,6 +138,7 @@ const attrsGE = [
 	'GE_Basis',
 	'GE_mod',
 	'GE_mod_wounds',
+	'GE_mod_advantages_disadvantages',
 ];
 Object.freeze(attrsGE);
 
@@ -146,8 +147,22 @@ on(attrsGE.map(attr => "change:" + attr).join(" ").toLowerCase(),
 		const caller = "Action Listener for GE";
 		safeGetAttrs(
 			attrsGE, function(v) {
-				let attrsToChange = { "GE": parseInt(v["GE_Basis"]) + parseInt(v["GE_mod"]) + v["GE_mod_wounds"] };
+				// Boilerplate
+				const limitLower = 0;
+				let stat = 0;
+				let attrsToChange = { "GE": getDefaultValue("GE") };
 
+				// Calculate GE
+				stat =
+					parseInt(v["GE_Basis"])
+					+ parseInt(v["GE_mod"])
+					+ v["GE_mod_wounds"]
+					+ v["GE_mod_advantages_disadvantages"];
+
+				// Sanity checking
+				stat = Math.max(limitLower, stat);
+
+				attrsToChange["GE"] = stat;
 				for (attr in attrsToChange)
 				{
 					if (!DSAsane(attrsToChange[attr], "stat"))
@@ -219,6 +234,7 @@ const attrsGS = [
 	'GS_Basis',
 	'GS_Mod',
 	'GS_mod_wounds',
+	'GS_mod_advantages_disadvantages',
 	'GE',
 ];
 Object.freeze(attrsGS);
@@ -236,7 +252,7 @@ on(attrsGS.map(attr => "change:" + attr).join(" ").toLowerCase(),
 				// Calculate Movement (GS)
 				let GS = {
 					"base": parseInt(v["GS_Basis"]),
-					"mod": parseInt(v["GS_Mod"]) + v["GS_mod_wounds"],
+					"mod": parseInt(v["GS_Mod"]) + v["GS_mod_wounds"] + v["GS_mod_advantages_disadvantages"],
 					"GE effect": 0,
 				};
 
