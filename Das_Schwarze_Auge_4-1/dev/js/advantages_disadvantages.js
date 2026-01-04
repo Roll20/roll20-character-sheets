@@ -141,4 +141,62 @@ on( [ 'safe-sheet-open', ...attrsFirmMatrixBlock ].map(attr => "change:" + attr)
 				}
 		});
 });
+
+/* Wound threshold (WS) affecting advantages/disadvantages */
+const attrsWoundThresholdAffecting = [
+	'Eisern',
+	'nachteil_glasknochen',
+];
+Object.freeze(attrsWoundThresholdAffecting);
+
+on(attrsWoundThresholdAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
+	function(eventInfo) {
+		const caller = "Action Listener Wound threshold affecting advantages/disadvantages";
+
+		safeGetAttrs(
+			attrsWoundThresholdAffecting, function(v) {
+				// Boilerplate
+				const trigger = eventInfo["sourceAttribute"];
+				const newValue = eventInfo["newValue"];
+				const defaultMod = 0;
+				const adamant = v["Eisern"];
+				const adamantMod = 2;
+				const glassBones = v["nachteil_glasknochen"];
+				const glassBonesMod = -2;
+
+				let attrsToChange = {};
+
+
+				// The advantages/disadvantages are mutually exclusive
+				if (
+					trigger === "eisern"
+					&&
+					newValue !== "0"
+				)
+				{
+					attrsToChange["nachteil_glasknochen"] = "0";
+				}
+				if (
+					trigger === "nachteil_glasknochen"
+					&&
+					newValue !== "0"
+				)
+				{
+					attrsToChange["Eisern"] = "0";
+				}
+
+				// Calculate WS mod based on new attribute states
+				if (adamant !== "0")
+				{
+					attrsToChange["WS_mod_advantages_disadvantages"] = adamantMod;
+				} else if (glassBones !== "0") {
+					attrsToChange["WS_mod_advantages_disadvantages"] = glassBonesMod;
+				} else {
+					attrsToChange["WS_mod_advantages_disadvantages"] = defaultMod;
+				}
+
+				// Apply changes
+				safeSetAttrs(attrsToChange);
+		});
+});
 /* advantages_disadvantages end */
