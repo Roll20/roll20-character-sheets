@@ -3320,10 +3320,12 @@
 			let stamina_set = Math.min(stamina_max, stamina + recovery_amount);
 			let recoveries = parseInt(values.recoveries)||0;
 			let recoveries_set = Math.max(recoveries - 1,0);
-			setAttrs({
-				"stamina": stamina_set,
-				"recoveries": recoveries_set
-			});
+			if (revoveries > 0) {
+				setAttrs({
+					"stamina": stamina_set,
+					"recoveries": recoveries_set
+				});
+			}
 		});
 	}
 
@@ -3359,27 +3361,26 @@
 	async function rollDamageSurges() {
 		console.log("~~~ rollDamageSurges ~~~");
 		// Get the necessary attributes.
-		const attrs = await getAttrsAsync(["might", "agility", "reason", "intuition", "presence"]);
-			let highest = 0;
-			for(const val of Object.values(attrs)) {
-				const num = parseInt(val) || 0;
-				highest = Math.max(highest, num);
-			}
-		const attr_surges = await getAttrsAsync(["surges"]);
-		const surges = parseInt(attr_surges.surges) || 0;
-
-                const rollQuery = `[[?{How many?|1|2|3}]]`;
-
-		const rollTemplate = `@{wtype}&{template:${ROLLTEMPLATES.SIMPLE}} {{charactername=@{character_name}}} {{name=Using Surges for Damage}} {{rolltitle=${rollQuery}}} {{roll=Surges used for [[${rollQuery}*${highest}]] damage}}`;
-
-		startRoll(rollTemplate, ({ rollId, results }) => {
-			const surges_lose = results.rolltitle.result || 0;
-                        const surges_updated = surges - surges_lose;
+		const attrs = await getAttrsAsync(["surges", "surge_damage"]);
+		const damage = attrs.surge_damage;
+		const surges = parseInt(attrs.surges) || 0;
+		
+		// Check to see we actually have surges to spend
+		if (surges > 0) {
+			const rollQuery = `[[?{How many?|1|2|3}]]`;
+			const rollTemplate = `@{wtype}&{template:${ROLLTEMPLATES.SIMPLE}} {{charactername=@{character_name}}} {{name=Using Surges for Damage}} {{rolltitle=${rollQuery}}} {{roll=Surges used for [[${rollQuery}*${damage}]] damage}}`;
 			
-			setAttrs({ "surges": surges_updated });
-			
-			finishRoll(rollId);
-		});
+			startRoll(rollTemplate, ({ rollId, results }) => {
+				const surges_lose = results.rolltitle.result || 0;
+				// If we have enough, adjust the surges by the amount we just used
+				if (surges_lose <= surges) {
+					const surges_updated = surges - surges_lose;
+					setAttrs({ "surges": surges_updated });
+				}
+				
+				finishRoll(rollId);
+			});
+		}
 	}
 
 	/**
@@ -3389,14 +3390,15 @@
 	async function rollPotencySurges() {
 		console.log("~~~ rollPotencySurges ~~~");
 		// Get the necessary attributes.
-		const attrs = await getAttrsAsync(["surges", "agility", "reason", "intuition", "presence"]);
+		const attrs = await getAttrsAsync(["surges"]);
 		const surges = parseInt(attrs.surges) || 0;
+		if (surges < 2) return; 
 
 		const rollTemplate = `@{wtype}&{template:${ROLLTEMPLATES.SIMPLE}} {{charactername=@{character_name}}} {{name=Using Surges for Potency Increase}} {{rolltitle=[[2]]}} {{roll=Surges used to increase potency by 1}}`;
 
 		startRoll(rollTemplate, ({ rollId, results }) => {
 			const surges_lose = results.rolltitle.result || 0;
-                        const surges_updated = surges - surges_lose;
+			const surges_updated = surges - surges_lose;
 			
 			setAttrs({ "surges": surges_updated });
 			
