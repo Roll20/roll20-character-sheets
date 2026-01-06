@@ -4804,14 +4804,12 @@ on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_ite
 
 // Auto-generates a repeating row as a placeholder
 on('sheet:opened', async (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   const output = {};
   const weaponRows = await getSectionIDsAsync('weapon');
   const abilityRows = await getSectionIDsAsync('ability');
   const nwpRows = await getSectionIDsAsync('nonweaponproficiencies');
   const equipmentRows = await getSectionIDsAsync('equipment');
   const spellsRows = await getSectionIDsAsync('spells');
-
   if (weaponRows.length === 0) {
     const newID = generateUniqueRowID();
     output[concatRepAttrName('weapon', newID, 'weapon_value')] = 1;
@@ -4831,10 +4829,8 @@ on('sheet:opened', async (eventInfo) => {
   if (spellsRows.length === 0) {
     const newID = generateUniqueRowID();
     output[concatRepAttrName('spells', newID, 'spell_value')] = 1;
-  } else {
-    return;
   }
-  setAttrsAsync(output, {silent: true});
+  await setAttrsAsync(output, {silent: true});
 });
 
 // Reset Macros to default
