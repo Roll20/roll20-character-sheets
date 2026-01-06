@@ -3749,16 +3749,16 @@ on('remove:repeating_equipment', async (eventInfo) => {
 on('clicked:addturnundead', (eventInfo) => {
   const output = {};
   const newID = generateUniqueRowID();
-  output[`repeating_ability_${newID}_ability_name`] = 'Turn Undead by Type';
-  output[`repeating_ability_${newID}_ability_short_description`] = '[Turn Undead by Type](~selected|turn_undead_roll)';
+  output[concatRepAttrName('repeating_ability', newID, 'ability_name')] = 'Turn Undead by Type';
+  output[concatRepAttrName('repeating_ability', newID, 'ability_short_description')] = '[Turn Undead by Type](~selected|turn_undead_roll)';
   setAttrs(output, {silent: true});
 });
 
 on('clicked:addturnundead2', (eventInfo) => {
   const output = {};
   const newID = generateUniqueRowID();
-  output[`repeating_ability_${newID}_ability_name`] = 'Turn Undead by HD';
-  output[`repeating_ability_${newID}_ability_short_description`] = '[Turn Undead by HD](~selected|turn_undead2_roll)';
+  output[concatRepAttrName('repeating_ability', newID, 'ability_name')] = 'Turn Undead by HD';
+  output[concatRepAttrName('repeating_ability', newID, 'ability_short_description')] = '[Turn Undead by HD](~selected|turn_undead2_roll)';
   setAttrs(output, {silent: true});
 });
 
