@@ -14,12 +14,12 @@
     <!-- ========================================================= -->
     <!-- DETAILS -->
     <!-- ========================================================= -->
-    {{^norollnodamage}} {{#rollTotal() details 1}}
+    {{#rollTotal() details 1}}
     <div id="DETAILS" class="sheet-template-rolls sheet-template-rolls4">
       <span class="sheet-headerstyle3"> {{#usage}}USA. /{{/usage}} {{#duration}}DURA. /{{/duration}} {{#range}}RNG /{{/range}} {{#target}}TAR /{{/target}} {{#charge}}CHRG{{/charge}} </span>
       <span class="sheet-headerstyle4"> {{#usage}}{{usage}} /{{/usage}} {{#duration}}{{duration}} /{{/duration}} {{#range}}{{range}} /{{/range}} {{#target}}{{target}} /{{/target}} {{#charge}}{{charge}}{{/charge}} </span>
     </div>
-    {{/rollTotal() details 1}} {{/norollnodamage}}
+    {{/rollTotal() details 1}}
 
     <!-- ========================================================= -->
     <!-- ATTACK ROLLS (only if NOT dmgonly) -->
@@ -87,7 +87,7 @@
     <!-- NOTE: critical MUST be an inline roll in the button:
     <!--       {{critical=[[?{Critical hit?|No,0|Yes,1}]]}} -->
     <!-- ========================================================= -->
-    {{^norollnodamage}} {{^withroll}}
+    {{^norollnodamage}} {{^standard}}
     <!-- ------------------------- -->
     {{#rollGreater() dmg1 0}}
     <!-- ------------------------- -->
@@ -129,7 +129,7 @@
     <!-- ------------------------- -->
     {{/rollGreater() dmg1 0}}
     <!-- ------------------------- -->
-    {{/withroll}} {{/norollnodamage}}
+    {{/standard}} {{/norollnodamage}}
     <!-- ------------------------- -->
     <!-- ========================================================= -->
     <!-- SAVE -->
@@ -145,9 +145,7 @@
     <!-- EXTRA BUTTON (only if NOT dmgonly AND NOT nodmg AND desc) -->
     <!-- ========================================================= -->
     {{#rollGreater() dmg1 0}} {{^norollnodamage}} {{^dmgonly}} {{^nodmg}} {{#desc}}
-    <div class="sheet-borderbottom">
-    <div class="sheet-extra-button sheet-doublecolumn sheet-doublebutton">{{button}} {{buttoncrit}}</div>
-    </div>
+    <div class="sheet-extra-button sheet-doublecolumn sheet-doublebutton">{{button}}{{buttoncrit}}</div>
     {{/desc}} {{/nodmg}} {{/dmgonly}} {{/norollnodamage}} {{/rollGreater() dmg1 0}}
 
     <!-- ========================================================= -->
@@ -163,23 +161,18 @@
     </div>
     {{/description}} {{/norollnodamage}} {{/withdmg}}
   </div>
-
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-levelup-description">
-
   <div class="sheet-template-header sheet-bloc-header">
-       
     <!-- ========================================================= -->
     <!-- HEADER -->
     <!-- ========================================================= -->
-      <div class="sheet-header-bloc">
     {{#name}}
     <span class="sheet-headerstyle1">{{name}}</span>
     {{/name}} {{#source}}
     <span class="sheet-headerstyle2">{{source}}</span>
     {{/source}}
-        </div>
 
     <!-- ========================================================= -->
     <!-- DESCRIPTION -->
@@ -578,7 +571,7 @@
     </div>
   </div>
 
-<script id="✓ CALC : Display NPC/Player + Pages" type="text/worker">
+<script id="✓ CALC : Display NPC/Player + Pages (Forced)" type="text/worker">
   const PAGE_MAP = {
     "sheet-character": "sheet-character-display",
     "sheet-spells": "sheet-spells-display",
@@ -595,51 +588,36 @@
 
   const ALL_PAGE_CLASSES = Object.values(PAGE_MAP).join(", .");
 
-  const applyType = (type) => {
-    if (type === "npc") {
+  const applyDisplay = (selectedType, selectedPage) => {
+    if (selectedType === "npc") {
       $20(".sheet-npc-display").removeClass("sheet-hidden");
       $20(".sheet-player-display").addClass("sheet-hidden");
     } else {
       $20(".sheet-player-display").removeClass("sheet-hidden");
       $20(".sheet-npc-display").addClass("sheet-hidden");
     }
-  };
 
-  const applyPage = (pageKey) => {
-    const pageClass = PAGE_MAP[pageKey] || PAGE_MAP["sheet-character"];
+    const pageClass = PAGE_MAP[selectedPage] || PAGE_MAP["sheet-character"];
     $20(`.${ALL_PAGE_CLASSES}`).addClass("sheet-hidden");
     $20(`.${pageClass}`).removeClass("sheet-hidden");
   };
 
-  on("sheet:opened", () => {
+  on("sheet:opened change:npcornot-status change:changepage", () => {
     getAttrs(["npcornot-status", "changepage"], v => {
       const type = v["npcornot-status"] || "player";
-      const page = v["changepage"] || (type === "npc" ? "sheet-character-npc" : "sheet-character");
-      applyType(type);
-      applyPage(page);
-    });
-  });
+      const desiredPage = (type === "npc") ? "sheet-character-npc" : "sheet-character";
+      const currentPage = v["changepage"] || desiredPage;
 
-  on("change:npcornot-status", () => {
-    getAttrs(["npcornot-status"], v => {
-      const type = v["npcornot-status"] || "player";
-      const desiredPage = type === "npc" ? "sheet-character-npc" : "sheet-character";
-      setAttrs({ changepage: desiredPage }, { silent: true });
-      applyType(type);
-      applyPage(desiredPage);
-    });
-  });
+      if (currentPage !== desiredPage) {
+        setAttrs({ "changepage": desiredPage }, { silent: true });
+        applyDisplay(type, desiredPage);
+        return;
+      }
 
-  on("change:changepage", () => {
-    getAttrs(["npcornot-status", "changepage"], v => {
-      const type = v["npcornot-status"] || "player";
-      const page = v["changepage"] || (type === "npc" ? "sheet-character-npc" : "sheet-character");
-      applyType(type);
-      applyPage(page);
+      applyDisplay(type, currentPage);
     });
   });
 </script>
-
 
 
   <!-- ----- MENU -----  -->
@@ -653,7 +631,7 @@
         </div>
         <div class="sheet-online">
           <input type="radio" value="sheet-background-npc" name="attr_changepage" />
-          <label class="radio-button" data-i18n="notes-label">Notes</label>
+          <label class="radio-button" data-i18n="background-label">Background</label>
         </div>
         <div class="sheet-online">
           <input type="radio" value="sheet-admin-npc" name="attr_changepage" />
@@ -2166,43 +2144,44 @@
           </div>
         </div>
 
-<script id="SKILL : PASSIVE SKILLS CALCULATION" type="text/worker">
-  const skills = [
-    { key: "stealth",     ability: "dexterity-bonus" },
-    { key: "insight",     ability: "wisdom-bonus"    },
-    { key: "perception",  ability: "wisdom-bonus"    }
-  ];
+        <script id="SKILL : PASSIVE SKILLS CALCULATION" type="text/worker">
+          const skills = [
+            { key: "stealth",     ability: "dexterity-bonus" },
+            { key: "insight",     ability: "wisdom-bonus"    },
+            { key: "perception",  ability: "wisdom-bonus"    }
+          ];
 
-  const fields = [
-    "dexterity-bonus",
-    "wisdom-bonus",
-    "global-passive-bonus",
-    "pb"
-  ];
+          const fields = [
+            "dexterity-bonus",
+            "wisdom-bonus",
+            "global-passive-bonus",
+            "pb"
+          ];
 
-  skills.forEach(s => {
-    fields.push(`${s.key}_active`);
-  });
+          skills.forEach(s => {
+            fields.push(`${s.key}_active`);
+            fields.push(`${s.key}_text`);
+          });
 
-  on(fields.map(f => "change:" + f).join(" ") + " sheet:opened", () => {
-    getAttrs(fields, v => {
-      const up     = {};
-      const pb     = parseInt(v.pb || 0, 10);
-      const global = parseInt(v["global-passive-bonus"] || 0, 10);
+          on(fields.map(f => "change:" + f).join(" ") + " sheet:opened", () => {
+            getAttrs(fields, v => {
+              const up    = {};
+              const pb    = parseInt(v.pb || 0, 10);
+              const global = parseInt(v["global-passive-bonus"] || 0, 10);
 
-      skills.forEach(s => {
-        const ability = parseInt(v[s.ability] || 0, 10);
-        const active  = parseInt(v[`${s.key}_active`] || 0, 10) ? pb : 0;
+              skills.forEach(s => {
+                const ability = parseInt(v[s.ability] || 0, 10);
+                const active  = parseInt(v[`${s.key}_active`] || 0, 10) ? pb : 0;
+                const expert  = (v[`${s.key}_text`] || "").trim() !== "" ? 3 : 0;
 
-        const total = 10 + ability + global + active;
-        up[`passive-${s.key}`] = total;
-      });
+                const total = 10 + ability + global + active + expert;
+                up[`passive-${s.key}`] = total;
+              });
 
-      setAttrs(up);
-    });
-  });
-</script>
-
+              setAttrs(up);
+            });
+          });
+        </script>
 
         <!-- ----- FATIGUE & STRIFE ----- -->
         <div class="sheet-main-fatigue sheet-standardbox sheet-standardbox2">
@@ -2522,28 +2501,22 @@
 
               on("sheet:opened change:hp change:hp_max", updateHPBar);
             </script>
-            
 
-                        <div class="sheet-doublecolumn">
-                  <div class="sheet-main-hpmassive sheet-standardbox sheet-standardbox1">
-                <div class="sheet-oneline2">
-                  <h4 data-i18n="massive-label">Massive DMG</h4>
-                  <div class="sheet-main-statistics-maxhp sheet-general-hideshow-div1">
-                    <input class="sheet-maincolor sheet-inputchar" type="number" step="1" value="0" name="attr_hp_massive-damage" readonly />
-                  </div>
-                </div>
-              </div>
+            <div class="sheet-doublecolumn-x3">
+              <h4 style="text-align: left !important" data-i18n="massive-damages-label">Massive Damages :</h4>
+              <!-- ----- Massive DMG ----- -->
+              <input type="number" step="1" value="0" name="attr_hp_massive-damage" readonly />
 
-                      <div class="sheet-main-ac sheet-standardbox sheet-standardbox1">
-                <div class="sheet-oneline2">
-                  <h4 data-i18n="armorclass-label">Armor Class</h4>
-                  <div class="sheet-main-statistics-maxhp sheet-general-hideshow-div1">
-                    <input class="sheet-maincolor sheet-inputchar" type="number" step="1" value="0" name="attr_ac" />
-                  </div>
-                </div>
-              </div>
-</div>
-
+              <script id="HP : MASSIVE DAMAGE CALC" type="text/worker">
+                on("sheet:opened change:level",()=>{
+                  getAttrs(["level"],v=>{
+                    const lvl=parseInt(v.level||0,10);
+                    setAttrs({"hp_massive-damage":20+(lvl*3)});
+                  });
+                });
+              </script>
+            </div>
+            <input class="sheet-inputchar2" style="grid-column: 1/-1; max-width: none" type="text" placeholder="Armor Type" data-i18n-placeholder="armor-type-placeholder" name="attr_armor-type" style="max-width: none" />
           </div>
         </div>
 
@@ -4119,22 +4092,28 @@
         </div>
       </div>
 
-<script id="TALENTS : HEADER SWITCH" type="text/worker">
-  on("sheet:opened change:spellpoints", () => {
-    getAttrs(["spellpoints"], v => {
-      const spellOn = (parseInt(v.spellpoints || 0, 10) || 0) === 1;
+      <script id="TALENTS : HEADER SWITCH" type="text/worker">
+        on("sheet:opened change:class1 change:class2 change:class3",()=>{
+          getAttrs(["class1","class2","class3"],v=>{
+            const c1=v.class1||"";
+            const c2=v.class2||"";
+            const c3=v.class3||"";
 
-      const head = $20(".sheet-talent-headersection");
-      head.removeClass("sheet-spellpoints");
-      if (spellOn) head.addClass("sheet-spellpoints");
+            const isCaster =
+              c1==="Warlock" || c1==="Sorcerer" ||
+              c2==="Warlock" || c2==="Sorcerer" ||
+              c3==="Warlock" || c3==="Sorcerer";
 
-      const box = $20(".sheet-talent-spellpoints");
-      if (spellOn) box.removeClass("sheet-hidden");
-      else box.addClass("sheet-hidden");
-    });
-  });
-</script>
+            const head=$20(".sheet-talent-headersection");
+            head.removeClass("sheet-talent-headersection1 sheet-talent-headersection2");
+            head.addClass(isCaster ? "sheet-talent-headersection1" : "sheet-talent-headersection2");
 
+            const box=$20(".sheet-talent-spellpoints");
+            if(isCaster) box.removeClass("sheet-hidden");
+            else box.addClass("sheet-hidden");
+          });
+        });
+      </script>
 
       <script id="✓ CALC : Spell Button Links" type="text/worker">
         const spellSections = [
@@ -4296,44 +4275,6 @@
 
       <div class="sheet-triplecolumn">
         <div class="sheet-talent-leftcolumn">
-
-<script id="✓ CALC : Talents Damages Links (Atwill + Level1-9)" type="text/worker">
-  const sections = [
-    { key: "atwill", label: "Cantrips" },
-    { key: "level1", label: "Level 1" },
-    { key: "level2", label: "Level 2" },
-    { key: "level3", label: "Level 3" },
-    { key: "level4", label: "Level 4" },
-    { key: "level5", label: "Level 5" },
-    { key: "level6", label: "Level 6" },
-    { key: "level7", label: "Level 7" },
-    { key: "level8", label: "Level 8" },
-    { key: "level9", label: "Level 9" }
-  ];
-
-  const updateSection = (sectionKey, label) => {
-    const rep = `repeating_${sectionKey}`;
-    getSectionIDs(sectionKey, ids => {
-      const updates = {};
-      ids.forEach(id => {
-        updates[`${rep}_${id}_talent-button`] = `[Damages](~${id}__show-damages)`;
-        updates[`${rep}_${id}_talent-crit-button`] = `[C](~${id}__show-crit-damages)`;
-        updates[`${rep}_${id}_talent-category`] = label;
-      });
-      setAttrs(updates, { silent: true });
-    });
-  };
-
-  const updateAll = () => sections.forEach(s => updateSection(s.key, s.label));
-
-  const events = ["sheet:opened"]
-    .concat(sections.flatMap(s => [`change:repeating_${s.key}`, `remove:repeating_${s.key}`]))
-    .join(" ");
-
-  on(events, updateAll);
-</script>
-
-
           <!-- ----- SPELLS AT WILL -----  -->
           <div class="sheet-talent-atwill-talents sheet-talent-section">
             <div class="sheet-standardbox sheet-standardbox2">
@@ -4438,14 +4379,14 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-<button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{@{global-advantage-status}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
-<input class="sheet-hidden" type="text" name="attr_talent-button" />
-<input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
-<input class="sheet-hidden" type="text" name="attr_talent-category" />
-<button type="roll" class="sheet-hidden" name="roll_show-damages" value="@{global-privacy-status} &{template:levelup} {{name=Damages}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{dmgonly=1}} {{critical=[[0]]}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2type=@{talent-dmg2-type}}}"></button>
-<button type="roll" class="sheet-hidden" name="roll_show-crit-damages" value="@{global-privacy-status} &{template:levelup} {{name=Critical Damages}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{dmgonly=1}} {{critical=[[1]]}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg2type=@{talent-dmg2-type}}}"></button>
-<button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
-
+                        <button
+                          type="roll"
+                          class="sheet-button-description"
+                          name="roll_talent"
+                          value="@{global-privacy-status} &{template:levelup} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Cantrips}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}} {{description=@{talent-description}}}"
+                        ></button>
+                        <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
+                        <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
                         <span class="sheet-talent-name" style="text-align: left !important" name="attr_talent-name"></span>
 
@@ -4578,15 +4519,6 @@
                       <textarea placeholder="e.g. 1/2 of normal damages" data-i18n-placeholder="eg-1-2-of-normal-damages-placeholder" name="attr_talent-saveeffects"></textarea>
                     </div>
 
-                    <div class="sheet-talent-card-line0" style="grid-template-columns: 71px 1fr">
-                      <h4 data-i18n="roll-type-label-2">R.Type:</h4>
-                      <select name="attr_attacks_tooglespell">
-                        <option value="withroll" data-i18n="with-roll-option">With Roll</option>
-                        <option value="norollnodamage" data-i18n="only-desc-option">Only Desc.</option>
-                        <option value="withdmg" selected data-i18n="dmg-only-option">DMG Only</option>
-                      </select>
-                    </div>
-
                     <div class="sheet-talent-card-line0">
                       <h4 data-i18n="description-label">Description:</h4>
                       <textarea placeholder="Description" data-i18n-placeholder="description-placeholder" name="attr_talent-description"></textarea>
@@ -4598,13 +4530,9 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{@{global-advantage-status}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
-<input class="sheet-hidden" type="text" name="attr_talent-button" />
-<input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
-<input class="sheet-hidden" type="text" name="attr_talent-category" />
-<button type="roll" class="sheet-hidden" name="roll_show-damages" value="@{global-privacy-status} &{template:levelup} {{name=Damages}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{dmgonly=1}} {{critical=[[0]]}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2type=@{talent-dmg2-type}}}"></button>
-<button type="roll" class="sheet-hidden" name="roll_show-crit-damages" value="@{global-privacy-status} &{template:levelup} {{name=Critical Damages}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{dmgonly=1}} {{critical=[[1]]}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg2type=@{talent-dmg2-type}}}"></button>
-<button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 1}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
+                        <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
                         <span class="sheet-talent-name" style="text-align: left !important" name="attr_talent-name"></span>
 
@@ -4736,15 +4664,6 @@
                       <textarea placeholder="e.g. 1/2 of normal damages" data-i18n-placeholder="eg-1-2-of-normal-damages-placeholder" name="attr_talent-saveeffects"></textarea>
                     </div>
 
-                    <div class="sheet-talent-card-line0" style="grid-template-columns: 71px 1fr">
-                      <h4 data-i18n="roll-type-label-2">R.Type:</h4>
-                      <select name="attr_attacks_tooglespell">
-                        <option value="withroll" data-i18n="with-roll-option">With Roll</option>
-                        <option value="norollnodamage" data-i18n="only-desc-option">Only Desc.</option>
-                        <option value="withdmg" selected data-i18n="dmg-only-option">DMG Only</option>
-                      </select>
-                    </div>
-
                     <div class="sheet-talent-card-line0">
                       <h4 data-i18n="description-label">Description:</h4>
                       <textarea placeholder="Description" data-i18n-placeholder="description-placeholder" name="attr_talent-description"></textarea>
@@ -4756,13 +4675,9 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-           <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{@{global-advantage-status}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
-<input class="sheet-hidden" type="text" name="attr_talent-button" />
-<input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
-<input class="sheet-hidden" type="text" name="attr_talent-category" />
-<button type="roll" class="sheet-hidden" name="roll_show-damages" value="@{global-privacy-status} &{template:levelup} {{name=Damages}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{dmgonly=1}} {{critical=[[0]]}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2type=@{talent-dmg2-type}}}"></button>
-<button type="roll" class="sheet-hidden" name="roll_show-crit-damages" value="@{global-privacy-status} &{template:levelup} {{name=Critical Damages}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{dmgonly=1}} {{critical=[[1]]}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg2type=@{talent-dmg2-type}}}"></button>
-<button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 2}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
+                        <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
                         <span class="sheet-talent-name" style="text-align: left !important" name="attr_talent-name"></span>
 
@@ -4896,15 +4811,6 @@
                       <textarea placeholder="e.g. 1/2 of normal damages" data-i18n-placeholder="eg-1-2-of-normal-damages-placeholder" name="attr_talent-saveeffects"></textarea>
                     </div>
 
-                    <div class="sheet-talent-card-line0" style="grid-template-columns: 71px 1fr">
-                      <h4 data-i18n="roll-type-label-2">R.Type:</h4>
-                      <select name="attr_attacks_tooglespell">
-                        <option value="withroll" data-i18n="with-roll-option">With Roll</option>
-                        <option value="norollnodamage" data-i18n="only-desc-option">Only Desc.</option>
-                        <option value="withdmg" selected data-i18n="dmg-only-option">DMG Only</option>
-                      </select>
-                    </div>
-
                     <div class="sheet-talent-card-line0">
                       <h4 data-i18n="description-label">Description:</h4>
                       <textarea placeholder="Description" data-i18n-placeholder="description-placeholder" name="attr_talent-description"></textarea>
@@ -4916,13 +4822,9 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-   <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{@{global-advantage-status}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
-<input class="sheet-hidden" type="text" name="attr_talent-button" />
-<input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
-<input class="sheet-hidden" type="text" name="attr_talent-category" />
-<button type="roll" class="sheet-hidden" name="roll_show-damages" value="@{global-privacy-status} &{template:levelup} {{name=Damages}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{dmgonly=1}} {{critical=[[0]]}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2type=@{talent-dmg2-type}}}"></button>
-<button type="roll" class="sheet-hidden" name="roll_show-crit-damages" value="@{global-privacy-status} &{template:levelup} {{name=Critical Damages}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{dmgonly=1}} {{critical=[[1]]}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg2type=@{talent-dmg2-type}}}"></button>
-<button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 3}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
+                        <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
                         <span class="sheet-talent-name" style="text-align: left !important" name="attr_talent-name"></span>
 
@@ -5054,15 +4956,6 @@
                       <textarea placeholder="e.g. 1/2 of normal damages" data-i18n-placeholder="eg-1-2-of-normal-damages-placeholder" name="attr_talent-saveeffects"></textarea>
                     </div>
 
-                    <div class="sheet-talent-card-line0" style="grid-template-columns: 71px 1fr">
-                      <h4 data-i18n="roll-type-label-2">R.Type:</h4>
-                      <select name="attr_attacks_tooglespell">
-                        <option value="withroll" data-i18n="with-roll-option">With Roll</option>
-                        <option value="norollnodamage" data-i18n="only-desc-option">Only Desc.</option>
-                        <option value="withdmg" selected data-i18n="dmg-only-option">DMG Only</option>
-                      </select>
-                    </div>
-
                     <div class="sheet-talent-card-line0">
                       <h4 data-i18n="description-label">Description:</h4>
                       <textarea placeholder="Description" data-i18n-placeholder="description-placeholder" name="attr_talent-description"></textarea>
@@ -5074,13 +4967,9 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-         <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{@{global-advantage-status}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
-<input class="sheet-hidden" type="text" name="attr_talent-button" />
-<input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
-<input class="sheet-hidden" type="text" name="attr_talent-category" />
-<button type="roll" class="sheet-hidden" name="roll_show-damages" value="@{global-privacy-status} &{template:levelup} {{name=Damages}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{dmgonly=1}} {{critical=[[0]]}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2type=@{talent-dmg2-type}}}"></button>
-<button type="roll" class="sheet-hidden" name="roll_show-crit-damages" value="@{global-privacy-status} &{template:levelup} {{name=Critical Damages}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{dmgonly=1}} {{critical=[[1]]}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg2type=@{talent-dmg2-type}}}"></button>
-<button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 4}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
+                        <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
                         <span class="sheet-talent-name" style="text-align: left !important" name="attr_talent-name"></span>
 
@@ -5212,15 +5101,6 @@
                       <textarea placeholder="e.g. 1/2 of normal damages" data-i18n-placeholder="eg-1-2-of-normal-damages-placeholder" name="attr_talent-saveeffects"></textarea>
                     </div>
 
-                    <div class="sheet-talent-card-line0" style="grid-template-columns: 71px 1fr">
-                      <h4 data-i18n="roll-type-label-2">R.Type:</h4>
-                      <select name="attr_attacks_tooglespell">
-                        <option value="withroll" data-i18n="with-roll-option">With Roll</option>
-                        <option value="norollnodamage" data-i18n="only-desc-option">Only Desc.</option>
-                        <option value="withdmg" selected data-i18n="dmg-only-option">DMG Only</option>
-                      </select>
-                    </div>
-
                     <div class="sheet-talent-card-line0">
                       <h4 data-i18n="description-label">Description:</h4>
                       <textarea placeholder="Description" data-i18n-placeholder="description-placeholder" name="attr_talent-description"></textarea>
@@ -5232,13 +5112,9 @@
                       <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                       <div class="sheet-talent-card-line4 sheet-button-div-holder">
-   <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{@{global-advantage-status}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
-<input class="sheet-hidden" type="text" name="attr_talent-button" />
-<input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
-<input class="sheet-hidden" type="text" name="attr_talent-category" />
-<button type="roll" class="sheet-hidden" name="roll_show-damages" value="@{global-privacy-status} &{template:levelup} {{name=Damages}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{dmgonly=1}} {{critical=[[0]]}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2type=@{talent-dmg2-type}}}"></button>
-<button type="roll" class="sheet-hidden" name="roll_show-crit-damages" value="@{global-privacy-status} &{template:levelup} {{name=Critical Damages}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{dmgonly=1}} {{critical=[[1]]}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg2type=@{talent-dmg2-type}}}"></button>
-<button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
+                        <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{details=[[@{talent-details}]]}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=Lvl 5}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll1=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{roll2=[[1d20+@{pb}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{desc=@{talent-description}}}"></button>
+                        <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_talent-button" />
+                        <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:levelup-description} {{name=Description}} {{description=@{talent-description}}}"></button>
 
                         <span class="sheet-talent-name" style="text-align: left !important" name="attr_talent-name"></span>
 
@@ -5365,15 +5241,6 @@
                     <div class="sheet-talent-card-line0">
                       <h4 data-i18n="save-effect-label">Save Effect:</h4>
                       <textarea placeholder="e.g. 1/2 of normal damages" data-i18n-placeholder="eg-1-2-of-normal-damages-placeholder" name="attr_talent-saveeffects"></textarea>
-                    </div>
-
-                    <div class="sheet-talent-card-line0" style="grid-template-columns: 71px 1fr">
-                      <h4 data-i18n="roll-type-label-2">R.Type:</h4>
-                      <select name="attr_attacks_tooglespell">
-                        <option value="withroll" data-i18n="with-roll-option">With Roll</option>
-                        <option value="norollnodamage" data-i18n="only-desc-option">Only Desc.</option>
-                        <option value="withdmg" selected data-i18n="dmg-only-option">DMG Only</option>
-                      </select>
                     </div>
 
                     <div class="sheet-talent-card-line0">
@@ -5516,15 +5383,6 @@
                       <textarea placeholder="e.g. 1/2 of normal damages" data-i18n-placeholder="eg-1-2-of-normal-damages-placeholder" name="attr_talent-saveeffects"></textarea>
                     </div>
 
-                    <div class="sheet-talent-card-line0" style="grid-template-columns: 71px 1fr">
-                      <h4 data-i18n="roll-type-label-2">R.Type:</h4>
-                      <select name="attr_attacks_tooglespell">
-                        <option value="withroll" data-i18n="with-roll-option">With Roll</option>
-                        <option value="norollnodamage" data-i18n="only-desc-option">Only Desc.</option>
-                        <option value="withdmg" selected data-i18n="dmg-only-option">DMG Only</option>
-                      </select>
-                    </div>
-
                     <div class="sheet-talent-card-line0">
                       <h4 data-i18n="description-label">Description:</h4>
                       <textarea placeholder="Description" data-i18n-placeholder="description-placeholder" name="attr_talent-description"></textarea>
@@ -5663,15 +5521,6 @@
                     <div class="sheet-talent-card-line0">
                       <h4 data-i18n="save-effect-label">Save Effect:</h4>
                       <textarea placeholder="e.g. 1/2 of normal damages" data-i18n-placeholder="eg-1-2-of-normal-damages-placeholder" name="attr_talent-saveeffects"></textarea>
-                    </div>
-
-                    <div class="sheet-talent-card-line0" style="grid-template-columns: 71px 1fr">
-                      <h4 data-i18n="roll-type-label-2">R.Type:</h4>
-                      <select name="attr_attacks_tooglespell">
-                        <option value="withroll" data-i18n="with-roll-option">With Roll</option>
-                        <option value="norollnodamage" data-i18n="only-desc-option">Only Desc.</option>
-                        <option value="withdmg" selected data-i18n="dmg-only-option">DMG Only</option>
-                      </select>
                     </div>
 
                     <div class="sheet-talent-card-line0">
@@ -5814,15 +5663,6 @@
                       <textarea placeholder="e.g. 1/2 of normal damages" data-i18n-placeholder="eg-1-2-of-normal-damages-placeholder" name="attr_talent-saveeffects"></textarea>
                     </div>
 
-                    <div class="sheet-talent-card-line0" style="grid-template-columns: 71px 1fr">
-                      <h4 data-i18n="roll-type-label-2">R.Type:</h4>
-                      <select name="attr_attacks_tooglespell">
-                        <option value="withroll" data-i18n="with-roll-option">With Roll</option>
-                        <option value="norollnodamage" data-i18n="only-desc-option">Only Desc.</option>
-                        <option value="withdmg" selected data-i18n="dmg-only-option">DMG Only</option>
-                      </select>
-                    </div>
-                    
                     <div class="sheet-talent-card-line0">
                       <h4 data-i18n="description-label">Description:</h4>
                       <textarea placeholder="Description" data-i18n-placeholder="description-placeholder" name="attr_talent-description"></textarea>
@@ -6181,7 +6021,6 @@ A creature that is shoved off of a precipice is propelled off of whatever it is 
                 <div class="sheet-maneuvers">
                   <button type="roll" class="sheet-button-description" name="roll_maneuvers-roll" value="@{global-privacy-status} &{template:levelup} {{details=[[0]]}} {{name=@{maneuvers-name}}} {{charactername=@{maneuvers-tradition}}} {{category=@{maneuvers-degree} Degree}} {{@{global-advantage-status}=1}} {{description=@{maneuvers-description}}}"></button>
                   <input type="checkbox" value="1" name="attr_maneuvers-active" />
-                  <input class="sheet-hidden" type="text" value="1st" name="attr_maneuvers-degree" />
                   <input class="sheet-left" type="text" placeholder="Maneuvers Name" data-i18n-placeholder="maneuvers-name-placeholder" name="attr_maneuvers-name" />
                   <input type="number" value="0" name="attr_maneuvers-points" />
                   <input type="text" placeholder="-" name="attr_maneuvers-tradition" />
@@ -6218,7 +6057,6 @@ A creature that is shoved off of a precipice is propelled off of whatever it is 
                 <div class="sheet-maneuvers">
                   <button type="roll" class="sheet-button-description" name="roll_maneuvers-roll" value="@{global-privacy-status} &{template:levelup} {{details=[[0]]}} {{name=@{maneuvers-name}}} {{charactername=@{maneuvers-tradition}}} {{category=@{maneuvers-degree} Degree}} {{@{global-advantage-status}=1}} {{description=@{maneuvers-description}}}"></button>
                   <input type="checkbox" value="1" name="attr_maneuvers-active" />
-                  <input class="sheet-hidden" type="text" value="2nd" name="attr_maneuvers-degree" />
                   <input class="sheet-left" type="text" placeholder="Maneuvers Name" data-i18n-placeholder="maneuvers-name-placeholder" name="attr_maneuvers-name" />
                   <input type="number" value="0" name="attr_maneuvers-points" />
                   <input type="text" placeholder="-" name="attr_maneuvers-tradition" />
@@ -6257,7 +6095,6 @@ A creature that is shoved off of a precipice is propelled off of whatever it is 
                 <div class="sheet-maneuvers">
                   <button type="roll" class="sheet-button-description" name="roll_maneuvers-roll" value="@{global-privacy-status} &{template:levelup} {{details=[[0]]}} {{name=@{maneuvers-name}}} {{charactername=@{maneuvers-tradition}}} {{category=@{maneuvers-degree} Degree}} {{@{global-advantage-status}=1}} {{description=@{maneuvers-description}}}"></button>
                   <input type="checkbox" value="1" name="attr_maneuvers-active" />
-                  <input class="sheet-hidden" type="text" value="3rd" name="attr_maneuvers-degree" />
                   <input class="sheet-left" type="text" placeholder="Maneuvers Name" data-i18n-placeholder="maneuvers-name-placeholder" name="attr_maneuvers-name" />
                   <input type="number" value="0" name="attr_maneuvers-points" />
                   <input type="text" placeholder="-" name="attr_maneuvers-tradition" />
@@ -6294,7 +6131,6 @@ A creature that is shoved off of a precipice is propelled off of whatever it is 
                 <div class="sheet-maneuvers">
                   <button type="roll" class="sheet-button-description" name="roll_maneuvers-roll" value="@{global-privacy-status} &{template:levelup} {{details=[[0]]}} {{name=@{maneuvers-name}}} {{charactername=@{maneuvers-tradition}}} {{category=@{maneuvers-degree} Degree}} {{@{global-advantage-status}=1}} {{description=@{maneuvers-description}}}"></button>
                   <input type="checkbox" value="1" name="attr_maneuvers-active" />
-                  <input class="sheet-hidden" type="text" value="4th" name="attr_maneuvers-degree" />
                   <input class="sheet-left" type="text" placeholder="Maneuvers Name" data-i18n-placeholder="maneuvers-name-placeholder" name="attr_maneuvers-name" />
                   <input type="number" value="0" name="attr_maneuvers-points" />
                   <input type="text" placeholder="-" name="attr_maneuvers-tradition" />
@@ -6331,7 +6167,6 @@ A creature that is shoved off of a precipice is propelled off of whatever it is 
                 <div class="sheet-maneuvers">
                   <button type="roll" class="sheet-button-description" name="roll_maneuvers-roll" value="@{global-privacy-status} &{template:levelup} {{details=[[0]]}} {{name=@{maneuvers-name}}} {{charactername=@{maneuvers-tradition}}} {{category=@{maneuvers-degree} Degree}} {{@{global-advantage-status}=1}} {{description=@{maneuvers-description}}}"></button>
                   <input type="checkbox" value="1" name="attr_maneuvers-active" />
-                  <input class="sheet-hidden" type="text" value="5th" name="attr_maneuvers-degree" />
                   <input class="sheet-left" type="text" placeholder="Maneuvers Name" data-i18n-placeholder="maneuvers-name-placeholder" name="attr_maneuvers-name" />
                   <input type="number" value="0" name="attr_maneuvers-points" />
                   <input type="text" placeholder="-" name="attr_maneuvers-tradition" />
@@ -6369,6 +6204,20 @@ A creature that is shoved off of a precipice is propelled off of whatever it is 
           <input type="text" placeholder="-" name="attr_character_skin" />
           <input type="text" placeholder="-" name="attr_character_hair" />
           <input type="text" placeholder="-" name="attr_character_eye" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ----- INSPIRATION HEADER -----  -->
+    <div class="sheet-background-header sheet-standardbox sheet-standardbox2">
+      <div class="sheet-oneline">
+        <div class="sheet-triplecolumn">
+          <h4 data-i18n="source-of-inspiration-label">Source of Inspiration</h4>
+          <h4 data-i18n="inspiration-feature-label">Inspiration Feature</h4>
+          <h4 data-i18n="fulfillment-feature-label">Fulfillment Feature</h4>
+          <input type="text" placeholder="-" name="attr_character_source-inspiration" />
+          <input type="text" placeholder="-" name="attr_character_inspiration-feature" />
+          <input type="text" placeholder="-" name="attr_character_fulfillment-feature" />
         </div>
       </div>
     </div>
@@ -6431,19 +6280,93 @@ A creature that is shoved off of a precipice is propelled off of whatever it is 
 
   <!-- ----- BACKGROUND -----  -->
   <div class="sheet-background-npc-display sheet-hidden">
+    <!-- ----- BACKGROUND HEADER -----  -->
+    <div class="sheet-background-header sheet-standardbox sheet-standardbox2">
+      <div class="sheet-oneline">
+        <div class="sheet-background-header-line1">
+          <h4 data-i18n="age-label">Age</h4>
+          <h4 data-i18n="height-label">Height</h4>
+          <h4 data-i18n="weight-label">Weight</h4>
+          <h4 data-i18n="skin-label">Skin</h4>
+          <h4 data-i18n="hair-label">Hair</h4>
+          <h4 data-i18n="eye-label">Eye</h4>
+          <input type="text" placeholder="-" name="attr_character_age" />
+          <input type="text" placeholder="-" name="attr_character_height" />
+          <input type="text" placeholder="-" name="attr_character_weight" />
+          <input type="text" placeholder="-" name="attr_character_skin" />
+          <input type="text" placeholder="-" name="attr_character_hair" />
+          <input type="text" placeholder="-" name="attr_character_eye" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ----- INSPIRATION HEADER -----  -->
+    <div class="sheet-background-header sheet-standardbox sheet-standardbox2">
+      <div class="sheet-oneline">
+        <div class="sheet-triplecolumn">
+          <h4 data-i18n="source-of-inspiration-label">Source of Inspiration</h4>
+          <h4 data-i18n="inspiration-feature-label">Inspiration Feature</h4>
+          <h4 data-i18n="fulfillment-feature-label">Fulfillment Feature</h4>
+          <input type="text" placeholder="-" name="attr_character_source-inspiration" />
+          <input type="text" placeholder="-" name="attr_character_inspiration-feature" />
+          <input type="text" placeholder="-" name="attr_character_fulfillment-feature" />
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet-background-area">
+      <!--  -->
+      <div class="sheet-background-vertical-art">
+        <!-- ----- CHARACTER PORTRAITS -----  -->
+        <div class="sheet-standardbox sheet-standardbox2">
+          <div class="sheet-main-vehicle-name1">
+            <h4 class="sheet-main-characterstatusupgrades" data-i18n="character-appearance-label">Character Appearance</h4>
+            <div class="sheet-cogs-container">
+              <input class="sheet-cogs-input sheet-portrait-hideshow" type="checkbox" name="attr_sheet-portrait-hideshow" />
+              <span class="sheet-cogs-icon">y</span>
+            </div>
+          </div>
+          <div class="sheet-oneline">
+            <input class="sheet-hidden sheet-portrait-hideshow" type="checkbox" name="attr_sheet-portrait-hideshow" />
+            <input class="sheet-portrait-hideshow-div1" type="text" placeholder="(URL) Character Portrait" data-i18n-placeholder="url-character-portrait-placeholder" name="attr_character-portrait" />
+            <img name="attr_character-portrait" />
+          </div>
+        </div>
+
+        <!-- ----- CHARACTER APPEARANCE -----  -->
+        <div class="sheet-standardbox sheet-standardbox2">
+          <h4 class="sheet-minititles2" data-i18n="character-appearance-label">Character Appearance</h4>
+          <div class="sheet-oneline">
+            <textarea class="sheet-left" placeholder="-" name="attr_background-characternotes" style="height: 100px"></textarea>
+          </div>
+        </div>
+
+        <!-- ----- CHARACTER BACKGROUND -----  -->
+        <div class="sheet-standardbox sheet-standardbox2">
+          <h4 class="sheet-minititles2" data-i18n="character-background-label">Character Background</h4>
+          <div class="sheet-oneline">
+            <textarea class="sheet-left" placeholder="-" name="attr_background-characterbackground" style="height: 100px"></textarea>
+          </div>
+        </div>
+      </div>
 
       <!-- ----- GENERAL  NOTES -----  -->
-      <div class="sheet-background-generalnotes2">
+      <div class="sheet-background-generalnotes">
         <div class="sheet-standardbox sheet-standardbox2">
           <h4 class="sheet-minititles2" data-i18n="general-notes-label">General Notes</h4>
           <div class="sheet-oneline">
-            <textarea class="sheet-left" name="attr_background-generalnotes" style="height: 350px;"></textarea>
+            <textarea class="sheet-left" name="attr_background-generalnotes"></textarea>
+          </div>
+        </div>
+
+        <div class="sheet-standardbox sheet-standardbox2">
+          <h4 class="sheet-minititles2" data-i18n="allies-organization-label">Allies & Organization</h4>
+          <div class="sheet-oneline">
+            <textarea class="sheet-left" name="attr_background-alliesetorganization" style="height: 100px !important"></textarea>
           </div>
         </div>
       </div>
       <!--  -->
     </div>
-  
-  <h4 class="sheet-credits">Level Up: Advanced 5th Edition 2026 Official Character Sheet ordered by EN Publishing created by Spirito & Yojojoman with the help of the community.</h4>
   </div>
-
+  </div>
