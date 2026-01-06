@@ -7595,7 +7595,7 @@ const weaponInUse = async () => {
     output.weapon_in_use = '';
     output.weapon_in_use_speed = '';
     output.weapon_in_use_misc = '';
-    await setAttrsAsync({silent: true});
+    await setAttrsAsync(output, {silent: true});
     return;
   }
   const weaponsInUse = [];
@@ -7634,10 +7634,13 @@ const weaponInUse = async () => {
   await setAttrsAsync(output, {silent: true});
 };
 
-on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use change:repeating_weapon:weapon_speed change:repeating_weapon:weapon_misc', (eventInfo) => {
-  // clog(eventInfo.sourceAttribute);
-  weaponInUse();
-});
+on(
+  'change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use change:repeating_weapon:weapon_speed change:repeating_weapon:weapon_misc remove:repeating_weapon',
+  (eventInfo) => {
+    clog(eventInfo.sourceAttribute);
+    weaponInUse();
+  },
+);
 
 // async version of getSectionIDsOrdered
 const getSectionIDsOrderedAsync = async (sectionName) => {
