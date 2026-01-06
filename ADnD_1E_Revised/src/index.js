@@ -1424,25 +1424,25 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       if (armor0) {
         if (unarmored0_ID.length === 20) {
           // has name && has id = UPDATE ROW
-          newID = unarmored0_ID.toLowerCase();
-          output.unarmored_row_id = newID;
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.unarmored_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.unarmored.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.unarmored_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.unarmored_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_bulk')] = +v.unarmored_bulk || 0;
+          rowId = unarmored0_ID.toLowerCase();
+          output.unarmored_row_id = rowId;
+          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.unarmored_worn || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.unarmored.trim();
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.unarmored_ac || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.unarmored_base || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_bulk')] = +v.unarmored_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
           if ((+v.unarmored_worn || 0) === 1 && (+v.unarmored_carried || 0) === 0) {
-            output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = 1;
+            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = 1;
             output.unarmored_carried = 1;
           } else {
-            output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.unarmored_carried || 0;
+            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.unarmored_carried || 0;
           }
-          output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.unarmored_weight || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.unarmored_cost || 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'armor1':${newID}`);
+          output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.unarmored_weight || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.unarmored_cost || 0;
+          clog(`syncArmorToEquipment - repeating Armor exists for 'armor1':${rowId}`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1503,26 +1503,26 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       if (armor1) {
         if (armortype1_ID.length === 20) {
           // has name && has id = UPDATE ROW
-          newID = armortype1_ID.toLowerCase();
-          output.armortype1_row_id = newID;
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 1;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armortype_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armortype.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armortype_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armortype_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armortype_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_bulk')] = +v.armortype_bulk || 0;
+          rowId = armortype1_ID.toLowerCase();
+          output.armortype1_row_id = rowId;
+          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 1;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armortype_worn || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armortype.trim();
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armortype_ac || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armortype_base || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armortype_magic || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_bulk')] = +v.armortype_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
           if ((+v.armortype_worn || 0) === 1 && (+v.armortype_carried || 0) === 0) {
-            output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = 1;
+            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = 1;
             output.armortype_carried = 1;
           } else {
-            output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armortype_carried || 0;
+            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armortype_carried || 0;
           }
-          output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.armor_weight || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.armor_cost || 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'armor1':${newID}`);
+          output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.armor_weight || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.armor_cost || 0;
+          clog(`syncArmorToEquipment - repeating Armor exists for 'armor1':${rowId}`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1575,26 +1575,26 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       if (armor2) {
         if (armortype2_ID.length === 20) {
           // has name && has id = UPDATE ROW
-          newID = armortype2_ID.toLowerCase();
-          output.armortype2_row_id = newID;
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armortype2_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armortype2.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armortype2_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armortype2_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armortype2_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_bulk')] = +v.armortype2_bulk || 0;
+          rowId = armortype2_ID.toLowerCase();
+          output.armortype2_row_id = rowId;
+          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 2;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armortype2_worn || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armortype2.trim();
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armortype2_ac || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armortype2_base || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armortype2_magic || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_bulk')] = +v.armortype2_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
           if ((+v.armortype2_worn || 0) === 1 && (+v.armortype2_carried || 0) === 0) {
-            output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = 1;
+            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = 1;
             output.armortype2_carried = 1;
           } else {
-            output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armortype2_carried || 0;
+            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armortype2_carried || 0;
           }
-          output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.armortype2_weight || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.armortype2_cost || 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'armor2':${newID}`);
+          output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.armortype2_weight || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.armortype2_cost || 0;
+          clog(`syncArmorToEquipment - repeating Armor exists for 'armor2':${rowId}`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1647,27 +1647,27 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       if (shield) {
         if (armorshield_ID.length === 20) {
           // has name && has id = UPDATE ROW
-          newID = armorshield_ID.toLowerCase();
-          output.armorshield_row_id = newID;
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 3;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorshield_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorshield.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorshield_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorshield_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = v.armorshield_magic;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = v.armorshield_mod;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_bulk')] = +v.armorshield_bulk || 0;
+          rowId = armorshield_ID.toLowerCase();
+          output.armorshield_row_id = rowId;
+          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 3;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorshield_worn || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorshield.trim();
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorshield_ac || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorshield_base || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = v.armorshield_magic;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = v.armorshield_mod;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_bulk')] = +v.armorshield_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
           if ((+v.armorshield_worn || 0) === 1 && (+v.armorshield_carried || 0) === 0) {
-            output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = 1;
+            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = 1;
             output.armorshield_carried = 1;
           } else {
-            output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armorshield_carried || 0;
+            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorshield_carried || 0;
           }
-          output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.armorshield_weight || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.armorshield_cost || 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'shield':${newID}`);
+          output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.armorshield_weight || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.armorshield_cost || 0;
+          clog(`syncArmorToEquipment - repeating Armor exists for 'shield':${rowId}`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1723,24 +1723,24 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       if (helmet) {
         if (armorhelmet_ID.length === 20) {
           // has name && has id = UPDATE ROW
-          newID = armorhelmet_ID.toLowerCase();
-          output.armorhelmet_row_id = newID;
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 4;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorhelmet_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorhelmet.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorhelmet_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = v.armorhelmet_magic;
+          rowId = armorhelmet_ID.toLowerCase();
+          output.armorhelmet_row_id = rowId;
+          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 4;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorhelmet_worn || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorhelmet.trim();
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorhelmet_ac || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = v.armorhelmet_magic;
           // armor in use ie 'worn', should always be considered as carried
           if ((+v.armorhelmet_worn || 0) === 1 && (+v.armorhelmet_carried || 0) === 0) {
-            output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = 1;
+            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = 1;
             output.armorhelmet_carried = 1;
           } else {
-            output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armorhelmet_carried || 0;
+            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorhelmet_carried || 0;
           }
-          output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.armorhelmet_weight || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.armorhelmet_cost || 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'helmet':${newID}`);
+          output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.armorhelmet_weight || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.armorhelmet_cost || 0;
+          clog(`syncArmorToEquipment - repeating Armor exists for 'helmet':${rowId}`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1791,19 +1791,19 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       if (other1) {
         if (armorother1_ID.length === 20) {
           // has name && has id = UPDATE ROW
-          newID = armorother1_ID.toLowerCase();
-          output.armorother1_row_id = newID;
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 5;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorother_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother_mod || 0;
+          rowId = armorother1_ID.toLowerCase();
+          output.armorother1_row_id = rowId;
+          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 5;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorother_worn || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorother.trim();
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorother_ac || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorother_base || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armorother_magic || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
-          output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armorother_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'other1':${newID}`);
+          output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother_worn === 1 ? 1 : 0;
+          clog(`syncArmorToEquipment - repeating Armor exists for 'other1':${rowId}`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1849,18 +1849,18 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       if (other2) {
         if (armorother2_ID.length === 20) {
           // has name && has id = UPDATE ROW
-          newID = armorother2_ID.toLowerCase();
-          output.armorother2_row_id = newID;
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 6;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorother2_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother2.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother2_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother2_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother2_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother2_mod || 0;
+          rowId = armorother2_ID.toLowerCase();
+          output.armorother2_row_id = rowId;
+          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 6;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorother2_worn || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorother2.trim();
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorother2_ac || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorother2_base || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armorother2_magic || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother2_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
-          output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armorother2_worn === 1 ? 1 : 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother2_worn === 1 ? 1 : 0;
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1906,19 +1906,19 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       if (other3) {
         if (armorother3_ID.length === 20) {
           // has name && has id = UPDATE ROW
-          newID = armorother3_ID.toLowerCase();
-          output.armorother3_row_id = newID;
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 7;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorother3_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother3.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother3_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother3_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother3_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother3_mod || 0;
+          rowId = armorother3_ID.toLowerCase();
+          output.armorother3_row_id = rowId;
+          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 7;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorother3_worn || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorother3.trim();
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorother3_ac || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorother3_base || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armorother3_magic || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother3_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
-          output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armorother3_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'other3':${newID}`);
+          output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother3_worn === 1 ? 1 : 0;
+          clog(`syncArmorToEquipment - repeating Armor exists for 'other3':${rowId}`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1964,19 +1964,19 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       if (other4) {
         if (armorother4_ID.length === 20) {
           // has name && has id = UPDATE ROW
-          newID = armorother4_ID.toLowerCase();
-          output.armorother4_row_id = newID;
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 8;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorother4_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother4.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother4_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother4_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother4_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother4_mod || 0;
+          rowId = armorother4_ID.toLowerCase();
+          output.armorother4_row_id = rowId;
+          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 8;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorother4_worn || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorother4.trim();
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorother4_ac || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorother4_base || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armorother4_magic || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother4_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
-          output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armorother4_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'other4':${newID}`);
+          output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother4_worn === 1 ? 1 : 0;
+          clog(`syncArmorToEquipment - repeating Armor exists for 'other4':${rowId}`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -2022,19 +2022,19 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       if (other5) {
         if (armorother5_ID.length === 20) {
           // has name && has id = UPDATE ROW
-          newID = armorother5_ID.toLowerCase();
-          output.armorother5_row_id = newID;
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 9;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorother5_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother5.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother5_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother5_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother5_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother5_mod || 0;
+          rowId = armorother5_ID.toLowerCase();
+          output.armorother5_row_id = rowId;
+          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 9;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorother5_worn || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorother5.trim();
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorother5_ac || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorother5_base || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armorother5_magic || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother5_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
-          output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armorother5_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'other5':${newID}`);
+          output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother5_worn === 1 ? 1 : 0;
+          clog(`syncArmorToEquipment - repeating Armor exists for 'other5':${rowId}`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -2080,19 +2080,19 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       if (other6) {
         if (armorother6_ID.length === 20) {
           // has name && has id = UPDATE ROW
-          newID = armorother6_ID.toLowerCase();
-          output.armorother6_row_id = newID;
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 10;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorother6_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother6.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother6_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother6_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother6_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother6_mod || 0;
+          rowId = armorother6_ID.toLowerCase();
+          output.armorother6_row_id = rowId;
+          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 10;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorother6_worn || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorother6.trim();
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorother6_ac || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorother6_base || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armorother6_magic || 0;
+          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother6_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
-          output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armorother6_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'other6':${newID}`);
+          output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother6_worn === 1 ? 1 : 0;
+          clog(`syncArmorToEquipment - repeating Armor exists for 'other6':${rowId}`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
