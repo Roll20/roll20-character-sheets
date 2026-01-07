@@ -4005,7 +4005,7 @@ on('change:toggle_to_hit_table', async (eventInfo) => {
   await setAttrsAsync(output, {silent: true});
 });
 
-on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_whisper_to_hit_select', async (eventInfo) => {
+on('change:repeating_weapon:weapon_whisper_to_hit_select', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const v = await getAttrsAsync(['toggle_to_hit_table', `repeating_weapon_${id}_weapon_whisper_to_hit_select`, `repeating_weapon_${id}_weapon_whisper_to_hit`]);
   const output = getToHitRowUpdate(v, id);

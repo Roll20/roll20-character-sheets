@@ -3964,7 +3964,6 @@ on(
 );
 
 // Matrix or THAC0 Toggle for repeating_weapon
-// Helper to generate the key-value pairs for a specific row
 const getToHitRowUpdate = (v, id) => {
   const output = {};
   const flag = +v.toggle_to_hit_table || 0;
@@ -3993,30 +3992,24 @@ const getToHitRowUpdate = (v, id) => {
   return output;
 };
 
-// GLOBAL TOGGLE EVENT
 on('change:toggle_to_hit_table', async (eventInfo) => {
   const idArray = await getSectionIDsAsync('weapon');
   const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_whisper_to_hit_select`, `repeating_weapon_${id}_weapon_whisper_to_hit`]);
-
   const v = await getAttrsAsync(['toggle_to_hit_table', ...fields]);
-  let finalUpdate = {};
-
+  let output = {};
   // Collect all updates into one object
   idArray.forEach((id) => {
     const rowUpdate = getToHitRowUpdate(v, id);
-    Object.assign(finalUpdate, rowUpdate);
+    Object.assign(output, rowUpdate);
   });
-
-  await setAttrsAsync(finalUpdate, {silent: true});
+  await setAttrsAsync(output, {silent: true});
 });
 
-// SINGLE ROW EVENT
-on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_whisper_to_hit_select', async (eventInfo) => {
+on('change:repeating_weapon:weapon_whisper_to_hit_select', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const v = await getAttrsAsync(['toggle_to_hit_table', `repeating_weapon_${id}_weapon_whisper_to_hit_select`, `repeating_weapon_${id}_weapon_whisper_to_hit`]);
-
-  const finalUpdate = getToHitRowUpdate(v, id);
-  await setAttrsAsync(finalUpdate, {silent: true});
+  const output = getToHitRowUpdate(v, id);
+  await setAttrsAsync(output, {silent: true});
 });
 
 // Weapon Proficiency Toggle
