@@ -167,7 +167,7 @@ const generateUniqueRowID = () => {
 
 // Validate character name for illegal characters
 on('change:character_name', async (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const v = await getAttrsAsync(['character_name']);
   const output = {};
   const attr = v[`${eventInfo.sourceAttribute}`];
@@ -183,7 +183,7 @@ on('change:character_name', async (eventInfo) => {
 on(
   'change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:repeating_equipment:equipment_armor_mod change:repeating_equipment:equipment_armor_magic, change:hitpoints_1_class, change:hitpoints_2_class, change:hitpoints_3_class',
   async (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
     const v = await getAttrsAsync([
       'armortype_magic',
@@ -2764,7 +2764,7 @@ on('change:abilities_info_show change:toggle_exceptional change:strength', (even
 // PC or NPC sheet role
 on('change:is_npc', async (eventInfo) => {
   const v = await getAttrsAsync(['is_npc', 'toggle_npc']);
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const output = {};
   const isNPC = +v.is_npc || 0;
   let toggleNPC = +v.toggle_npc || 0;
@@ -2794,7 +2794,7 @@ const sumEquipmentCost = async () => {
 
 // Equipment Cost Calcs
 on('change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_cost remove:repeating_equipment', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   sumEquipmentCost();
 });
 
@@ -2970,7 +2970,7 @@ const setCurrentMovement = async () => {
 
 on('change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', async (eventInfo) => {
   // clog('Current Base Movement has been re-calculated');
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const v = await getAttrsAsync(['movement']);
   const output = {};
   const recalc = 0;
@@ -3038,7 +3038,7 @@ const setCurrentBulk = async () => {
 on(
   'change:unarmored_bulk change:armortype_bulk change:armortype2_bulk change:armorshield_bulk change:armorhelmet_bulk change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorshield_carried remove:repeating_equipment',
   (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
     setCurrentBulk();
   },
 );
@@ -3072,7 +3072,7 @@ on(
 
 // Equipment Tabs hide/show Rows
 on('change:equipment_tabs_type change:equipment_tabs_carry', async (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const idArray = await getSectionIDsAsync('equipment');
   const output = {};
   const fields = idArray.flatMap((id) => [
@@ -3663,7 +3663,7 @@ const testArmorRowIDs = async (id) => {
   const armorDetailsArray = await generateArmorDetailsArray();
   let isMatch = '';
   isMatch = armorDetailsArray.includes(id) ? 1 : 0;
-  clog(`testArmorRowIDs - isMatch?: ${isMatch} for id:${id}\n ${!isMatch ? 'No match found in armorDetailsArray' : 'Match found in armorDetailsArray:'}`);
+  clog(`testArmorRowIDs - id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
   return {
     isMatch: isMatch,
     armorDetailsArray: armorDetailsArray,
@@ -3764,7 +3764,7 @@ on('clicked:addturnundead2', (eventInfo) => {
 
 // Spell Tabs and Memorized toggle
 on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs change:toggle_caster2', async (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const idArray = await getSectionIDsAsync('spells');
   const output = {};
   const fields = idArray.flatMap((id) => [
@@ -3939,7 +3939,7 @@ on('change:repeating_spells:spell_name', async (eventInfo) => {
   const output = {};
   const levelTab = +v.spell_tabs || 0;
   const thisSpellLevel = v[concatRepAttrName('spells', id, 'spell_level')]; // can be '?'
-  // console.log(`Change detected: [Setting Spell Level based on Spell Tab] SpellTab:${levelTab} ThisSpellLvl:${thisSpellLevel}`);
+  // console.log(`Δ detected: [Setting Spell Level based on Spell Tab] SpellTab:${levelTab} ThisSpellLvl:${thisSpellLevel}`);
   // test if Spell Tab is set to 'All' or if this Spell's Lvl has already been set
   if (levelTab === -1 || thisSpellLevel != '?') return;
   output[concatRepAttrName('spells', id, 'spell_level')] = levelTab;
@@ -3950,7 +3950,7 @@ on('change:repeating_spells:spell_name', async (eventInfo) => {
 on(
   'change:repeating_weapon:weapon_tohitacadj_flag change:repeating_weapon:weapon_thac_adj0 change:repeating_weapon:weapon_thac_adj1 change:repeating_weapon:weapon_thac_adj2 change:repeating_weapon:weapon_thac_adj3 change:repeating_weapon:weapon_thac_adj4 change:repeating_weapon:weapon_thac_adj5 change:repeating_weapon:weapon_thac_adj6 change:repeating_weapon:weapon_thac_adj7 change:repeating_weapon:weapon_thac_adj8 change:repeating_weapon:weapon_thac_adj9 change:repeating_weapon:weapon_thac_adj10',
   async (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
     const v = await getAttrsAsync([concatRepAttrName('weapon', id, 'weapon_ToHitACadj_flag'), concatRepAttrName('weapon', id, 'weapon_ToHitACadj')]);
     const output = {};
@@ -4014,7 +4014,7 @@ on('change:repeating_weapon:weapon_whisper_to_hit_select', async (eventInfo) => 
 
 // Weapon Proficiency Toggle
 on('change:weapon_proficiency_initial change:weapon_proficiency_added_per_level change:weapon_proficiency_penalty', async (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const idArray = await getSectionIDsAsync('weapon');
   const output = {};
   const fields = idArray.flatMap((id) => [concatRepAttrName('weapon', id, 'weapon_prof_flag')]);
@@ -4030,7 +4030,7 @@ on('change:weapon_proficiency_initial change:weapon_proficiency_added_per_level 
 });
 
 on('change:repeating_weapon:weapon_prof_flag', async (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
   const v = await getAttrsAsync(['weapon_proficiency_penalty', concatRepAttrName('weapon', id, 'weapon_prof_flag')]);
@@ -4044,7 +4044,7 @@ on('change:repeating_weapon:weapon_prof_flag', async (eventInfo) => {
 
 // Weapon Backstab Toggle
 on('change:backstab change:backstab_bonus change:toggle_thief_skills', async (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const idArray = await getSectionIDsAsync('weapon');
   const output = {};
   const fields = idArray.flatMap((id) => [concatRepAttrName('weapon', id, 'weapon_backstab_flag')]);
@@ -4071,7 +4071,7 @@ on('change:backstab change:backstab_bonus change:toggle_thief_skills', async (ev
 });
 
 on('change:repeating_weapon:weapon_backstab_flag', async (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
   const v = await getAttrsAsync(['backstab', 'backstab_bonus', 'toggle_thief_skills', concatRepAttrName('weapon', id, 'weapon_backstab_flag')]);
@@ -4132,7 +4132,7 @@ const syncDualPen = async () => {
 
 // Weapon Dual-Wield Calc Penalty
 on('change:dual_pen_primary change:dual_pen_secondary change:dexterity', async (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const v = await getAttrsAsync(['dexterity']);
   // clog('Weapon Attack Type has been re-calculated');
   const output = {};
@@ -4222,14 +4222,14 @@ const calcRange = async (id) => {
 };
 
 on('change:repeating_weapon:weapon_range change:repeating_weapon:weapon_attack_type', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   calcRange(id);
 });
 
 // set flag for css to show/hide fields according to weapon type
 on('change:repeating_weapon:weapon_attack_type', async (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   const v = await getAttrsAsync([concatRepAttrName('weapon', id, 'weapon_attack_type'), concatRepAttrName('weapon', id, 'weapon_attack_type_flag')]);
   const output = {};
@@ -4265,7 +4265,7 @@ const calcHP = async () => {
 };
 
 on('change:sync_hp_flag change:hitpoints change:hitpoints_max change:hitpoints_1_class change:hitpoints_2_class change:hitpoints_3_class', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   calcHP();
 });
 
@@ -4288,7 +4288,7 @@ const calcAC = async (recalc) => {
   const autoCalcAcFlag = +v.autocalc_ac || 0;
   if (autoCalcAcFlag + recalc === 0) return;
   // RecalcAC button overrides sync checkbox = continue
-  // Or sync is on and an armor change detected = continue
+  // Or sync is on and an armor Δ detected = continue
   const output = {};
   const armorClass = +v.armorclass || 0;
   const syncAcFlag = +v.sync_ac_flag || 0;
@@ -4549,7 +4549,7 @@ const damageMacro = async (id, passedAutoDamage) => {
 on(
   'change:repeating_weapon:weapon_name change:repeating_weapon:weapon_damagesmallmedium change:repeating_weapon:weapon_damagelarge change:repeating_weapon:weapon_critdamagesmallmedium change:repeating_weapon:weapon_critdamagelarge change:repeating_weapon:weapon_attackdmgbonus change:repeating_weapon:weapon_critdamage_flag',
   async (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
     const output = await damageMacro(id);
     await setAttrsAsync(output, {silent: true});
@@ -4681,7 +4681,7 @@ const repeatingNWPAll = [...repeatingNWPNumber, ...repeatingNWPString];
 
 const setWeapons = async (id) => {
   const fields = repeatingWeaponAll.map((field) => concatRepAttrName('weapon', id, field));
-  // console.log(`setWeapons - Change detected: id: ${id}`);
+  // console.log(`setWeapons - Δ detected: id: ${id}`);
   const v = await getAttrsAsync(fields);
   const output = repeatingWeaponAll.reduce((accumulator, field) => {
     const fullAttrName = concatRepAttrName('weapon', id, field);
@@ -4748,7 +4748,7 @@ const setNWP = async (id) => {
 
 // Set repeating attr values for new rows. Makes visible to API
 on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item change:repeating_nonweaponproficiencies:nwp_name', async (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   // if API || sheetworker is creating the row: bail out
   if (eventInfo.sourceType !== 'player') return;
 
@@ -4809,7 +4809,7 @@ on(
     const match = eventTrigger.match(/clicked:(\w+)/);
     // Check if there is a match and extract the captured word
     const clickedWord = match ? match[1] : null;
-    // clog(`Change Detected:${JSON.stringify(eventInfo)}`);
+    // clog(`Δ detected:${JSON.stringify(eventInfo)}`);
     clog(`reset macros detected: ${clickedWord}`);
     const output = {};
     if (clickedWord === 'resetallmacros') {
@@ -5112,47 +5112,47 @@ const thiefmisc2Calc = async () => {
 };
 
 on('change:pickpockets_base change:pickpockets_racial_mod change:pickpockets_ability_mod change:pickpockets_magic', (eventInfo) => {
-  clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  clog(`Δ detected:${eventInfo.sourceAttribute}`);
   pickpocketsCalc();
 });
 on('change:openlocks_base change:openlocks_racial_mod change:openlocks_ability_mod change:openlocks_magic', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   openlocksCalc();
 });
 on('change:findtraps_base change:findtraps_racial_mod change:findtraps_ability_mod change:findtraps_magic', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   findtrapsCalc();
 });
 on('change:movequietly_base change:movequietly_racial_mod change:movequietly_ability_mod change:movequietly_magic', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   movequietlyCalc();
 });
 on('change:hideinshadows_base change:hideinshadows_racial_mod change:hideinshadows_ability_mod change:hideinshadows_magic', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   hideinshadowsCalc();
 });
 on('change:hearnoise_base change:hearnoise_racial_mod change:hearnoise_ability_mod change:hearnoise_magic', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   hearnoiseCalc();
 });
 on('change:climbwalls_base change:climbwalls_racial_mod change:climbwalls_ability_mod change:climbwalls_magic', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   climbwallsCalc();
 });
 on('change:readlanguages_base change:readlanguages_racial_mod change:readlanguages_ability_mod change:readlanguages_magic', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   readlanguagesCalc();
 });
 on('change:thiefmisc_base change:thiefmisc_racial_mod change:thiefmisc_ability_mod change:thiefmisc_magic', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   thiefmiscCalc();
 });
 on('change:thiefmisc1_base change:thiefmisc1_racial_mod change:thiefmisc1_ability_mod change:thiefmisc1_magic', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   thiefmisc1Calc();
 });
 on('change:thiefmisc2_base change:thiefmisc2_racial_mod change:thiefmisc2_ability_mod change:thiefmisc2_magic', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   thiefmisc2Calc();
 });
 
@@ -5430,45 +5430,45 @@ const savemisc2Calc = async () => {
 on(
   'change:saveparalysispoisondeath_base change:saveparalysispoisondeath_racial_mod change:saveparalysispoisondeath_ability_mod change:saveparalysispoisondeath_misc_mod change:saveparalysispoisondeath_temp_mod',
   (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
     saveparalysispoisondeathCalc();
   },
 );
 on(
   'change:savepetrificationpolymorph_base change:savepetrificationpolymorph_racial_mod change:savepetrificationpolymorph_ability_mod change:savepetrificationpolymorph_misc_mod change:savepetrificationpolymorph_temp_mod',
   (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
     savepetrificationpolymorphCalc();
   },
 );
 on(
   'change:saverodsstaveswands_base change:saverodsstaveswands_racial_mod change:saverodsstaveswands_ability_mod change:saverodsstaveswands_misc_mod change:saverodsstaveswands_temp_mod',
   (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
     saverodsstaveswandsCalc();
   },
 );
 on(
   'change:savebreathweapons_base change:savebreathweapons_racial_mod change:savebreathweapons_ability_mod change:savebreathweapons_misc_mod change:savebreathweapons_temp_mod',
   (eventInfo) => {
-    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
     savebreathweaponsCalc();
   },
 );
 on('change:savespells_base change:savespells_racial_mod change:savespells_ability_mod change:savespells_misc_mod change:savespells_temp_mod', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   savespellsCalc();
 });
 on('change:savemisc_base change:savemisc_racial_mod change:savemisc_ability_mod change:savemisc_misc_mod change:savemisc_temp_mod', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   savemiscCalc();
 });
 on('change:savemisc1_base change:savemisc1_racial_mod change:savemisc1_ability_mod change:savemisc1_misc_mod change:savemisc1_temp_mod', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   savemisc1Calc();
 });
 on('change:savemisc2_base change:savemisc2_racial_mod change:savemisc2_ability_mod change:savemisc2_misc_mod change:savemisc2_temp_mod', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   savemisc2Calc();
 });
 
@@ -5628,7 +5628,7 @@ const calcThac0 = async () => {
 on(
   'change:matrix_class change:matrix_level change:matrix_hitdice change:autofill_matrix change:sync_matrix_class change:toggle_fighter5 change:class_selected change:class change:secondclass change:thirdclass change:level change:level_2 change:level_3',
   async (eventInfo) => {
-    // clog(`Matrix Autofill Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Matrix Autofill Δ detected:${eventInfo.sourceAttribute}`);
     const v = await getAttrsAsync([
       'matrix_class',
       'matrix_level',
@@ -7465,37 +7465,37 @@ on('change:race change:autofill_thief_race change:thief_race_selected', async (e
 
 // Strength Calculations
 on('change:strength change:exceptionalstrength', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   strengthCalcs();
 });
 
 // Intelligence Calculations
 on('change:intelligence change:race', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   intelligenceCalcs();
 });
 
 // Wisdom Calculations
 on('change:wisdom', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   wisdomCalcs();
 });
 
 // Dexterity Calculations
 on('change:dexterity', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   dexterityCalcs();
 });
 
 // Constitution Calculations
 on('change:constitution change:class change:secondclass change:thirdclass', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   constitutionCalcs();
 });
 
 // Charisma Calculations
 on('change:charisma change:comeliness', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   charismaCalcs();
 });
 
@@ -7529,7 +7529,7 @@ const portraitUrlCalc = async () => {
 };
 
 on('change:character_avatar change:sheet_image change:sheet_image_url', (eventInfo) => {
-  // clog(`change detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   portraitUrlCalc();
 });
 
@@ -7625,7 +7625,7 @@ const getSectionIDsOrderedAsync = async (sectionName) => {
 // sort repeating rows
 on('clicked:spell-sort-alphabetical clicked:spell-sort-level', async (eventInfo) => {
   const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
-  // clog(`Change detected: Sorting Spells ${buttonClicked}`);
+  // clog(`Δ detected: Sorting Spells ${buttonClicked}`);
   const v = await getAttrsAsync(['spells_sheet_busy']);
   // Exit if already sorting
   if (+v.spells_sheet_busy === 1) return;
@@ -7706,7 +7706,7 @@ on('clicked:spell-sort-alphabetical clicked:spell-sort-level', async (eventInfo)
 });
 
 on('clicked:spell-sort-undo', async (eventInfo) => {
-  // clog(`Change detected: Undo last Sort`);
+  // clog(`Δ detected: Undo last Sort`);
   const v = await getAttrsAsync(['spells_sheet_busy']);
   // Exit if already sorting
   if (+v.spells_sheet_busy === 1) return;
@@ -7746,7 +7746,7 @@ on('clicked:spell-sort-undo', async (eventInfo) => {
 
 on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', async (eventInfo) => {
   const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
-  // clog(`Change detected: Sorting Equipment ${buttonClicked}`);
+  // clog(`Δ detected: Sorting Equipment ${buttonClicked}`);
   const v = await getAttrsAsync(['equipment_sheet_busy']);
   // Exit if already sorting
   if (+v.equipment_sheet_busy === 1) return;
@@ -7816,7 +7816,7 @@ on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', async 
 });
 
 on('clicked:equipment-sort-undo', async (eventInfo) => {
-  // clog(`Change detected: Undo last Sort`);
+  // clog(`Δ detected: Undo last Sort`);
   const v = await getAttrsAsync(['equipment_sheet_busy']);
   // Exit if already sorting
   if (+v.equipment_sheet_busy === 1) return;
