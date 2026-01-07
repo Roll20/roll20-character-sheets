@@ -1346,7 +1346,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
   let id_low = id;
   id_low = id_low !== null ? id.toLowerCase() : id_low;
   clog(`syncArmorToEquipment - id_low:${id_low} ${id_low === null ? `Sync '${attr}' from Armor Details` : 'Sync from repeating_equipment'}\n null means Δ came from Armor Details`);
-  clog(`syncArmorToEquipment - row_removed?:${row_removed} = ${row_removed ? 'Row removed' : 'Row not removed'}`);
+  clog(`syncArmorToEquipment - row_removed?:${row_removed} ${row_removed ? 'Row removed' : 'Row not removed'}`);
   const unarmored0_ID = v.unarmored_row_id.toString();
   const armortype1_ID = v.armortype1_row_id.toString();
   const armortype2_ID = v.armortype2_row_id.toString();
@@ -1442,7 +1442,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           }
           output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.unarmored_weight || 0;
           output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.unarmored_cost || 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'armor1':${rowId}`);
+          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'armor1'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1522,7 +1522,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           }
           output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.armor_weight || 0;
           output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.armor_cost || 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'armor1':${rowId}`);
+          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'armor1'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1594,7 +1594,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           }
           output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.armortype2_weight || 0;
           output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.armortype2_cost || 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'armor2':${rowId}`);
+          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'armor2'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1667,7 +1667,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           }
           output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.armorshield_weight || 0;
           output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.armorshield_cost || 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'shield':${rowId}`);
+          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'shield'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1740,7 +1740,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           }
           output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.armorhelmet_weight || 0;
           output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.armorhelmet_cost || 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'helmet':${rowId}`);
+          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'helmet'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1803,7 +1803,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
           output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'other1':${rowId}`);
+          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other1'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1918,7 +1918,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother3_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
           output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother3_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'other3':${rowId}`);
+          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other3'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1976,7 +1976,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother4_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
           output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother4_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'other4':${rowId}`);
+          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other4'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -2034,7 +2034,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother5_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
           output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother5_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'other5':${rowId}`);
+          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other5'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -2092,7 +2092,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother6_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
           output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother6_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - repeating Armor exists for 'other6':${rowId}`);
+          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other6'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -3674,7 +3674,7 @@ const armorDetailsRowidArray = async (id) => {
   const output = {};
   const {isMatch, armorDetailsArray} = await testArmorRowIDs(id);
   output.armordetails_array = [`${armorDetailsArray}`];
-  clog(`armorDetailsRowidArray - isMatch:${isMatch} id:${id}`);
+  clog(`armorDetailsRowidArray - id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
 
   await setAttrsAsync(output, {silent: true});
   // const armorDetailsArray = await generateArmorDetailsArray();
@@ -3718,7 +3718,7 @@ on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_ar
   const output = {};
   const synced = +v[concatRepAttrName('equipment', id, 'equipment_sync_armor_flag')] || 0;
   const type = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')] || 0;
-  clog(`${trigger} - id:${id} type:${type} synced:${synced}`);
+  clog(`${trigger} - id:${id} type:${type} already synced?:${synced === 1 ? 'yes' : 'no'}`);
   if (trigger === 'addarmor' && type !== 99) {
     await fillArmorDetails(id);
     await removeEmptyArmorRows();
