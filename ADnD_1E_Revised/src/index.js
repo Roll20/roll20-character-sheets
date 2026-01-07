@@ -3997,10 +3997,9 @@ on('change:toggle_to_hit_table', async (eventInfo) => {
   const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_whisper_to_hit_select`, `repeating_weapon_${id}_weapon_whisper_to_hit`]);
   const v = await getAttrsAsync(['toggle_to_hit_table', ...fields]);
   let output = {};
-  // Collect all updates into one object
   idArray.forEach((id) => {
     const rowUpdate = getToHitRowUpdate(v, id);
-    Object.assign(output, rowUpdate);
+    output = {...output, ...rowUpdate};
   });
   await setAttrsAsync(output, {silent: true});
 });
@@ -4586,7 +4585,6 @@ const repeatingWeaponNumber = [
   'weapon_attack_type_flag',
   'weapon_critdamage_flag',
   'weapon_prof_pen',
-  'weapon_tohitacadj',
   'weapon_whisper_to_hit_select',
   'weapon_dual_pen',
   'weapon_backstab_var',
@@ -4621,6 +4619,7 @@ const repeatingWeaponNumber = [
 const repeatingWeaponString = [
   'weapon_range_error',
   'weapon_dual',
+  'weapon_tohitacadj',
   'weapon_whisper_to_hit',
   'weapon_length',
   'weapon_space',
@@ -4695,7 +4694,7 @@ const setWeapons = async (id) => {
     return accumulator;
   }, {});
   await setAttrsAsync(output, {silent: true});
-  // clog(`setWeapons - default values have been set.`);
+  clog(`setWeapons - default values have been set.`);
 };
 
 const setEquipment = async (id) => {
