@@ -1,3 +1,7 @@
+# 2026-01-08
+
+- Fix for creatures max PP
+
 # 2026-01-06
 
 First update of 2026.
