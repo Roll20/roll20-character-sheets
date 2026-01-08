@@ -2617,7 +2617,7 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
           <option value="13">Leviathan</option>
         </select>
         <select class='fancyselect' name='attr_type'>
-        <option value='lb'>Bow, Long</option><option value='cr'>Crush</option><option value='bx'>Battle Axe</option><option value='gr'>Grapple</option><option value='bi'>Bite</option><option value='ls'>Long Sword</option><option value='td'>Thrown Dagger</option><option value='any'>Arming Sword</option><option value='we'>Arming Sword</option><option value='cl'>Claw</option><option value='sh'>Shield Bash</option><option value='handcrossbow'>Hand Crossbow</option><option value='rt'>Thrown Rock</option><option value='tx'>Two Handed Axe</option><option value='tr'>Trample</option><option value='sc'>Scimitar</option><option value='un'>Unarmed Strike</option><option value='px'>Pole Axe</option><option value='wm'>War Mattock</option><option value='hf'>Heavy Flail</option><option value='sp'>Spear</option><option value='rp'>Rapier</option><option value='wi'>Whip</option><option value='wbo'>Water Bolt</option><option value='tw'>War Hammer</option><option value='sl'>Sling</option><option value='ts'>Two Handed Sword</option><option value='lbo'>Ligtning Bolt</option><option value='cu'>Club</option><option value='bs'>Broadsword</option><option value='tp'>Thrown Spear</option><option value='sb'>Bow, Short</option><option value='lba'>Lightning Ball</option><option value='ta'>Thrown Hand Axe</option><option value='ho'>Horn</option><option value='tc'>Two Handed Club</option><option value='bo'>Bola</option><option value='ma'>Mace</option><option value='fba'>Fire ball</option><option value='cba'>Cold Ball</option><option value='ss'>Short Sword</option><option value='si'>Stinger</option><option value='ja'>Javelin</option><option value='sw'>Sweep</option><option value='qs'>Quarterstaff</option><option value='ro'>Thrown Rock</option><option value='fa'>Falchion</option><option value='be'>Beak</option><option value='da'>Dagger</option><option value='as'>Arming Sword</option><option value='rw'>Arming Sword</option><option value='all'>Arming Sword</option><option value='ebo'>Earth Ball</option><option value='fbo'>Fire Bolt</option><option value='hx'>Hand Axe</option><option value='hc'>Heavy Crossbow</option><option value='ibo'>Ice bolt</option><option value='lc'>Light Crossbow</option><option value='ra'>Ram</option>
+        <option value='sl'>Sling</option><option value='sh'>Shield Bash</option><option value='un'>Unarmed Strike</option><option value='sp'>Spear</option><option value='tc'>Two Handed Club</option><option value='sc'>Scimitar</option><option value='rp'>Rapier</option><option value='ra'>Ram</option><option value='cba'>Cold Ball</option><option value='fba'>Fire ball</option><option value='ta'>Thrown Hand Axe</option><option value='all'>Arming Sword</option><option value='ma'>Mace</option><option value='any'>Arming Sword</option><option value='px'>Pole Axe</option><option value='ja'>Javelin</option><option value='ls'>Long Sword</option><option value='bi'>Bite</option><option value='we'>Arming Sword</option><option value='fa'>Falchion</option><option value='be'>Beak</option><option value='bo'>Bola</option><option value='handcrossbow'>Hand Crossbow</option><option value='cu'>Club</option><option value='hc'>Heavy Crossbow</option><option value='da'>Dagger</option><option value='bs'>Broadsword</option><option value='tr'>Trample</option><option value='bx'>Battle Axe</option><option value='si'>Stinger</option><option value='tx'>Two Handed Axe</option><option value='wi'>Whip</option><option value='wbo'>Water Bolt</option><option value='wm'>War Mattock</option><option value='tw'>War Hammer</option><option value='qs'>Quarterstaff</option><option value='fbo'>Fire Bolt</option><option value='ebo'>Earth Ball</option><option value='hx'>Hand Axe</option><option value='tp'>Thrown Spear</option><option value='ts'>Two Handed Sword</option><option value='ibo'>Ice bolt</option><option value='td'>Thrown Dagger</option><option value='rw'>Arming Sword</option><option value='cl'>Claw</option><option value='lc'>Light Crossbow</option><option value='ss'>Short Sword</option><option value='lba'>Lightning Ball</option><option value='sb'>Bow, Short</option><option value='gr'>Grapple</option><option value='lb'>Bow, Long</option><option value='ro'>Thrown Rock</option><option value='rt'>Thrown Rock</option><option value='cr'>Crush</option><option value='as'>Arming Sword</option><option value='ho'>Horn</option><option value='lbo'>Ligtning Bolt</option><option value='hf'>Heavy Flail</option><option value='sw'>Sweep</option>
         </select>
           
 
@@ -6683,7 +6683,8 @@ bleed and penalties you need side and  location.  A Z ends the list.<p>
 
 <h3>Tokens</h3>
 
-<p>Active Token ID: <input type="text" name="attr_activetokenid"></p>
+<p>Active Token ID: <input type="text" name="attr_activetokenid"> | 
+Target Character ID: <input type="text" name="attr_target_characterid"></p>
 
 <hr>
 
@@ -6792,7 +6793,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 364e0ef9e236f9ed783f229bb8140825d1180c02
+Revision c87c395f3b03746b0e9462fe1b395a3196849103
 
 
 <hr>
@@ -16844,7 +16845,31 @@ function sizeFromNumeric(value) {
 	attacks.getTargetData('target'); // Special keyword
     });
 
-    onCheck('clicked:rmuattacktargetrefresh', (ev) => {
+    onCheck('clicked:rmuattacktargetrefresh', (_) => {
+	getAttrs(["target_characterid"], (ev) => {
+	    console.log(ev);
+	    const myid = setActiveCharacterId(ev.target_characterid);
+	    console.log(myid);
+	
+	    getAttrs(["name", "db", "size", "name", "at_head", "at_torso", "at_arms", "at_legs"],
+		    (remote) => {
+		console.log("remote", remote);
+		let atstr = ev.athead;
+		if (remote.at_head != remote.at_torso ||
+			remote.at_head != remote.at_arms ||
+			remote.at_head != remote.at_legs) {
+		    atstr = `${remote.attorso},${remote.athead},${remote.atarms},${remote.atlegs}`
+		}
+
+	    	let attrs = {target_at: atstr,
+			target_name: remote.name,
+			target_db: remote.db};
+
+	    });
+	    setActiveCharacterId(myid);
+	});
+
+/*
 	getAttrs(["target_name"], (e) => {
 		console.log(e);
 		if (e.target_name && e.target_name.length > 0) {
@@ -16852,8 +16877,41 @@ function sizeFromNumeric(value) {
 		} else {
 		    console.log("Can't refresh when no target selected");
 		}
-	});
+	});*/
     });
+
+	function setActiveCharacterId(id) {
+		const ocid = getActiveCharacterId();
+		const data = {
+			id: '0',
+			type: 'setActiveCharacter',
+			data: id,
+		};
+		if (self.dispatchEvent) {
+			const event = new CustomEvent('message');
+			event.data = data;
+			self.dispatchEvent(event);
+		}
+		else {
+			self.onmessage({ data });
+		}
+		return ocid;
+	}
+	function getAttrsAsync(props) {
+		const acid = getActiveCharacterId();
+		let ocid = null;
+		return new Promise((resolve, reject) => {
+			ocid = setActiveCharacterId(acid);
+			try {
+				getAttrs(props, (values) => resolve(values));
+			}
+			catch {
+				reject();
+			}
+		}).finally(() => {
+			setActiveCharacterId(ocid);
+		});
+	}
 
     onCheck('clicked:rmuattacktargetdelete', (ev) => {
 	    console.log("Target delete");
@@ -16869,7 +16927,8 @@ function sizeFromNumeric(value) {
 	
 	const roll_string = "@{whispertype} &{template:rmuattacktarget} [[1d20]]  " +
 	    "{\{who=@{character_name}}} " +
-	    `{\{targettokenid=[[0[@${whom}|token_id}] ]]}} ` +
+	    `{\{targettokenid=[[0[@{${whom}|token_id}] ]]}} ` +
+	    `{\{targetcharacterid=[[0[@{${whom}|character_id}] ]]}} ` +
 	    `{\{targetname=[[0[@{${whom}|character_name}] ]]}} ` +
 	    `{\{targetsize=[[0[@{${whom}|size}] ]]}} ` +
 	    `{\{targetathead=[[0[@{${whom}|at_head}] ]]}} ` +
@@ -16894,6 +16953,7 @@ function sizeFromNumeric(value) {
 		const block = attacks.getDataFromRoll(roll.results.targetdb.expression);
 		const critred = parseIntDefault(
 			attacks.getDataFromRoll(roll.results.targetcritred.expression, 0));
+		const charid = attacks.getDataFromRoll(roll.results.targetcharacterid.expression);
 		let atstr = athead
 		if (athead != attorso || athead != atarms || athead != atlegs) {
 		    atstr = `${attorso},${athead},${atarms},${atlegs}`
@@ -16903,12 +16963,14 @@ function sizeFromNumeric(value) {
 			target_db: db,
 			target_size: sizeToNumeric(tsize),
 			target_crit: critred,
-			target_tokenid: target_tokenid};
+			target_tokenid: target_tokenid,
+			target_characterid: charid};
 		if (prefix != "") {
 		    attrs = Object.keys(attrs).reduce((a, c) => 
 			    (a[`${prefix}${c}`] = attrs[c], a), {});
 
 		}
+		console.log("fetched", attrs);
 		setAttrs(attrs);
 		finishRoll(roll.rollId, { targetname: tname })
 	});
@@ -17765,16 +17827,18 @@ function roundString(phases) {
 /***/
 function actionsUpdateStatus() {
   getAttrs(["character_name", "statusstagger", "statusstun75", "statusstun50", "statusstun25",
+            "grapplestatus",
 	    "statuslist", "statuspenalty"], (status) => {
-	console.log(status);
 	let updates = {}
 
 	let statusstagger = parseIntDefault(status.statusstagger, 0);
 	let statusstun75 = parseIntDefault(status.statusstun75, 0);
 	let statusstun50 = parseIntDefault(status.statusstun50, 0);
 	let statusstun25 = parseIntDefault(status.statusstun25, 0);
+	let grapplestatus = parseIntDefault(status.grapplestatus, 0);
 
 	updates.statuseffect = 0;  // Default
+
 	updates.statusmessage = 'Okay';
 	let statuspenalty = parseIntDefault(status.statuspenalty, 0);
 	updates.allpenalties = statuspenalty;
@@ -17795,6 +17859,15 @@ function actionsUpdateStatus() {
 	  updates.statusmessage = 'Stun -25'
 	  updates.allpenalties = updates.statuseffect + statuspenalty;
 	}
+
+        if (grapplestatus > 0) {
+          updates.allpenalties -= grapplestatus;
+          if (updates.statusmessage === "Okay") {
+            updates.statusmessage = `Grappled ${grapplestatus}%`;
+          } else {
+            updates.statusmessage += `; Grappled ${grapplestatus}%`;
+          } 
+        }
 
 	updates.statuspercent = Math.max(100 + updates.allpenalties, 0);
 	updates.statuspercent200 = Math.max(200 + updates.allpenalties, 0);
@@ -18109,7 +18182,7 @@ onCheck("change:bodydevelopment_bonus change:hits change:powerdevelopment_bonus 
 
 function updateHPPP(_) {
     getAttrs(['bodydevelopment_bonus', 'hp', 'pp', 'powerdevelopment_bonus', 'hits',
-	  'hp_misc', 'pp_multiplier'], (ev) => {
+	  'hp_misc', 'pp_multiplier', 'sheettype'], (ev) => {
 	let update = {}
 	let hplog = "Hit Points\n"
 	let hp = 0;
@@ -18129,19 +18202,21 @@ function updateHPPP(_) {
 	update.hp_max = hp;
 	update.hp_info = hplog;
 
-	let pp = ev.powerdevelopment_bonus;
-	if (pp < 0) {
-	  pp = 0;
-	}
-	if (ev.pp_multiplier) {
-	  let mul = Number.parseFloat(ev.pp_multiplier);
-	  if (!Number.isNaN(mul) && mul > 0) {
-	    // So it's valid
-	    pp = Math.floor(mul * pp);
+	if (ev.sheettype != 'playersheet') {
+	  let pp = ev.powerdevelopment_bonus;
+	  if (pp < 0) {
+	    pp = 0;
 	  }
-	}
+	  if (ev.pp_multiplier) {
+	    let mul = Number.parseFloat(ev.pp_multiplier);
+	    if (!Number.isNaN(mul) && mul > 0) {
+	      // So it's valid
+	      pp = Math.floor(mul * pp);
+	    }
+	  }
 
-	update.pp_max = pp
+	  update.pp_max = pp
+	}
 	setAttrs(update, { silent:true });
     });
 }
