@@ -1395,7 +1395,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
   const other4 = v.armorother4.trim();
   const other5 = v.armorother5.trim();
   const other6 = v.armorother6.trim();
-  // if syncArmorToEquipment is triggered from Armor Details, ie (id === null)
+  // if syncArmorToEquipment is triggered from Armor Details, ie (id === null),
   // assign the appropriate id according to it's Armor Details row
   const indexMap = {
     unarmoredAttrs: 0,
@@ -2593,9 +2593,9 @@ const updateSyncArmorFlag = async (current_version, final_version) => {
   const fieldsToGet = idArray.map((id) => concatRepAttrName('equipment', id, 'equipment_armor_type'));
   const v = await getAttrsAsync([...armorRowIDs, ...fieldsToGet]);
   const output = {};
-  // bail out if no rows
+  // if no rows, exit.
   if (idArray.length === 0) {
-    // Set the sheet version and exit
+    // Set the sheet version and exit.
     output.sheet_version = current_version;
     clog(`VERSION UPDATE: updateSyncArmorFlag completed (No rows to check)`);
     await setAttrsAsync(output, {silent: true});
@@ -3109,10 +3109,13 @@ const removeEmptyArmorRows = async () => {
   clog(`removeEmptyArmorRows - armorDetailsArray:`);
   console.log(armorDetailsArray);
   _.each(idArray, (id) => {
-    // this id is the trigger
+    // this new id/row
     const type = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')] || 0;
     // Armor Type not selected
-    if (type === 99) return;
+    if (type === 99) {
+      return;
+      clog(`removeEmptyArmorRows - Armor Type:${type} Exit`);
+    }
     clog(`removeEmptyArmorRows - Armor Type:${type}`);
     // Find Armor Details row position where the id matches in armorDetailsArray
     const matchingIndices = armorDetailsArray
@@ -3126,7 +3129,7 @@ const removeEmptyArmorRows = async () => {
         return null;
       })
       .filter((index) => index !== null);
-    // Do stuff only when there are 1 or more matches
+    // detect and remove the old id/row matches
     if (matchingIndices.length > 1) {
       rowType = type + 1; // Align Armor Type with the Actual Armor Details row
       clog(`removeEmptyArmorRows - matchingIndices: [${matchingIndices}] id:${id} type:${rowType}`);
@@ -3816,7 +3819,7 @@ on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs chan
 
 // Spell Tabs level change sync
 on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_class', async (eventInfo) => {
-  // if API || sheetworker is creating the row: bail out
+  // if API || sheetworker is creating the row: exit
   if (eventInfo.sourceType !== 'player') return;
 
   const id = eventInfo.sourceAttribute.split('_')[2];
@@ -3876,7 +3879,7 @@ on('change:caster_class1_name change:caster_class2_name change:caster_class1_lev
 // Set Caster Class and level for THIS Spell based on Caster Tab
 on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_class', async (eventInfo) => {
   // console.log(`sourceType:${eventInfo.sourceType}`);
-  // if API || sheetworker is creating the row: bail out
+  // if API || sheetworker is creating the row: exit
   if (eventInfo.sourceType !== 'player') return;
 
   const id = eventInfo.sourceAttribute.split('_')[2];
@@ -3932,7 +3935,7 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
 // Set Spell's Level for new spells based selected Spell level Tab
 on('change:repeating_spells:spell_name', async (eventInfo) => {
   // console.log(`sourceType:${eventInfo.sourceType}`);
-  // if API || sheetworker is creating the row: bail out
+  // if API || sheetworker is creating the row: exit
   if (eventInfo.sourceType !== 'player') return;
 
   const id = eventInfo.sourceAttribute.split('_')[2];
@@ -4749,7 +4752,7 @@ const setNWP = async (id) => {
 // Set repeating attr values for new rows. Makes visible to API
 on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item change:repeating_nonweaponproficiencies:nwp_name', async (eventInfo) => {
   // clog(`Δ detected:${eventInfo.sourceAttribute}`);
-  // if API || sheetworker is creating the row: bail out
+  // if API || sheetworker is creating the row: exit
   if (eventInfo.sourceType !== 'player') return;
 
   // test for a new row name (ie no existing value)
@@ -5596,7 +5599,7 @@ const matchClassName = async (name) => {
 const calcThac0 = async () => {
   const v = await getAttrsAsync(['thac00', 'autofill_matrix']);
   const autocalcFill = +v.autofill_matrix || 0;
-  // bail out if auto-fill is not enabled.
+  // if auto-fill is not enabled, exit.
   if (!autocalcFill) return;
 
   const output = {};
@@ -5645,7 +5648,7 @@ on(
       'level_3',
     ]);
     const autocalcFill = +v.autofill_matrix || 0;
-    // bail out if auto-fill is not enabled.
+    // if auto-fill is not enabled, exit.
     if (!autocalcFill) return;
 
     const output = {};
@@ -6675,7 +6678,7 @@ on(
 on('sheet:opened change:thac0 change:thac00 change:autofill_matrix', async (eventInfo) => {
   const v = await getAttrsAsync(['attack_matrix_flag', 'matrix_class', 'thac0', 'thac1', 'thac2', 'thac00', 'thac01', 'thac02', 'autofill_matrix']);
   const autocalcFill = +v.autofill_matrix || 0;
-  // bail out if auto-fill is not enabled.
+  // if auto-fill is not enabled, exit.
   if (!autocalcFill) return;
 
   const output = {};
@@ -7558,7 +7561,7 @@ on('change:psionic_ability_strength_max change:psionic_attack change:psionic_def
 const weaponInUse = async () => {
   const idArray = await getSectionIDsAsync('weapon');
   const output = {};
-  // bail out if no rows
+  // if no rows, exit.
   if (idArray.length === 0) {
     output.weapon_in_use = '';
     output.weapon_in_use_speed = '';
@@ -7717,7 +7720,7 @@ on('clicked:spell-sort-undo', async (eventInfo) => {
     const sectionName = 'spells';
     const [v, currentIDs] = await Promise.all([getAttrsAsync(['spells_previous_order_array']), getSectionIDsAsync(sectionName)]);
     const savedOrderStr = v.spells_previous_order_array || '';
-    // exit if no 'Undo'
+    // no 'Undo', bait out.
     if (!savedOrderStr) {
       // clog('No undo history found.');
     } else {
@@ -7827,7 +7830,7 @@ on('clicked:equipment-sort-undo', async (eventInfo) => {
     const sectionName = 'equipment';
     const [v, currentIDs] = await Promise.all([getAttrsAsync(['equipment_previous_order_array']), getSectionIDsAsync(sectionName)]);
     const savedOrderStr = v.equipment_previous_order_array || '';
-    // exit if no 'Undo'
+    // no 'Undo', exit.
     if (!savedOrderStr) {
       // clog('No undo history found.');
     } else {
