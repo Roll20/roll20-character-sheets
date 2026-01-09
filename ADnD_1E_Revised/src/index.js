@@ -203,8 +203,8 @@ on(
       'armorother4_mod',
       'armorother5_mod',
       'armorother6_mod',
-      concatRepAttrName('equipment', id, 'equipment_armor_magic'),
-      concatRepAttrName('equipment', id, 'equipment_armor_mod'),
+      `repeating_equipment_${id}_equipment_armor_magic`,
+      `repeating_equipment_${id}_equipment_armor_mod`,
       'hitpoints_1_class',
       'hitpoints_2_class',
       'hitpoints_3_class',
@@ -359,16 +359,16 @@ const dmgSwap = (current_version, final_version) => {
   // copy DmgBonus value to AttackDmgBonus
   // replace all instances of @{DmgBonus} with @{AttackDmgBonus} in macro-text
   getSectionIDs('repeating_weapon', (idArray) => {
-    const fields = idArray.flatMap((id) => [concatRepAttrName('weapon', id, 'DmgBonus'), concatRepAttrName('weapon', id, 'macro-text')]);
+    const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_DmgBonus`, `repeating_weapon_${id}_macro-text`]);
     getAttrs([...fields], (v) => {
       const output = {};
       const macrodefault =
         '&{template:attacks} {{name=@{character_name}}} {{subtag=@{WeaponName}}} {{attack1=[[1d20 + @{ToHitBonus}[BON] + @{MagicBonus}[MAG] + ?{To Hit Modifier?|0}[MOD] ]]}} {{damage1vsSM=[[@{DamageSmallMedium} + @{DmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{DamageLarge} + @{DmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{WeaponNotes}}} @{whisper_to-hit}';
       _.each(idArray, (id) => {
-        const macrotext = v[concatRepAttrName('weapon', id, 'macro-text')] || macrodefault;
+        const macrotext = v[`repeating_weapon_${id}_macro-text`] || macrodefault;
         // replaces old attribute value with new
-        output[concatRepAttrName('weapon', id, 'macro-text')] = macrotext.replace(/@{DmgBonus}/g, '@{AttackDmgBonus}');
-        output[concatRepAttrName('weapon', id, 'AttackDmgBonus')] = +v[concatRepAttrName('weapon', id, 'DmgBonus')] || 0;
+        output[`repeating_weapon_${id}_macro-text`] = macrotext.replace(/@{DmgBonus}/g, '@{AttackDmgBonus}');
+        output[`repeating_weapon_${id}_AttackDmgBonus`] = +v[`repeating_weapon_${id}_DmgBonus`] || 0;
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: dmgSwap completed`);
@@ -382,12 +382,12 @@ const dmgSwap = (current_version, final_version) => {
 // fixes attribute name conflict
 const maxSwap = (current_version, final_version) => {
   getSectionIDs('repeating_ability', (idArray) => {
-    const fields = idArray.map((id) => [concatRepAttrName('ability', id, 'max')]);
+    const fields = idArray.map((id) => [`repeating_ability_${id}_max`]);
     getAttrs([...fields], (v) => {
       const output = {};
       _.each(idArray, (id) => {
         // replaces old attribute value with new
-        output[concatRepAttrName('ability', id, 'current_max')] = +v[concatRepAttrName('ability', id, 'max')] || 0;
+        output[`repeating_ability_${id}_current_max`] = +v[`repeating_ability_${id}_max`] || 0;
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: maxSwap completed`);
@@ -402,7 +402,7 @@ const maxSwap = (current_version, final_version) => {
 const nwpMacroUpdate = (current_version, final_version) => {
   const output = {};
   getSectionIDs('repeating_nonweaponproficiencies', (idArray) => {
-    const fields = idArray.map((id) => [concatRepAttrName('nonweaponproficiencies', id, 'macro-text')]);
+    const fields = idArray.map((id) => [`repeating_nonweaponproficiencies_${id}_macro-text`]);
     getAttrs([...fields], (v) => {
       const replacements = {
         nwp_old:
@@ -411,11 +411,8 @@ const nwpMacroUpdate = (current_version, final_version) => {
           '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{Proficiency Check=[[ 1d20 + [[@{rmodifier}]][MOD] + [[?{Additional modifier?|0}]][MOD] ]] vs [[ @{rAttribute}[ATTR] ]]}}{{freetext=@{short_description}}}',
       };
       _.each(idArray, (id) => {
-        if (v[concatRepAttrName('nonweaponproficiencies', id, 'macro-text')]) {
-          output[concatRepAttrName('nonweaponproficiencies', id, 'macro-text')] = v[concatRepAttrName('nonweaponproficiencies', id, 'macro-text')].replace(
-            replacements.nwp_old,
-            replacements.nwp_new,
-          );
+        if (v[`repeating_nonweaponproficiencies_${id}_macro-text`]) {
+          output[`repeating_nonweaponproficiencies_${id}_macro-text`] = v[`repeating_nonweaponproficiencies_${id}_macro-text`].replace(replacements.nwp_old, replacements.nwp_new);
         }
       });
       output.sheet_version = current_version;
@@ -430,22 +427,22 @@ const nwpMacroUpdate = (current_version, final_version) => {
 const weaponNameFix = (current_version, final_version) => {
   getSectionIDs('repeating_weapon', (idArray) => {
     const fields = idArray.flatMap((id) => [
-      concatRepAttrName('weapon', id, 'roll'),
-      concatRepAttrName('weapon', id, 'weaponname'),
-      concatRepAttrName('weapon', id, 'tohitbonus'),
-      concatRepAttrName('weapon', id, 'magicbonus'),
-      concatRepAttrName('weapon', id, 'attackdmgbonus'),
-      concatRepAttrName('weapon', id, 'whisper_to-hit'),
-      concatRepAttrName('weapon', id, 'macro-text'),
-      concatRepAttrName('weapon', id, 'damagesmallmedium'),
-      concatRepAttrName('weapon', id, 'damagelarge'),
-      concatRepAttrName('weapon', id, 'rateoffire'),
-      concatRepAttrName('weapon', id, 'range'),
-      concatRepAttrName('weapon', id, 'quantity'),
-      concatRepAttrName('weapon', id, 'weight'),
-      concatRepAttrName('weapon', id, 'weaponspeed'),
-      concatRepAttrName('weapon', id, 'cost'),
-      concatRepAttrName('weapon', id, 'weaponnotes'),
+      `repeating_weapon_${id}_roll`,
+      `repeating_weapon_${id}_weaponname`,
+      `repeating_weapon_${id}_tohitbonus`,
+      `repeating_weapon_${id}_magicbonus`,
+      `repeating_weapon_${id}_attackdmgbonus`,
+      `repeating_weapon_${id}_whisper_to-hit`,
+      `repeating_weapon_${id}_macro-text`,
+      `repeating_weapon_${id}_damagesmallmedium`,
+      `repeating_weapon_${id}_damagelarge`,
+      `repeating_weapon_${id}_rateoffire`,
+      `repeating_weapon_${id}_range`,
+      `repeating_weapon_${id}_quantity`,
+      `repeating_weapon_${id}_weight`,
+      `repeating_weapon_${id}_weaponspeed`,
+      `repeating_weapon_${id}_cost`,
+      `repeating_weapon_${id}_weaponnotes`,
     ]);
     getAttrs([...fields], (v) => {
       const output = {};
@@ -469,33 +466,23 @@ const weaponNameFix = (current_version, final_version) => {
       const oldMacrotext =
         '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{WeaponName}}} {{attack1=[[1d20 + @{ToHitBonus}[BON] + @{MagicBonus}[MAG] + ?{To Hit Modifier?|0}[MOD]) ]]}} {{damage1vsSM=[[@{DamageSmallMedium} + @{AttackDmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{DamageLarge} + @{AttackDmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{WeaponNotes}}} @{whisper_to-hit}';
       _.each(idArray, (id) => {
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'rateoffire')]))
-          output[concatRepAttrName('weapon', id, 'weapon_rateoffire')] = int(v[concatRepAttrName('weapon', id, 'rateoffire')]);
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'roll')])) output[concatRepAttrName('weapon', id, 'weapon_roll')] = v[concatRepAttrName('weapon', id, 'roll')];
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'weaponname')])) output[concatRepAttrName('weapon', id, 'weapon_name')] = v[concatRepAttrName('weapon', id, 'weaponname')];
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'tohitbonus')]))
-          output[concatRepAttrName('weapon', id, 'weapon_tohitbonus')] = int(v[concatRepAttrName('weapon', id, 'tohitbonus')]);
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'magicbonus')]))
-          output[concatRepAttrName('weapon', id, 'weapon_magicbonus')] = int(v[concatRepAttrName('weapon', id, 'magicbonus')]);
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'attackdmgbonus')]))
-          output[concatRepAttrName('weapon', id, 'weapon_attackdmgbonus')] = int(v[concatRepAttrName('weapon', id, 'attackdmgbonus')]);
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'whisper_to-hit')]))
-          output[concatRepAttrName('weapon', id, 'weapon_whisper_to_hit')] = v[concatRepAttrName('weapon', id, 'whisper_to-hit')];
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'macro-text')], oldMacrotext))
-          output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = replaceSet(v[concatRepAttrName('weapon', id, 'macro-text')], namesToFix);
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'damagesmallmedium')]))
-          output[concatRepAttrName('weapon', id, 'weapon_damagesmallmedium')] = v[concatRepAttrName('weapon', id, 'damagesmallmedium')];
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'damagelarge')]))
-          output[concatRepAttrName('weapon', id, 'weapon_damagelarge')] = v[concatRepAttrName('weapon', id, 'damagelarge')];
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'range')])) output[concatRepAttrName('weapon', id, 'weapon_range')] = v[concatRepAttrName('weapon', id, 'range')];
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'quantity')]))
-          output[concatRepAttrName('weapon', id, 'weapon_quantity')] = float(v[concatRepAttrName('weapon', id, 'quantity')]);
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'weight')])) output[concatRepAttrName('weapon', id, 'weapon_weight')] = float(v[concatRepAttrName('weapon', id, 'weight')]);
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'weaponspeed')]))
-          output[concatRepAttrName('weapon', id, 'weapon_speed')] = int(v[concatRepAttrName('weapon', id, 'weaponspeed')]);
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'cost')])) output[concatRepAttrName('weapon', id, 'weapon_cost')] = float(v[concatRepAttrName('weapon', id, 'cost')]);
-        if (doUpdate(v[concatRepAttrName('weapon', id, 'weaponnotes')]))
-          output[concatRepAttrName('weapon', id, 'weapon_notes')] = v[concatRepAttrName('weapon', id, 'weaponnotes')];
+        if (doUpdate(v[`repeating_weapon_${id}_rateoffire`])) output[`repeating_weapon_${id}_weapon_rateoffire`] = int(v[`repeating_weapon_${id}_rateoffire`]);
+        if (doUpdate(v[`repeating_weapon_${id}_roll`])) output[`repeating_weapon_${id}_weapon_roll`] = v[`repeating_weapon_${id}_roll`];
+        if (doUpdate(v[`repeating_weapon_${id}_weaponname`])) output[`repeating_weapon_${id}_weapon_name`] = v[`repeating_weapon_${id}_weaponname`];
+        if (doUpdate(v[`repeating_weapon_${id}_tohitbonus`])) output[`repeating_weapon_${id}_weapon_tohitbonus`] = int(v[`repeating_weapon_${id}_tohitbonus`]);
+        if (doUpdate(v[`repeating_weapon_${id}_magicbonus`])) output[`repeating_weapon_${id}_weapon_magicbonus`] = int(v[`repeating_weapon_${id}_magicbonus`]);
+        if (doUpdate(v[`repeating_weapon_${id}_attackdmgbonus`])) output[`repeating_weapon_${id}_weapon_attackdmgbonus`] = int(v[`repeating_weapon_${id}_attackdmgbonus`]);
+        if (doUpdate(v[`repeating_weapon_${id}_whisper_to-hit`])) output[`repeating_weapon_${id}_weapon_whisper_to_hit`] = v[`repeating_weapon_${id}_whisper_to-hit`];
+        if (doUpdate(v[`repeating_weapon_${id}_macro-text`], oldMacrotext))
+          output[`repeating_weapon_${id}_weapon_macro_text`] = replaceSet(v[`repeating_weapon_${id}_macro-text`], namesToFix);
+        if (doUpdate(v[`repeating_weapon_${id}_damagesmallmedium`])) output[`repeating_weapon_${id}_weapon_damagesmallmedium`] = v[`repeating_weapon_${id}_damagesmallmedium`];
+        if (doUpdate(v[`repeating_weapon_${id}_damagelarge`])) output[`repeating_weapon_${id}_weapon_damagelarge`] = v[`repeating_weapon_${id}_damagelarge`];
+        if (doUpdate(v[`repeating_weapon_${id}_range`])) output[`repeating_weapon_${id}_weapon_range`] = v[`repeating_weapon_${id}_range`];
+        if (doUpdate(v[`repeating_weapon_${id}_quantity`])) output[`repeating_weapon_${id}_weapon_quantity`] = float(v[`repeating_weapon_${id}_quantity`]);
+        if (doUpdate(v[`repeating_weapon_${id}_weight`])) output[`repeating_weapon_${id}_weapon_weight`] = float(v[`repeating_weapon_${id}_weight`]);
+        if (doUpdate(v[`repeating_weapon_${id}_weaponspeed`])) output[`repeating_weapon_${id}_weapon_speed`] = int(v[`repeating_weapon_${id}_weaponspeed`]);
+        if (doUpdate(v[`repeating_weapon_${id}_cost`])) output[`repeating_weapon_${id}_weapon_cost`] = float(v[`repeating_weapon_${id}_cost`]);
+        if (doUpdate(v[`repeating_weapon_${id}_weaponnotes`])) output[`repeating_weapon_${id}_weapon_notes`] = v[`repeating_weapon_${id}_weaponnotes`];
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: weaponNameFix completed`);
@@ -509,20 +496,20 @@ const weaponNameFix = (current_version, final_version) => {
 const spellNameFix = (current_version, final_version) => {
   getSectionIDs('repeating_spells', (idArray) => {
     const fields = idArray.flatMap((id) => [
-      concatRepAttrName('spells', id, 'roll'),
-      concatRepAttrName('spells', id, 'memorized'),
-      concatRepAttrName('spells', id, 'level'),
-      concatRepAttrName('spells', id, 'name'),
-      concatRepAttrName('spells', id, 'school'),
-      concatRepAttrName('spells', id, 'range'),
-      concatRepAttrName('spells', id, 'duration'),
-      concatRepAttrName('spells', id, 'aoe'),
-      concatRepAttrName('spells', id, 'components'),
-      concatRepAttrName('spells', id, 'ct'),
-      concatRepAttrName('spells', id, 'save'),
-      concatRepAttrName('spells', id, 'macro-text'),
-      concatRepAttrName('spells', id, 'description'),
-      concatRepAttrName('spells', id, 'description-show'),
+      `repeating_spells_${id}_roll`,
+      `repeating_spells_${id}_memorized`,
+      `repeating_spells_${id}_level`,
+      `repeating_spells_${id}_name`,
+      `repeating_spells_${id}_school`,
+      `repeating_spells_${id}_range`,
+      `repeating_spells_${id}_duration`,
+      `repeating_spells_${id}_aoe`,
+      `repeating_spells_${id}_components`,
+      `repeating_spells_${id}_ct`,
+      `repeating_spells_${id}_save`,
+      `repeating_spells_${id}_macro-text`,
+      `repeating_spells_${id}_description`,
+      `repeating_spells_${id}_description-show`,
     ]);
     getAttrs([...fields], (v) => {
       const output = {};
@@ -543,25 +530,21 @@ const spellNameFix = (current_version, final_version) => {
       const oldMacrotext =
         '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{name}}} {{Level:=@{level}}} {{Range:=@{range}}} {{Duration:=@{duration}}} {{AOE:=@{aoe}}} {{Comp:=@{components}}} {{CT:=@{ct}}} {{Save:=@{save}}} {{freetext=@{description}}}';
       _.each(idArray, (id) => {
-        if (doUpdate(v[concatRepAttrName('spells', id, 'roll')])) output[concatRepAttrName('spells', id, 'spell_roll')] = v[concatRepAttrName('spells', id, 'roll')];
-        if (doUpdate(v[concatRepAttrName('spells', id, 'memorized')]))
-          output[concatRepAttrName('spells', id, 'spell_memorized')] = int(v[concatRepAttrName('spells', id, 'memorized')]);
-        if (doUpdate(v[concatRepAttrName('spells', id, 'level')])) output[concatRepAttrName('spells', id, 'spell_level')] = v[concatRepAttrName('spells', id, 'level')];
-        if (doUpdate(v[concatRepAttrName('spells', id, 'name')])) output[concatRepAttrName('spells', id, 'spell_name')] = v[concatRepAttrName('spells', id, 'name')];
-        if (doUpdate(v[concatRepAttrName('spells', id, 'school')])) output[concatRepAttrName('spells', id, 'spell_school')] = v[concatRepAttrName('spells', id, 'school')];
-        if (doUpdate(v[concatRepAttrName('spells', id, 'range')])) output[concatRepAttrName('spells', id, 'spell_range')] = v[concatRepAttrName('spells', id, 'range')];
-        if (doUpdate(v[concatRepAttrName('spells', id, 'duration')])) output[concatRepAttrName('spells', id, 'spell_duration')] = v[concatRepAttrName('spells', id, 'duration')];
-        if (doUpdate(v[concatRepAttrName('spells', id, 'aoe')])) output[concatRepAttrName('spells', id, 'spell_aoe')] = v[concatRepAttrName('spells', id, 'aoe')];
-        if (doUpdate(v[concatRepAttrName('spells', id, 'components')]))
-          output[concatRepAttrName('spells', id, 'spell_components')] = v[concatRepAttrName('spells', id, 'components')];
-        if (doUpdate(v[concatRepAttrName('spells', id, 'ct')])) output[concatRepAttrName('spells', id, 'spell_ct')] = v[concatRepAttrName('spells', id, 'ct')];
-        if (doUpdate(v[concatRepAttrName('spells', id, 'save')])) output[concatRepAttrName('spells', id, 'spell_save')] = v[concatRepAttrName('spells', id, 'save')];
-        if (doUpdate(v[concatRepAttrName('spells', id, 'macro-text')], oldMacrotext))
-          output[concatRepAttrName('spells', id, 'spell_macro_text')] = replaceSet(v[concatRepAttrName('spells', id, 'macro-text')], namesToFix);
-        if (doUpdate(v[concatRepAttrName('spells', id, 'description')]))
-          output[concatRepAttrName('spells', id, 'spell_description')] = v[concatRepAttrName('spells', id, 'description')];
-        if (doUpdate(v[concatRepAttrName('spells', id, 'description-show')]))
-          output[concatRepAttrName('spells', id, 'spell_description_show')] = int(v[concatRepAttrName('spells', id, 'description-show')]);
+        if (doUpdate(v[`repeating_spells_${id}_roll`])) output[`repeating_spells_${id}_spell_roll`] = v[`repeating_spells_${id}_roll`];
+        if (doUpdate(v[`repeating_spells_${id}_memorized`])) output[`repeating_spells_${id}_spell_memorized`] = int(v[`repeating_spells_${id}_memorized`]);
+        if (doUpdate(v[`repeating_spells_${id}_level`])) output[`repeating_spells_${id}_spell_level`] = v[`repeating_spells_${id}_level`];
+        if (doUpdate(v[`repeating_spells_${id}_name`])) output[`repeating_spells_${id}_spell_name`] = v[`repeating_spells_${id}_name`];
+        if (doUpdate(v[`repeating_spells_${id}_school`])) output[`repeating_spells_${id}_spell_school`] = v[`repeating_spells_${id}_school`];
+        if (doUpdate(v[`repeating_spells_${id}_range`])) output[`repeating_spells_${id}_spell_range`] = v[`repeating_spells_${id}_range`];
+        if (doUpdate(v[`repeating_spells_${id}_duration`])) output[`repeating_spells_${id}_spell_duration`] = v[`repeating_spells_${id}_duration`];
+        if (doUpdate(v[`repeating_spells_${id}_aoe`])) output[`repeating_spells_${id}_spell_aoe`] = v[`repeating_spells_${id}_aoe`];
+        if (doUpdate(v[`repeating_spells_${id}_components`])) output[`repeating_spells_${id}_spell_components`] = v[`repeating_spells_${id}_components`];
+        if (doUpdate(v[`repeating_spells_${id}_ct`])) output[`repeating_spells_${id}_spell_ct`] = v[`repeating_spells_${id}_ct`];
+        if (doUpdate(v[`repeating_spells_${id}_save`])) output[`repeating_spells_${id}_spell_save`] = v[`repeating_spells_${id}_save`];
+        if (doUpdate(v[`repeating_spells_${id}_macro-text`], oldMacrotext))
+          output[`repeating_spells_${id}_spell_macro_text`] = replaceSet(v[`repeating_spells_${id}_macro-text`], namesToFix);
+        if (doUpdate(v[`repeating_spells_${id}_description`])) output[`repeating_spells_${id}_spell_description`] = v[`repeating_spells_${id}_description`];
+        if (doUpdate(v[`repeating_spells_${id}_description-show`])) output[`repeating_spells_${id}_spell_description_show`] = int(v[`repeating_spells_${id}_description-show`]);
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: spellNameFix completed`);
@@ -575,33 +558,26 @@ const spellNameFix = (current_version, final_version) => {
 const equipmentNameFix = (current_version, final_version) => {
   getSectionIDs('repeating_equipment', (idArray) => {
     const fields = idArray.flatMap((id) => [
-      concatRepAttrName('equipment', id, 'item-show'),
-      concatRepAttrName('equipment', id, 'item'),
-      concatRepAttrName('equipment', id, 'location'),
-      concatRepAttrName('equipment', id, 'carried'),
-      concatRepAttrName('equipment', id, 'quantity'),
-      concatRepAttrName('equipment', id, 'quantity_max'),
-      concatRepAttrName('equipment', id, 'weight'),
-      concatRepAttrName('equipment', id, 'cos'),
+      `repeating_equipment_${id}_item-show`,
+      `repeating_equipment_${id}_item`,
+      `repeating_equipment_${id}_location`,
+      `repeating_equipment_${id}_carried`,
+      `repeating_equipment_${id}_quantity`,
+      `repeating_equipment_${id}_quantity_max`,
+      `repeating_equipment_${id}_weight`,
+      `repeating_equipment_${id}_cos`,
     ]);
     getAttrs([...fields], (v) => {
       const output = {};
       _.each(idArray, (id) => {
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'item-show')]))
-          output[concatRepAttrName('equipment', id, 'equipment_item_show')] = v[concatRepAttrName('equipment', id, 'item-show')];
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'item')])) output[concatRepAttrName('equipment', id, 'equipment_item')] = v[concatRepAttrName('equipment', id, 'item')];
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'location')]))
-          output[concatRepAttrName('equipment', id, 'equipment_location')] = v[concatRepAttrName('equipment', id, 'location')];
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'carried')]))
-          output[concatRepAttrName('equipment', id, 'equipment_carried')] = v[concatRepAttrName('equipment', id, 'carried')];
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'quantity')]))
-          output[concatRepAttrName('equipment', id, 'equipment_quantity')] = float(v[concatRepAttrName('equipment', id, 'quantity')]);
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'quantity_max')]))
-          output[concatRepAttrName('equipment', id, 'equipment_quantity_max')] = float(v[concatRepAttrName('equipment', id, 'quantity_max')]);
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'weight')]))
-          output[concatRepAttrName('equipment', id, 'equipment_weight')] = float(v[concatRepAttrName('equipment', id, 'weight')]);
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'cost')]))
-          output[concatRepAttrName('equipment', id, 'equipment_cost')] = float(v[concatRepAttrName('equipment', id, 'cost')]);
+        if (doUpdate(v[`repeating_equipment_${id}_item-show`])) output[`repeating_equipment_${id}_equipment_item_show`] = v[`repeating_equipment_${id}_item-show`];
+        if (doUpdate(v[`repeating_equipment_${id}_item`])) output[`repeating_equipment_${id}_equipment_item`] = v[`repeating_equipment_${id}_item`];
+        if (doUpdate(v[`repeating_equipment_${id}_location`])) output[`repeating_equipment_${id}_equipment_location`] = v[`repeating_equipment_${id}_location`];
+        if (doUpdate(v[`repeating_equipment_${id}_carried`])) output[`repeating_equipment_${id}_equipment_carried`] = v[`repeating_equipment_${id}_carried`];
+        if (doUpdate(v[`repeating_equipment_${id}_quantity`])) output[`repeating_equipment_${id}_equipment_quantity`] = float(v[`repeating_equipment_${id}_quantity`]);
+        if (doUpdate(v[`repeating_equipment_${id}_quantity_max`])) output[`repeating_equipment_${id}_equipment_quantity_max`] = float(v[`repeating_equipment_${id}_quantity_max`]);
+        if (doUpdate(v[`repeating_equipment_${id}_weight`])) output[`repeating_equipment_${id}_equipment_weight`] = float(v[`repeating_equipment_${id}_weight`]);
+        if (doUpdate(v[`repeating_equipment_${id}_cost`])) output[`repeating_equipment_${id}_equipment_cost`] = float(v[`repeating_equipment_${id}_cost`]);
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: equipmentNameFix completed`);
@@ -615,14 +591,14 @@ const equipmentNameFix = (current_version, final_version) => {
 const abilityNameFix = (current_version, final_version) => {
   getSectionIDs('repeating_ability', (idArray) => {
     const fields = idArray.flatMap((id) => [
-      concatRepAttrName('equipment', id, 'roll'),
-      concatRepAttrName('equipment', id, 'name'),
-      concatRepAttrName('equipment', id, 'short_description'),
-      concatRepAttrName('equipment', id, 'current'),
-      concatRepAttrName('equipment', id, 'current_max'),
-      concatRepAttrName('equipment', id, 'macro-text'),
-      concatRepAttrName('equipment', id, 'description'),
-      concatRepAttrName('equipment', id, 'description-show'),
+      `repeating_equipment_${id}_roll`,
+      `repeating_equipment_${id}_name`,
+      `repeating_equipment_${id}_short_description`,
+      `repeating_equipment_${id}_current`,
+      `repeating_equipment_${id}_current_max`,
+      `repeating_equipment_${id}_macro-text`,
+      `repeating_equipment_${id}_description`,
+      `repeating_equipment_${id}_description-show`,
     ]);
     getAttrs([...fields], (v) => {
       const output = {};
@@ -637,20 +613,17 @@ const abilityNameFix = (current_version, final_version) => {
       const oldMacrotext =
         '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{name}}} {{freetext=@{short_description} @{description}}}';
       _.each(idArray, (id) => {
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'roll')])) output[concatRepAttrName('equipment', id, 'ability_roll')] = v[concatRepAttrName('equipment', id, 'roll')];
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'name')])) output[concatRepAttrName('equipment', id, 'ability_name')] = v[concatRepAttrName('equipment', id, 'name')];
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'short_description')]))
-          output[concatRepAttrName('equipment', id, 'ability_short_description')] = v[concatRepAttrName('equipment', id, 'short_description')];
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'current')]))
-          output[concatRepAttrName('equipment', id, 'ability_current')] = int(v[concatRepAttrName('equipment', id, 'current')]);
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'current_max')]))
-          output[concatRepAttrName('equipment', id, 'ability_current_max')] = int(v[concatRepAttrName('equipment', id, 'current_max')]);
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'macro-text')], oldMacrotext))
-          output[concatRepAttrName('equipment', id, 'ability_macro_text')] = replaceSet(v[concatRepAttrName('equipment', id, 'macro-text')], namesToFix);
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'description')]))
-          output[concatRepAttrName('equipment', id, 'ability_description')] = v[concatRepAttrName('equipment', id, 'description')];
-        if (doUpdate(v[concatRepAttrName('equipment', id, 'description-show')]))
-          output[concatRepAttrName('equipment', id, 'ability_description_show')] = int(v[concatRepAttrName('equipment', id, 'description-show')]);
+        if (doUpdate(v[`repeating_equipment_${id}_roll`])) output[`repeating_equipment_${id}_ability_roll`] = v[`repeating_equipment_${id}_roll`];
+        if (doUpdate(v[`repeating_equipment_${id}_name`])) output[`repeating_equipment_${id}_ability_name`] = v[`repeating_equipment_${id}_name`];
+        if (doUpdate(v[`repeating_equipment_${id}_short_description`]))
+          output[`repeating_equipment_${id}_ability_short_description`] = v[`repeating_equipment_${id}_short_description`];
+        if (doUpdate(v[`repeating_equipment_${id}_current`])) output[`repeating_equipment_${id}_ability_current`] = int(v[`repeating_equipment_${id}_current`]);
+        if (doUpdate(v[`repeating_equipment_${id}_current_max`])) output[`repeating_equipment_${id}_ability_current_max`] = int(v[`repeating_equipment_${id}_current_max`]);
+        if (doUpdate(v[`repeating_equipment_${id}_macro-text`], oldMacrotext))
+          output[`repeating_equipment_${id}_ability_macro_text`] = replaceSet(v[`repeating_equipment_${id}_macro-text`], namesToFix);
+        if (doUpdate(v[`repeating_equipment_${id}_description`])) output[`repeating_equipment_${id}_ability_description`] = v[`repeating_equipment_${id}_description`];
+        if (doUpdate(v[`repeating_equipment_${id}_description-show`]))
+          output[`repeating_equipment_${id}_ability_description_show`] = int(v[`repeating_equipment_${id}_description-show`]);
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: abilityNameFix completed`);
@@ -665,15 +638,15 @@ const abilityNameFix = (current_version, final_version) => {
 const nwpNameFix = (current_version, final_version) => {
   getSectionIDs('repeating_nonweaponproficiencies', (idArray) => {
     const fields = idArray.flatMap((id) => [
-      concatRepAttrName('nonweaponproficiencies', id, 'roll'),
-      concatRepAttrName('nonweaponproficiencies', id, 'name'),
-      concatRepAttrName('nonweaponproficiencies', id, 'rAttribute'),
-      concatRepAttrName('nonweaponproficiencies', id, 'short_description'),
-      concatRepAttrName('nonweaponproficiencies', id, 'rSlots'),
-      concatRepAttrName('nonweaponproficiencies', id, 'rModifier'),
-      concatRepAttrName('nonweaponproficiencies', id, 'macro-text'),
-      concatRepAttrName('nonweaponproficiencies', id, 'description-show'),
-      concatRepAttrName('nonweaponproficiencies', id, 'description'),
+      `repeating_nonweaponproficiencies_${id}_roll`,
+      `repeating_nonweaponproficiencies_${id}_name`,
+      `repeating_nonweaponproficiencies_${id}_rAttribute`,
+      `repeating_nonweaponproficiencies_${id}_short_description`,
+      `repeating_nonweaponproficiencies_${id}_rSlots`,
+      `repeating_nonweaponproficiencies_${id}_rModifier`,
+      `repeating_nonweaponproficiencies_${id}_macro-text`,
+      `repeating_nonweaponproficiencies_${id}_description-show`,
+      `repeating_nonweaponproficiencies_${id}_description`,
     ]);
     getAttrs([...fields], (v) => {
       const output = {};
@@ -689,24 +662,24 @@ const nwpNameFix = (current_version, final_version) => {
       const oldMacrotext =
         '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{Proficiency Check=[[ 1d20 + [[@{rmodifier}]][MOD] + [[?{Additional modifier?|0}]][MOD] ]] vs [[ @{rAttribute}[ATTR] ]]}}{{freetext=@{short_description}}}';
       _.each(idArray, (id) => {
-        if (doUpdate(v[concatRepAttrName('nonweaponproficiencies', id, 'roll')]))
-          output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_roll')] = v[concatRepAttrName('nonweaponproficiencies', id, 'roll')];
-        if (doUpdate(v[concatRepAttrName('nonweaponproficiencies', id, 'name')]))
-          output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_name')] = v[concatRepAttrName('nonweaponproficiencies', id, 'name')];
-        if (doUpdate(v[concatRepAttrName('nonweaponproficiencies', id, 'rAttribute')]))
-          output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_attribute')] = v[concatRepAttrName('nonweaponproficiencies', id, 'rAttribute')].toLowerCase();
-        if (doUpdate(v[concatRepAttrName('nonweaponproficiencies', id, 'short_description')]))
-          output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_short_description')] = v[concatRepAttrName('nonweaponproficiencies', id, 'short_description')];
-        if (doUpdate(v[concatRepAttrName('nonweaponproficiencies', id, 'rSlots')]))
-          output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_slots')] = int(v[concatRepAttrName('nonweaponproficiencies', id, 'rSlots')]);
-        if (doUpdate(v[concatRepAttrName('nonweaponproficiencies', id, 'rModifier')]))
-          output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_modifier')] = int(v[concatRepAttrName('nonweaponproficiencies', id, 'rModifier')]);
-        if (doUpdate(v[concatRepAttrName('nonweaponproficiencies', id, 'macro-text')], oldMacrotext))
-          output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')] = replaceSet(v[concatRepAttrName('nonweaponproficiencies', id, 'macro-text')], namesToFix);
-        if (doUpdate(v[concatRepAttrName('nonweaponproficiencies', id, 'description-show')]))
-          output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_description_show')] = int(v[concatRepAttrName('nonweaponproficiencies', id, 'description-show')]);
-        if (doUpdate(v[concatRepAttrName('nonweaponproficiencies', id, 'description')]))
-          output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_description')] = v[concatRepAttrName('nonweaponproficiencies', id, 'description')];
+        if (doUpdate(v[`repeating_nonweaponproficiencies_${id}_roll`]))
+          output[`repeating_nonweaponproficiencies_${id}_nwp_roll`] = v[`repeating_nonweaponproficiencies_${id}_roll`];
+        if (doUpdate(v[`repeating_nonweaponproficiencies_${id}_name`]))
+          output[`repeating_nonweaponproficiencies_${id}_nwp_name`] = v[`repeating_nonweaponproficiencies_${id}_name`];
+        if (doUpdate(v[`repeating_nonweaponproficiencies_${id}_rAttribute`]))
+          output[`repeating_nonweaponproficiencies_${id}_nwp_attribute`] = v[`repeating_nonweaponproficiencies_${id}_rAttribute`].toLowerCase();
+        if (doUpdate(v[`repeating_nonweaponproficiencies_${id}_short_description`]))
+          output[`repeating_nonweaponproficiencies_${id}_nwp_short_description`] = v[`repeating_nonweaponproficiencies_${id}_short_description`];
+        if (doUpdate(v[`repeating_nonweaponproficiencies_${id}_rSlots`]))
+          output[`repeating_nonweaponproficiencies_${id}_nwp_slots`] = int(v[`repeating_nonweaponproficiencies_${id}_rSlots`]);
+        if (doUpdate(v[`repeating_nonweaponproficiencies_${id}_rModifier`]))
+          output[`repeating_nonweaponproficiencies_${id}_nwp_modifier`] = int(v[`repeating_nonweaponproficiencies_${id}_rModifier`]);
+        if (doUpdate(v[`repeating_nonweaponproficiencies_${id}_macro-text`], oldMacrotext))
+          output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = replaceSet(v[`repeating_nonweaponproficiencies_${id}_macro-text`], namesToFix);
+        if (doUpdate(v[`repeating_nonweaponproficiencies_${id}_description-show`]))
+          output[`repeating_nonweaponproficiencies_${id}_nwp_description_show`] = int(v[`repeating_nonweaponproficiencies_${id}_description-show`]);
+        if (doUpdate(v[`repeating_nonweaponproficiencies_${id}_description`]))
+          output[`repeating_nonweaponproficiencies_${id}_nwp_description`] = v[`repeating_nonweaponproficiencies_${id}_description`];
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: nwpNameFix completed`);
@@ -729,16 +702,16 @@ const macroColorUpdate = (current_version, final_version) => {
           const attrsAbility = [];
           const attrsSpells = [];
           _.each(idnwps, (id) => {
-            attrsNWP.push(concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text'));
+            attrsNWP.push(`repeating_nonweaponproficiencies_${id}_nwp_macro_text`);
           });
           _.each(idweapons, (id) => {
-            attrsWeapon.push(concatRepAttrName('weapon', id, 'weapon_macro_text'));
+            attrsWeapon.push(`repeating_weapon_${id}_weapon_macro_text`);
           });
           _.each(idabilities, (id) => {
-            attrsAbility.push(concatRepAttrName('ability', id, 'ability_macro_text'));
+            attrsAbility.push(`repeating_ability_${id}_ability_macro_text`);
           });
           _.each(idspells, (id) => {
-            attrsSpells.push(concatRepAttrName('spells', id, 'spell_macro_text'));
+            attrsSpells.push(`repeating_spells_${id}_spell_macro_text`);
           });
           getAttrs([...attrsNWP, ...attrsWeapon, ...attrsAbility, ...attrsSpells], (v) => {
             const replacements = {
@@ -752,8 +725,8 @@ const macroColorUpdate = (current_version, final_version) => {
               spl_new: '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}}',
             };
             _.each(idnwps, (id) => {
-              if (v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')]) {
-                output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')] = v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')].replace(
+              if (v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`]) {
+                output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`].replace(
                   replacements.nwp_old,
                   replacements.nwp_new,
                 );
@@ -761,29 +734,20 @@ const macroColorUpdate = (current_version, final_version) => {
               }
             });
             _.each(idweapons, (id) => {
-              if (v[concatRepAttrName('weapon', id, 'weapon_macro_text')]) {
-                output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = v[concatRepAttrName('weapon', id, 'weapon_macro_text')].replace(
-                  replacements.wpn_old,
-                  replacements.wpn_new,
-                );
+              if (v[`repeating_weapon_${id}_weapon_macro_text`]) {
+                output[`repeating_weapon_${id}_weapon_macro_text`] = v[`repeating_weapon_${id}_weapon_macro_text`].replace(replacements.wpn_old, replacements.wpn_new);
                 clog(`VERSION UPDATE: colorUpdate completed`);
               }
             });
             _.each(idabilities, (id) => {
-              if (v[concatRepAttrName('ability', id, 'ability_macro_text')]) {
-                output[concatRepAttrName('ability', id, 'ability_macro_text')] = v[concatRepAttrName('ability', id, 'ability_macro_text')].replace(
-                  replacements.abl_old,
-                  replacements.abl_new,
-                );
+              if (v[`repeating_ability_${id}_ability_macro_text`]) {
+                output[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.abl_old, replacements.abl_new);
                 clog(`VERSION UPDATE: colorUpdate completed`);
               }
             });
             _.each(idspells, (id) => {
-              if (v[concatRepAttrName('spells', id, 'spell_macro_text')]) {
-                output[concatRepAttrName('spells', id, 'spell_macro_text')] = v[concatRepAttrName('spells', id, 'spell_macro_text')].replace(
-                  replacements.spl_old,
-                  replacements.spl_new,
-                );
+              if (v[`repeating_spells_${id}_spell_macro_text`]) {
+                output[`repeating_spells_${id}_spell_macro_text`] = v[`repeating_spells_${id}_spell_macro_text`].replace(replacements.spl_old, replacements.spl_new);
                 clog(`VERSION UPDATE: colorUpdate completed`);
               }
             });
@@ -860,14 +824,14 @@ const autoCalcThiefRows = (current_version, final_version) => {
 const removeWhisper = (current_version, final_version) => {
   // remove all instances of @{weapon_whisper_to_hit} in macro-text
   getSectionIDs('repeating_weapon', (idArray) => {
-    const fields = idArray.map((id) => [concatRepAttrName('weapon', id, 'weapon_macro_text')]);
+    const fields = idArray.map((id) => [`repeating_weapon_${id}_weapon_macro_text`]);
     getAttrs([...fields], (v) => {
       const output = {};
       const macrodefault =
         '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{attack1=[[1d20 + @{weapon_tohitbonus}[BON] + @{weapon_magicbonus}[MAG] + ?{To Hit Modifier?|0}[MOD] ]]}} {{damage1vsSM=[[@{weapon_damagesmallmedium} + @{weapon_attackdmgbonus}[BON] + @{weapon_magicbonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{weapon_damagelarge} + @{weapon_attackdmgbonus}[BON] + @{weapon_magicbonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{weapon_notes}}} @{weapon_whisper_to_hit}';
       _.each(idArray, (id) => {
-        const macrotext = v[concatRepAttrName('weapon', id, 'weapon_macro_text')] || macrodefault;
-        output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = macrotext.replace(/} @{weapon_whisper_to_hit}/g, '}');
+        const macrotext = v[`repeating_weapon_${id}_weapon_macro_text`] || macrodefault;
+        output[`repeating_weapon_${id}_weapon_macro_text`] = macrotext.replace(/} @{weapon_whisper_to_hit}/g, '}');
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: removeWhisper completed`);
@@ -956,7 +920,7 @@ const migrateAC = (current_version, final_version) => {
 // Tests against previous macro-text changes back to v1.58
 const weaponMacroUpdate = (current_version, final_version) => {
   getSectionIDs('repeating_weapon', (idArray) => {
-    const fields = idArray.map((id) => [concatRepAttrName('weapon', id, 'weapon_macro_text')]);
+    const fields = idArray.map((id) => [`repeating_weapon_${id}_weapon_macro_text`]);
     getAttrs([...fields], (v) => {
       const output = {};
       const replacements = {
@@ -976,36 +940,18 @@ const weaponMacroUpdate = (current_version, final_version) => {
           '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{dual=@{weapon_dual}}} {{attack1=[[ 1d20 + ( @{weapon_backstab_bonus}[BACKSTAB] ) + ( @{weapon_tohitbonus}[HIT_BON] ) + ( @{weapon_prof_pen}[PROF_PEN] ) + ( @{weapon_dual_pen}[DUAL_PEN] ) + ( @{weapon_magicbonus}[MAG_BON] ) + ( ?{To Hit Modifier?|0}[MISC_MOD] ) ]]}} {{damagevsSMchatmenu=@{weapon_damagesmallmedium_chat_menu}}} {{damagevsLchatmenu=@{weapon_damagelarge_chat_menu}}} {{critdamagevsSMchatmenu=@{weapon_critdamagesmallmedium_chat_menu}}} {{critdamagevsLchatmenu=@{weapon_critdamagelarge_chat_menu}}} {{WeaponNotes=@{weapon_notes}}} {{backstab=[[ @{weapon_backstab_mult} ]]}} {{damagetype=@{weapon_attackdmgtype}}} {{rate=@{weapon_rateoffire}}} {{range=@{weapon_range}}} {{length=@{weapon_length}}} {{space=@{weapon_space}}} {{speed=@{weapon_speed}}} {{ammo=[[ @{weapon_ammo} ]]/[[ @{weapon_ammo|max} ]]}} {{crit=[[ @{toggle_critdamage} ]]}} @{weapon_tohitacadj}',
       };
       _.each(idArray, (id) => {
-        if (v[concatRepAttrName('weapon', id, 'weapon_macro_text')] === replacements.weapon_old_v6) {
-          output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = v[concatRepAttrName('weapon', id, 'weapon_macro_text')].replace(
-            replacements.weapon_old_v6,
-            replacements.weapon_current,
-          );
-        } else if (v[concatRepAttrName('weapon', id, 'weapon_macro_text')] === replacements.weapon_old_v5) {
-          output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = v[concatRepAttrName('weapon', id, 'weapon_macro_text')].replace(
-            replacements.weapon_old_v5,
-            replacements.weapon_current,
-          );
-        } else if (v[concatRepAttrName('weapon', id, 'weapon_macro_text')] === replacements.weapon_old_v4) {
-          output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = v[concatRepAttrName('weapon', id, 'weapon_macro_text')].replace(
-            replacements.weapon_old_v4,
-            replacements.weapon_current,
-          );
-        } else if (v[concatRepAttrName('weapon', id, 'weapon_macro_text')] === replacements.weapon_old_v3) {
-          output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = v[concatRepAttrName('weapon', id, 'weapon_macro_text')].replace(
-            replacements.weapon_old_v3,
-            replacements.weapon_current,
-          );
-        } else if (v[concatRepAttrName('weapon', id, 'weapon_macro_text')] === replacements.weapon_old_v2) {
-          output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = v[concatRepAttrName('weapon', id, 'weapon_macro_text')].replace(
-            replacements.weapon_old_v2,
-            replacements.weapon_current,
-          );
-        } else if (v[concatRepAttrName('weapon', id, 'weapon_macro_text')] === replacements.weapon_old) {
-          output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = v[concatRepAttrName('weapon', id, 'weapon_macro_text')].replace(
-            replacements.weapon_old,
-            replacements.weapon_current,
-          );
+        if (v[`repeating_weapon_${id}_weapon_macro_text`] === replacements.weapon_old_v6) {
+          output[`repeating_weapon_${id}_weapon_macro_text`] = v[`repeating_weapon_${id}_weapon_macro_text`].replace(replacements.weapon_old_v6, replacements.weapon_current);
+        } else if (v[`repeating_weapon_${id}_weapon_macro_text`] === replacements.weapon_old_v5) {
+          output[`repeating_weapon_${id}_weapon_macro_text`] = v[`repeating_weapon_${id}_weapon_macro_text`].replace(replacements.weapon_old_v5, replacements.weapon_current);
+        } else if (v[`repeating_weapon_${id}_weapon_macro_text`] === replacements.weapon_old_v4) {
+          output[`repeating_weapon_${id}_weapon_macro_text`] = v[`repeating_weapon_${id}_weapon_macro_text`].replace(replacements.weapon_old_v4, replacements.weapon_current);
+        } else if (v[`repeating_weapon_${id}_weapon_macro_text`] === replacements.weapon_old_v3) {
+          output[`repeating_weapon_${id}_weapon_macro_text`] = v[`repeating_weapon_${id}_weapon_macro_text`].replace(replacements.weapon_old_v3, replacements.weapon_current);
+        } else if (v[`repeating_weapon_${id}_weapon_macro_text`] === replacements.weapon_old_v2) {
+          output[`repeating_weapon_${id}_weapon_macro_text`] = v[`repeating_weapon_${id}_weapon_macro_text`].replace(replacements.weapon_old_v2, replacements.weapon_current);
+        } else if (v[`repeating_weapon_${id}_weapon_macro_text`] === replacements.weapon_old) {
+          output[`repeating_weapon_${id}_weapon_macro_text`] = v[`repeating_weapon_${id}_weapon_macro_text`].replace(replacements.weapon_old, replacements.weapon_current);
         }
       });
       output.sheet_version = current_version;
@@ -1020,7 +966,7 @@ const weaponMacroUpdate = (current_version, final_version) => {
 // update Special Ability macro-text ONLY IF they haven't been edited. Tests against v1.58 macro-text
 const abilityMacroUpdate = (current_version, final_version) => {
   getSectionIDs('repeating_ability', (idArray) => {
-    const fields = idArray.map((id) => [concatRepAttrName('ability', id, 'ability_macro_text')]);
+    const fields = idArray.map((id) => [`repeating_ability_${id}_ability_macro_text`]);
     getAttrs([...fields], (v) => {
       const output = {};
       const replacements = {
@@ -1038,35 +984,20 @@ const abilityMacroUpdate = (current_version, final_version) => {
           '&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{ability_name}}} {{roll= [[ 0 + @{ability_die} + @{ability_mod}[MOD] ]]}} {{link=@{ability_link}}} {{freetext=@{ability_short_description} @{ability_description}}} {{uses=@{ability_current}}} {{uses_max=[[ 0 + @{ability_current|max} ]]}} {{effect_type=@{ability_effect_type}}} {{spell_level=@{ability_level}}} {{casting_time=@{ability_ct}}} {{range=@{ability_range}}} {{duration=@{ability_duration}}} {{saving_throw=@{ability_save}}} {{area_of_effect=@{ability_aoe}}} {{save_type=@{ability_save_type}}}',
       };
       _.each(idArray, (id) => {
-        if (v[concatRepAttrName('ability', id, 'ability_macro_text')] === replacements.ability_old_v5) {
-          output[concatRepAttrName('ability', id, 'ability_macro_text')] = v[concatRepAttrName('ability', id, 'ability_macro_text')].replace(
-            replacements.ability_old_v5,
-            replacements.ability_current,
-          );
+        if (v[`repeating_ability_${id}_ability_macro_text`] === replacements.ability_old_v5) {
+          output[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.ability_old_v5, replacements.ability_current);
         }
-        if (v[concatRepAttrName('ability', id, 'ability_macro_text')] === replacements.ability_old_v4) {
-          output[concatRepAttrName('ability', id, 'ability_macro_text')] = v[concatRepAttrName('ability', id, 'ability_macro_text')].replace(
-            replacements.ability_old_v4,
-            replacements.ability_current,
-          );
+        if (v[`repeating_ability_${id}_ability_macro_text`] === replacements.ability_old_v4) {
+          output[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.ability_old_v4, replacements.ability_current);
         }
-        if (v[concatRepAttrName('ability', id, 'ability_macro_text')] === replacements.ability_old_v3) {
-          output[concatRepAttrName('ability', id, 'ability_macro_text')] = v[concatRepAttrName('ability', id, 'ability_macro_text')].replace(
-            replacements.ability_old_v3,
-            replacements.ability_current,
-          );
+        if (v[`repeating_ability_${id}_ability_macro_text`] === replacements.ability_old_v3) {
+          output[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.ability_old_v3, replacements.ability_current);
         }
-        if (v[concatRepAttrName('ability', id, 'ability_macro_text')] === replacements.ability_old_v2) {
-          output[concatRepAttrName('ability', id, 'ability_macro_text')] = v[concatRepAttrName('ability', id, 'ability_macro_text')].replace(
-            replacements.ability_old_v2,
-            replacements.ability_current,
-          );
+        if (v[`repeating_ability_${id}_ability_macro_text`] === replacements.ability_old_v2) {
+          output[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.ability_old_v2, replacements.ability_current);
         }
-        if (v[concatRepAttrName('ability', id, 'ability_macro_text')] === replacements.ability_old) {
-          output[concatRepAttrName('ability', id, 'ability_macro_text')] = v[concatRepAttrName('ability', id, 'ability_macro_text')].replace(
-            replacements.ability_old,
-            replacements.ability_current,
-          );
+        if (v[`repeating_ability_${id}_ability_macro_text`] === replacements.ability_old) {
+          output[`repeating_ability_${id}_ability_macro_text`] = v[`repeating_ability_${id}_ability_macro_text`].replace(replacements.ability_old, replacements.ability_current);
         }
       });
       output.sheet_version = current_version;
@@ -1081,7 +1012,7 @@ const abilityMacroUpdate = (current_version, final_version) => {
 // update NWP macro-text ONLY IF they haven't been edited. Tests against v1.58 macro-text
 const nwpMacroUpdate2 = (current_version, final_version) => {
   getSectionIDs('repeating_nonweaponproficiencies', (idArray) => {
-    const fields = idArray.map((id) => [concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')]);
+    const fields = idArray.map((id) => [`repeating_nonweaponproficiencies_${id}_nwp_macro_text`]);
     getAttrs([...fields], (v) => {
       const output = {};
       const replacements = {
@@ -1093,14 +1024,14 @@ const nwpMacroUpdate2 = (current_version, final_version) => {
           '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{nwp_name}}} {{roll_low=[[ 1d20 + [[ @{nwp_modifier} ]][MOD] + [[ ?{Modifier?|0} ]][MOD] ]]}} {{roll_target=[[ @{nwp_attribute}[ATTR] ]]}} {{mod_applied=[[ ?{Modifier?|0} ]]}} {{nwp_mod_applied=[[ @{nwp_modifier} ]]}} {{link=@{nwp_link}}} {{freetext=@{nwp_short_description} @{nwp_description}}}',
       };
       _.each(idArray, (id) => {
-        if (v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')] === replacements.nwp_old_2) {
-          output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')] = v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')].replace(
+        if (v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] === replacements.nwp_old_2) {
+          output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`].replace(
             replacements.nwp_old_2,
             replacements.nwp_current,
           );
         }
-        if (v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')] === replacements.nwp_old) {
-          output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')] = v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')].replace(
+        if (v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] === replacements.nwp_old) {
+          output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`].replace(
             replacements.nwp_old,
             replacements.nwp_current,
           );
@@ -1118,7 +1049,7 @@ const nwpMacroUpdate2 = (current_version, final_version) => {
 // update Spells macro-text ONLY IF they haven't been edited. Tests against v1.58 macro-text
 const spellsMacroUpdate = (current_version, final_version) => {
   getSectionIDs('repeating_spells', (idArray) => {
-    const fields = idArray.map((id) => [concatRepAttrName('spells', id, 'spell_macro_text')]);
+    const fields = idArray.map((id) => [`repeating_spells_${id}_spell_macro_text`]);
     getAttrs([...fields], (v) => {
       const output = {};
       const replacements = {
@@ -1132,23 +1063,14 @@ const spellsMacroUpdate = (current_version, final_version) => {
           '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Casts: @{spell_name}}} {{school=@{spell_school}}} {{spell_level=@{spell_level}}} {{spell_class=@{spell_caster_class_name}}} {{spell_class_level=@{spell_caster_class_level}}} {{range=@{spell_range}}} {{duration=@{spell_duration}}} {{area_of_effect=@{spell_aoe}}} {{components=@{spell_components}}} {{casting_time=@{spell_ct}}} {{saving_throw=@{spell_save}}} {{save_type=@{spell_save_type}}} {{link=@{spell_link}}} {{freetext=@{spell_description}}}',
       };
       _.each(idArray, (id) => {
-        if (v[concatRepAttrName('spells', id, 'spell_macro_text')] === replacements.spell_old_v3) {
-          output[concatRepAttrName('spells', id, 'spell_macro_text')] = v[concatRepAttrName('spells', id, 'spell_macro_text')].replace(
-            replacements.spell_old_v3,
-            replacements.spell_current,
-          );
+        if (v[`repeating_spells_${id}_spell_macro_text`] === replacements.spell_old_v3) {
+          output[`repeating_spells_${id}_spell_macro_text`] = v[`repeating_spells_${id}_spell_macro_text`].replace(replacements.spell_old_v3, replacements.spell_current);
         }
-        if (v[concatRepAttrName('spells', id, 'spell_macro_text')] === replacements.spell_old_v2) {
-          output[concatRepAttrName('spells', id, 'spell_macro_text')] = v[concatRepAttrName('spells', id, 'spell_macro_text')].replace(
-            replacements.spell_old_v2,
-            replacements.spell_current,
-          );
+        if (v[`repeating_spells_${id}_spell_macro_text`] === replacements.spell_old_v2) {
+          output[`repeating_spells_${id}_spell_macro_text`] = v[`repeating_spells_${id}_spell_macro_text`].replace(replacements.spell_old_v2, replacements.spell_current);
         }
-        if (v[concatRepAttrName('spells', id, 'spell_macro_text')] === replacements.spell_old) {
-          output[concatRepAttrName('spells', id, 'spell_macro_text')] = v[concatRepAttrName('spells', id, 'spell_macro_text')].replace(
-            replacements.spell_old,
-            replacements.spell_current,
-          );
+        if (v[`repeating_spells_${id}_spell_macro_text`] === replacements.spell_old) {
+          output[`repeating_spells_${id}_spell_macro_text`] = v[`repeating_spells_${id}_spell_macro_text`].replace(replacements.spell_old, replacements.spell_current);
         }
       });
       output.sheet_version = current_version;
@@ -1163,7 +1085,7 @@ const spellsMacroUpdate = (current_version, final_version) => {
 // update Equipment macro-text ONLY IF they haven't been edited. Tests against v1.641 macro-text
 const equipmentMacroUpdate = (current_version, final_version) => {
   getSectionIDs('repeating_equipment', (idArray) => {
-    const fields = idArray.map((id) => [concatRepAttrName('equipment', id, 'equipment_macro_text')]);
+    const fields = idArray.map((id) => [`repeating_equipment_${id}_equipment_macro_text`]);
     getAttrs([...fields], (v) => {
       const output = {};
       const replacements = {
@@ -1173,8 +1095,8 @@ const equipmentMacroUpdate = (current_version, final_version) => {
           '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Item/Equipment: @{equipment_item}}} {{link=@{equipment_link}}} {{freetext=@{equipment_description}}} {{quantity=@{equipment_quantity}}} {{quantity_max=@{equipment_quantity|max}}} {{uses=@{equipment_current}}} {{uses_max=[[ @{equipment_current|max} ]]}}',
       };
       _.each(idArray, (id) => {
-        if (v[concatRepAttrName('equipment', id, 'equipment_macro_text')] === replacements.equipment_old) {
-          output[concatRepAttrName('equipment', id, 'equipment_macro_text')] = v[concatRepAttrName('equipment', id, 'equipment_macro_text')].replace(
+        if (v[`repeating_equipment_${id}_equipment_macro_text`] === replacements.equipment_old) {
+          output[`repeating_equipment_${id}_equipment_macro_text`] = v[`repeating_equipment_${id}_equipment_macro_text`].replace(
             replacements.equipment_old,
             replacements.equipment_current,
           );
@@ -1194,19 +1116,19 @@ const updateRange = (current_version, final_version) => {
   getSectionIDs('repeating_weapon', (idArray) => {
     const output = {};
     const fields = idArray.flatMap((id) => [
-      concatRepAttrName('weapon', id, 'weapon_range'),
-      concatRepAttrName('weapon', id, 'weapon_range_short'),
-      concatRepAttrName('weapon', id, 'weapon_range_medium'),
-      concatRepAttrName('weapon', id, 'weapon_range_long'),
-      concatRepAttrName('weapon', id, 'weapon_attack_type'),
-      concatRepAttrName('weapon', id, 'weapon_range_error'),
+      `repeating_weapon_${id}_weapon_range`,
+      `repeating_weapon_${id}_weapon_range_short`,
+      `repeating_weapon_${id}_weapon_range_medium`,
+      `repeating_weapon_${id}_weapon_range_long`,
+      `repeating_weapon_${id}_weapon_attack_type`,
+      `repeating_weapon_${id}_weapon_range_error`,
     ]);
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
         // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
-        const thisType = +v[concatRepAttrName('weapon', id, 'weapon_attack_type')] || 0;
+        const thisType = +v[`repeating_weapon_${id}_weapon_attack_type`] || 0;
         if (thisType === 0 || thisType === 2) return;
-        let thisRange = v[concatRepAttrName('weapon', id, 'weapon_range')];
+        let thisRange = v[`repeating_weapon_${id}_weapon_range`];
         // remove quotes to prevent NaN (ie distance indicators)
         thisRange = thisRange.replace(/'/g, '');
         thisRange = thisRange.replace(/"/g, '');
@@ -1228,28 +1150,28 @@ const updateRange = (current_version, final_version) => {
 
         // check to see if range is in the proper format.
         if (Number.isNaN(thisRangeShort)) {
-          output[concatRepAttrName('weapon', id, 'weapon_range_short')] = 0;
-          output[concatRepAttrName('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
+          output[`repeating_weapon_${id}_weapon_range_short`] = 0;
+          output[`repeating_weapon_${id}_weapon_range_error`] = thisRange === '' ? 1 : 0;
           // clog(`WARNING: Field is not in the proper format.`);
         } else {
-          output[concatRepAttrName('weapon', id, 'weapon_range_short')] = thisRangeShort;
+          output[`repeating_weapon_${id}_weapon_range_short`] = thisRangeShort;
         }
         if (Number.isNaN(thisRangeMedium)) {
-          output[concatRepAttrName('weapon', id, 'weapon_range_medium')] = 0;
-          output[concatRepAttrName('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
+          output[`repeating_weapon_${id}_weapon_range_medium`] = 0;
+          output[`repeating_weapon_${id}_weapon_range_error`] = thisRange === '' ? 1 : 0;
           // clog(`WARNING: Field is not in the proper format.`);
         } else {
-          output[concatRepAttrName('weapon', id, 'weapon_range_medium')] = thisRangeMedium;
+          output[`repeating_weapon_${id}_weapon_range_medium`] = thisRangeMedium;
         }
         if (Number.isNaN(thisRangeLong)) {
-          output[concatRepAttrName('weapon', id, 'weapon_range_long')] = 0;
-          output[concatRepAttrName('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
+          output[`repeating_weapon_${id}_weapon_range_long`] = 0;
+          output[`repeating_weapon_${id}_weapon_range_error`] = thisRange === '' ? 1 : 0;
           // clog(`WARNING: Field is not in the proper format.`);
         } else {
-          output[concatRepAttrName('weapon', id, 'weapon_range_long')] = thisRangeLong;
+          output[`repeating_weapon_${id}_weapon_range_long`] = thisRangeLong;
         }
         if (!Number.isNaN(thisRangeShort) && !Number.isNaN(thisRangeMedium) && !Number.isNaN(thisRangeLong)) {
-          output[concatRepAttrName('weapon', id, 'weapon_range_error')] = 1;
+          output[`repeating_weapon_${id}_weapon_range_error`] = 1;
         } else {
           // clog(`Value did not parse.`);
         }
@@ -1266,15 +1188,15 @@ const updateRange = (current_version, final_version) => {
 // One-time update: replace @{weapon_attack_type_pen} with @{weapon_dual_pen} in attack macro-text
 const updateAttackTypeMacro = (current_version, final_version) => {
   getSectionIDs('repeating_weapon', (idArray) => {
-    const fields = idArray.map((id) => [concatRepAttrName('weapon', id, 'weapon_macro_text')]);
+    const fields = idArray.map((id) => [`repeating_weapon_${id}_weapon_macro_text`]);
     getAttrs([...fields], (v) => {
       const output = {};
       const macrodefault =
         '&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{weapon_name}}} {{dual=@{weapon_dual}}} {{attack1=[[ 1d20 + @{weapon_backstab_bonus}[BACKSTAB] + @{weapon_tohitbonus}[HIT_BON] + @{weapon_prof_pen}[PROF_PEN] + @{weapon_dual_pen}[DUAL_PEN]+ @{weapon_magicbonus}[MAG_BON] + ?{To Hit Modifier?|0}[MISC_MOD] ]]}} {{damagevsSMchatmenu=@{weapon_damagesmallmedium_chat_menu}}} {{damagevsLchatmenu=@{weapon_damagelarge_chat_menu}}} {{WeaponNotes=@{weapon_notes}}} {{backstab=[[ @{weapon_backstab_mult} ]]}} {{damagetype=@{weapon_attackdmgtype}}} {{rate=@{weapon_rateoffire}}} {{range=@{weapon_range}}} {{length=@{weapon_length}}} {{space=@{weapon_space}}} {{speed=@{weapon_speed}}} @{weapon_tohitacadj}';
       _.each(idArray, (id) => {
-        const macrotext = v[concatRepAttrName('weapon', id, 'weapon_macro_text')] || macrodefault;
-        output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = macrotext.replace(/@{weapon_attack_type_pen}/g, '@{weapon_dual_pen}');
-        output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = macrotext.replace(/{{attacktype=@{weapon_attack_type}}} /g, '');
+        const macrotext = v[`repeating_weapon_${id}_weapon_macro_text`] || macrodefault;
+        output[`repeating_weapon_${id}_weapon_macro_text`] = macrotext.replace(/@{weapon_attack_type_pen}/g, '@{weapon_dual_pen}');
+        output[`repeating_weapon_${id}_weapon_macro_text`] = macrotext.replace(/{{attacktype=@{weapon_attack_type}}} /g, '');
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: updateAttackTypeMacro completed`);
@@ -1426,44 +1348,44 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           // has name && has id = UPDATE ROW
           rowId = unarmored0_ID.toLowerCase();
           output.unarmored_row_id = rowId;
-          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.unarmored_worn || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.unarmored.trim();
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.unarmored_ac || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.unarmored_base || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_bulk')] = +v.unarmored_bulk || 0;
+          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
+          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.unarmored_worn || 0;
+          output[`repeating_equipment_${rowId}_equipment_item`] = v.unarmored.trim();
+          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.unarmored_ac || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.unarmored_base || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_bulk`] = +v.unarmored_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
           if ((+v.unarmored_worn || 0) === 1 && (+v.unarmored_carried || 0) === 0) {
-            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = 1;
+            output[`repeating_equipment_${rowId}_equipment_carried_select`] = 1;
             output.unarmored_carried = 1;
           } else {
-            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.unarmored_carried || 0;
+            output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.unarmored_carried || 0;
           }
-          output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.unarmored_weight || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.unarmored_cost || 0;
+          output[`repeating_equipment_${rowId}_equipment_weight`] = +v.unarmored_weight || 0;
+          output[`repeating_equipment_${rowId}_equipment_cost`] = +v.unarmored_cost || 0;
           clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'armor1'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
           output.unarmored_row_id = newID.toLowerCase();
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.unarmored_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.unarmored.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.unarmored_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.unarmored_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_bulk')] = +v.unarmored_bulk || 0;
+          output[`repeating_equipment_${newID}_equipment_type`] = 2;
+          output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn || 0;
+          output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored.trim();
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
           if ((+v.unarmored_worn || 0) === 1 && (+v.unarmored_carried || 0) === 0) {
-            output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = 1;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
             output.unarmored_carried = 1;
           } else {
-            output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.unarmored_carried || 0;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
           }
-          output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.unarmored_weight || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.unarmored_cost || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+          output[`repeating_equipment_${newID}_equipment_weight`] = +v.unarmored_weight || 0;
+          output[`repeating_equipment_${newID}_equipment_cost`] = +v.unarmored_cost || 0;
+          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
           clog(`syncArmorToEquipment - repeating Armor does not exist. Creating armor1: ${newID}`);
         }
       } else if (unarmored0_ID === idArray[0]) {
@@ -1505,40 +1427,40 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           // has name && has id = UPDATE ROW
           rowId = armortype1_ID.toLowerCase();
           output.armortype1_row_id = rowId;
-          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 1;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armortype_worn || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armortype.trim();
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armortype_ac || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armortype_base || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armortype_magic || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_bulk')] = +v.armortype_bulk || 0;
+          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
+          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 1;
+          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armortype_worn || 0;
+          output[`repeating_equipment_${rowId}_equipment_item`] = v.armortype.trim();
+          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armortype_ac || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armortype_base || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armortype_magic || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
           if ((+v.armortype_worn || 0) === 1 && (+v.armortype_carried || 0) === 0) {
-            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = 1;
+            output[`repeating_equipment_${rowId}_equipment_carried_select`] = 1;
             output.armortype_carried = 1;
           } else {
-            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armortype_carried || 0;
+            output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armortype_carried || 0;
           }
-          output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.armor_weight || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.armor_cost || 0;
+          output[`repeating_equipment_${rowId}_equipment_weight`] = +v.armor_weight || 0;
+          output[`repeating_equipment_${rowId}_equipment_cost`] = +v.armor_cost || 0;
           clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'armor1'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
           output.armortype1_row_id = newID.toLowerCase();
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 1;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armortype_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armortype.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armortype_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armortype_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armortype_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_bulk')] = +v.armortype_bulk || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armortype_carried || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.armor_weight || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.armor_cost || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+          output[`repeating_equipment_${newID}_equipment_type`] = 2;
+          output[`repeating_equipment_${newID}_equipment_armor_type`] = 1;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype_worn || 0;
+          output[`repeating_equipment_${newID}_equipment_item`] = v.armortype.trim();
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype_magic || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
+          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
+          output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
+          output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
+          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
           clog(`syncArmorToEquipment - repeating Armor does not exist. Creating armor1: ${newID}`);
         }
       } else if (armortype1_ID === idArray[1]) {
@@ -1577,40 +1499,40 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           // has name && has id = UPDATE ROW
           rowId = armortype2_ID.toLowerCase();
           output.armortype2_row_id = rowId;
-          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 2;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armortype2_worn || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armortype2.trim();
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armortype2_ac || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armortype2_base || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armortype2_magic || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_bulk')] = +v.armortype2_bulk || 0;
+          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
+          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 2;
+          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armortype2_worn || 0;
+          output[`repeating_equipment_${rowId}_equipment_item`] = v.armortype2.trim();
+          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armortype2_ac || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armortype2_base || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armortype2_magic || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
           if ((+v.armortype2_worn || 0) === 1 && (+v.armortype2_carried || 0) === 0) {
-            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = 1;
+            output[`repeating_equipment_${rowId}_equipment_carried_select`] = 1;
             output.armortype2_carried = 1;
           } else {
-            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armortype2_carried || 0;
+            output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armortype2_carried || 0;
           }
-          output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.armortype2_weight || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.armortype2_cost || 0;
+          output[`repeating_equipment_${rowId}_equipment_weight`] = +v.armortype2_weight || 0;
+          output[`repeating_equipment_${rowId}_equipment_cost`] = +v.armortype2_cost || 0;
           clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'armor2'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
           output.armortype2_row_id = newID.toLowerCase();
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armortype2_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armortype2.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armortype2_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armortype2_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armortype2_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_bulk')] = +v.armortype2_bulk || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armortype2_carried || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.armortype2_weight || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.armortype2_cost || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+          output[`repeating_equipment_${newID}_equipment_type`] = 2;
+          output[`repeating_equipment_${newID}_equipment_armor_type`] = 2;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype2_worn || 0;
+          output[`repeating_equipment_${newID}_equipment_item`] = v.armortype2.trim();
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype2_magic || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
+          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
+          output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
+          output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
+          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
           clog(`syncArmorToEquipment - repeating Armor does not exist. Creating armor2: ${newID}`);
         }
       } else if (armortype2_ID === idArray[2]) {
@@ -1649,42 +1571,42 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           // has name && has id = UPDATE ROW
           rowId = armorshield_ID.toLowerCase();
           output.armorshield_row_id = rowId;
-          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 3;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorshield_worn || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorshield.trim();
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorshield_ac || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorshield_base || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = v.armorshield_magic;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = v.armorshield_mod;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_bulk')] = +v.armorshield_bulk || 0;
+          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
+          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 3;
+          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorshield_worn || 0;
+          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorshield.trim();
+          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorshield_ac || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorshield_base || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = v.armorshield_magic;
+          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = v.armorshield_mod;
+          output[`repeating_equipment_${rowId}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
           // armor in use ie 'worn', should always be considered as carried
           if ((+v.armorshield_worn || 0) === 1 && (+v.armorshield_carried || 0) === 0) {
-            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = 1;
+            output[`repeating_equipment_${rowId}_equipment_carried_select`] = 1;
             output.armorshield_carried = 1;
           } else {
-            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorshield_carried || 0;
+            output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorshield_carried || 0;
           }
-          output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.armorshield_weight || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.armorshield_cost || 0;
+          output[`repeating_equipment_${rowId}_equipment_weight`] = +v.armorshield_weight || 0;
+          output[`repeating_equipment_${rowId}_equipment_cost`] = +v.armorshield_cost || 0;
           clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'shield'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
           output.armorshield_row_id = newID.toLowerCase();
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 3;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorshield_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorshield.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorshield_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorshield_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = v.armorshield_magic;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = v.armorshield_mod;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_bulk')] = +v.armorshield_bulk || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armorshield_carried || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.armorshield_weight || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.armorshield_cost || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+          output[`repeating_equipment_${newID}_equipment_type`] = 2;
+          output[`repeating_equipment_${newID}_equipment_armor_type`] = 3;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorshield_worn || 0;
+          output[`repeating_equipment_${newID}_equipment_item`] = v.armorshield.trim();
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorshield_magic;
+          output[`repeating_equipment_${newID}_equipment_armor_mod`] = v.armorshield_mod;
+          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
+          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
+          output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
+          output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
+          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
           clog(`syncArmorToEquipment - repeating Armor does not exist. Creating shield: ${newID}`);
         }
       } else if (armorshield_ID === idArray[3]) {
@@ -1725,36 +1647,36 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           // has name && has id = UPDATE ROW
           rowId = armorhelmet_ID.toLowerCase();
           output.armorhelmet_row_id = rowId;
-          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 4;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorhelmet_worn || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorhelmet.trim();
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorhelmet_ac || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = v.armorhelmet_magic;
+          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
+          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 4;
+          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorhelmet_worn || 0;
+          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorhelmet.trim();
+          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = v.armorhelmet_magic;
           // armor in use ie 'worn', should always be considered as carried
           if ((+v.armorhelmet_worn || 0) === 1 && (+v.armorhelmet_carried || 0) === 0) {
-            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = 1;
+            output[`repeating_equipment_${rowId}_equipment_carried_select`] = 1;
             output.armorhelmet_carried = 1;
           } else {
-            output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorhelmet_carried || 0;
+            output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
           }
-          output[concatRepAttrName('equipment', rowId, 'equipment_weight')] = +v.armorhelmet_weight || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_cost')] = +v.armorhelmet_cost || 0;
+          output[`repeating_equipment_${rowId}_equipment_weight`] = +v.armorhelmet_weight || 0;
+          output[`repeating_equipment_${rowId}_equipment_cost`] = +v.armorhelmet_cost || 0;
           clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'helmet'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
           output.armorhelmet_row_id = newID.toLowerCase();
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 4;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorhelmet_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorhelmet.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorhelmet_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = v.armorhelmet_magic;
-          output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armorhelmet_carried || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.armorhelmet_weight || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.armorhelmet_cost || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+          output[`repeating_equipment_${newID}_equipment_type`] = 2;
+          output[`repeating_equipment_${newID}_equipment_armor_type`] = 4;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorhelmet_worn || 0;
+          output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet.trim();
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorhelmet_magic;
+          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
+          output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
+          output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
+          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
           clog(`syncArmorToEquipment - repeating Armor does not exist. Creating helmet: ${newID}`);
         }
       } else if (armorhelmet_ID === idArray[4]) {
@@ -1793,30 +1715,30 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           // has name && has id = UPDATE ROW
           rowId = armorother1_ID.toLowerCase();
           output.armorother1_row_id = rowId;
-          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 5;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorother_worn || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorother.trim();
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorother_ac || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorother_base || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armorother_magic || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother_mod || 0;
+          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
+          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 5;
+          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorother_worn || 0;
+          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorother.trim();
+          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorother_ac || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorother_base || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armorother_magic || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
-          output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother_worn === 1 ? 1 : 0;
+          output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother_worn === 1 ? 1 : 0;
           clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other1'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
           output.armorother1_row_id = newID.toLowerCase();
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 5;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorother_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother_mod || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+          output[`repeating_equipment_${newID}_equipment_type`] = 2;
+          output[`repeating_equipment_${newID}_equipment_armor_type`] = 5;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother_worn || 0;
+          output[`repeating_equipment_${newID}_equipment_item`] = v.armorother.trim();
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
+          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
           clog(`syncArmorToEquipment - repeating Armor does not exist. Creating other1: ${newID}`);
         }
       } else if (armorother1_ID === idArray[5]) {
@@ -1851,29 +1773,29 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           // has name && has id = UPDATE ROW
           rowId = armorother2_ID.toLowerCase();
           output.armorother2_row_id = rowId;
-          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 6;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorother2_worn || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorother2.trim();
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorother2_ac || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorother2_base || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armorother2_magic || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother2_mod || 0;
+          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
+          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 6;
+          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorother2_worn || 0;
+          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorother2.trim();
+          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorother2_ac || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorother2_base || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armorother2_magic || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother2_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
-          output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother2_worn === 1 ? 1 : 0;
+          output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother2_worn === 1 ? 1 : 0;
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
           output.armorother2_row_id = newID.toLowerCase();
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 6;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorother2_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother2.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother2_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother2_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother2_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother2_mod || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+          output[`repeating_equipment_${newID}_equipment_type`] = 2;
+          output[`repeating_equipment_${newID}_equipment_armor_type`] = 6;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother2_worn || 0;
+          output[`repeating_equipment_${newID}_equipment_item`] = v.armorother2.trim();
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
+          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
           clog(`syncArmorToEquipment - repeating Armor does not exist. Creating other2: ${newID}`);
         }
       } else if (armorother2_ID === idArray[6]) {
@@ -1908,30 +1830,30 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           // has name && has id = UPDATE ROW
           rowId = armorother3_ID.toLowerCase();
           output.armorother3_row_id = rowId;
-          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 7;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorother3_worn || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorother3.trim();
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorother3_ac || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorother3_base || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armorother3_magic || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother3_mod || 0;
+          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
+          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 7;
+          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorother3_worn || 0;
+          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorother3.trim();
+          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorother3_ac || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorother3_base || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armorother3_magic || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother3_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
-          output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother3_worn === 1 ? 1 : 0;
+          output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother3_worn === 1 ? 1 : 0;
           clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other3'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
           output.armorother3_row_id = newID.toLowerCase();
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 7;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorother3_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother3.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother3_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother3_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother3_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother3_mod || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+          output[`repeating_equipment_${newID}_equipment_type`] = 2;
+          output[`repeating_equipment_${newID}_equipment_armor_type`] = 7;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother3_worn || 0;
+          output[`repeating_equipment_${newID}_equipment_item`] = v.armorother3.trim();
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
+          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
           clog(`syncArmorToEquipment - repeating Armor does not exist. Creating other3: ${newID}`);
         }
       } else if (armorother3_ID === idArray[7]) {
@@ -1966,30 +1888,30 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           // has name && has id = UPDATE ROW
           rowId = armorother4_ID.toLowerCase();
           output.armorother4_row_id = rowId;
-          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 8;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorother4_worn || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorother4.trim();
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorother4_ac || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorother4_base || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armorother4_magic || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother4_mod || 0;
+          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
+          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 8;
+          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorother4_worn || 0;
+          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorother4.trim();
+          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorother4_ac || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorother4_base || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armorother4_magic || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother4_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
-          output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother4_worn === 1 ? 1 : 0;
+          output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother4_worn === 1 ? 1 : 0;
           clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other4'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
           output.armorother4_row_id = newID.toLowerCase();
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 8;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorother4_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother4.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother4_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother4_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother4_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother4_mod || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+          output[`repeating_equipment_${newID}_equipment_type`] = 2;
+          output[`repeating_equipment_${newID}_equipment_armor_type`] = 8;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother4_worn || 0;
+          output[`repeating_equipment_${newID}_equipment_item`] = v.armorother4.trim();
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
+          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
           clog(`syncArmorToEquipment - repeating Armor does not exist. Creating other4: ${newID}`);
         }
       } else if (armorother4_ID === idArray[8]) {
@@ -2024,30 +1946,30 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           // has name && has id = UPDATE ROW
           rowId = armorother5_ID.toLowerCase();
           output.armorother5_row_id = rowId;
-          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 9;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorother5_worn || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorother5.trim();
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorother5_ac || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorother5_base || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armorother5_magic || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother5_mod || 0;
+          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
+          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 9;
+          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorother5_worn || 0;
+          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorother5.trim();
+          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorother5_ac || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorother5_base || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armorother5_magic || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother5_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
-          output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother5_worn === 1 ? 1 : 0;
+          output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother5_worn === 1 ? 1 : 0;
           clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other5'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
           output.armorother5_row_id = newID.toLowerCase();
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 9;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorother5_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother5.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother5_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother5_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother5_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother5_mod || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+          output[`repeating_equipment_${newID}_equipment_type`] = 2;
+          output[`repeating_equipment_${newID}_equipment_armor_type`] = 9;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother5_worn || 0;
+          output[`repeating_equipment_${newID}_equipment_item`] = v.armorother5.trim();
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
+          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
           clog(`syncArmorToEquipment - repeating Armor does not exist. Creating other5: ${newID}`);
         }
       } else if (armorother5_ID === idArray[9]) {
@@ -2082,30 +2004,30 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           // has name && has id = UPDATE ROW
           rowId = armorother6_ID.toLowerCase();
           output.armorother6_row_id = rowId;
-          output[concatRepAttrName('equipment', rowId, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_type')] = 10;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_worn')] = +v.armorother6_worn || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_item')] = v.armorother6.trim();
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_ac')] = +v.armorother6_ac || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_base')] = +v.armorother6_base || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_magic')] = +v.armorother6_magic || 0;
-          output[concatRepAttrName('equipment', rowId, 'equipment_armor_mod')] = +v.armorother6_mod || 0;
+          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
+          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 10;
+          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorother6_worn || 0;
+          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorother6.trim();
+          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorother6_ac || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorother6_base || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armorother6_magic || 0;
+          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother6_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
-          output[concatRepAttrName('equipment', rowId, 'equipment_carried_select')] = +v.armorother6_worn === 1 ? 1 : 0;
+          output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother6_worn === 1 ? 1 : 0;
           clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other6'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
           output.armorother6_row_id = newID.toLowerCase();
-          output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 10;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = +v.armorother6_worn || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother6.trim();
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother6_ac || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother6_base || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother6_magic || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother6_mod || 0;
-          output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+          output[`repeating_equipment_${newID}_equipment_type`] = 2;
+          output[`repeating_equipment_${newID}_equipment_armor_type`] = 10;
+          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother6_worn || 0;
+          output[`repeating_equipment_${newID}_equipment_item`] = v.armorother6.trim();
+          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
+          output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
+          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
           clog(`syncArmorToEquipment - repeating Armor does not exist. Creating other6: ${newID}`);
         }
       } else if (armorother6_ID === idArray[10]) {
@@ -2156,43 +2078,43 @@ const setEquipmentUpdate = (current_version, final_version) => {
   getSectionIDs('repeating_equipment', (idArray) => {
     const output = {};
     const fields = idArray.flatMap((id) => [
-      concatRepAttrName('equipment', id, 'equipment_type'),
-      concatRepAttrName('equipment', id, 'equipment_current'),
-      concatRepAttrName('equipment', id, 'equipment_current_max'),
-      concatRepAttrName('equipment', id, 'equipment_carried_select'),
-      concatRepAttrName('equipment', id, 'equipment_carried'),
-      concatRepAttrName('equipment', id, 'equipment_quantity'),
-      concatRepAttrName('equipment', id, 'equipment_quantity_max'),
-      concatRepAttrName('equipment', id, 'equipment_weight'),
-      concatRepAttrName('equipment', id, 'equipment_cost'),
-      concatRepAttrName('equipment', id, 'equipment_armor_type'),
-      concatRepAttrName('equipment', id, 'equipment_armor_worn'),
-      concatRepAttrName('equipment', id, 'equipment_armor_ac'),
-      concatRepAttrName('equipment', id, 'equipment_armor_base'),
-      concatRepAttrName('equipment', id, 'equipment_armor_magic'),
-      concatRepAttrName('equipment', id, 'equipment_armor_mod'),
-      concatRepAttrName('equipment', id, 'equipment_armor_bulk'),
-      concatRepAttrName('equipment', id, 'equipment_macro_text'),
+      `repeating_equipment_${id}_equipment_type`,
+      `repeating_equipment_${id}_equipment_current`,
+      `repeating_equipment_${id}_equipment_current_max`,
+      `repeating_equipment_${id}_equipment_carried_select`,
+      `repeating_equipment_${id}_equipment_carried`,
+      `repeating_equipment_${id}_equipment_quantity`,
+      `repeating_equipment_${id}_equipment_quantity_max`,
+      `repeating_equipment_${id}_equipment_weight`,
+      `repeating_equipment_${id}_equipment_cost`,
+      `repeating_equipment_${id}_equipment_armor_type`,
+      `repeating_equipment_${id}_equipment_armor_worn`,
+      `repeating_equipment_${id}_equipment_armor_ac`,
+      `repeating_equipment_${id}_equipment_armor_base`,
+      `repeating_equipment_${id}_equipment_armor_magic`,
+      `repeating_equipment_${id}_equipment_armor_mod`,
+      `repeating_equipment_${id}_equipment_armor_bulk`,
+      `repeating_equipment_${id}_equipment_macro_text`,
     ]);
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
-        output[concatRepAttrName('equipment', id, 'equipment_type')] = +v[concatRepAttrName('equipment', id, 'equipment_type')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_current')] = +v[concatRepAttrName('equipment', id, 'equipment_current')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_current_max')] = +v[concatRepAttrName('equipment', id, 'equipment_current_max')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_carried_select')] = +v[concatRepAttrName('equipment', id, 'equipment_carried')] || 0; // setting to carried to preserve existing value
-        output[concatRepAttrName('equipment', id, 'equipment_carried')] = +v[concatRepAttrName('equipment', id, 'equipment_carried')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_quantity')] = +v[concatRepAttrName('equipment', id, 'equipment_quantity')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_quantity_max')] = +v[concatRepAttrName('equipment', id, 'equipment_quantity_max')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_weight')] = +v[concatRepAttrName('equipment', id, 'equipment_weight')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_cost')] = +v[concatRepAttrName('equipment', id, 'equipment_cost')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_armor_type')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_armor_worn')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_worn')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_armor_ac')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_ac')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_armor_base')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_base')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_armor_magic')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_magic')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_armor_mod')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_mod')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_armor_bulk')] = +v[concatRepAttrName('equipment', id, 'equipment_armor_bulk')] || 0;
-        output[concatRepAttrName('equipment', id, 'equipment_macro_text')] = v[concatRepAttrName('equipment', id, 'equipment_macro_text')];
+        output[`repeating_equipment_${id}_equipment_type`] = +v[`repeating_equipment_${id}_equipment_type`] || 0;
+        output[`repeating_equipment_${id}_equipment_current`] = +v[`repeating_equipment_${id}_equipment_current`] || 0;
+        output[`repeating_equipment_${id}_equipment_current_max`] = +v[`repeating_equipment_${id}_equipment_current_max`] || 0;
+        output[`repeating_equipment_${id}_equipment_carried_select`] = +v[`repeating_equipment_${id}_equipment_carried`] || 0; // setting to carried to preserve existing value
+        output[`repeating_equipment_${id}_equipment_carried`] = +v[`repeating_equipment_${id}_equipment_carried`] || 0;
+        output[`repeating_equipment_${id}_equipment_quantity`] = +v[`repeating_equipment_${id}_equipment_quantity`] || 0;
+        output[`repeating_equipment_${id}_equipment_quantity_max`] = +v[`repeating_equipment_${id}_equipment_quantity_max`] || 0;
+        output[`repeating_equipment_${id}_equipment_weight`] = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
+        output[`repeating_equipment_${id}_equipment_cost`] = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
+        output[`repeating_equipment_${id}_equipment_armor_type`] = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
+        output[`repeating_equipment_${id}_equipment_armor_worn`] = +v[`repeating_equipment_${id}_equipment_armor_worn`] || 0;
+        output[`repeating_equipment_${id}_equipment_armor_ac`] = +v[`repeating_equipment_${id}_equipment_armor_ac`] || 0;
+        output[`repeating_equipment_${id}_equipment_armor_base`] = +v[`repeating_equipment_${id}_equipment_armor_base`] || 0;
+        output[`repeating_equipment_${id}_equipment_armor_magic`] = +v[`repeating_equipment_${id}_equipment_armor_magic`] || 0;
+        output[`repeating_equipment_${id}_equipment_armor_mod`] = +v[`repeating_equipment_${id}_equipment_armor_mod`] || 0;
+        output[`repeating_equipment_${id}_equipment_armor_bulk`] = +v[`repeating_equipment_${id}_equipment_armor_bulk`] || 0;
+        output[`repeating_equipment_${id}_equipment_macro_text`] = v[`repeating_equipment_${id}_equipment_macro_text`];
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: setEquipmentUpdate completed`);
@@ -2208,103 +2130,103 @@ const setWeaponsUpdate = (current_version, final_version) => {
   getSectionIDs('repeating_weapon', (idArray) => {
     const output = {};
     const fields = idArray.flatMap((id) => [
-      concatRepAttrName('weapon', id, 'weapon_attack_type'),
-      concatRepAttrName('weapon', id, 'weapon_dual'),
-      concatRepAttrName('weapon', id, 'weapon_whisper_to_hit'),
-      concatRepAttrName('weapon', id, 'weapon_whisper_to_hit_select'),
-      concatRepAttrName('weapon', id, 'weapon_dual_pen'),
-      concatRepAttrName('weapon', id, 'weapon_backstab_var'),
-      concatRepAttrName('weapon', id, 'weapon_tohitbonus'),
-      concatRepAttrName('weapon', id, 'weapon_magicbonus'),
-      concatRepAttrName('weapon', id, 'weapon_prof'),
-      concatRepAttrName('weapon', id, 'weapon_backstab'),
-      concatRepAttrName('weapon', id, 'weapon_backstab_bonus'),
-      concatRepAttrName('weapon', id, 'weapon_backstab_mult'),
-      concatRepAttrName('weapon', id, 'weapon_attackdmgbonus'),
-      concatRepAttrName('weapon', id, 'weapon_num_attacks'),
-      concatRepAttrName('weapon', id, 'weapon_quantity'),
-      concatRepAttrName('weapon', id, 'weapon_ammo'),
-      concatRepAttrName('weapon', id, 'weapon_ammo_max'),
-      concatRepAttrName('weapon', id, 'weapon_weight'),
-      concatRepAttrName('weapon', id, 'weapon_cost'),
-      concatRepAttrName('weapon', id, 'weapon_range_short'),
-      concatRepAttrName('weapon', id, 'weapon_range_medium'),
-      concatRepAttrName('weapon', id, 'weapon_range_long'),
-      concatRepAttrName('weapon', id, 'weapon_length'),
-      concatRepAttrName('weapon', id, 'weapon_space'),
-      concatRepAttrName('weapon', id, 'weapon_speed'),
-      concatRepAttrName('weapon', id, 'weapon_misc'),
-      concatRepAttrName('weapon', id, 'weapon_thac_adj0'),
-      concatRepAttrName('weapon', id, 'weapon_thac_adj1'),
-      concatRepAttrName('weapon', id, 'weapon_thac_adj2'),
-      concatRepAttrName('weapon', id, 'weapon_thac_adj3'),
-      concatRepAttrName('weapon', id, 'weapon_thac_adj4'),
-      concatRepAttrName('weapon', id, 'weapon_thac_adj5'),
-      concatRepAttrName('weapon', id, 'weapon_thac_adj6'),
-      concatRepAttrName('weapon', id, 'weapon_thac_adj7'),
-      concatRepAttrName('weapon', id, 'weapon_thac_adj8'),
-      concatRepAttrName('weapon', id, 'weapon_thac_adj9'),
-      concatRepAttrName('weapon', id, 'weapon_thac_adj10'),
-      concatRepAttrName('weapon', id, 'weapon_macro_text'),
-      concatRepAttrName('weapon', id, 'weapon_damagesmallmedium_chat_menu'),
-      concatRepAttrName('weapon', id, 'weapon_damagelarge_chat_menu'),
-      concatRepAttrName('weapon', id, 'weapon_damagesmallmedium_npc_chat_menu'),
-      concatRepAttrName('weapon', id, 'weapon_damagelarge_npc_chat_menu'),
-      concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium_chat_menu'),
-      concatRepAttrName('weapon', id, 'weapon_critdamagelarge_chat_menu'),
-      concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium_npc_chat_menu'),
-      concatRepAttrName('weapon', id, 'weapon_critdamagelarge_npc_chat_menu'),
-      concatRepAttrName('weapon', id, 'weapon_damage_chat_menu_npc'),
+      `repeating_weapon_${id}_weapon_attack_type`,
+      `repeating_weapon_${id}_weapon_dual`,
+      `repeating_weapon_${id}_weapon_whisper_to_hit`,
+      `repeating_weapon_${id}_weapon_whisper_to_hit_select`,
+      `repeating_weapon_${id}_weapon_dual_pen`,
+      `repeating_weapon_${id}_weapon_backstab_var`,
+      `repeating_weapon_${id}_weapon_tohitbonus`,
+      `repeating_weapon_${id}_weapon_magicbonus`,
+      `repeating_weapon_${id}_weapon_prof`,
+      `repeating_weapon_${id}_weapon_backstab`,
+      `repeating_weapon_${id}_weapon_backstab_bonus`,
+      `repeating_weapon_${id}_weapon_backstab_mult`,
+      `repeating_weapon_${id}_weapon_attackdmgbonus`,
+      `repeating_weapon_${id}_weapon_num_attacks`,
+      `repeating_weapon_${id}_weapon_quantity`,
+      `repeating_weapon_${id}_weapon_ammo`,
+      `repeating_weapon_${id}_weapon_ammo_max`,
+      `repeating_weapon_${id}_weapon_weight`,
+      `repeating_weapon_${id}_weapon_cost`,
+      `repeating_weapon_${id}_weapon_range_short`,
+      `repeating_weapon_${id}_weapon_range_medium`,
+      `repeating_weapon_${id}_weapon_range_long`,
+      `repeating_weapon_${id}_weapon_length`,
+      `repeating_weapon_${id}_weapon_space`,
+      `repeating_weapon_${id}_weapon_speed`,
+      `repeating_weapon_${id}_weapon_misc`,
+      `repeating_weapon_${id}_weapon_thac_adj0`,
+      `repeating_weapon_${id}_weapon_thac_adj1`,
+      `repeating_weapon_${id}_weapon_thac_adj2`,
+      `repeating_weapon_${id}_weapon_thac_adj3`,
+      `repeating_weapon_${id}_weapon_thac_adj4`,
+      `repeating_weapon_${id}_weapon_thac_adj5`,
+      `repeating_weapon_${id}_weapon_thac_adj6`,
+      `repeating_weapon_${id}_weapon_thac_adj7`,
+      `repeating_weapon_${id}_weapon_thac_adj8`,
+      `repeating_weapon_${id}_weapon_thac_adj9`,
+      `repeating_weapon_${id}_weapon_thac_adj10`,
+      `repeating_weapon_${id}_weapon_macro_text`,
+      `repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`,
+      `repeating_weapon_${id}_weapon_damagelarge_chat_menu`,
+      `repeating_weapon_${id}_weapon_damagesmallmedium_npc_chat_menu`,
+      `repeating_weapon_${id}_weapon_damagelarge_npc_chat_menu`,
+      `repeating_weapon_${id}_weapon_critdamagesmallmedium_chat_menu`,
+      `repeating_weapon_${id}_weapon_critdamagelarge_chat_menu`,
+      `repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`,
+      `repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`,
+      `repeating_weapon_${id}_weapon_damage_chat_menu_npc`,
     ]);
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
-        output[concatRepAttrName('weapon', id, 'weapon_attack_type')] = +v[concatRepAttrName('weapon', id, 'weapon_attack_type')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_dual')] = v[concatRepAttrName('weapon', id, 'weapon_dual')];
-        output[concatRepAttrName('weapon', id, 'weapon_whisper_to_hit')] = v[concatRepAttrName('weapon', id, 'weapon_whisper_to_hit')];
-        output[concatRepAttrName('weapon', id, 'weapon_whisper_to_hit_select')] = +v[concatRepAttrName('weapon', id, 'weapon_whisper_to_hit_select')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_dual_pen')] = +v[concatRepAttrName('weapon', id, 'weapon_dual_pen')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_backstab_var')] = +v[concatRepAttrName('weapon', id, 'weapon_backstab_var')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_tohitbonus')] = +v[concatRepAttrName('weapon', id, 'weapon_tohitbonus')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_magicbonus')] = +v[concatRepAttrName('weapon', id, 'weapon_magicbonus')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_prof')] = +v[concatRepAttrName('weapon', id, 'weapon_prof')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_backstab')] = +v[concatRepAttrName('weapon', id, 'weapon_backstab')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_backstab_bonus')] = +v[concatRepAttrName('weapon', id, 'weapon_backstab_bonus')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_backstab_mult')] = +v[concatRepAttrName('weapon', id, 'weapon_backstab_mult')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_attackdmgbonus')] = +v[concatRepAttrName('weapon', id, 'weapon_attackdmgbonus')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_num_attacks')] = +v[concatRepAttrName('weapon', id, 'weapon_num_attacks')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_quantity')] = +v[concatRepAttrName('weapon', id, 'weapon_quantity')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_ammo')] = +v[concatRepAttrName('weapon', id, 'weapon_ammo')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_ammo_max')] = +v[concatRepAttrName('weapon', id, 'weapon_ammo_max')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_weight')] = +v[concatRepAttrName('weapon', id, 'weapon_weight')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_cost')] = +v[concatRepAttrName('weapon', id, 'weapon_cost')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_range_short')] = +v[concatRepAttrName('weapon', id, 'weapon_range_short')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_range_medium')] = +v[concatRepAttrName('weapon', id, 'weapon_range_medium')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_range_long')] = +v[concatRepAttrName('weapon', id, 'weapon_range_long')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_length')] = v[concatRepAttrName('weapon', id, 'weapon_length')];
-        output[concatRepAttrName('weapon', id, 'weapon_space')] = v[concatRepAttrName('weapon', id, 'weapon_space')];
-        output[concatRepAttrName('weapon', id, 'weapon_speed')] = v[concatRepAttrName('weapon', id, 'weapon_speed')];
-        output[concatRepAttrName('weapon', id, 'weapon_misc')] = v[concatRepAttrName('weapon', id, 'weapon_misc')];
-        output[concatRepAttrName('weapon', id, 'weapon_thac_adj0')] = +v[concatRepAttrName('weapon', id, 'weapon_thac_adj0')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_thac_adj1')] = +v[concatRepAttrName('weapon', id, 'weapon_thac_adj1')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_thac_adj2')] = +v[concatRepAttrName('weapon', id, 'weapon_thac_adj2')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_thac_adj3')] = +v[concatRepAttrName('weapon', id, 'weapon_thac_adj3')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_thac_adj4')] = +v[concatRepAttrName('weapon', id, 'weapon_thac_adj4')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_thac_adj5')] = +v[concatRepAttrName('weapon', id, 'weapon_thac_adj5')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_thac_adj6')] = +v[concatRepAttrName('weapon', id, 'weapon_thac_adj6')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_thac_adj7')] = +v[concatRepAttrName('weapon', id, 'weapon_thac_adj7')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_thac_adj8')] = +v[concatRepAttrName('weapon', id, 'weapon_thac_adj8')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_thac_adj9')] = +v[concatRepAttrName('weapon', id, 'weapon_thac_adj9')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_thac_adj10')] = +v[concatRepAttrName('weapon', id, 'weapon_thac_adj10')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = v[concatRepAttrName('weapon', id, 'weapon_macro_text')];
-        output[concatRepAttrName('weapon', id, 'weapon_damagesmallmedium_chat_menu')] = v[concatRepAttrName('weapon', id, 'weapon_damagesmallmedium_chat_menu')];
-        output[concatRepAttrName('weapon', id, 'weapon_damagelarge_chat_menu')] = v[concatRepAttrName('weapon', id, 'weapon_damagelarge_chat_menu')];
-        output[concatRepAttrName('weapon', id, 'weapon_damagesmallmedium_npc_chat_menu')] = v[concatRepAttrName('weapon', id, 'weapon_damagesmallmedium_npc_chat_menu')];
-        output[concatRepAttrName('weapon', id, 'weapon_damagelarge_npc_chat_menu')] = v[concatRepAttrName('weapon', id, 'weapon_damagelarge_npc_chat_menu')];
-        output[concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium_chat_menu')] = v[concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium_chat_menu')];
-        output[concatRepAttrName('weapon', id, 'weapon_critdamagelarge_chat_menu')] = v[concatRepAttrName('weapon', id, 'weapon_critdamagelarge_chat_menu')];
-        output[concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium_npc_chat_menu')] = v[concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium_npc_chat_menu')];
-        output[concatRepAttrName('weapon', id, 'weapon_critdamagelarge_npc_chat_menu')] = v[concatRepAttrName('weapon', id, 'weapon_critdamagelarge_npc_chat_menu')];
-        output[concatRepAttrName('weapon', id, 'weapon_damage_chat_menu_npc')] = v[concatRepAttrName('weapon', id, 'weapon_damage_chat_menu_npc')];
+        output[`repeating_weapon_${id}_weapon_attack_type`] = +v[`repeating_weapon_${id}_weapon_attack_type`] || 0;
+        output[`repeating_weapon_${id}_weapon_dual`] = v[`repeating_weapon_${id}_weapon_dual`];
+        output[`repeating_weapon_${id}_weapon_whisper_to_hit`] = v[`repeating_weapon_${id}_weapon_whisper_to_hit`];
+        output[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] = +v[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] || 0;
+        output[`repeating_weapon_${id}_weapon_dual_pen`] = +v[`repeating_weapon_${id}_weapon_dual_pen`] || 0;
+        output[`repeating_weapon_${id}_weapon_backstab_var`] = +v[`repeating_weapon_${id}_weapon_backstab_var`] || 0;
+        output[`repeating_weapon_${id}_weapon_tohitbonus`] = +v[`repeating_weapon_${id}_weapon_tohitbonus`] || 0;
+        output[`repeating_weapon_${id}_weapon_magicbonus`] = +v[`repeating_weapon_${id}_weapon_magicbonus`] || 0;
+        output[`repeating_weapon_${id}_weapon_prof`] = +v[`repeating_weapon_${id}_weapon_prof`] || 0;
+        output[`repeating_weapon_${id}_weapon_backstab`] = +v[`repeating_weapon_${id}_weapon_backstab`] || 0;
+        output[`repeating_weapon_${id}_weapon_backstab_bonus`] = +v[`repeating_weapon_${id}_weapon_backstab_bonus`] || 0;
+        output[`repeating_weapon_${id}_weapon_backstab_mult`] = +v[`repeating_weapon_${id}_weapon_backstab_mult`] || 0;
+        output[`repeating_weapon_${id}_weapon_attackdmgbonus`] = +v[`repeating_weapon_${id}_weapon_attackdmgbonus`] || 0;
+        output[`repeating_weapon_${id}_weapon_num_attacks`] = +v[`repeating_weapon_${id}_weapon_num_attacks`] || 0;
+        output[`repeating_weapon_${id}_weapon_quantity`] = +v[`repeating_weapon_${id}_weapon_quantity`] || 0;
+        output[`repeating_weapon_${id}_weapon_ammo`] = +v[`repeating_weapon_${id}_weapon_ammo`] || 0;
+        output[`repeating_weapon_${id}_weapon_ammo_max`] = +v[`repeating_weapon_${id}_weapon_ammo_max`] || 0;
+        output[`repeating_weapon_${id}_weapon_weight`] = +v[`repeating_weapon_${id}_weapon_weight`] || 0;
+        output[`repeating_weapon_${id}_weapon_cost`] = +v[`repeating_weapon_${id}_weapon_cost`] || 0;
+        output[`repeating_weapon_${id}_weapon_range_short`] = +v[`repeating_weapon_${id}_weapon_range_short`] || 0;
+        output[`repeating_weapon_${id}_weapon_range_medium`] = +v[`repeating_weapon_${id}_weapon_range_medium`] || 0;
+        output[`repeating_weapon_${id}_weapon_range_long`] = +v[`repeating_weapon_${id}_weapon_range_long`] || 0;
+        output[`repeating_weapon_${id}_weapon_length`] = v[`repeating_weapon_${id}_weapon_length`];
+        output[`repeating_weapon_${id}_weapon_space`] = v[`repeating_weapon_${id}_weapon_space`];
+        output[`repeating_weapon_${id}_weapon_speed`] = v[`repeating_weapon_${id}_weapon_speed`];
+        output[`repeating_weapon_${id}_weapon_misc`] = v[`repeating_weapon_${id}_weapon_misc`];
+        output[`repeating_weapon_${id}_weapon_thac_adj0`] = +v[`repeating_weapon_${id}_weapon_thac_adj0`] || 0;
+        output[`repeating_weapon_${id}_weapon_thac_adj1`] = +v[`repeating_weapon_${id}_weapon_thac_adj1`] || 0;
+        output[`repeating_weapon_${id}_weapon_thac_adj2`] = +v[`repeating_weapon_${id}_weapon_thac_adj2`] || 0;
+        output[`repeating_weapon_${id}_weapon_thac_adj3`] = +v[`repeating_weapon_${id}_weapon_thac_adj3`] || 0;
+        output[`repeating_weapon_${id}_weapon_thac_adj4`] = +v[`repeating_weapon_${id}_weapon_thac_adj4`] || 0;
+        output[`repeating_weapon_${id}_weapon_thac_adj5`] = +v[`repeating_weapon_${id}_weapon_thac_adj5`] || 0;
+        output[`repeating_weapon_${id}_weapon_thac_adj6`] = +v[`repeating_weapon_${id}_weapon_thac_adj6`] || 0;
+        output[`repeating_weapon_${id}_weapon_thac_adj7`] = +v[`repeating_weapon_${id}_weapon_thac_adj7`] || 0;
+        output[`repeating_weapon_${id}_weapon_thac_adj8`] = +v[`repeating_weapon_${id}_weapon_thac_adj8`] || 0;
+        output[`repeating_weapon_${id}_weapon_thac_adj9`] = +v[`repeating_weapon_${id}_weapon_thac_adj9`] || 0;
+        output[`repeating_weapon_${id}_weapon_thac_adj10`] = +v[`repeating_weapon_${id}_weapon_thac_adj10`] || 0;
+        output[`repeating_weapon_${id}_weapon_macro_text`] = v[`repeating_weapon_${id}_weapon_macro_text`];
+        output[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`] = v[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`];
+        output[`repeating_weapon_${id}_weapon_damagelarge_chat_menu`] = v[`repeating_weapon_${id}_weapon_damagelarge_chat_menu`];
+        output[`repeating_weapon_${id}_weapon_damagesmallmedium_npc_chat_menu`] = v[`repeating_weapon_${id}_weapon_damagesmallmedium_npc_chat_menu`];
+        output[`repeating_weapon_${id}_weapon_damagelarge_npc_chat_menu`] = v[`repeating_weapon_${id}_weapon_damagelarge_npc_chat_menu`];
+        output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_chat_menu`] = v[`repeating_weapon_${id}_weapon_critdamagesmallmedium_chat_menu`];
+        output[`repeating_weapon_${id}_weapon_critdamagelarge_chat_menu`] = v[`repeating_weapon_${id}_weapon_critdamagelarge_chat_menu`];
+        output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`] = v[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`];
+        output[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`] = v[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`];
+        output[`repeating_weapon_${id}_weapon_damage_chat_menu_npc`] = v[`repeating_weapon_${id}_weapon_damage_chat_menu_npc`];
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: setWeaponsUpdate completed`);
@@ -2320,17 +2242,17 @@ const setNWPUpdate = (current_version, final_version) => {
   getSectionIDs('nonweaponproficiencies', (idArray) => {
     const output = {};
     const fields = idArray.flatMap((id) => [
-      concatRepAttrName('nonweaponproficiencies', id, 'nwp_attribute'),
-      concatRepAttrName('nonweaponproficiencies', id, 'nwp_slots'),
-      concatRepAttrName('nonweaponproficiencies', id, 'nwp_modifier'),
-      concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text'),
+      `repeating_nonweaponproficiencies_${id}_nwp_attribute`,
+      `repeating_nonweaponproficiencies_${id}_nwp_slots`,
+      `repeating_nonweaponproficiencies_${id}_nwp_modifier`,
+      `repeating_nonweaponproficiencies_${id}_nwp_macro_text`,
     ]);
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
-        output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_attribute')] = v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_attribute')];
-        output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_slots')] = +v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_slots')] || 0;
-        output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_modifier')] = +v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_modifier')] || 0;
-        output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')] = v[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')];
+        output[`repeating_nonweaponproficiencies_${id}_nwp_attribute`] = v[`repeating_nonweaponproficiencies_${id}_nwp_attribute`];
+        output[`repeating_nonweaponproficiencies_${id}_nwp_slots`] = +v[`repeating_nonweaponproficiencies_${id}_nwp_slots`] || 0;
+        output[`repeating_nonweaponproficiencies_${id}_nwp_modifier`] = +v[`repeating_nonweaponproficiencies_${id}_nwp_modifier`] || 0;
+        output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`];
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: setNWPUpdate completed`);
@@ -2346,16 +2268,12 @@ const clearWeaponsWeightCost = () => {
   // clear old weapon weight and cost values
   getSectionIDs('repeating_weapon', (idArray) => {
     const output = {};
-    const fields = idArray.flatMap((id) => [
-      concatRepAttrName('weapon', id, 'weapon_quantity'),
-      concatRepAttrName('weapon', id, 'weapon_weight'),
-      concatRepAttrName('weapon', id, 'weapon_cost'),
-    ]);
+    const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_quantity`, `repeating_weapon_${id}_weapon_weight`, `repeating_weapon_${id}_weapon_cost`]);
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
-        output[concatRepAttrName('weapon', id, 'weapon_quantity')] = +v[concatRepAttrName('weapon', id, 'weapon_quantity')] || 0;
-        output[concatRepAttrName('weapon', id, 'weapon_weight')] = 0;
-        output[concatRepAttrName('weapon', id, 'weapon_cost')] = 0;
+        output[`repeating_weapon_${id}_weapon_quantity`] = +v[`repeating_weapon_${id}_weapon_quantity`] || 0;
+        output[`repeating_weapon_${id}_weapon_weight`] = 0;
+        output[`repeating_weapon_${id}_weapon_cost`] = 0;
         // clog(`CLEARED OLD WEAPON WEIGHT AND COST`);
       });
       setAttrs(output);
@@ -2371,16 +2289,16 @@ const migrateWeaponWtCostFunction = () => {
       const equipmentFields = [];
       const fields = [...weaponFields, ...equipmentFields];
       _.each(weaponsArray, (id) => {
-        fields.push(concatRepAttrName('weapon', id, 'weapon_name'));
-        fields.push(concatRepAttrName('weapon', id, 'weapon_quantity'));
-        fields.push(concatRepAttrName('weapon', id, 'weapon_weight'));
-        fields.push(concatRepAttrName('weapon', id, 'weapon_cost'));
+        fields.push(`repeating_weapon_${id}_weapon_name`);
+        fields.push(`repeating_weapon_${id}_weapon_quantity`);
+        fields.push(`repeating_weapon_${id}_weapon_weight`);
+        fields.push(`repeating_weapon_${id}_weapon_cost`);
       });
       _.each(equipmentArray, (idEquip) => {
-        fields.push(concatRepAttrName('equipment', idEquip, 'equipment_item'));
-        fields.push(concatRepAttrName('equipment', idEquip, 'equipment_quantity'));
-        fields.push(concatRepAttrName('equipment', idEquip, 'equipment_weight'));
-        fields.push(concatRepAttrName('equipment', idEquip, 'equipment_cost'));
+        fields.push(`repeating_equipment_${idEquip}_equipment_item`);
+        fields.push(`repeating_equipment_${idEquip}_equipment_quantity`);
+        fields.push(`repeating_equipment_${idEquip}_equipment_weight`);
+        fields.push(`repeating_equipment_${idEquip}_equipment_cost`);
       });
       getAttrs(fields, (v) => {
         const equipmentNamesArray = [];
@@ -2389,18 +2307,18 @@ const migrateWeaponWtCostFunction = () => {
         const equipmentIdsArray = [];
         let newID = '';
         _.each(weaponsArray, (id) => {
-          const weaponName = v[concatRepAttrName('weapon', id, 'weapon_name')];
-          const weaponQuantity = v[concatRepAttrName('weapon', id, 'weapon_quantity')];
-          const weaponWeight = v[concatRepAttrName('weapon', id, 'weapon_weight')];
-          const weaponCost = v[concatRepAttrName('weapon', id, 'weapon_cost')];
+          const weaponName = v[`repeating_weapon_${id}_weapon_name`];
+          const weaponQuantity = v[`repeating_weapon_${id}_weapon_quantity`];
+          const weaponWeight = v[`repeating_weapon_${id}_weapon_weight`];
+          const weaponCost = v[`repeating_weapon_${id}_weapon_cost`];
           _.each(equipmentArray, (idEquip) => {
             const equipmentId = idEquip;
             equipmentIdsArray.push(equipmentId);
-            const equipmentName = v[concatRepAttrName('equipment', idEquip, 'equipment_item')];
+            const equipmentName = v[`repeating_equipment_${idEquip}_equipment_item`];
             equipmentNamesArray.push(equipmentName);
-            const equipmentWeight = v[concatRepAttrName('equipment', idEquip, 'equipment_weight')];
+            const equipmentWeight = v[`repeating_equipment_${idEquip}_equipment_weight`];
             equipmentWeightsArray.push(equipmentWeight);
-            const equipmentCost = v[concatRepAttrName('equipment', idEquip, 'equipment_cost')];
+            const equipmentCost = v[`repeating_equipment_${idEquip}_equipment_cost`];
             equipmentCostsArray.push(equipmentCost);
           });
           // weapon weight, cost, or both are being tracked on the weapon row
@@ -2412,12 +2330,12 @@ const migrateWeaponWtCostFunction = () => {
               clog(`NO MATCH || COPY TO NEW ROW ||`);
               // create a new row
               newID = generateUniqueRowID();
-              output[concatRepAttrName('equipment', newID, 'equipment_type')] = 1;
-              output[concatRepAttrName('equipment', newID, 'equipment_item')] = weaponName;
-              output[concatRepAttrName('equipment', newID, 'equipment_quantity')] = weaponQuantity;
-              output[concatRepAttrName('equipment', newID, 'equipment_quantity_max')] = weaponQuantity;
-              output[concatRepAttrName('equipment', newID, 'equipment_weight')] = weaponWeight;
-              output[concatRepAttrName('equipment', newID, 'equipment_cost')] = weaponCost;
+              output[`repeating_equipment_${newID}_equipment_type`] = 1;
+              output[`repeating_equipment_${newID}_equipment_item`] = weaponName;
+              output[`repeating_equipment_${newID}_equipment_quantity`] = weaponQuantity;
+              output[`repeating_equipment_${newID}_equipment_quantity_max`] = weaponQuantity;
+              output[`repeating_equipment_${newID}_equipment_weight`] = weaponWeight;
+              output[`repeating_equipment_${newID}_equipment_cost`] = weaponCost;
             } else if (equipmentWeightsArray[nameIndex] === '0' && equipmentCostsArray[nameIndex] === '0') {
               // weight & cost are being tracked on weapons
               clog(
@@ -2425,11 +2343,11 @@ const migrateWeaponWtCostFunction = () => {
               );
               // update existing row
               newID = equipmentIdsArray[nameIndex];
-              output[concatRepAttrName('equipment', newID, 'equipment_type')] = 1;
-              output[concatRepAttrName('equipment', newID, 'equipment_quantity')] = weaponQuantity;
-              output[concatRepAttrName('equipment', newID, 'equipment_quantity_max')] = weaponQuantity;
-              output[concatRepAttrName('equipment', newID, 'equipment_weight')] = weaponWeight;
-              output[concatRepAttrName('equipment', newID, 'equipment_cost')] = weaponCost;
+              output[`repeating_equipment_${newID}_equipment_type`] = 1;
+              output[`repeating_equipment_${newID}_equipment_quantity`] = weaponQuantity;
+              output[`repeating_equipment_${newID}_equipment_quantity_max`] = weaponQuantity;
+              output[`repeating_equipment_${newID}_equipment_weight`] = weaponWeight;
+              output[`repeating_equipment_${newID}_equipment_cost`] = weaponCost;
             } else if (equipmentWeightsArray[nameIndex] !== '0' && equipmentCostsArray[nameIndex] === '0') {
               // weight is being tracked on equipment but costs are not
               clog(
@@ -2437,8 +2355,8 @@ const migrateWeaponWtCostFunction = () => {
               );
               // update existing row
               newID = equipmentIdsArray[nameIndex];
-              output[concatRepAttrName('equipment', newID, 'equipment_type')] = 1;
-              output[concatRepAttrName('equipment', newID, 'equipment_cost')] = weaponCost;
+              output[`repeating_equipment_${newID}_equipment_type`] = 1;
+              output[`repeating_equipment_${newID}_equipment_cost`] = weaponCost;
             } else if (equipmentWeightsArray[nameIndex] === '0' && equipmentCostsArray[nameIndex] !== '0') {
               // weight is not being tracked on equipment but costs are
               clog(
@@ -2446,8 +2364,8 @@ const migrateWeaponWtCostFunction = () => {
               );
               // update existing row
               newID = equipmentIdsArray[nameIndex];
-              output[concatRepAttrName('equipment', newID, 'equipment_type')] = 1;
-              output[concatRepAttrName('equipment', newID, 'equipment_weight')] = weaponWeight;
+              output[`repeating_equipment_${newID}_equipment_type`] = 1;
+              output[`repeating_equipment_${newID}_equipment_weight`] = weaponWeight;
             } else if (equipmentWeightsArray[nameIndex] !== '0' && equipmentCostsArray[nameIndex] !== '0') {
               clog(
                 `100% MATCH weight & cost tracked on equipment. || IGNORE ROW || name:${weaponName} weight: ${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex}`,
@@ -2479,12 +2397,12 @@ const migrateWeaponWtCost = (current_version, final_version) => {
 const setEquipmentType = (current_version, final_version) => {
   getSectionIDs('repeating_equipment', (idArray) => {
     const output = {};
-    const fields = idArray.map((id) => [concatRepAttrName('equipment', id, 'equipment_type')]);
+    const fields = idArray.map((id) => [`repeating_equipment_${id}_equipment_type`]);
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
-        const equipType = +v[concatRepAttrName('equipment', id, 'equipment_type')] || 0;
+        const equipType = +v[`repeating_equipment_${id}_equipment_type`] || 0;
         if (equipType >= 0) return;
-        output[concatRepAttrName('equipment', id, 'equipment_type')] = 0;
+        output[`repeating_equipment_${id}_equipment_type`] = 0;
         clog(`equipType -1:${equipType} reset to Gear`);
       });
       output.sheet_version = current_version;
@@ -2532,16 +2450,16 @@ const initMacroUpdate = (current_version, final_version) => {
 // One-time update: add parenthesis to critical damage macro-text
 const updateCriticalDamageMacro = (current_version, final_version) => {
   getSectionIDs('repeating_weapon', (idArray) => {
-    const fields = idArray.flatMap((id) => [concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium'), concatRepAttrName('weapon', id, 'weapon_critdamagelarge')]);
+    const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_critdamagesmallmedium`, `repeating_weapon_${id}_weapon_critdamagelarge`]);
     getAttrs([...fields], (v) => {
       const output = {};
       const macrodefaultSmall = '(@{weapon_damagesmallmedium})*2';
       const macrodefaultLarge = '(@{weapon_damagelarge})*2';
       _.each(idArray, (id) => {
-        const macrotextSmall = v[concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium')] || macrodefaultSmall;
-        const macrotextLarge = v[concatRepAttrName('weapon', id, 'weapon_critdamagelarge')] || macrodefaultLarge;
-        output[concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium')] = macrotextSmall.replace(/@{weapon_damagesmallmedium}*2/g, '(@{weapon_damagesmallmedium})*2');
-        output[concatRepAttrName('weapon', id, 'weapon_critdamagelarge')] = macrotextLarge.replace(/@{weapon_damagelarge}*2/g, '(@{weapon_damagelarge})*2');
+        const macrotextSmall = v[`repeating_weapon_${id}_weapon_critdamagesmallmedium`] || macrodefaultSmall;
+        const macrotextLarge = v[`repeating_weapon_${id}_weapon_critdamagelarge`] || macrodefaultLarge;
+        output[`repeating_weapon_${id}_weapon_critdamagesmallmedium`] = macrotextSmall.replace(/@{weapon_damagesmallmedium}*2/g, '(@{weapon_damagesmallmedium})*2');
+        output[`repeating_weapon_${id}_weapon_critdamagelarge`] = macrotextLarge.replace(/@{weapon_damagelarge}*2/g, '(@{weapon_damagelarge})*2');
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: updateCriticalDamageMacro completed`);
@@ -2590,7 +2508,7 @@ const newSheet = async () => {
 // One-time update: set repeating_equipment_equipment_sync_armor_flag
 const updateSyncArmorFlag = async (current_version, final_version) => {
   const idArray = await getSectionIDsAsync('equipment');
-  const fieldsToGet = idArray.map((id) => concatRepAttrName('equipment', id, 'equipment_armor_type'));
+  const fieldsToGet = idArray.map((id) => `repeating_equipment_${id}_equipment_armor_type`);
   const v = await getAttrsAsync([...armorRowIDs, ...fieldsToGet]);
   const output = {};
   // if no rows, exit.
@@ -2607,10 +2525,10 @@ const updateSyncArmorFlag = async (current_version, final_version) => {
   // map the ID array to an array of Promises (the async checks)
   // promise is necessary because of the async function inside the loop
   const updatePromises = idArray.map(async (id) => {
-    const type = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')] || 0;
+    const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
     // Await the asynchronous test
     const {isMatch} = await testArmorRowIDs(id);
-    const flagName = concatRepAttrName('equipment', id, 'equipment_sync_armor_flag');
+    const flagName = `repeating_equipment_${id}_equipment_sync_armor_flag`;
     if (type !== 99 && isMatch) {
       clog(`updateSyncArmorFlag - match from testArmorRowIDs():${isMatch} type:${type}`);
       output[flagName] = 1;
@@ -2776,12 +2694,12 @@ on('change:is_npc', async (eventInfo) => {
 const sumEquipmentCost = async () => {
   const idArray = await getSectionIDsAsync('equipment');
   const output = {};
-  const fields = idArray.flatMap((id) => [concatRepAttrName('equipment', id, 'equipment_quantity'), concatRepAttrName('equipment', id, 'equipment_cost')]);
+  const fields = idArray.flatMap((id) => [`repeating_equipment_${id}_equipment_quantity`, `repeating_equipment_${id}_equipment_cost`]);
   const v = await getAttrsAsync(fields);
   const equipmentCosts = [];
   _.each(idArray, (id) => {
-    const quantity = +v[concatRepAttrName('equipment', id, 'equipment_quantity')] || 0;
-    let cost = +v[concatRepAttrName('equipment', id, 'equipment_cost')] || 0;
+    const quantity = +v[`repeating_equipment_${id}_equipment_quantity`] || 0;
+    let cost = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
     // costs
     cost = quantity > 0 ? cost * quantity : 0;
     equipmentCosts.push(cost);
@@ -2816,11 +2734,11 @@ const sumEquipmentWeight = async () => {
   const idArray = await getSectionIDsAsync('equipment');
   const output = {};
   const fields = idArray.flatMap((id) => [
-    concatRepAttrName('equipment', id, 'equipment_type'),
-    concatRepAttrName('equipment', id, 'equipment_weight'),
-    concatRepAttrName('equipment', id, 'equipment_quantity'),
-    concatRepAttrName('equipment', id, 'equipment_carried'),
-    concatRepAttrName('equipment', id, 'equipment_carried_select'),
+    `repeating_equipment_${id}_equipment_type`,
+    `repeating_equipment_${id}_equipment_weight`,
+    `repeating_equipment_${id}_equipment_quantity`,
+    `repeating_equipment_${id}_equipment_carried`,
+    `repeating_equipment_${id}_equipment_carried_select`,
   ]);
   await sumCoinWeight();
   const v = await getAttrsAsync(['total_coin_weight', ...fields]);
@@ -2829,14 +2747,14 @@ const sumEquipmentWeight = async () => {
   const totalEquipmentWeights = [];
   const totalCoinWeight = +v.total_coin_weight || 0;
   _.each(idArray, (id) => {
-    const type = +v[concatRepAttrName('equipment', id, 'equipment_type')] || 0;
+    const type = +v[`repeating_equipment_${id}_equipment_type`] || 0;
     // Weight calcs use equipment_carried
     let carried = 0;
-    const carriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')] || 0;
-    output[concatRepAttrName('equipment', id, 'equipment_carried')] = carriedSelect === 1 ? 1 : 0;
+    const carriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
+    output[`repeating_equipment_${id}_equipment_carried`] = carriedSelect === 1 ? 1 : 0;
     carried = carriedSelect === 1 ? 1 : 0;
-    const quantity = +v[concatRepAttrName('equipment', id, 'equipment_quantity')] || 0;
-    let weight = +v[concatRepAttrName('equipment', id, 'equipment_weight')] || 0;
+    const quantity = +v[`repeating_equipment_${id}_equipment_quantity`] || 0;
+    let weight = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
     let weaponWeight = 0;
     let armorWeight = 0;
     weight = weight * quantity * carried;
@@ -3052,16 +2970,16 @@ on(
     const source = `${eventInfo.sourceAttribute}`;
     const pattern = /equipment_type/; // parses the event text
     const isType = pattern.test(source); // boolean for equipment_type change
-    const fields = [concatRepAttrName('equipment', id, 'equipment_type'), concatRepAttrName('equipment', id, 'equipment_carried_select')];
+    const fields = [`repeating_equipment_${id}_equipment_type`, `repeating_equipment_${id}_equipment_carried_select`];
     const v = await getAttrsAsync(['equipment_tabs_type', 'equipment_tabs_carry', ...fields]);
     await setAttrsAsync(output, {silent: true});
     const output = {};
     const carriedTab = +v.equipment_tabs_carry || 0; // 1, 0, 2, -1
     const typeTab = +v.equipment_tabs_type || 0; // 0, 1, 2, 3, 4, -1
-    const thisType = +v[concatRepAttrName('equipment', id, 'equipment_type')] || 0; // 0, 1, 2, 3, 4
-    const thisCarriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')] || 0; // 0, 1, 2
+    const thisType = +v[`repeating_equipment_${id}_equipment_type`] || 0; // 0, 1, 2, 3, 4
+    const thisCarriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0; // 0, 1, 2
     // Weight calcs use equipment_carried so keep them synced
-    output[concatRepAttrName('equipment', id, 'equipment_carried')] = thisCarriedSelect === 1 ? 1 : 0;
+    output[`repeating_equipment_${id}_equipment_carried`] = thisCarriedSelect === 1 ? 1 : 0;
     // jumps to equip type tab unless Show All or same equip type tab
     output.equipment_tabs_type = typeTab !== -1 && isType ? thisType : typeTab;
     // jumps to carry type tab unless Show All or same carry type tab
@@ -3076,24 +2994,24 @@ on('change:equipment_tabs_type change:equipment_tabs_carry', async (eventInfo) =
   const idArray = await getSectionIDsAsync('equipment');
   const output = {};
   const fields = idArray.flatMap((id) => [
-    concatRepAttrName('equipment', id, 'equipment_type'),
-    concatRepAttrName('equipment', id, 'equipment_carried_select'),
-    concatRepAttrName('equipment', id, 'equipment_magical'),
+    `repeating_equipment_${id}_equipment_type`,
+    `repeating_equipment_${id}_equipment_carried_select`,
+    `repeating_equipment_${id}_equipment_magical`,
   ]);
   const v = await getAttrsAsync(['equipment_tabs_type', 'equipment_tabs_carry', 'equipment_magical', ...fields]);
   const typeTab = +v.equipment_tabs_type || 0; // 0, 1, 2, 3, 4, -1
   const carriedTab = +v.equipment_tabs_carry || 0; // 1, 0, 2, -1
   _.each(idArray, (id) => {
-    const isMagical = +v[concatRepAttrName('equipment', id, 'equipment_magical')] || 0; // checkbox
-    const thisType = +v[concatRepAttrName('equipment', id, 'equipment_type')] || 0; // 0, 1, 2, 3, 4
-    const thisCarriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')] || 0; // 0, 1, 2
+    const isMagical = +v[`repeating_equipment_${id}_equipment_magical`] || 0; // checkbox
+    const thisType = +v[`repeating_equipment_${id}_equipment_type`] || 0; // 0, 1, 2, 3, 4
+    const thisCarriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0; // 0, 1, 2
     // CSS to hide/show the repeating row based on typeTab and/or carriedTab
     if (typeTab === -1 || typeTab === thisType || (typeTab === 3 && isMagical)) {
-      output[concatRepAttrName('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
-      return (output[concatRepAttrName('equipment', id, 'equipment_show_type')] = 1);
+      output[`repeating_equipment_${id}_equipment_show_carry`] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
+      return (output[`repeating_equipment_${id}_equipment_show_type`] = 1);
     } else {
-      output[concatRepAttrName('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
-      output[concatRepAttrName('equipment', id, 'equipment_show_type')] = 0;
+      output[`repeating_equipment_${id}_equipment_show_carry`] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
+      output[`repeating_equipment_${id}_equipment_show_type`] = 0;
     }
   });
   await setAttrsAsync(output);
@@ -3103,14 +3021,14 @@ const removeEmptyArmorRows = async () => {
   const idArray = await getSectionIDsAsync('equipment');
   clog(`removeEmptyArmorRows`);
   const output = {};
-  const fields = idArray.flatMap((id) => [concatRepAttrName('equipment', id, 'equipment_armor_type')]);
+  const fields = idArray.flatMap((id) => [`repeating_equipment_${id}_equipment_armor_type`]);
   // grab all attrs and ids before continuing
   const [v, armorDetailsArray] = await Promise.all([getAttrsAsync(fields), generateArmorDetailsArray()]);
   clog(`removeEmptyArmorRows - armorDetailsArray:`);
   console.log(armorDetailsArray);
   _.each(idArray, (id) => {
     // this new id/row
-    const type = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')] || 0;
+    const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
     // Armor Type not selected
     if (type === 99) {
       return;
@@ -3222,8 +3140,7 @@ const removeEmptyArmorRows = async () => {
 };
 
 // Changes in Armor Details
-// IF this is a new row, add new repeating_equipment armor
-// OR update existing synced row
+// IF this is a new row, add new repeating_equipment armor OR update an existing synced row
 const armorDetailslisteners = `${armorAttrs.map((stat) => `change:${stat}`).join(' ')}`;
 on(armorDetailslisteners, async (eventInfo) => {
   clog(`armorDetailslisteners - sourceType:${eventInfo.sourceType}`);
@@ -3242,14 +3159,14 @@ on(armorDetailslisteners, async (eventInfo) => {
       newID = generateUniqueRowID();
       output.unarmored_row_id = newID.toLowerCase();
       output.unarmored_worn = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.unarmored.trim();
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.unarmored_ac || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.unarmored_base || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+      output[`repeating_equipment_${newID}_equipment_type`] = 2;
+      output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+      output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored.trim();
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
+      output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       clog(`Creating a new repeating_equipment row for unarmored: ${newID}`);
     }
     if (attr === 'armortype') {
@@ -3257,18 +3174,18 @@ on(armorDetailslisteners, async (eventInfo) => {
       newID = generateUniqueRowID();
       output.armortype1_row_id = newID.toLowerCase();
       output.armortype_worn = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armortype.trim();
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armortype_ac || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armortype_base || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armortype_magic || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_bulk')] = +v.armortype_bulk || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armortype_carried || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.armor_weight || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.armor_cost || 0;
+      output[`repeating_equipment_${newID}_equipment_type`] = 2;
+      output[`repeating_equipment_${newID}_equipment_armor_type`] = 1;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+      output[`repeating_equipment_${newID}_equipment_item`] = v.armortype.trim();
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype_magic || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
+      output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
+      output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
+      output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
       // clog(`Creating a new repeating_equipment row for armor1: ${newID}`);
     }
     if (attr === 'armortype2') {
@@ -3276,18 +3193,18 @@ on(armorDetailslisteners, async (eventInfo) => {
       newID = generateUniqueRowID();
       output.armortype2_row_id = newID.toLowerCase();
       output.armortype2_worn = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 2;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armortype2.trim();
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armortype2_ac || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armortype2_base || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armortype2_magic || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_bulk')] = +v.armortype2_bulk || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armortype2_carried || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.armortype2_weight || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.armortype2_cost || 0;
+      output[`repeating_equipment_${newID}_equipment_type`] = 2;
+      output[`repeating_equipment_${newID}_equipment_armor_type`] = 2;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+      output[`repeating_equipment_${newID}_equipment_item`] = v.armortype2.trim();
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype2_magic || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
+      output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
+      output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
+      output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
       // clog(`Creating a new repeating_equipment row for armor2: ${newID}`);
     }
     if (attr === 'armorshield') {
@@ -3295,19 +3212,19 @@ on(armorDetailslisteners, async (eventInfo) => {
       newID = generateUniqueRowID();
       output.armorshield_row_id = newID.toLowerCase();
       output.armorshield_worn = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 3;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorshield.trim();
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorshield_ac || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorshield_base || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorshield_magic || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorshield_mod || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_bulk')] = +v.armorshield_bulk || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armorshield_carried || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.armorshield_weight || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.armorshield_cost || 0;
+      output[`repeating_equipment_${newID}_equipment_type`] = 2;
+      output[`repeating_equipment_${newID}_equipment_armor_type`] = 3;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+      output[`repeating_equipment_${newID}_equipment_item`] = v.armorshield.trim();
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorshield_magic || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorshield_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
+      output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
+      output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
+      output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
       // clog(`Creating a new repeating_equipment row for shield: ${newID}`);
     }
     if (attr === 'armorhelmet') {
@@ -3315,16 +3232,16 @@ on(armorDetailslisteners, async (eventInfo) => {
       newID = generateUniqueRowID();
       output.armorhelmet_row_id = newID.toLowerCase();
       output.armorhelmet_worn = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 4;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorhelmet.trim();
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorhelmet_ac || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorhelmet_magic || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_carried_select')] = +v.armorhelmet_carried || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_weight')] = +v.armorhelmet_weight || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_cost')] = +v.armorhelmet_cost || 0;
+      output[`repeating_equipment_${newID}_equipment_type`] = 2;
+      output[`repeating_equipment_${newID}_equipment_armor_type`] = 4;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+      output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet.trim();
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorhelmet_magic || 0;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
+      output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
+      output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
+      output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
       // clog(`Creating a new repeating_equipment row for helmet: ${newID}`);
     }
     if (attr === 'armorother') {
@@ -3332,15 +3249,15 @@ on(armorDetailslisteners, async (eventInfo) => {
       newID = generateUniqueRowID();
       output.armorother1_row_id = newID.toLowerCase();
       output.armorother1_worn = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 5;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother.trim();
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother_ac || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother_base || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother_magic || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother_mod || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+      output[`repeating_equipment_${newID}_equipment_type`] = 2;
+      output[`repeating_equipment_${newID}_equipment_armor_type`] = 5;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+      output[`repeating_equipment_${newID}_equipment_item`] = v.armorother.trim();
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for other1: ${newID}`);
     }
     if (attr === 'armorother2') {
@@ -3348,15 +3265,15 @@ on(armorDetailslisteners, async (eventInfo) => {
       newID = generateUniqueRowID();
       output.armorother2_row_id = newID.toLowerCase();
       output.armorother2_worn = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 6;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother2.trim();
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother2_ac || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother2_base || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother2_magic || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother2_mod || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+      output[`repeating_equipment_${newID}_equipment_type`] = 2;
+      output[`repeating_equipment_${newID}_equipment_armor_type`] = 6;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+      output[`repeating_equipment_${newID}_equipment_item`] = v.armorother2.trim();
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for other2: ${newID}`);
     }
     if (attr === 'armorother3') {
@@ -3364,15 +3281,15 @@ on(armorDetailslisteners, async (eventInfo) => {
       newID = generateUniqueRowID();
       output.armorother3_row_id = newID.toLowerCase();
       output.armorother3_worn = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 7;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother3.trim();
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother3_ac || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother3_base || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother3_magic || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother3_mod || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+      output[`repeating_equipment_${newID}_equipment_type`] = 2;
+      output[`repeating_equipment_${newID}_equipment_armor_type`] = 7;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+      output[`repeating_equipment_${newID}_equipment_item`] = v.armorother3.trim();
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for other3: ${newID}`);
     }
     if (attr === 'armorother4') {
@@ -3380,15 +3297,15 @@ on(armorDetailslisteners, async (eventInfo) => {
       newID = generateUniqueRowID();
       output.armorother4_row_id = newID.toLowerCase();
       output.armorother4_worn = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 8;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother4.trim();
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother4_ac || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother4_base || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother4_magic || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother4_mod || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+      output[`repeating_equipment_${newID}_equipment_type`] = 2;
+      output[`repeating_equipment_${newID}_equipment_armor_type`] = 8;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+      output[`repeating_equipment_${newID}_equipment_item`] = v.armorother4.trim();
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for other4: ${newID}`);
     }
     if (attr === 'armorother5') {
@@ -3396,15 +3313,15 @@ on(armorDetailslisteners, async (eventInfo) => {
       newID = generateUniqueRowID();
       output.armorother5_row_id = newID.toLowerCase();
       output.armorother5_worn = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 9;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother5.trim();
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother5_ac || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother5_base || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother5_magic || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother5_mod || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+      output[`repeating_equipment_${newID}_equipment_type`] = 2;
+      output[`repeating_equipment_${newID}_equipment_armor_type`] = 9;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+      output[`repeating_equipment_${newID}_equipment_item`] = v.armorother5.trim();
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for other5: ${newID}`);
     }
     if (attr === 'armorother6') {
@@ -3412,15 +3329,15 @@ on(armorDetailslisteners, async (eventInfo) => {
       newID = generateUniqueRowID();
       output.armorother6_row_id = newID.toLowerCase();
       output.armorother6_worn = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_type')] = 2;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_type')] = 10;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_worn')] = 1;
-      output[concatRepAttrName('equipment', newID, 'equipment_item')] = v.armorother6.trim();
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_ac')] = +v.armorother6_ac || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_base')] = +v.armorother6_base || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_magic')] = +v.armorother6_magic || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_armor_mod')] = +v.armorother6_mod || 0;
-      output[concatRepAttrName('equipment', newID, 'equipment_sync_armor_flag')] = 1;
+      output[`repeating_equipment_${newID}_equipment_type`] = 2;
+      output[`repeating_equipment_${newID}_equipment_armor_type`] = 10;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
+      output[`repeating_equipment_${newID}_equipment_item`] = v.armorother6.trim();
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for other6: ${newID}`);
     }
   }
@@ -3432,39 +3349,39 @@ on(armorDetailslisteners, async (eventInfo) => {
 const fillArmorDetails = async (id) => {
   clog(`fillArmorDetails - id passed:${id}`);
   const v = await getAttrsAsync([
-    concatRepAttrName('equipment', id, 'equipment_armor_type'),
-    concatRepAttrName('equipment', id, 'equipment_item'),
-    concatRepAttrName('equipment', id, 'equipment_armor_worn'),
-    concatRepAttrName('equipment', id, 'equipment_armor_ac'),
-    concatRepAttrName('equipment', id, 'equipment_armor_base'),
-    concatRepAttrName('equipment', id, 'equipment_armor_magic'),
-    concatRepAttrName('equipment', id, 'equipment_armor_mod'),
-    concatRepAttrName('equipment', id, 'equipment_armor_bulk'),
-    concatRepAttrName('equipment', id, 'equipment_carried_select'),
-    concatRepAttrName('equipment', id, 'equipment_carried'),
-    concatRepAttrName('equipment', id, 'equipment_weight'),
-    concatRepAttrName('equipment', id, 'equipment_cost'),
+    `repeating_equipment_${id}_equipment_armor_type`,
+    `repeating_equipment_${id}_equipment_item`,
+    `repeating_equipment_${id}_equipment_armor_worn`,
+    `repeating_equipment_${id}_equipment_armor_ac`,
+    `repeating_equipment_${id}_equipment_armor_base`,
+    `repeating_equipment_${id}_equipment_armor_magic`,
+    `repeating_equipment_${id}_equipment_armor_mod`,
+    `repeating_equipment_${id}_equipment_armor_bulk`,
+    `repeating_equipment_${id}_equipment_carried_select`,
+    `repeating_equipment_${id}_equipment_carried`,
+    `repeating_equipment_${id}_equipment_weight`,
+    `repeating_equipment_${id}_equipment_cost`,
   ]);
   const output = {};
   const recalc = 0;
-  const type = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')] || 0;
-  const item = v[concatRepAttrName('equipment', id, 'equipment_item')];
-  const worn = +v[concatRepAttrName('equipment', id, 'equipment_armor_worn')] || 0;
-  const ac = +v[concatRepAttrName('equipment', id, 'equipment_armor_ac')] || 0;
-  const base = +v[concatRepAttrName('equipment', id, 'equipment_armor_base')] || 0;
-  const magic = +v[concatRepAttrName('equipment', id, 'equipment_armor_magic')] || 0;
-  const mod = +v[concatRepAttrName('equipment', id, 'equipment_armor_mod')] || 0;
-  const bulk = +v[concatRepAttrName('equipment', id, 'equipment_armor_bulk')] || 0;
-  let carriedSelect = +v[concatRepAttrName('equipment', id, 'equipment_carried_select')] || 0;
-  const weight = +v[concatRepAttrName('equipment', id, 'equipment_weight')] || 0;
-  const cost = +v[concatRepAttrName('equipment', id, 'equipment_cost')] || 0;
+  const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
+  const item = v[`repeating_equipment_${id}_equipment_item`];
+  const worn = +v[`repeating_equipment_${id}_equipment_armor_worn`] || 0;
+  const ac = +v[`repeating_equipment_${id}_equipment_armor_ac`] || 0;
+  const base = +v[`repeating_equipment_${id}_equipment_armor_base`] || 0;
+  const magic = +v[`repeating_equipment_${id}_equipment_armor_magic`] || 0;
+  const mod = +v[`repeating_equipment_${id}_equipment_armor_mod`] || 0;
+  const bulk = +v[`repeating_equipment_${id}_equipment_armor_bulk`] || 0;
+  let carriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
+  const weight = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
+  const cost = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
   // armor in use ie 'worn', should always be considered as carried
   if (worn === 1) {
     carriedSelect = 1;
-    output[concatRepAttrName('equipment', id, 'equipment_carried_select')] = 1;
+    output[`repeating_equipment_${id}_equipment_carried_select`] = 1;
     // clog(`armor is worn: so armor is carried`);
   } else if (worn === 0 && (carriedSelect === 0 || carriedSelect === 2)) {
-    output[concatRepAttrName('equipment', id, 'equipment_carried_select')] = carriedSelect;
+    output[`repeating_equipment_${id}_equipment_carried_select`] = carriedSelect;
     // clog(`armor is not worn: so armor is not carried or on mount.`);
   }
   const thisLog = [
@@ -3606,36 +3523,36 @@ const fillArmorDetails = async (id) => {
 
 const createAttack = async (id) => {
   const v = await getAttrsAsync([
-    concatRepAttrName('equipment', id, 'equipment_item'),
-    concatRepAttrName('equipment', id, 'equipment_weapon_type'),
-    concatRepAttrName('equipment', id, 'equipment_weapon_speed'),
-    concatRepAttrName('equipment', id, 'equipment_weapon_length'),
-    concatRepAttrName('equipment', id, 'equipment_weapon_space'),
-    concatRepAttrName('equipment', id, 'equipment_weapon_misc'),
-    concatRepAttrName('equipment', id, 'equipment_weapon_damagesmallmedium'),
-    concatRepAttrName('equipment', id, 'equipment_weapon_damagelarge'),
-    concatRepAttrName('equipment', id, 'equipment_weapon_attackdmgtype'),
-    concatRepAttrName('equipment', id, 'equipment_weapon_rateoffire'),
-    concatRepAttrName('equipment', id, 'equipment_weapon_range'),
-    concatRepAttrName('equipment', id, 'equipment_quantity'),
-    concatRepAttrName('equipment', id, 'equipment_description'),
+    `repeating_equipment_${id}_equipment_item`,
+    `repeating_equipment_${id}_equipment_weapon_type`,
+    `repeating_equipment_${id}_equipment_weapon_speed`,
+    `repeating_equipment_${id}_equipment_weapon_length`,
+    `repeating_equipment_${id}_equipment_weapon_space`,
+    `repeating_equipment_${id}_equipment_weapon_misc`,
+    `repeating_equipment_${id}_equipment_weapon_damagesmallmedium`,
+    `repeating_equipment_${id}_equipment_weapon_damagelarge`,
+    `repeating_equipment_${id}_equipment_weapon_attackdmgtype`,
+    `repeating_equipment_${id}_equipment_weapon_rateoffire`,
+    `repeating_equipment_${id}_equipment_weapon_range`,
+    `repeating_equipment_${id}_equipment_quantity`,
+    `repeating_equipment_${id}_equipment_description`,
   ]);
   const output = {};
   const newID = generateUniqueRowID();
   // clog(`Creating a new attack newID:${newID}`);
-  output[concatRepAttrName('weapon', newID, 'weapon_name')] = v[concatRepAttrName('equipment', id, 'equipment_item')];
-  output[concatRepAttrName('weapon', newID, 'weapon_type')] = +v[concatRepAttrName('equipment', id, 'equipment_weapon_type')] || 0;
-  output[concatRepAttrName('weapon', newID, 'weapon_speed')] = v[concatRepAttrName('equipment', id, 'equipment_weapon_speed')];
-  output[concatRepAttrName('weapon', newID, 'weapon_length')] = v[concatRepAttrName('equipment', id, 'equipment_weapon_length')];
-  output[concatRepAttrName('weapon', newID, 'weapon_space')] = v[concatRepAttrName('equipment', id, 'equipment_weapon_space')];
-  output[concatRepAttrName('weapon', newID, 'weapon_misc')] = v[concatRepAttrName('equipment', id, 'equipment_weapon_misc')];
-  output[concatRepAttrName('weapon', newID, 'weapon_damagesmallmedium')] = v[concatRepAttrName('equipment', id, 'equipment_weapon_damagesmallmedium')];
-  output[concatRepAttrName('weapon', newID, 'weapon_damagelarge')] = v[concatRepAttrName('equipment', id, 'equipment_weapon_damagelarge')];
-  output[concatRepAttrName('weapon', newID, 'weapon_attackdmgtype')] = v[concatRepAttrName('equipment', id, 'equipment_weapon_attackdmgtype')];
-  output[concatRepAttrName('weapon', newID, 'weapon_rateoffire')] = v[concatRepAttrName('equipment', id, 'equipment_weapon_rateoffire')];
-  output[concatRepAttrName('weapon', newID, 'weapon_range')] = v[concatRepAttrName('equipment', id, 'equipment_weapon_range')];
-  output[concatRepAttrName('weapon', newID, 'weapon_quantity')] = +v[concatRepAttrName('equipment', id, 'equipment_quantity')] || 0;
-  output[concatRepAttrName('weapon', newID, 'weapon_notes')] = v[concatRepAttrName('equipment', id, 'equipment_description')];
+  output[`repeating_weapon_${newID}_weapon_name`] = v[`repeating_equipment_${id}_equipment_item`];
+  output[`repeating_weapon_${newID}_weapon_type`] = +v[`repeating_equipment_${id}_equipment_weapon_type`] || 0;
+  output[`repeating_weapon_${newID}_weapon_speed`] = v[`repeating_equipment_${id}_equipment_weapon_speed`];
+  output[`repeating_weapon_${newID}_weapon_length`] = v[`repeating_equipment_${id}_equipment_weapon_length`];
+  output[`repeating_weapon_${newID}_weapon_space`] = v[`repeating_equipment_${id}_equipment_weapon_space`];
+  output[`repeating_weapon_${newID}_weapon_misc`] = v[`repeating_equipment_${id}_equipment_weapon_misc`];
+  output[`repeating_weapon_${newID}_weapon_damagesmallmedium`] = v[`repeating_equipment_${id}_equipment_weapon_damagesmallmedium`];
+  output[`repeating_weapon_${newID}_weapon_damagelarge`] = v[`repeating_equipment_${id}_equipment_weapon_damagelarge`];
+  output[`repeating_weapon_${newID}_weapon_attackdmgtype`] = v[`repeating_equipment_${id}_equipment_weapon_attackdmgtype`];
+  output[`repeating_weapon_${newID}_weapon_rateoffire`] = v[`repeating_equipment_${id}_equipment_weapon_rateoffire`];
+  output[`repeating_weapon_${newID}_weapon_range`] = v[`repeating_equipment_${id}_equipment_weapon_range`];
+  output[`repeating_weapon_${newID}_weapon_quantity`] = +v[`repeating_equipment_${id}_equipment_quantity`] || 0;
+  output[`repeating_weapon_${newID}_weapon_notes`] = v[`repeating_equipment_${id}_equipment_description`];
   // set new row with equip values then set attack defaults and damage macros
   await setAttrsAsync(output, {silent: true});
   await setWeapons(newID);
@@ -3755,16 +3672,16 @@ on('remove:repeating_equipment', async (eventInfo) => {
 on('clicked:addturnundead', (eventInfo) => {
   const output = {};
   const newID = generateUniqueRowID();
-  output[concatRepAttrName('repeating_ability', newID, 'ability_name')] = 'Turn Undead by Type';
-  output[concatRepAttrName('repeating_ability', newID, 'ability_short_description')] = '[Turn Undead by Type](~selected|turn_undead_roll)';
+  output[`repeating_ability_${newID}_ability_name`] = 'Turn Undead by Type';
+  output[`repeating_ability_${newID}_ability_short_description`] = '[Turn Undead by Type](~selected|turn_undead_roll)';
   setAttrs(output, {silent: true});
 });
 
 on('clicked:addturnundead2', (eventInfo) => {
   const output = {};
   const newID = generateUniqueRowID();
-  output[concatRepAttrName('repeating_ability', newID, 'ability_name')] = 'Turn Undead by HD';
-  output[concatRepAttrName('repeating_ability', newID, 'ability_short_description')] = '[Turn Undead by HD](~selected|turn_undead2_roll)';
+  output[`repeating_ability_${newID}_ability_name`] = 'Turn Undead by HD';
+  output[`repeating_ability_${newID}_ability_short_description`] = '[Turn Undead by HD](~selected|turn_undead2_roll)';
   setAttrs(output, {silent: true});
 });
 
@@ -3774,10 +3691,10 @@ on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs chan
   const idArray = await getSectionIDsAsync('spells');
   const output = {};
   const fields = idArray.flatMap((id) => [
-    concatRepAttrName('spells', id, 'spell_memorized'),
-    concatRepAttrName('spells', id, 'spell_show_all'),
-    concatRepAttrName('spells', id, 'spell_level'),
-    concatRepAttrName('spells', id, 'spell_caster_class'),
+    `repeating_spells_${id}_spell_memorized`,
+    `repeating_spells_${id}_spell_show_all`,
+    `repeating_spells_${id}_spell_level`,
+    `repeating_spells_${id}_spell_caster_class`,
   ]);
   const v = await getAttrsAsync(['spell_tabs', 'toggle_show_memorized', 'spell_caster_tabs', 'toggle_caster2', ...fields]);
   const memorizedOnly = +v.toggle_show_memorized || 0;
@@ -3785,35 +3702,35 @@ on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs chan
   const hideCaster2 = +v.toggle_caster2 || 0;
   const levelTab = +v.spell_tabs || 0;
   _.each(idArray, (id) => {
-    const thisMemorizedOnly = +v[concatRepAttrName('spells', id, 'spell_memorized')] || 0;
-    const thisCaster = +v[concatRepAttrName('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
-    const thisLevel = v[concatRepAttrName('spells', id, 'spell_level')]; // can be '?'
-    output[concatRepAttrName('spells', id, 'spell_show_memorized')] = memorizedOnly === 1 && thisMemorizedOnly > 0 ? 1 : 0;
-    output[concatRepAttrName('spells', id, 'spell_show_all')] = memorizedOnly === 1 ? 0 : 1;
+    const thisMemorizedOnly = +v[`repeating_spells_${id}_spell_memorized`] || 0;
+    const thisCaster = +v[`repeating_spells_${id}_spell_caster_class`] || 0; // 0, 1, 2
+    const thisLevel = v[`repeating_spells_${id}_spell_level`]; // can be '?'
+    output[`repeating_spells_${id}_spell_show_memorized`] = memorizedOnly === 1 && thisMemorizedOnly > 0 ? 1 : 0;
+    output[`repeating_spells_${id}_spell_show_all`] = memorizedOnly === 1 ? 0 : 1;
     // show THIS spell if spell level and spell tab match
     if (levelTab === -1 || levelTab === thisLevel) {
       // one caster: ignore caster tabs and show THIS spell
       if (hideCaster2 === 1) {
-        output[concatRepAttrName('spells', id, 'spell_show')] = 1;
+        output[`repeating_spells_${id}_spell_show`] = 1;
         // multi-caster: continue using caster tabs
       } else if (hideCaster2 === 0) {
         // caster tab is All or spell class is 'n/a': show THIS spell
         if (casterTab === -1 || thisCaster === 0) {
-          output[concatRepAttrName('spells', id, 'spell_show')] = 1;
+          output[`repeating_spells_${id}_spell_show`] = 1;
           // caster tab is caster1 and spell is caster1: show THIS spell
         } else if (casterTab === 0 && thisCaster === 1) {
-          output[concatRepAttrName('spells', id, 'spell_show')] = 1;
+          output[`repeating_spells_${id}_spell_show`] = 1;
           // caster tab is caster2 and spell is caster2: show THIS spell
         } else if (casterTab === 1 && thisCaster === 2) {
-          output[concatRepAttrName('spells', id, 'spell_show')] = 1;
+          output[`repeating_spells_${id}_spell_show`] = 1;
           // hide THIS spell
         } else {
-          output[concatRepAttrName('spells', id, 'spell_show')] = 0;
+          output[`repeating_spells_${id}_spell_show`] = 0;
         }
       }
       // hide THIS spell if it does not match spell level tab selected
     } else {
-      output[concatRepAttrName('spells', id, 'spell_show')] = 0;
+      output[`repeating_spells_${id}_spell_show`] = 0;
     }
   });
   await setAttrsAsync(output, {silent: true});
@@ -3825,11 +3742,11 @@ on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_cla
   if (eventInfo.sourceType !== 'player') return;
 
   const id = eventInfo.sourceAttribute.split('_')[2];
-  const v = await getAttrsAsync([concatRepAttrName('spells', id, 'spell_level'), concatRepAttrName('spells', id, 'spell_caster_class'), 'spell_caster_tabs', 'spell_tabs']);
+  const v = await getAttrsAsync([`repeating_spells_${id}_spell_level`, `repeating_spells_${id}_spell_caster_class`, 'spell_caster_tabs', 'spell_tabs']);
   const output = {};
   const casterTab = +v.spell_caster_tabs || 0; // 0, 1, -1
-  const thisCaster = +v[concatRepAttrName('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
-  const thisLevel = v[concatRepAttrName('spells', id, 'spell_level')]; // can be '?'
+  const thisCaster = +v[`repeating_spells_${id}_spell_caster_class`] || 0; // 0, 1, 2
+  const thisLevel = v[`repeating_spells_${id}_spell_level`]; // can be '?'
   const levelTab = +v.spell_tabs || 0;
   // jumps to spell level tab unless Show All or same level tab
   output.spell_tabs = levelTab >= 0 && levelTab !== thisLevel ? thisLevel : levelTab;
@@ -3841,27 +3758,27 @@ on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_cla
 const setSpellsCasterClass = async () => {
   const idArray = await getSectionIDsAsync('spells');
   const output = {};
-  const fields = idArray.flatMap((id) => [concatRepAttrName('spells', id, 'spell_caster_class')]);
+  const fields = idArray.flatMap((id) => [`repeating_spells_${id}_spell_caster_class`]);
   const v = await getAttrsAsync(['caster_class1_name', 'caster_class2_name', 'caster_class1_level', 'caster_class2_level', ...fields]);
   const caster1Name = v.caster_class1_name;
   const caster2Name = v.caster_class2_name;
   const caster1Level = +v.caster_class1_level || 0;
   const caster2Level = +v.caster_class2_level || 0;
   _.each(idArray, (id) => {
-    const thisClass = +v[concatRepAttrName('spells', id, 'spell_caster_class')] || 0;
+    const thisClass = +v[`repeating_spells_${id}_spell_caster_class`] || 0;
     switch (thisClass) {
       case 0:
-        output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = '';
+        output[`repeating_spells_${id}_spell_caster_class_name`] = '';
         // clog(`thisClass 0:${thisClass}`);
         break;
       case 1:
-        output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = caster1Name;
-        output[concatRepAttrName('spells', id, 'spell_caster_class_level')] = caster1Level;
+        output[`repeating_spells_${id}_spell_caster_class_name`] = caster1Name;
+        output[`repeating_spells_${id}_spell_caster_class_level`] = caster1Level;
         // clog(`thisClass 1:${thisClass}`);
         break;
       case 2:
-        output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = caster2Name;
-        output[concatRepAttrName('spells', id, 'spell_caster_class_level')] = caster2Level;
+        output[`repeating_spells_${id}_spell_caster_class_name`] = caster2Name;
+        output[`repeating_spells_${id}_spell_caster_class_level`] = caster2Level;
         // clog(`thisClass 2:${thisClass}`);
         break;
       default:
@@ -3889,7 +3806,7 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
   const trigger = eventInfo.sourceAttribute.split('_').slice(3).join('_');
   const newSpell = previousValue === undefined && trigger === 'spell_name' ? 1 : 0;
   const v = await getAttrsAsync([
-    concatRepAttrName('spells', id, 'spell_caster_class'),
+    `repeating_spells_${id}_spell_caster_class`,
     'caster_class1_name',
     'caster_class1_level',
     'caster_class2_name',
@@ -3904,7 +3821,7 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
   const caster2Level = +v.caster_class2_level || 0;
   const showCaster2 = +v.toggle_caster2 || 0;
   const casterTab = +v.spell_caster_tabs || 0; // 0, 1, -1
-  let thisClass = +v[concatRepAttrName('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
+  let thisClass = +v[`repeating_spells_${id}_spell_caster_class`] || 0; // 0, 1, 2
 
   // Caster Class 2 is enabled
   if (showCaster2 === 0) {
@@ -3914,17 +3831,17 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
 
   switch (thisClass) {
     case 0:
-      output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = '';
+      output[`repeating_spells_${id}_spell_caster_class_name`] = '';
       // clog(`Set Caster Class to N/A`);
       break;
     case 1:
-      output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = caster1Name;
-      output[concatRepAttrName('spells', id, 'spell_caster_class_level')] = caster1Level;
+      output[`repeating_spells_${id}_spell_caster_class_name`] = caster1Name;
+      output[`repeating_spells_${id}_spell_caster_class_level`] = caster1Level;
       // clog(`Set Caster Class to ${caster1Name}`);
       break;
     case 2:
-      output[concatRepAttrName('spells', id, 'spell_caster_class_name')] = caster2Name;
-      output[concatRepAttrName('spells', id, 'spell_caster_class_level')] = caster2Level;
+      output[`repeating_spells_${id}_spell_caster_class_name`] = caster2Name;
+      output[`repeating_spells_${id}_spell_caster_class_level`] = caster2Level;
       // clog(`Set Caster Class to ${caster2Name}`);
       break;
     default:
@@ -3941,14 +3858,14 @@ on('change:repeating_spells:spell_name', async (eventInfo) => {
   if (eventInfo.sourceType !== 'player') return;
 
   const id = eventInfo.sourceAttribute.split('_')[2];
-  const v = await getAttrsAsync([concatRepAttrName('spells', id, 'spell_level'), 'spell_tabs']);
+  const v = await getAttrsAsync([`repeating_spells_${id}_spell_level`, 'spell_tabs']);
   const output = {};
   const levelTab = +v.spell_tabs || 0;
-  const thisSpellLevel = v[concatRepAttrName('spells', id, 'spell_level')]; // can be '?'
+  const thisSpellLevel = v[`repeating_spells_${id}_spell_level`]; // can be '?'
   // console.log(`Δ detected: [Setting Spell Level based on Spell Tab] SpellTab:${levelTab} ThisSpellLvl:${thisSpellLevel}`);
   // test if Spell Tab is set to 'All' or if this Spell's Lvl has already been set
   if (levelTab === -1 || thisSpellLevel != '?') return;
-  output[concatRepAttrName('spells', id, 'spell_level')] = levelTab;
+  output[`repeating_spells_${id}_spell_level`] = levelTab;
   await setAttrsAsync(output, {silent: true});
 });
 
@@ -3958,9 +3875,9 @@ on(
   async (eventInfo) => {
     // clog(`Δ detected:${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
-    const v = await getAttrsAsync([concatRepAttrName('weapon', id, 'weapon_ToHitACadj_flag'), concatRepAttrName('weapon', id, 'weapon_ToHitACadj')]);
+    const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_ToHitACadj_flag`, `repeating_weapon_${id}_weapon_ToHitACadj`]);
     const output = {};
-    const thisflag = +v[concatRepAttrName('weapon', id, 'weapon_ToHitACadj_flag')] || 0;
+    const thisflag = +v[`repeating_weapon_${id}_weapon_ToHitACadj_flag`] || 0;
     output.repeating_weapon_weapon_ToHitACadj =
       thisflag === 1
         ? '{{ToHitACadj2to10=HitAdj:[[ @{weapon_thac_adj0} ]]|[[ @{weapon_thac_adj1} ]]|[[ @{weapon_thac_adj2} ]]|[[ @{weapon_thac_adj3} ]]|[[ @{weapon_thac_adj4} ]]|[[ @{weapon_thac_adj5} ]]|[[ @{weapon_thac_adj6} ]]|[[ @{weapon_thac_adj7} ]]|[[ @{weapon_thac_adj8} ]]|[[ @{weapon_thac_adj9} ]]|[[ @{weapon_thac_adj10} ]] }}'
@@ -4022,13 +3939,13 @@ on('change:weapon_proficiency_initial change:weapon_proficiency_added_per_level 
   // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const idArray = await getSectionIDsAsync('weapon');
   const output = {};
-  const fields = idArray.flatMap((id) => [concatRepAttrName('weapon', id, 'weapon_prof_flag')]);
+  const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_prof_flag`]);
   const v = await getAttrsAsync(['weapon_proficiency_penalty', ...fields]);
   const thispenalty = +v.weapon_proficiency_penalty || 0;
   _.each(idArray, (id) => {
-    const thisflag = +v[concatRepAttrName('weapon', id, 'weapon_prof_flag')] || 0;
-    output[concatRepAttrName('weapon', id, 'weapon_prof')] = thispenalty;
-    output[concatRepAttrName('weapon', id, 'weapon_prof_pen')] = thisflag === 0 ? '0' : thispenalty;
+    const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`] || 0;
+    output[`repeating_weapon_${id}_weapon_prof`] = thispenalty;
+    output[`repeating_weapon_${id}_weapon_prof_pen`] = thisflag === 0 ? '0' : thispenalty;
   });
   await setAttrsAsync(output, {silent: true});
   // clog('Weapon Proficiency has been re-calculated');
@@ -4038,11 +3955,11 @@ on('change:repeating_weapon:weapon_prof_flag', async (eventInfo) => {
   // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
-  const v = await getAttrsAsync(['weapon_proficiency_penalty', concatRepAttrName('weapon', id, 'weapon_prof_flag')]);
+  const v = await getAttrsAsync(['weapon_proficiency_penalty', `repeating_weapon_${id}_weapon_prof_flag`]);
   const thispenalty = +v.weapon_proficiency_penalty || 0;
-  const thisflag = +v[concatRepAttrName('weapon', id, 'weapon_prof_flag')] || 0;
-  output[concatRepAttrName('weapon', id, 'weapon_prof')] = thispenalty;
-  output[concatRepAttrName('weapon', id, 'weapon_prof_pen')] = thisflag === 0 ? '0' : thispenalty;
+  const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`] || 0;
+  output[`repeating_weapon_${id}_weapon_prof`] = thispenalty;
+  output[`repeating_weapon_${id}_weapon_prof_pen`] = thisflag === 0 ? '0' : thispenalty;
   await setAttrsAsync(output, {silent: true});
   // clog('Weapon Proficiency has been re-calculated');
 });
@@ -4052,24 +3969,24 @@ on('change:backstab change:backstab_bonus change:toggle_thief_skills', async (ev
   // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const idArray = await getSectionIDsAsync('weapon');
   const output = {};
-  const fields = idArray.flatMap((id) => [concatRepAttrName('weapon', id, 'weapon_backstab_flag')]);
+  const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_backstab_flag`]);
   const v = await getAttrsAsync(['backstab', 'backstab_bonus', 'toggle_thief_skills', ...fields]);
   const thiefSkills = +v.toggle_thief_skills || 0;
   const thisMult = +v.backstab || 0;
   const thisBonus = +v.backstab_bonus || 0;
   _.each(idArray, (id) => {
-    const thisFlag = +v[concatRepAttrName('weapon', id, 'weapon_backstab_flag')] || 0;
+    const thisFlag = +v[`repeating_weapon_${id}_weapon_backstab_flag`] || 0;
     if (thiefSkills === 0) {
-      output[concatRepAttrName('weapon', id, 'weapon_backstab_var')] = thisFlag === 0 ? 0 : `+${thisBonus}`;
-      output[concatRepAttrName('weapon', id, 'weapon_backstab_bonus')] = thisFlag === 0 ? 0 : thisBonus;
-      output[concatRepAttrName('weapon', id, 'weapon_backstab')] = thisFlag === 0 ? 1 : `x${thisMult}`;
-      output[concatRepAttrName('weapon', id, 'weapon_backstab_mult')] = thisFlag === 0 ? 1 : thisMult;
+      output[`repeating_weapon_${id}_weapon_backstab_var`] = thisFlag === 0 ? 0 : `+${thisBonus}`;
+      output[`repeating_weapon_${id}_weapon_backstab_bonus`] = thisFlag === 0 ? 0 : thisBonus;
+      output[`repeating_weapon_${id}_weapon_backstab`] = thisFlag === 0 ? 1 : `x${thisMult}`;
+      output[`repeating_weapon_${id}_weapon_backstab_mult`] = thisFlag === 0 ? 1 : thisMult;
     }
     if (thiefSkills === 1) {
-      output[concatRepAttrName('weapon', id, 'weapon_backstab_var')] = 0;
-      output[concatRepAttrName('weapon', id, 'weapon_backstab_bonus')] = 0;
-      output[concatRepAttrName('weapon', id, 'weapon_backstab')] = 1;
-      output[concatRepAttrName('weapon', id, 'weapon_backstab_mult')] = 1;
+      output[`repeating_weapon_${id}_weapon_backstab_var`] = 0;
+      output[`repeating_weapon_${id}_weapon_backstab_bonus`] = 0;
+      output[`repeating_weapon_${id}_weapon_backstab`] = 1;
+      output[`repeating_weapon_${id}_weapon_backstab_mult`] = 1;
     }
   });
   await setAttrsAsync(output, {silent: true});
@@ -4079,22 +3996,22 @@ on('change:repeating_weapon:weapon_backstab_flag', async (eventInfo) => {
   // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
-  const v = await getAttrsAsync(['backstab', 'backstab_bonus', 'toggle_thief_skills', concatRepAttrName('weapon', id, 'weapon_backstab_flag')]);
+  const v = await getAttrsAsync(['backstab', 'backstab_bonus', 'toggle_thief_skills', `repeating_weapon_${id}_weapon_backstab_flag`]);
   const thiefSkills = +v.toggle_thief_skills || 0;
   const thisMult = +v.backstab || 0;
   const thisBonus = +v.backstab_bonus || 0;
-  const thisFlag = +v[concatRepAttrName('weapon', id, 'weapon_backstab_flag')] || 0;
+  const thisFlag = +v[`repeating_weapon_${id}_weapon_backstab_flag`] || 0;
   if (thiefSkills === 0) {
-    output[concatRepAttrName('weapon', id, 'weapon_backstab_var')] = thisFlag === 0 ? 0 : `+${thisBonus}`;
-    output[concatRepAttrName('weapon', id, 'weapon_backstab_bonus')] = thisFlag === 0 ? 0 : thisBonus;
-    output[concatRepAttrName('weapon', id, 'weapon_backstab')] = thisFlag === 0 ? 1 : `x${thisMult}`;
-    output[concatRepAttrName('weapon', id, 'weapon_backstab_mult')] = thisFlag === 0 ? 1 : thisMult;
+    output[`repeating_weapon_${id}_weapon_backstab_var`] = thisFlag === 0 ? 0 : `+${thisBonus}`;
+    output[`repeating_weapon_${id}_weapon_backstab_bonus`] = thisFlag === 0 ? 0 : thisBonus;
+    output[`repeating_weapon_${id}_weapon_backstab`] = thisFlag === 0 ? 1 : `x${thisMult}`;
+    output[`repeating_weapon_${id}_weapon_backstab_mult`] = thisFlag === 0 ? 1 : thisMult;
   }
   if (thiefSkills === 1) {
-    output[concatRepAttrName('weapon', id, 'weapon_backstab_var')] = 0;
-    output[concatRepAttrName('weapon', id, 'weapon_backstab_bonus')] = 0;
-    output[concatRepAttrName('weapon', id, 'weapon_backstab')] = 1;
-    output[concatRepAttrName('weapon', id, 'weapon_backstab_mult')] = 1;
+    output[`repeating_weapon_${id}_weapon_backstab_var`] = 0;
+    output[`repeating_weapon_${id}_weapon_backstab_bonus`] = 0;
+    output[`repeating_weapon_${id}_weapon_backstab`] = 1;
+    output[`repeating_weapon_${id}_weapon_backstab_mult`] = 1;
   }
   await setAttrsAsync(output, {silent: true});
 });
@@ -4102,35 +4019,35 @@ on('change:repeating_weapon:weapon_backstab_flag', async (eventInfo) => {
 on('change:repeating_weapon:weapon_dual', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
-  const v = await getAttrsAsync(['dual_pen_primary', 'dual_pen_secondary', concatRepAttrName('weapon', id, 'weapon_dual')]);
+  const v = await getAttrsAsync(['dual_pen_primary', 'dual_pen_secondary', `repeating_weapon_${id}_weapon_dual`]);
   clog('this weapon attack Type has been re-calculated');
   const primary = +v.dual_pen_primary || 0;
   const secondary = +v.dual_pen_secondary || 0;
-  const attack_type = v[concatRepAttrName('weapon', id, 'weapon_dual')];
+  const attack_type = v[`repeating_weapon_${id}_weapon_dual`];
   let handed_mod = 0;
   if (attack_type === 'Normal') handed_mod = 0;
   else if (attack_type === 'Primary') handed_mod = primary;
   else if (attack_type === 'Secondary') handed_mod = secondary;
   const thispenalty = Math.min(0, handed_mod);
-  output[concatRepAttrName('weapon', id, 'weapon_dual_pen')] = thispenalty;
+  output[`repeating_weapon_${id}_weapon_dual_pen`] = thispenalty;
   await setAttrsAsync(output, {silent: true});
 });
 
 const syncDualPen = async () => {
   const idArray = await getSectionIDsAsync('weapon');
   const output = {};
-  const fields = idArray.flatMap((id) => [concatRepAttrName('weapon', id, 'weapon_critdamage_flag'), concatRepAttrName('weapon', id, 'weapon_critdamage_mult')]);
+  const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_critdamage_flag`, `repeating_weapon_${id}_weapon_critdamage_mult`]);
   const v = await getAttrsAsync(['dual_pen_primary', 'dual_pen_secondary', ...fields]);
   // clog('Weapon Attack Type has been re-calculated');
   const primary = +v.dual_pen_primary || 0;
   const secondary = +v.dual_pen_secondary || 0;
   _.each(idArray, (id) => {
-    const attack_type = v[concatRepAttrName('weapon', id, 'weapon_dual')];
+    const attack_type = v[`repeating_weapon_${id}_weapon_dual`];
     let handed_mod = 0;
     if (attack_type === 'Primary') handed_mod = primary;
     else if (attack_type === 'Secondary') handed_mod = secondary;
     const thispenalty = Math.min(0, handed_mod);
-    output[concatRepAttrName('weapon', id, 'weapon_dual_pen')] = thispenalty;
+    output[`repeating_weapon_${id}_weapon_dual_pen`] = thispenalty;
   });
   await setAttrsAsync(output);
 };
@@ -4164,19 +4081,19 @@ on('change:dual_pen_primary change:dual_pen_secondary change:dexterity', async (
 // Weapon Range: Parse Ranges
 const calcRange = async (id) => {
   const fields = [
-    concatRepAttrName('weapon', id, 'weapon_range'),
-    concatRepAttrName('weapon', id, 'weapon_range_short'),
-    concatRepAttrName('weapon', id, 'weapon_range_medium'),
-    concatRepAttrName('weapon', id, 'weapon_range_long'),
-    concatRepAttrName('weapon', id, 'weapon_attack_type'),
-    concatRepAttrName('weapon', id, 'weapon_range_error'),
+    `repeating_weapon_${id}_weapon_range`,
+    `repeating_weapon_${id}_weapon_range_short`,
+    `repeating_weapon_${id}_weapon_range_medium`,
+    `repeating_weapon_${id}_weapon_range_long`,
+    `repeating_weapon_${id}_weapon_attack_type`,
+    `repeating_weapon_${id}_weapon_range_error`,
   ];
   const v = await getAttrsAsync(fields);
   const output = {};
   // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
-  const thisType = +v[concatRepAttrName('weapon', id, 'weapon_attack_type')] || 0;
+  const thisType = +v[`repeating_weapon_${id}_weapon_attack_type`] || 0;
   if (thisType === 0 || thisType === 2) return;
-  let thisRange = v[concatRepAttrName('weapon', id, 'weapon_range')];
+  let thisRange = v[`repeating_weapon_${id}_weapon_range`];
   // remove quotes to prevent NaN (ie distance indicators)
   thisRange = thisRange.replace(/'/g, '');
   thisRange = thisRange.replace(/"/g, '');
@@ -4198,28 +4115,28 @@ const calcRange = async (id) => {
 
   // check to see if range is in the proper format.
   if (Number.isNaN(thisRangeShort)) {
-    output[concatRepAttrName('weapon', id, 'weapon_range_short')] = 0;
-    output[concatRepAttrName('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
+    output[`repeating_weapon_${id}_weapon_range_short`] = 0;
+    output[`repeating_weapon_${id}_weapon_range_error`] = thisRange === '' ? 1 : 0;
     // clog(`WARNING: Field is not in the proper format.`);
   } else {
-    output[concatRepAttrName('weapon', id, 'weapon_range_short')] = thisRangeShort;
+    output[`repeating_weapon_${id}_weapon_range_short`] = thisRangeShort;
   }
   if (Number.isNaN(thisRangeMedium)) {
-    output[concatRepAttrName('weapon', id, 'weapon_range_medium')] = 0;
-    output[concatRepAttrName('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
+    output[`repeating_weapon_${id}_weapon_range_medium`] = 0;
+    output[`repeating_weapon_${id}_weapon_range_error`] = thisRange === '' ? 1 : 0;
     // clog(`WARNING: Field is not in the proper format.`);
   } else {
-    output[concatRepAttrName('weapon', id, 'weapon_range_medium')] = thisRangeMedium;
+    output[`repeating_weapon_${id}_weapon_range_medium`] = thisRangeMedium;
   }
   if (Number.isNaN(thisRangeLong)) {
-    output[concatRepAttrName('weapon', id, 'weapon_range_long')] = 0;
-    output[concatRepAttrName('weapon', id, 'weapon_range_error')] = thisRange === '' ? 1 : 0;
+    output[`repeating_weapon_${id}_weapon_range_long`] = 0;
+    output[`repeating_weapon_${id}_weapon_range_error`] = thisRange === '' ? 1 : 0;
     // clog(`WARNING: Field is not in the proper format.`);
   } else {
-    output[concatRepAttrName('weapon', id, 'weapon_range_long')] = thisRangeLong;
+    output[`repeating_weapon_${id}_weapon_range_long`] = thisRangeLong;
   }
   if (!Number.isNaN(thisRangeShort) && !Number.isNaN(thisRangeMedium) && !Number.isNaN(thisRangeLong)) {
-    output[concatRepAttrName('weapon', id, 'weapon_range_error')] = 1;
+    output[`repeating_weapon_${id}_weapon_range_error`] = 1;
   } else {
     // clog(`Value did not parse.`);
   }
@@ -4236,12 +4153,12 @@ on('change:repeating_weapon:weapon_range change:repeating_weapon:weapon_attack_t
 on('change:repeating_weapon:weapon_attack_type', async (eventInfo) => {
   // clog(`Δ detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
-  const v = await getAttrsAsync([concatRepAttrName('weapon', id, 'weapon_attack_type'), concatRepAttrName('weapon', id, 'weapon_attack_type_flag')]);
+  const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_attack_type`, `repeating_weapon_${id}_weapon_attack_type_flag`]);
   const output = {};
-  const currentType = +v[concatRepAttrName('weapon', id, 'weapon_attack_type')] || 0;
-  const currentTypeFlag = +v[concatRepAttrName('weapon', id, 'weapon_attack_type_flag')] || 0;
+  const currentType = +v[`repeating_weapon_${id}_weapon_attack_type`] || 0;
+  const currentTypeFlag = +v[`repeating_weapon_${id}_weapon_attack_type_flag`] || 0;
   if (currentType !== currentTypeFlag) {
-    output[concatRepAttrName('weapon', id, 'weapon_attack_type_flag')] = currentType;
+    output[`repeating_weapon_${id}_weapon_attack_type_flag`] = currentType;
   }
   await setAttrsAsync(output, {silent: true});
 });
@@ -4528,24 +4445,23 @@ const damageMacro = async (id, passedAutoDamage) => {
   const damageSmallMediumNpcCrit = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_critdamagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
   const damageLargeNpcCrit = ` vs LG [[ (@{repeating_weapon_${id}_weapon_critdamagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
   if (autoDamage === 0) {
-    output[concatRepAttrName('weapon', id, 'weapon_damagesmallmedium_chat_menu')] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_roll)`;
-    output[concatRepAttrName('weapon', id, 'weapon_damagelarge_chat_menu')] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_roll)`;
-    output[concatRepAttrName('weapon', id, 'weapon_damagesmallmedium_npc_chat_menu')] = `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_npc_roll)`;
-    output[concatRepAttrName('weapon', id, 'weapon_damagelarge_npc_chat_menu')] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_npc_roll)`;
-    output[concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium_chat_menu')] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_roll)`;
-    output[concatRepAttrName('weapon', id, 'weapon_critdamagelarge_chat_menu')] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_roll)`;
-    output[concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium_npc_chat_menu')] =
-      `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_roll)`;
-    output[concatRepAttrName('weapon', id, 'weapon_critdamagelarge_npc_chat_menu')] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_npc_roll)`;
+    output[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_roll)`;
+    output[`repeating_weapon_${id}_weapon_damagelarge_chat_menu`] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_roll)`;
+    output[`repeating_weapon_${id}_weapon_damagesmallmedium_npc_chat_menu`] = `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_damagesmallmedium_npc_roll)`;
+    output[`repeating_weapon_${id}_weapon_damagelarge_npc_chat_menu`] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_damagelarge_npc_roll)`;
+    output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_chat_menu`] = `[Roll Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_roll)`;
+    output[`repeating_weapon_${id}_weapon_critdamagelarge_chat_menu`] = `[Roll Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_roll)`;
+    output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`] = `[Damage](~@{character_id}|repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_roll)`;
+    output[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`] = `[Damage vs LG](~@{character_id}|repeating_weapon_${id}_weapon_critdamagelarge_npc_roll)`;
   } else {
-    output[concatRepAttrName('weapon', id, 'weapon_damagesmallmedium_chat_menu')] = damageSmallMedium;
-    output[concatRepAttrName('weapon', id, 'weapon_damagelarge_chat_menu')] = damageLarge;
-    output[concatRepAttrName('weapon', id, 'weapon_damagesmallmedium_npc_chat_menu')] = damageSmallMediumNpc;
-    output[concatRepAttrName('weapon', id, 'weapon_damagelarge_npc_chat_menu')] = damageLargeNPC;
-    output[concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium_chat_menu')] = damageSmallMediumCrit;
-    output[concatRepAttrName('weapon', id, 'weapon_critdamagelarge_chat_menu')] = damageLargeCrit;
-    output[concatRepAttrName('weapon', id, 'weapon_critdamagesmallmedium_npc_chat_menu')] = damageSmallMediumNpcCrit;
-    output[concatRepAttrName('weapon', id, 'weapon_critdamagelarge_npc_chat_menu')] = damageLargeNpcCrit;
+    output[`repeating_weapon_${id}_weapon_damagesmallmedium_chat_menu`] = damageSmallMedium;
+    output[`repeating_weapon_${id}_weapon_damagelarge_chat_menu`] = damageLarge;
+    output[`repeating_weapon_${id}_weapon_damagesmallmedium_npc_chat_menu`] = damageSmallMediumNpc;
+    output[`repeating_weapon_${id}_weapon_damagelarge_npc_chat_menu`] = damageLargeNPC;
+    output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_chat_menu`] = damageSmallMediumCrit;
+    output[`repeating_weapon_${id}_weapon_critdamagelarge_chat_menu`] = damageLargeCrit;
+    output[`repeating_weapon_${id}_weapon_critdamagesmallmedium_npc_chat_menu`] = damageSmallMediumNpcCrit;
+    output[`repeating_weapon_${id}_weapon_critdamagelarge_npc_chat_menu`] = damageLargeNpcCrit;
   }
   return output;
 };
@@ -4563,13 +4479,13 @@ on(
 
 on('change:toggle_critdamage change:toggle_auto_damage', async (eventInfo) => {
   const idArray = await getSectionIDsAsync('weapon');
-  const fields = idArray.map((id) => concatRepAttrName('weapon', id, 'weapon_critdamage_flag'));
+  const fields = idArray.map((id) => `repeating_weapon_${id}_weapon_critdamage_flag`);
   const v = await getAttrsAsync(['toggle_auto_damage', ...fields]);
   const output = {};
   const autoDamage = +v.toggle_auto_damage || 0;
   // Map IDs to Promises that return objects
   const damagePromises = idArray.map(async (id) => {
-    const attrName = concatRepAttrName('weapon', id, 'weapon_critdamage_flag');
+    const attrName = `repeating_weapon_${id}_weapon_critdamage_flag`;
     const currentValue = +v[attrName] || 0;
     output[attrName] = 1 - currentValue;
     // Get the macro changes for this ID
@@ -4709,7 +4625,7 @@ const setEquipment = async (id) => {
   const combined = [...nonRep, ...fields];
   const v = await getAttrsAsync(combined);
   const equipTab = +v.equipment_tabs_type || 0;
-  const equipTypeAttr = concatRepAttrName('equipment', id, 'equipment_type');
+  const equipTypeAttr = `repeating_equipment_${id}_equipment_type`;
   const equipType = +v[equipTypeAttr] || 0;
 
   const output = repeatingEquipmentAll.reduce((accumulator, field) => {
@@ -4784,24 +4700,24 @@ on('sheet:opened', async (eventInfo) => {
   const equipmentRows = await getSectionIDsAsync('equipment');
   const spellsRows = await getSectionIDsAsync('spells');
   if (weaponRows.length === 0) {
-    const newID = generateUniqueRowID();
-    output[concatRepAttrName('weapon', newID, 'weapon_value')] = 1;
+    const id = generateUniqueRowID();
+    output[`repeating_weapon_${id}_weapon_value`] = 1;
   }
   if (abilityRows.length === 0) {
-    const newID = generateUniqueRowID();
-    output[concatRepAttrName('ability', newID, 'ability_value')] = 1;
+    const id = generateUniqueRowID();
+    output[`repeating_ability_${id}_ability_value`] = 1;
   }
   if (nwpRows.length === 0) {
-    const newID = generateUniqueRowID();
-    output[concatRepAttrName('nonweaponproficiencies', newID, 'nwp_value')] = 1;
+    const id = generateUniqueRowID();
+    output[`repeating_nonweaponproficiencies_${id}_nwp_value`] = 1;
   }
   if (equipmentRows.length === 0) {
-    const newID = generateUniqueRowID();
-    output[concatRepAttrName('equipment', newID, 'equipment_value')] = 1;
+    const id = generateUniqueRowID();
+    output[`repeating_equipment_${id}_equipment_value`] = 1;
   }
   if (spellsRows.length === 0) {
-    const newID = generateUniqueRowID();
-    output[concatRepAttrName('spells', newID, 'spell_value')] = 1;
+    const id = generateUniqueRowID();
+    output[`repeating_spells_${id}_spell_value`] = 1;
   }
   await setAttrsAsync(output, {silent: true});
 });
@@ -4823,62 +4739,62 @@ on(
       output.init_macro_text = '';
       const idArrayEquipment = await getSectionIDsAsync('equipment');
       _.each(idArrayEquipment, (id) => {
-        output[concatRepAttrName('equipment', id, 'equipment_macro_text')] = '';
+        output[`repeating_equipment_${id}_equipment_macro_text`] = '';
         clog(`macro reset completed on: ${id} Equipment`);
       });
       const idArrayWeapons = await getSectionIDsAsync('weapon');
       _.each(idArrayWeapons, (id) => {
-        output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = '';
+        output[`repeating_weapon_${id}_weapon_macro_text`] = '';
         clog(`macro reset completed on: ${id} Weapon`);
       });
       const idArrayAbilities = await getSectionIDsAsync('ability');
       _.each(idArrayAbilities, (id) => {
-        output[concatRepAttrName('ability', id, 'ability_macro_text')] = '';
+        output[`repeating_ability_${id}_ability_macro_text`] = '';
         clog(`macro reset completed on: ${id} Ability`);
       });
       const idArrayNWPs = await getSectionIDsAsync('nonweaponproficiencies');
       _.each(idArrayNWPs, (id) => {
-        output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')] = '';
+        output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = '';
         clog(`macro reset completed on: ${id} NWP`);
       });
       const idArraySpells = await getSectionIDsAsync('spells');
       _.each(idArraySpells, (id) => {
-        output[concatRepAttrName('spells', id, 'spell_macro_text')] = '';
+        output[`repeating_spells_${id}_spell_macro_text`] = '';
         clog(`macro reset completed on: ${id} Spells`);
       });
     }
     if (clickedWord === 'resetequipmentmacros') {
       const idArrayEquipment = await getSectionIDsAsync('equipment');
       _.each(idArrayEquipment, (id) => {
-        output[concatRepAttrName('equipment', id, 'equipment_macro_text')] = '';
+        output[`repeating_equipment_${id}_equipment_macro_text`] = '';
         clog(`macro reset completed on: ${id} Equipment`);
       });
     }
     if (clickedWord === 'resetweaponsmacros') {
       const idArrayWeapons = await getSectionIDsAsync('weapon');
       _.each(idArrayWeapons, (id) => {
-        output[concatRepAttrName('weapon', id, 'weapon_macro_text')] = '';
+        output[`repeating_weapon_${id}_weapon_macro_text`] = '';
         clog(`macro reset completed on: ${id} Weapon`);
       });
     }
     if (clickedWord === 'resetabilitiesmacros') {
       const idArrayAbilities = await getSectionIDsAsync('ability');
       _.each(idArrayAbilities, (id) => {
-        output[concatRepAttrName('ability', id, 'ability_macro_text')] = '';
+        output[`repeating_ability_${id}_ability_macro_text`] = '';
         clog(`macro reset completed on: ${id} Ability`);
       });
     }
     if (clickedWord === 'resetnwpsmacros') {
       const idArrayNWPs = await getSectionIDsAsync('nonweaponproficiencies');
       _.each(idArrayNWPs, (id) => {
-        output[concatRepAttrName('nonweaponproficiencies', id, 'nwp_macro_text')] = '';
+        output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = '';
         clog(`macro reset completed on: ${id} NWP`);
       });
     }
     if (clickedWord === 'resetspellsmacros') {
       const idArraySpells = await getSectionIDsAsync('spells');
       _.each(idArraySpells, (id) => {
-        output[concatRepAttrName('spells', id, 'spell_macro_text')] = '';
+        output[`repeating_spells_${id}_spell_macro_text`] = '';
         clog(`macro reset completed on: ${id} Spells`);
       });
     }
@@ -7573,21 +7489,21 @@ const weaponInUse = async () => {
   }
   const weaponsInUse = [];
   const fields = idArray.flatMap((id) => [
-    concatRepAttrName('weapon', id, 'weapon_name'),
-    concatRepAttrName('weapon', id, 'weapon_use'),
-    concatRepAttrName('weapon', id, 'weapon_speed'),
-    concatRepAttrName('weapon', id, 'weapon_misc'),
+    `repeating_weapon_${id}_weapon_name`,
+    `repeating_weapon_${id}_weapon_use`,
+    `repeating_weapon_${id}_weapon_speed`,
+    `repeating_weapon_${id}_weapon_misc`,
   ]);
   const v = await getAttrsAsync(fields);
   idArray.forEach((id) => {
-    const inUse = parseInt(v[concatRepAttrName('weapon', id, 'weapon_use')]) || 0;
+    const inUse = parseInt(v[`repeating_weapon_${id}_weapon_use`]) || 0;
     // Logic: Only process if the weapon is actually checked 'on'
     if (inUse === 1) {
-      const name = v[concatRepAttrName('weapon', id, 'weapon_name')] || 'Unknown';
-      const rawSpeed = String(v[concatRepAttrName('weapon', id, 'weapon_speed')] || '0');
+      const name = v[`repeating_weapon_${id}_weapon_name`] || 'Unknown';
+      const rawSpeed = String(v[`repeating_weapon_${id}_weapon_speed`] || '0');
       const speedMatch = rawSpeed.match(/\d+/);
       const speed = speedMatch ? parseInt(speedMatch[0]) : 0;
-      const misc = v[concatRepAttrName('weapon', id, 'weapon_misc')] || '';
+      const misc = v[`repeating_weapon_${id}_weapon_misc`] || '';
       // clog(`Processing ID:${id} - Name:${name}, Speed:${speed}`);
       weaponsInUse.push({id, name, inUse, speed, misc});
     }
@@ -7644,18 +7560,14 @@ on('clicked:spell-sort-alphabetical clicked:spell-sort-level', async (eventInfo)
     const idArray = await getSectionIDsAsync(sectionName);
     if (idArray.length > 0) {
       // grab attrs used for sorting
-      const fields = idArray.flatMap((id) => [
-        concatRepAttrName('spells', id, 'spell_caster_class'),
-        concatRepAttrName('spells', id, 'spell_level'),
-        concatRepAttrName('spells', id, 'spell_name'),
-      ]);
+      const fields = idArray.flatMap((id) => [`repeating_spells_${id}_spell_caster_class`, `repeating_spells_${id}_spell_level`, `repeating_spells_${id}_spell_name`]);
       const v = await getAttrsAsync(fields);
       const output = {};
       const spells = idArray.map((id) => ({
         id,
-        casterClass: v[concatRepAttrName('spells', id, 'spell_caster_class')] || 0,
-        level: v[concatRepAttrName('spells', id, 'spell_level')], // can be '?'
-        name: (v[concatRepAttrName('spells', id, 'spell_name')] || '').trim(),
+        casterClass: v[`repeating_spells_${id}_spell_caster_class`] || 0,
+        level: v[`repeating_spells_${id}_spell_level`], // can be '?'
+        name: (v[`repeating_spells_${id}_spell_name`] || '').trim(),
       }));
 
       const getLevelValue = (level) => {
@@ -7765,13 +7677,13 @@ on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', async 
     const idArray = await getSectionIDsAsync(sectionName);
     if (idArray.length > 0) {
       // grab attrs used for sorting
-      const fields = idArray.flatMap((id) => [concatRepAttrName('equipment', id, 'equipment_item'), concatRepAttrName('equipment', id, 'equipment_location')]);
+      const fields = idArray.flatMap((id) => [`repeating_equipment_${id}_equipment_item`, `repeating_equipment_${id}_equipment_location`]);
       const v = await getAttrsAsync(fields);
       const output = {};
       const equipment = idArray.map((id) => ({
         id,
-        name: (v[concatRepAttrName('equipment', id, 'equipment_item')] || '').trim(),
-        location: (v[concatRepAttrName('equipment', id, 'equipment_location')] || '').trim(),
+        name: (v[`repeating_equipment_${id}_equipment_item`] || '').trim(),
+        location: (v[`repeating_equipment_${id}_equipment_location`] || '').trim(),
       }));
 
       // sort logic
