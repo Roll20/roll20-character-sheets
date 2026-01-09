@@ -10,12 +10,17 @@
 <script type="text/worker">// Behold, the Script Worker for Streets of Jade
 
 on("clicked:mark clicked:repeating_goals:mark clicked:repeating_favors:mark clicked:repeating_assets:mark clicked:repeating_factiongifts:mark clicked:repeating_gifts:mark clicked:repeating_command:mark clicked:repeating_officers:mark clicked:repeating_goals:mark clicked:repeating_favors:mark clicked:repeating_factionfavors:mark", function(event) {
+	log(event);
 	log("clicked:mark (of some sort)");
 	var what = event.htmlAttributes.value;
 	var ats = {};
 	var rowprefix = "";
+	var asscheck = "";
+	var offcheck = "";
 	if ( typeof(event.sourceAttribute) !== "undefined" ) {
 		rowprefix = (event.sourceAttribute).slice(0,-4); // Strips off the 'mark'
+		asscheck = (event.sourceAttribute).slice(10,15); // 'asset' or not
+		offcheck = (event.sourceAttribute).slice(10,17); // 'officer' or not
 	}
 	var atname = rowprefix + "toggle_" + what;
 	ats[atname] = 1;
@@ -23,7 +28,7 @@ on("clicked:mark clicked:repeating_goals:mark clicked:repeating_favors:mark clic
 	var numfound = numfind.exec(atname);
 	var namefind = /^.*[^0-9]/;
 	var namefound = namefind.exec(atname);
-	if ( numfound[0] == "" || numfound[0] == "1" ) { 
+	if ( numfound[0] == "" ) { 
 		setAttrs(ats);
 		log(what + " mark");
 		log(numfound);
@@ -33,19 +38,85 @@ on("clicked:mark clicked:repeating_goals:mark clicked:repeating_favors:mark clic
 		log("we have a potential sequence");
 		var seq = Number(numfound[0]);
 		var seqs = []; var s = 0;
+		var all = []; 
 		while(seq > 1) {
 			seq--;
 			seqs[s] = namefound+seq;
+			all[s] = namefound+seq;
 			s++;
 		}
-		log("sequences to retrieve...")
-		log(seqs);
-		getAttrs(seqs,function(a) {
+		log(all.length);
+		if ( asscheck == "asset" && s < 4 ) {
+			log('asset');
+			for(var i = s+1; i <= 4; i++) {
+				log("i="+i+" therefore "+namefound+i);
+				all[s] = namefound+i;
+				s++;
+			}
+			all[s] = rowprefix+"asset-value";
+		}
+		if ( offcheck == "officer" && s < 12 ) {
+			log('officer');
+			for(var i = s+1; i <= 12; i++) {
+				log("i="+i+" therefore "+namefound+i);
+				all[s] = namefound+i;
+				s++;
+			}
+			all[s] = rowprefix+"die1";
+		}
+		log(all.length);
+		log("all...");
+		log(all);
+		getAttrs(all,function(a) {
+			log("sequences to retrieve...")
+			log(seqs);
+			var stressed = {}; stressed[atname] = 1; // Gotta include the actual to-be-set attribute itself, dammit
+			log("\n\n\n\n\n"+atname+"\n\n\n\n\n");
 			for(var i = 0; i < seqs.length; i++) {
 				var val = a[seqs[i]];
 				if ( val == "0" ) { // We only auto-mark empty boxes, not "itched" ones (val == 2)
 					ats[seqs[i]] = "1";
+					if ( typeof(stressed[seqs[i]]) == "undefined" ) { stressed[seqs[i]] = 1; }
 				}
+			}
+			if ( asscheck == "asset" ) {
+				// need to fill out stressed for the stuff not covered
+				for(var i = 0; i < all.length; i++) {
+					if ( typeof(stressed[all[i]]) == "undefined" ) { stressed[all[i]] = a[all[i]]; }
+				}
+				log("stressed"); log(stressed);
+				var effective = 0;
+				if ( typeof(a[rowprefix+"asset-value"]) !== "undefined" && a[rowprefix+"asset-value"] !== "" && a[rowprefix+"asset-value"] !== "0" ) {
+					effective = Number(a[rowprefix+"asset-value"]);
+				}
+				for(var i = 1; i <= 4; i++) {
+					log(namefound+i+"="+stressed[namefound+i]); // use stressed because we're looking at the changes to come, not the current pre-write state.
+					var stresscheck = stressed[namefound+i];
+					if ( typeof(stresscheck) !== "undefined" & stresscheck == "1") {
+						effective--;
+					}
+				}
+				ats[rowprefix+"asset-value-effective"] = effective;
+			}
+			if ( offcheck == "officer" ) {
+				// need to fill out stressed for the stuff not covered
+				for(var i = 0; i < all.length; i++) {
+					if ( typeof(stressed[all[i]]) == "undefined" ) { stressed[all[i]] = a[all[i]]; }
+				}
+				log("stressed"); log(stressed);
+				var effective = 0;
+				if ( typeof(a[rowprefix+"die1"]) !== "undefined" && a[rowprefix+"die1"] !== "" && a[rowprefix+"die1"] !== "0" ) {
+					effective = Number(a[rowprefix+"die1"]);
+				}
+				for(var i = 1; i <= 12; i++) {
+					log(namefound+i+"="+stressed[namefound+i]); // use stressed because we're looking at the changes to come, not the current pre-write state.
+					var stresscheck = stressed[namefound+i];
+					if ( typeof(stresscheck) !== "undefined" & stresscheck == "1") {
+						effective--;
+					}
+				}
+				if ( effective < 6 ) { effective = 6; } else if ( effective == 7 ) { effective = 8; } else if ( effective == 9 ) { effective = 10; } else if ( effective == 11 ) { effective = 12; }
+				ats[rowprefix+"die1-effective"] = effective;
 			}
 			setAttrs(ats);
 			log(namefound);
@@ -62,8 +133,12 @@ on("clicked:unmark clicked:repeating_goals:unmark clicked:repeating_favors:unmar
 	var what = event.htmlAttributes.value;
 	var ats = {};
 	var rowprefix = "";
+	var asscheck = "";
+	var offcheck = "";
 	if ( typeof(event.sourceAttribute) !== "undefined" ) {
 		rowprefix = (event.sourceAttribute).slice(0,-6); // Strips off the 'unmark'
+		asscheck = (event.sourceAttribute).slice(10,15); // 'asset' or not
+		offcheck = (event.sourceAttribute).slice(10,17); // 'officer' or not
 	}
 	var atname = rowprefix + "toggle_" + what;
 	ats[atname] = 0;
@@ -81,20 +156,59 @@ on("clicked:unmark clicked:repeating_goals:unmark clicked:repeating_favors:unmar
 	} else {
 		log("we have a potential sequence");
 		var seq = Number(numfound[0]);
-		var seqs = []; var s = 0;
+		var seqs = []; var s = 0; var all = []; var alls = 0;
+		while(alls < seq) {
+			alls++;
+			all[alls-1] = namefound+alls;
+		}
 		while(seq < 41) {
 			seq++;
+			alls++; all[alls-1] = namefound+seq;
 			seqs[s] = namefound+seq;
 			s++;
 		}
-		log(seqs);
-		getAttrs(seqs,function(a) {
-			log(a);
+		if ( asscheck == "asset" ) { all[seq] = rowprefix+"asset-value"; seq++; }
+		if ( offcheck == "officer" ) { all[seq] = rowprefix+"die1"; seq++; }
+		// log(seqs);
+		// log(all);
+		getAttrs(all,function(a) {
+			var stressed = a; stressed[atname] = 0; 
+			// log(a);
 			for(var i = 0; i < seqs.length; i++) {
 				var val = a[seqs[i]];
 				if ( val == "1" ) { // We only change it to unmarked if it's normal-marked. If val == "2", then it's "itched" and requires special attention.
 					ats[seqs[i]] = "0";
+					stressed[seqs[i]] = 0;
 				}
+			}
+			if ( asscheck == "asset" ) {
+				var effective = 0;
+				if ( typeof(a[rowprefix+"asset-value"]) !== "undefined" ) {
+					effective = Number(a[rowprefix+"asset-value"]);
+				}
+				log("stressed"); log(stressed);
+				for(var i = 0; i < all.length; i++) {
+					if ( typeof(stressed[all[i]]) !== "undefined" && stressed[all[i]] == "1" ) {
+						effective--;
+					}
+				}
+				log("effective"); log(effective);
+				ats[rowprefix+"asset-value-effective"] = effective;
+			}
+			if ( offcheck == "officer" ) {
+				var effective = 0;
+				if ( typeof(a[rowprefix+"die1"]) !== "undefined" ) {
+					effective = Number(a[rowprefix+"die1"]);
+				}
+				log("stressed"); log(stressed);
+				for(var i = 0; i < all.length; i++) {
+					if ( typeof(stressed[all[i]]) !== "undefined" && stressed[all[i]] == "1" ) {
+						effective--;
+					}
+				}
+				if ( effective < 6 ) { effective = 6; } else if ( effective == 7 ) { effective = 8; } else if ( effective == 9 ) { effective = 10; } else if ( effective == 11 ) { effective = 12; }
+				log("effective"); log(effective);
+				ats[rowprefix+"die1-effective"] = effective;
 			}
 			setAttrs(ats);
 			log(namefound);
@@ -115,6 +229,88 @@ on("clicked:itch", function(event) {
 	setAttrs(ats);
 	log(what + " itch");
 });
+
+// Asset value determines track length but has to be asset-value minus 3.
+// Effective value changes when stress is marked or unmarked — but that's handled in the mark/unmark handler
+
+on("change:repeating_assets:asset-value", function(e) {
+	log("change:repeating_assets:asset-value"); log(e);
+	var track = 0;
+	var ats = {};
+	var rowprefix = (e.sourceAttribute).slice(0,-11); // Strips off the 'asset-value'
+	log(rowprefix);
+	if ( typeof(e.newValue) !== "undefined" ) {
+		track = Number(e.newValue) - 3;
+		ats[rowprefix+"asset-value-effective"] = Number(e.newValue);
+	} else {
+		ats[rowprefix+"asset-value-effective"] = "";
+	}
+	ats[e.sourceAttribute + "-track"] = track;
+	var gets = [rowprefix+'toggle_stress1',rowprefix+'toggle_stress2',rowprefix+'toggle_stress3',rowprefix+'toggle_stress4'];
+	getAttrs(gets, function(a) {
+		for(i = 1; i <= 4; i++) {
+			if ( i > track ) {
+				ats[rowprefix+'toggle_stress'+i] = 0; // If the track length has shortened, we must make sure that there are no hidden checkmarked boxes, therefore they must be force-unchecked.
+			} else {
+				var stresskey = rowprefix+"toggle_stress"+i; 
+				if ( typeof(a[stresskey]) !== "undefined" && a[stresskey] == 1 ) {
+					ats[rowprefix+"asset-value-effective"]--;
+				}
+			}
+		}
+		log(ats);
+		setAttrs(ats); // 
+	});
+});
+
+
+// Officer die size determines track length but has to be asset-value minus 3.
+// Effective size changes when stress is marked or unmarked — but that's handled in the mark/unmark handler, largely. Here, we just need to make sure we're adjusting effective value for the changed track length vs. marked stress. 
+
+on("change:repeating_officers:die1", function(e) {
+	log("change:repeating_officers:die1"); log(e);
+	var track = 0;
+	var ats = {};
+	var rowprefix = (e.sourceAttribute).slice(0,-4); // Strips off the 'die1'
+	log(rowprefix);
+	log(e);
+	if ( typeof(e.newValue) !== "undefined" ) {
+		track = Number(e.newValue);
+		ats[rowprefix+"die1-effective"] = Number(e.newValue);
+		track = Number(e.newValue);
+	} else {
+		ats[rowprefix+"die1-effective"] = "";
+	}
+	const twelve = [1,2,3,4,5,6,7,8,9,10,11,12];
+	var gets = [];
+	twelve.forEach( (entry) => {
+		gets[gets.length] = rowprefix+"toggle_stress"+entry;
+	});
+	log(gets);
+	getAttrs(gets, function(a) {
+		var deduct = 0;
+		for(i = 1; i <= 12; i++) {
+			if ( i > track ) {
+				ats[rowprefix+'toggle_stress'+i] = 0; // If the track length has shortened, we must make sure that there are no hidden checkmarked boxes, therefore they must be force-unchecked.
+			} else {
+				var stresskey = rowprefix+"toggle_stress"+i; 
+				if ( typeof(a[stresskey]) !== "undefined" && a[stresskey] == 1 ) {
+					deduct++;
+				}
+			}
+		}
+		var effective = track - deduct;
+		if ( effective < 6 ) { effective = 6; } else if ( effective == 7 ) { effective = 8; } else if ( effective == 9 ) { effective = 10; } else if ( effective == 11 ) { effective = 12; }
+		if ( ats[rowprefix+"die1-effective"] !== "" ) {
+			ats[rowprefix+"die1-effective"] = effective; // If it's blank, then it should be blank, not a number, so we respect this
+		}
+		log(effective);
+		log(ats);
+		setAttrs(ats);
+	});
+});
+
+// Skill roll selection
 
 on("change:roll-main-skill change:roll-second-skill", function(e) {
 	log("change:roll-main-skill change:roll-second-skill");
@@ -291,10 +487,12 @@ on("clicked:repeating_command:skirmishroll clicked:repeating_officers:skirmishro
 	var rt = "&{template:"+template+"} {{name=@{"+rowprefix+"name} ^{skirmishes}}} {{total=[[0]]}} {{itches=[[0]]}} {{die-total=[[0]]}} {{jadedie-total=[[0]]}} {{die-size=@{skirmish-die}}} {{jade-count}}";
 	var alist = [
 		rowprefix+"die1",
+		rowprefix+"die1-effective",
 		rowprefix+"die2",
 		rowprefix+"die3",
 		rowprefix+"die4",
 		rowprefix+"asset-value",
+		rowprefix+"asset-value-effective",
 		rowprefix+"faction-roll-jade", // the discipline indicator
 		rowprefix+"roll-jade-die-1", // the actual dice
 		rowprefix+"roll-jade-die-2",
@@ -302,14 +500,19 @@ on("clicked:repeating_command:skirmishroll clicked:repeating_officers:skirmishro
 	];
 	getAttrs(alist, function(a) {
 
-		if ( typeof(a[rowprefix+"asset-value"]) !== "undefined" && a[rowprefix+"asset-value"] !== "" ) {
+		if ( typeof(a[rowprefix+"asset-value-effective"]) !== "undefined" && a[rowprefix+"asset-value-effective"] !== "" ) {
+			rt += " {{die-name=^{"+ftype+"}}} {{asset-size="+a[rowprefix+"asset-value-effective"]+"}}{{asset-value=[["+a[rowprefix+"asset-value-effective"]+"]]}}";
+		} else if ( typeof(a[rowprefix+"asset-value"]) !== "undefined" && a[rowprefix+"asset-value"] !== "" ) {
 			rt += " {{die-name=^{"+ftype+"}}} {{asset-size="+a[rowprefix+"asset-value"]+"}}{{asset-value=[["+a[rowprefix+"asset-value"]+"]]}}";
 		}
 
 		if ( typeof(a[rowprefix+"die1"]) !== "undefined" && a[rowprefix+"die1"] !== "" ) {
 			rt += " {{die-name=^{"+ftype+"}}}";
 			[1,2,3,4].forEach( (dice) => {
-				if ( typeof(a[rowprefix+"die"+dice]) !== "undefined" && a[rowprefix+"die"+dice] !== "" ) {
+				if ( typeof(a[rowprefix+"die"+dice+"-effective"]) !== "undefined" && a[rowprefix+"die"+dice+"-effective"] !== "") {
+					rt += " {{skirmish-die"+dice+"-size="+a[rowprefix+"die"+dice+"-effective"]+"}}";
+					rt += " {{skirmish-die"+dice+"=[[d"+a[rowprefix+"die"+dice+"-effective"]+"]]}}";
+				} else if ( typeof(a[rowprefix+"die"+dice]) !== "undefined" && a[rowprefix+"die"+dice] !== "" ) {
 					rt += " {{skirmish-die"+dice+"-size="+a[rowprefix+"die"+dice]+"}}";
 					rt += " {{skirmish-die"+dice+"=[[d"+a[rowprefix+"die"+dice]+"]]}}";
 				}
@@ -1450,10 +1653,14 @@ on("clicked:jaderoll", (info) => {
             </div>
           </div>
         </div>
+        <div class="stress-section">
+          <div class="bighead"><span data-i18n="Stress">Stress</span> 
+          </div>
+          <div class="btw"><span class="smallnote italic" data-i18n="While you have any wounds marked, lose one die from all pools before rolling in a contest. Click once to mark a box; click again to mark it as Itched. ">While you have any wounds marked, lose one die from all pools before rolling in a contest. Click once to mark a box; click again to mark it as Itched. </span> 
+          </div>
+        </div>
         <div class="c2 wounds-pathos">
-          <div class="pathos">
-            <div class="toptag"><span data-i18n="Pathos">Pathos</span> 
-            </div>
+          <div class="pathos lozenge">
             <div class="boxbox"><span>
                 <input class="thider" name="attr_toggle_pathos1" type="hidden" value="0"/>
                 <button class="cbox marked" type="action" name="act_itch" value="pathos1"></button>
@@ -1530,11 +1737,11 @@ on("clicked:jaderoll", (info) => {
                 </div>
               </div>
             </div>
-          </div>
-          <div class="spacer"></div>
-          <div class="wounds">
-            <div class="toptag"><span data-i18n="Wounds">Wounds</span> 
+            <div class="tag"><span data-i18n="Pathos">Pathos</span> 
             </div>
+          </div>
+          <div class="connect-line"></div>
+          <div class="wounds lozenge">
             <div class="boxbox"><span>
                 <input class="thider" name="attr_toggle_wound1" type="hidden" value="0"/>
                 <button class="cbox marked" type="action" name="act_itch" value="wound1"></button>
@@ -1611,14 +1818,108 @@ on("clicked:jaderoll", (info) => {
                 </div>
               </div>
             </div>
-            <div class="btw"><span class="smallnote italic" data-i18n="While you have any wounds marked, lose one die from all pools before rolling in a contest.">While you have any wounds marked, lose one die from all pools before rolling in a contest.</span> 
+            <div class="tag"><span data-i18n="Wounds">Wounds</span> 
             </div>
           </div>
         </div>
-        <div class="glory">
-          <div class="toptag"><span data-i18n="Glory">Glory</span> 
+        <div class="stress-section glory-section">
+          <div class="bighead"><span data-i18n="Jade Points">Jade Points</span> 
           </div>
-          <div class="bordered">
+          <div class="smallnote italic"><span data-i18n="When you fill the jade points track, clear it and add a d4 to a jade discipline permanently. You receive 1 jade point when you strip jade from a defeated foe, or 2 from a slain foe. When an enemy defeats you and takes your jade, you lose 1 jade point. Every jade point you lose inflicts an Itch.">When you fill the jade points track, clear it and add a d4 to a jade discipline permanently. You receive 1 jade point when you strip jade from a defeated foe, or 2 from a slain foe. When an enemy defeats you and takes your jade, you lose 1 jade point. Every jade point you lose inflicts an Itch.</span> 
+          </div>
+          <div class="jade-glory lozenge">
+            <div class="boxbox">
+              <input class="thider" name="attr_toggle_jadeglory1" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory1"></button>
+              <input class="tshower" name="attr_toggle_jadeglory1" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory1"></button>
+              <input class="thider" name="attr_toggle_jadeglory2" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory2"></button>
+              <input class="tshower" name="attr_toggle_jadeglory2" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory2"></button>
+              <input class="thider" name="attr_toggle_jadeglory3" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory3"></button>
+              <input class="tshower" name="attr_toggle_jadeglory3" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory3"></button>
+              <input class="thider" name="attr_toggle_jadeglory4" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory4"></button>
+              <input class="tshower" name="attr_toggle_jadeglory4" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory4"></button>
+              <input class="thider" name="attr_toggle_jadeglory5" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory5"></button>
+              <input class="tshower" name="attr_toggle_jadeglory5" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory5"></button>
+              <input class="thider" name="attr_toggle_jadeglory6" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory6"></button>
+              <input class="tshower" name="attr_toggle_jadeglory6" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory6"></button>
+              <input class="thider" name="attr_toggle_jadeglory7" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory7"></button>
+              <input class="tshower" name="attr_toggle_jadeglory7" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory7"></button>
+              <input class="thider" name="attr_toggle_jadeglory8" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory8"></button>
+              <input class="tshower" name="attr_toggle_jadeglory8" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory8"></button>
+              <input class="thider" name="attr_toggle_jadeglory9" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory9"></button>
+              <input class="tshower" name="attr_toggle_jadeglory9" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory9"></button>
+              <input class="thider" name="attr_toggle_jadeglory10" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory10"></button>
+              <input class="tshower" name="attr_toggle_jadeglory10" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory10"></button>
+              <input class="thider" name="attr_toggle_jadeglory11" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory11"></button>
+              <input class="tshower" name="attr_toggle_jadeglory11" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory11"></button>
+              <input class="thider" name="attr_toggle_jadeglory12" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory12"></button>
+              <input class="tshower" name="attr_toggle_jadeglory12" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory12"></button>
+              <input class="thider" name="attr_toggle_jadeglory13" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory13"></button>
+              <input class="tshower" name="attr_toggle_jadeglory13" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory13"></button>
+              <input class="thider" name="attr_toggle_jadeglory14" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory14"></button>
+              <input class="tshower" name="attr_toggle_jadeglory14" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory14"></button>
+              <input class="thider" name="attr_toggle_jadeglory15" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory15"></button>
+              <input class="tshower" name="attr_toggle_jadeglory15" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory15"></button>
+              <input class="thider" name="attr_toggle_jadeglory16" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory16"></button>
+              <input class="tshower" name="attr_toggle_jadeglory16" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory16"></button>
+              <input class="thider" name="attr_toggle_jadeglory17" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory17"></button>
+              <input class="tshower" name="attr_toggle_jadeglory17" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory17"></button>
+              <input class="thider" name="attr_toggle_jadeglory18" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory18"></button>
+              <input class="tshower" name="attr_toggle_jadeglory18" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory18"></button>
+              <input class="thider" name="attr_toggle_jadeglory19" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory19"></button>
+              <input class="tshower" name="attr_toggle_jadeglory19" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory19"></button>
+              <input class="thider" name="attr_toggle_jadeglory20" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="jadeglory20"></button>
+              <input class="tshower" name="attr_toggle_jadeglory20" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="jadeglory20"></button>
+            </div>
+            <!-- .tag+t("Jade Points")
+            -->
+          </div>
+          <div class="bighead golden"><span data-i18n="Glory">Glory</span> 
+          </div>
+          <div class="smallnote italic"><span data-i18n="When you fill the glory track, clear it and take a Boon.">When you fill the glory track, clear it and take a Boon.</span> 
+          </div>
+        </div>
+        <div class="glory lozenge golden">
+          <div class="boxbox">
             <input class="thider" name="attr_toggle_glory1" type="hidden" value="0"/>
             <button class="cbox marked" type="action" name="act_unmark" value="glory1"></button>
             <input class="tshower" name="attr_toggle_glory1" type="hidden" value="0"/>
@@ -1780,11 +2081,11 @@ on("clicked:jaderoll", (info) => {
             <input class="tshower" name="attr_toggle_glory40" type="hidden" value="0"/>
             <button class="cbox unmarked" type="action" name="act_mark" value="glory40"></button>
           </div>
+          <!-- .tag+t("Glory")
+          -->
         </div>
         <div class="boons">
           <div class="toptag golden"><span data-i18n="Boons">Boons</span> 
-          </div>
-          <div class="tagnote smallnote italic"><span data-i18n="When you fill the glory track, clear it and take a Boon.">When you fill the glory track, clear it and take a Boon.</span> 
           </div>
           <div class="bordered">
             <div class="boxes">
@@ -1817,24 +2118,6 @@ on("clicked:jaderoll", (info) => {
               <input class="tshower" name="attr_toggle_boon-rep-step-4" type="hidden" value="0"/>
               <button class="cbox unmarked" type="action" name="act_mark" value="boon-rep-step-4"></button>
             </div><span data-i18n="Step up a reputation">Step up a reputation</span> 
-            <div class="boxes">
-              <input class="thider" name="attr_toggle_boon-jade-1" type="hidden" value="0"/>
-              <button class="cbox marked" type="action" name="act_unmark" value="boon-jade-1"></button>
-              <input class="tshower" name="attr_toggle_boon-jade-1" type="hidden" value="0"/>
-              <button class="cbox unmarked" type="action" name="act_mark" value="boon-jade-1"></button>
-              <input class="thider" name="attr_toggle_boon-jade-2" type="hidden" value="0"/>
-              <button class="cbox marked" type="action" name="act_unmark" value="boon-jade-2"></button>
-              <input class="tshower" name="attr_toggle_boon-jade-2" type="hidden" value="0"/>
-              <button class="cbox unmarked" type="action" name="act_mark" value="boon-jade-2"></button>
-              <input class="thider" name="attr_toggle_boon-jade-3" type="hidden" value="0"/>
-              <button class="cbox marked" type="action" name="act_unmark" value="boon-jade-3"></button>
-              <input class="tshower" name="attr_toggle_boon-jade-3" type="hidden" value="0"/>
-              <button class="cbox unmarked" type="action" name="act_mark" value="boon-jade-3"></button>
-              <input class="thider" name="attr_toggle_boon-jade-4" type="hidden" value="0"/>
-              <button class="cbox marked" type="action" name="act_unmark" value="boon-jade-4"></button>
-              <input class="tshower" name="attr_toggle_boon-jade-4" type="hidden" value="0"/>
-              <button class="cbox unmarked" type="action" name="act_mark" value="boon-jade-4"></button>
-            </div><span data-i18n="Add 1d4 to a jade ability">Add 1d4 to a jade ability</span> 
             <div class="boxes">
               <input class="thider" name="attr_toggle_boon-skill-1" type="hidden" value="0"/>
               <button class="cbox marked" type="action" name="act_unmark" value="boon-skill-1"></button>
@@ -1871,19 +2154,19 @@ on("clicked:jaderoll", (info) => {
               <input class="tshower" name="attr_toggle_boon-gift-4" type="hidden" value="0"/>
               <button class="cbox unmarked" type="action" name="act_mark" value="boon-gift-4"></button>
             </div><span data-i18n="Acquire a gift">Acquire a gift</span> 
+            <!-- .sequestered
+            .boxes
+            	each box in [1,2,3,4,5,6]
+            		+cbox("boon-jade-"+box).jade
+            +t("Add 1d4 to a jade ability").jade
+            
+            -->
           </div>
         </div>
         <div class="gifts">
-          <div class="topstrip">
-            <div class="toptag"><span data-i18n="Gifts">Gifts</span> 
-            </div>
-            <div class="sideblock">
-              <input class="thider" name="attr_toggle_show-gifts" type="hidden" value="0"/>
-              <button class="goldroll" type="action" name="act_unmark" value="show-gifts"><span data-i18n="Hide Gifts">Hide Gifts</span> 
-              </button>
-            </div>
+          <div class="bighead"><span data-i18n="Gifts">Gifts</span> 
           </div>
-          <div class="bordered">
+          <div class="gifts-section">
             <fieldset class="repeating_gifts">
               <div class="gift bordered">
                 <div class="topstrip">
@@ -2438,7 +2721,7 @@ on("clicked:jaderoll", (info) => {
           </div>
         </div>
       </div>
-      <div class="spacer"></div>
+      <div class="connect-line"></div>
       <div class="right-part">
         <div class="scandal">
           <div class="boxbox">
@@ -2901,15 +3184,10 @@ on("clicked:jaderoll", (info) => {
                 <div class="topstrip">
                   <div class="nameblock">
                     <div class="name-die">
-                      <input class="thider" name="attr_toggle_diemark" type="hidden" value="0"/>
-                      <button class="cbox marked" type="action" name="act_unmark" value="diemark"></button>
-                      <input class="tshower" name="attr_toggle_diemark" type="hidden" value="0"/>
-                      <button class="cbox unmarked" type="action" name="act_mark" value="diemark"></button>
                       <div class="die smalldie">
                         <input class="chosendie" type="hidden" name="attr_die1" value=""/>
                         <select name="attr_die1">
                           <option value=""></option>
-                          <option value="4">4</option>
                           <option value="6">6</option>
                           <option value="8">8</option>
                           <option value="10">10</option>
@@ -2925,6 +3203,64 @@ on("clicked:jaderoll", (info) => {
                     <div class="connect-line"></div>
                     <div class="lozenge namefield">
                       <input type="text" name="attr_name"/>
+                      <div class="bottomline">
+                        <!-- .text.golden+t("Stress")
+                        -->
+                        <input class="hider" type="hidden" name="attr_die1-effective" value=""/>
+                        <div class="text effective"><span>&nbsp;d</span><span name="attr_die1-effective"></span>
+                        </div>
+                        <div class="elastics">
+                          <input class="elastic" type="hidden" name="attr_die1" value=""/><span class="box">
+                            <input class="thider" name="attr_toggle_stress1" type="hidden" value="0"/>
+                            <button class="cbox marked" type="action" name="act_unmark" value="stress1"></button>
+                            <input class="tshower" name="attr_toggle_stress1" type="hidden" value="0"/>
+                            <button class="cbox unmarked" type="action" name="act_mark" value="stress1"></button></span><span class="box">
+                            <input class="thider" name="attr_toggle_stress2" type="hidden" value="0"/>
+                            <button class="cbox marked" type="action" name="act_unmark" value="stress2"></button>
+                            <input class="tshower" name="attr_toggle_stress2" type="hidden" value="0"/>
+                            <button class="cbox unmarked" type="action" name="act_mark" value="stress2"></button></span><span class="box">
+                            <input class="thider" name="attr_toggle_stress3" type="hidden" value="0"/>
+                            <button class="cbox marked" type="action" name="act_unmark" value="stress3"></button>
+                            <input class="tshower" name="attr_toggle_stress3" type="hidden" value="0"/>
+                            <button class="cbox unmarked" type="action" name="act_mark" value="stress3"></button></span><span class="box">
+                            <input class="thider" name="attr_toggle_stress4" type="hidden" value="0"/>
+                            <button class="cbox marked" type="action" name="act_unmark" value="stress4"></button>
+                            <input class="tshower" name="attr_toggle_stress4" type="hidden" value="0"/>
+                            <button class="cbox unmarked" type="action" name="act_mark" value="stress4"></button></span><span class="box">
+                            <input class="thider" name="attr_toggle_stress5" type="hidden" value="0"/>
+                            <button class="cbox marked" type="action" name="act_unmark" value="stress5"></button>
+                            <input class="tshower" name="attr_toggle_stress5" type="hidden" value="0"/>
+                            <button class="cbox unmarked" type="action" name="act_mark" value="stress5"></button></span><span class="box">
+                            <input class="thider" name="attr_toggle_stress6" type="hidden" value="0"/>
+                            <button class="cbox marked" type="action" name="act_unmark" value="stress6"></button>
+                            <input class="tshower" name="attr_toggle_stress6" type="hidden" value="0"/>
+                            <button class="cbox unmarked" type="action" name="act_mark" value="stress6"></button></span><span class="box">
+                            <input class="thider" name="attr_toggle_stress7" type="hidden" value="0"/>
+                            <button class="cbox marked" type="action" name="act_unmark" value="stress7"></button>
+                            <input class="tshower" name="attr_toggle_stress7" type="hidden" value="0"/>
+                            <button class="cbox unmarked" type="action" name="act_mark" value="stress7"></button></span><span class="box">
+                            <input class="thider" name="attr_toggle_stress8" type="hidden" value="0"/>
+                            <button class="cbox marked" type="action" name="act_unmark" value="stress8"></button>
+                            <input class="tshower" name="attr_toggle_stress8" type="hidden" value="0"/>
+                            <button class="cbox unmarked" type="action" name="act_mark" value="stress8"></button></span><span class="box">
+                            <input class="thider" name="attr_toggle_stress9" type="hidden" value="0"/>
+                            <button class="cbox marked" type="action" name="act_unmark" value="stress9"></button>
+                            <input class="tshower" name="attr_toggle_stress9" type="hidden" value="0"/>
+                            <button class="cbox unmarked" type="action" name="act_mark" value="stress9"></button></span><span class="box">
+                            <input class="thider" name="attr_toggle_stress10" type="hidden" value="0"/>
+                            <button class="cbox marked" type="action" name="act_unmark" value="stress10"></button>
+                            <input class="tshower" name="attr_toggle_stress10" type="hidden" value="0"/>
+                            <button class="cbox unmarked" type="action" name="act_mark" value="stress10"></button></span><span class="box">
+                            <input class="thider" name="attr_toggle_stress11" type="hidden" value="0"/>
+                            <button class="cbox marked" type="action" name="act_unmark" value="stress11"></button>
+                            <input class="tshower" name="attr_toggle_stress11" type="hidden" value="0"/>
+                            <button class="cbox unmarked" type="action" name="act_mark" value="stress11"></button></span><span class="box">
+                            <input class="thider" name="attr_toggle_stress12" type="hidden" value="0"/>
+                            <button class="cbox marked" type="action" name="act_unmark" value="stress12"></button>
+                            <input class="tshower" name="attr_toggle_stress12" type="hidden" value="0"/>
+                            <button class="cbox unmarked" type="action" name="act_mark" value="stress12"></button></span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div class="sideblock">
@@ -2932,7 +3268,7 @@ on("clicked:jaderoll", (info) => {
                     <button class="goldroll" type="action" name="act_mark" value="show-hide"><span data-i18n="Hide">Hide</span> 
                     </button>
                     <input class="thider" name="attr_toggle_show-hide" type="hidden" value="0"/>
-                    <button class="goldroll" type="action" name="act_unmark" value="show-hide"><span data-i18n="Show">Show</span> 
+                    <button class="jaderoll" type="action" name="act_unmark" value="show-hide"><span data-i18n="Details">Details</span> 
                     </button>
                     <input class="thider" name="attr_toggle_skirmish" type="hidden" value="0"/>
                     <button class="redroll" type="action" name="act_unmark" value="skirmish"><span data-i18n="Close">Close</span> 
@@ -2949,7 +3285,7 @@ on("clicked:jaderoll", (info) => {
                       <div class="choicegrid">
                         <div class="action">
                           <div class="vessel">
-                                <input class="chosendie" type="hidden" name="attr_die1" value=""/>
+                                <input class="chosendie" type="hidden" name="attr_die1-effective" value=""/>
                                 <div class="d4 df-d4-4 small"></div>
                                 <div class="d6 df-d6-6 small"></div>
                                 <div class="d8 df-d8-8 small"></div>
@@ -3151,9 +3487,11 @@ on("clicked:jaderoll", (info) => {
                     <!-- not really a die-->
                     <select name="attr_asset-value">
                       <option value=""></option>
-                      <option value="4">4</option>
-                      <option value="5">5</option>
+                      <option value="7">7</option>
                       <option value="6">6</option>
+                      <option value="5">5</option>
+                      <option value="4">4</option>
+                      <!-- option(value=3) 3-->
                     </select>
                     <div class="die-display"><span name="attr_asset-value"></span>
                     </div>
@@ -3162,20 +3500,31 @@ on("clicked:jaderoll", (info) => {
                   <div class="namefield">
                     <input type="text" name="attr_name"/>
                     <div class="bottomline">
-                      <div class="text golden"><span data-i18n="Stress">Stress</span> 
+                      <!-- .text.golden+t("Stress")
+                      -->
+                      <!-- +hidden("stress-marked").stress-hider-->
+                      <div class="text effective">
+                        <!-- +t("Effective Value:")--><span name="attr_asset-value-effective"></span>
                       </div>
-                      <input class="thider" name="attr_toggle_stress1" type="hidden" value="0"/>
-                      <button class="cbox marked" type="action" name="act_unmark" value="stress1"></button>
-                      <input class="tshower" name="attr_toggle_stress1" type="hidden" value="0"/>
-                      <button class="cbox unmarked" type="action" name="act_mark" value="stress1"></button>
-                      <input class="thider" name="attr_toggle_stress2" type="hidden" value="0"/>
-                      <button class="cbox marked" type="action" name="act_unmark" value="stress2"></button>
-                      <input class="tshower" name="attr_toggle_stress2" type="hidden" value="0"/>
-                      <button class="cbox unmarked" type="action" name="act_mark" value="stress2"></button>
-                      <input class="thider" name="attr_toggle_stress3" type="hidden" value="0"/>
-                      <button class="cbox marked" type="action" name="act_unmark" value="stress3"></button>
-                      <input class="tshower" name="attr_toggle_stress3" type="hidden" value="0"/>
-                      <button class="cbox unmarked" type="action" name="act_mark" value="stress3"></button>
+                      <div class="elastics">
+                        <input class="elastic" type="hidden" name="attr_asset-value-track" value=""/><span class="box">
+                          <input class="thider" name="attr_toggle_stress1" type="hidden" value="0"/>
+                          <button class="cbox marked" type="action" name="act_unmark" value="stress1"></button>
+                          <input class="tshower" name="attr_toggle_stress1" type="hidden" value="0"/>
+                          <button class="cbox unmarked" type="action" name="act_mark" value="stress1"></button></span><span class="box">
+                          <input class="thider" name="attr_toggle_stress2" type="hidden" value="0"/>
+                          <button class="cbox marked" type="action" name="act_unmark" value="stress2"></button>
+                          <input class="tshower" name="attr_toggle_stress2" type="hidden" value="0"/>
+                          <button class="cbox unmarked" type="action" name="act_mark" value="stress2"></button></span><span class="box">
+                          <input class="thider" name="attr_toggle_stress3" type="hidden" value="0"/>
+                          <button class="cbox marked" type="action" name="act_unmark" value="stress3"></button>
+                          <input class="tshower" name="attr_toggle_stress3" type="hidden" value="0"/>
+                          <button class="cbox unmarked" type="action" name="act_mark" value="stress3"></button></span><span class="box">
+                          <input class="thider" name="attr_toggle_stress4" type="hidden" value="0"/>
+                          <button class="cbox marked" type="action" name="act_unmark" value="stress4"></button>
+                          <input class="tshower" name="attr_toggle_stress4" type="hidden" value="0"/>
+                          <button class="cbox unmarked" type="action" name="act_mark" value="stress4"></button></span>
+                      </div>
                     </div>
                   </div>
                   <div class="spacer"></div>
@@ -3200,8 +3549,8 @@ on("clicked:jaderoll", (info) => {
                     <div class="choice">
                       <div class="choicegrid">
                         <div class="action">
-                          <div class="vessel"><span name="attr_asset-value"></span>
-                            <div class="smallnote"><span data-i18n="(fixed&amp;nbsp;value)">(fixed&amp;nbsp;value)</span> 
+                          <div class="vessel"><span name="attr_asset-value-effective"></span>
+                            <div class="smallnote"><span data-i18n="(effective&amp;nbsp;value)">(effective&amp;nbsp;value)</span> 
                             </div>
                           </div>
                         </div>
@@ -3388,87 +3737,133 @@ on("clicked:jaderoll", (info) => {
                 <div class="desc">
                   <textarea class="squat" name="attr_goal"></textarea>
                 </div>
+                <div class="smallnote"><span data-i18n="Glory">Glory</span> 
+                </div>
                 <div class="goalmarks">
-                  <input class="thider" name="attr_toggle_favor-owe-1" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-1"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-1" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-1"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-2" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-2"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-2" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-2"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-3" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-3"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-3" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-3"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-4" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-4"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-4" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-4"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-5" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-5"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-5" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-5"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-6" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-6"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-6" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-6"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-7" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-7"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-7" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-7"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-8" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-8"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-8" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-8"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-9" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-9"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-9" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-9"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-10" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-10"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-10" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-10"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-11" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-11"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-11" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-11"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-12" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-12"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-12" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-12"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-13" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-13"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-13" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-13"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-14" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-14"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-14" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-14"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-15" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-15"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-15" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-15"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-16" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-16"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-16" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-16"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-17" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-17"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-17" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-17"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-18" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-18"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-18" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-18"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-19" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-19"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-19" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-19"></button>
-                  <input class="thider" name="attr_toggle_favor-owe-20" type="hidden" value="0"/>
-                  <button class="jade cbox marked" type="action" name="act_unmark" value="favor-owe-20"></button>
-                  <input class="tshower" name="attr_toggle_favor-owe-20" type="hidden" value="0"/>
-                  <button class="jade cbox unmarked" type="action" name="act_mark" value="favor-owe-20"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-1" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-1"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-1" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-1"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-2" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-2"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-2" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-2"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-3" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-3"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-3" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-3"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-4" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-4"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-4" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-4"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-5" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-5"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-5" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-5"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-6" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-6"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-6" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-6"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-7" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-7"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-7" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-7"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-8" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-8"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-8" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-8"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-9" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-9"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-9" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-9"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-10" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-10"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-10" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-10"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-11" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-11"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-11" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-11"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-12" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-12"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-12" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-12"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-13" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-13"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-13" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-13"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-14" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-14"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-14" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-14"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-15" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-15"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-15" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-15"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-16" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-16"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-16" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-16"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-17" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-17"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-17" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-17"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-18" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-18"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-18" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-18"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-19" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-19"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-19" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-19"></button>
+                  <input class="thider" name="attr_toggle_goal-glory-20" type="hidden" value="0"/>
+                  <button class="golden cbox marked" type="action" name="act_unmark" value="goal-glory-20"></button>
+                  <input class="tshower" name="attr_toggle_goal-glory-20" type="hidden" value="0"/>
+                  <button class="golden cbox unmarked" type="action" name="act_mark" value="goal-glory-20"></button>
+                </div>
+                <div class="smallnote"><span data-i18n="Jade Points">Jade Points</span> 
+                </div>
+                <div class="goalmarks">
+                  <input class="thider" name="attr_toggle_goal-jade-1" type="hidden" value="0"/>
+                  <button class="jade cbox marked" type="action" name="act_unmark" value="goal-jade-1"></button>
+                  <input class="tshower" name="attr_toggle_goal-jade-1" type="hidden" value="0"/>
+                  <button class="jade cbox unmarked" type="action" name="act_mark" value="goal-jade-1"></button>
+                  <input class="thider" name="attr_toggle_goal-jade-2" type="hidden" value="0"/>
+                  <button class="jade cbox marked" type="action" name="act_unmark" value="goal-jade-2"></button>
+                  <input class="tshower" name="attr_toggle_goal-jade-2" type="hidden" value="0"/>
+                  <button class="jade cbox unmarked" type="action" name="act_mark" value="goal-jade-2"></button>
+                  <input class="thider" name="attr_toggle_goal-jade-3" type="hidden" value="0"/>
+                  <button class="jade cbox marked" type="action" name="act_unmark" value="goal-jade-3"></button>
+                  <input class="tshower" name="attr_toggle_goal-jade-3" type="hidden" value="0"/>
+                  <button class="jade cbox unmarked" type="action" name="act_mark" value="goal-jade-3"></button>
+                  <input class="thider" name="attr_toggle_goal-jade-4" type="hidden" value="0"/>
+                  <button class="jade cbox marked" type="action" name="act_unmark" value="goal-jade-4"></button>
+                  <input class="tshower" name="attr_toggle_goal-jade-4" type="hidden" value="0"/>
+                  <button class="jade cbox unmarked" type="action" name="act_mark" value="goal-jade-4"></button>
+                  <input class="thider" name="attr_toggle_goal-jade-5" type="hidden" value="0"/>
+                  <button class="jade cbox marked" type="action" name="act_unmark" value="goal-jade-5"></button>
+                  <input class="tshower" name="attr_toggle_goal-jade-5" type="hidden" value="0"/>
+                  <button class="jade cbox unmarked" type="action" name="act_mark" value="goal-jade-5"></button>
+                  <input class="thider" name="attr_toggle_goal-jade-6" type="hidden" value="0"/>
+                  <button class="jade cbox marked" type="action" name="act_unmark" value="goal-jade-6"></button>
+                  <input class="tshower" name="attr_toggle_goal-jade-6" type="hidden" value="0"/>
+                  <button class="jade cbox unmarked" type="action" name="act_mark" value="goal-jade-6"></button>
+                  <input class="thider" name="attr_toggle_goal-jade-7" type="hidden" value="0"/>
+                  <button class="jade cbox marked" type="action" name="act_unmark" value="goal-jade-7"></button>
+                  <input class="tshower" name="attr_toggle_goal-jade-7" type="hidden" value="0"/>
+                  <button class="jade cbox unmarked" type="action" name="act_mark" value="goal-jade-7"></button>
+                  <input class="thider" name="attr_toggle_goal-jade-8" type="hidden" value="0"/>
+                  <button class="jade cbox marked" type="action" name="act_unmark" value="goal-jade-8"></button>
+                  <input class="tshower" name="attr_toggle_goal-jade-8" type="hidden" value="0"/>
+                  <button class="jade cbox unmarked" type="action" name="act_mark" value="goal-jade-8"></button>
+                  <input class="thider" name="attr_toggle_goal-jade-9" type="hidden" value="0"/>
+                  <button class="jade cbox marked" type="action" name="act_unmark" value="goal-jade-9"></button>
+                  <input class="tshower" name="attr_toggle_goal-jade-9" type="hidden" value="0"/>
+                  <button class="jade cbox unmarked" type="action" name="act_mark" value="goal-jade-9"></button>
+                  <input class="thider" name="attr_toggle_goal-jade-10" type="hidden" value="0"/>
+                  <button class="jade cbox marked" type="action" name="act_unmark" value="goal-jade-10"></button>
+                  <input class="tshower" name="attr_toggle_goal-jade-10" type="hidden" value="0"/>
+                  <button class="jade cbox unmarked" type="action" name="act_mark" value="goal-jade-10"></button>
                 </div>
               </div>
             </fieldset>

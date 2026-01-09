@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2025-11-13 ** v.92 Chuz (James Culp)
+	Added Patterncraft to skills
 **2025-07-15 ** v.91 Chuz (James Culp)
 	Bugfix - Minor bugfixes
 **2025-07-11 ** v.91 Karovex

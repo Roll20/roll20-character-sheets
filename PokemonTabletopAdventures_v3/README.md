@@ -23,6 +23,13 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Oct 6, 2025
+- Resolved an issue with incorrectly updating capture rolls when changing display modes
+- Updated skill templates to not mislabel capture rolls
+
+### Aug 16, 2025
+- Resolved an issue with capture rolls not adding all ball modifiers correctly
+
 ### Jul 26, 2025
 - Resolved a few niggling issue with skills
   - Sleight of Hand had a mismatch in attribute name for the selected ability modifier

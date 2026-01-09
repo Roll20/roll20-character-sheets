@@ -35,25 +35,27 @@
 <div class="charactersheet">
 <main>
   <section class="header f-center flexheader borderless">
-  <div class="stack header-left empty">
-      <input class="hidden sheet-briny" name="attr_briny" type="checkbox">
-      <div class="brinyhide">
-        <div class="autoExpand eighty">
-         <input spellcheck="false" class="header-input" name="attr_character_tattoo" type="text">
-         <span name="attr_character_tattoo"></span>
+  <div class="header-left-wrapper">
+    <div class="stack header-left empty">
+        <input class="hidden sheet-briny" name="attr_briny" type="checkbox">
+        <div class="brinyhide">
+          <div class="autoExpand eighty">
+           <input spellcheck="false" class="header-input" name="attr_character_tattoo" type="text">
+           <span name="attr_character_tattoo"></span>
+          </div>
+          <hr class="underline eighty">
+          <label>Tattoo/Brand</label>
         </div>
-        <hr class="underline eighty">
-        <label>Tattoo/Brand</label>
+    </div>  
+      
+    <div class="stack header-left">
+      <div class="autoExpand long">
+       <input spellcheck="false" class="header-input" name="attr_character_name" type="text">
+       <span name="attr_character_name"></span>
       </div>
-  </div>  
-    
-  <div class="stack header-left">
-    <div class="autoExpand long">
-     <input spellcheck="false" class="header-input" name="attr_character_name" type="text">
-     <span name="attr_character_name"></span>
+      <hr class="underline nintety">
+      <label>Name</label>
     </div>
-    <hr class="underline nintety">
-    <label>Name</label>
   </div>
 
   <div class="stack header-right">
@@ -91,6 +93,7 @@
   </section>
 
   <input class="hidden sheet-briny" name="attr_briny" type="checkbox">
+  <input class="hidden sheet-space" name="attr_space" type="checkbox">
   <section class="conditions">
     <div class="title">
       <h2>Conditions</h2>
@@ -137,7 +140,7 @@
             </div>
         </div>
         
-        <div class="conds brinycond">
+        <div class="conds brinyorspacecond">
             <div class="cond">
                <label for="attr_burn">Burning?
                  <input name="attr_burn" type="number" min="0" value="0">
@@ -149,6 +152,14 @@
             <div class="cond">
                <label for="attr_immobilized">Immobilized?
                <input name="attr_immobilized" type="checkbox"></label>
+            </div>
+        </div>
+        
+        <div class="conds spacecond">
+            <div class="cond">
+               <label for="attr_damaged">Damaged?
+                 <input name="attr_damaged" type="checkbox">
+               </label>
             </div>
         </div>
          
@@ -164,11 +175,6 @@
             </div>
         </div> 
         
-        <div class="conds">
-            <div class="cond">
-               <input name="attr_blank3" type="text">
-            </div>
-        </div> 
       </div>
   </section>
 
@@ -478,6 +484,12 @@
     <span class="centertext"><i>You've equipped <span name="attr_armsEquipped"></span>/3 armaments.</i></span>
       <fieldset class="repeating_arm filtered_arm filtered">
        <input class="hidden equipped" type="checkbox" name="attr_equipped">
+        <div class="armament-checkboxes">
+          <span class="checkbox-group">
+            <input type="checkbox" name="attr_blown">
+            <label class="inline">Blown?</label>
+          </span>
+        </div>
         <div class="weapon">
           <span class="entire">
             <span class="left">
@@ -496,6 +508,7 @@
           <span class="hidden rangetext" name="attr_rangetext" value=""></span>
           <textarea class="maxwidth" spellcheck="false" name="attr_weapontext">Description and upgrades</textarea>
         </div>
+        <hr class="armament-divider">
       </fieldset>
   
   </div>
@@ -506,7 +519,20 @@
       <h3>Mech</h3>
         <div class="centerme">
           <input spellcheck="false" style="width:10em;" class="header-input" list="mechtypes" name="attr_character_mechtype" type="text">
-          <textarea class="maxwidth" spellcheck="false" value="Tug" name="attr_mechtug">Tug</textarea>
+          <div class="mech-abilities">
+            <div class="mech-ability-section">
+              <label>Tug:</label>
+              <textarea spellcheck="false" value="" name="attr_mechtug">Tug</textarea>
+            </div>
+            <div class="mech-ability-divider"></div>
+            <div class="mech-ability-section">
+              <div class="mshop-header">
+                <input type="checkbox" class="mshop-toggle" name="attr_mshop_enabled" value="1">
+                <label>M-shop captstone:</label>
+              </div>
+              <textarea spellcheck="false" name="attr_mechmshop"></textarea>
+            </div>
+          </div>
           <!-- Todo: we could auto populate tug based on mechtype change -->
         </div>
       <div class="mechStuff">
@@ -516,11 +542,11 @@
                 <fieldset class="repeating_Subs">
                     <span class="subspan">
                         <label>Type:</label>
-                        <select>
-                          <option value="Shoulder">Locomotion</option>
-                          <option value="Shoulder">Power Source</option>
+                        <select name="attr_subtype">
+                          <option value="Locomotion">Locomotion</option>
+                          <option value="Power Source">Power Source</option>
                           <option value="Shoulder">Shoulder</option>
-                          <option value="Shoulder">Undercarriage</option>
+                          <option value="Undercarriage">Undercarriage</option>
                         </select>
                         
                         <button type="roll" class="d6" name="roll_mun" value="&{template:powers} {{title=Subsystem}} {{name=@{character_name}}} {{description=@{subtext}}} {{powerName=@{subnamerep}}}"></button>
@@ -564,8 +590,16 @@
               <input type="hidden" name="attr_armsEquipped" value="0">
               <span>You've equipped <span name="attr_armsEquipped"></span>/3 armaments.</span>
               <fieldset class="repeating_arm">
-                  <label class="inline">Equipped?</label>
-                  <input class="equippedArm" type="checkbox" name="attr_equipped">
+                  <div class="armament-checkboxes">
+                    <span class="checkbox-group">
+                      <input class="equippedArm" type="checkbox" name="attr_equipped">
+                      <label class="inline">Equipped?</label>
+                    </span>
+                    <span class="checkbox-group">
+                      <input type="checkbox" name="attr_blown">
+                      <label class="inline">Blown?</label>
+                    </span>
+                  </div>
                   <div class="weapon">
                     <button type="action" class="btn d6" name="act_rollarm" value=""></button>
                     <input class="weapon" spellcheck="false" type="text" name="attr_armname" value="Name">
@@ -587,6 +621,7 @@
                     </span>
                     <textarea class="maxwidth" spellcheck="false" name="attr_weapontext">Description and upgrades</textarea>
                   </div>
+                  <hr class="armament-divider">
                 </fieldset>
               <!-- Subsystems -->
             <!-- </div> -->
@@ -642,10 +677,10 @@
     </section>
     
   <input class="hidden sheet-space" name="attr_space" type="checkbox">
-  <section class="scars">
-    <h3>Scars</h3>
-    <fieldset class="repeating_scar">
-        <label class="inline">Scar</label>
+  <section class="perks">
+    <h3>Pilot Perks</h3>
+    <fieldset class="repeating_perk">
+        <label class="inline">Perk</label>
         <input class="equippedArm" type="text" name="attr_scarname">
         <div class="weapon">
           <textarea class="maxwidth" spellcheck="false" name="attr_scartext">Description</textarea>
@@ -750,6 +785,7 @@
       <label class="basecost"></label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom1"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom1"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom1"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext1"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom1"></input>
@@ -762,6 +798,7 @@
       <label class="basecost"></label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom2"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom2"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom2"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext2"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom2" ></input>
@@ -774,6 +811,7 @@
       <label class="basecost">1</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom3"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom3"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom3"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext3"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom3" checked></input>
@@ -786,6 +824,7 @@
       <label class="basecost">1</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom4"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom4"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom4"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext4"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom4" checked></input>
@@ -798,6 +837,7 @@
       <label class="basecost">2</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom5"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom5"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom5"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext5"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom5" checked></input>
@@ -810,6 +850,7 @@
       <label class="basecost">2</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom6"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom6"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom6"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext6"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom6" checked></input>
@@ -822,6 +863,7 @@
       <label class="basecost">2</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom7"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom7"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom7"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext7"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom7" checked></input>
@@ -834,6 +876,7 @@
       <label class="basecost">2</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom8"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom8"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom8"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext8"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom8" checked></input>
@@ -846,6 +889,7 @@
       <label class="basecost">3</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom9"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom9"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom9"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext9"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom9" checked></input>
@@ -858,6 +902,7 @@
       <label class="basecost">3</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom10"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom10"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom10"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext10"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom10" checked></input>
@@ -870,6 +915,7 @@
       <label class="basecost">3</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom11"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom11"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom11"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext11"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom11" checked></input>
@@ -882,6 +928,7 @@
       <label class="basecost">3</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom12"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom12"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom12"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext12"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom12" checked></input>
@@ -894,6 +941,7 @@
       <label class="basecost">4</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom13"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom13"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom13"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext13"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom13" checked></input>
@@ -906,6 +954,7 @@
       <label class="basecost">4</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom14"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom14"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom14"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext14"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom14" checked></input>
@@ -918,6 +967,7 @@
       <label class="basecost">4</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom15"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom15"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom15"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext15"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom15" checked></input>
@@ -930,6 +980,7 @@
       <label class="basecost">4</label>
       <input type="text" list="corebuildings" class="buildinglist corebuildings" name="attr_buildingnameroom16"></input>
       <input type="text" list="brinybuildings" class="buildinglist brinybuildings" name="attr_buildingnameroom16"></input>
+      <input type="text" list="spacebuildings" class="buildinglist spacebuildings" name="attr_buildingnameroom16"></input>
       <textarea class="roomtext" spellcheck="false" name="attr_roomtext16"></textarea>
       <span class="baselocker">
         <input type="checkbox" class="baselocked" name="attr_baselockedroom16" checked></input>
@@ -2215,6 +2266,24 @@
     <option>Workbench</option>
 </datalist>
 
+<datalist id="spacebuildings">
+    <option>Armory</option>
+    <option>The Bar</option>
+    <option>Body Shop</option>
+    <option>Clockmaker's Hall</option>
+    <option>Databank</option>
+    <option>Flag Shop</option>
+    <option>Medbay</option>
+    <option>The Memorial Wall</option>
+    <option>The M-Shop</option>
+    <option>Mr. Tippy's Fully Licensed Totally Chompin' Above Board Lost and Found Emporium</option>
+    <option>Radio Station</option>
+    <option>Repair Bay</option>
+    <option>Supply Closet</option>
+    <option>Tranquility Gardens</option>
+    <option>Union Hall & Bowling Alley</option>
+</datalist>
+
 <datalist id="assistants">
     <option>Trisha Young</option>
     <option>Max Croissant</option>
@@ -2330,24 +2399,6 @@
         </div>
       {{/range}}
       
-      
-      {{#armUpgrades}}
-        <!-- {{#fuseDie}} -->
-        <div class="sheet-armUpgrades">
-          <h4>Fuse die rolled a = {{fuseDie}}</h4>
-           You have {{armUpgrades}} upgrades.
-
-          {{#rollGreater() fuseDie armUpgrades}}
-            <h5>Fuse is safe</h5>
-          {{/rollGreater() fuseDie armUpgrades}}
-
-          {{#^rollGreater() fuseDie armUpgrades}}
-            <h5>Fuse blows, armament disabled</h5>
-          {{/^rollGreater() fuseDie armUpgrades}}
-           
-        </div>
-      <!-- {{/fuseDie}} -->
-      {{/armUpgrades}}
 
 </rolltemplate>
 
@@ -2589,6 +2640,7 @@
     {{/rollBetween() roll 5 6}}
   </div>
   {{#details}}<div class="details">{{details}}</div>{{/details}}
+  <div class="armament-reminder"><small><em>Did you use an armament? If so, check your fuse!</em></small></div>
 </rolltemplate>
 
 
@@ -2645,7 +2697,22 @@ const Rooms = {
   Sacrifice_Booth: 'Sacrifice Booth',
   Sentinel_System: 'Sentinel System',
   Trophy_Room: 'Trophy Room',
-  Workbench: 'Workbench'
+  Workbench: 'Workbench',
+  Space_Armory: 'Armory',
+  The_Bar: 'The Bar',
+  Body_Shop: 'Body Shop',
+  Clockmakers_Hall: "Clockmaker's Hall",
+  Databank: 'Databank',
+  Flag_Shop: 'Flag Shop',
+  Medbay: 'Medbay',
+  The_Memorial_Wall: 'The Memorial Wall',
+  The_M_Shop: 'The M-Shop',
+  Mr_Tippys: "Mr. Tippy's Fully Licensed Totally Chompin' Above Board Lost and Found Emporium",
+  Radio_Station: 'Radio Station',
+  Repair_Bay: 'Repair Bay',
+  Supply_Closet: 'Supply Closet',
+  Tranquility_Gardens: 'Tranquility Gardens',
+  Union_Hall: 'Union Hall & Bowling Alley'
 };
 
 const Relationships = {
@@ -2759,6 +2826,60 @@ function getSubRoomDetails(room) {
   }
 }
 
+function getMechTug(mechType) {
+  switch(mechType) {
+    case "Beatbox":
+      return "You can spend Diesel as SP.";
+    case "Boomwagon":
+      return "Munition slots in your loadout can hold munitions or armaments. That is, you could have 6 armaments and 0 munitions, instead of the usual limit of 3 of each. Additionally, if you start your turn without any Diesel, you may take an additional action. If you are part of a supermech, the entire supermech must not have diesel. Each of your munitions with the \"blow a fuse\" condition can only activate if you have an unblown fuse to blow.";
+    case "Dynamo":
+      return "Cycle: Gain [2] Diesel, then increase this amount by 1 for the remainder of the mission.";
+    case "The Frog":
+      return "You have a hopper, a big, unfillable void in your gut. As an action, you can attempt to Gobble a close creature smaller than yourself. This is an automatic action if the creature is willing. Gobbled creatures are stored in The Frog's belly and are considered to be carried and isolated from all non-gobbled creatures. They are considered Weakened when harming the frog from the inside. The frog can store a max of [2] creatures. Mechs cannot be stored inside the frog, they are too big. The frog can open its mouth without spending an action, allowing all gobbled creatures out. Gobbled creatures can spend an action to force the pilot to make an Attribute test of their (the gobbled creature's) choice. On a failure, the gobbled creature escapes. There are no other failure or mixed success consequences.\r\nUpgrade cost 2: You may pull a mounted Operative directly into The Frog's belly, dismounting them in the process.";
+    case "The Germinator":
+      return "At the start of your turn, you may choose another mech at Close range. They gain Cycle: Gain [1] <Diesel>. If you choose the same mech multiple times, this effect stacks.";
+    case "Hotbox":
+      return "Hotbox has to constantly monitor Heat. Many of its powers and armaments generate Heat when used. Certain abilities can only be used in specific Heat ranges. General armaments and munitions can be used in any Heat range, and generate 1 Heat. If a pilot exceeds maximum Heat, the mech cannot take any actions.\r\nAny stacks of Burn applied to the mech increase Heat instead of damaging SP.";
+    case "The Juggler":
+      return "You gain additional Soak equal to the number of enemies you have Taunted.";
+    case "Leftovers":
+      return "You can consume fuel drops as health drops. Additionally, your mech can equip [2] powers that your pilot knows. These powers run off of Biotech and can be used while mounted. These powers do not occupy slots in the existing mech loadout.";
+    case "The Predatower":
+      return "Deal double Harm to creatures you have carried, moved, or immobilized this turn.";
+    case "Spider":
+      return "Egg Drop: As an automatic action, set down an egg sac in your location. When you do, start a 2-clock for that egg. Any creature forcibly moved into an egg sac becomes Immobilized and Dazed until the end of the ENEMY PHASE, destroying the egg sac. As an automatic action, you may pop (destroy) an egg sac, pulling all Near creatures Close to it. When the 2-clock fills up, the egg cracks and splits, revealing a still-damp hatchling. Each hatchling has 1 HP and Cycle: deal X Harm to one Close enemy, where X is the number of hatchlings. You can move all hatchlings one range band as a single automatic action.";
+    default:
+      return "";
+  }
+}
+
+function getMechMshop(mechType) {
+  switch(mechType) {
+    case "Beatbox":
+      return "You gain Stereo Select. Start each mission modeless and gain Cycle: switch to a new mode. The modes are Volume: All your armaments gain the Arc tag. Bass: All your armaments gain the Shred tag. Treble: Your armaments deal 1 True Harm before other effects. Subs: All of your armaments gain the Slowing keyword. That's right, you must switch modes each round!";
+    case "Boomwagon":
+      return "When you would blow a fuse on one of your armaments for any reason other than this ability, instead mark a 2-clock. When this clock fills, blow a fuse and clear the clock. Supermech armaments aren't yours!";
+    case "Dynamo":
+      return "Increase your starting Diesel by your Sly score. Additionally, add your lowest Attribute to the fuse die whenever you roll it.";
+    case "The Frog":
+      return "On your turn, you can spend 2 points of Biotech to apply one of the following effects to all creatures you have Gobbled: Deal 1 True Harm, Recover 1 HP, Recover 1 Biotech. This is not an action.";
+    case "The Germinator":
+      return "Whenever you restore <Diesel> to yourself or another mech, increase the <Diesel> gained by your lowest Attribute.";
+    case "Hotbox":
+      return "On your turn, you may spend 1 fuel to shift up or down one temperature zone. Your Heat changes by the smallest amount necessary to move into the new zone. You may do this as often as you'd like. This is not an action.";
+    case "The Juggler":
+      return "Gain Soak equal to your lowest Attribute.";
+    case "Leftovers":
+      return "The first Power or Munition you use on your turn each round does not cost any Biotech or Diesel.";
+    case "The Predatower":
+      return "On your turn, you may spend 1 <Biotech> to roll a die. If you roll less than or equal to your highest Attribute, gain 2 <Diesel>. You may do this as often as you'd like. This is not an action.";
+    case "Spider":
+      return "At the start of each mission, gain a number of chits equal to your Cyber score. At any point before or after a roll, you can give yourself or a Close ally 1 chit to increase that roll by 1.";
+    default:
+      return "";
+  }
+}
+
 function getRoomDetails(room, isBriny, isHoneycomb) {
 // Defense should show up for the main room only and only in BB expansion. Better would be to refactor to isMainRoom but here we are.
   return getRawRoomDetails(room) + (isBriny ?  !isHoneycomb ? `\r\nCurrent Defense: 0` : "" : "");
@@ -2772,7 +2893,7 @@ function getRawRoomDetails(room) {
       return `Unlocks the Augury powers for purchase by any Operative`;
 
   case Rooms.Clinic:
-      return `Injured Operatives can be healed by any Operative(s) spending 2 Scrip during downtime. Each time any Operative uses the Clinic, the cost increases by 1 Scrip.\r\nCurrent cost:`;
+      return `Injured Operatives can be healed by any Operative(s) spending 2 Scrip during downtime. Each time any Operative uses the Clinic, the cost increases by 1 Scrip.\r\nCurrent cost: 2`;
 
   case Rooms.Debt_House:
       return `All Operatives on the primary mission roll an extra d6 for Scrip.`;
@@ -2857,6 +2978,51 @@ function getRawRoomDetails(room) {
       
   case Rooms.Workbench:
       return `All Items have their cost reduced by 1 Gear Part (min 1).`;
+  
+  case Rooms.Space_Armory:
+      return `Unlocks the Beam armament upgrade, several general armaments, and the Portable Turret item`;
+  
+  case Rooms.The_Bar:
+      return `Injured Operatives can go on the primary mission. If an Operative who starts a Primary mission Injured would become Injured on the mission, they instead die.`;
+  
+  case Rooms.Body_Shop:
+      return `Unlocks some personal abilities. Additionally, Operatives with careers may learn a power from their mutator as a downtime action.`;
+  
+  case Rooms.Clockmakers_Hall:
+      return `Unlocks the Overclock Engine and Min's Cursed Stopwatch.`;
+  
+  case Rooms.Databank:
+      return `Unlocks the Byte general munition and the Data Bank Item.`;
+  
+  case Rooms.Flag_Shop:
+      return `Unlocks flags. Flags can be carried by any Operative or mech. Once placed down, a flag grants an effect to all Close allies. These effects end when the ally is no longer Close to the flag. Each flag can be placed once per mission, and cannot be moved after being placed. It does not cost an action to place a flag. Flags do not take a spot in loadout. There is only one copy of each flag.`;
+  
+  case Rooms.Medbay:
+      return `Allows an Injured Operative to be healed. Spend 2 Scrap, then increase the cost of this service by 1 Scrap (max 5). Injured Operatives can also be healed with a successful secondary mission.`;
+  
+  case Rooms.The_Memorial_Wall:
+      return `When an Operative dies, they may choose to give [1] piece of general equipment to their next of kin. This can be an Item, a general munition, general armament, or piece of personal gear. Special: The Memorial Wall can share space with another room. If there is no other room in this space, increase the number of hand-me-downs by 1.`;
+  
+  case Rooms.The_M_Shop:
+      return `All mechs unlock their capstone abilities. These abilities do not occupy a loadout slot.\r\nAdditionally, any Operatives may swap out their specific capstone for Anointing Cleanse.`;
+  
+  case Rooms.Mr_Tippys:
+      return `Unlocks the following items for purchase: Action Figure, Comically Large Horseshoe Magnet, Goggles, Magnifying Glass, Refined "Safe To Drink" Reactor Fuel (Tippy's Secret recipe), Rubber Boots, Suction Cups, Spray Glitter, Walkie Talkie.`;
+  
+  case Rooms.Radio_Station:
+      return `Each Drone can be equipped with one general armament (purchased separately for the Drone). This armament activates automatically at the start of your turn, using your Cyber score. You may select the target. On a failure or partial success, or if it blows a fuse, the Drone is deactivated. If an ability would cause a drone to dismount, it is deactivated. If an ability would cause a drone to be killed, it is destroyed, and must be purchased again, retaining all protocols and armaments.`;
+  
+  case Rooms.Repair_Bay:
+      return `Installed by default. Allows a Disabled mech to be repaired. Choose fast or cheap. Fast: spend 2 Scrap, then increase the cost of this service by 1 Scrap (max 5). Cheap: Start a 2-clock that increments at the start of Downtime. Collect your mech here when it's done. In the meantime, you're hoofin' it! The Repair Bay is the only way to repair a Disabled mech.`;
+  
+  case Rooms.Supply_Closet:
+      return `Any Operative may take the Gearhead power. Passive: Whenever you use an Item, roll a d6. On a 4+, the item is not expended. This power does not work with Drones or while mounted.`;
+  
+  case Rooms.Tranquility_Gardens:
+      return `Any Operative who spends their Downtime action in the Gardens may re-roll one 1 on their next mission. This includes on the secondary mission.`;
+  
+  case Rooms.Union_Hall:
+      return `A place to gather after missions.`;
       
   default:
       return "";
@@ -3265,31 +3431,24 @@ on("clicked:repeating_arm:rollarm", function(eventInfo) {
       "repeating_arm_weapontext",
       "repeating_arm_upgrades",
       "repeating_arm_harm",
+      "repeating_arm_blown",
     ], function(values) {
-          console.log(values);
+          if(values.repeating_arm_blown === "on") {
+            const armamentName = values.repeating_arm_armname;
+            startRoll(`&{template:default} {{name=Cannot Use Armament}} {{${armamentName}=Cannot use armament with blown fuse}}`,(results) => {
+              finishRoll(results.rollId, {});
+            });
+            return;
+          }
+          
           if(!values.repeating_arm_rangetext) {
             values.repeating_arm_rangetext = "";
           }
           
-          console.log(values.repeating_arm_upgrades);
-         // Do we have at least one upgrade? If not, don't show the fuse die at all.
-         if(values.repeating_arm_upgrades > 0) {
-         
-                startRoll(`&{template:weapon} {{title=Armament}} {{name=@{character_name}}} {{description=${values.repeating_arm_weapontext}}} {{weaponname=${values.repeating_arm_armname}}} {{harm=${values.repeating_arm_harm}}} {{range=${values.repeating_arm_rangetext}}} {{fuseDie=[[1d6]]}} {{armUpgrades=[[${values.repeating_arm_upgrades}]]}} `, (results) => {
-                finishRoll(
-                    results.rollId,
-                    {
-                    }
-                );
-          });
-
-         }
-          else {
       startRoll(`&{template:weapon} {{title=Armament}} {{name=@{character_name}}} {{description=${values.repeating_arm_weapontext}}}  {{weaponname=${values.repeating_arm_armname}}} {{harm=${values.repeating_arm_harm}}} {{range=${values.repeating_arm_rangetext}}}`,(results) => {
           finishRoll(results.rollId, {});
         }
       );
-    }
   });
 });
 
@@ -3384,6 +3543,18 @@ on("change:repeating_adversaries:adversaryname", function(eventInfo) {
       setAttrs({
         repeating_adversaries_adversarytext : adversaryText
       });
+  });
+});
+
+// Mech type change - autocomplete Tug and M-shop abilities
+on("change:character_mechtype", function(eventInfo) {
+  const mechType = eventInfo.newValue;
+  const tugText = getMechTug(mechType);
+  const mshopText = getMechMshop(mechType);
+  
+  setAttrs({
+    "mechtug": tugText,
+    "mechmshop": mshopText
   });
 });
 
@@ -3758,7 +3929,7 @@ on("clicked:drops", function() {
 
 // Reset after each mission
 on("clicked:reset", function() {
-  getAttrs(["hp_max", "resetpowers", "biotech_max", "barrier_max", "soak_max", "shard_max", "mech_diesel_max", "mech_shard_max", "mech_SP_max", "mech_soak_max"], (values) => {
+  getAttrs(["hp_max", "resetpowers", "biotech_max", "barrier_max", "soak_max", "shard_max", "mech_diesel_max", "mech_shard_max", "mech_SP_max", "mech_soak_max", "smash"], (values) => {
     // Set HP to max HP
     // Set Biotech to max Biotech
     const hp = values.hp_max;
@@ -3770,6 +3941,7 @@ on("clicked:reset", function() {
     const msh = values.mech_shard_max;
     const msp = values.mech_SP_max;
     const msk = values.mech_soak_max;
+    const smashVal = values.smash;
     setAttrs({
       "hp" : hp,
       "biotech" : bt,
@@ -3779,7 +3951,8 @@ on("clicked:reset", function() {
       "mech_diesel" : md,
       "mech_shard" : msh,
       "mech_SP" : msp,
-      "mech_soak": msk
+      "mech_soak": msk,
+      "heat": smashVal
     });
     
     // Unuse all drones

@@ -1,3 +1,4 @@
+const mode = process.env.NODE_ENV;
 class HtmlWorkerScriptPlugin {
   apply(compiler) {
     compiler.hooks.thisCompilation.tap('HtmlWorkerScriptPlugin', (compilation) => {
@@ -7,11 +8,12 @@ class HtmlWorkerScriptPlugin {
           stage: compilation.constructor.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE,
         },
         (assets) => {
-          const htmlAsset = assets['index.html'];
+          const htmlFileName = mode === 'production' ? 'pathfinder_community.html' : 'index.html';
+          const htmlAsset = assets[htmlFileName];
           const jsAsset = assets['index.js'];
 
           if (!htmlAsset || !jsAsset) {
-            console.warn('HtmlWorkerScriptPlugin: Required assets missing (index.html or index.js)');
+            console.warn(`HtmlWorkerScriptPlugin: Required assets missing (${htmlFileName} or index.js)`);
             return;
           }
 
@@ -31,7 +33,7 @@ class HtmlWorkerScriptPlugin {
           }
 
           // Replace index.html asset with modified version
-          compilation.updateAsset('index.html', {
+          compilation.updateAsset(htmlFileName, {
             source: () => updatedHtml,
             size: () => Buffer.byteLength(updatedHtml, 'utf8'),
           });
