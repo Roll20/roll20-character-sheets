@@ -2946,7 +2946,8 @@ const setCurrentBulk = async () => {
       output.current_bulk = 2;
       break;
     default:
-    // clog(`>> failure in bulk calculation <<`);
+      console.error(`Error: failure in bulk calculation.`);
+      break;
   }
   await setAttrsAsync(output, {silent: true});
   // clog(`setCurrentBulk - triggering sumEquipmentWeight`);
@@ -3131,7 +3132,8 @@ const removeEmptyArmorRows = async () => {
             // clog(`>> DELETE/RESET ROW 10 - Other 6 <<`);
             break;
           default:
-          // clog(`>> NOTHING TO DELETE/RESET <<`);
+            console.error(`Error: NOTHING TO DELETE/RESET.`);
+            break;
         }
       });
     }
@@ -3515,7 +3517,8 @@ const fillArmorDetails = async (id) => {
       output.armorother6_row_id = id;
       break;
     default:
-    // clog(`Armor row is out of range.`);
+      console.error(`Error: Armor row is out of range.`);
+      break;
   }
   await setAttrsAsync(output, {silent: true});
   calcAC(recalc);
@@ -3780,7 +3783,7 @@ const setSpellsCasterClass = async () => {
         // clog(`thisClass 2:${thisClass}`);
         break;
       default:
-        // clog(`Error: spell_caster_class value not recognized.`);
+        console.error(`Error: spell_caster_class value not recognized.`);
         break;
     }
   });
@@ -3843,7 +3846,7 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
       // clog(`Set Caster Class to ${caster2Name}`);
       break;
     default:
-      // clog(`Error: spell_caster_class value not recognized.`);
+      console.error(`Error: spell_caster_class value not recognized.`);
       break;
   }
   await setAttrsAsync(output, {silent: true});
@@ -6560,7 +6563,7 @@ on(
     }
     // NO CLASS found when Sync is enabled: Reset table
     if (classSelected === 99) {
-      // clog('Error: Class not recognized or class name is empty.');
+      console.error('Error: Class not recognized or class name is empty.');
       output[`thac-10`] = 20;
       output[`thac-9`] = 20;
       output[`thac-8`] = 20;
@@ -6625,11 +6628,11 @@ on('change:thac00', (eventInfo) => {
 // Auto-fill Abilities
 const getValidVariable = (str_value, string_type, lower_bound, higher_bound) => {
   if (str_value < lower_bound) {
-    // console.log(`Error: ${string_type} value is not a number or out of range. [${str_value}].\\nDefaulting to ${lower_bound}.`);
+    console.error(`Error: ${string_type} value is not a number or out of range. [${str_value}].\\nDefaulting to ${lower_bound}.`);
     return lower_bound;
   }
   if (str_value > higher_bound) {
-    // console.log(`Error: ${string_type} value is out of range. [${str_value}].\\nDefaulting to ${higher_bound}.`);
+    console.error(`Error: ${string_type} value is out of range. [${str_value}].\\nDefaulting to ${higher_bound}.`);
     return higher_bound;
   }
   // Keep value between lowerbound and higherbound.
@@ -6733,6 +6736,7 @@ class StrengthAdjustmentTable {
       case 'Encumbrance':
         return this.getEntry(str_value_STR, str_per_value).getEncumbranceBonus();
       default:
+        console.error(`Error: Invalid Test.`);
         return 'Invalid Test';
     }
   }
@@ -7613,7 +7617,7 @@ on('clicked:spell-sort-alphabetical clicked:spell-sort-level', async (eventInfo)
       // console.log(spells);
     }
   } catch (error) {
-    console.error('Sort failed', error);
+    console.error('Error: Sort failed.', error);
   } finally {
     await setAttrsAsync({spells_sheet_busy: 0});
     // clog(`Sheet busy flag cleared.`);
@@ -7652,7 +7656,7 @@ on('clicked:spell-sort-undo', async (eventInfo) => {
       await setAttrsAsync({spells_previous_order_array: ''}, {silent: true});
     }
   } catch (error) {
-    console.error('Undo failed', error);
+    console.error('Error: Undo failed', error);
   } finally {
     await setAttrsAsync({spells_sheet_busy: 0});
     // clog(`Undo process finished. Sheet unlocked.`);
@@ -7723,7 +7727,7 @@ on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', async 
       // console.log(equipment);
     }
   } catch (error) {
-    console.error('Sort failed', error);
+    console.error('Error: Sort failed.', error);
   } finally {
     await setAttrsAsync({equipment_sheet_busy: 0});
     // clog(`Sheet busy flag cleared.`);
@@ -7762,7 +7766,7 @@ on('clicked:equipment-sort-undo', async (eventInfo) => {
       await setAttrsAsync({equipment_previous_order_array: ''}, {silent: true});
     }
   } catch (error) {
-    console.error('Undo failed', error);
+    console.error('Error: Undo failed.', error);
   } finally {
     await setAttrsAsync({equipment_sheet_busy: 0});
     // clog(`Undo process finished. Sheet unlocked.`);
