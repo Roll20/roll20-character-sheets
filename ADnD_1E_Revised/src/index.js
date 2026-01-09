@@ -157,7 +157,7 @@ const uniqueids = {};
 const generateUniqueRowID = () => {
   let generated = generateRowID();
   while (uniqueids[generated] === true) {
-    clog(`generateUniqueRowID: ${generated} is not a unique ID, trying again.`);
+    // clog(`generateUniqueRowID: ${generated} is not a unique ID, trying again.`);
     generated = generateRowID();
   }
   // clog(`generateUniqueRowID: ${generated} verified as unique, returning.`);
@@ -167,7 +167,7 @@ const generateUniqueRowID = () => {
 
 // Validate character name for illegal characters
 on('change:character_name', async (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const v = await getAttrsAsync(['character_name']);
   const output = {};
   const attr = v[`${eventInfo.sourceAttribute}`];
@@ -183,7 +183,7 @@ on('change:character_name', async (eventInfo) => {
 on(
   'change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:repeating_equipment:equipment_armor_mod change:repeating_equipment:equipment_armor_magic, change:hitpoints_1_class, change:hitpoints_2_class, change:hitpoints_3_class',
   async (eventInfo) => {
-    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
     const v = await getAttrsAsync([
       'armortype_magic',
@@ -879,7 +879,7 @@ const migrateAC = (current_version, final_version) => {
     const armorClassTotal = +v.armorclass_total || 0;
     const armortypeAC = +v.armortype_ac || 0;
     const armorShield = v.armorshield;
-    clog(`armorShield:${armorShield} armorClassTotal:${armorClassTotal} armorBonus:${armorBonus} armortypeAC:${armortypeAC} armorClass:${armorClass}`);
+    // clog(`armorShield:${armorShield} armorClassTotal:${armorClassTotal} armorBonus:${armorBonus} armortypeAC:${armortypeAC} armorClass:${armorClass}`);
     // older sheet will have default value for armortypeAC and armorClassTotal.  AC s/b better than 10
     if (armorShield) {
       if (armortypeAC === 10 && armorClass < 10) {
@@ -892,16 +892,16 @@ const migrateAC = (current_version, final_version) => {
         output.armorshield_base = -1;
         output.armorshield_worn = 1;
         output.armorshield_carried = 1;
-        clog(`new armor w/shield`);
+        // clog(`new armor w/shield`);
       }
     } else if (armortypeAC === 10 && armorClass < 10) {
       output.armortype_ac = armorClass;
       output.armortype_base = armorClass;
       output.armortype_worn = 1;
       output.armortype_carried = 1;
-      clog(`new armor w/out shield`);
+      // clog(`new armor w/out shield`);
     } else {
-      clog(`NEW ARMOR CHECK AND SET FAILED`);
+      // clog(`NEW ARMOR CHECK AND SET FAILED`);
     }
     output.sheet_version = current_version;
     clog(`VERSION UPDATE: Migrate AC completed`);
@@ -1267,8 +1267,8 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
   let newID = '';
   let id_low = id;
   id_low = id_low !== null ? id.toLowerCase() : id_low;
-  clog(`syncArmorToEquipment - id_low:${id_low} ${id_low === null ? `Sync '${attr}' from Armor Details` : 'Sync from repeating_equipment'}\n null means Δ came from Armor Details`);
-  clog(`syncArmorToEquipment - row_removed?:${row_removed} ${row_removed ? 'Row removed' : 'Row not removed'}`);
+  // clog(`syncArmorToEquipment: id_low:${id_low} ${id_low === null ? `Sync '${attr}' from Armor Details` : 'Sync from repeating_equipment'}\n null means Δ came from Armor Details`);
+  // clog(`syncArmorToEquipment: row_removed?:${row_removed} ${row_removed ? 'Row removed' : 'Row not removed'}`);
   const unarmored0_ID = v.unarmored_row_id.toString();
   const armortype1_ID = v.armortype1_row_id.toString();
   const armortype2_ID = v.armortype2_row_id.toString();
@@ -1302,9 +1302,9 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
   const attrToCheck = attr;
   const matchingArray = matchAttr(attrToCheck);
   if (matchingArray) {
-    clog(`syncArmorToEquipment - Match found for '${attrToCheck}' in:${matchingArray}`);
+    // clog(`syncArmorToEquipment: Match found for '${attrToCheck}' in:${matchingArray}`);
   } else {
-    clog(`syncArmorToEquipment - No match found for attribute:${attrToCheck} (null = repeating_equipment removed)`);
+    // clog(`syncArmorToEquipment: No match found for attribute:${attrToCheck} (null = repeating_equipment removed)`);
   }
   const armor0 = v.unarmored.trim();
   const armor1 = v.armortype.trim();
@@ -1339,7 +1339,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       id_low = idArray[index];
     }
   }
-  clog(`syncArmorToEquipment - id:${id_low} matchingArray:${matchingArray}`);
+  // clog(`syncArmorToEquipment: id:${id_low} matchingArray:${matchingArray}`);
   // match the row
   if (matchingArray === 'unarmoredAttrs' || id_low === idArray[0] || migrate) {
     if (matchingArray === 'unarmoredAttrs' || migrate) {
@@ -1364,7 +1364,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           }
           output[`repeating_equipment_${rowId}_equipment_weight`] = +v.unarmored_weight || 0;
           output[`repeating_equipment_${rowId}_equipment_cost`] = +v.unarmored_cost || 0;
-          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'armor1'`);
+          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'armor1'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1386,7 +1386,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.unarmored_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.unarmored_cost || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          clog(`syncArmorToEquipment - repeating Armor does not exist. Creating armor1: ${newID}`);
+          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating armor1: ${newID}`);
         }
       } else if (unarmored0_ID === idArray[0]) {
         // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
@@ -1404,7 +1404,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         } else {
           output.unarmored_carried = +v.unarmored_carried || 0;
         }
-        clog(`syncArmorToEquipment - Armor Details removed - ID Exists. Deleted from Armor Detail unarmored:${newID}`);
+        // clog(`syncArmorToEquipment: Armor Details removed - ID Exists. Deleted from Armor Detail unarmored:${newID}`);
       }
     } else if (matchingArray === null && row_removed) {
       // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
@@ -1417,7 +1417,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       output.unarmored_weight = 0;
       output.unarmored_cost = 0;
       output.unarmored_carried = 1;
-      clog(`syncArmorToEquipment - Armor Details removed - NO name and/or NO ID. Deleted from Equipment unarmored:${newID}`);
+      // clog(`syncArmorToEquipment: Armor Details removed - NO name and/or NO ID. Deleted from Equipment unarmored:${newID}`);
     }
   }
   if (matchingArray === 'armor1Attrs' || id_low === idArray[1] || migrate) {
@@ -1444,7 +1444,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           }
           output[`repeating_equipment_${rowId}_equipment_weight`] = +v.armor_weight || 0;
           output[`repeating_equipment_${rowId}_equipment_cost`] = +v.armor_cost || 0;
-          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'armor1'`);
+          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'armor1'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1461,7 +1461,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          clog(`syncArmorToEquipment - repeating Armor does not exist. Creating armor1: ${newID}`);
+          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating armor1: ${newID}`);
         }
       } else if (armortype1_ID === idArray[1]) {
         // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
@@ -1475,7 +1475,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         output.armortype_weight = 0;
         output.armortype_cost = 0;
         output.armortype_carried = 1;
-        clog(`syncArmorToEquipment - Armor Details row removed. Resetting armor1:${newID}`);
+        // clog(`syncArmorToEquipment: Armor Details row removed. Resetting armor1:${newID}`);
       }
     } else if (matchingArray === null && row_removed) {
       // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
@@ -1489,7 +1489,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       output.armortype_weight = 0;
       output.armortype_cost = 0;
       output.armortype_carried = 1;
-      clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for armor1`);
+      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for armor1`);
     }
   }
   if (matchingArray === 'armor2Attrs' || id_low === idArray[2] || migrate) {
@@ -1516,7 +1516,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           }
           output[`repeating_equipment_${rowId}_equipment_weight`] = +v.armortype2_weight || 0;
           output[`repeating_equipment_${rowId}_equipment_cost`] = +v.armortype2_cost || 0;
-          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'armor2'`);
+          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'armor2'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1533,7 +1533,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          clog(`syncArmorToEquipment - repeating Armor does not exist. Creating armor2: ${newID}`);
+          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating armor2: ${newID}`);
         }
       } else if (armortype2_ID === idArray[2]) {
         // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
@@ -1547,7 +1547,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         output.armortype2_weight = 0;
         output.armortype2_cost = 0;
         output.armortype2_carried = 1;
-        clog(`syncArmorToEquipment - Armor Details row removed. Resetting armor2:${newID}`);
+        // clog(`syncArmorToEquipment: Armor Details row removed. Resetting armor2:${newID}`);
       }
     } else if (matchingArray === null && row_removed) {
       // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
@@ -1561,7 +1561,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       output.armortype2_weight = 0;
       output.armortype2_cost = 0;
       output.armortype2_carried = 1;
-      clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for armor2`);
+      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for armor2`);
     }
   }
   if (matchingArray === 'shieldAttrs' || id_low === idArray[3] || migrate) {
@@ -1589,7 +1589,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           }
           output[`repeating_equipment_${rowId}_equipment_weight`] = +v.armorshield_weight || 0;
           output[`repeating_equipment_${rowId}_equipment_cost`] = +v.armorshield_cost || 0;
-          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'shield'`);
+          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'shield'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1607,7 +1607,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          clog(`syncArmorToEquipment - repeating Armor does not exist. Creating shield: ${newID}`);
+          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating shield: ${newID}`);
         }
       } else if (armorshield_ID === idArray[3]) {
         // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
@@ -1622,7 +1622,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         output.armorshield_weight = 0;
         output.armorshield_cost = 0;
         output.armorshield_carried = 1;
-        clog(`syncArmorToEquipment - Armor Details row removed. Resetting shield:${newID}`);
+        // clog(`syncArmorToEquipment: Armor Details row removed. Resetting shield:${newID}`);
       }
     } else if (matchingArray === null && row_removed) {
       // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
@@ -1637,7 +1637,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       output.armorshield_weight = 0;
       output.armorshield_cost = 0;
       output.armorshield_carried = 1;
-      clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for shield`);
+      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for shield`);
     }
   }
   if (matchingArray === 'helmetAttrs' || id_low === idArray[4] || migrate) {
@@ -1662,7 +1662,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           }
           output[`repeating_equipment_${rowId}_equipment_weight`] = +v.armorhelmet_weight || 0;
           output[`repeating_equipment_${rowId}_equipment_cost`] = +v.armorhelmet_cost || 0;
-          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'helmet'`);
+          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'helmet'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1677,7 +1677,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
           output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          clog(`syncArmorToEquipment - repeating Armor does not exist. Creating helmet: ${newID}`);
+          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating helmet: ${newID}`);
         }
       } else if (armorhelmet_ID === idArray[4]) {
         // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
@@ -1691,7 +1691,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         output.armorhelmet_weight = 0;
         output.armorhelmet_cost = 0;
         output.armorhelmet_carried = 1;
-        clog(`syncArmorToEquipment - Armor Details row removed. Resetting helmet:${newID}`);
+        // clog(`syncArmorToEquipment: Armor Details row removed. Resetting helmet:${newID}`);
       }
     } else if (matchingArray === null && row_removed) {
       // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
@@ -1705,7 +1705,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       output.armorhelmet_weight = 0;
       output.armorhelmet_cost = 0;
       output.armorhelmet_carried = 1;
-      clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for helmet`);
+      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for helmet`);
     }
   }
   if (matchingArray === 'other1Attrs' || id_low === idArray[5] || migrate) {
@@ -1725,7 +1725,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
           output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other1'`);
+          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'other1'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1739,7 +1739,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          clog(`syncArmorToEquipment - repeating Armor does not exist. Creating other1: ${newID}`);
+          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating other1: ${newID}`);
         }
       } else if (armorother1_ID === idArray[5]) {
         // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
@@ -1751,7 +1751,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         output.armorother_magic = 0;
         output.armorother_mod = 0;
         output.armorother_bulk = 0;
-        clog(`syncArmorToEquipment - Armor Details row removed. Resetting other1:${newID}`);
+        // clog(`syncArmorToEquipment: Armor Details row removed. Resetting other1:${newID}`);
       }
     } else if (matchingArray === null && row_removed) {
       // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
@@ -1763,7 +1763,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       output.armorother_magic = 0;
       output.armorother_mod = 0;
       output.armorother_bulk = 0;
-      clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other1`);
+      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other1`);
     }
   }
   if (matchingArray === 'other2Attrs' || id_low === idArray[6] || migrate) {
@@ -1796,7 +1796,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          clog(`syncArmorToEquipment - repeating Armor does not exist. Creating other2: ${newID}`);
+          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating other2: ${newID}`);
         }
       } else if (armorother2_ID === idArray[6]) {
         // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
@@ -1808,7 +1808,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         output.armorother2_magic = 0;
         output.armorother2_mod = 0;
         output.armorother2_bulk = 0;
-        clog(`syncArmorToEquipment - Armor Details row removed. Resetting other2:${newID}`);
+        // clog(`syncArmorToEquipment: Armor Details row removed. Resetting other2:${newID}`);
       }
     } else if (matchingArray === null && row_removed) {
       // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
@@ -1820,7 +1820,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       output.armorother2_magic = 0;
       output.armorother2_mod = 0;
       output.armorother2_bulk = 0;
-      clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other2`);
+      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other2`);
     }
   }
   if (matchingArray === 'other3Attrs' || id_low === idArray[7] || migrate) {
@@ -1840,7 +1840,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother3_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
           output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother3_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other3'`);
+          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'other3'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1854,7 +1854,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          clog(`syncArmorToEquipment - repeating Armor does not exist. Creating other3: ${newID}`);
+          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating other3: ${newID}`);
         }
       } else if (armorother3_ID === idArray[7]) {
         // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
@@ -1866,7 +1866,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         output.armorother3_magic = 0;
         output.armorother3_mod = 0;
         output.armorother3_bulk = 0;
-        clog(`syncArmorToEquipment - Armor Details row removed. Resetting other3:${newID}`);
+        // clog(`syncArmorToEquipment: Armor Details row removed. Resetting other3:${newID}`);
       }
     } else if (matchingArray === null && row_removed) {
       // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
@@ -1878,7 +1878,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       output.armorother3_magic = 0;
       output.armorother3_mod = 0;
       output.armorother3_bulk = 0;
-      clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other3`);
+      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other3`);
     }
   }
   if (matchingArray === 'other4Attrs' || id_low === idArray[8] || migrate) {
@@ -1898,7 +1898,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother4_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
           output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother4_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other4'`);
+          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'other4'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1912,7 +1912,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          clog(`syncArmorToEquipment - repeating Armor does not exist. Creating other4: ${newID}`);
+          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating other4: ${newID}`);
         }
       } else if (armorother4_ID === idArray[8]) {
         // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
@@ -1924,7 +1924,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         output.armorother4_magic = 0;
         output.armorother4_mod = 0;
         output.armorother4_bulk = 0;
-        clog(`syncArmorToEquipment - Armor Details row removed. Resetting other4:${newID}`);
+        // clog(`syncArmorToEquipment: Armor Details row removed. Resetting other4:${newID}`);
       }
     } else if (matchingArray === null && row_removed) {
       // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
@@ -1936,7 +1936,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       output.armorother4_magic = 0;
       output.armorother4_mod = 0;
       output.armorother4_bulk = 0;
-      clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other4`);
+      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other4`);
     }
   }
   if (matchingArray === 'other5Attrs' || id_low === idArray[9] || migrate) {
@@ -1956,7 +1956,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother5_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
           output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother5_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other5'`);
+          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'other5'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -1970,7 +1970,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          clog(`syncArmorToEquipment - repeating Armor does not exist. Creating other5: ${newID}`);
+          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating other5: ${newID}`);
         }
       } else if (armorother5_ID === idArray[9]) {
         // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
@@ -1982,7 +1982,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         output.armorother5_magic = 0;
         output.armorother5_mod = 0;
         output.armorother5_bulk = 0;
-        clog(`syncArmorToEquipment - Armor Details row removed. Resetting other5:${newID}`);
+        // clog(`syncArmorToEquipment: Armor Details row removed. Resetting other5:${newID}`);
       }
     } else if (matchingArray === null && row_removed) {
       // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
@@ -1994,7 +1994,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       output.armorother5_magic = 0;
       output.armorother5_mod = 0;
       output.armorother5_bulk = 0;
-      clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other5`);
+      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other5`);
     }
   }
   if (matchingArray === 'other6Attrs' || id_low === idArray[10] || migrate) {
@@ -2014,7 +2014,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother6_mod || 0;
           // armor in use ie 'worn', should always be considered as carried
           output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother6_worn === 1 ? 1 : 0;
-          clog(`syncArmorToEquipment - id:${rowId} repeating Armor exists for 'other6'`);
+          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'other6'`);
         } else {
           // has name but NO id = CREATE NEW ROW
           newID = generateUniqueRowID();
@@ -2028,7 +2028,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
           output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
           output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
           output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          clog(`syncArmorToEquipment - repeating Armor does not exist. Creating other6: ${newID}`);
+          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating other6: ${newID}`);
         }
       } else if (armorother6_ID === idArray[10]) {
         // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
@@ -2040,7 +2040,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         output.armorother6_magic = 0;
         output.armorother6_mod = 0;
         output.armorother6_bulk = 0;
-        clog(`syncArmorToEquipment - Armor Details row removed. Resetting other6:${newID}`);
+        // clog(`syncArmorToEquipment: Armor Details row removed. Resetting other6:${newID}`);
       }
     } else if (matchingArray === null && row_removed) {
       // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
@@ -2052,7 +2052,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       output.armorother6_magic = 0;
       output.armorother6_mod = 0;
       output.armorother6_bulk = 0;
-      clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other6`);
+      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other6`);
     }
   }
   await setAttrsAsync(output, {silent: true});
@@ -2323,11 +2323,11 @@ const migrateWeaponWtCostFunction = () => {
           });
           // weapon weight, cost, or both are being tracked on the weapon row
           if (weaponWeight !== 0 || weaponCost !== 0) {
-            clog(`weaponName:${weaponName} weaponWeight:${weaponWeight} weaponCost:${weaponCost}`);
+            // clog(`weaponName:${weaponName} weaponWeight:${weaponWeight} weaponCost:${weaponCost}`);
             // test weapon name against equipment names
             const nameIndex = equipmentNamesArray.indexOf(weaponName);
             if (nameIndex === -1) {
-              clog(`NO MATCH || COPY TO NEW ROW ||`);
+              // clog(`NO MATCH || COPY TO NEW ROW ||`);
               // create a new row
               newID = generateUniqueRowID();
               output[`repeating_equipment_${newID}_equipment_type`] = 1;
@@ -2338,9 +2338,9 @@ const migrateWeaponWtCostFunction = () => {
               output[`repeating_equipment_${newID}_equipment_cost`] = weaponCost;
             } else if (equipmentWeightsArray[nameIndex] === '0' && equipmentCostsArray[nameIndex] === '0') {
               // weight & cost are being tracked on weapons
-              clog(
-                `MATCH w/weight & cost tracked on weapons. || UPDATE ROW || name:${weaponName} weight:${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex} id:${equipmentIdsArray[nameIndex]}`,
-              );
+              // clog(
+              //   `MATCH w/weight & cost tracked on weapons. || UPDATE ROW || name:${weaponName} weight:${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex} id:${equipmentIdsArray[nameIndex]}`,
+              // );
               // update existing row
               newID = equipmentIdsArray[nameIndex];
               output[`repeating_equipment_${newID}_equipment_type`] = 1;
@@ -2350,29 +2350,29 @@ const migrateWeaponWtCostFunction = () => {
               output[`repeating_equipment_${newID}_equipment_cost`] = weaponCost;
             } else if (equipmentWeightsArray[nameIndex] !== '0' && equipmentCostsArray[nameIndex] === '0') {
               // weight is being tracked on equipment but costs are not
-              clog(
-                `MATCH w/weight tracked on equipment. || UPDATE ROW || name:${weaponName} weight:${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex} id:${equipmentIdsArray[nameIndex]}`,
-              );
+              // clog(
+              //   `MATCH w/weight tracked on equipment. || UPDATE ROW || name:${weaponName} weight:${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex} id:${equipmentIdsArray[nameIndex]}`,
+              // );
               // update existing row
               newID = equipmentIdsArray[nameIndex];
               output[`repeating_equipment_${newID}_equipment_type`] = 1;
               output[`repeating_equipment_${newID}_equipment_cost`] = weaponCost;
             } else if (equipmentWeightsArray[nameIndex] === '0' && equipmentCostsArray[nameIndex] !== '0') {
               // weight is not being tracked on equipment but costs are
-              clog(
-                `MATCH w/cost tracked on equipment. || UPDATE ROW || name:${weaponName} weight:${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex} id:${equipmentIdsArray[nameIndex]}`,
-              );
+              // clog(
+              //   `MATCH w/cost tracked on equipment. || UPDATE ROW || name:${weaponName} weight:${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex} id:${equipmentIdsArray[nameIndex]}`,
+              // );
               // update existing row
               newID = equipmentIdsArray[nameIndex];
               output[`repeating_equipment_${newID}_equipment_type`] = 1;
               output[`repeating_equipment_${newID}_equipment_weight`] = weaponWeight;
             } else if (equipmentWeightsArray[nameIndex] !== '0' && equipmentCostsArray[nameIndex] !== '0') {
-              clog(
-                `100% MATCH weight & cost tracked on equipment. || IGNORE ROW || name:${weaponName} weight: ${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex}`,
-              );
+              // clog(
+              //   `100% MATCH weight & cost tracked on equipment. || IGNORE ROW || name:${weaponName} weight: ${equipmentWeightsArray[nameIndex]} cost:${equipmentCostsArray[nameIndex]} at index:${nameIndex}`,
+              // );
             } else {
               // ignore
-              clog(`No attribute data to migrate. || IGNORE ROW ||`);
+              // clog(`No attribute data to migrate. || IGNORE ROW ||`);
             }
           }
         });
@@ -2403,7 +2403,7 @@ const setEquipmentType = (current_version, final_version) => {
         const equipType = +v[`repeating_equipment_${id}_equipment_type`] || 0;
         if (equipType >= 0) return;
         output[`repeating_equipment_${id}_equipment_type`] = 0;
-        clog(`equipType -1:${equipType} reset to Gear`);
+        // clog(`equipType -1:${equipType} reset to Gear`);
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: setEquipmentType completed`);
@@ -2530,10 +2530,10 @@ const updateSyncArmorFlag = async (current_version, final_version) => {
     const {isMatch} = await testArmorRowIDs(id);
     const flagName = `repeating_equipment_${id}_equipment_sync_armor_flag`;
     if (type !== 99 && isMatch) {
-      clog(`updateSyncArmorFlag - match from testArmorRowIDs():${isMatch} type:${type}`);
+      // clog(`updateSyncArmorFlag - match from testArmorRowIDs():${isMatch} type:${type}`);
       output[flagName] = 1;
     } else {
-      clog(`updateSyncArmorFlag - NO match:${isMatch} type:${type}`);
+      // clog(`updateSyncArmorFlag - NO match:${isMatch} type:${type}`);
       output[flagName] = 0;
     }
   });
@@ -2682,7 +2682,7 @@ on('change:abilities_info_show change:toggle_exceptional change:strength', (even
 // PC or NPC sheet role
 on('change:is_npc', async (eventInfo) => {
   const v = await getAttrsAsync(['is_npc', 'toggle_npc']);
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const output = {};
   const isNPC = +v.is_npc || 0;
   let toggleNPC = +v.toggle_npc || 0;
@@ -2712,7 +2712,7 @@ const sumEquipmentCost = async () => {
 
 // Equipment Cost Calcs
 on('change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_cost remove:repeating_equipment', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   sumEquipmentCost();
 });
 
@@ -2888,7 +2888,7 @@ const setCurrentMovement = async () => {
 
 on('change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', async (eventInfo) => {
   // clog('Current Base Movement has been re-calculated');
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const v = await getAttrsAsync(['movement']);
   const output = {};
   const recalc = 0;
@@ -2946,7 +2946,7 @@ const setCurrentBulk = async () => {
       output.current_bulk = 2;
       break;
     default:
-      clog(`>> failure in bulk calculation <<`);
+    // clog(`>> failure in bulk calculation <<`);
   }
   await setAttrsAsync(output, {silent: true});
   // clog(`setCurrentBulk - triggering sumEquipmentWeight`);
@@ -2956,7 +2956,7 @@ const setCurrentBulk = async () => {
 on(
   'change:unarmored_bulk change:armortype_bulk change:armortype2_bulk change:armorshield_bulk change:armorhelmet_bulk change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorshield_carried remove:repeating_equipment',
   (eventInfo) => {
-    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
     setCurrentBulk();
   },
 );
@@ -2990,7 +2990,7 @@ on(
 
 // Equipment Tabs hide/show Rows
 on('change:equipment_tabs_type change:equipment_tabs_carry', async (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const idArray = await getSectionIDsAsync('equipment');
   const output = {};
   const fields = idArray.flatMap((id) => [
@@ -3019,12 +3019,12 @@ on('change:equipment_tabs_type change:equipment_tabs_carry', async (eventInfo) =
 
 const removeEmptyArmorRows = async () => {
   const idArray = await getSectionIDsAsync('equipment');
-  clog(`removeEmptyArmorRows`);
+  // clog(`removeEmptyArmorRows`);
   const output = {};
   const fields = idArray.flatMap((id) => [`repeating_equipment_${id}_equipment_armor_type`]);
   // grab all attrs and ids before continuing
   const [v, armorDetailsArray] = await Promise.all([getAttrsAsync(fields), generateArmorDetailsArray()]);
-  clog(`removeEmptyArmorRows - armorDetailsArray:`);
+  // clog(`removeEmptyArmorRows - armorDetailsArray:`);
   console.log(armorDetailsArray);
   _.each(idArray, (id) => {
     // this new id/row
@@ -3032,9 +3032,9 @@ const removeEmptyArmorRows = async () => {
     // Armor Type not selected
     if (type === 99) {
       return;
-      clog(`removeEmptyArmorRows - Armor Type:${type} Exit`);
+      // clog(`removeEmptyArmorRows - Armor Type:${type} Exit`);
     }
-    clog(`removeEmptyArmorRows - Armor Type:${type}`);
+    // clog(`removeEmptyArmorRows - Armor Type:${type}`);
     // Find Armor Details row position where the id matches in armorDetailsArray
     const matchingIndices = armorDetailsArray
       .map((element, index) => {
@@ -3050,7 +3050,7 @@ const removeEmptyArmorRows = async () => {
     // detect and remove the old id/row matches
     if (matchingIndices.length > 1) {
       rowType = type + 1; // Align Armor Type with the Actual Armor Details row
-      clog(`removeEmptyArmorRows - matchingIndices: [${matchingIndices}] id:${id} type:${rowType}`);
+      // clog(`removeEmptyArmorRows - matchingIndices: [${matchingIndices}] id:${id} type:${rowType}`);
       // Create a new array of Armor Details row index positions with multiple matches
       const indicesWithMultipleMatches = matchingIndices;
       // Convert indicesWithMultipleMatches array to a comma-separated string
@@ -3058,7 +3058,7 @@ const removeEmptyArmorRows = async () => {
       // Create a new variable called "removeRows" with values that don't equal "rowType"
       const removeRows = indicesString.split(',').filter((value) => value !== String(rowType));
       // Log matching row(s)
-      clog(`removeEmptyArmorRows - matching rows: ${removeRows}`);
+      // clog(`removeEmptyArmorRows - matching rows: ${removeRows}`);
       // const removeRow = removeRows.length > 0 ? removeRows[0] : null;
 
       // Delete the old matching Armor Details row(s)
@@ -3068,70 +3068,70 @@ const removeEmptyArmorRows = async () => {
             output.unarmored = '';
             output.unarmored_worn = 0;
             output.unarmored_row_id = 0;
-            clog(`>> DELETE/RESET ROW 0 - Unarmored <<`);
+            // clog(`>> DELETE/RESET ROW 0 - Unarmored <<`);
             break;
           case '2':
             output.armortype = '';
             output.armortype_worn = 0;
             output.armortype1_row_id = 0;
-            clog(`>> DELETE/RESET ROW 1 - Armor 1 <<`);
+            // clog(`>> DELETE/RESET ROW 1 - Armor 1 <<`);
             break;
           case '3':
             output.armortype2 = '';
             output.armortype2_worn = 0;
             output.armortype2_row_id = 0;
-            clog(`>> DELETE/RESET ROW 2 - Armor 2 <<`);
+            // clog(`>> DELETE/RESET ROW 2 - Armor 2 <<`);
             break;
           case '4':
             output.armorshield = '';
             output.armorshield_worn = 0;
             output.armorshield_row_id = 0;
-            clog(`>> DELETE/RESET ROW 3 - Shield <<`);
+            // clog(`>> DELETE/RESET ROW 3 - Shield <<`);
             break;
           case '5':
             output.armorhelmet = '';
             output.armorhelmet_worn = 0;
             output.armorhelmet_row_id = 0;
-            clog(`>> DELETE/RESET ROW 4 - Helmet <<`);
+            // clog(`>> DELETE/RESET ROW 4 - Helmet <<`);
             break;
           case '6':
             output.armorother = '';
             output.armorother_worn = 0;
             output.armorother1_row_id = 0;
-            clog(`>> DELETE/RESET ROW 5 - Other <<`);
+            // clog(`>> DELETE/RESET ROW 5 - Other <<`);
             break;
           case '7':
             output.armorother2 = '';
             output.armorother2_worn = 0;
             output.armorother2_row_id = 0;
-            clog(`>> DELETE/RESET ROW 6 - Other 2 <<`);
+            // clog(`>> DELETE/RESET ROW 6 - Other 2 <<`);
             break;
           case '8':
             output.armorother3 = '';
             output.armorother3_worn = 0;
             output.armorother3_row_id = 0;
-            clog(`>> DELETE/RESET ROW 7 - Other 3 <<`);
+            // clog(`>> DELETE/RESET ROW 7 - Other 3 <<`);
             break;
           case '9':
             output.armorother4 = '';
             output.armorother4_worn = 0;
             output.armorother4_row_id = 0;
-            clog(`>> DELETE/RESET ROW 8 - Other 4 <<`);
+            // clog(`>> DELETE/RESET ROW 8 - Other 4 <<`);
             break;
           case '10':
             output.armorother5 = '';
             output.armorother5_worn = 0;
             output.armorother5_row_id = 0;
-            clog(`>> DELETE/RESET ROW 9 - Other 5 <<`);
+            // clog(`>> DELETE/RESET ROW 9 - Other 5 <<`);
             break;
           case '11':
             output.armorother6 = '';
             output.armorother6_worn = 0;
             output.armorother6_row_id = 0;
-            clog(`>> DELETE/RESET ROW 10 - Other 6 <<`);
+            // clog(`>> DELETE/RESET ROW 10 - Other 6 <<`);
             break;
           default:
-            clog(`>> NOTHING TO DELETE/RESET <<`);
+          // clog(`>> NOTHING TO DELETE/RESET <<`);
         }
       });
     }
@@ -3143,13 +3143,13 @@ const removeEmptyArmorRows = async () => {
 // IF this is a new row, add new repeating_equipment armor OR update an existing synced row
 const armorDetailslisteners = `${armorAttrs.map((stat) => `change:${stat}`).join(' ')}`;
 on(armorDetailslisteners, async (eventInfo) => {
-  clog(`armorDetailslisteners - sourceType:${eventInfo.sourceType}`);
+  // clog(`armorDetailslisteners: sourceType:${eventInfo.sourceType}`);
   if (eventInfo.sourceType === 'sheetworker') return;
   const attr = eventInfo.sourceAttribute;
   const attrPrev = eventInfo.previousValue;
   const attrNew = eventInfo.newValue;
   const row_removed = 0;
-  clog(`armorDetailslisteners - ${attrPrev === undefined ? `Adding new repeating_equipment '${attr}': ${attrNew}.` : `Sync '${attr}' with existing repeating_equipment Armor.`}`);
+  // clog(`armorDetailslisteners: ${attrPrev === undefined ? `Adding new repeating_equipment '${attr}': ${attrNew}.` : `Sync '${attr}' with existing repeating_equipment Armor.`}`);
   const v = await getAttrsAsync(armorAttrs);
   const output = {};
   let newID = '';
@@ -3167,7 +3167,7 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
       output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-      clog(`Creating a new repeating_equipment row for unarmored: ${newID}`);
+      // clog(`Creating a new repeating_equipment row for unarmored: ${newID}`);
     }
     if (attr === 'armortype') {
       // new name and NO id = CREATE NEW ROW
@@ -3347,7 +3347,7 @@ on(armorDetailslisteners, async (eventInfo) => {
 
 // sets Armor Details row from repeating_equipment
 const fillArmorDetails = async (id) => {
-  clog(`fillArmorDetails - id passed:${id}`);
+  // clog(`fillArmorDetails - id passed:${id}`);
   const v = await getAttrsAsync([
     `repeating_equipment_${id}_equipment_armor_type`,
     `repeating_equipment_${id}_equipment_item`,
@@ -3389,10 +3389,10 @@ const fillArmorDetails = async (id) => {
   ];
   switch (type) {
     case 99:
-      clog(`Choose an armor row.`);
+      // clog(`Choose an armor row.`);
       break;
     case 0:
-      clog(`${thisLog}Unarmored`);
+      // clog(`${thisLog}Unarmored`);
       output.unarmored_worn = worn;
       output.unarmored = item;
       output.unarmored_ac = ac;
@@ -3404,7 +3404,7 @@ const fillArmorDetails = async (id) => {
       output.unarmored_row_id = id;
       break;
     case 1:
-      clog(`${thisLog}Armor 1`);
+      // clog(`${thisLog}Armor 1`);
       output.armortype_worn = worn;
       output.armortype = item;
       output.armortype_ac = ac;
@@ -3417,7 +3417,7 @@ const fillArmorDetails = async (id) => {
       output.armortype1_row_id = id;
       break;
     case 2:
-      clog(`${thisLog}Armor 2`);
+      // clog(`${thisLog}Armor 2`);
       output.armortype2_worn = worn;
       output.armortype2 = item;
       output.armortype2_ac = ac;
@@ -3430,7 +3430,7 @@ const fillArmorDetails = async (id) => {
       output.armortype2_row_id = id;
       break;
     case 3:
-      clog(`${thisLog}Shield`);
+      // clog(`${thisLog}Shield`);
       output.armorshield_worn = worn;
       output.armorshield = item;
       output.armorshield_ac = ac >= 0 ? 0 : -Math.abs(ac);
@@ -3444,7 +3444,7 @@ const fillArmorDetails = async (id) => {
       output.armorshield_row_id = id;
       break;
     case 4:
-      clog(`${thisLog}Helmet`);
+      // clog(`${thisLog}Helmet`);
       output.armorhelmet_worn = worn;
       output.armorhelmet = item;
       output.armorhelmet_base = base;
@@ -3455,7 +3455,7 @@ const fillArmorDetails = async (id) => {
       output.armorhelmet_row_id = id;
       break;
     case 5:
-      clog(`${thisLog}Other`);
+      // clog(`${thisLog}Other`);
       output.armorother_worn = worn;
       output.armorother = item;
       output.armorother_ac = ac;
@@ -3465,7 +3465,7 @@ const fillArmorDetails = async (id) => {
       output.armorother1_row_id = id;
       break;
     case 6:
-      clog(`${thisLog}Other 2`);
+      // clog(`${thisLog}Other 2`);
       output.armorother2_worn = worn;
       output.armorother2 = item;
       output.armorother2_ac = ac >= 0 ? 0 : -Math.abs(ac);
@@ -3475,7 +3475,7 @@ const fillArmorDetails = async (id) => {
       output.armorother2_row_id = id;
       break;
     case 7:
-      clog(`${thisLog}Other 3`);
+      // clog(`${thisLog}Other 3`);
       output.armorother3_worn = worn;
       output.armorother3 = item;
       output.armorother3_ac = ac >= 0 ? 0 : -Math.abs(ac);
@@ -3485,7 +3485,7 @@ const fillArmorDetails = async (id) => {
       output.armorother3_row_id = id;
       break;
     case 8:
-      clog(`${thisLog}Other 4`);
+      // clog(`${thisLog}Other 4`);
       output.armorother4_worn = worn;
       output.armorother4 = item;
       output.armorother4_ac = ac >= 0 ? 0 : -Math.abs(ac);
@@ -3495,7 +3495,7 @@ const fillArmorDetails = async (id) => {
       output.armorother4_row_id = id;
       break;
     case 9:
-      clog(`${thisLog}Other 5`);
+      // clog(`${thisLog}Other 5`);
       output.armorother5_worn = worn;
       output.armorother5 = item;
       output.armorother5_ac = ac >= 0 ? 0 : -Math.abs(ac);
@@ -3505,7 +3505,7 @@ const fillArmorDetails = async (id) => {
       output.armorother5_row_id = id;
       break;
     case 10:
-      clog(`${thisLog}Other 6`);
+      // clog(`${thisLog}Other 6`);
       output.armorother6_worn = worn;
       output.armorother6 = item;
       output.armorother6_ac = ac >= 0 ? 0 : -Math.abs(ac);
@@ -3515,7 +3515,7 @@ const fillArmorDetails = async (id) => {
       output.armorother6_row_id = id;
       break;
     default:
-      clog(`Armor row is out of range.`);
+    // clog(`Armor row is out of range.`);
   }
   await setAttrsAsync(output, {silent: true});
   calcAC(recalc);
@@ -3582,7 +3582,7 @@ const testArmorRowIDs = async (id) => {
   const armorDetailsArray = await generateArmorDetailsArray();
   let isMatch = '';
   isMatch = armorDetailsArray.includes(id) ? 1 : 0;
-  clog(`testArmorRowIDs - id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
+  // clog(`testArmorRowIDs: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
   return {
     isMatch: isMatch,
     armorDetailsArray: armorDetailsArray,
@@ -3593,23 +3593,21 @@ const armorDetailsRowidArray = async (id) => {
   const output = {};
   const {isMatch, armorDetailsArray} = await testArmorRowIDs(id);
   output.armordetails_array = [`${armorDetailsArray}`];
-  clog(`armorDetailsRowidArray - id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
-
+  // clog(`armorDetailsRowidArray: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
   await setAttrsAsync(output, {silent: true});
-  // const armorDetailsArray = await generateArmorDetailsArray();
-  console.log(`armorDetailsRowidArray - has been updated.`);
-  console.log(armorDetailsArray);
+  // clog(`armorDetailsRowidArray: has been updated.`);
+  // console.log(armorDetailsArray);
 };
 
 // ensures armordetails_array stays updated when the ids change
 const updateArrayEventListener = `${armorRowIDs.map((stat) => `change:${stat}`).join(' ')}`;
 on(updateArrayEventListener, async (eventInfo) => {
   const attr = eventInfo.sourceAttribute;
-  console.log(`updateArrayEventListener - ARMOR DETAILS ARRAY HAS CHANGED attr:${attr} sourceType: ${eventInfo.sourceType}`);
+  // console.log(`updateArrayEventListener - ARMOR DETAILS ARRAY HAS CHANGED attr:${attr} sourceType: ${eventInfo.sourceType}`);
   // if (eventInfo.sourceType === 'sheetworker') return;
   const v = await getAttrsAsync([`${attr}`, 'armordetails_array']);
   const id = v[`${eventInfo.sourceAttribute}`];
-  console.log(`updateArrayEventListener - source type: ${eventInfo.sourceType} id:${id} UPDATING armordetails_array...`);
+  // console.log(`updateArrayEventListener - source type: ${eventInfo.sourceType} id:${id} UPDATING armordetails_array...`);
   armorDetailsRowidArray(id);
 });
 
@@ -3619,10 +3617,10 @@ on(
   async (eventInfo) => {
     const id = eventInfo.sourceAttribute.split('_')[2].toLowerCase();
     if (eventInfo.sourceType === 'sheetworker') return;
-    clog(`Δ detected - ${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
     // checks repeating_equipment id against armor details ids
     const {isMatch} = await testArmorRowIDs(id);
-    if (isMatch) clog(`testArmorRowIDs - id:${id} found in armordetails_array`);
+    // if (isMatch) clog(`testArmorRowIDs: id:${id} found in armordetails_array`);
     if (isMatch) fillArmorDetails(id);
   },
 );
@@ -3641,7 +3639,7 @@ on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_ar
   const output = {};
   const type = +v[attrType] || 0;
   const synced = +v[attrSync] || 0;
-  clog(`${trigger} - id:${id} type:${type} synced:${synced === 1}`);
+  // clog(`${trigger} - id:${id} type:${type} synced:${synced === 1}`);
   // Armor Type's set and button clicked OR Type's changed on an already synced item.
   const updateArmorDetails = (trigger === 'addarmor' && type !== 99) || (trigger === 'equipment_armor_type' && synced === 1);
   if (updateArmorDetails) {
@@ -3664,7 +3662,7 @@ on('clicked:repeating_equipment:addattack', (eventInfo) => {
 on('remove:repeating_equipment', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2].toLowerCase();
   const row_removed = 1;
-  console.log({event: 'remove:repeating_equipment', eventInfo, id});
+  // console.log({event: 'remove:repeating_equipment', eventInfo, id});
   const {isMatch} = await testArmorRowIDs(id);
   if (isMatch) syncArmorToEquipment(id, null, row_removed);
 });
@@ -3687,7 +3685,7 @@ on('clicked:addturnundead2', (eventInfo) => {
 
 // Spell Tabs and Memorized toggle
 on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs change:toggle_caster2', async (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const idArray = await getSectionIDsAsync('spells');
   const output = {};
   const fields = idArray.flatMap((id) => [
@@ -3782,7 +3780,7 @@ const setSpellsCasterClass = async () => {
         // clog(`thisClass 2:${thisClass}`);
         break;
       default:
-        clog(`Error: spell_caster_class value not recognized.`);
+        // clog(`Error: spell_caster_class value not recognized.`);
         break;
     }
   });
@@ -3845,7 +3843,7 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
       // clog(`Set Caster Class to ${caster2Name}`);
       break;
     default:
-      clog(`Error: spell_caster_class value not recognized.`);
+      // clog(`Error: spell_caster_class value not recognized.`);
       break;
   }
   await setAttrsAsync(output, {silent: true});
@@ -3873,7 +3871,7 @@ on('change:repeating_spells:spell_name', async (eventInfo) => {
 on(
   'change:repeating_weapon:weapon_tohitacadj_flag change:repeating_weapon:weapon_thac_adj0 change:repeating_weapon:weapon_thac_adj1 change:repeating_weapon:weapon_thac_adj2 change:repeating_weapon:weapon_thac_adj3 change:repeating_weapon:weapon_thac_adj4 change:repeating_weapon:weapon_thac_adj5 change:repeating_weapon:weapon_thac_adj6 change:repeating_weapon:weapon_thac_adj7 change:repeating_weapon:weapon_thac_adj8 change:repeating_weapon:weapon_thac_adj9 change:repeating_weapon:weapon_thac_adj10',
   async (eventInfo) => {
-    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
     const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_ToHitACadj_flag`, `repeating_weapon_${id}_weapon_ToHitACadj`]);
     const output = {};
@@ -3936,7 +3934,7 @@ on('change:repeating_weapon:weapon_whisper_to_hit_select', async (eventInfo) => 
 
 // Weapon Proficiency Toggle
 on('change:weapon_proficiency_initial change:weapon_proficiency_added_per_level change:weapon_proficiency_penalty', async (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const idArray = await getSectionIDsAsync('weapon');
   const output = {};
   const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_prof_flag`]);
@@ -3952,7 +3950,7 @@ on('change:weapon_proficiency_initial change:weapon_proficiency_added_per_level 
 });
 
 on('change:repeating_weapon:weapon_prof_flag', async (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
   const v = await getAttrsAsync(['weapon_proficiency_penalty', `repeating_weapon_${id}_weapon_prof_flag`]);
@@ -3966,7 +3964,7 @@ on('change:repeating_weapon:weapon_prof_flag', async (eventInfo) => {
 
 // Weapon Backstab Toggle
 on('change:backstab change:backstab_bonus change:toggle_thief_skills', async (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const idArray = await getSectionIDsAsync('weapon');
   const output = {};
   const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_backstab_flag`]);
@@ -3993,7 +3991,7 @@ on('change:backstab change:backstab_bonus change:toggle_thief_skills', async (ev
 });
 
 on('change:repeating_weapon:weapon_backstab_flag', async (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
   const v = await getAttrsAsync(['backstab', 'backstab_bonus', 'toggle_thief_skills', `repeating_weapon_${id}_weapon_backstab_flag`]);
@@ -4020,7 +4018,7 @@ on('change:repeating_weapon:weapon_dual', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
   const v = await getAttrsAsync(['dual_pen_primary', 'dual_pen_secondary', `repeating_weapon_${id}_weapon_dual`]);
-  clog('this weapon attack Type has been re-calculated');
+  // clog('this weapon attack Type has been re-calculated');
   const primary = +v.dual_pen_primary || 0;
   const secondary = +v.dual_pen_secondary || 0;
   const attack_type = v[`repeating_weapon_${id}_weapon_dual`];
@@ -4054,7 +4052,7 @@ const syncDualPen = async () => {
 
 // Weapon Dual-Wield Calc Penalty
 on('change:dual_pen_primary change:dual_pen_secondary change:dexterity', async (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const v = await getAttrsAsync(['dexterity']);
   // clog('Weapon Attack Type has been re-calculated');
   const output = {};
@@ -4144,14 +4142,14 @@ const calcRange = async (id) => {
 };
 
 on('change:repeating_weapon:weapon_range change:repeating_weapon:weapon_attack_type', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   calcRange(id);
 });
 
 // set flag for css to show/hide fields according to weapon type
 on('change:repeating_weapon:weapon_attack_type', async (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_attack_type`, `repeating_weapon_${id}_weapon_attack_type_flag`]);
   const output = {};
@@ -4187,7 +4185,7 @@ const calcHP = async () => {
 };
 
 on('change:sync_hp_flag change:hitpoints change:hitpoints_max change:hitpoints_1_class change:hitpoints_2_class change:hitpoints_3_class', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   calcHP();
 });
 
@@ -4470,7 +4468,7 @@ const damageMacro = async (id, passedAutoDamage) => {
 on(
   'change:repeating_weapon:weapon_name change:repeating_weapon:weapon_damagesmallmedium change:repeating_weapon:weapon_damagelarge change:repeating_weapon:weapon_critdamagesmallmedium change:repeating_weapon:weapon_critdamagelarge change:repeating_weapon:weapon_attackdmgbonus change:repeating_weapon:weapon_critdamage_flag',
   async (eventInfo) => {
-    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
     const output = await damageMacro(id);
     await setAttrsAsync(output, {silent: true});
@@ -4616,7 +4614,7 @@ const setWeapons = async (id) => {
     return accumulator;
   }, {});
   await setAttrsAsync(output, {silent: true});
-  clog(`setWeapons - default values have been set.`);
+  // clog(`setWeapons - default values have been set.`);
 };
 
 const setEquipment = async (id) => {
@@ -4669,7 +4667,7 @@ const setNWP = async (id) => {
 
 // Set repeating attr values for new rows. Makes visible to API
 on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item change:repeating_nonweaponproficiencies:nwp_name', async (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   // if API || sheetworker is creating the row: exit
   if (eventInfo.sourceType !== 'player') return;
 
@@ -4730,8 +4728,8 @@ on(
     const match = eventTrigger.match(/clicked:(\w+)/);
     // Check if there is a match and extract the captured word
     const clickedWord = match ? match[1] : null;
-    // clog(`Δ detected:${JSON.stringify(eventInfo)}`);
-    clog(`reset macros detected: ${clickedWord}`);
+    // clog(`Δ detected: ${JSON.stringify(eventInfo)}`);
+    // clog(`reset macros detected: ${clickedWord}`);
     const output = {};
     if (clickedWord === 'resetallmacros') {
       output.surprise_macro_text = '';
@@ -4740,62 +4738,62 @@ on(
       const idArrayEquipment = await getSectionIDsAsync('equipment');
       _.each(idArrayEquipment, (id) => {
         output[`repeating_equipment_${id}_equipment_macro_text`] = '';
-        clog(`macro reset completed on: ${id} Equipment`);
+        // clog(`macro reset completed on: ${id} Equipment`);
       });
       const idArrayWeapons = await getSectionIDsAsync('weapon');
       _.each(idArrayWeapons, (id) => {
         output[`repeating_weapon_${id}_weapon_macro_text`] = '';
-        clog(`macro reset completed on: ${id} Weapon`);
+        // clog(`macro reset completed on: ${id} Weapon`);
       });
       const idArrayAbilities = await getSectionIDsAsync('ability');
       _.each(idArrayAbilities, (id) => {
         output[`repeating_ability_${id}_ability_macro_text`] = '';
-        clog(`macro reset completed on: ${id} Ability`);
+        // clog(`macro reset completed on: ${id} Ability`);
       });
       const idArrayNWPs = await getSectionIDsAsync('nonweaponproficiencies');
       _.each(idArrayNWPs, (id) => {
         output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = '';
-        clog(`macro reset completed on: ${id} NWP`);
+        // clog(`macro reset completed on: ${id} NWP`);
       });
       const idArraySpells = await getSectionIDsAsync('spells');
       _.each(idArraySpells, (id) => {
         output[`repeating_spells_${id}_spell_macro_text`] = '';
-        clog(`macro reset completed on: ${id} Spells`);
+        // clog(`macro reset completed on: ${id} Spells`);
       });
     }
     if (clickedWord === 'resetequipmentmacros') {
       const idArrayEquipment = await getSectionIDsAsync('equipment');
       _.each(idArrayEquipment, (id) => {
         output[`repeating_equipment_${id}_equipment_macro_text`] = '';
-        clog(`macro reset completed on: ${id} Equipment`);
+        // clog(`macro reset completed on: ${id} Equipment`);
       });
     }
     if (clickedWord === 'resetweaponsmacros') {
       const idArrayWeapons = await getSectionIDsAsync('weapon');
       _.each(idArrayWeapons, (id) => {
         output[`repeating_weapon_${id}_weapon_macro_text`] = '';
-        clog(`macro reset completed on: ${id} Weapon`);
+        // clog(`macro reset completed on: ${id} Weapon`);
       });
     }
     if (clickedWord === 'resetabilitiesmacros') {
       const idArrayAbilities = await getSectionIDsAsync('ability');
       _.each(idArrayAbilities, (id) => {
         output[`repeating_ability_${id}_ability_macro_text`] = '';
-        clog(`macro reset completed on: ${id} Ability`);
+        // clog(`macro reset completed on: ${id} Ability`);
       });
     }
     if (clickedWord === 'resetnwpsmacros') {
       const idArrayNWPs = await getSectionIDsAsync('nonweaponproficiencies');
       _.each(idArrayNWPs, (id) => {
         output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = '';
-        clog(`macro reset completed on: ${id} NWP`);
+        // clog(`macro reset completed on: ${id} NWP`);
       });
     }
     if (clickedWord === 'resetspellsmacros') {
       const idArraySpells = await getSectionIDsAsync('spells');
       _.each(idArraySpells, (id) => {
         output[`repeating_spells_${id}_spell_macro_text`] = '';
-        clog(`macro reset completed on: ${id} Spells`);
+        // clog(`macro reset completed on: ${id} Spells`);
       });
     }
     setAttrsAsync(output, {silent: true});
@@ -5033,47 +5031,47 @@ const thiefmisc2Calc = async () => {
 };
 
 on('change:pickpockets_base change:pickpockets_racial_mod change:pickpockets_ability_mod change:pickpockets_magic', (eventInfo) => {
-  clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   pickpocketsCalc();
 });
 on('change:openlocks_base change:openlocks_racial_mod change:openlocks_ability_mod change:openlocks_magic', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   openlocksCalc();
 });
 on('change:findtraps_base change:findtraps_racial_mod change:findtraps_ability_mod change:findtraps_magic', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   findtrapsCalc();
 });
 on('change:movequietly_base change:movequietly_racial_mod change:movequietly_ability_mod change:movequietly_magic', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   movequietlyCalc();
 });
 on('change:hideinshadows_base change:hideinshadows_racial_mod change:hideinshadows_ability_mod change:hideinshadows_magic', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   hideinshadowsCalc();
 });
 on('change:hearnoise_base change:hearnoise_racial_mod change:hearnoise_ability_mod change:hearnoise_magic', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   hearnoiseCalc();
 });
 on('change:climbwalls_base change:climbwalls_racial_mod change:climbwalls_ability_mod change:climbwalls_magic', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   climbwallsCalc();
 });
 on('change:readlanguages_base change:readlanguages_racial_mod change:readlanguages_ability_mod change:readlanguages_magic', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   readlanguagesCalc();
 });
 on('change:thiefmisc_base change:thiefmisc_racial_mod change:thiefmisc_ability_mod change:thiefmisc_magic', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   thiefmiscCalc();
 });
 on('change:thiefmisc1_base change:thiefmisc1_racial_mod change:thiefmisc1_ability_mod change:thiefmisc1_magic', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   thiefmisc1Calc();
 });
 on('change:thiefmisc2_base change:thiefmisc2_racial_mod change:thiefmisc2_ability_mod change:thiefmisc2_magic', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   thiefmisc2Calc();
 });
 
@@ -5351,45 +5349,45 @@ const savemisc2Calc = async () => {
 on(
   'change:saveparalysispoisondeath_base change:saveparalysispoisondeath_racial_mod change:saveparalysispoisondeath_ability_mod change:saveparalysispoisondeath_misc_mod change:saveparalysispoisondeath_temp_mod',
   (eventInfo) => {
-    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
     saveparalysispoisondeathCalc();
   },
 );
 on(
   'change:savepetrificationpolymorph_base change:savepetrificationpolymorph_racial_mod change:savepetrificationpolymorph_ability_mod change:savepetrificationpolymorph_misc_mod change:savepetrificationpolymorph_temp_mod',
   (eventInfo) => {
-    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
     savepetrificationpolymorphCalc();
   },
 );
 on(
   'change:saverodsstaveswands_base change:saverodsstaveswands_racial_mod change:saverodsstaveswands_ability_mod change:saverodsstaveswands_misc_mod change:saverodsstaveswands_temp_mod',
   (eventInfo) => {
-    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
     saverodsstaveswandsCalc();
   },
 );
 on(
   'change:savebreathweapons_base change:savebreathweapons_racial_mod change:savebreathweapons_ability_mod change:savebreathweapons_misc_mod change:savebreathweapons_temp_mod',
   (eventInfo) => {
-    // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+    // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
     savebreathweaponsCalc();
   },
 );
 on('change:savespells_base change:savespells_racial_mod change:savespells_ability_mod change:savespells_misc_mod change:savespells_temp_mod', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   savespellsCalc();
 });
 on('change:savemisc_base change:savemisc_racial_mod change:savemisc_ability_mod change:savemisc_misc_mod change:savemisc_temp_mod', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   savemiscCalc();
 });
 on('change:savemisc1_base change:savemisc1_racial_mod change:savemisc1_ability_mod change:savemisc1_misc_mod change:savemisc1_temp_mod', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   savemisc1Calc();
 });
 on('change:savemisc2_base change:savemisc2_racial_mod change:savemisc2_ability_mod change:savemisc2_misc_mod change:savemisc2_temp_mod', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   savemisc2Calc();
 });
 
@@ -5610,7 +5608,7 @@ on(
     // clerics table
     if (classSelected === 1) {
       if (levelSelected === 0) {
-        clog('Choose a class level greater than 0 to continue.');
+        // clog('Choose a class level greater than 0 to continue.');
       } else if (levelSelected < 4) {
         output[`thac-10`] = 25;
         output[`thac-9`] = 24;
@@ -6013,7 +6011,7 @@ on(
     // magic-users table
     if (classSelected === 3) {
       if (levelSelected === 0) {
-        clog('Choose a class level greater than 0 to continue.');
+        // clog('Choose a class level greater than 0 to continue.');
       } else if (levelSelected < 6) {
         output[`thac-10`] = 26;
         output[`thac-9`] = 25;
@@ -6135,7 +6133,7 @@ on(
     // thieves table
     if (classSelected === 4) {
       if (levelSelected === 0) {
-        clog('Choose a class level greater than 0 to continue.');
+        // clog('Choose a class level greater than 0 to continue.');
       } else if (levelSelected < 5) {
         output[`thac-10`] = 26;
         output[`thac-9`] = 25;
@@ -6562,7 +6560,7 @@ on(
     }
     // NO CLASS found when Sync is enabled: Reset table
     if (classSelected === 99) {
-      clog('Error: Class not recognized or class name is empty.');
+      // clog('Error: Class not recognized or class name is empty.');
       output[`thac-10`] = 20;
       output[`thac-9`] = 20;
       output[`thac-8`] = 20;
@@ -6627,11 +6625,11 @@ on('change:thac00', (eventInfo) => {
 // Auto-fill Abilities
 const getValidVariable = (str_value, string_type, lower_bound, higher_bound) => {
   if (str_value < lower_bound) {
-    console.log(`Error: ${string_type} value is not a number or out of range. [${str_value}].\\nDefaulting to ${lower_bound}.`);
+    // console.log(`Error: ${string_type} value is not a number or out of range. [${str_value}].\\nDefaulting to ${lower_bound}.`);
     return lower_bound;
   }
   if (str_value > higher_bound) {
-    console.log(`Error: ${string_type} value is out of range. [${str_value}].\\nDefaulting to ${higher_bound}.`);
+    // console.log(`Error: ${string_type} value is out of range. [${str_value}].\\nDefaulting to ${higher_bound}.`);
     return higher_bound;
   }
   // Keep value between lowerbound and higherbound.
@@ -7386,37 +7384,37 @@ on('change:race change:autofill_thief_race change:thief_race_selected', async (e
 
 // Strength Calculations
 on('change:strength change:exceptionalstrength', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   strengthCalcs();
 });
 
 // Intelligence Calculations
 on('change:intelligence change:race', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   intelligenceCalcs();
 });
 
 // Wisdom Calculations
 on('change:wisdom', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   wisdomCalcs();
 });
 
 // Dexterity Calculations
 on('change:dexterity', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   dexterityCalcs();
 });
 
 // Constitution Calculations
 on('change:constitution change:class change:secondclass change:thirdclass', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   constitutionCalcs();
 });
 
 // Charisma Calculations
 on('change:charisma change:comeliness', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   charismaCalcs();
 });
 
@@ -7450,7 +7448,7 @@ const portraitUrlCalc = async () => {
 };
 
 on('change:character_avatar change:sheet_image change:sheet_image_url', (eventInfo) => {
-  // clog(`Δ detected:${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   portraitUrlCalc();
 });
 
@@ -7526,7 +7524,7 @@ const weaponInUse = async () => {
 on(
   'change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use change:repeating_weapon:weapon_speed change:repeating_weapon:weapon_misc remove:repeating_weapon',
   (eventInfo) => {
-    clog(eventInfo.sourceAttribute);
+    // clog(eventInfo.sourceAttribute);
     weaponInUse();
   },
 );
