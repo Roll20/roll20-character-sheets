@@ -3710,30 +3710,32 @@ on(
   },
 );
 
-// sync armor button - fill armor details row with repeating attr values
-// IF the row already exists, but is then moved to a new row,
-// removeEmptyArmorRows will test for duplicates and reset old row
+// +Add button: fills Armor Details row with repeating_equipment values
+// IF the item is already synced, but the armor type has been changed,
+// removeEmptyArmorRows tests for duplicate ids and will delete/reset any old rows
 on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_armor_type', async (eventInfo) => {
-  const id = eventInfo.sourceAttribute.split('_')[2].toLowerCase();
-  const trigger = eventInfo.sourceAttribute.split('_').slice(3).join('_').toLowerCase();
-  const v = await getAttrsAsync([concatRepAttrName('equipment', id, 'equipment_armor_type'), concatRepAttrName('equipment', id, 'equipment_sync_armor_flag')]);
+  const source = eventInfo.sourceAttribute.toLowerCase();
+  const parts = source.split('_');
+  const id = parts[2];
+  const trigger = parts.slice(3).join('_');
+  const attrType = `repeating_equipment_${id}_equipment_armor_type`;
+  const attrSync = `repeating_equipment_${id}_equipment_sync_armor_flag`;
+  const v = await getAttrsAsync([attrType, attrSync]);
   const output = {};
-  const synced = +v[concatRepAttrName('equipment', id, 'equipment_sync_armor_flag')] || 0;
-  const type = +v[concatRepAttrName('equipment', id, 'equipment_armor_type')] || 0;
-  clog(`${trigger} - id:${id} type:${type} already synced?:${synced === 1 ? 'yes' : 'no'}`);
-  if (trigger === 'addarmor' && type !== 99) {
-    // type selected and add button used
+  const type = +v[attrType] || 0;
+  const synced = +v[attrSync] || 0;
+  clog(`${trigger} - id:${id} type:${type} synced:${synced === 1}`);
+  // Armor Type's set and button clicked OR Type's changed on an already synced item.
+  const updateArmorDetails = (trigger === 'addarmor' && type !== 99) || (trigger === 'equipment_armor_type' && synced === 1);
+  if (updateArmorDetails) {
     await fillArmorDetails(id);
     await removeEmptyArmorRows();
-    output[concatRepAttrName('equipment', id, 'equipment_sync_armor_flag')] = 1;
+    // update the sync flag for newly added items
+    if (synced !== 1) {
+      output.attrSync = 1;
+      await setAttrsAsync(output, {silent: true});
+    }
   }
-  if (trigger === 'equipment_armor_type' && synced === 1) {
-    // type changed on a previously synced item
-    await fillArmorDetails(id);
-    await removeEmptyArmorRows();
-    // output[concatRepAttrName('equipment', id, 'equipment_sync_armor_flag')] = 0;
-  }
-  await setAttrsAsync(output, {silent: true});
 });
 
 on('clicked:repeating_equipment:addattack', (eventInfo) => {
