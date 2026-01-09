@@ -2946,7 +2946,7 @@ const setCurrentBulk = async () => {
       output.current_bulk = 2;
       break;
     default:
-      console.error(`Error: failure in bulk calculation.`);
+      console.log(`WARNING: failure in bulk calculation.`);
       break;
   }
   await setAttrsAsync(output, {silent: true});
@@ -3132,7 +3132,7 @@ const removeEmptyArmorRows = async () => {
             // clog(`>> DELETE/RESET ROW 10 - Other 6 <<`);
             break;
           default:
-            console.error(`Error: NOTHING TO DELETE/RESET.`);
+            console.log(`WARNING: NOTHING TO DELETE/RESET.`);
             break;
         }
       });
@@ -3517,7 +3517,7 @@ const fillArmorDetails = async (id) => {
       output.armorother6_row_id = id;
       break;
     default:
-      console.error(`Error: Armor row is out of range.`);
+      console.log(`WARNING: Armor row is out of range.`);
       break;
   }
   await setAttrsAsync(output, {silent: true});
@@ -3783,7 +3783,7 @@ const setSpellsCasterClass = async () => {
         // clog(`thisClass 2:${thisClass}`);
         break;
       default:
-        console.error(`Error: spell_caster_class value not recognized.`);
+        console.log(`WARNING: spell_caster_class value not recognized.`);
         break;
     }
   });
@@ -3846,7 +3846,7 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
       // clog(`Set Caster Class to ${caster2Name}`);
       break;
     default:
-      console.error(`Error: spell_caster_class value not recognized.`);
+      console.log(`WARNING: spell_caster_class value not recognized.`);
       break;
   }
   await setAttrsAsync(output, {silent: true});
@@ -6628,11 +6628,11 @@ on('change:thac00', (eventInfo) => {
 // Auto-fill Abilities
 const getValidVariable = (str_value, string_type, lower_bound, higher_bound) => {
   if (str_value < lower_bound) {
-    console.error(`Error: ${string_type} value is not a number or out of range. [${str_value}].\\nDefaulting to ${lower_bound}.`);
+    console.log(`WARNING: ${string_type} value is not a number or out of range. [${str_value}].\nDefaulting to ${lower_bound}.`);
     return lower_bound;
   }
   if (str_value > higher_bound) {
-    console.error(`Error: ${string_type} value is out of range. [${str_value}].\\nDefaulting to ${higher_bound}.`);
+    console.log(`WARNING: ${string_type} value is out of range. [${str_value}].\nDefaulting to ${higher_bound}.`);
     return higher_bound;
   }
   // Keep value between lowerbound and higherbound.
@@ -6736,7 +6736,7 @@ class StrengthAdjustmentTable {
       case 'Encumbrance':
         return this.getEntry(str_value_STR, str_per_value).getEncumbranceBonus();
       default:
-        console.error(`Error: Invalid Test.`);
+        console.log(`WARNING: Invalid Test.`);
         return 'Invalid Test';
     }
   }
