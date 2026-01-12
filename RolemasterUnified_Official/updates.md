@@ -1,6 +1,22 @@
+# 2026-01-15
+
+- Add tracker back
+- Add general "asCharacter" helpers
+- Tracker:
+  - Can add data using new as character
+  - Characters now remember their tracker
+  - for All Characters methods to tracker
+  - Tracker can set everyones AP/round message
+  - Tracker can roll everyones initiative (not to turn tracker though)
+  - Track base attributes
+- Add option for non-tracker initiative.
+- Clean up build so compiled/processed files go to build
+
 # 2026-01-08
 
 - Fix for creatures max PP
+- Fix fetch for targetted creatures
+- Partial fix for grapple
 
 # 2026-01-06
 
