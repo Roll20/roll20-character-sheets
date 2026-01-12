@@ -91,7 +91,7 @@ let updateArmor = (modifierList) => {
         let AC = 10 + armor_bonus + dex + shield_bonus + touch_bonus + flatfooted_bonus + universal_armor_bonus
             + universalArmorModifier + touchArmorModifier + flatArmorModifier;
         let TAC = 10 +dex + touch_bonus + universal_armor_bonus + universalArmorModifier + touchArmorModifier;
-        let FFAC = 10 + armor_bonus + shield_bonus + flatfooted_bonus + universal_armor_bonus + universalArmorModifier + flatArmorModifier;
+        let FFAC = 10 + (dex < 0 ? dex : 0) + armor_bonus + shield_bonus + flatfooted_bonus + universal_armor_bonus + universalArmorModifier + flatArmorModifier;
         let skill_malus = (shield_malus > 0 ? -shield_malus : shield_malus) - (armor_malus < 0 ? -armor_malus : armor_malus);
         setAttrs({
             "ac_tot":AC,

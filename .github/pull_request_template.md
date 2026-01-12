@@ -4,7 +4,7 @@
 
 > [!WARNING]
 > Submission Checklist
-> Failure to complete this checklist in its entirety will result in your Pull Request being dismissed. If you have any questions, please feel free to create an issue.
+> Failure to complete this checklist in its entirety will result in your Pull Request being dismissed. _Deleting parts of this template (except the new sheet section for existing sheets) counts as failure to complete it_. If you have any questions, please feel free to create an issue.
 
 > [!NOTE]
 > Draft Pull Requests
@@ -32,18 +32,22 @@ Please complete this section if you are adding a new sheet to the repository.
 If you are submitting a new sheet to the repository, please fill in any empty spaces indicated by [  ].
 
 - The name of this game is: [   ]  
-  > _(i.e. Dungeons & Dragons 5th Edition, The Dresden Files RPG)_
+  > _(e.g. Dungeons & Dragons 5th Edition, The Dresden Files RPG)_
 - The publisher of this game is: [   ]  
-  > _(i.e. Wizards of the Coast, Evil Hat)_
+  > _(e.g. Wizards of the Coast, Evil Hat)_
 - The name of this game system/family is: [   ]  
-  > _(i.e. Dungeons & Dragons, FATE)_
+  > _(e.g. Dungeons & Dragons, FATE)_
+- The rules for this game can be found at the following location: [   ]
+  > _(e.g. a link to purchase, ISBN, Half-Price Books)_
 
 - [ ] I have followed the [Character Sheets Standards](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository) when building this sheet.
 - [ ] I have authorization from the game's publisher to make this an official sheet on Roll20 with their name attached.
+- [ ] (Official Sheets Only) The game's publisher has reached out to [licensing@roll20.net](mailto:licensing@roll20.net) to confirm they are aware of and supporting this sheet as an official sheet with their name attached.
 
-Select One:
-- [ ] EITHER: This game is not a traditionally published game, but a copy of the game rules can be purchased/downloaded/found at: [   ]
-- [ ] OR: This sheet is for an unofficial fan game, modification to an existing game, or a homebrew system.
+Select EXACTLY One:
+- [ ] This game is a traditionally published game.
+- [ ] This game is not a traditionally published game.
+- [ ] This sheet is for an unofficial fan game, modification to an existing game, or a homebrew system. [  ADD DETAILS HERE  ]
 
 # Changes / Description
 

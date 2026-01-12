@@ -1,0 +1,1359 @@
+/* === @Fontface === */
+@import url("https://fonts.googleapis.com/css2?family=Fasthand&family=Pirata+One&display=swap");
+
+@font-face {
+  font-family: "Freely22";
+  src: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/fonts/P22Freely.otf")
+    format("otf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Cattedrale";
+  src: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/fonts/cattedrale-regular.otf")
+    format("otf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* === Variables === */
+:root {
+  --penombre-brown: #722f16;
+  --penombre-red: #b85563;
+  --penombre-gold: #8e7d36;
+  --penombre-white: #fef4e8;
+  --penombre-text: #2d221b;
+  --penombre-light: #fcf1de;
+  --penombre-dark: #f9e8ce;
+  --penombre-gradient-dark-to-light: linear-gradient(
+    to right,
+    #f9e8ce 30%,
+    #f1eae0 90%
+  );
+  --penombre-green: #5e7470;
+  --penombre-font-freely: "P22Freely", "Fasthand", serif;
+  --penombre-font-cattedrale: "Cattedrale", "Pirata One", serif;
+}
+
+.penombre-sheet {
+  background-color: var(--penombre-brown);
+  color: var(--penombre-text);
+  border: 2px solid var(--penombre-brown);
+  border-radius: 6px;
+  padding: 0 10px 0;
+  width: 833px;
+  overflow: hidden;
+}
+
+.d-none {
+  display: none;
+}
+
+.itemcontrol .repcontrol_del {
+  position: relative;
+  z-index: 100;
+}
+
+/* ========================================
+          Onglets de la feuille
+======================================== */
+
+/* configure the tab buttons */
+.charsheet .sheet_eminence,
+.charsheet .sheet_adversaire,
+.charsheet .sheet_collegial {
+  display: none;
+}
+
+.sheet_tabs {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin: 4px 0;
+}
+
+.sheet_tabs button {
+  padding: 0.6rem 0.6rem;
+  border-radius: 10px;
+  font-size: 16px;
+  background-image: none;
+  background-color: transparent;
+  color: var(--penombre-light);
+  border: 1px dotted transparent;
+  text-shadow: none;
+  font-family: var(--penombre-font-cattedrale);
+  cursor: pointer;
+
+  &:hover {
+    border: 1px dotted var(--penombre-light);
+  }
+}
+
+/* show the selected tab */
+.charsheet .sheet-tabstoggle[value="eminence"] ~ section.sheet_eminence,
+.charsheet .sheet-tabstoggle[value="adversaire"] ~ section.sheet_adversaire,
+.charsheet .sheet-tabstoggle[value="collegial"] ~ section.sheet_collegial {
+  display: block;
+}
+
+/* Bouton actif selon l’onglet sélectionné */
+.sheet_tabs button[data-tab="eminence"][name="act_eminence"]::after,
+.sheet_tabs button[data-tab="adversaire"][name="act_adversaire"]::after,
+.sheet_tabs button[data-tab="collegial"][name="act_collegial"]::after {
+  content: "";
+}
+
+.charsheet
+  .sheet-tabstoggle[value="eminence"]
+  ~ .sheet_tabs
+  button[data-tab="eminence"],
+.charsheet
+  .sheet-tabstoggle[value="adversaire"]
+  ~ .sheet_tabs
+  button[data-tab="adversaire"],
+.charsheet
+  .sheet-tabstoggle[value="collegial"]
+  ~ .sheet_tabs
+  button[data-tab="collegial"] {
+  border: 1px solid var(--penombre-light);
+}
+
+/* ========================================
+          FEUILLE D'ÉMINENCE GRISE
+======================================== */
+
+/* === Bandeau === */
+.header {
+  background: linear-gradient(
+      to left,
+      #f8f2ea 30%,
+      rgba(248, 242, 234, 0.1) 70%
+    ),
+    /* fondu beige → transparent */
+      url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/banner.png")
+      left center / 70% 100% no-repeat;
+  position: relative;
+  min-height: 100px;
+  margin-bottom: 10px;
+}
+
+.header .logo {
+  width: 200px;
+  height: auto;
+  margin-bottom: 10px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 10px;
+}
+
+/* === Layout en colonnes === */
+.columns {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.col-left {
+  flex: 0 0 40%;
+}
+.col-right {
+  flex: 1;
+}
+
+/* === Identité === */
+.identite {
+  background: var(--penombre-white);
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+/* Conteneur horizontal : colonne verticale + zone d’inputs */
+.identite-container,
+.harmoniques-container,
+.conscience-container {
+  display: flex;
+  align-items: stretch;
+}
+
+/* --- Titre vertical --- */
+.titre-vertical {
+  padding: 10px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2px;
+}
+
+.identite-titre {
+  background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/marron.webp")
+    center 60% / 50% no-repeat;
+  color: var(--penombre-brown);
+}
+
+h3 {
+  font-size: 1.8em;
+}
+
+h3.titre-vertical span {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg) translateX(16px);
+  font-family: var(--penombre-font-cattedrale);
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+/* --- Zone des champs --- */
+.identite-champs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 250px;
+}
+.identite-champ {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.identite-champ label {
+  font-weight: bold;
+  color: var(--penombre-brown);
+  display: inline-block;
+  margin: 0;
+  width: 40px;
+  font-size: 1.4rem;
+}
+
+.identite-champ input {
+  border: none;
+  border-bottom: 1px dotted var(--penombre-brown);
+  background: transparent;
+  margin-bottom: 3px;
+  display: inline-block;
+  font-family: var(--penombre-font-freely);
+  font-size: 1.5em;
+  padding-bottom: 0;
+}
+
+/* === Harmoniques === */
+.harmoniques {
+  text-align: center;
+  padding: 6px;
+  background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/fond-coupe.webp")
+    no-repeat 90% center;
+  background-size: 70%;
+  background-color: var(--penombre-white);
+  margin-bottom: 10px;
+}
+
+.harmoniques-titre {
+  background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/grise.webp")
+    center 60% / 50% no-repeat;
+  color: var(--penombre-green);
+}
+
+h3.harmoniques-titre span {
+  margin-top: 3rem;
+}
+
+/* grille générale */
+.harmoniques-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  justify-items: center;
+  width: 60%;
+  margin-left: 10%;
+}
+
+/* Grille principale */
+.harmoniques-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  justify-items: center;
+}
+
+/* Chaque bloc harmonique + label */
+.harmonique-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.esprit-wrap {
+  transform: translateX(40%);
+}
+
+.nature-wrap {
+  transform: translateX(-40%);
+}
+
+.etincelle-wrap {
+  transform: translateX(50%);
+  margin-top: -80px;
+}
+
+/* Visuel harmonique */
+.harmonique {
+  width: 100px;
+  height: 100px;
+  background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/case_de_penombre.webp");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sélecteur centré */
+.harmonique select {
+  border: none;
+  background: transparent;
+  font-weight: bold;
+  font-size: 2rem;
+  text-align: center;
+  appearance: none;
+  cursor: pointer;
+  font-family: var(--penombre-font-freely);
+  height: 60px;
+  width: 60px !important;
+  line-height: 60px;
+  margin-left: 10px;
+}
+
+/* Label en dessous */
+.harmonique-wrap .label-btn {
+  font-family: var(--penombre-font-cattedrale);
+  font-weight: 600;
+  line-height: 1;
+}
+
+button.label-btn {
+  background: var(--penombre-gradient-dark-to-light);
+  border: 0;
+  color: var(--penombre-green);
+  padding: 0.8rem 0.5rem !important;
+  font-size: 2em !important;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--penombre-brown);
+    color: var(--penombre-light);
+  }
+}
+
+button[type="roll"].label-btn::before {
+  content: none !important;
+}
+
+.sub-label {
+  display: block;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--penombre-red);
+  font-weight: bold;
+  margin-top: 2px;
+}
+
+/* ===== Conscience ===== */
+.conscience {
+  background: var(--penombre-white);
+  padding: 8px;
+}
+
+.conscience-titre {
+  background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/doree.webp")
+    center 60% / 50% no-repeat;
+  color: var(--penombre-gold);
+}
+
+h3.conscience-titre span {
+  margin-top: 1rem;
+}
+
+.conscience-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.conscience-header h4 {
+  font-family: var(--penombre-font-cattedrale);
+  font-size: 2rem;
+  color: var(--penombre-gold);
+  margin-right: 10px;
+}
+.conscience-header input[type="number"] {
+  width: 56px;
+  text-align: center;
+}
+
+/* Jetons */
+.tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin: 6px 0 10px;
+}
+
+.token {
+  width: 46px;
+  height: 46px;
+  position: relative;
+}
+.token-btn {
+  width: 46px;
+  height: 46px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  box-shadow: none;
+}
+
+.complications h4 {
+  margin: 6px 0;
+  font-size: 2.1rem;
+  font-family: var(--penombre-font-cattedrale);
+  color: var(--penombre-green);
+  text-align: right;
+}
+
+/* États visuels */
+input[name^="attr_token"][value="0"] + .token-btn {
+  background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/jeton_face_active.webp");
+}
+input[name^="attr_token"][value="1"] + .token-btn {
+  background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/jeton_face_inactive.webp");
+}
+input[name^="attr_token"][value="2"] + .token-btn {
+  background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/cercle.webp");
+}
+
+/* === Masquage au-delà du cmax === */
+input[name="attr_cmax"][value="0"] ~ .tokens .token:nth-child(n + 1) {
+  display: none;
+}
+input[name="attr_cmax"][value="1"] ~ .tokens .token:nth-child(n + 2) {
+  display: none;
+}
+input[name="attr_cmax"][value="2"] ~ .tokens .token:nth-child(n + 3) {
+  display: none;
+}
+input[name="attr_cmax"][value="3"] ~ .tokens .token:nth-child(n + 4) {
+  display: none;
+}
+input[name="attr_cmax"][value="4"] ~ .tokens .token:nth-child(n + 5) {
+  display: none;
+}
+input[name="attr_cmax"][value="5"] ~ .tokens .token:nth-child(n + 6) {
+  display: none;
+}
+input[name="attr_cmax"][value="6"] ~ .tokens .token:nth-child(n + 7) {
+  display: none;
+}
+input[name="attr_cmax"][value="7"] ~ .tokens .token:nth-child(n + 8) {
+  display: none;
+}
+input[name="attr_cmax"][value="8"] ~ .tokens .token:nth-child(n + 9) {
+  display: none;
+}
+input[name="attr_cmax"][value="9"] ~ .tokens .token:nth-child(n + 10) {
+  display: none;
+}
+input[name="attr_cmax"][value="10"] ~ .tokens .token:nth-child(n + 11) {
+  display: none;
+}
+input[name="attr_cmax"][value="11"] ~ .tokens .token:nth-child(n + 12) {
+  display: none;
+}
+input[name="attr_cmax"][value="12"] ~ .tokens .token:nth-child(n + 13) {
+  display: none;
+}
+input[name="attr_cmax"][value="13"] ~ .tokens .token:nth-child(n + 14) {
+  display: none;
+}
+input[name="attr_cmax"][value="14"] ~ .tokens .token:nth-child(n + 15) {
+  display: none;
+}
+input[name="attr_cmax"][value="15"] ~ .tokens .token:nth-child(n + 16) {
+  display: none;
+}
+
+/* Complications */
+.complications h4 {
+  margin: 6px 0;
+}
+.comp-row {
+  display: grid;
+  grid-template-columns: 1fr repeat(3, 24px);
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.comp-row input[type="text"] {
+  height: 30px;
+  border: 1px solid #8e6245;
+  background: #f3f0ed;
+  padding: 0 8px;
+}
+.comp-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--penombre-brown);
+  cursor: pointer;
+}
+
+.comp-help {
+  font-style: italic;
+  opacity: 0.8;
+  margin: 4px 0 0;
+}
+
+/* ====== Pouvoirs ====== */
+.pouvoirs,
+.atouts,
+.maitrise-magie,
+.notes,
+.aide-joueur {
+  background: var(--penombre-white);
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.pouvoirs h2,
+.atouts h2,
+.maitrise-magie h2,
+.notes h2 {
+  font-family: var(--penombre-font-cattedrale);
+  font-size: 2.8rem;
+  color: var(--penombre-text);
+  text-align: center;
+}
+
+/* Layout principal : flex */
+.capacites-flex {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+/* ---- Colonne gauche : Potentiel ---- */
+.col-potentiel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 15%;
+}
+
+.potentiel-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.potentiel-img {
+  width: 80px;
+  height: 80px;
+  background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/potentiel.webp")
+    center/contain no-repeat;
+}
+
+input[type="number"].potentiel-input::-webkit-inner-spin-button,
+input[type="number"].potentiel-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"].potentiel-input {
+  position: absolute;
+  appearance: none;
+  -moz-appearance: textfield;
+  inset: 0;
+  margin: 2.8rem auto;
+  width: 48px;
+  height: 48px;
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  border: none;
+  background: transparent;
+  color: var(--penombre-text);
+  font-family: var(--penombre-font-freely);
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.potentiel-caption {
+  font-weight: 700;
+  color: var(--penombre-brown);
+  font-family: var(--penombre-font-cattedrale);
+  font-size: 2rem;
+  margin: 0 0 0 1rem;
+  transform: translateY(-10px);
+}
+
+/* ---- Colonne droite : Pouvoirs ---- */
+.col-pouvoirs {
+  flex: 1;
+}
+
+.pouvoirs-head {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  color: #4a372d;
+  margin-bottom: 6px;
+  padding-right: 6px;
+}
+
+.pouvoir-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.pouvoir-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--penombre-brown);
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.pouvoir-row input[type="text"] {
+  height: 32px;
+  border: none;
+  border-bottom: 1px dotted var(--penombre-brown);
+  background: transparent;
+  padding: 0 8px;
+  width: 89px;
+  font-family: var(--penombre-font-freely);
+  font-size: 1.5rem;
+  display: none;
+}
+
+.pouvoir-row textarea {
+  flex: 2;
+  height: 26px;
+  margin-top: 5px;
+  border: none;
+  border-bottom: 1px dotted var(--penombre-brown);
+  background: transparent;
+  padding: 0 8px;
+  font-family: var(--penombre-font-freely);
+  font-size: 1.5rem;
+  resize: none;
+  overflow: hidden;
+  line-height: 26px;
+  transition: height 0.7s ease, border 0.7s ease;
+
+  &:focus {
+    outline: none;
+    border: 1px dotted var(--penombre-brown);
+    height: 100px;
+  }
+}
+
+.pouvoir-row select[name="attr_pouvoir_type"] {
+  height: 32px;
+  width: 90px;
+  border: none;
+  border-bottom: 1px dotted var(--penombre-brown);
+  background: transparent;
+  padding: 0 8px;
+  margin: 0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  font-family: var(--penombre-font-freely);
+}
+
+.pouvoir-row button.btn-roll {
+  margin-top: 5px;
+  height: 100%;
+}
+
+/* === Atouts === */
+
+.col-atouts {
+  flex: 1;
+}
+
+.atout-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.atout-row input[type="text"] {
+  flex: 2;
+  height: 32px;
+  border: none;
+  border-bottom: 1px dotted var(--penombre-brown);
+  background: transparent;
+  padding: 0 8px;
+  font-family: var(--penombre-font-freely);
+  font-size: 1.5rem;
+}
+
+.atout-row textarea {
+  flex: 2;
+  height: 26px;
+  margin-top: 5px;
+  border: none;
+  border-bottom: 1px dotted var(--penombre-brown);
+  background: transparent;
+  padding: 0 8px;
+  font-family: var(--penombre-font-freely);
+  font-size: 1.5rem;
+  resize: none;
+  overflow: hidden;
+  line-height: 26px;
+  transition: height 0.7s ease, border 0.7s ease;
+
+  &:focus {
+    outline: none;
+    border: 1px dotted var(--penombre-brown);
+    height: 100px;
+  }
+}
+
+/* Conteneur niveaux */
+.atout-level {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* Conteneur des niveaux */
+.atout-level {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+}
+
+/* Cases personnalisées */
+.atout-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+.atout-row .atout-level-row {
+  min-width: 60px;
+}
+
+.atout-row select[name="attr_atout_harmonique"] {
+  height: 32px;
+  width: 80px;
+  border: none;
+  border-bottom: 1px dotted var(--penombre-brown);
+  background: transparent;
+  padding: 0 8px;
+  margin: 0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  font-family: var(--penombre-font-freely);
+}
+
+.case {
+  width: 32px;
+  height: 32px;
+  background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/de_case_unchecked.webp");
+  background-size: cover;
+  border: none;
+  appearance: none;
+  cursor: pointer;
+  background-color: var(--penombre-light);
+}
+.case:checked {
+  background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/de_case_checked.webp");
+}
+
+/* Boutons harmoniques cachés  */
+.sheet-atout-container {
+  position: relative;
+  display: inline-block;
+}
+
+.sheet-atout-menu {
+  display: none;
+  position: absolute;
+  background: var(--penombre-white);
+  padding: 10px 0;
+  border: 1px solid var(--penombre-brown);
+  border-radius: 10px;
+  z-index: 100;
+  min-width: 90px;
+  right: 25px;
+  top: -10px;
+}
+
+.sheet-atout-heading {
+  font-weight: bolder;
+  color: var(--penombre-brown);
+  text-align: center;
+  padding: 2px 5px;
+  border-bottom: 1px solid var(--penombre-dark);
+}
+
+.sheet-atout-heading:hover {
+  background: transparent;
+}
+
+.sheet-atout-container:hover .sheet-atout-menu {
+  display: block;
+}
+
+.sheet-atout-btn:hover {
+  color: var(--penombre-brown);
+  border: 1px solid var(--penombre-brown);
+}
+
+.sheet-atout-menu > div:not(.sheet-atout-heading) {
+  display: flex;
+  align-items: center;
+  padding: 2px 5px;
+  border-bottom: 1px solid var(--penombre-dark);
+}
+
+.sheet-atout-menu > div:not(.sheet-atout-heading):hover {
+  background: var(--penombre-dark);
+}
+
+.sheet-atout-menu > div:last-child {
+  border-bottom: none;
+}
+
+.sheet-atout-choice {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  flex-shrink: 0;
+}
+
+.sheet-atout-menu label {
+  margin-bottom: 0 !important;
+}
+
+/* === Maîtrises Magiques === */
+.col-magies {
+  flex: 1;
+}
+
+.magie-row {
+  display: flex;
+  align-items: flex-start;
+  /* flex-wrap: wrap; */
+  gap: 8px;
+  margin: 4px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.magie-row textarea {
+  flex: 2;
+  height: 26px;
+  margin-top: 5px;
+  border: none;
+  border-bottom: 1px dotted var(--penombre-brown);
+  background: transparent;
+  padding: 0 8px;
+  font-family: var(--penombre-font-freely);
+  font-size: 1.5rem;
+  resize: none;
+  overflow: hidden;
+  line-height: 26px;
+  transition: height 0.7s ease, border 0.7s ease;
+  min-width: 115px;
+
+  &:focus {
+    outline: none;
+    border: 1px dotted var(--penombre-brown);
+    height: 100px;
+  }
+}
+
+.magie-row select[name="attr_magie_harmonique"] {
+  height: 32px;
+  width: 80px;
+  border: none;
+  border-bottom: 1px dotted var(--penombre-brown);
+  background: transparent;
+  padding: 0 8px;
+  margin: 0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  font-family: var(--penombre-font-freely);
+}
+
+.magie-lvl-img {
+  position: relative; /* nécessaire pour positionner l'input à l'intérieur */
+  width: 40px;
+  height: 40px;
+  background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/magie_level.webp")
+    center/contain no-repeat;
+}
+
+/* Positionner l'input au centre de l'image */
+.magie-lvl-img input[type="number"] {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 30px !important;
+  height: 30px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 1.8rem;
+  color: var(--penombre-text);
+  font-family: var(--penombre-font-freely);
+
+  /* supprime les flèches */
+  appearance: none;
+  -moz-appearance: textfield;
+}
+
+.magie-lvl-img input[type="number"]::-webkit-inner-spin-button,
+.magie-lvl-img input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.magie-row button.btn-roll {
+  margin-top: 5px;
+  height: 100%;
+}
+
+/* === Notes === */
+
+.notes-wrap {
+  display: flex;
+  justify-content: center;
+  width: 90%;
+  margin: 0 auto 10px;
+}
+
+textarea.notes-textarea {
+  height: 100px;
+  border: 1px dotted var(--penombre-brown);
+  background: transparent;
+  padding: 8px;
+  font-size: 1.2rem !important;
+  resize: vertical;
+  transition: height 0.7s ease;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+/* === aide de jeu === */
+.aide-joueur h2 {
+  display: none;
+}
+.aides-wrap {
+  display: flex;
+  justify-content: center; /* centre l'ensemble */
+  align-items: center;
+  gap: 6px;
+  margin: 1rem auto 10px 0.8rem;
+  width: 110%;
+}
+
+.aide-jetons-img {
+  width: 70%; /* occupe la moitié de l'espace */
+  min-height: 100px;
+}
+
+.aide-succes-img {
+  width: 34%; /* occupe la moitié de l'espace */
+}
+
+.aide-succes-img img {
+  width: 59%;
+  max-height: 117px;
+}
+
+.aide-jetons-img img {
+  max-height: 117px;
+}
+
+/* ========================================
+          FEUILLE ADVERSAIRE
+======================================== */
+
+.adversaire-feuille {
+  background: var(--penombre-white);
+  width: 60%;
+  margin: 0 auto 10px;
+  padding-bottom: 2rem;
+}
+
+.adversaire-feuille .titre-section {
+  font-family: var(--penombre-font-cattedrale);
+  text-align: center;
+  font-size: 2.8rem;
+  color: var(--penombre-light);
+  padding: 1.5rem 0 2.5rem 0;
+  margin-bottom: 12px;
+  background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/adversite.webp")
+    no-repeat center;
+  background-size: cover;
+}
+
+.adversaire-content {
+  padding: 12px;
+}
+
+.adversaire-entete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.adversaire-content input[type="text"].adversaire-nom,
+.adversaire-content input[type="text"].adversaire-concept {
+  background-color: transparent;
+  border: none;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.adversaire-entete input[type="text"].adversaire-nom {
+  font-size: 3rem;
+  font-weight: bold;
+  text-align: center;
+  font-family: var(--penombre-font-cattedrale);
+  color: var(--penombre-brown);
+}
+
+.adversaire-entete input[type="text"].adversaire-concept {
+  font-size: 1.8rem;
+  text-align: center;
+  font-family: var(--penombre-font-freely);
+  color: var(--penombre-text);
+  transform: translateY(-5px);
+}
+
+.adversaire-entete input[type="text"],
+.adversaire-entete textarea {
+  width: 100%;
+  border: none;
+  border-bottom: 1px dotted var(--penombre-brown);
+  background: transparent;
+  font-size: 1rem;
+  resize: none;
+}
+
+.adversaire-jauges {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  margin: 12px 0;
+  border-top: 2px solid var(--penombre-brown);
+  border-bottom: 2px solid var(--penombre-brown);
+  padding: 8px 0;
+}
+
+.adversaire-jauges .jauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.jauge label {
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: var(--penombre-brown);
+}
+
+.jauge-input {
+  width: 40px;
+  text-align: center;
+  border: none;
+  border-bottom: 1px dotted var(--penombre-brown);
+  background: transparent;
+  font-size: 1.2rem;
+}
+
+select.dissonance-select {
+  border: none;
+  background: transparent;
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-align: center;
+  appearance: none;
+  cursor: pointer;
+  font-family: var(--penombre-font-freely);
+  width: 60px !important;
+  margin-left: 10px;
+}
+
+.adversaire-section-rep {
+  margin-top: 12px;
+}
+
+.adversaire-section-rep h3 {
+  font-family: var(--penombre-font-cattedrale);
+  color: var(--penombre-green);
+  margin-bottom: 8px;
+}
+
+.adversaire-section-rep textarea {
+  width: 100%;
+  border: 1px dotted var(--penombre-brown);
+  background: transparent;
+  height: 50px;
+  resize: vertical;
+  font-size: 1.2rem;
+  color: var(--penombre-text);
+  transition: height 0.7s ease;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.adversaire-section-rep input[type="text"] {
+  width: 100%;
+  border: none;
+  border-bottom: 1px dotted var(--penombre-brown);
+  background: transparent;
+  font-size: 1.5rem;
+  font-family: var(--penombre-font-freely);
+  color: var(--penombre-text);
+
+  &:focus {
+    outline: none;
+  }
+}
+
+/* ========================================
+          FEUILLE COLLÉGIALE
+======================================== */
+
+/* Conteneur principal */
+.sheet_collegial {
+  width: 100%;
+  padding: 20px;
+}
+
+.collegiale-container {
+  position: relative;
+  width: 600px;
+  height: 600px;
+  margin: 0 auto;
+  background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/collegial-bg.jpeg")
+    center center no-repeat;
+  background-size: contain;
+}
+
+/* Cache les vrais inputs checkbox */
+.jeton-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Style de base des jetons (labels cliquables) */
+.jeton {
+  position: absolute;
+  width: 78px;
+  height: 78px;
+  display: inline-block; /* Force la taille exacte */
+  cursor: pointer;
+  background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/jeton_face_active.webp");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: transform 0.15s ease;
+  /* Centrage : on décale de -50% pour centrer réellement */
+  transform: translate(-50%, -50%);
+  /* Empêche tout contenu texte de déborder */
+  overflow: hidden;
+  line-height: 0;
+  font-size: 0;
+}
+
+/* Hover effect */
+.jeton:hover {
+  transform: translate(-50%, -50%) scale(1.02);
+}
+
+/* Quand le checkbox est coché → change l'image */
+.jeton-input:checked + .jeton {
+  background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/jeton_face_inactive.webp");
+  transform: translate(-50%, -50%);
+}
+
+.jeton-input:checked + .jeton:hover {
+  transform: translate(-50%, -50%) scale(1.02);
+}
+
+.collegiale-container label {
+  width: 78px !important;
+  height: 78px !important;
+}
+
+/* ========================================
+   POSITIONNEMENT DES JETONS
+   Basé sur l'image de référence
+   ======================================== */
+
+/* ========================================
+   POSITIONNEMENT DES JETONS
+   Ajustement collectif via margin-top supplémentaire
+   ======================================== */
+
+/* Rangée 1 - 1 jeton au centre haut */
+.jeton1 {
+  top: 29%;
+  left: 50%;
+}
+
+/* Rangée 2 - 3 jetons */
+.jeton2 {
+  top: 36%;
+  left: 36%;
+}
+
+.jeton3 {
+  top: 43%;
+  left: 50%;
+}
+
+.jeton4 {
+  top: 36%;
+  left: 64%;
+}
+
+/* Rangée 3 - 3 jetons */
+.jeton5 {
+  top: 50%;
+  left: 36%;
+}
+
+.jeton6 {
+  top: 57%;
+  left: 50%;
+}
+
+.jeton7 {
+  top: 50%;
+  left: 64%;
+}
+
+/* Rangée 4 - 3 jetons */
+.jeton8 {
+  top: 64%;
+  left: 36%;
+}
+
+.jeton9 {
+  top: 71%;
+  left: 50%;
+}
+
+.jeton10 {
+  top: 64%;
+  left: 64%;
+}
+
+/*=======================================
+   Rolltemplate custom styles
+   ======================================*/
+
+.sheet-rolltemplate-harmonique .sheet-rolltemplate-harmonique-center {
+  text-align: center;
+}
+
+.sheet-rolltemplate-harmonique .sheet-rolltemplate-harmonique-background {
+  background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Penombre/assets/img/fond-coupe-petit.webp") -0%
+    top no-repeat;
+  background-color: #fef4e8;
+  min-height: 120px;
+  max-width: 200px;
+  margin: 0px;
+  padding: 1.6rem 10px;
+  background-size: 110%;
+  border: 3px double #722f16;
+}
+
+.sheet-rolltemplate-harmonique .sheet-rolltemplate-harmonique-header {
+  font-family: "cattedrale", "pirata one", serif;
+  color: #722f16;
+  font-size: 3.5rem;
+  margin: 1rem 0 2rem;
+  text-align: center;
+}
+
+.sheet-rolltemplate-harmonique .sheet-rolltemplate-harmonique-subheader {
+  font-family: "cattedrale", "pirata one", serif;
+  font-size: 1.8rem;
+  text-align: center;
+  color: #3c4762;
+}
+
+.sheet-rolltemplate-harmonique .sheet-rolltemplate-harmonique-result {
+  color: #110d0b;
+  text-align: center;
+  margin-top: 1.9rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.sheet-rolltemplate-harmonique img.sheet-rolltemplate-harmonique-critique-icon,
+.sheet-rolltemplate-harmonique
+  .sheet-rolltemplate-harmonique-critique-icon
+  img {
+  height: 2.7rem;
+  margin-right: 0.6rem;
+}
+
+.sheet-rolltemplate-harmonique .inlinerollresult {
+  background-color: transparent;
+  border: none !important;
+}
+
+.sheet-rolltemplate-harmonique .sheet-rolltemplate-harmonique-merveilleux {
+  display: block;
+  color: #a70909;
+}
+
+.sheet-rolltemplate-harmonique .sheet-rolltemplate-harmonique-succes {
+  font-family: "P22Freely", "Fasthand", serif;
+  font-size: 2.7rem;
+}
+
+.sheet-rolltemplate-harmonique .sheet-rolltemplate-harmonique-echec {
+  color: #bf2525;
+  margin: 10px 0 4px;
+}
+
+.sheet-rolltemplate-harmonique .sheet-rolltemplate-harmonique-reussite {
+  color: #23bf26;
+  margin: 10px 0 4px;
+}

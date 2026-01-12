@@ -89,21 +89,25 @@ The default roll for Perception is equal to the character's Intelligence Roll. P
 
 ![Page 2](/HeroSystem6eHeroic/images/screenshot-02-scaled.png)
 
-The Gear page provides space for most of a character's physical goods (weapons, armor, and equipment) as well as a section of common and martial combat maneuvers.
+The Gear page provides space for most of a character's attacks, defenses, and equipment (physical goods or equivalent powers) as well as a section for common and martial combat maneuvers.
 
 Along the top is an accounting of your carried weight and DCV and movement penalties. The Endurance cost is accounted for automatically when taking a Post-Segment 12 recovery. Each value is read-only except "DCV Modifier." Use this field to account for skill levels or items that might reduce or enhance your DCV (see the note on current DCV in the token section below).
 
 ![Encumbrance](/HeroSystem6eHeroic/images/encumbrance.png)
 
-To the right of encumbrance bar you will find OCV* and DCV*. These combat values represent the character's OCV and DCV after the modifiers applied by the most recent maneuver. If the last action was use of a mental power, these values represent OMCV and DMCV. One exception are roll modifiers. These will not be applied to OCV* and DCV* due limitations of Roll20's roll actions.
+To the right of the encumbrance bar you will find OCV* and DCV*. These combat values represent the character's OCV and DCV after the modifiers applied by the most recent maneuver. If the action was a mental power, these values represent OMCV and DMCV. Roll modifiers are not applied to OCV* and DCV* due limitations of Roll20's roll actions.
 
 ![Ephemeral CVs](/HeroSystem6eHeroic/images/ephemeralCVs.png)
 
-The sheet includes space for four suits or pieces of armor (plus four more accessible via the "A/B" set button). If PD/ED are left at 0, then Total Defense will be automatically calculated when you click Roll. Although this sheet is designed for the simpler armor activation approach, there is a field for hit locations if your GM chooses to use that system.
+The sheet includes space for four defenses (plus four more accessible via the "A/B" set button). 
 
 ![Armor Table](/HeroSystem6eHeroic/images/armor.png)
 
-Click the "Roll" button to roll armor activation. A message like the one shown below will be sent to the chat window. If ACT is set to NA, and locations are filled then the second message will appear.
+The *Defense* entry space is actually a button that brings up a worksheet in which you can enter values for PD, ED, power defense, mental defense, and flash defense. The sheet will use these values to create a summary of these defenses for display in the parent table.
+
+![Armor Worksheet](/HeroSystem6eHeroic/images/armorWorksheet.png)
+
+Use the "Roll" button to send an item's critical information to the chat window. If ACT is not *NA* Roll20 will make an activation roll. If the option to use the hit location system is active, Roll20 will also display locations.
 
 ![Armor Activation Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat.png)![Armor Activation Alternate Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat2.png)
 
@@ -111,7 +115,7 @@ The weapons section contains space for five weapons (or spells or abilities with
 
 ![Weapons Table B](/HeroSystem6eHeroic/images/weapons.png)
 
-With the Weapon Worksheet open, begin by entering a weapon's base damage (the shield works the same way). HS6eH will attempt to translate entered damage to a valid HERO damage dice string, meaning some combination of xd6, +d3, +1, and -1 for killing damage and xd6 and +d3 for normal damage (*Damage Type* of *Normal* or *Power*). The resulting dice string will appear on the right under "Results."
+With the Weapon Worksheet open, begin by entering a weapon's base damage. HS6eH will attempt to translate entered damage to a valid HERO damage dice string, meaning some combination of xd6, +d3, +1, and -1 for killing damage and xd6 and +d3 for normal damage (*Damage Type* of *Normal* or *Power*). The resulting dice string will appear on the right under "Results."
 
 > [!TIP]
 > A weapon with damage type *power* will use the violet power template for attack rolls and damage. Potentially useful for special weapons or weapon-like adjustment powers.
@@ -157,6 +161,12 @@ An attack doing normal damage appears in chat with a green heading. The weapon's
 To make a targeted attack select the radio button corresponding to desired focus of your attack. If the target is stunned or otherwise incapacitated check the "1/2 penalty" option. Characters who purchased penalty skill levels may also apply them using the "Apply PSL" input. Any of the attack buttons on the Gear sheet will automatically calculate the character's OCV, determine the hit location, and calculate stun for killing attacks. The attack message will also display post-defense STUN and BODY modifiers. An attack using a weapon marked as "AoE" will not use the hit location system (this allows the hit location system to be applied on a case by case basis).
 
 ![Hit Locations](/HeroSystem6eHeroic/images/HitLocationTable.png)
+
+*Knockdown and Knockback (Optional)*
+
+If your campaign uses the knockdown or knockback rules, Roll20 will roll knockback dice and subtract the total from the BODY damage done by the attack. The outcome appears after the calculated damage result: a distance (⚞10m⚟) for knockback, two down arrows (↓↓) for knockdown, and three dots (•••) for a null result. Hover over the calculated result to see the knockback roll. Note that knockback isn't rolled for mental damage.
+
+![Knockdown](/HeroSystem6eHeroic/images/KnockdownChat.png)
 
 # <a id="page-3">Page 3: Skills</a>
 
@@ -286,6 +296,10 @@ The last page of this sheet contains a number of gameplay or display options.
 
 &emsp; Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color. Font size seems to be just right or too small.
 
+### Roll for Knockback
+
+&emsp; If the campaign uses knockback rules select whether if it is for full knockback or only knockdown. The default is *never* and the standard knockdown roll is *2d6.* Lower power campaigns might opt for a knockback roll of *1d6* and higher power campaigns might use *3d6*.
+
 ### Whisper Rolls to GM
 
 &emsp; This dropdown offers three options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
@@ -372,9 +386,19 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
 *First version by Villain In Glasses, August 1, 2021.*
+
 *Recent updates:*
+
+*Oct 5, 2025 added option to automatically roll for knockback (Version 4.80)*
+
+*May 8, 2025 added mental, power, and flash defense to armor (Version 4.70)*
+
 *March 7, 2025 adds Mental as a weapon damage type (Version 4.50).*
+
 *February 5, 2025 adds vehicle support (Version 4.40).*
+
 *January 25, 2025 adds damage type (killing, normal, and power) to the weapon worksheet (Version 4.10).*
+
 *January 3, 2025 to represent the sheet as of Version 4.02.*
+
 *November 21, 2024 to represent the sheet as of Version 3.81 and updated support in Hero Roller 1.3.0.*

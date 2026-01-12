@@ -1,47 +1,117 @@
-const fs = require('fs'); // used to read and write files
-const path = require('path'); // used to resolve file paths
-const {minify} = require('html-minifier'); // used to minify HTML
-const chokidar = require('chokidar'); // used to watch for src file changes
-const argv = require('minimist')(process.argv.slice(2)); // used to parse command-line arguments
+const fs = require('fs');
+const path = require('path');
+const {minify} = require('html-minifier-terser');
+const chokidar = require('chokidar');
+const argv = require('minimist')(process.argv.slice(2));
+
 const htmlInput = 'index.html';
-const isProduction = argv.prod; // --prod flag
-const isDevelopment = argv.dev; // --dev flag
-const bundledOutput = path.resolve(__dirname, '../1ESheet.html'); // final output file in the root folder
+const jsInput = 'index.js';
+const cssInput = '1ESheet.css';
 
-function bundle(isProduction) {
-  const jsInput = isProduction ? 'prod/index.js' : 'dev/index.js'; // conditional JS input
+const isProduction = argv.prod;
+const isDevelopment = argv.dev;
 
-  try {
-    const html = fs.readFileSync(htmlInput, 'utf8');
-    const js = fs.readFileSync(jsInput, 'utf8');
-    let minifiedHTML = html; // original HTML
-    let injectedHTML = '';
-    // Minify only in production
-    if (isProduction) {
-      minifiedHTML = minify(html, {
-        collapseWhitespace: true,
-        minifyJS: true,
-      });
-      injectedHTML = minifiedHTML.replace(/<script type="text\/worker"><\/script>/, `\r<script type="text/worker">${js.trim()}</script>`);
-    } else {
-      injectedHTML = minifiedHTML.replace(/<script type="text\/worker"><\/script>/, `\r<script type="text/worker">\r${js.trim()}\r</script>`);
-    }
+// Output paths
+const devDir = 'dev';
+const prodDir = 'prod';
+const devJsOutput = `${devDir}/index.js`;
+const prodJsInput = `${prodDir}/index.js`;
 
-    fs.writeFileSync(bundledOutput, injectedHTML, 'utf8');
-    console.log(`${isProduction ? 'Production' : 'Development'} build complete!`);
-  } catch (err) {
-    console.error('Error during build:', err);
+const devHtmlOutput = `${devDir}/1ESheet.html`;
+const prodHtmlOutput = `${prodDir}/1ESheet.html`;
+
+const devCssOutput = `${devDir}/1ESheet.css`;
+const prodCssOutput = `${prodDir}/1ESheet.css`;
+
+// Ensure directory exists
+function ensureDir(folder) {
+  if (!fs.existsSync(folder)) {
+    fs.mkdirSync(folder);
   }
 }
 
-// initial build
-bundle(isProduction);
+// ---- Copy JS for development ----
+function copyDevJs() {
+  try {
+    ensureDir(devDir);
+    fs.copyFileSync(jsInput, devJsOutput);
+    console.log(`Copied ${jsInput} → ${devJsOutput}`);
+  } catch (err) {
+    console.error(`Error copying ${jsInput}:`, err);
+  }
+}
 
-// watch src files only in development
+// ---- Copy CSS ----
+function copyCss(outputPath) {
+  try {
+    fs.copyFileSync(cssInput, outputPath);
+    console.log(`Copied ${cssInput} → ${outputPath}`);
+  } catch (err) {
+    console.error(`Error copying CSS:`, err);
+  }
+}
+
+// ---- Bundling function ----
+async function bundle() {
+  const jsPath = isProduction ? prodJsInput : devJsOutput;
+
+  try {
+    const html = fs.readFileSync(htmlInput, 'utf8');
+    const js = fs.readFileSync(jsPath, 'utf8');
+    let injectedHTML;
+
+    if (isProduction) {
+      const minifiedHTML = await minify(html, {
+        collapseWhitespace: true,
+        minifyJS: true,
+        removeComments: true,
+      });
+
+      injectedHTML = minifiedHTML.replace(/<script type="text\/worker"><\/script>/, `<script type="text/worker">${js.trim()}</script>`);
+    } else {
+      injectedHTML = html.replace(/<script type="text\/worker"><\/script>/, `<script type="text/worker">\r\n${js.trim()}\r\n</script>`);
+    }
+
+    // output to dev/ or prod/
+    const outputPath = isProduction ? prodHtmlOutput : devHtmlOutput;
+    fs.writeFileSync(outputPath, injectedHTML, 'utf8');
+
+    console.log(`✅ ${isProduction ? 'Production' : 'Development'} build → ${outputPath}`);
+  } catch (err) {
+    console.error('❌ Error during build:', err);
+  }
+}
+
+// ---- DEV MODE ----
 if (isDevelopment) {
-  chokidar.watch([htmlInput, isProduction ? null : 'dev/index.js'].filter(Boolean)).on('change', (path) => {
-    console.log(`File ${path} has been changed`);
-    bundle(isProduction);
+  ensureDir(devDir);
+
+  // Initial actions
+  copyDevJs();
+  copyCss(devCssOutput);
+  bundle();
+
+  console.log('👀 Watching for changes...');
+
+  chokidar.watch([htmlInput, jsInput, cssInput]).on('change', (changedPath) => {
+    console.log(`\nFile changed: ${changedPath}`);
+
+    if (changedPath === jsInput) {
+      copyDevJs();
+    }
+
+    if (changedPath === cssInput) {
+      copyCss(devCssOutput);
+    }
+
+    bundle();
   });
-  console.log('Watching for changes...');
+}
+
+// ---- PROD MODE ----
+if (isProduction) {
+  ensureDir(prodDir);
+
+  copyCss(prodCssOutput);
+  bundle();
 }

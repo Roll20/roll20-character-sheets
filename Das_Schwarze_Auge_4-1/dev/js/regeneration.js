@@ -1,4 +1,66 @@
-/* regeneration begin */
+/* regeneration start */
+/* Handle active regeneration tabs when deactivating magic/karma */
+const attrsUIReg = [
+	'ui_tab_reg',
+	'MagieTab',
+	'LiturgienTab',
+];
+Object.freeze(attrsUIReg);
+
+on(attrsUIReg.map(attr => "change:" + attr).join(" ").toLowerCase(),
+	function(eventInfo) {
+		// Boilerplate
+		const caller = "Action Listener for Showing/Hiding Regeneration Tabs";
+		debugLog(caller, "eventInfo", eventInfo);
+
+		// Preparation
+		const sourceType = eventInfo["sourceType"];
+		const sourceAttr = eventInfo["sourceAttribute"];
+		const newValue = eventInfo["newValue"];
+
+		// Quick decision
+		if (sourceType === "player")
+		{
+			safeGetAttrs(attrsUIReg, function(values) {
+				// Preparation
+				const currentTab = values["ui_tab_reg"];
+				/// Regeneration type always available
+				const fallback = "sleep";
+				let attrsToChange = {};
+
+				// Handling changes to showing/hiding regeneration tabs
+				/// The user must always see a non-hidden regeneration tab
+				/// When hiding e. g. the magic tab, astral meditation gets hidden.
+				/// If the user goes back to the regeneration tab it would appear empty
+				/// if not set to a non-hidden regeneration type.
+				if (
+					(newValue === "1")
+					&&
+					(
+						(
+							(sourceAttr === "magietab")
+							&&
+							(currentTab === "astralmeditation")
+						)
+						||
+						(
+							(sourceAttr === "liturgientab")
+							&&
+							(currentTab === "karmicmeditation")
+						)
+					)
+				)
+				{
+					attrsToChange["ui_tab_reg"] = fallback;
+				}
+
+				// Finish
+				debugLog(caller, "attrsToChange", attrsToChange);
+				safeSetAttrs(attrsToChange);
+			});
+		}
+});
+
 /* handle activation/deactivation of advantages/disadvantages */
 on(
 	"change:nachteil_schlechte_regeneration " +

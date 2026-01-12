@@ -1,4 +1,4 @@
-/* melee begin */
+/* melee start */
 /*
 Handle (de)activation of shields/parry weapons
 
