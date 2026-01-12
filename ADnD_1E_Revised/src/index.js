@@ -3650,7 +3650,7 @@ on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_ar
     await removeEmptyArmorRows();
     // update the sync flag for newly added items
     if (synced !== 1) {
-      output.attrSync = 1;
+      output[attrSync] = 1;
       await setAttrsAsync(output, {silent: true});
     }
   }
