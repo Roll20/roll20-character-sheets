@@ -1987,8 +1987,196 @@ You become deeply attached to this item and losing it causes great strife"
       </div>
       <h4 class="sheet-separative" style="margin-top: 25px !important; opacity: 0% !important"></h4>
     </div>
+
+     <div class="sheet-cogs-container" style="width: 35px !important;right: -5px;bottom: 4px;position: absolute;">
+                    <input class="sheet-cogs-input sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
+                    <span class="sheet-cogs-icon">y</span>
+                  </div>
   </div>
+
+  <input class="sheet-hidden sheet-cogs-hideshow" type="checkbox" name="attr_sheet-cogs-hideshow" />
+<div class="sheet-import-export sheet-doublecolumn sheet-cogs-hideshow-div1">
+
+  <button type="action" style="height: 25px !important;margin-top: 10px !important;" name="act_export_json">Export</button>
+<button type="action" style="height: 25px !important;margin-top: 10px !important;" name="act_import_json">Import</button>
+
+<textarea name="attr_importexport" style="height:100px!important;grid-column:1/-1"></textarea>
+
+<script type="text/worker">
+const RAW_ATTRS = [
+  "archery_1","archery_2","archery_3","archery_4","archery_bonus","archery_damage","archery_roll","archery_special","archery_specialisactive","archery_total",
+  "assassinate-checked","assassinate-desc","assassinate_1","assassinate_2","assassinate_3","assassinate_4","assassinate_roll","assassinate_total",
+  "athletics_1","athletics_2","athletics_3","athletics_4","athletics_bonus","athletics_roll","athletics_total",
+  "background_1","background_10","background_11","background_12","background_13","background_14","background_15","background_16","background_17","background_18","background_19","background_2","background_20","background_21","background_22","background_23","background_24","background_25","background_3","background_4","background_5","background_6","background_7","background_8","background_9",
+  "blackjacks_1","blackjacks_2","blackjacks_3","blackjacks_4","blackjacks_bonus","blackjacks_damage","blackjacks_roll","blackjacks_special","blackjacks_specialisactive","blackjacks_total",
+  "body-armorclass","bonus-damage-malus","bonus-damage-malus2","bonus-tohit-malus","bonus-tohit-malus2",
+  "character_concept","character_name","character_player",
+  "charm","clothing-back-armorclass","clothing-belt-armorclass","clothing-chest-armorclass","clothing-face-armorclass","clothing-feets-armorclass","clothing-hands-armorclass","clothing-head-armorclass","clothing-legs-armorclass",
+  "core-reverse","core_1","core_2","core_3","core_4",
+  "damage-malus","damage-malus2","damagebonus","damagebonus2",
+  "deflect_1","deflect_2","deflect_3","deflect_4","deflect_bonus","deflect_roll","deflect_total",
+  "dex","disguise_1","disguise_2","disguise_3","disguise_4","disguise_bonus","disguise_roll","disguise_total",
+  "drive_1","drive_2","drive_3","drive_4","drive_bonus","drive_roll","drive_total",
+  "empathy_1","empathy_2","empathy_3","empathy_4","empathy_bonus","empathy_roll","empathy_total",
+  "energy","energy_max","energy_mod",
+  "evade_1","evade_2","evade_3","evade_4","evade_bonus","evade_roll","evade_total",
+  "focus","force_1","force_2","force_3","force_4","force_bonus","force_roll","force_total",
+  "global-privacy-status",
+  "grenades_1","grenades_2","grenades_3","grenades_4","grenades_bonus","grenades_damage","grenades_roll","grenades_special","grenades_specialisactive","grenades_total",
+  "grit","guile_1","guile_2","guile_3","guile_4","guile_bonus","guile_roll","guile_total",
+  "hp","hp_max","hp_mod",
+  "improvised_1","improvised_2","improvised_3","improvised_4","improvised_bonus","improvised_damage","improvised_roll","improvised_special","improvised_specialisactive","improvised_total",
+  "intimidate_1","intimidate_2","intimidate_3","intimidate_4","intimidate_bonus","intimidate_roll","intimidate_total",
+  "investigate_1","investigate_2","investigate_3","investigate_4","investigate_bonus","investigate_roll","investigate_total",
+  "knives_1","knives_2","knives_3","knives_4","knives_bonus","knives_damage","knives_roll","knives_special","knives_specialisactive","knives_total",
+  "knuckles_1","knuckles_2","knuckles_3","knuckles_4","knuckles_bonus","knuckles_damage","knuckles_roll","knuckles_special","knuckles_specialisactive","knuckles_total",
+  "language_1","language_2","language_3","language_4","language_5",
+  "level","levelup",
+  "machineguns_1","machineguns_2","machineguns_3","machineguns_4","machineguns_bonus","machineguns_damage","machineguns_roll","machineguns_special","machineguns_specialisactive","machineguns_total",
+  "melee-defense","mental-defense","misc-armorclass","misc-hp","misc-speed",
+  "notice_1","notice_2","notice_3","notice_4","notice_bonus","notice_roll","notice_total",
+  "pianowire_1","pianowire_2","pianowire_3","pianowire_4","pianowire_bonus","pianowire_damage","pianowire_roll","pianowire_special","pianowire_specialisactive","pianowire_total",
+  "pistols_1","pistols_2","pistols_3","pistols_4","pistols_bonus","pistols_damage","pistols_roll","pistols_special","pistols_specialisactive","pistols_total",
+  "portrait","ranged-defense","rapiers_1","rapiers_2","rapiers_3","rapiers_4","rapiers_bonus","rapiers_damage","rapiers_roll","rapiers_special","rapiers_specialisactive","rapiers_total",
+  "reload","resilience_1","resilience_2","resilience_3","resilience_4","resilience_bonus","resilience_roll","resilience_total",
+  "rifles_1","rifles_2","rifles_3","rifles_4","rifles_bonus","rifles_damage","rifles_roll","rifles_special","rifles_specialisactive","rifles_total",
+  "shotguns_1","shotguns_2","shotguns_3","shotguns_4","shotguns_bonus","shotguns_damage","shotguns_roll","shotguns_special","shotguns_specialisactive","shotguns_total",
+  "smuggle_1","smuggle_2","smuggle_3","smuggle_4","smuggle_bonus","smuggle_roll","smuggle_total",
+  "sneak_1","sneak_2","sneak_3","sneak_4","sneak_bonus","sneak_roll","sneak_total",
+  "speech_1","speech_2","speech_3","speech_4","speech_bonus","speech_roll","speech_total",
+  "speed","stealth","str","tenacity_1","tenacity_2","tenacity_3","tenacity_4","tenacity_roll","tenacity_total",
+  "totalpointscore","unwind",
+  "wealth_1","wealth_2","wealth_3","wealth_4","wealth_5"
+];
+
+const REPEATING = { equipment: ["equipment-name1","equipment-name2"] };
+
+const safeParse = (txt) => { try { return JSON.parse(txt); } catch (e) { return null; } };
+
+const chunk = (arr, size) => {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+};
+
+const shouldExclude = (k) =>
+  k === "global-privacy-status" ||
+  /^roll-/.test(k) ||
+  /-desc\b/.test(k) ||
+  /_special/.test(k);
+
+const getAllowedAttrs = () => {
+  const uniq = Array.from(new Set(RAW_ATTRS.map(s => String(s).trim()).filter(Boolean)));
+  return uniq.filter(k => !shouldExclude(k));
+};
+
+on("clicked:export_json", () => {
+  const keys = getAllowedAttrs();
+  const batches = chunk(keys, 80);
+  const out = { v: 1, attrs: {}, repeating: {} };
+
+  const readAttrsBatch = (i) => {
+    if (i >= batches.length) return exportRepeating();
+    const batch = batches[i];
+    getAttrs(batch, values => {
+      batch.forEach(k => { out.attrs[k] = values[k] ?? ""; });
+      readAttrsBatch(i + 1);
+    });
+  };
+
+  const exportRepeating = () => {
+    const sections = Object.keys(REPEATING);
+    let si = 0;
+
+    const nextSection = () => {
+      if (si >= sections.length) {
+        setAttrs({ importexport: JSON.stringify(out) });
+        return;
+      }
+
+      const section = sections[si++];
+      const fields = REPEATING[section];
+      const secName = `repeating_${section}`;
+
+      getSectionIDs(secName, ids => {
+        out.repeating[section] = [];
+        if (!ids || !ids.length) return nextSection();
+
+        const attrList = [];
+        ids.forEach(id => fields.forEach(f => attrList.push(`${secName}_${id}_${f}`)));
+
+        getAttrs(attrList, vals => {
+          ids.forEach(id => {
+            const row = { id };
+            fields.forEach(f => { row[f] = vals[`${secName}_${id}_${f}`] ?? ""; });
+            out.repeating[section].push(row);
+          });
+          nextSection();
+        });
+      });
+    };
+
+    nextSection();
+  };
+
+  readAttrsBatch(0);
+});
+
+on("clicked:import_json", () => {
+  getAttrs(["importexport"], v => {
+    const data = safeParse(v.importexport || "");
+    if (!data || typeof data !== "object") return;
+
+    const attrsIn = (data.attrs && typeof data.attrs === "object") ? data.attrs : {};
+    const repIn = (data.repeating && typeof data.repeating === "object") ? data.repeating : {};
+
+    const allowed = new Set(getAllowedAttrs());
+    const updates = {};
+    Object.keys(attrsIn).forEach(k => {
+      if (allowed.has(k)) updates[k] = attrsIn[k];
+    });
+
+    const keys = Object.keys(updates);
+    const batches = chunk(keys, 80);
+
+    const applyAttrsBatch = (i) => {
+      if (i >= batches.length) return importRepeating();
+      const b = batches[i];
+      const u = {};
+      b.forEach(k => u[k] = updates[k]);
+      setAttrs(u, () => applyAttrsBatch(i + 1));
+    };
+
+    const importRepeating = () => {
+      Object.keys(REPEATING).forEach(section => {
+        const rows = repIn[section];
+        if (!Array.isArray(rows)) return;
+
+        const fields = REPEATING[section];
+        const secName = `repeating_${section}`;
+
+        rows.forEach(r => {
+          const newId = generateRowID();
+          const rowUpdates = {};
+          fields.forEach(f => {
+            rowUpdates[`${secName}_${newId}_${f}`] = (r && r[f] != null) ? r[f] : "";
+          });
+          setAttrs(rowUpdates);
+        });
+      });
+    };
+
+    applyAttrsBatch(0);
+  });
+});
+</script>
+
+
 </div>
+
+</div>
+
+
 
 <script id="✓ CALC : Auto HP_MAX and ENERGY_MAX" type="text/worker">
   on("sheet:opened change:grit change:stealth change:focus change:charm", function () {
@@ -2309,36 +2497,39 @@ You become deeply attached to this item and losing it causes great strife"
 
 <script id="✓-SCRIPTCALC : Core Stats Validation" type="text/worker">
   const updateCoreValidation = () => {
-    getAttrs(["grit", "stealth", "focus", "charm"], function(values) {
-      const grit = parseInt(values.grit) || 0;
-      const stealth = parseInt(values.stealth) || 0;
-      const focus = parseInt(values.focus) || 0;
-      const charm = parseInt(values.charm) || 0;
+    getAttrs(["grit", "stealth", "focus", "charm"], values => {
+      const grit = parseInt(values.grit, 10) || 0;
+      const stealth = parseInt(values.stealth, 10) || 0;
+      const focus = parseInt(values.focus, 10) || 0;
+      const charm = parseInt(values.charm, 10) || 0;
 
       const total = grit + stealth + focus + charm;
 
-      const hasInvalid = (
+      const hasInvalid =
         grit < 2 || grit > 6 ||
         stealth < 2 || stealth > 6 ||
         focus < 2 || focus > 6 ||
         charm < 2 || charm > 6 ||
-        total !== 12
-      );
+        total !== 12;
 
       setAttrs({ totalpointscore: total });
 
       if (hasInvalid) {
         $20(".sheet-inputchar.sheet-core").addClass("sheet-invalid");
-        $20(".sheet-core-reverse").addClass("sheet-visible");
+        $20(".sheet-core-reverse").removeClass("sheet-hidden");
       } else {
         $20(".sheet-inputchar.sheet-core").removeClass("sheet-invalid");
-        $20(".sheet-core-reverse").removeClass("sheet-visible");
+        $20(".sheet-core-reverse").addClass("sheet-hidden");
       }
     });
   };
 
-  on("sheet:opened change:grit change:stealth change:focus change:charm", updateCoreValidation);
+  on(
+    "sheet:opened change:grit change:stealth change:focus change:charm",
+    updateCoreValidation
+  );
 </script>
+
 
 <script id="✓-SCRIPTCALC : Proper Cascade Checkboxes" type="text/worker">
   const cascadingSkills = [
