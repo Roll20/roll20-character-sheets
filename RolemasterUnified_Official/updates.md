@@ -1,4 +1,22 @@
+# 2025-01-20
+
+- Show PP Mulitplier on front page
+  - Attribute is pp_multiplier
+- Show height in feet'inches, inches and cm.
+- Updates display of height on change
+- Sheet version -> 18; upgrade height on load
+- Fix initialisation setting vesion instead of version
+- Tracker:
+  - Better layout
+  - Read NPC attacks
+  - Read parry/db etc from PCs and from tracker
+  - Make attacks from tracker.
+- Inventory: Fix appearance of accordian
+
+
 # 2026-01-15
+
+(went live on the 16th)
 
 - Add tracker back
 - Add general "asCharacter" helpers
