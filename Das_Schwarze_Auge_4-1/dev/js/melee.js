@@ -982,6 +982,37 @@ on(
 		});
 });
 
+/*
+Evade Modifier from High Acrobatics Value
+
+Evading an attack gets easier for every full three points above a skill value over 12.
+*/
+const attrsEvadeModAcrobatics = [
+	'TaW_akrobatik',
+];
+Object.freeze(attrsEvadeModAcrobatics);
+
+on(attrsEvadeModAcrobatics.map(attr => "change:" + attr).join(" ").toLowerCase(),
+	function(eventInfo) {
+		safeGetAttrs(
+			attrsEvadeModAcrobatics,
+			function(values) {
+				// Boilerplate
+				const step = 3;
+				const offset = 12;
+				let attrsToChange = { 'k_ausweichen_mod_akrobatik': getDefaultValue("k_ausweichen_mod_akrobatik") };
+
+				// Calculation
+				let result = parseInt(values["TaW_akrobatik"]);
+				result = Math.max(result - offset, 0);
+				result = Math.trunc(result / step);
+				// Negative value to get correct behaviour
+				attrsToChange["k_ausweichen_mod_akrobatik"] = -result;
+
+				safeSetAttrs(attrsToChange);
+		});
+});
+
 on(
 	[
 		"attacke_parierwaffe",

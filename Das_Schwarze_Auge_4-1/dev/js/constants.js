@@ -178,6 +178,7 @@ const defaultValues = {
 	"TP_Bonus_Aktiv": 0,
 
 	"k_mod_left_hand": 9,
+	"k_ausweichen_mod_akrobatik": 0,
 
 	/// Ranged Combat
 	"FK_Aktiv": 5,
@@ -1916,7 +1917,7 @@ const meleeData = {
 			'sf_ausweichenI',
 			'sf_ausweichenII',
 			'sf_ausweicheniII',
-			'k_ausweichen_akrobatikbonus'
+			'k_ausweichen_mod_akrobatik'
 			]
 		// +DK, +#Gegner, +BE, -Ausweichen 1-3, -Akrobatikbonus, ggf. INI-Verlust
 	},
@@ -1937,7 +1938,7 @@ const meleeData = {
 			'sf_ausweichenI',
 			'sf_ausweichenII',
 			'sf_ausweicheniII',
-			'k_ausweichen_akrobatikbonus'
+			'k_ausweichen_mod_akrobatik'
 			]
 		// +DK, +#Gegner, +BE, -Ausweichen 1-3, -Akrobatikbonus, INI-Verlust
 	},
