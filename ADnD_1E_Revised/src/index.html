@@ -67,6 +67,8 @@
           </h5>
           <ul>
             <h5>Latest</h5>
+            <li>Auto sync enabled by default for new sheets; HP, AC, and "Sync to Class" used for Attack Matrix and Thief Skills. These options can still be changed by the game creator according to the game's default sheet settings.</li>
+            <li>Fixed HP Max calc for multi-class. HP Total in the Class Details section will show HP with a decimal. HP Max now rounds up if partial/fractional HP is >=.5</li>
             <li>Refactoring done for the majority of sheetworkers. Converted the callback-based Roll20 functions to async/await versions.</li>
             <li>Some refactoring done in the sheetworker that keeps Armor Details and repeating_equipment Armor in sync. Includes a one-time update to check and set 'repeating_equipment_$X_equipment_sync_armor_flag' attribute.</li>
             <li>Added a "lock" icon next to the armor type dropdown selector in the equipment armor sub-section. Visual indicator if the item is currently synced with an Armor Details row.</li>
@@ -198,7 +200,7 @@
           <input type="text" class="width-small" name="attr_hitpoints_max" title="@{hitpoints|max}" value="0" />
         </label>
       </span>
-      <span class="inline-label split" style="margin-left: 15%;">
+      <span class="inline-label split" style="margin-left: 15%; width: auto;">
         <label class="label-percent">
           <button class="dice-button text-only btn ui-draggable" type="roll" name="attr_morale-roll" title="%{selected|morale-roll} | NPC Roll" value="@{whisper_npc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Morale Check}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{morale_base}[BASE] + ( ?{Modifier?|0}[MOD] ) ]]%}} {{mod_applied=[[ ?{Modifier?|0} ]]%}}">
             <span>MORALE</span>
@@ -502,7 +504,7 @@
             <span>/</span>
             <input type="text" class="width-smaller" name="attr_hitpoints_max" title="@{hitpoints|max} | Maximum Hit Points. No Damage." value="0" style="height: 2em;" />
             <span class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP from Class Details with HP ( @{hitpoints_max} ).">
-              <input type="checkbox" name="attr_sync_hp_flag" value="1" />
+              <input type="checkbox" name="attr_sync_hp_flag" value="1" checked />
               <span></span>
             </span>
           </label>
@@ -512,7 +514,7 @@
               <input type="text" class="shield-input" name="attr_armorclass" title="@{armorclass} | Best AC." value="10" />
             </span>
             <span class="sync-lock" title="@{sync_ac_flag} | Let the sheet sync Total AC from Armor Details with AC ( @{armorclass} ).">
-              <input type="checkbox" name="attr_sync_ac_flag" value="1" />
+              <input type="checkbox" name="attr_sync_ac_flag" value="1" checked />
               <span></span>
             </span>
           </label>
@@ -638,7 +640,7 @@
             </label>
             <label class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP from Class Details with HP ( @{hitpoints_max} ).">
               <span class="center">Sync HP:</span>
-              <input type="checkbox" name="attr_sync_hp_flag" value="1" />
+              <input type="checkbox" name="attr_sync_hp_flag" value="1" checked />
               <span></span>
             </label>
           </span>
@@ -1229,7 +1231,7 @@
           <span class="inline-label sync-lock" title="@{sync_ac_flag} | Let the sheet sync Total AC from Armor Details with AC ( @{armorclass} ).">
             <label>
               <span>Sync AC:</span>
-              <input type="checkbox" name="attr_sync_ac_flag" value="1" />
+              <input type="checkbox" name="attr_sync_ac_flag" value="1" checked />
               <span></span>
             </label>
           </span>
@@ -2780,7 +2782,7 @@
 
             <label class="inline-label" title="@{sync_matrix_class} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes. Note: multi-class/dual-class characters should pick the most favorable class. Defaults to Class 1 of 3 if enabled.">
               <span>Sync to Class:</span>
-              <input type="checkbox" name="attr_sync_matrix_class" value="1" />
+              <input type="checkbox" name="attr_sync_matrix_class" value="1" checked />
             </label>
             <label class="show-sync-class">
               <select class="class-selected border" name="attr_class_selected" title="@{class_selected} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes. Note: multi-class/dual-class characters should pick the most favorable class.">
@@ -3824,7 +3826,7 @@
 
         <label class="inline-label" title="@{sync_thief_class} | Linking to a class will automatically adjust the thief base values when the linked class level changes.">
           <span>Sync to Class:</span>
-          <input type="checkbox" name="attr_sync_thief_class" value="1" />
+          <input type="checkbox" name="attr_sync_thief_class" value="1" checked />
         </label>
         <label class="show-sync-class">
           <select class="class-selected border" name="attr_thief_class_selected" title="@{thief_class_selected} | Linking to a class will automatically adjust the thief base values when the linked class level changes.">
@@ -4751,12 +4753,12 @@
           <span class="span-six inline-label wrap">
             <label class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP from Class Details with HP ( @{hitpoints_max} ).">
               <span>Sync HP:</span>
-              <input type="checkbox" name="attr_sync_hp_flag" value="1" />
+              <input type="checkbox" name="attr_sync_hp_flag" value="1" checked />
               <span></span>
             </label>
             <label class="sync-lock" title="@{sync_ac_flag} | Let the sheet sync Total AC from Armor Details with AC ( @{armorclass} ).">
               <span>Sync AC:</span>
-              <input type="checkbox" name="attr_sync_ac_flag" value="1" />
+              <input type="checkbox" name="attr_sync_ac_flag" value="1" checked />
               <span></span>
             </label>
             <label title="@{autocalc_ac} | This is a persistent setting. Let the sheet auto-calculate AC based on the values entered in the Armor Details table above. This will overwrite all values in the bottom row.">
@@ -4773,7 +4775,7 @@
             </label>
             <label class="inline-label" title="@{sync_matrix_class} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes. Note: multi-class/dual-class characters should pick the most favorable class. Defaults to Class 1 of 3 if enabled.">
               <span>Sync to-Hit to Class:</span>
-              <input type="checkbox" name="attr_sync_matrix_class" value="1" />
+              <input type="checkbox" name="attr_sync_matrix_class" value="1" checked />
             </label>
             <label class="inline-label" title="@{autofill_thief} | Let the sheet auto-fill the Base chance when the level selector is changed.">
               <span>Autofill Thief Base:</span>
@@ -4781,7 +4783,7 @@
             </label>
             <label class="inline-label" title="@{sync_thief_class} | Linking to a class will automatically adjust the thief base values when the linked class level changes.">
               <span>Sync Thief Skills to Class:</span>
-              <input type="checkbox" name="attr_sync_thief_class" value="1" />
+              <input type="checkbox" name="attr_sync_thief_class" value="1" checked />
             </label>
           </span>
           <span class="span-seven inline-label" title="WARNING: any customization/editing that has been done on existing macro-text fields will be lost! You will not break anything by reseting. Reseting a field simply erases the existing value and forces the sheet to re-populate the field with the latest default value.">

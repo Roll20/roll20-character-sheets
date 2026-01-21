@@ -4178,12 +4178,20 @@ const calcHP = async () => {
   const class2 = hitpoints_2_class !== 0 ? 1 : 0;
   const class3 = hitpoints_3_class !== 0 ? 1 : 0;
   const numberOfClasses = class1 + class2 + class3;
-  const totalClassHP = int(hitpoints_1_class + hitpoints_2_class + hitpoints_3_class);
-  const totalHP = float(totalClassHP / numberOfClasses).toFixed(2);
+  const totalClassHP = hitpoints_1_class + hitpoints_2_class + hitpoints_3_class;
+  const totalHP = +numberOfClasses > 0 ? float(totalClassHP / numberOfClasses).toFixed(2) : 0;
+  const remainder = +(totalHP % 1).toFixed(2);
+  // remainder may not be needed if decimal is shown hitpoints_total
+  const fractionalHP = remainder <= 0.4 ? 0 : 1;
+  // fractionalHP may not be needed if rounding is done on hitpoints_max
+  clog(`remainder type:${typeof remainder}`);
+  clog(`totalHP:${totalHP} remainder:${remainder} fractionalHP:${fractionalHP}`);
   output.hitpoints_class_total = totalClassHP;
   output.hp_quotient = numberOfClasses;
   output.hitpoints_total = totalHP;
-  output.hitpoints_max = syncHpFlag === 1 ? int(totalHP) : hitPointsMax;
+  output.hitpoints_max = syncHpFlag ? Math.round(totalHP) : hitPointsMax;
+  // possibly no longer needed if decimal is shown hitpoints_total
+  output.hitpoints_remainder_total = remainder;
   await setAttrsAsync(output, {silent: true});
 };
 
@@ -5128,7 +5136,7 @@ on(
     let levelSelected = +v.thief_level || 0;
 
     // Determine Level based on Sync logic
-    if (syncClass === 1 && classLinked >= 1 && classLinked <= 3) {
+    if (syncClass && classLinked >= 1 && classLinked <= 3) {
       const classNames = [v.class, v.secondclass, v.thirdclass];
       const levels = [v.level, v.level_2, v.level_3];
 
@@ -5582,7 +5590,7 @@ on(
     const fighter5Selected = +v.toggle_fighter5 || 0;
     // sync enabled?
     // check for selected class and use that class level unless changed
-    if (syncClass === 1) {
+    if (syncClass) {
       if (classLinked === 1) {
         // clog(`Linked Class is: ${class1Name} Current Level:${v.level}`);
         classSelected = await matchClassName(class1Name);
