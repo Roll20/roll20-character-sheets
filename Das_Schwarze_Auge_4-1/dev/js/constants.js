@@ -179,6 +179,7 @@ const defaultValues = {
 
 	"k_mod_left_hand": 9,
 	"k_ausweichen_mod_akrobatik": 0,
+	"k_ausweichen_mod_vorteile_nachteile": 0,
 
 	/// Ranged Combat
 	"FK_Aktiv": 5,
