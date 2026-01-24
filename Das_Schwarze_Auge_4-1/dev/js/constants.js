@@ -96,6 +96,8 @@ const defaultValues = {
 	"KE": 0,
 	"KE_max": 0,
 
+	"jump_mod_advantages_disadvantages": 0,
+
 	"ap_verfuegbar": 0,
 
 	// Rolls

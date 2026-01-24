@@ -214,6 +214,18 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 					"nachteil_zwergenwuchs": 1,
 					"BE": 0,
 				};
+				const jumpMods = {
+					"vorteil_flink_i": 0,
+					"vorteil_flink_ii": 0,
+					"nachteil_behaebig": -1,
+					"nachteil_einbeinig": 0,
+					// Wege des Schwerts, p. 141
+					"nachteil_kleinwuechsig": -1,
+					"nachteil_lahm": 0,
+					"nachteil_zwergenwuchs": -2,
+					// Encumbrance is already part of the jump height/distance formula.
+					"BE": 0,
+				};
 
 				let attrsToChange = {};
 
@@ -276,6 +288,7 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 				let agilityMod = 0;
 				let movementMod = 0;
 				let evadeMod = 0;
+				let jumpMod = 0;
 				let swiftEncumbranceHint = false;
 
 				const updatedAttrs = Object.assign(v, attrsToChange);
@@ -298,11 +311,13 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 						agilityMod += agilityEffects[attr];
 						movementMod += movementEffects[attr];
 						evadeMod += evadeMods[attr];
+						jumpMod += jumpMods[attr];
 					}
 				}
 				attrsToChange["GE_mod_advantages_disadvantages"] = agilityMod;
 				attrsToChange["GS_mod_advantages_disadvantages"] = movementMod;
 				attrsToChange["k_ausweichen_mod_vorteile_nachteile"] = evadeMod;
+				attrsToChange["jump_mod_advantages_disadvantages"] = jumpMod;
 
 				if (swiftEncumbranceHint)
 				{
