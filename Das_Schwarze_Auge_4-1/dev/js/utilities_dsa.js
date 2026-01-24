@@ -175,6 +175,17 @@ function DSAsane (value, type) {
 		}
 	}
 
+	function limitedNumberValid(value, minimum, maximum) {
+		if (isNaN(value)
+		|| isNaN(parseFloat(value))
+		|| parseFloat(value) < minimum
+		|| parseFloat(value) > maximum) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	switch(type) {
 		case "int":
 			// General
@@ -190,6 +201,15 @@ function DSAsane (value, type) {
 			// Must be number of parseInt()-able number
 			// Non-negative integer
 			if (!limitedIntValid(value, 0, Infinity)) {
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
+				sane = false;
+			}
+			break;
+		case "non-negative number":
+			// General
+			// Must be number or parseFloat()-able number
+			// Non-negative number
+			if (!limitedNumberValid(value, 0, Infinity)) {
 				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
 				sane = false;
 			}
