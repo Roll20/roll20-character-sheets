@@ -772,6 +772,57 @@ on(attrsWS.map(attr => "change:" + attr).join(" ").toLowerCase(),
 		});
 });
 
+/* Jump base values */
+const attrsJumps = [
+	'GE',
+	'KK',
+	'BE',
+	'jump_mod_advantages_disadvantages',
+];
+Object.freeze(attrsJumps);
+
+on(attrsJumps.map(attr => "change:" + attr).join(" ").toLowerCase(),
+	function() {
+		const caller = "Action Listener for Jump base values";
+		safeGetAttrs(
+			attrsJumps, function(v) {
+				// Boilerplate
+				/// Conversion factors for length units used: 1 Spann = 20 cm, 1 Schritt = 1 m
+				const facSchrittPerSpann = 0.2;
+				const minDistance = 0;
+				let attrsToChange = {};
+
+				// Base value used in all calculations
+				let jumpsBase = v["GE"] + v["KK"] - v["BE"] + v["jump_mod_advantages_disadvantages"];
+				/// Conversion to Schritt
+				jumpsBase = jumpsBase * facSchrittPerSpann;
+
+				// Calculation of the single jump distances
+				attrsToChange["jump_long_runup_distance"] = jumpsBase;
+				attrsToChange["jump_long_stand_distance"] = jumpsBase / 2;
+				attrsToChange["jump_high_runup_distance"] = jumpsBase / 4;
+				attrsToChange["jump_high_stand_distance"] = jumpsBase / 8;
+
+				/// DSA rounding to two decimal figures (cm precision is enough)
+				for (attr in attrsToChange)
+				{
+					attrsToChange[attr] = DSAround(100 * attrsToChange[attr]) / 100;
+					attrsToChange[attr] = Math.max(minDistance, attrsToChange[attr]);
+				}
+
+				// Sanity checking
+				for (attr in attrsToChange)
+				{
+					if (!DSAsane(attrsToChange[attr], "non-negative number"))
+					{
+						delete attrsToChange[attr];
+						debugLog(caller, `${attr} ließ sich nicht berechnen. Erhaltene Attribute: ${JSON.stringify(v)}.`);
+					}
+				}
+				safeSetAttrs(attrsToChange);
+		});
+});
+
 /* AP ('Abenteuerpunkte', Adventure Points) */
 const attrsAP = [
 	'AP_gesamt',

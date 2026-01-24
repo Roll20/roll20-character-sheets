@@ -96,6 +96,10 @@ const defaultValues = {
 	"KE": 0,
 	"KE_max": 0,
 
+	"jump_long_runup_distance": 3.20,
+	"jump_long_stand_distance": 1.60,
+	"jump_high_runup_distance": 0.80,
+	"jump_high_stand_distance": 0.40,
 	"jump_mod_advantages_disadvantages": 0,
 
 	"ap_verfuegbar": 0,
