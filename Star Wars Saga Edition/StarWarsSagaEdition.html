@@ -583,7 +583,7 @@
 				<div class="DRBody" >
 					<h4 data-i18n="damage_reduction">Damage Reduction</h4>
 					<input type="checkbox" class="hidden sect-show" value="1" name="attr_ArmorDRHouseRule"/>
-					<div class="sect2">
+					<div class="sect2 inline-block">
 						<input type="number" name="attr_DR" placeholder="0" value="" title="Damage Reduction @{DR}" />
 					</div>
 					<div class="sect">
@@ -591,7 +591,7 @@
 							<div>
 								<span class="small bold">Total DR</span>
 								<br />
-								<input type="number" name="attr_TotalDR" disabled="true" value="@{ArmorRef}[ArmorDR]+@{DR}[Misc]" title="Total Damage Reduction @{TotalDR}" />
+								<input type="number" name="attr_TotalDR" disabled="true" value="@{ArmorDRRef}[ArmorDR]+@{DR}[Misc]" title="Total Damage Reduction @{TotalDR}" />
 							</div>
 							<div>
 								<br/>
@@ -600,7 +600,7 @@
 							<div>
 								<span class="small bold">Armor DR</span>
 								<br />
-								<input type="number" name="attr_ArmorRef" value="0" title="Armor Reflex Defense Bonus @{ArmorRef}" />
+								<input type="number" name="attr_ArmorDRRef" readonly value="0" title="DR from Armor @{ArmorDRRef}" />
 							</div>
 							<div>
 								<br/>
@@ -9056,13 +9056,14 @@ var ArmorPerception = function() {
 };
 
 var ArmorUpdate = function() {
-	getAttrs(["ArmorWornCheck", "ArmorDefense", "ImpArmorDefense", "ArmorProf", "ArmorRef", "level", "ArmorType", "ArmorDex", "DEX", "RefMod", "ArmorDRHouseRule"], function(v) {
+	getAttrs(["ArmorWornCheck", "ArmorDefense", "ImpArmorDefense", "ArmorProf", "ArmorRef", "level", "ArmorType", "ArmorDex", "DEX", "RefMod", "ArmorDRHouseRule", "ArmorDRRef"], function(v) {
 	let ArmorWornCheck = parseInt(v.ArmorWornCheck)||0;
 	let ArmorDefense = parseInt(v.ArmorDefense)||0;
 	let ImpArmorDefense = parseInt(v.ImpArmorDefense)||0;
 	let ArmorProf = parseInt(v.ArmorProf)||0;
 	let ArmorRef = parseInt(v.ArmorRef)||0;
 	let DRHR = parseInt(v.ArmorDRHouseRule)||0;
+	let ArmorDRRef = parseInt(v.ArmorRef)||0;
 	let level = parseInt(v.level)||0;
 	let ArmorType = v.ArmorType;
 	let ArmorDex = parseInt(v.ArmorDex)||0;
@@ -9084,6 +9085,7 @@ var ArmorUpdate = function() {
 			armorPenalty = "0";
 			if(DRHR == 1) {
 				armorReflex = level;
+				if(ImpArmorDefense == 1) {ArmorDRRef = Math.floor(1.5*ArmorRef);}
 			}
 			else if(ArmorDefense != 1 ) {
 				armorReflex = "@{ArmorRef}";
@@ -9103,7 +9105,8 @@ var ArmorUpdate = function() {
 		}
 		else {
 			console.log("==== Not Proficient in Armor ====");
-			armorReflex = "@{ArmorRef}";
+			if(DRHR == 1) {armorReflex = level;}
+			else {armorReflex = "@{ArmorRef}";}
 			armorFortitude = "@{level}";
 			//Armor Penalty
 			switch (v["ArmorType"]) {
@@ -9119,21 +9122,22 @@ var ArmorUpdate = function() {
 					break;
 			};
 		}
+		setAttrs({ "ArmorDRRef": ArmorDRRef});
 	}
 	else {
-			console.log("==== Not Wearing Armor ====");
-			armorReflex = "@{level}";
-			armorFortitude = "@{level}"
-			armorPenalty = "0";
-			setAttrs({"ArmorCarry": "0"}); //Armor is not Carried
-		}
-
+		console.log("==== Not Wearing Armor ====");
+		armorReflex = "@{level}";
+		armorFortitude = "@{level}"
+		armorPenalty = "0";
+		ArmorDRRef = 0;
+		setAttrs({"ArmorCarry": "0", "ArmorDRRef": ArmorDRRef}); //Armor is not Carried
+	}
 	console.log("armorReflex = " + armorReflex + '\n' + "armorFortitude = " + armorFortitude + '\narmorPenalty = ' + armorPenalty );
-		setAttrs({
-			"RefLevel_max": armorReflex,
-			"FortLevel_max": armorFortitude,
-			"ArmorType_max": armorPenalty
-		});
+	setAttrs({
+		"RefLevel_max": armorReflex,
+		"FortLevel_max": armorFortitude,
+		"ArmorType_max": armorPenalty
+	});
 
 	//Determine which Dex mod to use
 	dexMod = Math.floor((parseInt(v["DEX"],10) - 10) / 2);
