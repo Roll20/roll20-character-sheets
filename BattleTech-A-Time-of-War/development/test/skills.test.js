@@ -8,33 +8,9 @@ import {
     getSkillDisplayName
 } from '../src/skills'
 
-// Get normal or tiered skill
-test('should get basic tiered skill', () => {
-    expect(getSkill('computers', 3, true)).toStrictEqual({
-        "linkedAttributes": ["intelligence_link", ],
-        "targetNumber": 8,
-        "complexity": "CB",
-        "subSkills": false,
-        "displayName": {
-            "computers": "Computers",
-        },
-    })
-})
-
-test('should get advanced tiered skill', () => {
-    expect(getSkill('martial', 4, true)).toStrictEqual({
-        "linkedAttributes": ["reflex_link", "dexterity_link", ],
-        "targetNumber": 8,
-        "complexity": "SA",
-        "subSkills": false,
-        "displayName": {
-            "martial_arts": "Martial Arts",
-        },
-    })
-})
-
-test('should get normal skill', () => {
-    expect(getSkill('leadership', 7, false)).toStrictEqual({
+// Get skill
+test('should get skill', () => {
+    expect(getSkill('leadership')).toStrictEqual({
         "linkedAttributes": ["will_link", "charisma_link", ],
         "targetNumber": 8,
         "complexity": "SA",

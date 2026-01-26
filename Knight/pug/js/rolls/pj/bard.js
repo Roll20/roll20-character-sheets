@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable camelcase */
 /* eslint-disable no-undef */
 on('clicked:distanceBard', async (info) => {

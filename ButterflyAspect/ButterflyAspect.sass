@@ -1,31 +1,38 @@
 $sizes: (full: 100%, threequarters: 75%, half: 50%, quarter: 25%)
 
-@mixin grid_skill
-  display: grid
-  grid-template-columns: 530px 120px 60px 60px 55px
-  grid-gap: 5px
+$textdark: #373b44
+$textlight: #C8C4BB
+$borderdark: #373b44
+$borderlight: #C8C4BB
+$backgrounddark: #2b2b2b
+$backgroundlight: #f5f5f5
 
-@mixin grid_weapons
+@mixin grid($columns, $gap, $a_content: null, $j_content: null,  $a_items: null, $j_items: null)
   display: grid
-  grid-template-columns: 530px 120px 60px 60px 55px
-  grid-gap: 5px
-
-@mixin grid_mage
-  display: grid
-  grid-template-columns: 100px 350px 60px 60px 60px 60px 60px 55px
-  grid-gap: 5px
-
-input::read-only
-  cursor: not-allowed
+  grid-template-columns: $columns
+  grid-gap: $gap
+  @if $a_content != null
+    align-content: $a_content
+  @if $j_content != null
+  justify-content: $j_content
+  @if $a_items != null
+  align-items: $a_items
+  @if $j_items != null
+  justify-items: $j_items
 
 .sheetform
   background-color: transparent
 
 .charsheet
+  color: $textdark
+
   .container
     width: 850px
     padding: 0
     margin: 0
+
+    button
+      color: $textdark
 
     button[type="roll"]
       width: auto
@@ -41,25 +48,14 @@ input::read-only
       -moz-box-sizing: border-box
       -webkit-box-sizing: border-box
 
-      label
-        line-height: 24px
-        font-size: 13px
-        text-align: center
-        font-weight: 700
-
-      input
-        line-height: 24px
-        font-size: 13px
-        text-align: center
-        font-weight: 700
-
-    input
+    input:not([type=checkbox])
       background: transparent
       width: 100%
-      border: 1px solid #ddd
+      border: 1px solid $borderlight
       border-radius: 3px
 
-    input[type=number]
+    input[type=number],
+    input[type=text].center
       text-align: center
       -moz-appearance: textfield
       -webkit-appearance: textfield
@@ -71,14 +67,18 @@ input::read-only
       height: 65px
       resize: vertical
       box-sizing: border-box
-      border: 1px solid #ddd
+      border: 1px solid $borderlight
       border-radius: 3px
 
     select
       background: transparent
+      width: 100%
+      border: 1px solid $borderlight
+      border-radius: 3px
 
     label
       width: auto
+      color: $textdark
 
     .options-flag,
     .options-flag+span
@@ -103,13 +103,9 @@ input::read-only
         margin-top: 0
         display: none
 
-      ~ .hiddenBox,
-      ~ div .hiddenBox
-        display: none
-
-      &:checked ~ .hiddenBox,
-      &:checked ~ div .hiddenBox
-        display: inherit
+      &:not(:checked) ~ .hiddenBox,
+      &:not(:checked) ~ div .hiddenBox
+        display: none !important
 
     .number-20
       font-size: 20px
@@ -134,7 +130,7 @@ input::read-only
     .formular
       padding: 9px
       margin-top: 15px
-      border: 1px solid #ddd
+      border: 1px solid $borderlight
       border-radius: 3px
 
       label
@@ -145,7 +141,6 @@ input::read-only
         margin-bottom: 0px
         background: #fff
         padding: 2px 5px 2px 5px
-        color: #b9b9b9
         font-weight: normal
 
       input
@@ -154,7 +149,7 @@ input::read-only
 
     .gridplace
 
-      .repcontainer
+      &:not(.repcontrol)
 
         select
           border: none
@@ -162,23 +157,51 @@ input::read-only
 
         input,
         select,
-        button
+        button:not(.repcontrol_add):not(.repcontrol_edit):not(.repcontrol_del)
           width: -webkit-fill-available
           width: -moz-available
           -webkit-box-shadow: none
           -moz-box-shadow: none
           box-shadow: none
 
-        .repitem
+        .repitem,
+        .items
 
           &:nth-child(even)
-            background: #EEE
+            background: $backgroundlight
 
         .repcontrol_move
           float: left
 
         .repcontrol_del
           width: auto
+
+    .navigation
+      display: flex
+      flex-direction: row
+      justify-content: space-evenly
+
+      button
+        padding: calc(.5em + .45em) calc(.9em + .45em)
+        color: $textdark
+        background: conic-gradient(from 90deg at 3px 3px,#0000 90deg,$textdark 0) .45em .45em/calc(100% - 3px - 2*.45em) calc(100% - 3px - 2*.45em)
+        transition: .3s linear, color 0s, background-color 0s
+        font-size: 14px
+        border: 0
+        user-select: none
+        -webkit-user-select: none
+        touch-action: manipulation
+
+    .sheet-attribute_skills,
+    .sheet-weapons_mage,
+    .sheet-asects_inventory,
+    .sheet-xp
+        display: none
+
+    $buttons: (attribute_skills, weapons_mage, asects_inventory, xp)
+    @each $button in $buttons
+      .sheet-tabstoggle[value="#{$button}"] ~ div.sheet-#{$button}
+        display: block
 
     .header
       margin-bottom: 4px
@@ -209,124 +232,46 @@ input::read-only
         input
           height: 21px
 
-    .head
-      .head-logo
-        width: 200px
-        vertical-align: middle
+    .head-logo
+      vertical-align: middle
 
       .logo
         height: 200px
 
       .settings
+        margin-top: 20px
 
         select
           width: -webkit-fill-available
           width: -moz-available
 
-      .head-info
-        width: calc(100% - 200px)
+    .head-info
 
-        .head-info-boxes
-          width: 100%
-
-          >div
-
-            &:first-child
-              height: 36px
-
-          input
-            width: 100%
-            box-sizing: border-box
-
-          textarea
-            height: 64px
-            border: none
-
-          .formular
-            margin-bottom: 5px
-
-    .head-stats
-      display: flex
-      width: 100%
-      justify-content: space-between
-
-      >div
-        width: min-content
-        height: 36px
-
-      input
-        max-width: 100px
-        float: right
-        text-align: center
-
-      .formular
-
-        >input
-          width: -webkit-fill-available
-          width: -moz-available
-
-      button
-        display: block
-        float: left
-        margin-top: -21px !important
-        background: #fff
-        padding: 2px 5px 2px 5px !important
-        color: #b9b9b9
-        border: 1px solid #ddd
-        border-radius: 3px
-
-      button[type="roll"]
-
-        &:before
-          content: ""
-          display: none
-
-      .geisteskraft,
-      .koerperkraft
-        background: #fff
-        display: block
-        float: right
-        height: 26px
-        width: 50px !important
-        margin-top: -21px
-        margin-right: -5px
-        border: 1px solid
-
-      .koerperkraft
-        margin-top: -21px2
-
-      .health,
-      .spzanzahl
-        display: flex
-        width: max-content
-        font-size: x-large
-
-        input
-          max-width: 80px
-
-      .ressourcen
+      .head-info-boxes
+        width: 100%
 
         >div
-          width: max-content
-          margin: 14px auto
-          line-height: 10px
 
-          *
-            width: auto
-            float: left
+          &:first-child
+            height: 36px
 
-    .attribut
-      display: inherit
+        input
+          width: 100%
+          box-sizing: border-box
 
-      .attribut-stats
-        display: flex
-        width: 100%
-        justify-content: space-evenly
-        flex-flow: row wrap
+        textarea
+          height: 64px
+          border: none
 
         .formular
-          width: 21%
-          height: 56px
+          margin-bottom: 5px
+
+    .attribute,
+    .extra
+      display: inherit
+
+      .attribute-stats,
+      .extra-stats
 
         input
           width: -webkit-fill-available
@@ -337,10 +282,10 @@ input::read-only
           display: block
           float: left
           margin-top: -21px
-          background: #fff
+          background: var(--color-surface1)
           padding: 2px 5px 2px 5px
-          color: #b9b9b9
-          border: 1px solid #ddd
+          color: $textdark
+          border: 1px solid $borderlight
           border-radius: 3px
 
         button[type="roll"]
@@ -349,14 +294,33 @@ input::read-only
             content: ""
             display: none
 
+      .attribute-stats
+        @include grid(197px 197px 197px, 5px 20px)
+
+      .extra-stats
+        @include grid(197px, 5px 20px)
+
+        .formular
+
+          .max
+            background: var(--color-surface1)
+            display: block
+            float: right
+            height: 26px
+            width: 50px !important
+            margin-top: -21px
+            margin-right: -5px
+            border: 1px solid
+            margin-top: -21px2
+
     .skills
       display: inherit
 
       .grid
-        @include grid_skill
+        @include grid(530px 120px 60px 60px 55px, 5px)
 
         >div
-          background-color: #EEE
+          background-color: $backgroundlight
           font-weight: bold
           text-align: center
 
@@ -372,43 +336,198 @@ input::read-only
           width: -webkit-fill-available
           width: -moz-available
 
-        .repcontainer
+        .basicskills .items,
+        .repcontainer .repitem
+          @include grid(530px 120px 60px 60px 55px, 5px)
+          min-height: 40px
 
-          .repitem
+          select
+            width: -webkit-fill-available
+            width: -moz-available
+            box-shadow: none
 
-            .repeat-skill
-              @include grid_skill
-              min-height: 40px
+          input.liketextarea
+            width: 845px
+            height: 26px
+            border: 1px solid $borderlight
+            border-radius: 3px
 
-            input.liketextarea
-              width: 845px
-              height: 26px
-              border: 1px solid #ddd
-              border-radius: 3px
+          textarea
+            width: 845px
 
-            textarea
-              width: 845px
+          div
+            margin: auto 0
+            text-align: center
 
-            div
-              margin: auto 0
-              text-align: center
+    .status
+      position: relative
+      display: inherit
 
-            .repeat-weapon
+      .repeat-stress,
+      .repeat-mana
+        display: none
 
-              input.options-flag
-                width: auto
+      input#checkbox-stress[value="1"] ~ .repeat-stress,
+      input#checkbox-mana[value="1"] ~ .repeat-mana
+        display: block
 
-              &:hover .options-flag+span
+      .header,
+      .repeat-wounds,
+      .repeat-stress,
+      .repeat-mana
+        position: relative
+
+        input.options-flag
+          width: auto
+
+        &:hover .options-flag+span
+          display: block
+
+      .sheet-status-row
+
+        &.wounds
+          @for $i from 1 through 10
+            input#attr_usable_wounds[value="#{$i}"] ~div.wounds:nth-child(n+#{$i + 3})
+              display: none
+
+        &.stress
+          @for $i from 1 through 10
+            input#attr_usable_stress[value="#{$i}"] ~div.stress:nth-child(n+#{$i + 3})
+              display: none
+
+        &.mana
+          @for $i from 1 through 20
+            input#attr_usable_mana[value="#{$i}"] ~div.mana:nth-child(n+#{$i + 2})
+              display: none
+
+      .settings
+        position: relative
+        display: flex !important
+        flex-direction: row
+        justify-content: space-evenly
+
+        input
+          position: absolute
+          top: -10px
+          left: -10px
+          opacity: 0
+          width: 16px
+          min-height: 16px
+          z-index: 2
+
+        label
+          color: red
+          user-select: none
+          width: min-content
+
+        input:checked+label
+          color: green
+
+      .sheet-status-row
+        @include grid(repeat(10, 9%), 1%)
+
+        .statusbox
+          position: relative
+          width: min-content
+
+          input[type="checkbox"]
+            display: none
+            & + label
+              &::before
+                width: 30px
+                height: 30px
                 display: block
+                content: " "
+
+          label
+            display: inline-block
+            width: 30px
+            height: 30px
+            font-size: 30px
+            line-height: 30px
+            background-color: transparent
+            cursor: pointer
+            margin: 0
+            padding: 0
+
+          label.value
+            position: absolute
+            top: 7px
+            left: 16px
+            font-size: 25px
+            width: auto
+            user-select: none
+
+        &.wounds
+
+          input[type="checkbox"]
+
+            & + label
+              &::before
+                background-image: url("https://codeberg.org/ButterflyAspect/roll20-character-sheet/raw/branch/develop/img/heart_full.png")
+                background-repeat: no-repeat
+
+          input[type="checkbox"]:checked
+            & + label
+              &::before
+                background-image: url("https://codeberg.org/ButterflyAspect/roll20-character-sheet/raw/branch/develop/img/heart_empty.png")
+
+        &.stress
+
+          input[type="checkbox"]
+
+            & + label
+              &::before
+                background-image: url("https://codeberg.org/ButterflyAspect/roll20-character-sheet/raw/branch/develop/img/face_happy.png")
+                background-repeat: no-repeat
+
+          input[type="checkbox"]:checked
+            & + label
+              &::before
+                background-image: url("https://codeberg.org/ButterflyAspect/roll20-character-sheet/raw/branch/develop/img/face-dizzy.png")
+
+        &.mana
+
+          input[type="checkbox"]
+
+            & + label
+              &::before
+                background-image: url("https://codeberg.org/ButterflyAspect/roll20-character-sheet/raw/branch/develop/img/mage_stick_violet.png")
+                background-repeat: no-repeat
+
+          input[type="checkbox"]:checked
+            & + label
+              &::before
+                background-image: url("https://codeberg.org/ButterflyAspect/roll20-character-sheet/raw/branch/develop/img/mage_stick.png")
+
+    .consequences
+      display: inherit
+
+      .grid
+
+        .repeat-consequences
+          @include grid(90px 325px, 5px)
+
+      .repcontainer
+
+        .repitem
+
+          .repeat-consequences
+            @include grid(90px 325px, 5px)
+
+            select:not(:hover)
+              -webkit-appearance: none
+              -moz-appearance: none
+              appearance: none
 
     .weapons
       display: inherit
 
       .grid
-        @include grid_weapons
+        @include grid(470px 120px 90px 90px 55px, 5px)
 
         >div
-          background-color: #EEE
+          background-color: $backgroundlight
           font-weight: bold
           text-align: center
 
@@ -429,13 +548,13 @@ input::read-only
           .repitem
 
             .repeat-weapon
-              @include grid_weapons
+              @include grid(470px 120px 90px 90px 55px, 5px)
               min-height: 40px
 
             input.liketextarea
               width: 845px
               height: 26px
-              border: 1px solid #ddd
+              border: 1px solid $borderlight
               border-radius: 3px
 
             textarea
@@ -464,18 +583,15 @@ input::read-only
         width: -webkit-fill-available
         width: -moz-available
 
-        &::before
-          content: ""
-
         input
           padding: 0
           pointer-events: none
 
       .grid
-        @include grid_mage
+        @include grid(500px 90px 90px 90px 55px, 5px)
 
         >div
-          background-color: #EEE
+          background-color: $backgroundlight
           font-weight: bold
           text-align: center
 
@@ -486,7 +602,7 @@ input::read-only
           .repitem
 
             .repeat-mage
-              @include grid_mage
+              @include grid(500px 90px 90px 90px 55px, 5px)
               min-height: 40px
 
               input.options-flag
@@ -495,28 +611,10 @@ input::read-only
               &:hover .options-flag+span
                 display: block
 
-              div.select-3
-                width: 42px
-                margin: auto
-
-              div.select-4
-                width: 56px
-                margin: auto
-
               div.hiddenBox
-                grid-template-columns: 60px 60px 60px 60px 60px 60px 60px 60px 60px 60px 60px 60px 60px
-                grid-gap: 5px
+                @include grid(165px 165px 165px 165px 165px, 5px)
                 grid-template-rows: auto
-                grid-template-areas: ". . . . . . . . . . attribut damage healing" "textarea textarea textarea textarea textarea textarea textarea textarea textarea textarea textarea textarea textarea"
-
-                #attribut
-                  grid-area: attribut
-
-                #damage
-                  grid-area: damage
-
-                #healing
-                  grid-area: healing
+                grid-template-areas: ". . . . ." "textarea textarea textarea textarea textarea"
 
                 #textarea
                   grid-area: textarea
@@ -524,6 +622,12 @@ input::read-only
             input[type="checkbox"]
               width: auto
               float: left
+
+            input[name="attr_spelleffekt"]
+              width: calc(100% - 18px)
+
+            input[name="attr_spelleffekt_wiederstand"]
+              float: none
 
             div
               margin: auto 0
@@ -603,19 +707,22 @@ input::read-only
 
 .sheet-darkmode
 
+  input.readonly
+    cursor: not-allowed
+
   button,
   input,
   optgroup,
   select,
   textarea,
   .charsheet
-    color: #EEE
+    color: #C8C4BB
 
   .btn,
   .btn.btn-default
-    color: rgb(200, 195, 188)
+    color: $textlight
     text-shadow: rgba(24, 26, 27, 0.75) 0px 1px 1px
-    background-color: rgb(30, 32, 33)
+    background-color: $backgrounddark
     background-image: linear-gradient(rgb(24, 26, 27), rgb(38, 41, 43))
     border-color: rgb(62, 68, 70) rgb(62, 68, 70) rgb(67, 73, 76)
     box-shadow: rgba(24, 26, 27, 0.2) 0px 1px 0px inset, rgba(0, 0, 0, 0.05) 0px 1px 2px
@@ -632,36 +739,50 @@ input::read-only
       optgroup,
       select,
       textarea
-        border-color: rgb(58, 62, 65)
+        border-color: $borderdark
+        color: $textlight
+
+      .navigation
+        display: flex
+        flex-direction: row
+        justify-content: space-evenly
+
+        button
+          padding: calc(.5em + .45em) calc(.9em + .45em)
+          color: $textlight
+          background: conic-gradient(from 90deg at 3px 3px,#0000 90deg,$textlight 0) .45em .45em/calc(100% - 3px - 2*.45em) calc(100% - 3px - 2*.45em)
+          transition: .3s linear, color 0s, background-color 0s
 
       .formular
-        border-color: rgb(58, 62, 65)
+        border-color: $borderdark
 
         label,
-        button,
-        .geisteskraft,
-        .koerperkraft
+        button
           background-color: var(--dark-surface1)
-          color: rgb(188, 182, 173)
+          color: $textlight
 
-        button,
-        .geisteskraft,
-        .koerperkraft
-          border-color: rgb(58, 62, 65)
+        button
+          border-color: $borderdark
 
       .gridplace
 
-        .repcontainer
+        .repitem,
+        .items
 
-          .repitem:nth-child(2n)
-            background-color: rgb(34, 36, 38)
+          &:nth-child(even)
+            background-color: $borderdark
+
+      .navigation
+
+        button
+          --color: $textlight
 
       .skills,
       .weapons,
       .mage
 
         .grid > div
-          background-color: rgb(34, 36, 38)
+          background-color: $borderdark
 
 .sheet-rolltemplate-butterfly
 
@@ -696,11 +817,15 @@ input::read-only
         padding: 5px
 
         &:nth-child(even)
-          background: #EEE
+          background: $backgroundlight
 
         span
           margin-left: 15px
           font-weight: bold
+
+        .sheet-text
+          margin-left: 20px
+          font-weight: normal
 
       .sheet-desc
         grid-column: span 2

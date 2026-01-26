@@ -1,5 +1,36 @@
 Change Log
 ==============================================
+**2025-11-13 ** v.92 Chuz (James Culp)
+	Added Patterncraft to skills
+**2025-07-15 ** v.91 Chuz (James Culp)
+	Bugfix - Minor bugfixes
+**2025-07-11 ** v.91 Karovex
+	Added 'fade_compiling_modifier' to support the Sprite Conduit echo bonus
+	Added 'sprite_resist_dv_modifier' to suppor the Technoshaman compiling DV reduction
+	Added Sprite levels 11-15
+	Added New Sprite Types (Assassin, Defender, Modular, Music, Primal)
+	Added CM and OS trackers per sprite
+	Added Register Sprite macro chain
+	Bugfix - While Compiling a Sprite, the 'Resist Fade' macro will now roll the proper stats (Willpower+Charisma instead of Willpower+Logic)
+**2025-03-16 ** v.90 Chuz (James Culp)
+	Added i18n values for translating many placeholders and some other labels throughout the Player facing sheet.  Thanks to Talon_Zorch for his hard work translating the sheet on Crowdin and compiling the list for me to add.
+**2024-10-11 ** v.88 Chuz (James Culp)
+	Added lwa spirits from Shadows In Focus: That Old Voodoo to the Spirit NPC sheet.  (Agwe, Azaca, Damballah, Erzulie, Ghede, Legba, Obatala, Ogoun and Shango)
+**2024-06-05 ** v.87 Chuz (James Culp)
+	Bugfix - Found an issue with imports where items would be dropped mysteriously.  This affected anything that was in a repeating list and was tied to unique ids within Roll20.  Added another check to prevent duplicate ids.
+**2024-03-03 ** v.86 Chuz (James Culp)
+	Bugfix - Essence Mod works again
+	Added Omega, Exoware and Gammaware to Augmentation grade drop downs and essence calculations.  They do not however add the bad luck quality or extra condition monitor boxes when selected.
+**2023-09-04 ** v.85 Chuz (James Culp)
+	New Feature - GM Helper sheet, added extended test and d6 roll buttons so GMs can roll from the sheet if needed.
+	Bugfix - PC Vehicles tab, handling mod was only reflected on the onroad handling value not the offroad value when settings mode was turned off.
+	Bugfix - GM Helper sheet, incrementing OS using the + button was doing strange things, this has been fixed.
+**2023-07-10 ** v.84 Chuz (James Culp)
+	Bugfix - AoE Spells weren't adding the right amount of drain for 12m and 14m
+	Bugfix - Attribute+Attribute selections were missing Strength
+	New Feature - skill mods in the repeating skill list now should update those skills everywhere in the sheet.
+	Bugfix - Sprint rolls now include -1 skill modifier if the PC doesn't have an Athletics skill.  Also added a function to resynch the hidden skill attributes any time a skill name is changed (via the drop down changing) or a skill is deleted.
+	Bugfix - Fixed the increment button on the OS Tracker it now adds 1 instead of concatenating a 1 after the other digits sometimes.
 **2023-06-15 ** v.83 Chuz (James Culp)
 	New Feature - Beginning work on the GM Helper sheet, step 1 add an OS Tracker.  I'm open to suggestions for other helpful GM tools to include in this sheet in the usual venues (Discord, Patreon, Roll20 DMs)
 	New Feature - GMs rejoice, select a token on the board and click the "Track Selected" button on the GM Helper character sheet to add the selected character's name and A/S/D/F to the tracker.

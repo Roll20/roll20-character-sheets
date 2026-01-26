@@ -1,29 +1,57 @@
-@font-face {
-  font-family: 'Play';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Play-Bold'), url(http://themes.googleusercontent.com/static/fonts/play/v4/ZzUearZLklGfoL18Ti0GaQ.woff) format('woff');
+@import url('https://fonts.googleapis.com/css?family=Play:wght@400&display=swap');
+
+input.tab::before,
+.textHead > span,
+.textHead,
+.textHead2Col,
+.character-record {
+    font-family: 'Play', 'Tahoma', sans-serif;
+    letter-spacing: 1px;
 }
 
 :root {
 	/* Light mode colors */
-  --sheet-text: #000;
+  --sheet-text: #333;
+  --active-tab-bg1:#dcdcdc;
+  --active-tab-bg2:#fcfcfc;
+  --inactive-tab-bg1:#fff;
+  --inactive-tab-bg2:#c8c8c8;
   --input-border: #222;
   --input-border-top: #ccc;
   --input-disabled-bg:#e3e3e3;
   --input-disabled-border:#444;
   --input-disabled-border-top:#999;
+  --input-darker-text: #333;
+  --checkbox-accent: #606060; /* This is now unused on the sheet because of visible-checkbox */
+  --checkbox-bg:#eee;
+  --checkbox-checked-bg:#ddd;
+  --checkbox-border:#8f8f9d;
+  --checkbox-checked-border:#0b0b0b;
+  --checkbox-check:#222;
+  --checkbox-disabled-bg:#cecece;
+  --checkbox-disabled-check:#606060;
+  --toggle-bar: #eeeefb;
+  --toggle-bar-checked: #cacad5;
+  --toggle-shadow: #4441;
   --header-bg: #000;
+  --header-bg-highlight: #333;
+  --col1-bg:#a7a8aa;
+  --col1-bg-2:#c6c7ca;
+  --col1-bg-2-highlight:#d7d8db;
   --header-text: #fff;
-  --button-border: #d0d0d0;
-  --button-bg: #a7a8aa;
+  --header-text-highlight: #b9b9b9;
+  --clickable-highlight: #0004;
+  --roll-button-border: #d0d0d0;
+  --roll-button-bg: #a7a8aa;
   --button-inset: #ffffff80;
   --button-image: #000000;
   --button2-text: #333;
-  --checkbox-accent: #606060;
-  --persistent-checked-bg: #888;
-  --persistent-checked-inset: #6668;
-  --persistent-checked-textshadow: #707070c0;
+  --rule-borders: #777;
+  --ct-checked-text: #fff;
+  --ct-checked-bg: #888;
+  --ct-checked-inset1: #5559;
+  --ct-checked-inset2: #bbb9;
+  --ct-checked-textshadow: #707070c0;
   --button-border: #8886;
   --button-border-bot: #7776;
   --button-text-shadow: #ffffffc0;
@@ -32,10 +60,37 @@
   --button-gradient2: #e6e6e6;
   --button-shadow1: #ffffff33;
   --button-shadow2: #0000000d;
+  --bonuses-bg: #7794;
+  --bonuses-skills-bg: #0000000c;
+  --bonuses-skills-border: #8a8aa844;
+  --bonuses-toggle-shadow: #4444;
+  --scrollbar1-thumb: #a7a7ae;
+  --scrollbar1-shaft: #d3d3dc;
+  --scrollbar2-thumb: #9090ae;
+  --scrollbar2-shaft: #d9d9e6;
+}
+
+.ui-dialog {
+    scrollbar-color: var(--scrollbar1-thumb) var(--scrollbar1-shaft);
 }
 
 .center {
-    text-align: center;
+    text-align: center; /* Used inside block elements */
+    justify-content: center; /* Used if display is grid or flex */
+}
+
+.center2 {
+    margin-left:50%!important;
+    transform:translate(-50%);
+}
+
+.vertical-center {
+    display:flex;
+    align-items: center;
+}
+
+.vertical-center2 {
+    align-self: center;
 }
 
 .left {
@@ -46,42 +101,44 @@
     text-align: right;
 }
 
-.charsheet h3 {
-    margin-bottom:0;
+.bold {
+    font-weight: bold;
 }
- 
-.charsheet .sheet-small, 
-.charsheet .sheet-smallSkills {
+
+.charsheet .small,
+.charsheet .smallSkills {
     font-size: 10px;
     line-height:9px;
 }
-.charsheet .sheet-smallSkills{
+
+.charsheet .smallSkills{
     margin-left:15px;
 }
- 
+
 .charsheet label {
     display: inline-block;
-    text-align: right;
-    font-size:14px;     
+    font-size:14px;
     width: auto;
+	margin-bottom: 0px;
+    padding-right:0px;
 }
- 
+
 .long {
     width: 100px;
 }
- 
+
 .charsheet input,
 .charsheet select {
     border: 1px solid var(--input-border);
     border-top-color: var(--input-border-top);
-    display: inline-block; 
+    display: inline-block;
+    border-radius: 5px;
 }
 
 .charsheet input[disabled],
 .charsheet input[readonly],
-.defaultCrew:not(:checked) ~ .defaultCrewLock {
-	-webkit-appearance: textarea;
-	-moz-appearance: textfield;
+.defaultCrew:not(:checked) ~ .defaultCrewLock:not([type="checkbox"]) {
+    appearance:textfield!important; /* Otherwise, this will get overridden by the input[type="number"]:hover selector rule */
 	cursor: default;
 	border-color: var(--input-disabled-border);
 	border-top-color: var(--input-disabled-border-top);
@@ -90,105 +147,750 @@
 	outline: none;
 }
 
+.charsheet .defaultCrew:not(:checked) ~ .defaultCrewLock[type="checkbox"] {
+    background-color: var(--checkbox-disabled-bg);
+}
+
+.charsheet .defaultCrew:not(:checked) ~ .defaultCrewLock[type="checkbox"]:before {
+    background-color: var(--checkbox-disabled-check);
+}
+
+input[type="number"] {
+    appearance:textfield;
+}
+
+input[type="number"]:hover {
+    appearance:initial;
+}
+
 .charsheet input[disabled]::-webkit-outer-spin-button,
 .charsheet input[disabled]::-webkit-inner-spin-button,
 .charsheet input[readonly]::-webkit-outer-spin-button,
 .charsheet input[readonly]::-webkit-inner-spin-button {
-	/* This is necessary for Chrome, since the spin buttons still take up space in disabled input boxes, even while invisible. */
+	/* This is necessary for Chrome, since the spin buttons still take up space in disabled and readonly input boxes, even while invisible. */
 	display:none;
 }
- 
-.charsheet input.header {   
+
+.charsheet input.header {
     width: 100%;
 }
- 
+
 .classHeader {
-    width: calc(100% - 300px) !important; 
+    width: calc(100% - 300px) !important;
 }
- 
-.charsheet div.sheet-record {
-    font-size: 14px;
+
+input:focus-visible {
+    /* Could also adjust the outline, but this is specific to each browser. */
+    z-index: 1;
+    position: relative;
+}
+
+input.tab[type="radio"]:focus {
+    outline: none!important;
+    outline-offset: 0px;
+}
+
+/* ******** GRIDS ******** */
+
+.flex-break {
+    flex-basis: 100%;
+    height: 0;
+}
+
+.flex-texthead {
+    height:21px;
+    margin-right:-2px;
+}
+
+.charsheet .grid-title {
     font-weight: bold;
-    text-align:center;    
-    width:300px;
-    float:right;
+    text-align: center;
+    justify-content: center;
+    align-self: end;
+    line-height: 15px;
+    margin-top:4px;
 }
- 
+
+.repcontrol {
+    margin-bottom: 15px;
+}
+
+/* Bonuses and Penalties Grid */
+.repcontainer[data-groupname="repeating_bonuses"] > .repitem {
+    display:inline-block;
+    width:33.33%;
+}
+
+.repcontainer[data-groupname="repeating_bonuses"] {
+    display:flex;
+    flex-wrap:wrap;
+}
+
+.bonuses-grid {
+    display:grid;
+    grid-template-columns: 3fr 2fr;
+    gap:4px;
+    margin:4px;
+    border: 1px solid var(--rule-borders);
+    border-radius:5px;
+    padding: 5px;
+    box-sizing: content-box;
+}
+
+.bonuses-header {
+    grid-column: 1/3;
+    display: flex;
+    gap: 4px;
+}
+
+.bonuses-header input[type="text"] {
+    width: calc(100% - 65px);
+    color: var(--input-darker-text);
+}
+
+.bonus-categories-grid {
+    margin: 6px 2px 4px 4px;
+    display:grid;
+    grid-template-columns: 1fr 3fr 2fr;
+    row-gap: 2px;
+}
+
+.bonuses-grid .bonus-categories-grid label,
+.bonuses-grid .bonus-categories-grid h4 {
+    font-size:13px;
+}
+
+.bonuses-grid select {
+    width: auto;
+}
+
+.bonuses-defenses > div {
+    display:inline-flex;
+    margin-left: -5px;
+    margin-right: -5px;
+    width: 100%;
+}
+
+.bonuses-defenses div div {
+    flex-basis: 50px;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.bonuses-skills {
+    grid-column-start: span 2;
+    height: 200px;
+    overflow: scroll;
+    border-style: inset;
+    border-width: 2px;
+    padding: 5px;
+    background-color: var(--bonuses-skills-bg);
+    border-radius: 5px;
+    border-color: var(--bonuses-skills-border);
+}
+
+/* If the bonus is active */
+.bonuses-grid:has(.bonuses-header .visible-checkbox:checked) {
+    background-color: var(--bonuses-bg);
+    outline: 1px solid var(--rule-borders);
+    scrollbar-color: var(--scrollbar2-thumb) var(--scrollbar2-shaft);
+}
+
+.bonuses-header .visible-checkbox:checked ~ input[type="text"] {
+    font-weight:bold;
+}
+
+.bonuses-header .visible-checkbox:checked ~ label.toggle-bar {
+    box-shadow: 0px 0px 6px 1px var(--bonuses-toggle-shadow) inset;
+}
+
+/* Vitals Grid (HP, Threshold, Condition Track, Second Wind) */
+.vitals-grid {
+    display: grid;
+    grid-template-columns: 7fr 3fr;
+    column-gap: 6px;
+    row-gap: 8px;
+    text-align: center;
+}
+
+.vitals-grid-hp,
+.vitals-grid-sw,
+.vitals-grid-dt {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+}
+
+.vitals-grid-hp {
+    grid-area: 1/1/span 1/span 1;
+}
+
+.vitals-grid-sw {
+    grid-area: 2/1/span 1/span 1;
+}
+
+.vitals-grid-ct {
+    grid-area: 1/2/span 2/span 1;
+}
+
+.vitals-grid-dt {
+    grid-area: 3/1/span 1/span 2;
+}
+
+/* Defenses grid section */
+.defenses-grid {
+    display:grid;
+    grid-template-columns:72px repeat(4,1fr) 1.5fr 1fr;
+    grid-template-rows:auto;
+    justify-content: center;
+    column-gap: 4px;
+    row-gap:1px;
+    margin-bottom: 18px;
+}
+
+.charsheet .defenses-grid input[type="number"] {
+    width:100%;
+}
+
+.charsheet .defenses-grid select.modtype {
+    width:auto;
+    min-width: 72px;
+}
+
+.defenses-grid textarea {
+    grid-column-start:span 7;
+}
+
+.defenses-grid .col1 {
+    padding-right: 5px;
+}
+
+.defenses-grid .shift-left {
+    margin-left: -3px;
+}
+
+/* Attacks grid section */
+.attacks-grid {
+    display:grid;
+    grid-template-columns:50px 3fr repeat(6,1fr) 2fr 1fr 2fr;
+    grid-template-rows:auto;
+    justify-content: center;
+    grid-row-gap: 1px;
+    grid-column-gap: 2px;
+}
+
+.attacks-grid-attack-title.col1,
+.attacks-grid-damage-title.col1 {
+    display:flex;
+    height:100%;
+    font-size: 13px;
+    background-color:var(--col1-bg-2);
+    cursor: pointer;
+}
+
+.sectAttack-show:checked ~ label.col1:hover {
+    background-color: var(--col1-bg-2-highlight);
+}
+
+.attacks-grid-weapon-name {
+    grid-column:2/9;
+    color: var(--input-darker-text);
+    font-weight:bold;
+    width:100%;
+}
+
+.attacks-grid-damage-type {
+    grid-column:9/12;
+    width:100%;
+}
+
+.attacks-grid-full-details {
+    grid-column:1/2;
+    margin-top:3px!important;
+}
+
+.attacks-grid-attack-title {
+    grid-column:2/3;
+}
+
+.attacks-grid-attack-total {
+    grid-column:3/8;
+}
+
+.sectAttack-show:not(:checked) ~ .attacks-grid-attack-title,
+.sectAttack-show:not(:checked) ~ .attacks-grid-damage-title {
+    pointer-events: none;
+}
+
+.sectAttack-show:not(:checked) ~ .attacks-grid-attack-total {
+    grid-column:3/6;
+    text-align:left;
+}
+
+.attacks-grid-damage-title {
+    grid-column: 2/3;
+}
+
+.sectAttack-show:not(:checked) ~ .attacks-grid-damage-title {
+    grid-column:6/9;
+}
+
+.attacks-grid-weapon-damage {
+    grid-column: 3/5;
+    width:100%;
+}
+
+.sectAttack-show:not(:checked) ~ .attacks-grid-weapon-damage {
+    grid-column:9/10;
+}
+
+.sectAttack-show:not(:checked) ~ .attacks-grid-damage-plus {
+    grid-column:10/11;
+}
+
+.attacks-grid-damage-total {
+    grid-column: 6/8;
+    width:100%;
+}
+
+.sectAttack-show:not(:checked) ~ .attacks-grid-damage-total {
+    grid-column: 11/12;
+}
+
+.attacks-grid-crit-info {
+    grid-column: 2/10;
+    font-weight:bold;
+    justify-content: space-around;
+}
+
+.attacks-grid-formulas {
+    grid-column: 2/12;
+}
+
+.repcontainer[data-groupname="repeating_attack"] .repitem:first-child {
+    margin-top: 2px;
+}
+
+.repcontainer[data-groupname="repeating_attack"] .repitem:not(:last-child) {
+    margin-bottom: 5px;
+}
+
+/* Skills Grid */
+.skills-grid {
+    display:grid;
+    align-items:center;
+    grid-template-columns:50px 4fr 1.8fr 2fr 0.4fr 2.7fr 1fr 1fr 2fr;
+    grid-template-rows:auto;
+    grid-row-gap: 2px;
+    grid-column-gap: 4px;
+    margin-bottom: 1px;
+}
+
+.skills-grid .skills-grid-name {
+    grid-column: 1/3;
+    min-width: 125px;
+    padding-left: 5px;
+}
+
+.skills-grid .skills-grid-name label {
+    padding-right: 0px;
+    font-size:13px;
+    color:var(--sheet-text);
+}
+
+.charsheet .skills-grid button[type="roll"] {
+    margin:0px;
+}
+
+.charsheet .skills-grid select,
+.charsheet .skills-grid input[type="number"],
+.skills-grid input[type="text"] {
+    width:100%!important;
+}
+
+.skills-grid select {
+    padding-left: calc(10% - 2px);
+    padding-right: 0px;
+}
+
+.skills-grid .skills-grid-notes {
+    grid-column: 2/10;
+    display:flex;
+    justify-content: space-between;
+}
+
+.skills-grid .skills-grid-formulas {
+    grid-column: 2/10;
+}
+
+.skills-grid-formulas input {
+    font-size: 12px;
+}
+
+/* Force Power/Suite and Starship Maneuvers Grid */
+.powers-flex-container {
+    display:flex;
+    justify-content:space-evenly;
+    padding: 2px;
+}
+
+.powers-flex-container label,
+.maneuvers-flex-container label {
+    font-size:13px;
+    padding-right:0px;
+}
+
+#individual-powers:checked ~ textarea,
+#power-suite:checked ~ .repcontainer,
+#power-suite:checked ~ .repcontrol {
+    display:none;
+}
+
+.powers-grid,
+.maneuvers-grid {
+    display:grid;
+    grid-template-columns:48px 1fr 45px 10px 45px;
+    grid-template-rows:auto;
+    justify-content: center;
+    grid-row-gap: 2px;
+    grid-column-gap: 2px;
+}
+
+.charsheet .powers-grid button,
+.charsheet .maneuvers-grid button {
+    width:fit-content;
+}
+
+.charsheet .powers-grid input[type="text"],
+.charsheet .powers-grid input[type="number"],
+.charsheet .maneuvers-grid input[type="text"],
+.charsheet .maneuvers-grid input[type="number"] {
+    width:auto;
+}
+
+.powers-notes-title,
+.maneuvers-notes-title {
+    grid-column:1/6;
+    font-size:12px;
+    line-height:10px;
+    font-weight:bold;
+}
+
+/* Equipment CSS-rules section */
 .EquipmentSection {
+    width: 100%;
+    overflow: hidden;
+    padding: 0px 2px;
+}
+
+.EquipmentSection .EquipmentSubSection {
+    /* Left side column rules */
+    float: left;
+    width: calc(60% - 15px);
+    margin-right: 10px;
+}
+
+.EquipmentSection .EquipmentSubSection2 {
+    /* Right side column rules. */
+    float: right;
+    width: calc(40% - 15px);
+}
+
+.EquipmentSection > div {
+    vertical-align: top;
+}
+
+.EquipmentSubSection {
     /*width: calc(100% - 330px) !important; */
     width:60%;
     min-width:490px;
     max-width:680px;
 }
-.charsheet div.EquipmentSection2 {
+
+/* Equipment grids */
+.equipment-title-grid-container {
+    display: grid;
+    grid-template-columns: 4fr repeat(3, 1fr) repeat(4, 1.25fr);
+    width: 100%;
+    /* The following code is for when bordered regions are implemented
+    background-color: #952fbd4f;
+    border-style: solid;
+    border-color: #ffffff;
+    border-width: 1px;
+    border-radius: 8px 8px 0px 0px; */
+}
+
+.equipment-title-grid-container > span {
+    /* Place objects inside to the bottom centre */
+    justify-self: center;
+    align-self: end;
+
+    /* Ensure the div uses the entire width of the grid adjusting for parent padding */
+    box-sizing: border-box;
+    width: 100%;
+    padding: 2px;
+
+    /* Font/Text settings */
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Equipment grid section */
+.equipment-row-grid-container {
+    display: grid;
+    grid-template-columns: 4fr repeat(3, 1fr) repeat(4, 1.25fr);
+    grid-template-rows: 40px auto;
+    width: 100%;
+    /* The following code is for when bordered regions are implemented
+    background-color: #952fbd27;
+    border-style: solid;
+    border-color: #ffffff;
+    border-width: 1px;
+    border-top-width: 0px; */
+}
+
+.equipment-grid-row {
+    justify-self: center;
+    align-self: center;
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.equipment-grid-row > input {
+    justify-self: start;
+    width: 100%;
+}
+
+.equipment-grid-row.carried-toggle label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Repeating equipment grid (and equipment armor) rules */
+.EquipmentSubSection > .repcontainer,
+.EquipmentSubSection > .equipment-armor-container {
+    display: grid;
+    grid-auto-rows: auto;
+    grid-auto-flow: row;
+    width: 100%;
+    /* The following code is for when bordered regions are implemented
+    background-color: #952fbd27;
+    border-color: #ffffff;
+    border-style: solid;
+    border-width: 1px;
+    border-top-width: 0px;
+    border-radius: 0px 0px 4px 4px; */
+}
+
+.equipment-armor-container {
+    border-top-width: 0px;
+    border-bottom-width: 0px;
+    border-radius: 0px;
+}
+
+.EquipmentSubSection > .repcontainer > .repitem:first-child {
+    margin-top: 2px;
+}
+
+.EquipmentSubSection .repitem {
+    margin-bottom: 2px;
+}
+
+.equipment-details-container {
+    display: grid;
+    grid-template-columns: 4fr repeat(3, 1fr) repeat(4, 1.25fr);
+    grid-auto-flow: column;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    align-items: center;
+    justify-items: center;
+}
+
+.equipment-details-container input[type="text"]{
+    width: calc(100% - 4px);
+}
+
+.equipment-details-container input[type="checkbox"]{
+    width: 50%;
+    height: 50%;
+}
+
+textarea.equipment-note-field {
+    min-height: 40px;
+    height: 40px;
+    margin: 0px 4px 0px 0px;
+}
+
+.equipment-note-container {
+    display: grid;
+    width: 100%;
+    justify-self: start;
+    align-self: normal;
+    padding: 2px 4px 0px 40px;
+}
+
+.charsheet div.EquipmentSubSection2 {
     width:37%;
     font-size: 14px;
     font-weight: bold;
-    text-align:center;    
+    text-align:center;
     min-width:300px;
     float:right;
 }
- 
-.charsheet input.skills {
-    width:42px !important; 
+
+/* Hiding weight and encumbrance with house rule */
+.encumbrance-sectShow:checked ~ .encumbrance-sect,
+.encumbrance-sectShow:checked ~ div .encumbrance-sect {
+    display:none;
 }
- 
+
+.encumbrance-sectShow:checked ~ div .equipment-details-container,
+.encumbrance-sectShow:checked ~ .equipment-title-grid-container,
+.encumbrance-sectShow:checked ~ .equipment-row-grid-container {
+    grid-template-columns: 4fr repeat(3, 1fr) repeat(2, 1.25fr);
+}
+
+/* Encumbrance grid section */
+
+.encumbrance-grid {
+    display:grid;
+    margin:1px;
+    justify-content: center;
+    grid-template-columns:2fr 1fr 10px 1fr;
+    grid-template-rows:auto;
+    column-gap: 4px;
+    row-gap:1px;
+}
+
+.ui-dialog .charsheet .encumbrance-grid input[type="number"],
+.ui-dialog .charsheet .encumbrance-grid input[type="text"] {
+    width:100%;
+}
+    /* The button for heavy/light load is grouped with the CT buttons */
+
+/* Alernative encumbrance grid
+.encumbrance-grid2 {
+    display:grid;
+    margin:1px;
+    justify-content: center;
+    grid-template-columns:1fr 1fr 10px repeat(4, 1fr);
+    grid-template-rows:auto;
+    column-gap: 4px;
+    row-gap:1px;
+}
+
+.ui-dialog .charsheet .encumbrance-grid2 input[type="number"],
+.ui-dialog .charsheet .encumbrance-grid2 input[type="text"],
+.encumbrance-grid2 span {
+    width:100%;
+    grid-column: span 2;
+}*/
+
+/* Crew Skills grid */
+
+.crew-skills-grid {
+    display:grid;
+    margin:1px;
+    justify-content: center;
+    grid-template-columns:8fr 3fr 3fr 1fr 3fr 1fr 3fr;
+    grid-template-rows:auto;
+    row-gap:1px;
+}
+
+.crew-skills-grid div {
+    align-self: center;
+    text-align: center;
+}
+
+.defaultCrew:not(:checked) ~ .defaultCrewLock {
+	pointer-events:none;
+}
+
+.crew-skills-grid label {
+    color:var(--sheet-text);
+    font-size:13px;
+    line-height:13px;
+}
+
+/* ******** END GRIDS ******** */
+
 .charsheet select.modtype {
     width: 72px;
 }
- 
-.charsheet div.sheet-textHead, 
-.charsheet div.sheet-textHead2Col {
+
+.charsheet div.textHead,
+.charsheet div.textHead2Col,
+.charsheet label.textHead,
+.charsheet label.textHead2Col {
     background-color: var(--header-bg);
     color: var(--header-text);
     font-size: 15px;
     font-weight: bold;
     text-align:center;
-    border-radius:  5px;
+    border-radius: 5px;
     width:100%;
     padding:1px 2px;
-    border-spacing: 0px 4px;   
 	margin-left: -2px;
+    line-height: 21px;
 }
-.charsheet div.sheet-textHead2Col, 
-.charsheet table.sheet-table2col {
-	min-width: 395px;
+
+.charsheet label.textHead,
+.charsheet label.textHead2Col {
+    margin-right: 2px;
 }
- 
+
+h4 {
+    display:inline-block;
+    margin-right:10px;
+}
+
 .charsheet textarea {
     width: calc(100% - 10px);
     border-left: 1px solid var(--input-border);
     border-right: 1px solid var(--input-border);
     border-bottom: 1px solid var(--input-border);
+    border-radius: 5px;
     margin-bottom: 1px;
+    resize: vertical;
 }
-.charsheet textarea.atkFormula, 
-.charsheet input.skillFormula, 
+
+.charsheet textarea.atkFormula,
 .charsheet textarea.atkNotes {
     font-size: 12px;
-    min-width:330px;
 }
-.skillFormula {
-	width:100%;
-}
-.charsheet textarea.atkFormula {
-    height: 80px; 
-}
+
+.charsheet textarea.atkFormula,
 .charsheet textarea.atkNotes {
     height: 40px;
 }
+
 .charsheet textarea.ActionNotes {
     font-size: 12px;
     height:60px;
-    min-width:385px;
 }
+
 .charsheet textarea.StatBlock {
     font-size: 12px;
     height:60px;
     display: inline-block;
 }
- 
-.charsheet div.clear { clear:both; }
+
+.charsheet div.clear {
+    clear:both;
+}
+
+.charsheet div.bot-margin {
+    margin-bottom: 15px;
+}
+
+.repcontainer[data-groupname="repeating_bonuses"] > .repitem {
+    display:inline-block;
+    width:33.33%;
+}
 
 .repcontainer[data-groupname="repeating_organization"] > .repitem {
     display: inline-block;
@@ -205,48 +907,56 @@
 
 .repcontainer[data-groupname="repeating_organization"] > .repitem:nth-child(odd) {
 	padding-right:10px;
-} 
+}
 
 .charsheet div.repitem:last-child hr {
 	display:none;
 }
 
+hr.small-hr {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
 /* ******** Buttons, Checkboxes, and Radio Buttons ******** */
 .charsheet button[type=roll] {
-    padding: 5px 10px 5px !important;
+    padding: 6px 10px 4px !important;
     font-size: 20px;
-    background-color: var(--button-bg);
+    background-color: var(--roll-button-bg);
     font-weight: bold;
     text-shadow: 1px 1px var(--button-border);
     color: var(--button-image);
     border-radius: 100px;
-    border: 1px solid var(--button-border);
+    border: 1px solid var(--roll-button-border);
     cursor: pointer;
     box-shadow: 0 1px 0 var(--button-inset) inset;
 }
 
-.charsheet button[type=roll].blank-roll-button::before { content: "";}
- 
-.charsheet button[type=roll].blank-roll-button, 
+.charsheet button[type=roll].blank-roll-button::before,
+.charsheet button[type=roll].wiki-url::before {
+    content: "";
+}
+
+.charsheet button[type=roll].blank-roll-button,
 .charsheet button[type=roll].small-roll-button {
     font-size: 12px !important;
     line-height:5px;
+    margin-top:-4px;
 }
 
-.charsheet button[type=action] {
-	/*The only button on the sheet that uses this right now is the button for taking second wind.*/
-	padding: 4px 6px;
+.btn.small-roll-button:hover {
+    background-position: 0 -8px;
+}
+
+.charsheet button[type=action],
+.charsheet button[type=roll].wiki-url {
+	/*The only buttons that use this right now are the button for taking second wind, and the wiki button on the Settings tab.*/
+	padding: 2px 6px!important;
 	font-size: 13px;
 	line-height: 18px;
 	color: var(--button2-text);
 	text-shadow: 0 1px 1px var(--button-text-shadow);
 	background-color: var(--button-bg);
-	background-image: -moz-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -ms-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(var(--button-gradient1)), to(var(--button-gradient2)));
-	background-image: -webkit-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -o-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
 	border: 1px solid var(--button-border);
 	border-bottom-color: var(--button-border-bot);
 	border-radius: 4px;
@@ -254,227 +964,420 @@
 	cursor: pointer;
 }
 
-.charsheet select{
+.charsheet button[type=roll].wiki-url:hover {
+    background-position:0;
+}
+
+.charsheet select {
     margin:0;
 }
 
 .charsheet input[type=radio],
 .charsheet input[type=checkbox] {
+    /* This should no longer be in use, with all checkboxes on the sheet using visible-checkbox */
 	accent-color: var(--checkbox-accent);
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox {
-	display:none;
+.ui-dialog .charsheet .visible-checkbox {
+    appearance: none;
+    background-color: var(--checkbox-bg);
+    color: currentColor;
+    box-sizing:content-box;
+    width: 1.153847em; /* For a font-size of 13px this is 15px */
+    height: 1.153847em; /* For a font-size of 13px this is 15px */
+    border: 0.077em solid var(--checkbox-border); /* For a font-size of 13px this is 1px */
+    border-radius: 33%;
+    display: inline-grid;
+    transition: 80ms all linear;
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox + label {
-	width:90%;
-	padding: 0px 3px;
+.ui-dialog .charsheet .visible-checkbox:focus {
+    outline:none;
+}
+
+.ui-dialog .charsheet .visible-checkbox::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    box-sizing:border-box;
+    border-radius:33%;
+    transform: scale(0);
+    transition: 80ms transform ease-in-out;
+    border: 1px solid var(--checkbox-border);  /*For a font-size of 13px this is 1px */
+    background: var(--checkbox-check);
+    box-shadow: inset 1px 1px var(--checkbox-bg), inset -1px 1px var(--checkbox-bg), inset 1px -1px var(--checkbox-bg), inset -1px -1px var(--checkbox-bg);
+}
+
+.ui-dialog .charsheet .small .visible-checkbox {
+    width: 8px;
+    height: 8px;
+    border-width: 1px;
+}
+
+.ui-dialog .charsheet .visible-checkbox:checked::before {
+	transform: scale(1);
+}
+
+.ui-dialog .charsheet .visible-checkbox:checked {
+	border-color: var(--checkbox-checked-border);
+	background-color: var(--checkbox-checked-bg);
+	transition: 80ms all linear;
+}
+
+.ui-dialog .charsheet .visible-checkbox:hover::before {
+	filter: contrast(70%);
+}
+
+/* Begin Hide/Show toggle */
+label.toggle-bar {
+    display: inline-block;
+    width: 38px;
+    height: 17px;
+    margin-bottom:-3px;
+    box-sizing: border-box;
+    background-color: var(--toggle-bar);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color .25s;
+    box-shadow: 0px 0px 6px 1px var(--toggle-shadow) inset
+}
+
+.toggle-bar:has(input:checked) {
+    background-color: var(--toggle-bar-checked);
+}
+
+label.toggle-bar input {
+    display: none;
+}
+
+.toggle-knob {
+    display: block;
+    position: relative;
+}
+
+.toggle-knob::after {
+    content:"";
+    background-image:url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Star%20Wars%20Saga%20Edition/eyecons/eye-closed-gray.png");
+    background-size:85% 85%;
+    background-repeat:no-repeat;
+    background-position:center;
+    background-color: #eef;
+    width: 13px;
+    height: 13px;
+    border: 1px solid #e9e9ee;
+    border-radius: 50%;
+    box-shadow: 0 0 3px #333b;
+    position: relative;
+    top: 1px;
+    left: 1px;
+    display: flex;
+    transition: all .15s linear;
+}
+
+input:checked + .toggle-knob::after {
+    background-image:url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Star%20Wars%20Saga%20Edition/eyecons/eye-open-gray.png");
+    transform: translateX(21px);
+}
+/* End Hide/Show Toggle */
+
+/* ******** END Buttons, Checkboxes, and Radio Buttons ******** */
+
+/* ********Condition Track, Take 10/20, and Heavy Load labels ******** */
+.charsheet input.encumbrance-load:checked ~ .light-load,
+.charsheet input.encumbrance-load:not(:checked) ~ .heavy-load {
+    display:none;
+}
+
+.charsheet input.ct-label + label,
+.charsheet input.take10or20 + label,
+.charsheet input.encumbrance-load ~ label {
 	text-align: center;
-	font-size: 12px;
+    font-family: 'Play';
 	user-select: none;
-	line-height: 16px;
 	color: var(--button2-text);
 	text-shadow: 0 1px 1px var(--button-text-shadow);
 	background-color: var(--button-bg);
-	background-image: -moz-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -ms-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(var(--button-gradient1)), to(var(--button-gradient2)));
-	background-image: -webkit-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: -o-linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
-	background-image: linear-gradient(top, var(--button-gradient1), var(--button-gradient2));
 	border: 1px solid var(--button-border);
 	border-bottom-color: var(--button-border-bot);
-	border-radius: 100px;
-	box-shadow: inset 0 1px 0 var(--button-shadow1), 0 1px 2px var(--button-shadow2);
+	box-shadow: inset 0 2px 0 var(--button-shadow1), 0 2px 2px var(--button-shadow2);
 	cursor: pointer;
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox:checked + label {
-	text-shadow: 0 1px 1px var(--persistent-checked-textshadow);
-	background-image: none;
-	background-color: var(--persistent-checked-bg);
-	color: var(--sheet-text);
-	box-shadow: 0 1px 0 var(--persistent-checked-inset) inset;
+.charsheet input.ct-label + label {
+    width:80%;
+	padding: 0px 3px;
+    margin-left:3px;
+    margin-top:2px;
+    font-size: 12px;
+    line-height: 1.3em;
+    border-radius: 100px;
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox:hover + label {
+.charsheet input.take10or20 + label {
+	width:auto;
+	padding: 0px 7px;
+    margin-left:3px;
+    margin-top:2px;
+    font-size: 12px;
+	font-weight: bold!important; /* Otherwise, this gets overriden by another rule in dark mode */
+    line-height: 1.3em;
+    border-radius: 100px;
+}
+
+.charsheet input.encumbrance-load ~ label {
+    width:100%;
+    padding:10px;
+    border-radius:15px;
+    font-size:13px;
+    font-weight: bold!important; /* Otherwise, this gets overriden by another rule in dark mode */
+    letter-spacing: 1px;
+}
+
+.charsheet input[type="checkbox"].ct-persistent + label{
+    margin-left:0px;
+    margin-top:6px;
+    width:89%;
+    line-height: 1.6em;
+}
+
+.charsheet input.ct-label:checked + label,
+.charsheet input.take10or20:checked + label,
+.charsheet input.encumbrance-load ~ .heavy-load {
+	text-shadow: 0 1px 1px var(--ct-checked-textshadow);
+	background-color: var(--ct-checked-bg);
+    color:var(--ct-checked-text);
+	box-shadow: 1px 2px 2px var(--ct-checked-inset1) inset, -1px -1px 2px var(--ct-checked-inset2) inset;
+}
+
+.charsheet input.encumbrance-load ~ .heavy-load {
+    font-size:15px;
+}
+
+.charsheet input.ct-label:hover + label,
+.charsheet input.take10or20:hover + label,
+.charsheet input.encumbrance-load:hover ~ label {
 	filter: brightness(103%);
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox:checked:hover + label {
-	filter: brightness(107%);
+.charsheet input.ct-label:checked:hover + label,
+.charsheet input.take10or20:checked:hover + label,
+.charsheet input.encumbrance-load:checked:hover ~ label {
+	filter: brightness(109%);
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox:active + label {
-	filter: contrast(120%);
+.charsheet input.ct-label:active + label,
+.charsheet input.take10or20:active + label,
+.charsheet input.encumbrance-load:active ~ label {
+	filter: contrast(95%);
 }
 
-.charsheet input[type="checkbox"].Persistent-checkbox:checked:active + label {
-	filter: contrast(107%);
+.charsheet input.ct-label:checked:active + label,
+.charsheet input.take10or20:checked:active + label,
+.charsheet input.encumbrance-load:checked:active ~ label {
+	filter: contrast(105%);
 }
- 
-/* ******** Start code for hiding sections ******** */
+
+/* ********END Condition Track, Take 10/20, and Heavy Load labels ******** */
+
+/* ******** Hiding sections and show/hide toggle ******** */
 .forceShow:not(:checked) ~ .forceBody,
+.forceShow:not(:checked) ~ div.repcontainer .forceBody,
 .organizationShow:not(:checked) ~ .organizationBody,
 .SRShow:not(:checked) ~ .SRBody,
 .DRShow:not(:checked) ~ .DRBody,
 .immuneShow:not(:checked) ~ .immuneBody,
-.DefArmorLevelShow:not(:checked) ~ .DefArmorLevelBody,
-.PerceptionShow:not(:checked) ~ .PerceptionBody,
 .statusBody:not(:checked) ~ .statusBody,
-.athleticsShow:not(:checked) ~ .athleticsBody,
-.athleticsShow:checked ~ .noathleticsBody,
 .pilotSkillShow:not(:checked) ~ .pilotBody,
-.sectAttack-show:checked ~ .sectAttack,
-.sect-show:not(:checked) ~ .sect {
+.commanderSkillShow:not(:checked) ~ .commanderBody,
+.sectAttack-show:not(:checked) ~ .sectAttack,
+.sectCon-show:checked ~ .sectCon,
+.sect-show:not(:checked) ~ .sect,
+.sect-show:checked ~ .sect2,
+.ArmorDRcheckbox:checked + .sect-show + .sect,
+.skillShow:not(:checked) + .skillBody,
+.other-mod-toggle:checked ~ div .other-mod-off,
+.other-mod-toggle:checked ~ .other-mod-off,
+.other-mod-toggle:not(:checked) ~ div .other-mod-on,
+.other-mod-toggle:not(:checked) ~ .other-mod-on {
     display: none;
 }
- 
-.sheet-hidden {
-    display: none !important;       
+
+.hidden {
+    display: none !important;
 }
- 
-.skillsHeader {
-    opacity:0;  
-    position: relative;
-    height: 0px;    
+
+/* Section for showing/hiding specific skills */
+.athleticsShow:not(:checked) ~ .athleticsBody,
+.athleticsShow:not(:checked) ~ div.repcontainer .athleticsBody,
+.athleticsShow:checked ~ .noathleticsBody,
+.athleticsShow:checked ~ div.repcontainer .noathleticsBody {
+    display:none!important;
 }
- 
-.charsheet input[type="checkbox"] + span:not(.not-show)::before {
-    margin-right: 4px;
-    line-height: 14px;
-    text-align: center;
-    display: inline-block;
-    vertical-align: middle;
-    content: "[show]";
-    width: 14px;
-    height: 14px;
-    font-size: 12px;
+
+.individual-skills-show:checked + .sect-show:not(:checked) ~ .sect {
+    display:block;
 }
-.charsheet input.sectAttack-show + span:not(.not-show)::before {
-    margin-right: 4px;
-    line-height: 14px;
-    text-align: center;
-    display: inline-block;
-    vertical-align: middle;
-    content: "[hide]";
-    width: 14px;
-    height: 14px;
-    font-size: 12px;
+
+.individual-skills-show:checked + .sect-show:not(:checked) ~ .sect .skill:not(:has(.trained:checked)) {
+    display:none;
+}
+
+.individual-skills-show:checked + .sect-show:not(:checked) ~ .sect .skill:has(.trained:checked) {
+    display:block;
+}
+
+.clickable:hover {
+    cursor:pointer;
+    text-shadow: 0px 0px 3px var(--clickable-highlight);
+}
+
+.individual-skills-show:checked + input:not(:checked) + label.clickable.textHead,
+.individual-skills-show:checked + input:not(:checked) + label.clickable.textHead2Col {
+    /* To fix the margin when individual skills still show */
+    margin-bottom: 0px;
 }
 
 .charsheet option.CustomCrew:checked + span {
 	display:none;
 }
- 
-.charsheet span.not-show {
-    margin-right: 4px;
-    vertical-align: middle; 
-    min-height: 32px;
-}
- 
-.charsheet input[type="checkbox"]:checked + span:not(.not-show)::before {
-    content: "[hide]";
+
+/* Hiding and showing the starship maneuvers */
+.charsheet .textManeuverShow:not(:checked) ~ .man-text,
+.charsheet .textManeuverShow:checked ~ .man1 {
+    display: none!important;
 }
 
-.charsheet input.sectAttack-show:checked + span:not(.not-show)::before {
-    content: "[show]";
+.maneuver-numbers:has([value="1"]:checked) ~ .man1.man2,
+.maneuver-numbers:has([value="2"]:checked) ~ .man2.man3,
+.maneuver-numbers:has([value="3"]:checked) ~ .man3.man4,
+.maneuver-numbers:has([value="4"]:checked) ~ .man4.man5,
+.maneuver-numbers:has([value="5"]:checked) ~ .man5.man6,
+.maneuver-numbers:has([value="6"]:checked) ~ .man6.man7,
+.maneuver-numbers:has([value="7"]:checked) ~ .man7.man8,
+.maneuver-numbers:has([value="8"]:checked) ~ .man8.man9,
+.maneuver-numbers:has([value="9"]:checked) ~ .man9.man10,
+.maneuver-numbers:has([value="10"]:checked) ~ .man10.man11,
+.maneuver-numbers:has([value="11"]:checked) ~ .man11.man12,
+.maneuver-numbers:has([value="12"]:checked) ~ .man12.man13,
+.maneuver-numbers:has([value="13"]:checked) ~ .man13.man14,
+.maneuver-numbers:has([value="14"]:checked) ~ .man14.man15,
+.maneuver-numbers:has([value="15"]:checked) ~ .man15.man16,
+.maneuver-numbers:has([value="16"]:checked) ~ .man16.man17,
+.maneuver-numbers:has([value="17"]:checked) ~ .man17.man18,
+.maneuver-numbers:has([value="18"]:checked) ~ .man18.man19,
+.maneuver-numbers:has([value="19"]:checked) ~ .man19.man20
+ {
+    display:none;
 }
 
-.sheet-hideCheckbox {
-    opacity: 0;
-    position: relative;
-    left: 6px;
-    cursor: pointer;
-    z-index: 1;
-}
-.sheet-skillsHideCheckbox {   
-    opacity:0;
-    position: relative;
-    cursor: pointer;
-    z-index: 1;
-    height: 15px;
-}
 .itemcontrol {
+    /* This class is used by repeating sections */
 	z-index: 5;
 }
 
-.ui-dialog .charsheet .showhidetoggle {
-	opacity:0;
-	width: 35px;
-	height: 16px;
-	position: relative;
-	top: 1px;
-	margin: -32px;
-	cursor: pointer;
+/* ******** END Hiding sections and show/hide toggle ******** */
+
+/* Code for hideable sections */
+
+label.clickable.textHead:hover,
+label.clickable.textHead2Col:hover {
+    background-color: var(--header-bg-highlight);
+    text-shadow: 0px 0px 4px var(--header-text-highlight);
 }
 
-.defaultCrew:not(:checked) ~ .defaultCrewLock {
-	pointer-events:none;
+label.clickable.textHead:hover:has(button:hover),
+label.clickable.textHead2Col:hover:has(button:hover) {
+    /* So that the label isn't lit up when just hovering over a button on it */
+    background-color: var(--header-bg);
+    text-shadow:none;
 }
- 
+
+input:not(:checked) + label.clickable.textHead,
+input:not(:checked) + label.clickable.textHead2Col {
+    margin-bottom:5px;
+}
+
 /* ******** Start code for tabs ******** */
-.charsheet div.sheet-tab-content
-{ display: none; }
- 
+.charsheet div.tab-content {
+    display: none;
+}
+
 .charsheet input.tab1:checked ~ div.tab1,
 .charsheet input.tab2:checked ~ div.tab2,
 .charsheet input.tab3:checked ~ div.tab3,
 .charsheet input.tab4:checked ~ div.tab4 {
     display: block;
 }
+
+.rule-sections {
+	border: 1px solid var(--rule-borders);
+	border-radius: 5px;
+	padding: 5px;
+	margin-bottom: 5px;
+}
+
+span.setting {
+    font-weight: normal;
+    font-size: 13px;
+    user-select: none;
+}
+
+label:has(.setting):hover {
+    text-shadow: 0px 0px 2px var(--clickable-highlight);
+}
+
+.visible-checkbox + span {
+    margin-left:5px;
+}
+
 .charsheet input.tab {
     width: 150px;
     height: 20px;
     position: relative;
-    left: 6px; 
-    margin: 0px -1.5px;
+    left: 6px;
+    margin: 0px -1px;
     cursor: pointer;
     z-index: 1;
 	border:none;
-	-moz-appearance:initial;
+    appearance:initial;
 }
 
 .charsheet input.tab::before {
     content: attr(title);
     text-align: center;
     display: inline-block;
-     
-    background: #fff;
-    background: -moz-linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-    background: -webkit-linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-    background: -ms-linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-    background: -o-linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-    background: linear-gradient(to top, #c8c8c8, #fff, #c8c8c8);
-     
+    background: var(--inactive-tab-bg1);
+    background: linear-gradient(to top, var(--inactive-tab-bg2), var(--inactive-tab-bg1), var(--inactive-tab-bg2));
     width: 150px;
-    height: 20px;
+    height: 22px;
     font-size: 18px;
+    letter-spacing: 1px;
 }
 
 .charsheet input.tab:checked::before {
-    background: #dcdcdc;
-    background: -moz-linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    background: -webkit-linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    background: -ms-linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    background: -o-linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    background: linear-gradient(to top, #fcfcfc, #dcdcdc, #fcfcfc);
-    /* border-bottom-color: #fff; */
+    background: var(--active-tab-bg1);
+    background: linear-gradient(to top, var(--active-tab-bg2), var(--active-tab-bg1), var(--active-tab-bg2));
 }
+
+.charsheet input.tab:hover::before {
+    filter: brightness(105%);
+}
+
 .charsheet input.tab:not(:first-child)::before {
     border-left: none;
 }
-.charsheet div.sheet-tab-content { 
+
+.charsheet div.tab-content {
     margin: 2px 0 0 5px;
     padding: 5px;
 }
- 
+
 /* ******** Tables ******** */
 .charsheet table {
     text-align: center;
     width: 100%;
 }
+
 .charsheet table th {
     font-size: 13px;
     font-weight: bold;
@@ -491,51 +1394,40 @@
 	margin-right: 30px;
 }
 
-.sheet-col1, 
-.sheet-skillsCol1, 
-.sheet-skillsCrewCol1 {
+.col1,
+.skillsCrewCol1 {
     font-size: 13px;
     font-weight: bold;
     text-align: left;
     padding-left: 5px;
 }
-.sheet-col1 {
-    background-color: #a7a8aa;
+
+.col1 {
+    background-color: var(--col1-bg);
     border-radius: 5px;
 }
-.sheet-skillsCol1 {
-    width: 35%;
-    min-width: 122px;
+
+.charsheet .skillsCrewCol1 {
+    min-width:130px;
+    line-height:10px;
+    text-align:left;
 }
-.sheet-skillsCrewCol1 {
-    width: 35%;
-    min-width: 90px;
+
+.grid-table {
+	display:grid;
 }
-.skillsHideCheckbox {   
-    width: 100%;
-    margin-left: calc(1px - (100% + 17px));
-}
- 
-.charsheet input.skillsNotes {
-    width: 100%;
-    min-width:250px;
-}
-.sheet-skillsFeats {
-    min-width: 25px;
-    text-align: center; 
-    cursor: pointer;
-}
-.sheet-spacing {    
+
+.spacing {
     border-spacing: 1px 1px;
     border-collapse: separate;
     padding: 0px 1px;
 }
- 
+
 .sheet-table {
     display: table;
     width: 100%;
 }
- 
+
 .sheet-table-header {
     display: table-cell;
     vertical-align: bottom;
@@ -543,36 +1435,44 @@
     font-weight: bold;
     text-align: center;
 }
- 
+
 .sheet-table-data {
     display: table-cell;
     vertical-align: middle;
     padding-bottom: 1px;
 }
- 
+
 .sheet-table-row {
     display: table-row;
     vertical-align: bottom;
-    width: 100%; 
 }
 
 /* ******** LOGOS ******** */
 
-.charsheet div.sheet-record input + label img {
+.charsheet div.character-record {
+    font-size: 14px;
+    font-weight: bold;
+    text-align:center;
+    width:300px;
+    float:right;
+}
+
+.charsheet div.character-record label {
 	cursor: pointer;
 }
 
-.sheet-darkmode .charsheet div.sheet-record label img {
-	content: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Star%20Wars%20Saga%20Edition/SWSE%20dark%20mode%20title.png");
+.sheet-darkmode .character-record img {
+    content: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Star%20Wars%20Saga%20Edition/SWSE%20dark%20mode%20title.png");
 }
 
-.charsheet div.sheet-record input[type="checkbox"]:checked + label img {
-	content: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Star%20Wars%20Saga%20Edition/SWSE%20yellow%20title.png");
+.character-record input[type="checkbox"]:checked + img {
+    content: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Star%20Wars%20Saga%20Edition/SWSE%20yellow%20title.png");
 }
 
 /* ******** DARK MODE FOR SHEET ******** */
 :root {
 	/* Dark mode colors*/
+  --dm-sheet-text: #f5f5f5;
   --dm-input-bg: #3f3f50;
   --dm-input-text: #f5f5f5;
   --dm-placeholder-text: #a1a1a9;
@@ -580,30 +1480,79 @@
   --dm-scrollbar1-shaft: #2e2e40;
   --dm-scrollbar2-thumb: #1e1e44;
   --dm-scrollbar2-shaft: #60608c;
+  --dm-scrollbar3-shaft: #232331;
   --dm-col1: #55555a;
+  --dm-col1-highlight: #727275;
   --dm-input-border: #707099;
   --dm-input-border-top: #44445c;
-  --dm-checkbox-accent: #668;
   --dm-input-disabled-bg: #334;
   --dm-input-disabled-text: #ddd;
   --dm-input-disabled-border: #444457;
   --dm-input-disabled-border-top: #393949;
+  --dm-checkbox-accent: #668;
+  --dm-checkbox-bg: #202055;
+  --dm-checkbox-bg-checked: #227;
+  --dm-checkbox-border: #4b4b8f;
+  --dm-checkbox-border-checked: #7497ea;
+  --dm-checkbox-check: #8cd0ff;
+  --dm-checkbox-disabled-bg: #303060;
+  --dm-checkbox-disabled-check: #719cbb;
   --dm-header-bg: #338;
+  --dm-header-bg-highlight: #44a;
   --dm-header-text: #f5f5f5;
+  --dm-header-text-highlight: #a9a9ff;
+  --dm-clickable-hover:#eee;
+  --dm-clickable-highlight:#fff6;
+  --dm-button-bg: #747492;
+  --dm-button-gradient1:#d9d9e3;
+  --dm-button-gradient2: #b8b8cc;
+  --dm-button-border:#7799;
+  --dm-button-top-border: #bbe9;
+  --dm-button-shadow:#cacaea;
   --dm-tab-active-gradient1: #333;
   --dm-tab-active-gradient2: #6e6e6e;
   --dm-tab-inactive-gradient1: #444;
   --dm-tab-inactive-gradient2: #292929;
-  --dm-persistent-checked-bg: #6e6e87;
-  --dm-persistent-checked-inset: #6688;
-  --dm-persistent-checked-border: #88a6;
+  --dm-toggle-bar: #446;
+  --dm-toggle-bar-checked: #3c3cbc;
+  --dm-toggle-shadow: #0008;
+  --dm-toggle-knob:#bbbbd7;
+  --dm-toggle-knob-border:#6c6c8f;
+  --dm-toggle-knob-active:#d1d1ec;
+  --dm-toggle-knob-active-border:#9d9dcc;
+  --dm-bonuses-outline: #556;
+  --dm-bonuses-outline-active: #8a8aa8;
+  --dm-bonuses-toggle-shadow: #000a;
+  --dm-bonuses-toggle-outline: #0006;
+  /* Colors below are for the CT buttons */
+  --dm-ct-bg: #747492;
+  --dm-ct-border: #000f;
+  --dm-ct-text: #f5f5f5;
+  --dm-ct-checked-bg: #6e6e87;
+  --dm-ct-inset1: #0005;
+  --dm-ct-inset2: #fff9;
+  --dm-ct-checked-inset1: #0005;
+  --dm-ct-checked-inset2: #fff9;
+  --dm-ct-checked-border: #88a6;
+  --dm-ct-checked-text:#f5f5f5;
+  --dm-ct-normal:#00a000;
+  --dm-ct-minus1:#69a500;
+  --dm-ct-minus2:#b9ad00;
+  --dm-ct-minus5:#cc6600;
+  --dm-ct-minus10:#cc0000;
+  --dm-ct-helpless:#6600cc;
+  --dm-ct-persistent:#00bbbb;
+  --dm-take10or20:#00bbbb;
+  --dm-heavy-load:#cc0000;
 }
-.sheet-darkmode .ui-dialog { 
+
+.sheet-darkmode .ui-dialog {
 	scrollbar-color: var(--dm-scrollbar1-thumb) var(--dm-scrollbar1-shaft);
 }
 
 .sheet-darkmode textarea {
 	scrollbar-color: var(--dm-scrollbar2-thumb) var(--dm-scrollbar2-shaft);
+    scrollbar-width: thin;
 }
 
 .sheet-darkmode .charsheet {
@@ -611,8 +1560,13 @@
 	color: var(--dark-primarytext);
 }
 
-.sheet-darkmode .charsheet .sheet-col1 {
+.sheet-darkmode .charsheet .col1 {
 	background-color: var(--dm-col1);
+    color: var(--dark-primarytext);
+}
+
+.sheet-darkmode .charsheet .sectAttack-show:checked ~ label.col1:hover {
+    background-color: var(--dm-col1-highlight);
 }
 
 .sheet-darkmode .charsheet hr {
@@ -638,9 +1592,49 @@
 	color: var(--dark-primarytext);
 }
 
+.sheet-darkmode .charsheet label span.setting {
+    color: var(--dark-primarytext);
+}
+
+/* Begin section for checkboxes */
 .sheet-darkmode .charsheet input[type=radio],
 .sheet-darkmode .charsheet input[type=checkbox] {
 	accent-color: var(--dm-checkbox-accent);
+}
+
+.sheet-darkmode .ui-dialog .charsheet .visible-checkbox {
+	background-color: var(--dm-checkbox-bg);
+	border-color: var(--dm-checkbox-border);
+}
+
+.sheet-darkmode .ui-dialog .charsheet .visible-checkbox::before {
+	border-color: var(--dm-checkbox-border-checked);
+    background: var(--dm-checkbox-check);
+    box-shadow: inset 0.077em 0.077em var(--dm-checkbox-bg), inset -0.077em 0.077em var(--dm-checkbox-bg), inset 0.077em -0.077em var(--dm-checkbox-bg), inset -0.077em -0.077em var(--dm-checkbox-bg);
+}
+
+.sheet-darkmode .ui-dialog .charsheet .visible-checkbox:checked {
+	background-color: var(--dm-checkbox-bg-checked);
+	border-color: var(--dm-checkbox-border-checked);
+	transition: 60ms all linear;
+}
+
+.sheet-darkmode .charsheet .visible-checkbox:hover {
+    filter: brightness(125%);
+}
+
+.sheet-darkmode .charsheet .visible-checkbox:hover::before {
+    filter:none; /* This gets rid of the contrast filter from light mode. */
+}
+/* End section for checkboxes */
+
+/* Start section for crew */
+.sheet-darkmode .skills-grid .skills-grid-name label {
+    color:var(--dark-primarytext);
+}
+
+.sheet-darkmode .crew-skills-grid label {
+    color:var(--dark-primarytext);
 }
 
 .sheet-darkmode .charsheet input[disabled],
@@ -652,10 +1646,48 @@
 	border-top-color: var(--dm-input-disabled-border-top);
 }
 
-.sheet-darkmode .charsheet div.sheet-textHead2Col,
-.sheet-darkmode .charsheet div.sheet-textHead {
+.sheet-darkmode .charsheet .defaultCrew:not(:checked) ~ .defaultCrewLock[type="checkbox"] {
+    background-color: var(--dm-checkbox-disabled-bg);
+}
+
+.sheet-darkmode .charsheet .defaultCrew:not(:checked) ~ .defaultCrewLock[type="checkbox"]::before {
+    box-shadow: inset 1em 1em var(--dm-checkbox-disabled-check); /*The dimensions don't actually make a difference, as long as they are larger than the width and height. */
+}
+/* End section for crew */
+
+.sheet-darkmode .charsheet div.textHead2Col,
+.sheet-darkmode .charsheet div.textHead,
+.sheet-darkmode .charsheet label.textHead,
+.sheet-darkmode .charsheet label.textHead2Col {
 	background-color: var(--dm-header-bg);
 	color: var(--dm-header-text);
+    text-shadow: 1px 1px 1px black;
+}
+
+.sheet-darkmode .charsheet h4 {
+    color: var(--dark-secondarytext);
+}
+
+.sheet-darkmode .clickable:hover {
+    color: var(--dm-clickable-hover);
+    text-shadow: 0px 0px 3px var(--dm-clickable-highlight);
+}
+
+.sheet-darkmode label:has(.setting):hover {
+    text-shadow: 0px 0px 3px var(--dm-clickable-highlight);
+}
+
+.sheet-darkmode .charsheet label.clickable.textHead:hover,
+.sheet-darkmode .charsheet label.clickable.textHead2Col:hover {
+    color: var(--dm-header-text);
+    background-color: var(--dm-header-bg-highlight);
+    text-shadow: 0px 0px 4px var(--dm-header-text-highlight), 1px 1px 1px black;
+}
+
+.sheet-darkmode .charsheet label.clickable.textHead:hover:has(button:hover),
+.sheet-darkmode .charsheet label.clickable.textHead2Col:hover:has(button:hover) {
+    /* So that the label isn't lit up when just hovering over a button on it */
+    background-color: var(--dm-header-bg);
 }
 
 .sheet-darkmode .charsheet input.tab {
@@ -670,16 +1702,142 @@
     background: linear-gradient(to top, var(--dm-tab-active-gradient1), var(--dm-tab-active-gradient2), var(--dm-tab-active-gradient1));
 }
 
-.sheet-darkmode .charsheet input[type="checkbox"].Persistent-checkbox:checked + label {
-	background-color: var(--dm-persistent-checked-bg);
-	box-shadow: 0 1px 0 var(--dm-persistent-checked-inset) inset;
-	border: 1px solid var(--dm-persistent-checked-border);
+.sheet-darkmode .charsheet input.tab:hover::before {
+    filter: brightness(120%);
 }
 
-/* This doesn't work right now, but hopefully it can be fixed eventually. */
+.sheet-darkmode .charsheet button[type=roll] {
+    background-color: var(--dm-button-bg);
+    /* These do not use color variables because linear-gradients have problems with them as background-images. */
+    background-image: -moz-linear-gradient(top, #d9d9e3, #b8b8cc);
+    background-image: -ms-linear-gradient(top, #d9d9e3, #b8b8cc);
+    background-image: -webkit-linear-gradient(top, #d9d9e3, #b8b8cc);
+    background-image: -o-linear-gradient(top, #d9d9e3, #b8b8cc);
+    background-image: linear-gradient(top, #d9d9e3, #b8b8cc);
+    border: 1px solid var(--dm-button-border);
+    border-top: 1px outset var(--dm-button-top-border);
+    box-shadow: 0 1px 0 var(--dm-button-shadow) inset;
+}
+
+/* Start section for toggle switches */
+.sheet-darkmode label.toggle-bar {
+    background-color: var(--dm-toggle-bar);
+    box-shadow: 0px 0px 6px 1px var(--dm-toggle-shadow) inset
+}
+
+.sheet-darkmode .toggle-bar:has(input:checked) {
+    background-color: var(--dm-toggle-bar-checked);
+}
+
+.sheet-darkmode .toggle-knob::after {
+    background-image:url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Star%20Wars%20Saga%20Edition/eyecons/eye-closed-black.png");
+    background-color: var(--dm-toggle-knob);
+    border-color: var(--dm-toggle-knob-border);
+}
+
+.sheet-darkmode input:checked + .toggle-knob::after {
+    background-image:url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Star%20Wars%20Saga%20Edition/eyecons/eye-open-black.png");
+    background-color: var(--dm-toggle-knob-active);
+    border-color: var(--dm-toggle-knob-active-border);
+}
+/* End section for toggle switches */
+
+/* Start section for Bonuses and Penalties */
+.sheet-darkmode .charsheet .bonuses-grid {
+    border: 1px solid var(--dm-bonuses-outline);
+}
+
+.sheet-darkmode .charsheet .bonuses-skills {
+    background-color: #0002;
+    border-color: #8a8aa888;
+}
+
+.sheet-darkmode .charsheet .bonuses-grid:has(.bonuses-header .visible-checkbox:checked) {
+    /* If the bonus is active */
+    border-color: var(--dm-bonuses-outline-active);
+    outline: 1px solid var(--dm-bonuses-outline-active);
+    scrollbar-color: var(--dm-scrollbar1-thumb) var(--dm-scrollbar3-shaft);
+}
+
+.sheet-darkmode .charsheet .bonuses-header .visible-checkbox:checked ~ label.toggle-bar {
+    box-shadow: 0px 0px 6px 1px var(--dm-bonuses-toggle-shadow) inset;
+    outline: 1px solid var(--dm-bonuses-toggle-outline);
+}
+/* End section for Bonuses and Penalties */
+
+/* Start section for condition track buttons, take 10/20, and heavy load warning */
+.sheet-darkmode .charsheet input.ct-label + label,
+.sheet-darkmode .charsheet input.take10or20 + label,
+.sheet-darkmode .charsheet input.encumbrance-load ~ label {
+	background-color: var(--dm-ct-bg);
+    color:var(--dm-ct-text);
+    font-weight:400;
+    text-shadow: 0px 0px 2px black;
+    box-shadow: 0px 1px 1px var(--dm-ct-checked-inset2) inset, -1px -2px 2px var(--dm-ct-checked-inset1) inset, 0 2px 2px var(--button-shadow2);
+    border: 1px solid var(--dm-ct-border);
+}
+
+.sheet-darkmode .charsheet input.ct-label:checked + label,
+.sheet-darkmode .charsheet input.take10or20:checked + label,
+.sheet-darkmode .charsheet input.encumbrance-load:checked ~ label {
+	box-shadow: 1px 2px 2px var(--dm-ct-checked-inset1) inset, -1px -1px 2px var(--dm-ct-checked-inset2) inset;
+	border: 1px solid var(--dm-ct-checked-border);
+    font-weight:bold;
+    text-shadow: 0px 0px 2px black, 0px 0px 5px black;
+}
+
+.sheet-darkmode .charsheet input.ct-normal:checked + label {
+	background-color: var(--dm-ct-normal);
+}
+
+.sheet-darkmode .charsheet input.ct-minus1:checked + label {
+	background-color: var(--dm-ct-minus1);
+}
+
+.sheet-darkmode .charsheet input.ct-minus2:checked + label {
+	background-color: var(--dm-ct-minus2);
+}
+
+.sheet-darkmode .charsheet input.ct-minus5:checked + label {
+	background-color: var(--dm-ct-minus5);
+}
+
+.sheet-darkmode .charsheet input.ct-minus10:checked + label {
+	background-color: var(--dm-ct-minus10);
+}
+
+.sheet-darkmode .charsheet input.ct-helpless:checked + label {
+	background-color: var(--dm-ct-helpless);
+}
+
+.sheet-darkmode .charsheet input.ct-persistent:checked + label {
+	background-color: var(--dm-ct-persistent);
+}
+
+.sheet-darkmode .charsheet input.take10or20:checked + label {
+	background-color: var(--dm-take10or20);
+}
+
+.sheet-darkmode .charsheet input.encumbrance-load:checked ~ label {
+	background-color: var(--dm-heavy-load);
+}
+
+.sheet-darkmode .charsheet input.ct-label:hover + label,
+.sheet-darkmode .charsheet input.take10or20:hover + label,
+.sheet-darkmode .charsheet input.encumbrance-load:hover ~ label {
+	filter: brightness(105%);
+}
+
+.sheet-darkmode .charsheet input.ct-label:checked:hover + label,
+.sheet-darkmode .charsheet input.take10or20:checked:hover + label,
+.sheet-darkmode .charsheet input.encumbrance-load:checked:hover ~ label {
+	filter: brightness(105%);
+}
+
+/* REMARK: This doesn't work right now, but hopefully it can be fixed eventually. */
 /*.sheet-darkmode .charsheet input::part(-webkit-outer-spin-button):hover,
 .sheet-darkmode .charsheet input[type=number]::part(-webkit-outer-spin-button) {
-	
+
 	filter:invert(80%);
 }*/
 
@@ -705,9 +1863,12 @@
   --rt-result-bg: #000;
   --rt-result-text: #f5f5f5;
   --rt-result-border: #a7a8aa;
-  --rt-result-crit-bg: #3fb315;
+  --rt-result-crit-bg: #00bfff;
+  --rt-result-crit-border: #00bfff;
   --rt-result-fail-bg: #b31515;
-  --rt-result-mixed-bg: #4a57ed;
+  --rt-result-fail-border: #b31515;
+  --rt-result-mixed-bg: #525cca;
+  --rt-result-mixed-border: #525cca;
 }
 
 	/* All roll templates (or most of them, anyway) */
@@ -744,6 +1905,7 @@
 }
 
 .sheet-rolltemplate-sagadefault .sheet-subheader,
+.sheet-rolltemplate-skill .sheet-take10or20,
 .sheet-rolltemplate-attack .sheet-subheader {
     background-color: var(--rt-subheader-bg);
     color: var(--rt-subheader-text);
@@ -775,7 +1937,7 @@
 .sheet-rolltemplate-second-wind tr:nth-child(odd) {
     background-color: var(rt-tr-odd);
 }
- 
+
 .sheet-rolltemplate-sagadefault tr:nth-child(even),
 .sheet-rolltemplate-attack tr:nth-child(even),
 .sheet-rolltemplate-skill tr:nth-child(even),
@@ -790,18 +1952,19 @@
 .sheet-rolltemplate-second-wind .inlinerollresult {
     display: inline-block;
     min-width: 1.5em;
-    text-align: center; 
+    text-align: center;
     border: 2px solid var(--rt-result-border);
 	border-radius: 5px;
     background-color: var(--rt-result-bg);
     color: var(--rt-result-text);
 }
- 
+
 .sheet-rolltemplate-sagadefault .inlinerollresult.fullcrit,
 .sheet-rolltemplate-attack .inlinerollresult.fullcrit,
 .sheet-rolltemplate-skill .inlinerollresult.fullcrit,
 .sheet-rolltemplate-second-wind .inlinerollresult.fullcrit {
     background-color: var(--rt-result-crit-bg);
+    border-color: var(--rt-result-crit-border);
 }
 
 .sheet-rolltemplate-sagadefault .inlinerollresult.fullfail,
@@ -809,6 +1972,7 @@
 .sheet-rolltemplate-skill .inlinerollresult.fullfail,
 .sheet-rolltemplate-second-wind .inlinerollresult.fullfail {
     background-color: var(--rt-result-fail-bg);
+    border-color: var(--rt-result-fail-border);
 }
 
 .sheet-rolltemplate-sagadefault .inlinerollresult.importantroll,
@@ -816,14 +1980,15 @@
 .sheet-rolltemplate-skill .inlinerollresult.importantroll,
 .sheet-rolltemplate-second-wind .inlinerollresult.importantroll {
     background-color: var(--rt-result-mixed-bg);
+    border-color: var(--rt-result-mixed-border);
 }
 
 .sheet-rolltemplate-sagadefault div,
 .sheet-rolltemplate-attack div,
 .sheet-rolltemplate-skill div,
-.sheet-rolltemplate-second-wind div { 
-    width:100%; 
-    max-width:400px; 
+.sheet-rolltemplate-second-wind div {
+    width:100%;
+    max-width:400px;
 }
 
 /* INDIVIDUAL ROLL TEMPLATES*/
@@ -849,7 +2014,7 @@
     text-align: center;
     border-left: none;
 	border-top-right-radius: 2.5px;
-    width: 75px;
+    width: 65px;
 }
 
 .sheet-rolltemplate-skill tr:last-child td {
@@ -871,9 +2036,11 @@
 .sheet-rolltemplate-second-wind table {
     border-radius:5px;
 }
+
 .sheet-rolltemplate-second-wind .sheet-tcat {
     font-weight: bold;
 }
+
 .sheet-rolltemplate-second-wind th {
     text-align: center;
 }
@@ -932,21 +2099,21 @@
   --rtdm-result-text: #f5f5f5;
   --rtdm-result-bg: #4a206c;
   --rtdm-result-border: #732d95;
-  --rtdm-result-crit-bg: #247905;
-  --rtdm-result-crit-border: #46c419;
+  --rtdm-result-crit-bg: #00a0c2;
+  --rtdm-result-crit-border: #13ebee;
   --rtdm-result-fail-bg: #790505;
   --rtdm-result-fail-border: #c41919;
   --rtdm-result-mixed-bg: #3944ca;
   --rtdm-result-mixed-border: #4a57ed;
 }
+
 .sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode,
 .sheet-rolltemplate-attack.sheet-rolltemplate-darkmode,
 .sheet-rolltemplate-skill.sheet-rolltemplate-darkmode,
 .sheet-rolltemplate-second-wind.sheet-rolltemplate-darkmode,
 .sheet-rolltemplate-statBlock.sheet-rolltemplate-darkmode,
-.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode
- {
-    background-color: var(--dark-surface2); 
+.sheet-rolltemplate-Status.sheet-rolltemplate-darkmode {
+    background-color: var(--dark-surface2);
 	/* This uses the default Roll20 color variable to prevent colored rectangles from poking through in the rounded corners. */
 }
 
@@ -979,20 +2146,25 @@
 }
 
 .sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode .sheet-subheader,
+.sheet-rolltemplate-skill.sheet-rolltemplate-darkmode .sheet-take10or20,
 .sheet-rolltemplate-attack.sheet-rolltemplate-darkmode .sheet-subheader {
     background-color: var(--rtdm-subheader-bg);
     color: var(--rtdm-subheader-text);
 }
 
 .sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode tr:nth-child(odd),
+.sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode tr:has(td.sheet-subheader) ~ tr:nth-child(even),
 .sheet-rolltemplate-attack.sheet-rolltemplate-darkmode tr:nth-child(odd),
-.sheet-rolltemplate-skill.sheet-rolltemplate-darkmode tr:nth-child(odd) {
+.sheet-rolltemplate-skill.sheet-rolltemplate-darkmode tr:nth-child(odd),
+.sheet-rolltemplate-skill.sheet-rolltemplate-darkmode tr.sheet-take10or20 ~ tr:nth-child(even) {
     background-color: var(--rtdm-tr-odd);
 }
- 
+
 .sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode tr:nth-child(even),
+.sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode tr:has(td.sheet-subheader) ~ tr:nth-child(odd),
 .sheet-rolltemplate-attack.sheet-rolltemplate-darkmode tr:nth-child(even),
 .sheet-rolltemplate-skill.sheet-rolltemplate-darkmode tr:nth-child(even),
+.sheet-rolltemplate-skill.sheet-rolltemplate-darkmode tr.sheet-take10or20 ~ tr:nth-child(odd),
 .sheet-rolltemplate-second-wind.sheet-rolltemplate-darkmode tr:nth-child(even) {
     background-color: var(--rtdm-tr-even);
 }
@@ -1006,7 +2178,7 @@
     background-color: var(--rtdm-result-bg);
     border: 2px solid var(--rtdm-result-border);
 }
- 
+
 .sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode .inlinerollresult.fullcrit,
 .sheet-rolltemplate-attack.sheet-rolltemplate-darkmode .inlinerollresult.fullcrit,
 .sheet-rolltemplate-skill.sheet-rolltemplate-darkmode .inlinerollresult.fullcrit,
@@ -1014,7 +2186,7 @@
 	background-color: var(--rtdm-result-crit-bg);
     border: 2px solid var(--rtdm-result-crit-border);
 }
- 
+
 .sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode .inlinerollresult.fullfail,
 .sheet-rolltemplate-attack.sheet-rolltemplate-darkmode .inlinerollresult.fullfail,
 .sheet-rolltemplate-skill.sheet-rolltemplate-darkmode .inlinerollresult.fullfail,
@@ -1022,7 +2194,7 @@
 	background-color: var(--rtdm-result-fail-bg);
     border: 2px solid var(--rtdm-result-fail-border);
 }
- 
+
 .sheet-rolltemplate-sagadefault.sheet-rolltemplate-darkmode .inlinerollresult.importantroll,
 .sheet-rolltemplate-attack.sheet-rolltemplate-darkmode .inlinerollresult.importantroll,
 .sheet-rolltemplate-skill.sheet-rolltemplate-darkmode .inlinerollresult.importantroll,
@@ -1032,18 +2204,18 @@
 }
 
 	/* DARK MODE for Saga Default Roll Template */
-/*Nothing specific yet*/
+/* Nothing specific yet */
 
 	/* DARK MODE for Attack Roll Template*/
-/*Nothing specific yet*/
+/* Nothing specific yet */
 
 	/* DARK MODE for Skill Roll Template */
-.sheet-rolltemplate-skill.sheet-rolltemplate-darkmode tr:first-child td{
+.sheet-rolltemplate-skill.sheet-rolltemplate-darkmode tr:first-child td {
     background-color: var(--rtdm-bg);
 }
 
 	/* DARK MODE for Second Wind Roll Template */
-/*Nothing specific yet*/
+/* Nothing specific yet */
 
 	/* DARK MODE for statBlock Template*/
 .sheet-rolltemplate-statBlock.sheet-rolltemplate-darkmode td,

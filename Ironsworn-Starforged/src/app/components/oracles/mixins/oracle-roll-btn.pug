@@ -1,31 +1,20 @@
-//- mixin oracleRollButton()
-//-   - console.log("Processing oracle", oracle.Name)
-//-   if rollButton === true && oracle.Tables
-//-     +oracleMultiBtn(oracle)
-//-   else if rollButton === true && oracle.Table
-//-     +oracleSingleButton(oracle)
-
 mixin oracleListGroupItem(id, buttonLabel)
   +oracleRollBtn(id, buttonLabel)
 
-mixin oracleSubtablesListGroupItem(id, buttonLabel, tables)
+mixin oracleSubOraclesListGroupItem(id, buttonLabel, oracles)
   -
-    let counter = 0;Label
-    let options = [];
-    tables.forEach((oracle) => {
-      if (oracle.Tables) {
-        oracle.Tables.forEach(subtable => {
-          let tableLabel = subtable['Display name']||subtable['Name'];
-          options.push(`${tableLabel},${counter}`);
-          counter++;
+    let count = 0
+    const options = oracles.map((table) => {
+      if (table.Oracles) {
+        const subOracleOptions = table.Oracles.map((oracle) => {
+          return `${oracle['Name']}&#44;${count++}`
         })
-      }
-      else {
-        let tableLabel = oracle['Display name']||oracle['Name'];
-        options.push(`${tableLabel},${counter}`);
-        counter++;
+        return `${table['Name']},?{${table['Name']}&#124;${subOracleOptions.join('&#124;')}&#125;`
+      } else {
+        return `${table['Name']},${count++}`
       }
     })
+
   - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}}`
   +oracleRollBtn(id, buttonLabel, rollQuery)
 
@@ -55,10 +44,21 @@ mixin oracleRollBtn(id, buttonLabel, rollQuery="")
     .btn-content.oracle-name=buttonLabel.replace(/ - /i, ": ")
 
 mixin oracleMultiBtn(oracle, btnText, indexOffset=0)
-  - const labelText = oracle['Display name']||oracle['Name']
-  - const options = oracle.Tables.map((table, index) => { return `${table['Display name']||table['Name']},${index+indexOffset}` })
-  - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}} {{header=${labelText}}}`
-  - const id = oracle.id
+  -
+    const labelText = oracle['Name']
+    const options = oracle.Oracles.map((table, index) => {
+      if (table.Oracles) {
+        const subOracleOptions = table.Oracles.map((oracle, index) => {
+          return `${oracle['Name']}&#44;${index}`
+        })
+        return `?{Type&#124;${subOracleOptions.join('&#124;')}}`
+      } else {
+        return `${table['Name']},${index+indexOffset}`
+      }
+    })
+    console.log('opt 2', options)
+    const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}} {{header=${labelText}}}`
+    const id = oracle.$id
   label.roll-label.embedded-btn=btnText||labelText
     button.hide-element(
       type='roll'
@@ -68,8 +68,8 @@ mixin oracleMultiBtn(oracle, btnText, indexOffset=0)
     )
 
 mixin oracleSingleButton(oracle, btnText)
-  - const labelText=oracle['Display name']||oracle.Name
-  - const id = oracle.id
+  - const labelText=oracle.Name
+  - const id = oracle.$id
   label.roll-label.surface-2.embedded-btn=btnText||labelText
     button.hide-element(
       type='roll'

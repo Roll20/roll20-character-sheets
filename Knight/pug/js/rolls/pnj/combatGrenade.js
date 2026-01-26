@@ -3,7 +3,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-undef */
 
-const rollCombatGrenadePNJ = ['grenade1PNJ', 'grenade2PNJ', 'grenade3PNJ', 'grenade4PNJ', 'grenade5PNJ'];
+const rollCombatGrenadePNJ = ['grenade1PNJ', 'grenade2PNJ', 'grenade3PNJ', 'grenade4PNJ', 'grenade5PNJ', 'grenade6PNJ'];
 
 rollCombatGrenadePNJ.forEach((button) => {
   on(`clicked:${button}`, async (info) => {
@@ -151,6 +151,14 @@ rollCombatGrenadePNJ.forEach((button) => {
         exec.push(`{{choc=${i18n_choc} 1}} {{chocCondition=${i18n_chocCondition}}} {{grenadeExplosive=${i18n_surVehicule}}} {{grenadeExplosiveD=[[3D6]]}}`);
         autresEffets.push(i18n_antiVehicule);
         autresEffets.push(`${i18n_dispersion} 3`);
+        break;
+      case 'grenade6PNJ':
+        isConditionnelA = true;
+
+        exec.push(`{{demoralisant=${i18n_demoralisant} 1}} {{demoralisantCondition=${i18n_demoralisantCondition}}}`);
+        autresEffets.push(i18n_ignoreCouvert);
+        autresEffets.push(i18n_nonLetal);
+        autresEffets.push(`${i18n_dispersion} 6`);
         break;
       default:
         isConditionnelA = false;

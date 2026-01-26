@@ -21,7 +21,7 @@ const megMagicSkillIds = ['binding', 'devotion', 'exhort', 'folk_magic', 'invoca
  * Imports JSON data from the Mythras Encounter Generator or other sources which use the same data format
  */
 on("clicked:import", function() {
-    getAttrs(['import_json_data', 'import_character', 'setting_option', 'simplified_combat_enabled', 'action_points_calc', 'shaping_traits'], function(v) {
+    getAttrs(['import_json_data', 'import_character', 'character_id', 'setting_option', 'simplified_combat_enabled', 'action_points_calc', 'shaping_traits'], function(v) {
         try {
             const jsonData = JSON.parse(v['import_json_data']);
             const import_character = parseInt(v['import_character']);
@@ -207,6 +207,7 @@ on("clicked:import", function() {
 
                         if (weapon["type"] === "ranged") {
                             newAttrs["repeating_rangedweapon_" + weaponid + "_id"] = `repeating_rangedweapon_${weaponid}`;
+                            newAttrs["repeating_rangedweapon_" + weaponid + "_rollval"] = `%{${v['character_id']}|repeating_rangedweapon_${weaponid}_roll}`;
                             newAttrs["repeating_rangedweapon_" + weaponid + "_name"] = weapon["name"];
                             newAttrs["repeating_rangedweapon_" + weaponid + "_force"] = weapon["size"];
                             newAttrs["repeating_rangedweapon_" + weaponid + "_impale_size"] = weapon["size"];
@@ -229,6 +230,7 @@ on("clicked:import", function() {
                             weaponButtons = weaponButtons + ` [${weapon["name"]}](~@{character_id}|repeating_rangedweapon_${weaponid}_damage)`;
                         } else {
                             newAttrs["repeating_meleeweapon_" + weaponid + "_id"] = `repeating_meleeweapon_${weaponid}`;
+                            newAttrs["repeating_meleeweapon_" + weaponid + "_rollval"] = `%{${v['character_id']}|repeating_meleeweapon_${weaponid}_roll}`;
                             newAttrs["repeating_meleeweapon_" + weaponid + "_name"] = weapon["name"];
                             newAttrs["repeating_meleeweapon_" + weaponid + "_size"] = weapon["size"];
                             newAttrs["repeating_meleeweapon_" + weaponid + "_reach"] = weapon["reach"];

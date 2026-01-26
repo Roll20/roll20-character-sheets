@@ -2,10 +2,7 @@ import {
     linkedAttributeDisplayNames
 } from './attributes'
 import {
-    skillsList,
-    tieredSkills,
-    tieredSkillsBasic,
-    tieredSkillsAdvanced
+    skillsList
 } from './domain/skills/skills-list'
 
 const skillXPChanged = ({
@@ -29,11 +26,7 @@ const skillXPChanged = ({
 
         skillAttributesToSet[skillLevel] = calculateSkillLevel(Number(newValue), values.learning_speed)
 
-        const skillData = getSkill(
-            skillNameLookupKey,
-            skillAttributesToSet[skillLevel],
-            tieredSkills.includes(skillNameLookupKey)
-        )
+        const skillData = getSkill(skillNameLookupKey)
 
         skillAttributesToSet["repeating_skills_" + skillId + "skill_tnc"] = skillData.targetNumber + "/" + skillData.complexity
         skillAttributesToSet["repeating_skills_" + skillId + "target_number"] = skillData.targetNumber
@@ -93,14 +86,6 @@ export const getSkillDisplayName = (skill, skillDisplayNameKey, subSkill) => {
     return skill.displayName[skillDisplayNameKey]
 }
 
-export const getSkill = (skillName, skillLevel, tieredSkill) => {
-    if (tieredSkill) {
-        if (skillLevel <= 3) {
-            return tieredSkillsBasic[skillName]
-        } else {
-            return tieredSkillsAdvanced[skillName]
-        }
-    } else {
-        return skillsList[skillName]
-    }
+export const getSkill = (skillName) => {
+    return skillsList[skillName]
 }

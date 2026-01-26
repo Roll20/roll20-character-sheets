@@ -3,7 +3,7 @@
 
 
 	<div class="nav">
-		<input type="hidden" class="mooktoggle" name="attr_mooksheet_flag" value='0' />
+		<input type="hidden" class="mooktoggle" name="attr_mooksheet_flag" value="0" />
 
 		<div class="character-mode"><button type="action" name="act_character" >CHARACTER</button></div>
 		<div class="mook-mode"><button type="action" name="act_mook" >MOOK</button></div>
@@ -11,7 +11,7 @@
 		<div class="character-mode"><button type="action" name="act_cyberware" >CYBERWARE</button></div>
 		<div class="character-mode"><button type="action" name="act_netrunning" >NETRUNNING</button></div>
 		<div class="character-mode"><button type="action" name="act_journal" >JOURNAL</button></div>
-		<div class="character-mode"><button type="roll" name="roll_initiative" value="&{template:initiative} {{name=Initiative}} {{roll=[[d10+@{Reflex} &{tracker}]]}}">ROLL INITIATIVE</button></div>
+		<div class="character-mode"><button type="roll" name="roll_initiative" value="&{template:initiative} {{name=Initiative}} {{roll=[[d10+@{Reflex}+@{initiative_modifier} &{tracker}]]}}">ROLL INITIATIVE</button></div>
 		<div><button type="action" name="act_settings" >SETTINGS</button></div>
 	</div>
 	<input type='hidden' class='sheet-tabstoggle' name='attr_sheetTab'  value='character'  />
@@ -84,6 +84,12 @@
 					<div class="bg-white skill-rank"><input type="number" name="attr_rankOperator" placeholder="0"/></div>
 					<div class="bg-white skill-name">Moto (Nomad)</div>
 					<div class="bg-white skill-rank"><input type="number" name="attr_rankMoto" placeholder="0"/></div>
+				</div>
+
+				<input type="hidden" class="settings-toggle-show-initiative-modifier" name="attr_initiative_modifier_flag" value="0" />
+				<div class="flex-table initiative-modifier">
+					<div class="bg-black-2 skill-name">Initiative Modifier</div>
+					<div class="bg-white skill-rank"><input type="number" name="attr_initiative_modifier" value="0"/></div>
 				</div>
 			</div>
 
@@ -906,7 +912,12 @@
 					<div class="flex-table">
 						<button type="roll" name="roll_weapon_dmg" style="display: none;" value="@{DMG}"></button>
 						<input type="hidden" name="attr_WeaponMod" value="@{Total_Melee}">
-						<div class="bg-white weapon-name"><button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button> <input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here..."></div>
+						<div class="bg-white weapon-name">
+							<input type="hidden" class="settings-toggle-show-aimed-shot-button" name="attr_aimed_shot_flag" value="0" />
+							<button name="roll_aimed_shot" type="roll" class="txt-btn aimed-shot-icon" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{aimed_shot=1}}  {{roll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1d10]]}}" title="Aimed Shot">⌖</button>
+							<button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button>
+							<input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here...">
+						</div>
 						<div class="bg-white weapon-type">
 							<select name="attr_Weapontype" class="Weapontype">
 								<option value="-" selected>(Select Type)</option>
@@ -1594,24 +1605,123 @@
 	</div>
 
 	<div class="settings">
-
-		<div class="nav">
-			<div><button class="options" type="action" name="act_resetbase" >RESET BASE SKILLS</button></div>
-			<div><button class="options" type="action" name="act_newcharacter" >TOGGLE STAT/SKILLPOINT TRACKER</button></div>
-		</div>
-
 		<div class="my-settings">
-			<div class="option">
-				<div class="settings-title">ENABLE MOOK SHEET</div>
-				<div class='settings-checkbox'>
-					<input type="hidden" class="mooktoggle" name="attr_mooksheet_flag" value=0/>
-					<button type="action" name="act_mooksheet" class="mooktoggle">
-						<span class="checked">✓</span>
-					</button>
+
+			<div class="settings-row">
+				<h3>CHARACTER SHEET OPTIONS</h3>
+				<div class="nav">
+					<div class="reset-skills-setting">
+						<input type="hidden" class="sheet-reset-skills" name="attr_reset_skills_state" value="button" />
+						<div class="reset-button">
+							<button class="options" type="action" name="act_resetcheck">RESET BASE SKILLS</button>
+						</div>
+						<div class="reset-check">
+							<div class="heading">RESET BASE SKILLS</div>
+							<div class="question">Are you sure?</div>
+							<div class="buttons">
+								<button class="options" type="action" name="act_resetconfirm" title="This will reset all base skill values to defaults!">Yes</button> /
+								<button class="options" type="action" name="act_resetcancel" title="This will NOT reset skill values.">No</button>
+							</div>
+						</div>
+					</div>
+					<div class="toggle-tracker-setting">
+						<button class="options" type="action" name="act_newcharacter" >TOGGLE STAT/SKILLPOINT TRACKER</button>
+					</div>
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">ENABLE MOOK SHEET</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="mooktoggle" name="attr_mooksheet_flag" value="0" />
+							<button type="action" name="act_mooksheet" class="mooktoggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">SHOW INITIATIVE MODIFIER</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="settings-toggle settings-toggle-show-initiative-modifier" name="attr_initiative_modifier_flag" value="0" />
+							<button type="action" name="act_initiative_modifier" class="settings-toggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
-		</div>
 
+			<div class="settings-row">
+				<h3>AIMED SHOT OPTIONS</h3>
+				<div class="settings-help">
+					When enabled, an aimed shot button is displayed next to the "Attack" button for each weapon.
+					The button will be displayed as a crosshair icon that looks like this: "<span class="aimed-shot-icon">⌖</span>".
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">SHOW AIMED SHOT BUTTON</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="settings-toggle settings-toggle-show-aimed-shot-button" name="attr_aimed_shot_flag" value="0" />
+							<button type="action" name="act_aimed_shot" class="settings-toggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">AIMED SHOT PENALTY</div>
+					<div class="settings-value">
+						<div class="settings-number">
+							<input type="number" name="attr_aimed_shot_penalty" value="-8" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="settings-row">
+				<h3>ARMOR PENALTY</h3>
+				<div class="settings-help">
+					By default the Armor Penalty applies to REF, DEX and MOVE. You can change this behavior by selecting not to apply the armor penalty per stat, 
+					which then allows you to set that stat manually. The penantly will be applied when these settings are enabled or when the Head or Body armor 
+					penalty is changed. The REF and DEX stats can be reduced to below 0, but the MOVE stat cannot.
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">APPLY TO REF</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="settings-toggle" name="attr_armor_penalty_ref_flag" value="1" />
+							<button type="action" name="act_armor_penalty_ref" class="settings-toggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">APPLY TO DEX</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="settings-toggle" name="attr_armor_penalty_dex_flag" value="1" />
+							<button type="action" name="act_armor_penalty_dex" class="settings-toggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">APPLY TO MOVE</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="settings-toggle" name="attr_armor_penalty_move_flag" value="1" />
+							<button type="action" name="act_armor_penalty_move" class="settings-toggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
 	</div>
 
 	<div class="mook">
@@ -1673,10 +1783,10 @@
 		</div>
 		<div class="mookweapons section">
 			<div class="mookweapontitle">
-				<div class="h2">Weapons</div>
+				<div class="h2">WEAPONS</div>
 			</div>
 			<div class="mookarmortitle">
-				<div class="h2">Armor</div>
+				<div class="h2">ARMOR</div>
 			</div>
 			<div class="mookweaponheader">
 				<div class="flex-table">
@@ -1700,7 +1810,11 @@
 					<div class="flex-table">
 						<button type="roll" name="roll_weapon_dmg" style="display: none;" value="@{DMG}"></button>
 						<input type="hidden" name="attr_WeaponMod" value="@{Total_Melee}">
-						<div class="bg-white weapon-name"><button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button> <input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here..."></div>
+						<div class="bg-white weapon-name">
+							<input type="hidden" class="settings-toggle-show-aimed-shot-button" name="attr_aimed_shot_flag" value="0" />
+							<button name="roll_aimed_shot" type="roll" class="txt-btn aimed-shot-icon" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{aimed_shot=1}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1d10]]}}" title="Aimed Shot">⌖</button>
+							<button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button>
+							<input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here..."></div>
 						<div class="bg-white weapon-type">
 							<select name="attr_Weapontype" class="Weapontype">
 								<option value="Brawling">Brawling</option>
@@ -1736,23 +1850,37 @@
 					</div>
 				</fieldset>
 			</div>
-			<div class="armordetails">
-				<div class="armor-piece"><input type="text" placeholder="Head"></div>
-				<div class="armor-sp"><input type="number" placeholder="SP"></div>
-				<div class="armor-penalty"><input type="number" placeholder="0"></div>
-				<div class="armor-piece"><input type="text" placeholder="Body"></div>
-				<div class="armor-sp"><input type="number" placeholder="SP"></div>
-				<div class="armor-penalty"><input type="number" placeholder="0"></div>
-				<div class="armor-piece"><input type="text" placeholder="Shield"></div>
-				<div class="armor-sp"><input type="number" placeholder="HP"></div>
-				<div class="armor-penalty"><input type="number" placeholder="0"></div>
+
+			<div class="armor">
+
+				<div class="flex-table">
+					<div class="bg-white armor-piece"><div>Head:&nbsp;</div><input type=text spellcheck=false name="attr_HeadArmor" placeholder="Type here..."></div>
+					<div class="bg-white armor-sp"><input type="number" name="attr_HeadSP"   />/<input type="number" name="attr_HeadSP_max" /></div>
+					<div class="bg-white armor-penalty"><input type="number" name="attr_HeadPenalty" /></div>
+				</div>
+
+				<div class="flex-table">
+					<div class="bg-white armor-piece">Body:&nbsp;<input type=text spellcheck=false name="attr_BodyArmor" placeholder="Type here..."></div>
+					<div class="bg-white armor-sp"><input type="number" name="attr_BodySP"  />/<input type="number" name="attr_BodySP_max" /></div>
+					<div class="bg-white armor-penalty"><input type="number" name="attr_BodyPenalty"/></div>
+				</div>
+
+				<div class="flex-table">
+					<div class="bg-white armor-piece">Shield:&nbsp;<input type=text spellcheck=false name="attr_Shield" placeholder="Type here..."></div>
+					<div class="bg-white armor-sp"><input type="number" name="attr_ShieldHP" />/<input type="number" name="attr_ShieldHP_max" /></div>
+					<div class="bg-white armor-penalty"><input type="number" name="attr_ShieldPenalty" /></div>
+				</div>
+			</div>
+
+		</div>
+		<div class="mookskillstitlesection section">
+			<div class="mookskillstitle">
+				<h2>SKILLS</h2>
 			</div>
 		</div>
-		<div class="mookskills section">
-			<div class="mookskillstitle">
-				<h2>Skills</h2>
-			</div>
-			<div>
+		<div class="mookskills">
+			
+			<div class="mookskillscolumn">
 
 			<!-- AWARENESS SKILLS -->
 
@@ -1773,7 +1901,6 @@
 					<div class="bg-white skill-base"><input type="number" name="attr_LVL_ConcealReveal" value="0"  /></div>
 					<div class="bg-white skill-mod"><input type="number" name="attr_Misc_ConcealReveal" value="0"  /></div>
 					<div class="bg-white skill-total"><input type="number" name="attr_Total_ConcealReveal" value="0" readonly /></div>
-				
 
 					<div class="bg-white skill-name"><button name="roll_LipReading" type="roll" class="txt-btn" value="&{template:skill} {{critroll=[[@{Total_LipReading}+10+1d10]]}} {{failroll=[[@{Total_LipReading}+1-1d10]]}} {{rollname=Lip Reading}}  {{roll=[[@{Total_LipReading}+1d10]]}}">Lip Reading (INT)</button></div>
 					<div class="bg-white skill-base"><input type="number" name="attr_LVL_LipReading" value="0"  /></div>
@@ -1925,7 +2052,7 @@
 				</div>
 
 			</div>
-			<div>
+			<div class="mookskillscolumn">
 				<div class="flex-table">
 					<div class="bg-black-2 skill-name">Education Skills (Cont.)</div>
 					<div class="bg-black-2 skill-base">LVL</div>
@@ -2118,7 +2245,7 @@
 					<div class="bg-white skill-total"><input type="number" name="attr_Total_Handgun" value="0" readonly /></div>
 				</div>	
 			</div>
-			<div>
+			<div class="mookskillscolumn">
 				<!-- RANGED WEAPONS CONT. -->
 
 				<div class="flex-table">
@@ -2307,8 +2434,10 @@
 			</div>
 		</div>
 		<div class="mookinventory section">
-			<h2>Inventory and Notes</h2>
-			<textarea spellcheck=false name="attr_mookinventory"></textarea>
+			<div class="h2">INVENTORY AND NOTES</div>
+			<div class="mookinventorycolumn">
+				<textarea spellcheck=false name="attr_mookinventory"></textarea>
+			</div>
 		</div>
 	</div>
 
@@ -2411,21 +2540,21 @@
 	<div class="sheet-template-container normal">
 		<div class="sheet-template-header"><span>{{roll}}</span></div>
 		<div class="sheet-template-row-subhead"><span>{{rollname}}</span></div>
-		<div class="sheet-template-row">{{weapontype}}</div>
+		<div class="sheet-template-row">{{weapontype}}{{#aimed_shot}} - Aimed Shot{{/aimed_shot}}</div>
 	</div>
 	{{/^rollWasFumble() roll}} {{/^rollWasCrit() roll}}
 	{{#rollWasCrit() roll}}
 	<div class="sheet-template-container crit">
 		<div class="sheet-template-header"><span>{{critroll}}</span></div>
 		<div class="sheet-template-row-subhead">{{rollname}}</div>
-		<div class="sheet-template-row">{{weapontype}}</div>
+		<div class="sheet-template-row">{{weapontype}}{{#aimed_shot}} - Aimed Shot{{/aimed_shot}}</div>
 	</div>
 	{{/rollWasCrit() roll}}
 	{{#rollWasFumble() roll}}
 	<div class="sheet-template-container fail">
 		<div class="sheet-template-header"><span>{{failroll}}</span></div>
 		<div class="sheet-template-row-subhead">{{rollname}}</div>
-		<div class="sheet-template-row">{{weapontype}}</div>
+		<div class="sheet-template-row">{{weapontype}}{{#aimed_shot}} - Aimed Shot{{/aimed_shot}}</div>
 	</div>
 	{{/rollWasFumble() roll}}
 
@@ -2478,6 +2607,7 @@
 		<div>51-100</div><div>101-200</div>
 		<div>201-400</div><div>401-800</div>
 
+		<div class="header">DV</div>
 		<div>20</div><div>17</div>
 		<div>20</div><div>25</div>
 		<div>30</div><div>N/A</div>
@@ -2658,29 +2788,56 @@
 			});
 	});
 
-	on("change:Dexterity_max change:HeadPenalty change:BodyPenalty", function() {
-		getAttrs([
-			"HeadPenalty",
-			"BodyPenalty",
-			"Dexterity_max",
-			"Reflex_max",
-			"Movement_max"
-			], function(values) {
+	const armor_penalty_triggers = [
+		"HeadPenalty",
+		"BodyPenalty",
+		"armor_penalty_ref_flag",
+		"armor_penalty_dex_flag",
+		"armor_penalty_move_flag"
+	];
+	armor_penalty_triggers.forEach(function(trigger) {
+		on(`change:${trigger}`, function() {
+			getAttrs([
+				"HeadPenalty",
+				"BodyPenalty",
+				"Reflex_max",
+				"Dexterity_max",
+				"Movement_max",
+				"armor_penalty_ref_flag",
+				"armor_penalty_dex_flag",
+				"armor_penalty_move_flag"
+				], function(values) {
 
-				const headpen = Math.abs(parseInt(values.HeadPenalty))||0;
-				const bodypen = Math.abs(parseInt(values.BodyPenalty))||0;
-				const DEX = parseInt(values.Dexterity_max);
-				const REF = parseInt(values.Reflex_max);
-				const MOVE = parseInt(values.Movement_max);
+					const headpen = Math.abs(parseInt(values.HeadPenalty))||0;
+					const bodypen = Math.abs(parseInt(values.BodyPenalty))||0;
+					const DEX = parseInt(values.Dexterity_max);
+					const REF = parseInt(values.Reflex_max);
+					const MOVE = parseInt(values.Movement_max);
 
-				var maxpenalty = Math.max(headpen,bodypen)||0;
+					var maxpenalty = Math.max(headpen,bodypen)||0;
 
-				setAttrs({
-					"Dexterity" : DEX - maxpenalty,
-					"Reflex" : REF - maxpenalty,
-					"Movement" : MOVE - maxpenalty
-				});
-			});
+					let update_attrs = {};
+
+					if (values.armor_penalty_ref_flag == 1) {
+						update_attrs.Reflex = REF - maxpenalty;
+					}
+
+					if (values.armor_penalty_dex_flag == 1) {
+						update_attrs.Dexterity = DEX - maxpenalty;
+					}
+
+					if (values.armor_penalty_move_flag == 1) {
+						update_attrs.Movement = MOVE - maxpenalty;
+						if (update_attrs.Movement < 0)
+						{
+							update_attrs.Movement = 0
+						}
+					}
+
+					setAttrs(update_attrs);
+				}
+			);
+		});
 	});
 
 	// Creating a list of Program Names and details
@@ -2963,6 +3120,14 @@
 			});
 	});
 
+	on("change:repeating_weapons", function() {
+		getAttrs(["aimed_shot_flag"], function(values) {
+			setAttrs({
+				"repeating_weapons_aimed_shot_flag": values.aimed_shot_flag||0
+			});
+		});
+	});
+
 	const buttonlist = ["character","lifepath","cyberware","netrunning","journal","settings","mook"];
 	buttonlist.forEach(button => {
 		on(`clicked:${button}`, function() {
@@ -3116,10 +3281,10 @@
 			"lvl_" + skill,
 			"misc_" + skill
 	));
-	const all_skills_lvl_misc_changes = all_skills_lvl_misc.map(skill => `change:${skill}`).join(' ');
 	const stats_lower = ["intelligence","reflex","dexterity","technique","cool","willpower","luck","movement","body","empathy"];
-	const stats_changes = stats_lower.map(stat => `change:${stat.toLowerCase()}`).join(' ');
-	on(`${all_skills_lvl_misc_changes} ${stats_changes} sheet:opened`, function() {
+
+	// When sheet is opened, update "total" attribute of all skills.
+	on("sheet:opened", function() {
 		getAttrs([...stats_lower.map(stat => stat.toLowerCase()), ...all_skills_lvl_misc], function(values) {
 			const output = {};
 			Object.keys(all_skills).forEach(skill => {
@@ -3131,6 +3296,52 @@
 				output['total_' + skill] = total;
 			});
 			setAttrs(output);
+		});
+	});
+
+	// When stat changes, update "total" attribute of associated skills.
+	stats_lower.forEach(function(stat_name) {
+		on(`change:${stat_name}`, function() {
+			const skill_attributes = [];
+			const associated_skills = [];
+			skill_attributes.push(stat_name);
+			Object.entries(all_skills).forEach(([key, value]) => {
+				if (value == stat_name) {
+					associated_skills.push(key);
+					skill_attributes.push("lvl_" + key, "misc_" + key);
+				}
+			});
+			getAttrs(skill_attributes, function(values) {
+				const stat_set_attrs = [];
+				associated_skills.forEach(skill => {
+					const base = parseInt(values["lvl_" + skill]) || 0;
+					const misc = parseInt(values["misc_" + skill]) || 0;
+					const stat = parseInt(values[stat_name]) || 0;
+					const total = base + misc + stat;
+					stat_set_attrs["total_" + skill] = total;
+				});
+				setAttrs(stat_set_attrs);
+			});
+		});
+	});
+
+	// Update "total" attribute of skill when "lvl" or "misc" atrributes change.
+	Object.keys(all_skills).forEach(function (skill) {
+		on(`change:LVL_${skill} change:Misc_${skill}`, function() {
+			const skill_attributes = [
+				all_skills[skill], // Stat attribute
+				`lvl_${skill}`,
+				`misc_${skill}`
+			];
+			getAttrs(skill_attributes, function(values) {
+				const base = parseInt(values["lvl_" + skill]) || 0;
+				const misc = parseInt(values["misc_" + skill]) || 0;
+				const stat = parseInt(values[all_skills[skill]]) || 0;
+				const total = base + misc + stat;
+				const skill_set_attrs = {};
+				skill_set_attrs["total_" + skill] = total;
+				setAttrs(skill_set_attrs);
+			});
 		});
 	});
 
@@ -3158,27 +3369,27 @@
 	                    ,"LVL_Streetslang","LVL_YourHome","LVL_Brawling","LVL_Evasion","LVL_Conversation"
 	                    ,"LVL_HumanPerception","LVL_Persuasion","LVL_FirstAid"];
 
+	on("clicked:resetcheck", function() {
+		setAttrs({"reset_skills_state": "confirm"});
+	});
 
-	on("clicked:resetbase", function() {
+	on("clicked:resetcancel", function() {
+		setAttrs({"reset_skills_state": "button"});
+	});
 
+	on("clicked:resetconfirm", function() {
 		getAttrs([], function(v) {
-
+			const reset_skills = {};
+			reset_skills["reset_skills_state"] = "button";
+			reset_skills["LVL_LanguageA"] = 4;
 			for (var skill of allskills) {
-
- 				if (basicskills.includes(skill)) {
-					setAttrs({
-						[skill] : 2
-					});
+				if (basicskills.includes(skill)) {
+					reset_skills[skill] = 2;
 				} else {
-					setAttrs({
-						[skill] : 0
-					});
+					reset_skills[skill] = 0;
 				}		
 			}
-
-			setAttrs({
-				"LVL_LanguageA" : 4
-			});
+			setAttrs(reset_skills);
 		});
 	});
 
@@ -3186,33 +3397,27 @@
 
 	allskills.forEach(function(skill) {
 		on(`change:${skill}`, function() {
-
 			var total = 0;
-
 			getAttrs(easyskills, function(values) {
-
 				for (var key of Object.keys(values)) {
 					total = total + parseInt(values[key])||0;
 				}
-
 			});
-
 			getAttrs(hardskills, function(values) {
-
 				for (var key of Object.keys(values)) {
 					total = total + 2 * parseInt(values[key])||0;
 				}
-
 				setAttrs({
 					"skillpoints" : 90 - total
 				});
 			});
-
-
 		});
 	});
 
-	const toggleList = ["cbaudio","lefteye","righteye","rightarm","leftarm","neurallink","rightleg","leftleg","mooksheet"];
+	const toggleList = [
+		"cbaudio","lefteye","righteye","rightarm","leftarm","neurallink","rightleg","leftleg","mooksheet",
+		"initiative_modifier", "armor_penalty_ref", "armor_penalty_dex", "armor_penalty_move"
+	];
 	toggleList.forEach(function(button) {
 		on(`clicked:${button}`, function() {
 			const flag = `${button}_flag`;
@@ -3223,5 +3428,25 @@
 			});
 		});
 	});
+	on('clicked:aimed_shot', function() {
+		getAttrs(['aimed_shot_flag'], function(v) {
+			const flag_value = v['aimed_shot_flag'] !== "1" ? "1" : "0";
+			setAttrs({
+				['aimed_shot_flag']: flag_value
+			});
+
+			getSectionIDs("repeating_weapons", function(idarray) {
+				const output = {};
+				idarray.forEach(id => {
+					output[`repeating_weapons_${id}_aimed_shot_flag`] = flag_value;
+				});
+				setAttrs(output);
+			});
+		});
+	});
 
 </script>
+
+
+
+

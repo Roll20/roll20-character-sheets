@@ -1,0 +1,54 @@
+- const { mods } = data.signature;
++panel({ name: 'mods', title: 'Mods' })
+  +block('content')
+    +editorblock('mods')
+      - const { fields } = mods;
+      +block('edit')
+        .mods__turbo
+          each field in fields
+            label.mods__check
+              +field(field).checkbox--scribble
+              span(data-i18n='mod_' + field.name)= field.label
+      //- +block('view')
+        .mods__turbo
+          each field in fields
+            +hidden(field.name)
+            div(data-i18n='mod_' + field.name)= field.label
+
++blob({ name: 'mods' })
+  +block('content')
+    +repeating('mods')
+      - const { hidden, broadcast, repeating } = mods;
+      - const [check, name, cost, desc] = repeating;
+      +block('edit')
+        .row.mods__edit
+          each field in hidden
+            +field(field)
+          each field in repeating
+            - const hideLabel = ['mod_check', 'mod_name'].includes(field.name);
+            - const divClass = field.span ? `col-${field.span}` : '';
+            - const labelClass = hideLabel ? 'visually-hidden' : null;
+            .mods__field(class=`${field.name} ${divClass}`)
+              unless field.type === "checkbox"
+                +field(field)
+                label(class=labelClass, data-i18n=field.name, for=field.name)= field.label
+              else
+                label(for=field.name)
+                  +field(field)
+                  span(class=labelClass, data-i18n=field.name)= field.label
+
+      +block('view')
+        +bubble({ name: 'mod', broadcast })
+          +block('header')
+            .mods__view
+              label.mods__check
+                +field(check)
+                +span(name).mod__name
+            +block('content')
+              +span(cost)
+              label(data-i18n=cost.name)= cost.label
+              +span(desc)
+              label(data-i18n=desc.name)= desc.label
+
+      +block('delete')
+        +span(name).mod__name

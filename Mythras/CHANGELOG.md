@@ -4,6 +4,45 @@ All notable changes to the Mythras sheet will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## 3.8
+### Fixed
+- Corrected damage modifier calculations for table values above 50
+- Corrected movement modifier for fatigue level of winded
+- Corrected an issue preventing moveRate calculations when old encumbrance values were in place
+
+## 3.7
+### Fixed
+- Deleting a weapon will now actually remove the row instead of just clearing the data
+
+## 3.6
+### Fixed
+- Combat Styles did not default to applying Encumbrance penalties
+- Professional Skills and Combat Style did not proper evaluate which encumbrance penalties should apply when STR or DEX was part of the base score.
+
+## 3.5
+### Fixed
+- [Various reapeating fields can not be added to the macro bar #77](https://github.com/DigitalPagan/Mythras-Roll20-Sheet/issues/77)
+- Weapons added via the meg import were not getting their rollval set to make the buttons work
+
+## 3.4
+### Fixed
+- [Damage modifier and other fields may not appear when weapon button used from roll template #73](https://github.com/DigitalPagan/Mythras-Roll20-Sheet/issues/73)
+- [Favoriting Weapons & Clicking them from the Combat Style prompts all notes #68](https://github.com/DigitalPagan/Mythras-Roll20-Sheet/issues/68)
+
+### Changed
+- Weapon rolls were renamed from `%{$ID_damage}` to `%{$ID_roll}`.  They now use custom roll parsing and the roll button itself is a reference to the ability
+
+## 3.3
+### Fixed
+- [Issue #70: Using hidden HP configs is not working right](https://github.com/DigitalPagan/Mythras-Roll20-Sheet/issues/70)
+- [Issue #72: Text is too light when weapon is not favored](https://github.com/DigitalPagan/Mythras-Roll20-Sheet/issues/72) - Removed text transparency
+- Added some missing translation keys
+
+### Changed
+- Removed v3 conversion problems notice from the options bar
+- Removed the redo v3 conversions button from help pop-up
+- Reduced transparency on greyed out items
+
 ## 3.2
 ### Fixed
 - Issue causing default setting of Mythic Britain to actually be Mythic Babylon and visa-versa.
