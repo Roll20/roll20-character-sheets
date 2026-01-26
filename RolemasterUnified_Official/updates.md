@@ -1,6 +1,40 @@
+# 2025-01-20
+
+- Show PP Mulitplier on front page
+  - Attribute is pp_multiplier
+- Show height in feet'inches, inches and cm.
+- Updates display of height on change
+- Sheet version -> 18; upgrade height on load
+- Fix initialisation setting vesion instead of version
+- Tracker:
+  - Better layout
+  - Read NPC attacks
+  - Read parry/db etc from PCs and from tracker
+  - Make attacks from tracker.
+- Inventory: Fix appearance of accordian
+
+
+# 2026-01-15
+
+(went live on the 16th)
+
+- Add tracker back
+- Add general "asCharacter" helpers
+- Tracker:
+  - Can add data using new as character
+  - Characters now remember their tracker
+  - for All Characters methods to tracker
+  - Tracker can set everyones AP/round message
+  - Tracker can roll everyones initiative (not to turn tracker though)
+  - Track base attributes
+- Add option for non-tracker initiative.
+- Clean up build so compiled/processed files go to build
+
 # 2026-01-08
 
 - Fix for creatures max PP
+- Fix fetch for targetted creatures
+- Partial fix for grapple
 
 # 2026-01-06
 
