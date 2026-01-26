@@ -193,3 +193,4 @@ Neue Features:
 #### 1.9
 
 - The sheet now has a (partial) French translation.
+- Added Ilaris logo to github repo.
