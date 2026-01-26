@@ -194,3 +194,4 @@ Neue Features:
 
 - The sheet now has a (partial) French translation.
 - Added Ilaris logo to github repo.
+- Remove background image, as it no longer exists at the given url.
