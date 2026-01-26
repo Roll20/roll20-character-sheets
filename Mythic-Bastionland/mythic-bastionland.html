@@ -2,25 +2,33 @@
 <input type="hidden" name="attr_sheetTab" value="character" />
 
 <!-- SHEET SELECTOR -->
-<div class="sheet-button-select">
+<!-- <div class="sheet-button-select">
   <button type="action" name="act_character">Knight</button>
   <button type="action" name="act_property">Property</button>
   <button type="action" name="act_notes">Notes</button>
-</div>
+</div> -->
 <!-- END OF SHEET SELECTOR -->
-<!-- CHARACTER SHEET -->
+<!-- TOGGLE BUTTON -->
+<input type="checkbox" name="attr_sheet_toggle" id="sheet-toggle" class="sheet-toggle-checkbox" />
+<label for="sheet-toggle" class="sheet-toggle-btn">
+  <span class="knight-btn-text">Knight</span>
+  <span class="npc-btn-text">NPCs</span>
+</label>
+
+<!-- KNIGHT SHEET -->
+<div class="knight-sheet">
 <div class="sheet-character">
   <div>
     <!-- Header -->
     <div class="header">
       <div class="header-line">
         <label>
-          Knight:
-          <input type="text" name="attr_knight" id="knight-input" />
-        </label>
-        <label>
-          Name:
+          They were named:
           <input type="text" name="attr_character_name" id="name-input" />
+        </label>
+               <label>
+          Known as the:
+          <input type="text" name="attr_knight" id="knight-input" />
         </label>
       </div>
       <div class="header-line">
@@ -29,6 +37,13 @@
         </label>
         <label>Rank:
           <input type="text" name="attr_rank" readonly />
+        </label>
+        <label>Age:
+          <select name="attr_age" class="age_select">
+            <option value="Young" selected>Young</option>
+            <option value="Mature">Mature</option>
+            <option value="Old">Old</option>
+          </select>
         </label>
       </div>
     </div>
@@ -49,7 +64,7 @@
               <input type="text" name="attr_vigourMax" class="attribute-input" />
             </label>
             <button type="roll" name="attr_rollVigour"
-              value="&{template:test-under} {{rollName=@{character_name} saves Vigour}} {{result=[[1d20]]}} {{target=[[@{vigourCurrent}]]}}"
+              value="&{template:test-under} {{rollName=@{character_name} saves Vigour (@{vigourCurrent})}} {{result=[[1d20]]}} {{target=[[@{vigourCurrent}]]}}"
               class="virtue-button" />
           </div>
           <div class="virtues-line">
@@ -60,7 +75,7 @@
               <input type="text" name="attr_clarityMax" class="attribute-input" />
             </label>
             <button type="roll" name="attr_rollClarity"
-              value="&{template:test-under} {{rollName=@{character_name} saves Clarity}} {{result=[[1d20]]}} {{target=[[@{clarityCurrent}]]}}"
+              value="&{template:test-under} {{rollName=@{character_name} saves Clarity (@{clarityCurrent})}} {{result=[[1d20]]}} {{target=[[@{clarityCurrent}]]}}"
               class="virtue-button" />
           </div>
           <div class="virtues-line">
@@ -71,11 +86,14 @@
               <input type="text" name="attr_spiritMax" class="attribute-input" />
             </label>
             <button type="roll" name="attr_rollSpirit"
-              value="&{template:test-under} {{rollName=@{character_name} saves Spirit}} {{result=[[1d20]]}} {{target=[[@{spiritCurrent}]]}}"
+              value="&{template:test-under} {{rollName=@{character_name} saves Spirit (@{spiritCurrent})}} {{result=[[1d20]]}} {{target=[[@{spiritCurrent}]]}}"
               class="virtue-button" />
           </div>
+                    <div class="virtues-line">
+            <label><input type="checkbox" name="attr_fatigued" value="1" />Fatigued</label>
+          </div>
           <div class="virtues-line" id="guard">
-            <label>Guard (GD)<input type="text" name="attr_ac" />/<input type="text" name="attr_ac" /></label>
+            <label>Guard (GD)<input type="text" name="attr_ac" />/<input type="text" name="attr_acMax" /></label>
           </div>
         </div>
       </div>
@@ -87,19 +105,23 @@
         <h3>Armor</h3>
         <div class="armor-content">
           <div class="armor-line">
-            <input type="text" name="attr_armor_coat_name" placeholder="Coat" />
+            <input type="text" name="attr_armor_coat_desc" placeholder="Coat description" />
+            <input type="number" name="attr_armor_coat_name" placeholder="0" class="armor_value" />
             <input type="checkbox" name="attr_armor_coat_score" value="1" />
           </div>
           <div class="armor-line">
-            <input type="text" name="attr_armor_plate_name" placeholder="Plate" />
+            <input type="text" name="attr_armor_plate_desc" placeholder="Plate description" />
+            <input type="number" name="attr_armor_plate_name" placeholder="0" class="armor_value" />
             <input type="checkbox" name="attr_armor_plate_score" value="1" />
           </div>
           <div class="armor-line">
-            <input type="text" name="attr_armor_helm_name" placeholder="Helm" />
+            <input type="text" name="attr_armor_helm_desc" placeholder="Helm description" />
+            <input type="number" name="attr_armor_helm_name" placeholder="0" class="armor_value" />
             <input type="checkbox" name="attr_armor_helm_score" value="1" />
           </div>
           <div class="armor-line">
-            <input type="text" name="attr_armor_shield_name" placeholder="Shield" />
+            <input type="text" name="attr_armor_shield_desc" placeholder="Shield description" />
+            <input type="number" name="attr_armor_shield_name" placeholder="0" class="armor_value" />
             <input type="checkbox" name="attr_armor_shield_score" value="1" />
           </div>
           <label>Armor<input class="armor-total" type="text" readonly name="attr_armorTotal" /></label>
@@ -138,6 +160,55 @@
         <label class="weapon-damage-label">Damage</label>
       </div>
     </div>
+          <div class="weapon">
+                    <div class="weapon-grid">
+          <div id="weapon-roll">
+            <input type="hidden" name="attr_weaponRoll" value="0" />
+            <button type="roll" name="AttackRoll" class="attack-roll"
+              value="&{template:default} {{name=@{character_name} attacks with @{weaponNameSmite}}} {{Damage=[[@{weaponDamageSmite}]]}}"></button>
+          </div>
+          <div id="weapon-name">
+            <input type="text" name="attr_weaponNameSmite" value="Smite" />
+          </div>
+          <div id="weapon-attack-type">
+            <input type="text" name="attr_weaponTypeSmite" />
+          </div>
+          <div id="weapon-damage">
+            <input type="text" name="attr_weaponDamageSmite" value="1d12" class="input-as-number" />
+          </div>
+        </div>
+                <div class="weapon-grid">
+          <div id="weapon-roll">
+            <input type="hidden" name="attr_weaponRoll" value="0" />
+            <button type="roll" name="AttackRoll" class="attack-roll"
+              value="&{template:default} {{name=@{character_name} attacks with @{weaponNameAdvantage}}} {{Damage=[[@{weaponDamageAdvantage}]]}}"></button>
+          </div>
+          <div id="weapon-name">
+            <input type="text" name="attr_weaponNameAdvantage" value="Advantage" />
+          </div>
+          <div id="weapon-attack-type">
+            <input type="text" name="attr_weaponTypeAdvantage" />
+          </div>
+          <div id="weapon-damage">
+            <input type="text" name="attr_weaponDamageAdvantage" value="1d8" class="input-as-number" />
+          </div>
+        </div>
+        <div class="weapon-grid">
+          <div id="weapon-roll">
+            <input type="hidden" name="attr_weaponRoll" value="0" />
+            <button type="roll" name="AttackRoll" class="attack-roll"
+              value="&{template:default} {{name=@{character_name} attacks with @{weaponName}}} {{Damage=[[@{weaponDamage}]]}}"></button>
+          </div>
+          <div id="weapon-name">
+            <input type="text" name="attr_weaponName" value="Dagger" />
+          </div>
+          <div id="weapon-attack-type">
+            <input type="text" name="attr_weaponType" />
+          </div>
+          <div id="weapon-damage">
+            <input type="text" name="attr_weaponDamage" value="1d6" class="input-as-number" />
+          </div>
+        </div>
     <fieldset class="repeating_weapons">
       <div class="weapon">
         <div class="weapon-grid">
@@ -160,18 +231,328 @@
     </fieldset>
   </div>
   <!-- End of Weapons -->
+  
+  <!-- Recovery, Oath, Feats, and Gambits Section -->
+  <div class="recovery-oath-feats-gambits">
+    <div class="top-row">
+            <div class="oath-section">
+        <h3>OATH</h3>
+        <div class="oath-content">
+          <p>Seek the Myths</p>
+          <p>Honour the Seers</p>
+          <p>Protect the Realm</p>
+        </div>
+      <div class="recovery-section">
+        <h3>Recovery</h3>
+        <div class="recovery-content">
+          <p><strong>VIG</strong> - Hospitality or consume Sustenance</p>
+          <p><strong>CLA</strong> - Seer's guidance or consume Stimulant</p>
+          <p><strong>SPI</strong> - Indulge passion or consume Sacrament</p>
+          <p><strong>Gd/Fatigue</strong> - A moment's calm and rest</p>
+        </div>
+      </div>
+      </div>
+      <div class="feats-section">
+        <h3>FEATS</h3>
+        <div class="feats-content">
+          <p><strong>SMITE</strong> - +d12 or Blast to a melee attack.<br>
+          <em>VIG Save or become Fatigued.</em></p>
+          <p><strong>FOCUS</strong> - Perform a Gambit without using a die.<br>
+          <em>CLA Save or become Fatigued.</em></p>
+          <p><strong>DENY</strong> - Discard a damage die rolled against you or a nearby Ally.<br>
+          <em>SPI Save or become Fatigued.</em></p>
+        </div>
+      </div>
+      <div class="gambits-section">
+        <h3>GAMBITS</h3>
+        <div class="gambits-content">
+          <p><strong>Bolster</strong> the attack for +1 total damage</p>
+          <p><strong>Move</strong> after the attack</p>
+          <p><strong>Repel</strong> a foe away from you</p>
+          <p><strong>Stop</strong> a foe from moving next turn</p>
+          <p><strong>Impair</strong> a weapon on their next turn</p>
+          <p><strong>Trap</strong> a shield until your next turn</p>
+          <p><strong>Dismount</strong> a foe</p>
+          <p><strong>Other</strong> effect of a similar level of impact</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End of Recovery, Oath, Feats, and Gambits Section -->
 </div>
 <!-- END OF CHARACTER SHEET -->
-<!-- PROPERTY SHEET -->
-<div class="sheet-property">
-  <textarea name="attr_property" class="property"></textarea>
+<!-- PROPERTY AND NOTES CONTAINER -->
+<div class="sheet-property-notes-container">
+  <!-- PROPERTY SHEET -->
+  <div class="sheet-property">
+   <h3>Property</h3>
+    <textarea name="attr_property" class="property"></textarea>
+  </div>
+  <!-- END OF PROPERTY SHEET -->
+  <!-- NOTES SHEET -->
+  <div class="sheet-notes">
+     <h3>Notes</h3>
+    <textarea name="attr_notes" class="notes"></textarea>
+  </div>
+  <!-- END OF NOTES SHEET -->
 </div>
-<!-- END OF PROPERTY SHEET -->
-<!-- NOTES SHEET -->
-<div class="sheet-notes">
-  <textarea name="attr_notes" class="notes"></textarea>
+<!-- END OF PROPERTY AND NOTES CONTAINER -->
+<!-- COMPANIONS SECTION -->
+<div class="companions-section">
+  <h3>Companions</h3>
+  <fieldset class="repeating_weapons">
+  <div><div class="companion-row">
+    <div class="companion-item">
+      <label>Name:
+        <input type="text" name="attr_companion_name" class="companion-name-input" />
+      </label>
+    </div>
+    <div class="companion-item">
+      <label>Vigour
+        <input type="text" name="attr_companion_vigourCurrent" class="attribute-input" />
+        /
+        <input type="text" name="attr_companion_vigourMax" class="attribute-input" />
+      </label>
+      <button type="roll" name="attr_rollCompanionVigour"
+        value="&{template:test-under} {{rollName=@{companion_name} saves Vigour (@{companion_vigourCurrent})}} {{result=[[1d20]]}} {{target=[[@{companion_vigourCurrent}]]}}"
+        class="virtue-button" />
+    </div>
+    <div class="companion-item">
+      <label>Clarity
+        <input type="text" name="attr_companion_clarityCurrent" class="attribute-input" />
+        /
+        <input type="text" name="attr_companion_clarityMax" class="attribute-input" />
+      </label>
+      <button type="roll" name="attr_rollCompanionClarity"
+        value="&{template:test-under} {{rollName=@{companion_name} saves Clarity (@{companion_clarityCurrent})}} {{result=[[1d20]]}} {{target=[[@{companion_clarityCurrent}]]}}"
+        class="virtue-button" />
+    </div>
+    <div class="companion-item">
+      <label>Spirit
+        <input type="text" name="attr_companion_spiritCurrent" class="attribute-input" />
+        /
+        <input type="text" name="attr_companion_spiritMax" class="attribute-input" />
+      </label>
+      <button type="roll" name="attr_rollCompanionSpirit"
+        value="&{template:test-under} {{rollName=@{companion_name} saves Spirit (@{companion_spiritCurrent})}} {{result=[[1d20]]}} {{target=[[@{companion_spiritCurrent}]]}}"
+        class="virtue-button" />
+    </div>
+    <div class="companion-item">
+      <label>Guard (GD)
+        <input type="text" name="attr_companion_ac" />
+        /
+        <input type="text" name="attr_companion_acMax" />
+      </label>
+    </div>
+  </div>
+  <div class="companion-weapons">
+    <div class="weapon-grid companion-weapon-grid">
+      <div id="weapon-roll">
+        <label class="weapon-roll-label">.</label>
+      </div>
+      <div id="weapon-name">
+        <label>Name</label>
+      </div>
+      <div id="weapon-attack-type">
+        <label>Type</label>
+      </div>
+      <div id="weapon-damage">
+        <label class="weapon-damage-label">Damage</label>
+      </div>
+    </div>
+    <div class="weapon companion-weapon">
+      <div class="weapon-grid companion-weapon-grid">
+        <div id="weapon-roll">
+          <input type="hidden" name="attr_companion_weaponRoll1" value="0" />
+          <button type="roll" name="CompanionAttackRoll1" class="attack-roll companion-attack-roll"
+            value="&{template:default} {{name=@{companion_name} attacks with @{companion_weaponName1}}} {{Damage=[[@{companion_weaponDamage1}]]}}"></button>
+        </div>
+        <div id="weapon-name">
+          <input type="text" name="attr_companion_weaponName1" placeholder="attack" />
+        </div>
+        <div id="weapon-attack-type">
+          <input type="text" name="attr_companion_weaponType1" />
+        </div>
+        <div id="weapon-damage">
+          <input type="text" name="attr_companion_weaponDamage1" value="1d6" class="input-as-number" />
+        </div>
+      </div>
+    </div>
+    <div class="weapon companion-weapon">
+      <div class="weapon-grid companion-weapon-grid">
+        <div id="weapon-roll">
+          <input type="hidden" name="attr_companion_weaponRoll2" value="0" />
+          <button type="roll" name="CompanionAttackRoll2" class="attack-roll companion-attack-roll"
+            value="&{template:default} {{name=@{companion_name} attacks with @{companion_weaponName2}}} {{Damage=[[@{companion_weaponDamage2}]]}}"></button>
+        </div>
+        <div id="weapon-name">
+          <input type="text" name="attr_companion_weaponName2" placeholder="attack" />
+        </div>
+        <div id="weapon-attack-type">
+          <input type="text" name="attr_companion_weaponType2" />
+        </div>
+        <div id="weapon-damage">
+          <input type="text" name="attr_companion_weaponDamage2" value="1d6" class="input-as-number" />
+        </div>
+      </div>
+    </div>
+    <div class="weapon companion-weapon">
+      <div class="weapon-grid companion-weapon-grid">
+        <div id="weapon-roll">
+                      <input type="hidden" name="attr_npc_weaponRoll3" value="0" />
+            <button type="roll" name="CompanionAttackRoll3" class="attack-roll companion-attack-roll"
+              value="&{template:default} {{name=@{companion_name} attacks with @{companion_weaponName3}}} {{Damage=[[@{companion_weaponDamage3}]]}}"></button>
+          </div>
+          <div id="weapon-name">
+            <input type="text" name="attr_companion_weaponName3" placeholder="attack" />
+          </div>
+          <div id="weapon-attack-type">
+            <input type="text" name="attr_companion_weaponType3" />
+          </div>
+          <div id="weapon-damage">
+            <input type="text" name="attr_companion_weaponDamage3" value="1d6" class="input-as-number" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="companion-notes-row">
+    <textarea name="attr_companion_notes" class="companion-notes-textarea"></textarea>
+  </div>
 </div>
-<!-- END OF NOTES SHEET -->
+</fieldset>
+</div>
+<!-- END OF COMPANIONS SECTION -->
+</div></div>
+<!-- END OF KNIGHT SHEET -->
+
+<!-- NPC SHEET -->
+<div class="npc-sheet" style="display: none;">
+  <div class="companions-section">
+    <h3>NPCs</h3>
+    <fieldset class="repeating_weapons">
+    <div><div class="companion-row">
+      <div class="companion-item">
+        <label>Name:
+          <input type="text" name="attr_npc_name" class="companion-name-input" />
+        </label>
+      </div>
+      <div class="companion-item">
+        <label>Vigour
+          <input type="text" name="attr_npc_vigourCurrent" class="attribute-input" />
+          /
+          <input type="text" name="attr_npc_vigourMax" class="attribute-input" />
+        </label>
+        <button type="roll" name="attr_rollNpcVigour"
+          value="&{template:test-under} {{rollName=@{npc_name} saves Vigour (@{npc_vigourCurrent})}} {{result=[[1d20]]}} {{target=[[@{npc_vigourCurrent}]]}}"
+          class="virtue-button" />
+      </div>
+      <div class="companion-item">
+        <label>Clarity
+          <input type="text" name="attr_npc_clarityCurrent" class="attribute-input" />
+          /
+          <input type="text" name="attr_npc_clarityMax" class="attribute-input" />
+        </label>
+        <button type="roll" name="attr_rollNpcClarity"
+          value="&{template:test-under} {{rollName=@{npc_name} saves Clarity (@{npc_clarityCurrent})}} {{result=[[1d20]]}} {{target=[[@{npc_clarityCurrent}]]}}"
+          class="virtue-button" />
+      </div>
+      <div class="companion-item">
+        <label>Spirit
+          <input type="text" name="attr_npc_spiritCurrent" class="attribute-input" />
+          /
+          <input type="text" name="attr_npc_spiritMax" class="attribute-input" />
+        </label>
+        <button type="roll" name="attr_rollNpcSpirit"
+          value="&{template:test-under} {{rollName=@{npc_name} saves Spirit (@{npc_spiritCurrent})}} {{result=[[1d20]]}} {{target=[[@{npc_spiritCurrent}]]}}"
+          class="virtue-button" />
+      </div>
+      <div class="companion-item">
+        <label>Guard (GD)
+          <input type="text" name="attr_npc_ac" />
+          /
+          <input type="text" name="attr_npc_acMax" />
+        </label>
+      </div>
+    </div>
+    <div class="companion-weapons">
+      <div class="weapon-grid companion-weapon-grid">
+        <div id="weapon-roll">
+          <label class="weapon-roll-label">.</label>
+        </div>
+        <div id="weapon-name">
+          <label>Name</label>
+        </div>
+        <div id="weapon-attack-type">
+          <label>Type</label>
+        </div>
+        <div id="weapon-damage">
+          <label class="weapon-damage-label">Damage</label>
+        </div>
+      </div>
+      <div class="weapon companion-weapon">
+        <div class="weapon-grid companion-weapon-grid">
+          <div id="weapon-roll">
+            <input type="hidden" name="attr_npc_weaponRoll1" value="0" />
+            <button type="roll" name="NpcAttackRoll1" class="attack-roll companion-attack-roll"
+              value="&{template:default} {{name=@{npc_name} attacks with @{npc_weaponName1}}} {{Damage=[[@{npc_weaponDamage1}]]}}"></button>
+          </div>
+          <div id="weapon-name">
+            <input type="text" name="attr_npc_weaponName1" placeholder="attack" />
+          </div>
+          <div id="weapon-attack-type">
+            <input type="text" name="attr_npc_weaponType1" />
+          </div>
+          <div id="weapon-damage">
+            <input type="text" name="attr_npc_weaponDamage1" value="1d6" class="input-as-number" />
+          </div>
+        </div>
+      </div>
+      <div class="weapon companion-weapon">
+        <div class="weapon-grid companion-weapon-grid">
+          <div id="weapon-roll">
+            <input type="hidden" name="attr_npc_weaponRoll2" value="0" />
+            <button type="roll" name="NpcAttackRoll2" class="attack-roll companion-attack-roll"
+              value="&{template:default} {{name=@{npc_name} attacks with @{npc_weaponName2}}} {{Damage=[[@{npc_weaponDamage2}]]}}"></button>
+          </div>
+          <div id="weapon-name">
+            <input type="text" name="attr_npc_weaponName2" placeholder="attack" />
+          </div>
+          <div id="weapon-attack-type">
+            <input type="text" name="attr_npc_weaponType2" />
+          </div>
+          <div id="weapon-damage">
+            <input type="text" name="attr_npc_weaponDamage2" value="1d6" class="input-as-number" />
+          </div>
+        </div>
+      </div>
+      <div class="weapon companion-weapon">
+        <div class="weapon-grid companion-weapon-grid">
+          <div id="weapon-roll">
+            <input type="hidden" name="attr_npc_weaponRoll3" value="0" />
+            <button type="roll" name="CompanionAttackRoll3" class="attack-roll companion-attack-roll"
+              value="&{template:default} {{name=@{npc_name} attacks with @{npc_weaponName3}}} {{Damage=[[@{npc_weaponDamage3}]]}}"></button>
+          </div>
+          <div id="weapon-name">
+            <input type="text" name="attr_npc_weaponName3" placeholder="attack" />
+          </div>
+          <div id="weapon-attack-type">
+            <input type="text" name="attr_npc_weaponType3" />
+          </div>
+          <div id="weapon-damage">
+            <input type="text" name="attr_npc_weaponDamage3" value="1d6" class="input-as-number" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="companion-notes-row">
+      <textarea name="attr_npc_notes" class="companion-notes-textarea"></textarea>
+    </div>
+  </div>
+  </fieldset>
+  </div>
+</div>
+<!-- END OF NPC SHEET -->
+
 <!-- ROLLTEMPLATES -->
 <rolltemplate class="sheet-rolltemplate-test-under">
   <div class="sheet-template-container">
@@ -201,14 +582,26 @@
     });
 
     // Calculate armor total based on checked pieces
-    const armorPieces = ['armor_coat_score', 'armor_plate_score', 'armor_helm_score', 'armor_shield_score'];
+    const armorPieces = [
+      {score: 'armor_coat_score', value: 'armor_coat_name'},
+      {score: 'armor_plate_score', value: 'armor_plate_name'},
+      {score: 'armor_helm_score', value: 'armor_helm_name'},
+      {score: 'armor_shield_score', value: 'armor_shield_name'}
+    ];
     
     function calculateArmorTotal() {
-      getAttrs(armorPieces, function(values) {
+      // Get all armor score and value attributes
+      const attrsToGet = [];
+      armorPieces.forEach(piece => {
+        attrsToGet.push(piece.score, piece.value);
+      });
+      
+      getAttrs(attrsToGet, function(values) {
         let total = 0;
         armorPieces.forEach(piece => {
-          if(values[piece] === "1") {
-            total += 1;
+          if(values[piece.score] === "1") {
+            const armorValue = parseInt(values[piece.value]) || 0;
+            total += armorValue;
           }
         });
         setAttrs({
@@ -217,13 +610,16 @@
       });
     }
 
-    // Listen for changes in any armor piece
+    // Listen for changes in any armor piece score or value
     armorPieces.forEach(piece => {
-      on(`change:${piece}`, calculateArmorTotal);
+      on(`change:${piece.score}`, calculateArmorTotal);
+      on(`change:${piece.value}`, calculateArmorTotal);
     });
 
     // Initial calculation when sheet opens
     on('sheet:opened', calculateArmorTotal);
+
+
 
     on("sheet:opened change:glory", function() {
       getAttrs(["glory"], function(values) {

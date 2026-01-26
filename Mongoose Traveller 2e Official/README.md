@@ -102,5 +102,35 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Fixed spacecraft weapons resize column issue
 - Added traits to weapon description
 
+### Version 1.1.05
+- Added Monthly Salary to finances
+- Added Mod. to weapons for e.g. HUD or scopes or similar
+- Updated translation key for personal Armour for translations
+- Allow custom characteristics to be dragged to macro bar
+
+### Version 1.1.06
+- Added Robot tab to character sheet
+
+### Version 1.1.07
+- Added Skills to Robot tab
+- Added Weapons and Armour to Ship's Locker
+- Added repeating row for custom power requirements to Ship tab
+
+### Version 1.1.08
+- Fixed Skills on Robot tab that were affecting modifiers on PC/NPC skills
+
+### Version 1.1.09
+- Added custom Characteristics to NPC to allow values for Attitude, Influence, Power etc. to be captured
+
+### Version 1.1.10
+- Fixed rounding error on carry capacity
+- Addition of Ship's Ledger
+- Addition of highly detailed Ship Combat tab (with help from Roll20 member and superstar TrooperSJP)
+- Fix to Robot parsing on drag'n'drop
+
+### Version 1.1.11
+- Added STR modifier when weapon range is 'Melee' as per rules
+- Added repeating groups under all ship sheet components to allow for extended/custom/2300AD entries
+- 
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 

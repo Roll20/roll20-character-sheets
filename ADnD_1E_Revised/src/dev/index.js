@@ -805,10 +805,10 @@ const migrateAC = (current_version, final_version) => {
   getAttrs(['armorclass', 'armortype_ac', 'armorclass_total', 'armorbonus', 'armorshield'], (v) => {
     const output = {};
     const recalc = 0;
-    let armorClass = +v.armorclass || 0;
+    let armorClass = +v.armorclass;
     const armorBonus = -Math.abs(v.armorbonus) || 0;
     const armorClassTotal = +v.armorclass_total || 0;
-    const armortypeAC = +v.armortype_ac || 0;
+    const armortypeAC = +v.armortype_ac;
     const armorShield = v.armorshield;
     clog(`armorShield:${armorShield} armorClassTotal:${armorClassTotal} armorBonus:${armorBonus} armortypeAC:${armortypeAC} armorClass:${armorClass}`);
     // older sheet will have default value for armortypeAC and armorClassTotal.  AC s/b better than 10
@@ -1098,7 +1098,7 @@ const updateRange = (current_version, final_version) => {
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
         // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
-        const thisType = +v[section_attribute('weapon', id, 'weapon_attack_type')] || 0;
+        const thisType = +v[section_attribute('weapon', id, 'weapon_attack_type')];
         if (thisType === 0 || thisType === 2) return;
         let thisRange = v[section_attribute('weapon', id, 'weapon_range')];
         // remove quotes to prevent NaN (ie distance indicators)
@@ -1335,17 +1335,17 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.unarmored_row_id = newID;
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base;
+            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk;
             // armor in use ie 'worn', should always be considered as carried
             if (+v.unarmored_worn === 1 && +v.unarmored_carried === 0) {
               output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
               output.unarmored_carried = 1;
             } else {
-              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
+              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried;
             }
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.unarmored_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.unarmored_cost || 0;
@@ -1356,19 +1356,18 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.unarmored_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base;
+            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk;
             // armor in use ie 'worn', should always be considered as carried
             if (+v.unarmored_worn === 1 && +v.unarmored_carried === 0) {
               output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
               output.unarmored_carried = 1;
             } else {
-              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
+              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried;
             }
-            // output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.unarmored_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.unarmored_cost || 0;
             // clog(`repeating armor does not exist. Creating armor1: ${newID}`);
@@ -1376,18 +1375,18 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
         } else if (unarmored0_ID === idArray[0]) {
           // no name but id exists: armor detail row REMOVED RESETING ROW
           output.unarmored_row_id = 0;
-          output.unarmored_worn = +v.unarmored_worn || 0;
+          output.unarmored_worn = +v.unarmored_worn;
           output.unarmored = '';
-          output.unarmored_ac = +v.unarmored_ac || 0;
-          output.unarmored_base = +v.unarmored_base || 0;
-          output.unarmored_bulk = +v.unarmored_bulk || 0;
+          output.unarmored_ac = +v.unarmored_ac;
+          output.unarmored_base = +v.unarmored_base;
+          output.unarmored_bulk = +v.unarmored_bulk;
           output.unarmored_weight = +v.unarmored_weight || 0;
           output.unarmored_cost = +v.unarmored_cost || 0;
           // armor in use ie 'worn', should always be considered as carried
           if (+v.unarmored_worn === 1 && +v.unarmored_carried === 0) {
             output.unarmored_carried = 1;
           } else {
-            output.unarmored_carried = +v.unarmored_carried || 0;
+            output.unarmored_carried = +v.unarmored_carried;
           }
           // clog(`rep_removed:${row_removed} - ID Exists. Deleted from Armor Detail unarmored:${newID}`);
         }
@@ -1414,18 +1413,18 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armortype1_row_id = newID;
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 1;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armortype;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype_magic || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk;
             // armor in use ie 'worn', should always be considered as carried
             if (+v.armortype_worn === 1 && +v.armortype_carried === 0) {
               output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
               output.armortype_carried = 1;
             } else {
-              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
+              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried;
             }
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
@@ -1436,13 +1435,13 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armortype1_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 1;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armortype;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype_magic || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
             // clog(`repeating armor does not exist. Creating armor1: ${newID}`);
@@ -1485,18 +1484,18 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armortype2_row_id = newID;
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 2;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype2_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype2_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armortype2;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype2_magic || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk;
             // armor in use ie 'worn', should always be considered as carried
             if (+v.armortype2_worn === 1 && +v.armortype2_carried === 0) {
               output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
               output.armortype2_carried = 1;
             } else {
-              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
+              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried;
             }
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
@@ -1507,13 +1506,13 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armortype2_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 2;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype2_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype2_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armortype2;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype2_magic || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
             // clog(`repeating armor does not exist. Creating armor2: ${newID}`);
@@ -1556,19 +1555,19 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorshield_row_id = newID;
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 3;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorshield_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorshield_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorshield;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorshield_magic;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = v.armorshield_mod;
-            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk;
             // armor in use ie 'worn', should always be considered as carried
             if (+v.armorshield_worn === 1 && +v.armorshield_carried === 0) {
               output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
               output.armorshield_carried = 1;
             } else {
-              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
+              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried;
             }
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
@@ -1579,14 +1578,14 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorshield_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 3;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorshield_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorshield_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorshield;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorshield_magic;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = v.armorshield_mod;
-            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
             // clog(`repeating armor does not exist. Creating shield: ${newID}`);
@@ -1631,16 +1630,16 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorhelmet_row_id = newID;
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 4;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorhelmet_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorhelmet_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorhelmet_magic;
             // armor in use ie 'worn', should always be considered as carried
             if (+v.armorhelmet_worn === 1 && +v.armorhelmet_carried === 0) {
               output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
               output.armorhelmet_carried = 1;
             } else {
-              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
+              output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried;
             }
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
@@ -1651,11 +1650,11 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorhelmet_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 4;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorhelmet_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorhelmet_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorhelmet_magic;
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
+            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried;
             output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
             output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
             // clog(`repeating armor does not exist. Creating helmet: ${newID}`);
@@ -1698,10 +1697,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorother1_row_id = newID;
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 5;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorother;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
             // armor in use ie 'worn', should always be considered as carried
@@ -1713,10 +1712,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorother1_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 5;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorother;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
             // clog(`repeating armor does not exist. Creating other1: ${newID}`);
@@ -1755,10 +1754,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorother2_row_id = newID;
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 6;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother2_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother2_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorother2;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
             // armor in use ie 'worn', should always be considered as carried
@@ -1769,10 +1768,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorother2_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 6;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother2_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother2_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorother2;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
             // clog(`repeating armor does not exist. Creating other2: ${newID}`);
@@ -1811,10 +1810,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorother3_row_id = newID;
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 7;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother3_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother3_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorother3;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
             // armor in use ie 'worn', should always be considered as carried
@@ -1826,10 +1825,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorother3_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 7;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother3_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother3_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorother3;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
             // clog(`repeating armor does not exist. Creating other3: ${newID}`);
@@ -1868,10 +1867,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorother4_row_id = newID;
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 8;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother4_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother4_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorother4;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
             // armor in use ie 'worn', should always be considered as carried
@@ -1883,10 +1882,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorother4_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 8;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother4_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother4_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorother4;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
             // clog(`repeating armor does not exist. Creating other4: ${newID}`);
@@ -1925,10 +1924,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorother5_row_id = newID;
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 9;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother5_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother5_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorother5;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
             // armor in use ie 'worn', should always be considered as carried
@@ -1940,10 +1939,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorother5_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 9;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother5_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother5_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorother5;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
             // clog(`repeating armor does not exist. Creating other5: ${newID}`);
@@ -1982,10 +1981,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorother6_row_id = newID;
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 10;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother6_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother6_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorother6;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
             // armor in use ie 'worn', should always be considered as carried
@@ -1997,10 +1996,10 @@ function syncArmorToEquipment(id, attr, row_removed, migrate) {
             output.armorother6_row_id = newID.toLowerCase();
             output[`repeating_equipment_${newID}_equipment_type`] = 2;
             output[`repeating_equipment_${newID}_equipment_armor_type`] = 10;
-            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother6_worn || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother6_worn;
             output[`repeating_equipment_${newID}_equipment_item`] = v.armorother6;
-            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac || 0;
-            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
+            output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac;
+            output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base;
             output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
             output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
             // clog(`repeating armor does not exist. Creating other6: ${newID}`);
@@ -2071,22 +2070,22 @@ const setEquipmentUpdate = (current_version, final_version) => {
     });
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
-        output[section_attribute('equipment', id, 'equipment_type')] = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
+        output[section_attribute('equipment', id, 'equipment_type')] = +v[section_attribute('equipment', id, 'equipment_type')];
         output[section_attribute('equipment', id, 'equipment_current')] = +v[section_attribute('equipment', id, 'equipment_current')] || 0;
         output[section_attribute('equipment', id, 'equipment_current_max')] = +v[section_attribute('equipment', id, 'equipment_current_max')] || 0;
-        output[section_attribute('equipment', id, 'equipment_carried_select')] = +v[section_attribute('equipment', id, 'equipment_carried')] || 0; // setting to carried to preserve existing value
-        output[section_attribute('equipment', id, 'equipment_carried')] = +v[section_attribute('equipment', id, 'equipment_carried')] || 0;
+        output[section_attribute('equipment', id, 'equipment_carried_select')] = +v[section_attribute('equipment', id, 'equipment_carried')]; // setting to carried to preserve existing value
+        output[section_attribute('equipment', id, 'equipment_carried')] = +v[section_attribute('equipment', id, 'equipment_carried')];
         output[section_attribute('equipment', id, 'equipment_quantity')] = +v[section_attribute('equipment', id, 'equipment_quantity')] || 0;
         output[section_attribute('equipment', id, 'equipment_quantity_max')] = +v[section_attribute('equipment', id, 'equipment_quantity_max')] || 0;
         output[section_attribute('equipment', id, 'equipment_weight')] = +v[section_attribute('equipment', id, 'equipment_weight')] || 0;
         output[section_attribute('equipment', id, 'equipment_cost')] = +v[section_attribute('equipment', id, 'equipment_cost')] || 0;
-        output[section_attribute('equipment', id, 'equipment_armor_type')] = +v[section_attribute('equipment', id, 'equipment_armor_type')] || 0;
-        output[section_attribute('equipment', id, 'equipment_armor_worn')] = +v[section_attribute('equipment', id, 'equipment_armor_worn')] || 0;
-        output[section_attribute('equipment', id, 'equipment_armor_ac')] = +v[section_attribute('equipment', id, 'equipment_armor_ac')] || 0;
-        output[section_attribute('equipment', id, 'equipment_armor_base')] = +v[section_attribute('equipment', id, 'equipment_armor_base')] || 0;
+        output[section_attribute('equipment', id, 'equipment_armor_type')] = +v[section_attribute('equipment', id, 'equipment_armor_type')];
+        output[section_attribute('equipment', id, 'equipment_armor_worn')] = +v[section_attribute('equipment', id, 'equipment_armor_worn')];
+        output[section_attribute('equipment', id, 'equipment_armor_ac')] = +v[section_attribute('equipment', id, 'equipment_armor_ac')];
+        output[section_attribute('equipment', id, 'equipment_armor_base')] = +v[section_attribute('equipment', id, 'equipment_armor_base')];
         output[section_attribute('equipment', id, 'equipment_armor_magic')] = +v[section_attribute('equipment', id, 'equipment_armor_magic')] || 0;
         output[section_attribute('equipment', id, 'equipment_armor_mod')] = +v[section_attribute('equipment', id, 'equipment_armor_mod')] || 0;
-        output[section_attribute('equipment', id, 'equipment_armor_bulk')] = +v[section_attribute('equipment', id, 'equipment_armor_bulk')] || 0;
+        output[section_attribute('equipment', id, 'equipment_armor_bulk')] = +v[section_attribute('equipment', id, 'equipment_armor_bulk')];
         output[section_attribute('equipment', id, 'equipment_macro_text')] = v[section_attribute('equipment', id, 'equipment_macro_text')];
       });
       output.sheet_version = current_version;
@@ -2152,10 +2151,10 @@ const setWeaponsUpdate = (current_version, final_version) => {
     });
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
-        output[`repeating_weapon_${id}_weapon_attack_type`] = +v[section_attribute('weapon', id, 'weapon_attack_type')] || 0;
+        output[`repeating_weapon_${id}_weapon_attack_type`] = +v[section_attribute('weapon', id, 'weapon_attack_type')];
         output[`repeating_weapon_${id}_weapon_dual`] = v[section_attribute('weapon', id, 'weapon_dual')];
         output[`repeating_weapon_${id}_weapon_whisper_to_hit`] = v[section_attribute('weapon', id, 'weapon_whisper_to_hit')];
-        output[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] = +v[section_attribute('weapon', id, 'weapon_whisper_to_hit_select')] || 0;
+        output[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] = +v[section_attribute('weapon', id, 'weapon_whisper_to_hit_select')];
         output[`repeating_weapon_${id}_weapon_dual_pen`] = +v[section_attribute('weapon', id, 'weapon_dual_pen')] || 0;
         output[`repeating_weapon_${id}_weapon_backstab_var`] = +v[section_attribute('weapon', id, 'weapon_backstab_var')] || 0;
         output[`repeating_weapon_${id}_weapon_tohitbonus`] = +v[section_attribute('weapon', id, 'weapon_tohitbonus')] || 0;
@@ -2202,6 +2201,31 @@ const setWeaponsUpdate = (current_version, final_version) => {
       });
       output.sheet_version = current_version;
       clog(`VERSION UPDATE: setWeaponsUpdate completed`);
+      setAttrs(output, {silent: true}, versionator(current_version, final_version));
+    });
+  });
+};
+
+// One-time update: sets all NWP default values
+const setNWPUpdate = (current_version, final_version) => {
+  getSectionIDs('nonweaponproficiencies', (idArray) => {
+    const output = {};
+    const fields = [];
+    _.each(idArray, (id) => {
+      fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_attribute'));
+      fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_slots'));
+      fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_modifier'));
+      fields.push(section_attribute('nonweaponproficiencies', id, 'nwp_macro_text'));
+    });
+    getAttrs(fields, (v) => {
+      _.each(idArray, (id) => {
+        output[`repeating_nonweaponproficiencies_${id}_attribute`] = v[section_attribute('nonweaponproficiencies', id, 'nwp_attribute')];
+        output[`repeating_nonweaponproficiencies_${id}_slots`] = +v[section_attribute('nonweaponproficiencies', id, 'nwp_slots')] || 0;
+        output[`repeating_nonweaponproficiencies_${id}_modifier`] = +v[section_attribute('nonweaponproficiencies', id, 'nwp_modifier')] || 0;
+        output[`repeating_nonweaponproficiencies_${id}_macro_text`] = v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')] || 0;
+      });
+      output.sheet_version = current_version;
+      clog(`VERSION UPDATE: setNWPUpdate completed`);
       setAttrs(output, {silent: true}, versionator(current_version, final_version));
     });
   });
@@ -2350,7 +2374,7 @@ const setEquipmentType = (current_version, final_version) => {
     });
     getAttrs(fields, (v) => {
       _.each(idArray, (id) => {
-        const equipType = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
+        const equipType = +v[section_attribute('equipment', id, 'equipment_type')];
         if (equipType >= 0) return;
         output[section_attribute('equipment', id, 'equipment_type')] = 0;
         clog(`equipType -1:${equipType} reset to Gear`);
@@ -2421,13 +2445,13 @@ const newSheet = () => {
     const testOldChar = +v.old_character || 0;
     if (testOldChar === 1) return;
     const testHitdice = +v.hitdice;
-    const testAC = +v.armorclass || 0;
-    const testStr = +v.strength || 0;
-    const testInt = +v.intelligence || 0;
-    const testWis = +v.wisdom || 0;
-    const testDex = +v.dexterity || 0;
-    const testCon = +v.constitution || 0;
-    const testCha = +v.charisma || 0;
+    const testAC = +v.armorclass;
+    const testStr = +v.strength;
+    const testInt = +v.intelligence;
+    const testWis = +v.wisdom;
+    const testDex = +v.dexterity;
+    const testCon = +v.constitution;
+    const testCha = +v.charisma;
     // new sheets will have all abilities '10' by default
     // defaults will then be set to '8' default
     const testAbility = testStr + testInt + testWis + testDex + testCon + testCha;
@@ -2529,6 +2553,8 @@ versionator = (current_version, final_version) => {
     initMacroUpdate(1.656, final_version);
   } else if (current_version < 1.658) {
     updateCriticalDamageMacro(1.658, final_version);
+  } else if (current_version < 1.659) {
+    setNWPUpdate(1.66, final_version);
     // all updates completed
   } else if (current_version < final_version) {
     setAttrs({
@@ -2542,7 +2568,7 @@ versionator = (current_version, final_version) => {
 // Versioning
 on('sheet:opened', () => {
   // SET LATEST VERSION HERE. needs to be => the last update made in versionator
-  const final_version = 1.658;
+  const final_version = 1.68;
   getAttrs(['sheet_version', 'old_character'], (v) => {
     const output = {};
     let current_version = float(v.sheet_version);
@@ -2562,7 +2588,7 @@ on('sheet:opened', () => {
 on('change:abilities_info_show change:toggle_exceptional change:intelligence change:wisdom change:dexterity change:constitution change:charisma change:comeliness', (eventInfo) => {
   getAttrs(['intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'comeliness', 'toggle_exceptional'], (v) => {
     const output = {};
-    const toggle_exceptional = +v.toggle_exceptional || 0;
+    const toggle_exceptional = +v.toggle_exceptional;
     if (toggle_exceptional === 1) return;
     output.exceptional_intelligence_flag = 1;
     output.exceptional_wisdom_flag = 1;
@@ -2638,12 +2664,12 @@ const sumEquipmentWeight = () => {
       const armorWeights = [];
       const totalEquipmentWeights = [];
       _.each(idArray, (id) => {
-        const type = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
-        const armorType = +v[section_attribute('equipment', id, 'equipment_armor_type')] || 0;
+        const type = +v[section_attribute('equipment', id, 'equipment_type')];
+        // const armorType = +v[section_attribute('equipment', id, 'equipment_armor_type')];
         // const location = v[section_attribute('equipment', id, 'equipment_location')];
         // Weight calcs use equipment_carried
         let carried = 0;
-        const carriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 0;
+        const carriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')];
         output[section_attribute('equipment', id, 'equipment_carried')] = carriedSelect === 1 ? 1 : 0;
         carried = carriedSelect === 1 ? 1 : 0;
         const quantity = +v[section_attribute('equipment', id, 'equipment_quantity')] || 0;
@@ -2704,12 +2730,12 @@ function setCurrentEncumbranceFlag() {
   getAttrs(['normal_load_adjusted', 'heavy_load', 'very_heavy_load', 'total_weight', 'autocalc_movement_flag', 'current_bulk', 'current_encumbrance_move'], (v) => {
     // clog('Current Encumbrance flag has been re-calculated');
     const output = {};
-    const autocalc_movement_flag = +v.autocalc_movement_flag || 0;
+    const autocalc_movement_flag = +v.autocalc_movement_flag;
     const normal_load_adjusted = +v.normal_load_adjusted || 0;
     const heavy_load = +v.heavy_load || 0;
     const very_heavy_load = +v.very_heavy_load || 0;
     const total_weight = +v.total_weight || 0;
-    const current_bulk = +v.current_bulk || 0;
+    const current_bulk = +v.current_bulk;
     let currentEncumbrance = 0;
 
     if (total_weight <= normal_load_adjusted) {
@@ -2781,7 +2807,7 @@ function setCurrentMovement() {
     const output = {};
     // only extract an integer from movement
     const movement = +v.movement.toString().replace(/[^0-9]/g, '');
-    const current_encumbrance_move = +v.current_encumbrance_move || 0;
+    const current_encumbrance_move = +v.current_encumbrance_move;
     let adjustedMove = 0;
     if (current_encumbrance_move === 0) {
       adjustedMove = movement;
@@ -2871,31 +2897,35 @@ on(
 
 // type/carry should jump to follow selector unless set to Show All or matches the type/carry tab
 // carried_select/carried sync are used for weight calcs
-on('change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_type change:repeating_equipment:equipment_carried_select', (eventInfo) => {
-  // clog(`Change Detected:${eventInfo.sourceAttribute}`);
-  const id = eventInfo.sourceAttribute.split('_')[2];
-  const source = `${eventInfo.sourceAttribute}`;
-  const pattern = /equipment_type/; // parses the event text
-  const isType = pattern.test(source); // boolean for equipment_type change
-  const fields = [section_attribute('equipment', id, 'equipment_type'), section_attribute('equipment', id, 'equipment_carried_select')];
-  getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', ...fields], (v) => {
-    const output = {};
-    const carriedTab = +v.equipment_tabs_carry || 0; // 1, 0, 2, -1
-    const typeTab = +v.equipment_tabs_type || 0; // 0, 1, 2, 3, 4, -1
-    const thisType = +v[section_attribute('equipment', id, 'equipment_type')] || 0; // 0, 1, 2, 3, 4
-    const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 0; // 0, 1, 2
-    // Weight calcs use equipment_carried so keep them synced
-    output[section_attribute('equipment', id, 'equipment_carried')] = thisCarriedSelect === 1 ? 1 : 0;
-    // jumps to equip type tab unless Show All or same equip type tab
-    output.equipment_tabs_type = typeTab !== -1 && isType ? thisType : typeTab;
-    // jumps to carry type tab unless Show All or same carry type tab
-    output.equipment_tabs_carry = carriedTab === -1 || carriedTab === thisCarriedSelect ? -1 : thisCarriedSelect;
-    setAttrs(output);
-  });
-});
+on(
+  'change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_type change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_magical',
+  (eventInfo) => {
+    const id = eventInfo.sourceAttribute.split('_')[2];
+    const source = `${eventInfo.sourceAttribute}`;
+    const pattern = /equipment_type/; // parses the event text
+    const isType = pattern.test(source); // boolean for equipment_type change
+    const fields = [section_attribute('equipment', id, 'equipment_type'), section_attribute('equipment', id, 'equipment_carried_select')];
+    getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', ...fields], (v) => {
+      const output = {};
+      const carriedTab = +v.equipment_tabs_carry; // 1, 0, 2, -1
+      const typeTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
+      const thisType = +v[section_attribute('equipment', id, 'equipment_type')]; // 0, 1, 2, 3, 4
+      const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')]; // 0, 1, 2
+      // Weight calcs use equipment_carried so keep them synced
+      output[section_attribute('equipment', id, 'equipment_carried')] = thisCarriedSelect === 1 ? 1 : 0;
+      // jumps to equip type tab unless Show All or same equip type tab
+      output.equipment_tabs_type = typeTab !== -1 && isType ? thisType : typeTab;
+      // jumps to carry type tab unless Show All or same carry type tab
+      const testCarrySelected = carriedTab === -1 || carriedTab === thisCarriedSelect ? -1 : thisCarriedSelect;
+      console.log(`Change detected: testCarrySelected:${testCarrySelected}`);
+      output.equipment_tabs_carry = carriedTab === -1 || carriedTab === thisCarriedSelect ? -1 : thisCarriedSelect;
+      setAttrs(output);
+    });
+  },
+);
 
 // Equipment Tabs hide/show Rows
-on('change:equipment_tabs_type change:equipment_tabs_carry change:repeating_equipment:equipment_magical', (eventInfo) => {
+on('change:equipment_tabs_type change:equipment_tabs_carry', (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   getSectionIDs('repeating_equipment', (idArray) => {
     const fields = [];
@@ -2906,19 +2936,20 @@ on('change:equipment_tabs_type change:equipment_tabs_carry change:repeating_equi
     });
     getAttrs(['equipment_tabs_type', 'equipment_tabs_carry', 'equipment_magical', ...fields], (v) => {
       const output = {};
-      const typeTab = +v.equipment_tabs_type || 0; // 0, 1, 2, 3, 4, -1
-      const carriedTab = +v.equipment_tabs_carry || 0; // 1, 0, 2, -1
+      const typeTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
+      const carriedTab = +v.equipment_tabs_carry; // 1, 0, 2, -1
       _.each(idArray, (id) => {
-        const isMagical = +v[section_attribute('equipment', id, 'equipment_magical')] || 0; // checkbox
-        const thisType = +v[section_attribute('equipment', id, 'equipment_type')] || 0; // 0, 1, 2, 3, 4
-        const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 0; // 0, 1, 2
+        const isMagical = +v[section_attribute('equipment', id, 'equipment_magical')]; // checkbox
+        const thisType = +v[section_attribute('equipment', id, 'equipment_type')]; // 0, 1, 2, 3, 4
+        const thisCarriedSelect = +v[section_attribute('equipment', id, 'equipment_carried_select')]; // 0, 1, 2
         // CSS to hide/show the repeating row based on typeTab and/or carriedTab
         if (typeTab === -1 || typeTab === thisType || (typeTab === 3 && isMagical)) {
+          output[section_attribute('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
           return (output[section_attribute('equipment', id, 'equipment_show_type')] = 1);
         } else {
+          output[section_attribute('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
           output[section_attribute('equipment', id, 'equipment_show_type')] = 0;
         }
-        output[section_attribute('equipment', id, 'equipment_show_carry')] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
       });
       setAttrs(output);
     });
@@ -3070,8 +3101,8 @@ on(armorDetailslisteners, (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored;
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base;
       output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
       clog(`repeating armor does not exist. Creating unarmored: ${newID}`);
     }
@@ -3081,13 +3112,13 @@ on(armorDetailslisteners, (eventInfo) => {
       output.armortype1_row_id = newID.toLowerCase();
       output[`repeating_equipment_${newID}_equipment_type`] = 2;
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 1;
-      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype_worn || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype_worn;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armortype;
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
-      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried;
       output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
       output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
       // clog(`repeating armor does not exist. Creating armor1: ${newID}`);
@@ -3098,13 +3129,13 @@ on(armorDetailslisteners, (eventInfo) => {
       output.armortype2_row_id = newID.toLowerCase();
       output[`repeating_equipment_${newID}_equipment_type`] = 2;
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 2;
-      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype2_worn || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype2_worn;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armortype2;
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype2_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
-      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried;
       output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
       output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
       // clog(`repeating armor does not exist. Creating armor2: ${newID}`);
@@ -3115,14 +3146,14 @@ on(armorDetailslisteners, (eventInfo) => {
       output.armorshield_row_id = newID.toLowerCase();
       output[`repeating_equipment_${newID}_equipment_type`] = 2;
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 3;
-      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorshield_worn || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorshield_worn;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorshield;
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorshield_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorshield_mod || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
-      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried;
       output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
       output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
       // clog(`repeating armor does not exist. Creating shield: ${newID}`);
@@ -3133,11 +3164,11 @@ on(armorDetailslisteners, (eventInfo) => {
       output.armorhelmet_row_id = newID.toLowerCase();
       output[`repeating_equipment_${newID}_equipment_type`] = 2;
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 4;
-      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorhelmet_worn || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorhelmet_worn;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet;
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorhelmet_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried;
       output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
       output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
       // clog(`repeating armor does not exist. Creating helmet: ${newID}`);
@@ -3148,10 +3179,10 @@ on(armorDetailslisteners, (eventInfo) => {
       output.armorother1_row_id = newID.toLowerCase();
       output[`repeating_equipment_${newID}_equipment_type`] = 2;
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 5;
-      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother_worn || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother_worn;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother;
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
       // clog(`repeating armor does not exist. Creating other1: ${newID}`);
@@ -3162,10 +3193,10 @@ on(armorDetailslisteners, (eventInfo) => {
       output.armorother2_row_id = newID.toLowerCase();
       output[`repeating_equipment_${newID}_equipment_type`] = 2;
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 6;
-      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother2_worn || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother2_worn;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother2;
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
       // clog(`repeating armor does not exist. Creating other2: ${newID}`);
@@ -3176,10 +3207,10 @@ on(armorDetailslisteners, (eventInfo) => {
       output.armorother3_row_id = newID.toLowerCase();
       output[`repeating_equipment_${newID}_equipment_type`] = 2;
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 7;
-      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother3_worn || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother3_worn;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother3;
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
       // clog(`repeating armor does not exist. Creating other3: ${newID}`);
@@ -3190,10 +3221,10 @@ on(armorDetailslisteners, (eventInfo) => {
       output.armorother4_row_id = newID.toLowerCase();
       output[`repeating_equipment_${newID}_equipment_type`] = 2;
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 8;
-      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother4_worn || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother4_worn;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother4;
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
       // clog(`repeating armor does not exist. Creating other4: ${newID}`);
@@ -3204,10 +3235,10 @@ on(armorDetailslisteners, (eventInfo) => {
       output.armorother5_row_id = newID.toLowerCase();
       output[`repeating_equipment_${newID}_equipment_type`] = 2;
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 9;
-      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother5_worn || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother5_worn;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother5;
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
       // clog(`repeating armor does not exist. Creating other5: ${newID}`);
@@ -3218,10 +3249,10 @@ on(armorDetailslisteners, (eventInfo) => {
       output.armorother6_row_id = newID.toLowerCase();
       output[`repeating_equipment_${newID}_equipment_type`] = 2;
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 10;
-      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother6_worn || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother6_worn;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother6;
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
       // clog(`repeating armor does not exist. Creating other6: ${newID}`);
@@ -3250,15 +3281,15 @@ function fillArmorDetails(id, callback) {
     (v) => {
       const output = {};
       const recalc = 0;
-      const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
+      const type = +v[`repeating_equipment_${id}_equipment_armor_type`];
       const item = v[`repeating_equipment_${id}_equipment_item`];
-      const worn = +v[`repeating_equipment_${id}_equipment_armor_worn`] || 0;
-      const ac = +v[`repeating_equipment_${id}_equipment_armor_ac`] || 0;
-      const base = +v[`repeating_equipment_${id}_equipment_armor_base`] || 0;
+      const worn = +v[`repeating_equipment_${id}_equipment_armor_worn`];
+      const ac = +v[`repeating_equipment_${id}_equipment_armor_ac`];
+      const base = +v[`repeating_equipment_${id}_equipment_armor_base`];
       const magic = +v[`repeating_equipment_${id}_equipment_armor_magic`] || 0;
       const mod = +v[`repeating_equipment_${id}_equipment_armor_mod`] || 0;
-      const bulk = +v[`repeating_equipment_${id}_equipment_armor_bulk`] || 0;
-      let carriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
+      const bulk = +v[`repeating_equipment_${id}_equipment_armor_bulk`];
+      let carriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`];
       const weight = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
       const cost = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
       // armor in use ie 'worn', should always be considered as carried
@@ -3432,7 +3463,7 @@ function createAttack(id) {
       const newID = generateUniqueRowID();
       // clog(`Creating a new attack newID:${newID}`);
       output[`repeating_weapon_${newID}_weapon_name`] = v[`repeating_equipment_${id}_equipment_item`];
-      output[`repeating_weapon_${newID}_weapon_type`] = +v[`repeating_equipment_${id}_equipment_weapon_type`] || 0;
+      output[`repeating_weapon_${newID}_weapon_type`] = +v[`repeating_equipment_${id}_equipment_weapon_type`];
       output[`repeating_weapon_${newID}_weapon_speed`] = v[`repeating_equipment_${id}_equipment_weapon_speed`];
       output[`repeating_weapon_${newID}_weapon_length`] = v[`repeating_equipment_${id}_equipment_weapon_length`];
       output[`repeating_weapon_${newID}_weapon_space`] = v[`repeating_equipment_${id}_equipment_weapon_space`];
@@ -3444,8 +3475,8 @@ function createAttack(id) {
       output[`repeating_weapon_${newID}_weapon_range`] = v[`repeating_equipment_${id}_equipment_weapon_range`];
       output[`repeating_weapon_${newID}_weapon_quantity`] = +v[`repeating_equipment_${id}_equipment_quantity`] || 0;
       output[`repeating_weapon_${newID}_weapon_notes`] = v[`repeating_equipment_${id}_equipment_description`];
-      setAttrs(output, {silent: true});
-      damageMacro(newID);
+      // set new row with equip values then set attack defaults and damage macros
+      setAttrs(output, {silent: true}, setWeapons(id), damageMacro(newID));
     },
   );
 }
@@ -3586,13 +3617,13 @@ on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs chan
     });
     getAttrs(['spell_tabs', 'toggle_show_memorized', 'spell_caster_tabs', 'toggle_caster2', ...fields], (v) => {
       const output = {};
-      const memorizedOnly = +v.toggle_show_memorized || 0;
-      const casterTab = +v.spell_caster_tabs || 0; // -1, 0, 1
-      const hideCaster2 = +v.toggle_caster2 || 0;
-      const levelTab = +v.spell_tabs || 0;
+      const memorizedOnly = +v.toggle_show_memorized;
+      const casterTab = +v.spell_caster_tabs; // -1, 0, 1
+      const hideCaster2 = +v.toggle_caster2;
+      const levelTab = +v.spell_tabs;
       _.each(idArray, (id) => {
         const thisMemorizedOnly = +v[section_attribute('spells', id, 'spell_memorized')] || 0;
-        const thisCaster = +v[section_attribute('spells', id, 'spell_caster_class')] || 0; // 0, 1, 2
+        const thisCaster = +v[section_attribute('spells', id, 'spell_caster_class')]; // 0, 1, 2
         const thisLevel = +v[section_attribute('spells', id, 'spell_level')] || 0;
         output[section_attribute('spells', id, 'spell_show_memorized')] = memorizedOnly === 1 && thisMemorizedOnly > 0 ? 1 : 0;
         output[section_attribute('spells', id, 'spell_show_all')] = memorizedOnly === 1 ? 0 : 1;
@@ -3633,21 +3664,18 @@ on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_cla
   if (eventInfo.sourceType !== 'player') return;
   getAttrs(['repeating_spells_spell_level', 'repeating_spells_spell_caster_class', 'spell_caster_tabs', 'spell_tabs'], (v) => {
     const output = {};
-    // 0, 1, -1
-    const casterTab = +v.spell_caster_tabs || 0;
-    // 0, 1, 2
-    const thisCaster = +v.repeating_spells_spell_caster_class || 0;
-    const levelTab = +v.spell_tabs || 0;
+    const casterTab = +v.spell_caster_tabs; // 0, 1, -1
+    const thisCaster = +v.repeating_spells_spell_caster_class; // 0, 1, 2
+    const levelTab = +v.spell_tabs;
     const thisLevel = v.repeating_spells_spell_level;
     // jumps to spell level tab unless Show All or same level tab
-    output.spell_tabs = thisLevel >= 0 && levelTab !== thisLevel ? thisLevel : levelTab;
+    output.spell_tabs = levelTab >= 0 && levelTab !== thisLevel ? thisLevel : levelTab;
     // jumps to caster class tab unless Show All or same caster tab
     output.spell_caster_tabs = casterTab !== -1 && thisCaster <= 1 ? 0 : 1;
     setAttrs(output);
   });
 });
 
-// Spell Caster Class Name/Level fill-in
 setSpellsCasterClass = () => {
   getSectionIDs('repeating_spells', (idArray) => {
     const output = {};
@@ -3659,7 +3687,7 @@ setSpellsCasterClass = () => {
     const combined = [...nonRep, ...fields];
     getAttrs(combined, (v) => {
       _.each(idArray, (id) => {
-        const thisClass = +v[section_attribute('spells', id, 'spell_caster_class')] || 0;
+        const thisClass = +v[section_attribute('spells', id, 'spell_caster_class')];
         if (thisClass === 0) {
           output[section_attribute('spells', id, 'spell_caster_class_name')] = '';
           output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
@@ -3681,30 +3709,68 @@ setSpellsCasterClass = () => {
   });
 };
 
+// Update ALL Spells to match new Caster and/or Level
 on('change:caster_class1_name change:caster_class2_name change:caster_class1_level change:caster_class2_level', (eventInfo) => {
   // clog(`spell changed by who:${eventInfo.sourceType}`);
   setSpellsCasterClass();
 });
 
+// Set Caster Class and level for THIS Spell based on Caster Tab
 on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_class', (eventInfo) => {
   // console.log(`sourceType:${eventInfo.sourceType}`);
+  // test if API is creating the repeating row and bail
+  if (eventInfo.sourceType !== 'player') return;
+  const previousValue = eventInfo.previousValue;
+  const trigger = eventInfo.sourceAttribute.split('_').slice(3).join('_');
   const id = eventInfo.sourceAttribute.split('_')[2];
-  getAttrs([`repeating_spells_${id}_spell_caster_class`, 'caster_class1_name', 'caster_class1_level', 'caster_class2_name', 'caster_class2_level'], (v) => {
+  const newSpell = previousValue === undefined && trigger === 'spell_name' ? 1 : 0;
+  getAttrs(
+    ['repeating_spells_spell_caster_class', 'caster_class1_name', 'caster_class1_level', 'caster_class2_name', 'caster_class2_level', 'spell_caster_tabs', 'toggle_caster2'],
+    (v) => {
+      const output = {};
+      const caster2 = +v.toggle_caster2;
+      const casterTab = +v.spell_caster_tabs; // 0, 1, -1
+      let thisClass = +v[section_attribute('spells', id, 'spell_caster_class')]; // 0, 1, 2
+      console.log(`Change detected:PRE-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+      // Caster Class 2 is enabled
+      if (caster2 === 0) {
+        // test for New and not on All tab
+        if (newSpell === 1 && casterTab !== -1) thisClass = casterTab === 0 ? 1 : 2;
+      } else {
+        thisClass = 1;
+      }
+      console.log(`Change detected:POST-CHECK Hide Caster2:${caster2} CasterTab:${casterTab} thisClass:${thisClass}`);
+      if (thisClass === 0) {
+        output[section_attribute('spells', id, 'spell_caster_class_name')] = '';
+        output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
+      } else if (thisClass === 1) {
+        output[section_attribute('spells', id, 'spell_caster_class_name')] = v.caster_class1_name;
+        output[section_attribute('spells', id, 'spell_caster_class_level')] = +v.caster_class1_level || 0;
+        output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
+      } else if (thisClass === 2) {
+        output[section_attribute('spells', id, 'spell_caster_class_name')] = v.caster_class2_name;
+        output[section_attribute('spells', id, 'spell_caster_class_level')] = +v.caster_class2_level || 0;
+        output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
+      }
+      setAttrs(output, {silent: true});
+    },
+  );
+});
+
+// Set Spell's Level for new spells based selected Spell level Tab
+on('change:repeating_spells:spell_name', (eventInfo) => {
+  // console.log(`sourceType:${eventInfo.sourceType}`);
+  // test if API is creating the repeating row and bail
+  if (eventInfo.sourceType !== 'player') return;
+  const id = eventInfo.sourceAttribute.split('_')[2];
+  getAttrs([`repeating_spells_${id}_spell_level`, 'spell_tabs'], (v) => {
     const output = {};
-    const thisClass = +v[section_attribute('spells', id, 'spell_caster_class')] || 0;
-    // console.log(`thisClass: ${thisClass} id: ${id}`);
-    if (thisClass === 0) {
-      output[section_attribute('spells', id, 'spell_caster_class_name')] = '';
-      output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
-    } else if (thisClass === 1) {
-      output[section_attribute('spells', id, 'spell_caster_class_name')] = v.caster_class1_name;
-      output[section_attribute('spells', id, 'spell_caster_class_level')] = +v.caster_class1_level || 0;
-      output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
-    } else if (thisClass === 2) {
-      output[section_attribute('spells', id, 'spell_caster_class_name')] = v.caster_class2_name;
-      output[section_attribute('spells', id, 'spell_caster_class_level')] = +v.caster_class2_level || 0;
-      output[section_attribute('spells', id, 'spell_caster_class')] = thisClass;
-    }
+    const levelTab = +v.spell_tabs;
+    const thisSpellLevel = v[section_attribute('spells', id, 'spell_level')] || 0;
+    // console.log(`Change detected: [Setting Spell Level based on Spell Tab] SpellTab:${levelTab} ThisSpellLvl:${thisSpellLevel}`);
+    // test if Spell Tab is set to 'All' or if this Spell's Lvl has already been set
+    if (levelTab === -1 || thisSpellLevel != '?') return;
+    output[`repeating_spells_${id}_spell_level`] = levelTab;
     setAttrs(output, {silent: true});
   });
 });
@@ -3716,7 +3782,7 @@ on(
     // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['repeating_weapon_weapon_ToHitACadj_flag', 'repeating_weapon_weapon_ToHitACadj'], (v) => {
       const output = {};
-      const thisflag = +v.repeating_weapon_weapon_ToHitACadj_flag || 0;
+      const thisflag = +v.repeating_weapon_weapon_ToHitACadj_flag;
       output.repeating_weapon_weapon_ToHitACadj =
         thisflag === 1
           ? '{{ToHitACadj2to10=HitAdj:[[ @{weapon_thac_adj0} ]]|[[ @{weapon_thac_adj1} ]]|[[ @{weapon_thac_adj2} ]]|[[ @{weapon_thac_adj3} ]]|[[ @{weapon_thac_adj4} ]]|[[ @{weapon_thac_adj5} ]]|[[ @{weapon_thac_adj6} ]]|[[ @{weapon_thac_adj7} ]]|[[ @{weapon_thac_adj8} ]]|[[ @{weapon_thac_adj9} ]]|[[ @{weapon_thac_adj10} ]] }}'
@@ -3737,10 +3803,10 @@ on('change:toggle_to_hit_table change:repeating_weapon:weapon_name change:repeat
     });
     getAttrs(['toggle_to_hit_table', ...fields], (v) => {
       const output = {};
-      const flag = +v.toggle_to_hit_table || 0;
+      const flag = +v.toggle_to_hit_table;
 
       _.each(idArray, (id) => {
-        let thishitTableSelect = +v[`repeating_weapon_${id}_weapon_whisper_to_hit_select`] || 0;
+        let thishitTableSelect = +v[`repeating_weapon_${id}_weapon_whisper_to_hit_select`];
         let thishitTableMacro = v[`repeating_weapon_${id}_weapon_whisper_to_hit`];
         const noMacro = '&nbsp;';
         const matrixMacro =
@@ -3788,7 +3854,7 @@ on('change:repeating_weapon:weapon_prof_flag change:weapon_proficiency_initial c
       // clog('Weapon Proficiency has been re-calculated');
       const output = {};
       _.each(idArray, (id) => {
-        const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`] || 0;
+        const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`];
         const thispenalty = +v.weapon_proficiency_penalty || 0;
         output[`repeating_weapon_${id}_weapon_prof`] = thispenalty;
         output[`repeating_weapon_${id}_weapon_prof_pen`] = thisflag === 0 ? '0' : thispenalty;
@@ -3809,7 +3875,7 @@ on('change:repeating_weapon:weapon_backstab_flag change:backstab change:backstab
     getAttrs(['backstab', 'backstab_bonus', 'toggle_thief_skills', ...fields], (v) => {
       const output = {};
       const thiefSkills = +v.toggle_thief_skills;
-      const thisMult = +v.backstab || 1;
+      const thisMult = +v.backstab;
       const thisBonus = +v.backstab_bonus || 0;
       _.each(idArray, (id) => {
         const thisFlag = +v[`repeating_weapon_${id}_weapon_backstab_flag`];
@@ -3912,7 +3978,7 @@ calcRange = (id) => {
   ];
   getAttrs(fields, (v) => {
     // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
-    const thisType = +v[section_attribute('weapon', id, 'weapon_attack_type')] || 0;
+    const thisType = +v[section_attribute('weapon', id, 'weapon_attack_type')];
     if (thisType === 0 || thisType === 2) return;
     let thisRange = v[section_attribute('weapon', id, 'weapon_range')];
     // remove quotes to prevent NaN (ie distance indicators)
@@ -3976,8 +4042,8 @@ on('change:repeating_weapon:weapon_attack_type', (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   getAttrs(['repeating_weapon_weapon_attack_type', 'repeating_weapon_weapon_attack_type_flag'], (v) => {
     const output = {};
-    const currentType = +v.repeating_weapon_weapon_attack_type || 0;
-    const currentTypeFlag = +v.repeating_weapon_weapon_attack_type_flag || 0;
+    const currentType = +v.repeating_weapon_weapon_attack_type;
+    const currentTypeFlag = +v.repeating_weapon_weapon_attack_type_flag;
     if (currentType !== currentTypeFlag) {
       output.repeating_weapon_weapon_attack_type_flag = currentType;
     }
@@ -3990,7 +4056,7 @@ calcHP = () => {
   // clog('HP re-calculated');
   getAttrs(['hitpoints', 'hitpoints_max', 'sync_hp_flag', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class'], (v) => {
     const output = {};
-    const syncHpFlag = +v.sync_hp_flag || 0;
+    const syncHpFlag = +v.sync_hp_flag;
     const hitPointsMax = +v.hitpoints_max || 0;
     const hitpoints_1_class = Math.max(0, +v.hitpoints_1_class || 0);
     const hitpoints_2_class = Math.max(0, +v.hitpoints_2_class || 0);
@@ -4080,14 +4146,14 @@ calcAC = (recalc) => {
       'sync_ac_flag',
     ],
     (v) => {
-      const autoCalcAcFlag = +v.autocalc_ac || 0;
+      const autoCalcAcFlag = +v.autocalc_ac;
       if (autoCalcAcFlag + recalc === 0) return;
       // RecalcAC button overrides sync checkbox = continue
       // Or sync is on and an armor change detected = continue
       const output = {};
-      const armorClass = +v.armorclass || 0;
-      const syncAcFlag = +v.sync_ac_flag || 0;
-      const armorRatingFlag = +v.armor_rating_flag || 0;
+      const armorClass = +v.armorclass;
+      const syncAcFlag = +v.sync_ac_flag;
+      const armorRatingFlag = +v.armor_rating_flag;
       const armorShield_mod = +v.armorshield_mod * -1 || 0;
       const armorOther_mod = +v.armorother_mod * -1 || 0;
       const armorOther2_mod = +v.armorother2_mod * -1 || 0;
@@ -4105,17 +4171,17 @@ calcAC = (recalc) => {
       const armorOther4_magic = +v.armorother4_magic * -1 || 0;
       const armorOther5_magic = +v.armorother5_magic * -1 || 0;
       const armorOther6_magic = +v.armorother6_magic * -1 || 0;
-      const unarmored_worn = +v.unarmored_worn || 0;
-      const armorType_worn = +v.armortype_worn || 0;
-      const armorType2_worn = +v.armortype2_worn || 0;
-      const armorShield_worn = +v.armorshield_worn || 0;
-      const armorHelmet_worn = +v.armorhelmet_worn || 0;
-      const armorOther_worn = +v.armorother_worn || 0;
-      const armorOther2_worn = +v.armorother2_worn || 0;
-      const armorOther3_worn = +v.armorother3_worn || 0;
-      const armorOther4_worn = +v.armorother4_worn || 0;
-      const armorOther5_worn = +v.armorother5_worn || 0;
-      const armorOther6_worn = +v.armorother6_worn || 0;
+      const unarmored_worn = +v.unarmored_worn;
+      const armorType_worn = +v.armortype_worn;
+      const armorType2_worn = +v.armortype2_worn;
+      const armorShield_worn = +v.armorshield_worn;
+      const armorHelmet_worn = +v.armorhelmet_worn;
+      const armorOther_worn = +v.armorother_worn;
+      const armorOther2_worn = +v.armorother2_worn;
+      const armorOther3_worn = +v.armorother3_worn;
+      const armorOther4_worn = +v.armorother4_worn;
+      const armorOther5_worn = +v.armorother5_worn;
+      const armorOther6_worn = +v.armorother6_worn;
       // check encumbrance/bulk for DEX penalty
       const current_encumbrance_move = +v.current_encumbrance_move || 0;
       let armorBonusToggle = +v.armorbonus_toggle || 0;
@@ -4133,22 +4199,22 @@ calcAC = (recalc) => {
         armorBonus = +v.armorbonus || 0;
       }
       output.encumbrance_flag = encumbranceConditionFlag;
-      const unarmored_base = +v.unarmored_base || 0;
-      const armorType_base = +v.armortype_base || 0;
-      const armorType2_base = +v.armortype2_base || 0;
-      const armorShield_base = +v.armorshield_base || 0;
-      const armorOther_base = +v.armorother_base || 0;
+      const unarmored_base = +v.unarmored_base;
+      const armorType_base = +v.armortype_base;
+      const armorType2_base = +v.armortype2_base;
+      const armorShield_base = +v.armorshield_base;
+      const armorOther_base = +v.armorother_base;
       // must do the extra checks on these to ensure they are bonuses and not flat AC|AR values
       const armorOther2_base = v.armorother2_base >= 0 ? 0 : -Math.abs(v.armorother2_base) || 0;
       const armorOther3_base = v.armorother3_base >= 0 ? 0 : -Math.abs(v.armorother3_base) || 0;
       const armorOther4_base = v.armorother4_base >= 0 ? 0 : -Math.abs(v.armorother4_base) || 0;
       const armorOther5_base = v.armorother5_base >= 0 ? 0 : -Math.abs(v.armorother5_base) || 0;
       const armorOther6_base = v.armorother6_base >= 0 ? 0 : -Math.abs(v.armorother6_base) || 0;
-      const unarmored_ac = +v.unarmored_ac || 0;
-      const armorType_ac = +v.armortype_ac || 0;
-      const armorType2_ac = +v.armortype2_ac || 0;
-      const armorShield_ac = +v.armorshield_ac || 0;
-      const armorOther_ac = +v.armorother_ac || 0;
+      const unarmored_ac = +v.unarmored_ac;
+      const armorType_ac = +v.armortype_ac;
+      const armorType2_ac = +v.armortype2_ac;
+      const armorShield_ac = +v.armorshield_ac;
+      const armorOther_ac = +v.armorother_ac;
       // must do the extra checks on these to ensure they are bonuses and not flat AC|AR values
       const armorOther2_ac = v.armorother2_ac >= 0 ? 0 : -Math.abs(v.armorother2_ac) || 0;
       const armorOther3_ac = v.armorother3_ac >= 0 ? 0 : -Math.abs(v.armorother3_ac) || 0;
@@ -4310,7 +4376,7 @@ damageMacro = (id) => {
   getAttrs(['toggle_auto_damage'], (v) => {
     const output = {};
     const autoDamage = +v.toggle_auto_damage;
-    clog(`auto damage toggle:${autoDamage}`);
+    // clog(`auto damage toggle:${autoDamage}`);
     // NOTE: these macros substitute the damage rolls for the chatmenu buttons directly to support crit logic
     const damageSmallMedium = `Damage vs S/M [[ (@{repeating_weapon_${id}_weapon_damagesmallmedium}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
     const damageLarge = ` vs LG [[ (@{repeating_weapon_${id}_weapon_damagelarge}) * @{repeating_weapon_${id}_weapon_backstab_mult}[MULT] + ( @{repeating_weapon_${id}_weapon_attackdmgbonus}[DMG_BON] ) + ( @{repeating_weapon_${id}_weapon_magicbonus}[MAG_BON] ) + ( ?{Damage Modifier?|0}[MISC_MOD] ) ]]`;
@@ -4347,7 +4413,7 @@ damageMacro = (id) => {
 on(
   'change:repeating_weapon:weapon_name change:repeating_weapon:weapon_damagesmallmedium change:repeating_weapon:weapon_damagelarge change:repeating_weapon:weapon_critdamagesmallmedium change:repeating_weapon:weapon_critdamagelarge change:repeating_weapon:weapon_attackdmgbonus change:repeating_weapon:weapon_critdamage_flag',
   (eventInfo) => {
-    clog(`Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Change Detected:${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
     damageMacro(id);
   },
@@ -4441,49 +4507,50 @@ function setWeapons(id) {
     section_attribute('weapon', id, 'weapon_damage_chat_menu_npc'),
   ];
   getAttrs(fields, (v) => {
-    output.repeating_weapon_weapon_use = +v[section_attribute('weapon', id, 'weapon_use')] || 0;
-    output.repeating_weapon_weapon_attack_type_flag = +v[section_attribute('weapon', id, 'weapon_attack_type_flag')] || 0;
-    output.repeating_weapon_weapon_critdamage_flag = +v[section_attribute('weapon', id, 'weapon_critdamage_flag')] || 1;
-    output.repeating_weapon_weapon_prof_pen = +v[section_attribute('weapon', id, 'weapon_prof_pen')] || 0;
-    output.repeating_weapon_weapon_range_error = +v[section_attribute('weapon', id, 'weapon_range_error')] || 1;
-    output.repeating_weapon_weapon_tohitacadj = +v[section_attribute('weapon', id, 'weapon_tohitacadj')] || 1;
-    output.repeating_weapon_weapon_attack_type = +v[section_attribute('weapon', id, 'weapon_attack_type')] || 0;
+    // console.log(`Change detected: ${fields}`);
+    output.repeating_weapon_weapon_use = +v[section_attribute('weapon', id, 'weapon_use')];
+    output.repeating_weapon_weapon_attack_type_flag = +v[section_attribute('weapon', id, 'weapon_attack_type_flag')];
+    output.repeating_weapon_weapon_critdamage_flag = +v[section_attribute('weapon', id, 'weapon_critdamage_flag')];
+    output.repeating_weapon_weapon_prof_pen = +v[section_attribute('weapon', id, 'weapon_prof_pen')];
+    output.repeating_weapon_weapon_range_error = +v[section_attribute('weapon', id, 'weapon_range_error')];
+    output.repeating_weapon_weapon_tohitacadj = +v[section_attribute('weapon', id, 'weapon_tohitacadj')];
+    output.repeating_weapon_weapon_attack_type = +v[section_attribute('weapon', id, 'weapon_attack_type')];
     output.repeating_weapon_weapon_dual = v[section_attribute('weapon', id, 'weapon_dual')];
     output.repeating_weapon_weapon_whisper_to_hit = v[section_attribute('weapon', id, 'weapon_whisper_to_hit')];
-    output.repeating_weapon_weapon_whisper_to_hit_select = +v[section_attribute('weapon', id, 'weapon_whisper_to_hit_select')] || 0;
-    output.repeating_weapon_weapon_dual_pen = +v[section_attribute('weapon', id, 'weapon_dual_pen')] || 0;
-    output.repeating_weapon_weapon_backstab_var = +v[section_attribute('weapon', id, 'weapon_backstab_var')] || 0;
-    output.repeating_weapon_weapon_tohitbonus = +v[section_attribute('weapon', id, 'weapon_tohitbonus')] || 0;
-    output.repeating_weapon_weapon_magicbonus = +v[section_attribute('weapon', id, 'weapon_magicbonus')] || 0;
-    output.repeating_weapon_weapon_prof = +v[section_attribute('weapon', id, 'weapon_prof')] || 0;
-    output.repeating_weapon_weapon_backstab = +v[section_attribute('weapon', id, 'weapon_backstab')] || 0;
-    output.repeating_weapon_weapon_backstab_bonus = +v[section_attribute('weapon', id, 'weapon_backstab_bonus')] || 0;
-    output.repeating_weapon_weapon_backstab_mult = +v[section_attribute('weapon', id, 'weapon_backstab_mult')] || 0;
-    output.repeating_weapon_weapon_attackdmgbonus = +v[section_attribute('weapon', id, 'weapon_attackdmgbonus')] || 0;
-    output.repeating_weapon_weapon_num_attacks = +v[section_attribute('weapon', id, 'weapon_num_attacks')] || 0;
-    output.repeating_weapon_weapon_quantity = +v[section_attribute('weapon', id, 'weapon_quantity')] || 0;
-    output.repeating_weapon_weapon_ammo = +v[section_attribute('weapon', id, 'weapon_ammo')] || 0;
-    output.repeating_weapon_weapon_ammo_max = +v[section_attribute('weapon', id, 'weapon_ammo_max')] || 0;
-    output.repeating_weapon_weapon_weight = +v[section_attribute('weapon', id, 'weapon_weight')] || 0;
-    output.repeating_weapon_weapon_cost = +v[section_attribute('weapon', id, 'weapon_cost')] || 0;
-    output.repeating_weapon_weapon_range_short = +v[section_attribute('weapon', id, 'weapon_range_short')] || 0;
-    output.repeating_weapon_weapon_range_medium = +v[section_attribute('weapon', id, 'weapon_range_medium')] || 0;
-    output.repeating_weapon_weapon_range_long = +v[section_attribute('weapon', id, 'weapon_range_long')] || 0;
+    output.repeating_weapon_weapon_whisper_to_hit_select = +v[section_attribute('weapon', id, 'weapon_whisper_to_hit_select')];
+    output.repeating_weapon_weapon_dual_pen = +v[section_attribute('weapon', id, 'weapon_dual_pen')];
+    output.repeating_weapon_weapon_backstab_var = +v[section_attribute('weapon', id, 'weapon_backstab_var')];
+    output.repeating_weapon_weapon_tohitbonus = +v[section_attribute('weapon', id, 'weapon_tohitbonus')];
+    output.repeating_weapon_weapon_magicbonus = +v[section_attribute('weapon', id, 'weapon_magicbonus')];
+    output.repeating_weapon_weapon_prof = +v[section_attribute('weapon', id, 'weapon_prof')];
+    output.repeating_weapon_weapon_backstab = +v[section_attribute('weapon', id, 'weapon_backstab')];
+    output.repeating_weapon_weapon_backstab_bonus = +v[section_attribute('weapon', id, 'weapon_backstab_bonus')];
+    output.repeating_weapon_weapon_backstab_mult = +v[section_attribute('weapon', id, 'weapon_backstab_mult')];
+    output.repeating_weapon_weapon_attackdmgbonus = +v[section_attribute('weapon', id, 'weapon_attackdmgbonus')];
+    output.repeating_weapon_weapon_num_attacks = +v[section_attribute('weapon', id, 'weapon_num_attacks')];
+    output.repeating_weapon_weapon_quantity = +v[section_attribute('weapon', id, 'weapon_quantity')];
+    output.repeating_weapon_weapon_ammo = +v[section_attribute('weapon', id, 'weapon_ammo')];
+    output.repeating_weapon_weapon_ammo_max = +v[section_attribute('weapon', id, 'weapon_ammo_max')];
+    output.repeating_weapon_weapon_weight = +v[section_attribute('weapon', id, 'weapon_weight')];
+    output.repeating_weapon_weapon_cost = +v[section_attribute('weapon', id, 'weapon_cost')];
+    output.repeating_weapon_weapon_range_short = +v[section_attribute('weapon', id, 'weapon_range_short')];
+    output.repeating_weapon_weapon_range_medium = +v[section_attribute('weapon', id, 'weapon_range_medium')];
+    output.repeating_weapon_weapon_range_long = +v[section_attribute('weapon', id, 'weapon_range_long')];
     output.repeating_weapon_weapon_length = v[section_attribute('weapon', id, 'weapon_length')];
     output.repeating_weapon_weapon_space = v[section_attribute('weapon', id, 'weapon_space')];
     output.repeating_weapon_weapon_speed = v[section_attribute('weapon', id, 'weapon_speed')];
     output.repeating_weapon_weapon_misc = v[section_attribute('weapon', id, 'weapon_misc')];
-    output.repeating_weapon_weapon_thac_adj0 = +v[section_attribute('weapon', id, 'weapon_thac_adj0')] || 0;
-    output.repeating_weapon_weapon_thac_adj1 = +v[section_attribute('weapon', id, 'weapon_thac_adj1')] || 0;
-    output.repeating_weapon_weapon_thac_adj2 = +v[section_attribute('weapon', id, 'weapon_thac_adj2')] || 0;
-    output.repeating_weapon_weapon_thac_adj3 = +v[section_attribute('weapon', id, 'weapon_thac_adj3')] || 0;
-    output.repeating_weapon_weapon_thac_adj4 = +v[section_attribute('weapon', id, 'weapon_thac_adj4')] || 0;
-    output.repeating_weapon_weapon_thac_adj5 = +v[section_attribute('weapon', id, 'weapon_thac_adj5')] || 0;
-    output.repeating_weapon_weapon_thac_adj6 = +v[section_attribute('weapon', id, 'weapon_thac_adj6')] || 0;
-    output.repeating_weapon_weapon_thac_adj7 = +v[section_attribute('weapon', id, 'weapon_thac_adj7')] || 0;
-    output.repeating_weapon_weapon_thac_adj8 = +v[section_attribute('weapon', id, 'weapon_thac_adj8')] || 0;
-    output.repeating_weapon_weapon_thac_adj9 = +v[section_attribute('weapon', id, 'weapon_thac_adj9')] || 0;
-    output.repeating_weapon_weapon_thac_adj10 = +v[section_attribute('weapon', id, 'weapon_thac_adj10')] || 0;
+    output.repeating_weapon_weapon_thac_adj0 = +v[section_attribute('weapon', id, 'weapon_thac_adj0')];
+    output.repeating_weapon_weapon_thac_adj1 = +v[section_attribute('weapon', id, 'weapon_thac_adj1')];
+    output.repeating_weapon_weapon_thac_adj2 = +v[section_attribute('weapon', id, 'weapon_thac_adj2')];
+    output.repeating_weapon_weapon_thac_adj3 = +v[section_attribute('weapon', id, 'weapon_thac_adj3')];
+    output.repeating_weapon_weapon_thac_adj4 = +v[section_attribute('weapon', id, 'weapon_thac_adj4')];
+    output.repeating_weapon_weapon_thac_adj5 = +v[section_attribute('weapon', id, 'weapon_thac_adj5')];
+    output.repeating_weapon_weapon_thac_adj6 = +v[section_attribute('weapon', id, 'weapon_thac_adj6')];
+    output.repeating_weapon_weapon_thac_adj7 = +v[section_attribute('weapon', id, 'weapon_thac_adj7')];
+    output.repeating_weapon_weapon_thac_adj8 = +v[section_attribute('weapon', id, 'weapon_thac_adj8')];
+    output.repeating_weapon_weapon_thac_adj9 = +v[section_attribute('weapon', id, 'weapon_thac_adj9')];
+    output.repeating_weapon_weapon_thac_adj10 = +v[section_attribute('weapon', id, 'weapon_thac_adj10')];
     output.repeating_weapon_weapon_macro_text = v[section_attribute('weapon', id, 'weapon_macro_text')];
     output.repeating_weapon_weapon_damagesmallmedium_chat_menu = v[section_attribute('weapon', id, 'weapon_damagesmallmedium_chat_menu')];
     output.repeating_weapon_weapon_damagelarge_chat_menu = v[section_attribute('weapon', id, 'weapon_damagelarge_chat_menu')];
@@ -4535,29 +4602,31 @@ function setEquipment(id) {
   ];
   const combined = [...nonRep, ...fields];
   getAttrs(combined, (v) => {
-    const equipTab = +v.equipment_tabs_type || 0;
-    const equipType = +v[section_attribute('equipment', id, 'equipment_type')] || 0;
-    clog(`equipType:${equipType}`);
-    output.repeating_equipment_equipment_type = equipType <= 0 || equipTab === -1 ? 0 : equipType;
-    output.repeating_equipment_equipment_magical = +v[section_attribute('equipment', id, 'equipment_magical')] || 0;
-    output.repeating_equipment_equipment_show_type = +v[section_attribute('equipment', id, 'equipment_show_type')] || 0;
-    output.repeating_equipment_equipment_current = +v[section_attribute('equipment', id, 'equipment_current')] || 0;
-    output.repeating_equipment_equipment_current_max = +v[section_attribute('equipment', id, 'equipment_current_max')] || 0;
-    output.repeating_equipment_equipment_carried_select = +v[section_attribute('equipment', id, 'equipment_carried_select')] || 1;
-    output.repeating_equipment_equipment_carried = +v[section_attribute('equipment', id, 'equipment_carried')] || 1;
-    output.repeating_equipment_equipment_quantity = +v[section_attribute('equipment', id, 'equipment_quantity')] || 1;
-    output.repeating_equipment_equipment_quantity_max = +v[section_attribute('equipment', id, 'equipment_quantity_max')] || 1;
-    output.repeating_equipment_equipment_weight = +v[section_attribute('equipment', id, 'equipment_weight')] || 0;
-    output.repeating_equipment_equipment_cost = +v[section_attribute('equipment', id, 'equipment_cost')] || 0;
-    output.repeating_equipment_equipment_armor_type = +v[section_attribute('equipment', id, 'equipment_armor_type')] || 0;
-    output.repeating_equipment_equipment_armor_worn = +v[section_attribute('equipment', id, 'equipment_armor_worn')] || 0;
-    output.repeating_equipment_equipment_armor_ac = +v[section_attribute('equipment', id, 'equipment_armor_ac')] || 0;
-    output.repeating_equipment_equipment_armor_base = +v[section_attribute('equipment', id, 'equipment_armor_base')] || 0;
-    output.repeating_equipment_equipment_armor_magic = +v[section_attribute('equipment', id, 'equipment_armor_magic')] || 0;
-    output.repeating_equipment_equipment_armor_mod = +v[section_attribute('equipment', id, 'equipment_armor_mod')] || 0;
-    output.repeating_equipment_equipment_armor_bulk = +v[section_attribute('equipment', id, 'equipment_armor_bulk')] || 0;
+    // console.log(`Change detected: ${fields}`);
+    const equipTab = +v.equipment_tabs_type; // 0, 1, 2, 3, 4, -1
+    const equipType = +v[section_attribute('equipment', id, 'equipment_type')];
+    // output.repeating_equipment_equipment_type = equipType <= 0 || equipTab === -1 ? 0 : equipType;
+    // Set Equipment type for new rows based on selected Type Tab
+    output.repeating_equipment_equipment_type = equipTab !== -1 ? equipTab : equipType;
+    output.repeating_equipment_equipment_magical = equipType === 3 || equipTab === 3 ? 1 : +v[section_attribute('equipment', id, 'equipment_magical')];
+    output.repeating_equipment_equipment_show_type = +v[section_attribute('equipment', id, 'equipment_show_type')];
+    output.repeating_equipment_equipment_current = +v[section_attribute('equipment', id, 'equipment_current')];
+    output.repeating_equipment_equipment_current_max = +v[section_attribute('equipment', id, 'equipment_current_max')];
+    output.repeating_equipment_equipment_carried_select = +v[section_attribute('equipment', id, 'equipment_carried_select')];
+    output.repeating_equipment_equipment_carried = +v[section_attribute('equipment', id, 'equipment_carried')];
+    output.repeating_equipment_equipment_quantity = +v[section_attribute('equipment', id, 'equipment_quantity')];
+    output.repeating_equipment_equipment_quantity_max = +v[section_attribute('equipment', id, 'equipment_quantity_max')];
+    output.repeating_equipment_equipment_weight = +v[section_attribute('equipment', id, 'equipment_weight')];
+    output.repeating_equipment_equipment_cost = +v[section_attribute('equipment', id, 'equipment_cost')];
+    output.repeating_equipment_equipment_armor_type = +v[section_attribute('equipment', id, 'equipment_armor_type')];
+    output.repeating_equipment_equipment_armor_worn = +v[section_attribute('equipment', id, 'equipment_armor_worn')];
+    output.repeating_equipment_equipment_armor_ac = +v[section_attribute('equipment', id, 'equipment_armor_ac')];
+    output.repeating_equipment_equipment_armor_base = +v[section_attribute('equipment', id, 'equipment_armor_base')];
+    output.repeating_equipment_equipment_armor_magic = +v[section_attribute('equipment', id, 'equipment_armor_magic')];
+    output.repeating_equipment_equipment_armor_mod = +v[section_attribute('equipment', id, 'equipment_armor_mod')];
+    output.repeating_equipment_equipment_armor_bulk = +v[section_attribute('equipment', id, 'equipment_armor_bulk')];
     output.repeating_equipment_equipment_macro_text = v[section_attribute('equipment', id, 'equipment_macro_text')];
-    output.repeating_equipment_equipment_weapon_type = +v[section_attribute('equipment', id, 'equipment_weapon_type')] || 0;
+    output.repeating_equipment_equipment_weapon_type = +v[section_attribute('equipment', id, 'equipment_weapon_type')];
     output.repeating_equipment_equipment_weapon_speed = v[section_attribute('equipment', id, 'equipment_weapon_speed')];
     output.repeating_equipment_equipment_weapon_misc = v[section_attribute('equipment', id, 'equipment_weapon_misc')];
     output.repeating_equipment_equipment_weapon_length = v[section_attribute('equipment', id, 'equipment_weapon_length')];
@@ -4571,14 +4640,35 @@ function setEquipment(id) {
   });
 }
 
+function setNWP(id) {
+  const output = {};
+  const fields = [
+    section_attribute('nonweaponproficiencies', id, 'nwp_attribute'),
+    section_attribute('nonweaponproficiencies', id, 'nwp_slots'),
+    section_attribute('nonweaponproficiencies', id, 'nwp_modifier'),
+    section_attribute('nonweaponproficiencies', id, 'nwp_macro_text'),
+  ];
+  getAttrs(fields, (v) => {
+    // console.log(`Change detected: ${fields}`);
+    output.repeating_nonweaponproficiencies_attribute = +v[section_attribute('nonweaponproficiencies', id, 'nwp_attribute')];
+    output.repeating_nonweaponproficiencies_slots = +v[section_attribute('nonweaponproficiencies', id, 'nwp_slots')];
+    output.repeating_nonweaponproficiencies_modifier = +v[section_attribute('nonweaponproficiencies', id, 'nwp_modifier')];
+    output.repeating_nonweaponproficiencies_macro_text = v[section_attribute('nonweaponproficiencies', id, 'nwp_macro_text')];
+    setAttrs(output, {silent: true});
+  });
+}
+
 // Set repeating attr values for new rows. Makes visible to API
-on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item', (eventInfo) => {
+on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_item change:repeating_nonweaponproficiencies:nwp_name', (eventInfo) => {
   // clog(`Change Detected:${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
   // test if API is creating the repeating row and bail
   if (eventInfo.sourceType !== 'player') return;
-  if (eventInfo.newValue !== eventInfo.previousValue) return;
+
   // test for new row name (ie no existing value)
+  // console.log(`Change detected: new: ${eventInfo.newValue} previous:${eventInfo.previousValue}`);
+  if (eventInfo.previousValue !== undefined) return;
+
   if (eventInfo.sourceAttribute.includes('equipment_item')) {
     // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Setting default values.`);
     setEquipment(id);
@@ -4586,6 +4676,10 @@ on('change:repeating_weapon:weapon_name change:repeating_equipment:equipment_ite
   if (eventInfo.sourceAttribute.includes('weapon_name')) {
     // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Setting default values.`);
     setWeapons(id);
+  }
+  if (eventInfo.sourceAttribute.includes('nwp_name')) {
+    // clog(`new ${eventInfo.sourceAttribute.match(/^[^_]+_[^_]+/)[0]} row added. Setting default values.`);
+    setNWP(id);
   }
 });
 
@@ -5022,221 +5116,234 @@ on('change:thiefmisc2_base change:thiefmisc2_racial_mod change:thiefmisc2_abilit
 on(
   'change:thief_level change:autofill_thief change:sync_thief_class change:thief_class_selected change:class change:secondclass change:thirdclass change:level change:level_2 change:level_3',
   (eventInfo) => {
-    clog(`Thief Autofill Change Detected:${eventInfo.sourceAttribute}`);
+    // clog(`Thief Autofill Change Detected:${eventInfo.sourceAttribute}`);
     getAttrs(['thief_level', 'autofill_thief', 'sync_thief_class', 'thief_class_selected', 'class', 'secondclass', 'thirdclass', 'level', 'level_2', 'level_3'], (v) => {
       const output = {};
-      const autocalcFill = +v.autofill_thief || 0;
-      const syncClass = +v.sync_thief_class || 0;
+      const autocalcFill = +v.autofill_thief;
+      const syncClass = +v.sync_thief_class;
       // bail out if auto-fill is not enabled.
       if (!autocalcFill) return;
-      const classLinked = +v.thief_class_selected || 1;
+      const classLinked = +v.thief_class_selected;
       let levelSelected = +v.thief_level || 0;
-      const class1Name = v.class || '';
-      const class2Name = v.secondclass || '';
-      const class3Name = v.thirdclass || '';
+      const class1Name = (v.class || '').trim();
+      const class2Name = (v.secondclass || '').trim();
+      const class3Name = (v.thirdclass || '').trim();
+      const setThiefSkills = (levelSelected) => {
+        if (levelSelected === 0) {
+          output.pickpockets_base = 0;
+          output.openlocks_base = 0;
+          output.findtraps_base = 0;
+          output.movequietly_base = 0;
+          output.hideinshadows_base = 0;
+          output.hearnoise_base = 0;
+          output.climbwalls_base = 0;
+          output.readlanguages_base = 0;
+        }
+        if (levelSelected === 1) {
+          output.pickpockets_base = 30;
+          output.openlocks_base = 25;
+          output.findtraps_base = 20;
+          output.movequietly_base = 15;
+          output.hideinshadows_base = 10;
+          output.hearnoise_base = 10;
+          output.climbwalls_base = 85;
+          output.readlanguages_base = 0;
+        }
+        if (levelSelected === 2) {
+          output.pickpockets_base = 35;
+          output.openlocks_base = 29;
+          output.findtraps_base = 25;
+          output.movequietly_base = 21;
+          output.hideinshadows_base = 15;
+          output.hearnoise_base = 10;
+          output.climbwalls_base = 86;
+          output.readlanguages_base = 0;
+        }
+        if (levelSelected === 3) {
+          output.pickpockets_base = 40;
+          output.openlocks_base = 33;
+          output.findtraps_base = 30;
+          output.movequietly_base = 27;
+          output.hideinshadows_base = 20;
+          output.hearnoise_base = 15;
+          output.climbwalls_base = 87;
+          output.readlanguages_base = 0;
+        }
+        if (levelSelected === 4) {
+          output.pickpockets_base = 45;
+          output.openlocks_base = 37;
+          output.findtraps_base = 35;
+          output.movequietly_base = 33;
+          output.hideinshadows_base = 25;
+          output.hearnoise_base = 15;
+          output.climbwalls_base = 88;
+          output.readlanguages_base = 20;
+        }
+        if (levelSelected === 5) {
+          output.pickpockets_base = 50;
+          output.openlocks_base = 42;
+          output.findtraps_base = 40;
+          output.movequietly_base = 40;
+          output.hideinshadows_base = 31;
+          output.hearnoise_base = 20;
+          output.climbwalls_base = 90;
+          output.readlanguages_base = 25;
+        }
+        if (levelSelected === 6) {
+          output.pickpockets_base = 55;
+          output.openlocks_base = 47;
+          output.findtraps_base = 45;
+          output.movequietly_base = 47;
+          output.hideinshadows_base = 37;
+          output.hearnoise_base = 20;
+          output.climbwalls_base = 92;
+          output.readlanguages_base = 30;
+        }
+        if (levelSelected === 7) {
+          output.pickpockets_base = 60;
+          output.openlocks_base = 52;
+          output.findtraps_base = 50;
+          output.movequietly_base = 55;
+          output.hideinshadows_base = 43;
+          output.hearnoise_base = 25;
+          output.climbwalls_base = 94;
+          output.readlanguages_base = 35;
+        }
+        if (levelSelected === 8) {
+          output.pickpockets_base = 65;
+          output.openlocks_base = 57;
+          output.findtraps_base = 55;
+          output.movequietly_base = 62;
+          output.hideinshadows_base = 49;
+          output.hearnoise_base = 25;
+          output.climbwalls_base = 96;
+          output.readlanguages_base = 40;
+        }
+        if (levelSelected === 9) {
+          output.pickpockets_base = 70;
+          output.openlocks_base = 62;
+          output.findtraps_base = 60;
+          output.movequietly_base = 70;
+          output.hideinshadows_base = 56;
+          output.hearnoise_base = 30;
+          output.climbwalls_base = 98;
+          output.readlanguages_base = 45;
+        }
+        if (levelSelected === 10) {
+          output.pickpockets_base = 80;
+          output.openlocks_base = 67;
+          output.findtraps_base = 65;
+          output.movequietly_base = 78;
+          output.hideinshadows_base = 63;
+          output.hearnoise_base = 30;
+          output.climbwalls_base = 99;
+          output.readlanguages_base = 50;
+        }
+        if (levelSelected === 11) {
+          output.pickpockets_base = 90;
+          output.openlocks_base = 72;
+          output.findtraps_base = 70;
+          output.movequietly_base = 86;
+          output.hideinshadows_base = 70;
+          output.hearnoise_base = 35;
+          output.climbwalls_base = 99.1;
+          output.readlanguages_base = 55;
+        }
+        if (levelSelected === 12) {
+          output.pickpockets_base = 100;
+          output.openlocks_base = 77;
+          output.findtraps_base = 75;
+          output.movequietly_base = 94;
+          output.hideinshadows_base = 77;
+          output.hearnoise_base = 35;
+          output.climbwalls_base = 99.2;
+          output.readlanguages_base = 60;
+        }
+        if (levelSelected === 13) {
+          output.pickpockets_base = 105;
+          output.openlocks_base = 82;
+          output.findtraps_base = 80;
+          output.movequietly_base = 99;
+          output.hideinshadows_base = 85;
+          output.hearnoise_base = 40;
+          output.climbwalls_base = 99.3;
+          output.readlanguages_base = 65;
+        }
+        if (levelSelected === 14) {
+          output.pickpockets_base = 110;
+          output.openlocks_base = 87;
+          output.findtraps_base = 85;
+          output.movequietly_base = 99;
+          output.hideinshadows_base = 93;
+          output.hearnoise_base = 40;
+          output.climbwalls_base = 99.4;
+          output.readlanguages_base = 70;
+        }
+        if (levelSelected === 15) {
+          output.pickpockets_base = 115;
+          output.openlocks_base = 92;
+          output.findtraps_base = 90;
+          output.movequietly_base = 99;
+          output.hideinshadows_base = 99;
+          output.hearnoise_base = 50;
+          output.climbwalls_base = 99.5;
+          output.readlanguages_base = 75;
+        }
+        if (levelSelected === 16) {
+          output.pickpockets_base = 125;
+          output.openlocks_base = 97;
+          output.findtraps_base = 95;
+          output.movequietly_base = 99;
+          output.hideinshadows_base = 99;
+          output.hearnoise_base = 50;
+          output.climbwalls_base = 99.6;
+          output.readlanguages_base = 80;
+        }
+        if (levelSelected === 17) {
+          output.pickpockets_base = 125;
+          output.openlocks_base = 99;
+          output.findtraps_base = 99;
+          output.movequietly_base = 99;
+          output.hideinshadows_base = 99;
+          output.hearnoise_base = 55;
+          output.climbwalls_base = 99.7;
+          output.readlanguages_base = 80;
+        }
+        if (levelSelected > 17) {
+          output.pickpockets_base = 125;
+          output.openlocks_base = 99;
+          output.findtraps_base = 99;
+          output.movequietly_base = 99;
+          output.hideinshadows_base = 99;
+          output.hearnoise_base = 55;
+          output.climbwalls_base = 99.7;
+          output.readlanguages_base = 80;
+        }
+      };
       // sync enabled?
       // check for selected class and use that class level unless changed
       if (syncClass === 1) {
         if (classLinked === 1) {
-          // clog(`Linked Class is: ${class1Name} Current Level:${v.level}`);
           classSelected = matchClassName(class1Name);
           levelSelected = +v.level;
-          output.thief_level = levelSelected;
-        }
-        if (classLinked === 2) {
-          // clog(`Linked Class is: ${class2Name} Current Level:${v.level_2}`);
+          clog(`Linked Class is: ${class1Name} ${classSelected} Current Level:${v.level}`);
+          output.thief_level = classSelected === 4 ? levelSelected : 0;
+          setThiefSkills(levelSelected);
+        } else if (classLinked === 2) {
           classSelected = matchClassName(class2Name);
           levelSelected = +v.level_2;
-          output.thief_level = levelSelected;
-        }
-        if (classLinked === 3) {
-          // clog(`Linked Class is: ${class3Name} Current Level:${v.level_3}`);
+          clog(`Linked Class is: ${class2Name} ${classSelected} Current Level:${v.level_2}`);
+          output.thief_level = classSelected === 4 ? levelSelected : 0;
+          setThiefSkills(levelSelected);
+        } else if (classLinked === 3) {
           classSelected = matchClassName(class3Name);
           levelSelected = +v.level_3;
-          output.thief_level = levelSelected;
+          clog(`Linked Class is: ${class3Name} ${classSelected} Current Level:${v.level_3}`);
+          output.thief_level = classSelected === 4 ? levelSelected : 0;
+          setThiefSkills(levelSelected);
         }
-      }
-      if (levelSelected === 0) return;
-      // set Base by level
-      if (levelSelected === 1) {
-        output.pickpockets_base = 30;
-        output.openlocks_base = 25;
-        output.findtraps_base = 20;
-        output.movequietly_base = 15;
-        output.hideinshadows_base = 10;
-        output.hearnoise_base = 10;
-        output.climbwalls_base = 85;
-        output.readlanguages_base = 0;
-      }
-      if (levelSelected === 2) {
-        output.pickpockets_base = 35;
-        output.openlocks_base = 29;
-        output.findtraps_base = 25;
-        output.movequietly_base = 21;
-        output.hideinshadows_base = 15;
-        output.hearnoise_base = 10;
-        output.climbwalls_base = 86;
-        output.readlanguages_base = 0;
-      }
-      if (levelSelected === 3) {
-        output.pickpockets_base = 40;
-        output.openlocks_base = 33;
-        output.findtraps_base = 30;
-        output.movequietly_base = 27;
-        output.hideinshadows_base = 20;
-        output.hearnoise_base = 15;
-        output.climbwalls_base = 87;
-        output.readlanguages_base = 0;
-      }
-      if (levelSelected === 4) {
-        output.pickpockets_base = 45;
-        output.openlocks_base = 37;
-        output.findtraps_base = 35;
-        output.movequietly_base = 33;
-        output.hideinshadows_base = 25;
-        output.hearnoise_base = 15;
-        output.climbwalls_base = 88;
-        output.readlanguages_base = 20;
-      }
-      if (levelSelected === 5) {
-        output.pickpockets_base = 50;
-        output.openlocks_base = 42;
-        output.findtraps_base = 40;
-        output.movequietly_base = 40;
-        output.hideinshadows_base = 31;
-        output.hearnoise_base = 20;
-        output.climbwalls_base = 90;
-        output.readlanguages_base = 25;
-      }
-      if (levelSelected === 6) {
-        output.pickpockets_base = 55;
-        output.openlocks_base = 47;
-        output.findtraps_base = 45;
-        output.movequietly_base = 47;
-        output.hideinshadows_base = 37;
-        output.hearnoise_base = 20;
-        output.climbwalls_base = 92;
-        output.readlanguages_base = 30;
-      }
-      if (levelSelected === 7) {
-        output.pickpockets_base = 60;
-        output.openlocks_base = 52;
-        output.findtraps_base = 50;
-        output.movequietly_base = 55;
-        output.hideinshadows_base = 43;
-        output.hearnoise_base = 25;
-        output.climbwalls_base = 94;
-        output.readlanguages_base = 35;
-      }
-      if (levelSelected === 8) {
-        output.pickpockets_base = 65;
-        output.openlocks_base = 57;
-        output.findtraps_base = 55;
-        output.movequietly_base = 62;
-        output.hideinshadows_base = 49;
-        output.hearnoise_base = 25;
-        output.climbwalls_base = 96;
-        output.readlanguages_base = 40;
-      }
-      if (levelSelected === 9) {
-        output.pickpockets_base = 70;
-        output.openlocks_base = 62;
-        output.findtraps_base = 60;
-        output.movequietly_base = 70;
-        output.hideinshadows_base = 56;
-        output.hearnoise_base = 30;
-        output.climbwalls_base = 98;
-        output.readlanguages_base = 45;
-      }
-      if (levelSelected === 10) {
-        output.pickpockets_base = 80;
-        output.openlocks_base = 67;
-        output.findtraps_base = 65;
-        output.movequietly_base = 78;
-        output.hideinshadows_base = 63;
-        output.hearnoise_base = 30;
-        output.climbwalls_base = 99;
-        output.readlanguages_base = 50;
-      }
-      if (levelSelected === 11) {
-        output.pickpockets_base = 90;
-        output.openlocks_base = 72;
-        output.findtraps_base = 70;
-        output.movequietly_base = 86;
-        output.hideinshadows_base = 70;
-        output.hearnoise_base = 35;
-        output.climbwalls_base = 99.1;
-        output.readlanguages_base = 55;
-      }
-      if (levelSelected === 12) {
-        output.pickpockets_base = 100;
-        output.openlocks_base = 77;
-        output.findtraps_base = 75;
-        output.movequietly_base = 94;
-        output.hideinshadows_base = 77;
-        output.hearnoise_base = 35;
-        output.climbwalls_base = 99.2;
-        output.readlanguages_base = 60;
-      }
-      if (levelSelected === 13) {
-        output.pickpockets_base = 105;
-        output.openlocks_base = 82;
-        output.findtraps_base = 80;
-        output.movequietly_base = 99;
-        output.hideinshadows_base = 85;
-        output.hearnoise_base = 40;
-        output.climbwalls_base = 99.3;
-        output.readlanguages_base = 65;
-      }
-      if (levelSelected === 14) {
-        output.pickpockets_base = 110;
-        output.openlocks_base = 87;
-        output.findtraps_base = 85;
-        output.movequietly_base = 99;
-        output.hideinshadows_base = 93;
-        output.hearnoise_base = 40;
-        output.climbwalls_base = 99.4;
-        output.readlanguages_base = 70;
-      }
-      if (levelSelected === 15) {
-        output.pickpockets_base = 115;
-        output.openlocks_base = 92;
-        output.findtraps_base = 90;
-        output.movequietly_base = 99;
-        output.hideinshadows_base = 99;
-        output.hearnoise_base = 50;
-        output.climbwalls_base = 99.5;
-        output.readlanguages_base = 75;
-      }
-      if (levelSelected === 16) {
-        output.pickpockets_base = 125;
-        output.openlocks_base = 97;
-        output.findtraps_base = 95;
-        output.movequietly_base = 99;
-        output.hideinshadows_base = 99;
-        output.hearnoise_base = 50;
-        output.climbwalls_base = 99.6;
-        output.readlanguages_base = 80;
-      }
-      if (levelSelected === 17) {
-        output.pickpockets_base = 125;
-        output.openlocks_base = 99;
-        output.findtraps_base = 99;
-        output.movequietly_base = 99;
-        output.hideinshadows_base = 99;
-        output.hearnoise_base = 55;
-        output.climbwalls_base = 99.7;
-        output.readlanguages_base = 80;
-      }
-      if (levelSelected > 17) {
-        output.pickpockets_base = 125;
-        output.openlocks_base = 99;
-        output.findtraps_base = 99;
-        output.movequietly_base = 99;
-        output.hideinshadows_base = 99;
-        output.hearnoise_base = 55;
-        output.climbwalls_base = 99.7;
-        output.readlanguages_base = 80;
+      } else {
+        setThiefSkills(levelSelected);
       }
       setAttrs(output);
     });
@@ -5256,11 +5363,11 @@ saveparalysispoisondeathCalc = (migrate) => {
     ],
     (v) => {
       const output = {};
-      const baseSaveparalysispoisondeath = +v.saveparalysispoisondeath_base || 0;
-      const racialSaveparalysispoisondeath = +v.saveparalysispoisondeath_racial_mod || 0;
-      const abilitySaveparalysispoisondeath = +v.saveparalysispoisondeath_ability_mod || 0;
-      const miscSaveparalysispoisondeath = +v.saveparalysispoisondeath_misc_mod || 0;
-      const tempSaveparalysispoisondeath = +v.saveparalysispoisondeath_temp_mod || 0;
+      const baseSaveparalysispoisondeath = +v.saveparalysispoisondeath_base;
+      const racialSaveparalysispoisondeath = +v.saveparalysispoisondeath_racial_mod;
+      const abilitySaveparalysispoisondeath = +v.saveparalysispoisondeath_ability_mod;
+      const miscSaveparalysispoisondeath = +v.saveparalysispoisondeath_misc_mod;
+      const tempSaveparalysispoisondeath = +v.saveparalysispoisondeath_temp_mod;
       const oldSave = +v.saveparalysispoisondeath || 0;
       const newSave = int(
         baseSaveparalysispoisondeath + racialSaveparalysispoisondeath + abilitySaveparalysispoisondeath + miscSaveparalysispoisondeath + tempSaveparalysispoisondeath,
@@ -5293,11 +5400,11 @@ savepetrificationpolymorphCalc = (migrate) => {
     ],
     (v) => {
       const output = {};
-      const baseSavepetrificationpolymorph = +v.savepetrificationpolymorph_base || 0;
-      const racialSavepetrificationpolymorph = +v.savepetrificationpolymorph_racial_mod || 0;
-      const abilitySavepetrificationpolymorph = +v.savepetrificationpolymorph_ability_mod || 0;
-      const miscSavepetrificationpolymorph = +v.savepetrificationpolymorph_misc_mod || 0;
-      const tempSavepetrificationpolymorph = +v.savepetrificationpolymorph_temp_mod || 0;
+      const baseSavepetrificationpolymorph = +v.savepetrificationpolymorph_base;
+      const racialSavepetrificationpolymorph = +v.savepetrificationpolymorph_racial_mod;
+      const abilitySavepetrificationpolymorph = +v.savepetrificationpolymorph_ability_mod;
+      const miscSavepetrificationpolymorph = +v.savepetrificationpolymorph_misc_mod;
+      const tempSavepetrificationpolymorph = +v.savepetrificationpolymorph_temp_mod;
       const oldSave = +v.savepetrificationpolymorph || 0;
       const newSave = int(
         baseSavepetrificationpolymorph + racialSavepetrificationpolymorph + abilitySavepetrificationpolymorph + miscSavepetrificationpolymorph + tempSavepetrificationpolymorph,
@@ -5330,11 +5437,11 @@ saverodsstaveswandsCalc = (migrate) => {
     ],
     (v) => {
       const output = {};
-      const baseSaverodsstaveswands = +v.saverodsstaveswands_base || 0;
-      const racialSaverodsstaveswands = +v.saverodsstaveswands_racial_mod || 0;
-      const abilitySaverodsstaveswands = +v.saverodsstaveswands_ability_mod || 0;
-      const miscSaverodsstaveswands = +v.saverodsstaveswands_misc_mod || 0;
-      const tempSaverodsstaveswands = +v.saverodsstaveswands_temp_mod || 0;
+      const baseSaverodsstaveswands = +v.saverodsstaveswands_base;
+      const racialSaverodsstaveswands = +v.saverodsstaveswands_racial_mod;
+      const abilitySaverodsstaveswands = +v.saverodsstaveswands_ability_mod;
+      const miscSaverodsstaveswands = +v.saverodsstaveswands_misc_mod;
+      const tempSaverodsstaveswands = +v.saverodsstaveswands_temp_mod;
       const oldSave = +v.saverodsstaveswands || 0;
       const newSave = int(baseSaverodsstaveswands + racialSaverodsstaveswands + abilitySaverodsstaveswands + miscSaverodsstaveswands + tempSaverodsstaveswands);
       // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
@@ -5358,11 +5465,11 @@ savebreathweaponsCalc = (migrate) => {
     ['savebreathweapons', 'savebreathweapons_base', 'savebreathweapons_racial_mod', 'savebreathweapons_ability_mod', 'savebreathweapons_misc_mod', 'savebreathweapons_temp_mod'],
     (v) => {
       const output = {};
-      const baseSavebreathweapons = +v.savebreathweapons_base || 0;
-      const racialSavebreathweapons = +v.savebreathweapons_racial_mod || 0;
-      const abilitySavebreathweapons = +v.savebreathweapons_ability_mod || 0;
-      const miscSavebreathweapons = +v.savebreathweapons_misc_mod || 0;
-      const tempSavebreathweapons = +v.savebreathweapons_temp_mod || 0;
+      const baseSavebreathweapons = +v.savebreathweapons_base;
+      const racialSavebreathweapons = +v.savebreathweapons_racial_mod;
+      const abilitySavebreathweapons = +v.savebreathweapons_ability_mod;
+      const miscSavebreathweapons = +v.savebreathweapons_misc_mod;
+      const tempSavebreathweapons = +v.savebreathweapons_temp_mod;
       const oldSave = +v.savebreathweapons || 0;
       const newSave = int(baseSavebreathweapons + racialSavebreathweapons + abilitySavebreathweapons + miscSavebreathweapons + tempSavebreathweapons);
       // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
@@ -5384,11 +5491,11 @@ savebreathweaponsCalc = (migrate) => {
 savespellsCalc = (migrate) => {
   getAttrs(['savespells', 'savespells_base', 'savespells_racial_mod', 'savespells_ability_mod', 'savespells_misc_mod', 'savespells_temp_mod'], (v) => {
     const output = {};
-    const baseSavespells = +v.savespells_base || 0;
-    const racialSavespells = +v.savespells_racial_mod || 0;
-    const abilitySavespells = +v.savespells_ability_mod || 0;
-    const miscSavespells = +v.savespells_misc_mod || 0;
-    const tempSavespells = +v.savespells_temp_mod || 0;
+    const baseSavespells = +v.savespells_base;
+    const racialSavespells = +v.savespells_racial_mod;
+    const abilitySavespells = +v.savespells_ability_mod;
+    const miscSavespells = +v.savespells_misc_mod;
+    const tempSavespells = +v.savespells_temp_mod;
     const oldSave = +v.savespells || 0;
     const newSave = int(baseSavespells + racialSavespells + abilitySavespells + miscSavespells + tempSavespells);
     // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
@@ -5410,11 +5517,11 @@ savespellsCalc = (migrate) => {
 savemiscCalc = () => {
   getAttrs(['savemisc', 'savemisc_base', 'savemisc_racial_mod', 'savemisc_ability_mod', 'savemisc_misc_mod', 'savemisc_temp_mod'], (v) => {
     const output = {};
-    const baseSavemisc = +v.savemisc_base || 0;
-    const racialSavemisc = +v.savemisc_racial_mod || 0;
-    const abilitySavemisc = +v.savemisc_ability_mod || 0;
-    const miscSavemisc = +v.savemisc_misc_mod || 0;
-    const tempSavemisc = +v.savemisc_temp_mod || 0;
+    const baseSavemisc = +v.savemisc_base;
+    const racialSavemisc = +v.savemisc_racial_mod;
+    const abilitySavemisc = +v.savemisc_ability_mod;
+    const miscSavemisc = +v.savemisc_misc_mod;
+    const tempSavemisc = +v.savemisc_temp_mod;
     const newSave = int(baseSavemisc + racialSavemisc + abilitySavemisc + miscSavemisc + tempSavemisc);
     output.savemisc = newSave;
     setAttrs(output, {silent: true});
@@ -5424,11 +5531,11 @@ savemiscCalc = () => {
 savemisc1Calc = () => {
   getAttrs(['savemisc1', 'savemisc1_base', 'savemisc1_racial_mod', 'savemisc1_ability_mod', 'savemisc1_misc_mod', 'savemisc1_temp_mod'], (v) => {
     const output = {};
-    const baseSavemisc1 = +v.savemisc1_base || 0;
-    const racialSavemisc1 = +v.savemisc1_racial_mod || 0;
-    const abilitySavemisc1 = +v.savemisc1_ability_mod || 0;
-    const miscSavemisc1 = +v.savemisc1_misc_mod || 0;
-    const tempSavemisc1 = +v.savemisc1_temp_mod || 0;
+    const baseSavemisc1 = +v.savemisc1_base;
+    const racialSavemisc1 = +v.savemisc1_racial_mod;
+    const abilitySavemisc1 = +v.savemisc1_ability_mod;
+    const miscSavemisc1 = +v.savemisc1_misc_mod;
+    const tempSavemisc1 = +v.savemisc1_temp_mod;
     // const oldSave = +v.savemisc1 || 0;
     const newSave = int(baseSavemisc1 + racialSavemisc1 + abilitySavemisc1 + miscSavemisc1 + tempSavemisc1);
     output.savemisc1 = newSave;
@@ -5439,11 +5546,11 @@ savemisc1Calc = () => {
 savemisc2Calc = () => {
   getAttrs(['savemisc2', 'savemisc2_base', 'savemisc2_racial_mod', 'savemisc2_ability_mod', 'savemisc2_misc_mod', 'savemisc2_temp_mod'], (v) => {
     const output = {};
-    const baseSavemisc2 = +v.savemisc2_base || 0;
-    const racialSavemisc2 = +v.savemisc2_racial_mod || 0;
-    const abilitySavemisc2 = +v.savemisc2_ability_mod || 0;
-    const miscSavemisc2 = +v.savemisc2_misc_mod || 0;
-    const tempSavemisc2 = +v.savemisc2_temp_mod || 0;
+    const baseSavemisc2 = +v.savemisc2_base;
+    const racialSavemisc2 = +v.savemisc2_racial_mod;
+    const abilitySavemisc2 = +v.savemisc2_ability_mod;
+    const miscSavemisc2 = +v.savemisc2_misc_mod;
+    const tempSavemisc2 = +v.savemisc2_temp_mod;
     // const oldSave = +v.savemisc1 || 0;
     const newSave = int(baseSavemisc2 + racialSavemisc2 + abilitySavemisc2 + miscSavemisc2 + tempSavemisc2);
     output.savemisc2 = newSave;
@@ -5501,10 +5608,10 @@ on('change:saves_class change:saves_level change:autofill_saves', (eventInfo) =>
   clog(`Saves Autofill Change Detected:${eventInfo.sourceAttribute}`);
   getAttrs(['saves_class', 'saves_level', 'autofill_saves'], (v) => {
     const output = {};
-    const autocalcFill = +v.autofill_saves || 0;
+    const autocalcFill = +v.autofill_saves;
     // bail out if auto-fill is not enabled.
     if (!autocalcFill) return;
-    const classSelected = +v.saves_class || 0;
+    const classSelected = +v.saves_class;
     const levelSelected = +v.saves_level || 0;
     clog(`Class:${classSelected} Level:${levelSelected}`);
     // do saves per class and level here
@@ -5821,7 +5928,7 @@ on('change:saves_class change:saves_level change:autofill_saves', (eventInfo) =>
 on('change:matrix_class', (eventInfo) => {
   getAttrs(['matrix_class'], (v) => {
     const output = {};
-    const classSelected = +v.matrix_class || 0;
+    const classSelected = +v.matrix_class;
     output.toggle_matrixhd = classSelected === 5 ? 1 : 0;
     setAttrs(output, {silent: true});
   });
@@ -5829,12 +5936,12 @@ on('change:matrix_class', (eventInfo) => {
 
 // match class name to core class & return # for hit table lookup
 function matchClassName(name) {
-  const lowerCaseName = name.toLowerCase();
+  const lowerCaseName = name.trim().toLowerCase();
   if (/cleric|druid|monk/.test(lowerCaseName)) {
     return 1;
   } else if (/fighter|paladin|ranger|bard|cavalier|barbarian/.test(lowerCaseName)) {
     return 2;
-  } else if (/magic-user|illusionist|magic|mage/.test(lowerCaseName)) {
+  } else if (/magic-user|illusionist|magic|mage|wizard/.test(lowerCaseName)) {
     return 3;
   } else if (/thief|assassin|rogue|thief-acrobat|acrobat/.test(lowerCaseName)) {
     return 4;
@@ -5847,10 +5954,10 @@ function matchClassName(name) {
 function calcThac0() {
   getAttrs(['thac00', 'autofill_matrix'], (v) => {
     const output = {};
-    const autocalcFill = +v.autofill_matrix || 0;
+    const autocalcFill = +v.autofill_matrix;
     // bail out if auto-fill is not enabled.
     if (!autocalcFill) return;
-    const baseThac0 = +v.thac00 || 20;
+    const baseThac0 = +v.thac00;
     output[`thac0-10`] = baseThac0 + 10;
     output[`thac0-9`] = baseThac0 + 9;
     output[`thac0-8`] = baseThac0 + 8;
@@ -5898,18 +6005,18 @@ on(
       ],
       (v) => {
         const output = {};
-        const autocalcFill = +v.autofill_matrix || 0;
-        const syncClass = +v.sync_matrix_class || 0;
+        const autocalcFill = +v.autofill_matrix;
+        const syncClass = +v.sync_matrix_class;
         // bail out if auto-fill is not enabled.
         if (!autocalcFill) return;
-        const classLinked = +v.class_selected || 1;
+        const classLinked = +v.class_selected;
         let levelSelected = +v.matrix_level || 0;
-        let classSelected = +v.matrix_class || 0;
-        const class1Name = v.class || '';
-        const class2Name = v.secondclass || '';
-        const class3Name = v.thirdclass || '';
+        let classSelected = +v.matrix_class;
+        const class1Name = (v.class || '').trim();
+        const class2Name = (v.secondclass || '').trim();
+        const class3Name = (v.thirdclass || '').trim();
         const hitdiceSelected = +v.matrix_hitdice || 0;
-        const fighter5Selected = +v.toggle_fighter5 || 0;
+        const fighter5Selected = +v.toggle_fighter5;
         // sync enabled?
         // check for selected class and use that class level unless changed
         if (syncClass === 1) {
@@ -6927,21 +7034,21 @@ on(
 on('sheet:opened change:thac0 change:thac00 change:autofill_matrix', (eventInfo) => {
   getAttrs(['attack_matrix_flag', 'matrix_class', 'thac0', 'thac1', 'thac2', 'thac00', 'thac01', 'thac02', 'autofill_matrix'], (v) => {
     const output = {};
-    const autocalcFill = +v.autofill_matrix || 0;
+    const autocalcFill = +v.autofill_matrix;
     // bail out if auto-fill is not enabled.
     if (!autocalcFill) return;
-    const attack_matrix_flag = +v.attack_matrix_flag || 0;
-    const matrix_class = +v.matrix_class || 0;
+    const attack_matrix_flag = +v.attack_matrix_flag;
+    const matrix_class = +v.matrix_class;
     if (attack_matrix_flag === 0 || matrix_class > 0) {
       // clog(`attack_matrix_flag:${attack_matrix_flag} matrix_class:${matrix_class}`);
       output.attack_matrix_flag = 0;
     } else {
-      const thac0 = +v.thac0 || 20;
-      const thac1 = +v.thac1 || 20;
-      const thac2 = +v.thac2 || 20;
-      const thac00 = +v.thac00 || 20;
-      const thac01 = +v.thac01 || 20;
-      const thac02 = +v.thac02 || 20;
+      const thac0 = +v.thac0;
+      const thac1 = +v.thac1;
+      const thac2 = +v.thac2;
+      const thac00 = +v.thac00;
+      const thac01 = +v.thac01;
+      const thac02 = +v.thac02;
       const toHitIsDefaultValue = thac0 + thac1 + thac2;
       const thac0IsDefaultValue = thac00 + thac01 + thac02;
       // clog(`toHitIsDefaultValue:${toHitIsDefaultValue} thac0IsDefaultValue:${thac0IsDefaultValue}`);
@@ -7006,36 +7113,36 @@ class StrengthAdjustmentTable {
   constructor() {
     // MeleeAttackBonus, MeleeDamageBonus, EncumbranceBonus, MinorStrengthCheck, MinorStrengthCheck(locked), MajorStrengthCheck
     this.strength_dict = {
-      3: new StrengthCheck(-3, -1, -350, 15, 0, 0),
-      4: new StrengthCheck(-2, -1, -250, 15, 0, 0),
-      5: new StrengthCheck(-2, -1, -250, 15, 0, 0),
-      6: new StrengthCheck(-1, 0, -150, 15, 0, 0),
-      7: new StrengthCheck(-1, 0, -150, 15, 0, 0),
-      8: new StrengthCheck(0, 0, 0, 30, 0, 1),
-      9: new StrengthCheck(0, 0, 0, 30, 0, 1),
-      10: new StrengthCheck(0, 0, 0, 30, 0, 2),
-      11: new StrengthCheck(0, 0, 0, 30, 0, 2),
-      12: new StrengthCheck(0, 0, 100, 30, 0, 4),
-      13: new StrengthCheck(0, 0, 100, 30, 0, 4),
-      14: new StrengthCheck(0, 0, 200, 30, 0, 7),
-      15: new StrengthCheck(0, 0, 200, 30, 0, 7),
-      16: new StrengthCheck(0, 1, 350, 50, 0, 10),
-      17: new StrengthCheck(1, 1, 500, 50, 0, 13),
+      3: new StrengthCheck(-3, -1, -350, 1, 0, 0),
+      4: new StrengthCheck(-2, -1, -250, 1, 0, 0),
+      5: new StrengthCheck(-2, -1, -250, 1, 0, 0),
+      6: new StrengthCheck(-1, 0, -150, 1, 0, 0),
+      7: new StrengthCheck(-1, 0, -150, 1, 0, 0),
+      8: new StrengthCheck(0, 0, 0, 2, 0, 1),
+      9: new StrengthCheck(0, 0, 0, 2, 0, 1),
+      10: new StrengthCheck(0, 0, 0, 2, 0, 2),
+      11: new StrengthCheck(0, 0, 0, 2, 0, 2),
+      12: new StrengthCheck(0, 0, 100, 2, 0, 4),
+      13: new StrengthCheck(0, 0, 100, 2, 0, 4),
+      14: new StrengthCheck(0, 0, 200, 2, 0, 7),
+      15: new StrengthCheck(0, 0, 200, 2, 0, 7),
+      16: new StrengthCheck(0, 1, 350, 3, 0, 10),
+      17: new StrengthCheck(1, 1, 500, 3, 0, 13),
       18: {
-        None: new StrengthCheck(1, 2, 750, 50, 0, 16),
-        '01-50': new StrengthCheck(1, 3, 1000, 50, 0, 20),
-        '51-75': new StrengthCheck(2, 3, 1250, 70, 0, 25),
-        '76-90': new StrengthCheck(2, 4, 1500, 70, 0, 30),
-        '91-99': new StrengthCheck(2, 5, 2000, 70, 15, 35),
-        '00': new StrengthCheck(3, 6, 3000, 85, 30, 40),
+        None: new StrengthCheck(1, 2, 750, 3, 0, 16),
+        '01-50': new StrengthCheck(1, 3, 1000, 3, 0, 20),
+        '51-75': new StrengthCheck(2, 3, 1250, 4, 0, 25),
+        '76-90': new StrengthCheck(2, 4, 1500, 4, 0, 30),
+        '91-99': new StrengthCheck(2, 5, 2000, 4, 1, 35),
+        '00': new StrengthCheck(3, 6, 3000, 5, 2, 40),
       },
-      19: new StrengthCheck(3, 7, 4500, 90, 50, 50),
-      20: new StrengthCheck(3, 8, 5000, 90, 50, 60),
-      21: new StrengthCheck(4, 9, 6000, 90, 70, 70),
-      22: new StrengthCheck(4, 10, 7500, 90, 70, 80),
-      23: new StrengthCheck(5, 11, 9000, 90, 85, 90),
-      24: new StrengthCheck(6, 12, 12000, 95, 87, 100),
-      25: new StrengthCheck(7, 14, 15000, 95, 90, 100),
+      19: new StrengthCheck(3, 7, 4500, 7, 3, 50),
+      20: new StrengthCheck(3, 8, 5000, 7, 3, 60),
+      21: new StrengthCheck(4, 9, 6000, 9, 4, 70),
+      22: new StrengthCheck(4, 10, 7500, 11, 4, 80),
+      23: new StrengthCheck(5, 11, 9000, 11, 5, 90),
+      24: new StrengthCheck(6, 12, 12000, 19, 7, 100),
+      25: new StrengthCheck(7, 14, 15000, 23, 9, 100),
     };
   }
 
@@ -7397,10 +7504,17 @@ class ThiefSkillsDexAdjustmentTable {
       16: new ThiefSkillsDexEntry(0, 5, 0, 0, 0),
       17: new ThiefSkillsDexEntry(5, 10, 0, 5, 5),
       18: new ThiefSkillsDexEntry(10, 15, 5, 10, 10),
+      19: new ThiefSkillsDexEntry(15, 20, 10, 12, 12),
+      20: new ThiefSkillsDexEntry(20, 25, 15, 15, 15),
+      21: new ThiefSkillsDexEntry(25, 30, 20, 18, 18),
+      22: new ThiefSkillsDexEntry(30, 35, 25, 20, 20),
+      23: new ThiefSkillsDexEntry(35, 40, 30, 23, 23),
+      24: new ThiefSkillsDexEntry(40, 45, 35, 25, 25),
+      25: new ThiefSkillsDexEntry(45, 50, 40, 30, 30),
     };
   }
   getEntry(str_value) {
-    return this.dexterity_dict[getValidVariable(str_value, 'dexterity', 9, 18)];
+    return this.dexterity_dict[getValidVariable(str_value, 'dexterity', 9, 25)];
   }
 }
 
@@ -7503,10 +7617,66 @@ intelligenceCalcs = () => {
   getAttrs(['intelligence', 'bonuslanguages', 'race'], (values) => {
     const output = {};
     const stat_int = parseValues(values, 'intelligence', 'int');
-    // set bonus languages if human
     const race_value = parseValues(values, 'race', 'str');
+    let tableBonus = +AT_INT.getEntry(stat_int).getBonusLanguages();
     if (/human/gi.test(race_value)) {
-      output.bonuslanguages = AT_INT.getEntry(stat_int).getBonusLanguages();
+      // bonus language INT table data is given for humans
+      output.bonuslanguages = tableBonus;
+    } else if (/dwarf/gi.test(race_value) || /gnome/gi.test(race_value) || /orc/gi.test(race_value)) {
+      // dwarf, gnome, and half-orc are capped at 2
+      output.bonuslanguages = Math.min(tableBonus, 2);
+    } else if (/half-elf/gi.test(race_value) || /halfling/gi.test(race_value) || /hobbit/gi.test(race_value)) {
+      // half-elf or halfling gain +1 for every point above 16
+      if (tableBonus <= 5) {
+        tableBonus = 0;
+      } else if (tableBonus === 6) {
+        tableBonus = 1;
+      } else if (tableBonus === 7) {
+        tableBonus = 2;
+      } else if (tableBonus === 8) {
+        tableBonus = 3;
+      } else if (tableBonus === 9) {
+        tableBonus = 4;
+      } else if (tableBonus === 10) {
+        tableBonus = 5;
+      } else if (tableBonus === 11) {
+        tableBonus = 6;
+      } else if (tableBonus === 12) {
+        tableBonus = 7;
+      } else if (tableBonus === 13) {
+        tableBonus = 8;
+      } else if (tableBonus >= 14) {
+        tableBonus = 9;
+      }
+      output.bonuslanguages = tableBonus;
+    } else if (/elf/gi.test(race_value)) {
+      // elf +1 for every point above 15
+      if (tableBonus <= 4) {
+        tableBonus = 0;
+      } else if (tableBonus === 5) {
+        tableBonus = 1;
+      } else if (tableBonus == 6) {
+        tableBonus = 2;
+      } else if (tableBonus === 7) {
+        tableBonus = 3;
+      } else if (tableBonus === 8) {
+        tableBonus = 4;
+      } else if (tableBonus === 9) {
+        tableBonus = 5;
+      } else if (tableBonus === 10) {
+        tableBonus = 6;
+      } else if (tableBonus === 11) {
+        tableBonus = 7;
+      } else if (tableBonus === 12) {
+        tableBonus = 8;
+      } else if (tableBonus === 13) {
+        tableBonus = 9;
+      } else if (tableBonus >= 14) {
+        tableBonus = 10;
+      }
+      output.bonuslanguages = tableBonus;
+    } else {
+      output.bonuslanguages = 0;
     }
     output.knowspell = AT_INT.getEntry(stat_int).getKnowSpell();
     output.minspells = AT_INT.getEntry(stat_int).getMinSpells();
@@ -7570,7 +7740,7 @@ charismaCalcs = () => {
   });
 };
 
-thiefSkillsDexCalcs = () => {
+thiefSkillsDexCalcs = (autofill_thief_dex) => {
   getAttrs(['dexterity'], (values) => {
     const output = {};
     //get dexterity value and look up table data
@@ -7580,16 +7750,16 @@ thiefSkillsDexCalcs = () => {
     const findRemoveTraps = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getFindRemoveTraps();
     const moveSilently = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getMoveSilently();
     const hideInShadows = AT_THIEF_SKILLS_DEX.getEntry(stat_dex).getHideInShadows();
-    output.pickpockets_ability_mod = pickPockets;
-    output.openlocks_ability_mod = openLocks;
-    output.findtraps_ability_mod = findRemoveTraps;
-    output.movequietly_ability_mod = moveSilently;
-    output.hideinshadows_ability_mod = hideInShadows;
+    output.pickpockets_ability_mod = autofill_thief_dex === 1 ? pickPockets : 0;
+    output.openlocks_ability_mod = autofill_thief_dex === 1 ? openLocks : 0;
+    output.findtraps_ability_mod = autofill_thief_dex === 1 ? findRemoveTraps : 0;
+    output.movequietly_ability_mod = autofill_thief_dex === 1 ? moveSilently : 0;
+    output.hideinshadows_ability_mod = autofill_thief_dex === 1 ? hideInShadows : 0;
     setAttrs(output);
   });
 };
 
-thiefSkillsRacialCalcs = () => {
+thiefSkillsRacialCalcs = (autofill_thief_race) => {
   getAttrs(['thief_race_selected'], (values) => {
     const output = {};
     //get racial value from select and look up table data
@@ -7603,14 +7773,14 @@ thiefSkillsRacialCalcs = () => {
     const climbWalls = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getClimbWalls();
     const readLanguages = AT_THIEF_SKILLS_RACIAL.getEntry(stat_dex).getReadLanguages();
 
-    output.pickpockets_racial_mod = pickPockets;
-    output.openlocks_racial_mod = openLocks;
-    output.findtraps_racial_mod = findRemoveTraps;
-    output.movequietly_racial_mod = moveSilently;
-    output.hideinshadows_racial_mod = hideInShadows;
-    output.hearnoise_racial_mod = hearNoise;
-    output.climbwalls_racial_mod = climbWalls;
-    output.readlanguages_racial_mod = readLanguages;
+    output.pickpockets_racial_mod = autofill_thief_race === 1 ? pickPockets : 0;
+    output.openlocks_racial_mod = autofill_thief_race === 1 ? openLocks : 0;
+    output.findtraps_racial_mod = autofill_thief_race === 1 ? findRemoveTraps : 0;
+    output.movequietly_racial_mod = autofill_thief_race === 1 ? moveSilently : 0;
+    output.hideinshadows_racial_mod = autofill_thief_race === 1 ? hideInShadows : 0;
+    output.hearnoise_racial_mod = autofill_thief_race === 1 ? hearNoise : 0;
+    output.climbwalls_racial_mod = autofill_thief_race === 1 ? climbWalls : 0;
+    output.readlanguages_racial_mod = autofill_thief_race === 1 ? readLanguages : 0;
 
     setAttrs(output);
   });
@@ -7620,15 +7790,13 @@ thiefSkillsRacialCalcs = () => {
 on('change:autofill_thief_dex change:dexterity', (eventInfo) => {
   getAttrs(['autofill_thief_dex'], (v) => {
     const autofill_thief_dex = +v.autofill_thief_dex;
-    //bail out if not enabled
-    if (autofill_thief_dex === 0) return;
-    thiefSkillsDexCalcs();
+    thiefSkillsDexCalcs(autofill_thief_dex);
   });
 });
 
 // match class name to core class & return # for hit table lookup
 function matchRaceName(name) {
-  const lowerCaseName = name.toLowerCase();
+  const lowerCaseName = name.trim().toLowerCase();
   if (/human/.test(lowerCaseName)) {
     return 1;
   } else if (/dwarf/.test(lowerCaseName)) {
@@ -7655,16 +7823,14 @@ on('change:race change:autofill_thief_race change:thief_race_selected', (eventIn
   getAttrs(['race', 'autofill_thief_race'], (v) => {
     const output = {};
     const autofill_thief_race = +v.autofill_thief_race;
-    // bail out if not enabled
-    if (autofill_thief_race === 0) return;
 
     // check attr_race for a match to the race selector
-    const race = v.race || 'human';
+    const race = (v.race || 'human').trim();
     if (triggerAttr === 'autofill_thief_race' || triggerAttr === 'race') {
       output.thief_race_selected = matchRaceName(race);
     }
     setAttrs(output, {silent: true});
-    thiefSkillsRacialCalcs();
+    thiefSkillsRacialCalcs(autofill_thief_race);
   });
 });
 
@@ -7765,22 +7931,22 @@ weaponInUse = () => {
     const fields = [];
     const weaponsInUse = [];
     // Array to store weapons with inUse === 1
-    idArray.forEach((rowID) => {
-      fields.push(section_attribute('weapon', rowID, 'weapon_name'));
-      fields.push(section_attribute('weapon', rowID, 'weapon_use'));
-      fields.push(section_attribute('weapon', rowID, 'weapon_speed'));
-      fields.push(section_attribute('weapon', rowID, 'weapon_misc'));
+    idArray.forEach((id) => {
+      fields.push(section_attribute('weapon', id, 'weapon_name'));
+      fields.push(section_attribute('weapon', id, 'weapon_use'));
+      fields.push(section_attribute('weapon', id, 'weapon_speed'));
+      fields.push(section_attribute('weapon', id, 'weapon_misc'));
     });
     getAttrs(fields, (v) => {
-      idArray.forEach((rowID) => {
-        const inUse = +v[section_attribute('weapon', rowID, 'weapon_use')] || 0;
+      idArray.forEach((id) => {
+        const inUse = +v[section_attribute('weapon', id, 'weapon_use')] || 0;
         if (inUse === 0) return;
-        const name = v[section_attribute('weapon', rowID, 'weapon_name')];
+        const name = v[section_attribute('weapon', id, 'weapon_name')];
         // default to 0 if empty otherwise grab the first integer entered
-        const speedStr = v[section_attribute('weapon', rowID, 'weapon_speed')] || '0';
+        const speedStr = v[section_attribute('weapon', id, 'weapon_speed')] || '0';
         const speed = parseInt(speedStr.match(/\d+/)?.[0]) || 0;
-        const misc = v[section_attribute('weapon', rowID, 'weapon_misc')];
-        weaponsInUse.push({rowID, name, inUse, speed, misc});
+        const misc = v[section_attribute('weapon', id, 'weapon_misc')];
+        weaponsInUse.push({id, name, inUse, speed, misc});
       });
 
       // Find fastest(ie lowest) speed factor
@@ -7810,4 +7976,159 @@ weaponInUse = () => {
 on('change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use change:repeating_weapon:weapon_speed change:repeating_weapon:weapon_misc', (eventInfo) => {
   // clog(eventInfo.sourceAttribute);
   weaponInUse();
+});
+
+// utility function to grab row order
+const getSectionIDsOrdered = function (sectionName, callback) {
+  getAttrs([`_reporder_${sectionName}`], function (v) {
+    getSectionIDs(sectionName, function (idArray) {
+      let reporderArray = v[`_reporder_${sectionName}`] ? v[`_reporder_${sectionName}`].toLowerCase().split(',') : [],
+        ids = [...new Set(reporderArray.filter((x) => idArray.includes(x)).concat(idArray))];
+      callback(ids);
+    });
+  });
+};
+
+// sort repeating rows
+on('clicked:spell-sort-alphabetical clicked:spell-sort-level', function (eventInfo) {
+  // console.log(`Change detected: Sorting Spells`);
+  const sectionName = 'repeating_spells';
+  // needed to grab current/previous order
+  getSectionIDsOrdered(sectionName, function (ids) {
+    getSectionIDs(sectionName, (idArray) => {
+      // Bail out IF 0 repeating entries
+      if (!idArray.length) return;
+      const fields = [];
+      const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
+      // grab any attrs used for sorting
+      idArray.forEach((id) => {
+        fields.push(section_attribute('spells', id, 'spell_caster_class'));
+        fields.push(section_attribute('spells', id, 'spell_level'));
+        fields.push(section_attribute('spells', id, 'spell_name'));
+      });
+      getAttrs([...fields], (v) => {
+        const output = {};
+        const spells = idArray.map((id) => ({
+          id,
+          casterClass: v[section_attribute('spells', id, 'spell_caster_class')] || 0,
+          level: v[section_attribute('spells', id, 'spell_level')], // can be '?'
+          name: (v[section_attribute('spells', id, 'spell_name')] || '').trim(),
+        }));
+
+        const getLevelValue = (level) => {
+          if (level === '?') return -1;
+          return level || 0;
+        };
+
+        // SORT LOGIC
+        if (buttonClicked === 'spell-sort-alphabetical') {
+          spells.sort((a, b) => {
+            // sort by spell name A-Z
+            return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+          });
+        } else if (buttonClicked === 'spell-sort-level') {
+          // sort by Caster Class, then level 0-9, then by spell name A-Z
+          spells.sort((a, b) => {
+            const aLevel = getLevelValue(a.level);
+            const bLevel = getLevelValue(b.level);
+            return (
+              a.casterClass - b.casterClass ||
+              aLevel - bLevel || // Sort using the new values
+              a.name.localeCompare(b.name, undefined, {sensitivity: 'base'})
+            );
+          });
+        }
+
+        // new sort order
+        const order = spells.map((s) => `${s.id}`);
+
+        // save previous order/state for 'Undo'
+        output.spells_previous_order_array = ids.join(',');
+        // console.log(`Previous Order has been saved.`);
+        // console.log(ids);
+
+        // set new sort order
+        setAttrs(output, {silent: true}, setSectionOrder('spells', order));
+        // console.log(`${buttonClicked} Reordered ${sectionName}:`, spells);
+      });
+    });
+  });
+});
+
+// restores previous order
+on('clicked:spell-sort-undo', (eventInfo) => {
+  // console.log(`Change detected: Undo last Sort`);
+  getAttrs(['spells_previous_order_array'], (v) => {
+    const order = v.spells_previous_order_array;
+    if (!order || typeof order !== 'string') return;
+    const previousOrder = order.split(',');
+    // console.log(`Previous Order:${previousOrder}`);
+    setSectionOrder('spells', previousOrder);
+  });
+});
+
+on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', function (eventInfo) {
+  // console.log(`Change detected: Sorting Equipment`);
+  const sectionName = 'repeating_equipment';
+  // needed to grab current/previous order
+  getSectionIDsOrdered(sectionName, function (ids) {
+    getSectionIDs(sectionName, (idArray) => {
+      // Bail out IF 0 repeating entries
+      if (!idArray.length) return;
+      const fields = [];
+      const buttonClicked = eventInfo.triggerName.replace('clicked:', '');
+      // grab any attrs used for sorting
+      idArray.forEach((id) => {
+        fields.push(section_attribute('equipment', id, 'equipment_item'));
+        fields.push(section_attribute('equipment', id, 'equipment_location'));
+      });
+      getAttrs([...fields], (v) => {
+        const output = {};
+        const equipment = idArray.map((id) => ({
+          id,
+          name: (v[section_attribute('equipment', id, 'equipment_item')] || '').trim(),
+          location: (v[section_attribute('equipment', id, 'equipment_location')] || '').trim(),
+        }));
+
+        if (buttonClicked === 'equipment-sort-alphabetical') {
+          equipment.sort((a, b) => {
+            // sort by equipment name A-Z
+            return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+          });
+        } else if (buttonClicked === 'equipment-sort-location') {
+          equipment.sort((a, b) => {
+            // 1. Compare by location first
+            const locationComparison = a.location.localeCompare(b.location, undefined, {sensitivity: 'base'});
+            // If locations are different (non-zero result), return the location comparison
+            if (locationComparison !== 0) {
+              return locationComparison;
+            }
+            // 2. If locations are the same (locationComparison is 0), then compare by equipment name
+            return a.name.localeCompare(b.name, undefined, {sensitivity: 'base'});
+          });
+        }
+        // Apply the new order
+        const order = equipment.map((s) => `${s.id}`);
+        // save previous order/state for 'Undo'
+        output.equipment_previous_order_array = ids.join(',');
+        // console.log(`Previous Order has been saved.`);
+        // console.log(ids);
+        // set new sort order
+        setAttrs(output, {silent: true}, setSectionOrder('equipment', order));
+        // console.log(`${buttonClicked} Reordered ${sectionName}:`, equipment);
+      });
+    });
+  });
+});
+
+// restores previous order
+on('clicked:equipment-sort-undo', (eventInfo) => {
+  // console.log(`Change detected: Undo last Sort`);
+  getAttrs(['equipment_previous_order_array'], (v) => {
+    const order = v.equipment_previous_order_array;
+    if (!order || typeof order !== 'string') return;
+    const previousOrder = order.split(',');
+    // console.log(`Previous Order:${previousOrder}`);
+    setSectionOrder('equipment', previousOrder);
+  });
 });

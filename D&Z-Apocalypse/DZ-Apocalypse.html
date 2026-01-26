@@ -235,6 +235,29 @@
       </div>
     </div>
 
+        <script id="✓ CALC : Display Page" type="text/worker">
+      on("sheet:opened change:changepage", function () {
+        getAttrs(["changepage"], function (values) {
+          const selectedPage = values.changepage || "sheet-base";
+
+          const pageMap = {
+            "sheet-base": "sheet-base-display",
+            "sheet-vehicle": "sheet-vehicle-display",
+            "sheet-notes": "sheet-notes-display"
+          };
+
+          Object.keys(pageMap).forEach(pageKey => {
+            const element = $20(`.${pageMap[pageKey]}`);
+            if (selectedPage === pageKey) {
+              element.removeClass("sheet-hidden");
+            } else {
+              element.addClass("sheet-hidden");
+            }
+          });
+        });
+      });
+    </script>
+
         <!-- ----- ROLL STATUS -----  -->
     <div class="sheet-main-header-blank">
       <div class="sheet-standardbox sheet-standardbox11">
@@ -291,29 +314,6 @@
           <input class="sheet-cogs-input sheet-general-hideshow" type="checkbox" name="attr_sheet-general-hideshow" />
           <span class="sheet-cogs-icon">y</span>
         </div>
-
-    <script id="✓ CALC : Display Page" type="text/worker">
-      on("sheet:opened change:changepage", function () {
-        getAttrs(["changepage"], function (values) {
-          const selectedPage = values.changepage || "sheet-base";
-
-          const pageMap = {
-            "sheet-base": "sheet-base-display",
-            "sheet-vehicle": "sheet-vehicle-display",
-            "sheet-notes": "sheet-notes-display"
-          };
-
-          Object.keys(pageMap).forEach(pageKey => {
-            const element = $20(`.${pageMap[pageKey]}`);
-            if (selectedPage === pageKey) {
-              element.removeClass("sheet-hidden");
-            } else {
-              element.addClass("sheet-hidden");
-            }
-          });
-        });
-      });
-    </script>
     </div>
 
   <div class="sheet-maingrid-area sheet-base-display sheet-hidden">
@@ -1261,47 +1261,55 @@
           </div>
         </div>
 
-        <script id="✓ - CALC : Armor Class Totale" type="text/worker">
-          on("sheet:opened change:dex change:armorclass-mod change:clothing-head-armorclass change:clothing-face-armorclass change:clothing-chest-armorclass change:clothing-back-armorclass change:clothing-hands-armorclass change:clothing-belt-armorclass change:clothing-legs-armorclass change:clothing-feet-armorclass", function () {
-            getAttrs([
-              "dex",
-              "armorclass-mod",
-              "clothing-head-armorclass",
-              "clothing-face-armorclass",
-              "clothing-chest-armorclass",
-              "clothing-back-armorclass",
-              "clothing-hands-armorclass",
-              "clothing-belt-armorclass",
-              "clothing-legs-armorclass",
-              "clothing-feet-armorclass"
-            ], function(values) {
-              const base = 5;
-              const dex = parseInt(values["dex"], 10) || 0;
-              const armorMod = parseInt(values["armorclass-mod"], 10) || 0;
+<script id="✓ - CALC : Armor Class Totale" type="text/worker">
+on(
+  "sheet:opened change:dex change:armorclass-mod " +
+  "change:clothing-head-armorclass change:clothing-face-armorclass " +
+  "change:clothing-chest-armorclass change:clothing-back-armorclass " +
+  "change:clothing-hands-armorclass change:clothing-feets-armorclass " +
+  "change:clothing-belt-armorclass change:clothing-legs-armorclass",
+  function () {
 
-              const armorPieces = [
-                "clothing-head-armorclass",
-                "clothing-face-armorclass",
-                "clothing-chest-armorclass",
-                "clothing-back-armorclass",
-                "clothing-hands-armorclass",
-                "clothing-belt-armorclass",
-                "clothing-legs-armorclass",
-                "clothing-feet-armorclass"
-              ];
+    getAttrs([
+      "dex",
+      "armorclass-mod",
+      "clothing-head-armorclass",
+      "clothing-face-armorclass",
+      "clothing-chest-armorclass",
+      "clothing-back-armorclass",
+      "clothing-hands-armorclass",
+      "clothing-feets-armorclass",
+      "clothing-belt-armorclass",
+      "clothing-legs-armorclass"
+    ], function(values) {
 
-              const armorTotal = armorPieces.reduce((total, attr) => {
-                return total + (parseInt(values[attr], 10) || 0);
-              }, 0);
+      const base = 5;
+      const dex = parseInt(values.dex, 10) || 0;
+      const armorMod = parseInt(values["armorclass-mod"], 10) || 0;
 
-              const totalAC = base + dex + armorMod + armorTotal;
+      const armorPieces = [
+        "clothing-head-armorclass",
+        "clothing-face-armorclass",
+        "clothing-chest-armorclass",
+        "clothing-back-armorclass",
+        "clothing-hands-armorclass",
+        "clothing-feets-armorclass",
+        "clothing-belt-armorclass",
+        "clothing-legs-armorclass"
+      ];
 
-              setAttrs({
-                armorclass: totalAC
-              });
-            });
-          });
-        </script>
+      const armorTotal = armorPieces.reduce(
+        (total, attr) => total + (parseInt(values[attr], 10) || 0),
+        0
+      );
+
+      setAttrs({
+        armorclass: base + dex + armorMod + armorTotal
+      });
+    });
+  }
+);
+</script>
 
         <!-- HIT POINT -->
         <div class="sheet-standardbox sheet-standardbox51" style="grid-column: 2/4">
@@ -1431,6 +1439,18 @@
           </div>
         </div>
 
+        <script id="✓ - CALC : Initiative = 1 + dex" type="text/worker">
+  on("sheet:opened change:dex", function () {
+    getAttrs(["dex"], function(values) {
+      const dex = parseInt(values.dex) || 0;
+      const initiative = 1 + dex;
+
+      setAttrs({ initiative });
+    });
+  });
+</script>
+
+
         <!-- HIT DIE -->
         <div class="sheet-standardbox sheet-standardbox12">
           <div class="sheet-oneline">
@@ -1520,24 +1540,33 @@
               <input class="sheet-inputchar" type="text" step="0.01" value="0" name="attr_pb" readonly />
             </div>
             <h4>Prof. Bonus</h4>
+            <select name="attr_nopb" style="position: absolute;width: 20px!important;top: -9px;left: -9px;">
+                <option value="1">✔</option>
+                <option value="0">✘</option>
+              </select>
           </div>
         </div>
 
-        <script id="✓ - CALC : Proficiency Bonus" type="text/worker">
-          on("sheet:opened change:level", function () {
-            getAttrs(["level"], function (values) {
-              const level = parseInt(values.level, 10) || 1;
-              let pb = 2;
+<script id="✓ - CALC : Proficiency Bonus" type="text/worker">
+  on("sheet:opened change:level change:nopb", function () {
+    getAttrs(["level","nopb"], function (values) {
+      const enabled = (String(values.nopb ?? "").toLowerCase() === "1") ||
+                      (String(values.nopb ?? "").toLowerCase() === "on");
 
-              if (level >= 17) pb = 6;
-              else if (level >= 13) pb = 5;
-              else if (level >= 9) pb = 4;
-              else if (level >= 5) pb = 3;
+      if (!enabled) { setAttrs({ pb: 0 }); return; }
 
-              setAttrs({ pb });
-            });
-          });
-        </script>
+      const level = parseInt(values.level, 10) || 1;
+      let pb = 2;
+      if (level >= 17) pb = 6;
+      else if (level >= 13) pb = 5;
+      else if (level >= 9) pb = 4;
+      else if (level >= 5) pb = 3;
+
+      setAttrs({ pb });
+    });
+  });
+</script>
+
 
         <!-- EXHAUSTION -->
         <div class="sheet-standardbox sheet-standardbox42">
@@ -2037,7 +2066,7 @@
 
             <fieldset class="repeating_weapons">
               <div class="sheet-weapons-row1">
-                <button type="roll" class="sheet-button-attack" name="roll_talent" value="@{global-privacy-status} &{template:dzapocalypse} {{name=@{weapon_name}}} {{charactername=@{character_name}}} {{category=Weapon}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{weapon_hitmod}]]}} {{roll1=[[1d20+@{weapon_hitmod}]]}} {{roll2=[[1d20+@{weapon_hitmod}]]}} {{range=@{weapon_range}}} {{dmg1=[[@{weapon_dmg}+@{weapon_type_selector}]]}} {{dmg1type=@{weapon_dmgtype_selector}}} {{description=@{weapons-description}}} {{button=@{weapon-button}}} {{desc=[[1]]}}"></button>
+                <button type="roll" class="sheet-button-attack" name="roll_talent" value="@{global-privacy-status} &{template:dzapocalypse} {{name=@{weapon_name}}} {{charactername=@{character_name}}} {{category=Weapon}} {{@{global-advantage-status}=1}} {{roll=[[1d20+@{weapon_hitmod}+@{pb}]]}} {{roll1=[[1d20+@{weapon_hitmod}+@{pb}]]}} {{roll2=[[1d20+@{weapon_hitmod}+@{pb}]]}} {{range=@{weapon_range}}} {{dmg1=[[@{weapon_dmg}+@{weapon_type_selector}]]}} {{dmg1type=@{weapon_dmgtype_selector}}} {{description=@{weapons-description}}} {{button=@{weapon-button}}} {{desc=[[1]]}}"></button>
                 <input style="grid-column: 1/-1" class="sheet-hidden" type="text" value="" name="attr_weapon-button" />
                 <button type="roll" class="sheet-hidden" name="roll_show-description" value="@{global-privacy-status} &{template:dzapocalypse-description} {{name=Details}} {{description=@{weapons-description}}} {{properties=@{weapons_properties}}} {{barrel=@{barrel_name}}} {{tactical1=@{tactical1_name}}} {{tactical2=@{tactical2_name}}} {{scope=@{scope_name}}} {{magazine=@{magazine_name}}}"></button>
                     
