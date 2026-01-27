@@ -5244,8 +5244,15 @@
 		
 		// 2. Extract and format primary data fields.
 		const distanceInfo = abilityData.distance?.[0];
-		const distance = distanceInfo ? `${distanceInfo.type} ${distanceInfo.value || ''}`.trim() : '';
-
+		let distance = '';
+		if (distanceInfo) {
+			const valueTwo = (parseInt(distanceInfo.value2) > 0) ? ` x ${distanceInfo.value2}` : '';
+			const within = (parseInt(distanceInfo.within) > 0) ? ` within ${distanceInfo.within}` : '';
+			const type = distanceInfo.type;
+			const valueOne = distanceInfo.value ? distanceInfo.value : '';
+			distance = (type === 'Melee' || type === 'Ranged' || type === 'Self') ? `${type} ${valueOne}`.trim() : `${valueOne}${valueTwo} ${type}${within}`;
+		}
+		
 		const effect = abilityData.sections
 			.filter(s => s.type === 'text' || s.type === 'field')
 			.map(s => s.name ? `${s.name} ${s.value}: ${s.effect}` : s.text)
