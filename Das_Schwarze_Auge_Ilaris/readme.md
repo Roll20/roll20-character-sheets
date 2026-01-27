@@ -1,12 +1,13 @@
+## Roll20 character sheet for Das Schwarze Auge: Ilaris
+
 A custom Roll20 character sheet for Das Schwarze Auge: Ilaris (an alternative ruleset for roleplaying in Aventuria).
 
-Currently only available in German and English. The ruleset itself is so far not localized.
+Currently only available in German, English and French. The ruleset itself is so far not localized.
 
-Ruleset is available for free at ilarisblog.wordpress.com!
+Ruleset is available for free at [ilarisblog.wordpress.com](https://ilarisblog.wordpress.com)!
 
----
 
-Gebrauchsanweisung:
+### Gebrauchsanweisung
 
 Das Character Sheet ist ausdrücklich kein Ersatz für Sephrasto oder generell die Charakterverwaltung. Die meisten Werte müssen aus einem bereits erstellten Charakterbogen übertragen werden.
 
@@ -50,23 +51,35 @@ Zauber/Liturgien werden einzeln eingetragen, mit ihren jeweiligen Probenwerten. 
 Die Charakter-Attributes "wounds" (Einschränkungen), "energy" (Karma/Astralenergie) und "schip" (Schicksalspunkte) eignen sich gut um als Token-Bars benutzt zu werden. Dazu muss das Token dem Charakter zugeordnet ("Represents Character") und dann der entsprechende Wert im Dropdownmenü bei den Bars ausgewählt werden. Dann verändern sich automatisch die Werte im Sheet mit den Werten des Tokens und umgekehrt. Bei Einschränkungen sollten die Werte im Sheet verändert werden - der Weg vom Token zum Sheet funktioniert wegen der Trennung in Wunden und Erschöpfung nicht.
 "wounds" verhält sich dabei entgegengesetzt - Ein gesunder Charakter ohne Einschränkungen hat 8 "wounds", ein Charakter mit 8 Einschränkungen hat 0 "wounds". Sonst verhalten sich die Balken unintuitiv.
 
----
 
-Limitationen:
+### Limitationen
 
 Die enthaltenen Formeln haben relativ viele Abhängigkeiten und sind - wie gesagt - quick and dirty gebaut. Deswegen funktionieren viele davon nicht, wenn nicht alle Werte eingetragen sind, etwa Behinderung, Geschwindigkeit oder einzelne Attribute. Ab 1.1.1 etwas mitigiert durch Checkboxen und Default-Werte.
 
 Sonderfertigkeiten sind teilweise nicht integriert - Etwa der Bonus für mehrere Modifikationen bei Gildenmagier II oder für Manöver bei Parierwaffenkampf. Das muss man derzeit noch im Kopf oder durch die globalen Modifikatoren machen, auch weil IF/THEN-Operationen derzeit meinen Horizont etwas übersteigen.
 
----
 
-Versionshistorie:
+### Kontakt
 
-1.0.3: Überrennen und Reittier-GS hinzugefügt; Globale Kampf- und Magie-Modifikatoren hinzugefügt. MR-Probenwert-Berechnung gefixt.
-1.0.4: Anzeigefehler VT-Gesamtmodifikator behoben.
+Via Topic *Roll20 Character Sheet für Ilaris* im [DSA-Forum](https://dsaforum.de/viewtopic.php?f=180&t=53410).
 
-1.1:
+
+### Versionshistorie
+
+#### 1.0.3
+
+- Überrennen und Reittier-GS hinzugefügt.
+- Globale Kampf- und Magie-Modifikatoren hinzugefügt
+- MR-Probenwert-Berechnung gefixt.
+
+#### 1.0.4
+
+- Anzeigefehler VT-Gesamtmodifikator behoben.
+
+#### 1.1
+
 Eine Menge neue Features:
+
 - Wundschwellen hinzugefügt - Keine Abhängigkeiten, rein informativ.
 - Einschränkungen mit entsprechenden Modifikatoren per Dropdown auswählbar.
 - Ja/Nein-Entscheidungen durch Checkboxen ersetzt.
@@ -80,29 +93,44 @@ Eine Menge neue Features:
 - Globaler Schadens-Modifikator hinzugefügt.
 - Alle Werte standardmäßig auf Null gesetzt, um Fehler in den Formeln zu vermeiden.
 
-1.1.1: Kleine Fixes.
-1.1.2: Initiative-Makro hinzugefügt. Wenn das richtige Charakter-Token ausgewählt ist, wird die Initiative in den Turn Tracker übernommen.
+#### 1.1.1
 
-1.2:
+- Kleine Fixes.
+
+#### 1.1.2
+
+- Initiative-Makro hinzugefügt. Wenn das richtige Charakter-Token ausgewählt ist, wird die Initiative in den Turn Tracker übernommen.
+
+#### 1.2
+
 Noch mehr neue Features:
+
 - CSS Design hinzugefügt, mit einem einfachen Hintergrund und Unterstützung für bunte Roll Templates.
 - Schicksalspunkte sind einsetzbar um einen zusätzlichen Würfel zu allen Proben hinzuzufügen. Einfach den Haken setzen und eine Probe würfeln.
 - Custom Roll Templates mit etwas mehr Information zu allen Würfen.
 - "Präzision" und "Mühelose Magie/Liebling der Götter" können jetzt markiert werden, um sie aktiv abzufragen. Bei einem Wurf >15 wird dann ein Hinweis ausgegeben. Das Häkchen bei Präzision addiert dann GE zum Schaden.
 - Große Mengen an Technical Debt beglichen.
 
-1.2.1: Kleine Fixes & Layout-Anpassungen.
+#### 1.2.1
 
-1.3:
+- Kleine Fixes & Layout-Anpassungen.
+
+#### 1.3
+
 Weitere Verbesserungen bei Roll-Templates:
+
 - Manöver werden bei AT-, VT-, FK- und Schadens-Würfen aufgelistet.
 - Modifikationen werden bei Zauber/Liturgie-Proben aufgelistet.
 - Schicksalspunkte können jetzt auch doppelt angewählt werden, um einen weiteren Würfel zu addieren ("Eigenheiten einsetzen").
 
-1.3.1: Präzision bei Fernkampfwaffen gefixt.
+#### 1.3.1
 
-1.4: 
+- Präzision bei Fernkampfwaffen gefixt.
+
+#### 1.4
+
 Neue Features:
+
 - Der Bogen zeigt die berechneten, talentierten Probenwerte der Fertigkeiten jetzt an.
 - Bei "Auflaufen lassen" kann eine Geschwindigkeit des Gegners eingetragen werden, die zu Schadenswürfen bei Nahkampfwaffen addiert wird wenn das Häkchen gesetzt ist.
 - Wunden und Erschöpfungen werden jetzt unterschieden, zusammengefasst als "wounds" auslesbar.
@@ -119,34 +147,53 @@ Neue Features:
 - Passierschläge hinzugefügt.
 - Berechnung von Verteidigungswürfen gefixt.
 
-1.4.1: Fix der Anzeige von "Meisterschuss" in den Roll Templates.
+#### 1.4.1
 
-1.5:
+- Fix der Anzeige von "Meisterschuss" in den Roll Templates.
+
+#### 1.5
+
 Neue Features:
+
 - Getrennte AE- und KE-Werte für geweihte Zauberer
 - Optionale Sektion für Inventar und Notizen
 
-1.5.1: 
+#### 1.5.1
+
 - Fix des Zuschlags für "Doppelangriff".
 - Mehrfachnennung "Entwaffnen" entfernt.
 - Globaler Modifikator wird jetzt zur besseren Übersichtlichkeit in den verschiedenen Sektionen nochmal angezeigt.
 
-1.6:
+#### 1.6
+
 - GM-Roll-Funktion hinzugefügt.
 
-1.6.1: Fix der Anzeige von Würfelbuttons.
+#### 1.6.1
 
-1.7:
+- Fix der Anzeige von Würfelbuttons.
+
+#### 1.7
+
 Neue Features:
+
 - Standard-Talente der profanen Fertigkeiten können jetzt ein- und ausgeblendet werden.
 - Attributs-Modifikatoren hinzugefügt (z.B. bei Stärkung durch Elixiere oder Attributo)
 - Repeating Sections bei Waffen und Fernkampfwaffen eingefügt, falls mehr als 5 oder 3 nötig sind.
 - Kleine Layout-Anpassungen.
 
-1.7.1: Fix der Anzeige bei Verschlagenheit III(u).
+#### 1.7.1
 
-1.8:
-Translation:
-- The Sheet now has an English translation (best effort)
-Design:
+- Fix der Anzeige bei Verschlagenheit III(u).
+
+#### 1.8
+
+- The sheet now has an English translation (best effort).
 - The sheet is now using tabulated areas instead of one looooong scroll area.
+
+#### 1.9
+
+- The sheet now has a (partial) French translation.
+- Added Ilaris logo to github repo.
+- Remove background image, as it no longer exists at the given url.
+- Fixed attack rolls to calculate encumbrance (Behinderung) only once. It no longer shows in the attack roll
+  modifiers sum.
