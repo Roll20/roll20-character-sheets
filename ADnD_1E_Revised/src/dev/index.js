@@ -2805,8 +2805,17 @@ const setEncumbranceThresholds = async () => {
   setCurrentEncumbranceFlag();
 };
 
-const setCurrentEncumbranceFlag = async () => {
-  const v = await getAttrsAsync(['normal_load_adjusted', 'heavy_load', 'very_heavy_load', 'total_weight', 'autocalc_movement_flag', 'current_bulk', 'current_encumbrance_move']);
+const setCurrentEncumbranceFlag = async (override) => {
+  const v = await getAttrsAsync([
+    'normal_load_adjusted',
+    'heavy_load',
+    'very_heavy_load',
+    'total_weight',
+    'autocalc_movement_flag',
+    'current_bulk',
+    'current_encumbrance_move',
+    'current_encumbrance',
+  ]);
   const output = {};
   const autocalc_movement_flag = +v.autocalc_movement_flag || 0;
   const normal_load_adjusted = +v.normal_load_adjusted || 0;
@@ -2814,44 +2823,75 @@ const setCurrentEncumbranceFlag = async () => {
   const very_heavy_load = +v.very_heavy_load || 0;
   const total_weight = +v.total_weight || 0;
   const current_bulk = +v.current_bulk || 0;
-  let currentEncumbrance = 0;
+  let currentEncumbrance = +v.current_encumbrance || 0;
 
-  if (total_weight <= normal_load_adjusted) {
-    output.current_encumbrance_label = 'Unencumbered';
-    currentEncumbrance = 0;
-    output.current_encumbrance = currentEncumbrance;
-    // Bail out of IF unless auto-calc movement is enabled
-    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
-    // clog('===== Carrying Capacity is Unencumbered =====');
-  } else if (total_weight > normal_load_adjusted && total_weight <= heavy_load) {
-    output.current_encumbrance_label = 'Heavy';
-    currentEncumbrance = 1;
-    output.current_encumbrance = currentEncumbrance;
-    // Bail out of IF unless auto-calc movement is enabled
-    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
-    // clog('===== Carrying Capacity is Heavy =====');
-  } else if (total_weight > heavy_load && total_weight <= very_heavy_load) {
-    output.current_encumbrance_label = 'Very Heavy';
-    currentEncumbrance = 2;
-    output.current_encumbrance = currentEncumbrance;
-    // Bail out of IF unless auto-calc movement is enabled
-    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
-    // clog('===== Carrying Capacity is Very Heavy =====');
+  if (override) {
+    clog(`Encumbrance Set Manually: Adjusting Movement`);
+    if (currentEncumbrance === 0) {
+      output.current_encumbrance_label = 'Unencumbered';
+      output.current_encumbrance = currentEncumbrance;
+      // Bail out of IF unless auto-calc movement is enabled
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      // clog('===== Carrying Capacity is Unencumbered =====');
+    } else if (currentEncumbrance === 1) {
+      output.current_encumbrance_label = 'Heavy';
+      output.current_encumbrance = currentEncumbrance;
+      // Bail out of IF unless auto-calc movement is enabled
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      // clog('===== Carrying Capacity is Heavy =====');
+    } else if (currentEncumbrance === 2) {
+      output.current_encumbrance_label = 'Very Heavy';
+      output.current_encumbrance = currentEncumbrance;
+      // Bail out of IF unless auto-calc movement is enabled
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      // clog('===== Carrying Capacity is Very Heavy =====');
+    } else {
+      // currentEncumbrance = 3
+      output.current_encumbrance_label = 'Encumbered';
+      // no DEX Bonus to AC
+      output.current_encumbrance = currentEncumbrance;
+      // Bail out of IF unless auto-calc movement is enabled
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      // clog('===== Carrying Capacity is Encumbered =====');
+    }
   } else {
-    output.current_encumbrance_label = 'Encumbered';
-    // no DEX Bonus to AC
-    currentEncumbrance = 3;
-    output.current_encumbrance = currentEncumbrance;
-    // Bail out of IF unless auto-calc movement is enabled
-    output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
-    // clog('===== Carrying Capacity is Encumbered =====');
+    if (total_weight <= normal_load_adjusted) {
+      output.current_encumbrance_label = 'Unencumbered';
+      currentEncumbrance = 0;
+      output.current_encumbrance = currentEncumbrance;
+      // Bail out of IF unless auto-calc movement is enabled
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      // clog('===== Carrying Capacity is Unencumbered =====');
+    } else if (total_weight > normal_load_adjusted && total_weight <= heavy_load) {
+      output.current_encumbrance_label = 'Heavy';
+      currentEncumbrance = 1;
+      output.current_encumbrance = currentEncumbrance;
+      // Bail out of IF unless auto-calc movement is enabled
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      // clog('===== Carrying Capacity is Heavy =====');
+    } else if (total_weight > heavy_load && total_weight <= very_heavy_load) {
+      output.current_encumbrance_label = 'Very Heavy';
+      currentEncumbrance = 2;
+      output.current_encumbrance = currentEncumbrance;
+      // Bail out of IF unless auto-calc movement is enabled
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      // clog('===== Carrying Capacity is Very Heavy =====');
+    } else {
+      output.current_encumbrance_label = 'Encumbered';
+      // no DEX Bonus to AC
+      currentEncumbrance = 3;
+      output.current_encumbrance = currentEncumbrance;
+      // Bail out of IF unless auto-calc movement is enabled
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      // clog('===== Carrying Capacity is Encumbered =====');
+    }
   }
   await setAttrsAsync(output, {silent: true});
   // clog('setCurrentEncumbranceFlag - Current Encumbrance flag has been re-calculated');
 };
 
 on(
-  'change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_armor_worn remove:repeating_equipment change:pp change:gp change:ep change:sp change:cp change:encumbrancebonus change:normal_load change:toggle_lbs',
+  'sheet:opened change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_armor_worn remove:repeating_equipment change:pp change:gp change:ep change:sp change:cp change:encumbrancebonus change:normal_load change:toggle_lbs',
   (eventInfo) => {
     // clog(`Event Listener:${eventInfo.sourceAttribute} - triggering sumEquipmentWeight`);
     sumEquipmentWeight();
@@ -2862,7 +2902,7 @@ on(
 const setCurrentMovement = async () => {
   const v = await getAttrsAsync(['current_encumbrance_move', 'movement']);
   const output = {};
-  // clog('Movement Rates have been re-calculated');
+  clog('Movement Rates have been re-calculated');
   // only extract an integer from movement
   const movement = +v.movement.toString().replace(/[^0-9]/g, '');
   const current_encumbrance_move = +v.current_encumbrance_move || 0;
@@ -2888,7 +2928,9 @@ const setCurrentMovement = async () => {
 
 on('change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', async (eventInfo) => {
   // clog('Current Base Movement has been re-calculated');
-  // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
+  // clog(`Δ detected: ${eventInfo.sourceAttribute} Source: ${eventInfo.sourceType}`);
+  if (eventInfo.sourceType === 'player') return;
+
   const v = await getAttrsAsync(['movement']);
   const output = {};
   const recalc = 0;
@@ -2900,6 +2942,17 @@ on('change:movement change:current_encumbrance change:current_encumbrance_move c
   await setAttrsAsync(output, {silent: true});
   await setCurrentMovement();
   await calcAC(recalc);
+});
+
+on('change:current_encumbrance', async (eventInfo) => {
+  clog(`Δ detected: ${eventInfo.sourceAttribute}`);
+  if (eventInfo.sourceType === 'player') {
+    clog(`Encumbrance Set Manually: executing setCurrentEncumbranceFlag`);
+    const override = 1;
+    await setCurrentEncumbranceFlag(override);
+  } else {
+    clog(`Encumbrance Set by sheetworker`);
+  }
 });
 
 // Bulk Calcs
