@@ -1,3 +1,14 @@
+# 2025-01-27
+
+- Refactor the status boxes for grapple, staggered, stun
+- Show grapple correctly
+- Have a delete grapple button
+
+# 2025-01-22
+
+- Add BMR Crawl to front page.
+- Tweak colors of the subbox on the tracker page
+
 # 2025-01-20
 
 - Show PP Mulitplier on front page
