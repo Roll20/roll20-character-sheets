@@ -644,10 +644,11 @@
                     <h2>Warp Charge</h2>
                     <div class="grid col2 vcol novgap">
                         <label>Current</label>
-                        <input type="number" name="attr_warp_charge_current" />
+                        <input type="hidden" name="attr_warp_charge_current" />
+                        <input type="number" name="attr_warp_charge" />
 
                         <label>Threshold</label>
-                        <input  type="number" name="attr_warp_charge_threshold" />
+                        <input  type="number" name="attr_warp_charge_max" />
                     </div>
                     <label class="hint">WilB (×2 if Sanctioned)</label>
                 </div>
@@ -665,10 +666,11 @@
 
             <div class="grid col2 vcol novgap">
                 <label>Current</label>
-                <input type="number" name="attr_wounds_current" />
+                        <input type="hidden" name="attr_wounds_current" />
+                <input type="number" name="attr_wounds" />
 
                 <label>Maximum</label>
-                <input type="number" name="attr_wounds_maximum" />
+                <input type="number" name="attr_wounds_max" />
             </div>
         </div>
 
@@ -901,7 +903,8 @@
 
                   <div class="grid col2 vcol novgap">
                       <label>Current</label>
-                      <input type="number" name="attr_encumbrance_current" />
+                      <input type="hidden" name="attr_encumbrance_current" />
+                      <input type="number" name="attr_encumbrance" />
 
                       <label>Maximum</label>
                       <input type="number" name="attr_encumbrance_max" />
@@ -1305,6 +1308,7 @@
             <label>Roll Visibility</label>
         </div>
     </div>
+    <input type="hidden" name="attr_migration_version" value="0" />
 </div>
 
 <script type="text/worker">
@@ -1484,11 +1488,28 @@
                     });
                 });
                 update["initiative"] = initiative;
-                update["wounds_maximum"] = wounds;
+                update["wounds_max"] = wounds;
                 update["encumbrance_max"] = encumbrance;
-                update["warp_charge_threshold"] = warp;
+                update["warp_charge_max"] = warp;
                 setAttrs(update);
             });
+        });
+    });
+
+    on('sheet:opened', function(eventInfo) {
+        getAttrs(['encumbrance_current', 'wounds_current', 'warp_charge_current', 'migration_version'], function(values) {
+            const currentVersion = parseInt(values.migration_version) || 0;
+
+            // Only run if migration version is less than 1
+            if (currentVersion < 1) {
+                console.log('Running migration v1: Syncing current values...');
+                setAttrs({
+                    encumbrance: values.encumbrance_current || 0,
+                    wounds: values.wounds_current || 0,
+                    warp_charge: values.warp_charge_current || 0,
+                    migration_version: 1  // Mark v1 as complete
+                });
+            }
         });
     });
 
