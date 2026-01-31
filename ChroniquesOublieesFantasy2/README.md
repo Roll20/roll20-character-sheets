@@ -6,9 +6,31 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.13.0 [Screenshot](cof2e.png)
+v1.14.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.14.0_ (2026-01-31)
+
+- Fiche de PJ:
+  - Ajout d'une liste d'options tactiques activables avec bonus d'attaque, dé bonus/malus, DM supplémentaires
+  - Suppression des buffs au DM et conversion en options tactiques
+  - Meilleure prise en charge des jets liés aux capacités (propriété `roll:`)
+  - Amélioration des buffs de capacités (propriété `buff:`)
+  - Ajout d'un contrôle du bonus maximum de compétence
+  - Gestion des DM temporaires
+  - Ajout des emojis des compétences dans le popup Roll20
+  - Remplacement du menu de chat des états préjudiciables par un popup Roll20
+  - Assignation automatique des paramètres de base d'une nouvelle attaque
+
+- Fiche de PNJ:
+  - Ajout d'un bouton de réinitialisation des utilisation de capacités
+  - Ajout d'un onglet _Version_
+  - Ajout d'une case à cocher _Mook_ (pour liaison des PV par attribut ou par valeur en cas d'utilisation du script _TokenMod_)
+  - Ajout de la liste des ressources à l'onglet _Equipement_
+  - Ajout d'une option pense-bête pour le script _TokenMod_
+  - Ajout de la possibilité d'afficher les informations de tactique et/ou les notes dans une infobulle visible du MJ uniquement
+
 
 ### Version _1.13.0_ (2026-01-04)
 
@@ -17,6 +39,7 @@ v1.13.0 [Screenshot](cof2e.png)
 - Ajout d'un champ pour le score d'attaque à distance de base à la fiche de PNJ
 - Ajout d'un champ Genre à la fiche de PNJ
 - Mise à jour automatique des PV en cas d'utilisation d'un consommable de soins
+- Prise en charge de l'import de texte (voies et créatures) depuis le DRS officiel
 - Gestion des effets prolongés des attaques et capacités
 - Prise en charge du script MOD AddCustomTurn pour les effets prolongés
 
