@@ -2887,6 +2887,7 @@ const setCurrentEncumbranceFlag = async (override) => {
     }
   }
   await setAttrsAsync(output, {silent: true});
+  await setCurrentMovement();
   // clog('setCurrentEncumbranceFlag - Current Encumbrance flag has been re-calculated');
 };
 
@@ -2926,10 +2927,16 @@ const setCurrentMovement = async () => {
   await setAttrsAsync(output, {silent: true});
 };
 
-on('change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', async (eventInfo) => {
+on('change:current_encumbrance_move', async (eventInfo) => {
   // clog('Current Base Movement has been re-calculated');
   // clog(`Δ detected: ${eventInfo.sourceAttribute} Source: ${eventInfo.sourceType}`);
-  if (eventInfo.sourceType === 'player') return;
+  await setCurrentMovement();
+});
+
+on('sheet:opened change:movement change:current_encumbrance change:current_encumbrance_move change:autocalc_movement_flag', async (eventInfo) => {
+  // clog('Current Base Movement has been re-calculated');
+  // clog(`Δ detected: ${eventInfo.sourceAttribute} Source: ${eventInfo.sourceType}`);
+  if (eventInfo.sourceType === 'player' && eventInfo.sourceAttribute !== 'movement') return;
 
   const v = await getAttrsAsync(['movement']);
   const output = {};
