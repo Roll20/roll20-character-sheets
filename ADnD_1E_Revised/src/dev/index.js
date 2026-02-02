@@ -2903,7 +2903,7 @@ on(
 const setCurrentMovement = async () => {
   const v = await getAttrsAsync(['current_encumbrance_move', 'movement']);
   const output = {};
-  clog('Movement Rates have been re-calculated');
+  // clog('Movement Rates have been re-calculated');
   // only extract an integer from movement
   const movement = +v.movement.toString().replace(/[^0-9]/g, '');
   const current_encumbrance_move = +v.current_encumbrance_move || 0;
@@ -2946,6 +2946,7 @@ on('sheet:opened change:movement change:current_encumbrance change:current_encum
   output.movement_heavy = Math.max(movement - 3, 0);
   output.movement_load = Math.max(movement - 6, 0);
   output.movement_max = Math.max(movement - 9, 0);
+
   await setAttrsAsync(output, {silent: true});
   await setCurrentMovement();
   await calcAC(recalc);
