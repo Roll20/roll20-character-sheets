@@ -5584,13 +5584,17 @@ const matchClassName = async (name) => {
 };
 
 // THAC0
-const calcThac0 = async () => {
+const calcThac0 = async (classSelected) => {
   const v = await getAttrsAsync(['thac00', 'autofill_matrix']);
   const autocalcFill = +v.autofill_matrix || 0;
   // if auto-fill is not enabled, exit.
   if (!autocalcFill) return;
 
+  const levelSelected = +v.matrix_level || 0; // defaults to 0
+  if (levelSelected === 0 && classSelected === 99) return;
+
   const output = {};
+
   const baseThac0 = +v.thac00 || 0;
   output[`thac0-10`] = baseThac0 + 10;
   output[`thac0-9`] = baseThac0 + 9;
@@ -6658,35 +6662,28 @@ on(
       output.attack_matrix_flag = 0;
     }
     await setAttrsAsync(output, {silent: true});
-    calcThac0();
+    calcThac0(classSelected);
   },
 );
 
 // flags Attack Matrix with a warning if it hasn't been filled-in
-on('sheet:opened change:thac0 change:thac00 change:autofill_matrix', async (eventInfo) => {
-  const v = await getAttrsAsync(['attack_matrix_flag', 'matrix_class', 'thac0', 'thac1', 'thac2', 'thac00', 'thac01', 'thac02', 'autofill_matrix']);
+on('sheet:opened change:thac0 change:thac00 change:autofill_matrix change:sync_matrix_level change:sync_matrix_class change:sync_class_selected', async (eventInfo) => {
+  const v = await getAttrsAsync(['thac0', 'thac1', 'thac2', 'thac00', 'thac01', 'thac02', 'autofill_matrix']);
   const autocalcFill = +v.autofill_matrix || 0;
   // if auto-fill is not enabled, exit.
   if (!autocalcFill) return;
 
   const output = {};
-  const attack_matrix_flag = +v.attack_matrix_flag || 0;
-  const matrix_class = +v.matrix_class || 0;
-  if (attack_matrix_flag === 0 || matrix_class > 0) {
-    // clog(`attack_matrix_flag:${attack_matrix_flag} matrix_class:${matrix_class}`);
-    output.attack_matrix_flag = 0;
-  } else {
-    const thac0 = +v.thac0 || 0;
-    const thac1 = +v.thac1 || 0;
-    const thac2 = +v.thac2 || 0;
-    const thac00 = +v.thac00 || 0;
-    const thac01 = +v.thac01 || 0;
-    const thac02 = +v.thac02 || 0;
-    const toHitIsDefaultValue = thac0 + thac1 + thac2;
-    const thac0IsDefaultValue = thac00 + thac01 + thac02;
-    // clog(`toHitIsDefaultValue:${toHitIsDefaultValue} thac0IsDefaultValue:${thac0IsDefaultValue}`);
-    output.attack_matrix_flag = toHitIsDefaultValue === 60 && thac0IsDefaultValue === 60 ? 1 : 0;
-  }
+  const thac0 = +v.thac0 || 0;
+  const thac1 = +v.thac1 || 0;
+  const thac2 = +v.thac2 || 0;
+  const thac00 = +v.thac00 || 0;
+  const thac01 = +v.thac01 || 0;
+  const thac02 = +v.thac02 || 0;
+  const toHitIsDefaultValue = thac0 + thac1 + thac2;
+  const thac0IsDefaultValue = thac00 + thac01 + thac02;
+  // clog(`toHitIsDefaultValue:${toHitIsDefaultValue} thac0IsDefaultValue:${thac0IsDefaultValue}`);
+  output.attack_matrix_flag = toHitIsDefaultValue === 60 && thac0IsDefaultValue === 60 ? 1 : 0;
   await setAttrsAsync(output, {silent: true});
 });
 

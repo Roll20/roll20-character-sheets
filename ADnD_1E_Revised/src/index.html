@@ -68,13 +68,14 @@
           <ul>
             <h5>Latest</h5>
             <li>Manually changing "Current Encumbrance" in the Carrying Capacity section will also adjust movement "Speed" accordingly. Further adjusting any item weight or reloading the sheet will recalc and undo any temp encumbrance and speed changes. Similarly, you may also override adjusted speed temporarily.</li>
-            <li>Sync is now enabled by default. ie Sync HP, Sync AC, and "Sync to Class" (used for Attack Matrix and Thief Skills). These options can still be changed per-sheet or per-game by the game creator using the game's default sheet settings. This update only effects new sheets going forward.</li>
+            <li>Sync is now enabled by default. ie Sync HP, and Sync AC. These options can still be changed per-sheet or per-game by the game creator using the game's default sheet settings. This update only effects new sheets going forward.</li>
             <li>Fixed HP Max calc for multi-class. HP Total in the Class Details section will show HP with a decimal. HP Max now rounds up if partial/fractional HP is >=.5 The Partial HP field has been hidden. I do not see the need for it any longer given Total HP shows any fractional HP.</li>
             <li>Small adjustments on the NPC/Monster page to prevent overflowing elements at small window sizes.</li>
             <li>Refactoring done for the majority of sheetworkers. Converted the callback-based Roll20 functions to async/await versions.</li>
             <li>Some refactoring done in the sheetworker that keeps Armor Details and repeating_equipment Armor in sync. Includes a one-time update to check and set 'repeating_equipment_$X_equipment_sync_armor_flag' attribute.</li>
             <li>Added a "lock" icon next to the armor type dropdown selector in the equipment armor sub-section. Visual indicator if the item is currently synced with an Armor Details row.</li>
             <li>Hide Multi-Class toggle is been set as the default for new sheets. These options can still be changed per-sheet or per-game by the game creator using the game's default sheet settings.</li>
+            <li>Updated the Pick Pockets roll to not require a selected token.</li>
             <br>
 
             <h5>Recent/Previous</h5>
@@ -506,7 +507,7 @@
             </span>
             <span>/</span>
             <input type="text" class="width-smaller" name="attr_hitpoints_max" title="@{hitpoints|max} | Maximum Hit Points. No Damage." value="0" style="height: 2em;" />
-            <span class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP max from Class Details with HP ( @{hitpoints_max} ).">
+            <span class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP max from Class Details.">
               <input type="checkbox" name="attr_sync_hp_flag" value="1" checked />
               <span></span>
             </span>
@@ -647,7 +648,7 @@
               </label>
             -->
             <input type="number" class="hidden width-auto" name="attr_hitpoints_remainder_total" value="0" step=".01" />
-            <label class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP max from Class Details with HP ( @{hitpoints_max} ).">
+            <label class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP max from Class Details.">
               <span class="center nowrap">Sync HP:</span>
               <input type="checkbox" name="attr_sync_hp_flag" value="1" checked />
               <span></span>
@@ -2758,7 +2759,7 @@
 
       <!-- Matrix Tables -->
       <div class="sect" style="margin-top: -.5em;">
-        <input type="checkbox" class="hidden toggle-input-attention" name="attr_attack_matrix_flag" value="1" checked />
+        <input type="checkbox" class="hidden toggle-input-attention" name="attr_attack_matrix_flag" value="1" />
         <span class="material-icons" title="Attack tables have not been set!">nearby_error</span>
         <input type="checkbox" class="hidden toggle-to-hit-table" name="attr_toggle_to_hit_table" value="1" />
         <input type="checkbox" class="sect-show" name="attr_matrix_info_show" value="1" style="margin-top: .75em;" title="Enter To-Hit Armor Class Table data." checked />
@@ -2789,9 +2790,9 @@
             </label>
             <label></label>
 
-            <label class="inline-label" title="@{sync_matrix_class} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes. Note: multi-class/dual-class characters should pick the most favorable class. Defaults to Class 1 of 3 if enabled.">
+            <label class="inline-label" title="@{sync_matrix_class} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes. Ensure class and level are filled in at the top of the sheet. Note: multi-class/dual-class characters should pick the most favorable class. Defaults to Class 1 of 3 if enabled.">
               <span>Sync to Class:</span>
-              <input type="checkbox" name="attr_sync_matrix_class" value="1" checked />
+              <input type="checkbox" name="attr_sync_matrix_class" value="1" />
             </label>
             <label class="show-sync-class">
               <select class="class-selected border" name="attr_class_selected" title="@{class_selected} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes. Note: multi-class/dual-class characters should pick the most favorable class.">
@@ -2808,10 +2809,10 @@
             </label>
             <!-- calc this attr based on the class selected -->
             <label class="matrix-level show-sync-class">
-              <input class="width-small border" type="number" name="attr_matrix_level" value="1" title="@{matrix_level}" readonly />
+              <input class="width-small border" type="number" name="attr_matrix_level" value="0" title="@{matrix_level}" readonly />
             </label>
             <label class="matrix-level show-when-not-synced">
-              <input class="width-small border" type="number" name="attr_matrix_level" value="1" title="@{matrix_level}" />
+              <input class="width-small border" type="number" name="attr_matrix_level" value="0" title="@{matrix_level}" />
             </label>
             <label class="matrix-hd">
               <select class="width-small-plus border" name="attr_matrix_hitdice" title="@{matrix_hitdice}">
@@ -3835,7 +3836,7 @@
 
         <label class="inline-label" title="@{sync_thief_class} | Linking to a class will automatically adjust the thief base values when the linked class level changes.">
           <span>Sync to Class:</span>
-          <input type="checkbox" name="attr_sync_thief_class" value="1" checked />
+          <input type="checkbox" name="attr_sync_thief_class" value="1" />
         </label>
         <label class="show-sync-class">
           <select class="class-selected border" name="attr_thief_class_selected" title="@{thief_class_selected} | Linking to a class will automatically adjust the thief base values when the linked class level changes.">
@@ -3887,8 +3888,7 @@
           <span>Magic/Item</span>
         </span>
         <span class="thief-columns">
-          <!-- <button class="text-only thiefskills-button" type="roll" name="roll_pickpockets" title="%{selected|pickpockets}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Pick Pockets}} {{roll_low=[[ 1d100 ]]%}} {{roll_target= [[ @{pickpockets} ]]%}}"><span>Pick Pockets</span></button> -->
-          <button class="text-only thiefskills-button" type="roll" name="roll_pickpockets" title="%{selected|pickpockets}" value="@{selected|whisper_pc} &{template:general} {{color=@{selected|color_option}}} {{name=@{selected|character_name}}} {{subtag=Pick Pockets vs HD?{HD of target (The level of the target will decrease your chance of success (-5% for each level or hit dice over 3) |1}}} {{roll_low=[[ 1d100 ]]%}} {{roll_target= [[ @{selected|pickpockets} - ([[ floor({?{HD of target (The level of the target will decrease your chance of success (-5% for each level or hit dice over 3) |1}-3, 0}kh1)*5 ]]) ]]%}} {{roll_target2= [[ @{selected|pickpockets} - ([[ floor({?{HD of target (The level of the target will decrease your chance of success (-5% for each level or hit dice over 3) |1}-3, 0}kh1)*5 ]]) + 21 ]]%}}"><span>Pick Pockets</span></button>
+          <button class="text-only thiefskills-button" type="roll" name="roll_pickpockets" title="%{selected|pickpockets}" value="@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Pick Pockets vs HD?{HD of target (The level of the target will decrease your chance of success (-5% for each level or hit dice over 3) |1}}} {{roll_low=[[ 1d100 ]]%}} {{roll_target= [[ @{pickpockets} - ([[ floor({?{HD of target (The level of the target will decrease your chance of success (-5% for each level or hit dice over 3) |1}-3, 0}kh1)*5 ]]) ]]%}} {{roll_target2= [[ @{pickpockets} - ([[ floor({?{HD of target (The level of the target will decrease your chance of success (-5% for each level or hit dice over 3) |1}-3, 0}kh1)*5 ]]) + 21 ]]%}}"><span>Pick Pockets</span></button>
           <label class="label-percent" title="@{pickpockets}">
             <input type="text" name="attr_pickpockets" class="field-border readonly-span" title="@{pickpockets}" value="0" />
           </label>
@@ -4760,7 +4760,7 @@
         <span class="eight-columns">
           <h4 style="grid-row: 1/3; justify-self: left;">ADVANCED Options:</h4>
           <span class="span-six inline-label wrap">
-            <label class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP max from Class Details with HP ( @{hitpoints_max} ).">
+            <label class="sync-lock" title="@{sync_hp_flag} | Let the sheet sync Total HP max from Class Details.">
               <span>Sync HP:</span>
               <input type="checkbox" name="attr_sync_hp_flag" value="1" checked />
               <span></span>
@@ -4782,9 +4782,9 @@
               <span>Autofill to-Hit Table:</span>
               <input type="checkbox" name="attr_autofill_matrix" value="1" checked />
             </label>
-            <label class="inline-label" title="@{sync_matrix_class} | Linking to a class will automatically adjust the to-Hit values when the linked class level changes. Note: multi-class/dual-class characters should pick the most favorable class. Defaults to Class 1 of 3 if enabled.">
+            <label class="inline-label" title="@{sync_matrix_class} | Linking to a class will automatically adjust the to-Hit values when the linked class and/or level changes from the top of the sheet. Note: multi-class/dual-class characters should pick the most favorable class. Defaults to Class 1 of 3 if enabled.">
               <span>Sync to-Hit to Class:</span>
-              <input type="checkbox" name="attr_sync_matrix_class" value="1" checked />
+              <input type="checkbox" name="attr_sync_matrix_class" value="1" />
             </label>
             <label class="inline-label" title="@{autofill_thief} | Let the sheet auto-fill the Base chance when the level selector is changed.">
               <span>Autofill Thief Base:</span>
@@ -4792,7 +4792,7 @@
             </label>
             <label class="inline-label" title="@{sync_thief_class} | Linking to a class will automatically adjust the thief base values when the linked class level changes.">
               <span>Sync Thief Skills to Class:</span>
-              <input type="checkbox" name="attr_sync_thief_class" value="1" checked />
+              <input type="checkbox" name="attr_sync_thief_class" value="1" />
             </label>
           </span>
           <span class="span-seven inline-label" title="WARNING: any customization/editing that has been done on existing macro-text fields will be lost! You will not break anything by reseting. Reseting a field simply erases the existing value and forces the sheet to re-populate the field with the latest default value.">
