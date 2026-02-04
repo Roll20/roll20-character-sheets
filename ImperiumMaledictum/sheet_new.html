@@ -644,10 +644,11 @@
                     <h2>Warp Charge</h2>
                     <div class="grid col2 vcol novgap">
                         <label>Current</label>
-                        <input type="number" name="attr_warp_charge_current" />
+                        <input type="hidden" name="attr_warp_charge_current" />
+                        <input type="number" name="attr_warp_charge" />
 
                         <label>Threshold</label>
-                        <input  type="number" name="attr_warp_charge_threshold" />
+                        <input  type="number" name="attr_warp_charge_max" />
                     </div>
                     <label class="hint">WilB (×2 if Sanctioned)</label>
                 </div>
@@ -665,10 +666,11 @@
 
             <div class="grid col2 vcol novgap">
                 <label>Current</label>
-                <input type="number" name="attr_wounds_current" />
+                        <input type="hidden" name="attr_wounds_current" />
+                <input type="number" name="attr_wounds" />
 
                 <label>Maximum</label>
-                <input type="number" name="attr_wounds_maximum" />
+                <input type="number" name="attr_wounds_max" />
             </div>
         </div>
 
@@ -901,7 +903,8 @@
 
                   <div class="grid col2 vcol novgap">
                       <label>Current</label>
-                      <input type="number" name="attr_encumbrance_current" />
+                      <input type="hidden" name="attr_encumbrance_current" />
+                      <input type="number" name="attr_encumbrance" />
 
                       <label>Maximum</label>
                       <input type="number" name="attr_encumbrance_max" />
@@ -1287,14 +1290,25 @@
 <div class="grid settings widegap">
     <h2>Settings</h2>
 
-    <div class="grid col4 vcol">
-        <select class="input" name="attr_sheet_type">
-            <option value="character">Character</option>
-            <option value="patron">Patron</option>
-            <option value="npc">NPC</option>
-        </select>
-        <label>Sheet Type</label>
+    <div class="grid col2 widegap">
+        <div class="grid vcol">
+            <select class="input" name="attr_sheet_type">
+                <option value="character">Character</option>
+                <option value="patron">Patron</option>
+                <option value="npc">NPC</option>
+            </select>
+            <label>Sheet Type</label>
+        </div>
+
+        <div class="grid vcol">
+            <select class="input" name="attr_roll_visibility">
+                <option value="public">Public</option>
+                <option value="gm">Game Master Only</option>
+            </select>
+            <label>Roll Visibility</label>
+        </div>
     </div>
+    <input type="hidden" name="attr_migration_version" value="0" />
 </div>
 
 <script type="text/worker">
@@ -1474,11 +1488,28 @@
                     });
                 });
                 update["initiative"] = initiative;
-                update["wounds_maximum"] = wounds;
+                update["wounds_max"] = wounds;
                 update["encumbrance_max"] = encumbrance;
-                update["warp_charge_threshold"] = warp;
+                update["warp_charge_max"] = warp;
                 setAttrs(update);
             });
+        });
+    });
+
+    on('sheet:opened', function(eventInfo) {
+        getAttrs(['encumbrance_current', 'wounds_current', 'warp_charge_current', 'migration_version'], function(values) {
+            const currentVersion = parseInt(values.migration_version) || 0;
+
+            // Only run if migration version is less than 1
+            if (currentVersion < 1) {
+                console.log('Running migration v1: Syncing current values...');
+                setAttrs({
+                    encumbrance: values.encumbrance_current || 0,
+                    wounds: values.wounds_current || 0,
+                    warp_charge: values.warp_charge_current || 0,
+                    migration_version: 1  // Mark v1 as complete
+                });
+            }
         });
     });
 
@@ -1756,7 +1787,7 @@
         });
     });
 
-    const test_list = ["difficulty","circumstances","superiority","psychic_focus"];
+const test_list = ["difficulty","circumstances","superiority","psychic_focus","roll_visibility"];
     const button_list = chars_list.concat(skill_list).concat(npc_chars_list);
     button_list.forEach(trigger => {
         on(`clicked:${trigger}`, function(eventInfo) {
@@ -1848,63 +1879,67 @@
             hitloc = ` {{hitlocation=[[0]]}}`;
         }
 
-        startRoll(`&{template:imtest} {{reroll=[Reroll](~${reroll})}} `
-            .concat(`{{name=@{character_name}}} {{skill_name=${skill_name}}} `)
-            .concat(`{{skill_total=[[${skill_total}]]}} {{difficulty=[[${diff_roll}]]}} `)
-            .concat(`{{result=[[1d100]]}}${adv_roll}${disadv_roll}${circ_roll}${dmg_roll}${dmg_info}${hitloc} `)
-            .concat(`{{sl=[[0]]}} {{sl_info=[[0]]}} {{critical=[[0]]}} {{fumble=[[0]]}}${adjustedsl}`)
-            .concat(`{{superiority=${superiority}}}`), (results) => {
-            const result = results.results.result.result;
-            let digits = result.toString().split('').map(Number);
-            if (digits.length == 1) {
-                digits.push(0);
-            }
-            const difficulty = results.results.difficulty.result;
-            const diff_name = diff_data[`${difficulty}`]["name"];
-            // account for original SL that is better/worse
-            let final_result = result;
-            let final_total = skill_total + difficulty;
-            let final_sl = getSl(final_total, final_result, slmod, superiority);
-            if (circ != 0) {
-                final_total += circ_bonus;
+        getAttrs(["roll_visibility"], function(vis) {
+            let rollPrefix = vis.roll_visibility === "gm" ? "/w gm " : "";
 
-                let hi_result = result == 100 ? 100 :
-                    Math.min(...digits) * 10 + Math.max(...digits);
-                let hi_sl = getSl(final_total, hi_result, slmod, superiority);
-
-                let lo_result = result == 100 ? 100 :
-                    Math.max(...digits) * 10 + Math.min(...digits);
-                let lo_sl = getSl(final_total, lo_result, slmod, superiority);
-
-                if ((circ > 0 && parseInt(hi_sl) >= parseInt(lo_sl)) ||
-                    (circ < 0 && parseInt(hi_sl) <= parseInt(lo_sl))) {
-                    final_result = hi_result;
-                    final_sl = hi_sl;
-                } else if ((circ > 0 && parseInt(lo_sl) >= parseInt(hi_sl)) ||
-                    (circ < 0 && parseInt(lo_sl) <= parseInt(hi_sl))) {
-                    final_result = lo_result;
-                    final_sl = lo_sl;
+            startRoll(`${rollPrefix}&{template:imtest} {{reroll=[Reroll](~${reroll})}} `
+                .concat(`{{name=@{character_name}}} {{skill_name=${skill_name}}} `)
+                .concat(`{{skill_total=[[${skill_total}]]}} {{difficulty=[[${diff_roll}]]}} `)
+                .concat(`{{result=[[1d100]]}}${adv_roll}${disadv_roll}${circ_roll}${dmg_roll}${dmg_info}${hitloc} `)
+                .concat(`{{sl=[[0]]}} {{sl_info=[[0]]}} {{critical=[[0]]}} {{fumble=[[0]]}}${adjustedsl}`)
+                .concat(`{{superiority=${superiority}}}`), (results) => {
+                const result = results.results.result.result;
+                let digits = result.toString().split('').map(Number);
+                if (digits.length == 1) {
+                    digits.push(0);
                 }
-            }
-            let final_sl_info = getSlInfo(final_sl);
+                const difficulty = results.results.difficulty.result;
+                const diff_name = diff_data[`${difficulty}`]["name"];
 
-            let crit = critfum && final_result <= final_total && final_result % 10 == Math.floor(final_result / 10) ? 1 : 0;
-            let fumb = critfum && final_result > final_total && final_result % 10 == Math.floor(final_result / 10) ? 1 : 0;
-            let u = final_result % 10;
-            let hitlocation = `${u}, ${hitloc_data[u]["name"]}`;
-            finishRoll(
-                results.rollId,
-                {
-                    "result": final_result,
-                    "difficulty": diff_name,
-                    "skill_total": final_total,
-                    "sl": final_sl,
-                    "sl_info": final_sl_info,
-                    "critical": crit,
-                    "fumble": fumb,
-                    "hitlocation": hitlocation
+                let final_result = result;
+                let final_total = skill_total + difficulty;
+                let final_sl = getSl(final_total, final_result, slmod, superiority);
+                if (circ != 0) {
+                    final_total += circ_bonus;
+
+                    let hi_result = result == 100 ? 100 :
+                        Math.min(...digits) * 10 + Math.max(...digits);
+                    let hi_sl = getSl(final_total, hi_result, slmod, superiority);
+
+                    let lo_result = result == 100 ? 100 :
+                        Math.max(...digits) * 10 + Math.min(...digits);
+                    let lo_sl = getSl(final_total, lo_result, slmod, superiority);
+
+                    if ((circ > 0 && parseInt(hi_sl) >= parseInt(lo_sl)) ||
+                        (circ < 0 && parseInt(hi_sl) <= parseInt(lo_sl))) {
+                        final_result = hi_result;
+                        final_sl = hi_sl;
+                    } else if ((circ > 0 && parseInt(lo_sl) >= parseInt(hi_sl)) ||
+                        (circ < 0 && parseInt(lo_sl) <= parseInt(hi_sl))) {
+                        final_result = lo_result;
+                        final_sl = lo_sl;
+                    }
                 }
-            );
+                let final_sl_info = getSlInfo(final_sl);
+
+                let crit = critfum && final_result <= final_total && final_result % 10 == Math.floor(final_result / 10) ? 1 : 0;
+                let fumb = critfum && final_result > final_total && final_result % 10 == Math.floor(final_result / 10) ? 1 : 0;
+                let u = final_result % 10;
+                let hitlocation = `${u}, ${hitloc_data[u]["name"]}`;
+                finishRoll(
+                    results.rollId,
+                    {
+                        "result": final_result,
+                        "difficulty": diff_name,
+                        "skill_total": final_total,
+                        "sl": final_sl,
+                        "sl_info": final_sl_info,
+                        "critical": crit,
+                        "fumble": fumb,
+                        "hitlocation": hitlocation
+                    }
+                );
+            });
         });
     };
 
