@@ -4240,18 +4240,17 @@ const calcHP = async () => {
   const class3 = hitpoints_3_class !== 0 ? 1 : 0;
   const numberOfClasses = class1 + class2 + class3;
   const totalClassHP = hitpoints_1_class + hitpoints_2_class + hitpoints_3_class;
-  const totalHP = +numberOfClasses > 0 ? float(totalClassHP / numberOfClasses).toFixed(2) : 0;
+  // only show decimal when multi-class
+  const totalHP = +numberOfClasses > 1 ? float(totalClassHP / numberOfClasses).toFixed(2) : totalClassHP;
+  // remainder no longer needed. decimal is now shown with multi-class hitpoints_total
   const remainder = +(totalHP % 1).toFixed(2);
-  // remainder may not be needed if decimal is shown hitpoints_total
-  const fractionalHP = remainder <= 0.4 ? 0 : 1;
-  // fractionalHP may not be needed if rounding is done on hitpoints_max
-  clog(`remainder type:${typeof remainder}`);
-  clog(`totalHP:${totalHP} remainder:${remainder} fractionalHP:${fractionalHP}`);
+  // const fractionalHP = remainder <= 0.4 ? 0 : 1;
+  // clog(`totalHP:${totalHP} remainder:${remainder} fractionalHP:${fractionalHP}`);
   output.hitpoints_class_total = totalClassHP;
   output.hp_quotient = numberOfClasses;
   output.hitpoints_total = totalHP;
   output.hitpoints_max = syncHpFlag ? Math.round(totalHP) : hitPointsMax;
-  // possibly no longer needed if decimal is shown hitpoints_total
+  // no longer needed. decimal is now shown with multi-class hitpoints_total
   output.hitpoints_remainder_total = remainder;
   await setAttrsAsync(output, {silent: true});
 };
