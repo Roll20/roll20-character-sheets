@@ -1,8 +1,59 @@
 <script type="text/worker">
+on ("change:attribute_roll_modifier change:skill_roll_modifier", sanitizeAllowNegative);
+
+async function sanitizeAllowNegative(info)
+    {
+    if (info.sourceType="player" && await sanitizeNumberInput(info, true))
+        {
+        return;
+        }
+    }
+
+on ("change:repeating_armor:armor_cmr change:repeating_armor:armor_slow change:repeating_armor:armor_da change:repeating_ammo:ammo_quantity change:repeating_weapons:weapon_spread change:repeating_weapons:weapon_burst change:repeating_weapons:weapon_volley change:repeating_weapons:weapon_clip_ammo change:repeating_weapons:weapon_clip_capacity change:repeating_resources:resource_level change:shield change:ap change:gf change:max_gf", sanitize);
+
+async function sanitize(info)
+    {
+    if (info.sourceType="player" && await sanitizeNumberInput(info, false))
+        {
+        return;
+        }
+    }
+
+async function sanitizeNumberInput(info, allowNegative)
+    {
+    try
+        {
+        var num = Number(info.newValue);
+        
+        if (!Object.hasOwn(info, "previousValue"))
+            {
+            info.previousValue = "0";
+            }
+            
+        if (num == NaN || (num != NaN && (!allowNegative && (num < 0) || !Number.isInteger(num))))
+            {
+            await setAttrsAsync({[info.sourceAttribute]: info.previousValue});
+            return true;
+            }
+        return false;
+        }
+        catch (error)
+        {
+        console.log("Error:" + error);
+        await setAttrsAsync({[info.sourceAttribute]: info.previousValue});
+        return true;
+        }
+    }
+
 on ("change:repeating_advantages:advantage_cost change:repeating_resources:resource_cost change:repeating_backgrounds:background_cost", changeRepeatingXP);
 
 async function changeRepeatingXP(info)
     {
+    if (await sanitizeNumberInput(info, false))
+        {
+        return;
+        }
+        
     var ids;
     var total = 0;
     
@@ -63,6 +114,11 @@ async function changeEquippedHP(info)
     {
     if (info.sourceType == "player")
         {
+        console.log("changing armor hp");
+        if (await sanitizeNumberInput(info, false))
+            {
+            return;
+            }
         var values = await getAttrsAsync(["equipped_armor_id"]);
         //console.log(values);
         if (values.equipped_armor_id != "0")
@@ -86,6 +142,10 @@ async function changeArmorHP(info)
     console.log(JSON.stringify(info));
     if (info.sourceType == "player")
         {
+        if (await sanitizeNumberInput(info, false))
+            {
+            return;
+            }
         var id = info.triggerName.split("_")[2];
         console.log(id);
         if (info.previousValue == "" |
@@ -283,8 +343,12 @@ async function equipWeapon(info)
 
 on ("change:wil change:pain_from_damage change:pain_modifier", setPain);
 
-async function setPain()
+async function setPain(info)
     {
+    if (await sanitizeNumberInput(info, true))
+        {
+        return;
+        }
     var values = await getAttrsAsync(["wil", "pain_from_damage", "pain_modifier"]);
     var wil = Number(values.wil);
     var pfd = Number(values.pain_from_damage);
@@ -355,7 +419,7 @@ async function addLine(info)
     return id;
     }
 
-on ("change:cc_bridge_tech_talent change:cc_mounted_weaponry_talent  change:cc_pilot_spacecraft_talent change:cc_vehicle_engineering_talent change:cc_drive_ground_vehicle_talent change:cc_knowledge_corporate_talent change:cc_knowledge_planets_talent change:cc_knowledge_urban_talent change:cc_pilot_aircraft_talent change:cc_trade_talent change:cc_aim_talent change:cc_athletics_talent change:cc_endurance_talent change:cc_melee_talent change:cc_reaction_talent change:cc_throw_talent change:cc_notice_talent change:cc_hack_security_talent change:cc_search_talent change:cc_sleight_of_hand_talent change:cc_sneak_talent change:cc_astronomy_talent change:cc_computer_science_talent change:cc_medicine_talent change:cc_natural_sciences_talent change:cc_robotics_talent change:cc_weapons_engineering_talent change:cc_xenobiology_talent change:cc_convince_talent change:cc_deceive_talent change:cc_empathy_talent change:cc_intimidate_talent change:cc_lead_talent", changeTalent);
+on ("change:cc_bridge_tech_talent change:cc_mounted_weaponry_talent change:cc_pilot_spacecraft_talent change:cc_vehicle_engineering_talent change:cc_drive_ground_vehicle_talent change:cc_knowledge_corporate_talent change:cc_knowledge_planets_talent change:cc_knowledge_urban_talent change:cc_pilot_aircraft_talent change:cc_trade_talent change:cc_aim_talent change:cc_athletics_talent change:cc_endurance_talent change:cc_melee_talent change:cc_reaction_talent change:cc_throw_talent change:cc_notice_talent change:cc_hack_security_talent change:cc_search_talent change:cc_sleight_of_hand_talent change:cc_sneak_talent change:cc_astronomy_talent change:cc_computer_science_talent change:cc_medicine_talent change:cc_natural_sciences_talent change:cc_robotics_talent change:cc_weapons_engineering_talent change:cc_xenobiology_talent change:cc_convince_talent change:cc_deceive_talent change:cc_empathy_talent change:cc_intimidate_talent change:cc_lead_talent", changeTalent);
 
 async function changeTalent(info)
     {
@@ -364,8 +428,21 @@ async function changeTalent(info)
         return;
         }
         
+    console.log("1: " + JSON.stringify(info));
+    try
+        {
+        if (await sanitizeNumberInput(info, false))
+            {
+            return;
+            }
+        }
+        catch (error)
+        {
+        console.log(error);
+        }
+        
     var xpInfo = await getXPData();
-    console.log(xpInfo);
+    console.log("2: " + JSON.stringify(info));
     
     var skillName = info.sourceAttribute.substring(3);
     skillName = skillName.substring(0, skillName.length - 7);
@@ -425,7 +502,8 @@ async function changeTalent(info)
     
     await setAttrsAsync({"talent": "" + (talent - delta),
                          [skillName + "_talent"]: "" + (prev + delta),
-                         ["cc_" + skillName + "_talent"]: "" + (prev + delta)});
+                         ["cc_" + skillName + "_talent"]: "" + (prev + delta),
+                         ["cc_" + skillName + "_diff"]: "" + (difficulty - prev - delta)});
                          
     setPlanetTalentSpent(values.planet_select);
     
@@ -454,7 +532,7 @@ async function changeTalent(info)
         await setAttrsAsync({"spent_xp": spent - xpDelta,
                             [skillName]: skill - skillDelta});
                             
-        await setXP();
+        await setXP(null);
         await enableCCComplete();
         }
     }
@@ -617,7 +695,7 @@ async function ccBack()
 						 "total_xp": (xpInfo.ccSkillXp + 10) + "",
 	                     "spent_xp": 0});
 	init();
-	await setXP();
+	await setXP(null);
 	}
 
 var arduloM2 = {name: "Ardulo -M2-", description: "", spread:"2", burst: "0", volley: "0", clip_ammo:"7", clip_capacity:"7", ammo:"A"};
@@ -644,7 +722,7 @@ async function closeCC()
     console.log(xpInfo);
 	await setAttrsAsync({"cc2_prompt_hider": 1,
 						 "total_xp": 100 + Number(values.cc_points) * xpInfo.attrCost + xpInfo.ccSkillXp});
-	await setXP();
+	await setXP(null);
 	
 	console.log(values);
 	
@@ -962,11 +1040,42 @@ async function openCC2()
 	{
 	var xpInfo = await getXPData();
     console.log(xpInfo);
-	await setAttrsAsync({"cc1_prompt_hider": 1,
-						 "cc2_prompt_hider": 0,
-						 "total_xp": xpInfo.ccSkillXp + 10,
-	                     "spent_xp": 0});
-	await setXP();
+    
+    var values = await getAttrsAsync(["planet_select"]);
+    var toChange = {"cc1_prompt_hider": 1,
+					 "cc2_prompt_hider": 0,
+					 "total_xp": xpInfo.ccSkillXp + 10,
+	                 "spent_xp": 0};
+    
+    switch (values.planet_select)
+        {
+        case "a":
+            toChange.civilizational = "(favored)";
+        break;
+        
+        case "b":
+            toChange.social = "(favored)";
+        break;
+        
+        case "c":
+            toChange.infiltration = "(favored)";
+        break;
+        
+        case "d":
+            toChange.combat = "(favored)";
+        break;
+        
+        case "e":
+            toChange.science = "(favored)";
+        break;
+        
+        case "f":
+            toChange.astronomics = "(favored)";
+        break;
+        }
+    
+	await setAttrsAsync(toChange);
+	await setXP(null);
 	await enableCCComplete();
 	}
 
@@ -1350,6 +1459,10 @@ on("change:money", changeMoney);
 
 async function changeMoney(info)
     {
+    if (await sanitizeNumberInput(info, true))
+        {
+        return;
+        }
     var values = await getAttrsAsync(["money"]);
     
     var money = Number(values["money"]);
@@ -2237,9 +2350,12 @@ on ("change:skill_xp", setSkillText);
 	
 async function setSkillText(info)
     {
-    if (info.sourceType == "player" &&
-        Number(info.newValue) != NaN)
+    if (info.sourceType == "player")
         {
+        if (await sanitizeNumberInput(info, false))
+            {
+            return;
+            }
         var skillToRaise = (await getAttrsAsync(["skill_to_change"])).skill_to_change;
         var values = await getAttrsAsync(["spent_xp"]);
 	
@@ -3012,25 +3128,26 @@ async function setBirthplace()
 //=======================================================================
 on ("change:hp", setPainFromDamage);
 
-async function setPainFromDamage()
+async function setPainFromDamage(info)
 	{
 	console.log("HP changed, setting pain.");
+	if (await sanitizeNumberInput(info, false))
+        {
+        return;
+        }
 	var values = await getAttrsAsync(["hp", "max_hp"]);
 	
-	if (isInteger(values.hp))
+	var hp = parseInt(values.hp);
+	var maxHp = parseInt(values.max_hp);
+		
+	if (hp > maxHp)
 		{
-		var hp = parseInt(values.hp);
-		var maxHp = parseInt(values.max_hp);
-			
-		if (hp > maxHp)
-			{
-			hp = maxHp;
-			await setAttrsAsync({"hp": maxHp});
-			}
-			
-		var modGroup = Math.ceil((maxHp - hp)/parseFloat(maxHp/5));
-		await setAttrsAsync({"pain_from_damage": -2 * modGroup});
+		hp = maxHp;
+		await setAttrsAsync({"hp": maxHp});
 		}
+			
+	var modGroup = Math.ceil((maxHp - hp)/parseFloat(maxHp/5));
+	await setAttrsAsync({"pain_from_damage": -2 * modGroup});
 	}
 	
 //========================================================================
@@ -3042,7 +3159,7 @@ on ("change:bought_hp", hpBought);
 
 async function hpBought()
     {
-    setXP();
+    setXP(null);
     setMaxHP();
     }
 
@@ -3107,8 +3224,13 @@ function isInteger(value)
 	return Number(value) != NaN;
 	}
 	
-async function setXP()
+async function setXP(info)
 	{
+	if (info != null &&
+	    await sanitizeNumberInput(info, false))
+        {
+        return;
+        }
 	console.log("Setting xp.");
 	var values = await getAttrsAsync(["total_xp", "spent_xp", "bought_hp", "advantage_xp", "resource_xp", "background_xp"]);
 	
@@ -3480,7 +3602,7 @@ function getSectionIDsAsync(sectionName){
 
 <input type="hidden" name="attr_cc2_prompt_hider" class="hide-cc2-prompt" value="1">
 	<div id="cc2_prompt" class="prompt cc2-prompt-hide">
-		<div width="850" class="grid1 table">
+		<div width="900" class="grid1 table">
 			<span colspan="2" style="grid-row: 1; grid-column: 1 / span 2;" class="cell">
 				<div class="title1" align="center">
 					Character Creation - Step 2
@@ -3588,7 +3710,7 @@ function getSectionIDsAsync(sectionName){
 				</div>
 			</span>
 			<span style="grid-row: 2; grid-column: 2;" class="cell">
-				<div align="center" style="overflow: auto;width: 400px;height: 305px;">
+				<div align="center" style="overflow: auto;width: 450px;height: 305px;">
 					<div class="grid3 table">
 						<span colspan="5" style="grid-row: 1; grid-column: 1 / span 5;" class="cell">
 							<div align="center">
@@ -3616,11 +3738,11 @@ function getSectionIDsAsync(sectionName){
 						</span>
 						<span colspan="5" style="grid-row: 4; grid-column: 1 / span 5;" class="cell">
 							<div align="center">
-								Astronomics
+								Astronomics <span class="small-font" name="attr_astronomics"/>
 							</div>
 						</span>
 						<span style="grid-row: 5; grid-column: 1;" class="cell">
-							Bridge Technology
+							Bridge Technology (<span name="attr_cc_bridge_tech_diff">5</span>)
 						</span>
 						<span style="grid-row: 5; grid-column: 2;" class="cell">
 							<input type="text" name="attr_bridge_tech" id="num" readonly>
@@ -3635,7 +3757,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_bridge_tech_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 6; grid-column: 1;" class="cell">
-							Mounted Weaponry
+							Mounted Weaponry (<span name="attr_cc_mounted_weaponry_diff">5</span>)
 						</span>
 						<span style="grid-row: 6; grid-column: 2;" class="cell">
 							<input type="text" name="attr_mounted_weaponry" id="num" readonly>
@@ -3650,7 +3772,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_mounted_weaponry_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 7; grid-column: 1;" class="cell">
-							Pilot Spacecraft
+							Pilot Spacecraft (<span name="attr_cc_pilot_spacecraft_diff">5</span>)
 						</span>
 						<span style="grid-row: 7; grid-column: 2;" class="cell">
 							<input type="text" name="attr_pilot_spacecraft" id="num" readonly>
@@ -3665,7 +3787,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_pilot_spacecraft_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 8; grid-column: 1;" class="cell">
-							Vehicle Engineering
+							Vehicle Engineering (<span name="attr_cc_vehicle_engineering_diff">5</span>)
 						</span>
 						<span style="grid-row: 8; grid-column: 2;" class="cell">
 							<input type="text" name="attr_vehicle_engineering" id="num" readonly>
@@ -3681,11 +3803,11 @@ function getSectionIDsAsync(sectionName){
 						</span>
 						<span colspan="5" style="grid-row: 9; grid-column: 1 / span 5;" class="cell">
 							<div align="center">
-								Civilizational
+								Civilizational <span class="small-font" name="attr_civilizational"/>
 							</div>
 						</span>
 						<span style="grid-row: 10; grid-column: 1;" class="cell">
-							Drive Ground Vehicle
+							Drive Ground Vehicle (<span name="attr_cc_drive_ground_vehicle_diff">3</span>)
 						</span>
 						<span style="grid-row: 10; grid-column: 2;" class="cell">
 							<input type="text" name="attr_drive_ground_vehicle" id="num" readonly>
@@ -3700,7 +3822,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_drive_ground_vehicle_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 11; grid-column: 1;" class="cell">
-							Knowledge (Corporate)
+							Knowledge (Corporate) (<span name="attr_cc_knowledge_corporate_diff">4</span>)
 						</span>
 						<span style="grid-row: 11; grid-column: 2;" class="cell">
 							<input type="text" name="attr_knowledge_corporate" id="num" readonly>
@@ -3715,7 +3837,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_knowledge_corporate_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 12; grid-column: 1;" class="cell">
-							Knowledge (Planets) 
+							Knowledge (Planets)  (<span name="attr_cc_knowledge_planets_diff">5</span>)
 						</span>
 						<span style="grid-row: 12; grid-column: 2;" class="cell">
 							<input type="text" name="attr_knowledge_planets" id="num" readonly>
@@ -3730,7 +3852,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_knowledge_planets_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 13; grid-column: 1;" class="cell">
-							Knowledge (Urban)
+							Knowledge (Urban) (<span name="attr_cc_knowledge_urban_diff">4</span>)
 						</span>
 						<span style="grid-row: 13; grid-column: 2;" class="cell">
 							<input type="text" name="attr_knowledge_urban" id="num" readonly>
@@ -3745,7 +3867,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_knowledge_urban_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 14; grid-column: 1;" class="cell">
-							Pilot Aircraft 
+							Pilot Aircraft  (<span name="attr_cc_pilot_aircraft_diff">5</span>)
 						</span>
 						<span style="grid-row: 14; grid-column: 2;" class="cell">
 							<input type="text" name="attr_pilot_aircraft" id="num" readonly>
@@ -3760,7 +3882,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_pilot_aircraft_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 15; grid-column: 1;" class="cell">
-							Trade
+							Trade (<span name="attr_cc_trade_diff">4</span>)
 						</span>
 						<span style="grid-row: 15; grid-column: 2;" class="cell">
 							<input type="text" name="attr_trade" id="num" readonly>
@@ -3776,11 +3898,11 @@ function getSectionIDsAsync(sectionName){
 						</span>
 						<span colspan="5" style="grid-row: 16; grid-column: 1 / span 5;" class="cell">
 							<div align="center">
-								Combat
+								Combat <span class="small-font" name="attr_combat"/>
 							</div>
 						</span>
 						<span style="grid-row: 17; grid-column: 1;" class="cell">
-							Aim
+							Aim (<span name="attr_cc_aim_diff">5</span>)
 						</span>
 						<span style="grid-row: 17; grid-column: 2;" class="cell">
 							<input type="text" name="attr_aim" id="num" readonly>
@@ -3795,7 +3917,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_aim_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 18; grid-column: 1;" class="cell">
-							Athletics
+							Athletics (<span name="attr_cc_athletics_diff">3</span>)
 						</span>
 						<span style="grid-row: 18; grid-column: 2;" class="cell">
 							<input type="text" name="attr_athletics" id="num" readonly>
@@ -3810,7 +3932,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_athletics_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 19; grid-column: 1;" class="cell">
-							Endurance
+							Endurance (<span name="attr_cc_endurance_diff">4</span>)
 						</span>
 						<span style="grid-row: 19; grid-column: 2;" class="cell">
 							<input type="text" name="attr_endurance" id="num" readonly>
@@ -3825,7 +3947,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_endurance_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 20; grid-column: 1;" class="cell">
-							Melee
+							Melee (<span name="attr_cc_melee_diff">6</span>)
 						</span>
 						<span style="grid-row: 20; grid-column: 2;" class="cell">
 							<input type="text" name="attr_melee" id="num" readonly>
@@ -3840,7 +3962,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_melee_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 21; grid-column: 1;" class="cell">
-							Reaction 
+							Reaction  (<span name="attr_cc_reaction_diff">4</span>)
 						</span>
 						<span style="grid-row: 21; grid-column: 2;" class="cell">
 							<input type="text" name="attr_reaction" id="num" readonly>
@@ -3855,7 +3977,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_reaction_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 22; grid-column: 1;" class="cell">
-							Throw
+							Throw (<span name="attr_cc_throw_diff">3</span>)
 						</span>
 						<span style="grid-row: 22; grid-column: 2;" class="cell">
 							<input type="text" name="attr_throw" id="num" readonly>
@@ -3871,11 +3993,11 @@ function getSectionIDsAsync(sectionName){
 						</span>
 						<span colspan="5" style="grid-row: 23; grid-column: 1 / span 5;" class="cell">
 							<div align="center">
-								Infiltration
+								Infiltration <span class="small-font" name="attr_infiltration"/>
 							</div>
 						</span>
 						<span style="grid-row: 24; grid-column: 1;" class="cell">
-							Notice
+							Notice (<span name="attr_cc_notice_diff">5</span>)
 						</span>
 						<span style="grid-row: 24; grid-column: 2;" class="cell">
 							<input type="text" name="attr_notice" id="num" readonly>
@@ -3890,7 +4012,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_notice_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 25; grid-column: 1;" class="cell">
-							Hack Security
+							Hack Security (<span name="attr_cc_hack_security_diff">4</span>)
 						</span>
 						<span style="grid-row: 25; grid-column: 2;" class="cell">
 							<input type="text" name="attr_hack_security" id="num" readonly>
@@ -3905,7 +4027,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_hack_security_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 26; grid-column: 1;" class="cell">
-							Search
+							Search (<span name="attr_cc_search_diff">3</span>)
 						</span>
 						<span style="grid-row: 26; grid-column: 2;" class="cell">
 							<input type="text" name="attr_search" id="num" readonly>
@@ -3920,7 +4042,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_search_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 27; grid-column: 1;" class="cell">
-							Sleight of Hand
+							Sleight of Hand (<span name="attr_cc_sleight_of_hand_diff">6</span>)
 						</span>
 						<span style="grid-row: 27; grid-column: 2;" class="cell">
 							<input type="text" name="attr_sleight_of_hand" id="num" readonly>
@@ -3935,7 +4057,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_sleight_of_hand_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 28; grid-column: 1;" class="cell">
-							Sneak 
+							Sneak (<span name="attr_cc_sneak_diff">5</span>)
 						</span>
 						<span style="grid-row: 28; grid-column: 2;" class="cell">
 							<input type="text" name="attr_sneak" id="num" readonly>
@@ -3951,11 +4073,11 @@ function getSectionIDsAsync(sectionName){
 						</span>
 						<span colspan="5" style="grid-row: 29; grid-column: 1 / span 5;" class="cell">
 							<div align="center">
-								Science
+								Science <span class="small-font" name="attr_science"/>
 							</div>
 						</span>
 						<span style="grid-row: 30; grid-column: 1;" class="cell">
-							Astronomy 
+							Astronomy (<span name="attr_cc_astronomy_diff">4</span>)
 						</span>
 						<span style="grid-row: 30; grid-column: 2;" class="cell">
 							<input type="text" name="attr_astronomy" id="num" readonly>
@@ -3970,7 +4092,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_astronomy_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 31; grid-column: 1;" class="cell">
-							Computer Science
+							Computer Science (<span name="attr_cc_computer_science_diff">6</span>)
 						</span>
 						<span style="grid-row: 31; grid-column: 2;" class="cell">
 							<input type="text" name="attr_computer_science" id="num" readonly>
@@ -3985,7 +4107,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_computer_science_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 32; grid-column: 1;" class="cell">
-							Medicine
+							Medicine (<span name="attr_cc_medicine_diff">5</span>)
 						</span>
 						<span style="grid-row: 32; grid-column: 2;" class="cell">
 							<input type="text" name="attr_medicine" id="num" readonly>
@@ -4000,7 +4122,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_medicine_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 33; grid-column: 1;" class="cell">
-							Natural Sciences
+							Natural Sciences (<span name="attr_cc_natural_sciences_diff">6</span>)
 						</span>
 						<span style="grid-row: 33; grid-column: 2;" class="cell">
 							<input type="text" name="attr_natural_sciences" id="num" readonly>
@@ -4015,7 +4137,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_natural_sciences_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 34; grid-column: 1;" class="cell">
-							Robotics  
+							Robotics (<span name="attr_cc_robotics_diff">6</span>)
 						</span>
 						<span style="grid-row: 34; grid-column: 2;" class="cell">
 							<input type="text" name="attr_robotics" id="num" readonly>
@@ -4030,7 +4152,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_robotics_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 35; grid-column: 1;" class="cell">
-							Weapons Engineering
+							Weapons Engineering (<span name="attr_cc_weapons_engineering_diff">6</span>)
 						</span>
 						<span style="grid-row: 35; grid-column: 2;" class="cell">
 							<input type="text" name="attr_weapons_engineering" id="num" readonly>
@@ -4045,7 +4167,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_weapons_engineering_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 36; grid-column: 1;" class="cell">
-							Xenobiology  
+							Xenobiology (<span name="attr_cc_xenobiology_diff">8</span>)
 						</span>
 						<span style="grid-row: 36; grid-column: 2;" class="cell">
 							<input type="text" name="attr_xenobiology" id="num" readonly>
@@ -4062,11 +4184,11 @@ function getSectionIDsAsync(sectionName){
 						</span>
 						<span colspan="5" style="grid-row: 37; grid-column: 1 / span 5;" class="cell">
 							<div align="center">
-								Social
+								Social <span class="small-font" name="attr_social"/>
 							</div>
 						</span>
 						<span style="grid-row: 38; grid-column: 1;" class="cell">
-							Convince 
+							Convince (<span name="attr_cc_convince_diff">5</span>) 
 						</span>
 						<span style="grid-row: 38; grid-column: 2;" class="cell">
 							<input type="text" name="attr_convince" id="num" readonly>
@@ -4081,7 +4203,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_convince_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 39; grid-column: 1;" class="cell">
-							Deceive
+							Deceive (<span name="attr_cc_deceive_diff">4</span>)
 						</span>
 						<span style="grid-row: 39; grid-column: 2;" class="cell">
 							<input type="text" name="attr_deceive" id="num" readonly>
@@ -4096,7 +4218,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_deceive_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 40; grid-column: 1;" class="cell">
-							Empathy
+							Empathy (<span name="attr_cc_empathy_diff">5</span>)
 						</span>
 						<span style="grid-row: 40; grid-column: 2;" class="cell">
 							<input type="text" name="attr_empathy" id="num" readonly>
@@ -4111,7 +4233,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_empathy_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 41; grid-column: 1;" class="cell">
-							Intimidate
+							Intimidate (<span name="attr_cc_intimidate_diff">3</span>)
 						</span>
 						<span style="grid-row: 41; grid-column: 2;" class="cell">
 							<input type="text" name="attr_intimidate" id="num" readonly>
@@ -4126,7 +4248,7 @@ function getSectionIDsAsync(sectionName){
 							<input type="text" name="attr_cc_intimidate_talent" value="0" id="num">
 						</span>
 						<span style="grid-row: 42; grid-column: 1;" class="cell">
-							Lead  
+							Lead (<span name="attr_cc_lead_diff">5</span>)  
 						</span>
 						<span style="grid-row: 42; grid-column: 2;" class="cell">
 							<input type="text" name="attr_lead" id="num" readonly>
@@ -5943,8 +6065,7 @@ function getSectionIDsAsync(sectionName){
 						<input type="hidden" name="attr_hobby1_difficulty" value="5">
 					</span>
 					<span style="grid-row: 45; grid-column: 2;" class="cell">
-						<input type="hidden" name="attr_hobby1" value="0"/>
-						<input type="text" id="num" name="attr_hobby1" value="@{hobby1}" readonly>
+						<input type="text" id="num" name="attr_hobby1" value="0" readonly>
 					</span>
 					<span style="grid-row: 45; grid-column: 3;" class="cell">
 						<button type="action" name="act_roll_hobby1" class="rollButton"/>
