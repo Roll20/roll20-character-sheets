@@ -153,7 +153,7 @@
 
 <rolltemplate class="sheet-rolltemplate-rmutrackeradd">
   <div class='sheet-rolltemplate-rmumsg'>
-    <i>{{whom}}</i> added to template.
+    <i>{{computed::targetname}}</i> added to tracker.
   </div>
 </rolltemplate>
 
@@ -2617,7 +2617,7 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
           <option value="13">Leviathan</option>
         </select>
         <select class='fancyselect' name='attr_type'>
-        <option value='ja'>Javelin</option><option value='px'>Pole Axe</option><option value='ma'>Mace</option><option value='lc'>Light Crossbow</option><option value='rt'>Thrown Rock</option><option value='hc'>Heavy Crossbow</option><option value='da'>Dagger</option><option value='fa'>Falchion</option><option value='rp'>Rapier</option><option value='handcrossbow'>Hand Crossbow</option><option value='tp'>Thrown Spear</option><option value='ho'>Horn</option><option value='ls'>Long Sword</option><option value='wi'>Whip</option><option value='cr'>Crush</option><option value='any'>Arming Sword</option><option value='sl'>Sling</option><option value='we'>Arming Sword</option><option value='tr'>Trample</option><option value='fbo'>Fire Bolt</option><option value='ebo'>Earth Ball</option><option value='cu'>Club</option><option value='bs'>Broadsword</option><option value='si'>Stinger</option><option value='sb'>Bow, Short</option><option value='bi'>Bite</option><option value='all'>Arming Sword</option><option value='rw'>Arming Sword</option><option value='lba'>Lightning Ball</option><option value='lbo'>Ligtning Bolt</option><option value='bo'>Bola</option><option value='lb'>Bow, Long</option><option value='cl'>Claw</option><option value='tw'>War Hammer</option><option value='hf'>Heavy Flail</option><option value='ss'>Short Sword</option><option value='ts'>Two Handed Sword</option><option value='qs'>Quarterstaff</option><option value='un'>Unarmed Strike</option><option value='tx'>Two Handed Axe</option><option value='td'>Thrown Dagger</option><option value='ro'>Thrown Rock</option><option value='as'>Arming Sword</option><option value='wm'>War Mattock</option><option value='sw'>Sweep</option><option value='sp'>Spear</option><option value='bx'>Battle Axe</option><option value='sh'>Shield Bash</option><option value='gr'>Grapple</option><option value='cba'>Cold Ball</option><option value='wbo'>Water Bolt</option><option value='ra'>Ram</option><option value='hx'>Hand Axe</option><option value='ta'>Thrown Hand Axe</option><option value='fba'>Fire ball</option><option value='sc'>Scimitar</option><option value='tc'>Two Handed Club</option><option value='ibo'>Ice bolt</option><option value='be'>Beak</option>
+        <option value='bx'>Battle Axe</option><option value='fba'>Fire ball</option><option value='lbo'>Ligtning Bolt</option><option value='cl'>Claw</option><option value='cr'>Crush</option><option value='all'>Arming Sword</option><option value='handcrossbow'>Hand Crossbow</option><option value='lb'>Bow, Long</option><option value='we'>Arming Sword</option><option value='any'>Arming Sword</option><option value='hf'>Heavy Flail</option><option value='tx'>Two Handed Axe</option><option value='tr'>Trample</option><option value='si'>Stinger</option><option value='wm'>War Mattock</option><option value='px'>Pole Axe</option><option value='gr'>Grapple</option><option value='wi'>Whip</option><option value='rt'>Thrown Rock</option><option value='sl'>Sling</option><option value='wbo'>Water Bolt</option><option value='tp'>Thrown Spear</option><option value='sp'>Spear</option><option value='rp'>Rapier</option><option value='un'>Unarmed Strike</option><option value='lba'>Lightning Ball</option><option value='cba'>Cold Ball</option><option value='ts'>Two Handed Sword</option><option value='hc'>Heavy Crossbow</option><option value='cu'>Club</option><option value='tc'>Two Handed Club</option><option value='ta'>Thrown Hand Axe</option><option value='fa'>Falchion</option><option value='sw'>Sweep</option><option value='da'>Dagger</option><option value='bs'>Broadsword</option><option value='ra'>Ram</option><option value='be'>Beak</option><option value='sh'>Shield Bash</option><option value='ma'>Mace</option><option value='lc'>Light Crossbow</option><option value='as'>Arming Sword</option><option value='bi'>Bite</option><option value='ho'>Horn</option><option value='ls'>Long Sword</option><option value='sc'>Scimitar</option><option value='ebo'>Earth Ball</option><option value='rw'>Arming Sword</option><option value='sb'>Bow, Short</option><option value='tw'>War Hammer</option><option value='hx'>Hand Axe</option><option value='ss'>Short Sword</option><option value='td'>Thrown Dagger</option><option value='ro'>Thrown Rock</option><option value='bo'>Bola</option><option value='ibo'>Ice bolt</option><option value='fbo'>Fire Bolt</option><option value='qs'>Quarterstaff</option><option value='ja'>Javelin</option>
         </select>
           
 
@@ -2982,6 +2982,11 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
       <option value="4">4 AP/Phase</option>
     </select>
     <button type='action' name='act_trackerrollinitiative' class='fancybutton'>Initiative</button>
+    <button type='action' name='act_trackernextturn' class='fancybutton'>Next Turn</button>
+
+    <!-- These should all become visible when in combat mode only -->
+    Current Init: <span name='attr_currentinitcount'></span>
+    <button type='action' name='act_endcombat' class='fancybutton'>End Combat</button>
   </div>
 
 
@@ -2989,17 +2994,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
 
 <!-- -->
-<div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow1_lastinitiative' type='hidden'>
+<div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow1_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow1_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow1_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow1_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow1_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -3173,17 +3181,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow2_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow2_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow2_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow2_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow2_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow2_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -3357,17 +3368,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow3_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow3_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow3_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow3_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow3_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow3_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -3541,17 +3555,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow4_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow4_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow4_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow4_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow4_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow4_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -3725,17 +3742,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow5_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow5_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow5_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow5_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow5_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow5_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -3909,17 +3929,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow6_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow6_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow6_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow6_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow6_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow6_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -4093,17 +4116,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow7_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow7_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow7_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow7_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow7_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow7_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -4277,17 +4303,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow8_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow8_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow8_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow8_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow8_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow8_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -4461,17 +4490,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow9_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow9_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow9_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow9_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow9_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow9_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -4645,17 +4677,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow10_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow10_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow10_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow10_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow10_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow10_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -4829,17 +4864,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow11_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow11_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow11_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow11_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow11_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow11_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -5013,17 +5051,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow12_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow12_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow12_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow12_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow12_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow12_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -5197,17 +5238,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow13_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow13_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow13_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow13_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow13_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow13_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -5381,17 +5425,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow14_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow14_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow14_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow14_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow14_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow14_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -5565,17 +5612,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow15_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow15_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow15_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow15_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow15_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow15_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -5749,17 +5799,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow16_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow16_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow16_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow16_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow16_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow16_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -5933,17 +5986,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow17_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow17_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow17_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow17_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow17_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow17_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -6117,17 +6173,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow18_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow18_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow18_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow18_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow18_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow18_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -6301,17 +6360,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow19_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow19_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow19_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow19_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow19_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow19_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -6485,17 +6547,20 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
       </div>
     </div>
-  </div></div><div class='trackercharacter'>
-  <input class='trackerorder' name='attr_tvrow20_lastinitiative' type='hidden'>
+  </div></div><div class='trackercharacter gridordered'>
+  <!-- {-{ First thing here is what we sort by.  We have a field called "order" to force
+    it. }-}-->
+  <input class='trackerorder' name='attr_tvrow20_order' type='hidden'>
+  <input type='checkbox' name='attr_tvrow20_inuse' class='toggle'>
   <!-- pcframebox gives the nice frame around the whole thing -->
-  <div class='pcframebox'>
+  <div class='pcframebox toggler'>
     <div class='trackericonbox'> <!-- two children, the image and _everything_ else -->
       <img alt='Token' class='avatar' name='attr_tvrow20_character_token'>
       <div class='trackermain'>
         <div>
           <div>
             <span class='trackedname' name='attr_tvrow20_character_name'></span>
-            <button type='action' name='act_deletetracked' class='fancybutton fancybuttoninline'>
+            <button type='action' name='act_tvrow20_deletetracked' class='fancybutton fancybuttoninline'>
               <span style="font-family:Pictos;">#</span>
             </button>
           </div>
@@ -7105,6 +7170,42 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
     <option value='/w gm'>GM Only</option>
   </select>
 </div>
+
+
+<!--  -->
+
+<br class='clearfix'>
+
+<input type='checkbox' name='attr_pctrackactive' class='toggle'>
+<div class='toggler'>
+  <div class='pcinittracker'>
+    <input type='checkbox' name='attr_pctrack1_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack1_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack1_token'><span class='pcinitname' name='attr_pctrack1_name'></span></div>
+<input type='checkbox' name='attr_pctrack2_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack2_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack2_token'><span class='pcinitname' name='attr_pctrack2_name'></span></div>
+<input type='checkbox' name='attr_pctrack3_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack3_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack3_token'><span class='pcinitname' name='attr_pctrack3_name'></span></div>
+<input type='checkbox' name='attr_pctrack4_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack4_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack4_token'><span class='pcinitname' name='attr_pctrack4_name'></span></div>
+<input type='checkbox' name='attr_pctrack5_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack5_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack5_token'><span class='pcinitname' name='attr_pctrack5_name'></span></div>
+<input type='checkbox' name='attr_pctrack6_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack6_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack6_token'><span class='pcinitname' name='attr_pctrack6_name'></span></div>
+<input type='checkbox' name='attr_pctrack7_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack7_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack7_token'><span class='pcinitname' name='attr_pctrack7_name'></span></div>
+<input type='checkbox' name='attr_pctrack8_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack8_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack8_token'><span class='pcinitname' name='attr_pctrack8_name'></span></div>
+<input type='checkbox' name='attr_pctrack9_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack9_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack9_token'><span class='pcinitname' name='attr_pctrack9_name'></span></div>
+<input type='checkbox' name='attr_pctrack10_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack10_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack10_token'><span class='pcinitname' name='attr_pctrack10_name'></span></div>
+<input type='checkbox' name='attr_pctrack11_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack11_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack11_token'><span class='pcinitname' name='attr_pctrack11_name'></span></div>
+<input type='checkbox' name='attr_pctrack12_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack12_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack12_token'><span class='pcinitname' name='attr_pctrack12_name'></span></div>
+<input type='checkbox' name='attr_pctrack13_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack13_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack13_token'><span class='pcinitname' name='attr_pctrack13_name'></span></div>
+<input type='checkbox' name='attr_pctrack14_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack14_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack14_token'><span class='pcinitname' name='attr_pctrack14_name'></span></div>
+<input type='checkbox' name='attr_pctrack15_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack15_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack15_token'><span class='pcinitname' name='attr_pctrack15_name'></span></div>
+<input type='checkbox' name='attr_pctrack16_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack16_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack16_token'><span class='pcinitname' name='attr_pctrack16_name'></span></div>
+<input type='checkbox' name='attr_pctrack17_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack17_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack17_token'><span class='pcinitname' name='attr_pctrack17_name'></span></div>
+<input type='checkbox' name='attr_pctrack18_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack18_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack18_token'><span class='pcinitname' name='attr_pctrack18_name'></span></div>
+<input type='checkbox' name='attr_pctrack19_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack19_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack19_token'><span class='pcinitname' name='attr_pctrack19_name'></span></div>
+<input type='checkbox' name='attr_pctrack20_inuse' class='toggle'><div class='pcitem pcframebox toggler'><input class='trackerorder' name='attr_pctrack20_order' type='hidden'><img alt='Token' class='avatar' name='attr_pctrack20_token'><span class='pcinitname' name='attr_pctrack20_name'></span></div>
+
+  </div>
+</div>
+
+<br class='clearfix'>
+<!--- vim: set sw=2 sts=2 syn=html : -->
+
 
 
 
@@ -10358,7 +10459,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision 1bec58d251ff2542aa5a505d2a4f22351ddf1d58
+Revision ead72a44557d53190c1cf469987201727ecba285
 
 
 <hr>
@@ -22353,7 +22454,7 @@ function doRollInitiative() {
   });
 }
 
-function doRollInitiativeNoTracker() {
+function doRollInitiativeNoTracker(donefn) {
   // roll20 treats floor as round to negative infinity, so ceil since they should be negative
   startRoll('@{whispertype} &{template:rmuinit} [[ [[ 2d10 ]] + @{initiative} + [[ceil(@{statuspenalty} / 10)]] ]] ' +
       '{\{actor=@{character_name} }} ' +
@@ -22361,8 +22462,11 @@ function doRollInitiativeNoTracker() {
       '{\{total=$[[2]]}} {\{roll=$[[0]]}} ' +
       '{\{maneuver=$[[1]] }}',
       (roll) => {
-	rmuSetAttrs({lastinitiative: roll.results.total.result});
+	setAttrs({lastinitiative: roll.results.total.result}, {silent:true});
 	finishRoll(roll.rollId, {});
+	if (donefn && typeof(donefn) === 'function') {
+	  donefn(roll.results.total.result);
+	}
   });
 }
 
@@ -24203,6 +24307,7 @@ function messageHackery() {
 
 
 let tracker = {}
+tracker.DEFAULTTOKEN = 'https://app.roll20.net/images/character.png';
 
 /*
 Movement
@@ -24216,6 +24321,7 @@ Perception*/
 // FIXME: Pull from the Lua aboce
 tracker.allAttributes = [
   "hp", "hp_max", "pp", "pp_max", 
+  "sheettype",
   "hp_percent", "pp_percent",
   "character_token",
   "character_name",
@@ -24259,7 +24365,6 @@ onCheck("clicked:trackerinit", () => {
 // We just get the token_id and the character_id first.
 // Then we start getting all the other fields.
 onCheck("clicked:trackeraddcreature", () =>{
-//  tracker.dataGet('target', generateRowID());
  const roll_string = "&{template:rmutrackeradd} [[1d20]] " +
         "{\{who=Tracker}} " +
         "{\{targettokenid=[[0[@{target|token_id}]]]}} " +
@@ -24272,7 +24377,7 @@ onCheck("clicked:trackeraddcreature", () =>{
       const characterid = attacks.getDataFromRoll(roll.results.targetcharacterid.expression);
       const targetname = attacks.getDataFromRoll(roll.results.targetname.expression);
       const updates = { targetname: targetname };
-      console.log("Got tokenid and characterid", tokenid, characterid, roll);
+      console.log("Got tokenid and characterid", tokenid, characterid, roll, updates);
 
       tracker.addTarget(targetname, characterid, tokenid);
       finishRoll(roll.rollId, updates);
@@ -24298,55 +24403,85 @@ onCheck("change:apperphase", (ev) => {
 // FIXME: Should check for duplicates
 // FIXME: Should warn if no character id
 tracker.addTarget = function(name, characterid, tokenid) {
-  const rowid = Math.floor(Math.random() * 20) + 1;;
-  const prefix = `tvrow${rowid}_`;
+  const inuse = []
+  for (var i = 1 ; i <= 20 ; i ++ ) {
+    // For each of the items we want to get:
+    inuse.push(`tvrow${i}_inuse`);
+    inuse.push(`tvrow${i}_characterid`);
+  }
+  getAttrs(inuse, (data) => {
+    // First check to see if it's duplicate
+    for (var i = 1 ; i <= 20 ; i ++ ) {
+      if (data[`tvrow${i}_characterid`] === characterid) {
+        console.log("Duplicate character", characterid);
+        return;
+      }
+    }
+    // First check to see if it's duplicate
+    var rowid = 0;
+    for (var i = 1 ; i <= 20 ; i ++ ) {
+      console.log(data[`tvrow${i}_inuse`])
+      if (data[`tvrow${i}_inuse`] != 'on') {
+        rowid = i;
+        break;
+      }
+    }
+    console.log("Using slot: ", rowid);
 
-  // First pass: Lets just add the basic item
-  const updates = {}
-  updates.trackedname = name;
-  updates.tokenid = tokenid;
-  updates.characterid = characterid;
 
-  console.log(tracker.appendPrefix(prefix, updates));
-  setAttrs(tracker.appendPrefix(prefix, updates));
+    const prefix = `tvrow${rowid}_`;
 
-  const trackerid = getActiveCharacterId();
+    // First pass: Lets just add the basic item
+    const updates = {}
+    updates.trackedname = name;
+    updates.tokenid = tokenid;
+    updates.characterid = characterid;
+    updates.inuse = 'on'
 
-  // So as the character I need to let it know what tracker it has
-  rmuSetAttrsRemote(characterid, {trackerid: trackerid, trackerprefix: prefix});
+    console.log(tracker.appendPrefix(prefix, updates));
+    setAttrs(tracker.appendPrefix(prefix, updates));
+
+    const trackerid = getActiveCharacterId();
+
+    // So as the character I need to let it know what tracker it has
+    rmuSetAttrsRemote(characterid, {trackerid: trackerid, trackerprefix: prefix});
 
 
-  /// THis is all a seperate function really
-  
-  rmuGetAttrsRemote(characterid, tracker.allAttributes, (data) => {
-      // this call back is in the context of the character.
-      rmuSetAttrsRemote(trackerid, tracker.appendPrefix(prefix, data));
-  });
+    /// THis is all a seperate function really
 
-  asCharacter(characterid, () => {
-    getSectionIDs("repeating_creatureattack", (ids) => {
-      const toget = [];
-      console.log("Atack ids", ids);
-      ids.forEach((id) => {
-          toget.push(`repeating_creatureattack_${id}_attack`);
-      });
-      getAttrs(toget, (attackinfo) => {
-        console.log("Gives attacks", attackinfo);
-        const trackertoset = {};
-        let row = 1;
-        for (let i = 1 ; i <= 11; i ++) {
-          trackertoset[`${prefix}trackerboxattack_attack${row}_show`] = false;
-          
+    rmuGetAttrsRemote(characterid, tracker.allAttributes, (data) => {
+        if (!data.character_token || data.character_token == "") {
+          data.character_token = tracker.DEFAULTTOKEN;
         }
-        ids.forEach((id) => {
-          trackertoset[`${prefix}trackerboxattack_attack${row}_name`] = attackinfo[`repeating_creatureattack_${id}_attack`];
-          trackertoset[`${prefix}trackerboxattack_attack${row}_basename`] = `repeating_creatureattack_${id}`;
-          trackertoset[`${prefix}trackerboxattack_attack${row}_show`] = 'on';
-          row = row + 1;
+        // this call back is in the context of the character.
+        rmuSetAttrsRemote(trackerid, tracker.appendPrefix(prefix, data));
         });
-        console.log("to set on tracker", trackerid, trackertoset);
-        rmuSetAttrsRemote(trackerid, trackertoset);
-      });
+
+    asCharacter(characterid, () => {
+        getSectionIDs("repeating_creatureattack", (ids) => {
+            const toget = [];
+            console.log("Atack ids", ids);
+            ids.forEach((id) => {
+                toget.push(`repeating_creatureattack_${id}_attack`);
+                });
+            getAttrs(toget, (attackinfo) => {
+                console.log("Gives attacks", attackinfo);
+                const trackertoset = {};
+                let row = 1;
+                for (let i = 1 ; i <= 11; i ++) {
+                trackertoset[`${prefix}trackerboxattack_attack${row}_show`] = false;
+
+                }
+                ids.forEach((id) => {
+                    trackertoset[`${prefix}trackerboxattack_attack${row}_name`] = attackinfo[`repeating_creatureattack_${id}_attack`];
+                    trackertoset[`${prefix}trackerboxattack_attack${row}_basename`] = `repeating_creatureattack_${id}`;
+                    trackertoset[`${prefix}trackerboxattack_attack${row}_show`] = 'on';
+                    row = row + 1;
+                    });
+                console.log("to set on tracker", trackerid, trackertoset);
+                rmuSetAttrsRemote(trackerid, trackertoset);
+                });
+        });
     });
   });
 }
@@ -24359,22 +24494,147 @@ tracker.setAllSheets = function(values) {
 }
 
 tracker.forAllSheets = function(func) {
- 
-   const toget = Array.from({ length: 20 }, (_, i) => `tvrow${i + 1}_characterid`);
-
-    getAttrs(toget, (characterids) => {
-      console.log(toget, characterids);
-      for (row in characterids) {
-        func(characterids[row])
+  const toget = [];
+  for (let i = 1 ; i <= 20 ; i ++) {
+    toget.push(`tvrow${i}_characterid`, `tvrow${i}_inuse`);
+  }
+  getAttrs(toget, (data) => {
+      for (let i = 1 ; i <= 20 ; i ++) {
+        if (data[`tvrow${i}_inuse`] === 'on') {
+          func(data[`tvrow${i}_characterid`], i);
+        }
       }
-    });
+  });
 }
 
-onCheck("clicked:trackerrollinitiative", (_) => {
-  tracker.forAllSheets((id) => {
-    asCharacter(id, () => {doRollInitiativeNoTracker()});
+/**/
+tracker.forEachFetch = function(extra, func) {
+  const toget = [];
+  for (let i = 1 ; i <= 20 ; i ++) {
+    toget.push(`tvrow${i}_characterid`, `tvrow${i}_inuse`);
+    for (let x = 0 ; x < extra.len ; x ++) {
+      toget.push(`tvrow${i}_${extra[x]}`);
+    }
+  }
+  getAttrs(toget, (data) => {
+      for (let i = 1 ; i <= 20 ; i ++) {
+        if (data[`tvrow${i}_inuse`] === 'on') {
+          let args = {}
+          for (let x = 0 ; x < extra.len ; x ++) {
+            args[extra[x]] = data[`tvrow${i}_${extra[x]}`];
+          }
+          func(data[`tvrow${i}_characterid`], args);
+        }
+      }
+  });
+}
+
+/* Send the data from the Tracker init rolls to all the PC sheets */
+tracker.updatePCSheetInit = function(newphase) {
+  sendMessage("All init done!");
+  const toget = ['currentinitcount'];
+  for (let i = 1 ; i <= 20 ; i ++) {
+    toget.push(`tvrow${i}_characterid`, `tvrow${i}_inuse`, `tvrow${i}_lastinitiative`,
+                `tvrow${i}_character_name`, `tvrow${i}_character_token`,
+                `tvrow${i}_sheettype`);
+  }
+  getAttrs(toget, (data) => {
+      // Our (eventually) sorted array
+      let chars = []
+      for (let i = 1 ; i <= 20 ; i ++) {
+        if (data[`tvrow${i}_inuse`] === 'on') {
+          let ch = {}
+          ch.init = data[`tvrow${i}_lastinitiative`];
+          ch.rowid = i;
+          ch.characterid = data[`tvrow${i}_characterid`];
+          ch.character_name = data[`tvrow${i}_character_name`];
+          ch.character_token = data[`tvrow${i}_character_token`];
+          ch.sheettype = data[`tvrow${i}_sheettype`];
+          console.log('adding', ch)
+          chars.push(ch);
+        }
+      }
+
+      let currentinit = 999;
+      if (!newphase) {
+        // Subtract half so it's in the middle
+        currentinit = parseIntDefault(data.currentinitcount) - 0.5;
+      }
+
+      const updates = {};
+
+      // Have our list of PCs: Now sort it
+      chars.sort((a,b) => {
+          return ((a.init > currentinit && b.init > currentinit) ||
+                  (a.init < currentinit && b.init < currentinit)) ?
+            b.init - a.init : a.init - b.init});
+      console.log("sorted", currentinit, chars)
+      updates.currentinitcount = chars[0].init;
+
+      // Awesome now, lets set them
+      let pos = 40;
+      const remoteupdates = {}
+      remoteupdates.pctrackactive = 'on';
+      let pcrow = 1;
+      for (ch of chars) {
+        console.log(ch)
+        updates[`tvrow${ch.rowid}_order`] = pos;
+        remoteupdates[`pctrack${pcrow}_order`] = pos;
+        remoteupdates[`pctrack${pcrow}_token`] = ch.character_token;
+        remoteupdates[`pctrack${pcrow}_name`] = ch.character_name;
+        remoteupdates[`pctrack${pcrow}_inuse`] = 'on';
+        pos --;
+        pcrow ++;
+      }
+      for ( ; pcrow <= 20; pcrow ++) {
+        remoteupdates[`pctrack${pcrow}_inuse`] = false;
+      }
+      console.log(updates);
+      setAttrs(updates);
+      for (ch of chars) {
+        rmuSetAttrsRemote(ch.characterid, remoteupdates);
+        console.log("remote test", ch.characterid, remoteupdates);
+      }
+  });
+}
+
+onCheck("clicked:endcombat", () => {
+  const toget = []
+  for (let i = 1 ; i <= 20 ; i ++) {
+    toget.push(`tvrow${i}_characterid`, `tvrow${i}_sheettype`);
+  }
+  getAttrs(toget, (data) => {
+      for (let i = 1 ; i <= 20 ; i ++) {
+        rmuSetAttrsRemote(data[`tvrow${i}_characterid`], { pctrackactive : false });
+      }
   });
 });
+
+onCheck("clicked:trackerrollinitiative", (_) => {
+  let count = 0;
+  const updates = {};
+  let trackerid = getActiveCharacterId();
+  tracker.forAllSheets((id, row) => {
+    count ++;
+    asCharacter(id, () => {
+        doRollInitiativeNoTracker((result) => {
+            updates[`tvrow${row}_lastinitiative`] = result;
+            count --;
+            if (count == 0) {
+              asCharacter(trackerid, () => {
+                setAttrs(updates, () => { tracker.updatePCSheetInit(true);});
+              });
+            }
+        })
+    });
+  });
+});
+
+onCheck("clicked:trackernextturn", () => {
+  // False: just the next phase
+  tracker.updatePCSheetInit(false);
+})
+
 
 // Still using.  FIXME add confirmation animation
 /*
@@ -24383,10 +24643,15 @@ intentionally breaking the build here
 - so the delete tracked just means clear all the things
 - For the attack events - use a http attribute and pull it in the event.
 */
-onCheck("trackercharacter:deletetracked", (ev) => {
-  const basename = ev.sourceAttribute.replace("_deletetracked", "");
-  removeRepeatingRow(basename);
-});
+onCheck(Array.from({ length: 20 }, (_, i) => `clicked:tvrow${i + 1}_deletetracked`).join(" "), (ev) => {
+  const basename = ev.triggerName.replace("_deletetracked", "").replace("clicked:", "");
+  setAttrs({[basename + '_inuse'] : false,
+          [basename + '_characterid'] : 'none',
+          [basename + '_character_name'] : 'Deleted',
+          [basename + '_character_token'] : tracker.DEFAULTTOKEN,
+          [basename + '_lastinitiative'] : -99,
+          })
+})
 
       onCheck("clicked:repeating_trackercharacter:tvtrackerboxattackattack1do", (ev) => {
         const attackid = ev.sourceAttribute.replace(/attack(\d*)*do$/, "_attack$1_basename");
