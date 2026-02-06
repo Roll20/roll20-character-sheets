@@ -1,15 +1,31 @@
-# 2025-01-27
+# 2026-02-05
+
+Lots of tracker updates
+- Fix delete in the new tracker
+    - Set icon to safe default
+    - Put it at the bottom
+- Add a toggle to hide/show created characters
+- Fetch the inuse items when adding ones
+- Add item for hte inuse item
+- Hide unused tracker templates
+- Correct message when adding to tracker
+- Add tracker to PC sheet
+- Add toggle to hide PC trackers
+- Initiative button rolls initiative; and sends to pc sheet
+- Add 'next' button to advance initiative.
+
+# 2026-01-27
 
 - Refactor the status boxes for grapple, staggered, stun
 - Show grapple correctly
 - Have a delete grapple button
 
-# 2025-01-22
+# 2026-01-22
 
 - Add BMR Crawl to front page.
 - Tweak colors of the subbox on the tracker page
 
-# 2025-01-20
+# 2026-01-20
 
 - Show PP Mulitplier on front page
   - Attribute is pp_multiplier
