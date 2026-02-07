@@ -49,7 +49,7 @@ on ("change:repeating_advantages:advantage_cost change:repeating_resources:resou
 
 async function changeRepeatingXP(info)
     {
-    if (await sanitizeNumberInput(info, false))
+    if (await sanitizeNumberInput(info, true))
         {
         return;
         }
@@ -88,22 +88,26 @@ async function changeRepeatingXP(info)
         console.log(values);
         
         var cost = Number(values[attribA + ids[i] + attribB]);
+        
+        console.log(cost);
+        
         if (cost != NaN)
             {
             total += cost;
+            console.log(total);
             }
         }
         
     switch (property)
         {
         case "advantages":
-            await setAttrsAsync({"advantage_xp": total});
+            await setAttrsAsync({"advantage_xp": "" + total});
         break;
         case "resources":
-            await setAttrsAsync({"resource_xp": total});
+            await setAttrsAsync({"resource_xp": "" + total});
         break;
         case "backgrounds":
-            await setAttrsAsync({"background_xp": total});
+            await setAttrsAsync({"background_xp": "" + total});
         break;
         }
     }
@@ -532,7 +536,8 @@ async function changeTalent(info)
         await setAttrsAsync({"spent_xp": spent - xpDelta,
                             [skillName]: skill - skillDelta});
                             
-        await setXP(null);
+        console.log("changeTalent");
+        await setXP();
         await enableCCComplete();
         }
     }
@@ -689,13 +694,9 @@ on ("clicked:cc_back", ccBack);
 async function ccBack()
 	{
 	var xpInfo = await getXPData();
-    console.log(xpInfo);
 	await setAttrsAsync({"cc2_prompt_hider": 1,
-						 "cc1_prompt_hider": 0,
-						 "total_xp": (xpInfo.ccSkillXp + 10) + "",
-	                     "spent_xp": 0});
+						 "cc1_prompt_hider": 0});
 	init();
-	await setXP(null);
 	}
 
 var arduloM2 = {name: "Ardulo -M2-", description: "", spread:"2", burst: "0", volley: "0", clip_ammo:"7", clip_capacity:"7", ammo:"A"};
@@ -722,7 +723,8 @@ async function closeCC()
     console.log(xpInfo);
 	await setAttrsAsync({"cc2_prompt_hider": 1,
 						 "total_xp": 100 + Number(values.cc_points) * xpInfo.attrCost + xpInfo.ccSkillXp});
-	await setXP(null);
+	console.log("closeCC");
+	await setXP();
 	
 	console.log(values);
 	
@@ -1039,13 +1041,27 @@ on ("clicked:cc1_complete", openCC2);
 async function openCC2()
 	{
 	var xpInfo = await getXPData();
-    console.log(xpInfo);
+    var skills = {"bridge_tech": "5", "mounted_weaponry": "5", "pilot_spacecraft": "5", "vehicle_engineering": "5", "drive_ground_vehicle": "3", "knowledge_corporate": "4", "knowledge_planets": "5", "pilot_aircraft": "5", "knowledge_urban": "4", "trade": "4", "aim": "5", "athletics": "3", "endurance": "4", "reaction": "4", "melee": "6", "throw": "3", "notice": "5", "hack_security": "4", "search": "3", "sleight_of_hand": "6", "sneak": "5", "astronomy": "4", "computer_science": "6", "medicine": "5", "natural_sciences": "6", "robotics": "6", "weapons_engineering": "6", "xenobiology": "8", "convince": "5", "deceive": "4", "empathy": "5", "intimidate": "3", "lead": "5"};
     
     var values = await getAttrsAsync(["planet_select"]);
     var toChange = {"cc1_prompt_hider": 1,
-					 "cc2_prompt_hider": 0,
-					 "total_xp": xpInfo.ccSkillXp + 10,
-	                 "spent_xp": 0};
+					"cc2_prompt_hider": 0,
+	                "total_xp": "" + (xpInfo.ccSkillXp + 10),
+	                "spent_xp": "0"};
+	                 
+	toChange.civilizational = " ";
+	toChange.social = " ";
+	toChange.infiltration = " ";
+	toChange.combat = " ";
+	toChange.science = " ";
+	toChange.astronomics = " ";
+	
+	for (var skill in skills)
+	    {
+	    toChange["cc_" + skill + "_diff"] = skills[skill];
+	    toChange["cc_" + skill + "_talent"] = 0;
+	    toChange[skill + "_bonus"] = "0";
+	    }
     
     switch (values.planet_select)
         {
@@ -1075,7 +1091,9 @@ async function openCC2()
         }
     
 	await setAttrsAsync(toChange);
-	await setXP(null);
+	console.log(toChange);
+	console.log("openCC2");
+	await setXP();
 	await enableCCComplete();
 	}
 
@@ -3159,14 +3177,16 @@ on ("change:bought_hp", hpBought);
 
 async function hpBought()
     {
-    setXP(null);
-    setMaxHP();
+    console.log("hpBought");
+    await setXP();
+    await setMaxHP();
     }
 
 async function init()
 	{
 	await log("Sheet opened.");
 	var values = await getAttrsAsync(["cc1_prompt_hider"]);
+	var xpInfo = await getXPData();; 
 	if (values.cc1_prompt_hider == "0")
 	    {
 	    setTerritory();
@@ -3224,22 +3244,17 @@ function isInteger(value)
 	return Number(value) != NaN;
 	}
 	
-async function setXP(info)
+async function setXP()
 	{
-	if (info != null &&
-	    await sanitizeNumberInput(info, false))
-        {
-        return;
-        }
-	console.log("Setting xp.");
+	console.log("Setting XP");
 	var values = await getAttrsAsync(["total_xp", "spent_xp", "bought_hp", "advantage_xp", "resource_xp", "background_xp"]);
 	
 	console.log("Values in setXP: " + JSON.stringify(values));
 	
-	let totalXp = parseInt(values.total_xp);
-	let skillXp = parseInt(values.spent_xp);
-	let hpXp = parseInt(values.bought_hp) * 50;
-	let advantageXp = parseInt(values.advantage_xp);
+	let totalXp = Number(values.total_xp);
+	let skillXp = Number(values.spent_xp);
+	let hpXp = Number(values.bought_hp) * 50;
+	let advantageXp = Number(values.advantage_xp);
 	let resourceXp = Number(values.resource_xp);
 	let backgroundXp = Number(values.background_xp);
 	await setAttrsAsync({"xp": totalXp - (skillXp + hpXp + advantageXp + resourceXp + backgroundXp)});
@@ -6208,7 +6223,7 @@ function getSectionIDsAsync(sectionName){
 			</span>
 			<span colspan="2" style="grid-row: 3; grid-column: 1 / span 2;" class="cell">
 				<div id="tiny-font" align="center">
-					Millenium Freelancers Character Sheet v3.0 by Zoltán Király. Join us on Discord: https://discord.gg/XV9MX8Yeme
+					Millenium Freelancers Character Sheet v3.2 by Zoltán Király. Join us on Discord: https://discord.gg/XV9MX8Yeme
 				</div>
 			</span>
 		</div>
