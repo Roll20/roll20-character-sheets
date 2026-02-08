@@ -3940,7 +3940,7 @@ on(
     const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_ToHitACadj_flag`, `repeating_weapon_${id}_weapon_ToHitACadj`]);
     const output = {};
     const thisflag = +v[`repeating_weapon_${id}_weapon_ToHitACadj_flag`] || 0;
-    output.repeating_weapon_weapon_ToHitACadj =
+    output[`repeating_weapon_${id}_weapon_ToHitACadj`] =
       thisflag === 1
         ? '{{ToHitACadj2to10=HitAdj:[[ @{weapon_thac_adj0} ]]|[[ @{weapon_thac_adj1} ]]|[[ @{weapon_thac_adj2} ]]|[[ @{weapon_thac_adj3} ]]|[[ @{weapon_thac_adj4} ]]|[[ @{weapon_thac_adj5} ]]|[[ @{weapon_thac_adj6} ]]|[[ @{weapon_thac_adj7} ]]|[[ @{weapon_thac_adj8} ]]|[[ @{weapon_thac_adj9} ]]|[[ @{weapon_thac_adj10} ]] }}'
         : '{{ToHitACadj2to10}}';
