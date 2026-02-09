@@ -130,7 +130,7 @@
 	<!-- Stats Panel -->
 	<div class="sheet-panel stats-panel minimizable">
 		<div class="minimize-control">
-			<input id="stats-minimize-checkbox" class="minimize" type="checkbox" checked />
+			<input id="stats-minimize-checkbox" class="minimize" type="checkbox" name="attr_stats-minimize-checkbox" checked />
 			<label for="stats-minimize-checkbox" data-i18n="characteristics"></label>
 		</div>
 		<div class="stat-dashboard minimize-ignore">
@@ -266,25 +266,25 @@
 			<input type="hidden" name="attr_growingresource_show_8" />
 			<input type="hidden" name="attr_growingresource_show_10" />
 			<input type="hidden" name="attr_growingresource_show_12" />
+			<div class="growing-resource-selector-display">
+				<select class="growing-resource-selector" name="attr_growing_resource_type">
+					<option value="furyberserker" data-i18n="fury-berserker"></option>
+					<option value="furyreaver" data-i18n="fury-reaver"></option>
+					<option value="furystormwight" data-i18n="fury-stormwight"></option>
+					<option value="nullchronokinetic" data-i18n="null-chronokinetic"></option>
+					<option value="nullcryokinetic" data-i18n="null-cryokinetic"></option>
+					<option value="nullmetakinetic" data-i18n="null-metakinetic"></option>
+				</select>
+				<select class="stormwight-growing-resource-selector" name="attr_stormwight_growing_resource_type">
+					<option value="" selected></option>
+					<option value="boren" data-i18n="boren"></option>
+					<option value="corven" data-i18n="corven"></option>
+					<option value="raden" data-i18n="raden"></option>
+					<option value="vuken" data-i18n="vuken"></option>
+				</select>
+			</div>
 			<div class="growing-resource-display sheet-panel-box minimize-ignore">
 				<h5 class="panel-title" data-i18n="growing-resource"></h5>
-				<div class="growing-resource-selector-display">
-					<select class="growing-resource-selector" name="attr_growing_resource_type">
-						<option value="furyberserker" data-i18n="fury-berserker"></option>
-						<option value="furyreaver" data-i18n="fury-reaver"></option>
-						<option value="furystormwight" data-i18n="fury-stormwight"></option>
-						<option value="nullchronokinetic" data-i18n="null-chronokinetic"></option>
-						<option value="nullcryokinetic" data-i18n="null-cryokinetic"></option>
-						<option value="nullmetakinetic" data-i18n="null-metakinetic"></option>
-					</select>
-					<select class="stormwight-growing-resource-selector" name="attr_stormwight_growing_resource_type">
-						<option value="" selected></option>
-						<option value="boren" data-i18n="boren"></option>
-						<option value="corven" data-i18n="corven"></option>
-						<option value="raden" data-i18n="raden"></option>
-						<option value="vuken" data-i18n="vuken"></option>
-					</select>
-				</div>
 				<div class="berserker-growing-resource-display">
 					<div class="growing-resource-display-label">
 						<label><span data-i18n="ferocity"></span></label><label><span data-i18n="benefit"></span></label>
@@ -5139,6 +5139,46 @@
 	});
 */
 
+// Show full Growing Resource Table whenever Characteristics is opened
+	on("change:stats-minimize-checkbox", function(eventInfo) {
+		showGrowingResource();
+	});
+	
+	function showGrowingResource() {
+		console.log('~~~ showGrowingResource ~~~');
+		getAttrs(["stats-minimize-checkbox","resource","level"], function(values) {
+			let isChecked = values["stats-minimize-checkbox"] === "on";
+			let resource = parseInt(values.resource)||0;
+			let level = parseInt(values.level)||0;
+			if (!isChecked) {
+				setAttrs({
+					"growingresource_show_2": "1",
+					"growingresource_show_4": "1",
+					"growingresource_show_6": "1",
+					"growingresource_show_8": "1",
+					"growingresource_show_10": "1",
+					"growingresource_show_12": "1",
+				});
+			}
+			else {
+				let show2 = resource >= 2 ? "1" : "0";
+				let show4 = resource >= 4 ? "1" : "0";
+				let show6 = resource >= 6 ? "1" : "0";
+				let show8 = (resource >= 8 && level >= 4) ? "1" : "0";
+				let show10 = (resource >= 10 && level >= 7) ? "1" : "0";
+				let show12 = (resource >= 12 && level >= 10) ? "1" : "0";
+				setAttrs({
+					"growingresource_show_2": show2,
+					"growingresource_show_4": show4,
+					"growingresource_show_6": show6,
+					"growingresource_show_8": show8,
+					"growingresource_show_10": show10,
+					"growingresource_show_12": show12,
+				});		
+			}
+		});
+	}
+
 // Growing Resource
 	on("change:resource change:level", function() {
 		calculateGrowingResource();
@@ -5146,23 +5186,27 @@
 	
 	function calculateGrowingResource() {
 		console.log('~~~ calculateGrowingResource ~~~');
-		getAttrs(["resource", "level"], function(values) {
-			let resource = parseInt(values.resource)||0;
-			let level = parseInt(values.level)||0;
-			let show2 = resource >= 2 ? "1" : "0";
-			let show4 = resource >= 4 ? "1" : "0";
-			let show6 = resource >= 6 ? "1" : "0";
-			let show8 = (resource >= 8 && level >= 4) ? "1" : "0";
-			let show10 = (resource >= 10 && level >= 7) ? "1" : "0";
-			let show12 = (resource >= 12 && level >= 10) ? "1" : "0";
-			setAttrs({
-				"growingresource_show_2": show2,
-				"growingresource_show_4": show4,
-				"growingresource_show_6": show6,
-				"growingresource_show_8": show8,
-				"growingresource_show_10": show10,
-				"growingresource_show_12": show12,
-			});
+		getAttrs(["stats-minimize-checkbox","resource", "level"], function(values) {
+			let isChecked = values["stats-minimize-checkbox"] === "on";
+			
+			if (isChecked) {
+				let resource = parseInt(values.resource)||0;
+				let level = parseInt(values.level)||0;
+				let show2 = resource >= 2 ? "1" : "0";
+				let show4 = resource >= 4 ? "1" : "0";
+				let show6 = resource >= 6 ? "1" : "0";
+				let show8 = (resource >= 8 && level >= 4) ? "1" : "0";
+				let show10 = (resource >= 10 && level >= 7) ? "1" : "0";
+				let show12 = (resource >= 12 && level >= 10) ? "1" : "0";
+				setAttrs({
+					"growingresource_show_2": show2,
+					"growingresource_show_4": show4,
+					"growingresource_show_6": show6,
+					"growingresource_show_8": show8,
+					"growingresource_show_10": show10,
+					"growingresource_show_12": show12,
+				});
+                       }
 		});
 	}
 
