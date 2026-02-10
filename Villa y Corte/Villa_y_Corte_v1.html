@@ -2772,14 +2772,14 @@
                                         <div class="sheet-poderfile">
                                              <div class="sheet-infopj">
                                                  <div class="sheet-nomenclatura">Extra % ataque:</div><!-- end .sheet-nomenclatura -->
-                                                 <input class="sheet-magiainfo1" type="number" name="attr_extrabonoarmaataque" max="100" min="-100" title="" value="0" />
+                                                 <input class="sheet-magiainfo1" type="number" name="attr_extrabonoarmaataque" max="100" min="-100" title="Modificador, positivo o negativo, al porcentaje de ataque en el uso del arma." value="0" />
                                              </div><!-- end .sheet-infopj -->  
                                         </div><!-- end .sheet-poderfile -->
                                  
                                         <div class="sheet-poderfile">
                                              <div class="sheet-infopj">
                                                  <div class="sheet-nomenclatura">Extra % parada:</div><!-- end .sheet-nomenclatura -->
-                                                 <input class="sheet-magiainfo1" type="number" name="attr_extrabonoarmaparada" max="100" min="-100" title="" value="0" />
+                                                 <input class="sheet-magiainfo1" type="number" name="attr_extrabonoarmaparada" max="100" min="-100" title="Modificador, positivo o negativo, al porcentaje de parada en el uso del arma." value="0" />
                                              </div><!-- end .sheet-infopj -->  
                                         </div><!-- end .sheet-poderfile --> 
                 
@@ -2806,7 +2806,7 @@
                                      <div class="sheet-espai-5"></div><!-- end .sheet-espai-10 --> 
                                      
                                          <div class="sheet-columnaters">
-                                             <select  class="sheet-selectmagia" name="attr_tamañoarma" title="Forma del Hechizo" style="  "> 
+                                             <select  class="sheet-selectmagia" name="attr_tamañoarma" title="Tamaño del arma del Hechizo" style="  "> 
                                                 <option value="0" selected>Ligera</option>
                                                 <option value="-20">Intermedia</option>
                                                 <option value="-40">Pesada</option>
@@ -7447,18 +7447,25 @@ on(
 
       } 
       else if (estado === "Herido") {
-        // Mitad del bono → expresión válida
-        if (bdmax !== "0") {
+
+        // SOLO dividir si es positivo
+        if (bdmax !== "0" && !bdmax.startsWith("-")) {
           bdact = `(${bdmax})/2`;
         } else {
-          bdact = "0";
+          bdact = bdmax;
         }
 
       } 
       else if (estado === "Malherido") {
-        bdact = "0";
 
-      } 
+        // Positivo → 0 | Negativo → se mantiene
+        if (bdmax !== "0" && !bdmax.startsWith("-")) {
+          bdact = "0";
+        } else {
+          bdact = bdmax;
+        }
+
+      }  
       else {
         // Inconsciente / Muerto / otros
         if (!bdmax.startsWith("-") && bdmax !== "0") {
