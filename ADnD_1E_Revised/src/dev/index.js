@@ -3942,8 +3942,8 @@ on(
     const thisflag = +v[`repeating_weapon_${id}_weapon_ToHitACadj_flag`] || 0;
     output[`repeating_weapon_${id}_weapon_ToHitACadj`] =
       thisflag === 1
-        ? '{{ToHitACadj2to10=HitAdj:[[ @{weapon_thac_adj0} ]]|[[ @{weapon_thac_adj1} ]]|[[ @{weapon_thac_adj2} ]]|[[ @{weapon_thac_adj3} ]]|[[ @{weapon_thac_adj4} ]]|[[ @{weapon_thac_adj5} ]]|[[ @{weapon_thac_adj6} ]]|[[ @{weapon_thac_adj7} ]]|[[ @{weapon_thac_adj8} ]]|[[ @{weapon_thac_adj9} ]]|[[ @{weapon_thac_adj10} ]] }}'
-        : '{{ToHitACadj2to10}}';
+        ? '{{ToHitArmorType0=@{weapon_thac_adj0}}} {{ToHitArmorType1=@{weapon_thac_adj1}}} {{ToHitArmorType2=@{weapon_thac_adj2}}} {{ToHitArmorType3=@{weapon_thac_adj3}}} {{ToHitArmorType4=@{weapon_thac_adj4}}} {{ToHitArmorType5=@{weapon_thac_adj5}}} {{ToHitArmorType6=@{weapon_thac_adj6}}} {{ToHitArmorType7=@{weapon_thac_adj7}}} {{ToHitArmorType8=@{weapon_thac_adj8}}} {{ToHitArmorType9=@{weapon_thac_adj9}}} {{ToHitArmorType10=@{weapon_thac_adj10}}}'
+        : '{{ToHitArmorType0}} {{ToHitArmorType1}} {{ToHitArmorType2}} {{ToHitArmorType3}} {{ToHitArmorType4}} {{ToHitArmorType5}} {{ToHitArmorType6}} {{ToHitArmorType7}} {{ToHitArmorType8}} {{ToHitArmorType9}} {{ToHitArmorType10}}';
     await setAttrsAsync(output, {silent: true});
   },
 );
@@ -3957,10 +3957,11 @@ const getToHitRowUpdate = (v, id) => {
   let thishitTableSelect = +v[attrSelect] || 0;
   let thishitTableMacro = '';
   const noMacro = '&nbsp;';
-  const matrixMacro =
-    '%NEWLINE%/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10to0=ToHit:[[ @{thac-10} ]]|[[ @{thac-9} ]]|[[ @{thac-8} ]]|[[ @{thac-7} ]]|[[ @{thac-6} ]]|[[ @{thac-5} ]]|[[ @{thac-4} ]]|[[ @{thac-3} ]]|[[ @{thac-2} ]]|[[ @{thac-1} ]]|[[ @{thac0} ]]}} {{ToHitAC1to10=ToHit:[[ @{thac0} ]]|[[ @{thac1} ]]|[[ @{thac2} ]]|[[ @{thac3} ]]|[[ @{thac4} ]]|[[ @{thac5} ]]|[[ @{thac6} ]]|[[ @{thac7} ]]|[[ @{thac8} ]]|[[ @{thac9} ]]|[[ @{thac10} ]] }}';
-  const thac0Macro =
-    '%NEWLINE%/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10to0=ToHit:[[ @{thac0-10} ]]|[[ @{thac0-9} ]]|[[ @{thac0-8} ]]|[[ @{thac0-7} ]]|[[ @{thac0-6} ]]|[[ @{thac0-5} ]]|[[ @{thac0-4} ]]|[[ @{thac0-3} ]]|[[ @{thac0-2} ]]|[[ @{thac0-1} ]]|[[ @{thac00} ]]}} {{ToHitAC1to10=ToHit:[[ @{thac00} ]]|[[ @{thac01} ]]|[[ @{thac02} ]]|[[ @{thac03} ]]|[[ @{thac04} ]]|[[ @{thac05} ]]|[[ @{thac06} ]]|[[ @{thac07} ]]|[[ @{thac08} ]]|[[ @{thac09} ]]|[[ @{thac010} ]] }}';
+  // IMPORTANT these strings MUST include a hard return to force a new line
+  const matrixMacro = `
+  %NEWLINE%/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10=[[ @{thac-10} ]]}} {{ToHitAC-9=[[ @{thac-9} ]]}} {{ToHitAC-8=[[ @{thac-8} ]]}} {{ToHitAC-7=[[ @{thac-7} ]]}} {{ToHitAC-6=[[ @{thac-6} ]]}} {{ToHitAC-5=[[ @{thac-5} ]]}} {{ToHitAC-4=[[ @{thac-4} ]]}} {{ToHitAC-3=[[ @{thac-3} ]]}} {{ToHitAC-2=[[ @{thac-2} ]]}} {{ToHitAC-1=[[ @{thac-1} ]]}} {{ToHitAC0=[[ @{thac0} ]]}} {{ToHitAC1=[[ @{thac1} ]]}} {{ToHitAC2=[[ @{thac2} ]]}} {{ToHitAC3=[[ @{thac3} ]]}} {{ToHitAC4=[[ @{thac4} ]]}} {{ToHitAC5=[[ @{thac5} ]]}} {{ToHitAC6=[[ @{thac6} ]]}} {{ToHitAC7=[[ @{thac7} ]]}} {{ToHitAC8=[[ @{thac8} ]]}} {{ToHitAC9=[[ @{thac9} ]]}} {{ToHitAC10=[[ @{thac10} ]] }}`;
+  const thac0Macro = `
+  %NEWLINE%/w gm &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10=[[ @{thac0-10} ]]}} {{ToHitAC-9=[[ @{thac0-9} ]]}} {{ToHitAC-8=[[ @{thac0-8} ]]}} {{ToHitAC-7=[[ @{thac0-7} ]]}} {{ToHitAC-6=[[ @{thac0-6} ]]}} {{ToHitAC-5=[[ @{thac0-5} ]]}} {{ToHitAC-4=[[ @{thac0-4} ]]}} {{ToHitAC-3=[[ @{thac0-3} ]]}} {{ToHitAC-2=[[ @{thac0-2} ]]}} {{ToHitAC-1=[[ @{thac0-1} ]]}} {{ToHitAC0=[[ @{thac00} ]]}} {{ToHitAC1=[[ @{thac01} ]]}} {{ToHitAC2=[[ @{thac02} ]]}} {{ToHitAC3=[[ @{thac03} ]]}} {{ToHitAC4=[[ @{thac04} ]]}} {{ToHitAC5=[[ @{thac05} ]]}} {{ToHitAC6=[[ @{thac06} ]]}} {{ToHitAC7=[[ @{thac07} ]]}} {{ToHitAC8=[[ @{thac08} ]]}} {{ToHitAC9=[[ @{thac09} ]]}} {{ToHitAC10=[[ @{thac010} ]] }}`;
   if (thishitTableSelect === 2) {
     thishitTableMacro = noMacro;
   } else {
