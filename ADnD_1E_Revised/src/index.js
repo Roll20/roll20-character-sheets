@@ -823,6 +823,7 @@ const autoCalcThiefRows = (current_version, final_version) => {
 // Remove @{weapon_whisper_to_hit}
 const removeWhisper = (current_version, final_version) => {
   // remove all instances of @{weapon_whisper_to_hit} in macro-text
+  // this has been moved to the attack button
   getSectionIDs('repeating_weapon', (idArray) => {
     const fields = idArray.map((id) => [`repeating_weapon_${id}_weapon_macro_text`]);
     getAttrs([...fields], (v) => {
@@ -2544,6 +2545,31 @@ const updateSyncArmorFlag = async (current_version, final_version) => {
   versionator(current_version, final_version);
 };
 
+// One-time update: trigger recalc for '/w gm to-Hit' default values
+const recalcToHitWhisper = async (current_version, final_version) => {
+  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_whisper_to_hit`, `repeating_weapon_${id}_weapon_whisper_to_hit_select`]);
+  const v = await getAttrsAsync(['toggle_to_hit_table', ...fields]);
+  const updates = await Promise.all(idArray.map((id) => getToHitRowUpdate(v, id)));
+  const output = Object.assign({}, ...updates);
+  output.sheet_version = current_version;
+  clog(`VERSION UPDATE: recalcToHitWhisper completed`);
+  await setAttrsAsync(output, {silent: true});
+  await versionator(current_version, final_version);
+};
+
+const recalcToHitACadj = async (current_version, final_version) => {
+  const idArray = await getSectionIDsAsync('repeating_weapon');
+  const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_tohitacadj_flag`, `repeating_weapon_${id}_weapon_tohitacadj`]);
+  const v = await getAttrsAsync([...fields]);
+  const updates = await Promise.all(idArray.map((id) => getToHitACadjUpdate(v, id)));
+  const output = Object.assign({}, ...updates);
+  output.sheet_version = current_version;
+  clog(`VERSION UPDATE: recalcToHitACadj completed`);
+  await setAttrsAsync(output, {silent: true});
+  await versionator(current_version, final_version);
+};
+
 // versioning routine to handle attribute changes
 versionator = async (current_version, final_version) => {
   if (current_version < 0.1) {
@@ -2627,6 +2653,10 @@ versionator = async (current_version, final_version) => {
     setNWPUpdate(1.66, final_version);
   } else if (current_version < 1.681) {
     await updateSyncArmorFlag(1.69, final_version);
+  } else if (current_version < 1.691) {
+    await recalcToHitWhisper(1.691, final_version);
+  } else if (current_version < 1.692) {
+    await recalcToHitACadj(1.692, final_version);
     // all updates completed
   } else if (current_version < final_version) {
     output.sheet_version = final_version;
@@ -2640,7 +2670,7 @@ versionator = async (current_version, final_version) => {
 // Versioning
 on('sheet:opened', async () => {
   // SET LATEST VERSION HERE. needs to be => the last update made in versionator
-  const final_version = 1.69;
+  const final_version = 1.692;
   const v = await getAttrsAsync(['sheet_version', 'old_character']);
   const output = {};
   let current_version = float(v.sheet_version);
@@ -3932,24 +3962,31 @@ on('change:repeating_spells:spell_name', async (eventInfo) => {
 });
 
 // ToHitACadj Toggle
+const getToHitACadjUpdate = (v, id) => {
+  // clog(`Δ detected: getToHitACadjUpdate for id:${id}`);
+  const output = {};
+  const flag = +v[`repeating_weapon_${id}_weapon_tohitacadj_flag`] || 0;
+  output[`repeating_weapon_${id}_weapon_tohitacadj`] =
+    flag === 1
+      ? '{{ToHitArmorType0=@{weapon_thac_adj0}}} {{ToHitArmorType1=@{weapon_thac_adj1}}} {{ToHitArmorType2=@{weapon_thac_adj2}}} {{ToHitArmorType3=@{weapon_thac_adj3}}} {{ToHitArmorType4=@{weapon_thac_adj4}}} {{ToHitArmorType5=@{weapon_thac_adj5}}} {{ToHitArmorType6=@{weapon_thac_adj6}}} {{ToHitArmorType7=@{weapon_thac_adj7}}} {{ToHitArmorType8=@{weapon_thac_adj8}}} {{ToHitArmorType9=@{weapon_thac_adj9}}} {{ToHitArmorType10=@{weapon_thac_adj10}}}'
+      : '{{ToHitArmorType0}} {{ToHitArmorType1}} {{ToHitArmorType2}} {{ToHitArmorType3}} {{ToHitArmorType4}} {{ToHitArmorType5}} {{ToHitArmorType6}} {{ToHitArmorType7}} {{ToHitArmorType8}} {{ToHitArmorType9}} {{ToHitArmorType10}}';
+  return output;
+};
+
 on(
   'change:repeating_weapon:weapon_tohitacadj_flag change:repeating_weapon:weapon_thac_adj0 change:repeating_weapon:weapon_thac_adj1 change:repeating_weapon:weapon_thac_adj2 change:repeating_weapon:weapon_thac_adj3 change:repeating_weapon:weapon_thac_adj4 change:repeating_weapon:weapon_thac_adj5 change:repeating_weapon:weapon_thac_adj6 change:repeating_weapon:weapon_thac_adj7 change:repeating_weapon:weapon_thac_adj8 change:repeating_weapon:weapon_thac_adj9 change:repeating_weapon:weapon_thac_adj10',
   async (eventInfo) => {
     // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
-    const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_ToHitACadj_flag`, `repeating_weapon_${id}_weapon_ToHitACadj`]);
-    const output = {};
-    const thisflag = +v[`repeating_weapon_${id}_weapon_ToHitACadj_flag`] || 0;
-    output[`repeating_weapon_${id}_weapon_ToHitACadj`] =
-      thisflag === 1
-        ? '{{ToHitArmorType0=@{weapon_thac_adj0}}} {{ToHitArmorType1=@{weapon_thac_adj1}}} {{ToHitArmorType2=@{weapon_thac_adj2}}} {{ToHitArmorType3=@{weapon_thac_adj3}}} {{ToHitArmorType4=@{weapon_thac_adj4}}} {{ToHitArmorType5=@{weapon_thac_adj5}}} {{ToHitArmorType6=@{weapon_thac_adj6}}} {{ToHitArmorType7=@{weapon_thac_adj7}}} {{ToHitArmorType8=@{weapon_thac_adj8}}} {{ToHitArmorType9=@{weapon_thac_adj9}}} {{ToHitArmorType10=@{weapon_thac_adj10}}}'
-        : '{{ToHitArmorType0}} {{ToHitArmorType1}} {{ToHitArmorType2}} {{ToHitArmorType3}} {{ToHitArmorType4}} {{ToHitArmorType5}} {{ToHitArmorType6}} {{ToHitArmorType7}} {{ToHitArmorType8}} {{ToHitArmorType9}} {{ToHitArmorType10}}';
+    const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_tohitacadj_flag`, `repeating_weapon_${id}_weapon_tohitacadj`]);
+    const output = getToHitACadjUpdate(v, id);
     await setAttrsAsync(output, {silent: true});
   },
 );
 
 // Matrix or THAC0 Toggle for repeating_weapon
 const getToHitRowUpdate = (v, id) => {
+  // clog(`Δ detected: getToHitRowUpdate for id:${id}`);
   const output = {};
   const flag = +v.toggle_to_hit_table || 0;
   const attrSelect = `repeating_weapon_${id}_weapon_whisper_to_hit_select`;
