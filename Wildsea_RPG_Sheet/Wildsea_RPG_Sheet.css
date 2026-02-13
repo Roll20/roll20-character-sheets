@@ -1,0 +1,633 @@
+/* Roll20 Custom Sheet Sandbox CSS (no sheetworkers) */
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800&display=swap');
+
+.ws-sheet { font-family: "Barlow", Arial, sans-serif; font-size: 12px; line-height: 1.25; color: #1c1f1c; box-sizing: border-box; }
+.ws-sheet * { box-sizing: border-box; }
+
+/* Persist anchor for repeating rows (forces Roll20 to store the row immediately) */
+.ws-rowpersist{
+  position: absolute !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
+}
+
+.ws-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 100%; }
+@media (max-width: 860px) { .ws-grid { grid-template-columns: 1fr; } }
+
+.ws-col { display: flex; flex-direction: column; gap: 8px; }
+.ws-panel { border: 2px solid #6f7f63; border-radius: 4px; background: #f7f8f4; overflow: hidden; }
+
+.ws-sectionbar { padding: 4px 8px; background: #6f7f63; color: #f7f8f4; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; }
+.ws-block { padding: 8px; }
+
+.ws-input, .ws-textarea { width: 100%; border: 1px solid #6f7f63; border-radius: 3px; padding: 4px 6px; background: #ffffff; color: #1c1f1c; outline: none; min-width: 0; }
+.ws-input:focus, .ws-textarea:focus { border-color: #556247; box-shadow: 0 0 0 2px rgba(111,127,99,0.18); }
+.ws-textarea { resize: vertical; }
+
+/* compact defaults */
+.ws-textarea { height: 2.4em; min-height: 2.4em; line-height: 1.2; padding-top: 4px; padding-bottom: 4px; }
+.ws-textarea-sm { height: 2.2em; min-height: 2.2em; }
+.ws-textarea-md { height: 3.6em; min-height: 3.6em; }
+.ws-textarea-lg { height: 6em; min-height: 6em; }
+
+/* Background: compact description box */
+.ws-textarea-bg { height: 2em; min-height: 2em; }
+
+/* Repeating */
+.ws-repeat { margin: 0; padding: 0; border: 0; }
+.ws-item { padding: 6px 8px; background: #fdfdfb; border: 1px solid #6f7f63; border-radius: 3px; margin: 6px 8px; }
+.ws-item-row { display: grid; grid-template-columns: 58px 1fr; gap: 8px; align-items: center; width: 100%; }
+.ws-item-row-2 { margin-top: 6px; align-items: start; }
+.ws-item-label { font-weight: 800; text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px; color: #2a2f2a; }
+
+/* Top bar + mode tabs */
+.ws-mode-radio { position: absolute; opacity: 0; pointer-events: none; }
+
+.ws-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.ws-topbar-spacer { flex: 1 1 auto; }
+
+.ws-mode-tabs { display: inline-flex; border: 2px solid #6f7f63; border-radius: 999px; overflow: hidden; background: #f7f8f4; }
+.ws-mode-tab { padding: 6px 10px; font-weight: 800; font-size: 11px; letter-spacing: 0.3px; text-transform: uppercase; cursor: pointer; user-select: none; border-right: 1px solid #6f7f63; }
+.ws-mode-tab:last-child { border-right: none; }
+
+#ws-mode-character:checked ~ .ws-topbar .ws-mode-tabs label[for="ws-mode-character"],
+#ws-mode-npc:checked       ~ .ws-topbar .ws-mode-tabs label[for="ws-mode-npc"],
+#ws-mode-ship:checked      ~ .ws-topbar .ws-mode-tabs label[for="ws-mode-ship"] {
+  background: #6f7f63;
+  color: #f7f8f4;
+}
+
+/* Mode visibility */
+.ws-mode { display: none; }
+#ws-mode-character:checked ~ .ws-modes .ws-mode--character { display: block; }
+#ws-mode-npc:checked       ~ .ws-modes .ws-mode--npc { display: block; }
+#ws-mode-ship:checked      ~ .ws-modes .ws-mode--ship { display: block; }
+
+/* Background block */
+.ws-bg-fields { display: grid; gap: 1px; }
+.ws-bg-line { display: grid; grid-template-columns: 60px 1fr; gap: 4px; align-items: center; }
+.ws-bg-k { font-weight: 800; text-transform: uppercase; font-size: 8px; color: #2a2f2a; }
+.ws-bg-desc { margin-top: 6px; }
+.ws-bg-desc .ws-item-label { margin-bottom: 4px; display: block; }
+
+/* Resources */
+.ws-res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px; }
+.ws-res { border: 1px solid #6f7f63; border-radius: 3px; background: #ffffff; overflow: hidden; }
+.ws-res-h { padding: 4px 6px; background: #e7eadf; border-bottom: 1px solid #6f7f63; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 0.3px; }
+.ws-res .ws-textarea { border: none; border-radius: 0; height: 3.8em; min-height: 3.8em; }
+
+/* Track line with pips + dropdown aligned right */
+.ws-trackline { margin-top: 8px; border-top: 1px solid #c8d0be; padding-top: 6px; display: grid; grid-template-columns: 58px 1fr; gap: 8px; align-items: center; }
+.ws-track-h { font-weight: 800; text-transform: uppercase; font-size: 10px; letter-spacing: 0.3px; color: #2a2f2a; }
+
+.ws-trackline-right { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.ws-len-select { margin-left: auto; width: 54px; height: 22px; border: 1px solid #6f7f63; border-radius: 3px; background: #ffffff; font-weight: 700; font-size: 12px; text-align: center; }
+.ws-len-radio{
+  position: absolute !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Pips */
+.ws-pips { display: flex !important; gap: 5px !important; flex-wrap: nowrap !important; align-items: center !important; justify-content: flex-start !important; overflow: hidden; min-width: 0; }
+.ws-pip { display: inline-flex !important; width: 12px !important; height: 12px !important; flex: 0 0 12px !important; position: relative !important; cursor: pointer !important; padding: 0 !important; margin: 0 !important; }
+.ws-pip input { position: absolute !important; opacity: 0 !important; pointer-events: none !important; }
+.ws-pip span { position: absolute !important; inset: 0 !important; width: 12px !important; height: 12px !important; border-radius: 999px !important; border: 2px solid #6f7f63 !important; background: transparent !important; }
+.ws-pip input:checked + span { background: #6f7f63 !important; }
+
+/* Track-length hiding (max 15) - SCOPED FIX (prevents repeater interference) */
+.ws-trackline-right .ws-len-1:checked  ~ .ws-pips--15 > :nth-child(n+2),
+.ws-trackline-right .ws-len-2:checked  ~ .ws-pips--15 > :nth-child(n+3),
+.ws-trackline-right .ws-len-3:checked  ~ .ws-pips--15 > :nth-child(n+4),
+.ws-trackline-right .ws-len-4:checked  ~ .ws-pips--15 > :nth-child(n+5),
+.ws-trackline-right .ws-len-5:checked  ~ .ws-pips--15 > :nth-child(n+6),
+.ws-trackline-right .ws-len-6:checked  ~ .ws-pips--15 > :nth-child(n+7),
+.ws-trackline-right .ws-len-7:checked  ~ .ws-pips--15 > :nth-child(n+8),
+.ws-trackline-right .ws-len-8:checked  ~ .ws-pips--15 > :nth-child(n+9),
+.ws-trackline-right .ws-len-9:checked  ~ .ws-pips--15 > :nth-child(n+10),
+.ws-trackline-right .ws-len-10:checked ~ .ws-pips--15 > :nth-child(n+11),
+.ws-trackline-right .ws-len-11:checked ~ .ws-pips--15 > :nth-child(n+12),
+.ws-trackline-right .ws-len-12:checked ~ .ws-pips--15 > :nth-child(n+13),
+.ws-trackline-right .ws-len-13:checked ~ .ws-pips--15 > :nth-child(n+14),
+.ws-trackline-right .ws-len-14:checked ~ .ws-pips--15 > :nth-child(n+15),
+.ws-trackline-right .ws-len-15:checked ~ .ws-pips--15 > :nth-child(n+16) { display: none !important; }
+
+/* MIRES: compact row (textarea left, 2 pips right, top-aligned) */
+.ws-mireitem { padding: 6px 8px; }
+
+.ws-mire-row{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.ws-textarea-mire{
+  height: 1.9em !important;
+  min-height: 1.9em !important;
+  line-height: 1.2;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  resize: vertical;
+}
+
+.ws-mire-pips{
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding-top: 2px;
+}
+
+/* Edges */
+.ws-edges-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 6px; }
+.ws-edgebtn { position: relative; cursor: pointer; }
+.ws-edgebtn input { position: absolute; opacity: 0; pointer-events: none; }
+.ws-edgebtn span{
+  display: block;
+  width: 100%;
+  padding: 4px 8px;
+  border: 2px solid #6f7f63;
+  border-radius: 4px;
+  background: #eef1e8;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 11px;
+  text-align: center;
+}
+.ws-edgebtn input:checked + span { background: #6f7f63; color: #f7f8f4; }
+
+/* Skills/Languages */
+.ws-ratings-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px 10px; padding: 8px; }
+@media (max-width: 860px) { .ws-ratings-grid { grid-template-columns: 1fr 1fr; } }
+.ws-ratings-grid--langs { grid-template-columns: 1fr 1fr; }
+
+.ws-rate { display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid #c8d0be; border-radius: 3px; padding: 4px 6px; background: #ffffff; }
+.ws-rate-name { font-weight: 700; font-size: 12px; white-space: nowrap; }
+.ws-rate-pips { display: flex; gap: 4px; align-items: center; }
+
+/* Milestones textarea */
+.ws-miles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px; }
+.ws-miles-col { border: 1px solid #6f7f63; border-radius: 3px; background: #ffffff; overflow: hidden; }
+.ws-miles-h { padding: 4px 6px; background: #e7eadf; border-bottom: 1px solid #6f7f63; font-weight: 800; text-transform: uppercase; font-size: 11px; letter-spacing: 0.3px; }
+.ws-miles-pad { padding: 6px; }
+.ws-textarea-miles { height: 6em; min-height: 3.6em; resize: vertical; }
+
+/* Aspect X-toggles */
+.ws-pips--x { gap: 6px !important; }
+.ws-pipstack { display: flex; flex-direction: column-reverse; align-items: center; gap: 3px; width: 12px; flex: 0 0 12px; }
+
+.ws-xcheck {
+  width: -1px;
+  height: -1px;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 2px solid #6f7f63;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+.ws-xcheck:checked { background: #6f7f63; }
+
+.ws-pip span { position: relative !important; }
+.ws-pip span::before,
+.ws-pip span::after {
+  content: "";
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  top: 50%;
+  height: 2px;
+  background: #6f7f63;
+  transform-origin: center;
+  opacity: 0;
+}
+.ws-pip span::before { transform: translateY(-50%) rotate(45deg); }
+.ws-pip span::after  { transform: translateY(-50%) rotate(-45deg); }
+
+.ws-xcheck:checked + .ws-pip span::before,
+.ws-xcheck:checked + .ws-pip span::after { opacity: 1; }
+
+/* Collapsible panels (remembered via attr_c_* checkboxes) */
+.ws-collapse{
+  position: absolute !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Make sectionbar act like a clickable header with a right-side arrow */
+.ws-collapsible .ws-sectionbar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Arrow */
+.ws-collapsible .ws-collapse-arrow{
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Default (open) arrow = up */
+.ws-collapse:checked + .ws-collapsible .ws-collapse-arrow::before{
+  content: "▴";
+}
+
+/* Closed arrow = down */
+.ws-collapse:not(:checked) + .ws-collapsible .ws-collapse-arrow::before{
+  content: "▾";
+}
+
+/* Hide body when closed */
+.ws-collapse:not(:checked) + .ws-collapsible .ws-collapse-body{
+  display: none;
+}
+/* =========================
+   NPC TAB: scoped styling
+   ========================= */
+.ws-mode--npc .ws-titlebar{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 8px;
+  background: #6f7f63;
+  color: #f7f8f4;
+}
+
+.ws-mode--npc .ws-titleinput{
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #f7f8f4;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-size: 16px;
+  padding: 0;
+}
+.ws-mode--npc .ws-titleinput::placeholder{ color: rgba(247,248,244,0.95); }
+
+.ws-mode--npc .ws-size{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.ws-mode--npc .ws-label{
+  font-size: 11px;
+  opacity: 0.95;
+}
+
+.ws-mode--npc .ws-size input{
+  width: 110px;
+  max-width: 40vw;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.10);
+  color: #f7f8f4;
+  padding: 3px 6px;
+  border-radius: 3px;
+  outline: none;
+}
+.ws-mode--npc .ws-size input::placeholder{ color: rgba(255,255,255,0.75); }
+
+.ws-mode--npc .ws-block-h{
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+  color: #2a2f2a;
+}
+
+/* Repeating item top row + delete button (NPC-only usage) */
+.ws-mode--npc .ws-item-top{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ws-mode--npc .ws-iconbtn{
+  border: 1px solid #6f7f63;
+  background: #ffffff;
+  border-radius: 3px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.ws-mode--npc .ws-iconbtn:hover{ background: #f0f2ea; }
+.ws-mode--npc .ws-ic{ font-size: 13px; line-height: 1; }
+
+/* NPC aspect track row (uses ws-track, not ws-trackline) */
+.ws-mode--npc .ws-track{
+  margin-top: 6px;
+  border-top: 1px solid #c8d0be;
+  padding-top: 6px;
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.ws-mode--npc .ws-track-right{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+/* ---- SHIP GRID (same two-column behavior as others) ---- */
+.ws-grid--ship {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* make the NAME label above the ship name input match style */
+.ws-titlewrap { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.ws-titlelabel {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 12px;
+  opacity: 0.95;
+}
+
+/* DESIGN rows stack */
+.ws-ship-design { display: grid; gap: 10px; }
+.ws-ship-design-row { display: grid; gap: 4px; }
+
+/* stakes two fields */
+.ws-ship-stakes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 8px 10px 10px;
+}
+.ws-ship-stakes-h {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+.ws-input-num { width: 100%; }
+
+/* ratings list spacing */
+.ws-ship-ratings { display: grid; gap: 10px; padding: 8px 10px 10px; }
+.ws-ship-rating { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 10px; }
+.ws-ship-rating-name {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+/* tighten rating track row (uses your existing ws-trackline-right / ws-pips / ws-len-select) */
+.ws-ship-rating-track .ws-trackline-right { width: 100%; }
+
+/* reputation row */
+.ws-repitem { padding: 8px 10px 10px; }
+.ws-rep-pips { display: flex; gap: 6px; margin-top: 8px; }
+
+/* small design textareas height (if needed) */
+.ws-textarea-design { min-height: 52px; }
+/* =========================
+   SHIP HEADER (match NPC)
+   ========================= */
+
+/* If your NPC header styles are scoped like .ws-mode--npc .ws-titlebar {...},
+   you must repeat them for ship mode. */
+
+.ws-mode--ship .ws-titlebar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  background: var(--ws-olive, #6f7b61);
+  border:1px solid var(--ws-border, #5e6a55);
+  border-radius:6px 6px 0 0;
+}
+
+.ws-mode--ship .ws-titleinput{
+  flex:1 1 auto;
+  min-width:0;
+  height:28px;
+  padding:3px 8px;
+  border:1px solid var(--ws-border, #5e6a55);
+  border-radius:4px;
+  background:#fff;
+}
+
+.ws-mode--ship .ws-size{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:4px 8px;
+  border:1px solid rgba(255,255,255,0.35);
+  border-radius:4px;
+  color:#fff;
+  white-space:nowrap;
+}
+
+.ws-mode--ship .ws-size input{
+  width:130px;              /* adjust to taste */
+  height:24px;
+  padding:2px 6px;
+  border:1px solid rgba(255,255,255,0.35);
+  border-radius:4px;
+  background:rgba(255,255,255,0.12);
+  color:#fff;
+}
+
+.ws-mode--ship .ws-size input::placeholder{
+  color:rgba(255,255,255,0.75);
+}
+
+/* Optional: if your ship header panel has rounded corners, ensure titlebar matches */
+.ws-mode--ship .ws-panel > .ws-titlebar + .ws-block{
+  border-top-left-radius:0;
+  border-top-right-radius:0;
+}
+/* =========================
+   SHIP HEADER tweaks
+   ========================= */
+
+/* Make NAME look like NPC “PANGOSKA” header text (no input box visible) */
+.ws-mode--ship .ws-titleinput--ship{
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  height: auto;
+  line-height: 1;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 18px; /* match your NPC header size; adjust if needed */
+}
+
+/* Keep it editable but remove focus ring/box styling */
+.ws-mode--ship .ws-titleinput--ship:focus{
+  outline: none;
+  box-shadow: none;
+}
+
+/* Remove the extra “box around motif” by flattening the container */
+.ws-mode--ship .ws-size--ship{
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  gap: 8px;
+}
+
+/* Style the Type input like the NPC size field (not boxed container) */
+.ws-mode--ship .ws-typeinput{
+  width: 130px;
+  height: 24px;
+  padding: 2px 6px;
+  border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 4px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+.ws-mode--ship .ws-typeinput::placeholder{
+  color: rgba(255,255,255,0.75);
+}
+
+/* Ensure the titlebar still lays out correctly */
+.ws-mode--ship .ws-titlebar--ship{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+/* Ship titlebar: force clean rounded corners */
+.ws-mode--ship .ws-titlebar{
+  border-radius: 6px 6px 0 0;
+  overflow: hidden;                 /* key: clips inner corners */
+  background-clip: padding-box;     /* reduces corner “seams” */
+}
+
+/* If the motif box still causes seams, remove its outer background/border */
+.ws-mode--ship .ws-titlebar .ws-size--ship{
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+/* Keep the motif input styled without creating a second rounded border seam */
+.ws-mode--ship .ws-titlebar .ws-size--ship input{
+  border-radius: 4px;
+}
+/* === SHIP HEADER PANEL: ONE rounded container, header fill painted by the panel === */
+.ws-mode--ship .ws-panel.ws-ship-header{
+  position: relative;
+  border-radius: 8px;     /* MUST match your .ws-panel radius */
+  overflow: hidden;       /* clips the header fill cleanly */
+  padding: 0;             /* IMPORTANT: prevents corner gaps from panel padding */
+}
+
+/* Paint the green header bar as part of the panel, so it clips perfectly */
+.ws-mode--ship .ws-panel.ws-ship-header::before{
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 44px;           /* set to your titlebar height */
+  background: #6f7b62;    /* EXACT same green you use for NPC titlebar */
+  z-index: 0;
+}
+
+/* Titlebar no longer owns the background (prevents anti-aliased corner seams) */
+.ws-mode--ship .ws-panel.ws-ship-header .ws-titlebar{
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  border-radius: 0;
+  margin: 0;
+  padding: 10px;          /* move spacing here since panel padding is now 0 */
+}
+
+/* Body content spacing (since panel padding is 0) */
+.ws-mode--ship .ws-panel.ws-ship-header .ws-block{
+  padding: 10px;
+}
+/* =========================
+   SHIP — STAKES
+   ========================= */
+
+.ws-mode--ship .ws-stakes-row{
+  display:flex;
+  justify-content:center;     /* center the pair */
+  align-items:center;
+  gap:40px;                   /* space between Used and Total */
+  padding:18px 0;             /* makes the panel taller */
+}
+
+.ws-mode--ship .ws-stake-col{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+}
+
+/* Labels (USED / TOTAL) */
+.ws-mode--ship .ws-stake-col .ws-item-label{
+  font-weight:800;
+  font-size:14px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+
+/* Input fields */
+.ws-mode--ship .ws-stake-col input{
+  width:90px;
+  height:42px;                /* taller */
+  font-size:24px;             /* bigger number */
+  font-weight:700;
+  text-align:center;
+  border-radius:6px;
+}
+
+/* Optional slash between values */
+.ws-mode--ship .ws-stakes-row::after{
+  content:"/";
+  position:absolute;
+  transform:translateY(4px);
+  font-size:26px;
+  font-weight:700;
+  opacity:0.6;
+}
+/* Ship Reputation: allow 3 pips without wrapping */
+.ws-mode--ship .ws-mire-pips--3{
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 6px;
+  align-items: center;
+}
+
