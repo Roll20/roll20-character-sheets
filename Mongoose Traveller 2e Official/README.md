@@ -122,5 +122,19 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 ### Version 1.1.09
 - Added custom Characteristics to NPC to allow values for Attitude, Influence, Power etc. to be captured
 
+### Version 1.1.10
+- Fixed rounding error on carry capacity
+- Addition of Ship's Ledger
+- Addition of highly detailed Ship Combat tab (with help from Roll20 member and superstar TrooperSJP)
+- Fix to Robot parsing on drag'n'drop
+
+### Version 1.1.11
+- Added STR modifier when weapon range is 'Melee' as per rules
+- Added repeating groups under all ship sheet components to allow for extended/custom/2300AD entries
+
+### Version 1.1.12
+- Added Salvage tab to Trade to allow for free stuff Travellers get
+- Fixed Consolidate button in Manifest for Trade to only consolidate where price paid and commodity match (and ensure salvage does not get consolidated)
+
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 

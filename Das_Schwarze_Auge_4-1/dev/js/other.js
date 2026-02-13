@@ -1,4 +1,4 @@
-/* other begin */
+/* other start */
 /*
 	calcCritLevels
 Calculates the required d20 rolls for critical success/failure by check type
