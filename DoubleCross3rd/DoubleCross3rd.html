@@ -96,6 +96,8 @@
 					<option value="12" data-i18n="i_syndrome_item_12">솔라리스</option>
 					<option value="13" data-i18n="i_syndrome_item_13">우로보로스</option>
 					<option value="14" data-i18n="i_syndrome_item_14">아자토스</option>
+					<option value="15" data-i18n="i_syndrome_item_15">미스틸테인</option>
+					<option value="16" data-i18n="i_syndrome_item_16">글레이프니르</option>
 				</select>
 			</div>
 			<div class="sheet-item">
@@ -115,6 +117,8 @@
 					<option value="12" data-i18n="i_syndrome_item_12">솔라리스</option>
 					<option value="13" data-i18n="i_syndrome_item_13">우로보로스</option>
 					<option value="14" data-i18n="i_syndrome_item_14">아자토스</option>
+					<option value="15" data-i18n="i_syndrome_item_15">미스틸테인</option>
+					<option value="16" data-i18n="i_syndrome_item_16">글레이프니르</option>
 				</select>
 			</div>
 			<div class="sheet-item">
@@ -134,6 +138,8 @@
 					<option value="12" data-i18n="i_syndrome_item_12">솔라리스</option>
 					<option value="13" data-i18n="i_syndrome_item_13">우로보로스</option>
 					<option value="14" data-i18n="i_syndrome_item_14">아자토스</option>
+					<option value="15" data-i18n="i_syndrome_item_15">미스틸테인</option>
+					<option value="16" data-i18n="i_syndrome_item_16">글레이프니르</option>
 				</select>
 			</div>
 		</div>
@@ -184,7 +190,7 @@
   <input type="text" name="attr_money" value="(@{spec04}*2)+(@{spec04_02}*2)+@{money_bonus}" placeholder="0" readonly />
 
   <!-- 보정 입력용 칸 (직접 입력 가능) -->
-  <input type="number" name="attr_money_bonus" value="0" placeholder="0"  title="D 로이스, 아이템, 이펙트 등으로 추가되는 상비화 포인트를 입력하세요."/>
+  <input type="number" name="attr_money_bonus" value="0" placeholder="0" />
 </div>
 
 				<div>
@@ -234,7 +240,15 @@
 	</div>
 
 	<div class="sheet-reduction-section">
-		<div class="sheet-tit" data-i18n="i_reduction">침식치</div>
+		<div class="sheet-tit sheet-reduction-title"> 침식치
+
+			<select name="attr_is_reduction" class="sheet-reduction-select">
+				<option value="0">EA</option>
+				<option value="1">코어</option>
+				<option value="2">기원종</option>
+			</select>
+		</div>
+
 		<div class="sheet-form">
 			<input type="number" name="attr_add_reduction" value="0" placeholder="0" class="sheet-point" />
 			<span>+</span>
@@ -501,22 +515,27 @@
 		<div class="sheet-flip-content">
 			<div class="sheet-sub-title" data-i18n="i_d_lois">D 로이스</div>
 			<div class="sheet-table">
-				<div class="sheet-thead">
-					<div class="sheet-row">
-						<div class="sheet-dic"></div>
-						<div class="sheet-no">No.</div>
-						<div class="sheet-name" data-i18n="i_name">이름</div>
-						<div data-i18n="i_effect_txt">효과</div>
+  				<div class="sheet-thead">
+    					<div class="sheet-row">
+    						<div class="sheet-dic"></div>
+    						<div class="sheet-no">No.</div>
+    						<div class="sheet-name" data-i18n="i_name">이름</div>
+    						<div data-i18n="i_effect_txt">효과</div>
 					</div>
 				</div>
-				<div class="sheet-row">
-					<div class="sheet-dic"><button type="roll" class="sheet-dice" value="&{template:Dx3Dice} @{template_name} {{title=@{lois0_tit}}}{{subtitle=@{i_d_lois} | No.@{lois0_number}}}{{desc=@{lois0_desc}}}"></button></div>
-					<div class="sheet-no"><input type="text" name="attr_lois0_number" value="" class="sheet-tac" /></div>
-					<div class="sheet-name"><input type="text" name="attr_lois0_tit" value="" class="sheet-tac" /></div>
-					<div><input type="text" name="attr_lois0_desc" value="" /></div>
-				</div>
-			</div>
 
+			<div class="sheet-tbody">
+			<fieldset class="repeating_dlois">
+				<div class="sheet-row">
+					<div class="sheet-dic"><button type="roll" class="sheet-dice"value="&{template:Dx3Dice} @{template_name}{{title=@{dlois_tit}}}{{subtitle=@{i_d_lois} | No.@{dlois_number}}}{{desc=@{dlois_desc}}}"></button></div>
+
+					<div class="sheet-no"><input type="text" name="attr_dlois_number" value="" class="sheet-tac" /></div>
+					<div class="sheet-name"><input type="text" name="attr_dlois_tit" value="" class="sheet-tac" /></div>
+					<div><input type="text" name="attr_dlois_desc" value="" /></div>
+				</div>
+			</fieldset>
+		</div>
+	</div>
 
 			<div class="sheet-sub-title" data-i18n="i_e_lois">E 로이스</div>
 			<div class="sheet-table">
@@ -534,7 +553,7 @@
 					</div>
 				</div>
 				<div class="sheet-tbody">
-					<fieldset class="repeating_easyeffect">
+					<fieldset class="repeating_elois">
 						<div class="sheet-table-item">
 							<input type="hidden" class="sheet-chk-flip" name="attr_elois_eff_view" value="" />
 							<div class="sheet-row">
@@ -1189,9 +1208,60 @@
 <!-- 스크립트 작업 -->
 
 <script type="text/worker">
-	function getreduction_effect(type) {
+	function getreduction_effect(type, is_reduction) {
 		var data = {0:0,1:0}; // 1 - 다이스 / 2 - 이펙트 레벨
 
+		/* 기원종 전용 */
+	if (is_reduction == 2) {
+		if (type >= 80) { // 침식치 80 이상
+			data[1] = 1;
+		}
+		if (type >= 100) { // 침식치 100 이상
+			data[1] = 2;
+		}
+		if (type >= 150) { // 침식치 150 이상
+			data[1] = 3;
+		}
+		if (type >= 200) { // 침식치 200 이상
+			data[1] = 4;
+		}
+
+		return data;
+	}
+
+		/* 코어 */
+	if (is_reduction == 1) {
+		if(type >= 60) { // 침식치 60 이상
+			data[0] = 1;
+		}
+		if(type >= 80) { // 침식치 80 이상
+			data[0] = 2;
+		}
+		if(type >= 100) { // 침식치 100 이상
+			data[0] = 3;
+			data[1] = 1;
+		}
+		if(type >= 130) { // 침식치 130 이상
+			data[0] = 4;
+		}
+		if(type >= 160) { // 침식치 160 이상
+			data[0] = 5;			
+			data[1] = 2;
+		}
+		if(type >= 200) { // 침식치 200 이상
+			data[0] = 6;
+		}
+		if(type >= 240) { // 침식치 240 이상
+			data[0] = 7;
+		}
+		if(type >= 300) { // 침식치 300 이상
+			data[0] = 8;
+		}
+
+		return data;
+	}
+
+		/* 기본(EA) */
 		if(type >= 60) { // 침식치 60 이상
 			data[0] = 1;
 		}
@@ -1342,19 +1412,21 @@
 		});
 	});
 
-	on("change:reduction change:reduction_max change:base_reduction change:add_reduction", function() {
-		getAttrs(["reduction", "reduction_max", "base_reduction", "add_reduction"], function(values) {
+	on("change:reduction change:reduction_max change:base_reduction change:add_reduction change:is_reduction", function() {
+		getAttrs(["reduction", "reduction_max", "base_reduction", "add_reduction", "is_reduction"], function(values) {
 			
 			// 최종 침식치
 			var b_reduction = values.base_reduction * 1;
 			var t_reduction = b_reduction + (values.add_reduction *1);
+			if (values.reduction * 1 !== t_reduction) {
 			setAttrs({reduction:t_reduction});
+		}
 			var chk_reduction = t_reduction > values.reduction_max ? values.reduction_max : t_reduction;
 			setAttrs({hide_reduction:chk_reduction});
 
 			// 침식치 별 수정 효과 (이펙트 레벨 및 최종 다이스 효과)
 			// -- 이펙트 다이스 효과는 콤보에서만 설정하도록 한다.
-			var red_effect = getreduction_effect(t_reduction);
+			var red_effect = getreduction_effect(t_reduction, values.is_reduction * 1);
 			var add_dice = red_effect[0]; // 판정 다이스 업
 			var add_lv = red_effect[1]; // 이펙트 레벨업
 
@@ -1364,8 +1436,8 @@
 			// 2) 추가 다이스
 			setAttrs({add_dice:add_dice});
 
-			let max = values.reduction_max;
-			let now = values.reduction;
+			let max = values.reduction_max * 1 || 0;
+			let now = t_reduction;
 			let pers = (now == 0 || max == 0) ? 0 : now/max*100;
 			pers = Math.floor(pers);
 			setAttrs({reduction_per: pers});
