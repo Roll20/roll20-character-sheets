@@ -18824,7 +18824,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 						<div class="grid-item">
 							<input type="number" name="attr_vehicle_hit_points" value="0" title="Macro: @{NAME|vehicle_hit_points}" />
 							<span>/</span>
-							<input type="number" name="attr_vehicle_hit_points_max" readonly value="0" title="Macro: @{NAME|vehicle_hit_points_max}" />
+							<input type="number" name="attr_vehicle_hit_points_max" readonly title="Macro: @{NAME|vehicle_hit_points_max}" />
 						</div>
 						<div class="grid-item">
 							<input type="number" name="attr_vehicle_major_wound_threshold" readonly value="11" title="Macro: @{NAME|vehicle_major_wound_threshold}" />
@@ -19151,7 +19151,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 						<div class="grid-item">
 							<input type="number" name="attr_vehicle_hit_points" value="0" title="Macro: @{NAME|vehicle_hit_points}" />
 							<span>/</span>
-							<input type="number" name="attr_vehicle_hit_points_max" readonly value="0" title="Macro: @{NAME|vehicle_hit_points_max}" />
+							<input type="number" name="attr_vehicle_hit_points_max" readonly title="Macro: @{NAME|vehicle_hit_points_max}" />
 						</div>
 						<div class="grid-item">
 							<input type="number" name="attr_vehicle_major_wound_threshold" readonly value="11" readonly title="Macro: @{NAME|vehicle_major_wound_threshold}" />
@@ -19197,18 +19197,20 @@ Select the indent level of the spell. This is handy to help show the spell belon
 					<div class="grid-item">
 						<select name="attr_vehicle_hit_location_type" title="Macro: @{NAME|vehicle_hit_location_type}">
 							<option value="select" data-i18n="option-select">--Select--</option>
-							<option value="aircraft" data-i18n="option-aircraft">Aircraft</option>
+							<option value="aircraft-open" data-i18n="option-aircraft-open">Aircraft (Open)</option>
+							<option value="aircraft-closed" data-i18n="option-aircraft-closed">Aircraft (Closed)</option>
 							<option value="automobile" data-i18n="option-automobile">Automobile</option>
-							<option value="biplane" data-i18n="option-biplane">Biplane</option>
-							<option value="helicopter" data-i18n="option-helicopter">Helicopter</option>
-							<option value="hovercraft" data-i18n="option-hovercraft">Hovercraft</option>
-							<option value="monoplace" data-i18n="option-monoplane">Monoplane</option>
+							<option value="boat" data-i18n="option-boat">Boat</option>
+							<option value="helicopter-light" data-i18n="option-helicopter-light">Helicopter (Light)</option>
+							<option value="helicopter-utility" data-i18n="option-helicopter-utility">Helicopter (Utility)</option>
 							<option value="motorcycle" data-i18n="option-motorcycle">Motorcycle</option>
-							<option value="row-boat" data-i18n="option-row-boat">Row Boat</option>
-							<option value="sail-boat" data-i18n="option-sailboat">Sailboat</option>
-							<option value="speed-boat" data-i18n="option-speed-boat">Speed Boat</option>
-							<option value="submarine" data-i18n="option-submarine">Submarine</option>
-							<option value="tank" data-i18n="option-tank">Tank</option>																
+							<option value="humanoid" data-i18n="option-humanoid">Humanoid</option>
+							<option value="ichthyoid" data-i18n="option-ichthyoid">Ichthyoid</option>
+							<option value="octopod" data-i18n="option-octopod">Octopod</option>
+							<option value="quadruped" data-i18n="option-quadruped">Quadruped</option>
+							<option value="vermiform" data-i18n="option-vermiform">Vermiform</option>
+							<option value="wagon" data-i18n="option-wagon">Wagon</option>
+							<option value="tank" data-i18n="option-tank">Tank</option>
 						</select>
 						<button type="action" name="act_vehicle_locations_apply" class="reset" title="Apply the selected hit location type"><span data-i18n="apply-label">Apply</span></button>
 					</div>
@@ -19738,7 +19740,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 						<div class="grid-item">
 							<input type="number" name="attr_vehicle_hit_points" value="0" title="Macro: @{NAME|vehicle_hit_points}" />
 							<span>/</span>
-							<input type="number" name="attr_vehicle_hit_points_max" readonly value="0" title="Macro: @{NAME|vehicle_hit_points_max}" />
+							<input type="number" name="attr_vehicle_hit_points_max" readonly title="Macro: @{NAME|vehicle_hit_points_max}" />
 						</div>
 						<div class="grid-item">
 							<input type="number" name="attr_vehicle_major_wound_threshold" readonly value="11" title="Macro: @{NAME|vehicle_major_wound_threshold}" />
@@ -34714,6 +34716,177 @@ B378
 		]],
 	]);
 	
+	// predefined vehicle hit locations
+	const VEHICLE_HIT_LOCATIONS_JSON = new Map([
+		["aircraft-open", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Large-Area Injury. B400" },
+			{ key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 50, notes: "If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Powered vehicle. tight-beam x2 damage; impaling/piercing x3 damage." },
+			{ key: "open-cabin", display: "Open Cabin", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "If a person is present they are struck instead of the vehicle. No DR. B555." },
+			{ key: "wing-1", display: "Wing, left", penalty: -2, DR: 0, hp_divisor: 4, speed_percentage: 0, notes: "If crippled, lose control and crash." },
+			{ key: "wing-2", display: "Wing, right", penalty: -2, DR: 0, hp_divisor: 4, speed_percentage: 0, notes: "If crippled, lose control and crash." },
+			{ key: "wheel-1", display: "Wheel, left", penalty: -4, DR: 0, hp_divisor: 4, speed_percentage: 0, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+			{ key: "wheel-2", display: "Wheel, right", penalty: -4, DR: 0, hp_divisor: 4, speed_percentage: 0, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+		]],
+		["aircraft-closed", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Large-Area Injury. B400" },
+			{ key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 50, notes: "If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Powered vehicle. tight-beam x2 damage; impaling/piercing x3 damage." },
+			{ key: "glass-window-large", display: "Glass Window, large", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Check for occupant hit, if hit half DR. Occupant Hit Table B555." },
+			{ key: "wing-1", display: "Wing, left", penalty: -2, DR: 0, hp_divisor: 4, speed_percentage: 0, notes: "If crippled, lose control and crash." },
+			{ key: "wing-2", display: "Wing, right", penalty: -2, DR: 0, hp_divisor: 4, speed_percentage: 0, notes: "If crippled, lose control and crash." },
+			{ key: "wheel-1", display: "Wheel, left", penalty: -4, DR: 0, hp_divisor: 4, speed_percentage: 0, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+			{ key: "wheel-2", display: "Wheel, right", penalty: -4, DR: 0, hp_divisor: 4, speed_percentage: 0, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+		]],
+		["automobile", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Large-Area Injury. B400" },
+			{ key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 50, notes: "If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Powered vehicle. tight-beam x2 damage; impaling/piercing x3 damage." },
+			{ key: "glass-window-large", display: "Glass Window, large", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Check for occupant hit, if hit half DR. Occupant Hit Table B555." },
+			{ key: "wheel-1", display: "Wheel, front left", penalty: -4, DR: 0, hp_divisor: 8, speed_percentage: 25, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+			{ key: "wheel-2", display: "Wheel, front right", penalty: -4, DR: 0, hp_divisor: 8, speed_percentage: 25, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+			{ key: "wheel-3", display: "Wheel, rear left", penalty: -4, DR: 0, hp_divisor: 8, speed_percentage: 25, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+			{ key: "wheel-4", display: "Wheel, rear right", penalty: -4, DR: 0, hp_divisor: 8, speed_percentage: 25, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+		]],
+		["boat", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Large-Area Injury. B400" },
+			{ key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 50, notes: "If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Powered vehicle. tight-beam x2 damage; impaling/piercing x3 damage." },
+			{ key: "open-cabin", display: "Open Cabin", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "If a person is present they are struck instead of the vehicle. No DR. B555." },
+		]],
+		["helicopter-light", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Large-Area Injury. B400" },
+			{ key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 50, notes: "If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Powered vehicle. tight-beam x2 damage; impaling/piercing x3 damage." },
+			{ key: "glass-window-large", display: "Glass Window, large", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Check for occupant hit, if hit half DR. Occupant Hit Table B555." },
+			{ key: "helicoptor-rotors", display: "Rotors", penalty: -2, DR: 0, hp_divisor: 3, speed_percentage: 0, notes: "If crippled, lose control and crash." },
+			{ key: "wheel-1", display: "Wheel, retractable, front", penalty: -4, DR: 0, hp_divisor: 6, speed_percentage: 0, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+			{ key: "wheel-2", display: "Wheel, retractable, rear left", penalty: -4, DR: 0, hp_divisor: 6, speed_percentage: 0, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+			{ key: "wheel-3", display: "Wheel, retractable, rear right", penalty: -4, DR: 0, hp_divisor: 6, speed_percentage: 0, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+		]],
+		["helicopter-utility", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Large-Area Injury. B400" },
+			{ key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 50, notes: "If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Powered vehicle. tight-beam x2 damage; impaling/piercing x3 damage." },
+			{ key: "glass-window-small", display: "Glass Window, small", penalty: -7, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Check for occupant hit, if hit half DR. Occupant Hit Table B555." },
+			{ key: "helicoptor-rotors", display: "Rotors", penalty: -2, DR: 0, hp_divisor: 3, speed_percentage: 0, notes: "If crippled, lose control and crash." },
+			{ key: "runner-1", display: "Runner, left", penalty: -4, DR: 0, hp_divisor: 3, speed_percentage: 0, notes: "Crippled runner topples vehicle." },
+			{ key: "runner-2", display: "Runner, right", penalty: -4, DR: 0, hp_divisor: 3, speed_percentage: 0, notes: "Crippled runner topples vehicle." },
+		]],
+		["motorcycle", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Large-Area Injury. B400" },
+			{ key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 50, notes: "If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Powered vehicle. tight-beam x2 damage; impaling/piercing x3 damage." },
+			{ key: "exposed-rider", display: "Exposed Rider", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "If a person is present they are struck instead of the vehicle. No DR. B555." },
+			{ key: "wheel-1", display: "Wheel, front", penalty: -4, DR: 0, hp_divisor: 4, speed_percentage: 50, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+			{ key: "wheel-2", display: "Wheel, rear", penalty: -4, DR: 0, hp_divisor: 4, speed_percentage: 50, notes: "Any damage, roll vs HT. Failure cripples the wheel." },
+		]],
+		["humanoid", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Large-Area Injury. B400" },
+			{ key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "left-eye", display: "Left Eye", penalty: -9, DR: 0, hp_divisor: 10, speed_percentage: 0, notes: "" },
+			{ key: "right-eye", display: "Right Eye", penalty: -9, DR: 0, hp_divisor: 10, speed_percentage: 0, notes: "" },
+			{ key: "left-arm", display: "Left Arm", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 0, notes: "" },
+			{ key: "left-hand", display: "Left Hand", penalty: -4, DR: 0, hp_divisor: 3, speed_percentage: 0, notes: "" },
+			{ key: "right-arm", display: "Right Arm", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 0, notes: "" },
+			{ key: "right-hand", display: "Right Hand", penalty: -4, DR: 0, hp_divisor: 3, speed_percentage: 0, notes: "" },
+			{ key: "left-leg", display: "Left Leg", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 50, notes: "" },
+			{ key: "left-foot", display: "Left Foot", penalty: -4, DR: 0, hp_divisor: 3, speed_percentage: 50, notes: "" },
+			{ key: "right-leg", display: "Right Leg", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 50, notes: "" },
+			{ key: "right-foot", display: "Right Foot", penalty: -4, DR: 0, hp_divisor: 3, speed_percentage: 50, notes: "" },
+		]],
+		["ichthyoid", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Large-Area Injury. B400" },
+			{ key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "left-eye", display: "Left Eye", penalty: -8, DR: 0, hp_divisor: 10, speed_percentage: 0, notes: "" },
+			{ key: "right-eye", display: "Right Eye", penalty: -8, DR: 0, hp_divisor: 10, speed_percentage: 0, notes: "" },
+			{ key: "left-fin", display: "Left Fin", penalty: -2, DR: 0, hp_divisor: 3, speed_percentage: 25, notes: "" },
+			{ key: "right-fin", display: "Right Fin", penalty: -2, DR: 0, hp_divisor: 3, speed_percentage: 25, notes: "" },
+			{ key: "top-fin", display: "Top Fin", penalty: -4, DR: 0, hp_divisor: 3, speed_percentage: 25, notes: "" },
+			{ key: "bottom-fin", display: "Bottom Fin", penalty: -2, DR: 0, hp_divisor: 3, speed_percentage: 25, notes: "" },
+			{ key: "tail", display: "Tail", penalty: -3, DR: 0, hp_divisor: 3, speed_percentage: 25, notes: "" },
+		]],
+		["octopod", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Large-Area Injury. B400" },
+			{ key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "brain", display: "Brain", penalty: -7, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "left-eye", display: "Left Eye", penalty: -8, DR: 0, hp_divisor: 10, speed_percentage: 0, notes: "" },
+			{ key: "right-eye", display: "Right Eye", penalty: -8, DR: 0, hp_divisor: 10, speed_percentage: 0, notes: "" },
+			{ key: "arm-1", display: "Arm #1", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 12.5, notes: "" },
+			{ key: "arm-2", display: "Arm #2", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 12.5, notes: "" },
+			{ key: "arm-3", display: "Arm #3", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 12.5, notes: "" },
+			{ key: "arm-4", display: "Arm #4", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 12.5, notes: "" },
+			{ key: "arm-5", display: "Arm #5", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 12.5, notes: "" },
+			{ key: "arm-6", display: "Arm #6", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 12.5, notes: "" },
+			{ key: "arm-7", display: "Arm #7", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 12.5, notes: "" },
+			{ key: "arm-8", display: "Arm #8", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 12.5, notes: "" },
+		]],
+		["quadruped", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Large-Area Injury. B400" },
+			{ key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "left-eye", display: "Left Eye", penalty: -9, DR: 0, hp_divisor: 10, speed_percentage: 0, notes: "" },
+			{ key: "right-eye", display: "Right Eye", penalty: -9, DR: 0, hp_divisor: 10, speed_percentage: 0, notes: "" },
+			{ key: "left-wing", display: "Left Wing", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 0, notes: "If crippled, lose control and crash." },
+			{ key: "right-wing", display: "Right Wing", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 0, notes: "If crippled, lose control and crash." },
+			{ key: "left-foreleg", display: "Left Foreleg", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 25, notes: "" },
+			{ key: "left-foreleg-foot", display: "Left Foreleg Foot", penalty: -4, DR: 0, hp_divisor: 3, speed_percentage: 25, notes: "" },
+			{ key: "right-foreleg", display: "Right Foreleg", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 25, notes: "" },
+			{ key: "right-foreleg-foot", display: "Right Foreleg Foot", penalty: -4, DR: 0, hp_divisor: 3, speed_percentage: 25, notes: "" },
+			{ key: "left-hind-leg", display: "Left Hind Leg", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 25, notes: "" },
+			{ key: "left-hind-foot", display: "Left Hind Foot", penalty: -4, DR: 0, hp_divisor: 3, speed_percentage: 25, notes: "" },
+			{ key: "right-hind-leg", display: "Right Hind Leg", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 25, notes: "" },
+			{ key: "right-hind-foot", display: "Right Hind Foot", penalty: -4, DR: 0, hp_divisor: 3, speed_percentage: 25, notes: "" },
+			{ key: "tail", display: "Tail", penalty: -3, DR: 0, hp_divisor: 3, speed_percentage: 0, notes: "" },
+		]],
+		["vermiform", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 50, notes: "Large-Area Injury. B400" },
+			{ key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, speed_percentage: 0, notes: "" },
+			{ key: "left-eye", display: "Left Eye", penalty: -8, DR: 0, hp_divisor: 10, speed_percentage: 0, notes: "" },
+			{ key: "right-eye", display: "Right Eye", penalty: -8, DR: 0, hp_divisor: 10, speed_percentage: 0, notes: "" },
+		]],
+		["wagon", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 50, notes: "Large-Area Injury. B400" },
+			{ key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Check occupant hit." },
+			{ key: "wheel-1", display: "Wheel #1", penalty: -4, DR: 0, hp_divisor: 8, speed_percentage: 25, notes: "If damaged, roll HT to avoid flat tire." },
+			{ key: "wheel-2", display: "Wheel #2", penalty: -4, DR: 0, hp_divisor: 8, speed_percentage: 25, notes: "If damaged, roll HT to avoid flat tire." },
+			{ key: "wheel-3", display: "Wheel #3", penalty: -4, DR: 0, hp_divisor: 8, speed_percentage: 25, notes: "If damaged, roll HT to avoid flat tire." },
+			{ key: "wheel-4", display: "Wheel #4", penalty: -4, DR: 0, hp_divisor: 8, speed_percentage: 25, notes: "If damaged, roll HT to avoid flat tire." },
+		]],
+		["tank", [
+			{ key: "large-area", display: "Large-Area", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 50, notes: "Large-Area Injury. B400" },
+			{ key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Check occupant hit. If powered vehicle sustains Major Wound, roll HT. B554" },
+			{ key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, speed_percentage: 0, notes: "Tight-beam burning x2 damage. Impaling/piercing x3 damage." },
+			{ key: "caterpillar-track-left", display: "Left Track", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 100, notes: "If track disabled, move is 0." },
+			{ key: "caterpillar-track-left", display: "Main Rotor", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 100, notes: "If track disabled, move is 0." },
+			{ key: "main-turrent", display: "Main Turrent", penalty: -2, DR: 0, hp_divisor: 2, speed_percentage: 0, notes: "If major wound and failed HT roll, turret is knocked out." },
+			{ key: "exposed-weapon", display: "Exposed Weapon", penalty: -7, DR: 0, hp_divisor: 5, speed_percentage: 0, notes: "" },
+		]],
+	]);
+
 	let rawRollNotes = {};
 
 	
@@ -46994,6 +47167,101 @@ B378
 	
 	}
 
+	// handle vehicle hit location call to action
+	on("clicked:vehicle_locations_apply", (event) => {
+	
+		clearVehicleHitLocations();
+	
+		addVehicleHitLocations();
+	
+	});
+	
+	/**
+	 * delete all the hit locations from the locations table
+	 *
+	 */
+	function clearVehicleHitLocations() {
+	
+		getSectionIDs("repeating_vehicle-hit-location-table", (ids) => {
+	
+			// loop through the rows
+			for (let i = 0; i < ids.length; i++) {
+	
+				removeRepeatingRow("repeating_vehicle-hit-location-table_" + ids[i]);
+	
+			}
+	
+		});
+	
+	}
+	
+	/**
+	 * Add the hit locations based on the selected hit location type
+	 */
+	function addVehicleHitLocations() {
+	
+		let fields = [
+			"vehicle_hit_location_type",
+			"vehicle_hit_points_max",
+		];
+	
+		getAttrs(fields, values => {
+	
+			let type = values.vehicle_hit_location_type;
+	
+			let hitPoints = Number(values.vehicle_hit_points_max);
+	
+			let locations = VEHICLE_HIT_LOCATIONS_JSON.get(type);
+	
+			let rows = {};
+	
+			// loop through each location object in the array
+			// location = {key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			locations.forEach(location => {
+	
+				let id = generateRowID();
+	
+				let penalty = Number(location.penalty);
+	
+				let divisor = Number(location.hp_divisor);
+	
+				let crippled = 0;
+	
+				if (divisor > 1) {
+					crippled = Math.floor(hitPoints / divisor) + 1;
+				}
+	
+				rows[`repeating_vehicle-hit-location-table_${id}_key`] = location.key;
+	
+				rows[`repeating_vehicle-hit-location-table_${id}_name`] = location.display;
+	
+				rows[`repeating_vehicle-hit-location-table_${id}_layer_1_front`] = location.DR;
+	
+				rows[`repeating_vehicle-hit-location-table_${id}_layer_1_back`] = location.DR;
+	
+				rows[`repeating_vehicle-hit-location-table_${id}_layer_summary_front`] = location.DR;
+	
+				rows[`repeating_vehicle-hit-location-table_${id}_layer_summary_back`] = location.DR;
+	
+				rows[`repeating_vehicle-hit-location-table_${id}_hit_modifier`] = penalty;
+	
+				rows[`repeating_vehicle-hit-location-table_${id}_divisor`] = location.hp_divisor;
+	
+				rows[`repeating_vehicle-hit-location-table_${id}_disabled`] = crippled;
+	
+				rows[`repeating_vehicle-hit-location-table_${id}_reduced_top_speed`] = location.speed_percentage;
+	
+				rows[`repeating_vehicle-hit-location-table_${id}_notes`] = location.notes;
+	
+			});
+	
+			setAttrs(rows);
+	
+		});
+	
+	
+	}
+	
 	function upgradeHitLocationPenaltiesToNewVersion() {
 
 		getAttrs(["hit_location_modifiers_upgraded", "size"], values => {
@@ -47400,7 +47668,7 @@ B378
 	}
 	
 	// check if a hit locations damage divisor changed
-	on(`change:repeating_hitlocation:divisor`, event => {
+	on(`change:repeating_hitlocation:divisor change:hit_points_max`, event => {
 	
 		updateHitLocationDisabledColumn();
 	
@@ -61125,7 +61393,7 @@ Characters with Skill: ${knowsSkill}`;
 
 	}
 
-	on("change:repeating_vehicle-hit-location-table:divisor", event => {
+	on("change:repeating_vehicle-hit-location-table:divisor change:vehicle_hit_points_max", event => {
 
 		if (event.sourceType !== "player") {
 			return;
