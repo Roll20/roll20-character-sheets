@@ -1,3 +1,7 @@
+### Version 2.48 (2026-02)
+- by Anduh: stops the sheet stretching too wide (started happening after 2.47 update)
+- minor code cleanup
+
 ### Version 2.47 (2026-01)
 - by Anduh: Update CSS so Settings Menu(cogwheel) text is readable in Roll20 Light Mode (was white on white)
 
