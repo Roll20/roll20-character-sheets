@@ -43,7 +43,10 @@
 			<div class="prof-info biginput">
 				<h3>ROLE ABILITIES</h3><input type=text spellcheck=false name="attr_RoleAbility" />
 			</div>
-			<div>
+
+			<input type="hidden" class="sheet-take-damage-panel-toggle" name="attr_take_damage_panel_toggle" value="0" />
+
+			<div class="role-ability-panel">
 				<div class="flex-table">
 					<div class="bg-black-2 skill-name">Role Ability Ranks</div>
 					<div class="bg-black-2 skill-rank">Rank</div>
@@ -95,8 +98,90 @@
 
 			<input type="hidden" name="attr_hp_max" />
 
+			<div class="take-damage-panel">
+				<div class="take-damage-flow">
+					<div class="sheet-bg-black sheet-take-damage-title">TAKE DAMAGE</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Damage Amount</div>
+						<div class="sheet-bg-white sheet-take-damage-input"><input type="number" name="attr_take_damage_amount" value="" /></div>
+					</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Damage Location</div>
+						<div class="sheet-bg-white sheet-take-damage-input">
+							<select name="attr_take_damage_location">
+								<option value="body">Body</option>
+								<option value="head">Head</option>
+							</select>
+						</div>
+					</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Armor Interaction</div>
+						<div class="sheet-bg-white sheet-take-damage-input">
+							<select name="attr_take_damage_armor_behaviour">
+								<option value="subrtract_armor">Normal</option>
+								<option value="ignore_half_armor">Ignore Half Armor</option>
+								<option value="ignore_armor_below">Ignore Armor Below</option>
+								<option value="bypass_armor">Bypass Armor</option>
+							</select>
+						</div>
+					</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Ignore Armor Below</div>
+						<div class="sheet-bg-white sheet-take-damage-input"><input type="number" name="attr_take_damage_ignore_armor_below_sp" value="7" />SP</div>
+					</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Ablate Armor By</div>
+						<div class="sheet-bg-white sheet-take-damage-input"><input type="number" name="attr_take_damage_armor_ablation" value="1" />SP</div>
+					</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Ablation location</div>
+						<div class="sheet-bg-white sheet-take-damage-input">
+							<select name="attr_take_damage_armor_ablation_location">
+								<option value="damage_location">Damage Location</option>
+								<option value="head_and_body">Head and Body</option>
+							</select>
+						</div>
+					</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Critical Injury</div>
+						<div class="sheet-bg-white sheet-take-damage-input">
+							<select name="attr_take_damage_critical_injury_bonus_damage">
+								<option value="none">No Bonus Damage</option>
+								<option value="bonus_damage">5 Bonus Damage</option>
+								<option value="bonus_damage_x2">5 Bonus Damage x2</option>
+							</select>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-flex-table">
+							<div class="sheet-bg-yellow sheet-take-damage-preview-label">New HP</div>
+							<div class="sheet-bg-yellow sheet-take-damage-preview"><input type="text" name="attr_take_damage_preview_hp" readonly /></div>
+						</div>
+						<div class="sheet-flex-table">
+							<div class="sheet-bg-yellow sheet-take-damage-preview-label">New Head HP</div>
+							<div class="sheet-bg-yellow sheet-take-damage-preview"><input type="text" name="attr_take_damage_preview_head_sp" readonly /></div>
+						</div>
+						<div class="sheet-flex-table">
+							<div class="sheet-bg-yellow sheet-take-damage-preview-label">New Body HP</div>
+							<div class="sheet-bg-yellow sheet-take-damage-preview"><input type="text" name="attr_take_damage_preview_body_sp" readonly /></div>
+						</div>
+						<div class="take-damage-main-buttons">
+							<button class="sheet-button-left" type="action" name="act_takedamagecalculate">Calculate</button>
+							<button class="sheet-button-left" type="action" name="act_takedamageapply">Apply</button>
+							<button type="action" name="act_takedamagecancel">Cancel</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<div class="hp-humanity">
-				<div class="white-bg"><h3>HIT POINTS</h3></div>
+				<div class="white-bg">
+					<h3>HIT POINTS</h3>
+					<input type="hidden" class="sheet-take-damage-button-flag" name="attr_take_damage_button_flag" value="0" />
+					<div class="sheet-take-damage-button">
+						<button type="action" name="act_takedamagepanel">Take Damage</button>
+					</div>
+				</div>
 				<div class="white-bg">
 					<span class="small">CURRENT</span>
 					<input type="number" name="attr_hp" />
@@ -107,7 +192,7 @@
 				</div>
 			</div>
 
-			<div class="hp-humanity">
+			<div class="hp-humanity humanity-panel">
 				<div class="white-bg"><h3>HUMANITY</h3></div>
 				<div class="white-bg">
 					<span class="small">CURRENT</span>
@@ -1721,6 +1806,24 @@
 				</div>
 			</div>
 
+			<div class="settings-row">
+				<h3>HIT POINTS CALCUATION OPTIONS</h3>
+				<div class="settings-help">
+					Show a "Take Damage" button next to your Hit Points attribute that will display a form to calculate damage based on armor interactions.
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">SHOW TAKE DAMAGE BUTTON</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="settings-toggle" name="attr_take_damage_button_flag" value="0" />
+							<button type="action" name="act_take_damage_button" class="settings-toggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 		</div>
 	</div>
 
@@ -3295,6 +3398,10 @@
 				const total = base + misc + stat;
 				output['total_' + skill] = total;
 			});
+
+			// Hide "take damage" panel on character sheet load.
+			take_damage_panel_clear_and_close(output);
+
 			setAttrs(output);
 		});
 	});
@@ -3414,6 +3521,7 @@
 		});
 	});
 
+	// If checkbox is clicked toggle a hidden attribute with same name and suffix of "_flag" appended.
 	const toggleList = [
 		"cbaudio","lefteye","righteye","rightarm","leftarm","neurallink","rightleg","leftleg","mooksheet",
 		"initiative_modifier", "armor_penalty_ref", "armor_penalty_dex", "armor_penalty_move"
@@ -3442,6 +3550,233 @@
 				});
 				setAttrs(output);
 			});
+		});
+	});
+	on('clicked:take_damage_button', function() {
+		getAttrs(['take_damage_button_flag'], function(v) {
+			const attrs = {};
+			attrs['take_damage_button_flag'] = v['take_damage_button_flag'] !== "1" ? "1" : "0";
+			if (attrs['take_damage_button_flag'] == "0") {
+				attrs['take_damage_panel_toggle'] = "0";
+			}
+			setAttrs(attrs);
+		});
+	});
+
+	// Set attribures to be passed to setAttrs function.
+	function take_damage_panel_clear_and_close(attrs) {
+		attrs["take_damage_panel_toggle"] = 0;
+		attrs["take_damage_amount"] = "";
+		attrs["take_damage_location"] = "body";
+		attrs["take_damage_armor_behaviour"] = "subrtract_armor";
+		attrs["take_damage_ignore_armor_below_sp"] = "7";
+		attrs["take_damage_armor_ablation"] = "1";
+		attrs["take_damage_armor_ablation_location"] = "";
+		attrs["take_damage_critical_injury_bonus_damage"] = "";
+	}
+
+	function take_damage_reset_preview(attrs) {
+		attrs["take_damage_preview_hp"] = "<click calculate>";
+		attrs["take_damage_preview_head_sp"] = "";
+		attrs["take_damage_preview_body_sp"] = "";
+	}
+
+	function isValidInteger(val) {
+		const num = +val;
+		return Number.isInteger(num);
+	}
+
+	// Fields used in take damage calculation.
+	const fields_used_in_take_damage_calc = [
+		"hp",
+		"HeadSP",
+		"BodySP",
+		"take_damage_amount",
+		"take_damage_armor_behaviour",
+		"take_damage_location",
+		"take_damage_armor_ablation",
+		"take_damage_ignore_armor_below_sp",
+		"take_damage_armor_ablation_location",
+		"take_damage_critical_injury_bonus_damage"
+	];
+	const selects_used_in_take_damage_calc = [
+		"take_damage_armor_behaviour",
+		"take_damage_location",
+		"take_damage_armor_ablation_location",
+		"take_damage_critical_injury_bonus_damage"
+	];
+
+	// Rest preview and hide apply button if any fields used to calculate the preview are clicked (pre-empting any changes).
+	fields_used_in_take_damage_calc.forEach(function(field_name) {
+		$20('input[name="attr_' + field_name + '"]').on('click', function (event) {
+			const attrs = {};
+			take_damage_reset_preview(attrs);
+			setAttrs(attrs);
+		});
+	});
+	selects_used_in_take_damage_calc.forEach(function(field_name) {
+		on(`change:${field_name}`, function() {
+			const attrs = {};
+			take_damage_reset_preview(attrs);
+			setAttrs(attrs);
+		});
+	});
+	
+	on("clicked:takedamagepanel", function() {
+		getAttrs(["take_damage_panel_toggle"], function(v) {
+			const attrs = {};
+			attrs["take_damage_panel_toggle"] = v["take_damage_panel_toggle"] !== "1" ? "1" : "0";
+			// Clear preview values when take damage panel loads
+			if (attrs["take_damage_panel_toggle"] == 1)
+			{
+				take_damage_reset_preview(attrs);
+			}
+			setAttrs(attrs);
+		});
+	});
+
+	on("clicked:takedamagecalculate", function() {
+		const get_attribute_names = [
+			"hp",
+			"HeadSP",
+			"BodySP",
+			"take_damage_amount",
+			"take_damage_armor_behaviour",
+			"take_damage_location",
+			"take_damage_armor_ablation",
+			"take_damage_ignore_armor_below_sp",
+			"take_damage_armor_ablation_location",
+			"take_damage_critical_injury_bonus_damage"
+		];
+		getAttrs(get_attribute_names, function(v) {
+
+			const attrs = {};
+
+			// Clear preview.
+			attrs["take_damage_preview_hp"] = "";
+			attrs["take_damage_preview_head_sp"] = "";
+			attrs["take_damage_preview_body_sp"] = "";
+
+			// Validate attributes or show error message.
+			if (v["hp"] === "" || ! isValidInteger(v["hp"])) {
+				attrs["take_damage_preview_hp"] = "<HP value invalid>";
+			} else if (v["HeadSP"] === "" || v["BodySP"] === "" || ! isValidInteger(v["HeadSP"]) || ! isValidInteger(v["BodySP"]) || v["HeadSP"] < 0 || v["BodySP"] < 0) {
+				attrs["take_damage_preview_hp"] = "<SP value invalid>";
+			} else if (v["take_damage_amount"] === "" || ! isValidInteger(v["take_damage_amount"]) || v["take_damage_amount"] == 0 || v["take_damage_amount"] < 0) {
+				attrs["take_damage_preview_hp"] = "<invalid damage>";
+			} else if (v["take_damage_ignore_armor_below_sp"] === "" || ! isValidInteger(v["take_damage_ignore_armor_below_sp"]) || v["take_damage_ignore_armor_below_sp"] < 0) {
+				attrs["take_damage_preview_hp"] = "<ignore armor invalid>";
+			} else if (v["take_damage_armor_ablation"] === "" || ! isValidInteger(v["take_damage_armor_ablation"]) || v["take_damage_armor_ablation"] < 0) {
+				attrs["take_damage_preview_hp"] = "<ablation invalid>";
+			} else {
+
+				const hp = parseInt(v["hp"])||0;
+				const BodySP = parseInt(v["BodySP"])||0;
+				const HeadSP = parseInt(v["HeadSP"])||0;
+				const take_damage_amount = parseInt(v["take_damage_amount"])||0;
+				const take_damage_location = v["take_damage_location"];
+				const take_damage_armor_behaviour = v["take_damage_armor_behaviour"];
+				const take_damage_armor_ablation = parseInt(v["take_damage_armor_ablation"])||0;
+				const take_damage_ignore_armor_below_sp = parseInt(v["take_damage_ignore_armor_below_sp"])||0;
+				const take_damage_armor_ablation_location = v["take_damage_armor_ablation_location"];
+				const take_damage_critical_injury_bonus_damage = v["take_damage_critical_injury_bonus_damage"];
+				
+				// set initial values for attributes
+				attrs["take_damage_preview_hp"] = hp;
+				attrs["take_damage_preview_head_sp"] = HeadSP;
+				attrs["take_damage_preview_body_sp"] = BodySP;
+
+				// vars
+				var armorSP;
+				var damage = 0;
+
+				// armor SP
+				if (take_damage_location == "head") {
+					armorSP = HeadSP;
+				} else {
+					armorSP = BodySP;	
+				}
+				if (take_damage_armor_behaviour == "bypass_armor") {
+					armorSP = 0;
+				} else if (take_damage_armor_behaviour == "ignore_half_armor") {
+					armorSP = Math.ceil(armorSP/2);
+				} else if (take_damage_armor_behaviour == "ignore_armor_below") {
+					if (armorSP < take_damage_ignore_armor_below_sp) {
+						armorSP = 0;
+					}
+				}
+
+				// damage amount
+				if (take_damage_amount > armorSP) {
+					damage = take_damage_amount - armorSP;
+				}
+				if (take_damage_location == "head") {
+					// Double damage to head.
+					damage *= 2;
+				}
+				attrs["take_damage_preview_hp"] -= damage;
+
+				// critical injury bonus damage
+				if (take_damage_critical_injury_bonus_damage == "bonus_damage") {
+					attrs["take_damage_preview_hp"] -= 5;
+				} else if (take_damage_critical_injury_bonus_damage == "bonus_damage_x2") {
+					attrs["take_damage_preview_hp"] -= 10;
+				}
+
+				// ablate armor
+				if (take_damage_armor_behaviour != "bypass_armor" && damage > 0) {
+					if (take_damage_armor_ablation_location == "head_and_body") {
+						attrs["take_damage_preview_head_sp"] -= take_damage_armor_ablation;
+						attrs["take_damage_preview_body_sp"] -= take_damage_armor_ablation;
+					} else if (take_damage_location == "head") {
+						attrs["take_damage_preview_head_sp"] -= take_damage_armor_ablation;
+					} else {
+						attrs["take_damage_preview_body_sp"] -= take_damage_armor_ablation;
+					}
+
+					// SP cannot be negative.
+					if (attrs["take_damage_preview_head_sp"] < 0) {
+						attrs["take_damage_preview_head_sp"] = 0
+					}
+					if (attrs["take_damage_preview_body_sp"] < 0) {
+						attrs["take_damage_preview_body_sp"] = 0
+					}
+				}
+			}
+
+			setAttrs(attrs);
+		});
+	});
+
+	on("clicked:takedamageapply", function() {
+		getAttrs(["take_damage_preview_hp", "take_damage_preview_head_sp", "take_damage_preview_body_sp"], function(v) {
+			const attrs = {};
+
+			// Only apply damage if preview hp has a value.
+			if (v["take_damage_preview_hp"] == "<click calculate>") {
+				attrs["take_damage_preview_hp"] = "<first click calculate>";
+			} else if (v["take_damage_preview_hp"] === "" || ! isValidInteger(v["take_damage_preview_hp"])) {
+				attrs["take_damage_preview_hp"] = "<click calculate>";
+			} else {
+				
+				// Set HP and SP attributes.
+				attrs["hp"] = v["take_damage_preview_hp"];
+				attrs["HeadSP"] = v["take_damage_preview_head_sp"];
+				attrs["BodySP"] = v["take_damage_preview_body_sp"];
+
+				// Clear take damage form.
+				take_damage_panel_clear_and_close(attrs);
+			}
+
+			setAttrs(attrs);
+		});
+	});
+
+	on("clicked:takedamagecancel", function() {
+		getAttrs(["take_damage_panel"], function(v) {
+			const attrs = {};
+			attrs["take_damage_panel_toggle"] = "0";
+			setAttrs(attrs);
 		});
 	});
 
