@@ -2068,18 +2068,11 @@
           const max1      = v[`${prefix}resource-tracker-max1`] || "";
           const max2      = v[`${prefix}resource-tracker-max2`] || "";
 
-          if (selector1 === restType) {
-            updates[`${prefix}ressource-tracker1`] = max1;
-          }
-
-          if (selector2 === restType) {
-            updates[`${prefix}ressource-tracker2`] = max2;
-          }
+          if (selector1 === restType) updates[`${prefix}ressource-tracker1`] = max1;
+          if (selector2 === restType) updates[`${prefix}ressource-tracker2`] = max2;
         });
 
-        if (Object.keys(updates).length) {
-          setAttrs(updates);
-        }
+        if (Object.keys(updates).length) setAttrs(updates);
       });
     });
   };
@@ -2091,6 +2084,22 @@
     });
   };
 
+  const resetCurrentDicesOnLongRest = () => {
+    const attrs = [];
+    for (let i = 1; i <= 6; i++) {
+      attrs.push(`max-dices${i}`, `current-dices${i}`);
+    }
+
+    getAttrs(attrs, (v) => {
+      const updates = {};
+      for (let i = 1; i <= 6; i++) {
+        const maxVal = v[`max-dices${i}`] || 0;
+        updates[`current-dices${i}`] = maxVal;
+      }
+      setAttrs(updates);
+    });
+  };
+
   on("clicked:short_rest", () => {
     updateResourcesOnRest("short");
   });
@@ -2098,8 +2107,10 @@
   on("clicked:long_rest", () => {
     updateResourcesOnRest("Long");
     refillExertionOnLongRest();
+    resetCurrentDicesOnLongRest();
   });
 </script>
+
 
 
       <!-- ----- DEATH SAVES ----- -->
