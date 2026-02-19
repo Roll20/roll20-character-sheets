@@ -1,4 +1,4 @@
-/* advantages disadvantages begin */
+/* advantages_disadvantages start */
 on("change:nachteil_nachtblind",
 	function() {
 		safeGetAttrs(
@@ -119,4 +119,4 @@ on(
 		}
 	});
 });
-/* advantages disadvantages end */
+/* advantages_disadvantages end */

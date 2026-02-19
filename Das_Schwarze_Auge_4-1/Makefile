@@ -6,26 +6,85 @@ MAKEFLAGS += --no-builtin-rules
 HTML = \
 	dev/html/sheet/intro.html \
 	dev/html/sheet/header.html \
-	dev/html/sheet/section_allgemein.html \
-	dev/html/sheet/section_grundwerte.html \
-	dev/html/sheet/section_fertigkeiten.html \
-	dev/html/sheet/section_inventar.html \
-	dev/html/sheet/section_talente.html \
-	dev/html/sheet/section_magie.html \
-	dev/html/sheet/section_liturgien.html \
-	dev/html/sheet/section_kampfwerte.html \
-	dev/html/sheet/section_regeneration.html \
-	dev/html/sheet/section_notizen.html \
-	dev/html/sheet/section_config.html \
-	dev/html/sheet/section_info.html \
+	dev/html/sheet/sections/general.html \
+	dev/html/sheet/sections/stats.html \
+	dev/html/sheet/sections/advantages_disadvantages_special_skills.html \
+	dev/html/sheet/sections/inventory/intro.html \
+	dev/html/sheet/sections/inventory/header.html \
+	dev/html/sheet/sections/inventory/main.html \
+	dev/html/sheet/sections/inventory/purse.html \
+	dev/html/sheet/sections/inventory/outro.html \
+	dev/html/sheet/sections/talents/intro.html \
+	dev/html/sheet/sections/talents/header.html \
+	dev/html/sheet/sections/talents/combat_techniques.html \
+	dev/html/sheet/sections/talents/physical.html \
+	dev/html/sheet/sections/talents/social.html \
+	dev/html/sheet/sections/talents/nature.html \
+	dev/html/sheet/sections/talents/knowledge.html \
+	dev/html/sheet/sections/talents/languages.html \
+	dev/html/sheet/sections/talents/crafts.html \
+	dev/html/sheet/sections/talents/gifts.html \
+	dev/html/sheet/sections/talents/meta.html \
+	dev/html/sheet/sections/talents/outro.html \
+	dev/html/sheet/sections/magic/intro.html \
+	dev/html/sheet/sections/magic/header.html \
+	dev/html/sheet/sections/magic/aventuria/spells.html \
+	dev/html/sheet/sections/magic/myranor/conjuration.html \
+	dev/html/sheet/sections/magic/aventuria/rituals.html \
+	dev/html/sheet/sections/magic/advantages_disadvantages_special_skills.html \
+	dev/html/sheet/sections/magic/outro.html \
+	dev/html/sheet/sections/liturgies.html \
+	dev/html/sheet/sections/combat/intro.html \
+	dev/html/sheet/sections/combat/header.html \
+	dev/html/sheet/sections/combat/equipment.html \
+	dev/html/sheet/sections/combat/hand_to_hand.html \
+	dev/html/sheet/sections/combat/ranged.html \
+	dev/html/sheet/sections/combat/special_skills.html \
+	dev/html/sheet/sections/combat/outro.html \
+	dev/html/sheet/sections/regeneration/intro.html \
+	dev/html/sheet/sections/regeneration/header.html \
+	dev/html/sheet/sections/regeneration/relax.html \
+	dev/html/sheet/sections/regeneration/rest.html \
+	dev/html/sheet/sections/regeneration/sleep.html \
+	dev/html/sheet/sections/regeneration/astral_meditation.html \
+	dev/html/sheet/sections/regeneration/karmic_meditation.html \
+	dev/html/sheet/sections/regeneration/outro.html \
+	dev/html/sheet/sections/notes/intro.html \
+	dev/html/sheet/sections/notes/header.html \
+	dev/html/sheet/sections/notes/main.html \
+	dev/html/sheet/sections/notes/entities.html \
+	dev/html/sheet/sections/notes/locations.html \
+	dev/html/sheet/sections/notes/outro.html \
+	dev/html/sheet/sections/config.html \
+	dev/html/sheet/sections/info.html \
 	dev/html/sheet/footer.html \
 	dev/html/sheet/outro.html \
-	dev/html/roll\ templates/intro.html \
-	dev/html/roll\ templates/crp.html \
-	dev/html/roll\ templates/regeneration.html \
-	dev/html/roll\ templates/legacy.html \
-	dev/html/roll\ templates/tests.html \
-	dev/html/roll\ templates/outro.html \
+	dev/html/roll_templates/intro.html \
+	dev/html/roll_templates/crp/intro.html \
+	dev/html/roll_templates/crp/talents.html \
+	dev/html/roll_templates/crp/spells.html \
+	dev/html/roll_templates/crp/liturgies.html \
+	dev/html/roll_templates/crp/hand_to_hand_combat.html \
+	dev/html/roll_templates/crp/outro.html \
+	dev/html/roll_templates/regeneration/intro.html \
+	dev/html/roll_templates/regeneration/deepbreath.html \
+	dev/html/roll_templates/regeneration/relax.html \
+	dev/html/roll_templates/regeneration/rest.html \
+	dev/html/roll_templates/regeneration/sleep.html \
+	dev/html/roll_templates/regeneration/astralmeditation.html \
+	dev/html/roll_templates/regeneration/karmicmeditation.html \
+	dev/html/roll_templates/regeneration/outro.html \
+	dev/html/roll_templates/legacy/intro.html \
+	dev/html/roll_templates/legacy/talents.html \
+	dev/html/roll_templates/legacy/spells.html \
+	dev/html/roll_templates/legacy/liturgies.html \
+	dev/html/roll_templates/legacy/stats.html \
+	dev/html/roll_templates/legacy/hand_to_hand_combat.html \
+	dev/html/roll_templates/legacy/ranged_combat.html \
+	dev/html/roll_templates/legacy/combat_shared.html \
+	dev/html/roll_templates/legacy/outro.html \
+	dev/html/roll_templates/tests.html \
+	dev/html/roll_templates/outro.html \
 	$(JS)
 JS = \
 	dev/js/intro.js \

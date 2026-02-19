@@ -1,4 +1,4 @@
-/* wounds begin */
+/* wounds start */
 /*
 Input: object with zonal wound numbers
 Output: object with modifiers of AT, PA, FK, IB, MU, IN, KL, FF, GE, KO, KK and GS

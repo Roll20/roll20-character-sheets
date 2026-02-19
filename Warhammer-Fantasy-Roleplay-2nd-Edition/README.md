@@ -4,6 +4,9 @@ This sheet is created for use in Warhammer 2nd Edition games, based on the chara
 
 ## Features / Changelog
 
+- v2.1.2
+  - Minor
+    * Now rounds up instead of down when using half your Characteristic for untrained Basic Skill Tests.
 - v2.1.1
   - Minor
     * Fixed career advancements to only update for careers marked as "entered".

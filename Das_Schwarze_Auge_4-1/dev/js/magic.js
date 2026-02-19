@@ -1,4 +1,4 @@
-/* magic begin */
+/* magic start */
 
 /*
 	Adapt Spell Stats Based on Spell Representation

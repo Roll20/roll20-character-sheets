@@ -633,7 +633,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
 
-      if (aIGuidage === 0) {
+      if (aIGuidage === '0') {
         exec.push(`{{vMStyleA=${modA}D}}`);
         cRoll.push(Number(modA));
       }
@@ -701,8 +701,11 @@ on('clicked:distanceRangerLongbow', async (info) => {
       break;
 
     case 'suppression':
-      exec.push(`{{style=${i18n_style} ${i18n_pilonnage}}}`);
+      exec.push(`{{style=${i18n_style} ${i18n_suppression}}}`);
+
       if (PG50_3 !== '1') {
+        cRoll.push(-2);
+
         const vSuppressionD = Math.floor(Number(attrs.styleSuppressionD) / 2);
         const vSuppressionV = Math.floor(Number(attrs.styleSuppressionV) / 2);
 

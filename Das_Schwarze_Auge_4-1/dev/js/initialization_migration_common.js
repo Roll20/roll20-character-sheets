@@ -1,4 +1,4 @@
-/* initialization migration common begin */
+/* initialization_migration_common start */
 /*
 # Old Data Conversion
 Always try to migrate as much data as possible
@@ -116,4 +116,4 @@ function callNextMigration(migrationChain)
 		}
 	}
 }
-/* initialization migration common end */
+/* initialization_migration_common end */

@@ -1,4 +1,4 @@
-/* talents begin */
+/* talents start */
 
 function generateTalentRollMacro(template, nameInternal, nameUI, statAttrs, ebeMacro = "") {
 	const func = "generateTalentRollMacro";

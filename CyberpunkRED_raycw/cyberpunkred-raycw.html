@@ -1610,8 +1610,23 @@
 			<div class="settings-row">
 				<h3>CHARACTER SHEET OPTIONS</h3>
 				<div class="nav">
-					<div><button class="options" type="action" name="act_resetbase" >RESET BASE SKILLS</button></div>
-					<div><button class="options" type="action" name="act_newcharacter" >TOGGLE STAT/SKILLPOINT TRACKER</button></div>
+					<div class="reset-skills-setting">
+						<input type="hidden" class="sheet-reset-skills" name="attr_reset_skills_state" value="button" />
+						<div class="reset-button">
+							<button class="options" type="action" name="act_resetcheck">RESET BASE SKILLS</button>
+						</div>
+						<div class="reset-check">
+							<div class="heading">RESET BASE SKILLS</div>
+							<div class="question">Are you sure?</div>
+							<div class="buttons">
+								<button class="options" type="action" name="act_resetconfirm" title="This will reset all base skill values to defaults!">Yes</button> /
+								<button class="options" type="action" name="act_resetcancel" title="This will NOT reset skill values.">No</button>
+							</div>
+						</div>
+					</div>
+					<div class="toggle-tracker-setting">
+						<button class="options" type="action" name="act_newcharacter" >TOGGLE STAT/SKILLPOINT TRACKER</button>
+					</div>
 				</div>
 				<div class="settings-option">
 					<div class="settings-title">ENABLE MOOK SHEET</div>
@@ -3266,10 +3281,10 @@
 			"lvl_" + skill,
 			"misc_" + skill
 	));
-	const all_skills_lvl_misc_changes = all_skills_lvl_misc.map(skill => `change:${skill}`).join(' ');
 	const stats_lower = ["intelligence","reflex","dexterity","technique","cool","willpower","luck","movement","body","empathy"];
-	const stats_changes = stats_lower.map(stat => `change:${stat.toLowerCase()}`).join(' ');
-	on(`${all_skills_lvl_misc_changes} ${stats_changes} sheet:opened`, function() {
+
+	// When sheet is opened, update "total" attribute of all skills.
+	on("sheet:opened", function() {
 		getAttrs([...stats_lower.map(stat => stat.toLowerCase()), ...all_skills_lvl_misc], function(values) {
 			const output = {};
 			Object.keys(all_skills).forEach(skill => {
@@ -3281,6 +3296,52 @@
 				output['total_' + skill] = total;
 			});
 			setAttrs(output);
+		});
+	});
+
+	// When stat changes, update "total" attribute of associated skills.
+	stats_lower.forEach(function(stat_name) {
+		on(`change:${stat_name}`, function() {
+			const skill_attributes = [];
+			const associated_skills = [];
+			skill_attributes.push(stat_name);
+			Object.entries(all_skills).forEach(([key, value]) => {
+				if (value == stat_name) {
+					associated_skills.push(key);
+					skill_attributes.push("lvl_" + key, "misc_" + key);
+				}
+			});
+			getAttrs(skill_attributes, function(values) {
+				const stat_set_attrs = [];
+				associated_skills.forEach(skill => {
+					const base = parseInt(values["lvl_" + skill]) || 0;
+					const misc = parseInt(values["misc_" + skill]) || 0;
+					const stat = parseInt(values[stat_name]) || 0;
+					const total = base + misc + stat;
+					stat_set_attrs["total_" + skill] = total;
+				});
+				setAttrs(stat_set_attrs);
+			});
+		});
+	});
+
+	// Update "total" attribute of skill when "lvl" or "misc" atrributes change.
+	Object.keys(all_skills).forEach(function (skill) {
+		on(`change:LVL_${skill} change:Misc_${skill}`, function() {
+			const skill_attributes = [
+				all_skills[skill], // Stat attribute
+				`lvl_${skill}`,
+				`misc_${skill}`
+			];
+			getAttrs(skill_attributes, function(values) {
+				const base = parseInt(values["lvl_" + skill]) || 0;
+				const misc = parseInt(values["misc_" + skill]) || 0;
+				const stat = parseInt(values[all_skills[skill]]) || 0;
+				const total = base + misc + stat;
+				const skill_set_attrs = {};
+				skill_set_attrs["total_" + skill] = total;
+				setAttrs(skill_set_attrs);
+			});
 		});
 	});
 
@@ -3308,27 +3369,27 @@
 	                    ,"LVL_Streetslang","LVL_YourHome","LVL_Brawling","LVL_Evasion","LVL_Conversation"
 	                    ,"LVL_HumanPerception","LVL_Persuasion","LVL_FirstAid"];
 
+	on("clicked:resetcheck", function() {
+		setAttrs({"reset_skills_state": "confirm"});
+	});
 
-	on("clicked:resetbase", function() {
+	on("clicked:resetcancel", function() {
+		setAttrs({"reset_skills_state": "button"});
+	});
 
+	on("clicked:resetconfirm", function() {
 		getAttrs([], function(v) {
-
+			const reset_skills = {};
+			reset_skills["reset_skills_state"] = "button";
+			reset_skills["LVL_LanguageA"] = 4;
 			for (var skill of allskills) {
-
- 				if (basicskills.includes(skill)) {
-					setAttrs({
-						[skill] : 2
-					});
+				if (basicskills.includes(skill)) {
+					reset_skills[skill] = 2;
 				} else {
-					setAttrs({
-						[skill] : 0
-					});
+					reset_skills[skill] = 0;
 				}		
 			}
-
-			setAttrs({
-				"LVL_LanguageA" : 4
-			});
+			setAttrs(reset_skills);
 		});
 	});
 
@@ -3336,29 +3397,20 @@
 
 	allskills.forEach(function(skill) {
 		on(`change:${skill}`, function() {
-
 			var total = 0;
-
 			getAttrs(easyskills, function(values) {
-
 				for (var key of Object.keys(values)) {
 					total = total + parseInt(values[key])||0;
 				}
-
 			});
-
 			getAttrs(hardskills, function(values) {
-
 				for (var key of Object.keys(values)) {
 					total = total + 2 * parseInt(values[key])||0;
 				}
-
 				setAttrs({
 					"skillpoints" : 90 - total
 				});
 			});
-
-
 		});
 	});
 

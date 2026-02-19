@@ -275,7 +275,7 @@ function set_difficulty_level(
   // let difficulty_level = current_difficulty;
   let difficulty_level = findMaxIndex(current_difficulty, max_difficulty_level);
 
-  if (skill_value < 1 && skill_value !== null) {
+  if (skill_value < 1 && skill_value !== null && !is_battle) {
     difficulty_level++;
   } else if (!is_battle && skill_value !== null) {
     difficulty_level -= Math.floor(skill_value / 4);
@@ -285,9 +285,10 @@ function set_difficulty_level(
     0,
     Math.min(difficulty_level, max_difficulty_level)
   );
-
-  difficulty_level += count_number(rolls, 20);
-  difficulty_level -= count_number(rolls, 1);
+  if (!is_battle) {
+    difficulty_level += count_number(rolls, 20);
+    difficulty_level -= count_number(rolls, 1);
+  }
   difficulty_level = Math.max(
     0,
     Math.min(difficulty_level, max_difficulty_level)
