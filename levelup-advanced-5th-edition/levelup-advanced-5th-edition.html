@@ -121,16 +121,16 @@
     {{#rollGreater() save 0}}
     <div id="SAVE" class="sheet-template-rolls sheet-template-rolls3">
       <div class="sheet-description3">DC: {{save}} {{savecomp}}</div>
-      <div class="sheet-description">{{saveeffect}}</div>
+      {{#saveeffect}}<div class="sheet-description">{{saveeffect}}</div>{{/saveeffect}}
     </div>
     {{/rollGreater() save 0}}
 
     <!-- ========================================================= -->
-    {{#rollGreater() dmg1 0}} {{^norollnodamage}} {{^dmgonly}} {{^nodmg}} {{#desc}}
+    {{#rollGreater() dmg1 0}} {{^withdmg}} {{^norollnodamage}} {{^dmgonly}} {{^nodmg}} {{#desc}}
     <div class="sheet-borderbottom">
       <div class="sheet-extra-button sheet-doublecolumn sheet-doublebutton">{{button}} {{buttoncrit}}</div>
     </div>
-    {{/desc}} {{/nodmg}} {{/dmgonly}} {{/norollnodamage}} {{/rollGreater() dmg1 0}}
+    {{/desc}} {{/nodmg}} {{/dmgonly}} {{/norollnodamage}} {{/withdmg}} {{/rollGreater() dmg1 0}}
 
     <!-- ========================================================= -->
     {{^withdmg}} {{#norollnodamage}}
@@ -685,10 +685,21 @@
           <input type="number" value="0" name="attr_global-ability-bonus" />
           <h3 data-i18n="global-skill-bonus-label">Global Skill Bonus</h3>
           <input type="number" value="0" name="attr_global-skill-bonus" />
-          <h3 data-i18n="global-passive-bonus-label">Global Passive Bonus</h3>
-          <input type="number" value="0" name="attr_global-passive-bonus" />
           <h3 data-i18n="global-save-bonus-label">Global Save Bonus</h3>
           <input type="number" value="0" name="attr_global-save-bonus" />
+        </div>
+      </div>
+
+      <!-- ----- PASSIVES BONUSES -----  -->
+      <div class="sheet-standardbox sheet-standardbox2">
+        <h4 class="sheet-minititles2" style="grid-column: 1/-1" data-i18n="passives-label">Passives</h4>
+        <div class="sheet-oneline">
+          <h3 data-i18n="passives-stealth-bonus-label">Passive Stealth Bonus</h3>
+          <input type="number" value="0" name="attr_passives-stealth-bonus" />
+          <h3 data-i18n="passives-insight-bonus-label">Passive Insight Bonus</h3>
+          <input type="number" value="0" name="attr_passives-insight-bonus" />
+          <h3 data-i18n="passives-perception-bonus-label">Passive Perception Bonus</h3>
+          <input type="number" value="0" name="attr_passives-perception-bonus" />
         </div>
       </div>
 
@@ -1580,21 +1591,37 @@
             );
           </script>
 
-          <script id="✓ CALC : Attacks & Spells Button Links" type="text/worker">
-            on("sheet:opened change:repeating_attacksandspells remove:repeating_attacksandspells", () => {
-              getSectionIDs("repeating_attacksandspells", ids => {
-                const updates = {};
-                (ids || []).forEach(id => {
-                  updates[`repeating_attacksandspells_${id}_attacksorspell-button`] =
-                    `[Damages](~${id}__show-attackorspell-damages)`;
+<script id="✓ CALC : Attacks & Spells Button Links" type="text/worker">
+  const updateAttacksAndSpells = () => {
+    const rep = "repeating_attacksandspells";
 
-                  updates[`repeating_attacksandspells_${id}_attacksorspell-crit-button`] =
-                    `[C](~${id}__show-attackorspell-crit-damages)`;
-                });
-                setAttrs(updates);
-              });
-            });
-          </script>
+    getSectionIDs(rep, (ids) => {
+      const updates = {};
+
+      (ids || []).forEach((id) => {
+        // Version "comme Talents" (shorthand basé sur l'id)
+        updates[`${rep}_${id}_attacksorspell-button`] =
+          `[Damages](~${id}__show-attackorspell-damages)`;
+
+        updates[`${rep}_${id}_attacksorspell-crit-button`] =
+          `[C](~${id}__show-attackorspell-crit-damages)`;
+      });
+
+      if (Object.keys(updates).length) setAttrs(updates);
+    });
+  };
+
+  on(
+    [
+      "sheet:opened",
+      "change:repeating_attacksandspells",
+      "remove:repeating_attacksandspells"
+    ].join(" "),
+    updateAttacksAndSpells
+  );
+</script>
+
+
 
           <!-- FIELDSET ATTACKS AND SPELLCASTINGS -->
           <fieldset class="repeating_attacksandspells">
@@ -2014,57 +2041,77 @@
         </div>
       </div>
 
-      <script id="REST : REST & RESOURCES" type="text/worker">
-        const updateResourcesOnRest = (restType) => {
-          getSectionIDs("resources-tracker", (ids) => {
-            if (!ids || !ids.length) return;
+<script id="REST : REST & RESOURCES" type="text/worker">
+  const updateResourcesOnRest = (restType) => {
+    getSectionIDs("resources-tracker", (ids) => {
+      if (!ids || !ids.length) return;
 
-            const attrs = [];
-            ids.forEach((id) => {
-              const prefix = `repeating_resources-tracker_${id}_`;
-              attrs.push(
-                `${prefix}ressource-tracker-resetselector1`,
-                `${prefix}ressource-tracker-resetselector2`,
-                `${prefix}resource-tracker-max1`,
-                `${prefix}resource-tracker-max2`
-              );
-            });
+      const attrs = [];
+      ids.forEach((id) => {
+        const prefix = `repeating_resources-tracker_${id}_`;
+        attrs.push(
+          `${prefix}ressource-tracker-resetselector1`,
+          `${prefix}ressource-tracker-resetselector2`,
+          `${prefix}resource-tracker-max1`,
+          `${prefix}resource-tracker-max2`
+        );
+      });
 
-            getAttrs(attrs, (v) => {
-              const updates = {};
+      getAttrs(attrs, (v) => {
+        const updates = {};
 
-              ids.forEach((id) => {
-                const prefix = `repeating_resources-tracker_${id}_`;
+        ids.forEach((id) => {
+          const prefix = `repeating_resources-tracker_${id}_`;
 
-                const selector1 = v[`${prefix}ressource-tracker-resetselector1`] || "";
-                const selector2 = v[`${prefix}ressource-tracker-resetselector2`] || "";
-                const max1      = v[`${prefix}resource-tracker-max1`] || "";
-                const max2      = v[`${prefix}resource-tracker-max2`] || "";
+          const selector1 = v[`${prefix}ressource-tracker-resetselector1`] || "";
+          const selector2 = v[`${prefix}ressource-tracker-resetselector2`] || "";
+          const max1      = v[`${prefix}resource-tracker-max1`] || "";
+          const max2      = v[`${prefix}resource-tracker-max2`] || "";
 
-                if (selector1 === restType) {
-                  updates[`${prefix}ressource-tracker1`] = max1;
-                }
-
-                if (selector2 === restType) {
-                  updates[`${prefix}ressource-tracker2`] = max2;
-                }
-              });
-
-              if (Object.keys(updates).length) {
-                setAttrs(updates);
-              }
-            });
-          });
-        };
-
-        on("clicked:short_rest", () => {
-          updateResourcesOnRest("short");
+          if (selector1 === restType) updates[`${prefix}ressource-tracker1`] = max1;
+          if (selector2 === restType) updates[`${prefix}ressource-tracker2`] = max2;
         });
 
-        on("clicked:long_rest", () => {
-          updateResourcesOnRest("Long");
-        });
-      </script>
+        if (Object.keys(updates).length) setAttrs(updates);
+      });
+    });
+  };
+
+  const refillExertionOnLongRest = () => {
+    getAttrs(["maneuvers-exertionpoints"], (v) => {
+      const maxEP = parseInt(v["maneuvers-exertionpoints"], 10) || 0;
+      setAttrs({ "maneuvers-exertionpoints-act": maxEP });
+    });
+  };
+
+  const resetCurrentDicesOnLongRest = () => {
+    const attrs = [];
+    for (let i = 1; i <= 6; i++) {
+      attrs.push(`max-dices${i}`, `current-dices${i}`);
+    }
+
+    getAttrs(attrs, (v) => {
+      const updates = {};
+      for (let i = 1; i <= 6; i++) {
+        const maxVal = v[`max-dices${i}`] || 0;
+        updates[`current-dices${i}`] = maxVal;
+      }
+      setAttrs(updates);
+    });
+  };
+
+  on("clicked:short_rest", () => {
+    updateResourcesOnRest("short");
+  });
+
+  on("clicked:long_rest", () => {
+    updateResourcesOnRest("Long");
+    refillExertionOnLongRest();
+    resetCurrentDicesOnLongRest();
+  });
+</script>
+
+
 
       <!-- ----- DEATH SAVES ----- -->
       <div class="sheet-main-deathsaves sheet-standardbox sheet-standardbox2">
@@ -2398,42 +2445,42 @@
           </div>
         </div>
 
-        <script id="SKILL : PASSIVE SKILLS CALCULATION" type="text/worker">
-          const skills = [
-            { key: "stealth",     ability: "dexterity-bonus" },
-            { key: "insight",     ability: "wisdom-bonus"    },
-            { key: "perception",  ability: "wisdom-bonus"    }
-          ];
+<script id="SKILL : PASSIVE SKILLS CALCULATION" type="text/worker">
+  const skills = [
+    { key: "stealth",     ability: "dexterity-bonus", bonus: "passives-stealth-bonus"     },
+    { key: "insight",     ability: "wisdom-bonus",    bonus: "passives-insight-bonus"     },
+    { key: "perception",  ability: "wisdom-bonus",    bonus: "passives-perception-bonus"  }
+  ];
 
-          const fields = [
-            "dexterity-bonus",
-            "wisdom-bonus",
-            "global-passive-bonus",
-            "pb"
-          ];
+  const fields = [
+    "dexterity-bonus",
+    "wisdom-bonus",
+    "pb",
+    "passives-stealth-bonus",
+    "passives-insight-bonus",
+    "passives-perception-bonus"
+  ];
 
-          skills.forEach(s => {
-            fields.push(`${s.key}_active`);
-          });
+  skills.forEach(s => fields.push(`${s.key}_active`));
 
-          on(fields.map(f => "change:" + f).join(" ") + " sheet:opened", () => {
-            getAttrs(fields, v => {
-              const up     = {};
-              const pb     = parseInt(v.pb || 0, 10);
-              const global = parseInt(v["global-passive-bonus"] || 0, 10);
+  on(fields.map(f => "change:" + f).join(" ") + " sheet:opened", () => {
+    getAttrs(fields, v => {
+      const up = {};
+      const pb = parseInt(v.pb || 0, 10);
 
-              skills.forEach(s => {
-                const ability = parseInt(v[s.ability] || 0, 10);
-                const active  = parseInt(v[`${s.key}_active`] || 0, 10) ? pb : 0;
+      skills.forEach(s => {
+        const ability = parseInt(v[s.ability] || 0, 10);
+        const active  = parseInt(v[`${s.key}_active`] || 0, 10) ? pb : 0;
+        const bonus   = parseInt(v[s.bonus] || 0, 10);
 
-                const total = 10 + ability + global + active;
-                up[`passive-${s.key}`] = total;
-              });
+        up[`passive-${s.key}`] = 10 + ability + active + bonus;
+      });
 
-              setAttrs(up);
-            });
-          });
-        </script>
+      setAttrs(up);
+    });
+  });
+</script>
+
 
         <!-- ----- FATIGUE & STRIFE ----- -->
         <div class="sheet-main-fatigue sheet-standardbox sheet-standardbox2">
@@ -4775,7 +4822,7 @@ on(events, updateAll);
                     <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                     <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
+                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
                       <input class="sheet-hidden" type="text" name="attr_talent-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-category" />
@@ -4921,7 +4968,7 @@ on(events, updateAll);
                     <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                     <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
+                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
                       <input class="sheet-hidden" type="text" name="attr_talent-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-category" />
@@ -5066,7 +5113,7 @@ on(events, updateAll);
                     <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                     <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
+                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
                       <input class="sheet-hidden" type="text" name="attr_talent-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-category" />
@@ -5211,7 +5258,7 @@ on(events, updateAll);
                     <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                     <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
+                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
                       <input class="sheet-hidden" type="text" name="attr_talent-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-category" />
@@ -5356,7 +5403,7 @@ on(events, updateAll);
                     <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                     <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
+                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
                       <input class="sheet-hidden" type="text" name="attr_talent-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-category" />
@@ -5501,7 +5548,7 @@ on(events, updateAll);
                     <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                     <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
+                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
                       <input class="sheet-hidden" type="text" name="attr_talent-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-category" />
@@ -5641,7 +5688,7 @@ on(events, updateAll);
                     <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                     <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
+                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
                       <input class="sheet-hidden" type="text" name="attr_talent-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-category" />
@@ -5781,7 +5828,7 @@ on(events, updateAll);
                     <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                     <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
+                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
                       <input class="sheet-hidden" type="text" name="attr_talent-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-category" />
@@ -5921,7 +5968,7 @@ on(events, updateAll);
                     <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                     <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
+                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
                       <input class="sheet-hidden" type="text" name="attr_talent-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-category" />
@@ -6061,7 +6108,7 @@ on(events, updateAll);
                     <input class="sheet-checkbox-active" type="checkbox" value="1" name="attr_talent-active" />
 
                     <div class="sheet-talent-card-line4 sheet-button-div-holder">
-                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{savecomp=@{talent-save-ability}}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
+                      <button type="roll" class="sheet-button-description" name="roll_talent" value="@{global-privacy-status} &{template:levelup} {{@{global-advantage-status}=1}} {{name=@{talent-name}}} {{charactername=@{character_name}}} {{category=@{talent-category}}} {{@{attacks_tooglespell}=1}} {{critical=[[0]]}} {{details=[[@{talent-details}]]}} {{roll=[[@{d20expr}+@{talent-attackbonus}]]}} {{usage=@{talent-usetime}}} {{duration=@{talent-duration}}} {{range=@{talent-range}}} {{target=@{talent-target}}} {{charge=@{talent-charges}}} {{dmg1=[[@{talent-dmg1}]]}} {{dmg1crit=[[@{talent-dmg1}]]}} {{dmg2=[[@{talent-dmg2}]]}} {{dmg2crit=[[@{talent-dmg2}]]}} {{dmg1type=@{talent-dmg1-type}}} {{dmg2type=@{talent-dmg2-type}}} {{save=[[@{talent-save}]]}} {{saveeffect=@{talent-saveeffects}}} {{button=@{talent-button}}} {{buttoncrit=@{talent-crit-button}}} {{desc=1}} {{description=@{talent-description}}}"></button>
                       <input class="sheet-hidden" type="text" name="attr_talent-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-crit-button" />
                       <input class="sheet-hidden" type="text" name="attr_talent-category" />
