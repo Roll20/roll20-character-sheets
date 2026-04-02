@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2026-04-01 ** v.2.6 Sam C
+    Added multi-class characters, enabled via settings
 **2023-06-05 ** v.2.5 Paul V
 	Fixed issue with the weapon rolls, they will now correctly add the total mod, if 'modifiers on rolls' is disabled
 	Fixed issue with stat rolls, they will now correctly add the modifier if 'modifiers on rolls' is disabled
