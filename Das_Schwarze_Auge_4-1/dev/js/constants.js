@@ -119,6 +119,9 @@ const defaultValues = {
 	"cf_talent": 20,
 	"cf_zauber": 20,
 
+	// Talents
+	"t_ko_athletik_gsbonus": 1,
+
 	// Combat
 	/// Melee AT Values
 	"AT_Aktiv": 5,

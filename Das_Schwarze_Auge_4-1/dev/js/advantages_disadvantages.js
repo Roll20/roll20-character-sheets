@@ -326,6 +326,31 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 					attrsToChange["BE_GS_mod_hint_swift"] = 0;
 				}
 
+				// Calculate athletics speed bonus based on new attribute states (Swift I/II)
+				/// Successful athletics checks make you faster (1/10 GS per remaining point after the check)
+				/// This is truly a bonus, not a mod. The bonus gets added on top of the actual result.
+				/// Swift I/II increases this bonus.
+				let athleticsGSBonus = 1;
+				const athleticsGSBonusEffectSize = 1;
+
+				for (attr in updatedAttrs)
+				{
+					// Consider encumbrance for Swift I/II
+					if (
+						attr in swiftEncumbranceThresholds &&
+						updatedAttrs[attr] === "1"
+					)
+					{
+						if (encumbrance >= swiftEncumbranceThresholds[attr])
+						{
+							continue;
+						} else {
+							athleticsGSBonus += athleticsGSBonusEffectSize;
+						}
+					}
+				}
+				attrsToChange["t_ko_athletik_gsbonus"] = athleticsGSBonus;
+
 				// Apply changes
 				safeSetAttrs(attrsToChange);
 		});

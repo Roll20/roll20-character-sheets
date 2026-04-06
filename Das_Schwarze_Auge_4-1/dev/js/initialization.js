@@ -18,6 +18,9 @@ function initializeSheet(migrationChain) {
 		"cs_kampf_at", "cs_kampf_fk", "cs_kampf_pa", "cs_ritual", "cs_talent", "cs_zauber",
 		"cf_kampf_at", "cf_kampf_fk", "cf_kampf_pa", "cf_ritual", "cf_talent", "cf_zauber",
 
+		// Talents
+		"t_ko_athletik_gsbonus",
+
 		// Combat
 		/// Melee AT Values
 		"AT_Aktiv", "AT_Aktiv_TaW", "atbasis",
