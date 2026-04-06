@@ -40,6 +40,19 @@ function generateTalentRollMacro(template, nameInternal, nameUI, statAttrs, ebeM
 			"}}"
 		].join("");
 	}
+
+	let talentSpecificRoll = [];
+	switch(nameInternal)
+	{
+		case 'athletik':
+			talentSpecificRoll.push(
+				"{{athletics=1}}",
+				"{{athleticsbonus=[[@{t_ko_athletik_gsbonus}]]}}",
+			);
+			break;
+	}
+	talentSpecificRoll = talentSpecificRoll.join(" ");
+
 	const rollMacro = [
 		"@{gm_roll_opt}",
 		"&{template:" + template + "}",
@@ -51,7 +64,8 @@ function generateTalentRollMacro(template, nameInternal, nameUI, statAttrs, ebeM
 		"{{roll=[[3d20cs<@{cs_talent}cf>@{cf_talent}]]}}",
 		"{{result=[[0]]}}",
 		"{{criticality=[[0]]}}",
-		"{{critThresholds=[[[[@{cs_talent}]]d1cs0cf2 + [[@{cf_talent}]]d1cs0cf2]]}}"
+		"{{critThresholds=[[[[@{cs_talent}]]d1cs0cf2 + [[@{cf_talent}]]d1cs0cf2]]}}",
+		talentSpecificRoll,
 	].join(" ");
 
 	debugLog(func, "rollMacro", rollMacro);
@@ -314,6 +328,42 @@ on(talents.map(talent => "clicked:" + talent + "-action").join(" "), async (info
 		stats: processedResult.stats.toString().replaceAll(",", "/"),
 	}
 
+	/// Talent-specific Processing
+	//// Athletics
+	switch(trigger)
+	{
+		case "t_ko_athletik":
+			// Additional GS can only be generated in successful checks (result = 1)
+			if (processedResult.result === 1)
+			{
+				// Calculate bonus GS
+				let athleticsGSBonus = parseInt(results["athleticsbonus"].result);
+				let TaPstarEffective = processedResult.TaPstar;
+				const TaW = results.wert.result;
+				const successfulCheckMinEffectiveTaPstar = 1;
+
+				/// Handle negative TaW, critical success and 0 TaP*
+				//// In all cases, a successful check must give at least 1 TaP*
+				//// Critical successes give max. TaP*
+				if (processedResult.criticality >= 2)
+				{
+					TaPstarEffective = TaW;
+				}
+
+				//// Handle 0 TaP*: It is a success, but counts the same as 1.
+				//// Do not care about negative values, because these get filtered away.
+				if (TaPstarEffective <= 0)
+				{
+					TaPstarEffective = successfulCheckMinEffectiveTaPstar;
+				}
+				athleticsGSBonus = TaPstarEffective * athleticsGSBonus / 10;
+				athleticsGSBonus = athleticsGSBonus.toFixed(1);
+				athleticsGSBonus = athleticsGSBonus.replace("\.", ",");
+				rollResult["athleticsbonus"] = athleticsGSBonus;
+			}
+			break;
+	}
+
 	finishRoll(
 		rollID,
 		rollResult,
@@ -359,6 +409,42 @@ on(talents_ebe.map(talent => "clicked:" + talent + "-ebe-action").join(" "), asy
 		result: processedResult.result,
 		criticality: processedResult.criticality,
 		stats: processedResult.stats.toString().replaceAll(",", "/"),
+	}
+
+	/// Talent-specific Processing
+	//// Athletics
+	switch(trigger)
+	{
+		case "t_ko_athletik":
+			// Additional GS can only be generated in successful checks (result = 1)
+			if (processedResult.result === 1)
+			{
+				// Calculate bonus GS
+				let athleticsGSBonus = parseInt(results["athleticsbonus"].result);
+				let TaPstarEffective = processedResult.TaPstar;
+				const TaW = results.wert.result;
+				const successfulCheckMinEffectiveTaPstar = 1;
+
+				/// Handle negative TaW, critical success and 0 TaP*
+				//// In all cases, a successful check must give at least 1 TaP*
+				//// Critical successes give max. TaP*
+				if (processedResult.criticality >= 2)
+				{
+					TaPstarEffective = TaW;
+				}
+
+				//// Handle 0 TaP*: It is a success, but counts the same as 1.
+				//// Do not care about negative values, because these get filtered away.
+				if (TaPstarEffective <= 0)
+				{
+					TaPstarEffective = successfulCheckMinEffectiveTaPstar;
+				}
+				athleticsGSBonus = TaPstarEffective * athleticsGSBonus / 10;
+				athleticsGSBonus = athleticsGSBonus.toFixed(1);
+				athleticsGSBonus = athleticsGSBonus.replace("\.", ",");
+				rollResult["athleticsbonus"] = athleticsGSBonus;
+			}
+			break;
 	}
 
 	finishRoll(
