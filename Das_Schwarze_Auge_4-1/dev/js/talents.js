@@ -306,15 +306,17 @@ on(talents.map(talent => "clicked:" + talent + "-action").join(" "), async (info
 	let rollID = results.rollId;
 	results = results.results;
 	let processedResult = getTalentRollResults(results);
+	const rollResult =
+	{
+		roll: processedResult.TaPstar,
+		result: processedResult.result,
+		criticality: processedResult.criticality,
+		stats: processedResult.stats.toString().replaceAll(",", "/"),
+	}
 
 	finishRoll(
 		rollID,
-		{
-			roll: processedResult.TaPstar,
-			result: processedResult.result,
-			criticality: processedResult.criticality,
-			stats: processedResult.stats.toString().replaceAll(",", "/")
-		}
+		rollResult,
 	);
 });
 
@@ -350,16 +352,18 @@ on(talents_ebe.map(talent => "clicked:" + talent + "-ebe-action").join(" "), asy
 	var ebe = results.ebe.result;
 	var modOnly = results.mod.result - ebe;
 	let processedResult = getTalentRollResults(results);
+	const rollResult =
+	{
+		mod: modOnly,
+		roll: processedResult.TaPstar,
+		result: processedResult.result,
+		criticality: processedResult.criticality,
+		stats: processedResult.stats.toString().replaceAll(",", "/"),
+	}
 
 	finishRoll(
 		rollID,
-		{
-			mod: modOnly,
-			roll: processedResult.TaPstar,
-			result: processedResult.result,
-			criticality: processedResult.criticality,
-			stats: processedResult.stats.toString().replaceAll(",", "/")
-		}
+		rollResult
 	);
 });
 /* talents end */
