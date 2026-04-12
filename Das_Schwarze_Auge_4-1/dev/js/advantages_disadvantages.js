@@ -214,6 +214,16 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 					"nachteil_zwergenwuchs": 1,
 					"BE": 0,
 				};
+				const counterAttackMods = {
+					"vorteil_flink_i": 0,
+					"vorteil_flink_ii": 0,
+					"nachteil_behaebig": 0,
+					"nachteil_einbeinig": 0,
+					"nachteil_kleinwuechsig": -1,
+					"nachteil_lahm": 0,
+					"nachteil_zwergenwuchs": -2,
+					"BE": 0,
+				};
 				const jumpMods = {
 					"vorteil_flink_i": 0,
 					"vorteil_flink_ii": 0,
@@ -350,6 +360,18 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 					}
 				}
 				attrsToChange["t_ko_athletik_gsbonus"] = athleticsGSBonus;
+
+				// Calculate Counter Attack ("Gegenhalten") modifier
+				let counterAttackMod = 0;
+
+				for (attr in updatedAttrs)
+				{
+					if (updatedAttrs[attr] === "1")
+					{
+						counterAttackMod += counterAttackMods[attr];
+					}
+				}
+				attrsToChange["k_gegenhalten_mod_advantages_disadvantages"] = counterAttackMod;
 
 				// Apply changes
 				safeSetAttrs(attrsToChange);

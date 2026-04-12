@@ -173,6 +173,9 @@ const defaultValues = {
 	"PA_zweihand-hiebwaffen": 5,
 	"PA_zweihandschwerter": 5,
 
+	/// Melee manoeuvres
+	"k_gegenhalten_mod_advantages_disadvantages": 0,
+
 	/// Melee other
 	"NKW_Aktiv1": 0,
 	"NKW_Aktiv2": 0,

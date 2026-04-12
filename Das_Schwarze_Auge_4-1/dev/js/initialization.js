@@ -30,6 +30,9 @@ function initializeSheet(migrationChain) {
 		"PA_Aktiv", "PA_Aktiv_TaW", "pabasis",
 		"PA_Anderthalbhander", "PA_bastardstaebe", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
 
+		/// Melee manoeuvres
+		"k_gegenhalten_mod_advantages_disadvantages",
+
 		/// Melee other
 		"NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4",
 		"NKW1_SB", "NKW2_SB", "NKW3_SB", "NKW4_SB",
