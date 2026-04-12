@@ -175,6 +175,7 @@ const defaultValues = {
 
 	/// Melee manoeuvres
 	"k_gegenhalten_mod_advantages_disadvantages": 0,
+	"k_umreissen_mod_advantages_disadvantages": 0,
 
 	/// Melee other
 	"NKW_Aktiv1": 0,

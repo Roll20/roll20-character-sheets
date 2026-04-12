@@ -32,6 +32,7 @@ function initializeSheet(migrationChain) {
 
 		/// Melee manoeuvres
 		"k_gegenhalten_mod_advantages_disadvantages",
+		"k_umreissen_mod_advantages_disadvantages",
 
 		/// Melee other
 		"NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4",
