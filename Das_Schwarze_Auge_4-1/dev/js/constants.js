@@ -174,6 +174,7 @@ const defaultValues = {
 	"PA_zweihandschwerter": 5,
 
 	/// Melee manoeuvres
+	"k_ausfall_mod_dialog_dwarven_stature": "",
 	"k_gegenhalten_mod_advantages_disadvantages": 0,
 	"k_umreissen_mod_advantages_disadvantages": 0,
 

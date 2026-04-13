@@ -395,6 +395,16 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 				}
 				attrsToChange["k_umreissen_mod_advantages_disadvantages"] = knockDownMod;
 
+				// Toggle Charge ("Ausfall") modifier dialog
+				const chargeDwarvenStatureModDialog = "(?{Ist diese Attacke Teil eines bereits laufenden Ausfalls oder dient sie der Einleitung eines Ausfalls?|Teil eines laufenden Ausfalls,0|Einleitung eines Ausfalls,2})";
+				let chargeModDialog = "";
+
+				if (updatedAttrs["nachteil_zwergenwuchs"] === "1")
+				{
+					chargeModDialog = chargeDwarvenStatureModDialog;
+				}
+				attrsToChange["k_ausfall_mod_dialog_dwarven_stature"] = chargeModDialog;
+
 				// Apply changes
 				safeSetAttrs(attrsToChange);
 		});

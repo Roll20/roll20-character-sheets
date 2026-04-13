@@ -31,6 +31,7 @@ function initializeSheet(migrationChain) {
 		"PA_Anderthalbhander", "PA_bastardstaebe", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
 
 		/// Melee manoeuvres
+		"k_ausfall_mod_dialog_dwarven_stature",
 		"k_gegenhalten_mod_advantages_disadvantages",
 		"k_umreissen_mod_advantages_disadvantages",
 
