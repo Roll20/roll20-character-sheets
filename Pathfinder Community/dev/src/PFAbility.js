@@ -528,42 +528,42 @@ export function importFromCompendium(callback, eventInfo) {
 export function setAttackEntryVals(spellPrefix, weaponPrefix, v, setter, noName) {
   let notes = '',
     attackType = '';
-  setter = setter || {};
+  const output = setter || {};
   try {
     attackType = PFUtils.findAbilityInString(v[spellPrefix + 'abil-attack-type']);
     if (v[spellPrefix + 'name']) {
       if (!noName) {
-        setter[weaponPrefix + 'name'] = v[spellPrefix + 'name'];
+        output[weaponPrefix + 'name'] = v[spellPrefix + 'name'];
       }
-      setter[weaponPrefix + 'source-ability-name'] = v[spellPrefix + 'name'];
+      output[weaponPrefix + 'source-ability-name'] = v[spellPrefix + 'name'];
     }
     if (attackType) {
-      setter[weaponPrefix + 'attack-type'] = v[spellPrefix + 'abil-attack-type'];
+      output[weaponPrefix + 'attack-type'] = v[spellPrefix + 'abil-attack-type'];
       if (/CMB/i.test(attackType)) {
-        setter[weaponPrefix + 'vs'] = 'cmd';
+        output[weaponPrefix + 'vs'] = 'cmd';
       } else if (/ranged/i.test(attackType)) {
-        setter[weaponPrefix + 'vs'] = 'touch';
-        setter[weaponPrefix + 'isranged'] = 1;
-        setter[weaponPrefix + 'range'] = v[spellPrefix + 'range_numeric'] || 0;
+        output[weaponPrefix + 'vs'] = 'touch';
+        output[weaponPrefix + 'isranged'] = 1;
+        output[weaponPrefix + 'range'] = v[spellPrefix + 'range_numeric'] || 0;
       } else {
-        setter[weaponPrefix + 'vs'] = 'touch';
-        setter[weaponPrefix + 'range'] = 0;
+        output[weaponPrefix + 'vs'] = 'touch';
+        output[weaponPrefix + 'range'] = 0;
       }
     }
     if (v[spellPrefix + 'damage-macro-text']) {
-      setter[weaponPrefix + 'precision_dmg_macro'] = v[spellPrefix + 'damage-macro-text'];
+      output[weaponPrefix + 'precision_dmg_macro'] = v[spellPrefix + 'damage-macro-text'];
       if (attackType) {
-        setter[weaponPrefix + 'critical_dmg_macro'] = v[spellPrefix + 'damage-macro-text'];
+        output[weaponPrefix + 'critical_dmg_macro'] = v[spellPrefix + 'damage-macro-text'];
       } else {
-        setter[weaponPrefix + 'critical_dmg_macro'] = '';
+        output[weaponPrefix + 'critical_dmg_macro'] = '';
       }
     }
     if (v[spellPrefix + 'damage-type']) {
-      setter[weaponPrefix + 'precision_dmg_type'] = v[spellPrefix + 'damage-type'];
+      output[weaponPrefix + 'precision_dmg_type'] = v[spellPrefix + 'damage-type'];
       if (attackType) {
-        setter[weaponPrefix + 'critical_dmg_type'] = v[spellPrefix + 'damage-type'];
+        output[weaponPrefix + 'critical_dmg_type'] = v[spellPrefix + 'damage-type'];
       } else {
-        setter[weaponPrefix + 'critical_dmg_type'] = '';
+        output[weaponPrefix + 'critical_dmg_type'] = '';
       }
     }
     if (v[spellPrefix + 'save']) {
@@ -597,12 +597,12 @@ export function setAttackEntryVals(spellPrefix, weaponPrefix, v, setter, noName)
       }
     }
     if (notes) {
-      setter[weaponPrefix + 'notes'] = notes;
+      output[weaponPrefix + 'notes'] = notes;
     }
   } catch (err) {
     TAS.error('PFAbility.setAttackEntryVals', err);
   } finally {
-    return setter;
+    return output;
   }
 }
 /**Triggered from a button in repeating spells
