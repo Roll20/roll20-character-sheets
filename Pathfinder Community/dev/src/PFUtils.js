@@ -645,9 +645,10 @@ export function replaceDiceDieString(str) {
  *@returns {string} brackets around dice roll or ""
  */
 export function getDiceDieString(str) {
-  var matches;
-  str = replaceMissingNegatives_BadDice(str);
-  matches = PFConst.diceDieregOneGroup.exec(str);
+  let matches;
+  let workingStr = str || '';
+  workingStr = replaceMissingNegatives_BadDice(workingStr);
+  matches = PFConst.diceDieregOneGroup.exec(workingStr);
   if (matches) {
     return '[[ ' + matches[0] + ' ]]';
   }
