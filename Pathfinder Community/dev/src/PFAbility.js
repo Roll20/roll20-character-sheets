@@ -116,6 +116,7 @@ function setTypeTab(callback, silently, id, eventInfo) {
     },
   );
 }
+
 function setRuleTab(callback, silently, id, eventInfo) {
   let prefix = 'repeating_ability_' + SWUtils.getRepeatingIDStr(id);
   getAttrs(
@@ -178,6 +179,7 @@ function setRuleTab(callback, silently, id, eventInfo) {
     },
   );
 }
+
 export function setRuleTabs() {
   getSectionIDs('repeating_ability', function (ids) {
     _.each(ids, function (id) {
@@ -243,6 +245,7 @@ function getAbilityTypes(callback) {
     });
   });
 }
+
 function getNewAbilityAttrs(ability) {
   let setter = {},
     id = '',
@@ -295,6 +298,7 @@ function getNewAbilityAttrs(ability) {
     return setter;
   }
 }
+
 export function copyToAbilities(callback, abilities) {
   let done = _.once(function () {
       //TAS.debug("leaving PFAbility.copyToAbilities");
@@ -362,6 +366,7 @@ function getTopOfMenu(callback, isNPC) {
     done(newMacro);
   }
 }
+
 export function resetCommandMacro(callback) {
   let done = _.once(function () {
       if (typeof callback === 'function') {
@@ -383,6 +388,7 @@ export function resetCommandMacro(callback) {
   PFMenus.resetOneCommandMacro('sp', false, doneOne);
   PFMenus.resetOneCommandMacro('su', false, doneOne);
 }
+
 export function importFromCompendium(callback, eventInfo) {
   let done = _.once(function () {
       resetCommandMacro();
@@ -605,6 +611,7 @@ export function setAttackEntryVals(spellPrefix, weaponPrefix, v, setter, noName)
     return output;
   }
 }
+
 /**Triggered from a button in repeating spells
  *@param {string} id the row id or null
  *@param {string} weaponId if updating existing row
@@ -696,6 +703,7 @@ export function createAttackEntryFromRow(id, callback, silently, eventInfo, weap
     }
   });
 }
+
 export function updateAssociatedAttack(id, callback, silently, eventInfo) {
   let done = _.once(function () {
       //TAS.debug("leaving PFAbility.updateAssociatedAttack");
@@ -788,6 +796,7 @@ export function updateAssociatedAttack(id, callback, silently, eventInfo) {
     });
   });
 }
+
 function updateCharLevel(id, callback, eventInfo) {
   let done = _.once(function () {
       //TAS.debug("leaving updateCharLevel");
@@ -827,6 +836,7 @@ function updateCharLevel(id, callback, eventInfo) {
     }
   });
 }
+
 function updateAbilityRange(id, callback, silently, eventInfo) {
   let done = _.once(function () {
       //TAS.debug("leaving updateAbilityRange");
@@ -875,6 +885,7 @@ function updateAbilityRange(id, callback, silently, eventInfo) {
     }
   });
 }
+
 /** to use in calls to _.invoke or otherwise, sets switch variables to setter for given row
  * @param {jsobj} setter to pass in first var of SWUtils.setWrapper
  * @param {string} id the id of this row, or null if we are within the row context already
@@ -890,19 +901,19 @@ function resetOption(setter, id, v, eventInfo) {
     hasAttack = '',
     atkstr = '',
     attackStrForDisplay = '';
-  setter = setter || {};
+  const output = setter || {};
   try {
     if (!v) {
-      return setter;
+      return output;
     }
     isSP = v[prefix + 'ability_type'] === 'Sp' ? '1' : '';
 
     if (isSP !== v[prefix + 'is_sp']) {
-      setter[prefix + 'is_sp'] = isSP;
+      output[prefix + 'is_sp'] = isSP;
     }
     posRange = (parseInt(v[prefix + 'range_numeric'], 10) || 0) > 0 ? '1' : '';
     if (posRange !== v[prefix + 'hasposrange']) {
-      setter[prefix + 'hasposrange'] = posRange;
+      output[prefix + 'hasposrange'] = posRange;
     }
     if (v[prefix + 'frequency'] && v[prefix + 'frequency'] !== 'not-applicable') {
       hasFrequency = '1';
@@ -916,16 +927,16 @@ function resetOption(setter, id, v, eventInfo) {
       }
     }
     if (hasFrequency !== v[prefix + 'hasfrequency']) {
-      setter[prefix + 'hasfrequency'] = hasFrequency;
+      output[prefix + 'hasfrequency'] = hasFrequency;
     }
     if (hasUses !== v[prefix + 'hasuses']) {
-      setter[prefix + 'hasuses'] = hasUses;
+      output[prefix + 'hasuses'] = hasUses;
     }
     if (PFUtils.findAbilityInString(v[prefix + 'abil-attack-type'])) {
       hasAttack = '1';
     }
     if (hasAttack !== v[prefix + 'hasattack']) {
-      setter[prefix + 'hasattack'] = hasAttack;
+      output[prefix + 'hasattack'] = hasAttack;
     }
     if (hasAttack) {
       atkstr = v[prefix + 'abil-attack-type'].toLowerCase();
@@ -938,14 +949,15 @@ function resetOption(setter, id, v, eventInfo) {
       }
     }
     if (attackStrForDisplay !== v[prefix + 'abil-attacktypestr']) {
-      setter[prefix + 'abil-attacktypestr'] = attackStrForDisplay;
+      output[prefix + 'abil-attacktypestr'] = attackStrForDisplay;
     }
   } catch (err) {
     TAS.error('PFAbility.recalcAbilities', err);
   } finally {
-    return setter;
+    return output;
   }
 }
+
 function resetOptionAsync(id, callback, eventInfo) {
   let done = _.once(function () {
       //TAS.debug("leaving PFAbility.resetOption");
@@ -1018,11 +1030,13 @@ function recalcAbilities(callback, silently, eventInfo, levelOnly) {
     });
   });
 }
+
 export function migrate(callback) {
   if (typeof callback === 'function') {
     callback();
   }
 }
+
 export let recalculate = TAS.callback(function callPFAbilityRecalculate(callback, silently, oldversion) {
   let done = _.once(function () {
       TAS.info('leaving PFAbility.recalculate');
@@ -1047,6 +1061,7 @@ export let recalculate = TAS.callback(function callPFAbilityRecalculate(callback
     done();
   }
 });
+
 //sync repeating_ability with settings>attacks>link spells
 function updateIncludeLink() {
   getSectionIDs('repeating_ability', function (ids) {
@@ -1060,6 +1075,7 @@ function updateIncludeLink() {
     });
   });
 }
+
 //trigger updateIncludeLink when updating the sheet version
 export function updateIncludeLinkVersionCheck() {
   setAttrs({
@@ -1283,4 +1299,5 @@ function registerEventHandlers() {
     PFMacros.checkAbilityType2Row(eventInfo);
   });
 }
+
 registerEventHandlers();
