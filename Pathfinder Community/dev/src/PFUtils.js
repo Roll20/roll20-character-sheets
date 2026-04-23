@@ -635,8 +635,6 @@ export function getDiceDieFromString(str, cleanedup, atStart) {
  *@returns {string} same string with brackets around dice roll
  */
 export function replaceDiceDieString(str) {
-  let tempstr = '';
-  let tempstrs;
   let workingStr = str || '';
   workingStr = replaceMissingNegatives_BadDice(workingStr);
   return workingStr.replace(PFConst.diceDieregOneGroup, '[[ $1 ]]');
