@@ -844,14 +844,16 @@ function updateAbilityRange(id, callback, silently, eventInfo) {
       isSP = 0,
       currPosRange = 0;
     try {
-      isSP = v[prefix + 'ability_type'] === 'Sp' ? 1 : 0;
+      // isSP = v[prefix + 'ability_type'] === 'Sp' ? 1 : 0;
       currRange = parseInt(v[prefix + 'range_numeric'], 10) || 0;
-      if (isSP) {
-        cl = parseInt(v[prefix + 'casterlevel'], 10) || 0;
-        newRange = PFUtils.findSpellRange(v[prefix + 'range'], v[prefix + 'range_pick'], cl) || 0;
-      } else {
-        newRange = parseInt(SWUtils.trimBoth(v[prefix + 'range']), 10) || 0;
-      }
+      // if (isSP) {
+      //   cl = parseInt(v[prefix + 'casterlevel'], 10) || 0;
+      //   newRange = PFUtils.findSpellRange(v[prefix + 'range'], v[prefix + 'range_pick'], cl) || 0;
+      // } else {
+      //   newRange = parseInt(SWUtils.trimBoth(v[prefix + 'range']), 10) || 0;
+      // }
+      cl = parseInt(v[prefix + 'casterlevel'], 10) || 0;
+      newRange = PFUtils.findSpellRange(v[prefix + 'range'], v[prefix + 'range_pick'], cl) || 0;
       if (newRange !== currRange) {
         //TAS.debug("updating range");
         setter[prefix + 'range_numeric'] = newRange;
