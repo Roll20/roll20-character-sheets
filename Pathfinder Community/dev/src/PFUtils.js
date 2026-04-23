@@ -295,9 +295,9 @@ export function getAvgHP(hdice, hdie, mult, firstMax, ispfs) {
  * @returns {decimal} either 0.5, 0.75,  or 1.00
  */
 export function getAutoHPPercentMultiplier(autohp_percent) {
-  var newhealth = 0;
-  autohp_percent = parseInt(autohp_percent, 10) || 0;
-  switch (autohp_percent) {
+  let newhealth = 0;
+  const autoHpPercent = parseInt(autohp_percent, 10) || 0;
+  switch (autoHpPercent) {
     case 1:
       newhealth = 0.5;
       break;
@@ -311,7 +311,7 @@ export function getAutoHPPercentMultiplier(autohp_percent) {
       newhealth = 0.5;
       break;
   }
-  //TAS.debug("at getAutoHPPercentMultiplier called with "+autohp_percent+", returning with :" + newhealth);
+  //TAS.debug("at getAutoHPPercentMultiplier called with "+autoHpPercent+", returning with :" + newhealth);
   return newhealth;
 }
 /** parseSpellRangeText - Initial parse of a string from spell , it returns the value to set in the dropdown,
