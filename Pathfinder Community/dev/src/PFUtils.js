@@ -239,17 +239,18 @@ export function shouldNotDisplayOption(attr, val) {
 }
 /** deleteOption - removes option text from string and adds {{optionKey=}}
  * @param {string} optionText the string of a rolltemplate macro
- * @param {string} optionKey the key from rolltemplate setting, as in: {{optionKey=xxxx}}
- * @param {string} regexMap output of keys, what to search for from getOptionsCompiledRegexMap()
- * @returns {string} optionText with the optionKey portion of macro replaced with empty value
+ * @param {string} optionKey the key from rolltemplate setting
+ * @param {string} regexMap output of keys
+ * @returns {string} modified text with the optionKey portion replaced
  */
 export function deleteOption(optionText, optionKey, regexMap) {
-  var repStr = isOptionTemplateReversed(optionKey) ? '{{=' + optionKey + '}}' : '{{' + optionKey + '=}}';
-  //TAS.debug("deleteOption optionKey"+optionKey+", regexMap[optionKey]:"+regexMap[optionKey]+", repStr:"+repStr);
-  if (optionKey && optionText && regexMap[optionKey]) {
-    optionText = optionText.replace(regexMap[optionKey], repStr);
+  let resultText = optionText || '';
+  const repStr = isOptionTemplateReversed(optionKey) ? '{{=' + optionKey + '}}' : '{{' + optionKey + '=}}';
+  // TAS.debug("deleteOption optionKey: " + optionKey + ", regexMap[optionKey]: " + regexMap[optionKey] + ", repStr: " + repStr);
+  if (optionKey && resultText && regexMap[optionKey]) {
+    resultText = resultText.replace(regexMap[optionKey], repStr);
   }
-  return optionText;
+  return resultText;
 }
 /**getAvgHP returns average hp for given hit dice and die
  * also can return 75% or 100% of max hp
