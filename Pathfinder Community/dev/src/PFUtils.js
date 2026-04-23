@@ -779,6 +779,7 @@ export function getNoteAfterNumber(str) {
   }
   return workingStr;
 }
+
 /**gets value of '<field>_compendium' from v,passes it to synchronous methodToCall mapping function, then adds 'field' to setter with val:
  *   setter[<prefix>(<setField>|<field>)] = methodToCall(v[<prefix><field>_compendium])
  *@param {string} prefix the repeating_section_id_  string
@@ -789,21 +790,23 @@ export function getNoteAfterNumber(str) {
  *@param {string} setField optional if the attr to write to is not 'field' it will be prefix+setField
  */
 export function getCompendiumFunctionSet(prefix, field, methodToCall, v, setter, setField) {
-  var temp = 0,
-    attr = v[prefix + field + '_compendium'];
-  setter = setter || {};
+  let temp = 0;
+  const attr = v[prefix + field + '_compendium'];
+  const output = setter || {};
+  const targetField = setField || field;
   TAS.debug('PFUtils.getCompendiumFunctionSet getting ' + prefix + field + '_compendium, val: ' + attr);
   if (attr) {
     temp = methodToCall(attr);
     TAS.debug('on return value is:' + temp);
     if (temp) {
-      setField = setField || field;
       TAS.debug('setting ' + prefix + field + ' with value ' + temp);
-      setter[prefix + setField] = temp;
+      // We modify the property of the object, which is perfectly fine
+      output[prefix + targetField] = temp;
     }
   }
-  return setter;
+  return output;
 }
+
 /**gets int value 'field_compendium' from v, then sets in 'field':
  *   setter[<prefix>(<setField>|<field>)] = getIntFromString(v[<prefix><field>_compendium])
  *@param {string} prefix the repeating_section_id_  string
