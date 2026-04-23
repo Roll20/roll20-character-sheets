@@ -572,25 +572,27 @@ export function getIntFromString(str, cleanedup, atStart) {
  * @returns {{'crit':number,'critmult':number,'spaces':number}}
  */
 export function getCritFromString(str, cleanedup) {
-  var ret = {crit: 20, critmult: 2, spaces: 0},
-    matches;
+  let ret = {crit: 20, critmult: 2, spaces: 0};
+  let matches;
+  let workingStr = str || '';
   if (!cleanedup) {
-    str = convertDashToMinus(str);
-    str = replaceMissingNegatives_CritRange(str);
+    workingStr = convertDashToMinus(workingStr);
+    workingStr = replaceMissingNegatives_CritRange(workingStr);
   }
   ret.critmult = 2;
-  if ((matches = PFConst.critreg.exec(str)) !== null) {
-    ret.crit = parseInt(matches[1], 10);
+  if ((matches = PFConst.critreg.exec(workingStr)) !== null) {
+    ret.crit = parseInt(matches[1], 10) || 20;
     if (matches[2]) {
       ret.critmult = parseInt(matches[2], 10);
     }
     ret.spaces = matches[0].length;
-  } else if ((matches = PFConst.critmultreg.exec(str)) !== null) {
+  } else if ((matches = PFConst.critmultreg.exec(workingStr)) !== null) {
     ret.critmult = parseInt(matches[1], 10);
     ret.spaces = matches[0].length;
   }
   return ret;
 }
+
 /**Returns object of a dice string as mapped ints: dice:# of dice, die:# of sides, plus: plus or minus to roll, spaces:length of string found
  * @param {string} str the string that should have xdy+z in it.
  * @param {boolean} cleanedup if replaceMissingNegatives_BadDice already called on string
