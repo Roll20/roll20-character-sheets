@@ -807,31 +807,31 @@ export function getCompendiumFunctionSet(prefix, field, methodToCall, v, setter,
   return output;
 }
 
-/**gets int value 'field_compendium' from v, then sets in 'field':
- *   setter[<prefix>(<setField>|<field>)] = getIntFromString(v[<prefix><field>_compendium])
- *@param {string} prefix the repeating_section_id_  string
- *@param {string} field the name of compendium field , must have _compendium at end. Without '_compendium' this is the write field
- *@param {Map<string,any>} v the values returned from getAttrs
- *@param {Map<string,any>} setter to pass to SWUtils.setWrapper
- *@param {string} setField optional if the attr to write to is not 'field' it will be prefix+setField
+/** gets int value 'field_compendium' from v, then sets in 'field'
+ * @param {string} prefix the repeating_section_id_ string
+ * @param {string} field the name of compendium field
+ * @param {Map} v the values returned from getAttrs
+ * @param {Map} setter to pass to SWUtils.setWrapper
+ * @param {string} setField optional target field name
  */
 export function getCompendiumIntSet(prefix, field, v, setter, setField) {
-  var tempInt = 0,
-    attr;
+  let tempInt = 0;
+  let attr;
+  const targetField = setField || field;
+  const output = setter || {};
   try {
     attr = v[prefix + field + '_compendium'];
     if (attr) {
       tempInt = getIntFromString(attr);
-      //TAS.debug("get int field:"+field+", val="+attr+", int:"+tempInt);
       if (tempInt) {
-        setField = setField || field;
-        setter[prefix + field] = tempInt;
+        // Use targetField instead of field
+        output[prefix + targetField] = tempInt;
       }
     }
   } catch (err) {
-    TAS.error('getCompendiumIntSet error on :' + prefix + ', field:' + field + ', setField:' + setField, err);
+    TAS.error('getCompendiumIntSet error on :' + prefix + ', field:' + field + ', setField:' + targetField, err);
   } finally {
-    return setter;
+    return output;
   }
 }
 
