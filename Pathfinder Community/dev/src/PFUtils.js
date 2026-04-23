@@ -667,6 +667,7 @@ export function getSpecialAbilityTypeFromString(str) {
   }
   return '';
 }
+
 /** returns string after first comma ( that is after an opening parenthesis )
  * or after first comma if there is no opening parenthesis
  * @param {string} str the string to split
@@ -694,6 +695,7 @@ export function removeUptoFirstComma(str, putOutside) {
   }
   return retstr;
 }
+
 /**getDCString - gets macro formula for special ability calculating DC using ability score, what the level attribute is, and
  * whether to divide that level by 2 or not.
  * @param {string} ability the ability score string the DC is based on. Usually CON for special abilities.
@@ -704,16 +706,17 @@ export function removeUptoFirstComma(str, putOutside) {
  * @returns {string} default is: "DC [[ 10 + @{" + ability + "-mod} + floor(@{"+levelAttr+"}/2) ]]";
  */
 export function getDCString(ability, levelAttr, isUndead, miscBonus, doNotDivideByTwo) {
-  var tempstr = '',
-    pre = 'floor(',
-    post = '/2)';
+  let tempstr = '';
+  let pre = 'floor(';
+  let post = '/2)';
+  let workingAbility = ability || '';
 
   tempstr = 'DC [[ 10 ';
-  if (ability) {
-    if (isUndead && ability === 'CON') {
-      ability = 'CHA';
+  if (workingAbility) {
+    if (isUndead && workingAbility === 'CON') {
+      workingAbility = 'CHA';
     }
-    tempstr += '+ @{' + ability + '-mod} ';
+    tempstr += '+ @{' + workingAbility + '-mod} ';
   }
   if (levelAttr) {
     if (doNotDivideByTwo) {
@@ -727,7 +730,6 @@ export function getDCString(ability, levelAttr, isUndead, miscBonus, doNotDivide
     tempstr += '+ ' + miscBonus;
   }
   tempstr += ' ]]';
-
   return tempstr;
 }
 /**replaceDCString looks for DC n, and replaces "n" with the [[ calculated DC  ]] by calling getDCString
