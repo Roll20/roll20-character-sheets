@@ -601,23 +601,24 @@ export function getCritFromString(str, cleanedup) {
  */
 export function getDiceDieFromString(str, cleanedup, atStart) {
   let matches;
-  let ret = {dice: 0, die: 0, plus: 0, spaces: 0};
   let sign = 1;
+  const ret = {dice: 0, die: 0, plus: 0, spaces: 0};
   let workingStr = str || '';
-  if (!str) {
+  if (!workingStr) {
     return ret;
   }
   if (!cleanedup) {
     workingStr = replaceMissingNegatives_BadDice(workingStr);
     workingStr = convertDashToMinus(workingStr);
   }
-  matches = workingStr.match(PFConst.diceDiereg); //  PFConst.diceDiereg.exec(workingStr);
+  matches = workingStr.match(PFConst.diceDiereg);
   if (matches) {
+    // If we don't care about the start, or it IS at the start
     if (!atStart || matches.index === 0) {
-      ret.spaces = matches[0].length + matches.index;
+      ret.spaces = matches[0].length + (matches.index || 0);
       ret.dice = parseInt(matches[1], 10) || 0;
       ret.die = parseInt(matches[2], 10) || 0;
-      if (matches[3] && matches[3] === '-') {
+      if (matches[3] === '-') {
         sign = -1;
       }
       if (matches[4]) {
@@ -625,7 +626,7 @@ export function getDiceDieFromString(str, cleanedup, atStart) {
       }
     }
   }
-  TAS.debug('x1 at getDiceDieFromString parsing ' + workingStr, matches, ret);
+  TAS.debug('getDiceDieFromString parsed: ' + workingStr, matches, ret);
   return ret;
 }
 
@@ -634,11 +635,13 @@ export function getDiceDieFromString(str, cleanedup, atStart) {
  *@returns {string} same string with brackets around dice roll
  */
 export function replaceDiceDieString(str) {
-  var tempstr = '',
-    tempstrs;
-  str = replaceMissingNegatives_BadDice(str);
-  return str.replace(PFConst.diceDieregOneGroup, '[[ $1 ]]');
+  let tempstr = '';
+  let tempstrs;
+  let workingStr = str || '';
+  workingStr = replaceMissingNegatives_BadDice(workingStr);
+  return workingStr.replace(PFConst.diceDieregOneGroup, '[[ $1 ]]');
 }
+
 /* like replaceDiceDieString but instead of replacing returns the first dice match with [[ ]] around it.
  *@param {string} str a string which includes a diceroll substring xdy or xdy +/-z
  *@returns {string} brackets around dice roll or ""
