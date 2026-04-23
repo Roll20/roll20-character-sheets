@@ -1096,14 +1096,15 @@ function registerEventHandlers() {
       PFAttacks.removeLinkedAttack(null, PFAttacks.linkedAttackType.ability, SWUtils.getRowId(eventInfo.sourceAttribute));
     }),
   );
+
   macroEvent = _.reduce(
     events.commandMacroFields,
     function (m, a) {
-      m += singleEvent + a + ' ';
-      return m;
+      return m + singleEvent + a + ' ';
     },
     macroEvent,
   );
+
   on(
     macroEvent,
     TAS.callback(function eventRepeatingAbilityCommandMacroUpdate(eventInfo) {
@@ -1114,6 +1115,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:CL-basis',
     TAS.callback(function eventAbilityClassDropdown(eventInfo) {
@@ -1124,14 +1126,15 @@ function registerEventHandlers() {
       }
     }),
   );
+
   eventToWatch = _.reduce(
     optionRepeatingHelperFields,
     function (m, a) {
-      m += 'change:repeating_ability:' + a + ' ';
-      return m;
+      return m + 'change:repeating_ability:' + a + ' ';
     },
     '',
   );
+
   on(
     eventToWatch,
     TAS.callback(function eventChangeAbilityTypeFrequencyOrRange(eventInfo) {
@@ -1141,6 +1144,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:CL-misc change:repeating_ability:spell_level-misc',
     TAS.callback(function eventSLAEquationMacro(eventInfo) {
@@ -1148,6 +1152,7 @@ function registerEventHandlers() {
       SWUtils.evaluateAndSetNumber(eventInfo.sourceAttribute, eventInfo.sourceAttribute + '-mod');
     }),
   );
+
   on(
     'change:buff_CasterLevel-total change:CasterLevel-Penalty',
     TAS.callback(function eventAbilityLevelChange(eventInfo) {
@@ -1157,6 +1162,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:CL-basis-mod change:repeating_ability:CL-misc-mod',
     TAS.callback(function eventAbilityLevelChange(eventInfo) {
@@ -1166,6 +1172,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:compendium_category',
     TAS.callback(function eventAbilityCompendium(eventInfo) {
@@ -1175,6 +1182,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:create-attack-entry',
     TAS.callback(function eventcreateAttackEntryFromSLA(eventInfo) {
@@ -1184,6 +1192,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:CL-misc-mod change:repeating_ability:CL-basis-mod change:repeating_ability:range_pick change:repeating_ability:range',
     TAS.callback(function eventClassRangeMod(eventInfo) {
@@ -1198,14 +1207,15 @@ function registerEventHandlers() {
       }
     }),
   );
+
   eventToWatch = _.reduce(
     events.attackEventsSLA,
     function (memo, attr) {
-      memo += 'change:repeating_ability:' + attr + ' ';
-      return memo;
+      return memo + 'change:repeating_ability:' + attr + ' ';
     },
     '',
   );
+
   on(
     eventToWatch,
     TAS.callback(function eventupdateAssociatedSLAttackAttack(eventInfo) {
@@ -1215,6 +1225,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:toggle_attack_entry',
     TAS.callback(function eventupdateAssociatedSLAttackAttack(eventInfo) {
@@ -1224,6 +1235,7 @@ function registerEventHandlers() {
       }
     }),
   );
+
   on(
     'change:repeating_ability:rule_category',
     TAS.callback(function eventUpdateAbilityRule(eventInfo) {
@@ -1231,6 +1243,7 @@ function registerEventHandlers() {
       setRuleTab(null, null, null, eventInfo);
     }),
   );
+
   on(
     'change:repeating_ability:ability_type',
     TAS.callback(function eventUpdateAbilityType(eventInfo) {
@@ -1238,6 +1251,7 @@ function registerEventHandlers() {
       setTypeTab(null, null, null, eventInfo);
     }),
   );
+
   // toggles the chat menu Show option for all repeating abilities
   on('change:showinmenu_all_abilities', function () {
     getSectionIDs('repeating_ability', function (idArrayAbility) {
@@ -1267,6 +1281,7 @@ function registerEventHandlers() {
       });
     });
   });
+
   //sync repeating_abilities with settings>attacks>link abilities
   on('change:include_link_abilities', function (eventInfo) {
     TAS.debug('caught ' + eventInfo.sourceAttribute + ' event' + eventInfo.sourceType);
@@ -1274,6 +1289,7 @@ function registerEventHandlers() {
       updateIncludeLink();
     }
   });
+
   // dynamic translation of datalist for ability_type2
   on('change:repeating_ability:ability_type2', (eventInfo) => {
     TAS.debug('caught ' + eventInfo.sourceAttribute + ' event' + eventInfo.sourceType);
