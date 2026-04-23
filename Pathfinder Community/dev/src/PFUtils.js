@@ -600,17 +600,18 @@ export function getCritFromString(str, cleanedup) {
  * @returns {{'dice':number,'die':number,'plus':number,'spaces':number}}
  */
 export function getDiceDieFromString(str, cleanedup, atStart) {
-  var matches,
-    ret = {dice: 0, die: 0, plus: 0, spaces: 0},
-    sign = 1;
+  let matches;
+  let ret = {dice: 0, die: 0, plus: 0, spaces: 0};
+  let sign = 1;
+  let workingStr = str || '';
   if (!str) {
     return ret;
   }
   if (!cleanedup) {
-    str = replaceMissingNegatives_BadDice(str);
-    str = convertDashToMinus(str);
+    workingStr = replaceMissingNegatives_BadDice(workingStr);
+    workingStr = convertDashToMinus(workingStr);
   }
-  matches = str.match(PFConst.diceDiereg); //  PFConst.diceDiereg.exec(str);
+  matches = workingStr.match(PFConst.diceDiereg); //  PFConst.diceDiereg.exec(workingStr);
   if (matches) {
     if (!atStart || matches.index === 0) {
       ret.spaces = matches[0].length + matches.index;
@@ -624,9 +625,10 @@ export function getDiceDieFromString(str, cleanedup, atStart) {
       }
     }
   }
-  TAS.debug('x1  at getDiceDieFromString parsing ' + str, matches, ret);
+  TAS.debug('x1 at getDiceDieFromString parsing ' + workingStr, matches, ret);
   return ret;
 }
+
 /**replaceDiceDieString puts inline roll brackets [[ ]] around 'xdy +z' dice strings (z exists or not)
  *@param {string} str a string which includes a diceroll substring xdy or xdy +/-z
  *@returns {string} same string with brackets around dice roll
