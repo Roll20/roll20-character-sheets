@@ -262,26 +262,28 @@ export function deleteOption(optionText, optionKey, regexMap) {
  * @returns {int} hit point average.
  */
 export function getAvgHP(hdice, hdie, mult, firstMax, ispfs) {
-  var hp = 0,
-    bonus = 1;
-  //TAS.debug("PFUtils.getAvgHP called with hdice:"+hdice+", hdie:"+hdie+", mult:"+mult+", firstMax:"+firstMax);
+  let hp = 0;
+  let bonus = 1;
+  let hpMult = mult || 1;
+  let diceCount = hdice || 0;
+  //TAS.debug("PFUtils.getAvgHP called with hdice:"+hdice+", hdie:"+hdie+", mult:"+hpMult+", firstMax:"+firstMax);
   if (hdie === 0) {
     return 0;
   }
-  if (!(mult === 0.5 || mult === 0.75 || mult === 1)) {
-    mult = 0.5;
+  if (!(hpMult === 0.5 || hpMult === 0.75 || hpMult === 1)) {
+    hpMult = 0.5;
   }
   if (ispfs) {
     bonus = 2;
-    mult = 0.5;
+    hpMult = 0.5;
   }
-  if (mult === 1) {
+  if (hpMult === 1) {
     hp = hdie * hdice;
   } else {
     if (firstMax) {
-      hdice--;
+      diceCount--;
     }
-    hp = Math.floor((100 * (hdie + bonus) * mult * hdice) / 100);
+    hp = Math.floor((100 * (hdie + bonus) * hpMult * diceCount) / 100);
     if (firstMax) {
       hp += hdie;
     }
