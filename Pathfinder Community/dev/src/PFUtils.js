@@ -131,6 +131,7 @@ export function findAbilityInString(stringToSearch) {
   return stringToSearch.replace('@{', '').replace('}', '');
   //    return "";
 }
+
 /** calculateSpellRanges - returns {close:x, medium:y , long:z} for casterlevel
  *@param {int} casterlevel level of caster
  *@param {int} use_metrics metric flag
@@ -146,6 +147,7 @@ export function calculateSpellRanges(casterlevel, use_metrics) {
     long: Math.round((400 + 40 * level) * multiplier),
   };
 }
+
 /** findSpellRange - calculates range number based on spell settings
  * @param {number} customRangeVal value that is in the custom range field
  * @param {string} rangeDropdown selected value from spell range dropdown
@@ -190,6 +192,7 @@ export function findSpellRange(customRangeVal, rangeDropdown, casterlevel, use_m
   // TAS.debug("returning customRangeVal " + newRange + " for " + rangeKey);
   return newRange;
 }
+
 /** getWoundPenalty - applies Endurance feat or Gritty Mode to wound level.
  *@param {int} woundLevel value of wounds attribute
  *@param {boolean} hasEndurance if char has Endurance feat (lessens penalty by 1)
@@ -203,6 +206,7 @@ export function getWoundPenalty(woundLevel, hasEndurance, grittyMode) {
 export function isOptionTemplateReversed(spellOptionKey) {
   return spellOptionKey === 'range_pick';
 }
+
 /** getOptionsCompiledRegexMap - finds {{key=*}} in a string to search rolltemplate macros
  * uses lookahead and lookbehind  to ensure must be preceded by start or }} , followed by end or {{
  * @param {jsobj map} options map {} of key , only key looked at.
@@ -216,6 +220,7 @@ export function getOptionsCompiledRegexMap(options) {
     return new RegExp('((?=\\{\\{)|(?=^))\\s*\\{\\{\\.*?\\=' + key + '\\}\\}\\s*((?=\\{\\{)|(?=$))');
   });
 }
+
 /** shouldNotDisplayOption- returns true if the value is the default so we know not to bother displaying in roll.
  * @param {string} attr: can pass either the attribute or the option name it will be sent to
  * @param {string} val : the value of the attribute
@@ -237,6 +242,7 @@ export function shouldNotDisplayOption(attr, val) {
       return false;
   }
 }
+
 /** deleteOption - removes option text from string and adds {{optionKey=}}
  * @param {string} optionText the string of a rolltemplate macro
  * @param {string} optionKey the key from rolltemplate setting
@@ -252,6 +258,7 @@ export function deleteOption(optionText, optionKey, regexMap) {
   }
   return resultText;
 }
+
 /**getAvgHP returns average hp for given hit dice and die
  * also can return 75% or 100% of max hp
  * @param {int} hdice # of dice
@@ -290,6 +297,7 @@ export function getAvgHP(hdice, hdie, mult, firstMax, ispfs) {
   }
   return hp;
 }
+
 /** takes value of auto hit point radio and returns percent it represents 50,75,100.
  * @param {int} autohp_percent the value of attr_autohp_percent
  * @returns {decimal} either 0.5, 0.75,  or 1.00
@@ -314,13 +322,11 @@ export function getAutoHPPercentMultiplier(autohp_percent) {
   //TAS.debug("at getAutoHPPercentMultiplier called with "+autoHpPercent+", returning with :" + newhealth);
   return newhealth;
 }
-/** parseSpellRangeText - Initial parse of a string from spell , it returns the value to set in the dropdown,
- * plus whether to run the range text through a secondary parse for numbers.
- * returns object with keys: dropdown, useorig, number, rangetext
- * (number only returned if number is a flat number)
+
+/** parseSpellRangeText - Initial parse of a string from spell
  * @param {string} range the range string from a spell
- * @param {string} area the area or target string from a spell (whichever filled in, only 1 will be)
- * @returns {jsobj} map format: {"dropdown":newRangeDropdown,"useorig":useOrigRangeText if special,"number":flatRange,"rangetext":newRangeText if we need to fill in text}
+ * @param {string} area the area or target string from a spell
+ * @returns {object} map format: {"dropdown":newRangeDropdown,"useorig":useOrigRangeText,"number":flatRange,"rangetext":newRangeText}
  */
 export function parseSpellRangeText(range, area) {
   var newRangeDropdown = '',
@@ -331,10 +337,10 @@ export function parseSpellRangeText(range, area) {
     flatRange = -1,
     areaRange,
     newRangeText = '';
-  //TAS.debug("at parseSpellRangeText: range:"+range+", area:"+area);
+  let currentRange = (range || '').toLowerCase();
+  // TAS.debug("at parseSpellRangeText: range:" + currentRange + ", area:" + area);
   try {
-    if (!range) {
-      //if range is blank, use the number in area/effect/targets since it will be "30ft emanation" or something similar
+    if (!currentRange) {
       if (!area) {
         return {
           dropdown: 'blank',
@@ -353,10 +359,9 @@ export function parseSpellRangeText(range, area) {
       }
       return areaRange;
     }
-    //begin
-    range = range.toLowerCase();
-    //if unlimited use area/target field
-    if (!newRangeDropdown && range === 'unlimited') {
+
+    // if unlimited use area/target field
+    if (!newRangeDropdown && currentRange === 'unlimited') {
       areaRange = parseSpellRangeText(area, null);
       if (areaRange.dropdown === 'unknownrange') {
         newRangeDropdown = 'blank';
@@ -365,47 +370,46 @@ export function parseSpellRangeText(range, area) {
         if (!/short|medium|long/.test(newRangeDropdown)) {
           useOrigRangeText = areaRange.useorig;
           if (useOrigRangeText && areaRange.rangetext) {
-            range = areaRange.rangetext;
+            currentRange = areaRange.rangetext;
           }
         }
       }
     }
+
     if (!newRangeDropdown) {
-      //and or or - use the value after and/or if there is one, and keep rangetext
-      tempMatches = range.match(/(.*?)\s+(or|and)\s+/);
+      // and or or - use value after and/or if there is one
+      tempMatches = currentRange.match(/(.*?)\s+(or|and)\s+/);
       if (tempMatches && tempMatches[1]) {
-        areaRange = parseSpellRangeText(range.substring(tempMatches[0].length), null);
+        areaRange = parseSpellRangeText(currentRange.substring(tempMatches[0].length), null);
         if (areaRange && !(areaRange.dropdown === 'unknownrange' || areaRange.dropdown === 'blank')) {
           newRangeDropdown = areaRange.dropdown;
-          if (areaRange.rangetext) {
-            //If second value is a flat number or per level
-            // then move it BEFORE the and/or so parseInt on rangetext works.
+          if (areaRange.rangetext || areaRange.number !== -1) {
             if (newRangeDropdown === 'number') {
               if (areaRange.rangetext) {
-                range = areaRange.rangetext + ' ' + tempMatches[2] + ' ' + tempMatches[1];
+                currentRange = areaRange.rangetext + ' ' + tempMatches[2] + ' ' + tempMatches[1];
               } else {
-                range = areaRange.number + ' ft. ' + tempMatches[2] + ' ' + tempMatches[1];
+                currentRange = areaRange.number + ' ft. ' + tempMatches[2] + ' ' + tempMatches[1];
               }
             } else if (newRangeDropdown === 'perlevel') {
-              //must add /level when it is and/or but otherwise not.
               if (areaRange.rangetext) {
-                range = areaRange.rangetext + '/level ' + tempMatches[2] + ' ' + tempMatches[1];
+                currentRange = areaRange.rangetext + '/level ' + tempMatches[2] + ' ' + tempMatches[1];
               } else {
-                range = areaRange.number + 'ft. /level  ' + tempMatches[2] + ' ' + tempMatches[1];
+                currentRange = areaRange.number + 'ft. /level  ' + tempMatches[2] + ' ' + tempMatches[1];
               }
             } else {
-              range = tempMatches[1] + ' ' + tempMatches[2] + ' ' + areaRange.rangetext;
+              currentRange = tempMatches[1] + ' ' + tempMatches[2] + ' ' + (areaRange.rangetext || '');
             }
           }
           useOrigRangeText = true;
         }
       }
     }
+
     if (!newRangeDropdown) {
-      if (range === 'you') {
+      if (currentRange === 'you') {
         newRangeDropdown = 'personal';
       } else {
-        tempMatches = range.match(/close|short|medium|long|touch|see text|personal|special|\/level/);
+        tempMatches = currentRange.match(/close|short|medium|long|touch|see text|personal|special|\/level/);
         if (tempMatches && tempMatches[0]) {
           switch (tempMatches[0]) {
             case 'close':
@@ -423,10 +427,10 @@ export function parseSpellRangeText(range, area) {
               newRangeDropdown = 'see_text';
               break;
             case '/level':
-              tempMatches2 = range.match(/(\d+)(\D*)\/level/);
+              tempMatches2 = currentRange.match(/(\d+)(\D*)\/level/);
               if (tempMatches2 && tempMatches2[1]) {
                 tempRange = parseInt(tempMatches2[1], 10) || 0;
-                range = tempMatches2[1] + (tempMatches2[2] || '');
+                currentRange = tempMatches2[1] + (tempMatches2[2] || '');
                 useOrigRangeText = true;
                 newRangeDropdown = 'perlevel';
                 flatRange = tempRange;
@@ -436,34 +440,35 @@ export function parseSpellRangeText(range, area) {
         }
       }
     }
+
     if (!newRangeDropdown) {
-      //number in front usually emanation, line, cone, etc
-      tempRange = parseInt(range, 10);
+      tempRange = parseInt(currentRange, 10);
       if (!isNaN(tempRange) && tempRange > 0) {
         newRangeDropdown = 'number';
         flatRange = tempRange;
         useOrigRangeText = true;
       } else {
-        //number in middle after "more than" or "within"
-        tempMatches2 = range.match(/within\s|more\sthan\s/);
-        if (tempMatches2 && tempMatches2[0]) {
-          range = range.substring(tempMatches2[0].index + tempMatches2[0].length);
-          tempRange = parseInt(range, 10);
+        tempMatches2 = currentRange.match(/within\s|more\sthan\s/);
+        if (tempMatches2) {
+          const searchIndex = tempMatches2.index + tempMatches2[0].length;
+          const searchRange = currentRange.substring(searchIndex);
+          tempRange = parseInt(searchRange, 10);
           if (!isNaN(tempRange) && tempRange > 0) {
             newRangeDropdown = 'number';
             flatRange = tempRange;
             useOrigRangeText = true;
+            currentRange = searchRange;
           }
         }
       }
     }
+
     if (!newRangeDropdown && area) {
-      //give up , retry using the text in area/target/effect
       areaRange = parseSpellRangeText(area, null);
       newRangeDropdown = areaRange.dropdown;
       if (newRangeDropdown === 'number' || newRangeDropdown === 'perlevel') {
         useOrigRangeText = true;
-        range = areaRange.rangetext;
+        currentRange = areaRange.rangetext;
       }
     }
   } catch (errorParsing) {
@@ -471,20 +476,20 @@ export function parseSpellRangeText(range, area) {
     newRangeDropdown = 'unknownrange';
     useOrigRangeText = true;
   }
+
   if (!newRangeDropdown) {
     newRangeDropdown = 'unknownrange';
     useOrigRangeText = true;
   }
+
   if (useOrigRangeText === true) {
     if (newRangeDropdown !== 'unknownrange') {
-      //erase everything in parenthesis - also ltrim and rtrim
-      newRangeText = range
+      newRangeText = currentRange
         .replace(/\s*\(.*?\)/, '')
-        .replace(/^\s+/, '')
-        .replace(/\s+$/, '')
+        .trim()
         .replace('feet', 'ft.');
     } else {
-      newRangeText = range;
+      newRangeText = currentRange;
     }
   }
   return {
