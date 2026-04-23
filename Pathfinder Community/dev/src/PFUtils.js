@@ -769,14 +769,15 @@ export function replaceDCString(str, ability, levelAttr, isUndead, levelFlatNum,
  *@returns {string} rest of string after finding a number.
  */
 export function getNoteAfterNumber(str) {
-  var match;
-  if (str) {
-    match = str.match(/\d+/);
+  let match;
+  let workingStr = str || '';
+  if (workingStr) {
+    match = workingStr.match(/\d+/);
     if (match) {
-      str = SWUtils.trimBoth(str.slice(match.index + match.length));
+      workingStr = SWUtils.trimBoth(workingStr.slice(match.index + match.length));
     }
   }
-  return str;
+  return workingStr;
 }
 /**gets value of '<field>_compendium' from v,passes it to synchronous methodToCall mapping function, then adds 'field' to setter with val:
  *   setter[<prefix>(<setField>|<field>)] = methodToCall(v[<prefix><field>_compendium])
