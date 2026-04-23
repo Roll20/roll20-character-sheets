@@ -507,9 +507,11 @@ export function replaceMissingNegatives_BadDice(str) {
   }
   return str;
 }
+
 export function replaceMissingNegatives_CritRange(str) {
   return str.replace(PFConst.findBadCritRange, '$1-20');
 }
+
 export function convertDashToMinus(str) {
   return str.replace(PFConst.dashtominusreg, '-');
 }
@@ -542,23 +544,27 @@ export function getCostInGP(str) {
   }
   return temp;
 }
+
 export function getIntFromString(str, cleanedup, atStart) {
-  var temp = 0,
-    matches;
+  let temp = 0;
+  let matches;
+  let workingStr = str || '';
+
   if (!cleanedup) {
-    str = replaceMissingNegatives_CritRange(str);
-    str = convertDashToMinus(str);
+    workingStr = replaceMissingNegatives_CritRange(workingStr);
+    workingStr = convertDashToMinus(workingStr);
   }
   if (!atStart) {
-    matches = str.match(/[\+\-]{0,1}\d+/);
+    matches = workingStr.match(/[\+\-]{0,1}\d+/);
   } else {
-    matches = str.match(/^[\+\-]{0,1}\d+/);
+    matches = workingStr.match(/^[\+\-]{0,1}\d+/);
   }
   if (matches) {
     temp = parseInt(matches[0], 10) || 0;
   }
   return temp;
 }
+
 /**Returns object of a crit string as mapped ints as: crit:minimum threat range (def 20), critmult: how much by which to multiply dice (def 2)
  * spaces: number of spaces string took
  * @param {string} str the string that should have /19-20x2 or x2 in it.
