@@ -236,37 +236,54 @@ const attrsGS = [
 	'GS_mod_wounds',
 	'GS_mod_advantages_disadvantages',
 	'GE',
+	'BE',
 ];
 Object.freeze(attrsGS);
 
 on(attrsGS.map(attr => "change:" + attr).join(" ").toLowerCase(),
-	function() {
+	function(info) {
 		const caller = "Action Listener for Movement (GS)";
 		safeGetAttrs(
 			attrsGS, function(v) {
 				// Boilerplate
-				let attrsToChange = { "GS": getDefaultValue("GS") };
+				let GS = getDefaultValue("GS");
+				let GSMarch = GS;
+				let attrsToChange = {};
 				/// Movement (GS) cannot be lower than 1
 				const GSMin = 1;
 
 				// Calculate Movement (GS)
-				let GS = {
+				let GSParts = {
 					"base": parseInt(v["GS_Basis"]),
 					"mod": parseInt(v["GS_Mod"]) + v["GS_mod_wounds"] + v["GS_mod_advantages_disadvantages"],
+					"BEMod": -v["BE"],
 					"GE effect": 0,
 				};
 
 				/// High/low agility (GE) affect Movement (GS)
 				if (v["GE"] < 11)
 				{
-					GS["GE effect"] = -1;
+					GSParts["GE effect"] = -1;
 				} else if (v["GE"] > 15) {
-					GS["GE effect"] = 1;
+					GSParts["GE effect"] = 1;
 				}
 
 				/// Add all parts up
-				attrsToChange["GS"] = GS["base"] + GS["mod"] + GS["GE effect"];
-				attrsToChange["GS"] = Math.max(GSMin, attrsToChange["GS"])
+				GS = GSParts["base"] + GSParts["mod"] + GSParts["GE effect"] + GSParts["BEMod"];
+				GS = Math.max(GSMin, GS);
+
+
+				// Calculate March Movement
+				/// Strictly speaking, this is only required when "Dwarven Stature" is active.
+				const GSWithoutEncumbrance = GSParts["base"] + GSParts["mod"] + GSParts["GE effect"];
+				let excessEncumbranceMod = -Math.max(0, v["BE"] - GSWithoutEncumbrance);
+				GSMarch = GSWithoutEncumbrance + excessEncumbranceMod;
+				GSMarch = Math.max(GSMin, GSMarch);
+
+
+				attrsToChange["GS"] = GS;
+				attrsToChange["GS_march"] = GSMarch;
+				console.log("info", info, "v", v, "GSParts", GSParts);
 
 				for (attr in attrsToChange)
 				{

@@ -67,6 +67,8 @@ const defaultValues = {
 	"GS": 8,
 	"GE_mod_advantages_disadvantages": 0,
 	"GS_mod_advantages_disadvantages": 0,
+	// 6, because only used/shown when "Dwarven Stature" is active and base GS for such characters is lowered by 2
+	"GS_march" : 6,
 
 	"LE": 12,
 	"legrundw": 12,
