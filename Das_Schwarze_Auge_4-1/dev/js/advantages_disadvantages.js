@@ -323,6 +323,21 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 				let jumpMod = 0;
 				let swiftEncumbranceHint = false;
 				let dwarvenStatureEncumbranceHint = false;
+				let dwarvenStatureMarchHint = false;
+				const hints = {
+					"swiftEncumbrance": {
+						"state": false,
+						"attr": "BE_GS_mod_hint_swift",
+					},
+					"dwarvenStatureEncumbrance": {
+						"state": false,
+						"attr": "BE_GS_mod_hint_dwarven_stature",
+					},
+					"dwarvenStatureMarch": {
+						"state": false,
+						"attr": "BE_GS_march_hint_dwarven_stature",
+					},
+				};
 
 				const updatedAttrs = Object.assign(v, attrsToChange);
 
@@ -335,7 +350,7 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 						{
 							if (encumbrance >= swiftEncumbranceThresholds[attr])
 							{
-								swiftEncumbranceHint = true;
+								hints["swiftEncumbrance"]["state"] = true;
 								continue;
 							}
 						}
@@ -351,24 +366,22 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 				attrsToChange["jump_mod_advantages_disadvantages"] = jumpMod;
 
 				/// Dwarven Stature Encumbrance Hint
+				/// Dwarven Stature March Hint
 				if (v["nachteil_zwergenwuchs"] === "1")
 				{
-					dwarvenStatureEncumbranceHint = true;
+					hints["dwarvenStatureEncumbrance"]["state"] = true;
+					hints["dwarvenStatureMarch"]["state"] = true;
 				}
 
 				/// Process hints
-				if (swiftEncumbranceHint)
+				for (hint in hints)
 				{
-					attrsToChange["BE_GS_mod_hint_swift"] = 1;
-				} else {
-					attrsToChange["BE_GS_mod_hint_swift"] = 0;
-				}
-
-				if (dwarvenStatureEncumbranceHint)
-				{
-					attrsToChange["BE_GS_mod_hint_dwarven_stature"] = 1;
-				} else {
-					attrsToChange["BE_GS_mod_hint_dwarven_stature"] = 0;
+					if (hints[hint]["state"])
+					{
+						attrsToChange[hints[hint]["attr"]] = 1;
+					} else {
+						attrsToChange[hints[hint]["attr"]] = 0;
+					}
 				}
 
 				// Calculate athletics speed bonus based on new attribute states (Swift I/II)
