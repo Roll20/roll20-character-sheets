@@ -154,6 +154,8 @@ The mutually exclusive pairs are:
 
 "Short Stature" (Kleinwüchsig) and "Dwarven Stature" (Zwergenwuchs) are not mutually exclusive, but would make for a very short dwarf (below ~1.1 m).
 
+The encumbrance reduction from Dwarven Stature is already accounted for in the encumbrance calculation.
+
 */
 const attrsMovementAffecting = [
 	'vorteil_flink_i',
@@ -163,7 +165,8 @@ const attrsMovementAffecting = [
 	'nachteil_kleinwuechsig',
 	'nachteil_lahm',
 	'nachteil_zwergenwuchs',
-	'BE',
+	'BE_RG',
+	'BE_Last',
 ];
 Object.freeze(attrsMovementAffecting);
 
@@ -176,7 +179,7 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 				// Boilerplate
 				const trigger = eventInfo["sourceAttribute"];
 				const newValue = eventInfo["newValue"];
-				const encumbrance = v["BE"];
+				const encumbrance = v["BE_RG"] + (parseInt(v["BE_Last"]) | 0);
 				const defaultAgilityMod = 0;
 				const defaultMovementMod = 0;
 				const defaultEvadeMod = 0;
@@ -192,7 +195,6 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 					"nachteil_kleinwuechsig": 0,
 					"nachteil_lahm": -2,
 					"nachteil_zwergenwuchs": 0,
-					"BE": 0,
 				};
 				const movementEffects = {
 					"vorteil_flink_i": 1,
@@ -202,7 +204,6 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 					"nachteil_kleinwuechsig": -1,
 					"nachteil_lahm": -1,
 					"nachteil_zwergenwuchs": -2,
-					"BE": -encumbrance,
 				};
 				const evadeMods = {
 					"vorteil_flink_i": -1,
@@ -212,7 +213,6 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 					"nachteil_kleinwuechsig": 0,
 					"nachteil_lahm": 0,
 					"nachteil_zwergenwuchs": 1,
-					"BE": 0,
 				};
 				const counterAttackMods = {
 					"vorteil_flink_i": 0,
@@ -222,7 +222,6 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 					"nachteil_kleinwuechsig": -1,
 					"nachteil_lahm": 0,
 					"nachteil_zwergenwuchs": -2,
-					"BE": 0,
 				};
 				const knockDownMods = {
 					"vorteil_flink_i": 0,
@@ -232,7 +231,6 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 					"nachteil_kleinwuechsig": 0,
 					"nachteil_lahm": 0,
 					"nachteil_zwergenwuchs": -2,
-					"BE": 0,
 				};
 				const jumpMods = {
 					"vorteil_flink_i": 0,
@@ -243,11 +241,25 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 					"nachteil_kleinwuechsig": -1,
 					"nachteil_lahm": 0,
 					"nachteil_zwergenwuchs": -2,
-					// Encumbrance is already part of the jump height/distance formula.
-					"BE": 0,
 				};
 
 				let attrsToChange = {};
+
+				// Dwarven Stature affects encumbrance calculation
+				let encumbranceMod = 0;
+
+				if (v["nachteil_zwergenwuchs"] === "1")
+				{
+					const encumbranceFactor = 0.5;
+
+					encumbranceMod = encumbranceFactor * encumbrance;
+					// This will be subtracted from the full encumbrance, rounding down is the inverse operation to rounding up the full encumbrance.
+					// But: Mods are only added, so switch the sign.
+					encumbranceMod = Math.floor(encumbranceMod);
+					encumbranceMod = -encumbranceMod;
+				}
+
+				attrsToChange["BE_mod_advantages_disadvantages"] = encumbranceMod;
 
 				// The advantages/disadvantages are mutually exclusive
 				/// Swift/Unhurried group
@@ -310,10 +322,9 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 				let evadeMod = 0;
 				let jumpMod = 0;
 				let swiftEncumbranceHint = false;
+				let dwarvenStatureEncumbranceHint = false;
 
 				const updatedAttrs = Object.assign(v, attrsToChange);
-				/// Special case: Always consider encumbrance
-				updatedAttrs["BE"] = "1";
 
 				for (attr in updatedAttrs)
 				{
@@ -339,11 +350,25 @@ on(attrsMovementAffecting.map(attr => "change:" + attr).join(" ").toLowerCase(),
 				attrsToChange["k_ausweichen_mod_vorteile_nachteile"] = evadeMod;
 				attrsToChange["jump_mod_advantages_disadvantages"] = jumpMod;
 
+				/// Dwarven Stature Encumbrance Hint
+				if (v["nachteil_zwergenwuchs"] === "1")
+				{
+					dwarvenStatureEncumbranceHint = true;
+				}
+
+				/// Process hints
 				if (swiftEncumbranceHint)
 				{
 					attrsToChange["BE_GS_mod_hint_swift"] = 1;
 				} else {
 					attrsToChange["BE_GS_mod_hint_swift"] = 0;
+				}
+
+				if (dwarvenStatureEncumbranceHint)
+				{
+					attrsToChange["BE_GS_mod_hint_dwarven_stature"] = 1;
+				} else {
+					attrsToChange["BE_GS_mod_hint_dwarven_stature"] = 0;
 				}
 
 				// Calculate athletics speed bonus based on new attribute states (Swift I/II)

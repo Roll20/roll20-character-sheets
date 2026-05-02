@@ -292,6 +292,7 @@ const defaultValues = {
 	"BE_GS_mod_hint": 0,
 	"BE_RG": 0,
 	"BE_RG_INI": 0,
+	"BE_mod_advantages_disadvantages": 0,
 
 	"inibasis2": 6,
 	"inibasis": 6,

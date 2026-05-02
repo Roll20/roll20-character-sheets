@@ -277,6 +277,7 @@ function calculateArmourEncumbranceFX(values, eventInfo) {
 const attrsEncumbranceSources = [
 	'BE_RG',
 	'BE_Last',
+	'BE_mod_advantages_disadvantages',
 ];
 Object.freeze(attrsEncumbranceSources);
 
@@ -285,10 +286,14 @@ on(attrsEncumbranceSources.map(attr => "change:" + attr).join(" ").toLowerCase()
 		safeGetAttrs(
 			attrsEncumbranceSources,
 			function(values) {
+				// Boilerplate
+				const encumbranceMinimum = 0;
 				let encumbranceTotal = 0;
 
+				// Calculating the total
 				encumbranceTotal += values["BE_RG"];
 				encumbranceTotal += parseInt(values["BE_Last"]) | 0;
+				encumbranceTotal += values["BE_mod_advantages_disadvantages"];
 
 				let attrsToChange = { "BE": encumbranceTotal };
 
