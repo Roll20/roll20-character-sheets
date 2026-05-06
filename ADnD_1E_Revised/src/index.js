@@ -1968,7 +1968,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
     }
   }
   await setAttrsAsync(output, {silent: true});
-  await armorDetailsRowidArray(id_low);
+  await refreshArmorDetailsArray(id_low);
   calcAC();
 };
 
@@ -3589,26 +3589,23 @@ const testArmorRowIDs = async (id) => {
   };
 };
 
-const armorDetailsRowidArray = async (id) => {
+const refreshArmorDetailsArray = async (id) => {
   const output = {};
   const {isMatch, armorDetailsArray} = await testArmorRowIDs(id);
-  output.armordetails_array = [`${armorDetailsArray}`];
-  // clog(`armorDetailsRowidArray: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
+  output.armordetails_array = armorDetailsArray.join(',');
+  // clog(`refreshArmorDetailsArray: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
   await setAttrsAsync(output, {silent: true});
-  // clog(`armorDetailsRowidArray: has been updated.`);
-  // console.log(armorDetailsArray);
+  // clog(`refreshArmorDetailsArray: has been updated.`);
+  console.log(armorDetailsArray);
 };
 
-// ensures armordetails_array stays updated when the ids change
 const updateArrayEventListener = `${armorRowIDs.map((stat) => `change:${stat}`).join(' ')}`;
+// ensures armordetails_array stays updated when the ids change
 on(updateArrayEventListener, async (eventInfo) => {
   const attr = eventInfo.sourceAttribute;
   // console.log(`updateArrayEventListener - ARMOR DETAILS ARRAY HAS CHANGED attr:${attr} sourceType: ${eventInfo.sourceType}`);
-  // if (eventInfo.sourceType === 'sheetworker') return;
-  const v = await getAttrsAsync([`${attr}`, 'armordetails_array']);
-  const id = v[`${eventInfo.sourceAttribute}`];
-  // console.log(`updateArrayEventListener - source type: ${eventInfo.sourceType} id:${id} UPDATING armordetails_array...`);
-  armorDetailsRowidArray(id);
+  const id = eventInfo.newValue; // Using the eventInfo directly is faster than getAttrs
+  refreshArmorDetailsArray(id);
 });
 
 // sync/update Armor Details when repeating_equipment armor changes
