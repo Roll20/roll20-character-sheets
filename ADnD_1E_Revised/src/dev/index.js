@@ -3562,18 +3562,18 @@ const createAttack = async (id) => {
 const generateArmorDetailsArray = async () => {
   const v = await getAttrsAsync(armorRowIDs);
   const idArray = [
-    (unarmored0_ID = v.unarmored_row_id.toString()),
-    (armortype1_ID = v.armortype1_row_id.toString()),
-    (armortype2_ID = v.armortype2_row_id.toString()),
-    (armorshield_ID = v.armorshield_row_id.toString()),
-    (armorhelmet_ID = v.armorhelmet_row_id.toString()),
-    (armorother1_ID = v.armorother1_row_id.toString()),
-    (armorother2_ID = v.armorother2_row_id.toString()),
-    (armorother3_ID = v.armorother3_row_id.toString()),
-    (armorother4_ID = v.armorother4_row_id.toString()),
-    (armorother5_ID = v.armorother5_row_id.toString()),
-    (armorother6_ID = v.armorother6_row_id.toString()),
-  ].map((str) => (str ? str.toString().toLowerCase() : '0'));
+    v.unarmored_row_id,
+    v.armortype1_row_id,
+    v.armortype2_row_id,
+    v.armorshield_row_id,
+    v.armorhelmet_row_id,
+    v.armorother1_row_id,
+    v.armorother2_row_id,
+    v.armorother3_row_id,
+    v.armorother4_row_id,
+    v.armorother5_row_id,
+    v.armorother6_row_id,
+  ].map((id) => (id ? id.toString().toLowerCase() : '0'));
   return idArray;
 };
 
