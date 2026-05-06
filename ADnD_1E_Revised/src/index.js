@@ -3650,6 +3650,40 @@ on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_ar
   }
 });
 
+// +Add button: fills Armor Details row with repeating_equipment values
+// IF the item is already synced, but the armor type has been changed,
+// removeEmptyArmorRows tests for duplicate ids and will delete/reset any old rows
+on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_armor_type', async (eventInfo) => {
+  const source = eventInfo.sourceAttribute.toLowerCase();
+  const parts = source.split('_');
+  const id = parts[2];
+  const trigger = parts.slice(3).join('_');
+  const attrType = `repeating_equipment_${id}_equipment_armor_type`;
+  const attrSync = `repeating_equipment_${id}_equipment_sync_armor_flag`;
+  const v = await getAttrsAsync([attrType, attrSync]);
+  const output = {};
+  const type = +v[attrType] || 0;
+  const synced = +v[attrSync] || 0;
+  // clog(`${trigger} - id:${id} type:${type} synced:${synced === 1}`);
+  // Armor Type's set and button clicked OR Type's changed on an already synced item.
+  const isArmor = type !== 99;
+  const updateArmorDetails = (trigger === 'addarmor' && isArmor) || (trigger === 'equipment_armor_type' && synced === 1);
+  if (updateArmorDetails) {
+    if (isArmor) {
+      await fillArmorDetails(id);
+      // This flag update is now inside the block to ensure it only happens when valid
+      output[attrSync] = 1;
+    } else {
+      // Item was synced but is now Type 99: Clean up the flag
+      output[attrSync] = 0;
+    }
+    await removeEmptyArmorRows();
+    if (Object.keys(output).length > 0) {
+      await setAttrsAsync(output, {silent: true});
+    }
+  }
+});
+
 on('clicked:repeating_equipment:addattack', (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   createAttack(id);
