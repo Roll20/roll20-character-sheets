@@ -3027,11 +3027,9 @@ const removeEmptyArmorRows = async () => {
   _.each(idArray, (id) => {
     // this new id/row
     const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
-    // Armor Type not selected
-    if (type === 99) {
-      return;
-      // clog(`removeEmptyArmorRows - Armor Type:${type} Exit`);
-    }
+
+    // If Type 99, set to -1 (ie nothing). Forcing removal of any existing syncs.
+    const rowType = type === 99 ? -1 : type + 1;
     // clog(`removeEmptyArmorRows - Armor Type:${type}`);
     // Find Armor Details row position where the id matches in armorDetailsArray
     const matchingIndices = armorDetailsArray
@@ -3046,7 +3044,7 @@ const removeEmptyArmorRows = async () => {
       })
       .filter((index) => index !== null);
     // detect and remove the old id/row matches
-    if (matchingIndices.length > 1) {
+    if (matchingIndices.length > 0) {
       rowType = type + 1; // Align Armor Type with the Actual Armor Details row
       // clog(`removeEmptyArmorRows - matchingIndices: [${matchingIndices}] id:${id} type:${rowType}`);
       // Create a new array of Armor Details row index positions with multiple matches
