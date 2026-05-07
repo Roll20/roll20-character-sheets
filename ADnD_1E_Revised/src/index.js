@@ -3029,7 +3029,7 @@ const removeEmptyArmorRows = async () => {
     const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
 
     // If Type 99, set to -1 (ie nothing). Forcing removal of any existing syncs.
-    const rowType = type === 99 ? -1 : type + 1;
+    let rowType = type === 99 ? -1 : type + 1;
     // clog(`removeEmptyArmorRows - Armor Type:${type}`);
     // Find Armor Details row position where the id matches in armorDetailsArray
     const matchingIndices = armorDetailsArray
