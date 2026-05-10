@@ -1221,6 +1221,11 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         }
         // set repeating row
         const prefix = `repeating_equipment_${rowId}_`;
+        console.log(`Syncing Row: ${rowId} for ${row.armorType}`);
+        console.log(
+          'CREATING ROW WITH:',
+          Object.keys(output).filter((k) => k.includes(rowId)),
+        );
         output[`${prefix}equipment_type`] = 2;
         output[`${prefix}equipment_armor_type`] = row.typeValue;
         output[`${prefix}equipment_item`] = itemName;
@@ -1257,7 +1262,6 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       }
     }
   });
-
   await setAttrsAsync(output, {silent: true});
   // clog(`Final Output Sent to setAttrs: ${JSON.stringify(output)}`);
   await refreshArmorDetailsArray(id_low);
@@ -2431,6 +2435,8 @@ const removeEmptyArmorRows = async () => {
 // Changes in Armor Details
 // IF this is a new row, add new repeating_equipment armor OR update an existing synced row
 const armorDetailslisteners = `${armorAttrs.map((stat) => `change:${stat}`).join(' ')}`;
+
+// Triggers sync to repeating_equipment when Armor Details are modified manually
 on(armorDetailslisteners, async (eventInfo) => {
   // clog(`armorDetailslisteners: sourceType:${eventInfo.sourceType}`);
   if (eventInfo.sourceType === 'sheetworker') return;
@@ -2883,9 +2889,9 @@ const refreshArmorDetailsArray = async (id) => {
   const output = {};
   const {isMatch, armorDetailsArray} = await testArmorRowIDs(id);
   output.armordetails_array = armorDetailsArray.join(',');
-  // clog(`refreshArmorDetailsArray: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
+  clog(`refreshArmorDetailsArray: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
   await setAttrsAsync(output, {silent: true});
-  // clog(`refreshArmorDetailsArray: has been updated.`);
+  clog(`refreshArmorDetailsArray: has been updated.`);
   console.log(armorDetailsArray);
 };
 
@@ -2893,7 +2899,7 @@ const updateArrayEventListener = `${armorRowIDs.map((stat) => `change:${stat}`).
 // ensures armordetails_array stays updated when the ids change
 on(updateArrayEventListener, async (eventInfo) => {
   const attr = eventInfo.sourceAttribute;
-  // console.log(`updateArrayEventListener - ARMOR DETAILS ARRAY HAS CHANGED attr:${attr} sourceType: ${eventInfo.sourceType}`);
+  console.log(`updateArrayEventListener - ARMOR DETAILS ARRAY HAS CHANGED attr:${attr} sourceType: ${eventInfo.sourceType}`);
   const id = eventInfo.newValue; // Using the eventInfo directly is faster than getAttrs
   refreshArmorDetailsArray(id);
 });
@@ -2911,34 +2917,6 @@ on(
     if (isMatch) fillArmorDetails(id);
   },
 );
-
-// +Add button: fills Armor Details row with repeating_equipment values
-// IF the item is already synced, but the armor type has been changed,
-// removeEmptyArmorRows tests for duplicate ids and will delete/reset any old rows
-on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_armor_type', async (eventInfo) => {
-  const source = eventInfo.sourceAttribute.toLowerCase();
-  const parts = source.split('_');
-  const id = parts[2];
-  const trigger = parts.slice(3).join('_');
-  const attrType = `repeating_equipment_${id}_equipment_armor_type`;
-  const attrSync = `repeating_equipment_${id}_equipment_sync_armor_flag`;
-  const v = await getAttrsAsync([attrType, attrSync]);
-  const output = {};
-  const type = +v[attrType] || 0;
-  const synced = +v[attrSync] || 0;
-  // clog(`${trigger} - id:${id} type:${type} synced:${synced === 1}`);
-  // Armor Type's set and button clicked OR Type's changed on an already synced item.
-  const updateArmorDetails = (trigger === 'addarmor' && type !== 99) || (trigger === 'equipment_armor_type' && synced === 1);
-  if (updateArmorDetails) {
-    await fillArmorDetails(id);
-    await removeEmptyArmorRows();
-    // update the sync flag for newly added items
-    if (synced !== 1) {
-      output[attrSync] = 1;
-      await setAttrsAsync(output, {silent: true});
-    }
-  }
-});
 
 // +Add button: fills Armor Details row with repeating_equipment values
 // IF the item is already synced, but the armor type has been changed,
