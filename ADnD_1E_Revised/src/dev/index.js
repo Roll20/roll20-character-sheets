@@ -1161,7 +1161,6 @@ const clearArmorOther = async (current_version, final_version) => {
 
 // combines all Armor Details attrs and their row id's
 const armorIDsAndAttrs = armorAttrs.concat(armorRowIDs);
-
 // sync armor changes between Armor Details and repeating_equipment
 const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
   const v = await getAttrsAsync(armorIDsAndAttrs);
@@ -2314,17 +2313,15 @@ const removeEmptyArmorRows = async () => {
   const output = {};
   const fields = idArray.flatMap((id) => [`repeating_equipment_${id}_equipment_armor_type`]);
   // grab all attrs and ids before continuing
-  const [v, armorDetailsArray] = await Promise.all([getAttrsAsync(fields), refreshArmorDetailsArray()]);
+  const [v, armorDetailsArray] = await Promise.all([getAttrsAsync(fields), generateArmorDetailsArray()]);
   // clog(`removeEmptyArmorRows - armorDetailsArray:`);
   console.log(armorDetailsArray);
   _.each(idArray, (id) => {
     // this new id/row
     const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
-    // Armor Type not selected
-    if (type === 99) {
-      return;
-      // clog(`removeEmptyArmorRows - Armor Type:${type} Exit`);
-    }
+
+    // If Type 99, set to -1 (ie nothing). Forcing removal of any existing syncs.
+    let rowType = type === 99 ? -1 : type + 1;
     // clog(`removeEmptyArmorRows - Armor Type:${type}`);
     // Find Armor Details row position where the id matches in armorDetailsArray
     const matchingIndices = armorDetailsArray
@@ -2339,7 +2336,7 @@ const removeEmptyArmorRows = async () => {
       })
       .filter((index) => index !== null);
     // detect and remove the old id/row matches
-    if (matchingIndices.length > 1) {
+    if (matchingIndices.length > 0) {
       rowType = type + 1; // Align Armor Type with the Actual Armor Details row
       // clog(`removeEmptyArmorRows - matchingIndices: [${matchingIndices}] id:${id} type:${rowType}`);
       // Create a new array of Armor Details row index positions with multiple matches
@@ -2852,27 +2849,27 @@ const createAttack = async (id) => {
   damageMacro(newID);
 };
 
-const refreshArmorDetailsArray = async () => {
+const generateArmorDetailsArray = async () => {
   const v = await getAttrsAsync(armorRowIDs);
   const idArray = [
-    (unarmored0_ID = v.unarmored_row_id.toString()),
-    (armortype1_ID = v.armortype1_row_id.toString()),
-    (armortype2_ID = v.armortype2_row_id.toString()),
-    (armorshield_ID = v.armorshield_row_id.toString()),
-    (armorhelmet_ID = v.armorhelmet_row_id.toString()),
-    (armorother1_ID = v.armorother1_row_id.toString()),
-    (armorother2_ID = v.armorother2_row_id.toString()),
-    (armorother3_ID = v.armorother3_row_id.toString()),
-    (armorother4_ID = v.armorother4_row_id.toString()),
-    (armorother5_ID = v.armorother5_row_id.toString()),
-    (armorother6_ID = v.armorother6_row_id.toString()),
-  ].map((str) => (str ? str.toString().toLowerCase() : '0'));
+    v.unarmored_row_id,
+    v.armortype1_row_id,
+    v.armortype2_row_id,
+    v.armorshield_row_id,
+    v.armorhelmet_row_id,
+    v.armorother1_row_id,
+    v.armorother2_row_id,
+    v.armorother3_row_id,
+    v.armorother4_row_id,
+    v.armorother5_row_id,
+    v.armorother6_row_id,
+  ].map((id) => (id ? id.toString().toLowerCase() : '0'));
   return idArray;
 };
 
 // checks repeating_equipment id against Armor Detail's ids
 const testArmorRowIDs = async (id) => {
-  const armorDetailsArray = await refreshArmorDetailsArray();
+  const armorDetailsArray = await generateArmorDetailsArray();
   let isMatch = '';
   isMatch = armorDetailsArray.includes(id) ? 1 : 0;
   // clog(`testArmorRowIDs: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
@@ -2882,26 +2879,23 @@ const testArmorRowIDs = async (id) => {
   };
 };
 
-const armorDetailsRowidArray = async (id) => {
+const refreshArmorDetailsArray = async (id) => {
   const output = {};
   const {isMatch, armorDetailsArray} = await testArmorRowIDs(id);
-  output.armordetails_array = [`${armorDetailsArray}`];
-  // clog(`armorDetailsRowidArray: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
+  output.armordetails_array = armorDetailsArray.join(',');
+  // clog(`refreshArmorDetailsArray: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
   await setAttrsAsync(output, {silent: true});
-  // clog(`armorDetailsRowidArray: has been updated.`);
-  // console.log(armorDetailsArray);
+  // clog(`refreshArmorDetailsArray: has been updated.`);
+  console.log(armorDetailsArray);
 };
 
-// ensures armordetails_array stays updated when the ids change
 const updateArrayEventListener = `${armorRowIDs.map((stat) => `change:${stat}`).join(' ')}`;
+// ensures armordetails_array stays updated when the ids change
 on(updateArrayEventListener, async (eventInfo) => {
   const attr = eventInfo.sourceAttribute;
   // console.log(`updateArrayEventListener - ARMOR DETAILS ARRAY HAS CHANGED attr:${attr} sourceType: ${eventInfo.sourceType}`);
-  // if (eventInfo.sourceType === 'sheetworker') return;
-  const v = await getAttrsAsync([`${attr}`, 'armordetails_array']);
-  const id = v[`${eventInfo.sourceAttribute}`];
-  // console.log(`updateArrayEventListener - source type: ${eventInfo.sourceType} id:${id} UPDATING armordetails_array...`);
-  armorDetailsRowidArray(id);
+  const id = eventInfo.newValue; // Using the eventInfo directly is faster than getAttrs
+  refreshArmorDetailsArray(id);
 });
 
 // sync/update Armor Details when repeating_equipment armor changes
@@ -2941,6 +2935,40 @@ on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_ar
     // update the sync flag for newly added items
     if (synced !== 1) {
       output[attrSync] = 1;
+      await setAttrsAsync(output, {silent: true});
+    }
+  }
+});
+
+// +Add button: fills Armor Details row with repeating_equipment values
+// IF the item is already synced, but the armor type has been changed,
+// removeEmptyArmorRows tests for duplicate ids and will delete/reset any old rows
+on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_armor_type', async (eventInfo) => {
+  const source = eventInfo.sourceAttribute.toLowerCase();
+  const parts = source.split('_');
+  const id = parts[2];
+  const trigger = parts.slice(3).join('_');
+  const attrType = `repeating_equipment_${id}_equipment_armor_type`;
+  const attrSync = `repeating_equipment_${id}_equipment_sync_armor_flag`;
+  const v = await getAttrsAsync([attrType, attrSync]);
+  const output = {};
+  const type = +v[attrType] || 0;
+  const synced = +v[attrSync] || 0;
+  // clog(`${trigger} - id:${id} type:${type} synced:${synced === 1}`);
+  // Armor Type's set and button clicked OR Type's changed on an already synced item.
+  const isArmor = type !== 99;
+  const updateArmorDetails = (trigger === 'addarmor' && isArmor) || (trigger === 'equipment_armor_type' && synced === 1);
+  if (updateArmorDetails) {
+    if (isArmor) {
+      await fillArmorDetails(id);
+      // This flag update is now inside the block to ensure it only happens when valid
+      output[attrSync] = 1;
+    } else {
+      // Item was synced but is now Type 99: Clean up the flag
+      output[attrSync] = 0;
+    }
+    await removeEmptyArmorRows();
+    if (Object.keys(output).length > 0) {
       await setAttrsAsync(output, {silent: true});
     }
   }
