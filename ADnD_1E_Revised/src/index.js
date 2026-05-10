@@ -1183,6 +1183,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
     {armorType: 'armorother5', syncedID: 'armorother5_row_id', typeValue: 9, defaultAC: 0, armorAttrs: 'other5Attrs'},
     {armorType: 'armorother6', syncedID: 'armorother6_row_id', typeValue: 10, defaultAC: 0, armorAttrs: 'other6Attrs'},
   ];
+
   // Map synced rowIds into an array (11 elements)
   const idArray = armorDetailsRow.map((row) => (v[row.syncedID] ? v[row.syncedID].toString().toLowerCase() : '0'));
 
@@ -1191,8 +1192,10 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
     const matchingArray = Object.entries(arrays).find(([arrayName, array]) => array.includes(attrToCheck));
     return matchingArray ? matchingArray[0] : null;
   }
+
   // match the attr changed to the specific armor row
   const matchingArray = matchAttr(attr);
+
   // clog(`syncArmorToEquipment: id_low:${id_low} ${id_low === null ? `Sync '${attr}' from Armor Details` : 'Sync from repeating_equipment'}\n null means Δ came from Armor Details`);
   // clog(`syncArmorToEquipment: row_removed?:${row_removed} ${row_removed ? 'Row removed' : 'Row not removed'}`);
 
@@ -1255,6 +1258,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
       }
     }
   });
+
   await setAttrsAsync(output, {silent: true});
   // clog(`Final Output Sent to setAttrs: ${JSON.stringify(output)}`);
   await refreshArmorDetailsArray(id_low);
@@ -2310,15 +2314,17 @@ const removeEmptyArmorRows = async () => {
   const output = {};
   const fields = idArray.flatMap((id) => [`repeating_equipment_${id}_equipment_armor_type`]);
   // grab all attrs and ids before continuing
-  const [v, armorDetailsArray] = await Promise.all([getAttrsAsync(fields), generateArmorDetailsArray()]);
+  const [v, armorDetailsArray] = await Promise.all([getAttrsAsync(fields), refreshArmorDetailsArray()]);
   // clog(`removeEmptyArmorRows - armorDetailsArray:`);
   console.log(armorDetailsArray);
   _.each(idArray, (id) => {
     // this new id/row
     const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
-
-    // If Type 99, set to -1 (ie nothing). Forcing removal of any existing syncs.
-    let rowType = type === 99 ? -1 : type + 1;
+    // Armor Type not selected
+    if (type === 99) {
+      return;
+      // clog(`removeEmptyArmorRows - Armor Type:${type} Exit`);
+    }
     // clog(`removeEmptyArmorRows - Armor Type:${type}`);
     // Find Armor Details row position where the id matches in armorDetailsArray
     const matchingIndices = armorDetailsArray
@@ -2333,7 +2339,7 @@ const removeEmptyArmorRows = async () => {
       })
       .filter((index) => index !== null);
     // detect and remove the old id/row matches
-    if (matchingIndices.length > 0) {
+    if (matchingIndices.length > 1) {
       rowType = type + 1; // Align Armor Type with the Actual Armor Details row
       // clog(`removeEmptyArmorRows - matchingIndices: [${matchingIndices}] id:${id} type:${rowType}`);
       // Create a new array of Armor Details row index positions with multiple matches
@@ -2846,27 +2852,27 @@ const createAttack = async (id) => {
   damageMacro(newID);
 };
 
-const generateArmorDetailsArray = async () => {
+const refreshArmorDetailsArray = async () => {
   const v = await getAttrsAsync(armorRowIDs);
   const idArray = [
-    v.unarmored_row_id,
-    v.armortype1_row_id,
-    v.armortype2_row_id,
-    v.armorshield_row_id,
-    v.armorhelmet_row_id,
-    v.armorother1_row_id,
-    v.armorother2_row_id,
-    v.armorother3_row_id,
-    v.armorother4_row_id,
-    v.armorother5_row_id,
-    v.armorother6_row_id,
-  ].map((id) => (id ? id.toString().toLowerCase() : '0'));
+    (unarmored0_ID = v.unarmored_row_id.toString()),
+    (armortype1_ID = v.armortype1_row_id.toString()),
+    (armortype2_ID = v.armortype2_row_id.toString()),
+    (armorshield_ID = v.armorshield_row_id.toString()),
+    (armorhelmet_ID = v.armorhelmet_row_id.toString()),
+    (armorother1_ID = v.armorother1_row_id.toString()),
+    (armorother2_ID = v.armorother2_row_id.toString()),
+    (armorother3_ID = v.armorother3_row_id.toString()),
+    (armorother4_ID = v.armorother4_row_id.toString()),
+    (armorother5_ID = v.armorother5_row_id.toString()),
+    (armorother6_ID = v.armorother6_row_id.toString()),
+  ].map((str) => (str ? str.toString().toLowerCase() : '0'));
   return idArray;
 };
 
 // checks repeating_equipment id against Armor Detail's ids
 const testArmorRowIDs = async (id) => {
-  const armorDetailsArray = await generateArmorDetailsArray();
+  const armorDetailsArray = await refreshArmorDetailsArray();
   let isMatch = '';
   isMatch = armorDetailsArray.includes(id) ? 1 : 0;
   // clog(`testArmorRowIDs: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
@@ -2876,23 +2882,26 @@ const testArmorRowIDs = async (id) => {
   };
 };
 
-const refreshArmorDetailsArray = async (id) => {
+const armorDetailsRowidArray = async (id) => {
   const output = {};
   const {isMatch, armorDetailsArray} = await testArmorRowIDs(id);
-  output.armordetails_array = armorDetailsArray.join(',');
-  // clog(`refreshArmorDetailsArray: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
+  output.armordetails_array = [`${armorDetailsArray}`];
+  // clog(`armorDetailsRowidArray: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
   await setAttrsAsync(output, {silent: true});
-  // clog(`refreshArmorDetailsArray: has been updated.`);
-  console.log(armorDetailsArray);
+  // clog(`armorDetailsRowidArray: has been updated.`);
+  // console.log(armorDetailsArray);
 };
 
-const updateArrayEventListener = `${armorRowIDs.map((stat) => `change:${stat}`).join(' ')}`;
 // ensures armordetails_array stays updated when the ids change
+const updateArrayEventListener = `${armorRowIDs.map((stat) => `change:${stat}`).join(' ')}`;
 on(updateArrayEventListener, async (eventInfo) => {
   const attr = eventInfo.sourceAttribute;
   // console.log(`updateArrayEventListener - ARMOR DETAILS ARRAY HAS CHANGED attr:${attr} sourceType: ${eventInfo.sourceType}`);
-  const id = eventInfo.newValue; // Using the eventInfo directly is faster than getAttrs
-  refreshArmorDetailsArray(id);
+  // if (eventInfo.sourceType === 'sheetworker') return;
+  const v = await getAttrsAsync([`${attr}`, 'armordetails_array']);
+  const id = v[`${eventInfo.sourceAttribute}`];
+  // console.log(`updateArrayEventListener - source type: ${eventInfo.sourceType} id:${id} UPDATING armordetails_array...`);
+  armorDetailsRowidArray(id);
 });
 
 // sync/update Armor Details when repeating_equipment armor changes
@@ -2925,19 +2934,13 @@ on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_ar
   const synced = +v[attrSync] || 0;
   // clog(`${trigger} - id:${id} type:${type} synced:${synced === 1}`);
   // Armor Type's set and button clicked OR Type's changed on an already synced item.
-  const isArmor = typeValue !== 99;
-  const updateArmorDetails = (trigger === 'addarmor' && isArmor) || (trigger === 'equipment_armor_type' && synced === 1);
+  const updateArmorDetails = (trigger === 'addarmor' && type !== 99) || (trigger === 'equipment_armor_type' && synced === 1);
   if (updateArmorDetails) {
-    if (isArmor) {
-      await fillArmorDetails(id);
-      // This flag update is now inside the block to ensure it only happens when valid
-      output[attrSync] = 1;
-    } else {
-      // Item was synced but is now Type 99: Clean up the flag
-      output[attrSync] = 0;
-    }
+    await fillArmorDetails(id);
     await removeEmptyArmorRows();
-    if (Object.keys(output).length > 0) {
+    // update the sync flag for newly added items
+    if (synced !== 1) {
+      output[attrSync] = 1;
       await setAttrsAsync(output, {silent: true});
     }
   }
