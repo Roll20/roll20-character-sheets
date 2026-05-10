@@ -8,9 +8,9 @@
 	* nameInternal: string, the internal name of the talent.
 	* nameUI: string, the UI name of the talent.
 	* statAttrs: An array of at least three attributes (called "Eigenschaftn + nameInternal", e. g. "Eigenschaft1akrobatik") carrying strings with stats attributes ("@{MU}" etc.).
-	* optional: object, pre-filled with default values to be overwritten when called for special cases. Special cases handled: macro to use for the calculation of the effective encumbrance ("eBE").
+	* optional: object, pre-filled with default values to be overwritten when called for special cases. Special cases handled: macro to use for the calculation of the effective encumbrance ("eBE"), state of the disadvantage "lame", mod roll macro code for the talent affected by "lame".
 */
-function generateTalentRollMacro(template, nameInternal, nameUI, statAttrs, optional = { "ebeMacro": "" } ) {
+function generateTalentRollMacro(template, nameInternal, nameUI, statAttrs, optional = { "ebeMacro": "", "lame": "0", "lameMod": "0" } ) {
 	const caller = "generateTalentRollMacro";
 	const prefix = "@{gm_roll_opt}";
 	const suffix = "";
@@ -81,9 +81,11 @@ function generateTalentRollMacro(template, nameInternal, nameUI, statAttrs, opti
 
 	//// optional
 	///// Check for expected/minimal properties
-	const optionalMinimumProperties = [ "ebeMacro" ];
+	const optionalMinimumProperties = [ "ebeMacro", "lame" ];
 	const optionalPropertiesDefaults = {
 		"ebeMacro": "",
+		"lame": "0",
+		"lameMod": "0",
 	};
 
 	for (let property of optionalMinimumProperties)
@@ -160,22 +162,50 @@ function generateTalentRollMacro(template, nameInternal, nameUI, statAttrs, opti
 		);
 	}
 
-	/// Modifier rolls depending on effective encumbrance (eBE)
+	/// Modifier
+	//// The modifier consists of several different modifiers building the one modifier applied to the check.
+	//// Since the single parts may need to be displayed separately this is a bit more complicated.
 	const modRolls = [];
+	//// Parts of the roll property "mod"; "Inner" refers to "inside the all-embracing [[]]"
+	const modPartsInner = [ "( [Allgemeiner Modifikator:] [[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]] )" ];
 
-	if (args["optional"]["ebeMacro"] === "")
+	//// Rolls related to Lame
+	if (args["optional"]["lame"] === "1")
 	{
-		modRolls
-		.push(
-			new RollProperty("mod", "[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]"),
-		);
-	} else {
-		modRolls
-		.push(
-			new RollProperty("ebe", `[[{0d1 + (${args["optional"]["ebeMacro"]}), 0d1}kh1]]`),
-			new RollProperty("mod", `[[ 0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2) + [[{0d1 + (${args["optional"]["ebeMacro"]}), 0d1}kh1]]d1cs0cf2 ]]`),
-		);
+		// Suppress if not physical talent
+		const physicalTalentStart = "t_ko_";
+		if (nameInternalNew.startsWith(physicalTalentStart))
+		{
+			// "Inner" refers to "inside the [[]]"
+			const lameModRollInner = `( [Lahm:] [[${args["optional"]["lameMod"]}d1cs0cf2]] )`;
+			modPartsInner.push(lameModRollInner);
+			modRolls
+				.push(
+					new RollProperty("lamemod", `[[ ${lameModRollInner} ]]`),
+				);
+		} else {
+			debugLog(caller, `'Lame' enabled, but talent gotten not physical (${nameInternalNew}). Nothing to do.`);
+		}
 	}
+
+	if (args["optional"]["ebeMacro"] !== "")
+	{
+		// "Inner" refers to "inside the [[]]"
+		const ebeRollInner = `( [eBE:] [[${args["optional"]["ebeMacro"]}d1cs0cf2]] )`;
+		modPartsInner.push(ebeRollInner);
+		modRolls
+			.push(
+				new RollProperty("ebe", `[[ ${ebeRollInner} ]]`),
+			);
+	}
+
+	//// Build the mod roll including everything
+	let modRollFull = modPartsInner.join(" + ");
+	modRollFull = `[[ ${modRollFull} ]]`;
+	modRolls
+		.unshift(
+			new RollProperty("mod", modRollFull),
+		);
 
 	// Build Roll Macro
 	const body = new RollPropertyArray(
@@ -659,146 +689,191 @@ on(
 		...talents_ebe.map(talent => `clicked:${talent}-ebe-action`),
 	].join(" "),
 	async (info) => {
-
 	// Boilerplate
 	const caller = "Action Listener for Talent Roll Buttons (Without and With Encumbrance)";
 	const ebeRelevant = info["triggerName"].endsWith("-ebe-action");
 	const trigger = info["triggerName"].replace(/^clicked:([^-]+)-(?:ebe-)?action/, '$1');
+	const isPhysicalTalent = trigger.startsWith("t_ko_");
 	const nameInternal = talentsData[trigger]["internal"];
+	const nameInternalNew = talentsDataOldToNew[nameInternal];
 	const nameUI = talentsData[trigger]["ui"];
 	const rollOptions = {};
 	let rollTemplate = "talent";
 	let ebeMacro = "@{BE}";
 	debugLog(caller, `trigger: ${trigger}`);
 
-	// Set attributes for stats
-	const attrsStatsDefault = [
-		`Eigenschaft1${nameInternal}`,
-		`Eigenschaft2${nameInternal}`,
-		`Eigenschaft3${nameInternal}`,
-	];
-	let attrsStats = [];
-
-	/// Special Case: No stats attributes for languages and scripts
-	if (
-		trigger.startsWith("t_sp_") ||
-		trigger.startsWith("t_sc_")
-	)
-	{
-		const talentGroupRegex = /^t_(?<group>[^_]+)_/;
-		const talentGroup = trigger.match(talentGroupRegex).groups["group"];
-		const talentGroupStats = {
-			"sp": ["KL", "IN", "CH"],
-			"sc": ["KL", "KL", "FF"],
-		};
-		attrsStats = talentGroupStats["talentGroup"];
-	} else {
-		attrsStats = attrsStatsDefault;
+	/// Lame
+	//// Build dictionary for converting mod setting to actual mod value (for direct feeding to roll macros)
+	const lameModSettingConversion = {
+		"always": "3",
+		"ask": "[[?{Wirkt sich der Nachteil &bdquo;Lahm&ldquo; auf diese Probe aus?|Ja,3|Nein,0}]]",
+		"never": "0",
 	}
 
-	// Effective encumbrance (eBE)
-	if (ebeRelevant)
-	{
-		// Get eBE data from global
-		const talentEbeData = effectiveEncumbrance[trigger];
+	//// Build mod setting attribute
+	const lameModSettingAttr = `${nameInternalNew}_mod_lame_setting`;
 
-		// Set correct roll template
-		rollTemplate = "talent-ebe";
+	safeGetAttrs([
+			"nachteil_lahm",
+			lameModSettingAttr,
+		],
+		async (v) => {
 
-		// Create roll macro for eBE
-		if (talentEbeData["type"] === "factor")
+		// Additional Boilerplate
+		const isLame = (v["nachteil_lahm"] === "1");
+		const lameModSetting = v[lameModSettingAttr];
+
+		// Set attributes for stats
+		const attrsStatsDefault = [
+			`Eigenschaft1${nameInternal}`,
+			`Eigenschaft2${nameInternal}`,
+			`Eigenschaft3${nameInternal}`,
+		];
+		let attrsStats = [];
+
+		/// Special Case: No stats attributes for languages and scripts
+		if (
+			trigger.startsWith("t_sp_") ||
+			trigger.startsWith("t_sc_")
+		)
 		{
-			ebeMacro = `${talentEbeData["value"]} * ${ebeMacro}`;
-		} else if (talentEbeData["type"] === "summand") {
-			ebeMacro = `${ebeMacro}${talentEbeData["value"]}`;
+			const talentGroupRegex = /^t_(?<group>[^_]+)_/;
+			const talentGroup = trigger.match(talentGroupRegex).groups["group"];
+			const talentGroupStats = {
+				"sp": ["KL", "IN", "CH"],
+				"sc": ["KL", "KL", "FF"],
+			};
+			attrsStats = talentGroupStats["talentGroup"];
+		} else {
+			attrsStats = attrsStatsDefault;
 		}
-		rollOptions["ebeMacro"] = ebeMacro;
-	}
 
-	// Generate roll macro
-	const rollMacro = generateTalentRollMacro(
-		rollTemplate,
-		nameInternal,
-		nameUI,
-		attrsStats,
-		rollOptions
-	);
-	debugLog(caller, rollMacro);
+		// Effective encumbrance (eBE)
+		if (ebeRelevant)
+		{
+			// Get eBE data from global
+			const talentEbeData = effectiveEncumbrance[trigger];
 
-	// Execute the roll
-	const roll = await startRoll(rollMacro);
-	debugLog(caller, "info:", info, "roll results:", roll);
+			// Set correct roll template
+			rollTemplate = "talent-ebe";
 
-	// Process the roll
-	const rollID = roll.rollId;
-	const resultComputed = {};
-
-	/// Process results
-	const resultProcessed = getTalentRollResults(roll.results);
-
-	/// Formatting
-	resultProcessed["stats"] = resultProcessed["stats"].toString().replaceAll(",", "/");
-
-	/// Consider effective encumbrance
-	let modOnly = roll.results.mod.result;
-	if (ebeRelevant)
-	{
-		modOnly = roll.results.mod.result - roll.results.ebe.result;
-	}
-
-	/// Talent-specific Processing
-	//// Athletics
-	switch(trigger)
-	{
-		case "t_ko_athletik":
-			// Additional GS can only be generated in successful checks (result = 1)
-			if (resultProcessed.result === 1)
+			// Create roll macro for eBE
+			if (talentEbeData["type"] === "factor")
 			{
-				// Calculate bonus GS
-				let athleticsGSBonus = parseInt(roll.results["athleticsbonus"].result);
-				let TaPstarEffective = resultProcessed.TaPstar;
-				const TaW = roll.results.wert.result;
-				const successfulCheckMinEffectiveTaPstar = 1;
-
-				/// Handle negative TaW, critical success and 0 TaP*
-				//// In all cases, a successful check must give at least 1 TaP*
-				//// Critical successes give max. TaP*
-				if (resultProcessed.criticality >= 2)
-				{
-					TaPstarEffective = TaW;
-				}
-
-				//// Handle 0 TaP*: It is a success, but counts the same as 1.
-				//// Also considers criticial successes with negative TaW.
-				if (TaPstarEffective <= 0)
-				{
-					TaPstarEffective = successfulCheckMinEffectiveTaPstar;
-				}
-				athleticsGSBonus = TaPstarEffective * athleticsGSBonus / 10;
-				athleticsGSBonus = athleticsGSBonus.toFixed(1);
-				athleticsGSBonus = athleticsGSBonus.replace("\.", ",");
-				resultComputed["athleticsbonus"] = athleticsGSBonus;
+				ebeMacro = `${talentEbeData["value"]} * ${ebeMacro}`;
+			} else if (talentEbeData["type"] === "summand") {
+				ebeMacro = `${ebeMacro}${talentEbeData["value"]}`;
 			}
-			break;
-	}
+			rollOptions["ebeMacro"] = ebeMacro;
+		}
 
-	/// Build computed results
-	resultComputed["roll"] = prettifyResult(resultProcessed.TaPstar);
-	resultComputed["result"] = resultProcessed.result;
-	resultComputed["criticality"] = resultProcessed.criticality;
-	resultComputed["stats"] = resultProcessed.stats;
+		// Lame only applies to physical talents
+		if (isPhysicalTalent)
+		{
+			if (isLame)
+			{
+				// General roll option
+				rollOptions["lame"] = "1";
 
-	/// Consider effective encumbrance
-	if (ebeRelevant)
-	{
-		resultComputed["mod"] = modOnly;
-	}
+				// Mod roll macro string roll option
+				if (Object.hasOwn(lameModSettingConversion, lameModSetting))
+				{
+					const lameMod = lameModSettingConversion[lameModSetting];
+					rollOptions["lameMod"] = lameMod;
+				} else {
+					rollOptions["lame"] = "0";
+					debugLog(caller, `Lame mod setting unknown: ${v[lameModSettingAttr]}. No talent-specific roll for lame added.`);
+				}
+			} else {
+				rollOptions["lame"] = "0";
+			}
+		}
 
-	// Finish roll
-	debugLog(caller, "resultComputed", resultComputed);
-	finishRoll(
-		rollID,
-		resultComputed
-	);
+		// Generate roll macro
+		const rollMacro = generateTalentRollMacro(
+			rollTemplate,
+			nameInternal,
+			nameUI,
+			attrsStats,
+			rollOptions
+		);
+		debugLog(caller, rollMacro);
+
+		// Execute the roll
+		const roll = await startRoll(rollMacro);
+		debugLog(caller, "info:", info, "roll results:", roll);
+
+		// Process the roll
+		const rollID = roll.rollId;
+		const resultComputed = {};
+
+		/// Process results
+		const resultProcessed = getTalentRollResults(roll.results);
+
+		/// Formatting
+		resultProcessed["stats"] = resultProcessed["stats"].toString().replaceAll(",", "/");
+
+		/// Consider effective encumbrance
+		let modOnly = roll.results.mod.result;
+		if (ebeRelevant)
+		{
+			modOnly = roll.results.mod.result - roll.results.ebe.result;
+		}
+
+		/// Talent-specific Processing
+		//// Athletics
+		switch(trigger)
+		{
+			case "t_ko_athletik":
+				// Additional GS can only be generated in successful checks (result = 1)
+				if (resultProcessed.result === 1)
+				{
+					// Calculate bonus GS
+					let athleticsGSBonus = parseInt(roll.results["athleticsbonus"].result);
+					let TaPstarEffective = resultProcessed.TaPstar;
+					const TaW = roll.results.wert.result;
+					const successfulCheckMinEffectiveTaPstar = 1;
+
+					/// Handle negative TaW, critical success and 0 TaP*
+					//// In all cases, a successful check must give at least 1 TaP*
+					//// Critical successes give max. TaP*
+					if (resultProcessed.criticality >= 2)
+					{
+						TaPstarEffective = TaW;
+					}
+
+					//// Handle 0 TaP*: It is a success, but counts the same as 1.
+					//// Also considers criticial successes with negative TaW.
+					if (TaPstarEffective <= 0)
+					{
+						TaPstarEffective = successfulCheckMinEffectiveTaPstar;
+					}
+					athleticsGSBonus = TaPstarEffective * athleticsGSBonus / 10;
+					athleticsGSBonus = athleticsGSBonus.toFixed(1);
+					athleticsGSBonus = athleticsGSBonus.replace("\.", ",");
+					resultComputed["athleticsbonus"] = athleticsGSBonus;
+				}
+				break;
+		}
+
+		/// Build computed results
+		resultComputed["roll"] = prettifyResult(resultProcessed.TaPstar);
+		resultComputed["result"] = resultProcessed.result;
+		resultComputed["criticality"] = resultProcessed.criticality;
+		resultComputed["stats"] = resultProcessed.stats;
+
+		/// Consider effective encumbrance
+		if (ebeRelevant)
+		{
+			resultComputed["mod"] = modOnly;
+		}
+
+		// Finish roll
+		debugLog(caller, "resultComputed", resultComputed);
+		finishRoll(
+			rollID,
+			resultComputed
+		);
+	});
 });
 /* talents end */
