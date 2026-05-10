@@ -1161,813 +1161,102 @@ const clearArmorOther = async (current_version, final_version) => {
 
 // combines all Armor Details attrs and their row id's
 const armorIDsAndAttrs = armorAttrs.concat(armorRowIDs);
+
 // sync armor changes between Armor Details and repeating_equipment
 const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
   const v = await getAttrsAsync(armorIDsAndAttrs);
   const output = {};
-  let newID = '';
-  let id_low = id;
-  id_low = id_low !== null ? id.toLowerCase() : id_low;
-  // clog(`syncArmorToEquipment: id_low:${id_low} ${id_low === null ? `Sync '${attr}' from Armor Details` : 'Sync from repeating_equipment'}\n null means Δ came from Armor Details`);
-  // clog(`syncArmorToEquipment: row_removed?:${row_removed} ${row_removed ? 'Row removed' : 'Row not removed'}`);
-  const unarmored0_ID = v.unarmored_row_id.toString();
-  const armortype1_ID = v.armortype1_row_id.toString();
-  const armortype2_ID = v.armortype2_row_id.toString();
-  const armorshield_ID = v.armorshield_row_id.toString();
-  const armorhelmet_ID = v.armorhelmet_row_id.toString();
-  const armorother1_ID = v.armorother1_row_id.toString();
-  const armorother2_ID = v.armorother2_row_id.toString();
-  const armorother3_ID = v.armorother3_row_id.toString();
-  const armorother4_ID = v.armorother4_row_id.toString();
-  const armorother5_ID = v.armorother5_row_id.toString();
-  const armorother6_ID = v.armorother6_row_id.toString();
-  const idArray = [
-    unarmored0_ID,
-    armortype1_ID,
-    armortype2_ID,
-    armorshield_ID,
-    armorhelmet_ID,
-    armorother1_ID,
-    armorother2_ID,
-    armorother3_ID,
-    armorother4_ID,
-    armorother5_ID,
-    armorother6_ID,
-  ].map((str) => (str ? str.toString().toLowerCase() : '0'));
+  // check if change comes from Armor Details
+  let id_low = id !== null ? id.toLowerCase() : null;
+  // Map Armor Detail rows
+  // armorAttrs helps matching with global attribute arrays from above
+  const armorDetailsRow = [
+    {armorType: 'unarmored', syncedID: 'unarmored_row_id', typeValue: 0, defaultAC: 10, armorAttrs: 'unarmoredAttrs'},
+    {armorType: 'armortype', syncedID: 'armortype1_row_id', typeValue: 1, defaultAC: 10, armorAttrs: 'armor1Attrs'},
+    {armorType: 'armortype2', syncedID: 'armortype2_row_id', typeValue: 2, defaultAC: 10, armorAttrs: 'armor2Attrs'},
+    {armorType: 'armorshield', syncedID: 'armorshield_row_id', typeValue: 3, defaultAC: 0, armorAttrs: 'shieldAttrs'},
+    {armorType: 'armorhelmet', syncedID: 'armorhelmet_row_id', typeValue: 4, defaultAC: 10, armorAttrs: 'helmetAttrs'},
+    {armorType: 'armorother', syncedID: 'armorother1_row_id', typeValue: 5, defaultAC: 10, armorAttrs: 'other1Attrs'},
+    {armorType: 'armorother2', syncedID: 'armorother2_row_id', typeValue: 6, defaultAC: 0, armorAttrs: 'other2Attrs'},
+    {armorType: 'armorother3', syncedID: 'armorother3_row_id', typeValue: 7, defaultAC: 0, armorAttrs: 'other3Attrs'},
+    {armorType: 'armorother4', syncedID: 'armorother4_row_id', typeValue: 8, defaultAC: 0, armorAttrs: 'other4Attrs'},
+    {armorType: 'armorother5', syncedID: 'armorother5_row_id', typeValue: 9, defaultAC: 0, armorAttrs: 'other5Attrs'},
+    {armorType: 'armorother6', syncedID: 'armorother6_row_id', typeValue: 10, defaultAC: 0, armorAttrs: 'other6Attrs'},
+  ];
+  // Map synced rowIds into an array (11 elements)
+  const idArray = armorDetailsRow.map((row) => (v[row.syncedID] ? v[row.syncedID].toString().toLowerCase() : '0'));
 
   function matchAttr(attrToCheck) {
     const arrays = {unarmoredAttrs, armor1Attrs, armor2Attrs, shieldAttrs, helmetAttrs, other1Attrs, other2Attrs, other3Attrs, other4Attrs, other5Attrs, other6Attrs};
     const matchingArray = Object.entries(arrays).find(([arrayName, array]) => array.includes(attrToCheck));
-    return matchingArray ? matchingArray[0] : null; // Return array's name (ie Armor Details row) or null if no match is found
+    return matchingArray ? matchingArray[0] : null;
   }
-  const attrToCheck = attr;
-  const matchingArray = matchAttr(attrToCheck);
-  if (matchingArray) {
-    // clog(`syncArmorToEquipment: Match found for '${attrToCheck}' in:${matchingArray}`);
-  } else {
-    // clog(`syncArmorToEquipment: No match found for attribute:${attrToCheck} (null = repeating_equipment removed)`);
-  }
-  const armor0 = v.unarmored.trim();
-  const armor1 = v.armortype.trim();
-  const armor2 = v.armortype2.trim();
-  const shield = v.armorshield.trim();
-  const helmet = v.armorhelmet.trim();
-  const other1 = v.armorother.trim();
-  const other2 = v.armorother2.trim();
-  const other3 = v.armorother3.trim();
-  const other4 = v.armorother4.trim();
-  const other5 = v.armorother5.trim();
-  const other6 = v.armorother6.trim();
-  // if syncArmorToEquipment is triggered from Armor Details, ie (id === null),
-  // assign the appropriate id according to it's Armor Details row
-  const indexMap = {
-    unarmoredAttrs: 0,
-    armor1Attrs: 1,
-    armor2Attrs: 2,
-    shieldAttrs: 3,
-    helmetAttrs: 4,
-    other1Attrs: 5,
-    other2Attrs: 6,
-    other3Attrs: 7,
-    other4Attrs: 8,
-    other5Attrs: 9,
-    other6Attrs: 10,
-  };
+  // match the attr changed to the specific armor row
+  const matchingArray = matchAttr(attr);
+  // clog(`syncArmorToEquipment: id_low:${id_low} ${id_low === null ? `Sync '${attr}' from Armor Details` : 'Sync from repeating_equipment'}\n null means Δ came from Armor Details`);
+  // clog(`syncArmorToEquipment: row_removed?:${row_removed} ${row_removed ? 'Row removed' : 'Row not removed'}`);
 
-  if (id_low === null) {
-    const index = indexMap[matchingArray];
-    if (index !== undefined) {
-      id_low = idArray[index];
-    }
+  // If the change came from Armor Details (is null), find which row it belongs to and set id_low
+  if (id_low === null && matchingArray) {
+    const slotIndex = armorDetailsRow.findIndex((s) => s.armorAttrs === matchingArray);
+    if (slotIndex !== -1) id_low = idArray[slotIndex];
   }
-  // clog(`syncArmorToEquipment: id:${id_low} matchingArray:${matchingArray}`);
-  // match the row
-  if (matchingArray === 'unarmoredAttrs' || id_low === idArray[0] || migrate) {
-    if (matchingArray === 'unarmoredAttrs' || migrate) {
-      if (armor0) {
-        if (unarmored0_ID.length === 20) {
-          // has name && has id = UPDATE ROW
-          rowId = unarmored0_ID.toLowerCase();
-          output.unarmored_row_id = rowId;
-          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
-          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.unarmored_worn || 0;
-          output[`repeating_equipment_${rowId}_equipment_item`] = v.unarmored.trim();
-          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.unarmored_ac || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.unarmored_base || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_bulk`] = +v.unarmored_bulk || 0;
-          // armor in use ie 'worn', should always be considered as carried
-          if ((+v.unarmored_worn || 0) === 1 && (+v.unarmored_carried || 0) === 0) {
-            output[`repeating_equipment_${rowId}_equipment_carried_select`] = 1;
-            output.unarmored_carried = 1;
-          } else {
-            output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.unarmored_carried || 0;
-          }
-          output[`repeating_equipment_${rowId}_equipment_weight`] = +v.unarmored_weight || 0;
-          output[`repeating_equipment_${rowId}_equipment_cost`] = +v.unarmored_cost || 0;
-          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'armor1'`);
-        } else {
-          // has name but NO id = CREATE NEW ROW
-          newID = generateUniqueRowID();
-          output.unarmored_row_id = newID.toLowerCase();
-          output[`repeating_equipment_${newID}_equipment_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.unarmored_worn || 0;
-          output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.unarmored_bulk || 0;
-          // armor in use ie 'worn', should always be considered as carried
-          if ((+v.unarmored_worn || 0) === 1 && (+v.unarmored_carried || 0) === 0) {
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
-            output.unarmored_carried = 1;
-          } else {
-            output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.unarmored_carried || 0;
-          }
-          output[`repeating_equipment_${newID}_equipment_weight`] = +v.unarmored_weight || 0;
-          output[`repeating_equipment_${newID}_equipment_cost`] = +v.unarmored_cost || 0;
-          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating armor1: ${newID}`);
+  // Iterate through each armor row configuration
+  armorDetailsRow.forEach((row, index) => {
+    const currentRowID = idArray[index];
+    const isTriggeringRow = matchingArray === row.armorAttrs || id_low === currentRowID || migrate;
+    if (isTriggeringRow) {
+      const itemName = (v[row.armorType] || '').trim();
+      const hasExistingID = currentRowID.length === 20;
+      // Handle Update || Creation
+      // don't update a row that is being deleted
+      if (!row_removed && (itemName || (matchingArray === null && hasExistingID))) {
+        const rowId = hasExistingID ? currentRowID : generateUniqueRowID().toLowerCase();
+        if (!hasExistingID) {
+          output[row.syncedID] = rowId;
+          output[`repeating_equipment_${rowId}_equipment_sync_armor_flag`] = 1;
+          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating ${row.armorType}: ${rowId}`);
         }
-      } else if (unarmored0_ID === idArray[0]) {
-        // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
-        output.unarmored_row_id = 0;
-        output.unarmored_worn = +v.unarmored_worn || 0;
-        output.unarmored = '';
-        output.unarmored_ac = +v.unarmored_ac || 0;
-        output.unarmored_base = +v.unarmored_base || 0;
-        output.unarmored_bulk = +v.unarmored_bulk || 0;
-        output.unarmored_weight = +v.unarmored_weight || 0;
-        output.unarmored_cost = +v.unarmored_cost || 0;
-        // armor in use ie 'worn', should always be considered as carried
-        if ((+v.unarmored_worn || 0) === 1 && (+v.unarmored_carried || 0) === 0) {
-          output.unarmored_carried = 1;
+        // set repeating row
+        const prefix = `repeating_equipment_${rowId}_`;
+        output[`${prefix}equipment_type`] = 2;
+        output[`${prefix}equipment_armor_type`] = row.typeValue;
+        output[`${prefix}equipment_item`] = itemName;
+        output[`${prefix}equipment_armor_worn`] = +v[`${row.armorType}_worn`] || 0;
+        output[`${prefix}equipment_armor_ac`] = +v[`${row.armorType}_ac`] || 0;
+        output[`${prefix}equipment_armor_base`] = +v[`${row.armorType}_base`] || 0;
+        output[`${prefix}equipment_armor_bulk`] = +v[`${row.armorType}_bulk`] || 0;
+        output[`${prefix}equipment_weight`] = +v[`${row.armorType === 'armortype' ? 'armor' : row.armorType}_weight`] || 0;
+        output[`${prefix}equipment_cost`] = +v[`${row.armorType === 'armortype' ? 'armor' : row.armorType}_cost`] || 0;
+        if (v[`${row.armorType}_magic`] !== undefined) output[`${prefix}equipment_armor_magic`] = v[`${row.armorType}_magic`];
+        if (v[`${row.armorType}_mod`] !== undefined) output[`${prefix}equipment_armor_mod`] = v[`${row.armorType}_mod`];
+        if ((+v[`${row.armorType}_worn`] || 0) === 1 && (+v[`${row.armorType}_carried`] || 0) === 0) {
+          output[`${prefix}equipment_carried_select`] = 1;
+          output[`${row.armorType}_carried`] = 1;
         } else {
-          output.unarmored_carried = +v.unarmored_carried || 0;
+          output[`${prefix}equipment_carried_select`] = +v[`${row.armorType}_carried`] || 0;
         }
-        removeRepeatingRow(`repeating_equipment_${id_low}`);
-        // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting unarmored:${newID}`);
+      } else if (hasExistingID && (row_removed || !itemName)) {
+        // Handle Removal or Reset
+        output[row.syncedID] = '0';
+        output[row.armorType] = '';
+        output[`${row.armorType}_worn`] = row.armorType === 'unarmored' ? 1 : 0;
+        output[`${row.armorType}_ac`] = row.defaultAC;
+        output[`${row.armorType}_base`] = row.defaultAC;
+        output[`${row.armorType}_carried`] = 1;
+        if (v[`${row.armorType}_magic`] !== undefined) output[`${row.armorType}_magic`] = 0;
+        if (v[`${row.armorType}_mod`] !== undefined) output[`${row.armorType}_mod`] = 0;
+        if (v[`${row.armorType}_bulk`] !== undefined) output[`${row.armorType}_bulk`] = 0;
+        // user cleared the name, delete the equipment row.
+        if (id_low === currentRowID && !row_removed) {
+          removeRepeatingRow(`repeating_equipment_${id_low}`);
+          // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting ${row.armorType}.`);
+        }
       }
-    } else if (matchingArray === null && row_removed) {
-      // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
-      output.unarmored_row_id = 0;
-      output.unarmored_worn = 1;
-      output.unarmored = '';
-      output.unarmored_ac = 10;
-      output.unarmored_base = 10;
-      output.unarmored_bulk = 0;
-      output.unarmored_weight = 0;
-      output.unarmored_cost = 0;
-      output.unarmored_carried = 1;
-      // clog(`syncArmorToEquipment: Armor Details removed - NO name and/or NO ID. Deleted from Equipment unarmored:${newID}`);
     }
-  }
-  if (matchingArray === 'armor1Attrs' || id_low === idArray[1] || migrate) {
-    if (matchingArray === 'armor1Attrs' || migrate) {
-      if (armor1) {
-        if (armortype1_ID.length === 20) {
-          // has name && has id = UPDATE ROW
-          rowId = armortype1_ID.toLowerCase();
-          output.armortype1_row_id = rowId;
-          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
-          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 1;
-          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armortype_worn || 0;
-          output[`repeating_equipment_${rowId}_equipment_item`] = v.armortype.trim();
-          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armortype_ac || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armortype_base || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armortype_magic || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
-          // armor in use ie 'worn', should always be considered as carried
-          if ((+v.armortype_worn || 0) === 1 && (+v.armortype_carried || 0) === 0) {
-            output[`repeating_equipment_${rowId}_equipment_carried_select`] = 1;
-            output.armortype_carried = 1;
-          } else {
-            output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armortype_carried || 0;
-          }
-          output[`repeating_equipment_${rowId}_equipment_weight`] = +v.armor_weight || 0;
-          output[`repeating_equipment_${rowId}_equipment_cost`] = +v.armor_cost || 0;
-          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'armor1'`);
-        } else {
-          // has name but NO id = CREATE NEW ROW
-          newID = generateUniqueRowID();
-          output.armortype1_row_id = newID.toLowerCase();
-          output[`repeating_equipment_${newID}_equipment_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_type`] = 1;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype_worn || 0;
-          output[`repeating_equipment_${newID}_equipment_item`] = v.armortype.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype_magic || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
-          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
-          output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
-          output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
-          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating armor1: ${newID}`);
-        }
-      } else if (armortype1_ID === idArray[1]) {
-        // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
-        output.armortype1_row_id = 0;
-        output.armortype_worn = 0;
-        output.armortype = '';
-        output.armortype_ac = 10;
-        output.armortype_base = 10;
-        output.armortype_magic = 0;
-        output.armortype_bulk = 0;
-        output.armortype_weight = 0;
-        output.armortype_cost = 0;
-        output.armortype_carried = 1;
-        removeRepeatingRow(`repeating_equipment_${id_low}`);
-        // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting armor1:${newID}`);
-      }
-    } else if (matchingArray === null && row_removed) {
-      // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
-      output.armortype1_row_id = 0;
-      output.armortype_worn = 0;
-      output.armortype = '';
-      output.armortype_ac = 10;
-      output.armortype_base = 10;
-      output.armortype_magic = 0;
-      output.armortype_bulk = 0;
-      output.armortype_weight = 0;
-      output.armortype_cost = 0;
-      output.armortype_carried = 1;
-      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for armor1`);
-    }
-  }
-  if (matchingArray === 'armor2Attrs' || id_low === idArray[2] || migrate) {
-    if (matchingArray === 'armor2Attrs' || migrate) {
-      if (armor2) {
-        if (armortype2_ID.length === 20) {
-          // has name && has id = UPDATE ROW
-          rowId = armortype2_ID.toLowerCase();
-          output.armortype2_row_id = rowId;
-          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
-          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 2;
-          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armortype2_worn || 0;
-          output[`repeating_equipment_${rowId}_equipment_item`] = v.armortype2.trim();
-          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armortype2_ac || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armortype2_base || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armortype2_magic || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
-          // armor in use ie 'worn', should always be considered as carried
-          if ((+v.armortype2_worn || 0) === 1 && (+v.armortype2_carried || 0) === 0) {
-            output[`repeating_equipment_${rowId}_equipment_carried_select`] = 1;
-            output.armortype2_carried = 1;
-          } else {
-            output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armortype2_carried || 0;
-          }
-          output[`repeating_equipment_${rowId}_equipment_weight`] = +v.armortype2_weight || 0;
-          output[`repeating_equipment_${rowId}_equipment_cost`] = +v.armortype2_cost || 0;
-          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'armor2'`);
-        } else {
-          // has name but NO id = CREATE NEW ROW
-          newID = generateUniqueRowID();
-          output.armortype2_row_id = newID.toLowerCase();
-          output[`repeating_equipment_${newID}_equipment_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armortype2_worn || 0;
-          output[`repeating_equipment_${newID}_equipment_item`] = v.armortype2.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype2_magic || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
-          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
-          output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
-          output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
-          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating armor2: ${newID}`);
-        }
-      } else if (armortype2_ID === idArray[2]) {
-        // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
-        output.armortype2_row_id = 0;
-        output.armortype2_worn = 0;
-        output.armortype2 = '';
-        output.armortype2_ac = 10;
-        output.armortype2_base = 10;
-        output.armortype2_magic = 0;
-        output.armortype2_bulk = 0;
-        output.armortype2_weight = 0;
-        output.armortype2_cost = 0;
-        output.armortype2_carried = 1;
-        removeRepeatingRow(`repeating_equipment_${id_low}`);
-        // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting armor2:${newID}`);
-      }
-    } else if (matchingArray === null && row_removed) {
-      // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
-      output.armortype2_row_id = 0;
-      output.armortype2_worn = 0;
-      output.armortype2 = '';
-      output.armortype2_ac = 10;
-      output.armortype2_base = 10;
-      output.armortype2_magic = 0;
-      output.armortype2_bulk = 0;
-      output.armortype2_weight = 0;
-      output.armortype2_cost = 0;
-      output.armortype2_carried = 1;
-      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for armor2`);
-    }
-  }
-  if (matchingArray === 'shieldAttrs' || id_low === idArray[3] || migrate) {
-    if (matchingArray === 'shieldAttrs' || migrate) {
-      if (shield) {
-        if (armorshield_ID.length === 20) {
-          // has name && has id = UPDATE ROW
-          rowId = armorshield_ID.toLowerCase();
-          output.armorshield_row_id = rowId;
-          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
-          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 3;
-          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorshield_worn || 0;
-          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorshield.trim();
-          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorshield_ac || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorshield_base || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = v.armorshield_magic;
-          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = v.armorshield_mod;
-          output[`repeating_equipment_${rowId}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
-          // armor in use ie 'worn', should always be considered as carried
-          if ((+v.armorshield_worn || 0) === 1 && (+v.armorshield_carried || 0) === 0) {
-            output[`repeating_equipment_${rowId}_equipment_carried_select`] = 1;
-            output.armorshield_carried = 1;
-          } else {
-            output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorshield_carried || 0;
-          }
-          output[`repeating_equipment_${rowId}_equipment_weight`] = +v.armorshield_weight || 0;
-          output[`repeating_equipment_${rowId}_equipment_cost`] = +v.armorshield_cost || 0;
-          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'shield'`);
-        } else {
-          // has name but NO id = CREATE NEW ROW
-          newID = generateUniqueRowID();
-          output.armorshield_row_id = newID.toLowerCase();
-          output[`repeating_equipment_${newID}_equipment_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_type`] = 3;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorshield_worn || 0;
-          output[`repeating_equipment_${newID}_equipment_item`] = v.armorshield.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorshield_magic;
-          output[`repeating_equipment_${newID}_equipment_armor_mod`] = v.armorshield_mod;
-          output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
-          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
-          output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
-          output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
-          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating shield: ${newID}`);
-        }
-      } else if (armorshield_ID === idArray[3]) {
-        // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
-        output.armorshield_row_id = 0;
-        output.armorshield_worn = 0;
-        output.armorshield = '';
-        output.armorshield_ac = 0;
-        output.armorshield_base = 0;
-        output.armorshield_magic = 0;
-        output.armorshield_mod = 0;
-        output.armorshield_bulk = 0;
-        output.armorshield_weight = 0;
-        output.armorshield_cost = 0;
-        output.armorshield_carried = 1;
-        removeRepeatingRow(`repeating_equipment_${id_low}`);
-        // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting shield:${newID}`);
-      }
-    } else if (matchingArray === null && row_removed) {
-      // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
-      output.armorshield_row_id = 0;
-      output.armorshield_worn = 0;
-      output.armorshield = '';
-      output.armorshield_ac = 0;
-      output.armorshield_base = 0;
-      output.armorshield_magic = 0;
-      output.armorshield_mod = 0;
-      output.armorshield_bulk = 0;
-      output.armorshield_weight = 0;
-      output.armorshield_cost = 0;
-      output.armorshield_carried = 1;
-      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for shield`);
-    }
-  }
-  if (matchingArray === 'helmetAttrs' || id_low === idArray[4] || migrate) {
-    if (matchingArray === 'helmetAttrs' || migrate) {
-      if (helmet) {
-        if (armorhelmet_ID.length === 20) {
-          // has name && has id = UPDATE ROW
-          rowId = armorhelmet_ID.toLowerCase();
-          output.armorhelmet_row_id = rowId;
-          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
-          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 4;
-          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorhelmet_worn || 0;
-          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorhelmet.trim();
-          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = v.armorhelmet_magic;
-          // armor in use ie 'worn', should always be considered as carried
-          if ((+v.armorhelmet_worn || 0) === 1 && (+v.armorhelmet_carried || 0) === 0) {
-            output[`repeating_equipment_${rowId}_equipment_carried_select`] = 1;
-            output.armorhelmet_carried = 1;
-          } else {
-            output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
-          }
-          output[`repeating_equipment_${rowId}_equipment_weight`] = +v.armorhelmet_weight || 0;
-          output[`repeating_equipment_${rowId}_equipment_cost`] = +v.armorhelmet_cost || 0;
-          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'helmet'`);
-        } else {
-          // has name but NO id = CREATE NEW ROW
-          newID = generateUniqueRowID();
-          output.armorhelmet_row_id = newID.toLowerCase();
-          output[`repeating_equipment_${newID}_equipment_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_type`] = 4;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorhelmet_worn || 0;
-          output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_magic`] = v.armorhelmet_magic;
-          output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
-          output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
-          output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
-          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating helmet: ${newID}`);
-        }
-      } else if (armorhelmet_ID === idArray[4]) {
-        // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
-        output.armorhelmet_row_id = 0;
-        output.armorhelmet_worn = 0;
-        output.armorhelmet = '';
-        output.armorhelmet_ac = 10;
-        output.armorhelmet_base = 10;
-        output.armorhelmet_magic = 0;
-        output.armorhelmet_bulk = 0;
-        output.armorhelmet_weight = 0;
-        output.armorhelmet_cost = 0;
-        output.armorhelmet_carried = 1;
-        removeRepeatingRow(`repeating_equipment_${id_low}`);
-        // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting helmet:${newID}`);
-      }
-    } else if (matchingArray === null && row_removed) {
-      // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
-      output.armorhelmet_row_id = 0;
-      output.armorhelmet_worn = 0;
-      output.armorhelmet = '';
-      output.armorhelmet_ac = 10;
-      output.armorhelmet_base = 10;
-      output.armorhelmet_magic = 0;
-      output.armorhelmet_bulk = 0;
-      output.armorhelmet_weight = 0;
-      output.armorhelmet_cost = 0;
-      output.armorhelmet_carried = 1;
-      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for helmet`);
-    }
-  }
-  if (matchingArray === 'other1Attrs' || id_low === idArray[5] || migrate) {
-    if (matchingArray === 'other1Attrs' || migrate) {
-      if (other1) {
-        if (armorother1_ID.length === 20) {
-          // has name && has id = UPDATE ROW
-          rowId = armorother1_ID.toLowerCase();
-          output.armorother1_row_id = rowId;
-          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
-          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 5;
-          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorother_worn || 0;
-          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorother.trim();
-          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorother_ac || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorother_base || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armorother_magic || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother_mod || 0;
-          // armor in use ie 'worn', should always be considered as carried
-          output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother_worn === 1 ? 1 : 0;
-          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'other1'`);
-        } else {
-          // has name but NO id = CREATE NEW ROW
-          newID = generateUniqueRowID();
-          output.armorother1_row_id = newID.toLowerCase();
-          output[`repeating_equipment_${newID}_equipment_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_type`] = 5;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother_worn || 0;
-          output[`repeating_equipment_${newID}_equipment_item`] = v.armorother.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
-          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating other1: ${newID}`);
-        }
-      } else if (armorother1_ID === idArray[5]) {
-        // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
-        output.armorother1_row_id = 0;
-        output.armorother_worn = 0;
-        output.armorother = '';
-        output.armorother_ac = 10;
-        output.armorother_base = 10;
-        output.armorother_magic = 0;
-        output.armorother_mod = 0;
-        output.armorother_bulk = 0;
-        removeRepeatingRow(`repeating_equipment_${id_low}`);
-        // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting other1:${newID}`);
-      }
-    } else if (matchingArray === null && row_removed) {
-      // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
-      output.armorother1_row_id = 0;
-      output.armorother_worn = 0;
-      output.armorother = '';
-      output.armorother_ac = 10;
-      output.armorother_base = 10;
-      output.armorother_magic = 0;
-      output.armorother_mod = 0;
-      output.armorother_bulk = 0;
-      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other1`);
-    }
-  }
-  if (matchingArray === 'other2Attrs' || id_low === idArray[6] || migrate) {
-    if (matchingArray === 'other2Attrs' || migrate) {
-      if (other2) {
-        if (armorother2_ID.length === 20) {
-          // has name && has id = UPDATE ROW
-          rowId = armorother2_ID.toLowerCase();
-          output.armorother2_row_id = rowId;
-          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
-          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 6;
-          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorother2_worn || 0;
-          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorother2.trim();
-          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorother2_ac || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorother2_base || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armorother2_magic || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother2_mod || 0;
-          // armor in use ie 'worn', should always be considered as carried
-          output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother2_worn === 1 ? 1 : 0;
-        } else {
-          // has name but NO id = CREATE NEW ROW
-          newID = generateUniqueRowID();
-          output.armorother2_row_id = newID.toLowerCase();
-          output[`repeating_equipment_${newID}_equipment_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_type`] = 6;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother2_worn || 0;
-          output[`repeating_equipment_${newID}_equipment_item`] = v.armorother2.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
-          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating other2: ${newID}`);
-        }
-      } else if (armorother2_ID === idArray[6]) {
-        // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
-        output.armorother2_row_id = 0;
-        output.armorother2_worn = 0;
-        output.armorother2 = '';
-        output.armorother2_ac = 0;
-        output.armorother2_base = 0;
-        output.armorother2_magic = 0;
-        output.armorother2_mod = 0;
-        output.armorother2_bulk = 0;
-        removeRepeatingRow(`repeating_equipment_${id_low}`);
-        // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting other2:${newID}`);
-      }
-    } else if (matchingArray === null && row_removed) {
-      // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
-      output.armorother2_row_id = 0;
-      output.armorother2_worn = 0;
-      output.armorother2 = '';
-      output.armorother2_ac = 0;
-      output.armorother2_base = 0;
-      output.armorother2_magic = 0;
-      output.armorother2_mod = 0;
-      output.armorother2_bulk = 0;
-      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other2`);
-    }
-  }
-  if (matchingArray === 'other3Attrs' || id_low === idArray[7] || migrate) {
-    if (matchingArray === 'other3Attrs' || migrate) {
-      if (other3) {
-        if (armorother3_ID.length === 20) {
-          // has name && has id = UPDATE ROW
-          rowId = armorother3_ID.toLowerCase();
-          output.armorother3_row_id = rowId;
-          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
-          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 7;
-          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorother3_worn || 0;
-          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorother3.trim();
-          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorother3_ac || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorother3_base || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armorother3_magic || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother3_mod || 0;
-          // armor in use ie 'worn', should always be considered as carried
-          output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother3_worn === 1 ? 1 : 0;
-          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'other3'`);
-        } else {
-          // has name but NO id = CREATE NEW ROW
-          newID = generateUniqueRowID();
-          output.armorother3_row_id = newID.toLowerCase();
-          output[`repeating_equipment_${newID}_equipment_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_type`] = 7;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother3_worn || 0;
-          output[`repeating_equipment_${newID}_equipment_item`] = v.armorother3.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
-          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating other3: ${newID}`);
-        }
-      } else if (armorother3_ID === idArray[7]) {
-        // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
-        output.armorother3_row_id = 0;
-        output.armorother3_worn = 0;
-        output.armorother3 = '';
-        output.armorother3_ac = 0;
-        output.armorother3_base = 0;
-        output.armorother3_magic = 0;
-        output.armorother3_mod = 0;
-        output.armorother3_bulk = 0;
-        removeRepeatingRow(`repeating_equipment_${id_low}`);
-        // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting other3:${newID}`);
-      }
-    } else if (matchingArray === null && row_removed) {
-      // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
-      output.armorother3_row_id = 0;
-      output.armorother3_worn = 0;
-      output.armorother3 = '';
-      output.armorother3_ac = 0;
-      output.armorother3_base = 0;
-      output.armorother3_magic = 0;
-      output.armorother3_mod = 0;
-      output.armorother3_bulk = 0;
-      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other3`);
-    }
-  }
-  if (matchingArray === 'other4Attrs' || id_low === idArray[8] || migrate) {
-    if (matchingArray === 'other4Attrs' || migrate) {
-      if (other4) {
-        if (armorother4_ID.length === 20) {
-          // has name && has id = UPDATE ROW
-          rowId = armorother4_ID.toLowerCase();
-          output.armorother4_row_id = rowId;
-          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
-          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 8;
-          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorother4_worn || 0;
-          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorother4.trim();
-          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorother4_ac || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorother4_base || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armorother4_magic || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother4_mod || 0;
-          // armor in use ie 'worn', should always be considered as carried
-          output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother4_worn === 1 ? 1 : 0;
-          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'other4'`);
-        } else {
-          // has name but NO id = CREATE NEW ROW
-          newID = generateUniqueRowID();
-          output.armorother4_row_id = newID.toLowerCase();
-          output[`repeating_equipment_${newID}_equipment_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_type`] = 8;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother4_worn || 0;
-          output[`repeating_equipment_${newID}_equipment_item`] = v.armorother4.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
-          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating other4: ${newID}`);
-        }
-      } else if (armorother4_ID === idArray[8]) {
-        // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
-        output.armorother4_row_id = 0;
-        output.armorother4_worn = 0;
-        output.armorother4 = '';
-        output.armorother4_ac = 0;
-        output.armorother4_base = 0;
-        output.armorother4_magic = 0;
-        output.armorother4_mod = 0;
-        output.armorother4_bulk = 0;
-        removeRepeatingRow(`repeating_equipment_${id_low}`);
-        // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting other4:${newID}`);
-      }
-    } else if (matchingArray === null && row_removed) {
-      // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
-      output.armorother4_row_id = 0;
-      output.armorother4_worn = 0;
-      output.armorother4 = '';
-      output.armorother4_ac = 0;
-      output.armorother4_base = 0;
-      output.armorother4_magic = 0;
-      output.armorother4_mod = 0;
-      output.armorother4_bulk = 0;
-      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other4`);
-    }
-  }
-  if (matchingArray === 'other5Attrs' || id_low === idArray[9] || migrate) {
-    if (matchingArray === 'other5Attrs' || migrate) {
-      if (other5) {
-        if (armorother5_ID.length === 20) {
-          // has name && has id = UPDATE ROW
-          rowId = armorother5_ID.toLowerCase();
-          output.armorother5_row_id = rowId;
-          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
-          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 9;
-          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorother5_worn || 0;
-          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorother5.trim();
-          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorother5_ac || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorother5_base || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armorother5_magic || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother5_mod || 0;
-          // armor in use ie 'worn', should always be considered as carried
-          output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother5_worn === 1 ? 1 : 0;
-          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'other5'`);
-        } else {
-          // has name but NO id = CREATE NEW ROW
-          newID = generateUniqueRowID();
-          output.armorother5_row_id = newID.toLowerCase();
-          output[`repeating_equipment_${newID}_equipment_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_type`] = 9;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother5_worn || 0;
-          output[`repeating_equipment_${newID}_equipment_item`] = v.armorother5.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
-          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating other5: ${newID}`);
-        }
-      } else if (armorother5_ID === idArray[9]) {
-        // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
-        output.armorother5_row_id = 0;
-        output.armorother5_worn = 0;
-        output.armorother5 = '';
-        output.armorother5_ac = 0;
-        output.armorother5_base = 0;
-        output.armorother5_magic = 0;
-        output.armorother5_mod = 0;
-        output.armorother5_bulk = 0;
-        removeRepeatingRow(`repeating_equipment_${id_low}`);
-        // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting other5:${newID}`);
-      }
-    } else if (matchingArray === null && row_removed) {
-      // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
-      output.armorother5_row_id = 0;
-      output.armorother5_worn = 0;
-      output.armorother5 = '';
-      output.armorother5_ac = 0;
-      output.armorother5_base = 0;
-      output.armorother5_magic = 0;
-      output.armorother5_mod = 0;
-      output.armorother5_bulk = 0;
-      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other5`);
-    }
-  }
-  if (matchingArray === 'other6Attrs' || id_low === idArray[10] || migrate) {
-    if (matchingArray === 'other6Attrs' || migrate) {
-      if (other6) {
-        if (armorother6_ID.length === 20) {
-          // has name && has id = UPDATE ROW
-          rowId = armorother6_ID.toLowerCase();
-          output.armorother6_row_id = rowId;
-          output[`repeating_equipment_${rowId}_equipment_type`] = 2;
-          output[`repeating_equipment_${rowId}_equipment_armor_type`] = 10;
-          output[`repeating_equipment_${rowId}_equipment_armor_worn`] = +v.armorother6_worn || 0;
-          output[`repeating_equipment_${rowId}_equipment_item`] = v.armorother6.trim();
-          output[`repeating_equipment_${rowId}_equipment_armor_ac`] = +v.armorother6_ac || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_base`] = +v.armorother6_base || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_magic`] = +v.armorother6_magic || 0;
-          output[`repeating_equipment_${rowId}_equipment_armor_mod`] = +v.armorother6_mod || 0;
-          // armor in use ie 'worn', should always be considered as carried
-          output[`repeating_equipment_${rowId}_equipment_carried_select`] = +v.armorother6_worn === 1 ? 1 : 0;
-          // clog(`syncArmorToEquipment: id:${rowId} repeating Armor exists for 'other6'`);
-        } else {
-          // has name but NO id = CREATE NEW ROW
-          newID = generateUniqueRowID();
-          output.armorother6_row_id = newID.toLowerCase();
-          output[`repeating_equipment_${newID}_equipment_type`] = 2;
-          output[`repeating_equipment_${newID}_equipment_armor_type`] = 10;
-          output[`repeating_equipment_${newID}_equipment_armor_worn`] = +v.armorother6_worn || 0;
-          output[`repeating_equipment_${newID}_equipment_item`] = v.armorother6.trim();
-          output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
-          output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
-          output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-          // clog(`syncArmorToEquipment: repeating Armor does not exist. Creating other6: ${newID}`);
-        }
-      } else if (armorother6_ID === idArray[10]) {
-        // id exists but no name: Armor Detail row has been REMOVED - RESETING ROW
-        output.armorother6_row_id = 0;
-        output.armorother6_worn = 0;
-        output.armorother6 = '';
-        output.armorother6_ac = 0;
-        output.armorother6_base = 0;
-        output.armorother6_magic = 0;
-        output.armorother6_mod = 0;
-        output.armorother6_bulk = 0;
-        removeRepeatingRow(`repeating_equipment_${id_low}`);
-        // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting other6:${newID}`);
-      }
-    } else if (matchingArray === null && row_removed) {
-      // matchingArray === null means repeating_row removed: NO Name and/or id REMOVED - RESETING ROW
-      output.armorother6_row_id = 0;
-      output.armorother6_worn = 0;
-      output.armorother6 = '';
-      output.armorother6_ac = 0;
-      output.armorother6_base = 0;
-      output.armorother6_magic = 0;
-      output.armorother6_mod = 0;
-      output.armorother6_bulk = 0;
-      // clog(`repeating row_removed:${row_removed} - Armor Details row has been reset for other6`);
-    }
-  }
+  });
   await setAttrsAsync(output, {silent: true});
+  // clog(`Final Output Sent to setAttrs: ${JSON.stringify(output)}`);
   await refreshArmorDetailsArray(id_low);
   calcAC();
 };
@@ -3636,35 +2925,7 @@ on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_ar
   const synced = +v[attrSync] || 0;
   // clog(`${trigger} - id:${id} type:${type} synced:${synced === 1}`);
   // Armor Type's set and button clicked OR Type's changed on an already synced item.
-  const updateArmorDetails = (trigger === 'addarmor' && type !== 99) || (trigger === 'equipment_armor_type' && synced === 1);
-  if (updateArmorDetails) {
-    await fillArmorDetails(id);
-    await removeEmptyArmorRows();
-    // update the sync flag for newly added items
-    if (synced !== 1) {
-      output[attrSync] = 1;
-      await setAttrsAsync(output, {silent: true});
-    }
-  }
-});
-
-// +Add button: fills Armor Details row with repeating_equipment values
-// IF the item is already synced, but the armor type has been changed,
-// removeEmptyArmorRows tests for duplicate ids and will delete/reset any old rows
-on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_armor_type', async (eventInfo) => {
-  const source = eventInfo.sourceAttribute.toLowerCase();
-  const parts = source.split('_');
-  const id = parts[2];
-  const trigger = parts.slice(3).join('_');
-  const attrType = `repeating_equipment_${id}_equipment_armor_type`;
-  const attrSync = `repeating_equipment_${id}_equipment_sync_armor_flag`;
-  const v = await getAttrsAsync([attrType, attrSync]);
-  const output = {};
-  const type = +v[attrType] || 0;
-  const synced = +v[attrSync] || 0;
-  // clog(`${trigger} - id:${id} type:${type} synced:${synced === 1}`);
-  // Armor Type's set and button clicked OR Type's changed on an already synced item.
-  const isArmor = type !== 99;
+  const isArmor = typeValue !== 99;
   const updateArmorDetails = (trigger === 'addarmor' && isArmor) || (trigger === 'equipment_armor_type' && synced === 1);
   if (updateArmorDetails) {
     if (isArmor) {
