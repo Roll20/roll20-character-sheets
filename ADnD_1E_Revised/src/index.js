@@ -2666,17 +2666,17 @@ const fillArmorDetails = async (id) => {
   ]);
   const output = {};
   const recalc = 0;
-  const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
+  const type = int(v[`repeating_equipment_${id}_equipment_armor_type`]);
   const item = v[`repeating_equipment_${id}_equipment_item`];
-  const worn = +v[`repeating_equipment_${id}_equipment_armor_worn`] || 0;
-  const ac = +v[`repeating_equipment_${id}_equipment_armor_ac`] || 0;
-  const base = +v[`repeating_equipment_${id}_equipment_armor_base`] || 0;
-  const magic = +v[`repeating_equipment_${id}_equipment_armor_magic`] || 0;
-  const mod = +v[`repeating_equipment_${id}_equipment_armor_mod`] || 0;
-  const bulk = +v[`repeating_equipment_${id}_equipment_armor_bulk`] || 0;
-  let carriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
-  const weight = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
-  const cost = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
+  const worn = int(v[`repeating_equipment_${id}_equipment_armor_worn`]);
+  const ac = int(v[`repeating_equipment_${id}_equipment_armor_ac`]);
+  const base = int(v[`repeating_equipment_${id}_equipment_armor_base`]);
+  const magic = int(v[`repeating_equipment_${id}_equipment_armor_magic`]);
+  const mod = int(v[`repeating_equipment_${id}_equipment_armor_mod`]);
+  const bulk = int(v[`repeating_equipment_${id}_equipment_armor_bulk`]);
+  let carriedSelect = int(v[`repeating_equipment_${id}_equipment_carried_select`]);
+  const weight = int(v[`repeating_equipment_${id}_equipment_weight`]);
+  const cost = int(v[`repeating_equipment_${id}_equipment_cost`]);
   // armor in use ie 'worn', should always be considered as carried
   if (worn === 1) {
     carriedSelect = 1;
