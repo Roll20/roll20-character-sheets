@@ -112,8 +112,14 @@ const getSectionIDsAsync = (sectionName) => {
 //-------------------------------------------------------------------------------------
 
 // GiGs custom handling for number type and logs
-const int = (score, error = 0) => parseInt(score) || error;
-const float = (score, error = 0) => parseFloat(score) || error;
+const int = (score, error = 0) => {
+  const n = parseInt(score, 10);
+  return isNaN(n) ? error : n;
+};
+const float = (score, error = 0) => {
+  const n = parseFloat(score);
+  return isNaN(n) ? error : n;
+};
 const clog = (text, color = 'green') => {
   const message = `%c ${text}`;
   console.log(message, `color: ${color}; font-weight:bold`);
@@ -2473,7 +2479,8 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 1;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armortype.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac || 0;
+      // output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.armortype_ac);
       output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
       output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype_magic || 0;
       output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
