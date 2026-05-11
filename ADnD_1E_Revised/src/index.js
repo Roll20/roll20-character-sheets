@@ -1235,19 +1235,19 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         output[`${prefix}equipment_type`] = 2;
         output[`${prefix}equipment_armor_type`] = row.typeValue;
         output[`${prefix}equipment_item`] = itemName;
-        output[`${prefix}equipment_armor_worn`] = +v[`${row.armorType}_worn`] || 0;
-        output[`${prefix}equipment_armor_ac`] = +v[`${row.armorType}_ac`] || 0;
-        output[`${prefix}equipment_armor_base`] = +v[`${row.armorType}_base`] || 0;
-        output[`${prefix}equipment_armor_bulk`] = +v[`${row.armorType}_bulk`] || 0;
-        output[`${prefix}equipment_weight`] = +v[`${row.armorType === 'armortype' ? 'armor' : row.armorType}_weight`] || 0;
-        output[`${prefix}equipment_cost`] = +v[`${row.armorType === 'armortype' ? 'armor' : row.armorType}_cost`] || 0;
+        output[`${prefix}equipment_armor_worn`] = int(v[`${row.armorType}_worn`]);
+        output[`${prefix}equipment_armor_ac`] = int(v[`${row.armorType}_ac`]);
+        output[`${prefix}equipment_armor_base`] = int(v[`${row.armorType}_base`]);
+        output[`${prefix}equipment_armor_bulk`] = int(v[`${row.armorType}_bulk`]);
+        output[`${prefix}equipment_weight`] = int(v[`${row.armorType === 'armortype' ? 'armor' : row.armorType}_weight`]);
+        output[`${prefix}equipment_cost`] = int(v[`${row.armorType === 'armortype' ? 'armor' : row.armorType}_cost`]);
         if (v[`${row.armorType}_magic`] !== undefined) output[`${prefix}equipment_armor_magic`] = v[`${row.armorType}_magic`];
         if (v[`${row.armorType}_mod`] !== undefined) output[`${prefix}equipment_armor_mod`] = v[`${row.armorType}_mod`];
         if ((+v[`${row.armorType}_worn`] || 0) === 1 && (+v[`${row.armorType}_carried`] || 0) === 0) {
           output[`${prefix}equipment_carried_select`] = 1;
           output[`${row.armorType}_carried`] = 1;
         } else {
-          output[`${prefix}equipment_carried_select`] = +v[`${row.armorType}_carried`] || 0;
+          output[`${prefix}equipment_carried_select`] = int(v[`${row.armorType}_carried`]);
         }
       } else if (hasExistingID && (row_removed || !itemName)) {
         // Handle Removal or Reset
