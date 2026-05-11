@@ -1,5 +1,16 @@
 <div class="charsheet">
 	<div class="sheet-qualin">
+		<input type="hidden" name="attr_npc" value="0" />
+		<input type="checkbox" class="sheet-is-npc" name="attr_is_npc" value="1" id="sheet_mode_npc" />
+		<div class="sheet-mode-toggle">
+			<label class="sheet-toggle-pill" for="sheet_mode_npc">
+				<strong>Sheet Mode:</strong>
+				<span class="sheet-toggle-mode">PC</span>
+				<span>Use NPC / Monster View</span>
+			</label>
+		</div>
+
+		<div class="sheet-pc-sheet">
 		<div class="sheet-banner">
 			<div class="sheet-banner-copy">
 				<p class="sheet-kicker">Roll20 Character Sheet</p>
@@ -658,6 +669,126 @@
 
 			</div>
 		</div>
+		</div>
+
+		<div class="sheet-npc-sheet">
+			<div class="sheet-card sheet-npc-statblock">
+				<div class="sheet-npc-row sheet-npc-row-title">
+					<input type="text" name="attr_character_name" placeholder="Monster Name" />
+				</div>
+				<div class="sheet-npc-row">
+					<label>
+						<span>Tier</span>
+						<input type="text" name="attr_tier" value="1" />
+					</label>
+				</div>
+				<div class="sheet-npc-row">
+					<input type="text" name="attr_npc_type" placeholder="Magical Creature, Flying" />
+				</div>
+				<div class="sheet-npc-row sheet-npc-row-paired">
+					<label>
+						<span>Speed</span>
+						<input type="number" name="attr_speed" value="0" />
+					</label>
+					<label>
+						<span>Defense</span>
+						<input type="number" name="attr_defense" value="0" />
+					</label>
+				</div>
+				<div class="sheet-npc-row sheet-npc-row-paired">
+					<label>
+						<span>Health</span>
+						<input type="number" name="attr_health" value="0" />
+					</label>
+					<label>
+						<span>Soak</span>
+						<input type="number" name="attr_armor_soak" value="0" />
+					</label>
+				</div>
+				<input type="hidden" name="attr_health_max" value="0" />
+				<div class="sheet-npc-divider">Attributes</div>
+				<div class="sheet-npc-row sheet-npc-row-paired">
+					<label>
+						<span>Body</span>
+						<input type="number" name="attr_body" value="0" />
+					</label>
+					<label>
+						<span>Mind</span>
+						<input type="number" name="attr_mind" value="0" />
+					</label>
+				</div>
+				<div class="sheet-npc-row sheet-npc-row-paired">
+					<label>
+						<span>Coordination</span>
+						<input type="number" name="attr_coordination" value="0" />
+					</label>
+					<label>
+						<span>Presence</span>
+						<input type="number" name="attr_presence" value="0" />
+					</label>
+				</div>
+				<div class="sheet-npc-divider">Environment</div>
+				<div class="sheet-npc-row">
+					<textarea name="attr_npc_environment" rows="2" placeholder="Griefwings haunt graveyards, ruins, and battlefields steeped in sorrow."></textarea>
+				</div>
+				<div class="sheet-npc-divider">Abilities</div>
+				<fieldset class="repeating_npcactions sheet-npc-ability-list">
+					<div class="sheet-npc-ability-item">
+						<div class="sheet-npc-ability-name">
+							<input type="text" name="attr_action_name" placeholder="Wall of Sorrow" />
+							<input type="text" name="attr_action_recharge" placeholder="Recharge 5,6" />
+						</div>
+						<div class="sheet-npc-ability-text">
+							<textarea name="attr_action_effect" rows="3" placeholder="Ability effect text"></textarea>
+						</div>
+						<div class="sheet-npc-ability-meta">
+							<select name="attr_action_attribute">
+								<option value="@{body}">Body</option>
+								<option value="@{coordination}">Coordination</option>
+								<option value="@{mind}" selected="selected">Mind</option>
+								<option value="@{presence}">Presence</option>
+							</select>
+							<input type="number" name="attr_action_pool_mod" value="0" placeholder="Pool Mod" />
+							<input type="number" name="attr_action_difficulty" value="1" placeholder="Difficulty" />
+							<input type="text" name="attr_action_damage" placeholder="Damage" />
+							<input type="number" name="attr_action_target_defense" value="0" placeholder="Defense" />
+							<select name="attr_action_recharge_target">
+								<option value="6" selected="selected">Recharge 6</option>
+								<option value="5">Recharge 5,6</option>
+							</select>
+						</div>
+						<div class="sheet-npc-ability-rolls">
+							<button type="roll" name="roll_npc_action" value="&{template:default} {{name=@{character_name} - @{action_name}}} {{pool=[[@{tier}+@{action_attribute}+@{action_pool_mod}]]}} {{successes=[[(@{tier}+@{action_attribute}+@{action_pool_mod})d6>4]]}} {{difficulty=@{action_difficulty}}} {{defense=@{action_target_defense}}} {{recharge=@{action_recharge}}} {{effect=@{action_effect}}}">Use</button>
+							<button type="roll" name="roll_npc_action_damage" value="&{template:default} {{name=@{character_name} - @{action_name} Damage}} {{damage=[[ @{action_damage} ]]}} {{armor_soak=@{armor_soak}}}">Damage</button>
+							<button type="roll" name="roll_npc_action_recharge" value="&{template:default} {{name=@{character_name} - @{action_name} Recharge}} {{recharge=@{action_recharge}}} {{target=@{action_recharge_target}+}} {{recharged=[[1d6>=@{action_recharge_target}]]}}">Recharge</button>
+						</div>
+					</div>
+				</fieldset>
+				<div class="sheet-npc-helper-row">
+					<label>
+						<span>Attack Mod</span>
+						<input type="number" name="attr_npc_attack_mod" value="0" />
+					</label>
+					<label>
+						<span>Reaction Attribute</span>
+						<select name="attr_npc_reaction_attribute">
+							<option value="@{body}">Body</option>
+							<option value="@{coordination}">Coordination</option>
+							<option value="@{mind}" selected="selected">Mind</option>
+							<option value="@{presence}">Presence</option>
+						</select>
+					</label>
+					<label>
+						<span>Reaction Mod</span>
+						<input type="number" name="attr_npc_reaction_mod" value="0" />
+					</label>
+				</div>
+				<div class="sheet-npc-helper-rolls">
+					<button type="roll" name="roll_npc_attack" value="&{template:default} {{name=@{character_name} - Attack}} {{pool=[[@{coordination}+@{tier}+@{npc_attack_mod}]]}} {{successes=[[(@{coordination}+@{tier}+@{npc_attack_mod})d6>4]]}} {{note=Use for baseline attack checks when no dedicated attack line is present.}}">Attack</button>
+					<button type="roll" name="roll_npc_reaction" value="&{template:default} {{name=@{character_name} - Reaction}} {{pool=[[@{tier}+@{npc_reaction_attribute}+@{npc_reaction_mod}]]}} {{successes=[[(@{tier}+@{npc_reaction_attribute}+@{npc_reaction_mod})d6>4]]}}">Reaction</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -1262,9 +1393,285 @@ const toNumber = value => {
 	return Number.isNaN(parsed) ? 0 : parsed;
 };
 
+function syncNpcModeFlags() {
+	getAttrs(["is_npc", "npc"], values => {
+		const npcEnabled = values.is_npc === "1" || values.npc === "1";
+		const normalized = npcEnabled ? "1" : "0";
+		const updates = {};
+
+		if (values.is_npc !== normalized) {
+			updates.is_npc = normalized;
+		}
+
+		if (values.npc !== normalized) {
+			updates.npc = normalized;
+		}
+
+		if (Object.keys(updates).length) {
+			setAttrs(updates);
+		}
+	});
+}
+
+const npcCompendiumFieldMap = {
+	character_name: ["npc_name", "npc_character_name", "npc_monster_name", "name"],
+	npc_type: ["npc_type", "npc_race", "npc_size", "npc_creature_type", "npc_alignment"],
+	npc_environment: ["npc_environment", "npc_bio", "npc_description", "npc_senses"],
+	tier: ["npc_tier", "npc_level", "npc_challenge", "npc_cr"],
+	speed: ["npc_speed", "speed"],
+	defense: ["npc_defense", "npc_ac", "ac", "npc_armor_class", "npc_armour_class"],
+	health: ["npc_hp", "npc_hpbase", "hp", "hp_max"],
+	armor_soak: ["npc_armor_soak", "npc_armour_soak", "npc_soak", "npc_armor", "npc_armour"],
+	body: ["npc_body", "npc_str", "strength", "str"],
+	mind: ["npc_mind", "npc_int", "intelligence", "int", "npc_wis", "wisdom", "wis"],
+	coordination: ["npc_coordination", "npc_dex", "dexterity", "dex"],
+	presence: ["npc_presence", "npc_cha", "charisma", "cha"],
+	npc_attack_mod: ["npc_attack_mod", "npc_attackbonus", "npc_attack_bonus", "npc_to_hit"],
+	npc_reaction_mod: ["npc_reaction_mod", "npc_save_bonus", "npc_reaction_bonus"]
+};
+
+const sourceActionSections = ["repeating_npcaction", "repeating_npctrait", "repeating_npclegendaryaction"];
+
+const parseIntLoose = value => {
+	if (value === null || value === undefined) {
+		return 0;
+	}
+	const match = String(value).match(/-?\d+/);
+	return match ? parseInt(match[0], 10) : 0;
+};
+
+const hasMeaningfulText = value => String(value || "").trim().length > 0;
+
+const getFirstMappedValue = (values, keyList) => {
+	for (let i = 0; i < keyList.length; i += 1) {
+		const value = values[keyList[i]];
+		if (hasMeaningfulText(value)) {
+			return String(value).trim();
+		}
+	}
+	return "";
+};
+
+const inferActionAttribute = row => {
+	const text = `${row.attack_type || ""} ${row.name || ""} ${row.description || ""}`.toLowerCase();
+	if (text.includes("range") || text.includes("ranged") || text.includes("bow") || text.includes("shot")) {
+		return "@{coordination}";
+	}
+	if (text.includes("spell") || text.includes("arcane") || text.includes("magic") || text.includes("mind")) {
+		return "@{mind}";
+	}
+	if (text.includes("presence") || text.includes("fear") || text.includes("charm")) {
+		return "@{presence}";
+	}
+	return "@{body}";
+};
+
+const parseRecharge = text => {
+	const match = String(text || "").match(/recharge\s*(\d)\s*(?:-|,)?\s*(\d)?/i);
+	if (!match) {
+		return { recharge: "", target: "6" };
+	}
+
+	if (match[1] === "5" && match[2] === "6") {
+		return { recharge: "Recharge 5,6", target: "5" };
+	}
+
+	const target = match[2] || match[1] || "6";
+	return { recharge: `Recharge ${target}`, target };
+};
+
+const parseActionsFromTextBlock = rawText => {
+	const lines = String(rawText || "")
+		.split(/\r?\n/)
+		.map(line => line.trim())
+		.filter(Boolean);
+
+	const rows = [];
+	lines.forEach(line => {
+		const parts = line.split(/[:\-]\s+/);
+		const name = parts[0] || "Action";
+		const description = parts.slice(1).join(" - ") || line;
+		rows.push({
+			name,
+			description,
+			tohit: "0",
+			damage: "",
+			attack_type: ""
+		});
+	});
+
+	return rows;
+};
+
+function importNpcActionsIntoQualin(values) {
+	if (
+		typeof getSectionIDs !== "function" ||
+		typeof generateRowID !== "function"
+	) {
+		return;
+	}
+
+	getSectionIDs("repeating_npcactions", targetIds => {
+		if ((targetIds || []).length > 0) {
+			return;
+		}
+
+		const collectedRows = [];
+		let pendingSections = sourceActionSections.length;
+
+		const finalizeImport = () => {
+			if (!pendingSections) {
+				let rows = collectedRows;
+				if (!rows.length && hasMeaningfulText(values.npc_actions)) {
+					rows = parseActionsFromTextBlock(values.npc_actions);
+				}
+
+				if (!rows.length) {
+					return;
+				}
+
+				const updates = {};
+				const cappedRows = rows.slice(0, 20);
+				const defaultDefense = parseIntLoose(values.defense);
+				const tier = Math.max(1, parseIntLoose(values.tier) || 1);
+
+				cappedRows.forEach(row => {
+					const rowId = generateRowID();
+					const prefix = `repeating_npcactions_${rowId}_`;
+					const rechargeParsed = parseRecharge(`${row.name || ""} ${row.description || ""}`);
+					const toHit = parseIntLoose(row.tohit);
+
+					updates[`${prefix}action_name`] = String(row.name || "Action").trim();
+					updates[`${prefix}action_effect`] = String(row.description || "").trim();
+					updates[`${prefix}action_attribute`] = inferActionAttribute(row);
+					updates[`${prefix}action_pool_mod`] = String(toHit);
+					updates[`${prefix}action_difficulty`] = String(tier);
+					updates[`${prefix}action_damage`] = String(row.damage || "").trim();
+					updates[`${prefix}action_target_defense`] = String(defaultDefense);
+					updates[`${prefix}action_recharge`] = rechargeParsed.recharge;
+					updates[`${prefix}action_recharge_target`] = rechargeParsed.target;
+				});
+
+				setAttrs(updates);
+			}
+		};
+
+		sourceActionSections.forEach(sectionName => {
+			getSectionIDs(sectionName, sourceIds => {
+				if (!sourceIds || !sourceIds.length) {
+					pendingSections -= 1;
+					finalizeImport();
+					return;
+				}
+
+				const fields = [];
+				sourceIds.forEach(id => {
+					const prefix = `${sectionName}_${id}_`;
+					fields.push(`${prefix}name`);
+					fields.push(`${prefix}description`);
+					fields.push(`${prefix}attack_tohit`);
+					fields.push(`${prefix}attack_damage`);
+					fields.push(`${prefix}attack_type`);
+				});
+
+				getAttrs(fields, rowValues => {
+					sourceIds.forEach(id => {
+						const prefix = `${sectionName}_${id}_`;
+						const name = String(rowValues[`${prefix}name`] || "").trim();
+						const description = String(rowValues[`${prefix}description`] || "").trim();
+						if (!name && !description) {
+							return;
+						}
+
+						collectedRows.push({
+							name,
+							description,
+							tohit: rowValues[`${prefix}attack_tohit`] || "0",
+							damage: rowValues[`${prefix}attack_damage`] || "",
+							attack_type: rowValues[`${prefix}attack_type`] || ""
+						});
+					});
+
+					pendingSections -= 1;
+					finalizeImport();
+				});
+			});
+		});
+	});
+}
+
+function syncNpcCompendiumImport() {
+	const sourceFields = Object.values(npcCompendiumFieldMap).flat();
+	const targetFields = Object.keys(npcCompendiumFieldMap);
+	const fetchFields = ["is_npc", "npc", "npc_actions", ...sourceFields, ...targetFields, "tier", "defense"];
+
+	getAttrs(fetchFields, values => {
+		const importedNpcFlag = values.is_npc === "1" || values.npc === "1" || hasMeaningfulText(values.npc_name);
+		if (!importedNpcFlag) {
+			return;
+		}
+
+		const updates = {
+			is_npc: "1",
+			npc: "1"
+		};
+
+		Object.keys(npcCompendiumFieldMap).forEach(targetKey => {
+			const mappedValue = getFirstMappedValue(values, npcCompendiumFieldMap[targetKey]);
+			if (!hasMeaningfulText(mappedValue)) {
+				return;
+			}
+
+			const currentValue = String(values[targetKey] || "").trim();
+			if (targetKey === "tier") {
+				const nextTier = Math.max(1, parseIntLoose(mappedValue) || 1);
+				const currentTier = Math.max(0, parseIntLoose(currentValue));
+				if (currentTier <= 0) {
+					updates.tier = String(nextTier);
+				}
+				return;
+			}
+
+			if ([
+				"speed",
+				"defense",
+				"health",
+				"armor_soak",
+				"body",
+				"mind",
+				"coordination",
+				"presence",
+				"npc_attack_mod",
+				"npc_reaction_mod"
+			].includes(targetKey)) {
+				const nextNumber = parseIntLoose(mappedValue);
+				const currentNumber = parseIntLoose(currentValue);
+				if (currentNumber <= 0 && nextNumber !== 0) {
+					updates[targetKey] = String(nextNumber);
+				}
+				return;
+			}
+
+			if (!currentValue) {
+				updates[targetKey] = mappedValue;
+			}
+		});
+
+		if (Object.keys(updates).length) {
+			setAttrs(updates);
+		}
+
+		importNpcActionsIntoQualin({
+			...values,
+			tier: updates.tier || values.tier,
+			defense: updates.defense || values.defense
+		});
+	});
+}
+
 function applySelectionsRoll20() {
 	const fetchFields = [
-		"species", "environment", "upbringing", "package_1", "package_2", "package_3", "tier",
+		"is_npc", "npc", "species", "environment", "upbringing", "package_1", "package_2", "package_3", "tier",
 		...trackedAttributes,
 		...trackedSkills,
 		...trackedAttributes.map(name => `applied_attr_bonus_${name}`),
@@ -1272,6 +1679,10 @@ function applySelectionsRoll20() {
 	];
 
 	getAttrs(fetchFields, values => {
+		if (values.is_npc === "1" || values.npc === "1") {
+			return;
+		}
+
 		const species = speciesEffects[values.species] || speciesEffects.wolf;
 
 		const updates = {
@@ -1323,7 +1734,12 @@ function applySelectionsRoll20() {
 }
 
 if (typeof on === "function" && typeof getAttrs === "function" && typeof setAttrs === "function") {
-	on("sheet:opened change:species change:environment change:upbringing change:package_1 change:package_2 change:package_3 change:tier", () => {
+	on("sheet:opened change:is_npc change:npc change:npc_name change:npc_hp change:npc_ac change:npc_speed change:npc_actions", () => {
+		syncNpcModeFlags();
+		syncNpcCompendiumImport();
+	});
+
+	on("sheet:opened change:species change:environment change:upbringing change:package_1 change:package_2 change:package_3 change:tier change:is_npc change:npc", () => {
 		applySelectionsRoll20();
 	});
 }
