@@ -2844,7 +2844,7 @@ const createAttack = async (id) => {
   const newID = generateUniqueRowID();
   // clog(`Creating a new attack newID:${newID}`);
   output[`repeating_weapon_${newID}_weapon_name`] = v[`repeating_equipment_${id}_equipment_item`];
-  output[`repeating_weapon_${newID}_weapon_type`] = +v[`repeating_equipment_${id}_equipment_weapon_type`] || 0;
+  output[`repeating_weapon_${newID}_weapon_type`] = int(v[`repeating_equipment_${id}_equipment_weapon_type`]);
   output[`repeating_weapon_${newID}_weapon_speed`] = v[`repeating_equipment_${id}_equipment_weapon_speed`];
   output[`repeating_weapon_${newID}_weapon_length`] = v[`repeating_equipment_${id}_equipment_weapon_length`];
   output[`repeating_weapon_${newID}_weapon_space`] = v[`repeating_equipment_${id}_equipment_weapon_space`];
@@ -2854,7 +2854,7 @@ const createAttack = async (id) => {
   output[`repeating_weapon_${newID}_weapon_attackdmgtype`] = v[`repeating_equipment_${id}_equipment_weapon_attackdmgtype`];
   output[`repeating_weapon_${newID}_weapon_rateoffire`] = v[`repeating_equipment_${id}_equipment_weapon_rateoffire`];
   output[`repeating_weapon_${newID}_weapon_range`] = v[`repeating_equipment_${id}_equipment_weapon_range`];
-  output[`repeating_weapon_${newID}_weapon_quantity`] = +v[`repeating_equipment_${id}_equipment_quantity`] || 0;
+  output[`repeating_weapon_${newID}_weapon_quantity`] = int(v[`repeating_equipment_${id}_equipment_quantity`]);
   output[`repeating_weapon_${newID}_weapon_notes`] = v[`repeating_equipment_${id}_equipment_description`];
   // set new row with equip values then set attack defaults and damage macros
   await setAttrsAsync(output, {silent: true});
