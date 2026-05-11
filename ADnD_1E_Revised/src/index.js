@@ -2464,8 +2464,8 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 0;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.unarmored.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.unarmored_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.unarmored_base || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.unarmored_ac);
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = int(v.unarmored_base);
       output[`repeating_equipment_${newID}_equipment_carried_select`] = 1;
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for unarmored: ${newID}`);
@@ -2479,15 +2479,15 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 1;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armortype.trim();
-      // output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype_ac || 0;
+      // output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.armortype_ac);
       output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.armortype_ac);
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype_base || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype_bulk || 0;
-      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype_carried || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = int(v.armortype_base);
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = int(v.armortype_magic);
+      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = int(v.armortype_bulk);
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = int(v.armortype_carried);
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-      output[`repeating_equipment_${newID}_equipment_weight`] = +v.armor_weight || 0;
-      output[`repeating_equipment_${newID}_equipment_cost`] = +v.armor_cost || 0;
+      output[`repeating_equipment_${newID}_equipment_weight`] = int(v.armor_weight);
+      output[`repeating_equipment_${newID}_equipment_cost`] = int(v.armor_cost);
       // clog(`Creating a new repeating_equipment row for armor1: ${newID}`);
     }
     if (attr === 'armortype2') {
@@ -2499,14 +2499,14 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 2;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armortype2.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armortype2_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armortype2_base || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armortype2_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armortype2_bulk || 0;
-      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armortype2_carried || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.armortype2_ac);
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = int(v.armortype2_base);
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = int(v.armortype2_magic);
+      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = int(v.armortype2_bulk);
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = int(v.armortype2_carried);
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-      output[`repeating_equipment_${newID}_equipment_weight`] = +v.armortype2_weight || 0;
-      output[`repeating_equipment_${newID}_equipment_cost`] = +v.armortype2_cost || 0;
+      output[`repeating_equipment_${newID}_equipment_weight`] = int(v.armortype2_weight);
+      output[`repeating_equipment_${newID}_equipment_cost`] = int(v.armortype2_cost);
       // clog(`Creating a new repeating_equipment row for armor2: ${newID}`);
     }
     if (attr === 'armorshield') {
@@ -2518,15 +2518,15 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 3;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorshield.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorshield_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorshield_base || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorshield_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorshield_mod || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = +v.armorshield_bulk || 0;
-      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorshield_carried || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.armorshield_ac);
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = int(v.armorshield_base);
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = int(v.armorshield_magic);
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = int(v.armorshield_mod);
+      output[`repeating_equipment_${newID}_equipment_armor_bulk`] = int(v.armorshield_bulk);
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = int(v.armorshield_carried);
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-      output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorshield_weight || 0;
-      output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorshield_cost || 0;
+      output[`repeating_equipment_${newID}_equipment_weight`] = int(v.armorshield_weight);
+      output[`repeating_equipment_${newID}_equipment_cost`] = int(v.armorshield_cost);
       // clog(`Creating a new repeating_equipment row for shield: ${newID}`);
     }
     if (attr === 'armorhelmet') {
@@ -2538,12 +2538,12 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 4;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorhelmet.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorhelmet_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorhelmet_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_carried_select`] = +v.armorhelmet_carried || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.armorhelmet_ac);
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = int(v.armorhelmet_magic);
+      output[`repeating_equipment_${newID}_equipment_carried_select`] = int(v.armorhelmet_carried);
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
-      output[`repeating_equipment_${newID}_equipment_weight`] = +v.armorhelmet_weight || 0;
-      output[`repeating_equipment_${newID}_equipment_cost`] = +v.armorhelmet_cost || 0;
+      output[`repeating_equipment_${newID}_equipment_weight`] = int(v.armorhelmet_weight);
+      output[`repeating_equipment_${newID}_equipment_cost`] = int(v.armorhelmet_cost);
       // clog(`Creating a new repeating_equipment row for helmet: ${newID}`);
     }
     if (attr === 'armorother') {
@@ -2555,10 +2555,10 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 5;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother_base || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.armorother_ac);
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = int(v.armorother_base);
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = int(v.armorother_magic);
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = int(v.armorother_mod);
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for other1: ${newID}`);
     }
@@ -2571,10 +2571,10 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 6;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother2.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother2_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother2_base || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother2_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother2_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.armorother2_ac);
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = int(v.armorother2_base);
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = int(v.armorother2_magic);
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = int(v.armorother2_mod);
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for other2: ${newID}`);
     }
@@ -2587,10 +2587,10 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 7;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother3.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother3_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother3_base || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother3_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother3_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.armorother3_ac);
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = int(v.armorother3_base);
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = int(v.armorother3_magic);
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = int(v.armorother3_mod);
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for other3: ${newID}`);
     }
@@ -2603,10 +2603,10 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 8;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother4.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother4_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother4_base || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother4_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother4_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.armorother4_ac);
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = int(v.armorother4_base);
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = int(v.armorother4_magic);
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = int(v.armorother4_mod);
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for other4: ${newID}`);
     }
@@ -2619,10 +2619,10 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 9;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother5.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother5_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother5_base || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother5_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother5_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.armorother5_ac);
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = int(v.armorother5_base);
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = int(v.armorother5_magic);
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = int(v.armorother5_mod);
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for other5: ${newID}`);
     }
@@ -2635,10 +2635,10 @@ on(armorDetailslisteners, async (eventInfo) => {
       output[`repeating_equipment_${newID}_equipment_armor_type`] = 10;
       output[`repeating_equipment_${newID}_equipment_armor_worn`] = 1;
       output[`repeating_equipment_${newID}_equipment_item`] = v.armorother6.trim();
-      output[`repeating_equipment_${newID}_equipment_armor_ac`] = +v.armorother6_ac || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_base`] = +v.armorother6_base || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_magic`] = +v.armorother6_magic || 0;
-      output[`repeating_equipment_${newID}_equipment_armor_mod`] = +v.armorother6_mod || 0;
+      output[`repeating_equipment_${newID}_equipment_armor_ac`] = int(v.armorother6_ac);
+      output[`repeating_equipment_${newID}_equipment_armor_base`] = int(v.armorother6_base);
+      output[`repeating_equipment_${newID}_equipment_armor_magic`] = int(v.armorother6_magic);
+      output[`repeating_equipment_${newID}_equipment_armor_mod`] = int(v.armorother6_mod);
       output[`repeating_equipment_${newID}_equipment_sync_armor_flag`] = 1;
       // clog(`Creating a new repeating_equipment row for other6: ${newID}`);
     }
