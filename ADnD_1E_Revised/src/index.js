@@ -1191,8 +1191,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
   let id_low = targetID ? targetID.toLowerCase() : null;
   const v = await getAttrsAsync(armorIDsAndAttrs);
   const output = {};
-
-  // Map a new array of Armor Detail ids (11 slots/rows)
+  // Map an array of currently linked IDs from the 11 static armor slots
   const idArray = armorDetailsRow.map((row) => (v[row.syncedID] ? v[row.syncedID].toString().toLowerCase() : '0'));
   function matchAttr(attrToCheck) {
     const arrays = {unarmoredAttrs, armor1Attrs, armor2Attrs, shieldAttrs, helmetAttrs, other1Attrs, other2Attrs, other3Attrs, other4Attrs, other5Attrs, other6Attrs};
@@ -1204,7 +1203,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
   // clog(`syncArmorToEquipment: id_low:${id_low} ${id_low === null ? `Sync '${attr}' from Armor Details` : 'Sync from repeating_equipment'}\n null means Δ came from Armor Details`);
   // clog(`syncArmorToEquipment: row_removed?:${row_removed} ${row_removed ? 'Row removed' : 'Row not removed'}`);
 
-  // which row does the attr belong to and set id_low
+  // If change originated in Armor Details (id_low is null), resolve the target ID from the slot index
   if (id_low === null && matchingArray) {
     const slotIndex = armorDetailsRow.findIndex((s) => s.armorAttrs === matchingArray);
     if (slotIndex !== -1) id_low = idArray[slotIndex];
@@ -1212,14 +1211,13 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
   // Iterate through each armor row configuration
   armorDetailsRow.forEach((row, index) => {
     const currentRowID = idArray[index];
-    // Use the passed id_low OR the array match
+    // Determine if this specific slot iteration needs to run
     const isTriggeringRow = matchingArray === row.armorAttrs || id_low === currentRowID || migrate;
     if (isTriggeringRow) {
-      // clean ID for the prefix
-      // use the mixed-case/raw id if available, otherwise fallback.
+      // Prioritize the raw, mixed-case ID from the sheet for the Roll20 prefix
       const rawIdFromSheet = v[row.syncedID];
       const rowId = rawIdFromSheet && rawIdFromSheet !== '0' ? rawIdFromSheet : targetID || currentRowID;
-      if (rowId === '0') return;
+      if (rowId === '0') return; // Ignore empty rows with no data
 
       const itemName = (v[row.armorType] || '').trim();
       const hasExistingID = currentRowID.length === 20;
@@ -1252,8 +1250,10 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         } else {
           output[`${prefix}equipment_carried_select`] = int(v[`${row.armorType}_carried`]);
         }
+        // clog(`syncArmorToEquipment: Syncing ${row.armorType} to repeating row: ${rowId}`);
       } else if (hasExistingID && (row_removed || !itemName)) {
-        // Handle Removal or Reset
+        // Handle attribute reset and removal of the equipment row
+        // ... reset logic ...
         output[row.syncedID] = '0';
         output[row.armorType] = '';
         output[`${row.armorType}_worn`] = row.armorType === 'unarmored' ? 1 : 0;
@@ -1266,7 +1266,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         // user cleared the name, delete the equipment row.
         if (id_low === currentRowID && !row_removed) {
           removeRepeatingRow(`repeating_equipment_${id_low}`);
-          // clog(`syncArmorToEquipment: row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting ${row.armorType}.`);
+          // clog(`syncArmorToEquipment: Name cleared or row removed. Deleting repeating_equipment_${id_low} and resetting static fields.`);
         }
       }
     }
