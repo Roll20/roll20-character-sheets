@@ -1266,7 +1266,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         // user cleared the name, delete the equipment row.
         if (id_low === currentRowID && !row_removed) {
           removeRepeatingRow(`repeating_equipment_${id_low}`);
-          // clog(`syncArmorToEquipment: Armor Details row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting ${row.armorType}.`);
+          // clog(`syncArmorToEquipment: row removed but ID Exists. DELETING repeating_equipment_${id_low}. Resetting ${row.armorType}.`);
         }
       }
     }
