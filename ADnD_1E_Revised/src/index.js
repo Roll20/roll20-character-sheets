@@ -1168,7 +1168,7 @@ const clearArmorOther = async (current_version, final_version) => {
 // combines all Armor Details attrs and their row id's
 const armorIDsAndAttrs = armorAttrs.concat(armorRowIDs);
 
-// armorAttrs helps matching with global attribute arrays from above
+// armorAttrs & attrs pull from global arrays from above
 const armorDetailsRow = [
   {armorType: 'unarmored', syncedID: 'unarmored_row_id', typeValue: 0, defaultAC: 10, armorAttrs: 'unarmoredAttrs', attrs: unarmoredAttrs},
   {armorType: 'armortype', syncedID: 'armortype1_row_id', typeValue: 1, defaultAC: 10, armorAttrs: 'armor1Attrs', attrs: armor1Attrs},
@@ -1185,29 +1185,26 @@ const armorDetailsRow = [
 
 // sync armor changes between Armor Details and repeating_equipment
 const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
-  // If an ID was passed, use it immediately.
-  // Normalize it for internal logic, but keep a mixed-case version for the prefix.
+  // Normalize id for internal logic, but keep a mixed-case version for prefix.
+  // null = change came from Armor Details.
   let targetID = id && id !== '0' ? id : null;
   let id_low = targetID ? targetID.toLowerCase() : null;
   const v = await getAttrsAsync(armorIDsAndAttrs);
   const output = {};
-  // 2. Refresh the idArray from current values
-  // Map Armor Detail rows
-  // Map synced rowIds into an array (11 elements)
+
+  // Map a new array of Armor Detail ids (11 slots/rows)
   const idArray = armorDetailsRow.map((row) => (v[row.syncedID] ? v[row.syncedID].toString().toLowerCase() : '0'));
   function matchAttr(attrToCheck) {
     const arrays = {unarmoredAttrs, armor1Attrs, armor2Attrs, shieldAttrs, helmetAttrs, other1Attrs, other2Attrs, other3Attrs, other4Attrs, other5Attrs, other6Attrs};
     const matchingArray = Object.entries(arrays).find(([arrayName, array]) => array.includes(attrToCheck));
     return matchingArray ? matchingArray[0] : null;
   }
-
   // match the attr changed to the specific armor row
   const matchingArray = matchAttr(attr);
-
   // clog(`syncArmorToEquipment: id_low:${id_low} ${id_low === null ? `Sync '${attr}' from Armor Details` : 'Sync from repeating_equipment'}\n null means Δ came from Armor Details`);
   // clog(`syncArmorToEquipment: row_removed?:${row_removed} ${row_removed ? 'Row removed' : 'Row not removed'}`);
 
-  // If the change came from Armor Details (is null), find which row it belongs to and set id_low
+  // which row does the attr belong to and set id_low
   if (id_low === null && matchingArray) {
     const slotIndex = armorDetailsRow.findIndex((s) => s.armorAttrs === matchingArray);
     if (slotIndex !== -1) id_low = idArray[slotIndex];
@@ -1218,14 +1215,12 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
     // Use the passed id_low OR the array match
     const isTriggeringRow = matchingArray === row.armorAttrs || id_low === currentRowID || migrate;
     if (isTriggeringRow) {
-      // 3. Ensure we use a clean ID for the prefix
-      // Use the mixed-case one from getAttrs if available, otherwise fallback
+      // clean ID for the prefix
+      // use the mixed-case/raw id if available, otherwise fallback.
       const rawIdFromSheet = v[row.syncedID];
       const rowId = rawIdFromSheet && rawIdFromSheet !== '0' ? rawIdFromSheet : targetID || currentRowID;
-      // CRITICAL: Ensure rowId is not "0" before building prefix
       if (rowId === '0') return;
 
-      const prefix = `repeating_equipment_${rowId}_`;
       const itemName = (v[row.armorType] || '').trim();
       const hasExistingID = currentRowID.length === 20;
       // Handle Update || Creation
@@ -1239,7 +1234,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         }
         // set repeating row
         const prefix = `repeating_equipment_${rowId}_`;
-        clog(`syncArmorToEquipment: Syncing Row: ${rowId} for ${row.armorType}`);
+        // clog(`syncArmorToEquipment: Syncing Row: ${rowId} for ${row.armorType}`);
         output[`${prefix}equipment_type`] = 2;
         output[`${prefix}equipment_armor_type`] = row.typeValue;
         output[`${prefix}equipment_item`] = itemName;
