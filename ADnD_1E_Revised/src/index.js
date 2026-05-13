@@ -1962,9 +1962,9 @@ const sumEquipmentCost = async () => {
 };
 
 // Equipment Cost Calcs
-on('change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_cost remove:repeating_equipment', (eventInfo) => {
+on('change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_cost remove:repeating_equipment', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  sumEquipmentCost();
+  await sumEquipmentCost();
 });
 
 // Coin Weight
@@ -2028,7 +2028,7 @@ const sumEquipmentWeight = async () => {
   output.total_weight = total_weight;
   await setAttrsAsync(output, {silent: true});
   // clog(`sumEquipmentWeight - triggering setEncumbranceThresholds`);
-  setEncumbranceThresholds();
+  await setEncumbranceThresholds();
 };
 
 // Encumbrance Calcs
@@ -2144,9 +2144,9 @@ const setCurrentEncumbranceFlag = async (override) => {
 
 on(
   'sheet:opened change:repeating_equipment:equipment_weight change:repeating_equipment:equipment_quantity change:repeating_equipment:equipment_carried change:repeating_equipment:equipment_carried_select change:repeating_equipment:equipment_armor_worn remove:repeating_equipment change:pp change:gp change:ep change:sp change:cp change:encumbrancebonus change:normal_load change:toggle_lbs',
-  (eventInfo) => {
+  async (eventInfo) => {
     // clog(`Event Listener:${eventInfo.sourceAttribute} - triggering sumEquipmentWeight`);
-    sumEquipmentWeight();
+    await sumEquipmentWeight();
   },
 );
 
@@ -2773,7 +2773,7 @@ on(updateArrayEventListener, async (eventInfo) => {
   const attr = eventInfo.sourceAttribute;
   // console.log(`updateArrayEventListener - ARMOR DETAILS ARRAY HAS CHANGED attr:${attr} sourceType: ${eventInfo.sourceType}`);
   const id = eventInfo.newValue ? eventInfo.newValue.toLowerCase() : '0';
-  refreshArmorDetailsArray(id);
+  await refreshArmorDetailsArray(id);
 });
 
 // sync/update Armor Details when repeating_equipment armor changes
@@ -2786,7 +2786,7 @@ on(
     // checks repeating_equipment id against armor details ids
     const {isMatch} = await testArmorRowIDs(id);
     // if (isMatch) clog(`testArmorRowIDs: id:${id} found in armordetails_array`);
-    if (isMatch) fillArmorDetails(id);
+    if (isMatch) await fillArmorDetails(id);
   },
 );
 
@@ -2824,9 +2824,9 @@ on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_ar
   }
 });
 
-on('clicked:repeating_equipment:addattack', (eventInfo) => {
+on('clicked:repeating_equipment:addattack', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
-  createAttack(id);
+  await createAttack(id);
 });
 
 // resets the matching Armor Detail row attributes if removed
@@ -2835,7 +2835,7 @@ on('remove:repeating_equipment', async (eventInfo) => {
   const row_removed = 1;
   // console.log({event: 'remove:repeating_equipment', eventInfo, id});
   const {isMatch} = await testArmorRowIDs(id);
-  if (isMatch) syncArmorToEquipment(id, null, row_removed);
+  if (isMatch) await syncArmorToEquipment(id, null, row_removed);
 });
 
 on('clicked:addturnundead', (eventInfo) => {
@@ -3039,7 +3039,7 @@ on('change:repeating_spells:spell_name', async (eventInfo) => {
 });
 
 // ToHitACadj Toggle
-const getToHitACadjUpdate = (v, id) => {
+const getToHitACadjUpdate = async (v, id) => {
   // clog(`Δ detected: getToHitACadjUpdate for id:${id}`);
   const output = {};
   const hideAR = int(v.toggle_ar);
@@ -3058,7 +3058,7 @@ on(
     // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
     const id = eventInfo.sourceAttribute.split('_')[2];
     const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_tohitacadj_flag`, 'toggle_ar']);
-    const output = getToHitACadjUpdate(v, id);
+    const output = await getToHitACadjUpdate(v, id);
     await setAttrsAsync(output, {silent: true});
   },
 );
@@ -3336,10 +3336,10 @@ const calcRange = async (id) => {
   await setAttrsAsync(output, {silent: true});
 };
 
-on('change:repeating_weapon:weapon_range change:repeating_weapon:weapon_attack_type', (eventInfo) => {
+on('change:repeating_weapon:weapon_range change:repeating_weapon:weapon_attack_type', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const id = eventInfo.sourceAttribute.split('_')[2];
-  calcRange(id);
+  await calcRange(id);
 });
 
 // set flag for css to show/hide fields according to weapon type
@@ -3386,9 +3386,9 @@ const calcHP = async () => {
   await setAttrsAsync(output, {silent: true});
 };
 
-on('change:sync_hp_flag change:hitpoints change:hitpoints_max change:hitpoints_1_class change:hitpoints_2_class change:hitpoints_3_class', (eventInfo) => {
+on('change:sync_hp_flag change:hitpoints change:hitpoints_max change:hitpoints_1_class change:hitpoints_2_class change:hitpoints_3_class', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  calcHP();
+  await calcHP();
 });
 
 // AC Calcs
@@ -4278,49 +4278,49 @@ const thiefmisc2Calc = async () => {
   setAttrsAsync(output, {silent: true});
 };
 
-on('change:pickpockets_base change:pickpockets_racial_mod change:pickpockets_ability_mod change:pickpockets_magic', (eventInfo) => {
+on('change:pickpockets_base change:pickpockets_racial_mod change:pickpockets_ability_mod change:pickpockets_magic', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  pickpocketsCalc();
+  await pickpocketsCalc();
 });
-on('change:openlocks_base change:openlocks_racial_mod change:openlocks_ability_mod change:openlocks_magic', (eventInfo) => {
+on('change:openlocks_base change:openlocks_racial_mod change:openlocks_ability_mod change:openlocks_magic', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  openlocksCalc();
+  await openlocksCalc();
 });
-on('change:findtraps_base change:findtraps_racial_mod change:findtraps_ability_mod change:findtraps_magic', (eventInfo) => {
+on('change:findtraps_base change:findtraps_racial_mod change:findtraps_ability_mod change:findtraps_magic', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  findtrapsCalc();
+  await findtrapsCalc();
 });
-on('change:movequietly_base change:movequietly_racial_mod change:movequietly_ability_mod change:movequietly_magic', (eventInfo) => {
+on('change:movequietly_base change:movequietly_racial_mod change:movequietly_ability_mod change:movequietly_magic', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  movequietlyCalc();
+  await movequietlyCalc();
 });
-on('change:hideinshadows_base change:hideinshadows_racial_mod change:hideinshadows_ability_mod change:hideinshadows_magic', (eventInfo) => {
+on('change:hideinshadows_base change:hideinshadows_racial_mod change:hideinshadows_ability_mod change:hideinshadows_magic', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  hideinshadowsCalc();
+  await hideinshadowsCalc();
 });
-on('change:hearnoise_base change:hearnoise_racial_mod change:hearnoise_ability_mod change:hearnoise_magic', (eventInfo) => {
+on('change:hearnoise_base change:hearnoise_racial_mod change:hearnoise_ability_mod change:hearnoise_magic', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  hearnoiseCalc();
+  await hearnoiseCalc();
 });
-on('change:climbwalls_base change:climbwalls_racial_mod change:climbwalls_ability_mod change:climbwalls_magic', (eventInfo) => {
+on('change:climbwalls_base change:climbwalls_racial_mod change:climbwalls_ability_mod change:climbwalls_magic', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  climbwallsCalc();
+  await climbwallsCalc();
 });
-on('change:readlanguages_base change:readlanguages_racial_mod change:readlanguages_ability_mod change:readlanguages_magic', (eventInfo) => {
+on('change:readlanguages_base change:readlanguages_racial_mod change:readlanguages_ability_mod change:readlanguages_magic', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  readlanguagesCalc();
+  await readlanguagesCalc();
 });
-on('change:thiefmisc_base change:thiefmisc_racial_mod change:thiefmisc_ability_mod change:thiefmisc_magic', (eventInfo) => {
+on('change:thiefmisc_base change:thiefmisc_racial_mod change:thiefmisc_ability_mod change:thiefmisc_magic', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  thiefmiscCalc();
+  await thiefmiscCalc();
 });
-on('change:thiefmisc1_base change:thiefmisc1_racial_mod change:thiefmisc1_ability_mod change:thiefmisc1_magic', (eventInfo) => {
+on('change:thiefmisc1_base change:thiefmisc1_racial_mod change:thiefmisc1_ability_mod change:thiefmisc1_magic', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  thiefmisc1Calc();
+  await thiefmisc1Calc();
 });
-on('change:thiefmisc2_base change:thiefmisc2_racial_mod change:thiefmisc2_ability_mod change:thiefmisc2_magic', (eventInfo) => {
+on('change:thiefmisc2_base change:thiefmisc2_racial_mod change:thiefmisc2_ability_mod change:thiefmisc2_magic', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  thiefmisc2Calc();
+  await thiefmisc2Calc();
 });
 
 // Thief Autofill Base Column
@@ -4590,47 +4590,47 @@ const savemisc2Calc = async () => {
 
 on(
   'change:saveparalysispoisondeath_base change:saveparalysispoisondeath_racial_mod change:saveparalysispoisondeath_ability_mod change:saveparalysispoisondeath_misc_mod change:saveparalysispoisondeath_temp_mod',
-  (eventInfo) => {
+  async (eventInfo) => {
     // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-    saveparalysispoisondeathCalc();
+    await saveparalysispoisondeathCalc();
   },
 );
 on(
   'change:savepetrificationpolymorph_base change:savepetrificationpolymorph_racial_mod change:savepetrificationpolymorph_ability_mod change:savepetrificationpolymorph_misc_mod change:savepetrificationpolymorph_temp_mod',
-  (eventInfo) => {
+  async (eventInfo) => {
     // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-    savepetrificationpolymorphCalc();
+    await savepetrificationpolymorphCalc();
   },
 );
 on(
   'change:saverodsstaveswands_base change:saverodsstaveswands_racial_mod change:saverodsstaveswands_ability_mod change:saverodsstaveswands_misc_mod change:saverodsstaveswands_temp_mod',
-  (eventInfo) => {
+  async (eventInfo) => {
     // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-    saverodsstaveswandsCalc();
+    await saverodsstaveswandsCalc();
   },
 );
 on(
   'change:savebreathweapons_base change:savebreathweapons_racial_mod change:savebreathweapons_ability_mod change:savebreathweapons_misc_mod change:savebreathweapons_temp_mod',
-  (eventInfo) => {
+  async (eventInfo) => {
     // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-    savebreathweaponsCalc();
+    await savebreathweaponsCalc();
   },
 );
-on('change:savespells_base change:savespells_racial_mod change:savespells_ability_mod change:savespells_misc_mod change:savespells_temp_mod', (eventInfo) => {
+on('change:savespells_base change:savespells_racial_mod change:savespells_ability_mod change:savespells_misc_mod change:savespells_temp_mod', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  savespellsCalc();
+  await savespellsCalc();
 });
-on('change:savemisc_base change:savemisc_racial_mod change:savemisc_ability_mod change:savemisc_misc_mod change:savemisc_temp_mod', (eventInfo) => {
+on('change:savemisc_base change:savemisc_racial_mod change:savemisc_ability_mod change:savemisc_misc_mod change:savemisc_temp_mod', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  savemiscCalc();
+  await savemiscCalc();
 });
-on('change:savemisc1_base change:savemisc1_racial_mod change:savemisc1_ability_mod change:savemisc1_misc_mod change:savemisc1_temp_mod', (eventInfo) => {
+on('change:savemisc1_base change:savemisc1_racial_mod change:savemisc1_ability_mod change:savemisc1_misc_mod change:savemisc1_temp_mod', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  savemisc1Calc();
+  await savemisc1Calc();
 });
-on('change:savemisc2_base change:savemisc2_racial_mod change:savemisc2_ability_mod change:savemisc2_misc_mod change:savemisc2_temp_mod', (eventInfo) => {
+on('change:savemisc2_base change:savemisc2_racial_mod change:savemisc2_ability_mod change:savemisc2_misc_mod change:savemisc2_temp_mod', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  savemisc2Calc();
+  await savemisc2Calc();
 });
 
 // Saves Autofill Base Column
@@ -5833,7 +5833,7 @@ on(
       output.attack_matrix_flag = 0;
     }
     await setAttrsAsync(output, {silent: true});
-    calcThac0(classSelected);
+    await calcThac0(classSelected);
   },
 );
 
@@ -5858,8 +5858,8 @@ on('sheet:opened change:thac0 change:thac00 change:autofill_matrix change:sync_m
   await setAttrsAsync(output, {silent: true});
 });
 
-on('change:thac00', (eventInfo) => {
-  calcThac0();
+on('change:thac00', async (eventInfo) => {
+  await calcThac0();
 });
 
 // Sync Caster class
@@ -6640,7 +6640,7 @@ on('change:autofill_thief_dex change:dexterity', async (eventInfo) => {
 });
 
 // match class name to core class & return # for hit table lookup
-const matchRaceName = (name) => {
+const matchRaceName = async (name) => {
   const lowerCaseName = name.trim().toLowerCase();
   if (/human/.test(lowerCaseName)) {
     return 1;
@@ -6671,46 +6671,46 @@ on('change:race change:autofill_thief_race change:thief_race_selected', async (e
   // check attr_race for a match to the race selector
   const race = (v.race || 'human').trim();
   if (triggerAttr === 'autofill_thief_race' || triggerAttr === 'race') {
-    output.thief_race_selected = matchRaceName(race);
+    output.thief_race_selected = await matchRaceName(race);
   }
   await setAttrsAsync(output, {silent: true});
-  thiefSkillsRacialCalcs(autofill_thief_race);
+  await thiefSkillsRacialCalcs(autofill_thief_race);
 });
 
 // Strength Calculations
-on('change:strength change:exceptionalstrength', (eventInfo) => {
+on('change:strength change:exceptionalstrength', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  strengthCalcs();
+  await strengthCalcs();
 });
 
 // Intelligence Calculations
-on('change:intelligence change:race', (eventInfo) => {
+on('change:intelligence change:race', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  intelligenceCalcs();
+  await intelligenceCalcs();
 });
 
 // Wisdom Calculations
-on('change:wisdom', (eventInfo) => {
+on('change:wisdom', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  wisdomCalcs();
+  await wisdomCalcs();
 });
 
 // Dexterity Calculations
-on('change:dexterity', (eventInfo) => {
+on('change:dexterity', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  dexterityCalcs();
+  await dexterityCalcs();
 });
 
 // Constitution Calculations
-on('change:constitution change:class change:secondclass change:thirdclass', (eventInfo) => {
+on('change:constitution change:class change:secondclass change:thirdclass', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  constitutionCalcs();
+  await constitutionCalcs();
 });
 
 // Charisma Calculations
-on('change:charisma change:comeliness', (eventInfo) => {
+on('change:charisma change:comeliness', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  charismaCalcs();
+  await charismaCalcs();
 });
 
 const portraitUrlCalc = async () => {
@@ -6742,9 +6742,9 @@ const portraitUrlCalc = async () => {
   await setAttrsAsync(output, {silent: true});
 };
 
-on('change:character_avatar change:sheet_image change:sheet_image_url', (eventInfo) => {
+on('change:character_avatar change:sheet_image change:sheet_image_url', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-  portraitUrlCalc();
+  await portraitUrlCalc();
 });
 
 // uses CRP to auto-update link with sheet_image_src
@@ -6818,9 +6818,9 @@ const weaponInUse = async () => {
 
 on(
   'change:repeating_weapon:weapon_name change:repeating_weapon:weapon_use change:repeating_weapon:weapon_speed change:repeating_weapon:weapon_misc remove:repeating_weapon',
-  (eventInfo) => {
+  async (eventInfo) => {
     // clog(eventInfo.sourceAttribute);
-    weaponInUse();
+    await weaponInUse();
   },
 );
 
