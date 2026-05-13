@@ -2163,13 +2163,13 @@ const setCurrentMovement = async () => {
     adjustedMove = movement;
     // clog('=====Movement is Normal=====');
   } else if (current_encumbrance_move === 1) {
-    adjustedMove = int(movement - 3);
+    adjustedMove = movement - 3;
     // clog('=====Movement is Heavy=====');
   } else if (current_encumbrance_move === 2) {
-    adjustedMove = int(movement - 6);
+    adjustedMove = movement - 6;
     // clog('=====Movement is Very Heavy=====');
   } else {
-    adjustedMove = int(movement - 9);
+    adjustedMove = movement - 9;
     // clog('=====Movement is Encumbered=====');
   }
   output.movement_normal = adjustedMove;
@@ -6789,13 +6789,13 @@ const weaponInUse = async () => {
   ]);
   const v = await getAttrsAsync(fields);
   idArray.forEach((id) => {
-    const inUse = parseInt(v[`repeating_weapon_${id}_weapon_use`]) || 0;
+    const inUse = int(v[`repeating_weapon_${id}_weapon_use`]);
     // Logic: Only process if the weapon is actually checked 'on'
     if (inUse === 1) {
       const name = v[`repeating_weapon_${id}_weapon_name`] || 'Unknown';
       const rawSpeed = String(v[`repeating_weapon_${id}_weapon_speed`] || '0');
       const speedMatch = rawSpeed.match(/\d+/);
-      const speed = speedMatch ? parseInt(speedMatch[0]) : 0;
+      const speed = speedMatch ? int(speedMatch[0]) : 0;
       const misc = v[`repeating_weapon_${id}_weapon_misc`] || '';
       // clog(`Processing ID:${id} - Name:${name}, Speed:${speed}`);
       weaponsInUse.push({id, name, inUse, speed, misc});
