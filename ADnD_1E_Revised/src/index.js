@@ -4756,16 +4756,16 @@ const matchClassName = async (name) => {
 // THAC0
 const calcThac0 = async (classSelected) => {
   const v = await getAttrsAsync(['thac00', 'autofill_matrix']);
-  const autocalcFill = +v.autofill_matrix || 0;
+  const autocalcFill = int(v.autofill_matrix);
   // if auto-fill is not enabled, exit.
   if (!autocalcFill) return;
 
-  const levelSelected = +v.matrix_level || 0; // defaults to 0
+  const levelSelected = int(v.matrix_level); // defaults to 0
   if (levelSelected === 0 && classSelected === 99) return;
 
   const output = {};
 
-  const baseThac0 = +v.thac00 || 0;
+  const baseThac0 = int(v.thac00);
   output[`thac0-10`] = baseThac0 + 10;
   output[`thac0-9`] = baseThac0 + 9;
   output[`thac0-8`] = baseThac0 + 8;
@@ -4810,41 +4810,41 @@ on(
       'level_2',
       'level_3',
     ]);
-    const autocalcFill = +v.autofill_matrix || 0;
+    const autocalcFill = int(v.autofill_matrix);
     // if auto-fill is not enabled, exit.
     if (!autocalcFill) return;
 
     const output = {};
-    const syncClass = +v.sync_matrix_class || 0;
-    const classLinked = +v.class_selected || 0;
-    let levelSelected = +v.matrix_level || 0;
-    let classSelected = +v.matrix_class || 0;
+    const syncClass = int(v.sync_matrix_class);
+    const classLinked = int(v.class_selected);
+    let levelSelected = int(v.matrix_level);
+    let classSelected = int(v.matrix_class);
     const class1Name = (v.class || '').trim();
     const class2Name = (v.secondclass || '').trim();
     const class3Name = (v.thirdclass || '').trim();
-    const hitdiceSelected = +v.matrix_hitdice || 0;
-    const fighter5Selected = +v.toggle_fighter5 || 0;
+    const hitdiceSelected = int(v.matrix_hitdice);
+    const fighter5Selected = int(v.toggle_fighter5);
     // sync enabled?
     // check for selected class and use that class level unless changed
     if (syncClass) {
       if (classLinked === 1) {
         // clog(`Linked Class is: ${class1Name} Current Level:${v.level}`);
         classSelected = await matchClassName(class1Name);
-        levelSelected = +v.level || 0;
+        levelSelected = int(v.level);
         output.matrix_level = levelSelected;
         output.matrix_class = classSelected;
       }
       if (classLinked === 2) {
         // clog(`Linked Class is: ${class2Name} Current Level:${v.level_2}`);
         classSelected = await matchClassName(class2Name);
-        levelSelected = +v.level_2 || 0;
+        levelSelected = int(v.level_2);
         output.matrix_level = levelSelected;
         output.matrix_class = classSelected;
       }
       if (classLinked === 3) {
         // clog(`Linked Class is: ${class3Name} Current Level:${v.level_3}`);
         classSelected = await matchClassName(class3Name);
-        levelSelected = +v.level_3 || 0;
+        levelSelected = int(v.level_3);
         output.matrix_level = levelSelected;
         output.matrix_class = classSelected;
       }
@@ -5840,17 +5840,17 @@ on(
 // flags Attack Matrix with a warning if it hasn't been filled-in
 on('sheet:opened change:thac0 change:thac00 change:autofill_matrix change:sync_matrix_level change:sync_matrix_class change:sync_class_selected', async (eventInfo) => {
   const v = await getAttrsAsync(['thac0', 'thac1', 'thac2', 'thac00', 'thac01', 'thac02', 'autofill_matrix']);
-  const autocalcFill = +v.autofill_matrix || 0;
+  const autocalcFill = int(v.autofill_matrix);
   // if auto-fill is not enabled, exit.
   if (!autocalcFill) return;
 
   const output = {};
-  const thac0 = +v.thac0 || 0;
-  const thac1 = +v.thac1 || 0;
-  const thac2 = +v.thac2 || 0;
-  const thac00 = +v.thac00 || 0;
-  const thac01 = +v.thac01 || 0;
-  const thac02 = +v.thac02 || 0;
+  const thac0 = int(v.thac0);
+  const thac1 = int(v.thac1);
+  const thac2 = int(v.thac2);
+  const thac00 = int(v.thac00);
+  const thac01 = int(v.thac01);
+  const thac02 = int(v.thac02);
   const toHitIsDefaultValue = thac0 + thac1 + thac2;
   const thac0IsDefaultValue = thac00 + thac01 + thac02;
   // clog(`toHitIsDefaultValue:${toHitIsDefaultValue} thac0IsDefaultValue:${thac0IsDefaultValue}`);
@@ -5881,16 +5881,16 @@ on(
     ]);
 
     const output = {};
-    const syncClass1 = +v.sync_caster_class1 || 0;
-    const syncClass2 = +v.sync_caster_class2 || 0;
-    const class1Linked = +v.caster_class1_selected || 0;
-    const class2Linked = +v.caster_class2_selected || 0;
+    const syncClass1 = int(v.sync_caster_class1);
+    const syncClass2 = int(v.sync_caster_class2);
+    const class1Linked = int(v.caster_class1_selected);
+    const class2Linked = int(v.caster_class2_selected);
     const class1Name = (v.class || '').trim();
     const class2Name = (v.secondclass || '').trim();
     const class3Name = (v.thirdclass || '').trim();
-    const class1Level = +v.level || 0;
-    const class2Level = +v.level_2 || 0;
-    const class3Level = +v.level_3 || 0;
+    const class1Level = int(v.level);
+    const class2Level = int(v.level_2);
+    const class3Level = int(v.level_3);
 
     if (syncClass1) {
       if (class1Linked === 1) {
