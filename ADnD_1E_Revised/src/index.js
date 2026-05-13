@@ -379,7 +379,7 @@ const dmgSwap = async (current_version, final_version) => {
     output[`${prefix}macro-text`] = macrotext.replace(/@{DmgBonus}/g, '@{AttackDmgBonus}');
 
     // copy old numeric value to the new attribute key
-    output[`${prefix}AttackDmgBonus`] = +v[`${prefix}DmgBonus`] || 0;
+    output[`${prefix}AttackDmgBonus`] = int(v[`${prefix}DmgBonus`]);
   });
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: dmgSwap completed`);
@@ -396,7 +396,7 @@ const maxSwap = async (current_version, final_version) => {
   _.each(idArray, (id) => {
     const oldAttr = `repeating_ability_${id}_max`;
     const newAttr = `repeating_ability_${id}_current_max`;
-    output[newAttr] = +v[oldAttr] || 0;
+    output[newAttr] = int(v[oldAttr]);
   });
   output.sheet_version = current_version;
   clog(`VERSION UPDATE: maxSwap completed`);
@@ -811,10 +811,10 @@ const removeWhisper = async (current_version, final_version) => {
 const migrateHP = async (current_version, final_version) => {
   const v = await getAttrsAsync(['hitpoints_max', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class']);
   const output = {};
-  const hitPointsMax = +v.hitpoints_max || 0;
-  const hitpoints_1_class = +v.hitpoints_1_class || 0;
-  const hitpoints_2_class = +v.hitpoints_2_class || 0;
-  const hitpoints_3_class = +v.hitpoints_3_class || 0;
+  const hitPointsMax = int(v.hitpoints_max);
+  const hitpoints_1_class = int(v.hitpoints_1_class);
+  const hitpoints_2_class = int(v.hitpoints_2_class);
+  const hitpoints_3_class = int(v.hitpoints_3_class);
   const totalClassHP = Math.max(0, hitpoints_1_class) + Math.max(0, hitpoints_2_class) + Math.max(0, hitpoints_3_class);
 
   // If older sheet has no HP per class but has a total max, migrate it to class 1
@@ -835,8 +835,8 @@ const migrateAC = async (current_version, final_version) => {
   const v = await getAttrsAsync(['armorclass', 'armortype_ac', 'armorclass_total', 'armorbonus', 'armorshield']);
   const output = {};
   const recalc = 0;
-  let armorClass = +v.armorclass || 0;
-  const armortypeAC = +v.armortype_ac || 0;
+  let armorClass = int(v.armorclass);
+  const armortypeAC = int(v.armortype_ac);
   const armorShield = v.armorshield;
   // older sheet will have default value for armortypeAC. AC s/b better than 10
   if (armorShield) {
@@ -1050,7 +1050,7 @@ const updateRange = async (current_version, final_version) => {
     const prefix = `repeating_weapon_${id}_`;
 
     // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
-    const thisType = +v[`${prefix}weapon_attack_type`] || 0;
+    const thisType = int(v[`${prefix}weapon_attack_type`]);
 
     // Skip if melee or touch
     if (thisType === 0 || thisType === 2) return;
@@ -1244,7 +1244,7 @@ const syncArmorToEquipment = async (id, attr, row_removed, migrate) => {
         output[`${prefix}equipment_cost`] = int(v[`${row.armorType === 'armortype' ? 'armor' : row.armorType}_cost`]);
         if (v[`${row.armorType}_magic`] !== undefined) output[`${prefix}equipment_armor_magic`] = v[`${row.armorType}_magic`];
         if (v[`${row.armorType}_mod`] !== undefined) output[`${prefix}equipment_armor_mod`] = v[`${row.armorType}_mod`];
-        if ((+v[`${row.armorType}_worn`] || 0) === 1 && (+v[`${row.armorType}_carried`] || 0) === 0) {
+        if (int(v[`${row.armorType}_worn`]) === 1 && int(v[`${row.armorType}_carried`]) === 0) {
           output[`${prefix}equipment_carried_select`] = 1;
           output[`${row.armorType}_carried`] = 1;
         } else {
@@ -1317,23 +1317,23 @@ const setEquipmentUpdate = async (current_version, final_version) => {
     const prefix = `repeating_equipment_${id}_`;
 
     // Numbers
-    output[`${prefix}equipment_type`] = +v[`${prefix}equipment_type`] || 0;
-    output[`${prefix}equipment_current`] = +v[`${prefix}equipment_current`] || 0;
-    output[`${prefix}equipment_current_max`] = +v[`${prefix}equipment_current_max`] || 0;
+    output[`${prefix}equipment_type`] = int(v[`${prefix}equipment_type`]);
+    output[`${prefix}equipment_current`] = int(v[`${prefix}equipment_current`]);
+    output[`${prefix}equipment_current_max`] = int(v[`${prefix}equipment_current_max`]);
     // Setting carried_select to carried value to preserve existing state
-    output[`${prefix}equipment_carried_select`] = +v[`${prefix}equipment_carried`] || 0;
-    output[`${prefix}equipment_carried`] = +v[`${prefix}equipment_carried`] || 0;
-    output[`${prefix}equipment_quantity`] = +v[`${prefix}equipment_quantity`] || 0;
-    output[`${prefix}equipment_quantity_max`] = +v[`${prefix}equipment_quantity_max`] || 0;
-    output[`${prefix}equipment_weight`] = +v[`${prefix}equipment_weight`] || 0;
-    output[`${prefix}equipment_cost`] = +v[`${prefix}equipment_cost`] || 0;
-    output[`${prefix}equipment_armor_type`] = +v[`${prefix}equipment_armor_type`] || 0;
-    output[`${prefix}equipment_armor_worn`] = +v[`${prefix}equipment_armor_worn`] || 0;
-    output[`${prefix}equipment_armor_ac`] = +v[`${prefix}equipment_armor_ac`] || 0;
-    output[`${prefix}equipment_armor_base`] = +v[`${prefix}equipment_armor_base`] || 0;
-    output[`${prefix}equipment_armor_magic`] = +v[`${prefix}equipment_armor_magic`] || 0;
-    output[`${prefix}equipment_armor_mod`] = +v[`${prefix}equipment_armor_mod`] || 0;
-    output[`${prefix}equipment_armor_bulk`] = +v[`${prefix}equipment_armor_bulk`] || 0;
+    output[`${prefix}equipment_carried_select`] = int(v[`${prefix}equipment_carried`]);
+    output[`${prefix}equipment_carried`] = int(v[`${prefix}equipment_carried`]);
+    output[`${prefix}equipment_quantity`] = int(v[`${prefix}equipment_quantity`]);
+    output[`${prefix}equipment_quantity_max`] = int(v[`${prefix}equipment_quantity_max`]);
+    output[`${prefix}equipment_weight`] = int(v[`${prefix}equipment_weight`]);
+    output[`${prefix}equipment_cost`] = int(v[`${prefix}equipment_cost`]);
+    output[`${prefix}equipment_armor_type`] = int(v[`${prefix}equipment_armor_type`]);
+    output[`${prefix}equipment_armor_worn`] = int(v[`${prefix}equipment_armor_worn`]);
+    output[`${prefix}equipment_armor_ac`] = int(v[`${prefix}equipment_armor_ac`]);
+    output[`${prefix}equipment_armor_base`] = int(v[`${prefix}equipment_armor_base`]);
+    output[`${prefix}equipment_armor_magic`] = int(v[`${prefix}equipment_armor_magic`]);
+    output[`${prefix}equipment_armor_mod`] = int(v[`${prefix}equipment_armor_mod`]);
+    output[`${prefix}equipment_armor_bulk`] = int(v[`${prefix}equipment_armor_bulk`]);
 
     // Strings
     output[`${prefix}equipment_macro_text`] = v[`${prefix}equipment_macro_text`];
@@ -1401,30 +1401,30 @@ const setWeaponsUpdate = async (current_version, final_version) => {
   _.each(idArray, (id) => {
     const prefix = `repeating_weapon_${id}_`;
     // Numbers
-    output[`${prefix}weapon_attack_type`] = +v[`${prefix}weapon_attack_type`] || 0;
-    output[`${prefix}weapon_whisper_to_hit_select`] = +v[`${prefix}weapon_whisper_to_hit_select`] || 0;
-    output[`${prefix}weapon_dual_pen`] = +v[`${prefix}weapon_dual_pen`] || 0;
-    output[`${prefix}weapon_backstab_var`] = +v[`${prefix}weapon_backstab_var`] || 0;
-    output[`${prefix}weapon_tohitbonus`] = +v[`${prefix}weapon_tohitbonus`] || 0;
-    output[`${prefix}weapon_magicbonus`] = +v[`${prefix}weapon_magicbonus`] || 0;
-    output[`${prefix}weapon_prof`] = +v[`${prefix}weapon_prof`] || 0;
-    output[`${prefix}weapon_backstab`] = +v[`${prefix}weapon_backstab`] || 0;
-    output[`${prefix}weapon_backstab_bonus`] = +v[`${prefix}weapon_backstab_bonus`] || 0;
-    output[`${prefix}weapon_backstab_mult`] = +v[`${prefix}weapon_backstab_mult`] || 0;
-    output[`${prefix}weapon_attackdmgbonus`] = +v[`${prefix}weapon_attackdmgbonus`] || 0;
-    output[`${prefix}weapon_num_attacks`] = +v[`${prefix}weapon_num_attacks`] || 0;
-    output[`${prefix}weapon_quantity`] = +v[`${prefix}weapon_quantity`] || 0;
-    output[`${prefix}weapon_ammo`] = +v[`${prefix}weapon_ammo`] || 0;
-    output[`${prefix}weapon_ammo_max`] = +v[`${prefix}weapon_ammo_max`] || 0;
-    output[`${prefix}weapon_weight`] = +v[`${prefix}weapon_weight`] || 0;
-    output[`${prefix}weapon_cost`] = +v[`${prefix}weapon_cost`] || 0;
-    output[`${prefix}weapon_range_short`] = +v[`${prefix}weapon_range_short`] || 0;
-    output[`${prefix}weapon_range_medium`] = +v[`${prefix}weapon_range_medium`] || 0;
-    output[`${prefix}weapon_range_long`] = +v[`${prefix}weapon_range_long`] || 0;
+    output[`${prefix}weapon_attack_type`] = int(v[`${prefix}weapon_attack_type`]);
+    output[`${prefix}weapon_whisper_to_hit_select`] = int(v[`${prefix}weapon_whisper_to_hit_select`]);
+    output[`${prefix}weapon_dual_pen`] = int(v[`${prefix}weapon_dual_pen`]);
+    output[`${prefix}weapon_backstab_var`] = int(v[`${prefix}weapon_backstab_var`]);
+    output[`${prefix}weapon_tohitbonus`] = int(v[`${prefix}weapon_tohitbonus`]);
+    output[`${prefix}weapon_magicbonus`] = int(v[`${prefix}weapon_magicbonus`]);
+    output[`${prefix}weapon_prof`] = int(v[`${prefix}weapon_prof`]);
+    output[`${prefix}weapon_backstab`] = int(v[`${prefix}weapon_backstab`]);
+    output[`${prefix}weapon_backstab_bonus`] = int(v[`${prefix}weapon_backstab_bonus`]);
+    output[`${prefix}weapon_backstab_mult`] = int(v[`${prefix}weapon_backstab_mult`]);
+    output[`${prefix}weapon_attackdmgbonus`] = int(v[`${prefix}weapon_attackdmgbonus`]);
+    output[`${prefix}weapon_num_attacks`] = int(v[`${prefix}weapon_num_attacks`]);
+    output[`${prefix}weapon_quantity`] = int(v[`${prefix}weapon_quantity`]);
+    output[`${prefix}weapon_ammo`] = int(v[`${prefix}weapon_ammo`]);
+    output[`${prefix}weapon_ammo_max`] = int(v[`${prefix}weapon_ammo_max`]);
+    output[`${prefix}weapon_weight`] = int(v[`${prefix}weapon_weight`]);
+    output[`${prefix}weapon_cost`] = int(v[`${prefix}weapon_cost`]);
+    output[`${prefix}weapon_range_short`] = int(v[`${prefix}weapon_range_short`]);
+    output[`${prefix}weapon_range_medium`] = int(v[`${prefix}weapon_range_medium`]);
+    output[`${prefix}weapon_range_long`] = int(v[`${prefix}weapon_range_long`]);
 
     // THAC Adjs
     for (let i = 0; i <= 10; i++) {
-      output[`${prefix}weapon_thac_adj${i}`] = +v[`${prefix}weapon_thac_adj${i}`] || 0;
+      output[`${prefix}weapon_thac_adj${i}`] = int(v[`${prefix}weapon_thac_adj${i}`]);
     }
 
     // Strings/Misc
@@ -1465,8 +1465,8 @@ const setNWPUpdate = async (current_version, final_version) => {
   _.each(idArray, (id) => {
     // We map the values to ensure they exist and convert strings to numbers where needed
     output[`repeating_nonweaponproficiencies_${id}_nwp_attribute`] = v[`repeating_nonweaponproficiencies_${id}_nwp_attribute`];
-    output[`repeating_nonweaponproficiencies_${id}_nwp_slots`] = +v[`repeating_nonweaponproficiencies_${id}_nwp_slots`] || 0;
-    output[`repeating_nonweaponproficiencies_${id}_nwp_modifier`] = +v[`repeating_nonweaponproficiencies_${id}_nwp_modifier`] || 0;
+    output[`repeating_nonweaponproficiencies_${id}_nwp_slots`] = int(v[`repeating_nonweaponproficiencies_${id}_nwp_slots`]);
+    output[`repeating_nonweaponproficiencies_${id}_nwp_modifier`] = int(v[`repeating_nonweaponproficiencies_${id}_nwp_modifier`]);
     output[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`] = v[`repeating_nonweaponproficiencies_${id}_nwp_macro_text`];
   });
   output.sheet_version = current_version;
@@ -1483,7 +1483,7 @@ const clearWeaponsWeightCost = async () => {
   const output = {};
   _.each(idArray, (id) => {
     // We keep quantity but zero out weight and cost
-    output[`repeating_weapon_${id}_weapon_quantity`] = +v[`repeating_weapon_${id}_weapon_quantity`] || 0;
+    output[`repeating_weapon_${id}_weapon_quantity`] = int(v[`repeating_weapon_${id}_weapon_quantity`]);
     output[`repeating_weapon_${id}_weapon_weight`] = 0;
     output[`repeating_weapon_${id}_weapon_cost`] = 0;
   });
@@ -1511,14 +1511,14 @@ const migrateWeaponWtCostFunction = async (current_version, final_version) => {
   const v = await getAttrsAsync(fields);
   const output = {};
   const equipmentNamesArray = equipmentArray.map((id) => v[`repeating_equipment_${id}_equipment_item`]);
-  const equipmentWeightsArray = equipmentArray.map((id) => +v[`repeating_equipment_${id}_equipment_weight`]) || 0;
-  const equipmentCostsArray = equipmentArray.map((id) => +v[`repeating_equipment_${id}_equipment_cost`]) || 0;
+  const equipmentWeightsArray = equipmentArray.map((id) => int(v[`repeating_equipment_${id}_equipment_weight`]));
+  const equipmentCostsArray = equipmentArray.map((id) => int(v[`repeating_equipment_${id}_equipment_cost`]));
 
   _.each(weaponsArray, (id) => {
     const weaponName = v[`repeating_weapon_${id}_weapon_name`];
-    const weaponQuantity = +v[`repeating_weapon_${id}_weapon_quantity`] || 0;
-    const weaponWeight = +v[`repeating_weapon_${id}_weapon_weight`] || 0;
-    const weaponCost = +v[`repeating_weapon_${id}_weapon_cost`] || 0;
+    const weaponQuantity = int(v[`repeating_weapon_${id}_weapon_quantity`]);
+    const weaponWeight = int(v[`repeating_weapon_${id}_weapon_weight`]);
+    const weaponCost = int(v[`repeating_weapon_${id}_weapon_cost`]);
 
     if (weaponWeight !== 0 || weaponCost !== 0) {
       const nameIndex = equipmentNamesArray.indexOf(weaponName);
@@ -1580,7 +1580,7 @@ const setEquipmentType = async (current_version, final_version) => {
   const output = {};
   _.each(idArray, (id) => {
     const attrName = `repeating_equipment_${id}_equipment_type`;
-    const equipType = +v[attrName] || 0;
+    const equipType = int(v[attrName]);
     if (equipType >= 0) return;
     // If it's out of range (like -1), reset it to 0 (Gear)
     output[attrName] = 0;
@@ -1644,8 +1644,8 @@ const updateCriticalDamageMacro = async (current_version, final_version) => {
 const newSheet = async () => {
   const v = await getAttrsAsync(['hitdice', 'armorclass', 'strength', 'intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma']);
   const output = {old_character: 1}; // no longer a new sheet
-  const testAbility = (+v.strength || 0) + (+v.intelligence || 0) + (+v.wisdom || 0) + (+v.dexterity || 0) + (+v.constitution || 0) + (+v.charisma || 0);
-  if ((+v.hitdice || 0) === 0 && (+v.armorclass || 0) === 10 && testAbility === 60) {
+  const testAbility = int(v.strength) + int(v.intelligence) + int(v.wisdom) + int(v.dexterity) + int(v.constitution) + int(v.charisma);
+  if (int(v.hitdice) === 0 && int(v.armorclass) === 10 && testAbility === 60) {
     output.strength = 8;
     output.intelligence = 8;
     output.wisdom = 8;
@@ -1679,7 +1679,7 @@ const updateSyncArmorFlag = async (current_version, final_version) => {
   // map the ID array to an array of Promises (the async checks)
   // promise is necessary because of the async function inside the loop
   const updatePromises = idArray.map(async (id) => {
-    const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
+    const type = int(v[`repeating_equipment_${id}_equipment_armor_type`]);
     // Await the asynchronous test
     const {isMatch} = await testArmorRowIDs(id);
     const flagName = `repeating_equipment_${id}_equipment_sync_armor_flag`;
@@ -1727,11 +1727,11 @@ const recalcToHitACadj = async (current_version, final_version) => {
 // On-time update: check Open Doors for non-d6 value
 const checkOpenDoors = async (current_version, final_version) => {
   const v = await getAttrsAsync(['minorstrengthfeat', 'strength', 'exceptionalstrength']);
-  const openDoors = +v['minorstrengthfeat'] || 0;
+  const openDoors = int(v['minorstrengthfeat']);
   const output = {};
   if (openDoors > 6) {
-    const stat_str = +v['strength'] || 0;
-    let stat_str_per = v['exceptionalstrength'] === '00' ? 100 : +v['exceptionalstrength'] || 0;
+    const stat_str = int(v['strength']);
+    let stat_str_per = v['exceptionalstrength'] === '00' ? 100 : int(v['exceptionalstrength']);
     output.minorstrengthfeat = AT_STR.getStrengthValue('Minor', stat_str, stat_str_per);
     clog(`VERSION UPDATE: checkOpenDoors calculation performed`);
   }
@@ -1890,7 +1890,7 @@ on('sheet:opened', async () => {
   const v = await getAttrsAsync(['sheet_version', 'old_character']);
   let current_version = parseFloat(v.sheet_version) || 0;
   // New Sheet?
-  const isNewSheet = (+v.old_character || 0) === 0 && current_version === 0;
+  const isNewSheet = int(v.old_character) === 0 && current_version === 0;
   if (isNewSheet) {
     clog(`New sheet detected. Initializing...`);
     await setAttrsAsync(
@@ -1912,7 +1912,7 @@ on(
   async (eventInfo) => {
     const v = await getAttrsAsync(['intelligence', 'wisdom', 'dexterity', 'constitution', 'charisma', 'comeliness', 'toggle_exceptional']);
     const output = {};
-    const toggle_exceptional = +v.toggle_exceptional || 0;
+    const toggle_exceptional = int(v.toggle_exceptional);
     if (toggle_exceptional === 1) return;
     output.exceptional_intelligence_flag = 1;
     output.exceptional_wisdom_flag = 1;
@@ -1935,8 +1935,8 @@ on('change:is_npc', async (eventInfo) => {
   const v = await getAttrsAsync(['is_npc', 'toggle_npc']);
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   const output = {};
-  const isNPC = +v.is_npc || 0;
-  let toggleNPC = +v.toggle_npc || 0;
+  const isNPC = int(v.is_npc);
+  let toggleNPC = int(v.toggle_npc);
   toggleNPC = isNPC === 0 ? 0 : 1;
   output.toggle_npc = toggleNPC;
   await setAttrsAsync(output, {silent: true});
@@ -1949,8 +1949,8 @@ const sumEquipmentCost = async () => {
   const v = await getAttrsAsync(fields);
   const equipmentCosts = [];
   _.each(idArray, (id) => {
-    const quantity = +v[`repeating_equipment_${id}_equipment_quantity`] || 0;
-    let cost = +v[`repeating_equipment_${id}_equipment_cost`] || 0;
+    const quantity = int(v[`repeating_equipment_${id}_equipment_quantity`]);
+    let cost = int(v[`repeating_equipment_${id}_equipment_cost`]);
     // costs
     cost = quantity > 0 ? cost * quantity : 0;
     equipmentCosts.push(cost);
@@ -1971,7 +1971,7 @@ on('change:repeating_equipment:equipment_quantity change:repeating_equipment:equ
 const sumCoinWeight = async () => {
   const v = await getAttrsAsync(['pp', 'gp', 'ep', 'sp', 'cp', 'toggle_lbs']);
   const output = {};
-  const toggleLbs = +v.toggle_lbs || 0;
+  const toggleLbs = int(v.toggle_lbs);
   const lbsConversion = toggleLbs ? 10 : 1;
   const totalCoinCount = float(v.pp) + float(v.gp) + float(v.ep) + float(v.sp) + float(v.cp);
   const totalCoinWeight = (totalCoinCount / lbsConversion).toFixed(2);
@@ -1996,16 +1996,16 @@ const sumEquipmentWeight = async () => {
   const weaponWeights = [];
   const armorWeights = [];
   const totalEquipmentWeights = [];
-  const totalCoinWeight = +v.total_coin_weight || 0;
+  const totalCoinWeight = int(v.total_coin_weight);
   _.each(idArray, (id) => {
-    const type = +v[`repeating_equipment_${id}_equipment_type`] || 0;
+    const type = int(v[`repeating_equipment_${id}_equipment_type`]);
     // Weight calcs use equipment_carried
     let carried = 0;
-    const carriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
+    const carriedSelect = int(v[`repeating_equipment_${id}_equipment_carried_select`]);
     output[`repeating_equipment_${id}_equipment_carried`] = carriedSelect === 1 ? 1 : 0;
     carried = carriedSelect === 1 ? 1 : 0;
-    const quantity = +v[`repeating_equipment_${id}_equipment_quantity`] || 0;
-    let weight = +v[`repeating_equipment_${id}_equipment_weight`] || 0;
+    const quantity = int(v[`repeating_equipment_${id}_equipment_quantity`]);
+    let weight = int(v[`repeating_equipment_${id}_equipment_weight`]);
     let weaponWeight = 0;
     let armorWeight = 0;
     weight = weight * quantity * carried;
@@ -2035,10 +2035,10 @@ const sumEquipmentWeight = async () => {
 const setEncumbranceThresholds = async () => {
   const v = await getAttrsAsync(['encumbrancebonus', 'toggle_lbs']);
   const output = {};
-  const useLbs = +v.toggle_lbs || 0;
+  const useLbs = int(v.toggle_lbs);
   const lbsConversion = useLbs ? 0.1 : 1;
   const normal = 350 * lbsConversion;
-  const encumbranceBonus = +v.encumbrancebonus || 0;
+  const encumbranceBonus = int(v.encumbrancebonus);
   const encumbranceBonusLbs = float(encumbranceBonus * lbsConversion);
   const thisBonus = useLbs ? encumbranceBonusLbs : encumbranceBonus;
   const normalAdjusted = normal + thisBonus;
@@ -2068,13 +2068,13 @@ const setCurrentEncumbranceFlag = async (override) => {
     'current_encumbrance',
   ]);
   const output = {};
-  const autocalc_movement_flag = +v.autocalc_movement_flag || 0;
-  const normal_load_adjusted = +v.normal_load_adjusted || 0;
-  const heavy_load = +v.heavy_load || 0;
-  const very_heavy_load = +v.very_heavy_load || 0;
-  const total_weight = +v.total_weight || 0;
-  const current_bulk = +v.current_bulk || 0;
-  let currentEncumbrance = +v.current_encumbrance || 0;
+  const autocalc_movement_flag = int(v.autocalc_movement_flag);
+  const normal_load_adjusted = int(v.normal_load_adjusted);
+  const heavy_load = int(v.heavy_load);
+  const very_heavy_load = int(v.very_heavy_load);
+  const total_weight = int(v.total_weight);
+  const current_bulk = int(v.current_bulk);
+  let currentEncumbrance = int(v.current_encumbrance);
 
   if (override) {
     clog(`Encumbrance Set Manually: Adjusting Movement`);
@@ -2082,19 +2082,19 @@ const setCurrentEncumbranceFlag = async (override) => {
       output.current_encumbrance_label = 'Unencumbered';
       output.current_encumbrance = currentEncumbrance;
       // Bail out of IF unless auto-calc movement is enabled
-      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : int(v.current_encumbrance_move);
       // clog('===== Carrying Capacity is Unencumbered =====');
     } else if (currentEncumbrance === 1) {
       output.current_encumbrance_label = 'Heavy';
       output.current_encumbrance = currentEncumbrance;
       // Bail out of IF unless auto-calc movement is enabled
-      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : int(v.current_encumbrance_move);
       // clog('===== Carrying Capacity is Heavy =====');
     } else if (currentEncumbrance === 2) {
       output.current_encumbrance_label = 'Very Heavy';
       output.current_encumbrance = currentEncumbrance;
       // Bail out of IF unless auto-calc movement is enabled
-      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : int(v.current_encumbrance_move);
       // clog('===== Carrying Capacity is Very Heavy =====');
     } else {
       // currentEncumbrance = 3
@@ -2102,7 +2102,7 @@ const setCurrentEncumbranceFlag = async (override) => {
       // no DEX Bonus to AC
       output.current_encumbrance = currentEncumbrance;
       // Bail out of IF unless auto-calc movement is enabled
-      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : int(v.current_encumbrance_move);
       // clog('===== Carrying Capacity is Encumbered =====');
     }
   } else {
@@ -2111,21 +2111,21 @@ const setCurrentEncumbranceFlag = async (override) => {
       currentEncumbrance = 0;
       output.current_encumbrance = currentEncumbrance;
       // Bail out of IF unless auto-calc movement is enabled
-      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : int(v.current_encumbrance_move);
       // clog('===== Carrying Capacity is Unencumbered =====');
     } else if (total_weight > normal_load_adjusted && total_weight <= heavy_load) {
       output.current_encumbrance_label = 'Heavy';
       currentEncumbrance = 1;
       output.current_encumbrance = currentEncumbrance;
       // Bail out of IF unless auto-calc movement is enabled
-      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : int(v.current_encumbrance_move);
       // clog('===== Carrying Capacity is Heavy =====');
     } else if (total_weight > heavy_load && total_weight <= very_heavy_load) {
       output.current_encumbrance_label = 'Very Heavy';
       currentEncumbrance = 2;
       output.current_encumbrance = currentEncumbrance;
       // Bail out of IF unless auto-calc movement is enabled
-      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : int(v.current_encumbrance_move);
       // clog('===== Carrying Capacity is Very Heavy =====');
     } else {
       output.current_encumbrance_label = 'Encumbered';
@@ -2133,7 +2133,7 @@ const setCurrentEncumbranceFlag = async (override) => {
       currentEncumbrance = 3;
       output.current_encumbrance = currentEncumbrance;
       // Bail out of IF unless auto-calc movement is enabled
-      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : +v.current_encumbrance_move || 0;
+      output.current_encumbrance_move = autocalc_movement_flag === 1 ? Math.max(currentEncumbrance, current_bulk) : int(v.current_encumbrance_move);
       // clog('===== Carrying Capacity is Encumbered =====');
     }
   }
@@ -2156,8 +2156,8 @@ const setCurrentMovement = async () => {
   const output = {};
   // clog('Movement Rates have been re-calculated');
   // only extract an integer from movement
-  const movement = +v.movement.toString().replace(/[^0-9]/g, '') || 0;
-  const current_encumbrance_move = +v.current_encumbrance_move || 0;
+  const movement = int(v.movement.toString().replace(/[^0-9]/g, ''));
+  const current_encumbrance_move = int(v.current_encumbrance_move);
   let adjustedMove = 0;
   if (current_encumbrance_move === 0) {
     adjustedMove = movement;
@@ -2193,7 +2193,7 @@ on('sheet:opened change:movement change:current_encumbrance change:current_encum
   const output = {};
   const recalc = 0;
   // only extract an integer from movement
-  const movement = +v.movement.toString().replace(/[^0-9]/g, '') || 0;
+  const movement = int(v.movement.toString().replace(/[^0-9]/g, ''));
   output.movement_heavy = Math.max(movement - 3, 0);
   output.movement_load = Math.max(movement - 6, 0);
   output.movement_max = Math.max(movement - 9, 0);
@@ -2228,17 +2228,17 @@ const setCurrentBulk = async () => {
     'armorshield_carried',
   ]);
   const output = {};
-  const unarmored_worn = +v.unarmored_worn || 0;
-  const armortype_worn = +v.armortype_worn || 0;
-  const armortype2_worn = +v.armortype2_worn || 0;
-  const armorshield_worn = +v.armorshield_worn || 0;
-  const armorshield_carried = +v.armorshield_carried || 0;
+  const unarmored_worn = int(v.unarmored_worn);
+  const armortype_worn = int(v.armortype_worn);
+  const armortype2_worn = int(v.armortype2_worn);
+  const armorshield_worn = int(v.armorshield_worn);
+  const armorshield_carried = int(v.armorshield_carried);
   // shield bulk s/b considered even if it's just carried
   const armorShieldWornOrCarried = Math.max(armorshield_worn, armorshield_carried);
-  const unarmored_bulk = (+v.unarmored_bulk || 0) * unarmored_worn;
-  const armortype_bulk = (+v.armortype_bulk || 0) * armortype_worn;
-  const armortype2_bulk = (+v.armortype2_bulk || 0) * armortype2_worn;
-  const armorshield_bulk = (+v.armorshield_bulk || 0) * armorShieldWornOrCarried;
+  const unarmored_bulk = int(v.unarmored_bulk || 0) * unarmored_worn;
+  const armortype_bulk = int(v.armortype_bulk || 0) * armortype_worn;
+  const armortype2_bulk = int(v.armortype2_bulk || 0) * armortype2_worn;
+  const armorshield_bulk = int(v.armorshield_bulk || 0) * armorShieldWornOrCarried;
   const armorBulk = Math.max(unarmored_bulk, armortype_bulk, armortype2_bulk, armorshield_bulk);
   switch (armorBulk) {
     case 0:
@@ -2281,10 +2281,10 @@ on('change:repeating_equipment:equipment_carried_select change:repeating_equipme
   const fields = [`repeating_equipment_${id}_equipment_type`, `repeating_equipment_${id}_equipment_carried_select`];
   const v = await getAttrsAsync(['equipment_tabs_type', 'equipment_tabs_carry', ...fields]);
   const output = {};
-  const carriedTab = +v.equipment_tabs_carry || 0;
-  const typeTab = +v.equipment_tabs_type || 0;
-  const thisType = +v[`repeating_equipment_${id}_equipment_type`] || 0;
-  const thisCarriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0;
+  const carriedTab = int(v.equipment_tabs_carry);
+  const typeTab = int(v.equipment_tabs_type);
+  const thisType = int(v[`repeating_equipment_${id}_equipment_type`]);
+  const thisCarriedSelect = int(v[`repeating_equipment_${id}_equipment_carried_select`]);
   output[`repeating_equipment_${id}_equipment_carried`] = thisCarriedSelect === 1 ? 1 : 0;
   output.equipment_tabs_type = typeTab !== -1 && isType ? thisType : typeTab;
   output.equipment_tabs_carry = carriedTab === -1 || carriedTab === thisCarriedSelect ? -1 : thisCarriedSelect;
@@ -2302,12 +2302,12 @@ on('change:equipment_tabs_type change:equipment_tabs_carry', async (eventInfo) =
     `repeating_equipment_${id}_equipment_magical`,
   ]);
   const v = await getAttrsAsync(['equipment_tabs_type', 'equipment_tabs_carry', 'equipment_magical', ...fields]);
-  const typeTab = +v.equipment_tabs_type || 0; // 0, 1, 2, 3, 4, -1
-  const carriedTab = +v.equipment_tabs_carry || 0; // 1, 0, 2, -1
+  const typeTab = int(v.equipment_tabs_type); // 0, 1, 2, 3, 4, -1
+  const carriedTab = int(v.equipment_tabs_carry); // 1, 0, 2, -1
   _.each(idArray, (id) => {
-    const isMagical = +v[`repeating_equipment_${id}_equipment_magical`] || 0; // checkbox
-    const thisType = +v[`repeating_equipment_${id}_equipment_type`] || 0; // 0, 1, 2, 3, 4
-    const thisCarriedSelect = +v[`repeating_equipment_${id}_equipment_carried_select`] || 0; // 0, 1, 2
+    const isMagical = int(v[`repeating_equipment_${id}_equipment_magical`]); // checkbox
+    const thisType = int(v[`repeating_equipment_${id}_equipment_type`]); // 0, 1, 2, 3, 4
+    const thisCarriedSelect = int(v[`repeating_equipment_${id}_equipment_carried_select`]); // 0, 1, 2
     // CSS to hide/show the repeating row based on typeTab and/or carriedTab
     if (typeTab === -1 || typeTab === thisType || (typeTab === 3 && isMagical)) {
       output[`repeating_equipment_${id}_equipment_show_carry`] = carriedTab === -1 || carriedTab === thisCarriedSelect ? 1 : 0;
@@ -2331,7 +2331,7 @@ const removeEmptyArmorRows = async () => {
   console.log(armorDetailsArray);
   _.each(idArray, (id) => {
     // this new id/row
-    const type = +v[`repeating_equipment_${id}_equipment_armor_type`] || 0;
+    const type = int(v[`repeating_equipment_${id}_equipment_armor_type`]);
 
     // If Type 99, set to -1 (ie nothing). Forcing removal of any existing syncs.
     let rowType = type === 99 ? -1 : type + 1;
@@ -2802,8 +2802,8 @@ on('clicked:repeating_equipment:addarmor change:repeating_equipment:equipment_ar
   const attrSync = `repeating_equipment_${id}_equipment_sync_armor_flag`;
   const v = await getAttrsAsync([attrType, attrSync]);
   const output = {};
-  const type = +v[attrType] || 0;
-  const synced = +v[attrSync] || 0;
+  const type = int(v[attrType]);
+  const synced = int(v[attrSync]);
   // clog(`${trigger} - id:${id} type:${type} synced:${synced === 1}`);
   // Armor Type's set and button clicked OR Type's changed on an already synced item.
   const isArmor = type !== 99;
@@ -2866,14 +2866,14 @@ on('change:spell_tabs change:toggle_show_memorized change:spell_caster_tabs chan
     `repeating_spells_${id}_spell_caster_class`,
   ]);
   const v = await getAttrsAsync(['spell_tabs', 'toggle_show_memorized', 'spell_caster_tabs', 'toggle_caster2', ...fields]);
-  const memorizedOnly = +v.toggle_show_memorized || 0;
-  const casterTab = +v.spell_caster_tabs || 0; // -1, 0, 1
-  const hideCaster2 = +v.toggle_caster2 || 0;
-  const levelTab = +v.spell_tabs || 0; // -1, 0, 1, 2, ..., 9
+  const memorizedOnly = int(v.toggle_show_memorized);
+  const casterTab = int(v.spell_caster_tabs); // -1, 0, 1
+  const hideCaster2 = int(v.toggle_caster2);
+  const levelTab = int(v.spell_tabs); // -1, 0, 1, 2, ..., 9
   _.each(idArray, (id) => {
-    const thisMemorizedOnly = +v[`repeating_spells_${id}_spell_memorized`] || 0;
-    const thisCaster = +v[`repeating_spells_${id}_spell_caster_class`] || 0; // 0, 1, 2
-    const thisLevel = +v[`repeating_spells_${id}_spell_level`] || 0; // '?' will be coerced to 0
+    const thisMemorizedOnly = int(v[`repeating_spells_${id}_spell_memorized`]);
+    const thisCaster = int(v[`repeating_spells_${id}_spell_caster_class`]); // 0, 1, 2
+    const thisLevel = int(v[`repeating_spells_${id}_spell_level`]); // '?' will be coerced to 0
     output[`repeating_spells_${id}_spell_show_memorized`] = memorizedOnly === 1 && thisMemorizedOnly > 0 ? 1 : 0;
     output[`repeating_spells_${id}_spell_show_all`] = memorizedOnly === 1 ? 0 : 1;
     // show THIS spell if spell level and spell tab match or if show ALL
@@ -2913,10 +2913,10 @@ on('change:repeating_spells:spell_level change:repeating_spells:spell_caster_cla
   const id = eventInfo.sourceAttribute.split('_')[2];
   const v = await getAttrsAsync([`repeating_spells_${id}_spell_level`, `repeating_spells_${id}_spell_caster_class`, 'spell_caster_tabs', 'spell_tabs']);
   const output = {};
-  const casterTab = +v.spell_caster_tabs || 0; // 0, 1, -1
-  const thisCaster = +v[`repeating_spells_${id}_spell_caster_class`] || 0; // 0, 1, 2
+  const casterTab = int(v.spell_caster_tabs); // 0, 1, -1
+  const thisCaster = int(v[`repeating_spells_${id}_spell_caster_class`]); // 0, 1, 2
   const thisLevel = v[`repeating_spells_${id}_spell_level`]; // can be '?'
-  const levelTab = +v.spell_tabs || 0;
+  const levelTab = int(v.spell_tabs);
   // jumps to spell level tab unless Show All or same level tab
   output.spell_tabs = levelTab >= 0 && levelTab !== thisLevel ? thisLevel : levelTab;
   // jumps to caster class tab unless Show All or same caster tab
@@ -2931,10 +2931,10 @@ const setSpellsCasterClass = async () => {
   const v = await getAttrsAsync(['caster_class1_name', 'caster_class2_name', 'caster_class1_level', 'caster_class2_level', ...fields]);
   const caster1Name = v.caster_class1_name;
   const caster2Name = v.caster_class2_name;
-  const caster1Level = +v.caster_class1_level || 0;
-  const caster2Level = +v.caster_class2_level || 0;
+  const caster1Level = int(v.caster_class1_level);
+  const caster2Level = int(v.caster_class2_level);
   _.each(idArray, (id) => {
-    const thisClass = +v[`repeating_spells_${id}_spell_caster_class`] || 0;
+    const thisClass = int(v[`repeating_spells_${id}_spell_caster_class`]);
     switch (thisClass) {
       case 0:
         output[`repeating_spells_${id}_spell_caster_class_name`] = '';
@@ -2986,11 +2986,11 @@ on('change:repeating_spells:spell_name change:repeating_spells:spell_caster_clas
   const output = {};
   const caster1Name = v.caster_class1_name;
   const caster2Name = v.caster_class2_name;
-  const caster1Level = +v.caster_class1_level || 0;
-  const caster2Level = +v.caster_class2_level || 0;
-  const showCaster2 = +v.toggle_caster2 || 0;
-  const casterTab = +v.spell_caster_tabs || 0; // 0, 1, -1
-  let thisClass = +v[`repeating_spells_${id}_spell_caster_class`] || 0; // 0, 1, 2
+  const caster1Level = int(v.caster_class1_level);
+  const caster2Level = int(v.caster_class2_level);
+  const showCaster2 = int(v.toggle_caster2);
+  const casterTab = int(v.spell_caster_tabs); // 0, 1, -1
+  let thisClass = int(v[`repeating_spells_${id}_spell_caster_class`]); // 0, 1, 2
 
   // Caster Class 2 is enabled
   if (showCaster2 === 0) {
@@ -3029,7 +3029,7 @@ on('change:repeating_spells:spell_name', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const v = await getAttrsAsync([`repeating_spells_${id}_spell_level`, 'spell_tabs']);
   const output = {};
-  const levelTab = +v.spell_tabs || 0;
+  const levelTab = int(v.spell_tabs);
   const thisSpellLevel = v[`repeating_spells_${id}_spell_level`]; // can be '?'
   // console.log(`Δ detected: [Setting Spell Level based on Spell Tab] SpellTab:${levelTab} ThisSpellLvl:${thisSpellLevel}`);
   // test if Spell Tab is set to 'All' or if this Spell's Lvl has already been set
@@ -3042,8 +3042,8 @@ on('change:repeating_spells:spell_name', async (eventInfo) => {
 const getToHitACadjUpdate = (v, id) => {
   // clog(`Δ detected: getToHitACadjUpdate for id:${id}`);
   const output = {};
-  const hideAR = +v.toggle_ar || 0;
-  const includeToHitACadj = +v[`repeating_weapon_${id}_weapon_tohitacadj_flag`] || 0;
+  const hideAR = int(v.toggle_ar);
+  const includeToHitACadj = int(v[`repeating_weapon_${id}_weapon_tohitacadj_flag`]);
   // clog(`includeToHitACadj:${includeToHitACadj} hideAR:${hideAR}`);
   output[`repeating_weapon_${id}_weapon_tohitacadj`] =
     includeToHitACadj === 1 && hideAR === 0
@@ -3081,10 +3081,10 @@ on('change:toggle_ar', async (eventInfo) => {
 const getToHitRowUpdate = (v, id) => {
   // clog(`Δ detected: getToHitRowUpdate for id:${id}`);
   const output = {};
-  const flag = +v.toggle_to_hit_table || 0;
+  const flag = int(v.toggle_to_hit_table);
   const attrSelect = `repeating_weapon_${id}_weapon_whisper_to_hit_select`;
   const attrMacro = `repeating_weapon_${id}_weapon_whisper_to_hit`;
-  let thishitTableSelect = +v[attrSelect] || 0;
+  let thishitTableSelect = int(v[attrSelect]);
   let thishitTableMacro = '';
   const noMacro = '&nbsp;';
   // IMPORTANT these strings MUST include a hard return to force a new line
@@ -3134,9 +3134,9 @@ on('change:weapon_proficiency_initial change:weapon_proficiency_added_per_level 
   const output = {};
   const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_prof_flag`]);
   const v = await getAttrsAsync(['weapon_proficiency_penalty', ...fields]);
-  const thispenalty = +v.weapon_proficiency_penalty || 0;
+  const thispenalty = int(v.weapon_proficiency_penalty);
   _.each(idArray, (id) => {
-    const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`] || 0;
+    const thisflag = int(v[`repeating_weapon_${id}_weapon_prof_flag`]);
     output[`repeating_weapon_${id}_weapon_prof`] = thispenalty;
     output[`repeating_weapon_${id}_weapon_prof_pen`] = thisflag === 0 ? '0' : thispenalty;
   });
@@ -3149,8 +3149,8 @@ on('change:repeating_weapon:weapon_prof_flag', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
   const v = await getAttrsAsync(['weapon_proficiency_penalty', `repeating_weapon_${id}_weapon_prof_flag`]);
-  const thispenalty = +v.weapon_proficiency_penalty || 0;
-  const thisflag = +v[`repeating_weapon_${id}_weapon_prof_flag`] || 0;
+  const thispenalty = int(v.weapon_proficiency_penalty);
+  const thisflag = int(v[`repeating_weapon_${id}_weapon_prof_flag`]);
   output[`repeating_weapon_${id}_weapon_prof`] = thispenalty;
   output[`repeating_weapon_${id}_weapon_prof_pen`] = thisflag === 0 ? '0' : thispenalty;
   await setAttrsAsync(output, {silent: true});
@@ -3164,11 +3164,11 @@ on('change:backstab change:backstab_bonus change:toggle_thief_skills', async (ev
   const output = {};
   const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_backstab_flag`]);
   const v = await getAttrsAsync(['backstab', 'backstab_bonus', 'toggle_thief_skills', ...fields]);
-  const thiefSkills = +v.toggle_thief_skills || 0;
-  const thisMult = +v.backstab || 0;
-  const thisBonus = +v.backstab_bonus || 0;
+  const thiefSkills = int(v.toggle_thief_skills);
+  const thisMult = int(v.backstab);
+  const thisBonus = int(v.backstab_bonus);
   _.each(idArray, (id) => {
-    const thisFlag = +v[`repeating_weapon_${id}_weapon_backstab_flag`] || 0;
+    const thisFlag = int(v[`repeating_weapon_${id}_weapon_backstab_flag`]);
     if (thiefSkills === 0) {
       output[`repeating_weapon_${id}_weapon_backstab_var`] = thisFlag === 0 ? 0 : `+${thisBonus}`;
       output[`repeating_weapon_${id}_weapon_backstab_bonus`] = thisFlag === 0 ? 0 : thisBonus;
@@ -3190,10 +3190,10 @@ on('change:repeating_weapon:weapon_backstab_flag', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const output = {};
   const v = await getAttrsAsync(['backstab', 'backstab_bonus', 'toggle_thief_skills', `repeating_weapon_${id}_weapon_backstab_flag`]);
-  const thiefSkills = +v.toggle_thief_skills || 0;
-  const thisMult = +v.backstab || 0;
-  const thisBonus = +v.backstab_bonus || 0;
-  const thisFlag = +v[`repeating_weapon_${id}_weapon_backstab_flag`] || 0;
+  const thiefSkills = int(v.toggle_thief_skills);
+  const thisMult = int(v.backstab);
+  const thisBonus = int(v.backstab_bonus);
+  const thisFlag = int(v[`repeating_weapon_${id}_weapon_backstab_flag`]);
   if (thiefSkills === 0) {
     output[`repeating_weapon_${id}_weapon_backstab_var`] = thisFlag === 0 ? 0 : `+${thisBonus}`;
     output[`repeating_weapon_${id}_weapon_backstab_bonus`] = thisFlag === 0 ? 0 : thisBonus;
@@ -3214,8 +3214,8 @@ on('change:repeating_weapon:weapon_dual', async (eventInfo) => {
   const output = {};
   const v = await getAttrsAsync(['dual_pen_primary', 'dual_pen_secondary', `repeating_weapon_${id}_weapon_dual`]);
   // clog('this weapon attack Type has been re-calculated');
-  const primary = +v.dual_pen_primary || 0;
-  const secondary = +v.dual_pen_secondary || 0;
+  const primary = int(v.dual_pen_primary);
+  const secondary = int(v.dual_pen_secondary);
   const attack_type = v[`repeating_weapon_${id}_weapon_dual`];
   let handed_mod = 0;
   if (attack_type === 'Normal') handed_mod = 0;
@@ -3232,8 +3232,8 @@ const syncDualPen = async () => {
   const fields = idArray.flatMap((id) => [`repeating_weapon_${id}_weapon_critdamage_flag`, `repeating_weapon_${id}_weapon_critdamage_mult`]);
   const v = await getAttrsAsync(['dual_pen_primary', 'dual_pen_secondary', ...fields]);
   // clog('Weapon Attack Type has been re-calculated');
-  const primary = +v.dual_pen_primary || 0;
-  const secondary = +v.dual_pen_secondary || 0;
+  const primary = int(v.dual_pen_primary);
+  const secondary = int(v.dual_pen_secondary);
   _.each(idArray, (id) => {
     const attack_type = v[`repeating_weapon_${id}_weapon_dual`];
     let handed_mod = 0;
@@ -3251,7 +3251,7 @@ on('change:dual_pen_primary change:dual_pen_secondary change:dexterity', async (
   const v = await getAttrsAsync(['dexterity']);
   // clog('Weapon Attack Type has been re-calculated');
   const output = {};
-  const dex = +v.dexterity || 0;
+  const dex = int(v.dexterity);
   let dex_mod = 0;
   if (dex < 6) {
     dex_mod = Math.max(-3, dex - 6);
@@ -3268,7 +3268,7 @@ on('change:dual_pen_primary change:dual_pen_secondary change:dexterity', async (
   output.dual_pen_primary = primary_mod;
   output.dual_pen_secondary = secondary_mod;
   await setAttrsAsync(output, {silent: true});
-  syncDualPen();
+  await syncDualPen();
 });
 
 // Weapon Range: Parse Ranges
@@ -3284,7 +3284,7 @@ const calcRange = async (id) => {
   const v = await getAttrsAsync(fields);
   const output = {};
   // attack types selector: melee=0, ranged=1, touch=2, ranged_touch=3
-  const thisType = +v[`repeating_weapon_${id}_weapon_attack_type`] || 0;
+  const thisType = int(v[`repeating_weapon_${id}_weapon_attack_type`]);
   if (thisType === 0 || thisType === 2) return;
   let thisRange = v[`repeating_weapon_${id}_weapon_range`];
   // remove quotes to prevent NaN (ie distance indicators)
@@ -3348,8 +3348,8 @@ on('change:repeating_weapon:weapon_attack_type', async (eventInfo) => {
   const id = eventInfo.sourceAttribute.split('_')[2];
   const v = await getAttrsAsync([`repeating_weapon_${id}_weapon_attack_type`, `repeating_weapon_${id}_weapon_attack_type_flag`]);
   const output = {};
-  const currentType = +v[`repeating_weapon_${id}_weapon_attack_type`] || 0;
-  const currentTypeFlag = +v[`repeating_weapon_${id}_weapon_attack_type_flag`] || 0;
+  const currentType = int(v[`repeating_weapon_${id}_weapon_attack_type`]);
+  const currentTypeFlag = int(v[`repeating_weapon_${id}_weapon_attack_type_flag`]);
   if (currentType !== currentTypeFlag) {
     output[`repeating_weapon_${id}_weapon_attack_type_flag`] = currentType;
   }
@@ -3622,7 +3622,7 @@ const damageMacro = async (id, passedAutoDamage) => {
   let autoDamage;
   if (passedAutoDamage === undefined || passedAutoDamage === null) {
     const v = await getAttrsAsync(['toggle_auto_damage']);
-    autoDamage = +v.toggle_auto_damage || 0;
+    autoDamage = int(v.toggle_auto_damage);
   } else {
     autoDamage = passedAutoDamage;
   }
@@ -3675,11 +3675,11 @@ on('change:toggle_critdamage change:toggle_auto_damage', async (eventInfo) => {
   const fields = idArray.map((id) => `repeating_weapon_${id}_weapon_critdamage_flag`);
   const v = await getAttrsAsync(['toggle_auto_damage', ...fields]);
   const output = {};
-  const autoDamage = +v.toggle_auto_damage || 0;
+  const autoDamage = int(v.toggle_auto_damage);
   // Map IDs to Promises that return objects
   const damagePromises = idArray.map(async (id) => {
     const attrName = `repeating_weapon_${id}_weapon_critdamage_flag`;
-    const currentValue = +v[attrName] || 0;
+    const currentValue = int(v[attrName]);
     output[attrName] = 1 - currentValue;
     // Get the macro changes for this ID
     return await damageMacro(id, autoDamage);
@@ -3827,9 +3827,9 @@ const setEquipment = async (id) => {
   const fields = repeatingEquipmentAll.map((field) => concatRepAttrName('equipment', id, field));
   const combined = [...nonRep, ...fields];
   const v = await getAttrsAsync(combined);
-  const equipTab = +v.equipment_tabs_type || 0;
+  const equipTab = int(v.equipment_tabs_type);
   const equipTypeAttr = `repeating_equipment_${id}_equipment_type`;
-  const equipType = +v[equipTypeAttr] || 0;
+  const equipType = int(v[equipTypeAttr]);
 
   const output = repeatingEquipmentAll.reduce((accumulator, field) => {
     const fullAttrName = concatRepAttrName('equipment', id, field);
@@ -4732,7 +4732,7 @@ on('change:saves_class change:saves_level change:autofill_saves', async (eventIn
 on('change:matrix_class', async (eventInfo) => {
   const v = await getAttrsAsync(['matrix_class']);
   const output = {};
-  const classSelected = +v.matrix_class || 0;
+  const classSelected = int(v.matrix_class);
   output.toggle_matrixhd = classSelected === 5 ? 1 : 0;
   await setAttrsAsync(output, {silent: true});
 });
@@ -6635,7 +6635,7 @@ const thiefSkillsRacialCalcs = async (autofill_thief_race) => {
 // Thief Skills Dex Calculations
 on('change:autofill_thief_dex change:dexterity', async (eventInfo) => {
   const v = await getAttrsAsync(['autofill_thief_dex']);
-  const autofill_thief_dex = +v.autofill_thief_dex || 0;
+  const autofill_thief_dex = int(v.autofill_thief_dex);
   await thiefSkillsDexCalcs(autofill_thief_dex);
 });
 
@@ -6667,7 +6667,7 @@ on('change:race change:autofill_thief_race change:thief_race_selected', async (e
   const triggerAttr = eventInfo.sourceAttribute;
   const v = await getAttrsAsync(['race', 'autofill_thief_race']);
   const output = {};
-  const autofill_thief_race = +v.autofill_thief_race || 0;
+  const autofill_thief_race = int(v.autofill_thief_race);
   // check attr_race for a match to the race selector
   const race = (v.race || 'human').trim();
   if (triggerAttr === 'autofill_thief_race' || triggerAttr === 'race') {
@@ -6716,7 +6716,7 @@ on('change:charisma change:comeliness', (eventInfo) => {
 const portraitUrlCalc = async () => {
   const v = await getAttrsAsync(['character_avatar', 'sheet_image', 'sheet_image_url']);
   const output = {};
-  const whichImage = +v.sheet_image || 0;
+  const whichImage = int(v.sheet_image);
   // roll20 urls includes extra meta after the image extension
   const avatarURL = (function getAvatarUrl(url) {
     // check url for common image extension
@@ -6763,7 +6763,7 @@ on('clicked:postimage', async (eventInfo) => {
 on('change:psionic_ability_strength_max change:psionic_attack change:psionic_defense', async (eventInfo) => {
   const v = await getAttrsAsync(['psionic_ability_strength_max']);
   const output = {};
-  const strengthMax = +v.psionic_ability_strength_max || 0;
+  const strengthMax = int(v.psionic_ability_strength_max);
   output.psionic_attack_max = float(strengthMax / 2).toFixed(1);
   output.psionic_defense_max = float(strengthMax / 2).toFixed(1);
   await setAttrsAsync(output, {silent: true});
@@ -6842,7 +6842,7 @@ on('clicked:spell-sort-alphabetical clicked:spell-sort-level', async (eventInfo)
   // clog(`Δ detected: Sorting Spells ${buttonClicked}`);
   const v = await getAttrsAsync(['spells_sheet_busy']);
   // Exit if already sorting
-  if (+v.spells_sheet_busy === 1) return;
+  if (int(v.spells_sheet_busy) === 1) return;
   // flag as busy on sheet
   await setAttrsAsync({spells_sheet_busy: 1});
 
@@ -6919,7 +6919,7 @@ on('clicked:spell-sort-undo', async (eventInfo) => {
   // clog(`Δ detected: Undo last Sort`);
   const v = await getAttrsAsync(['spells_sheet_busy']);
   // Exit if already sorting
-  if (+v.spells_sheet_busy === 1) return;
+  if (int(v.spells_sheet_busy) === 1) return;
   // flag as busy on sheet
   await setAttrsAsync({spells_sheet_busy: 1});
 
@@ -6959,7 +6959,7 @@ on('clicked:equipment-sort-alphabetical clicked:equipment-sort-location', async 
   // clog(`Δ detected: Sorting Equipment ${buttonClicked}`);
   const v = await getAttrsAsync(['equipment_sheet_busy']);
   // Exit if already sorting
-  if (+v.equipment_sheet_busy === 1) return;
+  if (int(v.equipment_sheet_busy) === 1) return;
   // flag as busy on sheet
   await setAttrsAsync({equipment_sheet_busy: 1});
 
@@ -7029,7 +7029,7 @@ on('clicked:equipment-sort-undo', async (eventInfo) => {
   // clog(`Δ detected: Undo last Sort`);
   const v = await getAttrsAsync(['equipment_sheet_busy']);
   // Exit if already sorting
-  if (+v.equipment_sheet_busy === 1) return;
+  if (int(v.equipment_sheet_busy) === 1) return;
   // flag as busy on sheet
   await setAttrsAsync({equipment_sheet_busy: 1});
 
