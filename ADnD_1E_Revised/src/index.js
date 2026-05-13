@@ -2328,7 +2328,7 @@ const removeEmptyArmorRows = async () => {
   // grab all attrs and ids before continuing
   const [v, armorDetailsArray] = await Promise.all([getAttrsAsync(fields), generateArmorDetailsArray()]);
   // clog(`removeEmptyArmorRows - armorDetailsArray:`);
-  console.log(armorDetailsArray);
+  // console.log(armorDetailsArray);
   _.each(idArray, (id) => {
     // this new id/row
     const type = int(v[`repeating_equipment_${id}_equipment_armor_type`]);
@@ -2485,7 +2485,7 @@ on(armorDetailslisteners, async (eventInfo) => {
       else if (fullAttrName !== thisRowsConfig.armorType) resetRowData[fullAttrName] = 0;
     });
     await setAttrsAsync(resetRowData, {silent: true});
-    syncArmorToEquipment(null, thisRowsConfig.armorType, 1); // Pass 1 for row_removed
+    await syncArmorToEquipment(null, thisRowsConfig.armorType, 1); // Pass 1 for row_removed
     return;
   }
 
@@ -2764,14 +2764,14 @@ const refreshArmorDetailsArray = async (id) => {
   // clog(`refreshArmorDetailsArray: id:${id} ${isMatch === 0 ? 'No match' : 'Match'} found in armorDetailsArray`);
   await setAttrsAsync(output, {silent: true});
   // clog(`refreshArmorDetailsArray: has been updated.`);
-  console.log(armorDetailsArray);
+  // console.log(armorDetailsArray);
 };
 
 const updateArrayEventListener = `${armorRowIDs.map((stat) => `change:${stat}`).join(' ')}`;
 // ensures armordetails_array stays updated when the ids change
 on(updateArrayEventListener, async (eventInfo) => {
   const attr = eventInfo.sourceAttribute;
-  console.log(`updateArrayEventListener - ARMOR DETAILS ARRAY HAS CHANGED attr:${attr} sourceType: ${eventInfo.sourceType}`);
+  // console.log(`updateArrayEventListener - ARMOR DETAILS ARRAY HAS CHANGED attr:${attr} sourceType: ${eventInfo.sourceType}`);
   const id = eventInfo.newValue ? eventInfo.newValue.toLowerCase() : '0';
   refreshArmorDetailsArray(id);
 });
