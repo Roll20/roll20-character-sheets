@@ -2263,14 +2263,14 @@ const setCurrentBulk = async () => {
   }
   await setAttrsAsync(output, {silent: true});
   // clog(`setCurrentBulk - triggering sumEquipmentWeight`);
-  sumEquipmentWeight();
+  await sumEquipmentWeight();
 };
 
 on(
   'change:unarmored_bulk change:armortype_bulk change:armortype2_bulk change:armorshield_bulk change:armorhelmet_bulk change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorshield_carried remove:repeating_equipment',
-  (eventInfo) => {
+  async (eventInfo) => {
     // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
-    setCurrentBulk();
+    await setCurrentBulk();
   },
 );
 
