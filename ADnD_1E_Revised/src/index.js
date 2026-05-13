@@ -3361,11 +3361,11 @@ const calcHP = async () => {
   // clog('HP re-calculated');
   const v = await getAttrsAsync(['hitpoints', 'hitpoints_max', 'sync_hp_flag', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class']);
   const output = {};
-  const syncHpFlag = +v.sync_hp_flag || 0;
-  const hitPointsMax = +v.hitpoints_max || 0;
-  const hitpoints_1_class = Math.max(0, +v.hitpoints_1_class);
-  const hitpoints_2_class = Math.max(0, +v.hitpoints_2_class);
-  const hitpoints_3_class = Math.max(0, +v.hitpoints_3_class);
+  const syncHpFlag = int(v.sync_hp_flag);
+  const hitPointsMax = int(v.hitpoints_max);
+  const hitpoints_1_class = Math.max(0, int(v.hitpoints_1_class));
+  const hitpoints_2_class = Math.max(0, int(v.hitpoints_2_class));
+  const hitpoints_3_class = Math.max(0, int(v.hitpoints_3_class));
   const class1 = hitpoints_1_class !== 0 ? 1 : 0;
   const class2 = hitpoints_2_class !== 0 ? 1 : 0;
   const class3 = hitpoints_3_class !== 0 ? 1 : 0;
