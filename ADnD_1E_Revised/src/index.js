@@ -4408,15 +4408,13 @@ const saveparalysispoisondeathCalc = async (migrate) => {
     'saveparalysispoisondeath_temp_mod',
   ]);
   const output = {};
-  const baseSaveparalysispoisondeath = +v.saveparalysispoisondeath_base || 0;
-  const racialSaveparalysispoisondeath = +v.saveparalysispoisondeath_racial_mod || 0;
-  const abilitySaveparalysispoisondeath = +v.saveparalysispoisondeath_ability_mod || 0;
-  const miscSaveparalysispoisondeath = +v.saveparalysispoisondeath_misc_mod || 0;
-  const tempSaveparalysispoisondeath = +v.saveparalysispoisondeath_temp_mod || 0;
-  const oldSave = +v.saveparalysispoisondeath || 0;
-  const newSave = int(
-    baseSaveparalysispoisondeath + racialSaveparalysispoisondeath + abilitySaveparalysispoisondeath + miscSaveparalysispoisondeath + tempSaveparalysispoisondeath,
-  );
+  const baseSaveparalysispoisondeath = int(v.saveparalysispoisondeath_base);
+  const racialSaveparalysispoisondeath = int(v.saveparalysispoisondeath_racial_mod);
+  const abilitySaveparalysispoisondeath = int(v.saveparalysispoisondeath_ability_mod);
+  const miscSaveparalysispoisondeath = int(v.saveparalysispoisondeath_misc_mod);
+  const tempSaveparalysispoisondeath = int(v.saveparalysispoisondeath_temp_mod);
+  const oldSave = int(v.saveparalysispoisondeath);
+  const newSave = baseSaveparalysispoisondeath + racialSaveparalysispoisondeath + abilitySaveparalysispoisondeath + miscSaveparalysispoisondeath + tempSaveparalysispoisondeath;
   // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
   if (migrate === 1) {
     if (oldSave <= 20 && newSave === 20) {
@@ -4441,15 +4439,14 @@ const savepetrificationpolymorphCalc = async (migrate) => {
     'savepetrificationpolymorph_temp_mod',
   ]);
   const output = {};
-  const baseSavepetrificationpolymorph = +v.savepetrificationpolymorph_base || 0;
-  const racialSavepetrificationpolymorph = +v.savepetrificationpolymorph_racial_mod || 0;
-  const abilitySavepetrificationpolymorph = +v.savepetrificationpolymorph_ability_mod || 0;
-  const miscSavepetrificationpolymorph = +v.savepetrificationpolymorph_misc_mod || 0;
-  const tempSavepetrificationpolymorph = +v.savepetrificationpolymorph_temp_mod || 0;
-  const oldSave = +v.savepetrificationpolymorph || 0;
-  const newSave = int(
-    baseSavepetrificationpolymorph + racialSavepetrificationpolymorph + abilitySavepetrificationpolymorph + miscSavepetrificationpolymorph + tempSavepetrificationpolymorph,
-  );
+  const baseSavepetrificationpolymorph = int(v.savepetrificationpolymorph_base);
+  const racialSavepetrificationpolymorph = int(v.savepetrificationpolymorph_racial_mod);
+  const abilitySavepetrificationpolymorph = int(v.savepetrificationpolymorph_ability_mod);
+  const miscSavepetrificationpolymorph = int(v.savepetrificationpolymorph_misc_mod);
+  const tempSavepetrificationpolymorph = int(v.savepetrificationpolymorph_temp_mod);
+  const oldSave = int(v.savepetrificationpolymorph);
+  const newSave =
+    baseSavepetrificationpolymorph + racialSavepetrificationpolymorph + abilitySavepetrificationpolymorph + miscSavepetrificationpolymorph + tempSavepetrificationpolymorph;
   // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
   if (migrate === 1) {
     if (oldSave <= 20 && newSave === 20) {
@@ -4474,13 +4471,13 @@ const saverodsstaveswandsCalc = async (migrate) => {
     'saverodsstaveswands_temp_mod',
   ]);
   const output = {};
-  const baseSaverodsstaveswands = +v.saverodsstaveswands_base || 0;
-  const racialSaverodsstaveswands = +v.saverodsstaveswands_racial_mod || 0;
-  const abilitySaverodsstaveswands = +v.saverodsstaveswands_ability_mod || 0;
-  const miscSaverodsstaveswands = +v.saverodsstaveswands_misc_mod || 0;
-  const tempSaverodsstaveswands = +v.saverodsstaveswands_temp_mod || 0;
-  const oldSave = +v.saverodsstaveswands || 0;
-  const newSave = int(baseSaverodsstaveswands + racialSaverodsstaveswands + abilitySaverodsstaveswands + miscSaverodsstaveswands + tempSaverodsstaveswands);
+  const baseSaverodsstaveswands = int(v.saverodsstaveswands_base);
+  const racialSaverodsstaveswands = int(v.saverodsstaveswands_racial_mod);
+  const abilitySaverodsstaveswands = int(v.saverodsstaveswands_ability_mod);
+  const miscSaverodsstaveswands = int(v.saverodsstaveswands_misc_mod);
+  const tempSaverodsstaveswands = int(v.saverodsstaveswands_temp_mod);
+  const oldSave = int(v.saverodsstaveswands);
+  const newSave = baseSaverodsstaveswands + racialSaverodsstaveswands + abilitySaverodsstaveswands + miscSaverodsstaveswands + tempSaverodsstaveswands;
   // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
   if (migrate === 1) {
     if (oldSave <= 20 && newSave === 20) {
@@ -4505,13 +4502,13 @@ const savebreathweaponsCalc = async (migrate) => {
     'savebreathweapons_temp_mod',
   ]);
   const output = {};
-  const baseSavebreathweapons = +v.savebreathweapons_base || 0;
-  const racialSavebreathweapons = +v.savebreathweapons_racial_mod || 0;
-  const abilitySavebreathweapons = +v.savebreathweapons_ability_mod || 0;
-  const miscSavebreathweapons = +v.savebreathweapons_misc_mod || 0;
-  const tempSavebreathweapons = +v.savebreathweapons_temp_mod || 0;
-  const oldSave = +v.savebreathweapons || 0;
-  const newSave = int(baseSavebreathweapons + racialSavebreathweapons + abilitySavebreathweapons + miscSavebreathweapons + tempSavebreathweapons);
+  const baseSavebreathweapons = int(v.savebreathweapons_base);
+  const racialSavebreathweapons = int(v.savebreathweapons_racial_mod);
+  const abilitySavebreathweapons = int(v.savebreathweapons_ability_mod);
+  const miscSavebreathweapons = int(v.savebreathweapons_misc_mod);
+  const tempSavebreathweapons = int(v.savebreathweapons_temp_mod);
+  const oldSave = int(v.savebreathweapons);
+  const newSave = baseSavebreathweapons + racialSavebreathweapons + abilitySavebreathweapons + miscSavebreathweapons + tempSavebreathweapons;
   // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
   if (migrate === 1) {
     if (oldSave <= 20 && newSave === 20) {
@@ -4529,13 +4526,13 @@ const savebreathweaponsCalc = async (migrate) => {
 const savespellsCalc = async (migrate) => {
   const v = await getAttrsAsync(['savespells', 'savespells_base', 'savespells_racial_mod', 'savespells_ability_mod', 'savespells_misc_mod', 'savespells_temp_mod']);
   const output = {};
-  const baseSavespells = +v.savespells_base || 0;
-  const racialSavespells = +v.savespells_racial_mod || 0;
-  const abilitySavespells = +v.savespells_ability_mod || 0;
-  const miscSavespells = +v.savespells_misc_mod || 0;
-  const tempSavespells = +v.savespells_temp_mod || 0;
-  const oldSave = +v.savespells || 0;
-  const newSave = int(baseSavespells + racialSavespells + abilitySavespells + miscSavespells + tempSavespells);
+  const baseSavespells = int(v.savespells_base);
+  const racialSavespells = int(v.savespells_racial_mod);
+  const abilitySavespells = int(v.savespells_ability_mod);
+  const miscSavespells = int(v.savespells_misc_mod);
+  const tempSavespells = int(v.savespells_temp_mod);
+  const oldSave = int(v.savespells);
+  const newSave = baseSavespells + racialSavespells + abilitySavespells + miscSavespells + tempSavespells;
   // clog(`oldSave: ${oldSave} newSave: ${newSave}`);
   if (migrate === 1) {
     if (oldSave <= 20 && newSave === 20) {
@@ -4554,12 +4551,12 @@ const savespellsCalc = async (migrate) => {
 const savemiscCalc = async () => {
   const v = await getAttrsAsync(['savemisc', 'savemisc_base', 'savemisc_racial_mod', 'savemisc_ability_mod', 'savemisc_misc_mod', 'savemisc_temp_mod']);
   const output = {};
-  const baseSavemisc = +v.savemisc_base || 0;
-  const racialSavemisc = +v.savemisc_racial_mod || 0;
-  const abilitySavemisc = +v.savemisc_ability_mod || 0;
-  const miscSavemisc = +v.savemisc_misc_mod || 0;
-  const tempSavemisc = +v.savemisc_temp_mod || 0;
-  const newSave = int(baseSavemisc + racialSavemisc + abilitySavemisc + miscSavemisc + tempSavemisc);
+  const baseSavemisc = int(v.savemisc_base);
+  const racialSavemisc = int(v.savemisc_racial_mod);
+  const abilitySavemisc = int(v.savemisc_ability_mod);
+  const miscSavemisc = int(v.savemisc_misc_mod);
+  const tempSavemisc = int(v.savemisc_temp_mod);
+  const newSave = baseSavemisc + racialSavemisc + abilitySavemisc + miscSavemisc + tempSavemisc;
   output.savemisc = newSave;
   await setAttrsAsync(output, {silent: true});
 };
@@ -4567,13 +4564,13 @@ const savemiscCalc = async () => {
 const savemisc1Calc = async () => {
   const v = await getAttrsAsync(['savemisc1', 'savemisc1_base', 'savemisc1_racial_mod', 'savemisc1_ability_mod', 'savemisc1_misc_mod', 'savemisc1_temp_mod']);
   const output = {};
-  const baseSavemisc1 = +v.savemisc1_base || 0;
-  const racialSavemisc1 = +v.savemisc1_racial_mod || 0;
-  const abilitySavemisc1 = +v.savemisc1_ability_mod || 0;
-  const miscSavemisc1 = +v.savemisc1_misc_mod || 0;
-  const tempSavemisc1 = +v.savemisc1_temp_mod || 0;
-  // const oldSave = +v.savemisc1 || 0;
-  const newSave = int(baseSavemisc1 + racialSavemisc1 + abilitySavemisc1 + miscSavemisc1 + tempSavemisc1);
+  const baseSavemisc1 = int(v.savemisc1_base);
+  const racialSavemisc1 = int(v.savemisc1_racial_mod);
+  const abilitySavemisc1 = int(v.savemisc1_ability_mod);
+  const miscSavemisc1 = int(v.savemisc1_misc_mod);
+  const tempSavemisc1 = int(v.savemisc1_temp_mod);
+  // const oldSave = int(v.savemisc1);
+  const newSave = baseSavemisc1 + racialSavemisc1 + abilitySavemisc1 + miscSavemisc1 + tempSavemisc1;
   output.savemisc1 = newSave;
   await setAttrsAsync(output, {silent: true});
 };
@@ -4581,13 +4578,13 @@ const savemisc1Calc = async () => {
 const savemisc2Calc = async () => {
   const v = await getAttrsAsync(['savemisc2', 'savemisc2_base', 'savemisc2_racial_mod', 'savemisc2_ability_mod', 'savemisc2_misc_mod', 'savemisc2_temp_mod']);
   const output = {};
-  const baseSavemisc2 = +v.savemisc2_base || 0;
-  const racialSavemisc2 = +v.savemisc2_racial_mod || 0;
-  const abilitySavemisc2 = +v.savemisc2_ability_mod || 0;
-  const miscSavemisc2 = +v.savemisc2_misc_mod || 0;
-  const tempSavemisc2 = +v.savemisc2_temp_mod || 0;
-  // const oldSave = +v.savemisc1 || 0;
-  const newSave = int(baseSavemisc2 + racialSavemisc2 + abilitySavemisc2 + miscSavemisc2 + tempSavemisc2);
+  const baseSavemisc2 = int(v.savemisc2_base);
+  const racialSavemisc2 = int(v.savemisc2_racial_mod);
+  const abilitySavemisc2 = int(v.savemisc2_ability_mod);
+  const miscSavemisc2 = int(v.savemisc2_misc_mod);
+  const tempSavemisc2 = int(v.savemisc2_temp_mod);
+  // const oldSave = int(v.savemisc1);
+  const newSave = baseSavemisc2 + racialSavemisc2 + abilitySavemisc2 + miscSavemisc2 + tempSavemisc2;
   output.savemisc2 = newSave;
   await setAttrsAsync(output, {silent: true});
 };
