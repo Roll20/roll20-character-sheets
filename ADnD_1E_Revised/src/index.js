@@ -4636,10 +4636,10 @@ on('change:savemisc2_base change:savemisc2_racial_mod change:savemisc2_ability_m
 // Saves Autofill Base Column
 on('change:saves_class change:saves_level change:autofill_saves', async (eventInfo) => {
   const v = await getAttrsAsync(['saves_class', 'saves_level', 'autofill_saves']);
-  const autofillSaves = +v.autofill_saves || 0;
+  const autofillSaves = int(v.autofill_saves);
   if (!autofillSaves) return;
 
-  const classID = +v.saves_class || 0;
+  const classID = int(v.saves_class);
   if (!classID) return;
 
   const saveKeys = ['saveparalysispoisondeath_base', 'savepetrificationpolymorph_base', 'saverodsstaveswands_base', 'savebreathweapons_base', 'savespells_base'];
@@ -4716,7 +4716,7 @@ on('change:saves_class change:saves_level change:autofill_saves', async (eventIn
   if (!selectedTable) return;
 
   // Find the correct row based on level
-  const level = +v.saves_level || 0;
+  const level = int(v.saves_level);
   // .find() returns the first element where the condition is true
   const row = selectedTable.find((entry) => level < entry.lvl) || selectedTable[selectedTable.length - 1];
 
