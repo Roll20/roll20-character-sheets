@@ -4052,12 +4052,12 @@ on(
 const pickpocketsCalc = async (migrate) => {
   const v = await getAttrsAsync(['pickpockets', 'pickpockets_base', 'pickpockets_racial_mod', 'pickpockets_ability_mod', 'pickpockets_magic']);
   const output = {};
-  const basePickpockets = +v.pickpockets_base || 0;
-  const racialPickpockets = +v.pickpockets_racial_mod || 0;
-  const abilityPickpockets = +v.pickpockets_ability_mod || 0;
-  const magicPickpockets = +v.pickpockets_magic || 0;
-  const oldSkill = +v.pickpockets || 0;
-  const newSkill = Math.max(0, int(basePickpockets + racialPickpockets + abilityPickpockets + magicPickpockets));
+  const basePickpockets = int(v.pickpockets_base);
+  const racialPickpockets = int(v.pickpockets_racial_mod);
+  const abilityPickpockets = int(v.pickpockets_ability_mod);
+  const magicPickpockets = int(v.pickpockets_magic);
+  const oldSkill = int(v.pickpockets);
+  const newSkill = Math.max(0, basePickpockets + racialPickpockets + abilityPickpockets + magicPickpockets);
   // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
   if (migrate === 1) {
     if (oldSkill >= 0 && newSkill === 0) {
@@ -4075,12 +4075,12 @@ const pickpocketsCalc = async (migrate) => {
 const openlocksCalc = async (migrate) => {
   const v = await getAttrsAsync(['openlocks', 'openlocks_base', 'openlocks_racial_mod', 'openlocks_ability_mod', 'openlocks_magic']);
   const output = {};
-  const baseOpenlocks = +v.openlocks_base || 0;
-  const racialOpenlocks = +v.openlocks_racial_mod || 0;
-  const abilityOpenlocks = +v.openlocks_ability_mod || 0;
-  const magicOpenlocks = +v.openlocks_magic || 0;
-  const oldSkill = +v.openlocks || 0;
-  const newSkill = Math.max(0, Math.min(100, int(baseOpenlocks + racialOpenlocks + abilityOpenlocks + magicOpenlocks)));
+  const baseOpenlocks = int(v.openlocks_base);
+  const racialOpenlocks = int(v.openlocks_racial_mod);
+  const abilityOpenlocks = int(v.openlocks_ability_mod);
+  const magicOpenlocks = int(v.openlocks_magic);
+  const oldSkill = int(v.openlocks);
+  const newSkill = Math.max(0, Math.min(100, baseOpenlocks + racialOpenlocks + abilityOpenlocks + magicOpenlocks));
   // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
   if (migrate === 1) {
     if (oldSkill >= 0 && newSkill === 0) {
@@ -4098,12 +4098,12 @@ const openlocksCalc = async (migrate) => {
 const findtrapsCalc = async (migrate) => {
   const v = await getAttrsAsync(['findtraps', 'findtraps_base', 'findtraps_racial_mod', 'findtraps_ability_mod', 'findtraps_magic']);
   const output = {};
-  const baseFindtraps = +v.findtraps_base || 0;
-  const racialFindtraps = +v.findtraps_racial_mod || 0;
-  const abilityFindtraps = +v.findtraps_ability_mod || 0;
-  const magicFindtraps = +v.findtraps_magic || 0;
-  const oldSkill = +v.findtraps || 0;
-  const newSkill = Math.max(0, Math.min(100, int(baseFindtraps + racialFindtraps + abilityFindtraps + magicFindtraps)));
+  const baseFindtraps = int(v.findtraps_base);
+  const racialFindtraps = int(v.findtraps_racial_mod);
+  const abilityFindtraps = int(v.findtraps_ability_mod);
+  const magicFindtraps = int(v.findtraps_magic);
+  const oldSkill = int(v.findtraps);
+  const newSkill = Math.max(0, Math.min(100, baseFindtraps + racialFindtraps + abilityFindtraps + magicFindtraps));
   // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
   if (migrate === 1) {
     if (oldSkill >= 0 && newSkill === 0) {
@@ -4121,12 +4121,12 @@ const findtrapsCalc = async (migrate) => {
 const movequietlyCalc = async (migrate) => {
   const v = await getAttrsAsync(['movequietly', 'movequietly_base', 'movequietly_racial_mod', 'movequietly_ability_mod', 'movequietly_magic']);
   const output = {};
-  const baseMovequietly = +v.movequietly_base || 0;
-  const racialMovequietly = +v.movequietly_racial_mod || 0;
-  const abilityMovequietly = +v.movequietly_ability_mod || 0;
-  const magicMovequietly = +v.movequietly_magic || 0;
-  const oldSkill = +v.movequietly || 0;
-  const newSkill = Math.max(0, Math.min(100, int(baseMovequietly + racialMovequietly + abilityMovequietly + magicMovequietly)));
+  const baseMovequietly = int(v.movequietly_base);
+  const racialMovequietly = int(v.movequietly_racial_mod);
+  const abilityMovequietly = int(v.movequietly_ability_mod);
+  const magicMovequietly = int(v.movequietly_magic);
+  const oldSkill = int(v.movequietly);
+  const newSkill = Math.max(0, Math.min(100, baseMovequietly + racialMovequietly + abilityMovequietly + magicMovequietly));
   // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
   if (migrate === 1) {
     if (oldSkill >= 0 && newSkill === 0) {
@@ -4144,12 +4144,12 @@ const movequietlyCalc = async (migrate) => {
 const hideinshadowsCalc = async (migrate) => {
   const v = await getAttrsAsync(['hideinshadows', 'hideinshadows_base', 'hideinshadows_racial_mod', 'hideinshadows_ability_mod', 'hideinshadows_magic']);
   const output = {};
-  const baseHideinshadows = +v.hideinshadows_base || 0;
-  const racialHideinshadows = +v.hideinshadows_racial_mod || 0;
-  const abilityHideinshadows = +v.hideinshadows_ability_mod || 0;
-  const magicHideinshadows = +v.hideinshadows_magic || 0;
-  const oldSkill = +v.hideinshadows || 0;
-  const newSkill = Math.max(0, Math.min(100, int(baseHideinshadows + racialHideinshadows + abilityHideinshadows + magicHideinshadows)));
+  const baseHideinshadows = int(v.hideinshadows_base);
+  const racialHideinshadows = int(v.hideinshadows_racial_mod);
+  const abilityHideinshadows = int(v.hideinshadows_ability_mod);
+  const magicHideinshadows = int(v.hideinshadows_magic);
+  const oldSkill = int(v.hideinshadows);
+  const newSkill = Math.max(0, Math.min(100, baseHideinshadows + racialHideinshadows + abilityHideinshadows + magicHideinshadows));
   // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
   if (migrate === 1) {
     if (oldSkill >= 0 && newSkill === 0) {
@@ -4167,12 +4167,12 @@ const hideinshadowsCalc = async (migrate) => {
 const hearnoiseCalc = async (migrate) => {
   const v = await getAttrsAsync(['hearnoise', 'hearnoise_base', 'hearnoise_racial_mod', 'hearnoise_ability_mod', 'hearnoise_magic']);
   const output = {};
-  const baseHearnoise = +v.hearnoise_base || 0;
-  const racialHearnoise = +v.hearnoise_racial_mod || 0;
-  const abilityHearnoise = +v.hearnoise_ability_mod || 0;
-  const magicHearnoise = +v.hearnoise_magic || 0;
-  const oldSkill = +v.hearnoise || 0;
-  const newSkill = Math.max(0, Math.min(100, int(baseHearnoise + racialHearnoise + abilityHearnoise + magicHearnoise)));
+  const baseHearnoise = int(v.hearnoise_base);
+  const racialHearnoise = int(v.hearnoise_racial_mod);
+  const abilityHearnoise = int(v.hearnoise_ability_mod);
+  const magicHearnoise = int(v.hearnoise_magic);
+  const oldSkill = int(v.hearnoise);
+  const newSkill = Math.max(0, Math.min(100, baseHearnoise + racialHearnoise + abilityHearnoise + magicHearnoise));
   // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
   if (migrate === 1) {
     if (oldSkill >= 0 && newSkill === 0) {
@@ -4190,13 +4190,13 @@ const hearnoiseCalc = async (migrate) => {
 const climbwallsCalc = async (migrate) => {
   const v = await getAttrsAsync(['climbwalls', 'climbwalls_base', 'climbwalls_racial_mod', 'climbwalls_ability_mod', 'climbwalls_magic']);
   const output = {};
-  let baseClimbwalls = +v.climbwalls_base || 0;
+  let baseClimbwalls = int(v.climbwalls_base);
   baseClimbwalls = baseClimbwalls >= 99.1 ? baseClimbwalls.toFixed(1) : Math.floor(baseClimbwalls);
-  const racialClimbwalls = +v.climbwalls_racial_mod || 0;
-  const abilityClimbwalls = +v.climbwalls_ability_mod || 0;
-  const magicClimbwalls = +v.climbwalls_magic || 0;
-  const oldSkill = +v.climbwalls || 0;
-  const newSkill = Math.max(0, Math.min(100, baseClimbwalls + int(racialClimbwalls + abilityClimbwalls + magicClimbwalls)));
+  const racialClimbwalls = int(v.climbwalls_racial_mod);
+  const abilityClimbwalls = int(v.climbwalls_ability_mod);
+  const magicClimbwalls = int(v.climbwalls_magic);
+  const oldSkill = int(v.climbwalls);
+  const newSkill = Math.max(0, Math.min(100, baseClimbwalls + racialClimbwalls + abilityClimbwalls + magicClimbwalls));
   const macroNormal =
     '@{whisper_pc} &{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Climb Walls}} {{roll_low=[[ 1d100 ]]%}} {{roll_target=[[ @{climbwalls} ]]%}}';
   const macroExceptional =
@@ -4219,12 +4219,12 @@ const climbwallsCalc = async (migrate) => {
 const readlanguagesCalc = async (migrate) => {
   const v = await getAttrsAsync(['readlanguages', 'readlanguages_base', 'readlanguages_racial_mod', 'readlanguages_ability_mod', 'readlanguages_magic']);
   const output = {};
-  const baseReadlanguages = +v.readlanguages_base || 0;
-  const racialReadlanguages = +v.readlanguages_racial_mod || 0;
-  const abilityReadlanguages = +v.readlanguages_ability_mod || 0;
-  const magicReadlanguages = +v.readlanguages_magic || 0;
-  const oldSkill = +v.readlanguages || 0;
-  const newSkill = Math.max(0, Math.min(100, int(baseReadlanguages + racialReadlanguages + abilityReadlanguages + magicReadlanguages)));
+  const baseReadlanguages = int(v.readlanguages_base);
+  const racialReadlanguages = int(v.readlanguages_racial_mod);
+  const abilityReadlanguages = int(v.readlanguages_ability_mod);
+  const magicReadlanguages = int(v.readlanguages_magic);
+  const oldSkill = int(v.readlanguages);
+  const newSkill = Math.max(0, Math.min(100, baseReadlanguages + racialReadlanguages + abilityReadlanguages + magicReadlanguages));
   // clog(`oldThiefSkill: ${oldSkill} newThiefSkill: ${newSkill}`);
   if (migrate === 1) {
     if (oldSkill >= 0 && newSkill === 0) {
@@ -4242,12 +4242,12 @@ const readlanguagesCalc = async (migrate) => {
 const thiefmiscCalc = async () => {
   const v = await getAttrsAsync(['thiefmisc', 'thiefmisc_base', 'thiefmisc_racial_mod', 'thiefmisc_ability_mod', 'thiefmisc_magic']);
   const output = {};
-  const baseThiefmisc = +v.thiefmisc_base || 0;
-  const racialThiefmisc = +v.thiefmisc_racial_mod || 0;
-  const abilityThiefmisc = +v.thiefmisc_ability_mod || 0;
-  const magicThiefmisc = +v.thiefmisc_magic || 0;
-  // const oldSkill = +v.thiefmisc || 0;
-  const newSkill = Math.max(0, Math.min(100, int(baseThiefmisc + racialThiefmisc + abilityThiefmisc + magicThiefmisc)));
+  const baseThiefmisc = int(v.thiefmisc_base);
+  const racialThiefmisc = int(v.thiefmisc_racial_mod);
+  const abilityThiefmisc = int(v.thiefmisc_ability_mod);
+  const magicThiefmisc = int(v.thiefmisc_magic);
+  // const oldSkill = int(v.thiefmisc);
+  const newSkill = Math.max(0, Math.min(100, baseThiefmisc + racialThiefmisc + abilityThiefmisc + magicThiefmisc));
   output.thiefmisc = newSkill;
   setAttrsAsync(output, {silent: true});
 };
@@ -4255,12 +4255,12 @@ const thiefmiscCalc = async () => {
 const thiefmisc1Calc = async () => {
   const v = await getAttrsAsync(['thiefmisc1', 'thiefmisc1_base', 'thiefmisc1_racial_mod', 'thiefmisc1_ability_mod', 'thiefmisc1_magic']);
   const output = {};
-  const baseThiefmisc1 = +v.thiefmisc1_base || 0;
-  const racialThiefmisc1 = +v.thiefmisc1_racial_mod || 0;
-  const abilityThiefmisc1 = +v.thiefmisc1_ability_mod || 0;
-  const magicThiefmisc1 = +v.thiefmisc1_magic || 0;
-  // const oldSkill = +v.thiefmisc1 || 0;
-  const newSkill = Math.max(0, Math.min(100, int(baseThiefmisc1 + racialThiefmisc1 + abilityThiefmisc1 + magicThiefmisc1)));
+  const baseThiefmisc1 = int(v.thiefmisc1_base);
+  const racialThiefmisc1 = int(v.thiefmisc1_racial_mod);
+  const abilityThiefmisc1 = int(v.thiefmisc1_ability_mod);
+  const magicThiefmisc1 = int(v.thiefmisc1_magic);
+  // const oldSkill = int(v.thiefmisc1);
+  const newSkill = Math.max(0, Math.min(100, baseThiefmisc1 + racialThiefmisc1 + abilityThiefmisc1 + magicThiefmisc1));
   output.thiefmisc1 = newSkill;
   setAttrsAsync(output, {silent: true});
 };
@@ -4268,12 +4268,12 @@ const thiefmisc1Calc = async () => {
 const thiefmisc2Calc = async () => {
   const v = await getAttrsAsync(['thiefmisc2', 'thiefmisc2_base', 'thiefmisc2_racial_mod', 'thiefmisc2_ability_mod', 'thiefmisc2_magic']);
   const output = {};
-  const baseThiefmisc2 = +v.thiefmisc2_base || 0;
-  const racialThiefmisc2 = +v.thiefmisc2_racial_mod || 0;
-  const abilityThiefmisc2 = +v.thiefmisc2_ability_mod || 0;
-  const magicThiefmisc2 = +v.thiefmisc2_magic || 0;
-  // const oldSkill = +v.thiefmisc2 || 0;
-  const newSkill = Math.max(0, Math.min(100, int(baseThiefmisc2 + racialThiefmisc2 + abilityThiefmisc2 + magicThiefmisc2)));
+  const baseThiefmisc2 = int(v.thiefmisc2_base);
+  const racialThiefmisc2 = int(v.thiefmisc2_racial_mod);
+  const abilityThiefmisc2 = int(v.thiefmisc2_ability_mod);
+  const magicThiefmisc2 = int(v.thiefmisc2_magic);
+  // const oldSkill = int(v.thiefmisc2);
+  const newSkill = Math.max(0, Math.min(100, baseThiefmisc2 + racialThiefmisc2 + abilityThiefmisc2 + magicThiefmisc2));
   output.thiefmisc2 = newSkill;
   setAttrsAsync(output, {silent: true});
 };
@@ -4339,11 +4339,10 @@ on(
       'level_2',
       'level_3',
     ]);
-    const autocalcFill = +v.autofill_thief || 0;
+    const autocalcFill = int(v.autofill_thief);
     if (!autocalcFill) return;
 
     const output = {};
-
     const skillKeys = ['pickpockets_base', 'openlocks_base', 'findtraps_base', 'movequietly_base', 'hideinshadows_base', 'hearnoise_base', 'climbwalls_base', 'readlanguages_base'];
 
     // table data based on PHB
@@ -4368,9 +4367,9 @@ on(
       17: [125, 99, 99, 99, 99, 55, 99.7, 80],
     };
 
-    const syncClass = +v.sync_thief_class || 0;
-    const classLinked = +v.thief_class_selected || 0; // 1, 2, 3
-    let levelSelected = +v.thief_level || 0;
+    const syncClass = int(v.sync_thief_class);
+    const classLinked = int(v.thief_class_selected); // 1, 2, 3
+    let levelSelected = int(v.thief_level);
 
     // Determine Level based on Sync logic
     if (syncClass && classLinked >= 1 && classLinked <= 3) {
