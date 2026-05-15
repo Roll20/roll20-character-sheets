@@ -15261,6 +15261,14 @@ visualize what it will look like in chat.
 										<span data-i18n="ranged-elevation-label">Elevation. If you're above the target, enter a positive number of hexes. If you're below the target, enter a negative number of hexes. See B407.</span>
 									</div>
 								</div>
+								<div class="cell telescopic-vision">
+									<div class="popup">
+										<span data-i18n="abbreviation-telescopic-vision-level-label">Tele V</span>
+									</div>
+									<div class="tooltip">
+										<span data-i18n="telescopic-vision-level-tooltip">If you take an Aim maneuver enter the Telescopic Vision Level. Each level will ignore -2 in range penalties. B92.</span>
+									</div>
+								</div>
 								<div class="cell new-range">
 									<div class="popup">
 										<span data-i18n="abbreviation-effective-label">EFF</span>
@@ -15274,7 +15282,7 @@ visualize what it will look like in chat.
 										<span data-i18n="abbreviation-accuracy-label">Acc</span>
 									</div>
 									<div class="tooltip">
-										<span data-i18n="accuracy-bonus-tooltip">Accuracy</span>
+										<span data-i18n="accuracy-tooltip">Accuracy</span>
 									</div>
 								</div>
 								<div class="cell aiming">
@@ -15303,16 +15311,16 @@ visualize what it will look like in chat.
 										<span data-i18n="target-size-modifier-tooltip">Size Modifier of target.</span>
 									</span>
 								</div>
-								<div class="cell hit-mod">
-									<span data-i18n="abbreviation-hit-modifier-label">Hit Mod</span>
-								</div>
 								<div class="cell braced">
 									<div class="popup">
-										<span data-i18n="braced-title">Braced</span>
+										<span data-i18n="abbreviation-braced-label">BRCD</span>
 									</div>
 									<span class="tooltip">
 										<span data-i18n="braced-title-tooltip">If you brace a firearm or crossbow, you get an extra +1 to Acc. See B364.</span>
 									</span>
+								</div>
+								<div class="cell hit-mod">
+									<span data-i18n="abbreviation-hit-modifier-label">Hit Mod</span>
 								</div>
 								<div class="cell braced apply-button">
 									<div class="popup">
@@ -15336,6 +15344,9 @@ visualize what it will look like in chat.
 									<div class="cell fire-up-dwn-distance">
 										<input type="number" step="1" value="0" name="attr_firing_elevation" title="Macro: @{NAME|firing_elevation}" />
 									</div>
+									<div class="cell telescopic-vision">
+										<input type="number" step="1" value="0" name="attr_firing_telescopic_vision" title="Macro: @{NAME|firing_telescopic_vision}" />
+									</div>
 									<div class="cell new-range">
 										<input type="number" step="1" value="0" min="0" name="attr_firing_new_range" readonly="readonly" title="Macro: @{NAME|firing_new_range}" />
 									</div>
@@ -15355,11 +15366,11 @@ visualize what it will look like in chat.
 									<div class="cell size">
 										<input type="number" step="1" value="0" name="attr_firing_size_mod" title="Macro: @{NAME|firing_size_mod}" />
 									</div>
-									<div class="cell hit-mod">
-										<input type="number" step="1" value="0" name="attr_firing_hit_mod" readonly="readonly" title="Macro: @{NAME|firing_hit_mod}" />
-									</div>
 									<div class="cell braced roll-modifiers centered">
 										<input type="checkbox" name="attr_firing_braced" value="1" title="Macro: @{NAME|firing_braced}">
+									</div>
+									<div class="cell hit-mod">
+										<input type="number" step="1" value="0" name="attr_firing_hit_mod" readonly="readonly" title="Macro: @{NAME|firing_hit_mod}" />
 									</div>
 									<div class="cell braced reset apply-button">
 										<button type="action" name="act_apply_firing_modifiers" class="reset"><span data-i18n="apply-label">Apply</span></button>
@@ -23497,7 +23508,7 @@ Select the indent level of the spell. This is handy to help show the spell belon
 							<div class="standard-tooltip">
 								<h4><span data-i18n="abbreviation-accuracy-label">Acc</span></h4>
 								<span class="tooltiptext">
-									<span data-i18n="accuracy-bonus-tooltip">Accuracy</span>
+									<span data-i18n="accuracy-tooltip">Accuracy</span>
 								</span>
 							</div>
 						</div>
@@ -28061,8 +28072,13 @@ For more information, see B409.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.24.2 -->
-			 <ul>
+			<!-- current version notes: 2.24.3 -->
+			<ul>
+				<li><b>NEW:</b> Add scope/telescopic field to Range Calculator Tool.</li>
+			</ul>
+
+			<h4>Version: 2.24.2</h4>
+			<ul>
 				<li><b>BUGFIX:</b> Fix B269 dice/add conversion logic. Reported by Captain Joy.</li>
 			</ul>
 
@@ -33826,9 +33842,9 @@ B378
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.24.2";
+	const version = "2.24.3";
 	
-	const latestChangesDate = "2/28/2026";
+	const latestChangesDate = "5/14/2026";
 	
 	let modCascade = true;
 	
@@ -39993,6 +40009,7 @@ B378
 				"firing_speed_difference": 0,
 				"firing_size_mod": 0,
 				"firing_elevation": 0,
+				"firing_telescopic_vision": 0,
 				"firing_acc": 0,
 				"firing_braced": 0,
 				"firing_aiming_bonus": 0,
@@ -40002,7 +40019,7 @@ B378
 	}
 	
 	// Range Calculator
-	on('change:firing_distance change:firing_speed_difference change:firing_size_mod change:firing_elevation change:firing_acc change:firing_aiming_bonus change:firing_rof change:firing_braced', function (event) {
+	on('change:firing_distance change:firing_speed_difference change:firing_size_mod change:firing_elevation change:firing_telescopic_vision change:firing_acc change:firing_aiming_bonus change:firing_rof change:firing_braced', function (event) {
 	
 		updateRangeModifier("calculator");
 	
@@ -40027,6 +40044,7 @@ B378
 			"firing_speed_difference",
 			"firing_size_mod",
 			"firing_elevation",
+			"firing_telescopic_vision",
 			"firing_acc",
 			"firing_aiming_bonus",
 			"firing_rof",
@@ -40036,26 +40054,30 @@ B378
 	
 		getAttrs(fields, function (values) {
 	
-			let linearDistance = Number(values.firing_distance);
+			let linearDistance = Number(values.firing_distance) || 0;
 	
-			let sizeMod = Number(values.firing_size_mod);
+			let sizeMod = Number(values.firing_size_mod) || 0;
 	
 			let characterSize = Number(values.size) || 0;
 	
 			// calculate the final size modifier
 			sizeMod = sizeMod + characterSize;
 	
-			let speed = Number(values.firing_speed_difference);
+			let speed = Number(values.firing_speed_difference) || 0;
 	
-			let elevation = Number(values.firing_elevation);
+			let elevation = Number(values.firing_elevation) || 0;
 	
-			let acc = Number(values.firing_acc);
+			let acc = Number(values.firing_acc) || 0;
 	
-			let aiming = Number(values.firing_aiming_bonus);
+			let aiming = Number(values.firing_aiming_bonus) || 0;
 
-			let braced = Number(values.firing_braced);
+			let telescopicVision = Number(values.firing_telescopic_vision) || 0;
+
+			let telescopicVisionRangeOffsetModifier = telescopicVision * 2;
 	
-			let rof = Number(values.firing_rof);
+			let braced = Number(values.firing_braced) || 0;
+	
+			let rof = Number(values.firing_rof) || 1;
 	
 			let rofModifier = getRateOfFireModifier(rof);
 	
@@ -40099,7 +40121,15 @@ B378
 			finalSpeedRangeValue = rangeToTarget + speed;
 	
 			let rangeModifier = getModBySpeedRange(finalSpeedRangeValue);
-	
+
+			// offset the telescopic vision modifier to the rangeModifier
+			rangeModifier = rangeModifier + telescopicVisionRangeOffsetModifier;
+
+			// if rangeModifier is greater than 0, set it to 0
+			if (rangeModifier > 0) {
+				rangeModifier = 0;
+			}
+
 			// add in size modifier
 			let hitModifier = rangeModifier + sizeMod + acc + aiming + rofModifier + braced;
 	
@@ -40108,39 +40138,31 @@ B378
 			if (applyTo == "tool") {
 	
 				if (acc) {
-	
 					rangedRollModSummary += `+${acc} ACC\n`;
-	
 				}
 	
 				if (aiming) {
-	
 					rangedRollModSummary += `+${aiming} Aiming\n`;
-	
 				}
 	
 				if (braced) {
-	
 					rangedRollModSummary += `+${braced} Braced\n`;
-	
 				}
 	
 				if (rofModifier) {
-	
 					rangedRollModSummary += `+${rofModifier} RoF [${rof} shots fired]\n`;
-	
 				}
 	
 				if (rangeModifier) {
-	
 					rangedRollModSummary += `${rangeModifier} Speed/Range\n`;
-	
+				}
+
+				if (telescopicVisionRangeOffsetModifier) {
+					rangedRollModSummary += `+${telescopicVisionRangeOffsetModifier} Telescopic Vision Range Offset\n`;
 				}
 	
 				if (sizeMod) {
-	
 					rangedRollModSummary += `${sizeMod} Size Modifier\n`;
-	
 				}
 
 				let hitModifierStatus = "neutral";
