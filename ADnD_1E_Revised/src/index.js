@@ -3382,9 +3382,10 @@ on('change:repeating_weapon:weapon_attack_type', async (eventInfo) => {
 // HP Calcs
 const calcHP = async () => {
   // clog('HP re-calculated');
-  const v = await getAttrsAsync(['hitpoints', 'hitpoints_max', 'sync_hp_flag', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class']);
+  const v = await getAttrsAsync(['hitpoints', 'hitpoints_max', 'sync_hp_flag', 'toggle_npc', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class']);
   const output = {};
-  const syncHpFlag = int(v.sync_hp_flag);
+  const isMonster = int(v.toggle_npc); // monster
+  const syncHpFlag = isMonster === 1 ? 0 : int(v.sync_hp_flag);
   const hitPointsMax = int(v.hitpoints_max);
   const hitpoints_1_class = Math.max(0, int(v.hitpoints_1_class));
   const hitpoints_2_class = Math.max(0, int(v.hitpoints_2_class));
@@ -3403,13 +3404,15 @@ const calcHP = async () => {
   output.hitpoints_class_total = totalClassHP;
   output.hp_quotient = numberOfClasses;
   output.hitpoints_total = totalHP;
-  output.hitpoints_max = syncHpFlag ? Math.round(totalHP) : hitPointsMax;
+  // output.hitpoints_max = syncHpFlag ? Math.round(totalHP) : hitPointsMax;
   // no longer needed. decimal is now shown with multi-class hitpoints_total
   output.hitpoints_remainder_total = remainder;
+  output.hitpoints_max = syncHpFlag ? Math.round(totalHP) : hitPointsMax;
+  output.sync_hp_flag = syncHpFlag;
   await setAttrsAsync(output, {silent: true});
 };
 
-on('change:sync_hp_flag change:hitpoints change:hitpoints_max change:hitpoints_1_class change:hitpoints_2_class change:hitpoints_3_class', async (eventInfo) => {
+on('change:toggle_npc change:sync_hp_flag change:hitpoints change:hitpoints_max change:hitpoints_1_class change:hitpoints_2_class change:hitpoints_3_class', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   await calcHP();
 });
@@ -3438,7 +3441,7 @@ const calcAC = async (recalc) => {
   const output = {};
   const armorClass = int(v.armorclass);
   const isMonster = int(v.toggle_npc); // monster
-  let syncAcFlag = isMonster === 1 ? 0 : int(v.sync_ac_flag);
+  const syncAcFlag = isMonster === 1 ? 0 : int(v.sync_ac_flag);
   const armorRatingFlag = int(v.armor_rating_flag);
   const armorShield_mod = int(v.armorshield_mod) * -1;
   const armorOther_mod = int(v.armorother_mod) * -1;
