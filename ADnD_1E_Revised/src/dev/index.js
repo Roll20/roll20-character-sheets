@@ -3429,6 +3429,7 @@ const calcAC = async (recalc) => {
     'autocalc_ac',
     'current_encumbrance_move',
     'sync_ac_flag',
+    'toggle_npc',
   ]);
   const autoCalcAcFlag = int(v.autocalc_ac);
   if (autoCalcAcFlag + recalc === 0) return;
@@ -3436,7 +3437,8 @@ const calcAC = async (recalc) => {
   // Or sync is on and an armor Δ detected = continue
   const output = {};
   const armorClass = int(v.armorclass);
-  const syncAcFlag = int(v.sync_ac_flag);
+  const isMonster = int(v.toggle_npc); // monster
+  let syncAcFlag = isMonster === 1 ? 0 : int(v.sync_ac_flag);
   const armorRatingFlag = int(v.armor_rating_flag);
   const armorShield_mod = int(v.armorshield_mod) * -1;
   const armorOther_mod = int(v.armorother_mod) * -1;
@@ -3627,11 +3629,12 @@ const calcAC = async (recalc) => {
   output.armorclass_combined_shield_mod_magic_inverted = combinedShieldModMagic_add_sign;
   output.armorclass_total = totalAC;
   output.armorclass = syncAcFlag ? totalAC : armorClass;
+  output.sync_ac_flag = syncAcFlag;
   await setAttrsAsync(output, {silent: true});
 };
 
 on(
-  'change:armor_details_show change:armor_rating_flag change:sync_ac_flag change:autocalc_ac change:unarmored change:armortype change:armortype2 change:armorshield change:armorhelmet change:armorother change:armorother2 change:armorother3 change:armorother4 change:armorother5 change:armorother6 change:armorclass_mod change:armorclass_magic change:armorbonus change:armorbonus_toggle change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorother_worn change:armorother2_worn change:armorother3_worn change:armorother4_worn change:armorother5_worn change:armorother6_worn change:armortype_base change:armortype2_base change:armorshield_base change:armorother_base change:armorother2_base change:armorother3_base change:armorother4_base change:armorother5_base change:armorother6_base change:unarmored_base change:armortype_ac change:armortype2_ac change:armorshield_ac change:armorhelmet_ac change:armorother_ac change:armorother2_ac change:armorother3_ac change:armorother4_ac change:armorother5_ac change:armorother6_ac change:unarmored_ac change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic clicked:calcac',
+  'change:armor_details_show change:armor_rating_flag change:toggle_npc change:sync_ac_flag change:autocalc_ac change:unarmored change:armortype change:armortype2 change:armorshield change:armorhelmet change:armorother change:armorother2 change:armorother3 change:armorother4 change:armorother5 change:armorother6 change:armorclass_mod change:armorclass_magic change:armorbonus change:armorbonus_toggle change:unarmored_worn change:armortype_worn change:armortype2_worn change:armorshield_worn change:armorhelmet_worn change:armorother_worn change:armorother2_worn change:armorother3_worn change:armorother4_worn change:armorother5_worn change:armorother6_worn change:armortype_base change:armortype2_base change:armorshield_base change:armorother_base change:armorother2_base change:armorother3_base change:armorother4_base change:armorother5_base change:armorother6_base change:unarmored_base change:armortype_ac change:armortype2_ac change:armorshield_ac change:armorhelmet_ac change:armorother_ac change:armorother2_ac change:armorother3_ac change:armorother4_ac change:armorother5_ac change:armorother6_ac change:unarmored_ac change:armorshield_mod change:armorother_mod change:armorother2_mod change:armorother3_mod change:armorother4_mod change:armorother5_mod change:armorother6_mod change:armortype_magic change:armortype2_magic change:armorshield_magic change:armorhelmet_magic change:armorother_magic change:armorother2_magic change:armorother3_magic change:armorother4_magic change:armorother5_magic change:armorother6_magic clicked:calcac',
   async (eventInfo) => {
     // const thisEvent = eventInfo.sourceAttribute === undefined ? 'sheet opened' : eventInfo.sourceAttribute;
     const triggerEvent = eventInfo.triggerName;
