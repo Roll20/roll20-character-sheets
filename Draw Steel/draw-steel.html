@@ -4890,7 +4890,16 @@
 		const damagePerSurge = parseInt(attrs.surge_damage) || 0;
 	
 		if (type === 'damage' && available > 0) {
-			const query = `?{${getTranslationByKey('how-many-surges')}|1|2|3}`;
+		
+			const maxSurges = Math.min(available, 3);
+			
+			const options = [];
+			for (let i = 1; i <= maxSurges; i++) {
+				options.push(i);
+			}
+			const queryOptions = options.length > 0 ? options.join('|') : '0';
+			
+			const query = (available > 1) ? `?{${getTranslationByKey('how-many-surges')}|${queryOptions}}}` : '1';
 			const template = `@{wtype}&{template:${ROLLTEMPLATES.SIMPLE}} {{charactername=@{character_name}}} {{name=^{surges}}} {{text=^{roll-surge-damage}}} {{rolltitle=[[${query}]] ^{surges}}} {{roll=[[([[${query}]]*${damagePerSurge})]] ^{surges-damage}}}`;
 	
 			startRoll(template, ({ rollId, results }) => {
