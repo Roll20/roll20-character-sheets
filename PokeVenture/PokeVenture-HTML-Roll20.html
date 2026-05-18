@@ -204,7 +204,7 @@ function updateMoveSTAB(rowId) {
 
 <input type="hidden" name="attr_para_dex"  disabled="true"/>
 
-<input type="hidden" name="attr_hitc_calc"   value="8 + (@{DEXTERITY_calc}) + (@{evasion} * 4)" disabled="true"/>
+<input type="hidden" name="attr_hitc_calc"   value="8 + @{hitcmod} + (@{DEXTERITY_calc}) + (@{evasion} * 4)" disabled="true"/>
 
 <input type="hidden" name="attr_hp_calc"   value="@{hp_base} + (@{hp_rank} * 2) + (@{hpup} * 2)" disabled="true"/>
 
@@ -851,6 +851,11 @@ on('change:creature_mode', function(eventInfo) {
                             <input type="number" name="attr_hitc" title="@{hitc}" value="@{hitc_calc} - @{para_dex}" disabled="true"/>
                             <span title="">Current</span>
                         </span>
+                         <strong>/</strong>
+                        <span class="field-labeled">
+                            <input type="number" name="attr_hitcmod" title="@{hitcmod}" value="0" />
+                            <span title="">Flat Mod</span>
+                        </span>
                     </div>
                     <div class="hp-will">
                         <strong style="display:inline-block;width:120px;text-align:right;">EP</strong>
@@ -1106,19 +1111,16 @@ on('change:creature_mode', function(eventInfo) {
                                         <option value="0">-</option>
                                         <option value="@{Athletics}">Athletics</option>
                                             <option value="@{Finesse}">Finesse</option>
-                                            <option value="@{deception}">Deception</option>
                                             <option value="@{science}">Science</option>
-                                            <option value="@{nature}">Nature</option>
+                                            <option value="@{Speech}">Speech</option>
                                             <option value="@{channel}">Channel</option>
                                             <option value="@{performance}">Performance</option>
-                                            <option value="@{intimidation}">Intimidation</option>
                                             <option value="@{medicine}">Medicine</option>
                                             <option value="@{insight}">Insight</option>
                                             <option value="@{alert}">Alert</option>
                                             <option value="@{stealth}">Stealth</option>
-                                            <option value="@{empathy}">Empathy</option>
                                             <option value="@{lore}">Lore</option>
-                                            <option value="@{custom}">Custom</option>
+                                            <option value="@{Drive}">Drive</option>
                                     </select>
                                     <span title="">Skill</span>
                                 </span>
@@ -1261,16 +1263,12 @@ on('change:creature_mode', function(eventInfo) {
                         <input type="number" name="attr_finesse" title="@{finesse}" min="0" value="0" max="10" />
                     </div>
                     <div>
-                        <strong>Deception</strong>
-                        <input type="number" name="attr_deception" title="@{deception}" min="0" value="0" max="10" />
-                    </div>
-                    <div>
                         <strong>Science</strong>
                         <input type="number" name="attr_science" title="@{science}" min="0" value="0" max="10" />
                     </div>
                      <div>
-                        <strong>Nature</strong>
-                        <input type="number" name="attr_nature" title="@{nature}" min="0" value="0" max="10" />
+                        <strong>Speech</strong>
+                        <input type="number" name="attr_speech" title="@{speech}" min="0" value="0" max="10" />
                     </div>
                 </div>
                 <div class="skills-col">
@@ -1281,10 +1279,6 @@ on('change:creature_mode', function(eventInfo) {
                     <div>
                         <strong>Performance</strong>
                         <input type="number" name="attr_performance" title="@{performance}" min="0" value="0" max="10" />
-                    </div>
-                    <div>
-                        <strong>Intimidation</strong>
-                        <input type="number" name="attr_intimidation" title="@{intimidation}" min="0" value="0" max="10" />
                     </div>
                     <div>
                         <strong>Medicine</strong>
@@ -1305,16 +1299,12 @@ on('change:creature_mode', function(eventInfo) {
                         <input type="number" name="attr_stealth" title="@{stealth}" min="0" value="0" max="10" />
                     </div>
                     <div>
-                        <strong>Empathy</strong>
-                        <input type="number" name="attr_empathy" title="@{empathy}" min="0" value="0" max="10" />
-                    </div>
-                    <div>
                         <strong>Lore</strong>
                         <input type="number" name="attr_lore" title="@{lore}" min="0" value="0" max="10" />
                     </div>
                     <div>
-                        <input type="text" name="attr_extra_custom_name" title="@{extra_custom_name}" placeholder="Custom" style="margin-left:20px;text-align:right;width:80px;border:none;border-bottom:2px;" />
-                        <input type="number" name="attr_custom" title="@{custom}" min="0" value="0" max="10" />
+                        <strong>Drive</strong>
+                        <input type="number" name="attr_drive" title="@{drive}" min="0" value="0" max="10" />
                     </div>
                 </div>
             </div>
@@ -1672,7 +1662,7 @@ on('change:creature_mode', function(eventInfo) {
                                 <span class="field-labeled">
                                 <strong>+</strong>
                                 <span class="field-labeled" style="width: 70px; text-align:center" >
-                                    <input type="number" name="attr_move_accuracy_mod" value="0"/>
+                                    <input type="number" name="attr_move_accuracy_mod" min="-10" value="0" />
                                     <span>Flat Mod</span>
                                 </span>
                             </div>
@@ -1692,12 +1682,12 @@ on('change:creature_mode', function(eventInfo) {
                                     </span>
                                     <strong>+</strong>
                                     <span class="field-labeled" style="width:70px;text-align:center" >
-                                        <input type="number" name="attr_move_power" min="0" value="0"  />
+                                        <input type="number" name="attr_move_power" value="0"  />
                                         <span>Power</span>
                                     </span>
                                     <strong>+</strong>
                                     <span class="field-labeled" style="width:70px;text-align:center" >
-                                        <input type="number" name="attr_move_flatmod" min="0" value="0"  />
+                                        <input type="number" name="attr_move_flatmod" value="0"  />
                                         <span>Flat Mod</span>
                                     </span>
                                 </span>
