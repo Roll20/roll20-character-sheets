@@ -1,12 +1,11 @@
-# Medievo_Oscuro
-Medievo Oscuro Roll20 character sheet.
+# ABBADON
+Abbadon character sheet. 
 
-We recomend to download and install Morpheus font. 
+Abbadon is a roleplaying game from Lost Haven Art. The game system uses cards. You can use the default Roll20 cards or purchase the custom card pack from the Marketplace.
 
-Hoja del superviviente lista para jugar a Medievo Oscuro, el juego de rol infernal, en Roll20.
-
-Recomendamos descargar e instalar la fuente Morpheus.
+To use the character sheet we recomend to download and install the next fonts from [Gogle Fonts](https://fonts.google.com/): Lora, Metal Mania, Rubik Wet Paint.
 
 More information about the game / Más información sobre el juego
 
-[Medievo Oscuro](http://medievooscuro.es/).
+[ABBADON - LOST HAVEN ART](https://losthavenart.com/).
+
