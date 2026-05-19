@@ -3205,6 +3205,15 @@
 							</div>
 							<textarea class="ability-malice" data-i18n-placeholder="malice" name="attr_ability_malice" spellcheck="false"></textarea>
 						</div>
+						<div class="ability-toggle-group">
+							<input type="checkbox" name="attr_has_spend" />
+							<label data-i18n="spend"></label>
+							<div class="grid-span-full">
+								<label data-i18n="ability-cost"></label>
+								<input type="text" name="attr_ability_spend_cost" />
+							</div>
+							<textarea class="ability-malice" data-i18n-placeholder="spend" name="attr_ability_spend" spellcheck="false"></textarea>
+						</div>
 					</div>			
 				</div>
 				<div class="ability-card -togglehide">
@@ -3280,7 +3289,11 @@
 						<label><span name="attr_ability_cost"></span>&nbsp;<span data-i18n="malice"></span>:</label>
 						<span class="ability-malice" name="attr_ability_malice"></span>
 					</div>
-				
+					<input type="hidden" name="attr_has_spend" />					
+					<div class="npc-ability-malice grid-span-full">
+						<label><span data-i18n="spend"></span>&nbsp;<span name="attr_ability_spend_cost"></span>:</label>
+						<span class="ability-malice" name="attr_ability_spend"></span>
+					</div>
 				</div>
 			</fieldset>
 		</div>
@@ -6227,7 +6240,7 @@
 				let queryString = `!{{template:default}}{{ask=![[?{${getTranslationByKey('import-monster')}|${getTranslationByKey('import-select-prompt')},-1`;
 				for (const [index, monster] of data.monsters.entries()) {
 					
-					queryString += '|' + monster.name + ', ' + index.toString();
+					queryString += '|' + monster.name + ' (' + getTranslationByKey('level') + ' ' + monster.level + '), ' + index.toString();
 				}
 				queryString += '}]]}}';
 				
@@ -6613,11 +6626,11 @@
 				}
 				return acc;
 			}, {});
-		
+
 		const abilityFeatures = data.features
 			.filter(f => f.type === FEATURE_TYPES.ABILITY)
 			.reduce((acc, f) => ({ ...acc, ...processMonsterAbility(f.data.ability) }), {});
-		
+
 		const maliceFeatures = malice ? importMalice(malice) : [];
 		
 		const minionTag = roleString.includes('Minion') ? getTranslationByKey('minion-text') : '';
