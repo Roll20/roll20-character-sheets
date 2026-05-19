@@ -1867,7 +1867,7 @@ versionator = async (current_version, final_version) => {
     return await recalcToHitACadj(1.692, final_version);
   }
   if (current_version < 1.693) {
-    return await checkOpenDoors(1.694, final_version);
+    return await checkOpenDoors(1.695, final_version);
   }
   // All updates completed
   const finalCheck = await getAttrsAsync(['sheet_version', 'old_character']);
@@ -1886,7 +1886,7 @@ versionator = async (current_version, final_version) => {
 };
 
 on('sheet:opened', async () => {
-  const final_version = 1.694;
+  const final_version = 1.695; // must be >= last update versionator()
   const v = await getAttrsAsync(['sheet_version', 'old_character']);
   let current_version = parseFloat(v.sheet_version) || 0;
   // New Sheet?
@@ -2703,13 +2703,16 @@ const createAttack = async (id) => {
     `repeating_equipment_${id}_equipment_weapon_rateoffire`,
     `repeating_equipment_${id}_equipment_weapon_range`,
     `repeating_equipment_${id}_equipment_quantity`,
+    `repeating_equipment_${id}_equipment_quantity_max`,
+    `repeating_equipment_${id}_equipment_current`,
+    `repeating_equipment_${id}_equipment_current_max`,
     `repeating_equipment_${id}_equipment_description`,
   ]);
   const output = {};
   const newID = generateUniqueRowID();
   // clog(`Creating a new attack newID:${newID}`);
   output[`repeating_weapon_${newID}_weapon_name`] = v[`repeating_equipment_${id}_equipment_item`];
-  output[`repeating_weapon_${newID}_weapon_type`] = int(v[`repeating_equipment_${id}_equipment_weapon_type`]);
+  output[`repeating_weapon_${newID}_weapon_attack_type`] = int(v[`repeating_equipment_${id}_equipment_weapon_type`]);
   output[`repeating_weapon_${newID}_weapon_speed`] = v[`repeating_equipment_${id}_equipment_weapon_speed`];
   output[`repeating_weapon_${newID}_weapon_length`] = v[`repeating_equipment_${id}_equipment_weapon_length`];
   output[`repeating_weapon_${newID}_weapon_space`] = v[`repeating_equipment_${id}_equipment_weapon_space`];
@@ -2719,12 +2722,14 @@ const createAttack = async (id) => {
   output[`repeating_weapon_${newID}_weapon_attackdmgtype`] = v[`repeating_equipment_${id}_equipment_weapon_attackdmgtype`];
   output[`repeating_weapon_${newID}_weapon_rateoffire`] = v[`repeating_equipment_${id}_equipment_weapon_rateoffire`];
   output[`repeating_weapon_${newID}_weapon_range`] = v[`repeating_equipment_${id}_equipment_weapon_range`];
+  output[`repeating_weapon_${newID}_weapon_ammo`] = int(v[`repeating_equipment_${id}_equipment_current`]);
+  output[`repeating_weapon_${newID}_weapon_ammo_max`] = int(v[`repeating_equipment_${id}_equipment_current_max`]);
   output[`repeating_weapon_${newID}_weapon_quantity`] = int(v[`repeating_equipment_${id}_equipment_quantity`]);
   output[`repeating_weapon_${newID}_weapon_notes`] = v[`repeating_equipment_${id}_equipment_description`];
   // set new row with equip values then set attack defaults and damage macros
   await setAttrsAsync(output, {silent: true});
   await setWeapons(newID);
-  damageMacro(newID);
+  await damageMacro(newID);
 };
 
 const generateArmorDetailsArray = async () => {
@@ -3094,7 +3099,7 @@ const getToHitRowUpdate = async (v, id, isLocal) => {
   const thac0Macro = `
   &{template:attacks-table} {{color=@{color_option}}} {{ToHitAC-10=[[ @{thac0-10} ]]}} {{ToHitAC-9=[[ @{thac0-9} ]]}} {{ToHitAC-8=[[ @{thac0-8} ]]}} {{ToHitAC-7=[[ @{thac0-7} ]]}} {{ToHitAC-6=[[ @{thac0-6} ]]}} {{ToHitAC-5=[[ @{thac0-5} ]]}} {{ToHitAC-4=[[ @{thac0-4} ]]}} {{ToHitAC-3=[[ @{thac0-3} ]]}} {{ToHitAC-2=[[ @{thac0-2} ]]}} {{ToHitAC-1=[[ @{thac0-1} ]]}} {{ToHitAC0=[[ @{thac00} ]]}} {{ToHitAC1=[[ @{thac01} ]]}} {{ToHitAC2=[[ @{thac02} ]]}} {{ToHitAC3=[[ @{thac03} ]]}} {{ToHitAC4=[[ @{thac04} ]]}} {{ToHitAC5=[[ @{thac05} ]]}} {{ToHitAC6=[[ @{thac06} ]]}} {{ToHitAC7=[[ @{thac07} ]]}} {{ToHitAC8=[[ @{thac08} ]]}} {{ToHitAC9=[[ @{thac09} ]]}} {{ToHitAC10=[[ @{thac010} ]] }}`;
   if (isLocal) {
-    clog(`getToHitRowUpdate: USE LOCAL CHANGE`);
+    // clog(`getToHitRowUpdate: USE LOCAL CHANGE`);
     if (thishitTableSelect === 2) {
       thishitTableMacro = noMacro;
     } else {
@@ -3107,7 +3112,7 @@ const getToHitRowUpdate = async (v, id, isLocal) => {
       }
     }
   } else {
-    clog(`getToHitRowUpdate: USE GLOBAL CHANGE`);
+    // clog(`getToHitRowUpdate: USE GLOBAL CHANGE`);
     // use global
     if (hideToHit) {
       thishitTableMacro = noMacro;
