@@ -440,6 +440,953 @@
   color: var(--col-yellow);
 }
 
+.version-mode[value=legacy] ~ .sheet {
+  /* ==== Overlay infrastructure (legacy editors only) =====
+     Pre-3.0 overlays use the URL-fragment `:target` mechanism to open. Scope
+     these rules to `[id^="legacy-edit-"]` so they DON'T clobber the new
+     builder's complications/conditions/movement overlays (which use a
+     JS-managed `.is-open` class and are visible in legacy mode too). */
+}
+.version-mode[value=legacy] ~ .sheet .overlay[id^=legacy-edit-] {
+  display: none;
+  opacity: 0;
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(4px) sepia(50%);
+  z-index: 600;
+}
+.version-mode[value=legacy] ~ .sheet .overlay[id^=legacy-edit-]:target {
+  display: block;
+  opacity: 1;
+  animation: fade-in 200ms ease;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.version-mode[value=legacy] ~ .sheet .overlay[id^=legacy-edit-] .btn_exit {
+  display: flex;
+  position: fixed;
+  padding-top: 30px;
+  inset: 0;
+  font-size: 12rem;
+  line-height: 4rem;
+  color: var(--col-white);
+  text-align: center;
+  text-shadow: var(--fx-stroke2);
+  justify-content: center;
+  z-index: -1;
+}
+.version-mode[value=legacy] ~ .sheet .edit-icon .content a h1::after,
+.version-mode[value=legacy] ~ .sheet .dice-icon .content button::after,
+.version-mode[value=legacy] ~ .sheet .delete-icon::after,
+.version-mode[value=legacy] ~ .sheet .calculator-icon a h1::after {
+  content: "p";
+  position: absolute;
+  opacity: 0;
+  right: 0;
+  top: 50%;
+  height: 1em;
+  aspect-ratio: 1;
+  font-family: "pictos";
+  font-size: 2.5rem;
+  color: var(--col-white);
+  text-transform: none;
+  text-align: center;
+  background: linear-gradient(var(--col-green), var(--col-green)), var(--bg-halftone), var(--col-green);
+  background-blend-mode: color, multiply, normal;
+  background-size: 200px;
+  background-repeat: no-repeat;
+  border: 2px solid var(--col-black);
+  filter: drop-shadow(0.2em 0.2em 0px var(--col-black));
+  border-radius: 100%;
+  transform: translateX(50%);
+  transition: all 200ms var(--math-pop);
+}
+.version-mode[value=legacy] ~ .sheet .calculator-icon:hover a h1::after {
+  content: "o";
+  font-family: "Pictos Custom";
+}
+.version-mode[value=legacy] ~ .sheet .delete-icon::after {
+  content: "#";
+  font-size: 1em;
+}
+.version-mode[value=legacy] ~ .sheet .dice-icon .content h1 button::after {
+  content: "0";
+  font-family: "dicefontd20";
+}
+.version-mode[value=legacy] ~ .sheet .edit-icon:hover .content a h1::after,
+.version-mode[value=legacy] ~ .sheet .dice-icon:hover .content button::after,
+.version-mode[value=legacy] ~ .sheet .calculator-icon:hover a h1::after {
+  opacity: 1;
+  transform: translate(150%, -50%);
+}
+.version-mode[value=legacy] ~ .sheet .delete-icon:hover::after {
+  opacity: 1;
+  transform: translate(100%, -50%);
+}
+.version-mode[value=legacy] ~ .sheet .edit-icon:hover .content a h1,
+.version-mode[value=legacy] ~ .sheet .dice-icon:hover .content h1 button span {
+  color: var(--col-green);
+}
+.version-mode[value=legacy] ~ .sheet {
+  /* ==== Section Powers / Edit Powers ===== */
+}
+.version-mode[value=legacy] ~ .sheet .section-powers {
+  grid-area: main;
+  min-width: 200px;
+  border-image: unset;
+  background: linear-gradient(to bottom, var(--col-option), var(--col-black)), var(--bg-circuit), var(--col-option);
+  background-size: 200px;
+  background-blend-mode: multiply, overlay, normal;
+  transform: scale(1);
+  box-shadow: inset 0 0 40px var(--col-black-t), inset 0 0 80px var(--col-black-t), inset 0 0 160px var(--col-black-t), inset 0 0 16px var(--col-option), inset 0 0 8px var(--col-option), 0 4px 12px var(--col-option), 0 4px 4px var(--col-option);
+  border: 4px solid var(--col-option);
+  z-index: 400;
+  transition: unset;
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers {
+  --col-stroke: var(--col-black);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 30%;
+  top: 100px;
+  left: 10%;
+  z-index: 0;
+  height: 80%;
+  overflow: scroll;
+  overflow-x: hidden;
+  padding: 1rem;
+  padding-right: 2rem;
+  padding-bottom: 2rem;
+  grid-template-columns: 1fr 2fr 1fr;
+  border: 1rem solid var(--col-black);
+  border-right-width: 0;
+  border-radius: 2rem 0 0 2rem;
+  background: linear-gradient(to bottom, transparent, var(--col-purple)), linear-gradient(var(--col-black), var(--col-black)), var(--bg-circuit), var(--col-purple);
+  background-size: 200px;
+  background-blend-mode: normal, lighten, darken, normal;
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers .repcontainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers [class|=element] {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  background: var(--col-white);
+  border: 4px solid var(--col-black);
+  border-radius: 1rem 0 1rem 0;
+  padding: 4px 10px;
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers [class|=element] > span {
+  display: block;
+  padding: 0 4px;
+  flex: 1;
+  font-family: var(--font-header);
+  font-size: 14px;
+  background: var(--col-black);
+  color: var(--col-white);
+  transform: skew(-10deg);
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers [class|=element] label {
+  display: flex;
+  flex-direction: row-reverse;
+  position: relative;
+  flex-wrap: wrap;
+  align-items: center;
+  border: 0px solid var(--col-purple);
+  border-bottom-width: 2px;
+  color: var(--col-purple);
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers [class|=element] label:focus-within {
+  color: var(--col-blue);
+  background: var(--col-blue-t);
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers [class|=element] label:hover {
+  color: var(--col-blue);
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers [class|=element] input:not([type=checkbox]) {
+  position: absolute;
+  left: 0;
+  outline: 0px solid var(--col-purple);
+  border-bottom-width: 0px;
+  padding: 0 4px;
+  margin: 0 10px;
+  font-family: var(--font-normal);
+  font-size: 11px;
+  font-weight: bold;
+  text-align: left;
+  color: var(--col-black);
+  transition: outline 400ms ease;
+  width: calc(100% - 24px);
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers [class|=element] label:hover::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  transition: all 0ms ease;
+  background: var(--col-purple);
+  height: 2px;
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers [class|=element] label:first-of-type input {
+  font-size: 14px;
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers [class|=element] textarea {
+  background: var(--col-black);
+  font-family: var(--font-normal);
+  font-size: 10px;
+  font-weight: normal;
+  color: var(--col-white);
+  display: block;
+  height: 10em;
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers select {
+  position: absolute;
+  left: 0;
+  background: none;
+  border: 0px solid var(--col-blue-t);
+  width: calc(100% - 150px);
+  min-width: 80px;
+  padding: 0;
+  padding-left: 10px;
+  margin: 0;
+  font-size: 10px;
+  height: 20px;
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers select:focus {
+  outline: none;
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers select option {
+  color: var(--col-blue);
+  background: var(--col-black);
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers input[type=checkbox] + span {
+  display: flex;
+  padding: 0 18px;
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers input[type=checkbox] + span::after {
+  content: "";
+  display: block;
+  place-self: center;
+  height: 6px;
+  width: 6px;
+  box-sizing: border-box;
+  background: var(--col-white);
+  border: 1px solid var(--col-purple);
+  outline: 1px solid var(--col-white);
+  box-shadow: 0 0 0 3px var(--col-purple);
+  transform: rotate(45deg);
+}
+.version-mode[value=legacy] ~ .sheet .edit-powers input[type=checkbox]:checked + span::after {
+  background: var(--col-blue);
+}
+.version-mode[value=legacy] ~ .sheet .section-powers label {
+  cursor: pointer;
+}
+.version-mode[value=legacy] ~ .sheet .element-menu {
+  background: var(--col-yellow);
+}
+.version-mode[value=legacy] ~ .sheet [class$=powers] input.controller:not([value=menu]) ~ .element-menu,
+.version-mode[value=legacy] ~ .sheet [class$=powers] input.controller:not([value=vehicle]) ~ .element-vehicle,
+.version-mode[value=legacy] ~ .sheet [class$=powers] input.controller:not([value=power]) ~ .element-power,
+.version-mode[value=legacy] ~ .sheet [class$=powers] input.controller:not([value=gen_power]) ~ .element-gen_power,
+.version-mode[value=legacy] ~ .sheet [class$=powers] input.controller:not([value=alt_power]) ~ .element-alt_power,
+.version-mode[value=legacy] ~ .sheet [class$=powers] input.controller:not([value=dyn_power]) ~ .element-dyn_power,
+.version-mode[value=legacy] ~ .sheet [class$=powers] input.controller:not([value=general_fx]) ~ .element-general_fx,
+.version-mode[value=legacy] ~ .sheet [class$=powers] input.controller:not([value=attack_fx]) ~ .element-attack_fx,
+.version-mode[value=legacy] ~ .sheet [class$=powers] input.controller:not([value=movement_fx]) ~ .element-movement_fx,
+.version-mode[value=legacy] ~ .sheet [class$=powers] input.controller:not([value=sensory_fx]) ~ .element-sensory_fx,
+.version-mode[value=legacy] ~ .sheet [class$=powers] input.controller:not([value=text]) ~ .element-text {
+  display: none;
+}
+.version-mode[value=legacy] ~ .sheet {
+  /* ==== Display Powers (legacy preview panel) ===== */
+}
+.version-mode[value=legacy] ~ .sheet .display-powers h1,
+.version-mode[value=legacy] ~ .sheet .display-powers h1 span,
+.version-mode[value=legacy] ~ .sheet .display-powers h1::before,
+.version-mode[value=legacy] ~ .sheet .display-powers h2,
+.version-mode[value=legacy] ~ .sheet .display-powers h3 {
+  all: unset;
+  margin: auto 0;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers h1 span,
+.version-mode[value=legacy] ~ .sheet .display-powers h2 span {
+  font-size: 18px;
+  font-family: var(--font-comic);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers {
+  background: var(--col-white);
+  border-radius: 5px;
+  padding: 2px 0;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .repcontrol .repcontrol_add {
+  display: none !important;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers input[type=hidden][value=general] + div.element-attack_fx,
+.version-mode[value=legacy] ~ .sheet .display-powers input[type=hidden][value=general] + div.element-attack_fx * {
+  --col-option: var(--col-red);
+  --col-option-t: var(--col-red-t);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers input[type=hidden][value=alternative] + div.element-attack_fx,
+.version-mode[value=legacy] ~ .sheet .display-powers input[type=hidden][value=alternative] + div.element-attack_fx * {
+  --col-option: var(--col-blue);
+  --col-option-t: var(--col-blue-t);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers input[type=hidden][value=dynamic] + div.element-attack_fx,
+.version-mode[value=legacy] ~ .sheet .display-powers input[type=hidden][value=dynamic] + div.element-attack_fx * {
+  --col-option: var(--col-purple);
+  --col-option-t: var(--col-purple-t);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers h1 span {
+  color: var(--col-option);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers [class|=element] {
+  margin: 4px;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers [class*=power] summary {
+  display: flex;
+  position: relative;
+  justify-content: space-between;
+  height: 25px;
+  z-index: 1;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers h2 span {
+  color: var(--col-white);
+  position: relative;
+  padding: 0 2px;
+  font-family: var(--font-normal);
+  font-size: 11px;
+  z-index: 1;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .tag:not(:empty),
+.version-mode[value=legacy] ~ .sheet .display-powers input.tag[type=number] {
+  background: var(--col-black);
+  color: var(--col-white);
+  mix-blend-mode: overlay;
+  padding: 0px 6px;
+  border-radius: 20px;
+  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers input.tag[type=number] {
+  padding: 0;
+  width: 2ch;
+  font-family: var(--font-comic) !important;
+  font-size: 10px;
+  font-weight: 300;
+  align-self: flex-start;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-text:hover input[type=hidden][value] + h1 span {
+  color: var(--col-green);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-text input[type=hidden][value=on] + span {
+  display: none;
+}
+.version-mode[value=legacy] ~ .sheet .tag.rule:not(:empty) {
+  mix-blend-mode: multiply;
+  display: block;
+  margin: 4px;
+  line-height: 1em;
+}
+.version-mode[value=legacy] ~ .sheet .tag.__dc:not(:empty) {
+  mix-blend-mode: normal !important;
+}
+.version-mode[value=legacy] ~ .sheet .tag.__dc:not(:empty)::before {
+  content: "DC ";
+  color: var(--col-white);
+  font-size: 12px;
+  font-family: var(--font-comic);
+  mix-blend-mode: normal;
+}
+.version-mode[value=legacy] ~ .sheet .tag.__dmg:not(:empty) {
+  mix-blend-mode: normal !important;
+}
+.version-mode[value=legacy] ~ .sheet .tag.__dmg:not(:empty)::before {
+  content: "DMG ";
+  color: var(--col-white);
+  font-size: 12px;
+  font-family: var(--font-comic);
+}
+.version-mode[value=legacy] ~ .sheet .rank_display:not(:empty) {
+  position: absolute;
+  left: -24px;
+  top: -4px;
+  margin: 0 2px;
+  background: var(--col-yellow);
+  border: 2px solid var(--col-white);
+  border-radius: 100%;
+  height: 15px;
+  width: 15px;
+  font-family: var(--font-numbers);
+  font-size: 14px;
+  text-align: center;
+  line-height: 16px;
+  filter: drop-shadow(2px 2px 2px var(--col-black-t));
+}
+.version-mode[value=legacy] ~ .sheet button.rank_display span {
+  line-height: 1em;
+}
+.version-mode[value=legacy] ~ .sheet .charsheet .element-general_fx button.rank_display {
+  padding: 2px;
+  font-size: 14px;
+}
+.version-mode[value=legacy] ~ .sheet {
+  /* -------- Vehicle ------- */
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--col-white-t), var(--col-white)), linear-gradient(5deg, var(--col-black), rgb(50, 108, 89) 25%, rgb(79, 201, 161) 75%, rgb(255, 255, 255) 100%), var(--bg-circuit);
+  background-blend-mode: normal, lighten, normal;
+  background-size: 150px;
+  outline: 4px solid var(--col-white);
+  transform: skew(10deg);
+  z-index: -1;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle summary {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr auto 1fr;
+  grid-gap: 4px;
+  justify-content: space-between;
+  min-height: 120px;
+  margin-bottom: 14px;
+  z-index: 1;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle summary > div {
+  grid-column: 1/-1;
+  position: relative;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle summary > div input[type=number] {
+  position: absolute;
+  bottom: 0;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle button[type=roll],
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle label {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(var(--col-green-t), var(--col-green-t)), var(--bg-circle), var(--col-green);
+  background-blend-mode: screen, multiply, normal;
+  background-size: 200%;
+  background-position: center;
+  box-shadow: 0 0 0 2px var(--col-white);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle label {
+  display: flex;
+  justify-content: flex-end;
+  background: linear-gradient(var(--col-black), var(--col-black)), linear-gradient(var(--col-yellow-t), var(--col-yellow-t)), var(--bg-circle), var(--col-yellow);
+  background-blend-mode: lighten, darken, multiply, normal;
+  background-position: center;
+  background-size: 200px;
+  cursor: default;
+  padding: 4px 8px;
+  border-radius: 5px;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle label span {
+  color: var(--col-yellow);
+  line-height: 1;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle label span:first-of-type {
+  margin-right: 10px;
+  text-shadow: var(--fx-stroke);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle label span:last-of-type {
+  font-size: 16px;
+  text-shadow: var(--fx-stroke2);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle button[type=roll]:hover {
+  filter: hue-rotate(45deg) brightness(1.2);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle button span {
+  font-family: var(--font-header);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle button span:first-of-type {
+  position: relative;
+  z-index: 2;
+  --col-stroke: var(--col-white-t);
+  text-shadow: var(--fx-stroke);
+  bottom: -12px;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle button span:last-of-type {
+  position: absolute;
+  right: 10px;
+  top: 0;
+  font-size: 38px;
+  line-height: 1;
+  color: var(--col-white);
+  z-index: 1;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle h1 {
+  grid-column: 1/-1;
+  padding: 4px;
+  padding-right: 12px;
+  background: linear-gradient(to left, var(--col-black) 20%, var(--col-black) 50%, var(--col-black-t));
+  border-radius: 5px;
+  transform: skew(-25deg);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-vehicle h1 span {
+  float: right;
+  padding: 0 12px;
+  font-family: var(--font-header);
+  font-size: 28px;
+  line-height: 0.9em;
+  color: var(--col-black);
+  background: var(--gra-punch);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transform: skew(25deg);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers [class^=element] h1 {
+  width: 100%;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-power h1 {
+  z-index: 1;
+  width: calc(100% - 40px);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-text h1 {
+  width: auto;
+  max-width: 80%;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-power textarea {
+  border-color: transparent;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers h1 span {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-power h1 span {
+  --col-stroke: var(--col-yellow);
+  font-family: var(--font-header);
+  color: var(--col-white);
+  font-size: 2rem;
+  background: var(--gra-punch);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  padding: 0 2px;
+  z-index: 1;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-power::before {
+  content: "";
+  inset: 0;
+  left: -1rem;
+  right: -1rem;
+  position: absolute;
+  background: var(--col-black);
+  border: 2px solid var(--col-white);
+  transform: skew(-10deg);
+  z-index: 0;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers [class*=power] input[type=number],
+.version-mode[value=legacy] ~ .sheet .display-powers [class*=headquarter] div > input[type=number],
+.version-mode[value=legacy] ~ .sheet .display-powers [class*=vehicle] div > input[type=number] {
+  width: 40px;
+  background: var(--col-black);
+  border: 2px solid var(--col-yellow);
+  color: var(--col-white);
+  box-shadow: 0 0 0 2px var(--col-black);
+  z-index: 1;
+}
+.version-mode[value=legacy] ~ .sheet {
+  /* -------- Power Titles ------- */
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-gen_power,
+.version-mode[value=legacy] ~ .sheet .display-powers .element-alt_power,
+.version-mode[value=legacy] ~ .sheet .display-powers .element-dyn_power {
+  --col-option: var(--col-red);
+  background: var(--bg-halftone), var(--col-option);
+  background-blend-mode: multiply;
+  background-size: 300px;
+  background-repeat: no-repeat;
+  border: 2px solid var(--col-black);
+  border-radius: 0 10px;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-alt_power {
+  --col-option: var(--col-blue);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-dyn_power {
+  --col-option: var(--col-purple);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-gen_power h1 span,
+.version-mode[value=legacy] ~ .sheet .display-powers .element-alt_power h1 span,
+.version-mode[value=legacy] ~ .sheet .display-powers .element-dyn_power h1 span {
+  font-family: var(--font-header);
+  font-size: 2rem;
+  padding-left: 2rem;
+  color: var(--col-white);
+  --col-stroke: var(--col-black);
+  text-shadow: var(--fx-stroke2);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-gen_power textarea,
+.version-mode[value=legacy] ~ .sheet .display-powers .element-alt_power textarea,
+.version-mode[value=legacy] ~ .sheet .display-powers .element-dyn_power textarea {
+  margin: 4px;
+  width: calc(100% - 8px);
+  border-radius: 0 10px 0 10px;
+}
+.version-mode[value=legacy] ~ .sheet {
+  /* -------- Alt Power ------- */
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-alt_power input[type=checkbox] + span {
+  content: "";
+  margin: 0 4px;
+  width: 20px;
+  height: 5px;
+  align-self: center;
+  background: var(--col-black);
+  border: 2px solid var(--col-white-t);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-alt_power input[type=checkbox]:checked + span {
+  background: var(--col-green);
+}
+.version-mode[value=legacy] ~ .sheet {
+  /* -------- Attack fx ------- */
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-attack_fx {
+  padding: 2px;
+  background: var(--bg-halftone-w), var(--col-option-t);
+  background-blend-mode: multiply;
+  background-size: 300px;
+  background-repeat: no-repeat;
+  border: 2px solid var(--col-black);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-attack_fx h1 {
+  display: flex;
+  justify-content: space-between;
+  border: 2px solid var(--col-black);
+  background: var(--bg-halftone), var(--col-option);
+  background-blend-mode: multiply;
+  background-size: 300px;
+  background-repeat: no-repeat;
+  height: 20px;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-attack_fx h1::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: -8px;
+  height: 36px;
+  width: 50px;
+  background: var(--bg-pow);
+  background-size: 100% 100%;
+  filter: drop-shadow(-4px 0px 0px var(--col-white));
+  z-index: 1;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-attack_fx h1 span {
+  --col-stroke: var(--col-black);
+  padding: 0 6px;
+  font-family: var(--font-header);
+  color: var(--col-white);
+  text-shadow: var(--fx-stroke2);
+  font-size: 1.5rem;
+  z-index: 2;
+}
+.version-mode[value=legacy] ~ .sheet .element-attack_fx .edit_afflictions summary > span::before {
+  font-family: pictos;
+  content: "l";
+  text-transform: none;
+  padding: 0 4px;
+}
+.version-mode[value=legacy] ~ .sheet .element-attack_fx .edit_afflictions:hover summary span,
+.version-mode[value=legacy] ~ .sheet .element-attack_fx .edit_afflictions:hover summary span::before {
+  color: var(--col-green);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-attack_fx input[type=hidden][value="0"] + span {
+  display: none;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-attack_fx .display_condition {
+  cursor: default;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-attack_fx .display_condition:hover {
+  transform: skew(10deg);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-attack_fx input[type=hidden]:not([value]) + .section-Affliction,
+.version-mode[value=legacy] ~ .sheet .display-powers .element-attack_fx input[type=hidden][value=""] + .section-Affliction {
+  display: none;
+}
+.version-mode[value=legacy] ~ .sheet .element-attack_fx .section-Affliction {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-gap: 4px;
+  background: linear-gradient(var(--col-option-t), var(--col-option-t)), var(--bg-halftone-w);
+  background-size: 300px;
+  background-repeat: repeat, no-repeat;
+  border: 2px solid var(--col-white);
+  border-radius: 5px;
+  padding: 2px;
+}
+.version-mode[value=legacy] ~ .sheet .element-attack_fx .section-Affliction div:first-child {
+  display: flex;
+  flex-direction: column;
+  grid-gap: 4px;
+  text-shadow: var(--fx-stroke2);
+  background: linear-gradient(var(--col-option), var(--col-option)), var(--bg-halftone-w), var(--col-black);
+  background-blend-mode: darken, lighten, normal;
+  background-size: 250px;
+  background-repeat: no-repeat;
+  padding: 4px;
+  border: 2px solid var(--col-black);
+  border-radius: 5px;
+}
+.version-mode[value=legacy] ~ .sheet .element-attack_fx .section-Affliction div:last-child {
+  display: flex;
+  flex-direction: column;
+  align-content: space-between;
+  min-width: 50px;
+}
+.version-mode[value=legacy] ~ .sheet .element-attack_fx .section-Affliction h2 {
+  align-self: center;
+  padding: 2px;
+  font-family: var(--font-header);
+  font-size: 16px;
+  color: var(--col-white);
+  transform: rotate(180deg);
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+}
+.version-mode[value=legacy] ~ .sheet .section-Affliction span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.version-mode[value=legacy] ~ .sheet .element-attack_fx .section-Affliction .tag {
+  mix-blend-mode: normal !important;
+}
+.version-mode[value=legacy] ~ .sheet .element-attack_fx .section-Affliction div:last-child h3 {
+  display: grid;
+  position: relative;
+}
+.version-mode[value=legacy] ~ .sheet .element-attack_fx .section-Affliction div:last-child h3 span {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+.version-mode[value=legacy] ~ .sheet {
+  /* -------- General fx ------- */
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-general_fx {
+  background: var(--col-yellow-t);
+  border: 2px solid var(--col-black-t);
+  border-radius: 10px;
+  padding: 0px 10px;
+  line-height: 1.2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  cursor: pointer;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-general_fx h1 span {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--col-black);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-general_fx span[name=attr_label] {
+  font-family: var(--font-numbers);
+  font-size: 11px;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-general_fx summary {
+  padding-left: 6px;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-general_fx button:hover {
+  background: var(--col-green);
+}
+.version-mode[value=legacy] ~ .sheet {
+  /* -------- Text ------- */
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-text,
+.version-mode[value=legacy] ~ .sheet .display-powers textarea {
+  background: var(--col-black);
+  color: var(--col-orange);
+  padding: 4px 6px;
+  border: 2px solid var(--col-white);
+  border-radius: 10px 0 10px 0;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-text span,
+.version-mode[value=legacy] ~ .sheet .display-powers textarea {
+  color: var(--col-orange);
+  font-family: var(--font-normal);
+  display: block;
+  font-size: 14px;
+  line-height: 14px;
+  font-weight: normal;
+  text-transform: initial;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers textarea {
+  height: 10em;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers textarea:focus {
+  outline: unset;
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-text h1 {
+  position: absolute;
+  right: 6px;
+  top: -8px;
+  border-radius: 10px 5px 0 0;
+  padding: 1px 10px;
+  transform: skew(-10deg);
+  background: var(--col-black);
+}
+.version-mode[value=legacy] ~ .sheet .display-powers .element-text h1 span {
+  font-family: var(--font-normal);
+  font-size: 13px;
+  text-align: right;
+  color: var(--col-white-t);
+  transform: skew(10deg);
+}
+.version-mode[value=legacy] ~ .sheet {
+  /* ==== Two-panel layout: editor overlay + matching display tab ===== */
+  /* Original pre-3.0 rule; ported to legacy edit-* overlay IDs in _legacy-mode.scss
+     for the new `_legacy-center-tabs.pug` markup. */
+}
+
+.version-mode[value=legacy] ~ .sheet > .wrapper.main .section-center.bottom-section {
+  display: none;
+}
+.version-mode[value=legacy] ~ .sheet #edit_powers,
+.version-mode[value=legacy] ~ .sheet #edit_equipment,
+.version-mode[value=legacy] ~ .sheet #edit_vehicles,
+.version-mode[value=legacy] ~ .sheet #edit_headquarters {
+  display: none !important;
+}
+.version-mode[value=legacy] ~ .sheet .btn-edit-power {
+  display: none;
+}
+.version-mode[value=legacy] ~ .sheet .attacks-list-new {
+  display: none;
+}
+.version-mode[value=legacy] ~ .sheet .legacy-attacks {
+  display: block;
+}
+.version-mode[value=legacy] ~ .sheet .legacy-center-tabs .display-powers .repitem {
+  display: flex !important;
+}
+.version-mode[value=legacy] ~ .sheet .skill-group:has(> button.repcontrol-button--add) > .repcontrol .repcontrol_add {
+  display: inline-block !important;
+}
+.version-mode[value=legacy] ~ .sheet .skill-group:has(> button.repcontrol-button--add) > .repcontrol-button--add {
+  display: none !important;
+}
+
+.version-mode:not([value=legacy]) ~ .sheet .legacy-center-tabs {
+  display: none;
+}
+
+.version-mode:not([value=legacy]) ~ .sheet .overlay[id^=legacy-edit-] {
+  display: none !important;
+}
+
+.version-mode[value=legacy] ~ .sheet .overlay[id^=legacy-edit-]:target {
+  display: flex !important;
+}
+
+.version-mode[value=legacy] ~ .sheet #legacy-edit-powers:target ~ .legacy-center-tabs .tab-powers,
+.version-mode[value=legacy] ~ .sheet #legacy-edit-equipment:target ~ .legacy-center-tabs .tab-equipment,
+.version-mode[value=legacy] ~ .sheet #legacy-edit-vehicles:target ~ .legacy-center-tabs .tab-vehicles,
+.version-mode[value=legacy] ~ .sheet #legacy-edit-headquarters:target ~ .legacy-center-tabs .tab-headquarters {
+  z-index: 601;
+  position: fixed;
+  top: 100px;
+  right: 10%;
+  height: 83%;
+  width: 30%;
+  padding: 1rem;
+  overflow: auto;
+}
+.version-mode[value=legacy] ~ .sheet #legacy-edit-powers:target ~ .legacy-center-tabs .tab-powers a h1,
+.version-mode[value=legacy] ~ .sheet #legacy-edit-equipment:target ~ .legacy-center-tabs .tab-equipment a h1,
+.version-mode[value=legacy] ~ .sheet #legacy-edit-vehicles:target ~ .legacy-center-tabs .tab-vehicles a h1,
+.version-mode[value=legacy] ~ .sheet #legacy-edit-headquarters:target ~ .legacy-center-tabs .tab-headquarters a h1 {
+  display: none;
+}
+
+.version-mode[value=new] ~ .sheet .version-mode-toggle-label.label-when-legacy,
+.version-mode:not([value=legacy]) ~ .sheet .version-mode-toggle-label.label-when-legacy {
+  display: none;
+}
+
+.version-mode[value=legacy] ~ .sheet .version-mode-toggle-label.label-when-new {
+  display: none;
+}
+
+.version-mode:not([value=legacy]) ~ .sheet .legacy-attacks {
+  display: none;
+}
+
+input[type=hidden][name=attr_op_npc][value=on] ~ .version-mode[value=legacy] ~ .sheet .npcSheet:not(.legacy-npc-sheet) {
+  display: none;
+}
+input[type=hidden][name=attr_op_npc][value=on] ~ .version-mode[value=legacy] ~ .sheet .npcSheet.legacy-npc-sheet {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+input[type=hidden][name=attr_op_npc][value=on] ~ .version-mode:not([value=legacy]) ~ .sheet .legacy-npc-sheet {
+  display: none;
+}
+
+.section-center.bottom-section,
+.section-center.legacy-center-tabs {
+  position: relative;
+}
+
+.version-mode-toggle-wrapper {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  z-index: 500;
+}
+
+.version-mode-toggle {
+  display: inline-block;
+  cursor: pointer;
+  padding: 1px 10px 2px;
+  border: 1px dashed var(--col-gray);
+  border-radius: 12px;
+  color: var(--col-gray);
+  font-family: var(--font-normal);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.2;
+  letter-spacing: 0.3px;
+  background: rgba(255, 255, 255, 0.65);
+  text-align: center;
+  transform: rotate(-2deg);
+  transform-origin: right center;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease, transform 120ms ease;
+}
+.version-mode-toggle::before {
+  content: "✎ ";
+  font-style: normal;
+  opacity: 0.7;
+}
+.version-mode-toggle:hover {
+  color: var(--col-black);
+  border-color: var(--col-black);
+  background: var(--col-yellow);
+  transform: rotate(0deg);
+}
+
 *, *::after, *::before {
   --fx-stroke: -1px -1px 0 var(--col-stroke), 1px -1px 0 var(--col-stroke), -1px 1px 0 var(--col-stroke), 1px 1px 0 var(--col-stroke),
     0 -1px 0 var(--col-stroke), 0 1px 0 var(--col-stroke), -1px 0 0 var(--col-stroke), 1px 0 0 var(--col-stroke);
@@ -5552,6 +6499,9 @@ body .ui-dialog .tab-content .charsheet .array-controls .array-budget-display in
   font-weight: bold;
   text-align: center;
 }
+body .ui-dialog .tab-content .charsheet .legacy-attacks .repitem:not(:has(input.controller[value=attack_fx])) {
+  display: none;
+}
 body .ui-dialog .tab-content .charsheet .attack-powers .repitem:not(:has(.attack-gate:checked)) {
   display: none;
 }
@@ -6150,123 +7100,19 @@ body .ui-dialog .tab-content .charsheet .display-powers .is-array-flag:checked ~
   pointer-events: none;
   line-height: 1;
 }
-body .ui-dialog .tab-content .charsheet .legacy-section {
-  margin: var(--half-gap) 0;
-  padding: var(--half-gap);
-  border: 2px dashed var(--col-gray);
-  border-radius: 8px;
-  background: var(--col-white);
-  opacity: 0.85;
-}
-body .ui-dialog .tab-content .charsheet .legacy-section h2 {
-  font-family: var(--font-header);
-  color: var(--col-gray);
-  margin-bottom: var(--tiny-gap);
-}
-body .ui-dialog .tab-content .charsheet .legacy-section .legacy-row {
+body .ui-dialog .tab-content .charsheet .section-center.legacy-center-tabs .legacy-actions {
   display: flex;
-  gap: var(--tiny-gap);
-  align-items: baseline;
-  padding: 2px 0;
-  border-bottom: 1px solid var(--col-gray);
+  gap: var(--half-gap);
+  justify-content: center;
+  margin-top: var(--normal-gap);
+  padding-top: var(--half-gap);
+  border-top: 1px dashed var(--col-gray);
 }
-body .ui-dialog .tab-content .charsheet .legacy-section .legacy-label {
-  font-weight: bold;
-  flex: 1;
-}
-body .ui-dialog .tab-content .charsheet .legacy-section .legacy-type {
-  font-size: 0.85em;
-  padding: 1px 6px;
-  border-radius: 4px;
-  background: var(--col-gray);
-  color: var(--col-white);
-  text-transform: capitalize;
-}
-body .ui-dialog .tab-content .charsheet .legacy-section .legacy-cost {
-  font-family: var(--font-numbers);
-}
-body .ui-dialog .tab-content .charsheet .legacy-section .legacy-cost:not(:empty)::before {
-  content: "Cost: ";
-}
-body .ui-dialog .tab-content .charsheet .legacy-section .legacy-desc {
-  font-size: 0.85em;
-  color: var(--col-gray);
-}
-body .ui-dialog .tab-content .charsheet .legacy-section .btn-clear-legacy {
-  margin-top: var(--half-gap);
-  background: var(--col-red);
-  color: var(--col-white);
-  border: 2px solid var(--col-black);
-  border-radius: 20px;
-  padding: 4px 12px;
-  cursor: pointer;
-}
-body .ui-dialog .tab-content .charsheet .legacy-section:has(.repcontainer:empty) {
+body .ui-dialog .tab-content .charsheet .section-center.legacy-center-tabs:not(:has(.repcontainer:not(:empty))) .legacy-actions {
   display: none;
 }
-body .ui-dialog .tab-content .charsheet .wrapper.legacy_archive {
-  margin: auto;
-  display: grid;
-  width: fit-content;
-}
-body .ui-dialog .tab-content .charsheet .wrapper.legacy_archive h1 {
-  font-family: var(--font-header);
-  margin-bottom: var(--half-gap);
-  position: relative;
-  justify-self: start;
-  top: 0;
-  left: 0;
-}
-body .ui-dialog .tab-content .charsheet .wrapper.legacy_archive .legacy-archive-help {
-  color: var(--col-gray);
-  font-style: italic;
-  margin-bottom: var(--half-gap);
-  padding: var(--half-gap);
-  background: var(--col-white);
-  border: 2px solid var(--col-gray);
-  border-radius: 6px;
-}
-body .ui-dialog .tab-content .charsheet .section-center.bottom-section {
-  position: relative;
-}
-body .ui-dialog .tab-content .charsheet .legacy-archive-launcher {
-  display: none;
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  z-index: 500;
-  padding: 1px 10px 2px;
-  border: 1px dashed var(--col-gray);
-  border-radius: 12px;
-  color: var(--col-gray);
-  font-family: var(--font-normal);
-  font-style: italic;
-  font-size: 13px;
-  line-height: 1.2;
-  letter-spacing: 0.3px;
-  background: rgba(255, 255, 255, 0.65);
-  text-decoration: none;
-  text-align: center;
-  cursor: pointer;
-  transform: rotate(-2deg);
-  transform-origin: right center;
-  transition: color 120ms ease, border-color 120ms ease, background 120ms ease, transform 120ms ease;
-}
-body .ui-dialog .tab-content .charsheet .legacy-archive-launcher::before {
-  content: "✎ ";
-  font-style: normal;
-  opacity: 0.7;
-}
-body .ui-dialog .tab-content .charsheet .legacy-archive-launcher:hover {
-  color: var(--col-black);
-  border-color: var(--col-black);
-  background: var(--col-yellow);
-  transform: rotate(0deg);
-}
-body .ui-dialog .tab-content .charsheet .wrapper.main:has(#legacy_archive .legacy-section .repcontainer:not(:empty)) .legacy-archive-launcher {
-  display: inline-block;
-}
-body .ui-dialog .tab-content .charsheet .rerun-conversion-launcher {
+body .ui-dialog .tab-content .charsheet .rerun-conversion-launcher,
+body .ui-dialog .tab-content .charsheet .clear-legacy-all-launcher {
   margin: var(--half-gap);
   padding: 4px 12px;
   border: 2px dashed var(--col-red);
@@ -6278,22 +7124,10 @@ body .ui-dialog .tab-content .charsheet .rerun-conversion-launcher {
   background: var(--col-white);
   cursor: pointer;
 }
-body .ui-dialog .tab-content .charsheet .rerun-conversion-launcher:hover {
+body .ui-dialog .tab-content .charsheet .rerun-conversion-launcher:hover,
+body .ui-dialog .tab-content .charsheet .clear-legacy-all-launcher:hover {
   background: var(--col-red);
   color: var(--col-white);
-}
-body .ui-dialog .tab-content .charsheet .legacy-displays {
-  max-height: 80dvh;
-  max-width: 80dvw;
-  overflow-y: auto;
-  margin: auto;
-}
-body .ui-dialog .tab-content .charsheet .legacy-archive-rerun {
-  display: flex;
-  justify-content: center;
-  margin-top: var(--normal-gap);
-  padding-top: var(--half-gap);
-  border-top: 1px dashed var(--col-gray);
 }
 body .ui-dialog .tab-content .charsheet .wrapper.rerun_confirmation {
   margin: auto;
@@ -6347,6 +7181,58 @@ body .ui-dialog .tab-content .charsheet .wrapper.rerun_confirmation .rerun-confi
 body .ui-dialog .tab-content .charsheet .wrapper.rerun_confirmation .rerun-confirmation-actions .btn-confirm-rerun:hover {
   background: var(--col-black);
 }
+body .ui-dialog .tab-content .charsheet .wrapper.clear_legacy_confirmation {
+  margin: auto;
+  display: grid;
+  width: fit-content;
+  max-width: 60dvw;
+}
+body .ui-dialog .tab-content .charsheet .wrapper.clear_legacy_confirmation h1 {
+  font-family: var(--font-header);
+  margin-bottom: var(--half-gap);
+  position: relative;
+  justify-self: start;
+  top: 0;
+  left: 0;
+}
+body .ui-dialog .tab-content .charsheet .wrapper.clear_legacy_confirmation .clear-legacy-confirmation-body {
+  color: var(--col-gray);
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: var(--half-gap);
+  padding: var(--half-gap);
+  background: var(--col-white);
+  border: 2px solid var(--col-red);
+  border-radius: 6px;
+}
+body .ui-dialog .tab-content .charsheet .wrapper.clear_legacy_confirmation .clear-legacy-confirmation-actions {
+  display: flex;
+  gap: var(--half-gap);
+  justify-content: center;
+  margin-top: var(--half-gap);
+}
+body .ui-dialog .tab-content .charsheet .wrapper.clear_legacy_confirmation .clear-legacy-confirmation-actions button {
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-family: var(--font-header);
+  cursor: pointer;
+  border: 2px solid var(--col-black);
+}
+body .ui-dialog .tab-content .charsheet .wrapper.clear_legacy_confirmation .clear-legacy-confirmation-actions .btn-cancel-clear-legacy {
+  background: var(--col-white);
+  color: var(--col-gray);
+}
+body .ui-dialog .tab-content .charsheet .wrapper.clear_legacy_confirmation .clear-legacy-confirmation-actions .btn-cancel-clear-legacy:hover {
+  background: var(--col-gray);
+  color: var(--col-white);
+}
+body .ui-dialog .tab-content .charsheet .wrapper.clear_legacy_confirmation .clear-legacy-confirmation-actions .btn-confirm-clear-legacy {
+  background: var(--col-red);
+  color: var(--col-white);
+}
+body .ui-dialog .tab-content .charsheet .wrapper.clear_legacy_confirmation .clear-legacy-confirmation-actions .btn-confirm-clear-legacy:hover {
+  background: var(--col-black);
+}
 body .ui-dialog .tab-content .charsheet .wrapper.release_notes {
   margin: auto;
   display: grid;
@@ -6366,6 +7252,12 @@ body .ui-dialog .tab-content .charsheet .wrapper.release_notes h1 {
 body .ui-dialog .tab-content .charsheet .release-notes-fieldset + .repcontainer + .repcontrol,
 body .ui-dialog .tab-content .charsheet fieldset.release-notes-fieldset + .repcontainer + .repcontrol {
   display: none;
+}
+body .ui-dialog .tab-content .charsheet input.primary-action-controller[value=""] ~ .has-primary-action {
+  display: none;
+}
+body .ui-dialog .tab-content .charsheet .has-primary-action {
+  margin-top: var(--half-gap);
 }
 body .ui-dialog .tab-content .charsheet .release-notes-row {
   margin-bottom: var(--normal-gap);
