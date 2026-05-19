@@ -5878,6 +5878,7 @@
 		MALICE_ABILITY: 'Malice Ability',
 		CONDITION_IMMUNITY: 'Condition Immunity',
 		SUMMON_CHOICE: 'Summon Choice',
+		ABILITY_DAMAGE: 'Ability Damage',
 	};
 
 	/**
@@ -6474,6 +6475,16 @@
 				return { ...acc, ...processAbility(abilityData) };
 			}, {});
 		
+		const damageModifiers = allFeatures
+			.filter(f => f.type === FEATURE_TYPES.ABILITY_DAMAGE)
+			.reduce((acc, f) => {
+				const id = generateRowID();
+				acc[`repeating_damagemods_${id}_mod_name`] = f.name;
+				acc[`repeating_damagemods_${id}_mod_keywords`] = f.data?.keywords.join(', ');
+				acc[`repeating_damagemods_${id}_mod_value`] = f.data?.value;
+				return acc;
+			}, {});
+		
 		const immunity = [
 			getDamageModifiers(allFeatures, level, 'Immunity'),
 			getConditionImmunities(allFeatures),
@@ -6541,10 +6552,11 @@
 			...classFeatures,
 			...abilityFeatures,
 			...classAbilities,
+			...damageModifiers,
 		};
 
 		// Clear existing repeating sections before adding new data.
-		const sectionsToClear = ['modifiers', 'perks', 'ancestrytraits', 'classfeatures', 'abilities', 'noaction', 'maneuvers', 'triggered', 'moves', 'conditions'];
+		const sectionsToClear = ['modifiers', 'perks', 'ancestrytraits', 'classfeatures', 'abilities', 'noaction', 'maneuvers', 'triggered', 'moves', 'conditions', 'damagemods'];
 		await Promise.all(sectionsToClear.map(s => clearRepeatingSection(s)));
 		
 		// Set the new attributes on the character sheet.
