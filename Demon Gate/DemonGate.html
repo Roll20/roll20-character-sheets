@@ -263,7 +263,7 @@
             rankToUse = 50;
         }
 
-        return diceTable[rank] || "";
+        return diceTable[rankToUse] || "";
     }
 
     // Helper function to generate race summary from modifiers
@@ -833,7 +833,8 @@
                 setAttrs({
                     StrTotal: total,
                     StrRank: rank,
-                    StrDice: getDice(rank)
+                    StrDice: getDice(rank),
+                    WtAllow: calculateWeightAllowance(total)
                 });
 
                 const damageModifierBonus = Number(values.DmgModBonus);
@@ -883,8 +884,9 @@
     }
 
     function calculateDamageModifier(str) {
-        if (str <= 3) return Math.min(-3, 4 - str);
-        if (str >= 80) return 33;
+        if (str <= 1) return -3;
+        if (str === 2) return -2;
+        if (str === 3) return -1;
         if (str >= 15) return Math.floor((str - 13) / 2);
         return 0;
     }
@@ -898,9 +900,10 @@
         if (str <= 9) return "l";
         if (str <= 14) return "m/2vl";
         if (str <= 19) return "h/2l";
-        if (str <= 30) return "vh/2m";
+        if (str <= 29) return "vh/2m";
         if (str <= 49) return "vh/2h";
-        return "vh/2vh";
+        if (str <= 99) return "vh/2vh";
+        return "Godly";
     }
 
     /* DEXTERITY */
@@ -1015,6 +1018,7 @@
 
     function calculateMovementModifier(dexterity) {
         if (dexterity <= 3) return -1;
+        if (dexterity >= 90) return 6;
         if (dexterity >= 60) return 5;
         if (dexterity >= 50) return 4;
         if (dexterity >= 15) return Math.floor(dexterity / 10);
@@ -1079,35 +1083,37 @@
         if (bdy <= 35) return Math.floor((bdy - 6) / 3);
         if (bdy <= 47) return Math.floor((bdy + 4) / 4);
         if (bdy <= 62) return Math.floor((bdy + 17) / 5);
-        if (bdy <= 74) return Math.floor((bdy + 33) / 6);
-        return 18;
+        if (bdy <= 80) return Math.floor((bdy + 33) / 6);
+        if (bdy <= 87) return 19;
+        if (bdy <= 94) return 20;
+        return 21;
     }
 
     function calculateHPAdjustment(bdy) {
         if (bdy <= 14) return 0;
-        if (bdy == 15) return 1;
-        if (bdy == 16) return 3;
-        if (bdy == 17) return 6;
-        if (bdy == 18) return 10;
-        if (bdy == 19) return 15;
-        if (bdy <= 21) return 21;
-        if (bdy <= 23) return 28;
-        if (bdy <= 25) return 36;
-        if (bdy <= 27) return 45;
-        if (bdy <= 30) return 55;
-        if (bdy <= 33) return 66;
-        if (bdy <= 36) return 78;
-        if (bdy <= 39) return 91;
-        if (bdy <= 42) return 105;
-        if (bdy <= 46) return 120;
-        if (bdy <= 50) return 136;
-        if (bdy <= 54) return 153;
-        if (bdy <= 58) return 171;
-        if (bdy <= 62) return 190;
-        if (bdy <= 67) return 210;
-        if (bdy <= 72) return 231;
-        if (bdy <= 77) return 253;
-        return 276;
+        if (bdy <= 19) return bdy - 14;
+        if (bdy <= 21) return 6;
+        if (bdy <= 23) return 7;
+        if (bdy <= 25) return 8;
+        if (bdy <= 27) return 9;
+        if (bdy <= 30) return 10;
+        if (bdy <= 33) return 11;
+        if (bdy <= 36) return 12;
+        if (bdy <= 39) return 13;
+        if (bdy <= 42) return 14;
+        if (bdy <= 46) return 15;
+        if (bdy <= 50) return 16;
+        if (bdy <= 54) return 17;
+        if (bdy <= 58) return 18;
+        if (bdy <= 62) return 19;
+        if (bdy <= 67) return 20;
+        if (bdy <= 72) return 21;
+        if (bdy <= 77) return 22;
+        if (bdy <= 82) return 23;
+        if (bdy <= 87) return 24;
+        if (bdy <= 93) return 25;
+        if (bdy <= 99) return 26;
+        return 27;
     }
 
     function calculateBodySave(bdy) {
@@ -1118,12 +1124,13 @@
         if (bdy <= 24) return 14;
         if (bdy <= 27) return 13;
         if (bdy <= 30) return 12;
-        if (bdy <= 34) return 11;
+        if (bdy <= 33) return 11;
         if (bdy <= 39) return 10;
         if (bdy <= 49) return 9;
         if (bdy <= 59) return 8;
         if (bdy <= 69) return 7;
-        return 6;
+        if (bdy <= 99) return 6;
+        return 5;
     }
 
     function updateTotalArmorRating() {
@@ -1249,9 +1256,9 @@
     }
 
     function calculateShotDamageModifier(prc) {
-        if (prc >= 78) return 22;
-        if (prc >= 15) return Math.floor((prc - 12) / 3);
-        return 0;
+        if (prc <= 14) return 0;
+        if (prc >= 20 && prc <= 23) return 3;
+        return Math.floor((prc - 12) / 3);
     }
 
     function calculateToHitModifier(perception) {
@@ -1259,7 +1266,6 @@
     }
 
     function calculateRangeModifier(prc) {
-        if (prc >= 80) return 8;
         if (prc >= 15) return Math.floor(prc / 10);
         return 0;
     }
@@ -1330,7 +1336,6 @@
     }
 
     function calculateSpellEffectModifier(int) {
-        if (int >= 80) return 8;
         if (int >= 15) return Math.floor(int / 10);
         return 0;
     }
@@ -1341,15 +1346,18 @@
         if (int <= 9) return "d12";
         if (int <= 12) return "d8";
         if (int <= 14) return "d4";
-        if (int <= 19) return "2d6";
-        if (int <= 24) return "d8";
-        if (int <= 29) return "d6";
+        if (int <= 17) return "d10";
+        if (int <= 19) return "d8";
+        if (int <= 24) return "d6";
+        if (int <= 29) return "d4";
         if (int <= 39) return "2d10";
         if (int <= 49) return "2d6";
-        if (int <= 59) return "d10";
-        if (int <= 69) return "d8";
-        if (int <= 79) return "d6";
-        return "d4";
+        if (int <= 59) return "1d10";
+        if (int <= 69) return "1d8";
+        if (int <= 79) return "1d6";
+        if (int <= 89) return "1d4";
+        if (int <= 99) return "1d3";
+        return "1d2";
     }
 
     function determineSpellTimeText(int) {
@@ -1441,37 +1449,34 @@
     }
 
     function calculateFortitude(wil) {
-        if (wil >= 80) return 33;
-        if (wil >= 15) return Math.floor((wil - 13) / 2);
+        if (wil >= 15) return wil - 14;
         return 0;
     }
 
     function calculateManaAdjustment(wil) {
-        // Mana adjustment uses the same calculation as HP adjustment
         if (wil <= 14) return 0;
-        if (wil == 15) return 1;
-        if (wil == 16) return 3;
-        if (wil == 17) return 6;
-        if (wil == 18) return 10;
-        if (wil == 19) return 15;
-        if (wil <= 21) return 21;
-        if (wil <= 23) return 28;
-        if (wil <= 25) return 36;
-        if (wil <= 27) return 45;
-        if (wil <= 30) return 55;
-        if (wil <= 33) return 66;
-        if (wil <= 36) return 78;
-        if (wil <= 39) return 91;
-        if (wil <= 42) return 105;
-        if (wil <= 46) return 120;
-        if (wil <= 50) return 136;
-        if (wil <= 54) return 153;
-        if (wil <= 58) return 171;
-        if (wil <= 62) return 190;
-        if (wil <= 67) return 210;
-        if (wil <= 72) return 231;
-        if (wil <= 77) return 253;
-        return 276;
+        if (wil <= 19) return wil - 14;
+        if (wil <= 21) return 6;
+        if (wil <= 23) return 7;
+        if (wil <= 25) return 8;
+        if (wil <= 27) return 9;
+        if (wil <= 30) return 10;
+        if (wil <= 33) return 11;
+        if (wil <= 36) return 12;
+        if (wil <= 39) return 13;
+        if (wil <= 42) return 14;
+        if (wil <= 46) return 15;
+        if (wil <= 50) return 16;
+        if (wil <= 54) return 17;
+        if (wil <= 59) return 18;
+        if (wil <= 64) return 19;
+        if (wil <= 69) return 20;
+        if (wil <= 74) return 21;
+        if (wil <= 80) return 22;
+        if (wil <= 86) return 23;
+        if (wil <= 92) return 24;
+        if (wil <= 98) return 25;
+        return 26;
     }
 
     /* CHARISMA */
@@ -1516,12 +1521,17 @@
     }
 
     function calculateSocialPool(chr) {
-        if (chr <= 30) return Math.max(0, Math.floor(chr / 15));
-        return Math.min(Math.floor((chr + 10) / 20), 4);
+        if (chr <= 14) return 0;
+        if (chr <= 19) return 1;
+        if (chr <= 29) return 2;
+        if (chr <= 39) return 3;
+        if (chr <= 59) return 4;
+        if (chr <= 79) return 5;
+        if (chr <= 99) return 6;
+        return 7;
     }
 
     function calculateReputationBonus(chr) {
-        if (chr >= 80) return 40;
         if (chr >= 15) return Math.floor(chr / 10) * 5;
         return 0;
     }
@@ -1587,37 +1597,17 @@
     function calculateInfluence(allure) {
         if (allure <= 3) return -10;
         if (allure <= 6) return -5;
-        if (allure >= 80) return 40;
         if (allure >= 15) return Math.floor(allure / 10) * 5;
         return 0;
     }
 
     function calculateSocialModifier(allure) {
-        if (allure < 2) {
-            return -3;
-        }
-        if (allure < 4) {
-            return -2;
-        }
-        if (allure < 7) {
-            return -1;
-        }
-        if (allure < 16) {
-            return 0;
-        }
-        if (allure < 20) {
-            return 1;
-        }
-        if (allure < 30) {
-            return 2;
-        }
-        if (allure < 40) {
-            return 3;
-        }
-        if (allure < 50) {
-            return 4;
-        }
-        return 5;
+        if (allure <= 1) return -3;
+        if (allure <= 3) return -2;
+        if (allure <= 6) return -1;
+        if (allure <= 15) return 0;
+        if (allure <= 19) return 1;
+        return Math.floor(allure / 10);
     }
 
     /* SHARED ATTRIBUTE FUNCTIONS */
@@ -1984,6 +1974,14 @@
             setAttrs(attrs);
         });
     }
+
+    on("change:armordefbase change:armordefbonus", function () {
+        getAttrs(["ArmorDefBase", "ArmorDefBonus"], function (values) {
+            setAttrs({
+                ArmorDefTotal: Number(values.ArmorDefBase) + Number(values.ArmorDefBonus)
+            });
+        });
+    });
 
     function updateUnarmed() {
         getAttrs(["Unarmed", "RaceUnarmedRank", "Race"], function (values) {
@@ -3477,7 +3475,7 @@
                                             <th class="sheet-small-table-header">Rating</th>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Unarmed</td>
+                                            <th class="sheet-skillname">Unarmed</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Unarmed">
@@ -3496,7 +3494,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Axes</td>
+                                            <th class="sheet-skillname">Axes</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Axes">
@@ -3515,7 +3513,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Flails</td>
+                                            <th class="sheet-skillname">Flails</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Flails">
@@ -3534,7 +3532,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Grenades</td>
+                                            <th class="sheet-skillname">Grenades</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Grenades">
@@ -3553,7 +3551,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Hammers</td>
+                                            <th class="sheet-skillname">Hammers</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Hammers">
@@ -3572,7 +3570,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Javelins</td>
+                                            <th class="sheet-skillname">Javelins</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Javelins">
@@ -3591,7 +3589,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Knives</td>
+                                            <th class="sheet-skillname">Knives</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Knives">
@@ -3610,7 +3608,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Maces</td>
+                                            <th class="sheet-skillname">Maces</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Maces">
@@ -3629,7 +3627,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Polearms</td>
+                                            <th class="sheet-skillname">Polearms</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Polearms">
@@ -3648,7 +3646,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Shurikens</td>
+                                            <th class="sheet-skillname">Shurikens</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Shurikens">
@@ -3667,7 +3665,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Staves</td>
+                                            <th class="sheet-skillname">Staves</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Staves">
@@ -3686,7 +3684,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Swords</td>
+                                            <th class="sheet-skillname">Swords</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Swords">
@@ -3705,7 +3703,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Whips</td>
+                                            <th class="sheet-skillname">Whips</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Whips">
@@ -3724,7 +3722,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Blind Fighting</td>
+                                            <th class="sheet-skillname">Blind Fighting</th>
                                             <td class="sheet-cell-numeric-readonly">2</td>
                                             <td>
                                                 <select name="attr_BlindFighting">
@@ -3734,7 +3732,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Dual Melee</td>
+                                            <th class="sheet-skillname">Dual Melee</th>
                                             <td class="sheet-cell-numeric-readonly">3</td>
                                             <td>
                                                 <select name="attr_DualMelee">
@@ -3744,7 +3742,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Throwing</td>
+                                            <th class="sheet-skillname">Throwing</th>
                                             <td class="sheet-cell-numeric-readonly">1</td>
                                             <td>
                                                 <select name="attr_Throwing">
@@ -3779,7 +3777,7 @@
                                             <th class="sheet-small-table-header">Rating</th>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Black Powder</td>
+                                            <th class="sheet-skillname">Black Powder</th>
                                             <td class="sheet-cell-numeric-readonly">1</td>
                                             <td>
                                                 <select name="attr_BlackPowder">
@@ -3789,7 +3787,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Lances</td>
+                                            <th class="sheet-skillname-indented">Lances</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Lances">
@@ -3808,7 +3806,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Pistols</td>
+                                            <th class="sheet-skillname-indented">Pistols</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Pistols">
@@ -3827,7 +3825,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Rifles</td>
+                                            <th class="sheet-skillname-indented">Rifles</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Rifles">
@@ -3846,7 +3844,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Shotguns</td>
+                                            <th class="sheet-skillname-indented">Shotguns</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Shotguns">
@@ -3865,7 +3863,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Blind Shooting</td>
+                                            <th class="sheet-skillname">Blind Shooting</th>
                                             <td class="sheet-cell-numeric-readonly">2</td>
                                             <td>
                                                 <select name="attr_BlindShooting">
@@ -3875,7 +3873,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Dual Shooting</td>
+                                            <th class="sheet-skillname">Dual Shooting</th>
                                             <td class="sheet-cell-numeric-readonly">3</td>
                                             <td>
                                                 <select name="attr_DualShooting">
@@ -3885,7 +3883,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Projectiles</td>
+                                            <th class="sheet-skillname">Projectiles</th>
                                             <td class="sheet-cell-numeric-readonly">1</td>
                                             <td>
                                                 <select name="attr_Projectiles">
@@ -3895,7 +3893,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Blow Guns</td>
+                                            <th class="sheet-skillname-indented">Blow Guns</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_BlowGuns">
@@ -3914,7 +3912,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Bows</td>
+                                            <th class="sheet-skillname-indented">Bows</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Bows">
@@ -3933,7 +3931,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Crossbows</td>
+                                            <th class="sheet-skillname-indented">Crossbows</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Crossbows">
@@ -3952,7 +3950,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Hand Bows</td>
+                                            <th class="sheet-skillname-indented">Hand Bows</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_HandBows">
@@ -3971,7 +3969,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Slings</td>
+                                            <th class="sheet-skillname-indented">Slings</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Slings">
@@ -3990,7 +3988,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Siege Weapons</td>
+                                            <th class="sheet-skillname">Siege Weapons</th>
                                             <td class="sheet-cell-numeric-readonly">1</td>
                                             <td>
                                                 <select name="attr_Siege">
@@ -4000,7 +3998,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Ballistae</td>
+                                            <th class="sheet-skillname-indented">Ballistae</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Ballistae">
@@ -4019,7 +4017,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Cannons</td>
+                                            <th class="sheet-skillname-indented">Cannons</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Cannons">
@@ -4038,7 +4036,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Catapults</td>
+                                            <th class="sheet-skillname-indented">Catapults</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Catapults">
@@ -4057,7 +4055,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname-indented">Trebuchets</td>
+                                            <th class="sheet-skillname-indented">Trebuchets</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_Trebuchets">
@@ -4098,7 +4096,7 @@
                                             <th class="sheet-small-table-header">Rating</th>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Sorcery</td>
+                                            <th class="sheet-skillname">Sorcery</th>
                                             <td class="sheet-cell-numeric-readonly">1</td>
                                             <td>
                                                 <select name="attr_Sorcery">
@@ -4108,7 +4106,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Black Magic</td>
+                                            <th class="sheet-skillname">Black Magic</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_BlackMagic">
@@ -4127,7 +4125,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Blue Magic</td>
+                                            <th class="sheet-skillname">Blue Magic</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_BlueMagic">
@@ -4146,7 +4144,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Brown Magic</td>
+                                            <th class="sheet-skillname">Brown Magic</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_BrownMagic">
@@ -4165,7 +4163,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Gold Magic</td>
+                                            <th class="sheet-skillname">Gold Magic</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_GoldMagic">
@@ -4184,7 +4182,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Gray Magic</td>
+                                            <th class="sheet-skillname">Gray Magic</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_GrayMagic">
@@ -4203,7 +4201,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Green Magic</td>
+                                            <th class="sheet-skillname">Green Magic</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_GreenMagic">
@@ -4222,7 +4220,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Red Magic</td>
+                                            <th class="sheet-skillname">Red Magic</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_RedMagic">
@@ -4241,7 +4239,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">White Magic</td>
+                                            <th class="sheet-skillname">White Magic</th>
                                             <td class="sheet-cell-numeric-readonly">*</td>
                                             <td>
                                                 <select name="attr_WhiteMagic">
@@ -4283,7 +4281,7 @@
                                             <th class="sheet-small-table-header">Rating</th>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Light Armor</td>
+                                            <th class="sheet-skillname">Light Armor</th>
                                             <td class="sheet-cell-numeric-readonly">1</td>
                                             <td class="sheet-cell-centred">
                                                 <input type="checkbox" name="attr_LightArmorOwned" value="1" />
@@ -4305,7 +4303,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Medium Armor</td>
+                                            <th class="sheet-skillname">Medium Armor</th>
                                             <td class="sheet-cell-numeric-readonly">1</td>
                                             <td class="sheet-cell-centred">
                                                 <input type="checkbox" name="attr_MedArmorOwned" value="1" />
@@ -4327,7 +4325,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Heavy Armor</td>
+                                            <th class="sheet-skillname">Heavy Armor</th>
                                             <td class="sheet-cell-numeric-readonly">1</td>
                                             <td class="sheet-cell-centred">
                                                 <input type="checkbox" name="attr_HeavyArmorOwned" value="1" />
@@ -4349,7 +4347,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="sheet-skillname">Shields</td>
+                                            <th class="sheet-skillname">Shields</th>
                                             <td class="sheet-cell-numeric-readonly">1</td>
                                             <td></td>
                                             <td>
@@ -6138,25 +6136,25 @@
                                 <th class="sheet-small-table-header">Amt</th>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Unarmed</td>
+                                <th class="sheet-skillname">Unarmed</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_UnarmedActions" value="0" />
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Melee</td>
+                                <th class="sheet-skillname">Melee</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_MeleeActions" value="0" />
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Projectile</td>
+                                <th class="sheet-skillname">Projectile</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_ProjActions" value="0" />
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Magic</td>
+                                <th class="sheet-skillname">Magic</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_MagicActions" value="0" />
                                 </td>
@@ -6167,17 +6165,31 @@
                     <div class="sheet-column-grow">
                         <table>
                             <tr>
-                                <th colspan="3">
+                                <th colspan="4">
                                     <h2>Defense</h2>
                                 </th>
                             </tr>
                             <tr>
                                 <th class="sheet-small-table-header">Type</th>
+                                <th class="sheet-small-table-header">Modifier</th>
                                 <th class="sheet-small-table-header">Bonus</th>
                                 <th class="sheet-small-table-header">Roll</th>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Dodge</td>
+                                <th class="sheet-skillname">Armor Defense</th>
+                                <td colspan="2" class="sheet-cell-numeric-readonly">
+                                    <input
+                                        type="number"
+                                        class="sheet-desctotalfield"
+                                        name="attr_ArmorDefTotal"
+                                        value="0"
+                                        readonly
+                                    />
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th class="sheet-skillname">Dodge</th>
                                 <td class="sheet-cell-numeric-readonly">
                                     <input
                                         type="number"
@@ -6187,64 +6199,97 @@
                                         readonly
                                     />
                                 </td>
+                                <td class="sheet-cell-numeric">
+                                    <input type="number" name="attr_DodgeBonus" value="0" />
+                                </td>
                                 <td class="sheet-button-cell">
                                     <button
                                         type="roll"
-                                        value="&{template:roll} {{character=@{character_name}}} {{name=Dodge Roll}} {{roll=[[d20+@{DefModTotal}+?{Modifier|0}]]}}"
+                                        value="&{template:roll} {{character=@{character_name}}} {{name=Dodge Roll}} {{roll=[[d20+@{DefModTotal}+@{ArmorDefTotal}+@{DodgeBonus}+@{PhysMod}+?{Modifier|0}]]}}"
                                     ></button>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Parry</td>
+                                <th class="sheet-skillname">Parry</th>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input
+                                        type="number"
+                                        class="sheet-desctotalfield"
+                                        name="attr_DefModTotal"
+                                        value="0"
+                                        readonly
+                                    />
+                                </td>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_ParryBonus" value="0" />
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button
                                         type="roll"
-                                        value="&{template:roll} {{character=@{character_name}}} {{name=Parry Roll}} {{roll=[[d20+@{DefModTotal}+@{ParryBonus}-1+?{Modifier|0}]]}}"
+                                        value="&{template:roll} {{character=@{character_name}}} {{name=Parry Roll}} {{roll=[[d20+@{DefModTotal}+@{ArmorDefTotal}+@{ParryBonus}-2+@{PhysMod}+?{Modifier|0}]]}}"
                                     ></button>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Block w/ Melee</td>
+                                <th class="sheet-skillname">Block</th>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input
+                                        type="number"
+                                        class="sheet-desctotalfield"
+                                        name="attr_StrBlockModTotal"
+                                        value="0"
+                                        readonly
+                                    />
+                                </td>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_BlockBonus" value="0" />
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button
                                         type="roll"
-                                        value="&{template:roll} {{character=@{character_name}}} {{name=Block Roll}} {{roll=[[d20+@{DefModTotal}+@{BlockBonus}+1+?{Modifier|0}]]}}"
+                                        value="&{template:roll} {{character=@{character_name}}} {{name=Block Roll}} {{roll=[[d20+@{StrBlockModTotal}+@{ArmorDefTotal}+@{BlockBonus}+1+@{PhysMod}+?{Modifier|0}]]}}"
                                     ></button>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Block w/ Shield</td>
+                                <th class="sheet-skillname">Shield Block</th>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input
+                                        type="number"
+                                        class="sheet-desctotalfield"
+                                        name="attr_StrBlockModTotal"
+                                        value="0"
+                                        readonly
+                                    />
+                                </td>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_ShieldBlockBonus" value="0" />
                                 </td>
                                 <td class="sheet-button-cell">
                                     <button
                                         type="roll"
-                                        value="&{template:roll} {{character=@{character_name}}} {{name=Shield Block Roll}} {{roll=[[d20+@{DefModTotal}+@{ShieldBlockBonus}+@{ShieldCover}+?{Modifier|0}]]}}"
+                                        value="&{template:roll} {{character=@{character_name}}} {{name=Shield Block Roll}} {{roll=[[d20+@{StrBlockModTotal}+@{ArmorDefTotal}+@{ShieldBlockBonus}+@{ShieldCover}+@{PhysMod}+?{Modifier|0}]]}}"
                                     ></button>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Mental Defense</td>
+                                <th class="sheet-skillname">Mental</th>
                                 <td class="sheet-cell-numeric-readonly">
                                     <input
                                         type="number"
                                         class="sheet-desctotalfield"
-                                        name="attr_MenDefTotal"
+                                        name="attr_MenDefBase"
                                         value="0"
                                         readonly
                                     />
                                 </td>
+                                <td class="sheet-cell-numeric">
+                                    <input type="number" name="attr_MenDefBonus" value="0" />
+                                </td>
                                 <td class="sheet-button-cell">
                                     <button
                                         type="roll"
-                                        value="&{template:roll} {{character=@{character_name}}} {{name=Mental Defense Roll}} {{roll=[[d20+@{MenDefTotal}+?{Modifier|0}]]}}"
+                                        value="&{template:roll} {{character=@{character_name}}} {{name=Mental Defense Roll}} {{roll=[[d20+@{MenDefTotal}+@{MenMod}+?{Modifier|0}]]}}"
                                     ></button>
                                 </td>
                             </tr>
@@ -6259,7 +6304,7 @@
                                 </th>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Initiative</td>
+                                <th class="sheet-skillname">Initiative</th>
                                 <td class="sheet-button-cell">
                                     <button
                                         type="roll"
@@ -6278,7 +6323,7 @@
                                 </th>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Total Armor Value</td>
+                                <th class="sheet-skillname">Total Armor Value</th>
                                 <td class="sheet-cell-numeric-readonly">
                                     <input
                                         type="number"
@@ -6290,7 +6335,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Toughness</td>
+                                <th class="sheet-skillname">Toughness</th>
                                 <td class="sheet-cell-numeric-readonly">
                                     <input
                                         type="number"
@@ -6302,7 +6347,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Fortitude</td>
+                                <th class="sheet-skillname">Fortitude</th>
                                 <td class="sheet-cell-numeric-readonly">
                                     <input
                                         type="number"
@@ -6324,31 +6369,31 @@
                                 </th>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Fire</td>
+                                <th class="sheet-skillname">Fire</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_FireRes" value="0" />
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Cold</td>
+                                <th class="sheet-skillname">Cold</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_ColdRes" value="0" />
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Toxic</td>
+                                <th class="sheet-skillname">Toxic</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_ToxicRes" value="0" />
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Electrical</td>
+                                <th class="sheet-skillname">Electrical</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_ElecRes" value="0" />
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Sonic</td>
+                                <th class="sheet-skillname">Sonic</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_SonicRes" value="0" />
                                 </td>
@@ -7211,7 +7256,37 @@
 
                         <table class="sheet-spacer-top-margin">
                             <tr>
-                                <th colspan="4">
+                                <th colspan="3">
+                                    <h2>Armor Defense</h2>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th class="sheet-small-table-header">Base</th>
+                                <th class="sheet-small-table-header">Bonus</th>
+                                <th class="sheet-small-table-header">Total</th>
+                            </tr>
+                            <tr>
+                                <td class="sheet-cell-numeric">
+                                    <input type="number" name="attr_ArmorDefBase" value="0" />
+                                </td>
+                                <td class="sheet-cell-numeric">
+                                    <input type="number" name="attr_ArmorDefBonus" value="0" />
+                                </td>
+                                <td class="sheet-cell-numeric-readonly">
+                                    <input
+                                        type="number"
+                                        class="sheet-desctotalfield"
+                                        name="attr_ArmorDefTotal"
+                                        value="0"
+                                        readonly
+                                    />
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table class="sheet-spacer-top-margin">
+                            <tr>
+                                <th colspan="5">
                                     <h2>Shield</h2>
                                 </th>
                             </tr>
@@ -7223,7 +7298,7 @@
                                 <th class="sheet-small-table-header">Cover</th>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Shield</td>
+                                <th class="sheet-skillname">Shield</th>
                                 <td>
                                     <input type="text" name="attr_ShieldName" value="" />
                                 </td>
@@ -7241,7 +7316,7 @@
 
                         <table class="sheet-spacer-top-margin">
                             <tr>
-                                <th colspan="4">
+                                <th colspan="5">
                                     <h2>Armor</h2>
                                 </th>
                             </tr>
@@ -7253,7 +7328,7 @@
                                 <th class="sheet-small-table-header">Armor Rating</th>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Helmet</td>
+                                <th class="sheet-skillname">Helmet</th>
                                 <td>
                                     <input type="text" name="attr_HelmetName" value="" />
                                 </td>
@@ -7268,7 +7343,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Amulet</td>
+                                <th class="sheet-skillname">Amulet</th>
                                 <td>
                                     <input type="text" name="attr_AmuletName" value="" />
                                 </td>
@@ -7283,7 +7358,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Cloak</td>
+                                <th class="sheet-skillname">Cloak</th>
                                 <td>
                                     <input type="text" name="attr_CloakName" value="" />
                                 </td>
@@ -7298,7 +7373,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Pauldrons</td>
+                                <th class="sheet-skillname">Pauldrons</th>
                                 <td>
                                     <input type="text" name="attr_PauldronsName" value="" />
                                 </td>
@@ -7318,7 +7393,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Clothing</td>
+                                <th class="sheet-skillname">Clothing</th>
                                 <td>
                                     <input type="text" name="attr_ClothingName" value="" />
                                 </td>
@@ -7333,7 +7408,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Torso</td>
+                                <th class="sheet-skillname">Torso</th>
                                 <td>
                                     <input type="text" name="attr_TorsoName" value="" />
                                 </td>
@@ -7348,7 +7423,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Bracers</td>
+                                <th class="sheet-skillname">Bracers</th>
                                 <td>
                                     <input type="text" name="attr_BracersName" value="" />
                                 </td>
@@ -7363,7 +7438,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Gloves</td>
+                                <th class="sheet-skillname">Gloves</th>
                                 <td>
                                     <input type="text" name="attr_GlovesName" value="" />
                                 </td>
@@ -7378,7 +7453,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Belt</td>
+                                <th class="sheet-skillname">Belt</th>
                                 <td>
                                     <input type="text" name="attr_BeltName" value="" />
                                 </td>
@@ -7393,7 +7468,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Greaves</td>
+                                <th class="sheet-skillname">Greaves</th>
                                 <td>
                                     <input type="text" name="attr_GreavesName" value="" />
                                 </td>
@@ -7408,7 +7483,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Boots</td>
+                                <th class="sheet-skillname">Boots</th>
                                 <td>
                                     <input type="text" name="attr_BootsName" value="" />
                                 </td>
@@ -7423,7 +7498,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Ring</td>
+                                <th class="sheet-skillname">Ring</th>
                                 <td>
                                     <input type="text" name="attr_RingName" value="" />
                                 </td>
@@ -7438,7 +7513,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Ring</td>
+                                <th class="sheet-skillname">Ring</th>
                                 <td>
                                     <input type="text" name="attr_Ring2Name" value="" />
                                 </td>
@@ -7453,7 +7528,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Other</td>
+                                <th class="sheet-skillname">Other</th>
                                 <td>
                                     <input type="text" name="attr_OtherName" value="" />
                                 </td>
@@ -7468,7 +7543,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="sheet-skillname">Other</td>
+                                <th class="sheet-skillname">Other</th>
                                 <td>
                                     <input type="text" name="attr_Other2Name" value="" />
                                 </td>
@@ -7643,7 +7718,7 @@
                             </tr>
                         </table>
 
-                        <h2 class="sheet-spacer-top-margin">Equipment (Backpack)</h2>
+                        <h2 class="sheet-spacer-top-margin sheet-table-like-heading">Equipment (Backpack)</h2>
 
                         <fieldset class="repeating_equip">
                             <table class="sheet-repeating-section">
@@ -7680,7 +7755,7 @@
                             class="sheet-textarea-equipment"
                         ></textarea>
 
-                        <h2 class="sheet-spacer-top-margin">Transportation</h2>
+                        <h2 class="sheet-spacer-top-margin sheet-table-like-heading">Transportation</h2>
 
                         <fieldset class="repeating_trans">
                             <table class="sheet-repeating-section">
@@ -7713,7 +7788,7 @@
 
                         <h1 class="sheet-spacer-top-margin">Other</h1>
 
-                        <h2 class="sheet-spacer-top-margin">Hideouts</h2>
+                        <h2 class="sheet-spacer-top-margin sheet-table-like-heading">Hideouts</h2>
 
                         <fieldset class="repeating_hideouts">
                             <table class="sheet-repeating-section">
@@ -7760,11 +7835,14 @@
                 <div class="sheet-flex-section">
                     <div class="sheet-column-grow">
                         <div class="sheet-religion-table">
-                            <h2>Details</h2>
-
                             <table>
                                 <tr>
-                                    <td class="sheet-skillname">Soul Points</td>
+                                    <th colspan="2">
+                                        <h2>Details</h2>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th class="sheet-skillname">Soul Points</th>
                                     <td>
                                         <input
                                             type="number"
@@ -7775,13 +7853,13 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="sheet-skillname">Path</td>
+                                    <th class="sheet-skillname">Path</th>
                                     <td class="sheet-cell-numeric">
                                         <input type="text" name="attr_ReligionPath" value="" />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="sheet-skillname" rowspan="3">Gods</td>
+                                    <th class="sheet-skillname" rowspan="3">Gods</th>
                                     <td class="sheet-cell-numeric">
                                         <input type="text" name="attr_Gods1" value="" />
                                     </td>
@@ -7797,19 +7875,19 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="sheet-skillname">Spirit Animal</td>
+                                    <th class="sheet-skillname">Spirit Animal</th>
                                     <td class="sheet-cell-numeric">
                                         <input type="text" name="attr_SpiritAnimal" value="" />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="sheet-skillname">Astrological Sign</td>
+                                    <th class="sheet-skillname">Astrological Sign</th>
                                     <td class="sheet-cell-numeric">
                                         <input type="text" name="attr_AstSign" value="" />
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="sheet-skillname">Fate Power</td>
+                                    <th class="sheet-skillname">Fate Power</th>
                                     <td class="sheet-cell-numeric">
                                         <input type="text" name="attr_FatePower" value="" />
                                     </td>
@@ -7819,7 +7897,7 @@
                     </div>
 
                     <div class="sheet-column-grow">
-                        <h2 class="sheet-spiritual-influence-header">Spiritual Influence</h2>
+                        <h2 class="sheet-table-like-heading">Spiritual Influence</h2>
 
                         <div class="sheet-centred-section">
                             <div class="sheet-spiritual-influence-image">
@@ -9797,10 +9875,14 @@
 
                         <div class="sheet-flex-section">
                             <div class="sheet-column-grow">
-                                <h2>Honor (Good Reputation)</h2>
                                 <table>
                                     <tr>
-                                        <td class="sheet-skillname">Honor</td>
+                                        <th colspan="2">
+                                            <h2>Honor (Good Reputation)</h2>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th class="sheet-skillname">Honor</th>
                                         <td>
                                             <input
                                                 type="number"
@@ -9811,7 +9893,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-skillname">Title</td>
+                                        <th class="sheet-skillname">Title</th>
                                         <td class="sheet-read-only-field">
                                             <input
                                                 type="text"
@@ -9857,10 +9939,14 @@
                             </div>
 
                             <div class="sheet-column-grow">
-                                <h2>Corruption (Bad Reputation)</h2>
                                 <table>
                                     <tr>
-                                        <td class="sheet-skillname">Corruption</td>
+                                        <th colspan="2">
+                                            <h2>Corruption (Bad Reputation)</h2>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th class="sheet-skillname">Corruption</th>
                                         <td>
                                             <input
                                                 type="number"
@@ -9871,7 +9957,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-skillname">Title</td>
+                                        <th class="sheet-skillname">Title</th>
                                         <td class="sheet-read-only-field">
                                             <input
                                                 type="text"
@@ -9917,10 +10003,14 @@
                             </div>
 
                             <div class="sheet-column-grow">
-                                <h2>Total Reputation</h2>
                                 <table>
                                     <tr>
-                                        <td class="sheet-skillname">Total Reputation</td>
+                                        <th colspan="2">
+                                            <h2>Total Reputation</h2>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th class="sheet-skillname">Total Reputation</th>
                                         <td class="sheet-read-only-field">
                                             <input
                                                 type="text"
@@ -9932,7 +10022,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-skillname">Next Tier</td>
+                                        <th class="sheet-skillname">Next Tier</th>
                                         <td class="sheet-read-only-field">
                                             <input
                                                 type="text"
@@ -9944,13 +10034,13 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-skillname">Additional Talents</td>
+                                        <th class="sheet-skillname">Additional Talents</th>
                                         <td class="sheet-cell-numeric-readonly">
                                             <input type="number" name="attr_ReputationTalents" value="0" readonly />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-skillname">Fame</td>
+                                        <th class="sheet-skillname">Fame</th>
                                         <td class="sheet-cell-numeric-readonly">
                                             <input type="number" name="attr_Glory" value="0" readonly />%
                                         </td>
@@ -10090,15 +10180,15 @@
 
                 <table>
                     <tr>
-                        <th>Rating</th>
+                        <th><span>Rating</span></th>
                         <td>{{rating}}</td>
                     </tr>
                     <tr>
-                        <th>Max. Rating</th>
+                        <th><span>Max. Rating</span></th>
                         <td>{{maxRating}}</td>
                     </tr>
                     <tr>
-                        <th>Power</th>
+                        <th><span>Power</span></th>
                         <td>{{power}}</td>
                     </tr>
                 </table>
@@ -10126,11 +10216,11 @@
 
                 <table>
                     <tr>
-                        <th>Roll</th>
+                        <th><span>Roll</span></th>
                         <td>{{roll}}</td>
                     </tr>
                     <tr>
-                        <th>Target</th>
+                        <th><span>Target</span></th>
                         <td>{{target}}</td>
                     </tr>
                 </table>
@@ -10146,7 +10236,7 @@
 
                 <table>
                     <tr>
-                        <th>Total To Hit</th>
+                        <th><span>Total To Hit</span></th>
                         <td>{{roll}}</td>
                     </tr>
                 </table>
@@ -10155,7 +10245,7 @@
 
                 <table>
                     <tr>
-                        <th>Actions</th>
+                        <th><span>Actions</span></th>
                         <td>{{actions}}</td>
                     </tr>
                 </table>
@@ -10171,7 +10261,7 @@
 
                 <table>
                     <tr>
-                        <th>Damage</th>
+                        <th><span>Damage</span></th>
                         <td>{{damage}}</td>
                     </tr>
                 </table>
@@ -10187,7 +10277,7 @@
 
                 <table>
                     <tr>
-                        <th>Roll</th>
+                        <th><span>Roll</span></th>
                         <td>{{roll}}</td>
                     </tr>
                 </table>
@@ -10229,23 +10319,23 @@
 
                 <table>
                     <tr>
-                        <th>Area</th>
+                        <th><span>Area</span></th>
                         <td>{{area}}</td>
                     </tr>
                     <tr>
-                        <th>Duration</th>
+                        <th><span>Duration</span></th>
                         <td>{{duration}}</td>
                     </tr>
                     <tr>
-                        <th>Protection</th>
+                        <th><span>Protection</span></th>
                         <td>{{protection}}</td>
                     </tr>
                     <tr>
-                        <th>Mana Drain</th>
+                        <th><span>Mana Drain</span></th>
                         <td>{{drain}}</td>
                     </tr>
                     <tr>
-                        <th>Magic Actions</th>
+                        <th><span>Magic Actions</span></th>
                         <td>{{actions}}</td>
                     </tr>
                 </table>
@@ -10265,7 +10355,7 @@
 
                 <table>
                     <tr>
-                        <th>Total to Cast</th>
+                        <th><span>Total to Cast</span></th>
                         <td>{{roll}}</td>
                     </tr>
                 </table>
@@ -10274,19 +10364,19 @@
 
                 <table>
                     <tr>
-                        <th>Area</th>
+                        <th><span>Area</span></th>
                         <td>{{area}}</td>
                     </tr>
                     <tr>
-                        <th>Duration</th>
+                        <th><span>Duration</span></th>
                         <td>{{duration}}</td>
                     </tr>
                     <tr>
-                        <th>Mana Drain</th>
+                        <th><span>Mana Drain</span></th>
                         <td>{{drain}}</td>
                     </tr>
                     <tr>
-                        <th>Magic Actions</th>
+                        <th><span>Magic Actions</span></th>
                         <td>{{actions}}</td>
                     </tr>
                 </table>
@@ -10302,7 +10392,7 @@
 
                 <table>
                     <tr>
-                        <th>Total Spell Effect</th>
+                        <th><span>Total Spell Effect</span></th>
                         <td>{{roll}}</td>
                     </tr>
                 </table>
@@ -10311,7 +10401,7 @@
 
                 <table>
                     <tr>
-                        <th>Protection</th>
+                        <th><span>Protection</span></th>
                         <td>{{protection}}</td>
                     </tr>
                 </table>
