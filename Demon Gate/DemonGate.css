@@ -68,6 +68,36 @@
     --dg-mental-4: rgba(110, 20, 185, 0.62);
     --dg-mental-5: rgba(110, 20, 185, 0.78);
     --dg-mental-6: rgba(110, 20, 185, 0.94);
+
+    /* Toggle button / pill tokens — shared by tab buttons and max-uses pills */
+    --dg-toggle-bg: var(--dg-surface); /* unselected bg — header background */
+    --dg-toggle-bg-dark: var(--dg-surface-dark); /* unselected bg — header background (dark) */
+
+    /* selected bg — h1 radial gradient (light: amber→dark-red; dark: dark-red→near-black) */
+    --dg-toggle-bg-selected: radial-gradient(ellipse at center, #c85e21 0%, #a53c18 42%, #732012 72%, #4f140b 100%);
+    --dg-toggle-bg-selected-dark: radial-gradient(ellipse at center, #5f1d14 0%, #441711 22%, #301411 100%);
+
+    --dg-toggle-fg: var(--dg-primary); /* general toggle fg — unselected button text */
+    --dg-toggle-fg-dark: var(--dg-primary-dark); /* general toggle fg (dark) */
+
+    --dg-toggle-fg-selected: var(--dg-surface); /* selected toggle fg — text on gradient bg */
+    --dg-toggle-fg-selected-dark: var(--dg-primary-dark); /* selected toggle fg (dark) */
+
+    --dg-toggle-border: var(--dg-border); /* unselected border */
+    --dg-toggle-border-dark: var(--dg-border-dark); /* unselected border (dark) */
+
+    --dg-toggle-border-selected: var(--dg-border); /* selected border — same as unselected in light */
+    --dg-toggle-border-selected-dark: #b03828; /* selected border — brighter red for dark mode */
+}
+
+/* Override toggle selected-state tokens in dark mode so the enable-selector matrix
+   (which references the plain --dg-toggle-* names) automatically resolves the dark values
+   without duplicating the full 15-rule selector matrix. */
+.sheet-darkmode {
+    --dg-toggle-bg-selected: radial-gradient(ellipse at center, #5f1d14 0%, #441711 22%, #301411 100%);
+    --dg-toggle-border-selected: #b03828;
+    --dg-toggle-fg: var(--dg-primary-dark);
+    --dg-toggle-fg-selected: var(--dg-primary-dark);
 }
 
 /* ************************************************************************************************************************************************ */
@@ -75,12 +105,12 @@
 /* ************************************************************************************************************************************************ */
 
 .charsheet {
-    background: url("https://raw.githubusercontent.com/phaldenby72/roll20-character-sheets/refs/heads/demon-gate-attributes-and-defences/Demon%20Gate/map_watermark.jpg");
+    background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/refs/heads/master/Demon%20Gate/map_watermark.jpg");
     font-family: "Atkinson Hyperlegible", sans-serif;
 }
 
 .sheet-darkmode .charsheet {
-    background: url("https://raw.githubusercontent.com/phaldenby72/roll20-character-sheets/refs/heads/demon-gate-attributes-and-defences/Demon%20Gate/map_watermark_dark.jpg");
+    background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/refs/heads/master/Demon%20Gate/map_watermark_dark.jpg");
 }
 
 .sheet-demon-gate-charsheet {
@@ -142,10 +172,10 @@ span.sheet-tab {
     display: inline-block;
     font-size: 14px;
     line-height: 28px;
-    color: var(--dg-text-muted);
-    border: 1px solid var(--dg-primary);
+    color: var(--dg-toggle-fg);
+    border: 1px solid var(--dg-toggle-border);
     border-radius: 4px;
-    background: var(--dg-table-header-bg);
+    background: var(--dg-toggle-bg);
     width: 90px;
     height: 28px;
     cursor: pointer;
@@ -170,9 +200,9 @@ input.sheet-tab8:checked ~ div.sheet-section-notes {
 }
 
 input.sheet-tab:checked + span {
-    background: var(--dg-surface);
-    color: var(--dg-primary);
-    border: 2px solid var(--dg-primary);
+    background: var(--dg-toggle-bg-selected);
+    border: 2px solid var(--dg-toggle-border-selected);
+    color: var(--dg-toggle-fg-selected);
 }
 
 /* ************************************************************************************************************************************************ */
@@ -180,15 +210,15 @@ input.sheet-tab:checked + span {
 /* ************************************************************************************************************************************************ */
 
 .sheet-darkmode span.sheet-tab {
-    color: var(--dg-text-muted-dark);
-    border-color: var(--dg-border-dark);
-    background: var(--dg-table-header-bg-dark);
+    color: var(--dg-toggle-fg-dark);
+    border-color: var(--dg-toggle-border-dark);
+    background: var(--dg-toggle-bg-dark);
 }
 
 .sheet-darkmode input.sheet-tab:checked + span {
-    background: var(--dg-surface-dark);
-    color: var(--dg-primary-dark);
-    border-color: var(--dg-primary-dark);
+    background: var(--dg-toggle-bg-selected-dark);
+    border-color: var(--dg-toggle-border-selected-dark);
+    color: var(--dg-toggle-fg-selected-dark);
 }
 
 /* ************************************************************************************************************************************************ */
@@ -534,7 +564,7 @@ td.sheet-cell-numeric {
 /* Entry controls */
 /* ************************************************************************************************************************************************ */
 
-input,
+input:not([type="radio"]):not([type="checkbox"]),
 select,
 textarea,
 .sheet-input-like {
@@ -655,7 +685,7 @@ textarea::placeholder {
 /* Dark mode overrides */
 /* ************************************************************************************************************************************************ */
 
-.sheet-darkmode input,
+.sheet-darkmode input:not([type="radio"]):not([type="checkbox"]),
 .sheet-darkmode select,
 .sheet-darkmode textarea,
 .sheet-darkmode .sheet-input-like {
@@ -916,6 +946,170 @@ textarea.sheet-textarea-equipment {
 }
 
 /* ************************************************************************************************************************************************ */
+/* Class ability usage tracking */
+/* ************************************************************************************************************************************************ */
+
+/* Row containing the pill radio group and use circles */
+.sheet-uses-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding: 4px 8px;
+    border-top: 1px solid var(--dg-border);
+    background-color: var(--dg-surface);
+}
+
+/* "Max" / "Used" section labels */
+.sheet-uses-label {
+    font-size: 0.8em;
+    font-weight: bold;
+    white-space: nowrap;
+    color: var(--dg-text-muted);
+    margin-right: 6px;
+    flex-shrink: 0;
+}
+
+/* Radio pill: invisible but clickable (opacity: 0 pattern, same as .sheet-expand-collapse-checkbox).
+   The LABEL span is the visual element; the radio just captures clicks.
+   No gap on the flex container — spacing comes from .sheet-max-label margin-right. */
+input.sheet-max-radio {
+    opacity: 0;
+    display: inline-block;
+    width: 28px;
+    height: 20px;
+    flex-shrink: 0;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* Pill label: the visual pill. Overlays the preceding radio via negative margin.
+   pointer-events: none lets clicks fall through to the radio behind it.
+   margin-left: -28px pulls it back over the radio.
+   margin-right: 4px provides the gap before the next pill.
+   Net flex contribution = -28 + 28 + 4 = 4px (gap only). */
+.sheet-max-pill {
+    display: inline-block;
+    width: 28px;
+    height: 20px;
+    line-height: 18px;
+    margin-left: -28px;
+    margin-right: 4px;
+    text-align: center;
+    font-size: 0.7em;
+    font-weight: bold;
+    pointer-events: none;
+    color: var(--dg-toggle-fg);
+    flex-shrink: 0;
+    border-radius: 10px;
+    border: 1px solid var(--dg-toggle-border);
+    background: var(--dg-toggle-bg);
+    box-sizing: border-box;
+}
+
+/* Selected pill — toggle gradient background; fg from toggle-fg token */
+input.sheet-max-radio:checked + .sheet-max-pill {
+    background: var(--dg-toggle-bg-selected);
+    border: 1px solid var(--dg-toggle-border-selected);
+    color: var(--dg-toggle-fg-selected);
+}
+
+/* Thin vertical divider between pill group and use circles */
+.sheet-uses-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--dg-border);
+    margin: 0 8px;
+    flex-shrink: 0;
+}
+
+/* Use circle checkboxes — disabled by default.
+   appearance: none + explicit size. element.class selector (0,1,1) beats any
+   Roll20-injected input rules. background: transparent is required — without it
+   the dark-mode forms rule would fill the circle with the control background colour. */
+.sheet-demon-gate-charsheet input.sheet-use-cb {
+    /** Use higher specificity to override Roll20's injected rules */
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 2px solid var(--dg-border);
+    background: transparent;
+    cursor: not-allowed;
+    opacity: 0.3;
+    pointer-events: none;
+    margin-left: 4px;
+    box-sizing: border-box;
+}
+
+/* Checked — same look as a selected pill; the × is provided by the adjacent .sheet-use-icon span */
+.sheet-demon-gate-charsheet input.sheet-use-cb:checked {
+    background: var(--dg-toggle-bg-selected);
+    border: 2px solid var(--dg-toggle-border-selected);
+}
+
+/* Icon span: overlays the preceding checkbox via negative margin.
+   The × is always in the DOM but transparent until the checkbox is checked or focused+checked. */
+.sheet-use-icon {
+    display: inline-block;
+    width: 16px;
+    height: 18px;
+    line-height: 16px;
+    margin-left: -16px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: transparent;
+    pointer-events: none;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+/* Show × when the checkbox is checked (covers plain :checked and :focus:checked) */
+input.sheet-use-cb:checked + .sheet-use-icon {
+    color: var(--dg-toggle-fg-selected);
+}
+
+/* Hide the separator, "Used" label, circles, icons, and reset button when max is N/A (value 0).
+   The "Max" label precedes the radio so ~ won't reach it — only siblings after value="0" are hidden. */
+input.sheet-max-radio[value="0"]:checked ~ .sheet-uses-sep,
+input.sheet-max-radio[value="0"]:checked ~ .sheet-uses-label,
+input.sheet-max-radio[value="0"]:checked ~ input.sheet-use-cb,
+input.sheet-max-radio[value="0"]:checked ~ .sheet-use-icon {
+    display: none;
+}
+
+/* Progressively enable circles based on the selected max pill.
+   ~ general sibling selector skips the separator and "Used" label spans between
+   the radio pills and the use circles. */
+input.sheet-max-radio[value="1"]:checked ~ input.sheet-use-cb-1,
+input.sheet-max-radio[value="2"]:checked ~ input.sheet-use-cb-1,
+input.sheet-max-radio[value="2"]:checked ~ input.sheet-use-cb-2,
+input.sheet-max-radio[value="3"]:checked ~ input.sheet-use-cb-1,
+input.sheet-max-radio[value="3"]:checked ~ input.sheet-use-cb-2,
+input.sheet-max-radio[value="3"]:checked ~ input.sheet-use-cb-3,
+input.sheet-max-radio[value="4"]:checked ~ input.sheet-use-cb-1,
+input.sheet-max-radio[value="4"]:checked ~ input.sheet-use-cb-2,
+input.sheet-max-radio[value="4"]:checked ~ input.sheet-use-cb-3,
+input.sheet-max-radio[value="4"]:checked ~ input.sheet-use-cb-4,
+input.sheet-max-radio[value="5"]:checked ~ input.sheet-use-cb-1,
+input.sheet-max-radio[value="5"]:checked ~ input.sheet-use-cb-2,
+input.sheet-max-radio[value="5"]:checked ~ input.sheet-use-cb-3,
+input.sheet-max-radio[value="5"]:checked ~ input.sheet-use-cb-4,
+input.sheet-max-radio[value="5"]:checked ~ input.sheet-use-cb-5 {
+    opacity: 1;
+    pointer-events: auto;
+    cursor: pointer;
+    background: var(--dg-toggle-bg-selected);
+    border: 1px solid var(--dg-toggle-border-selected);
+    /* Dark mode: .sheet-darkmode overrides --dg-toggle-bg-selected and --dg-toggle-border-selected
+       in variables.css, so this rule resolves correctly in both modes without a separate matrix. */
+}
+
+/* ************************************************************************************************************************************************ */
 /* Dark mode overrides */
 /* ************************************************************************************************************************************************ */
 
@@ -928,6 +1122,43 @@ textarea.sheet-textarea-equipment {
 .sheet-darkmode .sheet-textarea-equipment {
     border-color: var(--dg-border-dark);
 }
+
+.sheet-darkmode .sheet-uses-row {
+    border-color: var(--dg-border-dark);
+    background-color: var(--dg-surface-dark);
+}
+
+.sheet-darkmode .sheet-uses-label {
+    color: var(--dg-text-muted-dark);
+}
+
+.sheet-darkmode .sheet-max-pill {
+    color: var(--dg-toggle-fg-dark);
+    border-color: var(--dg-toggle-border-dark);
+    background: var(--dg-toggle-bg-dark);
+}
+
+.sheet-darkmode input.sheet-max-radio:checked + .sheet-max-pill {
+    background: var(--dg-toggle-bg-selected-dark);
+    border: 1px solid var(--dg-toggle-border-selected-dark);
+    color: var(--dg-toggle-fg-selected-dark);
+}
+
+.sheet-darkmode .sheet-uses-sep {
+    background: var(--dg-border-dark);
+}
+
+.sheet-darkmode input.sheet-use-cb {
+    background: transparent;
+    border-color: var(--dg-border-dark);
+}
+
+.sheet-darkmode input.sheet-use-cb:checked + .sheet-use-icon {
+    color: var(--dg-toggle-fg-selected-dark);
+}
+
+/* Checked circles and enable selectors use the same red in dark mode —
+   base-rule specificity (0,4,2) already beats dark mode overrides (0,2,1), so no dark overrides needed */
 
 /* ************************************************************************************************************************************************ */
 /* Mysic tab
@@ -946,7 +1177,7 @@ textarea.sheet-textarea-equipment {
 }
 
 .sheet-spiritual-influence-image {
-    background: url("https://raw.githubusercontent.com/phaldenby72/roll20-character-sheets/refs/heads/demon-gate-attributes-and-defences/Demon%20Gate/circle_v2.png");
+    background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/refs/heads/master/Demon%20Gate/circle_v2.png");
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -1026,6 +1257,7 @@ tr.sheet-spell-spacer-row td {
 /* Roll template CSS variables - Roll20 requires these to be defined separately */
 .sheet-rolltemplate-text,
 .sheet-rolltemplate-class-ability-text,
+.sheet-rolltemplate-chi-power,
 .sheet-rolltemplate-percentile,
 .sheet-rolltemplate-attack,
 .sheet-rolltemplate-damage,
@@ -1072,6 +1304,7 @@ tr.sheet-spell-spacer-row td {
 
 .sheet-rolltemplate-text .sheet-template-box,
 .sheet-rolltemplate-class-ability-text .sheet-template-box,
+.sheet-rolltemplate-chi-power .sheet-template-box,
 .sheet-rolltemplate-percentile .sheet-template-box,
 .sheet-rolltemplate-attack .sheet-template-box,
 .sheet-rolltemplate-damage .sheet-template-box,
@@ -1089,6 +1322,7 @@ tr.sheet-spell-spacer-row td {
 
 .sheet-rolltemplate-text .sheet-template-text,
 .sheet-rolltemplate-class-ability-text .sheet-template-text,
+.sheet-rolltemplate-chi-power .sheet-template-text,
 .sheet-rolltemplate-percentile .sheet-template-text,
 .sheet-rolltemplate-spell-description .sheet-template-text {
     font-size: 13px;
@@ -1100,6 +1334,7 @@ tr.sheet-spell-spacer-row td {
 
 .sheet-rolltemplate-text .sheet-template-title,
 .sheet-rolltemplate-class-ability-text .sheet-template-title,
+.sheet-rolltemplate-chi-power .sheet-template-title,
 .sheet-rolltemplate-percentile .sheet-template-title,
 .sheet-rolltemplate-attack .sheet-template-title,
 .sheet-rolltemplate-damage .sheet-template-title,
@@ -1126,6 +1361,7 @@ tr.sheet-spell-spacer-row td {
 
 .sheet-rolltemplate-text .sheet-template-title::before,
 .sheet-rolltemplate-class-ability-text .sheet-template-title::before,
+.sheet-rolltemplate-chi-power .sheet-template-title::before,
 .sheet-rolltemplate-percentile .sheet-template-title::before,
 .sheet-rolltemplate-attack .sheet-template-title::before,
 .sheet-rolltemplate-damage .sheet-template-title::before,
@@ -1149,6 +1385,7 @@ tr.sheet-spell-spacer-row td {
 
 .sheet-rolltemplate-text .sheet-template-subtitle,
 .sheet-rolltemplate-class-ability-text .sheet-template-subtitle,
+.sheet-rolltemplate-chi-power .sheet-template-subtitle,
 .sheet-rolltemplate-percentile .sheet-template-subtitle,
 .sheet-rolltemplate-attack .sheet-template-subtitle,
 .sheet-rolltemplate-damage .sheet-template-subtitle,
@@ -1170,6 +1407,7 @@ tr.sheet-spell-spacer-row td {
 
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-text .sheet-template-title,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text .sheet-template-title,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-chi-power .sheet-template-title,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .sheet-template-title,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-attack .sheet-template-title,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-damage .sheet-template-title,
@@ -1186,6 +1424,7 @@ tr.sheet-spell-spacer-row td {
 
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-text .sheet-template-subtitle,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text .sheet-template-subtitle,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-chi-power .sheet-template-subtitle,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .sheet-template-subtitle,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-attack .sheet-template-subtitle,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-damage .sheet-template-subtitle,
@@ -1202,6 +1441,7 @@ tr.sheet-spell-spacer-row td {
 /* Divider styling for roll templates that use them */
 
 .sheet-rolltemplate-class-ability-text .sheet-template-hr,
+.sheet-rolltemplate-chi-power .sheet-template-hr,
 .sheet-rolltemplate-percentile .sheet-template-hr,
 .sheet-rolltemplate-attack .sheet-template-hr,
 .sheet-rolltemplate-spell-description .sheet-template-hr,
@@ -1221,6 +1461,7 @@ tr.sheet-spell-spacer-row td {
 /** Table styling for roll templates that use them */
 
 .sheet-rolltemplate-class-ability-text th,
+.sheet-rolltemplate-chi-power th,
 .sheet-rolltemplate-percentile th,
 .sheet-rolltemplate-spell-description th,
 .sheet-rolltemplate-spell-cast th,
@@ -1241,6 +1482,7 @@ tr.sheet-spell-spacer-row td {
 }
 
 .sheet-rolltemplate-class-ability-text th span,
+.sheet-rolltemplate-chi-power th span,
 .sheet-rolltemplate-percentile th span,
 .sheet-rolltemplate-attack th span,
 .sheet-rolltemplate-damage th span,
@@ -1252,6 +1494,7 @@ tr.sheet-spell-spacer-row td {
 }
 
 .sheet-rolltemplate-class-ability-text td,
+.sheet-rolltemplate-chi-power td,
 .sheet-rolltemplate-percentile td,
 .sheet-rolltemplate-spell-description td,
 .sheet-rolltemplate-spell-cast td,
@@ -1292,6 +1535,7 @@ tr.sheet-spell-spacer-row td {
 
 /* Dark mode text colour — th span overrides Roll20's html.dark th !important; td/text elements get full amber */
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text th span,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-chi-power th span,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile th span,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-attack th span,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-damage th span,
@@ -1304,6 +1548,7 @@ tr.sheet-spell-spacer-row td {
 
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-text td,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text td,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-chi-power td,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile td,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-attack td,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-damage td,
@@ -1318,6 +1563,7 @@ tr.sheet-spell-spacer-row td {
 
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-text .sheet-template-text,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text .sheet-template-text,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-chi-power .sheet-template-text,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .sheet-template-text,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-description .sheet-template-text,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-simple .sheet-template-text-prominent,
@@ -1329,6 +1575,7 @@ tr.sheet-spell-spacer-row td {
 /* Dark mode support */
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-text .sheet-template-box,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text .sheet-template-box,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-chi-power .sheet-template-box,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .sheet-template-box,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-attack .sheet-template-box,
 .sheet-rolltemplate-darkmode.sheet-rolltemplate-damage .sheet-template-box,
