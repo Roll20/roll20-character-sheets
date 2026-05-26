@@ -1,31 +1,31 @@
-// TURN RPG — Roll Banner API Script v10
+// TURN RPG — Roll Banner API Script v12
 
 var TURN_BANNERS = {
-  1:  'https://files.d20.io/images/486058023/gKbwiBmDlQmbHjlPuMjMHg/max.png?1778112004',
-  2:  'https://files.d20.io/images/486058024/MHv5K9XnIccGXva_AhdB9w/max.png?1778112004',
-  3:  'https://files.d20.io/images/486058025/4YmcHs7G6HuOmBO5ccr2RQ/max.png?1778112004',
-  4:  'https://files.d20.io/images/486058031/olGlF3dUAlvBrB1QrPuIkQ/max.png?1778112005',
-  5:  'https://files.d20.io/images/486057979/Lk37RS9O_jFoXz2CM7OYNA/max.png?1778111998',
-  6:  'https://files.d20.io/images/486057980/0R_F8YGsKRLs5uetIr_zjg/max.png?1778111998',
-  7:  'https://files.d20.io/images/486057982/SExufyTOQWoFesmiexo8Xw/max.png?1778111999',
-  8:  'https://files.d20.io/images/486057981/z4bJhLJ9zlrXQh0vfG-hzQ/max.png?1778111999',
-  9:  'https://files.d20.io/images/486057983/oMv42rzYJbLCWYGfvEQcPg/max.png?1778111999',
-  10: 'https://files.d20.io/images/486058000/dIZvoYkB7X_f60izQmfHaA/max.png?1778112001',
-  11: 'https://files.d20.io/images/486057999/APXrwJVstGB_N7OSFxXZUA/max.png?1778112001',
-  12: 'https://files.d20.io/images/486058001/lITWH7nHlclgVJXyX2oL7w/max.png?1778112001',
-  13: 'https://files.d20.io/images/486058017/QLY0EUg72V3LmAdm1r33cg/max.png?1778112003',
-  14: 'https://files.d20.io/images/486058012/e4yvJmkAZQr9xSO7iQMalA/max.png?1778112002',
-  15: 'https://files.d20.io/images/486058013/DtHvE6_nzkudG6kndor2pg/max.png?1778112002',
-  16: 'https://files.d20.io/images/486058014/HSwHUJBQB9etZJ_VLoK41Q/max.png?1778112002',
+  1:  'https://files.d20.io/images/487960941/4AIEjbxGlFlYiThCHnotMw/med.webp?1779492921',
+  2:  'https://files.d20.io/images/487960942/RaF-djQpGeJT3VAUQ08t7w/max.webp?1779492362',
+  3:  'https://files.d20.io/images/487960918/8Ha5OxLM5UDTihIgkmQoIA/max.webp?1779492360',
+  4:  'https://files.d20.io/images/487960914/wVxDTQEahRHiZIty4sq2UQ/max.webp?1779492360',
+  5:  'https://files.d20.io/images/487960917/6wVeQP5gtnP2DzOO760ipg/max.webp?1779492360',
+  6:  'https://files.d20.io/images/487960913/ZhAAwMiwkBb0Cs7Lkbp_7g/max.webp?1779492360',
+  7:  'https://files.d20.io/images/487960915/oS28HbAvisTjSMACiDw2fQ/max.webp?1779492360',
+  8:  'https://files.d20.io/images/487960920/Oi0QljzqLOGHICD-VAb-WA/max.webp?1779492360',
+  9:  'https://files.d20.io/images/487960922/U48cT6BgKW4KhbK0jBmx-A/max.webp?1779492361',
+  10: 'https://files.d20.io/images/487960924/Uz_sgY8pqzZzrscMsJi4zw/max.webp?1779492361',
+  11: 'https://files.d20.io/images/487960925/Waw780sLs1xkERr68SqdSA/max.webp?1779492361',
+  12: 'https://files.d20.io/images/487960928/vXalYpZ9ZeLXyNugHxVnJg/max.webp?1779492361',
+  13: 'https://files.d20.io/images/487960929/5TbXurKlheE4MR74VCgArA/max.webp?1779492361',
+  14: 'https://files.d20.io/images/487960931/DDCmJ0HqaEoCsee1ZtV7Dg/max.webp?1779492361',
+  15: 'https://files.d20.io/images/487960932/YVbYP5vT2BSVv7iqLcIoVw/max.webp?1779492361',
+  16: 'https://files.d20.io/images/487960933/iuWoLeVibbdBgM5uMLPP0Q/max.webp?1779492361',
 };
 
 var TURN_DIE_BANNERS = {
-  1: 'https://files.d20.io/images/486388213/WRvGftNR4FU0OD7M9LCvkg/max.png?1778358228',
-  2: 'https://files.d20.io/images/486388203/1UcMlBr7KkrjM4JwGrNLTg/max.png?1778358226',
-  3: 'https://files.d20.io/images/486388204/g-GJWDNQVdNReh8uxdsN7A/max.png?1778358226',
-  4: 'https://files.d20.io/images/486388205/_e7JCX51nc_Xd-wHBDgXDA/max.png?1778358226',
-  5: 'https://files.d20.io/images/486388206/WKv4-RMkerJOB6mxvDq9Sw/max.png?1778358226',
-  6: 'https://files.d20.io/images/486388207/dCh4uENBm-RtN55uoaxplw/max.png?1778358226',
+  1: 'https://files.d20.io/images/487960934/ndaKhWBNg9CKZB_BTye60g/max.webp?1779492362',
+  2: 'https://files.d20.io/images/487960935/eutRuRozclY9pOs1RhXcVQ/max.webp?1779492362',
+  3: 'https://files.d20.io/images/487960937/hhopbNtWomcyrzDfY7SaTw/max.webp?1779492362',
+  4: 'https://files.d20.io/images/487960938/Fv6iIOAbDhUyRwLziYRhDw/max.webp?1779492362',
+  5: 'https://files.d20.io/images/487960939/2ApdbuiM4VjmOBanZSwHhw/max.webp?1779492362',
+  6: 'https://files.d20.io/images/487960940/IN_Q-mHTfji7jdxRsif9kQ/max.webp?1779492362',
 };
 
 function getTier(total) {
@@ -79,7 +79,7 @@ on('chat:message', function(msg) {
 
   // Health check
   if (msg.type === 'api' && msg.content.trim() === '!turn-test') {
-    sendChat('Turn API', '/w gm Turn API v10 is running.');
+    sendChat('Turn API', '/w gm Turn API v12 is running.');
     return;
   }
 
