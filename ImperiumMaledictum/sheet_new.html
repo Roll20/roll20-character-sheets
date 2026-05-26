@@ -16,15 +16,6 @@
         name="act_settings">Settings</button></div>
 
     <div class="roller">
-        <select class="input character" name="attr_difficulty">
-          <option value="60">Very Easy (+60)</option>
-          <option value="40">Easy (+40)</option>
-          <option value="20">Routine (+20)</option>
-          <option value="0" selected>Challenging (+0)</option>
-          <option value="-10">Difficult (-10)</option>
-          <option value="-20">Hard (-20)</option>
-          <option value="-30">Very Hard (-30)</option>
-        </select>
         <select class="input character" name="attr_superiority">
           <option value="0">No Superiority</option>
           <option value="1">+1 Superiority</option>
@@ -33,15 +24,6 @@
           <option value="4">+4 Superiority</option>
           <option value="5">+5 Superiority</option>
           <option value="6">+6 Superiority</option>
-        </select>
-        <select class="input character" name="attr_circumstances">
-            <option value="3">Advantage (+20)</option>
-            <option value="2">Advantage (+10)</option>
-            <option value="1">Advantage</option>
-            <option value="0" selected>No Advantage</option>
-            <option value="-1">Disadvantage</option>
-            <option value="-2">Disadvantage (-10)</option>
-            <option value="-3">Disadvantage (-20)</option>
         </select>
     </div>
 </div>
@@ -1787,7 +1769,7 @@
         });
     });
 
-const test_list = ["difficulty","circumstances","superiority","psychic_focus","roll_visibility"];
+const test_list = ["superiority","psychic_focus","roll_visibility"];
     const button_list = chars_list.concat(skill_list).concat(npc_chars_list);
     button_list.forEach(trigger => {
         on(`clicked:${trigger}`, function(eventInfo) {
@@ -1802,11 +1784,9 @@ const test_list = ["difficulty","circumstances","superiority","psychic_focus","r
 
             getAttrs(test_list.concat(button_list), function(values) {
                 let skill_total = parseInt(values[`${field}`])||0;
-                let diff_roll = parseInt(values["difficulty"])||0;
-                let circ = parseInt(values["circumstances"])||0;
                 let superiority = parseInt(values["superiority"])||0;
 
-                rollTest(reroll, skill_name, skill_total, diff_roll, circ, superiority);
+                rollTest(reroll, skill_name, skill_total, superiority);
             });
         });
     });
@@ -1828,50 +1808,29 @@ const test_list = ["difficulty","circumstances","superiority","psychic_focus","r
                     `${trigger}_${key}_name`,
                     `${trigger}_${key}_total`,
                     `${trigger}_${key}_damage_total`,
-                    `${trigger}_${key}_damage_info`,
-                    `${trigger}_${key}_difficulty`
+                    `${trigger}_${key}_damage_info`
                 ]), function(values) {
                 let skill_name = values[`${trigger}_${key}_name`];
                 let skill_total = parseInt(values[`${trigger}_${key}_total`])||0;
-                let diff_roll = parseInt(values["difficulty"])||0;
-                if (`${trigger}_${key}_difficulty` in values) {
-                    diff_roll = parseInt(values[`${trigger}_${key}_difficulty`])||0;
-                }
-                let circ = parseInt(values["circumstances"])||0;
                 let superiority = parseInt(values["superiority"])||0;
                 let slmod = trigger == "repeating_powers" ? (parseInt(values["psychic_focus"])||0) : 0;
                 let dmg = parseInt(values[`${trigger}_${key}_damage_total`])||-1;
                 let dmg_info = values[`${trigger}_${key}_damage_info`];
                 let critfum = trigger == "repeating_weapons";
 
-                rollTest(reroll, skill_name, skill_total, diff_roll, circ, superiority, dmg, dmg_info, slmod, critfum);
+                rollTest(reroll, skill_name, skill_total, superiority, dmg, dmg_info, slmod, critfum);
             });
         });
     });
 
-    const rollTest = function(reroll, skill_name, skill_total, diff_roll, circ, superiority, dmg=-1, dmgi="", slmod=0, critfum=false) {
-        let circ_bonus = 0;
-        let circ_roll = "";
-        let adv_roll = "";
-        let disadv_roll = "";
+    const rollTest = function(reroll, skill_name, skill_total, superiority, dmg=-1, dmgi="", slmod=0, critfum=false) {
+        const diff_query = "?{Difficulty|Challenging (+0),0|Very Easy (+60),60|Easy (+40),40|Routine (+20),20|Difficult (-10),-10|Hard (-20),-20|Very Hard (-30),-30}";
+        const circ_query = "?{Circumstances|No Advantage,0|Advantage,1|Disadvantage,-1}";
         let dmg_roll = "";
         let dmg_info = dmgi ? ` {{damage_info=${dmgi}}}` : "";
         let hitloc = "";
         let adjustedsl = slmod > 0 ? ` {{adjustedsl=+${slmod}}}` :
             slmod < 0 ? ` {{adjustedsl=${slmod}}}` : "";
-        if (circ > 0) {
-            circ_bonus = (circ - 1) * 10;
-            adv_roll = " {{advantage=[[0]]}}";
-            circ_roll = " {{circumstances=Advantage";
-            circ_roll += circ_bonus > 0 ? ` (+${circ_bonus})` : "";
-            circ_roll += "}}";
-        } else if (circ < 0) {
-            circ_bonus = (circ + 1) * 10;
-            disadv_roll = " {{disadvantage=[[0]]}}";;
-            circ_roll = " {{circumstances=Disadvantage";
-            circ_roll += circ_bonus < 0 ? ` (${circ_bonus})` : "";
-            circ_roll += "}}";
-        }
         if (dmg > -1) {
             dmg_roll = ` {{damage=[[${dmg}]]}}`;
         }
@@ -1884,8 +1843,8 @@ const test_list = ["difficulty","circumstances","superiority","psychic_focus","r
 
             startRoll(`${rollPrefix}&{template:imtest} {{reroll=[Reroll](~${reroll})}} `
                 .concat(`{{name=@{character_name}}} {{skill_name=${skill_name}}} `)
-                .concat(`{{skill_total=[[${skill_total}]]}} {{difficulty=[[${diff_roll}]]}} `)
-                .concat(`{{result=[[1d100]]}}${adv_roll}${disadv_roll}${circ_roll}${dmg_roll}${dmg_info}${hitloc} `)
+                .concat(`{{skill_total=[[${skill_total}]]}} {{difficulty=[[${diff_query}]]}} `)
+                .concat(`{{result=[[1d100]]}} {{circ_value=[[${circ_query}]]}} {{circumstances=[[0]]}}${dmg_roll}${dmg_info}${hitloc} `)
                 .concat(`{{sl=[[0]]}} {{sl_info=[[0]]}} {{critical=[[0]]}} {{fumble=[[0]]}}${adjustedsl}`)
                 .concat(`{{superiority=${superiority}}}`), (results) => {
                 const result = results.results.result.result;
@@ -1895,6 +1854,19 @@ const test_list = ["difficulty","circumstances","superiority","psychic_focus","r
                 }
                 const difficulty = results.results.difficulty.result;
                 const diff_name = diff_data[`${difficulty}`]["name"];
+                const circ = results.results.circ_value.result;
+
+                let circ_bonus = 0;
+                let circ_text = "";
+                if (circ > 0) {
+                    circ_bonus = (circ - 1) * 10;
+                    circ_text = "Advantage";
+                    circ_text += circ_bonus > 0 ? ` (+${circ_bonus})` : "";
+                } else if (circ < 0) {
+                    circ_bonus = (circ + 1) * 10;
+                    circ_text = "Disadvantage";
+                    circ_text += circ_bonus < 0 ? ` (${circ_bonus})` : "";
+                }
 
                 let final_result = result;
                 let final_total = skill_total + difficulty;
@@ -1929,6 +1901,7 @@ const test_list = ["difficulty","circumstances","superiority","psychic_focus","r
                 finishRoll(
                     results.rollId,
                     {
+                        "circ_value": circ,
                         "result": final_result,
                         "difficulty": diff_name,
                         "skill_total": final_total,
@@ -1936,7 +1909,8 @@ const test_list = ["difficulty","circumstances","superiority","psychic_focus","r
                         "sl_info": final_sl_info,
                         "critical": crit,
                         "fumble": fumb,
-                        "hitlocation": hitlocation
+                        "hitlocation": hitlocation,
+                        "circumstances": circ_text
                     }
                 );
             });
@@ -2050,13 +2024,19 @@ const test_list = ["difficulty","circumstances","superiority","psychic_focus","r
         {{#adjustedsl}}
             <p>//Adjusted SL: {{adjustedsl}}</p>
         {{/adjustedsl}}
-        {{#circumstances}}
-            <p>//{{circumstances}}</p>
-        {{/circumstances}}
+        {{#rollGreater() computed::circ_value 0}}
+            <p>//{{computed::circumstances}}</p>
+        {{/rollGreater() computed::circ_value 0}}
+        {{#rollLess() computed::circ_value 0}}
+            <p>//{{computed::circumstances}}</p>
+        {{/rollLess() computed::circ_value 0}}
         <p>Test adjusted to {{computed::skill_total}}%</p>
-        {{#circumstances}}
+        {{#rollGreater() computed::circ_value 0}}
             <p>//Unmodified roll: {{result}}</p>
-        {{/circumstances}}
+        {{/rollGreater() computed::circ_value 0}}
+        {{#rollLess() computed::circ_value 0}}
+            <p>//Unmodified roll: {{result}}</p>
+        {{/rollLess() computed::circ_value 0}}
         {{#rollLess() superiority 1 }}
         {{#superiority}}
             <p>//Superiority: {{superiority}}</p>
