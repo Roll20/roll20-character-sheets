@@ -1,3 +1,16 @@
+# 2026-05-26
+
+- Update of build process to handle a new version of VNU.
+- Expertise can now be special for a skill (instead of just true false).
+   - Power development is now special.
+- Add option for average realm stats.
+- Signature Style edit box.
+- Tracker:
+  - Slightly improved error handling.
+  - New combat button re-enabled.
+  - Deleted old 'next init' which was 100% useless and wrong.
+  - Attacks work for creatures.
+
 # 2026-05-05
 
 - Injury string fix missing ')'
