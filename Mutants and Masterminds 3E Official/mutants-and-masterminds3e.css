@@ -1281,12 +1281,6 @@
 .version-mode[value=legacy] ~ .sheet .legacy-center-tabs .display-powers .repitem {
   display: flex !important;
 }
-.version-mode[value=legacy] ~ .sheet .skill-group:has(> button.repcontrol-button--add) > .repcontrol .repcontrol_add {
-  display: inline-block !important;
-}
-.version-mode[value=legacy] ~ .sheet .skill-group:has(> button.repcontrol-button--add) > .repcontrol-button--add {
-  display: none !important;
-}
 
 .version-mode:not([value=legacy]) ~ .sheet .legacy-center-tabs {
   display: none;
@@ -2949,18 +2943,41 @@ input.anim-reduced[type=hidden][value=off] ~ div .edit_conditions label:hover {
 }
 
 .section-movement {
+  display: grid;
   flex: 1 0 160px;
-  display: flex;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "--fieldset --edit" "--fieldset --add";
   gap: 4px;
   border-image: unset;
+  position: relative;
 }
 .section-movement > button {
   width: auto;
-  flex: 0 0 auto;
 }
-.section-movement > fieldset.repeating_movement {
-  flex: 1;
-  min-width: 0;
+.section-movement .repcontrol {
+  grid-area: --edit;
+}
+.section-movement > .repcontrol-button--add {
+  grid-area: --add;
+  align-self: start;
+  background: var(--col-black);
+  color: var(--col-white);
+  border: 0;
+  padding: 2px 8px;
+  font-size: 13px;
+  border-radius: 20px;
+  flex: 0 0 auto;
+  text-align: center;
+  transform: scaleY(0);
+  transition: transform 100ms ease;
+}
+.section-movement:hover > .repcontrol-button--add {
+  transform: scaleY(1);
+}
+.section-movement > .repcontainer .repcontrol .repcontrol_add,
+.section-movement > .repcontrol .repcontrol_add {
+  display: none;
 }
 .section-movement {
   background: linear-gradient(var(--col-white-t), var(--col-white-t)), linear-gradient(var(--col-purple-t), var(--col-purple-t)), var(--bg-conditions);
@@ -2970,6 +2987,7 @@ input.anim-reduced[type=hidden][value=off] ~ div .edit_conditions label:hover {
   transform: scale(1);
 }
 .section-movement .repcontainer {
+  grid-area: --fieldset;
   display: flex;
   flex-wrap: wrap;
   flex: 1;
@@ -3024,8 +3042,14 @@ input.anim-reduced[type=hidden][value=off] ~ div .edit_conditions label:hover {
 .section-movement .speedExample span {
   display: inline-block;
 }
+.section-movement .speedExample .speedSeparator {
+  margin: 0 0.4em;
+  color: var(--col-black);
+  opacity: 0.6;
+}
 .section-movement .speedExample input[type=hidden][value=teleportation] ~ span:nth-of-type(1),
-.section-movement .speedExample input[type=hidden][value=teleportation] ~ span:nth-of-type(2) {
+.section-movement .speedExample input[type=hidden][value=teleportation] ~ span:nth-of-type(2),
+.section-movement .speedExample input[type=hidden][value=teleportation] ~ span:nth-of-type(3) {
   display: none;
 }
 
@@ -4622,12 +4646,25 @@ input.anim-reduced[type=hidden][value=off] ~ div .skill-row button:hover {
   z-index: 1;
 }
 .skill-group:has(> button.repcontrol-button--add) > .repcontrol .repcontrol_add {
-  display: none;
+  display: none !important;
 }
-.skill-group > .repcontrol-button--add {
-  position: absolute;
-  bottom: 4px;
-  left: 8px;
+.skill-group:has(> button.repcontrol-button--add) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: "--header --header" "--repcontainer --repcontainer" "--add --edit";
+}
+.skill-group:has(> button.repcontrol-button--add) > h2 {
+  grid-area: --header;
+}
+.skill-group:has(> button.repcontrol-button--add) > .repcontainer {
+  grid-area: --repcontainer;
+}
+.skill-group:has(> button.repcontrol-button--add) > .repcontrol {
+  display: contents;
+}
+.skill-group:has(> button.repcontrol-button--add) > .repcontrol-button--add,
+.skill-group:has(> button.repcontrol-button--add) .repcontrol_edit {
   background: var(--col-black);
   color: var(--col-white);
   border: 0;
@@ -4638,8 +4675,19 @@ input.anim-reduced[type=hidden][value=off] ~ div .skill-row button:hover {
   transition: transform 100ms ease;
   z-index: 2;
 }
+.skill-group:has(> button.repcontrol-button--add) > .repcontrol-button--add {
+  grid-area: --add;
+  justify-self: start;
+  margin: 4px 8px;
+}
+.skill-group:has(> button.repcontrol-button--add) .repcontrol_edit {
+  grid-area: --edit;
+  justify-self: end;
+  margin: 4px 8px;
+}
 
-.container-section:hover .skill-group > .repcontrol-button--add {
+.container-section:hover .skill-group:has(> button.repcontrol-button--add) > .repcontrol-button--add,
+.container-section:hover .skill-group:has(> button.repcontrol-button--add) .repcontrol_edit {
   transform: scaleY(1);
 }
 
@@ -5373,15 +5421,13 @@ body .ui-dialog .tab-content .charsheet .power-builder .repitem:has(.row-type[va
 }
 body .ui-dialog .tab-content .charsheet .power-builder-header-row {
   display: grid;
-  grid-template-columns: 1fr auto 50px;
+  grid-template-columns: 1fr auto auto;
   position: relative;
   top: -10px;
   align-items: baseline;
 }
 body .ui-dialog .tab-content .charsheet .power-builder-header-row .power-cost-group {
-  position: absolute;
-  top: 10px;
-  right: -5px;
+  margin-right: -5px;
   z-index: 1;
   display: flex;
   flex-direction: row;
@@ -6661,11 +6707,18 @@ body .ui-dialog .tab-content .charsheet .display-powers .display-array-header {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 1px;
+  overflow: hidden;
+}
+body .ui-dialog .tab-content .charsheet .display-powers .display-array-header .array-header-summary {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
 }
 body .ui-dialog .tab-content .charsheet .display-powers .display-array-header .array-header-label {
   text-transform: capitalize;
+  flex: 1;
   min-width: 0;
-  max-width: 80%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -7002,7 +7055,7 @@ body .ui-dialog .tab-content .charsheet .display-powers .tag {
   align-items: center;
   text-transform: capitalize;
 }
-body .ui-dialog .tab-content .charsheet .display-powers .tag:empty {
+body .ui-dialog .tab-content .charsheet .display-powers .tag:empty:not(input) {
   display: none;
 }
 body .ui-dialog .tab-content .charsheet .display-powers .display-extra,
