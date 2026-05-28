@@ -1,6 +1,7 @@
 # 2026-05-27
 
 - Reset drop data after a drop.
+- Add Alt XP
 
 # 2026-05-26
 
