@@ -107,7 +107,7 @@
                 });
             }
         });
-        if(mancerdata["l1-race"] && mancerdata["l1-race"].values.race == "Rules:Races") {
+        if(mancerdata["l1-race"] && mancerdata["l1-race"].values.race == "Rules:Species") {
             _.each(abilityList, function(ability){
                 var custom = mancerdata["l1-race"].values["race_custom_" + ability.toLowerCase()] || false;
                 if(custom) {
@@ -115,7 +115,7 @@
                 }
             });
         }
-        if(mancerdata["l1-race"] && mancerdata["l1-race"].values.subrace == "Rules:Races") {
+        if(mancerdata["l1-race"] && mancerdata["l1-race"].values.subrace == "Rules:Species") {
             _.each(abilityList, function(ability){
                 var custom = mancerdata["l1-race"].values["subrace_custom_" + ability.toLowerCase()] || false;
                 if(custom) {
@@ -356,15 +356,15 @@
         var additionalList = {};
         var blobs = getRelevantBlobs(mancerdata, "1", "l1");
 
-        //First look through all Blobs for any blob.Powers
+        //First look through all Blobs for any blob.Spells or blob.Powers
         _.each(blobs.all, function(blob) {
-            if(blob.Powers) {
-                var spells = JSON.parse(blob.Powers);
+            if(blob.Spells || blob.Powers) {
+                var spells = JSON.parse(blob.Spells || blob.Powers);
                 //Examine each spell to determine if it is "Extended List". "Extended List" adds to the classes spell list.
                 //Ravnica Guilds backgrounds such as Dimir Operative are examples of this
                 _.each(spells, function(spell) {
                     if(spell["Expanded List"]) {
-                        expandedList[spell.Level] = expandedList[spell.Level] ? expandedList[spell.Level].concat(spell["Expanded List"]) : spell["Expanded List"];
+                        expandedList[spell.Level || spell.Rank] = expandedList[spell.Level || spell.Rank] ? expandedList[spell.Level || spell.Rank].concat(spell["Expanded List"]) : spell["Expanded List"];
                     }
                 });
             }
@@ -388,12 +388,12 @@
                 //Looks through the blobs for Spells attribute
                 //class.Powers contains the information for how many spells are choosen at each level & Prepared spells to be selected based on ability modifer + 1
                 //[subclass, background, race}.Powers will contain KNOWN, CHOSEN, or EXPANDED LIST for extra spells granted by these sections
-                if(blob.Powers) {
-                    var spells = JSON.parse(blob.Powers);
+                if(blob.Spells || blob.Powers) {
+                    var spells = JSON.parse(blob.Spells || blob.Powers);
                     allSpells[parentsection] = allSpells[parentsection] || {known: [], choices: []}
                     _.each(spells, function(spell) {
                         var numSpells = 0;
-                        expandedList[spell.Level] = expandedList[spell.Level] || [];
+                        expandedList[spell.Level || spell.Rank] = expandedList[spell.Level || spell.Rank] || [];
                         //class.Powers will contain Prepared and Choose.
                         //These are used to populate the number of selects needed for each spell lists on the Spells slide
                         if(spell.Prepared) {
@@ -405,17 +405,17 @@
                         //If Spells are to be Chosen or Prepared add them to a class list, expand the list, and set the Ability modifier & Level
                         if(numSpells > 0) {
                             _.times(numSpells, function(n) {
-                                var thisspell = {Level: parseInt(spell.Level)};
+                                var thisspell = {Level: parseInt(spell.Level || spell.Rank)};
                                 thisspell.List = spell.List ? spell.List : classname;
                                 thisspell.AddList = additionalList[parentsection];
                                 thisspell.Ability = spell.Ability ? spell.Ability : classAbility;
-                                if(parentsection == "class") thisspell["Expanded List"] = expandedList[spell.Level];
+                                if(parentsection == "class") thisspell["Expanded List"] = expandedList[spell.Level || spell.Rank];
                                 allSpells[parentsection].choices.push(thisspell);
                             });
                         }
                         //Add any spells that are already known from sections such as Forge Domain Cleric starts with identify & searing smite
                         _.each(spell.Known, function(known) {
-                            var thisspell = {Name: known, Level: parseInt(spell.Level)};
+                            var thisspell = {Name: known, Level: parseInt(spell.Level || spell.Rank)};
                             thisspell.Ability = spell.Ability ? spell.Ability : classAbility;
                             thisspell.Source = parentsection;
                             allSpells[parentsection].known.push(thisspell);
@@ -1250,21 +1250,12 @@
     };
 
     var isTashaEnabled  = data => {
-        data = data || getCharmancerData();
-        let enabled = false;
-        const customizeOrigin = (SheetUtils.checkPath(data, "['l1-race']['values']['customize_origin']") && data['l1-race']['values']['customize_origin'] == 1)
-        if(SheetUtils.checkPath(data, "['l1-welcome']['values']['has_tasha']") && data['l1-welcome']['values']['has_tasha'] == 1 && customizeOrigin) enabled = true;
-        //return enabled;
-        return false;
+        return false; // Tasha's Cauldron rules not used in Esper Genesis
     };
 
     var hasTasha = callback => {
-        getCompendiumPage('Customizing Your Origin', eventInfo => {
-            let enabled = false;
-            if(eventInfo.expansion && SheetUtils.checkPath(eventInfo, "['data']['Category']") && eventInfo['data']['Category'] === 'Rules') enabled = true;
-            //callback(enabled);
-            return false;
-        });
+        // Tasha's Cauldron rules not used in Esper Genesis
+        return false;
     };
 
     var clearTasha = (eventinfo, subraceOnly, callback) => {
@@ -1317,7 +1308,7 @@
                 clearRepeatingSections("subrace_holder");
             }
 
-            if(eventinfo.newValue === "Rules:Races") {
+            if(eventinfo.newValue === "Rules:Species") {
                 //Clears saved data for this field
                 getCompendiumPage("");
                 setAttrs(reset, function() {
@@ -1420,7 +1411,7 @@
                 clearRepeatingSections("subrace_holder");
             }
 
-            if(eventinfo.newValue === "Rules:Races") {
+            if(eventinfo.newValue === "Rules:Species") {
                 //Clears saved data for this field
                 getCompendiumPage("");
                 setAttrs(reset, function() {
@@ -2244,7 +2235,7 @@
         var mancerdata = getCharmancerData();
         var known = knownSpells().known;
         _.each(mancerdata["l1-spells"].repeating, function(id) {
-            disableCharmancerOptions(id + "_choice", known, {category: "Powers"});
+            disableCharmancerOptions(id + "_choice", known, {category: "Spells"});
         });
     });
 
@@ -2310,7 +2301,7 @@
         if(_.last(eventinfo.sourceSection.split("_")) == "spellrow") {
             spell_name = data["l1-spells"].values[eventinfo.sourceAttribute];
         } else {
-            spell_name = data["l1-spells"].values[eventinfo.sourceSection + "_choice"] ? data["l1-spells"].values[eventinfo.sourceSection + "_choice"] : "Rules:Spells";
+            spell_name = data["l1-spells"].values[eventinfo.sourceSection + "_choice"] ? data["l1-spells"].values[eventinfo.sourceSection + "_choice"] : "Rules:Esper Powers";
             card = data["l1-spells"].values[eventinfo.sourceSection + "_choice"] ? card : "";
         }
         changeCompendiumPage("sheet-spells-info", spell_name, card);
@@ -2572,7 +2563,7 @@
                             var thisSpell = spell;
                             thisSpell += "<button type=\"action\" class=\"choice action mancer_info\" name=\"act_" + rowid + "_known" + index + "\">i</button>";
                             thisSpell += "<input type=\"hidden\" name=\"comp_" + rowid + "_known" + index + "\">";
-                            toset[rowid + "_known" + index] = "Powers:" + spell;
+                            toset[rowid + "_known" + index] = "Spells:" + spell;
                             knownspells.push(thisSpell);
                         });
                         repupdate[rowid + " label p"] = knownspells.join(", ");
@@ -2584,8 +2575,8 @@
                                 var toset = {};
                                 var lists = [spell.List];
                                 if(spell.AddList) lists = lists.concat(spell.AddList);
-                                var choices = "Category:Powers Classes:*" + lists.join("|*") + " Rank:" + spell.Level;
-                                var settings = {category: "Powers", disable: spellData.known};
+                                var choices = "Category:Spells Classes:*" + lists.join("|*") + " Level:" + spell.Level;
+                                var settings = {category: "Spells", disable: spellData.known};
                                 toset[id + "_info"] = spell.Ability;
                                 if(section != "class") toset[id + "_custom"] = section;
                                 repids.push(id);
@@ -2741,7 +2732,7 @@
                         for(let i=0; i<spells.length; i++) {
                             const spellIndex = i+1;
                             const selector = `comp_feat_spell_choice${spellIndex}`;
-                            const query = `Category:Powers ${spells[i]['List']}`;
+                            const query = `Category:Spells ${spells[i]['List']}`;
                             showList.push(`feat_spell_choice${spellIndex}`);
                             setCharmancerOptions(selector, query);
                         }
@@ -2757,7 +2748,7 @@
 
     /* BIO PAGE */
     on("page:l1-bio", function(eventinfo) {
-        const attrs = ["age", "character_name", "eyes", "hair", "height", "weight", "skin"];
+        const attrs = ["age", "character_name", "height", "weight", "character_appearance"];
         const mancerdata = getCharmancerData();
         const biodata = mancerdata["l1-bio"] || undefined;
         const race = getName("race");
@@ -2911,36 +2902,30 @@
                 if(mancerdata["l1-bio"].values.weight) {
                     set["bio_info"] += '<p>Your weight is ' + mancerdata["l1-bio"].values.weight + '.</p>';};
     
-                if(mancerdata["l1-bio"].values.eyes) {
-                    set["bio_info"] += '<p>Your eye color is ' + mancerdata["l1-bio"].values.eyes + '.</p>';};
-    
-                if(mancerdata["l1-bio"].values.hair) {
-                    set["bio_info"] += '<p>Your hair is ' + mancerdata["l1-bio"].values.hair + '.</p>';};
-    
-                if(mancerdata["l1-bio"].values.skin) {
-                    set["bio_info"] += '<p>Your skin is ' + mancerdata["l1-bio"].values.skin + '.</p>';};
+                if(mancerdata["l1-bio"].values.character_appearance) {
+                    set["bio_info"] += '<p>' + mancerdata["l1-bio"].values.character_appearance + '</p>';};
     
                 if (mancerdata["l1-bio"].values.previous_race != racename) {
                     setCharmancerText({
-                        race_warning: '<p class="sheet-warning">Each race has unique look and different names. You might want to adjust your choices to reflect your race.</p>'
+                        race_warning: '<p class="sheet-warning">Each species has a unique look and different names. You might want to adjust your choices to reflect your species.</p>'
                     });
                 };
             };
         };
     
         if(mancerdata["l1-race"] && racename) {
-            set["race_info"] = '<p>Your race is ' + racename + '</p>';
+            set["race_info"] = '<p>Your species is ' + racename + '</p>';
             if(!mancerdata["l1-race"].values.alignment) set["race_info"] += '<p class="sheet-warning">You haven\'t chosen your alignment.</p>';
             set["race_info"] += handleMissing("race");
             if(mancerdata["l1-race"].values["has_subrace"] == "true") {
                 if(subracename) {
-                    set["race_info"] += '<p>Your subrace is ' + subracename + '</p>';
+                    set["race_info"] += '<p>Your archetype is ' + subracename + '</p>';
                     set["race_info"] += handleMissing("subrace");
                 } else {
-                    if(mancerdata["l1-race"].values.subrace == "Rules:Races" && !mancerdata["l1-race"].values.subrace_name) {
-                        set["race_info"] = '<p class="sheet-warning sheet-needed">You need to pick a name for your custom subrace!</p>';
+                    if(mancerdata["l1-race"].values.subrace == "Rules:Species" && !mancerdata["l1-race"].values.subrace_name) {
+                        set["race_info"] = '<p class="sheet-warning sheet-needed">You need to pick a name for your custom archetype!</p>';
                     } else {
-                        set["race_info"] += '<p class="sheet-warning sheet-needed">You have not selected a subrace!</p>';
+                        set["race_info"] += '<p class="sheet-warning sheet-needed">You have not selected an archetype!</p>';
                     }
                     ready = false;
                     showChoices(["race_button"]);
@@ -2956,15 +2941,15 @@
                         console.log("Unknown race spell error: " + error);
                 }
             });
-            if(mancerdata["l1-race"].values.race == "Rules:Races") {
-                if(!mancerdata["l1-race"].values.size) set["race_info"] += '<p class="sheet-warning">You have not selected a size for your custom race!</p>';
-                if(!mancerdata["l1-race"].values.speed) set["race_info"] += '<p class="sheet-warning">You have not selected a walking speed for your custom race!</p>';
+            if(mancerdata["l1-race"].values.race == "Rules:Species") {
+                if(!mancerdata["l1-race"].values.size) set["race_info"] += '<p class="sheet-warning">You have not selected a size for your custom species!</p>';
+                if(!mancerdata["l1-race"].values.speed) set["race_info"] += '<p class="sheet-warning">You have not selected a walking speed for your custom species!</p>';
             }
         } else {
-            if(mancerdata["l1-race"] && mancerdata["l1-race"].values.race == "Rules:Races" && !mancerdata["l1-race"].values.race_name) {
-                set["race_info"] = '<p class="sheet-warning sheet-needed">You need to pick a name for your custom race!</p>';
+            if(mancerdata["l1-race"] && mancerdata["l1-race"].values.race == "Rules:Species" && !mancerdata["l1-race"].values.race_name) {
+                set["race_info"] = '<p class="sheet-warning sheet-needed">You need to pick a name for your custom species!</p>';
             } else {
-                set["race_info"] = '<p class="sheet-warning sheet-needed">You have not selected a race!</p>';
+                set["race_info"] = '<p class="sheet-warning sheet-needed">You have not selected a species!</p>';
             }
             ready = false;
             showChoices(["race_button"]);
@@ -3131,7 +3116,7 @@
             currentClass = getName("class", mancerdata, true) + getName("subclass", mancerdata, true);
             set["spells_info"] = "";
             if((raceSpells + classSpells) == 0) {
-                set["spells_info"] += '<p>The arcane is a mystery to you.</p>';
+                set["spells_info"] += '<p>Cosmic forces are a mystery to you.</p>';
                 deleteCharmancerData(["l1-spells"]);
                 spellsready = false;
             } else if(prevRace != currentRace || prevClass != currentClass || mancerdata["l1-spells"].values.race_number != raceSpells || mancerdata["l1-spells"].values.class_number != classSpells) {
@@ -3141,7 +3126,7 @@
                         toDelete.push("race_level1_choice" + x);
                     }
                     if(raceSpells > 0 && mancerdata["l1-spells"].values.race_number > 0) {
-                        set["spells_info"] += '<p class="sheet-warning">Your racial spells were reset because your options have changed.</p>';
+                        set["spells_info"] += '<p class="sheet-warning">Your species powers were reset because your options have changed.</p>';
                     }
                 }
                 if(prevClass != currentClass || mancerdata["l1-spells"].values.class_number > classSpells) {
@@ -3159,7 +3144,7 @@
             spellsready = false;
             showChoices(["spells_button"]);
         } else {
-            set["spells_info"] = '<p>The arcane is a mystery to you.</p>';
+            set["spells_info"] = '<p>Cosmic forces are a mystery to you.</p>';
             spellsready = false
         }
         
@@ -3223,7 +3208,7 @@
     /* Info Button Listeners */
     on("clicked:info_race", function(eventinfo) {
         var data = getCharmancerData();
-        var race = data["l1-race"] && data["l1-race"].values.race ? data["l1-race"].values.race : "Rules:Races";
+        var race = data["l1-race"] && data["l1-race"].values.race ? data["l1-race"].values.race : "Rules:Species";
         changeCompendiumPage("sheet-race-info", race);
     });
 
@@ -3337,7 +3322,7 @@
                     page.name = page.name.replace(/@@!!@@/g,""); // Hacky bugfix to prevent custom names from matching unavailable content
                     nextGet = nextGet.concat(getOtherDrops(page.data));
                     if(page.data["data-Starting Gold"] && !noEquipmentDrop) {
-                        set["gp"] += parseInt(page.data["data-Starting Gold"]);
+                        set["cu"] += parseInt(page.data["data-Starting Gold"]);
                     }
                     allPageData.push(page);
                 });
@@ -3410,15 +3395,15 @@
         var silentattrs = ["class_resource_name", "class_resource", "class_resource_max", "other_resource_name", "other_resource", "other_resource_max", "other_resource_itemid", "class", "class_display", "subclass", "hitdietype", "hitdie_final", "race", "subrace", "race_display", "custom_class", "cust_classname"];
         var clearset = {};
         const globalModifiers = ["global_damage_mod_flag", "global_ac_mod_flag", "global_attack_mod_flag", "global_save_mod_flag", "global_skill_mod_flag"];
-        var clearattrs = ["hp", "hp_max", "size", "speed", "gp", "alignment", "spellcasting_ability", "cust_hitdietype", "cust_spellslots", "cust_spellcasting_ability", "ac", "jack_bonus", "jack_attr", "death_save_bonus", "weighttotal", "initiative_bonus", "hit_dice", "hit_dice_max", "pb", "jack", "caster_level", "spell_attack_mod", "spell_attack_bonus", "spell_save_dc", "passive_wisdom", "custom_ac_base", "custom_ac_part1", "custom_ac_part2", "custom_ac_shield", "background"].concat(globalModifiers);
+        var clearattrs = ["hp", "hp_max", "size", "speed", "cu", "gp", "alignment", "spellcasting_ability", "cust_hitdietype", "cust_spellslots", "cust_spellcasting_ability", "ac", "jack_bonus", "jack_attr", "death_save_bonus", "weighttotal", "initiative_bonus", "hit_dice", "hit_dice_max", "pb", "jack", "caster_level", "spell_attack_mod", "spell_attack_bonus", "spell_save_dc", "passive_wisdom", "custom_ac_base", "custom_ac_part1", "custom_ac_part2", "custom_ac_shield", "background"].concat(globalModifiers);
         var classname = "";
-        var set = {gp: 0};
+        var set = {cu: 0};
         var allDrops = [];
         var currentDrop = 0;
         var totalDrops = 1;
         var allSkills = ["athletics", "acrobatics", "sleight_of_hand", "stealth", "arcana", "history", "investigation", "nature", "religion", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"];
         var allAbilities = SheetUtils.toLowerCase(abilityList);
-        var eraseSections = ["attack", "inventory", "traits", "resource", "proficiencies", "tool", "damagemod", "spell-cantrip", "hpmod", "acmod", "tohitmod", "savemod", "skillmod"];
+        var eraseSections = ["attack", "inventory", "traits", "resource", "proficiencies", "tool", "damagemod", "spell-prime", "hpmod", "acmod", "tohitmod", "savemod", "skillmod"];
         for(var x=1; x<=9; x++) {
             eraseSections.push("spell-" + x);
         }
@@ -3667,10 +3652,10 @@
 
         //Next, add spell drops
         _.each(spells.all, function(spell) {
-            var spelldata = {name: "Powers:" + spell.Name};
+            var spelldata = {name: "Spells:" + spell.Name};
             spelldata.data = {"spellcasting_ability": spell.Ability};
             if(spell.Source == "race") {
-                spelldata.data.spellclass = "Racial";
+                spelldata.data.spellclass = "Species";
             } else {
                 spelldata.data.spellclass = classname;
             };
@@ -3707,13 +3692,13 @@
                 }
             });
 
-            set["gp"] = parseInt(data["l1-equipment"].values["background_starting_gold"]) || 0;
+            set["cu"] = parseInt(data["l1-equipment"].values["background_starting_gold"]) || 0;
         } else if(data["l1-equipment"].values["equipment_type"] == "gold" && data["l1-equipment"].values["starting_gold"]) {
-            set["gp"] = parseInt(data["l1-equipment"].values["starting_gold"]);
+            set["cu"] = parseInt(data["l1-equipment"].values["starting_gold"]);
         }
         //Add the bio info
         if(data["l1-bio"]) {
-            _.each(["character_name", "age", "height", "weight", "eyes", "hair", "skin"], function(type) {
+            _.each(["character_name", "age", "height", "weight", "character_appearance"], function(type) {
                 if(data["l1-bio"].values[type]) {
                     set[type] = data["l1-bio"].values[type] || "";
                 }
@@ -3771,15 +3756,12 @@
                         getAllPages(allDrops, function() {
                             setCharmancerText({"mancer_progress" :'<div style="width: 20%"></div>'});
                             doAllDrops(allPageData, function() {
-                                console.log("DOING THE FINAL SET!!");
                                 setAttrs(set, function() {
                                     setCharmancerText({"mancer_progress" :'<div style="width: 100%"></div>'});
                                     update_class();
                                     organize_section_proficiencies();
                                     update_skills(allSkills);
                                     update_attacks("all");
-                                    var endTime = Date.now();
-                                    console.log(`Elapsed time: ${(endTime-startTime)/1000}`);
                                     finishCharactermancer();
                                 });
                             });
