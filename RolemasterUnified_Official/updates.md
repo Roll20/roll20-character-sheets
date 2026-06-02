@@ -1,7 +1,13 @@
+# 2026-06-02
+
+- Spacer for popups in skills
+- Header for Combat styles
+- Unhide some skills:
+
 # 2026-05-27
 
 - Reset drop data after a drop.
-- Add Alt XP
+- Alt XP
 
 # 2026-05-26
 
