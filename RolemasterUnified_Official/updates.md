@@ -1,3 +1,24 @@
+# 2026-06-04
+
+- Arcane:
+   - Aspects now display all fancy like.
+   - Arcane users select aspects during creation
+- New spell loading system:
+  - All pure Roll20 calls: Doesn't use the the RMU Async
+  - Faster, lots, non-blocking
+  - Use the save state structure instead of something unique
+  - Handles Aspects from Arcane
+- Remove a spurious print
+- Add more 'use strict';
+    - Fix a spurious global write of prefix, nameid
+    - Fix a lot of bad for loops that wrote to globals
+- Make spell update fully async.
+    - Should be faster
+    - Removes some async/pending errors/warnings
+- Training Package have purchase button (unlinked)
+    - Toggles on/off based on completion
+    - Fix some Training Package skill names
+
 # 2026-06-02
 
 - Spacer for popups in skills
