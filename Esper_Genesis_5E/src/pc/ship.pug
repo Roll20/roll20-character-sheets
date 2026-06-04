@@ -27,31 +27,53 @@ mixin armorClassOrManeuverEntry(name)
     span(data-i18n=`${name.replace(/_/g,'-')}`)
 
 .sheet-pc-ship
-  input.tab-button.type-pc(name='attr_pc_sheet_type' type='radio' value!='pc' checked='checked')
-  span(data-i18n='pc-u') PC
-  input.tab-button.type-starship(name='attr_pc_sheet_type' type='radio' value!='starship')
-  span(data-i18n='starship-u') STARSHIP
+  input.tab-button.type-pc(id='tab-type-pc-ship' name='attr_pc_sheet_type' type='radio' value!='pc' checked='checked')
+  input.tab-button.type-starship(id='tab-type-starship-ship' name='attr_pc_sheet_type' type='radio' value!='starship')
 
   .sheet-top
-    .sheet-flex-container.sheet-logo
-      h2
-        span(data-i18n='starship-statistics')
-      div
-        img(src='https://raw.githubusercontent.com/skydawn1/esper_genesis/master/EG_Logo.png' alt='Esper Genesis Logo')
+    .sheet-ship-top-layout
+      .sheet-token-frame
+        img.sheet-char-avatar(name='attr_character_avatar')
+      .sheet-ship-info
+        .sheet-flex-container
+          label(for='attr_character_name')
+            span(data-i18n='pc_ship_name')
+          input(type='text' name='attr_character_name')
+          +headerEntry('owner')
+        .sheet-flex-container
+          +headerEntry('size_category')
+          label(for='attr_pc_ship_weight')
+            span(data-i18n='pc_ship_weight')
+          input.sheet-ship-compact(type='text' name='attr_pc_ship_weight')
+          label(for='attr_pc_ship_hull_type')
+            span(data-i18n='pc_ship_hull_type')
+          input.sheet-ship-compact(type='text' name='attr_pc_ship_hull_type')
+          +headerEntry('crew_capacity')
+          +headerEntry('cargo_capacity')
 
+  .sheet-crew-roles
+    h3
+      span(data-i18n='crewmember-roles') Crewmember Roles
     .sheet-flex-container
-      +headerEntry('name')
-      +headerEntry('owner')
-    .sheet-flex-container
-      +headerEntry('size_category')
-      +headerEntry('weight')
-      +headerEntry('hull_type')
-    .sheet-flex-container
-      +headerEntry('crew_capacity')
-      +headerEntry('cargo_capacity')
-      +headerEntry('length')
-      +headerEntry('width')
-      +headerEntry('height')
+      label.sheet-crew-field
+        input(type='text' name='attr_pc_ship_crew_pilot_name')
+        span PILOT
+      label.sheet-crew-field
+        input(type='text' name='attr_pc_ship_crew_tech1_name')
+        span TECHNICIAN 1
+      label.sheet-crew-field
+        input(type='text' name='attr_pc_ship_crew_tech2_name')
+        span TECHNICIAN 2
+      label.sheet-crew-field
+        input(type='text' name='attr_pc_ship_crew_copilot_name')
+        span CO-PILOT
+      label.sheet-crew-field
+        input(type='text' name='attr_pc_ship_crew_captain_name')
+        span CAPTAIN
+
+  .ship-tab-row
+    label.tab-label.type-pc(for='tab-type-pc-ship') PC
+    label.tab-label.type-starship(for='tab-type-starship-ship') STARSHIP
 
   .sheet-middle.sheet-grid-container
       .sheet-col-left
@@ -86,23 +108,27 @@ mixin armorClassOrManeuverEntry(name)
 
       .sheet-col-center
         .sheet-piloting-maneuver-check
-          +subtitle('piloting-maneuver-check')
+          h3
+            button(type='roll' name='roll_pc_ship_piloting' value!="@{wtype}&{template:npc} {{name=@{character_name}}} {{rname=^{piloting-check}}} {{mod=[[0+@{pc_ship_piloting_num}]]}} {{r1=[[@{d20}+@{pc_ship_piloting_num}]]}} @{rtype}+@{pc_ship_piloting_num}]]}} {{type=Vehicle}}")
+              span(data-i18n='piloting-maneuver-check')
           .sheet-fancy-input
             img(src=`${imagePath}/piloting_maneuver_check.png` alt='Piloting maneuver Check')
+            input(type='hidden' name='attr_pc_ship_piloting_num' value='0')
             input(type='text' name='attr_pc_ship_piloting_maneuver_check')
             
           p
             span(data-i18n='piloting-maneuver-check-info')
         
         .sheet-command-dice
+          h3
+            span(data-i18n='command-dice')
           label(for='attr_pc_ship_command_dice')
             span(data-i18n='type-u')
             select(name='attr_pc_ship_command_dice')
-              options(value='d4') d4
-              options(value='d6') d6
-              options(value='d4') d8
-              options(value='d6') d12
-              options(value='d6') d20
+              option(value='') None
+              option(value='d6') d6
+              option(value='d8') d8
+              option(value='d10') d10
           
           .sheet-grid-container
             label(for='attr_pc_ship_total_dice')
@@ -140,20 +166,65 @@ mixin armorClassOrManeuverEntry(name)
                 span(data-i18n='maneuver-save-dc-info')
         
 
-        .sheet-special-features
-          +subtitle('special-features-and-options')
-          +repeatingSection('ship-features')
-            textarea(name='attr_feature' placeholder='Enter feature description...' required)
-            span(name='attr_feature')
+        .sheet-weapon-systems
+          .sheet-grid-container.sheet-max-weapon-payload
+            label(for='attr_pc_ship_max_weapon_payload')
+              span(data-i18n='max-weapon-payload')
+            div
+              input(type='text' name='attr_pc_ship_max_weapon_payload')
 
-        .sheet-ship-cargo
-          +subtitle('ship-cargo')
-          +repeatingSection('ship-cargo')
-            .sheet-grid-container
-              div
-                input(type='text' name='attr_name')
-              div
-                input(type='text' name='attr_weight')
+          +subtitle('weapon-systems')
+          +repeatingSection('weapon-systems')
+            input(type='hidden' name='attr_rollbase' value!='@{wtype}&{template:atkdmg} {{attack=1}} {{damage=1}} {{dmg1flag=1}} {{mod=[[0@{tohit}]]}} {{rname=@{weapon}}} {{r1=[[@{d20}@{tohit}]]}} {{normal=1}} {{r2=[[0d20]]}} {{range=@{range}}} {{dmg1=[[@{damage}+0]]}} {{dmg1type=@{dmgtype}}} {{desc=@{special}}} ammo=@{ammo} {{licensedsheet=@{licensedsheet}}}')
+            input(type='hidden' name='attr_atkdmg' value!='')
+            input(type='hidden' name='attr_atkdmgc' value!='')
+            .sheet-weapon-action
+              input.sheet-weapon-flag(type='checkbox' name='attr_weapon_options_flag' checked='checked')
+              span y
+              .sheet-weapon-options
+                .sheet-weapon-row
+                  span WEAPON:
+                  input(type='text' name='attr_weapon')
+                  span GUNNER NAME:
+                  input(type='text' name='attr_gunner')
+                .sheet-weapon-row
+                  span RANGE:
+                  input(type='text' name='attr_range')
+                  span TO HIT:
+                  input(type='text' name='attr_tohit')
+                .sheet-weapon-row
+                  span ON HIT:
+                  input(type='text' name='attr_damage')
+                  input(type='text' name='attr_dmgtype' placeholder='damage type')
+                .sheet-weapon-row
+                  span SPECIAL:
+                  input(type='text' name='attr_special')
+                .sheet-weapon-row
+                  span AMMO:
+                  input(type='text' name='attr_ammo')
+                  span RECHARGE:
+                  input(type='checkbox' name='attr_recharge' value='3')
+                  input(type='checkbox' name='attr_recharge' value='2')
+                  input(type='checkbox' name='attr_recharge' value='1')
+              .sheet-weapon-display
+                button.pick(type='roll' value!='@{rollbase}' name='roll_attack')
+                  span.sheet-weapon-name(name='attr_weapon')
+                  .sheet-weapon-meta
+                    span Gunner:
+                    span(name='attr_gunner')
+                    span  | Range:
+                    span(name='attr_range')
+                    span  | To Hit:
+                    span(name='attr_tohit')
+                    span  | Hit:
+                    span(name='attr_damage')
+                    span
+                    span(name='attr_dmgtype')
+            button.hidden(type='roll' value!='@{atkdmg}' name='roll_atkdmg')
+            button.hidden(type='roll' value!='@{atkdmgc}' name='roll_atkdmgc')
+
+          .sheet-weapon-systems-info
+            span(data-i18n='weapon-systems-info')
 
 
   .sheet-bottom
@@ -183,7 +254,10 @@ mixin armorClassOrManeuverEntry(name)
                   input(type='text' name='attr_pc_ship_maneuver_defense_bonus')
                 
               .sheet-grid-container
-                +armorClassOrManeuverEntry('base_maneuver_defense')
+                div
+                  span.sheet-static-num 8
+                label
+                  span(data-i18n='base-maneuver-defense')
                 +armorClassOrManeuverEntry('proficiency_bonus')
                 +armorClassOrManeuverEntry('pilot_wis_modifier')
                 +armorClassOrManeuverEntry('captain_cha_modifier')
@@ -247,66 +321,26 @@ mixin armorClassOrManeuverEntry(name)
                   .sheet-fancy-input
                     img(src=`${imagePath}/structural_integrity.png` alt='Structural Integrity')
                     input(type='text' name='attr_pc_ship_structural_integrity')
-                  span(data-i18n='structural-integrity-info')
-                    
                 label
                   input(type='text' name='attr_pc_remaining_si')
                   span(data-i18n='remaining-si')
+              span(data-i18n='structural-integrity-info')
     
-    .sheet-weapon-systems
-      .sheet-grid-container.sheet-max-weapon-payload
-        label(for='attr_pc_ship_max_weapon_payload')
-          span(data-i18n='max-weapon-payload')
-        div
-          input(type='text' name='attr_pc_ship_max_weapon_payload')
-        
-      +subtitle('weapon-systems')
-      .sheet-grid-container.table-header
-        .sheet-gunner
-          span(data-i18n='pc-ship-gunner')
-        .sheet-weapon
-          span(data-i18n='pc-ship-weapon')
-        .sheet-range
-          span(data-i18n='pc-ship-range')
-        .sheet-to-hit
-          span(data-i18n='pc-ship-to-hit')
-        .sheet-damage
-          span(data-i18n='pc-ship-damage')
-        .sheet-damage-type
-          span(data-i18n='pc-ship-damage-type')
+    .sheet-grid-container.sheet-features-cargo-row
+      .sheet-special-features
+        +subtitle('special-features-and-options')
+        +repeatingSection('ship-features')
+          textarea(name='attr_feature' placeholder='Enter feature description...' required)
+          span(name='attr_feature')
 
-      +repeatingSection('weapon-systems')
-        input(type='hidden' name='attr_rollbase' value!='@{wtype}&{template:atk} {{mod=@{tohit}}} {{rname=[@{weapon}](~repeating_weapon-systems_atkdmg)}} {{rnamec=[@{weapon}](~repeating_weapon-systems_atkdmgc)}} {{r1=[[@{d20} + @{tohit}]]}} {{normal=1}} {{r2=[[0d20]]}} {{range=@{range}}} {{desc=@{special}}} ammo=@{ammo} @{pc_ship_name} {{licensedsheet=@{licensedsheet}}}')
-        input(type='hidden' name='attr_atkdmg' value!='')
-        input(type='hidden' name='attr_atkdmgc' value!='')
-        .sheet-grid-container.table-body
-          .sheet-gunner
-            input(type='text' name='attr_gunner')
-          .sheet-weapon
-            input(type='text' name='attr_weapon')
-          .sheet-range
-            input(type='text' name='attr_range')
-          .sheet-to-hit
-            input(type='text' name='attr_tohit')
-          .sheet-damage
-            input(type='text' name='attr_damage')
-          .sheet-damage-type
-            input(type='text' name='attr_dmgtype')
-        .sheet-grid-container.table-meta
-          label.sheet-special
-            span(data-i18n='pc-ship-special')
-            input(type='text' name='attr_special')
-          label.sheet-ammo
-            span(data-i18n='pc-ship-ammo')
-            input(type='text' name='attr_ammo')
-          label.sheet-recharge
-            span(data-i18n='pc-ship-recharge')
-            input(type='checkbox' name='attr_recharge' value='3')
-            input(type='checkbox' name='attr_recharge' value='2')
-            input(type='checkbox' name='attr_recharge' value='1')
-        button.hidden(type='roll' value!='@{atkdmg}' name='roll_atkdmg')
-        button.hidden(type='roll' value!='@{atkdmgc}' name='roll_atkdmgc')
-        button(type='roll' value!='@{rollbase}' name='roll_attack') 
-      
-      div
-        span(data-i18n='weapon-systems-info')
+      .sheet-ship-cargo
+        +subtitle('ship-cargo')
+        +repeatingSection('ship-cargo')
+          .sheet-grid-container
+            div
+              input(type='text' name='attr_name')
+            div
+              input(type='text' name='attr_weight')
+
+  .sheet-ship-logo-footer
+    img.sheet-ship-logo-img(src='https://raw.githubusercontent.com/skydawn1/esper_genesis/master/EG_Logo.png' alt='Esper Genesis Logo')

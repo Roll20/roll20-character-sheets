@@ -225,10 +225,10 @@ on("sheet:compendium-drop", function() {
                 update_initiative();
                 break;
             case "intelligence":
-                update_skills(["astrophysics", "lore", "investigation", "xenobiology", "computers"]);
+                update_skills(["astrophysics", "lore", "investigation", "xenobiology", "computers", "arcana", "history", "nature", "religion"]);
                 break;
             case "wisdom":
-                update_skills(["mechanics", "insight", "medicine", "perception", "survival"]);
+                update_skills(["mechanics", "insight", "medicine", "perception", "survival", "animal_handling"]);
                 break;
             case "charisma":
                 update_skills(["deception", "intimidation", "performance", "persuasion"]);
@@ -256,8 +256,9 @@ on("change:death_save_mod", function(eventinfo) {
     update_save("death");
 });
 
-['acrobatics','astrophysics','athletics','computers','deception','insight','intimidation','investigation','lore',
-'mechanics','medicine','perception','performance','persuasion','piloting','sleight_of_hand','stealth','survival','xenobiology'].forEach(attr => {
+['acrobatics','animal_handling','arcana','astrophysics','athletics','computers','deception','history','insight',
+'intimidation','investigation','lore','mechanics','medicine','nature','perception','performance','persuasion',
+'piloting','religion','sleight_of_hand','stealth','survival','xenobiology'].forEach(attr => {
     on(`change:${attr}_prof change:${attr}_type change:${attr}_flat`, function(eventinfo) {
         if(eventinfo.sourceType === "sheetworker") {return;};
         update_skills([`${attr}`]);
@@ -413,7 +414,7 @@ on("change:repeating_inventory:itemname change:repeating_inventory:itempropertie
     });
 });
 
-on("change:repeating_inventory:itemweight change:repeating_inventory:itemcount change:cp change:sp change:ep change:cu change:cn change:encumberance_setting change:size change:carrying_capacity_mod", function() {
+on("change:repeating_inventory:itemweight change:repeating_inventory:itemcount change:cp change:sp change:ep change:cu change:cn change:encumberance_setting change:size change:carrying_capacity_mod change:powerful_build", function() {
     update_weight();
 });
 
@@ -519,6 +520,29 @@ on("change:base_level change:multiclass1_flag change:multiclass1 change:multicla
     set_level();
 });
 
+// Cybermancer Talent Slot auto-calculation.
+// Fires when class or level changes; sets slots_max, slot_rank_max, and slots_used
+// from the Cybermancer level progression table (analogous to Warlock pact slots).
+var cybermancerSlotTable = [
+    //  [slots, rank]  index = level - 1
+    [1,1],[2,1],[2,2],[2,2],[2,3],[2,3],[2,4],[2,4],[2,5],[2,5],
+    [3,5],[3,5],[3,5],[3,5],[3,5],[3,5],[4,5],[4,5],[4,5],[4,5]
+];
+var update_cybermancer_slots = function() {
+    getAttrs(["class", "base_level"], function(values) {
+        var className = (values["class"] || "").toLowerCase().trim();
+        if(className !== "cybermancer") return;
+        var level = parseInt(values["base_level"], 10) || 1;
+        level = Math.min(Math.max(level, 1), 20);
+        var entry = cybermancerSlotTable[level - 1];
+        setAttrs({ slots_max: entry[0], slot_rank_max: entry[1], slots_used: entry[0] });
+    });
+};
+on("change:class change:base_level", function(eventinfo) {
+    if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") return;
+    update_cybermancer_slots();
+});
+
 on("change:level_calculations change:caster_level change:lvl1_slots_mod change:lvl2_slots_mod change:lvl3_slots_mod change:lvl4_slots_mod change:lvl5_slots_mod change:lvl6_slots_mod change:lvl7_slots_mod change:lvl8_slots_mod change:lvl9_slots_mod", function(eventinfo) {
     if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
         return;
@@ -554,12 +578,53 @@ on("change:dtype", function(eventinfo) {
     update_npc_action("all");
 });
 
+on("change:default_critical_range", function(eventinfo) {
+    if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
+        return;
+    }
+    update_attacks("all");
+});
+
 on("change:jack_of_all_trades", function(eventinfo) {
     if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
         return;
     }
     update_jack_attr();
     update_all_ability_checks();
+});
+
+on("change:reliable_talent", function(eventinfo) {
+    if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
+        return;
+    }
+    update_skills(["athletics","acrobatics","sleight_of_hand","stealth","astrophysics","lore","investigation","xenobiology","computers","mechanics","insight","medicine","perception","survival","deception","intimidation","performance","persuasion","animal_handling","arcana","history","nature","religion"]);
+});
+
+on("change:show_5e_skills", function(eventinfo) {
+    if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {return;}
+    update_skills(["animal_handling","arcana","history","nature","religion"]);
+});
+
+// ---- Feature: Hero Points ----
+var updateHeroPoints = function(level) {
+    getAttrs(["use_hero_points", "level"], values => {
+        if (!values["use_hero_points"] || values["use_hero_points"] != "1") return;
+        const lvl = level !== undefined ? parseInt(level) : (parseInt(values["level"]) || 0);
+        setAttrs({ hero_points: Math.floor(lvl / 2) + 5 }, { silent: true });
+    });
+};
+on("change:consumed_hero_points", () => {
+    getAttrs(["hero_points"], values => {
+        const hp = values["hero_points"] ? parseInt(values["hero_points"]) : 0;
+        setAttrs({ hero_points: Math.max(hp - 1, 0) }, { silent: true });
+    });
+});
+on("change:hero_points", eventInfo => {
+    const hp = eventInfo.newValue ? Math.max(parseInt(eventInfo.newValue), 0) : 0;
+    setAttrs({ hero_points: hp }, { silent: true });
+});
+on("change:use_hero_points", eventInfo => {
+    if (eventInfo.newValue && eventInfo.newValue == "1") updateHeroPoints();
 });
 
 on("change:initmod change:init_tiebreaker", function(eventinfo) {
@@ -914,12 +979,13 @@ var update_all_saves = function() {
 
 var update_all_ability_checks = function(){
     update_initiative();
-    update_skills(["athletics", "acrobatics", "sleight_of_hand", "stealth", "astrophysics", "lore", "investigation", "xenobiology", "computers", "mechanics", "insight", "medicine", "perception", "survival", "deception", "intimidation", "performance", "persuasion", "piloting"]);
+    update_skills(["athletics", "acrobatics", "sleight_of_hand", "stealth", "astrophysics", "lore", "investigation", "xenobiology", "computers", "mechanics", "insight", "medicine", "perception", "survival", "deception", "intimidation", "performance", "persuasion", "piloting", "animal_handling", "arcana", "history", "nature", "religion"]);
 };
 
 var update_skills = function (skills_array) {
-    var skill_parent = {athletics: "strength", acrobatics: "dexterity", sleight_of_hand: "dexterity", stealth: "dexterity", astrophysics: "intelligence", lore: "intelligence", investigation: "intelligence", xenobiology: "intelligence", computers: "intelligence", mechanics: "wisdom", insight: "wisdom", medicine: "wisdom", perception: "wisdom", survival: "wisdom", deception: "charisma", intimidation: "charisma", performance: "charisma", persuasion: "charisma", piloting: "dexterity"};
-    var attrs_to_get = ["pb","pb_type","jack_of_all_trades","jack"];
+    var skill_parent = {athletics: "strength", acrobatics: "dexterity", sleight_of_hand: "dexterity", stealth: "dexterity", astrophysics: "intelligence", lore: "intelligence", investigation: "intelligence", xenobiology: "intelligence", computers: "intelligence", mechanics: "wisdom", insight: "wisdom", medicine: "wisdom", perception: "wisdom", survival: "wisdom", deception: "charisma", intimidation: "charisma", performance: "charisma", persuasion: "charisma", piloting: "dexterity",
+        animal_handling: "wisdom", arcana: "intelligence", history: "intelligence", nature: "intelligence", religion: "intelligence"};
+    var attrs_to_get = ["pb","pb_type","jack_of_all_trades","jack","reliable_talent"];
     var update = {};
     var callbacks = [];
 
@@ -989,6 +1055,10 @@ var update_skills = function (skills_array) {
 
                 };
                 update[s + "_bonus"] = total;
+                // Reliable Talent: floor skill die at 10 for proficient skills (Specialist class feature)
+                const isProficient = v[s + "_prof"] && v[s + "_prof"] != 0;
+                const hasReliableTalent = v["reliable_talent"] && parseInt(v["reliable_talent"]) === 10;
+                update[s + "_d20"] = (isProficient && hasReliableTalent) ? "{@{d20},0d20+10}k1" : "@{d20}";
             });
 
             setAttrs(update, {silent: true}, function() {callbacks.forEach(function(callback) {callback(); })} );
@@ -1573,7 +1643,7 @@ const update_attacks = (update_id, source) => {
 };
 
 const do_update_attack = (attack_array, source) => {
-    let attack_attribs = ["level","d20","pb","pb_type","pbd_safe","dtype","globalmagicmod","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod","spellcasting_ability","spell_save_dc","spell_attack_mod", "spell_dc_mod", "global_damage_mod_roll", "global_damage_mod_crit"];
+    let attack_attribs = ["level","d20","pb","pb_type","pbd_safe","dtype","globalmagicmod","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod","spellcasting_ability","spell_save_dc","spell_attack_mod", "spell_dc_mod", "global_damage_mod_roll", "global_damage_mod_crit", "default_critical_range"];
     _.each(attack_array, (attackid) => {
         ["atkflag","atkname","atkattr_base","atkmod","atkprofflag","atkmagic","dmgflag","dmgbase","dmgattr","dmgmod","dmgtype","dmg2flag","dmg2base","dmg2attr","dmg2mod","dmg2type","dmgcustcrit","dmg2custcrit","saveflag","savedc","saveeffect","saveflat","hldmg","spellid","spelllevel","atkrange","itemid","ammo",].forEach((attr) => {
             attack_attribs.push(`repeating_attack_${attackid}_${attr}`)
@@ -1787,10 +1857,17 @@ const do_update_attack = (attack_array, source) => {
             let globaldamagecrit = `[[${v.global_damage_mod_crit || 0}]]`;
 
             //Assamble Roll Templates
+            // Use default_critical_range if set and lower than the per-attack range (e.g. Warrior subclass expanded crit)
+            const criticalrange =
+                v[`${repeating_attack}_atkcritrange`] &&
+                v["default_critical_range"] &&
+                parseInt(v["default_critical_range"]) < parseInt(v[`${repeating_attack}_atkcritrange`])
+                    ? "@{default_critical_range}"
+                    : "@{atkcritrange}";
             if (v.dtype === "full") {
-                rollbase = `@{wtype}&{template:atkdmg} {{mod=@{atkbonus}}} {{rname=@{atkname}}} {{r1=[[${r1}cs>@{atkcritrange}${hbonus}]]}} ${r2}cs>@{atkcritrange}${hbonus}]]}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[${hdmg1}]]}} {{dmg1type=${dmgtype}}} @{dmg2flag} {{dmg2=[[${hdmg2}]]}} {{dmg2type=${dmg2type}}} {{crit1=[[${crit1}[CRIT]]]}} {{crit2=[[${crit2}[CRIT]]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} ${hldmgcrit} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globalattack=@{global_attack_mod}}} {{globaldamage=${globaldamage}}} {{globaldamagecrit=${globaldamagecrit}}} {{globaldamagetype=@{global_damage_mod_type}}} ammo=@{ammo} @{charname_output} {{licensedsheet=@{licensedsheet}}}`;
+                rollbase = `@{wtype}&{template:atkdmg} {{mod=@{atkbonus}}} {{rname=@{atkname}}} {{r1=[[${r1}cs>${criticalrange}${hbonus}]]}} ${r2}cs>${criticalrange}${hbonus}]]}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[${hdmg1}]]}} {{dmg1type=${dmgtype}}} @{dmg2flag} {{dmg2=[[${hdmg2}]]}} {{dmg2type=${dmg2type}}} {{crit1=[[${crit1}[CRIT]]]}} {{crit2=[[${crit2}[CRIT]]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} ${hldmgcrit} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globalattack=@{global_attack_mod}}} {{globaldamage=${globaldamage}}} {{globaldamagecrit=${globaldamagecrit}}} {{globaldamagetype=@{global_damage_mod_type}}} ammo=@{ammo} @{charname_output} {{licensedsheet=@{licensedsheet}}}`;
             } else if (atkflag != 0) {
-                rollbase = `@{wtype}&{template:atk} {{mod=@{atkbonus}}} {{rname=[@{atkname}](~repeating_attack_attack_dmg)}} {{rnamec=[@{atkname}](~repeating_attack_attack_crit)}} {{r1=[[${r1}cs>@{atkcritrange}${hbonus}]]}} ${r2}cs>@{atkcritrange}${hbonus}]]}} {{range=@{atkrange}}} {{desc=@{atk_desc}}} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globalattack=@{global_attack_mod}}} ammo=@{ammo} @{charname_output} {{licensedsheet=@{licensedsheet}}}`;
+                rollbase = `@{wtype}&{template:atk} {{mod=@{atkbonus}}} {{rname=[@{atkname}](~repeating_attack_attack_dmg)}} {{rnamec=[@{atkname}](~repeating_attack_attack_crit)}} {{r1=[[${r1}cs>${criticalrange}${hbonus}]]}} ${r2}cs>${criticalrange}${hbonus}]]}} {{range=@{atkrange}}} {{desc=@{atk_desc}}} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globalattack=@{global_attack_mod}}} ammo=@{ammo} @{charname_output} {{licensedsheet=@{licensedsheet}}}`;
             } else if (dmgflag1 != 0) {
                 rollbase = `@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[${hdmg1}]]}} {{dmg1type=${dmgtype}}} @{dmg2flag} {{dmg2=[[${hdmg2}]]}} {{dmg2type=${dmg2type}}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globaldamage=${globaldamage}}} {{globaldamagetype=@{global_damage_mod_type}}} ammo=@{ammo} @{charname_output} {{licensedsheet=@{licensedsheet}}}`;
             } else {
@@ -2066,7 +2143,7 @@ const remove_resource = (id) => {
 const update_weight = function() {
     let update = {};
     let wtotal = 0;
-    let weight_attrs = ["cp","sp","ep","cu","cn","encumberance_setting","strength","size","carrying_capacity_mod"];
+    let weight_attrs = ["cp","sp","ep","cu","cn","encumberance_setting","strength","size","carrying_capacity_mod","powerful_build"];
     getSectionIDs("repeating_inventory", (idarray) => {
         _.each(idarray, (currentID, i) => {
             weight_attrs.push(`repeating_inventory_${currentID}_itemweight`);
@@ -2095,6 +2172,7 @@ const update_weight = function() {
                 size_multiplier =
                     (size === "tiny") ? .5 : (size === "large") ? 2 : (size === "huge") ? 4 : (size === "gargantuan") ? 8 : size_multiplier;
             };
+            if (v["powerful_build"] && v["powerful_build"] == 1) { size_multiplier *= 2; }
             let str = str_base*size_multiplier;
             // Parse the carrying capacitiy modificator if any
             if (v.carrying_capacity_mod) {
@@ -2356,9 +2434,15 @@ const set_level = function() {
         let hitdie_final  = (multiclass) ? `?{Hit Die Class|${charclass},@{hitdietype}` : "@{hitdietype}";
         const subclass    = (v[`subclass`]) ? v[`subclass`] + " " : "";
         let class_display = `${subclass}${charclass} ${finallevel}`;
+        const baselevel   = finallevel;
 
         // This nested array is used to determine the overall spellcasting level for the character.
         var classes = [ [finalclass.toLowerCase(), v[`base_level`]] ];
+
+        // Reset all multiclass HD slots; active ones will be populated in the forEach below.
+        update["multiclass1_hitdietype"] = ""; update["multiclass1_hit_dice_max"] = "0";
+        update["multiclass2_hitdietype"] = ""; update["multiclass2_hit_dice_max"] = "0";
+        update["multiclass3_hitdietype"] = ""; update["multiclass3_hit_dice_max"] = "0";
 
         ["multiclass1", "multiclass2", "multiclass3"].forEach((multiclass) => {
                 if (v[`${multiclass}_flag`] && v[`${multiclass}_flag`] === "1") {
@@ -2368,6 +2452,8 @@ const set_level = function() {
                 hitdie_final = `${hitdie_final}|` + v[`${multiclass}`].charAt(0).toUpperCase() + v[`${multiclass}`].slice(1) + "," + checkHitDie(v[`${multiclass}`]);
                 classes.push([ v[`${multiclass}`], multiclasslevel ]);
                 class_display = `${class_display}, ${subclass}` + v[`${multiclass}`] + ` ${multiclasslevel}`;
+                update[`${multiclass}_hitdietype`]   = checkHitDie(v[`${multiclass}`]);
+                update[`${multiclass}_hit_dice_max`] = multiclasslevel;
             };
         });
 
@@ -2376,14 +2462,31 @@ const set_level = function() {
         update["hitdie_final"]  = (multiclass) ? `${hitdie_final}}` : hitdie_final;
         update["level"]         = finallevel;
         update["caster_level"]  = casterlevel;
+        // Set flag: does this class use power slots (not TP-only or Talent Slot system)?
+        var slotClasses = ["engineer","full","hunter","sentinel","half","third"];
+        var usesSlots = classes.some(function(c) {
+            var cn = c[0].toLowerCase();
+            return slotClasses.indexOf(cn) !== -1
+                || (cn === "fighter"    && v["arcane_fighter"] === "1")
+                || (cn === "rogue"      && v["arcane_rogue"]   === "1")
+                || (cn === "warrior"   && v["arcane_fighter"] === "1")
+                || (cn === "specialist" && v["arcane_rogue"]  === "1");
+        });
+        update["uses_power_slots"] = usesSlots ? "1" : "0";
         update["class_display"] = class_display;
 
         if(!v["level_calculations"] || v["level_calculations"] === "on") {
-            update["hit_dice_max"] = finallevel;
+            update["hit_dice_max"] = baselevel;
             callbacks.push(() => {update_spell_slots();} );
         }
         callbacks.push(() => {update_pb();} );
         callbacks.push(() => {update_leveler_display();} );
+        callbacks.push(() => {updateHeroPoints(finallevel);} );
+        callbacks.push(() => {
+            getAttrs(["use_spell_points"], v => {
+                if (v["use_spell_points"] && v["use_spell_points"] == "1") setSpellPoints();
+            });
+        });
         setAttrs(update, {silent: true},() => {callbacks.forEach((callback) => {callback(); })} );
     });
 };
@@ -2403,7 +2506,8 @@ var isMultiCaster = function(classes, arcane_fighter, arcane_rogue) {
 };
 
 var getCasterType = function(class_string, levels, arcane_fighter, arcane_rogue) {
-    var full = ["adept","cybermancer","engineer","melder","full"];
+    // Full slot casters: Engineer only (Melder/Adept use TP; Cybermancer uses Talent Slots)
+    var full = ["engineer","full"];
     var half = ["hunter","sentinel","half"];
     class_string = class_string.toLowerCase();
     if(full.indexOf(class_string) != -1) {
@@ -2411,7 +2515,12 @@ var getCasterType = function(class_string, levels, arcane_fighter, arcane_rogue)
     } else if(half.indexOf(class_string) != -1) {
         if(class_string === "artificer" && levels == 1) return 1;
         return (levels == 1) ? 0 : (1/2);
-    } else if(class_string === "third" || (class_string === "fighter" && arcane_fighter === "1") || (class_string === "rogue" && arcane_rogue === "1")) {
+    } else if(class_string === "third"
+        || (class_string === "fighter" && arcane_fighter === "1")
+        || (class_string === "rogue" && arcane_rogue === "1")
+        || (class_string === "warrior" && arcane_fighter === "1")
+        || (class_string === "specialist" && arcane_rogue === "1")
+    ) {
         return (levels == 1 || levels == 2) ? 0 : (1/3);
     } else {
         return 0;
@@ -2465,8 +2574,13 @@ var update_leveler_display = function () {
 };
 
 var update_spell_slots = function() {
-    getAttrs(["lvl1_slots_mod","lvl2_slots_mod","lvl3_slots_mod","lvl4_slots_mod","lvl5_slots_mod","lvl6_slots_mod","lvl7_slots_mod","lvl8_slots_mod","lvl9_slots_mod","caster_level"], function(v) {
+    getAttrs(["use_spell_points","lvl1_slots_mod","lvl2_slots_mod","lvl3_slots_mod","lvl4_slots_mod","lvl5_slots_mod","lvl6_slots_mod","lvl7_slots_mod","lvl8_slots_mod","lvl9_slots_mod","caster_level"], function(v) {
         var update = {};
+        if (v["use_spell_points"] && v["use_spell_points"] == "1") {
+            for (var i = 1; i <= 9; i++) update[`lvl${i}_slots_total`] = 0;
+            setAttrs(update, {silent: true});
+            return;
+        }
         var lvl = v["caster_level"] && !isNaN(parseInt(v["caster_level"], 10)) ? parseInt(v["caster_level"], 10) : 0;
         var l1 = v["lvl1_slots_mod"] && !isNaN(parseInt(v["lvl1_slots_mod"], 10)) ? parseInt(v["lvl1_slots_mod"], 10) : 0;
         var l2 = v["lvl2_slots_mod"] && !isNaN(parseInt(v["lvl2_slots_mod"], 10)) ? parseInt(v["lvl2_slots_mod"], 10) : 0;
@@ -2531,7 +2645,7 @@ var update_pb = function() {
         callbacks.push( function() {update_initiative();} );
         callbacks.push( function() {update_tool("all");} );
         callbacks.push( function() {update_all_saves();} );
-        callbacks.push( function() {update_skills(["athletics", "acrobatics", "sleight_of_hand", "stealth", "astrophysics", "lore", "investigation", "xenobiology", "computers", "mechanics", "insight", "medicine", "perception", "survival", "deception", "intimidation", "performance", "persuasion", "piloting"]);} );
+        callbacks.push( function() {update_skills(["athletics", "acrobatics", "sleight_of_hand", "stealth", "astrophysics", "lore", "investigation", "xenobiology", "computers", "mechanics", "insight", "medicine", "perception", "survival", "deception", "intimidation", "performance", "persuasion", "piloting", "animal_handling", "arcana", "history", "nature", "religion"]);} );
 
         setAttrs(update, {silent: true}, function() {callbacks.forEach(function(callback) {callback(); })} );
     });
@@ -3216,7 +3330,7 @@ var upgrade_to_2_0 = function(doneupdating) {
                 update_mod("wisdom");
                 update_mod("charisma");
                 update_all_saves();
-                update_skills(["athletics", "acrobatics", "sleight_of_hand", "stealth", "astrophysics", "lore", "investigation", "xenobiology", "computers", "mechanics", "insight", "medicine", "perception", "survival", "deception", "intimidation", "performance", "persuasion", "piloting"]);
+                update_skills(["athletics", "acrobatics", "sleight_of_hand", "stealth", "astrophysics", "lore", "investigation", "xenobiology", "computers", "mechanics", "insight", "medicine", "perception", "survival", "deception", "intimidation", "performance", "persuasion", "piloting", "animal_handling", "arcana", "history", "nature", "religion"]);
                 update_tool("all")
                 update_attacks("all");
                 update_pb();
@@ -3679,8 +3793,8 @@ on("change:repeating_weapon-systems", eventinfo => {
         if(values[`${pre}_damage`]) {
             const damage = addShipDamageType(values[`${pre}_damage`], values[`${pre}_dmgtype`]);
             const damagec = addShipDamageType(calcShipAtkdmgc(values[`${pre}_damage`]), values[`${pre}_dmgtype`]);
-            const atkdmg = `@{wtype}&{template:dmg} {{rname=@{weapon}}} {{attack=1}} {{range=@{range}}} {{damage=1}} {{dmg1flag=1}} {{dmg1=[[${damage}]]}} {{dmg1type=${values[`${pre}_dmgtype`]}}} {{desc=@{special}}} @{pc_ship_name} {{licensedsheet=@{licensedsheet}}}`;
-            const atkdmgc = `@{wtype}&{template:dmg} {{rname=@{weapon}}} {{attack=1}} {{range=@{range}}} {{damage=1}} {{dmg1flag=1}} {{dmg1=[[${damagec}]]}} {{dmg1type=${values[`${pre}_dmgtype`]}}} {{desc=@{special}}} @{pc_ship_name} {{licensedsheet=@{licensedsheet}}}`;
+            const atkdmg = `@{wtype}&{template:dmg} {{rname=@{weapon}}} {{attack=1}} {{range=@{range}}} {{damage=1}} {{dmg1flag=1}} {{dmg1=[[${damage}]]}} {{dmg1type=${values[`${pre}_dmgtype`]}}} {{desc=@{special}}} @{character_name} {{licensedsheet=@{licensedsheet}}}`;
+            const atkdmgc = `@{wtype}&{template:dmg} {{rname=@{weapon}}} {{attack=1}} {{range=@{range}}} {{damage=1}} {{dmg1flag=1}} {{dmg1=[[${damagec}]]}} {{dmg1type=${values[`${pre}_dmgtype`]}}} {{desc=@{special}}} @{character_name} {{licensedsheet=@{licensedsheet}}}`;
             const update = {
                 [`${pre}_atkdmg`]: atkdmg,
                 [`${pre}_atkdmgc`]: atkdmgc,
@@ -3690,5 +3804,345 @@ on("change:repeating_weapon-systems", eventinfo => {
     });
 });
 
+
+// ---- Feature: Spell Points Variant ----
+const createResource = function(name, max, current) {
+    getAttrs(["other_resource_name"], v => {
+        if (!v.other_resource_name || v.other_resource_name === "" || v.other_resource_name === name) {
+            setAttrs({ other_resource_name: name, other_resource_max: max, other_resource: current });
+        } else {
+            getSectionIDs("repeating_resource", ids => {
+                if (ids.length === 0) {
+                    const newid = generateRowID();
+                    setAttrs({
+                        [`repeating_resource_${newid}_resource_left_name`]: name,
+                        [`repeating_resource_${newid}_resource_left_max`]: max,
+                        [`repeating_resource_${newid}_resource_left`]: current
+                    });
+                    return;
+                }
+                const nameAttrs = ids.map(id => `repeating_resource_${id}_resource_left_name`)
+                    .concat(ids.map(id => `repeating_resource_${id}_resource_right_name`));
+                getAttrs(nameAttrs, nv => {
+                    const existingKey = Object.keys(nv).find(k => nv[k] === name);
+                    const side = existingKey && existingKey.includes("_right_") ? "right" : "left";
+                    const existingID = existingKey
+                        ? existingKey.replace("repeating_resource_", "").split("_resource_")[0]
+                        : generateRowID();
+                    setAttrs({
+                        [`repeating_resource_${existingID}_resource_${side}_name`]: name,
+                        [`repeating_resource_${existingID}_resource_${side}_max`]: max,
+                        [`repeating_resource_${existingID}_resource_${side}`]: current
+                    });
+                });
+            });
+        }
+    });
+};
+const formatPrintedTools = () => {
+    getSectionIDs("tool", (ids) => {
+        const attrs = [
+            ...ids.map((id) => `repeating_tool_${id}_toolbonus_base`),
+            ...ids.map((id) => `repeating_tool_${id}_toolname`),
+        ];
+        getAttrs(attrs, (values) => {
+            const tools = [];
+            ids.forEach((id) => {
+                const expert = values[`repeating_tool_${id}_toolbonus_base`] && values[`repeating_tool_${id}_toolbonus_base`] == "(@{pb}*2)" ? "⁺" : "";
+                const name = values[`repeating_tool_${id}_toolname`];
+                if (name) tools.push(name + expert);
+            });
+            setAttrs({ other_tool: tools.sort().join(", ") });
+        });
+    });
+};
+
+const formatPrintedSkills = () => {
+    getSectionIDs("proficiencies", (ids) => {
+        const attrs = [
+            ...ids.map((id) => `repeating_proficiencies_${id}_prof_type`),
+            ...ids.map((id) => `repeating_proficiencies_${id}_name`),
+        ];
+        getAttrs(attrs, (values) => {
+            const otherSkills = { language: [], weapon: [], armor: [], other: [] };
+            ids.forEach((id) => {
+                const type = values[`repeating_proficiencies_${id}_prof_type`];
+                const name = values[`repeating_proficiencies_${id}_name`];
+                if (type && name) otherSkills[type.toLowerCase()].push(name);
+            });
+            setAttrs({
+                other_languages: otherSkills.language.sort().join(", "),
+                other_armor:     otherSkills.armor.sort().join(", "),
+                other_weapon:    otherSkills.weapon.sort().join(", "),
+                other_other:     otherSkills.other.sort().join(", "),
+            });
+        });
+    });
+};
+
+const deleteResource = function(name) {
+    getAttrs(["other_resource_name"], v => {
+        if (v.other_resource_name === name) {
+            setAttrs({ other_resource_name: "", other_resource_max: "", other_resource: "" });
+        } else {
+            getSectionIDs("repeating_resource", ids => {
+                if (ids.length === 0) return;
+                const nameAttrs = ids.map(id => `repeating_resource_${id}_resource_left_name`)
+                    .concat(ids.map(id => `repeating_resource_${id}_resource_right_name`));
+                getAttrs(nameAttrs, nv => {
+                    const existingKey = Object.keys(nv).find(k => nv[k] === name);
+                    if (!existingKey) return;
+                    const existingID = existingKey.replace("repeating_resource_", "").split("_resource_")[0];
+                    const side = existingKey.includes("_right_") ? "right" : "left";
+                    const otherSide = side === "left" ? "right" : "left";
+                    if (!nv[`repeating_resource_${existingID}_resource_${otherSide}_name`]) {
+                        removeRepeatingRow(`repeating_resource_${existingID}`);
+                    } else {
+                        setAttrs({
+                            [`repeating_resource_${existingID}_resource_${side}_name`]: "",
+                            [`repeating_resource_${existingID}_resource_${side}_max`]: "",
+                            [`repeating_resource_${existingID}_resource_${side}`]: ""
+                        });
+                    }
+                });
+            });
+        }
+    });
+};
+const getSpellPoints = function(callback) {
+    const classAttrs = ["base_level","class","multiclass1_flag","multiclass1","multiclass1_lvl",
+        "multiclass2_flag","multiclass2","multiclass2_lvl","multiclass3_flag","multiclass3","multiclass3_lvl",
+        "arcane_fighter","arcane_rogue"];
+    const pointsPerLevel = [0,4,6,14,17,27,32,38,44,57,64,73,78,83,88,94,100,107,114,123,133];
+    getAttrs(classAttrs, v => {
+        const classes = [[v["class"] || "", v["base_level"] || 0]].concat(
+            [1,2,3].filter(i => v[`multiclass${i}_flag`] === "1")
+                   .map(i => [v[`multiclass${i}`] || "", v[`multiclass${i}_lvl`] || 0])
+        );
+        const multicaster = isMultiCaster(classes, v["arcane_fighter"], v["arcane_rogue"]);
+        let totalCasterLevel = 0;
+        classes.forEach(function([cls, lvl]) {
+            const lvlInt = parseInt(lvl) || 0;
+            const fraction = getCasterType(cls, lvlInt, v["arcane_fighter"], v["arcane_rogue"]);
+            const contribution = lvlInt * fraction;
+            totalCasterLevel += multicaster ? Math.floor(contribution) : Math.ceil(contribution);
+        });
+        const level = Math.min(Math.max(Math.round(totalCasterLevel), 0), 20);
+        callback(pointsPerLevel[level] || 0);
+    });
+};
+const setSpellPoints = function() {
+    getSpellPoints(points => {
+        if (points > 0) createResource("Spell Points", points, points);
+    });
+};
+on("change:use_spell_points", eventInfo => {
+    if (eventInfo.newValue && eventInfo.newValue == "1") {
+        setSpellPoints();
+    } else {
+        deleteResource("Spell Points");
+    }
+    update_spell_slots();
+});
+
+// ---- Feature: Short/Long Rest Buttons ----
+class Rest {
+    static resetResources(types) {
+        if (!types.includes("long")) return;
+        getSectionIDs("resource", ids => {
+            const attributes = [
+                "class_resource_max", "class_resource_use_pb",
+                "other_resource_max", "other_resource_use_pb",
+                "pb"
+            ];
+            ids.forEach(id => {
+                attributes.push(`repeating_resource_${id}_resource_left_max`);
+                attributes.push(`repeating_resource_${id}_resource_left_use_pb`);
+                attributes.push(`repeating_resource_${id}_resource_right_max`);
+                attributes.push(`repeating_resource_${id}_resource_right_use_pb`);
+            });
+            getAttrs(attributes, values => {
+                const update = {};
+                const pb = parseInt(values["pb"]) || 0;
+                const resetOne = (currentKey, maxKey, pbKey) => {
+                    const usePB = values[pbKey] === "1";
+                    const max = usePB ? pb : parseInt(values[maxKey]);
+                    if (!isNaN(max) && max > 0) update[currentKey] = max;
+                };
+                resetOne("class_resource", "class_resource_max", "class_resource_use_pb");
+                resetOne("other_resource", "other_resource_max", "other_resource_use_pb");
+                ids.forEach(id => {
+                    resetOne(`repeating_resource_${id}_resource_left`, `repeating_resource_${id}_resource_left_max`, `repeating_resource_${id}_resource_left_use_pb`);
+                    resetOne(`repeating_resource_${id}_resource_right`, `repeating_resource_${id}_resource_right_max`, `repeating_resource_${id}_resource_right_use_pb`);
+                });
+                setAttrs(update);
+            });
+        });
+    }
+    static resetHP() {
+        getAttrs(["hp_max"], values => {
+            if(!isNaN(values["hp_max"])) setAttrs({hp: values["hp_max"]});
+        });
+    }
+    static resetHitDice() {
+        getAttrs(["level", "hit_dice", "hit_dice_max"], values => {
+            const update = {};
+            const level = parseInt(values["level"]) || 0;
+            const maxHitDice = Math.max(Math.floor(level / 2), 1);
+            if(!isNaN(values["hit_dice_max"])) {
+                if(!isNaN(values["hit_dice"])) {
+                    update["hit_dice"] = String(Math.min(parseInt(values["hit_dice"]) + maxHitDice, parseInt(values["hit_dice_max"])));
+                } else {
+                    update["hit_dice"] = String(maxHitDice);
+                }
+            }
+            setAttrs(update);
+        });
+    }
+    // Restores the Talent Points pool (tp). Used by Adept, Cybermancer, Melder on long rest.
+    static resetTalentPoints() {
+        getAttrs(["tp_max"], values => {
+            if(!isNaN(values["tp_max"])) setAttrs({tp: values["tp_max"]});
+        });
+    }
+    // Restores Cybermancer Talent Slots (slots_used = remaining slots) to max.
+    // Cybermancer is EG's Warlock equivalent: talent slots recover on both short and long rest.
+    static resetCybermancerSlots() {
+        get_class_level("cybermancer", cybermancerLvl => {
+            if(cybermancerLvl === 0 || cybermancerLvl === "0") return;
+            getAttrs(["slots_max"], values => {
+                if(!isNaN(values["slots_max"])) setAttrs({slots_used: values["slots_max"]});
+            });
+        });
+    }
+    // Restores power slots (lvl1–9) to their calculated totals on long rest.
+    static resetPowerSlots() {
+        const attributes = [
+            "lvl1_slots_total", "lvl2_slots_total", "lvl3_slots_total",
+            "lvl4_slots_total", "lvl5_slots_total", "lvl6_slots_total",
+            "lvl7_slots_total", "lvl8_slots_total", "lvl9_slots_total"
+        ];
+        getAttrs(attributes, values => {
+            const update = {};
+            Object.keys(values).filter(key => !isNaN(values[key])).forEach(key => {
+                update[key.replace("_total", "_expended")] = values[key];
+            });
+            setAttrs(update);
+        });
+    }
+    // Clears Esper Mastery used-flags on long rest.
+    static resetEsperMastery() {
+        setAttrs({
+            mastery_6th_used: "",
+            mastery_7th_used: "",
+            mastery_8th_used: "",
+            mastery_9th_used: ""
+        });
+    }
+    static resetDeathSave() {
+        const update = {};
+        for(let i = 1; i <= 3; i++) {
+            update[`deathsave_succ${i}`] = "";
+            update[`deathsave_fail${i}`] = "";
+        }
+        setAttrs(update);
+    }
+    static decreaseExhaustionLevels() {
+        getAttrs(["exhaustion_toggle", "exhaustion_level"], values => {
+            if(!values["exhaustion_toggle"] || values["exhaustion_toggle"] !== "1") return;
+            const level = isNaN(values["exhaustion_level"])
+                ? 0
+                : Math.max(parseInt(values["exhaustion_level"]) - 1, 0);
+            setAttrs({exhaustion_level: level});
+        });
+    }
+    static long() {
+        Rest.resetResources(["short", "long"]);
+        Rest.resetHP();
+        Rest.resetHitDice();
+        Rest.resetTalentPoints();
+        Rest.resetCybermancerSlots();
+        Rest.resetPowerSlots();
+        Rest.resetEsperMastery();
+        Rest.decreaseExhaustionLevels();
+        Rest.resetDeathSave();
+    }
+    static short() {
+        Rest.resetResources(["short"]);
+        Rest.resetCybermancerSlots();
+        Rest.resetDeathSave();
+    }
+}
+
+on("clicked:short_rest", () => {
+    console.log("Taking a short rest...");
+    Rest.short();
+});
+on("clicked:long_rest", () => {
+    console.log("Taking a long rest...");
+    Rest.long();
+});
+
+const sanitizeShipNum = (val) => {
+    const raw = (val || "").trim().replace(/^\+/, "");
+    const n = parseInt(raw, 10);
+    return isNaN(n) ? 0 : n;
+};
+
+on("change:pc_ship_piloting_maneuver_check", () => {
+    getAttrs(["pc_ship_piloting_maneuver_check"], function(v) {
+        setAttrs({ pc_ship_piloting_num: sanitizeShipNum(v["pc_ship_piloting_maneuver_check"]) }, { silent: true });
+    });
+});
+
+const update_pc_ship_ac = () => {
+    getAttrs(["pc_ship_base_armor_class", "pc_ship_maneuver_bonus", "pc_ship_pilot_dex_modifier", "pc_ship_misc_mod_bonus"], function(v) {
+        const ac = sanitizeShipNum(v["pc_ship_base_armor_class"])
+                 + sanitizeShipNum(v["pc_ship_maneuver_bonus"])
+                 + sanitizeShipNum(v["pc_ship_pilot_dex_modifier"])
+                 + sanitizeShipNum(v["pc_ship_misc_mod_bonus"]);
+        setAttrs({ pc_ship_armor_class: ac }, { silent: true });
+    });
+};
+
+const update_pc_ship_md = () => {
+    getAttrs(["pc_ship_proficiency_bonus", "pc_ship_pilot_wis_modifier", "pc_ship_captain_cha_modifier"], function(v) {
+        const md = 8
+                 + sanitizeShipNum(v["pc_ship_proficiency_bonus"])
+                 + sanitizeShipNum(v["pc_ship_pilot_wis_modifier"])
+                 + sanitizeShipNum(v["pc_ship_captain_cha_modifier"]);
+        setAttrs({ pc_ship_base_maneuver_defense: 8, pc_ship_maneuver_defense_bonus: md }, { silent: true });
+    });
+};
+
+on("change:pc_ship_base_armor_class change:pc_ship_maneuver_bonus change:pc_ship_pilot_dex_modifier change:pc_ship_misc_mod_bonus", update_pc_ship_ac);
+on("change:pc_ship_proficiency_bonus change:pc_ship_pilot_wis_modifier change:pc_ship_captain_cha_modifier", update_pc_ship_md);
+
+on("sheet:opened", () => {
+    update_pc_ship_ac();
+    update_pc_ship_md();
+});
+
+// ── Damage / Heal buttons ──────────────────────────────────────────────────
+// Minus (−): subtract hp_change from current HP, floor at 0
+on("clicked:damage", function() {
+    getAttrs(["hp", "hp_change"], function(v) {
+        const current = parseInt(v.hp)        || 0;
+        const change  = parseInt(v.hp_change) || 0;
+        const newHp   = Math.max(0, current - change);
+        setAttrs({ hp: newHp });
+    });
+});
+
+// Plus (+): add hp_change to current HP, ceiling at hp_max
+on("clicked:heal", function() {
+    getAttrs(["hp", "hp_max", "hp_change"], function(v) {
+        const current = parseInt(v.hp)        || 0;
+        const max     = parseInt(v.hp_max)    || 0;
+        const change  = parseInt(v.hp_change) || 0;
+        const newHp   = Math.min(max, current + change);
+        setAttrs({ hp: newHp });
+    });
+});
 
 //# sourceURL=espergenesis.js
