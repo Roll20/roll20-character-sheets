@@ -3389,8 +3389,10 @@ const calcHP = async () => {
   // clog('HP re-calculated');
   const v = await getAttrsAsync(['hitpoints', 'hitpoints_max', 'sync_hp_flag', 'toggle_npc', 'hitpoints_1_class', 'hitpoints_2_class', 'hitpoints_3_class']);
   const output = {};
-  const isMonster = int(v.toggle_npc); // monster
-  const syncHpFlag = isMonster === 1 ? 0 : int(v.sync_hp_flag);
+  const isMonster = int(v.toggle_npc);
+  let syncHpFlag = int(v.sync_hp_flag);
+  // if monster do not sync, otherwise follow user setting
+  syncHpFlag = isMonster ? 0 : syncHpFlag;
   const hitPointsMax = int(v.hitpoints_max);
   const hitpoints_1_class = Math.max(0, int(v.hitpoints_1_class));
   const hitpoints_2_class = Math.max(0, int(v.hitpoints_2_class));
@@ -3413,7 +3415,6 @@ const calcHP = async () => {
   // no longer needed. decimal is now shown with multi-class hitpoints_total
   output.hitpoints_remainder_total = remainder;
   output.hitpoints_max = syncHpFlag ? Math.round(totalHP) : hitPointsMax;
-  output.sync_hp_flag = syncHpFlag;
   await setAttrsAsync(output, {silent: true});
 };
 
@@ -3445,8 +3446,10 @@ const calcAC = async (recalc) => {
   // Or sync is on and an armor Δ detected = continue
   const output = {};
   const armorClass = int(v.armorclass);
-  const isMonster = int(v.toggle_npc); // monster
-  const syncAcFlag = isMonster === 1 ? 0 : int(v.sync_ac_flag);
+  const isMonster = int(v.toggle_npc);
+  let syncAcFlag = int(v.sync_ac_flag);
+  // if monster do not sync, otherwise follow user setting
+  syncAcFlag = isMonster ? 0 : 1;
   const armorRatingFlag = int(v.armor_rating_flag);
   const armorShield_mod = int(v.armorshield_mod) * -1;
   const armorOther_mod = int(v.armorother_mod) * -1;
@@ -3637,7 +3640,7 @@ const calcAC = async (recalc) => {
   output.armorclass_combined_shield_mod_magic_inverted = combinedShieldModMagic_add_sign;
   output.armorclass_total = totalAC;
   output.armorclass = syncAcFlag ? totalAC : armorClass;
-  output.sync_ac_flag = syncAcFlag;
+  // output.sync_ac_flag = syncAcFlag;
   await setAttrsAsync(output, {silent: true});
 };
 
