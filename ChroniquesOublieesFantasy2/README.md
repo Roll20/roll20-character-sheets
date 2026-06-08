@@ -23,7 +23,7 @@ v1.16.0 [Screenshot](cof2e.png)
   - Possibilité d'indiquer plusieurs capacités (nom + description) par rang dans les voies 7 à 9
   - Changement de syntaxe des propriétés de capacités `selonRang` et `buff`
   - Ajout de la propriété de capacité `pcorphelin` pour calcul correct des PV maximum
-  - Ajout de `att N` et `jet N` dans la propriété de capacité `roll`
+  - Ajout de `atk N` et `jet N` dans la propriété de capacité `roll`
   - Ajout des modificateurs d'attaque `aoe` et `save`
   - Ajout des options high fantasy de _Récupération complète_ et _Concentration puissante_
 
