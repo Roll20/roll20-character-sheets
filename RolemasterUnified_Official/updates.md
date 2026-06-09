@@ -1,13 +1,26 @@
+# 2026-06-09
+
+- Fix issue with profession bonuses not saving correctly
+    for newer professions.  Report an error if not found. (@aerius9432)
+- Fix for specialized skills not having a mod popup. (@snowdragon)
+- Fix magicAL ritual not working correctly in creation for some professions
+  - Handles both correct and bad case
+  - Got rid of a later check that did not work either.
+  - Fix Seer & Astrologer costs for rituals
+- Create: Kill an async for setting some initial properties.
+- Create: Fix for many stat options (3 or more).
+- Handle stride of 0 for races.
+
 # 2026-06-04
 
-- Arcane:
-   - Aspects now display all fancy like.
-   - Arcane users select aspects during creation
 - New spell loading system:
   - All pure Roll20 calls: Doesn't use the the RMU Async
   - Faster, lots, non-blocking
   - Use the save state structure instead of something unique
   - Handles Aspects from Arcane
+- Arcane:
+   - Aspects now display all fancy like.
+   - Arcane users select aspects during creation
 - Remove a spurious print
 - Add more 'use strict';
     - Fix a spurious global write of prefix, nameid
