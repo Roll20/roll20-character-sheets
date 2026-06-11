@@ -596,6 +596,26 @@
 			<td><span class="sheet-tcat">Successes:</span></td>
 			<td><span class="sheet-inlinerollresult">{{computed::successes}}</span></td>
 		</tr>
+    {{#rollTotal() glorious 1}}
+    <tr>
+			<td><span class="sheet-tcat">Rerolled Failures:</span></td>
+			<td><span class="sheet-inlinerollresult">{{computed::glorious_rerolled}}</span></td>
+		</tr>
+    <tr>
+			<td><span class="sheet-tcat">Total Successes:</span></td>
+			<td><span class="sheet-inlinerollresult">{{computed::total_successes}}</span></td>
+		</tr>
+    {{/rollTotal() glorious 1}}
+    {{#rollTotal() glorious 2}}
+    <tr>
+			<td><span class="sheet-tcat">Rerolled Successes:</span></td>
+			<td><span class="sheet-inlinerollresult">{{computed::grim_rerolled}}</span></td>
+		</tr>
+    <tr>
+			<td><span class="sheet-tcat">Total Successes:</span></td>
+			<td><span class="sheet-inlinerollresult">{{computed::total_successes}}</span></td>
+		</tr>
+    {{/rollTotal() glorious 2}}
     <tr>
 			<td><span class="sheet-tcat">Success Type:</span></td>
 			<td><span class="sheet-inlinerollresult">{{computed::success_type}}</span></td>
@@ -628,6 +648,26 @@
 			<td><span class="sheet-tcat">Successes:</span></td>
 			<td><span class="sheet-inlinerollresult">{{computed::successes}}</span></td>
 		</tr>
+    {{#rollTotal() glorious 1}}
+    <tr>
+			<td><span class="sheet-tcat">Rerolled Failures:</span></td>
+			<td><span class="sheet-inlinerollresult">{{computed::glorious_rerolled}}</span></td>
+		</tr>
+    <tr>
+			<td><span class="sheet-tcat">Total Successes:</span></td>
+			<td><span class="sheet-inlinerollresult">{{computed::total_successes}}</span></td>
+		</tr>
+    {{/rollTotal() glorious 1}}
+    {{#rollTotal() glorious 2}}
+    <tr>
+			<td><span class="sheet-tcat">Rerolled Successes:</span></td>
+			<td><span class="sheet-inlinerollresult">{{computed::grim_rerolled}}</span></td>
+		</tr>
+    <tr>
+			<td><span class="sheet-tcat">Total Successes:</span></td>
+			<td><span class="sheet-inlinerollresult">{{computed::total_successes}}</span></td>
+		</tr>
+    {{/rollTotal() glorious 2}}
     <tr>
 			<td><span class="sheet-tcat">Weapon Damage:</span></td>
 			<td><span class="sheet-inlinerollresult">{{computed::damage}} - Opponent SL</span></td>
@@ -659,19 +699,37 @@
       let damage = results.results.damage.result;
       let skill = results.results.skill.result;
       let modifier = results.results.modifier.result;
+      // 0 = Normal, 1 = Glorious (reroll failures), 2 = Grim (reroll successes)
+      let glorious = results.results.glorious ? results.results.glorious.result : 0;
       dice_pool = (dice_pool + modifier) > 0 ? (dice_pool + modifier) : 1;
 
       // console.log("DICE POOL: " + dice_pool);
-      let successes = 0;
+      let successes = 0;          // successes in the first set of rolls
+      let total_successes = 0;    // successes after rerolls (drives damage)
       let numbers_rolled = [];
+      let glorious_rerolled = []; // newly rerolled dice (Glorious)
+      let grim_rerolled = [];     // newly rerolled dice (Grim)
       for (let i = 0; i < dice_pool; i++) {
         let dieRoll = Math.floor(Math.random() * 10) + 1;
-        numbers_rolled.push(dieRoll);
-        if (dieRoll <= skill) {
+        numbers_rolled.push(dieRoll); // original first-set roll
+        let isSuccess = dieRoll <= skill;
+        if (isSuccess) {
           successes += 1;
         }
+        let finalRoll = dieRoll;
+        // Glorious rerolls failures, Grim rerolls successes.
+        if (glorious == 1 && !isSuccess) {
+          finalRoll = Math.floor(Math.random() * 10) + 1;
+          glorious_rerolled.push(finalRoll); // the newly rerolled die
+        } else if (glorious == 2 && isSuccess) {
+          finalRoll = Math.floor(Math.random() * 10) + 1;
+          grim_rerolled.push(finalRoll); // the newly rerolled die
+        }
+        if (finalRoll <= skill) {
+          total_successes += 1;
+        }
       }
-      damage = damage + successes;
+      damage = damage + total_successes;
 
       if (debug) {
         console.log("NUMBERS ROLLED: " + numbers_rolled);
@@ -689,7 +747,10 @@
             dice_pool: dice_pool,
             successes: successes,
             numbers_rolled: numbers_rolled,
-            damage: damage
+            damage: damage,
+            glorious_rerolled: glorious_rerolled.length ? glorious_rerolled.join(", ") : "None",
+            grim_rerolled: grim_rerolled.length ? grim_rerolled.join(", ") : "None",
+            total_successes: total_successes
           }
       );
 
@@ -729,7 +790,7 @@
 
           console.log(name + " | " + dice_pool + " | " + damage + " | " + traits  + " | " + skill);
 
-          let roll_string = "&{template:tow1ed2} [[?{Dice Mod | None,+0 | 1d,+1 | 2d,+2 | 3d,+3 | 4d,+4 | 5d,+5 | -1d,-1  | -2d,-2 | -3d,-3 | -4d,-4 | -5d,-5}]] {{modifier=$[[0]]}}{{name="+name+"}}{{dice_pool=[["+dice_pool+"]]}}{{damage=[["+damage+"]]}}{{traits="+traits+"}}{{skill=[["+skill+"]]}}{{Character Name=@{character_name} }}{{successes=[[d10]]}}{{numbers_rolled=[[d10]]}}";
+          let roll_string = "&{template:tow1ed2} [[?{Dice Mod | None,+0 | 1d,+1 | 2d,+2 | 3d,+3 | 4d,+4 | 5d,+5 | -1d,-1  | -2d,-2 | -3d,-3 | -4d,-4 | -5d,-5}]] {{modifier=$[[0]]}}{{name="+name+"}}{{dice_pool=[["+dice_pool+"]]}}{{damage=[["+damage+"]]}}{{traits="+traits+"}}{{skill=[["+skill+"]]}}{{glorious=[[?{GLORIOUS? | Normal,0 | Glorious,1 | Grim,2}]]}}{{Character Name=@{character_name} }}{{successes=[[d10]]}}{{numbers_rolled=[[d10]]}}{{glorious_rerolled=[[d10]]}}{{grim_rerolled=[[d10]]}}{{total_successes=[[d10]]}}";
           rollattack(roll_string, true);
           //rollTest(reroll, skill_name, skill_total, diff_roll, circ, superiority, dmg, dmg_info, slmod, critfum);
       });
@@ -750,9 +811,9 @@
       console.log("Selected Roll Type: " + selected_rolltype);
     }
 
-    let roll_string = "&{template:tow1ed} [[?{Dice Mod | None,+0 | 1d,+1 | 2d,+2 | 3d,+3 | 4d,+4 | 5d,+5 | -1d,-1  | -2d,-2 | -3d,-3 | -4d,-4 | -5d,-5}]] {{characteristic=[[@{"+selected_characteristic+"}]]}}{{skill=[[@{skill_"+selected_skill+"}]]}}{{modifier=$[[0]]}}{{selected_skill="+selected_skill+"}}{{successes=[[d10]]}}{{numbers_rolled=[[d10]]}}{{success_type=[[d10]]}}{{Character Name=@{character_name} }}";
+    let roll_string = "&{template:tow1ed} [[?{Dice Mod | None,+0 | 1d,+1 | 2d,+2 | 3d,+3 | 4d,+4 | 5d,+5 | -1d,-1  | -2d,-2 | -3d,-3 | -4d,-4 | -5d,-5}]] {{characteristic=[[@{"+selected_characteristic+"}]]}}{{skill=[[@{skill_"+selected_skill+"}]]}}{{modifier=$[[0]]}}{{glorious=[[?{GLORIOUS? | Normal,0 | Glorious,1 | Grim,2}]]}}{{selected_skill="+selected_skill+"}}{{successes=[[d10]]}}{{numbers_rolled=[[d10]]}}{{success_type=[[d10]]}}{{glorious_rerolled=[[d10]]}}{{grim_rerolled=[[d10]]}}{{total_successes=[[d10]]}}{{Character Name=@{character_name} }}";
     if (selected_rolltype == 'spell') {
-      roll_string = "&{template:tow1ed} [[?{Dice Mod | None,+0 | 1d,+1 | 2d,+2 | 3d,+3 | 4d,+4 | 5d,+5 | -1d,-1  | -2d,-2 | -3d,-3 | -4d,-4 | -5d,-5}]] {{characteristic=[[@{"+selected_characteristic+"}]]}}{{skill=[[@{skill_"+selected_skill+"}]]}}{{miscast_pool=[[@{miscast_pool}]]}}{{selected_skill="+selected_skill+"}}{{wizard_level=[[@{wizard_level}]]}}{{modifier=$[[0]]}}{{successes=[[d10]]}}{{numbers_rolled=[[d10]]}}{{success_type=[[d10]]}}{{Character Name=@{character_name} }}";
+      roll_string = "&{template:tow1ed} [[?{Dice Mod | None,+0 | 1d,+1 | 2d,+2 | 3d,+3 | 4d,+4 | 5d,+5 | -1d,-1  | -2d,-2 | -3d,-3 | -4d,-4 | -5d,-5}]] {{characteristic=[[@{"+selected_characteristic+"}]]}}{{skill=[[@{skill_"+selected_skill+"}]]}}{{miscast_pool=[[@{miscast_pool}]]}}{{selected_skill="+selected_skill+"}}{{wizard_level=[[@{wizard_level}]]}}{{modifier=$[[0]]}}{{glorious=[[?{GLORIOUS? | Normal,0 | Glorious,1 | Grim,2}]]}}{{successes=[[d10]]}}{{numbers_rolled=[[d10]]}}{{success_type=[[d10]]}}{{glorious_rerolled=[[d10]]}}{{grim_rerolled=[[d10]]}}{{total_successes=[[d10]]}}{{Character Name=@{character_name} }}";
       selected_skill = "magic";
     }
 
@@ -770,21 +831,39 @@ function rolltest(roll_string, selected_skill, debug=false) {
     let modifier = results.results.modifier.result;
     let miscast_pool = results.results.miscast_pool ? results.results.miscast_pool.result : null;
     let wizard_level = results.results.wizard_level ? results.results.wizard_level.result : null;
+    // 0 = Normal, 1 = Glorious (reroll failures), 2 = Grim (reroll successes)
+    let glorious = results.results.glorious ? results.results.glorious.result : 0;
 
     let dice_pool = (characteristic + modifier) > 0 ? (characteristic + modifier) : 1;
 
     // console.log("DICE POOL: " + dice_pool);
-    let successes = 0;
+    let successes = 0;          // successes in the first set of rolls
+    let total_successes = 0;    // successes after rerolls (drives success type)
     let numbers_rolled = [];
     let nines_rolled = [];
+    let glorious_rerolled = []; // newly rerolled dice (Glorious)
+    let grim_rerolled = [];     // newly rerolled dice (Grim)
     for (let i = 0; i < dice_pool; i++) {
       let dieRoll = Math.floor(Math.random() * 10) + 1;
-      numbers_rolled.push(dieRoll);
-      if (dieRoll == 9 && selected_skill == "magic") {
-        nines_rolled.push(dieRoll);
-      }
-      if (dieRoll <= skill) {
+      numbers_rolled.push(dieRoll); // original first-set roll
+      let isSuccess = dieRoll <= skill;
+      if (isSuccess) {
         successes += 1;
+      }
+      let finalRoll = dieRoll;
+      // Glorious rerolls failures, Grim rerolls successes.
+      if (glorious == 1 && !isSuccess) {
+        finalRoll = Math.floor(Math.random() * 10) + 1;
+        glorious_rerolled.push(finalRoll); // the newly rerolled die
+      } else if (glorious == 2 && isSuccess) {
+        finalRoll = Math.floor(Math.random() * 10) + 1;
+        grim_rerolled.push(finalRoll); // the newly rerolled die
+      }
+      if (finalRoll == 9 && selected_skill == "magic") {
+        nines_rolled.push(finalRoll);
+      }
+      if (finalRoll <= skill) {
+        total_successes += 1;
       }
     }
     if (debug) {
@@ -797,12 +876,13 @@ function rolltest(roll_string, selected_skill, debug=false) {
     }
     if (((nines_rolled.length + miscast_pool) > wizard_level) && selected_skill == "magic") {
       successes = 0;
+      total_successes = 0;
       success_type = "Miscast Failure!";
-    } else if (successes >= 3) {
+    } else if (total_successes >= 3) {
       success_type = "Total Success!";
-    } else if (successes >= 2) {
+    } else if (total_successes >= 2) {
       success_type = "Success";
-    } else if (successes >= 1) {
+    } else if (total_successes >= 1) {
       success_type = "Marginal Success";
     } else {
       success_type = "Failure!";
@@ -817,7 +897,10 @@ function rolltest(roll_string, selected_skill, debug=false) {
           dice_pool: dice_pool,
           successes: successes,
           numbers_rolled: numbers_rolled,
-          success_type: success_type
+          success_type: success_type,
+          glorious_rerolled: glorious_rerolled.length ? glorious_rerolled.join(", ") : "None",
+          grim_rerolled: grim_rerolled.length ? grim_rerolled.join(", ") : "None",
+          total_successes: total_successes
         }
     );
 
