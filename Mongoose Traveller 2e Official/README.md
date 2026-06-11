@@ -149,7 +149,10 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Made robot PC skills panel show/hide via checkbox
 - Improve armour encumbrance check for battle dress and powered suits where the armour weight is effectively zero rather than 25% when worn
 - Fixed issues with equipment, weapons and armour weight calculations and triggering events
-- 
+
+### Version 1.1.16
+- Fixed bad compendium item weight/mass by checking for NaN
+- Fixed encumberance carry capacity for Athletics specialties
 
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 
