@@ -57,6 +57,11 @@ const globalAttributesByCategory = {
 
 on("sheet:opened", function(eventinfo) {
     lastDropID = "";
+    // Refresh the PC initiative bonus + its display label on open so existing characters
+    // correct any stale initiative_bonus_label (NPC init is managed separately).
+    getAttrs(["npc"], function(initv) {
+        if (!(initv["npc"] && initv["npc"] == "1")) { update_initiative(); }
+    });
     versioning(function() {
         var getInfo = function(sections, callback, results) {
             results =  results || {};
@@ -414,7 +419,7 @@ on("change:repeating_inventory:itemname change:repeating_inventory:itempropertie
     });
 });
 
-on("change:repeating_inventory:itemweight change:repeating_inventory:itemcount change:cp change:sp change:ep change:cu change:cn change:encumberance_setting change:size change:carrying_capacity_mod change:powerful_build", function() {
+on("change:repeating_inventory:itemweight change:repeating_inventory:itemcount change:cp change:sp change:ep change:cu change:cn change:encumberance_setting change:strength change:size change:carrying_capacity_mod change:powerful_build", function() {
     update_weight();
 });
 
@@ -430,7 +435,7 @@ on("change:repeating_inventory:itemmodifiers change:repeating_inventory:equipped
     });
 });
 
-on("change:custom_ac_flag change:custom_ac_base change:custom_ac_part1 change:custom_ac_part2 change:custom_ac_shield", function(eventinfo) {
+on("change:custom_ac_flag change:custom_ac_base change:custom_ac_part1 change:custom_ac_part2 change:custom_ac_shield change:ac_misc_mod", function(eventinfo) {
     if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
         return;
     }
@@ -465,10 +470,15 @@ on("change:custom_ac_flag change:custom_ac_base change:custom_ac_part1 change:cu
 
             if (spelloutput && spelloutput === "ATTACK") {
                 create_attack_from_spell(lvl, spellid, v["character_id"]);
-            } else if (spelloutput && spelloutput === "POWERCARD" && attackid && attackid != "") {
-                let lvl = parseInt(v[repeating_source + "_spelllevel"], 10);
-                remove_attack(attackid);
-                update_spelloutput(higherlevels, lvl, repeating_source, spelloutput, licensedsheet);
+            } else if (spelloutput && spelloutput === "POWERCARD") {
+                // Always regenerate the powercard macro when switching to POWERCARD. Do NOT
+                // gate this on an existing attackid: if it's empty, a spell whose rollcontent
+                // is a stale %{...attack} call (or broken/empty) never gets reset to the spell
+                // template, so the button keeps firing the old ATTACK roll. Remove the attack
+                // only if one actually exists.
+                const lvl2 = parseInt(v[repeating_source + "_spelllevel"], 10);
+                if (attackid && attackid != "") { remove_attack(attackid); }
+                update_spelloutput(higherlevels, lvl2, repeating_source, spelloutput, licensedsheet);
             }
         });
     });
@@ -492,19 +502,52 @@ on("change:custom_ac_flag change:custom_ac_base change:custom_ac_part1 change:cu
 });
 
 const update_spelloutput = (higherlevels, lvl, repeating_source, spelloutput, licensedsheet)  => {
-    let spelllevel = "@{spelllevel}";
     let update = {};
 
-    if (higherlevels) {
-        for(i = 0; i < 10-lvl; i++) {
-            let tot = parseInt(i, 10) + parseInt(lvl, 10);
-            spelllevel = spelllevel + "|Level " + tot + "," + tot;
-        }
-        spelllevel = `?{Cast at what level? ${spelllevel}}`;
-    }
-    update[repeating_source + "_rollcontent"] = `@{wtype}&{template:spell} {{level=@{spellschool} ${spelllevel}}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{pointcost}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output} {{licensedsheet=@{licensedsheet}}}`;
+    // POWERCARD is a descriptive card with no damage roll, so it displays the base rank
+    // statically. A ?{Cast at what level?} query inside the &{template:spell} level field
+    // breaks the macro (Roll20 silently drops the whole message) for EVERY power with "At
+    // Higher Ranks" text; the higher-rank info is already shown via {{athigherlevels=...}}
+    // and the ATTACK output handles real cast-level scaling. (higherlevels/lvl params kept
+    // for signature compatibility with existing callers.)
+    // Must stay byte-identical to dropFunctions.buildSpellQuery() and the sheet:opened
+    // POWERCARD_MACRO self-heal, or the self-heal rewrites this on the next open (thrash).
+    update[repeating_source + "_rollcontent"] = `@{wtype}&{template:spell} {{level=Rank @{spelllevel} @{spellschool}}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} {{pointcost=@{pointcost}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}`;
     setAttrs(update, {silent: true});
 };
+
+// Self-heal for the POWERCARD macro. Earlier sheet versions baked a ?{Cast at what level?}
+// query into each power's rollcontent (via buildSpellQuery on compendium drop, and the old
+// update_spelloutput). That query inside the &{template:spell} {{level=...}} field silently
+// breaks the macro for any power with higher-rank text. On open, normalize every non-ATTACK
+// spell's rollcontent to the current canonical macro: repairs broken macros (old query,
+// stale %{...attack} calls, empty) AND upgrades older working macros to the latest template
+// (e.g. to add the Point Cost line). ATTACK spells keep their %{...attack} call. Already-
+// canonical rows are skipped, so there's no thrash — all generators emit this exact string.
+on("sheet:opened", function() {
+    const POWERCARD_MACRO = `@{wtype}&{template:spell} {{level=Rank @{spelllevel} @{spellschool}}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} {{pointcost=@{pointcost}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}`;
+    ['spell-prime','spell-1','spell-2','spell-3','spell-4','spell-5','spell-6','spell-7','spell-8','spell-9'].forEach(function(attr) {
+        getSectionIDs(`repeating_${attr}`, function(ids) {
+            if(!ids || !ids.length) { return; }
+            const fields = [];
+            ids.forEach(function(id) {
+                fields.push(`repeating_${attr}_${id}_rollcontent`, `repeating_${attr}_${id}_spelloutput`);
+            });
+            getAttrs(fields, function(v) {
+                const update = {};
+                ids.forEach(function(id) {
+                    const rcKey  = `repeating_${attr}_${id}_rollcontent`;
+                    const output = v[`repeating_${attr}_${id}_spelloutput`];
+                    const rc     = v[rcKey] || "";
+                    if(output !== "ATTACK" && rc !== POWERCARD_MACRO) {
+                        update[rcKey] = POWERCARD_MACRO;
+                    }
+                });
+                if(Object.keys(update).length) { setAttrs(update, {silent: true}); }
+            });
+        });
+    });
+});
 
 on("change:class change:custom_class change:cust_classname change:cust_hitdietype change:cust_spellcasting_ability change:cust_spellslots change:cust_strength_save_prof change:cust_dexterity_save_prof change:cust_constitution_save_prof change:cust_intelligence_save_prof change:cust_wisdom_save_prof change:cust_charisma_save_prof change:subclass change:multiclass1 change:multiclass1_subclass change:multiclass2 change:multiclass2_subclass change:multiclass3 change:multiclass3_subclass" , function(eventinfo) {
     if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
@@ -2187,6 +2230,8 @@ const update_weight = function() {
                 }
             }
 
+            update["carrying_capacity"] = isNaN(str) ? 0 : Math.round(str * 15);
+
             if (!v.encumberance_setting || v.encumberance_setting === "off") {
                 update["encumberance"] = (wtotal > str*15) ? "OVER CARRYING CAPACITY" : " ";
             } else if (v.encumberance_setting === "on") {
@@ -2212,7 +2257,7 @@ var update_ac = function() {
         }
         else {
             var update = {};
-            var ac_attrs = ["simpleinventory","custom_ac_base","custom_ac_part1","custom_ac_part2","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod", "custom_ac_shield"];
+            var ac_attrs = ["simpleinventory","custom_ac_base","custom_ac_part1","custom_ac_part2","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod", "custom_ac_shield", "ac_misc_mod"];
             getSectionIDs("repeating_acmod", function(acidarray) {
                 _.each(acidarray, function(currentID, i) {
                     ac_attrs.push("repeating_acmod_" + currentID + "_global_ac_val");
@@ -2244,6 +2289,7 @@ var update_ac = function() {
                         var armorcount = 0;
                         var shieldcount = 0;
                         var armoritems = [];
+                        var armorDisplay = 10;
                         if(b.simpleinventory === "complex") {
                             _.each(idarray, function(currentID, i) {
                                 if(b["repeating_inventory_" + currentID + "_equipped"] && b["repeating_inventory_" + currentID + "_equipped"] === "1" && b["repeating_inventory_" + currentID + "_itemmodifiers"] && b["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().indexOf("ac") > -1) {
@@ -2297,6 +2343,7 @@ var update_ac = function() {
                             });
 
                             total = base + armorac + shieldac + modac;
+                            armorDisplay = armorac;
 
                         };
                         update["armorwarningflag"] = "hide";
@@ -2311,8 +2358,12 @@ var update_ac = function() {
                             }
                             else {
                                 update["ac"] = b.custom_ac_shield == "yes" ? custom_total + shieldac + globalacmod + modac : custom_total + globalacmod + modac;
+                                armorDisplay = isNaN(parseInt(b.custom_ac_base, 10)) ? 10 : parseInt(b.custom_ac_base, 10);
                             }
                         }
+                        var miscmod = isNaN(parseInt(b.ac_misc_mod, 10)) ? 0 : parseInt(b.ac_misc_mod, 10);
+                        update["ac"] = update["ac"] + miscmod;
+                        update["ac_armor"] = armorDisplay;
                         setAttrs(update, {silent: true});
                     });
                 });
@@ -2367,6 +2418,14 @@ const update_initiative = () => {
                 final_init = parseFloat(final_init.toPrecision(12)); // ROUNDING ERROR BUGFIX
             }
             update["initiative_bonus"] = final_init;
+            // Display label shown on the Initiative button (span name="attr_initiative_bonus_label").
+            // The roll uses initiative_bonus; this formatted string is what the user sees.
+            // Prefix non-negative values with "+".
+            let init_label = String(final_init);
+            if (init_label.charAt(0) !== "-" && init_label.charAt(0) !== "+") {
+                init_label = "+" + init_label;
+            }
+            update["initiative_bonus_label"] = init_label;
             setAttrs(update, {silent: true});
         });
     });
