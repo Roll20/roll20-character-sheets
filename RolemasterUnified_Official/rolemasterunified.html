@@ -3188,6 +3188,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
     <div class='prop_pair'>
       <span>
+        <button type='action' name='act_edit_initiative' class='editbutton'>
+          <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+          <span name='attr_initiative_info' class='stat_info'></span>
+        </button>
         <button type='action' name='act_rollinitiative' class='fancybutton'>Initative
           <span name='attr_initiative'></span>
         </button>
@@ -7588,6 +7592,10 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
 
     <div class='prop_pair'>
       <span>
+        <button type='action' name='act_edit_initiative' class='editbutton'>
+          <span class="icon" style="font-family: 'Pictos Custom'; color: rgb(150,150,150);">y</span>
+          <span name='attr_initiative_info' class='stat_info'></span>
+        </button>
         <button type='action' name='act_rollinitiative' class='fancybutton'>Initative
           <span name='attr_initiative'></span>
         </button>
@@ -10541,7 +10549,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision bd1cd0b53e132d086b293d533b98270ef70fe84e
+Revision cc13ace7eb5c3746d0dc6112ccf50a6667293154
 
 
 <hr>
@@ -18769,7 +18777,6 @@ console.log("done cultures");
 	    { "Max Pace", "maxpace" }, -- table 5-3
 	    { "Maneuver Penalty", "manpenalty" }, -- enc penglty = armor penlty
 	    -- More misc stuff
-	    { "Initiative", "initiative" },
 	    { "Power", "pp" },	PP 
 	    { "Size", "size" }, Race
 
@@ -18845,15 +18852,19 @@ frontpage.updateHeight = function() {
 }
 
 frontpage.updateInit = function () { 
-  // FIXME: Not taking into accoutn MM penalty
+  // FIXME: Not taking into account MM penalty,
+  // that is done at roll time (or should be).
   // Initiative is 2d10 + Qu - 1/10 penalty
-  getAttrsPending(["qu", "initiative_misc"], (ev) => {
+  getAttrs(["qu", "initiative_misc"], (ev) => {
       let [total, mlog] = miscBonusTotal(ev.initiative_misc, "");
-      total += parseIntDefault(ev.qu, 0);
-      setAttrsPending({initiative: total});
+      const qu = parseIntDefault(ev.qu, 0);
+      total += qu;
+      mlog += `${F(qu)} Quickness\n`;
+      mlog += `${T(total)} Total Initiative`;
+      setAttrs({initiative: total, initiative_info: mlog});
   });
-}
-onCheck("change:qu", frontpage.updateInit);
+};
+onCheck("change:qu change:initiative_misc", frontpage.updateInit);
 
 frontpage.updateFeatsOfStrength = function () {
   const feats = [
@@ -20194,8 +20205,17 @@ onCheck("clicked:edit_stat", (ev) => {
       { name: "Pot",  field: `${stat}_pot_misc` },
       { name: "Bonus",  field: `${abbr}_misc` }
     ]);
-
 });
+
+onCheck("clicked:edit_initiative", () => {
+  Edit.clearSections();
+
+  Edit.editList("Initiative", { canedit:false },
+  [
+     { name: "Initiative", field: `initiative_misc` },
+  ]);
+});
+
 
 onCheck("clicked:add_specialization", (ev) => {
     const aname = ev.htmlAttributes['data-skill'];

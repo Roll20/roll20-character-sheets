@@ -1,3 +1,7 @@
+# 2026-06-11
+
+- Add ability to edit initiative modifiers.
+
 # 2026-06-09
 
 - Fix issue with profession bonuses not saving correctly
