@@ -1436,6 +1436,12 @@ const talentsData = {
 	't_sc_vorimperialepiktogramme': {'internal': "schrift_vorimperialepiktogramme", 'ui': "Vor-Imperiale Piktogramme"},
 	't_sc_wasserschallzeichen': {'internal': "schrift_wasserschallzeichen", 'ui': "Wasserschallzeichen"}
 };
+const talentsDataOldToNew = {};
+for (let talent in talentsData)
+{
+	talentsDataOldToNew[talentsData[talent]["internal"]] = talent;
+}
+
 const spellsData = {
 	'z_abvenenum': {'internal': "abvenenum", 'ui': "Abvenenum Reine Speise", 'stats': ['KL', 'KL', 'FF']},
 	'z_accuratum': {'internal': "accuratum", 'ui': "Accuratum Zaubernadel", 'stats': ['KL', 'CH', 'FF']},
