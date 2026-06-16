@@ -1,3 +1,9 @@
+# 2026-06-16
+
+- Add edit notes to the creature sheet
+- Fix burrow / tunnel
+- Crawl pace is shown for the currant AP/phase
+
 # 2026-06-11
 
 - Add ability to edit initiative modifiers.
