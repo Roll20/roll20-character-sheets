@@ -6118,6 +6118,11 @@ class IntelligenceAdjustmentTable {
   constructor() {
     // bonuslanguages, knowspell, minspells, maxspells
     this.intelligence_dict = {
+      3: new IntelligenceEntry(0, 0, 0, 0),
+      4: new IntelligenceEntry(0, 0, 0, 0),
+      5: new IntelligenceEntry(0, 0, 0, 0),
+      6: new IntelligenceEntry(0, 0, 0, 0),
+      7: new IntelligenceEntry(0, 0, 0, 0),
       8: new IntelligenceEntry(1, 0, 0, 0),
       9: new IntelligenceEntry(1, 35, 4, 6),
       10: new IntelligenceEntry(2, 45, 5, 7),
@@ -6137,10 +6142,9 @@ class IntelligenceAdjustmentTable {
       24: new IntelligenceEntry(13, 100, 15, 99),
       25: new IntelligenceEntry(14, 100, 16, 99),
     };
-  }
 
   getEntry(str_value) {
-    return this.intelligence_dict[getValidVariable(str_value, 'intelligence', 8, 25)];
+    return this.intelligence_dict[getValidVariable(str_value, 'intelligence', 3, 25)];
   }
 }
 
