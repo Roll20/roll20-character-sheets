@@ -6142,7 +6142,7 @@ class IntelligenceAdjustmentTable {
       24: new IntelligenceEntry(13, 100, 15, 99),
       25: new IntelligenceEntry(14, 100, 16, 99),
     };
-
+  }
   getEntry(str_value) {
     return this.intelligence_dict[getValidVariable(str_value, 'intelligence', 3, 25)];
   }
