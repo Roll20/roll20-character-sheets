@@ -353,7 +353,10 @@ function upgradeGeneric3Dot1() {
  * @param version the sheet version already parse to a float or 0 if not a valid float
  */
 function versioning(sheet_type, version) {
-    const latestVersion = '3.2';
+    const latestVersion = '3.8';
+    if (!sheet_type) {
+        sheet_type = "pc";
+    }
     if (debug) {console.log(`Current sheet version = ${version}`);}
     version = parseFloat(version) || 0;
     /* Eval sheet version and run upgrade functions as needed, note we have dropped functions of old versions */
@@ -370,14 +373,33 @@ function versioning(sheet_type, version) {
         versioning(sheet_type, '3.0');
     }
     else if (version < 3.1) {
-        if (sheet_type === 'pc') {upgradeCharacter3Dot1();}
+        if (sheet_type === 'character' || sheet_type === 'pc') {upgradeCharacter3Dot1();}
         else if (sheet_type === 'battle_unit') {upgradeGeneric3Dot1();}
         else if (sheet_type === 'ship') {upgradeGeneric3Dot1();}
         else if (sheet_type === 'solar_system') {upgradeGeneric3Dot1();}
         else if (sheet_type === 'vehicle') {upgradeGeneric3Dot1();}
         versioning(sheet_type, '3.1');
-    } else if (version >= 3.1) { /* TODO change this when we next introduce a version that requires updating */
-        setAttrs({"version": "3.2"});
+    } else if (version < 3.4) {
+        console.log("sheet type is = " + sheet_type);
+        if (sheet_type === 'character' || sheet_type === 'pc' || sheet_type === 'creature' || sheet_type === 'spirit') {
+            console.log("run character 3.4 update");
+            upgradeCharacter3Dot4();
+        }
+        versioning(sheet_type, '3.4');
+    } else if (version < 3.6) {
+        if (sheet_type === 'character' || sheet_type === 'pc' || sheet_type === 'creature' || sheet_type === 'spirit') {
+            console.log("running character 3.6 update");
+            upgradeCharacter3Dot6();
+        }
+        versioning(sheet_type, '3.6');
+    } else if (version < 3.8) { /* TODO change this when we next introduce a version that requires updating */
+        if (sheet_type === 'character' || sheet_type === 'pc' || sheet_type === 'creature' || sheet_type === 'spirit') {
+            console.log("running character 3.8 update");
+            upgradeCharacter3Dot8();
+        }
+        versioning(sheet_type, '3.8');
+    } else {
+        setAttrs({"version": 3.8})
     }
 }
 

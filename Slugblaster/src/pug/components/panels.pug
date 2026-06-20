@@ -1,0 +1,64 @@
+//- panels have editor toggles
+mixin panel(panel)
+  - const semantic = panel.semantic || 'section';
+  - const editor = panel.editor || panel.name;
+  #{semantic}.panel(class=panel.name)&attributes(attributes)
+    input.editor__controller(name=`attr_${panel.name}_editor`, type='hidden', value='on')
+    input.minimizer__controller(name=`attr_${panel.name}_minimizer`, type='hidden', value='0')
+    .panel__wrapper
+      block
+      .panel__header(class=`${panel.name}__header`)
+        +block('header', true)
+          if (panel.title)
+            h2.panel__title(class=`${panel.name}__title`, data-i18n=panel.name)= panel.title
+        .panel__controls
+          unless panel.static
+            +minitoggle(panel.name)
+          +edittoggle(panel.name)
+      .panel__content(class=`${panel.name}__content`)
+        +block('content', true)
+
+mixin blob(blob)
+  - const semantic = blob.semantic || 'section';
+  - const editorClass = blob.editor ? 'blob--editor' : null;
+  #{semantic}.blob(class=blob.name)&attributes(attributes)
+    input.editor__controller(name=`attr_${blob.name}_editor`, type='hidden', value='on')
+    input.minimizer__controller(name=`attr_${blob.name}_minimizer`, type='hidden', value='0')
+    .blob__wrapper(class=editorClass)
+      block
+      if (blob.title)
+        .blob__header(class=`${blob.name}__header`)
+          h2.blob__title(class=`${blob.name}__title`, data-i18n=blob.name)= blob.title
+          .blob__controls
+            if blob.broadcast
+              - const { name, broadcast } = blob;
+              +broadcast({ name, broadcast})
+            if blob.editor
+              +edittoggle(blob.name)
+            if blob.minimizer
+              +minitoggle(blob.name)
+      .blob__content(class=`${blob.name}__content`)
+        +block('content', true)
+
+mixin bubble(bubble)
+  article.bubble(class=`bubble__${bubble.name}`)
+    block
+    input.bubble__controller(name=`attr_${bubble.name}_collapse`, type='hidden', value='0')
+    .bubble__header
+      +block('header', true)
+      .bubble__controls
+        if (bubble.broadcast)
+          +broadcast(bubble).bubble__broadcast
+        label.bubble__expand(for=`attr_${bubble.name}_collapse`)
+          input(name=`attr_${bubble.name}_collapse`, type='checkbox')
+          span.bubble__expand--collapse.visually-hidden(data-i18n='collapse_content') Collapse Content
+          span.bubble__expand--expand.visually-hidden(data-i18n='expand_content') Expand Content
+    .bubble__content
+      .bubble__collapse
+        +block('content', true)
+
+mixin broadcast(broadcast)
+  - const broadcastClass = attributes.class || 'broadcast';
+  button.broadcast(class=broadcastClass, name=`roll_${broadcast.name}-broadcast`, type='roll', value=broadcast.broadcast)
+    span.pictos w
+    span.visually-hidden(data-i18n='broadcast_to_chat') Broadcast to Chat

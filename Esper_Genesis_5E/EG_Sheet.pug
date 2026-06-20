@@ -3,9 +3,9 @@
 -
   const globalAttributesByCatagory = {
     abilities: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
-    optionalAbilites: ['honor', 'sanity'],
+    optionalAbilites: [],
     alignments: ['Lawful Good', 'Neutral Good', 'Chaotic Good', 'Lawful Neutral', 'Neutral', 'Chaotic Neutral', 'Lawful Evil', 'Neutral Evil', 'Chaotic Evil'],
-    classes: ['artificer', 'bard', 'cleric', 'druid', 'paladin', 'ranger', 'sorcerer', 'warlock', 'wizard'],
+    classes: ['adept', 'cybermancer', 'engineer', 'hunter', 'melder', 'sentinel'],
     sizes: ['Tiny', 'Small', 'Medium', 'Large', 'Huge', 'Gargantuan'],
     diceSizes: ['d4', 'd6', 'd8', 'd10', 'd12']
   };
@@ -13,7 +13,7 @@
 
 include src/mixins/mixins.pug
 
-input(name='attr_version' type='hidden' value!='3.0')
+input(name='attr_version' type='hidden' value!='4.2')
 input.monster_confirm_flag(name='attr_monster_confirm_flag' type='hidden')
 input.mancer_confirm_flag(name='attr_mancer_confirm_flag' type='hidden')
 input.licensedsheet(name='attr_licensedsheet' type='hidden')
@@ -23,22 +23,23 @@ input.licensedsheet(name='attr_licensedsheet' type='hidden')
   input.npcspellcastingflag(name='attr_npcspellcastingflag' type='hidden' value!='0')
   input.sheet-pc-type(name='attr_pc_sheet_type' type='hidden' value='pc')
   input.npcspellcastingflag(name='attr_npcspellcastingflag' type='hidden')
-  input.toggleflag(name='attr_rtype' type='hidden')
-  .advantagetoggle
-    input.toggle-left(type='radio' name='attr_advantagetoggle' value!='{{query=1}} {{advantage=1}} {{r2=[[@{d20}')
-    span(data-i18n='adv-u') ADVANTAGE
-    input.toggle-center(type='radio' name='attr_advantagetoggle' value!='{{query=1}} {{normal=1}} {{r2=[[0d20' checked='checked')
-    span(data-i18n='norm-u') NORMAL
-    input.toggle-right(type='radio' name='attr_advantagetoggle' value!='{{query=1}} {{disadvantage=1}} {{r2=[[@{d20}')
-    span(data-i18n='disadv-u') DISADVANTAGE
-  input.toggleflag(name='attr_wtype' type='hidden')
-  .advantagetoggle.whispertoggle
-    input.toggle-left(name='attr_whispertoggle' type='radio' value!='' checked='checked')
-    span(data-i18n='public:-u') PUBLIC
-    input.toggle-right(name='attr_whispertoggle' type='radio' value!='/w gm ')
-    span(data-i18n='to-gm:-u')
-      | TO
-      span.togm GM
+  .top-bar
+    input.toggleflag(name='attr_rtype' type='hidden')
+    .advantagetoggle
+      input.toggle-left(type='radio' id='adv-toggle-adv' name='attr_advantagetoggle' value!='{{query=1}} {{advantage=1}} {{r2=[[@{d20}')
+      label(for='adv-toggle-adv' data-i18n='adv-u') ADVANTAGE
+      input.toggle-center(type='radio' id='adv-toggle-norm' name='attr_advantagetoggle' value!='{{query=1}} {{normal=1}} {{r2=[[0d20' checked='checked')
+      label(for='adv-toggle-norm' data-i18n='norm-u') NORMAL
+      input.toggle-right(type='radio' id='adv-toggle-disadv' name='attr_advantagetoggle' value!='{{query=1}} {{disadvantage=1}} {{r2=[[@{d20}')
+      label(for='adv-toggle-disadv' data-i18n='disadv-u') DISADVANTAGE
+    input.toggleflag(name='attr_wtype' type='hidden')
+    .advantagetoggle.whispertoggle
+      input.toggle-left(id='whisper-toggle-pub' name='attr_whispertoggle' type='radio' value!='' checked='checked')
+      label(for='whisper-toggle-pub' data-i18n='public:-u') PUBLIC
+      input.toggle-right(id='whisper-toggle-gm' name='attr_whispertoggle' type='radio' value!='/w gm ')
+      label(for='whisper-toggle-gm' data-i18n='to-gm:-u') WHISPER
+    input.npc-mode-mirror(type='checkbox' name='attr_npc' value='1')
+    label.settings-modal-btn(for='settings-modal-toggle') ⚙ SHEET SETTINGS
   
   include src/npc/npc.pug
   .container.pc
@@ -69,10 +70,9 @@ input.licensedsheet(name='attr_licensedsheet' type='hidden')
 .mancer_confirm
   span(style='line-height: 25px' data-i18n='do_you_want_mancer') How do you want to create this character?
   div(style='margin-top: 20px;')
-    //
-      div(style='position: relative; display: inline-block; width:130px;')
-        input.yes(type='checkbox' style='width:130px;' name='attr_mancer_confirm')
-        span.yes(style='width:130px;' data-i18n='mancer-confirm-yes') Use the Charactermancer
+    div(style='position: relative; display: inline-block; width:130px;')
+      input.yes(type='checkbox' style='width:130px;' name='attr_mancer_confirm')
+      span.yes(style='width:130px;' data-i18n='mancer-confirm-yes') Use the Charactermancer
     div(style='position: relative; display: inline-block; width:80px;')
       input.yes(style='width:80px;' type='checkbox' name='attr_mancer_npc')
       span.yes(style='width:80px;' data-i18n='npc-new') Create an NPC
@@ -84,13 +84,13 @@ input.licensedsheet(name='attr_licensedsheet' type='hidden')
 include src/rolltemplates/rolltemplates.html
 
 //- CHARACTERMANCER REPEATING SECTIONS
-  include src/charactermancer/repeating/repeatingsections.html
+include src/charactermancer/repeating/repeatingsections.html
 
 //- CHARACTERMANCER LEVEL 1
-  include src/charactermancer/l1/l1.pug
+include src/charactermancer/l1/l1.pug
 
 //- CHARACTERMANCER LEVEL UP
-  include src/charactermancer/lp/lp.pug
+include src/charactermancer/lp/lp.pug
 
 //- HIDDEN INPUTS
 include src/hiddeninputs/hiddeninputs.pug

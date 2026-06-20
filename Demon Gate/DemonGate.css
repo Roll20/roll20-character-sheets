@@ -1,62 +1,152 @@
+@import url("https://fonts.googleapis.com/css?family=IM+Fell+English+SC&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Atkinson+Hyperlegible&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Lato&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IM+Fell+English+SC&family=Lato:wght@400;700&display=swap");
+
 /* ************************************************************************************************************************************************ */
 /* Colours */
 /* ************************************************************************************************************************************************ */
 /*
-#948a54 (mid brown) - table borders, headings of older parts of the sheet
-#ddd9c3 (beige) - header cells, active tab button
-#b6ad7c (darker beige) - inactive tab buttons
-#f6f5ef (pale beige) - input control backgrounds
-#e0e0e0 (light grey) - read-only cell background
+#5c4228 (dark warm brown) - table borders, headings of older parts of the sheet
+#c2bba0 (aged parchment) - header cells, active tab button
+#8c7d58 (darker aged parchment) - inactive tab buttons
+#edeae0 (pale parchment) - input control backgrounds
+#c8c2ac (muted parchment) - read-only cell background
 
-#c4bc96 (slightly darker beige) - tab button borders
+#c9c2a6 - tab button borders
 */
 
+/* Theme variables: modify these to change the sheet appearance quickly */
+:root {
+    /* New semantic theme tokens (use these going forward) */
+    --dg-border: #8a7038; /* table outer borders, headings */
+    --dg-border-dark: #5f1d14; /* border color in dark mode */
+
+    --dg-table-cell-border: #baa870; /* table cell borders */
+    --dg-table-cell-border-dark: #6a3828; /* dark-mode table cell borders */
+
+    --dg-table-header-bg: #d8c694; /* table header cell background */
+    --dg-table-header-bg-dark: #262424; /* dark-mode table header background */
+
+    --dg-surface: #e8dcb0; /* default table cells, active tab button */
+    --dg-surface-dark: #202020; /* dark-mode surface/background */
+
+    --dg-control-bg: #f2eedc; /* input control backgrounds */
+    --dg-control-bg-dark: #302a28; /* dark warm brown — editable control background in dark mode */
+
+    --dg-primary: #3a1008; /* primary accent / text */
+    --dg-primary-dark: #d4c0a0; /* warm cream — editable control text in dark mode */
+
+    --dg-text-muted: #786848; /* muted text color */
+    --dg-text-muted-dark: #8a6840; /* faded warm brown — disabled/read-only text in dark mode */
+
+    --dg-placeholder: rgba(120, 104, 72, 0.5); /* input placeholder — faded version of text-muted */
+    --dg-placeholder-dark: rgba(138, 104, 64, 0.5); /* dark mode placeholder */
+
+    --dg-h1-fg: #120705; /* near-black charred ink */
+    --dg-h1-fg-dark: #c98b4e; /* amber for headings in dark mode */
+
+    --dg-h1-bg-dark: #4b1208; /* darker edge / border */
+
+    --dg-h2-fg: #4b1208; /* heading foreground to use on parchment surfaces */
+    --dg-h2-fg-dark: #c98b4e; /* amber — h2/h3 heading foreground in dark mode */
+
+    /* Condition level colors (progressive severity scales) */
+    /* rgba with varying alpha — single values work in both light and dark mode */
+    --dg-condition-none: transparent; /* no condition (baseline) */
+
+    --dg-physical-1: rgba(220, 30, 30, 0.12);
+    --dg-physical-2: rgba(220, 30, 30, 0.28);
+    --dg-physical-3: rgba(220, 30, 30, 0.46);
+    --dg-physical-4: rgba(220, 30, 30, 0.62);
+    --dg-physical-5: rgba(220, 30, 30, 0.78);
+    --dg-physical-6: rgba(220, 30, 30, 0.94);
+
+    --dg-mental-1: rgba(110, 20, 185, 0.12);
+    --dg-mental-2: rgba(110, 20, 185, 0.28);
+    --dg-mental-3: rgba(110, 20, 185, 0.46);
+    --dg-mental-4: rgba(110, 20, 185, 0.62);
+    --dg-mental-5: rgba(110, 20, 185, 0.78);
+    --dg-mental-6: rgba(110, 20, 185, 0.94);
+
+    /* Toggle button / pill tokens — shared by tab buttons and max-uses pills */
+    --dg-toggle-bg: var(--dg-surface); /* unselected bg — header background */
+    --dg-toggle-bg-dark: var(--dg-surface-dark); /* unselected bg — header background (dark) */
+
+    /* selected bg — h1 radial gradient (light: amber→dark-red; dark: dark-red→near-black) */
+    --dg-toggle-bg-selected: radial-gradient(ellipse at center, #c85e21 0%, #a53c18 42%, #732012 72%, #4f140b 100%);
+    --dg-toggle-bg-selected-dark: radial-gradient(ellipse at center, #5f1d14 0%, #441711 22%, #301411 100%);
+
+    --dg-toggle-fg: var(--dg-primary); /* general toggle fg — unselected button text */
+    --dg-toggle-fg-dark: var(--dg-primary-dark); /* general toggle fg (dark) */
+
+    --dg-toggle-fg-selected: var(--dg-surface); /* selected toggle fg — text on gradient bg */
+    --dg-toggle-fg-selected-dark: var(--dg-primary-dark); /* selected toggle fg (dark) */
+
+    --dg-toggle-border: var(--dg-border); /* unselected border */
+    --dg-toggle-border-dark: var(--dg-border-dark); /* unselected border (dark) */
+
+    --dg-toggle-border-selected: var(--dg-border); /* selected border — same as unselected in light */
+    --dg-toggle-border-selected-dark: #b03828; /* selected border — brighter red for dark mode */
+}
+
+/* Override toggle selected-state tokens in dark mode so the enable-selector matrix
+   (which references the plain --dg-toggle-* names) automatically resolves the dark values
+   without duplicating the full 15-rule selector matrix. */
+.sheet-darkmode {
+    --dg-toggle-bg-selected: radial-gradient(ellipse at center, #5f1d14 0%, #441711 22%, #301411 100%);
+    --dg-toggle-border-selected: #b03828;
+    --dg-toggle-fg: var(--dg-primary-dark);
+    --dg-toggle-fg-selected: var(--dg-primary-dark);
+}
 
 /* ************************************************************************************************************************************************ */
 /* Whole Sheet */
 /* ************************************************************************************************************************************************ */
 
 .charsheet {
-	background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/Paper.jpg");
+    background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/refs/heads/master/Demon%20Gate/map_watermark.jpg");
+    font-family: "Atkinson Hyperlegible", sans-serif;
+}
+
+.sheet-darkmode .charsheet {
+    background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/refs/heads/master/Demon%20Gate/map_watermark_dark.jpg");
 }
 
 .sheet-demon-gate-charsheet {
-	min-height: 750px;
+    min-height: 750px;
 }
 
 .sheet-background-flex-layout {
-	display: flex;
-	justify-content: space-between;
-	flex-wrap: nowrap;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
 }
 
 .sheet-background-column-fixed-left,
 .sheet-background-column-fixed-right {
-	flex-grow: 0;
-	margin-left: 10px;
-	margin-right: 10px;
-	width: 10px;
-	min-width: 10px;
-	max-width: 10px;
-	background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/border.png");
-	background-repeat: repeat-y;
+    flex-grow: 0;
+    width: 10px;
+    min-width: 10px;
+    color: var(--dg-primary);
+    background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/border.png");
+    background-repeat: repeat-y;
 }
 
 .sheet-background-column-fixed-left {
-	margin-left: 5px;
-	margin-right: 15px;
+    margin-left: 5px;
+    margin-right: 15px;
 }
 
 .sheet-background-column-fixed-right {
-	margin-left: 15px;
-	margin-right: 5px;
+    margin-left: 15px;
+    margin-right: 5px;
 }
 
 .sheet-background-column-grow {
-	flex-grow: 1;
-	margin: 0;
+    flex-grow: 1;
+    margin: 0;
 }
-
 
 /* ************************************************************************************************************************************************ */
 /* Tab buttons */
@@ -64,56 +154,72 @@
 
 input.sheet-tab,
 span.sheet-tab {
-	margin-top: 10px;
+    margin-top: 10px;
 }
 
 .sheet-demon-gate-charsheet input.sheet-tab {
-	width: 94px;
-	height: 32px;
-	cursor: pointer;
-	position: relative;
-	opacity: 0;
-	z-index: 9999;
-	margin-left: 10px;
+    width: 94px;
+    height: 32px;
+    cursor: pointer;
+    position: relative;
+    opacity: 0;
+    z-index: 9999;
+    margin-left: 10px;
 }
 
 span.sheet-tab {
-	text-align: center;
-	display: inline-block;
-	font-size: 14px;
-	line-height: 28px;
-	color: maroon;
-	border: 2px solid maroon;
-	border-radius: 4px;
-	background: #b6ad7c;
-	width: 90px;
-	height: 28px;
-	cursor: pointer;
-	position: relative;
-	vertical-align: middle;
-	margin-left: -99px;
+    text-align: center;
+    display: inline-block;
+    font-size: 14px;
+    line-height: 28px;
+    color: var(--dg-toggle-fg);
+    border: 1px solid var(--dg-toggle-border);
+    border-radius: 4px;
+    background: var(--dg-toggle-bg);
+    width: 90px;
+    height: 28px;
+    cursor: pointer;
+    position: relative;
+    vertical-align: middle;
+    margin-left: -99px;
 }
 
 div[class^="sheet-section"] {
-	display: none;
+    display: none;
 }
 
-input.sheet-tab1:checked~div.sheet-section-core,
-input.sheet-tab2:checked~div.sheet-section-skills,
-input.sheet-tab3:checked~div.sheet-section-combat,
-input.sheet-tab4:checked~div.sheet-section-gear,
-input.sheet-tab5:checked~div.sheet-section-mystic,
-input.sheet-tab6:checked~div.sheet-section-abilities,
-input.sheet-tab7:checked~div.sheet-section-reputation,
-input.sheet-tab8:checked~div.sheet-section-notes,
-input.sheet-tab9:checked~div.sheet-section-old-skills {
-	display: block;
+input.sheet-tab1:checked ~ div.sheet-section-core,
+input.sheet-tab2:checked ~ div.sheet-section-skills,
+input.sheet-tab3:checked ~ div.sheet-section-combat,
+input.sheet-tab4:checked ~ div.sheet-section-gear,
+input.sheet-tab5:checked ~ div.sheet-section-mystic,
+input.sheet-tab6:checked ~ div.sheet-section-abilities,
+input.sheet-tab7:checked ~ div.sheet-section-reputation,
+input.sheet-tab8:checked ~ div.sheet-section-notes {
+    display: block;
 }
 
-input.sheet-tab:checked+span {
-	background: #ddd9c3;
+input.sheet-tab:checked + span {
+    background: var(--dg-toggle-bg-selected);
+    border: 2px solid var(--dg-toggle-border-selected);
+    color: var(--dg-toggle-fg-selected);
 }
 
+/* ************************************************************************************************************************************************ */
+/* Dark mode overrides */
+/* ************************************************************************************************************************************************ */
+
+.sheet-darkmode span.sheet-tab {
+    color: var(--dg-toggle-fg-dark);
+    border-color: var(--dg-toggle-border-dark);
+    background: var(--dg-toggle-bg-dark);
+}
+
+.sheet-darkmode input.sheet-tab:checked + span {
+    background: var(--dg-toggle-bg-selected-dark);
+    border-color: var(--dg-toggle-border-selected-dark);
+    color: var(--dg-toggle-fg-selected-dark);
+}
 
 /* ************************************************************************************************************************************************ */
 /* Headings */
@@ -122,111 +228,174 @@ input.sheet-tab:checked+span {
 h1,
 h2,
 h3 {
-	width: 100%;
-	text-align: center;
+    width: 100%;
+    text-align: center;
 }
 
 h1 {
-	height: 40px;
-	line-height: 40px;
-	color: #ddd9c3;
-	background-color: #590902;
-	background-image: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/runes-dark.png');
-	background-position-y: center;
-	background-repeat: repeat-x;
-	border: 2px solid #590902;
-	border-radius: 4px;
-	font-size: 20px;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+
+    color: var(--dg-h1-fg);
+
+    background: radial-gradient(ellipse at center, #d48a2f 0%, #c85e21 22%, #a53c18 42%, #732012 72%, #4f140b 100%);
+    background-position-y: center;
+    background-repeat: repeat-x;
+
+    border: 2px solid var(--dg-primary-dark);
+    border-radius: 4px;
+    border-color: var(--dg-h1-bg-dark);
+
+    height: 40px;
+    line-height: 40px;
+    font-family: "IM Fell English SC", serif;
+    font-size: 20pt;
+    font-weight: normal;
+}
+
+.sheet-darkmode h1 {
+    color: #c98b4e;
+
+    background: radial-gradient(ellipse at center, #5f1d14 0%, #441711 22%, #301411 42%, #26201e 72%, #202020 100%);
+
+    border: none;
+}
+
+h1::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/runes-dark.png");
+    background-repeat: repeat;
+    background-position: center;
+
+    opacity: 0.15;
+    mix-blend-mode: multiply;
+
+    pointer-events: none;
+    z-index: -1;
 }
 
 h2,
 h3 {
-	color: maroon;
-	background-color: #ddd9c3;
-	font-weight: normal;
-	font-size: 16px;
-	height: 28px;
-	line-height: 28px;
+    color: var(--dg-h2-fg);
+    font-family: "IM Fell English SC", serif;
+    font-weight: normal;
+    font-size: 18px;
+    height: 28px;
+    line-height: 28px;
 }
 
 h2 {
-	padding-top: 2px;
-	padding-bottom: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 h3 {
-	text-align: left;
+    text-align: left;
 }
 
+.sheet-table-like-heading {
+    border: 2px solid var(--dg-border);
+    border-radius: 4px;
+    background-color: var(--dg-table-header-bg);
+}
+
+.sheet-darkmode h2,
+.sheet-darkmode h3 {
+    color: var(--dg-h2-fg-dark);
+}
+
+.sheet-darkmode .sheet-table-like-heading {
+    border-color: var(--dg-border-dark);
+    background-color: var(--dg-table-header-bg-dark);
+}
+
+.sheet-info {
+    font-weight: normal;
+    font-style: italic;
+    font-size: 0.9em;
+}
 
 /* ************************************************************************************************************************************************ */
 /* Expand/collapse (custom checkbox plus hiding a section)*/
 /* ************************************************************************************************************************************************ */
 
 .sheet-collapse-wrapper {
-	border: 2px solid #948a54;
-	margin-top: 20px;
+    border: 2px solid var(--dg-border);
+    margin-top: 20px;
+    background-color: var(--dg-table-header-bg);
 }
 
 /* Hide the browser's default checkbox */
 input.sheet-expand-collapse-checkbox {
-	position: absolute;
-	opacity: 0;
-	cursor: pointer;
-	margin-left: 7px;
-	margin-top: 4px;
-	width: 16px;
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    margin-left: 7px;
+    margin-top: 4px;
+    width: 16px;
 }
 
 /* Show the checkmark when checked */
-input.sheet-expand-collapse-checkbox:checked~.sheet-expand-collapse-symbol:after {
-	display: block;
-	height: 24px;
-	width: 20px;
-	margin-left: 4px;
-	content: " ";
-	background-image: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/expanded.png');
-	background-position: center;
-	background-repeat: no-repeat;
+input.sheet-expand-collapse-checkbox:checked ~ .sheet-expand-collapse-symbol:after {
+    display: block;
+    height: 24px;
+    width: 20px;
+    margin-left: 4px;
+    content: " ";
+    background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/expanded.png");
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 /* Style the checkmark/indicator */
-input.sheet-expand-collapse-checkbox~.sheet-expand-collapse-symbol:after {
-	display: block;
-	height: 24px;
-	width: 20px;
-	margin-left: 4px;
-	content: " ";
-	background-image: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/collapsed.png');
-	background-position: center;
-	background-repeat: no-repeat;
+input.sheet-expand-collapse-checkbox ~ .sheet-expand-collapse-symbol:after {
+    display: block;
+    height: 24px;
+    width: 20px;
+    margin-left: 4px;
+    content: " ";
+    background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/collapsed.png");
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-input[type="checkbox"].sheet-expand-collapse-checkbox~.sheet-collapsible {
-	display: none;
+input[type="checkbox"].sheet-expand-collapse-checkbox ~ .sheet-collapsible {
+    display: none;
 }
 
-input[type="checkbox"].sheet-expand-collapse-checkbox:checked~.sheet-collapsible {
-	display: block;
+input[type="checkbox"].sheet-expand-collapse-checkbox:checked ~ .sheet-collapsible {
+    display: block;
 }
 
 /* Designed to spill over on to the expand/collapse element below */
 .sheet-table-header-collapse {
-	height: 5px;
-	line-height: 30px;
-	padding: 0;
+    height: 5px;
+    line-height: 30px;
+    padding: 0;
 }
 
+/*
 .sheet-collapse-section {
-	background-color: #ddd9c3;
-}
+	background-color: var(--dg-surface);
+}*/
 
 .sheet-collapsible table,
 table.sheet-embedded-table {
-	border: 0;
+    border: 0;
 }
 
+/* ************************************************************************************************************************************************ */
+/* Dark mode overrides */
+/* ************************************************************************************************************************************************ */
 
+.sheet-darkmode .sheet-collapse-wrapper {
+    border-color: var(--dg-border-dark);
+    background-color: var(--dg-table-header-bg-dark);
+}
 
 /* ************************************************************************************************************************************************ */
 /* Flexbox columns */
@@ -235,315 +404,384 @@ table.sheet-embedded-table {
 .sheet-flex-section,
 .sheet-flex-section-centre,
 .sheet-flex-section-no-margin {
-	margin-left: -10px;
-	margin-right: -10px;
-	display: flex;
-	flex-wrap: wrap;
+    margin-left: -10px;
+    margin-right: -10px;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .sheet-flex-section,
 .sheet-flex-section-no-margin {
-	justify-content: space-between;
+    justify-content: space-between;
 }
 
 .sheet-flex-section-centre {
-	justify-content: space-around;
+    justify-content: space-around;
 }
 
 .sheet-flex-section {
-	margin-top: 20px;
+    margin-top: 20px;
 }
 
 .sheet-column-fixed {
-	flex-grow: 0;
-	margin: 10px;
+    flex-grow: 0;
+    margin: 10px;
 }
 
 .sheet-column-grow {
-	flex-grow: 1;
-	margin: 10px;
+    flex-grow: 1;
+    margin: 10px;
 }
 
 .sheet-flex-form-container {
-	display: flex;
-	flex-wrap: nowrap;
-	justify-content: space-between;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
 }
 
 .sheet-flex-form-grow {
-	flex-grow: 1;
+    flex-grow: 1;
 }
 
 .sheet-flex-form-fixed {
-	flex-grow: 0;
-	padding-left: 2px;
-	padding-right: 2px;
+    flex-grow: 0;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 
 .sheet-centred-section {
-	display: flex;
-	flex-flow: column nowrap;
-	align-items: center;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
 }
-
 
 /* ************************************************************************************************************************************************ */
 /* Tables */
 /* ************************************************************************************************************************************************ */
 
 table {
-	width: 100%;
-	border: 2px solid #948a54;
-	background-color: #ddd9c3;
-	table-layout: auto;
+    width: 100%;
+    border: 2px solid var(--dg-border);
+    background-color: var(--dg-surface);
+    table-layout: auto;
 }
 
 th,
 td {
-	border: 1px solid #c4bc96;
+    border: 1px solid var(--dg-table-cell-border);
+    font-family: "Lato", sans-serif;
 }
 
 th {
-	max-width: max-content;
-	white-space: nowrap;
-	font-size: 11px;
-	font-weight: bold;
-	color: dimgray;
-	padding-left: 10px;
-	padding-right: 10px;
+    max-width: max-content;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--dg-text-muted);
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: var(--dg-table-header-bg);
 }
 
 th.sheet-small-table-header {
-	font-size: 0.7em;
-	font-weight: bold;
-	text-align: center;
-	height: 16px;
-	line-height: normal;
+    font-size: 0.7em;
+    font-weight: bold;
+    text-align: center;
+    height: 16px;
+    line-height: normal;
 }
 
 td.sheet-small-text,
 th.sheet-small-text {
-	text-align: center;
-	height: 28px;
+    text-align: center;
+    height: 28px;
 }
 
 td.sheet-small-text {
-	font-size: 0.7em;
-	background-color: #f6f5ef;
+    font-size: 0.7em;
+    background-color: var(--dg-surface);
+    color: var(--dg-text-muted);
 }
 
 th.sheet-small-text {
-	font-size: 0.8em;
-	font-weight: bold;
+    font-size: 0.8em;
+    font-weight: bold;
 }
 
 td.sheet-cell-numeric,
-td.sheet-cell-numeric-readonly {
-	text-align: center;
-	max-width: 50px;
+td.sheet-cell-numeric-readonly,
+td.sheet-cell-centred {
+    text-align: center;
+    max-width: 50px;
 }
 
 td.sheet-cell-numeric {
-	background-color: #f6f5ef;
+    background-color: var(--dg-control-bg);
+}
+
+.sheet-cell-right {
+    text-align: right;
+    padding-right: 5px;
 }
 
 .sheet-header-column {
-	width: 15em;
+    width: 15em;
 }
 
 .sheet-button-cell {
-	text-align: center;
+    text-align: center;
 }
 
+/* ************************************************************************************************************************************************ */
+/* Dark mode overrides */
+/* ************************************************************************************************************************************************ */
+
+.sheet-darkmode table {
+    border-color: var(--dg-border-dark);
+    background-color: var(--dg-surface-dark);
+}
+
+.sheet-darkmode th,
+.sheet-darkmode td {
+    border-color: var(--dg-table-cell-border-dark);
+}
+
+.sheet-darkmode th {
+    color: var(--dg-text-muted-dark);
+    background-color: var(--dg-table-header-bg-dark);
+}
+
+.sheet-darkmode td.sheet-small-text {
+    background-color: var(--dg-surface-dark);
+    color: var(--dg-text-muted-dark);
+}
+
+.sheet-darkmode td.sheet-cell-numeric {
+    background-color: var(--dg-control-bg-dark);
+}
 
 /* ************************************************************************************************************************************************ */
 /* Entry controls */
 /* ************************************************************************************************************************************************ */
 
-input,
+input:not([type="radio"]):not([type="checkbox"]),
 select,
 textarea,
-.sheet-input-like,
-.sheet-input-like-no-padding {
-	width: 100%;
-	background-color: #f6f5ef;
+.sheet-input-like {
+    width: 100%;
+    background-color: var(--dg-control-bg);
+    color: var(--dg-primary);
 }
 
-.sheet-demon-gate-charsheet input[type=number],
-.sheet-demon-gate-charsheet input[type=text],
+.sheet-demon-gate-charsheet input[type="number"],
+.sheet-demon-gate-charsheet input[type="text"],
 .sheet-demon-gate-charsheet select {
-	border: 0;
-	border-radius: 0;
+    border: 0;
+    border-radius: 0;
 }
 
 input[type="number"].sheet-totalfield,
 input[type="text"].sheet-totalfield {
-	text-align: center;
-	font-weight: bold;
-	font-size: 16px;
-	color: dimgray;
-	background-color: #e0e0e0;
-	border: 0;
-	border-radius: 0;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: var(--dg-text-muted);
+    background-color: var(--dg-surface);
+    border: 0;
+    border-radius: 0;
 }
 
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-	-webkit-appearance: none;
-	margin: 0;
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
-td input[type=number] {
-	min-width: 2.2em;
-	text-align: center;
+td input[type="number"] {
+    min-width: 2.2em;
+    text-align: center;
 }
 
 .sheet-input-narrow {
-	width: 5em;
-	min-width: 5em;
-	max-width: 5em;
+    width: 5em;
+    min-width: 5em;
+    max-width: 5em;
 }
 
 .sheet-read-only-field,
 td.sheet-cell-numeric-readonly,
 td input:read-only {
-	color: lightslategray;
-	background-color: #e0e0e0;
+    color: var(--dg-text-muted);
+    background-color: var(--dg-surface);
 }
 
 .sheet-text-centred,
-td input[type=text].sheet-text-centred {
-	text-align: center;
+td input[type="text"].sheet-text-centred {
+    text-align: center;
 }
 
-.sheet-demon-gate-charsheet input[type=number].sheet-numeric-wide {
-	text-align: center;
-	width: 100%;
+.sheet-demon-gate-charsheet input[type="number"].sheet-numeric-wide {
+    text-align: center;
+    width: 100%;
 }
 
 .sheet-tall-control,
 input.sheet-tall-control {
-	height: 36px;
-	line-height: 36px;
-	font-size: 16px;
+    height: 36px;
+    line-height: 36px;
+    font-size: 16px;
 }
 
-td input[type=text].sheet-dice-field {
-	min-width: 7em;
-	text-align: center;
+td input[type="text"].sheet-dice-field {
+    min-width: 7em;
+    text-align: center;
 }
 
 .sheet-input-like {
-	padding-left: 4px;
+    padding-left: 4px;
 }
 
 button.sheet-button,
 button.btn {
-	border: 2px solid maroon;
-	border-radius: 4px;
-	color: maroon;
-	text-shadow: none;
+    border: 2px solid var(--dg-primary);
+    border-radius: 4px;
+    color: var(--dg-primary);
+    text-shadow: none;
 }
 
 button.btn {
-	background: #ddd9c3;
+    background: var(--dg-surface);
 }
 
-.sheet-demon-gate-charsheet button.sheet-display-text-button[type=roll]:before,
-.sheet-demon-gate-charsheet button.sheet-display-text-button-small[type=roll]:before {
-	content: "";
+.sheet-darkmode button.btn {
+    background: var(--dg-surface-dark);
+    color: var(--dg-primary-dark);
+    border: 1px solid var(--dg-primary-dark);
+}
+
+.sheet-demon-gate-charsheet button.sheet-display-text-button[type="roll"]:before,
+.sheet-demon-gate-charsheet button.sheet-display-text-button-small[type="roll"]:before {
+    content: "";
 }
 
 button.sheet-display-text-button-small {
-	height: 20px;
+    height: 20px;
 }
 
-.sheet-demon-gate-charsheet button.sheet-display-text-button-small[type=roll] {
-	font-size: 0.8em;
+.sheet-demon-gate-charsheet button.sheet-display-text-button-small[type="roll"] {
+    font-size: 0.8em;
 }
 
-.sheet-demon-gate-charsheet button.sheet-display-text-button[type=roll] {
-	font-size: 1em;
+.sheet-demon-gate-charsheet button.sheet-display-text-button[type="roll"] {
+    font-size: 1em;
 }
 
+input::placeholder,
+textarea::placeholder {
+    color: var(--dg-placeholder);
+}
+
+/* ************************************************************************************************************************************************ */
+/* Dark mode overrides */
+/* ************************************************************************************************************************************************ */
+
+.sheet-darkmode input:not([type="radio"]):not([type="checkbox"]),
+.sheet-darkmode select,
+.sheet-darkmode textarea,
+.sheet-darkmode .sheet-input-like {
+    color: var(--dg-primary-dark);
+    background-color: var(--dg-control-bg-dark);
+}
+
+.sheet-darkmode textarea {
+    border-color: var(--dg-border-dark);
+}
+
+.sheet-darkmode input::placeholder,
+.sheet-darkmode textarea::placeholder {
+    color: var(--dg-placeholder-dark);
+}
+
+.sheet-darkmode input[type="number"].sheet-totalfield,
+.sheet-darkmode input[type="text"].sheet-totalfield {
+    color: var(--dg-text-muted-dark);
+    background-color: var(--dg-surface-dark);
+}
+
+.sheet-darkmode .sheet-read-only-field,
+.sheet-darkmode td.sheet-cell-numeric-readonly,
+.sheet-darkmode td input:read-only {
+    color: var(--dg-text-muted-dark);
+    background-color: var(--dg-surface-dark);
+}
 
 /* ************************************************************************************************************************************************ */
 /* Top section of first sheet */
 /* ************************************************************************************************************************************************ */
 .sheet-demon-gate-logo {
-	height: 116px;
+    height: 116px;
 }
 
 .sheet-demon-gate-charsheet table td input {
-	height: 28px;
-	line-height: 28px;
-	margin: 0;
+    height: 28px;
+    line-height: 28px;
+    margin: 0;
 }
 
 .sheet-demon-gate-charsheet table td select {
-	height: 36px;
-	line-height: 36px;
-	margin: 0;
+    height: 36px;
+    line-height: 36px;
+    margin: 0;
 }
 
 .sheet-input-wide {
-	min-width: 12em;
-}
-
-.sheet-input-like-no-padding input.sheet-input-narrow {
-	max-width: 7.5em;
+    min-width: 12em;
 }
 
 .sheet-demon-gate-charsheet td input.sheet-prominent-label,
 .sheet-demon-gate-charsheet td input.sheet-prominent-field {
-	height: 72px;
+    height: 72px;
 }
 
 td input.sheet-prominent-field {
-	font-size: 30px;
-	text-align: center;
+    font-size: 30px;
+    text-align: center;
 }
 
 .sheet-vertical-margin {
-	margin-top: 10px;
-	margin-bottom: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .sheet-vertical-margin-moderate {
-	margin-top: 20px;
-	margin-bottom: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-input[type=number].sheet-input-split {
-	max-width: 40%;
-	min-width: 1.1em;
+input[type="number"].sheet-input-split {
+    max-width: 40%;
+    min-width: 1.1em;
 }
 
 td .sheet-input-spacer {
-	min-width: 1.1em;
-	text-align: center;
+    min-width: 1.1em;
+    text-align: center;
 }
-
-.sheet-beauty-table-spacer-cell {
-	min-width: 19.5em;
-}
-
 
 /* ************************************************************************************************************************************************ */
 /* HP, Mana etc. */
 /* ************************************************************************************************************************************************ */
 
 .sheet-column-prominent-stat {
-	flex-grow: 0;
-	width: 120px;
-	margin: 10px;
+    flex-grow: 0;
+    width: 120px;
+    margin: 10px;
 }
 
 .sheet-demon-gate-charsheet td input.sheet-extra-prominent-field {
-	font-size: 36px;
-	height: 84px;
+    font-size: 36px;
+    height: 84px;
 }
-
 
 /* ************************************************************************************************************************************************ */
 /** Physical and mental conditions, including gradient colours */
@@ -563,282 +801,510 @@ td .sheet-input-spacer {
 .sheet-mental-condition-4,
 .sheet-mental-condition-5,
 .sheet-mental-condition-6 {
-	width: 14%;
+    width: 14%;
 }
 
+/* inset box-shadow instead of background-color bypasses Roll20's html.dark td override */
 tr td.sheet-physical-condition-0,
 tr td.sheet-mental-condition-0 {
-	background-color: white;
+    box-shadow: none;
 }
 
 tr td.sheet-physical-condition-1 {
-	background-color: #ffcccc;
+    box-shadow: inset 0 0 0 9999px var(--dg-physical-1);
 }
 
 tr td.sheet-physical-condition-2 {
-	background-color: #ff9999;
+    box-shadow: inset 0 0 0 9999px var(--dg-physical-2);
 }
 
 tr td.sheet-physical-condition-3 {
-	background-color: #ff6666;
+    box-shadow: inset 0 0 0 9999px var(--dg-physical-3);
 }
 
 tr td.sheet-physical-condition-4 {
-	background-color: #ff3333;
+    box-shadow: inset 0 0 0 9999px var(--dg-physical-4);
 }
 
 tr td.sheet-physical-condition-5 {
-	background-color: #cc0000;
+    box-shadow: inset 0 0 0 9999px var(--dg-physical-5);
 }
 
 tr td.sheet-physical-condition-6 {
-	background-color: #800000;
+    box-shadow: inset 0 0 0 9999px var(--dg-physical-6);
 }
 
 tr td.sheet-mental-condition-1 {
-	background-color: #cce0ff;
+    box-shadow: inset 0 0 0 9999px var(--dg-mental-1);
 }
 
 tr td.sheet-mental-condition-2 {
-	background-color: #80b3ff;
+    box-shadow: inset 0 0 0 9999px var(--dg-mental-2);
 }
 
 tr td.sheet-mental-condition-3 {
-	background-color: #4d94ff;
+    box-shadow: inset 0 0 0 9999px var(--dg-mental-3);
 }
 
 tr td.sheet-mental-condition-4 {
-	background-color: #0066ff;
+    box-shadow: inset 0 0 0 9999px var(--dg-mental-4);
 }
 
 tr td.sheet-mental-condition-5 {
-	background-color: #0047b3;
+    box-shadow: inset 0 0 0 9999px var(--dg-mental-5);
 }
 
 tr td.sheet-mental-condition-6 {
-	background-color: #003380;
+    box-shadow: inset 0 0 0 9999px var(--dg-mental-6);
 }
-
 
 /* ************************************************************************************************************************************************ */
 /* Skills tab
 /* ************************************************************************************************************************************************ */
 
-.sheet-top-margin {
-	margin-top: 40px;
-}
-
-.charsheet select.sheet-skilldescshort {
-	width: 4.2em;
-	margin: 0;
-	border: 0;
-	border-radius: 0;
-}
-
 .sheet-skillname,
 .sheet-skillname-indented {
-	padding-right: 10px;
-	width: 9em;
+    padding-right: 10px;
+    width: 9em;
 }
 
 .sheet-skillname {
-	padding-left: 10px;
+    padding-left: 10px;
 }
 
 .sheet-skillname-indented {
-	padding-left: 30px;
+    padding-left: 30px;
 }
 
 .sheet-skillname-input-cell {
-	width: 10.5em;
+    width: 10.5em;
 }
-
 
 /* ************************************************************************************************************************************************ */
 /* Abilities and notes tabs
 /* ************************************************************************************************************************************************ */
-.sheet-subsection-header,
-.sheet-subsection-header-wide {
-	width: 100%;
-	height: 36px;
-	line-height: 36px;
-	color: dimgray;
-	background-color: #ddd9c3;
-	text-align: center;
-	font-size: 16px;
-}
-
-.sheet-subsection-header-wide {
-	min-width: 15em;
-	border: 2px solid #c4c1b2;
-	margin-bottom: 5px;
-}
-
 textarea.sheet-text-area-full,
 textarea.sheet-text-area-large,
-textarea.sheet-standalone-textarea,
 textarea.sheet-textarea-gems,
 textarea.sheet-textarea-equipment {
-	box-sizing: border-box;
-	resize: none;
-	width: 100%;
-	margin-bottom: 0;
-	margin-left: 0;
-	margin-right: 0;
+    box-sizing: border-box;
+    resize: none;
+    width: 100%;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 textarea.sheet-text-area-full {
-	margin-left: 0;
-	margin-right: 0;
-	border-radius: 0;
-	height: 150px;
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 0;
+    height: 150px;
 }
 
 textarea.sheet-text-area-large {
-	margin-top: 0;
-	border: 0;
-	border-radius: 0;
-	height: 300px;
+    margin-top: 0;
+    border: 0;
+    border-radius: 0;
+    height: 300px;
 }
 
 .sheet-repeating-section {
-	margin-top: 10px;
-	margin-bottom: 10px;
-	background-color: #ddd9c3;
-	border: 2px solid #948a54;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: var(--dg-surface);
+    border: 2px solid var(--dg-border);
 }
 
 /* This could probably be added to h2 (and maybe h1?) with a bit of reorg */
 .sheet-spacer-top-margin {
-	margin-top: 20px;
+    margin-top: 20px;
 }
 
 h1.sheet-spacer-top-margin {
-	margin-top: 40px;
+    margin-top: 40px;
 }
 
-.sheet-standalone-textarea,
 .sheet-textarea-gems,
 .sheet-textarea-equipment {
-	margin-top: 20px;
-	border: 2px solid #948a54;
-	border-radius: 0;
-}
-
-textarea.sheet-standalone-textarea {
-	height: 150px;
+    margin-top: 20px;
+    border: 2px solid var(--dg-border);
+    border-radius: 0;
 }
 
 textarea.sheet-textarea-gems {
-	height: 530px;
+    height: 530px;
 }
 
 textarea.sheet-textarea-equipment {
-	height: 570px;
+    height: 570px;
 }
-
 
 /* TODO: This is a hack - sorting out heading spacing properly and removing it from flex sections should allow this to be removed */
 .sheet-remove-margin-bottom {
-	margin-bottom: -10px;
+    margin-bottom: -10px;
 }
 
+/* ************************************************************************************************************************************************ */
+/* Class ability usage tracking */
+/* ************************************************************************************************************************************************ */
 
+/* Row containing the pill radio group and use circles */
+.sheet-uses-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding: 4px 8px;
+    border-top: 1px solid var(--dg-border);
+    background-color: var(--dg-surface);
+}
+
+/* "Max" / "Used" section labels */
+.sheet-uses-label {
+    font-size: 0.8em;
+    font-weight: bold;
+    white-space: nowrap;
+    color: var(--dg-text-muted);
+    margin-right: 6px;
+    flex-shrink: 0;
+}
+
+/* Radio pill: invisible but clickable (opacity: 0 pattern, same as .sheet-expand-collapse-checkbox).
+   The LABEL span is the visual element; the radio just captures clicks.
+   No gap on the flex container — spacing comes from .sheet-max-label margin-right. */
+input.sheet-max-radio {
+    opacity: 0;
+    display: inline-block;
+    width: 28px;
+    height: 20px;
+    flex-shrink: 0;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* Pill label: the visual pill. Overlays the preceding radio via negative margin.
+   pointer-events: none lets clicks fall through to the radio behind it.
+   margin-left: -28px pulls it back over the radio.
+   margin-right: 4px provides the gap before the next pill.
+   Net flex contribution = -28 + 28 + 4 = 4px (gap only). */
+.sheet-max-pill {
+    display: inline-block;
+    width: 28px;
+    height: 20px;
+    line-height: 18px;
+    margin-left: -28px;
+    margin-right: 4px;
+    text-align: center;
+    font-size: 0.7em;
+    font-weight: bold;
+    pointer-events: none;
+    color: var(--dg-toggle-fg);
+    flex-shrink: 0;
+    border-radius: 10px;
+    border: 1px solid var(--dg-toggle-border);
+    background: var(--dg-toggle-bg);
+    box-sizing: border-box;
+}
+
+/* Selected pill — toggle gradient background; fg from toggle-fg token */
+input.sheet-max-radio:checked + .sheet-max-pill {
+    background: var(--dg-toggle-bg-selected);
+    border: 1px solid var(--dg-toggle-border-selected);
+    color: var(--dg-toggle-fg-selected);
+}
+
+/* Thin vertical divider between pill group and use circles */
+.sheet-uses-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--dg-border);
+    margin: 0 8px;
+    flex-shrink: 0;
+}
+
+/* Use circle checkboxes — disabled by default.
+   appearance: none + explicit size. element.class selector (0,1,1) beats any
+   Roll20-injected input rules. background: transparent is required — without it
+   the dark-mode forms rule would fill the circle with the control background colour. */
+.sheet-demon-gate-charsheet input.sheet-use-cb {
+    /** Use higher specificity to override Roll20's injected rules */
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 2px solid var(--dg-border);
+    background: transparent;
+    cursor: not-allowed;
+    opacity: 0.3;
+    pointer-events: none;
+    margin-left: 4px;
+    box-sizing: border-box;
+}
+
+/* Checked — same look as a selected pill; the × is provided by the adjacent .sheet-use-icon span */
+.sheet-demon-gate-charsheet input.sheet-use-cb:checked {
+    background: var(--dg-toggle-bg-selected);
+    border: 2px solid var(--dg-toggle-border-selected);
+}
+
+/* Icon span: overlays the preceding checkbox via negative margin.
+   The × is always in the DOM but transparent until the checkbox is checked or focused+checked. */
+.sheet-use-icon {
+    display: inline-block;
+    width: 16px;
+    height: 18px;
+    line-height: 16px;
+    margin-left: -16px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: transparent;
+    pointer-events: none;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+/* Show × when the checkbox is checked (covers plain :checked and :focus:checked) */
+input.sheet-use-cb:checked + .sheet-use-icon {
+    color: var(--dg-toggle-fg-selected);
+}
+
+/* Hide the separator, "Used" label, circles, icons, and reset button when max is N/A (value 0).
+   The "Max" label precedes the radio so ~ won't reach it — only siblings after value="0" are hidden. */
+input.sheet-max-radio[value="0"]:checked ~ .sheet-uses-sep,
+input.sheet-max-radio[value="0"]:checked ~ .sheet-uses-label,
+input.sheet-max-radio[value="0"]:checked ~ input.sheet-use-cb,
+input.sheet-max-radio[value="0"]:checked ~ .sheet-use-icon {
+    display: none;
+}
+
+/* Progressively enable circles based on the selected max pill.
+   ~ general sibling selector skips the separator and "Used" label spans between
+   the radio pills and the use circles. */
+input.sheet-max-radio[value="1"]:checked ~ input.sheet-use-cb-1,
+input.sheet-max-radio[value="2"]:checked ~ input.sheet-use-cb-1,
+input.sheet-max-radio[value="2"]:checked ~ input.sheet-use-cb-2,
+input.sheet-max-radio[value="3"]:checked ~ input.sheet-use-cb-1,
+input.sheet-max-radio[value="3"]:checked ~ input.sheet-use-cb-2,
+input.sheet-max-radio[value="3"]:checked ~ input.sheet-use-cb-3,
+input.sheet-max-radio[value="4"]:checked ~ input.sheet-use-cb-1,
+input.sheet-max-radio[value="4"]:checked ~ input.sheet-use-cb-2,
+input.sheet-max-radio[value="4"]:checked ~ input.sheet-use-cb-3,
+input.sheet-max-radio[value="4"]:checked ~ input.sheet-use-cb-4,
+input.sheet-max-radio[value="5"]:checked ~ input.sheet-use-cb-1,
+input.sheet-max-radio[value="5"]:checked ~ input.sheet-use-cb-2,
+input.sheet-max-radio[value="5"]:checked ~ input.sheet-use-cb-3,
+input.sheet-max-radio[value="5"]:checked ~ input.sheet-use-cb-4,
+input.sheet-max-radio[value="5"]:checked ~ input.sheet-use-cb-5 {
+    opacity: 1;
+    pointer-events: auto;
+    cursor: pointer;
+    background: var(--dg-toggle-bg-selected);
+    border: 1px solid var(--dg-toggle-border-selected);
+    /* Dark mode: .sheet-darkmode overrides --dg-toggle-bg-selected and --dg-toggle-border-selected
+       in variables.css, so this rule resolves correctly in both modes without a separate matrix. */
+}
+
+/* ************************************************************************************************************************************************ */
+/* Dark mode overrides */
+/* ************************************************************************************************************************************************ */
+
+.sheet-darkmode .sheet-repeating-section {
+    background-color: var(--dg-surface-dark);
+    border-color: var(--dg-border-dark);
+}
+
+.sheet-darkmode .sheet-textarea-gems,
+.sheet-darkmode .sheet-textarea-equipment {
+    border-color: var(--dg-border-dark);
+}
+
+.sheet-darkmode .sheet-uses-row {
+    border-color: var(--dg-border-dark);
+    background-color: var(--dg-surface-dark);
+}
+
+.sheet-darkmode .sheet-uses-label {
+    color: var(--dg-text-muted-dark);
+}
+
+.sheet-darkmode .sheet-max-pill {
+    color: var(--dg-toggle-fg-dark);
+    border-color: var(--dg-toggle-border-dark);
+    background: var(--dg-toggle-bg-dark);
+}
+
+.sheet-darkmode input.sheet-max-radio:checked + .sheet-max-pill {
+    background: var(--dg-toggle-bg-selected-dark);
+    border: 1px solid var(--dg-toggle-border-selected-dark);
+    color: var(--dg-toggle-fg-selected-dark);
+}
+
+.sheet-darkmode .sheet-uses-sep {
+    background: var(--dg-border-dark);
+}
+
+.sheet-darkmode input.sheet-use-cb {
+    background: transparent;
+    border-color: var(--dg-border-dark);
+}
+
+.sheet-darkmode input.sheet-use-cb:checked + .sheet-use-icon {
+    color: var(--dg-toggle-fg-selected-dark);
+}
+
+/* Checked circles and enable selectors use the same red in dark mode —
+   base-rule specificity (0,4,2) already beats dark mode overrides (0,2,1), so no dark overrides needed */
 
 /* ************************************************************************************************************************************************ */
 /* Mysic tab
 /* ************************************************************************************************************************************************ */
 
 .sheet-religion-table {
-	border: 2px solid #948a54;
+    border: 2px solid var(--dg-border);
 }
 
 .sheet-religion-table table {
-	border: 0;
+    border: 0;
 }
 
 .sheet-religion-table table td {
-	border-right: 0;
-}
-
-.sheet-spiritual-influence-header {
-	border: 2px solid #948a54;
+    border-right: 0;
 }
 
 .sheet-spiritual-influence-image {
-	background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/Circle.png");
-	background-repeat: no-repeat;
-	background-size: contain;
-	background-position: center;
-	height: 271px;
-	width: 288px;
-	display: flex;
-	flex-flow: column nowrap;
-	align-items: center;
-	justify-content: center;
+    background: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/refs/heads/master/Demon%20Gate/circle_v2.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    height: 280px;
+    width: 280px;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+    margin: 8px;
 }
 
-.sheet-spiritual-influence-image input[type=number].sheet-spiritual-influence {
-	width: 2.2em;
-	font-size: 18px;
-	text-align: center;
-	border-radius: 20px;
-	height: 40px;
-	line-height: 40px;
-	padding: 0;
-	border: 2px solid maroon;
+.sheet-spiritual-influence-image input[type="number"].sheet-spiritual-influence {
+    width: 2.2em;
+    font-size: 18px;
+    text-align: center;
+    border-radius: 20px;
+    height: 40px;
+    line-height: 40px;
+    padding: 0;
+    border: 2px solid var(--dg-primary);
 }
 
 textarea.sheet-spell-description,
 textarea.sheet-chi-ability-description {
-	box-sizing: border-box;
-	resize: none;
-	width: 100%;
-	min-width: 30em;
-	margin: 0;
+    box-sizing: border-box;
+    resize: none;
+    width: 100%;
+    min-width: 30em;
+    margin: 0;
 }
 
 textarea.sheet-spell-description {
-	height: 120px;
+    height: 120px;
 }
 
 textarea.sheet-chi-ability-description {
-	height: 105px;
+    height: 105px;
 }
 
 th.sheet-cell-moderate-width {
-	width: 10em;
+    width: 10em;
 }
 
 th.sheet-cell-narrow {
-	width: 4em;
+    width: 4em;
 }
 
 tr.sheet-spell-padding-row {
-	height: 36px;
+    height: 36px;
 }
 
 tr.sheet-spell-spacer-row {
-	height: 4px;
+    height: 4px;
 }
 
 tr.sheet-spell-spacer-row td {
-	background-color: #948a54;
+    background-color: var(--dg-border);
 }
 
+/* ************************************************************************************************************************************************ */
+/* Dark mode overrides */
+/* ************************************************************************************************************************************************ */
 
+.sheet-darkmode .sheet-religion-table {
+    border-color: var(--dg-border-dark);
+}
+
+.sheet-darkmode tr.sheet-spell-spacer-row td {
+    background-color: var(--dg-border-dark);
+}
 
 /* ************************************************************************************************************************************************ */
 /* Roll Templates
 /* ************************************************************************************************************************************************ */
 
+/* Roll template CSS variables - Roll20 requires these to be defined separately */
+.sheet-rolltemplate-text,
+.sheet-rolltemplate-class-ability-text,
+.sheet-rolltemplate-chi-power,
+.sheet-rolltemplate-percentile,
+.sheet-rolltemplate-attack,
+.sheet-rolltemplate-damage,
+.sheet-rolltemplate-roll,
+.sheet-rolltemplate-spell-description,
+.sheet-rolltemplate-spell-cast,
+.sheet-rolltemplate-spell-effect,
+.sheet-rolltemplate-simple,
+.sheet-rolltemplate-two-part {
+    --dg-roll-border: #8a7038; /* Keep in sync with --dg-border */
+    --dg-roll-border-dark: #5f1d14; /* Keep in sync with --dg-border-dark */
+
+    --dg-roll-table-cell-border: #baa870; /* Keep in sync with --dg-table-cell-border */
+    --dg-roll-table-cell-border-dark: #5a3820; /* Keep in sync with --dg-table-cell-border-dark */
+
+    --dg-roll-surface: #e8dcb0; /* Keep in sync with --dg-surface */
+    --dg-roll-surface-dark: #202020; /* Keep in sync with --dg-surface-dark */
+
+    --dg-roll-control-bg: #f2eedc; /* Keep in sync with --dg-control-bg */
+    --dg-roll-control-bg-dark: #302820; /* Keep in sync with --dg-control-bg-dark */
+
+    --dg-roll-primary: #3a1008; /* Keep in sync with --dg-primary */
+    --dg-roll-primary-dark: #d4c0a0; /* Keep in sync with --dg-primary-dark */
+
+    --dg-roll-text-muted: #786848; /* Keep in sync with --dg-text-muted */
+    --dg-roll-text-muted-dark: #8a6840; /* Keep in sync with --dg-text-muted-dark */
+
+    --dg-roll-h1-fg: #120705; /* Keep in sync with --dg-h1-fg */
+    --dg-roll-h1-fg-dark: #c98b4e; /* Keep in sync with --dg-h1-fg-dark */
+
+    --dg-roll-table-header-bg: #d8c694; /* Keep in sync with --dg-table-header-bg */
+    --dg-roll-table-header-bg-dark: #26201e; /* Keep in sync with --dg-table-header-bg-dark */
+
+    --dg-roll-success: #239c23; /* Roll template only */
+    --dg-roll-success-dark: #3eec3e; /* Roll template only */
+
+    --dg-roll-failure: #d31b1b; /* Roll template only */
+    --dg-roll-failure-dark: #ff3a3a; /* Roll template only */
+}
 
 .sheet-rolltemplate-text .sheet-template-container {
-	width: 100%;
+    width: 100%;
 }
 
 .sheet-rolltemplate-text .sheet-template-box,
 .sheet-rolltemplate-class-ability-text .sheet-template-box,
+.sheet-rolltemplate-chi-power .sheet-template-box,
 .sheet-rolltemplate-percentile .sheet-template-box,
 .sheet-rolltemplate-attack .sheet-template-box,
 .sheet-rolltemplate-damage .sheet-template-box,
@@ -848,13 +1314,27 @@ tr.sheet-spell-spacer-row td {
 .sheet-rolltemplate-spell-effect .sheet-template-box,
 .sheet-rolltemplate-simple .sheet-template-box,
 .sheet-rolltemplate-two-part .sheet-template-box {
-	width: 100%;
-	border: 2px solid #948a54;
-	background-color: #f6f5ef;
+    width: 100%;
+    border: 2px solid var(--dg-roll-border);
+    background-color: var(--dg-roll-surface);
+    font-family: "Atkinson Hyperlegible", sans-serif;
 }
+
+.sheet-rolltemplate-text .sheet-template-text,
+.sheet-rolltemplate-class-ability-text .sheet-template-text,
+.sheet-rolltemplate-chi-power .sheet-template-text,
+.sheet-rolltemplate-percentile .sheet-template-text,
+.sheet-rolltemplate-spell-description .sheet-template-text {
+    font-size: 13px;
+    padding: 4px;
+    color: var(--dg-roll-primary);
+}
+
+/* Titles and subtitles - light and dark mode */
 
 .sheet-rolltemplate-text .sheet-template-title,
 .sheet-rolltemplate-class-ability-text .sheet-template-title,
+.sheet-rolltemplate-chi-power .sheet-template-title,
 .sheet-rolltemplate-percentile .sheet-template-title,
 .sheet-rolltemplate-attack .sheet-template-title,
 .sheet-rolltemplate-damage .sheet-template-title,
@@ -864,15 +1344,49 @@ tr.sheet-spell-spacer-row td {
 .sheet-rolltemplate-spell-effect .sheet-template-title,
 .sheet-rolltemplate-simple .sheet-template-title,
 .sheet-rolltemplate-two-part .sheet-template-title {
-	width: 100%;
-	text-align: center;
-	color: maroon;
-	background-color: #ddd9c3;
-	font-weight: normal;
-	font-size: 16px;
-	padding: 8px 0;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    width: 100%;
+    text-align: center;
+    color: var(--dg-roll-h1-fg);
+    background: radial-gradient(ellipse at center, #d48a2f 0%, #c85e21 37%, #a53c18 52%, #732012 72%, #4f140b 100%);
+    background-position-y: center;
+    background-repeat: repeat-x;
+    font-family: "IM Fell English SC", serif;
+    font-weight: normal;
+    font-size: 22px;
+    padding: 8px 0;
 }
 
+.sheet-rolltemplate-text .sheet-template-title::before,
+.sheet-rolltemplate-class-ability-text .sheet-template-title::before,
+.sheet-rolltemplate-chi-power .sheet-template-title::before,
+.sheet-rolltemplate-percentile .sheet-template-title::before,
+.sheet-rolltemplate-attack .sheet-template-title::before,
+.sheet-rolltemplate-damage .sheet-template-title::before,
+.sheet-rolltemplate-roll .sheet-template-title::before,
+.sheet-rolltemplate-spell-description .sheet-template-title::before,
+.sheet-rolltemplate-spell-cast .sheet-template-title::before,
+.sheet-rolltemplate-spell-effect .sheet-template-title::before,
+.sheet-rolltemplate-simple .sheet-template-title::before,
+.sheet-rolltemplate-two-part .sheet-template-title::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/runes-dark.png");
+    background-repeat: repeat;
+    background-position: center;
+    opacity: 0.15;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.sheet-rolltemplate-text .sheet-template-subtitle,
+.sheet-rolltemplate-class-ability-text .sheet-template-subtitle,
+.sheet-rolltemplate-chi-power .sheet-template-subtitle,
+.sheet-rolltemplate-percentile .sheet-template-subtitle,
 .sheet-rolltemplate-attack .sheet-template-subtitle,
 .sheet-rolltemplate-damage .sheet-template-subtitle,
 .sheet-rolltemplate-roll .sheet-template-subtitle,
@@ -880,104 +1394,325 @@ tr.sheet-spell-spacer-row td {
 .sheet-rolltemplate-spell-effect .sheet-template-subtitle,
 .sheet-rolltemplate-simple .sheet-template-subtitle,
 .sheet-rolltemplate-two-part .sheet-template-subtitle {
-	width: 100%;
-	text-align: center;
-	color: maroon;
-	background-color: #ddd9c3;
-	font-weight: normal;
-	font-size: 12px;
-	padding-bottom: 2px;
+    width: 100%;
+    text-align: center;
+    color: var(--dg-roll-primary);
+    background-color: var(--dg-roll-table-header-bg);
+    font-family: "IM Fell English SC", serif;
+    font-weight: normal;
+    font-size: 16px;
+    padding: 4px 0 2px 0;
+    border-bottom: 1px solid var(--dg-roll-border);
 }
 
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-text .sheet-template-title,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text .sheet-template-title,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-chi-power .sheet-template-title,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .sheet-template-title,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-attack .sheet-template-title,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-damage .sheet-template-title,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-roll .sheet-template-title,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-description .sheet-template-title,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-cast .sheet-template-title,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-effect .sheet-template-title,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-simple .sheet-template-title,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-two-part .sheet-template-title {
+    color: var(--dg-roll-h1-fg-dark);
+    background: radial-gradient(ellipse at center, #5f1d14 0%, #441711 37%, #301411 62%, #26201e 82%, #202020 100%);
+    border-bottom-color: transparent;
+}
+
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-text .sheet-template-subtitle,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text .sheet-template-subtitle,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-chi-power .sheet-template-subtitle,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .sheet-template-subtitle,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-attack .sheet-template-subtitle,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-damage .sheet-template-subtitle,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-roll .sheet-template-subtitle,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-cast .sheet-template-subtitle,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-effect .sheet-template-subtitle,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-simple .sheet-template-subtitle,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-two-part .sheet-template-subtitle {
+    color: var(--dg-roll-h1-fg-dark);
+    background-color: var(--dg-roll-table-header-bg-dark);
+    border-bottom: 1px solid var(--dg-roll-border-dark);
+}
+
+/* Divider styling for roll templates that use them */
+
 .sheet-rolltemplate-class-ability-text .sheet-template-hr,
+.sheet-rolltemplate-chi-power .sheet-template-hr,
 .sheet-rolltemplate-percentile .sheet-template-hr,
 .sheet-rolltemplate-attack .sheet-template-hr,
 .sheet-rolltemplate-spell-description .sheet-template-hr,
 .sheet-rolltemplate-spell-cast .sheet-template-hr,
 .sheet-rolltemplate-spell-effect .sheet-template-hr,
 .sheet-rolltemplate-two-part .sheet-template-hr {
-	width: 100%;
-	height: 24px;
-	background-image: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/roll-divider.png');
-	background-repeat: no-repeat;
-	background-position-x: center;
-	background-position-y: center;
-	background-size: contain;
-	padding: 0;
+    width: 100%;
+    height: 24px;
+    background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Demon%20Gate/roll-divider.png");
+    background-repeat: no-repeat;
+    background-position-x: center;
+    background-position-y: center;
+    background-size: contain;
+    padding: 0;
 }
 
-.sheet-rolltemplate-text .sheet-template-text,
-.sheet-rolltemplate-class-ability-text .sheet-template-text,
-.sheet-rolltemplate-percentile .sheet-template-text,
-.sheet-rolltemplate-spell-description .sheet-template-text {
-	font-size: 13px;
-	padding: 4px;
-}
+/** Table styling for roll templates that use them */
 
 .sheet-rolltemplate-class-ability-text th,
+.sheet-rolltemplate-chi-power th,
 .sheet-rolltemplate-percentile th,
 .sheet-rolltemplate-spell-description th,
 .sheet-rolltemplate-spell-cast th,
 .sheet-rolltemplate-spell-effect th {
-	font-size: 13px;
-	padding: 4px;
-	font-weight: bold;
+    font-size: 14px;
+    padding: 4px;
+    font-weight: bold;
+    font-family: "Lato", sans-serif;
 }
 
 .sheet-rolltemplate-attack th,
 .sheet-rolltemplate-damage th,
 .sheet-rolltemplate-roll th {
-	font-size: 16px;
-	padding: 10px;
-	font-weight: bold;
+    font-size: 14px;
+    padding: 10px;
+    font-weight: bold;
+    font-family: "Lato", sans-serif;
+}
+
+.sheet-rolltemplate-class-ability-text th span,
+.sheet-rolltemplate-chi-power th span,
+.sheet-rolltemplate-percentile th span,
+.sheet-rolltemplate-attack th span,
+.sheet-rolltemplate-damage th span,
+.sheet-rolltemplate-roll th span,
+.sheet-rolltemplate-spell-description th span,
+.sheet-rolltemplate-spell-cast th span,
+.sheet-rolltemplate-spell-effect th span {
+    color: var(--dg-roll-text-muted);
 }
 
 .sheet-rolltemplate-class-ability-text td,
+.sheet-rolltemplate-chi-power td,
 .sheet-rolltemplate-percentile td,
 .sheet-rolltemplate-spell-description td,
 .sheet-rolltemplate-spell-cast td,
 .sheet-rolltemplate-spell-effect td {
-	font-size: 13px;
-	text-align: center;
-	min-width: 3em;
-	padding: 4px;
+    font-size: 13px;
+    text-align: center;
+    min-width: 3em;
+    padding: 4px;
+    color: var(--dg-roll-primary);
+    font-family: "Lato", sans-serif;
 }
 
 .sheet-rolltemplate-attack td,
 .sheet-rolltemplate-damage td,
 .sheet-rolltemplate-roll td {
-	font-size: 16px;
-	text-align: center;
-	min-width: 3em;
-	padding: 10px;
-}
-
-.sheet-rolltemplate-percentile .sheet-template-success,
-.sheet-rolltemplate-percentile .sheet-template-failure {
-	font-size: 16px;
-	font-weight: bold;
-	padding: 10px;
-	margin-top: 4px;
-	text-align: center;
-}
-
-.sheet-rolltemplate-percentile .sheet-template-success {
-	color: darkgreen;
-}
-
-.sheet-rolltemplate-percentile .sheet-template-failure {
-	color: maroon;
+    font-size: 16px;
+    text-align: center;
+    min-width: 3em;
+    padding: 10px;
+    color: var(--dg-roll-primary);
+    font-family: "Lato", sans-serif;
 }
 
 .sheet-rolltemplate-simple .sheet-template-text-prominent,
 .sheet-rolltemplate-two-part .sheet-template-text-prominent {
-	font-size: 16px;
-	padding: 10px;
-	text-align: center;
+    font-size: 16px;
+    padding: 10px;
+    text-align: center;
+    color: var(--dg-roll-primary);
 }
 
 .sheet-rolltemplate-two-part .sheet-template-text-supplementary {
-	font-size: 13px;
-	padding: 10px;
-	text-align: center;
+    font-size: 13px;
+    padding: 10px;
+    text-align: center;
+    color: var(--dg-roll-primary);
+}
+
+/* Dark mode text colour — th span overrides Roll20's html.dark th !important; td/text elements get full amber */
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text th span,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-chi-power th span,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile th span,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-attack th span,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-damage th span,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-roll th span,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-description th span,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-cast th span,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-effect th span {
+    color: var(--dg-roll-text-muted-dark);
+}
+
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-text td,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text td,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-chi-power td,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile td,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-attack td,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-damage td,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-roll td,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-description td,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-cast td,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-effect td,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-simple td,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-two-part td {
+    color: var(--dg-roll-primary-dark);
+}
+
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-text .sheet-template-text,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text .sheet-template-text,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-chi-power .sheet-template-text,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .sheet-template-text,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-description .sheet-template-text,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-simple .sheet-template-text-prominent,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-two-part .sheet-template-text-prominent,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-two-part .sheet-template-text-supplementary {
+    color: var(--dg-roll-primary-dark);
+}
+
+/* Dark mode support */
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-text .sheet-template-box,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text .sheet-template-box,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-chi-power .sheet-template-box,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .sheet-template-box,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-attack .sheet-template-box,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-damage .sheet-template-box,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-roll .sheet-template-box,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-description .sheet-template-box,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-cast .sheet-template-box,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-effect .sheet-template-box,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-simple .sheet-template-box,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-two-part .sheet-template-box {
+    border: 2px solid var(--dg-roll-border-dark);
+    background-color: var(--dg-roll-surface-dark);
+}
+
+/** Roll result styling - light and dark mode */
+
+.sheet-rolltemplate-text .inlinerollresult,
+.sheet-rolltemplate-class-ability-text .inlinerollresult,
+.sheet-rolltemplate-percentile .inlinerollresult,
+.sheet-rolltemplate-attack .inlinerollresult,
+.sheet-rolltemplate-damage .inlinerollresult,
+.sheet-rolltemplate-roll .inlinerollresult,
+.sheet-rolltemplate-spell-description .inlinerollresult,
+.sheet-rolltemplate-spell-cast .inlinerollresult,
+.sheet-rolltemplate-spell-effect .inlinerollresult,
+.sheet-rolltemplate-simple .inlinerollresult,
+.sheet-rolltemplate-two-part .inlinerollresult {
+    background-color: var(--dg-roll-control-bg);
+    border: 2px solid var(--dg-roll-table-cell-border);
+    border-radius: 4px;
+    color: var(--dg-roll-primary);
+    font-family: sans-serif;
+}
+
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-text .inlinerollresult,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text .inlinerollresult,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .inlinerollresult,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-attack .inlinerollresult,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-damage .inlinerollresult,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-roll .inlinerollresult,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-description .inlinerollresult,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-cast .inlinerollresult,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-effect .inlinerollresult,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-simple .inlinerollresult,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-two-part .inlinerollresult {
+    background-color: var(--dg-roll-control-bg-dark);
+    border: 2px solid var(--dg-roll-table-cell-border-dark);
+    border-radius: 4px;
+    color: var(--dg-roll-primary-dark);
+}
+
+/** Success and failure result styling - light and dark mode */
+
+/** NOTE - the repeated styling below is weird, but it seems to break Roll20 otherwise. **/
+.sheet-rolltemplate-percentile .sheet-template-success,
+.sheet-rolltemplate-percentile .sheet-template-failure {
+    font-size: 20px;
+    font-weight: bold;
+    padding: 10px;
+    margin-top: 4px;
+    text-align: center;
+}
+
+.sheet-rolltemplate-percentile .sheet-template-success {
+    color: var(--dg-roll-success);
+    font-size: 20px;
+    font-weight: bold;
+    padding: 10px;
+    margin-top: 4px;
+    text-align: center;
+}
+
+.sheet-rolltemplate-percentile .sheet-template-failure {
+    color: var(--dg-roll-failure);
+}
+
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .sheet-template-success {
+    color: var(--dg-roll-success-dark);
+}
+
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .sheet-template-failure {
+    color: var(--dg-roll-failure-dark);
+}
+
+/** Critical success and failure borders (light and dark mode)*/
+
+.sheet-rolltemplate-text .inlinerollresult.fullfail,
+.sheet-rolltemplate-class-ability-text .inlinerollresult.fullfail,
+.sheet-rolltemplate-percentile .inlinerollresult.fullfail,
+.sheet-rolltemplate-attack .inlinerollresult.fullfail,
+.sheet-rolltemplate-damage .inlinerollresult.fullfail,
+.sheet-rolltemplate-roll .inlinerollresult.fullfail,
+.sheet-rolltemplate-spell-description .inlinerollresult.fullfail,
+.sheet-rolltemplate-spell-cast .inlinerollresult.fullfail,
+.sheet-rolltemplate-spell-effect .inlinerollresult.fullfail,
+.sheet-rolltemplate-simple .inlinerollresult.fullfail,
+.sheet-rolltemplate-two-part .inlinerollresult.fullfail {
+    border: 3px solid var(--dg-roll-failure);
+}
+
+.sheet-rolltemplate-text .inlinerollresult.fullcrit,
+.sheet-rolltemplate-class-ability-text .inlinerollresult.fullcrit,
+.sheet-rolltemplate-percentile .inlinerollresult.fullcrit,
+.sheet-rolltemplate-attack .inlinerollresult.fullcrit,
+.sheet-rolltemplate-damage .inlinerollresult.fullcrit,
+.sheet-rolltemplate-roll .inlinerollresult.fullcrit,
+.sheet-rolltemplate-spell-description .inlinerollresult.fullcrit,
+.sheet-rolltemplate-spell-cast .inlinerollresult.fullcrit,
+.sheet-rolltemplate-spell-effect .inlinerollresult.fullcrit,
+.sheet-rolltemplate-simple .inlinerollresult.fullcrit,
+.sheet-rolltemplate-two-part .inlinerollresult.fullcrit {
+    border: 3px solid var(--dg-roll-success);
+}
+
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-text .inlinerollresult.fullfail,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text .inlinerollresult.fullfail,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .inlinerollresult.fullfail,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-attack .inlinerollresult.fullfail,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-damage .inlinerollresult.fullfail,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-roll .inlinerollresult.fullfail,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-description .inlinerollresult.fullfail,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-cast .inlinerollresult.fullfail,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-effect .inlinerollresult.fullfail,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-simple .inlinerollresult.fullfail,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-two-part .inlinerollresult.fullfail {
+    border: 3px solid var(--dg-roll-failure-dark);
+}
+
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-text .inlinerollresult.fullcrit,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-class-ability-text .inlinerollresult.fullcrit,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-percentile .inlinerollresult.fullcrit,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-attack .inlinerollresult.fullcrit,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-damage .inlinerollresult.fullcrit,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-roll .inlinerollresult.fullcrit,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-description .inlinerollresult.fullcrit,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-cast .inlinerollresult.fullcrit,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-spell-effect .inlinerollresult.fullcrit,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-simple .inlinerollresult.fullcrit,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-two-part .inlinerollresult.fullcrit {
+    border: 3px solid var(--dg-roll-success-dark);
 }

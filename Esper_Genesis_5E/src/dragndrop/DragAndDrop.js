@@ -30,7 +30,6 @@ var handle_drop = function(category, eventinfo) {
             return;
         } else {
             setTimeout(() => {
-                console.log("cleaning last ID");
                 lastDropID = "";
             }, 2000);
         };
@@ -102,6 +101,14 @@ var processDrop = function(page, currentData, repeating, looped) {
         try {
             const itemType = page.data["Item Type"] ? page.data["Item Type"] : category;
             const npc = currentData.npc === "0" ? false : true;
+
+            // Equipment Packs (Explorer Pack, Agent's Pack, etc.) are bundles of other
+            // items, not inventory items in their own right. Their contents are added
+            // individually via the equipment list, so don't create a row for the pack.
+            const itemSubtype = (page.data["Item Subtype"] || page.data["Subtype"] || page.data["Item Sub Type"] || "").toString();
+            if (itemSubtype.toLowerCase() === "equipment pack") {
+                return;
+            }
 
             if (!npc) {
                 let newObject = new Item(page.name)
@@ -219,7 +226,8 @@ var processDrop = function(page, currentData, repeating, looped) {
     const processSpells = () => {
         try {
             if(page.name) {
-                const spellLevel = page.data["Rank"] && page.data["Rank"] > 0 ? page.data["Rank"] : "prime";
+                const rankOrLevel = page.data["Rank"] !== undefined ? page.data["Rank"] : (page.data["Level"] !== undefined ? parseInt(page.data["Level"]) : 0);
+                const spellLevel = rankOrLevel > 0 ? rankOrLevel : "prime";
                 const section = `spell-${spellLevel}`
                 let existing = {id: false}; 
 
@@ -234,7 +242,7 @@ var processDrop = function(page, currentData, repeating, looped) {
     
                 const dropSheetAssocitation = {
                     spelldescription: page.data['data-description'],
-                    spellschool: page.data['Domain'].toLowerCase(),
+                    spellschool: page.data['Domain'] ? page.data['Domain'].toLowerCase() : undefined,
                     spellclass: page.data['spellclass'],
                     spellsource: page.data['spellsource'],
                     spellritual: page.data['Ritual'],
@@ -331,6 +339,7 @@ var processDrop = function(page, currentData, repeating, looped) {
 
             if(ship) {
                 dropSheetAssocitation['npc_piloting_flag'] = 1;
+                dropSheetAssocitation['npc_piloting_base'] = page.data['Piloting Bonus'];
                 dropSheetAssocitation['npc_md'] = page.data['Maneuver Defense'];
                 dropSheetAssocitation['npc_mnv_save'] = page.data['Maneuver Save DC'];
                 dropSheetAssocitation['ship_si'] = page.data['Structural Integrity'];
@@ -382,8 +391,7 @@ var processDrop = function(page, currentData, repeating, looped) {
                 if (page.data["data-MAdesc"]) {
                      newObject.attributes.npc_mythic_actions_desc = page.data["data-MAdesc"];
                 } else {
-                    //TODO UC1098
-                    newObject.attributes.npc_legendary_actions_desc = ``;
+                    newObject.attributes.npc_mythic_actions_desc = ``;
                 }
             }
 
@@ -673,9 +681,7 @@ var processDrop = function(page, currentData, repeating, looped) {
             if (page.data.multiclass) {
                 update[`${page.data.multiclass}_subclass`] = page.name;
                 classlevel = parseInt(currentData[`${page.data.multiclass}_lvl`]);
-                if (page.data["Spellcasting Ability"] && (lowercaseClass === 'fighter' || lowercaseClass === 'rogue')) {
-                    update[`"arcane_${lowercaseClass}`] = "1";
-                }
+
             } else {
                 let newObject = new Subclass(page.name);
                 const spellcastingAbility = page.data["Spellcasting Ability"] ? page.data["Spellcasting Ability"].toLowerCase() : false;
@@ -760,6 +766,7 @@ var processDrop = function(page, currentData, repeating, looped) {
             processProficiencies();
             break;
         case "Powers":
+        case "Spells":
             processSpells();
             break;
         case "Subclasses":
@@ -1003,7 +1010,6 @@ var processDrop = function(page, currentData, repeating, looped) {
                         }
                     }
 
-                    //Testing this funtion to find an empty resource
                     const findEmptyResource = () => {
                         if (currentData["class_resource_name"].length === 0) {
                             return "class_resource"

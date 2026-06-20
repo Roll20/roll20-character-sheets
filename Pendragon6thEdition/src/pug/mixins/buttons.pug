@@ -1,0 +1,36 @@
+- const templateHeader = name => `&{template:rolls} {{header=^{${name}}}}`
+- const damageFormula = attrName => `{{damage=[[(@{${attrName}}+(?{Damage Modifier|0}))]]}}`;
+
+- const rollFormula = attrName => `{{dice=[[{1d20+({@{${attrName}}+(?{Modifier|0})-20,0}kh1),1d0+20}kl1 [Roll]]]}} {{threshold=[[{@{${attrName}}+(?{Modifier|0}),20}kl1[Threshold]]]}} {{fumbleVal=[[20+({@{${attrName}}+(?{Modifier|0}),0}kl1)]]}}`
+
+- const buttonName = name => name.replace(/ /g, '-');
+
+mixin attributeButton(name, i18n)
+  - i18n = i18n ? i18n : name.slice(0, 3)
+  button.uppercase(data-i18n=i18n name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} ${rollFormula(attrName(name))}`)
+
+mixin rollButton(name)
+  button.capitalize(data-i18n=name title=name name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} ${rollFormula(attrName(name))}`)
+
+mixin squireButton(name)
+  button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader("squire")}  ^{skill}}} ${rollFormula(attrName(`${name}`))}`) t
+
+mixin brawlDamageRollButton(name, i18n)
+  - i18n = i18n ? i18n : name
+  button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(i18n)} ${rollFormula("brawling")} {{damage=[[(@{${attrName(name)}}+(?{Modifier|0}))]]}}`) t
+
+mixin damageButtonD20(name, i18n)
+ - i18n = i18n ? i18n : name
+  button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(i18n)} ${damageFormula(attrName(name))}`) t
+
+mixin repeatingRollButton(name)
+  button.d20.capitalize(name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=@{name}}} ${rollFormula(attrName(name))}`) t
+
+mixin repeatingAttackRollButton(name)
+  button.d20.capitalize(name=`roll_attack` type='roll' value!=`&{template:rolls} {{header=@{name}}} ${rollFormula("skill")} ${damageFormula("damage")}`) t
+
+mixin tabButtons(value, className, selected)
+  - const selectedKeyWord = selected ? 'selected' : ''
+  label(class=`${className}` data-i18n-title=`sheet: ${value}`)
+    input(name=`attr_sheet_type` title=`@{sheet_type}` type='radio' value=value ${selectedKeyWord})
+    span.capitalize.text-center(data-i18n=`${value}`)

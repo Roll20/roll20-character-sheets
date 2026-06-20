@@ -1,0 +1,42 @@
+.section.psionics
+    +sectionheader("show_psionics", false)
+        span(data-i18n="PSYCHIC_SKILLS_TECHNIQUES")
+    div
+        .psionics.super-psionics-only
+            .skills-psionic.skill-container(data-i18n-list="SKILL_ORDER_PSIONIC")
+                each skill in skills.psionic
+                    +makeSkill(skill)
+            .skills-repeating.mt
+                fieldset.repeating_psychic-skills
+                    +makeSkill("", true)
+            .skills-psionic.skill-container
+                .skill.skill-points
+                    .display.flex-center
+                        span(data-i18n="UNSPENT_PSIONIC_SKILL_POINTS").name.ellipsis
+                        span(name="attr_unspent_psionic_skill_points").level
+                    .edit.flex-center
+                        span(data-i18n="UNSPENT_PSIONIC_SKILL_POINTS").name.ellipsis
+                        input(type="number", min="0", value="0", name="attr_unspent_psionic_skill_points").level
+            .psionics-effort.grey-box
+                h3(data-i18n="COMMITTED_EFFORT")
+                +text-input("psionics_extra_effort", "BONUS")(type="number", value="0").center
+                each val in ["current", "scene", "day"]
+                    +text-input(`psionics_committed_effort_${val}`, `${val.toUpperCase()}`)(type="number", value="0", min="0").center
+                +text-input("psionics_total_effort", "UNCOMMITTED")(type="number", value="1", readonly, data-i18n-title="MAXIMUM_EFFORT_DESC").center
+            .techniques.grey-box.simple-repsection.mt
+                .flex-center.mb
+                    h3(data-i18n="PSYCHIC_TECHNIQUES")
+                input(type="hidden", name="attr_show_technique_details", value="1").input-details
+                fieldset.repeating_techniques
+                    .show-chevron
+                        +collapseChevron()
+                        button.display.invisible-button(name="roll_Technique", type="roll", value!="&{template:swn-default} {{system=@{system}}} {{charname=@{character_name}}} {{info=^{PSYCHIC_TECHNIQUE} — @{technique_discipline}}} {{title=@{technique_name}}} {{desc=@{technique_description}}}")
+                        .display
+                            .name.ellipsis.flex
+                                span(name="attr_technique_name")
+                                span.discipline(name="attr_technique_discipline")
+                            .details #[span(name="attr_technique_description")]
+                        .edit.flex-wrap
+                            input.name.ellipsis.grow(type="text", name="attr_technique_name", data-i18n-placeholder="TECHNIQUE")
+                            input.discipline(type="text", name="attr_technique_discipline", data-i18n-placeholder="DISCIPLINE")
+                            textarea.details(name="attr_technique_description", data-i18n-placeholder="DESCRIPTION")

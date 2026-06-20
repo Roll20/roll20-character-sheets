@@ -245,51 +245,51 @@ async function psBonusComplete(prefix = "") {
       }
       if (ps <= 15) {
         restrained_punch = "1D6";
-        punch = "4D6";
-        power_punch = "1D4";
-        power_punch_unit = "mdc";
+        punch = kick = "4D6";
+        power_punch = leap_kick = "1D4";
+        power_punch_unit = leap_kick_unit = "mdc";
       } else if (ps <= 20) {
         restrained_punch = "3D6";
-        punch = "1D6";
-        power_punch = "2D6";
-        punch_unit = power_punch_unit = "mdc";
+        punch = kick = "1D6";
+        power_punch = leap_kick = "2D6";
+        punch_unit = power_punch_unit = kick_unit = leap_kick_unit = "mdc";
       } else if (ps <= 25) {
         restrained_punch = "4D6";
-        punch = "2D6";
-        power_punch = "4D6";
-        punch_unit = power_punch_unit = "mdc";
+        punch = kick = "2D6";
+        power_punch = leap_kick = "4D6";
+        punch_unit = power_punch_unit = kick_unit = leap_kick_unit = "mdc";
       } else if (ps <= 30) {
         restrained_punch = "5D6";
-        punch = "3D6";
-        power_punch = "6D6";
-        punch_unit = power_punch_unit = "mdc";
+        punch = kick = "3D6";
+        power_punch = leap_kick = "6D6";
+        punch_unit = power_punch_unit = kick_unit = leap_kick_unit = "mdc";
       } else if (ps <= 35) {
         restrained_punch = "5D6";
-        punch = "4D6";
-        power_punch = "1D4*10";
-        punch_unit = power_punch_unit = "mdc";
+        punch = kick = "4D6";
+        power_punch = leap_kick = "1D4*10";
+        punch_unit = power_punch_unit = kick_unit = leap_kick_unit = "mdc";
       } else if (ps <= 40) {
         restrained_punch = "6D6";
-        punch = "5D6";
-        power_punch = "1D6*10";
-        punch_unit = power_punch_unit = "mdc";
+        punch = kick = "5D6";
+        power_punch = leap_kick = "1D6*10";
+        punch_unit = power_punch_unit = kick_unit = leap_kick_unit = "mdc";
       } else if (ps <= 50) {
         restrained_punch = "1D6*10";
-        punch = "6D6";
-        power_punch = "2D4*10";
-        punch_unit = power_punch_unit = "mdc";
+        punch = kick = "6D6";
+        power_punch = leap_kick = "2D4*10";
+        punch_unit = power_punch_unit = kick_unit = leap_kick_unit = "mdc";
       } else if (ps <= 60) {
         restrained_punch = "1D6";
-        punch = "1D6*10";
-        power_punch = "2D6*10";
-        restrained_punch_unit = punch_unit = power_punch_unit = "mdc";
+        punch = kick = "1D6*10";
+        power_punch = leap_kick = "2D6*10";
+        restrained_punch_unit = punch_unit = power_punch_unit = kick_unit = leap_kick_unit = "mdc";
       } else {
         // > 60
         const extra = Math.ceil((ps - 60) / 10) * 10;
         restrained_punch = "1D6";
-        punch = `1D6*10+${extra}`;
-        power_punch = `2D6*10+${extra * 2}`;
-        restrained_punch_unit = punch_unit = power_punch_unit = "mdc";
+        punch = kick = `1D6*10+${extra}`;
+        power_punch = leap_kick = `2D6*10+${extra * 2}`;
+        restrained_punch_unit = punch_unit = power_punch_unit = kick_unit = leap_kick_unit = "mdc";
       }
       break;
   }

@@ -1,0 +1,603 @@
+@use "_reset.scss";
+@use "_tailwind.scss";
+@use "_rolltemplate.scss";
+
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Mohave:ital,wght@0,300..700;1,300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playpen+Sans:wght@100..800&display=swap");
+
+// Roll20 Reset
+.charsheet {
+  * {
+    box-sizing: border-box;
+    height: unset;
+    width: unset;
+    padding: unset;
+    margin: unset;
+    text-align: unset;
+  }
+}
+
+button {
+  background-color: transparent;
+  border: none;
+  font-family: var(--font-text-header);
+}
+
+.wf,
+.sheet-rolltemplate-action {
+  --font-text-title: "Josefin Sans", sans-serif;
+  --font-text-header: Mohave, sans-serif;
+  --font-text: "Source Serif 4", serif;
+  --font-text-monospace: OCRB, "JetBrains Mono", monospace;
+  --font-text-input: "Playpen Sans", "Nanum Pen Script", "Comic Sans MS",
+    sans-serif;
+
+  --color-black: #030608;
+  --color-white: #fff;
+  --color-navy: #2f4d9a;
+  --color-orange: #ef8017;
+  --color-red: #f04f50;
+  --color-green: #208474;
+  --color-parchment: #fcf6ea;
+
+  --color-black-rgb: 3, 6, 8;
+  --color-white-rgb: 255, 255, 255;
+  --color-navy-rgb: 47, 77, 154;
+  --color-orange-rgb: 239, 128, 23;
+  --color-red-rgb: 240, 79, 80;
+  --color-green-rgb: 32, 132, 116;
+  --color-parchment-rgb: 252, 246, 234;
+}
+
+.wf {
+  position: relative;
+  background-color: var(--color-white);
+  border: 6px double var(--color-orange);
+  padding: 0.5em;
+  margin-inline: 1em;
+  font-family: var(--font-text);
+
+  label {
+    font-family: var(--font-text-header);
+    margin-bottom: 0;
+    padding-right: 0;
+
+    &:has(:checked) {
+      span {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  textarea,
+  input {
+    background-color: var(--color-white);
+    border-radius: 0;
+    font-family: var(--font-text-input);
+
+    &[type="text"] {
+      padding-left: 0.5em;
+      border: 1px solid rgba(var(--color-rgb), 0.5);
+    }
+
+    &[type="number"] {
+      appearance: textfield;
+      text-align: center;
+      font-family: var(--font-text-input);
+      border: 1px solid rgba(var(--color-rgb), 0.5);
+
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        appearance: none;
+        margin: 0;
+      }
+    }
+  }
+
+  textarea {
+    width: auto;
+    min-height: 3em;
+    max-height: 10em;
+    resize: vertical;
+    margin: 0;
+    padding: 0 0.25em;
+    border: 1px solid rgba(var(--color-rgb), 0.5);
+
+    scrollbar-width: thin;
+
+    @supports selector(::-webkit-scrollbar) {
+      &::-webkit-scrollbar {
+        width: 0.5rem;
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: var(--input-color-active);
+      }
+    }
+  }
+
+  $colors: "black", "white", "navy", "orange", "red", "green";
+  @each $color in $colors {
+    &-#{$color} {
+      --text-normal: var(--color-#{$color});
+      --border-color: var(--color-#{$color});
+      --container-color: var(--color-#{$color});
+      --color-rgb: var(--color-#{$color}-rgb, var(--color-orange-rgb));
+    }
+  }
+
+  .wf__sheet-toggle {
+    position: absolute;
+    top: -1em;
+    right: 1em;
+    text-align: center;
+    text-transform: uppercase;
+    float: right;
+
+    padding-inline: 0.5em;
+    background-color: var(--color-white);
+
+    label {
+      font-family: var(--font-text-monospace);
+      color: var(--color-orange);
+    }
+    select {
+      color: var(--color-navy);
+      font-family: var(--font-text-monospace);
+      text-transform: uppercase;
+    }
+  }
+
+  @each $sheet in "wilder", "pack", "area" {
+    .#{$sheet} {
+      display: none;
+    }
+    input[name="attr_sheet"][value="#{$sheet}"] ~ .#{$sheet} {
+      display: grid;
+    }
+  }
+
+  .repcontainer {
+    .repitem + .repitem {
+      margin-top: 0.25em;
+      padding-top: 0.25em;
+      border-top: 1px dashed var(--border-color);
+    }
+  }
+}
+
+.wf .wf {
+  &__title {
+    color: var(--color-navy);
+    text-align: center;
+    margin-top: -0.75em;
+
+    span {
+      font-family: var(--font-text-title);
+      text-transform: uppercase;
+      background-color: var(--color-white);
+      padding: 0 0.5em;
+    }
+  }
+
+  &__header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    margin-bottom: 1em;
+  }
+  .pack > .wf__header {
+    grid-template-columns: 1fr 1fr auto;
+  }
+
+  &__version {
+    float: right;
+
+    padding-inline: 0.5em;
+    margin-right: 1em;
+    background-color: var(--color-white);
+    color: var(--color-orange);
+
+    font-family: var(--font-text-monospace);
+    text-transform: uppercase;
+
+    span + span {
+      color: var(--color-navy);
+    }
+  }
+
+  &-span {
+    &--focus-up {
+      text-transform: uppercase;
+      font-family: var(--font-text-header);
+      font-weight: 700;
+      color: var(--color-green);
+    }
+    &--go-wild {
+      text-transform: uppercase;
+      font-family: var(--font-text-header);
+      font-weight: 700;
+      color: var(--color-navy);
+    }
+  }
+  &-input {
+    padding: 0.25em;
+
+    label {
+      color: var(--text-normal);
+      text-transform: uppercase;
+
+      span {
+        vertical-align: bottom;
+        font-size: 1em;
+      }
+    }
+
+    input[type="text"] {
+      width: 100%;
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+      margin-right: 0.25em;
+    }
+
+    &:has(> textarea) {
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+    &.flex {
+      label {
+        margin: 0 auto;
+      }
+    }
+    &.inline {
+      display: grid;
+      gap: 0.25em;
+      grid-template-columns: 1fr 3fr;
+    }
+
+    &--style {
+      @extend .wf-input;
+
+      --container-color: var(--color-orange);
+
+      display: inline-block;
+      width: 100%;
+      padding: 0;
+
+      label {
+        text-align: start;
+        font-weight: 700;
+        color: var(--container-color);
+        text-transform: uppercase;
+        font-family: var(--font-text-header);
+        font-size: 2em;
+        white-space: nowrap;
+
+        // Orange on White does not meet a11y/WCAG
+        // but stroke looks... bad.
+        // -webkit-text-stroke: 4px black;
+        // paint-order:  fill stroke;
+      }
+    }
+    &--valuemax {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0 0.25em;
+      padding: 0.25em;
+      align-items: flex-end;
+
+      > label {
+        color: var(--container-color);
+        text-transform: uppercase;
+        margin-bottom: 0.25em;
+      }
+
+      .wf-input {
+        display: grid;
+        background-color: var(--color-white);
+
+        label {
+          font-size: 0.8rem;
+          text-align: center;
+        }
+
+        input[type="number"] {
+          margin: auto;
+        }
+      }
+    }
+  }
+
+  &-heading {
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--text-normal, var(--color-black));
+    font-family: var(--font-text-header);
+
+    grid-column: 1/-1;
+  }
+
+  &__body {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.5em;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+
+      @each $col in 1, 2, 3, 4, 5, 6 {
+        > .col-span-#{$col} {
+          grid-column: span 1 / span 1;
+        }
+      }
+    }
+  }
+
+  &-container {
+    padding: 0 0.5em 0.5em;
+    border: 4px solid var(--border-color, var(--color-black));
+  }
+
+  &__styles {
+    display: grid;
+    gap: 0 0.25em;
+  }
+
+  &__style {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.25em;
+
+    align-items: center;
+
+    .wf-input {
+      input[type="number"] {
+        font-size: 1.5em;
+      }
+    }
+  }
+
+  &__you-are {
+    grid-template-rows: repeat(2, auto) 1fr auto;
+    border-color: transparent;
+  }
+
+  &__portrait {
+    padding: 0;
+    max-height: 20em;
+    overflow: hidden;
+    background-color: var(--color-parchment);
+
+    img {
+      object-fit: cover;
+      object-position: top;
+      height: 100%;
+      width: 100%;
+      border: none;
+    }
+  }
+  .area .wf__portrait {
+    background-color: transparent;
+    border: none;
+
+    img {
+      object-fit: contain;
+    }
+  }
+
+  &__skills {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.25em;
+
+    h3 {
+      grid-column: 1/-1;
+    }
+  }
+
+  &-skill {
+    display: contents;
+
+    label {
+      display: flex;
+      gap: 0.25em;
+      align-items: center;
+
+      margin: 0;
+      padding: 0 0.25em;
+
+      width: auto;
+
+      border: 2px solid var(--border-color);
+
+      span {
+        color: var(--text-normal);
+        text-transform: uppercase;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      input[type="number"] {
+        margin-left: auto;
+        border: none;
+        border-left: 1px solid var(--border-color);
+      }
+    }
+  }
+
+  &__dice-tray {
+    grid-template-columns: 1fr 3fr;
+    gap: 0 0.25em;
+    padding: 1em;
+    border: none;
+  }
+
+  &__actions {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5em 1em;
+
+    span {
+      font-family: var(--font-text-title);
+    }
+  }
+
+  &-action[type="action"],
+  &-action--wild[type="action"] {
+    --container-color: var(--color-navy);
+
+    display: grid;
+    grid-template-columns: 1em 1fr 1em;
+    gap: 1em;
+    padding: 0 1em;
+
+    outline: 3px solid var(--container-color);
+    // border-radius: 4px;
+
+    // width: calc(100% - 1em);
+
+    img {
+      width: 1em;
+      fill: var(--color-orange);
+      margin-block: auto;
+    }
+
+    span {
+      text-align: center;
+      font-weight: 700;
+      color: var(--container-color);
+      text-transform: uppercase;
+      font-family: var(--font-text-header);
+      font-size: 1.5em;
+      white-space: nowrap;
+    }
+
+    &:hover {
+      background-color: var(--color-parchment);
+      // box-shadow: 4px 4px 0px var(--color-orange);
+    }
+  }
+  &-action--wild[type="action"] {
+    --container-color: var(--color-green);
+  }
+
+  &-tool {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 0.5em;
+
+    .wf-tool__durability {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 0.25em;
+
+      background-color: var(--color-black);
+
+      padding: 0.25em;
+
+      h4 {
+        color: var(--color-white);
+        grid-column: 1/-1;
+      }
+
+      .wf-input {
+        display: grid;
+        background-color: var(--color-white);
+
+        label {
+          font-size: 0.8rem;
+          text-align: center;
+        }
+
+        input[type="number"] {
+          margin: auto;
+        }
+      }
+    }
+  }
+
+  &-technique,
+  &-trait {
+    input[name*="cost"] {
+      font-style: italic;
+    }
+  }
+
+  &-technique {
+    gap: 0 0.25em;
+  }
+
+  &-trait {
+    gap: 0 0.25em;
+
+    &--default {
+      font-family: var(--font-text);
+
+      strong {
+        color: var(--text-normal);
+        font-family: var(--font-text-header);
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  &__stamina {
+    .wf-input--valuemax {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    input[type="number"] {
+      font-size: 2em;
+    }
+  }
+
+  &__conditions {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+
+    .wf-input {
+      display: flex;
+      padding: 0;
+
+      label {
+        margin: auto 0;
+      }
+
+      span {
+        opacity: 0.5;
+        color: var(--color-black);
+      }
+
+      input[type="number"] {
+        opacity: 0;
+        width: 3.5em;
+        margin-left: auto;
+        color: var(--text-normal);
+      }
+
+      &:has(:checked) {
+        input[type="number"] {
+          opacity: 1;
+        }
+
+        span {
+          color: var(--container-color);
+          font-weight: 700;
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  &-ingredient,
+  &-monster {
+    display: grid;
+    grid-template-columns: 4fr minmax(5em, 1fr);
+  }
+}

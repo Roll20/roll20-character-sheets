@@ -4,6 +4,23 @@ This sheet is created for use in Godbound games on Roll20, based on the Characte
 
 ## Features / Changelog
 
+- v4.2
+  - Minor
+    * Misc Effort Spent added to Effort Spent in the Resources section.
+- v4.1
+  - Minor
+    * Minor fix for missed HTML and CSS code in the 4.0 update.
+- v4.0
+  - Major
+    - Legacy
+      * HTML and CSS modified to update the sheet from legacy to the new Character Sheet Eenhancement.
+	- Darkmode
+	  * Implemented Darkmode option, which required CSE.
+  - Minor
+    * Tweaks to layout, color choices, and some element logic, such as wrapping checkboxes in labels.
+- v3.3
+  - Minor
+    * Attacks now do not require inputting target's AC. Instead, the rolltemplate displays the AC the attack would hit. New calculation is "20 - roll - modifiers." This makes combat faster by removing one step in the sheet's rolling process.
 - v3.2
   - Minor
     * Add missing Effort entry for Invocations

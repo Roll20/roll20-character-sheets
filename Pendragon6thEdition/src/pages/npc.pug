@@ -1,53 +1,74 @@
-
-.npc
+.npc.grid
   .grid.name
-    +textInput('character name')
-    h2.capitalize(data-i18n='glory won')
-    +textInput('glory won')
-  .row
-    textarea(data-i18n-placeholder='description' name='attr_description')
-  .grid.characteristics.5column
-    each value in ['size', 'dexterity', 'strength', 'constitution', 'appearance']
-      .grid.2autocolumn
-        +attributeButton(value)
-        +numberInput(value)
-  .grid.stats.4column
-    .grid.move
-      h2.capitalize(data-i18n='move')
-      +numberInput('move')
-      +textInput('move description')
-    each value in ['armor', 'unconscious', 'major wound', 'knockdown', 'hit points', 'healing rate']
-      .grid.2autocolumn
-        h2.capitalize(data-i18n=value)
-        +numberInput(value)
-  .grid.row
-    h2.italic(data-i18n='attacks')
-    .repeating-container
-        fieldset(class='repeating_attacks')
-          .grid.row.weapons 
-            +textInput('name')
-            .skill
-              span (
-              +numberInput('skill')
-              span )
-            +repeatingRollButton('skill') 
-            +textInput('damage')
-            +repeatingAttackRollButton('damage')
-            +textInput('description')
-  .grid.row.skills
-    h2.italic(data-i18n='skills / passions')
-    .repeating-container
-        fieldset(class='repeating_skills')
-          .row
-            +textInput('name')
-            +numberInput('skill')
-            +textInput('description')
-            +repeatingRollButton('skill')
-  .grid.row.abilities
-    h2.italic(data-i18n='abilities')
-    .repeating-container
+    +dropInput({name: 'character name'})
+    .grid.auto-flow-col.align-end
+      +subHeader("type")
+      +dropInput({name: 'type', i18n: 'type', accept: 'type'})
+  .characteristics.grid.mb
+    .grid.core.auto-flow-col
+        each value in characteristics
+            .grid.row.centered
+                +attributeButton(value)
+                .shield.mt
+                    +numberInput(value)
+    .grid.statistic.auto-flow-col
+        .col
+            +primarySubheader('health')
+            +npcTable(healthRows)
+        .col
+            +primarySubheader('other')
+            +npcTable(npcOtherRows)
+    input(type='hidden' name='attr_hide_npc_knight_attributes' value='1')
+    .grid.statistic.auto-flow-col
+        .col
+            +primarySubheader('knight')
+            +npcTable(["knight value", "ransom"])
+        .col
+            +primarySubheader('other')
+            +npcTable(["morale loss", "valorous modifier"])
+  
+  include ./components/attacks.pug
+  
+  .grid.skills
+    +header('skills')
+    .grid.combat-skills.hide
+      each val in combatSkills
+        .row.grid
+          +rollButton(val)
+          +numberInput(val)
+    .row.hide
+      +subHeader('other')
+    .repeating-container.hide
+      fieldset(class='repeating_skills')
+        .grid.auto-flow-col.3columns
+          +nameTargetValue()
+
+  include ./components/personality-traits.pug
+
+  .grid.passions
+    +header('passions')
+    .repeating-container.hide
+        fieldset(class='repeating_passions')
+          .grid.auto-flow-col.3columns
+            +nameTargetValue()
+  
+  .grid.abilities
+    +header('abilities')
+    .repeating-container.hide
         fieldset(class='repeating_abilities')
-          .row
-            +textInput('name')
-          .row
-            textarea(data-i18n-placeholder='description' name='attr_description')
+          .row.grid.flags
+            +repeatingFlags()
+            .row.grid.2autocolumn
+                h2(data-i18n='name')
+                span.display.bottom-border(name='attr_name')
+                +textInput('name')
+            .row.notes
+                span.display(name='attr_notes')
+                +textArea('notes')
+
+  include ./components/equipment.pug
+
+  .grid
+    +header('description')
+    .grid.description.gap.hide
+      +notesTextarea('description')

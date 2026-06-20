@@ -119,6 +119,8 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
         base = `${destinationPrefix}_mod_ma_bonus`;
       } else if (field == "charmimpress") {
         base = `${destinationPrefix}_mod_pb_bonus`;
+      } else if (field == "spellstrength") {
+        base = `base_spellstrength`;
       }
       await repeatingSumAsync(
         rsaDestinations,
@@ -152,6 +154,12 @@ async function combineBonuses(rowIds, destinationPrefix) {
       `${destinationPrefix}_damage_range`,
       `${destinationPrefix}_damage_range_single`,
       `${destinationPrefix}_damage_range_burst`,
+      `${destinationPrefix}_damage_range_1`,
+      `${destinationPrefix}_damage_range_1_name`,
+      `${destinationPrefix}_damage_range_2`,
+      `${destinationPrefix}_damage_range_2_name`,
+      `${destinationPrefix}_damage_range_3`,
+      `${destinationPrefix}_damage_range_3_name`,
     ],
     section: "bonuses",
     fields: [
@@ -162,6 +170,12 @@ async function combineBonuses(rowIds, destinationPrefix) {
       "damage_range",
       "damage_range_single",
       "damage_range_burst",
+      "damage_range_1",
+      "damage_range_1_name",
+      "damage_range_2",
+      "damage_range_2_name",
+      "damage_range_3",
+      "damage_range_3_name",
     ],
     filter: rowIds,
   });
@@ -408,14 +422,8 @@ on("change:repeating_bonusselections:enabled", async (e) => {
   await outputSelectedBonusIds();
 });
 
-const insertedBonuses = [];
 async function insertSelection(name, bonusRowId, level) {
   console.log("insertSelection", name, bonusRowId, level);
-  if (insertedBonuses.includes(bonusRowId)) {
-    return;
-  } else {
-    insertedBonuses.push(bonusRowId);
-  }
   const selectionRowId = generateRowID();
   const attrs = {};
   attrs[`repeating_bonusselections_${selectionRowId}_bonus_id`] = bonusRowId;
@@ -436,21 +444,39 @@ async function updateSelection(name, selectionRowId, level) {
   await setAttrsAsync(attrs);
 }
 
+const pendingInserts = new Set(); // Track rows being inserted to prevent duplicates
 on(
   "change:repeating_bonuses:name \
   change:repeating_bonuses:level",
   async (e) => {
-    console.log("change:repeating_bonuses:name", e);
+    console.log("change:repeating_bonuses:name/level", e);
+
     const [r, section, rowId] = e.sourceAttribute.split("_");
+    if (!rowId) return;
+
     const selectionIdKey = `repeating_bonuses_${rowId}_selection_id`;
     const levelKey = `repeating_bonuses_${rowId}_level`;
     const nameKey = `repeating_bonuses_${rowId}_name`;
+
     const a = await getAttrsAsync([selectionIdKey, levelKey, nameKey]);
-    console.log(a);
+
+    console.log(`Processed for ${rowId}:`, e.triggerName, a);
+
+    if (!a[nameKey] || !a[levelKey]) {
+      return; // Ensure both values exist before proceeding
+    }
+
     if (a[selectionIdKey]) {
       await updateSelection(a[nameKey], a[selectionIdKey], a[levelKey]);
     } else {
-      await insertSelection(a[nameKey], rowId, a[levelKey]);
+      if (!pendingInserts.has(rowId)) {
+        pendingInserts.add(rowId);
+        console.log(`Inserting selection for row ${rowId}`);
+        await insertSelection(a[nameKey], rowId, a[levelKey]);
+        pendingInserts.delete(rowId); // Remove from pending after insertion
+      } else {
+        console.log(`Skipping duplicate insert for row ${rowId}`);
+      }
     }
   }
 );

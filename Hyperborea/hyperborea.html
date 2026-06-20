@@ -125,6 +125,11 @@ PC Sheet
           <input class="sheet-digit_input_stat" type="number" name="attr_cn_mod" value="0"/>
         </div>
         <div class="sheet-stat_block_small">
+          <input type="hidden" name="attr_cn_feat_bonus" value="0"/>
+          <label class="sheet-txt_label_small">8% Feat Bonus:</label>
+          <input class="sheet-stat_checkbox" type="checkbox" name="attr_cn_feat_bonus_toggle"/>
+        </div>
+        <div class="sheet-stat_block_small">
           <label class="sheet-txt_label_small">Hit Point Mod:</label>
           <span class="sheet-txt_label_small" name="attr_hp_mod"></span>
         </div>
@@ -138,7 +143,7 @@ PC Sheet
         </div>
         <div class="sheet-stat_block_small">
           <button class="sheet-stat_button" type="roll" name="test_of_cn" value="&{template:default} {{name=Test of CN (@{character_name})}} {{Roll (d6) = [[d6]]}} {{Success on = @{test_cn}:6}}">CN Test</button>
-          <button class="sheet-stat_button" type="roll" name="feat_of_cn" value="&{template:default} {{name=Feat of CN (@{character_name})}} {{Roll (%) = [[d100]]}} {{Success on = @{feat_cn}%}}">CN Feat</button>
+          <button class="sheet-stat_button" type="roll" name="feat_of_cn" value="&{template:default} {{name=Feat of CN (@{character_name})}} {{Roll (%) = [[d100]]}} {{Success on = [[@{feat_cn}+(@{cn_feat_bonus})]]%}}">CN Feat</button>
         </div>
       </div>
       <div class="sheet-one_col_box">
@@ -596,7 +601,7 @@ Monster Sheet
               const commonMultipliers = (fields.length <= destinations.length) ? [] : fields.splice(destinations.length, fields.length - destinations.length);
               const output = {};
               destinations.forEach((destination, index) => {
-                  output[destination] = idArray.reduce((total, id) => total + getValue(section, id, fields[index]) * commonMultipliers.reduce((subtotal, mult) => subtotal * getValue(section, id, mult), 1), 0);
+                  output[destination] = idArray.reduce((total, id) => Math.round(total + getValue(section, id, fields[index]) * commonMultipliers.reduce((subtotal, mult) => subtotal * getValue(section, id, mult), 1)), 0);
               });
               setAttrs(output);
           });
@@ -605,8 +610,8 @@ Monster Sheet
 
   on(`change:st change:st_mod`, () => {
       getAttrs(["st", "st_mod"], values => {
-          const st_base = xparseInt(values["st"], 10);
-          const st_mod = xparseInt(values["st_mod"], 10);
+          const st_base = xparseInt(values["st"]);
+          const st_mod = xparseInt(values["st_mod"]);
           const st_val = st_base + st_mod;
           hit_mod = 0;
           if (st_val <= 3) {
@@ -676,8 +681,8 @@ Monster Sheet
 
   on(`change:dx change:dx_mod`, () => {
       getAttrs(["dx", "dx_mod"], values => {
-          const dx_base = xparseInt(values["dx"], 10);
-          const dx_mod = xparseInt(values["dx_mod"], 10);
+          const dx_base = xparseInt(values["dx"]);
+          const dx_mod = xparseInt(values["dx_mod"]);
           const dx_val = dx_base + dx_mod;
           missile_mod = 0;
           if (dx_val <= 3) {
@@ -717,7 +722,7 @@ Monster Sheet
           } else if (dx_val == 17) {
               test_dx = 4;
           } else if (dx_val >= 18) {
-              text_dx = 5;
+              test_dx = 5;
           }
           setAttrs({
               [`test_dx`]: test_dx
@@ -747,8 +752,8 @@ Monster Sheet
 
   on(`change:cn change:cn_mod`, () => {
       getAttrs(["cn", "cn_mod"], values => {
-          const cn_base = xparseInt(values["cn"], 10);
-          const cn_mod = xparseInt(values["cn_mod"], 10);
+          const cn_base = xparseInt(values["cn"]);
+          const cn_mod = xparseInt(values["cn_mod"]);
           const cn_val = cn_base + cn_mod;
           hp_mod = 0;
           if (cn_val <= 6) {
@@ -806,7 +811,7 @@ Monster Sheet
           } else if (cn_val == 17) {
               test_cn = 4;
           } else if (cn_val >= 18) {
-              text_cn = 5;
+              test_cn = 5;
           }
           setAttrs({
               [`test_cn`]: test_cn
@@ -836,8 +841,8 @@ Monster Sheet
 
   on(`change:in change:in_mod`, () => {
       getAttrs(["in", "in_mod"], values => {
-          const in_base = xparseInt(values["in"], 10);
-          const in_mod = xparseInt(values["in_mod"], 10);
+          const in_base = xparseInt(values["in"]);
+          const in_mod = xparseInt(values["in_mod"]);
           const in_val = in_base + in_mod;
           lang_mod = 0;
           if (in_val <= 6) {
@@ -886,8 +891,8 @@ Monster Sheet
   });
   on(`change:ws change:ws_mod`, () => {
       getAttrs(["ws", "ws_mod"], values => {
-          const ws_base = xparseInt(values["ws"], 10);
-          const ws_mod = xparseInt(values["ws_mod"], 10);
+          const ws_base = xparseInt(values["ws"]);
+          const ws_mod = xparseInt(values["ws_mod"]);
           const ws_val = ws_base + ws_mod;
           will_mod = 0;
           if (ws_val <= 3) {
@@ -936,14 +941,16 @@ Monster Sheet
   });
   on(`change:ch change:ch_mod`, () => {
       getAttrs(["ch", "ch_mod"], values => {
-          const ch_base = xparseInt(values["ch"], 10);
-          const ch_mod = xparseInt(values["ch_mod"], 10);
+          const ch_base = xparseInt(values["ch"]);
+          const ch_mod = xparseInt(values["ch_mod"]);
           const ch_val = ch_base + ch_mod;
           react_mod = 0;
           if (ch_val <= 3) {
               react_mod = -3;
           } else if (ch_val <= 6 && ch_val >= 4) {
               react_mod = -2;
+          } else if (ch_val == 8 || ch_val == 7) {
+              react_mod = -1;
           } else if (ch_val <= 16 && ch_val >= 13) {
               react_mod = 1;
           } else if (ch_val == 17) {
@@ -1006,7 +1013,7 @@ Monster Sheet
 
   on('change:equip_encumbrance change:coin_encumbrance', function () {
       getAttrs(['equip_encumbrance', 'coin_encumbrance'], function (values) {
-          const encumbrance = xparseFloat(values.equip_encumbrance) + xparseFloat(values.coin_encumbrance);
+          const encumbrance = Math.round(xparseFloat(values.equip_encumbrance) + xparseFloat(values.coin_encumbrance));
           setAttrs({
               [`encumbrance`]: encumbrance
           });
@@ -1036,6 +1043,20 @@ Monster Sheet
           } else {
               setAttrs({
                   [`dx_feat_bonus`]: 0
+              });
+          }
+      });
+  });
+
+  on('change:cn_feat_bonus_toggle', function () {
+      getAttrs(['cn_feat_bonus_toggle'], function (value) {
+          if (value.cn_feat_bonus_toggle == "on") {
+              setAttrs({
+                  [`cn_feat_bonus`]: 8
+              });
+          } else {
+              setAttrs({
+                  [`cn_feat_bonus`]: 0
               });
           }
       });

@@ -12,7 +12,7 @@ buttontab.forEach((button) => {
 });
 
 // EQUIPEMENT PORTE
-const buttonPorte = ['barbarian', 'bard', 'berserk', 'druid', 'monk', 'necromancer', 'paladin', 'priest', 'psion', 'ranger', 'rogue', 'shaman', 'sorcerer', 'warlock', 'warmaster', 'warrior', 'wizard', 'sans', 'guardian'];
+const buttonPorte = ['barbarian', 'bard', 'berserk', 'druid', 'monk', 'necromancer', 'paladin', 'priest', 'psion', 'ranger', 'rogue', 'shaman', 'sorcerer', 'warlock', 'warmaster', 'warrior', 'wizard', 'sans', 'guardian', 'personnalise'];
 
 buttonPorte.forEach((button) => {
   on(`clicked:${button}`, () => {

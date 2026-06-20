@@ -1,0 +1,35 @@
+name: Sheet Checks
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  check-sheet:
+    name: Check Sheet
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v46.0.1
+        with:
+          since_last_remote_commit: true
+          separator: "SEPARATEMYCHECKEDFILES"
+      - name: Run Checks
+        uses: ./.actions/sheet-checks
+        with:
+          file-list: ${{ steps.changed-files.outputs.all_modified_files }}
+          separator: "SEPARATEMYCHECKEDFILES"
+          credentials: ${{ secrets.SERVICE_ACCOUNT_KEY }}
+          user: ${{ github.event.pull_request.user.login }}
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          repository: ${{ github.event.repository.name }}
+        env:
+          TAVERN_API_KEY: ${{ secrets.TAVERN_API_KEY }}
+          STAGING_API_KEY: ${{ secrets.STAGING_API_KEY }}
+          PRODUCTION_API_KEY: ${{ secrets.PRODUCTION_API_KEY }}
+          ACTIONS_STEP_DEBUG: true

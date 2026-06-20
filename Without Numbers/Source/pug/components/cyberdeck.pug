@@ -1,0 +1,31 @@
+.section.cyberdeck
+	+sectionheader("show_cyberdeck", false)
+		span(data-i18n="CYBERDECK")
+	div.simple-repsection.grey-box
+		- const cyberdeckStats =  ["bonus_access", "memory", "shielding", "cpu"]
+		.table-header.cyberdeck-grid.grid.gap-1
+			each val in ["name", ...cyberdeckStats]
+				.ellipsis(data-i18n=val.toUpperCase() data-i18n-title=val.toUpperCase())
+		fieldset.repeating_cyberdeck
+			.show-chevron
+				+collapseChevron
+				button.display.invisible-button(name="roll_Cyberdeck", type="roll", value!="&{template:swn-default} {{system=@{system}}} {{charname=@{character_name}}} {{title=@{cyberdeck_name}}} {{info=^{CYBERDECK}; @{cyberdeck_bonus_access} ^{BONUS_ACCESS}, @{cyberdeck_memory} ^{MEMORY}, @{cyberdeck_shielding} ^{SHIELDING}, @{cyberdeck_cpu} ^{CPU}}} {{desc=@{cyberdeck_description}}}")
+				.display
+					.grid.cyberdeck-grid.gap-1.border-bottom
+						span(name="attr_cyberdeck_name").ellipsis.font-bold
+						each val in cyberdeckStats
+							span(name=`attr_cyberdeck_${val.toLowerCase()}`).ellipsis.center
+					.details
+						.grid.gap-1.grid-flow-col
+							each val in ["COST", "ENCUMBRANCE"]
+								span #[span(data-i18n=val).font-bold]: #[span(name=`attr_cyberdeck_${val.toLowerCase()}`)]
+						span(name="attr_cyberdeck_description")
+				.edit.grid.gap-1
+					.grid.gap-1.grid-flow-col.name-row.cyberdeck-grid
+						+text-input("cyberdeck_name", "NAME").name
+						each val in cyberdeckStats
+							+text-input(`cyberdeck_${val}`, val)(type="number" value="0").name.center
+					.grid.gap-1.grid-flow-col
+						each val in [ "COST", "ENCUMBRANCE"]
+							+text-input(`cyberdeck_${val.toLowerCase()}`, val).name
+					textarea(name="attr_cyberdeck_description", data-i18n-placeholder="DESCRIPTION").details

@@ -1,0 +1,85 @@
+@use 'sass:math';
+@use 'sass:map';
+
+// bootstrap containers
+.container {
+  background: transparent;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat($grid-columns, 1fr);
+  gap: $grid-gutter;
+  justify-items: center;
+  align-items: start;
+
+  width: 100%;
+
+  &:before,
+  &:after {
+    display: none;
+  }
+
+  margin: auto;
+  // padding: math.div($gutter-gap, 2);
+
+  > * {
+    width: 100%;
+    grid-column: 1 / -1;
+  }
+}
+
+.col {
+  grid-column: 1 / -1;
+}
+
+// bootstrap columns
+@for $i from 1 through $grid-columns {
+  .col-#{$i} {
+    position: initial;
+    grid-column-start: auto;
+    grid-column-end: span $i;
+  }
+}
+
+// bootstrap grid
+@each $breakpoint in map.keys($grid-breakpoints) {
+  @media (min-width: map.get($grid-breakpoints, $breakpoint)) {
+    @for $i from 1 through $grid-columns {
+      .col-#{$breakpoint}-#{$i} {
+        position: initial;
+        grid-column-start: auto;
+        grid-column-end: span $i;
+      }
+    }
+
+    .show-#{$breakpoint} {
+      display: none;
+    }
+  }
+  @media (max-width: map.get($grid-breakpoints, $breakpoint)) {
+    .hide-#{$breakpoint} {
+      display: none;
+    }
+  }
+
+  .only-#{$breakpoint} {
+    display: none;
+  }
+  @media (width: map.get($grid-breakpoints, $breakpoint)) {
+    .only-#{$breakpoint} {
+      display: block;
+    }
+  }
+}
+
+@for $i from 2 through $grid-columns {
+  .rowspan-#{$i} {
+    height: 100%;
+    grid-row: span $i;
+  }
+  .colspan-#{$i} {
+    height: 100%;
+    grid-column: span $i;
+  }
+}

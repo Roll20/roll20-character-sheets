@@ -1,0 +1,66 @@
+.style {
+  $this: '.style';
+
+  input[name='attr_style'] {
+    &[value='0'],
+    &:not([value]) {
+      ~ #{$this}__checkbox--0 {
+        display: none;
+      }
+    }
+  }
+
+  &__track {
+    display: flex;
+    gap: $grid-gutter;
+    margin: $m-md;
+  }
+  &__checkbox {
+    display: grid;
+    font-size: 1rem;
+
+    &:nth-of-type(3n + 1) {
+      margin-right: $m-md;
+    }
+
+    input {
+      appearance: none;
+      outline: none;
+
+      width: 1.5rem;
+      aspect-ratio: 1;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-image: image('diamond.svg');
+      filter: var(--icon-filter);
+
+      &:checked {
+        background-image: image('diamond-filled.svg');
+      }
+    }
+
+    // move 0 slot to end
+    &--0 {
+      order: 1;
+      padding-left: $grid-gutter-col;
+      border-left: 2px solid $text-color;
+
+      input {
+        background-image: image('circle-x.svg');
+      }
+    }
+  }
+
+  // fill in previous radios
+  @each $selected in 1, 2, 3, 4, 5, 6, 7, 8, 9 {
+    @each $fill in 9, 8, 7, 6, 5, 4, 3, 2, 1 {
+      @if $fill < $selected {
+        input[name='attr_style'][value='#{$selected}'] {
+          ~ #{$this}__checkbox--#{$fill} input {
+            background-image: image('diamond-filled.svg');
+          }
+        }
+      }
+    }
+  }
+}

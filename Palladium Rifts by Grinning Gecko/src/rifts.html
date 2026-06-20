@@ -1,10 +1,34 @@
 <input type="hidden" class="debug" name="attr_debug" />
+<input type="hidden" class="opt_dodge_penalty" name="attr_opt_dodge_penalty" />
 <main id="megaverse" class="">
   <img
     class="logo"
     src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Palladium%20Rifts%20by%20Grinning%20Gecko/rifts-logo.png"
   />
   <span name="attr_character_name"></span>
+  <input type="hidden" class="youtube-toggle" name="attr_youtube" />
+  <span style="float:right;" class="youtube-link">
+    Links will appear in chat:
+    <button
+      style="font-size: 1em;"
+      class="no-dice"
+      type="roll"
+      value="[YouTube Sheet Tutorials](https://www.youtube.com/playlist?list=PLZk7Im2gciP87Imdx6GcVrZT6JAK10zvv)"
+      name="roll_youtube"
+    >
+      YouTube Sheet Tutorials
+    </button>
+    <button
+      style="font-size: 1em;"
+      class="no-dice"
+      type="roll"
+      value="[Support & Request Thread](https://app.roll20.net/forum/post/12397464/palladium-rifts-by-grinning-gecko-support-and-request-thread)"
+      name="roll_support"
+    >
+      Support & Request Thread
+    </button>
+  </span>
+
   <div class="r-tabbed">
     <input type="radio" id="tab-core" name="css-tabs" checked />
     <input type="radio" id="tab-skills" name="css-tabs" />
@@ -212,6 +236,10 @@
                   ><span><b>Row ID:</b></span>
                   <input type="text" readonly name="attr_rowid" value=""
                 /></label>
+                <label
+                  ><span><b>Bonus ID:</b></span>
+                  <input type="text" readonly name="attr_bonus_id" value=""
+                /></label>
               </div>
               <!-- inject:partials/repeating_modifiers.html -->
               <!-- endinject -->
@@ -261,6 +289,10 @@
                     ><span><b>Row ID:</b></span>
                     <input type="text" readonly name="attr_rowid" value=""
                   /></label>
+                  <label
+                    ><span><b>Bonus ID:</b></span>
+                    <input type="text" readonly name="attr_bonus_id" value=""
+                  /></label>
                 </div>
                 <h2>Modifiers</h2>
                 <!-- inject:partials/repeating_modifiers.html -->
@@ -285,6 +317,7 @@
         </label>
         <label>
           <span>Spell Strength</span>
+          <input type="hidden" name="attr_base_spellstrength" value="12" />
           <input type="number" name="attr_spellstrength" value="0" />
         </label>
         <div class="heading">
@@ -293,6 +326,7 @@
           <h5>Spell Level</h5>
           <h5>Range</h5>
           <h5>Duration</h5>
+          <h5>Frequency</h5>
           <h5>Damage</h5>
           <h5></h5>
           <h5></h5>
@@ -321,6 +355,10 @@
                 <label
                   ><span><b>Row ID:</b></span>
                   <input type="text" readonly name="attr_rowid" value=""
+                /></label>
+                <label
+                  ><span><b>Bonus ID:</b></span>
+                  <input type="text" readonly name="attr_bonus_id" value=""
                 /></label>
               </div>
               <h2>Modifiers</h2>
@@ -356,6 +394,7 @@
           <h5>Psionic</h5>
           <h5>Range</h5>
           <h5>Duration</h5>
+          <h5>Frequency</h5>
           <h5>Damage</h5>
           <h5></h5>
           <h5></h5>
@@ -385,6 +424,10 @@
                   ><span><b>Row ID:</b></span>
                   <input type="text" readonly name="attr_rowid" value=""
                 /></label>
+                <label
+                  ><span><b>Bonus ID:</b></span>
+                  <input type="text" readonly name="attr_bonus_id" value=""
+                /></label>
               </div>
               <h2>Modifiers</h2>
               <!-- inject:partials/repeating_modifiers.html -->
@@ -400,23 +443,134 @@
         <div class="bonuses-container">
           <h3>Modifiers, Weapons, Armor, Gear</h3>
           <div class="repeating-bonuses-outer">
+            <div class="heading">
+              <h5>Info</h5>
+              <h5>Ability</h5>
+              <h5>Range</h5>
+              <h5>Duration</h5>
+              <h5>Frequency</h5>
+              <h5>Damage</h5>
+              <h5></h5>
+              <h5></h5>
+              <h5 title="Damage Capacity">D.C.</h5>
+              <h5>Skill</h5>
+              <h5></h5>
+              <h5>Level</h5>
+            </div>
             <fieldset class="repeating_modifiers">
               <details class="info">
                 <summary>
-                  <div class="bonus-thing-heading">
+                  <div class="abilities-list">
                     <b class="click-expand"
-                      ><span title="Click for more info">&nbsp;&#9432;</span></b
+                      ><span class="not-readonly" title="Click for more info"
+                        >&nbsp;&#9432;</span
+                      ></b
                     >
-                    <label
-                      ><span>Name</span>
-                      <input type="text" name="attr_name" />
-                    </label>
-                    <label
-                      ><span>Level</span>
-                      <input type="number" value="1" name="attr_level" />
-                    </label>
+                    <input type="text" value="" name="attr_name" />
+                    <input type="hidden" value="0" name="attr_range" />
+                    <span name="attr_range"></span>
+                    <input type="hidden" value="0" name="attr_duration" />
+                    <span name="attr_duration"></span>
+                    <input type="hidden" value="0" name="attr_frequency" />
+                    <span name="attr_frequency"></span>
+                    <span name="attr_damage"></span>
+                    <input type="hidden" value="0" name="attr_damage" />
+                    <span name="attr_damage_unit"></span>
+                    <button
+                      type="roll"
+                      value="@{opt_whisper}&{template:custom} {{title=@{character_name} connects with @{name}}} {{Damage=[[@{damage_modifier}]] @{damage_modifier_unit}}}"
+                      name="roll_powerability_damage"
+                    ></button>
+                    <input type="hidden" value="0" name="attr_dc" />
+                    <span name="attr_dc"></span>
+                    <input type="hidden" value="0" name="attr_percentage" />
+                    <span name="attr_percentage"></span>
+                    <button
+                      type="roll"
+                      value="@{opt_whisper}&{template:skill} [[ [[{@{percentage} + [[ {{ @{opt_iq_bonus},0 }dl1 } * @{active_profile_mod_iq_bonus} ]] +(?{Modifier?|0}),98}kl1]] + [[1d100]] ]] {{title=@{character_name} uses @{name}}} {{target=$[[1]]}} {{roll=$[[2]]}} {{total=$[[3]]}} {{add_skill=[[@{opt_add_skill}]]}}"
+                      name="roll_powerability_skill"
+                      class="pop-out"
+                    ><span>R</span></button>
+                    <input type="number" value="1" name="attr_level" />
                   </div>
                 </summary>
+                <br />
+                <div class="ability-details">
+                  <label
+                    ><span>Starting range</span
+                    ><input type="number" value="0" name="attr_range_starting"
+                  /></label>
+                  <label
+                    ><span>Range per level</span
+                    ><input type="number" value="0" name="attr_range_per_level"
+                  /></label>
+                  <label
+                    ><span>Range unit</span
+                    ><input type="text" value="" name="attr_range_unit" list="distance-units" />
+                  </label>
+                  <label
+                    ><span>Starting duration</span
+                    ><input type="number" value="0" name="attr_duration_starting"
+                  /></label>
+                  <label
+                    ><span>Duration per level</span
+                    ><input type="number" value="0" name="attr_duration_per_level"
+                  /></label>
+                  <label
+                    ><span>Duration unit</span
+                    ><input type="text" value="" name="attr_duration_unit" list="time-units" />
+                  </label>
+                  <label
+                    ><span>Starting frequency</span
+                    ><input type="number" value="0" name="attr_frequency_starting"
+                  /></label>
+                  <label
+                    ><span>Frequency per level</span
+                    ><input type="number" value="0" name="attr_frequency_per_level"
+                  /></label>
+                  <label
+                    ><span>Frequency unit</span
+                    ><input
+                      type="text"
+                      value=""
+                      name="attr_frequency_unit"
+                      list="frequency-units"
+                    />
+                  </label>
+                  <label
+                    ><span>Starting damage</span
+                    ><input type="text" value="0" name="attr_damage_starting"
+                  /></label>
+                  <label
+                    ><span>Damage per level</span
+                    ><input type="text" value="0" name="attr_damage_per_level"
+                  /></label>
+                  <label
+                    ><span>Damage unit</span
+                    ><input type="text" value="" name="attr_damage_unit" list="damage-units" />
+                  </label>
+                  <label
+                    ><span title="Starting Damage Capacity">Starting D.C.</span
+                    ><input type="number" value="0" name="attr_dc_starting"
+                  /></label>
+                  <label
+                    ><span title="Damage Capacity per level">D.C. per level</span
+                    ><input type="number" value="0" name="attr_dc_per_level"
+                  /></label>
+                  <label
+                    ><span title="Damage Capacity unit">D.C. unit</span
+                    ><input type="text" value="" name="attr_dc_unit" list="damage-units" />
+                  </label>
+                  <label
+                    ><span>Starting skill %</span
+                    ><input type="number" value="0" name="attr_percentage_starting"
+                  /></label>
+                  <label
+                    ><span>Skill % per level</span
+                    ><input type="number" value="0" name="attr_percentage_per_level"
+                  /></label>
+                  <label></label>
+                </div>
                 <div class="details-body">
                   <label class="description"
                     ><b>Description</b>
@@ -430,6 +584,10 @@
                     <label
                       ><span><b>Row ID:</b></span>
                       <input type="text" readonly name="attr_rowid" value=""
+                    /></label>
+                    <label
+                      ><span><b>Bonus ID:</b></span>
+                      <input type="text" readonly name="attr_bonus_id" value=""
                     /></label>
                   </div>
                   <!-- inject:partials/repeating_modifiers.html -->
@@ -490,6 +648,36 @@
                 </fieldset>
               </div>
               <hr />
+              <div class="armor">
+                <h3>Ammo</h3>
+                <div class="armor-damage">
+                  <label
+                    >Rounds
+                    <input
+                      type="number"
+                      placeholder="Rounds"
+                      name="attr_ammorounds"
+                    />
+                  </label>
+                  <button type="action" name="act_ammodeductrounds">
+                    Deduct Rounds
+                  </button>
+                </div>
+                <div class="armor-labels heading">
+                  <label>Active</label>
+                  <label>Weapon</label>
+                  <label>Full Clips</label>
+                  <label>Rounds per Clip</label>
+                  <label>Current Clip</label>
+                </div>
+                <fieldset class="repeating_ammo">
+                  <div class="repeating_ammo-inner">
+                    <!-- inject:partials/ammo.html -->
+                    <!-- endinject -->
+                  </div>
+                </fieldset>
+              </div>
+              <hr />
               <div class="profile-builder">
                 <div class="profiles repeating-bonuses-outer">
                   <div class="profiles-inner">
@@ -497,18 +685,26 @@
                     <button type="action" name="act_getdefaultprofile">
                       Debug Defaults
                     </button>
+                    <button
+                      type="action"
+                      name="act_updateprofiles"
+                      class="metal-btn btn-silver-flat"
+                    >
+                      Refresh All Profiles &#x27F3;
+                    </button>
                     <input type="hidden" name="attr_default_mdc" />
                     <input type="hidden" name="attr_default_profile" />
                     <label>Active</label>
                     <fieldset class="repeating_profiles">
                       <div class="repeating_profiles-inner">
-                        <label>
+                        <label class="radio-style">
                           <input
                             type="checkbox"
                             class="is-default"
                             name="attr_is_default"
                             value="1"
                           />
+                          <span class="checkmark"></span>
                         </label>
                         <details class="info profile">
                           <summary>
@@ -625,6 +821,10 @@
                 <div class="details-body">
                   <!-- inject:partials/repeating_modifiers_readonly.html -->
                   <!-- endinject -->
+                  <label
+                    ><span>Selection ID</span>
+                    <input type="text" readonly name="attr_selection_id" value="" />
+                  </label>
                 </div>
               </details>
             </fieldset>
@@ -669,6 +869,9 @@
   /* endinject */
 
   /* inject:js/armor.js */
+  /* endinject */
+
+  /* inject:js/ammo.js */
   /* endinject */
 
   /* inject:js/profiles.js */

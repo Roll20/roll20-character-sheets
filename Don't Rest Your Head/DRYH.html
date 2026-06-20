@@ -1,0 +1,1408 @@
+
+<!-- Load things up-->
+<!-- Translation: +translate, +t, +translations-->
+<!-- Attribute Display: +display, +d-->
+<!-- Input Elements: +select, +option, +toption, +hidden, +text, +textarea-->
+<!-- Visibility Controls: +hider, +shower, +mhider, +thider, +tdimmer, +tshower, +hideif-->
+<!-- Checkboxes: +cbox, +stbox-->
+<!-- Fieldset structure: +fieldset-->
+<!-- Layout conveniences: +d6, +advisory-->
+<script type="text/worker">// Functions
+
+var uniqueids = {}; // Need this to persist across executions
+
+var generateActuallyUniqueRowID = function() {
+	var generated = generateRowID();
+	while ( uniqueids[generated] === true ) {
+		log("generateActuallyUniqueRowID: " + generated + " is not a unique ID, trying again.");
+		generated = generateRowID();
+	}
+	// log("generateActuallyUniqueRowID: " + generated + " verified as unique, returning.");
+	uniqueids[generated] = true;
+	return generated;
+}; 
+
+var gTBK = function(t) {
+	if ( typeof t === "undefined" ) {
+		return "";
+	} else {
+		var result = getTranslationByKey(t);
+		// log(`${t} -> ${result}`,"translation")
+		if ( result === false ) {
+			log("could not translate: " + t);
+			// return "UNTRANSLATED ["+t+"]";
+			return t; // It's untranslated, but we want it to fail over to the original language
+		} else {
+			if ( result === "" ) { return ""; }
+			else { return result; }
+		}
+	}
+};
+
+const qLists = {
+	"standard": [
+		"What’s been keeping you awake?",
+		"What just happened to you?",
+		"What’s on the surface?",
+		"What lies beneath?",
+		"What’s your path?",
+	],
+	"badman": [
+		"Why can’t you sleep?",
+		"What just happened to you?",
+		"What do the other kids think of you?",
+		"What is home really like?",
+		"Why do you deserve to be punished?",
+		"What do you wish upon a star for?",
+	]
+};
+
+var qSetup = function(q) {
+	log("qSetup!");
+	if ( typeof q !== "undefined" && typeof qLists[q] !== undefined ) {
+		var wa = {};
+		setAttrs({ "setquestionnaire": "" }); // we want to clear this out real fast so it doesn't glitch!
+		qLists[q].forEach( (query) => {
+			var stringid = "repeating_questions_" + generateActuallyUniqueRowID();
+			wa[`${stringid}_query`] = gTBK(query); 
+		});
+		setAttrs(wa);
+	}
+}
+
+// Event Handlers
+
+on("sheet:opened", function(event) {
+	log("sheet:opened");
+	log(event);
+	getAttrs([
+		"dryh-sheet-migrated", "scardescription1", "scarbox1", "scardescription2", "scarbox2", "scardescription3", "scarbox3", "scardescription4", "scarbox4", "qawake", "qhappening", "qsurface", "qbeneath", "qpath","madness","tmadness","discipline","exhaustion","setquestionnaire"
+	], function(a) {
+		var dowrite = false;
+		var wa = {}; // write attributes
+		log(a);
+		["madness","tmadness","exhaustion"].forEach( (n) => {
+			log(n); log(a[n]);
+			if(typeof(a[n]) == "undefined") {
+				wa[n] = 0; dowrite = true;
+			}
+		});
+		log("discipline"); log(a["discipline"]);
+		if(typeof(a["discipline"]) == "undefined" || a["discipline"] == "") {
+			wa.discipline = 3; dowrite = true;
+		}
+		if(typeof(a["setquestionnaire"]) !== "undefined" && a["setquestionnaire"] !== "") {
+			qSetup(a["setquestionnaire"]);
+		}
+		if(typeof(a["dryh-sheet-migrated"]) == "undefined") {
+			// Then proceed!
+			wa["dryh-sheet-migrated"] = "yes"; 
+			dowrite = true; 
+			[1,2,3,4].forEach( (n) => {
+				if( typeof(a["scarbox"+n]) !== "undefined" ) {
+					// Then we should create a scar row
+					var boxval = a["scarbox"+n];
+					var desc = "";
+					if( typeof(a["scardescription"+n]) !== "undefined" ) { desc = a["scardescription"+n]; }
+					var stringid = "repeating_scars_" + generateActuallyUniqueRowID();
+					wa[`${stringid}_description`] = desc; 
+					wa[`${stringid}_toggle_box`] = 0; // Creates our starter Scar entry
+					if ( boxval == "on" ) {
+						wa[`${stringid}_toggle_box`] = 1;
+					}
+				}
+			});
+			if( typeof(a["qawake"]) !== "undefined" ) {
+				var stringid = "repeating_questions_" + generateActuallyUniqueRowID();
+				wa[`${stringid}_query`] = gTBK("What’s been keeping you awake?")
+				wa[`${stringid}_response`] = a["qawake"];
+			}
+			if( typeof(a["qhappening"]) !== "undefined" ) {
+				var stringid = "repeating_questions_" + generateActuallyUniqueRowID();
+				wa[`${stringid}_query`] = gTBK("What just happened to you?")
+				wa[`${stringid}_response`] = a["qhappening"];
+			}
+			if( typeof(a["qsurface"]) !== "undefined" ) {
+				var stringid = "repeating_questions_" + generateActuallyUniqueRowID();
+				wa[`${stringid}_query`] = gTBK("What’s on the surface?")
+				wa[`${stringid}_response`] = a["qsurface"];
+			}
+			if( typeof(a["qbeneath"]) !== "undefined" ) {
+				var stringid = "repeating_questions_" + generateActuallyUniqueRowID();
+				wa[`${stringid}_query`] = gTBK("What lies beneath?")
+				wa[`${stringid}_response`] = a["qbeneath"];
+			}
+			if( typeof(a["qpath"]) !== "undefined" ) {
+				var stringid = "repeating_questions_" + generateActuallyUniqueRowID();
+				wa[`${stringid}_query`] = gTBK("What’s your path?")
+				wa[`${stringid}_response`] = a["qpath"];
+			}
+		}
+		// Got all the attributes to set; set em!
+		log(wa);
+		if ( dowrite ) { setAttrs(wa); }
+	});
+});
+
+const dcap = {
+	"discipline": 3,
+	"madness": 3,
+	"tmadness": 6,
+	"exhaustion": 6,
+	"pain": 15
+};
+
+on("clicked:increment clicked:decrement", function(event) {
+	log(event.triggerName);
+	var tn = event.triggerName;
+	var what = event.htmlAttributes.value;
+	getAttrs([what], function(a) {
+		var val = 0; var sa = {};
+		if ( typeof(a[what]) !== "undefined" ) {
+			val = Number(a[what]);
+		}
+		if ( tn == "clicked:increment" ) {
+			val++;
+			if ( val > dcap[what] ) { val = dcap[what]; }
+		}
+		if ( tn == "clicked:decrement" ) {
+			val--;
+			if ( val < 0 ) { val = 0; }
+		}
+		sa[what] = val;
+		setAttrs(sa);
+		log(sa);
+	});
+});
+
+on("clicked:repeating_nightmares:increment clicked:repeating_nightmares:decrement", function(event) {
+	log(event.triggerName);
+	var tn = event.triggerName;
+	var what = event.htmlAttributes.value;
+	var whatkey = what;
+	var ats = {};
+	var rowprefix = "";
+	if ( typeof(event.sourceAttribute) !== "undefined" ) {
+		rowprefix = (event.sourceAttribute).slice(0,-9); // Strips off the 'increment'
+		tn = (event.sourceAttribute).slice(-9); // Leaves only the 'increment'
+	}
+	what = rowprefix+what;
+	getAttrs([what], function(a) {
+		var val = 0; var sa = {};
+		if ( typeof(a[what]) !== "undefined" ) {
+			val = Number(a[what]);
+		}
+		if ( tn == "increment" ) {
+			val++;
+			if ( val > dcap[whatkey] ) { val = dcap[whatkey]; }
+		}
+		if ( tn == "decrement" ) {
+			val--;
+			if ( val < 0 ) { val = 0; }
+		}
+		sa[what] = val;
+		setAttrs(sa);
+		log(sa);
+	});
+});
+
+on("clicked:mark clicked:repeating_scars:mark", function(event) {
+	log("clicked:mark (of some sort)");
+	var what = event.htmlAttributes.value;
+	var ats = {};
+	var rowprefix = "";
+	if ( typeof(event.sourceAttribute) !== "undefined" ) {
+		rowprefix = (event.sourceAttribute).slice(0,-4); // Strips off the 'mark'
+	}
+	var atname = rowprefix + "toggle_" + what;
+	ats[atname] = 1;
+	var numfind = /[0-9]*$/;
+	var numfound = numfind.exec(atname);
+	var namefind = /^.*seq[^0-9]/;
+	var namefound = namefind.exec(atname);
+	log(namefound);
+	if ( numfound[0] == "" || numfound[0] == "1" || namefound == null ) { 
+		setAttrs(ats);
+		log(what + " mark");
+		log(numfound);
+		log(event);
+		log(ats);
+	} else {
+		log("we have a potential sequence");
+		var seq = Number(numfound[0]);
+		var seqs = []; var s = 0;
+		while(seq > 1) {
+			seq--;
+			seqs[s] = namefound+seq;
+			s++;
+		}
+		log("sequences to retrieve...")
+		log(seqs);
+		getAttrs(seqs,function(a) {
+			for(var i = 0; i < seqs.length; i++) {
+				var val = a[seqs[i]];
+				if ( val == "0" ) { // We only auto-mark empty boxes, not "itched" ones (val == 2)
+					ats[seqs[i]] = "1";
+				}
+			}
+			setAttrs(ats);
+			log(namefound);
+			log(what + " mark");
+			log(numfound);
+			log(event);
+			log(ats);
+		});
+	}
+});
+
+on("clicked:unmark clicked:repeating_scars:unmark", function(event) {
+	log("clicked:unmark (of some sort)");
+	var what = event.htmlAttributes.value;
+	var ats = {};
+	var rowprefix = "";
+	if ( typeof(event.sourceAttribute) !== "undefined" ) {
+		rowprefix = (event.sourceAttribute).slice(0,-6); // Strips off the 'unmark'
+	}
+	var atname = rowprefix + "toggle_" + what;
+	ats[atname] = 0;
+
+	var numfind = /[0-9]*$/;
+	var numfound = numfind.exec(atname);
+	var namefind = /^.*seq[^0-9]/;
+	var namefound = namefind.exec(atname);
+	log(namefound);
+	if ( numfound[0] == "" || namefound == null ) { 
+		setAttrs(ats);
+		log(what + " unmark");
+		log(numfound);
+		log(event);
+		log(ats);
+	} else {
+		log("we have a potential sequence");
+		var seq = Number(numfound[0]);
+		var seqs = []; var s = 0;
+		while(seq < 41) {
+			seq++;
+			seqs[s] = namefound+seq;
+			s++;
+		}
+		log(seqs);
+		getAttrs(seqs,function(a) {
+			log(a);
+			for(var i = 0; i < seqs.length; i++) {
+				var val = a[seqs[i]];
+				if ( val == "1" ) { // We only change it to unmarked if it's normal-marked. If val == "2", then it's "itched" and requires special attention.
+					ats[seqs[i]] = "0";
+				}
+			}
+			setAttrs(ats);
+			log(namefound);
+			log(what + " unmark");
+			log(numfound);
+			log(event);
+			log(ats);
+		});
+	}
+});
+
+on("clicked:strike clicked:repeating_scars:strike", function(event) {
+	log("clicked:strike (of some sort)");
+	var what = event.htmlAttributes.value;
+	var ats = {};
+	var rowprefix = "";
+	if ( typeof(event.sourceAttribute) !== "undefined" ) {
+		rowprefix = (event.sourceAttribute).slice(0,-6); // Strips off the 'strike'
+	}
+	var atname = rowprefix + "toggle_" + what;
+	ats[atname] = 2;
+
+	var numfind = /[0-9]*$/;
+	var numfound = numfind.exec(atname);
+	if ( numfound[0] == "" ) { 
+		setAttrs(ats);
+		log(what + " strike");
+		log(numfound);
+		log(event);
+		log(ats);
+	}
+});
+
+on("clicked:repeating_nightmares:painroll", function(event) {
+	log(event.triggerName);
+	var what = event.htmlAttributes.value;
+	var ats = {};
+	var rowprefix = "";
+	if ( typeof(event.sourceAttribute) !== "undefined" ) {
+		rowprefix = (event.sourceAttribute).slice(0,-8); // Strips off the 'painroll'
+	}
+	getAttrs([
+		rowprefix+"pain",
+		rowprefix+"name",
+	], function(a) {
+		log(a);
+		var template = 'default'; // for testing
+		var template = 'pcroll'; // for actual
+		var rt;
+		var rt = "&{template:"+template+"} {{name=^{Pain from} @{"+rowprefix+"name}}} {{pain=[[@{"+rowprefix+"pain}]]}} {{successes=[[0]]}} {{dominates=[[0]]}}";
+		var pain = 0;
+		if ( typeof(a[rowprefix+"pain"]) !== "undefined" ) {
+			pain = Number(a[rowprefix+"pain"]);
+		}
+		for (let i = 0; i < pain; i++) {
+			rt += " {{pain" + (i+1) + "=";
+			rt += "[[d6]]";
+			rt += "}}";
+		}
+		log(rt);
+		var c = {};
+		startRoll(rt, (results) => {
+			c.successes = 0;
+			c.dominates = 3; // code for Pain
+			rv = results.results;
+
+			// log(rv); log('vals'); log(vals);
+			
+			var pains = [];
+			var biggest = 0;
+
+			for (let i = 0; i < pain; i++) {
+				if ( rv["pain"+(i+1)].result <= 3 ) {
+					c.successes++;
+				}
+				pains[i] = rv["pain"+(i+1)].result;
+				if ( i > biggest ) { biggest = i; }
+			}
+
+			pains.sort(function(a,b) { return b - a });
+			for (let i = 0; i < pain; i++) {
+				c["pain"+(i+1)] = pains[i];
+			}
+
+			finishRoll(results.rollId, c);
+			log(results);
+			log(c);
+		});
+	});
+});
+
+on("clicked:pcroll", function(event) {
+	log(event.triggerName);
+	getAttrs(["discipline","madness","exhaustion","tmadness","use-etalent","use-mtalent","exhaustiontal","madnesstal"], function(a) {
+			var vals = {
+				discipline: 0, madness: 0, exhaustion: 0, tmadness: 0
+			};
+			["discipline","madness","exhaustion","tmadness","use-etalent","use-mtalent"].forEach( (f) => {
+				if ( typeof(a[f]) !== "undefined" ) {
+					vals[f] = Number(a[f]);
+				}
+			});
+			vals.madness = vals.madness + vals.tmadness;
+			// log(vals);
+
+			var template = 'default'; // for testing
+			var template = 'pcroll'; // for actual
+			var rt = "&{template:"+template+"} {{name=@{character_name} ^{rolls}}} {{successes=[[0]]}} {{dominates=[[0]]}} {{usemtal=[[@{use-mtalent}]]}} {{mtal=@{madnesstal}}} {{useetal=[[@{use-etalent}]]}} {{etal=@{exhaustiontal}}} {{exhaustion=@{exhaustion}}}";
+
+			for (let i = 0; i < vals.discipline; i++) {
+				rt += " {{discipline" + (i+1) + "=";
+				rt += "[[d6]]";
+				rt += "}}";
+			}
+
+			for (let i = 0; i < vals.madness; i++) {
+				rt += " {{madness" + (i+1) + "=";
+				rt += "[[d6]]";
+				rt += "}}";
+			}
+
+			for (let i = 0; i < vals.exhaustion; i++) {
+				rt += " {{exhaustion" + (i+1) + "=";
+				rt += "[[d6]]";
+				rt += "}}";
+			}
+
+			var c = {};
+			startRoll(rt, (results) => {
+				c.successes = 0;
+				c.dominates = "";
+				rv = results.results;
+
+				// log(rv); log('vals'); log(vals);
+				
+				var discipline = [];
+				var madness = [];
+				var exhaustion = [];
+				var biggest = 0;
+
+				for (let i = 0; i < vals.discipline; i++) {
+					if ( rv["discipline"+(i+1)].result <= 3 ) {
+						c.successes++;
+					}
+					discipline[i] = rv["discipline"+(i+1)].result;
+					if ( i > biggest ) { biggest = i; }
+				}
+
+				discipline.sort(function(a,b) { return b - a });
+				for (let i = 0; i < vals.discipline; i++) {
+					c["discipline"+(i+1)] = discipline[i];
+					if ( i > biggest ) { biggest = i; }
+				}
+				// log(discipline);
+
+				for (let i = 0; i < vals.madness; i++) {
+					if ( rv["madness"+(i+1)].result <= 3 ) {
+						c.successes++;
+					}
+					madness[i] = rv["madness"+(i+1)].result;
+				}
+
+				madness.sort(function(a,b) { return b - a });
+				for (let i = 0; i < vals.madness; i++) {
+					c["madness"+(i+1)] = madness[i];
+					if ( i > biggest ) { biggest = i; }
+				}
+				// log(madness);
+
+				for (let i = 0; i < vals.exhaustion; i++) {
+					if ( rv["exhaustion"+(i+1)].result <= 3 ) {
+						c.successes++;
+					}
+					exhaustion[i] = rv["exhaustion"+(i+1)].result;
+				}
+
+				exhaustion.sort(function(a,b) { return b - a });
+				for (let i = 0; i < vals.exhaustion; i++) {
+					c["exhaustion"+(i+1)] = exhaustion[i];
+					if ( i > biggest ) { biggest = i; }
+				}
+				// log(exhaustion);
+
+				// Larger pool wins, but if they're on equal footing, discipline beats madness; madness beats exhaustion; exhaustion beats pain
+				// Override indicates that something has failed to stay in the running, so all subsequent values of the array should be taken as zero
+				var doverride = false; var moverride = false; var eoverride = false;
+				// Give dominates an always-wrong value
+				c["dominates"] = -1;
+				for (let i = 0; i < (biggest+1); i++) {
+					var d = 0; m = 0; e = 0;
+					if ( doverride ) {
+						d = 0;
+					} else if ( typeof(discipline[i]) !== "undefined") {
+						d = discipline[i];
+					}
+					if ( moverride ) {
+						m = 0;
+					} else if ( typeof(madness[i]) !== "undefined") {
+						m = madness[i];
+					}
+					if ( eoverride ) {
+						e = 0;
+					} else if ( typeof(exhaustion[i]) !== "undefined") {
+						e = exhaustion[i];
+					}
+					
+					log("d = "+d+" m = "+m+" e = "+e);
+				 // Making this numeric will work better with the roll template. So 0 = discipline, 1 = madness, 2 = exhaustion
+					if ( d > m && d > e ) {
+						// Then discipline wins
+						c["dominates"] = 0; break;
+					} else if ( m > d && m > e ) {
+						// Then madness wins
+						c["dominates"] = 1; break;
+					} else if ( e > d && e > m ) {
+						// Then exhaustion wins
+						c["dominates"] = 2; break;
+					} else if ( d > m && d == e ) {
+						// Then we have a two-way tie, but we need to flag that m is no longer in the fight.
+						moverride = true;
+					} else if ( d > e && d == m ) {
+						// Then we have a two-way tie, but we need to flag that e is no longer in the fight.
+						eoverride = true;
+					} else if ( m > d && m == e ) {
+						// Then we have a two-way tie, but we need to flag that d is no longer in the fight.
+						doverride = true;
+					}
+
+				}
+
+				// If we're here and c.dominates still = -1, then it's a tie all the way down for at least two of them, and we need to look at pool identities
+				if ( c.dominates == -1 ) {
+					if ( ! doverride ) {
+						// Then discipline stayed in the running, and wins
+						c.dominates = 0;
+					} else if ( ! moverride ) {
+						// Then discipline didn't stay in the running but madness did, and wins
+						c.dominates = 1;
+					} else if ( ! eoverride ) {
+						// Then neither d or m stayed in the running but e did, and wins
+						c.dominates = 2;
+					}
+				}
+
+				// Also need to check in on exhaustion talent and see if it was used
+				log(vals);
+				if ( vals["use-etalent"] == 1 ) {
+					log("Minor Use");
+					// Minor use; enforce minimum value for c.successes
+					if ( c.successes < vals.exhaustion ) {
+						c.successes = vals.exhaustion;
+					}
+				} else if ( vals["use-etalent"] == 2 ) {
+					// Major use; add value to c.successes
+						c.successes += vals.exhaustion;
+				}
+
+				finishRoll(results.rollId, c);
+				log(results);
+				log(discipline);
+				log(c);
+			});
+	});
+});
+
+on("clicked:upsort clicked:downsort", function(event) {
+	var field = event.htmlAttributes.value;
+	var direction = event.triggerName;
+	log(event);
+	getSectionIDs("repeating_nightmares", function(ids) {
+		var sorted = []; var ats = [];
+		log(ids); log(field);
+		if ( field == "creation" ) {
+			ids.sort(function(one,two) { 
+				if ( direction == "clicked:upsort" ) {
+					return one.localeCompare(two); 
+				} else {
+					return two.localeCompare(one); 
+				}
+			});
+			log(ids);
+			setSectionOrder("nightmares",ids);
+		} else {
+			for(i = 0; i < ids.length; i++) {
+				ats[i] = "repeating_nightmares_"+ids[i]+"_"+field;
+			}
+			getAttrs(ats, function(a) {
+				log(a);
+				if ( field == "name" ) {
+					ids.sort(function(one,two) { 
+						var first = a["repeating_nightmares_"+one+"_"+field].toLowerCase();
+						var second = a["repeating_nightmares_"+two+"_"+field].toLowerCase();
+						if ( direction == "clicked:upsort" ) {
+							return first.localeCompare(second); 
+						} else {
+							return second.localeCompare(first); 
+						}
+					});
+					log(ids);
+				} else if ( field == "pain" ) {
+					ids.sort(function(one,two) {
+						var first = Number(a["repeating_nightmares_"+one+"_"+field]);
+						var second = Number(a["repeating_nightmares_"+two+"_"+field]);
+						log(first+" vs "+second);
+						if ( direction == "clicked:upsort" ) {
+							return(first - second); 
+						} else {
+							return(second - first); 
+						}
+						
+					});
+					log(ids);
+				}
+				setSectionOrder("nightmares",ids);
+			});
+		}
+	});
+});
+
+</script>
+<div class="wrapper">
+  <div class="modeblock">
+    <input class="shower" name="attr_sheetmode" type="hidden" value=""/>
+    <select name="attr_sheetmode">
+      <option value="" data-i18n="Which kind of sheet?"></option>
+      <option value="character" data-i18n="Awake PC"></option>
+      <option value="nightmare" data-i18n="GM's Nightmares"></option>
+    </select>
+  </div>
+  <input class="mhider" name="attr_sheetmode" type="hidden" value=""/>
+  <div class="pc">
+    <div class="name span2"><span name="attr_character_name"></span>
+    </div>
+    <div class="description span2">
+      <input type="text" name="attr_description" data-i18n-placeholder="Character concept"/>
+    </div>
+    <div class="c2">
+      <div class="left">
+        <div class="dice">
+          <div class="header with-info discipline"><span data-i18n="Discipline">Discipline</span> 
+            <div class="outer">
+              <input class="thider" name="attr_toggle_adv-d" type="hidden" value="0"/>
+              <button class="cbox info marked" type="action" name="act_unmark" value="adv-d"></button>
+              <input class="tshower" name="attr_toggle_adv-d" type="hidden" value="0"/>
+              <button class="cbox info unmarked" type="action" name="act_mark" value="adv-d"></button>
+            </div>
+            <input class="thider" name="attr_toggle_adv-d" type="hidden" value="0"/>
+          </div>
+          <div class="data discipline">
+            <div class="controls">
+              <input class="hideif-0" type="hidden" name="attr_discipline" value="3"/>
+              <button type="action" name="act_decrement" value="discipline">do_not_disturb_on</button><span class="number" name="attr_discipline"></span>
+              <input class="hideif-3" type="hidden" name="attr_discipline" value="3"/>
+              <button type="action" name="act_increment" value="discipline">add_circle</button>
+            </div>
+            <input class="d6display" type="hidden" name="attr_discipline" value="3"/><span class="die d6">g</span><span class="die d6">h</span><span class="die d6">i</span><span class="die d6">j</span><span class="die d6">k</span><span class="die d6">l</span>
+          </div>
+          <input class="thider" name="attr_toggle_adv-d" type="hidden" value="0"/>
+          <div class="advisory"><span data-i18n="&lt;b&gt;If you lose all discipline, you become a Nightmare:&lt;/b&gt; You become an NPC with a Pain rating equal to the total number of dice you rolled when you snapped.&lt;br&gt;&lt;br&gt;Always rolled.">&lt;b&gt;If you lose all discipline, you become a Nightmare:&lt;/b&gt; You become an NPC with a Pain rating equal to the total number of dice you rolled when you snapped.&lt;br&gt;&lt;br&gt;Always rolled.</span> 
+          </div>
+          <div class="header with-info"><span data-i18n="Madness">Madness</span> 
+            <div class="smallnote"><span data-i18n="(Permanent)">(Permanent)</span> 
+            </div>
+            <div class="outer">
+              <input class="thider" name="attr_toggle_adv-m" type="hidden" value="0"/>
+              <button class="cbox info marked" type="action" name="act_unmark" value="adv-m"></button>
+              <input class="tshower" name="attr_toggle_adv-m" type="hidden" value="0"/>
+              <button class="cbox info unmarked" type="action" name="act_mark" value="adv-m"></button>
+            </div>
+            <input class="thider" name="attr_toggle_adv-m" type="hidden" value="0"/>
+          </div>
+          <div class="data madness">
+            <div class="controls">
+              <input class="hideif-0" type="hidden" name="attr_madness" value="0"/>
+              <button type="action" name="act_decrement" value="madness">do_not_disturb_on</button><span class="number" name="attr_madness"></span>
+              <input class="hideif-3" type="hidden" name="attr_madness" value="0"/>
+              <button type="action" name="act_increment" value="madness">add_circle</button>
+            </div>
+            <input class="d6display" type="hidden" name="attr_madness" value="0"/><span class="die d6">G</span><span class="die d6">H</span><span class="die d6">I</span><span class="die d6">J</span><span class="die d6">K</span><span class="die d6">L</span><span class="die d6">O</span><span class="die d6">L</span>
+          </div>
+          <input class="thider" name="attr_toggle_adv-m" type="hidden" value="0"/>
+          <div class="advisory"><span data-i18n="&lt;b&gt;Permanent Madness&lt;/b&gt; is gained from snapping (see Responses).&lt;br&gt;&lt;br&gt;Always rolled.">&lt;b&gt;Permanent Madness&lt;/b&gt; is gained from snapping (see Responses).&lt;br&gt;&lt;br&gt;Always rolled.</span> 
+          </div>
+          <div class="header with-info exhaustion"><span data-i18n="Exhaustion">Exhaustion</span> 
+            <div class="smallnote"><span data-i18n="(Current)">(Current)</span> 
+            </div>
+            <div class="outer">
+              <input class="thider" name="attr_toggle_adv-e" type="hidden" value="0"/>
+              <button class="cbox info marked" type="action" name="act_unmark" value="adv-e"></button>
+              <input class="tshower" name="attr_toggle_adv-e" type="hidden" value="0"/>
+              <button class="cbox info unmarked" type="action" name="act_mark" value="adv-e"></button>
+            </div>
+            <input class="thider" name="attr_toggle_adv-e" type="hidden" value="0"/>
+          </div>
+          <div class="data exhaustion">
+            <div class="controls">
+              <input class="hideif-0" type="hidden" name="attr_exhaustion" value="0"/>
+              <button type="action" name="act_decrement" value="exhaustion">do_not_disturb_on</button><span class="number" name="attr_exhaustion"></span>
+              <input class="hideif-6" type="hidden" name="attr_exhaustion" value="0"/>
+              <button type="action" name="act_increment" value="exhaustion">add_circle</button>
+            </div>
+            <div>
+              <input class="d6display" type="hidden" name="attr_exhaustion" value="0"/><span class="die d6">G</span><span class="die d6">H</span><span class="die d6">I</span><span class="die d6">J</span><span class="die d6">K</span><span class="die d6">L</span>
+              <div><span data-i18n="Talent:">Talent:</span> 
+                <input class="selert" type="hidden" name="attr_use-etalent" value="0"/>
+                <select name="attr_use-etalent">
+                  <option value="0" data-i18n="No"></option>
+                  <option value="1" data-i18n="Minor"></option>
+                  <option value="2" data-i18n="Major"></option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <input class="thider" name="attr_toggle_adv-e" type="hidden" value="0"/>
+          <div class="advisory"><span data-i18n="Once per roll, you may increase your exhaustion by one.&lt;br&gt;&lt;br&gt;&lt;b&gt;If exhaustion would increase above 6, you crash.&lt;/b&gt; When you crash, you fall asleep for at least one day, or face some other serious defeat (like death). Clear out your response boxes and set your exhaustion to 0. When you reawaken, set your discipline to 1 and lose access to your talents until you stay awake for at least as long as you slept. While vulnerable, the Nightmares can find you.&lt;br&gt;&lt;br&gt;Always rolled.">Once per roll, you may increase your exhaustion by one.&lt;br&gt;&lt;br&gt;&lt;b&gt;If exhaustion would increase above 6, you crash.&lt;/b&gt; When you crash, you fall asleep for at least one day, or face some other serious defeat (like death). Clear out your response boxes and set your exhaustion to 0. When you reawaken, set your discipline to 1 and lose access to your talents until you stay awake for at least as long as you slept. While vulnerable, the Nightmares can find you.&lt;br&gt;&lt;br&gt;Always rolled.</span> 
+          </div>
+          <div class="header tmadness with-info"><span data-i18n="Madness">Madness</span> 
+            <div class="smallnote"><span data-i18n="(Temporary)">(Temporary)</span> 
+            </div>
+            <div class="outer">
+              <input class="thider" name="attr_toggle_adv-tm" type="hidden" value="0"/>
+              <button class="cbox info marked" type="action" name="act_unmark" value="adv-tm"></button>
+              <input class="tshower" name="attr_toggle_adv-tm" type="hidden" value="0"/>
+              <button class="cbox info unmarked" type="action" name="act_mark" value="adv-tm"></button>
+            </div>
+            <input class="thider" name="attr_toggle_adv-tm" type="hidden" value="0"/>
+          </div>
+          <div class="data additional">
+            <div class="madness">
+              <div class="controls">
+                <input class="hideif-0" type="hidden" name="attr_tmadness" value="0"/>
+                <button type="action" name="act_decrement" value="tmadness">do_not_disturb_on</button><span class="number" name="attr_tmadness"></span>
+                <input class="hideif-6" type="hidden" name="attr_tmadness" value="0"/>
+                <button type="action" name="act_increment" value="tmadness">add_circle</button>
+              </div>
+              <div>
+                <input class="d6display" type="hidden" name="attr_tmadness" value="0"/><span class="die d6">G</span><span class="die d6">H</span><span class="die d6">I</span><span class="die d6">J</span><span class="die d6">K</span><span class="die d6">L</span><span class="die d6">O</span><span class="die d6">L</span><span class="die d6">O</span>
+                <div class="micro"><span data-i18n="Talent:">Talent:</span> 
+                  <input class="selert" type="hidden" name="attr_use-mtalent" value="0"/>
+                  <select name="attr_use-mtalent">
+                    <option value="0" data-i18n="No"></option>
+                    <option value="1" data-i18n="Yes"></option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <button type="action" name="act_pcroll"><span data-i18n="Roll Dice">Roll Dice</span> 
+            </button>
+          </div>
+          <input class="thider" name="attr_toggle_adv-tm" type="hidden" value="0"/>
+          <div class="advisory"><span data-i18n="Any time you roll, you may add one to six dice of temporary madness to your roll.">Any time you roll, you may add one to six dice of temporary madness to your roll.</span> 
+          </div>
+        </div>
+        <div class="talents">
+          <div class="header"><span data-i18n="Talents">Talents</span> 
+          </div>
+          <div class="talent">
+            <div class="header with-info"><span data-i18n="Exhaustion Talent">Exhaustion Talent</span> 
+              <div class="outer">
+                <input class="thider" name="attr_toggle_advisory1" type="hidden" value="0"/>
+                <button class="cbox info marked" type="action" name="act_unmark" value="advisory1"></button>
+                <input class="tshower" name="attr_toggle_advisory1" type="hidden" value="0"/>
+                <button class="cbox info unmarked" type="action" name="act_mark" value="advisory1"></button>
+              </div>
+              <input class="thider" name="attr_toggle_advisory1" type="hidden" value="0"/>
+              <div class="advisory">
+                <ul>
+                  <li><span data-i18n="&lt;b&gt;To make minor use of an exhaustion talent&lt;/b&gt;, your exhaustion must be at least one. On the affected roll, your minimum number of successes is equal to your current level of exhaustion.">&lt;b&gt;To make minor use of an exhaustion talent&lt;/b&gt;, your exhaustion must be at least one. On the affected roll, your minimum number of successes is equal to your current level of exhaustion.</span> 
+                  </li>
+                  <li><span data-i18n="&lt;b&gt;To make major use of an exhaustion talent&lt;/b&gt;, you must &lt;b&gt;increase&lt;/b&gt; your exhaustion by one, and you may &lt;b&gt;add&lt;/b&gt; your current level of exhaustion to the roll as successes.">&lt;b&gt;To make major use of an exhaustion talent&lt;/b&gt;, you must &lt;b&gt;increase&lt;/b&gt; your exhaustion by one, and you may &lt;b&gt;add&lt;/b&gt; your current level of exhaustion to the roll as successes.</span> 
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <textarea name="attr_exhaustiontal" placeholder="A talent that allows your character to be thoroughly exceptional (supernaturally so) at a particular thing you can already do." data-i18n-placeholder="A talent that allows your character to be thoroughly exceptional (supernaturally so) at a particular thing you can already do."></textarea>
+          </div>
+          <div class="talent">
+            <div class="header"><span data-i18n="Madness Talent">Madness Talent</span> 
+            </div>
+            <textarea name="attr_madnesstal" placeholder="A talent that allows your character to do something a person simply can't normally do, something which is normally outside of the realm of human possibility." data-i18n-placeholder="A talent that allows your character to do something a person simply can't normally do, something which is normally outside of the realm of human possibility."></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="right">
+        <div class="responses">
+          <div class="header with-info"><span data-i18n="Responses">Responses</span> 
+            <div class="outer">
+              <input class="thider" name="attr_toggle_advisory2" type="hidden" value="0"/>
+              <button class="cbox info marked" type="action" name="act_unmark" value="advisory2"></button>
+              <input class="tshower" name="attr_toggle_advisory2" type="hidden" value="0"/>
+              <button class="cbox info unmarked" type="action" name="act_mark" value="advisory2"></button>
+            </div>
+            <input class="thider" name="attr_toggle_advisory2" type="hidden" value="0"/>
+            <div class="advisory"><span data-i18n="&lt;b&gt;If you must check off a response, but can’t, you snap:&lt;/b&gt; you go mad for a time, clear out your responses, lose one discipline, and gain one permanent madness.">&lt;b&gt;If you must check off a response, but can’t, you snap:&lt;/b&gt; you go mad for a time, clear out your responses, lose one discipline, and gain one permanent madness.</span> 
+            </div>
+          </div>
+          <div class="response">
+            <input class="hideif-0" type="hidden" name="attr_response1" value=""/>
+            <div class="box">
+              <input class="thider" name="attr_toggle_responseuse1" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="responseuse1"></button>
+              <input class="tshower" name="attr_toggle_responseuse1" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="responseuse1"></button>
+            </div>
+            <select name="attr_response1">
+              <option value=""></option>
+              <option value="fight" data-i18n="Fight"></option>
+              <option value="flight" data-i18n="Flight"></option>
+              <option value="freeze" data-i18n="Freeze"></option>
+              <option value="fawn" data-i18n="Fawn"></option>
+              <option value="feast" data-i18n="Feast"></option>
+            </select>
+            <input class="ractivate" type="hidden" name="attr_toggle_responseuse1" value="0"/>
+            <input class="rindicate" type="hidden" name="attr_response1" value=""/><span class="flight" data-i18n="React with &lt;b&gt;total fear.&lt;/b&gt;">React with &lt;b&gt;total fear.&lt;/b&gt;</span> <span class="fight" data-i18n="React with &lt;b&gt;consuming rage.&lt;/b&gt;">React with &lt;b&gt;consuming rage.&lt;/b&gt;</span> <span class="freeze" data-i18n="React with &lt;b&gt;debilitating inaction.&lt;/b&gt;">React with &lt;b&gt;debilitating inaction.&lt;/b&gt;</span> <span class="fawn" data-i18n="React with &lt;b&gt;solicitous appeasement.&lt;/b&gt;">React with &lt;b&gt;solicitous appeasement.&lt;/b&gt;</span> <span class="feast" data-i18n="React with &lt;b&gt;extreme appetite.&lt;/b&gt;">React with &lt;b&gt;extreme appetite.&lt;/b&gt;</span> 
+          </div>
+          <div class="response">
+            <input class="hideif-0" type="hidden" name="attr_response2" value=""/>
+            <div class="box">
+              <input class="thider" name="attr_toggle_responseuse2" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="responseuse2"></button>
+              <input class="tshower" name="attr_toggle_responseuse2" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="responseuse2"></button>
+            </div>
+            <select name="attr_response2">
+              <option value=""></option>
+              <option value="fight" data-i18n="Fight"></option>
+              <option value="flight" data-i18n="Flight"></option>
+              <option value="freeze" data-i18n="Freeze"></option>
+              <option value="fawn" data-i18n="Fawn"></option>
+              <option value="feast" data-i18n="Feast"></option>
+            </select>
+            <input class="ractivate" type="hidden" name="attr_toggle_responseuse2" value="0"/>
+            <input class="rindicate" type="hidden" name="attr_response2" value=""/><span class="flight" data-i18n="React with &lt;b&gt;total fear.&lt;/b&gt;">React with &lt;b&gt;total fear.&lt;/b&gt;</span> <span class="fight" data-i18n="React with &lt;b&gt;consuming rage.&lt;/b&gt;">React with &lt;b&gt;consuming rage.&lt;/b&gt;</span> <span class="freeze" data-i18n="React with &lt;b&gt;debilitating inaction.&lt;/b&gt;">React with &lt;b&gt;debilitating inaction.&lt;/b&gt;</span> <span class="fawn" data-i18n="React with &lt;b&gt;solicitous appeasement.&lt;/b&gt;">React with &lt;b&gt;solicitous appeasement.&lt;/b&gt;</span> <span class="feast" data-i18n="React with &lt;b&gt;extreme appetite.&lt;/b&gt;">React with &lt;b&gt;extreme appetite.&lt;/b&gt;</span> 
+          </div>
+          <div class="response">
+            <input class="hideif-0" type="hidden" name="attr_response3" value=""/>
+            <div class="box">
+              <input class="thider" name="attr_toggle_responseuse3" type="hidden" value="0"/>
+              <button class="cbox marked" type="action" name="act_unmark" value="responseuse3"></button>
+              <input class="tshower" name="attr_toggle_responseuse3" type="hidden" value="0"/>
+              <button class="cbox unmarked" type="action" name="act_mark" value="responseuse3"></button>
+            </div>
+            <select name="attr_response3">
+              <option value=""></option>
+              <option value="fight" data-i18n="Fight"></option>
+              <option value="flight" data-i18n="Flight"></option>
+              <option value="freeze" data-i18n="Freeze"></option>
+              <option value="fawn" data-i18n="Fawn"></option>
+              <option value="feast" data-i18n="Feast"></option>
+            </select>
+            <input class="ractivate" type="hidden" name="attr_toggle_responseuse3" value="0"/>
+            <input class="rindicate" type="hidden" name="attr_response3" value=""/><span class="flight" data-i18n="React with &lt;b&gt;total fear.&lt;/b&gt;">React with &lt;b&gt;total fear.&lt;/b&gt;</span> <span class="fight" data-i18n="React with &lt;b&gt;consuming rage.&lt;/b&gt;">React with &lt;b&gt;consuming rage.&lt;/b&gt;</span> <span class="freeze" data-i18n="React with &lt;b&gt;debilitating inaction.&lt;/b&gt;">React with &lt;b&gt;debilitating inaction.&lt;/b&gt;</span> <span class="fawn" data-i18n="React with &lt;b&gt;solicitous appeasement.&lt;/b&gt;">React with &lt;b&gt;solicitous appeasement.&lt;/b&gt;</span> <span class="feast" data-i18n="React with &lt;b&gt;extreme appetite.&lt;/b&gt;">React with &lt;b&gt;extreme appetite.&lt;/b&gt;</span> 
+          </div>
+        </div>
+        <div class="scars">
+          <div class="header with-info"><span data-i18n="Scars">Scars</span> 
+            <div class="outer">
+              <input class="thider" name="attr_toggle_advisory3" type="hidden" value="0"/>
+              <button class="cbox info marked" type="action" name="act_unmark" value="advisory3"></button>
+              <input class="tshower" name="attr_toggle_advisory3" type="hidden" value="0"/>
+              <button class="cbox info unmarked" type="action" name="act_mark" value="advisory3"></button>
+            </div>
+            <input class="thider" name="attr_toggle_advisory3" type="hidden" value="0"/>
+            <div class="advisory"><span data-i18n="A scar is a short description of an important experience the character has had during play.&lt;br&gt;&lt;br&gt;&lt;b&gt;At any time, once per session or at the session’s conclusion,&lt;/b&gt; the player may indicate an experience from the session that has left a scar on the character (not always literal).&lt;br&gt;&lt;br&gt;You may &lt;b&gt;mark a scar&lt;/b&gt; to &lt;b&gt;recall&lt;/b&gt; it, allowing you to reroll one of your three dice pools (discipline, madness, or fear). All such marks clear at the end of the session.&lt;br&gt;&lt;br&gt;You may instead &lt;b&gt;cross out&lt;/b&gt; (two clicks) a scar to &lt;b&gt;transform&lt;/b&gt; it, and select one of the following three benefits:&lt;ul&gt;&lt;li&gt;Change your madness talent to another one, either for one scene or permanently.&lt;li&gt;Change your exhaustion talent to another one, either for one scene or permanently.&lt;li&gt;Use up to five coins of hope without taking them from the hope coffer, with immediate effect.&lt;/ul&gt;">A scar is a short description of an important experience the character has had during play.&lt;br&gt;&lt;br&gt;&lt;b&gt;At any time, once per session or at the session’s conclusion,&lt;/b&gt; the player may indicate an experience from the session that has left a scar on the character (not always literal).&lt;br&gt;&lt;br&gt;You may &lt;b&gt;mark a scar&lt;/b&gt; to &lt;b&gt;recall&lt;/b&gt; it, allowing you to reroll one of your three dice pools (discipline, madness, or fear). All such marks clear at the end of the session.&lt;br&gt;&lt;br&gt;You may instead &lt;b&gt;cross out&lt;/b&gt; (two clicks) a scar to &lt;b&gt;transform&lt;/b&gt; it, and select one of the following three benefits:&lt;ul&gt;&lt;li&gt;Change your madness talent to another one, either for one scene or permanently.&lt;li&gt;Change your exhaustion talent to another one, either for one scene or permanently.&lt;li&gt;Use up to five coins of hope without taking them from the hope coffer, with immediate effect.&lt;/ul&gt;</span> 
+            </div>
+          </div>
+          <fieldset class="repeating_scars">
+            <div class="scar"><span>
+                <input class="thider" name="attr_toggle_box" type="hidden" value="0"/>
+                <button class="cbox marked" type="action" name="act_strike" value="box"></button>
+                <input class="tshower" name="attr_toggle_box" type="hidden" value="0"/>
+                <button class="cbox unmarked" type="action" name="act_mark" value="box"></button>
+                <input class="tstriker" name="attr_toggle_box" type="hidden" value="0"/>
+                <button class="cbox struck" type="action" name="act_unmark" value="box"></button></span>
+              <input class="strike-if" type="hidden" name="attr_toggle_box" value="0"/>
+              <input class="strikeout" type="text" name="attr_description"/>
+            </div>
+          </fieldset>
+        </div>
+        <div class="questionnaire">
+          <div class="header"><span data-i18n="Questions">Questions</span> 
+          </div>
+          <fieldset class="repeating_questions">
+            <div class="question">
+              <input type="text" name="attr_query"/>
+              <textarea name="attr_response"></textarea>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+  </div>
+  <input class="mhider" name="attr_sheetmode" type="hidden" value=""/>
+  <div class="gm">
+    <div class="coins">
+      <div class="header with-info"><span data-i18n="Coins">Coins</span> 
+        <div class="outer">
+          <input class="thider" name="attr_toggle_advisory4" type="hidden" value="0"/>
+          <button class="cbox info marked" type="action" name="act_unmark" value="advisory4"></button>
+          <input class="tshower" name="attr_toggle_advisory4" type="hidden" value="0"/>
+          <button class="cbox info unmarked" type="action" name="act_mark" value="advisory4"></button>
+        </div>
+        <input class="thider" name="attr_toggle_advisory4" type="hidden" value="0"/>
+        <div class="advisory"><span data-i18n="&lt;b&gt;Despair&lt;/b&gt; coins are gained when pain dominates. The GM may spend a coin of despair to &lt;b&gt;cast a shadow&lt;/b&gt; over an outcome, to either... &lt;ul&gt;&lt;li&gt;&lt;b&gt;add&lt;/b&gt; a six to any of the pools in play, or&lt;li&gt;&lt;b&gt;remove&lt;/b&gt; a six from any of the pools in play.&lt;/ul&gt;">&lt;b&gt;Despair&lt;/b&gt; coins are gained when pain dominates. The GM may spend a coin of despair to &lt;b&gt;cast a shadow&lt;/b&gt; over an outcome, to either... &lt;ul&gt;&lt;li&gt;&lt;b&gt;add&lt;/b&gt; a six to any of the pools in play, or&lt;li&gt;&lt;b&gt;remove&lt;/b&gt; a six from any of the pools in play.&lt;/ul&gt;</span> <span data-i18n="&lt;b&gt;Hope&lt;/b&gt; coins are gained when the GM spends despair, one for one. Hope is a communal pool available to the players. Players may spend hope coins in a few different ways:&lt;ul&gt;&lt;li&gt;&lt;b&gt;Get a break:&lt;/b&gt; Spend one hope to remove a check mark from their response, or instead reduce their current exhaustion by one.&lt;li&gt;&lt;b&gt;Improve success:&lt;/b&gt; Spend one or more coins of hope to add successes to a result, one for one.&lt;li&gt;&lt;b&gt;Restore discipline:&lt;/b&gt; Spend five minus their current discipline level in hope coins to remove one permanent madness and restore one point of lost discipline.&lt;/ul&gt;">&lt;b&gt;Hope&lt;/b&gt; coins are gained when the GM spends despair, one for one. Hope is a communal pool available to the players. Players may spend hope coins in a few different ways:&lt;ul&gt;&lt;li&gt;&lt;b&gt;Get a break:&lt;/b&gt; Spend one hope to remove a check mark from their response, or instead reduce their current exhaustion by one.&lt;li&gt;&lt;b&gt;Improve success:&lt;/b&gt; Spend one or more coins of hope to add successes to a result, one for one.&lt;li&gt;&lt;b&gt;Restore discipline:&lt;/b&gt; Spend five minus their current discipline level in hope coins to remove one permanent madness and restore one point of lost discipline.&lt;/ul&gt;</span> 
+        </div>
+      </div>
+      <div class="coin">
+        <div class="header"><span data-i18n="Despair">Despair</span> 
+        </div>
+        <input type="number" name="attr_despair" value="0" min="0" max="99"/>
+      </div>
+      <div class="coin">
+        <div class="header"><span data-i18n="Hope">Hope</span> 
+        </div>
+        <input type="number" name="attr_hope" value="0" min="0" max="99"/>
+      </div>
+    </div>
+    <div class="header"><span data-i18n="Nightmares and Other Pains">Nightmares and Other Pains</span> 
+    </div>
+    <div class="nightmare-grid">
+      <div class="buttonbox"><b><span data-i18n="Sorting">Sorting</span> </b>
+        <button type="action" name="act_downsort" value="name"><span data-i18n="Name (ascending)">Name (ascending)</span> 
+        </button>
+        <button type="action" name="act_upsort" value="name"><span data-i18n="Name (descending)">Name (descending)</span> 
+        </button>
+        <button type="action" name="act_downsort" value="pain"><span data-i18n="Pain (ascending)">Pain (ascending)</span> 
+        </button>
+        <button type="action" name="act_upsort" value="pain"><span data-i18n="Pain (descending)">Pain (descending)</span> 
+        </button>
+        <button type="action" name="act_downsort" value="creation"><span data-i18n="Creation (ascending)">Creation (ascending)</span> 
+        </button>
+        <button type="action" name="act_upsort" value="creation"><span data-i18n="Creation (descending)">Creation (descending)</span> 
+        </button>
+      </div>
+      <fieldset class="repeating_nightmares">
+        <div class="nightmare-entry">
+          <input type="text" name="attr_name"/>
+          <div class="dice pain">
+            <div class="con">
+              <div class="controls">
+                <input class="hideif-0" type="hidden" name="attr_pain" value="0"/>
+                <button type="action" name="act_decrement" value="pain">do_not_disturb_on</button><span class="number pain" name="attr_pain"></span>
+                <input class="hideif-15" type="hidden" name="attr_pain" value="0"/>
+                <button type="action" name="act_increment" value="pain">add_circle</button>
+              </div>
+              <div class="conhead"><span data-i18n="Pain">Pain</span> 
+              </div>
+            </div>
+            <div class="alldice">
+              <input class="d6display" type="hidden" name="attr_pain" value="0"/><span class="die d6">g</span><span class="die d6">h</span><span class="die d6">i</span><span class="die d6">j</span><span class="die d6">k</span><span class="die d6">l</span><span class="die d6">g</span><span class="die d6">h</span><span class="die d6">i</span><span class="die d6">j</span><span class="die d6">k</span><span class="die d6">l</span><span class="die d6">g</span><span class="die d6">h</span><span class="die d6">i</span>
+              <button type="action" name="act_painroll"><span data-i18n="Roll">Roll</span> 
+              </button>
+            </div>
+          </div>
+          <textarea name="attr_description"></textarea>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+</div>
+<!-- Template!-->
+<rolltemplate class="sheet-rolltemplate-pcroll">{{#rollTotal() computed::dominates 3}}
+  <div class="sheet-pained"></div>{{/rollTotal() computed::dominates 3}}
+  <div class="sheet-rollbox">
+    <div class="sheet-nameblock">{{name}} </div>
+    <div class="sheet-results sheet-degree">{{#computed::successes}}
+      <div class="sheet-result">
+        <div class="sheet-tag"><span data-i18n="Degree">Degree</span> 
+        </div>
+        <div class="sheet-success-result">{{#rollTotal() computed::successes 0}}
+          <div class="sheet-success">0</div>{{/rollTotal() computed::successes 0}}{{#rollTotal() computed::successes 1}}
+          <div class="sheet-success">1</div>{{/rollTotal() computed::successes 1}}{{#rollTotal() computed::successes 2}}
+          <div class="sheet-success">2</div>{{/rollTotal() computed::successes 2}}{{#rollTotal() computed::successes 3}}
+          <div class="sheet-success">3</div>{{/rollTotal() computed::successes 3}}{{#rollTotal() computed::successes 4}}
+          <div class="sheet-success">4</div>{{/rollTotal() computed::successes 4}}{{#rollTotal() computed::successes 5}}
+          <div class="sheet-success">5</div>{{/rollTotal() computed::successes 5}}{{#rollTotal() computed::successes 6}}
+          <div class="sheet-success">6</div>{{/rollTotal() computed::successes 6}}{{#rollTotal() computed::successes 7}}
+          <div class="sheet-success">7</div>{{/rollTotal() computed::successes 7}}{{#rollTotal() computed::successes 8}}
+          <div class="sheet-success">8</div>{{/rollTotal() computed::successes 8}}{{#rollTotal() computed::successes 9}}
+          <div class="sheet-success">9</div>{{/rollTotal() computed::successes 9}}{{#rollTotal() computed::successes 10}}
+          <div class="sheet-success">10</div>{{/rollTotal() computed::successes 10}}{{#rollTotal() computed::successes 11}}
+          <div class="sheet-success">11</div>{{/rollTotal() computed::successes 11}}{{#rollTotal() computed::successes 12}}
+          <div class="sheet-success">12</div>{{/rollTotal() computed::successes 12}}{{#rollTotal() computed::successes 13}}
+          <div class="sheet-success">13</div>{{/rollTotal() computed::successes 13}}{{#rollTotal() computed::successes 14}}
+          <div class="sheet-success">14</div>{{/rollTotal() computed::successes 14}}{{#rollTotal() computed::successes 15}}
+          <div class="sheet-success">15</div>{{/rollTotal() computed::successes 15}}{{#rollTotal() computed::successes 16}}
+          <div class="sheet-success">16</div>{{/rollTotal() computed::successes 16}}{{#rollTotal() computed::successes 17}}
+          <div class="sheet-success">17</div>{{/rollTotal() computed::successes 17}}{{#rollTotal() computed::successes 18}}
+          <div class="sheet-success">18</div>{{/rollTotal() computed::successes 18}}{{#rollTotal() computed::successes 19}}
+          <div class="sheet-success">19</div>{{/rollTotal() computed::successes 19}}{{#rollTotal() computed::successes 20}}
+          <div class="sheet-success">20</div>{{/rollTotal() computed::successes 20}}{{#rollTotal() computed::successes 21}}
+          <div class="sheet-success">21</div>{{/rollTotal() computed::successes 21}}{{#rollTotal() computed::successes 22}}
+          <div class="sheet-success">22</div>{{/rollTotal() computed::successes 22}}{{#rollTotal() computed::successes 23}}
+          <div class="sheet-success">23</div>{{/rollTotal() computed::successes 23}}{{#rollTotal() computed::successes 24}}
+          <div class="sheet-success">24</div>{{/rollTotal() computed::successes 24}}{{#rollTotal() computed::successes 25}}
+          <div class="sheet-success">25</div>{{/rollTotal() computed::successes 25}}{{#rollTotal() computed::successes 26}}
+          <div class="sheet-success">26</div>{{/rollTotal() computed::successes 26}}{{#rollTotal() computed::successes 27}}
+          <div class="sheet-success">27</div>{{/rollTotal() computed::successes 27}}{{#rollTotal() computed::successes 28}}
+          <div class="sheet-success">28</div>{{/rollTotal() computed::successes 28}}{{#rollTotal() computed::successes 29}}
+          <div class="sheet-success">29</div>{{/rollTotal() computed::successes 29}}{{#rollTotal() computed::successes 30}}
+          <div class="sheet-success">30</div>{{/rollTotal() computed::successes 30}}{{#computed::dominates}}{{#rollTotal() computed::dominates -1}}<span data-i18n="Uncertain (full tie)">Uncertain (full tie)</span> {{/rollTotal() computed::dominates -1}}{{#rollTotal() computed::dominates 0}}<span data-i18n="Discipline dominates">Discipline dominates</span> {{/rollTotal() computed::dominates 0}}{{#rollTotal() computed::dominates 1}}<span data-i18n="Madness dominates">Madness dominates</span> {{/rollTotal() computed::dominates 1}}{{#rollTotal() computed::dominates 2}}<span data-i18n="Exhaustion dominates">Exhaustion dominates</span> {{/rollTotal() computed::dominates 2}}{{#rollTotal() computed::dominates 3}}<span data-i18n="Pain dominates">Pain dominates</span> {{/rollTotal() computed::dominates 3}}{{/computed::dominates}}
+        </div>
+      </div>{{/computed::successes}}
+      <div class="sheet-effect">{{#rollTotal() computed::dominates 0}}<span class="sheet-preamble" data-i18n="If Discipline dominates:">If Discipline dominates:</span> <span class="sheet-attention" data-i18n="Things stay under control.">Things stay under control.</span> <span class="sheet-action" data-i18n="You may remove a response check-mark or decrease your exhaustion by one.">You may remove a response check-mark or decrease your exhaustion by one.</span> {{/rollTotal() computed::dominates 0}}{{#rollTotal() computed::dominates 1}}<span class="sheet-preamble" data-i18n="If Madness dominates:">If Madness dominates:</span> <span class="sheet-attention" data-i18n="Things get more chaotic.">Things get more chaotic.</span> <span data-i18n="Check off a response and behave accordingly.">Check off a response and behave accordingly.</span> {{/rollTotal() computed::dominates 1}}{{#rollTotal() computed::dominates 2}}<span class="sheet-preamble" data-i18n="If Exhaustion dominates:">If Exhaustion dominates:</span> <span class="sheet-attention" data-i18n="Your resources are taxed.">Your resources are taxed.</span> <span class="sheet-action" data-i18n="Increase exhaustion by one.">Increase exhaustion by one.</span> {{/rollTotal() computed::dominates 2}}{{#rollTotal() computed::dominates 3}}<span class="sheet-preamble" data-i18n="If Pain dominates:">If Pain dominates:</span> <span class="sheet-attention" data-i18n="You pay a greater price.">You pay a greater price.</span> <span class="sheet-action" data-i18n="The GM gains one coin of despair.">The GM gains one coin of despair.</span> {{/rollTotal() computed::dominates 3}}
+      </div>
+    </div>{{#rollTotal() computed::dominates 3}}
+    <div class="sheet-results">
+      <div class="sheet-dominated"></div>
+      <div class="sheet-result">
+        <div class="sheet-tag"><span data-i18n="Pain">Pain</span> *
+        </div>
+        <div class="sheet-data">{{#computed::pain1}}{{#rollTotal() computed::pain1 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain1 1}}{{#rollTotal() computed::pain1 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain1 2}}{{#rollTotal() computed::pain1 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain1 3}}{{#rollTotal() computed::pain1 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain1 4}}{{#rollTotal() computed::pain1 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain1 5}}{{#rollTotal() computed::pain1 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain1 6}}{{/computed::pain1}}{{#computed::pain2}}{{#rollTotal() computed::pain2 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain2 1}}{{#rollTotal() computed::pain2 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain2 2}}{{#rollTotal() computed::pain2 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain2 3}}{{#rollTotal() computed::pain2 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain2 4}}{{#rollTotal() computed::pain2 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain2 5}}{{#rollTotal() computed::pain2 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain2 6}}{{/computed::pain2}}{{#computed::pain3}}{{#rollTotal() computed::pain3 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain3 1}}{{#rollTotal() computed::pain3 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain3 2}}{{#rollTotal() computed::pain3 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain3 3}}{{#rollTotal() computed::pain3 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain3 4}}{{#rollTotal() computed::pain3 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain3 5}}{{#rollTotal() computed::pain3 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain3 6}}{{/computed::pain3}}{{#computed::pain4}}{{#rollTotal() computed::pain4 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain4 1}}{{#rollTotal() computed::pain4 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain4 2}}{{#rollTotal() computed::pain4 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain4 3}}{{#rollTotal() computed::pain4 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain4 4}}{{#rollTotal() computed::pain4 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain4 5}}{{#rollTotal() computed::pain4 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain4 6}}{{/computed::pain4}}{{#computed::pain5}}{{#rollTotal() computed::pain5 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain5 1}}{{#rollTotal() computed::pain5 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain5 2}}{{#rollTotal() computed::pain5 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain5 3}}{{#rollTotal() computed::pain5 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain5 4}}{{#rollTotal() computed::pain5 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain5 5}}{{#rollTotal() computed::pain5 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain5 6}}{{/computed::pain5}}{{#computed::pain6}}{{#rollTotal() computed::pain6 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain6 1}}{{#rollTotal() computed::pain6 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain6 2}}{{#rollTotal() computed::pain6 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain6 3}}{{#rollTotal() computed::pain6 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain6 4}}{{#rollTotal() computed::pain6 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain6 5}}{{#rollTotal() computed::pain6 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain6 6}}{{/computed::pain6}}{{#computed::pain7}}{{#rollTotal() computed::pain7 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain7 1}}{{#rollTotal() computed::pain7 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain7 2}}{{#rollTotal() computed::pain7 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain7 3}}{{#rollTotal() computed::pain7 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain7 4}}{{#rollTotal() computed::pain7 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain7 5}}{{#rollTotal() computed::pain7 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain7 6}}{{/computed::pain7}}{{#computed::pain8}}{{#rollTotal() computed::pain8 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain8 1}}{{#rollTotal() computed::pain8 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain8 2}}{{#rollTotal() computed::pain8 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain8 3}}{{#rollTotal() computed::pain8 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain8 4}}{{#rollTotal() computed::pain8 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain8 5}}{{#rollTotal() computed::pain8 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain8 6}}{{/computed::pain8}}{{#computed::pain9}}{{#rollTotal() computed::pain9 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain9 1}}{{#rollTotal() computed::pain9 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain9 2}}{{#rollTotal() computed::pain9 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain9 3}}{{#rollTotal() computed::pain9 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain9 4}}{{#rollTotal() computed::pain9 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain9 5}}{{#rollTotal() computed::pain9 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain9 6}}{{/computed::pain9}}{{#computed::pain10}}{{#rollTotal() computed::pain10 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain10 1}}{{#rollTotal() computed::pain10 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain10 2}}{{#rollTotal() computed::pain10 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain10 3}}{{#rollTotal() computed::pain10 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain10 4}}{{#rollTotal() computed::pain10 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain10 5}}{{#rollTotal() computed::pain10 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain10 6}}{{/computed::pain10}}{{#computed::pain11}}{{#rollTotal() computed::pain11 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain11 1}}{{#rollTotal() computed::pain11 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain11 2}}{{#rollTotal() computed::pain11 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain11 3}}{{#rollTotal() computed::pain11 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain11 4}}{{#rollTotal() computed::pain11 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain11 5}}{{#rollTotal() computed::pain11 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain11 6}}{{/computed::pain11}}{{#computed::pain12}}{{#rollTotal() computed::pain12 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain12 1}}{{#rollTotal() computed::pain12 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain12 2}}{{#rollTotal() computed::pain12 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain12 3}}{{#rollTotal() computed::pain12 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain12 4}}{{#rollTotal() computed::pain12 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain12 5}}{{#rollTotal() computed::pain12 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain12 6}}{{/computed::pain12}}{{#computed::pain13}}{{#rollTotal() computed::pain13 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain13 1}}{{#rollTotal() computed::pain13 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain13 2}}{{#rollTotal() computed::pain13 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain13 3}}{{#rollTotal() computed::pain13 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain13 4}}{{#rollTotal() computed::pain13 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain13 5}}{{#rollTotal() computed::pain13 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain13 6}}{{/computed::pain13}}{{#computed::pain14}}{{#rollTotal() computed::pain14 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain14 1}}{{#rollTotal() computed::pain14 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain14 2}}{{#rollTotal() computed::pain14 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain14 3}}{{#rollTotal() computed::pain14 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain14 4}}{{#rollTotal() computed::pain14 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain14 5}}{{#rollTotal() computed::pain14 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain14 6}}{{/computed::pain14}}{{#computed::pain15}}{{#rollTotal() computed::pain15 1}}
+          <div class="sheet-d6 sheet-pain">g</div>{{/rollTotal() computed::pain15 1}}{{#rollTotal() computed::pain15 2}}
+          <div class="sheet-d6 sheet-pain">h</div>{{/rollTotal() computed::pain15 2}}{{#rollTotal() computed::pain15 3}}
+          <div class="sheet-d6 sheet-pain">i</div>{{/rollTotal() computed::pain15 3}}{{#rollTotal() computed::pain15 4}}
+          <div class="sheet-d6 sheet-pain">j</div>{{/rollTotal() computed::pain15 4}}{{#rollTotal() computed::pain15 5}}
+          <div class="sheet-d6 sheet-pain">k</div>{{/rollTotal() computed::pain15 5}}{{#rollTotal() computed::pain15 6}}
+          <div class="sheet-d6 sheet-pain">l</div>{{/rollTotal() computed::pain15 6}}{{/computed::pain15}}
+        </div>
+      </div>
+    </div>{{/rollTotal() computed::dominates 3}}{{#rollLess() computed::dominates 3}}
+    <div class="sheet-results"> {{#rollTotal() computed::dominates 0}}
+      <div class="sheet-dominated"></div>{{/rollTotal() computed::dominates 0}}
+      <div class="sheet-result">
+        <div class="sheet-tag"><span data-i18n="Discipline">Discipline</span> {{#rollTotal() computed::dominates 0}}*{{/rollTotal() computed::dominates 0}}
+        </div>
+        <div class="sheet-data">{{#computed::discipline1}}{{#rollTotal() computed::discipline1 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline1 1}}{{#rollTotal() computed::discipline1 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline1 2}}{{#rollTotal() computed::discipline1 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline1 3}}{{#rollTotal() computed::discipline1 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline1 4}}{{#rollTotal() computed::discipline1 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline1 5}}{{#rollTotal() computed::discipline1 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline1 6}}{{/computed::discipline1}}{{#computed::discipline2}}{{#rollTotal() computed::discipline2 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline2 1}}{{#rollTotal() computed::discipline2 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline2 2}}{{#rollTotal() computed::discipline2 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline2 3}}{{#rollTotal() computed::discipline2 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline2 4}}{{#rollTotal() computed::discipline2 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline2 5}}{{#rollTotal() computed::discipline2 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline2 6}}{{/computed::discipline2}}{{#computed::discipline3}}{{#rollTotal() computed::discipline3 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline3 1}}{{#rollTotal() computed::discipline3 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline3 2}}{{#rollTotal() computed::discipline3 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline3 3}}{{#rollTotal() computed::discipline3 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline3 4}}{{#rollTotal() computed::discipline3 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline3 5}}{{#rollTotal() computed::discipline3 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline3 6}}{{/computed::discipline3}}{{#computed::discipline4}}{{#rollTotal() computed::discipline4 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline4 1}}{{#rollTotal() computed::discipline4 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline4 2}}{{#rollTotal() computed::discipline4 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline4 3}}{{#rollTotal() computed::discipline4 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline4 4}}{{#rollTotal() computed::discipline4 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline4 5}}{{#rollTotal() computed::discipline4 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline4 6}}{{/computed::discipline4}}{{#computed::discipline5}}{{#rollTotal() computed::discipline5 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline5 1}}{{#rollTotal() computed::discipline5 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline5 2}}{{#rollTotal() computed::discipline5 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline5 3}}{{#rollTotal() computed::discipline5 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline5 4}}{{#rollTotal() computed::discipline5 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline5 5}}{{#rollTotal() computed::discipline5 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline5 6}}{{/computed::discipline5}}{{#computed::discipline6}}{{#rollTotal() computed::discipline6 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline6 1}}{{#rollTotal() computed::discipline6 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline6 2}}{{#rollTotal() computed::discipline6 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline6 3}}{{#rollTotal() computed::discipline6 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline6 4}}{{#rollTotal() computed::discipline6 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline6 5}}{{#rollTotal() computed::discipline6 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline6 6}}{{/computed::discipline6}}{{#computed::discipline7}}{{#rollTotal() computed::discipline7 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline7 1}}{{#rollTotal() computed::discipline7 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline7 2}}{{#rollTotal() computed::discipline7 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline7 3}}{{#rollTotal() computed::discipline7 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline7 4}}{{#rollTotal() computed::discipline7 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline7 5}}{{#rollTotal() computed::discipline7 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline7 6}}{{/computed::discipline7}}{{#computed::discipline8}}{{#rollTotal() computed::discipline8 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline8 1}}{{#rollTotal() computed::discipline8 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline8 2}}{{#rollTotal() computed::discipline8 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline8 3}}{{#rollTotal() computed::discipline8 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline8 4}}{{#rollTotal() computed::discipline8 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline8 5}}{{#rollTotal() computed::discipline8 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline8 6}}{{/computed::discipline8}}{{#computed::discipline9}}{{#rollTotal() computed::discipline9 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline9 1}}{{#rollTotal() computed::discipline9 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline9 2}}{{#rollTotal() computed::discipline9 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline9 3}}{{#rollTotal() computed::discipline9 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline9 4}}{{#rollTotal() computed::discipline9 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline9 5}}{{#rollTotal() computed::discipline9 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline9 6}}{{/computed::discipline9}}{{#computed::discipline10}}{{#rollTotal() computed::discipline10 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline10 1}}{{#rollTotal() computed::discipline10 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline10 2}}{{#rollTotal() computed::discipline10 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline10 3}}{{#rollTotal() computed::discipline10 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline10 4}}{{#rollTotal() computed::discipline10 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline10 5}}{{#rollTotal() computed::discipline10 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline10 6}}{{/computed::discipline10}}{{#computed::discipline11}}{{#rollTotal() computed::discipline11 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline11 1}}{{#rollTotal() computed::discipline11 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline11 2}}{{#rollTotal() computed::discipline11 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline11 3}}{{#rollTotal() computed::discipline11 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline11 4}}{{#rollTotal() computed::discipline11 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline11 5}}{{#rollTotal() computed::discipline11 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline11 6}}{{/computed::discipline11}}{{#computed::discipline12}}{{#rollTotal() computed::discipline12 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline12 1}}{{#rollTotal() computed::discipline12 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline12 2}}{{#rollTotal() computed::discipline12 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline12 3}}{{#rollTotal() computed::discipline12 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline12 4}}{{#rollTotal() computed::discipline12 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline12 5}}{{#rollTotal() computed::discipline12 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline12 6}}{{/computed::discipline12}}{{#computed::discipline13}}{{#rollTotal() computed::discipline13 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline13 1}}{{#rollTotal() computed::discipline13 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline13 2}}{{#rollTotal() computed::discipline13 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline13 3}}{{#rollTotal() computed::discipline13 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline13 4}}{{#rollTotal() computed::discipline13 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline13 5}}{{#rollTotal() computed::discipline13 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline13 6}}{{/computed::discipline13}}{{#computed::discipline14}}{{#rollTotal() computed::discipline14 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline14 1}}{{#rollTotal() computed::discipline14 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline14 2}}{{#rollTotal() computed::discipline14 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline14 3}}{{#rollTotal() computed::discipline14 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline14 4}}{{#rollTotal() computed::discipline14 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline14 5}}{{#rollTotal() computed::discipline14 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline14 6}}{{/computed::discipline14}}{{#computed::discipline15}}{{#rollTotal() computed::discipline15 1}}
+          <div class="sheet-d6">g</div>{{/rollTotal() computed::discipline15 1}}{{#rollTotal() computed::discipline15 2}}
+          <div class="sheet-d6">h</div>{{/rollTotal() computed::discipline15 2}}{{#rollTotal() computed::discipline15 3}}
+          <div class="sheet-d6">i</div>{{/rollTotal() computed::discipline15 3}}{{#rollTotal() computed::discipline15 4}}
+          <div class="sheet-d6">j</div>{{/rollTotal() computed::discipline15 4}}{{#rollTotal() computed::discipline15 5}}
+          <div class="sheet-d6">k</div>{{/rollTotal() computed::discipline15 5}}{{#rollTotal() computed::discipline15 6}}
+          <div class="sheet-d6">l</div>{{/rollTotal() computed::discipline15 6}}{{/computed::discipline15}}
+        </div>
+      </div>{{#rollTotal() computed::dominates 1}}
+      <div class="sheet-dominated"></div>{{/rollTotal() computed::dominates 1}}
+      <div class="sheet-result">
+        <div class="sheet-tag"><span data-i18n="Madness">Madness</span> {{#rollTotal() computed::dominates 1}}*{{/rollTotal() computed::dominates 1}}
+        </div>
+        <div class="sheet-data">{{#computed::madness1}}{{#rollTotal() computed::madness1 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness1 1}}{{#rollTotal() computed::madness1 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness1 2}}{{#rollTotal() computed::madness1 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness1 3}}{{#rollTotal() computed::madness1 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness1 4}}{{#rollTotal() computed::madness1 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness1 5}}{{#rollTotal() computed::madness1 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness1 6}}{{/computed::madness1}}{{#computed::madness2}}{{#rollTotal() computed::madness2 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness2 1}}{{#rollTotal() computed::madness2 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness2 2}}{{#rollTotal() computed::madness2 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness2 3}}{{#rollTotal() computed::madness2 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness2 4}}{{#rollTotal() computed::madness2 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness2 5}}{{#rollTotal() computed::madness2 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness2 6}}{{/computed::madness2}}{{#computed::madness3}}{{#rollTotal() computed::madness3 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness3 1}}{{#rollTotal() computed::madness3 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness3 2}}{{#rollTotal() computed::madness3 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness3 3}}{{#rollTotal() computed::madness3 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness3 4}}{{#rollTotal() computed::madness3 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness3 5}}{{#rollTotal() computed::madness3 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness3 6}}{{/computed::madness3}}{{#computed::madness4}}{{#rollTotal() computed::madness4 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness4 1}}{{#rollTotal() computed::madness4 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness4 2}}{{#rollTotal() computed::madness4 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness4 3}}{{#rollTotal() computed::madness4 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness4 4}}{{#rollTotal() computed::madness4 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness4 5}}{{#rollTotal() computed::madness4 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness4 6}}{{/computed::madness4}}{{#computed::madness5}}{{#rollTotal() computed::madness5 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness5 1}}{{#rollTotal() computed::madness5 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness5 2}}{{#rollTotal() computed::madness5 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness5 3}}{{#rollTotal() computed::madness5 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness5 4}}{{#rollTotal() computed::madness5 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness5 5}}{{#rollTotal() computed::madness5 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness5 6}}{{/computed::madness5}}{{#computed::madness6}}{{#rollTotal() computed::madness6 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness6 1}}{{#rollTotal() computed::madness6 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness6 2}}{{#rollTotal() computed::madness6 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness6 3}}{{#rollTotal() computed::madness6 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness6 4}}{{#rollTotal() computed::madness6 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness6 5}}{{#rollTotal() computed::madness6 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness6 6}}{{/computed::madness6}}{{#computed::madness7}}{{#rollTotal() computed::madness7 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness7 1}}{{#rollTotal() computed::madness7 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness7 2}}{{#rollTotal() computed::madness7 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness7 3}}{{#rollTotal() computed::madness7 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness7 4}}{{#rollTotal() computed::madness7 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness7 5}}{{#rollTotal() computed::madness7 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness7 6}}{{/computed::madness7}}{{#computed::madness8}}{{#rollTotal() computed::madness8 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness8 1}}{{#rollTotal() computed::madness8 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness8 2}}{{#rollTotal() computed::madness8 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness8 3}}{{#rollTotal() computed::madness8 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness8 4}}{{#rollTotal() computed::madness8 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness8 5}}{{#rollTotal() computed::madness8 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness8 6}}{{/computed::madness8}}{{#computed::madness9}}{{#rollTotal() computed::madness9 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness9 1}}{{#rollTotal() computed::madness9 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness9 2}}{{#rollTotal() computed::madness9 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness9 3}}{{#rollTotal() computed::madness9 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness9 4}}{{#rollTotal() computed::madness9 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness9 5}}{{#rollTotal() computed::madness9 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness9 6}}{{/computed::madness9}}{{#computed::madness10}}{{#rollTotal() computed::madness10 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness10 1}}{{#rollTotal() computed::madness10 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness10 2}}{{#rollTotal() computed::madness10 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness10 3}}{{#rollTotal() computed::madness10 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness10 4}}{{#rollTotal() computed::madness10 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness10 5}}{{#rollTotal() computed::madness10 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness10 6}}{{/computed::madness10}}{{#computed::madness11}}{{#rollTotal() computed::madness11 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness11 1}}{{#rollTotal() computed::madness11 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness11 2}}{{#rollTotal() computed::madness11 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness11 3}}{{#rollTotal() computed::madness11 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness11 4}}{{#rollTotal() computed::madness11 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness11 5}}{{#rollTotal() computed::madness11 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness11 6}}{{/computed::madness11}}{{#computed::madness12}}{{#rollTotal() computed::madness12 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness12 1}}{{#rollTotal() computed::madness12 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness12 2}}{{#rollTotal() computed::madness12 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness12 3}}{{#rollTotal() computed::madness12 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness12 4}}{{#rollTotal() computed::madness12 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness12 5}}{{#rollTotal() computed::madness12 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness12 6}}{{/computed::madness12}}{{#computed::madness13}}{{#rollTotal() computed::madness13 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness13 1}}{{#rollTotal() computed::madness13 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness13 2}}{{#rollTotal() computed::madness13 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness13 3}}{{#rollTotal() computed::madness13 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness13 4}}{{#rollTotal() computed::madness13 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness13 5}}{{#rollTotal() computed::madness13 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness13 6}}{{/computed::madness13}}{{#computed::madness14}}{{#rollTotal() computed::madness14 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness14 1}}{{#rollTotal() computed::madness14 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness14 2}}{{#rollTotal() computed::madness14 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness14 3}}{{#rollTotal() computed::madness14 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness14 4}}{{#rollTotal() computed::madness14 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness14 5}}{{#rollTotal() computed::madness14 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness14 6}}{{/computed::madness14}}{{#computed::madness15}}{{#rollTotal() computed::madness15 1}}
+          <div class="sheet-d6 sheet-madness">G</div>{{/rollTotal() computed::madness15 1}}{{#rollTotal() computed::madness15 2}}
+          <div class="sheet-d6 sheet-madness">H</div>{{/rollTotal() computed::madness15 2}}{{#rollTotal() computed::madness15 3}}
+          <div class="sheet-d6 sheet-madness">I</div>{{/rollTotal() computed::madness15 3}}{{#rollTotal() computed::madness15 4}}
+          <div class="sheet-d6 sheet-madness">J</div>{{/rollTotal() computed::madness15 4}}{{#rollTotal() computed::madness15 5}}
+          <div class="sheet-d6 sheet-madness">K</div>{{/rollTotal() computed::madness15 5}}{{#rollTotal() computed::madness15 6}}
+          <div class="sheet-d6 sheet-madness">L</div>{{/rollTotal() computed::madness15 6}}{{/computed::madness15}}
+        </div>
+      </div>
+      <!-- Set up a CSS thing where .sheet-dominated + .sheet-result styles the .sheet-result-->{{#rollTotal() usemtal 1}}
+      <div class="sheet-effect"><span class="sheet-preamble" data-i18n="Madness talent:">Madness talent:</span> <span data-i18n="Something impossible happens...">Something impossible happens...</span> 
+        <div class="sheet-handwritten">{{mtal}}</div>
+      </div>{{/rollTotal() usemtal 1}}{{#rollTotal() computed::dominates 2}}
+      <div class="sheet-dominated"></div>{{/rollTotal() computed::dominates 2}}
+      <div class="sheet-result">
+        <div class="sheet-tag"><span data-i18n="Exhaustion">Exhaustion</span> {{#rollTotal() computed::dominates 2}}*{{/rollTotal() computed::dominates 2}}
+        </div>
+        <div class="sheet-data">{{#computed::exhaustion1}}{{#rollTotal() computed::exhaustion1 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion1 1}}{{#rollTotal() computed::exhaustion1 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion1 2}}{{#rollTotal() computed::exhaustion1 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion1 3}}{{#rollTotal() computed::exhaustion1 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion1 4}}{{#rollTotal() computed::exhaustion1 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion1 5}}{{#rollTotal() computed::exhaustion1 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion1 6}}{{/computed::exhaustion1}}{{#computed::exhaustion2}}{{#rollTotal() computed::exhaustion2 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion2 1}}{{#rollTotal() computed::exhaustion2 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion2 2}}{{#rollTotal() computed::exhaustion2 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion2 3}}{{#rollTotal() computed::exhaustion2 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion2 4}}{{#rollTotal() computed::exhaustion2 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion2 5}}{{#rollTotal() computed::exhaustion2 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion2 6}}{{/computed::exhaustion2}}{{#computed::exhaustion3}}{{#rollTotal() computed::exhaustion3 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion3 1}}{{#rollTotal() computed::exhaustion3 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion3 2}}{{#rollTotal() computed::exhaustion3 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion3 3}}{{#rollTotal() computed::exhaustion3 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion3 4}}{{#rollTotal() computed::exhaustion3 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion3 5}}{{#rollTotal() computed::exhaustion3 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion3 6}}{{/computed::exhaustion3}}{{#computed::exhaustion4}}{{#rollTotal() computed::exhaustion4 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion4 1}}{{#rollTotal() computed::exhaustion4 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion4 2}}{{#rollTotal() computed::exhaustion4 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion4 3}}{{#rollTotal() computed::exhaustion4 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion4 4}}{{#rollTotal() computed::exhaustion4 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion4 5}}{{#rollTotal() computed::exhaustion4 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion4 6}}{{/computed::exhaustion4}}{{#computed::exhaustion5}}{{#rollTotal() computed::exhaustion5 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion5 1}}{{#rollTotal() computed::exhaustion5 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion5 2}}{{#rollTotal() computed::exhaustion5 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion5 3}}{{#rollTotal() computed::exhaustion5 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion5 4}}{{#rollTotal() computed::exhaustion5 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion5 5}}{{#rollTotal() computed::exhaustion5 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion5 6}}{{/computed::exhaustion5}}{{#computed::exhaustion6}}{{#rollTotal() computed::exhaustion6 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion6 1}}{{#rollTotal() computed::exhaustion6 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion6 2}}{{#rollTotal() computed::exhaustion6 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion6 3}}{{#rollTotal() computed::exhaustion6 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion6 4}}{{#rollTotal() computed::exhaustion6 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion6 5}}{{#rollTotal() computed::exhaustion6 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion6 6}}{{/computed::exhaustion6}}{{#computed::exhaustion7}}{{#rollTotal() computed::exhaustion7 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion7 1}}{{#rollTotal() computed::exhaustion7 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion7 2}}{{#rollTotal() computed::exhaustion7 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion7 3}}{{#rollTotal() computed::exhaustion7 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion7 4}}{{#rollTotal() computed::exhaustion7 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion7 5}}{{#rollTotal() computed::exhaustion7 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion7 6}}{{/computed::exhaustion7}}{{#computed::exhaustion8}}{{#rollTotal() computed::exhaustion8 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion8 1}}{{#rollTotal() computed::exhaustion8 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion8 2}}{{#rollTotal() computed::exhaustion8 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion8 3}}{{#rollTotal() computed::exhaustion8 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion8 4}}{{#rollTotal() computed::exhaustion8 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion8 5}}{{#rollTotal() computed::exhaustion8 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion8 6}}{{/computed::exhaustion8}}{{#computed::exhaustion9}}{{#rollTotal() computed::exhaustion9 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion9 1}}{{#rollTotal() computed::exhaustion9 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion9 2}}{{#rollTotal() computed::exhaustion9 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion9 3}}{{#rollTotal() computed::exhaustion9 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion9 4}}{{#rollTotal() computed::exhaustion9 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion9 5}}{{#rollTotal() computed::exhaustion9 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion9 6}}{{/computed::exhaustion9}}{{#computed::exhaustion10}}{{#rollTotal() computed::exhaustion10 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion10 1}}{{#rollTotal() computed::exhaustion10 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion10 2}}{{#rollTotal() computed::exhaustion10 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion10 3}}{{#rollTotal() computed::exhaustion10 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion10 4}}{{#rollTotal() computed::exhaustion10 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion10 5}}{{#rollTotal() computed::exhaustion10 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion10 6}}{{/computed::exhaustion10}}{{#computed::exhaustion11}}{{#rollTotal() computed::exhaustion11 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion11 1}}{{#rollTotal() computed::exhaustion11 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion11 2}}{{#rollTotal() computed::exhaustion11 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion11 3}}{{#rollTotal() computed::exhaustion11 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion11 4}}{{#rollTotal() computed::exhaustion11 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion11 5}}{{#rollTotal() computed::exhaustion11 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion11 6}}{{/computed::exhaustion11}}{{#computed::exhaustion12}}{{#rollTotal() computed::exhaustion12 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion12 1}}{{#rollTotal() computed::exhaustion12 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion12 2}}{{#rollTotal() computed::exhaustion12 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion12 3}}{{#rollTotal() computed::exhaustion12 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion12 4}}{{#rollTotal() computed::exhaustion12 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion12 5}}{{#rollTotal() computed::exhaustion12 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion12 6}}{{/computed::exhaustion12}}{{#computed::exhaustion13}}{{#rollTotal() computed::exhaustion13 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion13 1}}{{#rollTotal() computed::exhaustion13 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion13 2}}{{#rollTotal() computed::exhaustion13 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion13 3}}{{#rollTotal() computed::exhaustion13 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion13 4}}{{#rollTotal() computed::exhaustion13 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion13 5}}{{#rollTotal() computed::exhaustion13 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion13 6}}{{/computed::exhaustion13}}{{#computed::exhaustion14}}{{#rollTotal() computed::exhaustion14 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion14 1}}{{#rollTotal() computed::exhaustion14 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion14 2}}{{#rollTotal() computed::exhaustion14 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion14 3}}{{#rollTotal() computed::exhaustion14 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion14 4}}{{#rollTotal() computed::exhaustion14 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion14 5}}{{#rollTotal() computed::exhaustion14 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion14 6}}{{/computed::exhaustion14}}{{#computed::exhaustion15}}{{#rollTotal() computed::exhaustion15 1}}
+          <div class="sheet-d6">G</div>{{/rollTotal() computed::exhaustion15 1}}{{#rollTotal() computed::exhaustion15 2}}
+          <div class="sheet-d6">H</div>{{/rollTotal() computed::exhaustion15 2}}{{#rollTotal() computed::exhaustion15 3}}
+          <div class="sheet-d6">I</div>{{/rollTotal() computed::exhaustion15 3}}{{#rollTotal() computed::exhaustion15 4}}
+          <div class="sheet-d6">J</div>{{/rollTotal() computed::exhaustion15 4}}{{#rollTotal() computed::exhaustion15 5}}
+          <div class="sheet-d6">K</div>{{/rollTotal() computed::exhaustion15 5}}{{#rollTotal() computed::exhaustion15 6}}
+          <div class="sheet-d6">L</div>{{/rollTotal() computed::exhaustion15 6}}{{/computed::exhaustion15}}
+        </div>
+      </div>{{#rollTotal() useetal 1}}
+      <div class="sheet-effect"><span class="sheet-preamble" data-i18n="Minor exhaustion use:">Minor exhaustion use:</span> <span data-i18n="Minimum degree is equal to number of Exhaustion dice ">Minimum degree is equal to number of Exhaustion dice </span> ({{exhaustion}}).
+        <div class="sheet-handwritten">{{etal}}</div>
+      </div>{{/rollTotal() useetal 1}}{{#rollTotal() useetal 2}}
+      <div class="sheet-effect"><span class="sheet-preamble" data-i18n="Major exhaustion use:">Major exhaustion use:</span> <span data-i18n="Degree is increased by the number of Exhaustion dice ">Degree is increased by the number of Exhaustion dice </span> ({{exhaustion}}).
+      </div>{{/rollTotal() useetal 2}}
+    </div>{{/rollLess() computed::dominates 3}}
+    <!-- Here we exit the big +rtLess-->
+    <div class="sheet-advisory">* <span data-i18n="The dominant player pool must be compared to the GM’s pain pool to determine what actually dominates the roll.">The dominant player pool must be compared to the GM’s pain pool to determine what actually dominates the roll.</span> 
+    </div>
+  </div>
+</rolltemplate>

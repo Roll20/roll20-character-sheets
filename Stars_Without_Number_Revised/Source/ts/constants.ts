@@ -2,7 +2,7 @@
 
 /* Data constants */
 const sheetName = "Stars Without Number (revised)";
-const sheetVersion = "2.6.5";
+const sheetVersion = "2.7.0";
 const translate = getTranslationByKey;
 const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -73,6 +73,12 @@ const reverseClasses = {
     [translate("EXPERT").toString().toLowerCase()]: "expert",
     [translate("PSYCHIC").toString().toLowerCase()]: "psychic",
     [translate("WARRIOR").toString().toLowerCase()]: "warrior",
+  [translate("ADVENTURER_EXPERT_PSYCHIC").toString().toLowerCase()]:
+    "adventurer (expert/psychic)",
+  [translate("ADVENTURER_EXPERT_WARRIOR").toString().toLowerCase()]:
+    "adventurer (expert/warrior)",
+  [translate("ADVENTURER_PSYCHIC_WARRIOR").toString().toLowerCase()]:
+    "adventurer (psychic/warrior)",
 };
 const autofillSections = ["armor", "cyberware", "foci", "gear", "ship-defenses", "ship-fittings", "ship-weapons", "techniques", "weapons"];
 type AutofillSectionsKey = "armor" | "cyberware" | "foci" | "gear" | "ship-defenses" | "ship-fittings" | "ship-weapons" | "techniques" | "weapons"
@@ -90,6 +96,16 @@ const autofillData = {
         warrior: {
             attack_bonus: "1",
             class_ability: translate("WARRIOR_CLASS_ABILITY"),
+        },
+        partialExpert: {
+            class_ability: translate("PARTIAL_EXPERT_CLASS_ABILITY"),
+        },
+        partialPsychic: {
+            class_ability: translate("PARTIAL_PSYCHIC_CLASS_ABILITY"),
+        },
+        partialWarrior: {
+            attack_bonus: "1",
+            class_ability: translate("PARTIAL_WARRIOR_CLASS_ABILITY"),
         },
     },
     "drones": {
