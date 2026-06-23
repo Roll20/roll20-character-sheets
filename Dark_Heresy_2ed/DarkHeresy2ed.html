@@ -193,7 +193,7 @@
 						<!-- Strength (S) -->
 						<div class="sheet-2colrow">
 							<div class="sheet-col">
-								<button name="roll_S" type="roll" value="@{whisper}&{template:dh2ed}[[[[floor((@{Strength} +[[?{Modifier|+0}]])/10))]]-[[floor([[1d100]]/10)]]]] {{name=Strength}}{{roll= $[[2]] }}{{degrees=$[[4]]}}{{skill=[[@{Strength}]]}} {{modifier=?{Modifier|+0} }} {{target=[[@{Strength} + [[?{Modifier|+0}]]]]}}">
+								<button name="roll_S" type="roll" value="@{whisper}&{template:dh2ed}[[[[floor((@{Strength} +[[?{Modifier|+0}]])/10))]]-[[floor([[1d100]]/10)]]]] {{name=Strength}}{{roll= $[[2]] }}{{degrees=$[[4]]}}{{successdegrees=[[$[[4]] + ceil(@{UnS}/2)]]}}{{skill=[[@{Strength}]]}} {{modifier=?{Modifier|+0} }} {{target=[[@{Strength} + [[?{Modifier|+0}]]]]}}">
 									<label>Strength (S)</label>
 								</button>
 							</div>
@@ -3071,7 +3071,10 @@
 		{{#rollGreater() degrees 0}}
 		<tr class="sheet-success">
 			<th colspan="2">
-				<span>Success</span> <span>with </span> {{degrees}} <span> additional degrees</span>
+				<span>Success</span> <span>with </span>
+				{{#successdegrees}}{{successdegrees}}{{/successdegrees}}
+				{{^successdegrees}}{{degrees}}{{/successdegrees}}
+				<span> additional degrees</span>
 			</th>
 		</tr>
 		{{/rollGreater() degrees 0}}
@@ -3080,7 +3083,15 @@
 		{{#^rollLess() target roll}}
 		<tr class="sheet-success">
 			<th colspan="2">
-				<span>Success</span> <span> </span>  <span></span>
+				{{#successdegrees}}
+				<span>Success</span> <span>with </span>
+				{{successdegrees}}
+				<span> additional degrees</span>
+				{{/successdegrees}}
+
+				{{^successdegrees}}
+				<span>Success</span>
+				{{/successdegrees}}
 			</th>
 		</tr>
 		{{/^rollLess() target roll}}
