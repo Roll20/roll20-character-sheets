@@ -4377,7 +4377,7 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.26.0 -->
+				<!-- current version notes: 2.27.0 -->
 				<div>
 					Dated: <span name="attr_latest_changes"></span>
 				</div>
@@ -4387,14 +4387,8 @@
 				</h4>
 
 				<div>
-					<b>FIX:</b> Turning and Velocity Modifiers: Fixed turning radius and deceleration calculation bugs.<br />
-					<b>NEW:</b> Turning and Velocity Modifiers: Added a field for base move and top speed, handy if using a jet pack or similar device.<br />
-					<b>REVISED:</b> Updated the icon for <b>Target</b> button on the Melee and Range tables and added additional help text. 
-					Removed the <b>Select</b> button since it only works with custom script developed with the Roll20 API.<br />
-					<b>REVISED:</b> Set the default value for <b>Max ER</b> to 0, helps prevent possible macro errors if you never set this value.<br />
-					<b>REVISED:</b> Updated the <b>Wound Modifier Notes</b> and added additional formatting.<br />
-					<b style="text-decoration: underline;">ACTION REQUIRED:</b> To get the latest notes for these Wound Modifier Notes, please go to the Gear Icon > Rules Tab 
-					and under the section titled <b>Wound Modifier Notes</b> click the <b>Reset</b> button.
+					<b>NEW:</b> Added styling to roll results when "Private Rolls" is selected.<br />
+					<b>FIX:</b> Inventory Tab, fixed bug where the weight didn't update after deleting a row.<br />
 				</div>
 
 				<div style="margin: 10px 0 10px 0;">
@@ -28114,7 +28108,15 @@ For more information, see B409.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.26.0 -->
+			<!-- current version notes: 2.27.0 -->
+			<div>
+				<b>NEW:</b> Added styling to roll results when "Private Rolls" is selected.<br />
+				<b>FIX:</b> Inventory Tab, fixed bug where the weight didn't update after deleting a row.<br />
+			</div>
+				
+
+			<h4>Version: 2.26.0</h4>
+			<p>Pull Request: 6/16/2026</p>
 			<div style="margin: 0 0 10px 0">
 				<b>FIX:</b> Turning and Velocity Modifiers: Fixed turning radius and deceleration calculation bugs.<br />
 				<b>NEW:</b> Turning and Velocity Modifiers: Added a field for base move and top speed, handy if using a jet pack or similar device.<br />
@@ -31733,7 +31735,16 @@ See notes for the weapon.
     <rolltemplate class="sheet-rolltemplate-skillRoll">
         <div class="container rolltemplate-color-setting-{{sheetStyle}}">
             <table class="result">
-                <tr>
+                {{#privateRoll}}
+				<tr>
+                    <td colspan="2" class="sheet-private-roll">
+					<div>
+						<span data-i18n="private-roll-label">Private Roll</span>
+					</div>
+					</td>
+                </tr>
+				{{/privateRoll}}		
+				<tr>
                     <th colspan="2">
 						{{characterName}}
 						{{#target1}}
@@ -33917,9 +33928,9 @@ See notes for the weapon.
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.26.0";
+	const version = "2.27.0";
 	
-	const latestChangesDate = "6/16/2026";
+	const latestChangesDate = "6/29/2026";
 	
 	let modCascade = true;
 	
@@ -36866,7 +36877,7 @@ See notes for the weapon.
 		});
 		
 	});
-	
+
 	// Update the line total weight and cost
 	on('change:repeating_item:count change:repeating_item:cost change:repeating_item:carried change:repeating_item:weight', function (e) {
 		getAttrs(['repeating_item_count', 'repeating_item_cost', 'repeating_item_weight', 'repeating_item_carried'], function (item) {
@@ -36993,12 +37004,16 @@ See notes for the weapon.
 						items[parentFieldName] = "";
 
 						items[locationFieldName] = "";	
+
+						doUpdate = true;
 					}
 
 				});
 
 				if (doUpdate) {
 					setAttrs(items, null, callback);
+				} else {
+					callback();
 				}
 				
 			});
@@ -52368,7 +52383,7 @@ See notes for the weapon.
 	
 			} else if (rollOption === "private") {
 	
-				rollMacro = "/w gm ";
+				rollMacro = "/w gm {{privateRoll=1}}";
 	
 			} else if (rollOption === "custom") {
 	
@@ -52405,7 +52420,7 @@ See notes for the weapon.
 				rollOption = "public";
 			} else if (rollValue === "/w gm --l") {
 				rollOption = "deprecated";
-			} else if (rollValue === "/w gm") {
+			} else if (rollValue === "/w gm {{privateRoll=1}}") {
 				rollOption = "private";
 			} else {
 				rollOption = "custom";
