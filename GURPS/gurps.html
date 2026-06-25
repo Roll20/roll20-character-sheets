@@ -4389,6 +4389,7 @@
 				<div>
 					<b>NEW:</b> Added styling to roll results when "Private Rolls" is selected.<br />
 					<b>FIX:</b> Inventory Tab, fixed bug where the weight didn't update after deleting a row.<br />
+					<b>REVISION:</b> Moved custom macros results to the bottom of the roll results and added a title row "Custom Macros".<br />
 				</div>
 
 				<div style="margin: 10px 0 10px 0;">
@@ -5318,7 +5319,7 @@ Unmodified: <span name="attr_basic_speed_base" value="10"></span>
 						<input type="number" name="attr_basic_speed_points" value="0" step="5" title="Macro: @{NAME|basic_speed_points}" />
 					</div>
 					<div class="cell col4">
-						<button title="Reminder: You must select your Token first.&#013;This will add the Token's Speed plus DX&#013;as a single number in the Turn Order.&#013;DX was added to Speed to help break ties. (B363)" class="roll-tracker" type="roll" value="@{speed_tracker} [[[[@{selected|Basic_Speed}]]+[[(@{selected|dexterity}/100)]] &{tracker:=}]] &{template:addToTracker} {{characterName=@{character_name}}} {{skillName=Added to the Turn Order as [[ [[@{selected|Basic_Speed}]]+[[(@{selected|dexterity}/100)]] ]]}} {{basicSpeed=Speed: @{selected|Basic_Speed} &nbsp;&nbsp; DX: @{selected|dexterity}}}" name="roll_init" />
+						<button title="Reminder: You must select your Token first.&#013;This will add the Token's Speed plus DX&#013;as a single number in the Turn Order.&#013;DX was added to Speed to help break ties. (B363)" class="roll-tracker" type="roll" value="@{speed_tracker} [[[[@{selected|Basic_Speed}]]+[[(@{selected|dexterity}/100)]] &{tracker:=}]] &{template:addToTracker} {{sheetStyle=@{chatstyle}}} {{characterName=@{character_name}}} {{skillName=Added to the Turn Order as [[ [[@{selected|Basic_Speed}]]+[[(@{selected|dexterity}/100)]] ]]}} {{basicSpeed=Speed: @{selected|Basic_Speed} &nbsp;&nbsp; DX: @{selected|dexterity}}}" name="roll_init" />
 					</div>
 				</div> <!-- .row -->
 
@@ -28112,6 +28113,7 @@ For more information, see B409.
 			<div>
 				<b>NEW:</b> Added styling to roll results when "Private Rolls" is selected.<br />
 				<b>FIX:</b> Inventory Tab, fixed bug where the weight didn't update after deleting a row.<br />
+				<b>REVISION:</b> Moved custom macros results to the bottom of the roll results and added a title row "Custom Macros".<br />
 			</div>
 				
 
@@ -30457,7 +30459,7 @@ For more information, see B409.
 						</span>
 						<br />
 						
-						<input type="radio" name="attr_speed_tracker" value="/w gm" />
+						<input type="radio" name="attr_speed_tracker" value="/w gm {{privateRoll=1}}" />
 						<span class="popup">
 							<span data-i18n="private-speed-tracker-label">Private Speed Tracker</span>
 						</span>
@@ -31702,7 +31704,16 @@ See notes for the weapon.
     <rolltemplate class="sheet-rolltemplate-addToTracker">
         <div class="container rolltemplate-color-setting-{{sheetStyle}}">
             <table class="result">
-                <tr>
+                {{#privateRoll}}
+				<tr>
+                    <td colspan="2" class="sheet-private-roll">
+					<div>
+						<span data-i18n="private-roll-label">Private Roll</span>
+					</div>
+					</td>
+                </tr>
+				{{/privateRoll}}		
+				<tr>
                     <th colspan="2">
 						{{characterName}}
 					</th>
@@ -33494,78 +33505,6 @@ See notes for the weapon.
 				</tr>
 				{{/rollTotal() maxNine 1}}
 
-				{{#rollTotal() showCustomMacroOne 1}}
-					{{#customMacroOne}}
-					<tr>
-						<td colspan="2">
-							<div>
-								{{customMacroOne}}
-							</div>
-						</td>
-					</tr>
-					{{/customMacroOne}}
-				{{/rollTotal() showCustomMacroOne 1}}
-
-				{{#rollTotal() showCustomMacroTwo 1}}
-					{{#customMacroTwo}}
-					<tr>
-						<td colspan="2">
-							<div>
-								{{customMacroTwo}}
-							</div>
-						</td>
-					</tr>
-					{{/customMacroTwo}}
-				{{/rollTotal() showCustomMacroTwo 1}}
-
-				{{#rollTotal() showCustomMacroThree 1}}
-					{{#customMacroThree}}
-					<tr>
-						<td colspan="2">
-							<div>
-								{{customMacroThree}}
-							</div>
-						</td>
-					</tr>
-					{{/customMacroThree}}
-				{{/rollTotal() showCustomMacroThree 1}}
-
-				{{#rollTotal() showCustomMacroFour 1}}
-					{{#customMacroFour}}
-					<tr>
-						<td colspan="2">
-							<div>
-								{{customMacroFour}}
-							</div>
-						</td>
-					</tr>
-					{{/customMacroFour}}
-				{{/rollTotal() showCustomMacroFour 1}}
-
-				{{#rollTotal() showCustomMacroFive 1}}
-					{{#customMacroFive}}
-					<tr>
-						<td colspan="2">
-							<div>
-								{{customMacroFive}}
-							</div>
-						</td>
-					</tr>
-					{{/customMacroFive}}
-				{{/rollTotal() showCustomMacroFive 1}}
-
-				{{#rollTotal() showCustomMacroSix 1}}
-					{{#customMacroSix}}
-					<tr>
-						<td colspan="2">
-							<div>
-								{{customMacroSix}}
-							</div>
-						</td>
-					</tr>
-					{{/customMacroSix}}
-				{{/rollTotal() showCustomMacroSix 1}}
-
 				{{#rollTotal() displayRollModifierSummary 1}}
 					
 					{{#rollTraitSummary}}
@@ -33854,6 +33793,88 @@ See notes for the weapon.
                 </tr>
                 {{/noteBoxFourContent}}
         {{/rollTotal() noteBoxFourShow 1}}
+
+				{{#showCustomMacroTitleRow}}
+				<tr>
+					<td colspan="2" class="tool-modifier-title">
+						<div>
+							<span data-i18n="custom-macros-label">Custom Macros</span>
+						</div>
+					</td>
+				</tr>
+				{{/showCustomMacroTitleRow}}
+
+				{{#rollTotal() showCustomMacroOne 1}}
+					{{#customMacroOne}}
+					<tr>
+						<td colspan="2">
+							<div>
+								{{customMacroOne}}
+							</div>
+						</td>
+					</tr>
+					{{/customMacroOne}}
+				{{/rollTotal() showCustomMacroOne 1}}
+
+				{{#rollTotal() showCustomMacroTwo 1}}
+					{{#customMacroTwo}}
+					<tr>
+						<td colspan="2">
+							<div>
+								{{customMacroTwo}}
+							</div>
+						</td>
+					</tr>
+					{{/customMacroTwo}}
+				{{/rollTotal() showCustomMacroTwo 1}}
+
+				{{#rollTotal() showCustomMacroThree 1}}
+					{{#customMacroThree}}
+					<tr>
+						<td colspan="2">
+							<div>
+								{{customMacroThree}}
+							</div>
+						</td>
+					</tr>
+					{{/customMacroThree}}
+				{{/rollTotal() showCustomMacroThree 1}}
+
+				{{#rollTotal() showCustomMacroFour 1}}
+					{{#customMacroFour}}
+					<tr>
+						<td colspan="2">
+							<div>
+								{{customMacroFour}}
+							</div>
+						</td>
+					</tr>
+					{{/customMacroFour}}
+				{{/rollTotal() showCustomMacroFour 1}}
+
+				{{#rollTotal() showCustomMacroFive 1}}
+					{{#customMacroFive}}
+					<tr>
+						<td colspan="2">
+							<div>
+								{{customMacroFive}}
+							</div>
+						</td>
+					</tr>
+					{{/customMacroFive}}
+				{{/rollTotal() showCustomMacroFive 1}}
+
+				{{#rollTotal() showCustomMacroSix 1}}
+					{{#customMacroSix}}
+					<tr>
+						<td colspan="2">
+							<div>
+								{{customMacroSix}}
+							</div>
+						</td>
+					</tr>
+					{{/customMacroSix}}
+				{{/rollTotal() showCustomMacroSix 1}}
 
             </table>
         </div>
@@ -56296,16 +56317,22 @@ Characters with Skill: ${knowsSkill}`;
 		"show_skill_conditionals",
 		"skill_conditional_notes",
 		"macro_one_checked",
+		"macro_one_name",
 		"macro_one",
 		"macro_two_checked",
+		"macro_two_name",
 		"macro_two",
 		"macro_three_checked",
+		"macro_three_name",
 		"macro_three",
 		"macro_four_checked",
+		"macro_four_name",
 		"macro_four",
 		"macro_five_checked",
+		"macro_five_name",
 		"macro_five",
 		"macro_six_checked",
+		"macro_six_name",
 		"macro_six",
 	];
 
@@ -56372,27 +56399,51 @@ Characters with Skill: ${knowsSkill}`;
 
 		let macroOneChecked = values[`${section}_${rowId}_macro_one_checked`] ?? "0";
 
+		let macroOneName = values[`${section}_${rowId}_macro_one_name`] ?? "";
+
 		let macroOne = values[`${section}_${rowId}_macro_one`] ?? "";
 
 		let macroTwoChecked = values[`${section}_${rowId}_macro_two_checked`] ?? "0";
+
+		let macroTwoName = values[`${section}_${rowId}_macro_two_name`] ?? "";
 
 		let macroTwo = values[`${section}_${rowId}_macro_two`] ?? "";
 
 		let macroThreeChecked = values[`${section}_${rowId}_macro_three_checked`] ?? "0";
 
+		let macroThreeName = values[`${section}_${rowId}_macro_three_name`] ?? "";
+
 		let macroThree = values[`${section}_${rowId}_macro_three`] ?? "";
 
 		let macroFourChecked = values[`${section}_${rowId}_macro_four_checked`] ?? "0";
+
+		let macroFourName = values[`${section}_${rowId}_macro_four_name`] ?? "";
 
 		let macroFour = values[`${section}_${rowId}_macro_four`] ?? "";
 
 		let macroFiveChecked = values[`${section}_${rowId}_macro_five_checked`] ?? "0";
 
+		let macroFiveName = values[`${section}_${rowId}_macro_five_name`] ?? "";
+
 		let macroFive = values[`${section}_${rowId}_macro_five`] ?? "";
 
 		let macroSixChecked = values[`${section}_${rowId}_macro_six_checked`] ?? "0";
 
+		let macroSixName = values[`${section}_${rowId}_macro_six_name`] ?? "";
+
 		let macroSix = values[`${section}_${rowId}_macro_six`] ?? "";
+
+		let showMacroTitleRow = "0";
+
+		// if any of the macros are checked, show a title row
+		if ((macroOneChecked == "1" && macroOne) || 
+			(macroTwoChecked == "1" && macroTwo) || 
+			(macroThreeChecked == "1" && macroThree) || 
+			(macroFourChecked == "1" && macroFour) || 
+			(macroFiveChecked == "1" && macroFive) || 
+			(macroSixChecked == "1" && macroSix)) {
+			showMacroTitleRow = "1";
+		}
 
 		let rollDataArray = [];
 
@@ -56490,6 +56541,10 @@ Characters with Skill: ${knowsSkill}`;
 
 		if (macroSix) {
 			rollDataArray.push(`{{customMacroSix=${macroSix}}}`);
+		}
+
+		if (showMacroTitleRow == "1") {
+			rollDataArray.push(`{{showCustomMacroTitleRow=[[${showMacroTitleRow}]]}}`);
 		}
 
 		let rollData = rollDataArray.join(" ");
@@ -56752,6 +56807,18 @@ Characters with Skill: ${knowsSkill}`;
 
 		let macroSix = values[`${sectionName}_macro_six`] ?? "";
 
+		let showMacroTitleRow = "0";
+
+		// if any of the macros are checked, show a title row
+		if ((macroOneChecked == "1" && macroOne) || 
+			(macroTwoChecked == "1" && macroTwo) || 
+			(macroThreeChecked == "1" && macroThree) || 
+			(macroFourChecked == "1" && macroFour) || 
+			(macroFiveChecked == "1" && macroFive) || 
+			(macroSixChecked == "1" && macroSix)) {
+			showMacroTitleRow = "1";
+		}
+
 		let rollDataArray = [];
 
 		if (name) {
@@ -56797,7 +56864,6 @@ Characters with Skill: ${knowsSkill}`;
 		if (skillCriticalFailNote) {
 			rollDataArray.push(`{{customCriticalFailNote=${skillCriticalFailNote}}}`);
 		}
-
 		
 		rollDataArray.push(`{{showCustomMacroOne=[[${macroOneChecked}]]}}`);
 
@@ -56833,6 +56899,10 @@ Characters with Skill: ${knowsSkill}`;
 
 		if (macroSix) {
 			rollDataArray.push(`{{customMacroSix=${macroSix}}}`);
+		}
+
+		if (showMacroTitleRow == "1") {
+			rollDataArray.push(`{{showCustomMacroTitleRow=[[${showMacroTitleRow}]]}}`);
 		}
 
 		let rollData = rollDataArray.join(" ");
@@ -57017,6 +57087,18 @@ Characters with Skill: ${knowsSkill}`;
 
 		let macroSix = values[`${sectionName}_macro_six`] ?? "";
 
+		let showMacroTitleRow = "0";
+
+		// if any of the macros are checked, show a title row
+		if ((macroOneChecked == "1" && macroOne) || 
+			(macroTwoChecked == "1" && macroTwo) || 
+			(macroThreeChecked == "1" && macroThree) || 
+			(macroFourChecked == "1" && macroFour) || 
+			(macroFiveChecked == "1" && macroFive) || 
+			(macroSixChecked == "1" && macroSix)) {
+			showMacroTitleRow = "1";
+		}
+
 		let rollDataArray = [];
 
 		if (defenseType) {
@@ -57116,6 +57198,10 @@ Characters with Skill: ${knowsSkill}`;
 			rollDataArray.push(`{{customMacroSix=${macroSix}}}`);
 		}
 
+		if (showMacroTitleRow == "1") {
+			rollDataArray.push(`{{showCustomMacroTitleRow=[[${showMacroTitleRow}]]}}`);
+		}
+		
 		let rollData = rollDataArray.join(" ");
 
 		return rollData;
@@ -57478,6 +57564,18 @@ Characters with Skill: ${knowsSkill}`;
 
 		let macroSix = values[`${sectionName}_macro_six`] ?? "";
 
+		let showMacroTitleRow = "0";
+
+		// if any of the macros are checked, show a title row
+		if ((macroOneChecked == "1" && macroOne) || 
+			(macroTwoChecked == "1" && macroTwo) || 
+			(macroThreeChecked == "1" && macroThree) || 
+			(macroFourChecked == "1" && macroFour) || 
+			(macroFiveChecked == "1" && macroFive) || 
+			(macroSixChecked == "1" && macroSix)) {
+			showMacroTitleRow = "1";
+		}
+
 		let rollDataArray = [];
 
 		if (skillName) {
@@ -57556,6 +57654,10 @@ Characters with Skill: ${knowsSkill}`;
 
 		if (parryingWeaponWeight > 0) {
 			rollDataArray.push(`{{parryingWeaponWeight=${parryingWeaponWeight}}}`);
+		}
+
+		if (showMacroTitleRow == "1") {
+			rollDataArray.push(`{{showCustomMacroTitleRow=[[${showMacroTitleRow}]]}}`);
 		}
 
 		rollDataArray.push(`{{showCustomMacroOne=[[${macroOneChecked}]]}}`);
@@ -57774,6 +57876,18 @@ Characters with Skill: ${knowsSkill}`;
 
 		let macroSix = values[`${sectionName}_macro_six`] ?? "";
 
+		let showMacroTitleRow = "0";
+
+		// if any of the macros are checked, show a title row
+		if ((macroOneChecked == "1" && macroOne) || 
+			(macroTwoChecked == "1" && macroTwo) || 
+			(macroThreeChecked == "1" && macroThree) || 
+			(macroFourChecked == "1" && macroFour) || 
+			(macroFiveChecked == "1" && macroFive) || 
+			(macroSixChecked == "1" && macroSix)) {
+			showMacroTitleRow = "1";
+		}
+
 		let rollDataArray = [];
 
 		if (skillName) {
@@ -57903,6 +58017,10 @@ Characters with Skill: ${knowsSkill}`;
 
 		if (macroSix) {
 			rollDataArray.push(`{{customMacroSix=${macroSix}}}`);
+		}
+
+		if (showMacroTitleRow == "1") {
+			rollDataArray.push(`{{showCustomMacroTitleRow=[[${showMacroTitleRow}]]}}`);
 		}
 
 		let rollData = rollDataArray.join(" ");
@@ -58059,6 +58177,18 @@ Characters with Skill: ${knowsSkill}`;
 
 		let macroSix = values[`${sectionName}_macro_six`] ?? "";
 
+		let showMacroTitleRow = "0";
+
+		// if any of the macros are checked, show a title row
+		if ((macroOneChecked == "1" && macroOne) || 
+			(macroTwoChecked == "1" && macroTwo) || 
+			(macroThreeChecked == "1" && macroThree) || 
+			(macroFourChecked == "1" && macroFour) || 
+			(macroFiveChecked == "1" && macroFive) || 
+			(macroSixChecked == "1" && macroSix)) {
+			showMacroTitleRow = "1";
+		}
+
 		let rollDataArray = [];
 
 		if (skillName) {
@@ -58165,6 +58295,10 @@ Characters with Skill: ${knowsSkill}`;
 
 		if (macroSix) {
 			rollDataArray.push(`{{customMacroSix=${macroSix}}}`);
+		}
+
+		if (showMacroTitleRow == "1") {
+			rollDataArray.push(`{{showCustomMacroTitleRow=[[${showMacroTitleRow}]]}}`);
 		}
 
 		let rollData = rollDataArray.join(" ");
