@@ -7,7 +7,45 @@ More Information
 - [Star Wars 5E Sheet Wiki article](https://wiki.roll20.net/StarWars5E-Sheet)
 - [Star Wars 5e Discord](https://discord.gg/zYcPYTu)
 
+# Technical Informations
+## Dependencies
+Those are softwares that will be used to make use of the sheet.
+### npm
+npm is the package manager for Node.js.
+It is used to install, update, and manage project dependencies that are defined in a package.json file and installed via commands.
+Download : https://www.npmjs.com/
+
+### gulp 
+Gulp is a task runner used to automate development workflows. 
+It handles tasks such as building, bundling, and optimizing assets.Those are defined in a gulpfile and executed via commands
+Documentation : https://gulpjs.com/
+Download : npm i -g gulp
+
+### pug
+Pug is a template engine for Node.js used to generate HTML. It provides a concise, indentation-based syntax to write templates.
+Pug templates are compiled into HTML as part of the build process. 
+Documentation : https://pugjs.org/api/getting-started.html
+No need to download
+
+## Installation
+Once downloaded and, goes to the src folder and type the following command 
+- npm i
+This will install the required Dependencies.
+
+Then, still in the src folder you have three commands you can do :
+- gulp
+- gulp watch
+- gulp build
+The first will build the sheet that can be uploaded to a roll20 game with custom sheet or in sheet sandbox.
+The second is identical to the first, but will automatically build the sheet when a source file is changed.
+The third will also copy the generated sheet in the main folder so that the files are available for roll20 once they have accepted the changes.
+
 # Changelog
+## 2026-03-03
+* Chore : Added some technical documentation
+* Improvement : Added Trained Modifier to the list
+* Improvement : Added PC Import / Export
+* Bugfix : Stepper showing on some numeric fields that should not.
 ## 2025-05-07
 * Improvement : Added prepared checkbox for power
 * Bugfix : Solved issue with "item modifiers" 

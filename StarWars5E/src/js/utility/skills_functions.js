@@ -71,10 +71,26 @@ var update_inventory_from_skill_change = function(inventory, idarray,hiddenInven
 
             var total = attr_mod + flat + item_bonus;
 
+            var typeMult = 1;
+            switch(type)
+            {
+                case 3 : 
+                    typeMult = 0.5; //Trained
+                    break;
+                default : //Case 1 and 2 are already multiplier
+                    typeMult = type;
+            }
+
             if(v["pb_type"] && v["pb_type"] === "die") {
                 if(v[s + "_prof"] != 0) {
-                    type === 1 ? "" : "2"
-                    total = total + "+" + type + v["pb"];
+                    if(typeMult >= 1)
+                    {
+                        total = total + "+" + typeMult + v["pb"];
+                    }
+                    else
+                    {
+                        total = total + "+ floor(" + typeMult + " * " + v["pb"] + ")";
+                    }
                 }
                 else if(v[s + "_prof"] == 0 && jack != 0) {
                     total = total + "+" + jack;
@@ -82,7 +98,7 @@ var update_inventory_from_skill_change = function(inventory, idarray,hiddenInven
             }
             else {
                 if(v[s + "_prof"] != 0) {
-                    total = total + (prof * type);
+                    total = total + Math.floor(prof * typeMult);
                 }
                 else if(v[s + "_prof"] == 0 && jack != 0) {
                     total = total + parseInt(jack, 10);

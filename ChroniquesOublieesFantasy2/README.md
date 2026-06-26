@@ -6,9 +6,51 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.14.0 [Screenshot](cof2e.png)
+v1.16.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.16.0_ (2026-06-08)
+
+- Fiche de PJ:
+  - Gestion des Points d'Ego du profil de Psionique
+  - Amélioration des DM temporaires (message d'information, récupération)
+  - Affichage optionnel d'un bouton _Fin de tour_ sur les attaques
+  - Amélioration des jets de caractéristiques pour les capacités réglées sur _Demander_
+  - Ajout d'une saisie de modificateur aux jets de capacités et de compétences depuis le bouton caractéristique +
+  - Ajout de `DM/2` dans les DM supplémentaires des options tactiques (_Frappe du justicier_)
+  - Corrections sur la gestion des voies de prestige
+  - Possibilité d'indiquer plusieurs capacités (nom + description) par rang dans les voies 7 à 9
+  - Changement de syntaxe des propriétés de capacités `selonRang` et `buff`
+  - Ajout de la propriété de capacité `pcorphelin` pour calcul correct des PV maximum
+  - Ajout de `atk N` et `jet N` dans la propriété de capacité `roll`
+  - Ajout des modificateurs d'attaque `aoe` et `save`
+  - Ajout des options high fantasy de _Récupération complète_ et _Concentration puissante_
+
+- Fiche de PNJ:
+  - Ajout de 2 coups spéciaux paramétrables (pour un total de 5)
+  - Corrections sur les jets de caractéristiques
+  - Corrections sur les scores d'attaque de base
+
+### Version _1.15.1_ (2026-04-08)
+
+- Fiche de PJ:
+  - Affichage optionnel des options tactiques favorites sur le sous-onglet Attaques
+  - Ajout d'une option de configuration pour les options tactiques favorites
+  - Ajout d'un champ post-it pour saisie de notes "techniques"
+  - Ajout d'un bouton pour le combat à deux armes dans le sous-onglet _En main_
+  - Ajout d'une case pour le combat en milieu aquatique dans le sous-onglet _En main_
+  - Prise en compte des armes maîtrisées par profil
+  - Ajout d'une icone pour afficher les maîtrises martiales
+  - **Compagnon du Joueur**
+    - Ajout des peuples optionnels et des profils
+    - Prise en compte des bonus de manoeuvres et aux DM des armes
+
+- Fiche de PNJ:
+  - Ajout d'un modificateur d'attaque btn:N pour afficher un bouton de chat d'appel de la capacité no N
+  - Possibilité d'envoyer une description anonyme du PNJ dans le chat
+  - Affichage optionnel des capacités favorites sur le sous-onglet Attaques
+  - Ajout d'une option de configuration pour les capacités favorites
 
 ### Version _1.14.0_ (2026-01-31)
 
@@ -30,7 +72,6 @@ v1.14.0 [Screenshot](cof2e.png)
   - Ajout de la liste des ressources à l'onglet _Equipement_
   - Ajout d'une option pense-bête pour le script _TokenMod_
   - Ajout de la possibilité d'afficher les informations de tactique et/ou les notes dans une infobulle visible du MJ uniquement
-
 
 ### Version _1.13.0_ (2026-01-04)
 

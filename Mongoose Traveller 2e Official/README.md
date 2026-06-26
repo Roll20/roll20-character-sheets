@@ -136,5 +136,23 @@ This is the Official Mongoose Traveller 2nd Edition Character Sheet
 - Added Salvage tab to Trade to allow for free stuff Travellers get
 - Fixed Consolidate button in Manifest for Trade to only consolidate where price paid and commodity match (and ensure salvage does not get consolidated)
 
+### Version 1.1.13
+- Added max hits for robot so works on token
+- Added characteristics panel to Robot
+
+### Version 1.1.14
+- Fixed weapon headers and fields width on resize on Ship Combat tab
+- Changed DEX Mod label on Ship Combat Pilot tab to 'Charac. Mod'
+- Added Characteristic Mod to initiative roll
+
+### Version 1.1.15
+- Made robot PC skills panel show/hide via checkbox
+- Improve armour encumbrance check for battle dress and powered suits where the armour weight is effectively zero rather than 25% when worn
+- Fixed issues with equipment, weapons and armour weight calculations and triggering events
+
+### Version 1.1.16
+- Fixed bad compendium item weight/mass by checking for NaN
+- Fixed encumberance carry capacity for Athletics specialties
+
 ![Image](Official%20Mongoose%20Publishing%20Traveller%202nd%20Edition.png)
 

@@ -1,6 +1,6 @@
 /* -------------------------- IMPORTS -------------------------- */
-@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap");
 
 /* -------------------------- BASE STYLES -------------------------- */
 .charsheet {
@@ -13,12 +13,19 @@
   --h4color: #4f4f4f;
   --blackandwhite: white;
   --blackandwhite2: #1f1f1f;
+  --input-surface: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(246, 242, 242, 0.92) 100%);
+  --input-surface-hover: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(249, 243, 243, 0.98) 100%);
+  --input-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 1px 2px rgba(18, 20, 21, 0.08);
+  --input-shadow-focus: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 0 0 3px rgba(153, 0, 0, 0.12), 0 8px 18px rgba(153, 0, 0, 0.12);
   --main-font: "Lora", serif !important;
   --standard-font: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   --secondary-font: "Questrial", sans-serif;
+  --sheet-logo-url: url("https://www.dl.spirito.fr/RP/dzapocalypse/DZ-Logo.png");
 }
 
-.sheet-darkmode .charsheet {
+/* Ancestor .sheet-darkmode + descendant .charsheet (Roll20 DOM) */
+.sheet-darkmode .charsheet,
+.charsheet.sheet-darkmode {
   --main-color: #990000;
   --secondary-color: #d6e0e6;
   --accent-color: #a57979;
@@ -28,13 +35,35 @@
   --h4color: #9b9b9b;
   --blackandwhite: #1f1f1f;
   --blackandwhite2: white;
+  --input-surface: linear-gradient(180deg, rgba(48, 48, 48, 0.96) 0%, rgba(35, 35, 35, 0.96) 100%);
+  --input-surface-hover: linear-gradient(180deg, rgba(58, 58, 58, 0.98) 0%, rgba(40, 40, 40, 0.98) 100%);
+  --input-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 1px 3px rgba(0, 0, 0, 0.32);
+  --input-shadow-focus: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 0 3px rgba(153, 0, 0, 0.18), 0 8px 20px rgba(0, 0, 0, 0.35);
   --main-font: "Lora", serif !important;
   --standard-font: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   --secondary-font: "Questrial", sans-serif;
+  --sheet-logo-url: url("https://www.dl.spirito.fr/RP/dzapocalypse/DZ-Logo_dm.png");
+  background-color: #1f1f1f !important;
 }
 
-.sheet-darkmode .charactersheet {
-  background-color: var(--blackandwhite);
+/* Outer chrome (Roll20): area around / behind .charsheet often stays light without this */
+.sheet-darkmode .charactersheet,
+.charactersheet.sheet-darkmode {
+  background-color: #1f1f1f !important;
+}
+
+/* Roll20 default: .sheet-darkmode .sheetform { background: #fff } -- force sheet chrome to match theme */
+.sheet-darkmode .charactersheet .sheetform,
+.sheet-darkmode .sheetform,
+.charactersheet.sheet-darkmode .sheetform,
+.sheetform.sheet-darkmode {
+  background-color: #1f1f1f !important;
+}
+
+/* Character sheet dialog: body.sheet-darkmode > ... > #tab-content often keeps Roll20 light background */
+body.sheet-darkmode .characterviewer #tab-content.tab-content,
+body.sheet-darkmode .characterviewer > .tab-content {
+  background-color: #1f1f1f !important;
 }
 
 * {
@@ -52,15 +81,14 @@ textarea[readonly] {
   cursor: default;
   border-color: var(--border-grey) !important;
   color: var(--text-grey) !important;
-  background-color: var(--background-grey);
+  background: var(--background-grey);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.04);
 }
 
 /* -------------------------- UI DIALOG STYLES -------------------------- */
 button,
 input,
 select,
-span,
-label,
 option,
 textarea,
 button[type="roll"] {
@@ -81,15 +109,32 @@ button[type="roll"] {
   line-height: 18px;
   color: var(--secondary-color);
   border-color: var(--border-grey) !important;
-  background-color: var(--background-grey);
+  background: var(--input-surface);
   border: 1px solid;
+  box-shadow: var(--input-shadow);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, transform 0.16s ease;
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):hover,
+select:hover,
+textarea:hover {
+  border-color: var(--accent-color) !important;
+  background: var(--input-surface-hover);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):focus,
+select:focus,
+textarea:focus {
+  border-color: var(--main-color) !important;
+  box-shadow: var(--input-shadow-focus);
+  background: var(--input-surface-hover);
+  cursor: text;
+  transform: none;
 }
 
 button,
 input,
 select,
-span,
-label,
 option,
 button[type="roll"] {
   height: 18px !important;
@@ -100,6 +145,8 @@ button[type="roll"] {
 .charsheet label {
   background-color: transparent !important;
   border: none !important;
+  background-image: none !important;
+  box-shadow: none !important;
   margin: 0;
   padding: 0;
   text-align: center;
@@ -108,6 +155,7 @@ button[type="roll"] {
 input[type="number"] {
   -moz-appearance: textfield !important;
   appearance: textfield !important;
+  text-align: center;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -133,12 +181,6 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /* -------------------------- INPUT STYLES -------------------------- */
-input[type="number"] {
-  -moz-appearance: textfield;
-  appearance: none;
-  text-align: center;
-}
-
 input::-webkit-inner-spin-button,
 input::-webkit-outer-spin-button {
   -webkit-appearance: none;
@@ -225,64 +267,146 @@ button[type="roll"].sheet-button-description:before {
   content: "description" !important;
 }
 
+.charsheet button[type="roll"].sheet-button-description:before {
+  content: "description" !important;
+  font-family: "Material Symbols Outlined" !important;
+  font-size: 14px !important;
+  font-weight: 400;
+  line-height: 1;
+  display: block;
+  text-indent: 0 !important;
+}
+
 button[type="roll"].sheet-button-attack:before {
   content: "swords" !important;
 }
 
+.charsheet button[type="roll"].sheet-button-attack:before {
+  content: "swords" !important;
+  font-family: "Material Symbols Outlined" !important;
+  font-size: 14px !important;
+  font-weight: 400;
+  line-height: 1;
+  display: block;
+  text-indent: 0 !important;
+}
+
 /* -------------------------- SPECIAL -------------------------- */
 
-.sheet-main-skills input[type="checkbox"]:checked::before,
-.sheet-main-skills input[type="checkbox"]::before,
-.sheet-main-savingthrows input[type="checkbox"]:checked::before,
-.sheet-main-savingthrows input[type="checkbox"]::before,
-.sheet-main-weapons input[name="attr_weapon_active"]:checked::before,
-.sheet-main-weapons input[name="attr_weapon_active"]::before {
-  content: "";
+/* Skills / saves / weapons / nopb / HP custom: compact checkbox, aligned with sheet chrome */
+.charsheet .sheet-main-skills input[type="checkbox"],
+.charsheet .sheet-main-savingthrows input[type="checkbox"],
+.charsheet .sheet-main-weapons input[name="attr_weapon_active"],
+.charsheet .sheet-main-inspiration input[type="checkbox"],
+.charsheet input.sheet-nopb-toggle[type="checkbox"],
+.charsheet input.sheet-hpcustom-hideshow[type="checkbox"] {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  width: 12px !important;
+  height: 12px !important;
+  min-width: 12px !important;
+  min-height: 12px !important;
+  max-width: 12px !important;
+  max-height: 12px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 1px solid var(--border-grey) !important;
+  border-radius: 2px !important;
+  background: var(--background-grey) !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  position: relative;
+  vertical-align: middle;
+  flex-shrink: 0;
 }
 
-.sheet-main-skills input[type="checkbox"]:checked,
-.sheet-main-savingthrows input[type="checkbox"]:checked,
-.sheet-main-weapons input[name="attr_weapon_active"]:checked  {
-  border-radius: 100%;
-  width: 10px !important;
-  height: 10px !important;
+.charsheet .sheet-main-skills input[type="checkbox"]:hover,
+.charsheet .sheet-main-savingthrows input[type="checkbox"]:hover,
+.charsheet .sheet-main-weapons input[name="attr_weapon_active"]:hover,
+.charsheet .sheet-main-inspiration input[type="checkbox"]:hover,
+.charsheet input.sheet-nopb-toggle[type="checkbox"]:hover,
+.charsheet input.sheet-hpcustom-hideshow[type="checkbox"]:hover {
+  border-color: var(--text-grey) !important;
 }
 
-.sheet-main-skills input[type="checkbox"],
-.sheet-main-savingthrows input[type="checkbox"],
-.sheet-main-weapons input[name="attr_weapon_active"] {
-  border-radius: 100%;
-  width: 10px !important;
-  height: 10px !important;
+.charsheet .sheet-main-skills input[type="checkbox"]:checked,
+.charsheet .sheet-main-savingthrows input[type="checkbox"]:checked,
+.charsheet .sheet-main-weapons input[name="attr_weapon_active"]:checked,
+.charsheet .sheet-main-inspiration input[type="checkbox"]:checked,
+.charsheet input.sheet-nopb-toggle[type="checkbox"]:checked,
+.charsheet input.sheet-hpcustom-hideshow[type="checkbox"]:checked {
+  background: var(--main-color) !important;
+  border-color: var(--main-color) !important;
+}
+
+.charsheet .sheet-main-skills input[type="checkbox"]::before,
+.charsheet .sheet-main-savingthrows input[type="checkbox"]::before,
+.charsheet .sheet-main-weapons input[name="attr_weapon_active"]::before,
+.charsheet .sheet-main-inspiration input[type="checkbox"]::before,
+.charsheet input.sheet-nopb-toggle[type="checkbox"]::before,
+.charsheet input.sheet-hpcustom-hideshow[type="checkbox"]::before {
+  content: "" !important;
+}
+
+.charsheet .sheet-main-skills input[type="checkbox"]:checked::before,
+.charsheet .sheet-main-savingthrows input[type="checkbox"]:checked::before,
+.charsheet .sheet-main-weapons input[name="attr_weapon_active"]:checked::before,
+.charsheet .sheet-main-inspiration input[type="checkbox"]:checked::before,
+.charsheet input.sheet-nopb-toggle[type="checkbox"]:checked::before,
+.charsheet input.sheet-hpcustom-hideshow[type="checkbox"]:checked::before {
+  content: "" !important;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 6px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-right: 1.5px solid rgba(255, 255, 255, 0.92);
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.92);
+  box-sizing: border-box;
+  transform: translate(-50%, -58%) rotate(45deg);
+  display: block;
+  pointer-events: none;
+  background: none !important;
+  box-shadow: none !important;
 }
 
 input[type="checkbox"]:checked::before {
-    content: "✔";
+    content: "+";
     color: white;
     font-size: 10px;
+    font-weight: bold;
 }
 
 input[type="checkbox"]::before {
-  content: "✘";
+  content: "-";
   color: grey;
   font-size: 10px;
+  font-weight: bold;
 }
 
 /* -------------------------- TEXT AREA STYLES -------------------------- */
 .charsheet textarea {
   width: 100% !important;
-  border: none;
   height: 16px;
   line-height: 14px !important;
   text-shadow: none;
   font-family: var(--secondary-font);
   font-weight: normal;
   border: 1px solid var(--border-grey);
-  box-shadow: none;
   resize: vertical;
   overflow: hidden;
-  padding: 0 5px;
+  padding: 3px 7px;
   margin: 0;
+  border-radius: 4px;
+  background: var(--input-surface);
+  box-shadow: var(--input-shadow);
+}
+
+select {
+  padding-right: 4px !important;
 }
 
 /* -------------------------- ROLL TEMPLATE -------------------------- */
@@ -305,6 +429,26 @@ input[type="checkbox"]::before {
   font-size: 16px;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
+}
+
+/* ROLL TEMPLATE: dark vars — Roll20 may put darkmode on the template root OR on a parent wrapper */
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-dzapocalypse,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-dzapocalypse-description,
+.sheet-rolltemplate-darkmode .sheet-rolltemplate-dzapocalypse,
+.sheet-rolltemplate-darkmode .sheet-rolltemplate-dzapocalypse-description {
+  --main-color: #990000;
+  --secondary-color: #d6e0e6;
+  --accent-color: #a57979;
+  --background-grey: #2d2d2d;
+  --border-grey: #454545;
+  --text-grey: #8d8d8d;
+  --h4color: #9b9b9b;
+  --blackandwhite: #1f1f1f;
+  --blackandwhite2: white;
+  --main-font: "Lora", serif !important;
+  --standard-font: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  --secondary-font: "Questrial", sans-serif;
+  background-color: #252a30;
 }
 
 .sheet-rolltemplate-dzapocalypse .sheet-triplecolumn {
@@ -391,10 +535,10 @@ input[type="checkbox"]::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/bottom-background3.png");
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/bottom-background3.png");
   background-size: cover;
   background-position: center;
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ55.png");
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ55.png");
   border-image-slice: 25;
   border-image-width: 18px;
   border-image-outset: 0px;
@@ -403,12 +547,13 @@ input[type="checkbox"]::before {
   z-index: 0;
 }
 
-.sheet-rolltemplate-dzapocalypse-description .sheet-rolltemplate-darkmode .sheet-template-header::before,
-.sheet-rolltemplate-dzapocalypse .sheet-rolltemplate-darkmode .sheet-template-header::before {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/bottom-background3.png");
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ55_DM.png");
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-dzapocalypse-description .sheet-template-header::before,
+.sheet-rolltemplate-darkmode.sheet-rolltemplate-dzapocalypse .sheet-template-header::before,
+.sheet-rolltemplate-darkmode .sheet-rolltemplate-dzapocalypse-description .sheet-template-header::before,
+.sheet-rolltemplate-darkmode .sheet-rolltemplate-dzapocalypse .sheet-template-header::before {
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/bottom-background3.png");
 }
-
+ 
 .sheet-rolltemplate-dzapocalypse-description .sheet-template-header > *,
 .sheet-rolltemplate-dzapocalypse .sheet-template-header > * {
   position: relative;
@@ -754,15 +899,20 @@ h4.sheet-minititles2 {
 /* -------------------------- REP CONTROL CONTAINER SECTION -------------------------- */
 
 .charsheet .repcontrol {
-  width: 100%;
-  display: flex;
+  width: 100% !important;
+  display: flex !important;
   position: relative;
   z-index: 99;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   height: 18px;
   max-height: 18px;
   margin: auto !important;
+}
+
+.charsheet .repcontrol[data-groupname="repeating_vehiclestorage"] {
+  min-height: 18px;
+  flex-wrap: nowrap;
 }
 
 .repcontrol_add,
@@ -809,9 +959,49 @@ h4.sheet-minititles2 {
   color: transparent;
   background: transparent;
   box-shadow: none;
+  float: none !important;
+  clear: none !important;
   margin: 0;
   padding: 0;
   height: 18px;
+  line-height: 18px;
+  width: 18px;
+  flex: 0 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.charsheet .repcontrol > .btn.repcontrol_edit,
+.charsheet .repcontrol > .btn.repcontrol_add {
+  width: 18px !important;
+  min-width: 18px !important;
+  max-width: 18px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-indent: -9999px !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+}
+
+.charsheet .repcontrol_edit {
+  order: 1;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
+.charsheet .repcontrol_add {
+  order: 2;
+  margin-left: auto !important;
+  margin-right: 0 !important;
 }
 
 .charsheet .repcontrol_add:focus-visible,
@@ -822,30 +1012,43 @@ h4.sheet-minititles2 {
 .repcontrol_add:before {
   content: "+";
   visibility: visible;
-  padding: 2px 0 0 0;
+  text-indent: 0 !important;
+  padding: 0;
   border: none;
   font-family: pictos;
   font-size: 14px;
   color: #555;
-  text-align: right;
+  text-align: center;
   display: block;
-  width: 100%;
+  width: auto;
+  line-height: 1;
+}
+
+.charsheet .repcontrol[data-groupname="repeating_vehiclestorage"] .repcontrol_edit {
+  order: 1;
+  margin-right: auto;
+}
+
+.charsheet .repcontrol[data-groupname="repeating_vehiclestorage"] .repcontrol_add {
+  order: 2;
+  margin-left: auto;
 }
 
 .repcontrol_edit:after {
   content: "y";
   visibility: visible;
+  text-indent: 0 !important;
   padding: 0;
   border: none;
   font-family: pictos;
   font-size: 16px;
   color: #555;
-  text-align: left;
+  text-align: center;
   display: block;
-  width: 100%;
-  position: relative;
-  top: -16px !important;
-  height: fit-content;
+  width: auto;
+  position: static;
+  height: auto;
+  line-height: 1;
 }
 
 .editmode ~ .repcontrol .repcontrol_edit:after {
@@ -949,6 +1152,9 @@ select.sheet-inputchar {
   font-weight: bolder;
   background-color: transparent !important;
   border: none;
+  background-image: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
 }
 
 input.sheet-inputchar2 {
@@ -957,7 +1163,12 @@ input.sheet-inputchar2 {
   max-width: 45px;
   font-size: 12px !important;
   font-family: var(--secondary-font);
-  color:var(--text-grey)!important;
+  color:var(--main-color)!important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  border-color: transparent !important;
 }
 
 .sheet-button-holder input {
@@ -1000,10 +1211,13 @@ input[type="radio"] {
   font-weight: 100 !important;
   margin: 0;
   padding: 0;
+  background-color: var(--background-grey) !important;
+  border: 1px solid var(--border-grey) !important;
 }
 
 input[type="radio"]:checked + .radio-button {
-  background-color: var(--main-color);
+  background-color: var(--main-color) !important;
+  border-color: var(--main-color) !important;
   color: white!important;
   margin: 0;
   padding: 0;
@@ -1028,16 +1242,6 @@ input:hover ~ span {
   width: 100%;
   margin: 0 auto;
   padding: 0;
-  position: relative;
-}
-
-.sheet-standardbox::before {
-  display: flex;
-  flex-direction: column-reverse;
-  position: relative;
-  z-index: 0;
-  min-width: 0;
-  overflow: hidden;
 }
 
 .sheet-standardbox::before {
@@ -1048,204 +1252,227 @@ input:hover ~ span {
   display: block;
   height: 100%;
   left: 0;
+  min-width: 0;
+  overflow: hidden;
   position: absolute;
   top: 0;
   width: 100%;
+  z-index: 0;
 }
 
 .sheet-standardbox11.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ51.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ51.png") 22 fill stretch !important;
 }
 
 .sheet-standardbox12.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ51.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ51.png") 22 fill stretch !important;
   transform: scaleY(-1);
 }
 
 .sheet-standardbox13.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ51.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ51.png") 22 fill stretch !important;
   transform: scaleX(-1);
 }
 
 .sheet-standardbox14.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ51.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ51.png") 22 fill stretch !important;
   transform: scale(-1, -1);
 }
 
 .sheet-standardbox21.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ52.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ52.png") 22 fill stretch !important;
 }
 
 .sheet-standardbox22.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ52.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ52.png") 22 fill stretch !important;
   transform: scaleY(-1);
 }
 
 .sheet-standardbox23.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ52.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ52.png") 22 fill stretch !important;
   transform: scaleX(-1);
 }
 
 .sheet-standardbox24.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ52.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ52.png") 22 fill stretch !important;
   transform: scale(-1, -1);
 }
 
 .sheet-standardbox31.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ53.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ53.png") 22 fill stretch !important;
 }
 
 .sheet-standardbox32.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ53.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ53.png") 22 fill stretch !important;
   transform: scaleY(-1);
 }
 
 .sheet-standardbox33.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ53.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ53.png") 22 fill stretch !important;
   transform: scaleX(-1);
 }
 
 .sheet-standardbox34.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ53.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ53.png") 22 fill stretch !important;
   transform: scale(-1, -1);
 }
 
 .sheet-standardbox41.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ54.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ54.png") 22 fill stretch !important;
 }
 
 .sheet-standardbox42.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ54.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ54.png") 22 fill stretch !important;
   transform: scaleY(-1);
 }
 
 .sheet-standardbox43.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ54.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ54.png") 22 fill stretch !important;
   transform: scaleX(-1);
 }
 
 .sheet-standardbox44.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ54.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ54.png") 22 fill stretch !important;
   transform: scale(-1, -1);
 }
 
 .sheet-standardbox51.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ55.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ55.png") 22 fill stretch !important;
 }
 
 .sheet-standardbox52.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ55.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ55.png") 22 fill stretch !important;
   transform: scaleY(-1);
 }
 
 .sheet-standardbox53.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ55.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ55.png") 22 fill stretch !important;
   transform: scaleX(-1);
 }
 
 .sheet-standardbox54.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ55.png") 22 fill stretch !important;
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ55.png") 22 fill stretch !important;
   transform: scale(-1, -1);
 }
 
 /* -------------------------- DARKMODE -------------------------- */
 
-.sheet-darkmode .sheet-standardbox11.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ51_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox11.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox11.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ51_DM.png") 22 fill stretch !important;
 }
 
-.sheet-darkmode .sheet-standardbox12.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ51_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox12.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox12.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ51_DM.png") 22 fill stretch !important;
   transform: scaleY(-1);
 }
 
-.sheet-darkmode .sheet-standardbox13.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ51_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox13.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox13.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ51_DM.png") 22 fill stretch !important;
   transform: scaleX(-1);
 }
 
-.sheet-darkmode .sheet-standardbox14.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ51_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox14.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox14.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ51_DM.png") 22 fill stretch !important;
   transform: scale(-1, -1);
 }
 
-.sheet-darkmode .sheet-standardbox21.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ52_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox21.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox21.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ52_DM.png") 22 fill stretch !important;
 }
 
-.sheet-darkmode .sheet-standardbox22.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ52_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox22.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox22.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ52_DM.png") 22 fill stretch !important;
   transform: scaleY(-1);
 }
 
-.sheet-darkmode .sheet-standardbox23.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ52_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox23.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox23.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ52_DM.png") 22 fill stretch !important;
   transform: scaleX(-1);
 }
 
-.sheet-darkmode .sheet-standardbox24.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ52_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox24.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox24.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ52_DM.png") 22 fill stretch !important;
   transform: scale(-1, -1);
 }
 
-.sheet-darkmode .sheet-standardbox31.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ53_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox31.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox31.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ53_DM.png") 22 fill stretch !important;
 }
 
-.sheet-darkmode .sheet-standardbox32.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ53_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox32.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox32.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ53_DM.png") 22 fill stretch !important;
   transform: scaleY(-1);
 }
 
-.sheet-darkmode .sheet-standardbox33.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ53_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox33.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox33.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ53_DM.png") 22 fill stretch !important;
   transform: scaleX(-1);
 }
 
-.sheet-darkmode .sheet-standardbox34.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ53_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox34.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox34.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ53_DM.png") 22 fill stretch !important;
   transform: scale(-1, -1);
 }
 
-.sheet-darkmode .sheet-standardbox41.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ54_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox41.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox41.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ54_DM.png") 22 fill stretch !important;
 }
 
-.sheet-darkmode .sheet-standardbox42.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ54_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox42.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox42.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ54_DM.png") 22 fill stretch !important;
   transform: scaleY(-1);
 }
 
-.sheet-darkmode .sheet-standardbox43.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ54_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox43.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox43.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ54_DM.png") 22 fill stretch !important;
   transform: scaleX(-1);
 }
 
-.sheet-darkmode .sheet-standardbox44.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ54_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox44.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox44.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ54_DM.png") 22 fill stretch !important;
   transform: scale(-1, -1);
 }
 
-.sheet-darkmode .sheet-standardbox51.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ55_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox51.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox51.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ55_DM.png") 22 fill stretch !important;
 }
 
-.sheet-darkmode .sheet-standardbox52.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ55_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox52.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox52.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ55_DM.png") 22 fill stretch !important;
   transform: scaleY(-1);
 }
 
-.sheet-darkmode .sheet-standardbox53.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ55_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox53.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox53.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ55_DM.png") 22 fill stretch !important;
   transform: scaleX(-1);
 }
 
-.sheet-darkmode .sheet-standardbox54.sheet-standardbox::before {
-  border-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/BlocFrame-DZ55_DM.png") 22 fill stretch !important;
+.sheet-darkmode .sheet-standardbox54.sheet-standardbox::before,
+.charsheet.sheet-darkmode .sheet-standardbox54.sheet-standardbox::before {
+  border-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/BlocFrame-DZ55_DM.png") 22 fill stretch !important;
   transform: scale(-1, -1);
 }
 
-/* -------------------------- -------------------------- */
+/* -------------------------- LAYOUT -------------------------- */
 
 .sheet-oneline {
   width: calc(100% - 20px) !important;
@@ -1301,6 +1528,10 @@ input:hover ~ span {
   align-items: center !important;
   column-gap: 0px !important;
   row-gap: 5px;
+}
+
+.sheet-equipment-summary-label {
+  grid-column: 1 / -1;
 }
 
 .sheet-quadcolumn {
@@ -1373,14 +1604,11 @@ input:hover ~ span {
   display: none;
 }
 
-.sheet-general-hideshow:checked ~ .sheet-general-hideshow-div1,
-.sheet-general-hideshow:not(:checked) ~ .sheet-general-hideshow-div2 {
-  display: none;
-}
-
 .sheet-hpcustom-hideshow:checked ~ .sheet-hpcustom-hideshow-div1,
-.sheet-hpcustom-hideshow:not(:checked) ~ .sheet-hpcustom-hideshow-div2 {
-  display: none;
+.sheet-hpcustom-hideshow:not(:checked) ~ .sheet-hpcustom-hideshow-div2,
+.sheet-hpcustom-hideshow:checked ~ .sheet-life-hp-values .sheet-hpcustom-hideshow-div1,
+.sheet-hpcustom-hideshow:not(:checked) ~ .sheet-life-hp-values .sheet-hpcustom-hideshow-div2 {
+  display: none !important;
 }
 
 .sheet-head-hideshow-div1,
@@ -1402,16 +1630,90 @@ input:hover ~ span {
 
 /* -------------------------- DZ SPECIAL DIV -------------------------- */
 
-.sheet-main-skills div,
-.sheet-main-savingthrows div {
-  row-gap: 0px !important;
+.charsheet .sheet-main-skills div,
+.charsheet .sheet-main-savingthrows div {
+  row-gap: 3px !important;
 }
 
 .sheet-main-skills .sheet-oneline div {
-  grid-template-columns: 10px 25px 12px 1fr;
+  grid-template-columns: 12px 26px 1fr 30px;
+  grid-template-rows: 1fr;
   justify-content: space-between;
-  column-gap: 7.5px;
+  column-gap: 4px;
   padding-left: 3px;
+}
+
+.sheet-main-skills .sheet-oneline > div > input[type="checkbox"] {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.sheet-main-skills .sheet-oneline > div > input[type="number"] {
+  grid-column: 2;
+  grid-row: 1;
+  text-align: center;
+  font-size: 11px !important;
+  font-weight: 700;
+  color: var(--secondary-color) !important;
+}
+
+.sheet-main-skills .sheet-oneline > div > .sheet-button-div-holder {
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.sheet-main-skills .sheet-oneline > div > select {
+  grid-column: 4;
+  grid-row: 1;
+  justify-self: end;
+  text-align: right;
+  font-size: 8px !important;
+  color: var(--text-grey) !important;
+  opacity: 0.85;
+}
+
+.sheet-main-skills .sheet-oneline > div > .sheet-button-div-holder h4 {
+  white-space: nowrap;
+}
+
+.sheet-main-skills .sheet-oneline > div,
+.sheet-main-savingthrows .sheet-oneline > div {
+  height: auto !important;
+  min-height: 0 !important;
+  align-items: center;
+}
+
+.sheet-main-skills input[type="number"],
+.sheet-main-skills select,
+.sheet-main-skills input[type="checkbox"],
+.sheet-main-savingthrows input[type="number"],
+.sheet-main-savingthrows select,
+.sheet-main-savingthrows input[type="checkbox"] {
+  height: 12px !important;
+  max-height: 12px !important;
+  line-height: 12px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.sheet-main-skills h4,
+.sheet-main-savingthrows h4 {
+  line-height: 10px !important;
+  margin: 0 !important;
+}
+
+.charsheet .sheet-main-skills h4.sheet-minititles2,
+.charsheet .sheet-main-savingthrows h4.sheet-minititles2 {
+  border-bottom: 1px solid var(--h4color);
+  padding-bottom: 3px !important;
+  margin: 7px auto -5px auto !important;
+  width: calc(100% + -10px);
+  left: 0;
+  position: relative;
+  line-height: 10px !important;
 }
 
 .sheet-main-skills .sheet-oneline div > div {
@@ -1423,10 +1725,49 @@ input:hover ~ span {
 }
 
 .sheet-main-savingthrows .sheet-oneline div {
-  grid-template-columns: 10px 12px 1fr;
+  grid-template-columns: 12px 26px 1fr 30px;
+  grid-template-rows: 1fr;
   justify-content: space-between;
-  column-gap: 7.5px;
+  column-gap: 4px;
   padding-left: 3px;
+}
+
+.sheet-main-savingthrows .sheet-oneline > div > input[type="checkbox"] {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.sheet-main-savingthrows .sheet-oneline > div > input[type="number"] {
+  grid-column: 2;
+  grid-row: 1;
+  text-align: center;
+  font-size: 11px !important;
+  font-weight: 700;
+  color: var(--secondary-color) !important;
+}
+
+.sheet-main-savingthrows .sheet-oneline > div > .sheet-button-div-holder {
+  grid-column: 3;
+  grid-row: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.sheet-main-savingthrows .sheet-oneline > div > .sheet-button-div-holder h4 {
+  white-space: nowrap;
+}
+
+.sheet-main-savingthrows .sheet-oneline > div > .sheet-button-div-holder::after {
+  content: "SAVE";
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: right;
+  font-size: 8px !important;
+  color: var(--text-grey) !important;
+  opacity: 0.85;
+  letter-spacing: 0.3px;
 }
 
 .sheet-main-savingthrows select,
@@ -1508,16 +1849,12 @@ input[name="attr_effect-time"] {
 
 .sheet-main-image {
   grid-area: image;
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/DZ-Logo.png") !important;
+  background-image: var(--sheet-logo-url) !important;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
   width: 100%;
   height: 100%;
-}
-
-.sheet-darkmode .sheet-main-image {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/DZ-Logo_dm.png") !important;
 }
 
 .sheet-maingrid-area,
@@ -1551,7 +1888,7 @@ input[name="attr_effect-time"] {
 }
 
 .sheet-weapons-row1 {
-    grid-template-columns: 25px 10px 1fr 35px 60px 80px 25px 25px 8px 12px;
+    grid-template-columns: 25px 12px 1fr 35px 60px 80px 25px 25px 8px 12px;
 }
 
 .sheet-weapons-row2 {
@@ -1590,6 +1927,7 @@ input[name="attr_effect-time"] {
 .sheet-maingrid-area > div > div,
 .sheet-background-area > div > div {
   height: 100%;
+  gap: 10px;
 }
 
 .sheet-main-features-traits,
@@ -1598,22 +1936,20 @@ input[name="attr_effect-time"] {
   height: auto !important;
 }
 
-.sheet-main-general-container {
-  grid-area:cogs;
-}
-
 .sheet-maingrid-area-header1 {
   grid-template-areas:
     "image image image image image image header header header header";
 }
 
 .sheet-maingrid-area-header2 {
-    grid-template-areas: "menu menu menu menu menu menu rollstatus rollstatus rollstatus cogs";
-    height: 28px;
-    grid-template-rows: 28px!important;
-    grid-template-columns: repeat(9,1fr) 20px;
+    grid-template-areas: "menu menu menu menu menu menu rollstatus rollstatus rollstatus rollstatus";
+    min-height: 32px;
+    height: auto;
+    grid-template-rows: minmax(32px, auto) !important;
+    grid-template-columns: repeat(10, 1fr);
     margin-top: 10px!important;
     gap: 10px!important;
+    align-items: stretch;
 }
 
 .sheet-maingrid-area {
@@ -1632,7 +1968,7 @@ input[name="attr_effect-time"] {
 }
 
 .sheet-imgfixed-weapons {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/weapon-icon.png");
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/weapon-icon.png");
   z-index: 0 !important;
   background-size: contain;
   background-repeat: no-repeat;
@@ -1644,7 +1980,7 @@ input[name="attr_effect-time"] {
 }
 
 .sheet-imgfixed-cadreblanc {
-    background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/cadre-blanc5.png");
+    background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/cadre-blanc5.png");
     z-index: 999!important;
     background-size: contain;
     background-repeat: no-repeat;
@@ -1654,8 +1990,9 @@ input[name="attr_effect-time"] {
     position: absolute!important;
 }
 
-.sheet-darkmode .sheet-imgfixed-cadreblanc {
-    background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/cadre-blanc5_dm.png");
+.sheet-darkmode .sheet-imgfixed-cadreblanc,
+.charsheet.sheet-darkmode .sheet-imgfixed-cadreblanc {
+    background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/cadre-blanc5_dm.png");
 }
 
 img.error {
@@ -1674,81 +2011,86 @@ img.error {
 }
 
 .sheet-imgfixed-back {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/backpack-icon.png");
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/backpack-icon.png");
 }
 
 .sheet-imgfixed-helmet {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/helmet-icon.png");
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/helmet-icon.png");
 }
 
 .sheet-imgfixed-feets {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/shoes-icon.png");
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/shoes-icon.png");
 }
 
 .sheet-imgfixed-hands {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/gloves-icon.png");
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/gloves-icon.png");
 }
 
 .sheet-imgfixed-face {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/face-icon.png");
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/face-icon.png");
 }
 
 .sheet-imgfixed-chest {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/chest-icon.png");
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/chest-icon.png");
 }
 
 .sheet-imgfixed-belt {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/belt-icon.png");
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/belt-icon.png");
 }
 
 .sheet-imgfixed-legs {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/pants-icon.png");
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/pants-icon.png");
 }
 
 .sheet-imgfixed-holster {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/holster-icon.png");
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/holster-icon.png");
 }
 
-.sheet-imgfixed-back {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/backpack-icon.png");
+/* -------------------------- DARK MODE ICONS -------------------------- */
+
+.sheet-darkmode .sheet-imgfixed-helmet,
+.charsheet.sheet-darkmode .sheet-imgfixed-helmet {
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/helmet_dm.png");
 }
 
-/* -------------------------- -------------------------- */
-
-.sheet-darkmode .sheet-imgfixed-helmet {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/helmet_dm.png");
+.sheet-darkmode .sheet-imgfixed-feets,
+.charsheet.sheet-darkmode .sheet-imgfixed-feets {
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/shoes_dm.png");
 }
 
-.sheet-darkmode .sheet-imgfixed-feets {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/shoes_dm.png");
+.sheet-darkmode .sheet-imgfixed-hands,
+.charsheet.sheet-darkmode .sheet-imgfixed-hands {
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/gloves_dm.png");
 }
 
-.sheet-darkmode .sheet-imgfixed-hands {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/gloves_dm.png");
+.sheet-darkmode .sheet-imgfixed-face,
+.charsheet.sheet-darkmode .sheet-imgfixed-face {
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/face_dm.png");
 }
 
-.sheet-darkmode .sheet-imgfixed-face {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/face_dm.png");
+.sheet-darkmode .sheet-imgfixed-chest,
+.charsheet.sheet-darkmode .sheet-imgfixed-chest {
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/chest_dm.png");
 }
 
-.sheet-darkmode .sheet-imgfixed-chest {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/chest_dm.png");
+.sheet-darkmode .sheet-imgfixed-belt,
+.charsheet.sheet-darkmode .sheet-imgfixed-belt {
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/belt_dm.png");
 }
 
-.sheet-darkmode .sheet-imgfixed-belt {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/belt_dm.png");
+.sheet-darkmode .sheet-imgfixed-legs,
+.charsheet.sheet-darkmode .sheet-imgfixed-legs {
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/pants_dm.png");
 }
 
-.sheet-darkmode .sheet-imgfixed-legs {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/pants_dm.png");
+.sheet-darkmode .sheet-imgfixed-holster,
+.charsheet.sheet-darkmode .sheet-imgfixed-holster {
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/holster_dm.png");
 }
 
-.sheet-darkmode .sheet-imgfixed-holster {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/holster_dm.png");
-}
-
-.sheet-darkmode .sheet-imgfixed-back {
-  background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/backpack_dm.png");
+.sheet-darkmode .sheet-imgfixed-back,
+.charsheet.sheet-darkmode .sheet-imgfixed-back {
+  background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/backpack_dm.png");
 }
 
 .sheet-bottom-background {
@@ -1758,22 +2100,18 @@ img.error {
     width: 100%;
     height: 217px !important;
     z-index: 0;
-    background-image: url("https://www.spirito.fr/DL/RP/dzapocalypse/bottom-background3.png");
+    background-image: url("https://www.dl.spirito.fr/RP/dzapocalypse/bottom-background3.png");
     background-size: cover;
     background-repeat: no-repeat;
     background-position: bottom;
-    width: 100%;
     text-align: center;
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1px;
-    position: relative;
-    z-index: 1;
     margin: -75px auto -10px auto!important;
     border: 1px;
     padding: 1px;
     opacity: 0.5;
-    z-index:0;
 }
 
 
@@ -1789,8 +2127,7 @@ img.error {
     "statistics skills skills"
     "statistics skills skills"
     "statistics skills skills"
-    "statistics inspiration inspiration"
-    "passiveperception passiveperception passiveperception"
+    "inspipassiv inspipassiv inspipassiv"
     "featurestraits featurestraits featurestraits"
     "proficiencies proficiencies proficiencies"
     "effects effects effects";
@@ -1805,9 +2142,11 @@ img.error {
 
 .sheet-maingrid-area-right {
   grid-template-areas:
+    "life life life life"
     "characteristics characteristics characteristics characteristics"
     "characteristics characteristics characteristics characteristics"
     "characteristics characteristics characteristics characteristics"
+    "needs needs needs needs"
     "clothing clothing clothing clothing"
     "clothing clothing clothing clothing"
     "equipment equipment equipment equipment"
@@ -1816,12 +2155,6 @@ img.error {
   grid-area: gridright;
   grid-template-columns: repeat(4, 1fr);
   z-index: 1;
-}
-
-.sheet-maingrid-area-right,
-.sheet-maingrid-area-left,
-.sheet-maingrid-area-middle {
-  grid-template-rows: calc(55px - 5px) !important;
 }
 
 .sheet-background-area {
@@ -1866,9 +2199,383 @@ img.error {
   grid-area: character-art;
 }
 
+.sheet-main-life {
+  grid-area: life;
+  display: grid;
+  grid-template-columns: 1fr;
+  column-gap: 10px !important;
+}
+
+.sheet-main-life > .sheet-standardbox .sheet-oneline {
+  width: calc(100% + -1px) !important;
+  margin: 0 0 0 0 !important;
+  min-height: 30px !important;
+  height: 30px !important;
+}
+
+.sheet-main-life > .sheet-standardbox .sheet-main-skills-bloodpoints {
+  width: 100%;
+  height: 100%;
+}
+
+.sheet-main-life > .sheet-standardbox .sheet-main-skills-bloodpoints .sheet-life-hp-panel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.sheet-main-life > .sheet-standardbox .sheet-main-skills-bloodpoints .sheet-life-hp-values {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  column-gap: 6px;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 12px;
+  pointer-events: none;
+}
+
+.sheet-main-life > .sheet-standardbox .sheet-main-skills-bloodpoints .sheet-life-hp-group {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  justify-items: center;
+}
+
+.sheet-main-life > .sheet-standardbox .sheet-main-skills-bloodpoints .sheet-life-hp-values .sheet-life-hp-sep {
+  font-family: var(--main-font) !important;
+  font-size: 20px;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.sheet-main-life > .sheet-standardbox .sheet-main-skills-bloodpoints .sheet-life-hp-group .sheet-inputchar {
+  height: 20px !important;
+  max-height: 20px !important;
+  font-size: 15px !important;
+  line-height: 15px !important;
+  text-align: center;
+  color: #e7a820 !important;
+  pointer-events: auto;
+}
+
+.sheet-main-life > .sheet-standardbox .sheet-main-skills-bloodpoints .sheet-life-hp-bar-wrapper {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sheet-main-life > .sheet-standardbox .sheet-main-skills-bloodpoints .sheet-life-hp-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  z-index: -1;
+  width: 0%;
+  background:
+    linear-gradient(90deg, rgba(120, 10, 10, 0.95) 0%, rgba(153, 0, 0, 0.96) 45%, rgba(210, 46, 46, 0.88) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 0 10px rgba(153, 0, 0, 0.18);
+  transition: width 0.25s ease;
+}
+
+.sheet-bar0 { width: 0% !important; }
+.sheet-bar1 { width: 1% !important; }
+.sheet-bar2 { width: 2% !important; }
+.sheet-bar3 { width: 3% !important; }
+.sheet-bar4 { width: 4% !important; }
+.sheet-bar5 { width: 5% !important; }
+.sheet-bar6 { width: 6% !important; }
+.sheet-bar7 { width: 7% !important; }
+.sheet-bar8 { width: 8% !important; }
+.sheet-bar9 { width: 9% !important; }
+.sheet-bar10 { width: 10% !important; }
+.sheet-bar11 { width: 11% !important; }
+.sheet-bar12 { width: 12% !important; }
+.sheet-bar13 { width: 13% !important; }
+.sheet-bar14 { width: 14% !important; }
+.sheet-bar15 { width: 15% !important; }
+.sheet-bar16 { width: 16% !important; }
+.sheet-bar17 { width: 17% !important; }
+.sheet-bar18 { width: 18% !important; }
+.sheet-bar19 { width: 19% !important; }
+.sheet-bar20 { width: 20% !important; }
+.sheet-bar21 { width: 21% !important; }
+.sheet-bar22 { width: 22% !important; }
+.sheet-bar23 { width: 23% !important; }
+.sheet-bar24 { width: 24% !important; }
+.sheet-bar25 { width: 25% !important; }
+.sheet-bar26 { width: 26% !important; }
+.sheet-bar27 { width: 27% !important; }
+.sheet-bar28 { width: 28% !important; }
+.sheet-bar29 { width: 29% !important; }
+.sheet-bar30 { width: 30% !important; }
+.sheet-bar31 { width: 31% !important; }
+.sheet-bar32 { width: 32% !important; }
+.sheet-bar33 { width: 33% !important; }
+.sheet-bar34 { width: 34% !important; }
+.sheet-bar35 { width: 35% !important; }
+.sheet-bar36 { width: 36% !important; }
+.sheet-bar37 { width: 37% !important; }
+.sheet-bar38 { width: 38% !important; }
+.sheet-bar39 { width: 39% !important; }
+.sheet-bar40 { width: 40% !important; }
+.sheet-bar41 { width: 41% !important; }
+.sheet-bar42 { width: 42% !important; }
+.sheet-bar43 { width: 43% !important; }
+.sheet-bar44 { width: 44% !important; }
+.sheet-bar45 { width: 45% !important; }
+.sheet-bar46 { width: 46% !important; }
+.sheet-bar47 { width: 47% !important; }
+.sheet-bar48 { width: 48% !important; }
+.sheet-bar49 { width: 49% !important; }
+.sheet-bar50 { width: 50% !important; }
+.sheet-bar51 { width: 51% !important; }
+.sheet-bar52 { width: 52% !important; }
+.sheet-bar53 { width: 53% !important; }
+.sheet-bar54 { width: 54% !important; }
+.sheet-bar55 { width: 55% !important; }
+.sheet-bar56 { width: 56% !important; }
+.sheet-bar57 { width: 57% !important; }
+.sheet-bar58 { width: 58% !important; }
+.sheet-bar59 { width: 59% !important; }
+.sheet-bar60 { width: 60% !important; }
+.sheet-bar61 { width: 61% !important; }
+.sheet-bar62 { width: 62% !important; }
+.sheet-bar63 { width: 63% !important; }
+.sheet-bar64 { width: 64% !important; }
+.sheet-bar65 { width: 65% !important; }
+.sheet-bar66 { width: 66% !important; }
+.sheet-bar67 { width: 67% !important; }
+.sheet-bar68 { width: 68% !important; }
+.sheet-bar69 { width: 69% !important; }
+.sheet-bar70 { width: 70% !important; }
+.sheet-bar71 { width: 71% !important; }
+.sheet-bar72 { width: 72% !important; }
+.sheet-bar73 { width: 73% !important; }
+.sheet-bar74 { width: 74% !important; }
+.sheet-bar75 { width: 75% !important; }
+.sheet-bar76 { width: 76% !important; }
+.sheet-bar77 { width: 77% !important; }
+.sheet-bar78 { width: 78% !important; }
+.sheet-bar79 { width: 79% !important; }
+.sheet-bar80 { width: 80% !important; }
+.sheet-bar81 { width: 81% !important; }
+.sheet-bar82 { width: 82% !important; }
+.sheet-bar83 { width: 83% !important; }
+.sheet-bar84 { width: 84% !important; }
+.sheet-bar85 { width: 85% !important; }
+.sheet-bar86 { width: 86% !important; }
+.sheet-bar87 { width: 87% !important; }
+.sheet-bar88 { width: 88% !important; }
+.sheet-bar89 { width: 89% !important; }
+.sheet-bar90 { width: 90% !important; }
+.sheet-bar91 { width: 91% !important; }
+.sheet-bar92 { width: 92% !important; }
+.sheet-bar93 { width: 93% !important; }
+.sheet-bar94 { width: 94% !important; }
+.sheet-bar95 { width: 95% !important; }
+.sheet-bar96 { width: 96% !important; }
+.sheet-bar97 { width: 97% !important; }
+.sheet-bar98 { width: 98% !important; }
+.sheet-bar99 { width: 99% !important; }
+.sheet-bar100 { width: 100% !important; }
+
+.sheet-main-life .sheet-life-mini-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 8px;
+  min-height: 30px;
+  align-items: center;
+}
+
+.sheet-main-life .sheet-life-mini-card h4 {
+  text-align: left;
+  font-size: 10px !important;
+  line-height: 10px !important;
+}
+
+.sheet-main-life .sheet-life-mini-card .sheet-inputchar {
+  width: 44px !important;
+  height: 18px !important;
+  max-height: 18px !important;
+  font-size: 11px !important;
+  line-height: 11px !important;
+  text-align: right;
+}
+
+.sheet-main-life .sheet-life-mini-card-toggle {
+  grid-template-columns: 1fr 12px;
+}
+
+.charsheet .sheet-main-life .sheet-life-mini-card-toggle input.sheet-hpcustom-hideshow[type="checkbox"] {
+  justify-self: center;
+}
+
+.sheet-main-life .sheet-main-life-subrow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 10px !important;
+}
+
+.sheet-main-life .sheet-main-life-subrow .sheet-oneline {
+  min-height: 30px !important;
+  height: 30px !important;
+  margin: 2px auto !important;
+}
+
 .sheet-main-characteristics {
   grid-area: characteristics;
   grid-template-columns: repeat(5, 1fr);
+  column-gap: 10px !important;
+}
+
+.sheet-main-characteristics-minirow {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 2fr 2fr 3fr;
+  column-gap: 10px !important;
+}
+
+.sheet-main-characteristics-minirow .sheet-oneline {
+  margin: 2px auto !important;
+  min-height: 30px !important;
+  height: 30px !important;
+}
+
+.sheet-minirow-speed {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 8px;
+  min-height: 30px;
+}
+
+.sheet-minirow-speed h4 {
+  text-align: left;
+  font-size: 10px !important;
+  line-height: 10px !important;
+}
+
+.sheet-minirow-speed .sheet-inputchar {
+  width: 44px !important;
+  height: 18px !important;
+  max-height: 18px !important;
+  font-size: 11px !important;
+  line-height: 11px !important;
+  text-align: right;
+}
+
+.sheet-minirow-pb {
+  display: grid;
+  grid-template-columns: 1fr 12px 34px;
+  align-items: center;
+  column-gap: 4px;
+  min-height: 30px;
+}
+
+.sheet-minirow-pb h4 {
+  text-align: left;
+  font-size: 10px !important;
+  line-height: 10px !important;
+}
+
+.charsheet .sheet-minirow-pb input.sheet-nopb-toggle[type="checkbox"] {
+  justify-self: center;
+}
+
+.sheet-minirow-pb .sheet-inputchar {
+  width: 34px !important;
+  height: 18px !important;
+  max-height: 18px !important;
+  font-size: 11px !important;
+  line-height: 11px !important;
+  text-align: center;
+}
+
+.sheet-minirow-bp {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 6px;
+  min-height: 30px;
+}
+
+.sheet-minirow-bp > h4 {
+  text-align: left;
+  font-size: 10px !important;
+  line-height: 10px !important;
+}
+
+.sheet-minirow-bp .sheet-doublecolumn.sheet-3 {
+  grid-template-columns: 1fr 8px 1fr;
+  column-gap: 4px !important;
+  align-items: center;
+}
+
+.sheet-minirow-bp .sheet-inputchar {
+  height: 18px !important;
+  max-height: 18px !important;
+  font-size: 11px !important;
+  line-height: 11px !important;
+  text-align: center;
+}
+
+/* AC / Initiative / Hit Die / Prof. Bonus / Speed / Blood: bold readable value color */
+.charsheet .sheet-main-skills-armorclass .sheet-inputchar,
+.charsheet .sheet-main-skills-initiative .sheet-inputchar,
+.charsheet .sheet-main-skills-hitdice .sheet-inputchar,
+.charsheet .sheet-minirow-speed .sheet-inputchar,
+.charsheet .sheet-minirow-pb .sheet-inputchar,
+.charsheet .sheet-minirow-bp .sheet-inputchar {
+  color: var(--blackandwhite2) !important;
+  font-weight: 600 !important;
+}
+
+.sheet-main-needs .sheet-oneline {
+  margin: 2px auto !important;
+  min-height: 30px !important;
+  height: 30px !important;
+}
+
+.sheet-main-needs .sheet-main-skills-rations,
+.sheet-main-needs .sheet-main-skills-water {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 8px;
+  min-height: 30px;
+}
+
+.sheet-main-needs .sheet-main-skills-rations > h4,
+.sheet-main-needs .sheet-main-skills-water > h4 {
+  text-align: left;
+  font-size: 10px !important;
+  line-height: 10px !important;
+}
+
+.sheet-main-needs .sheet-main-skills-rations .sheet-doublecolumn.sheet-3,
+.sheet-main-needs .sheet-main-skills-water .sheet-doublecolumn.sheet-3 {
+  grid-template-columns: 1fr 10px 1fr;
+  column-gap: 6px !important;
+  align-items: center;
+}
+
+.sheet-main-needs .sheet-main-skills-rations .sheet-inputchar,
+.sheet-main-needs .sheet-main-skills-water .sheet-inputchar {
+  height: 18px !important;
+  max-height: 18px !important;
+  font-size: 11px !important;
+  line-height: 11px !important;
+  text-align: center;
+}
+
+.sheet-main-needs {
+  grid-area: needs;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   column-gap: 10px !important;
 }
 
@@ -1976,7 +2683,7 @@ img.error {
 }
 
 .sheet-main-menu {
-  grid-area: menu;;
+  grid-area: menu;
 }
 
 .sheet-main-equipment {
@@ -2000,6 +2707,18 @@ img.error {
      grid-template-columns: 0.25fr 1fr 12px;
 }
 
+.sheet-main-inspipassiv {
+  grid-area: inspipassiv;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px !important;
+}
+
+.sheet-main-inspipassiv .sheet-main-inspiration,
+.sheet-main-inspipassiv .sheet-main-passiveperception {
+  grid-area: auto;
+}
+
 .sheet-main-passiveperception {
   grid-area: passiveperception;
 }
@@ -2020,11 +2739,48 @@ img.error {
 
 .sheet-main-clothing {
   grid-area: clothing;
+  gap: 5px !important;
 }
 
 .sheet-clothing {
     grid-template-columns: 40px 60px 5fr 35px 25px 8px 12px  !important;
     row-gap: 0px !important;
+    align-items: center;
+    padding: 0 4px;
+    min-height: 18px;
+    border-radius: 4px;
+    transition: background-color 120ms ease;
+}
+
+.sheet-main-clothing .sheet-clothing:hover {
+  background-color: rgba(0, 0, 0, 0.035);
+}
+
+.sheet-main-clothing .sheet-clothing:first-child {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid var(--border-grey);
+  padding-bottom: 4px;
+  margin-bottom: 2px;
+}
+
+.sheet-main-clothing .sheet-clothing:first-child h4 {
+  font-size: 9px !important;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.sheet-main-clothing .sheet-clothing:first-child h4.sheet-left {
+  text-align: left !important;
+  padding-right: 0 !important;
+}
+
+.sheet-main-clothing .sheet-clothing:first-child h4:nth-child(2),
+.sheet-main-clothing .sheet-clothing:first-child h4.sheet-left {
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  font-family: Helvetica !important;
+  text-align: left !important;
 }
 
 .sheet-clothing.sheet-backpack {
@@ -2035,6 +2791,56 @@ img.error {
 .sheet-clothing.sheet-holster {
     grid-template-columns: 40px 60px 5fr 25px 8px 12px!important;
     row-gap: 0px !important;
+}
+
+.sheet-main-clothing .sheet-clothing > h4.sheet-left {
+  font-family: var(--main-font) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.2px;
+}
+
+.sheet-main-clothing .sheet-clothing input[type="text"],
+.sheet-main-clothing .sheet-clothing select {
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.55) !important;
+  padding: 0 4px !important;
+}
+
+.sheet-main-clothing .sheet-clothing input[type="number"] {
+  text-align: center;
+}
+
+.sheet-main-clothing .sheet-clothing .sheet-minimalist {
+  font-size: 11px !important;
+  opacity: 0.9;
+}
+
+.charsheet .sheet-main-clothing .sheet-clothing .sheet-imgfixed {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  background-size: contain;
+  background-position: center;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.18));
+}
+
+.sheet-main-clothing .sheet-clothing .sheet-cogs-container {
+  opacity: 0.72;
+}
+
+.sheet-main-clothing .sheet-clothing .sheet-cogs-input:checked + .sheet-cogs-icon {
+  color: var(--main-color) !important;
+}
+
+.sheet-main-clothing .sheet-clothing textarea {
+  margin-top: 3px !important;
+  min-height: 34px;
+  border: 1px dashed rgba(0, 0, 0, 0.18);
+  border-radius: 3px;
+  padding: 4px 6px !important;
+  align-self: start;
 }
 
 .sheet-maxpocket.sheet-black,
@@ -2128,8 +2934,9 @@ img.error {
 .sheet-main-inspiration .sheet-oneline,
 .sheet-main-proficiencybonus .sheet-oneline,
 .sheet-main-passiveperception .sheet-oneline {
-  grid-template-columns: 35px 1fr;
-  column-gap: 5px !important;
+    grid-template-columns: 35px 1fr;
+    column-gap: 5px !important;
+    height: 10px;
 }
 
 .sheet-background-display textarea {
@@ -2214,6 +3021,7 @@ span[name="attr_proficiency-source"] {
 }
 
 .sheet-features-traits2 textarea {
+  grid-column: 1 / -1;
   padding: 0;
   background-color: transparent;
   border: none;
@@ -2223,6 +3031,7 @@ span[name="attr_proficiency-source"] {
 }
 
 .sheet-features-traits textarea {
+  grid-column: 1 / -1;
   padding: 0;
   text-align: left;
   padding-left: 5px;
@@ -2232,6 +3041,9 @@ span[name="attr_proficiency-source"] {
 .sheet-vanilla {
   background-color: transparent !important;
   border: none !important;
+  font-size: 18px !important;
+  font-family: var(--main-font);
+  font-weight: 700;
 }
 
 .sheet-equipment {
@@ -2240,11 +3052,11 @@ span[name="attr_proficiency-source"] {
 }
 
 .sheet-equipment1 {
-  grid-template-columns: 25px 8px 1fr 30px 12px;
+  grid-template-columns: 25px 8px 1fr 30px 18px;
 }
 
 .sheet-equipment2 {
-  grid-template-columns: 12px 30px 1fr 25px 8px;
+  grid-template-columns: 18px 30px 1fr 25px 8px;
 }
 
 .sheet-equipment3 {
@@ -2255,11 +3067,6 @@ span[name="attr_proficiency-source"] {
     left: -5px;
     width: calc(100% + 10px)!important;
     margin: 10px auto 0 auto !important;
-}
-
-.sheet-vanilla {
-  font-size: 18px !important;
-  font-family: var(--main-font);
 }
 
 .sheet-main-statistiques .sheet-inputchar2 {
@@ -2277,6 +3084,56 @@ span[name="attr_proficiency-source"] {
     border:none!important;
 }
 
+.sheet-main-statistiques .sheet-oneline {
+  display: grid;
+  grid-template-columns: 1fr;
+  column-gap: 0 !important;
+  row-gap: 2px;
+  align-items: center;
+  justify-items: center;
+}
+
+.sheet-main-statistiques .sheet-button-div-holder {
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%;
+  text-align: center;
+}
+
+.sheet-main-statistiques .sheet-oneline > .sheet-inputchar2 {
+  grid-column: 1;
+  grid-row: 2;
+  width: 100% !important;
+  max-width: 58px;
+  height: 22px !important;
+  max-height: 22px !important;
+  margin: 0 !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none;
+  font-size: 22px !important;
+  line-height: 22px !important;
+  font-family: var(--main-font);
+  font-weight: bold;
+  text-align: center;
+}
+
+.sheet-main-statistiques .sheet-inputchar {
+  grid-column: 1;
+  grid-row: 3;
+  justify-self: center;
+  width: 100% !important;
+  max-width: 34px;
+  height: 14px !important;
+  max-height: 14px !important;
+  margin: 0 !important;
+  font-size: 11px !important;
+  line-height: 11px !important;
+  font-weight: 600 !important;
+  color: var(--blackandwhite2) !important;
+  opacity: 1;
+}
+
 .sheet-main-statistiques .sheet-button-div-holder {
   position: relative;
   background-color: var(--blackandwhite);
@@ -2285,39 +3142,91 @@ span[name="attr_proficiency-source"] {
 }
 
 .sheet-main-menu .sheet-oneline {
-grid-template-columns: repeat(3, 1fr);
- margin: 0 auto !important;
-width: 99% !important;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 2px !important;
+  margin: 0 !important;
+  width: 100% !important;
+  padding: 2px !important;
 }
 
 .sheet-main-menu .sheet-oneline .sheet-online,
 .sheet-main-menu-blank .sheet-oneline .sheet-online {
-height: 30px !important;
+  position: relative;
+  height: 30px !important;
+  min-height: 30px !important;
 }
 
 .sheet-main-menu .sheet-oneline .sheet-online input,
 .sheet-main-menu-blank .sheet-oneline .sheet-online input,
 .sheet-button-holder {
-height: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
 }
 
-.sheet-main-header-blank .sheet-oneline {
-  width: 98% !important;
-  margin: 0 auto !important;
+.sheet-main-header-blank .sheet-button-holder,
+.sheet-main-menu .sheet-oneline .sheet-online {
+  width: 100% !important;
+}
+
+.sheet-main-header-blank .sheet-button-holder {
+  position: relative;
+}
+
+.sheet-main-header-blank .sheet-rollstatus-privacy {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 2px !important;
+  min-width: 0;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 2px !important;
+  position: relative;
+  z-index: 1;
+}
+
+.sheet-main-header-blank .sheet-rollstatus-advantage {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 2px !important;
+  min-width: 0;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 2px !important;
+  position: relative;
+  z-index: 1;
+}
+
+.sheet-main-header-blank .sheet-header-rollstatus-box {
+  position: relative;
+  min-height: 28px;
+  height: 100%;
+  align-self: stretch;
+}
+
+.sheet-main-header-blank .sheet-header-rollstatus-box .sheet-oneline {
+  height: 100%;
+  min-height: 24px;
 }
 
 .sheet-main-menu label,
 .sheet-main-header-blank label {
-    font-family: var(--main-font);
-    font-weight: bolder !important;
-    height: 80% !important;
-    line-height: 25px;
-    border-radius: 0px;
-    width: 99%!important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--main-font);
+  font-weight: bolder !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  line-height: 1;
+  border-radius: 1px;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 6px !important;
 }
 
 .sheet-main-menu label  {
-      font-size: 14px !important;
+  font-size: 14px !important;
+  text-transform: uppercase;
 }
 
 .sheet-main-menu input:checked + label,
@@ -2328,7 +3237,8 @@ height: 30px !important;
 }
 
 .sheet-main-header-blank label {
-    font-size: 10px !important;
+  font-size: 10px !important;
+  letter-spacing: 0.3px;
 }
 
 .sheet-main-header-blank input.sheet-globalprivacy:checked + label {
@@ -2374,6 +3284,7 @@ height: 30px !important;
 
 .sheet-background-header-line1 {
   gap: 5px !important;
+  grid-template-columns: repeat(7, 1fr);
 }
 
 input::placeholder {
@@ -2428,25 +3339,23 @@ input::placeholder {
   justify-content: right !important;
 }
 
-.sheet-background-header-line1 {
-  grid-template-columns: repeat(7, 1fr);
-}
-
 .sheet-background-area img {
   background-color: red;
 }
 
 .sheet-main-header-blank {
   grid-area: rollstatus;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: stretch;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .sheet-main-effects {
   grid-area: effects;
-}
-
-.sheet-main-header-blank > div > div {
-  grid-template-columns: repeat(3, 1fr) 12px repeat(3, 1fr);
-  column-gap: 5px !important;
 }
 
 .sheet-main-header-blank label {
@@ -2454,8 +3363,5 @@ input::placeholder {
   padding: 0;
   text-align: center;
   color: var(--secondary-color) !important;
-}
-
-.sheet-main-header-blank label {
   text-transform: uppercase !important;
 }

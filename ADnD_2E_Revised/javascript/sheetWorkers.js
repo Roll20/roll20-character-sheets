@@ -117,6 +117,10 @@ const displaySize = function(size) {
     }
 }
 
+const unique = function (value, index, array) {
+    return array.indexOf(value) === index;
+}
+
 const sizeToInt = function(size) {
     if (typeof size !== 'string' || size.length === 0)
         return '';
@@ -488,6 +492,34 @@ on('clicked:hide-toast', function(eventInfo) {
         ['toast-content']: 0,
     });
 });
+
+//#region Text field correction
+const SPECIAL_CHARACTER_REGEX = /[(){}\[\]"]/g
+on('change:character_name', function (eventInfo) {
+    console.log(eventInfo);
+    if (isSheetWorkerUpdate(eventInfo)) {
+        return;
+    }
+
+    if (!eventInfo.newValue) {
+        return;
+    }
+
+    let specialCharacters = eventInfo.newValue.match(SPECIAL_CHARACTER_REGEX)
+    if (!specialCharacters) {
+        return;
+    }
+
+    let message = `@{${eventInfo.sourceAttribute}} had the special characters '${specialCharacters.filter(unique).join(" ")}'. As these can break various buttons, calculations, and functionality on the sheet, they have been removed.\n\nFor flavor names, try using single quotes ' as these has not yet caused any issues. For instance: Thaldrin 'Hawkeye' Ravenflock.`
+
+
+    let toast = getToastObject(INFO, "Special characters removed", message);
+    let newValue = {...toast};
+    newValue[eventInfo.sourceAttribute] = eventInfo.newValue.replaceAll(SPECIAL_CHARACTER_REGEX, '');
+
+    setAttrs(newValue);
+})
+//#endregion
 
 //#region Ability Scores logic
 // Ability Score Parser function
@@ -2740,7 +2772,7 @@ function critEffectExplanations(critEffect, set) {
         return;
 
     injuryMatch = injuryMatch.map(s => s.toLowerCase().replace('internal ', '').trim())
-        .filter((v, i, a) => a.indexOf(v) === i);
+        .filter(unique);
     injuryMatch.forEach(key => {
         switch (key) {
             case 'graze':

@@ -1,6 +1,7 @@
-/* COF2e v1.14.0 */
+/* COF2e v1.16.0 */
 
 @import url('https://fonts.googleapis.com/css?family=Merriweather+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Material+Icons&display=swap');
 
 /* Declarations */
 * {
@@ -21,6 +22,10 @@ button,
 input:hover:read-write,
 select:hover {
   background-color: white;
+}
+
+.cofmain .material-icons {
+  font-size: 1.3rem;
 }
 
 .cofmain input[type="text"] {
@@ -120,17 +125,46 @@ summary h4 {
 }
 
 /* Redefine Roll20 repeating sections buttons */
-.charsheet .repcontrol button.repcontrol_add,
-.charsheet .repcontrol button.repcontrol_edit {
+
+.charsheet .repcontrol {
+    height: 2em;
+}
+
+.charsheet .repcontrol .btn.repcontrol_add,
+.charsheet .repcontrol .btn.repcontrol_edit {
+    color: #f5f5f5;
+    font-size: 0.1em;
+    height: 20px;
+}
+
+.charsheet .repcontrol button.btn.repcontrol_add::after {
+    font-family: "Pictos";
+    content: "&";
+    margin-left: -8px;
+    margin-right: -5px;
+    font-size: 11em;
+    color: var(--cof-dark);
+}
+
+.charsheet .repcontrol button.btn.repcontrol_edit::after {
+    font-family: "Pictos";
+    content: "(";
+    margin-left: -8px;
+    margin-right: -5px;
+    font-size: 11em;
+    color: var(--cof-dark);
+}
+
+.charsheet .repcontainer.editmode + .repcontrol button.btn.repcontrol_edit::after {
+    content: ")";
+}
+
+.charsheet .repcontrol button.btn.repcontrol_add,
+.charsheet .repcontrol button.btn.repcontrol_edit {
   border-radius: 5px;
   margin: 5px;
   padding-top: 0px;
   padding-bottom: 0px;
-}
-
-.charsheet .repcontrol button.repcontrol_add:hover,
-.charsheet .repcontrol button.repcontrol_edit:hover {
-  color: var(--cof-click);
 }
 
 button[type="roll"] {
@@ -222,6 +256,10 @@ select.select-xxs {
   appearance: none;
 }
 
+select.select-xxs.first-char {
+  width: 1.1rem;
+}
+
 select.select-xxs option {
   font-size: small;
 }
@@ -244,7 +282,8 @@ button.flat-btn {
   background-image: none;
 }
 
-.cofmain button[type="roll"].img-btn:before {
+.cofmain button[type="roll"].img-btn:before,
+.cofmain button[type="action"].img-btn:before {
   content: "";
 }
 
@@ -277,6 +316,7 @@ span.img-btn-xl {
 }
 
 .img-btn:hover {
+  font-weight: bold;
   color: var(--cof-click);
   transition: all 0.2s ease;
 }
@@ -285,7 +325,8 @@ img.bubble-img {
   width: 18px;
 }
 
-img.bubble-img:hover {
+img.bubble-img:hover,
+.bubble-icon:hover {
   transform: scale(1.5);
   background-color: var(--cof-click);
   border-radius: 100%;
@@ -363,6 +404,10 @@ div.path div.block-title {
   justify-content: space-between;
 }
 
+.d-flex-even {
+  justify-content: space-evenly;
+}
+
 .d-flex-middle {
   vertical-align: middle;
 }
@@ -391,6 +436,10 @@ div.path div.block-title {
   margin: 2px;
 }
 
+.m5 {
+  margin: 5px;
+}
+
 .p2 {
   padding: 2px;
 }
@@ -407,9 +456,20 @@ div.path div.block-title {
   text-overflow: ellipsis;
 }
 
+.cofmain input[value="0"].has-script + div.has-script,
 .cofmain input[value="0"].has-script textarea.has-script,
+.cofmain input[value=""].has-script + span.has-script,
+.cofmain input[value="0"].has-script + span.has-script,
 .cofmain input[value="0"].has-script .weapon span.has-script,
-.cofmain input[value="0"].has-script + div.ammos {
+.cofmain input[value="0"].has-script + div.ammos,
+.cofmain input[value="0"].has-psionic + .has-psionic,
+.cofmain input[value="0"].opt-tact + div.opt-tact,
+.cofmain input[value="0"].fav-tact + div.fav-tact,
+.cofmain input[value="0"].fav-abilities + div.fav-abilities,
+.cofmain input[value="0"].fav-ability + div.fav-ability,
+.cofmain input[value=""].immu-dm + span.immu-dm,
+.cofmain input[value="0"].mounted + .mounted,
+.cofmain input[value="0"].high-fan + .high-fan {
   display: none;
 }
 
@@ -420,6 +480,26 @@ div.path div.block-title {
 
 .cofmain input[value="1"].d20roll-btns + div.d20roll-btns {
   display: block;
+}
+
+.cofmain input[value="1"].locked ~ button.unlocked,
+.cofmain input[value="1"].locked + input.locked,
+.cofmain input[value="0"].locked ~ button.locked,
+.cofmain input[value="0"].locked ~ span.locked {
+  display: none;
+}
+
+.cofmain input[value="0"].locked ~ button.unlocked,
+.cofmain input[value="0"].locked + input.locked,
+.cofmain input[value="1"].locked ~ button.locked,
+.cofmain input[value="1"].locked ~ span.locked {
+  display: inline-block;
+}
+
+.cofmain input[value="npc"].locked ~ button.unlocked,
+.cofmain input[value="npc"].locked ~ button.locked,
+.cofmain input[value="npc"].locked ~ span.locked {
+  display: none;
 }
 
 /* Identity layout */
@@ -434,7 +514,9 @@ div.path div.block-title {
 .cofmain .heading .token {
   width: 100%;
 }
-.cofmain .heading input[value="0"].token-mod ~ div.token-mod {
+.cofmain .heading input[value="0"].token-mod ~ div.token-mod,
+.cofmain .heading input[value="1"].token-script ~ button.token-script,
+.cofmain .heading input[value="0"].token-script ~ div.token-script {
   display: none;
 }
 
@@ -463,8 +545,10 @@ div.path div.block-title {
   margin: 2px;
 }
 
+input[value="pc"] ~ input.is-mook,
 input[value="npc"] ~ button[name="act_charmancer-btn"],
-input[value="npc"] ~ button[name="roll_checkup"] {
+input[value="npc"] ~ button[name="roll_checkup"],
+input[value="1"].is-mook + .npc-configs.is-mook {
   display: none;
 }
 
@@ -499,7 +583,9 @@ input[value="npc"] ~ button[name="roll_checkup"] {
 .tab-btn,
 .d20roll_1d,
 .d20roll_db,
-.d20roll_dm {
+.d20roll_dm,
+.locked,
+.unlocked {
   border: none;
   margin-top: 5px;
 }
@@ -621,14 +707,12 @@ input.block-switch {
 }
 
 .abilities-view,
-.block-switch:checked ~ .abilities-edit,
-input[value="1"].show-script ~ div.show-script {
+.block-switch:checked ~ .abilities-edit {
   display: block;
 }
 
 .abilities-edit,
-.block-switch:checked ~ .abilities-view,
-input[value="0"].show-script ~ div.show-script {
+.block-switch:checked ~ .abilities-view {
   display: none;
 }
 
@@ -691,7 +775,7 @@ div.change-view {
 
 .pc-attributes .trait {
   display: grid;
-  grid-template-columns: 1.5fr 0.25fr 1fr 1.35fr 1.35fr;
+  grid-template-columns: 1.75fr 0.25fr 1fr 1.35fr 1.35fr;
   gap: 2px;
   padding: 2px;
 }
@@ -947,7 +1031,8 @@ input[type="hidden"][value="1"].has-buff + .has-buff {
   grid-template-columns: 25px 1fr 1fr;
 }
 
-.pc-hands input[value="0"].pc-hand ~ button {
+.pc-hands input[value="0"].pc-hand ~ button,
+input[value="0"].pc-dual + .pc-dual {
   display: none;
 }
 
@@ -991,7 +1076,7 @@ button.spell-concentration span {
   gap: 5px;
 }
 
-.abilities .rank .rank-summary span.rank-title {
+.abilities .rank .rank-summary .rank-title {
   width: 21rem;
   overflow-x: hidden;
   text-overflow: ellipsis;
@@ -1026,6 +1111,11 @@ button.spell-concentration span {
   text-decoration: overline;
 }
 
+/*.abilities-view input[value="0"].use-params div.rank details div.d-flex.use-params {
+  display: none;
+}*/
+
+.post-it textarea.post-it,
 .weapon textarea.one-row,
 .weapon-opt textarea.one-row,
 .abilities .path textarea.one-row,
@@ -1040,6 +1130,7 @@ button.spell-concentration span {
 .npc-gears .gears textarea.one-row,
 .npc-gears .ammos textarea.one-row,
 .npc-actions textarea.one-row,
+.npc-configs textarea.one-row,
 .resources textarea.one-row {
   padding: 0;
   margin: 0;
@@ -1075,8 +1166,18 @@ button.spell-concentration span {
 .npc-trait-rd textarea.one-row:focus,
 .npc-gears .gears textarea.one-row:focus,
 .npc-actions textarea.one-row:focus,
+.npc-configs textarea.one-row:focus,
 .resources textarea.one-row:focus {
   height: 6rem;
+}
+
+.post-it textarea.post-it:focus {
+  height: 4rem;
+}
+
+.post-it input:not([value=""]).post-it + textarea.post-it {
+  border: 2px dotted var(--cof-dark);
+  background-color: papayawhip;
 }
 
 input[value="0"].show-paths-4to9 ~ div.abilities,
@@ -1162,6 +1263,10 @@ input[value="0"].ability-uses + div.ability-uses {
   gap: 2px;
 }
 
+.pc-config-tab ul.pc-configs:has(.first-rank) {
+  margin-left: 0;
+}
+
 .pc-config-tab div.pc-configs.first-rank span {
   display: inline-block;
   white-space: nowrap;
@@ -1202,7 +1307,8 @@ input[value="0"].ability-uses + div.ability-uses {
 .pc-config-tab input[name="attr_pvmax_force"] ~ span,
 .pc-config-tab input[name="attr_drmax_force"] ~ span,
 .pc-config-tab input[name="attr_pcmax_force"] ~ span,
-.pc-config-tab input[name="attr_pmmax_force"] ~ span {
+.pc-config-tab input[name="attr_pmmax_force"] ~ span,
+.pc-config-tab input[name="attr_pemax_force"] ~ span {
   display: inline-block;
   width: 5rem;
 }
@@ -1262,7 +1368,7 @@ input[value="0"].ability-uses + div.ability-uses {
 
 .npc-attacks .weapon {
   display: grid;
-  grid-template-columns: 25px 4.5fr 3fr 1fr 3fr 1fr;
+  grid-template-columns: 25px 4fr 3.5fr 1fr 3fr 1fr;
   gap: 2px;
   margin-bottom: 2px;
 }
@@ -1292,6 +1398,20 @@ textarea.migration {
   background-color: transparent;
   resize: none;
 }
+
+/*.sheet-darkmode {
+  .cofmain {
+    background-color: #333;
+    color: #ddd;
+
+    h4 {
+      color: #ddd;
+    }
+    .tab-btn {
+      color: #333;
+    }
+  }
+}*/
 
 /* ROLL TEMPLATES */
 

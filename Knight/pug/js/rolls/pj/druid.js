@@ -977,8 +977,8 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
   }
 
   if (aPointeurLaser !== '0') {
-    exec.push('{{vMPLaser=+1}}');
-    bonus.push(1);
+    isConditionnelA = true;
+    exec.push(`{{pointeurLaserValue=[[3D6]]}} {{pointeurLaser=${i18n_pointeurLaser}}} {{pointeurLaserCondition=${i18n_pointeurLaserCondition}}}`);
   }
 
   if (aSystemeRefroidissement !== '0') {

@@ -2,7 +2,7 @@
 
 Welcome to the community-created Roll20 character sheet for [Draw Steel by MCDM](https://www.mcdmproductions.com/). This Draw Steel character sheet for Roll20 is an independent product published under the DRAW STEEL Creator License and is not affiliated with MCDM Productions, LLC. DRAW STEEL © 2024 MCDM Productions, LLC.
 
-Want to help out or give feedback? Please join us on the [Draw Steel over Roll20 Discord](https://discord.com/channels/1264403896634445875/1264403896634445877).
+Want to help out or give feedback? Please join us on the [Draw Steel over Roll20 Discord](https://discord.gg/AsaaHG78wc).
 
 **Happy adventuring. Draw Steel!**
 
@@ -57,21 +57,21 @@ The player sheet tries to automatically calculate damage from ability rolls, but
 
 This feature is a work in progress and currently expects a format similar to the one found in the books. If the tier effect is not formatted properly, it will just send the plain text to chat instead of a calculated value. The format is as follows:
 
-```<base damage> + <characteristic> <type> damage;<optional: other effects>```
+```<base damage> + <characteristics> <type> damage;<optional: other effects>```
 
 Characteristic uses the single letter abbreviation to add the appropriate value ('M' for might, 'A' for Agility, and so on). Spaces are currently needed around the plus sign.
 
 Will Calculate:
 * 3 + M holy damage 
+* 3 + M or A holy damage
 * 5 damage
 * 3 + A damage; Push 2
 
 Invalid:
 * M + 3 holy damage
-* 3+M holy damage
 * Push 2; 3 + A damage
 
-It automatically adds Kit Damage if the ability has the "Weapon" keyword and "Melee" or "Ranged".
+It automatically adds Kit Damage if the ability has the "Weapon" keyword and "Melee" or "Ranged". The kit section also has boxes for extra Magic/Psionic damage (triggered by their respective keywords), and Sanctified Weapon.
 
 ## Monster Sheet Mode
 
@@ -80,6 +80,7 @@ GMs can toggle the Monster Sheet using the settings cog at the top. It’s a sim
 * Stat blocks for quick reference.
 * Conditions tracking with buttons to roll saves and bleeding.
 * Ability cards
+* Director Screen for in-game reference
 
 You can edit Monster stats by clicking on the Pencil icon.
 
@@ -98,11 +99,16 @@ You can currently import characters or monsters from Forge Steel.
 
 How to import:
 1. Export the character or monster from Forge Steel.
-2. Open the file (.ds-hero or .ds-monster) in your favorite text editor.
+2. Open the file (.ds-hero, .ds-monster, or .ds-monster-group) in your favorite text editor.
 3. Copy the contents of the file and paste it into the import box. 
 4. Press the appropriate button. "Import Player" for heroes, "Import Monster" for monsters.
 
 *Note:* This function is still a work in progress. Please double-check that everything was imported correctly. 
+
+**New Feature: Monster Group Imports.** You can now import monsters using a .ds-monster-group file. 
+Follow the directions above and press the "Import Monster" button. The importer will automatically detect the monster group file and give you a choice of monsters to import. 
+
+Importing monsters this way will also import their group's Malice abilities.
 
 ---
 ## Upcoming Changes

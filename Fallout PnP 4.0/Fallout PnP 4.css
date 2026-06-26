@@ -1,10 +1,13 @@
 /*-----background-----*/
 .charsheet {
     background-image: url("https://i.imgur.com/pxJQ2ln.jpeg");
-    background-size: 800px auto;
+    background-size: 100% auto;
     background-repeat: repeat-y;
     background-position: center top;
     background-attachment: scroll;
+    box-sizing: border-box;
+    padding: 8px 12px 16px;
+    --sheet-frame-max: 980px;
 }
 
 /* Transparent panels override */
@@ -13,25 +16,23 @@
 }
 
 /*-----tabs-----*/
-
 input.sheet-tab1:not(:checked) ~ .sheet-tab1,
 input.sheet-tab2:not(:checked) ~ .sheet-tab2,
 input.sheet-tab3:not(:checked) ~ .sheet-tab3,
 input.sheet-tab4:not(:checked) ~ .sheet-tab4,
-input.sheet-tab5:not(:checked) ~ .sheet-tab5,
-input.sheet-tab6:not(:checked) ~ .sheet-tab6 {
+input.sheet-tab5:not(:checked) ~ .sheet-tab5 {
     display: none;
 }
 
 input.sheet-tab {
-    width: calc(20% - 4px);
-    max-width: 150px;
+    width: calc((100% / 5) - 4px);
+    max-width: none;
     height: 20px;
-    
     outline: none !important;
     position: relative;
     cursor: pointer;
     z-index: 1;
+    box-sizing: border-box;
 }
 
 input.sheet-tab1 {
@@ -66,6 +67,98 @@ input.sheet-tab:checked::before {
     border-bottom: 1px solid #a8a8a8;
     margin-bottom: 5px;
     margin-top: 1px;
+}
+
+/* Kill browser's gray default input edge */
+input.sheet-number,
+input.sheet-text,
+input.sheet-text_right,
+input.sheet-text_left,
+input.sheet-text_center {
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+}
+
+/* Only Combat text inputs should use the green style we wanted */
+.sheet-tab3 input.sheet-text {
+    height: 30px;
+    color: #114C12;
+    font-weight: bold;
+    text-align: left;
+    background: #89E799;
+    border: 1px solid #89E799;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 3px #114C12;
+    box-sizing: border-box;
+}
+
+/* Only Combat Health should get the special wide green total/formula look */
+.sheet-tab3 input[name="attr_total_health"],
+.sheet-tab3 input[name="attr_basetext-formula"] {
+    background: #89E799;
+    color: #114C12;
+    border: 1px solid #89E799;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 3px #114C12;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+}
+
+.sheet-tab3 input[name="attr_basetext-formula"] {
+    width: 100%;
+    max-width: none;
+    display: block;
+    margin: 0 auto;
+}
+
+/*-----sheet layout-----*/
+.sheet-tab-content {
+    width: min(960px, calc(100% - 24px));
+    margin: 0 auto 14px auto;
+    box-sizing: border-box;
+}
+
+.sheet-2colrow {
+    display: block !important;
+    width: 100% !important;
+}
+
+.sheet-2colrow .sheet-col {
+    display: block !important;
+    float: none !important;
+    clear: both;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto 14px auto !important;
+    box-sizing: border-box;
+}
+
+table.sheet-center,
+.sheet-biotable,
+.sheet-expkarma-table,
+.sheet-skilltable,
+.sheet-defensetable,
+.sheet-healthblock,
+.sheet-armorblock,
+.sheet-inventory-table {
+    width: 100%;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+.sheet-fullwidth,
+.sheet-weapon-name,
+.sheet-specialization,
+.sheet-health-formula {
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /*-----Sheet Arrow System (optional expandable sections)-----*/
@@ -192,31 +285,42 @@ h2 {
   border-spacing: 10px;
 }
 
-/* Text inputs aligned to the left (for left-side fields like Age, Sex, etc.) */
-.sheet-text-leftalign {
-  width: 85%;
-  margin-left: 10px;
-  resize: none;
+/* S.P.E.C.I.A.L. table: fixed column alignment */
+.sheet-special-table {
+  width: 98%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 8px 10px;
 }
 
-/* Text inputs aligned to the right (for right-side fields like Height, Eyes, etc.) */
-.sheet-text-rightalign {
-  width: 85%;
-  margin-right: 10px;
-  resize: none;
+.sheet-special-table th,
+.sheet-special-table td {
+  text-align: center;
+  vertical-align: middle;
+  word-wrap: normal;
+  word-break: normal;
 }
 
-/* Wider fields like Concept input */
-.sheet-text-wide {
-  width: 96%;
-  margin-left: 10px;
+.sheet-special-table th:first-child,
+.sheet-special-table td:first-child {
+  width: 32%;
 }
 
-/* Wide textarea for Appearance */
-.sheet-textarea-wide {
-  width: 96%;
-  margin-left: 10px;
-  resize: vertical;
+.sheet-special-table th:nth-child(2),
+.sheet-special-table td:nth-child(2),
+.sheet-special-table th:nth-child(3),
+.sheet-special-table td:nth-child(3),
+.sheet-special-table th:nth-child(4),
+.sheet-special-table td:nth-child(4),
+.sheet-special-table th:nth-child(5),
+.sheet-special-table td:nth-child(5) {
+  width: 17%;
+}
+
+.sheet-special-table input.sheet-number {
+  width: 48px;
+  margin: 0 auto;
+  display: block;
 }
 
 /* Table styling for Experience & Karma section */
@@ -242,8 +346,6 @@ h2 {
 
 /* ----- Skill Tables (All: Combat, Technical, Social, etc.) ----- */
 
-/* ----- Defense Skill Table Styling ----- */
-
 .sheet-skillname {
     width: 25%;
     font-weight: bold;
@@ -256,59 +358,147 @@ h2 {
 }
 
 .sheet-skillheader {
-    background: #3e4c3f;
-    color: #f1f1e6;
-    text-align: left;
-    padding: 8px;
-    border: 1px solid #606e60;
+    background: #89E799;
+    color: #114C12;
+    text-align: center;
+    padding: 10px 8px;
+    border: 1px solid #89E799;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 0 5px 3px #114C12;
 }
 
-/* ----- Defense Skills Table Wrapper ----- */
-.sheet-defensetable {
-    width: 80%;
-    border-collapse: separate;
-    border-spacing: 6px;
-    font-size: 12px;
-}
-
-/* Skill Category Header: "Combat Skills", "Technical Skills", etc. */
 .sheet-skillcategory {
     text-align: left;
     font-weight: bold;
-    background: #3e4c3f;
-    color: #f1f1e6;
-    padding: 10px 6px;
+    background: #89E799;
+    color: #114C12;
+    padding: 10px 8px;
     font-size: 14px;
-    border: 1px solid #606e60;
+    border: 1px solid #89E799;
+    box-shadow: 0 0 5px 3px #114C12;
 }
 
-/* Total / Bonus / Point input widths */
+/* Total / Bonus / Point / SPECIAL / Defaulting / Specialization input widths */
+/* Skills table layout */
+.sheet-skilltable {
+    width: 98%;
+    table-layout: fixed;
+    margin-top: 6px;
+}
+
+/* Tighten only the skills table cell spacing */
+.sheet-skilltable td,
+.sheet-skilltable th {
+    padding: 4px 1px;
+}
+
+/* Column header row */
+.sheet-skilltable tr:first-child th {
+    background: #114C12;
+    color: #89E799;
+    border-bottom: 1px solid #89E799;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+    word-break: normal;
+    word-wrap: normal;
+}
+
+.sheet-skilltable tr:first-child th:first-child {
+    text-align: left;
+    padding-left: 28px !important;
+}
+
+/* Keep Skill Name column as-is */
+.sheet-skilltable th:first-child,
+.sheet-skilltable td:first-child {
+    width: 23%;
+    text-align: left;
+}
+
+/* Total stays where it is */
+.sheet-skilltable th:nth-child(2),
+.sheet-skilltable td:nth-child(2) {
+    width: 8%;
+}
+
+/* Pull these columns closer together */
+.sheet-skilltable th:nth-child(3),
+.sheet-skilltable td:nth-child(3),
+.sheet-skilltable th:nth-child(4),
+.sheet-skilltable td:nth-child(4) {
+    width: 6%;
+}
+
+.sheet-skilltable th:nth-child(5),
+.sheet-skilltable td:nth-child(5),
+.sheet-skilltable th:nth-child(6),
+.sheet-skilltable td:nth-child(6) {
+    width: 7%;
+}
+
+/* Give the saved space to Specialization */
+.sheet-skilltable th:nth-child(7),
+.sheet-skilltable td:nth-child(7) {
+    width: 43%;
+}
+
+.sheet-skilltable th:last-child {
+    text-align: center;
+}
+
+/* Input widths inside skills table */
 .sheet-skillfield {
     width: 40px;
 }
 
-/* SPECIAL and Defaulting columns */
 .sheet-skilltag {
-    width: 30px;
-    margin-right: 2px;
+    width: 28px;
+    margin-right: 0;
 }
 
-/* Specialization input field */
 .sheet-specialization {
     width: 100%;
-    max-width: 240px;
-    margin-right: 8px;
+    max-width: none;
+    margin-right: 0;
+    box-sizing: border-box;
+    text-align: left !important;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
-/* Skill Category width (Combat, Technical, etc.) */
-.sheet-skilltable {
-    width: 98%;
-    table-layout: fixed;
-}
-
-/* Specialization header center */
-.sheet-skilltable th:last-child {
+.sheet-specialization::placeholder {
     text-align: center;
+}
+
+/* Repeating Skills: make the remaining white boxes green */
+.sheet-skilltable input[name^="attr_name-repeating"] {
+    width: 100%;
+    max-width: none;
+    height: 30px;
+    padding: 0 8px;
+    color: #114C12;
+    font-weight: bold;
+    text-align: left;
+    background: #89E799;
+    border: 1px solid #89E799;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 3px #114C12;
+    box-sizing: border-box;
+    display: block;
+}
+
+.sheet-skilltable input[name^="attr_skill-repeating"]:disabled,
+.sheet-skilltable input[name^="attr_skill-repeating"][disabled] {
+    background: #89E799 !important;
+    color: #114C12 !important;
+    border: 1px solid #89E799 !important;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 3px #114C12;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #114C12;
 }
 
 /* Align and scale all health-related tables to center with fixed layout */
@@ -318,12 +508,69 @@ h2 {
     table-layout: fixed;
 }
 
+/* Prime - Secondary Statistics: aligned columns + wider formula area */
+.sheet-secondary-table {
+    width: 98%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 6px;
+}
+
+.sheet-secondary-table th,
+.sheet-secondary-table td {
+    text-align: center;
+    vertical-align: middle;
+    word-break: normal;
+    word-wrap: normal;
+}
+
+.sheet-secondary-table th:first-child,
+.sheet-secondary-table td:first-child {
+    width: 26%;
+    text-align: center;
+}
+
+.sheet-secondary-table th:nth-child(2),
+.sheet-secondary-table td:nth-child(2),
+.sheet-secondary-table th:nth-child(3),
+.sheet-secondary-table td:nth-child(3),
+.sheet-secondary-table th:nth-child(4),
+.sheet-secondary-table td:nth-child(4) {
+    width: 11%;
+}
+
+.sheet-secondary-table th:nth-child(5),
+.sheet-secondary-table td:nth-child(5) {
+    width: 41%;
+}
+
+.sheet-secondary-table input.sheet-health-formula {
+    width: 100%;
+    max-width: none;
+    font-size: 0.82em;
+    box-sizing: border-box;
+}
+
+/* Carry Weight is longer than the others */
+.sheet-secondary-table input[name="attr_basetext-carry_weight"] {
+    font-size: 0.78em;
+}
+
+/* Keep Sprint Rate exactly as a full-width note row */
+.sheet-secondary-table tr:last-child td {
+    width: auto !important;
+    text-align: left !important;
+    white-space: nowrap;
+}
+
 /* Widen the formula field in Health section for better visibility */
 .sheet-health-formula {
     width: 100%;
     max-width: 300px;
+	min-width: 0;
     text-align: center;
     font-size: 0.9em;
+	box-sizing: border-box;
 }
 
 /* Align Armor, Outfit & Weapon sections to center like Health section */
@@ -332,19 +579,127 @@ h2 {
     margin: 0 auto;
 }
 
-/* Shared class for full-width fields (used in Ammo Type, Notes, Bonuses) */
-.sheet-fullwidth {
-    width: 97%;
+.sheet-nowrap-label {
+    white-space: nowrap;
+    word-break: normal;
+    word-wrap: normal;
 }
 
-/* Specific width class for Weapon Name fields */
+.sheet-armor-stats-row td {
+    padding: 3px 2px !important;
+    vertical-align: middle;
+}
+
+.sheet-armor-stats-row td:nth-child(odd) {
+    white-space: nowrap;
+    word-break: normal;
+    word-wrap: normal;
+    font-size: 12px;
+}
+
+.sheet-armor-stats-row td:nth-child(even) input.sheet-number {
+    width: 52px;
+    height: 28px;
+    font-size: 12px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Shared class for full-width fields (used in Ammo Type, Notes, Bonuses) */
+.sheet-fullwidth {
+    width: 100%;
+}
+
+/* Specific width class for Weapon Name & Ammo Type fields */
 .sheet-weapon-name {
     width: 90%;
+    display: block;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.sheet-ammo-type {
+    width: 72%;
+    max-width: none;
+    display: block;
+    margin-left: 0;
+    margin-right: auto;
+    box-sizing: border-box;
+}
+
+/* Weapon meta table: class-based so layout stays stable when fields are added */
+.sheet-weapon-meta {
+    table-layout: fixed;
+}
+
+.sheet-weapon-meta td,
+.sheet-weapon-meta th {
+    white-space: nowrap;
+    word-break: normal;
+    word-wrap: normal;
+    vertical-align: middle;
+}
+
+.sheet-weapon-meta input.sheet-number:not(.sheet-ammo-type):not(.sheet-firemode) {
+    width: 58px;
+    max-width: 58px;
+    box-sizing: border-box;
+}
+
+.sheet-weapon-meta .sheet-ammo-type {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    display: block;
+    box-sizing: border-box;
+}
+
+.sheet-weapon-meta .sheet-firemode {
+    width: 90px;
+    max-width: 90px;
+    box-sizing: border-box;
+}
+
+.sheet-weapon-meta .sheet-weapon-condition {
+    width: 58px;
+    max-width: 58px;
+    box-sizing: border-box;
+}
+
+/* Weapon tables: keep labels on one line, but do not affect range table */
+.sheet-weapon-stats,
+.sheet-weapon-ammo {
+    table-layout: auto;
+}
+
+.sheet-weapon-stats td,
+.sheet-weapon-ammo td,
+.sheet-weapon-stats th,
+.sheet-weapon-ammo th {
+    white-space: nowrap;
+    word-break: normal;
+    word-wrap: normal;
+    vertical-align: middle;
+}
+
+/* Small weapon stat boxes */
+.sheet-weapon-stats input.sheet-number,
+.sheet-weapon-ammo input.sheet-number {
+    width: 58px;
+    max-width: 58px;
+    box-sizing: border-box;
+}
+
+/* Keep the ammo type field wide */
+.sheet-weapon-ammo .sheet-ammo-type {
+    width: 100%;
+    max-width: none;
 }
 
 /* Fixed width for Fire Mode input box */
 .sheet-firemode {
-    width: 100px;
+    width: 90px;
+    max-width: 90px;
 }
 
 /* Short/Medium/Long/Extreme Range field sizing */
@@ -354,10 +709,12 @@ h2 {
 
 /* Heading styling override for subheadings like Weapons, Armor & Outfits */
 .sheet-subheading {
-    text-align: left;
+    text-align: center;
     font-size: 15px;
     margin: 6px 0;
     font-weight: bold;
+    display: block;
+    width: 100%;
 }
 
 /* Optional: If you want narrower subheadings in some sections like Armor */
@@ -365,23 +722,6 @@ h2 {
     font-size: 15px;
     margin: 4px 0;
     font-weight: bold;
-}
-
-/* Perk input styling */
-
-.sheet-perk-name {
-  width: 75%;
-}
-
-.sheet-perk-mini {
-  width: 50px;
-}
-
-.sheet-perk-notes {
-  width: 97%;
-  height: 4.5em;
-  overflow: auto;
-  resize: vertical;
 }
 
 /* Inventory Table - full width */
@@ -413,30 +753,20 @@ h2 {
   font-size: 0.9em;
 }
 
-/* Tactic / Martial Art Inputs */
-
-/* Name input (long input) */
-.sheet-tactic-name {
-  width: 75%;
+/* Perks tab: override generic .sheet-text_center width */
+.sheet-tab4 input.sheet-text_center.sheet-perk-name {
+    width: calc(100% - 280px);
+    max-width: none;
+    box-sizing: border-box;
 }
 
-/* Req Hits & Tac Point (short inputs) */
-.sheet-tactic-small {
-  width: 74px;
+.sheet-tab4 input.sheet-text_center.sheet-perk-mini {
+    width: 100px;
+    max-width: none;
+    box-sizing: border-box;
 }
-
-/* Notes textarea */
-.sheet-tactic-notes {
-  width: 97%;
-  height: 4.5em;
-  resize: vertical;
-  overflow: auto;
-  font-size: 0.9em;
-}
-
 
 /*-----tables & textarea-----*/
-
 table.sheet-center {
     text-align: center;
     margin-left: auto;
@@ -452,12 +782,22 @@ table.sheet-center {
 table.sheet-center td,
 table.sheet-center th {
     padding: 5px;
+}
+
+table.sheet-center td {
     word-wrap: break-word;
     word-break: break-word;
 }
 
+table.sheet-center th {
+    word-wrap: normal;
+    word-break: normal;
+}
+
 textarea {
-    height: 4.5em;
+    width: 100%;
+    height: 32px;
+    min-height: 32px;
     overflow: auto;
     resize: vertical;
     font-family: inherit;
@@ -467,6 +807,53 @@ textarea {
     border: 1px solid #89E799;
     background-color: #1e3820;
     color: #89E799;
+    box-sizing: border-box;
+}
+
+textarea.sheet-fullwidth {
+    height: 32px;
+    min-height: 32px;
+}
+
+/* Prime tab fields: own styling, always left-aligned */
+.sheet-text-leftalign,
+.sheet-text-rightalign,
+.sheet-text-wide,
+.sheet-textarea-wide {
+  color: #114C12;
+  font-weight: bold;
+  text-align: left;
+  background: #89E799;
+  border: 1px solid #89E799;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 3px #114C12;
+  box-sizing: border-box;
+}
+
+input.sheet-text-leftalign {
+  width: 85%;
+  margin-left: 10px;
+  padding: 0 8px;
+}
+
+input.sheet-text-rightalign {
+  width: 85%;
+  margin-right: 10px;
+  padding: 0 8px;
+}
+
+input.sheet-text-wide {
+  width: 96%;
+  margin-left: 10px;
+  padding: 0 8px;
+}
+
+textarea.sheet-textarea-wide {
+  width: 96%;
+  margin-left: 10px;
+  padding: 8px;
+  resize: vertical;
+  overflow: auto;
 }
 
 
@@ -594,6 +981,34 @@ input.sheet-roundcheck[type="checkbox"]:checked + span::before {
     border: 1px solid #89E799;
     border-radius: 5px;
     box-shadow: 0 0 5px 3px #114C12;
+}
+
+.sheet-number:disabled,
+.sheet-number[disabled],
+.sheet-number[readonly] {
+    background: #89E799 !important;
+    color: #114C12 !important;
+    border: 1px solid #89E799 !important;
+    border-radius: 5px;
+    box-shadow: 0 0 5px 3px #114C12;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #114C12;
+}
+
+.sheet-text_right:disabled,
+.sheet-text_right[disabled],
+.sheet-text_right[readonly],
+.sheet-text_left:disabled,
+.sheet-text_left[disabled],
+.sheet-text_left[readonly],
+.sheet-text_center:disabled,
+.sheet-text_center[disabled],
+.sheet-text_center[readonly] {
+    background: #89E799 !important;
+    color: #114C12 !important;
+    border: 1px solid #89E799 !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #114C12;
 }
 
 /*-----Skill Button-----*/
