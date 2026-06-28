@@ -1791,9 +1791,7 @@ Near Death: +3 Dice and +2 Enhancement. Gain Taken Out Status Effect.
                 <div class="sheet-roll-label sheet-total-label">Total Hits</div>
                 <div class="sheet-total-label"><strong>{{computed::total}}</strong></div>
                 {{/computed::showtotal}}
-                {{#computed::hastens}}
-                <div class="sheet-tens-label">10s rolled — double hits!</div>
-                {{/computed::hastens}}
+
             </div>
         </div>
     </div>
@@ -1846,16 +1844,15 @@ function getDiceValues(rollField) {
 
 function countDice(diceResults) {
     let successes = 0;
-    let hadTens = false;
     diceResults.forEach(function(die) {
         const v = (die && typeof die === 'object' && 'v' in die) ? die.v : +die;
-        if (v >= 10) { successes += 2; hadTens = true; }
+        if (v >= 10) { successes += 2; }
         else if (v >= 8) { successes++; }
     });
-    return { successes: successes, hadTens: hadTens };
+    return { successes: successes };
 }
 
-const COMPUTED_PLACEHOLDERS = ' {{successes=[[0]]}} {{cursedsuccesses=[[0]]}} {{hastens=[[0]]}} {{showcurse=[[0]]}} {{total=[[0]]}} {{showtotal=[[0]]}} {{bonusdice=[[0]]}}';
+const COMPUTED_PLACEHOLDERS = ' {{successes=[[0]]}} {{cursedsuccesses=[[0]]}} {{showcurse=[[0]]}} {{total=[[0]]}} {{showtotal=[[0]]}} {{bonusdice=[[0]]}}';
 
 async function performRoll(mainPool, cursePool, rollName, charName, whisper, bonusDice) {
     mainPool = Math.max(0, mainPool);
@@ -1871,12 +1868,9 @@ async function performRoll(mainPool, cursePool, rollName, charName, whisper, bon
     const result = await startRoll(templateExpr);
     const mainCount = countDice(getDiceValues(result.results.mainroll));
     const curseCount = countDice(getDiceValues(result.results.curseroll));
-    const hadAnyTen = mainCount.hadTens || curseCount.hadTens;
-
     finishRoll(result.rollId, {
         successes:       mainCount.successes,
         cursedsuccesses: curseCount.successes,
-        hastens:         hadAnyTen ? 1 : 0,
         showcurse:       cursePool > 0 ? 1 : 0,
         total:           mainCount.successes + curseCount.successes,
         showtotal:       cursePool > 0 ? 1 : 0,
