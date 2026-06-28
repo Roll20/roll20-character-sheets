@@ -1781,16 +1781,14 @@ Near Death: +3 Dice and +2 Enhancement. Gain Taken Out Status Effect.
                 <div>{{mainroll}}{{#computed::bonusdice}} <em class="sheet-bonus-label">(+{{computed::bonusdice}} bonus)</em>{{/computed::bonusdice}}</div>
                 <div class="sheet-roll-label">Hits</div>
                 <div><strong>{{computed::successes}}</strong></div>
-                {{#computed::showcurse}}
+                {{#curseroll}}
                 <div class="sheet-roll-label sheet-curse-label">Curse Dice</div>
                 <div>{{curseroll}}</div>
                 <div class="sheet-roll-label sheet-curse-label">Curse Hits</div>
                 <div><strong>{{computed::cursedsuccesses}}</strong></div>
-                {{/computed::showcurse}}
-                {{#computed::showtotal}}
                 <div class="sheet-roll-label sheet-total-label">Total Hits</div>
                 <div class="sheet-total-label"><strong>{{computed::total}}</strong></div>
-                {{/computed::showtotal}}
+                {{/curseroll}}
 
             </div>
         </div>
@@ -1852,7 +1850,7 @@ function countDice(diceResults) {
     return { successes: successes };
 }
 
-const COMPUTED_PLACEHOLDERS = ' {{successes=[[0]]}} {{cursedsuccesses=[[0]]}} {{showcurse=[[0]]}} {{total=[[0]]}} {{showtotal=[[0]]}} {{bonusdice=[[0]]}}';
+const COMPUTED_PLACEHOLDERS = ' {{successes=[[0]]}} {{cursedsuccesses=[[0]]}} {{total=[[0]]}} {{bonusdice=[[0]]}}';
 
 async function performRoll(mainPool, cursePool, rollName, charName, whisper, bonusDice) {
     mainPool = Math.max(0, mainPool);
@@ -1871,9 +1869,7 @@ async function performRoll(mainPool, cursePool, rollName, charName, whisper, bon
     finishRoll(result.rollId, {
         successes:       mainCount.successes,
         cursedsuccesses: curseCount.successes,
-        showcurse:       cursePool > 0 ? 1 : 0,
         total:           mainCount.successes + curseCount.successes,
-        showtotal:       cursePool > 0 ? 1 : 0,
         bonusdice:       bonusDice || 0
     });
 }
