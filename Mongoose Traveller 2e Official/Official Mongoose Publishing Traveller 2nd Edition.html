@@ -13059,7 +13059,7 @@
     </div>
 </div>
 <div class="sheet-tab-content sheet-help">
-    <h3>Character Sheet Version 1.1.15</h3>
+    <h3>Character Sheet Version 1.1.16</h3>
     <br>
     <h4>Assigning Attributes To Tokens</h4>
     <p style="margin-left: 10px; margin-top: 5px;">To represent the core character attributes on a token so they can be
@@ -14094,41 +14094,84 @@
             });
         });
 
+
+
+
         // Total Weight
-        on("change:weightright change:weightleft change:fixedcombatweight change:repeatingarmourweight change:repeatingweaponweight change:current-Strength change:current-Endurance change:injury-Strength change:injury-Endurance change:skilllevel-Athletics change:armour-mass sheet:opened", function() {
-                getAttrs(["weightright", "weightleft", "fixedcombatweight", "repeatingarmourweight", "repeatingweaponweight",
-                    "current-Strength", "current-Endurance", "skilllevel-Athletics", "armour-mass", "armour-carried"], function(values) {
+        on("change:weightright change:weightleft change:fixedcombatweight change:repeatingarmourweight change:repeatingweaponweight change:current-Strength change:current-Endurance change:injury-Strength change:injury-Endurance change:repeating_athleticsspec change:armour-mass sheet:opened", function(event) {
+                // In order to calculate encumberance we need to know STR and END which is easy, but also need to know
+                // the Athletics 'sub-skills' and check for strength or endurance specialities
+                let attrs =  [
+                    "weightright", "weightleft",
+                    "fixedcombatweight",
+                    "repeatingarmourweight", "repeatingweaponweight",
+                    "current-Strength", "current-Endurance",
+                    "skilllevel-Athletics", "skillCharacteristicDM-Athletics", "skillmodifier-Athletics",
+                    "armour-mass", "armour-carried"
+                ];
 
-                    // Grab our attrs to check weight against, then remove from values so we can tot up equipment weight
-                    const carryCapacity = parseInt(values["current-Strength"]) +  parseInt(values["current-Endurance"]) + parseInt(values["skilllevel-Athletics"]);
-                    const armourMass = parseFloat(values["armour-mass"]) * parseFloat(values["armour-carried"]);
-                    delete values["current-Strength"];
-                    delete values["current-Endurance"];
-                    delete values["skilllevel-Athletics"];
-                    delete values["armour-mass"];
-                    delete values["armour-carried"];
-
-                    const tw = Object.values(values).reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
-                    const tiw = parseFloat(values.weightleft) + parseFloat(values.weightright)
-
-                    // Calculate encumberance, Armour is only 25% of its weight for encumberance purposes, knock it off and re-calc
-                    const totalArmourWeight = parseFloat(values.repeatingarmourweight) + armourMass;
-                    let totalEncumberanceWeight = tw; // (tw - totalArmourWeight) + (totalArmourWeight * 0.25);
-                    totalEncumberanceWeight = totalEncumberanceWeight.toFixed(2); //Math.round(totalEncumberanceWeight * 10) / 10;
-                    let encumbered = totalEncumberanceWeight > carryCapacity  ? "Yes" : "No";
-
-                    // If the total gear weight is TWICE our capacity, then signal the DM-2 on physical actions
-                    if(totalEncumberanceWeight > carryCapacity * 2) {
-                        encumbered = "Yes (DM-2)";
+                // Get our specialities and their modifier to re-create the inline formula
+                getSectionIDs("repeating_athleticsspec", function (idarr) {
+                    for (let i=0; i<idarr.length; i++) {
+                        attrs.push("repeating_athleticsspec_" + idarr[i] + "_skillspeciality-athleticsspec");
+                        attrs.push("repeating_athleticsspec_" + idarr[i] + "_skilllevel-athleticsspec");
                     }
 
-                    //console.log("carryCapacity: " + carryCapacity);
-                    setAttrs({
-                        totalweight: tw.toFixed(1),
-                        totalitemweight: tiw,
-                        encumbered: encumbered,
-                        carrycapacity: "" + totalEncumberanceWeight + "/" + carryCapacity,
-                        totalequipmentweight: tiw.toFixed(2)
+                    getAttrs(attrs, function(values) {
+                        // Work out our carry capacity, STR and END are easy
+                        let carryCapacity = parseInt(values["current-Strength"]) +  parseInt(values["current-Endurance"]);
+
+                        // See if we have an Athletics sub-specialty in Strength AND/OR Endurance, so iterate over 'values'
+                        // keys and see what we've got
+                        for (const [key, value] of Object.entries(values)) {
+                            if(key.includes("repeating_athleticsspec")) {
+                                if(key.includes("_skillspeciality-athleticsspec")) {
+                                    // Looking for Strength or Endurance so need a bit of trimming and case matching
+                                    let specialty = values[key].trim().toUpperCase();
+                                    console.log("- Processing specialty: " + specialty);
+                                    if(specialty.includes("STR") || specialty.includes("END")) {
+                                        // Calculate the mod from our various values
+                                        carryCapacity += +values[key.replace("_skillspeciality-athleticsspec", "_skilllevel-athleticsspec")];
+                                    }
+                                }
+                                // Need to delete these from the values object as we sum up below
+                                delete values[key];
+                                delete values[key.replace("_skillspeciality-athleticsspec", "_skilllevel-athleticsspec")]
+                            }
+                        }
+
+                        // Grab our attrs to check weight against, then remove from values so we can tot up equipment weight
+                        const armourMass = parseFloat(values["armour-mass"]) * parseFloat(values["armour-carried"]);
+                        delete values["current-Strength"];
+                        delete values["current-Endurance"];
+                        delete values["skilllevel-Athletics"];
+                        delete values["skillCharacteristicDM-Athletics"];
+                        delete values["skillmodifier-Athletics"];
+                        delete values["armour-mass"];
+                        delete values["armour-carried"];
+
+                        const tw = Object.values(values).reduce((a, b) => parseFloat(a) + parseFloat(b), 0);
+                        const tiw = parseFloat(values.weightleft) + parseFloat(values.weightright)
+
+                        // Calculate encumberance, Armour is only 25% of its weight for encumberance purposes, knock it off and re-calc
+                        const totalArmourWeight = parseFloat(values.repeatingarmourweight) + armourMass;
+                        let totalEncumberanceWeight = tw; // (tw - totalArmourWeight) + (totalArmourWeight * 0.25);
+                        totalEncumberanceWeight = totalEncumberanceWeight.toFixed(2); //Math.round(totalEncumberanceWeight * 10) / 10;
+                        let encumbered = totalEncumberanceWeight > carryCapacity  ? "Yes" : "No";
+
+                        // If the total gear weight is TWICE our capacity, then signal the DM-2 on physical actions
+                        if(totalEncumberanceWeight > carryCapacity * 2) {
+                            encumbered = "Yes (DM-2)";
+                        }
+
+                        //console.log("carryCapacity: " + carryCapacity);
+                        setAttrs({
+                            totalweight: tw.toFixed(1),
+                            totalitemweight: tiw,
+                            encumbered: encumbered,
+                            carrycapacity: "" + totalEncumberanceWeight + "/" + carryCapacity,
+                            totalequipmentweight: tiw.toFixed(2)
+                        });
                     });
                 });
             });
@@ -14182,6 +14225,9 @@
                 let taw = fcw + parseFloat(values["repeatingarmourweight"]);
                 let tww = 0;
                 for (let i=1; i<=6; i++) {
+                    if(isNaN(values["weapon_weight-" + i])) {
+                        values["weapon_weight-" + i] = 0;
+                    }
                     tww += parseFloat(values["weapon_weight-" + i]) * parseInt(values["weapon_carried-" + i]);
                 }
                 fcw += tww;
@@ -14245,6 +14291,9 @@
 
                 getAttrs(attrs, function (values) {
                     for (var i=0; i<idarr.length; i++) {
+                        if(isNaN(values["repeating_weapons_" + idarr[i] + "_weapon_weight-rep"])) {
+                            values["repeating_weapons_" + idarr[i] + "_weapon_weight-rep"] = 0;
+                        }
                         total += parseFloat(values["repeating_weapons_" + idarr[i] + "_weapon_weight-rep"]) *
                             parseFloat(values["repeating_weapons_" + idarr[i] + "_weapon_carried-rep"]);
                     }
@@ -19318,7 +19367,7 @@
                     attrs[prefix + slotId + "_reparmour-protection"] = armourProtection;
                     attrs[prefix + slotId + "_reparmour-protection-laser"] = armourProtectionLaser;
                     attrs[prefix + slotId + "_reparmour-rads"] = armourRad;
-                    attrs[prefix + slotId + "_reparmour-mass"] = armourMass;
+                    attrs[prefix + slotId + "_reparmour-mass"] = isNaN(armourMass) ? 0 : armourMass;
                     attrs[prefix + slotId + "_reparmour-RequiredSkill"] = armourSkill;
                     attrs[prefix + slotId + "_reparmornotes"] = armourDesc;
                 }
@@ -19424,7 +19473,7 @@
                     attrs["weapon_damage-" + nextWeaponSlot] = compendiumData["Damage"];
                     attrs["weapon_tl-" + nextWeaponSlot] = compendiumData["TL"];
                     attrs["weapon_range-" + nextWeaponSlot] = compendiumData["Range"];
-                    attrs["weapon_weight-" + nextWeaponSlot] = compendiumData["KG"];
+                    attrs["weapon_weight-" + nextWeaponSlot] = isNaN(compendiumData["KG"]) ? 0 : compendiumData["KG"];
                     attrs["weapon_magazine-" + nextWeaponSlot] = compendiumData["Magazine"];
                     attrs["weapon_auto-" + nextWeaponSlot] = compendiumData["Auto"];
                     attrs["weapon_automode" + nextWeaponSlot] = "Single";
