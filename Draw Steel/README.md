@@ -26,24 +26,33 @@ The Hero Sheet is broken up into collapsible panels to save space. Click the hea
 
 ### Sheet Features
 
-#### Shortcut Buttons (Top of the Sheet)
+#### Button Bar (Top of the Sheet)
+The button bar is able to remain stuck to the top of the character sheet when scrolling in the options panel. 
+ 
+##### Mini Stat Dashboard
+When activated in the options panel, the mini stat dashboard will show the character's important stats just above the button bar. 
 
+##### Shorcut Buttons
 * **Initiative:** Rolls a d10 in chat.
 * **Start Combat:** Sets your Heroic Resources equal to your current Victories.
 * **End Combat:** Resets Heroic Resources, Surges, and temporary Stamina.
 * **Respite:** Resets Stamina and Recoveries. Moves Victories to XP, and resets Victories to zero.
 
+* ** Global Edge/Bane Selector:" Allows you to choose a default setting for power rolls. 
+* ** Global Bonus:" Allows you to set a default bonus for power rolls. 
+
+
 #### Characteristics Panel
 
-The Characteristic panel stays visible at the top, even when you scroll, so you always see your important stats. When collapsed it will only show your hero's core characteristics, current and temporary Stamina, and current Recoveries, Heroic Resources, and Surges.
+The Characteristic panel shows your character's important stats.
 
-* **Power Rolls:** Clicking a Characteristic's label does a Power Roll. It asks if you have Edge, Bane, or a skill bonus.
+* **Power Rolls:** Clicking a Characteristic's label does a Power Roll. Depending on your settings, it may ask if you have Edge, Bane, or a skill bonus.
 * **Stamina - Winded & Dying:** The character sheet calculates your hero's Winded and Dying values when your Maximum Stamina is changed.
 * **Recoveries:** Clicking Recoveries uses one up and adds the appropriate amount back to your current Stamina. 
 * **Heroic Resources:** Clicking Heroic Resources rolls for your resource gain. 
 * **Surge Damage:** Surge damage is calculated for you when your characteristics change. Click the Damage label to choose how many surges to use. It calculates the damage and removes the appropriate number of surges from your current total.
 * **Potencies:** are calculated automatically from your greatest characteristic.
-* **Conditions:** The conditions area has buttons to roll saves and bleeding damage .
+* **Conditions:** The conditions area has an area to track active effects and buttons to roll saves and bleeding damage.
 
 #### Features Panel
 
@@ -71,7 +80,14 @@ Invalid:
 * M + 3 holy damage
 * Push 2; 3 + A damage
 
-It automatically adds Kit Damage if the ability has the "Weapon" keyword and "Melee" or "Ranged". The kit section also has boxes for extra Magic/Psionic damage (triggered by their respective keywords), and Sanctified Weapon.
+It automatically adds Kit Damage if the ability has the "Weapon" keyword and "Melee" or "Ranged". 
+
+##### Global Damage Modifiers
+The Global Damage Modifier section allows you to automatically add or subtract damage based on specific conditions.
+
+* **Modifier Name:** Give your modifier a label (e.g., Acolyte of Fire). This appears alongside your damage total in the chat.
+* **Keywords:** Enter the keywords required to trigger this bonus, separated by commas (e.g., Fire, Magic). The modifier only applies if the ability has all listed keywords. Leave this blank to apply the modifier to every damage roll.
+* **Damage Bonus:** The amount of damage to add or remove. Use positive numbers to buff damage (2) or negative numbers to reduce it (-2).
 
 ## Monster Sheet Mode
 
@@ -80,7 +96,6 @@ GMs can toggle the Monster Sheet using the settings cog at the top. It’s a sim
 * Stat blocks for quick reference.
 * Conditions tracking with buttons to roll saves and bleeding.
 * Ability cards
-* Director Screen for in-game reference
 
 You can edit Monster stats by clicking on the Pencil icon.
 
@@ -91,8 +106,9 @@ Click the Cog icon to open the options panel. Current options:
 
 * Toggle between Hero and Monster sheets. 
 * Choose if your Power Rolls go to chat, get whispered to the Director, or if you want to be prompted every time. 
+* Show the optional Director Screen
 * Import from Forge Steel. 
-
+* and more...
 
 ### Importing from Forge Steel
 You can currently import characters or monsters from Forge Steel. 
@@ -105,10 +121,12 @@ How to import:
 
 *Note:* This function is still a work in progress. Please double-check that everything was imported correctly. 
 
-**New Feature: Monster Group Imports.** You can now import monsters using a .ds-monster-group file. 
+**Monster Group Imports:** You can import monsters using a .ds-monster-group file. 
 Follow the directions above and press the "Import Monster" button. The importer will automatically detect the monster group file and give you a choice of monsters to import. 
 
 Importing monsters this way will also import their group's Malice abilities.
+
+**Companion Imports (Beastheart):** Beastheart Companions can be imported from a hero export file (.ds-hero) using the "Import Companion" button.
 
 ---
 ## Upcoming Changes
