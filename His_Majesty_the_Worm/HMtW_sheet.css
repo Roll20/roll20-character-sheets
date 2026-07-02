@@ -1,114 +1,882 @@
-/* Basic Roll20 Tab Logic */
-div.sheet-tab-content { 
-    display: none; 
-    margin-top: 15px; 
+/* ==========================================================
+   His Majesty the Worm — Roll20 Character Sheet CSS
+   ========================================================== */
+
+/* --- Root Container --- */
+.hmtw {
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  color: #2a2013;
+  max-width: 1100px;
+  min-width: 800px;
+  margin: 0 auto;
 }
 
-input.sheet-tab1:checked ~ div.sheet-tab1-content,
-input.sheet-tab2:checked ~ div.sheet-tab2-content,
-input.sheet-tab3:checked ~ div.sheet-tab3-content,
-input.sheet-tab4:checked ~ div.sheet-tab4-content {
-    display: block;
+/* --- Tab Controls --- */
+input.tab-radio {
+  width: 170px !important;
+  height: 28px !important;
+  cursor: pointer;
+  position: relative;
+  opacity: 0;
+  z-index: 9999;
+  margin: 0;
+  vertical-align: middle;
 }
 
-/* Tab sizing adjusted for longer titles */
-input.sheet-tab {
-    width: 160px;
-    height: 30px;
-    cursor: pointer;
-    position: relative;
-    opacity: 0;
-    z-index: 9999;
+.tab-label {
+  display: inline-block;
+  width: 170px;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  padding: 0;
+  margin-left: -161px;
+  cursor: pointer;
+  background: #e8dcc8;
+  border: 1px solid #b8a88a;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  color: #5a4a32;
+  position: relative;
 }
 
-span.sheet-tab-label {
-    text-align: center;
-    display: inline-block;
-    font-weight: bold;
-    background: #e9ecef;
-    border: 1px solid #adb5bd;
-    border-radius: 4px;
-    line-height: 30px;
-    width: 160px;
-    height: 30px;
-    margin-left: -165px;
-    margin-right: 5px;
-    font-size: 13px;
-    box-sizing: border-box;
-    transition: background 0.2s, color 0.2s;
+.tab-radio:checked + .tab-label {
+  background: #ffffff;
+  border-bottom: 1px solid #ffffff;
+  border-top: 3px solid #8a7a5a;
+  color: #2a2013;
 }
 
-span.sheet-tab-label:hover {
-    background: #d6dce1;
+/* Page visibility via tab radio + general sibling selector */
+.page {
+  display: none;
+  background: #ffffff;
+  border: 2px solid #b8a88a;
+  border-radius: 0 8px 8px 8px;
+  padding: 16px;
 }
 
-input.sheet-tab:checked + span.sheet-tab-label {
-    background: #2a2a2a; /* Changed to dark grey/black to match the RPG's ink aesthetic */
-    color: white;
-    border-color: #000;
+.tab-radio[value="1"]:checked ~ .page1,
+.tab-radio[value="2"]:checked ~ .page2 {
+  display: block;
 }
 
-/* Layout Sections */
-.sheet-section {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 2px solid #333; /* Darker borders to match the sheet art */
-    border-radius: 5px;
-    background: #fafafa;
+/* --- Layout --- */
+.two-col {
+  display: flex;
+  gap: 20px;
 }
 
-.sheet-row { 
-    margin-bottom: 10px; 
+.col {
+  flex: 1;
+  min-width: 0;
 }
 
-.sheet-row label { 
-    font-weight: bold; 
-    display: inline-block; 
-    margin-bottom: 3px;
+.cheat-sheet {
+  border-right: 1px solid #c4b49a;
+  padding-right: 16px;
 }
 
-/* Inputs and Textareas Formatting */
-input[type="text"], 
-input[type="number"], 
-textarea {
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    padding: 6px;
-    box-sizing: border-box;
-    font-family: inherit;
-    background-color: #fff;
-    transition: border-color 0.2s;
+/* --- Typography --- */
+.section-title {
+  font-size: 20px;
+  text-align: center;
+  margin: 0 0 12px 0;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #8a7a5a;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-variant: small-caps;
 }
 
-input[type="text"]:focus, 
-input[type="number"]:focus, 
-textarea:focus {
-    border-color: #666;
-    outline: none;
+.sub-title {
+  font-size: 13px;
+  text-align: center;
+  margin: 10px 0 6px 0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-variant: small-caps;
+  border-top: 1px solid #c4b49a;
+  border-bottom: 1px solid #c4b49a;
+  padding: 3px 0;
 }
 
-textarea {
-    resize: vertical; /* Allows players to drag the box taller if they write a lot */
-    line-height: 1.4;
+.field-lbl {
+  font-size: 12px;
+  font-weight: bold;
+  display: inline-block !important;
+  width: auto !important;
+  float: none !important;
+  padding-right: 0 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  line-height: 16px;
 }
 
-/* Checkbox Alignment */
-input[type="checkbox"] {
-    vertical-align: middle;
-    cursor: pointer;
+.field-lbl-sm {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
-/* Reference Lists (Rules Tab) */
-.sheet-reference-list { 
-    font-size: 0.95em; 
-    line-height: 1.5; 
+/* --- Cheat Sheet Reference Text --- */
+.ref-text {
+  font-size: 11px;
+  line-height: 1.5;
+  margin-bottom: 4px;
 }
 
-.sheet-reference-list ul {
-    margin-top: 5px;
-    margin-bottom: 15px;
+.ref-text strong {
+  color: #4a3a22;
 }
 
-.sheet-reference-list li {
-    margin-bottom: 8px;
+/* --- Inputs --- */
+.input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #a09078;
+  font-family: inherit;
+  font-size: 12px;
+  color: #2a2013;
+  padding: 2px 4px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-bottom-color: #5a4a32;
+  background: rgba(255, 255, 230, 0.3);
+}
+
+.input-wide {
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+.input-bond {
+  flex: 1;
+}
+
+/* --- Select Dropdowns --- */
+.select {
+  font-family: inherit;
+  font-size: 12px;
+  color: #2a2013;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #a09078;
+  padding: 2px 4px;
+  outline: none;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+/* --- Kith/Kin Conditional Selects --- */
+.kin-select {
+  display: none !important;
+}
+
+.kith-show[value="Human"] ~ .row-split .kin-human,
+.kith-show[value="Fay"] ~ .row-split .kin-fay,
+.kith-show[value="Underfolk"] ~ .row-split .kin-underfolk,
+.kith-show[value="Orcs"] ~ .row-split .kin-orcs {
+  display: inline-block !important;
+  flex: 1;
+  min-width: 0;
+}
+
+/* --- Rows --- */
+.row {
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.row > .input {
+  flex: 1;
+  min-width: 0;
+}
+
+.row-split {
+  display: flex;
+  gap: 12px;
+}
+
+.half {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.half > .input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* --- Suit Cards --- */
+.suits {
+  display: flex;
+  justify-content: space-around;
+  margin: 12px 0;
+  gap: 8px;
+}
+
+.suit-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80px;
+}
+
+.suit-img {
+  width: 60px;
+  height: auto;
+  max-height: 100px;
+  margin-bottom: 4px;
+}
+
+.suit-val {
+  background: transparent;
+  border: 1px solid #a09078;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: inherit;
+  color: #2a2013;
+  padding: 0;
+  outline: none;
+  line-height: 32px;
+}
+
+.suit-val:focus {
+  border-color: #5a4a32;
+  background: rgba(255, 255, 230, 0.3);
+}
+
+.suit-name {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+/* --- Checkboxes (square) --- */
+.cb {
+  width: 14px !important;
+  height: 14px !important;
+  min-width: 14px;
+  min-height: 14px;
+  cursor: pointer;
+  accent-color: #5a4a32;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Tri-state Checkbox (select-based) --- */
+.tristate {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px;
+  min-height: 16px;
+  border: 2px solid #8a7a5a;
+  border-radius: 2px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  text-align-last: center;
+  line-height: 12px;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+  color: #2a2013;
+}
+
+.tristate option {
+  text-align: center;
+  color: #2a2013;
+}
+
+.tristate option[value="2"] {
+  color: #c83030;
+}
+
+/* --- Checkboxes (round) --- */
+.cb-round {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 14px !important;
+  height: 14px !important;
+  min-width: 14px;
+  min-height: 14px;
+  border: 2px solid #8a7a5a;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: transparent;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+  padding: 0;
+}
+
+.cb-round:checked {
+  background-color: #5a4a32;
+  border-color: #5a4a32;
+}
+
+/* --- Bonds --- */
+.bonds-header {
+  text-align: left;
+  padding-left: 2px;
+  margin-bottom: 2px;
+}
+
+.bonds-label-charged {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8a7a5a;
+}
+
+.bond-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+/* --- Talents (Kin / Arete) --- */
+.talents-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.talent-block {
+  flex: 1;
+  text-align: center;
+}
+
+.talent-block .input {
+  width: 100%;
+  text-align: center;
+}
+
+.talent-wounded {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.arete-boxes {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+/* === PAGE 2 === */
+
+/* --- Status --- */
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* --- Resolve / Lore --- */
+.res-lore-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 10px;
+  justify-content: center;
+}
+
+.res-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bubble-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bubble {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  border: 2px solid #8a7a5a;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: transparent;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0;
+  padding: 0;
+}
+
+.bubble:checked {
+  background-color: #5a4a32;
+  border-color: #5a4a32;
+}
+
+/* --- Path Talents --- */
+.talent-header {
+  display: flex;
+  gap: 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8a7a5a;
+  border-bottom: 1px solid #c4b49a;
+  padding-bottom: 2px;
+  margin-bottom: 2px;
+}
+
+.th-toggle { width: 20px; flex-shrink: 0; }
+.th-desc { flex: 1; text-align: left; }
+.th-xp { width: 60px; text-align: center; }
+.th-m { width: 70px; text-align: center; }
+.th-w { width: 70px; text-align: center; }
+
+/* --- Talent Expand/Collapse --- */
+.talent-block {
+  margin-bottom: 2px;
+}
+
+.talent-block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.talent-toggle {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  flex: 0 0 20px;
+  border: none;
+  background: transparent;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.talent-toggle::before {
+  content: "\25B6";
+  display: block;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  text-align: center;
+  font-size: 10px;
+  color: #8a7a5a;
+  transition: transform 0.15s ease;
+}
+
+.talent-toggle:checked::before {
+  transform: rotate(90deg);
+  color: #5a4a32;
+}
+
+.talent-toggle-label {
+  display: none;
+}
+
+.talent-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.talent-detail {
+  display: none;
+  margin: 2px 0 6px 24px;
+  flex: 0 0 100%;
+}
+
+.talent-toggle:checked ~ .talent-detail {
+  display: block;
+}
+
+.talent-detail-area {
+  width: 100%;
+  min-height: 60px;
+  border: 1px solid #c4b49a;
+  border-radius: 4px;
+  background: rgba(255, 255, 230, 0.15);
+  font-family: inherit;
+  font-size: 11px;
+  color: #2a2013;
+  padding: 6px;
+  resize: vertical;
+  box-sizing: border-box;
+  text-align: left !important;
+}
+
+.talent-detail-area:focus {
+  border-color: #5a4a32;
+  background: rgba(255, 255, 230, 0.3);
+}
+
+.talent-desc {
+  flex: 1;
+  min-width: 0;
+  text-align: left !important;
+}
+
+.talent-xp {
+  flex: 0 0 60px;
+  width: 60px;
+  text-align: center;
+}
+
+.talent-m,
+.talent-w {
+  width: 70px;
+  text-align: center;
+}
+
+/* --- Active Pet --- */
+.pet-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.pet-name-input {
+  flex: 1;
+}
+
+.pet-checks-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.pet-skills-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  margin-bottom: 4px;
+  color: #8a7a5a;
+}
+
+.pet-skills-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.pet-skill-slot {
+  flex: 1;
+  text-align: center;
+}
+
+.pet-skill-num {
+  display: block;
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.pet-skill-area {
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  border: 1px solid #a09078;
+  border-radius: 4px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 10px;
+  color: #2a2013;
+  padding: 3px;
+  resize: none;
+  box-sizing: border-box;
+}
+
+.pet-skill-area:focus {
+  border-color: #5a4a32;
+  background: rgba(255, 255, 230, 0.3);
+}
+
+.pet-note {
+  font-size: 9px;
+  font-style: italic;
+  color: #8a7a5a;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.xp-input {
+  width: 60px;
+  text-align: center;
+  flex: 0 0 60px;
+}
+
+/* --- Equipment List (stacked) --- */
+.equip-list {
+  margin-bottom: 10px;
+}
+
+.equip-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.equip-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: bold;
+  min-width: 60px;
+  flex-shrink: 0;
+}
+
+.equip-input {
+  flex: 1;
+}
+
+.equip-checks {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+/* --- Light & Flickers --- */
+.light-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.light-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.light-input {
+  flex: 1;
+}
+
+.flicker-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flicker-checks {
+  display: flex;
+  gap: 3px;
+}
+
+/* --- Belt --- */
+.belt-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.belt-slot {
+  flex: 1;
+  text-align: center;
+}
+
+.belt-num {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.belt-area {
+  width: 100%;
+  height: 30px;
+  min-height: 30px;
+  border: 1px solid #a09078;
+  border-radius: 4px;
+  background: transparent;
+  font-family: inherit;
+  font-size: 10px;
+  color: #2a2013;
+  padding: 3px;
+  resize: none;
+  box-sizing: border-box;
+}
+
+.belt-area:focus {
+  border-color: #5a4a32;
+  background: rgba(255, 255, 230, 0.3);
+}
+
+/* --- Pack Grid --- */
+.pack-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 10px;
+}
+
+.pack-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pack-full {
+  grid-column: 1 / -1;
+}
+
+.pack-num {
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 18px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.pack-input {
+  flex: 1;
+}
+
+/* --- Supply Resources Column --- */
+.supply-resources {
+  border-left: 1px solid #c4b49a;
+  padding-left: 16px;
+}
+
+/* --- Path Selection Buttons --- */
+.path-select-label {
+  margin: 10px 0 4px 0;
+}
+
+.path-select-btns {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.path-btn {
+  padding: 4px 14px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid #b8a88a;
+  border-radius: 4px;
+  background: #e8dcc8;
+  color: #5a4a32;
+  cursor: pointer;
+}
+
+.path-btn:hover {
+  background: #d8c8a8;
+}
+
+.path-btn-danger {
+  background: #c85a5a;
+  border-color: #a04040;
+  color: #fff;
+}
+
+.path-btn-danger:hover {
+  background: #b04a4a;
+}
+
+/* --- Path Confirm Panel --- */
+.path-confirm-toggle {
+  display: none;
+}
+
+.path-confirm-panel {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+  padding: 8px 12px;
+  background: #fff3cd;
+  border: 1px solid #d4a843;
+  border-radius: 4px;
+}
+
+.path-confirm-toggle:checked + .path-confirm-panel {
+  display: flex;
+}
+
+.path-confirm-msg {
+  font-size: 12px;
+  font-weight: bold;
+  color: #856404;
+  flex: 1;
+}
+
+/* --- Roll20 textarea height overrides ---
+   Beats .largedialog textarea (1 class + 1 element = specificity 0,1,1)
+   by using 2 classes + 1 element (specificity 0,2,1) */
+.hmtw textarea.belt-area {
+  height: 45px;
+  min-height: 45px;
+}
+
+.hmtw textarea.pet-skill-area {
+  height: 45px;
+  min-height: 45px;
 }
