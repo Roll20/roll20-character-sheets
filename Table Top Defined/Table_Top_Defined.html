@@ -5,6 +5,7 @@
 <input type="hidden" name="attr_intelligence_score_backup"/>
 <div style="text-align: center; width: 800px;" class="SAbutton">
  <button class="sheet-tab-button-main" type="action" name="act_main">Main</button>
+ <button class="sheet-tab-button-bio" type="action" name="act_bio">Bio</button>
  <button class="sheet-tab-button-definitions" type="action" name="act_definitions">Definitions</button>
  <button class="sheet-tab-button-abilities" type="action" name="act_abilities">Abilities/Feats</button>
  <button class="sheet-tab-button-spells" type="action" name="act_spells">Spells</button>
@@ -413,10 +414,12 @@
          <option value="Dizzy">Dizzy</option>
          <option value="Exhausted">Exhausted</option>
          <option value="Fatigued">Fatigued</option>
+         <option value="Haste">Haste</option>
          <option value="Nauseated">Nauseated</option>
          <option value="Scared">Scared</option>
          <option value="Sickened">Sickened</option>
          <option value="Sleep">Sleep</option>
+         <option value="Slow">Slow</option>
          <option value="Soaked">Soaked</option>
          <option value="Stifle">Stifle</option>
          <option value="Stunned">Stunned</option>
@@ -598,6 +601,34 @@
   <div class="column-header grcsa main-notes-header">Notes</div>
   <div class="main-notes-body">
    <textarea class="main-notes-textarea" name="attr_Main-Notes" placeholder="Pertinent information, notes, and bonuses..."></textarea>
+  </div>
+ </div>
+</div>
+<!--</editor-fold>-->
+
+<!--<editor-fold desc="Bio Tab"-->
+<div class="sheet-bio">
+ <div class="column-header">Biography and Details</div>
+ <div class="ggrid">
+  <div class="grc1 main-bio-left">
+   <div class="column-header-dark">Biography</div>
+   <div class="bio-text-box">
+    <textarea title="@{biography}" name="attr_biography"></textarea>
+   </div>
+   <div class="column-header-dark">Journal</div>
+   <div class="bio-text-box">
+    <textarea title="@{journal}" name="attr_journal"></textarea>
+   </div>
+  </div>
+  <div class="grc2 main-bio-right">
+   <div class="column-header-dark">Family</div>
+   <div class="bio-text-box">
+    <textarea title="@{family}" name="attr_family"></textarea>
+   </div>
+   <div class="column-header-dark">Contacts</div>
+   <div class="bio-text-box">
+    <textarea title="@{contacts}" name="attr_contacts"></textarea>
+   </div>
   </div>
  </div>
 </div>
@@ -3279,6 +3310,16 @@
             value="0"/>
     </div>
    </div>
+   <div class="settings-row">
+    <div class="settings-label">Skill Point(s) Modifier:</div>
+    <div class="settings-value">
+     <input title="@{skill_point_modifier}"
+            class="standard-input"
+            type="number"
+            name="attr_skill_point_modifier"
+            value="0"/>
+    </div>
+   </div>
   </div>
 
   <div class="settings-right">
@@ -3816,10 +3857,11 @@
  const SKILL_POINT_ATTRS = SKILLS.map(skill => skill.sp);
 
  var checkmaxskillpoints = function() {
-  const attrs = SKILL_POINT_ATTRS.concat(["NatIntMod", "BaseSkillGrowth", "HD"]);
+  const attrs = SKILL_POINT_ATTRS.concat(["NatIntMod", "BaseSkillGrowth", "HD","skill_point_modifier"]);
   getAttrs(attrs, function(values) {
    const currentSkillPoints = SKILL_POINT_ATTRS.reduce((sum, attr) => sum + num(values, attr), 0);
-   const maxSkillPoints = (num(values, "HD") + 3) * (num(values, "NatIntMod") + num(values, "BaseSkillGrowth"));
+   const maxSkillPoints = (num(values, "HD") + 3) * (num(values, "NatIntMod") + num(values, "BaseSkillGrowth")) +
+           num(values,"skill_point_modifier");
    setAttrs({
     TotalPossibleSkillPoints: maxSkillPoints,
     RemainingSkillPoints: maxSkillPoints - currentSkillPoints
@@ -3827,13 +3869,14 @@
   });
  };
 
- on(watch(["Specialty", "AttackCurve", "Versatile", "skill_growth_modifier"]), function(){
-  getAttrs(["Specialty", "AttackCurve", "Versatile", "skill_growth_modifier"], function(values){
+ on(watch(["skill_point_modifier"]), checkmaxskillpoints);
+
+ on(watch(["Specialty", "AttackCurve", "Versatile", "skill_growth_modifier","skill_point_modifier"]), function(){
+  getAttrs(["Specialty", "AttackCurve", "Versatile", "skill_growth_modifier", "skill_point_modifier"], function(values){
    let attack = 2;
    let specialty = 0;
    let versatile = 0;
    let skill_growth_modifier = num(values, "skill_growth_modifier");
-
    if(values.AttackCurve === "Medium") attack = 4;
    if(values.Specialty === "Specialist") specialty = 4;
    if(values.Specialty === "Generalist") specialty = 2;
@@ -3986,32 +4029,39 @@
   {
    name: "Dizzy",
    legacyAttr: "condition_dizzy",
-   effect: "Casting requires Concentration DC 10 + HD + spell level. Moving requires Balance DC 15 or fall prone; running raises" +
-           "this to DC 25. Melee attacks take a -2 circumstance penalty."
+   effect: "Casting requires a Concentration check with DC 10 + HD + spell level. Moving requires a Balance check with " +
+           "DC 15 or the creature falls prone; running raises this to DC 25. Melee attacks take a -2 circumstance penalty."
   },
   {
    name: "Exhausted",
    legacyAttr: "condition_exhausted",
-   effect: "May either move or take a standard action each round. Ground speed is halved. Takes a -3 dodge penalty to AC and" +
-           " Reflex saves."
+   effect: "May either move or take a standard action each round. Ground speed is halved. Takes a -3 dodge penalty to " +
+           "AC and Reflex saves."
   },
   {
    name: "Fatigued",
    legacyAttr: "condition_fatigued",
-   effect: "Cannot charge or double-move. Excessively tiring activity causes Exhausted. Takes a -1 dodge penalty to AC and" +
-           " Reflex saves."
+   effect: "Cannot charge or double-move. Excessively tiring activity causes the creature to become Exhausted. Takes a " +
+           "-1 dodge penalty to AC and Reflex saves."
+  },
+  {
+   name: "Haste",
+   legacyAttr: "condition_haste",
+   effect: "Speed is doubled or increased by 30 ft, whichever results in the lower speed. Gains a +1 bonus to attacks, " +
+           "AC, and Reflex saves. While hasted, the creature may make 1 additional attack per round. This is " +
+           "automatically calculated for you."
   },
   {
    name: "Nauseated",
    legacyAttr: "condition_nauseated",
-   effect: "Each round: 33% chance to lose the action vomiting, 33% chance to need Balance DC 18 or fall prone, and 33% chance to" +
-           " act normally."
+   effect: "Each round: 33% chance to lose the action vomiting, 33% chance to require a Balance check with DC 18 or fall " +
+           "prone, and 33% chance to act normally."
   },
   {
    name: "Scared",
    legacyAttr: "condition_scared",
-   effect: "Against the source of fear, takes -2 on attack rolls and Will saves, prefers staying out of range, and becomes more" +
-           " compliant unless a greater fear takes priority."
+   effect: "Against the source of fear, takes -2 on attack rolls and Will saves, prefers to stay out of range, and becomes " +
+           "more compliant unless a greater fear takes priority."
   },
   {
    name: "Sickened",
@@ -4021,26 +4071,32 @@
   {
    name: "Sleep",
    legacyAttr: "condition_sleep",
-   effect: "Temporarily unconscious. Noise of Listen DC 15 or higher gives a chance to wake on a successful Listen check. Takes" +
-           " -5 to Listen while asleep."
+   effect: "Temporarily unconscious. Noise with Listen DC 15 or higher gives the creature a chance to wake on a successful " +
+           "Listen check. Takes -5 to Listen while asleep."
+  },
+  {
+   name: "Slow",
+   legacyAttr: "condition_slow",
+   effect: "Speed is halved or reduced to 15 ft, whichever is slower. Takes a -1 penalty to attacks, AC, and Reflex saves. " +
+           "While slowed, the creature can make only 1 attack per round. This is automatically calculated for you."
   },
   {
    name: "Soaked",
    legacyAttr: "condition_soaked",
-   effect: "Electric spells gain vulnerability. Electric resistance is lost, immunity becomes resistance, and electric absorption" +
-           " heals by the vulnerable damage amount."
+   effect: "Electric spells gain vulnerability. Electric resistance is lost, immunity becomes resistance, and electric " +
+           "absorption heals by the vulnerable damage amount."
   },
   {
    name: "Stifle",
    legacyAttr: "condition_stifle",
-   effect: "Cannot act while left alone. May dodge, defend, or protect themselves if attacked. Magical stifle grants another" +
-           " immediate Will save after offensive action. Reactive skills take -4 circumstance penalty. Not flat-footed."
+   effect: "Cannot act while left alone. May dodge, defend, or protect themselves if attacked. Magical stifle grants another " +
+           "immediate Will save after an offensive action. Reactive skills take a -4 circumstance penalty. Not flat-footed."
   },
   {
    name: "Stunned",
    legacyAttr: "condition_stunned",
-   effect: "Drops weapons, cannot take standard actions, and threatens no squares. May move at half speed. Takes -2 dodge penalty" +
-           " to AC and Reflex saves, and -4 to Acrobatics, Balance, Investigate, Listen, and Spot."
+   effect: "Drops weapons, cannot take standard actions, and threatens no squares. May move at half speed. Takes a -2 " +
+           "dodge penalty to AC and Reflex saves, and -4 to Acrobatics, Balance, Investigate, Listen, and Spot."
   }
  ];
 
@@ -4105,7 +4161,8 @@
 
  //<editor-fold desc="Button-Tabs"
 
- const inputlist = ["Crown", "Face", "Neck", "Shoulders", "Ring1", "Ring2", "Hands", "Forearms", "UpperArms", "Torso", "Waist", "Feet"];
+ const inputlist = ["Crown", "Face", "Neck", "Shoulders", "Ring1", "Ring2", "Hands", "Forearms", "UpperArms", "Torso",
+  "Waist", "Feet"];
  inputlist.forEach(input =>{
   on(`change:${input.toLowerCase()}`, function(){
    getAttrs([input], function(values){
@@ -4117,7 +4174,7 @@
  });
 
  const buttonlist = ["main", "skills", "gear", "definitions", "abilities", "spells", "accessories", "inventory", "profitloss",
-  "settings"];
+  "settings","bio"];
  buttonlist.forEach(button => {
   on(`clicked:${button}`, function() {
    setAttrs({
@@ -4307,7 +4364,7 @@
  const rollRestingForever = function() {
   startRoll(
           `&{template:custom}{{title=Dead}}{{subtitle=@{character_name}}}` +
-          `{{Status=Dead}}{{desc=@{character_name} is dead and is now resting forever.}}`,
+          `{{Status=Dead}}{{desc=@{character_name} is dead and now resting forever.}}`,
           function(roll) {
            finishRoll(roll.rollId);
           }
@@ -4326,7 +4383,7 @@
            `{{rest=1}}{{rest_multiplier=[[${REST_MULTIPLIER_QUERY}]]}}` +
            `{{rest_healing=[[0]]}}{{rest_hp=[[0]]}}{{rest_hp_max=[[0]]}}` +
            `{{desc=Spell uses, ability uses, and resources reset to maximum. `+
-           `One non-terminal death save failure is cleared. One point of ability damage is reduces from every attribute.}}`,
+           `One non-terminal death save failure is cleared. One point of ability damage is reduced from every attribute.}}`,
            function(roll) {
             const multiplier = restRollResultTotal(roll.results.rest_multiplier, 1);
             const attrsToGet = ["hp", "hp_max", "HD", "conmod", "death_save_1", "death_save_2"];
