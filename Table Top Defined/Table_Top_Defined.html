@@ -1,5 +1,8 @@
 <!-- <editor-fold desc="ButtonBar"> -->
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="main"/>
+<input type="hidden" name="attr_sheet_version" value="1"/>
+<input type="hidden" name="attr_constitution_score_backup"/>
+<input type="hidden" name="attr_intelligence_score_backup"/>
 <div style="text-align: center; width: 800px;" class="SAbutton">
  <button class="sheet-tab-button-main" type="action" name="act_main">Main</button>
  <button class="sheet-tab-button-definitions" type="action" name="act_definitions">Definitions</button>
@@ -10,6 +13,7 @@
  <button class="sheet-tab-button-accessories" type="action" name="act_accessories">Accessories</button>
  <button class="sheet-tab-button-inventory" type="action" name="act_inventory">Inventory</button>
  <button class="sheet-tab-button-profitloss" type="action" name="act_profitloss">Profit/Loss</button>
+ <button class="sheet-tab-button-settings" type="action" name="act_settings">&#9881;</button>
 </div>
 
 <!-- </editor-fold> -->
@@ -39,20 +43,20 @@
   <div id="species-name">
    <div>Species</div>
    <div><input title="@{species}" class="flex-input" type="text" name="attr_species"/></div>
-   <div>Speed</div>
+   <div>Speed (Land)</div>
    <div><input title="@{basespeed}" class="flex-input" type="text" name="attr_basespeed"/></div>
   </div>
   <div id="more-speed">
-   <div>Speed (Fly)</div>
-   <div><input title="@{flyspeed}" class="flex-input" type="text" name="attr_flyspeed" placeholder="#(Manuverability)"/></div>
+   <div>Sanctity</div>
+   <div><input title="@{Sanctity}" class="flex-input" type="text" name="attr_Sanctity"/></div>
    <div>Speed (Swim)</div>
    <div><input title="@{swimspeed}" class="flex-input" type="text" name="attr_swimspeed"/></div>
   </div>
   <div id="religion-name">
    <div>Religion</div>
    <div><input title="@{Religion}" class="flex-input" type="text" name="attr_Religion"/></div>
-   <div>Sanctity</div>
-   <div><input title="@{Sanctity}" class="flex-input" type="text" name="attr_Sanctity"/></div>
+   <div>Speed (Fly)</div>
+   <div><input title="@{flyspeed}" class="flex-input" type="text" name="attr_flyspeed" placeholder="#(Manuverability)"/></div>
   </div>
   <div id="hd-and-size">
    <div>HD</div>
@@ -89,8 +93,8 @@
     <div class="titleblock_stat">Base</div>
     <div><input title="@{strength}" type="number" name="attr_strength"/></div>
     <div><input title="@{dexterity}" type="number" name="attr_dexterity"/></div>
-    <div><input title="@{constitution}" type="number" name="attr_constitution"/></div>
-    <div><input title="@{intelligence}" type="number" name="attr_intelligence"/></div>
+    <div><input title="@{constitution}" type="text" name="attr_constitution"/></div>
+    <div><input title="@{intelligence}" type="text" name="attr_intelligence"/></div>
     <div><input title="@{wisdom}" type="number" name="attr_wisdom"/></div>
     <div><input title="@{charisma}" type="number" name="attr_charisma"/></div>
    </div>
@@ -125,8 +129,8 @@
     <div class="titleblock_stat">Total</div>
     <div><input title="@{StrTotal}" type="number" name="attr_StrTotal" readonly/></div>
     <div><input title="@{DexTotal}" type="number" name="attr_DexTotal" readonly/></div>
-    <div><input title="@{ConTotal}" type="number" name="attr_ConTotal" readonly/></div>
-    <div><input title="@{IntTotal}" type="number" name="attr_IntTotal" readonly/></div>
+    <div><input title="@{ConTotal}" type="text" name="attr_ConTotal" readonly/></div>
+    <div><input title="@{IntTotal}" type="text" name="attr_IntTotal" readonly/></div>
     <div><input title="@{WisTotal}" type="number" name="attr_WisTotal" readonly/></div>
     <div><input title="@{ChaTotal}" type="number" name="attr_ChaTotal" readonly/></div>
    </div>
@@ -395,6 +399,45 @@
     </div>
    </div>
   </div> <!--Advanced Combat Grid-->
+  <div class="conditions-effects-block">
+   <div class="column-header">Conditions and Temporary Effects</div>
+   <div class="conditions-effects-content">
+    <div class="conditions-repeat-section">
+     <div class="conditions-subheader">Active Conditions</div>
+     <fieldset class="repeating_conditions">
+      <div class="condition-repeat-row">
+       <div class="condition-repeat-topline">
+        <select title="@{condition_type}" class="condition-select" name="attr_condition_type">
+         <option value="">Condition</option>
+         <option value="Bad Luck">Bad Luck</option>
+         <option value="Dizzy">Dizzy</option>
+         <option value="Exhausted">Exhausted</option>
+         <option value="Fatigued">Fatigued</option>
+         <option value="Nauseated">Nauseated</option>
+         <option value="Scared">Scared</option>
+         <option value="Sickened">Sickened</option>
+         <option value="Sleep">Sleep</option>
+         <option value="Soaked">Soaked</option>
+         <option value="Stifle">Stifle</option>
+         <option value="Stunned">Stunned</option>
+        </select>
+        <input title="@{condition_duration}"
+               class="condition-duration-input"
+               type="text" name="attr_condition_duration"
+               placeholder="Duration / source"/>
+       </div>
+       <div title="@{condition_effect}"
+            class="condition-effect-display">
+        <span name="attr_condition_effect"></span></div>
+      </div>
+     </fieldset>
+    </div>
+    <div class="temporary-effects-strip">
+     <label><input title="@{haste}" type="checkbox" name="attr_haste" value="1"/> Hasted</label>
+     <label><input title="@{slow}" type="checkbox" name="attr_slow" value="1"/> Slowed</label>
+    </div>
+   </div>
+  </div>
  </div>
  <div class="main-right">
   <div class="hp-armor-block">
@@ -491,9 +534,70 @@
     </div>
    </div>
   </div>
-  <div class="column-header grcsa">Notes</div>
-  <div>
-   <textarea name="attr_Main-Notes" placeholder="Pertinent information, notes, and bonuses..."/>
+  <div class="vitals-resistances-block">
+   <div class="column-header">Vitals and Resistances</div>
+   <div class="vitals-resistances-content">
+    <div class="vitals-rest-row">
+     <span>Rest:</span>
+     <button type="action" class="Small-Button vitals-rest-button" name="act_rest">Rest</button>
+    </div>
+    <div class="vitals-death-save-row">
+     <span>Death Saves:&nbsp;&nbsp;</span>
+     <!--<button type="action" class="Small-Button vitals-death-save-button" name="act_deathsave">Roll</button>-->
+     <label><input class="death-save-checkbox"
+                   title="@{death_save_1}"
+                   type="checkbox"
+                   name="attr_death_save_1"
+                   value="1"/> First Fail</label>
+     <label><input class="death-save-checkbox"
+                   title="@{death_save_2}"
+                   type="checkbox"
+                   name="attr_death_save_2"
+                   value="1"/> Second Fail</label>
+     <label><input class="death-save-checkbox"
+                   title="@{death_save_3}"
+                   type="checkbox"
+                   name="attr_death_save_3"
+                   value="1"/> Death</label>
+    </div>
+    <div class="vitals-repeat-columns">
+     <div class="vitals-repeat-section">
+      <div class="vitals-subheader">Damage Reduction</div>
+      <fieldset class="repeating_damagereduction">
+       <div class="damage-reduction-row">
+        <input title="@{damage_reduction_value}" class="vitals-small-number" type="number" name="attr_damage_reduction_value"/>
+        <span>/</span>
+        <input title="@{damage_reduction_bypass}" class="vitals-bypass-input" type="text" name="attr_damage_reduction_bypass" placeholder="Bypass"/>
+       </div>
+      </fieldset>
+     </div>
+     <div class="vitals-repeat-section">
+      <div class="vitals-subheader">Resistance</div>
+      <fieldset class="repeating_resistance">
+       <div class="resistance-row">
+        <select title="@{resistance_type}" class="vitals-element-select" name="attr_resistance_type">
+         <option value="Cold">Cold</option>
+         <option value="Corrosive">Corrosive</option>
+         <option value="Desiccation">Desiccation</option>
+         <option value="Electric">Electric</option>
+         <option value="Entropic">Entropic</option>
+         <option value="Force">Force</option>
+         <option value="Heat">Heat</option>
+         <option value="Holy">Holy</option>
+         <option value="Negative">Negative</option>
+         <option value="Positive">Positive</option>
+         <option value="Unholy">Unholy</option>
+        </select>
+        <input title="@{resistance_value}" class="vitals-small-number" type="number" name="attr_resistance_value"/>
+       </div>
+      </fieldset>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="column-header grcsa main-notes-header">Notes</div>
+  <div class="main-notes-body">
+   <textarea class="main-notes-textarea" name="attr_Main-Notes" placeholder="Pertinent information, notes, and bonuses..."></textarea>
   </div>
  </div>
 </div>
@@ -554,6 +658,7 @@
    <div class="grc1 bottom-border-div">
     <div class="column-header">Species Info/Traits</div>
     <div>Versatile?<input type="checkbox" name="attr_Versatile"/></div>
+    <div>Mystic?<input type="checkbox" name="attr_mystic" value="1"/></div>
     <div>
      <fieldset class="repeating_DTA1">
       <div class="column-header-dark">
@@ -568,6 +673,7 @@
    </div>
    <div class="grc2 wrapped-div">
     <div class="column-header">Definitions</div>
+    <div class="definition-flag">Diffuse Background?<input title="@{diffuse_background}" type="checkbox" name="attr_diffuse_background" value="1"/></div>
     <div class="titleblock_stat" style="font-size: medium">Primary</div>
     <div class="column-header"><input title="@{primarydefinitionname}" class="DTA-name" type="text" name="attr_primarydefinitionname" placeholder="<Primary Definition here>"></div>
     <div><textarea title="@{primarydescription}" name="attr_primarydescription" placeholder="<Description here>"></textarea></div>
@@ -669,11 +775,24 @@
    <div class="grc1">
     <div class="column-header">Abilities</div>
     <fieldset class="repeating_abilities">
-     <div class="midline-right-div ggrid">
+     <input type="hidden" name="attr_grant_key"/>
+     <input type="hidden" class="grant-hidden" name="attr_grant_hidden" value="0"/>
+     <div class="midline-right-div ggrid grant-row">
       <div class="row-header-dark grr1">
-       <div>
+       <div class="ability-title-row">
         <button type="action" class="Small-Button" name="act_minabilitytog">-</button>
+        <input type="hidden" class="grant-available" name="attr_source_available" value="1"/>
         <input type="text" class="Ability-name" name="attr_abilityname" placeholder="<Ability Name Here>"/>
+        <span class="grant-meta">
+         HD <input class="grant-level-input"
+                   title="@{granted_level}"
+                   type="number" name="attr_granted_level"
+                   placeholder="#" readonly/>
+         Source <input class="grant-source-input"
+                       title="@{granted_source}"
+                       type="text" name="attr_granted_source"
+                       placeholder="Manual" readonly/>
+        </span>
         <button type="roll" name="roll_ability_card" value="@{abilityroll}"></button>
        </div>
        <div class="grr2 titleblock" style="font-size: small; font-weight: normal; margin-bottom: 2px">
@@ -750,11 +869,25 @@
    <div class="grc2">
     <div class="column-header">Feats</div>
     <fieldset class="repeating_feats">
-     <div class="column-header-dark">
-      <button style="color:black" type="action" class="Small-Button" name="act_minfeats">-</button><input class="Ability-name" type="text" name="attr_featsname" placeholder="<Feat name here>">
+     <input type="hidden" name="attr_grant_key"/>
+     <input type="hidden" class="grant-hidden" name="attr_grant_hidden" value="0"/>
+     <div class="column-header-dark feat-title-row grant-row">
+      <button style="color:black" type="action" class="Small-Button" name="act_minfeats">-</button>
+      <input type="hidden" class="grant-available" name="attr_source_available" value="1"/>
+      <input class="Ability-name" type="text" name="attr_featsname" placeholder="<Feat name here>">
+      <span class="grant-meta">
+       HD <input class="grant-level-input"
+                 title="@{granted_level}"
+                 type="number"
+                 name="attr_granted_level"
+                 placeholder="#" readonly/>
+       Source <input class="grant-source-input"
+                     title="@{granted_source}"
+                     type="text" name="attr_granted_source"
+                     placeholder="Manual" readonly/></span>
      </div>
      <input type="hidden" class="feats-toggle" name="attr_minfeatval" value="0"/>
-     <div class="feats_description">
+     <div class="feats_description grant-row">
       <textarea name="attr_featsdescription" placeholder="<Description here>"></textarea>
      </div>
     </fieldset>
@@ -770,20 +903,20 @@
   <div class="titleblock">
    <h3 style="color:white">Spell Casting</h3>
    <div class="titleblock_stat">
-     Primary Mental Attribute(PMA): <select title="@{PMA}" name="attr_PMA" value="" class="fixed-select">
-     <option value="@{strmod}">Str</option>
-     <option value="@{dexmod}">Dex</option>
-     <option value="@{wismod}">Wis</option>
-     <option value="@{intmod}">Int</option>
-     <option value="@{chamod}">Cha</option>
-    </select><br>
-     Caster Level: <input title="@{cl}" type="number" name="attr_cl" readonly/>
-     Spell Penetration Bonus:<input title="@{spellpenetrationbonus}" type="number" name="attr_spellpenetrationbonus" value="0">
-     Spell Proficiency: <input title="@{SpellProf}" type="number" name="attr_SpellProf" readonly/><br>
-     Close Range: <input title="@{CloseRange}" type="number" name="attr_CloseRange" readonly/>
-     Medium Range: <input title="@{MediumRange}" type="number" name="attr_MediumRange" readonly/>
-     Long: <input title="@{LongRange}" type="number" name="attr_LongRange" readonly/>
-    </div>
+    Primary Mental Attribute(PMA): <select title="@{PMA}" name="attr_PMA" value="" class="fixed-select">
+    <option value="@{strmod}">Str</option>
+    <option value="@{dexmod}">Dex</option>
+    <option value="@{wismod}">Wis</option>
+    <option value="@{intmod}">Int</option>
+    <option value="@{chamod}">Cha</option>
+   </select><br>
+    Caster Level: <input title="@{cl}" type="number" name="attr_cl" readonly/>
+    Spell Penetration Bonus:<input title="@{spellpenetrationbonus}" type="number" name="attr_spellpenetrationbonus" value="0">
+    Spell Proficiency: <input title="@{SpellProf}" type="number" name="attr_SpellProf" readonly/><br>
+    Close Range: <input title="@{CloseRange}" type="number" name="attr_CloseRange" readonly/>
+    Medium Range: <input title="@{MediumRange}" type="number" name="attr_MediumRange" readonly/>
+    Long: <input title="@{LongRange}" type="number" name="attr_LongRange" readonly/>
+   </div>
   </div>
   <div class="Column1"> <!--Left Column-->
    <div class="Spell-Level">
@@ -942,7 +1075,7 @@
          <div>Components: <input type="text" name="attr_components"/></div>
          <div>Range: <input type="text" name="attr_range"/></div>
          <div>Duration: <input type="text" name="attr_duration"/></div>
-         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#"> 
+         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">
           <select class="die-select" name="attr_dicetype">
              <option value="d3">d3</option>
              <option value="d4">d4</option>
@@ -1041,7 +1174,7 @@
          <div>Components: <input type="text" name="attr_components"/></div>
          <div>Range: <input type="text" name="attr_range"/></div>
          <div>Duration: <input type="text" name="attr_duration"/></div>
-         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">            
+         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">
           <select class="die-select" name="attr_dicetype">
              <option value="d3">d3</option>
              <option value="d4">d4</option>
@@ -1140,7 +1273,7 @@
          <div>Components: <input type="text" name="attr_components"/></div>
          <div>Range: <input type="text" name="attr_range"/></div>
          <div>Duration: <input type="text" name="attr_duration"/></div>
-         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">            
+         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">
           <select class="die-select" name="attr_dicetype">
              <option value="d3">d3</option>
              <option value="d4">d4</option>
@@ -1239,7 +1372,7 @@
          <div>Components: <input type="text" name="attr_components"/></div>
          <div>Range: <input type="text" name="attr_range"/></div>
          <div>Duration: <input type="text" name="attr_duration"/></div>
-         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">            
+         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">
           <select class="die-select" name="attr_dicetype">
              <option value="d3">d3</option>
              <option value="d4">d4</option>
@@ -1340,7 +1473,7 @@
          <div>Components: <input type="text" name="attr_components"/></div>
          <div>Range: <input type="text" name="attr_range"/></div>
          <div>Duration: <input type="text" name="attr_duration"/></div>
-         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">            
+         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">
           <select class="die-select" name="attr_dicetype">
              <option value="d3">d3</option>
              <option value="d4">d4</option>
@@ -1439,7 +1572,7 @@
          <div>Components: <input type="text" name="attr_components"/></div>
          <div>Range: <input type="text" name="attr_range"/></div>
          <div>Duration: <input type="text" name="attr_duration"/></div>
-         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">            
+         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">
           <select class="die-select" name="attr_dicetype">
              <option value="d3">d3</option>
              <option value="d4">d4</option>
@@ -1538,7 +1671,7 @@
          <div>Components: <input type="text" name="attr_components"/></div>
          <div>Range: <input type="text" name="attr_range"/></div>
          <div>Duration: <input type="text" name="attr_duration"/></div>
-         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">            
+         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">
           <select class="die-select" name="attr_dicetype">
              <option value="d3">d3</option>
              <option value="d4">d4</option>
@@ -1637,7 +1770,7 @@
          <div>Components: <input type="text" name="attr_components"/></div>
          <div>Range: <input type="text" name="attr_range"/></div>
          <div>Duration: <input type="text" name="attr_duration"/></div>
-         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">            
+         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">
           <select class="die-select" name="attr_dicetype">
              <option value="d3">d3</option>
              <option value="d4">d4</option>
@@ -1736,7 +1869,7 @@
          <div>Components: <input type="text" name="attr_components"/></div>
          <div>Range: <input type="text" name="attr_range"/></div>
          <div>Duration: <input type="text" name="attr_duration"/></div>
-         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">            
+         <div>Dice Rolled:<span style="float: right; background: #D0D0D0"><input style="float:none" type="text" name="attr_dicenum" placeholder="#">
           <select class="die-select" name="attr_dicetype">
              <option value="d3">d3</option>
              <option value="d4">d4</option>
@@ -2445,12 +2578,20 @@
      <div style="margin: 0" class="column-header-dark weapon-column-span">
       <button type="action" class="Small-Button" name="act_weaponminimize">-</button>
       <input class="weapon-name" type="text" name="attr_weaponname" placeholder="<Weapon Name>"/>
-      <span style="font-weight: normal; font-size:small">
-       Full Attack:&nbsp;<button
-              class="CRP_Button"
-              type="action"
-              name="act_fullattackroll">t</button>
-      </span>
+      <div class="column-header">
+       <span style="font-weight: normal; font-size:small">
+               Single Attack:&nbsp;<button
+               class="CRP_Button"
+               title="Single Attack"
+               type="action"
+               name="act_singleattack">t</button>
+               &nbsp;&nbsp;Full Attack:&nbsp;<button
+               class="CRP_Button"
+               title="Full Attack"
+               type="action"
+               name="act_fullattackroll">t</button>
+       </span>
+      </div>
       <span style="display:none">
        <button type="action" name="act_fullattackdamage"></button>
        <button type="action" name="act_fullattackcritdamage"></button>
@@ -2459,6 +2600,14 @@
        <button type="action" name="act_fullattackconfirm3"></button>
        <button type="action" name="act_fullattackconfirm4"></button>
        <button type="action" name="act_fullattackconfirm5"></button>
+       <button type="action" name="act_singleattackdamage"></button>
+       <button type="action" name="act_singleattackcritdamage"></button>
+       <button type="action" name="act_singleattackconfirm"></button>
+          <input type="hidden" name="attr_focus_points_used" value="1"/>
+
+          <button type="action" name="act_focusattackdamage"></button>
+          <button type="action" name="act_focusattackcritdamage"></button>
+          <button type="action" name="act_focusattackconfirm"></button>
       </span>
      </div>
      <div class="ggrid">
@@ -2526,10 +2675,10 @@
        <div><input type="checkbox" name="attr_twohanded"/></div>
       </div>
      </div>
-     <div style="margin: 0;" class="column-header weapon-column-span">
+     <div style="margin: 0; display:none" class="column-header-dark weapon-column-span">
       Damage
      </div>
-     <div class="ggridc">
+     <div class="ggridc" style="display: none;">
       <div class="grr1 ggrid">
        <input type="hidden" name="attr_weapondamage"/>
        <input type="hidden" name="attr_critweapondamage"/>
@@ -2545,7 +2694,7 @@
        ></button></div>
       </div>
      </div>
-     <div style="margin:0; border-radius: 0" class="column-header weapon-column-span">
+     <div style="margin:0; border-radius: 0;display:none" class="column-header weapon-column-span">
       <button type="action" class="Small-Button" name="act_critconfirmminimize">-</button>Critical Confirmation Rolls
      </div>
      <div class="ggridc">
@@ -2671,12 +2820,20 @@
      <div style="margin: 0" class="column-header-dark weapon-column-span">
       <button type="action" class="Small-Button" name="act_weaponminimize">-</button>
       <input class="weapon-name" type="text" name="attr_weaponname" placeholder="<Weapon Name>"/>
-      <span style="font-weight: normal; font-size:small">
-       Full Attack:&nbsp;<button
-              class="CRP_Button"
-              type="action"
-              name="act_fullattackroll">t</button>
-      </span>
+      <div class="column-header">
+       <span style="font-weight: normal; font-size:small">
+               Single Attack:&nbsp;<button
+               class="CRP_Button"
+               title="Single Attack"
+               type="action"
+               name="act_singleattack">t</button>
+               Full Attack:&nbsp;<button
+               class="CRP_Button"
+               title="Full Attack"
+               type="action"
+               name="act_fullattackroll">t</button>
+       </span>
+      </div>
       <span style="display:none">
        <button type="action" name="act_fullattackdamage"></button>
        <button type="action" name="act_fullattackcritdamage"></button>
@@ -2685,6 +2842,14 @@
        <button type="action" name="act_fullattackconfirm3"></button>
        <button type="action" name="act_fullattackconfirm4"></button>
        <button type="action" name="act_fullattackconfirm5"></button>
+       <button type="action" name="act_singleattackdamage"></button>
+       <button type="action" name="act_singleattackcritdamage"></button>
+       <button type="action" name="act_singleattackconfirm"></button>
+          <input type="hidden" name="attr_focus_points_used" value="1"/>
+
+          <button type="action" name="act_focusattackdamage"></button>
+          <button type="action" name="act_focusattackcritdamage"></button>
+          <button type="action" name="act_focusattackconfirm"></button>
       </span>
      </div>
      <div class="ggrid">
@@ -2751,10 +2916,10 @@
        <div><input type="checkbox" name="attr_twohanded" value=".5"/></div>
       </div>
      </div>
-     <div style="margin: 0;" class="column-header weapon-column-span">
+     <div style="margin: 0; display:none" class="column-header-dark weapon-column-span">
       Damage
      </div>
-     <div class="ggridc">
+     <div class="ggridc" style="display: none">
       <div class="grr1 ggrid">
        <input type="hidden" name="attr_weapondamage"/>
        <input type="hidden" name="attr_critweapondamage"/>
@@ -2770,7 +2935,7 @@
        ></button></div>
       </div>
      </div>
-     <div style="margin:0;border-radius: 0" class="column-header weapon-column-span">
+     <div style="margin:0;border-radius: 0; display:none" class="column-header weapon-column-span">
       <button type="action" class="Small-Button" name="act_critconfirmminimize">-</button>Critical Confirmation Rolls
      </div>
      <div class="ggridc">
@@ -3098,6 +3263,59 @@
 
 <!--</editor-fold>-->
 
+<!--<editor-fold desc="Settings">-->
+<div class="sheet-settings">
+ <div class="row-header">Settings</div>
+
+ <div class="settings-grid">
+  <div class="settings-left">
+   <div class="settings-row">
+    <div class="settings-label">Skill Growth Modifier:</div>
+    <div class="settings-value">
+     <input title="@{skill_growth_modifier}"
+            class="standard-input"
+            type="number"
+            name="attr_skill_growth_modifier"
+            value="0"/>
+    </div>
+   </div>
+  </div>
+
+  <div class="settings-right">
+   <div class="settings-row">
+    <div class="settings-label">Automatic Feat/Ability Grants:</div>
+    <div class="settings-value">
+     <input title="@{enable_automatic_grants}"
+            type="checkbox"
+            name="attr_enable_automatic_grants"
+            value="1"/>
+    </div>
+   </div>
+
+   <div class="settings-row">
+    <div class="settings-label">No Constitution Score:</div>
+    <div class="settings-value">
+     <input title="@{no_constitution_score}"
+            type="checkbox"
+            name="attr_no_constitution_score"
+            value="1"/>
+    </div>
+   </div>
+
+   <div class="settings-row">
+    <div class="settings-label">No Intelligence Score:</div>
+    <div class="settings-value">
+     <input title="@{no_intelligence_score}"
+            type="checkbox"
+            name="attr_no_intelligence_score"
+            value="1"/>
+    </div>
+   </div>
+  </div>
+ </div>
+</div>
+<!--</editor-fold>-->
+
 <!-- <editor-fold desc="Roll Template" -->
 <rolltemplate class="sheet-rolltemplate-room">
  <div class="sheet-room-container">
@@ -3182,10 +3400,18 @@
    <div class="sheet-key">Damage</div>
    <div class="sheet-value">[Normal Damage](~{{characterid}}|{{confirm_normal_action}}) [Critical Damage](~{{characterid}}|{{confirm_critical_action}})</div>
    {{/fullattackconfirm}}
-   {{#allprops() title subtitle desc color characterid fullattack fullattackconfirm attack1 attack2 attack3 attack4 attack5 attack1_label attack2_label attack3_label attack4_label attack5_label attack1_next attack2_next attack3_next attack4_next attack5_next attack1_damage_action attack2_damage_action attack3_damage_action attack4_damage_action attack5_damage_action attack1_confirm_action attack2_confirm_action attack3_confirm_action attack4_confirm_action attack5_confirm_action confirm confirm_normal_action confirm_critical_action}}
+   {{#rest}}
+   <div class="sheet-key">Multiplier</div>
+   <div class="sheet-value">{{rest_multiplier}}</div>
+   <div class="sheet-key">HP Restored</div>
+   <div class="sheet-value">{{computed::rest_healing}}</div>
+   <div class="sheet-key">Current HP</div>
+   <div class="sheet-value">{{computed::rest_hp}} / {{computed::rest_hp_max}}</div>
+   {{/rest}}
+   {{#allprops() title subtitle desc color characterid fullattack fullattackconfirm rest deathsave rest_multiplier rest_summary rest_healing rest_hp rest_hp_max rest_death_save_removed attack1 attack2 attack3 attack4 attack5 attack1_label attack2_label attack3_label attack4_label attack5_label attack1_next attack2_next attack3_next attack4_next attack5_next attack1_damage_action attack2_damage_action attack3_damage_action attack4_damage_action attack5_damage_action attack1_confirm_action attack2_confirm_action attack3_confirm_action attack4_confirm_action attack5_confirm_action confirm confirm_normal_action confirm_critical_action}}
    <div class="sheet-key">{{key}}</div>
    <div class="sheet-value">{{value}}</div>
-   {{/allprops() title subtitle desc color characterid fullattack fullattackconfirm attack1 attack2 attack3 attack4 attack5 attack1_label attack2_label attack3_label attack4_label attack5_label attack1_next attack2_next attack3_next attack4_next attack5_next attack1_damage_action attack2_damage_action attack3_damage_action attack4_damage_action attack5_damage_action attack1_confirm_action attack2_confirm_action attack3_confirm_action attack4_confirm_action attack5_confirm_action confirm confirm_normal_action confirm_critical_action}}
+   {{/allprops() title subtitle desc color characterid fullattack fullattackconfirm rest deathsave rest_multiplier rest_summary rest_healing rest_hp rest_hp_max rest_death_save_removed attack1 attack2 attack3 attack4 attack5 attack1_label attack2_label attack3_label attack4_label attack5_label attack1_next attack2_next attack3_next attack4_next attack5_next attack1_damage_action attack2_damage_action attack3_damage_action attack4_damage_action attack5_damage_action attack1_confirm_action attack2_confirm_action attack3_confirm_action attack4_confirm_action attack5_confirm_action confirm confirm_normal_action confirm_critical_action}}
    {{#desc}}
    <div class="sheet-desc">{{desc}}</div>
    {{/desc}}
@@ -3300,6 +3526,63 @@
    });
   });
  });
+
+ // Always make sure the character has an "On Person" location.
+ // This row is recreated if deleted and normalized if renamed with odd casing/spaces.
+ const ON_PERSON_LOCATION_SECTION = "repeating_locationtotals";
+ const ON_PERSON_LOCATION_NAME = "On Person";
+
+ const normalizeLocationName = function(value) {
+  return String(value || "").trim().toLowerCase();
+ };
+
+ const ensureOnPersonLocation = function() {
+  getSectionIDs(ON_PERSON_LOCATION_SECTION, function(rowIds) {
+   const attrsToGet = rowIds.map(rowId =>
+           `${ON_PERSON_LOCATION_SECTION}_${rowId}_inventoryLocationName`
+   );
+
+   getAttrs(attrsToGet, function(values) {
+    const matchingRows = rowIds.filter(rowId =>
+            normalizeLocationName(values[`${ON_PERSON_LOCATION_SECTION}_${rowId}_inventoryLocationName`]) ===
+            normalizeLocationName(ON_PERSON_LOCATION_NAME)
+    );
+
+    const attrsToSet = {};
+
+    if (matchingRows.length > 0) {
+     const keeperRowId = matchingRows[0];
+
+     attrsToSet[`${ON_PERSON_LOCATION_SECTION}_${keeperRowId}_inventoryLocationName`] = ON_PERSON_LOCATION_NAME;
+     attrsToSet[`${ON_PERSON_LOCATION_SECTION}_${keeperRowId}_locationOnPerson`] = "1";
+
+     // Optional cleanup: "On Person" should be unique.
+     // This prevents the inventory matching logic from having duplicate location names.
+     matchingRows.slice(1).forEach(rowId => {
+      removeRepeatingRow(`${ON_PERSON_LOCATION_SECTION}_${rowId}`);
+     });
+    } else {
+     const rowId = generateRowID();
+
+     attrsToSet[`${ON_PERSON_LOCATION_SECTION}_${rowId}_inventoryLocationName`] = ON_PERSON_LOCATION_NAME;
+     attrsToSet[`${ON_PERSON_LOCATION_SECTION}_${rowId}_locationOnPerson`] = "1";
+     attrsToSet[`${ON_PERSON_LOCATION_SECTION}_${rowId}_locationItemCount`] = "0";
+     attrsToSet[`${ON_PERSON_LOCATION_SECTION}_${rowId}_locationTotalWeight`] = "0";
+    }
+
+    if (Object.keys(attrsToSet).length > 0) {
+     setAttrs(attrsToSet);
+    }
+   });
+  });
+ };
+
+ on(
+         "sheet:opened remove:repeating_locationtotals change:repeating_locationtotals:inventorylocationname",
+         function() {
+          ensureOnPersonLocation();
+         }
+ );
 
  // On Person Total Weight
  on("change:repeating_locationtotals remove:repeating_locationtotals", function(){
@@ -3544,11 +3827,12 @@
   });
  };
 
- on(watch(["Specialty", "AttackCurve", "Versatile"]), function(){
-  getAttrs(["Specialty", "AttackCurve", "Versatile"], function(values){
+ on(watch(["Specialty", "AttackCurve", "Versatile", "skill_growth_modifier"]), function(){
+  getAttrs(["Specialty", "AttackCurve", "Versatile", "skill_growth_modifier"], function(values){
    let attack = 2;
    let specialty = 0;
    let versatile = 0;
+   let skill_growth_modifier = num(values, "skill_growth_modifier");
 
    if(values.AttackCurve === "Medium") attack = 4;
    if(values.Specialty === "Specialist") specialty = 4;
@@ -3556,15 +3840,16 @@
    if(values.Versatile === "on") versatile = 1;
 
    setAttrs({
-    BaseSkillGrowth: attack + specialty + versatile
+    BaseSkillGrowth: attack + specialty + versatile + skill_growth_modifier
    });
   });
  });
 
- on(watch(["intelligence", "IntBonus", "IntPen", "BaseSkillGrowth", "HD"]), function() {
-  getAttrs(["intelligence", "IntBonus", "IntPen", "BaseSkillGrowth"], function(values) {
+ on(watch(["intelligence", "IntBonus", "IntPen", "BaseSkillGrowth", "HD", "no_intelligence_score"]), function() {
+  getAttrs(["intelligence", "IntBonus", "IntPen", "BaseSkillGrowth", "no_intelligence_score"], function(values) {
+   const noIntelligenceScore = values.no_intelligence_score === "1";
    const total = num(values, "intelligence") + num(values, "IntBonus") - num(values, "IntPen");
-   const mod = Math.floor((total - 10) / 2);
+   const mod = noIntelligenceScore ? 0 : Math.floor((total - 10) / 2);
    setAttrs({
     NatIntMod: mod,
     SkillsKnown: mod + num(values, "BaseSkillGrowth") + 4
@@ -3690,6 +3975,134 @@
  });
  //</editor-fold>
 
+ //<editor-fold desc="Conditions">
+
+ const TTD_CONDITIONS = [
+  {
+   name: "Bad Luck",
+   legacyAttr: "condition_bad_luck",
+   effect: "Damage rolls are treated as their minimum result."
+  },
+  {
+   name: "Dizzy",
+   legacyAttr: "condition_dizzy",
+   effect: "Casting requires Concentration DC 10 + HD + spell level. Moving requires Balance DC 15 or fall prone; running raises" +
+           "this to DC 25. Melee attacks take a -2 circumstance penalty."
+  },
+  {
+   name: "Exhausted",
+   legacyAttr: "condition_exhausted",
+   effect: "May either move or take a standard action each round. Ground speed is halved. Takes a -3 dodge penalty to AC and" +
+           " Reflex saves."
+  },
+  {
+   name: "Fatigued",
+   legacyAttr: "condition_fatigued",
+   effect: "Cannot charge or double-move. Excessively tiring activity causes Exhausted. Takes a -1 dodge penalty to AC and" +
+           " Reflex saves."
+  },
+  {
+   name: "Nauseated",
+   legacyAttr: "condition_nauseated",
+   effect: "Each round: 33% chance to lose the action vomiting, 33% chance to need Balance DC 18 or fall prone, and 33% chance to" +
+           " act normally."
+  },
+  {
+   name: "Scared",
+   legacyAttr: "condition_scared",
+   effect: "Against the source of fear, takes -2 on attack rolls and Will saves, prefers staying out of range, and becomes more" +
+           " compliant unless a greater fear takes priority."
+  },
+  {
+   name: "Sickened",
+   legacyAttr: "condition_sickened",
+   effect: "Takes -2 to all rolls. Movement speed is reduced by 10 ft."
+  },
+  {
+   name: "Sleep",
+   legacyAttr: "condition_sleep",
+   effect: "Temporarily unconscious. Noise of Listen DC 15 or higher gives a chance to wake on a successful Listen check. Takes" +
+           " -5 to Listen while asleep."
+  },
+  {
+   name: "Soaked",
+   legacyAttr: "condition_soaked",
+   effect: "Electric spells gain vulnerability. Electric resistance is lost, immunity becomes resistance, and electric absorption" +
+           " heals by the vulnerable damage amount."
+  },
+  {
+   name: "Stifle",
+   legacyAttr: "condition_stifle",
+   effect: "Cannot act while left alone. May dodge, defend, or protect themselves if attacked. Magical stifle grants another" +
+           " immediate Will save after offensive action. Reactive skills take -4 circumstance penalty. Not flat-footed."
+  },
+  {
+   name: "Stunned",
+   legacyAttr: "condition_stunned",
+   effect: "Drops weapons, cannot take standard actions, and threatens no squares. May move at half speed. Takes -2 dodge penalty" +
+           " to AC and Reflex saves, and -4 to Acrobatics, Balance, Investigate, Listen, and Spot."
+  }
+ ];
+
+ const TTD_CONDITION_EFFECTS = TTD_CONDITIONS.reduce(function(map, condition) {
+  map[condition.name] = condition.effect;
+  return map;
+ }, {});
+
+ const setConditionEffectForRow = function(rowId, values, attrsToSet) {
+  const typeAttr = `repeating_conditions_${rowId}_condition_type`;
+  const effectAttr = `repeating_conditions_${rowId}_condition_effect`;
+  const conditionType = str(values, typeAttr);
+  attrsToSet[effectAttr] = TTD_CONDITION_EFFECTS[conditionType] || "";
+ };
+
+ const updateConditionEffects = function(callback) {
+  getSectionIDs("repeating_conditions", function(rowIds) {
+   const attrsToGet = rowIds.map(rowId => `repeating_conditions_${rowId}_condition_type`);
+
+   getAttrs(attrsToGet, function(values) {
+    const attrsToSet = {};
+
+    rowIds.forEach(rowId => {
+     setConditionEffectForRow(rowId, values, attrsToSet);
+    });
+
+    if(Object.keys(attrsToSet).length > 0) {
+     setAttrs(attrsToSet, typeof callback === "function" ? callback : undefined);
+     return;
+    }
+
+    if(typeof callback === "function") callback();
+   });
+  });
+ };
+
+ const updateConditionEffectFromEvent = function(eventInfo) {
+  const source = eventInfo && eventInfo.sourceAttribute ? eventInfo.sourceAttribute : "";
+  const match = source.match(/repeating_conditions_([^_]+)_condition_type/);
+
+  if(!match) {
+   updateConditionEffects();
+   return;
+  }
+
+  const rowId = match[1];
+  const typeAttr = `repeating_conditions_${rowId}_condition_type`;
+
+  getAttrs([typeAttr], function(values) {
+   const attrsToSet = {};
+   setConditionEffectForRow(rowId, values, attrsToSet);
+   setAttrs(attrsToSet);
+  });
+ };
+
+ on("change:repeating_conditions:condition_type", updateConditionEffectFromEvent);
+ on("sheet:opened", function() {
+  updateConditionEffects();
+ });
+
+ //</editor-fold>
+
  //<editor-fold desc="Button-Tabs"
 
  const inputlist = ["Crown", "Face", "Neck", "Shoulders", "Ring1", "Ring2", "Hands", "Forearms", "UpperArms", "Torso", "Waist", "Feet"];
@@ -3703,7 +4116,8 @@
   });
  });
 
- const buttonlist = ["main", "skills", "gear", "definitions", "abilities", "spells", "accessories", "inventory", "profitloss"];
+ const buttonlist = ["main", "skills", "gear", "definitions", "abilities", "spells", "accessories", "inventory", "profitloss",
+  "settings"];
  buttonlist.forEach(button => {
   on(`clicked:${button}`, function() {
    setAttrs({
@@ -3785,6 +4199,208 @@
 
  //</editor-fold>
 
+ //<editor-fold desc="Rest Button">
+
+ const REST_SPELL_LEVELS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+ const REST_MULTIPLIER_QUERY = "?{Rest multiplier|1x,1|1.5x,1.5|2x,2|3x,3}";
+
+ const restRollResultTotal = function(rollResult, fallback = 0) {
+  if(rollResult && rollResult.result !== undefined) {
+   const parsed = parseFloat(rollResult.result);
+   return isNaN(parsed) ? fallback : parsed;
+  }
+
+  if(rollResult && rollResult.total !== undefined) {
+   const parsed = parseFloat(rollResult.total);
+   return isNaN(parsed) ? fallback : parsed;
+  }
+
+  return fallback;
+ };
+
+ const resetRepeatingCurrentFromMax = function(section, currentAttr, maxAttr, attrsToSet, callback) {
+  getSectionIDs(section, function(rowIds) {
+   const attrsToGet = [];
+
+   rowIds.forEach(rowId => {
+    attrsToGet.push(`${section}_${rowId}_${maxAttr}`);
+   });
+
+   getAttrs(attrsToGet, function(values) {
+    rowIds.forEach(rowId => {
+     const maxValue = values[`${section}_${rowId}_${maxAttr}`];
+
+     if(maxValue !== undefined && maxValue !== "") {
+      attrsToSet[`${section}_${rowId}_${currentAttr}`] = maxValue;
+     }
+    });
+
+    callback();
+   });
+  });
+ };
+
+ const REST_RESOURCE_EXCLUSIONS = [
+  "heme"
+ ];
+
+ const normalizeRestResourceName = function(value) {
+  return String(value || "").replace(/\s+/g, "").toLowerCase();
+ };
+
+ const restShouldSkipResource = function(value) {
+  return REST_RESOURCE_EXCLUSIONS.includes(normalizeRestResourceName(value));
+ };
+
+ const resetRestResources = function(attrsToSet, callback) {
+  getSectionIDs("repeating_resources", function(rowIds) {
+   const attrsToGet = [];
+
+   rowIds.forEach(rowId => {
+    attrsToGet.push(`repeating_resources_${rowId}_resourceName`);
+    attrsToGet.push(`repeating_resources_${rowId}_resourceNumber_max`);
+   });
+
+   getAttrs(attrsToGet, function(values) {
+    rowIds.forEach(rowId => {
+     const resourceName = values[`repeating_resources_${rowId}_resourceName`];
+     const maxValue = values[`repeating_resources_${rowId}_resourceNumber_max`];
+
+     if(restShouldSkipResource(resourceName)) return;
+
+     if(maxValue !== undefined && maxValue !== "") {
+      attrsToSet[`repeating_resources_${rowId}_resourceNumber`] = maxValue;
+     }
+    });
+
+    callback();
+   });
+  });
+ };
+
+ const resetRestRepeatingPools = function(attrsToSet, callback) {
+  resetRestResources(attrsToSet, function() {
+   resetRepeatingCurrentFromMax("repeating_abilities", "userdescription", "uses", attrsToSet, callback);
+  });
+ };
+
+ const deathSaveIsChecked = function(value) {
+  return value === "1" || value === 1 || value === true || value === "on" || value === "yes";
+ };
+
+ const applyRestDeathSaveRecovery = function(values, attrsToSet) {
+  if(deathSaveIsChecked(values.death_save_3)) return 3;
+
+  if(deathSaveIsChecked(values.death_save_2)) {
+   attrsToSet.death_save_2 = "0";
+   return 2;
+  }
+
+  if(deathSaveIsChecked(values.death_save_1)) {
+   attrsToSet.death_save_1 = "0";
+   return 1;
+  }
+
+  return 0;
+ };
+
+ const rollRestingForever = function() {
+  startRoll(
+          `&{template:custom}{{title=Dead}}{{subtitle=@{character_name}}}` +
+          `{{Status=Dead}}{{desc=@{character_name} is dead and is now resting forever.}}`,
+          function(roll) {
+           finishRoll(roll.rollId);
+          }
+  );
+ };
+
+ on("clicked:rest", function() {
+  getAttrs(["death_save_3"], function(deathValues) {
+   if(deathSaveIsChecked(deathValues.death_save_3)) {
+    rollRestingForever();
+    return;
+   }
+
+   startRoll(
+           `&{template:custom}{{title=Rest}}{{subtitle=@{character_name}}}` +
+           `{{rest=1}}{{rest_multiplier=[[${REST_MULTIPLIER_QUERY}]]}}` +
+           `{{rest_healing=[[0]]}}{{rest_hp=[[0]]}}{{rest_hp_max=[[0]]}}` +
+           `{{desc=Spell uses, ability uses, and resources reset to maximum. `+
+           `One non-terminal death save failure is cleared. One point of ability damage is reduces from every attribute.}}`,
+           function(roll) {
+            const multiplier = restRollResultTotal(roll.results.rest_multiplier, 1);
+            const attrsToGet = ["hp", "hp_max", "HD", "conmod", "death_save_1", "death_save_2"];
+
+            REST_SPELL_LEVELS.forEach(level => {
+             attrsToGet.push(`${level}perday`);
+            });
+
+            getAttrs(attrsToGet, function(values) {
+             const currentHp = num(values, "hp", 0);
+             const maxHp = Math.max(0, num(values, "hp_max", 0));
+             const hd = Math.max(0, num(values, "HD", 0));
+             const constitutionModifier = Math.max(1, num(values, "conmod", 0));
+             const restHealing = Math.max(0, Math.floor(hd * constitutionModifier * multiplier));
+             const newHp = Math.min(maxHp, currentHp + restHealing);
+             const actualHealing = Math.max(0, newHp - currentHp);
+             const attrsToSet = {
+              hp: newHp
+             };
+             const deathSaveRemoved = applyRestDeathSaveRecovery(values, attrsToSet);
+
+             REST_SPELL_LEVELS.forEach(level => {
+              const perDay = values[`${level}perday`];
+
+              if(perDay !== undefined && perDay !== "") {
+               attrsToSet[`${level}remaining`] = perDay;
+              }
+             });
+
+             resetRestRepeatingPools(attrsToSet, function() {
+              setAttrs(attrsToSet, function() {
+               finishRoll(roll.rollId, {
+                rest_healing: actualHealing,
+                rest_hp: newHp,
+                rest_hp_max: maxHp,
+                rest_death_save_removed: deathSaveRemoved
+               });
+              });
+             });
+            });
+           }
+   );
+  });
+ });
+
+ on("clicked:deathsave", function() {
+  getAttrs(["death_save_1", "death_save_2", "death_save_3"], function(values) {
+   if(deathSaveIsChecked(values.death_save_3)) {
+    startRoll(
+            `&{template:custom}{{title=Death Save}}{{subtitle=@{character_name}}}` +
+            `{{Status=Dead}}{{desc=@{character_name} is dead and is now sleeping forever.}}`,
+            function(roll) {
+             finishRoll(roll.rollId);
+            }
+    );
+    return;
+   }
+
+   const checkedFailures = ["death_save_1", "death_save_2", "death_save_3"].reduce(function(total, attr) {
+    return total + (deathSaveIsChecked(values[attr]) ? 1 : 0);
+   }, 0);
+
+   startRoll(
+           `&{template:custom}{{title=Death Save}}{{subtitle=@{character_name}}}` +
+           `{{Death Save=[[1d20]]}}{{Current Failures=${checkedFailures} / 3}}`,
+           function(roll) {
+            finishRoll(roll.rollId);
+           }
+   );
+  });
+ });
+
+ //</editor-fold>
+
  //<editor-fold desc="HD Calculations">
 
  on("change:hd change:lg sheet:opened", function(){
@@ -3801,26 +4417,96 @@
  //</editor-fold>
 
  //<editor-fold desc="Statblock"
-
  const STAT_DEFS = [
-  {base: "strength", bonus: "StrBonus", enhancement: "StrEnch", penalty: "StrPen", total: "StrTotal", mod: "strmod"},
-  {base: "dexterity", bonus: "DexBonus", enhancement: "DexEnch", penalty: "DexPen", total: "DexTotal", mod: "dexmod"},
-  {base: "constitution", bonus: "ConBonus", enhancement: "ConEnch", penalty: "ConPen", total: "ConTotal", mod: "conmod"},
-  {base: "wisdom", bonus: "WisBonus", enhancement: "WisEnch", penalty: "WisPen", total: "WisTotal", mod: "wismod"},
-  {base: "intelligence", bonus: "IntBonus", enhancement: "IntEnch", penalty: "IntPen", total: "IntTotal", mod: "intmod"},
-  {base: "charisma", bonus: "ChaBonus", enhancement: "ChaEnch", penalty: "ChaPen", total: "ChaTotal", mod: "chamod"}
+  {
+   base: "strength",
+   bonus: "StrBonus",
+   enhancement: "StrEnch",
+   penalty: "StrPen",
+   total: "StrTotal",
+   mod: "strmod"
+  },
+  {
+   base: "dexterity",
+   bonus: "DexBonus",
+   enhancement: "DexEnch",
+   penalty: "DexPen",
+   total: "DexTotal",
+   mod: "dexmod"
+  },
+  {
+   base: "constitution",
+   bonus: "ConBonus",
+   enhancement: "ConEnch",
+   penalty: "ConPen",
+   total: "ConTotal",
+   mod: "conmod",
+   noScore: "no_constitution_score",
+   backup: "constitution_score_backup"
+  },
+  {
+   base: "wisdom",
+   bonus: "WisBonus",
+   enhancement: "WisEnch",
+   penalty: "WisPen",
+   total: "WisTotal",
+   mod: "wismod"
+  },
+  {
+   base: "intelligence",
+   bonus: "IntBonus",
+   enhancement: "IntEnch",
+   penalty: "IntPen",
+   total: "IntTotal",
+   mod: "intmod",
+   noScore: "no_intelligence_score",
+   backup: "intelligence_score_backup"
+  },
+  {
+   base: "charisma",
+   bonus: "ChaBonus",
+   enhancement: "ChaEnch",
+   penalty: "ChaPen",
+   total: "ChaTotal",
+   mod: "chamod"
+  }
  ];
 
  STAT_DEFS.forEach(stat => {
   const attrs = [stat.base, stat.bonus, stat.enhancement, stat.penalty];
+  if(stat.noScore) attrs.push(stat.noScore);
+  if(stat.backup) attrs.push(stat.backup);
   on(watch(attrs), function() {
    getAttrs(attrs, function(values) {
-    const total = num(values, stat.base) + num(values, stat.bonus) +
+    const noScore = stat.noScore && values[stat.noScore] === "1";
+    const attrsToSet = {};
+    if(stat.backup && !noScore && values[stat.base] !== "-") {
+     attrsToSet[stat.backup] = values[stat.base];
+    }
+    if(noScore) {
+     attrsToSet[stat.total] = "-";
+     attrsToSet[stat.mod] = 0;
+     if(values[stat.base] !== "-") {
+      if(stat.backup && values[stat.base] !== "") {
+       attrsToSet[stat.backup] = values[stat.base];
+      }
+      attrsToSet[stat.base] = "-";
+     }
+     setAttrs(attrsToSet);
+     return;
+    }
+    if(stat.backup && values[stat.base] === "-") {
+     attrsToSet[stat.base] = values[stat.backup] || 10;
+    }
+    const baseValue = values[stat.base] === "-"
+            ? num(values, stat.backup, 10)
+            : num(values, stat.base);
+    const total = baseValue + num(values, stat.bonus) +
             num(values, stat.enhancement) - num(values, stat.penalty);
-    setAttrs({
-     [stat.total]: total,
-     [stat.mod]: Math.floor((total - 10) / 2)
-    });
+    attrsToSet[stat.total] = total;
+    attrsToSet[stat.mod] = Math.floor((total - 10) / 2);
+
+    setAttrs(attrsToSet);
    });
   });
  });
@@ -4019,9 +4705,692 @@
 
  // <editor-fold desc="Ability Info Calculations">
 
- on("change:repeating_abilities:minimizeability change_repeating_abilities:absavethrow " +
-         "change:repeating_abilities:abilitytype change:repeating_abilities:abilitysrconfirm " +
-         "change:repeating_abilities:asprof change:repeating_abilities", function(){
+ // Automatic grant rows are generated from exact grant keys, not from total row counts.
+ // This keeps Universal, ancestry/background, and progression grants from masking one another.
+ const UNIVERSAL_SOURCE_NAME = "Universal";
+ const VERSATILE_SOURCE_NAME = "Versatile";
+ const DIFFUSE_BACKGROUND_SOURCE_NAME = "Diffuse Background";
+ const MYSTIC_SOURCE_NAME = "Mystic";
+ const NULL_COMBATANT_SOURCE_NAME = "Null Combatant";
+ const NULL_GENERALIST_SOURCE_NAME = "Null Generalist";
+ const NULL_SPECIALIST_SOURCE_NAME = "Null Specialist";
+ const BASIC_COMBATANT_SOURCE_NAME = "Basic Combatant";
+ const BASIC_GENERALIST_SOURCE_NAME = "Basic Generalist";
+ const BASIC_SPECIALIST_SOURCE_NAME = "Basic Specialist";
+ const STANDARD_COMBATANT_SOURCE_NAME = "Standard Combatant";
+ const STANDARD_GENERALIST_SOURCE_NAME = "Standard Generalist";
+ const STANDARD_SPECIALIST_SOURCE_NAME = "Standard Specialist";
+ const ADVANCED_COMBATANT_SOURCE_NAME = "Advanced Combatant";
+ const ADVANCED_GENERALIST_SOURCE_NAME = "Advanced Generalist";
+ const ADVANCED_SPECIALIST_SOURCE_NAME = "Advanced Specialist";
+
+ const levelsOneThenStep = function(hd, firstStepLevel, step) {
+  const levels = [];
+  if(hd >= 1) levels.push(1);
+  for(let level = firstStepLevel; level <= hd; level += step) {
+   levels.push(level);
+  }
+  return levels;
+ };
+
+ const levelsStartingAt = function(hd, start, step) {
+  const levels = [];
+  for(let level = start; level <= hd; level += step) {
+   levels.push(level);
+  }
+  return levels;
+ };
+
+ const universalFeatLevels = function(hd) {
+  const levels = [];
+  if(hd >= 1) levels.push(1);
+  for(let level = 3; level <= hd; level += 3) {
+   levels.push(level);
+  }
+  return levels;
+ };
+
+ const universalAbilityLevels = function(hd) {
+  return levelsOneThenStep(hd, 10, 10);
+ };
+
+ const nullCombatantFeatLevels = function(hd) {
+  return levelsOneThenStep(hd, 2, 2);
+ };
+
+ const nullGeneralistFeatLevels = function(hd) {
+  return levelsStartingAt(hd, 2, 4);
+ };
+
+ const nullGeneralistAbilityLevels = function(hd) {
+  return levelsOneThenStep(hd, 4, 4);
+ };
+
+ const nullSpecialistAbilityLevels = function(hd) {
+  return levelsOneThenStep(hd, 2, 2);
+ };
+
+ const basicCombatantFeatLevels = function(hd) {
+  return levelsOneThenStep(hd, 4, 3);
+ };
+
+ const basicGeneralistFeatLevels = function(hd) {
+  return levelsStartingAt(hd, 4, 6);
+ };
+
+ const basicGeneralistAbilityLevels = function(hd) {
+  return levelsOneThenStep(hd, 7, 6);
+ };
+
+ const basicSpecialistAbilityLevels = function(hd) {
+  return levelsOneThenStep(hd, 4, 3);
+ };
+
+ const standardCombatantFeatLevels = function(hd) {
+  const levels = [];
+  if(hd >= 1) levels.push(1);
+  if(hd >= 4) levels.push(4);
+  for(let level = 12; level <= hd; level += 4) {
+   levels.push(level);
+  }
+  return levels;
+ };
+
+ const standardGeneralistFeatLevels = function(hd) {
+  const levels = [];
+  if(hd >= 4) levels.push(4);
+  for(let level = 16; level <= hd; level += 4) {
+   levels.push(level);
+  }
+  return levels;
+ };
+
+ const standardGeneralistAbilityLevels = function(hd) {
+  return levelsOneThenStep(hd, 8, 8);
+ };
+
+ const standardSpecialistAbilityLevels = function(hd) {
+  const levels = [];
+  if(hd >= 1) levels.push(1);
+  if(hd >= 4) levels.push(4);
+  for(let level = 12; level <= hd; level += 4) {
+   levels.push(level);
+  }
+  return levels;
+ };
+
+ const advancedCombatantFeatLevels = function(hd) {
+  return levelsOneThenStep(hd, 5, 5);
+ };
+
+ const advancedGeneralistFeatLevels = function(hd) {
+  return levelsStartingAt(hd, 5, 10);
+ };
+
+ const advancedGeneralistAbilityLevels = function(hd) {
+  return levelsOneThenStep(hd, 10, 10);
+ };
+
+ const advancedSpecialistAbilityLevels = function(hd) {
+  return levelsOneThenStep(hd, 5, 5);
+ };
+
+ const normalizeGrantSource = function(value) {
+  return String(value || "").trim().toLowerCase();
+ };
+
+ const normalizeGrantName = function(value) {
+  return String(value || "").trim().toLowerCase();
+ };
+
+ const grantIsChecked = function(value) {
+  return value === "1" || value === 1 || value === true || value === "on" || value === "yes";
+ };
+
+ const hasDiffuseBackground = function(values) {
+  return grantIsChecked(values.diffuse_background) ||
+          normalizeGrantName(values.primarydefinitionname) === "diffuse background";
+ };
+
+ const keyLevelFromPrefix = function(key, keyPrefix) {
+  if(!key || key.indexOf(keyPrefix) !== 0) return null;
+  const level = parseInt(key.slice(keyPrefix.length), 10);
+  return isNaN(level) ? null : level;
+ };
+
+ const genericSourceAvailability = function(currentHD, grantedLevel) {
+  const level = parseInt(grantedLevel, 10);
+  if(isNaN(level) || level <= 0) return "1";
+  return currentHD >= level ? "1" : "0";
+ };
+
+ const makeGrantSpec = function(key, source, level, name, description, available, hidden = false) {
+  return { key, source, level, name, description, available, hidden };
+ };
+
+ const progressionSourceMatches = function(context, magicCurve, specialty) {
+  return normalizeGrantName(context.magicCurve) === normalizeGrantName(magicCurve) &&
+          normalizeGrantName(context.specialty) === normalizeGrantName(specialty);
+ };
+
+ const GRANT_SECTIONS = [
+  {
+   section: "repeating_feats",
+   nameAttr: "featsname",
+   descriptionAttr: "featsdescription",
+   universalKeyPrefix: "universal_feat_hd_",
+   universalName: level => `Universal Feat`,
+   universalDescription: level => `Universal feat slot gained at HD ${level}. Replace this text with the selected feat.`,
+   conditionalGrants: [
+    {
+     key: "versatile_bonus_feat",
+     source: VERSATILE_SOURCE_NAME,
+     level: 1,
+     name: "Versatile Bonus Feat",
+     description: "Bonus feat gained from the Versatile species option. Replace this text with the selected feat.",
+     isExpected: context => context.versatile
+    },
+    {
+     key: "diffuse_background_bonus_feat",
+     source: DIFFUSE_BACKGROUND_SOURCE_NAME,
+     level: 1,
+     name: "Diffuse Background Bonus Feat",
+     description: "Bonus feat gained from the Diffuse Background primary definition. Replace this text with the selected feat.",
+     isExpected: context => context.diffuseBackground
+    }
+   ],
+   progressionGrants: [
+    {
+     keyPrefix: "null_combatant_feat_hd_",
+     source: NULL_COMBATANT_SOURCE_NAME,
+     magicCurve: "None",
+     specialty: "Combatant",
+     levels: nullCombatantFeatLevels,
+     name: level => `Null Combatant Feat`,
+     description: level => `Null Combatant feat slot gained at HD ${level}. Replace this text with the selected feat.`
+    },
+    {
+     keyPrefix: "null_generalist_feat_hd_",
+     source: NULL_GENERALIST_SOURCE_NAME,
+     magicCurve: "None",
+     specialty: "Generalist",
+     levels: nullGeneralistFeatLevels,
+     name: level => `Null Generalist Feat`,
+     description: level => `Null Generalist feat slot gained at HD ${level}. Replace this text with the selected feat.`
+    },
+    {
+     keyPrefix: "basic_combatant_feat_hd_",
+     source: BASIC_COMBATANT_SOURCE_NAME,
+     magicCurve: "Basic",
+     specialty: "Combatant",
+     levels: basicCombatantFeatLevels,
+     name: level => `Basic Combatant Feat`,
+     description: level => `Basic Combatant feat slot gained at HD ${level}. Replace this text with the selected feat.`
+    },
+    {
+     keyPrefix: "basic_generalist_feat_hd_",
+     source: BASIC_GENERALIST_SOURCE_NAME,
+     magicCurve: "Basic",
+     specialty: "Generalist",
+     levels: basicGeneralistFeatLevels,
+     name: level => `Basic Generalist Feat`,
+     description: level => `Basic Generalist feat slot gained at HD ${level}. Replace this text with the selected feat.`
+    },
+    {
+     keyPrefix: "standard_combatant_feat_hd_",
+     source: STANDARD_COMBATANT_SOURCE_NAME,
+     magicCurve: "Standard",
+     specialty: "Combatant",
+     levels: standardCombatantFeatLevels,
+     name: level => `Standard Combatant Feat`,
+     description: level => `Standard Combatant feat slot gained at HD ${level}. Replace this text with the selected feat.`
+    },
+    {
+     keyPrefix: "standard_generalist_feat_hd_",
+     source: STANDARD_GENERALIST_SOURCE_NAME,
+     magicCurve: "Standard",
+     specialty: "Generalist",
+     levels: standardGeneralistFeatLevels,
+     name: level => `Standard Generalist Feat`,
+     description: level => `Standard Generalist feat slot gained at HD ${level}. Replace this text with the selected feat.`
+    },
+    {
+     keyPrefix: "advanced_combatant_feat_hd_",
+     source: ADVANCED_COMBATANT_SOURCE_NAME,
+     magicCurve: "Advanced",
+     specialty: "Combatant",
+     levels: advancedCombatantFeatLevels,
+     name: level => `Advanced Combatant Feat`,
+     description: level => `Advanced Combatant feat slot gained at HD ${level}. Replace this text with the selected feat.`
+    },
+    {
+     keyPrefix: "advanced_generalist_feat_hd_",
+     source: ADVANCED_GENERALIST_SOURCE_NAME,
+     magicCurve: "Advanced",
+     specialty: "Generalist",
+     levels: advancedGeneralistFeatLevels,
+     name: level => `Advanced Generalist Feat`,
+     description: level => `Advanced Generalist feat slot gained at HD ${level}. Replace this text with the selected feat.`
+    }
+   ],
+   universalLevels: universalFeatLevels
+  },
+  {
+   section: "repeating_abilities",
+   nameAttr: "abilityname",
+   descriptionAttr: "abilitydescriptiontext",
+   universalKeyPrefix: "universal_ability_hd_",
+   universalName: level => `Universal Ability`,
+   universalDescription: level => `Universal ability slot gained at HD ${level}. Replace this text with the selected ability.`,
+   conditionalGrants: [
+    {
+     key: "mystic_bonus_ability",
+     source: MYSTIC_SOURCE_NAME,
+     level: 1,
+     name: "Mystic Ability",
+     description: "Bonus ability gained from the Mystic species option. Replace this text with the selected ability.",
+     isExpected: context => context.mystic
+    }
+   ],
+   progressionGrants: [
+    {
+     keyPrefix: "null_generalist_ability_hd_",
+     source: NULL_GENERALIST_SOURCE_NAME,
+     magicCurve: "None",
+     specialty: "Generalist",
+     levels: nullGeneralistAbilityLevels,
+     name: level => `Null Generalist Ability`,
+     description: level => `Null Generalist ability slot gained at HD ${level}. Replace this text with the selected ability.`
+    },
+    {
+     keyPrefix: "null_specialist_ability_hd_",
+     source: NULL_SPECIALIST_SOURCE_NAME,
+     magicCurve: "None",
+     specialty: "Specialist",
+     levels: nullSpecialistAbilityLevels,
+     name: level => `Null Specialist Ability`,
+     description: level => `Null Specialist ability slot gained at HD ${level}. Replace this text with the selected ability.`
+    },
+    {
+     keyPrefix: "basic_generalist_ability_hd_",
+     source: BASIC_GENERALIST_SOURCE_NAME,
+     magicCurve: "Basic",
+     specialty: "Generalist",
+     levels: basicGeneralistAbilityLevels,
+     name: level => `Basic Generalist Ability`,
+     description: level => `Basic Generalist ability slot gained at HD ${level}. Replace this text with the selected ability.`
+    },
+    {
+     keyPrefix: "basic_specialist_ability_hd_",
+     source: BASIC_SPECIALIST_SOURCE_NAME,
+     magicCurve: "Basic",
+     specialty: "Specialist",
+     levels: basicSpecialistAbilityLevels,
+     name: level => `Basic Specialist Ability`,
+     description: level => `Basic Specialist ability slot gained at HD ${level}. Replace this text with the selected ability.`
+    },
+    {
+     keyPrefix: "standard_generalist_ability_hd_",
+     source: STANDARD_GENERALIST_SOURCE_NAME,
+     magicCurve: "Standard",
+     specialty: "Generalist",
+     levels: standardGeneralistAbilityLevels,
+     name: level => `Standard Generalist Ability`,
+     description: level => `Standard Generalist ability slot gained at HD ${level}. Replace this text with the selected ability.`
+    },
+    {
+     keyPrefix: "standard_specialist_ability_hd_",
+     source: STANDARD_SPECIALIST_SOURCE_NAME,
+     magicCurve: "Standard",
+     specialty: "Specialist",
+     levels: standardSpecialistAbilityLevels,
+     name: level => `Standard Specialist Ability`,
+     description: level => `Standard Specialist ability slot gained at HD ${level}. Replace this text with the selected ability.`
+    },
+    {
+     keyPrefix: "advanced_generalist_ability_hd_",
+     source: ADVANCED_GENERALIST_SOURCE_NAME,
+     magicCurve: "Advanced",
+     specialty: "Generalist",
+     levels: advancedGeneralistAbilityLevels,
+     name: level => `Advanced Generalist Ability`,
+     description: level => `Advanced Generalist ability slot gained at HD ${level}. Replace this text with the selected ability.`
+    },
+    {
+     keyPrefix: "advanced_specialist_ability_hd_",
+     source: ADVANCED_SPECIALIST_SOURCE_NAME,
+     magicCurve: "Advanced",
+     specialty: "Specialist",
+     levels: advancedSpecialistAbilityLevels,
+     name: level => `Advanced Specialist Ability`,
+     description: level => `Advanced Specialist ability slot gained at HD ${level}. Replace this text with the selected ability.`
+    }
+   ],
+   universalLevels: universalAbilityLevels
+  }
+ ];
+
+ const buildUniversalGrantSpec = function(def, level, context) {
+  return makeGrantSpec(
+          `${def.universalKeyPrefix}${level}`,
+          UNIVERSAL_SOURCE_NAME,
+          level,
+          def.universalName(level),
+          def.universalDescription(level),
+          context.currentHD >= level
+  );
+ };
+
+ const buildProgressionGrantSpec = function(progression, level, context) {
+  const sourceMatches = progressionSourceMatches(context, progression.magicCurve, progression.specialty);
+  return makeGrantSpec(
+          `${progression.keyPrefix}${level}`,
+          progression.source,
+          level,
+          progression.name(level),
+          progression.description(level),
+          context.currentHD >= level && sourceMatches,
+          !sourceMatches
+  );
+ };
+
+ const buildExpectedGrantSpecs = function(def, context) {
+  const specs = def.universalLevels(context.currentHD).map(level => buildUniversalGrantSpec(def, level, context));
+
+  (def.conditionalGrants || []).forEach(grant => {
+   if(grant.isExpected(context)) {
+    specs.push(makeGrantSpec(
+            grant.key,
+            grant.source,
+            grant.level,
+            grant.name,
+            grant.description,
+            context.currentHD >= grant.level
+    ));
+   }
+  });
+
+  (def.progressionGrants || []).forEach(progression => {
+   if(!progressionSourceMatches(context, progression.magicCurve, progression.specialty)) return;
+
+   progression.levels(context.currentHD).forEach(level => {
+    specs.push(buildProgressionGrantSpec(progression, level, context));
+   });
+  });
+
+  return specs;
+ };
+
+ const grantSpecFromKey = function(def, key, context) {
+  const universalLevel = keyLevelFromPrefix(key, def.universalKeyPrefix);
+  if(universalLevel) return buildUniversalGrantSpec(def, universalLevel, context);
+
+  const conditional = (def.conditionalGrants || []).find(grant => grant.key === key);
+  if(conditional) {
+   return makeGrantSpec(
+           conditional.key,
+           conditional.source,
+           conditional.level,
+           conditional.name,
+           conditional.description,
+           context.currentHD >= conditional.level && conditional.isExpected(context)
+   );
+  }
+
+  for(const progression of (def.progressionGrants || [])) {
+   const progressionLevel = keyLevelFromPrefix(key, progression.keyPrefix);
+   if(progressionLevel) return buildProgressionGrantSpec(progression, progressionLevel, context);
+  }
+
+  return null;
+ };
+
+ const inferGrantKeyFromMetadata = function(def, values, prefix) {
+  const source = normalizeGrantSource(values[`${prefix}granted_source`]);
+  const level = int(values, `${prefix}granted_level`, 0);
+
+  if(source === normalizeGrantSource(UNIVERSAL_SOURCE_NAME) && level > 0) {
+   return `${def.universalKeyPrefix}${level}`;
+  }
+
+  const conditional = (def.conditionalGrants || []).find(grant =>
+          source === normalizeGrantSource(grant.source)
+  );
+
+  if(conditional) return conditional.key;
+
+  const progression = (def.progressionGrants || []).find(grant =>
+          source === normalizeGrantSource(grant.source)
+  );
+
+  if(progression && level > 0) return `${progression.keyPrefix}${level}`;
+
+  return "";
+ };
+
+ const grantSortLevel = function(value) {
+  const level = parseInt(value, 10);
+  return isNaN(level) || level <= 0 ? 999999 : level;
+ };
+
+ const grantSortSourceRank = function(source) {
+  const normalized = normalizeGrantSource(source);
+
+  // HD is always the primary sort. This rank is only a tie-breaker inside the same HD.
+  if(normalized === normalizeGrantSource(UNIVERSAL_SOURCE_NAME)) return 0;
+  if(normalized) return 10;
+  return 50;
+ };
+
+ const buildGrantReporder = function(rows) {
+  return rows
+          .slice()
+          .sort((left, right) => {
+           const leftLevel = grantSortLevel(left.level);
+           const rightLevel = grantSortLevel(right.level);
+
+           // Primary: HD, lowest to highest.
+           if(leftLevel !== rightLevel) return leftLevel - rightLevel;
+
+           // Secondary: within the same HD, Universal goes first.
+           if(left.sourceRank !== right.sourceRank) return left.sourceRank - right.sourceRank;
+
+           // Tertiary: preserve existing order as much as possible.
+           return left.originalIndex - right.originalIndex;
+          })
+          .map(row => row.rowId)
+          .join(',');
+ };
+
+ const setGrantReporderAfterRowsExist = function(def, orderRows, duplicateRowIds, callback) {
+  // Intentionally do not write _reporder for automatic feat/ability grants.
+  // Writing _reporder_repeating_feats or _reporder_repeating_abilities makes Roll20
+  // snap the repeating sections back into the worker's sorted order after HD,
+  // progression, grant metadata, or row changes. New grant rows can still be
+  // created, updated, hidden, and de-duplicated; existing row order is left alone.
+  if(callback) callback();
+ };
+
+ const updateGrantedRowsForSection = function(def, context, callback) {
+  getSectionIDs(def.section, function(rowIds) {
+   const attrsToGet = [];
+
+   rowIds.forEach(rowId => {
+    attrsToGet.push(`${def.section}_${rowId}_grant_key`);
+    attrsToGet.push(`${def.section}_${rowId}_granted_level`);
+    attrsToGet.push(`${def.section}_${rowId}_granted_source`);
+    attrsToGet.push(`${def.section}_${rowId}_grant_hidden`);
+   });
+
+   getAttrs(attrsToGet, function(values) {
+    const attrsToSet = {};
+    const existingGrantKeys = {};
+    const duplicateRowsToRemove = [];
+    const duplicateRowIds = {};
+    const orderRows = [];
+
+    rowIds.forEach((rowId, originalIndex) => {
+     const prefix = `${def.section}_${rowId}_`;
+     let key = str(values, `${prefix}grant_key`);
+
+     if(!key) {
+      key = inferGrantKeyFromMetadata(def, values, prefix);
+      if(key) attrsToSet[`${prefix}grant_key`] = key;
+     }
+
+     const spec = grantSpecFromKey(def, key, context);
+
+     if(spec) {
+      if(existingGrantKeys[spec.key]) {
+       duplicateRowsToRemove.push(`${def.section}_${rowId}`);
+       duplicateRowIds[rowId] = true;
+       return;
+      }
+
+      existingGrantKeys[spec.key] = true;
+      attrsToSet[`${prefix}granted_level`] = spec.level;
+      attrsToSet[`${prefix}granted_source`] = spec.source;
+      attrsToSet[`${prefix}source_available`] = spec.available ? "1" : "0";
+      attrsToSet[`${prefix}grant_hidden`] = spec.hidden ? "1" : "0";
+
+      orderRows.push({
+       rowId,
+       level: grantSortLevel(spec.level),
+       sourceRank: grantSortSourceRank(spec.source),
+       source: spec.source,
+       originalIndex
+      });
+      return;
+     }
+
+     const manualLevel = int(values, `${prefix}granted_level`, 0);
+     const manualSource = str(values, `${prefix}granted_source`);
+
+     attrsToSet[`${prefix}source_available`] = genericSourceAvailability(
+             context.currentHD,
+             manualLevel
+     );
+     attrsToSet[`${prefix}grant_hidden`] = "0";
+
+     orderRows.push({
+      rowId,
+      level: grantSortLevel(manualLevel),
+      sourceRank: grantSortSourceRank(manualSource),
+      source: manualSource,
+      originalIndex
+     });
+    });
+
+    if(context.enableAutomaticGrants) {
+     buildExpectedGrantSpecs(def, context).forEach(spec => {
+      if(existingGrantKeys[spec.key]) return;
+
+      const rowId = generateRowID();
+      const prefix = `${def.section}_${rowId}_`;
+
+      existingGrantKeys[spec.key] = true;
+      attrsToSet[`${prefix}grant_key`] = spec.key;
+      attrsToSet[`${prefix}${def.nameAttr}`] = spec.name;
+      attrsToSet[`${prefix}${def.descriptionAttr}`] = spec.description;
+      attrsToSet[`${prefix}granted_level`] = spec.level;
+      attrsToSet[`${prefix}granted_source`] = spec.source;
+      attrsToSet[`${prefix}source_available`] = spec.available ? "1" : "0";
+      attrsToSet[`${prefix}grant_hidden`] = spec.hidden ? "1" : "0";
+
+      orderRows.push({
+       rowId,
+       level: grantSortLevel(spec.level),
+       sourceRank: grantSortSourceRank(spec.source),
+       source: spec.source,
+       originalIndex: orderRows.length + rowIds.length
+      });
+     });
+    }
+
+    duplicateRowsToRemove.forEach(rowName => {
+     removeRepeatingRow(rowName);
+    });
+
+    if(Object.keys(attrsToSet).length > 0) {
+     setAttrs(attrsToSet, function() {
+      setGrantReporderAfterRowsExist(def, orderRows, duplicateRowIds, callback);
+     });
+    } else {
+     setGrantReporderAfterRowsExist(def, orderRows, duplicateRowIds, callback);
+    }
+   });
+  });
+ };
+
+ const updateGrantSectionsSequentially = function(context, index, callback) {
+  if(index >= GRANT_SECTIONS.length) {
+   if(callback) callback();
+   return;
+  }
+
+  updateGrantedRowsForSection(GRANT_SECTIONS[index], context, function() {
+   updateGrantSectionsSequentially(context, index + 1, callback);
+  });
+ };
+
+ const updateAutomaticGrants = function(callback) {
+  getAttrs(["HD", "MagicCurve", "Specialty", "Versatile", "mystic", "diffuse_background", "primarydefinitionname", "enable_automatic_grants"], function(values) {
+   const isNewSheet = values.HD === "" || values.HD === undefined;
+   const autoEnableNewSheet = isNewSheet && !grantIsChecked(values.enable_automatic_grants);
+
+   const context = {
+    currentHD: Math.max(0, int(values, "HD", 0)),
+    magicCurve: str(values, "MagicCurve"),
+    specialty: str(values, "Specialty"),
+    versatile: grantIsChecked(values.Versatile),
+    mystic: grantIsChecked(values.mystic),
+    diffuseBackground: hasDiffuseBackground(values),
+    enableAutomaticGrants: grantIsChecked(values.enable_automatic_grants) || autoEnableNewSheet
+   };
+
+   const finishUpdate = function() {
+    updateGrantSectionsSequentially(context, 0, callback);
+   };
+
+   if(autoEnableNewSheet) {
+    setAttrs({ enable_automatic_grants: "1" }, finishUpdate);
+    return;
+   }
+
+   finishUpdate();
+  });
+ };
+
+ let automaticGrantsRunning = false;
+ let automaticGrantsQueued = false;
+
+ const queueUpdateAutomaticGrants = function() {
+  if(automaticGrantsRunning) {
+   automaticGrantsQueued = true;
+   return;
+  }
+
+  automaticGrantsRunning = true;
+  updateAutomaticGrants(function() {
+   automaticGrantsRunning = false;
+
+   if(automaticGrantsQueued) {
+    automaticGrantsQueued = false;
+    queueUpdateAutomaticGrants();
+   }
+  });
+ };
+
+ on("change:hd change:magiccurve change:specialty change:versatile change:mystic change:diffuse_background change:primarydefinitionname change:enable_automatic_grants sheet:opened change:repeating_feats:granted_level change:repeating_feats:granted_source change:repeating_feats:grant_key change:repeating_feats:grant_hidden change:repeating_abilities:granted_level change:repeating_abilities:granted_source change:repeating_abilities:grant_key change:repeating_abilities:grant_hidden remove:repeating_feats remove:repeating_abilities", function() {
+  queueUpdateAutomaticGrants();
+ });
+
+ on("change:repeating_abilities:minimizeability " +
+         "change:repeating_abilities:absavethrow " +
+         "change:repeating_abilities:abilitytype " +
+         "change:repeating_abilities:abilitysrconfirm " +
+         "change:repeating_abilities:asprof " +
+         "change:repeating_abilities:abilityname", function(){
   getAttrs(["repeating_abilities_absavethrow","repeating_abilities_abilitytype",
    "repeating_abilities_abilitysrconfirm","repeating_abilities_asprof"],function(values){
    let savethrow = (values.repeating_abilities_absavethrow);
@@ -4154,6 +5523,49 @@
  // </editor-fold>
 
  // <editor-fold desc="Full Attack Custom Roll Parser">
+
+ const buildSingleAttackMacro = function(data) {
+  const attack = data.attacks[0] || { label: "Single Attack", base: 0, slowPenalty: 0 };
+
+  const damageAction = makeFullAttackActionTarget(data.section, data.rowId, "singleattackdamage");
+  const confirmAction = makeFullAttackActionTarget(data.section, data.rowId, "singleattackconfirm");
+
+  let macro = `&{template:custom}{{title=Single Attack}}{{subtitle=${data.characterName}'s ${data.weaponName}}}`;
+  macro += `{{fullattack=1}}{{characterid=@{character_id}}}`;
+  macro += `{{attack1_next=[[0]]}}`;
+  macro += `{{attack1_damage_action=${damageAction}}}`;
+  macro += `{{attack1_confirm_action=${confirmAction}}}`;
+  macro += `{{attack1_label=Attack}}`;
+  macro += `{{attack1=[[${buildFullAttackExpression(data, attack)}]]}}`;
+
+  return macro;
+ };
+
+
+ const rollSingleAttackConfirmation = function(col, eventInfo) {
+  getAttrs(getFullAttackAttrs(col), function(values) {
+   const data = buildFullAttackData(col, values, eventInfo);
+   const attack = data.attacks[0] || { label: "Single Attack", base: 0, slowPenalty: 0 };
+
+   const normalAction = makeFullAttackActionTarget(data.section, data.rowId, "singleattackdamage");
+   const criticalAction = makeFullAttackActionTarget(data.section, data.rowId, "singleattackcritdamage");
+
+   const macro =
+           `&{template:custom}` +
+           `{{title=Critical Confirmation}}` +
+           `{{subtitle=${data.characterName}'s ${data.weaponName} - Single Attack}}` +
+           `{{fullattackconfirm=1}}` +
+           `{{characterid=@{character_id}}}` +
+           `{{confirm_normal_action=${normalAction}}}` +
+           `{{confirm_critical_action=${criticalAction}}}` +
+           `{{confirm=[[${buildFullAttackExpression(data, attack)}]]}}`;
+
+   startRoll(macro, function(roll) {
+    finishRoll(roll.rollId);
+   });
+  });
+ };
+
  const getRepeatingRowIdFromEvent = function(eventInfo, section) {
   const source = eventInfo && (eventInfo.sourceAttribute || eventInfo.sourceButton || "");
   const match = source.match(new RegExp(`repeating_${section}_([^_]+)_`));
@@ -4295,7 +5707,8 @@
  };
 
  const buildFullAttackExpression = function(data, attack) {
-  let expression = `1d20cs>${data.critLow}+${attack.base}[Base Attack]+${data.attackKey}[Key Attribute]+${data.featAttack}[Feat Bonuses]+${data.enhancement}[Enhancement]+(0?{Do you have any miscellaneous bonuses?|0})[Misc.]`;
+  let expression = `1d20cs>${data.critLow}+${attack.base}[Base Attack]+${data.attackKey}[Key Attribute]+${data.featAttack}`+
+          `[Feat Bonuses]+${data.enhancement}[Enhancement]+(0?{Do you have any miscellaneous bonuses?|0})[Misc.]`;
   if(attack.slowPenalty) {
    expression += `-${attack.slowPenalty}[Slow]`;
   }
@@ -4303,7 +5716,8 @@
  };
 
  const buildFullAttackMacro = function(data) {
-  let macro = `&{template:custom}{{title=Full Attack}}{{subtitle=${data.characterName}'s ${data.weaponName}}}{{fullattack=1}}{{characterid=@{character_id}}}`;
+  let macro = `&{template:custom}{{title=Full Attack}}{{subtitle=${data.characterName}'s ${data.weaponName}}}`+
+          `{{fullattack=1}}{{characterid=@{character_id}}}`;
   data.attacks.forEach((attack, index) => {
    const attackNumber = index + 1;
    macro += `{{attack${attackNumber}_next=[[0]]}}`;
@@ -4323,9 +5737,11 @@
   if(!critical) {
    let macro = `&{template:custom}{{title=Damage}}{{subtitle=${data.characterName}'s ${data.weaponName}}}`;
    if(data.twoHanded) {
-    macro += `{{desc=${data.characterName} deals [[${data.diceNumber}${data.diceType}+[[floor(${data.damageKey}*1.5)]][Ability]+${data.featDamage}[Feats/Other]+${data.enhancement}[Enhancement]+${miscDamage}]] physical damage `;
+    macro += `{{desc=${data.characterName} deals [[${data.diceNumber}${data.diceType}+[[floor(${data.damageKey}*1.5)]]`+
+            `[Ability]+${data.featDamage}[Feats/Other]+${data.enhancement}[Enhancement]+${miscDamage}]] physical damage `;
    } else {
-    macro += `{{desc=${data.characterName} deals [[${data.diceNumber}${data.diceType}+[[${data.damageKey}]][Ability]+${data.featDamage}[Feats/Other]+${data.enhancement}[Enhancement]+${miscDamage}]] physical damage `;
+    macro += `{{desc=${data.characterName} deals [[${data.diceNumber}${data.diceType}+[[${data.damageKey}]][Ability]+`+
+            `${data.featDamage}[Feats/Other]+${data.enhancement}[Enhancement]+${miscDamage}]] physical damage `;
    }
    if(data.magicDice) {
     macro += ` and [[${data.magicDice}[${magicDamageType}]]] ${magicDamageType} damage`;
@@ -4336,9 +5752,15 @@
 
   let macro = `&{template:custom}{{title=Critical Damage}}{{subtitle=${data.characterName}'s ${data.weaponName}}}`;
   if(data.twoHanded) {
-   macro += `{{desc=${data.characterName} deals an astonishing [[[[${data.diceNumber}*${data.criticalMultiplier}]]${data.diceType}+[[(floor(${data.damageKey}*1.5)*${data.criticalMultiplier})]][Ability]+[[(${data.featDamage}*${data.criticalMultiplier})]][Feats/Other]+[[(${data.enhancement}*${data.criticalMultiplier})]][Enhancement]+${miscDamage}]]`;
+   macro += `{{desc=${data.characterName} deals an astonishing [[[[${data.diceNumber}*${data.criticalMultiplier}]]`+
+           `${data.diceType}+[[(floor(${data.damageKey}*1.5)*${data.criticalMultiplier})]][Ability]+[[(${data.featDamage}*`+
+           `${data.criticalMultiplier})]][Feats/Other]+[[(${data.enhancement}*${data.criticalMultiplier})]][Enhancement]+`+
+           `${miscDamage}]]`;
   } else {
-   macro += `{{desc=${data.characterName} deals an astonishing [[[[${data.diceNumber}*${data.criticalMultiplier}]]${data.diceType}+[[(floor(${data.damageKey})*${data.criticalMultiplier})]][Ability]+[[(${data.featDamage}*${data.criticalMultiplier})]][Feats/Other]+[[(${data.enhancement}*${data.criticalMultiplier})]][Enhancement]+${miscDamage}]]`;
+   macro += `{{desc=${data.characterName} deals an astonishing [[[[${data.diceNumber}*${data.criticalMultiplier}]]`+
+           `${data.diceType}+[[(floor(${data.damageKey})*${data.criticalMultiplier})]][Ability]+[[(${data.featDamage}*`+
+           `${data.criticalMultiplier})]][Feats/Other]+[[(${data.enhancement}*${data.criticalMultiplier})]][Enhancement]+`+
+           `${miscDamage}]]`;
   }
   if(data.magicDice) {
    macro += ` + [[${data.magicDice}[${magicDamageType}]]] ${magicDamageType} damage`;
@@ -4366,7 +5788,216 @@
    const attack = data.attacks[attackIndex - 1] || data.attacks[0];
    const normalAction = makeFullAttackActionTarget(data.section, data.rowId, "fullattackdamage");
    const criticalAction = makeFullAttackActionTarget(data.section, data.rowId, "fullattackcritdamage");
-   const macro = `&{template:custom}{{title=Critical Confirmation}}{{subtitle=${data.characterName}'s ${data.weaponName} - ${attack.label}}}{{fullattackconfirm=1}}{{characterid=@{character_id}}}{{confirm_normal_action=${normalAction}}}{{confirm_critical_action=${criticalAction}}}{{confirm=[[${buildFullAttackExpression(data, attack)}]]}}`;
+   const macro = `&{template:custom}{{title=Critical Confirmation}}{{subtitle=${data.characterName}'s ${data.weaponName} - `+
+           `${attack.label}}}{{fullattackconfirm=1}}{{characterid=@{character_id}}}{{confirm_normal_action=${normalAction}}}`+
+           `{{confirm_critical_action=${criticalAction}}}{{confirm=[[${buildFullAttackExpression(data, attack)}]]}}`;
+   startRoll(macro, function(roll) {
+    finishRoll(roll.rollId);
+   });
+  });
+ };
+
+ const FOCUS_POINTS_QUERY = "?{Focus Points Spent|1|2|3|4}";
+
+ const clampFocusPoints = function(value) {
+  let focusPoints = parseInt(value, 10);
+  if(isNaN(focusPoints)) focusPoints = 1;
+  focusPoints = Math.max(1, focusPoints);
+  focusPoints = Math.min(4, focusPoints);
+  return focusPoints;
+ };
+
+ const rollResultTotal = function(rollResult, fallback = 0) {
+  if(rollResult && rollResult.result !== undefined) {
+   const parsed = parseFloat(rollResult.result);
+   return isNaN(parsed) ? fallback : parsed;
+  }
+
+  if(rollResult && rollResult.total !== undefined) {
+   const parsed = parseFloat(rollResult.total);
+   return isNaN(parsed) ? fallback : parsed;
+  }
+
+  return fallback;
+ };
+
+ const focusRowAttr = function(data, attr) {
+  if(data.rowId) return `repeating_${data.section}_${data.rowId}_${attr}`;
+  return `repeating_${data.section}_${attr}`;
+ };
+
+ const getFocusAttackAttrs = function(col) {
+  return getFullAttackAttrs(col).concat([
+   `repeating_weapons${col}_focus_points_used`
+  ]);
+ };
+
+ const buildFocusAttackData = function(col, values, eventInfo) {
+  const data = buildFullAttackData(col, values, eventInfo);
+  const prefix = `repeating_weapons${col}_`;
+
+  data.focusPointsUsed = clampFocusPoints(values[`${prefix}focus_points_used`]);
+
+  return data;
+ };
+
+ const buildFocusAttackExpression = function(data, attack, focusPointsTerm) {
+  let expression =
+          `1d20cs>${data.critLow}` +
+          `+${attack.base}[Base Attack]` +
+          `+${data.attackKey}[Key Attribute]` +
+          `+${data.featAttack}[Feat Bonuses]` +
+          `+${data.enhancement}[Enhancement]` +
+          `+(${focusPointsTerm}*3)[Focus]` +
+          `+(0?{Do you have any miscellaneous bonuses?|0})[Misc.]`;
+
+  if(attack.slowPenalty) {
+   expression += `-${attack.slowPenalty}[Slow]`;
+  }
+
+  return expression;
+ };
+
+ const buildFocusAttackMacro = function(data) {
+  const attack = data.attacks[0] || {
+   label: "Focus Attack",
+   base: 0,
+   slowPenalty: 0
+  };
+
+  const damageAction = makeFullAttackActionTarget(data.section, data.rowId, "focusattackdamage");
+  const confirmAction = makeFullAttackActionTarget(data.section, data.rowId, "focusattackconfirm");
+
+  let macro =
+          `&{template:custom}` +
+          `{{title=Focus Attack}}` +
+          `{{subtitle=${data.characterName}'s ${data.weaponName}}}` +
+          `{{fullattack=1}}` +
+          `{{characterid=@{character_id}}}` +
+          `{{Focus Points=[[${FOCUS_POINTS_QUERY}]]}}` +
+          `{{attack1_next=[[0]]}}` +
+          `{{attack1_damage_action=${damageAction}}}` +
+          `{{attack1_confirm_action=${confirmAction}}}` +
+          `{{attack1_label=Focus Attack}}` +
+          `{{attack1=[[${buildFocusAttackExpression(data, attack, FOCUS_POINTS_QUERY)}]]}}`;
+
+  return macro;
+ };
+
+ const buildFocusDamageMacro = function(data, critical = false) {
+  const focusPoints = clampFocusPoints(data.focusPointsUsed);
+  const focusDamageBonus = focusPoints * 3;
+  const focusedDiceNumber = `[[${data.diceNumber}+${focusPoints}]]`;
+  const magicDamageType = data.damageType ? data.damageType : "energy";
+  const miscDamage = `(0?{Do you have any miscellaneous bonuses?|0})[Misc.]`;
+  const focusPointText = focusPoints === 1 ? "focus point" : "focus points";
+
+  if(!critical) {
+   let macro =
+           `&{template:custom}` +
+           `{{title=Focus Damage}}` +
+           `{{subtitle=${data.characterName}'s ${data.weaponName}}}`;
+
+   if(data.twoHanded) {
+    macro +=
+            `{{desc=${data.characterName} spends ${focusPoints} ${focusPointText} and deals ` +
+            `[[${focusedDiceNumber}${data.diceType}` +
+            `+[[floor(${data.damageKey}*1.5)]][Ability]` +
+            `+${data.featDamage}[Feats/Other]` +
+            `+${data.enhancement}[Enhancement]` +
+            `+${focusDamageBonus}[Focus]` +
+            `+${miscDamage}]] physical damage`;
+   } else {
+    macro +=
+            `{{desc=${data.characterName} spends ${focusPoints} ${focusPointText} and deals ` +
+            `[[${focusedDiceNumber}${data.diceType}` +
+            `+[[${data.damageKey}]][Ability]` +
+            `+${data.featDamage}[Feats/Other]` +
+            `+${data.enhancement}[Enhancement]` +
+            `+${focusDamageBonus}[Focus]` +
+            `+${miscDamage}]] physical damage`;
+   }
+
+   if(data.magicDice) {
+    macro += ` and [[${data.magicDice}[${magicDamageType}]]] ${magicDamageType} damage`;
+   }
+
+   macro += ` with ${data.weaponName}.}}`;
+
+   return macro;
+  }
+
+  let macro =
+          `&{template:custom}` +
+          `{{title=Focus Critical Damage}}` +
+          `{{subtitle=${data.characterName}'s ${data.weaponName}}}`;
+
+  if(data.twoHanded) {
+   macro +=
+           `{{desc=${data.characterName} spends ${focusPoints} ${focusPointText} and deals an astonishing ` +
+           `[[[[(${data.diceNumber}+${focusPoints})*${data.criticalMultiplier}]]${data.diceType}` +
+           `+[[(floor(${data.damageKey}*1.5)*${data.criticalMultiplier})]][Ability]` +
+           `+[[(${data.featDamage}*${data.criticalMultiplier})]][Feats/Other]` +
+           `+[[(${data.enhancement}*${data.criticalMultiplier})]][Enhancement]` +
+           `+[[(${focusDamageBonus}*${data.criticalMultiplier})]][Focus]` +
+           `+${miscDamage}]]`;
+  } else {
+   macro +=
+           `{{desc=${data.characterName} spends ${focusPoints} ${focusPointText} and deals an astonishing ` +
+           `[[[[(${data.diceNumber}+${focusPoints})*${data.criticalMultiplier}]]${data.diceType}` +
+           `+[[(floor(${data.damageKey})*${data.criticalMultiplier})]][Ability]` +
+           `+[[(${data.featDamage}*${data.criticalMultiplier})]][Feats/Other]` +
+           `+[[(${data.enhancement}*${data.criticalMultiplier})]][Enhancement]` +
+           `+[[(${focusDamageBonus}*${data.criticalMultiplier})]][Focus]` +
+           `+${miscDamage}]]`;
+  }
+
+  if(data.magicDice) {
+   macro += ` + [[${data.magicDice}[${magicDamageType}]]] ${magicDamageType} damage`;
+  }
+
+  if(data.bonusCriticalDice) {
+   macro += ` + [[${data.bonusCriticalDice}[Bonus Dice]]] bonus damage`;
+  }
+
+  macro += ` with ${data.weaponName}.}}`;
+
+  return macro;
+ };
+
+ const rollFocusDamage = function(col, critical, eventInfo) {
+  getAttrs(getFocusAttackAttrs(col), function(values) {
+   const data = buildFocusAttackData(col, values, eventInfo);
+   const macro = buildFocusDamageMacro(data, critical);
+
+   startRoll(macro, function(roll) {
+    finishRoll(roll.rollId);
+   });
+  });
+ };
+
+ const rollFocusAttackConfirmation = function(col, eventInfo) {
+  getAttrs(getFocusAttackAttrs(col), function(values) {
+   const data = buildFocusAttackData(col, values, eventInfo);
+   const attack = data.attacks[0] || {
+    label: "Focus Attack",
+    base: 0,
+    slowPenalty: 0
+   };
+
+   const normalAction = makeFullAttackActionTarget(data.section, data.rowId, "focusattackdamage");
+   const criticalAction = makeFullAttackActionTarget(data.section, data.rowId, "focusattackcritdamage");
+
+   const macro =
+           `&{template:custom}` +
+           `{{title=Focus Critical Confirmation}}` +
+           `{{subtitle=${data.characterName}'s ${data.weaponName}}}` +
+           `{{fullattackconfirm=1}}` +
+           `{{characterid=@{character_id}}}` +
+           `{{confirm_normal_action=${normalAction}}}` +
+           `{{confirm_critical_action=${criticalAction}}}` +
+           `{{confirm=[[${buildFocusAttackExpression(data, attack, data.focusPointsUsed)}]]}}`;
+
    startRoll(macro, function(roll) {
     finishRoll(roll.rollId);
    });
@@ -4374,6 +6005,34 @@
  };
 
  WeaponCol.forEach(col => {
+  on(`clicked:repeating_weapons${col}:singleattack`, function(eventInfo) {
+   getAttrs(getFullAttackAttrs(col), function(values) {
+    const data = buildFullAttackData(col, values, eventInfo);
+    const macro = buildSingleAttackMacro(data);
+
+    startRoll(macro, function(roll) {
+     const naturalDie = getFirstDie(roll.results.attack1);
+     const computed = {
+      attack1_next: naturalDie >= data.critLow ? 1 : 0
+     };
+
+     finishRoll(roll.rollId, computed);
+    });
+   });
+  });
+
+  on(`clicked:repeating_weapons${col}:singleattackdamage`, function(eventInfo) {
+   rollWeaponDamageFromFullAttack(col, false, eventInfo);
+  });
+
+  on(`clicked:repeating_weapons${col}:singleattackcritdamage`, function(eventInfo) {
+   rollWeaponDamageFromFullAttack(col, true, eventInfo);
+  });
+
+  on(`clicked:repeating_weapons${col}:singleattackconfirm`, function(eventInfo) {
+   rollSingleAttackConfirmation(col, eventInfo);
+  });
+
   on(`clicked:repeating_weapons${col}:fullattackroll`, function(eventInfo) {
    getAttrs(getFullAttackAttrs(col), function(values) {
     const data = buildFullAttackData(col, values, eventInfo);
@@ -4403,6 +6062,41 @@
     rollFullAttackConfirmation(col, attackIndex, eventInfo);
    });
   }
+  on(`clicked:repeating_weapons${col}:focusattack`, function(eventInfo) {
+   getAttrs(getFocusAttackAttrs(col), function(values) {
+    const data = buildFocusAttackData(col, values, eventInfo);
+    const macro = buildFocusAttackMacro(data);
+
+    startRoll(macro, function(roll) {
+     const naturalDie = getFirstDie(roll.results.attack1);
+     const focusPoints = clampFocusPoints(rollResultTotal(roll.results["Focus Points"], 1));
+
+     const computed = {
+      attack1_next: naturalDie >= data.critLow ? 1 : 0
+     };
+
+     const attrsToSet = {
+      [focusRowAttr(data, "focus_points_used")]: focusPoints
+     };
+
+     setAttrs(attrsToSet, function() {
+      finishRoll(roll.rollId, computed);
+     });
+    });
+   });
+  });
+
+  on(`clicked:repeating_weapons${col}:focusattackdamage`, function(eventInfo) {
+   rollFocusDamage(col, false, eventInfo);
+  });
+
+  on(`clicked:repeating_weapons${col}:focusattackcritdamage`, function(eventInfo) {
+   rollFocusDamage(col, true, eventInfo);
+  });
+
+  on(`clicked:repeating_weapons${col}:focusattackconfirm`, function(eventInfo) {
+   rollFocusAttackConfirmation(col, eventInfo);
+  });
  });
  // </editor-fold>
 
@@ -4644,84 +6338,191 @@
 
  //Focus <Pending>
  // weapondamage is the name of the damage button
+ // Focus <Legacy>
+ // WeaponCol.forEach(col => {
+ //  on(`clicked:repeating_weapons${col}:focusattack`, function(){
+ //   getAttrs([
+ //    `repeating_weapons${col}_bonustoattack`,
+ //    `repeating_weapons${col}_critlow`,
+ //    `repeating_weapons${col}_weaponhaste`,
+ //    `repeating_weapons${col}_weaponbab`,
+ //    `repeating_weapons${col}_enhancetoattack`,
+ //    `repeating_weapons${col}_weapontodamage`,
+ //    `repeating_weapons${col}_bonustodamage`,
+ //    `repeating_weapons${col}_dnum`,
+ //    `repeating_weapons${col}_dtype`,
+ //    `repeating_weapons${col}_enchdamagedice`,
+ //    `repeating_weapons${col}_extraenchdicecrit`,
+ //    `repeating_weapons${col}_weaponcritmod`,
+ //    `repeating_weapons${col}_twohanded`,
+ //    `repeating_weapons${col}_weapontohit`,
+ //    // `repeating_weapons${col}_character_name`,
+ //    // `repeating_weapons${col}_arrayID`,
+ //    `repeating_weapons${col}_weapondamagtype`], function(values){
+ //    // const arrayID = values[`repeating_weapons${col}_arrayID`]
+ //    // const characterName = values[`repeating_weapons${col}_character_name`];
+ //    const featBonusToAttack = values[`repeating_weapons${col}_bonustoattack`] || 0;
+ //    const featBonusToDamage = values[`repeating_weapons${col}_bonustodamage`] || 0;
+ //    const dieQuantity = values[`repeating_weapons${col}_dnum`] || 1;
+ //    const dieType = values[`repeating_weapons${col}_dtype`];
+ //    const weaponEnhancement = values[`repeating_weapons${col}_enhancetoattack`] || 0;
+ //    const baseAttack = values[`repeating_weapons${col}_weaponbab`] || 0;
+ //    const minCritThreshold = values[`repeating_weapons${col}_critlow`]|| 20 ;
+ //    const keyAttackAttribute = values[`repeating_weapons${col}_weapontohit`] || 0;
+ //    const keyDamageAttribute = values[`repeating_weapons${col}_weapontodamage`] ;
+ //    const twoHandedToggle = values[`repeating_weapons${col}_twohanded`];
+ //    const magicDice = values[`repeating_weapons${col}_enchdamagedice`];
+ //    const magicCriticalDice = values[`repeating_weapons${col}_extraenchdicecrit`];
+ //    const magicDamageType = values[`repeating_weapons${col}_weapondamagtype`];
+ //    const criticalModifier = values[`repeating_weapons${col}_weaponcritmod`];
+ //    let macroRoll = `&{template:custom} {{title=Focus Attack}}{{Attack Roll=[[1d20cs>${minCritThreshold}+${baseAttack}`+
+ //            `[BAB]+${keyAttackAttribute}[Key Attribute]+${featBonusToAttack}[Feats]+${weaponEnhancement}[Enhancement]`+
+ //            `-@{slow}[Slow]+((0?{Focus Points Spent})*3)[Focus]+(0?{Miscellaneous attack bonuses?})[Misc.]]]}}`;
+ //    if (twoHandedToggle === "on"){
+ //     macroRoll = macroRoll + `{{Damage=[[[[${dieQuantity}+(0?{Focus Points Spent})]]${dieType}+floor(`+
+ //             `(${keyDamageAttribute})*1.5)[Key Attribute]+${featBonusToDamage}[Feat]+${weaponEnhancement}[Magic]+((`+
+ //             `0?{Focus Points Spent})*3)[Focus]]]}}`;
+ //    }
+ //    if (twoHandedToggle !== "on"){
+ //     macroRoll = macroRoll + `{{Damage=[[[[${dieQuantity}+(0?{Focus Points Spent})]]${dieType}+floor(`+
+ //             `${keyDamageAttribute})[Key Attribute]+${featBonusToDamage}[Feat]+${weaponEnhancement}[Magic]+((0?{`+
+ //             `Focus Points Spent})*3)[Focus]]]}}`;
+ //    }
+ //    if (magicDice){
+ //     macroRoll = macroRoll + `{{${magicDamageType} Damage=[[${magicDice}[${magicDamageType}]]]}}`;
+ //    }
+ //    macroRoll = macroRoll + `{{Critical Confirmation Roll=[[1d20cs>${minCritThreshold}+${baseAttack}`+
+ //            `[BAB]+${keyAttackAttribute}[Key Attribute]+${featBonusToAttack}[Feats]+${weaponEnhancement}[Enhancement]`+
+ //            `-@{slow}[Slow]+((0?{Focus Points Spent})*3)[Focus]+(0?{Miscellaneous attack bonuses?})[Misc.]]]}}`;
+ //    if (twoHandedToggle === "on"){
+ //     macroRoll = macroRoll + `{{Critical Damage=[[[[((${dieQuantity}+(0?{Focus Points Spent}))*${criticalModifier})]]`+
+ //             `${dieType}+(floor(${keyDamageAttribute}*1.5)*${criticalModifier})[Key Attribute]+(`+
+ //             `${featBonusToDamage}*${criticalModifier}[Feat])+(${weaponEnhancement}*${criticalModifier})+(((0?{Focus`+
+ //             ` Points Spent})*3)*${criticalModifier})[Focus]]]}}`;
+ //    }
+ //    if (twoHandedToggle !== "on"){
+ //     macroRoll = macroRoll + `{{Critical Damage=[[[[((${dieQuantity}+(0?{Focus Points Spent}))*${criticalModifier})]]`+
+ //             `${dieType}+(${keyDamageAttribute}*${criticalModifier})[Key Attribute]+(`+
+ //             `${featBonusToDamage}*${criticalModifier}[Feat])+(${weaponEnhancement}*${criticalModifier})+(((0?{Focus`+
+ //             ` Points Spent})*3)*${criticalModifier})[Focus]]]}}`;
+ //    }
+ //    if (magicCriticalDice){
+ //     macroRoll = macroRoll + `{{Bonus Critical Damage = [[${magicCriticalDice}]]}}`
+ //    }
+ //    startRoll(macroRoll,function(roll){
+ //     finishRoll(roll.rollId);
+ //    });
+ //   });
+ //  });
+ // })
+ // </editor-fold>
 
- WeaponCol.forEach(col => {
-  on(`clicked:repeating_weapons${col}:focusattack`, function(){
-   getAttrs([
-    `repeating_weapons${col}_bonustoattack`,
-    `repeating_weapons${col}_critlow`,
-    `repeating_weapons${col}_weaponhaste`,
-    `repeating_weapons${col}_weaponbab`,
-    `repeating_weapons${col}_enhancetoattack`,
-    `repeating_weapons${col}_weapontodamage`,
-    `repeating_weapons${col}_bonustodamage`,
-    `repeating_weapons${col}_dnum`,
-    `repeating_weapons${col}_dtype`,
-    `repeating_weapons${col}_enchdamagedice`,
-    `repeating_weapons${col}_extraenchdicecrit`,
-    `repeating_weapons${col}_weaponcritmod`,
-    `repeating_weapons${col}_twohanded`,
-    `repeating_weapons${col}_weapontohit`,
-    // `repeating_weapons${col}_character_name`,
-    // `repeating_weapons${col}_arrayID`,
-    `repeating_weapons${col}_weapondamagtype`], function(values){
-    // const arrayID = values[`repeating_weapons${col}_arrayID`]
-    // const characterName = values[`repeating_weapons${col}_character_name`];
-    const featBonusToAttack = values[`repeating_weapons${col}_bonustoattack`] || 0;
-    const featBonusToDamage = values[`repeating_weapons${col}_bonustodamage`] || 0;
-    const dieQuantity = values[`repeating_weapons${col}_dnum`] || 1;
-    const dieType = values[`repeating_weapons${col}_dtype`];
-    const weaponEnhancement = values[`repeating_weapons${col}_enhancetoattack`] || 0;
-    const baseAttack = values[`repeating_weapons${col}_weaponbab`] || 0;
-    const minCritThreshold = values[`repeating_weapons${col}_critlow`]|| 20 ;
-    const keyAttackAttribute = values[`repeating_weapons${col}_weapontohit`] || 0;
-    const keyDamageAttribute = values[`repeating_weapons${col}_weapontodamage`] ;
-    const twoHandedToggle = values[`repeating_weapons${col}_twohanded`];
-    const magicDice = values[`repeating_weapons${col}_enchdamagedice`];
-    const magicCriticalDice = values[`repeating_weapons${col}_extraenchdicecrit`];
-    const magicDamageType = values[`repeating_weapons${col}_weapondamagtype`];
-    const criticalModifier = values[`repeating_weapons${col}_weaponcritmod`];
-    let macroRoll = `&{template:custom} {{title=Focus Attack}}{{Attack Roll=[[1d20cs>${minCritThreshold}+${baseAttack}`+
-            `[BAB]+${keyAttackAttribute}[Key Attribute]+${featBonusToAttack}[Feats]+${weaponEnhancement}[Enhancement]`+
-            `-@{slow}[Slow]+((0?{Focus Points Spent})*3)[Focus]+(0?{Miscellaneous attack bonuses?})[Misc.]]]}}`;
-    if (twoHandedToggle === "on"){
-     macroRoll = macroRoll + `{{Damage=[[[[${dieQuantity}+(0?{Focus Points Spent})]]${dieType}+floor(`+
-             `(${keyDamageAttribute})*1.5)[Key Attribute]+${featBonusToDamage}[Feat]+${weaponEnhancement}[Magic]+((`+
-             `0?{Focus Points Spent})*3)[Focus]]]}}`;
+ // <editor-fold desc="attr migration staging">
+ const CURRENT_SHEET_VERSION = 5;
+
+
+ const checkedLegacyCondition = function(value) {
+  return value === "1" || value === 1 || value === true || value === "on" || value === "yes";
+ };
+
+ const migrateFixedConditionsToRepeatingConditions = function(callback) {
+  getSectionIDs("repeating_conditions", function(existingRowIds) {
+   // If the new repeating section already has rows, do not duplicate anything.
+   if(existingRowIds && existingRowIds.length > 0) {
+    callback();
+    return;
+   }
+
+   const legacyAttrs = TTD_CONDITIONS.map(condition => condition.legacyAttr);
+
+   getAttrs(legacyAttrs, function(values) {
+    const attrsToSet = {};
+
+    TTD_CONDITIONS.forEach(condition => {
+     if(!checkedLegacyCondition(values[condition.legacyAttr])) return;
+
+     const rowId = generateRowID();
+     attrsToSet[`repeating_conditions_${rowId}_condition_type`] = condition.name;
+     attrsToSet[`repeating_conditions_${rowId}_condition_effect`] = condition.effect;
+    });
+
+    if(Object.keys(attrsToSet).length > 0) {
+     setAttrs(attrsToSet, callback);
+     return;
     }
-    if (twoHandedToggle !== "on"){
-     macroRoll = macroRoll + `{{Damage=[[[[${dieQuantity}+(0?{Focus Points Spent})]]${dieType}+floor(`+
-             `${keyDamageAttribute})[Key Attribute]+${featBonusToDamage}[Feat]+${weaponEnhancement}[Magic]+((0?{`+
-             `Focus Points Spent})*3)[Focus]]]}}`;
+
+    callback();
+   });
+  });
+ };
+
+ const migrateDamageReductionRepeatingSection = function(callback) {
+  getSectionIDs("repeating_damage_reduction", function(oldRowIds) {
+   if(!oldRowIds || oldRowIds.length === 0) {
+    callback();
+    return;
+   }
+
+   getSectionIDs("repeating_damagereduction", function(newRowIds) {
+    // Avoid duplicating rows if the user already recreated them after the section rename.
+    if(newRowIds && newRowIds.length > 0) {
+     callback();
+     return;
     }
-    if (magicDice){
-     macroRoll = macroRoll + `{{${magicDamageType} Damage=[[${magicDice}[${magicDamageType}]]]}}`;
-    }
-    macroRoll = macroRoll + `{{Critical Confirmation Roll=[[1d20cs>${minCritThreshold}+${baseAttack}`+
-            `[BAB]+${keyAttackAttribute}[Key Attribute]+${featBonusToAttack}[Feats]+${weaponEnhancement}[Enhancement]`+
-            `-@{slow}[Slow]+((0?{Focus Points Spent})*3)[Focus]+(0?{Miscellaneous attack bonuses?})[Misc.]]]}}`;
-    if (twoHandedToggle === "on"){
-     macroRoll = macroRoll + `{{Critical Damage=[[[[((${dieQuantity}+(0?{Focus Points Spent}))*${criticalModifier})]]`+
-             `${dieType}+(floor(${keyDamageAttribute}*1.5)*${criticalModifier})[Key Attribute]+(`+
-             `${featBonusToDamage}*${criticalModifier}[Feat])+(${weaponEnhancement}*${criticalModifier})+(((0?{Focus`+
-             ` Points Spent})*3)*${criticalModifier})[Focus]]]}}`;
-    }
-    if (twoHandedToggle !== "on"){
-     macroRoll = macroRoll + `{{Critical Damage=[[[[((${dieQuantity}+(0?{Focus Points Spent}))*${criticalModifier})]]`+
-             `${dieType}+(${keyDamageAttribute}*${criticalModifier})[Key Attribute]+(`+
-             `${featBonusToDamage}*${criticalModifier}[Feat])+(${weaponEnhancement}*${criticalModifier})+(((0?{Focus`+
-             ` Points Spent})*3)*${criticalModifier})[Focus]]]}}`;
-    }
-    if (magicCriticalDice){
-     macroRoll = macroRoll + `{{Bonus Critical Damage = [[${magicCriticalDice}]]}}`
-    }
-    startRoll(macroRoll,function(roll){
-     finishRoll(roll.rollId);
+
+    const attrsToGet = [];
+    oldRowIds.forEach(rowId => {
+     attrsToGet.push(`repeating_damage_reduction_${rowId}_damage_reduction_value`);
+     attrsToGet.push(`repeating_damage_reduction_${rowId}_damage_reduction_bypass`);
+    });
+
+    getAttrs(attrsToGet, function(oldValues) {
+     const attrsToSet = {};
+
+     oldRowIds.forEach(oldRowId => {
+      const newRowId = generateRowID();
+      attrsToSet[`repeating_damagereduction_${newRowId}_damage_reduction_value`] =
+              oldValues[`repeating_damage_reduction_${oldRowId}_damage_reduction_value`] || "";
+      attrsToSet[`repeating_damagereduction_${newRowId}_damage_reduction_bypass`] =
+              oldValues[`repeating_damage_reduction_${oldRowId}_damage_reduction_bypass`] || "";
+     });
+
+     setAttrs(attrsToSet, callback);
     });
    });
   });
- })
- // </editor-fold>
+ };
+
+ on("sheet:opened", function() {
+  getAttrs(["sheet_version"], function(values) {
+   const sheetVersion = int(values, "sheet_version", 0);
+
+   const finishMigrations = function() {
+    if(sheetVersion < CURRENT_SHEET_VERSION) {
+     setAttrs({
+      sheet_version: CURRENT_SHEET_VERSION
+     });
+    }
+   };
+
+   const runConditionMigration = function() {
+    if(sheetVersion < 5) {
+     migrateFixedConditionsToRepeatingConditions(finishMigrations);
+     return;
+    }
+
+    finishMigrations();
+   };
+
+   if(sheetVersion < 4) {
+    migrateDamageReductionRepeatingSection(runConditionMigration);
+    return;
+   }
+
+   runConditionMigration();
+  });
+ });
+ //</editor-fold>
 
 </script>
 
