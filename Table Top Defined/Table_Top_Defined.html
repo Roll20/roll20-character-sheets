@@ -742,7 +742,7 @@
  <div class="sheet-repeating-fields">
   <fieldset class="repeating_feats">
    <input type="hidden" class="feats-toggle" name="attr_minfeatval" value="0"/>
-   <div class="feats_title"><button style="color:black" type="action" class="Small-Button" name="act_minfeats">-</button><input type="text" name="attr_featsname" placeholder="<Feat name here>">
+   <div class="feats_title"><button style="color:black" type="action" class="Small-Button" name="act_minfeats">-</button><input type="text" name="attr_featsname" placeholder="<Enter Feat Name Here>">
    </div>
    <div class="feats_description">
     <textarea name="attr_featsdescription" placeholder="<Description here>"></textarea>
@@ -813,7 +813,10 @@
        <div class="ability-title-row">
         <button type="action" class="Small-Button" name="act_minabilitytog">-</button>
         <input type="hidden" class="grant-available" name="attr_source_available" value="1"/>
-        <input type="text" class="Ability-name" name="attr_abilityname" placeholder="<Ability Name Here>"/>
+        <input type="text" class="Ability-name" name="attr_abilityname" placeholder="<Enter Ability Name Here>"/>
+        <button type="roll" name="roll_ability_card" value="@{abilityroll}"></button>
+       </div>
+       <div class="row-header-dark grr2">
         <span class="grant-meta">
          HD <input class="grant-level-input"
                    title="@{granted_level}"
@@ -823,10 +826,9 @@
                        title="@{granted_source}"
                        type="text" name="attr_granted_source"
                        placeholder="Manual" readonly/>
-        </span>
-        <button type="roll" name="roll_ability_card" value="@{abilityroll}"></button>
+         </span>
        </div>
-       <div class="grr2 titleblock" style="font-size: small; font-weight: normal; margin-bottom: 2px">
+       <div class="grr3 titleblock" style="font-size: small; font-weight: normal; margin-bottom: 2px">
         Uses: <input class="standard-input" type="text" name="attr_userdescription" placeholder="per day"/>
         Max Uses: <input class="standard-input" type="text" name="attr_uses"/>
         Resource: <input title="Resource Name" class="standard-input" type="text" name="attr_resourceNameCard"/>
@@ -902,20 +904,24 @@
     <fieldset class="repeating_feats">
      <input type="hidden" name="attr_grant_key"/>
      <input type="hidden" class="grant-hidden" name="attr_grant_hidden" value="0"/>
-     <div class="column-header-dark feat-title-row grant-row">
-      <button style="color:black" type="action" class="Small-Button" name="act_minfeats">-</button>
-      <input type="hidden" class="grant-available" name="attr_source_available" value="1"/>
-      <input class="Ability-name" type="text" name="attr_featsname" placeholder="<Feat name here>">
-      <span class="grant-meta">
-       HD <input class="grant-level-input"
-                 title="@{granted_level}"
-                 type="number"
-                 name="attr_granted_level"
-                 placeholder="#" readonly/>
-       Source <input class="grant-source-input"
-                     title="@{granted_source}"
-                     type="text" name="attr_granted_source"
-                     placeholder="Manual" readonly/></span>
+     <div class ="row-header-dark grant-row grr1">
+      <div class="feat-title-row grant-row">
+       <button style="color:black" type="action" class="Small-Button" name="act_minfeats">-</button>
+       <input type="hidden" class="grant-available" name="attr_source_available" value="1"/>
+       <input class="feat-name" type="text" name="attr_featsname" placeholder="<Enter Feat Name Here>">
+      </div>
+      <div class="grr2 column-header-dark">
+       <span class="grant-meta">
+        HD <input class="grant-level-input"
+                  title="@{granted_level}"
+                  type="number"
+                  name="attr_granted_level"
+                  placeholder="#" readonly/>
+        Source <input class="grant-source-input"
+                      title="@{granted_source}"
+                      type="text" name="attr_granted_source"
+                      placeholder="Manual" readonly/></span>
+      </div>
      </div>
      <input type="hidden" class="feats-toggle" name="attr_minfeatval" value="0"/>
      <div class="feats_description grant-row">
@@ -5346,6 +5352,31 @@
   return { key, source, level, name, description, available, hidden };
  };
 
+ const GENERATED_FEAT_NAME = "<Enter Feat Name Here>";
+ const GENERATED_ABILITY_NAME = "<Enter Ability Name Here>";
+ const MAX_AUTOMATIC_GRANT_HD = 20;
+
+ const generatedGrantNameForSection = function(def) {
+  return def.section === "repeating_abilities" ? GENERATED_ABILITY_NAME : GENERATED_FEAT_NAME;
+ };
+
+ const shouldReplaceGeneratedGrantName = function(def, currentName) {
+  const name = String(currentName || "").trim();
+
+  if(!name) return true;
+  if(name === GENERATED_FEAT_NAME || name === GENERATED_ABILITY_NAME) return false;
+
+  if(def.section === "repeating_feats") {
+   return /^(Universal|Versatile Bonus|Diffuse Background Bonus|Null Combatant|Null Generalist|Basic Combatant|Basic Generalist|Standard Combatant|Standard Generalist|Advanced Combatant|Advanced Generalist) Feat(?: \(HD \d+\))?$/.test(name);
+  }
+
+  if(def.section === "repeating_abilities") {
+   return /^(Universal|Mystic|Null Generalist|Null Specialist|Basic Generalist|Basic Specialist|Standard Generalist|Standard Specialist|Advanced Generalist|Advanced Specialist) Ability(?: \(HD \d+\))?$/.test(name);
+  }
+
+  return false;
+ };
+
  const progressionSourceMatches = function(context, magicCurve, specialty) {
   return normalizeGrantName(context.magicCurve) === normalizeGrantName(magicCurve) &&
           normalizeGrantName(context.specialty) === normalizeGrantName(specialty);
@@ -5357,14 +5388,14 @@
    nameAttr: "featsname",
    descriptionAttr: "featsdescription",
    universalKeyPrefix: "universal_feat_hd_",
-   universalName: level => `Universal Feat`,
+   universalName: level => GENERATED_FEAT_NAME,
    universalDescription: level => `Universal feat slot gained at HD ${level}. Replace this text with the selected feat.`,
    conditionalGrants: [
     {
      key: "versatile_bonus_feat",
      source: VERSATILE_SOURCE_NAME,
      level: 1,
-     name: "Versatile Bonus Feat",
+     name: GENERATED_FEAT_NAME,
      description: "Bonus feat gained from the Versatile species option. Replace this text with the selected feat.",
      isExpected: context => context.versatile
     },
@@ -5372,7 +5403,7 @@
      key: "diffuse_background_bonus_feat",
      source: DIFFUSE_BACKGROUND_SOURCE_NAME,
      level: 1,
-     name: "Diffuse Background Bonus Feat",
+     name: GENERATED_FEAT_NAME,
      description: "Bonus feat gained from the Diffuse Background primary definition. Replace this text with the selected feat.",
      isExpected: context => context.diffuseBackground
     }
@@ -5384,7 +5415,7 @@
      magicCurve: "None",
      specialty: "Combatant",
      levels: nullCombatantFeatLevels,
-     name: level => `Null Combatant Feat`,
+     name: level => GENERATED_FEAT_NAME,
      description: level => `Null Combatant feat slot gained at HD ${level}. Replace this text with the selected feat.`
     },
     {
@@ -5393,7 +5424,7 @@
      magicCurve: "None",
      specialty: "Generalist",
      levels: nullGeneralistFeatLevels,
-     name: level => `Null Generalist Feat`,
+     name: level => GENERATED_FEAT_NAME,
      description: level => `Null Generalist feat slot gained at HD ${level}. Replace this text with the selected feat.`
     },
     {
@@ -5402,7 +5433,7 @@
      magicCurve: "Basic",
      specialty: "Combatant",
      levels: basicCombatantFeatLevels,
-     name: level => `Basic Combatant Feat`,
+     name: level => GENERATED_FEAT_NAME,
      description: level => `Basic Combatant feat slot gained at HD ${level}. Replace this text with the selected feat.`
     },
     {
@@ -5411,7 +5442,7 @@
      magicCurve: "Basic",
      specialty: "Generalist",
      levels: basicGeneralistFeatLevels,
-     name: level => `Basic Generalist Feat`,
+     name: level => GENERATED_FEAT_NAME,
      description: level => `Basic Generalist feat slot gained at HD ${level}. Replace this text with the selected feat.`
     },
     {
@@ -5420,7 +5451,7 @@
      magicCurve: "Standard",
      specialty: "Combatant",
      levels: standardCombatantFeatLevels,
-     name: level => `Standard Combatant Feat`,
+     name: level => GENERATED_FEAT_NAME,
      description: level => `Standard Combatant feat slot gained at HD ${level}. Replace this text with the selected feat.`
     },
     {
@@ -5429,7 +5460,7 @@
      magicCurve: "Standard",
      specialty: "Generalist",
      levels: standardGeneralistFeatLevels,
-     name: level => `Standard Generalist Feat`,
+     name: level => GENERATED_FEAT_NAME,
      description: level => `Standard Generalist feat slot gained at HD ${level}. Replace this text with the selected feat.`
     },
     {
@@ -5438,7 +5469,7 @@
      magicCurve: "Advanced",
      specialty: "Combatant",
      levels: advancedCombatantFeatLevels,
-     name: level => `Advanced Combatant Feat`,
+     name: level => GENERATED_FEAT_NAME,
      description: level => `Advanced Combatant feat slot gained at HD ${level}. Replace this text with the selected feat.`
     },
     {
@@ -5447,7 +5478,7 @@
      magicCurve: "Advanced",
      specialty: "Generalist",
      levels: advancedGeneralistFeatLevels,
-     name: level => `Advanced Generalist Feat`,
+     name: level => GENERATED_FEAT_NAME,
      description: level => `Advanced Generalist feat slot gained at HD ${level}. Replace this text with the selected feat.`
     }
    ],
@@ -5458,14 +5489,14 @@
    nameAttr: "abilityname",
    descriptionAttr: "abilitydescriptiontext",
    universalKeyPrefix: "universal_ability_hd_",
-   universalName: level => `Universal Ability`,
+   universalName: level => GENERATED_ABILITY_NAME,
    universalDescription: level => `Universal ability slot gained at HD ${level}. Replace this text with the selected ability.`,
    conditionalGrants: [
     {
      key: "mystic_bonus_ability",
      source: MYSTIC_SOURCE_NAME,
      level: 1,
-     name: "Mystic Ability",
+     name: GENERATED_ABILITY_NAME,
      description: "Bonus ability gained from the Mystic species option. Replace this text with the selected ability.",
      isExpected: context => context.mystic
     }
@@ -5477,7 +5508,7 @@
      magicCurve: "None",
      specialty: "Generalist",
      levels: nullGeneralistAbilityLevels,
-     name: level => `Null Generalist Ability`,
+     name: level => GENERATED_ABILITY_NAME,
      description: level => `Null Generalist ability slot gained at HD ${level}. Replace this text with the selected ability.`
     },
     {
@@ -5486,7 +5517,7 @@
      magicCurve: "None",
      specialty: "Specialist",
      levels: nullSpecialistAbilityLevels,
-     name: level => `Null Specialist Ability`,
+     name: level => GENERATED_ABILITY_NAME,
      description: level => `Null Specialist ability slot gained at HD ${level}. Replace this text with the selected ability.`
     },
     {
@@ -5495,7 +5526,7 @@
      magicCurve: "Basic",
      specialty: "Generalist",
      levels: basicGeneralistAbilityLevels,
-     name: level => `Basic Generalist Ability`,
+     name: level => GENERATED_ABILITY_NAME,
      description: level => `Basic Generalist ability slot gained at HD ${level}. Replace this text with the selected ability.`
     },
     {
@@ -5504,7 +5535,7 @@
      magicCurve: "Basic",
      specialty: "Specialist",
      levels: basicSpecialistAbilityLevels,
-     name: level => `Basic Specialist Ability`,
+     name: level => GENERATED_ABILITY_NAME,
      description: level => `Basic Specialist ability slot gained at HD ${level}. Replace this text with the selected ability.`
     },
     {
@@ -5513,7 +5544,7 @@
      magicCurve: "Standard",
      specialty: "Generalist",
      levels: standardGeneralistAbilityLevels,
-     name: level => `Standard Generalist Ability`,
+     name: level => GENERATED_ABILITY_NAME,
      description: level => `Standard Generalist ability slot gained at HD ${level}. Replace this text with the selected ability.`
     },
     {
@@ -5522,7 +5553,7 @@
      magicCurve: "Standard",
      specialty: "Specialist",
      levels: standardSpecialistAbilityLevels,
-     name: level => `Standard Specialist Ability`,
+     name: level => GENERATED_ABILITY_NAME,
      description: level => `Standard Specialist ability slot gained at HD ${level}. Replace this text with the selected ability.`
     },
     {
@@ -5531,7 +5562,7 @@
      magicCurve: "Advanced",
      specialty: "Generalist",
      levels: advancedGeneralistAbilityLevels,
-     name: level => `Advanced Generalist Ability`,
+     name: level => GENERATED_ABILITY_NAME,
      description: level => `Advanced Generalist ability slot gained at HD ${level}. Replace this text with the selected ability.`
     },
     {
@@ -5540,7 +5571,7 @@
      magicCurve: "Advanced",
      specialty: "Specialist",
      levels: advancedSpecialistAbilityLevels,
-     name: level => `Advanced Specialist Ability`,
+     name: level => GENERATED_ABILITY_NAME,
      description: level => `Advanced Specialist ability slot gained at HD ${level}. Replace this text with the selected ability.`
     }
    ],
@@ -5549,31 +5580,37 @@
  ];
 
  const buildUniversalGrantSpec = function(def, level, context) {
+  const overGrantCap = level > MAX_AUTOMATIC_GRANT_HD;
+
   return makeGrantSpec(
           `${def.universalKeyPrefix}${level}`,
           UNIVERSAL_SOURCE_NAME,
           level,
           def.universalName(level),
           def.universalDescription(level),
-          context.currentHD >= level
+          !overGrantCap && context.currentHD >= level,
+          overGrantCap
   );
  };
 
  const buildProgressionGrantSpec = function(progression, level, context) {
   const sourceMatches = progressionSourceMatches(context, progression.magicCurve, progression.specialty);
+  const overGrantCap = level > MAX_AUTOMATIC_GRANT_HD;
+
   return makeGrantSpec(
           `${progression.keyPrefix}${level}`,
           progression.source,
           level,
           progression.name(level),
           progression.description(level),
-          context.currentHD >= level && sourceMatches,
-          !sourceMatches
+          !overGrantCap && context.currentHD >= level && sourceMatches,
+          overGrantCap || !sourceMatches
   );
  };
 
  const buildExpectedGrantSpecs = function(def, context) {
-  const specs = def.universalLevels(context.currentHD).map(level => buildUniversalGrantSpec(def, level, context));
+  const automaticGrantHD = Math.min(context.currentHD, MAX_AUTOMATIC_GRANT_HD);
+  const specs = def.universalLevels(automaticGrantHD).map(level => buildUniversalGrantSpec(def, level, context));
 
   (def.conditionalGrants || []).forEach(grant => {
    if(grant.isExpected(context)) {
@@ -5591,7 +5628,7 @@
   (def.progressionGrants || []).forEach(progression => {
    if(!progressionSourceMatches(context, progression.magicCurve, progression.specialty)) return;
 
-   progression.levels(context.currentHD).forEach(level => {
+   progression.levels(automaticGrantHD).forEach(level => {
     specs.push(buildProgressionGrantSpec(progression, level, context));
    });
   });
@@ -5698,6 +5735,7 @@
     attrsToGet.push(`${def.section}_${rowId}_granted_level`);
     attrsToGet.push(`${def.section}_${rowId}_granted_source`);
     attrsToGet.push(`${def.section}_${rowId}_grant_hidden`);
+    attrsToGet.push(`${def.section}_${rowId}_${def.nameAttr}`);
    });
 
    getAttrs(attrsToGet, function(values) {
@@ -5730,6 +5768,10 @@
       attrsToSet[`${prefix}granted_source`] = spec.source;
       attrsToSet[`${prefix}source_available`] = spec.available ? "1" : "0";
       attrsToSet[`${prefix}grant_hidden`] = spec.hidden ? "1" : "0";
+
+      if(shouldReplaceGeneratedGrantName(def, values[`${prefix}${def.nameAttr}`])) {
+       attrsToSet[`${prefix}${def.nameAttr}`] = generatedGrantNameForSection(def);
+      }
 
       orderRows.push({
        rowId,
