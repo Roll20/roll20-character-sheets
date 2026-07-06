@@ -1,126 +1,119 @@
-<div align="center">
-    <a href="https://roll20.net">
-        <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Roll20%20Logo.png" alt="Roll20 logo" title="Roll20" height="60" />
-    </a>
+# StarHeart Roll20 Character Sheet
 
-![GitHub last commit (branch)](https://img.shields.io/github/last-commit/Roll20/roll20-character-sheets/master?color=ff0066&label=last%20updated) ![GitHub contributors](https://img.shields.io/github/contributors/Roll20/roll20-character-sheets?color=ff0066) ![Lines of code](https://img.shields.io/tokei/lines/github/Roll20/roll20-character-sheets?color=ff0066&label=lines%20of%20code) ![GitHub repo size](https://img.shields.io/github/repo-size/Roll20/roll20-character-sheets?color=ff0066)
-    
-</div>
+StarHeart is a science-fantasy tabletop RPG built as a Campaign Scaffold supplement for Daggerheart. It is published under the [Darrington Press Community Gaming License (DPCGL)](https://darringtonpress.com/license/).
 
-# Roll20 Character Sheets
+The full StarHeart rules are available on [DriveThruRPG](https://www.drivethrurpg.com).
 
-Roll20.net is the easy-to-use virtual tabletop that brings pen and paper gaming to the web the right way. Built on a powerful platform of tools, yet elegantly simple, it focuses on enhancing what makes tabletop gaming great: storytelling and camaraderie.
+---
 
-This repository is the collection of all the community-contributed character sheets that are available for use on [Roll20](https://roll20.net). These are, mostly, created for free, for use by the community, and represent dozens, if not hundreds of hours of effort on the parts of their creators. 
+## Overview
 
-This repository consists of over 📜 **800 community contributed sheets**, from over 🧑 **300 contributors**, who have written over ⌨️ **400,000 lines of code**. This is an 🦦 **otter**.
+This sheet supports all five StarHeart entity types via a tab strip at the top:
 
-## Community Conduct
+| Tab | Used for |
+|-----|----------|
+| **Character** | Player characters |
+| **Adversary** | NPCs, monsters, and enemy soldiers |
+| **Environment** | Encounter environments (Daggerheart Environment type) |
+| **Companion** | The Bonded subclass companion character |
+| **Vehicle** | PC ships; enemy vehicles use the Adversary tab |
 
-The [Roll20 Code of Conduct](https://help.roll20.net/hc/en-us/articles/360037254334-Community-Code-of-Conduct) applies to your participation on this repository.
+All tabs use the same `sh-roll` custom roll template, which outputs the Hope die, Fear die, total, damage, and the target's damage thresholds in a single roll card.
 
-**tl;dr**
+**No API required.** The sheet is fully functional on Roll20 free tier. The optional API scripts (see below) automate setup and add token action buttons but are not needed for play.
 
-Following the Roll20 Code of Conduct means **no racism, no sexism, no hate speech, no backseat gaming, no personal attacks, no transphobia, no misgendering, no ableism, no anti-LGBTQIA+ sentiments (and so on) are allowed.**
+---
 
-## Table of Contents
+## PC Sheet
 
-- [Roll20 Character Sheets](#roll20-character-sheets)
-  - [Community Conduct](#community-conduct)
-  - [Table of Contents](#table-of-contents)
-  - [Contributing](#contributing)
-    - [Getting Started](#getting-started)
-    - [Improving Existing Character Sheets](#improving-existing-character-sheets)
-    - [Starting a New Character Sheet](#starting-a-new-character-sheet)
-    - [Submission Guidelines](#submission-guidelines)
-    - [Release Cadence](#release-cadence)
-    - [Internationalization & Translations](#internationalization--translations)
-    - [Uploading Sheets](#uploading-sheets)
-  - [License](#license)
-  - [Contact](#contact)
+### Traits and Combat Stats
+Enter trait scores (Agility, Strength, Finesse, Instinct, Presence, Knowledge) manually. Evasion, Proficiency, and damage thresholds calculate automatically based on class, level, and any bonus fields.
 
-## Contributing
+Each trait has a roll button that outputs a Hope/Fear roll with the trait modifier applied.
 
-There are many ways in which you can contribute to these sheets, and to the health of the space: 
+### Domain Cards
 
-* [Report issues and bugs](https://github.com/Roll20/roll20-character-sheets/issues) you encounter when using the sheets.
-* [Review sheet code changes](https://github.com/Roll20/roll20-character-sheets/pulls)
-* Review and contribute to the documentation on the [community wiki](https://wiki.roll20.net/Building_Character_Sheets).
-* Write or contribute to a new or existing character sheet!
+Domain cards represent your character's special abilities. To add a card:
 
-### Getting Started
+1. Click **+ Add** in the Domain Cards section.
+2. Select the card name from the dropdown. Level, recall cost, and full card text populate automatically.
+3. To use a custom or homebrew card, type the name directly in the name field instead of using the dropdown.
 
-If you are interested in contributing code, fixing issues, or adding content, the [Roll20 Wiki: Building Character Sheets](https://wiki.roll20.net/Building_Character_Sheets) documentation is a great place to start familiarizing yourself with the space.
+**Vaulting a card:** Each domain card has a **Vault** toggle. When a card is vaulted (e.g. spent as part of a Reaction), click the toggle — the card collapses to show only its name with a `[VAULT]` label. This is a visual reminder that the card is unavailable until recovered. Click the toggle again to unvault it.
 
-### Improving Existing Character Sheets
+### Attack Rolls
 
-Before you submit work to the repository, please ensure that there is not already a sheet that covers the game you are intending to create a sheet for. If there is already one, fear not! Be bold and suggest some changes. 
+The attack roll button on the PC sheet rolls 1d20 + attack modifier against a targeted token. **You must have a target selected** (click the target reticle or hold Shift and click a token) before rolling — the roll card pulls the target's Difficulty and damage thresholds directly from their character sheet.
 
-In general, this should look something like this:
+The roll card shows:
+- Hope die and Fear die results
+- Total (with modifier)
+- Your damage roll
+- Target's Major and Severe thresholds
 
-* Fork the repository. 
-* Make your changes to the sheet in question.
-* Make the Pull Request.
-* Invite previous contributors to review your changes.
-* Once everyone is satisfied with the changes, we can merge the changes into the existing sheet.
+The GM compares the total to the target's **Difficulty** to determine hit/miss, then compares damage to thresholds.
 
- We have learned from experience that it is better to have a single sheet that is contributed to by a number of people, rather than perpetuating the cycle of a contributing a sheet, losing interest, moving on, and then the next contributor creating an entirely new sheet. This is a collaborative community, please feel empowered to collaborate!
+---
 
-[Beginner's Guide to GitHub](https://wiki.roll20.net/Github) - for Roll20 character sheets
+## Adversary Sheet
 
-### Starting a New Character Sheet
+Fill in the adversary's stat block fields (Tier, Type, Difficulty, Thresholds, HP, Stress, Experiences, Motives & Tactics, attack name, range, modifier, damage, damage type, and up to 10 feature slots).
 
-If you have a burning desire to start from scratch, and there isn't already an existing sheet for a game or system, then it's time to embark upon a voyage of discovery. ⛵ There is plenty of documentation available on the [Roll20 Help Center](https://help.roll20.net/hc/en-us/articles/360037773413) and on the [community wiki](https://wiki.roll20.net/Building_Character_Sheets), but here's a quick primer to get you started. 
+Feature slots each have a name, type (Action/Reaction/Passive), and text field. The token action macros reference these slots by number (F1–F10), so consistent slot usage across similar adversaries makes macro reuse easier.
 
-A character sheet, at a minimum requires four files in an appropriately named subfolder of the repo:
+### Adversary Attack Macros
 
-* **\<sheetname>.html** - This HTML file describes the structure and functionality of your character sheet. It might consist of [inputs to store user data](https://wiki.roll20.net/Building_Character_Sheets#Text_.26_Numbers), [buttons to make rolls](https://wiki.roll20.net/Button#Roll_Button) to the VTT, [repeating sections](https://wiki.roll20.net/Repeating_Sections) to store lists of information (like inventory items), or more advanced elements such as [roll templates](https://wiki.roll20.net/Building_Character_Sheets/Roll_Templates) or [sheet workers](https://wiki.roll20.net/Sheet_Worker_Scripts).
-* **\<sheetname>.css** - This CSS file is primarily responsible for adding styles to your character sheet. However, CSS can be very versatile and such is used for [much](https://wiki.roll20.net/CSS_Wizardry#Tabs), [much](https://wiki.roll20.net/CSS_Wizardry#Custom_Progress_Bar), [much](https://wiki.roll20.net/CSS_Wizardry#Clocks) more. 
-* **preview.(jpg/png/gif)** - This image file is what users will see as a preview, before selecting your sheet.
-* **sheet.json** - This JSON file includes metadata about the sheet, including the filenames for your sheet, your credit as author(s), and much more. It's integral to your sheet being implemented correctly that this format is followed. Please see [this document](https://wiki.roll20.net/Sheet.json) for more information.
+Adversary attacks use `@{target|...}` to pull the PC's Evasion and thresholds. **You must click a target token** before firing an attack macro — the macro will prompt for a target if none is selected.
 
-### Submission Guidelines
+The standard attack macro outputs:
+- Attacker name and target name
+- Target's current Evasion
+- d20 roll + attack modifier (with Normal / Advantage / Disadvantage prompt)
+- Damage roll and type
+- Target's Major and Severe thresholds
 
-All contributions to this repository must meet the minimum requirements outlined in [this article](https://help.roll20.net/hc/en-us/articles/360037773453). We additionally reccomend requesting approvals from a sheet's original author if you are submitting any large overhauls to actively-maintained sheets. This will speed up your approval process.
+**Note on minion adversaries:** Minions have no damage thresholds. Leave the threshold fields blank on their sheet — the roll card will display empty threshold fields, which is correct.
 
-If you are submitting a new sheet that is officially supported by the game's publisher, please ask that the publisher reach out to us at [licensing@roll20.net](mailto:licensing@roll20.net) to confirm they are aware of and supporting this sheet as an official sheet with their name attached, before submitting your PR.
+---
 
-### Release Cadence
+## Vehicle Sheet (PC Ships)
 
-Pull Requests are reviewed *at least* weekly by 00:00 UTC on Thursdays, although cadence is often more frequent. 
+The Vehicle tab is used for the **player characters' ship**. Enemy vehicles (Sovereignty fighters, fleet components, etc.) use the Adversary tab.
 
-Once a Pull Request has been merged, changes should be served on [Roll20.net](https://roll20.net) within approximately ten minutes. Contributors are encouraged to open a GitHub issue if their changes haven't appeared 24 hours after the Pull Request has been merged.
+### Vehicle Attack Workflow
 
-### Internationalization & Translations
+Vehicle attack macros read the **gunner PC's** trait score to calculate the attack modifier. The macro will first prompt you to select the gunner (the PC crewing that weapon station), then prompt for the enemy target.
 
-We use [Crowdin](https://crowdin.com/) to crowdsource and manage translations for various aspects of our site. 
+1. Trigger the vehicle attack macro.
+2. When prompted, select the **gunner PC's token** — the macro reads their trait/attack value from their sheet.
+3. When prompted, select the **enemy ship's token** as the target.
 
-Check out the Help Center articles and Community Wiki documentation below to learn about translations and to help us make Roll20 accessible in as many languages as possible!
+### Targeting Enemy Ships
 
-* [How to Become a Translation Volunteer](https://roll20.zendesk.com/hc/en-us/articles/360058423993-How-to-Become-a-Translation-Volunteer)
-* [How to Translate Content on Crowdin](https://roll20.zendesk.com/hc/en-us/articles/360057432414-How-to-Translate-Content-on-Crowdin)
-* [Roll20 Community Wiki](https://wiki.roll20.net/Character_Sheet_i18n)
+When a PC ship attacks an enemy ship, **the enemy ship must have its own Roll20 character sheet** (using the Adversary tab) with Difficulty set. The roll card pulls the target's Difficulty and thresholds.
 
-**Sheet translations submitted outside of Crowdin will not be accepted and/or will be overwritten by Crowdin.**
+If an enemy fleet has multiple system components (Bridge, Shield Generator, Reactor, etc.), each system should be set up as a separate character entry so it can be targeted independently and have its own HP tracked on its token.
 
-### Uploading Sheets
+---
 
-Ensure that you have installed [jq](https://jqlang.github.io/jq/download/) before running the following commands:
+## Companion Sheet (Bonded Subclass)
 
-```bash
-cd 5eShaped # Change this to your desired sheet directory
-cat sheet.json|  jq ". += {\"version\":\"$(date +%s)\"}" | tee sheet.json # This will bump the version field in sheet.json
-```
+The Bonded Scout subclass uses a companion character. The companion has its own character sheet using the **Companion tab** and its own token on the map.
 
-Commit the change to sheet.json, push your changes to one of the supported branches and watch CircleCI for the branch to which you pushed. The supported branches are:
+### Companion Attack Workflow
 
-- master
-- staging
+Companion attack macros read the **bonded PC's** trait score (Instinct, Presence, etc.) to calculate the attack modifier. The macro will first prompt you to select the bonded PC, then prompt for the enemy target.
 
-## License
+1. Trigger the companion attack macro.
+2. When prompted, select the **bonded PC's token** — the macro reads the relevant trait value from the PC's sheet.
+3. When prompted, select the **enemy token** as the target.
 
-All of the code (HTML/CSS) of the sheets in this repository is released under the MIT license (see [LICENSE](https://github.com/Roll20/roll20-character-sheets/blob/master/LICENSE) file for details). If you contribute a new sheet or help improve an existing sheet, you agree that your contribution is released under the MIT License as well.
+The companion's attack stat block and the bonded PC's trait are both required to produce the correct roll.
 
-## Contact
+---
 
-For urgent concerns, problems, or hotfixes, please submit a ticket at [https://roll20.net/help](https://roll20.net/help)
+## Attribution
+
+This product includes materials from the Daggerheart System Reference Document 1.0, © Critical Role, LLC, under the terms of the Darrington Press Community Gaming License (DPCGL). More information can be found at [daggerheart.com](https://www.daggerheart.com). There are no previous modifications by others.
+
+**Author:** Richard McNutt
