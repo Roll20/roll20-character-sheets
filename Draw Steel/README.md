@@ -134,3 +134,6 @@ Importing monsters this way will also import their group's Malice abilities.
 ---
 ## Version History
  *To be added*
+ 
+## Third-Party Assets
+- **"Dice 10" icon** by **Skoll**, from Game-icons.net. Licensed under the Creative Commons Attribution 3.0 Unported (CC BY 3.0) License. No changes were made. Source: https://game-icons.net/1x1/skoll/d10.html. License: https://creativecommons.org/licenses/by/3.0/
