@@ -4302,7 +4302,8 @@
  spellbuttonlist.forEach(level => {
   bindToggle(`spell${level}minimize`, `spell_${level}_minimize_toggle`);
   bindToggle(`repeating_spells-${level}:spell${level}minimize`, `repeating_spells-${level}_spell_${level}_minimize_toggle`);
-  bindToggle(`repeating_spells-${level}:spell${level}minimizeadvanced`, `repeating_spells-${level}_spell_${level}_minimize_advanced_toggle`);
+  bindToggle(`repeating_spells-${level}:spell${level}minimizeadvanced`,
+          `repeating_spells-${level}_spell_${level}_minimize_advanced_toggle`);
  });
 
  bindToggle("repeating_abilities:minabilitytog", "repeating_abilities_minimize_ability");
@@ -7086,6 +7087,64 @@
  //  });
  // })
  // </editor-fold>
+
+// <editor-fold desc="Temporary Compatibility"
+
+ const LEGACY_MACRO_ALIASES = {
+  str_mod: "strmod",
+  dex_mod: "dexmod",
+  con_mod: "conmod",
+  int_mod: "intmod",
+  wis_mod: "wismod",
+  cha_mod: "chamod",
+
+  magic_touch_attack: "MagicTouchAttack",
+  focus_ench: "FocusEnch",
+  spell_prof: "SpellProf",
+
+  close_range: "CloseRange",
+  medium_range: "MediumRange",
+  long_range: "LongRange"
+ };
+
+ const update_legacy_macro_aliases = function(callback) {
+  const new_attrs = Object.keys(LEGACY_MACRO_ALIASES);
+  const old_attrs = Object.values(LEGACY_MACRO_ALIASES);
+
+  getAttrs(new_attrs.concat(old_attrs), function(values) {
+   const attrs_to_set = {};
+
+   new_attrs.forEach(new_attr => {
+    const old_attr = LEGACY_MACRO_ALIASES[new_attr];
+    const new_value = values[new_attr];
+
+    if(new_value === undefined || new_value === null) return;
+
+    if(values[old_attr] !== new_value) {
+     attrs_to_set[old_attr] = new_value;
+    }
+   });
+
+   if(Object.keys(attrs_to_set).length > 0) {
+    setAttrs(attrs_to_set, { silent: true }, callback);
+    return;
+   }
+
+   if(typeof callback === "function") callback();
+  });
+ };
+
+ on(
+         "sheet:opened " +
+         "change:str_mod change:dex_mod change:con_mod change:int_mod change:wis_mod change:cha_mod " +
+         "change:magic_touch_attack change:focus_ench change:spell_prof " +
+         "change:close_range change:medium_range change:long_range",
+         function() {
+          update_legacy_macro_aliases();
+         }
+ );
+
+ //</editor-fold>
 
  // <editor-fold desc="attr migration staging">
  const CURRENT_SHEET_VERSION = 6;
