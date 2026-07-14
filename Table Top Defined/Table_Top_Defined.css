@@ -48,7 +48,7 @@
 }
 
 .sheet-rolltemplate-custom .sheet-container {
-    border: 0px solid;
+    border: 0 solid;
     /* by default, the border is the same color as the header. You can change this here, e.g. to black */
     border-color: var(--header-bg-color);
     width: fit-content;
@@ -75,6 +75,16 @@
     padding-bottom: 5px;
 }
 
+.sheet-rolltemplate-custom .sheet-title::after {
+    content: "꧁✧━━━━━━❖━━━━━━✧꧂";
+    display: block;
+    font-size: 14px;
+    line-height: 1;
+    margin-top: 2px;
+    opacity: 0.75;
+    letter-spacing: -1px;
+}
+
 .sheet-rolltemplate-custom .sheet-title a:link{
     color: #DDDDDD;
     text-decoration: underline;
@@ -90,15 +100,43 @@
 }
 
 .sheet-rolltemplate-custom .sheet-subtitle {
-    display: block;
     width: 100%;
     box-sizing: border-box;
     background-color: #323232;
-    font-size:1.1em;
+    font-size: 1.1em;
     font-style: italic;
     text-align: center;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: end;
+    column-gap: 8px;
+    padding: 5px 8px;
+    min-height: 26px;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.sheet-rolltemplate-custom .sheet-subtitle::before,
+.sheet-rolltemplate-custom .sheet-subtitle::after {
+    content: "━━❖✧";
+    font-family: "Noto Sans Symbols 2", "Noto Sans Symbols", "Segoe UI Symbol", "DejaVu Sans", serif;
+    font-size: 10px;
+    font-style: normal;
+    opacity: 0.7;
+    letter-spacing: -1px;
+    white-space: nowrap;
+    align-self: end;
+}
+
+.sheet-rolltemplate-custom .sheet-subtitle::before {
+    grid-column: 1;
+    direction: rtl;
+    unicode-bidi: bidi-override;
+}
+
+.sheet-rolltemplate-custom .sheet-subtitle::after {
+    grid-column: 3;
+    direction: ltr;
 }
 
 .sheet-rolltemplate-custom .sheet-container {
@@ -204,8 +242,9 @@
 /*</editor-fold>*/
 
 /*<editor-fold desc="Tab Buttons"*/
-/*Configure the tab buttons*/
+/* Configure the tab buttons */
 .charsheet .sheet-main,
+.charsheet .sheet-bio,
 .charsheet .sheet-skills,
 .charsheet .sheet-gear,
 .charsheet .sheet-definitions,
@@ -213,13 +252,15 @@
 .charsheet .sheet-spells,
 .charsheet .sheet-accessories,
 .charsheet .sheet-inventory,
-.charsheet .sheet-profitloss{
+.charsheet .sheet-profitloss,
+.charsheet .sheet-settings{
     display: none;
     text-align: center;
 }
 
 /* show the selected tab */
 .charsheet .sheet-tabstoggle[value="main"] ~ div.sheet-main,
+.charsheet .sheet-tabstoggle[value="bio"] ~ div.sheet-bio,
 .charsheet .sheet-tabstoggle[value="skills"] ~ div.sheet-skills,
 .charsheet .sheet-tabstoggle[value="definitions"] ~ div.sheet-definitions,
 .charsheet .sheet-tabstoggle[value="gear"] ~ div.sheet-gear,
@@ -227,24 +268,44 @@
 .charsheet .sheet-tabstoggle[value="spells"] ~ div.sheet-spells,
 .charsheet .sheet-tabstoggle[value="accessories"] ~ div.sheet-accessories,
 .charsheet .sheet-tabstoggle[value="inventory"] ~ div.sheet-inventory,
-.charsheet .sheet-tabstoggle[value="profitloss"] ~ div.sheet-profitloss{
+.charsheet .sheet-tabstoggle[value="profitloss"] ~ div.sheet-profitloss,
+.charsheet .sheet-tabstoggle[value="settings"] ~ div.sheet-settings {
     display: grid;
     width: 800px;
+    z-index: 2;
+}
+
+.ui-dialog .charsheet .SAbutton {
+    position: relative;
+    width: 800px;
+    text-align: left !important;
+    padding-left: 10px;
+    padding-top: 4px;
+    white-space: nowrap;
+    margin-bottom: -1px;
 }
 
 .ui-dialog .charsheet .SAbutton button{
+    position: relative;
+    z-index: 1;
     background-color: #ffffff;
     color: #000000;
-    padding: 0 4px 0 4px;
-    margin: 0 1px 0 1px;
+    padding: 0 8px 0 8px;
+    margin: 0 -6px 0 0;
     font-weight: bold;
     border: solid 1px black;
     border-radius: 5px 5px 0 0;
-    border-bottom: 0;
+    border-bottom: 1px #323232 solid;
+    transform: skewX(-8deg);
+    transform-origin: bottom left;
     transition-duration: 0.1s;
+    border-bottom: 1px solid #323232;
+    background-image: none;
+    box-shadow: none;
 }
 
 .ui-dialog .charsheet .SAbutton button:hover{
+    z-index: 2;
     background-color: #323232;
     color: #FFFFFF;
 }
@@ -252,10 +313,35 @@
 .ui-dialog .charsheet .SAbutton button:active{
     background-color: #000000;
     color: #db1c1c;
-    box-shadow: 0 0px;
+    box-shadow: 0 0;
+}
+
+.ui-dialog .charsheet .SAbutton button::after{
+    content: "";
+    position: absolute;
+    right: -7px;
+    top: -1px;
+    bottom: 0;
+    width: 12px;
+    height: auto;
+
+    background-color: inherit;
+    background-image: none;
+
+    border-top: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 0;
+    border-left: 0;
+
+    border-radius: 0 12px 0 0;
+    box-sizing: border-box;
+    z-index: 0;
+    pointer-events: none;
+    box-shadow: none;
 }
 
 .ui-dialog .charsheet .sheet-tabstoggle[value="main"] ~ .SAbutton .sheet-tab-button-main,
+.ui-dialog .charsheet .sheet-tabstoggle[value="bio"] ~ .SAbutton .sheet-tab-button-bio,
 .ui-dialog .charsheet .sheet-tabstoggle[value="definitions"] ~ .SAbutton .sheet-tab-button-definitions,
 .ui-dialog .charsheet .sheet-tabstoggle[value="abilities"] ~ .SAbutton .sheet-tab-button-abilities,
 .ui-dialog .charsheet .sheet-tabstoggle[value="spells"] ~ .SAbutton .sheet-tab-button-spells,
@@ -263,9 +349,12 @@
 .ui-dialog .charsheet .sheet-tabstoggle[value="gear"] ~ .SAbutton .sheet-tab-button-gear,
 .ui-dialog .charsheet .sheet-tabstoggle[value="accessories"] ~ .SAbutton .sheet-tab-button-accessories,
 .ui-dialog .charsheet .sheet-tabstoggle[value="inventory"] ~ .SAbutton .sheet-tab-button-inventory,
-.ui-dialog .charsheet .sheet-tabstoggle[value="profitloss"] ~ .SAbutton .sheet-tab-button-profitloss {
+.ui-dialog .charsheet .sheet-tabstoggle[value="profitloss"] ~ .SAbutton .sheet-tab-button-profitloss,
+.ui-dialog .charsheet .sheet-tabstoggle[value="settings"] ~ .SAbutton .sheet-tab-button-settings{
     background-color: #323232;
     color: #FFFFFF;
+    position: relative;
+    z-index: 3;
 }
 
 /*</editor-fold>*/
@@ -351,6 +440,7 @@
     text-align: center;
     border-radius: 10px 10px 0 0;
     width: 100%;
+    overflow: hidden;
 }
 
 .row-footer{
@@ -541,6 +631,68 @@
     grid-auto-rows: auto;
 }
 
+/* Roll20 generated repeating-section controls: +Add / Modify */
+.ui-dialog .charsheet .repcontrol {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 4px 0 8px 0;
+    padding: 2px 0;
+}
+
+.ui-dialog .charsheet .repcontrol button {
+    width: auto;
+    min-width: 16px;
+    height: 18px;
+    padding: 0 8px;
+    margin: 0;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: #F0F0F0;
+    background-image: none;
+    color: #000000;
+    box-shadow: 0 2px #505050;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 16px;
+    text-align: center;
+    text-shadow: none;
+    transition-duration: 0.2s;
+}
+
+.ui-dialog .charsheet .repcontrol button:hover {
+    background-color: #323232;
+    color: #FFFFFF;
+}
+
+.ui-dialog .charsheet .repcontrol button:active {
+    background-color: #000000;
+    color: #db1c1c;
+    box-shadow: 0 0;
+    transform: translateY(2px);
+}
+
+/* Replace Roll20's generated button text */
+.ui-dialog .charsheet .repcontrol .repcontrol_add,
+.ui-dialog .charsheet .repcontrol .repcontrol_edit {
+    font-size: 0;
+}
+
+.ui-dialog .charsheet .repcontrol .repcontrol_add::after {
+    content: "+";
+    font-size: 11px;
+}
+
+.ui-dialog .charsheet .repcontrol .repcontrol_edit::after {
+    content: "Move/Delete";
+    font-size: 11px;
+}
+
+.ui-dialog .charsheet .repcontainer.editmode + .repcontrol .repcontrol_edit::after {
+    content: "End";
+    font-size: 11px;
+}
+
 /*End General Grid -- End*/
 
 /*General Columns*/
@@ -635,6 +787,8 @@
     background-color: #000000;
     padding-bottom: 18px;
     border-radius: 12px;
+    overflow: hidden;
+    z-index: 5;
 }
 
 .main-full{grid-column: 1/-1;}
@@ -697,15 +851,30 @@
 
 /* Main Attribute Block Styles*/
 
-.sheet-main textarea{
+.ui-dialog .charsheet .sheet-main .main-right {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+}
+
+.ui-dialog .charsheet .sheet-main .main-notes-body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.ui-dialog .charsheet .sheet-main .main-notes-body textarea {
+    flex: 1 1 auto;
+    min-height: 120px;
+    width: auto;
+    box-sizing: border-box;
     vertical-align: top;
     text-align: left;
-    height: 232px;
-    width: 97%;
     border: 0;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
     resize: none;
-    margin: 3px 0 0;
+    margin: 3px 3px -10px 3px;
     padding: 3px;
 }
 
@@ -718,11 +887,12 @@
     border: 1px #323232;
 }
 
-.attribute-block-title{
+.attribute-block-title {
     grid-column: 1/9;
     background-color: #000000;
 }
 #name {grid-column: 1;}
+
 #base {
     grid-column:2;
     background-color: #FFFFFF;
@@ -739,8 +909,11 @@
     grid-column: 5;
     background-color: #FFFFFF;
 }
+
 #total { grid-column: 6;}
+
 #modifier {grid-column: 7;}
+
 #check  {grid-column: 8;}
 
 #name  > div,
@@ -750,16 +923,34 @@
 #penalty  > div,
 #total  > div,
 #modifier  > div,
-#check > div{
+#check > div {
     padding-bottom: 3px;
     padding-right: 1px;
     height: 18px;
 }
 
-#check > div{
+#check > div {
     background-color: #000000;
 }
 
+
+.ui-dialog .charsheet .attribute-block input[type=text]{
+    height: 18px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 2px;
+    border: 1px solid #909090;
+    background-color: #FFFFFF;
+    color: #000000;
+    text-align: center;
+}
+
+.ui-dialog .charsheet .attribute-block input[type=text][readonly]{
+    background-color: #5A5A5A;
+    color: #FFFFFF;
+    text-align: center;
+    font-weight: bold;
+}
 
 .ui-dialog .charsheet .attribute-block button[type=roll],
 .ui-dialog .charsheet .attribute-block button[type=compendium]{
@@ -870,6 +1061,258 @@
 
 /* End HP and Armor Block Styles -- End*/
 
+.ui-dialog .charsheet .conditions-effects-block .conditions-subheader{
+    color: #FFFFFF;
+    font-weight: bold;
+    padding: 2px;
+}
+
+.ui-dialog .charsheet .conditions-effects-block .condition-select{
+    width: 84px;
+}
+
+.ui-dialog .charsheet .conditions-effects-block .condition-duration-input{
+    height: 18px;
+    width: 60px;
+    padding: 0;
+    text-align: center;
+}
+
+.ui-dialog .charsheet .conditions-effects-block .condition-effect-display{
+    background-color: #323232;
+    border-radius: 5px;
+    padding: 1px;
+    margin: 4px;
+    color: #FFFFFF;
+}
+
+.ui-dialog .charsheet .sheet-main .temporary-effects-strip {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+.ui-dialog .charsheet .sheet-main .temporary-effects-strip label {
+    width: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* Vitals and Resistances */
+
+.vitals-resistances-block{
+    width: 400px;
+    display: grid;
+    grid-template-columns: 1fr;
+    background-color: #000000;
+    align-self: start;
+}
+
+.vitals-resistances-content{
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    box-sizing: border-box;
+    width: 400px;
+    padding: 4px;
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+.vitals-rest-row,
+.vitals-death-save-row{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 22px;
+    font-weight: bold;
+}
+
+.ui-dialog .charsheet .sheet-main .main-right .vitals-death-save-row{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+}
+
+.ui-dialog .charsheet .sheet-main .main-right .vitals-death-save-row span{
+    font-size: medium;
+    line-height: 18px;
+}
+
+.ui-dialog .charsheet .sheet-main .main-right .vitals-death-save-row label{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    font-weight: bold;
+    font-size: small;
+    width: auto;
+    height: 18px;
+    line-height: 18px;
+    margin: 0;
+    padding: 0;
+}
+
+
+.ui-dialog .charsheet .sheet-main .main-right .vitals-death-save-row input.death-save-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    background: #FFFFFF;
+    cursor: pointer;
+    position: relative;
+    vertical-align: middle;
+}
+
+.ui-dialog .charsheet .sheet-main .main-right .vitals-death-save-row input.death-save-checkbox:checked {
+    background: #000000;
+    border-color: #000000;
+}
+
+.ui-dialog .charsheet .sheet-main .main-right .vitals-death-save-row input.death-save-checkbox:checked::after {
+    content: "☠";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -52%);
+    color: #FFFFFF;
+    font-size: 18px;
+    line-height: 1;
+}
+
+.ui-dialog .charsheet .vitals-rest-button,
+.ui-dialog .charsheet .vitals-death-save-button{
+    width: 42px;
+    height: 18px;
+    padding: 0 4px;
+}
+
+.vitals-repeat-columns{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    align-items: start;
+}
+
+.vitals-repeat-section{
+    min-width: 0;
+    background-color: #000000;
+    border: 0;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+}
+
+.vitals-subheader{
+    background-color: #323232;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size: 12px;
+    text-align: center;
+    min-height: 18px;
+    line-height: 18px;
+    border: 0;
+    overflow: hidden;
+}
+
+.damage-reduction-row,
+.resistance-row{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 22px;
+    padding: 2px;
+    box-sizing: border-box;
+}
+
+.ui-dialog .charsheet .damage-reduction-row input[type=number],
+.ui-dialog .charsheet .resistance-row input[type=number],
+.ui-dialog .charsheet input.vitals-small-number[type=number]{
+    width: 34px;
+    height: 18px;
+    padding: 0;
+}
+
+.ui-dialog .charsheet .vitals-bypass-input[type=text]{
+    width: 104px;
+    height: 18px;
+    padding: 0 2px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.ui-dialog .charsheet .vitals-element-select{
+    width: 112px;
+    height: 18px;
+    padding: 0;
+    margin: 0;
+    font-size: 11px;
+    text-align: center;
+}
+
+.ui-dialog .charsheet .vitals-repeat-section .repcontrol{
+    margin: 2px 0 4px 0;
+}
+
+.ui-dialog .charsheet .vitals-repeat-section .repcontrol button{
+    height: 16px;
+    padding: 0 5px;
+    line-height: 14px;
+}
+
+/*</editor-fold>*/
+
+/*<editor-fold desc="Bio Tab">*/
+.ui-dialog .charsheet .sheet-bio .bio-text-box {
+    width: 1fr;
+}
+
+.ui-dialog .charsheet .sheet-bio .main-bio-right,
+.ui-dialog .charsheet .sheet-bio .main-bio-left{
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.ui-dialog .charsheet .sheet-bio .main-bio-right{
+    border-top: 0;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    border-left: 0;
+}
+.ui-dialog .charsheet .sheet-bio .main-bio-left{
+    border-top: 0;
+    border-right: 0;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+}
+
+.ui-dialog .charsheet .sheet-bio .main-bio-right textarea,
+.ui-dialog .charsheet .sheet-bio .main-bio-left textarea {
+    flex: 1 1 auto;
+    background: #F0F0F0;
+    min-height: 120px;
+    width: 97%;
+    box-sizing: border-box;
+    vertical-align: top;
+    text-align: left;
+    border: 1px solid #323232;
+    border-radius: 5px;
+    resize: vertical;
+    margin: 6px 6px 6px 6px;
+    padding: 3px;
+}
+
 /*</editor-fold>*/
 
 /*<editor-fold desc="Definitions and Traits"*/
@@ -912,9 +1355,77 @@
     display: none;
 }
 
+.sheet-definitions .definition-flag{
+    background-color: #000000;
+    color: #FFFFFF;
+    font-weight: bold;
+    text-align: center;
+    padding: 2px;
+}
+
 /*</editor-fold>*/
 
 /*<editor-fold desc="Abilities/Feats"*/
+
+.sheet-abilities .ability-title-row,
+.sheet-abilities .feat-title-row{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    flex-wrap: nowrap;
+    padding: 0 2px 0 2px;
+    width: auto;
+    overflow: hidden;
+}
+
+.sheet-abilities .ability-title-row .Ability-name,
+.sheet-abilities .feat-title-row .feat-name{
+    flex: 1 1 auto;
+    min-width: 80px;
+}
+
+.sheet-abilities .grant-meta{
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: normal;
+    color: #FFFFFF;
+}
+
+.ui-dialog .charsheet .sheet-abilities .grant-level-input[type=number]{
+    width: 28px;
+    height: 14px;
+    padding: 0;
+    font-size: 10px;
+    text-align: center;
+}
+
+.ui-dialog .charsheet .sheet-abilities .grant-source-input[type=text]{
+    width: 116px;
+    height: 14px;
+    padding: 0;
+    font-size: 10px;
+    text-align: center;
+}
+
+.sheet-abilities .grant-available[value="0"] ~ .Ability-name,
+.sheet-abilities .grant-available[value="0"] ~ .feat-name{
+    color: #db1c1c !important;
+}
+
+.sheet-abilities .grant-hidden[value="1"] ~ .grant-row{
+    display: none !important;
+}
+
+.ui-dialog .charsheet .sheet-abilities .grant-level-input[readonly],
+.ui-dialog .charsheet .sheet-abilities .grant-source-input[readonly]{
+    background-color: #5A5A5A;
+    color: #FFFFFF;
+    font-weight: bold;
+}
 
 .sheet-abilities{
     width: 800px;
@@ -944,8 +1455,42 @@
     color: #FFFFFF;
     text-align: center;
     font-weight: bold;
-    border: 0;
     font-size: medium;
+    border: 0;
+}
+
+.ui-dialog .charsheet .sheet-abilities .feat-name{
+    background-color: inherit;
+    color: inherit;
+    border: none;
+    width: 100%;
+    height: 16px;
+    font-size: 14px;
+    margin: 2px 0 0 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+.ui-dialog .charsheet .sheet-abilities .feat-name input{
+    background-color: #000000;
+    color: #FFFFFF;
+    text-align: center;
+    margin: 2px 0 0 0;
+    font-size: small;
+}
+
+.ui-dialog .charsheet .sheet-abilities .ability-title-row button[type="roll"] {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.ui-dialog .charsheet .sheet-abilities .ability-title-row button[type="roll"]::before {
+    content: "t";
+    font-family: dicefontd20, serif;
+    font-size: 14px;
+    line-height: 16px;
+    text-align: center;
 }
 
 .charsheet .sheet-abilities .ability_description{
@@ -965,15 +1510,26 @@
     color: #000000;
 }
 
-.sheet-abilities .ggrid .grr4.ggridc .ability-toggle[value="1"] ~ div.ability_description.ggrid{
+/* Abilities / Feats column split */
+.sheet-abilities .grr4.ggridc {
+    grid-template-columns: 1fr 1fr;
+}
+
+.sheet-abilities .grr4.ggridc > .grc1,
+.sheet-abilities .grr4.ggridc > .grc2 {
+    min-width: 0;
+}
+
+.sheet-abilities .ggrid .grr4.ggridc .ability-toggle[value="0"] ~ div.ability_description.ggrid{
     display: none;
 }
 
-.sheet-abilities .ggrid .grr4.ggridc .feats-toggle[value="1"] ~ div.feats_description{
+.sheet-abilities .ggrid .grr4.ggridc .feats-toggle[value="0"] ~ div.feats_description{
     display: none;
 }
 
-.ui-dialog .charsheet .sheet-abilities .resourceName{
+.ui-dialog .charsheet .sheet-abilities .resourceName,
+.ui-dialog .charsheet .sheet-abilities .resource_name {
     width: 96%;
     background-color: #000000;
     color: #FFFFFF;
@@ -1500,7 +2056,7 @@ input.sptoggle[value="1"] ~ .sheet-repeating-fields{
 .ui-dialog .charsheet .SkillsPage input::-webkit-inner-spin-button {
     display: none;
     -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    margin: 0; /* <-- Apparently some margins are still there even though they're hidden */
 }
 
 .ui-dialog .charsheet .SkillsPage input[readonly]{
@@ -1568,9 +2124,10 @@ input.sptoggle[value="1"] ~ .sheet-repeating-fields{
     color: #FFFFFF;
     text-align: center;
     font-weight: bold;
-    font-size: medium;
+    font-size: small;
     border: 0;
     padding: 3px;
+    width: 350px;
 }
 
 .weapon-column-span{
@@ -1597,6 +2154,7 @@ input.sptoggle[value="1"] ~ .sheet-repeating-fields{
     display: none;
 }
 
+
 .ui-dialog .charsheet .advancedAttackButton button[type="roll"]::before{
     content: none;
 }
@@ -1606,12 +2164,14 @@ input.sptoggle[value="1"] ~ .sheet-repeating-fields{
     color: #000000;
     border: solid 1px black;
     border-radius: 5px;
+    font-size: small;
     transition-duration: 0.4s;
     box-shadow: 0 2px #909090;
-    margin: 1px 1px 6px 1px;
+    margin: 1px;
     padding: 1px;
     content: none;
     width: fit-content;
+    height: 16px;
 }
 
 .ui-dialog .charsheet .advancedAttackButton button:hover{
@@ -1622,7 +2182,7 @@ input.sptoggle[value="1"] ~ .sheet-repeating-fields{
 .ui-dialog .charsheet .advancedAttackButton button:active{
     background-color: #000000;
     color: #db1c1c;
-    box-shadow: 0 0px;
+    box-shadow: 0 0;
     transform: translateY(2px);
 }
 
@@ -1633,7 +2193,7 @@ input.sptoggle[value="1"] ~ .sheet-repeating-fields{
 /*</editor-fold>*/
 
 /*<editor-fold desc="P&L">*/
-.sheet-profitloss{
+.sheet-profitloss {
     width: 800px;
     border-radius: 12px;
     border: 1px solid;
@@ -1641,3 +2201,60 @@ input.sptoggle[value="1"] ~ .sheet-repeating-fields{
 }
 /*</editor-fold>*/
 
+/*<editor-fold desc="settings">*/
+.sheet-settings {
+    width: 800px;
+    border-radius: 12px;
+    border: 1px solid;
+    overflow: clip;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 800px;
+}
+
+.settings-left,
+.settings-right {
+    width: 400px;
+    box-sizing: border-box;
+}
+
+.settings-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    min-height: 24px;
+}
+
+.settings-left .settings-row:nth-child(even),
+.settings-right .settings-row:nth-child(even) {
+    background-color: #D0D0D0;
+}
+
+.settings-left .settings-row:nth-child(odd),
+.settings-right .settings-row:nth-child(odd) {
+    background-color: #FFFFFF;
+}
+
+.settings-label {
+    background-color: #000000;
+    color: #FFFFFF;
+    font-weight: bold;
+    text-align: right;
+    padding: 4px 8px 4px 4px;
+    min-height: 18px;
+}
+
+.settings-value {
+    background-color: #FFFFFF;
+    padding: 2px 6px;
+    text-align: left;
+}
+
+.settings-value input[type=number] {
+    background-color: #FFFFFF;
+    color: #000000;
+}
+/*</editor-fold>*/
