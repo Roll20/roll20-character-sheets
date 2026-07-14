@@ -1,11 +1,135 @@
 <script type="text/worker">
 
-async function log(entry)
+on ("clicked:undo", undo);
+
+async function undo(info)
+    {
+    var action = await getAttrsAsync(["undo_action", "undo_id"]);
+    
+    if (action.undo_action != "none" &&
+        action.undo_action != "sheet" &&
+        action.undo_action != "" &&
+        action.undo_action != "undone")
+        {
+        var sets = {};
+        var attributes = action.undo_action.split(";");
+        for (var i=0; i<attributes.length; i++)
+            {
+            var toSet = attributes[i].split(":");
+            sets[toSet[0]] = toSet[1];
+            }
+            
+        await setAttrsAsync(sets);
+        
+        var logIds = await getSectionIDsAsync("log");
+        var gets = [];
+        
+        for (var i=0; i<logIds.length; i++)
+            {
+            gets.push("repeating_log_" + logIds[i] + "_log_undo");
+            }
+            
+        var logs = await getAttrsAsync(gets);
+        sets = {"undo_prompt_hider": "1"};
+            
+        for (var i=logIds.length; i>-1; i--)
+            {
+            if (logs["repeating_log_" + logIds[i] + "_log_undo"] != "sheet")
+                {
+                sets["repeating_log_" + logIds[i] + "_log_undo"] = "undone";
+                if (logIds[i] == action.undo_id)
+                    {
+                    break;
+                    }
+                }
+            }
+            
+        await setAttrsAsync(sets);
+        setXP(null);
+        }
+    }
+
+on ("change:confirm_undo", showUndoConfirmButton);
+
+async function showUndoConfirmButton(info)
+    {
+    if (info.sourceType != "player")
+        {
+        return;
+        }
+        
+    if (info.newValue.toLowerCase() == "shut up and do it")
+        {
+        await setAttrsAsync({"undo_confirm_hider": "0"});
+        }
+        else
+        {
+        await setAttrsAsync({"undo_confirm_hider": "1"});
+        }
+    }
+
+on ("clicked:cancel_undo", cancelUndo);
+
+async function cancelUndo(info)
+    {
+    await setAttrsAsync({"undo_prompt_hider": "1"});
+    }
+
+on ("clicked:open_undo", openUndo);
+
+async function openUndo(info)
+    {
+    var logIds = await getSectionIDsAsync("log");
+    var gets = [];
+    
+    for (var i=0; i<logIds.length; i++)
+        {
+        gets.push("repeating_log_" + logIds[i] + "_log_undo");
+        gets.push("repeating_log_" + logIds[i] + "_log_entry");
+        }
+        
+    var logs = await getAttrsAsync(gets);
+    
+    var last = "";
+    var lastAction = "";
+    var lastId = "";
+    
+    for (var i=logIds.length - 1; i>-1; i--)
+        {
+        var action = logs["repeating_log_" + logIds[i] + "_log_undo"];
+        console.log(action);
+        if (action != "none" && action != "sheet" && action != "undone")
+            {
+            last = logs["repeating_log_" + logIds[i] + "_log_entry"];
+            lastAction = action;
+            lastId = logIds[i];
+            break;
+            }
+        }
+    
+    await setAttrsAsync({"undo_prompt_hider": "0",
+                         "undo_confirm_hider": "1",
+                         "confirm_undo": "",
+                         "last_log": last,
+                         "undo_action": lastAction,
+                         "undo_id": lastId});
+    }
+
+async function log(entry, undo)
     {
     var id = generateRowID();
     var d = new Date();
     var dateTime = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate() + " " + d.getHours() + ":" + d.getMinutes() + ": ";
-    await setAttrsAsync({["repeating_log_" + id + "_log_entry"]: dateTime + entry});
+    
+    var ids = await getSectionIDsAsync("log");
+    
+    var lastEntry = await getAttrsAsync(["repeating_log_" + ids[ids.length - 1] + "_log_entry"]);
+    
+    if (lastEntry["repeating_log_" + ids[ids.length - 1] + "_log_entry"] != dateTime + entry)
+        {
+        await setAttrsAsync({["repeating_log_" + id + "_log_entry"]: dateTime + entry,
+                             ["repeating_log_" + id + "_log_undo"]: undo});
+        }
     }
 
 var properties = ["skill_difficulty_offset", "attribute_cost", "max_attribute_points", "cc_skill_xp", "health_levels", "init", "spent_xp", "talent0", "talent1", "talent2", "territory_select", "talent3", "talent4", "str", "sta", "agi", "per", "int", "cha", "wil", "xp", "bridge_tech", "mounted_weaponry", "piloting", "vehicle_engineering", "driving", "knowledge_corporate", "knowledge_urban", "trade", "aim", "athletics", "endurance", "melee", "reaction", "throw", "notice", "lock_hacking", "search", "sleight_of_hand", "stealth", "astronomy", "computer_science", "medicine", "natural_sciences", "robotics", "weapons_engineering", "xenobiology", "argumentation", "deception", "empathy", "intimidation", "leadership", "character_name", "gender", "description", "territory", "profession", "social_class", "planet", "total_xp", "str_territory", "str_planet", "str_social", "str_profession", "str_xp", "str_cc", "sta_territory", "sta_planet", "sta_social", "sta_profession", "sta_xp", "sta_cc", "agi_territory", "agi_planet", "agi_social", "agi_profession", "agi_xp", "agi_cc", "per_territory", "per_planet", "per_social", "per_profession", "per_xp", "per_cc", "int_territory", "int_planet", "int_social", "int_profession", "int_xp", "int_cc", "cha_territory", "cha_planet", "cha_social", "cha_profession", "cha_xp", "cha_cc", "wil_territory", "wil_planet", "wil_social", "wil_profession", "wil_xp", "wil_cc", "bought_hp", "hp", "max_hp", "pain_modifier", "pain_from_damage", "pain", "equipped_armor_id", "equipped_armor_da", "equipped_armor_cmr", "equipped_armor_slow", "equipped_armor_hp", "equipped_armor_bonus_hp", "shield", "shield_type", "equipped_weapon1_id", "equipped_weapon1_melee", "equipped_weapon1", "equipped_weapon2_melee", "equipped_weapon2_id", "equipped_weapon2", "equipped_weapon3_melee", "equipped_weapon3_id", "equipped_weapon3", "init_mod", "ap", "gf", "max_gf", "carried_gear", "quick_attribute", "quick_skill", "bridge_tech_talent", "bridge_tech_XP", "bridge_tech_bonus", "bridge_tech_training_time", "bridge_tech_difficulty", "mounted_weaponry_talent", "mounted_weaponry_XP", "mounted_weaponry_bonus", "mounted_weaponry_training_time", "mounted_weaponry_difficulty", "piloting_talent", "piloting_XP", "piloting_bonus", "piloting_training_time", "piloting_difficulty", "vehicle_engineering_talent", "vehicle_engineering_XP", "vehicle_engineering_bonus", "vehicle_engineering_training_time", "vehicle_engineering_difficulty", "driving_talent", "driving_XP", "driving_bonus", "driving_training_time", "driving_difficulty", "knowledge_corporate_talent", "knowledge_corporate_XP", "knowledge_corporate_bonus", "knowledge_corporate_training_time", "knowledge_corporate_difficulty", "knowledge_urban_talent", "knowledge_urban_XP", "knowledge_urban_bonus", "knowledge_urban_training_time", "knowledge_urban_difficulty", "trade_talent", "trade_XP", "trade_bonus", "trade_training_time", "trade_difficulty", "aim_talent", "aim_XP", "aim_bonus", "aim_training_time", "aim_difficulty", "athletics_talent", "athletics_XP", "athletics_bonus", "athletics_training_time", "athletics_difficulty", "endurance_talent", "endurance_XP", "endurance_bonus", "endurance_training_time", "endurance_difficulty", "melee_talent", "melee_XP", "melee_bonus", "melee_training_time", "melee_difficulty", "reaction_talent", "reaction_XP", "reaction_bonus", "reaction_training_time", "reaction_difficulty", "throw_talent", "throw_XP", "throw_bonus", "throw_training_time", "throw_difficulty", "notice_talent", "notice_XP", "notice_bonus", "notice_training_time", "notice_difficulty", "lock_hacking_talent", "lock_hacking_XP", "lock_hacking_bonus", "lock_hacking_training_time", "lock_hacking_difficulty", "search_talent", "search_XP", "search_bonus", "search_training_time", "search_difficulty", "sleight_of_hand_talent", "sleight_of_hand_XP", "sleight_of_hand_bonus", "sleight_of_hand_training_time", "sleight_of_hand_difficulty", "stealth_talent", "stealth_XP", "stealth_bonus", "stealth_training_time", "stealth_difficulty", "astronomy_talent", "astronomy_XP", "astronomy_bonus", "astronomy_training_time", "astronomy_difficulty", "computer_science_talent", "computer_science_XP", "computer_science_bonus", "computer_science_training_time", "computer_science_difficulty", "medicine_talent", "medicine_XP", "medicine_bonus", "medicine_training_time", "medicine_difficulty", "natural_sciences_talent", "natural_sciences_XP", "natural_sciences_bonus", "natural_sciences_training_time", "natural_sciences_difficulty", "robotics_talent", "robotics_XP", "robotics_bonus", "robotics_training_time", "robotics_difficulty", "weapons_engineering_talent", "weapons_engineering_XP", "weapons_engineering_bonus", "weapons_engineering_training_time", "weapons_engineering_difficulty", "xenobiology_talent", "xenobiology_XP", "xenobiology_bonus", "xenobiology_training_time", "xenobiology_difficulty", "argumentation_talent", "argumentation_XP", "argumentation_bonus", "argumentation_training_time", "argumentation_difficulty", "deception_talent", "deception_XP", "deception_bonus", "deception_training_time", "deception_difficulty", "empathy_talent", "empathy_XP", "empathy_bonus", "empathy_training_time", "empathy_difficulty", "intimidation_talent", "intimidation_XP", "intimidation_bonus", "intimidation_training_time", "intimidation_difficulty", "leadership_talent", "leadership_XP", "leadership_bonus", "leadership_training_time", "leadership_difficulty", "art_talent", "art1_name", "art1_XP", "art1_bonus", "art1_training_time", "art1_difficulty", "art1", "art2_name", "art2_XP", "art2_bonus", "art2_training_time", "art2_difficulty", "art2", "hobby_talent", "hobby1_name_disabler", "hobby1_name", "hobby1_XP", "hobby1_bonus", "hobby1_training_time", "hobby1_difficulty", "hobby1", "hobby2_name", "hobby2_XP", "hobby2_bonus", "hobby2_training_time", "hobby2_difficulty", "hobby2", "language_talent", "language1_name_disabler", "language1_name", "language1_XP", "language1_bonus", "language1_training_time", "language1_difficulty", "language1", "language2_name_disabler", "language2_name", "language2_XP", "language2_bonus", "language2_training_time", "language2_difficulty", "language2", "language3_name", "language3_XP", "language3_bonus", "language3_training_time", "language3_difficulty", "language3", "language4_name", "language4_XP", "language4_bonus", "language4_training_time", "language4_difficulty", "language4", "profession_talent", "profession1_name", "profession1_XP", "profession1_bonus", "profession1_training_time", "profession1_difficulty", "profession1", "profession2_name", "profession2_XP", "profession2_bonus", "profession2_training_time", "profession2_difficulty", "profession2", "money", "other_gear", "jornual", "companions", "misc"];
@@ -925,18 +1049,29 @@ async function changeRepeatingXP(info)
             }
         }
         
+    if (!Object.hasOwn(info, "previousValue"))
+        {
+        info.previousValue = "0";
+        }
+        
+    var undo = info.sourceAttribute + ":" + info.previousValue + ";";
+    var values = await getAttrsAsync(["advantage_xp", "resource_xp", "background_xp"]);
+        
     switch (property)
         {
         case "advantages":
-            await log("Advantage xp changed from " + info.previousValue + " to " + info.newValue);
+            undo += "advantage_xp:" + values.advantage_xp;
+            await log("Advantage xp changed from " + info.previousValue + " to " + info.newValue, undo);
             await setAttrsAsync({"advantage_xp": "" + total});
         break;
         case "resources":
-            await log("Resource xp changed from " + info.previousValue + " to " + info.newValue);
+            undo += "resource_xp:" + values.resource_xp;
+            await log("Resource xp changed from " + info.previousValue + " to " + info.newValue, undo);
             await setAttrsAsync({"resource_xp": "" + total});
         break;
         case "backgrounds":
-            await log("Background xp changed from " + info.previousValue + " to " + info.newValue);
+            undo += "background_xp:" + values.background_xp;
+            await log("Background xp changed from " + info.previousValue + " to " + info.newValue, undo);
             await setAttrsAsync({"background_xp": "" + total});
         break;
         }
@@ -1896,7 +2031,7 @@ async function openCC2()
     console.log(xpInfo);
     
     var values = await getAttrsAsync(["planet_select"]);
-    var toChange = {"legacy_18_cc1_prompt_hider": 1,
+    var toChange = {"cc1_prompt_hider": 1,
 					 "cc2_prompt_hider": 0,
 					 "total_xp": xpInfo.ccSkillXp + 10,
 	                 "spent_xp": 0};
@@ -2389,8 +2524,7 @@ async function changeMoney(info)
     
     var money = Number(values["money"]);
     
-    await setAttrsAsync({"petty_cash": Math.floor(money/1000.0) + "",
-                         "resupply": Math.floor(money/50.0) + ""});
+    await setAttrsAsync({"petty_cash": Math.floor(money/1000.0) + ""});
     }
     
 async function getXPData()
@@ -2660,7 +2794,7 @@ async function buyHp()
 	
 	if (boughtHp < stamina && xp >= 50)
 		{
-		await log("Bought hp for 50 XP.");
+		await log("Bought hp for 50 XP.", "bought_hp:" + boughtHp);
 		await setAttrsAsync({"bought_hp": boughtHp + 1});
 		}
 	}
@@ -3169,23 +3303,7 @@ async function editSkill(info)
 				  			 "skill_talent": sInfo.talent});
 		}
 	
-	var raiseCost = Math.max(0, (sInfo.currentValue + 1) * (sInfo.difficulty - sInfo.talent) - sInfo.skillXp);
-		
-	if (sInfo.availableXP >= raiseCost && sInfo.currentValue < 10)
-		{
-		await setAttrsAsync({"hide_level_skill": 0,
-				  			 "skill_level_up_text": "Raise skill (cost: -" + raiseCost + "- XP)?"});
-		}
-		else if (sInfo.currentValue < 10)
-		{
-		await setAttrsAsync({"hide_level_skill": 1,
-				  			 "skill_level_up_text": "Cost to raise: -" + raiseCost + "- XP"});
-		}
-		else
-		{
-		await setAttrsAsync({"hide_level_skill": 1,
-				  			 "skill_level_up_text": "This skill is maxed out."});
-		}
+	await updateEditSkillPrompt(skillToRaise);
 		
 	await setAttrsAsync({"skill_prompt_hider": 0});
 		
@@ -3198,6 +3316,36 @@ async function editSkill(info)
 	    await setAttrsAsync({"hide_reduce_skill": 1});
 	    }*/
 	}
+	
+async function updateEditSkillPrompt(skillToRaise)
+    {
+    var sInfo = await getSkillInfo(skillToRaise);
+    var raiseCost = Math.max(0, (sInfo.currentValue + 1) * (sInfo.difficulty - sInfo.talent) - sInfo.skillXp);
+        
+    if (sInfo.availableXP >= raiseCost && sInfo.currentValue < 10)
+		{
+		if ((sInfo.skillXp > sInfo.currentValue - 5 || sInfo.trainingTime != "0"))
+		    {
+    		await setAttrsAsync({"hide_level_skill": 0,
+    				  			 "skill_level_up_text": "Raise skill (cost: " + raiseCost + "/" + sInfo.availableXP + " XP)?"});
+		    }
+		    else
+		    {
+		    await setAttrsAsync({"skill_level_up_text": "More skill XP needed to raise this skill.",
+	                                 "hide_level_skill": 1});
+		    }
+		}
+		else if (sInfo.currentValue < 10)
+		{
+		await setAttrsAsync({"hide_level_skill": 1,
+				  			 "skill_level_up_text": "Cost to raise: " + raiseCost + "/" + sInfo.availableXP + " XP"});
+		}
+		else
+		{
+		await setAttrsAsync({"hide_level_skill": 1,
+				  			 "skill_level_up_text": "This skill is maxed out."});
+		}
+    }
 	
 async function getSkillInfo(skillToRaise)
     {
@@ -3240,8 +3388,6 @@ async function getSkillInfo(skillToRaise)
 		
 	info.skillName = await skillToName(skillToRaise);
 	
-	console.log(info);
-	
 	return info;
     }
 	
@@ -3265,9 +3411,13 @@ async function raiseSkill(info)
 	
 	console.log(totalCost + " vs " + raiseCost);
 
-    if (raiseCost <= sInfo.availableXP && sInfo.currentValue < 10)
+    if (raiseCost <= sInfo.availableXP && sInfo.currentValue < 10 && (sInfo.skillXp > sInfo.currentValue - 5 || sInfo.trainingTime != "0"))
         {
-        await log("Raised " + skillToName(skillToRaise) + " by 1 for " + totalCost + " XP.");
+        var undo = "spent_xp:" + values.spent_xp + ";";
+        undo += skillToRaise + "_XP:" + sInfo.skillXp + ";";
+        undo += skillToRaise + ":" + sInfo.currentValue + ";";
+        undo += skillToRaise + "_bonus:" + sInfo.bonus;
+        await log("Raised " + await skillToName(skillToRaise) + " by 1 for " + totalCost + " XP.", undo);
 	    await setAttrsAsync({"spent_xp": parseInt(values.spent_xp) + raiseCost,
 			  			 [skillToRaise + "_XP"]: "" + Math.max(0, (sInfo.skillXp - totalCost)),
 			  			 "skill_xp": "" + Math.max(0, (sInfo.skillXp - totalCost)),
@@ -3275,21 +3425,9 @@ async function raiseSkill(info)
 	                     [skillToRaise + "_bonus"]: (sInfo.bonus + 1) + "",
 	                     "skill_prompt_title": sInfo.skillName + " -" + (sInfo.currentValue + 1) + "-"});
 	                     
-	    var nextRaiseCost = (sInfo.currentValue + 2) * (sInfo.difficulty - sInfo.talent) - Math.max(0, (sInfo.skillXp - totalCost));
-	    if (sInfo.availableXP - nextRaiseCost > 0 && sInfo.currentValue < 9)
-	        {
-	        await setAttrsAsync({"skill_level_up_text": "Raise skill (cost: -" + Math.max(0, nextRaiseCost) + "- XP)?"});
-	        }
-	        else if (sInfo.currentValue < 9)
-	        {
-	        await setAttrsAsync({"skill_level_up_text": "Cost to raise: -" + Math.max(0, nextRaiseCost) + "- XP",
-	                             "hide_level_skill": 1});
-	        }
-	        else
-	        {
-	        await setAttrsAsync({"skill_level_up_text": "This skill is maxed out.",
-	                             "hide_level_skill": 1});
-	        }
+	    setXP(null);
+	    
+	    await updateEditSkillPrompt(skillToRaise);
         }
 	}
 	
@@ -3301,30 +3439,25 @@ async function setSkillText(info)
         {
         if (await sanitizeNumberInput(info, false))
             {
+            console.log("Invalid input.");
             return;
             }
+            
         var skillToRaise = (await getAttrsAsync(["skill_to_change"])).skill_to_change;
-        var values = await getAttrsAsync(["spent_xp"]);
-	
-	    var sInfo = await getSkillInfo(skillToRaise);
-	
-	    var totalCost = (sInfo.currentValue + 1) * (sInfo.difficulty - sInfo.talent);
-	    var raiseCost = Math.max(totalCost - Number(info.newValue), 0);
+        
+        if (!Object.hasOwn(info, "previousValue"))
+            {
+            info.previousValue = "0";
+            }
+        
+        console.log("SET SKILL TEXT INFO");
+        console.log(info);
+        
+        await log("Gained " + (Number(info.newValue) - Number(info.previousValue)) + " XP in " + await skillToName(skillToRaise), skillToRaise + "_XP:" + info.previousValue);
+        
+        await setAttrsAsync({[skillToRaise + "_XP"]: "" + info.newValue});
 	    
-	    //console.log(currentValue + "-" + talent + "-" + difficulty + "-" + availableXP + "-" + bonus);
-	    
-	    if (sInfo.availableXP - raiseCost > 0)
-	        {
-	        await setAttrsAsync({"skill_level_up_text": "Raise skill (cost: -" + raiseCost + "- XP)?",
-	                             [skillToRaise + "_XP"]: info.newValue,
-	                             "hide_level_skill": "0"});
-	        }
-	        else
-	        {
-	        await setAttrsAsync({"skill_level_up_text": "Cost to raise: -" + raiseCost + "- XP",
-	                             [skillToRaise + "_XP"]: info.newValue,
-	                             "hide_level_skill": "1"});
-	        }
+	    await updateEditSkillPrompt(skillToRaise);
         }
     }
 
@@ -3485,7 +3618,7 @@ async function acceptAttributePrompt()
     
     var name = await attributeToName(attrToRaise);
 	
-	await log(name + ":  raised by 1 for " + ((currentValue + 1) * xpInfo.attrCost) + " XP.");
+	await log(name + ":  raised by 1 for " + ((currentValue + 1) * xpInfo.attrCost) + " XP.", attrToRaise + ":" + currentValue);
 	
 	await setAttrsAsync({"attribute_prompt_hider": 1,
 						 [attrToRaise]: (currentValue + 1),
@@ -4122,7 +4255,7 @@ async function hpBought()
 
 async function init()
 	{
-	await log("Sheet opened.");
+	await log("Sheet opened.", "sheet");
 	var values = await getAttrsAsync(["cc1_prompt_hider", "cc2_prompt_hider", "cc0_prompt_hider", "total_xp", "talent_select_prompt_hider", "json_import_prompt_hider", "npc", "pilot_aircraft", "pilot_areal_vehicle", "pilot", "pilot_spacecraft", "intimidate", "convince", "deceive", "lead", "sneak", "hack_security", "hack_locks", "drive_ground_vehicle", "piloting_difficulty", "intimidation_difficulty", "argumentation_difficulty", "deception_difficulty", "leadership_difficulty", "stealth_difficulty", "lock_hacking_difficulty", "driving_difficulty", "skill_difficulty_offset"]);
 	if (values.total_xp == "50" && values.cc1_prompt_hider == "1" && values.cc2_prompt_hider == "1" && values.cc0_prompt_hider == "1" && values.talent_select_prompt_hider == "1" && values.json_import_prompt_hider == "1" && values.npc == "0")
 	   {
@@ -4234,7 +4367,8 @@ async function init()
 	                         "shoot_prompt_hider": "1",
 	                         "hp_prompt_hider": "1",
 	                         "damage_prompt_hider": "1",
-	                         "json_export_prompt_hider": "1"});
+	                         "json_export_prompt_hider": "1",
+	                         "undo_prompt_hider": "1"});
 	                         
 	var ammoIds = await getSectionIDsAsync("ammo");
 	var gets = ["ammo_next_id", "init", "per", "agi"];
@@ -4307,18 +4441,18 @@ async function setXP(info)
 	
 	if (info != null && info.sourceType == "player")
         {
-        await log("Total xp changed to: " + info.newValue + " (" + (Number(info.newValue) - Number(info.previousValue)) + ")");
-        await log("Available xp: " + (totalXp - (skillXp + hpXp + advantageXp + resourceXp + backgroundXp)));
+        await log("Total xp changed to: " + info.newValue + " (" + (Number(info.newValue) - Number(info.previousValue)) + ")", "total_xp:" + info.previousValue);
+        await log("Available xp: " + (totalXp - (skillXp + hpXp + advantageXp + resourceXp + backgroundXp)), "none");
         }
         else
         {
-        await log("Available xp: " + (totalXp - (skillXp + hpXp + advantageXp + resourceXp + backgroundXp)));
+        await log("Available xp: " + (totalXp - (skillXp + hpXp + advantageXp + resourceXp + backgroundXp)), "none");
         }
 	}
 	
 async function setMaxHP()
 	{
-	var values = await getAttrsAsync(["bought_hp", "sta", "cc2_prompt_hider", "legacy_18_cc1_prompt_hider", "health_levels"]);
+	var values = await getAttrsAsync(["bought_hp", "sta", "cc2_prompt_hider", "cc1_prompt_hider", "health_levels"]);
 	
 	let ccMode = values.character_creation_mode == "on";
 	let bought = parseInt(values.bought_hp);
@@ -4327,7 +4461,7 @@ async function setMaxHP()
 
 	await setAttrsAsync({"max_hp": (bought * levels + stamina * levels)});
 	if (values.cc2_prompt_hider == "0" ||
-	    values.legacy_18_cc1_prompt_hider == "0")
+	    values.cc1_prompt_hider == "0")
 		{
 		await setAttrsAsync({"hp": (bought * levels + stamina * levels)});
 		}
@@ -4702,6 +4836,31 @@ function getSectionIDsAsync(sectionName){
 	</div>
 </div>
 
+<input type="hidden" name="attr_undo_prompt_hider" class="hide-undo-prompt" value="1">
+    <div class="prompt undo-prompt-hide">
+        <div class="title1" align="center">
+			Undo
+		</div>
+		<br>
+		<div align="center">
+		    You are about to unravel temporal and causal order by ereasing the following action from history.
+		    <br>
+		    <br>
+		    <span name="attr_last_log" class="small-font"></span>
+		    <br>
+		    <br>
+		    If you don't dread the consequences, type "SHUT UP AND DO IT" below.
+		    <br>
+		    <br>
+		    <input type="text" class="largeTextField" name="attr_confirm_undo">
+		    <input type="hidden" name="attr_undo_action">
+		    <input type="hidden" name="attr_undo_id">
+		    <input type="hidden" name="attr_undo_confirm_hider" class="hide-undo-confirm-button">
+		    <button type="action" name="act_undo" class="promptButton undo-confirm-button-hide">Confirm</button>
+		    <button type="action" name="act_cancel_undo" class="promptButton">Cancel</button>
+		</div>
+    </div>
+
 <input type="hidden" name="attr_json_export_prompt_hider" class="hide-json-export-prompt" value="1">
     <div class="prompt json-export-prompt-hide">
         <div class="title1" align="center">
@@ -5051,7 +5210,7 @@ function getSectionIDsAsync(sectionName){
 							</div>
 						</span>
 						<span style="grid-row: 16; grid-column: 1;" class="cell">
-							Aim (<span name="attr_cc_aim_diff">5</span>)
+							Aim (<span name="attr_cc_aim_diff">6</span>)
 						</span>
 						<span style="grid-row: 16; grid-column: 2;" class="cell">
 							<input type="text" name="attr_aim" class="num" readonly>
@@ -6248,7 +6407,7 @@ function getSectionIDsAsync(sectionName){
             <tr>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_strLow" value="/w gm [[abs(1d20-1d20) + {per} + @{aim}]]" class="rollButton"><button type="roll" name="roll_strHigh" value="/w gm [[1d12 + {per} + @{aim}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_strLow" value="/w gm [[abs(1d20-1d20) + @{per} + @{aim}]]" class="rollButton"><button type="roll" name="roll_strHigh" value="/w gm [[1d12 + @{per} + @{aim}]]" class="highIntensityButton">
                     </div>
                 </td>
                 <td>
@@ -7724,7 +7883,7 @@ function getSectionIDsAsync(sectionName){
 			</span>
 			<span colspan="2" style="grid-row: 3; grid-column: 1 / span 2;" class="cell">
 				<div id="tiny-font" align="center">
-					Millenium Freelancers Character Sheet v3.2 by Zoltán Király. Join us on Discord: https://discord.gg/XV9MX8Yeme
+					Millenium Freelancers Character Sheet v3.3 by Zoltán Király. Join us on Discord: https://discord.gg/XV9MX8Yeme
 				</div>
 			</span>
 		</div>
@@ -7746,20 +7905,10 @@ function getSectionIDsAsync(sectionName){
 				Ŧ<input type="text" name="attr_money" id="tex4">
 			</span>
 			<span style="grid-row: 2; grid-column: 1;" class="cell">
-				Resupply: 
-			</span>
-			<span style="grid-row: 2; grid-column: 2;" class="cell">
-				Ŧ<input type="text" name="attr_resupply" id="tex4" readonly>
-			</span>
-			<span style="grid-row: 3; grid-column: 1;" class="cell">
 				Petty cash:
 			</span>
-			<span style="grid-row: 3; grid-column: 2;" class="cell">
+			<span style="grid-row: 2; grid-column: 2;" class="cell">
 				Ŧ<input type="text" name="attr_petty_cash" id="tex4" readonly>
-			</span>
-			<span colspan="2" style="grid-row: 4; grid-column: 1 / span 2;" class="cell">
-				Resupply list:<br>
-				<textarea></textarea>
 			</span>
 		</div>
 		<br>
@@ -7969,9 +8118,11 @@ function getSectionIDsAsync(sectionName){
 		</div>
 		<div style="overflow: auto; width: 800px; height: 120px; display: inline-block; background-color: #0A0A0A;" align="left">
 		    <fieldset class="repeating_log">
-		        <span class="small-font" name="attr_log_entry"></span><br>
+		        <input type="hidden" name="attr_log_undo" value="none" class="gray-log-entry"><span class="small-font" name="attr_log_entry"></span><br>
 		    </fieldset>
 		</div>
+		<br>
+		<button type="action" name="act_open_undo" class="promptButton">Undo</button>
 		<br>
 		<br>
 		<button type="action" name="act_to_json" class="promptButton" style="font-size: 8px; width: 100px; height: 25px;">Export to Json</button>
