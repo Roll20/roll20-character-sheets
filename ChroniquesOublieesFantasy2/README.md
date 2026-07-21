@@ -6,9 +6,28 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.16.0 [Screenshot](cof2e.png)
+v1.17.0 [Screenshot](cof2e.png)
 
 ## Notes de version
+
+### Version _1.17.0_ (2026-07-19)
+
+- Fiche de PJ:
+  - Ajout des Points d'Ego et des capacités combat/jour aux boutons de récupération
+  - Ajout des maîtrises de compétences liées aux peuples (compagnon compris)
+  - Ajout des propriétés `mods` et `options` aux équipements de type arme
+  - Amélioration des armes maîtrisées (arme magique avec +X dans son nom)
+  - Ajout de 4 langues personnalisées + possibilité de renommer les langues standard
+  - Inversion du nombre d'utilisations des capacités à usage limité
+  - Ajout de conditions d'armure pour les buffs (comparaison avec l'_agi-max_ de l'armure portée)
+  - Ajout du _pacte occulte_ des mages
+  - Interactions avec **COFantasy2** (contact/lancer, potions, décompte des PM et capacités)
+
+- Fiche de PNJ:
+  - Modification de la case à cocher _Attaques multiples_ par un nombre d'attaques (1 par défaut)
+  - Amélioration de l'import des attaques à distance d'un statblock
+  - Inversion du nombre d'utilisations des capacités à usage limité
+  - Interactions avec **COFantasy2** (paramètres des capacités)
 
 ### Version _1.16.0_ (2026-06-08)
 
