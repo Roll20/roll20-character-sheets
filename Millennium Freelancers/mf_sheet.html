@@ -1,4 +1,17 @@
 <script type="text/worker">
+var skillNames = ["bridge_tech", "mounted_weaponry", "piloting", "vehicle_engineering", "driving", "knowledge_corporate", "knowledge_urban", "trade", "aim", "athletics", "endurance", "reaction", "melee", "throw", "notice", "lock_hacking", "search", "sleight_of_hand", "stealth", "astronomy", "computer_science", "medicine", "natural_sciences", "robotics", "weapons_engineering", "xenobiology", "argumentation", "deception", "empathy", "intimidation", "leadership"];
+
+on ("clicked:reduce_ap", reduceAp);
+
+async function reduceAp(info)
+    {
+    var by = Number(info.htmlAttributes.value);
+    var values = await getAttrsAsync(["ap"]);
+    if (Number(values.ap) >= by)
+        {
+        await setAttrsAsync({"ap": "" + (Number(values.ap) - by)});
+        }
+    }
 
 on ("clicked:undo", undo);
 
@@ -97,7 +110,7 @@ async function openUndo(info)
     for (var i=logIds.length - 1; i>-1; i--)
         {
         var action = logs["repeating_log_" + logIds[i] + "_log_undo"];
-        console.log(action);
+        //console.log(action);
         if (action != "none" && action != "sheet" && action != "undone")
             {
             last = logs["repeating_log_" + logIds[i] + "_log_entry"];
@@ -139,11 +152,11 @@ on("clicked:finish_json_import", finishImport);
 async function finishImport(info)
     {
     var json = (await getAttrsAsync(["json_import"])).json_import;
-    var repeatingProperties = ["advantages", "resources", "backgrounds", "quickactions", "melees", "weapons", "armor", "ammo"];
+    var repeatingProperties = ["advantages", "resources", "backgrounds", "quickactions", "melees", "weapons", "armor", "ammo", "enhancements"];
     try 
         {
         var data = JSON.parse(json);
-        console.log("Data: " + data);
+        //console.log("Data: " + data);
         for (var i=0; i<properties.length; i++)
             {
             if (!Object.hasOwn(data, properties[i]))
@@ -167,7 +180,7 @@ async function finishImport(info)
             {
             if (data[properties[i]] != "")
                 {
-                sets[properties[i]] = data[properties[i]];
+                sets[properties[i]] = ("" + data[properties[i]]).replaceAll("|lbr|", "\n");
                 }
             }
             
@@ -175,7 +188,7 @@ async function finishImport(info)
         
         for (var i=0; i<repeatingProperties.length; i++)
             {
-            console.log(repeatingProperties[i]);
+            //console.log(repeatingProperties[i]);
             for (key in data[repeatingProperties[i]])
                 {
                 if (Object.hasOwn(data[repeatingProperties[i]], key))
@@ -185,7 +198,7 @@ async function finishImport(info)
                     if (!Object.hasOwn(ids, id))
                         {
                         ids[id] = generateRowID();
-                        console.log(id + " -> " + ids[id]);
+                        //console.log(id + " -> " + ids[id]);
                         }
                     line = line.replace(id, ids[id]);
                     sets[line] = data[repeatingProperties[i]][key];
@@ -201,7 +214,7 @@ async function finishImport(info)
                 }
             }
             
-        console.log(sets);
+        //console.log(sets);
             
         await setAttrsAsync(sets);
         } 
@@ -237,7 +250,8 @@ async function toJSON(info)
         {
         if (Object.hasOwn(values, properties[i]))
             {
-            json += "\"" + properties[i] + "\": \"" + values[properties[i]] + "\",";
+            var insert = ("" + values[properties[i]]).replaceAll("\n", "|lbr|");
+            json += "\"" + properties[i] + "\": \"" + insert + "\",";
             }
             else if (properties.includes(properties[i]))
             {
@@ -254,7 +268,8 @@ async function toJSON(info)
                              "melees": ["melee_name", "melee_damage", "melee_modifier", "melee_description", "melee_equipped"],
                              "weapons": ["weapon_name", "weapon_mods", "weapon_modifier", "weapon_spread", "weapon_burst", "weapon_volley", "weapon_clip_ammo", "weapon_ammo", "weapon_equipped"],
                              "armor": ["armor_name", "armor_da", "armor_slow", "armor_cmr", "armor_hp", "armor_max_hp", "armor_bonus_hp", "armor_max_bonus_hp", "armor_description", "armor_equipped"],
-                             "ammo": ["ammo_id", "ammo_class", "ammo_variant", "ammo_damage", "ammo_quantity", "ammo_description"]};
+                             "ammo": ["ammo_id", "ammo_class", "ammo_variant", "ammo_damage", "ammo_quantity", "ammo_description"],
+                             "enhancements": ["enhancement_name", "enhancement_type", "enhancement_description"]};
                     
     var gets = [];
                              
@@ -281,7 +296,7 @@ async function toJSON(info)
         if (Object.hasOwn(repeatingSections, key))
             {
             var ids = await getSectionIDsAsync(key);
-            json += ",\"" + key + "\":{"
+            json += ",\"" + key + "\":{";
             for (var i=0; i<repeatingSections[key].length; i++)
                 {
                 for (var j=0; j<ids.length; j++)
@@ -307,7 +322,7 @@ on("clicked:resend_initiative", resendInit);
 
 async function resendInit(info)
     {
-    var rollString = "&{template:hi-assist} {{name=@{character_name}}} {{title=: Initiative resend: }} {{roll1=[[@{last_init} &{tracker}]]}}";
+    var rollString = "&{template:initiative} {{name=@{character_name}}} {{title=: Initiative resend: }} {{roll1=[[@{last_init} &{tracker}]]}}";
     startRoll(rollString, initResendCallback);
     }
     
@@ -320,11 +335,13 @@ on("clicked:roll_initiative", rollInitiative);
 
 async function rollInitiative(info)
     {
-    console.log("rolling initiative");
+    //console.log("rolling initiative");
     var values = await getAttrsAsync(["agi", "per"]);
     var init = Math.max(Number(values.agi), Number(values.per));
-    var rollString = "&{template:hi-assist} {{name=@{character_name}}} {{title=: Initiative (@{init_mod}): }} {{roll1=[[1d12 + " + init + " * 1.01 + @{init_mod} &{tracker}]]}}";
+    var rollString = "&{template:initiative} {{name=@{character_name}}} {{title=: Initiative (@{init_mod}): }} {{roll1=[[1d12 + " + init + " * 1.01 + @{init_mod} &{tracker}]]}}";
     startRoll(rollString, initiativeCallback);
+    var values = await getAttrsAsync(["ap_per_turn", "ap", "equipped_armor_slow", "init_mod"]);
+    await setAttrsAsync({"ap": "" + (Number(values.ap_per_turn) + Math.min(3, Number(values.ap)) - Number(values.equipped_armor_slow) - Number(values.init_mod) / 2)});
     }
     
 async function initiativeCallback(result)
@@ -338,19 +355,19 @@ on("clicked:accept_talents", finishTalentSelect);
 
 async function finishTalentSelect(info)
     {
-    console.log("doin it");
+    //console.log("doin it");
     var sets = {};
     for (var i=0; i<talents.length; i++)
         {
         sets[talents[i].value + "_talent"] = "0";
         }
         
-    console.log(sets);
+    //console.log(sets);
         
     var raises = {};
     var values = await getAttrsAsync(["territory_select", "talent0", "talent1", "talent2", "talent3", "talent4"]);
     
-    console.log(values);
+    //console.log(values);
     
     for (var i=0; i<5; i++)
         {
@@ -367,7 +384,7 @@ async function finishTalentSelect(info)
             }
         }
     
-    console.log(raises);
+    //console.log(raises);
         
     for (var key in raises)
 		{
@@ -380,15 +397,15 @@ async function finishTalentSelect(info)
 	var xpInfo = await getXPData();
 		
 	sets.talent_select_prompt_hider = "1";
-	sets.cc2_prompt_hider = "0";
 	sets.total_xp = (xpInfo.ccSkillXp + 10) + "";
 	sets.spent_xp = "0";
 	
 	await setXP(null);
 		
-	console.log(sets);
+	//console.log(sets);
 		
 	await setAttrsAsync(sets);
+	await openCC2();
     }
 
 on("clicked:back_to_cc1", backToCC1);
@@ -400,7 +417,7 @@ async function backToCC1(info)
 
 async function initTalentSelects()
     {
-    console.log("initing");
+    //console.log("initing");
     var values = await getAttrsAsync(["planet_select", "talent0", "talent1", "talent2", "talent3", "talent4"]);
     if (values.talent0 != "" || values.talent1 != "" || values.talent2 != "" || values.talent3 != "" || values.talent4 != "")
         {
@@ -408,7 +425,7 @@ async function initTalentSelects()
         return;
         }
         
-    console.log("init happening");
+    //console.log("init happening");
         
     var planetFirst = "";
     
@@ -439,7 +456,7 @@ async function initTalentSelects()
         break;
         }
         
-    console.log(planetFirst);
+    //console.log(planetFirst);
         
     await setAttrsAsync({"talent0": "bridge_tech", "talent1": "mounted_weaponry", "talent2": planetFirst, "talent3": "bridge_tech", "talent4": "mounted_weaponry"});
     setTalentSelects({"sourceType": "player", "sourceAttribute": "9"});
@@ -483,32 +500,43 @@ on ("change:talent1 change:talent2 change:talent3 change:talent4 change:talent0"
 
 async function setTalentSelects(info)
     {
-    console.log("tryna select talents");
+    //console.log("tryna select talents");
         
     if (info.sourceType != "player")
         {
         return;
         }
         
-    console.log("setting talents");
+    //console.log("setting talents");
     var talentOptions = [structuredClone(talents), structuredClone(talents), structuredClone(talents), structuredClone(talents), structuredClone(talents)];
     
     var values = await getAttrsAsync(["planet_select", "talent0", "talent1", "talent2", "talent3", "talent4"]);
     var initSets = {};
-        
+    
     talentOptions[2].splice(0, skillCategories[values.planet_select][0]);
     if (-1 * (25 - skillCategories[values.planet_select][1]) != 0)
         {
         talentOptions[2].splice(-1 * (25 - skillCategories[values.planet_select][1]));
         }
         
-    if (!talentOptions[2].includes(values.talent2))
+    var found = false;
+    
+    for (var i=0; i<talentOptions[2].length; i++)
+        {
+        if (talentOptions[2][i].value == values.talent2)
+            {
+            found = true;
+            break;
+            }
+        }
+        
+    if (!found)
         {
         await setAttrsAsync({"talent2": talentOptions[2][0].value});
         values.talent2 = talentOptions[2][0].value;
         }
     
-    console.log(JSON.stringify(values) + "\n" + skillCategories[values.planet_select][0] + " - " + (-1 * (25 - skillCategories[values.planet_select][1])) + ":\n" + JSON.stringify(talentOptions[2]));
+    //console.log(JSON.stringify(values) + "\n" + skillCategories[values.planet_select][0] + " - " + (-1 * (25 - skillCategories[values.planet_select][1])) + ":\n" + JSON.stringify(talentOptions[2]));
         
     var caller = Number(info.sourceAttribute[info.sourceAttribute.length - 1]);
         
@@ -537,7 +565,7 @@ async function setTalentSelects(info)
         talentOptions[j][index].selected = "true";
         }
         
-    console.log(talentOptions);
+    //console.log(talentOptions);
     
     for (var i=0; i<5; i++)
         {
@@ -571,7 +599,23 @@ async function startCC(info)
         break;
         
         case "npc":
-            await setAttrsAsync({"cc0_prompt_hider": "1", "npc": "1", "npc_page_hider": "0", "character_page_hider": "1"});
+            await setAttrsAsync({"cc0_prompt_hider": "1",
+                                 "npc": "1", "npc_page_hider": "0",
+                                 "character_page_hider": "1",
+                                 "str": "2",
+                                 "sta": "2",
+                                 "agi": "2",
+                                 "per": "2",
+                                 "int": "2",
+                                 "cha": "2",
+                                 "wil": "2",
+                                 "aim": "0",
+                                 "melee": "0",
+                                 "reaction": "0",
+                                 "endurance": "0",
+                                 "notice": "0",
+                                 "empathy": "0",
+                                 "throw": "0"});
         break;
         
         case "json":
@@ -601,11 +645,13 @@ async function rollQuickAction(info)
     var rollString = "&{template:";
 	if (type=="high")
 		{
-		rollString += "hi-roll} {{name=@{character_name}}} {{title=: High intensity " + attributeName + " + " + skillName + " check: }} {{roll1=[[1d12" + " + " + values2[attribute] + " + " + values2[skill] + "]]}}";
+		rollString += "hi-roll} {{name=@{character_name}}} {{title=: High intensity " + attributeName + " + " + skillName + " check: }} {{roll1=[[1d12" + " + " + values2[attribute] + " + " + values2[skill] + " + @{pain}]]}} {{followUp=[[1d12]]}} {{total=[[0]]}} {{quality=[[0]]}}";
+		checkIntensity = 1;
 		}
 		else
 		{
-		rollString += "li-roll} {{name=@{character_name}}} {{title=: Low intensity " + attributeName + " + " + skillName + " check: }} {{roll1=[[abs(1d20 - 1d20)" + " + " + values2[attribute] + " + " + values2[skill] + "]]}}";
+		rollString += "li-roll} {{name=@{character_name}}} {{quality=[[0]]}} {{title=: Low intensity " + attributeName + " + " + skillName + " check: }} {{roll1=[[abs(1d20 - 1d20)" + " + " + values2[attribute] + " + " + values2[skill] + " + @{pain}]]}}";
+		checkIntensity = 0;
 		}
 		
 	rerollString = rollString;
@@ -963,7 +1009,7 @@ async function sanitizeAllowNegative(info)
         }
     }
 
-on ("change:repeating_armor:armor_cmr change:repeating_armor:armor_slow change:repeating_armor:armor_da change:repeating_ammo:ammo_quantity change:repeating_weapons:weapon_spread change:repeating_weapons:weapon_burst change:repeating_weapons:weapon_volley change:repeating_weapons:weapon_clip_ammo change:repeating_weapons:weapon_clip_capacity change:repeating_resources:resource_level change:shield change:ap change:gf change:max_gf", sanitize);
+on ("change:repeating_armor:armor_cmr change:repeating_armor:armor_slow change:repeating_armor:armor_da change:repeating_ammo:ammo_quantity change:repeating_weapons:weapon_spread change:repeating_weapons:weapon_burst change:repeating_weapons:weapon_volley change:repeating_weapons:weapon_clip_ammo change:repeating_weapons:weapon_clip_capacity change:repeating_resources:resource_level change:shield change:ap change:ap_per_turn change:gf change:max_gf", sanitize);
 
 async function sanitize(info)
     {
@@ -1326,7 +1372,7 @@ async function setPain(info)
     await setAttrsAsync({"pain": Math.min(0, wil + pfd + pm)});
     }
 
-on ("clicked:repeating_backgrounds:delete clicked:repeating_weapons:delete clicked:repeating_armor:delete clicked:repeating_ammo:delete clicked:repeating_advantages:delete clicked:repeating_resources:delete clicked:repeating_melees:delete clicked:repeating_quickactions:delete", deleteLine);
+on ("clicked:repeating_backgrounds:delete clicked:repeating_weapons:delete clicked:repeating_armor:delete clicked:repeating_ammo:delete clicked:repeating_advantages:delete clicked:repeating_resources:delete clicked:repeating_melees:delete clicked:repeating_quickactions:delete clicked:repeating_enhancements:delete", deleteLine);
 
 async function deleteLine(info)
     {
@@ -1676,14 +1722,10 @@ async function closeCC()
 	    break;
 	    
 	    case "zaidong":
-	        var id = await addLine({"htmlAttributes": "advantages"});
-	        await setAttrsAsync({["repeating_advantages_" + id + "_advantage_name"]: "Augmentation",
-	                             ["repeating_advantages_" + id + "_advantage_cost"]: "0",
-	                             ["repeating_advantages_" + id + "_advantage_description"]: "You have a level 1 genetic augmentation: " + values2.zaidong_augmentation});
-	                             
 	        var values2 = await getAttrsAsync(["zaidong_augmentation"]);
-	        await setAttrsAsync({"notes": values2.zaidong_augmentation});
-
+	        var id = await addLine({"htmlAttributes": "enhancements"});
+	        await setAttrsAsync({["repeating_enhancements_" + id + "_enhancement_name"]: values2.zaidong_augmentation,
+	                             ["repeating_enhancements_" + id + "_enhancement_type"]: "augmentation"});
 	    break;
 	    
 	    case "gavadai":
@@ -1748,10 +1790,9 @@ async function closeCC()
 	        await setAttrsAsync({["repeating_advantages_" + id + "_advantage_name"]: "Predisposition to cyberware",
 	                             ["repeating_advantages_" + id + "_advantage_cost"]: "0",
 	                             ["repeating_advantages_" + id2 + "_advantage_description"]: "You are considered to have +3 Stamina for the purposes of installing cyberware."});
-	        var id2 = await addLine({"htmlAttributes": "advantages"});
-	        await setAttrsAsync({["repeating_advantages_" + id2 + "_advantage_name"]: "Neurocom",
-	                             ["repeating_advantages_" + id2 + "_advantage_cost"]: "0",
-	                             ["repeating_advantages_" + id2 + "_advantage_description"]: "You have a Syndeel neurocom."});
+	        var id2 = await addLine({"htmlAttributes": "enhancements"});
+	        await setAttrsAsync({["repeating_enhancements_" + id2 + "_enhancement_name"]: "Syndeel neurocom",
+	                             ["repeating_enhancements_" + id2 + "_enhancement_type"]: "cyberware"});
 	    break;
 	    
 	    case "alliance":
@@ -2029,41 +2070,81 @@ async function openCC2()
 	{
 	var xpInfo = await getXPData();
     console.log(xpInfo);
+    var gets = ["planet_select", "territory_select", "talent0", "talent1", "talent2", "talent3", "talent4", "skill_difficulty_offset"];
     
-    var values = await getAttrsAsync(["planet_select"]);
-    var toChange = {"cc1_prompt_hider": 1,
+    for (var i=0; i<skillNames.length; i++)
+        {
+        gets.push(skillNames[i] + "_difficulty");
+        }
+    
+    var values = await getAttrsAsync(gets);
+    var sets = {"cc1_prompt_hider": 1,
 					 "cc2_prompt_hider": 0,
 					 "total_xp": xpInfo.ccSkillXp + 10,
 	                 "spent_xp": 0};
+	                 
+    for (var i=0; i<skillNames.length; i++)
+        {
+        sets["cc_" + skillNames[i] + "_diff"] = "" + (Number(values[skillNames[i]+"_difficulty"]) - Number(values.skill_difficulty_offset));
+        }
+	                 
+    var talentPool = 3;
+    if (values.territory_select == "omkinara")
+        {
+        talentPool = 5;
+        }
+	var talents = {};
+	var keys = [];
+	
+	for (var i=0; i<talentPool; i++)
+	    {
+	    var key = "cc_"+values["talent" + i]+"_diff";
+	    keys.push(values["talent" + i]);
+	    if (Object.hasOwn(talents, key))
+	        {
+	        talents[key]++;
+	        }
+	        else
+	        {
+	        talents[key] = 1;
+	        }
+	    }
+	    
+	
+	
+	for (var i=0; i<keys.length; i++)
+	    {
+	    sets["cc_" + keys[i] + "_diff"] = "" + (Number(values[keys[i] + "_difficulty"]) - Number(values.skill_difficulty_offset) - talents["cc_" + keys[i] + "_diff"]);
+	    }
     
     switch (values.planet_select)
         {
         case "a":
-            toChange.civilizational = "(favored)";
+            sets.civilizational = "(favored)";
         break;
         
         case "b":
-            toChange.social = "(favored)";
+            sets.social = "(favored)";
         break;
         
         case "c":
-            toChange.infiltration = "(favored)";
+            sets.infiltration = "(favored)";
         break;
         
         case "d":
-            toChange.combat = "(favored)";
+            sets.combat = "(favored)";
         break;
         
         case "e":
-            toChange.science = "(favored)";
+            sets.science = "(favored)";
         break;
         
         case "f":
-            toChange.astronomics = "(favored)";
+            sets.astronomics = "(favored)";
         break;
         }
     
-	await setAttrsAsync(toChange);
+	await setAttrsAsync(sets);
 	await setXP(null);
 	await enableCCComplete();
 	}
@@ -2100,7 +2181,7 @@ async function setCharacterInfo()
 	{
 	console.log("Setting character info.");
 	var values = await getAttrsAsync(["str", "sta", "agi", "per", "int", "cha", "wil", "territory_select", "planet_select", "social_class_select", "profession_select", "role_select", "hobby1", "hobby1_name", "language1", "language1_name", "language2", "language2_name", "gavadai_genetic_origin", "saturnada_creature", "gt_choice", "zaidong_augmentation"]);
-	var skills = await getAttrsAsync(["bridge_tech", "mounted_weaponry", "piloting", "vehicle_engineering", "driving", "knowledge_corporate", "knowledge_urban", "trade", "aim", "athletics", "endurance", "reaction", "melee", "throw", "notice", "lock_hacking", "search", "sleight_of_hand", "stealth", "astronomy", "computer_science", "medicine", "natural_sciences", "robotics", "weapons_engineering", "xenobiology", "argumentation", "deception", "empathy", "intimidation", "leadership"]);
+	var skills = await getAttrsAsync(skillNames);
 	await setSkillBonuses();
 	
 	var s = "Character stats:\n";
@@ -2424,14 +2505,14 @@ async function rollCondition(info)
     
     if (modLevel <= 0)
         {
-        rollString = "&{template:hi-assist} {{name=@{character_name}}} {{title=: Condition: }} {{roll1=[[0]]}}";
+        rollString = "&{template:condition} {{name=@{character_name}: }} {{title=Condition: }} {{roll1=[[0]]}} {{result=[[0]]}} {{quality=[[0]]}}";
         rerollString = rollString;
     
         startRoll(rollString, conditionRollCallback);
         }
         else
         {
-        rollString = "&{template:hi-assist} {{name=@{character_name}}} {{title=: Condition: }} {{roll1=[[abs(1d4-1d4) + " + modLevel + "]]}}";
+        rollString = "&{template:condition} {{name=@{character_name}: }} {{title=Condition: }} {{roll1=[[abs(1d4-1d4) + " + modLevel + "]]}} {{result=[[0]]}} {{quality=[[0]]}}";
         rerollString = rollString;
     
         startRoll(rollString, conditionRollCallback);
@@ -2442,61 +2523,70 @@ async function conditionRollCallback(resultData)
     {
     var rollResult = resultData.results.roll1.result;
     
-    var computed = "wtf?";
+    var computed = {};
+    
+    if (resultData.results.roll1.dice.length == 0)
+        {
+        computed.quality = 1;
+        }
+        else if (resultData.results.roll1.dice[0] == resultData.results.roll1.dice[1])
+        {
+        computed.quality = 1;
+        }
+        else if (Math.abs(resultData.results.roll1.dice[0] - resultData.results.roll1.dice[1]) == 3)
+        {
+        computed.quality = -1;
+        }
     
     switch (rollResult)
         {
         case 0:
-            computed = "Healthy";
+            computed.roll1 = "Healthy";
+            computed.result = 1;
         break;
         case 1:
-            computed = "Stable, quickly healing";
+            computed.roll1 = "Stable, quickly healing";
+            computed.result = 1;
         break;
         
         case 2:
-            computed = "Stable, normally healing";
+            computed.roll1 = "Stable, normally healing";
+            computed.result = 1;
         break;
         
         case 3:
-            computed = "Stable, slowly healing";
+            computed.roll1 = "Stable, slowly healing";
+            computed.result = 1;
         break;
         
         case 4:
-            computed = "Slowly degrading";
+            computed.roll1 = "Slowly degrading";
+            computed.result = 0;
         break;
         
         case 5:
-            computed = "Degrading";
+            computed.roll1 = "Degrading";
+            computed.result = 0;
         break;
         
         case 6:
-            computed = "Quickly degrading";
+            computed.roll1 = "Quickly degrading";
+            computed.result = 0;
         break;
         
         case 7:
-            computed = "Critical";
+            computed.roll1 = "Critical";
+            computed.result = -1;
         break;
         
         case 8:
-            computed = "Dead";
+            computed.roll1 = "Dead";
+            computed.result = -1;
         break;
         }
     
-    finishRoll(resultData.rollId, {roll1: computed});
+    finishRoll(resultData.rollId, computed);
     }
-
-/*on ("clicked:roll_initiative", initiative);
-
-async function initiative(info)
-    {
-    var values = await getAttrsAsync(["agi", "per", "init_mod"]);
-    
-    var modifier = Math.max(Number(values.agi), Number(values.per));
-    
-    var rollString = "&{template:hi-assist} {{name=@{character_name}}} {{title=: Initiative (" + values["init_mod"] + "): }} {{roll1=[[1d12 + " + modifier + " + @{init_mod} + " + modifier + " / 100 &{tracker}]]}}";
-    
-    startRoll(rollString, skillCheckCallback);
-    }*/
 
 on ("clicked:reroll", reroll);
 
@@ -2610,23 +2700,18 @@ async function fireWeapon()
     		}
     		
     	
-    	var rollString = "&{template:hi-roll} {{name=@{character_name}}} {{title= fires " + modeString + " their " + weapon.name + " (" + remainingAmmo + "/" + weapon.clip_capacity + "): }} {{roll1=[[1d12 + @{per} + @{aim} + @{pain} + " + weapon.modifier + "]]}}";
-    	
+    	var rollString = "&{template:hi-roll} {{name=@{character_name}}} {{title= fires " + modeString + " their " + weapon.name + " (" + remainingAmmo + "/" + weapon.clip_capacity + "): }} {{roll1=[[1d12 + @{per} + @{aim} + @{pain} + " + weapon.modifier + "]]}} {{quality=[[0]]}} {{followUp=[[1d12]]}} {{total=[[0]]}}";
+    	checkIntensity = 1;
     	rerollString = rollString;
-    	startRoll(rollString, shootCallback);
+    	startRoll(rollString, skillCheckCallback);
 	    }
 	    else
 	    {
-	    var rollString = "&{template:hi-roll} {{name=@{character_name}}} {{title= punches with their " + weapon.name + ": }} {{roll1=[[1d12 + @{agi} + @{melee} + @{pain} + " + weapon.modifier + "]]}}";
-    	
+	    var rollString = "&{template:hi-roll} {{name=@{character_name}}} {{title= punches with their " + weapon.name + ": }} {{roll1=[[1d12 + @{agi} + @{melee} + @{pain} + " + weapon.modifier + "]]}} {{quality=[[0]]}} {{followUp=[[1d12]]}} {{total=[[0]]}}";
+    	checkIntensity = 1;
     	rerollString = rollString;
-    	startRoll(rollString, shootCallback);
+    	startRoll(rollString, skillCheckCallback);
 	    }
-	}
-	
-function shootCallback(result)
-	{
-	finishRoll(result.rollId);
 	}
 
 on ("clicked:cancel_shoot", closeShootPrompt);
@@ -2705,8 +2790,9 @@ async function openShootPrompt(info)
     	    }
     	
     	await setAttrsAsync({"firing_text": "Fire " + weapon.name,
-    					  	 "shoot_prompt_hider": 0,
-    					  	 "shoot_hider": 0});
+    					  	 "shoot_prompt_hider": "0",
+    					  	 "shoot_hider": "0",
+	                         "intensity": "1"});
     
     	if (weapon.clip_ammo > 0)
     		{
@@ -2755,9 +2841,10 @@ async function openShootPrompt(info)
     	    }
 	    weapon["name"] = values["repeating_melees_" + id + "_melee_name"];
 	    await setAttrsAsync({"firing_text": "Strike with " + values["repeating_melees_" + id + "_melee_name"],
-    					  	 "shoot_prompt_hider": 0,
-    					  	 "shoot_hider": 0,
-	                         "firing_mode": "melee"});
+    					  	 "shoot_prompt_hider": "0",
+    					  	 "shoot_hider": "0",
+	                         "firing_mode": "melee",
+	                         "intensity": "1"});
     					  	 
 	    populateListOptions({elemSelector: ".firing-mode-select, .firing-mode-selectBlank",
             				 optionsArray: options});
@@ -2813,12 +2900,12 @@ async function openHpPrompt()
 	
 	if (boughtHp < stamina && xp >= 50)
 		{
-		await setAttrsAsync({"hp_raise_status": "Raise HP by -5- for -50- XP?",
+		await setAttrsAsync({"hp_raise_status": "Raise HP by 5 for 50 XP?",
 				  "buy_hp_hider": 0});
 		}
 		else if (boughtHp < stamina)
 		{
-		await setAttrsAsync({"hp_raise_status": "You do not have enough XP (-50-) to raise your HP.",
+		await setAttrsAsync({"hp_raise_status": "You do not have enough XP (50) to raise your HP.",
 				  "buy_hp_hider": 1});
 		}
 		else
@@ -2990,22 +3077,20 @@ async function makeSkillRoll(info)
 		skillToRoll == "profession1" ||
 		skillToRoll == "profession2")
 		{
-		values = await getAttrsAsync([attributeToAdd, skillToRoll, skillToRoll + "_name", "intensity", "skill_roll_modifier", "modifier"]);
+		values = await getAttrsAsync([attributeToAdd, skillToRoll, skillToRoll + "_name", "intensity", "skill_roll_modifier"]);
 		}
 		else
 		{
-		values = await getAttrsAsync([attributeToAdd, skillToRoll, "intensity", "skill_roll_modifier", "modifier"]);
+		values = await getAttrsAsync([attributeToAdd, skillToRoll, "intensity", "skill_roll_modifier"]);
 		}
 	
 	var skillName;
 	var attributeName;
 	var skillModifier = parseInt(values.skill_roll_modifier);
-	var hpModifier = parseInt(values.modifier);
 	var skillValue = parseInt(values[skillToRoll]);
 	var attrValue = parseInt(values[attributeToAdd]);
 	
 	var sms = "";
-	var hms = "";
 	var ss = "";
 	var as = "";
 	
@@ -3016,15 +3101,6 @@ async function makeSkillRoll(info)
 		else if (skillModifier < 0)
 		{
 		sms = " " + skillModifier;
-		}
-		
-	if (hpModifier > 0)
-		{
-		hms = " + " + hpModifier;
-		}
-		else if (hpModifier < 0)
-		{
-		hms = " " + hpModifier;
 		}
 		
 	if (skillValue > -1)
@@ -3075,11 +3151,13 @@ async function makeSkillRoll(info)
 	var rollString = "&{template:";
 	if (values.intensity == "1")
 		{
-		rollString += "hi-roll} {{name=@{character_name}}} {{title=: High intensity " + attributeName + " + " + skillName + " check: }} {{roll1=[[1d12" + as + ss + sms + hms + "]]}}";
+		rollString += "hi-roll} {{name=@{character_name}}}{{title=: High intensity " + attributeName + " + " + skillName + " check: }} {{roll1=[[1d12" + as + ss + sms + " + @{pain}]]}} {{followUp=[[1d12]]}} {{total=[[0]]}} {{quality=[[0]]}}";
+		checkIntensity = 1;
 		}
 		else
 		{
-		rollString += "li-roll} {{name=@{character_name}}} {{title=: Low intensity " + attributeName + " + " + skillName + " check: }} {{roll1=[[abs(1d20 - 1d20)" + as + ss + sms + hms + "]]}}";
+		rollString += "li-roll} {{name=@{character_name}}} {{quality=[[0]]}} {{title=: Low intensity " + attributeName + " + " + skillName + " check: }} {{roll1=[[abs(1d20 - 1d20)" + as + ss + sms + " + @{pain}]]}}";
+		checkIntensity = 0;
 		}
 		
 	rerollString = rollString;
@@ -3089,9 +3167,39 @@ async function makeSkillRoll(info)
 	                     "skill_roll_modifier": "0"});
 	}
 	
+var checkIntensity = 0;
 function skillCheckCallback(results)
 	{
-	finishRoll(results.rollId);
+	var computed = {};
+	if (checkIntensity == 0)
+	    {
+    	var die1 = results.results.roll1.dice[0];
+    	var die2 = results.results.roll1.dice[1];
+    	if (die1 == die2)
+    	    {
+    	    computed.quality = -1;
+    	    }
+    	    else if (Math.abs(die1-die2) > 15)
+    	    {
+    	    computed.quality = 1;
+    	    }
+	    }
+	    else
+	    {
+	    var die1 = results.results.roll1.dice[0];
+	    var die2 = results.results.followUp.dice[0];
+	    if (die1 == 12)
+	        {
+	        computed.quality = 1;
+	        computed.total = results.results.roll1.result + die2;
+	        }
+	        else if (die1 == 1)
+	        {
+	        computed.quality = -1;
+	        computed.total =  results.results.roll1.result - die2;
+	        }
+	    }
+	finishRoll(results.rollId, computed);
 	}
 
 var skillToRoll;
@@ -3327,7 +3435,7 @@ async function updateEditSkillPrompt(skillToRaise)
 		if ((sInfo.skillXp > sInfo.currentValue - 5 || sInfo.trainingTime != "0"))
 		    {
     		await setAttrsAsync({"hide_level_skill": 0,
-    				  			 "skill_level_up_text": "Raise skill (cost: " + raiseCost + "/" + sInfo.availableXP + " XP)?"});
+    				  			 "skill_level_up_text": "Rais skill for " + raiseCost + " XP? (Avaliable: " + sInfo.availableXP + ") "});
 		    }
 		    else
 		    {
@@ -3338,7 +3446,7 @@ async function updateEditSkillPrompt(skillToRaise)
 		else if (sInfo.currentValue < 10)
 		{
 		await setAttrsAsync({"hide_level_skill": 1,
-				  			 "skill_level_up_text": "Cost to raise: " + raiseCost + "/" + sInfo.availableXP + " XP"});
+				  			 "skill_level_up_text": "The cost to raise this skill is " + raiseCost + " XP. (Available: " + sInfo.availableXP + ") "});
 		}
 		else
 		{
@@ -3466,6 +3574,7 @@ async function setSkillText(info)
 on ("clicked:switch_to_character", openCharacter);
 on ("clicked:switch_to_gear", openGear);
 on ("clicked:switch_to_notes", openNotes);
+on ("clicked:switch_to_combat", openCombat);
 
 async function openCharacter()
 	{
@@ -3475,14 +3584,16 @@ async function openCharacter()
     	await setAttrsAsync({"npc_page_hider": 1,
     	                     "character_page_hider": 0,
     					     "gear_page_hider": 1,
-    					     "notes_page_hider": 1});
+    					     "notes_page_hider": 1,
+    					     "combat_page_hider": 1});
 	    }
 	    else
 	    {
 	    await setAttrsAsync({"npc_page_hider": 0,
     					     "character_page_hider": 1,
     					     "gear_page_hider": 1,
-    					     "notes_page_hider": 1});
+    					     "notes_page_hider": 1,
+    					     "combat_page_hider": 1});
 	    }
 	}
 	
@@ -3491,7 +3602,8 @@ async function openGear()
 	await setAttrsAsync({"npc_page_hider": 1,
     					 "character_page_hider": 1,
 					     "gear_page_hider": 0,
-					     "notes_page_hider": 1});
+					     "notes_page_hider": 1,
+    					 "combat_page_hider": 1});
 	}
 	
 async function openNotes()
@@ -3499,7 +3611,17 @@ async function openNotes()
 	await setAttrsAsync({"npc_page_hider": 1,
     					 "character_page_hider": 1,
 					     "gear_page_hider": 1,
-					     "notes_page_hider": 0});
+					     "notes_page_hider": 0,
+    					 "combat_page_hider": 1});
+	}
+	
+async function openCombat()
+	{
+	await setAttrsAsync({"npc_page_hider": 1,
+    					 "character_page_hider": 1,
+					     "gear_page_hider": 1,
+					     "notes_page_hider": 1,
+    					 "combat_page_hider": 0});
 	}
 
 //=========================================================================
@@ -4770,25 +4892,67 @@ function getSectionIDsAsync(sectionName){
 
 <rolltemplate class="sheet-rolltemplate-li-roll">
 <div class="sheet-template-container">
-		<span class="sheet-rolltemplate-li-roll-bold">{{name}}</span><span class="sheet-rolltemplate-li-roll-label">{{title}}{{roll1}}</span>
+		<span class="sheet-rolltemplate-li-roll-bold">{{name}}</span>
+		<span class="sheet-rolltemplate-li-roll-label">{{title}}</span>
+		{{#rollGreater() computed::quality 0}}
+            <span class="good"></span>
+        {{/rollGreater() computed::quality 0}}
+        {{#rollLess() computed::quality 0}}
+            <span class="bad"></span>
+        {{/rollLess() computed::quality 0}}
+		<span class="sheet-rolltemplate-li-result">{{roll1}}</span>
 	</div>
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-hi-roll">
 	<div class="sheet-template-container">
 		<div class="sheet-rolltemplate-hi-roll-label">
-			<span class="sheet-rolltemplate-hi-roll-bold">{{name}}</span><span class="sheet-rolltemplate-hi-roll-label">{{title}}{{roll1}}</span>
+		    {{#rollGreater() computed::quality 0}}
+                <span class="good"></span>
+            {{/rollGreater() computed::quality 0}}
+            {{#rollLess() computed::quality 0}}
+                <span class="bad"></span>
+            {{/rollLess() computed::quality 0}}
+			<span class="sheet-rolltemplate-hi-roll-bold">{{name}}</span>
+			<span class="sheet-rolltemplate-hi-roll-label">{{title}}</span>
+			<span class="sheet-rolltemplate-hi-result">{{roll1}}</span>
+			{{#rollGreater() computed::quality 0}}
+                <br><span class="sheet-rolltemplate-hi-roll-label">The winds of fortune favor you!</span>
+                <span class="sheet-rolltemplate-hi-result"> {{followUp}}</span>
+                <br><span class="sheet-rolltemplate-hi-roll-label">The glorious total: </span>
+                <span class="sheet-rolltemplate-hi-result" style="font-size: 18px; align-items: center;">{{computed::total}}</span>
+            {{/rollGreater() computed::quality 0}}
+            {{#rollLess() computed::quality 0}}
+                <br><span class="sheet-rolltemplate-hi-roll-label">Tragedy looms in the air!</span>
+                <span class="sheet-rolltemplate-hi-result"> {{followUp}}</span>
+                <br><span class="sheet-rolltemplate-hi-roll-label">The grievous total: </span>
+                <span class="sheet-rolltemplate-hi-result" style="font-size: 18px; align-items: center;">{{computed::total}}</span>
+            {{/rollLess() computed::quality 0}}
 		</div>
 	</div>
 </rolltemplate>
 
-<rolltemplate class="sheet-rolltemplate-li-assist">
+<rolltemplate class="sheet-rolltemplate-condition">
 	<div class="sheet-template-container">
-		<span class="sheet-rolltemplate-li-roll-bold">{{name}}</span><span class="sheet-rolltemplate-li-roll-label">{{title}}{{computed::roll1}}</span>
+		<span class="sheet-rolltemplate-li-roll-bold">{{name}}</span>
+		<span class="sheet-rolltemplate-li-roll-label">{{title}}</span>
+		{{#rollGreater() computed::quality 0}}
+            <span class="good"></span>
+        {{/rollGreater() computed::quality 0}}
+        {{#rollLess() computed::quality 0}}
+            <span class="bad"></span>
+        {{/rollLess() computed::quality 0}}
+        {{#rollGreater() computed::result 0}}
+            <span class="healing"></span>
+        {{/rollGreater() computed::result 0}}
+        {{#rollLess() computed::result 0}}
+            <span class="dead"></span>
+        {{/rollLess() computed::result 0}}
+		<span class="sheet-rolltemplate-condition-result">{{computed::roll1}}</span>
 	</div>
 </rolltemplate>
 
-<rolltemplate class="sheet-rolltemplate-hi-assist">
+<rolltemplate class="sheet-rolltemplate-initiative">
 	<div class="sheet-template-container">
 		<div class="sheet-rolltemplate-hi-roll-label">
 			<span class="sheet-rolltemplate-hi-roll-bold">{{name}}</span><span class="sheet-rolltemplate-hi-roll-label">{{title}}{{computed::roll1}}</span>
@@ -4825,10 +4989,15 @@ function getSectionIDsAsync(sectionName){
 		</span>
 		<span style="grid-row: 1; grid-column: 2;" class="cell">
 			<div align="center">
-				<button type="action" name="act_switch_to_gear" class="tabButton">Gear</button>
+				<button type="action" name="act_switch_to_combat" class="tabButton" value="">Combat</button>
 			</div>
 		</span>
 		<span style="grid-row: 1; grid-column: 3;" class="cell">
+			<div align="center">
+				<button type="action" name="act_switch_to_gear" class="tabButton">Gear</button>
+			</div>
+		</span>
+		<span style="grid-row: 1; grid-column: 4;" class="cell">
 			<div align="center">
 				<button type="action" name="act_switch_to_notes" class="tabButton">Notes</button>
 			</div>
@@ -5652,6 +5821,9 @@ function getSectionIDsAsync(sectionName){
 								<div class="title2" style="font-size: 12px;">
 									Custom profession
 								</div>
+								<div align="center" style="width: 250px; font-size: 8px; color: red;">
+								    Do not select this option unless you cleared it with the spacemaster first!
+								</div>
 								<span style="font-size: 10px">Name</span><br><input type="text" name="attr_custom_prof_name" value="Cat Wrangler" id="tex2" style="width: 200px"><br>
 								<span style="font-size: 10px">Attributes</span><br><select name="attr_custom_attr1" id="tex2" style="width: 200px" class="attribute1-select">
 									<option value="str" selected>Strength</option>
@@ -6008,18 +6180,13 @@ function getSectionIDsAsync(sectionName){
 					XP: <input type="text" name="attr_skill_xp" class="num">
 				</div>
 			</span>
-			<span style="grid-row: 4; grid-column: 1;" class="cell">
+			<span style="grid-row: 4; grid-column: 1 / span 2;" class="cell">
 				<br>
-				<div align="right">
-					<span name="attr_skill_level_up_text" class="label1"/>
-				</div>
-			</span>
-			<span style="grid-row: 4; grid-column: 2;" class="cell">
-				<br>
-				<input type="hidden" name="attr_hide_level_skill" class="hide-level-skill">
-				<button type="action" name="act_level_skill" class="levelUpButton level-skill-hide"/>
-				<!--><input type="hidden" name="attr_hide_reduce_skill" class="hide-reduce-skill">
-				<button type="action" name="act_reduce_skill" class="levelDownButton reduce-skill-hide"/> -->
+				<div align="center">
+    				<span name="attr_skill_level_up_text" class="label1"/>
+    				<input type="hidden" name="attr_hide_level_skill" class="hide-level-skill">
+    				<button type="action" name="act_level_skill" class="levelUpButton level-skill-hide"/>
+    			</div>
 			</span>
 			<span colspan="2" style="grid-row: 5; grid-column: 1 / span 2;" class="cell">
 				<div align="center">
@@ -6130,16 +6297,19 @@ function getSectionIDsAsync(sectionName){
 		</div>
 	</div>
 	
+<input type="hidden" name="attr_intensity" class="intensity" value="0">	
 <input type="hidden" name="attr_shoot_prompt_hider" class="hide-shoot-prompt" value="1">
 	<div id="shoot_prompt" class="prompt shoot-prompt-hide">
 		<div class="grid12 table">
 			<span colspan="2" style="grid-row: 1; grid-column: 1 / span 2;" class="cell">
 				<div align="center">
+                    <input type="hidden" name="attr_intensity" class="intensity" value="0">	
 					<span name="attr_firing_text" class="label3"/>
 				</div>
 			</span>
 			<span colspan="2" style="grid-row: 2; grid-column: 1 / span 2;" class="cell">
 				<div align="center">
+                    <input type="hidden" name="attr_intensity" class="intensity" value="0">
 					Mode: <select name="attr_firing_mode" id="tex6" class="firing-mode-select">
 						<option value="single">Single</option>
 						<option value="burst">Burst</option>
@@ -6151,6 +6321,7 @@ function getSectionIDsAsync(sectionName){
 			<span style="grid-row: 3; grid-column: 1;" class="cell">
 				<br>
 				<div align="center">
+                    <input type="hidden" name="attr_intensity" class="intensity" value="0">
 					<input type="hidden" name="attr_shoot_hider" value="0" class="hide-shoot">
 					<button type="action" name="act_shoot" class="promptButton shoot-hide">Attack</button>
 				</div>
@@ -6158,6 +6329,7 @@ function getSectionIDsAsync(sectionName){
 			<span style="grid-row: 3; grid-column: 2;" class="cell">
 				<br>
 				<div align="center">
+                    <input type="hidden" name="attr_intensity" class="intensity" value="0">
 					<button type="action" name="act_cancel_shoot" class="promptButton">Cancel</button>
 				</div>
 			</span>
@@ -6296,37 +6468,37 @@ function getSectionIDsAsync(sectionName){
             <tr>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_strLow" value="/w gm [[abs(1d20-1d20) + @{str}]]" class="rollButton"><button type="roll" name="roll_strHigh" value="/w gm [[1d12 + @{str}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_strLow" value="/w gm [[abs(1d20-1d20) + @{str}]]" class="rollButton"/><button type="roll" name="roll_strHigh" value="/w gm [[1d12 + @{str}]]" class="highIntensityButton"/>
                     </div>
                 </td>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_staLow" value="/w gm [[abs(1d20-1d20) + @{sta}]]" class="rollButton"><button type="roll" name="roll_staHigh" value="/w gm [[1d12 + @{sta}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_staLow" value="/w gm [[abs(1d20-1d20) + @{sta}]]" class="rollButton"/><button type="roll" name="roll_staHigh" value="/w gm [[1d12 + @{sta}]]" class="highIntensityButton"/>
                     </div>
                 </td>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_agiLow" value="/w gm [[abs(1d20-1d20) + @{agi}]]" class="rollButton"><button type="roll" name="roll_agiHigh" value="/w gm [[1d12 + @{agi}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_agiLow" value="/w gm [[abs(1d20-1d20) + @{agi}]]" class="rollButton"/><button type="roll" name="roll_agiHigh" value="/w gm [[1d12 + @{agi}]]" class="highIntensityButton"/>
                     </div>
                 </td>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_perLow" value="/w gm [[abs(1d20-1d20) + @{per}]]" class="rollButton"><button type="roll" name="roll_perHigh" value="/w gm [[1d12 + @{per}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_perLow" value="/w gm [[abs(1d20-1d20) + @{per}]]" class="rollButton"/><button type="roll" name="roll_perHigh" value="/w gm [[1d12 + @{per}]]" class="highIntensityButton"/>
                     </div>
                 </td>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_intLow" value="/w gm [[abs(1d20-1d20) + @{int}]]" class="rollButton"><button type="roll" name="roll_intHigh" value="/w gm [[1d12 + @{int}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_intLow" value="/w gm [[abs(1d20-1d20) + @{int}]]" class="rollButton"/><button type="roll" name="roll_intHigh" value="/w gm [[1d12 + @{int}]]" class="highIntensityButton"/>
                     </div>
                 </td>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_chaLow" value="/w gm [[abs(1d20-1d20) + @{cha}]]" class="rollButton"><button type="roll" name="roll_chaHigh" value="/w gm [[1d12 + @{cha}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_chaLow" value="/w gm [[abs(1d20-1d20) + @{cha}]]" class="rollButton"/><button type="roll" name="roll_chaHigh" value="/w gm [[1d12 + @{cha}]]" class="highIntensityButton"/>
                     </div>
                 </td>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_wilLow" value="/w gm [[abs(1d20-1d20) + @{wil}]]" class="rollButton"><button type="roll" name="roll_wilHigh" value="/w gm [[1d12 + @{wil}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_wilLow" value="/w gm [[abs(1d20-1d20) + @{wil}]]" class="rollButton"/><button type="roll" name="roll_wilHigh" value="/w gm [[1d12 + @{wil}]]" class="highIntensityButton"/>
                     </div>
                 </td>
             </tr>
@@ -6407,56 +6579,234 @@ function getSectionIDsAsync(sectionName){
             <tr>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_strLow" value="/w gm [[abs(1d20-1d20) + @{per} + @{aim}]]" class="rollButton"><button type="roll" name="roll_strHigh" value="/w gm [[1d12 + @{per} + @{aim}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_strLow" value="/w gm [[abs(1d20-1d20) + @{per} + @{aim}]]" class="rollButton"/><button type="roll" name="roll_strHigh" value="/w gm [[1d12 + @{per} + @{aim}]]" class="highIntensityButton"/>
                     </div>
                 </td>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_staLow" value="/w gm [[abs(1d20-1d20) + @{agi} + @{melee}]]" class="rollButton"><button type="roll" name="roll_staHigh" value="/w gm [[1d12 + @{agi} + @{melee}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_staLow" value="/w gm [[abs(1d20-1d20) + @{agi} + @{melee}]]" class="rollButton"/><button type="roll" name="roll_staHigh" value="/w gm [[1d12 + @{agi} + @{melee}]]" class="highIntensityButton"/>
                     </div>
                 </td>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_agiLow" value="/w gm [[abs(1d20-1d20) + @{sta} + @{endurance}]]" class="rollButton"><button type="roll" name="roll_agiHigh" value="/w gm [[1d12 + @{sta} + @{endurance}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_agiLow" value="/w gm [[abs(1d20-1d20) + @{sta} + @{endurance}]]" class="rollButton"/><button type="roll" name="roll_agiHigh" value="/w gm [[1d12 + @{sta} + @{endurance}]]" class="highIntensityButton"/>
                     </div>
                 </td>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_perLow" value="/w gm [[abs(1d20-1d20) + @{agi} + @{reaction}]]" class="rollButton"><button type="roll" name="roll_perHigh" value="/w gm [[1d12 + @{agi} + @{reaction}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_perLow" value="/w gm [[abs(1d20-1d20) + @{agi} + @{reaction}]]" class="rollButton"/><button type="roll" name="roll_perHigh" value="/w gm [[1d12 + @{agi} + @{reaction}]]" class="highIntensityButton"/>
                     </div>
                 </td>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_intLow" value="/w gm [[abs(1d20-1d20) + @{per} + @{throw}]]" class="rollButton"><button type="roll" name="roll_intHigh" value="/w gm [[1d12 + @{per} + @{throw}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_intLow" value="/w gm [[abs(1d20-1d20) + @{per} + @{throw}]]" class="rollButton"/><button type="roll" name="roll_intHigh" value="/w gm [[1d12 + @{per} + @{throw}]]" class="highIntensityButton"/>
                     </div>
                 </td>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_chaLow" value="/w gm [[abs(1d20-1d20) + @{per} + @{notice}]]" class="rollButton"><button type="roll" name="roll_chaHigh" value="/w gm [[1d12 + @{per} + @{notice}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_chaLow" value="/w gm [[abs(1d20-1d20) + @{per} + @{notice}]]" class="rollButton"/><button type="roll" name="roll_chaHigh" value="/w gm [[1d12 + @{per} + @{notice}]]" class="highIntensityButton"/>
                     </div>
                 </td>
                 <td>
                     <div align="center">
-                    <button type="roll" name="roll_wilLow" value="/w gm [[abs(1d20-1d20) + @{per} + @{empathy}]]" class="rollButton"><button type="roll" name="roll_wilHigh" value="/w gm [[1d12 + @{per} + @{empathy}]]" class="highIntensityButton">
+                    <button type="roll" name="roll_wilLow" value="/w gm [[abs(1d20-1d20) + @{per} + @{empathy}]]" class="rollButton"/><button type="roll" name="roll_wilHigh" value="/w gm [[1d12 + @{per} + @{empathy}]]" class="highIntensityButton"/>
                     </div>
                 </td>
             </tr>
         </table>
         <br>
-		<div class="title1" align="center" style="color: #C95327;">
-		Roll initiative:
-		</div>
-		<input type="hidden" name="last_init">
-		<select class="weapon-medium" name="attr_init_mod" style="color: #C95327; border-color: #C95327;">
-			<option value="-4">-4 ini, +2 AP</option>
-			<option value="-2">-2 ini, +1 AP</option>
-			<option value="0" selected>Unmodified</option>
-			<option value="2">+2 ini, -1 AP</option>
-			<option value="4">+4 ini, -2 AP</option>
-		</select>
-		<button type="action" name="act_roll_initiative" class="highIntensityButton" style="position: relative; top: -2px;"/>
-		<button type="action" name="act_resend_initiative" class="rerollButton" style="position: relative; top: -2px;"/>
+        <table>
+            <tr>
+                <td>
+                    <div align="center">
+                        Custom rolls
+                        <br>
+                        <input type="text" name="attr_custom_roll1_name" id="tex4">
+                        <input type="text" name="attr_custom_roll1_value" class="num">
+                        <button type="roll" name="roll_custom1Low" value="/w gm [[abs(1d20-1d20) + @{custom_roll1_value}]]" class="rollButton"/>
+                        <button type="roll" name="roll_custom1High" value="/w gm [[1d12 + @{custom_roll1_value}]]" class="highIntensityButton"/>
+                        <br>
+                        <input type="text" name="attr_custom_roll2_name" id="tex4">
+                        <input type="text" name="attr_custom_roll2_value" class="num">
+                        <button type="roll" name="roll_custom1Low" value="/w gm [[abs(1d20-1d20) + @{custom_roll2_value}]]" class="rollButton"/>
+                        <button type="roll" name="roll_custom1High" value="/w gm [[1d12 + @{custom_roll2_value}]]" class="highIntensityButton"/>
+                        <br>
+                        <input type="text" name="attr_custom_roll3_name" id="tex4">
+                        <input type="text" name="attr_custom_roll3_value" class="num">
+                        <button type="roll" name="roll_custom1Low" value="/w gm [[abs(1d20-1d20) + @{custom_roll3_value}]]" class="rollButton"/>
+                        <button type="roll" name="roll_custom1High" value="/w gm [[1d12 + @{custom_roll3_value}]]" class="highIntensityButton"/>
+                        <br>
+                    </div>
+                </td>
+                <td>
+                    <div align="center">
+                    	<span class="title1">HP: </span>
+                    	<input type="text" class="num" name="attr_npc_hp" value="20"> /
+                    	<input type="text" class="num" name="attr_npc_max_hp" value="20">
+                    </div>
+                    <div class="title1">
+            			Shield
+            		</div>
+            		<div align="center">
+            			<input type="text" name="attr_shield" class="num" value="0">
+            			<input type="text" name="attr_shield_type" id="tex6" style="width: 200px">
+            		</div>
+            	</td>
+            	<td>
+            		<div class="title1" align="center" style="color: #C95327;">
+            		    Roll initiative:
+            		</div>
+            		<br>
+            		<input type="hidden" name="last_init">
+            		<select class="weapon-medium" name="attr_init_mod" style="color: #C95327; border-color: #C95327;">
+            			<option value="-4">-4 ini, +2 AP</option>
+            			<option value="-2">-2 ini, +1 AP</option>
+            			<option value="0" selected>Unmodified</option>
+            			<option value="2">+2 ini, -1 AP</option>
+            			<option value="4">+4 ini, -2 AP</option>
+            		</select>
+            		<button type="action" name="act_roll_initiative" class="highIntensityButton" style="position: relative; top: -2px;"/>
+            		<button type="action" name="act_resend_initiative" class="rerollButton" style="position: relative; top: -2px;"/>
+            	</td>
+            </tr>
+        </table>
     </div>
+    
+<input type="hidden" name="attr_combat_page_hider" class="hide-combat-page" value="1">
+	<div id="combat_page" class="combat-page-hide">
+		<div align="center" class="main-title">
+			Combat
+		</div>
+		<br>
+		<div>
+		    <div class="combat-grid">
+		        <span style="grid-row: 1; grid-column: 1;" class="cell">
+        		    <div class="grid17 table">
+        				<span width="266" style="grid-row: 1; grid-column: 1;" class="cell">
+        					<div align="center">
+        						<span class="title1">HP: </span>
+        						<input type="hidden" name="attr_bought_hp" value="0">
+        						<input type="text" class="num" name="attr_hp" value="20"> /
+        						<input type="text" class="num" name="attr_max_hp" value="20" readonly>
+        						<button type="action" class="levelUpButton" name="act_hp_up"/>
+        					</div>
+        				</span>
+        				<span style="grid-row: 2; grid-column: 1;" class="cell">
+        					<div align="center">
+        						<span class="small-font">Pain modifier: </span><input type="text" class="num" name="attr_pain_modifier" value="0">
+        						<span class="small-font">Pain: </span><input type="hidden" name="attr_pain_from_damage" value="0">
+        						<input type="text" class="num" name="attr_pain" readonly>
+        					</div>
+        				</span>
+        				<span style="grid-row: 3; grid-column: 1;" class="cell">
+        					<div align="center">
+        						<span class="small-font">Roll condition: </span><button type="action" name="act_roll_condition" class="rollButton" style="position: relative; top: 8px;"/>
+        					</div>
+        				</span>
+        			</div>
+    			</span>
+    			<span style="grid-row: 1; grid-column: 2;" class="cell">
+    				<div class="title1">
+    					Armor
+    					<input type="hidden" name="attr_equipped_armor_id" value="0">
+    				</div>
+    				<div align="center">
+    					<div width="224" class="grid19 table">
+    						<span style="grid-row: 1; grid-column: 1;" class="cell">
+    							<span class="small-font">DA</span>
+    						</span>
+    						<span style="grid-row: 1; grid-column: 2;" class="cell">
+    							<span class="small-font">CMR</span>
+    						</span>
+    						<span style="grid-row: 1; grid-column: 3;" class="cell">
+    							<span class="small-font">Slow</span>
+    						</span>
+    						<span style="grid-row: 1; grid-column: 4;" class="cell">
+    							<span class="small-font">HP</span>
+    						</span>
+    						<span style="grid-row: 1; grid-column: 5;" class="cell">
+    							<span class="small-font">+HP</span>
+    						</span>
+    						<span style="grid-row: 2; grid-column: 1;" class="cell">
+    							<input type="text" class="num" name="attr_equipped_armor_da" value="0" readonly>
+    						</span>
+    						<span style="grid-row: 2; grid-column: 2;" class="cell">
+    							<input type="text" class="num" name="attr_equipped_armor_cmr" value="0" readonly>
+    						</span>
+    						<span style="grid-row: 2; grid-column: 3;" class="cell">
+    							<input type="text" class="num" name="attr_equipped_armor_slow" value="0" readonly>
+    						</span>
+    						<span style="grid-row: 2; grid-column: 4;" class="cell">
+    							<input type="text" class="num" name="attr_equipped_armor_hp" value="0">
+    						</span>
+    						<span style="grid-row: 2; grid-column: 5;" class="cell">
+    							<input type="text" class="num" name="attr_equipped_armor_bonus_hp" value="0">
+    						</span>
+    					</div>
+    				</div>
+					<div class="title1">
+						Shield
+					</div>
+					<div align="center">
+						<input type="text" name="attr_shield" class="num" value="0">
+						<input type="text" name="attr_shield_type" id="tex6" style="width: 200px">
+					</div>
+					<br>
+					<div class="title1 equipped-weapon1-hide">
+						Equipped Weapons
+					</div>
+					<input type="hidden" name="attr_equipped_weapon1_melee" value="-1">
+					<input type="hidden" name="attr_equipped_weapon1_id" class="hide-equipped-weapon1" value="0">
+					<div align="center" class="equipped-weapon1-hide">
+						<span name="attr_equipped_weapon1"/>
+						<button type="action" name="act_open_shoot" value="1" class="shootButton"/>
+						<button type="action" name="act_roll_damage" value="equipped1" class="damageButton"/>
+					</div>
+					<input type="hidden" name="attr_equipped_weapon2_melee" value="-1">
+					<input type="hidden" name="attr_equipped_weapon2_id" class="hide-equipped-weapon2" value="0">
+					<div align="center" class="equipped-weapon2-hide">
+						<span name="attr_equipped_weapon2"/>
+						<button type="action" name="act_open_shoot" value="2" class="shootButton"/>
+						<button type="action" name="act_roll_damage" value="equipped2" class="damageButton"/>
+					</div>
+					<input type="hidden" name="attr_equipped_weapon3_melee" value="-1">
+					<input type="hidden" name="attr_equipped_weapon3_id" class="hide-equipped-weapon3" value="0">
+					<div align="center" class="equipped-weapon3-hide">
+						<span name="attr_equipped_weapon3"/>
+						<button type="action" name="act_open_shoot" value="3" class="shootButton"/>
+						<button type="action" name="act_roll_damage" value="equipped3" class="damageButton"/>
+					</div>
+			        <br>
+			    </span>
+			    <span style="grid-row: 1; grid-column: 3;" class="cell">
+					<div align="center">
+						<div class="title1" align="center" style="color: #C95327;">
+						    Roll initiative:
+						</div>
+						<input type="hidden" name="last_init">
+						<select class="weapon-medium" name="attr_init_mod" style="color: #C95327; border-color: #C95327;">
+							<option value="-4">-4 ini, +2 AP</option>
+							<option value="-2">-2 ini, +1 AP</option>
+							<option value="0" selected>Unmodified</option>
+							<option value="2">+2 ini, -1 AP</option>
+							<option value="4">+4 ini, -2 AP</option>
+						</select>
+						<button type="action" name="act_roll_initiative" class="highIntensityButton" style="position: relative; top: -2px;"/>
+			    		<button type="action" name="act_resend_initiative" class="rerollButton" style="position: relative; top: -2px;"/>
+					</div>
+					<div align="center">
+					    <span class="title1">AP/turn: </span>	<input type="text" class="num" name="attr_ap_per_turn" value="7">
+						<br>
+						<span class="title1">AP: </span>	<input type="text" class="num" name="attr_ap" value="0">
+						<br>
+						<button class="promptButton" type="action" name="act_reduce_ap" value="3" style="width: 40px; border-width: 1px">-3</button>
+						<button class="promptButton" type="action" name="act_reduce_ap" value="4" style="width: 40px; border-width: 1px">-4</button>
+						<button class="promptButton" type="action" name="act_reduce_ap" value="6" style="width: 40px; border-width: 1px">-6</button>
+					</div>
+				</span>
+			</div>
+		</div>
+	</div>
     
 <input type="hidden" name="attr_npc" class="npc" value="0">
 <input type="hidden" name="attr_character_page_hider" class="hide-character-page" value="0">
@@ -6708,149 +7058,6 @@ function getSectionIDsAsync(sectionName){
 							<button type="action" name="act_wil_up" class="levelUpButton"/>
 						</span>
 					</div>
-					<br>
-					<div class="grid17 table">
-						<span width="380" style="grid-row: 1; grid-column: 1;" class="cell">
-							<div align="center">
-								<span class="title1">HP: </span>
-								<input type="hidden" name="attr_bought_hp" value="0">
-								<input type="text" class="num" name="attr_hp" value="20"> /
-								<input type="text" class="num" name="attr_max_hp" value="20" readonly>
-								<button type="action" class="levelUpButton" name="act_hp_up"/>
-							</div>
-						</span>
-						<span style="grid-row: 2; grid-column: 1;" class="cell">
-							<div align="center">
-								<span class="small-font">Pain modifier: </span><input type="text" class="num" name="attr_pain_modifier">
-								<span class="small-font">Pain: </span><input type="hidden" name="attr_pain_from_damage" value="0">
-								<input type="text" class="num" name="attr_pain" readonly>
-							</div>
-						</span>
-						<span style="grid-row: 3; grid-column: 1;" class="cell">
-							<div align="center">
-								<span class="small-font">Roll condition: </span><button type="action" name="act_roll_condition" class="rollButton" style="position: relative; top: 8px;"/>
-							</div>
-						</span>
-					</div>
-					<br>
-					<div class="grid18 table">
-						<span width="380" style="grid-row: 1; grid-column: 1;" class="cell">
-							<div class="title1">
-								Armor
-								<input type="hidden" name="attr_equipped_armor_id" value="0">
-							</div>
-						</span>
-						<span style="grid-row: 2; grid-column: 1;" class="cell">
-							<div align="center">
-								<div width="224" class="grid19 table">
-									<span style="grid-row: 1; grid-column: 1;" class="cell">
-										<span class="small-font">DA</span>
-									</span>
-									<span style="grid-row: 1; grid-column: 2;" class="cell">
-										<span class="small-font">CMR</span>
-									</span>
-									<span style="grid-row: 1; grid-column: 3;" class="cell">
-										<span class="small-font">Slow</span>
-									</span>
-									<span style="grid-row: 1; grid-column: 4;" class="cell">
-										<span class="small-font">HP</span>
-									</span>
-									<span style="grid-row: 1; grid-column: 5;" class="cell">
-										<span class="small-font">+HP</span>
-									</span>
-									<span style="grid-row: 2; grid-column: 1;" class="cell">
-										<input type="text" class="num" name="attr_equipped_armor_da" value="0" readonly>
-									</span>
-									<span style="grid-row: 2; grid-column: 2;" class="cell">
-										<input type="text" class="num" name="attr_equipped_armor_cmr" value="0" readonly>
-									</span>
-									<span style="grid-row: 2; grid-column: 3;" class="cell">
-										<input type="text" class="num" name="attr_equipped_armor_slow" value="0" readonly>
-									</span>
-									<span style="grid-row: 2; grid-column: 4;" class="cell">
-										<input type="text" class="num" name="attr_equipped_armor_hp" value="0">
-									</span>
-									<span style="grid-row: 2; grid-column: 5;" class="cell">
-										<input type="text" class="num" name="attr_equipped_armor_bonus_hp" value="0">
-									</span>
-								</div>
-							</div>
-						</span>
-						<span style="grid-row: 3; grid-column: 1;" class="cell">
-							<br>
-							<div class="title1">
-								Shield
-							</div>
-						</span>
-						<span style="grid-row: 4; grid-column: 1;" class="cell">
-							<div align="center">
-								<input type="text" name="attr_shield" class="num" value="0">
-								<input type="text" name="attr_shield_type" id="tex6">
-							</div>
-						</span>
-						<span style="grid-row: 5; grid-column: 1;" class="cell">
-							<br>
-							<input type="hidden" name="attr_equipped_weapon1_id" class="hide-equipped-weapon1">
-							<div class="title1 equipped-weapon1-hide">
-								Equipped Weapons
-							</div>
-						</span>
-						<span style="grid-row: 6; grid-column: 1;" class="cell">
-							<input type="hidden" name="attr_equipped_weapon1_melee" value="-1">
-							<input type="hidden" name="attr_equipped_weapon1_id" class="hide-equipped-weapon1" value="0">
-							<div align="center" class="equipped-weapon1-hide">
-								<span name="attr_equipped_weapon1"/>
-								<button type="action" name="act_open_shoot" value="1" class="shootButton"/>
-								<button type="action" name="act_roll_damage" value="equipped1" class="damageButton"/>
-							</div>
-						</span>
-						<span style="grid-row: 7; grid-column: 1;" class="cell">
-							<input type="hidden" name="attr_equipped_weapon2_melee" value="-1">
-							<input type="hidden" name="attr_equipped_weapon2_id" class="hide-equipped-weapon2" value="0">
-							<div align="center" class="equipped-weapon2-hide">
-								<span name="attr_equipped_weapon2"/>
-								<button type="action" name="act_open_shoot" value="2" class="shootButton"/>
-								<button type="action" name="act_roll_damage" value="equipped2" class="damageButton"/>
-							</div>
-						</span>
-						<span style="grid-row: 8; grid-column: 1;" class="cell">
-							<input type="hidden" name="attr_equipped_weapon3_melee" value="-1">
-							<input type="hidden" name="attr_equipped_weapon3_id" class="hide-equipped-weapon3" value="0">
-							<div align="center" class="equipped-weapon3-hide">
-								<span name="attr_equipped_weapon3"/>
-								<button type="action" name="act_open_shoot" value="3" class="shootButton"/>
-								<button type="action" name="act_roll_damage" value="equipped3" class="damageButton"/>
-							</div>
-						</span>
-					</div>
-					<br>
-					<div class="grid20 table">
-						<span style="grid-row: 1; grid-column: 1;" class="cell">
-							<div align="center">
-								<div class="title1" align="center" style="color: #C95327;">
-								    Roll initiative:
-								</div>
-								<input type="hidden" name="last_init">
-								<select class="weapon-medium" name="attr_init_mod" style="color: #C95327; border-color: #C95327;">
-									<option value="-4">-4 ini, +2 AP</option>
-									<option value="-2">-2 ini, +1 AP</option>
-									<option value="0" selected>Unmodified</option>
-									<option value="2">+2 ini, -1 AP</option>
-									<option value="4">+4 ini, -2 AP</option>
-								</select>
-								<button type="action" name="act_roll_initiative" class="highIntensityButton" style="position: relative; top: -2px;"/>
-								<button type="action" name="act_resend_initiative" class="rerollButton" style="position: relative; top: -2px;"/>
-							</div>
-						</span>
-					</div>
-					<div class="grid21 table">
-						<span width="380" style="grid-row: 1; grid-column: 1;" class="cell">
-							<div align="center">
-								<span class="title1">AP: </span>	<input type="text" class="num" name="attr_ap">
-							</div>
-						</span>
-					</div>
-					<br>
 					<div class="grid22 table">
 						<span width="380" style="grid-row: 1; grid-column: 1;" class="cell">
 							<div class="title1">
@@ -6867,6 +7074,28 @@ function getSectionIDsAsync(sectionName){
 								<button type="action" name="act_reroll" class="rerollButton">Reroll</button>
 							</div>
 						</span>
+					</div>
+					<div class="title1" style="width: 380px" align="center">
+						Enhancements
+						<input type="hidden" name="attr_advantage_xp" value="0">
+						<button type="action" name="act_addLine" value="enhancements" class="levelUpButton" style="width:18px; height:18px; background-size: contain;"/><br>
+						<div class="repeating-section-enhancements">
+							<div class="repeating-section-enhancements__header">
+								<span class="small-font">X</span>
+								<span class="small-font">Name</span>
+								<span class="small-font">Type</span>
+							</div>
+							<fieldset class="repeating_enhancements">
+								<button type="action" name="act_delete" class="levelDownButton" style="width: 18px; height 18px; background-size: contain;"/>
+								<input type="text" name="attr_enhancement_name" id="tex4">
+								<select name="attr_enhancement_type" id="tex4" style="font-size: 10px;">
+								    <option value="cybernetic">Cybernetic</option>
+								    <option value="augmentation">Genetic Augmentation</option>
+								    <option value="special">Special</option>
+								</select>
+								<input type="text" name="attr_enhancement_description" id="tex6" style="grid-column: 1 / span 3;font-size: 10px; height: 20px;">
+							</fieldset>
+						</div>
 					</div>
 					<br>
 					<div class="title1" style="width: 380px" align="center">
