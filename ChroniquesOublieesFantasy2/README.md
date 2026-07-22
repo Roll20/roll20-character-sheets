@@ -6,11 +6,11 @@ Consultez la [documentation](https://stephaned68.github.io/COF2e/)
 
 ## Version courante
 
-v1.17.0 [Screenshot](cof2e.png)
+v1.17.1 [Screenshot](cof2e.png)
 
 ## Notes de version
 
-### Version _1.17.0_ (2026-07-19)
+### Version _1.17.1_ (2026-07-19)
 
 - Fiche de PJ:
   - Ajout des Points d'Ego et des capacités combat/jour aux boutons de récupération

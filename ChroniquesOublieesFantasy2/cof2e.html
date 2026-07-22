@@ -1,8 +1,8 @@
 <div class="cofmain">
   <!-- Nouvelle version fiche -->
-  <input type="hidden" name="attr_verfdp" value="1.17.0">
+  <input type="hidden" name="attr_verfdp" value="1.17.1">
   <!-- Version courante fiche -->
-  <input type="hidden" name="attr_version" value="1.17.0">
+  <input type="hidden" name="attr_version" value="1.17.1">
   <!-- Mode debug -->
   <input type="hidden" name="attr_debug_mode" value="0">
   <!-- Edit locked -->
@@ -136,7 +136,7 @@
     <div>
       <img
         class="logo"
-        title="Version 1.17.0 - 07/2026"
+        title="Version 1.17.0 - 19/07/2026"
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesOublieesFantasy2/cof2e_logo.jpg"
       />
       <div class="d-flex m2">
@@ -6417,10 +6417,11 @@
               <li>
                 <details>
                   <summary>
-                    <strong>Version 1.17.0</strong> (2026-07)
+                    <strong>Version 1.17.1</strong> (2026-07-19)
                   </summary>
                   <ul>
                     <li>Amélioration des boutons Récupérations (PE, capacités, 0 DR)</li>
+                    <li>Ajout des maîtrises de compétences liées aux peuples (compagnon compris)</li>
                     <li>Ajout des propriétés <em>mods</em> et <em>options</em> aux équipements de type arme</li>
                     <li>Amélioration des armes maîtrisées (arme magique avec +X dans son nom)</li>
                     <li>Ajout de 4 langues personnalisées + possibilité de renommer les langues standard</li>
@@ -8117,11 +8118,13 @@
               <li>
                 <details>
                   <summary>
-                    <strong>Version 1.17.0</strong> (2026-07)
+                    <strong>Version 1.17.1</strong> (2026-07-19)
                   </summary>
                   <ul>
                     <li>Remplacement case multi-attaques par nombre d'attaque (1 par défaut)</li>
+                    <li>Amélioration de l'import des attaques à distance d'un statblock</li>
                     <li>Inversion du nombre d'utilisations des capacités à usage limité</li>
+                    <li>Interactions avec **COFantasy2** (paramètres des capacités)</li>
                   </ul>
                 </details>
               </li>
@@ -8941,7 +8944,7 @@
 
 /**
  * COF2e Sheet Worker
- * v1.17.0
+ * v1.17.1
  */
 
 const SWData = {
@@ -22606,7 +22609,7 @@ function migrateSheetToV1_16(sheetType, curVer = { major: 1, minor: 15, patch: 0
  * Migrate to Version 1.17.0
  * Change NPC multi-attack attribute
  */
-async function migrateSheetToV1_17(sheetType, curVer = { major: 1, minor: 16, patch: 0 }) {
+async function migrateSheetToV1_17(sheetType, curVer = { major: 1, minor: 16, patch: 1 }) {
   if (!isNPC(sheetType))
     return;
 
@@ -22661,8 +22664,11 @@ function migrateSheet(sheetType, curVer) {
   if (curVer.major === 1 && curVer.minor < 16)
     migrateSheetToV1_16(sheetType, curVer);
   
-  if (curVer.major === 1 && curVer.minor < 17)
-    //migrateSheetToV1_17(sheetType, curVer);
+  if (
+    (curVer.major === 1 && curVer.minor < 17) ||
+    (curVer.major === 1 && curVer.minor === 17 && curVer.patch < 1)
+  )
+    migrateSheetToV1_17(sheetType, curVer);
 
   return;
 }
