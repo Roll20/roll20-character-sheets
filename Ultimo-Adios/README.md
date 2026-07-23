@@ -1,3 +1,3 @@
-# Medievo_-Oscuro
-Medievo Oscuro roll20-character-sheets.
-Puedes descargar los archivos para jugar a Medievo Oscuro en Roll20
+# ÚLTIMO ADIÓS
+Último Adiós Roll20 character sheet.
+
