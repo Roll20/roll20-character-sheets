@@ -1,0 +1,419 @@
+/* Dresden Files Accelerated — Roll20 custom sheet
+   All rules scoped under .charsheet .dfa-sheet so they never leak into Roll20 chrome. */
+
+.charsheet .dfa-sheet {
+  --bg: #030304;
+  --bg-field: #000000;
+  --panel: #111116;
+  --panel-2: #18181e;
+  --grey: #6e7280;
+  --grey-light: #c3c6d0;
+  --grey-dark: #26272f;
+  --rule: #4a4e5a;
+  --rule-bright: #9298a8;
+  --gold: #e8b93b;
+  --gold-bright: #ffd966;
+  --gold-glow: rgba(255, 217, 102, 0.35);
+  --ink: #fbf8ee;
+  --ink-dim: #d8d3c4;
+  --ink-faint: #aca698;
+  --danger: #b23f34;
+  --danger-bright: #f06a5a;
+
+  font-family: 'EB Garamond', Georgia, serif;
+  background: radial-gradient(ellipse at 20% 0%, #131318 0%, #030304 55%) !important;
+  color: var(--ink) !important;
+  padding: 16px;
+  max-width: 1180px;
+  color-scheme: dark;
+}
+.charsheet .dfa-sheet * { box-sizing: border-box; }
+.charsheet .dfa-sheet h1, .charsheet .dfa-sheet h2, .charsheet .dfa-sheet h3 { font-family: 'Cinzel', Georgia, serif; }
+
+.charsheet .dfa-h1 {
+  text-align: left; font-size: 18px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold-bright); margin: 0; text-shadow: 0 0 10px var(--gold-glow);
+}
+.charsheet .dfa-headerbox {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  border: 1px solid var(--gold); background: var(--panel-2); padding: 7px 12px; margin-bottom: 10px;
+}
+.charsheet .dfa-token-img,
+.charsheet .dfa-avatar-img {
+  flex: none; width: 54px; height: 54px; object-fit: cover; border-radius: 4px;
+  border: 1px solid var(--gold); background: var(--bg-field);
+}
+.charsheet .dfa-header-title { flex: 1; min-width: 0; }
+.charsheet .dfa-header-sub {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px;
+  color: var(--grey-light); text-transform: uppercase; margin-top: 2px; min-height: 13px;
+}
+
+/* ---- Tabs ---- */
+.charsheet .dfa-tab-radio { display: none; }
+
+.charsheet .dfa-body { display: block; }
+.charsheet .dfa-main { min-width: 0; }
+
+/* ---- Horizontal top tab strip ---- */
+.charsheet .dfa-topbar {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
+  margin-bottom: 12px;
+}
+.charsheet .dfa-toptab {
+  font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  text-align: center; padding: 8px 4px; cursor: pointer;
+  background: var(--grey-dark); color: var(--grey-light);
+  border: 1px solid var(--rule-bright); border-bottom: 2px solid transparent;
+  transition: color .12s, background .12s;
+}
+.charsheet .dfa-toptab:hover { color: var(--gold-bright); }
+#dfa-tab-worksheet:checked  ~ .dfa-topbar label[for="dfa-tab-worksheet"],
+#dfa-tab-character:checked  ~ .dfa-topbar label[for="dfa-tab-character"],
+#dfa-tab-spells:checked     ~ .dfa-topbar label[for="dfa-tab-spells"],
+#dfa-tab-equipment:checked  ~ .dfa-topbar label[for="dfa-tab-equipment"],
+#dfa-tab-notes:checked      ~ .dfa-topbar label[for="dfa-tab-notes"] {
+  color: #0c0c0e; background: var(--gold-bright);
+  border-bottom-color: var(--gold); font-weight: 700; box-shadow: 0 0 12px var(--gold-glow);
+}
+
+.charsheet .dfa-panelset { display: none; }
+#dfa-tab-worksheet:checked  ~ .dfa-body .dfa-panelset-worksheet  { display: block; }
+#dfa-tab-character:checked  ~ .dfa-body .dfa-panelset-character  { display: block; }
+#dfa-tab-spells:checked     ~ .dfa-body .dfa-panelset-spells     { display: block; }
+#dfa-tab-equipment:checked  ~ .dfa-body .dfa-panelset-equipment  { display: block; }
+#dfa-tab-notes:checked      ~ .dfa-body .dfa-panelset-notes      { display: block; }
+
+/* ---- Shared field styling ---- */
+.charsheet .dfa-sheet label {
+  display: block; font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+  letter-spacing: .5px; text-transform: uppercase; color: var(--ink-faint);
+  margin: 6px 0 3px;
+}
+.charsheet .dfa-sheet input[type=text],
+.charsheet .dfa-sheet input[type=number],
+.charsheet .dfa-sheet select,
+.charsheet .dfa-sheet textarea {
+  width: 100%; background: var(--bg-field); border: 1px solid var(--grey); color: var(--ink);
+  font-family: 'EB Garamond', Georgia, serif; font-size: 13px; padding: 5px 7px;
+}
+.charsheet .dfa-sheet textarea { min-height: 56px; resize: vertical; }
+.charsheet .dfa-sheet textarea.tall { min-height: 90px; }
+.charsheet .dfa-sheet input:focus, .charsheet .dfa-sheet select:focus, .charsheet .dfa-sheet textarea:focus {
+  outline: none; border-color: var(--gold-bright); box-shadow: 0 0 0 1px var(--gold-bright) inset;
+}
+.charsheet .dfa-sheet input.mini-readonly { background: var(--grey-dark); color: var(--grey-light); border-color: var(--grey); }
+.charsheet .dfa-sheet .aspect-input { border-left: 3px solid var(--gold); }
+.charsheet .dfa-sheet .trouble-input { border-left: 3px solid var(--danger-bright); }
+.charsheet .qlabel { margin-top: 10px; }
+.charsheet .hint { font-size: 11px; color: var(--grey-light); margin-top: 6px; }
+.charsheet .hint-inline { font-size: 10px; font-family: 'JetBrains Mono', monospace; text-transform: none; letter-spacing: 0; color: var(--grey-light); }
+.charsheet .mini-readonly { width: 46px !important; display: inline-block; padding: 3px 4px !important; text-align: center; }
+
+/* ---- Panels (Bio/Attributes tabs) ---- */
+.charsheet .panel {
+  background: var(--panel-2); border: 1px solid var(--rule-bright); padding: 12px 14px; margin-bottom: 10px; position: relative;
+}
+.charsheet .panel h2 {
+  font-size: 12px; letter-spacing: 1.5px; color: var(--gold-bright); text-transform: uppercase; margin: 0 0 3px;
+  border-bottom: 1px solid var(--grey-dark); padding-bottom: 5px; text-shadow: 0 0 6px var(--gold-glow);
+}
+.charsheet .panel .flavor { font-style: italic; color: var(--grey-light); font-size: 12px; margin: 0 0 10px; }
+.charsheet .phase-num {
+  font-family: 'Cinzel', serif; font-size: 28px; color: var(--grey); position: absolute;
+  right: 16px; top: 10px; opacity: .6;
+}
+.charsheet .dfa-grid2 { display: grid; grid-template-columns: 1.25fr 1fr; gap: 14px; align-items: start; }
+.charsheet .col { min-width: 0; }
+
+/* ---- Quick-grid (Character Sheet tab) ---- */
+.charsheet .dfa-quickgrid {
+  display: grid; gap: 8px;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-areas:
+    "name       name       mantles    mantles"
+    "aspects    aspects    power      power"
+    "approaches approaches ladder     scale"
+    "stress     stress     stunts     stunts"
+    "fate       fate       fate       fate"
+    "cons       cons       bonus      bonus";
+}
+.charsheet .area-cons { grid-area: cons; }
+.charsheet .area-bonus { grid-area: bonus; }
+.charsheet .area-name { grid-area: name; }
+.charsheet .name-row { display: flex; gap: 8px; align-items: flex-start; }
+.charsheet .name-field { flex: 1; min-width: 0; }
+.charsheet .name-field-player { flex: 0 0 34%; }
+.charsheet .name-field .qlabel { margin-top: 0; }
+.charsheet .area-mantles { grid-area: mantles; }
+.charsheet .area-power { grid-area: power; }
+.charsheet .area-aspects { grid-area: aspects; }
+.charsheet .area-approaches { grid-area: approaches; }
+.charsheet .area-ladder { grid-area: ladder; }
+.charsheet .area-scale { grid-area: scale; }
+.charsheet .area-stress { grid-area: stress; }
+.charsheet .area-stunts { grid-area: stunts; }
+.charsheet .area-fate { grid-area: fate; }
+
+.charsheet .qbox {
+  background: var(--panel-2); border: 1px solid var(--gold); padding: 8px 10px;
+  box-shadow: 0 0 8px rgba(0,0,0,.45);
+}
+.charsheet .qbox h3 {
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold-bright);
+  margin: 0 0 5px; text-shadow: 0 0 6px var(--gold-glow);
+}
+.charsheet .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.charsheet .pl-readout { display: flex; gap: 10px; margin-top: 8px; font-size: 11px; color: var(--grey-light); align-items: center; flex-wrap: wrap; }
+.charsheet .pl-readout input { width: 46px !important; display: inline-block; }
+.charsheet .pl-readout input[name="attr_skillcap"] { width: 60px !important; }
+.charsheet .autofill-btn {
+  display: block; width: 100%; margin-top: 8px; padding: 6px 8px;
+  background: var(--panel-2); border: 1px solid var(--gold); color: var(--gold-bright);
+  font-size: 11px; letter-spacing: .5px; text-transform: uppercase; font-weight: 700;
+  border-radius: 3px; cursor: pointer;
+}
+.charsheet .autofill-btn:hover { background: var(--gold-bright); color: #0c0c0e; box-shadow: 0 0 10px var(--gold-glow); }
+.charsheet .pl-note { font-size: 9.5px; color: var(--ink-faint); font-style: italic; margin-top: 6px; line-height: 1.35; }
+.charsheet .pl-note b { color: var(--gold-bright); font-style: normal; }
+
+/* Approaches */
+.charsheet .appr-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.charsheet .appr-roll {
+  flex: none; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--gold);
+  background: var(--grey-dark); color: var(--gold-bright); cursor: pointer; font-size: 12px; padding: 0;
+}
+.charsheet .appr-roll:hover { background: var(--gold-bright); color: #0c0c0e; }
+.charsheet .appr-val { width: 44px !important; flex: none; text-align: center; }
+.charsheet .appr-row label {
+  margin: 0; font-family: 'EB Garamond', Georgia, serif; font-size: 13px; text-transform: none;
+  letter-spacing: 0; color: var(--ink);
+}
+.charsheet .appr-label { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+.charsheet .appr-name {
+  font-family: 'EB Garamond', Georgia, serif; font-size: 13px; color: var(--ink);
+}
+.charsheet .appr-alt { color: var(--gold-bright); font-style: italic; }
+.charsheet .appr-skills {
+  font-family: 'JetBrains Mono', monospace; font-size: 8.5px; letter-spacing: .3px;
+  text-transform: uppercase; color: var(--grey-light);
+}
+.charsheet .appr-dist {
+  margin-top: 8px; border-top: 1px solid var(--grey-dark); padding-top: 8px;
+}
+.charsheet .appr-dist-title { font-family: 'JetBrains Mono', monospace; font-size: 9px; text-transform: uppercase;
+  letter-spacing: .5px; color: var(--grey-light); margin-bottom: 4px; }
+.charsheet .appr-spread-field {
+  width: 100% !important; text-align: center; color: var(--gold-bright) !important;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .5px;
+}
+.charsheet .appr-ref { margin-top: 8px; border-top: 1px solid var(--grey-dark); padding-top: 8px; }
+.charsheet .appr-ref-title { font-family: 'JetBrains Mono', monospace; font-size: 9px; text-transform: uppercase;
+  letter-spacing: .5px; color: var(--grey-light); margin-bottom: 4px; }
+.charsheet .appr-ref-row { display: flex; justify-content: space-between; gap: 6px; font-size: 10.5px; color: var(--ink-faint); padding: 1px 0; }
+.charsheet .appr-ref-note { font-size: 9.5px; color: var(--ink-faint); font-style: italic; margin-top: 4px; line-height: 1.35; }
+
+/* Ladder */
+.charsheet .ladder-list { display: flex; flex-direction: column; gap: 3px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--grey-light); }
+
+/* Scale */
+.charsheet .scale-item {
+  display: flex; align-items: center; gap: 8px; margin: 0 0 6px; text-transform: none;
+  font-family: 'EB Garamond', Georgia, serif; font-size: 13px; letter-spacing: 0; color: var(--ink);
+}
+.charsheet .scale-item input { width: auto !important; accent-color: var(--gold-bright); }
+
+/* Stress & Conditions — aligned Name | Boxes | Value grid */
+.charsheet .cond-head {
+  display: grid; grid-template-columns: 1fr 172px 44px; gap: 10px; align-items: end;
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .5px;
+  text-transform: uppercase; color: var(--grey-light); margin-bottom: 4px;
+}
+.charsheet .cond-head.cond-head-extra { margin-top: 10px; border-top: 1px solid var(--grey-dark); padding-top: 8px; }
+.charsheet .cond-head .ch-boxes, .charsheet .cond-head .ch-value { text-align: center; }
+.charsheet .cond-row {
+  display: grid; grid-template-columns: 1fr 172px 44px; gap: 10px; align-items: center; margin-bottom: 6px;
+}
+.charsheet .cond-label { font-family: 'Cinzel', serif; font-size: 11px; text-transform: uppercase; color: var(--gold-bright); align-self: center; white-space: nowrap; }
+.charsheet .cond-boxes { display: flex; gap: 6px; justify-content: flex-end; }
+.charsheet .cond-value { width: 44px !important; text-align: center; }
+.charsheet .dot { display: inline-flex; }
+.charsheet .dot input {
+  appearance: none; -webkit-appearance: none; width: 20px !important; height: 20px; border-radius: 50%;
+  border: 1.5px solid var(--rule-bright); background: var(--bg-field); cursor: pointer; margin: 0;
+}
+.charsheet .dot input:checked { background: var(--gold-bright); border-color: var(--gold); }
+
+/* Extra Condition: show the editable input while empty; once a name is
+   typed, hide the input and show the name as static text. */
+/* Extra Condition name/size show-hide via a Roll20-native lock checkbox.
+   Uses only :checked and the adjacent-sibling combinator (+), both of which
+   Roll20's sandbox supports reliably (unlike :placeholder-shown / ~ / :has).
+   - Unlocked (default): .extracond-edit (text box + Boxes dropdown) shows;
+     the static name and the Edit button are hidden.
+   - Locked (auto-set once a name is entered): .extracond-edit hides; the
+     static name shows, and the Edit button appears to reopen the fields. */
+.charsheet .cond-row-extra {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 6px;
+}
+.charsheet .cond-row-extra .extracond-lock,
+.charsheet .cond-row-extra .extracond-edit,
+.charsheet .cond-row-extra .cond-label-display { order: 0; }
+.charsheet .cond-row-extra .extracond-boxes { order: 5; margin-left: auto; }
+.charsheet .cond-row-extra .cond-value { order: 6; }
+
+.charsheet .cond-row-extra .cond-label-display { display: none; }
+.charsheet .cond-row-extra .extracond-edit { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+/* Locked: hide the edit group, show the static name. */
+.charsheet .cond-row-extra .extracond-lock:checked + .extracond-edit { display: none; }
+.charsheet .cond-row-extra .extracond-lock:checked + .extracond-edit + .cond-label-display { display: inline-block; }
+.charsheet .cond-row-extra .cond-label-display {
+  font-family: 'Cinzel', serif; font-size: 12px; text-transform: uppercase;
+  color: var(--gold-bright); align-self: center; padding: 2px 0;
+}
+/* Toggle button: "Done" while editing, "Edit" once locked. It must stay
+   visible in BOTH states — hiding it when unchecked leaves an opened row
+   with no way to close again. */
+.charsheet .cond-row-extra .extracond-lock {
+  appearance: none; -webkit-appearance: none; flex: none; align-self: center;
+  width: auto !important; height: 16px; min-width: 36px; margin: 0; padding: 0 6px;
+  border: 1px solid var(--gold); border-radius: 3px; background: var(--gold-bright);
+  color: #0c0c0e; cursor: pointer; font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; letter-spacing: .5px; text-transform: uppercase;
+}
+.charsheet .cond-row-extra .extracond-lock:not(:checked) {
+  background: transparent; color: var(--gold-bright);
+}
+.charsheet .cond-row-extra .extracond-lock:not(:checked)::before { content: "Done"; }
+.charsheet .cond-row-extra .extracond-lock:checked::before { content: "Edit"; }
+
+.charsheet .extracond-size { display: flex; align-items: center; gap: 5px; }
+.charsheet .extracond-size-lbl {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: .5px;
+  text-transform: uppercase; color: var(--grey-light);
+}
+.charsheet .extracond-size-sel {
+  width: 48px !important; height: 22px; padding: 0 4px; font-size: 11px;
+  background: var(--bg-field); color: var(--ink); border: 1px solid var(--rule-bright);
+}
+/* Hide dots beyond the chosen count, read live off the size <select>. */
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="1"]:checked) .extracond-boxes .d2,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="1"]:checked) .extracond-boxes .d3,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="1"]:checked) .extracond-boxes .d4,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="1"]:checked) .extracond-boxes .d5,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="1"]:checked) .extracond-boxes .d6,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="2"]:checked) .extracond-boxes .d3,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="2"]:checked) .extracond-boxes .d4,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="2"]:checked) .extracond-boxes .d5,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="2"]:checked) .extracond-boxes .d6,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="3"]:checked) .extracond-boxes .d4,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="3"]:checked) .extracond-boxes .d5,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="3"]:checked) .extracond-boxes .d6,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="4"]:checked) .extracond-boxes .d5,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="4"]:checked) .extracond-boxes .d6,
+.charsheet .cond-row-extra:has(.extracond-size-sel option[value="5"]:checked) .extracond-boxes .d6 {
+  display: none;
+}
+
+/* Stunts quick view */
+.charsheet .rep-head-stuntquick, .charsheet .rep-row-stuntquick { display: grid; grid-template-columns: 1fr 60px; gap: 6px; margin-bottom: 4px; }
+.charsheet .rep-head-stuntquick { font-family: 'JetBrains Mono', monospace; font-size: 9px; text-transform: uppercase; color: var(--grey-light); }
+
+/* Fate table */
+.charsheet table.fate-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 6px; }
+.charsheet table.fate-table th {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .5px; text-transform: uppercase;
+  color: var(--grey-light); text-align: left; padding: 4px; border-bottom: 1px solid var(--rule-bright);
+}
+.charsheet table.fate-table td { padding: 4px; }
+
+/* ---- Repeating sections (Bio/Attributes tabs) ---- */
+.charsheet fieldset.repeating_bonusaspects,
+.charsheet fieldset.repeating_skills,
+.charsheet fieldset.repeating_stunts,
+.charsheet fieldset.repeating_extraconditions {
+  border: none; padding: 0; margin: 0;
+}
+.charsheet .rep-row { display: grid; gap: 6px; margin-bottom: 6px; align-items: start; }
+.charsheet .rep-row-aspect { grid-template-columns: 1.4fr 1fr; }
+.charsheet .rep-head { display: grid; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+  letter-spacing: .5px; text-transform: uppercase; color: var(--grey-light); margin-bottom: 4px; }
+.charsheet .rep-head-skill, .charsheet .rep-row-skill { grid-template-columns: 1fr 110px 44px 1.3fr 50px; }
+.charsheet .rep-head-stunt, .charsheet .rep-row-stunt { grid-template-columns: 1fr 100px 70px 2fr; }
+.charsheet .rep-row-stunt textarea { min-height: 40px; }
+.charsheet .rollbtn {
+  font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  background: var(--grey-dark); color: var(--gold-bright); border: 1px solid var(--gold); cursor: pointer; padding: 4px 2px;
+}
+.charsheet .rollbtn:hover { background: var(--gold-bright); color: #0c0c0e; }
+.charsheet .skill-totals { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 12px; color: var(--grey-light); align-items: center; }
+.charsheet .skill-totals input { width: 50px !important; display: inline-block; }
+
+/* Consequences table (Attributes tab) */
+.charsheet table.cons { width: 100%; border-collapse: collapse; font-size: 12px; }
+.charsheet table.cons th { text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: .5px; color: var(--grey-light); text-transform: uppercase; padding: 4px; border-bottom: 1px solid var(--rule-bright); }
+.charsheet table.cons td { padding: 4px; border-bottom: 1px solid var(--rule); }
+.charsheet table.cons .cbwrap { text-align: center; }
+.charsheet table.cons input[type=text] { font-size: 12px; padding: 4px 6px; }
+
+.charsheet .rep-head-item, .charsheet .rep-row-item { display: grid; grid-template-columns: 1fr 1.4fr; gap: 6px; margin-bottom: 6px; }
+.charsheet .rep-head-gear, .charsheet .rep-row-gear { display: grid; grid-template-columns: 1fr 1.6fr 1.6fr; gap: 6px; margin-bottom: 6px; align-items: start; }
+.charsheet .rep-head-gear { font-family: 'JetBrains Mono', monospace; font-size: 9px; text-transform: uppercase; color: var(--grey-light); margin: 10px 0 4px; }
+.charsheet .rep-row-gear textarea { min-height: 54px; }
+.charsheet .legacy-note { margin-top: 10px; border-top: 1px solid var(--grey-dark); padding-top: 6px; }
+.charsheet .legacy-note summary {
+  font-family: 'JetBrains Mono', monospace; font-size: 8.5px; letter-spacing: .5px;
+  text-transform: uppercase; color: var(--grey-light); cursor: pointer; margin-bottom: 5px;
+}
+.charsheet .legacy-note textarea { min-height: 70px; }
+.charsheet .split-btn {
+  margin-top: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px;
+  letter-spacing: .5px; text-transform: uppercase; padding: 4px 10px;
+  border: 1px solid var(--gold); background: var(--gold-bright); color: #0c0c0e; cursor: pointer;
+}
+.charsheet .split-hint {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; line-height: 1.5;
+  color: var(--ink-faint); margin-top: 5px;
+}
+.charsheet .rep-head-item { font-family: 'JetBrains Mono', monospace; font-size: 9px; text-transform: uppercase; color: var(--grey-light); margin: 10px 0 4px; }
+
+@media (max-width: 760px) {
+  .charsheet .dfa-quickgrid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "name" "mantles" "power" "aspects" "approaches" "ladder" "scale" "stress" "stunts" "fate" "cons" "bonus";
+  }
+  .charsheet .dfa-grid2 { grid-template-columns: 1fr; }
+  .charsheet .rep-head-stunt, .charsheet .rep-row-stunt { grid-template-columns: 1fr; }
+  .charsheet .rep-head-gear, .charsheet .rep-row-gear { grid-template-columns: 1fr; }
+  .charsheet .dfa-topbar { grid-template-columns: repeat(3, 1fr); }
+  .charsheet .dfa-headerbox { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .charsheet .dfa-token-note { width: 100%; border-left: 0; padding-left: 0; }
+}
+
+/* ============================================================
+   DFA roll template (renders in chat, outside .charsheet — use
+   explicit colors, not the sheet's CSS variables).
+   ============================================================ */
+.sheet-rolltemplate-dfa .dfa-rt {
+  border: 1px solid #e8b93b; background: #18181e; color: #efe9da;
+  border-radius: 5px; padding: 8px 10px; font-family: 'EB Garamond', Georgia, serif;
+  max-width: 260px;
+}
+.sheet-rolltemplate-dfa .dfa-rt-title {
+  font-family: 'Cinzel', serif; font-size: 13px; text-transform: uppercase;
+  letter-spacing: 1px; color: #ffd966; border-bottom: 1px solid #4a4636;
+  padding-bottom: 4px; margin-bottom: 6px;
+}
+.sheet-rolltemplate-dfa .dfa-rt-total {
+  font-size: 26px; font-weight: 600; text-align: center; color: #fbf8ee;
+  line-height: 1.1; margin: 2px 0;
+}
+.sheet-rolltemplate-dfa .dfa-rt-total .inlinerollresult {
+  background: transparent; border: none; color: #ffd966; font-weight: 700;
+}
+.sheet-rolltemplate-dfa .dfa-rt-sub {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; text-transform: uppercase;
+  letter-spacing: .5px; color: #aca698; text-align: center; margin-top: 4px;
+}
