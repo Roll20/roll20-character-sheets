@@ -1083,8 +1083,12 @@ var processDrop = function(page, currentData, repeating, looped) {
                 const parsedKey = dropFunctions.jsonParse(blob["Custom AC"]);
                 update["custom_ac_flag"] = "1";
                 update["custom_ac_base"] = parsedKey.Base;
-                update["custom_ac_part1"] = parsedKey["Attribute 1"];
-                update["custom_ac_part2"] = parsedKey["Attribute 2"] ? parsedKey["Attribute 2"] : "";
+                // "none" (not "") is the value update_ac() recognises as "no ability here";
+                // an empty string resolved to b["_mod"] === undefined and NaN'd out the whole
+                // custom AC calculation. Classes whose unarmored formula uses a single ability
+                // (10 + Dex) leave "Attribute 2" absent, so this was the common case.
+                update["custom_ac_part1"] = parsedKey["Attribute 1"] ? parsedKey["Attribute 1"] : "none";
+                update["custom_ac_part2"] = parsedKey["Attribute 2"] ? parsedKey["Attribute 2"] : "none";
                 update["custom_ac_shield"] = parsedKey.Shields;
                 if(!looped) {
                     callbacks.push( function() {update_ac();} )

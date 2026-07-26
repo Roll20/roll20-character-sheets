@@ -3341,8 +3341,32 @@
             } else {
                 var itemArray = [];
                 var splitItems = [];
+                // GUARD: _.each() treats a string as array-like and walks it ONE CHARACTER AT A
+                // TIME, which turns a malformed compendium bundle into dozens of single-letter
+                // inventory rows ("[", "\"", "B", "a", "c", ...). A string gets this far whenever
+                // a data-Bundle / data-Equipment field either fails JSON.parse (getOtherDrops
+                // falls back to the raw text) or is double-encoded (parse returns a string).
+                // Recover the real array where the text permits; otherwise degrade to ONE
+                // comma-separated entry, a shape the split below already handles, and warn so the
+                // offending compendium page is findable instead of failing silently.
+                if (typeof items === "string") {
+                    var candidate = items;
+                    for (var depth = 0; depth < 2 && typeof candidate === "string"; depth++) {
+                        try { candidate = JSON.parse(candidate); } catch (e) { break; }
+                    }
+                    if (_.isArray(candidate)) {
+                        items = candidate;
+                    } else {
+                        // Only warn when the text was evidently MEANT to be JSON. A bare
+                        // "Backpack, Bedroll" list is a supported shape and must stay quiet.
+                        if (/^\s*[\[{]/.test(items)) {
+                            warningMessage("makeItemData", "Bundle/Equipment field looks like JSON but does not parse - importing it as a single comma-separated list. Fix this compendium page's data-Bundle / data-Equipment field. Value: " + items);
+                        }
+                        items = [items];
+                    }
+                }
                 _.each(items, function(item) {
-                    item = item.split(",");
+                    item = String(item).split(",");
                     _.each(item, function(splitItem) {
                         splitItems.push(splitItem.trim());
                     });
