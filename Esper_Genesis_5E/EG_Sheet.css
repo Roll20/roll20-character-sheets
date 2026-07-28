@@ -1,5 +1,18 @@
+/* Esper Genesis 5E Sheet - v3.1
+   Revision 2026-07-26. Bug fixes only; sheet version intentionally NOT bumped.
+     - Armor Class: simpleinventory / simpletraits / simpleproficencies each had two
+       inputs declaring conflicting defaults. Equipped armor was ignored, and the
+       multiple-armor and custom-AC warnings could never fire.
+     - Armor Class: custom AC was silently discarded when a class formula supplied
+       only one ability (NaN fallthrough).
+     - Charactermancer: malformed equipment bundles no longer expand into one
+       inventory row per character.
+     - Header token frame: empty-state rules synced from the SASS source, and the
+       person glyph added to the Material Symbols icon subset.
+   Full detail in CHANGES.md.
+*/
 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;700&family=Noto+Sans:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_upload_ready,expand_more,settings,star_shine');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_upload_ready,expand_more,person,settings,star_shine');
 
 /* Esper Genesis Character Sheet */
 
@@ -712,12 +725,37 @@ input[type=radio].npc-button.ships + span {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+/* Placeholder shown when no avatar is bound. The VTT populates attr_character_avatar
+   from the character portrait; Roll20 Characters does NOT, so without the rule
+   below, the frame rendered a broken image and displayed its alt text ("Character Token"). The glyph
+   sits at z-index 0 and the avatar covers it at z-index 1 when a src is present. */
+.name-container :is(.sheet-token-frame, .token-frame)::before {
+  content: 'person';
+  font-family: 'Material Symbols Outlined';
+  font-size: 56px;
+  color: #ccc;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  text-transform: none;
+  font-variant: normal;
 }
 .name-container :is(.sheet-char-avatar, .char-avatar) {
   width: 100%;
   height: 100%;
   object-fit: contain;
   display: block;
+  position: relative;
+  z-index: 1;
+  background: var(--eg-bg);
+}
+.name-container :is(.sheet-char-avatar, .char-avatar):not([src]),
+.name-container :is(.sheet-char-avatar, .char-avatar)[src=''] {
+  display: none;
 }
 
 /* Right column: name row + toggle + edit/display panels */
@@ -7156,8 +7194,8 @@ span.spellritual, span.spellconcentration {
   margin-bottom: 1em;
 }
 /* Review tab: the section headers (Features / Feats / Powers) are p.label elements
-   that Roll20's platform CSS center-aligns by default. EG never overrode this, so it
-   was invisible until dark mode gave the labels a readable color. Left-align them to
+   that Roll20's platform CSS center-aligns by default. EG never overrode the
+   default, so the heading was invisible until dark mode gave the labels a readable color. Left-align them to
    match the "Before/After Leveling" h2 headers and the body text. */
 .charmancer .summary .label {
   text-align: left;
@@ -8499,6 +8537,13 @@ div.charmancer .compendium-logo, div.charmancer .compendium-logo {
   height: 100%;
   object-fit: contain;
   display: block;
+}
+/* Same empty-state guard as the PC frame: without it a src-less <img> renders as a
+   broken image. The ship markup carries no alt text, so no placeholder glyph is used
+   here - the empty gold frame is the intended look. */
+.charsheet .pc .sheet-pc-ship :is(.sheet-char-avatar, .char-avatar):not([src]),
+.charsheet .pc .sheet-pc-ship :is(.sheet-char-avatar, .char-avatar)[src=''] {
+  display: none;
 }
 .charsheet .pc .sheet-pc-ship .sheet-ship-info {
   flex: 1;

@@ -1,3 +1,12 @@
+# 2026-07-28
+
+The pre-Gencon release.  Been a while with other things.  
+
+- Add a button to hide the initiative tracker on PC sheets
+- Partial secret support
+- Add basic fighting style support
+- Fix TP tests
+
 # 2026-06-16
 
 - Add edit notes to the creature sheet
