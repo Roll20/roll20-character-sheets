@@ -1,5 +1,17 @@
+// Esper Genesis 5E Sheet - v3.1
+// Revision 2026-07-26. Bug fixes only; sheet version intentionally NOT bumped.
+//   - Armor Class: simpleinventory / simpletraits / simpleproficencies each had two
+//     inputs declaring conflicting defaults. Equipped armor was ignored, and the
+//     multiple-armor and custom-AC warnings could never fire.
+//   - Armor Class: custom AC was silently discarded when a class formula supplied
+//     only one ability (NaN fallthrough).
+//   - Charactermancer: malformed equipment bundles no longer expand into one
+//     inventory row per character.
+//   - Header token frame: empty-state rules synced from the SASS source, and the
+//     person glyph added to the Material Symbols icon subset.
+// Full detail in CHANGES.md.
 @import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;700&family=Noto+Sans:wght@400;700&display=swap')
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_upload_ready,expand_more,settings,star_shine')
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_upload_ready,expand_more,person,settings,star_shine')
 
 /* Esper Genesis Character Sheet
 
@@ -714,6 +726,9 @@ label.settings-modal-close
     display: block
     position: relative
     z-index: 1
+    // Opaque so the ::before placeholder glyph cannot show through the letterbox
+    // gaps left by object-fit: contain when an avatar IS present.
+    background: var(--eg-bg)
   :is(.sheet-char-avatar, .char-avatar):not([src]),
   :is(.sheet-char-avatar, .char-avatar)[src='']
     display: none
@@ -8230,6 +8245,12 @@ div.charmancer
       height: 100%
       object-fit: contain
       display: block
+    // Same empty-state guard as the PC frame: without it a src-less <img> renders
+    // as a broken image. The ship markup carries no alt text, so no placeholder
+    // glyph is used here - the empty gold frame is the intended look.
+    :is(.sheet-char-avatar, .char-avatar):not([src]),
+    :is(.sheet-char-avatar, .char-avatar)[src='']
+      display: none
 
     .sheet-ship-info
       flex: 1
