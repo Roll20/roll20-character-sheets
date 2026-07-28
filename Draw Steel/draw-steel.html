@@ -7259,6 +7259,8 @@
 		SUMMON_FORMATION: 'Summon Formation',
 		SUMMON: 'Summon',
 		HEROIC_GAIN: 'Heroic Resource Gain',
+		SAVE_THRESHOLD: 'Save Threshold',
+		PACKAGE: 'Package',
 	};
 
 	/**
@@ -7406,6 +7408,10 @@
 				if (obj.type === 'Class Ability' && Array.isArray(obj.selectedIDs)) {
 					obj.selectedIDs.forEach(id => { if (id) targetAbilityIds.add(id); });
 					return;
+				}
+				
+				if (obj.type === 'Heroic Resource' && obj.data?.details) {
+					extractActiveFeatures({id: obj.id + 'zzz', name: obj.name, type: 'Text', description: obj.data.details}, buckets, visited, currentLevel, targetAbilityIds);
 				}
 				
 				const fId = obj.id || `${targetKey}-${obj.name || ''}-${JSON.stringify(obj.data)}`;
@@ -8142,9 +8148,7 @@
 		const skills_intrigue = getSkillsByGroup(buckets.SKILL_CHOICE, SKILL_GROUPS.intrigue);
 		const skills_lore = getSkillsByGroup(buckets.SKILL_CHOICE, SKILL_GROUPS.lore);
 
-		const languages = [
-			...buckets.LANGUAGE_CHOICE.flatMap(f => f.data.selected),
-		].sort().join(', ');
+		const languages = [...new Set(buckets.LANGUAGE_CHOICE.flatMap(f => f.data.selected))].sort().join(', ');
 
 		// REPEATING SECTIONS (Kits, Perks, Abilities, etc.)
 		const kits = parseKits(buckets.KIT_STATS);
@@ -8154,14 +8158,14 @@
 			buckets.TEXT.filter(f => f.id.startsWith("perk")),
 			'perks', 'perk_name', 'perk_description'
 		);
-			
+		const ancestryTag = ancestry.id.split('ancestry-')[1];
 		const ancestryFeatures = parseRepeatingSection(
-			buckets.TEXT.filter(f => f.id.startsWith(ancestry.name.replace(' ', '-').toLowerCase())),
+			buckets.all.filter(f => f.id.startsWith(ancestryTag)),
 			'ancestrytraits', 'ancestrytrait_name', 'ancestrytrait_description'
 		);
 				
 		const classFeatures = parseRepeatingSection(
-			[...buckets.TEXT, ...buckets.SUMMON_FORMATION].filter(f => f.id.startsWith(characterClass.name.toLowerCase()) ),
+			[...buckets.TEXT, ...buckets.SUMMON_FORMATION, ...buckets.PACKAGE].filter(f => f.id.startsWith(characterClass.name.toLowerCase()) ),
 			'classfeatures', 'classfeature_name', 'classfeature_description'
 		);
 		
