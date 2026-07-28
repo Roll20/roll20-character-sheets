@@ -2710,6 +2710,17 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
   </div>
 </div>
 
+<!---->
+<input type='checkbox' class='toggle' name='attr_toggleeditfightingstyles'>
+<div class='overlay toggler'>
+  <div class='editbox'>
+    <h2>Edit <span name='attr_editfightingstylename'></span> Style</h2>
+
+
+    <button type='action' name='act_editfightingstylecancel' class='fancybutton'>Cancel</button>
+  </div>
+</div>
+
 
 
 
@@ -7216,6 +7227,8 @@ Lists Selected <input type='number' name='comp_cmbaselistcount'> / 6
   <select name='attr_whispertype' class='fancyselect'>
     <option value=''>Public</option>
     <option value='/w gm'>GM Only</option>
+    <option value='/s '>Secret</option>
+    <option value='/supersecret'>Super Secret</option>
   </select>
 </div>
 
@@ -9472,7 +9485,19 @@ Uses (Lvl/Total) <span name='attr_traps_usecount'></span> / <span name='attr_tra
 
 
         <div style="width:100%; height:12em">
-          <h3>Combat Styles</h3>
+          <h3>Fighting Styles</h3>
+
+          <fieldset class='repeating_fightingstyle'>
+            <b><span name='attr_name'></span></b>
+              (<span name='attr_group'></span>) <!-- group is discipline/combat/battle -->
+              <span name='attr_ranks'></span> ranks<br>
+              <div class='fightingstyle_abilities'>
+              <input type='checkbox' name='attr_abilityinuse1' class='toggle'><span class='toggler'><span name='attr_ability1'></span></span><input type='checkbox' name='attr_abilityinuse2' class='toggle'><span class='toggler'><span name='attr_ability2'></span></span><input type='checkbox' name='attr_abilityinuse3' class='toggle'><span class='toggler'><span name='attr_ability3'></span></span><input type='checkbox' name='attr_abilityinuse4' class='toggle'><span class='toggler'><span name='attr_ability4'></span></span><input type='checkbox' name='attr_abilityinuse5' class='toggle'><span class='toggler'><span name='attr_ability5'></span></span><input type='checkbox' name='attr_abilityinuse6' class='toggle'><span class='toggler'><span name='attr_ability6'></span></span><input type='checkbox' name='attr_abilityinuse7' class='toggle'><span class='toggler'><span name='attr_ability7'></span></span><input type='checkbox' name='attr_abilityinuse8' class='toggle'><span class='toggler'><span name='attr_ability8'></span></span><input type='checkbox' name='attr_abilityinuse9' class='toggle'><span class='toggler'><span name='attr_ability9'></span></span><input type='checkbox' name='attr_abilityinuse10' class='toggle'><span class='toggler'><span name='attr_ability10'></span></span>
+                Unused <span name='attr_spareranks'></span>
+                      <span name='attr_sparerankbonus'></span> OB Bonus
+                <button type='action' class='fancybuttoninline fancybutton' name='act_editfightingstyle'>Edit</button>
+              </div>
+          </fieldset>
         </div>
     </div>
 </div>
@@ -10413,6 +10438,8 @@ Uses (Lvl/Total) <span name='attr_traps_usecount'></span> / <span name='attr_tra
 <button type='action' name='act_edittalents' class='fancybutton'>Edit Talents</button>
 <button type='action' name='act_resetworkers' class='fancybutton'>Reset Workers</button>
 <button type='action' name='act_npcgenerate' class='fancybutton'>NPC Generate</button>
+<button type='action' name='act_clearfightingstyles' class='fancybutton'>Reset Fighting Styles</button>
+<button type='action' name='act_clearcombattracker' class='fancybutton'>Clear Combat Tracker</button>
 
 <input type='text' name='attr_npcstring'>
 
@@ -10548,7 +10575,7 @@ Sheet Version: <span name='attr_version'></span>
 
 <br>
 
-Revision ac99833f90877705a6135d1e825444c17d944eba
+Revision 73300afdce927b23771ae5a71af22e24ce069aeb
 
 
 <hr>
@@ -13687,6 +13714,149 @@ RMUSkills.usesClear = function() {
 }
 
 
+
+/**/
+
+// By using a variable, I avoid obvios typos
+const repeatingfightingstyle = "repeating_fightingstyle";
+
+onCheck("change:repeating_specializationdisciplinestyle:ranks", (ev) => {
+    'use strict';
+    // Ranks changed
+    const basename = ev.sourceAttribute.replace("_ranks", "");
+    fightingStyleUpdate("Discipline", basename);
+})
+
+onCheck("remove:repeating_specializationdisciplinestyle", (ev) => {
+    'use strict';
+    console.log("remove", ev);
+});
+onCheck("change:repeating_specializationdisciplinestyle", (ev) => {
+    'use strict';
+    console.log("Generic change?  Maybe delete", ev);
+    // On a delete from a sheet worker it seems we get a change event with no
+    // previousValue and newValue
+    if (Object.hasOwn(ev, "previousValue") || Object.hasOwn(ev, "newValue")) {
+      // Has one.. return
+      return;
+    }
+    fightingStyleDelete(ev.sourceAttribute);
+});
+
+function fightingStyleGetAll(donefn) {
+  'use strict';
+  getSectionIDs(repeatingfightingstyle, (ids) => {
+    let toget = []
+    const fields = ['origprefix', 'name', 'ranks', 'spareranks']
+    ids.forEach((id) => {
+      const prefix = `${repeatingfightingstyle}_${id}_`
+      fields.forEach(field => { toget.push(prefix + field); });
+    });
+    getAttrs(toget, (data) => {
+      const out = {}
+      ids.forEach((id) => {
+	const prefix = `${repeatingfightingstyle}_${id}_`
+	const sinfo = {}
+	fields.forEach(field => { sinfo[field] = data[prefix + field] });
+	out[id] = sinfo
+      });
+      console.log(out, toget, ids);
+      donefn(out)
+    });
+  });
+}
+
+function fightingStyleUpdate(group, basename) {
+  'use strict';
+  // Get the values of the fighting style
+  console.log([`${basename}_ranks`, `${basename}_name`]);
+  getAttrs([`${basename}_ranks`, `${basename}_name`], (data) => {
+      console.log("data", data);
+      fightingStyleGetAll((styleinfo) => {
+	  console.log("All the style info");
+	  // So is this _new_ or old?  If it's new the orig id should match one.
+	  for (const [id, sinfo] of Object.entries(styleinfo)) {
+	    console.log("match", sinfo.origprefix, basename);
+	    if (sinfo.origprefix == basename) {
+	      console.log("found");
+	      return fightingStyleEntryUpdate(basename, data[basename + '_name'],
+		    data[basename + '_ranks'], id);
+	    }
+	  }
+	  
+	  // This is wrong; assumign not found
+	  fightingStyleEntryAdd(basename, data[basename + '_name'], data[basename + '_ranks'], group);
+
+      });
+  });
+}
+
+// New entries are pretty simple: Ust name and ranks.
+// Spare ranks == new eanks
+// bonus is ranks * 2 max 10.
+function fightingStyleEntryAdd(origprefix, name, ranks, group) {
+  'use strict';
+  const rowid = generateRowID();
+  const prefix = repeatingfightingstyle + '_' + rowid + '_';
+  const toset = {}
+  toset[prefix + 'origprefix'] = origprefix;
+  toset[prefix + 'name'] = name;
+  toset[prefix + 'group'] = group;
+  toset[prefix + 'ranks'] = ranks;
+  toset[prefix + 'spareranks'] = ranks;
+  toset[prefix + 'sparerankbonus'] = Math.min(10, ranks * 2);
+  setAttrs(toset);
+}
+
+// New entries are pretty simple: Ust name and ranks.
+// Spare ranks == new eanks
+// bonus is ranks * 2 max 10.
+function fightingStyleEntryUpdate(origprefix, name, ranks, rowid, sinfo) {
+  'use strict';
+  console.log("doing update", origprefix, name, ranks, rowid, sinfo);
+  const prefix = repeatingfightingstyle + '_' + rowid + '_';
+  const toset = {}
+  toset[prefix + 'name'] = name;
+  toset[prefix + 'ranks'] = ranks;
+  toset[prefix + 'sparerankbonus'] = Math.min(10, ranks * 2);
+  setAttrs(toset);
+}
+
+
+function fightingStyleDelete(group, basename) {
+
+}
+
+
+
+// this is a debug function
+function fightingStyleDeleteAll() {
+  'use strict';
+  console.log("Clearing Fighting Styles");
+  getSectionIDs(repeatingfightingstyle, (ids) => {
+      ids.forEach(id => {
+	  removeRepeatingRow(repeatingfightingstyle + '_' + id)
+      });
+      console.log("Fighting Styles Cleared");
+  });
+}
+onCheck("clicked:clearfightingstyles", fightingStyleDeleteAll);
+
+
+
+/**/
+
+onCheck("clicked:repeating_fightingstyle:editfightingstyle", () => {
+  setAttrs({toggleeditfightingstyles : 'on'});
+});
+
+onCheck("clicked:editfightingstylecancel", () => {
+  setAttrs({toggleeditfightingstyles : 'off'});
+})
+
+
+
+/* vim: set sw=2 sts=2 syn=javascript : */
 
 
 
@@ -24733,9 +24903,11 @@ onCheck("sheet:opened", (x) => {
 
     messageHackery()
 
+    // Hide stuff that should be hidden
     Edit.hideEdit();
     setAttrs({inventoryaddshow: 'off', toggletalentshow: 'off',
-          togglesleepshow: 'off', togglesleepinjuriesuntreatedshow: 'off'});
+          togglesleepshow: 'off', togglesleepinjuriesuntreatedshow: 'off',
+	  toggleeditfightingstyles: 'off'});
 
     getAttrs(['charactercreated'], init => {
         if (init.charactercreated == 'true') {
@@ -25721,6 +25893,9 @@ for (attr of tracker.mirroredAttributes) {
 
 }
 
+onCheck("clicked:clearcombattracker", () => {
+    setAttrs({trackerincombat: false});
+});
 
 
 
@@ -25730,7 +25905,7 @@ console.log("Tracker sheet loaded");
 
 /**/
 const actionCalls = [
-	'attack primary_action', 'attack secondary_action',
+	'attack primary_action', 'attacksecondary_action',
 	'ap➙melee_action',
 	'ap➙missile_action', 'ap➙clear_action', 'ap➙spell_action',
 	'ap➙perception_action', 'ap➙concentration_action', 'ap➙free_action',
