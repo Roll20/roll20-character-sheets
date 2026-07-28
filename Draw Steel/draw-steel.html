@@ -8584,18 +8584,23 @@
 		if (cost === 'signature') subtype = 'signature-ability';
 		else if (!isNPC && cost > 0) subtype = 'heroic-ability';
 
-		// Distance Formatting (Universal Logic)
-		const dist = abilityData.distance?.[0];
-		let distanceStr = '';
-		if (dist) {
-			if (['Melee', 'Ranged', 'Self'].includes(dist.type)) {
-				distanceStr = `${dist.type} ${dist.value || ''}`.trim();
-			} else {
-				const v2 = parseInt(dist.value2) > 0 ? ` x ${dist.value2}` : '';
-				const w = parseInt(dist.within) > 0 ? ` within ${dist.within}` : '';
-				distanceStr = `${dist.value || ''}${v2} ${dist.type}${w}`.trim();
-			}
-		}
+		// Distance Formatting
+		const distances = abilityData.distance || [];
+		const orWord = getTranslationByKey('damage-calc-or') || 'or';
+		
+		const distanceStr = distances
+			.map(dist => {
+				if (!dist) return '';
+				if (['Melee', 'Ranged', 'Self'].includes(dist.type)) {
+					return `${dist.type} ${dist.value || ''}`.trim();
+				} else {
+					const v2 = parseInt(dist.value2) > 0 ? ` x ${dist.value2}` : '';
+					const w = parseInt(dist.within) > 0 ? ` within ${dist.within}` : '';
+					return `${dist.value || ''}${v2} ${dist.type}${w}`.trim();
+				}
+			})
+			.filter(Boolean)
+			.join(` ${orWord} `);
 
 		// Effect and Power Roll extraction
 		const powerRoll = sections.find(s => s.type === 'roll');
