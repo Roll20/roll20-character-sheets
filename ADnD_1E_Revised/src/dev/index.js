@@ -6928,6 +6928,20 @@ class ThiefSkillsRacialAdjustmentTable {
   }
 }
 
+// ensure that class related areas are visible
+const classView = async () => {
+  const output = {};
+  const v = await getAttrsAsync(['toggle_spells', 'toggle_thief_skills', 'class', 'secondclass', 'thirdclass']);
+  const classes = [v.class, v.secondclass, v.thirdclass];
+  if (/druid|cleric|paladin|bard|magic-user|illusionist|magic|mage|wizard/gi.test(classes)) {
+    output.toggle_spells = 0;
+  }
+  if (/thief|assassin|rogue|thief-acrobat|acrobat/gi.test(classes)) {
+    output.toggle_thief_skills = 0;
+  }
+  await setAttrs(output, {silent: true});
+};
+
 // Globals for Ability Calcs
 const AT_STR = new StrengthAdjustmentTable();
 const AT_INT = new IntelligenceAdjustmentTable();
@@ -7198,10 +7212,11 @@ on('change:dexterity', async (eventInfo) => {
   await dexterityCalcs();
 });
 
-// Constitution Calculations
+// Constitution Calculations and checks for hidden class sections
 on('change:constitution change:class change:secondclass change:thirdclass', async (eventInfo) => {
   // clog(`Δ detected: ${eventInfo.sourceAttribute}`);
   await constitutionCalcs();
+  await classView();
 });
 
 // Charisma Calculations
