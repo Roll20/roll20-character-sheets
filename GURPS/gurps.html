@@ -17088,7 +17088,7 @@ Heal [[1d6]] **Hit Points** to a character.
 						</div>
 						<div class="cell col1">
 							<input type="hidden" name="attr_rule_of_16_value" value="100" />
-							<button type="action" name="act_skillroll" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Spell Skill Roll}} {{spellRoll=true}}  {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{useModTool=[[1]]}} {{rollModifier=[[@{spell_roll_modifier}]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}}  {{rollModifierSummary=@{spell_roll_modifier_summary}}} {{popupModifier=@{popup_modifier}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{spellCriticalSuccessNote=@{spell_critical_success_notes}}} {{spellFailNote=@{spell_fail_notes}}} {{spellCriticalFailureNote=@{spell_critical_failure_notes}}} {{showCastingDetails=[[@{show_casting_details}]]}}" />
+							<button type="action" name="act_skillroll" class="button-roll-template btn ui-draggable" value="@{roll}&{template:skillRoll} {{sheetStyle=@{chatstyle}}} {{type=Spell Skill Roll}} {{spellRoll=true}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{rollResult=[[3d6cs<1cf>6]]}} {{useModTool=[[1]]}} {{rollModifier=[[@{spell_roll_modifier}]]}} {{displayRollModifierSummary=[[@{display_roll_modifier_summary}]]}} {{rollModifierSummary=@{spell_roll_modifier_summary}}} {{popupModifier=@{popup_modifier}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{spellCriticalSuccessNote=@{spell_critical_success_notes}}} {{spellFailNote=@{spell_fail_notes}}} {{spellCriticalFailureNote=@{spell_critical_failure_notes}}} {{showCastingDetails=[[@{show_casting_details}]]}}" />
 						</div>
 						<div class="cell col2">
 							<input type="text" name="attr_level" title="Macro: @{NAME|repeating_spells_$[row #]_level}" readonly="readonly" value="10"/>
@@ -17123,6 +17123,7 @@ Heal [[1d6]] **Hit Points** to a character.
 						</div>
 						<div class="cell col7">
 							<input type="text" name="attr_spell_resisted_by" placeholder="Resist" title="Macro: @{NAME|repeating_spells_$[row #]_spell_resisted_by}" />
+							<input type="hidden" name="attr_spell_resisted_by_macro" value="" title="@{NAME|repeating_spells_$[row #]_spell_resisted_by}" />
 						</div>
 						<div class="cell col8">
 							<input type="text" name="attr_duration" placeholder="Duration" title="Macro: @{NAME|repeating_spells_$[row #]_duration}" />
@@ -36524,30 +36525,30 @@ See notes for the weapon.
 	// if entered AND rule of 16 is checked, set the max effective skill level
 	on("change:repeating_spells:spell_resisted_by", event => {
 
-		const hasResistanceValue = Boolean(event.newValue);
+	 	const hasResistanceValue = Boolean(event.newValue);
 
-		getAttrs(["spell_roll_rule_of_16", "spell_rule_of_16_target_resistance"], values => {
+	 	getAttrs(["spell_roll_rule_of_16", "spell_rule_of_16_target_resistance"], values => {
 	
-			let maxEffectiveSkill = 100;
+	 		let maxEffectiveSkill = 100;
 
-			let targetResistance = Number(values.spell_rule_of_16_target_resistance) ?? 10;
+	 		let targetResistance = Number(values.spell_rule_of_16_target_resistance) ?? 10;
 
-			if (values.spell_roll_rule_of_16 == "1" && hasResistanceValue) {
+	 		if (values.spell_roll_rule_of_16 == "1" && hasResistanceValue) {
 	
-				if (targetResistance <= 16) {
+	 			if (targetResistance <= 16) {
 
-					maxEffectiveSkill = 16;
+	 				maxEffectiveSkill = 16;
 
-				} else {
+	 			} else {
 
-					maxEffectiveSkill = targetResistance;
-				}
+	 				maxEffectiveSkill = targetResistance;
+	 			}
 
-			}
+	 		}
 
-			setAttrs({repeating_spells_rule_of_16_value: maxEffectiveSkill});
+	 		setAttrs({repeating_spells_rule_of_16_value: maxEffectiveSkill});
 	
-		});
+	 	});
 
 	});
 
@@ -61217,7 +61218,7 @@ Characters with Skill: ${knowsSkill}`;
 
 		rollData += meleeDamageRollData;
 
-		// append the rollDifference
+		// append the blunt trauma roll to the rollData, customData replaces the value
 		rollData += " {{bluntTrauma=[[0]]}}";
 
 		const damageRoll = await startRoll(rollData);
