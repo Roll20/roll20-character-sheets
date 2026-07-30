@@ -7326,6 +7326,9 @@
 				}
 			});
 		}
+		
+		//Sort text features
+		buckets.TEXT.sort((a, b) => a.name.localeCompare(b.name));
 		return buckets;
 	}
 	
@@ -7683,28 +7686,59 @@
 	
 	/*
 	 * Parses kit information from features.
+	 * Guarantees default reset values if kitArray is empty or missing.
 	 */
-	const parseKits = (kitArray) => {
-		return kitArray
-			.reduce((acc, kit) => ({
-				modifier_name: acc.modifier_name ? `${acc.modifier_name} | ${kit.name}` : kit.name,
-				kit_weapon: acc.kit_weapon ? `${acc.kit_weapon}, ${kit.weapon.join(', ')}` : kit.weapon.join(', '),
-				kit_armor: acc.kit_armor ? `${acc.kit_armor}, ${kit.armor.join(', ')}` : kit.armor.join(', '),
-				kit_speed: Math.max(acc.kit_speed || 0, parseInt(kit.speed || 0)),
-				kit_disengage: Math.max(acc.kit_disengage || 0, parseInt(kit.disengage || 0)),
-				kit_stamina: Math.max(acc.kit_stamina || 0, parseInt(kit.stamina || 0)),
-				kit_stability: Math.max(acc.kit_stability || 0, parseInt(kit.stability || 0)),
-				kit_melee_distance: Math.max(acc.kit_melee_distance || 0, parseInt(kit.meleeDistance || 0)),
-				kit_ranged_distance: Math.max(acc.kit_ranged_distance || 0, parseInt(kit.rangedDistance || 0)),
-				// Note: These overwrite if multiple kits exist;
-				kit_melee_damage_1: kit.meleeDamage?.tier1 || 0,
-				kit_melee_damage_2: kit.meleeDamage?.tier2 || 0,
-				kit_melee_damage_3: kit.meleeDamage?.tier3 || 0,
-				kit_ranged_damage_1: kit.rangedDamage?.tier1 || 0,
-				kit_ranged_damage_2: kit.rangedDamage?.tier2 || 0,
-				kit_ranged_damage_3: kit.rangedDamage?.tier3 || 0,
-				modifier_description: acc.modifier_description ? `${acc.modifier_description}\n\n${kit.description}` : kit.description
-			}), {});
+	const parseKits = (kitArray = []) => {
+		// Default values to reset the character sheet attributes
+		const defaultKits = {
+			modifier_name: '',
+			kit_weapon: '',
+			kit_armor: '',
+			kit_speed: 0,
+			kit_disengage: 0,
+			kit_stamina: 0,
+			kit_stability: 0,
+			kit_melee_distance: 0,
+			kit_ranged_distance: 0,
+			kit_melee_damage_1: 0,
+			kit_melee_damage_2: 0,
+			kit_melee_damage_3: 0,
+			kit_ranged_damage_1: 0,
+			kit_ranged_damage_2: 0,
+			kit_ranged_damage_3: 0,
+			modifier_description: ''
+		};
+
+		// Handle null/undefined or non-array inputs gracefully
+		if (!Array.isArray(kitArray) || kitArray.length === 0) {
+			return defaultKits;
+		}
+
+		// Reduce kits, using defaultKits as the initial baseline accumulator
+		return kitArray.reduce((acc, kit) => {
+			const weaponList = Array.isArray(kit.weapon) ? kit.weapon.join(', ') : '';
+			const armorList = Array.isArray(kit.armor) ? kit.armor.join(', ') : '';
+
+			return {
+				...acc,
+				modifier_name: acc.modifier_name ? `${acc.modifier_name} | ${kit.name}` : (kit.name || ''),
+				kit_weapon: acc.kit_weapon && weaponList ? `${acc.kit_weapon}, ${weaponList}` : weaponList,
+				kit_armor: acc.kit_armor && armorList ? `${acc.kit_armor}, ${armorList}` : armorList,
+				kit_speed: Math.max(acc.kit_speed, parseInt(kit.speed || 0, 10)),
+				kit_disengage: Math.max(acc.kit_disengage, parseInt(kit.disengage || 0, 10)),
+				kit_stamina: Math.max(acc.kit_stamina, parseInt(kit.stamina || 0, 10)),
+				kit_stability: Math.max(acc.kit_stability, parseInt(kit.stability || 0, 10)),
+				kit_melee_distance: Math.max(acc.kit_melee_distance, parseInt(kit.meleeDistance || 0, 10)),
+				kit_ranged_distance: Math.max(acc.kit_ranged_distance, parseInt(kit.rangedDistance || 0, 10)),
+				kit_melee_damage_1: kit.meleeDamage?.tier1 ?? acc.kit_melee_damage_1,
+				kit_melee_damage_2: kit.meleeDamage?.tier2 ?? acc.kit_melee_damage_2,
+				kit_melee_damage_3: kit.meleeDamage?.tier3 ?? acc.kit_melee_damage_3,
+				kit_ranged_damage_1: kit.rangedDamage?.tier1 ?? acc.kit_ranged_damage_1,
+				kit_ranged_damage_2: kit.rangedDamage?.tier2 ?? acc.kit_ranged_damage_2,
+				kit_ranged_damage_3: kit.rangedDamage?.tier3 ?? acc.kit_ranged_damage_3,
+				modifier_description: acc.modifier_description ? `${acc.modifier_description}\n\n${kit.description}` : (kit.description || '')
+			};
+		}, defaultKits);
 	};
 	
 	/* 
@@ -7990,6 +8024,38 @@
 	
 		return newAttributes;
 	}
+	
+	/**
+	 * Sorts an array of ability objects by cost (ascending), then by name (alphabetical).
+	 * Treat 'signature' costs as 1.
+	 */
+	const sortAbilitiesByCostAndName = (abilities) => {
+		return [...abilities].sort((a, b) => {
+			// Helper to extract and normalize the numeric cost
+			const getCostValue = (obj) => {
+				const rawCost = obj?.data?.ability?.cost;
+				if (typeof rawCost === 'string' && rawCost.toLowerCase() === 'signature') {
+					return 1;
+				}
+				return Number(rawCost) || 0;
+			};
+
+			const costA = getCostValue(a);
+			const costB = getCostValue(b);
+
+			// Sort primary: Cost (Ascending)
+			if (costA !== costB) {
+				return costA - costB;
+			}
+
+			// Sort secondary: Name (Alphabetical)
+			const nameA = a?.data?.ability?.name || '';
+			const nameB = b?.data?.ability?.name || '';
+
+			return nameA.localeCompare(nameB, undefined, { sensitivity: 'base' });
+		});
+	};
+
 	// --- Import Player Event Listener ---
 	on('clicked:import', async () => {
 		try {
@@ -8176,9 +8242,8 @@
 		
 		const titles = getTitles(state);
 		
-		const abilityFeatures = buckets.ABILITY.reduce((acc, f) => ({ ...acc, ...processAbility(f.data.ability) }), {});
-		
-		const classAbilities = buckets.CLASS_ABILITY.reduce((acc, f) => ({ ...acc, ...processAbility(f.data.ability) }), {});
+		const abilitiesList = sortAbilitiesByCostAndName([...buckets.ABILITY, ...buckets.CLASS_ABILITY]);		
+		const abilityFeatures = abilitiesList.reduce((acc, f) => ({ ...acc, ...processAbility({...f.data.ability, ...kits}) }), {});
 		
 		const damageModifiers = getAbilityDamage(buckets.ABILITY_DAMAGE, state);
 		
@@ -8253,8 +8318,6 @@
 			...classFeatures,
 			...domainFeatures,
 			...abilityFeatures,
-			//...domainAbilities,
-			...classAbilities,
 			...damageModifiers,
 			...titles,
 			...inventory,
@@ -8584,18 +8647,25 @@
 		if (cost === 'signature') subtype = 'signature-ability';
 		else if (!isNPC && cost > 0) subtype = 'heroic-ability';
 
-		// Distance Formatting (Universal Logic)
-		const dist = abilityData.distance?.[0];
-		let distanceStr = '';
-		if (dist) {
-			if (['Melee', 'Ranged', 'Self'].includes(dist.type)) {
-				distanceStr = `${dist.type} ${dist.value || ''}`.trim();
-			} else {
-				const v2 = parseInt(dist.value2) > 0 ? ` x ${dist.value2}` : '';
-				const w = parseInt(dist.within) > 0 ? ` within ${dist.within}` : '';
-				distanceStr = `${dist.value || ''}${v2} ${dist.type}${w}`.trim();
-			}
-		}
+		// Distance Formatting
+		const distances = abilityData.distance || [];
+		const orWord = getTranslationByKey('damage-calc-or') || 'or';
+		
+		const distanceStr = distances
+			.map(dist => {
+				if (!dist) return '';
+				if (['Melee', 'Ranged', 'Self'].includes(dist.type)) {
+					let v = dist.value;
+					if (dist.type !== 'Self') v = parseInt(v,10) + parseInt(abilityData[`kit_${dist.type.toLowerCase()}_distance`] ?? 0, 0);
+					return `${dist.type} ${v || ''}`.trim();
+				} else {
+					const v2 = parseInt(dist.value2) > 0 ? ` x ${dist.value2}` : '';
+					const w = parseInt(dist.within) > 0 ? ` within ${dist.within}` : '';
+					return `${dist.value || ''}${v2} ${dist.type}${w}`.trim();
+				}
+			})
+			.filter(Boolean)
+			.join(` ${orWord} `);
 
 		// Effect and Power Roll extraction
 		const powerRoll = sections.find(s => s.type === 'roll');
@@ -8917,8 +8987,8 @@
                 "name": { i18n: "melee-free-strike" },
                 "type": { value: "main-action" },
                 "keywords": { i18n: "melee-free-strike-keywords" },
-                "distance": { i18n: "one-creature-object" },
-                "target": { i18n: "melee-one" },
+                "distance": {  i18n: "melee-one" },
+                "target": { i18n: "one-creature-object" },
                 "has_power_roll": { value: "on" },
                 "tier_1": { i18n: "melee-free-strike-tier1" },
                 "tier_2": { i18n: "melee-free-strike-tier2" },
@@ -8928,8 +8998,8 @@
                 "name": { i18n: "ranged-free-strike" },
                 "type": { value: "main-action" },
                 "keywords": { i18n: "ranged-free-strike-keywords" },
-                "distance": { i18n: "one-creature-object" },
-                "target": { i18n: "ranged-five" },
+                "distance": { i18n: "ranged-five" },
+                "target": { i18n: "one-creature-object" },
                 "has_power_roll": { value: "on" },
                 "tier_1": { i18n: "ranged-free-strike-tier1" },
                 "tier_2": { i18n: "ranged-free-strike-tier2" },
