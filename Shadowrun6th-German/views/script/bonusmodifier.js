@@ -46,8 +46,8 @@ function countStates(){
             getAttributes(cids,"repeating_cyberware",allids,attrArray);
             getSectionIDs("repeating_perks", pids=>{
                 getAttributes(pids,"repeating_perks",allids,attrArray);
-                getSectionIDs("repeating_perks", pids=>{
-                    getAttributes(pids,"repeating_perks",allids,attrArray);
+                getSectionIDs("repeating_gear", gids=>{
+                    getAttributes(gids,"repeating_gear",allids,attrArray);
                     getSectionIDs("repeating_focus", pids=>{
                         getAttributes(pids,"repeating_focus",allids,attrArray);
                         getSectionIDs("repeating_adeptpowers", pids=>{
