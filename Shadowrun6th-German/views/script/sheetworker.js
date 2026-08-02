@@ -922,13 +922,13 @@ on("sheet:opened change:stun_monitor_shift", () => {
                [`skill_${skill}_spec_visibility`]:0,
                [`magic_${skill}_total`]:0,
            })
-           if(skill = "astral"){
+           if(skill === "astral"){
                setAttrs({
-                        [`magic_${skill}_attribute`]:"display_intuition",
+                        [`skill_${skill}_attribute`]:"display_intuition",
                 })
            } else {
               setAttrs({
-                        [`magic_${skill}_attribute`]:"display_magic",
+                        [`skill_${skill}_attribute`]:"display_magic",
                 })
            }
         });
