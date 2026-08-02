@@ -16,10 +16,10 @@ on("sheet:opened",function(){
 
         if (v.skill_sorcery_spec.toString().toLowerCase().startsWith("spruch")) setAttrs({skill_sorcery_spec:"spellingcasting"});
         if (v.skill_sorcery_exp.toString().toLowerCase().startsWith("spruch")) setAttrs({skill_sorcery_exp:"spellingcasting"});
-        if (v.skill_sorcery_spec.toString().toLowerCase().startsWith("anti")) setAttrs({skill_sorcery_spec:"rituals"});
-        if (v.skill_sorcery_exp.toString().toLowerCase().startsWith("anti")) setAttrs({skill_sorcery_exp:"rituals"});
-        if (v.skill_sorcery_spec.toString().toLowerCase().startsWith("ritu")) setAttrs({skill_sorcery_spec:"counterspelling"});
-        if (v.skill_sorcery_exp.toString().toLowerCase().startsWith("ritu")) setAttrs({skill_sorcery_exp:"counterspelling"});
+        if (v.skill_sorcery_spec.toString().toLowerCase().startsWith("anti")) setAttrs({skill_sorcery_spec:"counterspelling"});
+        if (v.skill_sorcery_exp.toString().toLowerCase().startsWith("anti")) setAttrs({skill_sorcery_exp:"counterspelling"});
+        if (v.skill_sorcery_spec.toString().toLowerCase().startsWith("ritu")) setAttrs({skill_sorcery_spec:"rituals"});
+        if (v.skill_sorcery_exp.toString().toLowerCase().startsWith("ritu")) setAttrs({skill_sorcery_exp:"rituals"});
 
         
         
