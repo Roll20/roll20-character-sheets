@@ -129,6 +129,7 @@ filesHTML = [
 	'dev/js/armour_encumbrance_initiative.js',
 	'dev/js/wounds.js',
 	'dev/js/regeneration.js',
+	'dev/js/config.js',
 	'dev/js/debug_mode.js',
 	'dev/js/roll_macro_generator.js',
 	'dev/js/other.js',
