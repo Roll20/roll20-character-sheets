@@ -125,4 +125,21 @@ function callNextMigration(migrationChain)
 		}
 	}
 }
+
+// Supports migration chaining, but is not intended to be run as non-last member of a migration chain due to its crashy nature
+function initializeGameType(migrationChain)
+{
+	const caller = "initializeGameType()";
+	debugLog(caller, "Running function prone to crashes.");
+
+	// Check Game Type
+	const gameType = detectGameType();
+	gameType.then(
+		(value) => {
+			safeSetAttrs(value, {}, function () {
+				callNextMigration(migrationChain);
+			});
+		}
+	);
+}
 /* initialization_migration_common end */
