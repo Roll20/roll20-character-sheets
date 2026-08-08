@@ -96,12 +96,15 @@ function migrationCheck()
 	});
 }
 
-function setCurrentVersion()
+function setCurrentVersion(migrationChain)
 {
 	const caller = "setCurrentVersion:";
 	const currentVersion = versionsWithMigrations.at(-1);
+	const attrsToChange = { "data_version": currentVersion };
 	console.log(caller, "currentVersion:", currentVersion);
-	safeSetAttrs({ "data_version": currentVersion });
+	safeSetAttrs(attrsToChange, {}, function () {
+		callNextMigration(migrationChain);
+	});
 }
 
 function callNextMigration(migrationChain)
