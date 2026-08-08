@@ -3,6 +3,9 @@ function initializeSheet(migrationChain) {
 	var caller = "initializeSheet";
 	debugLog(caller, "Initializing sheet ...");
 	var attrsToInit = [
+		// Game Info
+		"global_game_type",
+
 		// Stats and derived values
 		"MU", "IN", "KL", "CH", "FF", "GE", "KO", "KK", "GS",
 		"LE", "legrundw", "LE_max",

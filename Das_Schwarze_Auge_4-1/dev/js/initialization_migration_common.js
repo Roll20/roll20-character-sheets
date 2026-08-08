@@ -88,6 +88,12 @@ function migrationCheck()
 			// then we call the function with name "firstFunction"
 			if (functionsToCall.length > 0) {
 				functionsToCall.push("setCurrentVersion");
+				// Try to detect the game type
+				/// This might fail in a way that stops further execution of the action listener, so always call last.
+				if (initialized === false)
+				{
+					functionsToCall.push("initializeGameType");
+				}
 				console.log(caller, "functionsToCall", functionsToCall);
 				// shift() removes the first item of the array in place and returns it
 				const firstFunction = functionsToCall.shift();

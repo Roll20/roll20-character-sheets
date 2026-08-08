@@ -55,6 +55,9 @@ const defaultValues = {
 	// Initializing these attributes to default values prevents this from happening.
 	// Some attributes might be created automatically, but have been included for the sake of completeness.
 
+	// Game Info
+	"global_game_type": "Legacy",
+
 	// Stats and derived values
 	"MU": 8,
 	"IN": 8,
