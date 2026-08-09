@@ -4312,6 +4312,12 @@
 	<div class="heading-character-name">
 		
 		<div style="float:right; margin-left: 15px;">
+			<button type="action" name="act_view_resync_settings" class="view-resync-settings" title="View Resync Actions">
+				<span data-i18n="resync-label">Resync</span>
+			</button>
+		</div>
+
+		<div style="float:right; margin-left: 15px;">
 
 			<!-- see: https://codepen.io/YozhEzhi/pen/gcLpI/ -->
 			<input type="hidden" name="attr_display_roll_modifiers_header" />
@@ -4381,22 +4387,18 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 
-				<!-- current version notes: 2.28.0 -->
+				<!-- current version notes: 2.29.0 -->
 				<div>
 					Dated: <span name="attr_latest_changes"></span>
 				</div>
 
 				<h4 style="font-style: italic; text-decoration: underline; margin: 10px 0 0 0;">
-					<span data-i18n="new-features-bugfixes-label">New Features & bugfixes:</span>
+					<span data-i18n="new-features-bugfixes-label">New Features & Bugfixes:</span>
 				</h4>
 
 				<div>
-					<b>NEW:</b> General tab > Dodge attribute. Added a help tooltip on where to find Dodge and Active Defenses.<br />
-					<b>REVISION:</b> Rule of 16.
-					<ul>
-						<li>Settings tab > Sheet Options > Spell Options > Rule of 16 option. Added (B349) to label.</li>
-						<li>Grimoire tab > Spell Roll Modifiers. Added a tooltip explanation for Rule of 16.</li>
-					</ul>
+					<b>NEW:</b> Added new top-level button <b>Resync</b> to quickly access Settings > Sheet Options tab. This will allow you to resync your character sheet skills.<br />
+					<b>NEW:</b> Settings Icon > Sheet Options tab. Added <b>Resync via Attributes</b> button. If clicked, each attribute value will be incremented then decremented to try to recalculate skill levels for related tables.<br />
 				</div>
 
 				<div style="margin: 10px 0 10px 0;">
@@ -28135,7 +28137,14 @@ For more information, see B409.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<!-- current version notes: 2.28.0 -->
+			<!-- current version notes: 2.29.0 -->
+			<div>
+				<b>NEW:</b> Added new top-level button <b>Resync</b> to quickly access Settings > Sheet Options tab. This will allow you to resync your character sheet skills.<br />
+				<b>NEW:</b> Settings Icon > Sheet Options tab. Added <b>Resync via Attributes</b> button. If clicked, each attribute value will be incremented then decremented to try to recalculate skill levels for related tables.<br />
+			</div>
+			
+			<h4>Version: 2.28.0</h4>
+			<p>Pull Request: 7/20/2026</p>
 			<div>
 				<b>NEW:</b> General tab > Dodge attribute. Added a help tooltip on where to find Dodge and Active Defenses.<br />
 				<b>REVISION:</b> Rule of 16.
@@ -30671,15 +30680,30 @@ For more information, see B409.
 						<div class="reset resync">
 							<input type="hidden" name="attr_resync_state" value="normal" />
 							<button type="action" name="act_resync" class="reset">
-								<span data-i18n="resync-label">Resync</span>
+								<span data-i18n="resync-tables-label">Resync Tables</span>
 							</button>
+							<div class="resync-tooltip">
+								<div class="sheet-popup">
+									<span class="sheet-info-icon">i</span>
+								</div>
+								<span class="sheet-tooltip">
+									<span data-i18n="resync-tables-tooltip">Will attempt to recalculate the following tables and update them to match the current attribute values:<ul><li>Resync repeating Skills and items linked them.</li><li>Resync repeating Techniques and items linked them.</li><li>Resync repeating Inventory cost and weight.</li></ul></span>
+								</span>
+							</div>
 						</div>
-						<div>
-							<ul>
-								<li>Resync repeating Skills and items linked them.</li>
-								<li>Resync repeating Techniques and items linked them.</li>
-								<li>Resync repeating Inventory cost and weight.</li>
-							</ul>
+						<div class="reset resync">
+							<input type="hidden" name="attr_resync_via_attributes_state" value="normal" />
+							<button type="action" name="act_resync_via_attributes" class="reset">
+								<span data-i18n="resync-via-attributes-label">Resync via Attributes</span>
+							</button>
+							<div class="resync-tooltip">
+								<div class="sheet-popup">
+									<span class="sheet-info-icon">i</span>
+								</div>
+								<span class="sheet-tooltip">
+									<span data-i18n="resync-via-attributes-tooltip">Alternate method to resync skill levels on attributes.<br />Should help mitigate possible issues when Roll20 may be experiencing slow performance.<ul><li>Each attribute will be incremented and then decremented.</li><li>This should trigger updating related tables. Please allow a few seconds for process to complete.</li></ul></span>
+								</span>
+							</div>
 						</div>
 					</div>
 					
@@ -34014,9 +34038,9 @@ See notes for the weapon.
 	
 	const noop = function () { }; // do nothing callback function.
 	
-	const version = "2.28.0";
+	const version = "2.29.0";
 	
-	const latestChangesDate = "7/30/2026";
+	const latestChangesDate = "8/10/2026";
 	
 	let modCascade = true;
 	
@@ -53228,9 +53252,8 @@ See notes for the weapon.
 				setAttrs(attribs, null, updateSectionSkillsLinkedToUpdatedRow(rowId));
 
 			});
-
 			
-			console.groupEnd();
+			// console.groupEnd();
 
 		});
 
@@ -53261,7 +53284,7 @@ See notes for the weapon.
 
 			});
 
-			console.groupEnd();
+			// console.groupEnd();
 		
 		});
 
@@ -53275,7 +53298,7 @@ See notes for the weapon.
 
 		getSectionIDs("repeating_item", ids => {
 
-			console.info("--resyncRepeatingItems--");
+			// console.info("--resyncRepeatingItems--");
 
 			ids.forEach(rowId => {
 
@@ -53344,15 +53367,88 @@ See notes for the weapon.
 				setAttrs(attribs, null, updateSectionSkillsLinkedToUpdatedRow(rowId));
 
 			});
-
 			
-			console.groupEnd();
+			// console.groupEnd();
 
 		});
 
 	}
 
-	// close roll modifiers, no updates
+	// resync via attributes
+	on("clicked:resync_via_attributes", event => {
+
+		setAttrs({resync_via_attributes_state: "clicked"}, () => {
+
+			// console.groupCollapsed("--resync_via_attributes--");
+
+			// console.log("resync_via_attributes clicked");
+
+			resetResyncViaAttributesButtonState();
+
+			const attribsToUpdate = [
+				"strength_mod",
+				"dexterity_mod",
+				"intelligence_mod",
+				"health_mod",
+				"willpower_mod",
+				"perception_mod",
+				"striking_st_mod",
+				"basic_speed_mod",
+				"dodge_mod",
+			];
+
+			// increment each attribute by 1, then decrement by 1 to force a resync of all dependent calculations
+			getAttrs(attribsToUpdate, values => {
+
+				// console.log("resync_via_attributes values", values);
+
+				attribsToUpdate.forEach(attr => {
+
+					// console.log("resync_via_attributes attr", attr);
+
+					setAttrs({[attr]: Number(values[attr]) + 1}, () => {
+
+						// console.log("resync_via_attributes attr incremented", attr);
+
+						setAttrs({[attr]: Number(values[attr])}, () => {
+
+							// console.log("resync_via_attributes attr decremented", attr);
+							// Trigger any dependent calculations
+
+						});
+
+					});
+
+				});
+
+			});
+
+		});
+
+		// console.groupEnd();
+	});
+
+	let resetResyncViaAttributesButtonState = () => {
+
+		setTimeout(() => {
+
+			setAttrs({resync_via_attributes_state: "normal"});
+
+		}, 4000);
+		
+	}
+
+	// handler for view_resync_updates button
+	on("clicked:view_resync_settings", event => {
+
+		// show the menu for settings and the sheet tab
+		setAttrs({
+			tab: "0",
+			options_tabs: "sheet"
+		});
+	
+	});
+
 	on("clicked:import_json", async (event) => {
 	
 		let attribs = {
