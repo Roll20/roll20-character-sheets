@@ -1,3 +1,10 @@
+# 2026-08-03
+
+Post GenCon updates.
+
+- Updates to some of the options.  
+- Another attempt to hide initiative tracker on PC sheets
+
 # 2026-07-28
 
 The pre-Gencon release.  Been a while with other things.  
