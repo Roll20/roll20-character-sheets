@@ -1926,6 +1926,10 @@
 			<input type="checkbox" class="sheet-toggle sheet-tab-powers">
 			<label class="sheet-headtwo sheet-tab-powers" data-i18n="powers">Powers</label>
 			<div class="sheet-statblock">
+				<div class="sheet-power-sort-row sheet-tab-powers">
+					<button type="action" name="act_sort_powers" class="sheet-power-sort" data-i18n="sort_powers_by_usage">Sort by Usage</button>
+					<span class="sheet-power-sort-note" data-i18n="sort_powers_note">Groups filled powers as At-Will, Encounter, Daily, Item. Cannot be undone.</span>
+				</div>
 				<!-- Start Original Power
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-[number]-toggle" class="sheet-power-card-toggle sheet-tab-settings">
@@ -27983,6 +27987,57 @@ for (let i = 1; i <= POWER_COUNT; i++) {
         on(`clicked:power_${i}_movedown`, function () { swapPowers(i, i + 1); });
     }
 }
+
+/*  Sort every filled power into standard 4e usage order, keeping the existing
+    relative order within each group, and push the empty slots to the end.
+    'Power Name' is the untouched default, so a slot still holding it is empty.  */
+
+const POWER_USAGE_ORDER = ['At-Will', 'Encounter', 'Daily', 'Item'];
+const POWER_EMPTY_NAME = 'Power Name';
+
+const isPowerFilled = (name) => {
+    const n = String(name === undefined || name === null ? '' : name).trim();
+    return n !== '' && n !== POWER_EMPTY_NAME;
+};
+
+// Unrecognised usage values sort after the four known ones rather than vanishing.
+const powerUsageRank = (usage) => {
+    const i = POWER_USAGE_ORDER.indexOf(String(usage === undefined || usage === null ? '' : usage).trim());
+    return i === -1 ? POWER_USAGE_ORDER.length : i;
+};
+
+on('clicked:sort_powers', function () {
+    const names = [];
+    for (let i = 1; i <= POWER_COUNT; i++) {
+        POWER_FIELDS.forEach(f => names.push(`power-${i}-${f}`));
+    }
+    getAttrs(names, function (values) {
+        const filled = [];
+        const empty = [];
+        for (let i = 1; i <= POWER_COUNT; i++) {
+            (isPowerFilled(values[`power-${i}-name`]) ? filled : empty).push(i);
+        }
+        // Stable: equal usage keeps the order the player already arranged.
+        filled.sort((x, y) => (powerUsageRank(values[`power-${x}-useage`])
+            - powerUsageRank(values[`power-${y}-useage`])) || (x - y));
+
+        const order = filled.concat(empty);   // order[dest - 1] = source slot
+        const output = {};
+        order.forEach((source, index) => {
+            const dest = index + 1;
+            if (source === dest) return;      // only write the slots that actually move
+            POWER_FIELDS.forEach(f => {
+                const value = values[`power-${source}-${f}`];
+                output[`power-${dest}-${f}`] = POWER_INDEXED.indexOf(f) !== -1
+                    ? reindexPower(value, source, dest)
+                    : value;
+            });
+        });
+        if (Object.keys(output).length) {
+            setAttrs(output, {silent: true});
+        }
+    });
+});
 
 </script>
 
