@@ -111,6 +111,7 @@ filesHTML = [
 	'dev/html/roll_templates/outro.html',
 	'dev/js/intro.js',
 	'dev/js/constants.js',
+	'dev/js/classes_rolls.js',
 	'dev/js/utilities_general.js',
 	'dev/js/utilities_dsa.js',
 	'dev/js/initialization_migration_common.js',
