@@ -1694,9 +1694,9 @@
   <label>Damage <input type="text" name="attr_weapon_1_damage" value="1d4" placeholder="1d4+1"></label>
   <label>Effects <textarea name="attr_weapon_1_effects" placeholder="Example: Save 12 or be stunned 1 round"></textarea></label>
   <div class="weapon-buttons">
-    <button type="roll" class="weapon-attack" name="roll_weapon_1_attack" value="&amp;{template:hopepunk} {{name=@{weapon_1_name} Attack}} {{Skill=@{weapon_1_skill_name}}} {{Roll=[[1d20 + @{weapon_1_attack_total} + @{weapon_1_attack_prof}d6 + @{weapon_1_attack_penalty} - @{strain_disadvantage}d4]]}} {{Damage=[[@{weapon_1_damage}]]}} {{Traits=@{weapon_1_traits_summary}}} {{Effects=@{weapon_1_effects}}} {{Strain=@{weapon_1_attack_strain_note}}}"></button>
-    <button type="roll" class="weapon-advantage" name="roll_weapon_1_advantage" value="&amp;{template:hopepunk} {{name=@{weapon_1_name} Advantage Attack}} {{Skill=@{weapon_1_skill_name}}} {{Roll=[[1d20 + @{weapon_1_attack_total} + @{weapon_1_attack_prof}d6 + @{weapon_1_attack_penalty} + @{adv_effective_die}]]}} {{Damage=[[@{weapon_1_damage}]]}} {{Traits=@{weapon_1_traits_summary}}} {{Effects=@{weapon_1_effects}}} {{Strain=@{weapon_1_attack_strain_note}}} {{Advantage=@{adv_effective_note}}}"></button>
-    <button type="roll" class="weapon-disadvantage" name="roll_weapon_1_disadvantage" value="&amp;{template:hopepunk} {{name=@{weapon_1_name} Disadvantage Attack}} {{Skill=@{weapon_1_skill_name}}} {{Roll=[[1d20 + @{weapon_1_attack_total} + @{weapon_1_attack_prof}d6 + @{weapon_1_attack_penalty} - @{dis_effective_die}]]}} {{Damage=[[@{weapon_1_damage}]]}} {{Traits=@{weapon_1_traits_summary}}} {{Effects=@{weapon_1_effects}}} {{Strain=@{weapon_1_attack_strain_note}}} {{Disadvantage=@{dis_effective_note}}}"></button>
+    <button type="action" class="weapon-attack" name="act_weapon_1_attack"></button>
+    <button type="action" class="weapon-advantage" name="act_weapon_1_advantage"></button>
+    <button type="action" class="weapon-disadvantage" name="act_weapon_1_disadvantage"></button>
   </div>
   <label>Description <textarea name="attr_weapon_1_description"></textarea></label>
   <div class="trait-selects">
@@ -1978,9 +1978,9 @@
   <label>Damage <input type="text" name="attr_weapon_2_damage" value="1d4" placeholder="1d4+1"></label>
   <label>Effects <textarea name="attr_weapon_2_effects" placeholder="Example: Save 12 or be stunned 1 round"></textarea></label>
   <div class="weapon-buttons">
-    <button type="roll" class="weapon-attack" name="roll_weapon_2_attack" value="&amp;{template:hopepunk} {{name=@{weapon_2_name} Attack}} {{Skill=@{weapon_2_skill_name}}} {{Roll=[[1d20 + @{weapon_2_attack_total} + @{weapon_2_attack_prof}d6 + @{weapon_2_attack_penalty} - @{strain_disadvantage}d4]]}} {{Damage=[[@{weapon_2_damage}]]}} {{Traits=@{weapon_2_traits_summary}}} {{Effects=@{weapon_2_effects}}} {{Strain=@{weapon_2_attack_strain_note}}}"></button>
-    <button type="roll" class="weapon-advantage" name="roll_weapon_2_advantage" value="&amp;{template:hopepunk} {{name=@{weapon_2_name} Advantage Attack}} {{Skill=@{weapon_2_skill_name}}} {{Roll=[[1d20 + @{weapon_2_attack_total} + @{weapon_2_attack_prof}d6 + @{weapon_2_attack_penalty} + @{adv_effective_die}]]}} {{Damage=[[@{weapon_2_damage}]]}} {{Traits=@{weapon_2_traits_summary}}} {{Effects=@{weapon_2_effects}}} {{Strain=@{weapon_2_attack_strain_note}}} {{Advantage=@{adv_effective_note}}}"></button>
-    <button type="roll" class="weapon-disadvantage" name="roll_weapon_2_disadvantage" value="&amp;{template:hopepunk} {{name=@{weapon_2_name} Disadvantage Attack}} {{Skill=@{weapon_2_skill_name}}} {{Roll=[[1d20 + @{weapon_2_attack_total} + @{weapon_2_attack_prof}d6 + @{weapon_2_attack_penalty} - @{dis_effective_die}]]}} {{Damage=[[@{weapon_2_damage}]]}} {{Traits=@{weapon_2_traits_summary}}} {{Effects=@{weapon_2_effects}}} {{Strain=@{weapon_2_attack_strain_note}}} {{Disadvantage=@{dis_effective_note}}}"></button>
+    <button type="action" class="weapon-attack" name="act_weapon_2_attack"></button>
+    <button type="action" class="weapon-advantage" name="act_weapon_2_advantage"></button>
+    <button type="action" class="weapon-disadvantage" name="act_weapon_2_disadvantage"></button>
   </div>
   <label>Description <textarea name="attr_weapon_2_description"></textarea></label>
   <div class="trait-selects">
@@ -4162,6 +4162,114 @@ function recalcWeaponAttacks() {
   });
 }
 
+
+function firstNaturalD20(rollResult) {
+  const parts = (rollResult && rollResult.rolls) || [];
+  for (const part of parts) {
+    if (part && part.sides === 20 && Array.isArray(part.results) && part.results.length) {
+      return n(part.results[0]);
+    }
+  }
+  return Array.isArray(rollResult && rollResult.dice) && rollResult.dice.length
+    ? n(rollResult.dice[0])
+    : 0;
+}
+
+function maximumDiceTotal(rollPart) {
+  if (!rollPart) return 0;
+  let total = 0;
+  if (Number.isFinite(rollPart.dice) && Number.isFinite(rollPart.sides)) {
+    total += rollPart.dice * rollPart.sides;
+  }
+  if (Array.isArray(rollPart.rolls)) {
+    rollPart.rolls.forEach(part => { total += maximumDiceTotal(part); });
+  }
+  return total;
+}
+
+function rolledDiceTotal(rollPart) {
+  if (!rollPart) return 0;
+  let total = 0;
+  if (Array.isArray(rollPart.results)) {
+    rollPart.results.forEach(result => { total += n(result && result.v !== undefined ? result.v : result); });
+  }
+  if (Array.isArray(rollPart.rolls)) {
+    rollPart.rolls.forEach(part => { total += rolledDiceTotal(part); });
+  }
+  return total;
+}
+
+function maximizedDamageTotal(rollResult) {
+  if (!rollResult) return 0;
+  const fixedModifiers = n(rollResult.result) - rolledDiceTotal(rollResult);
+  return maximumDiceTotal(rollResult) + fixedModifiers;
+}
+
+function escapeRollTemplateText(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/\{/g, "&#123;")
+    .replace(/\}/g, "&#125;");
+}
+
+function rollWeaponAttack(weaponNumber, mode) {
+  const prefix = `weapon_${weaponNumber}`;
+  const attrs = [
+    `${prefix}_name`, `${prefix}_skill_name`, `${prefix}_attack_total`,
+    `${prefix}_attack_prof`, `${prefix}_attack_penalty`,
+    `${prefix}_attack_strain_note`, `${prefix}_damage`,
+    `${prefix}_traits_summary`, `${prefix}_effects`,
+    "strain_disadvantage", "adv_effective_die", "adv_effective_note",
+    "dis_effective_die", "dis_effective_note"
+  ];
+
+  getAttrs(attrs, v => {
+    const name = escapeRollTemplateText(v[`${prefix}_name`] || `Weapon ${weaponNumber}`);
+    const skill = escapeRollTemplateText(v[`${prefix}_skill_name`] || "");
+    const traits = escapeRollTemplateText(v[`${prefix}_traits_summary`] || "");
+    const effects = escapeRollTemplateText(v[`${prefix}_effects`] || "");
+    const strain = escapeRollTemplateText(v[`${prefix}_attack_strain_note`] || "");
+    const damageExpression = String(v[`${prefix}_damage`] || "0").trim() || "0";
+
+    let title = `${name} Attack`;
+    let situational = `- ${n(v.strain_disadvantage)}d4`;
+    let extraField = "";
+    if (mode === "advantage") {
+      title = `${name} Advantage Attack`;
+      situational = `+ ${v.adv_effective_die || "0d1"}`;
+      extraField = ` {{Advantage=${escapeRollTemplateText(v.adv_effective_note)}}}`;
+    } else if (mode === "disadvantage") {
+      title = `${name} Disadvantage Attack`;
+      situational = `- ${v.dis_effective_die || "0d1"}`;
+      extraField = ` {{Disadvantage=${escapeRollTemplateText(v.dis_effective_note)}}}`;
+    }
+
+    const command = `&{template:hopepunk} {{name=${title}}} {{Skill=${skill}}}`
+      + ` {{Roll=[[1d20 + ${n(v[`${prefix}_attack_total`])} + ${n(v[`${prefix}_attack_prof`])}d6 + ${n(v[`${prefix}_attack_penalty`])} ${situational}]]}}`
+      + ` {{Damage=[[${damageExpression}]]}} {{CriticalBonus=[[0]]}} {{CriticalHandled=1}}`
+      + ` {{Traits=${traits}}} {{Effects=${effects}}} {{Strain=${strain}}}${extraField}`;
+
+    startRoll(command, result => {
+      const attack = result.results.Roll;
+      const damage = result.results.Damage;
+      const critical = firstNaturalD20(attack) === 20;
+      const criticalBonus = critical ? maximizedDamageTotal(damage) : 0;
+      const finalDamage = n(damage && damage.result) + criticalBonus;
+
+      finishRoll(result.rollId, {
+        Damage: finalDamage,
+        CriticalBonus: criticalBonus
+      });
+    });
+  });
+}
+
+[1, 2].forEach(weaponNumber => {
+  ["attack", "advantage", "disadvantage"].forEach(mode => {
+    on(`clicked:weapon_${weaponNumber}_${mode}`, () => rollWeaponAttack(weaponNumber, mode));
+  });
+});
+
 on("change:weapon_1_skill change:weapon_2_skill change:small_arms_total change:small_arms_prof change:small_arms_strain_penalty change:big_guns_total change:big_guns_prof change:big_guns_strain_penalty change:blades_total change:blades_prof change:blades_strain_penalty change:melee_combat_total change:melee_combat_prof change:melee_combat_strain_penalty change:weapon_1_trait_1 change:weapon_1_trait_2 change:weapon_1_trait_3 change:weapon_1_trait_4 change:weapon_2_trait_1 change:weapon_2_trait_2 change:weapon_2_trait_3 change:weapon_2_trait_4 sheet:opened", recalcWeaponAttacks);
 
 on(changeEvents.join(" "), recalcBonusesAndTotals);
@@ -4175,7 +4283,9 @@ on("change:advdis_level change:strain_disadvantage sheet:opened", recalcAdvDisDi
     <div class="sheet-roll-title">{{name}}</div>
     {{#Skill}}<div class="sheet-roll-row"><span>Skill</span><span>{{Skill}}</span></div>{{/Skill}}
     <div class="sheet-roll-row sheet-roll-main"><span>Roll</span><span>{{Roll}}</span></div>
-    {{#Damage}}<div class="sheet-roll-row"><span>Damage</span><span>{{Damage}}</span></div>{{/Damage}}
+    {{#CriticalHandled}}<div class="sheet-roll-row"><span>Damage</span><span>{{computed::Damage}}</span></div>{{/CriticalHandled}}
+    {{^CriticalHandled}}{{#Damage}}<div class="sheet-roll-row"><span>Damage</span><span>{{Damage}}</span></div>{{/Damage}}{{/CriticalHandled}}
+    {{#rollGreater() computed::CriticalBonus 0}}<div class="sheet-roll-row sheet-roll-good"><span>Critical</span><span>+{{computed::CriticalBonus}} maximum dice damage</span></div>{{/rollGreater() computed::CriticalBonus 0}}
     {{#Traits}}<div class="sheet-roll-row"><span>Traits</span><span>{{Traits}}</span></div>{{/Traits}}
     {{#Effects}}<div class="sheet-roll-row"><span>Effects</span><span>{{Effects}}</span></div>{{/Effects}}
     {{#Advantage}}<div class="sheet-roll-row sheet-roll-good"><span>Advantage</span><span>{{Advantage}}</span></div>{{/Advantage}}
@@ -4184,4 +4294,3 @@ on("change:advdis_level change:strain_disadvantage sheet:opened", recalcAdvDisDi
     {{#Armour}}<div class="sheet-roll-row sheet-roll-bad"><span>Armour</span><span>{{Armour}}</span></div>{{/Armour}}
   </div>
 </rolltemplate>
-
