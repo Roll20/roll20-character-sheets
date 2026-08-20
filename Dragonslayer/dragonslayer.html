@@ -7,7 +7,7 @@
   <button type="action" name="act_mode_party" class="mode-btn">Party Sheet</button>
 </div>
 
-<div class="compendium-drop-target monsters spells items character-races character-classes weapons fast-packs armor magic-armor magic-potions magic-rings magic-rods-staves-and-wands magic-runestones magic-scrolls magic-weapons miscellaneous-magic-items">
+<div class="compendium-drop-target monsters monster bestiary spells items character-races character-classes weapons fast-packs armor magic-items magic-item">
   <input type="hidden" class="sheet-mode-toggle" name="attr_sheetMode" value="pc" />
 
   <input type="hidden" name="attr_drop_category" accept="Category">
@@ -2215,7 +2215,8 @@ const getDropCategory = (data) =>
     (data?.Category || data?.category || data?.compendiumCategory || "")
         .toString()
         .trim()
-        .toLowerCase();
+        .toLowerCase()
+        .replace(/[\s\-]+/g, ""); // Removes all spaces and hyphens for foolproof matching
 
 const normalizeInt = (v, fallback) => {
     const n = parseInt(v, 10);
@@ -2286,12 +2287,12 @@ const dropSpell = (data, dropName) => {
 /* ----------------------------- */
 /* MONSTER DROP                  */
 /* ----------------------------- */
-const dropMonster = (data) => {
+const dropMonster = (data, dropName) => {
     const update = {};
     update.sheetMode = "monster";
-    update.monster_name = data.Name || data.name || "";
-
-    const d = data; 
+    
+    // Maps the name to character_name so it populates inside your roll templates
+    update.character_name = dropName || data.Name || data.name || "";
 
     const MAP = {
         "Number Encountered": "monster_no_enc",
@@ -2307,22 +2308,24 @@ const dropMonster = (data) => {
     };
 
     Object.entries(MAP).forEach(([jsonKey, attr]) => {
-        if (d[jsonKey] !== undefined) {
-            update[attr] = String(d[jsonKey]);
+        // Fallback check for Roll20's hidden 'data-' custom compendium prefixes
+        const val = data[jsonKey] !== undefined ? data[jsonKey] : data[`data-${jsonKey}`];
+        if (val !== undefined) {
+            update[attr] = String(val);
         }
     });
   
     for (let i = 1; i <= 10; i++) {
-        const nameKey = `data-Attack Name ${i}`;
-        if (!data[nameKey]) continue;
+        let atkName = data[`data-Attack Name ${i}`] || data[`Attack Name ${i}`];
+        if (!atkName) continue;
 
         const rowId = generateRowID();
         const prefix = `repeating_monster-attack_${rowId}`;
 
-        update[`${prefix}_mon_atk_attack_name`] = String(data[`data-Attack Name ${i}`] || "");
-        update[`${prefix}_mon_atk_attack_bonus`] = String(data[`data-Attack Bonus ${i}`] || "0");
-        update[`${prefix}_mon_atk_primary_damage`] = String(data[`data-Attack Damage ${i}`] || "");
-        update[`${prefix}_mon_atk_description`] = String(data[`data-Attack Description ${i}`] || "");
+        update[`${prefix}_mon_atk_attack_name`] = String(atkName);
+        update[`${prefix}_mon_atk_attack_bonus`] = String(data[`data-Attack Bonus ${i}`] || data[`Attack Bonus ${i}`] || "0");
+        update[`${prefix}_mon_atk_primary_damage`] = String(data[`data-Attack Damage ${i}`] || data[`Attack Damage ${i}`] || "");
+        update[`${prefix}_mon_atk_description`] = String(data[`data-Attack Description ${i}`] || data[`Attack Description ${i}`] || "");
     }
 
     return update;
@@ -2615,9 +2618,11 @@ on("change:drop_data", (eventInfo) => {
         return;
     }
 
-    getAttrs(["drop_name"], (v) => {
-        const category = getDropCategory(data);
-        const catRaw = data.Category || data.category || data.compendiumCategory || "Items";
+    getAttrs(["drop_name", "drop_category"], (v) => {
+        const catRaw = v.drop_category || data.Category || data.category || data.compendiumCategory || "Items";
+        
+        // Aggressively strips spaces, hyphens, and underscores for foolproof matching
+        const category = catRaw.toString().trim().toLowerCase().replace(/[\s\-_]+/g, "");
 
         const handlers = {
             monsters: dropMonster,
@@ -2627,28 +2632,18 @@ on("change:drop_data", (eventInfo) => {
             spell: dropSpell,
             items: dropItem,
             item: dropItem,
-            "fast packs": dropFastPack,
-            "fast pack": dropFastPack,
+            fastpacks: dropFastPack,
+            fastpack: dropFastPack,
             armor: dropArmorItem,
             weapons: dropWeapon,
             weapon: dropWeapon,
-            "character weapons": dropWeapon, 
-            "character races": dropRace,
-            "character-races": dropRace,
+            characterweapons: dropWeapon, 
+            characterraces: dropRace,
             races: dropRace,
-            "character classes": dropClass,
-            "character-classes": dropClass,
+            characterclasses: dropClass,
             classes: dropClass,
-            "magic armor": magicItemHandler,
-            "magic potions": magicItemHandler,
-            "magic rings": magicItemHandler,
-            "magic rods, staves, and wands": magicItemHandler,
-            "magic runestones": magicItemHandler,
-            "magic scrolls": magicItemHandler,
-            "magic weapons": magicItemHandler,
-            "miscellaneous magic items": magicItemHandler,
-            "magic items": magicItemHandler,
-            "magic item": magicItemHandler
+            magicitems: magicItemHandler,
+            magicitem: magicItemHandler
         };
 
         const handler = handlers[category];
@@ -2657,22 +2652,23 @@ on("change:drop_data", (eventInfo) => {
             return;
         }
 
-        if (category === "spells" || category === "spell" || category === "monsters" || category === "monster" || category === "bestiary") {
-            const update = handler(data, v.drop_name);
-            if (update && Object.keys(update).length) {
-                update.drop_category = "";
-                update.drop_name = "";
-                update.drop_data = "";
-                setAttrs(update);
+        // Execute the assigned handler
+        const result = handler(data, v.drop_name, catRaw); 
+        
+        // Dynamic check: If the handler returned an object, it's synchronous and needs setAttrs
+        if (result !== undefined) {
+            if (Object.keys(result).length > 0) {
+                result.drop_category = "";
+                result.drop_name = "";
+                result.drop_data = "";
+                setAttrs(result);
             } else {
                 clearDrop();
             }
-            return;
+        } else {
+            // It was an asynchronous equipment handler (handled setAttrs internally)
+            clearDrop();
         }
-
-        // Pass the precise raw category down to the handlers for accurate compendium linking
-        handler(data, v.drop_name, catRaw); 
-        clearDrop();
     });
 });
 
