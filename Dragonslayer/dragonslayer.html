@@ -1,11 +1,23 @@
 <!-- ======================================= -->
 <!-- Dragonslayer Sheet Toggle Button -->
 <!-- ======================================= -->
-<button type="action" name="act_toggleSheet" class="toggle-sheet-btn">Toggle Sheet</button>
-<input type="hidden" class="sheet-mode-toggle" name="attr_sheetMode" value="pc" />
-<div class="charsheet">
+<div class="sheet-mode-controls">
+  <button type="action" name="act_mode_pc" class="mode-btn">PC Sheet</button>
+  <button type="action" name="act_mode_monster" class="mode-btn">Monster Sheet</button>
+  <button type="action" name="act_mode_party" class="mode-btn">Party Sheet</button>
+</div>
 
-   <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="main" />
+<div class="compendium-drop-target monsters spells items character-races character-classes weapons fast-packs armor magic-armor magic-potions magic-rings magic-rods-staves-and-wands magic-runestones magic-scrolls magic-weapons miscellaneous-magic-items">
+  <input type="hidden" class="sheet-mode-toggle" name="attr_sheetMode" value="pc" />
+
+  <input type="hidden" name="attr_drop_category" accept="Category">
+  <input accept="Name" name="attr_drop_name" type="hidden" />
+  <input accept="data"  name="attr_drop_data" type="hidden" />
+  
+  <div class="charsheet">
+    <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="main" />
+    <input type="hidden" class="class-toggle" name="attr_class_toggle" value="" />
+    <input type="hidden" name="attr_turn_level" value="0" />
 
    <!-- ======================================= -->
    <!-- Dragonslayer Logo -->
@@ -95,17 +107,23 @@
                   <input type="text" name="attr_armor-class">
                </div>
                <div class="armor-description-container">
-                  <div class="compendium-drop-target">
-                     <input type="text" name="attr_armor1_name" accept="Armor" class="armor-description-input">
-                     <label for="attr_armor1_name" class="armor-description-label_1">Armor</label>
-                     <input type="text" name="attr_armor2_name" accept="Armor" class="armor-description-input">
-                     <label for="attr_armor2_name" class="armor-description-label_2">Shield</label>
-                     <input type="text" name="attr_armor_magic_name" accept="Item" class="armor-description-input">
-                     <label for="attr_armor_magic_name" class="armor-description-label_2">Magic Item</label>
-                  </div>
+					<input type="text" name="attr_armor1_name" accept="Armor" class="armor-description-input">
+					<label for="attr_armor1_name" class="armor-description-label_1">Armor</label>
+					
+					<input type="text" name="attr_armor2_name" accept="Armor" class="armor-description-input">
+					<label for="attr_armor2_name" class="armor-description-label_2">Shield</label>
+					
+					<input type="text" name="attr_armor_magic_name" accept="Item" class="armor-description-input">
+					<label for="attr_armor_magic_name" class="armor-description-label_2">Magic Item</label>
 
-               </div>
-            </div>
+
+					<input type="hidden" name="attr_armor1_ac_base" value="9">
+					<input type="hidden" name="attr_armor2_ac_bonus" value="0">
+					<input type="hidden" name="attr_armor_magic_ac_base" value="0">
+					<input type="hidden" name="attr_armor_magic_ac_bonus" value="0">
+					<input type="hidden" name="attr_armor_magic_is_set" value="0">
+			</div>
+         </div>
 
             <div class="sheet-pc-info-section">
                <!--  HIT POINTS  =========================== -->
@@ -173,8 +191,10 @@
 
             <fieldset class="repeating_weapon">
                <div class="weapon-row">
-<button type="roll" name="roll_attack_new" value="&{template:pc_attack_roll} {{character_name=@{character_name}}} {{weapon=@{new_weapon}}} {{rawToHit=[[1d20cs>=20]]}} {{toHitRoll=[[1d20 + (0 + @{new_weapon_hit_mod}) + (0 + ?{Additional Modifiers|0})]]}} {{modifier=[[ (0 + @{new_weapon_hit_mod}) + (0 + ?{Additional Modifiers|0}) ]]}} {{damage=[[ @{new_weapon_dmg} + (0 + @{new_weapon_dmg_mod}) ]]}} {{critDamage=[[ @{new_weapon_dmg} + @{new_weapon_dmg} + (0 + @{new_weapon_dmg_mod}) ]]}} {{fumbleResult=[[1d8]]}}"></button>
+                  <button type="roll" name="roll_attack_new" value="&{template:pc_attack_roll} {{character_name=@{character_name}}} {{weapon=@{new_weapon}}} {{rawToHit=[[1d20cs>=20]]}} {{toHitRoll=[[1d20 + (0 + @{new_weapon_hit_mod}) + (0 + ?{Additional Modifiers|0})]]}} {{modifier=[[ (0 + @{new_weapon_hit_mod}) + (0 + ?{Additional Modifiers|0}) ]]}} {{damage=[[ @{new_weapon_dmg} + (0 + @{new_weapon_dmg_mod}) ]]}} {{critDamage=[[ @{new_weapon_dmg} + @{new_weapon_dmg} + (0 + @{new_weapon_dmg_mod}) ]]}} {{fumbleResult=[[1d8]]}}"></button>
 
+                  <input type="hidden" name="attr_new_weapon_magic_hit" value="0">
+                  <input type="hidden" name="attr_new_weapon_magic_dmg" value="0">
 
                   <input type="text" name="attr_new_weapon" />
                   <select name="attr_new_weapon_type">
@@ -193,7 +213,7 @@
                      <option value="1d8">1d8</option>
                      <option value="1d10">1d10</option>
                   </select>
-                  <input type="number" name="attr_new_weapon_dmg_mod" value="0"/>
+                  <input type="number" name="attr_new_weapon_dmg_mod" value="0" />
                </div>
             </fieldset>
    
@@ -266,32 +286,32 @@
                <h3>Modifiers</h3>
                <div class="sheet-modifiers">
                   <div class="sheet-modifier">
-                     <input type="text" name="attr_melee-hit-damage">
-                     <input type="text" name="attr_force-door">
+                     <input type="text" name="attr_melee-hit-damage" readonly>
+                     <input type="text" name="attr_force-door" readonly>
                      <label for="attr_melee-hit-damage">Melee To Hit &amp; Damage</label>
                      <label for="attr_force-door">Force Door</label>
                   </div>
                   <div class="sheet-modifier">
-                     <input type="text" name="attr_languages-mod">
+                     <input type="text" name="attr_languages-mod" readonly>
                      <label for="attr_languages-mod">Modifier / # Languages</label>
                   </div>
                   <div class="sheet-modifier">
-                     <input type="text" name="attr_magic-save">
+                     <input type="text" name="attr_magic-save" readonly>
                      <label for="attr_magic-save">Magic Save</label>
                   </div>
                   <div class="sheet-modifier">
-                     <input type="text" name="attr_missile-hit-damage">
-                     <input type="text" name="attr_armor-mod">
+                     <input type="text" name="attr_missile-hit-damage" readonly>
+                     <input type="text" name="attr_armor-mod" readonly>
                      <label for="attr_missile-hit-damage">Missile To Hit &amp; Damage</label>
                      <label for="attr_armor-mod">Armor</label>
                   </div>
                   <div class="sheet-modifier">
-                     <input type="text" name="attr_hit-points-mod">
+                     <input type="text" name="attr_hit-points-mod" readonly>
                      <label for="attr_hit-points-mod">Hit Point</label>
                   </div>
                   <div class="sheet-modifier">
-                     <input type="text" name="attr_henchmen">
-                     <input type="text" name="attr_henchmen-morale">
+                     <input type="text" name="attr_henchmen" readonly>
+                     <input type="text" name="attr_henchmen-morale" readonly>
                      <label for="attr_henchmen"># Henchmen</label>
                      <label for="attr_henchmen-morale">Henchmen Morale</label>
                   </div>
@@ -330,6 +350,7 @@
                   </div>
                </div>
             </div>
+
          </div>
       </div>
 
@@ -339,24 +360,53 @@
       <!-- ======================================= -->
       <div class="sheet-equipment-tab">
          <div class="equipment-columns">
-
             <div class="equipment-column">
-               <label for="attr_equipment_item">
+               <label>
                   <h2>Items</h2>
                </label>
                <fieldset class="repeating_equipment1">
-                  <div class="equipment-entry">
+                  <div class="equipment-entry-grid">
+                     <button type="compendium" name="attr_equipment_infoButton" class="spell-compendium-btn" title="Open item"></button>
                      <input type="text" accept="equipment_name" name="attr_equipment_item">
                   </div>
                </fieldset>
             </div>
 
             <div class="equipment-column">
-               <label for="attr_equipment_item">
+               <label>
                   <h2>Items</h2>
                </label>
                <fieldset class="repeating_equipment2">
-                  <div class="equipment-entry">
+                  <div class="equipment-entry-grid">
+                     <button type="compendium" name="attr_equipment_infoButton" class="spell-compendium-btn" title="Open item"></button>
+                     <input type="text" accept="equipment_name" name="attr_equipment_item">
+                  </div>
+               </fieldset>
+            </div>
+         </div>
+         
+         <hr style="margin: 20px 0; border: 0; border-top: 2px solid #000;">
+         
+         <div class="equipment-columns magic-items-columns">
+            <div class="equipment-column">
+               <label>
+                  <h2>Magic Items</h2>
+               </label>
+               <fieldset class="repeating_magicitem1">
+                  <div class="equipment-entry-grid">
+                     <button type="compendium" name="attr_equipment_infoButton" class="spell-compendium-btn" title="Open item"></button>
+                     <input type="text" accept="equipment_name" name="attr_equipment_item">
+                  </div>
+               </fieldset>
+            </div>
+
+            <div class="equipment-column">
+               <label>
+                  <h2>Magic Items</h2>
+               </label>
+               <fieldset class="repeating_magicitem2">
+                  <div class="equipment-entry-grid">
+                     <button type="compendium" name="attr_equipment_infoButton" class="spell-compendium-btn" title="Open item"></button>
                      <input type="text" accept="equipment_name" name="attr_equipment_item">
                   </div>
                </fieldset>
@@ -370,86 +420,84 @@
       <div class="sheet-abilities-tab">
          <div class="abilities-columns">
 
+            <!-- MAIN ABILITIES COLUMN (Left Side) -->
             <div class="abilities-column">
                <h2>Abilities</h2>
-
                <fieldset class="repeating_ability">
                   <div class="ability-entry">
-                     <textarea name="attr_ability_description" rows="4"
-                        placeholder="Enter ability details..."></textarea>
+                     <textarea name="attr_ability_description" rows="4" placeholder="Enter ability details..."></textarea>
                   </div>
                </fieldset>
             </div>
 
-            <div class="thief-skills-column">
-               <h2>Thief Skills</h2>
-               <div class="thief-skills-list">
+            <!-- DYNAMIC STACKING WRAPPER (Right Side) -->
+            <div class="class-specific-wrapper">
 
-                  <div class="thief-skill">
-                     <button type="roll" name="roll_thief_pickpockets"
-                        value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Pick Pockets}} {{roll=[[1d100]]}} {{target=[[@{pick_pockets}]]}}">
-                     </button>
-                     <div class="skill-name">Pick Pockets</div>
-                     <input type="text" name="attr_pick_pockets">
-                  </div>
-
-                  <div class="thief-skill">
-                     <button type="roll" name="roll_thief_openlocks"
-                        value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Open Locks}} {{roll=[[1d100]]}} {{target=[[@{open_locks}]]}}">
-                     </button>
-                     <div class="skill-name">Open Locks</div>
-                     <input type="text" name="attr_open_locks">
-                  </div>
-
-                  <div class="thief-skill">
-                     <button type="roll" name="roll_thief_findtraps"
-                        value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Find and Remove Traps}} {{roll=[[1d100]]}} {{target=[[@{find_traps}]]}}">
-                     </button>
-                     <div class="skill-name">Find and Remove Traps</div>
-                     <input type="text" name="attr_find_traps">
-                  </div>
-
-                  <div class="thief-skill">
-                     <button type="roll" name="roll_thief_movesilently"
-                        value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Move Silently}} {{roll=[[1d100]]}} {{target=[[@{move_silently}]]}}">
-                     </button>
-                     <div class="skill-name">Move Silently</div>
-                     <input type="text" name="attr_move_silently">
-                  </div>
-
-                  <div class="thief-skill">
-                     <button type="roll" name="roll_thief_hideinshadows"
-                        value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Hide in Shadows}} {{roll=[[1d100]]}} {{target=[[@{hide_in_shadows}]]}}">
-                     </button>
-                     <div class="skill-name">Hide in Shadows</div>
-                     <input type="text" name="attr_hide_in_shadows">
-                  </div>
-
-                  <div class="thief-skill">
-                     <button type="roll" name="roll_thief_climbwalls"
-                        value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Climb Walls}} {{roll=[[1d100]]}} {{target=[[@{climb_walls}]]}}">
-                     </button>
-                     <div class="skill-name">Climb Walls</div>
-                     <input type="text" name="attr_climb_walls">
-                  </div>
-
-                  <div class="thief-skill">
-                     <button type="roll" name="roll_thief_hearnoise"
-                        value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Hear Noise}} {{roll=[[1d6]]}} {{target=[[@{hear_noise}]]}}">
-                     </button>
-                     <div class="skill-name">Hear Noise</div>
-                     <input type="text" name="attr_hear_noise">
-                  </div>
-
-                  <div class="thief-skill">
-                     <button type="roll" name="roll_thief_appraise"
-                        value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Appraise}} {{roll=[[1d6]]}} {{target=[[@{appraise}]]}}">
-                     </button>
-                     <div class="skill-name">Appraise</div>
-                     <input type="text" name="attr_appraise">
+               <!-- THIEF SKILLS COLUMN -->
+               <div class="thief-skills-column class-specific-section">
+                  <h2>Thief Skills</h2>
+                  <div class="thief-skills-list">
+                     <div class="thief-skill">
+                        <button type="roll" name="roll_thief_pickpockets" value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Pick Pockets}} {{roll=[[1d100]]}} {{target=[[@{pick_pockets}]]}}"></button>
+                        <div class="skill-name">Pick Pockets</div><input type="text" name="attr_pick_pockets" readonly>
+                     </div>
+                     <div class="thief-skill">
+                        <button type="roll" name="roll_thief_openlocks" value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Open Locks}} {{roll=[[1d100]]}} {{target=[[@{open_locks}]]}}"></button>
+                        <div class="skill-name">Open Locks</div><input type="text" name="attr_open_locks" readonly>
+                     </div>
+                     <div class="thief-skill">
+   <button type="roll" name="roll_thief_findtraps" value="/w gm &{template:thief_skill} {{character_name=@{character_name}}} {{skill=Find and Remove Traps}} {{roll=[[1d100]]}} {{target=[[@{find_traps}]]}}"></button>
+   <div class="skill-name">Find and Remove Traps</div><input type="text" name="attr_find_traps" readonly>
+</div>
+                     <div class="thief-skill">
+                        <button type="roll" name="roll_thief_movesilently" value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Move Silently}} {{roll=[[1d100]]}} {{target=[[@{move_silently}]]}}"></button>
+                        <div class="skill-name">Move Silently</div><input type="text" name="attr_move_silently" readonly>
+                     </div>
+                     <div class="thief-skill">
+                        <button type="roll" name="roll_thief_hideinshadows" value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Hide in Shadows}} {{roll=[[1d100]]}} {{target=[[@{hide_in_shadows}]]}}"></button>
+                        <div class="skill-name">Hide in Shadows</div><input type="text" name="attr_hide_in_shadows" readonly>
+                     </div>
+                     <div class="thief-skill">
+                        <button type="roll" name="roll_thief_climbwalls" value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Climb Walls}} {{roll=[[1d100]]}} {{target=[[@{climb_walls}]]}}"></button>
+                        <div class="skill-name">Climb Walls</div><input type="text" name="attr_climb_walls" readonly>
+                     </div>
+                     <div class="thief-skill">
+                        <button type="roll" name="roll_thief_hearnoise" value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Hear Noise}} {{roll=[[1d6]]}} {{target=[[@{hear_noise}]]}}"></button>
+                        <div class="skill-name">Hear Noise</div><input type="text" name="attr_hear_noise" readonly>
+                     </div>
+                     <div class="thief-skill">
+                        <button type="roll" name="roll_thief_appraise" value="&{template:thief_skill} {{character_name=@{character_name}}} {{skill=Appraise}} {{roll=[[1d6]]}} {{target=[[@{appraise}]]}}"></button>
+                        <div class="skill-name">Appraise</div><input type="text" name="attr_appraise" readonly>
+                     </div>
                   </div>
                </div>
-            </div>
+
+               <!-- CLERIC & PALADIN TURN COLUMN -->
+               <div class="cleric-turn-column class-specific-section">
+                  <div class="turn-header-container">
+                     <button type="roll" name="roll_turn_undead" value="&{template:ds_generic} {{name=Turn Undead}} {{subtitle=@{character_name}}} {{Turn Roll=[[1d20 - ?{Additional Turn Penalty (0 for 1st, 1 for 2nd, etc.)|0}]]}} {{HD Turned=[[2d4 + @{turn_level}]]}} {{Duration=[[1d3 + @{turn_level}]] turns}}"></button>
+                     <h2 style="margin: 0;">Turn Undead</h2>
+                  </div>
+                  
+                  <div class="turn-undead-table">
+                     <div class="turn-header">HD</div><div class="turn-header">Target</div>
+                     <div class="turn-cell">1</div><div class="turn-cell"><input type="text" name="attr_turn_hd_1" readonly="true"></div>
+                     <div class="turn-cell">2</div><div class="turn-cell"><input type="text" name="attr_turn_hd_2" readonly="true"></div>
+                     <div class="turn-cell">3</div><div class="turn-cell"><input type="text" name="attr_turn_hd_3" readonly="true"></div>
+                     <div class="turn-cell">4</div><div class="turn-cell"><input type="text" name="attr_turn_hd_4" readonly="true"></div>
+                     <div class="turn-cell">5</div><div class="turn-cell"><input type="text" name="attr_turn_hd_5" readonly="true"></div>
+                     <div class="turn-cell">6</div><div class="turn-cell"><input type="text" name="attr_turn_hd_6" readonly="true"></div>
+                     <div class="turn-cell">7</div><div class="turn-cell"><input type="text" name="attr_turn_hd_7" readonly="true"></div>
+                     <div class="turn-cell">8</div><div class="turn-cell"><input type="text" name="attr_turn_hd_8" readonly="true"></div>
+                     <div class="turn-cell">9</div><div class="turn-cell"><input type="text" name="attr_turn_hd_9" readonly="true"></div>
+                     <div class="turn-cell">Sp*</div><div class="turn-cell"><input type="text" name="attr_turn_hd_sp" readonly="true"></div>
+                  </div>
+                  <p style="font-size: 1.1em; margin-top: 10px; color: #444; line-height: 1.3em;">
+                     <em>*Special Undead (10+ HD, demons, devils).<br>T = Auto Turn. D = Destroyed.</em>
+                  </p>
+               </div>
+
+            </div> <!-- End Class Specific Wrapper -->
          </div>
       </div>
       <!-- ======================================= -->
@@ -501,15 +549,27 @@
                   </div>
       
                   <div class="spell-level-labels">
-                     <span title="Memorized Spell" class="memorized-header">✓</span>
-                     <span class="spell-name-header">Spell Name</span>
-                  </div>
-      
+					  <span class="memorized-header">✓</span>
+					  <span class="compendium-header"></span>
+					  <span class="spell-name-header">Spell Name</span>
+					</div>
+					
                   <fieldset class="repeating_spelllevel1">
                      <div class="spell-entry">
-                        <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
-                        <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
-                     </div>
+					  <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
+
+					  <!-- Button stores its own compendium target -->
+						<button type="compendium"
+								name="attr_spell_infoButton"
+								class="spell-compendium-btn"
+								title="Open spell">
+						</button>
+
+						<!-- optional: keep this hidden if you want to display/store separately, but not required -->
+						<input type="hidden" name="attr_spell_uniqueName">
+
+					  <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
+					</div>
                   </fieldset>
                </div>
       
@@ -520,15 +580,27 @@
                   </div>
       
                   <div class="spell-level-labels">
-                     <span class="memorized-header">✓</span>
-                     <span class="spell-name-header">Spell Name</span>
-                  </div>
+					  <span class="memorized-header">✓</span>
+					  <span class="compendium-header"></span>
+					  <span class="spell-name-header">Spell Name</span>
+					</div>
       
                   <fieldset class="repeating_spelllevel2">
                      <div class="spell-entry">
-                        <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
-                        <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
-                     </div>
+					  <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
+
+					  <!-- Button stores its own compendium target -->
+						<button type="compendium"
+								name="attr_spell_infoButton"
+								class="spell-compendium-btn"
+								title="Open spell">
+						</button>
+
+						<!-- optional: keep this hidden if you want to display/store separately, but not required -->
+						<input type="hidden" name="attr_spell_uniqueName">
+
+					  <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
+					</div>
                   </fieldset>
                </div>
       
@@ -538,15 +610,27 @@
                   </div>
       
                   <div class="spell-level-labels">
-                     <span class="memorized-header">✓</span>
-                     <span class="spell-name-header">Spell Name</span>
-                  </div>
+					  <span class="memorized-header">✓</span>
+					  <span class="compendium-header"></span>
+					  <span class="spell-name-header">Spell Name</span>
+					</div>
       
                   <fieldset class="repeating_spelllevel3">
                      <div class="spell-entry">
-                        <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
-                        <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
-                     </div>
+					  <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
+
+					  <!-- Button stores its own compendium target -->
+						<button type="compendium"
+								name="attr_spell_infoButton"
+								class="spell-compendium-btn"
+								title="Open spell">
+						</button>
+
+						<!-- optional: keep this hidden if you want to display/store separately, but not required -->
+						<input type="hidden" name="attr_spell_uniqueName">
+
+					  <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
+					</div>
                   </fieldset>
                </div>
       
@@ -558,15 +642,27 @@
                   </div>
       
                   <div class="spell-level-labels">
-                     <span class="memorized-header">✓</span>
-                     <span class="spell-name-header">Spell Name</span>
-                  </div>
+					  <span class="memorized-header">✓</span>
+					  <span class="compendium-header"></span>
+					  <span class="spell-name-header">Spell Name</span>
+					</div>
       
                   <fieldset class="repeating_spelllevel4">
                      <div class="spell-entry">
-                        <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
-                        <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
-                     </div>
+					  <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
+
+					  <!-- Button stores its own compendium target -->
+						<button type="compendium"
+								name="attr_spell_infoButton"
+								class="spell-compendium-btn"
+								title="Open spell">
+						</button>
+
+						<!-- optional: keep this hidden if you want to display/store separately, but not required -->
+						<input type="hidden" name="attr_spell_uniqueName">
+
+					  <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
+					</div>
                   </fieldset>
                </div>
       
@@ -577,15 +673,27 @@
                   </div>
       
                   <div class="spell-level-labels">
-                     <span class="memorized-header">✓</span>
-                     <span class="spell-name-header">Spell Name</span>
-                  </div>
+					  <span class="memorized-header">✓</span>
+					  <span class="compendium-header"></span>
+					  <span class="spell-name-header">Spell Name</span>
+					</div>
       
                   <fieldset class="repeating_spelllevel5">
                      <div class="spell-entry">
-                        <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
-                        <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
-                     </div>
+					  <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
+
+					  <!-- Button stores its own compendium target -->
+						<button type="compendium"
+								name="attr_spell_infoButton"
+								class="spell-compendium-btn"
+								title="Open spell">
+						</button>
+
+						<!-- optional: keep this hidden if you want to display/store separately, but not required -->
+						<input type="hidden" name="attr_spell_uniqueName">
+
+					  <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
+					</div>
                   </fieldset>
                </div>
       
@@ -602,15 +710,27 @@
                   </div>
       
                   <div class="spell-level-labels">
-                     <span class="memorized-header">✓</span>
-                     <span class="spell-name-header">Spell Name</span>
-                  </div>
+					  <span class="memorized-header">✓</span>
+					  <span class="compendium-header"></span>
+					  <span class="spell-name-header">Spell Name</span>
+					</div>
       
                   <fieldset class="repeating_spelllevel6">
                      <div class="spell-entry">
-                        <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
-                        <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
-                     </div>
+					  <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
+
+					  <!-- Button stores its own compendium target -->
+						<button type="compendium"
+								name="attr_spell_infoButton"
+								class="spell-compendium-btn"
+								title="Open spell">
+						</button>
+
+						<!-- optional: keep this hidden if you want to display/store separately, but not required -->
+						<input type="hidden" name="attr_spell_uniqueName">
+
+					  <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
+					</div>
                   </fieldset>
                </div>
       
@@ -620,15 +740,27 @@
                   </div>
       
                   <div class="spell-level-labels">
-                     <span class="memorized-header">✓</span>
-                     <span class="spell-name-header">Spell Name</span>
-                  </div>
+					  <span class="memorized-header">✓</span>
+					  <span class="compendium-header"></span>
+					  <span class="spell-name-header">Spell Name</span>
+					</div>
       
                   <fieldset class="repeating_spelllevel7">
                      <div class="spell-entry">
-                        <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
-                        <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
-                     </div>
+					  <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
+
+					  <!-- Button stores its own compendium target -->
+						<button type="compendium"
+								name="attr_spell_infoButton"
+								class="spell-compendium-btn"
+								title="Open spell">
+						</button>
+
+						<!-- optional: keep this hidden if you want to display/store separately, but not required -->
+						<input type="hidden" name="attr_spell_uniqueName">
+
+					  <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
+					</div>
                   </fieldset>
                </div>      
 
@@ -638,15 +770,27 @@
                   </div>
       
                   <div class="spell-level-labels">
-                     <span class="memorized-header">✓</span>
-                     <span class="spell-name-header">Spell Name</span>
-                  </div>
+					  <span class="memorized-header">✓</span>
+					  <span class="compendium-header"></span>
+					  <span class="spell-name-header">Spell Name</span>
+					</div>
       
                   <fieldset class="repeating_spelllevel8">
                      <div class="spell-entry">
-                        <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
-                        <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
-                     </div>
+					  <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
+
+					  <!-- Button stores its own compendium target -->
+						<button type="compendium"
+								name="attr_spell_infoButton"
+								class="spell-compendium-btn"
+								title="Open spell">
+						</button>
+
+						<!-- optional: keep this hidden if you want to display/store separately, but not required -->
+						<input type="hidden" name="attr_spell_uniqueName">
+
+					  <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
+					</div>
                   </fieldset>
                </div> 
 
@@ -656,15 +800,27 @@
                   </div>
       
                   <div class="spell-level-labels">
-                     <span class="memorized-header">✓</span>
-                     <span class="spell-name-header">Spell Name</span>
-                  </div>
+					  <span class="memorized-header">✓</span>
+					  <span class="compendium-header"></span>
+					  <span class="spell-name-header">Spell Name</span>
+					</div>
       
                   <fieldset class="repeating_spelllevel9">
                      <div class="spell-entry">
-                        <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
-                        <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
-                     </div>
+					  <input type="checkbox" name="attr_spellmemorized" class="spell-memorized">
+
+					  <!-- Button stores its own compendium target -->
+						<button type="compendium"
+								name="attr_spell_infoButton"
+								class="spell-compendium-btn"
+								title="Open spell">
+						</button>
+
+						<!-- optional: keep this hidden if you want to display/store separately, but not required -->
+						<input type="hidden" name="attr_spell_uniqueName">
+
+					  <input type="text" name="attr_spellname" accept="spell_name" placeholder="Spell Name">
+					</div>
                   </fieldset>
                </div> 
             </div>
@@ -675,19 +831,20 @@
          </div>
       </div>
  
-      <!-- ======================================= -->
+     <!-- ======================================= -->
       <!-- Wealth & Treasure Tab Content -->
       <!-- ======================================= -->
       <div class="sheet-wealth-tab">
 
+         <!-- CARRIED WEALTH -->
          <div class="sheet-wealth-table">
             <div class="wealth-row">
-               <div class="wealth-cell wealth-heading">Wealth</div>
-               <div class="wealth-cell coin-col"><input type="text" name="attr_coins_CP"></div>
-               <div class="wealth-cell coin-col"><input type="text" name="attr_coins_SP"></div>
-               <div class="wealth-cell coin-col"><input type="text" name="attr_coins_EP"></div>
-               <div class="wealth-cell coin-col"><input type="text" name="attr_coins_GP"></div>
-               <div class="wealth-cell coin-col"><input type="text" name="attr_coins_PP"></div>
+               <div class="wealth-cell wealth-heading">Carried Wealth</div>
+               <div class="wealth-cell coin-col"><input type="text" name="attr_carried_cp"></div>
+               <div class="wealth-cell coin-col"><input type="text" name="attr_carried_sp"></div>
+               <div class="wealth-cell coin-col"><input type="text" name="attr_carried_ep"></div>
+               <div class="wealth-cell coin-col"><input type="text" name="attr_carried_gp"></div>
+               <div class="wealth-cell coin-col"><input type="text" name="attr_carried_pp"></div>
             </div>
             <div class="wealth-row">
                <div class="wealth-cell"></div>
@@ -698,20 +855,42 @@
                <div class="wealth-cell coin-col"><label>PP</label></div>
             </div>
          </div>
+
+         <!-- TOTAL CARRIED COINS DISPLAY -->
+         <div class="carried-coins-total-row" style="margin: 10px 0; font-size: 1.3em; font-weight: bold;">
+            Total Carried Coins: <input type="text" name="attr_total_carried_coins" value="0" readonly="true" style="width: 100px; display: inline-block; border: none; font-weight: bold;" />
+         </div>
+
+         <!-- BANKED WEALTH -->
+         <div class="sheet-wealth-table" style="margin-top: 20px;">
+            <div class="wealth-row">
+               <div class="wealth-cell wealth-heading">Banked Wealth</div>
+               <div class="wealth-cell coin-col"><input type="text" name="attr_bank_cp"></div>
+               <div class="wealth-cell coin-col"><input type="text" name="attr_bank_sp"></div>
+               <div class="wealth-cell coin-col"><input type="text" name="attr_bank_ep"></div>
+               <div class="wealth-cell coin-col"><input type="text" name="attr_bank_gp"></div>
+               <div class="wealth-cell coin-col"><input type="text" name="attr_bank_pp"></div>
+            </div>
+            <div class="wealth-row">
+               <div class="wealth-cell"></div>
+               <div class="wealth-cell coin-col"><label>CP</label></div>
+               <div class="wealth-cell coin-col"><label>SP</label></div>
+               <div class="wealth-cell coin-col"><label>EP</label></div>
+               <div class="wealth-cell coin-col"><label>GP</label></div>
+               <div class="wealth-cell coin-col"><label>PP</label></div>
+            </div>
+         </div>
+
          <h2 class="treasure-heading">Treasure</h2>
 
          <div class="treasure-two-col">
-
             <div class="treasure-col">
                <div class="treasure-col-header">
                   <div class="col-item-label">Item</div>
                   <div class="col-value-label">Value</div>
                </div>
-
                <fieldset class="repeating_treasureleft">
-
                   <div class="treasure-entry-2col">
-
                      <input type="text" name="attr_item">
                      <input type="text" name="attr_value">
                   </div>
@@ -723,7 +902,6 @@
                   <div class="col-item-label">Item</div>
                   <div class="col-value-label">Value</div>
                </div>
-
                <fieldset class="repeating_treasureright">
                   <div class="treasure-entry-2col">
                      <input type="text" name="attr_item">
@@ -764,6 +942,8 @@
                      <option value="Halfling">Halfling</option>
                      <option value="Half-Elf">Half-Elf</option>
                      <option value="Half-Orc">Half-Orc</option>
+                     <option value="Animal">Animal</option>
+                     <option value="Other">Other</option>
                   </select>
                   <select class="hireling-col-class" name="attr_class">
                      <option value="">-- Class --</option>
@@ -782,6 +962,13 @@
                      <option value="Illusionist">Illusionist</option>
                      <option value="Thief">Thief</option>
                      <option value="Assassin">Assassin</option>
+                     <option value="Riding Horse">Riding Horse</option>
+                     <option value="Warhorse">Warhorse</option>
+                     <option value="Draft Horse">Draft Horse</option>
+                     <option value="Mule">Mule</option>
+                     <option value="Hawk">Hawk</option>
+                     <option value="War Dog">War Dog</option>
+                     <option value="Other">Other</option>
                   </select>
                   <input type="text" class="hireling-col-level" name="attr_level">
                   <input type="text" class="hireling-col-hp" name="attr_hitpoints">
@@ -808,9 +995,9 @@
                   <div class="hireling-col-notes">Notes</div>
                </div>
 
+               <!-- Attack 1 -->
                <div class="hireling-row2-data">
-<button type="roll" class="hireling-col-attack" name="roll_attack" value="&{template:pc_attack_roll} {{character_name=@{name}}} {{weapon=@{weapon}}} {{toHitRoll=[[1d20 + (0 + @{hitmod}) + (0 + ?{Additional Mods|0})]]}} {{damage=[[ @{dmgdice} + (0 + @{dmgmod}) ]]}}"></button>
-
+                  <button type="roll" class="hireling-col-attack" name="roll_attack" value="&{template:pc_attack_roll} {{character_name=@{name}}} {{weapon=@{weapon}}} {{rawToHit=[[1d20cs>=20]]}} {{toHitRoll=[[1d20 + (0 + @{hitmod}) + (0 + ?{Additional Mods|0})]]}} {{damage=[[ @{dmgdice} + (0 + @{dmgmod}) ]]}} {{critDamage=[[ 2 * (@{dmgdice}) + (0 + @{dmgmod}) ]]}} {{fumbleResult=[[1d8]]}}"></button>
                   <input type="text" class="hireling-col-weapon" name="attr_weapon">
                   <input type="text" class="hireling-col-hitmod" name="attr_hitmod" value="0">
                   <select class="hireling-col-dmgdice" name="attr_dmgdice">
@@ -826,6 +1013,26 @@
                   <input type="text" class="hireling-col-dmgmod" name="attr_dmgmod" value="0">
                   <input type="text" class="hireling-col-notes" name="attr_notes">
                </div>
+
+               <!-- Attack 2 -->
+               <div class="hireling-row2-data">
+                  <button type="roll" class="hireling-col-attack" name="roll_attack2" value="&{template:pc_attack_roll} {{character_name=@{name}}} {{weapon=@{weapon2}}} {{rawToHit=[[1d20cs>=20]]}} {{toHitRoll=[[1d20 + (0 + @{hitmod2}) + (0 + ?{Additional Mods|0})]]}} {{damage=[[ @{dmgdice2} + (0 + @{dmgmod2}) ]]}} {{critDamage=[[ 2 * (@{dmgdice2}) + (0 + @{dmgmod2}) ]]}} {{fumbleResult=[[1d8]]}}"></button>
+                  <input type="text" class="hireling-col-weapon" name="attr_weapon2">
+                  <input type="text" class="hireling-col-hitmod" name="attr_hitmod2" value="0">
+                  <select class="hireling-col-dmgdice" name="attr_dmgdice2">
+                     <option value="1d3">1d3</option>
+                     <option value="1d4">1d4</option>
+                     <option value="2d4">2d4</option>
+                     <option value="1d6">1d6</option>
+                     <option value="2d6">2d6</option>
+                     <option value="1d8">1d8</option>
+                     <option value="1d10">1d10</option>
+                     <option value="1d12">1d12</option>
+                  </select>
+                  <input type="text" class="hireling-col-dmgmod" name="attr_dmgmod2" value="0">
+                  <input type="text" class="hireling-col-notes" name="attr_notes2">
+               </div>
+
             </div>
          </fieldset>
       </div>
@@ -862,7 +1069,6 @@
    </div>
 </div>
 
-
 <!-- ======================================= -->
 <!-- Monster Sheet Content -->
 <!-- ======================================= -->
@@ -876,16 +1082,13 @@
 
             <div class="stat-row">
                <div class="stat-button">
-                  <button type="roll" name="roll_noenc"
-                     value="/w gm Monsters Encountered: [[0+@{monster_no_enc}]]"></button>
-
+                  <button type="roll" name="roll_noenc" value="/w gm &{template:ds_generic} {{name=Monsters Encountered}} {{Result=[[0+@{monster_no_enc}]]}}"></button>
                </div>
                <div class="stat-label">No. Enc</div>
                <div class="stat-input">
                   <div class="double-input">
                      <input type="text" name="attr_monster_no_enc" />
-                     <button type="roll" name="roll_noenc_lair"
-                        value="/w gm Monsters In Lair Encountered: [[0+@{monster_no_enc_lair}]]"></button>
+                     <button type="roll" name="roll_noenc_lair" value="/w gm &{template:ds_generic} {{name=Monsters In Lair}} {{Result=[[0+@{monster_no_enc_lair}]]}}"></button>
                      <input type="text" name="attr_monster_no_enc_lair">
                   </div>
                </div>
@@ -917,8 +1120,7 @@
 
             <div class="stat-row">
                <div class="stat-button">
-                  <button type="roll" name="roll_hitdice"
-                     value="/w gm Hit Dice: [[0+@{monster_hit_dice_full}]]"></button>
+                  <button type="roll" name="roll_hitdice" value="/w gm &{template:ds_generic} {{name=Hit Dice}} {{Result=[[0+@{monster_hit_dice_full}]]}}"></button>
                </div>
                <div class="stat-label">Hit Dice</div>
                <div class="stat-input">
@@ -938,7 +1140,9 @@
             </div>
 
             <div class="stat-row">
-               <div class="stat-button"></div>
+               <div class="stat-button">
+                  <button type="action" name="act_roll_treasure">t</button>
+               </div>
                <div class="stat-label">Treasure</div>
                <div class="stat-input">
                   <input type="text" name="attr_monster_treasure">
@@ -1002,8 +1206,7 @@
                <div class="atk-entry">
 
                   <div class="mon-atk-row-1">
-                     <button type="roll" name="roll_monster_attack"
-                        value="&{template:pc_attack_roll} {{character_name=@{character_name}}} {{weapon=@{mon_atk_attack_name}}} {{rawToHit=[[1d20cs>=20]]}} {{toHitRoll=[[1d20+@{mon_atk_attack_bonus}+?{Additional Modifiers|0}]]}} {{modifier=[[@{mon_atk_attack_bonus}+?{Additional Modifiers|0}]]}} {{damage=[[ @{mon_atk_primary_damage} ]]}} {{critDamage=[[ @{mon_atk_primary_damage}+0 ]]}} {{fumbleResult=[[1d8]]}}"></button>
+                     <button type="roll" name="roll_monster_attack" value="&{template:pc_attack_roll} {{character_name=@{character_name}}} {{weapon=@{mon_atk_attack_name}}} {{rawToHit=[[1d20cs>=20]]}} {{toHitRoll=[[1d20+@{mon_atk_attack_bonus}+?{Additional Modifiers|0}]]}} {{modifier=[[@{mon_atk_attack_bonus}+?{Additional Modifiers|0}]]}} {{damage=[[ @{mon_atk_primary_damage} ]]}} {{critDamage=[[ 2 * (@{mon_atk_primary_damage}) ]]}} {{fumbleResult=[[1d8]]}}"></button>
                      <label>Attack Name</label>
                      <input type="text" name="attr_mon_atk_attack_name">
                   </div>
@@ -1030,187 +1233,338 @@
       </div>
    </div>
 </div>
-<rolltemplate class="sheet-rolltemplate-pc_attack_roll">
-   <div class="sheet-container">
-      <div class="sheet-header">
-         <strong>{{character_name}}</strong> attacks with a 
-          <span class="sheet-atk-weapon">{{weapon}}</span> for a total roll of {{toHitRoll}}
 
-          
+<!-- ======================================= -->
+<!-- Party Sheet Content                     -->
+<!-- ======================================= -->
+<div class="partysheet">
+   <div class="party-sheet-container">
+      
+      <!-- Header Row with Date -->
+      <div class="sheet-header-row party-header-row">
+         <div>
+            <input type="text" name="attr_party_name">
+            <label>Party Name</label>
+         </div>
+         <div>
+            <input type="text" name="attr_session_number">
+            <label>Session #</label>
+         </div>
+         <div>
+            <input type="text" name="attr_session_date">
+            <label>Date</label>
+         </div>
+         <div>
+            <input type="text" name="attr_note_taker">
+            <label>Note Taker</label>
+         </div>
+      </div>
+
+      <hr class="party-divider">
+
+      <!-- Roster Section -->
+      <h2>Party Roster & Retainers</h2>
+      <div class="party-roster-header">
+         <div class="col-name">Name</div>
+         <div class="col-raceclass">Race / Class</div>
+         <div class="col-level">Level</div>
+         <div class="col-type">Role</div>
+      </div>
+      <fieldset class="repeating_roster">
+         <div class="party-roster-row">
+            <input type="text" name="attr_roster_name" class="col-name">
+            <input type="text" name="attr_roster_class" class="col-raceclass">
+            <input type="number" name="attr_roster_level" class="col-level">
+            <select name="attr_roster_type" class="col-type">
+               <option value="PC" selected>PC</option>
+               <option value="Henchman">Henchman</option>
+               <option value="Man-at-Arms">Man-at-Arms</option>
+               <option value="TB/Porter">TB/Porter</option>
+            </select>
+         </div>
+      </fieldset>
+
+      <hr class="party-divider">
+
+      <!-- Monsters Section -->
+      <div class="party-two-col">
+         <div class="party-col">
+            <h2>Monsters Defeated</h2>
+            <div class="party-monster-header">
+               <div class="col-monname">Monster Name</div>
+               <div class="col-monqty">No. Defeated</div>
+               <div class="col-monxp">XP</div>
+            </div>
+            <fieldset class="repeating_monsterkill">
+               <div class="party-monster-row">
+                  <input type="text" name="attr_kill_name" class="col-monname">
+                  <input type="number" name="attr_kill_qty" value="1" class="col-monqty">
+                  <input type="number" name="attr_kill_xp" value="0" class="col-monxp">
+               </div>
+            </fieldset>
+            <div class="party-totals-box">
+               <label>Total Monster XP:</label>
+               <input type="number" name="attr_total_monster_xp" value="0" readonly>
+            </div>
+         </div>
+
+         <!-- Treasure Section -->
+         <div class="party-col">
+            <h2>Treasure Tracker</h2>
+            <div class="party-treasure-header">
+               <div class="col-item">Item</div>
+               <div class="col-qty">Qty</div>
+               <div class="col-val">Value (Each)</div>
+               <div class="col-total">Total GP</div>
+               <div class="col-claim">Claimant</div>
+            </div>
+            <fieldset class="repeating_sessiontreasure">
+               <div class="party-treasure-row">
+                  <input type="text" name="attr_tres_name" class="col-item">
+                  <input type="number" name="attr_tres_qty" value="1" class="col-qty">
+                  <input type="number" name="attr_tres_val" value="0" class="col-val">
+                  <input type="number" name="attr_tres_total" value="0" readonly class="col-total">
+                  <input type="text" name="attr_tres_claim" class="col-claim">
+               </div>
+            </fieldset>
+            <div class="party-totals-box">
+               <label>Total Treasure Value (GP):</label>
+               <input type="number" name="attr_total_treasure_gp" value="0" readonly>
+            </div>
+         </div>
+      </div>
+
+      <hr class="party-divider">
+      
+      <!-- Report Generator -->
+      <div class="party-report-section">
+         <button type="action" name="act_session_report" class="session-report-btn">Generate Session Report</button>
+      </div>
+
+   </div>
+</div>
+</div>
+
+<rolltemplate class="sheet-rolltemplate-pc_attack_roll">
+   <div class="sheet-ds-roll-container">
+      <div class="sheet-ds-roll-header">
+         <div class="sheet-ds-roll-title">{{character_name}}</div>
+         <div class="sheet-ds-roll-subtitle">Attacks with {{weapon}}</div>
+      </div>
+      <div class="sheet-ds-roll-body">
+         <div class="sheet-ds-roll-row">
+            <span class="sheet-ds-roll-label">To Hit</span>
+            <span class="sheet-ds-roll-value">{{toHitRoll}}</span>
+         </div>
+         
          {{#rollBetween() toHitRoll 2 9}}
-         and missed!
+         <div class="sheet-ds-roll-row sheet-ds-miss">
+            <span class="sheet-ds-roll-label">Result</span>
+            <span class="sheet-ds-roll-value">Miss!</span>
+         </div>
          {{/rollBetween() toHitRoll 2 9}}
          
          {{#rollWasFumble() toHitRoll}}
-         <span class="sheet-fumble">
-            <strong>Fumble Result</strong>:<br>
+         <div class="sheet-ds-roll-row sheet-ds-fumble">
+            <span class="sheet-ds-roll-label">FUMBLE!</span>
+            <span class="sheet-ds-roll-value">{{fumbleResult}}</span>
+         </div>
+         <div class="sheet-ds-roll-desc">
             {{#rollTotal() fumbleResult 1}}Dexterity Check or miss next attack.{{/rollTotal() fumbleResult 1}}
             {{#rollTotal() fumbleResult 2}}You attack, slip, and fall prone.{{/rollTotal() fumbleResult 2}}
             {{#rollTotal() fumbleResult 3}}Weapon slips and lands behind enemy.{{/rollTotal() fumbleResult 3}}
             {{#rollTotal() fumbleResult 4}}Headgear slips, blind until adjusted.{{/rollTotal() fumbleResult 4}}
             {{#rollTotal() fumbleResult 5}}Cower in fear of enemy for 1 round.{{/rollTotal() fumbleResult 5}}
             {{#rollTotal() fumbleResult 6}}Enemy receives free attack.{{/rollTotal() fumbleResult 6}}
-            {{#rollTotal() fumbleResult 7}}Hit Closest Ally for {{damage}} points of damage: Dexterity Check to half the
-            damage.{{/rollTotal() fumbleResult 7}}
-            {{#rollTotal() fumbleResult 8}}Hit Yourself for {{damage}} points of damage: Dexterity Check to half the
-            damage.{{/rollTotal() fumbleResult 8}}
-         </span>
+            {{#rollTotal() fumbleResult 7}}Hit Closest Ally for {{damage}} dmg (Dex save half).{{/rollTotal() fumbleResult 7}}
+            {{#rollTotal() fumbleResult 8}}Hit Yourself for {{damage}} dmg (Dex save half).{{/rollTotal() fumbleResult 8}}
+         </div>
          {{/rollWasFumble() toHitRoll}}
-         
+
          {{#rollWasCrit() toHitRoll}}
-         <span class="sheet-crit">scoring a critical hit for {{critDamage}} damage.</span>
+         <div class="sheet-ds-roll-row sheet-ds-crit">
+            <span class="sheet-ds-roll-label">CRITICAL!</span>
+            <span class="sheet-ds-roll-value">{{critDamage}} DMG</span>
+         </div>
          {{/rollWasCrit() toHitRoll}}
          
          {{^rollWasFumble() toHitRoll}}
          {{^rollWasCrit() toHitRoll}}
-         <span class="sheet-normal-damage">
-            <span class="sheet-ac-hit">
-               {{#rollTotal() toHitRoll 10}}
-               <span class="sheet-hit">hitting AC 10 for {{damage}} points of damage. </span>
-               {{/rollTotal() toHitRoll 10}}
-               {{#rollTotal() toHitRoll 11}}
-               <span class="sheet-hit">hitting AC 9 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 11}}
-               {{#rollTotal() toHitRoll 12}}
-               <span class="sheet-hit">hitting AC 8 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 12}}
-               {{#rollTotal() toHitRoll 13}}
-               <span class="sheet-hit">hitting AC 7 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 13}}
-               {{#rollTotal() toHitRoll 14}}
-               <span class="sheet-hit">hitting AC 6 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 14}}
-               {{#rollTotal() toHitRoll 15}}
-               <span class="sheet-hit">hitting AC 5 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 15}}
-               {{#rollTotal() toHitRoll 16}}
-               <span class="sheet-hit">hitting AC 4 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 16}}
-               {{#rollTotal() toHitRoll 17}}
-               <span class="sheet-hit">hitting AC 3 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 17}}
-               {{#rollTotal() toHitRoll 18}}
-               <span class="sheet-hit">hitting AC 2 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 18}}
-               {{#rollTotal() toHitRoll 19}}
-               <span class="sheet-hit">hitting AC 1 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 19}}
-               {{#rollTotal() toHitRoll 20}}
-               <span class="sheet-hit">hitting AC 0 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 20}}
-               {{#rollTotal() toHitRoll 21}}
-               <span class="sheet-hit">hitting AC -1 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 21}}
-               {{#rollTotal() toHitRoll 22}}
-               <span class="sheet-hit">hitting AC -2 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 22}}
-               {{#rollTotal() toHitRoll 23}}
-               <span class="sheet-hit">hitting AC -3 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 23}}
-               {{#rollTotal() toHitRoll 24}}
-               <span class="sheet-hit">hitting AC -4 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 24}}
-               {{#rollTotal() toHitRoll 25}}
-               <span class="sheet-hit">hitting AC -5 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 25}}
-               {{#rollTotal() toHitRoll 26}}
-               <span class="sheet-hit">hitting AC -6 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 26}}
-               {{#rollTotal() toHitRoll 27}}
-               <span class="sheet-hit">hitting AC -7 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 27}}
-               {{#rollTotal() toHitRoll 28}}
-               <span class="sheet-hit">hitting AC -8 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 28}}
-               {{#rollTotal() toHitRoll 29}}
-               <span class="sheet-hit">hitting AC -9 for {{damage}} points of damage.</span>
-               {{/rollTotal() toHitRoll 29}}
-               {{#rollGreater() toHitRoll 29}}
-               <span class="sheet-hit">hitting AC -10 for {{damage}} points of damage.</span>
-               {{/rollGreater() toHitRoll 29}}
-            </span>
-         </span>
+         {{^rollBetween() toHitRoll 2 9}}
+         <div class="sheet-ds-roll-row">
+            <span class="sheet-ds-roll-label">Damage</span>
+            <span class="sheet-ds-roll-value">{{damage}}</span>
+         </div>
+         <div class="sheet-ds-roll-desc sheet-ds-ac-hit">
+            {{#rollTotal() toHitRoll 10}}Hits AC 10{{/rollTotal() toHitRoll 10}}
+            {{#rollTotal() toHitRoll 11}}Hits AC 9{{/rollTotal() toHitRoll 11}}
+            {{#rollTotal() toHitRoll 12}}Hits AC 8{{/rollTotal() toHitRoll 12}}
+            {{#rollTotal() toHitRoll 13}}Hits AC 7{{/rollTotal() toHitRoll 13}}
+            {{#rollTotal() toHitRoll 14}}Hits AC 6{{/rollTotal() toHitRoll 14}}
+            {{#rollTotal() toHitRoll 15}}Hits AC 5{{/rollTotal() toHitRoll 15}}
+            {{#rollTotal() toHitRoll 16}}Hits AC 4{{/rollTotal() toHitRoll 16}}
+            {{#rollTotal() toHitRoll 17}}Hits AC 3{{/rollTotal() toHitRoll 17}}
+            {{#rollTotal() toHitRoll 18}}Hits AC 2{{/rollTotal() toHitRoll 18}}
+            {{#rollTotal() toHitRoll 19}}Hits AC 1{{/rollTotal() toHitRoll 19}}
+            {{#rollTotal() toHitRoll 20}}Hits AC 0{{/rollTotal() toHitRoll 20}}
+            {{#rollTotal() toHitRoll 21}}Hits AC -1{{/rollTotal() toHitRoll 21}}
+            {{#rollTotal() toHitRoll 22}}Hits AC -2{{/rollTotal() toHitRoll 22}}
+            {{#rollTotal() toHitRoll 23}}Hits AC -3{{/rollTotal() toHitRoll 23}}
+            {{#rollTotal() toHitRoll 24}}Hits AC -4{{/rollTotal() toHitRoll 24}}
+            {{#rollTotal() toHitRoll 25}}Hits AC -5{{/rollTotal() toHitRoll 25}}
+            {{#rollTotal() toHitRoll 26}}Hits AC -6{{/rollTotal() toHitRoll 26}}
+            {{#rollTotal() toHitRoll 27}}Hits AC -7{{/rollTotal() toHitRoll 27}}
+            {{#rollTotal() toHitRoll 28}}Hits AC -8{{/rollTotal() toHitRoll 28}}
+            {{#rollTotal() toHitRoll 29}}Hits AC -9{{/rollTotal() toHitRoll 29}}
+            {{#rollGreater() toHitRoll 29}}Hits AC -10{{/rollGreater() toHitRoll 29}}
+         </div>
+         {{/rollBetween() toHitRoll 2 9}}
          {{/rollWasCrit() toHitRoll}}
          {{/rollWasFumble() toHitRoll}}
       </div>
    </div>
 </rolltemplate>
-<rolltemplate class="sheet-rolltemplate-savingthrow">
-   <div class="sheet-roll-header">
-      <span><strong>{{character_name}}</strong></span> rolls a <strong>{{save}}</strong> Save
-   </div>
-   <div class="sheet-roll-result">
-      <span class="sheet-roll-dice">{{roll}}</span> vs. <span class="sheet-roll-target">{{target}}</span>
-   </div>
-   
-   {{#rollLess() roll target}}
-   <div class="sheet-roll-failure">Failure!</div>
-   {{/rollLess() roll target}}
-   
-   {{#rollTotal() roll target}}
-   <div class="sheet-roll-success">Success!</div>
-   {{/rollTotal() roll target}}
-   
-   {{#rollGreater() roll target}}
-   <div class="sheet-roll-success">Success!</div>
-   {{/rollGreater() roll target}}
-</rolltemplate>
 <rolltemplate class="sheet-rolltemplate-rollover">
-   <div class="sheet-roll-header">
-      <strong>{{character_name}}</strong> rolls <strong>{{roll_type}}</strong>
+   <div class="sheet-ds-roll-container">
+      <div class="sheet-ds-roll-header">
+         <div class="sheet-ds-roll-title">{{character_name}}</div>
+         <div class="sheet-ds-roll-subtitle">Rolls {{roll_type}}</div>
+      </div>
+      <div class="sheet-ds-roll-body">
+         <div class="sheet-ds-roll-row">
+            <span class="sheet-ds-roll-label">Roll</span>
+            <span class="sheet-ds-roll-value">{{roll}}</span>
+         </div>
+         <div class="sheet-ds-roll-row">
+            <span class="sheet-ds-roll-label">Target</span>
+            <span class="sheet-ds-roll-value">{{target}}</span>
+         </div>
+         {{#rollGreater() roll target}}
+         <div class="sheet-ds-roll-row sheet-ds-crit">
+            <span class="sheet-ds-roll-label">Result</span><span class="sheet-ds-roll-value">Success!</span>
+         </div>
+         {{/rollGreater() roll target}}
+         {{#rollTotal() roll target}}
+         <div class="sheet-ds-roll-row sheet-ds-crit">
+            <span class="sheet-ds-roll-label">Result</span><span class="sheet-ds-roll-value">Success!</span>
+         </div>
+         {{/rollTotal() roll target}}
+         {{#rollLess() roll target}}
+         <div class="sheet-ds-roll-row sheet-ds-fumble">
+            <span class="sheet-ds-roll-label">Result</span><span class="sheet-ds-roll-value">Failure!</span>
+         </div>
+         {{/rollLess() roll target}}
+      </div>
    </div>
-   <div class="sheet-roll-result">
-      <span class="sheet-roll-dice">{{roll}}</span> vs. <span class="sheet-roll-target">{{target}}</span>
-   </div>
-   {{#rollGreater() roll target}}
-   <div class="sheet-roll-success">Success!</div>
-   {{/rollGreater() roll target}}
-   {{#rollTotal() roll target}}
-   <div class="sheet-roll-success">Success!</div>
-   {{/rollTotal() roll target}}
-   {{#rollLess() roll target}}
-   <div class="sheet-roll-failure">Failure!</div>
-   {{/rollLess() roll target}}
 </rolltemplate>
+
 <rolltemplate class="sheet-rolltemplate-rollunder">
-   <div class="sheet-roll-header">
-      <strong>{{character_name}}</strong> rolls a <strong>{{roll_type}}</strong>
+   <div class="sheet-ds-roll-container">
+      <div class="sheet-ds-roll-header">
+         <div class="sheet-ds-roll-title">{{character_name}}</div>
+         <div class="sheet-ds-roll-subtitle">Rolls {{roll_type}}</div>
+      </div>
+      <div class="sheet-ds-roll-body">
+         <div class="sheet-ds-roll-row">
+            <span class="sheet-ds-roll-label">Roll</span>
+            <span class="sheet-ds-roll-value">{{roll}}</span>
+         </div>
+         <div class="sheet-ds-roll-row">
+            <span class="sheet-ds-roll-label">Target</span>
+            <span class="sheet-ds-roll-value">{{target}}</span>
+         </div>
+         {{#rollLess() roll target}}
+         <div class="sheet-ds-roll-row sheet-ds-crit">
+            <span class="sheet-ds-roll-label">Result</span><span class="sheet-ds-roll-value">Success!</span>
+         </div>
+         {{/rollLess() roll target}}
+         {{#rollTotal() roll target}}
+         <div class="sheet-ds-roll-row sheet-ds-crit">
+            <span class="sheet-ds-roll-label">Result</span><span class="sheet-ds-roll-value">Success!</span>
+         </div>
+         {{/rollTotal() roll target}}
+         {{#rollGreater() roll target}}
+         <div class="sheet-ds-roll-row sheet-ds-fumble">
+            <span class="sheet-ds-roll-label">Result</span><span class="sheet-ds-roll-value">Failure!</span>
+         </div>
+         {{/rollGreater() roll target}}
+      </div>
    </div>
-   <div class="sheet-roll-result">
-      <span class="sheet-roll-dice">{{roll}}</span> vs. <span class="sheet-roll-target">{{target}}</span>
-   </div>
-   {{#rollLess() roll target}}
-   <div class="sheet-roll-success">Success!</div>
-   {{/rollLess() roll target}}
-   {{#rollTotal() roll target}}
-   <div class="sheet-roll-success">Success!</div>
-   {{/rollTotal() roll target}}
-   {{#rollGreater() roll target}}
-   <div class="sheet-roll-failure">Failure!</div>
-   {{/rollGreater() roll target}}
 </rolltemplate>
+
 <rolltemplate class="sheet-rolltemplate-thief_skill">
-   <div class="sheet-roll-message">
-      <strong>{{character_name}}</strong> rolls {{skill}} ({{roll}})
-      {{#rollBetween() roll 0 target}}
-      and Succeeds.
-      {{/rollBetween() roll 0 target}}
-      {{#rollGreater() roll target}}
-      and Fails.
-      {{/rollGreater() roll target}}
+   <div class="sheet-ds-roll-container">
+      <div class="sheet-ds-roll-header">
+         <div class="sheet-ds-roll-title">{{character_name}}</div>
+         <div class="sheet-ds-roll-subtitle">Rolls {{skill}}</div>
+      </div>
+      <div class="sheet-ds-roll-body">
+         <div class="sheet-ds-roll-row">
+            <span class="sheet-ds-roll-label">Roll</span>
+            <span class="sheet-ds-roll-value">{{roll}}</span>
+         </div>
+         <div class="sheet-ds-roll-row">
+            <span class="sheet-ds-roll-label">Target</span>
+            <span class="sheet-ds-roll-value">{{target}}</span>
+         </div>
+         {{#rollBetween() roll 0 target}}
+         <div class="sheet-ds-roll-row sheet-ds-crit">
+            <span class="sheet-ds-roll-label">Result</span><span class="sheet-ds-roll-value">Success!</span>
+         </div>
+         {{/rollBetween() roll 0 target}}
+         {{#rollGreater() roll target}}
+         <div class="sheet-ds-roll-row sheet-ds-fumble">
+            <span class="sheet-ds-roll-label">Result</span><span class="sheet-ds-roll-value">Failure!</span>
+         </div>
+         {{/rollGreater() roll target}}
+      </div>
    </div>
 </rolltemplate>
+
 <rolltemplate class="sheet-rolltemplate-morale">
-   <div class="sheet-roll-header">Morale Check</div>
-   <div class="sheet-roll-result">
-      <span class="sheet-roll-dice">{{roll}}</span> vs. <span class="sheet-roll-target">{{morale}}</span>
+   <div class="sheet-ds-roll-container">
+      <div class="sheet-ds-roll-header">
+         <div class="sheet-ds-roll-title">Morale Check</div>
+         <div class="sheet-ds-roll-subtitle">Monster Morale</div>
+      </div>
+      <div class="sheet-ds-roll-body">
+         <div class="sheet-ds-roll-row">
+            <span class="sheet-ds-roll-label">Roll</span>
+            <span class="sheet-ds-roll-value">{{roll}}</span>
+         </div>
+         <div class="sheet-ds-roll-row">
+            <span class="sheet-ds-roll-label">Target</span>
+            <span class="sheet-ds-roll-value">{{morale}}</span>
+         </div>
+         {{#rollBetween() roll 2 morale}}
+         <div class="sheet-ds-roll-row sheet-ds-crit">
+            <span class="sheet-ds-roll-label">Result</span><span class="sheet-ds-roll-value">Monster Holds!</span>
+         </div>
+         {{/rollBetween() roll 2 morale}}
+         {{#rollGreater() roll morale}}
+         <div class="sheet-ds-roll-row sheet-ds-fumble">
+            <span class="sheet-ds-roll-label">Result</span><span class="sheet-ds-roll-value">Monster Flees!</span>
+         </div>
+         {{/rollGreater() roll morale}}
+      </div>
    </div>
-   {{#rollBetween() roll 2 morale}}
-   <div class="sheet-roll-failure">Monster holds!</div>
-   {{/rollBetween() roll 2 morale}}
-   {{#rollGreater() roll morale}}
-   <div class="sheet-roll-success">Monster flees!</div>
-   {{/rollGreater() roll morale}}
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-ds_generic">
+   <div class="sheet-ds-roll-container">
+      <div class="sheet-ds-roll-header">
+         <div class="sheet-ds-roll-title">{{name}}</div>
+         {{#subtitle}}<div class="sheet-ds-roll-subtitle">{{subtitle}}</div>{{/subtitle}}
+      </div>
+      <div class="sheet-ds-roll-body">
+         {{#allprops() name subtitle}}
+         <div class="sheet-ds-roll-row">
+            <span class="sheet-ds-roll-label">{{key}}</span>
+            <span class="sheet-ds-roll-value">{{value}}</span>
+         </div>
+         {{/allprops() name subtitle}}
+      </div>
+   </div>
 </rolltemplate>
 
 
@@ -1220,191 +1574,1719 @@
 
 
 <script type="text/worker">
-   const buttonlist = ["main", "equipment", "abilities", "spells", "wealth", "henchmen", "notes"];
-   buttonlist.forEach(button => {
-       on(`clicked:${button}`, function() {
-           setAttrs({
-               sheetTab: button
-           });
-       });
-   });
 
-   on("clicked:toggleSheet", function() {
-    getAttrs(["sheetMode"], function(values) {
-      // Toggle between "pc" and "monster"
-      var newMode = (values.sheetMode === "monster") ? "pc" : "monster";
-      setAttrs({ sheetMode: newMode });
+const buttonlist = ["main", "equipment", "abilities", "spells", "wealth", "henchmen", "notes"];
+buttonlist.forEach(button => {
+    on(`clicked:${button}`, function() {
+        setAttrs({ sheetTab: button });
     });
-  });
+});
 
-  on("sheet:opened change:monster_hit_dice", function() {
+/* ===================================================== */
+/* SHEET MODE NAVIGATION                                 */
+/* ===================================================== */
+on("clicked:mode_pc", function() { setAttrs({ sheetMode: "pc" }); });
+on("clicked:mode_monster", function() { setAttrs({ sheetMode: "monster" }); });
+on("clicked:mode_party", function() { setAttrs({ sheetMode: "party" }); });
+
+/* ===================================================== */
+/* PARTY SHEET: MONSTER XP CALCULATION                   */
+/* ===================================================== */
+on("change:repeating_monsterkill:kill_qty change:repeating_monsterkill:kill_xp remove:repeating_monsterkill", function() {
+    getSectionIDs("repeating_monsterkill", function(idArray) {
+        let fields = [];
+        idArray.forEach(id => {
+            fields.push(`repeating_monsterkill_${id}_kill_qty`);
+            fields.push(`repeating_monsterkill_${id}_kill_xp`);
+        });
+        getAttrs(fields, function(v) {
+            let total = 0;
+            idArray.forEach(id => {
+                let qty = parseInt(v[`repeating_monsterkill_${id}_kill_qty`]) || 0;
+                let xp = parseInt(v[`repeating_monsterkill_${id}_kill_xp`]) || 0;
+                total += (qty * xp);
+            });
+            setAttrs({ total_monster_xp: total });
+        });
+    });
+});
+
+/* ===================================================== */
+/* PARTY SHEET: TREASURE CALCULATION                     */
+/* ===================================================== */
+on("change:repeating_sessiontreasure:tres_qty change:repeating_sessiontreasure:tres_val remove:repeating_sessiontreasure", function() {
+    getSectionIDs("repeating_sessiontreasure", function(idArray) {
+        let fields = [];
+        idArray.forEach(id => {
+            fields.push(`repeating_sessiontreasure_${id}_tres_qty`);
+            fields.push(`repeating_sessiontreasure_${id}_tres_val`);
+        });
+        getAttrs(fields, function(v) {
+            let totalGP = 0;
+            let updates = {};
+            idArray.forEach(id => {
+                let q = parseInt(v[`repeating_sessiontreasure_${id}_tres_qty`]) || 0;
+                let val = parseInt(v[`repeating_sessiontreasure_${id}_tres_val`]) || 0;
+                let rowTotal = q * val;
+                updates[`repeating_sessiontreasure_${id}_tres_total`] = rowTotal;
+                totalGP += rowTotal;
+            });
+            updates["total_treasure_gp"] = totalGP;
+            setAttrs(updates);
+        });
+    });
+});
+
+/* ===================================================== */
+/* PARTY SHEET: SESSION REPORT GENERATOR                 */
+/* ===================================================== */
+on("clicked:session_report", function() {
+    getSectionIDs("repeating_roster", function(idArray) {
+        let fields = ["total_monster_xp", "total_treasure_gp", "party_name", "session_number"];
+        idArray.forEach(id => fields.push(`repeating_roster_${id}_roster_type`));
+        getAttrs(fields, function(v) {
+            let monXP = parseInt(v.total_monster_xp) || 0;
+            let gpXP = parseInt(v.total_treasure_gp) || 0;
+            let totalBaseXP = monXP + gpXP;
+            
+            let pcCount = 0;
+            let henchCount = 0;
+            let maaCount = 0;
+            
+            // Tally the shares
+            idArray.forEach(id => {
+                let type = v[`repeating_roster_${id}_roster_type`] || "PC";
+                if (type === "PC") pcCount++;
+                else if (type === "Henchman") henchCount++;
+                else if (type === "Man-at-Arms") maaCount++;
+            });
+            
+            // Failsafe to prevent division by zero if roster is empty
+            let safePcCount = pcCount > 0 ? pcCount : 1;
+
+            // Retainer specific calculations
+            let xpShares = safePcCount + henchCount + (maaCount * 0.5); 
+            let goldShares = safePcCount + henchCount; 
+            
+            // The Math
+            let xpPerFull = Math.floor(totalBaseXP / xpShares);
+            let xpPerHalf = Math.floor(xpPerFull / 2);
+            let gpPerFull = Math.floor(gpXP / goldShares);
+            
+            let xp5 = Math.floor(xpPerFull * 1.05);
+            let xp10 = Math.floor(xpPerFull * 1.10);
+            
+            let partyName = v.party_name || "The Party";
+            let sessNum = v.session_number || "X";
+            
+            // Build the Output Template
+            let template = `&{template:ds_generic} {{name=Session ${sessNum} Report}} {{subtitle=${partyName}}} `;
+            template += `{{Monster XP Total=${monXP}}} `;
+            template += `{{Treasure GP Total=${gpXP}}} `;
+            template += `{{Base XP / Share=${xpPerFull} XP}} `;
+            template += `{{XP with 5% Bonus=${xp5} XP}} `;
+            template += `{{XP with 10% Bonus=${xp10} XP}} `;
+            
+            if (maaCount > 0) {
+                template += `{{Man-at-Arms XP=${xpPerHalf} XP}} `;
+            }
+            
+            template += `{{Gold per Share=${gpPerFull} GP}} `;
+            
+            // Send to chat
+            startRoll(template, function(outcome) {
+                finishRoll(outcome.rollId);
+            });
+        });
+    });
+});
+
+on("sheet:opened change:monster_hit_dice", function() {
     getAttrs(["monster_hit_dice"], function(values) {
-      var input = values.monster_hit_dice || "";
-      if(input.indexOf("d8") !== -1) {
-        setAttrs({ monster_hit_dice_full: input });
-      } else {
-        var parts = input.split("+");
-        if(parts.length === 2) {
-          var dice = parseInt(parts[0].trim(), 10);
-          var bonus = parseInt(parts[1].trim(), 10);
-          if(!isNaN(dice) && !isNaN(bonus)) {
-            setAttrs({ monster_hit_dice_full: dice + "d8+" + bonus });
-          } else {
-            setAttrs({ monster_hit_dice_full: "0" });
-          }
+        var input = values.monster_hit_dice || "";
+        if(input.indexOf("d8") !== -1) {
+            setAttrs({ monster_hit_dice_full: input });
         } else {
-          var diceOnly = parseInt(input.trim(),10);
-          if(!isNaN(diceOnly)) {
-            setAttrs({ monster_hit_dice_full: diceOnly + "d8" });
-          } else {
-            setAttrs({ monster_hit_dice_full: "0" });
-          }
+            var parts = input.split("+");
+            if(parts.length === 2) {
+                var dice = parseInt(parts[0].trim(), 10);
+                var bonus = parseInt(parts[1].trim(), 10);
+                if(!isNaN(dice) && !isNaN(bonus)) {
+                    setAttrs({ monster_hit_dice_full: dice + "d8+" + bonus });
+                } else {
+                    setAttrs({ monster_hit_dice_full: "0" });
+                }
+            } else {
+                var diceOnly = parseInt(input.trim(),10);
+                if(!isNaN(diceOnly)) {
+                    setAttrs({ monster_hit_dice_full: diceOnly + "d8" });
+                } else {
+                    setAttrs({ monster_hit_dice_full: "0" });
+                }
+            }
         }
-      }
     });
-  });
+});
   
 const abilityMods = {
-  strength: [
-    { min: 3, max: 3, values: { 'melee-hit-damage': -3, 'force-door': -3 } },
-    { min: 4, max: 5, values: { 'melee-hit-damage': -2, 'force-door': -2 } },
-    { min: 6, max: 8, values: { 'melee-hit-damage': -1, 'force-door': -1 } },
-    { min: 9, max: 12, values: { 'melee-hit-damage': 0,  'force-door': 0  } },
-    { min: 13, max: 15, values: { 'melee-hit-damage': 1,  'force-door': 1  } },
-    { min: 16, max: 17, values: { 'melee-hit-damage': 2,  'force-door': 2  } },
-    { min: 18, max: 18, values: { 'melee-hit-damage': 3,  'force-door': 3  } },
-  ],
-  intelligence: [
-    { min: 3, max: 3, values: { 'languages-mod': -3 } },
-    { min: 4, max: 5, values: { 'languages-mod': -2 } },
-    { min: 6, max: 8, values: { 'languages-mod': -1 } },
-    { min: 9, max: 12, values: { 'languages-mod': 0  } },
-    { min: 13, max: 15, values: { 'languages-mod': 1  } },
-    { min: 16, max: 17, values: { 'languages-mod': 2  } },
-    { min: 18, max: 18, values: { 'languages-mod': 3  } },
-  ],
-  wisdom: [
-    { min: 3, max: 3, values: { 'magic-save': -3 } },
-    { min: 4, max: 5, values: { 'magic-save': -2 } },
-    { min: 6, max: 8, values: { 'magic-save': -1 } },
-    { min: 9, max: 12, values: { 'magic-save': 0  } },
-    { min: 13, max: 15, values: { 'magic-save': 1  } },
-    { min: 16, max: 17, values: { 'magic-save': 2  } },
-    { min: 18, max: 18, values: { 'magic-save': 3  } },
-  ],
-  dexterity: [
-    { min: 3, max: 3, values: { 'missile-hit-damage': -3, 'armor-mod': 3 } },
-    { min: 4, max: 5, values: { 'missile-hit-damage': -2, 'armor-mod': 2 } },
-    { min: 6, max: 8, values: { 'missile-hit-damage': -1, 'armor-mod': 1 } },
-    { min: 9, max: 12, values: { 'missile-hit-damage': 0,  'armor-mod': 0 } },
-    { min: 13, max: 15, values: { 'missile-hit-damage': 1,  'armor-mod': -1 } },
-    { min: 16, max: 17, values: { 'missile-hit-damage': 2,  'armor-mod': -2 } },
-    { min: 18, max: 18, values: { 'missile-hit-damage': 3,  'armor-mod': -3 } },
-  ],
-  constitution: [
-    { min: 3, max: 3, values: { 'hit-points-mod': -3 } },
-    { min: 4, max: 5, values: { 'hit-points-mod': -2 } },
-    { min: 6, max: 8, values: { 'hit-points-mod': -1 } },
-    { min: 9, max: 12, values: { 'hit-points-mod': 0  } },
-    { min: 13, max: 15, values: { 'hit-points-mod': 1  } },
-    { min: 16, max: 17, values: { 'hit-points-mod': 2  } },
-    { min: 18, max: 18, values: { 'hit-points-mod': 3  } },
-  ],
-  charisma: [
-    { min: 3, max: 3, values: { 'henchmen': 0, 'henchmen-morale': 4 } },
-    { min: 4, max: 5, values: { 'henchmen': 1, 'henchmen-morale': 5 } },
-    { min: 6, max: 8, values: { 'henchmen': 2, 'henchmen-morale': 6 } },
-    { min: 9, max: 12, values: { 'henchmen': 3, 'henchmen-morale': 7 } },
-    { min: 13, max: 15, values: { 'henchmen': 4, 'henchmen-morale': 8 } },
-    { min: 16, max: 17, values: { 'henchmen': 5, 'henchmen-morale': 9 } },
-    { min: 18, max: 18, values: { 'henchmen': 6, 'henchmen-morale': 10 } },
-  ]
+    strength: [
+        { min: 3, max: 3, values: { 'melee-hit-damage': -3, 'force-door': -3 } },
+        { min: 4, max: 5, values: { 'melee-hit-damage': -2, 'force-door': -2 } },
+        { min: 6, max: 8, values: { 'melee-hit-damage': -1, 'force-door': -1 } },
+        { min: 9, max: 12, values: { 'melee-hit-damage': 0,  'force-door': 0  } },
+        { min: 13, max: 15, values: { 'melee-hit-damage': 1,  'force-door': 1  } },
+        { min: 16, max: 17, values: { 'melee-hit-damage': 2,  'force-door': 2  } },
+        { min: 18, max: 18, values: { 'melee-hit-damage': 3,  'force-door': 3  } },
+    ],
+    intelligence: [
+        { min: 3, max: 3, values: { 'languages-mod': -3 } },
+        { min: 4, max: 5, values: { 'languages-mod': -2 } },
+        { min: 6, max: 8, values: { 'languages-mod': -1 } },
+        { min: 9, max: 12, values: { 'languages-mod': 0  } },
+        { min: 13, max: 15, values: { 'languages-mod': 1  } },
+        { min: 16, max: 17, values: { 'languages-mod': 2  } },
+        { min: 18, max: 18, values: { 'languages-mod': 3  } },
+    ],
+    wisdom: [
+        { min: 3, max: 3, values: { 'magic-save': -3 } },
+        { min: 4, max: 5, values: { 'magic-save': -2 } },
+        { min: 6, max: 8, values: { 'magic-save': -1 } },
+        { min: 9, max: 12, values: { 'magic-save': 0  } },
+        { min: 13, max: 15, values: { 'magic-save': 1  } },
+        { min: 16, max: 17, values: { 'magic-save': 2  } },
+        { min: 18, max: 18, values: { 'magic-save': 3  } },
+    ],
+    dexterity: [
+        { min: 3, max: 3, values: { 'missile-hit-damage': -3, 'armor-mod': 3 } },
+        { min: 4, max: 5, values: { 'missile-hit-damage': -2, 'armor-mod': 2 } },
+        { min: 6, max: 8, values: { 'missile-hit-damage': -1, 'armor-mod': 1 } },
+        { min: 9, max: 12, values: { 'missile-hit-damage': 0,  'armor-mod': 0 } },
+        { min: 13, max: 15, values: { 'missile-hit-damage': 1,  'armor-mod': -1 } },
+        { min: 16, max: 17, values: { 'missile-hit-damage': 2,  'armor-mod': -2 } },
+        { min: 18, max: 18, values: { 'missile-hit-damage': 3,  'armor-mod': -3 } },
+    ],
+    constitution: [
+        { min: 3, max: 3, values: { 'hit-points-mod': -3 } },
+        { min: 4, max: 5, values: { 'hit-points-mod': -2 } },
+        { min: 6, max: 8, values: { 'hit-points-mod': -1 } },
+        { min: 9, max: 12, values: { 'hit-points-mod': 0  } },
+        { min: 13, max: 15, values: { 'hit-points-mod': 1  } },
+        { min: 16, max: 17, values: { 'hit-points-mod': 2  } },
+        { min: 18, max: 18, values: { 'hit-points-mod': 3  } },
+    ],
+    charisma: [
+        { min: 3, max: 3, values: { 'henchmen': 0, 'henchmen-morale': 4 } },
+        { min: 4, max: 5, values: { 'henchmen': 1, 'henchmen-morale': 5 } },
+        { min: 6, max: 8, values: { 'henchmen': 2, 'henchmen-morale': 6 } },
+        { min: 9, max: 12, values: { 'henchmen': 3, 'henchmen-morale': 7 } },
+        { min: 13, max: 15, values: { 'henchmen': 4, 'henchmen-morale': 8 } },
+        { min: 16, max: 17, values: { 'henchmen': 5, 'henchmen-morale': 9 } },
+        { min: 18, max: 18, values: { 'henchmen': 6, 'henchmen-morale': 10 } },
+    ]
 };
 
 Object.keys(abilityMods).forEach(ability => {
-  on(`change:${ability}`, function() {
-    getAttrs([ability], function(values) {
-      const score = parseInt(values[ability]) || 0;
-      const modTable = abilityMods[ability];
-      const match = modTable.find(entry => score >= entry.min && score <= entry.max);
-      if (match) {
-        setAttrs(match.values);
-      }
+    on(`change:${ability}`, function() {
+        getAttrs([ability], function(values) {
+            const score = parseInt(values[ability]) || 0;
+            const modTable = abilityMods[ability];
+            const match = modTable.find(entry => score >= entry.min && score <= entry.max);
+            if (match) {
+                setAttrs(match.values);
+            }
+        });
     });
-  });
 });
 
 // ===== SAVING THROWS SHEETWORKER =====
+on("change:class change:level sheet:opened", function() {
+    getAttrs(["class", "level"], function(values) {
+        const rawClassStr = (values.class || "").toLowerCase().trim();
+        const levelStr = String(values.level || "0").trim();
+        if (!rawClassStr || levelStr === "0") return;
 
-on("change:class change:level", function() {
-  getAttrs(["class", "level"], function(values) {
-    const cls = (values.class || "").toLowerCase().trim();
-    const level = parseInt(values.level || "0", 10);
+        const tables = {
+            cleric: [
+                { max: 3, breath:16, death:10, stone:13, wand:14, spell:15 },
+                { max: 6, breath:15, death:9, stone:12, wand:13, spell:14 },
+                { max: 9, breath:13, death:7, stone:10, wand:11, spell:12 },
+                { max:12, breath:12, death:6, stone:9, wand:10, spell:11 },
+                { max:15, breath:11, death:5, stone:8, wand:9,  spell:10 },
+                { max:18, breath:10, death:4, stone:7, wand:8,  spell:9 },
+                { max:99,breath:8,  death:2, stone:5, wand:6,  spell:7 }
+            ],
+            fighter: [
+                { max:0,  breath:17, death:16, stone:17, wand:18, spell:19 },
+                { max:2,  breath:16, death:14, stone:15, wand:16, spell:17 },
+                { max:4,  breath:15, death:13, stone:14, wand:15, spell:16 },
+                { max:6,  breath:13, death:11, stone:12, wand:13, spell:14 },
+                { max:8,  breath:12, death:10, stone:11, wand:12, spell:13 },
+                { max:10, breath:9,  death:8,  stone:9,  wand:10, spell:11 },
+                { max:12, breath:8,  death:7,  stone:8,  wand:9,  spell:10  },
+                { max:14, breath:5,  death:5,  stone:6,  wand:7,  spell:8  },
+                { max:16, breath:4,  death:4,  stone:5,  wand:6,  spell:7  },
+                { max:99, breath:4,  death:3,  stone:4,  wand:5,  spell:6  }
+            ],
+            magicuser: [
+                { max:5,  breath:15, death:14, stone:13, wand:11, spell:12 },
+                { max:10, breath:13, death:13, stone:11, wand:9,  spell:10 },
+                { max:15, breath:11, death:11, stone:9,  wand:7,  spell:8  },
+                { max:20, breath:9,  death:10, stone:7,  wand:5,  spell:6  },
+                { max:99, breath:4,  death:3,  stone:4,  wand:5,  spell:6  }
+            ],
+            thief: [
+                { max:4,  breath:16, death:13, stone:12, wand:14, spell:15 },
+                { max:8,  breath:15, death:12, stone:11, wand:12, spell:13 },
+                { max:12, breath:14, death:11, stone:10, wand:10, spell:11 },
+                { max:16, breath:12, death:10, stone:9,  wand:8,  spell:9 },
+                { max:99, breath:11, death:9,  stone:8,  wand:6,  spell:7  }
+            ]
+        };
 
-    const tables = {
-      cleric: [
-        { max: 3, breath:16, death:10, stone:13, wand:14, spell:15 },
-        { max: 6, breath:15, death:9, stone:12, wand:13, spell:14 },
-        { max: 9, breath:13, death:7, stone:10, wand:11, spell:12 },
-        { max:12, breath:12, death:6, stone:9, wand:10, spell:11 },
-        { max:15, breath:11, death:5, stone:8, wand:9,  spell:10 },
-        { max:18, breath:10, death:4, stone:7, wand:8,  spell:9 },
-        { max:99,breath:8,  death:2, stone:5, wand:6,  spell:7 }
-      ],
-      fighter: [
-        { max:0,  breath:17, death:16, stone:17, wand:18, spell:19 },
-        { max:2,  breath:16, death:14, stone:15, wand:16, spell:17 },
-        { max:4,  breath:15, death:13, stone:14, wand:15, spell:16 },
-        { max:6,  breath:13, death:11, stone:12, wand:13, spell:14 },
-        { max:8,  breath:12, death:10, stone:11, wand:12, spell:13 },
-        { max:10, breath:9,  death:8,  stone:9,  wand:10, spell:11 },
-        { max:12, breath:8,  death:7,  stone:8,  wand:9,  spell:10  },
-        { max:14, breath:5,  death:5,  stone:6,  wand:7,  spell:8  },
-        { max:16, breath:4,  death:4,  stone:5,  wand:6,  spell:7  },
-        { max:99, breath:4,  death:3,  stone:4,  wand:5,  spell:6  }
-      ],
-      magicuser: [
-        { max:5,  breath:15, death:14, stone:13, wand:11, spell:12 },
-        { max:10, breath:13, death:13, stone:11, wand:9,  spell:10 },
-        { max:15, breath:11, death:11, stone:9,  wand:7,  spell:8  },
-        { max:20, breath:9,  death:10, stone:7,  wand:5,  spell:6  },
-        { max:99, breath:4,  death:3,  stone:4,  wand:5,  spell:6  }
-      ],
-      thief: [
-        { max:4,  breath:16, death:13, stone:12, wand:14, spell:15 },
-        { max:8,  breath:15, death:12, stone:11, wand:12, spell:13 },
-        { max:12, breath:14, death:11, stone:10, wand:10, spell:11 },
-        { max:16, breath:12, death:10, stone:9,  wand:8,  spell:9 },
-        { max:99, breath:11, death:9,  stone:8,  wand:6,  spell:7  }
-      ]
+        // 1. Sanitize magic user so it doesn't break during aggressive splitting
+        const safeClassStr = rawClassStr.replace(/magic[\-\s]*user/g, "magicuser");
+        
+        // 2. Split safely on space, slash, backslash, dash, comma, or ampersand
+        const classes = safeClassStr.split(/[\s\/\-\\,&]+/).filter(c => c.length > 0);
+        const levelsArr = levelStr.split(/[\s\/\-\\,&]+/).filter(l => l.length > 0).map(l => parseInt(l, 10) || 0);
+        
+        let bestSaves = { breath: 99, death: 99, stone: 99, wand: 99, spell: 99 };
+        let foundTable = false;
+
+        classes.forEach((cls, i) => {
+            let table;
+            if (/cleric|druid|monk/.test(cls)) table = tables.cleric;
+            else if (/fighter|barbarian|paladin|ranger/.test(cls)) table = tables.fighter;
+            else if (/magic.?user|illusionist|mage|wizard/.test(cls)) table = tables.magicuser;
+            else if (/thief|assassin/.test(cls)) table = tables.thief;
+
+            if (table) {
+                const classLevel = levelsArr[i] || levelsArr[0] || 1;
+                const row = table.find(r => classLevel <= r.max);
+                if (row) {
+                    bestSaves.breath = Math.min(bestSaves.breath, row.breath);
+                    bestSaves.death = Math.min(bestSaves.death, row.death);
+                    bestSaves.stone = Math.min(bestSaves.stone, row.stone);
+                    bestSaves.wand = Math.min(bestSaves.wand, row.wand);
+                    bestSaves.spell = Math.min(bestSaves.spell, row.spell);
+                    foundTable = true;
+                }
+            }
+        });
+
+        if (foundTable) {
+            setAttrs({
+                "saving-breath": bestSaves.breath,
+                "saving-death": bestSaves.death,
+                "saving-stone": bestSaves.stone,
+                "saving-wand":  bestSaves.wand,
+                "saving-spell": bestSaves.spell
+            });
+        }
+    });
+});
+
+on("change:class change:strength change:intelligence change:wisdom change:dexterity change:constitution change:charisma sheet:opened", function() {
+    getAttrs(
+        ["class", "strength", "intelligence", "wisdom", "dexterity", "constitution", "charisma"],
+        function(v) {
+            const rawClassStr = (v["class"] || "").toString().toLowerCase().trim();
+            if (!rawClassStr) {
+                setAttrs({ "xp-bonus": "0%" });
+                return;
+            }
+
+            const stats = {
+                strength:     parseInt(v.strength, 10)     || 0,
+                intelligence: parseInt(v.intelligence, 10) || 0,
+                wisdom:       parseInt(v.wisdom, 10)       || 0,
+                dexterity:    parseInt(v.dexterity, 10)    || 0,
+                constitution: parseInt(v.constitution, 10) || 0,
+                charisma:     parseInt(v.charisma, 10)     || 0,
+            };
+
+            const primeReqs = {
+                cleric:      ["wisdom"],
+                druid:       ["wisdom", "charisma"],
+                monk:        ["intelligence", "wisdom"],
+                fighter:     ["strength"],
+                barbarian:   ["strength", "constitution"],
+                paladin:     ["strength", "wisdom"],
+                ranger:      ["strength", "intelligence", "wisdom"],
+                "magic-user":["intelligence"],
+                mage:        ["intelligence"],
+                illusionist: ["intelligence"],
+                thief:       ["dexterity"],
+                assassin:    ["dexterity", "intelligence"]
+            };
+
+            const xpAdj = score =>
+                score <= 5  ? -10 :
+                score <= 8  ? -5  :
+                score <= 12 ? 0   :
+                score <= 15 ? 5   : 10;
+
+            const safeClassStr = rawClassStr.replace(/magic[\-\s]*user/g, "magicuser");
+            const classes = safeClassStr.split(/[\s\/\-\\,&]+/).filter(c => c.length > 0);
+            let bonuses = [];
+
+            classes.forEach(cls => {
+                if (cls === "magicuser" || cls === "mu" || cls === "mage" || cls === "wizard") cls = "magic-user";
+                const primes = primeReqs[cls];
+                if (primes) {
+                    let classMod = primes.map(stat => xpAdj(stats[stat])).reduce((a, b) => a + b, 0);
+                    if (classMod > 10) classMod = 10;
+                    if (classMod < -10) classMod = -10;
+                    bonuses.push((classMod >= 0 ? "+" : "") + classMod + "%");
+                } else {
+                    bonuses.push("0%");
+                }
+            });
+
+            setAttrs({ "xp-bonus": bonuses.join(" / ") || "0%" });
+        }
+    );
+});
+
+
+const classData = {
+    cleric: [
+        [1600, "Acolyte", 0], [3100, "Devotee", 0], [6100, "Holy Man", 0], [13100, "Zealot", 1], [27600, "Priest", 2],
+        [55100, "Crusader", 2], [110100, "Templar", 3], [225100, "Ecclesiarch", 3], [450100, "Bishop", 3], [675200, "High Priest", 4]
+    ],
+    druid: [
+        [2100, "Soothsayer", 0], [4100, "Ovate of Spring", 0], [7600, "Ovate of Summer", 0], [12600, "Ovate of Autumn", 1],
+        [20100, "Ovate of Winter", 2], [35100, "Ovate of Nature", 2], [60100, "Voice of Nature", 3], [90100, "Hand of Nature", 3],
+        [125100, "Wrath of Nature", 3], [275200, "Arch Druid", 4]
+    ],
+    monk: [
+        [2350, "Postulant", 0], [4850, "Mendicant", 0], [10100, "Brother", 0], [22600, "Pilgrim", 1], [47600, "Friar", 2],
+        [98100, "Monastic", 2], [200100, "Cenobite", 3], [350100, "Ascetic", 3], [500100, "Prelate", 3], [750200, "Abbot", 4]
+    ],
+    fighter: [
+        [2100, "Swordsman", 0], [4100, "Freebooter", 0], [8100, "Sellsword", 1], [18100, "Veteran", 2], [35100, "Warrior", 3],
+        [70100, "Myrmidon", 4], [125100, "Axe Master", 5], [250100, "Battle Master", 6], [500100, "Champion", 7], [750200, "Warlord", 8]
+    ],
+    barbarian: [
+        [3100, "Brawler", 0], [5100, "Pillager", 0], [9150, "Marauder", 1], [19100, "Reaver", 2], [36100, "Berserker", 3],
+        [71100, "Ravager", 4], [126100, "Axe Master", 5], [250100, "Battle Master", 6], [501100, "Battle Lord", 7], [756200, "Barbarian King", 8]
+    ],
+    paladin: [
+        [2750, "Squire", 0], [5600, "Cavalier", 0], [12100, "Knight-Errant", 1], [24100, "Knight-Vigilant", 2], [45100, "Knight-Banneret", 3],
+        [95100, "Knight-Gallant", 4], [175100, "Knight-Crusader", 5], [350100, "Knight-Templar", 6], [700100, "Knight-Protector", 7], [1000200, "Knight of the Rose", 8]
+    ],
+    ranger: [
+        [2350, "Hunter", 0], [4600, "Wanderer", 0], [10100, "Rover", 1], [20100, "Scout", 2], [40100, "Gadabout", 3],
+        [90100, "Strider", 4], [150100, "Master Scout", 5], [225100, "Outrider", 6], [325100, "Pathfinder", 7], [600200, "Ranger Lord", 8]
+    ],
+    "magic-user": [
+        [2600, "Channeler", 0], [5100, "Spellweaver", 0], [10100, "Magician", 0], [22600, "Enchanter", 1], [40100, "Mage", 1],
+        [60100, "Summoner", 1], [90100, "Magister", 1], [135100, "Warlock", 2], [250100, "Arch Mage", 2], [450200, "Grand Mage", 2]
+    ],
+    illusionist: [
+        [2350, "Prestidigitator", 0], [4600, "Charmer", 0], [9100, "Dazzler", 0], [18100, "Glamourer", 1], [35100, "Hypnotist", 1],
+        [60100, "Illusioneer", 1], [95100, "Beguiler", 1], [145100, "Phantasmalist", 2], [220100, "Thaumaturge", 2], [440200, "Arch Beguiler", 2]
+    ],
+    thief: [
+        [1350, "Thug", 0], [2600, "Knave", 0], [5100, "Purse-Cutter", 0], [10100, "Charlatan", 1], [20100, "Blackguard", 1],
+        [42600, "Vagabond", 2], [70100, "Sneak-Thief", 2], [110100, "Burglar", 3], [160100, "Master Thief", 3], [380200, "Guildmaster", 4]
+    ],
+    assassin: [
+        [1600, "Throat-Cutter", 0], [3100, "Garotteur", 0], [6100, "Murderer", 0], [12100, "Backbiter", 1], [25100, "Master Garotteur", 1],
+        [50100, "Silent Killer", 2], [100100, "Death Dealer", 2], [200100, "Slayer", 3], [300100, "Assassin", 3], [550200, "Guildmaster", 4]
+    ]
+};
+
+on("change:class change:level sheet:opened", function() {
+    getAttrs(["class", "level"], function(v) {
+        const rawClassStr = String(v["class"] || "").toLowerCase().trim();
+        const levelStr = String(v.level || "0").trim();
+        
+        const safeClassStr = rawClassStr.replace(/magic[\-\s]*user/g, "magicuser");
+        const classes = safeClassStr.split(/[\s\/\-\\,&]+/).filter(c => c.length > 0);
+        const levelsArr = levelStr.split(/[\s\/\-\\,&]+/).filter(l => l.length > 0).map(l => parseInt(l, 10) || 0);
+
+        let updates = {
+            "class_toggle": rawClassStr // Pass the raw string so CSS toggles still work perfectly
+        };
+
+        // 1. Determine Effective Turn Level across classes
+        let turnLvl = 0;
+        classes.forEach((cls, i) => {
+            const classLevel = levelsArr[i] || levelsArr[0] || 0;
+            if (cls.includes("cleric")) turnLvl = Math.max(turnLvl, classLevel);
+            else if (cls.includes("paladin")) turnLvl = Math.max(turnLvl, classLevel - 2);
+        });
+
+        // Exact Turn Undead Matrix from rulebook
+        const turnMatrix = [
+            [11, 8, 5, "T", "T", "D", "D", "D", "D", "D"], // HD 1
+            [14, 11, 8, "T", "T", "D", "D", "D", "D", "D"], // HD 2
+            [17, 14, 11, 5, "T", "T", "D", "D", "D", "D"], // HD 3
+            [19, 17, 14, 8, 5, "T", "T", "D", "D", "D"], // HD 4
+            [20, 19, 17, 11, 8, 5, "T", "T", "D", "D"], // HD 5
+            ["-", 20, 19, 14, 11, 8, 5, "T", "T", "D"], // HD 6
+            ["-", "-", 20, 17, 14, 11, 8, 5, "T", "T"], // HD 7
+            ["-", "-", "-", 20, 17, 14, 11, 8, 5, "T"], // HD 8
+            ["-", "-", "-", "-", 20, 17, 14, 11, 8, 5], // HD 9
+            ["-", "-", "-", "-", "-", 20, 17, 14, 11, 8]  // Sp*
+        ];
+
+        updates["turn_level"] = turnLvl;
+
+        let tCol = Math.min(Math.max(1, turnLvl), 10) - 1; 
+        if (turnLvl > 0) {
+            updates["turn_hd_1"] = turnMatrix[0][tCol];
+            updates["turn_hd_2"] = turnMatrix[1][tCol];
+            updates["turn_hd_3"] = turnMatrix[2][tCol];
+            updates["turn_hd_4"] = turnMatrix[3][tCol];
+            updates["turn_hd_5"] = turnMatrix[4][tCol];
+            updates["turn_hd_6"] = turnMatrix[5][tCol];
+            updates["turn_hd_7"] = turnMatrix[6][tCol];
+            updates["turn_hd_8"] = turnMatrix[7][tCol];
+            updates["turn_hd_9"] = turnMatrix[8][tCol];
+            updates["turn_hd_sp"] = turnMatrix[9][tCol];
+        } else {
+            for (let i = 1; i <= 9; i++) updates[`turn_hd_${i}`] = "-";
+            updates["turn_hd_sp"] = "-";
+        }
+
+        // 2. Class Title, Attack Bonus, & XP Next Level Calculation
+        if (rawClassStr !== "") {
+            let combinedTitles = [];
+            let combinedXpNext = [];
+            let bestAtk = -1;
+            let foundClasses = false;
+
+            classes.forEach((cls, i) => {
+                const classLevel = levelsArr[i] || levelsArr[0] || 1;
+                if (cls === "magicuser" || cls === "mu" || cls === "mage" || cls === "wizard") cls = "magic-user";
+                
+                const levels = classData[cls];
+                if (levels) {
+                    const maxLevel = levels.length;
+                    const cappedLevel = Math.min(classLevel, maxLevel);
+                    const [xpToNext, title, atk] = levels[cappedLevel - 1];
+
+                    combinedTitles.push(title);
+                    combinedXpNext.push(xpToNext);
+                    if (atk > bestAtk) bestAtk = atk; 
+                    foundClasses = true;
+                }
+            });
+
+            if (foundClasses) {
+                updates["title"] = combinedTitles.join(" / ");
+                updates["attack-bonus"] = `+${Math.max(bestAtk, 0)}`;
+                updates["xp_next_level"] = combinedXpNext.join(" / ");
+            }
+        }
+
+        setAttrs(updates);
+    });
+});
+/* ----------------------------- */
+/* CENTRAL ARMOR CLASS ENGINE    */
+/* ----------------------------- */
+const recalculateTotalAC = () => {
+    getAttrs([
+        "armor1_name", "armor2_name", "armor_magic_name",
+        "armor1_ac_base", "armor2_ac_bonus", 
+        "armor_magic_ac_base", "armor_magic_ac_bonus", "armor_magic_is_set",
+        "armor-mod", "armor_tweak"
+    ], (v) => {
+        // Parse values safely, handling NaN if a variable got completely wiped
+        let baseArmor  = isNaN(parseInt(v.armor1_ac_base)) ? 9 : parseInt(v.armor1_ac_base); 
+        let shield     = parseInt(v.armor2_ac_bonus) || 0;
+        let magicBase  = parseInt(v.armor_magic_ac_base) || 0;
+        let magicBonus = parseInt(v.armor_magic_ac_bonus) || 0;
+        let isMagicSet = parseInt(v.armor_magic_is_set) || 0;
+        const dexMod   = parseInt(v["armor-mod"]) || 0; 
+        const tweaks   = parseInt(v.armor_tweak) || 0;
+
+        // Self-Healing: If a player deletes the item name, zero out its hidden bonuses
+        if ((v.armor1_name || "").trim() === "") baseArmor = 9;
+        if ((v.armor2_name || "").trim() === "") shield = 0;
+        if ((v.armor_magic_name || "").trim() === "") {
+            magicBase = 0;
+            magicBonus = 0;
+            isMagicSet = 0;
+        }
+
+        let finalBaseAC = baseArmor;
+
+        if (isMagicSet === 1 && magicBase > 0) {
+            finalBaseAC = magicBase;
+        }
+
+        let totalAC = finalBaseAC + dexMod - shield - magicBonus + tweaks;
+
+        setAttrs({ 
+            "armor-class": totalAC,
+            // Push the sanitized values back to the hidden fields to keep the sheet clean
+            "armor1_ac_base": baseArmor,
+            "armor2_ac_bonus": shield,
+            "armor_magic_ac_base": magicBase,
+            "armor_magic_ac_bonus": magicBonus,
+            "armor_magic_is_set": isMagicSet
+        });
+    });
+};
+
+// Added listeners for the name fields so the sheet instantly updates when you backspace an item out
+on("change:armor1_name change:armor2_name change:armor_magic_name change:armor1_ac_base change:armor2_ac_bonus change:armor_magic_ac_base change:armor_magic_ac_bonus change:armor_magic_is_set change:armor-mod change:armor_tweak", recalculateTotalAC);
+
+/* ===================================================== */
+/* MONSTER SAVE AUTOFILL (Fighter, Cleric, Magic-User)   */
+/* ===================================================== */
+
+const fighterSaveTable = [
+    { max: 2,  breath:16, death:14, stone:15, wand:16, spell:17 }, 
+    { max: 4,  breath:15, death:13, stone:14, wand:15, spell:16 }, 
+    { max: 6,  breath:13, death:11, stone:12, wand:13, spell:14 }, 
+    { max: 8,  breath:12, death:10, stone:11, wand:12, spell:13 }, 
+    { max: 10, breath:9,  death:8,  stone:9,  wand:10, spell:11 }, 
+    { max: 12, breath:8,  death:7,  stone:8,  wand:9,  spell:10 }, 
+    { max: 14, breath:5,  death:5,  stone:6,  wand:7,  spell:8  }, 
+    { max: 16, breath:4,  death:4,  stone:5,  wand:6,  spell:7  }, 
+    { max: 99, breath:4,  death:3,  stone:4,  wand:5,  spell:6  }  
+];
+
+const clericSaveTable = [
+    { max: 3,  breath:16, death:10, stone:13, wand:14, spell:15 },
+    { max: 6,  breath:15, death:9,  stone:12, wand:13, spell:14 },
+    { max: 9,  breath:13, death:7,  stone:10, wand:11, spell:12 },
+    { max: 12, breath:12, death:6,  stone:9,  wand:10, spell:11 },
+    { max: 15, breath:11, death:5,  stone:8,  wand:9,  spell:10 },
+    { max: 18, breath:10, death:4,  stone:7,  wand:8,  spell:9  },
+    { max: 99, breath:8,  death:2,  stone:5,  wand:6,  spell:7  }
+];
+
+const magicUserSaveTable = [
+    { max: 5,  breath:15, death:14, stone:13, wand:11, spell:12 },
+    { max: 10, breath:13, death:13, stone:11, wand:9,  spell:10 },
+    { max: 15, breath:11, death:11, stone:9,  wand:7,  spell:8  },
+    { max: 20, breath:9,  death:10, stone:7,  wand:5,  spell:6  },
+    { max: 99, breath:7,  death:8,  stone:5,  wand:3,  spell:4  }
+];
+
+on("change:monster_save_as sheet:opened", function() {
+    getAttrs(["monster_save_as"], function(v) {
+        let raw = (v.monster_save_as || "").toUpperCase().trim();
+        if(!raw) return;
+
+        let match = raw.match(/^([FCMU]+)(\d+)$/);
+        if(!match) return;
+
+        let type = match[1];
+        let lvl = parseInt(match[2], 10);
+        if(isNaN(lvl)) return;
+
+        let table = fighterSaveTable; // Default fallback
+        if (type === "C") {
+            table = clericSaveTable;
+        } else if (type === "MU") {
+            table = magicUserSaveTable;
+        }
+
+        let row = table.find(r => lvl <= r.max) || table[table.length - 1];
+
+        setAttrs({
+            monster_save_breath: row.breath,
+            monster_save_death:  row.death,
+            monster_save_stone:  row.stone,
+            monster_save_wand:   row.wand,
+            monster_save_spell:  row.spell
+        });
+    });
+});
+
+/* ===================================================== */
+/* DRAG & DROP: DISPATCH (FINAL)                          */
+/* ===================================================== */
+
+const clearDrop = () => setAttrs({
+    drop_category: "",
+    drop_name: "",
+    drop_data: ""
+});
+
+const getDropCategory = (data) =>
+    (data?.Category || data?.category || data?.compendiumCategory || "")
+        .toString()
+        .trim()
+        .toLowerCase();
+
+const normalizeInt = (v, fallback) => {
+    const n = parseInt(v, 10);
+    return Number.isFinite(n) ? n : fallback;
+};
+
+/* ----------------------------- */
+/* UNIVERSAL EQUIPMENT HELPER    */
+/* ----------------------------- */
+const pushToEquipmentBulk = (itemsArray, isMagic, callback) => {
+    if (!itemsArray || itemsArray.length === 0) {
+        if (callback) callback({});
+        return;
+    }
+    const sec1 = isMagic ? "repeating_magicitem1" : "repeating_equipment1";
+    const sec2 = isMagic ? "repeating_magicitem2" : "repeating_equipment2";
+    getSectionIDs(sec1, (ids1) => {
+        getSectionIDs(sec2, (ids2) => {
+            let count1 = ids1?.length || 0;
+            let count2 = ids2?.length || 0;
+            const update = {};
+            itemsArray.forEach(item => {
+                const rowId = generateRowID();
+                if (count1 <= count2) {
+                    update[`${sec1}_${rowId}_equipment_item`] = item.name;
+                    if (item.uniqueName) update[`${sec1}_${rowId}_equipment_infoButton`] = item.uniqueName;
+                    count1++;
+                } else {
+                    update[`${sec2}_${rowId}_equipment_item`] = item.name;
+                    if (item.uniqueName) update[`${sec2}_${rowId}_equipment_infoButton`] = item.uniqueName;
+                    count2++;
+                }
+            });
+            if (callback) callback(update);
+        });
+    });
+};
+
+/* ----------------------------- */
+/* SPELL DROP                    */
+/* ----------------------------- */
+const dropSpell = (data, dropName) => {
+    const update = {};
+    update.sheetMode = "pc";
+    update.sheetTab = "spells";
+
+    const spellName = (dropName || "").trim();
+    if (!spellName) return {};
+
+    const uniqueName =
+        (data?.uniqueName || data?.uniquename || "").toString().trim() ||
+        `Spells:${spellName}`;
+
+    let lvl = normalizeInt(data.Level, 1);
+    if (lvl < 1) lvl = 1;
+    if (lvl > 9) lvl = 9;
+
+    const rowId = generateRowID();
+    const prefix = `repeating_spelllevel${lvl}_${rowId}`;
+
+    update[`${prefix}_spellname`] = spellName;
+    update[`${prefix}_spell_infoButton`] = uniqueName;
+    update[`${prefix}_spell_uniqueName`] = uniqueName;
+
+    return update;
+};
+
+/* ----------------------------- */
+/* MONSTER DROP                  */
+/* ----------------------------- */
+const dropMonster = (data) => {
+    const update = {};
+    update.sheetMode = "monster";
+    update.monster_name = data.Name || data.name || "";
+
+    const d = data; 
+
+    const MAP = {
+        "Number Encountered": "monster_no_enc",
+        "Number Encountered In Lair": "monster_no_enc_lair",
+        "Alignment": "monster_alignment",
+        "Movement": "monster_movement",
+        "Armor Class": "monster_armor_class",
+        "Hit Dice": "monster_hit_dice",
+        "Save": "monster_save_as",
+        "Morale": "monster_morale",
+        "Treasure": "monster_treasure",
+        "XP": "monster_xp"
     };
 
-    let table;
-    if (/cleric|druid|monk/.test(cls)) {
-      table = tables.cleric;
-    } else if (/fighter|barbarian|paladin|ranger/.test(cls)) {
-      table = tables.fighter;
-    } else if (/magic.?user|illusionist/.test(cls)) {
-      table = tables.magicuser;
-    } else if (/thief|assassin/.test(cls)) {
-      table = tables.thief;
-    } else {
-      return; // Class doesn't match any known type
+    Object.entries(MAP).forEach(([jsonKey, attr]) => {
+        if (d[jsonKey] !== undefined) {
+            update[attr] = String(d[jsonKey]);
+        }
+    });
+  
+    for (let i = 1; i <= 10; i++) {
+        const nameKey = `data-Attack Name ${i}`;
+        if (!data[nameKey]) continue;
+
+        const rowId = generateRowID();
+        const prefix = `repeating_monster-attack_${rowId}`;
+
+        update[`${prefix}_mon_atk_attack_name`] = String(data[`data-Attack Name ${i}`] || "");
+        update[`${prefix}_mon_atk_attack_bonus`] = String(data[`data-Attack Bonus ${i}`] || "0");
+        update[`${prefix}_mon_atk_primary_damage`] = String(data[`data-Attack Damage ${i}`] || "");
+        update[`${prefix}_mon_atk_description`] = String(data[`data-Attack Description ${i}`] || "");
     }
 
-    const row = table.find(r => level <= r.max);
-    if (!row) return;
+    return update;
+};
 
-    setAttrs({
-      "saving-breath": row.breath,
-      "saving-death": row.death,
-      "saving-stone": row.stone,
-      "saving-wand":  row.wand,
-      "saving-spell": row.spell
+/* ----------------------------- */
+/* FAST PACKS DROP ROUTER        */
+/* ----------------------------- */
+const dropFastPack = (data) => {
+    const itemsToBalance = [];
+    const update = { sheetMode: "pc", sheetTab: "equipment" };
+
+    const armorLookup = {
+        "leather": { name: "Leather", ac: 8 },
+        "leather armor": { name: "Leather", ac: 8 },
+        "studded leather": { name: "Studded Leather", ac: 7 },
+        "ringmail": { name: "Ring Mail", ac: 7 },
+        "ring mail": { name: "Ring Mail", ac: 7 },
+        "chainmail": { name: "Chain Mail", ac: 5 },
+        "chain mail": { name: "Chain Mail", ac: 5 },
+        "half-plate mail": { name: "Half-Plate Mail", ac: 4 },
+        "plate mail": { name: "Plate Mail", ac: 3 },
+        "shield": { name: "Shield", bonus: 1 },
+        "wooden shield": { name: "Shield", bonus: 1 }
+    };
+
+    const weaponLookup = {
+        "battle axe": { name: "Axe, Battle", dmg: "1d8", type: "Melee" },
+        "hand axe": { name: "Axe, Hand", dmg: "1d6", type: "Melee" },
+        "longbow and 20 arrows": { name: "Bow, Long", dmg: "1d6", type: "Ranged" },
+        "shortword": { name: "Sword, Short", dmg: "1d6", type: "Melee" },
+        "shortsword": { name: "Sword, Short", dmg: "1d6", type: "Melee" },
+        "club": { name: "Club", dmg: "1d6", type: "Melee" },
+        "great club": { name: "Club, Great", dmg: "1d8", type: "Melee" },
+        "heavy crossbow and 20 bolts": { name: "Crossbow, Heavy", dmg: "1d8+1", type: "Ranged" },
+        "light crossbow and 20 bolts": { name: "Crossbow, Light", dmg: "1d6", type: "Ranged" },
+        "dagger": { name: "Dagger", dmg: "1d4", type: "Melee" },
+        "daggers (2)": { name: "Dagger", dmg: "1d4", type: "Melee" },
+        "daggers (3)": { name: "Dagger", dmg: "1d4", type: "Melee" },
+        "silvered dagger": { name: "Dagger, Silvered", dmg: "1d4", type: "Melee" },
+        "darts (6)": { name: "Dart", dmg: "1d3", type: "Ranged" },
+        "flail": { name: "Flail", dmg: "1d6", type: "Melee" },
+        "war hammer": { name: "Hammer, War", dmg: "1d6", type: "Melee" },
+        "spiked war hammer": { name: "Hammer, Spiked War", dmg: "1d6", type: "Melee" },
+        "lance": { name: "Lance", dmg: "2d6", type: "Melee" },
+        "mace": { name: "Mace", dmg: "1d6", type: "Melee" },
+        "heavy mace": { name: "Mace, Heavy", dmg: "1d8", type: "Melee" },
+        "quarterstaff": { name: "Quarterstaff", dmg: "1d6", type: "Melee" },
+        "seax knife": { name: "Seax Knife", dmg: "1d4+1", type: "Melee" },
+        "sling and 20 stones": { name: "Sling", dmg: "1d4", type: "Ranged" },
+        "sling with 20 stones": { name: "Sling", dmg: "1d4", type: "Ranged" },
+        "spear": { name: "Spear", dmg: "1d6", type: "Melee" },
+        "bastard sword": { name: "Sword, Bastard", dmg: "1d8", type: "Melee" },
+        "broadsword": { name: "Sword, Broad", dmg: "1d6+1", type: "Melee" },
+        "longsword": { name: "Sword, Long", dmg: "1d8", type: "Melee" },
+        "two-handed sword": { name: "Sword, Two-Handed", dmg: "2d6", type: "Melee" }
+    };
+
+    Object.keys(data).forEach(key => {
+        const rawValue = String(data[key]).trim();
+        const cleanKey = key.toLowerCase();
+        const cleanValue = rawValue.toLowerCase();
+
+        if (!rawValue || cleanValue === "none" || cleanKey === "category" || cleanKey === "cost") return;
+
+        if (cleanKey.startsWith("armor")) {
+            itemsToBalance.push({name: rawValue, uniqueName: ""});
+            const match = armorLookup[cleanValue];
+            if (match) {
+                if (match.bonus !== undefined) {
+                    update.armor2_name = match.name;
+                    update.armor2_ac_bonus = match.bonus;
+                } else {
+                    update.armor1_name = match.name;
+                    update.armor1_ac_base = match.ac;
+                }
+            }
+            // Stripped the hardcoded AC 5 Monk's Habit rule here. 
+            // Unrecognized armor just populates the equipment list cleanly.
+        }
+        else if (cleanKey.startsWith("weapon")) {
+            itemsToBalance.push({name: rawValue, uniqueName: ""});
+            const match = weaponLookup[cleanValue];
+            const rowId = generateRowID();
+            const prefix = `repeating_weapon_${rowId}`;
+
+            if (match) {
+                update[`${prefix}_new_weapon`] = match.name;
+                update[`${prefix}_new_weapon_type`] = match.type;
+                update[`${prefix}_new_weapon_dmg`] = match.dmg;
+            } else {
+                update[`${prefix}_new_weapon`] = rawValue;
+                update[`${prefix}_new_weapon_type`] = "Melee";
+                update[`${prefix}_new_weapon_dmg`] = "1d6";
+            }
+        }
+        else if (cleanKey.startsWith("item")) {
+            itemsToBalance.push({name: rawValue, uniqueName: ""});
+        }
     });
-  });
-});
-  
 
-  
+    pushToEquipmentBulk(itemsToBalance, false, (eqUpdate) => {
+        setAttrs(Object.assign(update, eqUpdate));
+    });
+};
+
+/* ============================= */
+/* DROP: CHARACTER RACE          */
+/* ============================= */
+const dropRace = (data) => {
+    const d = data || {};
+    const update = {};
+
+    const raceName = d.Name || d.name || d["Race"] || "";
+    if (raceName) update["race"] = raceName;
+
+    const count = parseInt(d["data-Racial Ability Count"], 10) || 0;
+
+    const abilities = [];
+    for (let i = 1; i <= count; i++) {
+        const n = (d[`data-Racial Ability Name ${i}`] || "").toString().trim();
+        const desc = (d[`data-Racial Ability Description ${i}`] || "").toString().trim();
+        if (!n && !desc) continue;
+        abilities.push(n && desc ? `${n}:\n${desc}` : (n || desc));
+    }
+
+    abilities.forEach((txt) => {
+        const rowId = generateRowID();
+        update[`repeating_ability_${rowId}_ability_description`] = txt;
+    });
+
+    setAttrs(update);
+};
+
+/* ============================= */
+/* DROP: CHARACTER CLASS         */
+/* ============================= */
+const dropClass = (data) => {
+    const d = data || {};
+    const update = {};
+
+    const droppedClassName = d.Name || d.name || d["Class"] || "";
+    const count = parseInt(d["data-Ability Count"], 10) || 0;
+
+    for (let i = 1; i <= count; i++) {
+        const n = (d[`data-Ability Name ${i}`] || "").toString().trim();
+        const desc = (d[`data-Ability Description ${i}`] || "").toString().trim();
+
+        if (!n && !desc) continue;
+
+        const rowId = generateRowID();
+        update[`repeating_ability_${rowId}_ability_description`] = n && desc ? `${n}:\n${desc}` : (n || desc);
+    }
+
+    // Check the existing class box to see if we should append or overwrite
+    getAttrs(["class"], function(v) {
+        const currentClass = (v["class"] || "").trim();
+        
+        if (currentClass && droppedClassName) {
+            // If there's already a class, append it for multiclassing
+            update["class"] = currentClass + " / " + droppedClassName;
+        } else if (droppedClassName) {
+            // If the box is empty, just drop the single class in
+            update["class"] = droppedClassName;
+        }
+        
+        setAttrs(update);
+    });
+};
+
+/* ----------------------------- */
+/* MAGIC ITEM & WEAPON DISPATCH  */
+/* ----------------------------- */
+
+const magicItemHandler = (data, dropName, catRaw) => {
+    const name = dropName || data.Name || data.name || "";
+    const uniqueName = data.uniqueName || data.uniquename || `${catRaw}:${name}`;
+    
+    getAttrs(["armor_magic_name", "armor_magic_ac_base", "armor_magic_ac_bonus", "armor_magic_is_set"], (v) => {
+        const update = { sheetMode: "pc", sheetTab: "equipment" };
+
+        // 1. Armor Logic Check (Stacking Enabled)
+        if (data.AC !== undefined || data.ac !== undefined || data["AC Bonus"] !== undefined || data["ac_bonus"] !== undefined) {
+            let existingName = (v.armor_magic_name || "").trim();
+            update.armor_magic_name = existingName ? existingName + ", " + name : name;
+            
+            if (data.AC !== undefined || data.ac !== undefined) {
+                update.armor_magic_ac_base = parseInt(data.AC || data.ac);
+                update.armor_magic_is_set = 1;
+            } else {
+                let existingBonus = parseInt(v.armor_magic_ac_bonus) || 0;
+                update.armor_magic_ac_bonus = existingBonus + parseInt(data["AC Bonus"] || data["ac_bonus"]);
+            }
+        }
+
+        // 2. Weapon Logic Check
+        if (data.Damage || data.damage || data["To-Hit Bonus"] || data["Damage Bonus"]) {
+            const styleRaw = (data.Style || data.style || "Melee").toString().trim().toLowerCase();
+            const dmg = (data.Damage || data.damage || "1d6").toString().trim();
+            const hitBonus = parseInt(data["To-Hit Bonus"] || data["to-hit bonus"] || 0);
+            const dmgBonus = parseInt(data["Damage Bonus"] || data["damage bonus"] || 0);
+
+            const types = styleRaw === "both" ? ["Melee", "Ranged"] : (styleRaw === "ranged" ? ["Ranged"] : ["Melee"]);
+
+            types.forEach((t) => {
+                const rowId = generateRowID();
+                const prefix = `repeating_weapon_${rowId}`;
+                update[`${prefix}_new_weapon`] = name;
+                update[`${prefix}_new_weapon_type`] = t;
+                update[`${prefix}_new_weapon_dmg`] = dmg;
+                update[`${prefix}_new_weapon_magic_hit`] = hitBonus;
+                update[`${prefix}_new_weapon_magic_dmg`] = dmgBonus;
+            });
+        }
+
+        // 3. Equipment List Distribution
+        pushToEquipmentBulk([{name: name, uniqueName: uniqueName}], true, (eqUpdate) => {
+            setAttrs(Object.assign(update, eqUpdate));
+        });
+    });
+};
+
+const dropArmorItem = (data, dropName, catRaw) => {
+    const update = { sheetMode: "pc", sheetTab: "equipment" };
+    const name = dropName || data.Name || data.name || "";
+    const uniqueName = data.uniqueName || data.uniquename || `${catRaw}:${name}`;
+    const type = (data.Type || data.type || "").toLowerCase();
+
+    if (type === "shield" || type === "wooden shield") {
+        update.armor2_name = name;
+        update.armor2_ac_bonus = parseInt(data["AC Bonus"] || data["ac_bonus"] || 1);
+    } else {
+        update.armor1_name = name;
+        update.armor1_ac_base = parseInt(data.AC || data.ac || 9);
+    }
+    
+    pushToEquipmentBulk([{name: name, uniqueName: uniqueName}], false, (eqUpdate) => {
+        setAttrs(Object.assign(update, eqUpdate));
+    });
+};
+
+const dropItem = (data, dropName, catRaw) => {
+    const itemName = (dropName || "").toString().trim() || (data?.Name || data?.name || "").toString().trim();
+    const uniqueName = data.uniqueName || data.uniquename || `${catRaw}:${itemName}`;
+    if (!itemName) return;
+
+    const update = { sheetMode: "pc", sheetTab: "equipment" };
+    
+    pushToEquipmentBulk([{name: itemName, uniqueName: uniqueName}], false, (eqUpdate) => {
+        setAttrs(Object.assign(update, eqUpdate));
+    });
+};
+
+const dropWeapon = (data, dropName, catRaw) => {
+    const name = (dropName || data.Name || data.name || data["Weapon"] || data["weapon"] || "").toString().trim();
+    if (!name) return;
+    const uniqueName = data.uniqueName || data.uniquename || `${catRaw}:${name}`;
+    const styleRaw = (data.Style || data.style || data["Weapon Style"] || data["data-Style"] || "").toString().trim().toLowerCase();
+    const dmg = (data.Damage || data.damage || data["Weapon Damage"] || data["data-Damage"] || "").toString().trim();
+    const types = styleRaw === "both" ? ["Melee", "Ranged"] : styleRaw === "ranged" ? ["Ranged"] : ["Melee"];
+
+    const update = { sheetMode: "pc", sheetTab: "equipment" };
+    types.forEach((t) => {
+        const rowId = generateRowID();
+        const prefix = `repeating_weapon_${rowId}`;
+        update[`${prefix}_new_weapon`] = name;
+        update[`${prefix}_new_weapon_type`] = t;
+        if (dmg) update[`${prefix}_new_weapon_dmg`] = dmg;
+        update[`${prefix}_new_weapon_magic_hit`] = 0;
+        update[`${prefix}_new_weapon_magic_dmg`] = 0;
+    });
+    
+    pushToEquipmentBulk([{name: name, uniqueName: uniqueName}], false, (eqUpdate) => {
+        setAttrs(Object.assign(update, eqUpdate));
+    });
+};
+
+/* ----------------------------- */
+/* CENTRAL DISPATCHER            */
+/* ----------------------------- */
+on("change:drop_data", (eventInfo) => {
+    const raw = eventInfo?.newValue;
+    if (!raw) return;
+
+    let data;
+    try {
+        data = JSON.parse(raw);
+    } catch {
+        clearDrop();
+        return;
+    }
+
+    getAttrs(["drop_name"], (v) => {
+        const category = getDropCategory(data);
+        const catRaw = data.Category || data.category || data.compendiumCategory || "Items";
+
+        const handlers = {
+            monsters: dropMonster,
+            monster: dropMonster,
+            bestiary: dropMonster,
+            spells: dropSpell,
+            spell: dropSpell,
+            items: dropItem,
+            item: dropItem,
+            "fast packs": dropFastPack,
+            "fast pack": dropFastPack,
+            armor: dropArmorItem,
+            weapons: dropWeapon,
+            weapon: dropWeapon,
+            "character weapons": dropWeapon, 
+            "character races": dropRace,
+            "character-races": dropRace,
+            races: dropRace,
+            "character classes": dropClass,
+            "character-classes": dropClass,
+            classes: dropClass,
+            "magic armor": magicItemHandler,
+            "magic potions": magicItemHandler,
+            "magic rings": magicItemHandler,
+            "magic rods, staves, and wands": magicItemHandler,
+            "magic runestones": magicItemHandler,
+            "magic scrolls": magicItemHandler,
+            "magic weapons": magicItemHandler,
+            "miscellaneous magic items": magicItemHandler,
+            "magic items": magicItemHandler,
+            "magic item": magicItemHandler
+        };
+
+        const handler = handlers[category];
+        if (!handler) {
+            clearDrop();
+            return;
+        }
+
+        if (category === "spells" || category === "spell" || category === "monsters" || category === "monster" || category === "bestiary") {
+            const update = handler(data, v.drop_name);
+            if (update && Object.keys(update).length) {
+                update.drop_category = "";
+                update.drop_name = "";
+                update.drop_data = "";
+                setAttrs(update);
+            } else {
+                clearDrop();
+            }
+            return;
+        }
+
+        // Pass the precise raw category down to the handlers for accurate compendium linking
+        handler(data, v.drop_name, catRaw); 
+        clearDrop();
+    });
+});
+
+/* ----------------------------- */
+/* WEAPON AUTO-CALC WORKER       */
+/* ----------------------------- */
+on("change:repeating_weapon:new_weapon_type change:repeating_weapon:new_weapon_magic_hit change:repeating_weapon:new_weapon_magic_dmg change:attack-bonus change:melee-hit-damage change:missile-hit-damage", function() {
+    getSectionIDs("repeating_weapon", function(idArray) {
+        const fields = ["attack-bonus", "melee-hit-damage", "missile-hit-damage"];
+        idArray.forEach(id => {
+            fields.push(`repeating_weapon_${id}_new_weapon_type`);
+            fields.push(`repeating_weapon_${id}_new_weapon_magic_hit`);
+            fields.push(`repeating_weapon_${id}_new_weapon_magic_dmg`);
+        });
+
+        getAttrs(fields, function(v) {
+            const update = {};
+            
+            let babStr = v["attack-bonus"] || "0";
+            let bab = parseInt(babStr.replace(/\+/g, ''), 10) || 0;
+            let meleeMod = parseInt(v["melee-hit-damage"], 10) || 0;
+            let missileMod = parseInt(v["missile-hit-damage"], 10) || 0;
+
+            idArray.forEach(id => {
+                let type = v[`repeating_weapon_${id}_new_weapon_type`] || "Melee";
+                let magHit = parseInt(v[`repeating_weapon_${id}_new_weapon_magic_hit`], 10) || 0;
+                let magDmg = parseInt(v[`repeating_weapon_${id}_new_weapon_magic_dmg`], 10) || 0;
+
+                let statMod = (type === "Ranged") ? missileMod : meleeMod;
+
+                update[`repeating_weapon_${id}_new_weapon_hit_mod`] = bab + statMod + magHit;
+                update[`repeating_weapon_${id}_new_weapon_dmg_mod`] = statMod + magDmg;
+            });
+            
+            setAttrs(update, {silent: true});
+        });
+    });
+});
+
+/* ===================================================== */
+/* MONSTER TREASURE GENERATOR                            */
+/* ===================================================== */
+
+const rollDice = (expr) => {
+    if (!expr) return 0;
+    if (typeof expr === 'number') return expr;
+    let match = expr.match(/(\d+)d(\d+)(?:\+([\d]+))?(?:\*([\d]+))?/i);
+    if (match) {
+        let count = parseInt(match[1]);
+        let sides = parseInt(match[2]);
+        let add = match[3] ? parseInt(match[3]) : 0;
+        let mult = match[4] ? parseInt(match[4]) : 1;
+        let total = 0;
+        for (let i = 0; i < count; i++) {
+            total += Math.floor(Math.random() * sides) + 1;
+        }
+        return (total + add) * mult;
+    }
+    return parseInt(expr) || 0;
+};
+
+const rollTable = (tableObj) => {
+    let roll = rollDice('1d100');
+    let result = "Unknown Magic Item";
+    for (let key in tableObj) {
+        let limits = key.split('-').map(Number);
+        if (limits.length === 1) limits.push(limits[0]); 
+        if (roll >= limits[0] && roll <= limits[1]) {
+            result = tableObj[key];
+            break;
+        }
+    }
+    return result;
+};
+
+const potionsTable = {
+    "01-03": "Potion of Animal Control", "04-06": "Potion of Clairaudience", "07-09": "Potion of Clairvoyance",
+    "10-12": "Potion of Climbing", "13-17": "Potion of Delusion (Cursed)", "18-20": "Potion of Diminution",
+    "21-23": "Potion of Dragon Control", "24-26": "Potion of ESP", "27-30": "Potion of Extra-healing",
+    "31-32": "Potion of Fire Resistance", "33-36": "Potion of Flying", "37-40": "Potion of Gaseous form",
+    "41-43": "Potion of Giant Control", "44-47": "Potion of Giant Strength", "48-50": "Potion of Growth",
+    "51-54": "Potion of Healing", "55-58": "Potion of Heroism (F/B/P/R)", "59-61": "Potion of Human Control",
+    "62-64": "Potion of Invisibility", "65-66": "Potion of Invulnerability", "67-69": "Potion of Levitation",
+    "70-71": "Potion of Longevity", "72-73": "Oil of Etherealness", "74-75": "Oil of Piercing",
+    "76-77": "Oil of Slipperiness", "78-79": "Potion of Philter of Love", "80-81": "Potion of Plant Control",
+    "82-83": "Potion of Poison", "84-85": "Potion of Polymorph", "86-88": "Potion of Speed",
+    "89-90": "Potion of Super-Heroism (F/B/P/R)", "91-93": "Potion of Sweet Water", "94-95": "Potion of Treasure Finding",
+    "96-97": "Potion of Undead Control", "98-100": "Potion of Water Breathing"
+};
+
+const scrollsTable = {
+    "01-11": "Cursed Scroll (Random Effect)", "12-17": "Protection from Demons", "18-23": "Protection from Devils",
+    "24-29": "Protection from Elementals", "30-35": "Protection from Lycanthropes", "36-41": "Protection from Magic",
+    "42-47": "Protection from Undead", "48-62": "Spell Scroll (5)", "63-72": "Spell Scroll (4)",
+    "73-80": "Spell Scroll (3)", "81-88": "Spell Scroll (2)", "89-93": "Spell Scroll (1)", "94-100": "Treasure Map"
+};
+
+const ringsTable = {
+    "01-04": "Ring of Animal Command", "05-09": "Ring of Delusion (Cursed)", "10-15": "Ring of Fire Resistance",
+    "16-20": "Ring of Free Action", "21-25": "Ring of Human Influence", "26-30": "Ring of Invisibility",
+    "31-35": "Ring of Jumping", "36-40": "Ring of Plant Command", "41-47": "Ring of Protection",
+    "48-49": "Ring of Regeneration", "50-55": "Ring of Shooting Stars (ILL/MU)", "56-60": "Ring of Spell Storing (ILL/MU/C/D/M)",
+    "61-65": "Ring of Spell Turning", "66-70": "Ring of Swimming", "71-73": "Ring of Telekinesis",
+    "74-78": "Ring of the Ram", "79-84": "Ring of Water Breathing", "85-90": "Ring of Water Walking",
+    "91-93": "Ring of Weakness", "94-96": "Ring of Wishes", "97-98": "Ring of Wizardry (ILL/MU)", "99-100": "Ring of X-Ray Vision"
+};
+
+const minorRunestonesTable = {
+    "01-07": "Runestone of Climbing", "08-10": "Runestone of Death", "11-13": "Runestone of Disintegration",
+    "14-25": "Runestone of Extra-Healing", "26-32": "Runestone of Giant Strength", "33-42": "Runestone of Growth",
+    "43-51": "Runestone of Healing", "52-59": "Runestone of Heroism", "60-67": "Runestone of Invulnerability",
+    "68-75": "Runestone of Levitation", "76-83": "Runestone of Speed", "84-91": "Runestone of Super-Heroism",
+    "92-100": "Runestone of Sweetwater"
+};
+
+const majorRunestonesTable = {
+    "01-03": "Runestone of Constitution", "04-07": "Runestone of Curing", "08-10": "Runestone of Delusion (Cursed)",
+    "11-13": "Runestone of Dwarvenkind", "14-17": "Runestone of Galeb", "18-21": "Runestone of Illumination",
+    "22-24": "Runestone of Impact", "25-28": "Runestone of Insanity (Cursed)", "29-31": "Runestone of Kalbandur",
+    "32-34": "Runestone of Magic Resistance", "35-37": "Runestone of Missile Attraction (Cursed)", "38-40": "Runestone of Monstrous Attention (Cursed)",
+    "41-43": "Runestone of Prayer (C/D/M)", "44-46": "Runestone of Proof Against Disease", "47-49": "Runestone of Proof Against Mummy Rot",
+    "50-52": "Runestone of Rejuvenation", "53-55": "Runestone of Sharpening (F/B/P/R)", "56-58": "Runestone of Steam and Vapor",
+    "59-61": "Runestone of Strength", "62-64": "Runestone of Stupidity (Cursed)", "65-67": "Runestone of Wisdom",
+    "68-70": "Runestone of the Stalagmite", "71-82": "Spellstone", "83-85": "Wardstone (Acid)",
+    "86-88": "Wardstone (Dragon Breath)", "89-91": "Wardstone (Gas)", "92-94": "Wardstone (Insects)",
+    "95-97": "Wardstone (Petrification)", "98-100": "Wardstone (Plants)"
+};
+
+const rodsStavesWandsTable = {
+    "01-02": "Rod of Absorption (C/D/M/ILL/MU)", "03-04": "Rod of Beguiling", "05-06": "Rod of Cancellation",
+    "07-08": "Rod of Lordly Might (F/P)", "09-10": "Rod of Resurrection (C)", "11-12": "Rod of Rulership",
+    "13-14": "Rod of Smiting (C/D/M/F)", "15-16": "Staff of Command (C/M)", "17-20": "Staff of Healing (C/D/M)",
+    "21-22": "Staff of Ozkadoo (C/D/M/ILL/MU)", "23-24": "Staff of Power (ILL/MU)", "25-27": "Staff of Striking (C/D/M)",
+    "28-30": "Staff of Withering (C/D/M)", "31-32": "Staff of Zuul (ILL/MU)", "33-34": "Staff of the Magi (ILL/MU)",
+    "35-37": "Staff of the Magus (ILL/MU)", "38-39": "Staff of the Prestidigitator (ILL/MU)", "40-41": "Staff of the Pyromancer (ILL/MU)",
+    "42-44": "Staff of the Serpent (C/D/M)", "45-47": "Walsom's Wretched Wand (ILL/MU)", "48-49": "Wand of Acid (ILL/MU)",
+    "50-52": "Wand of Cold (ILL/MU)", "53-55": "Wand of Conjuration (ILL/MU)", "56-57": "Wand of Enemy Detection (ILL/MU)",
+    "58-59": "Wand of Fear (ILL/MU)", "60-61": "Wand of Fiery Burning (ILL/MU)", "62-63": "Wand of Fire (ILL/MU)",
+    "64-65": "Wand of Fireballs (ILL/MU)", "66-67": "Wand of Frost (ILL/MU)", "68-69": "Wand of Illusion (ILL/MU)",
+    "70-71": "Wand of Light (ILL/MU)", "72-74": "Wand of Lightning (ILL/MU)", "75-76": "Wand of Lightning Bolts (ILL/MU)",
+    "77-78": "Wand of Magic Detection (ILL/MU)", "79-80": "Wand of Magic Missiles (ILL/MU)", "81-82": "Wand of Metal Detection (ILL/MU)",
+    "83-84": "Wand of Negation (ILL/MU)", "85-86": "Wand of Oil (ILL/MU)", "87-88": "Wand of Paralyzation (ILL/MU)",
+    "89-90": "Wand of Polymorphing (ILL/MU)", "91-92": "Wand of Secret Door Detection (ILL/MU)", "93-94": "Wand of Tar (ILL/MU)",
+    "95-96": "Wand of Trap Detection (ILL/MU)", "97-98": "Wand of Water (ILL/MU)", "99-100": "Wand of Wonder (ILL/MU)"
+};
+
+const miscAtoCTable = {
+    "01": "Albion (F/R)", "02-03": "Alchemy Jug", "04": "Allirass' Sequined Tuque of Shame (Cursed)",
+    "05-06": "Amulet of Inescapable Location", "07-08": "Amulet of Magic Resistance", "09-10": "Amulet of Proof Against Detection",
+    "11-12": "Amulet of Proof Against Possession", "13-14": "Amulet of Proof Against Turning", "15": "Amulet of the Planes",
+    "16-17": "Amulet versus Crystal Balls and ESP", "18": "Apparatus of the Crab", "19": "Armature of Palantis (C/P)",
+    "20": "Armbands of Healing", "21-22": "Arrow of Direction", "23": "Arrow of Herne (D/F/R)",
+    "24": "Aspergillum of Palantis (C/P)", "25-26": "Bag of Bones", "27-28": "Bag of Devouring",
+    "29-30": "Bag of Holding", "31-32": "Bag of Transformation", "33-34": "Bag of Tricks",
+    "35-36": "Baltron's Be-Cursed Beanie (Cursed)", "37-38": "Basprofo's Furry Cossack", "39-40": "Basprofo's Brilliant Bookbag",
+    "41": "Book of Chaotic Blackness (C)", "42": "Book of Lawful Deeds (C)", "43-44": "Boots of Dancing",
+    "45-46": "Boots of Elvenkind", "47-48": "Boots of Levitation", "49-50": "Boots of Speed",
+    "51-52": "Boots of Striding and Springing", "53": "Bottle of Djinni Summoning", "54": "Bowku's Beetle Armor (F/P)",
+    "55": "Bowl of Commanding Water Elementals", "56-57": "Bowl of Drowning (Cursed)", "58-59": "Bracers of Defense",
+    "60-61": "Bracers of Deflection", "62": "Brazier of Commanding Fire Elementals", "63": "Brazier of Sleep Smoke",
+    "64-65": "Broach of Shielding", "66-67": "Broom of Animated Attack", "68": "Broom of Cursed Flight (Cursed)",
+    "69-70": "Broom of Flying", "71": "Caliburn (F/P)", "72": "Censer of Controlling Air Elementals",
+    "73": "Censer of Cursed Summoning", "74": "Chime of Cannibalism", "75-76": "Chime of Opening",
+    "77-78": "Cloak of Arachnida", "79-80": "Cloak of Displacement", "81-82": "Cloak of Elvenkind",
+    "83": "Cloak of Poisonousness", "84-92": "Cloak of Protection", "93": "Couter of Palantis (C/P)",
+    "94": "Crystal Ball (ILL/MU)", "95": "Crystal Ball of Hypnosis (ILL/MU)", "96": "Crystal Ball with Clairaudience (ILL/MU)",
+    "97": "Crystal Ball with ESP (ILL/MU)", "98": "Cube of Force", "99": "Cube of Frost Resistance", "100": "Cubic Gate"
+};
+
+const miscDtoGTable = {
+    "01-02": "Decanter of Endless Water", "03-05": "Deck of Many Things", "06-07": "Drums of Deafening",
+    "08-09": "Drums of Panic", "10-12": "Dust of Appearance", "13-15": "Dust of Disappearance",
+    "16-18": "Dust of Sneezing and Choking", "19-20": "Efreeti Bottle", "21-22": "Eguresel's Brilliant Beret (ILL/MU)",
+    "23-24": "Eguresel's Key (ILL/MU)", "25-27": "Ekintzart's Eldritch Scroll Tube", "28": "Epirus Bow (F/P/R)",
+    "29-30": "Everburning Candle", "31-32": "Eversmoking Bottle", "33-35": "Eyeglass of House Longbeard",
+    "36-37": "Eyes of Charming (ILL/MU)", "38-39": "Eyes of Magnification", "40-41": "Eyes of Petrification",
+    "42-43": "Eyes of the Eagle", "44": "Fennril's Faithful Compass", "45-47": "Figurine of Wondrous Power",
+    "48-49": "Filangee's Propeller Beanie", "50-51": "Flask of Curses (Cursed)", "52-53": "Flying Carpet",
+    "54-55": "Folding Boat", "56-57": "Folding Boat of Flying", "58": "Fount of Law",
+    "59-60": "Gaidenmorden's Furry Mongol Helmet", "61-62": "Gauntlets of Geddinthor (F/B/P/R)", "63": "Gauntlet of Palantis (C/P)",
+    "64": "Gauntlets of Fumbling", "65-66": "Gauntlets of Ogre Power (F/B/P/R/C)", "67-68": "Gaxiluke's Corinthian Helm of Free Action",
+    "69-70": "Gaxiluke's Reptile-Eye Headband", "71-72": "Gem of Brightness", "73-75": "Gem of Seeing",
+    "76-77": "Gir-Shaul's Conical Cap of Eyes (ILL/MU)", "78-79": "Girdle of Femininity/Masculinity", "80-81": "Girdle of Giant Strength (F/B/P/R/C/M)",
+    "82-84": "Gloves of Dexterity", "85-87": "Gloves of Swimming and Climbing", "88-90": "Globus Cruciger of Antioch (C/P)",
+    "91-92": "Grabthar's Golden Gauntlets (F/B/P/R/C)", "93": "Grabthar's Hammer (F/B/P/R/C)", "94-96": "Great Helm of the Juggernaut (F/B/P/R)",
+    "97-98": "Grelf's Dented Metal Cone (ILL/MU)", "99-100": "Grigby's Woolly Owlbear Cap"
+};
+
+const miscHtoNTable = {
+    "01-02": "Halabaster's Hat of Hornets (ILL/MU)", "03-04": "Helm of Brilliance", "05-06": "Helm of Comprehending Languages",
+    "07-08": "Helm of Opposite Alignment (Cursed)", "09-10": "Helm of Telepathy", "11-12": "Helm of Teleportation",
+    "13-14": "Helm of Underwater Action", "15-16": "Hitzemun's Blue Tuque", "17-18": "Horn of Blasting",
+    "19-20": "Horn of Valhalla (C/F/P/R/T)", "21-22": "Horn of the Dead (C/F/P/R/T)", "23-24": "Horseshoes of Speed",
+    "25-26": "Horseshoes of Zephyr", "27-28": "Incense of Meditation (C/D/M)", "29-30": "Incense of Obsession (C/D/M)",
+    "31-32": "Ioun Stones", "33-34": "Javelin of Lightning (F/B/P/R)", "35-36": "Javelin of Piercing (F/B/P/R)",
+    "37-38": "Jewel of Monster Attraction", "39-40": "Kazzibal's Exotic Canterbury Cap", "41-42": "Kuato's Feather Token",
+    "43": "Libram of Dark Magic (ILL/MU)", "44": "Libram of White Magic (ILL/MU)", "45-46": "Lyre of Building",
+    "47-48": "Manual of Bodily Health", "49-50": "Manual of Gainful Exercise", "51-52": "Manual of Golems (C/M/ILL/MU)",
+    "53-54": "Manual of Martial Skillfulness", "55-56": "Manual of Quickness of Action", "57-58": "Matoowb's Instant Fortress",
+    "59-60": "Mattock of the Titans (F/B/P/R)", "61-62": "Maul of the Titans", "63-64": "Mazakala's Antlered Faluche",
+    "65-66": "Mazakala's Cursed Cowl (Cursed)", "67-68": "Medallion of ESP", "69-70": "Medallion of Thoughts",
+    "71-72": "Medallion of Thoughts (60 Feet)", "73-74": "Mermomodel's Conical Wizard Cap", "75-76": "Metznward's Golden Coif",
+    "77-78": "Mirror of Life Trapping (ILL/MU)", "79-80": "Mirror of Mental Prowess (ILL/MU)", "81-82": "Mirror of Opposition",
+    "83-84": "Monk's Habit", "85": "Mystic Jewel of Koweewah (ILL/MU)", "86-87": "Necklace of Adaptation",
+    "88-89": "Necklace of Missiles", "90-91": "Necklace of Prayer Beads (C/D/M)", "92-93": "Necklace of Strangulation (Cursed)",
+    "94-95": "Necro-Crown of Zadukalu", "96-97": "Nesting Golems", "98-99": "Net of Entrapment (C/F/T)", "100": "Net of Snaring (C/F/T)"
+};
+
+const miscOtoZTable = {
+    "01-02": "Ointment of Healing", "03-04": "Ool's Rusty Corinthian Helm", "05-06": "Pearl of Power (ILL/MU)",
+    "07-08": "Pearl of Wisdom (C/D/M)", "09": "Periapt of Foul Rotting (Cursed)", "10-11": "Periapt of Health",
+    "12-13": "Periapt of Proof against Mummy Rot", "14-15": "Periapt of Proof against Poison", "16-17": "Periapt of Wound Closure",
+    "18-19": "Phylactery of Faithfulness (C/D/M)", "20-21": "Phylactery of Long Years (C/D/M)", "22-23": "Phylactery of Undead Turning",
+    "24-25": "Pigface Bascinet (F/P/R)", "26-27": "Pinto's Conical Cap (ILL/MU)", "28-29": "Pipes of the Sewers",
+    "30": "Portable Hole", "31": "Raldurin's Runehammer (F/B/P/R)", "32": "Rerebrace of Palantis (C/P)",
+    "33-34": "Robe of Blending", "35-36": "Robe of Eyes (ILL/MU)", "37": "Robe of Powerlessness (Cursed) (ILL/MU)",
+    "38-39": "Robe of Scintillating Colors (ILL/MU)", "40": "Robe of the Archmagi (ILL/MU)", "41-42": "Robe of Useful Items (ILL/MU)",
+    "43-44": "Rope of Climbing", "45-46": "Rope of Entanglement", "47-48": "Rope of Strangulation",
+    "49-50": "Sagnala's Purple Velvet Fez (ILL/MU)", "51-52": "Sandals of Kicking (C/D/M/ILL/MU)", "53-54": "Sandals of Spider Climbing",
+    "55": "Scarab of Death", "56-57": "Scarab of Proof Against Fear", "58-59": "Scarab of Protection",
+    "60": "Seax of Beagnoth (F/B/P/R)", "61": "Sferenop's Shimmering Seashell", "62-63": "Shadred's Leather Headband",
+    "64": "Spear Predestined (F/P/R)", "65": "Sphere of Annihilation (ILL/MU)", "66-67": "Stone of Controlling Earth Elementals",
+    "68-69": "Stone of Good Luck (Luckstone)", "70": "Stone of Weight (Loadstone)", "71": "Talisman of Pure Good (C)",
+    "72-73": "Talisman of the Dead", "74": "Talisman of the Sphere (ILL/MU)", "75": "Talisman of Ultimate Evil (C)",
+    "76-77": "Tartan Tam of Sustenance", "78-79": "Teknar's 10-Foot Pole", "80": "Tome of Clear Thought",
+    "81": "Tome of Knowledge (ILL/MU)", "82": "Tome of Leadership and Influence", "83": "Tome of Puissant Martiality (F/P/R)",
+    "84": "Tome of Stealth (T/A)", "85": "Tome of Understanding", "86-87": "Uzeron's Unguent",
+    "88-89": "Vitharia's Cold Conical Cap", "90-91": "Vomael-Pa's Adamantine Coif (M/ILL/MU)", "92-93": "Wasp Darts",
+    "94": "Well of Many Worlds", "95-96": "Winged Hammer", "97-98": "Winged Helmet of Halgritte",
+    "99": "Wings of Flying", "100": "Zaflazna's Steel Skullcap (ILL/MU)"
+};
+
+const swordsTable = {
+    "01-03": "Sword -1", "04-06": "Sword -2", "07-37": "Sword +1", "38-39": "Sword +1, +2 vs Lycanthropes",
+    "40-41": "Sword +1, +2 vs Spell-Casters", "42-43": "Sword +1, +3 vs Reptiles", "44-45": "Sword +1, +3 vs Magic-Using Creatures",
+    "46-47": "Sword +1, +3 vs Undead", "48-49": "Sword +1, +3 vs Regenerating Creatures", "50-51": "Sword +1, Dancing",
+    "52-53": "Sword +1, Flame Tongue", "54-55": "Sword +1, Life Drinker", "56-57": "Sword +1, Light (30 Feet)",
+    "58-59": "Sword +1, Luck Blade", "60-61": "Sword +1, Sharpness", "62-63": "Sword +1, Wish Blade",
+    "64-65": "Sword +1, Wounding", "66-76": "Sword +2", "77-78": "Sword +2, Berserker", "79-80": "Sword +2, Giant Slayer",
+    "81-82": "Sword +2, Nine Lives Stealer", "83-84": "Sword +2, Sun Blade", "85-86": "Sword +3",
+    "87-88": "Sword +3, Frost Brand", "89-90": "Sword +3, Sharpness", "91-92": "Sword +3, Skewering",
+    "93-94": "Sword +4, Defender", "95-96": "Sword +5, Dragonslayer", "97-98": "Sword +5, Holy Avenger", "99-100": "Sword, Intelligent*"
+};
+
+const weaponsTable = {
+    "01-04": "Arrow or Bolt +1 (2d6)", "05-06": "Arrow or Bolt +2 (1d6)", "07-08": "Arrow or Bolt +3 (1d4)",
+    "09": "Arrow or Bolt +3, Slaying", "10-13": "Axe +1", "14-15": "Axe +2", "16-17": "Axe +2 (Hand), Thrower",
+    "18-21": "Bow or Crossbow +1", "22-23": "Bow or Crossbow +2", "24-25": "Bow or Crossbow +3",
+    "26": "Crossbow of Accuracy", "27": "Crossbow of Speed", "28-31": "Sling Stone +1 (2d6)",
+    "32-33": "Sling Stone +2 (1d6)", "34-35": "Sling Stone +3 (1d4)", "36": "Sling Stone +3, Slaying",
+    "37-38": "Dagger -1", "39-42": "Dagger +1", "43-44": "Dagger +1, Venom", "45-46": "Dagger +2, +3 vs Goblinkind",
+    "47-48": "Dagger, Long Point", "49-50": "Dagger, Stoutblade", "51-54": "Flail +1", "55-56": "Flail +2",
+    "57-60": "Hammer +1", "61-62": "Hammer +2", "63": "Hammer +3, Dwarven Thrower", "64": "Hammer +3, Thunderbolt",
+    "65-68": "Mace or Club +1", "69-70": "Mace or Club +2", "71": "Mace of Disruption", "72": "Mace of Shattering",
+    "73-76": "Polearm +1 (Halberd)", "77-78": "Polearm +2 (Halberd)", "79-82": "Seax Knife +1",
+    "83-84": "Seax Knife +2", "85-88": "Sling +1", "89-90": "Sling +2", "91": "Sling +2, Seeker",
+    "92-94": "Spear +1", "95-96": "Spear +2", "97": "Spear +3, Skewering", "98": "Spear, Arrow, or Bolt, Back-Biter",
+    "99": "Trident +1, Fish Command", "100": "Trident +2, Warning"
+};
+
+const armorTable = {
+    "01-03": "Armor -1", "04-06": "Armor -2", "07-09": "Shield -1 Missile Magnet", "10-12": "Shield -2 Missile Magnet",
+    "13-32": "Shield +1", "33-44": "Shield +2", "45-46": "Shield +2, +4 versus Missiles", "47-48": "Shield +3",
+    "49-50": "Shield +3, Dragon Scale", "51-52": "Shield +4", "53": "Shield +5", "54": "Shield of the Golden Hawk",
+    "55-57": "Helm +1", "58": "Helm +2", "59": "Helm +3", "60-79": "Armor +1", "80-91": "Armor +2",
+    "92-93": "Armor +2, +4 versus Missiles", "94-95": "Armor +3", "96-97": "Armor +3, Dragon Scale",
+    "98-99": "Armor +4", "100": "Armor +5"
+};
+
+const generateGem = () => {
+    let valRoll = rollDice('1d100');
+    let value = valRoll <= 15 ? 10 : valRoll <= 30 ? 25 : valRoll <= 45 ? 50 : valRoll <= 60 ? 75 : valRoll <= 75 ? 100 : valRoll <= 85 ? 200 : valRoll <= 90 ? 500 : valRoll <= 95 ? 750 : 1000;
+    const types = ["Azurite", "Lapis Lazuli", "Tiger Eye", "Bloodstone", "Moonstone", "Sardonyx", "Amethyst", "Aquamarine", "Pearl", "Black Sapphire", "Emerald", "Diamond"];
+    return `${types[rollDice('1d12')-1]} (${value} gp)`;
+};
+
+const generateJewelry = () => {
+    let valRoll = rollDice('1d100');
+    let value = valRoll <= 15 ? 10 : valRoll <= 30 ? 25 : valRoll <= 45 ? 50 : valRoll <= 60 ? 75 : valRoll <= 75 ? 100 : valRoll <= 85 ? 200 : valRoll <= 90 ? 500 : valRoll <= 95 ? 750 : 1000;
+    const types = ["Circlet", "Bracelet", "Ring", "Torc", "Disc Broach", "Belt Buckle", "Goblet", "Necklace", "Earring(s)", "Pendant", "Scabbard", "Maze Controller's Choice"];
+    return `${types[rollDice('1d12')-1]} (${value} gp)`;
+};
+
+const generateMagicItem = () => {
+    let catRoll = rollDice('1d100');
+    if (catRoll <= 20) return rollTable(potionsTable);
+    if (catRoll <= 32) return rollTable(scrollsTable);
+    if (catRoll <= 37) return rollTable(ringsTable);
+    if (catRoll <= 53) {
+        let sub = rollDice('1d100');
+        if (sub <= 60) return rollTable(minorRunestonesTable);
+        return rollTable(majorRunestonesTable);
+    }
+    if (catRoll <= 58) return rollTable(rodsStavesWandsTable);
+    if (catRoll <= 65) {
+        let sub = rollDice('1d100');
+        if (sub <= 25) return rollTable(miscAtoCTable);
+        if (sub <= 50) return rollTable(miscDtoGTable);
+        if (sub <= 75) return rollTable(miscHtoNTable);
+        return rollTable(miscOtoZTable);
+    }
+    if (catRoll <= 80) return rollTable(swordsTable);
+    if (catRoll <= 90) return rollTable(weaponsTable);
+    return rollTable(armorTable);
+};
+
+const treasureTables = {
+    A: { CP: { dice: '3d8' } },
+    B: { SP: { dice: '3d6' } },
+    C: { EP: { dice: '2d6' } },
+    D: { GP: { dice: '2d8' } },
+    E: { PP: { dice: '1d6' } },
+    F: { Gems: { dice: '1d3' } },
+    G: { Jewelry: { dice: '1d3' } },
+    H: { Magic: { type: '+1 Weapon', amount: 1, chance: 10 } },
+    I: { Magic: { type: '+1 Armor', amount: 1, chance: 10 } },
+    J: { CP: { dice: '1d100', chance: 80 }, SP: { dice: '1d100', chance: 30 }, GP: { dice: '1d100', chance: 30 }, Gems: { dice: '1d4', chance: 15 }, Jewelry: { dice: '1d4', chance: 10 }, Magic: { amount: 1, chance: 10 } },
+    K: { SP: { dice: '1d100', chance: 30 }, EP: { dice: '1d100', chance: 20 }, GP: { dice: '1d100', chance: 15 }, Gems: { dice: '1d6', chance: 30 }, Jewelry: { dice: '1d4', chance: 20 }, Magic: { amount: 1, chance: 15 } },
+    L: { Magic: { type: 'Scrolls', dice: '1d4', chance: 50 } },
+    M: { Magic: { type: 'Potions', dice: '2d4', chance: 50 } },
+    N: { GP: { dice: '1d8', mult: 1000, chance: 50 }, PP: { dice: '2d6', mult: 1000, chance: 40 }, Gems: { dice: '2d6', chance: 60 }, Jewelry: { dice: '2d6', chance: 40 } },
+    O: { Gems: { dice: '1d6', chance: 45 } },
+    P: { SP: { dice: '2d4', mult: 1000, chance: 30 }, EP: { dice: '1d4', mult: 1000, chance: 25 } },
+    Q: { CP: { dice: '1d6', mult: 1000, chance: 30 }, SP: { dice: '1d4', mult: 1000, chance: 20 } },
+    R: { PP: { dice: '2d4', mult: 1000, chance: 35 }, Gems: { dice: '2d6', chance: 55 }, Jewelry: { dice: '2d6', chance: 50 }, Magic: { amount: 1, chance: 25 } },
+    S: { CP: { dice: '3d6', mult: 1000, chance: 25 }, SP: { dice: '1d100', mult: 1000, chance: 65 }, EP: { dice: '2d4*10', mult: 1000, chance: 40 }, GP: { dice: '1d4', mult: 1000, chance: 60 }, PP: { dice: '3d6', mult: 1000, chance: 30 }, Gems: { dice: '2d4', chance: 30 }, Jewelry: { dice: '1d10', chance: 20 }, Magic: { amount: 6, chance: 20 } },
+    T: { GP: { dice: '1d6', mult: 1000, chance: 55 }, PP: { dice: '1d4', mult: 1000, chance: 45 }, Gems: { dice: '3d4', chance: 30 }, Jewelry: { dice: '1d10', chance: 25 }, Magic: { amount: 6, chance: 30 } },
+    U: { SP: { dice: '3d6', mult: 1000, chance: 20 }, EP: { dice: '1d6', mult: 1000, chance: 25 }, GP: { dice: '2d6', mult: 1000, chance: 45 }, PP: { dice: '1d4', mult: 1000, chance: 25 }, Gems: { dice: '3d6', chance: 25 }, Jewelry: { dice: '1d8', chance: 10 }, Magic: { amount: 5, chance: 30 } },
+    V: { CP: { dice: '2d6', mult: 1000, chance: 10 }, SP: { dice: '1d8', mult: 1000, chance: 35 }, EP: { dice: '1d6', mult: 1000, chance: 25 }, GP: { dice: '1d6', mult: 1000, chance: 30 }, Gems: { dice: '2d4', chance: 15 }, Jewelry: { dice: '2d4', chance: 10 }, Magic: { amount: 4, chance: 30 } },
+    W: { CP: { dice: '1d8', mult: 1000, chance: 10 }, SP: { dice: '1d8', mult: 1000, chance: 20 }, GP: { dice: '1d6+1', mult: 1000, chance: 55 }, Gems: { dice: '1d6', chance: 40 }, Jewelry: { dice: '1d6', chance: 40 }, Magic: { amount: 4, chance: 15 } },
+    X: { CP: { dice: '2d6', mult: 1000, chance: 30 }, SP: { dice: '1d6', mult: 1000, chance: 30 }, EP: { dice: '1d6', mult: 1000, chance: 15 }, Gems: { dice: '1d6', chance: 20 }, Jewelry: { dice: '1d6', chance: 20 }, Magic: { amount: 2, chance: 12 } },
+    Y: { CP: { dice: '1d8', mult: 1000, chance: 50 }, SP: { dice: '1d4', mult: 1000, chance: 25 }, EP: { dice: '1d4', mult: 1000, chance: 30 }, Gems: { dice: '1d6+1', chance: 30 }, Jewelry: { dice: '1d4', chance: 20 }, Magic: { amount: 1, chance: 12 } },
+    Z: { CP: { dice: '2d4', mult: 1000, chance: 30 }, SP: { dice: '1d4', mult: 1000, chance: 20 }, EP: { dice: '1d6', mult: 1000, chance: 25 }, GP: { dice: '1d8', mult: 1000, chance: 40 }, PP: { dice: '1d4', mult: 1000, chance: 20 }, Gems: { dice: '4d8', chance: 60 }, Jewelry: { dice: '4d8', chance: 50 }, Magic: { amount: 3, chance: 25 } }
+};
+
+const parseTreasureString = (str) => {
+    let types = [];
+    let bonusGP = 0;
+
+    let gpMatch = str.match(/\+([\d,]+)\s*GP/i);
+    if (gpMatch) {
+        bonusGP = parseInt(gpMatch[1].replace(/,/g, ''), 10);
+        str = str.replace(gpMatch[0], '');
+    }
+
+    let complexMatch = str.match(/\((\d+)%\s+([A-Z])\s+OR\s+([A-Z])\)/i);
+    if (complexMatch) {
+        if (rollDice('1d100') <= parseInt(complexMatch[1], 10)) {
+            types.push(rollDice('1d100') <= 50 ? complexMatch[2].toUpperCase() : complexMatch[3].toUpperCase());
+        }
+        str = str.replace(complexMatch[0], '');
+    }
+
+    if (/ALL/i.test(str)) {
+        let multMatch = str.match(/ALL\s*x\s*(\d+)/i);
+        let mult = multMatch ? parseInt(multMatch[1], 10) : 1;
+        for (let i = 0; i < mult; i++) "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').forEach(l => types.push(l));
+        str = str.replace(/ALL(?:x\d+)?/ig, '');
+    }
+
+    str = str.replace(/AND|OR|TRIBAL|NONE|COINS|GEMS|JEWELRY|MAGIC/ig, '');
+
+    let regex = /([A-Z])(?:-([A-Z]))?(?:\s*x\s*(\d+))?/gi;
+    let match;
+    while ((match = regex.exec(str)) !== null) {
+        let start = match[1].toUpperCase();
+        let end = match[2] ? match[2].toUpperCase() : null;
+        let mult = match[3] ? parseInt(match[3], 10) : 1;
+
+        if (end) {
+            let startCode = start.charCodeAt(0);
+            let endCode = end.charCodeAt(0);
+            if (startCode <= endCode) {
+                for (let c = startCode; c <= endCode; c++) {
+                    for (let i = 0; i < mult; i++) types.push(String.fromCharCode(c));
+                }
+            }
+        } else {
+            for (let i = 0; i < mult; i++) types.push(start);
+        }
+    }
+    return { types, bonusGP };
+};
+
+on('clicked:roll_treasure', function() {
+    getAttrs(['monster_treasure', 'character_name'], function(v) {
+        let rawStr = (v.monster_treasure || '').trim();
+        if (!rawStr || rawStr.toUpperCase() === 'NONE') return;
+
+        let parsed = parseTreasureString(rawStr);
+        if (parsed.types.length === 0 && parsed.bonusGP === 0) return;
+
+        let indResults = { CP: 0, SP: 0, EP: 0, GP: 0, PP: 0, Gems: [], Jewelry: [], Magic: [] };
+        
+        let lairResults = { CP: 0, SP: 0, EP: 0, GP: parsed.bonusGP, PP: 0, Gems: [], Jewelry: [], Magic: [] }; 
+
+        parsed.types.forEach(t => {
+            let table = treasureTables[t];
+            if (!table) return;
+
+            let targetBucket = /^[A-K]$/i.test(t) ? indResults : lairResults;
+
+            Object.keys(table).forEach(item => {
+                let data = table[item];
+                let chance = data.chance || 100;
+                if (rollDice('1d100') <= chance) {
+                    let amount = data.dice ? rollDice(data.dice) : (data.amount || 1);
+                    if (data.mult) amount *= data.mult;
+
+                    if (['CP', 'SP', 'EP', 'GP', 'PP'].includes(item)) {
+                        targetBucket[item] += amount;
+                    } else if (item === 'Gems') {
+                        for (let i = 0; i < amount; i++) targetBucket.Gems.push(generateGem());
+                    } else if (item === 'Jewelry') {
+                        for (let i = 0; i < amount; i++) targetBucket.Jewelry.push(generateJewelry());
+                    } else if (item === 'Magic') {
+                        for (let i = 0; i < amount; i++) {
+                            if (data.type === 'Potions') {
+                                targetBucket.Magic.push(rollTable(potionsTable));
+                            } else if (data.type === 'Scrolls') {
+                                targetBucket.Magic.push(rollTable(scrollsTable));
+                            } else if (data.type) {
+                                targetBucket.Magic.push(data.type); 
+                            } else {
+                                targetBucket.Magic.push(generateMagicItem());
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        let templateStr = `&{template:ds_generic} {{name=Treasure for ${v.character_name}}}`;
+        let empty = true;
+
+        const processBucket = (bucket, title) => {
+            let coinsStr = [];
+            if (bucket.CP > 0) coinsStr.push(`${bucket.CP.toLocaleString()} CP`);
+            if (bucket.SP > 0) coinsStr.push(`${bucket.SP.toLocaleString()} SP`);
+            if (bucket.EP > 0) coinsStr.push(`${bucket.EP.toLocaleString()} EP`);
+            if (bucket.GP > 0) coinsStr.push(`${bucket.GP.toLocaleString()} GP`);
+            if (bucket.PP > 0) coinsStr.push(`${bucket.PP.toLocaleString()} PP`);
+
+            if (coinsStr.length > 0 || bucket.Gems.length > 0 || bucket.Jewelry.length > 0 || bucket.Magic.length > 0) {
+                empty = false;
+                if (coinsStr.length > 0) templateStr += ` {{${title} Coins=${coinsStr.join(', ')}}}`;
+                if (bucket.Gems.length > 0) templateStr += ` {{${title} Gems=${bucket.Gems.join(', ')}}}`;
+                if (bucket.Jewelry.length > 0) templateStr += ` {{${title} Jewelry=${bucket.Jewelry.join(', ')}}}`;
+                if (bucket.Magic.length > 0) templateStr += ` {{${title} Magic Items=${bucket.Magic.join(', ')}}}`;
+            }
+        };
+
+        processBucket(indResults, "Individual");
+        processBucket(lairResults, "Lair");
+
+        if (empty) {
+            templateStr += ` {{Result=No treasure found.}}`;
+        }
+
+        startRoll(`/w gm ${templateStr}`, function(outcome) {
+            finishRoll(outcome.rollId);
+        });
+    });
+});
+
+/* ===================================================== */
+/* MOVEMENT & COIN ENCUMBRANCE ENGINE                    */
+/* ===================================================== */
+
+const calculateMovement = () => {
+    getAttrs([
+        "carried_cp", "carried_sp", "carried_ep", "carried_gp", "carried_pp",
+        "race", "armor1_name", "armor_magic_name"
+    ], (v) => {
+        const cp = parseInt(v.carried_cp, 10) || 0;
+        const sp = parseInt(v.carried_sp, 10) || 0;
+        const ep = parseInt(v.carried_ep, 10) || 0;
+        const gp = parseInt(v.carried_gp, 10) || 0;
+        const pp = parseInt(v.carried_pp, 10) || 0;
+        
+        const totalCoins = cp + sp + ep + gp + pp;
+
+        const armor1 = (v.armor1_name || "").toLowerCase();
+        const magicArmor = (v.armor_magic_name || "").toLowerCase();
+        const combinedArmor = armor1 + " " + magicArmor;
+
+        let armorType = "none";
+        if (/plate|half-plate|splint|banded/.test(combinedArmor)) {
+            armorType = "heavy";
+        } else if (/leather|studded|ring|chain|scale|brigandine/.test(combinedArmor)) {
+            armorType = "light_medium";
+        }
+
+        // Magic armor adds +100 allowance to the encumbrance thresholds
+        let limitBonus = (magicArmor.trim() !== "") ? 100 : 0;
+        
+        const noArmorLimit = 300 + limitBonus;
+        const heavyLimit = 100 + limitBonus;
+
+        const race = (v.race || "").toLowerCase().trim();
+        const isDwarvenGroup = /dwarf|gnome|halfling/.test(race);
+
+        let speed = isDwarvenGroup ? 20 : 40;
+
+        if (!isDwarvenGroup) {
+            if (armorType === "none") {
+                if (totalCoins >= noArmorLimit) speed = 30;
+            } else if (armorType === "light_medium") {
+                speed = 30; // Threshold logic bypassed here as Light/Med cap natively at 30
+            } else if (armorType === "heavy") {
+                speed = 20;
+                if (totalCoins >= heavyLimit) speed = 10;
+            }
+        } else {
+            if (armorType === "heavy") {
+                speed = 20;
+                if (totalCoins >= heavyLimit) speed = 10;
+            } else {
+                speed = 20;
+            }
+        }
+
+        setAttrs({
+            "total_carried_coins": totalCoins,
+            "movement": speed + "ft."
+        });
+    });
+};
+
+on("change:carried_cp change:carried_sp change:carried_ep change:carried_gp change:carried_pp change:race change:armor1_name change:armor_magic_name sheet:opened", calculateMovement);
+
+/* ===================================================== */
+/* THIEF SKILL AUTO-CALCULATOR                           */
+/* ===================================================== */
+on("change:class change:level change:race sheet:opened", function() {
+    getAttrs(["class", "level", "race"], function(v) {
+        const clsRaw = String(v.class || "").toLowerCase().trim();
+        const levelStr = String(v.level || "0").trim();
+        const race = String(v.race || "").toLowerCase().trim();
+
+        const safeClassStr = clsRaw.replace(/magic[\-\s]*user/g, "magicuser");
+        const classes = safeClassStr.split(/[\s\/\-\\,&]+/).filter(c => c.length > 0);
+        const levelsArr = levelStr.split(/[\s\/\-\\,&]+/).filter(l => l.length > 0).map(l => parseInt(l, 10) || 0);
+
+        // 1. Calculate Effective Thief Level
+        let tLvl = 0;
+        classes.forEach((c, i) => {
+            const classLevel = levelsArr[i] || levelsArr[0] || 0;
+            if (c.includes("assassin")) {
+                tLvl = Math.max(tLvl, classLevel - 2);
+            } else if (c.includes("thief")) {
+                tLvl = Math.max(tLvl, classLevel);
+            }
+        });
+
+        // If not a thief/assassin or level is too low, blank the fields
+        if (tLvl <= 0) {
+            setAttrs({
+                pick_pockets: "-", open_locks: "-", find_traps: "-",
+                move_silently: "-", hide_in_shadows: "-", climb_walls: "-",
+                hear_noise: "-", appraise: "-"
+            });
+            return;
+        }
+
+        const index = Math.min(Math.max(tLvl, 1), 15) - 1;
+
+        // Base values for levels 1 through 15+
+        const baseTable = [
+            [35, 35, 35, 33, 25, 85, 2, 2], // 1
+            [40, 40, 37, 37, 27, 86, 2, 2], // 2
+            [45, 45, 40, 40, 30, 87, 3, 3], // 3
+            [50, 50, 45, 43, 35, 88, 3, 3], // 4
+            [55, 55, 50, 50, 37, 90, 3, 3], // 5
+            [60, 60, 55, 60, 40, 92, 4, 4], // 6
+            [65, 65, 60, 70, 50, 94, 4, 4], // 7
+            [70, 70, 65, 80, 60, 96, 4, 4], // 8
+            [80, 75, 70, 90, 70, 98, 4, 4], // 9
+            [90, 80, 75, 99, 80, 99, 5, 5], // 10
+            [99, 85, 80, 99, 90, 99, 5, 5], // 11
+            [99, 90, 85, 99, 99, 99, 5, 5], // 12
+            [99, 95, 90, 99, 99, 99, 5, 5], // 13
+            [99, 99, 95, 99, 99, 99, 5, 5], // 14
+            [99, 99, 99, 99, 99, 99, 5, 5]  // 15+
+        ];
+
+        let [pp, ol, ft, ms, hs, cw, hn, app] = baseTable[index];
+
+        // 2. Apply Racial Modifiers
+        if (race.includes("half-orc") || race.includes("half orc")) {
+            pp -= 5; ol += 5; ft += 5; cw += 5;
+        } else if (race.includes("half-elf") || race.includes("half elven") || race.includes("half-elven")) {
+            pp += 10; hs += 5;
+        } else if (race.includes("halfling")) {
+            pp += 5; ol += 5; ft += 5; ms += 10; cw -= 15; hs += 10;
+        } else if (race.includes("gnome")) {
+            ol += 5; ft += 7; ms += 5; cw -= 15; hs += 5;
+        } else if (race.includes("elf") || race.includes("elven")) {
+            pp += 5; ol -= 5; ms += 7; hs += 10; hn += 1;
+        }
+
+        const capPerc = (val) => Math.min(Math.max(val, 0), 99);
+        const capD6 = (val) => Math.min(Math.max(val, 1), 6);
+
+        setAttrs({
+            pick_pockets: capPerc(pp),
+            open_locks: capPerc(ol),
+            find_traps: capPerc(ft),
+            move_silently: capPerc(ms),
+            hide_in_shadows: capPerc(hs),
+            climb_walls: capPerc(cw),
+            hear_noise: capD6(hn),
+            appraise: capD6(app)
+        });
+    });
+});
 </script>
