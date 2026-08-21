@@ -221,9 +221,9 @@ const dndUpdates = [
                                                     };
                                                     // Set all spells without a given modifier to 'spell'
                                                     var spgetList = [];
-                                                    getSectionIDs("spell-cantrip", function(secIds0) {
+                                                    getSectionIDs("spell-prime", function(secIds0) {
                                                         _.each(secIds0, function(x) {
-                                                            spgetList.push("repeating_spell-cantrip_" + x + "_spell_ability");
+                                                            spgetList.push("repeating_spell-prime_" + x + "_spell_ability");
                                                         });
                                                         getSectionIDs("spell-1", function(secIds1) {
                                                             _.each(secIds1, function(x) {
@@ -930,6 +930,138 @@ const dndUpdates = [
                             resolve();
                         }   
                     });
+                }
+            });
+        }
+    ),
+
+    // --- Updates added from OGL v4.2 base sheet ---
+
+    new SheetUpdate(
+        'fix_spellpoints',
+        (resolve, reject) => {
+            getAttrs(["npc"], function(values) {
+                if(values["npc"] && values["npc"] == "1") {
+                    reject('This update is only valid for pcs sheets');
+                } else {
+                    getAttrs(['use_spell_points'], v => {
+                        if(v['use_spell_points'] && v['use_spell_points'] == 1) {
+                            setSpellPoints();
+                        } else {
+                            deleteResource('Spell Points');
+                        }
+                        resolve();
+                    });
+                }
+            });
+        }
+    ),
+
+    new SheetUpdate(
+        'fix_advantage_query',
+        (resolve, reject) => {
+            getAttrs(['rtype'], function(values) {
+                const queryadvantage = '{{query=1}} ?{Advantage?|Normal Roll,&#123&#123normal=1&#125&#125 &#123&#123r2=[[0d20|Advantage,&#123&#123advantage=1&#125&#125 &#123&#123r2=[[@{d20}|Disadvantage,&#123&#123disadvantage=1&#125&#125 &#123&#123r2=[[@{d20}}';
+                setAttrs({queryadvantage: queryadvantage}, () => {
+                    if(values.rtype.includes('?{Advantage')) {
+                        const always = '{{always=1}} {{r2=[[@{d20}';
+                        const query = '@{queryadvantage}';
+                        setAttrs({rtype: always}, () => {
+                            setAttrs({rtype: query}, () => {
+                                resolve();
+                            });
+                        });
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+        }
+    ),
+
+    new SheetUpdate(
+        'fix_attacks_spelllink',
+        (resolve, reject) => {
+            getAttrs(["npc"], function(values) {
+                if(values["npc"] && values["npc"] == "1") {
+                    reject('This update is only valid for pcs sheets');
+                } else {
+                    update_attacks("spells");
+                    resolve();
+                }
+            });
+        }
+    ),
+
+    new SheetUpdate(
+        'fix_pc_skills_when_jack_and_odd_prof',
+        (resolve, reject) => {
+            getAttrs(["npc"], function(values) {
+                if(values["npc"] && values["npc"] == "1") {
+                    reject('This update is only valid for pcs sheets');
+                } else {
+                    // EG uses update_skills in place of OGL updateSkillRolls
+                    update_skills(["acrobatics", "astrophysics", "athletics", "computers", "deception",
+                                   "insight", "intimidation", "investigation", "lore", "mechanics",
+                                   "medicine", "perception", "performance", "persuasion",
+                                   "sleight_of_hand", "stealth", "survival", "xenobiology"]);
+                    resolve();
+                }
+            });
+        }
+    ),
+
+    new SheetUpdate(
+        'fix_armor_stealth_penalty',
+        (resolve, reject) => {
+            getAttrs(["npc"], function(values) {
+                if(values["npc"] && values["npc"] == "1") {
+                    reject('This update is only valid for pcs sheets');
+                } else {
+                    const armorsWithStealthDisadvantage = [
+                        "chain mail", "half plate", "plate", "ring mail",
+                        "scale mail", "spiked armor", "splint"
+                    ];
+                    const update = {};
+                    const attrs_to_get = [];
+                    getSectionIDs("repeating_inventory", function(idarray) {
+                        _.each(idarray, function(currentID) {
+                            attrs_to_get.push("repeating_inventory_" + currentID + "_itemname");
+                            attrs_to_get.push("repeating_inventory_" + currentID + "_itemmodifiers");
+                        });
+                        getAttrs(attrs_to_get, function(v) {
+                            Object.keys(v).filter(entry => entry.includes("itemname")).forEach(key => {
+                                if(armorsWithStealthDisadvantage.indexOf(v[key].toLowerCase()) > 1) {
+                                    const modifiersKey = key.replace("_itemname", "_itemmodifiers");
+                                    let modifiers = v[modifiersKey] || false;
+                                    if(!modifiers) {
+                                        update[modifiersKey] = "Stealth:Disadvantage";
+                                    } else if(!modifiers.includes("Stealth:Disadvantage")) {
+                                        update[modifiersKey] = modifiers + ", Stealth:Disadvantage";
+                                    }
+                                }
+                            });
+                            setAttrs(update, () => {
+                                update_skills(["stealth"]);
+                                resolve();
+                            });
+                        });
+                    });
+                }
+            });
+        }
+    ),
+
+    new SheetUpdate(
+        'fix_pc_printedskills',
+        (resolve, reject) => {
+            getAttrs(["npc"], function(values) {
+                if(values["npc"] && values["npc"] == "1") {
+                    reject('This update is only valid for pcs sheets');
+                } else {
+                    formatPrintedTools();
+                    formatPrintedSkills();
+                    resolve();
                 }
             });
         }

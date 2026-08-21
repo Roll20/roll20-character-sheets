@@ -8,12 +8,12 @@
   <button type="action" name="act_notes">Notes</button>
 </div> -->
 <!-- END OF SHEET SELECTOR -->
-<!-- TOGGLE BUTTON -->
-<input type="checkbox" name="attr_sheet_toggle" id="sheet-toggle" class="sheet-toggle-checkbox" />
-<label for="sheet-toggle" class="sheet-toggle-btn">
-  <span class="knight-btn-text">Knight</span>
-  <span class="npc-btn-text">NPCs</span>
-</label>
+<!-- MODE DROPDOWN -->
+<select name="attr_sheet_mode" class="sheet-mode-select">
+  <option value="knight" selected>Knight</option>
+  <option value="raider">Raider</option>
+  <option value="npcs">NPCs</option>
+</select>
 
 <!-- KNIGHT SHEET -->
 <div class="knight-sheet">
@@ -32,11 +32,17 @@
         </label>
       </div>
       <div class="header-line">
-        <label>Glory:
+        <label class="knight-only">Glory:
           <input type="number" name="attr_glory" />
         </label>
-        <label>Rank:
+        <label class="raider-only">Gold:
+          <input type="number" name="attr_glory" />
+        </label>
+        <label class="knight-only">Rank:
           <input type="text" name="attr_rank" readonly />
+        </label>
+        <label class="raider-only">Rank:
+          <input type="text" name="attr_raider_rank" readonly />
         </label>
         <label>Age:
           <select name="attr_age" class="age_select">
@@ -236,8 +242,8 @@
   <div class="recovery-oath-feats-gambits">
     <div class="top-row">
             <div class="oath-section">
-        <h3>OATH</h3>
-        <div class="oath-content">
+        <h3 class="knight-only">OATH</h3>
+        <div class="oath-content knight-only">
           <p>Seek the Myths</p>
           <p>Honour the Seers</p>
           <p>Protect the Realm</p>
@@ -255,11 +261,11 @@
       <div class="feats-section">
         <h3>FEATS</h3>
         <div class="feats-content">
-          <p><strong>SMITE</strong> - +d12 or Blast to a melee attack.<br>
+          <p><input type="checkbox" name="attr_raider_feat_smite" value="1" class="raider-only feat-checkbox" /><strong>SMITE</strong> - +d12 or Blast to a melee attack.<br>
           <em>VIG Save or become Fatigued.</em></p>
-          <p><strong>FOCUS</strong> - Perform a Gambit without using a die.<br>
+          <p><input type="checkbox" name="attr_raider_feat_focus" value="1" class="raider-only feat-checkbox" /><strong>FOCUS</strong> - Perform a Gambit without using a die.<br>
           <em>CLA Save or become Fatigued.</em></p>
-          <p><strong>DENY</strong> - Discard a damage die rolled against you or a nearby Ally.<br>
+          <p><input type="checkbox" name="attr_raider_feat_deny" value="1" class="raider-only feat-checkbox" /><strong>DENY</strong> - Discard a damage die rolled against you or a nearby Ally.<br>
           <em>SPI Save or become Fatigued.</em></p>
         </div>
       </div>
@@ -426,7 +432,7 @@
 <!-- END OF KNIGHT SHEET -->
 
 <!-- NPC SHEET -->
-<div class="npc-sheet" style="display: none;">
+<div class="npc-sheet">
   <div class="companions-section">
     <h3>NPCs</h3>
     <fieldset class="repeating_npc">
@@ -573,6 +579,15 @@
 <!-- END OF ROLLTEMPLATES -->
 <!-- SCRIPTS -->
 <script type="text/worker">
+    // Migrate old binary sheet_toggle (0/1) → sheet_mode (knight/npcs)
+    on("sheet:opened", function() {
+      getAttrs(["sheet_mode", "sheet_toggle"], function(values) {
+        if (values.sheet_mode) return;
+        var newMode = values.sheet_toggle === "1" ? "npcs" : "knight";
+        setAttrs({ sheet_mode: newMode });
+      });
+    });
+
     // Tabs
     const buttonlist = ["character", "property", "notes"];
     buttonlist.forEach((button) => {
@@ -717,16 +732,21 @@
       getAttrs(["glory"], function(values) {
         var glory = parseInt(values["glory"]) || 0;
         var rank = "Knight-Errant";
+        var raiderRank = "Sea Worm";
         if (glory >= 3 && glory <= 5) {
           rank = "Knight-Gallant";
+          raiderRank = "Sea Crow";
         } else if (glory >= 6 && glory <= 8) {
           rank = "Knight-Tenant";
+          raiderRank = "Sea Wolf";
         } else if (glory >= 9 && glory <= 11) {
           rank = "Knight Dominant";
+          raiderRank = "Sea Bear";
         } else if (glory >= 12) {
           rank = "Knight-Radiant";
+          raiderRank = "Sea Hawk";
         }
-        setAttrs({"rank": rank});
+        setAttrs({ rank: rank, raider_rank: raiderRank });
       });
     });
 </script>
