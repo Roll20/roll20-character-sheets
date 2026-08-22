@@ -103,7 +103,7 @@ The sheet includes space for four defenses (plus four more accessible via the "A
 
 ![Armor Table](/HeroSystem6eHeroic/images/armor.png)
 
-The *Defense* entry space is actually a button that brings up a worksheet in which you can enter values for PD, ED, power defense, mental defense, and flash defense. The sheet will use these values to create a summary of these defenses for display in the parent table.
+The *Defense* entry space is actually a button that brings up a worksheet in which you can enter values for PD, ED, power defense, mental defense, flash defense, and the hardened defense level. The sheet will use these values to create a summary of these defenses for display in the parent table.
 
 ![Armor Worksheet](/HeroSystem6eHeroic/images/armorWorksheet.png)
 
@@ -123,6 +123,8 @@ With the Weapon Worksheet open, begin by entering a weapon's base damage. HS6eH 
 Next, set the weapon's minimum strength value and the strength the character actually uses. If strength improves damage, check "DMG Enhanced by STR." Generally one only adds increments of +5 STR over the minimum since +5 STR = + 1 DC (damage class). Using less than a character's maximum strength may mean saving END costs. Note that typically a weapon's damage class can only be doubled via strength and skill enhancements, but this may be overridden with the option "Weapon Damage limited to 2x Base Damage." Combat Skill Levels can increase damage as well at a cost of +2 CSLs = + 1 DC. These may be entered either in the worksheet or, more conveniently for play, adjusted from the Weapons Table.
 
 ![Weapon Worksheet](/HeroSystem6eHeroic/images/weaponWorksheet.png)
+
+If the weapon has the advantage *Armor Piercing* select the number of applications purchased. HS6eH will automatically add an "AP" note to attack roll messages.
 
 HERO System 6th Edition considers certain power advantages when determining enhancements to damage (e.g., armor piercing, see 6E2 98-100). HS6eH uses an algorithm that duplicates the *Damage Classes Quick-Reference Tables* found on 6E2 101 plus a best attempt to expand them using the *Expanded Damage Class Tables* available for a small fee separately from Hero Games. The expanded tables were used only as guidance since they do not always agree with the rulebook (and are missing some important common values).
 
