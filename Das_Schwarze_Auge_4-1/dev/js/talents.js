@@ -168,6 +168,46 @@ function getTalentRollResults(results) {
 	};
 }
 
+/*
+	Action Listener for Physical Talents Lame Settings
+*/
+const attrsTalentsPhysicalLame = talents.filter(talent => talent.startsWith("t_ko_"));
+Object.freeze(attrsTalentsPhysicalLame);
+
+on(attrsTalentsPhysicalLame.map(talent => `change:${talent}_mod_lame_setting`).join(" ").toLowerCase(),
+	function (info) {
+
+	// Boilerplate
+	const caller = "Action Listener for Physical Talents Lame Settings";
+	const sourceAttr = info["sourceAttribute"];
+	const newValue = info["newValue"];
+	const talent = info["triggerName"].replace(/^(t_ko_[^-]+)_mod_lame_setting$/, '$1');
+	const modAttr = `${talent}_mod_lame`;
+
+	/// Conversion from easier-to-comprehend settings to the actual roll macro content
+	const settingsDictionary = {
+		"always": "3",
+		"ask": "(?{Nachteil &bdquo;Lahm&ldquo;: Benötigt diese Probe Beinarbeit?|Ja,3|Nein,0})",
+		"never": "0",
+	};
+	const attrsToChange = {};
+
+	// Conversion
+	let lameMod = "0";
+	if (Object.hasOwn(settingsDictionary, newValue))
+	{
+		lameMod = settingsDictionary[newValue];
+	} else {
+		debugLog(caller, "Unexpected new lame setting. Using default value for lame mod.");
+		lameMod = getDefaultValue(modAttr);
+	}
+	attrsToChange[modAttr] = lameMod;
+
+	// Setting attrs
+	debugLog(caller, "attrsToChange", attrsToChange);
+	safeSetAttrs(attrsToChange);
+});
+
 on("change:repeating_gaben:name_gabe change:repeating_gaben:name_gabe_zusatz", function(eventInfo) {
 		safeGetAttrs(["repeating_Gaben_Name_Gabe", "repeating_Gaben_Name_Gabe_Zusatz"], function(v) {
 				let gabe = v.repeating_Gaben_Name_Gabe;
