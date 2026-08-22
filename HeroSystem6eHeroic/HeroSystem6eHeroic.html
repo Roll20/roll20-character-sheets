@@ -22871,7 +22871,7 @@
 	arrayOf(maxArmorNum).forEach(num => {
 		var armorId = String(num).padStart(2,'0');
 		on(`clicked:activateArmor${armorId}`, (info) => {
-			getAttrs(["whisperToGM", "character_title", "displayDegreeOfSuccess", "optionHitLocationSystem", "armorActivation"+armorId, "armorLocations"+armorId, "armorPD"+armorId, "armorED"+armorId, "powerDefense"+armorId, "mentalDefense"+armorId, "flashDefense"+armorId, "flashDefenseSight"+armorId, "flashDefenseHearing"+armorId, "flashDefenseSmell"+armorId, "flashDefenseTouch"+armorId, "flashDefenseMental"+armorId, "flashDefenseRadio"+armorId, "useVehicleAttributes", "dingbat"], function(values) {
+			getAttrs(["whisperToGM", "character_title", "displayDegreeOfSuccess", "optionHitLocationSystem", "armorActivation"+armorId, "armorLocations"+armorId, "armorPD"+armorId, "armorED"+armorId, "powerDefense"+armorId, "mentalDefense"+armorId, "flashDefense"+armorId, "flashDefenseSight"+armorId, "flashDefenseHearing"+armorId, "flashDefenseSmell"+armorId, "flashDefenseTouch"+armorId, "flashDefenseMental"+armorId, "flashDefenseRadio"+armorId, "hardenedDefense"+armorId, "useVehicleAttributes", "dingbat"], function(values) {
 				var theRoll = values.whisperToGM||"";
 				
 				const isVehicle = (values.useVehicleAttributes === "on" ) ? true : false;
@@ -22889,6 +22889,7 @@
 				const rED = Math.min(maxDEF, Math.max(minDEF, parseInt(values["armorED"+armorId])||0));
 				const powerDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["powerDefense"+armorId])||0));
 				const mentalDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["mentalDefense"+armorId])||0));
+				const hardenedDEF = values["hardenedDefense"+armorId]||0;
 				const flashDEF = Math.min(maxDEF, Math.max(minDEF, parseInt(values["flashDefense"+armorId])||0));
 				const flashDefSight = (values["flashDefenseSight"+armorId] === "on") ? true : false;
 				const flashDefHearing = (values["flashDefenseHearing"+armorId] === "on") ? true : false;
@@ -22912,6 +22913,21 @@
 					}
 				}
 				
+				let hardenedDefenseString = "";
+				
+				switch (values["hardenedDefense"+armorId]) {
+					case "1":		hardenedDefenseString = " (H)";
+									break;
+					case "2":		hardenedDefenseString = " (H2)";
+									break;
+					case "3":		hardenedDefenseString = " (H3)";
+									break;
+					case "4":		hardenedDefenseString = " (H4)";
+									break;
+					default:		hardenedDefenseString = "";
+									break;
+				}
+				
 				theRoll += "&{template:custom-activate} ";
 				theRoll += "{{title=@{character_name}" + dingbat + "@{character_title}}} ";
 				theRoll += "{{subtitle= Defends with @{armorName"+armorId+"}**}} ";
@@ -22929,17 +22945,17 @@
 				
 				if ((rPD !== 0) || (rED !== 0)) {
 					if (isVehicle) {
-						theRoll += "{{Armor Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} ";
+						theRoll += "{{Armor Defense"+hardenedDefenseString+" = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} ";
 						theRoll += "{{Total Defense = **rPD ``@{totalPD"+armorId+"}`` rED ``@{totalED"+armorId+"}``**}} ";
 					} else {
-						theRoll += "{{Resistant Defense = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``**}} ";
+						theRoll += "{{Resistant Defense"+hardenedDefenseString+" = **rPD ``@{armorPD"+armorId+"}`` rED ``@{armorED"+armorId+"}``"+hardenedDefenseString+"**}} ";
 						theRoll += "{{Total Defense = **PD ``@{totalPD"+armorId+"}`` ED ``@{totalED"+armorId+"}``**}} ";
 					}
 				}
 				
-				theRoll += (powerDEF !== 0) ? "{{Power Defense = **``@{powerDefense"+armorId+"}``**}} " : "";
-				theRoll += (mentalDEF !== 0) ? "{{Mental Defense = **``@{mentalDefense"+armorId+"}``**}} " : "";
-				theRoll += (flashDEF !== 0) ? "{{Flash Defense = **``@{flashDefense"+armorId+"}``** "+flashSenseString+"}} " : "";
+				theRoll += (powerDEF !== 0) ? "{{Power Defense"+hardenedDefenseString+" = **``@{powerDefense"+armorId+"}``**}} " : "";
+				theRoll += (mentalDEF !== 0) ? "{{Mental Defense"+hardenedDefenseString+" = **``@{mentalDefense"+armorId+"}``**}} " : "";
+				theRoll += (flashDEF !== 0) ? "{{Flash Defense"+hardenedDefenseString+" = **``@{flashDefense"+armorId+"}``** "+flashSenseString+"}} " : "";
 				
 				startRoll(theRoll, (results) => {
 					finishRoll(results.rollId, {});
