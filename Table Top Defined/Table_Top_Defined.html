@@ -3626,6 +3626,37 @@
    </div>
   </div>
  </div>
+
+ <div class="character-importer">
+  <input class="character-import-toggle" type="hidden"
+         name="attr_character_import_minimize_toggle" value="1"/>
+  <input class="character-import-busy" type="hidden"
+         name="attr_character_import_busy" value="0"/>
+  <div class="character-import-header">
+   <button type="action" class="Small-Button character-import-toggle-button"
+           name="act_characterimportminimize"
+           title="Expand or collapse the character importer"></button>
+   Import Character JSON
+  </div>
+  <div class="character-import-body">
+   <p>Paste a Table Top Defined character export below. Imports update matching fields and preserve unrelated manual repeating rows.</p>
+   <textarea name="attr_character_import_json"
+             title="Table Top Defined character JSON"
+             placeholder="Paste the complete exported .json contents here..."
+             spellcheck="false"></textarea>
+   <div class="character-import-actions">
+    <button type="action" class="character-import-button"
+            name="act_characterimport">Import Character</button>
+    <span>Validate first, then import into this character.</span>
+   </div>
+   <label class="character-import-status-label">
+    Import Status
+    <textarea class="character-import-status"
+              name="attr_character_import_status"
+              readonly>Ready.</textarea>
+   </label>
+  </div>
+ </div>
 </div>
 <!--</editor-fold>-->
 
@@ -4670,6 +4701,7 @@
  bindToggle("repeating_maininventory:inventoryitemminimize",
          "repeating_maininventory_inventory_minimize_toggle");
  bindToggle("craftingmaterialsminimize", "crafting_materials_minimize_toggle");
+ bindToggle("characterimportminimize", "character_import_minimize_toggle");
  ["armor", "shield", "focus"].forEach(item => {
   bindToggle(`${item}itemminimize`, `${item}_minimize_toggle`);
  });
@@ -6275,6 +6307,386 @@
  on("change:hd change:magic_curve change:specialty change:versatile change:mystic change:diffuse_background change:primary_definition_name change:enable_automatic_grants sheet:opened change:repeating_feats:granted_level change:repeating_feats:granted_source change:repeating_feats:grant_key change:repeating_feats:grant_hidden change:repeating_abilities:granted_level change:repeating_abilities:granted_source change:repeating_abilities:grant_key change:repeating_abilities:grant_hidden remove:repeating_feats remove:repeating_abilities", function() {
   queueUpdateAutomaticGrants();
  });
+
+ //<editor-fold desc="Character JSON Importer">
+
+ const CHARACTER_IMPORT_FORMAT = "Table Top Defined Character";
+ const CHARACTER_IMPORT_SCHEMA_VERSION = 1;
+ const CHARACTER_IMPORT_MAX_ATTRIBUTES = 10000;
+ const CHARACTER_IMPORT_MAX_NAME_LENGTH = 250;
+ const CHARACTER_IMPORT_MAX_VALUE_LENGTH = 100000;
+ const CHARACTER_IMPORT_MAX_JSON_LENGTH = 5000000;
+ const CHARACTER_IMPORT_BATCH_SIZE = 250;
+ const CHARACTER_IMPORT_ROW_ID_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-";
+ const CHARACTER_IMPORT_REPEATING_SECTIONS = [
+  "damagereduction", "locationtotals", "maininventory", "profitloss",
+  "resistance", "conditions", "resources", "abilities", "weapons1",
+  "weapons2", "spells-0", "spells-1", "spells-2", "spells-3",
+  "spells-4", "spells-5", "spells-6", "spells-7", "spells-8",
+  "spells-9", "feats", "DTA1", "DTA2", "DTA3"
+ ].sort((left, right) => right.length - left.length);
+ const CHARACTER_IMPORT_RESERVED_ATTRS = {
+  character_import_json: true,
+  character_import_status: true,
+  character_import_busy: true,
+  character_import_minimize_toggle: true
+ };
+
+ const characterImportIsPlainObject = function(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+ };
+
+ const characterImportMultiply32 = function(left, right) {
+  if(typeof Math.imul === "function") return Math.imul(left, right) >>> 0;
+  const leftHigh = (left >>> 16) & 0xffff;
+  const leftLow = left & 0xffff;
+  const rightHigh = (right >>> 16) & 0xffff;
+  const rightLow = right & 0xffff;
+  return (leftLow * rightLow + ((leftHigh * rightLow + leftLow * rightHigh) << 16)) >>> 0;
+ };
+
+ const characterImportGeneratedRowID = function(seed) {
+  let first = 2166136261;
+  let second = 2246822519;
+
+  String(seed).split("").forEach((character, index) => {
+   const code = character.charCodeAt(0);
+   first = characterImportMultiply32(first ^ code, 16777619);
+   second = characterImportMultiply32(second ^ (code + index + 1), 3266489917);
+ });
+
+  let result = "-TTD";
+  let state = first || 0x9e3779b9;
+  let alternate = second || 0x85ebca6b;
+  while(result.length < 20) {
+   state ^= state << 13;
+   state ^= state >>> 17;
+   state ^= state << 5;
+   state = (state + alternate) >>> 0;
+   alternate = characterImportMultiply32(alternate ^ state, 2246822519);
+   result += CHARACTER_IMPORT_ROW_ID_CHARACTERS.charAt(state % CHARACTER_IMPORT_ROW_ID_CHARACTERS.length);
+  }
+  return result;
+ };
+
+ const characterImportValidRowID = function(value) {
+  return /^-[A-Za-z0-9-]+$/.test(value);
+ };
+
+ const characterImportRowIDNeedsRemap = function(value) {
+  return /^-web/i.test(value) || (/^-ttd/i.test(value) && value.length !== 20);
+ };
+
+ const characterImportKnownSection = function(name) {
+  return CHARACTER_IMPORT_REPEATING_SECTIONS.find(section =>
+          name.indexOf(`repeating_${section}_`) === 0
+  ) || "";
+ };
+
+ const characterImportSafeAttributeName = function(name) {
+  if(!name || name.length > CHARACTER_IMPORT_MAX_NAME_LENGTH) return false;
+  if(name === "__proto__" || name === "prototype" || name === "constructor") return false;
+  return /^[A-Za-z0-9_-]+$/.test(name);
+ };
+
+ const characterImportScalarValue = function(value, exportedName) {
+  if(value === null || value === undefined) return "";
+  if(typeof value === "object" || typeof value === "function") {
+   throw new Error(`Attribute ${exportedName} must contain a scalar value.`);
+  }
+
+  const result = String(value);
+  if(result.length > CHARACTER_IMPORT_MAX_VALUE_LENGTH) {
+   throw new Error(`Attribute ${exportedName} exceeds the maximum supported value length.`);
+  }
+  return result;
+ };
+
+ const characterImportPlan = function(rawText) {
+  let text = String(rawText || "").replace(/^\uFEFF/, "").trim();
+  text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  if(!text) throw new Error("Paste the exported character JSON before importing.");
+  if(text.length > CHARACTER_IMPORT_MAX_JSON_LENGTH) {
+   throw new Error("The pasted JSON is too large for the sheet importer.");
+  }
+
+  let payload;
+  try {
+   payload = JSON.parse(text);
+  } catch(error) {
+   throw new Error(`The pasted content is not valid JSON: ${error.message}`);
+  }
+
+  if(!characterImportIsPlainObject(payload)) {
+   throw new Error("The pasted JSON does not contain a character object.");
+  }
+  if(payload.format !== CHARACTER_IMPORT_FORMAT) {
+   throw new Error(`Unsupported character format: ${String(payload.format || "missing")}.`);
+  }
+  if(Number(payload.schema_version) !== CHARACTER_IMPORT_SCHEMA_VERSION) {
+   throw new Error(`Unsupported schema version ${String(payload.schema_version)}. This sheet supports version ${CHARACTER_IMPORT_SCHEMA_VERSION}.`);
+  }
+  if(payload.canonical_attribute_prefix !== "attr_") {
+   throw new Error("The export does not declare the canonical attr_ prefix.");
+  }
+  if(!characterImportIsPlainObject(payload.attributes)) {
+   throw new Error("The export has no attributes object.");
+  }
+
+  const exportedNames = Object.keys(payload.attributes);
+  if(!exportedNames.length) throw new Error("The export contains no attributes.");
+  if(exportedNames.length > CHARACTER_IMPORT_MAX_ATTRIBUTES) {
+   throw new Error("The export contains too many attributes.");
+  }
+
+  const warnings = [];
+  const normalized = Object.create(null);
+  const rowIDMappings = Object.create(null);
+  const assignedRowIDs = Object.create(null);
+  const nativeRowIDs = Object.create(null);
+  let generatedRows = 0;
+  let ignoredAttributes = 0;
+
+  exportedNames.forEach(exportedName => {
+   if(exportedName.indexOf("attr_") !== 0) return;
+   const sourceName = exportedName.slice(5);
+   const generic = sourceName.match(/^repeating_(.+?)_(-[A-Za-z0-9-]+)_(.+)$/);
+   if(generic && characterImportValidRowID(generic[2]) && !characterImportRowIDNeedsRemap(generic[2])) {
+    nativeRowIDs[generic[2]] = true;
+   }
+  });
+
+  const remapRowID = function(section, sourceRowID) {
+   const mappingKey = `${section}\u0000${sourceRowID}`;
+   if(rowIDMappings[mappingKey]) return rowIDMappings[mappingKey];
+
+   let attempt = 0;
+   let rowID = characterImportGeneratedRowID(mappingKey);
+   while(nativeRowIDs[rowID] || assignedRowIDs[rowID]) {
+    attempt += 1;
+    rowID = characterImportGeneratedRowID(`${mappingKey}#${attempt}`);
+   }
+
+   rowIDMappings[mappingKey] = rowID;
+   assignedRowIDs[rowID] = true;
+   generatedRows += 1;
+   warnings.push(`Remapped repeating_${section} row ${sourceRowID} to Roll20 row ID ${rowID}.`);
+   return rowID;
+  };
+
+  const normalizeRepeatingName = function(name) {
+   if(name.indexOf("repeating_") !== 0) return name;
+
+   const generic = name.match(/^repeating_(.+?)_(-[A-Za-z0-9-]+)_(.+)$/);
+   if(generic && characterImportValidRowID(generic[2])) {
+    if(characterImportRowIDNeedsRemap(generic[2])) {
+     return `repeating_${generic[1]}_${remapRowID(generic[1], generic[2])}_${generic[3]}`;
+    }
+    return name;
+   }
+
+   let section = characterImportKnownSection(name);
+   const futurePlaceholder = name.match(/^repeating_(.+?)_(\$row[A-Za-z0-9-]*|\[[^\]]+\])_(.+)$/i);
+   if(!section && futurePlaceholder) section = futurePlaceholder[1];
+   if(!section) {
+    throw new Error(`Repeating attribute lacks a recognizable row ID or known section: attr_${name}`);
+   }
+
+   const rest = name.slice(`repeating_${section}_`.length);
+   const placeholder = rest.match(/^(\$?row[A-Za-z0-9-]*|\[[^\]]+\])_(.+)$/i);
+   const token = placeholder ? placeholder[1] : "missing-row";
+   const field = placeholder ? placeholder[2] : rest;
+   if(!field) throw new Error(`Repeating attribute has no field name: attr_${name}`);
+   return `repeating_${section}_${remapRowID(section, token)}_${field}`;
+  };
+
+  const reporderEntries = [];
+  exportedNames.forEach(exportedName => {
+   if(exportedName.indexOf("attr_") !== 0) {
+    throw new Error(`Non-canonical attribute key: ${exportedName}`);
+   }
+
+   const sourceName = exportedName.slice(5);
+   if(CHARACTER_IMPORT_RESERVED_ATTRS[sourceName]) {
+    ignoredAttributes += 1;
+    return;
+   }
+   if(sourceName.indexOf("_reporder_repeating_") === 0) {
+    reporderEntries.push({ name: sourceName, exportedName });
+    return;
+   }
+
+   const storedName = normalizeRepeatingName(sourceName);
+   if(!characterImportSafeAttributeName(storedName)) {
+    throw new Error(`Unsafe attribute name: ${exportedName}`);
+   }
+   if(Object.prototype.hasOwnProperty.call(normalized, storedName)) {
+    throw new Error(`Duplicate attribute after normalization: ${storedName}`);
+   }
+   normalized[storedName] = characterImportScalarValue(payload.attributes[exportedName], exportedName);
+  });
+
+  reporderEntries.forEach(entry => {
+   if(!characterImportSafeAttributeName(entry.name)) {
+    throw new Error(`Unsafe attribute name: ${entry.exportedName}`);
+   }
+   const section = entry.name.slice("_reporder_repeating_".length);
+   const rawOrder = characterImportScalarValue(payload.attributes[entry.exportedName], entry.exportedName);
+   normalized[entry.name] = rawOrder.split(",").map(value => value.trim()).filter(Boolean).map(sourceRowID => {
+    if(characterImportRowIDNeedsRemap(sourceRowID)) return remapRowID(section, sourceRowID);
+    return sourceRowID;
+   }).join(",");
+  });
+
+  if(!Object.keys(normalized).length) {
+   throw new Error("The export contains no importable character attributes.");
+  }
+  if(ignoredAttributes) {
+   warnings.push(`Ignored ${ignoredAttributes} importer-only control field${ignoredAttributes === 1 ? "" : "s"}.`);
+  }
+
+  return {
+   attributes: normalized,
+   warnings,
+   generatedRows,
+   characterName: normalized.character_name || "TTD Character"
+  };
+ };
+
+ const characterImportGetAttrsInBatches = function(names, index, collected, callback) {
+  if(index >= names.length) {
+   callback(collected);
+   return;
+  }
+
+  const batch = names.slice(index, index + CHARACTER_IMPORT_BATCH_SIZE);
+  getAttrs(batch, function(values) {
+   Object.keys(values).forEach(name => { collected[name] = values[name]; });
+   characterImportGetAttrsInBatches(names, index + batch.length, collected, callback);
+  });
+ };
+
+ const characterImportSetAttrsInBatches = function(attributes, names, index, callback) {
+  if(index >= names.length) {
+   callback();
+   return;
+  }
+
+  const batchNames = names.slice(index, index + CHARACTER_IMPORT_BATCH_SIZE);
+  const batch = {};
+  batchNames.forEach(name => { batch[name] = attributes[name]; });
+  setAttrs(batch, { silent: true }, function() {
+   characterImportSetAttrsInBatches(attributes, names, index + batchNames.length, callback);
+  });
+ };
+
+ const characterImportGrantRows = function(attributes) {
+  const result = { repeating_feats: {}, repeating_abilities: {} };
+ Object.keys(attributes).forEach(name => {
+   const match = name.match(/^(repeating_(?:feats|abilities))_(-[A-Za-z0-9-]+)_/);
+   // Roll20 returns repeating IDs from getSectionIDs() in lowercase even
+   // when the attribute was written with a mixed-case generated row ID.
+   if(match) result[match[1]][match[2].toLowerCase()] = true;
+  });
+  return result;
+ };
+
+ const characterImportRemoveStaleGrantRows = function(importedRows, sections, index, callback) {
+  if(index >= sections.length) {
+   callback();
+   return;
+  }
+
+  const section = sections[index];
+  getSectionIDs(section, function(rowIds) {
+   if(!rowIds.length) {
+    characterImportRemoveStaleGrantRows(importedRows, sections, index + 1, callback);
+    return;
+   }
+   const grantAttrs = rowIds.map(rowId => `${section}_${rowId}_grant_key`);
+   getAttrs(grantAttrs, function(values) {
+    rowIds.forEach(rowId => {
+     if(String(values[`${section}_${rowId}_grant_key`] || "").trim() &&
+             !importedRows[section][String(rowId).toLowerCase()]) {
+      removeRepeatingRow(`${section}_${rowId}`);
+     }
+    });
+    characterImportRemoveStaleGrantRows(importedRows, sections, index + 1, callback);
+   });
+  });
+ };
+
+ const characterImportStatus = function(message, busy, clearJSON) {
+  const updates = {
+   character_import_status: message,
+   character_import_busy: busy ? "1" : "0"
+  };
+  if(clearJSON) updates.character_import_json = "";
+  setAttrs(updates);
+ };
+
+ on("clicked:characterimport", function() {
+  getAttrs(["character_import_json", "character_import_busy"], function(values) {
+   if(values.character_import_busy === "1") return;
+
+   setAttrs({
+    character_import_busy: "1",
+    character_import_status: "Validating pasted JSON..."
+   }, function() {
+    let plan;
+    try {
+     plan = characterImportPlan(values.character_import_json);
+    } catch(error) {
+     characterImportStatus(`Import failed: ${error.message}`, false, false);
+     return;
+    }
+
+    const names = Object.keys(plan.attributes);
+    characterImportGetAttrsInBatches(names, 0, {}, function(existingValues) {
+     let changed = 0;
+     let unchanged = 0;
+     names.forEach(name => {
+      if(String(existingValues[name] == null ? "" : existingValues[name]) === plan.attributes[name]) unchanged += 1;
+      else changed += 1;
+     });
+
+     characterImportSetAttrsInBatches(plan.attributes, names, 0, function() {
+      const importedGrantRows = characterImportGrantRows(plan.attributes);
+      characterImportRemoveStaleGrantRows(
+              importedGrantRows,
+              ["repeating_feats", "repeating_abilities"],
+              0,
+              function() {
+               // The bulk write is silent so partially imported rows cannot wake
+               // the grant generator. Reconcile once after every row exists.
+               queueUpdateAutomaticGrants();
+
+               const lines = [
+                "Import complete.",
+                `Character: ${plan.characterName}`,
+                `Canonical attributes: ${names.length}`,
+                `Changed: ${changed}; already matching: ${unchanged}.`,
+                `Generated repeating row IDs: ${plan.generatedRows}`
+               ];
+               if(plan.warnings.length) {
+                const shownWarnings = plan.warnings.slice(0, 6);
+                lines.push("Warnings:");
+                shownWarnings.forEach(warning => lines.push(`- ${warning}`));
+                if(plan.warnings.length > shownWarnings.length) {
+                 lines.push(`- ${plan.warnings.length - shownWarnings.length} additional warning(s) omitted.`);
+                }
+               }
+               lines.push("The pasted JSON was cleared after the successful import.");
+               characterImportStatus(lines.join("\n"), false, true);
+              }
+      );
+     });
+    });
+   });
+  });
+ });
+
+ //</editor-fold>
 
  on("change:repeating_abilities:minimize_ability " +
          "change:repeating_abilities:ability_save_throw " +
