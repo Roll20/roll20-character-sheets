@@ -803,6 +803,23 @@ div.sheet-showhide{
 input[type="checkbox"].sheet-showhide:checked + span ~ div.sheet-showhide{
     display: block;
 }
+
+div.sheet-showhide.sheet-obtable {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    box-sizing: border-box;
+    padding: 6px;
+    background: #ffffff;
+    border: 1px solid black;
+    white-space: normal;
+}
+
+div.sheet-showhide.sheet-obtable table {
+    width: 100%;
+}
+
 input.sheet-stockage{
     display: none;
     width: 100px;
@@ -1008,6 +1025,7 @@ button[type=roll].sheet-roll{
     box-shadow: none;
     background: none;
     background-color: inherit;
+    color: inherit;
     display: inline-block;
     vertical-align: top;
     padding: 0px;
@@ -1031,6 +1049,7 @@ button[type=roll].sheet-quote{
     box-shadow: none;
     background: none;
     background-color: inherit;
+    color: inherit;
     display: inline-block;
     vertical-align: top;
     padding: 0px;
@@ -1201,19 +1220,18 @@ input[type=radio].sheet-openended.sheet-unchecked:checked ~ input[type=radio].sh
 .sheet-lp-c5 { grid-template-columns: repeat(5, auto); }
 
 .sheet-lp-c8 {
+    width: 100%;
     --lp-name-col: 118px;
-    grid-template-columns: var(--lp-name-col) repeat(7, auto);
+    grid-template-columns: minmax(var(--lp-name-col), 1fr) repeat(7, auto);
 }
 
-.sheet-lp-c8 .sheet-lp-row > .sheet-lp-cell:first-child textarea {
+.sheet-lp-c8 .sheet-lp-row > .sheet-lp-cell:first-child input[type=text] {
     box-sizing: border-box;
     width: 100%;
     height: 100%;
 
     font-family: inherit;
     font-size: inherit;
-    resize: vertical;
-    overflow: auto;
 }
 
 .sheet-lp-skills {
@@ -1680,6 +1698,15 @@ body.sheet-darkmode .sheetform {
     color: var(--bw-surface);
 }
 
+/* --- roll buttons -------------------------------------------------------- */
+
+.sheet-darkmode .charsheet button[type=roll].sheet-roll,
+.sheet-darkmode .charsheet button[type=roll].sheet-roll::before,
+.sheet-darkmode .charsheet button[type=roll].sheet-quote,
+.sheet-darkmode .charsheet button[type=roll].sheet-quote::before {
+    color: var(--bw-ink);
+}
+
 /* --- checkboxes ---------------------------------------------------------- */
 
 .sheet-darkmode .charsheet input[type=checkbox] {
@@ -1808,6 +1835,11 @@ body.sheet-darkmode .sheetform {
 .sheet-darkmode .sheet-learned:checked + .sheet-learned2 {
     border-bottom: 1px solid var(--bw-rule);
     color: var(--bw-ink);
+}
+
+.sheet-darkmode div.sheet-showhide.sheet-obtable {
+    background: var(--bw-surface);
+    border-color: var(--bw-rule);
 }
 
 /* --- radios -------------------------------------------------------------- */
@@ -2030,6 +2062,28 @@ body.sheet-darkmode .sheetform {
         display: flex;
         flex-wrap: wrap;
         align-items: flex-end;
+        row-gap: 8px;
+    }
+
+    .charsheet div.sheet-3colrow + div.sheet-3colrow,
+    .charsheet div.sheet-row + div.sheet-3colrow,
+    .charsheet div.sheet-3colrow + div.sheet-row {
+        margin-top: 14px;
+    }
+
+    .charsheet div.sheet-row + div.sheet-row {
+        margin-top: 6px;
+    }
+
+    .charsheet div.sheet-table + div.sheet-table {
+        margin-top: 12px;
+    }
+
+    /* ...but never inside a block -- those lines stay as tight as the preview */
+    .charsheet div.sheet-col div.sheet-row + div.sheet-row,
+    .charsheet div.sheet-col div.sheet-3colrow + div.sheet-3colrow,
+    .charsheet div.sheet-col div.sheet-table + div.sheet-table {
+        margin-top: 0;
     }
 
     .charsheet div.sheet-col,
@@ -2038,6 +2092,12 @@ body.sheet-darkmode .sheetform {
     .charsheet div.sheet-4col {
         flex: 1 1 46%;
         min-width: 0;
+        box-sizing: border-box;
+        padding-right: 12px;
+    }
+
+    .charsheet div.sheet-col div.sheet-col {
+        padding-right: 0;
     }
 
     .charsheet div.sheet-col.sheet-stat-width,
@@ -2048,6 +2108,7 @@ body.sheet-darkmode .sheetform {
     .charsheet div.sheet-stat-width + div.sheet-col,
     .charsheet div.sheet-attribute-width + div.sheet-col {
         flex: 0 0 32px;
+        padding-right: 0;
     }
 
     .charsheet div.sheet-row.sheet-center {
@@ -2071,6 +2132,12 @@ body.sheet-darkmode .sheetform {
         white-space: normal;
     }
 
+    .charsheet input:not(.sheet-statname),
+    .charsheet select,
+    .charsheet textarea {
+        max-width: 100%;
+    }
+
     .charsheet div.sheet-npcrow1,
     .charsheet div.sheet-npcrow2,
     .charsheet div.sheet-npcrow5,
@@ -2089,14 +2156,6 @@ body.sheet-darkmode .sheetform {
         height: auto !important;
     }
 
-    .charsheet div[style*="min-width:700px"] {
-        min-width: 0 !important;
-    }
-
-    .charsheet table[style*="width: 700px"] {
-        width: 100% !important;
-    }
-
     .charsheet div.sheet-table > div.sheet-col {
         width: 100% !important;
     }
@@ -2110,13 +2169,15 @@ body.sheet-darkmode .sheetform {
 
     .charsheet table.sheet-page2,
     .charsheet div.sheet-skills {
-        width: calc(50% - 10px);
+        width: calc(50% - 18px);
+        margin-bottom: 14px;
     }
 
     .charsheet div.sheet-alearned {
         width: auto;
         min-width: 0;
         max-width: 100%;
+        margin-bottom: 10px;
     }
 
     /* --- the tables that cannot reflow ------------------------------------ */
@@ -2125,15 +2186,18 @@ body.sheet-darkmode .sheetform {
     .charsheet table.sheet-weapons {
         max-width: 100%;
         overflow-x: auto;
+        padding-bottom: 6px;
     }
 
     .charsheet table.sheet-page3 {
         display: block;
         overflow-x: auto;
+        padding-bottom: 6px;
     }
 
     .charsheet button.sheet-tab-button {
-        margin-bottom: 4px;
+        margin-bottom: 6px;
+        margin-right: 6px;
     }
 }
 
@@ -2144,6 +2208,12 @@ body.sheet-darkmode .sheetform {
     .charsheet div.sheet-3col,
     .charsheet div.sheet-4col {
         flex-basis: 100%;
+        padding-right: 0;
+    }
+
+    .charsheet div.sheet-row,
+    .charsheet div.sheet-3colrow {
+        row-gap: 10px;
     }
 
     .charsheet div.sheet-col.sheet-stat-width,
@@ -2155,6 +2225,7 @@ body.sheet-darkmode .sheetform {
     .charsheet div.sheet-skills {
         width: 100%;
         margin-left: 0;
+        margin-bottom: 16px;
     }
 
     .charsheet input,
