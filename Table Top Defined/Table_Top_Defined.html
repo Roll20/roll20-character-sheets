@@ -3636,10 +3636,10 @@
    <button type="action" class="Small-Button character-import-toggle-button"
            name="act_characterimportminimize"
            title="Expand or collapse the character importer"></button>
-   Import Character JSON
+   Import / Export Character JSON
   </div>
   <div class="character-import-body">
-   <p>Paste a Table Top Defined character export below. Imports update matching fields and preserve unrelated manual repeating rows.</p>
+   <p>Paste a Table Top Defined character export below, or generate one from this character. Imports update matching fields and preserve unrelated manual repeating rows.</p>
    <textarea name="attr_character_import_json"
              title="Table Top Defined character JSON"
              placeholder="Paste the complete exported .json contents here..."
@@ -3647,10 +3647,12 @@
    <div class="character-import-actions">
     <button type="action" class="character-import-button"
             name="act_characterimport">Import Character</button>
-    <span>Validate first, then import into this character.</span>
+    <button type="action" class="character-import-button"
+            name="act_characterexport">Export Character</button>
+    <span>Export replaces the JSON above with this character's current data.</span>
    </div>
    <label class="character-import-status-label">
-    Import Status
+    Import / Export Status
     <textarea class="character-import-status"
               name="attr_character_import_status"
               readonly>Ready.</textarea>
@@ -6332,6 +6334,162 @@
   character_import_minimize_toggle: true
  };
 
+ const characterExportFieldList = function(value) {
+  return String(value || "").trim().split(/\s+/).filter(Boolean);
+ };
+
+ // Sheet workers cannot enumerate ordinary attributes, so keep this manifest
+ // synchronized with the non-repeating attr_* controls in the sheet markup.
+ const CHARACTER_EXPORT_STANDARD_ATTRIBUTES = characterExportFieldList(`
+  acrobatics_misc acrobatics_sp acrobatics_total acrobatics_trained armor_bonus armor_description
+  armor_enhancement armor_hp armor_hp_max armor_imbuement_description armor_minimize_toggle
+  armor_name armor_sr armor_total_bonus attack_curve bab balance_misc balance_sp balance_total
+  balance_trained base_skill_growth base_speed beguile_misc beguile_sp beguile_total beguile_trained
+  belt_desc biography bushcraft_misc bushcraft_sp bushcraft_total bushcraft_trained
+  carrying_capacity cha_bonus cha_ench cha_mod cha_pen cha_total character_age character_gender
+  character_height character_name character_weight charisma check_pen cl close_range con_bonus
+  con_ench con_hp con_mod con_pen con_total conceal_misc conceal_sp conceal_total conceal_trained
+  concentration_misc concentration_sp concentration_total concentration_trained constitution
+  constitution_score_backup contacts counterfeit_misc counterfeit_sp counterfeit_total
+  counterfeit_trained craft_1_misc craft_1_name craft_1_sp craft_1_total craft_1_trained
+  craft_2_misc craft_2_name craft_2_sp craft_2_total craft_2_trained craft_3_misc craft_3_name
+  craft_3_sp craft_3_total craft_3_trained crafting_air_average crafting_air_excellent
+  crafting_air_flawless crafting_air_good crafting_air_poor crafting_cordage crafting_death_average
+  crafting_death_excellent crafting_death_flawless crafting_death_good crafting_death_poor
+  crafting_earth_average crafting_earth_excellent crafting_earth_flawless crafting_earth_good
+  crafting_earth_poor crafting_elemental_portions_total crafting_elemental_weight
+  crafting_fire_average crafting_fire_excellent crafting_fire_flawless crafting_fire_good
+  crafting_fire_poor crafting_force_average crafting_force_excellent crafting_force_flawless
+  crafting_force_good crafting_force_poor crafting_ice_average crafting_ice_excellent
+  crafting_ice_flawless crafting_ice_good crafting_ice_poor crafting_leather crafting_life_average
+  crafting_life_excellent crafting_life_flawless crafting_life_good crafting_life_poor
+  crafting_materials_minimize_toggle crafting_metal crafting_mineral crafting_mundane_total
+  crafting_sundries crafting_textile crafting_void_average crafting_void_excellent
+  crafting_void_flawless crafting_void_good crafting_void_poor crafting_water_average
+  crafting_water_excellent crafting_water_flawless crafting_water_good crafting_water_poor
+  crafting_wood crown crown_desc crown_hidden dark_mode death_save_1 death_save_2 death_save_3
+  deflection dex_ac_limit dex_bonus dex_ench dex_mod dex_pen dex_total dexterity diffuse_background
+  diplomacy_misc diplomacy_sp diplomacy_total diplomacy_trained discern_intent_misc
+  discern_intent_sp discern_intent_total discern_intent_trained disguise_misc disguise_sp
+  disguise_total disguise_trained dodge_ac ego_base_num ego_base_str ego_magic ego_misc_num
+  ego_temp_num ego_total enable_automatic_grants encumbrance_state encumbrance_status
+  escape_artist_misc escape_artist_sp escape_artist_total escape_artist_trained face face_desc
+  face_hidden family feet feet_desc feet_hidden flat_fac fly_speed focus_description focus_ench
+  focus_hp focus_hp_max focus_imbuement_description focus_minimize_toggle focus_name focus_sr
+  focus_value forearm_desc forearms forearms_hidden fort_base_num fort_base_str fort_magic
+  fort_misc_num fort_temp_num fort_total gather_information_misc gather_information_sp
+  gather_information_total gather_information_trained gp grapple grapple_feat grapple_misc
+  grapple_temp haggle_misc haggle_sp haggle_total haggle_trained hands hands_desc hands_hidden haste
+  hd heal_misc heal_sp heal_total heal_trained hp hp_max init_bonus init_total insight_ac int_bonus
+  int_ench int_mod int_pen int_total intelligence intelligence_score_backup intimidate_misc
+  intimidate_sp intimidate_total intimidate_trained investigate_misc investigate_sp
+  investigate_total investigate_trained journal key_cha key_con key_dex key_int key_str key_wis
+  knowledge_1_misc knowledge_1_name knowledge_1_sp knowledge_1_total knowledge_1_trained
+  knowledge_2_misc knowledge_2_name knowledge_2_sp knowledge_2_total knowledge_2_trained
+  knowledge_3_misc knowledge_3_name knowledge_3_sp knowledge_3_total knowledge_3_trained
+  knowledge_4_misc knowledge_4_name knowledge_4_sp knowledge_4_total knowledge_4_trained
+  knowledge_5_misc knowledge_5_name knowledge_5_sp knowledge_5_total knowledge_5_trained
+  knowledge_6_misc knowledge_6_name knowledge_6_sp knowledge_6_total knowledge_6_trained listen_misc
+  listen_sp listen_total listen_trained lockpicking_misc lockpicking_sp lockpicking_total
+  lockpicking_trained long_range magic_curve magic_touch_attack magic_touch_attack_feat
+  magic_touch_attack_misc magic_touch_attack_temp main_notes martial_touch_attack
+  martial_touch_attack_feat martial_touch_attack_misc martial_touch_attack_temp maximum_lift
+  medium_range misc_ac misc_hp move_silently_misc move_silently_sp move_silently_total
+  move_silently_trained mystic nat_int_mod natural_ac neck neck_desc neck_hidden
+  no_constitution_score no_intelligence_score parry_ac perform_1_misc perform_1_name perform_1_sp
+  perform_1_total perform_1_trained perform_2_misc perform_2_name perform_2_sp perform_2_total
+  perform_2_trained perform_3_misc perform_3_name perform_3_sp perform_3_total perform_3_trained
+  pl_total_gold player_name pma primary_definition_name primary_description profession_1_misc
+  profession_1_name profession_1_sp profession_1_total profession_1_trained profession_2_misc
+  profession_2_name profession_2_sp profession_2_total profession_2_trained prog_hp ref_base_num
+  ref_base_str ref_magic ref_misc_num ref_temp_num ref_total religion remaining_skill_points
+  ride_misc ride_sp ride_total ride_trained ring_1 ring_1_desc ring_1_hidden ring_2 ring_2_desc
+  ring_2_hidden roll_hp sabotage_device_misc sabotage_device_sp sabotage_device_total
+  sabotage_device_trained sanctity sheet_tab sheet_version shield shield_check_pen
+  shield_description shield_dex_ac_limit shield_enhancement shield_hp shield_hp_max
+  shield_imbuement_description shield_minimize_toggle shield_name shield_sr shield_total_bonus
+  shoulder_desc shoulders shoulders_hidden shove_opposed shove_opposed_feat shove_opposed_misc
+  shove_opposed_temp size skill_growth_modifier skill_point_modifier skills_known
+  sleight_of_hand_misc sleight_of_hand_sp sleight_of_hand_total sleight_of_hand_trained slow
+  specialty species spell_0_minimize_toggle spell_0_per_day spell_0_remaining
+  spell_1_minimize_toggle spell_1_per_day spell_1_remaining spell_2_minimize_toggle spell_2_per_day
+  spell_2_remaining spell_3_minimize_toggle spell_3_per_day spell_3_remaining
+  spell_4_minimize_toggle spell_4_per_day spell_4_remaining spell_5_minimize_toggle spell_5_per_day
+  spell_5_remaining spell_6_minimize_toggle spell_6_per_day spell_6_remaining
+  spell_7_minimize_toggle spell_7_per_day spell_7_remaining spell_8_minimize_toggle spell_8_per_day
+  spell_8_remaining spell_9_minimize_toggle spell_9_per_day spell_9_remaining
+  spell_penetration_bonus spell_prof spot_misc spot_sp spot_total spot_trained str_bonus str_ench
+  str_mod str_pen str_total strength swim_misc swim_sp swim_speed swim_total swim_trained torso
+  torso_desc torso_hidden total_ac total_possible_skill_points total_weight touch_ac trample_opposed
+  trample_opposed_feat trample_opposed_misc trample_opposed_temp trip_opposed trip_opposed_feat
+  trip_opposed_misc trip_opposed_temp upper_arm_desc upper_arms upper_arms_hidden use_rope_misc
+  use_rope_sp use_rope_total use_rope_trained versatile waist waist_hidden wil_base_num wil_base_str
+  wil_magic wil_misc_num wil_temp_num wil_total wis_bonus wis_ench wis_mod wis_pen wis_total wisdom
+  wound_dc
+ `);
+
+ const CHARACTER_EXPORT_REPEATING_FIELDS = {
+  DTA1: characterExportFieldList(`
+   dta_1_minimize_toggle species_trait_description species_trait_name
+  `),
+  DTA2: characterExportFieldList(`
+   dta_2_minimize_toggle secondary_definition_description secondary_definition_name
+  `),
+  DTA3: characterExportFieldList(`
+   affliction_description affliction_name dta_3_minimize_toggle min_afflictions_val
+  `),
+  abilities: characterExportFieldList(`
+   ability_action ability_dc ability_description_text ability_dice_num ability_dice_type
+   ability_duration ability_name ability_range ability_roll ability_save_throw ability_spell_prof
+   ability_sr_confirm ability_target ability_type grant_hidden grant_key granted_level
+   granted_source minimize_ability resource_name_card source_available user_description uses
+  `),
+  conditions: characterExportFieldList(`condition_duration condition_effect condition_type`),
+  damagereduction: characterExportFieldList(`damage_reduction_bypass damage_reduction_value`),
+  feats: characterExportFieldList(`
+   feat_description feat_name grant_hidden grant_key granted_level granted_source min_feat_val
+   source_available
+  `),
+  locationtotals: characterExportFieldList(`
+   inventory_location_name location_item_count location_on_person location_total_weight
+   location_weight_reduction
+  `),
+  maininventory: characterExportFieldList(`
+   inventory_location inventory_minimize_toggle location_validation main_inventory_description
+   main_inventory_name main_inventory_value main_piece_weight main_quantity main_total_weight
+  `),
+  profitloss: characterExportFieldList(`pl_credits pl_debits pl_memo pl_running_total`),
+  resistance: characterExportFieldList(`resistance_type resistance_value`),
+  resources: characterExportFieldList(`resource_name resource_number resource_number_max`)
+ };
+
+ const CHARACTER_EXPORT_SPELL_FIELDS = characterExportFieldList(`
+  casting_time category components dice_num dice_type duration effect harmless prepared range
+  save_success school spell_card spell_dc_mod spell_description spell_name spell_saving sr
+ `);
+ for(let spellLevel = 0; spellLevel <= 9; spellLevel += 1) {
+  const fields = CHARACTER_EXPORT_SPELL_FIELDS.slice();
+  if(spellLevel > 0) fields.push("known", "memorized");
+  fields.push(`spell_${spellLevel}_minimize_advanced_toggle`, `spell_${spellLevel}_minimize_toggle`);
+  CHARACTER_EXPORT_REPEATING_FIELDS[`spells-${spellLevel}`] = fields;
+ }
+
+ const CHARACTER_EXPORT_WEAPON_FIELDS = characterExportFieldList(`
+  advanced_weapon_minimize_toggle bonus_to_attack bonus_to_damage crack_shot crit_low
+  crit_weapon_damage critical_feat_damage_die critical_feat_damage_num critical_feat_damage_type
+  critical_imbuement_damage_die critical_imbuement_damage_num critical_imbuement_damage_type
+  damage_dice_num damage_dice_type deadly_assault ench_damage_dice enhance_to_attack
+  extra_ench_dice_crit focus_attack focus_points_used full_attack_roll grandmaster
+  grandmaster_value imbuement_damage_1_die imbuement_damage_1_num imbuement_damage_1_type
+  imbuement_damage_2_die imbuement_damage_2_num imbuement_damage_2_type misc_bonus_to_attack
+  opportunist_damage_die opportunist_damage_num twin_talon two_handed weapon_crit_mod
+  weapon_damage weapon_damage_type weapon_description weapon_flanking weapon_hp weapon_hp_max
+  weapon_improved_flanking weapon_minimize_toggle weapon_name weapon_opportunist weapon_sr
+  weapon_to_damage weapon_to_hit
+ `);
+ CHARACTER_EXPORT_REPEATING_FIELDS.weapons1 = CHARACTER_EXPORT_WEAPON_FIELDS.slice();
+ CHARACTER_EXPORT_REPEATING_FIELDS.weapons2 = CHARACTER_EXPORT_WEAPON_FIELDS.slice();
+
  const characterImportIsPlainObject = function(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
  };
@@ -6580,6 +6738,36 @@
   });
  };
 
+ const characterExportCollectRepeatingNames = function(sections, index, names, rowCount, callback) {
+  if(index >= sections.length) {
+   callback(names, rowCount);
+   return;
+  }
+
+  const section = sections[index];
+  const sectionName = `repeating_${section}`;
+  const fields = CHARACTER_EXPORT_REPEATING_FIELDS[section];
+  if(!fields) {
+   characterImportStatus(`Export failed: No field manifest exists for ${sectionName}.`, false, false);
+   return;
+  }
+
+  getSectionIDs(sectionName, function(rowIds) {
+   const ids = rowIds || [];
+   names.push(`_reporder_${sectionName}`);
+   ids.forEach(rowID => {
+    fields.forEach(field => names.push(`${sectionName}_${rowID}_${field}`));
+   });
+   characterExportCollectRepeatingNames(
+           sections,
+           index + 1,
+           names,
+           rowCount + ids.length,
+           callback
+   );
+  });
+ };
+
  const characterImportGrantRows = function(attributes) {
   const result = { repeating_feats: {}, repeating_abilities: {} };
  Object.keys(attributes).forEach(name => {
@@ -6682,6 +6870,72 @@
       );
      });
     });
+   });
+  });
+ });
+
+ on("clicked:characterexport", function() {
+  getAttrs(["character_import_busy"], function(values) {
+   if(values.character_import_busy === "1") return;
+
+   // Clear first so a failed export cannot leave stale JSON looking current.
+   setAttrs({
+    character_import_json: "",
+    character_import_busy: "1",
+    character_import_status: "Cleared previous JSON. Collecting character attributes..."
+   }, function() {
+    const names = CHARACTER_EXPORT_STANDARD_ATTRIBUTES.slice();
+    characterExportCollectRepeatingNames(
+            CHARACTER_IMPORT_REPEATING_SECTIONS,
+            0,
+            names,
+            0,
+            function(exportNames, repeatingRows) {
+             if(exportNames.length > CHARACTER_IMPORT_MAX_ATTRIBUTES) {
+              characterImportStatus(
+                      `Export failed: This character has ${exportNames.length} attributes; the schema limit is ${CHARACTER_IMPORT_MAX_ATTRIBUTES}.`,
+                      false,
+                      false
+              );
+              return;
+             }
+
+             characterImportGetAttrsInBatches(exportNames, 0, {}, function(exportValues) {
+              try {
+               const attributes = {};
+               exportNames.forEach(name => {
+                const exportedName = `attr_${name}`;
+                attributes[exportedName] = characterImportScalarValue(exportValues[name], exportedName);
+               });
+
+               const payload = {
+                format: CHARACTER_IMPORT_FORMAT,
+                schema_version: CHARACTER_IMPORT_SCHEMA_VERSION,
+                canonical_attribute_prefix: "attr_",
+                attributes
+               };
+               const json = JSON.stringify(payload, null, 2);
+               if(json.length > CHARACTER_IMPORT_MAX_JSON_LENGTH) {
+                throw new Error(`The generated JSON is ${json.length} characters; the schema limit is ${CHARACTER_IMPORT_MAX_JSON_LENGTH}.`);
+               }
+
+               setAttrs({
+                character_import_json: json,
+                character_import_busy: "0",
+                character_import_status: [
+                 "Export complete.",
+                 `Character: ${attributes.attr_character_name || "TTD Character"}`,
+                 `Canonical attributes: ${exportNames.length}`,
+                 `Repeating rows: ${repeatingRows}`,
+                 "The previous JSON was cleared before this export was generated."
+                ].join("\n")
+               });
+              } catch(error) {
+               characterImportStatus(`Export failed: ${error.message}`, false, false);
+              }
+             });
+            }
+    );
    });
   });
  });
