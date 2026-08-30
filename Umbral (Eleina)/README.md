@@ -76,6 +76,17 @@ pata, el tope baja solo y hay que decidir en el sitio qué se queda en el barro.
 Lo que no respira pero tampoco se carga —un taller, una parte de una nave, una patente de corso—
 se anota como el documento que lo acredita, con Estorbo 0.
 
+### Si vienes de la versión anterior
+
+El equipo era antes un solo cuadro de texto y ahora son filas con su Estorbo. **No hay que copiar
+nada a mano**: la primera vez que abras una ficha vieja, la hoja vuelca lo que hubiera escrito en
+ese cuadro y crea una fila por cada línea, con Estorbo 0 —adivinar cuánto ocupa cada cosa sería
+inventar—. Si el texto no tenía saltos de línea, entra entero en una sola fila.
+
+El cuadro de texto original **no se borra**: su atributo sigue guardado en la ficha, invisible pero
+intacto, por si hubiera que mirarlo. La conversión se hace una sola vez y no se repite al volver a
+abrir.
+
 ## Antes de la primera sesión
 
 **Las barras del token.** En los ajustes del token: **barra 1 → `aguante`**, **barra 2 →

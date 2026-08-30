@@ -15,6 +15,10 @@
   <input type="radio" name="attr_tab" class="sheet-tab sheet-tab3" value="3"><span class="sheet-tab-lab">Magia</span>
   <input type="radio" name="attr_tab" class="sheet-tab sheet-tab4" value="4"><span class="sheet-tab-lab">Notas</span>
 
+  <!-- Por qué versión de la hoja ha pasado ya esta ficha. Lo usa la migración
+       del equipo, abajo del todo. Una ficha nueva empieza en 0 y sube sola. -->
+  <input type="hidden" name="attr_version_hoja" value="0">
+
   <!-- ── Cabecera, siempre visible ───────────────────────────────── -->
   <div class="sheet-cabecera">
     <div class="sheet-retrato">
@@ -499,4 +503,46 @@ const recalcularEstorbo = () => {
 on('change:vigor change:proteccion sheet:opened', recalcularEstorbo);
 on('change:repeating_equipo remove:repeating_equipo', recalcularEstorbo);
 on('change:repeating_companeros remove:repeating_companeros', recalcularEstorbo);
+
+// ── Migración · del cuadro de texto a las filas de equipo ────────────
+// Hasta la versión 1 el equipo era un solo textarea llamado `equipo`. Ahora
+// son filas con su Estorbo, y una ficha vieja se quedaría con el texto
+// escrito en un campo que ya no se pinta. Al abrirla se vuelca:
+//
+//   · una fila por línea escrita, que es como la gente lista sus cosas;
+//   · si no hay saltos de línea, una sola fila con todo el texto dentro;
+//   · con Estorbo 0, porque adivinar cuánto ocupa cada cosa sería inventar.
+//
+// El textarea NO se borra: el atributo sigue en la ficha con su valor
+// original, invisible pero intacto, por si algo saliera mal. Y `version_hoja`
+// impide que esto se repita en la siguiente apertura.
+const VERSION_HOJA = 2;
+const MAX_FILAS_MIGRADAS = 20;
+
+on('sheet:opened', () => {
+  getAttrs(['version_hoja', 'equipo'], v => {
+    if ((parseInt(v.version_hoja, 10) || 0) >= VERSION_HOJA) { return; }
+
+    const viejo  = (v.equipo || '').trim();
+    const salida = { version_hoja: VERSION_HOJA };
+
+    if (viejo !== '') {
+      let trozos = viejo.split(/\r?\n/).map(t => t.trim()).filter(t => t !== '');
+      // Una lista larguísima no se convierte en cincuenta filas: las que
+      // pasen del tope se juntan en la última, que sigue siendo su texto.
+      if (trozos.length > MAX_FILAS_MIGRADAS) {
+        trozos = trozos.slice(0, MAX_FILAS_MIGRADAS - 1)
+                       .concat(trozos.slice(MAX_FILAS_MIGRADAS - 1).join(' · '));
+      }
+      trozos.forEach(texto => {
+        const pre = 'repeating_equipo_' + generateRowID() + '_';
+        salida[pre + 'eq_nombre']  = texto;
+        salida[pre + 'eq_estorbo'] = 0;
+        salida[pre + 'eq_carga']   = 0;
+      });
+    }
+
+    setAttrs(salida, { silent: true }, recalcularEstorbo);
+  });
+});
 </script>
