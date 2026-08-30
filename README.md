@@ -85,6 +85,11 @@ All contributions to this repository must meet the minimum requirements outlined
 
 If you are submitting a new sheet that is officially supported by the game's publisher, please ask that the publisher reach out to us at [licensing@roll20.net](mailto:licensing@roll20.net) to confirm they are aware of and supporting this sheet as an official sheet with their name attached, before submitting your PR.
 
+When opening a Pull Request, use the template that matches your change:
+
+* **Changes to an existing sheet:** [open a PR with the default template](https://github.com/Roll20/roll20-character-sheets/compare) (applied automatically).
+* **Submitting a new sheet:** [open a PR with the new-sheet template](https://github.com/Roll20/roll20-character-sheets/compare?template=new_sheet.md), or run `gh pr create --template new_sheet.md`.
+
 ### Release Cadence
 
 Pull Requests are reviewed *at least* weekly by 00:00 UTC on Thursdays, although cadence is often more frequent. 

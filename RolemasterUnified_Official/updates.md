@@ -1,8 +1,16 @@
+# 2026-09-21
+
+Fix an issue causing creature DB to be trashed.  Simple fix while I rewrite all
+the DBs.
+
 # 2026-08-03
 
 Post GenCon updates.
 
 - Updates to some of the options.  
+
+# 2026-07-30
+
 - Another attempt to hide initiative tracker on PC sheets
 
 # 2026-07-28
