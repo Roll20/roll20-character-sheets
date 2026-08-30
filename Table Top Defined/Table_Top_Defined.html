@@ -6560,6 +6560,109 @@
   return result;
  };
 
+ const characterImportPrebuiltSuffix = function(value) {
+  return String(value || "").replace(/[^a-z0-9]+/gi, "_").replace(/^_+|_+$/g, "").toLowerCase();
+ };
+
+ const characterImportReconcilePrebuiltGrants = function(attributes) {
+  if(normalizeGrantName(attributes.progression_mode) !== "prebuilt") return;
+
+  const profileSuffix = characterImportPrebuiltSuffix(attributes.prebuilt_progression);
+  if(!profileSuffix) return;
+
+  const context = {
+   currentHD: Math.max(0, int(attributes, "hd", 0)),
+   magicCurve: str(attributes, "magic_curve"),
+   specialty: str(attributes, "specialty"),
+   versatile: grantIsChecked(attributes.versatile),
+   mystic: grantIsChecked(attributes.mystic),
+   diffuseBackground: hasDiffuseBackground(attributes),
+   enableAutomaticGrants: true
+  };
+
+  GRANT_SECTIONS.forEach(def => {
+   const kind = def.section === "repeating_abilities" ? "ability" : "feat";
+   const rowPattern = new RegExp(`^${def.section}_(-[A-Za-z0-9-]+)_prebuilt_key$`);
+   const expectedPrefix = `prebuilt_${profileSuffix}_${kind}_`;
+   const prebuiltRows = [];
+   const prebuiltRowIDs = {};
+
+   Object.keys(attributes).forEach(name => {
+    const match = name.match(rowPattern);
+    if(!match) return;
+    const prebuiltKey = String(attributes[name] || "");
+    if(prebuiltKey.indexOf(expectedPrefix) !== 0) return;
+    const prefix = `${def.section}_${match[1]}_`;
+    const sequence = parseInt(prebuiltKey.slice(prebuiltKey.lastIndexOf("_") + 1), 10) || 0;
+    prebuiltRows.push({
+     rowId: match[1],
+     prefix,
+     level: int(attributes, `${prefix}granted_level`, 0),
+     sequence
+    });
+    prebuiltRowIDs[match[1].toLowerCase()] = true;
+   });
+
+   if(!prebuiltRows.length) return;
+
+   // Web prebuilt exports retain hidden automatic placeholders so a user can
+   // switch modes later. They must not become visible duplicate rows in Roll20.
+   const importedRowIDs = {};
+   Object.keys(attributes).forEach(name => {
+    const match = name.match(new RegExp(`^${def.section}_(-[A-Za-z0-9-]+)_`));
+    if(match) importedRowIDs[match[1]] = true;
+   });
+   Object.keys(importedRowIDs).forEach(rowId => {
+    if(prebuiltRowIDs[rowId.toLowerCase()]) return;
+    const prefix = `${def.section}_${rowId}_`;
+    const key = str(attributes, `${prefix}grant_key`);
+    if(!grantSpecFromKey(def, key, context)) return;
+    Object.keys(attributes).forEach(name => {
+     if(name.indexOf(prefix) === 0) delete attributes[name];
+    });
+   });
+
+   const specsByLevel = {};
+   buildExpectedGrantSpecs(def, context).forEach(spec => {
+    if(!specsByLevel[spec.level]) specsByLevel[spec.level] = [];
+    specsByLevel[spec.level].push(spec);
+   });
+   Object.keys(specsByLevel).forEach(level => {
+    specsByLevel[level].sort((left, right) => {
+     const rank = spec => {
+      if(spec.key.indexOf(def.universalKeyPrefix) === 0) return 0;
+      if((def.progressionGrants || []).some(grant => spec.key.indexOf(grant.keyPrefix) === 0)) return 1;
+      return 2;
+     };
+     return rank(left) - rank(right);
+    });
+   });
+   const usedAtLevel = {};
+   prebuiltRows.sort((left, right) => left.level - right.level || left.sequence - right.sequence);
+   prebuiltRows.forEach(row => {
+    const ordinal = usedAtLevel[row.level] || 0;
+    const spec = (specsByLevel[row.level] || [])[ordinal];
+    usedAtLevel[row.level] = ordinal + 1;
+    if(!spec) return;
+    attributes[`${row.prefix}grant_key`] = spec.key;
+    attributes[`${row.prefix}granted_source`] = spec.source;
+    attributes[`${row.prefix}source_available`] = spec.available ? "1" : "0";
+    attributes[`${row.prefix}grant_hidden`] = "0";
+   });
+
+   const reporderAttr = `_reporder_${def.section}`;
+   if(attributes[reporderAttr]) {
+    attributes[reporderAttr] = String(attributes[reporderAttr]).split(",").filter(rowId =>
+            Object.keys(attributes).some(name => name.indexOf(`${def.section}_${rowId}_`) === 0)
+    ).join(",");
+   }
+  });
+
+  // Keep automatic grants enabled: any Universal or class-progression slots not
+  // represented by the prebuilt are still generated normally.
+  attributes.enable_automatic_grants = "1";
+ };
+
  const characterImportPlan = function(rawText) {
   let text = String(rawText || "").replace(/^\uFEFF/, "").trim();
   text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
@@ -6695,6 +6798,8 @@
     return sourceRowID;
    }).join(",");
   });
+
+  characterImportReconcilePrebuiltGrants(normalized);
 
   if(!Object.keys(normalized).length) {
    throw new Error("The export contains no importable character attributes.");
