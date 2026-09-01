@@ -11066,7 +11066,18 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
   }
   let OccupationCompendiumData;
   try {
-    OccupationCompendiumData = JSON.parse(attributes.drop_data);
+    const parseCompendiumValue = (key, value) => {
+      if (value === "TRUE") return true;
+      if (value === "FALSE") return false;
+      return typeof value === "string" && value.startsWith("[{")
+        ? JSON.parse(value, parseCompendiumValue)
+        : value;
+    };
+    OccupationCompendiumData = JSON.parse(
+      attributes.drop_data,
+      parseCompendiumValue
+    );
+    console.log(OccupationCompendiumData);
     const dataToProcess =
       OccupationCompendiumData.data || OccupationCompendiumData;
     if (!dataToProcess) throw new Error("No 'data' field in compendium drop.");
@@ -11269,6 +11280,7 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
 
     const processAbilityList = async (abilityList) => {
       for (const ab of abilityList) {
+        if (!ab.name) continue;
         setAbilityRating(ab.name, ab.rating, null, ab.is_bonus);
 
         if (ab.sub_group) {
@@ -11290,7 +11302,7 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
             );
 
             for (const specificName of specificEntries) {
-              await addRepeatingSubItem(baseAbilityNameForSub, specificName);
+              await addRepeatingSubItem(repeatingSectionName, specificName);
             }
 
             for (const anyEntry of anyEntries) {
