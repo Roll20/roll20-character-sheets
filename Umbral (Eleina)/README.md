@@ -22,7 +22,8 @@ HTML y el CSS las busca tal cual, sin que Roll20 añada nada.
 Defensa = 9 + Destreza + protección, Esencia = 3 + Voluntad + grado del Hilo. Los máximos están
 bloqueados a propósito — si se pudieran escribir a mano habría dos verdades.
 
-**Cuatro pestañas**: Ficha (atributos, combate, armas, estados), Oficios y dotes, Magia, Notas.
+**Cuatro pestañas**: Ficha (atributos, combate, armadura, armas, estados), Oficios y equipo,
+Magia, Notas.
 **Once botones de tirada**, todos con la misma plantilla de resultado.
 
 Cada botón pregunta el dado —normal, ventaja o desventaja— y devuelve el total, el Umbral, el
@@ -30,7 +31,9 @@ margen y el grado ya leído. El 12 y el 1 naturales se avisan aparte, porque mue
 
 ## Cómo se juega un golpe
 
-Es la variante de mesa del [Libro VI](https://eleina.info/umbral/mesa-tactica.html): **tiradas enfrentadas y bandas de seis**.
+Son los modos **Narrativo y Táctico** del [Libro VI](https://eleina.info/umbral/mesa-tactica.html):
+**tiradas enfrentadas y bandas de seis**. El tercer modo, Mesa, es la partida por escrito y se
+juega en la web, no aquí.
 
 1. Quien ataca pulsa **Atacar** — 1d12 + Atributo del arma + Oficio que cubra pelear.
 2. Quien recibe pulsa **Defenderse** — 1d12 + Destreza + protección + Oficio que cubra defenderse.
@@ -39,6 +42,50 @@ Es la variante de mesa del [Libro VI](https://eleina.info/umbral/mesa-tactica.ht
 
 El margen es siempre del atacante y el empate lo gana él. Fuera del combate, los botones de
 Atributo y de Oficio tiran contra un Umbral fijo con las bandas de cuatro de siempre.
+
+## Equipo, armadura y Estorbo
+
+Cada cosa con nombre **ocupa** de 0 a 3 y se cuenta hasta **4 + Vigor**. Al pasarte estás
+**Cargado**: desventaja al correr, trepar, nadar, saltar y al sigilo, y una casilla menos de
+movimiento con tablero. Soltar es gratis y no cuesta acción. El medidor de arriba del equipo dice
+lo que llevas, lo que aguantas y de dónde sale el número.
+
+**La armadura puesta no cuenta Estorbo**, pero la limita el Vigor y es un límite duro —ligera pide
+Vigor 0, media 1, pesada 2, completa 3—. La hoja lo avisa en rojo debajo del peldaño en cuanto no
+llegas. El escudo va *dentro* del peldaño, así que no sube la Defensa por su cuenta, pero ocupa una
+mano y su Estorbo sí se anota.
+
+**Los bultos de carga suben el tope más de lo que ocupan.** Es la excepción de la escala, y por eso
+la fila de equipo tiene dos columnas más: *sube el tope* y *dónde*.
+
+| Bulto | Ocupa | Sube | Dónde |
+|---|:-:|:-:|---|
+| Zurrón | 0 | 1 | encima |
+| Petate | 1 | 3 | encima |
+| Mochila de campaña | 2 | 5 | encima |
+| Mochila de porteador | 3 | 8 | encima |
+| Alforjas | 0 | 5 | montura |
+| Aparejo de carga | 0 | 9 | montura |
+| Carro con mula | 0 | 12 | montura |
+
+Cuentan **dos y solo dos**: el mejor de encima y el mejor de la montura, porque nadie tiene una
+tercera espalda. El de la montura pide una anotada en **Compañía** —monturas, mascotas y
+ayudantes—, que no cuenta Estorbo porque no la llevas encima. El día que el caballo se rompe una
+pata, el tope baja solo y hay que decidir en el sitio qué se queda en el barro.
+
+Lo que no respira pero tampoco se carga —un taller, una parte de una nave, una patente de corso—
+se anota como el documento que lo acredita, con Estorbo 0.
+
+### Si vienes de la versión anterior
+
+El equipo era antes un solo cuadro de texto y ahora son filas con su Estorbo. **No hay que copiar
+nada a mano**: la primera vez que abras una ficha vieja, la hoja vuelca lo que hubiera escrito en
+ese cuadro y crea una fila por cada línea, con Estorbo 0 —adivinar cuánto ocupa cada cosa sería
+inventar—. Si el texto no tenía saltos de línea, entra entero en una sola fila.
+
+El cuadro de texto original **no se borra**: su atributo sigue guardado en la ficha, invisible pero
+intacto, por si hubiera que mirarlo. La conversión se hace una sola vez y no se repite al volver a
+abrir.
 
 ## Antes de la primera sesión
 
@@ -52,7 +99,7 @@ como marcadores de estado del token, además de las casillas de la hoja.
 después los enemigos. No hace falta tocar la barra de turnos de Roll20.
 
 **Los enemigos** se hacen con la misma hoja. Los del bestiario vienen con Ataque y Defensa
-pensados para jugar por escrito; en mesa se juegan restando: se ataca con `1d12 + (Ataque − 12)` y
+pensados para jugar por escrito; aquí se juegan restando: se ataca con `1d12 + (Ataque − 12)` y
 se defiende con `1d12 + (Defensa − 7)`. Lo cómodo es apuntar ya el bonificador restado en el
 Atributo de la ficha del PNJ y dejar el Oficio a 0.
 

@@ -1,7 +1,8 @@
 <!-- ══════════════════════════════════════════════════════════════════════
      UMBRAL — hoja de personaje para Roll20
-     El sistema de rol de Eleina. Variante de mesa: tiradas enfrentadas
-     en combate, bandas de seis, y el margen siempre del que ataca.
+     El sistema de rol de Eleina, en sus modos Narrativo y Táctico: tiradas
+     enfrentadas en combate, bandas de seis, y el margen siempre del que ataca.
+     (El tercer modo, Mesa, es la partida por escrito y no se juega aquí.)
      ══════════════════════════════════════════════════════════════════════ -->
 
 <div class="sheet-umbral">
@@ -10,9 +11,13 @@
        Radios y hermanos: es la única forma que tiene una hoja de Roll20
        de cambiar de pestaña sin pedirle nada al servidor. -->
   <input type="radio" name="attr_tab" class="sheet-tab sheet-tab1" value="1" checked><span class="sheet-tab-lab">Ficha</span>
-  <input type="radio" name="attr_tab" class="sheet-tab sheet-tab2" value="2"><span class="sheet-tab-lab">Oficios y dotes</span>
+  <input type="radio" name="attr_tab" class="sheet-tab sheet-tab2" value="2"><span class="sheet-tab-lab">Oficios y equipo</span>
   <input type="radio" name="attr_tab" class="sheet-tab sheet-tab3" value="3"><span class="sheet-tab-lab">Magia</span>
   <input type="radio" name="attr_tab" class="sheet-tab sheet-tab4" value="4"><span class="sheet-tab-lab">Notas</span>
+
+  <!-- Por qué versión de la hoja ha pasado ya esta ficha. Lo usa la migración
+       del equipo, abajo del todo. Una ficha nueva empieza en 0 y sube sola. -->
+  <input type="hidden" name="attr_version_hoja" value="0">
 
   <!-- ── Cabecera, siempre visible ───────────────────────────────── -->
   <div class="sheet-cabecera">
@@ -118,18 +123,19 @@
       </div>
     </div>
 
-    <h3>Combate <em>— en mesa tiran los dos y el margen es del que ataca</em></h3>
+    <h3>Combate <em>— tiran los dos y el margen es del que ataca</em></h3>
 
     <div class="sheet-combate">
       <div class="sheet-campo">
         <label>Protección</label>
         <select name="attr_proteccion">
           <option value="0">0 · Nada</option>
-          <option value="1">1 · Ligera</option>
-          <option value="2">2 · Media</option>
-          <option value="3">3 · Pesada</option>
-          <option value="4">4 · Completa</option>
+          <option value="1">1 · Ligera (Vigor 0)</option>
+          <option value="2">2 · Media (Vigor 1)</option>
+          <option value="3">3 · Pesada (Vigor 2)</option>
+          <option value="4">4 · Completa (Vigor 3)</option>
         </select>
+        <span class="sheet-pide-vigor" name="attr_aviso_armadura"></span>
       </div>
       <div class="sheet-campo">
         <label>Oficio que cubre pelear</label>
@@ -163,7 +169,18 @@
       botones de Atributo tiran contra un Umbral con las bandas de cuatro de siempre.
     </p>
 
-    <h3>Armas y protección</h3>
+    <h3>Armadura <em>— la puesta no cuenta Estorbo; el escudo sí</em></h3>
+    <div class="sheet-fila-armadura">
+      <input type="text" name="attr_armadura_pieza" placeholder="Qué llevas puesto: cota de malla, gambesón…">
+      <input type="text" name="attr_armadura_escudo" placeholder="Escudo, si llevas: rodela, pavés…">
+    </div>
+    <p class="sheet-nota">
+      El peldaño lo eliges arriba, en Combate, y lo limita tu Vigor: sin él, esa armadura no es
+      tuya. El escudo va <b>dentro</b> del peldaño —cuero con escudo protege como una cota
+      ligera—, pero ocupa una mano, así que su Estorbo sí cuenta en el equipo.
+    </p>
+
+    <h3>Armas</h3>
     <fieldset class="repeating_armas">
       <div class="sheet-fila-arma">
         <input type="text" name="attr_arma_nombre" placeholder="Arma">
@@ -186,7 +203,7 @@
     </div>
   </div>
 
-  <!-- ══ 2 · OFICIOS Y DOTES ═══════════════════════════════════════ -->
+  <!-- ══ 2 · OFICIOS, DOTES Y EQUIPO ════════════════════════════════ -->
   <div class="sheet-panel sheet-panel2">
     <h3>Oficios <em>— se suma uno solo: entero si cubre, la mitad si roza, nada si no</em></h3>
     <fieldset class="repeating_oficios">
@@ -206,8 +223,63 @@
       </div>
     </fieldset>
 
-    <h3>Equipo</h3>
-    <textarea name="attr_equipo" class="sheet-ancho" placeholder="Lo que tiene nombre. Lo cotidiano se presume."></textarea>
+    <h3>Equipo <em>— lo que tiene nombre; lo cotidiano se presume</em></h3>
+
+    <div class="sheet-estorbo">
+      <div class="sheet-estorbo-cifra">
+        <input type="number" name="attr_estorbo_llevado" value="0" disabled>
+        <span>/</span>
+        <input type="number" name="attr_estorbo_tope" value="4" disabled>
+      </div>
+      <div class="sheet-estorbo-texto">
+        <b>Estorbo</b>
+        <span name="attr_estorbo_desglose">4 + Vigor</span>
+      </div>
+      <span class="sheet-cargado" name="attr_aviso_cargado"></span>
+    </div>
+
+    <div class="sheet-cabeza-equipo">
+      <span class="sheet-ce-nombre">Qué llevas</span>
+      <span class="sheet-ce-num">Ocupa</span>
+      <span class="sheet-ce-num">Sube</span>
+      <span class="sheet-ce-sitio">Dónde</span>
+    </div>
+    <fieldset class="repeating_equipo">
+      <div class="sheet-fila-equipo">
+        <input type="text" name="attr_eq_nombre" placeholder="Qué llevas">
+        <input type="number" name="attr_eq_estorbo" value="0" min="0" max="3" title="Cuánto ocupa: 0 cinto, 1 una mano, 2 las dos, 3 no se lleva sin sufrir">
+        <input type="number" name="attr_eq_carga" value="0" min="0" max="12" title="Si es un bulto de carga, cuánto sube el tope">
+        <select name="attr_eq_sitio" title="Dónde va el bulto">
+          <option value="">—</option>
+          <option value="encima">Encima</option>
+          <option value="montura">En la montura</option>
+        </select>
+      </div>
+    </fieldset>
+    <p class="sheet-nota">
+      Las cuatro columnas son <b>qué</b>, <b>ocupa</b>, <b>sube el tope</b> y <b>dónde</b>. Las dos
+      últimas solo se rellenan en los bultos de carga —zurrón 0/1, petate 1/3, mochila de campaña
+      2/5, mochila de porteador 3/8, alforjas 0/5, aparejo 0/9, carro 0/12—, que suben tu tope más
+      de lo que ocupan. Cuentan dos: el mejor de encima y el mejor de la montura, y este último
+      solo si tienes una anotada abajo.
+    </p>
+
+    <h3>Compañía <em>— lo que va contigo y no se carga</em></h3>
+    <fieldset class="repeating_companeros">
+      <div class="sheet-fila-companero">
+        <select name="attr_comp_tipo">
+          <option value="montura">Montura</option>
+          <option value="mascota">Mascota</option>
+          <option value="ayudante">Ayudante</option>
+        </select>
+        <input type="text" name="attr_comp_nombre" placeholder="Quién te acompaña">
+        <input type="text" name="attr_comp_nota" placeholder="Nombre propio, raza, lo que sea">
+      </div>
+    </fieldset>
+    <p class="sheet-nota">
+      Un caballo no se carga: va contigo, y no cuenta Estorbo. Lo que sí pesa es el papel que lo
+      acredita —una escritura, una patente de corso—, y ese va arriba con Estorbo 0.
+    </p>
   </div>
 
   <!-- ══ 3 · MAGIA ═════════════════════════════════════════════════ -->
@@ -356,4 +428,121 @@ const recalcular = () => {
 };
 
 on('change:vigor change:destreza change:voluntad change:proteccion change:aguante_extra change:hilo_principal sheet:opened', recalcular);
+
+// ── El Estorbo (§14) ─────────────────────────────────────────────────
+// Tope = 4 + Vigor, más el mejor bulto de encima y el mejor de la montura.
+// Cuentan dos y solo dos: nadie tiene una tercera espalda. El de la montura
+// pide una: sin animal anotado en Compañía no suma, y el día que el caballo se
+// rompe una pata el tope baja solo.
+const ESTORBO_BASE = 4;
+
+// El Vigor mínimo de cada peldaño de armadura. null = cualquiera.
+const PIDE_VIGOR = [null, 0, 1, 2, 3];
+
+const recalcularEstorbo = () => {
+  getSectionIDs('repeating_equipo', filas => {
+    getSectionIDs('repeating_companeros', comps => {
+      const campos = ['vigor', 'proteccion'];
+      filas.forEach(id => {
+        campos.push('repeating_equipo_' + id + '_eq_estorbo');
+        campos.push('repeating_equipo_' + id + '_eq_carga');
+        campos.push('repeating_equipo_' + id + '_eq_sitio');
+      });
+      comps.forEach(id => campos.push('repeating_companeros_' + id + '_comp_tipo'));
+
+      getAttrs(campos, v => {
+        const n = k => parseInt(v[k], 10) || 0;
+
+        let llevado = 0;
+        let mejorEncima = 0;
+        let mejorMontura = 0;
+        filas.forEach(id => {
+          const pre = 'repeating_equipo_' + id + '_';
+          llevado += n(pre + 'eq_estorbo');
+          const carga = n(pre + 'eq_carga');
+          if (carga <= 0) { return; }
+          if (v[pre + 'eq_sitio'] === 'montura') {
+            if (carga > mejorMontura) { mejorMontura = carga; }
+          } else if (carga > mejorEncima) {
+            mejorEncima = carga;
+          }
+        });
+
+        const hayMontura = comps.some(id => v['repeating_companeros_' + id + '_comp_tipo'] === 'montura');
+        const deMontura  = hayMontura ? mejorMontura : 0;
+
+        const base = ESTORBO_BASE + n('vigor');
+        const tope = base + mejorEncima + deMontura;
+
+        let desglose = ESTORBO_BASE + ' + Vigor ' + n('vigor');
+        if (mejorEncima > 0) { desglose += ' + ' + mejorEncima + ' encima'; }
+        if (deMontura > 0)   { desglose += ' + ' + deMontura + ' en la montura'; }
+        if (mejorMontura > 0 && !hayMontura) {
+          desglose += ' · el bulto de montura no suma: no hay animal anotado';
+        }
+
+        // El Vigor manda sobre la armadura, y decirlo aquí evita una discusión
+        // el sábado por la noche.
+        const pide = PIDE_VIGOR[n('proteccion')];
+        const avisoArmadura = (pide !== null && pide !== undefined && n('vigor') < pide)
+          ? 'Esa armadura pide Vigor ' + pide
+          : '';
+
+        setAttrs({
+          estorbo_llevado: llevado,
+          estorbo_tope: tope,
+          estorbo_desglose: desglose,
+          aviso_cargado: llevado > tope ? 'Cargado' : '',
+          aviso_armadura: avisoArmadura
+        });
+      });
+    });
+  });
+};
+
+on('change:vigor change:proteccion sheet:opened', recalcularEstorbo);
+on('change:repeating_equipo remove:repeating_equipo', recalcularEstorbo);
+on('change:repeating_companeros remove:repeating_companeros', recalcularEstorbo);
+
+// ── Migración · del cuadro de texto a las filas de equipo ────────────
+// Hasta la versión 1 el equipo era un solo textarea llamado `equipo`. Ahora
+// son filas con su Estorbo, y una ficha vieja se quedaría con el texto
+// escrito en un campo que ya no se pinta. Al abrirla se vuelca:
+//
+//   · una fila por línea escrita, que es como la gente lista sus cosas;
+//   · si no hay saltos de línea, una sola fila con todo el texto dentro;
+//   · con Estorbo 0, porque adivinar cuánto ocupa cada cosa sería inventar.
+//
+// El textarea NO se borra: el atributo sigue en la ficha con su valor
+// original, invisible pero intacto, por si algo saliera mal. Y `version_hoja`
+// impide que esto se repita en la siguiente apertura.
+const VERSION_HOJA = 2;
+const MAX_FILAS_MIGRADAS = 20;
+
+on('sheet:opened', () => {
+  getAttrs(['version_hoja', 'equipo'], v => {
+    if ((parseInt(v.version_hoja, 10) || 0) >= VERSION_HOJA) { return; }
+
+    const viejo  = (v.equipo || '').trim();
+    const salida = { version_hoja: VERSION_HOJA };
+
+    if (viejo !== '') {
+      let trozos = viejo.split(/\r?\n/).map(t => t.trim()).filter(t => t !== '');
+      // Una lista larguísima no se convierte en cincuenta filas: las que
+      // pasen del tope se juntan en la última, que sigue siendo su texto.
+      if (trozos.length > MAX_FILAS_MIGRADAS) {
+        trozos = trozos.slice(0, MAX_FILAS_MIGRADAS - 1)
+                       .concat(trozos.slice(MAX_FILAS_MIGRADAS - 1).join(' · '));
+      }
+      trozos.forEach(texto => {
+        const pre = 'repeating_equipo_' + generateRowID() + '_';
+        salida[pre + 'eq_nombre']  = texto;
+        salida[pre + 'eq_estorbo'] = 0;
+        salida[pre + 'eq_carga']   = 0;
+      });
+    }
+
+    setAttrs(salida, { silent: true }, recalcularEstorbo);
+  });
+});
 </script>
