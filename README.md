@@ -23,10 +23,22 @@ The [Roll20 Code of Conduct](https://help.roll20.net/hc/en-us/articles/360037254
 
 Following the Roll20 Code of Conduct means **no racism, no sexism, no hate speech, no backseat gaming, no personal attacks, no transphobia, no misgendering, no ableism, no anti-LGBTQIA+ sentiments (and so on) are allowed.**
 
+## AI Policy
+
+The [Roll20 AI Policy for Community Mod Scripts & Character Sheets](https://help.roll20.net/hc/en-us/articles/43164327041943-AI-Policy-for-Community-Mod-Scripts-Character-Sheets) applies to all contributions to this repository. The linked article is the canonical version of the policy; this summary is provided for convenience.
+
+**tl;dr**
+
+* **Code may be AI-assisted or AI-generated.** HTML, CSS, and JavaScript may be written with generative AI tools, but **you are fully responsible for everything you submit**, regardless of how it was produced. You must be able to read, explain, debug, and stand behind all of the code in your PR. "Vibe coding" (submitting generated code you don't understand) is strongly discouraged, and sheets that break, introduce security issues, or infringe on someone else's work may be removed.
+* **Creative content must be human-made.** Creative written text (such as in-sheet copy and descriptions) and all visual assets (artwork, icons, illustrations, backgrounds, and other images) must originate from you or the human teammates you worked with. AI may be used to edit, proofread, post-process, or format human-created work, but not to write that copy or generate that art wholesale. AI-written technical documentation is allowed.
+* **No disclosure required** for contributions that comply with the policy. Contributions that don't use AI at all are encouraged to say so.
+* **Non-compliant contributions will be removed.** Misrepresenting how AI was used may result in permanent de-listing of the sheet, and repeated bad-faith violations may result in a ban from submitting sheets.
+
 ## Table of Contents
 
 - [Roll20 Character Sheets](#roll20-character-sheets)
   - [Community Conduct](#community-conduct)
+  - [AI Policy](#ai-policy)
   - [Table of Contents](#table-of-contents)
   - [Contributing](#contributing)
     - [Getting Started](#getting-started)
