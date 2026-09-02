@@ -11083,6 +11083,7 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
     if (!dataToProcess) throw new Error("No 'data' field in compendium drop.");
 
     const characterUpdates = {};
+    const selectedAbilityNames = new Set();
 
     const toTitleCase = (kebabString) =>
       (kebabString || "")
@@ -11095,17 +11096,19 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
       subName = null,
       isBonus = false
     ) => {
+      const buildPointsName = `${baseName}_build-points`;
       let currentBuildVal =
-        k.value(attributes[`${baseName}_build-points`]) || 0;
+        k.value(characterUpdates[buildPointsName] ?? attributes[buildPointsName]) || 0;
       let currentMaxVal = k.value(attributes[`${baseName}_max`]) || 0;
       let currentVal = k.value(attributes[baseName]) || 0;
 
       if (isBonus) {
-        characterUpdates[`${baseName}_build-points`] = currentBuildVal + rating;
+        characterUpdates[buildPointsName] = currentBuildVal + rating;
       } else {
         
-        characterUpdates[`${baseName}_build-points`] = rating;
+        characterUpdates[buildPointsName] = rating;
       }
+      selectedAbilityNames.add(baseName);
       k.debug(
         `Setting Occupation: ${baseName}_build-points to ${rating}. Current: ${
           characterUpdates[baseName]
@@ -11174,6 +11177,10 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
     let currentGeneralChoices = [
       ...(dataToProcess["data-cs-general_abilities_choices"] || []),
     ];
+    let specializationInvestigativeFixed = [];
+    let specializationGeneralFixed = [];
+    let specializationInvestigativeChoices = [];
+    let specializationGeneralChoices = [];
 
     if (
       dataToProcess["data-cs-specializations"] &&
@@ -11213,37 +11220,12 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
           if (selectedSpec.credit_rating_max_override !== undefined)
             baseCreditMax = selectedSpec.credit_rating_max_override;
 
-          const mergeAbilities = (baseList, bonusList) => {
-            (bonusList || []).forEach((bonusAb) => {
-              const existingAbIndex = baseList.findIndex(
-                (baseAb) => baseAb.name === bonusAb.name && !baseAb.sub_group
-              );
-              if (existingAbIndex !== -1) {
-                if (bonusAb.is_bonus) {
-                  baseList[existingAbIndex].rating =
-                    (k.value(baseList[existingAbIndex].rating) || 0) +
-                    bonusAb.rating;
-                } else {
-                  baseList[existingAbIndex].rating = bonusAb.rating;
-                }
-              } else {
-                baseList.push({ ...bonusAb });
-              }
-            });
-          };
-          mergeAbilities(
-            currentInvestigativeFixed,
-            selectedSpec.investigative_bonus_fixed
-          );
-          mergeAbilities(currentGeneralFixed, selectedSpec.general_bonus_fixed);
-          if (selectedSpec.investigative_bonus_choices)
-            currentInvestigativeChoices = currentInvestigativeChoices.concat(
-              selectedSpec.investigative_bonus_choices
-            );
-          if (selectedSpec.general_bonus_choices)
-            currentGeneralChoices = currentGeneralChoices.concat(
-              selectedSpec.general_bonus_choices
-            );
+          specializationInvestigativeFixed =
+            selectedSpec.investigative_bonus_fixed || [];
+          specializationGeneralFixed = selectedSpec.general_bonus_fixed || [];
+          specializationInvestigativeChoices =
+            selectedSpec.investigative_bonus_choices || [];
+          specializationGeneralChoices = selectedSpec.general_bonus_choices || [];
           if (selectedSpec.special_text_mod)
             characterUpdates.occupational_benefits += `\n${selectedSpec.special_text_mod}`;
         }
@@ -11278,10 +11260,10 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
       }
     }
 
-    const processAbilityList = async (abilityList) => {
+    const processAbilityList = async (abilityList, forceBonus = false) => {
       for (const ab of abilityList) {
         if (!ab.name) continue;
-        setAbilityRating(ab.name, ab.rating, null, ab.is_bonus);
+        setAbilityRating(ab.name, ab.rating, null, forceBonus || ab.is_bonus);
 
         if (ab.sub_group) {
           const subItems =
@@ -11335,8 +11317,8 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
         }
       }
     };
-    await processAbilityList(currentInvestigativeFixed, false);
-    await processAbilityList(currentGeneralFixed, true);
+    await processAbilityList(currentInvestigativeFixed);
+    await processAbilityList(currentGeneralFixed);
 
     const generateSkillQueryOptions = (optionsArray) => {
       return [
@@ -11360,9 +11342,10 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
     };
 
     const madeChoicesInExclusiveGroup = {};
-    const processChoiceList = async (choiceList) => {
+    const processChoiceList = async (choiceList, forceBonus = false) => {
       const exclusiveGroupData = {};
       const independentChoiceGroups = [];
+      const selectedCategoryAbilities = new Set();
 
       (choiceList || []).forEach((cg) => {
         if (cg.exclusive_group_id) {
@@ -11431,11 +11414,14 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
             const basePromptText =
               chosenBranch.prompt ||
               k.getTranslationByKey("select_skill_prompt");
-            const chosenSkillKebabName = await k.extractQueryResult(
-              `${basePromptText} (${
-                i + 1
-              }/${numToPick})|${uniqueSkillOptionsQuery}`
-            );
+            const chosenSkillKebabName =
+              optionsToPickFrom.length === 1
+                ? optionsToPickFrom[0].name
+                : await k.extractQueryResult(
+                    `${basePromptText} (${
+                      i + 1
+                    }/${numToPick})|${uniqueSkillOptionsQuery}`
+                  );
             const selectedOption = (chosenBranch.options || []).find(
               (opt) => opt.name === chosenSkillKebabName
             );
@@ -11451,7 +11437,11 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
                 const ratingForCatSkills = selectedOption.rating;
 
                 if (skillsInCategory.length > 0) {
-                  let availableCatSkills = [...skillsInCategory];
+                  let availableCatSkills = skillsInCategory.filter(
+                    (abilityName) =>
+                      !selectedCategoryAbilities.has(abilityName) &&
+                      (forceBonus || !selectedAbilityNames.has(abilityName))
+                  );
                   for (let j = 0; j < numToPickFromCat; j++) {
                     if (availableCatSkills.length === 0) break;
                     const catSkillQueryOptions = availableCatSkills
@@ -11479,10 +11469,12 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
                       setAbilityRating(
                         chosenCatSkill,
                         ratingForCatSkills,
-                        selectedOption.is_bonus
+                        null,
+                        forceBonus || selectedOption.is_bonus
                       );
+                      selectedCategoryAbilities.add(chosenCatSkill);
                       availableCatSkills = availableCatSkills.filter(
-                        (ab) => ab.name !== chosenCatSkill
+                        (abilityName) => abilityName !== chosenCatSkill
                       );
                     } else {
                       break;
@@ -11494,9 +11486,12 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
                   );
                 }
               } else if (selectedOption.grants_abilities) {
-                await processAbilityList(selectedOption.grants_abilities);
+                await processAbilityList(
+                  selectedOption.grants_abilities,
+                  forceBonus
+                );
               } else {
-                await processAbilityList([selectedOption]);
+                await processAbilityList([selectedOption], forceBonus);
               }
               const originalOptionIndex = optionsToPickFrom.findIndex(
                 (opt) => opt.name === chosenSkillKebabName
@@ -11525,9 +11520,12 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
           if (!skillOptionsQuery) break;
           const basePromptText =
             choiceGroup.prompt || k.getTranslationByKey("select_skill_prompt");
-          const chosenSkillKebabName = await k.extractQueryResult(
-            `${basePromptText} (${i + 1}/${numToPick})|${skillOptionsQuery}`
-          );
+          const chosenSkillKebabName =
+            optionsToPickFrom.length === 1
+              ? optionsToPickFrom[0].name
+              : await k.extractQueryResult(
+                  `${basePromptText} (${i + 1}/${numToPick})|${skillOptionsQuery}`
+                );
           const selectedOption = (choiceGroup.options || []).find(
             (opt) => opt.name === chosenSkillKebabName
           );
@@ -11540,7 +11538,11 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
               const ratingForCatSkills = selectedOption.rating;
 
               if (skillsInCategory.length > 0) {
-                let availableCatSkills = [...skillsInCategory];
+                let availableCatSkills = skillsInCategory.filter(
+                  (abilityName) =>
+                    !selectedCategoryAbilities.has(abilityName) &&
+                    (forceBonus || !selectedAbilityNames.has(abilityName))
+                );
                 for (let j = 0; j < numToPickFromCat; j++) {
                   if (availableCatSkills.length === 0) break;
                   const catSkillQueryOptions = availableCatSkills
@@ -11568,10 +11570,12 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
                     setAbilityRating(
                       chosenCatSkill,
                       ratingForCatSkills,
-                      selectedOption.is_bonus
+                      null,
+                      forceBonus || selectedOption.is_bonus
                     );
+                    selectedCategoryAbilities.add(chosenCatSkill);
                     availableCatSkills = availableCatSkills.filter(
-                      (ab) => ab.name !== chosenCatSkill
+                      (abilityName) => abilityName !== chosenCatSkill
                     );
                   } else {
                     break;
@@ -11583,9 +11587,12 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
                 );
               }
             } else if (selectedOption.grants_abilities) {
-              await processAbilityList(selectedOption.grants_abilities);
+              await processAbilityList(
+                selectedOption.grants_abilities,
+                forceBonus
+              );
             } else {
-              await processAbilityList([selectedOption]);
+              await processAbilityList([selectedOption], forceBonus);
             }
             const originalOptionIndex = optionsToPickFrom.findIndex(
               (opt) => opt.name === chosenSkillKebabName
@@ -11602,8 +11609,12 @@ const basicDrop = (lookupKey, arr, attributes, sections, casc, sectionsToQuery) 
       }
     };
 
-    await processChoiceList(currentInvestigativeChoices, false);
-    await processChoiceList(currentGeneralChoices, true);
+    await processChoiceList(currentInvestigativeChoices);
+    await processChoiceList(currentGeneralChoices);
+    await processAbilityList(specializationInvestigativeFixed, true);
+    await processAbilityList(specializationGeneralFixed, true);
+    await processChoiceList(specializationInvestigativeChoices, true);
+    await processChoiceList(specializationGeneralChoices, true);
 
     k.setAttrs(characterUpdates, true);
   } catch (e) {
