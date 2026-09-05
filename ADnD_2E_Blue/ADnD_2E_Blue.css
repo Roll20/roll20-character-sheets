@@ -1,0 +1,1524 @@
+/* ============================================================
+   AD&D 2E — Amigo Sheet
+   Two player-selectable themes: Crimson Red (default) & Navy Blue
+   Fonts: Cinzel (≈ Friz Quadrata), Libre Baskerville (≈ ITC Korinna)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* ── Reset ── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ══════════════════════════════════════════════════════
+   THEME VARIABLES — Navy Blue (default)
+══════════════════════════════════════════════════════ */
+.charsheet {
+  --accent:     #1E3A5F;
+  --accent-dk:  #0F2040;
+  --accent-lt:  #2E5A9F;
+  --accent-bg:  #E8EEF7;   /* tinted panel bg */
+  --accent-bar: #1E3A5F;   /* section header bg */
+  --accent-bar-text: #fff;
+  --gold:       #7A9AC4;
+  --gold-lt:    #C5D8EF;
+  --border:     #B0C4DE;
+  --bg:         #ffffff;
+  --bg-panel:   #fafafa;
+  --bg-inset:   #f0f4f8;
+  --ink:        #1C1C1C;
+  --ink-lt:     #445;
+  --radius:     4px;
+}
+
+/* ── Crimson theme override (player choice) ── */
+.charsheet:has(#theme-red:checked) {
+  --accent:     #9B1B30;
+  --accent-dk:  #6B1220;
+  --accent-lt:  #C9475A;
+  --accent-bg:  #F9E8EB;
+  --accent-bar: #9B1B30;
+  --accent-bar-text: #fff;
+  --gold:       #B8872A;
+  --gold-lt:    #E8D59A;
+  --border:     #D9B8BE;
+  --bg:         #ffffff;
+  --bg-panel:   #fafafa;
+  --bg-inset:   #f4f4f4;
+  --ink:        #1C1C1C;
+  --ink-lt:     #555;
+  --radius:     4px;
+}
+
+/* ── Sheet root ── */
+.charsheet {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.4;
+}
+
+/* ══════════════════════════════════════════════════════
+   THEME PICKER (lives in sheet header)
+══════════════════════════════════════════════════════ */
+#theme-red, #theme-blue { display: none; }
+
+.sheet-theme-picker {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 4px 10px 0;
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-lt);
+}
+.sheet-theme-picker label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  transition: border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.sheet-theme-picker label:hover { border-color: var(--accent); }
+.sheet-theme-picker .swatch {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.15);
+  display: inline-block;
+}
+.swatch-red  { background: #9B1B30; }
+.swatch-blue { background: #1E3A5F; }
+
+#theme-red:checked  ~ .charsheet .sheet-theme-picker label[for="theme-red"],
+#theme-blue:checked ~ .charsheet .sheet-theme-picker label[for="theme-blue"] {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+/* ══════════════════════════════════════════════════════
+   TAB NAVIGATION
+══════════════════════════════════════════════════════ */
+.sheet-tabs-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  background: var(--accent-dk);
+  padding: 4px 6px 0;
+  border-bottom: 3px solid var(--gold);
+}
+
+.sheet-tabs-top input[type="radio"] { display: none; }
+
+.sheet-tabs-top label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gold-lt);
+  padding: 5px 10px 4px;
+  cursor: pointer;
+  border-radius: var(--radius) var(--radius) 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  transition: background 0.15s, color 0.15s;
+}
+.sheet-tabs-top label:hover { background: rgba(255,255,255,0.12); }
+
+/* active tab */
+#sheet-tab-char:checked   ~ .sheet-tabs-top label[for="sheet-tab-char"],
+#sheet-tab-class:checked  ~ .sheet-tabs-top label[for="sheet-tab-class"],
+#sheet-tab-combat:checked ~ .sheet-tabs-top label[for="sheet-tab-combat"],
+#sheet-tab-prof:checked   ~ .sheet-tabs-top label[for="sheet-tab-prof"],
+#sheet-tab-spells:checked ~ .sheet-tabs-top label[for="sheet-tab-spells"],
+#sheet-tab-equip:checked  ~ .sheet-tabs-top label[for="sheet-tab-equip"],
+#sheet-tab-bio:checked    ~ .sheet-tabs-top label[for="sheet-tab-bio"],
+#sheet-tab-wizard:checked ~ .sheet-tabs-top label[for="sheet-tab-wizard"] {
+  background: var(--bg);
+  color: var(--accent-dk);
+  border-color: var(--gold);
+}
+
+/* tab panels */
+.sheet-tab-panel { display: none; padding: 12px; }
+
+#sheet-tab-char:checked   ~ .sheet-panel-char,
+#sheet-tab-class:checked  ~ .sheet-panel-class,
+#sheet-tab-combat:checked ~ .sheet-panel-combat,
+#sheet-tab-prof:checked   ~ .sheet-panel-prof,
+#sheet-tab-spells:checked ~ .sheet-panel-spells,
+#sheet-tab-equip:checked  ~ .sheet-panel-equip,
+#sheet-tab-bio:checked    ~ .sheet-panel-bio,
+#sheet-tab-wizard:checked ~ .sheet-panel-wizard { display: block; }
+
+/* ══════════════════════════════════════════════════════
+   EDIT / DONE TOGGLE (Identity, Ability Scores, Classes)
+══════════════════════════════════════════════════════ */
+
+/* Hide the underlying checkbox */
+.sheet-edit-check { display: none; }
+
+/* Section title flex so EDIT btn floats right */
+.sheet-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* EDIT / DONE label-button */
+.sheet-edit-lbl {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-lt);
+  background: rgba(255,255,255,0.15);
+  border: 1px solid var(--gold-lt);
+  border-radius: 3px;
+  padding: 2px 8px;
+  cursor: pointer;
+  margin-left: 8px;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.sheet-edit-lbl:hover { background: rgba(255,255,255,0.25); }
+.sheet-edit-lbl .lbl-done { display: none; }
+
+/* When checked: swap EDIT→DONE label (use + adjacent sibling to avoid cross-contamination) */
+#sheet-identity-edit:checked + .sheet-box .sheet-edit-lbl .lbl-edit,
+#sheet-ability-edit:checked  + .sheet-box .sheet-edit-lbl .lbl-edit,
+#sheet-class-edit:checked    + .sheet-box .sheet-edit-lbl .lbl-edit { display: none; }
+#sheet-identity-edit:checked + .sheet-box .sheet-edit-lbl .lbl-done,
+#sheet-ability-edit:checked  + .sheet-box .sheet-edit-lbl .lbl-done,
+#sheet-class-edit:checked    + .sheet-box .sheet-edit-lbl .lbl-done { display: inline; }
+
+/* ── Identity fields: readonly by default ── */
+.sheet-identity-fields input[type="text"],
+.sheet-identity-fields input[type="number"],
+.sheet-identity-fields select {
+  pointer-events: none;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+.sheet-identity-fields .sheet-alignment-grid input[type="radio"] {
+  pointer-events: none;
+  opacity: 0.6;
+}
+/* Identity edit mode */
+#sheet-identity-edit:checked + .sheet-box .sheet-identity-fields input[type="text"],
+#sheet-identity-edit:checked + .sheet-box .sheet-identity-fields input[type="number"],
+#sheet-identity-edit:checked + .sheet-box .sheet-identity-fields select {
+  pointer-events: auto;
+  background: var(--bg-inset) !important;
+  border-color: var(--border) !important;
+}
+#sheet-identity-edit:checked + .sheet-box .sheet-identity-fields .sheet-alignment-grid input[type="radio"] {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+/* ── Ability Scores: +/- buttons hidden by default ── */
+.sheet-ability-fields .sheet-stat-btns { display: none; }
+.sheet-ability-fields .sheet-stat-display input[type="number"] {
+  pointer-events: none;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--accent-dk);
+}
+/* Ability edit mode */
+#sheet-ability-edit:checked + .sheet-box .sheet-ability-fields .sheet-stat-btns { display: flex; }
+#sheet-ability-edit:checked + .sheet-box .sheet-ability-fields .sheet-stat-display input[type="number"] {
+  pointer-events: auto;
+  background: var(--bg-inset) !important;
+  border-color: var(--border) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   CLASS TAB TABLE
+══════════════════════════════════════════════════════ */
+
+.sct-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--border);
+}
+.sct-header {
+  background: var(--accent-bg);
+  border-bottom: 2px solid var(--accent);
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding: 5px 6px;
+}
+
+.sct-class   { flex: 3; min-width: 100px; }
+.sct-level   { flex: 0 0 32px; text-align: center; }
+.sct-smd     { flex: 0 0 64px; display: flex; gap: 4px; align-items: center; justify-content: center; }
+.sct-kit     { flex: 2; min-width: 80px; }
+.sct-xp      { flex: 2; min-width: 70px; }
+.sct-xpnext  { flex: 2; min-width: 70px; }
+.sct-del     { flex: 0 0 22px; text-align: center; }
+
+/* Read-only span cells */
+.sct-ro {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--accent-dk);
+  text-align: center;
+}
+
+/* S/M/D radio labels */
+.sct-smd-lbl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-family: 'Cinzel', serif;
+  font-size: 7px;
+  font-weight: 700;
+  color: var(--accent);
+  cursor: pointer;
+}
+.sct-smd-lbl input[type="radio"] {
+  width: 12px; height: 12px; margin: 0;
+  accent-color: var(--accent);
+}
+
+/* Kit input */
+.sct-kit-input {
+  width: 100%;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 10px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 4px;
+  background: var(--bg-inset);
+  color: var(--ink);
+}
+
+/* XP input */
+.sct-xp-input {
+  width: 100%;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 4px;
+  background: var(--bg-inset);
+  color: var(--ink);
+}
+
+/* Class dropdown */
+.sct-class select {
+  width: 100%;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 10px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 2px 4px;
+  background: var(--bg-inset);
+  color: var(--ink);
+}
+
+/* Delete button: hidden until EDIT mode */
+.sct-del-btn {
+  display: none;
+  font-size: 10px;
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 2px;
+  opacity: 0.7;
+}
+.sct-del-btn:hover { opacity: 1; }
+#sheet-class-edit:checked + .sheet-box .sct-del-btn { display: inline-block; }
+
+/* ══════════════════════════════════════════════════════
+   TYPOGRAPHY
+══════════════════════════════════════════════════════ */
+.sheet-title-main {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--accent);
+  text-align: center;
+  letter-spacing: 0.06em;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.08);
+  padding: 10px 0 4px;
+  border-bottom: 2px solid var(--accent);
+  margin-bottom: 4px;
+}
+
+.sheet-section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-bar-text);
+  background: var(--accent-bar);
+  padding: 4px 10px;
+  border-left: 4px solid var(--gold);
+  margin-bottom: 6px;
+}
+
+.sheet-subsection-title {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent);
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 2px;
+  margin-bottom: 5px;
+  letter-spacing: 0.05em;
+}
+
+/* ══════════════════════════════════════════════════════
+   LAYOUT PRIMITIVES
+══════════════════════════════════════════════════════ */
+.sheet-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.sheet-col { flex: 1; min-width: 0; }
+.sheet-col-2 { flex: 2; }
+.sheet-col-3 { flex: 3; }
+.sheet-col-fixed-100 { flex: 0 0 100px; }
+.sheet-col-fixed-140 { flex: 0 0 140px; }
+
+.sheet-box {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.sheet-box-inset {
+  background: var(--bg-inset);
+  border: 1px solid var(--gold-lt);
+  border-radius: var(--radius);
+  padding: 6px 8px;
+  margin-bottom: 6px;
+}
+
+.sheet-divider {
+  border: none;
+  border-top: 2px solid var(--accent);
+  margin: 8px 0 6px;
+  position: relative;
+}
+.sheet-divider::after {
+  content: '';
+  display: block;
+  border-top: 1px solid var(--gold);
+  margin-top: 2px;
+}
+
+/* ══════════════════════════════════════════════════════
+   FORM ELEMENTS
+══════════════════════════════════════════════════════ */
+label.sheet-label {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-lt);
+  margin-bottom: 1px;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 2px 4px;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 11px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  background: #fff;
+}
+
+input[type="number"] { text-align: center; }
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23555'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  padding-right: 20px;
+}
+
+textarea { resize: vertical; min-height: 60px; line-height: 1.4; }
+
+.sheet-field { display: flex; flex-direction: column; margin-bottom: 4px; }
+
+.sheet-field-inline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+.sheet-field-inline label.sheet-label { margin: 0; white-space: nowrap; }
+.sheet-field-inline input,
+.sheet-field-inline select { flex: 1; }
+
+/* ── Stat block — square stepper ── */
+.sheet-stat-block {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 6px 8px;
+  min-width: 90px;
+  flex: 1;
+}
+
+.sheet-stat-block .sheet-stat-name {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 5px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 3px;
+}
+
+/* stepper row: [square display] [+/-] */
+.sheet-stat-stepper {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  margin-bottom: 5px;
+}
+
+/* the square value display — hidden number input styled as a box */
+.sheet-stat-display {
+  flex: 1;
+  position: relative;
+}
+.sheet-stat-display input[type="number"] {
+  width: 100%;
+  height: 48px;
+  font-size: 26px;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  text-align: center;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  padding: 0;
+  background: var(--accent-bg);
+  color: var(--accent-dk);
+  /* hide native spinners */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.sheet-stat-display input[type="number"]::-webkit-inner-spin-button,
+.sheet-stat-display input[type="number"]::-webkit-outer-spin-button { display: none; }
+
+/* +/− button column */
+.sheet-stat-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sheet-stat-btns button,
+.sheet-stat-btns button[type="action"] {
+  width: 22px;
+  height: 23px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0;
+  text-align: center;
+  color: #fff;
+  background: var(--accent);
+  border: 1px solid var(--accent-dk);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.12s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sheet-stat-btns button:hover,
+.sheet-stat-btns button[type="action"]:hover { background: var(--accent-dk); }
+
+/* exceptional STR sub-field */
+.sheet-stat-block .sheet-stat-sub {
+  font-size: 8px;
+  color: var(--ink-lt);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 4px;
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.04em;
+}
+.sheet-stat-block .sheet-stat-sub input {
+  flex: 1;
+  font-size: 9px;
+  text-align: center;
+  height: 18px;
+  border-color: var(--gold-lt);
+}
+
+/* derived mini-fields inside stat blocks */
+.sheet-derived-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 10px;
+}
+
+/* ── Save rows ── */
+.sheet-save-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 4px;
+  border-bottom: 1px solid var(--bg-inset);
+  font-size: 10px;
+  gap: 6px;
+}
+.sheet-save-row:last-child { border-bottom: none; }
+.sheet-save-row label { flex: 1; color: var(--ink-lt); }
+.sheet-save-row input[type="number"] { width: 36px; }
+
+/* ── Roll button ── */
+button.sheet-roll-btn,
+button[type="roll"] {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent);
+  border: 1px solid var(--accent-dk);
+  border-radius: var(--radius);
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+button.sheet-roll-btn:hover,
+button[type="roll"]:hover { background: var(--accent-dk); }
+
+/* ── HP big display ── */
+.sheet-hp-big {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+.sheet-hp-big input[type="number"] {
+  width: 58px;
+  height: 44px;
+  font-size: 26px;
+  font-weight: 700;
+  font-family: 'Cinzel', serif;
+  text-align: center;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent-bg);
+  color: var(--accent-dk);
+}
+.sheet-hp-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--ink-lt);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+/* ── Read-only stat display (AC, THAC0, MV, Saves) ── */
+.sheet-stat-display-ro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.sheet-stat-display-ro .sheet-ro-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-lt);
+}
+.sheet-stat-display-ro span[name],
+.sheet-stat-display-ro .sheet-ro-value {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--accent-dk);
+  line-height: 1;
+  min-width: 52px;
+  text-align: center;
+  border-bottom: 2px solid var(--accent);
+  padding: 2px 8px;
+  display: block;
+}
+
+/* saves read-only row */
+.sheet-save-ro-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--bg-inset);
+  gap: 8px;
+  font-size: 10px;
+}
+.sheet-save-ro-row:last-child { border-bottom: none; }
+.sheet-save-ro-row .save-name { flex: 1; color: var(--ink-lt); }
+.sheet-save-ro-row .save-val {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 28px;
+  text-align: center;
+}
+.sheet-save-ro-row .save-roll-btn {
+  flex: 0 0 auto;
+}
+/* hidden input behind each displayed save */
+.sheet-save-ro-row input[type="hidden"] { display: none; }
+
+/* ══════════════════════════════════════════════════════
+   REPEATING SECTION TABLES
+══════════════════════════════════════════════════════ */
+.sheet-table-header,
+.sheet-table-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.sheet-table-header {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 3px;
+  margin-bottom: 4px;
+}
+.sheet-table-row {
+  padding: 2px 0;
+  border-bottom: 1px solid var(--bg-inset);
+}
+.sheet-table-row:last-child { border-bottom: none; }
+
+/* ── WEAPON TABLE (flat rows) ───────────────────────── */
+
+/* Reset global width:100% for the weapon name input only */
+.repeating_weapons input[type="text"].wt-name { width: 100%; }
+
+/* read-only span cell — mimics a display field */
+.wt-ro {
+  display: block;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 10.5px;
+  color: var(--ink);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 2px 0;
+}
+.wt-ro[name*="prof"] {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: left;
+}
+.wt-ro[name*="thac0"],
+.wt-ro[name*="attacks"],
+.wt-ro[name*="speed"] {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--accent-dk);
+}
+
+/* M/R/T checkbox group */
+.wt-mrt {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  flex: 0 0 58px;
+  justify-content: center;
+}
+.wt-mrt label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-family: 'Cinzel', serif;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  cursor: default;
+}
+.wt-mrt label input[type="checkbox"] {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  accent-color: var(--accent);
+  pointer-events: none;
+  cursor: default;
+}
+
+/* weapon table columns */
+.wt-name   { flex: 3; min-width: 120px; }
+.wt-prof   { flex: 2; min-width: 80px; }
+.wt-atk    { flex: 0 0 36px; text-align: center; }
+.wt-spd    { flex: 0 0 28px; text-align: center; }
+.wt-range  { flex: 2; min-width: 90px; }
+.wt-thac0  { flex: 0 0 38px; text-align: center; }
+.wt-dam-s  { flex: 1; min-width: 62px; }
+.wt-dam-l  { flex: 1; min-width: 62px; }
+.wt-type   { flex: 0 0 38px; text-align: center; }
+.wt-crit   { flex: 0 0 30px; text-align: center; font-size: 9px; }
+/* Crit threshold highlight for High/Grand Master */
+.wt-ro.wt-crit-active {
+  color: var(--accent);
+  font-weight: 700;
+}
+.wt-roll   { flex: 0 0 44px; }
+
+/* NWP columns */
+.nwp-name  { flex: 3; }
+.nwp-attr  { flex: 2; }
+.nwp-check { flex: 1; min-width: 34px; }
+.nwp-roll  { flex: 0 0 50px; }
+
+/* ══════════════════════════════════════════════════════
+   SPELL SLOTS GRID
+══════════════════════════════════════════════════════ */
+.sheet-spell-slots {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.sheet-spell-slot-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.sheet-spell-slot-col .sheet-label { font-size: 8px; text-align: center; }
+.sheet-spell-slot-col input { width: 32px; text-align: center; }
+
+/* ══════════════════════════════════════════════════════
+   MONEY ROW
+══════════════════════════════════════════════════════ */
+.sheet-money-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.sheet-money-coin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.sheet-money-coin .sheet-coin-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.sheet-money-coin input { width: 54px; text-align: center; }
+
+/* ══════════════════════════════════════════════════════
+   ALIGNMENT GRID
+══════════════════════════════════════════════════════ */
+.sheet-alignment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  text-align: center;
+}
+.sheet-alignment-grid label {
+  font-size: 9px;
+  font-family: 'Cinzel', serif;
+  padding: 4px 3px;
+  border: 1.5px solid var(--border);
+  border-radius: 3px;
+  cursor: pointer;
+  color: var(--ink-lt);
+  background: var(--bg);
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.sheet-alignment-grid input[type="radio"] { display: none; }
+.sheet-alignment-grid input[type="radio"]:checked + label {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent-dk);
+}
+
+/* ══════════════════════════════════════════════════════
+   CREATION WIZARD
+══════════════════════════════════════════════════════ */
+.sheet-wizard-step {
+  background: var(--bg-inset);
+  border: 2px solid var(--gold-lt);
+  border-left: 4px solid var(--accent);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.sheet-wizard-step-num {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sheet-wizard-step-num::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gold-lt);
+}
+.sheet-wizard-hint {
+  font-style: italic;
+  color: var(--ink-lt);
+  font-size: 10px;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-bg);
+  border-radius: 0 3px 3px 0;
+}
+
+/* ══════════════════════════════════════════════════════
+   TOOLTIP
+══════════════════════════════════════════════════════ */
+.sheet-tip {
+  position: relative;
+  cursor: help;
+}
+.sheet-tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: #fff;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 200;
+}
+.sheet-tip:hover::after { opacity: 1; }
+
+/* ══════════════════════════════════════════════════════
+   ORNAMENT
+══════════════════════════════════════════════════════ */
+.sheet-ornament {
+  text-align: center;
+  font-size: 18px;
+  color: var(--accent);
+  margin: 6px 0;
+  letter-spacing: 6px;
+  opacity: 0.4;
+}
+
+/* ══════════════════════════════════════════════════════
+   IDENTITY — nicer readonly display
+══════════════════════════════════════════════════════ */
+
+/* In readonly mode: fields look like plain label+value rows */
+.sheet-identity-fields .sheet-label {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-lt);
+  margin-bottom: 1px;
+}
+.sheet-identity-fields input[type="text"],
+.sheet-identity-fields input[type="number"],
+.sheet-identity-fields select {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  pointer-events: none;
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 2px 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+/* Hide number spinners in readonly */
+.sheet-identity-fields input[type="number"]::-webkit-inner-spin-button,
+.sheet-identity-fields input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+/* Remove select chevron in readonly */
+.sheet-identity-fields select { background-image: none !important; }
+
+/* Identity edit mode — restore proper field appearance */
+#sheet-identity-edit:checked + .sheet-box .sheet-identity-fields input[type="text"],
+#sheet-identity-edit:checked + .sheet-box .sheet-identity-fields input[type="number"],
+#sheet-identity-edit:checked + .sheet-box .sheet-identity-fields select {
+  pointer-events: auto;
+  background: var(--bg-inset) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  padding: 3px 6px;
+  -webkit-appearance: auto;
+  appearance: auto;
+}
+#sheet-identity-edit:checked + .sheet-box .sheet-identity-fields input[type="number"]::-webkit-inner-spin-button,
+#sheet-identity-edit:checked + .sheet-box .sheet-identity-fields input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: auto; }
+#sheet-identity-edit:checked + .sheet-box .sheet-identity-fields select { background-image: auto !important; }
+#sheet-identity-edit:checked + .sheet-box .sheet-identity-fields .sheet-alignment-grid input[type="radio"] {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════════════════
+   CLASS TAB — S/M/D progression selector
+══════════════════════════════════════════════════════ */
+
+.sct-progression {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: var(--accent-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.sct-prog-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.sct-prog-opt {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 10px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.sct-prog-opt input[type="radio"] {
+  accent-color: var(--accent);
+}
+.sct-prog-opt span { font-weight: 400; }
+/* Remove sct-smd column from header (was used for per-row S/M/D) */
+.sct-smd { display: none; }
+
+/* Class and Kit fields: pointer-events off (readonly) by default */
+.sct-class select,
+.sct-kit-input {
+  pointer-events: none;
+  background: transparent !important;
+  border-color: transparent !important;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+  -webkit-appearance: none;
+  appearance: none;
+  box-shadow: none;
+}
+/* In edit mode — restore */
+#sheet-class-edit:checked + .sheet-box .sct-class select,
+#sheet-class-edit:checked + .sheet-box .sct-kit-input {
+  pointer-events: auto;
+  background: var(--bg-inset) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  -webkit-appearance: auto;
+  appearance: auto;
+}
+
+/* XP column: span shown by default, input hidden */
+.sct-xp .sct-xp-input { display: none; }
+.sct-xp .sct-xp-ro { font-size: 11px; color: var(--ink); }
+
+/* Dual-class + EDIT mode only: switch XP span → editable input */
+.sheet-panel-class:has([name="attr_progression_type"][value="D"]:checked):has(#sheet-class-edit:checked) .sct-xp .sct-xp-ro { display: none; }
+.sheet-panel-class:has([name="attr_progression_type"][value="D"]:checked):has(#sheet-class-edit:checked) .sct-xp .sct-xp-input {
+  display: block;
+  pointer-events: auto;
+  background: var(--bg-inset) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+}
+/* XP over-budget: red input */
+.sct-xp-input.over-budget { border-color: #c0392b !important; color: #c0392b !important; background: #fdecea !important; }
+
+/* ══════════════════════════════════════════════════════
+   HIT POINTS — EDIT component
+══════════════════════════════════════════════════════ */
+.hp-main-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.hp-slash {
+  font-size: 22px;
+  color: var(--border);
+  line-height: 48px;
+}
+/* Max HP: show readonly by default, stepper in edit mode */
+.hp-max-ro  { display: block; }
+.hp-max-edit { display: none; }
+#sheet-hp-edit:checked + .sheet-box .hp-max-ro  { display: none; }
+#sheet-hp-edit:checked + .sheet-box .hp-max-edit { display: flex; }
+
+/* Temp HP — small stepper */
+.hp-temp-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+.hp-temp-stepper {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.hp-temp-btn {
+  width: 20px; height: 20px;
+  font-size: 13px; line-height: 1;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0;
+}
+.hp-temp-btn:hover { background: var(--accent-dk); }
+.hp-temp-input {
+  width: 42px;
+  height: 28px;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent-dk);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  background: var(--accent-bg);
+}
+
+/* ══════════════════════════════════════════════════════
+   ARMOR CLASS
+══════════════════════════════════════════════════════ */
+.ac-values-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  margin-bottom: 8px;
+}
+/* Larger AC numbers */
+.ac-values-row .sheet-stat-display-ro span:not(.sheet-ro-label) {
+  font-size: 40px;
+  min-width: 56px;
+}
+/* Two-column AC body: fields left, image right */
+.ac-body-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+.ac-fields-col { flex: 1; }
+.ac-image-col { flex: 0 0 72px; }
+.ac-armor-img {
+  width: 72px; height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  color: var(--border);
+  /* placeholder: future armor illustration */
+}
+.ac-helm-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent);
+  cursor: pointer;
+  margin-top: 3px;
+}
+/* Armor/shield dropdowns: readonly by default */
+.ac-field {
+  pointer-events: none;
+  background: transparent !important;
+  border-color: transparent !important;
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+  box-shadow: none;
+}
+/* Helmet checkbox: pointer-events off by default */
+.ac-helm-label input[type="checkbox"] { pointer-events: none; }
+
+/* AC Edit mode */
+#sheet-ac-edit:checked + .sheet-box .ac-field {
+  pointer-events: auto;
+  background: var(--bg-inset) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  -webkit-appearance: auto;
+  appearance: auto;
+}
+#sheet-ac-edit:checked + .sheet-box .ac-helm-label input[type="checkbox"] { pointer-events: auto; }
+#sheet-ac-edit:checked + .sheet-box .sheet-edit-lbl .lbl-edit { display: none; }
+#sheet-ac-edit:checked + .sheet-box .sheet-edit-lbl .lbl-done { display: inline; }
+
+/* AC items list */
+.ac-items-list { display: none; }
+#sheet-ac-edit:checked + .sheet-box .ac-items-list { display: block; margin: 4px 0; }
+.ac-item-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  padding: 2px 4px;
+  border-bottom: 1px solid var(--bg-inset);
+}
+.ac-item-name { flex: 1; color: var(--ink); font-style: italic; }
+.ac-item-bonus { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--accent); width: 28px; text-align: center; }
+.ac-item-del { display: none; }
+#sheet-ac-edit:checked + .sheet-box .ac-item-del { display: inline-block; }
+.ac-add-row { display: none; margin-top: 4px; }
+#sheet-ac-edit:checked + .sheet-box .ac-add-row { display: block; }
+
+/* ══════════════════════════════════════════════════════
+   MOVEMENT derived speeds
+══════════════════════════════════════════════════════ */
+.mv-speeds {
+  display: flex;
+  gap: 10px;
+  margin: 4px 0;
+}
+.mv-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.mv-ro {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-dk);
+  border-bottom: 1px solid var(--accent);
+  min-width: 28px;
+  text-align: center;
+  padding: 0 4px;
+}
+
+/* ══════════════════════════════════════════════════════
+   SAVING THROWS — inline adjustments
+══════════════════════════════════════════════════════ */
+.save-adj-label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: var(--ink-lt);
+  flex-shrink: 0;
+}
+.save-adj-input {
+  width: 34px;
+  flex: 0 0 34px;
+  min-width: 0;
+  height: 20px;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-dk);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--bg-inset);
+  flex-shrink: 0;
+}
+.save-adj-ro {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.save-adj-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 7.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-lt);
+  flex-shrink: 0;
+}
+.sheet-col-fixed-160 { flex: 0 0 160px; }
+
+/* ══════════════════════════════════════════════════════
+   CLASS FEATURES — expandable cards
+══════════════════════════════════════════════════════ */
+.cf-box { margin-top: 8px; }
+
+/* Group: one per class */
+.cf-group {
+  margin-bottom: 10px;
+}
+.cf-group:last-child { margin-bottom: 0; }
+
+.cf-group-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 0 4px 2px;
+  border-bottom: 2px solid var(--accent);
+  margin-bottom: 4px;
+}
+.cf-class-name {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-dk);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.cf-class-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--ink-lt);
+  letter-spacing: 0.05em;
+}
+
+/* Individual feature: <details> */
+.cf-feature {
+  border-bottom: 1px solid var(--bg-inset);
+}
+.cf-feature:last-child { border-bottom: none; }
+
+.cf-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  cursor: pointer;
+  list-style: none; /* hide default triangle */
+  user-select: none;
+  transition: background 0.1s;
+}
+.cf-summary::-webkit-details-marker { display: none; }
+.cf-summary:hover { background: var(--accent-bg); border-radius: var(--radius); }
+
+/* Expand arrow using pseudo-element */
+.cf-summary::before {
+  content: '▶';
+  font-size: 8px;
+  color: var(--accent);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+  width: 12px;
+  text-align: center;
+}
+.cf-feature[open] > .cf-summary::before {
+  transform: rotate(90deg);
+}
+
+.cf-feat-name {
+  flex: 1;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.cf-feat-lvl {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--ink-lt);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1px 6px;
+  flex-shrink: 0;
+}
+.cf-feat-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 7.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-lt);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-lt);
+  border-radius: 10px;
+  padding: 1px 6px;
+  flex-shrink: 0;
+}
+
+/* Feature body (expanded content) */
+.cf-body {
+  padding: 6px 12px 10px 20px;
+  font-family: 'Libre Baskerville', serif;
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: var(--ink-lt);
+  border-top: 1px solid var(--bg-inset);
+}
+.cf-body strong { color: var(--ink); }
+.cf-body em { color: var(--accent); font-style: italic; }
+
+/* Thieving skills mini-grid */
+.cf-skill-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  margin-top: 6px;
+  font-size: 10px;
+  max-width: 220px;
+}
+.cf-skill-grid span:nth-child(even) {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: right;
+}
+
+/* ══════════════════════════════════════════════════════
+   THAC0 + MV two-column grid
+══════════════════════════════════════════════════════ */
+.tm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  margin-bottom: 6px;
+}
+.tm-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+/* Larger THAC0 / MV numbers */
+.tm-stat span:not(.sheet-ro-label) {
+  font-size: 40px !important;
+  min-width: 60px;
+}
+
+/* ══════════════════════════════════════════════════════
+   ROLL TEMPLATE
+══════════════════════════════════════════════════════ */
+.sheet-rolltemplate-adnd2e .sheet-template-box {
+  min-width: 200px;
+  background: #fff;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  overflow: hidden;
+  font-family: 'Libre Baskerville', serif;
+}
+.sheet-rolltemplate-adnd2e .sheet-template-header {
+  background: var(--accent);
+  color: #fff;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  letter-spacing: 0.05em;
+}
+.sheet-rolltemplate-adnd2e .sheet-template-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 10px;
+  border-bottom: 1px solid var(--bg-inset);
+  font-size: 11px;
+}
+.sheet-rolltemplate-adnd2e .sheet-template-row:last-child { border-bottom: none; }
+.sheet-rolltemplate-adnd2e .sheet-template-label { color: var(--ink-lt); }
+.sheet-rolltemplate-adnd2e .sheet-template-value { font-weight: 700; color: var(--accent-dk); }
