@@ -23,10 +23,22 @@ The [Roll20 Code of Conduct](https://help.roll20.net/hc/en-us/articles/360037254
 
 Following the Roll20 Code of Conduct means **no racism, no sexism, no hate speech, no backseat gaming, no personal attacks, no transphobia, no misgendering, no ableism, no anti-LGBTQIA+ sentiments (and so on) are allowed.**
 
+## AI Policy
+
+The [Roll20 AI Policy for Community Mod Scripts & Character Sheets](https://help.roll20.net/hc/en-us/articles/43164327041943-AI-Policy-for-Community-Mod-Scripts-Character-Sheets) applies to all contributions to this repository. The linked article is the canonical version of the policy; this summary is provided for convenience.
+
+**tl;dr**
+
+* **Code may be AI-assisted or AI-generated.** HTML, CSS, and JavaScript may be written with generative AI tools, but **you are fully responsible for everything you submit**, regardless of how it was produced. You must be able to read, explain, debug, and stand behind all of the code in your PR. "Vibe coding" (submitting generated code you don't understand) is strongly discouraged, and sheets that break, introduce security issues, or infringe on someone else's work may be removed.
+* **Creative content must be human-made.** Creative written text (such as in-sheet copy and descriptions) and all visual assets (artwork, icons, illustrations, backgrounds, and other images) must originate from you or the human teammates you worked with. AI may be used to edit, proofread, post-process, or format human-created work, but not to write that copy or generate that art wholesale. AI-written technical documentation is allowed.
+* **No disclosure required** for contributions that comply with the policy. Contributions that don't use AI at all are encouraged to say so.
+* **Non-compliant contributions will be removed.** Misrepresenting how AI was used may result in permanent de-listing of the sheet, and repeated bad-faith violations may result in a ban from submitting sheets.
+
 ## Table of Contents
 
 - [Roll20 Character Sheets](#roll20-character-sheets)
   - [Community Conduct](#community-conduct)
+  - [AI Policy](#ai-policy)
   - [Table of Contents](#table-of-contents)
   - [Contributing](#contributing)
     - [Getting Started](#getting-started)
@@ -84,6 +96,11 @@ A character sheet, at a minimum requires four files in an appropriately named su
 All contributions to this repository must meet the minimum requirements outlined in [this article](https://help.roll20.net/hc/en-us/articles/360037773453). We additionally reccomend requesting approvals from a sheet's original author if you are submitting any large overhauls to actively-maintained sheets. This will speed up your approval process.
 
 If you are submitting a new sheet that is officially supported by the game's publisher, please ask that the publisher reach out to us at [licensing@roll20.net](mailto:licensing@roll20.net) to confirm they are aware of and supporting this sheet as an official sheet with their name attached, before submitting your PR.
+
+When opening a Pull Request, use the template that matches your change:
+
+* **Changes to an existing sheet:** [open a PR with the default template](https://github.com/Roll20/roll20-character-sheets/compare) (applied automatically).
+* **Submitting a new sheet:** [open a PR with the new-sheet template](https://github.com/Roll20/roll20-character-sheets/compare?template=new_sheet.md), or run `gh pr create --template new_sheet.md`.
 
 ### Release Cadence
 

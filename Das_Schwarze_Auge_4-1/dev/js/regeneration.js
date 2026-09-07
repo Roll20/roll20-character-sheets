@@ -1,4 +1,4 @@
-/* regeneration begin */
+/* regeneration start */
 /* Handle active regeneration tabs when deactivating magic/karma */
 const attrsUIReg = [
 	'ui_tab_reg',

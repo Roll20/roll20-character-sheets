@@ -656,7 +656,7 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{vBourreau=${i18n_bourreau} ${eBourreauV} ${i18n_inclus}}}`);
   }
 
-  if (eCadence && eCadenceActif === 0) {
+  if (eCadence && eCadenceActif === '0') {
     autresEffets.push(`${i18n_cadence} ${eCadenceV}`);
   } else if (eCadence && eCadenceActif === 1) {
     isCadence = true;
@@ -669,7 +669,7 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{chocCondition=${i18n_chocCondition}}}`);
   }
 
-  if (eConviction !== 0) {
+  if (eConviction !== '0') {
     autresEffets.push(i18n_conviction);
   }
 
@@ -708,7 +708,7 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
     exec.push(`{{esperanceConditionV=${i18n_esperanceConditionV}}}`);
   }
 
-  if (eExcellence) {
+  if (eExcellence !== '0') {
     isConditionnelD = true;
     isConditionnelV = true;
 
@@ -977,8 +977,8 @@ on('clicked:repeating_armeDruidLion:combatdruidroll', async (info) => {
   }
 
   if (aPointeurLaser !== '0') {
-    exec.push('{{vMPLaser=+1}}');
-    bonus.push(1);
+    isConditionnelA = true;
+    exec.push(`{{pointeurLaserValue=[[3D6]]}} {{pointeurLaser=${i18n_pointeurLaser}}} {{pointeurLaserCondition=${i18n_pointeurLaserCondition}}}`);
   }
 
   if (aSystemeRefroidissement !== '0') {

@@ -1,8 +1,8 @@
 <div class="sheet-mainBg">
   <!-- FDP -->
   <!-- INPUT HIDDEN Version FdP -->
-  <input type="hidden" name="attr_VERFDP" value="4.8.0" />
-  <input type="hidden" name="attr_VERSION" value="4.8.0" />
+  <input type="hidden" name="attr_VERFDP" value="4.8.1" />
+  <input type="hidden" name="attr_VERSION" value="4.8.1" />
   <!-- INPUT HIDDEN Univers (COF, COG, COC) -->
   <input type="hidden" name="attr_UNIVERS" value="COG" />
   <input type="hidden" name="attr_token_url" value="" />
@@ -156,7 +156,7 @@
     <div style="width: 420px; vertical-align: middle; text-align: center">
       <img
         width="320px"
-        title="Version 4.8.0 - 25/01/2025"
+        title="Version 4.8.1 - 14/03/2026"
         src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog2_logo.png"
       />
       <img width="90px" height="90px" name="attr_character_token" />
@@ -6117,6 +6117,17 @@
               <li>
                 <details>
                   <summary>
+                    <strong>Version 4.8.1</strong> (2025.01.25)
+                  </summary>
+                  <ul>
+                    <em>Fiche de personnage</em>
+                    <li>Correction d'un bug dans l'import de profil JSON</li>
+                  </ul>
+                </details>
+              </li>
+              <li>
+                <details>
+                  <summary>
                     <strong>Version 4.8.0</strong> (2025.01.25)
                   </summary>
                   <ul>
@@ -10002,10 +10013,6 @@ function clog(
   }
 }
 
-function getFunctioName() {
-  return getFunctioName.caller.name;
-}
-
 /**
 * Generate a random number between 1 and max
 * @param {integer} max Upper bound of range
@@ -11270,7 +11277,7 @@ function importProfileJSON(attrs, data) {
         attrs[`v${ix + 1}r${rank + 1}_freq`] = "";
         if (ability.uses) {
           const { number = 0, per = "" } = ability.uses;
-          if (number > 0 && by !== "") {
+          if (number > 0 && per !== "") {
             attrs[`v${ix + 1}r${rank + 1}_use_max`] = number;
             attrs[`v${ix + 1}r${rank + 1}_freq`] = per;
           }
@@ -13462,16 +13469,26 @@ function attrRanks(voie) {
 * @param {string} voie path #
 */
 function setRank(voie) {
-  getAttrs(attrRanks(voie), function (v) {
+  getAttrs([ `voie${voie}nom`, ...attrRanks(voie) ], function (v) {
     let rank = 0;
     seq(5).forEach(rn => {
       const flag = int(v[`v${voie}r${rn}`]);
       const title = stringOrDefault(v[`voie${voie}-t${rn}`]);
       const text = stringOrDefault(v[`voie${voie}-${rn}`]);
-      if (flag === 1 && (title !== "" || text !== "")) rank = rn;
+      if (flag === 1 && (title !== "" || text !== "")) 
+        rank = rn;
     });
     const ranks = {};
     ranks[`RANG_VOIE${voie}`] = rank;
+    const pathName = stringOrDefault(v[`voie${voie}nom`]).trim().toLowerCase();
+    if (pathName.includes("pilotage"))
+      ranks["rangs_pilotage"] = rank;
+    if (pathName.includes("moteurs"))
+      ranks["rangs_moteurs"] = rank;
+    if (pathName.includes("électronique"))
+      ranks["rangs_electronique"] = rank;
+    if (pathName.includes("armes lourdes"))
+      ranks["rangs_armes_lourdes"] = rank;    
     setAttrs(ranks);
     buildCaracs();
   });
@@ -14184,11 +14201,10 @@ function rebuildAll() {
   });
 }
 
-
 /**
  * Scan abilities for usage mention in description
  */
- function abilityUsage() {
+function abilityUsage() {
 
   const attrs = [];
   seq(9).forEach(v => {
@@ -14225,7 +14241,7 @@ function rebuildAll() {
     }
     clog(updatedAbilities, "ABILITY USAGE");
   }); 
-
+  
 }
 
 /**

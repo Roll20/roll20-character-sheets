@@ -12,6 +12,7 @@
 		<div class="character-mode"><button type="action" name="act_netrunning" >NETRUNNING</button></div>
 		<div class="character-mode"><button type="action" name="act_journal" >JOURNAL</button></div>
 		<div class="character-mode"><button type="roll" name="roll_initiative" value="&{template:initiative} {{name=Initiative}} {{roll=[[d10+@{Reflex}+@{initiative_modifier} &{tracker}]]}}">ROLL INITIATIVE</button></div>
+		<div class="mook-mode"><button type="roll" name="roll_initiative" value="&{template:initiative} {{name=Initiative}} {{roll=[[d10+@{Reflex}+@{initiative_modifier} &{tracker}]]}}">ROLL INITIATIVE</button></div>
 		<div><button type="action" name="act_settings" >SETTINGS</button></div>
 	</div>
 	<input type='hidden' class='sheet-tabstoggle' name='attr_sheetTab'  value='character'  />
@@ -43,7 +44,10 @@
 			<div class="prof-info biginput">
 				<h3>ROLE ABILITIES</h3><input type=text spellcheck=false name="attr_RoleAbility" />
 			</div>
-			<div>
+
+			<input type="hidden" class="sheet-take-damage-panel-toggle" name="attr_take_damage_panel_toggle" value="0" />
+
+			<div class="role-ability-panel">
 				<div class="flex-table">
 					<div class="bg-black-2 skill-name">Role Ability Ranks</div>
 					<div class="bg-black-2 skill-rank">Rank</div>
@@ -95,8 +99,90 @@
 
 			<input type="hidden" name="attr_hp_max" />
 
+			<div class="take-damage-panel">
+				<div class="take-damage-flow">
+					<div class="sheet-bg-black sheet-take-damage-title">TAKE DAMAGE</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Damage Amount</div>
+						<div class="sheet-bg-white sheet-take-damage-input"><input type="number" name="attr_take_damage_amount" value="" /></div>
+					</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Damage Location</div>
+						<div class="sheet-bg-white sheet-take-damage-input">
+							<select name="attr_take_damage_location">
+								<option value="body">Body</option>
+								<option value="head">Head</option>
+							</select>
+						</div>
+					</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Armor Interaction</div>
+						<div class="sheet-bg-white sheet-take-damage-input">
+							<select name="attr_take_damage_armor_behaviour">
+								<option value="subrtract_armor">Normal</option>
+								<option value="ignore_half_armor">Ignore Half Armor</option>
+								<option value="ignore_armor_below">Ignore Armor Below</option>
+								<option value="bypass_armor">Bypass Armor</option>
+							</select>
+						</div>
+					</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Ignore Armor Below</div>
+						<div class="sheet-bg-white sheet-take-damage-input"><input type="number" name="attr_take_damage_ignore_armor_below_sp" value="7" />SP</div>
+					</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Ablate Armor By</div>
+						<div class="sheet-bg-white sheet-take-damage-input"><input type="number" name="attr_take_damage_armor_ablation" value="1" />SP</div>
+					</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Ablation location</div>
+						<div class="sheet-bg-white sheet-take-damage-input">
+							<select name="attr_take_damage_armor_ablation_location">
+								<option value="damage_location">Damage Location</option>
+								<option value="head_and_body">Head and Body</option>
+							</select>
+						</div>
+					</div>
+					<div class="sheet-flex-table">
+						<div class="sheet-bg-white sheet-take-damage-field">Critical Injury</div>
+						<div class="sheet-bg-white sheet-take-damage-input">
+							<select name="attr_take_damage_critical_injury_bonus_damage">
+								<option value="none">No Bonus Damage</option>
+								<option value="bonus_damage">5 Bonus Damage</option>
+								<option value="bonus_damage_x2">5 Bonus Damage x2</option>
+							</select>
+						</div>
+					</div>
+					<div>
+						<div class="sheet-flex-table">
+							<div class="sheet-bg-yellow sheet-take-damage-preview-label">New HP</div>
+							<div class="sheet-bg-yellow sheet-take-damage-preview"><input type="text" name="attr_take_damage_preview_hp" readonly /></div>
+						</div>
+						<div class="sheet-flex-table">
+							<div class="sheet-bg-yellow sheet-take-damage-preview-label">New Head HP</div>
+							<div class="sheet-bg-yellow sheet-take-damage-preview"><input type="text" name="attr_take_damage_preview_head_sp" readonly /></div>
+						</div>
+						<div class="sheet-flex-table">
+							<div class="sheet-bg-yellow sheet-take-damage-preview-label">New Body HP</div>
+							<div class="sheet-bg-yellow sheet-take-damage-preview"><input type="text" name="attr_take_damage_preview_body_sp" readonly /></div>
+						</div>
+						<div class="take-damage-main-buttons">
+							<button class="sheet-button-left" type="action" name="act_takedamagecalculate">Calculate</button>
+							<button class="sheet-button-left" type="action" name="act_takedamageapply">Apply</button>
+							<button type="action" name="act_takedamagecancel">Cancel</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<div class="hp-humanity">
-				<div class="white-bg"><h3>HIT POINTS</h3></div>
+				<div class="white-bg">
+					<h3>HIT POINTS</h3>
+					<input type="hidden" class="sheet-take-damage-button-flag" name="attr_take_damage_button_flag" value="0" />
+					<div class="sheet-take-damage-button">
+						<button type="action" name="act_takedamagepanel">Take Damage</button>
+					</div>
+				</div>
 				<div class="white-bg">
 					<span class="small">CURRENT</span>
 					<input type="number" name="attr_hp" />
@@ -107,7 +193,7 @@
 				</div>
 			</div>
 
-			<div class="hp-humanity">
+			<div class="hp-humanity humanity-panel">
 				<div class="white-bg"><h3>HUMANITY</h3></div>
 				<div class="white-bg">
 					<span class="small">CURRENT</span>
@@ -914,8 +1000,8 @@
 						<input type="hidden" name="attr_WeaponMod" value="@{Total_Melee}">
 						<div class="bg-white weapon-name">
 							<input type="hidden" class="settings-toggle-show-aimed-shot-button" name="attr_aimed_shot_flag" value="0" />
-							<button name="roll_aimed_shot" type="roll" class="txt-btn aimed-shot-icon" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{aimed_shot=1}}  {{roll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1d10]]}}" title="Aimed Shot">⌖</button>
-							<button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button>
+							<button name="roll_aimed_shot" type="roll" class="txt-btn aimed-shot-icon" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{aimed_shot=1}}  {{throw_distance_@{weapon_option_maximum_throw_distance}=true}}  {{roll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1d10]]}}" title="Aimed Shot">⌖</button>
+							<button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{throw_distance_@{weapon_option_maximum_throw_distance}=true}}  {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button>
 							<input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here...">
 						</div>
 						<div class="bg-white weapon-type">
@@ -934,6 +1020,7 @@
 								<option value="Bow/Crossbow">Bow/Crossbow</option>
 								<option value="Grenade Launcher">Grenade Launcher</option>
 								<option value="Rocket Launcher">Rocket Launcher</option>
+								<option value="Throw (Athletics)">Throw (Athletics)</option>
 							</select>
 						</div>
 						<div class="bg-white dmg">
@@ -1610,8 +1697,23 @@
 			<div class="settings-row">
 				<h3>CHARACTER SHEET OPTIONS</h3>
 				<div class="nav">
-					<div><button class="options" type="action" name="act_resetbase" >RESET BASE SKILLS</button></div>
-					<div><button class="options" type="action" name="act_newcharacter" >TOGGLE STAT/SKILLPOINT TRACKER</button></div>
+					<div class="reset-skills-setting">
+						<input type="hidden" class="sheet-reset-skills" name="attr_reset_skills_state" value="button" />
+						<div class="reset-button">
+							<button class="options" type="action" name="act_resetcheck">RESET BASE SKILLS</button>
+						</div>
+						<div class="reset-check">
+							<div class="heading">RESET BASE SKILLS</div>
+							<div class="question">Are you sure?</div>
+							<div class="buttons">
+								<button class="options" type="action" name="act_resetconfirm" title="This will reset all base skill values to defaults!">Yes</button> /
+								<button class="options" type="action" name="act_resetcancel" title="This will NOT reset skill values.">No</button>
+							</div>
+						</div>
+					</div>
+					<div class="toggle-tracker-setting">
+						<button class="options" type="action" name="act_newcharacter" >TOGGLE STAT/SKILLPOINT TRACKER</button>
+					</div>
 				</div>
 				<div class="settings-option">
 					<div class="settings-title">ENABLE MOOK SHEET</div>
@@ -1632,6 +1734,27 @@
 							<button type="action" name="act_initiative_modifier" class="settings-toggle">
 								<span class="checked">✓</span>
 							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="settings-row">
+				<h3>WEAPON OPTIONS</h3>
+				<div class="settings-help">
+					Affects how weapons are displayed.
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">MAXIMUM THROW DISTANCE</div>
+					<div class="settings-value">
+						<div class="settings-select">
+							<select name="attr_weapon_option_maximum_throw_distance">
+								<option value="25m" selected>25m (RAW)</option>
+								<option value="50m">50m</option>
+								<option value="100m">100m</option>
+								<option value="200m">200m</option>
+								<option value="400m">400m</option>
+							</select>
 						</div>
 					</div>
 				</div>
@@ -1706,6 +1829,24 @@
 				</div>
 			</div>
 
+			<div class="settings-row">
+				<h3>HIT POINTS CALCUATION OPTIONS</h3>
+				<div class="settings-help">
+					Show a "Take Damage" button next to your Hit Points attribute that will display a form to calculate damage based on armor interactions.
+				</div>
+				<div class="settings-option">
+					<div class="settings-title">SHOW TAKE DAMAGE BUTTON</div>
+					<div class="settings-value">
+						<div class="settings-checkbox">
+							<input type="hidden" class="settings-toggle" name="attr_take_damage_button_flag" value="0" />
+							<button type="action" name="act_take_damage_button" class="settings-toggle">
+								<span class="checked">✓</span>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 		</div>
 	</div>
 
@@ -1768,10 +1909,10 @@
 		</div>
 		<div class="mookweapons section">
 			<div class="mookweapontitle">
-				<div class="h2">Weapons</div>
+				<div class="h2">WEAPONS</div>
 			</div>
 			<div class="mookarmortitle">
-				<div class="h2">Armor</div>
+				<div class="h2">ARMOR</div>
 			</div>
 			<div class="mookweaponheader">
 				<div class="flex-table">
@@ -1797,8 +1938,8 @@
 						<input type="hidden" name="attr_WeaponMod" value="@{Total_Melee}">
 						<div class="bg-white weapon-name">
 							<input type="hidden" class="settings-toggle-show-aimed-shot-button" name="attr_aimed_shot_flag" value="0" />
-							<button name="roll_aimed_shot" type="roll" class="txt-btn aimed-shot-icon" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{aimed_shot=1}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1d10]]}}" title="Aimed Shot">⌖</button>
-							<button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button>
+							<button name="roll_aimed_shot" type="roll" class="txt-btn aimed-shot-icon" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{aimed_shot=1}}  {{throw_distance_@{weapon_option_maximum_throw_distance}=true}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+@{aimed_shot_penalty}+1d10]]}}" title="Aimed Shot">⌖</button>
+							<button name="roll_attack" type="roll" class="txt-btn" value="&{template:attack} {{critroll=[[@{WeaponMod}+@{WeaponBonus}+10+1d10]]}} {{@{Weapontype}=true}} {{rollname=[@{Weaponname}](~repeating_weapons_weapon_dmg)}} {{failroll=[[@{WeaponMod}+@{WeaponBonus}+1-1d10]]}}  {{weapontype=@{Weapontype}}}  {{throw_distance_@{weapon_option_maximum_throw_distance}=true}} {{roll=[[@{WeaponMod}+@{WeaponBonus}+1d10]]}}">Attack:</button>
 							<input type=text spellcheck=false name="attr_Weaponname" placeholder="Type here..."></div>
 						<div class="bg-white weapon-type">
 							<select name="attr_Weapontype" class="Weapontype">
@@ -1815,6 +1956,7 @@
 								<option value="Bow/Crossbow">Bow/Crossbow</option>
 								<option value="Grenade Launcher">Grenade Launcher</option>
 								<option value="Rocket Launcher">Rocket Launcher</option>
+								<option value="Throw (Athletics)">Throw (Athletics)</option>
 							</select>
 						</div>
 						<div class="bg-white dmg">
@@ -1835,23 +1977,37 @@
 					</div>
 				</fieldset>
 			</div>
-			<div class="armordetails">
-				<div class="armor-piece"><input type="text" placeholder="Head"></div>
-				<div class="armor-sp"><input type="number" placeholder="SP"></div>
-				<div class="armor-penalty"><input type="number" placeholder="0"></div>
-				<div class="armor-piece"><input type="text" placeholder="Body"></div>
-				<div class="armor-sp"><input type="number" placeholder="SP"></div>
-				<div class="armor-penalty"><input type="number" placeholder="0"></div>
-				<div class="armor-piece"><input type="text" placeholder="Shield"></div>
-				<div class="armor-sp"><input type="number" placeholder="HP"></div>
-				<div class="armor-penalty"><input type="number" placeholder="0"></div>
+
+			<div class="armor">
+
+				<div class="flex-table">
+					<div class="bg-white armor-piece"><div>Head:&nbsp;</div><input type=text spellcheck=false name="attr_HeadArmor" placeholder="Type here..."></div>
+					<div class="bg-white armor-sp"><input type="number" name="attr_HeadSP"   />/<input type="number" name="attr_HeadSP_max" /></div>
+					<div class="bg-white armor-penalty"><input type="number" name="attr_HeadPenalty" /></div>
+				</div>
+
+				<div class="flex-table">
+					<div class="bg-white armor-piece">Body:&nbsp;<input type=text spellcheck=false name="attr_BodyArmor" placeholder="Type here..."></div>
+					<div class="bg-white armor-sp"><input type="number" name="attr_BodySP"  />/<input type="number" name="attr_BodySP_max" /></div>
+					<div class="bg-white armor-penalty"><input type="number" name="attr_BodyPenalty"/></div>
+				</div>
+
+				<div class="flex-table">
+					<div class="bg-white armor-piece">Shield:&nbsp;<input type=text spellcheck=false name="attr_Shield" placeholder="Type here..."></div>
+					<div class="bg-white armor-sp"><input type="number" name="attr_ShieldHP" />/<input type="number" name="attr_ShieldHP_max" /></div>
+					<div class="bg-white armor-penalty"><input type="number" name="attr_ShieldPenalty" /></div>
+				</div>
+			</div>
+
+		</div>
+		<div class="mookskillstitlesection section">
+			<div class="mookskillstitle">
+				<h2>SKILLS</h2>
 			</div>
 		</div>
-		<div class="mookskills section">
-			<div class="mookskillstitle">
-				<h2>Skills</h2>
-			</div>
-			<div>
+		<div class="mookskills">
+			
+			<div class="mookskillscolumn">
 
 			<!-- AWARENESS SKILLS -->
 
@@ -1872,7 +2028,6 @@
 					<div class="bg-white skill-base"><input type="number" name="attr_LVL_ConcealReveal" value="0"  /></div>
 					<div class="bg-white skill-mod"><input type="number" name="attr_Misc_ConcealReveal" value="0"  /></div>
 					<div class="bg-white skill-total"><input type="number" name="attr_Total_ConcealReveal" value="0" readonly /></div>
-				
 
 					<div class="bg-white skill-name"><button name="roll_LipReading" type="roll" class="txt-btn" value="&{template:skill} {{critroll=[[@{Total_LipReading}+10+1d10]]}} {{failroll=[[@{Total_LipReading}+1-1d10]]}} {{rollname=Lip Reading}}  {{roll=[[@{Total_LipReading}+1d10]]}}">Lip Reading (INT)</button></div>
 					<div class="bg-white skill-base"><input type="number" name="attr_LVL_LipReading" value="0"  /></div>
@@ -2024,7 +2179,7 @@
 				</div>
 
 			</div>
-			<div>
+			<div class="mookskillscolumn">
 				<div class="flex-table">
 					<div class="bg-black-2 skill-name">Education Skills (Cont.)</div>
 					<div class="bg-black-2 skill-base">LVL</div>
@@ -2217,7 +2372,7 @@
 					<div class="bg-white skill-total"><input type="number" name="attr_Total_Handgun" value="0" readonly /></div>
 				</div>	
 			</div>
-			<div>
+			<div class="mookskillscolumn">
 				<!-- RANGED WEAPONS CONT. -->
 
 				<div class="flex-table">
@@ -2406,8 +2561,10 @@
 			</div>
 		</div>
 		<div class="mookinventory section">
-			<h2>Inventory and Notes</h2>
-			<textarea spellcheck=false name="attr_mookinventory"></textarea>
+			<div class="h2">INVENTORY AND NOTES</div>
+			<div class="mookinventorycolumn">
+				<textarea spellcheck=false name="attr_mookinventory"></textarea>
+			</div>
 		</div>
 	</div>
 
@@ -2577,6 +2734,7 @@
 		<div>51-100</div><div>101-200</div>
 		<div>201-400</div><div>401-800</div>
 
+		<div class="header">DV</div>
 		<div>20</div><div>17</div>
 		<div>20</div><div>25</div>
 		<div>30</div><div>N/A</div>
@@ -2695,6 +2853,50 @@
 		<div>25</div><div>30</div>
 	</div>
 	{{/Rocket Launcher}}
+
+	{{#Throw (Athletics)}}
+	<div class="sheet-rolltemplate-table">
+		<div class=header>Range (m/yds)</div>
+		<div>0-6</div>
+		<div>7-12</div>
+		<div>13-25</div>
+		<div>26-50</div>
+		<div>51-100</div>
+		<div>101-200</div>
+		<div>201-400</div>
+		<div>401-800</div>
+
+		<div class=header>DV</div>
+		<div>16</div>
+		<div>15</div>
+		<div>15</div>
+		{{#throw_distance_50m}}
+			<div>17</div>
+			<div>N/A</div>
+			<div>N/A</div>
+			<div>N/A</div>
+		{{/throw_distance_50m}}
+		{{#throw_distance_100m}}
+			<div>17</div>
+			<div>20</div>
+			<div>N/A</div>
+			<div>N/A</div>
+		{{/throw_distance_100m}}
+		{{#throw_distance_200m}}
+			<div>17</div>
+			<div>20</div>
+			<div>22</div>
+			<div>N/A</div>
+		{{/throw_distance_200m}}
+		{{#throw_distance_400m}}
+			<div>17</div>
+			<div>20</div>
+			<div>22</div>
+			<div>25</div>
+		{{/throw_distance_400m}}
+		<div>N/A</div>
+	</div>
+	{{/Throw (Athletics)}}
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-damage">
@@ -2970,7 +3172,7 @@
 		});
 	});
 
-	const weapon_skills = ["archery", "handgun", "heavyarms", "shoulderarms", "brawling", "martial", "melee",  "autofire"];
+	const weapon_skills = ["archery", "handgun", "heavyarms", "shoulderarms", "brawling", "martial", "melee",  "autofire", "athletics"];
 	const weapon_skills_changes = weapon_skills.map(skill => 'change:total_' + skill).join(' ');
 	on(`${weapon_skills_changes} change:repeating_weapons:weapontype`, function() {
 		getSectionIDs("repeating_weapons", function(idarray) {
@@ -2996,7 +3198,8 @@
 					"Sniper Rifle": 'shoulderarms',
 					"Bow/Crossbow": 'archery',
 					"Grenade Launcher": 'heavyarms',
-					"Rocket Launcher": 'heavyarms'
+					"Rocket Launcher": 'heavyarms',
+					"Throw (Athletics)": 'athletics'
 				};
 				idarray.forEach(id => {
 					const wtype = values[`repeating_weapons_${id}_weapontype`];
@@ -3021,6 +3224,7 @@
 			"LVL_Martial",
 			"LVL_Melee",
 			"LVL_Autofire",
+			"LVL_Athletics",
 			"Reflex",
 			"Dexterity"
 			], function(values) {
@@ -3036,6 +3240,7 @@
 				const Melee = parseInt(values.LVL_Melee)||0;
 				const ShoulderArms = parseInt(values.LVL_ShoulderArms)||0;
 				const Autofire = parseInt(values.LVL_Autofire)||0;
+				const Athletics = parseInt(values.LVL_Athletics)||0;
 
 				switch(values.repeating_weapons_Weapontype) {
 					case "(Select Type)":
@@ -3079,6 +3284,9 @@
 					break;
 					case "Rocket Launcher":
 					weaponmod = REF + HeavyArms;
+					break;
+					case "Throw (Athletics)":
+					weaponmod = DEX + Athletics;
 					break;
 					default:		
 				}
@@ -3250,10 +3458,10 @@
 			"lvl_" + skill,
 			"misc_" + skill
 	));
-	const all_skills_lvl_misc_changes = all_skills_lvl_misc.map(skill => `change:${skill}`).join(' ');
 	const stats_lower = ["intelligence","reflex","dexterity","technique","cool","willpower","luck","movement","body","empathy"];
-	const stats_changes = stats_lower.map(stat => `change:${stat.toLowerCase()}`).join(' ');
-	on(`${all_skills_lvl_misc_changes} ${stats_changes} sheet:opened`, function() {
+
+	// When sheet is opened, update "total" attribute of all skills.
+	on("sheet:opened", function() {
 		getAttrs([...stats_lower.map(stat => stat.toLowerCase()), ...all_skills_lvl_misc], function(values) {
 			const output = {};
 			Object.keys(all_skills).forEach(skill => {
@@ -3264,7 +3472,57 @@
 				const total = base + misc + stat;
 				output['total_' + skill] = total;
 			});
+
+			// Hide "take damage" panel on character sheet load.
+			take_damage_panel_clear_and_close(output);
+
 			setAttrs(output);
+		});
+	});
+
+	// When stat changes, update "total" attribute of associated skills.
+	stats_lower.forEach(function(stat_name) {
+		on(`change:${stat_name}`, function() {
+			const skill_attributes = [];
+			const associated_skills = [];
+			skill_attributes.push(stat_name);
+			Object.entries(all_skills).forEach(([key, value]) => {
+				if (value == stat_name) {
+					associated_skills.push(key);
+					skill_attributes.push("lvl_" + key, "misc_" + key);
+				}
+			});
+			getAttrs(skill_attributes, function(values) {
+				const stat_set_attrs = [];
+				associated_skills.forEach(skill => {
+					const base = parseInt(values["lvl_" + skill]) || 0;
+					const misc = parseInt(values["misc_" + skill]) || 0;
+					const stat = parseInt(values[stat_name]) || 0;
+					const total = base + misc + stat;
+					stat_set_attrs["total_" + skill] = total;
+				});
+				setAttrs(stat_set_attrs);
+			});
+		});
+	});
+
+	// Update "total" attribute of skill when "lvl" or "misc" atrributes change.
+	Object.keys(all_skills).forEach(function (skill) {
+		on(`change:LVL_${skill} change:Misc_${skill}`, function() {
+			const skill_attributes = [
+				all_skills[skill], // Stat attribute
+				`lvl_${skill}`,
+				`misc_${skill}`
+			];
+			getAttrs(skill_attributes, function(values) {
+				const base = parseInt(values["lvl_" + skill]) || 0;
+				const misc = parseInt(values["misc_" + skill]) || 0;
+				const stat = parseInt(values[all_skills[skill]]) || 0;
+				const total = base + misc + stat;
+				const skill_set_attrs = {};
+				skill_set_attrs["total_" + skill] = total;
+				setAttrs(skill_set_attrs);
+			});
 		});
 	});
 
@@ -3292,27 +3550,27 @@
 	                    ,"LVL_Streetslang","LVL_YourHome","LVL_Brawling","LVL_Evasion","LVL_Conversation"
 	                    ,"LVL_HumanPerception","LVL_Persuasion","LVL_FirstAid"];
 
+	on("clicked:resetcheck", function() {
+		setAttrs({"reset_skills_state": "confirm"});
+	});
 
-	on("clicked:resetbase", function() {
+	on("clicked:resetcancel", function() {
+		setAttrs({"reset_skills_state": "button"});
+	});
 
+	on("clicked:resetconfirm", function() {
 		getAttrs([], function(v) {
-
+			const reset_skills = {};
+			reset_skills["reset_skills_state"] = "button";
+			reset_skills["LVL_LanguageA"] = 4;
 			for (var skill of allskills) {
-
- 				if (basicskills.includes(skill)) {
-					setAttrs({
-						[skill] : 2
-					});
+				if (basicskills.includes(skill)) {
+					reset_skills[skill] = 2;
 				} else {
-					setAttrs({
-						[skill] : 0
-					});
+					reset_skills[skill] = 0;
 				}		
 			}
-
-			setAttrs({
-				"LVL_LanguageA" : 4
-			});
+			setAttrs(reset_skills);
 		});
 	});
 
@@ -3320,32 +3578,24 @@
 
 	allskills.forEach(function(skill) {
 		on(`change:${skill}`, function() {
-
 			var total = 0;
-
 			getAttrs(easyskills, function(values) {
-
 				for (var key of Object.keys(values)) {
 					total = total + parseInt(values[key])||0;
 				}
-
 			});
-
 			getAttrs(hardskills, function(values) {
-
 				for (var key of Object.keys(values)) {
 					total = total + 2 * parseInt(values[key])||0;
 				}
-
 				setAttrs({
 					"skillpoints" : 90 - total
 				});
 			});
-
-
 		});
 	});
 
+	// If checkbox is clicked toggle a hidden attribute with same name and suffix of "_flag" appended.
 	const toggleList = [
 		"cbaudio","lefteye","righteye","rightarm","leftarm","neurallink","rightleg","leftleg","mooksheet",
 		"initiative_modifier", "armor_penalty_ref", "armor_penalty_dex", "armor_penalty_move"
@@ -3374,6 +3624,233 @@
 				});
 				setAttrs(output);
 			});
+		});
+	});
+	on('clicked:take_damage_button', function() {
+		getAttrs(['take_damage_button_flag'], function(v) {
+			const attrs = {};
+			attrs['take_damage_button_flag'] = v['take_damage_button_flag'] !== "1" ? "1" : "0";
+			if (attrs['take_damage_button_flag'] == "0") {
+				attrs['take_damage_panel_toggle'] = "0";
+			}
+			setAttrs(attrs);
+		});
+	});
+
+	// Set attribures to be passed to setAttrs function.
+	function take_damage_panel_clear_and_close(attrs) {
+		attrs["take_damage_panel_toggle"] = 0;
+		attrs["take_damage_amount"] = "";
+		attrs["take_damage_location"] = "body";
+		attrs["take_damage_armor_behaviour"] = "subrtract_armor";
+		attrs["take_damage_ignore_armor_below_sp"] = "7";
+		attrs["take_damage_armor_ablation"] = "1";
+		attrs["take_damage_armor_ablation_location"] = "";
+		attrs["take_damage_critical_injury_bonus_damage"] = "";
+	}
+
+	function take_damage_reset_preview(attrs) {
+		attrs["take_damage_preview_hp"] = "<click calculate>";
+		attrs["take_damage_preview_head_sp"] = "";
+		attrs["take_damage_preview_body_sp"] = "";
+	}
+
+	function isValidInteger(val) {
+		const num = +val;
+		return Number.isInteger(num);
+	}
+
+	// Fields used in take damage calculation.
+	const fields_used_in_take_damage_calc = [
+		"hp",
+		"HeadSP",
+		"BodySP",
+		"take_damage_amount",
+		"take_damage_armor_behaviour",
+		"take_damage_location",
+		"take_damage_armor_ablation",
+		"take_damage_ignore_armor_below_sp",
+		"take_damage_armor_ablation_location",
+		"take_damage_critical_injury_bonus_damage"
+	];
+	const selects_used_in_take_damage_calc = [
+		"take_damage_armor_behaviour",
+		"take_damage_location",
+		"take_damage_armor_ablation_location",
+		"take_damage_critical_injury_bonus_damage"
+	];
+
+	// Rest preview and hide apply button if any fields used to calculate the preview are clicked (pre-empting any changes).
+	fields_used_in_take_damage_calc.forEach(function(field_name) {
+		$20('input[name="attr_' + field_name + '"]').on('click', function (event) {
+			const attrs = {};
+			take_damage_reset_preview(attrs);
+			setAttrs(attrs);
+		});
+	});
+	selects_used_in_take_damage_calc.forEach(function(field_name) {
+		on(`change:${field_name}`, function() {
+			const attrs = {};
+			take_damage_reset_preview(attrs);
+			setAttrs(attrs);
+		});
+	});
+	
+	on("clicked:takedamagepanel", function() {
+		getAttrs(["take_damage_panel_toggle"], function(v) {
+			const attrs = {};
+			attrs["take_damage_panel_toggle"] = v["take_damage_panel_toggle"] !== "1" ? "1" : "0";
+			// Clear preview values when take damage panel loads
+			if (attrs["take_damage_panel_toggle"] == 1)
+			{
+				take_damage_reset_preview(attrs);
+			}
+			setAttrs(attrs);
+		});
+	});
+
+	on("clicked:takedamagecalculate", function() {
+		const get_attribute_names = [
+			"hp",
+			"HeadSP",
+			"BodySP",
+			"take_damage_amount",
+			"take_damage_armor_behaviour",
+			"take_damage_location",
+			"take_damage_armor_ablation",
+			"take_damage_ignore_armor_below_sp",
+			"take_damage_armor_ablation_location",
+			"take_damage_critical_injury_bonus_damage"
+		];
+		getAttrs(get_attribute_names, function(v) {
+
+			const attrs = {};
+
+			// Clear preview.
+			attrs["take_damage_preview_hp"] = "";
+			attrs["take_damage_preview_head_sp"] = "";
+			attrs["take_damage_preview_body_sp"] = "";
+
+			// Validate attributes or show error message.
+			if (v["hp"] === "" || ! isValidInteger(v["hp"])) {
+				attrs["take_damage_preview_hp"] = "<HP value invalid>";
+			} else if (v["HeadSP"] === "" || v["BodySP"] === "" || ! isValidInteger(v["HeadSP"]) || ! isValidInteger(v["BodySP"]) || v["HeadSP"] < 0 || v["BodySP"] < 0) {
+				attrs["take_damage_preview_hp"] = "<SP value invalid>";
+			} else if (v["take_damage_amount"] === "" || ! isValidInteger(v["take_damage_amount"]) || v["take_damage_amount"] == 0 || v["take_damage_amount"] < 0) {
+				attrs["take_damage_preview_hp"] = "<invalid damage>";
+			} else if (v["take_damage_ignore_armor_below_sp"] === "" || ! isValidInteger(v["take_damage_ignore_armor_below_sp"]) || v["take_damage_ignore_armor_below_sp"] < 0) {
+				attrs["take_damage_preview_hp"] = "<ignore armor invalid>";
+			} else if (v["take_damage_armor_ablation"] === "" || ! isValidInteger(v["take_damage_armor_ablation"]) || v["take_damage_armor_ablation"] < 0) {
+				attrs["take_damage_preview_hp"] = "<ablation invalid>";
+			} else {
+
+				const hp = parseInt(v["hp"])||0;
+				const BodySP = parseInt(v["BodySP"])||0;
+				const HeadSP = parseInt(v["HeadSP"])||0;
+				const take_damage_amount = parseInt(v["take_damage_amount"])||0;
+				const take_damage_location = v["take_damage_location"];
+				const take_damage_armor_behaviour = v["take_damage_armor_behaviour"];
+				const take_damage_armor_ablation = parseInt(v["take_damage_armor_ablation"])||0;
+				const take_damage_ignore_armor_below_sp = parseInt(v["take_damage_ignore_armor_below_sp"])||0;
+				const take_damage_armor_ablation_location = v["take_damage_armor_ablation_location"];
+				const take_damage_critical_injury_bonus_damage = v["take_damage_critical_injury_bonus_damage"];
+				
+				// set initial values for attributes
+				attrs["take_damage_preview_hp"] = hp;
+				attrs["take_damage_preview_head_sp"] = HeadSP;
+				attrs["take_damage_preview_body_sp"] = BodySP;
+
+				// vars
+				var armorSP;
+				var damage = 0;
+
+				// armor SP
+				if (take_damage_location == "head") {
+					armorSP = HeadSP;
+				} else {
+					armorSP = BodySP;	
+				}
+				if (take_damage_armor_behaviour == "bypass_armor") {
+					armorSP = 0;
+				} else if (take_damage_armor_behaviour == "ignore_half_armor") {
+					armorSP = Math.ceil(armorSP/2);
+				} else if (take_damage_armor_behaviour == "ignore_armor_below") {
+					if (armorSP < take_damage_ignore_armor_below_sp) {
+						armorSP = 0;
+					}
+				}
+
+				// damage amount
+				if (take_damage_amount > armorSP) {
+					damage = take_damage_amount - armorSP;
+				}
+				if (take_damage_location == "head") {
+					// Double damage to head.
+					damage *= 2;
+				}
+				attrs["take_damage_preview_hp"] -= damage;
+
+				// critical injury bonus damage
+				if (take_damage_critical_injury_bonus_damage == "bonus_damage") {
+					attrs["take_damage_preview_hp"] -= 5;
+				} else if (take_damage_critical_injury_bonus_damage == "bonus_damage_x2") {
+					attrs["take_damage_preview_hp"] -= 10;
+				}
+
+				// ablate armor
+				if (take_damage_armor_behaviour != "bypass_armor" && damage > 0) {
+					if (take_damage_armor_ablation_location == "head_and_body") {
+						attrs["take_damage_preview_head_sp"] -= take_damage_armor_ablation;
+						attrs["take_damage_preview_body_sp"] -= take_damage_armor_ablation;
+					} else if (take_damage_location == "head") {
+						attrs["take_damage_preview_head_sp"] -= take_damage_armor_ablation;
+					} else {
+						attrs["take_damage_preview_body_sp"] -= take_damage_armor_ablation;
+					}
+
+					// SP cannot be negative.
+					if (attrs["take_damage_preview_head_sp"] < 0) {
+						attrs["take_damage_preview_head_sp"] = 0
+					}
+					if (attrs["take_damage_preview_body_sp"] < 0) {
+						attrs["take_damage_preview_body_sp"] = 0
+					}
+				}
+			}
+
+			setAttrs(attrs);
+		});
+	});
+
+	on("clicked:takedamageapply", function() {
+		getAttrs(["take_damage_preview_hp", "take_damage_preview_head_sp", "take_damage_preview_body_sp"], function(v) {
+			const attrs = {};
+
+			// Only apply damage if preview hp has a value.
+			if (v["take_damage_preview_hp"] == "<click calculate>") {
+				attrs["take_damage_preview_hp"] = "<first click calculate>";
+			} else if (v["take_damage_preview_hp"] === "" || ! isValidInteger(v["take_damage_preview_hp"])) {
+				attrs["take_damage_preview_hp"] = "<click calculate>";
+			} else {
+				
+				// Set HP and SP attributes.
+				attrs["hp"] = v["take_damage_preview_hp"];
+				attrs["HeadSP"] = v["take_damage_preview_head_sp"];
+				attrs["BodySP"] = v["take_damage_preview_body_sp"];
+
+				// Clear take damage form.
+				take_damage_panel_clear_and_close(attrs);
+			}
+
+			setAttrs(attrs);
+		});
+	});
+
+	on("clicked:takedamagecancel", function() {
+		getAttrs(["take_damage_panel"], function(v) {
+			const attrs = {};
+			attrs["take_damage_panel_toggle"] = "0";
+			setAttrs(attrs);
 		});
 	});
 

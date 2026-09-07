@@ -1,4 +1,4 @@
-/* base values begin */
+/* base_values start */
 on(
 	"change:safe-sheet-open " +
 	"change:mu_basis change:mu_mod change:mu_mod_wounds " +
@@ -179,4 +179,4 @@ on("change:ap_gesamt change:ap_ausgegeben", function(eventInfo) {
 				});
 		});
 });
-/* base values end */
+/* base_values end */

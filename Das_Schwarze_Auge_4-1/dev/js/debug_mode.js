@@ -1,2 +1,2 @@
-/* debug mode begin */
-/* debug mode end */
+/* debug_mode start */
+/* debug_mode end */

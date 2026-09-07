@@ -1,4 +1,4 @@
-/* constants begin */
+/* constants start */
 const statAttrs = [
 	"MU",
 	"KL",

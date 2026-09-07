@@ -1,4 +1,4 @@
-/* armour encumbrance initiative begin */
+/* armour_encumbrance_initiative start */
 on(
 "change:rsname1 change:rs_gbe1 change:rsaktiv1 " +
 "change:rsname2 change:rs_gbe2 change:rsaktiv2 " +
@@ -287,4 +287,4 @@ function calculateWeaponBE(values) {
 
 		return BEModifiers;
 }
-/* armour encumbrance initiative end */
+/* armour_encumbrance_initiative end */
