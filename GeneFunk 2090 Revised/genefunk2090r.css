@@ -1,0 +1,2876 @@
+/* CHAT-CARD TYPEFACES (addendum 290). The font-loading at-rule below MUST
+   stay the FIRST at-rule in this file: a browser ignores one that follows
+   any style rule. (Ghost Protocol places its own after ~30 rules, i.e.
+   spec-ignored - do not copy that placement.)
+   ZERO PRECEDENT: it is the only at-rule of any kind in this stylesheet.
+   If a chat card ever goes magenta, DELETE THE NEXT LINE FIRST - it is the
+   entire revert, and every font stack below then falls back to Courier New
+   / Arial with nothing else changed.
+   The counted-strings corollary applies: this comment deliberately does not
+   spell the at-rule's name, so the pre-upload count reads a true 1. */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Chakra+Petch:wght@400;600;700&family=Share+Tech+Mono&display=swap');
+/* ================= GeneFunk 2090 Revised — sheet body ================= */
+/* 288: Roll20's sheet CONTAINER is default-white and peeks around the dark
+   root panel - paint it the palette bg. Platform chrome, nothing needs it. */
+.charsheet{background:#0f1317}
+/* ===== 319 (GM): the sheet interior takes the card's number font ==========
+   MEASURED BEFORE SHIPPING (fontwidth_319.html), because this project's actual
+   risk here is WIDTH, not looks - fixed numeric boxes have clipped three times
+   (283d, 284b, the DC cell):
+     DIGITS  narrower at every size the sheet uses, -0.14px to -2.54px each.
+             No numeric box can newly clip; that whole risk class is gone.
+     LABELS  every label renders UPPERCASE (.gfs-sheet label sets
+             text-transform), and mono uppercase is narrower - BACKGROUND
+             0.74x, DAMAGE REDUCTION 0.81x, PROFICIENCY 0.87x. Worst case is
+             INITIATIVE at +3.6px.
+   ⚠️ PLAYER-TYPED TEXT IS THE ONE THING THAT GROWS. Field values are not
+   uppercased, and a lowercase-heavy name runs ~1.29x wider ("Fiipi Aphig"
+   50.8 -> 65.3px). Long names in narrow fields are where to look first.
+   ⛔ The two things the GM asked to keep are the ARIAL DEFAULT, not styled
+   fonts - so they need explicit overrides below or this rule eats them. */
+/* ===== 321 (GM): Chakra Petch for the sheet, mono kept for the NUMBERS =====
+   ⛔ MEASURED FIRST, AND IT CHANGED THE PLAN. Chakra Petch is a fine face for
+   text but a poor one for a stat block, for two reasons a specimen page does
+   not show:
+     PROPORTIONAL FIGURES. Its digits span 7.65px ("1") to 13.05px ("0") at
+     20px - a 5.4px spread. Arial and Share Tech Mono are both perfectly
+     tabular. A skills column in Chakra Petch does not line up.
+     WIDER THAN ARIAL AT SMALL SIZES. +0.65 to +1.14px per digit at 9-12px,
+     which is exactly where the tight boxes live (.gfs-npcnum is 26px at 12px,
+     already snugged once in 284b). It is only narrower at 14-20px.
+   So the sheet takes Chakra Petch and the NUMBERS keep Share Tech Mono. That
+   is not a compromise invented here - it is the card's own proven design, a
+   condensed face for text with a mono for figures, which is why the card reads
+   well. Labels and typed text all measured SAFE in Chakra (DAMAGE REDUCTION
+   -7.9px vs Arial, names within 1px). */
+.gfs-sheet{font-family:'Chakra Petch',Arial,sans-serif;color:#22262a;padding:6px;max-width:900px}
+/* the figures stay tabular and stay inside their boxes.
+   ⛔⛔⛔ NEVER PUT A COMMENT INSIDE THIS SELECTOR LIST. 327c: the note below
+   was written between `.gfs-npcnum,` and `.gfs-vnum-big,` and it turned the
+   ENTIRE SHEET mono live - actions, skills, everything - while a conformant
+   browser parsed it perfectly and every gate passed. Roll20 rewrites each
+   selector of a comma list when it sandboxes the sheet; a comment spliced
+   into the list mangles that rewrite into something far broader than
+   intended. This is the [[comment-inside-a-selector]] trap for the FIFTH
+   time and the first where it matched MORE rather than nothing.
+   ⛔ 327b's actual lesson, kept here where it is safe: gfs-vnum-big was never
+   named in this list - AC/DR/Initiative/Speed/both Passives got their mono
+   from `input[type=number]` on the first line, i.e. through the element TYPE.
+   Retyping them to spans dropped them to Chakra Petch (slashed zero gone,
+   digits +18%) while every class-based assertion still passed. Before
+   retyping an element, grep what it will LOSE; naming it by CLASS makes it
+   type-independent for good. Same trap as 284b's width. */
+.gfs-sheet input[type=number],
+.gfs-sheet .gfs-vnum-hero,.gfs-sheet .gfs-vnum-mid,
+.gfs-sheet .gfs-ab-score,.gfs-sheet .gfs-ab-mod,.gfs-sheet .gfs-save-val,
+.gfs-sheet .gfs-skill-total,.gfs-sheet .gfs-npcval,.gfs-sheet .gfs-npcnum,
+.gfs-sheet .gfs-vnum-big,
+.gfs-sheet .gfs-hdn{font-family:'Share Tech Mono','Courier New',monospace}
+/* ⛔⛔ FORM CONTROLS DO NOT INHERIT font-family. Browsers hand input, textarea,
+   select and button their OWN default face, so the root rule above reaches
+   labels and prose and stops dead at every field. That is the exact opposite
+   of what was asked: the sheet's NUMBERS all live in inputs, so without this
+   line the prose changed and the numbers - the whole point - stayed Arial.
+   Caught by a probe asserting that a text input DID change; it failed while
+   the five other assertions passed. */
+.gfs-sheet input,.gfs-sheet textarea,.gfs-sheet select,.gfs-sheet button{font-family:inherit}
+/* KEEP AS-IS (GM, by screenshot): the senses panel and the tab pills. */
+.gfs-sheet .gfs-sentxt,.gfs-sheet .gfs-senlabel{font-family:Arial,sans-serif}
+.gfs-sheet .gfs-subtab::after{font-family:Arial,sans-serif}
+.gfs-sheet input,.gfs-sheet select{box-sizing:border-box;border:1px solid #b9c0c6;border-radius:3px;background:#fff;color:#22262a;font-size:12px;padding:2px 4px}
+.gfs-sheet input[readonly]{background:#eef1f3;font-weight:700;text-align:center}
+.gfs-sheet input[type=number]{width:44px;text-align:center;-moz-appearance:textfield}
+.gfs-sheet label{display:block;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#5a636b;margin-top:1px}
+.gfs-sheet button[type=action]{cursor:pointer;border:1px solid #16a596;background:#eafaf8;color:#0d6e64;border-radius:3px;font-weight:700}
+.gfs-sheet button[type=action]:hover{background:#16a596;color:#fff}
+
+.gfs-idbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+/* Core logo: invert(1) turns the black art white (sole zero-precedent
+   construct this rule adds - if chat ever goes magenta after this ships,
+   suspect it first); teal drop-shadow pair = the helix glow vocabulary.
+   Doubled class + !important = the Roll20 img max-width ambush. */
+.gfs-sheet img.gfs-corelogo.gfs-corelogo{height:52px;width:auto;max-width:none !important;flex:0 0 auto;align-self:center;margin:0 6px;filter:invert(1) drop-shadow(0 0 3px rgba(31,224,198,.55)) drop-shadow(0 0 8px rgba(31,224,198,.3))}
+/* BASES, not widths - every field flex-GROWS, so these numbers only decide
+   when the bar wraps, never how wide the fields look in practice. They were
+   cut (wide 150->120, plain 120->110) to make room for the Level Up arrow:
+   the sum must stay under ~809px or the Level field wraps (addendum 63), and
+   this leaves it at 756.9 with the arrow included - more headroom than before,
+   not less. Class and Genome share the plain rule with Background, so all
+   three moved together; giving Background its own basis would have cost a new
+   selector for no visible gain. */
+.gfs-field{flex:1 1 110px}
+.gfs-field.gfs-wide{flex:2 1 120px}
+.gfs-field.gfs-num{flex:0 0 60px}
+.gfs-field input{width:100%}
+
+.gfs-vitals{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;background:transparent;border:none;padding:0;margin-bottom:10px}
+.gfs-section .gfs-vitals{padding:6px 8px;align-items:flex-end;margin-bottom:0} /* settings strips keep inner padding */
+.gfs-vital{text-align:center} /* still used by Tools-page settings strips */
+.gfs-init-btn{padding:0;background:transparent !important;border:none !important}
+.gfs-init-btn input{width:44px}
+.gfs-init-misc{width:34px !important;font-size:10px !important}
+.gfs-select select{font-size:11px}
+
+.gfs-columns{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}
+.gfs-abilities{flex:0 0 190px;display:flex;flex-direction:column;gap:6px}
+.gfs-ability{display:grid;grid-template-columns:52px 48px 44px;grid-template-rows:auto auto;gap:3px 5px;align-items:center;background:#f2f4f6;border:1px solid #d7dce0;border-radius:5px;padding:5px}
+.gfs-ab-name{grid-row:1;font-size:13px;padding:4px 0}
+.gfs-ab-score{grid-row:1}
+.gfs-ab-mod{grid-row:1}
+.gfs-save-row{grid-column:1 / span 3;grid-row:2;display:flex;align-items:center;gap:5px;margin:0}
+.gfs-save-row input[type=checkbox]{width:14px;height:14px;margin:0}
+.gfs-save-btn{font-size:10px;padding:1px 8px;text-transform:none}
+.gfs-save-val{width:40px !important}
+.gfs-passives{display:flex;gap:6px;margin-top:7px}
+.gfs-passives div{flex:1;min-width:0;display:flex;flex-direction:column-reverse;align-items:center;gap:1px;background:#f2f4f6;border:1px solid #d7dce0;border-radius:5px;padding:4px 4px 3px;margin-top:0}
+.gfs-passives label{margin:0}
+
+.gfs-skills{flex:1 1 320px;background:#f2f4f6;border:1px solid #d7dce0;border-radius:5px;padding:6px}
+.gfs-skills-head{display:flex;justify-content:space-between;align-items:baseline;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#0d6e64;border-bottom:2px solid #16a596;padding-bottom:3px;margin-bottom:4px}
+.gfs-legend{font-size:9px;font-weight:600;color:#5a636b;text-transform:none;letter-spacing:0}
+/* 283: the legend glyphs wear the toggles' own checked colors */
+.gfs-leg-p{color:#1fe0c6}
+.gfs-leg-e{color:#ffb02e}
+.gfs-skill{display:flex;align-items:center;gap:5px;padding:1px 0}
+.gfs-prof{width:36px;font-size:11px;text-align:center;padding:1px}
+.gfs-skill-name{flex:1;text-align:left;font-size:11px;padding:2px 6px;background:transparent;border-color:transparent}
+.gfs-skill-name:hover{border-color:#16a596}
+.gfs-skill-ab{font-size:9px;font-weight:700;color:#8a939b;width:26px}
+.gfs-skill-misc{width:34px !important;font-size:10px !important}
+/* 283b/283c: at 30px the digits clipped LIVE - base CSS pads/reserves
+   spinner space on number inputs, and it survived a plain (0,2,1) assert,
+   so its own padding is IMPORTANT or better. Doubled class + !important is
+   the house idiom for exactly this war (see the corelogo rule at the top).
+   Spinners are removed outright - readonly, worker-written. */
+.gfs-sheet input.gfs-skill-total.gfs-skill-total{width:30px !important;min-width:0;padding:2px 1px !important;text-align:center !important;-webkit-appearance:none;appearance:none}
+
+/* ============================================================
+   GeneFunk 2090 Revised — Roll Template v3
+   Legacy-safe: no CSS variables. Self-contained dark card with
+   explicit colors — renders identically in light & dark chat.
+   ============================================================ */
+
+.sheet-rolltemplate-general .gfr-card.gfr-card {
+  border: 1.5px solid #43494f;
+  border-radius: 6px;
+  padding: 0;
+  margin: 2px 0;
+  overflow: hidden;
+  font-family: 'Barlow Condensed', Arial, sans-serif;
+  color: #e8eaec !important;
+}
+
+/* Crit / fumble state ring */
+.sheet-rolltemplate-general .gfr-card.gfr-card.gfr-crit.gfr-crit  { border-color: #34c467 !important; box-shadow: 0 0 0 1.5px #34c467; }
+.sheet-rolltemplate-general .gfr-card.gfr-card.gfr-fumble.gfr-fumble{ border-color: #e05252 !important; box-shadow: 0 0 0 1.5px #e05252; }
+
+.sheet-rolltemplate-general .gfr-skin.gfr-skin {
+  background-color: #23272c !important;
+}
+
+/* ---------- Header ---------- */
+.sheet-rolltemplate-general .gfr-header.gfr-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2px 8px;
+  background-color: #171a1d !important;
+  border-bottom: 2px solid #2fd4c2;
+  padding: 4px 8px;
+}
+.sheet-rolltemplate-general .gfr-name.gfr-name,
+.sheet-rolltemplate-general .gfr-name.gfr-name a {
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 12px;
+  text-decoration: none;
+}
+.sheet-rolltemplate-general .gfr-rollname.gfr-rollname {
+  color: #2fd4c2 !important;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+/* ---------- Result chips ---------- */
+.sheet-rolltemplate-general .gfr-results.gfr-results {
+  background-color: #23272c !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+}
+.sheet-rolltemplate-general .gfr-hex.gfr-hex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 8px 14px 9px;
+  clip-path: polygon(12% 0, 88% 0, 100% 50%, 88% 100%, 12% 100%, 0 50%);
+  color: #ffffff !important;
+  flex: 0 1 auto;
+}
+.sheet-rolltemplate-general .gfr-d20.gfr-d20  { background-color: #3a414a !important; }
+.sheet-rolltemplate-general .gfr-dmg1.gfr-dmg1 { background-color: #b02e21 !important; }
+.sheet-rolltemplate-general .gfr-dmg2.gfr-dmg2 { background-color: #c56f1d !important; }
+.sheet-rolltemplate-general .gfr-dc.gfr-dc   { background-color: #34659c !important; }
+
+.sheet-rolltemplate-general .gfr-value.gfr-value {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #ffffff !important;
+}
+.sheet-rolltemplate-general .gfr-critplus.gfr-critplus {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffd76a !important;
+}
+.sheet-rolltemplate-general .gfr-tag.gfr-tag {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #ffffff !important;
+  opacity: .85;
+  text-align: center;
+  max-width: 110px;
+  margin-top: 3px;
+}
+
+/* Neutralize Roll20's inline-roll chrome inside chips */
+.sheet-rolltemplate-general .gfr-hex.gfr-hex .inlinerollresult {
+  background-color: transparent !important;
+  border: none;
+  color: #ffffff !important;
+  font-weight: 800;
+  padding: 0;
+}
+
+/* ---------- Range / properties pills ---------- */
+.sheet-rolltemplate-general .gfr-meta.gfr-meta {
+  background-color: #23272c !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 8px 6px;
+}
+.sheet-rolltemplate-general .gfr-pill.gfr-pill {
+  background-color: #33393f !important;
+  border: 1px solid #4a5158;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #d7dade !important;
+  white-space: normal;
+  word-break: keep-all;
+}
+
+/* ---------- Description ---------- */
+.sheet-rolltemplate-general .gfr-desc.gfr-desc {
+  background-color: #23272c !important;
+  padding: 6px 8px 8px;
+  border-top: 1px solid #3a4046;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #d7dade !important;
+  white-space: pre-line;
+  max-height: none;
+  overflow: visible;
+}
+/* ============================================================
+   GeneFunk 2090 Revised — Roll Template v3
+   Legacy-safe: no CSS variables. Self-contained dark card with
+   explicit colors — renders identically in light & dark chat.
+   ============================================================ */
+
+.sheet-rolltemplate-general .sheet-gfr-card.sheet-gfr-card {
+  border: 1.5px solid #43494f;
+  border-radius: 6px;
+  padding: 0;
+  margin: 2px 0;
+  overflow: hidden;
+  font-family: 'Barlow Condensed', Arial, sans-serif;
+  color: #e8eaec !important;
+}
+
+.sheet-rolltemplate-general .sheet-gfr-card.sheet-gfr-card.sheet-gfr-crit.sheet-gfr-crit  { border-color: #34c467 !important; box-shadow: 0 0 0 1.5px #34c467; }
+.sheet-rolltemplate-general .sheet-gfr-card.sheet-gfr-card.sheet-gfr-fumble.sheet-gfr-fumble{ border-color: #e05252 !important; box-shadow: 0 0 0 1.5px #e05252; }
+
+.sheet-rolltemplate-general .sheet-gfr-skin.sheet-gfr-skin {
+  background-color: #23272c !important;
+}
+
+.sheet-rolltemplate-general .sheet-gfr-header.sheet-gfr-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2px 8px;
+  background-color: #171a1d !important;
+  border-bottom: 2px solid #2fd4c2;
+  padding: 4px 8px;
+}
+.sheet-rolltemplate-general .sheet-gfr-name.sheet-gfr-name,
+.sheet-rolltemplate-general .sheet-gfr-name.sheet-gfr-name a {
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 12px;
+  text-decoration: none;
+}
+.sheet-rolltemplate-general .sheet-gfr-rollname.sheet-gfr-rollname {
+  color: #2fd4c2 !important;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.sheet-rolltemplate-general .sheet-gfr-results.sheet-gfr-results {
+  background-color: #23272c !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+}
+.sheet-rolltemplate-general .sheet-gfr-hex.sheet-gfr-hex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 8px 14px 9px;
+  clip-path: polygon(12% 0, 88% 0, 100% 50%, 88% 100%, 12% 100%, 0 50%);
+  color: #ffffff !important;
+  flex: 0 1 auto;
+}
+.sheet-rolltemplate-general .sheet-gfr-d20.sheet-gfr-d20  { background-color: #3a414a !important; }
+.sheet-rolltemplate-general .sheet-gfr-dmg1.sheet-gfr-dmg1 { background-color: #b02e21 !important; }
+.sheet-rolltemplate-general .sheet-gfr-dmg2.sheet-gfr-dmg2 { background-color: #c56f1d !important; }
+.sheet-rolltemplate-general .sheet-gfr-dc.sheet-gfr-dc   { background-color: #34659c !important; }
+
+.sheet-rolltemplate-general .sheet-gfr-value.sheet-gfr-value {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #ffffff !important;
+}
+.sheet-rolltemplate-general .sheet-gfr-critplus.sheet-gfr-critplus {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffd76a !important;
+}
+.sheet-rolltemplate-general .sheet-gfr-tag.sheet-gfr-tag {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #ffffff !important;
+  opacity: .85;
+  text-align: center;
+  max-width: 110px;
+  margin-top: 3px;
+}
+
+.sheet-rolltemplate-general .sheet-gfr-hex.sheet-gfr-hex .inlinerollresult {
+  background-color: transparent !important;
+  border: none;
+  color: #ffffff !important;
+  font-weight: 800;
+  padding: 0;
+}
+
+.sheet-rolltemplate-general .sheet-gfr-meta.sheet-gfr-meta {
+  background-color: #23272c !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 8px 6px;
+}
+.sheet-rolltemplate-general .sheet-gfr-pill.sheet-gfr-pill {
+  background-color: #33393f !important;
+  border: 1px solid #4a5158;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #d7dade !important;
+  white-space: normal;
+  word-break: keep-all;
+}
+
+.sheet-rolltemplate-general .sheet-gfr-desc.sheet-gfr-desc {
+  background-color: #23272c !important;
+  padding: 6px 8px 8px;
+  border-top: 1px solid #3a4046;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #d7dade !important;
+  white-space: pre-line;
+  max-height: none;
+  overflow: visible;
+}
+
+/* patch: initiative roll layout */
+.gfs-init-wrap{display:flex;gap:3px;align-items:center}
+
+/* ================= phase 3: sections, repeating rows, global mods ================= */
+.gfs-section{background:#f2f4f6;border:1px solid #d7dce0;border-radius:5px;padding:6px;margin-top:10px}
+.gfs-section-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#0d6e64;border-bottom:2px solid #16a596;padding-bottom:3px;margin-bottom:5px}
+.gfs-hackstats{display:flex;gap:10px;align-items:center;text-transform:none;letter-spacing:0;font-weight:600}
+.gfs-inline{display:flex;align-items:center;gap:3px;font-size:10px;font-weight:700;margin:0}
+.gfs-inline span{text-transform:uppercase;color:#5a636b}
+.gfs-tiny{width:44px !important;text-align:center}
+.gfs-small{width:76px}
+.gfs-grow{flex:1;min-width:90px}
+
+.gfs-gm-cols{display:grid;grid-template-columns:22px minmax(0,1fr) 56px 56px 48px 48px;gap:5px;font-size:9px;font-weight:700;text-transform:uppercase;color:#5a636b;padding:0 2px}
+.gfs-gm-row{display:grid;grid-template-columns:22px minmax(0,1fr) 56px 56px 48px 48px;gap:5px;align-items:center;padding:2px 2px}
+.gfs-gm-row input[type=checkbox]{width:15px;height:15px;margin:0}
+
+.repitem{position:relative}
+.gfs-rep-head{display:flex;align-items:center;gap:6px;padding:3px 26px 3px 2px;border-top:1px solid #dfe3e7}
+.gfs-atk-roll{font-size:10px;padding:2px 9px}
+.gfs-rep-name{flex:1;font-weight:700}
+.gfs-expander{position:absolute;top:7px;right:4px;width:15px;height:15px;margin:0;z-index:2}
+.gfs-rep-body{display:none;padding:4px 2px 6px 26px;border-left:2px solid #16a596;margin-left:8px}
+.gfs-expander:checked ~ .gfs-rep-body{display:block}
+.gfs-rep-grid{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:4px}
+/* drawer selects hold 3-4 letter abbreviations ("DC: Fixed" is the widest) -
+   uncapped they render at platform default width and force one field per line.
+   Fire-mode options are sentences, so that select keeps the global picker's
+   130px. The slot picker keeps its own tighter cap via a higher-specificity
+   rule, NOT this one. */
+.gfs-rep-grid select{font-size:11px;width:auto;height:auto;line-height:1.2;max-width:80px}
+.gfs-firearm select{font-size:10px;max-width:130px}
+/* Roll20's base stylesheet hands every label a full-row width (the ambush the
+   passives + hackstats fixes already fight) - so Attack/Prof/Crit/Fire/Recoil/
+   Ammo each seized a wrap line of their own. Same fix as .gfs-hackstats. */
+.gfs-rep-grid label.gfs-inline,.gfs-act-drawerhead label.gfs-inline{display:flex;width:auto;min-width:0;float:none;margin:0}
+/* base CSS also hands inputs/selects a bottom margin - the vertical half of
+   the same ambush. Kill it inside the drawers only. */
+.gfs-rep-grid input,.gfs-rep-grid select,.gfs-act-drawerhead input{margin:0}
+
+/* ===== Actions table (5e-style): column headers, clickable name, hover row =====
+   Collapsed row is Name | Roll | Damage/Type. The name is a read-only display
+   with an invisible act_action button over it (click = roll); editing + the
+   Dmg/? buttons live in the cog drawer. roll_disp / dmg_disp are worker-owned.
+   Header + row share one grid so the columns line up; padding-right clears the
+   absolute cog. */
+.gfs-act-cols{display:grid;grid-template-columns:minmax(0,1.2fr) 48px minmax(0,1fr) 16px;gap:6px;padding:2px 26px 3px 8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5a636b}
+.gfs-act-cols span:nth-child(2){text-align:center}
+.gfs-act-row{display:grid;grid-template-columns:minmax(0,1.2fr) 48px minmax(0,1fr) 16px;gap:6px;align-items:center;padding:3px 26px 3px 8px}
+.gfs-act-row:hover{background:#1fe0c614}
+/* clickable cells: an ABSOLUTE overlay button inside a relative cell paints
+   above the read-only input WITHOUT a z-index the sanitizer might drop, so the
+   click always lands on the button (grid-overlap + z-index did NOT work live) */
+.gfs-act-namecell,.gfs-act-dmgcell{position:relative;display:flex;align-items:center;min-width:0}
+.gfs-sheet button.gfs-act-click{position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;background:transparent !important;border:none !important;padding:0;margin:0;cursor:pointer;color:transparent}
+.gfs-sheet input.gfs-act-name{width:100% !important;min-width:0;max-width:none;background:transparent !important;border:none !important;font-weight:700;font-size:11px;color:#ffffff !important;text-align:left !important;padding:2px 0;cursor:pointer;pointer-events:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gfs-sheet input.gfs-act-cell{width:100% !important;min-width:0;max-width:none;background:transparent !important;border:none !important;font-size:11px;padding:2px 0;pointer-events:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gfs-sheet input.gfs-act-roll{text-align:center;font-weight:700;color:#ffb02e}
+/* text-align:left undoes the centring that `.gfs-sheet input[readonly]` sets
+   at line 4 - the same competitor the ATK/DC cells document below. (No braces
+   written in this comment: the rule-count check greps them.) Equal
+   specificity (0,2,1) both ways, so this wins purely on sitting later in the
+   file; do not move it above line 4. The damage cell reads as a formula
+   ("2d8+6 Pierce"), and a centred formula drifts as its width changes. */
+.gfs-sheet input.gfs-act-dmg{color:#8fa0a8;cursor:pointer;text-align:left}
+/* hover the name zone -> tint name AND roll (the attack); hover damage -> tint it */
+/* .gfs-npchkname joins this group (addendum 185, GM request: hack names should
+   glow teal on hover). NOTE THIS ADDS NO RULE - the hack cells already carry
+   .gfs-act-namecell, so extending the existing comma group was enough, and the
+   rule count does not move. Same shape as its neighbours, so no new construct
+   for the chat parser to object to either. */
+.gfs-act-namecell:hover .gfs-act-name,.gfs-act-namecell:hover .gfs-npchkname,.gfs-act-namecell:hover ~ .gfs-act-roll{color:#1fe0c6 !important;text-shadow:0 0 6px #1fe0c6aa}
+.gfs-act-dmgcell:hover .gfs-act-dmg{color:#1fe0c6 !important;text-shadow:0 0 6px #1fe0c6aa}
+/* the ? info button, its own column just left of the cog */
+.gfs-sheet button.gfs-act-info{justify-self:center;width:16px;height:16px;padding:0;line-height:14px;font-size:10px;font-weight:800;border-radius:50%;background:#10151a !important;border:1px solid #5a636b !important;color:#8fa0a8 !important;cursor:pointer}
+.gfs-sheet button.gfs-act-info:hover{border-color:#1fe0c6 !important;color:#1fe0c6 !important}
+/* per-row hack TYPE icon - the genome-art reveal pattern (gfs-spgimgav), byte
+   for byte the same three shapes: hide the flag, hide every img, show the one
+   whose flag is ticked. Sized like the ? chip beside it; doubled class beats
+   Roll20's img{max-width:100%} ambush.
+   THE WHITE DISC IS NOT DECORATION - DO NOT REMOVE IT. In all seven PNGs the
+   glyph (brain, syringe, bolt) is a TRANSPARENT KNOCKOUT, not white paint:
+   alpha-scanned, under 1% of the opaque ink is whiteish. Straight onto
+   #0f1317 the artwork reads as a coloured ring with a dark smear inside -
+   measured 72% of the gadget disc and 65% of craft-explosive fell to
+   background luminance. The disc is a circle INSCRIBED in the 259px canvas
+   (radii 129-130 on all 8 rays, alpha 255 at every edge midpoint), so
+   border-radius:50% lands exactly on it and leaves no halo. */
+.gfs-sheet input.gfs-hicav{display:none}
+/* 304: the white disc is GONE. It existed because the icon art was a
+   transparent knockout - the glyph was a hole, and without something white
+   behind it the glyph rendered near-black on a dark sheet (addendum 137).
+   The 2026-08-20 re-export PAINTS the glyph (measured 18-53% white ink, was
+   0% on all seven), so the backing is redundant. ⛔ If an icon is ever
+   replaced with knockout art again, this line has to come back or that glyph
+   disappears.
+   ⛔⛔ 306: THE COMMENT ABOVE WAS ORIGINALLY PASTED MID-SELECTOR, between
+   `.gfs-sheet img` and `.gfs-hicon.gfs-hicon`. A CSS comment is WHITESPACE,
+   so the compound selector silently became a DESCENDANT one - .gfs-hicon
+   inside an img, which matches nothing - and every one of the 49 sheet icons
+   lost its display:none and its 16px cap and rendered at 256px over the
+   Actions tab. Nothing caught it: brace balance is unchanged (the braces are
+   still there), the comment delimiters balance, and the rule count is
+   identical. A COMMENT GOES ON ITS OWN LINE ABOVE A RULE, NEVER INSIDE THE
+   SELECTOR. */
+.gfs-sheet img.gfs-hicon.gfs-hicon{display:none;width:16px !important;height:16px !important;max-width:16px !important;min-width:16px;flex:0 0 16px;margin:0 5px 0 0;border-radius:50%}
+.gfs-sheet input.gfs-hicav:checked + img.gfs-hicon.gfs-hicon{display:block}
+.gfs-act-drawerhead{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+/* clickable-name rows (Genome / Class & Background Features / Feats): reuse the
+   actions namecell overlay + hover text-tint; the cell fills the rep-head and
+   the whole row gets the same teal hover as the actions table */
+.gfs-shownamecell{flex:1}
+.gfs-showrow:hover{background:#1fe0c614}
+.gfs-desc-edit{width:100%;box-sizing:border-box;border:1px solid #b9c0c6;border-radius:3px;font-size:11px;padding:3px 5px;resize:vertical}
+/* sizing split out at higher specificity: base CSS opens textareas TALL via
+   a prefixed rule that outranks a bare class - but ONLY the size may win
+   here, or the dark-theme border/background override at the bottom of the
+   file would lose to a raised selector (the ambush fix that overcorrects) */
+.gfs-sheet .gfs-desc-edit{height:26px;min-height:26px}
+
+/* ===== hack slot pips (one row per level block, sits in the section head) =====
+   Every pip is a teal hex: FILLED = the slot is available, HOLLOW = spent.
+   The pip COUNT is data-driven - the worker checks one hidden gfs-pipav box
+   immediately before each pip that exists at the current max, and a single
+   adjacent-sibling rule reveals it. (This replaced a 55-selector enumeration
+   that was the biggest single CSS addition and a prime chat-parser-load
+   suspect.) The pipav box and its pip must stay adjacent for the + combinator. */
+.gfs-slotbar{display:inline-flex;flex-wrap:wrap;gap:2px;align-items:center}
+.gfs-sheet input.gfs-pipav{display:none}
+/* the hide MUST outrank .gfs-sheet label{display:block} (0,1,1) or every pip
+   stays visible; the reveal below scores (0,3,1) and outranks this */
+.gfs-sheet label.gfs-pip{display:none}
+.gfs-pip.gfs-pip{position:relative;width:15px;height:17px;padding:0;margin:0;
+  align-items:center;justify-content:center;cursor:pointer;vertical-align:middle;flex:none;line-height:1}
+.gfs-pip.gfs-pip input{position:absolute;opacity:0;left:0;top:0;width:100%;height:100%;margin:0;padding:0;cursor:pointer;z-index:2}
+.gfs-pip.gfs-pip span{line-height:1;font-size:14px;color:#1fe0c6;-webkit-text-stroke:1.1px #1fe0c6}
+.gfs-pip.gfs-pip span::after{content:"⬢"}
+.gfs-pip.gfs-pip input:checked + span{color:transparent}
+.gfs-pip.gfs-pip:hover span{-webkit-text-stroke-color:#8ff5e6}
+/* Reveal: the worker checks hsN_k_av for each pip that exists at the current
+   max, and this ONE adjacent-sibling rule shows it. Replaced a 55-selector
+   enumeration that was the single biggest chat-parser load on the sheet. */
+.gfs-sheet input.gfs-pipav:checked + label.gfs-pip{display:inline-flex}
+
+repfieldset{display:block}
+
+/* ================= phase 4 ================= */
+.gfs-stance{display:flex;flex-direction:column;gap:1px}
+.gfs-stance .gfs-inline{font-size:9px}
+.gfs-firearm{background:#e8f6f4;border-radius:4px;padding:3px 5px}
+.gfs-money{width:64px !important;text-align:right}
+.gfs-eq-cols{display:grid;grid-template-columns:1fr 20px 44px 44px 20px;gap:5px;font-size:9px;font-weight:700;text-transform:uppercase;color:#5a636b;padding:0 2px}
+.gfs-eq-row{display:grid;grid-template-columns:1fr 20px 44px 44px;gap:5px;align-items:center;padding:2px 26px 2px 2px}
+.gfs-eq-row input[type=checkbox]{width:15px;height:15px;margin:0}
+
+/* recoil management bar */
+.gfs-recoilbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:#e8f6f4;border:1px solid #bfe3de;border-radius:5px;padding:5px 8px;margin-bottom:8px}
+.gfs-recoil-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#0d6e64}
+.gfs-recoil-total input{font-weight:800}
+
+/* class assist */
+.gfs-classassist select{flex:1;font-size:11px}
+
+/* drop status bar */
+.gfs-dropbar .gfs-init-wrap{width:100%}
+.gfs-dropstatus{flex:1;font-size:10px !important;text-align:left !important;color:#0d6e64 !important}
+
+/* paste import box */
+.gfs-droppaste{width:100%;box-sizing:border-box;min-height:34px;max-height:70px;border:1px dashed #16a596;border-radius:3px;font-size:9px;font-family:monospace;padding:3px 5px;resize:vertical;margin-bottom:3px}
+
+/* hack library picker */
+.gfs-hackpicker{display:flex;gap:5px;align-items:center;padding:2px 2px 5px}
+.gfs-hackpicker select{flex:1;max-width:340px;font-size:11px}
+
+/* DC prefix inside the save chip */
+.sheet-rolltemplate-general .gfr-dcprefix{font-size:11px;font-weight:800;opacity:.85;letter-spacing:.02em}
+.sheet-rolltemplate-general .sheet-gfr-dcprefix{font-size:11px;font-weight:800;opacity:.85;letter-spacing:.02em}
+
+/* book-style meta pills + At Higher Levels block */
+.sheet-rolltemplate-general .gfr-meta{padding:0 8px}
+.sheet-rolltemplate-general .gfr-pill{margin-bottom:6px}
+.sheet-rolltemplate-general .gfr-pill b{color:#ffffff !important;font-weight:800}
+.sheet-rolltemplate-general .gfr-higher{border-top:1px dashed #3a4046 !important}
+.sheet-rolltemplate-general .gfr-higher-label{font-weight:800;font-style:italic;color:#2fd4c2 !important}
+.sheet-rolltemplate-general .sheet-gfr-meta{padding:0 8px}
+.sheet-rolltemplate-general .sheet-gfr-pill{margin-bottom:6px}
+.sheet-rolltemplate-general .sheet-gfr-pill b{color:#ffffff !important;font-weight:800}
+.sheet-rolltemplate-general .sheet-gfr-higher{border-top:1px dashed #3a4046 !important}
+.sheet-rolltemplate-general .sheet-gfr-higher-label{font-weight:800;font-style:italic;color:#2fd4c2 !important}
+
+
+
+
+
+
+
+
+
+/* info button + rules card */
+.gfs-info{width:22px;padding:2px 0 !important;font-weight:800}
+.sheet-rolltemplate-general .gfr-rules{display:block !important;border-top:1px solid #3a4046 !important}
+.sheet-rolltemplate-general .sheet-gfr-rules{display:block !important;border-top:1px solid #3a4046 !important}
+
+/* command-link buttons on attack cards */
+.sheet-rolltemplate-general .gfr-dmglinks a{display:inline-block;background:#b02e21 !important;color:#ffffff !important;border:1px solid #d8453a;border-radius:4px;padding:3px 12px;font-size:11px;font-weight:800;text-decoration:none;margin:0 4px 6px 0}
+.sheet-rolltemplate-general .gfr-dmglinks a:hover{background:#d8453a !important}
+.sheet-rolltemplate-general .sheet-gfr-dmglinks a{display:inline-block;background:#b02e21 !important;color:#ffffff !important;border:1px solid #d8453a;border-radius:4px;padding:3px 12px;font-size:11px;font-weight:800;text-decoration:none;margin:0 4px 6px 0}
+.sheet-rolltemplate-general .sheet-gfr-dmglinks a:hover{background:#d8453a !important}
+
+/* description command link: teal variant */
+.sheet-rolltemplate-general .gfr-dmglinks a[href*="info-action"]{background:#0d6e64 !important;border-color:#16a596}
+.sheet-rolltemplate-general .gfr-dmglinks a[href*="info-action"]:hover{background:#16a596 !important}
+.sheet-rolltemplate-general .sheet-gfr-dmglinks a[href*="info-action"]{background:#0d6e64 !important;border-color:#16a596}
+.sheet-rolltemplate-general .sheet-gfr-dmglinks a[href*="info-action"]:hover{background:#16a596 !important}
+.gfs-dmgbtn{border-color:#b02e21 !important;background:#fdeceb !important;color:#8c2318 !important}
+.sheet-rolltemplate-general .gfr-dmglinks a[href*="critdmg"]{background:#7a1f14 !important;border-color:#ffd76a;box-shadow:0 0 0 1px #ffd76a}
+.sheet-rolltemplate-general .sheet-gfr-dmglinks a[href*="critdmg"]{background:#7a1f14 !important;border-color:#ffd76a;box-shadow:0 0 0 1px #ffd76a}
+.sheet-rolltemplate-general .gfr-dmglinks{padding-top:0;padding-bottom:0}
+.sheet-rolltemplate-general .gfr-dmglinks a{margin-bottom:4px}
+.sheet-rolltemplate-general .sheet-gfr-dmglinks{padding-top:0;padding-bottom:0}
+.sheet-rolltemplate-general .sheet-gfr-dmglinks a{margin-bottom:4px}
+.gfs-firemode-global{font-size:10px;max-width:130px}
+.gfs-daemon-ai{font-size:10px;max-width:170px}
+
+/* button blocks: separate markdown lines, same visual row */
+.sheet-rolltemplate-general .gfr-btnrow{padding:4px 8px 6px}
+.sheet-rolltemplate-general .gfr-btnrow .gfr-dmglinks{display:inline-block;padding:0;margin:0 6px 0 0}
+.sheet-rolltemplate-general .sheet-gfr-btnrow{padding:4px 8px 6px}
+.sheet-rolltemplate-general .sheet-gfr-btnrow .sheet-gfr-dmglinks{display:inline-block;padding:0;margin:0 6px 0 0}
+.gfs-rep-grid .gfs-slotpick{font-size:10px;max-width:52px}
+
+/* ===== Tab architecture ===== */
+.gfs-tabline{border-bottom:2px solid #16a596;margin-bottom:8px}
+.gfs-sheet input.gfs-tab{-webkit-appearance:none;appearance:none;width:auto;height:auto;margin:0 2px 0 0;cursor:pointer;display:inline-block;vertical-align:bottom;
+  border:1px solid #b9c0c6;border-bottom:none;border-radius:6px 6px 0 0;background:#f2f4f6;padding:7px 22px 6px;position:relative}
+.gfs-sheet input.gfs-tab::after{content:attr(title);font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:#5a636b}
+.gfs-sheet input.gfs-tab:hover{background:#eafaf8}
+.gfs-sheet input.gfs-tab:checked{background:#16a596;border-color:#16a596}
+.gfs-sheet input.gfs-tab:checked::after{color:#fff}
+/* Level Up: an arrow beside the Level field, sized so the idbar's height stays
+   logo-driven (52px) and nothing moves. flex:0 0 auto keeps it out of the
+   grow/shrink negotiation the text fields are in, and align-self:flex-start
+   lines it up with the INPUTS rather than stretching down past the labels.
+   height/min-width asserted because Roll20's base CSS ambushes form controls
+   with fixed box metrics - the documented default-width trap. Chrome comes
+   free from .gfs-sheet button[type=action], which the dark theme styles.
+   THE NEGATIVE LEFT MARGIN IS DELIBERATE. .gfs-idbar sets gap:8px, which
+   applies uniformly between every item and cannot be varied per-child - so the
+   only way to close one gap is to cancel it on the child. Flex gap stacks with
+   child margins (the documented trap, used here in reverse), and -8px cancels
+   all 8, seating the arrow flush against the Level field so the two read as
+   one control. The 1px borders then abut into a 2px seam; if that reads badly
+   this is a ONE-NUMBER retune to -6px for a 2px breath.
+   It also shrinks the wrap budget by 8px (756.9 -> 748.9) rather than growing
+   it, so it costs nothing there. */
+.gfs-sheet button.gfs-lvlup{flex:0 0 auto;align-self:flex-start;height:auto;min-width:0;
+  margin:0 0 0 -8px;padding:5px 4px;font-size:12px;line-height:1}
+/* ...AND THE OTHER HALF OF THAT GAP IS INSIDE THE LEVEL CELL. .gfs-num is a
+   fixed 60px, but Roll20's base CSS pins a width on number inputs that beats a
+   plain width:100% - the documented ambush - so the input renders narrower
+   than its cell and leaves dead space to its right. That space sits BEFORE the
+   flex gap, which is why the arrow looked further off than the 8px between
+   every other field even at margin 0. Doubled class + !important is the
+   standing fix for box properties on this platform; min-width:0 stops the
+   default from re-inflating it. */
+.gfs-sheet .gfs-field.gfs-num.gfs-num input{width:100% !important;min-width:0}
+.gfs-page{display:none}
+.gfs-tab[value="core"]:checked ~ .gfs-page-core{display:block}
+.gfs-tab[value="hacks"]:checked ~ .gfs-page-hacks{display:block}
+.gfs-tab[value="daemon"]:checked ~ .gfs-page-daemon{display:block}
+.gfs-tab[value="chargen"]:checked ~ .gfs-page-chargen{display:block}
+.gfs-tab[value="tools"]:checked ~ .gfs-page-tools{display:block}
+
+.sheet-gfs-page{display:none}
+.sheet-gfs-tab[value=core]:checked ~ .sheet-gfs-page-core{display:block}
+.sheet-gfs-tab[value=hacks]:checked ~ .sheet-gfs-page-hacks{display:block}
+.sheet-gfs-tab[value=daemon]:checked ~ .sheet-gfs-page-daemon{display:block}
+.sheet-gfs-tab[value=chargen]:checked ~ .sheet-gfs-page-chargen{display:block}
+.sheet-gfs-tab[value=tools]:checked ~ .sheet-gfs-page-tools{display:block}
+
+/* ============================================================
+   TERMINAL BIOPUNK THEME - dark foundation (mined from fan sheet + printable)
+   ============================================================ */
+.gfs-sheet{background:#0f1317;color:#dfe7ea;border-radius:8px;padding:10px 12px}
+.gfs-sheet input,.gfs-sheet select,.gfs-sheet textarea{background:#10151a;color:#dfe7ea;border:1px solid #2a323a;border-radius:4px}
+.gfs-sheet input[readonly]{background:#171d23;color:#ffb02e;border-color:#2a323a}
+.gfs-sheet input:focus,.gfs-sheet select:focus,.gfs-sheet textarea:focus{outline:none;border-color:#1fe0c6;box-shadow:0 0 0 1px #1fe0c644}
+.gfs-sheet label{color:#8fa0a8}
+.gfs-sheet option{background:#171d23}
+.gfs-sheet button[type=action]{background:#10151a;border:1px solid #1fe0c6;color:#1fe0c6;border-radius:4px;letter-spacing:.04em}
+.gfs-sheet button[type=action]:hover{background:#1fe0c6;color:#06231f}
+.gfs-sheet .gfs-dmg-roll{border-color:#ff4655;color:#ff4655;background:#10151a}
+.gfs-sheet .gfs-dmg-roll:hover{background:#ff4655;color:#fff}
+
+/* tabs */
+.gfs-tabline{border-bottom:2px solid #1fe0c6}
+.gfs-sheet input.gfs-tab{background:#171d23;border:1px solid #2a323a;border-bottom:none}
+.gfs-sheet input.gfs-tab::after{color:#8fa0a8}
+.gfs-sheet input.gfs-tab:hover{background:#1d242b}
+.gfs-sheet input.gfs-tab:checked{background:#1fe0c6;border-color:#1fe0c6}
+.gfs-sheet input.gfs-tab:checked::after{color:#06231f}
+
+/* section heads: dark bars w/ teal marker */
+.gfs-section{border:1px solid #232b33;border-radius:6px;background:#141a20;margin-bottom:10px}
+.gfs-section-head{background:#171d23;color:#1fe0c6;border-bottom:1px solid #232b33;border-radius:6px 6px 0 0;
+  text-transform:uppercase;letter-spacing:.12em;font-size:11px;font-weight:800;padding:6px 10px}
+.gfs-section-head::before{content:"▸ ";color:#1fe0c6}
+
+/* panels */
+.gfs-idbar,.gfs-ability,.gfs-skills,.gfs-passives div,.gfs-globalmods,.gfs-recoilbar{background:#141a20;border-color:#232b33}
+
+/* ===== vitals HUD (BEACON-style cards; July 20 pass 1) ===== */
+.gfs-vcard{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:1px;background:#141a20;border:1px solid #232b33;border-radius:8px;padding:7px 12px 5px;box-shadow:inset 0 1px 0 #ffffff08}
+.gfs-vcard::after{content:"";position:absolute;top:-1px;right:-1px;width:0;height:0;border-top:9px solid #0f1317;border-left:9px solid transparent;z-index:3;pointer-events:none}
+.gfs-vcard:focus-within{border-color:#1fe0c699;box-shadow:0 0 10px #1fe0c626,inset 0 1px 0 #ffffff08}
+.gfs-vcard label{margin:2px 0 0;font-size:8.5px;letter-spacing:.14em;color:#5f6a72}
+
+/* HP / heart card: emblem + triad + hit dice + death saves */
+.gfs-vcard-hp{flex-direction:row;align-items:stretch;gap:0;padding:5px 4px;border-color:#ff46553d;box-shadow:inset 0 1px 0 #ff465514}
+.gfs-vcard-hp:focus-within{border-color:#ff465599;box-shadow:0 0 10px #ff465526,inset 0 1px 0 #ff465514}
+/* tight slots so the values sit close to the heart, as in the speed / shield / senses cards */
+.gfs-vcard-hp .gfs-vslot{padding:2px 4px}
+.gfs-vcard-tempo{flex-direction:row;align-items:stretch;gap:0;padding:5px 4px}
+.gfs-vslot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px 10px}
+.gfs-vcard-tempo .gfs-vslot{padding:2px 12px}
+.gfs-vslot + .gfs-vslot{border-left:1px dotted #2a323a}
+.gfs-vslot.gfs-vslot > label{display:block;width:100% !important;min-width:0;max-width:none;float:none;text-align:center;margin:2px 0 0;padding:0;box-sizing:border-box}
+.gfs-sheet .gfs-vnum-sm.gfs-vnum-sm{width:92px !important;min-width:0;max-width:none;background:transparent !important;border:none !important;font-size:13px;line-height:1.2;font-weight:700;color:#dfe7ea;text-align:center;padding:0}
+
+/* death saves: stacked hex rows */
+.gfs-vslot-ds{position:relative;justify-content:center;gap:2px}
+/* whole death-save slot is the roll button; the six hexes stay clickable above it
+   so a wrong result can still be corrected by hand */
+.gfs-sheet button.gfs-ds-hit{position:absolute;top:0;left:0;right:0;bottom:0;z-index:1;background:transparent !important;border:none !important;border-radius:6px;padding:0;cursor:pointer}
+.gfs-sheet button.gfs-ds-hit:hover{background:transparent !important;color:transparent;box-shadow:inset 0 0 0 1px #ff4655,inset 0 0 14px #ff46551f}
+.gfs-ds-hit:hover ~ label::after{content:"▸";position:absolute;right:4px;bottom:3px;color:#ff4655;font-size:9px;line-height:1}
+.gfs-vslot-ds .gfs-hex-toggle{z-index:2}
+.gfs-dsrow{display:flex;align-items:center;gap:3px}
+.gfs-ds-mark{font-size:15px;line-height:1;width:16px;text-align:center}
+.gfs-ds-mark-ok{color:#34e58a;opacity:.85;text-shadow:0 0 1px #0a0f12,0 0 4px currentColor}
+.gfs-ds-mark-bad{color:#ff4655;opacity:.95;text-shadow:0 0 1px #0a0f12,0 0 4px currentColor}
+.gfs-ds-hex.gfs-ds-hex.gfs-ds-hex{width:14px;height:15px}
+.gfs-ds-hex.gfs-ds-hex.gfs-ds-hex span{font-size:12px}
+.gfs-ds-ok.gfs-ds-ok.gfs-ds-ok:hover span{-webkit-text-stroke-color:#34e58a}
+.gfs-ds-ok.gfs-ds-ok.gfs-ds-ok input:checked + span{color:#34e58a;-webkit-text-stroke-color:#34e58a}
+.gfs-ds-bad.gfs-ds-bad.gfs-ds-bad:hover span{-webkit-text-stroke-color:#ff4655}
+.gfs-ds-bad.gfs-ds-bad.gfs-ds-bad input:checked + span{color:#ff4655;-webkit-text-stroke-color:#ff4655}
+
+/* emblems: one per themed card, harmonized size/position/glow */
+.gfs-vemblem{align-self:center;line-height:1;padding:0 6px 2px 10px}
+.gfs-vemblem-heart{font-size:35px;color:#ff4655;text-shadow:0 0 2px #0a0f12,0 0 3px #0a0f12,0 0 11px currentColor}
+.gfs-vemblem-shield{filter:drop-shadow(0 0 1px #0a0f12) drop-shadow(0 0 2px #0a0f12) drop-shadow(0 0 6px #ffb02e)}
+.gfs-shield-shape{display:block;width:17px;height:19px;background:#ffb02e;clip-path:polygon(0 0,100% 0,100% 58%,50% 100%,0 58%)}
+
+/* shield card: AC / DR / resistances */
+.gfs-vcard-def{flex-direction:row;align-items:stretch;gap:0;padding:5px 4px;border-color:#ffb02e3d;box-shadow:inset 0 1px 0 #ffb02e14;flex:1 1 auto}
+/* resistances: 9 damage types as hex toggles + a caption, like any other slot */
+.gfs-resslot{display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;border-left:1px dotted #2a323a;margin-left:4px;padding:2px 4px 2px 8px}
+.gfs-resgrid{display:grid;grid-template-columns:repeat(3,auto);gap:1px 8px;justify-content:start;align-content:center}
+.gfs-resslot > .gfs-reslabel{width:100%;text-align:center}
+/* AC / DR are narrow values: 3-digit cells and tight slots, so they sit close to the shield */
+.gfs-vcard-def .gfs-vslot{padding:2px 4px}
+.gfs-sheet .gfs-vcard-def .gfs-vnum-big.gfs-vnum-big{width:44px !important;padding:4px 0}
+.gfs-sheet .gfs-vnum-hero.gfs-vnum-hero{width:44px !important;min-width:0;max-width:none;background:transparent !important;border:none !important;font-size:20px;line-height:1.1;font-weight:800;color:#ff4655;text-align:center;padding:4px 0;text-shadow:0 0 2px #0a0f12,0 0 3px #0a0f12,0 0 7px currentColor}
+.gfs-sheet .gfs-vnum-mid.gfs-vnum-mid{width:64px !important;min-width:0;max-width:none;background:transparent !important;border:none !important;font-size:21px;line-height:1.1;font-weight:700;color:#dfe7ea;text-align:center;padding:0 0 0 4px}
+.gfs-sheet .gfs-vcard-hp .gfs-vnum-mid.gfs-vnum-mid{width:40px !important;font-size:16px;padding:0}
+.gfs-sheet input.gfs-vnum-mid.gfs-dim{color:#8fa0a8}
+.gfs-sheet .gfs-vnum-mid.gfs-vnum-mid:focus{box-shadow:0 0 0 1px #1fe0c655;border-radius:4px}
+.gfs-sheet .gfs-vnum-hero.gfs-vnum-hero:focus{box-shadow:0 0 0 1px #ff465555;border-radius:4px}
+
+/* INIT / AC / DR value cards */
+/* ⛔ 327: THESE ARE SPANS NOW, NOT INPUTS, AND ONLY TO FREE THE GLOW.
+   A text input forces overflow:clip and it CANNOT be overridden - setting
+   overflow:visible on one COMPUTES to "clip" (measured, 326). So a text-shadow
+   reaching past the box is cut off flat, which is why these numbers looked
+   shaved top and bottom. Padding was never a fix: it moves the cut outward and
+   costs vertical space, which the GM ruled out.
+   All ELEVEN wearing this class were readonly (verified 11 of 11, zero
+   editable), so nothing is lost by not being an input - and each keeps a
+   hidden input beside it carrying the DEFAULT value, the one thing a span
+   cannot supply on a fresh character.
+   ⚠️ NOTHING ELSE MAY CHANGE, and box-sizing is the single property a span
+   does not inherit from the input UA styling - without it the 64px width
+   renders 68px. Verified in spanbox_327: with it the span matches the input on
+   width, height, padding, margin, font, line-height, weight and alignment, and
+   leaves the label offset and row height identical. IDENTICAL, not "close".
+   ⚠️ HP and the ability scores are TYPEABLE, so they stay inputs and their
+   glow stays clipped. That asymmetry is deliberate and known (GM chose it). */
+.gfs-sheet span.gfs-vnum-big{box-sizing:border-box}
+.gfs-sheet .gfs-vnum-big.gfs-vnum-big{width:64px !important;min-width:0;max-width:none;background:transparent !important;border:none !important;font-size:20px;line-height:1.1;font-weight:800;text-align:center;padding:4px 0 4px 4px}
+.gfs-sheet input.gfs-vnum-big.gfs-teal{color:#1fe0c6 !important;text-shadow:0 0 2px #0a0f12,0 0 3px #0a0f12,0 0 7px currentColor}
+.gfs-sheet input.gfs-vnum-big.gfs-amber{color:#ffb02e !important;text-shadow:0 0 2px #0a0f12,0 0 3px #0a0f12,0 0 7px currentColor}
+.gfs-sheet input.gfs-vnum-big.gfs-yellow{color:#ffe14a !important;text-shadow:0 0 2px #0a0f12,0 0 3px #0a0f12,0 0 7px currentColor}
+/* ⛔ 327: SPAN TWINS. The four colour rules above are qualified `input.`, so
+   the moment these fields became spans they lost their colour AND their glow
+   and rendered plain grey - the exact "something else changed" the GM ruled
+   out. Caught by the equivalence test, not by eye.
+   Added as TWINS rather than by deleting the `input.` qualifier: dropping it
+   would lower those rules from (0,3,1) to (0,3,0), and their text-shadow
+   carries no !important to protect it. Leaving the input rules untouched means
+   nothing that currently renders can change. */
+.gfs-sheet span.gfs-vnum-big.gfs-teal{color:#1fe0c6 !important;text-shadow:0 0 2px #0a0f12,0 0 3px #0a0f12,0 0 7px currentColor}
+.gfs-sheet span.gfs-vnum-big.gfs-amber{color:#ffb02e !important;text-shadow:0 0 2px #0a0f12,0 0 3px #0a0f12,0 0 7px currentColor}
+.gfs-sheet span.gfs-vnum-big.gfs-yellow{color:#ffe14a !important;text-shadow:0 0 2px #0a0f12,0 0 3px #0a0f12,0 0 7px currentColor}
+.gfs-sheet span.gfs-vnum-big.gfs-green{color:#34e58a !important;text-shadow:0 0 2px #0a0f12,0 0 3px #0a0f12,0 0 7px currentColor}
+/* the whole INIT slot is the roll button */
+.gfs-vslot-init{position:relative}
+.gfs-sheet button.gfs-init-hit{position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;background:transparent !important;border:none !important;border-radius:6px;padding:0;cursor:pointer}
+.gfs-sheet button.gfs-init-hit:hover{background:transparent !important;color:transparent;box-shadow:inset 0 0 0 1px #ffe14a,inset 0 0 14px #ffe14a1f}
+.gfs-init-hit:hover ~ .gfs-vnum-big{text-shadow:0 0 2px #0a0f12,0 0 12px currentColor}
+.gfs-init-hit:hover ~ label::after{content:"▸";position:absolute;right:4px;bottom:3px;color:#ffe14a;font-size:9px;line-height:1}
+
+/* initiative card: bolt emblem, yellow trim (distinct from the shield amber), grows with the row */
+.gfs-vcard-init{flex-direction:row;align-items:stretch;gap:0;padding:5px 4px;border-color:#ffe14a3d;box-shadow:inset 0 1px 0 #ffe14a14;flex:0 0 auto}
+.gfs-vcard-init:focus-within{border-color:#ffe14a99;box-shadow:0 0 10px #ffe14a26,inset 0 1px 0 #ffe14a14}
+.gfs-vcard-init .gfs-vslot{padding:2px 4px}
+.gfs-sheet .gfs-vcard-init .gfs-vnum-big.gfs-vnum-big{width:44px !important;padding:4px 0}
+.gfs-vemblem-init{filter:drop-shadow(0 0 1px #0a0f12) drop-shadow(0 0 2px #0a0f12) drop-shadow(0 0 7px #ffe14a)}
+.gfs-bolt-shape{display:block;width:14px;height:20px;background:#ffe14a;clip-path:polygon(52% 0,100% 0,62% 38%,96% 38%,26% 100%,44% 54%,10% 54%)}
+
+/* ability cards: label / big score / glowing mod badge */
+.gfs-ability{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 6px;border:1px solid #2a323a;border-radius:8px}
+.gfs-ability .gfs-ab-name{order:0;background:transparent !important;border:none !important;color:#8fa0a8;font-size:10px;font-weight:800;letter-spacing:.14em}
+.gfs-ability .gfs-ab-name:hover{color:#1fe0c6 !important}
+.gfs-ability .gfs-ab-score{order:1;width:56px;font-size:20px;font-weight:800;text-align:center;background:#10151a}
+.gfs-ability .gfs-ab-mod{order:2;width:46px;font-size:15px;font-weight:800;color:#1fe0c6 !important;background:#10151a !important;border:1px solid #1fe0c6;border-radius:6px;box-shadow:0 0 6px #1fe0c633}
+.gfs-ability .gfs-save-row{order:3;display:flex;align-items:center;gap:4px}
+.gfs-ability .gfs-save-btn{font-size:10px}
+.gfs-ability .gfs-save-val{width:36px;text-align:center}
+.gfs-ability .gfs-save-row{order:3}
+
+/* compact skill telemetry */
+.gfs-skills{padding:4px 8px}
+.gfs-skill{display:flex;align-items:center;gap:6px;padding:1px 2px;border-bottom:1px solid #1b2229;min-height:21px}
+.gfs-skill:last-child{border-bottom:none}
+.gfs-skill-name{flex:1;text-align:left;background:transparent !important;border:none !important;color:#dfe7ea !important;font-size:11.5px;padding:1px 2px}
+.gfs-skill-name:hover{color:#1fe0c6 !important;text-shadow:0 0 6px #1fe0c6aa}
+.gfs-skill-ab{color:#8fa0a8;font-size:9px;letter-spacing:.08em;width:26px;text-align:right}
+.gfs-skill-misc{width:34px;font-size:11px}
+.gfs-skill-total{width:30px;font-size:12px;color:#ffb02e}
+.gfs-prof{width:30px;font-size:10px;padding:0 1px}
+.gfs-skills-head{color:#1fe0c6;text-transform:uppercase;letter-spacing:.12em;font-size:11px;font-weight:800}
+
+/* collapsible skills */
+.gfs-collapse{width:14px;height:14px;float:right;accent-color:#1fe0c6;cursor:pointer}
+.gfs-collapse:not(:checked) ~ .gfs-skill{display:none}
+
+/* repeating rows */
+.gfs-rep-head{background:#171d23;border-color:#232b33}
+.gfs-rep-name{color:#dfe7ea;font-weight:700}
+.gfs-rep-body{background:#10151a;border-color:#232b33}
+repcontainer,.repcontainer{background:transparent}
+.gfs-expander{accent-color:#1fe0c6}
+
+/* dropstatus + pills */
+.gfs-dropstatus{color:#1fe0c6 !important;background:#10151a !important}
+
+/* legacy prefixes */
+.sheet-gfs-collapse:not(:checked) ~ .sheet-gfs-skill{display:none}
+
+/* ===== dark chat cards ===== */
+.sheet-rolltemplate-general .sheet-gfr-card{background:#12181d;border:1px solid #232b33;border-left:3px solid #1fe0c6;border-radius:6px;color:#dfe7ea}
+.sheet-rolltemplate-general .sheet-gfr-header{background:#171d23;color:#1fe0c6;letter-spacing:.1em;text-transform:uppercase;border-radius:5px 5px 0 0}
+.sheet-rolltemplate-general .sheet-gfr-name{color:#1fe0c6}
+.sheet-rolltemplate-general .sheet-gfr-rollname{color:#dfe7ea}
+.sheet-rolltemplate-general .sheet-gfr-meta{color:#8fa0a8}
+.sheet-rolltemplate-general .sheet-gfr-hexwrap .sheet-gfr-hex,
+.sheet-rolltemplate-general .sheet-gfr-hex{background:#10151a;border:1px solid #1fe0c6;color:#1fe0c6;box-shadow:0 0 8px #1fe0c62e}
+.sheet-rolltemplate-general .sheet-gfr-pill{background:#171d23;border:1px solid #2a323a;color:#ffb02e}
+.sheet-rolltemplate-general .sheet-gfr-desc{background:#10151a;color:#b8c4ca;border-top:1px solid #232b33}
+.sheet-rolltemplate-general .sheet-gfr-results{color:#dfe7ea}
+.sheet-rolltemplate-general .sheet-gfr-critplus{color:#ffb02e}
+.sheet-rolltemplate-general .sheet-gfr-higher-label{color:#8fa0a8}
+.sheet-rolltemplate-general .sheet-gfr-btnrow a,
+.sheet-rolltemplate-general .sheet-gfr-dmglinks a{background:#10151a;border:1px solid #1fe0c6;color:#ffffff !important;border-radius:4px}
+.sheet-rolltemplate-general .sheet-gfr-btnrow a:hover,
+.sheet-rolltemplate-general .sheet-gfr-dmglinks a:hover{background:#1fe0c6;color:#ffffff !important}
+.sheet-rolltemplate-general .sheet-gfr-dmglinks a[href*="damage"]{border-color:#ff4655}
+
+/* crit / fumble banners (replaces attribute-logic card tint) */
+.sheet-rolltemplate-general .gfr-critbar{background:#0d2a1c;color:#34e58a;border:1px solid #34e58a;border-radius:4px;
+  text-align:center;font-weight:800;letter-spacing:.18em;font-size:11px;padding:3px 0;margin:4px 6px 0;box-shadow:0 0 8px #34e58a44}
+.sheet-rolltemplate-general .gfr-fumblebar{background:#2a0f12;color:#ff4655;border:1px solid #ff4655;border-radius:4px;
+  text-align:center;font-weight:800;letter-spacing:.18em;font-size:11px;padding:3px 0;margin:4px 6px 0;box-shadow:0 0 8px #ff465544}
+
+
+/* ===== Jumpgate chat: unprefixed rolltemplate selectors ===== */
+/* ============================================================
+   GeneFunk 2090 Revised — Roll Template v3
+   Legacy-safe: no CSS variables. Self-contained dark card with
+   explicit colors — renders identically in light & dark chat.
+   ============================================================ */
+
+.rolltemplate-general .gfr-card.gfr-card {
+  border: 1.5px solid #43494f;
+  border-radius: 6px;
+  padding: 0;
+  margin: 2px 0;
+  overflow: hidden;
+  font-family: 'Barlow Condensed', Arial, sans-serif;
+  color: #e8eaec !important;
+}
+/* Crit / fumble state ring */
+.rolltemplate-general .gfr-card.gfr-card.gfr-crit.gfr-crit  { border-color: #34c467 !important; box-shadow: 0 0 0 1.5px #34c467; }
+.rolltemplate-general .gfr-card.gfr-card.gfr-fumble.gfr-fumble{ border-color: #e05252 !important; box-shadow: 0 0 0 1.5px #e05252; }
+.rolltemplate-general .gfr-skin.gfr-skin {
+  background-color: #23272c !important;
+}
+/* ---------- Header ---------- */
+.rolltemplate-general .gfr-header.gfr-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2px 8px;
+  background-color: #171a1d !important;
+  border-bottom: 2px solid #2fd4c2;
+  padding: 4px 8px;
+}
+.rolltemplate-general .gfr-name.gfr-name,
+.rolltemplate-general .gfr-name.gfr-name a {
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 12px;
+  text-decoration: none;
+}
+.rolltemplate-general .gfr-rollname.gfr-rollname {
+  color: #2fd4c2 !important;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+/* ---------- Result chips ---------- */
+.rolltemplate-general .gfr-results.gfr-results {
+  background-color: #23272c !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+}
+.rolltemplate-general .gfr-hex.gfr-hex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 8px 14px 9px;
+  clip-path: polygon(12% 0, 88% 0, 100% 50%, 88% 100%, 12% 100%, 0 50%);
+  color: #ffffff !important;
+  flex: 0 1 auto;
+}
+.rolltemplate-general .gfr-d20.gfr-d20  { background-color: #3a414a !important; }
+.rolltemplate-general .gfr-dmg1.gfr-dmg1 { background-color: #b02e21 !important; }
+.rolltemplate-general .gfr-dmg2.gfr-dmg2 { background-color: #c56f1d !important; }
+.rolltemplate-general .gfr-dc.gfr-dc   { background-color: #34659c !important; }
+.rolltemplate-general .gfr-value.gfr-value {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #ffffff !important;
+}
+.rolltemplate-general .gfr-critplus.gfr-critplus {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffd76a !important;
+}
+.rolltemplate-general .gfr-tag.gfr-tag {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #ffffff !important;
+  opacity: .85;
+  text-align: center;
+  max-width: 110px;
+  margin-top: 3px;
+}
+/* Neutralize Roll20's inline-roll chrome inside chips */
+.rolltemplate-general .gfr-hex.gfr-hex .inlinerollresult {
+  background-color: transparent !important;
+  border: none;
+  color: #ffffff !important;
+  font-weight: 800;
+  padding: 0;
+}
+/* ---------- Range / properties pills ---------- */
+.rolltemplate-general .gfr-meta.gfr-meta {
+  background-color: #23272c !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 8px 6px;
+}
+.rolltemplate-general .gfr-pill.gfr-pill {
+  background-color: #33393f !important;
+  border: 1px solid #4a5158;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #d7dade !important;
+  white-space: normal;
+  word-break: keep-all;
+}
+/* ---------- Description ---------- */
+.rolltemplate-general .gfr-desc.gfr-desc {
+  background-color: #23272c !important;
+  padding: 6px 8px 8px;
+  border-top: 1px solid #3a4046;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #d7dade !important;
+  white-space: pre-line;
+  max-height: none;
+  overflow: visible;
+}
+/* ============================================================
+   GeneFunk 2090 Revised — Roll Template v3
+   Legacy-safe: no CSS variables. Self-contained dark card with
+   explicit colors — renders identically in light & dark chat.
+   ============================================================ */
+
+.rolltemplate-general .sheet-gfr-card.sheet-gfr-card {
+  border: 1.5px solid #43494f;
+  border-radius: 6px;
+  padding: 0;
+  margin: 2px 0;
+  overflow: hidden;
+  font-family: 'Barlow Condensed', Arial, sans-serif;
+  color: #e8eaec !important;
+}
+.rolltemplate-general .sheet-gfr-card.sheet-gfr-card.sheet-gfr-crit.sheet-gfr-crit  { border-color: #34c467 !important; box-shadow: 0 0 0 1.5px #34c467; }
+.rolltemplate-general .sheet-gfr-card.sheet-gfr-card.sheet-gfr-fumble.sheet-gfr-fumble{ border-color: #e05252 !important; box-shadow: 0 0 0 1.5px #e05252; }
+.rolltemplate-general .sheet-gfr-skin.sheet-gfr-skin {
+  background-color: #23272c !important;
+}
+.rolltemplate-general .sheet-gfr-header.sheet-gfr-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 2px 8px;
+  background-color: #171a1d !important;
+  border-bottom: 2px solid #2fd4c2;
+  padding: 4px 8px;
+}
+.rolltemplate-general .sheet-gfr-name.sheet-gfr-name,
+.rolltemplate-general .sheet-gfr-name.sheet-gfr-name a {
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 12px;
+  text-decoration: none;
+}
+.rolltemplate-general .sheet-gfr-rollname.sheet-gfr-rollname {
+  color: #2fd4c2 !important;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+.rolltemplate-general .sheet-gfr-results.sheet-gfr-results {
+  background-color: #23272c !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+}
+.rolltemplate-general .sheet-gfr-hex.sheet-gfr-hex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 8px 14px 9px;
+  clip-path: polygon(12% 0, 88% 0, 100% 50%, 88% 100%, 12% 100%, 0 50%);
+  color: #ffffff !important;
+  flex: 0 1 auto;
+}
+.rolltemplate-general .sheet-gfr-d20.sheet-gfr-d20  { background-color: #3a414a !important; }
+.rolltemplate-general .sheet-gfr-dmg1.sheet-gfr-dmg1 { background-color: #b02e21 !important; }
+.rolltemplate-general .sheet-gfr-dmg2.sheet-gfr-dmg2 { background-color: #c56f1d !important; }
+.rolltemplate-general .sheet-gfr-dc.sheet-gfr-dc   { background-color: #34659c !important; }
+.rolltemplate-general .sheet-gfr-value.sheet-gfr-value {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: #ffffff !important;
+}
+.rolltemplate-general .sheet-gfr-critplus.sheet-gfr-critplus {
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffd76a !important;
+}
+.rolltemplate-general .sheet-gfr-tag.sheet-gfr-tag {
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #ffffff !important;
+  opacity: .85;
+  text-align: center;
+  max-width: 110px;
+  margin-top: 3px;
+}
+.rolltemplate-general .sheet-gfr-hex.sheet-gfr-hex .inlinerollresult {
+  background-color: transparent !important;
+  border: none;
+  color: #ffffff !important;
+  font-weight: 800;
+  padding: 0;
+}
+.rolltemplate-general .sheet-gfr-meta.sheet-gfr-meta {
+  background-color: #23272c !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 8px 6px;
+}
+.rolltemplate-general .sheet-gfr-pill.sheet-gfr-pill {
+  background-color: #33393f !important;
+  border: 1px solid #4a5158;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #d7dade !important;
+  white-space: normal;
+  word-break: keep-all;
+}
+.rolltemplate-general .sheet-gfr-desc.sheet-gfr-desc {
+  background-color: #23272c !important;
+  padding: 6px 8px 8px;
+  border-top: 1px solid #3a4046;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #d7dade !important;
+  white-space: pre-line;
+  max-height: none;
+  overflow: visible;
+}
+/* DC prefix inside the save chip */
+.rolltemplate-general .gfr-dcprefix{font-size:11px;font-weight:800;opacity:.85;letter-spacing:.02em}
+.rolltemplate-general .sheet-gfr-dcprefix{font-size:11px;font-weight:800;opacity:.85;letter-spacing:.02em}
+/* book-style meta pills + At Higher Levels block */
+.rolltemplate-general .gfr-meta{padding:0 8px}
+.rolltemplate-general .gfr-pill{margin-bottom:6px}
+.rolltemplate-general .gfr-pill b{color:#ffffff !important;font-weight:800}
+.rolltemplate-general .gfr-higher{border-top:1px dashed #3a4046 !important}
+.rolltemplate-general .gfr-higher-label{font-weight:800;font-style:italic;color:#2fd4c2 !important}
+.rolltemplate-general .sheet-gfr-meta{padding:0 8px}
+.rolltemplate-general .sheet-gfr-pill{margin-bottom:6px}
+.rolltemplate-general .sheet-gfr-pill b{color:#ffffff !important;font-weight:800}
+.rolltemplate-general .sheet-gfr-higher{border-top:1px dashed #3a4046 !important}
+.rolltemplate-general .sheet-gfr-higher-label{font-weight:800;font-style:italic;color:#2fd4c2 !important}
+.rolltemplate-general .gfr-rules{display:block !important;border-top:1px solid #3a4046 !important}
+.rolltemplate-general .sheet-gfr-rules{display:block !important;border-top:1px solid #3a4046 !important}
+/* command-link buttons on attack cards */
+.rolltemplate-general .gfr-dmglinks a{display:inline-block;background:#b02e21 !important;color:#ffffff !important;border:1px solid #d8453a;border-radius:4px;padding:3px 12px;font-size:11px;font-weight:800;text-decoration:none;margin:0 4px 6px 0}
+.rolltemplate-general .gfr-dmglinks a:hover{background:#d8453a !important}
+.rolltemplate-general .sheet-gfr-dmglinks a{display:inline-block;background:#b02e21 !important;color:#ffffff !important;border:1px solid #d8453a;border-radius:4px;padding:3px 12px;font-size:11px;font-weight:800;text-decoration:none;margin:0 4px 6px 0}
+.rolltemplate-general .sheet-gfr-dmglinks a:hover{background:#d8453a !important}
+/* description command link: teal variant */
+.rolltemplate-general .gfr-dmglinks a[href*="info-action"]{background:#0d6e64 !important;border-color:#16a596}
+.rolltemplate-general .gfr-dmglinks a[href*="info-action"]:hover{background:#16a596 !important}
+.rolltemplate-general .sheet-gfr-dmglinks a[href*="info-action"]{background:#0d6e64 !important;border-color:#16a596}
+.rolltemplate-general .sheet-gfr-dmglinks a[href*="info-action"]:hover{background:#16a596 !important}
+.rolltemplate-general .gfr-dmglinks a[href*="critdmg"]{background:#7a1f14 !important;border-color:#ffd76a;box-shadow:0 0 0 1px #ffd76a}
+.rolltemplate-general .sheet-gfr-dmglinks a[href*="critdmg"]{background:#7a1f14 !important;border-color:#ffd76a;box-shadow:0 0 0 1px #ffd76a}
+.rolltemplate-general .gfr-dmglinks{padding-top:0;padding-bottom:0}
+.rolltemplate-general .gfr-dmglinks a{margin-bottom:4px}
+.rolltemplate-general .sheet-gfr-dmglinks{padding-top:0;padding-bottom:0}
+.rolltemplate-general .sheet-gfr-dmglinks a{margin-bottom:4px}
+/* button blocks: separate markdown lines, same visual row */
+.rolltemplate-general .gfr-btnrow{padding:4px 8px 6px}
+.rolltemplate-general .gfr-btnrow .gfr-dmglinks{display:inline-block;padding:0;margin:0 6px 0 0}
+.rolltemplate-general .sheet-gfr-btnrow{padding:4px 8px 6px}
+.rolltemplate-general .sheet-gfr-btnrow .sheet-gfr-dmglinks{display:inline-block;padding:0;margin:0 6px 0 0}
+/* ===== dark chat cards ===== */
+.rolltemplate-general .sheet-gfr-card{background:#12181d;border:1px solid #232b33;border-left:3px solid #1fe0c6;border-radius:6px;color:#dfe7ea}
+.rolltemplate-general .sheet-gfr-header{background:#171d23;color:#1fe0c6;letter-spacing:.1em;text-transform:uppercase;border-radius:5px 5px 0 0}
+.rolltemplate-general .sheet-gfr-name{color:#1fe0c6}
+.rolltemplate-general .sheet-gfr-rollname{color:#dfe7ea}
+.rolltemplate-general .sheet-gfr-meta{color:#8fa0a8}
+.rolltemplate-general .sheet-gfr-hexwrap .sheet-gfr-hex,
+.rolltemplate-general .sheet-gfr-hex{background:#10151a;border:1px solid #1fe0c6;color:#1fe0c6;box-shadow:0 0 8px #1fe0c62e}
+.rolltemplate-general .sheet-gfr-pill{background:#171d23;border:1px solid #2a323a;color:#ffb02e}
+.rolltemplate-general .sheet-gfr-desc{background:#10151a;color:#b8c4ca;border-top:1px solid #232b33}
+.rolltemplate-general .sheet-gfr-results{color:#dfe7ea}
+.rolltemplate-general .sheet-gfr-critplus{color:#ffb02e}
+.rolltemplate-general .sheet-gfr-higher-label{color:#8fa0a8}
+.rolltemplate-general .sheet-gfr-btnrow a,
+.rolltemplate-general .sheet-gfr-dmglinks a{background:#10151a;border:1px solid #1fe0c6;color:#ffffff !important;border-radius:4px}
+.rolltemplate-general .sheet-gfr-btnrow a:hover,
+.rolltemplate-general .sheet-gfr-dmglinks a:hover{background:#1fe0c6;color:#ffffff !important}
+.rolltemplate-general .sheet-gfr-dmglinks a[href*="damage"]{border-color:#ff4655}
+/* crit / fumble banners (replaces attribute-logic card tint) */
+.rolltemplate-general .gfr-critbar{background:#0d2a1c;color:#34e58a;border:1px solid #34e58a;border-radius:4px;
+  text-align:center;font-weight:800;letter-spacing:.18em;font-size:11px;padding:3px 0;margin:4px 6px 0;box-shadow:0 0 8px #34e58a44}
+.rolltemplate-general .gfr-fumblebar{background:#2a0f12;color:#ff4655;border:1px solid #ff4655;border-radius:4px;
+  text-align:center;font-weight:800;letter-spacing:.18em;font-size:11px;padding:3px 0;margin:4px 6px 0;box-shadow:0 0 8px #ff465544}
+
+
+/* ===== hex/pentagon proficiency toggles (faithful to original sheet: glyph-based) ===== */
+.gfs-hex-toggle.gfs-hex-toggle{position:relative;display:inline-flex;width:16px;height:18px;padding:0;margin:0;
+  align-items:center;justify-content:center;cursor:pointer;vertical-align:middle;flex:none;line-height:1}
+.gfs-hex-toggle.gfs-hex-toggle input{position:absolute;opacity:0;left:0;top:0;width:100%;height:100%;margin:0;padding:0;cursor:pointer;z-index:2}
+.gfs-hex-toggle.gfs-hex-toggle span{line-height:1;font-size:15px;color:transparent;-webkit-text-stroke:1.1px #4a5560}
+.gfs-hex-toggle.gfs-hex-toggle span::after{content:"⬢"}
+.gfs-hex-exp.gfs-hex-exp span::after{content:"⬟"}
+.gfs-hex-toggle.gfs-hex-toggle:hover span{-webkit-text-stroke-color:#1fe0c6}
+.gfs-hex-exp.gfs-hex-exp:hover span{-webkit-text-stroke-color:#ffb02e}
+.gfs-hex-toggle.gfs-hex-toggle input:checked + span{color:#1fe0c6;-webkit-text-stroke-color:#1fe0c6}
+.gfs-hex-exp.gfs-hex-exp input:checked + span{color:#ffb02e;-webkit-text-stroke-color:#ffb02e}
+.gfs-hex-save.gfs-hex-save{width:18px;height:19px}
+.gfs-hex-save.gfs-hex-save span{font-size:17px}
+.gfs-hexpair{display:inline-flex;gap:2px;align-items:center;width:34px;justify-content:center;flex:none}
+
+
+
+/* ===== DNA helix ability column (structural, per original sheet geometry) ===== */
+.gfs-abilities{position:relative;isolation:isolate;width:156px;flex:none;padding:0 4px;gap:0;--gfs-shift:8px}
+/* helix PNG at measured geometry: pitch 95px, tails 17px, crossings 9px above block tops
+   registration: img top = first-block margin-top (30) - crossing offset (9) - top tail (17) = 4 */
+.gfs-helix.gfs-helix{position:absolute;top:4px;left:50%;transform:translateX(calc(-50% + var(--gfs-shift)));
+  height:604px !important;width:auto !important;max-width:none !important;max-height:none !important;
+  filter:drop-shadow(0 0 4px rgba(31,224,198,.55)) drop-shadow(0 0 10px rgba(31,224,198,.3));pointer-events:none;z-index:-1}
+
+/* rigid grid locked to strand node spacing (~101px per period)
+   tuning knobs: first-of-type margin-top (vertical anchor), margin-bottom (period) */
+.gfs-ability.gfs-ability{display:grid;
+  grid-template-columns:[lbl] 50px [hex] 22px [val] 1fr;
+  grid-template-rows:[name] 19px [score] 20px [mod] 19px [save] 24px;
+  row-gap:1px;column-gap:0;align-items:stretch;
+  background:transparent;border:none;box-shadow:none;border-radius:0;
+  padding:0;margin:0 0 10px;position:relative}
+.gfs-ability.gfs-ability:first-of-type{margin-top:30px}
+
+/* ability name centered on the helix crossing */
+.gfs-ability.gfs-ability .gfs-ab-name{grid-column:1 / -1;grid-row:name;justify-self:center;align-self:center;transform:translateX(var(--gfs-shift));
+  background:transparent !important;border:none !important;
+  color:#1fe0c6;font-size:14px;font-weight:800;letter-spacing:.14em;text-shadow:0 0 2px #0f1317,0 0 3px #0f1317,0 0 7px currentColor}
+.gfs-ability.gfs-ability .gfs-ab-name:hover{color:#ffb02e !important}
+
+/* continuous label bars running under the hex column, tucked beneath the strand */
+.gfs-ab-lbl,
+.gfs-ability.gfs-ability .gfs-save-row .gfs-save-btn{
+  grid-column:lbl / span 2;color:#eaf6f4;
+  background:transparent;text-shadow:0 0 2px #0f1317,0 0 3px #0f1317,0 0 7px currentColor;
+  font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  display:flex;align-items:center;padding:0 0 0 6px;height:100%;border:none;text-align:left;
+  border-radius:3px 0 0 3px;position:relative}
+.gfs-lbl-score,.gfs-lbl-mod{display:none}
+.gfs-ability.gfs-ability .gfs-save-row{display:contents}
+.gfs-ability.gfs-ability .gfs-save-row .gfs-save-btn{grid-row:save;position:relative;z-index:2}
+.gfs-ability.gfs-ability .gfs-save-row .gfs-save-btn:hover{color:#1fe0c6}
+
+/* save hex rides ON the bar's right end */
+.gfs-ability.gfs-ability .gfs-save-row .gfs-hex-save{grid-column:hex;grid-row:save;justify-self:start;align-self:center;z-index:3;margin-left:-14px}
+.gfs-ability.gfs-ability .gfs-save-row .gfs-hex-save span{filter:drop-shadow(0 0 2px #0f1317) drop-shadow(0 0 1px #0f1317)}
+
+/* open value rows: strand shows through, values print on it with underlines (per original) */
+/* ⛔⛔ 305 CORRECTS 273b: THE OLD 13px INDENT WAS SPINNER COMPENSATION AFTER
+   ALL, AND IT IS NOW GONE. 273 said so, removed it, and BOTH browsers went
+   13px left - so 273b concluded the opposite, that the number was artwork
+   geometry, and restored it. That conclusion held for months and was wrong.
+   What 273 actually missed is that its own change removed the space the
+   number was compensating for in ONE browser only, so the correction
+   overshot rather than being unnecessary.
+   Settled 2026-08-20 by nudging against the live strand with the GM watching:
+   the digits belong at essentially the input's own centre. The value below is
+   -1px - a single pixel, not a 13px correction - and there is no magic number
+   left in this rule to drift. If it ever needs re-tuning, tune it against the
+   strand on screen; do not reason about it from the box.
+   ⛔⛔ 305 - THE PREFIXED FIREFOX APPEARANCE VALUE HERE IS DELIBERATE AND
+   LOAD-BEARING. It is inert in Chrome (Chrome discards the prefixed property
+   at parse, so it never reaches the CSSOM), which is exactly why it is the
+   safe way to reach Firefox alone. Do not "tidy" it away, and do not switch it
+   to the unprefixed spelling: unprefixed would override the appearance value
+   above it in CHROME too, and Chrome's spinners would come back.
+   WHY IT IS NEEDED, measured on the live sheet 2026-08-20:
+     Firefox, spinner drawn   -> content box 78px  (the spinner eats 18px)
+     Firefox, spinner hidden  -> content box 96px
+     Chrome                   -> content box 96px
+   So a spinner-drawn Firefox centred the digits in a box 18px narrower and
+   put them NINE PIXELS LEFT of Chrome. Hiding the spinner makes Firefox's
+   geometry identical to Chrome's - same box, same indent, same result.
+   ⚠️ THE TRAP THAT COST TWO ROUNDS: hiding the spinner LOOKS like a rightward
+   break, because the digits move 9px right and the spinner your eye was using
+   as a right-hand anchor is gone. It is not a break - it is Firefox finally
+   agreeing with Chrome. The correct response is the one taken at 305: leave
+   the suppression in place and re-tune the offset ONCE, against the strand,
+   now that both browsers finally share one geometry.
+   (Property names are described rather than spelled here on purpose: the
+   pre-upload gates COUNT those tokens, and a comment that quotes them pushes
+   the count off by one. Same reason there are no braces in this comment.) */
+.gfs-ability.gfs-ability .gfs-ab-score{grid-column:1 / -1;grid-row:score;width:96px !important;min-width:0;margin:0;justify-self:center;transform:translateX(var(--gfs-shift));height:100%;order:0;padding:0;-webkit-appearance:none;appearance:none;-moz-appearance:textfield;text-indent:-1px;
+  font-size:20px;font-weight:800;text-align:center;color:#eaf6f4 !important;
+  background:transparent !important;border:none;border:none;border-radius:0;
+  text-shadow:0 0 2px #0f1317,0 0 3px #0f1317,0 0 7px currentColor}
+.gfs-ability.gfs-ability .gfs-ab-mod{grid-column:1 / -1;grid-row:mod;width:96px !important;min-width:0;margin:0;justify-self:center;transform:translateX(var(--gfs-shift));height:100%;order:0;padding:0;-webkit-appearance:none;appearance:none;-moz-appearance:textfield;text-indent:-1px;
+  font-size:13px;font-weight:800;text-align:center;color:#1fe0c6 !important;
+  background:transparent !important;border:none;border:none;border-radius:0;box-shadow:none;
+  text-shadow:0 0 2px #0f1317,0 0 3px #0f1317,0 0 7px currentColor}
+.gfs-ability.gfs-ability .gfs-save-row .gfs-save-val{grid-column:1 / -1;grid-row:save;width:96px !important;min-width:0;margin:0;justify-self:center;transform:translateX(var(--gfs-shift));height:100%;padding:0;-webkit-appearance:none;appearance:none;-moz-appearance:textfield;text-indent:-1px;
+  text-align:center;font-size:13px;font-weight:800;color:#ffb02e !important;
+  background:transparent !important;border:none;border:none;border-radius:0;
+  text-shadow:0 0 2px #0f1317,0 0 3px #0f1317,0 0 7px currentColor}
+.gfs-ability.gfs-ability .gfs-ab-score:focus,
+.gfs-ability.gfs-ability .gfs-ab-mod:focus,
+.gfs-ability.gfs-ability .gfs-save-row .gfs-save-val:focus{outline:none;border:none;text-shadow:0 0 2px #0f1317,0 0 9px currentColor,0 0 16px currentColor}
+
+/* checked proficiency hexes glow in their own color */
+.gfs-hex-toggle.gfs-hex-toggle input:checked + span{filter:drop-shadow(0 0 1px #0f1317) drop-shadow(0 0 3px currentColor)}
+/* ================= compact repeating-section controls =================
+   Restyles Roll20's auto-generated +Add / Modify bar into slim ghost
+   icons (old-sheet style: small "+" bottom-left, pencil bottom-right).
+   Literal glyphs only — never backslash escapes (sanitizer poison). */
+.charsheet .repcontrol{
+  display:flex;justify-content:space-between;align-items:center;
+  margin:3px 0 0;padding:0;background:transparent;
+}
+.charsheet .repcontrol .btn.repcontrol_add,
+.charsheet .repcontrol .btn.repcontrol_edit{
+  flex:0 0 auto;width:24px;height:18px;min-height:0;
+  margin:0;padding:0 !important;
+  background:transparent !important;
+  border:1px solid #232b33 !important;border-radius:4px;
+  box-shadow:none !important;text-shadow:none !important;
+  font-size:0 !important;line-height:0 !important;
+  color:#6d7a83 !important;cursor:pointer;
+}
+.charsheet .repcontrol .btn.repcontrol_add::before{
+  content:"+";font-family:"Helvetica Neue",Arial,sans-serif;
+  font-size:14px;font-weight:700;line-height:16px;display:block;
+}
+.charsheet .repcontrol .btn.repcontrol_edit::before{
+  content:"✎";font-family:"Helvetica Neue",Arial,sans-serif;
+  font-size:11px;line-height:16px;display:block;
+}
+.charsheet .repcontrol .btn.repcontrol_add:hover,
+.charsheet .repcontrol .btn.repcontrol_edit:hover{
+  color:#1fe0c6 !important;border-color:#1fe0c6 !important;
+  box-shadow:0 0 6px #1fe0c633 !important;
+}
+/* modify-mode active: pencil glows amber until toggled off */
+.charsheet .repcontainer.editmode + .repcontrol .btn.repcontrol_edit{
+  color:#ffb02e !important;border-color:#ffb02e !important;
+  box-shadow:0 0 6px #ffb02e44 !important;
+}
+/* per-row Delete / drag handles shown while in modify mode */
+.charsheet .repitem .itemcontrol{top:2px;right:2px}
+.charsheet .repitem .itemcontrol .btn{
+  min-height:0;height:16px;margin:0 0 0 2px;padding:0 4px !important;
+  background:#10151a !important;border:1px solid #2a323a !important;border-radius:3px;
+  box-shadow:none !important;text-shadow:none !important;
+  font-size:0 !important;line-height:0 !important;color:#8fa0a8 !important;
+}
+.charsheet .repitem .itemcontrol .repcontrol_del::before{
+  content:"✕";font-family:"Helvetica Neue",Arial,sans-serif;
+  font-size:10px;line-height:14px;display:block;color:#ff4655;
+}
+.charsheet .repitem .itemcontrol .repcontrol_move::before{
+  content:"≡";font-family:"Helvetica Neue",Arial,sans-serif;
+  font-size:11px;line-height:14px;display:block;
+}
+.charsheet .repitem .itemcontrol .repcontrol_del:hover{
+  border-color:#ff4655 !important;box-shadow:0 0 6px #ff465544 !important;
+}
+/* while modify mode is up, the per-row delete X lands exactly on the cog
+   (both live in the same corner). The cog has no job during delete/reorder,
+   so it steps aside rather than fighting for the pixels - it is back the
+   moment Done is clicked. */
+.repcontainer.editmode .gfs-expander,.repcontainer.editmode .gfs-expander-icon{display:none}
+
+/* ============ collapsible section bars (v3: the arrow IS the button) ========
+   Line ~867 evidence: proven hex toggles use opacity:0 absolute inputs, so
+   v1's failure was the "~ *" hide rule, not the overlay. v3 = v2's proven
+   explicit hide rules + invisible input over the arrow + hover glow.
+   State saves per character (attr_secopen_*). */
+.gfs-section{position:relative}
+.gfs-sec-collapse.gfs-sec-collapse{position:absolute;opacity:0;top:4px;left:6px;
+  width:28px !important;height:22px !important;min-width:0;margin:0;padding:0;cursor:pointer;z-index:3}
+.gfs-sec-collapse:checked ~ .gfs-section-head::before{content:"▾ "}
+.gfs-sec-collapse:hover ~ .gfs-section-head::before{text-shadow:0 0 6px #1fe0c6,0 0 10px #1fe0c6}
+/* collapsed: hide the section body (Roll20 renders fieldsets as divs) */
+.gfs-sec-collapse:not(:checked) ~ div{display:none}
+.gfs-sec-collapse:not(:checked) ~ fieldset{display:none}
+.gfs-sec-collapse:not(:checked) ~ .gfs-section-head.gfs-section-head{display:flex;border-radius:6px;margin-bottom:0}
+
+/* ============ core-page multi-column layout (July 20) ============
+   Old-sheet density: helix | skills | combat col | bio col.
+   Skills no longer greedy; sections live in wrapped flex columns and
+   stack below automatically on narrow windows. gap:0 + margins own
+   the rhythm (wisdom: flex gap stacks invisibly with child margins). */
+/* 260 -> 230 (July 23): the per-skill misc-bonus field is gone (Global
+   Modifiers owns that job), so the panel needs 30px less. Measured floor is
+   225px - "Physical Science" wraps to two lines at 220 - so 230 keeps a
+   cushion for font-metric drift. The 30px goes to the right-hand column. */
+.gfs-columns .gfs-skills{flex:0 1 230px;max-width:230px}
+.gfs-columns .gfs-skills .gfs-skill{gap:4px}
+.gfs-col{flex:1 1 300px;min-width:280px;display:flex;flex-direction:column;gap:0;align-self:flex-start}
+.gfs-col .gfs-section{margin-top:0}
+
+/* ===== 3-column tabbed row below the top columns (Genome | Features | Gear) =====
+   Column widths mirror the top row so they line up: genome=abilities(156),
+   features=skills(260), gear=combat(fills the rest). Sub-tabs are radios styled
+   like the main page tabs; :checked shows the matching sub-page (a sibling). */
+.gfs-cols3{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;margin-top:8px}
+.gfs-c3col{min-width:0}
+.gfs-c3col .gfs-section{margin-top:0}
+.gfs-c3-genome{flex:0 0 156px;max-width:156px}
+.gfs-c3-features{flex:0 1 260px;max-width:260px}
+.gfs-c3-gear{flex:1 1 300px;min-width:280px}
+.gfs-subpage{display:none}
+.gfs-subtab[value="actions"]:checked ~ .gfs-sub-actions,
+.gfs-subtab[value="gmods"]:checked ~ .gfs-sub-gmods,
+.gfs-subtab[value="firearms"]:checked ~ .gfs-sub-firearms,
+.gfs-subtab[value="genome"]:checked ~ .gfs-sub-genome,
+.gfs-subtab[value="class"]:checked ~ .gfs-sub-class,
+.gfs-subtab[value="background"]:checked ~ .gfs-sub-background,
+.gfs-subtab[value="feats"]:checked ~ .gfs-sub-feats,
+.gfs-subtab[value="equip"]:checked ~ .gfs-sub-equip,
+.gfs-subtab[value="upgrades"]:checked ~ .gfs-sub-upgrades,
+.gfs-subtab[value="money"]:checked ~ .gfs-sub-money{display:block}
+.gfs-sheet input.gfs-subtab{-webkit-appearance:none;appearance:none;width:auto;height:auto;margin:0 3px 4px 0;padding:2px 9px;cursor:pointer;display:inline-block;vertical-align:bottom;background:#10151a;border:1px solid #232b33;border-radius:4px 4px 0 0}
+.gfs-sheet input.gfs-subtab::after{content:attr(title);font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#5a636b}
+.gfs-sheet input.gfs-subtab:hover::after{color:#1fe0c6}
+.gfs-sheet input.gfs-subtab:checked{background:#171d23;border-color:#1fe0c6}
+.gfs-sheet input.gfs-subtab:checked::after{color:#1fe0c6}
+/* ===== skills-column Avatar tab (281). attr_character_avatar is Roll20's
+   read-only pseudo-attr; the platform fills the img. Hidden until its tab
+   is picked; the hint hides when the worker-derived flag says an avatar
+   exists. All selector shapes precedented in this file. */
+.gfs-avpane{display:none;margin-top:2px;background:#10151a;border:1px solid #232b33;border-radius:6px;overflow:hidden;min-height:120px}
+.gfs-subtab[value="avatar"]:checked ~ .gfs-avpane{display:block}
+.gfs-subtab[value="avatar"]:checked ~ .gfs-skills-head,
+.gfs-subtab[value="avatar"]:checked ~ .gfs-skill,
+.gfs-subtab[value="avatar"]:checked ~ .gfs-profbar,
+.gfs-subtab[value="notes"]:checked ~ .gfs-skills-head,
+.gfs-subtab[value="notes"]:checked ~ .gfs-skill,
+.gfs-subtab[value="notes"]:checked ~ .gfs-profbar{display:none}
+.gfs-avhint{display:block;padding:52px 12px;font-size:11px;letter-spacing:.03em;color:#5f6a72;text-align:center}
+.gfs-avflag{display:none}
+.gfs-avflag:checked + .gfs-avhint{display:none}
+/* hit-dice box (285b): a TEXTAREA so a multiclass pool WRAPS at its spaces
+   into the card's spare VERTICAL room (GM's call - the card cannot grow
+   sideways, 285's wide box overflowed into Roll Mode). Worker flag steps
+   the HEIGHT: one snug row single-class, three rows multiclass. Sizing at
+   raised specificity per 278 - base CSS opens textareas tall. */
+/* ===== 318: hit dice as spend buttons ==================================
+   One button per die type the character actually has. Four are declared in the
+   markup and the worker's hd_has_dN flags reveal the ones that apply, because
+   a sheet cannot generate markup at runtime.
+   ⛔ Each flag sits immediately before ITS pick and the reveal is a single
+   sibling step - no descendant after the combinator, which this project
+   forbids and which is why the count rides INSIDE the pick rather than being
+   reached through it. */
+.gfs-hdflag{display:none}
+.gfs-hdpick{display:none;align-items:center;gap:3px;margin:0 2px}
+.gfs-hdf12:checked ~ .gfs-hdp12,
+.gfs-hdf10:checked ~ .gfs-hdp10,
+.gfs-hdf8:checked ~ .gfs-hdp8,
+.gfs-hdf6:checked ~ .gfs-hdp6{display:inline-flex}
+.gfs-hdslot{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:2px}
+.gfs-sheet .gfs-hdbtn{display:inline-block;width:auto;min-width:0;margin:0;padding:2px 7px;background:#131a20;border:1px solid #2b6f66;border-radius:3px;color:#1fe0c6;font:700 10px 'Share Tech Mono','Courier New',monospace;letter-spacing:.06em;cursor:pointer}
+.gfs-sheet .gfs-hdbtn:hover{background:#1a2b30;border-color:#1fe0c6}
+.gfs-hdn{font-weight:700;font-size:10px;color:#8fa0a8;min-width:9px;text-align:left}
+/* the HD card takes the width the Roll Mode card gives up (318, GM) - one
+   hex fewer there, more room for buttons here */
+.gfs-vcard-hd{flex:1 1 150px}
+.gfs-vcard-adv{flex:0 1 92px}
+.gfs-hdwide{display:none}
+.gfs-sheet .gfs-hd{width:48px;height:18px;min-height:18px;box-sizing:border-box;resize:none;overflow:hidden;text-align:center;font:700 11px Arial;line-height:1.3;padding:2px 1px}
+.gfs-sheet .gfs-hdwide:checked + .gfs-hd{height:48px;min-height:48px;font-size:10px}
+/* ===== 312: BIO-SCAN frame (GM: match Ghost Protocol's Bio-Scan Active) =====
+   The FRAME is what the avatar_present flag reveals now, not the img. 281b
+   gated the img directly, but `~` only reaches siblings, so wrapping it would
+   have broken the reveal - and hiding the whole frame is better anyway: with no
+   avatar there is nothing to paint a HUD over.
+   ⛔ The old rule set the img height:auto. Inside a fixed frame it is
+   object-fit:cover anchored TOP CENTRE, which crops the sides and bottom of a
+   tall portrait but never the face. Frame height is the one number to tune. */
+.gfs-avframe{display:none;position:relative;height:580px;overflow:hidden;background:#0b0f12}
+.gfs-avflag:checked ~ .gfs-avframe{display:block}
+/* ⛔ BASE-CSS AMBUSH #8, and every !important here is load-bearing. Roll20's
+   sheet sandbox constrains images with !important (max-width/height:auto, and
+   something that defeats object-fit), which OUTRANKS this rule however
+   specific it is - 312's first attempt was (0,2,1) with no !important and the
+   portrait rendered SHRUNK with dead space at the sides: contain behaviour
+   against a stylesheet that plainly said cover, and the img sized 512px tall
+   inside a 420px frame because height:auto won.
+   Ghost Protocol puts !important on EVERY declaration of its portrait rule.
+   That reads like someone who lost this same fight and stopped negotiating -
+   copied here for the same reason. Reproduced and proven in avcheck_312. */
+.gfs-sheet img.gfs-avimg{display:block !important;position:absolute !important;top:0 !important;left:0 !important;width:100% !important;height:100% !important;max-width:none !important;object-fit:cover !important;object-position:top center !important;filter:contrast(1.05) saturate(.9);z-index:1}
+/* scanline texture - static, no animation */
+.gfs-avscan{position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0,transparent 4px,rgba(31,224,198,.05) 4px,rgba(31,224,198,.05) 5px)}
+/* corner reticles - four L-brackets, pure borders */
+.gfs-avret{position:absolute;width:18px;height:18px;z-index:5;pointer-events:none;border-color:#1fe0c6;border-style:solid;opacity:.55}
+.gfs-avtl{top:8px;left:8px;border-width:1px 0 0 1px}
+.gfs-avtr{top:8px;right:8px;border-width:1px 1px 0 0}
+.gfs-avbl{bottom:8px;left:8px;border-width:0 0 1px 1px}
+.gfs-avbr{bottom:8px;right:8px;border-width:0 1px 1px 0}
+/* 313: the sweep wrapper is gone - the frame's own overflow:hidden clips it,
+   and the bar has to be a DIRECT sibling of the crisis flag. */
+.gfs-avbar{position:absolute;left:0;right:0;height:2px;z-index:3;pointer-events:none;background:linear-gradient(90deg,transparent,#1fe0c6 30%,#8ffff2 50%,#1fe0c6 70%,transparent);opacity:.4;box-shadow:0 0 8px #1fe0c6;animation:gfs-scan-sweep 5s ease-in-out infinite}
+.gfs-avtag{display:block;position:absolute;top:8px;left:0;right:0;z-index:6;pointer-events:none;text-align:center;font-family:'Share Tech Mono','Courier New',monospace;font-size:8px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#1fe0c6;opacity:.5;text-shadow:0 0 6px rgba(31,224,198,.5);animation:gfs-hud-flicker 5s ease-in-out infinite}
+/* ===== 313: HP AT ZERO TURNS THE SCAN RED (GM; GP does this too) ==========
+   Driven by a worker-written CHECKBOX and `:checked ~ sibling`, which is the
+   shape this sheet already uses for avatar_present - NOT Ghost Protocol's
+   `input[value="N"] ~ ...` on a non-checkbox. Two reasons: a checkbox flag is
+   precedented here and proven to survive the platform, and every selector below
+   is a single `~` step with no descendant, which this project forbids after a
+   sibling combinator (gated).
+   ⛔ THAT CONSTRAINT IS WHY THE MARKUP IS FLAT. If the bar were still inside a
+   sweep wrapper, or the caption inside a HUD wrapper, these rules would have to
+   reach through the wrapper to its child, which is the banned shape - so they
+   could not be written at all. */
+.gfs-avwarn,.gfs-avcrit,.gfs-avdown,.gfs-avdead{display:none}
+/* ⛔⛔ THE FOUR TIER BLOCKS BELOW ARE ORDERED WORST-LAST AND THAT IS THE WHOLE
+   MECHANISM. A wounded character at 10% has BOTH hp_warn and hp_crit set; one
+   at 0 has warn, crit and down; a corpse has all four. Every block carries
+   identical specificity, so nothing but SOURCE ORDER picks the winner.
+   Reorder them and the sheet silently shows the wrong tier - amber corpses,
+   teal criticals - with no error anywhere. Thresholds mined from Ghost
+   Protocol's own worker: warning at half, critical at a quarter. */
+/* ---- tier 1: WOUNDED (hp <= half) - amber ---- */
+.gfs-avwarn:checked ~ .gfs-avret{border-color:#ffb02e;opacity:.65}
+.gfs-avwarn:checked ~ .gfs-avbar{background:linear-gradient(90deg,transparent,#ffb02e 30%,#ffd98a 50%,#ffb02e 70%,transparent);box-shadow:0 0 8px #ffb02e;opacity:.45}
+.gfs-avwarn:checked ~ .gfs-avtag{color:#ffb02e;text-shadow:0 0 6px rgba(255,176,46,.5)}
+.gfs-avwarn:checked ~ .gfs-avscan{background:repeating-linear-gradient(0deg,transparent 0,transparent 4px,rgba(255,176,46,.06) 4px,rgba(255,176,46,.06) 5px)}
+/* ---- tier 2: CRITICAL (hp <= a quarter) - red ---- */
+.gfs-avcrit:checked ~ .gfs-avret{border-color:#ff4655;opacity:.7}
+.gfs-avcrit:checked ~ .gfs-avbar{background:linear-gradient(90deg,transparent,#ff4655 30%,#ff9aa5 50%,#ff4655 70%,transparent);box-shadow:0 0 8px #ff4655;opacity:.5}
+.gfs-avcrit:checked ~ .gfs-avtag{color:#ff4655;text-shadow:0 0 6px rgba(255,70,85,.5)}
+.gfs-avcrit:checked ~ .gfs-avscan{background:repeating-linear-gradient(0deg,transparent 0,transparent 4px,rgba(255,70,85,.06) 4px,rgba(255,70,85,.06) 5px)}
+/* ---- tier 3: UNCONSCIOUS (hp at or below 0) - deeper red ---- */
+.gfs-avdown:checked ~ .gfs-avret{border-color:#c81e2b;opacity:.8}
+.gfs-avdown:checked ~ .gfs-avbar{background:linear-gradient(90deg,transparent,#c81e2b 30%,#ff6b78 50%,#c81e2b 70%,transparent);box-shadow:0 0 8px #c81e2b;opacity:.6}
+.gfs-avdown:checked ~ .gfs-avtag{color:#e8323f;text-shadow:0 0 7px rgba(200,30,43,.7);opacity:.85}
+.gfs-avdown:checked ~ .gfs-avscan{background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(200,30,43,.09) 3px,rgba(200,30,43,.09) 5px)}
+/* ---- state 3: DECEASED (three failed death saves) - all grey ----
+   ⛔ THESE MUST STAY BELOW THE RED BLOCK. A dead character is also at 0 hp, so
+   BOTH flags are set and both rule sets match; they carry equal specificity, so
+   the LATER one wins and nothing but source order decides it. Moving this block
+   above the red one would silently leave corpses red. */
+.gfs-avdead:checked ~ .gfs-avret{border-color:#7a838a;opacity:.5}
+.gfs-avdead:checked ~ .gfs-avbar{background:linear-gradient(90deg,transparent,#7a838a 30%,#aab2b8 50%,#7a838a 70%,transparent);box-shadow:0 0 8px rgba(122,131,138,.6);opacity:.35}
+.gfs-avdead:checked ~ .gfs-avtag{color:#7a838a;text-shadow:0 0 6px rgba(122,131,138,.45);opacity:.7}
+.gfs-avdead:checked ~ .gfs-avscan{background:repeating-linear-gradient(0deg,transparent 0,transparent 4px,rgba(122,131,138,.07) 4px,rgba(122,131,138,.07) 5px)}
+/* the portrait itself drains of colour - the one cue that reads at a glance
+   without having to find the caption */
+.gfs-avdead:checked ~ .gfs-avimg{filter:grayscale(1) brightness(.75) !important}
+/* ---- the caption: one span per state, exactly one shown ----
+   Base .gfs-avtag sets display:block for all three, so the two dormant ones are
+   switched off here and switched back on by their flag. Equal specificity
+   throughout, so ORDER carries this too. */
+.gfs-avtagdn,.gfs-avtagdd{display:none}
+.gfs-avdown:checked ~ .gfs-avtagok{display:none}
+.gfs-avdown:checked ~ .gfs-avtagdn{display:block}
+.gfs-avdead:checked ~ .gfs-avtagok{display:none}
+.gfs-avdead:checked ~ .gfs-avtagdn{display:none}
+.gfs-avdead:checked ~ .gfs-avtagdd{display:block}
+/* ⛔⛔ THE ONLY ANIMATION IN THIS STYLESHEET, AND THE ONLY AT-RULES BESIDES THE
+   FONT IMPORT. Kept together, on purpose: deleting these two blocks and the two
+   `animation:` declarations above is the ENTIRE revert of the moving parts, and
+   the frame / scanlines / reticles / caption all survive it as static art.
+   The GM approved them over a recorded caution against copying Ghost Protocol's
+   keyframes; the evidence for is that GP runs these live on Roll20 AND its
+   stylesheet demonstrably reaches chat. ⚠️ A stylesheet Roll20 rejects takes
+   ALL chat-card styling with it, so the card test after upload is not optional. */
+@keyframes gfs-scan-sweep{0%{top:-2px;opacity:.6}50%{opacity:.3}100%{top:100%;opacity:0}}
+@keyframes gfs-hud-flicker{0%,96%,100%{opacity:.5}97%{opacity:.1}98%{opacity:.5}99%{opacity:.05}}
+/* ===== 315: floating heal readout on the HP card =========================
+   GM: "little animations to show the number of hp restored... from nanodoc,
+   short rest, long rest, etc." Driven off the hp ATTRIBUTE rather than off any
+   healing path, so every source is covered - including ones added later.
+   ⛔ :empty IS THE TRIGGER. The span is display:none while blank; the instant
+   the worker writes a value it starts matching the :not(:empty) rule and the
+   animation fires. That boundary is the whole mechanism, which is why the
+   worker alternates two spans - a span that is already showing "+5" does NOT
+   restart its animation when it becomes "+3".
+   `forwards` leaves it invisible at the end, so a stale value costs nothing
+   and no timer is needed to clear it. */
+.gfs-vslot-cur{position:relative}
+.gfs-hprecov{display:inline-block;position:absolute;top:-4px;right:0;z-index:4;pointer-events:none;font-family:'Share Tech Mono','Courier New',monospace;font-size:15px;font-weight:700;letter-spacing:.04em;color:#8ef5a0;text-shadow:0 0 10px rgba(110,240,140,.9),0 0 3px rgba(230,255,235,.9)}
+.gfs-hprecov:empty{display:none}
+.gfs-hprecov:not(:empty){animation:gfs-hprecov-float 3s ease-out forwards}
+@keyframes gfs-hprecov-float{0%{opacity:0;transform:translateY(8px) scale(.9)}15%{opacity:1;transform:translateY(-4px) scale(1.15)}60%{opacity:1;transform:translateY(-12px) scale(1)}100%{opacity:0;transform:translateY(-22px) scale(1)}}
+/* ===== 323: the HP number reacts ==========================================
+   Mined from Ghost Protocol's hp-pulse. Two behaviours on one element, and the
+   ORDER of these four rules is what arbitrates between them.
+   ⛔ THE HEAL RULES COME FIRST, ON PURPOSE. All four carry equal specificity,
+   so the crisis rules below win when both apply - a character healed while
+   still critical keeps its alarm pulse instead of popping once and going
+   quiet. The floating +N already reports the heal in that case; a number that
+   stopped throbbing would read as "you're fine now", which is the one thing it
+   must not say.
+   ⛔ TWO IDENTICAL KEYFRAMES, hprA AND hprB, AND THAT IS NOT REDUNDANCY. The
+   number is a SINGLE element, so alternating spans is not enough to restart
+   its animation the way it restarts theirs - the computed animation-NAME has
+   to change, or the second heal does nothing at all. This is the same lesson
+   315 learned about the spans, one level up. */
+.gfs-hpcritf,.gfs-hpdownf{display:none}
+.gfs-hprA:not(:empty) ~ .gfs-vnum-hero{animation:gfs-hp-heal-a .9s ease-out}
+.gfs-hprB:not(:empty) ~ .gfs-vnum-hero{animation:gfs-hp-heal-b .9s ease-out}
+.gfs-hpcritf:checked ~ .gfs-vnum-hero{animation:gfs-hp-pulse 1.3s ease-in-out infinite}
+.gfs-hpdownf:checked ~ .gfs-vnum-hero{animation:gfs-hp-pulse .8s ease-in-out infinite}
+/* the glow is the sheet's own vnum-hero shadow, opened up and closed again -
+   so the pulse cannot drift from whatever colour the number currently is */
+@keyframes gfs-hp-pulse{0%,100%{text-shadow:0 0 2px #0a0f12,0 0 3px #0a0f12,0 0 7px currentColor}50%{text-shadow:0 0 2px #0a0f12,0 0 3px #0a0f12,0 0 18px currentColor}}
+@keyframes gfs-hp-heal-a{0%{transform:scale(1)}22%{transform:scale(1.16)}100%{transform:scale(1)}}
+@keyframes gfs-hp-heal-b{0%{transform:scale(1)}22%{transform:scale(1.16)}100%{transform:scale(1)}}
+/* Notes pane (282). Sizing split to a raised rule per the 278 lesson: base
+   CSS sets textarea height at (0,1,1), which beats a bare class. */
+.gfs-notes-edit{display:none;width:100%;box-sizing:border-box;margin-top:2px;font-size:11px;padding:6px 8px;resize:vertical}
+.gfs-subtab[value="notes"]:checked ~ .gfs-notes-edit{display:block}
+.gfs-sheet .gfs-notes-edit{height:420px;min-height:120px}
+
+/* ============ firearms modifiers panel (July 20) ============
+   Promoted from .gfs-recoilbar strip to a standard collapsible section.
+   2-per-row grid; stance toggles reuse the proven gfs-hex-toggle recipe
+   with width:auto so the text rides inside the clickable label. */
+.gfs-recoilgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;align-items:center;padding:4px 2px 2px}
+.gfs-stancehex.gfs-stancehex{width:auto;height:auto;gap:5px;align-items:center;cursor:pointer}
+.gfs-stancehex.gfs-stancehex b{font-weight:700;font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:#8fa0a8}
+.gfs-stancehex.gfs-stancehex input:checked ~ b{color:#1fe0c6}
+.gfs-selstack{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.gfs-selstack select{width:100%}
+
+/* equipment stats row: Satoshi + Wt/Capacity on one line (July 20) */
+.gfs-eqstats{display:flex;align-items:center;gap:14px;padding:4px 2px 2px;font-size:10px;font-weight:700;color:#8fa0a8}
+/* ---- MONEY TAB ----
+   The satoshi glyph leads the tab, so it gets size and a glow rather than the
+   10px muted grey the Wt readout wears. U+30B7 is an HTML ENTITY in the
+   markup, never a CSS content: - the magenta byte rule. */
+/* THREE STACKED SHADOWS, not one bigger one: a tight bright core, a mid halo
+   and a wide soft bloom. One large-radius shadow just goes evenly fuzzy and
+   reads as blur rather than glow. Same technique as the mosaic icon's paired
+   drop-shadows. */
+.gfs-sheet .gfs-satglyph{font-size:17px;font-weight:800;color:#1fe0c6;text-shadow:0 0 4px rgba(31,224,198,.95),0 0 10px rgba(31,224,198,.75),0 0 21px rgba(31,224,198,.45);line-height:1}
+.gfs-sheet .gfs-satrow{display:flex;align-items:center;gap:7px;padding:4px 2px 2px}
+/* ⛔ NO GLOW ON THE AMOUNT, and this is structural rather than a tuning miss.
+   An INPUT clips its own text-shadow to its box, so the bloom is cut at the
+   field edge no matter how the radius is set - GM saw it clip at 9px AND at
+   4px. Padding buys vertical room locally but did not save it on Roll20, so
+   the effect is simply not available to an input. The シ beside it glows fine
+   because it is a SPAN, which has no such clip. Don't retry this with a
+   smaller radius; the answer is a different ELEMENT, not a smaller number.
+   Left-aligned per the GM, so the amount starts at a fixed edge instead of
+   sliding as digits are added (7,500 -> 120,000 no longer jumps). */
+.gfs-sheet .gfs-satrow input.gfs-satbig{width:110px !important;text-align:left;font-size:14px;font-weight:700;color:#1fe0c6}
+/* the mosaic block: icon left, score + derived lifestyle right of it */
+.gfs-sheet .gfs-mosrow{display:flex;align-items:center;gap:9px;padding:6px 2px 2px}
+/* the icon carries the block's title now that the "Mosaic Score" head is gone,
+   so it gets the teal glow that makes it read as a heading on the dark panel.
+   drop-shadow, not box-shadow: the art is transparent PNG-style alpha and a
+   box glow would trace its bounding RECTANGLE instead of the logo. */
+.gfs-sheet .gfs-mosrow img.gfs-mosicon{width:38px;height:auto;flex:0 0 auto;filter:drop-shadow(0 0 5px rgba(31,224,198,.85)) drop-shadow(0 0 11px rgba(31,224,198,.45))}
+.gfs-sheet .gfs-mosfields{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.gfs-sheet .gfs-mospair{display:flex;flex-direction:column;gap:1px;min-width:0}
+.gfs-sheet .gfs-moslbl{display:block;font-size:10px;font-weight:700;letter-spacing:.04em;color:#8fa0a8}
+/* text-align AND padding-left are both undoing the generic readonly styling:
+   `.gfs-sheet input[readonly]` centres its text, which floated "Struggling"
+   into the middle of a 132px box while its "Lifestyle" label sat hard left,
+   and the base input padding of 2px 4px offsets the rest. Left-aligned and
+   flush, the label and the value share an edge. */
+.gfs-sheet .gfs-mosfields input.gfs-moslife{width:132px !important;background:transparent;border:none;color:#dfe7ea;font-size:11px;font-weight:700;pointer-events:none;text-align:left;padding-left:0}
+/* ---- Earn buttons: present only when the character HAS the ability ----
+   Flag checkbox immediately before its button, revealed with a plain `~` -
+   the proven shape (gfs-hasroll/gfs-assignbtn, gfs-spgimgav, gfs-pipav).
+   Classes are DOUBLED because .gfs-atk-roll already sets a display. */
+.gfs-sheet .gfs-sub-money input.gfs-moneyav{display:none}
+.gfs-sheet .gfs-sub-money .gfs-moneybtn.gfs-moneybtn{display:none}
+.gfs-sheet .gfs-sub-money input.gfs-skimav:checked ~ .gfs-skimbtn.gfs-skimbtn{display:inline-block}
+.gfs-sheet .gfs-sub-money input.gfs-favav:checked ~ .gfs-favbtn.gfs-favbtn{display:inline-block}
+
+/* equipment name input: defeat Roll20's fixed default input width so it
+   obeys its 1fr grid cell in the narrow column (wisdom: base CSS ambush)
+   ⚠️ font-size is 11px to MATCH every other repeating row. It was 11.5px -
+   incidental to this rule's actual job (width), but this selector is (0,3,1)
+   and beat `.gfs-sheet input.gfs-act-name` at (0,2,1), so Equipment rendered
+   half a pixel larger than Actions, Genome and Class. GM spotted it by eye. */
+.gfs-eq-row.gfs-eq-row input[type=text]{width:100%;min-width:0;box-sizing:border-box;font-size:11px}
+
+/* firearms sub-headings + teal divider (July 20) */
+.gfs-subhead{grid-column:1 / -1;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#1fe0c6}
+.gfs-subhead-rule{border-top:1px solid #1fe0c655;padding-top:6px;margin-top:4px}
+
+/* ============ heading alignment + expander cogs + EQ hex (July 20) ============ */
+/* 1) uniform left-aligned section headings; stats/legends still push right */
+.gfs-section-head.gfs-section-head{justify-content:flex-start;gap:8px}
+.gfs-section-head .gfs-hackstats{margin-left:auto}
+.gfs-section-head .gfs-legend{margin-left:auto}
+.gfs-section-head .gfs-slotbar{margin-left:auto}
+/* 2) row expander: invisible input (proven overlay) over a cog glyph */
+.gfs-expander.gfs-expander{opacity:0;z-index:3;cursor:pointer}
+.gfs-expander-icon{position:absolute;top:7px;right:4px;width:15px;height:15px;line-height:15px;
+  text-align:center;font-size:12px;color:#6d7a83;pointer-events:none;z-index:2;
+  font-family:"Helvetica Neue",Arial,sans-serif}
+.gfs-expander:hover + .gfs-expander-icon{color:#1fe0c6;filter:drop-shadow(0 0 3px #1fe0c6)}
+.gfs-expander:checked + .gfs-expander-icon{color:#1fe0c6;transform:rotate(60deg)}
+
+/* Suppress number-input spin buttons. THIS IS THE CANONICAL CROSS-BROWSER
+   RECIPE and it is half of a pair: killing the spin-button PSEUDO-ELEMENTS
+   handles WebKit/Blink, and the textfield value on the input itself handles
+   Gecko. 305: the three helix inputs joined this group, which costs no new
+   rule (addendum 185 - look for an existing comma group first).
+   ⛔ WHY THIS MATTERS RATHER THAN JUST LOOKING TIDIER: the helix inputs used
+   to rely on an `appearance` value alone to hide their spinners. That is the
+   one property Gecko re-specified, so when Firefox changed, the spinners came
+   back on their own with the stylesheet untouched - byte-identical to a build
+   that had worked for weeks. Pseudo-element suppression does not depend on
+   `appearance` at all, so a repeat of that change cannot reach it. */
+.gfs-sheet .gfs-vnum-hero::-webkit-inner-spin-button,.gfs-sheet .gfs-vnum-hero::-webkit-outer-spin-button,
+.gfs-sheet .gfs-vnum-mid::-webkit-inner-spin-button,.gfs-sheet .gfs-vnum-mid::-webkit-outer-spin-button,
+.gfs-sheet .gfs-vnum-big::-webkit-inner-spin-button,.gfs-sheet .gfs-vnum-big::-webkit-outer-spin-button,
+.gfs-ability .gfs-ab-score::-webkit-inner-spin-button,.gfs-ability .gfs-ab-score::-webkit-outer-spin-button,
+.gfs-ability .gfs-ab-mod::-webkit-inner-spin-button,.gfs-ability .gfs-ab-mod::-webkit-outer-spin-button,
+.gfs-ability .gfs-save-val::-webkit-inner-spin-button,.gfs-ability .gfs-save-val::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+
+/* Character Creation Tools page */
+.gfs-ccnote{font-size:11px;line-height:1.45;color:#8fa0a8;margin:2px 0 8px}
+.gfs-page-chargen .gfs-field.gfs-classassist{max-width:640px}
+
+/* Roll Mode card: three-position hex rocker bound to advantage_state */
+.gfs-vcard-roll{flex-direction:row;align-items:stretch;gap:0;padding:5px 4px}
+.gfs-advrow{display:flex;gap:6px;align-items:center;justify-content:center}
+.gfs-adv-hex.gfs-adv-hex{width:20px;height:22px}
+.gfs-adv-hex.gfs-adv-hex span{font-size:19px}
+.gfs-adv-norm.gfs-adv-norm.gfs-adv-norm input:checked + span{color:#8fa0a8;-webkit-text-stroke-color:#8fa0a8}
+.gfs-adv-ok.gfs-adv-ok.gfs-adv-ok input:checked + span{color:#34e58a;-webkit-text-stroke-color:#34e58a}
+.gfs-adv-bad.gfs-adv-bad.gfs-adv-bad input:checked + span{color:#ff4655;-webkit-text-stroke-color:#ff4655}
+.gfs-advcaps{display:flex;gap:6px;justify-content:center;margin-top:1px}
+.gfs-advcaps span{width:20px;text-align:center;font-size:7.5px;letter-spacing:.08em;color:#5f6a72;font-weight:800}
+
+/* dark-theme Dmg button: match Roll's transparent treatment, red identity */
+.gfs-sheet .gfs-dmgbtn.gfs-dmgbtn{background:#10151a !important;border-color:#ff4655 !important;color:#ff4655 !important}
+.gfs-sheet .gfs-dmgbtn.gfs-dmgbtn:hover{background:#ff4655 !important;color:#260609 !important}
+
+/* passives as compact vitals-style slots under skills */
+.gfs-passives.gfs-passives label{margin:0;width:auto !important;min-width:0;max-width:none;float:none;text-align:center;font-size:8px;letter-spacing:.05em;text-transform:uppercase;color:#5f6a72;line-height:1.2}
+.gfs-sheet .gfs-passives.gfs-passives input{width:44px !important;min-width:0;background:transparent !important;border:none !important;font-size:15px;font-weight:800;color:#dfe7ea;text-align:center;padding:0}
+
+/* Recovery card: rest buttons + hit dice, standard teal button treatment */
+.gfs-vcard-rec{flex-direction:row;align-items:stretch;gap:0;padding:5px 4px;border-color:#34e58a33;box-shadow:inset 0 1px 0 #34e58a12}
+.gfs-sheet .gfs-rest-btn.gfs-rest-btn{font-size:10px;font-weight:800;letter-spacing:.05em;white-space:nowrap;padding:3px 10px;background:#10151a !important;border:1px solid #1fe0c6 !important;color:#1fe0c6 !important;border-radius:4px;cursor:pointer}
+.gfs-sheet .gfs-rest-btn.gfs-rest-btn:hover{background:#1fe0c6 !important;color:#06231f !important}
+
+/* global-mod row: name fills its track exactly (defeats grid blowout from Roll20 input widths) */
+.gfs-sheet .gfs-gm-name.gfs-gm-name{width:100% !important;min-width:0;max-width:none;box-sizing:border-box}
+.gfs-gm-row .gfs-gm-hex{justify-self:center}
+.gfs-sheet fieldset{border:none;margin:0;padding:0;min-width:0}
+
+/* inline hex toggles: checkbox + text caption (Dmg enables, Prof, Amplified, etc.) */
+.gfs-inline.gfs-hexline{position:relative;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+.gfs-hexline input[type=checkbox]{position:absolute;opacity:0;left:0;top:0;width:100%;height:100%;margin:0;padding:0;cursor:pointer;z-index:2}
+.gfs-hexline .gfs-hexmark{line-height:1;font-size:14px;color:transparent;-webkit-text-stroke:1.1px #4a5560}
+.gfs-hexline .gfs-hexmark::after{content:"⬢"}
+.gfs-hexline:hover .gfs-hexmark{-webkit-text-stroke-color:#1fe0c6}
+.gfs-hexline input:checked + .gfs-hexmark{color:#1fe0c6;-webkit-text-stroke-color:#1fe0c6;filter:drop-shadow(0 0 1px #0f1317) drop-shadow(0 0 3px currentColor)}
+
+/* ===== Senses card (vitals HUD; July 21 rev 3: tall card spanning both HUD rows) ===== */
+.gfs-vstack{display:flex;flex-direction:column;gap:8px}
+.gfs-vcard-sen{flex-direction:row;align-items:stretch;padding:5px 6px;border-color:#34e58a33;box-shadow:inset 0 1px 0 #34e58a12;justify-content:flex-start;flex:1 1 auto}
+.gfs-senhead{display:flex;align-items:stretch;gap:0}
+.gfs-vcard-sen .gfs-vslot{padding:2px 4px}
+.gfs-sheet .gfs-vcard-sen .gfs-vnum-big.gfs-vnum-big{width:44px !important;padding:4px 0}
+.gfs-vcard-sen .gfs-lbl-2ln{line-height:1.35;text-align:center;letter-spacing:.10em}
+.gfs-sheet input.gfs-vnum-big.gfs-green{color:#34e58a !important;text-shadow:0 0 2px #0a0f12,0 0 3px #0a0f12,0 0 7px currentColor}
+.gfs-vemblem-eye{align-self:center;filter:drop-shadow(0 0 1px #0a0f12) drop-shadow(0 0 2px #0a0f12) drop-shadow(0 0 7px #34e58a)}
+.gfs-eye-shape{position:relative;display:block;width:19px;height:19px;background:#34e58a;border-radius:100% 0;transform:rotate(45deg)}
+.gfs-eye-shape::after{content:"";position:absolute;top:50%;left:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#0f1317}
+/* sense toggles + caption, same slot shape as the resistances grid */
+.gfs-senslot{display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;border-left:1px dotted #2a323a;margin-left:4px;padding:2px 4px 2px 8px}
+.gfs-sengrid{display:grid;grid-template-columns:repeat(2,auto);gap:1px 8px;justify-content:start;align-content:center}
+.gfs-senslot > .gfs-senlabel{width:100%;text-align:center}
+.gfs-vcard-sen .gfs-senline,.gfs-vcard-def .gfs-resline{margin:0}
+.gfs-senline .gfs-hexmark,.gfs-resline .gfs-hexmark,.gfs-profline .gfs-hexmark{font-size:10px}
+.gfs-senline .gfs-sentxt,.gfs-resline .gfs-sentxt,.gfs-profline .gfs-sentxt{font-size:8.5px;line-height:1;letter-spacing:.10em;color:#5f6a72;white-space:nowrap}
+
+/* ===== weapon / armor proficiencies (bottom of the skills panel) =====
+   Two icon-headed columns of three; the panel is capped at 260px so a single
+   row of three weapon labels will not fit. Emblems are clip-path/border-radius
+   shapes, not glyphs or SVG (sanitizer + font-support reasons). */
+.gfs-profbar{margin-top:5px;padding-top:5px;border-top:1px solid #232b33}
+.gfs-proflabel{font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#5f6a72;margin-bottom:4px}
+.gfs-profgroups{display:flex;gap:12px;align-items:flex-start}
+.gfs-profgroup{display:flex;align-items:center;gap:5px;min-width:0}
+.gfs-proflist{display:flex;flex-direction:column;gap:1px;min-width:0}
+/* kill the inherited label margin/leading — .gfs-sheet label's margin-top and the
+   host's own label styles both beat a bare .gfs-profline, which is what spreads
+   these rows apart on Roll20 */
+.gfs-sheet .gfs-proflist .gfs-profline.gfs-profline{margin:0 !important;padding:0 !important;line-height:1;min-height:0}
+.gfs-profline .gfs-hexmark,.gfs-profline .gfs-sentxt{line-height:1}
+.gfs-prof-mark{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:20px;
+  filter:drop-shadow(0 0 1px #0a0f12) drop-shadow(0 0 5px #1fe0c6)}
+/* pistol: firearms are the common case in GeneFunk, so the weapon mark is a gun.
+   Sword alternative, if melee reads better:
+   width:11px;height:20px;clip-path:polygon(50% 0,64% 16%,64% 50%,100% 50%,100% 62%,64% 62%,64% 86%,74% 86%,74% 100%,26% 100%,26% 86%,36% 86%,36% 62%,0 62%,0 50%,36% 50%,36% 16%) */
+.gfs-pistol-shape{display:block;width:19px;height:14px;background:#1fe0c6;
+  clip-path:polygon(0 0,100% 0,100% 30%,52% 30%,44% 100%,10% 100%,18% 30%,0 30%)}
+.gfs-vest-shape{display:block;width:16px;height:17px;background:#1fe0c6;
+  clip-path:polygon(16% 0,38% 0,50% 18%,62% 0,84% 0,100% 22%,84% 40%,88% 100%,12% 100%,16% 40%,0 22%)}
+
+/* ===== Rest and Recovery section (relocated from HUD; July 21) ===== */
+.gfs-restbar{display:flex;align-items:center;gap:2px;padding:6px 10px;flex-wrap:wrap}
+.gfs-restslot{display:flex;flex-direction:column;align-items:center;gap:2px;padding:2px 14px}
+.gfs-restslot + .gfs-restslot{border-left:1px dotted #2a323a}
+.gfs-restslot.gfs-restslot > label{display:block;width:100% !important;min-width:0;max-width:none;float:none;text-align:center;margin:2px 0 0;padding:0;box-sizing:border-box;font-size:8.5px;letter-spacing:.14em;color:#5f6a72}
+
+/* ===== Prof / Init / Speed split cards (July 21) ===== */
+.gfs-vcard-solo{flex-direction:row;align-items:stretch;gap:0;padding:5px 4px}
+.gfs-vcard-solo .gfs-vslot{padding:2px 8px}
+.gfs-vcard-spd{flex-direction:row;align-items:stretch;gap:0;padding:5px 4px}
+.gfs-vcard-spd .gfs-vslot{padding:2px 4px}
+/* speed is a 1-2 digit value: narrow cell keeps it tight against the chevron */
+.gfs-sheet .gfs-vcard-spd .gfs-vnum-big.gfs-vnum-big{width:44px !important;padding:4px 0}
+.gfs-sheet .gfs-vcard-spd .gfs-vnum-mid.gfs-vnum-mid{width:40px !important;font-size:16px}
+.gfs-vemblem-spd{align-self:center;filter:drop-shadow(0 0 1px #0a0f12) drop-shadow(0 0 2px #0a0f12) drop-shadow(0 0 7px #1fe0c6)}
+.gfs-ff-shape{display:block;width:22px;height:17px;background:#1fe0c6;clip-path:polygon(0 0,50% 33%,50% 0,100% 50%,50% 100%,50% 67%,0 100%)}
+
+/* ===== Combat controls above Actions (July 21) =====
+   Initiative, Proficiency, and Roll Mode are removed from the top HUD
+   and grouped as one compact row in the first right-hand CORE column. */
+.gfs-combat-hud{display:flex;align-items:stretch;gap:8px;margin:0 0 10px;min-width:0}
+.gfs-combat-hud .gfs-vcard{margin:0;min-width:0}
+/* 286: PROF snugged (GM: "plenty to cut") - a one-digit value in a 76px
+   card; the freed width relieves the REST/HD/Roll-Mode cards at small
+   window sizes. Input width scoped HERE only - gfs-vnum-big elsewhere
+   (vitals strip) keeps its 64px. */
+.gfs-combat-hud .gfs-vcard-solo{flex:0 0 48px}
+.gfs-combat-hud .gfs-vcard-solo input{width:36px !important}
+.gfs-combat-hud .gfs-vcard-roll{flex:1 1 118px}
+.gfs-combat-hud .gfs-vslot{width:100%;box-sizing:border-box;padding-left:4px;padding-right:4px}
+.gfs-combat-hud .gfs-vcard-roll .gfs-vslot{padding-left:6px;padding-right:6px}
+
+
+
+/* ==== class assist rework (labels, results box) ==== */
+.gfs-ca-rowlabel{min-width:82px;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#1fe0c6;text-align:right}
+.gfs-sheet textarea.gfs-castatus{width:100%;min-height:46px;font-size:10px;line-height:1.4;color:#1fe0c6;background:#10151a;border:1px solid #232b33;border-radius:4px;resize:vertical;padding:3px 6px}
+
+/* ==== global modifier drawer: skill-scope hexes ====
+   packed content-width chips (senline-style hex + tight label), wrapping
+   like the HUD Senses / Resistances grids instead of a stretched grid -
+   the old minmax(96px,1fr) padded every cell to 96px and spread short
+   labels apart. flex-wrap keeps it responsive with no wasted stretch. */
+.gfs-gm-skills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 8px;margin-top:2px}
+.gfs-gm-skills .gfs-hexline{gap:3px;min-width:0;line-height:1;margin:0}
+.gfs-gm-skills .gfs-hexmark{font-size:9px}
+.gfs-gm-skills .gfs-sentxt{font-size:8px;line-height:1;letter-spacing:.06em;color:#5f6a72;white-space:nowrap}
+
+/* gmod drawer: labeled mod fields, two per row */
+.gfs-gm-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 12px;margin-bottom:4px}
+.gfs-gm-fields .gfs-inline{display:flex;justify-content:space-between;align-items:center;gap:6px}
+
+/* ==== Charactermancer two-column layout + Results panel ==== */
+.gfs-cc-cols{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.gfs-cc-left{flex:1 1 420px;min-width:340px}
+.gfs-cc-right{flex:1 1 320px;min-width:280px}
+.gfs-sheet textarea.gfs-cc-rem{width:100%;min-height:64px;font-size:10px;line-height:1.5;font-weight:700;color:#ffb02e;background:#10151a;border:1px solid #232b33;border-radius:4px;resize:vertical;padding:4px 6px}
+.gfs-sheet textarea.gfs-cc-log{width:100%;min-height:220px;font-size:10px;line-height:1.5;color:#8fd0c8;background:#10151a;border:1px solid #232b33;border-radius:4px;resize:vertical;padding:4px 6px}
+
+/* ==== ability score block polish ==== */
+.gfs-ca-rowlabel.gfs-ca-left{text-align:left;min-width:0}
+.gfs-pb-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px 12px;margin-bottom:4px}
+.gfs-pb-fields .gfs-inline{display:flex;align-items:center;gap:6px}
+
+/* ============================================================
+   BISECT TEST FILE - diagnostic only, do not keep.
+   Some sheet styling WILL look wrong; that is expected.
+   The ONLY thing to judge is a posted CHAT CARD:
+     GOOD = grey hexagon chip, red Damage / teal Description buttons
+     BAD  = square violet chip, pink buttons
+   ============================================================ */
+/* ==== per-block collapse arrow (July 23) ====
+   Four rules. Base rule carries the COLLAPSED arrow; :checked::after gives
+   the open one - that form has precedent here, a negated pseudo-class in
+   front of a pseudo-element does not. Default is EXPANDED.
+   Glyphs are literal UTF-8 (never backslash escapes) and are built from
+   code points in the build script - PowerShell 5.1 mangles literal glyphs
+   pasted into a BOM-less .ps1.
+   If chat cards break, restore SAFE-css-revert-to-this.css. */
+.gfs-grpopen:not(:checked) ~ .gfs-subpage{display:none !important}
+.gfs-sheet input.gfs-grpopen{-webkit-appearance:none;appearance:none;width:auto;height:auto;margin:0 0 4px 4px;padding:2px 9px;cursor:pointer;display:inline-block;vertical-align:bottom;background:#10151a;border:1px solid #232b33;border-radius:4px 4px 0 0}
+.gfs-sheet input.gfs-grpopen::after{content:"▸";font-size:10px;font-weight:800;letter-spacing:.04em;color:#1fe0c6}
+.gfs-sheet input.gfs-grpopen:checked::after{content:"▾"}
+
+/* ==== Suit skill picker pop-up (July 24 rebuild) =====================
+   Reveal = the proven driver-checkbox pattern (same shape as sub-tabs).
+   The ONE construct with zero precedent in this stylesheet is the fixed
+   positioning on the modal - deliberately the single test variable of
+   this upload; its "confirmed poison" verdict from the morning is unsafe
+   (that build still carried the real poison). If chat cards go magenta,
+   swap the modal to absolute positioning. There is NO glyph rule in
+   this block - the close glyph is an HTML entity (see the byte rule in
+   PROJECT-WISDOM). */
+.gfs-sheet input.gfs-suitpick-driver{display:none}
+.gfs-suitpick-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:100;justify-content:center;align-items:flex-start}
+.gfs-suitpick-driver:checked ~ .gfs-suitpick-modal{display:flex}
+.gfs-sheet label.gfs-suitpick-back{display:block;position:absolute;top:0;left:0;right:0;bottom:0;background:#000000b3;cursor:pointer;margin:0;width:auto}
+.gfs-sheet .gfs-suitpick-back input,.gfs-suitpick-back span{display:none}
+.gfs-suitpick-card{position:relative;margin-top:70px;width:490px;max-width:94%;background:#141a20;border:1px solid #1fe0c655;border-radius:6px;padding:10px 12px;box-shadow:0 0 24px #000000cc}
+.gfs-suitpick-head{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.gfs-suitpick-title{color:#1fe0c6;font-weight:800;letter-spacing:.06em;font-size:12px}
+.gfs-sheet input.gfs-suitpick-count.gfs-suitpick-count{width:70px !important;min-width:0;margin-left:auto;text-align:center;background:#10151a;border:1px solid #232b33;color:#ffb02e;font-size:11px;pointer-events:none}
+.gfs-sheet label.gfs-suitpick-x{display:block;cursor:pointer;color:#1fe0c6;font-weight:800;font-size:11px;letter-spacing:.08em;margin:0;padding:1px 8px;width:auto;border:1px solid #1fe0c655;border-radius:3px;background:#10151a}
+.gfs-sheet .gfs-suitpick-x input{display:none}
+.gfs-suitpick-x:hover span{color:#7df3e1;text-shadow:0 0 6px #1fe0c6}
+.gfs-suitpick-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px}
+/* message/confirm mode (ability-score reroll offer): the worker checks
+   skillpick_msgmode and this panel shows under the (emptied) grid */
+.gfs-sheet .gfs-suitpick-card input.gfs-spmsgmode{display:none}
+.gfs-suitpick-msgpanel{display:none}
+.gfs-sheet .gfs-suitpick-card input.gfs-spmsgmode:checked ~ .gfs-suitpick-msgpanel{display:block}
+/* a second same-attr checkbox inside the head hides the (meaningless)
+   counter box in message mode - Roll20 keeps the two in sync */
+.gfs-sheet .gfs-suitpick-head input.gfs-spmsgmode:checked ~ input.gfs-suitpick-count{display:none}
+/* assignment mode (rolled ability scores): six staging fields + Apply;
+   the counter stays VISIBLE here (it shows placed / 6) */
+.gfs-sheet .gfs-suitpick-card input.gfs-spasnmode{display:none}
+.gfs-suitpick-asnpanel{display:none}
+.gfs-sheet .gfs-suitpick-card input.gfs-spasnmode:checked ~ .gfs-suitpick-asnpanel{display:block}
+.gfs-suitpick-asnpanel .gfs-pb-fields{margin-top:6px}
+.gfs-suitpick-asnpanel .gfs-hackpicker{margin-top:6px}
+/* MENU mode (Promotion / Bujutsu / nested choices): worker-labeled rows,
+   one column so long option labels fit; the head's twin checkbox hides
+   the counter (menus decide on one click) */
+.gfs-sheet .gfs-suitpick-card input.gfs-spmenumode{display:none}
+.gfs-sheet .gfs-suitpick-head input.gfs-spmenumode:checked ~ input.gfs-suitpick-count{display:none}
+.gfs-sheet .gfs-suitpick-card input.gfs-spmenumode:checked ~ .gfs-suitpick-grid{grid-template-columns:1fr}
+.gfs-suitpick-menunote{display:none}
+.gfs-sheet .gfs-suitpick-card input.gfs-spmenumode:checked ~ .gfs-suitpick-menunote{display:block}
+.gfs-sheet .gfs-suitpick-grid input.gfs-mnl.gfs-mnl{width:auto !important;min-width:0;flex:1 1 auto;background:transparent;border:none;color:#dfe7ea;font-size:11px;font-weight:700;padding:1px 0;height:15px !important;min-height:0;line-height:13px;pointer-events:none;text-align:left}
+/* ability-choice mode (genome choice ASIs): grid shows the six ability
+   hexes; this panel carries the note + the ledger-stamping Apply */
+.gfs-sheet .gfs-suitpick-card input.gfs-spabmode{display:none}
+.gfs-suitpick-abpanel{display:none}
+.gfs-sheet .gfs-suitpick-card input.gfs-spabmode:checked ~ .gfs-suitpick-abpanel{display:block}
+.gfs-suitpick-abpanel .gfs-hackpicker{margin-top:6px}
+.gfs-sheet input.gfs-spmsg.gfs-spmsg{width:100% !important;min-width:0;background:transparent;border:none;color:#dfe7ea;font-size:12px;font-weight:700;padding:2px 0;pointer-events:none;text-align:left}
+.gfs-sheet input.gfs-spmsg2.gfs-spmsg2{color:#8fa0a8;font-size:11px;font-weight:400}
+.gfs-suitpick-msgpanel .gfs-hackpicker{margin-top:6px}
+/* all-classes generalization (July 24): all 20 skill hexes render; the
+   worker checks spk_<skill>_av for the applied class's list and ONE
+   adjacent-sibling rule reveals them - same proven pattern as the
+   hack-slot pips. Hide rules sit at (0,3,1)+ to beat the sheet's own
+   label{display:block} ambush. */
+.gfs-sheet .gfs-suitpick-grid input.gfs-spav{display:none}
+.gfs-sheet .gfs-suitpick-grid label.gfs-hexline{display:none;width:auto;min-width:0}
+.gfs-sheet .gfs-suitpick-grid input.gfs-spav:checked + label.gfs-hexline{display:inline-flex}
+/* EXPERTISE entries (.gfs-exppick) speak the Core expertise vocabulary:
+   pentagon mark, amber when picked. These rules sit BEFORE the green
+   base rules on purpose - an already-expert entry matches both at equal
+   specificity, and the green must win the tie by order. */
+.gfs-sheet .gfs-suitpick-grid .gfs-exppick .gfs-hexmark::after{content:"⬟"}
+.gfs-sheet .gfs-suitpick-grid .gfs-exppick:hover .gfs-hexmark{-webkit-text-stroke-color:#ffb02e}
+.gfs-sheet .gfs-suitpick-grid .gfs-exppick input:checked + .gfs-hexmark{color:#ffb02e;-webkit-text-stroke-color:#ffb02e}
+/* entries already proficient when the picker opened (worker-set spk_*_base
+   flags, first child inside the label) render GREEN, not teal: they came
+   from another source and do not count toward the choice. (Green, not
+   amber - amber means expertise on the Core page.) The glow follows via
+   currentColor. */
+.gfs-sheet .gfs-suitpick-grid input.gfs-spbase{display:none}
+.gfs-sheet .gfs-suitpick-grid input.gfs-spbase:checked ~ .gfs-hexmark{color:#34e58a;-webkit-text-stroke-color:#34e58a}
+/* on MENU rows the base flag means "display row" (worker option.nohex,
+   e.g. the Mutt roller's rolled-name list): no hex, it is not a choice */
+.gfs-sheet .gfs-suitpick-grid .gfs-menurow input.gfs-spbase:checked ~ .gfs-hexmark{display:none}
+/* 328: A DISPLAY ROW CARRIES PROSE, AND PROSE DOES NOT FIT ON ONE LINE.
+   The genome picker's escape-hatch note is 80 characters - 425px of text at
+   11px bold in a 205px column, 2.07x over, with 38 characters visible and the
+   rest cut flat. It could not be shrunk into place either: the font size that
+   would fit one line is 5.3px.
+   ⛔ An <input> CANNOT WRAP - white-space has no effect on it and its
+   overflow:clip is unoverridable (the same wall 327 hit with the glow). So a
+   display row shows a SPAN bound to the same attribute instead, and the input
+   is hidden. Roll20 fills a name-bearing span read-only, which 327 proved live.
+   Scoped to .gfs-menurow because the base flag means something else entirely
+   on a SKILLS row ("already granted", which must keep its normal label) -
+   the same discriminator the hexmark rule above already relies on.
+   Choice rows are untouched: they stay single-line inputs.
+   ⛔ AND THE MIRROR OF 327's LESSON: retyping an element GAINS properties as
+   well as losing them. `.gfs-inline span` sets uppercase and .45px tracking,
+   and the label carries gfs-inline - so the span rendered the note SHOUTING
+   in caps while the input had been immune for not being a span. A screenshot
+   caught it; fifteen assertions had not, because they all asked about layout.
+   The span therefore restates the input's OWN computed values - 11px/700/
+   #dfe7ea/normal tracking/no transform - so only the wrapping differs. */
+.gfs-sheet .gfs-suitpick-grid span.gfs-mnlwrap{display:none}
+.gfs-sheet .gfs-suitpick-grid .gfs-menurow input.gfs-spbase:checked ~ input.gfs-mnl{display:none}
+.gfs-sheet .gfs-suitpick-grid .gfs-menurow input.gfs-spbase:checked ~ span.gfs-mnlwrap{display:block;flex:1 1 auto;min-width:0;color:#dfe7ea;font-size:11px;font-weight:700;letter-spacing:normal;text-transform:none;line-height:13px;white-space:normal;overflow-wrap:break-word;padding:1px 0}
+/* ⛔⛔ 325: THE VANISHING HEX, AND IT WAS THE MARKUP ALL ALONG.
+   A <label> with no `for` forwards its click to the FIRST LABELABLE DESCENDANT
+   in tree order. The menu row wrote spbase BEFORE the pick, so spbase was that
+   control - and spbase is the flag that HIDES the hex. Clicking a row anywhere
+   the invisible pick-overlay did not cover set base=1 on the row the player was
+   trying to choose, and the hex went out for good.
+   Proven, not theorised: label.control reported "gfs-spbase", and a real
+   label.click() flipped base to true while the pick stayed false.
+   ⚠️ It is display:none in this grid, which does NOT protect it - label
+   activation reaches a hidden control, which is the whole basis of the
+   hidden-checkbox-plus-styled-label pattern this sheet uses everywhere.
+   THE FIX IS ORDER: the pick now comes first, so the label targets it. spbase
+   still precedes the hexmark, so the hide rule above is untouched - but the
+   pick is no longer ADJACENT to the hexmark, so the global
+   `.gfs-hexline input:checked + .gfs-hexmark` teal rule can no longer see it.
+   This restores that, scoped to menu rows, with a single sibling step. */
+.gfs-sheet .gfs-suitpick-grid .gfs-menurow input.gfs-hexpick:checked ~ .gfs-hexmark{color:#1fe0c6;-webkit-text-stroke-color:#1fe0c6;filter:drop-shadow(0 0 1px #0f1317) drop-shadow(0 0 3px currentColor)}
+/* title is a worker-written readonly input now - kill the input chrome and
+   the Roll20 default width, keep the teal title look */
+.gfs-sheet input.gfs-suitpick-title.gfs-suitpick-title{width:auto !important;min-width:0;flex:1 1 auto;background:transparent;border:none;color:#1fe0c6;font-weight:800;letter-spacing:.06em;font-size:12px;padding:0;pointer-events:none}
+/* ---- Level Up select-confirm: right-column blurb panel + Done close button (skillpick_menuinfo; shapes precedented, card-widen rule live-proven July 25) ---- */
+.gfs-sheet .gfs-suitpick-modal input.gfs-spmninfo{display:none}
+.gfs-sheet .gfs-suitpick-modal input.gfs-spmninfo:checked ~ .gfs-suitpick-card{width:560px}
+.gfs-sheet .gfs-suitpick-modal input.gfs-spmncols{display:none}
+.gfs-sheet .gfs-suitpick-modal input.gfs-spmncols:checked ~ .gfs-suitpick-card{width:620px}
+.gfs-sheet .gfs-suitpick-card input.gfs-spmncols:checked ~ .gfs-suitpick-grid{grid-template-columns:1fr 1fr 1fr 1fr}
+.gfs-sheet .gfs-suitpick-card .gfs-suitpick-blurbpanel{display:none}
+.gfs-sheet .gfs-suitpick-card input.gfs-spmninfo:checked ~ .gfs-suitpick-grid{width:248px;min-height:200px}
+.gfs-sheet .gfs-suitpick-card input.gfs-spmninfo:checked ~ .gfs-suitpick-blurbpanel{display:block;position:absolute;top:42px;right:12px;width:270px;padding:6px 8px;background:#10151a;border:1px solid #1fe0c633;border-radius:4px}
+.gfs-sheet .gfs-suitpick-blurbpanel .gfs-spblabel,.gfs-sheet .gfs-suitpick-gpanel .gfs-spblabel{color:#1fe0c6;font-weight:700;font-size:10px;letter-spacing:.04em}
+.gfs-sheet .gfs-suitpick-blurbpanel .gfs-spbrow,.gfs-sheet .gfs-suitpick-gpanel .gfs-spbrow{display:flex;align-items:baseline;margin-top:3px}
+.gfs-sheet .gfs-suitpick-blurbpanel input.gfs-spbline.gfs-spbline,.gfs-sheet .gfs-suitpick-gpanel input.gfs-spbline.gfs-spbline{flex:1 1 auto;width:auto !important;min-width:0;background:transparent;border:none;color:#dfe7ea;font-size:10px;padding:0 0 0 4px;text-align:left;pointer-events:none}
+.gfs-sheet .gfs-suitpick-blurbpanel textarea.gfs-spblurb.gfs-spblurb,.gfs-sheet .gfs-suitpick-gpanel textarea.gfs-spblurb.gfs-spblurb{display:block;width:100% !important;min-width:0;background:transparent;border:none;resize:none;overflow:hidden;color:#dfe7ea;font-family:inherit;font-size:10px;line-height:13px;padding:1px 0 0;pointer-events:none}
+.gfs-sheet .gfs-suitpick-blurbpanel textarea.gfs-spb-roles.gfs-spb-roles{height:40px}
+.gfs-sheet .gfs-suitpick-blurbpanel textarea.gfs-spb-prof.gfs-spb-prof{height:28px}
+/* ---- genome picker panel (skillpick_gpanel): swaps in for the class panel; image reveals pip-style. The blurbpanel-suppress rule ties its reveal rule at (0,5,1) and wins by FILE ORDER - do not move it above. ---- */
+.gfs-sheet .gfs-suitpick-modal input.gfs-spgpanel{display:none}
+.gfs-sheet .gfs-suitpick-card .gfs-suitpick-gpanel{display:none}
+/* ⛔ THE PANEL IS PINNED BESIDE THE LIST, NOT SIZED AND LEFT TO LAND - addendum
+   259f. It used to be right-anchored with a FIXED width, so the dark gap between
+   the list and the panel was whatever the card width happened to leave over, and
+   every attempt to close it meant re-deriving three numbers at once. `left` is
+   the list column plus its padding plus six, so the gap is six pixels BY
+   CONSTRUCTION and stays six if the card is ever resized again. The panel now
+   stretches between left and right, which is also why its width vanished. */
+.gfs-sheet .gfs-suitpick-card input.gfs-spgpanel:checked ~ .gfs-suitpick-gpanel{display:flex;align-items:flex-start;position:absolute;top:42px;right:12px;bottom:12px;left:223px;padding:6px 8px;background:#ffffff;border:1px solid #1fe0c633;border-radius:4px}
+.gfs-sheet .gfs-suitpick-card input.gfs-spgpanel:checked ~ .gfs-suitpick-blurbpanel{display:none}
+.gfs-sheet .gfs-suitpick-gpanel input.gfs-spgimgav{display:none}
+.gfs-sheet .gfs-suitpick-gpanel img.gfs-spbimg.gfs-spbimg{display:none;margin:0;max-width:340px;max-height:435px}
+.gfs-sheet .gfs-suitpick-gpanel input.gfs-spgimgav:checked + img.gfs-spbimg.gfs-spbimg{display:block}
+.gfs-sheet .gfs-suitpick-gpanel textarea.gfs-spb-traits.gfs-spb-traits{height:140px}
+/* genome mode widens the card beyond the class menu's 560px - ties the 560 rule, wins by file order */
+.gfs-sheet .gfs-suitpick-modal input.gfs-spgpanel:checked ~ .gfs-suitpick-card{width:760px}
+.gfs-sheet .gfs-suitpick-gpanel textarea.gfs-spb-asi.gfs-spb-asi{height:28px}
+/* ARCHETYPE MODE. The gpanel is the only panel that carries a 340px image, so
+   the archetype browser reuses it - but it needs ONE text field, not four, and
+   four empty-but-present boxes would push its blurb ~130px down the column
+   while the art starts at the top. Same shape the featpanel's gfs-ftnotop uses:
+   a hidden flag as FIRST CHILD, then a plain `~` to a marker class.
+   SPECIFICITY IS THE WHOLE TRICK (the trap recorded at gfs-ftnotop below): the
+   targets are already display:block from `...gpanel textarea.gfs-spblurb
+   .gfs-spblurb` = (0,4,1), so the marker is DOUBLED to reach (0,6,0) counting
+   :checked. Singled it would be (0,5,0) and still win, but doubling matches
+   the house pattern and survives a future selector growing a class. */
+.gfs-sheet input.gfs-gpnotop{display:none}
+.gfs-sheet .gfs-suitpick-gpanel .gfs-gpnotop:checked ~ .gfs-gptop.gfs-gptop{display:none}
+.gfs-sheet .gfs-suitpick-gpanel .gfs-gptext{flex:0 0 130px;min-width:0;padding:2px 8px 0 0}
+.gfs-sheet .gfs-gptext .gfs-spblabel{display:block;margin:4px 0 2px}
+/* genome menu: names are short - narrow list, wide panel; compact rows. These tie earlier sibling rules at equal specificity and win by FILE ORDER. */
+/* align-content:start is load-bearing now that this panel serves SHORT menus
+   too. min-height keeps the column as tall as the 435px art, and a grid's
+   default align-content stretches its rows to fill that - invisible with 20
+   genomes (content already exceeds 440) but it spread the crook's THREE
+   archetypes across the whole height. Same fix, same reason, as the
+   gfs-ftnotop grid rule further down. Existing rule extended, no new rule. */
+.gfs-sheet .gfs-suitpick-card input.gfs-spgpanel:checked ~ .gfs-suitpick-grid{width:205px;min-height:440px;align-content:start}
+.gfs-sheet .gfs-suitpick-grid label.gfs-menurow.gfs-menurow{margin:0;padding:0}
+.gfs-sheet .gfs-suitpick-card input.gfs-spgpanel:checked ~ .gfs-suitpick-menunote{display:none}
+/* white genome panel: dark text + deep-teal labels (identical selectors as the shared rules - later file order wins) */
+.gfs-sheet .gfs-suitpick-gpanel .gfs-spblabel{color:#0c8f7d}
+.gfs-sheet .gfs-suitpick-gpanel input.gfs-spbline.gfs-spbline{color:#1c262e}
+.gfs-sheet .gfs-suitpick-gpanel textarea.gfs-spblurb.gfs-spblurb{color:#1c262e}
+/* Veteran art faces the wrong way - mirror it (transform family proven live: rotate/translateX) */
+.gfs-sheet .gfs-suitpick-gpanel img.gfs-flip.gfs-flip{transform:translateX(-27%) scaleX(-1)}
+/* paint-only shifts matched to each art's MEASURED baked-in left padding (alpha-scan July 25) */
+.gfs-sheet .gfs-suitpick-gpanel img.gfs-sh10.gfs-sh10{transform:translateX(-10%)}
+.gfs-sheet .gfs-suitpick-gpanel img.gfs-sh13.gfs-sh13{transform:translateX(-13%)}
+.gfs-sheet .gfs-suitpick-gpanel img.gfs-sh22.gfs-sh22{transform:translateX(-22%)}
+/* ---- background picker panel (skillpick_bgpanel): the class panel's chrome
+   and geometry with background labels. Every rule below is a COPY of a proven
+   blurbpanel/gpanel rule with the class name swapped - no new selector shape.
+   Sits at the END of the file so its blurbpanel-suppress rule wins the (0,5,1)
+   tie by FILE ORDER, exactly like the genome block above. ---- */
+.gfs-sheet .gfs-suitpick-modal input.gfs-spbgpanel{display:none}
+.gfs-sheet .gfs-suitpick-card .gfs-suitpick-bgpanel{display:none}
+.gfs-sheet .gfs-suitpick-card input.gfs-spbgpanel:checked ~ .gfs-suitpick-bgpanel{display:block;position:absolute;top:42px;right:12px;width:270px;padding:6px 8px;background:#10151a;border:1px solid #1fe0c633;border-radius:4px}
+.gfs-sheet .gfs-suitpick-card input.gfs-spbgpanel:checked ~ .gfs-suitpick-blurbpanel{display:none}
+.gfs-sheet .gfs-suitpick-bgpanel .gfs-spblabel{color:#1fe0c6;font-weight:700;font-size:10px;letter-spacing:.04em}
+.gfs-sheet .gfs-suitpick-bgpanel .gfs-spbrow{display:flex;align-items:baseline;margin-top:3px}
+.gfs-sheet .gfs-suitpick-bgpanel input.gfs-spbline.gfs-spbline{flex:1 1 auto;width:auto !important;min-width:0;background:transparent;border:none;color:#dfe7ea;font-size:10px;padding:0 0 0 4px;text-align:left;pointer-events:none}
+.gfs-sheet .gfs-suitpick-bgpanel textarea.gfs-spblurb.gfs-spblurb{display:block;width:100% !important;min-width:0;background:transparent;border:none;resize:none;overflow:hidden;color:#dfe7ea;font-family:inherit;font-size:10px;line-height:13px;padding:1px 0 0;pointer-events:none}
+/* The panel is ABSOLUTE, so it never grows the card - if it ends up taller
+   than the row list, it hangs over the note line at the card's foot. This
+   floor is what positions that note: the grid STRETCHES its rows to fill
+   whatever min-height it is given, so grid height = this number, and the
+   note sits directly under it. 312 = the 302px panel + clearance (the
+   genome block does the same at 440px). Ties the menu-info grid rule and
+   wins by file order. */
+.gfs-sheet .gfs-suitpick-card input.gfs-spbgpanel:checked ~ .gfs-suitpick-grid{width:248px;min-height:312px}
+/* Heights are MEASURED maxima across all 11 backgrounds (3 / 3 / 8 lines at
+   13px) - anything larger is dead black space inside the panel. Feature gets
+   one spare line because its text is prose behind a character clip, which
+   does not map exactly to line count. Re-measure if BG_LIB gains entries:
+   collapse each textarea (style.height="0px") and read scrollHeight. */
+.gfs-sheet .gfs-suitpick-bgpanel textarea.gfs-spb-bgprof.gfs-spb-bgprof{height:40px}
+.gfs-sheet .gfs-suitpick-bgpanel textarea.gfs-spb-bgequip.gfs-spb-bgequip{height:40px}
+.gfs-sheet .gfs-suitpick-bgpanel textarea.gfs-spb-bgfeat.gfs-spb-bgfeat{height:118px}
+/* ---- feat picker (skillpick_featpanel): ONE flag drives all three parts of
+   this mode - the wider card, the TWO-column list (all 32 feats on one page,
+   so the old nav-row paging is gone), and the benefits panel. Same
+   chrome as the class/background panels; every rule is a copy of a proven
+   one with the class name swapped. Last in the file, so its panel-suppress
+   rules win their (0,5,1) ties by file order. ---- */
+.gfs-sheet .gfs-suitpick-modal input.gfs-spfeat{display:none}
+.gfs-sheet .gfs-suitpick-modal input.gfs-spfeat:checked ~ .gfs-suitpick-card{width:620px}
+.gfs-sheet .gfs-suitpick-card .gfs-suitpick-featpanel{display:none}
+/* align-content:start so a SHORT list (5 bujutsu options) sits at natural
+   row height instead of stretching to fill the panel-driven min-height */
+.gfs-sheet .gfs-suitpick-card input.gfs-spfeat:checked ~ .gfs-suitpick-grid{width:310px;min-height:335px;grid-template-columns:1fr 1fr;align-content:start}
+/* worker-written label so this panel serves any two-field picker */
+.gfs-sheet .gfs-suitpick-featpanel input.gfs-splbl.gfs-splbl{display:block;width:100% !important;min-width:0;height:auto !important;background:transparent;border:none;padding:0;margin:0;font-size:10px;font-weight:700;letter-spacing:.04em;color:#1fe0c6;text-align:left;pointer-events:none}
+.gfs-sheet .gfs-suitpick-card input.gfs-spfeat:checked ~ .gfs-suitpick-featpanel{display:block;position:absolute;top:42px;right:12px;width:270px;padding:6px 8px;background:#10151a;border:1px solid #1fe0c633;border-radius:4px}
+.gfs-sheet .gfs-suitpick-card input.gfs-spfeat:checked ~ .gfs-suitpick-blurbpanel{display:none}
+.gfs-sheet .gfs-suitpick-featpanel .gfs-spblabel{color:#1fe0c6;font-weight:700;font-size:10px;letter-spacing:.04em}
+.gfs-sheet .gfs-suitpick-featpanel textarea.gfs-spblurb.gfs-spblurb{display:block;width:100% !important;min-width:0;background:transparent;border:none;resize:none;overflow:hidden;color:#dfe7ea;font-family:inherit;font-size:10px;line-height:13px;padding:1px 0 0;pointer-events:none}
+/* the ability-score rider is a BLOCK box, not a one-line row: four feats
+   (Rugged Bodied, Strong Minded, Striker, Weapon Enthusiast) carry riders up
+   to 170 chars, which no single line can hold. Heights are measured maxima. */
+/* opt-OUT of the two columns for a menu whose labels are long (Fighting
+   Style). Ties the feat-mode grid rule and wins by file order. */
+.gfs-sheet .gfs-suitpick-card input.gfs-spmn1col{display:none}
+.gfs-sheet .gfs-suitpick-modal input.gfs-spmn1col{display:none}
+/* SHORT-LIST mode: a handful of options with a couple of lines each, so the
+   feat mode's geometry (32 rows, 18-line descriptions) leaves the card mostly
+   empty. Every rule here is a plain sibling target - the two textareas are
+   reachable because a second same-name flag sits inside the panel. */
+.gfs-sheet .gfs-suitpick-modal input.gfs-spmn1col:checked ~ .gfs-suitpick-card{width:500px}
+.gfs-sheet .gfs-suitpick-card input.gfs-spmn1col:checked ~ .gfs-suitpick-grid{width:200px;min-height:186px;grid-template-columns:1fr}
+.gfs-sheet .gfs-suitpick-featpanel input.gfs-spmn1col:checked ~ textarea.gfs-spb-ftmods{height:39px}
+.gfs-sheet .gfs-suitpick-featpanel input.gfs-spmn1col:checked ~ textarea.gfs-spb-ftdesc{height:91px}
+/* ---- Assign button: only while a roll is actually waiting to be placed.
+   Its one job is reopening the assignment pop-up after a cancelled close,
+   so it is noise the rest of the time. Flag checkbox sits immediately
+   before it inside the same .gfs-hackpicker, keeping this a plain sibling
+   rule (and the section-collapse still hides the whole picker div). ---- */
+.gfs-sheet .gfs-hackpicker input.gfs-hasroll{display:none}
+.gfs-sheet .gfs-hackpicker .gfs-assignbtn{display:none}
+.gfs-sheet .gfs-hackpicker input.gfs-hasroll:checked ~ .gfs-assignbtn{display:inline-block}
+/* ---- Reminders panel: present only when something is outstanding. Both the
+   subhead and the box hide together; the flag checkbox sits inside the
+   wrapper so these stay plain sibling rules and the section-collapse
+   (.gfs-sec-collapse:not(:checked) ~ div) still hides the whole wrapper. ---- */
+.gfs-sheet .gfs-remwrap input.gfs-hasrem{display:none}
+.gfs-sheet .gfs-remwrap > .gfs-subhead,.gfs-sheet .gfs-remwrap > div{display:none}
+.gfs-sheet .gfs-remwrap input.gfs-hasrem:checked ~ .gfs-subhead,.gfs-sheet .gfs-remwrap input.gfs-hasrem:checked ~ div{display:block}
+/* ---- Charactermancer progress ticks. The flag checkbox sits INSIDE the
+   section head, immediately before its tick, so this is a plain sibling
+   rule - no descendant step after ~ (zero precedent, see PROJECT-WISDOM).
+   The glyph is an HTML ENTITY in the markup, never a CSS content: - that
+   is the magenta-box byte rule, and it costs nothing here. ---- */
+.gfs-sheet .gfs-section-head input.gfs-ccdone{display:none}
+.gfs-sheet .gfs-section-head .gfs-ccok{display:none}
+.gfs-sheet .gfs-section-head input.gfs-ccdone:checked ~ .gfs-ccok{display:inline;margin-left:7px;color:#1fe0c6;font-weight:800;text-shadow:0 0 6px #1fe0c6,0 0 12px #1fe0c666}
+/* ---- "Character creation complete", beside the Max HP tick ----
+   AMBER #ffb02e - the sheet's EXISTING second accent (expertise pips, action
+   roll totals, 23 uses). It stands clear of the teal tick right beside it
+   without inventing a third hue, which a blue would have done.
+   Same reveal shape as the tick above it (flag checkbox, plain `~`), and a
+   SPAN rather than an input - an input clips its own text-shadow and the glow
+   would be cut at the field edge (addendum 238b). */
+.gfs-sheet .gfs-section-head input.gfs-ccalldone{display:none}
+.gfs-sheet .gfs-section-head .gfs-ccdonemsg{display:none}
+.gfs-sheet .gfs-section-head input.gfs-ccalldone:checked ~ .gfs-ccdonemsg{display:inline;margin-left:10px;color:#ffb02e;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;text-shadow:0 0 4px #ffb02e,0 0 10px rgba(255,176,46,.7),0 0 20px rgba(255,176,46,.35)}
+/* ---- the guided walk: ONE chargen block at a time (July 28). Steps 2-5 are
+   off screen until recalcCcFlow ticks the ccshow_ flag that sits IMMEDIATELY
+   BEFORE each section, so the page always reads as "here is the next thing to
+   do". Byte-for-byte the sheet's standard reveal shape - hidden worker-set
+   checkbox + adjacent sibling - with 16 precedents already live here
+   (gfs-hicav hack icons line 385, gfs-pipav hack slots, gfs-spgimgav genome
+   art, gfs-spav picker rows). No descendant step after a combinator, ASCII
+   only, no content:. The reveal scores (0,5,1) against the hide's (0,3,0), so
+   it wins outright and file order is doing no work here. ---- */
+.gfs-sheet .gfs-cc-left input.gfs-ccshow{display:none}
+.gfs-sheet .gfs-cc-left .gfs-ccstep{display:none}
+.gfs-sheet .gfs-cc-left input.gfs-ccshow:checked + .gfs-ccstep{display:block}
+/* ---- a chargen button whose LABEL depends on state. Roll20 cannot bind a
+   button's text to an attribute, so both labels ship and the block's own
+   ccdone flag reveals one - the pip pattern applied to words instead of
+   pictures. Four rules serve all three blocks (genome, background, class).
+   The driver is a SECOND instance of the same attr_ccdone_ checkbox sitting
+   inside the button row, so every rule here is a plain sibling step; reaching
+   the head's copy would need a descendant after `~`, which has zero precedent.
+   Shapes: the checked-sibling HIDE form has 10 precedents in this file and the
+   checked-sibling REVEAL form 23. The hide of the post-tick button scores
+   (0,3,0) and its reveal (0,4,1), so the reveal wins on specificity and file
+   order does no work. (Selectors are described, not quoted - a brace in a
+   comment inflates the rule count, which is how this very line was caught.) ---- */
+.gfs-sheet .gfs-hackpicker input.gfs-ccalt{display:none}
+.gfs-sheet .gfs-hackpicker .gfs-ccpost{display:none}
+.gfs-sheet .gfs-hackpicker input.gfs-ccalt:checked ~ .gfs-ccpre{display:none}
+.gfs-sheet .gfs-hackpicker input.gfs-ccalt:checked ~ .gfs-ccpost{display:inline-block}
+/* ---- class features | class resources, side by side on the CLASS sub-tab.
+   The list keeps min-width:0 so a long feature name shrinks the NAME rather
+   than pushing the panel off the column (Roll20's default input widths
+   otherwise refuse to shrink - the documented grid-blowout ambush). ---- */
+.gfs-sheet .gfs-clsrow{display:flex;align-items:flex-start;gap:8px}
+.gfs-sheet .gfs-clslist{flex:1 1 auto;min-width:0}
+/* the pair stacks UNDER its label so the panel stays ~110px - every pixel
+   here comes off the feature-name column, whose longest entry ("Armor And
+   Weapon Proficiency") has little room to spare */
+.gfs-sheet .gfs-clsres{flex:0 0 96px;min-width:0;padding:4px 6px;background:#10151a;border:1px solid #1fe0c633;border-radius:4px}
+.gfs-sheet .gfs-clsres .gfs-clsrlbl{display:block;margin-top:5px;font-size:9.5px;font-weight:700;letter-spacing:.04em;color:#1fe0c6}
+.gfs-sheet .gfs-clsres .gfs-clsrpair{display:flex;align-items:center;gap:3px;font-size:10px;color:#8b98a5}
+.gfs-sheet .gfs-suitpick-featpanel textarea.gfs-spb-ftmods.gfs-spb-ftmods{height:52px}
+.gfs-sheet .gfs-suitpick-featpanel textarea.gfs-spb-ftdesc.gfs-spb-ftdesc{height:246px}/* ---- the generic five-field panel: every label in .gfs-suitpick-bgpanel is
+   worker-written, so this chrome serves any picker. Rule 1 is the featpanel's
+   block-label reset with the scope swapped; rule 2 is the same reset for an
+   INLINE row label, which needs a fixed basis (addendum 86 said so) - 76px,
+   measured: the widest candidate label is "Starting Cash:" at 69px. Rules 3-4
+   are the standard hidden-flag pair, letting a THREE-field picker collapse
+   blocks 4 and 5 instead of showing two empty boxes. Appended at end of file
+   so these win their ties by order, like the other panel blocks. ---- */
+.gfs-sheet .gfs-suitpick-bgpanel input.gfs-splbl.gfs-splbl,.gfs-sheet .gfs-suitpick-gpanel input.gfs-splbl.gfs-splbl{display:block;width:100% !important;min-width:0;height:auto !important;background:transparent;border:none;padding:0;margin:0;font-size:10px;font-weight:700;letter-spacing:.04em;color:#1fe0c6;text-align:left;pointer-events:none}
+.gfs-sheet .gfs-suitpick-bgpanel input.gfs-spinlbl.gfs-spinlbl,.gfs-sheet .gfs-suitpick-gpanel input.gfs-spinlbl.gfs-spinlbl{flex:0 0 76px;width:76px !important;min-width:0;height:auto !important;background:transparent;border:none;padding:0;margin:0;font-size:10px;font-weight:700;letter-spacing:.04em;color:#1fe0c6;text-align:left;pointer-events:none}
+.gfs-sheet .gfs-suitpick-bgpanel input.gfs-spcompact{display:none}
+.gfs-sheet .gfs-suitpick-bgpanel input.gfs-spcompact:checked ~ .gfs-spx45{display:none}
+/* compact mode's first box carries a FEATURE's text, not a background's three
+   lines of proficiencies. 212px = the measured maximum across all 17 bujutsu
+   entries (Jujutsu Adept, 832 chars, needs 209) - measured by collapsing the
+   textarea to 0 and reading scrollHeight, since scrollHeight never reports
+   below clientHeight. Panel then stands ~265px, inside the 312px grid floor,
+   so it still clears the note line. Same selector shape as the featpanel's
+   short-list height overrides. */
+.gfs-sheet .gfs-suitpick-bgpanel input.gfs-spcompact:checked ~ textarea.gfs-spb-bgprof{height:212px}
+/* ---- Resources: the Maneuvers row exists only for a character who has any.
+   Flag INSIDE .gfs-clsres so the section collapse still owns the whole panel
+   and this only reveals its contents (addendum 99). Both shapes have
+   precedent: the hidden-flag input, and ":checked ~ .class{display:block}"
+   from the bgpanel reveal. ---- */
+.gfs-sheet .gfs-clsres input.gfs-hasman{display:none}
+.gfs-sheet .gfs-clsres .gfs-manrow{display:none}
+.gfs-sheet .gfs-clsres input.gfs-hasman:checked ~ .gfs-manrow{display:block}
+
+/* HACKS TAB - the five level blocks flow into COLUMNS instead of stacking.
+   flex-wrap does the work, so the column count is WINDOW-DRIVEN rather than
+   fixed: Roll20's ~809px default gives TWO per row, and a window past ~1230px
+   gives THREE - the 1-2-3 / 4-5 arrangement, for free, with no second rule and
+   no media query.
+   THE 380px BASIS IS MEASURED, not chosen: the longest hack name is "Upgrade
+   Vehicle Handling" at 136px (bold 11 Arial, GDI+), and a row spends 116px on
+   the Roll/? columns, gaps and cog-clearing padding plus 21px on the type
+   badge - so a column needs ~405px to show that name whole. Two columns at
+   809px land within ~2px of it.
+   align-items:flex-start stops a one-row block (a lone 2nd-level hack)
+   stretching to the height of a tall neighbour; min-width:0 is the documented
+   guard against Roll20's default input widths refusing to shrink. */
+.gfs-hackcols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:flex-start}
+.gfs-hackcols > .gfs-section{min-width:0;margin-top:0}
+/* Inside the columns a hack row is NAME + "?" only. Dropping Roll and Damage
+   is what buys three columns: with them a column needs ~405px (1230px for
+   three), without them ~213px, against Roll20's ~809px default window.
+   THE CELLS ARE HIDDEN, NOT DELETED, and that is deliberate. The chat card's
+   [Damage] command link targets act_dmgbtn BY NAME - deleting that button
+   from the markup would break the two-stage damage flow on every hack, which
+   is a far worse loss than a column. Both values still show on the card and
+   in the cog drawer.
+   The column HEADER goes too: "NAME" over a single column is noise, and the
+   section title already says which level it is. Hiding the whole header also
+   avoids an :nth-child(3), which has no precedent here (only a literal 2). */
+.gfs-hackcols .gfs-act-cols{display:none}
+.gfs-hackcols .gfs-act-row{grid-template-columns:minmax(0,1fr) 16px}
+.gfs-hackcols .gfs-act-roll,
+.gfs-hackcols .gfs-act-dmgcell{display:none}
+
+
+/* GRANTED FREE is a variable-length LIST (a Cytomancer's Pharmacist grants
+   seven hacks), so it gets its OWN full-width row instead of competing for
+   space on the stats bar with three short numeric fields. That is why the
+   first attempt looked wrong both ways - squeezed onto one line it overflowed,
+   and allowed to wrap it pushed every field onto a line of its own.
+   THE LABEL MUST BE AN EXPLICIT FLEX ROW. .gfs-sheet label{display:block} is
+   (0,1,1) - the documented label ambush - so without out-specifying it the
+   caption blocks above the control and flex:1 on the input does nothing,
+   leaving Roll20's ~170px default width. The doubled class scores (0,2,0) on
+   the label and beats it. Same trick .gfs-hex-toggle has always used.
+   flex:1 on the input needs no width: flex-basis 0% overrides Roll20's. */
+.gfs-hackfree.gfs-hackfree{display:flex;flex:1;align-items:center;gap:4px;min-width:0}
+/* smaller than the bar's 10px so a long grant list fits: a Cytomancer's
+   Pharmacist alone hands over seven named hacks before anything else is
+   counted. Deliberately QUIET: 8px in the secondary grey #8fa0a8 at weight
+   600, so a long list reads as reference rather than competing with the amber
+   numbers beside it.
+   text-align:left is a real fix, not taste - the base rule
+   .gfs-sheet input[readonly] CENTRES its text, which is right for ATK and DC
+   and wrong for a comma list. Same (0,2,1) specificity as that rule, and this
+   one is later in the file, so it wins without !important.
+   The field is still a readonly input, so an overrun stays reachable - click
+   in and arrow across. */
+.gfs-hackfree.gfs-hackfree input{flex:1;min-width:0;font-size:8px;letter-spacing:0;font-weight:600;color:#8fa0a8;text-align:left}
+
+/* THE DEAD SPACE IN THIS BAR IS THE LABEL AMBUSH, not flex. Measured off the
+   live screenshot: ~150px of empty space before EVERY caption, uniformly -
+   that regularity is the signature of a FIXED-WIDTH label (Roll20's base
+   label{width:...}), because a flex gap would not repeat at a constant size
+   independent of the content beside it.
+   .gfs-inline is (0,1,0) and loses to Roll20's base; this is (0,2,1) and wins.
+   Sizing each label to its content packs the bar left and hands the reclaimed
+   width to Granted Free. Same doubled-class width assert the vitals captions
+   needed - the doubling is never cosmetic here.
+   float:none is insurance: the base label rule floats in some Roll20 themes,
+   and a floated flex item silently leaves the flow. */
+.gfs-hackstats label.gfs-inline{display:flex;width:auto;min-width:0;float:none}
+
+/* ONE-FIELD FEAT PANEL. A picker that fills only the big Benefits box - the
+   Call in a Favor menu - left lbl1 and the short blurb2 box empty ABOVE the
+   text, which is leading whitespace AND pushes the description down until it
+   clips. The flag is the FIRST child of the panel so both targets are reached
+   with a plain `~` (a descendant step after ~ has zero precedent here, and the
+   sheet keeps that count at zero on purpose). */
+.gfs-sheet input.gfs-ftnotop{display:none}
+/* SPECIFICITY, COUNTED NOT GUESSED. The first attempt at these two was
+   `.gfs-ftnotop:checked ~ input.gfs-splbl` = (0,3,1), and it lost outright to
+   the panel's own
+   `.gfs-sheet .gfs-suitpick-featpanel input.gfs-splbl.gfs-splbl{display:block}`
+   = (0,4,1) - which already doubles its class, because on this sheet that
+   doubling is never decoration. Matching the winner's prefix and its doubled
+   class puts these at (0,6,1), so they take it outright rather than by file
+   order. Exactly the ambush the hack-slot pips hit at line 6 of this file. */
+.gfs-sheet .gfs-suitpick-featpanel .gfs-ftnotop:checked ~ input.gfs-splbl.gfs-splbl{display:none}
+.gfs-sheet .gfs-suitpick-featpanel .gfs-ftnotop:checked ~ textarea.gfs-spb-ftmods.gfs-spb-ftmods{display:none}
+/* ...and having freed that space, USE it. One-field mode gets the whole panel
+   for its description: 200px instead of the short mode's 91, which was still
+   clipping while the card sat half empty.
+   THE GEOMETRY CHAIN IS THE POINT (addendum 80): the panel is ABSOLUTELY
+   positioned, so it never grows the card - the card's height comes from the
+   LIST. A 200px box plus its label needs ~215px, so the grid floor goes to
+   235px or a SHORT list (a 1st-level suit sees five favors) would leave the
+   panel hanging past the bottom of the card. 14 favors are ~250px and drive it
+   themselves; the floor only matters at the short end.
+   align-content:start so five rows sit at the top rather than spreading to
+   fill a floor meant for fourteen - the same fix the Fighting Style menu
+   needed for exactly this reason. */
+.gfs-sheet .gfs-suitpick-featpanel .gfs-ftnotop:checked ~ textarea.gfs-spb-ftdesc.gfs-spb-ftdesc{height:200px}
+.gfs-sheet .gfs-suitpick-card input.gfs-ftnotop:checked ~ .gfs-suitpick-grid{min-height:235px;align-content:start}
+/* ===== NPC MODE (addendum 169) =====
+   ONE page, no tabs. attr_is_npc is a checkbox sibling of the four tab radios,
+   so every reveal here is the ordinary :checked ~ / :checked + shape this file
+   already uses 65 and 17 times. The old sheet's master-display-controller
+   trick - one hidden input holding a packed state string, matched with an
+   attribute-SUBSTRING selector - is deliberately NOT copied: that selector
+   shape has zero precedent here. (Not spelled out on purpose; writing it in
+   a comment would trip the very audit that asserts it stays at zero.)
+   THE NPC PAGE DELIBERATELY DOES NOT CARRY .gfs-page. If it did, the blanket
+   hide below would match it too and we would be fighting our own rule with
+   specificity; keeping it off that class means the two never interact.
+   SPECIFICITY, counted by hand (addendum 159): the tab rules are
+   `.gfs-tab[value="core"]:checked ~ .gfs-page-core` = (0,3,0), so the hide
+   MUST out-rank them - `.gfs-sheet ... .gfs-page.gfs-page` is (0,4,0). A
+   plain `.gfs-npcmode:checked ~ .gfs-page` at (0,2,0) would lose and the PC
+   page would show straight through the NPC one.
+   No .sheet- duplicates: on legacy:true every bare selector here misses and
+   the sheet is unstyled regardless, so a duplicate buys nothing and doubles
+   the chat-parser surface. */
+.gfs-page-npc{display:none}
+/* HIDE THE DRIVERS. Every other worker-set flag family on this sheet carries
+   an explicit hide (gfs-hicav, gfs-pipav, gfs-ccshow); omitting these shipped a
+   bare checkbox beside the CORE tab and two more inside the Speed card where
+   climb and swim should be. A driver checkbox is never for the player to see. */
+/* .gfs-petmode joins this (addendum 191) - it is a worker-set DRIVER, so it must
+   be hidden like every other one. Added to the existing selector rather than as a
+   new rule, so the count does not move. An unhidden driver renders as a stray
+   checkbox on the page; that shipped once already in addendum 169. */
+.gfs-sheet input.gfs-npcmode,.gfs-sheet input.gfs-petmode,.gfs-sheet input.gfs-tgpetmode,.gfs-sheet input.gfs-robotmode{display:none}
+.gfs-sheet input.gfs-npcav{display:none}
+.gfs-sheet .gfs-npcmode:checked ~ .gfs-page.gfs-page{display:none}
+/* .gfs-tabline is only the UNDERLINE - the visible tab buttons are the styled
+   .gfs-tab radios themselves, so hiding the line alone left all four tabs on
+   screen above the NPC page. Both have to go. */
+.gfs-sheet .gfs-npcmode:checked ~ .gfs-tabline{display:none}
+.gfs-sheet .gfs-npcmode:checked ~ input.gfs-tab{display:none}
+.gfs-sheet .gfs-npcmode:checked ~ .gfs-page-npc.gfs-page-npc{display:block}
+/* Worker-set availability flags. The flag checkbox sits IMMEDIATELY BEFORE
+   the row it reveals, so this is the adjacent-sibling shape (17 precedents)
+   rather than a descendant step after ~, which has zero. Rows the NPC has no
+   value for - immunities, resistances, skill notes, climb/swim/jump - simply
+   are not there, instead of printing empty labels. */
+/* DOUBLED CLASS IS LOAD-BEARING HERE (addendum 170, caught by a local render
+   check). Every conditional row carries BOTH .gfs-npcline and .gfs-npcrow.
+   `.gfs-npcline{display:flex}` is (0,1,0) and sits LATER in this file, so a
+   plain `.gfs-npcrow{display:none}` at (0,1,0) LOSES the tie on file order and
+   every row showed regardless of its flag - skill notes, damage immunities and
+   vulnerability all rendered as empty labelled boxes, which is the exact
+   clutter the conditional rows exist to remove.
+   (0,2,0) for the hide, (0,4,0) for the reveal. Same lesson as addendum 159:
+   count specificity by hand, and when two rules touch the same property on the
+   same element, being later in the file is NOT a plan. */
+.gfs-npcrow.gfs-npcrow{display:none}
+.gfs-sheet input.gfs-npcav:checked + .gfs-npcrow.gfs-npcrow{display:flex}
+/* THERE IS DELIBERATELY NO is_npc CONTROL ON THE NPC PAGE (addendum 170).
+   The two rules that used to live here revealed one, and it was a trap rather
+   than an escape hatch: unchecking the flag hides the page the control sits on,
+   so the sheet reverts to PC with no way back. The GM hit it within minutes.
+   The toggle now lives on Tools & Settings, on the PC side, because the
+   conversion is one-way by design - NPCs never become PCs. Recovery from an
+   accidental flag is Attributes & Abilities, not a button. */
+/* packed one-line groups - the whole point of the NPC page */
+.gfs-npcline{display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 14px;padding:3px 6px;border-bottom:1px solid #232a32}
+.gfs-npclbl{font:700 10px 'Share Tech Mono','Courier New',monospace;color:#8b98a6;text-transform:uppercase;letter-spacing:.5px}
+/* A ROW OF HEX TOGGLES - addendum 255c, GENERALISED IN 257.
+   Born GM-caught: the Upgrade Robot toggles rendered stacked on Roll20 while
+   measuring as one 689x22 row locally. Giving them their own flex row makes the
+   layout independent of what the parent resolves to, which is the point - two
+   theories that fitted the screenshot were both disproved by experiment, so this
+   fixes the symptom by construction rather than by a cause I could not confirm.
+   RENAMED from .gfs-npcupg when the NPC feature hexes needed the same box: one
+   rule, two users, and a name that describes the shape rather than the first
+   thing that used it. Still the only stylesheet change since addendum 253 -
+   post a chat card after uploading.
+   No colour, no font, no size: the hexes and captions carry their own.
+   ⛔ NO `.gfs-sheet ` PREFIX, AND THAT IS LOAD-BEARING (addendum 257, caught by a
+   render check). With it this is (0,2,0) - a TIE with the doubled-class
+   .gfs-npcrow hide - which it then won on source order, so the conditional
+   feature hex was visible on every trait row. At (0,1,0) the hide outranks it, the
+   reveal at (0,4,1) still wins, and a bare div has no other competitor above an
+   element selector. Exactly the contest the comment ~30 lines above warns about:
+   count by hand, and being later in the file is NOT a plan. */
+.gfs-hexrow{display:flex;flex-wrap:nowrap;align-items:center;gap:0 12px}
+.gfs-npcval{font:700 12px 'Share Tech Mono','Courier New',monospace;color:#1fe0c6}
+/* .gfs-npcname retired addendum 173 - the NPC page no longer carries a
+   character-name input, because Roll20's dialog already prints the journal name
+   above the sheet. Rule deleted rather than left dead: every rule is chat-parser
+   surface, and a class with no markup is exactly what the pre-upload audit
+   flags. */
+/* LEFT-ALIGNED (addendum 172, GM request). Roll20 centres input text, which
+   made the packed skills line and every hack name float in the middle of a wide
+   box. Only the short numeric fields stay centred - see .gfs-npcnum. */
+.gfs-npctxt{font:400 11px 'Share Tech Mono','Courier New',monospace;color:#c8d2dc;padding:2px 6px;line-height:1.5}
+/* THE COMPETITOR IS LINE 4: `.gfs-sheet input[readonly]{text-align:center}` at
+   (0,2,1) - an attribute selector carries CLASS weight, so a bare .gfs-npctxt
+   at (0,1,0) lost and every packed line stayed centred. Doubled to (0,3,1).
+   Fourth specificity miss in this feature; the pattern is always the same -
+   a broad existing rule I did not look for. */
+.gfs-sheet input.gfs-npctxt.gfs-npctxt{text-align:left}
+/* the INIT label IS the roll button - no separate "Roll" beside it */
+.gfs-sheet button.gfs-npcbtn{font:700 10px 'Share Tech Mono','Courier New',monospace;color:#1fe0c6;text-transform:uppercase;letter-spacing:.5px;background:transparent !important;border:none !important;box-shadow:none !important;padding:0 2px;margin:0;width:auto !important;min-width:0;cursor:pointer}
+.gfs-sheet button.gfs-npcbtn:hover{color:#ffb02e}
+/* HACKS FLOW INLINE. Flex-wrapping Roll20's OWN .repcontainer is what puts ten
+   first-level hacks on two lines instead of ten rows, while each stays a real
+   repeating row with its own click handler - a packed text field would be
+   smaller still but could not be clicked per hack.
+   .repcontrol is Roll20's add/edit chrome: seven of those rows (one per
+   fieldset) were pure noise on a page built to be compact, so they are hidden
+   HERE ONLY - Features & Traits and Actions keep theirs, since those are the
+   two lists a GM realistically hand-edits. */
+/* THE WHOLE HACKS SECTION VANISHES WHEN AN NPC HAS NO HACKS (addendum 183,
+   GM-caught). Hiding the five LEVEL rows individually still left the
+   .gfs-section wrapper painting an empty 900x14 bordered box above Features &
+   Traits - a dead row, because a section's border does not know its contents
+   are gone. Measured, not guessed: the render check reports visibly-empty boxes.
+   .gfs-section sets no display of its own, so a plain display:none holds. */
+.gfs-npchacks{display:none}
+.gfs-sheet input.gfs-npcav:checked + .gfs-npchacks{display:block}
+/* FEATURES & TRAITS IN TWO COLUMNS (addendum 183). Same trick as the inline
+   hacks - style Roll20's own .repcontainer - but a GRID here rather than
+   flex-wrap, so the two columns line up instead of packing raggedly. Each
+   .repitem keeps position:relative, so every row's cog stays pinned to its own
+   right edge rather than the section's. */
+.gfs-sheet .gfs-npctraits .repcontainer{display:grid;grid-template-columns:1fr 1fr;gap:0 10px;background:transparent}
+.gfs-sheet .gfs-npchacks .repcontainer{display:flex;flex-wrap:wrap;gap:2px 6px;background:transparent}
+.gfs-sheet .gfs-npchacks .repitem{position:relative;flex:0 0 auto}
+.gfs-sheet .gfs-npchacks .repcontrol{display:none}
+.gfs-sheet .gfs-npchacks fieldset{flex:1 1 auto;min-width:0}
+.gfs-sheet .gfs-npchkcell{position:relative;display:inline-block}
+.gfs-sheet input.gfs-npchkname.gfs-npchkname{font:700 11px Arial;color:#ffb02e;background:transparent !important;border:none !important;box-shadow:none !important;text-align:left;padding:0 4px;height:auto !important;width:118px !important;cursor:pointer}
+.gfs-sheet .gfs-npchk{align-items:baseline}
+/* .gfs-npcdesc retired addendum 178 - the description moved to a collapsed
+   .gfs-section at the bottom of the page, which the sheet's existing
+   section-collapse rules already lay out. Rule deleted rather than left dead:
+   a class with no markup is what the pre-upload audit flags, and every rule is
+   chat-parser surface. */
+/* CLICKABLE SKILLS, FLOWED INLINE (addendum 177). Twenty controls ship hidden;
+   the worker reveals only the trained ones, so the row shows exactly the
+   statblock's list while each entry stays a real button. inline-flex - NOT the
+   .gfs-npcrow flex used by full-width conditional rows - is what lets several
+   sit side by side and wrap as a group. */
+.gfs-npcskill{display:none}
+.gfs-sheet input.gfs-npcav:checked + .gfs-npcskill{display:inline-flex;align-items:baseline;gap:1px}
+.gfs-sheet .gfs-npcskills{gap:2px 12px}
+/* "Medium droid" is ~70px of text in a 166px box. Sized for the longest real
+   pairing (a gargantuan construct), measured rather than guessed. */
+.gfs-sheet .gfs-npcline input.gfs-npckind{flex:0 1 124px;width:124px;min-width:0}
+/* The only worker-packed text of unbounded length left on the page: the hack
+   slot summary, which runs from "1st x7, 2nd x1" to all five levels at once.
+   BASIS MEASURED AGAINST THE ROW, not guessed: its siblings use 341px of a
+   705px row and the row's 14px gaps eat ~98 more, so a 260px basis sat right on
+   the wrap boundary and dropped the value onto its own line. 200px clears it
+   with room, and flex-grow still lets it take whatever is spare. Flex wrapping
+   is decided on the BASIS, before any shrinking - so a basis that "nearly fits"
+   wraps. */
+.gfs-sheet .gfs-npcline input.gfs-npcwide{flex:1 1 200px;min-width:120px}
+/* SHORT VALUES MUST NOT CLAIM A TEXT INPUT'S DEFAULT WIDTH. "5" was getting
+   166px, which pushed SLOTS and PROF onto lines of their own - two wasted rows
+   on a page whose entire purpose is compactness. Measured on the real page. */
+/* GM design philosophy (284b): value boxes SNUG and near-SQUARE - small,
+   efficient, no clipping. 26px at 12px bold = 22px content after 1px side
+   padding: three digits fit, two center with air, box is ~26x22. */
+.gfs-sheet .gfs-npcline input.gfs-npcnum{flex:0 0 26px;width:26px;min-width:0;padding:2px 1px;text-align:center}
+/* "6d8+6" needs 46px in a 40px slot. THE COMPETITOR IS THE SHEET'S OWN
+   `.gfs-sheet .gfs-vcard-hp .gfs-vnum-mid.gfs-vnum-mid{width:40px !important}`
+   at (0,4,0) - both rules carry !important, so specificity alone decides and
+   `.gfs-sheet input.gfs-npcdice.gfs-npcdice` at (0,3,1) LOSES: class weight
+   beats element weight. Matching its .gfs-vcard-hp scope puts this at (0,4,1).
+   Third specificity miss in this one feature - COUNT, never assume. */
+/* THE DEF CARD MUST NOT GROW ON THE NPC PAGE (addendum 184). Its base rule is
+   `flex:1 1 auto` (line 637) at (0,1,0), which is right on the PC sheet where the
+   damage-resistance hex list lives INSIDE that card and needs the room. The NPC
+   page puts resistances on their own row, so nothing filled it - and once the
+   passives card was removed it absorbed all the freed width, measuring 487px
+   around 138px of content: 349px of dead space inside a bordered box.
+   (0,3,0) here, so it wins without !important. */
+.gfs-sheet .gfs-page-npc .gfs-vcard-def{flex:0 1 auto}
+/* WIDENED 58 -> 84 (addendum 184, GM-caught clipping). 58px fitted "6d8+6" and
+   clipped "14d8+12" - the Omega Commando's. Sized for the longest plausible
+   pooled hit dice: two digits, a die size, and a two-digit CON bonus. */
+.gfs-sheet .gfs-vcard-hp input.gfs-npcdice.gfs-npcdice{width:84px !important;max-width:84px !important}
+/* NPC ability row. It does NOT reuse .gfs-abilities: that class IS the helix
+   column - 156px wide, the DNA artwork, --gfs-shift, and score/mod/save inputs
+   pinned to width:96px with doubled-class !important. Reusing it rendered the
+   six abilities as one tall vertical strip. Fighting those !important widths
+   from a second context is exactly the ambush the helix notes describe, so the
+   NPC row owns its own small block instead. Widths carry !important and a
+   doubled class because Roll20's base CSS puts fixed widths on number inputs. */
+.gfs-npcabil{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding:4px 6px;border-bottom:1px solid #232a32}
+.gfs-npcab{display:flex;flex-direction:column;align-items:center;gap:1px}
+.gfs-sheet .gfs-npcab button.gfs-npcabn{font:700 11px Arial;color:#1fe0c6;background:none;border:0;padding:0;cursor:pointer;letter-spacing:.5px}
+.gfs-sheet .gfs-npcab input.gfs-npcabin.gfs-npcabin{width:42px !important;max-width:42px !important;min-width:0 !important;height:17px !important;padding:0 !important;margin:0 !important;text-align:center;font:700 12px Arial;background:#10151a;color:#e6edf3;border:1px solid #232a32;border-radius:3px}
+.gfs-sheet .gfs-npcab input.gfs-npcabmod.gfs-npcabmod{font:400 10px Arial;color:#8b98a6;border:0;background:none;height:13px !important}
+
+/* ============================================================================
+   ADDENDUM 290 — CHAT CARD, GHOST-PROTOCOL LANGUAGE.
+   Appended rather than spliced into the four old card families (which are
+   scattered across ~300 lines in two ancestors x two class spellings): file
+   order breaks ties, tripled classes take these to (0,4,0) so they beat the
+   old (0,3,0) !important rules, and the REVERT IS A TAIL TRUNCATION back to
+   147,065 B. The old rules stay as dead weight on purpose.
+
+   Almost everything the new card needs is INLINE in the rolltemplate, because
+   an inline declaration beats the stylesheet. What is left here is exactly the
+   three things inline cannot do:
+     (a) undo an old !important,
+     (b) clip-path / filter, which would cost N inline copies,
+     (c) neutralise Roll20's own .inlinerollresult chrome.
+
+   ⛔ NO FLEX AND NO gap ANYWHERE IN THE CARD. Live evidence (ghost_protocol on
+   Roll20, GM-confirmed): an inline display:flex is INERT in chat - their
+   justify-content:flex-end renders hard left. The card is inline-block + margins
+   throughout, which renders identically whether or not flex applies.
+   ============================================================================ */
+
+/* -- the hex: glow on an UNCLIPPED wrapper, because clip-path clips its own
+      element's shadows. Same idiom as .gfs-hex-toggle at line ~1198. --------- */
+.sheet-rolltemplate-general .gfr-hexwrap.gfr-hexwrap,
+.sheet-rolltemplate-general .sheet-gfr-hexwrap.sheet-gfr-hexwrap,
+.rolltemplate-general .gfr-hexwrap.gfr-hexwrap,
+.rolltemplate-general .sheet-gfr-hexwrap.sheet-gfr-hexwrap{
+  display:inline-block;margin:0 5px 5px 0;
+  filter:drop-shadow(0 0 2px currentColor) drop-shadow(0 0 6px currentColor)}
+
+.sheet-rolltemplate-general .gfr-hexin.gfr-hexin,
+.sheet-rolltemplate-general .sheet-gfr-hexin.sheet-gfr-hexin,
+.rolltemplate-general .gfr-hexin.gfr-hexin,
+.rolltemplate-general .sheet-gfr-hexin.sheet-gfr-hexin{
+  clip-path:polygon(12% 0, 88% 0, 100% 50%, 88% 100%, 12% 100%, 0 50%)}
+
+/* -- undo the old filled-hex rule: it clips, whitens and pins a 64px width --- */
+.sheet-rolltemplate-general .gfr-hex.gfr-hex.gfr-hex,
+.sheet-rolltemplate-general .sheet-gfr-hex.sheet-gfr-hex.sheet-gfr-hex,
+.rolltemplate-general .gfr-hex.gfr-hex.gfr-hex,
+.rolltemplate-general .sheet-gfr-hex.sheet-gfr-hex.sheet-gfr-hex{
+  clip-path:none;min-width:0 !important;color:inherit !important}
+
+/* -- the number and the tag take the accent by INHERITANCE, which is what lets
+      one rule serve both a band and a hex (the band and .gfr-hexwrap each carry
+      the accent as an inline `color`). ---------------------------------------- */
+.sheet-rolltemplate-general .gfr-value.gfr-value.gfr-value,
+.sheet-rolltemplate-general .sheet-gfr-value.sheet-gfr-value.sheet-gfr-value,
+.rolltemplate-general .gfr-value.gfr-value.gfr-value,
+.rolltemplate-general .sheet-gfr-value.sheet-gfr-value.sheet-gfr-value{
+  color:inherit !important}
+
+.sheet-rolltemplate-general .gfr-tag.gfr-tag.gfr-tag,
+.sheet-rolltemplate-general .sheet-gfr-tag.sheet-gfr-tag.sheet-gfr-tag,
+.rolltemplate-general .gfr-tag.gfr-tag.gfr-tag,
+.rolltemplate-general .sheet-gfr-tag.sheet-gfr-tag.sheet-gfr-tag{
+  color:inherit !important;max-width:none;opacity:.78}
+
+/* -- Roll20's own inline-roll chrome. The OLD rule only reached chips inside
+      .gfr-hex; the bands' numbers are not, so violet chrome would have shown on
+      every headline number. Scoped to the card instead. ---------------------- */
+.sheet-rolltemplate-general .gfr-card .inlinerollresult,
+.sheet-rolltemplate-general .sheet-gfr-card .inlinerollresult,
+.rolltemplate-general .gfr-card .inlinerollresult,
+.rolltemplate-general .sheet-gfr-card .inlinerollresult{
+  background-color:transparent !important;border:none !important;padding:0 !important;
+  color:inherit !important;font-weight:inherit !important}
+
+/* -- head: kill the old flex bar's grey fill and teal underline -------------- */
+.sheet-rolltemplate-general .gfr-header.gfr-header.gfr-header,
+.sheet-rolltemplate-general .sheet-gfr-header.sheet-gfr-header.sheet-gfr-header,
+.rolltemplate-general .gfr-header.gfr-header.gfr-header,
+.rolltemplate-general .sheet-gfr-header.sheet-gfr-header.sheet-gfr-header{
+  background-color:transparent !important}
+
+.sheet-rolltemplate-general .gfr-name.gfr-name.gfr-name,
+.sheet-rolltemplate-general .gfr-name.gfr-name.gfr-name a,
+.sheet-rolltemplate-general .sheet-gfr-name.sheet-gfr-name.sheet-gfr-name,
+.sheet-rolltemplate-general .sheet-gfr-name.sheet-gfr-name.sheet-gfr-name a,
+.rolltemplate-general .gfr-name.gfr-name.gfr-name,
+.rolltemplate-general .gfr-name.gfr-name.gfr-name a,
+.rolltemplate-general .sheet-gfr-name.sheet-gfr-name.sheet-gfr-name,
+.rolltemplate-general .sheet-gfr-name.sheet-gfr-name.sheet-gfr-name a{
+  color:#ffb02e !important;font-size:11px;font-weight:700;text-decoration:none}
+
+.sheet-rolltemplate-general .gfr-rollname.gfr-rollname.gfr-rollname,
+.sheet-rolltemplate-general .sheet-gfr-rollname.sheet-gfr-rollname.sheet-gfr-rollname,
+.rolltemplate-general .gfr-rollname.gfr-rollname.gfr-rollname,
+.rolltemplate-general .sheet-gfr-rollname.sheet-gfr-rollname.sheet-gfr-rollname{
+  color:#ffd27a !important}
+
+/* -- result strip + meta + description: drop the old grey fills -------------- */
+.sheet-rolltemplate-general .gfr-results.gfr-results.gfr-results,
+.sheet-rolltemplate-general .sheet-gfr-results.sheet-gfr-results.sheet-gfr-results,
+.rolltemplate-general .gfr-results.gfr-results.gfr-results,
+.rolltemplate-general .sheet-gfr-results.sheet-gfr-results.sheet-gfr-results{
+  background-color:transparent !important}
+
+/* the meta row floats its value, so it needs a block formatting context or the
+   row collapses to zero height and the dashed rule lands on the wrong line. */
+.sheet-rolltemplate-general .gfr-meta.gfr-meta.gfr-meta,
+.sheet-rolltemplate-general .sheet-gfr-meta.sheet-gfr-meta.sheet-gfr-meta,
+.rolltemplate-general .gfr-meta.gfr-meta.gfr-meta,
+.rolltemplate-general .sheet-gfr-meta.sheet-gfr-meta.sheet-gfr-meta{
+  background-color:transparent !important;overflow:hidden;padding:3px 14px}
+
+.sheet-rolltemplate-general .gfr-desc.gfr-desc.gfr-desc,
+.sheet-rolltemplate-general .sheet-gfr-desc.sheet-gfr-desc.sheet-gfr-desc,
+.rolltemplate-general .gfr-desc.gfr-desc.gfr-desc,
+.rolltemplate-general .sheet-gfr-desc.sheet-gfr-desc.sheet-gfr-desc{
+  background-color:rgba(0,0,0,.2) !important;color:#cfd6e0 !important;
+  border-top:1px solid #1a2030 !important;font-size:13px}
+
+.sheet-rolltemplate-general .gfr-higher-label.gfr-higher-label.gfr-higher-label,
+.sheet-rolltemplate-general .sheet-gfr-higher-label.sheet-gfr-higher-label.sheet-gfr-higher-label,
+.rolltemplate-general .gfr-higher-label.gfr-higher-label.gfr-higher-label,
+.rolltemplate-general .sheet-gfr-higher-label.sheet-gfr-higher-label.sheet-gfr-higher-label{
+  color:#5a6678 !important;font-style:normal;font-weight:600}
+
+/* -- the command buttons. Ghost Protocol has no equivalent; these are ours, and
+      they are PROVEN styleable in chat (the GM's live card shows them red, not
+      Roll20 pink - which retires the "command buttons cannot be styled" note).
+      Restyled to a terminal pill so they sit in the same world as the card. --- */
+.sheet-rolltemplate-general .gfr-dmglinks.gfr-dmglinks a,
+.sheet-rolltemplate-general .sheet-gfr-dmglinks.sheet-gfr-dmglinks a,
+.rolltemplate-general .gfr-dmglinks.gfr-dmglinks a,
+.rolltemplate-general .sheet-gfr-dmglinks.sheet-gfr-dmglinks a{
+  display:inline-block;background:transparent !important;color:#1fe0c6 !important;
+  border:1px solid rgba(31,224,198,.45);border-radius:2px;padding:3px 11px;
+  font-family:'Share Tech Mono','Courier New',monospace;font-size:10px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;text-decoration:none;margin:0}
+.sheet-rolltemplate-general .gfr-dmglinks.gfr-dmglinks a:hover,
+.sheet-rolltemplate-general .sheet-gfr-dmglinks.sheet-gfr-dmglinks a:hover,
+.rolltemplate-general .gfr-dmglinks.gfr-dmglinks a:hover,
+.rolltemplate-general .sheet-gfr-dmglinks.sheet-gfr-dmglinks a:hover{
+  background:rgba(31,224,198,.12) !important;border-color:#1fe0c6}
+/* ===== 331: the card's top accent stripe, teal on a roll, amber on damage =====
+   ⛔ IT WAS NEVER RENDERING. The stripe has been in the rolltemplate all along
+   as an INLINE `background:linear-gradient(...)`, and Roll20's chat sanitizer
+   does not pass inline gradients - so every card has been drawing a 2px
+   transparent nothing. Recolouring the inline value (the first attempt) could
+   not have worked and did not.
+   ⛔ GHOST PROTOCOL SOLVED THIS ALREADY AND WE HAD THEIR FILE: their stripe is
+   a ::before on the card with the gradient IN THE STYLESHEET, recoloured by a
+   modifier class. Our gradient geometry is identical to theirs, which is proof
+   ours was copied from it originally and then put in the wrong place. Read the
+   reference implementation before rebuilding from memory.
+   ⛔ NOT copied: GP puts the modifier class in the class attribute via a
+   template tag. That is the shape recorded as broken on Jumpgate, and their
+   inline styles mask whether it fires. We gate two whole elements instead,
+   each carrying a STATIC class, which keeps every template tag outside every
+   HTML attribute.
+   Four families because Roll20 prefixes template classes inconsistently; the
+   class is doubled for specificity, matching every other card rule here. */
+.sheet-rolltemplate-general .gfr-stripe-roll.gfr-stripe-roll,
+.sheet-rolltemplate-general .sheet-gfr-stripe-roll.sheet-gfr-stripe-roll,
+.rolltemplate-general .gfr-stripe-roll.gfr-stripe-roll,
+.rolltemplate-general .sheet-gfr-stripe-roll.sheet-gfr-stripe-roll{background:linear-gradient(90deg,#1fe0c6 0%,rgba(31,224,198,.3) 50%,transparent 100%)}
+.sheet-rolltemplate-general .gfr-stripe-dmg.gfr-stripe-dmg,
+.sheet-rolltemplate-general .sheet-gfr-stripe-dmg.sheet-gfr-stripe-dmg,
+.rolltemplate-general .gfr-stripe-dmg.gfr-stripe-dmg,
+.rolltemplate-general .sheet-gfr-stripe-dmg.sheet-gfr-stripe-dmg{background:linear-gradient(90deg,#ffb02e 0%,rgba(255,176,46,.3) 50%,transparent 100%)}
+/* ===== 332c: kill Roll20's injected die icon on the overlay buttons =====
+   ⛔ IT IS A ::before, NOT A BACKGROUND. .gfs-act-click has carried
+   `background:transparent !important` since it was written, and that never had
+   any chance of touching this - Roll20 injects the icon as a generated
+   pseudo-element. The action-button overlays only LOOK clean because the rule
+   also sets color:transparent, which hides a text glyph; the die on a roll
+   button is not text, so it sailed straight through and drew itself behind
+   every equipment name.
+   ⛔ GHOST PROTOCOL HAD THIS EXACT RULE ALREADY (their comment calls it "a
+   small hexagon") and I found it in ten seconds by grepping their file. That
+   is twice in one session their stylesheet has answered a question faster than
+   reasoning did - read it FIRST when the platform fights back.
+   Covers both button kinds deliberately: the action overlays currently depend
+   on the colour trick alone, which is luck rather than intent. */
+.gfs-sheet button.gfs-act-click::before{content:"" !important;display:none !important}
+/* ===== 338: ease the state changes, mined from Ghost Protocol =====
+   GP attaches ~38 short transitions; we had none, so all 54 hover rules and
+   160 checked rules snapped. The properties listed are exactly the ones this
+   stylesheet actually changes on :hover / :checked, counted rather than
+   guessed: colour 46 sites, background 37, text-stroke 18, text-shadow 12,
+   opacity 10, border-colour 10, box-shadow 6, filter 5.
+   ⛔ DISPLAY IS DELIBERATELY ABSENT, and that is the whole reason this is safe:
+   display is not animatable, so every drawer, tab pane and conditional reveal
+   stays INSTANT. Only colour and glow ease. A transition list that reached
+   layout would make the sheet feel laggy exactly where it must not.
+   ⛔ .gfs-hexmark IS DELIBERATELY EXCLUDED, and hexclick_325 is why. A hex is
+   drawn as color:transparent plus a stroke, and picking one turns it teal - so
+   easing that colour leaves the hex PARTIALLY INVISIBLE for 150ms. This is the
+   element with a whole saga behind it (322-325) about hexes appearing to
+   vanish while the GM clicked quickly, and the suite written for that bug went
+   red here immediately, reading rgba(0,0,0,0) mid-fade. A 150ms fade on the
+   one control whose failure mode is "it looked like it disappeared" is not a
+   trade worth making for polish.
+   ⛔ The tabs are styled through a pseudo-element (content:attr(title)), so the
+   transition has to sit on ::after - putting it on the input itself would
+   animate nothing, because the input is not what is painted. */
+.gfs-sheet .gfs-act-name,
+.gfs-sheet .gfs-npchkname,
+.gfs-sheet .gfs-skill-name,
+.gfs-sheet .gfs-showrow,
+.gfs-sheet button.gfs-atk-roll,
+.gfs-sheet button.gfs-npcbtn,
+.gfs-sheet .gfs-hdbtn,
+.gfs-sheet input.gfs-tab::after,
+.gfs-sheet input.gfs-subtab::after{transition:color .15s,background-color .15s,border-color .15s,box-shadow .15s,text-shadow .15s,filter .15s,opacity .15s,-webkit-text-stroke-color .15s}
+/* the cog is the one control that MOVES on state (it rotates 60deg when its
+   drawer opens), so it gets transform as well - on its own rule rather than
+   in the group above, which would hand transform to ten elements that never
+   use it. */
+.gfs-sheet .gfs-expander-icon{transition:color .15s,filter .15s,transform .2s}
+/* ===== 339: the :has() probe - equipped rows carry a teal edge =====
+   Ghost Protocol uses :has() 37 times; we have never used it once. It is the
+   one capability we lack that is STRUCTURAL rather than cosmetic: it lets a
+   parent react to a checked DESCENDANT, which is the exact constraint this
+   sheet is built around. Our reveal flags must be DIRECT SIBLINGS of whatever
+   they affect (a descendant step after ~ is a forbidden shape here), and that
+   has cost real markup - 312 deleted the Bio-Scan sweep and HUD wrappers for
+   no reason other than this.
+   ⛔ THIS RULE STANDS ALONE, AND THAT IS THE ENTIRE SAFETY ARGUMENT. An invalid
+   selector invalidates its whole comma-separated group, so a parser that does
+   not know :has() must be able to drop THIS RULE AND NOTHING ELSE. Never add a
+   second selector to this rule, and never fold it into a group.
+   ⛔ Evidence it will not poison the stylesheet: GP ships 37 of these and their
+   CSS is both accepted AND reaches chat (their crit colour proves the latter).
+   ⛔ Deliberately NOT an attribute selector on the Roll20 name: our own class
+   plus a plain descendant keeps this to ONE unknown - whether :has() survives -
+   rather than two.
+   The effect is inset, so nothing reflows whether it applies or not: if :has()
+   is dropped the row looks exactly as it does today, and we learn that from a
+   single glance at the Equipment tab. */
+.gfs-sheet .gfs-eq-row:has(.gfs-hex-toggle input:checked){box-shadow:inset 2px 0 0 #1fe0c6}
+/* ===== 343: the possession banner on the Actions tab =====
+   Possession is otherwise an invisible mode: every attack silently loses its
+   class modifiers, which is the same failure shape the sneak-attack hex was
+   built to avoid. The flag input is a MIRROR of the daemon tab's toggle -
+   Roll20 syncs inputs that share an attribute name - and exists only so the
+   banner has a sibling to react to. */
+/* 364 (GM: "if we can cover the base ability scores during possession"). While
+   a Haneul is possessing their birth-daemon, Int/Wis/Cha are raised to the
+   daemon's - and the FLOOR LANDS ON THE MOD, so without this the score box
+   would keep showing the character's own number while every roll used a higher
+   one. This covers it.
+   ⛔ COVER, NOT HIDE - and that is a safety property, not a stylistic one. The
+   overlay is a span sharing the score box's grid cell (same grid-column and
+   grid-row), so it simply paints on top: three rules that only ever REVEAL,
+   with no :checked hide anywhere. Hiding the input instead would have been the
+   exact construct that poisoned chat on July 25 (see the note by the point-buy
+   rules). The geometry is copied from .gfs-ab-score at line 1318 so the cover
+   lands square on the box.
+   ⛔ THE BACKGROUND MUST BE OPAQUE. .gfs-ab-score is transparent so the helix
+   art shows through it; two numbers in one grid cell with a see-through cover
+   would render superimposed and unreadable. It costs a 96px slice of the helix
+   while possession is on, which is the point - the state should be obvious.
+   Amber matches the possession banner below. */
+.gfs-sheet .gfs-ability input.gfs-possovf{display:none}
+.gfs-sheet .gfs-ability span.gfs-ab-poss{display:none}
+.gfs-sheet .gfs-ability input.gfs-possovf:checked ~ span.gfs-ab-poss{display:flex;align-items:center;justify-content:center;grid-column:1 / -1;grid-row:score;width:96px;height:100%;margin:0;justify-self:center;transform:translateX(var(--gfs-shift));background:#0f1317;font-size:20px;font-weight:800;text-align:center;color:#ffb02e;text-shadow:0 0 2px #0f1317,0 0 3px #0f1317,0 0 7px currentColor}
+.gfs-sheet input.gfs-possflag{display:none}
+.gfs-sheet .gfs-possbar{display:none}
+.gfs-sheet input.gfs-possflag:checked ~ .gfs-possbar{display:block;margin:0 0 4px;padding:3px 8px;background:rgba(255,176,46,.12);border:1px solid rgba(255,176,46,.45);border-radius:2px;font-family:'Share Tech Mono','Courier New',monospace;font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#ffb02e}
+/* 350: the transhuman budget field. .gfs-small is 76px, which clipped a
+   six-digit figure to "40C" on the GM's screen - a number input also reserves
+   room for its spinner, so the visible text box is narrower than the element.
+   Sized to the widest realistic value (a seven-figure conversion) rather than
+   to 400000 exactly, per the standing rule that a box must never clip. */
+/* ⛔ !important, like .gfs-tiny beside it. Roll20 base CSS sets widths on
+   sheet inputs and beats a plain declaration - that is WHY .gfs-tiny carries
+   "width:44px !important" and always has. My first pass omitted it and the
+   field kept clipping on the live sheet while measuring a perfect 104px in a
+   harness that has no base stylesheet. The harness cannot see this fight; the
+   precedent beside it can. */
+.gfs-sheet input.gfs-budget{width:104px !important}
+/* 395: the contingency dice list - the budget shape (fixed px + !important,
+   because Roll20 base CSS beats a plain width on sheet inputs). 82px = the
+   96px resources card minus its padding and border; left-aligned, a hair
+   smaller, so five recorded d20s fit. */
+.gfs-sheet input.gfs-contdice{width:82px !important;text-align:left;font-size:9.5px}
+/* 351: the budget field was still clipping, and 104px was never the problem.
+   ⛔ .gfs-pb-fields is a THREE-COLUMN GRID whose tracks are minmax(0,1fr) -
+   they may shrink to ZERO - and .gfs-inline inside it is a flex container, so
+   the input was being compressed far below its set width no matter what that
+   width said. A probe that renders the input outside that grid measures 104px
+   and reports no clipping, which is exactly what mine did: the stub was too
+   tidy to reproduce the bug.
+   Two parts, both needed: the row spans the full grid so there is room for a
+   six-figure number, and the input refuses to shrink inside its flex line. */
+.gfs-sheet .gfs-pb-fields .gfs-budgetrow{grid-column:1 / -1}
+.gfs-sheet input.gfs-budget{flex:0 0 auto}
+/* 363 (GM screenshot): standard point buy was showing Blood Doll, Vampire and
+   Budget - all three are transhuman-only. They were added to .gfs-pb-fields in
+   347/348 with no mode gate at all.
+   ⛔⛔ THIS IS THE JULY 25 CRIME SCENE. The third magenta event was exactly two
+   rules added to THIS panel - a pbuy-mode flag hide plus a :checked hide on the
+   Apply row - and it was never isolated. Every static gate passed and chat
+   still rejected the stylesheet. Full record in PROJECT-WISDOM, "THE THIRD
+   MAGENTA EVENT"; the dead class name is deliberately NOT repeated here, so
+   the suite can keep asserting that family is absent from this file.
+   So the shape below is not chosen for elegance: it is copied from the
+   gfs-spasnmode pair at lines 1944/1946, which sits in the same panel, does the
+   same job, and is LIVE VERIFIED today.
+   ⛔ No braces are written inside this comment on purpose - the rule-count gate
+   counts brace characters, so quoting a rule here would inflate it and hide a
+   real rule being added. Prose only.
+   The one visible difference from the broken pair is direction: this REVEALS on
+   :checked, where July 25's second rule HID on :checked. That may or may not be
+   what mattered - nobody knows - but when the failure is unisolated, copying the
+   surviving shape beats inventing a new one.
+   ⛔ THE POSTED CARD IS THE ONLY GATE THAT COUNTS, on the FIRST upload after
+   this delta. Revert = delete these three rules (955 rules / 192,026 B). */
+.gfs-sheet .gfs-pb-fields input.gfs-spthmode{display:none}
+.gfs-sheet .gfs-pb-fields label.gfs-throw{display:none}
+.gfs-sheet .gfs-pb-fields input.gfs-spthmode:checked ~ label.gfs-throw{display:flex}
