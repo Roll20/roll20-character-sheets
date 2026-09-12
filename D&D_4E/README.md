@@ -52,6 +52,18 @@ stealth
 streetwise
 thievery
 
+Powers:
+
+Each power card has up and down buttons that move that power between slots. The
+slots themselves stay numbered 1-100; the contents move between them.
+
+Note what this means for token actions and macros kept outside the sheet. A
+reference like @{power-3-macro} or %{CharacterName|-power-3} names the *slot*,
+not the power sitting in it. After a reorder it still works, but it now rolls
+whichever power moved into slot 3 - so a token action labelled for one power can
+end up rolling another. If you keep token actions for your powers, re-check them
+after rearranging.
+
 Updates:
 
 2014-04-23 14:27 :
