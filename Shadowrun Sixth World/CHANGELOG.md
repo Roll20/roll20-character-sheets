@@ -1,5 +1,183 @@
 Change Log
 ==============================================
+**2026-08-04** v.93 Caith (Rob Fouts)
+	Modifiers and Effects
+	Added separate manual Mod and Effects Mod values for attributes, skills, Social Rating and condition monitors.
+	Added skill modifiers to the Effects modification system and ensured Effects change only Effects Mod values rather than manually entered modifiers.
+	Added support for using a repeating item's rating in its Modifications field with values such as "body_modifier: rating_num".
+	Added the +4 augmented modifier cap to attributes and skills. Situational roll modifiers remain exempt.
+	Added an Ignore Mod Cap option for campaigns that do not use the +4 limit.
+	Added ai_matrix_track_modifier and matrix_modifier to the Effects modification whitelist.
+	Added pain_tolerance_effect as a supported Effect modifier for High and Low Pain Tolerance behavior without enabling unrestricted modifiers, kept separate from the manual Pain Tolerance selection.
+	Added a Rebuild Effects control that reconstructs stored modifier totals from active modification rows and reruns derived-value synchronization.
+	Updated the Genesis importer to clear successfully imported JSON and remove any stored importer text when the sheet opens, while preserving failed input for correction.
+	Effects now default to disabled and display their calculated modifications on the sheet.
+	Added a Statuses tab with repeating status presets, activation controls and automatic status-specific modifications.
+	Added automatic initiative modifiers for Dazed, Hobbled and Nauseated, along with status-specific roll and movement effects.
+	Active statuses are identified in affected roll results, including Hobbled movement and post-roll Sprint calculations.
+	Added power-style activation controls to Gear, Augmentations, Adept Powers, Metamagics, Qualities, Devices, Programs, Complex Forms and Echoes.
+	Power-controlled modifications now apply only while their row is enabled. Augmentation Essence costs remain active when an augmentation's modifications are disabled.
+	Added a data migration that preserves the enabled state of existing rows whose modifications were already applied.
+
+	Skills and Situational Modifiers
+	Added separate Mod and Effects Mod columns to skills.
+	Added the Skill Roll Modifiers tab for an open-ended list of situational modifiers assigned to specific skills.
+	Skill rolls can select all applicable situational modifiers before rolling.
+	Situational modifier dialogs open only when the Modifiers option is enabled and matching modifiers exist.
+	Action rolls retain their trained, specialization and expertise choices even when situational modifiers are disabled.
+	Added a Knowledge Skills list button and display-to-chat buttons for individual Knowledge and Language skills.
+	Untrained skill rolls now use the linked attribute minus 1.
+	Added skill-specific Specialization and Expertise selections with standard choices, custom entries and automatic conversion of legacy values.
+	Added an Allow Additional Skill Training option that exposes one additional Specialization and Expertise per Skill after the primary entry is filled. Secondary choices are filtered to the linked skill, support direct rolls and training matching without stacking, and imports preserve all source training for a possible future open-ended Training tab.
+	Added the optional High Strength Reduces Recoil house rule, reducing firing-mode Attack Rating penalties by 1 at Strength 7+ or by 2 at Strength 10+.
+	Weapon Training Type selections now derive from the linked skill's Specializations and Expertise, automatically applying +2 or +3 when the selected training is learned.
+
+	Rolls, Actions and Edge
+	Added an Actions tab with Major and Minor Action sections, action-economy descriptions and Initiative (I) or Anytime (A) indicators.
+	Added action buttons with descriptions, linked skills and attributes, skill notes, specialization or expertise choices and applicable situational modifiers.
+	Added support for actions that offer a choice of skill or attribute, including Trip using Close Combat or Exotic Weapons and Agility or Strength.
+	Updated Sprint action output to report "Sprint: [15 + hits] Meters".
+	Added dynamic Major Actions and Minor Actions displays to the Attributes tab based on the initiative dice used by the latest initiative roll.
+	Action economy updates for physical, astral, Matrix AR, Cold Sim and Hot Sim initiative rolls.
+	Added an Edge tab containing Edge Boosts and Edge Actions grouped by Edge cost.
+	Added descriptive mouseover text to Actions, Matrix Actions and Edge buttons.
+	Expanded Matrix Actions with complete descriptions, situational skill modifiers and extended-test handling for Matrix Perception, Matrix Search and Probe.
+	Added structured descriptive tooltips to Actions, Matrix Actions, Edge options, attributes and skills.
+	Added Display Description controls to direct skill, Action and Matrix Action roll results.
+	Edge reroll and conversion functions now prompt for their Edge cost and decrement the character's current Edge points rather than the Edge attribute maximum.
+	Reroll misses costs 1 Edge per die, to a maximum of 4; converting rolled 4s costs 2 Edge each; rerolling hits costs 1 Edge per hit with no maximum.
+	Updated internal chat action, reroll and extended-test links to target the immutable Roll20 Character ID, allowing character names containing special characters without changing the name displayed in chat.
+	Added the immutable Roll20 Character ID to Personal Data and roll results for identifying the character that owns a roll.
+
+	Combat and Weapons
+	Weapon attacks now open applicable situational skill modifier dialogs from Core Combat and individual Arms weapon buttons.
+	Added a Use Str option to melee weapons, allowing them to roll with Strength instead of Agility.
+	Improved ranged weapon fire-mode initialization so Single Shot remains available when supported.
+	Ranged attacks now decrement current ammunition without changing maximum ammunition.
+	Single Shot uses 1 round, Semi-Auto 2, Burst Fire and Burst Fire Wide 4, and Full Auto 10.
+	Added Not Enough Rounds handling for Burst Fire, including the reduced Damage Value and adjusted Attack Rating for partial bursts and Single Shot behavior when only one round remains.
+	Added primary weapon selectors for ranged and melee weapons on Core Combat.
+	Added per-weapon installed modifications for dice pool, Damage Value and Attack Rating, including range-specific Attack Rating modifiers.
+
+	Gear, Weapon Mods and Armor Mods
+	Reorganized the Gear pane into Gear, Weapon Mods and Armor Mods child tabs.
+	Combined ranged and melee weapon modifications into one Weapon Mods list that can install a mod on any ranged or melee weapon.
+	Weapon and armor mod lists display all mods, their installed item and Install or Uninstall controls.
+	Added Modifications text fields to weapon and armor mods.
+	Armor mods can be installed on a specific armor item and can modify DR, Chemical, Cold, Electric, Fire and Social ratings while consuming capacity.
+	Modified armor ratings display both their base and adjusted values, such as "6 (7)".
+	Added a Carried option to Gear and a Carried column in the Gear list.
+	Removed the obsolete Has Mods option from ranged weapons.
+	Added direct Mods buttons to the Arms Ranged, Melee and Armor sections.
+	Added device-specific Program installation, separate Installed and Running states, and per-device running-slot accounting.
+	Added support for added and dedicated program slots, Virtual Machine, RCC program and autosoft capacity, living personas, AI program exceptions and GM-approved slot overages.
+
+	AI Characters and Matrix
+	Added AI as a Character Type.
+	Added distinct Firewall, Sleaze, Data Processing and Attack attributes for AI characters, with separate manual and Effects modifiers.
+	Switching to AI copies Body, Agility, Reaction and Strength into the corresponding AI attributes, clears the living attributes and excludes their Effects modifiers from the conversion.
+	Switching away from AI copies the AI attributes back and clears the AI attributes.
+	AI Attack Rating is Attack + Sleaze and AI Defense Rating is Data Processing + Firewall.
+	AI personas derive their Matrix ratings from the corresponding AI attributes when no device is marked as contributing to the Persona.
+	Technomancer personas derive their Matrix ratings from their living persona rules when no device is marked as contributing to the Persona.
+	Devices can be marked as contributing to Persona Matrix attributes; the highest contributed Attack, Sleaze, Data Processing and Firewall ratings are used, and selecting a Primary Device enables contribution by default.
+	AI characters use Hot Sim initiative and hide physical, Matrix AR and Cold Sim initiative displays.
+
+	Augmentation Grades
+	Added a permanent Bad Luck control and Omega-grade Bad Luck handling for tests actually affected by an Omega-grade augmentation.
+	Added Exoware Social Rating penalties and Physical Condition Monitor boxes.
+	Added Cyberadept Gammaware Essence handling and configurable Gammaware side effects with functional Modifications fields.
+	Gammaware side-effect controls display only on Gammaware augmentations.
+	Added a per-augmentation Adapsin Therapy option that reduces eligible cyberware Essence costs by ten percent after grade and other adjustments, rounded down.
+
+	Condition Monitors and Healing
+	Added the AI Matrix Condition Monitor, calculated as 8 + half Firewall rounded up.
+	AI characters hide and reset the Physical and Stun monitors; switching away from AI resets the AI Matrix Track.
+	The AI Matrix Track has no damage-overflow limit.
+	Added AI Natural Healing using Willpower x 2, with each hit removing one point of Matrix damage after an hour of rest.
+	All Natural Healing rolls now remove one point of damage per hit rolled.
+	Added Improved Restoration and Cascading Failure AI qualities to the Matrix Track settings.
+	Improved Restoration heals one additional box when a healing interval rolls at least one hit.
+	Cascading Failure increases an injured AI's wound penalty by 1 and causes the first wound to apply a penalty.
+	AI characters ignore hidden High Pain Tolerance and Low Pain Tolerance settings.
+	Corrected the three-box-per-row condition monitor layout and wound-penalty label positioning.
+
+	Display Buttons and Help
+	Added display-to-chat buttons to Adept Powers, Conjuring, Metamagics, Complex Forms, Submersion, Devices, Programs, Knowledge Skills, Effects and SINs.
+	Effects chat output includes Name, Duration, Source and Notes but omits the Modifications field.
+	SIN chat output includes Fake ID, Rating, Related Lifestyles, Licenses and Notes.
+	Added a Help pane with Effects, Situational Modifiers and Gear help tabs.
+	Documented supported Effects modifiers, situational skill modifiers, Gear modifications, Weapon Mods and Armor Mods.
+
+	Attributes, Vehicles and Layout
+	Added Edge to vehicle and drone sheets.
+	Magic or Resonance is shown only for applicable character types and uses the correct displayed label.
+	Expanded the Attributes pane to accommodate the added modifier columns.
+	The "Base + Mod + Effects Mod = Total" heading now aligns with the value columns and hides with the modifier boxes.
+	Standardized the Arms, Rolls, Gear and Help tab navigation.
+	Updated sheet image references to use the Shadowrun Sixth World repository image paths.
+
+	Weapons, Ammunition and Explosives
+	Replaced the single primary ranged and melee weapon displays on Core Combat with multi-weapon lists controlled by a Show on Core toggle on each weapon.
+	Core Combat weapon buttons now roll their corresponding repeating-row weapon directly, without requiring a primary weapon.
+	Weapon modifications now apply to the weapon on which they are installed whether or not that weapon is displayed on Core Combat.
+	Added editable current ammunition, maximum-ammunition limits and a Reload control to each displayed ranged weapon.
+	Added an Ammo inventory tab with standard or custom ammunition categories, load types, caseless ammunition and quantities.
+	Reloading now draws matching ammunition from inventory by category, load type and caseless state, and returns remaining loaded ammunition when changing load types.
+	Expanded firing-mode names and reorganized Core Combat and Arms weapon fields for clearer Pool, Mod, Damage, Attack Rating, Mode and Ammo displays.
+	Removed attack buttons from the Arms weapon lists so weapon attacks are initiated consistently from Core Combat.
+	Replaced the Grenades section with Explosives supporting grenades, launchers and other explosive weapons with their appropriate skills and attributes.
+	Explosives with no selected skill display their details to chat without making a roll.
+	Melee weapons can now select any attribute for their attack roll and default to Agility.
+
+	Martial Arts
+	Added a comprehensive Martial Arts technique dropdown covering Firing Squad, Body Shop and Deadly Arts, with a Custom option.
+	Existing free-text technique entries are preserved as Custom selections during conversion.
+	Selecting a standard technique automatically fills Notes with its book and page reference and verbatim rules description.
+	Existing generated technique summaries are upgraded to the verbatim text while manually written Notes remain unchanged.
+
+	Spirit, Sprite and Grunt NPCs
+	Modernized Spirit skills with editable ratings, manual modifiers and Effects modifiers.
+	Spirit type and Force populate the appropriate inherent and optional powers; optional powers require selection and reset when Force changes.
+	Added complete power and action descriptions, tooltips and Display Description controls to Spirit, Sprite and Grunt NPC sheets.
+	Added spirit-specific weapon notes, Astral Combat attacks and source-book references.
+	Standardized Spirit, Sprite and Grunt skill, power, action and weapon layouts for readable multi-column displays.
+	Added functional initiative and power controls to Host IC and expanded the Host IC GM Helper.
+	Weapon attack results now include a centered Roll Defense button that rolls for the selected target token and offers applicable defense modifiers.
+
+	Vehicle and Drone NPCs
+	Rebuilt the vehicle statistic block with Base, Mod, Effects Mod and calculated Value columns.
+	Added full Edge and current Edge tracking, rollable Body, Pilot, Sensor and custom PC-style attributes.
+	Added calculated autonomous initiative based on Pilot, with separate value and dice modifiers and action-economy displays.
+	Reorganized Defense Rating, Piloted Defense Rating, Defense Roll, Soak, Matrix Defense Rating and Matrix Soak with calculated values and modifiers.
+	Added editable Physical and Matrix Condition Monitor modifiers across NPC sheets.
+	Added repeating Modifications, Programs and Skills columns with ratings, notes, expandable details and functional Modifications fields.
+	Added vehicle and drone Actions with rules descriptions and tests, while retaining hideable legacy Modifications and Programs fields for compatibility.
+	Standardized Spirit and Vehicle weapon layouts and revealed their dice-pool modifier controls.
+
+	Rules and Roll Workflow
+	Expanded the PC Actions, Matrix Actions and Edge tabs with options from the available rulebooks and descriptive tooltips.
+	Matrix extended tests preserve their resistance test through every interval, and the unnecessary roll-reason prompt was removed.
+	Updated the Attributes Movement display with separate Move and Sprint buttons and their calculated values.
+	Situational modifiers can now trigger from either a linked Skill or Attribute and can optionally add or remove current Edge when the submitted roll occurs.
+	Added a Spend Edge control to every Edge-option result, defaulting fixed costs to the listed value and variable costs to zero while deducting only from current Edge.
+	Added canonical pre-application description previews to PC and NPC Status selectors.
+	Deployed repeating Status rows, activation controls and automatic status modifications across the NPC sheets.
+	Added firing-mode restrictions to Weapon Mods and an option to disable automatic ammunition tracking.
+
+	Performance and Layout
+	Canonicalized the shared Actions, Matrix Actions, Edge options and Status definitions so buttons, tooltips and rolls draw from one rules-data source.
+	Scoped Program, weapon and vehicle synchronization to affected owners or rows while retaining authoritative full passes for structural changes.
+	Isolated roll-processing state so overlapping rolls cannot leak weapon, action, Status or augmentation context into one another.
+	Restored the compact sheet widths across PC and NPC layouts and consolidated safe legacy CSS conflicts affecting dark mode, Sprites, vehicle Autosofts and repeating controls.
+
+	Bug Fix
+	Fixed asynchronous Essence calculations by calculating all augmentation and Matrix-device Essence costs in one guarded update.
+	Fixed overlapping Modifications changes losing updates by serializing modifier events and applying each event in one batched write.
+	Corrected malformed Roll20 attribute references in field tooltips.
+	Corrected the GM Helper settings selector so repeating-row settings display properly.
+	Completed translation-key coverage across the source catalog and all locale files.
+	Reduced worker console noise by gating development diagnostics behind a disabled debug logger while retaining actionable warnings and errors.
 **2025-11-13 ** v.92 Chuz (James Culp)
 	Added Patterncraft to skills
 **2025-07-15 ** v.91 Chuz (James Culp)
@@ -466,5 +644,3 @@ Change Log
 	Fixed update_wounds to handle High/Low Pain Tolerance correctly (this will probably need to be updated at some point)
 	
 	
-
-
