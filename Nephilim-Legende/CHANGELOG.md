@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Version 3.0
+
+- Bugfixes
+- Déplacement Grand Secret dans son propre onglet
+- Ajout Dracomachie
+
 ## Version 2.2
 
 - Réécriture du code de la fiche
