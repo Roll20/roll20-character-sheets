@@ -4449,11 +4449,22 @@ on(
       const levels = [v.level, v.level_2, v.level_3];
       // clog(`classNames: ${classNames} levels: ${levels}`);
       const index = classLinked - 1; // match index position
-      const currentClassName = (classNames[index] || '').trim();
+      const currentClassName = (classNames[index] || '').trim().toLowerCase();
       const currentLevel = +levels[index] || 0;
       const classSelected = await matchClassName(currentClassName);
       levelSelected = currentLevel;
-      output.thief_level = classSelected === 4 ? levelSelected : 0; // 4 = thief matchClassName()
+      // 4 = thief
+      if (classSelected === 4) {
+        if (currentClassName === 'assassin') {
+          // thief skills @ 2 lvl below their assassin lvl
+          levelSelected = Math.max(levelSelected - 2, 0);
+          output.thief_level = levelSelected;
+        } else {
+          output.thief_level = levelSelected;
+        }
+      } else {
+        output.thief_level = 0;
+      }
     }
 
     // Clamp level between 0 and 17 for the table lookup
