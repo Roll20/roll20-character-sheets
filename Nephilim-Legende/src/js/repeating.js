@@ -29,19 +29,19 @@ on("change:repeating_mag-sort:mag-sort-ka change:repeating_mag-sort:mag-sort-deg
 
                 var metamorphose = 0;
 
-                if(ka_element == "kaair")
+                if (ka_element == "kaair")
                     metamorphose = KADA;
 
-                if(ka_element == "kafeu")
+                if (ka_element == "kafeu")
                     metamorphose = KADF;
 
-                if(ka_element == "kaeau")
+                if (ka_element == "kaeau")
                     metamorphose = KADE;
 
-                if(ka_element == "katerre")
+                if (ka_element == "katerre")
                     metamorphose = KADT;
 
-                if(ka_element == "kalune")
+                if (ka_element == "kalune")
                     metamorphose = KADL;
 
                 var total = (ka_element_value + mag_voie_value + metamorphose - malusMag) - degre;
@@ -59,7 +59,6 @@ on("change:repeating_kabb-invoc:kabb-invoc-ka change:repeating_kabb-invoc:kabb-i
 {
     getSectionIDs("repeating_kabb-invoc", function(idarray)
     {
-        console.log("Metamorphose");
         _.each(idarray,function(id)
         {
             getAttrs([
@@ -101,7 +100,6 @@ on("change:repeating_kabb-invoc:kabb-invoc-ka change:repeating_kabb-invoc:kabb-i
                 if(ka_element == "kalune")
                     metamorphose = KADL;
 
-                console.log("Metamorphose : "+metamorphose);
 
                 var total = (ka_element_value + kabb_sephira_value + ordonnance + metamorphose - malusMag);
 
@@ -220,7 +218,6 @@ on("sheet:opened change:repeating_savoir-eso", function()
                 else
                     result = savoir;
 
-                console.log(result);
 
                 setAttrs({
                     ["repeating_savoir-eso_"+id+"_savoir_eso_perso"]: result
@@ -248,7 +245,6 @@ on("sheet:opened change:repeating_quetes-eso", function()
                 else
                     result = quete;
 
-                console.log(result);
 
                 setAttrs({
                     ["repeating_quetes-eso_"+id+"_quete_eso_perso"]: result
@@ -281,7 +277,6 @@ on("sheet:opened change:repeating_metamorphose remove:repeating_metamorphose", f
                 dMeta: length
             });
 
-            console.log("Meta : "+meta);
         });
     });
 });
@@ -320,19 +315,15 @@ on("change:repeating_maillon remove:repeating_maillon sheet:opened", function()
 
 on("change:repeating_epoques-incarnation:use_mnemos1 change:repeating_epoques-incarnation:use_mnemos2 sheet:opened", function(data)
 {
-    console.log("Dés-activer le Mnemos")
     getSectionIDs("repeating_epoques-incarnation", function(idarray) {
         _.each(idarray, function(id) {
             getAttrs(["repeating_epoques-incarnation_"+id+"_use_mnemos1", "repeating_epoques-incarnation_"+id+"_use_mnemos2"], function(values) {
-                console.log("Je suis dans la boucle !");
                 let useMnemos1 = values["repeating_epoques-incarnation_"+id+"_use_mnemos1"] == 'on';
                 let useMnemos2 = values["repeating_epoques-incarnation_"+id+"_use_mnemos2"] == 'on'
-                console.log("Mémos 1 " + useMnemos1 + "; Mnémos 2 " + useMnemos2);
 
                 let effectiveMnemos = "";
                 effectiveMnemos += useMnemos1 ? "@{degres_mnemos1}+" : "0+";
                 effectiveMnemos += useMnemos2 ? "@{degres_mnemos2}" : "0";
-                console.log("Effective mnemos: " + effectiveMnemos);
 
                 let effectiveRoll = "@{gm} &{template:base} {{name=@{character_name}}} {{vecu=@{vecu}}} {{jet=[[1d100]]}} @{approche}"
                 if (useMnemos1) {
@@ -341,7 +332,6 @@ on("change:repeating_epoques-incarnation:use_mnemos1 change:repeating_epoques-in
                 if (useMnemos2) {
                     effectiveRoll += " {{mnemos2=@{mnemos2}}}";
                 }
-                console.log("Effective roll: " + effectiveRoll);
 
                 setAttrs({
                     ["repeating_epoques-incarnation_"+id+"_effectiveMnemos"]: effectiveMnemos,
@@ -351,3 +341,79 @@ on("change:repeating_epoques-incarnation:use_mnemos1 change:repeating_epoques-in
         });
     });
 });
+
+on("change:repeating_habitus:syntaxe change:repeating_habitus:portee change:repeating_habitus:duree change:repeating_habitus:appris change:repeating_habitus:tatoue change:repeating_habitus:focus change:mag-secret-degre sheet:opened", data => {
+    getSectionIDs("repeating_habitus", idarray => {
+        _.each(idarray, id => {
+            let syntaxAttr = 'repeating_habitus_' + id + '_syntaxe'
+            let porteeAttr = 'repeating_habitus_' + id + '_portee'
+            let dureeAttr = 'repeating_habitus_' + id + '_duree'
+            let maillonsAttr = 'repeating_habitus_' + id + '_maillons'
+            let elemAttr = 'repeating_habitus_' + id + '_elem'
+            let diffAttr = 'repeating_habitus_' + id + '_difficulte'
+            let degreAttr = 'repeating_habitus_' + id + '_degre'
+            let apprisAttr = 'repeating_habitus_' + id + '_appris'
+            let tatoueAttr = 'repeating_habitus_' + id + '_tatoue'
+            let focusAttr = 'repeating_habitus_' + id + '_focus'
+
+            getAttrs([syntaxAttr, porteeAttr, dureeAttr, elemAttr, apprisAttr, tatoueAttr, focusAttr, 'KADAir', 'KADEau', 'KADFeu', 'KADLune', 'KADTerre', 'mag-secret-degre', 'malusMag', 'kaair', 'kaeau', 'kafeu', 'kalune', 'katerre'], values => {
+                let maillons = values[syntaxAttr].split('+').length
+                let portee = parseInt(values[porteeAttr])||0
+                let duree = parseInt(values[dureeAttr])||0
+                let degre = portee + duree + maillons - 1
+
+                let kaElem = values[elemAttr]
+                let grandSecret = parseInt(values['mag-secret-degre'])||0
+                let kaElemValue = parseInt(values[kaElem])||0
+                let malusMag = parseInt(values['malusMag'])||0
+
+                let KADA = parseInt(values['KADAir'])||0
+                let KADE = parseInt(values['KADEau'])||0
+                let KADF = parseInt(values['KADFeu'])||0
+                let KADL = parseInt(values['KADLune'])||0
+                let KADT = parseInt(values['KADTerre'])||0
+
+                let isHabitus = parseInt(values[apprisAttr])||
+                    parseInt(values[tatoueAttr])||
+                    parseInt(values[focusAttr])||
+                    0
+
+                let metamorphose = 0
+                if (kaElem == 'kaair') metamorphose = KADA
+                if (kaElem == 'kaeau') metamorphose = KADE
+                if (kaElem == 'kafeu') metamorphose = KADF
+                if (kaElem == 'kalune') metamorphose = KADL
+                if (kaElem == 'katerre') metamorphose = KADT
+
+                // Bonus de 1 parce que c’est un Habitus
+                let diff = kaElemValue + grandSecret + isHabitus + metamorphose - malusMag - degre
+                setAttrs({
+                    [maillonsAttr]: maillons,
+                    [degreAttr]: degre,
+                    [diffAttr]: diff
+                })
+            })
+        })
+    })
+})
+
+// Update rebellion gauge value
+on('change:repeating_dracoart:degre remove:repeating_dracoart sheet:opened', data => {
+    getSectionIDs('repeating_dracoart', idarray => {
+
+        const attrArray = idarray.map(id => `repeating_dracoart_${id}_degre`)
+
+        getAttrs(attrArray, values => {
+            let gauge = 0
+
+            idarray.forEach(id => {
+                const degre = parseInt(values[`repeating_dracoart_${id}_degre`])||0
+                gauge += degre
+            });
+
+            setAttrs({
+                perteControle: gauge
+            })
+        })
+    })
+})
