@@ -907,6 +907,19 @@ on('clicked:import', () => {
     const attrAus = {};
     O.ATTR.forEach((a) => { attrAus[a] = a; attrAus[O.IMP.attrEn[a]] = a; });
     (S.powers || []).forEach((pw) => {
+      // Aufstieg: mächtige Kräfte, Major und Grand Magica (und neu gelernte Kräfte mit Probe) bringen Probe und Text selbst mit
+      if (pw.t === 'g' || pw.t === 'x' || (pw.auf && pw.p)) {
+        const KAT = psion ? { s: 'klein', m: 'mittel', g: 'maechtig' } : { s: 'trick', m: 'minor', g: 'major', x: 'grand' };
+        const probe = String(pw.p || '');
+        const m = /^([A-Z]{2,3})(?:\s*\+\s*([^,]+))?/.exec(probe);
+        const p = `repeating_kraefte_${generateRowID()}_`;
+        out[p + 'name'] = pw.n;
+        out[p + 'kat'] = KAT[pw.t] || KAT.s;
+        out[p + 'attr'] = (m && attrAus[m[1]]) || (psion ? 'WK' : 'IN');
+        out[p + 'fert'] = (m && m[2] && O.IMP.fert[m[2].trim()]) || (psion ? O.B.fk.Telepathie : O.B.fk.Thaumaturgie);
+        out[p + 'notiz'] = [probe, pw.x || ''].filter(Boolean).join('\n');
+        return;
+      }
       const liste = psion ? (pw.t === 'm' ? O.B.powers.psi_mittel : O.B.powers.psi_klein) : (pw.t === 'm' ? O.B.powers.z_minor : O.B.powers.z_trick);
       const d = (liste || []).find((x) => x[0] === pw.n || x[2] === pw.n);
       const englisch = !!d && d[0] !== pw.n;
