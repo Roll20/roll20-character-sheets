@@ -1,7 +1,7 @@
 /* utilities_general start */
 // wird verwendet um aus dem Attributsnamen einer repeating section die Row-ID zu ermitteln
 function extractRowId(attributeId) {
-		return attributeId.match("repeating_[a-zA-Z]*_([-a-zA-Z0-9]*)_.*")[1];
+		return attributeId.match("repeating_[a-zA-Z0-9]*_([-a-zA-Z0-9]*)_.*")[1];
 }
 
 /*
