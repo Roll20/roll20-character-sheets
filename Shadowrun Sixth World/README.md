@@ -1,4 +1,6 @@
-# Shadowrun Sixth World
+# Shadowrun Sixth World — Community Character Sheet
+
+Community-maintained sheet · Maintained by Caith (Rob Fouts)
 
 ## Roll20 Character Sheet Guide
 

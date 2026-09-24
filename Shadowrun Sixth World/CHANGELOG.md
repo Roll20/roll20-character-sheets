@@ -133,8 +133,8 @@ Change Log
 	Martial Arts
 	Added a comprehensive Martial Arts technique dropdown covering Firing Squad, Body Shop and Deadly Arts, with a Custom option.
 	Existing free-text technique entries are preserved as Custom selections during conversion.
-	Selecting a standard technique automatically fills Notes with its book and page reference and verbatim rules description.
-	Existing generated technique summaries are upgraded to the verbatim text while manually written Notes remain unchanged.
+	Selecting a standard technique automatically fills Notes with its book and page reference and an original rules summary.
+	Existing generated technique notes follow the sheet's existing migration behavior; this prose update adds no new saved-note migration.
 
 	Spirit, Sprite and Grunt NPCs
 	Modernized Spirit skills with editable ratings, manual modifiers and Effects modifiers.
