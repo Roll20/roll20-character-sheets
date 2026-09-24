@@ -3414,7 +3414,7 @@ const calcHP = async () => {
   const output = {};
   const isMonster = int(v.toggle_npc);
   let syncHpFlag = int(v.sync_hp_flag);
-  // if monster do not sync, otherwise follow user setting
+  // if monster do not sync, otherwise follow user settings
   syncHpFlag = isMonster ? 0 : syncHpFlag;
   const hitPointsMax = int(v.hitpoints_max);
   const hitpoints_1_class = Math.max(0, int(v.hitpoints_1_class));
@@ -3448,7 +3448,7 @@ on('change:toggle_npc change:sync_hp_flag change:hitpoints change:hitpoints_max 
 
 // AC Calcs
 const calcAC = async (recalc) => {
-  clog('Armor re-calculated');
+  // clog('Armor re-calculated');
   const v = await getAttrsAsync([
     ...armorAttrs,
     'armor_rating_flag',
