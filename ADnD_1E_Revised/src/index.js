@@ -1910,7 +1910,7 @@ versionator = async (current_version, final_version) => {
 on('sheet:opened', async () => {
   const final_version = 1.7; // must be >= last update versionator()
   const v = await getAttrsAsync(['sheet_version', 'old_character']);
-  let current_version = parseFloat(v.sheet_version) || 0;
+  let current_version = float(v.sheet_version);
   // New Sheet?
   const isNewSheet = int(v.old_character) === 0 && current_version === 0;
   if (isNewSheet) {
@@ -3414,7 +3414,7 @@ const calcHP = async () => {
   const output = {};
   const isMonster = int(v.toggle_npc);
   let syncHpFlag = int(v.sync_hp_flag);
-  // if monster do not sync, otherwise follow user setting
+  // if monster do not sync, otherwise follow user settings
   syncHpFlag = isMonster ? 0 : syncHpFlag;
   const hitPointsMax = int(v.hitpoints_max);
   const hitpoints_1_class = Math.max(0, int(v.hitpoints_1_class));
@@ -3448,7 +3448,7 @@ on('change:toggle_npc change:sync_hp_flag change:hitpoints change:hitpoints_max 
 
 // AC Calcs
 const calcAC = async (recalc) => {
-  clog('Armor re-calculated');
+  // clog('Armor re-calculated');
   const v = await getAttrsAsync([
     ...armorAttrs,
     'armor_rating_flag',
@@ -4262,7 +4262,7 @@ const hearnoiseCalc = async (migrate) => {
 const climbwallsCalc = async (migrate) => {
   const v = await getAttrsAsync(['climbwalls', 'climbwalls_base', 'climbwalls_racial_mod', 'climbwalls_ability_mod', 'climbwalls_magic']);
   const output = {};
-  let baseClimbwalls = int(v.climbwalls_base);
+  let baseClimbwalls = float(v.climbwalls_base);
   baseClimbwalls = baseClimbwalls >= 99.1 ? baseClimbwalls.toFixed(1) : Math.floor(baseClimbwalls);
   const racialClimbwalls = int(v.climbwalls_racial_mod);
   const abilityClimbwalls = int(v.climbwalls_ability_mod);
@@ -4475,7 +4475,8 @@ on(
     skillKeys.forEach((key, i) => {
       output[key] = statValues[i];
     });
-    await setAttrsAsync(output, {silent: true});
+    // await setAttrsAsync(output, {silent: true});
+    await setAttrsAsync(output);
   },
 );
 
