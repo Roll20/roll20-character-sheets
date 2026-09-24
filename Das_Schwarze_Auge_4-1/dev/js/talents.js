@@ -444,6 +444,45 @@ on(attrsGifts.map(talent => `change:${talent.join(":")}`).join(" ").toLowerCase(
 	});
 });
 
+/*
+	Action Listener for Gifts Stats
+
+Update hidden stats values on changes to the actual stats.
+*/
+const attrsGiftsStats = [
+	[ 'repeating_Gaben', 'eigenschaft1' ],
+	[ 'repeating_Gaben', 'eigenschaft2' ],
+	[ 'repeating_Gaben', 'eigenschaft3' ],
+];
+Object.freeze(attrsGiftsStats);
+
+on(attrsGiftsStats.map(talent => `change:${talent.join(":")}`).join(" ").toLowerCase(),
+	function(eventInfo) {
+
+	// Boilerplate
+	const caller = "Action Listener for Gifts Stats";
+	const rowID = extractRowId(eventInfo["sourceAttribute"]);
+	const attrsGiftsStatsRow = attrsGiftsStats.map(talent => [ talent[0], rowID, talent[1] ].join("_"));
+	const attrPrefix = `repeating_Gaben_${rowID}`;
+	const attrsToGet = [ ...attrsGiftsStatsRow, ...statAttrs ];
+	let attrsToChange = {};
+
+	safeGetAttrs(attrsToGet,
+		function(attrs) {
+
+		// Assign stats
+		for (let index of [0, 1, 2])
+		{
+			let statAttr = attrs[`${attrPrefix}_eigenschaft${index + 1}`].toUpperCase();
+			attrsToChange[`${attrPrefix}_hiddeneigenschaft${index + 1}`] = attrs[statAttr];
+		}
+
+		// Setting attrs
+		debugLog(caller, "eventInfo", eventInfo, "attrs", attrs, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
+	});
+});
+
 on("change:repeating_metatalente201904:name_metatalent change:repeating_metatalente201904:name_metatalent_eigen", function(eventInfo) {
 		safeGetAttrs(["repeating_Metatalente201904_Name_Metatalent", "repeating_Metatalente201904_Name_Metatalent_Eigen"], function(v) {
 				let metatalent = v.repeating_Metatalente201904_Name_Metatalent;
@@ -474,17 +513,6 @@ on("change:repeating_metatalente201904:name_metatalent change:repeating_metatale
 						}
 						safeSetAttrs(update);
 				}
-		});
-});
-
-on("change:repeating_gaben:eigenschaft1 change:repeating_gaben:eigenschaft2 change:repeating_gaben:eigenschaft3", function(eventInfo) {
-		safeGetAttrs(["repeating_Gaben_eigenschaft1", "repeating_Gaben_eigenschaft2", "repeating_Gaben_eigenschaft3", "mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"], function(v) {
-						let attributes = {"mu": +v.mu, "kl": +v.kl, "in": +v.in, "ch": +v.ch, "ff": +v.ff, "ge": +v.ge, "ko": +v.ko, "kk": +v.kk};
-						safeSetAttrs({
-								'repeating_Gaben_hiddeneigenschaft1': attributes[v.repeating_Gaben_eigenschaft1] || 0,
-								'repeating_Gaben_hiddeneigenschaft2': attributes[v.repeating_Gaben_eigenschaft2] || 0,
-								'repeating_Gaben_hiddeneigenschaft3': attributes[v.repeating_Gaben_eigenschaft3] || 0
-						});
 		});
 });
 
