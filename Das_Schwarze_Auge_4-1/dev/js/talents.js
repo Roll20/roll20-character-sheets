@@ -537,15 +537,43 @@ on(attrsMetatalents.map(talent => `change:${talent.join(":")}`).join(" ").toLowe
 	});
 });
 
-on("change:repeating_metatalente201904:eigenschaft1 change:repeating_metatalente201904:eigenschaft2 change:repeating_metatalente201904:eigenschaft3", function(eventInfo) {
-		safeGetAttrs(["repeating_Metatalente201904_eigenschaft1", "repeating_Metatalente201904_eigenschaft2", "repeating_Metatalente201904_eigenschaft3", "mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"], function(v) {
-						let attributes = {"mu": +v.mu, "kl": +v.kl, "in": +v.in, "ch": +v.ch, "ff": +v.ff, "ge": +v.ge, "ko": +v.ko, "kk": +v.kk};
-						safeSetAttrs({
-								'repeating_Metatalente201904_hiddeneigenschaft1': attributes[v.repeating_Metatalente201904_eigenschaft1] || 0,
-								'repeating_Metatalente201904_hiddeneigenschaft2': attributes[v.repeating_Metatalente201904_eigenschaft2] || 0,
-								'repeating_Metatalente201904_hiddeneigenschaft3': attributes[v.repeating_Metatalente201904_eigenschaft3] || 0
-						});
-		});
+/*
+	Action Listener for Metatalents (2019-04) Stats
+
+Update hidden stats values on changes to the actual stats.
+*/
+const attrsMetatalentsStats = [
+	[ 'repeating_Metatalente201904', 'eigenschaft1' ],
+	[ 'repeating_Metatalente201904', 'eigenschaft2' ],
+	[ 'repeating_Metatalente201904', 'eigenschaft3' ],
+];
+Object.freeze(attrsMetatalentsStats);
+
+on(attrsMetatalentsStats.map(talent => `change:${talent.join(":")}`).join(" ").toLowerCase(),
+	function(eventInfo) {
+
+	// Boilerplate
+	const caller = "Action Listener for Metatalents (2019-04) Stats";
+	const rowID = extractRowId(eventInfo["sourceAttribute"]);
+	const attrsMetatalentsStatsRow = attrsMetatalentsStats.map(talent => [ talent[0], rowID, talent[1] ].join("_"));
+	const attrPrefix = `repeating_Metatalente201904_${rowID}`;
+	const attrsToGet = [ ...attrsMetatalentsStatsRow, ...statAttrs ];
+	let attrsToChange = {};
+
+	safeGetAttrs(attrsToGet,
+		function(attrs) {
+
+		// Assign stats
+		for (let index of [0, 1, 2])
+		{
+			let statAttr = attrs[`${attrPrefix}_eigenschaft${index + 1}`].toUpperCase();
+			attrsToChange[`${attrPrefix}_hiddeneigenschaft${index + 1}`] = attrs[statAttr];
+		}
+
+		// Setting attrs
+		debugLog(caller, "eventInfo", eventInfo, "attrs", attrs, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
+	});
 });
 
 on("change:mu change:kl change:in change:ch change:ff change:ge change:ko change:kk", function(eventInfo) {
