@@ -386,41 +386,62 @@ on(attrsTalentsPhysicalLame.map(talent => `change:${talent}_mod_lame_setting`).j
 	safeSetAttrs(attrsToChange);
 });
 
-on("change:repeating_gaben:name_gabe change:repeating_gaben:name_gabe_zusatz", function(eventInfo) {
-		safeGetAttrs(["repeating_Gaben_Name_Gabe", "repeating_Gaben_Name_Gabe_Zusatz"], function(v) {
-				let gabe = v.repeating_Gaben_Name_Gabe;
-				let gabeZusatz = v.repeating_Gaben_Name_Gabe_Zusatz;
-				let gaben = {
-						"empathie": [ ["mu", "in", "in"], "Empathie" ],
-						"gefahreninstinkt": [ ["kl", "in", "in"], "Gefahreninstinkt" ],
-						"geraeuschhexerei": [ ["in", "ch", "ko"], "Geräuschhexerei" ],
-						"kraefteschub/talentschub": [ ["mu", "in", "ko"], "Kräfteschub/Talentschub" ],
-						"magiegespuer": [ ["mu", "in", "in"], "Magiegespür" ],
-						"prophezeien": [ ["in", "in", "ch"], "Prophezeien" ],
-						"tierempathie": [ ["mu", "in", "ch"], "Tierempathie" ],
-						"zwergennase": [ ["in", "in", "ff"], "Zwergennase" ]
-				};
-				if (gabe != "nothing") {
-						let update = {
-								'repeating_Gaben_eigenschaft1': gaben[gabe][0][0],
-								'repeating_Gaben_eigenschaft2': gaben[gabe][0][1],
-								'repeating_Gaben_eigenschaft3': gaben[gabe][0][2],
-								'repeating_Gaben_Name_Gabe_Anzeige': gaben[gabe][1]
-						};
-						if (gabeZusatz != "") {
-								update['repeating_Gaben_Name_Gabe_Anzeige'] += " (" + gabeZusatz + ")";
-						}
-						safeSetAttrs(update);
-				} else {
-						let update = {};
-						if(gabeZusatz !== "") {
-								update['repeating_Gaben_Name_Gabe_Anzeige'] = gabeZusatz;
-						} else {
-								update['repeating_Gaben_Name_Gabe_Anzeige'] = "Eigene Gabe";
-						}
-						safeSetAttrs(update);
-				}
-		});
+/*
+	Action Listener for Gifts
+*/
+const attrsGifts = [
+	[ 'repeating_Gaben', 'Name_Gabe' ],
+	[ 'repeating_Gaben', 'Name_Gabe_Zusatz' ],
+];
+Object.freeze(attrsGifts);
+
+on(attrsGifts.map(talent => `change:${talent.join(":")}`).join(" ").toLowerCase(),
+	function(eventInfo) {
+
+	// Boilerplate
+	const caller = "Action Listener for Gifts";
+	const rowID = extractRowId(eventInfo["sourceAttribute"]);
+	const attrsGiftsRow = attrsGifts.map(talent => [ talent[0], rowID, talent[1] ].join("_"));
+	const attrPrefix = `repeating_Gaben_${rowID}`;
+	let attrsToChange = {};
+
+	safeGetAttrs(attrsGiftsRow,
+		function(attrs) {
+
+		// Boilerplate
+		const gift = attrs[`${attrPrefix}_Name_Gabe`];
+		const giftNote = attrs[`${attrPrefix}_Name_Gabe_Zusatz`];
+		const giftNameUIDefault = "Eigene Gabe";
+
+		// Pre-defined or custom ("nothing") gift
+		if (gift !== "nothing")
+		{
+			// Assign stats of pre-defined gifts
+			for (let index of [0, 1, 2])
+			{
+				attrsToChange[`${attrPrefix}_eigenschaft${index + 1}`] = giftsData[gift]["stats"][index].toLowerCase();
+			}
+			// Assign UI name for roll templates of pre-defined gifts
+			attrsToChange[`${attrPrefix}_Name_Gabe_Anzeige`] = giftsData[gift]["ui"];
+
+			// Handle additions to the name
+			if (giftNote !== "")
+			{
+				attrsToChange[`${attrPrefix}_Name_Gabe_Anzeige`] += ` (${giftNote})`;
+			}
+		} else {
+			if (giftNote !== "")
+			{
+				attrsToChange[`${attrPrefix}_Name_Gabe_Anzeige`] = giftNote;
+			} else {
+				attrsToChange[`${attrPrefix}_Name_Gabe_Anzeige`] = giftNameUIDefault;
+			}
+		}
+
+		// Setting attrs
+		debugLog(caller, "eventInfo", eventInfo, "attrs", attrs, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
+	});
 });
 
 on("change:repeating_metatalente201904:name_metatalent change:repeating_metatalente201904:name_metatalent_eigen", function(eventInfo) {

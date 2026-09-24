@@ -1442,6 +1442,22 @@ for (let talent in talentsData)
 	talentsDataOldToNew[talentsData[talent]["internal"]] = talent;
 }
 
+/*
+	Gifts Data
+
+Default data for known gifts.
+*/
+const giftsData = {
+	"empathie": { 'ui': "Empathie", 'stats': ['MU', 'IN', 'IN'] },
+	"gefahreninstinkt": { 'ui': "Gefahreninstinkt", 'stats': ['KL', 'IN', 'IN'] },
+	"geraeuschhexerei": { 'ui': "Geräuschhexerei", 'stats': ['IN', 'CH', 'KO'] },
+	"kraefteschub/talentschub": { 'ui': "Kräfteschub/Talentschub", 'stats': ['MU', 'IN', 'KO'] },
+	"magiegespuer": { 'ui': "Magiegespür", 'stats': ['MU', 'IN', 'IN'] },
+	"prophezeien": { 'ui': "Prophezeien", 'stats': ['IN', 'IN', 'CH'] },
+	"tierempathie": { 'ui': "Tierempathie", 'stats': ['MU', 'IN', 'CH'] },
+	"zwergennase": { 'ui': "Zwergennase", 'stats': ['IN', 'IN', 'FF'] },
+};
+
 const spellsData = {
 	'z_abvenenum': {'internal': "abvenenum", 'ui': "Abvenenum Reine Speise", 'stats': ['KL', 'KL', 'FF']},
 	'z_accuratum': {'internal': "accuratum", 'ui': "Accuratum Zaubernadel", 'stats': ['KL', 'CH', 'FF']},
