@@ -9,6 +9,14 @@
 <input type="hidden" name="attr_WeaponWeightTotal" value="0" />
 <input type="hidden" name="attr_sheetTab" value="character" />
 
+<!-- Dolmenwood-compatible mirror attributes: kept in sync with their OSE
+     equivalents so Monster-tab NPCs remain transferable between the two
+     sheets. See attr_BonusSTR/attr_BonusDEX and attr_numberAppearingWandering
+     sync workers below. -->
+<input type="hidden" name="attr_strMod" value="0" />
+<input type="hidden" name="attr_dexMod" value="0" />
+<input type="hidden" name="attr_numberAppearing" value="0" />
+
 <!-- Sheet Selector -->
 <div class="sheet-button-select">
   <button type="action" name="act_character" data-i18n="character">
@@ -3014,9 +3022,14 @@
             ];
             const [baseXP, baseXPPlus] = xp;
             const hitDiceModifier = parseInt(values.monsterHitDiceModifier, 10);
+            const mirroredHitDice = `${clampedMonsterHitDice}d8${
+              hitDiceModifier ? (hitDiceModifier > 0 ? `+${hitDiceModifier}` : hitDiceModifier) : ""
+            }`;
             setAttrs({
               monsterBAB: bab,
               monsterThac0: thac0,
+              bab: bab,
+              hitdice: mirroredHitDice,
               saveD: saves[0],
               saveW: saves[1],
               saveP: saves[2],
@@ -3240,6 +3253,24 @@
         HP: averageHP,
         HP_max: averageHP,
       });
+    });
+  });
+
+  on("sheet:opened change:BonusSTR", function () {
+    getAttrs(["BonusSTR"], function (values) {
+      setAttrs({ strMod: values.BonusSTR });
+    });
+  });
+
+  on("sheet:opened change:BonusDEX", function () {
+    getAttrs(["BonusDEX"], function (values) {
+      setAttrs({ dexMod: values.BonusDEX });
+    });
+  });
+
+  on("sheet:opened change:numberAppearingWandering", function () {
+    getAttrs(["numberAppearingWandering"], function (values) {
+      setAttrs({ numberAppearing: values.numberAppearingWandering });
     });
   });
 </script>
