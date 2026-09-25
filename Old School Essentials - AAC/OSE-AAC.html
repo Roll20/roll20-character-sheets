@@ -609,6 +609,7 @@
       </div>
 
       <div class="sheet-col movement">
+        <input type="hidden" name="attr_encumbranceType" value="none" class="encumbrance-type-proxy" />
         <h1 data-i18n="movement">Movement</h1>
         <p>Base mv. rate = 120, unless encumbered</p>
         <label class="inline-flex">
@@ -758,6 +759,7 @@
 
   <div>
     <h1 data-i18n="items-equipment">Items & Equipment</h1>
+    <input type="hidden" name="attr_encumbranceType" value="none" class="encumbrance-type-proxy" />
     <div class="equip">
       <h2>Gear</h2>
       <div class="items-grid">
@@ -783,6 +785,7 @@
         <span data-i18n="armor-class-abbr">AC</span>
         <span data-i18n="armor-weight">Armor Weight</span>
         <span data-i18n="worn-question">Worn?</span>
+        <span class="armor-type-header" data-i18n="armor-type">Type</span>
       </div>
       <div class="sheet-armor sheet-repeat">
         <fieldset class="repeating_armor">
@@ -795,6 +798,11 @@
             <div class="checkbox">
               <input type="checkbox" name="attr_armorWorn" checked />
             </div>
+            <select name="attr_armorType" class="armor-type-select">
+              <option value="unarmored" selected data-i18n="unarmored">Unarmored</option>
+              <option value="light" data-i18n="light-armor">Light</option>
+              <option value="heavy" data-i18n="heavy-armor">Heavy</option>
+            </select>
           </div>
         </fieldset>
       </div>
@@ -821,7 +829,11 @@
         <span data-i18n="copper-piece-abbr">CP</span>
         <input type="number" min="0" name="attr_CP" title="Copper" data-i18n-title="copper" value="0" />
       </label>
-      <label class="inline-flex inline-flex-wide-label" style="width: 150%;">
+      <label class="inline-flex inline-flex-wide-label carrying-treasure" style="width: 150%;">
+        <span data-i18n="carrying-treasure" style="margin-right: 15px;" >Carrying Treasure?</span>
+        <input type="checkbox" name="attr_carryingTreasure" value="1" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label encumbrance-field" style="width: 150%;">
         <span data-i18n="encumbrance">Encumbrance</span>
         <input readonly type="number" min="0" name="attr_encumbrance" value="0" />
       </label>
@@ -1351,6 +1363,14 @@
     <select name="attr_individualInitiative">
       <option value="enabled" data-i18n="enabled">Enabled</option>
       <option value="disabled" selected data-i18n="disabled">Disabled</option>
+    </select>
+  </label>
+  <label class="setting">
+    <span data-i18n="encumbrance-type">Encumbrance</span>
+    <select name="attr_encumbranceType">
+      <option value="none" selected data-i18n="encumbrance-none">None</option>
+      <option value="basic" data-i18n="encumbrance-basic">Basic</option>
+      <option value="detailed" data-i18n="encumbrance-detailed">Detailed</option>
     </select>
   </label>
 
@@ -1885,6 +1905,88 @@
     });
   });
 
+  /* ===== ENCUMBRANCE (Players Book p220-221) ==========
+  none: base movement rate is always 120.
+  basic: base movement rate depends on the heaviest armor worn and whether the
+    character is carrying a significant amount of treasure (referee's judgment,
+    tracked via the Carrying Treasure? checkbox).
+  detailed: base movement rate depends on total encumbrance (coins + armor +
+    weapons + gear weight, already tracked in the Encumbrance field). */
+  const armorTypeRank = { unarmored: 0, light: 1, heavy: 2 };
+  const basicEncumbranceMovement = {
+    unarmored: { withTreasure: 90, withoutTreasure: 120 },
+    light: { withTreasure: 60, withoutTreasure: 90 },
+    heavy: { withTreasure: 30, withoutTreasure: 60 },
+  };
+
+  function calculateBasicEncumbranceMovement() {
+    getSectionIDs("repeating_armor", function (idArray) {
+      const attributes = idArray.reduce(
+        (m, id) => [
+          ...m,
+          `repeating_armor_${id}_armorWorn`,
+          `repeating_armor_${id}_armorType`,
+        ],
+        ["carryingTreasure"]
+      );
+      getAttrs(attributes, function (values) {
+        const heaviestType = idArray.reduce((heaviest, id) => {
+          const worn = values[`repeating_armor_${id}_armorWorn`] === "on";
+          const type = values[`repeating_armor_${id}_armorType`] || "unarmored";
+          return worn && armorTypeRank[type] > armorTypeRank[heaviest]
+            ? type
+            : heaviest;
+        }, "unarmored");
+        const carryingTreasure = values.carryingTreasure === "1";
+        setAttrs({
+          movementExploration:
+            basicEncumbranceMovement[heaviestType][
+              carryingTreasure ? "withTreasure" : "withoutTreasure"
+            ],
+        });
+      });
+    });
+  }
+
+  function calculateDetailedEncumbranceMovement(encumbrance) {
+    const weight = parseInt(encumbrance, 10) || 0;
+    let movement;
+    if (weight <= 400) movement = 120;
+    else if (weight <= 600) movement = 90;
+    else if (weight <= 800) movement = 60;
+    else if (weight <= 1600) movement = 30;
+    else movement = 0;
+    setAttrs({ movementExploration: movement });
+  }
+
+  // Set base movement speed when the Encumbrance setting or its inputs change
+  on("sheet:opened change:encumbranceType", function () {
+    getAttrs(["encumbranceType", "encumbrance"], function (values) {
+      if (values.encumbranceType === "basic") {
+        calculateBasicEncumbranceMovement();
+      } else if (values.encumbranceType === "detailed") {
+        calculateDetailedEncumbranceMovement(values.encumbrance);
+      } else {
+        setAttrs({ movementExploration: 120 });
+      }
+    });
+  });
+
+  on(
+    [
+      "change:repeating_armor",
+      "remove:repeating_armor",
+      "change:carryingTreasure",
+    ].join(" "),
+    function () {
+      getAttrs(["encumbranceType"], function (values) {
+        if (values.encumbranceType === "basic") {
+          calculateBasicEncumbranceMovement();
+        }
+      });
+    }
+  );
+
   // Armor Calculation
   on("sheet:opened change:dex change:repeating_armor remove:repeating_armor",
     function () {
@@ -1939,10 +2041,15 @@
                       "ItemWeightTotal",
                     ],
                     (weights) => {
-                      setAttrs({
-                        Encumbrance: Object.values(weights)
-                          .map((weight) => parseInt(weight, 10))
-                          .reduce((sum, cur) => sum + cur),
+                      const encumbrance = Object.values(weights)
+                        .map((weight) => parseInt(weight, 10))
+                        .reduce((sum, cur) => sum + cur);
+                      setAttrs({ encumbrance }, function () {
+                        getAttrs(["encumbranceType"], function (values) {
+                          if (values.encumbranceType === "detailed") {
+                            calculateDetailedEncumbranceMovement(encumbrance);
+                          }
+                        });
                       });
                     }
                   );
