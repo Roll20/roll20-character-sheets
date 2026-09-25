@@ -1,4 +1,4 @@
-/* COF2e v1.17.1 */
+/* COF2e v1.18.0 */
 
 @import url('https://fonts.googleapis.com/css?family=Merriweather+Sans&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Material+Icons&display=swap');
@@ -51,6 +51,7 @@ select:hover {
   text-align: right;
 }
 
+.cofmain .heading input[type="number"].two-digits,
 .cofmain .cofsheet input[type="number"].two-digits {
   width: 4rem;
   text-align: right;
@@ -295,6 +296,11 @@ button.flat-btn {
   font-weight: bold;
 }
 
+.cofmain .attacks button[type="roll"].img-btn {
+  font-size: 13px;
+  font-weight: normal;
+}
+
 .cofmain .rank-summary button[type="roll"].img-btn {
   padding: 0;
   margin-left: 10px;
@@ -304,6 +310,11 @@ button.flat-btn {
 
 span.img-btn {
   font-family: pictos;
+  font-variant: normal;
+}
+
+span.img-btn-cust {
+  font-family: "pictos custom";
   font-variant: normal;
 }
 
@@ -388,6 +399,11 @@ div.path div.block-title {
   font-size: medium;
 }
 
+.summary-content {
+  display: inline-flex;
+  width: calc(100% - 20px);
+}
+
 .visible {
   display: block;
 }
@@ -410,6 +426,11 @@ div.path div.block-title {
 
 .d-flex-middle {
   vertical-align: middle;
+}
+
+.d-flex-centered {
+  align-items: center;
+  justify-content: center;
 }
 
 .d-flex-1 {
@@ -456,12 +477,14 @@ div.path div.block-title {
   text-overflow: ellipsis;
 }
 
+.cofmain input[value="0"].has-secret + .has-secret,
 .cofmain input[value="0"].has-script + div.has-script,
 .cofmain input[value="0"].has-script textarea.has-script,
 .cofmain input[value=""].has-script + span.has-script,
 .cofmain input[value="0"].has-script + span.has-script,
 .cofmain input[value="0"].has-script .weapon span.has-script,
 .cofmain input[value="0"].has-script + div.ammos,
+.cofmain input[value="0"].has-script + div.potions,
 .cofmain input[value="0"].has-psionic + .has-psionic,
 .cofmain input[value="0"].opt-tact + div.opt-tact,
 .cofmain input[value="0"].fav-tact + div.fav-tact,
@@ -469,7 +492,9 @@ div.path div.block-title {
 .cofmain input[value="0"].fav-ability + div.fav-ability,
 .cofmain input[value=""].immu-dm + span.immu-dm,
 .cofmain input[value="0"].mounted + .mounted,
-.cofmain input[value="0"].high-fan + .high-fan {
+.cofmain input[value="0"].high-fan + .high-fan,
+.cofmain input[value="0"].import-json + .import-json,
+.cofmain li.peuple-mod:has(input[value="0"].peuple-mod) {
   display: none;
 }
 
@@ -497,6 +522,7 @@ div.path div.block-title {
 .cofmain input[value="1"].locked ~ button.unlocked,
 .cofmain input[value="1"].locked + input.locked,
 .cofmain input[value="0"].locked ~ button.locked,
+.cofmain input[value="0"].spellbook ~ button.spellbook,
 .cofmain input[value="0"].locked ~ span.locked {
   display: none;
 }
@@ -1052,20 +1078,32 @@ input[value="0"].spell-concentration-show ~ button.spell-concentration {
   display: none;
 }
 
+button.secret-switch,
 button.attack-maneuvers,
-button.spell-concentration {
+button.vulnerable-def,
+button.spell-concentration,
+button.npc-boss,
+button.npc-narratif {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
 }
 
+button.secret-switch span,
 button.attack-maneuvers span,
-button.spell-concentration span {
+button.vulnerable-def span,
+button.spell-concentration span,
+button.npc-boss span,
+button.npc-narratif span {
   font-weight: bolder;
 }
 
+.cof-pc input[value="1"].secret-switch ~ button.secret-switch,
 .pc-main-tab input[value="1"].attack-maneuvers ~ button.attack-maneuvers,
-.pc-abilities-tab input[value="1"].spell-concentration ~ button.spell-concentration {
+.pc-attacks-subtab input[value="5"].vulnerable-def ~ button.vulnerable-def,
+.pc-abilities-tab input[value="1"].spell-concentration ~ button.spell-concentration,
+.npc-config-tab input[value="1"].npc-boss + button.npc-boss,
+.npc-config-tab input[value="1"].npc-narratif + button.npc-narratif {
   background-color: orange;
 }
 
@@ -1084,15 +1122,20 @@ button.spell-concentration span {
 
 .abilities .rank .rank-summary {
   display: inline-flex;
+  width: calc(100% - 20px);
   vertical-align: middle;
   gap: 5px;
 }
 
 .abilities .rank .rank-summary .rank-title {
-  width: 21rem;
+  flex-grow: 1;
   overflow-x: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.abilities .rank .rank-summary button {
+  margin-left: auto;
 }
 
 .abilities .rank textarea {
@@ -1128,23 +1171,21 @@ button.spell-concentration span {
 }*/
 
 .post-it textarea.post-it,
-.weapon textarea.one-row,
-.weapon-opt textarea.one-row,
-.abilities .path textarea.one-row,
-.abilities .rank textarea.one-row,
-.pc-abilities-tab .pc-master-subtab textarea.one-row,
-.pc-roll-r1 textarea.one-row,
-.pc-gears .gears textarea.one-row,
-.pc-gears .ammos textarea.one-row,
-.pc-gears .potions textarea.one-row,
-.pc-actions textarea.one-row,
-.npc-abilities .npc-ability textarea.one-row,
-.npc-trait-rd textarea.one-row,
-.npc-gears .gears textarea.one-row,
-.npc-gears .ammos textarea.one-row,
-.npc-actions textarea.one-row,
-.npc-configs textarea.one-row,
-.resources textarea.one-row {
+:is(
+  .weapon,
+  .weapon-opt,
+  .abilities :is(.path, .rank),
+  .pc-abilities-tab .pc-master-subtab,
+  .pc-roll-r1,
+  .pc-gears :is(.gears, .ammos, .potions),
+  .pc-actions,
+  .npc-abilities .npc-ability,
+  .npc-trait-rd,
+  .npc-gears :is(.gears, .ammos),
+  .npc-actions,
+  .npc-configs,
+  .resources
+) textarea.one-row {
   padding: 0;
   margin: 0;
   height: 2rem;
@@ -1166,23 +1207,28 @@ button.spell-concentration span {
   width: 100%;
 }
 
-.weapon textarea.one-row:focus,
-.weapon-opt textarea.one-row:focus,
-.abilities .rank textarea.one-row:focus,
-.abilities .path textarea.one-row:focus,
-.pc-abilities-tab .pc-master-subtab textarea.one-row:focus,
-.pc-roll-r1 textarea.one-row:focus,
-.pc-gears .gears textarea.one-row:focus,
-.pc-gears .ammos textarea.one-row:focus,
-.pc-gears .potions textarea.one-row:focus,
-.pc-actions textarea.one-row:focus,
-.npc-abilities .npc-ability textarea.one-row:focus,
-.npc-trait-rd textarea.one-row:focus,
-.npc-gears .gears textarea.one-row:focus,
-.npc-actions textarea.one-row:focus,
-.npc-configs textarea.one-row:focus,
-.resources textarea.one-row:focus {
+:is(
+  .weapon,
+  .weapon-opt,
+  .abilities :is(.path, .rank),
+  .pc-abilities-tab .pc-master-subtab,
+  .pc-roll-r1,
+  .pc-gears :is(.gears, .ammos, .potions),
+  .pc-actions,
+  .npc-abilities .npc-ability,
+  .npc-trait-rd,
+  .npc-gears .gears,
+  .npc-actions,
+  .npc-configs,
+  .resources
+) textarea.one-row:focus {
   height: 6rem;
+  @supports (field-sizing: content) {
+    & {
+      field-sizing: content;
+      height: auto;
+    }
+  }
 }
 
 .post-it textarea.post-it:focus {
@@ -1237,15 +1283,8 @@ input[value="0"].ability-uses + div.ability-uses {
   gap: 5px;
 }
 
-.pc-gears .gears,
-.npc-gears .gears,
-.pc-gears .resources,
-.npc-gears .resources,
-.pc-gears .ammos,
-.pc-gears .potions,
-.npc-gears .ammos,
-.pc-gears .misc-gears,
-.pc-gears .notes {
+.pc-gears :is(.gears, .resources, .ammos, .potions, .misc-gears, .notes),
+.npc-gears :is(.gears, .resources, .ammos) {
   margin-top: 10px;
 }
 
@@ -1407,8 +1446,13 @@ textarea.import-result {
   resize: none;
 }
 
-textarea.migration {
+textarea.migration,
+textarea.statblock {
   font-family: monospace;
+  font-weight: 800;
+}
+
+textarea.migration {
   border: none; 
   background-color: transparent;
   resize: none;
@@ -1545,10 +1589,6 @@ textarea.migration {
 
 .sheet-rolltemplate-cof2 .sheet-rt-centered {
   text-align: center;
-}
-
-.sheet-rolltemplate-cof2 .sheet-rt-text span > a.userscript-chat-button:hover {
-  color: orange;
 }
 
 .sheet-rolltemplate-cof2 .sheet-rt-tags {
@@ -1717,7 +1757,7 @@ textarea.migration {
 
 /* Left column */
 .sheet-rolltemplate-custom .sheet-content .sheet-key {
-  font-weight: bold;
+  font-weight: bold !important;
   padding-right: 10px;
   text-align: right;
 }
@@ -1743,6 +1783,12 @@ textarea.migration {
 .sheet-rolltemplate-custom .sheet-desc {
   text-align: center;
   background-color: var(--header-bg-color);
+}
+
+.message a.userscript-chat-button:hover,
+.sheet-rolltemplate-cof2 a.userscript-chat-button:hover,
+.sheet-rolltemplate-custom a.userscript-chat-button:hover {
+  opacity: 0.7;
 }
 
 /* ROLL TEMPLATES - Dark Mode */
