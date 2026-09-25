@@ -21,7 +21,6 @@ h1 {
   margin-bottom: 10px;
   margin-top: 10px;
   line-height: 40px;
-  background-image: url("https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Old%20School%20Essentials%20-%20AAC/images/banner.png");
   background-size: 100%;
   background-repeat: no-repeat;
   text-align: center;
@@ -40,6 +39,15 @@ h2 {
   text-align: center;
 }
 
+h3 {
+  font-size: 1.8rem;
+  font-family: "Girassol", serif;
+  color: black;
+  margin: 5px 0px;
+  line-height: 1.5em;
+  text-align: center;
+}
+
 label {
   font-weight: normal;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -54,6 +62,7 @@ p {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   display: inline-block;
+  font-style: italic;
 }
 
 span,
@@ -151,6 +160,7 @@ input[type="number"] {
 
 /* Firefox */
 .charsheet input[type="number"] {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
@@ -172,6 +182,30 @@ input[type="number"] {
 
 div.sheet-flex {
   display: flex;
+}
+
+.sheet-attribute-and-save-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+}
+
+.sheet-attribute-and-save-grid button {
+  width: 49px;
+}
+
+.charsheet .sheet-attribute-and-save-grid .sheet-inline-flex-wide-label {
+  width: unset;
+}
+
+.charsheet .sheet-inline-flex-wide-label > p {
+    margin-left: 10px;
+}
+
+.sheet-character-details-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 10px;
 }
 
 div.sheet-flex > * {
@@ -213,6 +247,114 @@ div.sheet-flex > .sheet-shrink {
   flex-grow: 3;
 }
 
+/* Keep all Ability Score and Saving Throw roll buttons the same fixed
+   width instead of stretching to fill the row (varying description
+   text lengths otherwise cause each button to grow by a different amount). */
+.charsheet .sheet-ability-scores button:first-child,
+.charsheet .sheet-saves button:first-child {
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.sheet-multiclass-toggle-proxy {
+  display: none;
+}
+
+.sheet-multiclass-block {
+  display: none;
+}
+
+input[name="attr_isMultiClass"]:checked ~ .sheet-multiclass-block {
+  display: block;
+}
+
+.sheet-multiclass-block-3 {
+  display: none;
+}
+
+input[name="attr_isMultiClass2"]:checked ~ .sheet-multiclass-block-3 {
+  display: block;
+}
+
+.sheet-race-as-class-proxy {
+  display: none;
+}
+
+input[name="attr_isRaceAsClass"][value="1"] ~ .sheet-flex select[name="attr_race"],
+input[name="attr_isRaceAsClass"][value="1"] ~ .sheet-flex input[name="attr_isMultiClass"] {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Only elf-blooded races may take a 3rd class (Players' Book p26). */
+.sheet-elf-race-proxy {
+  display: none;
+}
+
+input[name="attr_isElfRace"][value="0"] ~ .sheet-multiclass-block input[name="attr_isMultiClass2"] {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Tooltips explaining why the Multi-Class / 3rd-Class checkboxes are
+   disabled. Reuses the common Roll20-sheet CSS-only tooltip pattern:
+   a positioned wrapper + hidden text shown on :hover. The child input
+   keeps pointer-events: none (see rules above) but hovering over it still
+   triggers :hover on this wrapper, since the disabled input has no
+   content behind it to intercept the pointer. */
+/* Extra ".sheet-info-grid" specificity is needed here to beat the later
+   "div.sheet-info-grid span { display: inline-block }" rule, which would
+   otherwise blockify this flex item down to plain "display: block" and
+   break the centering of the checkbox inside it. */
+.sheet-info-grid .sheet-tooltip-wrap,
+.sheet-tooltip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 4.9rem;
+  background-color: white;
+  color: initial;
+  line-height: normal;
+  vertical-align: middle;
+}
+
+.sheet-tooltip-wrap input[type="checkbox"] {
+  width: 1.4em;
+  height: 1.4em;
+  margin: 0;
+  cursor: pointer;
+}
+
+.sheet-tooltip-wrap .sheet-tooltiptext {
+  visibility: hidden;
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #000;
+  color: #fff;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: normal;
+  width: 220px;
+  line-height: 1.4;
+  font-size: 11px;
+  font-weight: normal;
+  z-index: 99;
+  pointer-events: none;
+}
+
+input[name="attr_isRaceAsClass"][value="1"] ~ .sheet-flex .sheet-tooltip-wrap:hover .sheet-tooltiptext {
+  visibility: visible;
+}
+
+input[name="attr_isElfRace"][value="0"] ~ .sheet-multiclass-block .sheet-tooltip-wrap:hover .sheet-tooltiptext {
+  visibility: visible;
+}
+
 /* Info Grid / Header */
 
 div.sheet-info-grid {
@@ -233,26 +375,20 @@ div.sheet-info-grid select {
 
 /* Combat */
 
-.sheet-combat {
-  display: grid;
-  grid-template-columns: 3fr 1fr 0.5fr;
-  grid-gap: 10px;
-}
-
-.sheet-combat .sheet-armor {
+.sheet-character-details-grid .sheet-armor {
   display: none;
 }
 
-.sheet-combat input[name="attr_armorClassType"][value="aac"] ~ .sheet-armor-aac,
-.sheet-combat input[name="attr_armorClassType"][value="AAC"] ~ .sheet-armor-aac,
-.sheet-combat input[name="attr_armorClassType"][value="dac"] ~ .sheet-armor-dac,
-.sheet-combat
+.sheet-character-details-grid input[name="attr_armorClassType"][value="aac"] ~ .sheet-armor-aac,
+.sheet-character-details-grid input[name="attr_armorClassType"][value="AAC"] ~ .sheet-armor-aac,
+.sheet-character-details-grid input[name="attr_armorClassType"][value="dac"] ~ .sheet-armor-dac,
+.sheet-character-details-grid
   input[name="attr_armorClassType"][value="DAC"]
   ~ .sheet-armor-dac {
   display: flex;
 }
 
-input[name="attr_armorClassType"][value="aac"] ~ .sheet-matrix {
+.sheet-character-details-grid input[name="attr_armorClassType"][value="aac"] ~ .sheet-matrix {
   display: none;
 }
 
@@ -285,7 +421,12 @@ input[name="attr_armorClassType"][value="aac"] ~ .sheet-matrix {
 
 /* Initiative */
 
-.sheet-initiative button {
+.sheet-initiative input[type="hidden"] {
+  display: none;
+}
+
+.sheet-initiative button[name="attr_rollInit"],
+.sheet-initiative button[name="attr_rollInitIndividual"] {
   display: none;
 }
 
@@ -451,6 +592,11 @@ input[name="attr_armorClassType"][value="aac"] ~ .sheet-matrix {
   width: calc(100%-2px);
 }
 
+.sheet-rolltemplate-simple .sheet-template-grid > div.sheet-grid-headers-neg,
+.sheet-rolltemplate-simple .sheet-template-grid > div.sheet-grid-values-neg {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 .sheet-rolltemplate-simple .sheet-template-grid span {
   height: auto;
   border: 0 none;
@@ -479,15 +625,37 @@ input[name="attr_armorClassType"][value="aac"] ~ .sheet-matrix {
   border-right-width: 0;
 }
 
+/* Highlight the AC header/value that the attack roll exactly hits.
+   sheet-matrix-hit-marker is a hidden marker rendered only when
+   rollTotal() (attack == that column's required roll) is true; the
+   adjacent-sibling selector then colors the visible span next to it. */
+.sheet-rolltemplate-simple .sheet-matrix-hit-marker {
+  display: none;
+}
+
+.sheet-rolltemplate-simple .sheet-matrix-hit-marker + span {
+  background: #2ecc71 !important;
+  color: #fff !important;
+}
+
 /* Repeating Sections */
 
 .sheet-repeat .repitem button,
 .sheet-repeat .repitem input[type="text"],
 .sheet-repeat .repitem input[type="number"],
-.sheet-repeat .repitem select {
+.sheet-repeat .repitem select,
+.sheet-repeat .sheet-abilities-grid button,
+.sheet-repeat .sheet-abilities-grid input[type="text"],
+.sheet-repeat .sheet-abilities-grid input[type="number"],
+.sheet-repeat .sheet-abilities-grid select {
   height: 3rem;
   min-height: auto;
   margin: 0;
+  box-sizing: border-box;
+}
+
+.sheet-repeat .sheet-abilities-grid input[type="checkbox"] {
+  margin: auto;
   box-sizing: border-box;
 }
 
@@ -519,7 +687,9 @@ input[name="attr_armorClassType"][value="aac"] ~ .sheet-matrix {
 }
 
 .sheet-abilities-grid {
-  grid-template-columns: 35px 2fr 1fr 1fr 1fr 4fr;
+  grid-template-columns: 35px 2fr 1fr 1fr 1fr 4fr 60px;
+  height: 3rem;
+  min-height: auto;
 }
 
 .sheet-items-grid {
@@ -562,6 +732,121 @@ input[name="attr_armorClassType"][value="aac"] ~ .sheet-matrix {
 .sheet-spells-grid input[type="number"],
 .sheet-spells-grid select {
   width: 100%;
+}
+
+/* Armor Type column (Unarmored/Light/Heavy) only appears when Basic Encumbrance is selected */
+.sheet-armor-type-header,
+.sheet-armor-type-select {
+  display: none;
+}
+
+.sheet-encumbrance-type-proxy[value="basic"] ~ .sheet-equip .sheet-armor-grid {
+  grid-template-columns: 6fr 2fr 2fr 1fr 2fr;
+}
+
+.sheet-encumbrance-type-proxy[value="basic"] ~ .sheet-equip .sheet-armor-type-header,
+.sheet-encumbrance-type-proxy[value="basic"] ~ .sheet-equip .sheet-armor-type-select {
+  display: block;
+}
+
+/* Carrying Treasure checkbox only appears when Basic Encumbrance is selected;
+   the Encumbrance total field only appears when Detailed Encumbrance is selected. */
+.sheet-carrying-treasure,
+.sheet-encumbrance-field {
+  display: none;
+}
+
+.sheet-encumbrance-type-proxy[value="basic"] ~ .sheet-coins .sheet-carrying-treasure {
+  display: inline-flex;
+}
+
+.sheet-encumbrance-type-proxy[value="detailed"] ~ .sheet-coins .sheet-encumbrance-field {
+  display: inline-flex;
+}
+
+/* Base movement speed is auto-calculated when Basic or Detailed Encumbrance is selected */
+.sheet-movement .sheet-encumbrance-type-proxy[value="basic"] ~ label input[name="attr_movementExploration"],
+.sheet-movement .sheet-encumbrance-type-proxy[value="detailed"] ~ label input[name="attr_movementExploration"],
+.sheet-movement .sheet-encumbrance-type-proxy[value="itemBased"] ~ label input[name="attr_movementExploration"],
+.sheet-movement .sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ label input[name="attr_movementExploration"] {
+  pointer-events: none;
+  background-color: #eee;
+}
+
+.sheet-item-size-header,
+.sheet-item-size-select,
+.sheet-item-location-header,
+.sheet-item-location-select {
+  display: none;
+}
+
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-armor-grid,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-armor-grid {
+  grid-template-columns: 6fr 2fr 1fr 2fr 2fr;
+}
+
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-armor-weight-header,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-armor-weight-header,
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-armor-weight-input,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-armor-weight-input {
+  display: none;
+}
+
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-armor-grid .sheet-item-size-select,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-armor-grid .sheet-item-size-select,
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-armor-grid .sheet-item-location-select,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-armor-grid .sheet-item-location-select,
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-armor-grid .sheet-item-size-header,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-armor-grid .sheet-item-size-header,
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-armor-grid .sheet-item-location-header,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-armor-grid .sheet-item-location-header {
+  display: block;
+}
+
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-items-grid,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-items-grid {
+  grid-template-columns: 1fr 3fr 3fr 2fr 2fr;
+}
+
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-item-weight-header,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-item-weight-header,
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-item-weight-input,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-item-weight-input {
+  display: none;
+}
+
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-items-grid .sheet-item-size-header,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-items-grid .sheet-item-size-header,
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-items-grid .sheet-item-size-select,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-items-grid .sheet-item-size-select,
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-items-grid .sheet-item-location-header,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-items-grid .sheet-item-location-header,
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-equip .sheet-items-grid .sheet-item-location-select,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-equip .sheet-items-grid .sheet-item-location-select {
+  display: block;
+}
+
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-weapons-wrapper .sheet-weapons-grid,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-weapons-wrapper .sheet-weapons-grid {
+  grid-template-columns: 35px 2.5fr 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-weapons-wrapper .sheet-weapon-weight-header,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-weapons-wrapper .sheet-weapon-weight-header,
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-weapons-wrapper .sheet-weapon-weight-input,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-weapons-wrapper .sheet-weapon-weight-input {
+  display: none;
+}
+
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-weapons-wrapper .sheet-item-size-header,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-weapons-wrapper .sheet-item-size-header,
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-weapons-wrapper .sheet-item-size-select,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-weapons-wrapper .sheet-item-size-select,
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-weapons-wrapper .sheet-item-location-header,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-weapons-wrapper .sheet-item-location-header,
+.sheet-encumbrance-type-proxy[value="itemBased"] ~ .sheet-weapons-wrapper .sheet-item-location-select,
+.sheet-encumbrance-type-proxy[value="itemBasedStr"] ~ .sheet-weapons-wrapper .sheet-item-location-select {
+  display: block;
 }
 
 button[type="roll"].sheet-roll-describe::before {
@@ -844,4 +1129,18 @@ input.sheet-expand + span::after {
 
 input.sheet-expand:hover + span::after {
   opacity: 1;
+}
+
+.sheet-character-portrait {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+.sheet-character-portrait:not([src]),
+.sheet-character-portrait[src=""] {
+  height: 413px;
 }
