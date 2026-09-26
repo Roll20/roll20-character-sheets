@@ -238,6 +238,12 @@ input[type=radio]
     .hidden, :is(.sheet-row, .row).hidden
       display: block
 
+// Platform override - mirrors EG_Sheet.css. `.hidden` collides with a Bootstrap-style
+// rule bundled by the Roll20 CSE platform carrying display:none !important, so the
+// plain rule above never wins. Roll20's own OGL sheet carries the same override.
+.charsheet .toggleflag[value="1"] + .hidden, .charsheet .toggleflag[value="1"] + :is(.sheet-row, .row).hidden
+  display: block !important
+
 // Radio inputs hidden - label handles clicks
 .advantagetoggle input[type=radio]
   display: none
@@ -7413,23 +7419,77 @@ body:not(:-moz-handler-blocked) .charmancer
 
 // Section header labels inside the attacks box - match AC/Speed/Skills style
 .attacks .global-dmg > span.label,
-.attacks > span.label
+.attacks > span.label,
+.globalattack > span.label
   font-family: 'Oxanium', sans-serif
   color: var(--eg-blue)
   letter-spacing: 1px
   position: static
+  text-align: left
+  font-size: 11px
+  font-weight: bold
+  text-transform: uppercase
+  padding: 4px 8px 2px
+  border-bottom: 1px solid rgba(var(--eg-gold-rgb),0.3)
+  margin-top: 0
 
 div.globaldisplay
-  width: 80%
   background-color: transparent
-  display: inline-block
-  font-size: 9px
-  font-weight: normal
+  display: block
+  font-size: 11px
+  font-weight: bold
+  color: var(--eg-text)
   line-height: 16px
-  padding: 3px 4px
+  padding: 0
   text-align: left
-  -o-text-overflow: ellipsis
+  white-space: nowrap
+  overflow: hidden
   text-overflow: ellipsis
+
+// Unify the five global-modifier rows - mirrors EG_Sheet.css. Only .global-dmg used
+// to get flex, so align-self: center on .active-flag had no flex container elsewhere.
+.pc .globalattack .global-mod
+  display: flex
+  align-items: center
+
+.pc .globalattack .global-mod > :is(.sheet-display, .display), .pc .globalattack .global-mod > div.globaldisplay, .pc .globalattack .global-mod > :is(.sheet-options, .options)
+  flex: 1
+  min-width: 0
+
+// Global-modifier row contents - mirrors EG_Sheet.css. The shared label rule pins
+// every .globalattack span to 9px/centred/margin-top:5px; override so values read at
+// 11px like the attacks damage cell. Checkbox: that rule also adds margin-top:10px.
+.pc .globalattack .global-mod div.globaldisplay, .pc .globalattack .global-mod div.globaldisplay span, .pc .globalattack .global-mod :is(.sheet-display, .display) .title, .pc .globalattack .global-mod :is(.sheet-display, .display) .title span
+  font-size: 11px
+  line-height: 16px
+  text-align: left
+  width: auto
+  margin-top: 0
+
+.pc .globalattack .global-mod .active-flag
+  margin-top: 0
+  margin-bottom: 0
+
+// Header underline ran past the box edge - mirrors EG_Sheet.css. The shared span rule
+// sets width:100%, and the header style adds 8px side padding; under content-box
+// sizing that overflows by 16px.
+.pc .globalattack > span.label
+  width: auto
+
+// Click target for the gear on global-modifier rows - mirrors EG_Sheet.css. Target
+// starts 15px above the icon and is only 18px tall, so it covered just the icon's top
+// 3px on Save / Skill / AC. ".attacks" already enlarges it to 22x32 for the two that
+// work; use the same size everywhere. Icon and anchors are untouched.
+.pc .globalattack .global-mod > .options-flag
+  width: 22px
+  height: 32px
+
+// The gear draws at the top-right of each modifier row and Roll20's add/lock control
+// row followed straight underneath, so they collided. Push the control row down, the
+// same approach as ".resources .repcontrol". Icon and click target are left alone.
+.pc .globalattack .repcontrol
+  margin-top: 10px
+
 
   span
     display: inline
