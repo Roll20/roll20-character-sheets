@@ -6,6 +6,16 @@
 
 ## Changelog
 
+### v 1.7.0 (10/15/2025)
+
+* Layout modernization and simplification
+* Spells and liturgies now work with the advanced roll popup window. Their chat cards show additional information on the selected modifiers
+* Introduction of "item sheets" which show item details in a popup
+
+### v1.6.1 (10/12/2025)
+
+* Minor Bugfix
+
 ### v1.6.0 (12/02/2023)
 
 * Support for Optolith character import

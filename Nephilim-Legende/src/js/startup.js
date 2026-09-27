@@ -13,7 +13,8 @@ on("sheet:opened change:degreMetamorphe change:KaDominant", function()
                 KADTerre: 0,
                 KADAir: 0,
                 KADLune: 0,
-                KADEau: 0
+                KADEau: 0,
+                KADroll: "@{kafeu}"
             });
         }
 
@@ -24,7 +25,8 @@ on("sheet:opened change:degreMetamorphe change:KaDominant", function()
                 KADTerre: degre,
                 KADAir: 0,
                 KADLune: 0,
-                KADEau: 0
+                KADEau: 0,
+                KADroll: "@{katerre}"
             });
         }
 
@@ -35,7 +37,8 @@ on("sheet:opened change:degreMetamorphe change:KaDominant", function()
                 KADTerre: 0,
                 KADAir: degre,
                 KADLune: 0,
-                KADEau: 0
+                KADEau: 0,
+                KADroll: "@{kaair}"
             });
         }
 
@@ -46,7 +49,8 @@ on("sheet:opened change:degreMetamorphe change:KaDominant", function()
                 KADTerre: 0,
                 KADAir: 0,
                 KADLune: degre,
-                KADEau: 0
+                KADEau: 0,
+                KADroll: "@{kalune}"
             });
         }
 
@@ -57,7 +61,8 @@ on("sheet:opened change:degreMetamorphe change:KaDominant", function()
                 KADTerre: 0,
                 KADAir: 0,
                 KADLune: 0,
-                KADEau: degre
+                KADEau: degre,
+                KADroll: "@{kaeau}"
             });
         }
     });
@@ -67,6 +72,7 @@ on("sheet:opened", function() {
     getAttrs(["version"], function(value)
     {
         var version = value["version"];
+        console.log('Version ' + version)
 
         if(version < 2)
         {
@@ -86,12 +92,6 @@ on("sheet:opened", function() {
                             ["repeating_epoques-incarnation_"+id+"_vecu"]: vecus1,
                             ["repeating_epoques-incarnation_"+id+"_degres_vecu_passe"]: vecusD1
                         });
-
-                        console.log(epoque);
-                        console.log(vecus1);
-                        console.log(vecusD1);
-                        console.log(vecus2);
-                        console.log(vecusD2);
 
                         var newrowid = generateRowID();
                         var newrowattrs = {};
@@ -220,6 +220,63 @@ on("sheet:opened", function() {
 
             setAttrs({
                 ["version"]: "2"
+            });
+        }
+
+        if (version < 3) {
+            console.log('Migrer les habitus')
+
+            getSectionIDs('repeating_mag-sort', idarray => {
+                if (!idarray || idarray.length === 0) {
+                    setAttrs({ version: 3 });
+                    return;
+                }
+
+                const fields = [
+                    'mag-sort-nom', 'mag-sort-cercle', 'mag-sort-voie', 'mag-sort-ka',
+                    'mag-sort-portee', 'mag-sort-duree', 'mag-sort-desc',
+                    'mag-sort-a', 'mag-sort-t', 'mag-sort-f'
+                ];
+                const attrsToFetch = idarray.flatMap(id => fields.map(f => `repeating_mag-sort_${id}_${f}`));
+
+                getAttrs(attrsToFetch, values => {
+                    const attrsToSet = {};
+
+                    idarray.forEach(id => {
+                        const oldCercle = values[`repeating_mag-sort_${id}_mag-sort-cercle`];
+
+                        if (oldCercle === 'mag-secret-degre') {
+                            const newId = generateRowID();
+
+                            const nom = values[`repeating_mag-sort_${id}_mag-sort-nom`] || '';
+                            const voie = values[`repeating_mag-sort_${id}_mag-sort-voie`] || '';
+                            const ka = values[`repeating_mag-sort_${id}_mag-sort-ka`] || '';
+                            const appris = values[`repeating_mag-sort_${id}_mag-sort-a`] || 0;
+                            const tatoue = values[`repeating_mag-sort_${id}_mag-sort-t`] || 0;
+                            const focus = values[`repeating_mag-sort_${id}_mag-sort-f`] || 0;
+                            const portee = values[`repeating_mag-sort_${id}_mag-sort-portee`] || '';
+                            const duree = values[`repeating_mag-sort_${id}_mag-sort-duree`] || '';
+                            const desc = values[`repeating_mag-sort_${id}_mag-sort-desc`] || '';
+
+                            const description = `Portée: ${portee}\nDurée: ${duree}\n${desc}`.trim();
+
+                            attrsToSet[`repeating_habitus_${newId}_nom`] = nom;
+                            attrsToSet[`repeating_habitus_${newId}_voie`] = voie;
+                            attrsToSet[`repeating_habitus_${newId}_ka`] = ka;
+                            attrsToSet[`repeating_habitus_${newId}_appris`] = appris;
+                            attrsToSet[`repeating_habitus_${newId}_tatoue`] = tatoue;
+                            attrsToSet[`repeating_habitus_${newId}_focus`] = focus;
+                            attrsToSet[`repeating_habitus_${newId}_habitus-desc`] = description;
+
+                            removeRepeatingRow(`repeating_mag-sort_${id}`);
+                        }
+                    });
+
+                    attrsToSet['version'] = 3;
+                    setAttrs(attrsToSet, { silent: true }, () => {
+                        console.log('Migration des habitus terminée avec succès !');
+                    });
+                });
             });
         }
     });

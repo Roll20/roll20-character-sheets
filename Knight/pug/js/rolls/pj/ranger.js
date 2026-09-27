@@ -1,4 +1,5 @@
 /* eslint-disable linebreak-style */
+/* eslint-disable no-trailing-spaces */
 /* eslint-disable default-case */
 /* eslint-disable camelcase */
 /* eslint-disable prefer-destructuring */
@@ -548,8 +549,8 @@ on('clicked:distanceRangerLongbow', async (info) => {
   }
 
   if (aPLaser !== '0') {
-    exec.push('{{vMPLaser=+1}}');
-    bonus.push(1);
+    isConditionnelA = true;
+    exec.push(`{{pointeurLaserValue=[[3D6]]}} {{pointeurLaser=${i18n_pointeurLaser}}} {{pointeurLaserCondition=${i18n_pointeurLaserCondition}}}`);
   }
 
   if (aROmega !== '0') {
@@ -633,7 +634,7 @@ on('clicked:distanceRangerLongbow', async (info) => {
 
       exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
 
-      if (aIGuidage === 0) {
+      if (aIGuidage === '0') {
         exec.push(`{{vMStyleA=${modA}D}}`);
         cRoll.push(Number(modA));
       }
@@ -701,8 +702,11 @@ on('clicked:distanceRangerLongbow', async (info) => {
       break;
 
     case 'suppression':
-      exec.push(`{{style=${i18n_style} ${i18n_pilonnage}}}`);
+      exec.push(`{{style=${i18n_style} ${i18n_suppression}}}`);
+
       if (PG50_3 !== '1') {
+        cRoll.push(-2);
+
         const vSuppressionD = Math.floor(Number(attrs.styleSuppressionD) / 2);
         const vSuppressionV = Math.floor(Number(attrs.styleSuppressionV) / 2);
 

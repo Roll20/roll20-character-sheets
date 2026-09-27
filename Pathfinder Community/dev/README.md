@@ -24,9 +24,9 @@ This is a good option if you are not going to use VScode as your editor.
 #### Linux/Mac (adjust node version as needed)
 1. Run `curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash`
 2. Close and reopen your terminal
-3. Run `nvm install 6.9.5`
-4. Run `nvm alias default 6.9.5`
-5. Run `nvm use 6.9.5`
+3. Run `nvm install 25.1.0`
+4. Run `nvm alias default 25.1.0`
+5. Run `nvm use 25.1.0`
 
 #### Dependencies
 **NPM** is distributed with Node.js - which means that when you download [Node](https://nodejs.org/en/download/package-manager), you automatically get NPM installed on your computer as well.
@@ -67,23 +67,23 @@ More specific instructions; there is only a 'cmd' directory, not a bin directory
 2. Clone the project from within VScode or [Github Desktop](https://desktop.github.com/)
 
 ### Editing and Submitting updates
-1. It's highly recommended that you always create a new "working" branch(s) based on the Main/Master branch.
-2. Running `npm run build` will watch for changed in the "./src" files and auto-bundle HTML and JS as index.html to the "./dist" folder. (see below)
-3. Edit files in the "./src"
+1. It's highly recommended that you always create a new "working" branch(s) based on the your fork's current Main/Master branch.
+2. Running `npm run build` or `npm run dev` from the "./dev" folder will watch for changes in the "./src" files and auto-bundle HTML and JS as index.html to the "./dist" folder. (more below) Use the HTML, CSS, and translation files from the "./dist" folder when actively developing.
+3. Edit sheet files found in the "./src" folder when making changes to the sheet.
 4. Submit commits to your working branch until you are done editing and then submit a pull request to Roll20's Origin/Main for approval.
 5. Once the latest changes have been approved, they will be merged into Roll20's Origin/Master and propagate to the live servers.
 
 ## Build/Compile Script Commands
-- Run `npm run postinstall` - downloads latest version of [TheArronSheet.js](https://github.com/shdwjk/TheAaronSheet) and saves it to the "./src" folder as TheAaronSheet.cjs "TAS" is used to handle custom logging/debugging as well as some common utility functions. To simplify bundling, the ./src/TheAaronSheet.js included in the repo is a slightly edited (ie adds module.exports) version of TAS to make it an es6 module as well.
-- Run `npm run build` - Builds the project's index.html and watches for changes in the "./src" folder.Use Case: development/testing. Outputs bundled index.html, copies pathfinder.css and translation.json to "dist/" folder.
-- Run `npm run prod` - Turns **debug off** automatically. Builds the project's index.html Use Case: roll20 production. Outputs bundled index.html, copies pathfinder.css and translation.json to "prod/" folder. Can be used for roll20's pathfinder.html in the root of the project.
+- Run `npm run postinstall` - this will download the latest version of [TheArronSheet.js](https://github.com/shdwjk/TheAaronSheet) and save it to the "./src" folder as TheAaronSheet.cjs "TAS" is used to handle custom logging/debugging as well as some common utility functions in the sheet. NOTE: "./src/TheAaronSheet.js" that is included in the repo has been slightly edited version of TAS (ie adds 'module.exports') to make the file an es6 module to help simplify bundling.
+- Run `npm run build` or `npm run dev` - Builds/Bundles the project's index.html and continues to watch for changes in the "./src" folder. Use Case: Development/Testing. Outputs a bundled index.html, copies ".src/pathfinder.css" and ".src/translation.json" to ".dist/" folder.
+- Run `npm run prod` - Turns **debug off** automatically. Builds/Bundles "pathfinder_community.html" and copies the pathfinder_community.css and translation.json and HTML files to the "/prod" folder. Use Case: Roll20 production. To push the production code to Roll20's repository, simply copy these files to the root of the project and make a pull request of any changes to Roll20's Origin/Main for approval.
 
 ## Viewing Edits on Roll20
 * Option 1: (preferred) Sync a Custom Sandbox game to your local files using Scott C's Chrome browser extension [Roll20 API and Sheet Autouploader](https://chromewebstore.google.com/detail/roll20-api-and-sheet-auto/hboggmcfmaakkifgifjbccnpfmnegick) Use the in-game Custom Sandbox Tool to browse to your local "./dist" folder. The extension can "should" detect any local changes and update the sheet in-game.
-* Option 2: Use the bundled index.html, pathfinder.css, and translation.json from the ./dist or ./prod folder accordingly. These files can be copied as raw text directly into a Custom game's, "Game Settings" editor (HTML|CSS|TRANSLATION|PREVIEW). Do not rely on the Preview tab. Always view the sheet in-game for an accurate load.
+* Option 2: Use the bundled index.html, pathfinder.css, and translation.json from the ./dist or ./prod folder accordingly. These files can be copied as raw text directly into a Custom game's, "Game Settings" editor (HTML|CSS|TRANSLATION|PREVIEW). Do not rely on the Custom settings Preview tab. Always view sheet changes "in-game" for accurate depiction.
 
 ## Errors/Issues
-- Webpack dependencies: use caution when updating webpack and/or dependencies. Incompatibilities between dependencies can break the building process. Always use `npm install` to verify and update webpack-lock.json
+- Webpack dependencies: use caution when updating webpack and/or dependencies. Incompatibilities between dependencies can break the building process. Always use `npm audit` to identify issues and `npm install` to verify and update webpack-lock.json
 
 ## Module Breakdown
 Each "page" or section of the Pathfinder sheet has one or more modules associated with it. For instance, the core page has PFAbilityScores, PFInitiative, PFClassRaceGrid etc. The Defense page has PFDefense, PFSaves. The Attacks page has PFAttacks, spells page PFSpells, etc.

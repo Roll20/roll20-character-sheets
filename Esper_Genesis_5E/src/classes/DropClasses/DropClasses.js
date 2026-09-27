@@ -233,7 +233,7 @@ class Trait extends RepeatingFieldset {
           break;
         case "Races":
         case "Subraces":
-          return "Racial"
+          return "Species"
           break;
         case "Classes":
         case "Subclasses":

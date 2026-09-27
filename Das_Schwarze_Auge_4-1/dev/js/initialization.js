@@ -1,4 +1,4 @@
-/* initialization begin */
+/* initialization start */
 function initializeSheet(migrationChain) {
 	var caller = "initializeSheet";
 	debugLog(caller, "Initializing sheet ...");

@@ -1,4 +1,4 @@
-/* ranged combat calculator begin */
+/* ranged_combat_calculator start */
 function FKWgetType(typeRaw)
 {
 	var caller = "FKWgetType";
@@ -1318,4 +1318,4 @@ on("clicked:rc_attack-action", async (info) => {
 	});
 });
 
-/* ranged combat calculator end */
+/* ranged_combat_calculator end */

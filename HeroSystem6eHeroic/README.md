@@ -103,7 +103,7 @@ The sheet includes space for four defenses (plus four more accessible via the "A
 
 ![Armor Table](/HeroSystem6eHeroic/images/armor.png)
 
-The *Defense* entry space is actually a button that brings up a worksheet in which you can enter values for PD, ED, power defense, mental defense, and flash defense. The sheet will use these values to create a summary of these defenses for display in the parent table.
+The *Defense* entry space is actually a button that brings up a worksheet in which you can enter values for PD, ED, power defense, mental defense, flash defense, and the hardened defense level. The sheet will use these values to create a summary of these defenses for display in the parent table.
 
 ![Armor Worksheet](/HeroSystem6eHeroic/images/armorWorksheet.png)
 
@@ -123,6 +123,8 @@ With the Weapon Worksheet open, begin by entering a weapon's base damage. HS6eH 
 Next, set the weapon's minimum strength value and the strength the character actually uses. If strength improves damage, check "DMG Enhanced by STR." Generally one only adds increments of +5 STR over the minimum since +5 STR = + 1 DC (damage class). Using less than a character's maximum strength may mean saving END costs. Note that typically a weapon's damage class can only be doubled via strength and skill enhancements, but this may be overridden with the option "Weapon Damage limited to 2x Base Damage." Combat Skill Levels can increase damage as well at a cost of +2 CSLs = + 1 DC. These may be entered either in the worksheet or, more conveniently for play, adjusted from the Weapons Table.
 
 ![Weapon Worksheet](/HeroSystem6eHeroic/images/weaponWorksheet.png)
+
+If the weapon has the advantage *Armor Piercing* select the number of applications purchased. HS6eH will automatically add an "AP" note to attack roll messages.
 
 HERO System 6th Edition considers certain power advantages when determining enhancements to damage (e.g., armor piercing, see 6E2 98-100). HS6eH uses an algorithm that duplicates the *Damage Classes Quick-Reference Tables* found on 6E2 101 plus a best attempt to expand them using the *Expanded Damage Class Tables* available for a small fee separately from Hero Games. The expanded tables were used only as guidance since they do not always agree with the rulebook (and are missing some important common values).
 
@@ -161,6 +163,12 @@ An attack doing normal damage appears in chat with a green heading. The weapon's
 To make a targeted attack select the radio button corresponding to desired focus of your attack. If the target is stunned or otherwise incapacitated check the "1/2 penalty" option. Characters who purchased penalty skill levels may also apply them using the "Apply PSL" input. Any of the attack buttons on the Gear sheet will automatically calculate the character's OCV, determine the hit location, and calculate stun for killing attacks. The attack message will also display post-defense STUN and BODY modifiers. An attack using a weapon marked as "AoE" will not use the hit location system (this allows the hit location system to be applied on a case by case basis).
 
 ![Hit Locations](/HeroSystem6eHeroic/images/HitLocationTable.png)
+
+*Knockdown and Knockback (Optional)*
+
+If your campaign uses the knockdown or knockback rules, Roll20 will roll knockback dice and subtract the total from the BODY damage done by the attack. The outcome appears after the calculated damage result: a distance (⚞10m⚟) for knockback, two down arrows (↓↓) for knockdown, and three dots (•••) for a null result. Hover over the calculated result to see the knockback roll. Note that knockback isn't rolled for mental damage.
+
+![Knockdown](/HeroSystem6eHeroic/images/KnockdownChat.png)
 
 # <a id="page-3">Page 3: Skills</a>
 
@@ -290,6 +298,10 @@ The last page of this sheet contains a number of gameplay or display options.
 
 &emsp; Paste a single Unicode character in this text field if you would like a custom dingbat displayed between a character's name and title in Chat. For a list of possible characters, try [Unicode/List of useful symbols](https://en.wikibooks.org/wiki/Unicode/List_of_useful_symbols). Most of the monochrome symbols should work as well as a few of those with color. Font size seems to be just right or too small.
 
+### Roll for Knockback
+
+&emsp; If the campaign uses knockback rules select whether if it is for full knockback or only knockdown. The default is *never* and the standard knockdown roll is *2d6.* Lower power campaigns might opt for a knockback roll of *1d6* and higher power campaigns might use *3d6*.
+
 ### Whisper Rolls to GM
 
 &emsp; This dropdown offers three options: Never, Always, or Prompt. These give the option to send your rolls only to the GM, with prompt offering the option whenever you roll or show an ability.
@@ -378,6 +390,8 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 *First version by Villain In Glasses, August 1, 2021.*
 
 *Recent updates:*
+
+*Oct 5, 2025 added option to automatically roll for knockback (Version 4.80)*
 
 *May 8, 2025 added mental, power, and flash defense to armor (Version 4.70)*
 

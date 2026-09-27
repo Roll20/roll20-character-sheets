@@ -210,10 +210,58 @@
   border-radius: 1.5rem;
 }
 
-.sheet-container {
+/* Tabs Setup (Character/Monster) */
+
+/* Hides the contents of each tab by default */
+.charactersheet div[class^="sheet-section"] { 	
+	display: none;
+}
+
+/* Shows the tab content when the appropriate input field is selected */
+.charactersheet input.sheet-tab-character:checked ~ .sheet-section-character,
+.charactersheet input.sheet-tab-monster:checked ~ .sheet-section-monster{
+	display: flex;
+}
+
+
+/* Hides the radio button for each tab and makes sure it's above everything else */
+.charactersheet input.sheet-tab {
+  width: 100px;
+  height: 24px;
+	position: relative;
+	opacity: 0;
+	z-index: 9999;
+  cursor: pointer;
+}
+
+/* Styles the span with the tab information and slides to the left, so it appears underneath the radio button */
+.charactersheet span.sheet-tab {
+	display: inline-block;
+  width: 100px;
+  height: 24px;
+  margin-left: -100px;
+  vertical-align: middle;
+  background-color: var(--cinza-200);
+  text-align: center;
+	font-weight: bold;
+	border-radius: 3px;
+  cursor: pointer;
+}
+
+/* Modifies the span color once the radio button is selected so that is clear which tab is selected */
+.charactersheet input.sheet-tab-character:checked + span.sheet-tab-character,
+.charactersheet input.sheet-tab-monster:checked + span.sheet-tab-monster {
+  background-color: var(--carmesim-600);
+  color: white;
+	border-radius: 3px;
+}
+
+.sheet-section-character,
+.sheet-section-monster {
   display: flex;
   flex-direction: row;
   gap: 2rem;
+  margin-top: 10px;
   /* max-width: 832px; */
 
   .sheet-sidebar {
@@ -222,7 +270,8 @@
     align-items: center;
     gap: 1.5rem;
 
-    .stats {
+    .stats,
+    .monster-stats {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
@@ -242,9 +291,9 @@
           font-size: larger;
   
           label {
-            display: flex;
-            align-items: center;
-            gap: 0.1rem;
+            margin: 0px;
+            padding: 2px 3px;
+            font-size: medium;
           }
   
           input {
@@ -345,6 +394,41 @@
         }
       }
     }
+
+    .encounter,
+    .treasure,
+    .dv {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: max-content;
+      text-align: center;
+
+      .encounter-group,
+      .treasure-group,
+      .dv-group {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+
+        .dv-value {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        input {
+          width: 50px;
+          text-align: center;
+        }
+      }
+
+      .dv-group {
+        align-items: flex-start;
+      }
+    }
   }
 
   .sheet-body {
@@ -376,6 +460,20 @@
         }
       }
 
+      .monster-basic-info {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.25rem;
+
+        select {
+          margin-bottom: 0px;
+          width: auto;
+          background-color: #f5f5f5;
+        }
+      }
+
       .additional-info {
         display: flex;
         flex-direction: row;
@@ -396,6 +494,17 @@
             margin-bottom: 0px;
             width: 120px;
             background-color: #f5f5f5;
+          }
+        }
+
+        .monster-xp {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          input {
+            width: 40px;
+            text-align: center;
           }
         }
 
@@ -642,7 +751,9 @@
       .tab-spells,
       .tab-equipment,
       .tab-details,
-      .tab-notes {
+      .tab-notes,
+      .tab-monster-attacks,
+      .tab-monster-info {
         display: none;
       }
 
@@ -652,7 +763,9 @@
       .sheet-tabstoggle[value="spells"] ~ .navigation-tabs button[name="act_spells"],
       .sheet-tabstoggle[value="equipment"] ~ .navigation-tabs button[name="act_equipment"],
       .sheet-tabstoggle[value="details"] ~ .navigation-tabs button[name="act_details"],
-      .sheet-tabstoggle[value="notes"] ~ .navigation-tabs button[name="act_notes"] {
+      .sheet-tabstoggle[value="notes"] ~ .navigation-tabs button[name="act_notes"],
+      .sheet-tabstoggle[value="monster_attacks"] ~ .navigation-tabs button[name="act_monster_attacks"],
+      .sheet-tabstoggle[value="monster_info"] ~ .navigation-tabs button[name="act_monster_info"] {
         color: var(--carmesim-500);
         text-decoration: underline;
         text-underline-offset: 2px;
@@ -1255,6 +1368,161 @@
           }
         }
       }
+
+      /* monster attacks tab (Ataques) */
+      .sheet-tabstoggle[value="monster_attacks"] ~ div.tab-monster-attacks {
+        display: block;
+
+        .monster-attack-list-header {
+          display: flex;
+          flex-direction: row;
+          padding: 2.5px 5px;
+          border-top-left-radius: 0.5rem;
+          border-top-right-radius: 0.5rem;
+          background-color: var(--carmesim-600);
+          color: white;
+          font-size: smaller;
+          font-weight: bold;
+
+          .monster-attack-times-label {
+            flex-basis: 3%;
+            text-align: center;
+          }
+
+          .monster-attack-name-label {
+            flex-basis: 30.5%;
+            padding-left: 10px;
+          }
+
+          .monster-attack-ba-label {
+            flex-basis: 7%;
+          }
+
+          .monster-attack-damage-label {
+            flex-basis: 14.5%;
+          }
+
+          .monster-attack-bonus-damage-label {
+            flex-basis: 36%;
+          }
+
+          .monster-attack-action-label {
+            flex-basis: 9%;
+          }
+        }
+
+        .repcontainer[data-groupname=repeating_monsterattacks] {
+          .repitem {
+            .monster-attack-data {
+              display: flex;
+              flex-direction: row;
+              gap: 0.25rem;
+              margin-top: 0.25rem;
+              margin-bottom: 0.5rem;
+
+              .monster-attack-times {
+                flex-basis: 4%;
+
+                input {
+                  width: 30px;
+                  text-align: center;
+                }
+              }
+
+              .monster-attack-name {
+                flex-basis: 29%;
+              }
+
+              .monster-attack-ba {
+                flex-basis: 6%;
+              }
+
+              .monster-attack-damage {
+                flex-basis: 12%;
+
+                input {
+                  width: 100px;
+                }
+              }
+
+              .monster-attack-bonus-damage {
+                flex-basis: 39%;
+              }
+
+              .monster-attack-action {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                gap: 0.5rem;
+                flex-basis: 10%;
+
+                button {
+                  background-color: var(--carmesim-600);
+                  color: white;
+                  border: none;
+                  border-radius: 0.5rem;
+                  padding: 0.25rem;
+                  font-size: x-large;
+                }
+
+                button:hover {
+                  background-color: var(--carmesim-500);
+                }
+              }
+            }
+
+            .monster-attack-data input {
+              /* width: 100%; */
+              padding: 0.25rem;
+            }
+
+            .monster-attack-data input::placeholder {
+              color: var(--cinza-400);
+            }
+          }
+        }
+      }
+
+      /* monster info tab (Informações) */
+      .sheet-tabstoggle[value="monster_info"] ~ div.tab-monster-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        height: 100%;
+
+        .monster-flavor,
+        .monster-traits {
+          display: flex;
+          flex-direction: column;
+
+          .tab-title {
+            padding: 5px;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            background-color: var(--carmesim-600);
+            color: white;
+            text-align: center;
+            font-size: larger;
+            font-weight: bold;
+          }
+
+          textarea {
+            min-height: 164px;
+            height: auto;
+            padding: 5px;
+            background-color: white;
+            border: none;
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+          }
+
+          textarea[name="attr_monster_flavor"] {
+            min-height: 40px;
+          }
+        }
+      }
     }
   }
 
@@ -1318,7 +1586,9 @@
 
 .ui-dialog .charsheet button[type=roll].spell-roll,
 .ui-dialog .charsheet button[type=roll].attack-roll,
-.ui-dialog .charsheet button[type=roll].damage-roll {
+.ui-dialog .charsheet button[type=roll].monster-attack-roll,
+.ui-dialog .charsheet button[type=roll].damage-roll,
+.ui-dialog .charsheet button[type=roll].monster-damage-roll {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1326,27 +1596,33 @@
 
 .ui-dialog .charsheet button[type=roll].spell-roll::before,
 .ui-dialog .charsheet button[type=roll].attack-roll::before,
-.ui-dialog .charsheet button[type=roll].damage-roll::before {
+.ui-dialog .charsheet button[type=roll].monster-attack-roll::before,
+.ui-dialog .charsheet button[type=roll].damage-roll::before,
+.ui-dialog .charsheet button[type=roll].monster-damage-roll::before {
   content: "";
   padding: 0px;
 }
 
 .ui-dialog .charsheet button[type=roll].spell-roll::before span,
 .ui-dialog .charsheet button[type=roll].attack-roll::before span,
-.ui-dialog .charsheet button[type=roll].damage-roll::before span {
+.ui-dialog .charsheet button[type=roll].monster-attack-roll::before span,
+.ui-dialog .charsheet button[type=roll].damage-roll::before span,
+.ui-dialog .charsheet button[type=roll].monster-damage-roll::before span {
   font-size: small;
 }
 
 /* Roll Template styles */
 
-/* basicroll, bacroll, badroll, spellroll, attackroll, damageroll */
+/* basicroll, bacroll, badroll, spellroll, attackroll, monsterattackroll, damageroll, monsterdamageroll */
 
 .sheet-rolltemplate-basicroll,
 .sheet-rolltemplate-bacroll,
 .sheet-rolltemplate-badroll,
 .sheet-rolltemplate-spellroll,
 .sheet-rolltemplate-attackroll,
-.sheet-rolltemplate-damageroll {
+.sheet-rolltemplate-monsterattackroll,
+.sheet-rolltemplate-damageroll,
+.sheet-rolltemplate-monsterdamageroll {
   padding: 0.5rem;
 }
 
@@ -1355,7 +1631,9 @@
 .sheet-rolltemplate-badroll .sheet-character-name,
 .sheet-rolltemplate-spellroll .sheet-character-name,
 .sheet-rolltemplate-attackroll .sheet-character-name,
-.sheet-rolltemplate-damageroll .sheet-character-name {
+.sheet-rolltemplate-damageroll .sheet-character-name,
+.sheet-rolltemplate-monsterattackroll .sheet-character-name,
+.sheet-rolltemplate-monsterdamageroll .sheet-character-name {
   font-style: italic;
 }
 
@@ -1378,7 +1656,9 @@
 .sheet-rolltemplate-bacroll div.sheet-rollresult,
 .sheet-rolltemplate-badroll div.sheet-rollresult,
 .sheet-rolltemplate-attackroll div.sheet-rollresult,
-.sheet-rolltemplate-damageroll div.sheet-rollresult {
+.sheet-rolltemplate-monsterattackroll div.sheet-rollresult,
+.sheet-rolltemplate-damageroll div.sheet-rollresult,
+.sheet-rolltemplate-monsterdamageroll div.sheet-rollresult {
   padding: 1rem 0px;
 }
 
@@ -1396,7 +1676,9 @@
 .sheet-rolltemplate-bacroll div.sheet-rollresult span.inlinerollresult.showtip.tipsy-n-right:nth-child(2),
 .sheet-rolltemplate-badroll div.sheet-rollresult span.inlinerollresult.showtip.tipsy-n-right:nth-child(2),
 .sheet-rolltemplate-attackroll div.sheet-rollresult span.inlinerollresult.showtip.tipsy-n-right:nth-child(2),
-.sheet-rolltemplate-damageroll div.sheet-rollresult span.inlinerollresult.showtip.tipsy-n-right:nth-child(2) {
+.sheet-rolltemplate-monsterattackroll div.sheet-rollresult span.inlinerollresult.showtip.tipsy-n-right:nth-child(2),
+.sheet-rolltemplate-damageroll div.sheet-rollresult span.inlinerollresult.showtip.tipsy-n-right:nth-child(2),
+.sheet-rolltemplate-monsterdamageroll div.sheet-rollresult span.inlinerollresult.showtip.tipsy-n-right:nth-child(2) {
   padding: 0px;
   background: none;
   border: none;
@@ -1421,7 +1703,9 @@
 .sheet-rolltemplate-bacroll hr,
 .sheet-rolltemplate-badroll hr,
 .sheet-rolltemplate-attackroll hr,
+.sheet-rolltemplate-monsterattackroll hr,
 .sheet-rolltemplate-damageroll hr,
+.sheet-rolltemplate-monsterdamageroll hr,
 .sheet-rolltemplate-spellroll hr {
   margin-top: 0.75rem;
   margin-bottom: 0.75rem;

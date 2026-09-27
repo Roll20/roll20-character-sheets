@@ -37,13 +37,14 @@ const dropFunctions = {
 
     buildSpellQuery: spellLevel => {
         try {
-            let spellQuery = ""
-            for(i = 0; i < 10-spellLevel; i++) {
-                const sum = (parseInt(i, 10) + parseInt(spellLevel, 10))
-                spellQuery += `|Level ${sum},${sum}`
-            };
-    
-            return `@{wtype}&{template:spell} {{level=@{spellschool} ?{Cast at what level?${spellQuery}}}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}`
+            // POWERCARD is a descriptive card with no damage roll. A ?{Cast at what level?}
+            // query inside the &{template:spell} {{level=...}} field breaks the macro (Roll20
+            // silently drops the whole message) for any power with higher-rank scaling — this
+            // was the creation-time source of the broken cards. Show the base rank statically;
+            // the higher-rank text is in {{athigherlevels=...}} and the ATTACK output handles
+            // real cast-level scaling. Must stay byte-identical to update_spelloutput() and the
+            // sheet:opened POWERCARD_MACRO self-heal so the self-heal doesn't rewrite it (thrash).
+            return `@{wtype}&{template:spell} {{level=Rank @{spelllevel} @{spellschool}}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} {{pointcost=@{pointcost}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}`
         } catch (error) {
             console.error(error)
         }

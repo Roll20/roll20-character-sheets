@@ -1,4 +1,4 @@
-/* migration begin */
+/* migration start */
 /*
  this list has to be always ordered ascending in order to apply the migration steps in the correct order
 */

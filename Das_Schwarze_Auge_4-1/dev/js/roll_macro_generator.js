@@ -1,4 +1,4 @@
-/* roll macro generator begin */
+/* roll_macro_generator start */
 /*
 	Roll Macro Nester
 
@@ -678,4 +678,4 @@ function buildMacros(macros, reuse, resultType) {
 		return structuredResult;
 	}
 }
-/* roll macro generator end */
+/* roll_macro_generator end */

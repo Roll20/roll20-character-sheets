@@ -2602,7 +2602,7 @@ const vehiclefields = [
   'image',
   'description',
 ];
-const powerRobotArmorFields = [...vehiclefields, 'pilotarmor', 'pilotskillmod'];
+const powerRobotArmorFields = [...vehiclefields, 'pilotarmor', 'pilotskillmod','strength','strengthmod'];
 const armorfields = [
   'ArmorType',
   'armorminstrength',
@@ -2848,9 +2848,9 @@ const dropShields = function({repSectionID,repSection,targetObj,jsonObj}){
 const dropVehicle = function({jsonObj}){
   log('Vehicle Info', 'Made it to getting Vehicle Fields', r20color);
   const fields = [
-    ...(jsonObj.subcategory ? powerRobotArmorFields : vehiclefields),
+    ...((jsonObj.subcategory && / armor/i.test(jsonObj.subcategory)) ? powerRobotArmorFields : vehiclefields),
   ];
-  if (jsonObj.subcategory) {
+  if (jsonObj.subcategory && / armor/i.test(jsonObj.subcategory)) {
     prefix = jsonObj.subcategory === 'Power Armor' ? 'pa_' : 'ra_';
   }
   return [false,fields];
@@ -2891,11 +2891,10 @@ const dropCharacterType = function({repSectionID,repSection,targetObj,jsonObj,at
 };
 
 
-const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
+const getDropInfo = function (jsonObj, targetObj, repSection, attributes, prefix = '') {
   debug('Entering getDropInfo');
   let repSectionID;
   let fields;
-  let prefix = '';
   repSection ? 
     (repSectionID = generateRowID()) :
     log('Repeating Section', 'Not Found', r20color);
@@ -2949,8 +2948,13 @@ const getDropInfo = function (jsonObj, targetObj, repSection, attributes) {
     } else {
       log('Non-Repeating Fields', 'Fields Found', r20color);
       fields.forEach(field => {
+        // work around for inconsistent naming scheme.
+        // TODO: Update sheet with new attribute name to match rest of prefixed naming scheme
+        const usePrefix = /strength/.test(field) ?
+          prefix.replace(/_/,'') :
+          prefix;
         jsonObj[`${field}`] !== undefined
-          ? (targetObj[`${prefix}${field}`] = jsonObj[`${field}`])
+          ? (targetObj[`${usePrefix}${field}`] = jsonObj[`${field}`])
           : log(`${field}`, 'Not Found', r20color);
       });
     }
@@ -2984,11 +2988,11 @@ const prepVehicles = function({attributes,setObj,jsonObj}){
   const subCat = jsonObj.subcategory;
   let prefix = '';
   let vFields
-  if(subCat){
+  if(subCat && / armor/i.test(subCat)){
     prefix = `${subCat.replace(/(\w)\w+\s*/g,(match,letter)=>letter.toLowerCase())}_`;
     vFields = powerRobotArmorFields.map((field)=>`${prefix}${field}`);
     setObj[
-      jsonObj.subcategory.replace(/\s+/g, '_').toLowerCase()
+      subCat.replace(/\s+/g, '_').toLowerCase()
     ] = 1;
   }else{
     vFields = [...vehiclefields];
@@ -3004,28 +3008,31 @@ const prepVehicles = function({attributes,setObj,jsonObj}){
     : (setObj[`${prefix}vehicletype`] = jsonObj.name ||
       jsonObj['display_name'] ||
       '');
-  if (jsonObj['data-Weapons']) {
-    //if this is a vehicle with weapons, then need to add more stuff to the JSON
-    log('Vehicle Weapons Array', 'Found', r20color);
-    jsonObj['data-Weapons'].forEach(weapon => {
-      let source = subCat || jsonObj.Category;
-      let dropType = getDropInfoCommand('Weapons', source);
-      log(
-        'Import Vehicle Weapon',
-        weapon.data && weapon.data.weapon,
-        r20color
-      );
-      log('dropType', dropType, r20color);
-      log('source', source, r20color);
-      setObj = getDropInfo(
-        weapon.data,
-        setObj,
-        dropType,
-        attributes
-      );
-    });
-  }
-  return 'vehicle_non-repeating'; //Vehicles don't have a Repeating Sections for the core vehicle
+  jsonObj.image = jsonObj.Token;
+  // weapons handling commented out as handled by generalized pheg handling. was causing duplicates. Left in in case missing functionality.
+  // if (jsonObj['data-Weapons']) {
+  //   //if this is a vehicle with weapons, then need to add more stuff to the JSON
+  //   log('Vehicle Weapons Array', 'Found', r20color);
+  //   jsonObj['data-Weapons'].forEach(weapon => {
+  //     let source = subCat || jsonObj.Category;
+  //     let dropType = getDropInfoCommand('Weapons', source);
+  //     log(
+  //       'Import Vehicle Weapon',
+  //       weapon.data && weapon.data.weapon,
+  //       r20color
+  //     );
+  //     log('dropType', dropType, r20color);
+  //     log('source', source, r20color);
+  //     setObj = getDropInfo(
+  //       weapon.data,
+  //       setObj,
+  //       dropType,
+  //       attributes,
+  //       prefix
+  //     );
+  //   });
+  // }
+  return ['vehicle_non-repeating',prefix]; //Vehicles don't have a Repeating Sections for the core vehicle
 };
 
 const prepCharacterType = function({jsonObj}){
@@ -3090,14 +3097,20 @@ const compendiumDrop = function (category) {
           let repSection = dropSwitch[jsonObj.Category] ?
             dropSwitch[jsonObj.Category]({attributes:v,setObj:setattrvalues,jsonObj}) :
             undefined;
+          let prefix = '';
+          if(Array.isArray(repSection)){
+            prefix = repSection[1];
+            repSection = repSection[0];
+          }
           //If an invalid item was dropped, delete the compendium drop data and stop import.
           if(repSection === undefined){
             debug('Invalid drop category, no drop performed.');
             setAttrs(setattrvalues,{silent:true});
             return;
           }
-          setattrvalues = getDropInfo(jsonObj, setattrvalues, repSection, v);
+          setattrvalues = getDropInfo(jsonObj, setattrvalues, repSection, v,prefix);
           setattrvalues = processAdditionalPHEGs(jsonObj,setattrvalues,v);
+          sanitizeImage(setattrvalues);
           log('setattrvalues', '', r20color);
           setAttrs(setattrvalues);
           log('Values', 'Set...character sheet is updated', r20color);
@@ -3106,6 +3119,14 @@ const compendiumDrop = function (category) {
     }
   );
 };
+
+const sanitizeImage = (setObj) => {
+  [`image`,`pa_image`,`ra_image`,`Image`,`pa_Image`,`ra_Image`].forEach(ref => {
+    if(setObj[ref]){
+      setObj[ref] = setObj[ref].replace(/s3\.amazonaws\.com\/files\.d20\.io/,'files.d20.io/')
+    }
+  })
+}
 
 //Bestiary Compendium Drop
 const attributeNames = ['agility', 'smarts', 'spirit', 'strength', 'vigor'];
@@ -3316,6 +3337,7 @@ const compendiumBestiary = function () {
               finalCharacterDetails.runningDie = `1d${lookupObj.runningDie}`;
             }
             finalCharacterDetails['miniDisplay'] = '1';
+            sanitizeImage(finalCharacterDetails);
             log(
               'Finish',
               'Write PHEG data and all remaining attributes to character sheet',
@@ -3342,7 +3364,7 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
     },
     Vehicle: {
       vehicle: obj =>
-        obj['data-Vehicle'].some(o => !o.data.subcategory) ? 'on' : 0,
+        obj['data-Vehicle'].some(o => o.data.subcategory !== 'Power Armor' && o.data.subcategory !== 'Robot Armor') ? 'on' : 0,
       power_armor: obj =>
         obj['data-Vehicle'].some(
           o => o.data.subcategory === 'Power Armor'
@@ -3384,11 +3406,18 @@ const processAdditionalPHEGs = function(lookupObj,finalCharacterDetails,monster)
         log(`Monster`, singular, r20color);
         let source = phegObj.datasource;
         let dropType = getDropInfoCommand(type, source);
+        let prefix = '';
+        if(phegObj.data.subcategory){
+          prefix = /armor/i.test(phegObj.data.subcategory) ?
+            `${phegObj.data.subcategory[0].toLowerCase()}a_` :
+            '';
+        }
         finalCharacterDetails = getDropInfo(
           phegObj.data,
           finalCharacterDetails,
           dropType,
-          monster
+          monster,
+          prefix
         );
         
       });
@@ -15987,8 +16016,8 @@ on(
               <label class="csnLabel" data-i18n="weirdscience"> </label>= 
               <input class="csnInput" type="text" name="attr_weirdsciencename" value=""/>
             </div>
-            <input class="hiddenInput" type="text" name="pastrengthname" value=""/>
-            <input class="hiddenInput" type="text" name="rastrengthname" value=""/>
+            <input class="hiddenInput" type="text" name="attr_pastrengthname" value="Strength"/>
+            <input class="hiddenInput" type="text" name="attr_rastrengthname" value="Strength"/>
           </div>
         </div>
         <!-- JSON Importer-->
