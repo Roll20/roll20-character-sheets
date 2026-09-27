@@ -510,6 +510,7 @@ on(attrsMR.map(attr => "change:" + attr).join(" ").toLowerCase(),
 		safeGetAttrs(
 			attrsMR, function(v) {
 				// Boilerplate
+				const MRMin = 0;
 				let attrsToChange = {};
 
 				// Calculation
@@ -526,7 +527,7 @@ on(attrsMR.map(attr => "change:" + attr).join(" ").toLowerCase(),
 
 				// Build on MRBase
 				attrsToChange["MRGrundW"] = MRBase;
-				attrsToChange["MR"] = MRBase + parseInt(v["MRZugeK"]);
+				attrsToChange["MR"] = Math.max(MRMin, MRBase + parseInt(v["MRZugeK"]));
 
 				for (attr in attrsToChange)
 				{
