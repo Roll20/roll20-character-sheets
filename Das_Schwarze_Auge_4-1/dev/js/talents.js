@@ -576,36 +576,78 @@ on(attrsMetatalentsStats.map(talent => `change:${talent.join(":")}`).join(" ").t
 	});
 });
 
-on("change:mu change:kl change:in change:ch change:ff change:ge change:ko change:kk", function(eventInfo) {
-		// Aktualisiere Talentwerte
-		safeGetAttrs(["mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"], function(v) {
-				let attributes = {"mu": +v.mu, "kl": +v.kl, "in": +v.in, "ch": +v.ch, "ff": +v.ff, "ge": +v.ge, "ko": +v.ko, "kk": +v.kk};
-				let update = {};
+/*
+	Action Listener for Updating Gifts/Metatalents Hidden Stats
 
-				// Aktualisiere Gaben
-				getSectionIDs("gaben", function(idarray) {
-						 _.each(idarray, function(currentID, i) {
-								safeGetAttrs(["repeating_Gaben_" + currentID + "_eigenschaft1", "repeating_Gaben_" + currentID + "_eigenschaft2", "repeating_Gaben_" + currentID + "_eigenschaft3"], function(v) {
-										update["repeating_Gaben_" + currentID + "_hiddeneigenschaft1"] = attributes[v["repeating_Gaben_" + currentID + "_eigenschaft1"]];
-										update["repeating_Gaben_" + currentID + "_hiddeneigenschaft2"] = attributes[v["repeating_Gaben_" + currentID + "_eigenschaft2"]];
-										update["repeating_Gaben_" + currentID + "_hiddeneigenschaft3"] = attributes[v["repeating_Gaben_" + currentID + "_eigenschaft3"]];
-										safeSetAttrs(update);
-								});
-						});
-				});
+Gifts/metatalents use hidden stats in their rolls. These need updating when the actual stat changes.
+*/
+on(statAttrs.map(talent => `change:${talent}`).join(" ").toLowerCase(),
+	function(eventInfo) {
 
-				// Aktualisiere Metatalente
-				getSectionIDs("metatalente201904", function(idarray) {
-						 _.each(idarray, function(currentID, i) {
-								safeGetAttrs(["repeating_Metatalente201904_" + currentID + "_eigenschaft1", "repeating_Metatalente201904_" + currentID + "_eigenschaft2", "repeating_Metatalente201904_" + currentID + "_eigenschaft3"], function(v) {
-										update["repeating_Metatalente201904_" + currentID + "_hiddeneigenschaft1"] = attributes[v["repeating_Metatalente201904_" + currentID + "_eigenschaft1"]];
-										update["repeating_Metatalente201904_" + currentID + "_hiddeneigenschaft2"] = attributes[v["repeating_Metatalente201904_" + currentID + "_eigenschaft2"]];
-										update["repeating_Metatalente201904_" + currentID + "_hiddeneigenschaft3"] = attributes[v["repeating_Metatalente201904_" + currentID + "_eigenschaft3"]];
-										safeSetAttrs(update);
-								});
-						});
+	// Boilerplate
+	const caller = "Action Listener for Updating Gifts/Metatalents Hidden Stats";
+
+	safeGetAttrs(statAttrs,
+		function(attrsOuter) {
+
+		// Boilerplate
+		const sections = [
+			"gaben",
+			"metatalente201904",
+		];
+		const prefixes = {
+			"gaben": "repeating_Gaben_",
+			"metatalente201904": "repeating_Metatalente201904_",
+		}
+		const statAttrSuffix = "_eigenschaft";
+		const hiddenStatAttrSuffix = "_hiddeneigenschaft";
+
+		// Update Sections
+		for (let section of sections)
+		{
+			getSectionIDs(
+				section,
+				function(IDs) {
+
+				const attrsToChange = {};
+
+				// Gather all stat attrs of the section
+				/// Note: flatMap() turned out be roughly 2 x the speed of a for loop pushing new elements to the array (e. g. attrs not even nicely ordered); el cheapo tested on Firefox 156.0.1
+				const attrsSection = IDs
+					.map(ID => `${prefixes[section]}${ID}${statAttrSuffix}`)
+					.flatMap(attr => [`${attr}1`, `${attr}2`, `${attr}3`])
+				;
+
+				// Use the stat attrs of the section
+				safeGetAttrs(attrsSection,
+					function(attrsInner) {
+					for (let attr in attrsInner)
+					{
+						const ID = extractRowId(attr);
+						// Get the number of the stat (i. e., the last character of the string)
+						const statNumber = attr.at(-1);
+
+						// Attribute holding the (hidden) stat name (not its value)
+						const rowStatAttr = `${prefixes[section]}${ID}${statAttrSuffix}${statNumber}`;
+						const rowHiddenStatAttr = `${prefixes[section]}${ID}${hiddenStatAttrSuffix}${statNumber}`;
+
+						// Get the stat name and convert to uppercase for further consumption
+						const rowStatName = attrsInner[rowStatAttr].toUpperCase();
+
+						// Get the value of the stat
+						const rowStatValue = attrsOuter[rowStatName];
+
+						// Set the hidden stat to the value of the stat
+						attrsToChange[rowHiddenStatAttr] = rowStatValue;
+					}
+
+					// Setting attrs
+					debugLog(caller, `section: ${section}`, "attrsToChange", attrsToChange);
+					safeSetAttrs(attrsToChange);
 				});
-		});
+			});
+		}
+	});
 });
 
 /*
