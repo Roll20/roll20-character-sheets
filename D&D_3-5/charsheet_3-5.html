@@ -95,9 +95,23 @@
             <span style="text-align: left; font-weight: bold;" data-i18n="hit-diceTotal-i">HD Total</span>:<input type="text" name="attr_hitdie" title="hitdie" style="width: 43px;">
             <span style="text-align: left; font-weight: bold;" data-i18n="hit-pointsTotal-i">HP Totla</span>:<input type="text" name="attr_hitpoint" title="hitpoint" style="width: 43px;">
             <input type="checkbox" style="width: auto;" name="attr_autoCalcHP" title="autoCalcHP" value="1" />&nbsp;<span style="text-align: left;" data-i18n="autoCalc">Auto Calculate</span>
-
-
             <div class="pc-charclasses">
+                <div style="float: left; width: 100%; margin-bottom: 4px;">
+                    <span style="font-weight: bold;" data-i18n="first-level-skill-points-class">Apply ×4 first-level skill points to class</span>:
+                    <select name="attr_firstLevelClass" title="Select the class row whose first Hit Die receives ×4 skill points. Existing sheets remain unchanged while this stays at None; choosing None later removes the ×4 calculation." style="width: 75px;">
+                        <option value="0" data-i18n="none" selected>None</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
                 <div style="float: left">
                     <table>
                         <tbody>
@@ -3621,6 +3635,8 @@
                             <td colspan="9" class="statlabel-big" style="width: 790px;">
                                 <span data-i18n="totSkillPoint">Skill Point Total</span>:
                                 <input type="text" name="attr_totSkillPoint" title="totSkillPoint" class="inputbox inputboxWhite" style="width: 40px;" value="0"> -
+                                <span data-i18n="unspent-skill-points">Unspent Skill Points</span>:
+                                <input type="text" name="attr_unspentSkillPoints" title="Total skill points minus ranks purchased. Class-skill ranks cost 1 point; cross-class ranks cost 2 points." class="inputbox inputboxWhite" style="width: 40px;" value="0" readonly> -
                                 <span data-i18n="skill-points-per-level-a">skill points/lvl</span>:
                                 <input type="text" name="attr_skillpoints" title="skillpoints" value="@{skillpointsint}+@{skillpointsclass}" class="inputAsLabel" style="width: 40px;" disabled>
                                 =(<input type="text" name="attr_skillpointsint" value="(floor((@{int-base}) / 2) - 5)[base int bonus]" title="skillpointsint (Skill points/lvl from base int.)" class="inputAsLabel" style="width: 35px;" disabled>+
@@ -13734,84 +13750,41 @@ on("change:autoCalcHP change:hitpoint1  change:hitpoint2  change:hitpoint3  chan
    	});
 });
 
-on("change:hitdie1 change:skillPointLiv1 change:skillPointBonus1", eventInfo => {
-	getAttrs(["hitdie1", "skillPointLiv1", "skillPointBonus1"], values => {
-		setAttrs({
-			totSkillPoint1 : parseInt(values.hitdie1, 10) * (parseInt(values.skillPointLiv1, 10) + parseInt(values.skillPointBonus1, 10))
+const classSkillPointRows = Array.from({length: 10}, (unused, index) => index + 1);
+const classSkillPointFields = classSkillPointRows.reduce((fields, row) => {
+	fields.push(`hitdie${row}`, `skillPointLiv${row}`, `skillPointBonus${row}`);
+	return fields;
+}, ["firstLevelClass"]);
+const calculateClassSkillPoints = (row, values) => {
+	const firstLevelClass = parseInt(values.firstLevelClass, 10) || 0;
+	const hitDice = parseInt(values[`hitdie${row}`], 10) || 0;
+	const skillPointsPerLevel = parseInt(values[`skillPointLiv${row}`], 10) || 0;
+	const skillPointBonus = parseInt(values[`skillPointBonus${row}`], 10) || 0;
+	const firstLevelExtra = row === firstLevelClass && hitDice > 0 ? 3 : 0;
+	return (hitDice + firstLevelExtra) * (skillPointsPerLevel + skillPointBonus);
+};
+
+classSkillPointRows.forEach(row => {
+	const rowFields = [`hitdie${row}`, `skillPointLiv${row}`, `skillPointBonus${row}`];
+	const rowEvents = rowFields.map(field => `change:${field}`).join(" ");
+
+	on(rowEvents, eventInfo => {
+		getAttrs(["firstLevelClass", ...rowFields], values => {
+			setAttrs({[`totSkillPoint${row}`]: calculateClassSkillPoints(row, values)});
 		});
-   	});
+	});
 });
 
-on("change:hitdie2 change:skillPointLiv2 change:skillPointBonus2", eventInfo => {
-	getAttrs(["hitdie2", "skillPointLiv2", "skillPointBonus2"], values => {
-		setAttrs({
-			totSkillPoint2 : parseInt(values.hitdie2, 10) * (parseInt(values.skillPointLiv2, 10) + parseInt(values.skillPointBonus2, 10))
+on("change:firstLevelClass", eventInfo => {
+	getAttrs(classSkillPointFields, values => {
+		const firstLevelClass = parseInt(values.firstLevelClass, 10) || 0;
+		if (firstLevelClass === 0 && eventInfo.sourceType !== "player") return;
+		const updates = {};
+		classSkillPointRows.forEach(row => {
+			updates[`totSkillPoint${row}`] = calculateClassSkillPoints(row, values);
 		});
-   	});
-});
-
-on("change:hitdie3 change:skillPointLiv3 change:skillPointBonus3", eventInfo => {
-	getAttrs(["hitdie3", "skillPointLiv3", "skillPointBonus3"], values => {
-		setAttrs({
-			totSkillPoint3 : parseInt(values.hitdie3, 10) * (parseInt(values.skillPointLiv3, 10) + parseInt(values.skillPointBonus3, 10))
-		});
-   	});
-});
-
-on("change:hitdie4 change:skillPointLiv4 change:skillPointBonus4", eventInfo => {
-	getAttrs(["hitdie4", "skillPointLiv4", "skillPointBonus4"], values => {
-		setAttrs({
-			totSkillPoint4 : parseInt(values.hitdie4, 10) * (parseInt(values.skillPointLiv4, 10) + parseInt(values.skillPointBonus4, 10))
-		});
-   	});
-});
-
-on("change:hitdie5 change:skillPointLiv5 change:skillPointBonus5", eventInfo => {
-	getAttrs(["hitdie5", "skillPointLiv5", "skillPointBonus5"], values => {
-		setAttrs({
-			totSkillPoint5 : parseInt(values.hitdie5, 10) * (parseInt(values.skillPointLiv5, 10) + parseInt(values.skillPointBonus5, 10))
-		});
-   	});
-});
-
-on("change:hitdie6 change:skillPointLiv6 change:skillPointBonus6", eventInfo => {
-	getAttrs(["hitdie6", "skillPointLiv6", "skillPointBonus6"], values => {
-		setAttrs({
-			totSkillPoint6 : parseInt(values.hitdie6, 10) * (parseInt(values.skillPointLiv6, 10) + parseInt(values.skillPointBonus6, 10))
-		});
-   	});
-});
-
-on("change:hitdie7 change:skillPointLiv7 change:skillPointBonus7", eventInfo => {
-	getAttrs(["hitdie7", "skillPointLiv7", "skillPointBonus7"], values => {
-		setAttrs({
-			totSkillPoint7 : parseInt(values.hitdie7, 10) * (parseInt(values.skillPointLiv7, 10) + parseInt(values.skillPointBonus7, 10))
-		});
-   	});
-});
-
-on("change:hitdie8 change:skillPointLiv8 change:skillPointBonus8", eventInfo => {
-	getAttrs(["hitdie8", "skillPointLiv8", "skillPointBonus8"], values => {
-		setAttrs({
-			totSkillPoint8 : parseInt(values.hitdie8, 10) * (parseInt(values.skillPointLiv8, 10) + parseInt(values.skillPointBonus8, 10))
-		});
-   	});
-});
-
-on("change:hitdie9 change:skillPointLiv9 change:skillPointBonus9", eventInfo => {
-	getAttrs(["hitdie9", "skillPointLiv9", "skillPointBonus9"], values => {
-		setAttrs({
-			totSkillPoint9 : parseInt(values.hitdie9, 10) * (parseInt(values.skillPointLiv9, 10) + parseInt(values.skillPointBonus9, 10))
-		});
-   	});
-});
-
-on("change:hitdie10 change:skillPointLiv10 change:skillPointBonus10", eventInfo => {
-	getAttrs(["hitdie10", "skillPointLiv10", "skillPointBonus10"], values => {
-		setAttrs({
-			totSkillPoint10 : parseInt(values.hitdie10, 10) * (parseInt(values.skillPointLiv10, 10) + parseInt(values.skillPointBonus10, 10))
-		});
-   	});
+		setAttrs(updates);
+	});
 });
 
 on("change:totSkillPoint1 change:totSkillPoint2 change:totSkillPoint3 change:totSkillPoint4 change:totSkillPoint5 change:totSkillPoint6 change:totSkillPoint7 change:totSkillPoint8 change:totSkillPoint9 change:totSkillPoint10", eventInfo => {
@@ -13821,6 +13794,56 @@ on("change:totSkillPoint1 change:totSkillPoint2 change:totSkillPoint3 change:tot
 		});
    	});
 });
+
+const trackedSkills = [
+	"appraise", "autohypnosis", "balance", "bluff", "climb", "concentration",
+	"craft1", "craft2", "craft3", "decipherscript", "diplomacy", "disabledevice",
+	"disguise", "escapeartist", "forgery", "gatherinformation", "handleanimal", "heal",
+	"hide", "intimidate", "iaijutsufocus", "jump", "knowarcana", "knowengineer",
+	"knowdungeon", "knowgeography", "knowhistory", "knowlocal", "knownature",
+	"knownobility", "knowpsionic", "knowreligion", "knowplanes", "listen", "martiallore",
+	"movesilent", "openlock", "perform1", "perform2", "perform3", "profession1",
+	"profession2", "profession3", "psicraft", "ride", "search", "sensemotive",
+	"sleightofhand", "spellcraft", "spot", "survival", "swim", "truespeak", "tumble",
+	"usemagicdevice", "usepsionicdevice", "userope"
+];
+const trackedSkillFields = trackedSkills.reduce((fields, skill) => {
+	fields.push(`${skill}ranks`, `${skill}classskill`);
+	return fields;
+}, ["totSkillPoint"]);
+const trackedSkillEvents = trackedSkillFields.map(field => `change:${field}`).join(" ");
+
+const updateUnspentSkillPoints = () => {
+	getSectionIDs("repeating_skills", skillRowIds => {
+		const repeatingSkillFields = skillRowIds.reduce((fields, rowId) => {
+			fields.push(`repeating_skills_${rowId}_otherskillranks`, `repeating_skills_${rowId}_otherskillskill`);
+			return fields;
+		}, []);
+
+		getAttrs([...trackedSkillFields, ...repeatingSkillFields], values => {
+			const skillPointCost = (ranksField, classSkillField) => {
+				const ranks = Math.max(0, parseFloat(values[ranksField]) || 0);
+				return ranks * (values[classSkillField] === "1" ? 1 : 2);
+			};
+			let spentSkillPoints = trackedSkills.reduce((total, skill) => {
+				return total + skillPointCost(`${skill}ranks`, `${skill}classskill`);
+			}, 0);
+
+			skillRowIds.forEach(rowId => {
+				spentSkillPoints += skillPointCost(
+					`repeating_skills_${rowId}_otherskillranks`,
+					`repeating_skills_${rowId}_otherskillskill`
+				);
+			});
+
+			const totalSkillPoints = parseFloat(values.totSkillPoint) || 0;
+			const unspentSkillPoints = Math.round((totalSkillPoints - spentSkillPoints) * 100) / 100;
+			setAttrs({unspentSkillPoints});
+		});
+	});
+};
+
+on(`sheet:opened ${trackedSkillEvents} change:repeating_skills:otherskillranks change:repeating_skills:otherskillskill remove:repeating_skills`, updateUnspentSkillPoints);
 
 on("change:npcautoCalcHP change:npclevel1 change:npclevel2 change:npclevel3 change:npclevel4 change:npclevel5 change:npclevel6 change:npclevel7 change:npclevel8 change:npclevel9 change:npclevel10", eventInfo => {
 	getAttrs(["npcautoCalcHP", "npclevel1", "npclevel2", "npclevel3", "npclevel4", "npclevel5", "npclevel6", "npclevel7", "npclevel8", "npclevel9", "npclevel10"], values => {
@@ -15270,5 +15293,4 @@ on("sheet:opened change:spellsBonusEnabled change:spellsChaBonus change:powersBo
 
 //console.log(JSON.stringify(object, null, 4));
 </script>
-
 
