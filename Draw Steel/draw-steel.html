@@ -6529,15 +6529,14 @@
 			[getTranslationByKey("I")]: { macro: '@{intuition}', label: getTranslationByKey('intuition') },
 			[getTranslationByKey("P")]: { macro: '@{presence}',  label: getTranslationByKey('presence') }
 		};
-		
+
 		const charList = Object.keys(charMap).join('');
-		
+		const orTrans = getTranslationByKey("damage-calc-or");
+
 		// Separate Damage from Effects
 		const [rawDamage, ...rest] = tierEffect.split(';');
 		let effectSection = rest.length ? ';' + rest.join(';') : '';
-		
-		const orTrans = getTranslationByKey("damage-calc-or");
-		
+
 		/**
 		 * Tier effects typically use one of the following formats:
 		 * <baseDamage> + <characteristic> <damageType> damage; <added effects>
@@ -6545,38 +6544,53 @@
 		 * <baseDamage> <damageType> damage; <added effects>
 		 * <effects>
 		 *
-		 * REGEX to get characteristics from the tier effect:
-		 * ^(\d+)              : (Group 1) Base Damage - Required.
-		 * (?:                 : Start Optional non-capturing group for the "+" section.
-		 * \s*\+\s* : Match "+" with flexible spacing.
-		 * (                 : (Group 2) The Characteristic Block.
-		 * [charList]      : Start with one valid letter.
-		 * (?:[\s,]+(?:${orTrans}\s+)?[${charList}])* : Match additional letters with commas/or.
-		 * )
-		 * )?                  : End Optional group (the "?" makes "3 damage" work).
+		 * REGEX Breakdown:
+		 * ^([\d\bsd\s\+\-]+?)
+         *   - Group 1: Non-greedy match for base damage math.
+         *   - Matches digits (\d), word boundaries (\b), 'd' for dice (e.g. 2d6), flexible whitespace (\s), and math operators (\+, \-).
+         *   - Non-greedy (+?) ensures it yields to the characteristic block if one is attached via '+'.
+         *
+         * (?:\s*\+\s*(${characteristicPattern}))?
+         *   - Optional non-capturing group for characteristic addition.
+         *   - \s*\+\s* : Matches the connecting '+' sign.
+         *   - Group 2 (${characteristicPattern}): Matches localized characteristic codes (e.g., "A", "M or A").
+         *
+         * \s+([a-zA-Z].*)?$
+         *   - Group 3 (Optional): Matches the remaining damage type text starting with a letter up to end of string (e.g., "damage", "fire damage").
 		 */
-		const damageRegex = new RegExp(`^(\\d+)(?:\\s*\\+\\s*([${charList}](?:[\\s,]+(?:${orTrans}\\s+)?[${charList}])*))?`, "");
-		
+		const characteristicPattern = `[${charList}](?:[\\s,]+(?:${orTrans}\\s+)?[${charList}])*`;
+		const damageRegex = new RegExp(`^([\\d\\bsd\\s\\+\\-]+?)(?:\\s*\\+\\s*(${characteristicPattern}))?\\s+([a-zA-Z].*)?$`, "i");
+
 		const match = rawDamage.trim().match(damageRegex);
 		if (!match) return tierEffect;
-		
-		// baseDamage contains the damage number, characteristicsRaw contains any matched characteristics
-		const baseDamage = match[1];
-		const characteristicsRaw = match[2]; 
-				
+
+		let baseDamage = '';
+		let characteristicsRaw = null;
+		let damageType = '';
+
+		if (match) {
+			baseDamage = match[1].trim();
+			characteristicsRaw = match[2];
+			damageType = match[3] ? match[3].trim() : '';
+		} else {
+			// Fallback for cases without explicit trailing text
+			baseDamage = rawDamage.trim();
+		}
+
 		let damageCalc = [baseDamage];
 		let processedChars = [];
-		
+
 		// Parse Characteristics if they exist
 		if (characteristicsRaw) {
-			// Extract localized letters found in the string
 			const charLetters = characteristicsRaw.match(new RegExp(`[${charList}]`, "g"));
-			charLetters.forEach(letter => {
-				const entry = charMap[letter.toUpperCase()];
-				if (entry) {
-					processedChars.push(`${entry.macro}[${entry.label}]`);
-				}
-			});
+			if (charLetters) {
+				charLetters.forEach(letter => {
+					const entry = charMap[letter];
+					if (entry) {
+						processedChars.push(`${entry.macro}[${entry.label}]`);
+					}
+				});
+			}
 
 			if (processedChars.length > 1) {
 				damageCalc.push(`+ {${processedChars.join(', ')}}kh1`);
@@ -6590,19 +6604,18 @@
 		if (other) damageCalc.push(other);
 
 		// Extract Damage Type & Potency replacements
-		const matchedText = match[0];
-		const damageType = rawDamage.trim().substring(matchedText.length).trim();
-		
 		['weak', 'average', 'strong'].forEach(p => {
 			const trans = getTranslationByKey(`potency-${p}`);
 			const trigger = `[${trans.toLowerCase()}]`;
 			const replacement = `[[@{potency_${p}}[${trans}]]]`;
 			effectSection = effectSection.split(trigger).join(replacement);
 		});
-		
-		return `[[${damageCalc.join(' ')}]] ${damageType}${effectSection}`.trim();
+
+		const calculatedRoll = damageCalc.join(' ').replace(/\+\s*\+/, '+').trim();
+		const formattedType = damageType ? ` ${damageType}` : '';
+
+		return `[[${calculatedRoll}]]${formattedType}${effectSection}`.trim();
 	}
-	
 /**
  ** Event Handlers 
  **/
@@ -8642,6 +8655,7 @@
 				section = 'npcabilities';
 			}
 		}
+		const abilityType = usageData.free ? 'free-' + config.type : config.type;
  
 		const cost = rawCost === 'signature' ? 'signature' : (parseInt(rawCost) || 0);
 		if (cost === 'signature') subtype = 'signature-ability';
@@ -8690,7 +8704,7 @@
 		const attrs = {
 			[`${prefix}_name`]: name,
 			[`${prefix}_description`]: description,
-			[`${prefix}_type`]: isNPC ? (config.type || usage) : config.type,
+			[`${prefix}_type`]: abilityType,
 			[`${prefix}_subtype`]: subtype,
 			[`${prefix}_keywords`]: keywords.join(', '),
 			[`${prefix}_trigger`]: usageData.trigger ?? '',
