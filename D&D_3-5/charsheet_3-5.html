@@ -9,6 +9,7 @@
 <div class="content-sheet">
     <input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="8.0"/>
     <input type="hidden" name="attr_code_version" title="code_version" value="0"/>
+    <input type="hidden" name="attr_initiativetokenmacro" value="@{initmacro}"/>
 
     <input type="radio" class="switch-pc-show switch" title="npc-show" name="attr_npc-show" value="1" checked /><span style="text-align: left;" data-i18n="pc" >PC </span><span> &nbsp; &nbsp; &nbsp; &nbsp;</span>
     <input type="radio" class="switch-npc-show switch" title="npc-show" name="attr_npc-show" value="2" /><span style="text-align: left;" data-i18n="npc">NPC</span>
@@ -433,7 +434,7 @@
                                                                 <textarea rows="1" cols="40" style="width: 40px; height: 20px;" title="initmacro (modify to modify initiative roll macro)" name="attr_initmacro">&{template:DnD35Initiative} {{name=@{selected|character_name} }} {{check=Initiative:}} {{checkroll= [[ 1d20 + [[ @{selected|init} ]] + ( [[ (@{selected|init}) ]] /100) &{tracker} ]] }}</textarea>
                                                             </td>
                                                             <td>
-                                                                <button class="tokenaction" type="roll" name="roll_initiative" title="initiative" value="@{initmacro}"></button>
+                                                                <button class="tokenaction" type="roll" name="roll_initiative" title="initiative" value="@{initiativetokenmacro}"></button>
                                                                 <br>
                                                                 <div style="font-size: 0.5em;"> &nbsp; </div>
                                                             </td>
@@ -9584,7 +9585,7 @@ on("change:repeating_summons:summonsautoCalcHP change:repeating_summons:summonsh
                                         <span class="table-sheet-data-center">
 										<input class="inputbox" style="width: 25px; height: 24px; text-align: center;" type="text" name="attr_initactionmod" title="initactionmod" value="(@{conditionsBonusEnabled}*@{deafenedEnabled})" disabled/>
 									</span>
-                                        <button type="roll" name="roll_initiative" title="initiative" value="@{initmacro}""></button>
+                                        <button type="roll" name="roll_initiative" title="initiative" value="@{initiativetokenmacro}"></button>
                                     </div>
                                 </td>
                             </tr>
@@ -13463,6 +13464,16 @@ var TAS = TAS || (function(){
 
 /* ---- END: TheAaronSheet.js ---- */
 
+const updateInitiativeTokenMacro = function() {
+    getAttrs(["npc-show", "initmacro", "npcinitmacro"], function(values) {
+        setAttrs({
+            initiativetokenmacro: values["npc-show"] === "2" ? values.npcinitmacro : values.initmacro
+        });
+    });
+};
+
+on("sheet:opened change:npc-show change:initmacro change:npcinitmacro", updateInitiativeTokenMacro);
+
 on('change:repeating_equipment', function(){
     TAS.repeating('equipment')
         .attrs('totalequipmentweight','totalequipmentcost','summary')
@@ -13624,12 +13635,27 @@ on("change:npcstr", function() {
 	});
   });
 });
-on("change:npcdex", function() {
-  getAttrs(["npcdex", "npcdex-mod"], function(values) {
+const updateNpcDexterity = function(useDexForDefaultInitiative) {
+  getAttrs(["npcdex", "npcdex-mod", "npcinit"], function(values) {
+	const previousDexModifier = parseInt(values["npcdex-mod"], 10) || 0;
+	const dexScore = parseInt(values.npcdex, 10);
+	const dexModifier = isNaN(dexScore) ? 0 : Math.floor((dexScore / 2) - 5);
+	const initiative = parseInt(values.npcinit, 10) || 0;
+	const updatedInitiative = useDexForDefaultInitiative
+		? (initiative === 0 ? dexModifier : initiative)
+		: initiative + dexModifier - previousDexModifier;
+
 	setAttrs({
-	  "npcdex-mod": Math.floor((parseInt(values.npcdex,10) / 2) - 5)
+	  "npcdex-mod": dexModifier,
+	  npcinit: updatedInitiative
 	});
   });
+};
+on("sheet:opened", function() {
+  updateNpcDexterity(true);
+});
+on("change:npcdex", function() {
+  updateNpcDexterity(false);
 });
 on("change:npccon", function() {
   getAttrs(["npccon", "npccon-mod"], function(values) {
@@ -15293,4 +15319,3 @@ on("sheet:opened change:spellsBonusEnabled change:spellsChaBonus change:powersBo
 
 //console.log(JSON.stringify(object, null, 4));
 </script>
-
