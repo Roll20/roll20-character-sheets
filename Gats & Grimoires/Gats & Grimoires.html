@@ -1,7 +1,7 @@
 <div class="sheet-gg">
     <input type="hidden" name="attr_sheet_mode" class="sheet-mode-state" value="pc">
     <input type="hidden" name="attr_tab" class="sheet-tab-state" value="core">
-    <input type="hidden" name="attr_sheet_version" value="0.1.9">
+    <input type="hidden" name="attr_sheet_version" value="0.2.3">
     <input type="hidden" name="attr_worker_status" value="PREVIEW — WORKERS OFF">
     <input type="hidden" name="attr_physical_dc" value="10">
     <input type="hidden" name="attr_spell_dc" value="10">
@@ -9,11 +9,13 @@
     <input type="hidden" name="attr_armor_def" value="0">
     <input type="hidden" name="attr_armor_bulk" value="0">
     <input type="hidden" name="attr_inventory_bulk" value="0">
+    <input type="hidden" name="attr_weapon_bulk" value="0">
     <input type="hidden" name="attr_bulk_total" value="0">
     <input type="hidden" name="attr_bulk_over" value="0">
     <input type="hidden" name="attr_encumbrance_state" value="Normal">
     <input type="hidden" name="attr_connection_count" value="0">
     <input type="hidden" name="attr_connection_warning" class="sheet-connection-warning-state" value="0">
+    <input type="hidden" name="attr_personal_cash_total" value="20">
     <input type="hidden" name="attr_resource_hint" value="">
 
     <div class="sheet-brandbar">
@@ -283,18 +285,19 @@
             <div class="sheet-panel">
                 <div class="sheet-section-title">Attacks</div>
                 <div class="sheet-repeating-header sheet-attack-header">
-                    <span>Name</span><span>Stat</span><span>Bonus</span><span>Damage</span><span>Type</span><span>Range</span><span>Ammo</span><span></span>
+                    <span>Name</span><span>Hands</span><span>Stat</span><span>Bonus</span><span>Damage</span><span>Type</span><span>Range</span><span>Ammo</span><span></span>
                 </div>
                 <fieldset class="repeating_attacks">
                     <div class="sheet-repeating-row sheet-collapsible-row">
                         <input class="sheet-row-toggle" type="checkbox" name="attr_atk_expanded" value="1" checked="true" title="Expand or collapse this entry">
                         <div class="sheet-collapse-summary">
                             <span class="sheet-collapse-title" name="attr_atk_name"></span><span class="sheet-collapse-placeholder">New Attack</span>
-                            <span class="sheet-collapse-meta"><span name="attr_atk_damage_dice"></span> <span name="attr_atk_damage_type"></span></span>
-                            <span class="sheet-summary-actions"><button class="sheet-quick-button" type="roll" name="roll_atk_quick" value="@{roll_whisper}&{template:ggattack} {{name=@{character_name}}} {{title=@{atk_name}}} {{attack=[[@{roll_mode}+@{atk_stat_value}+@{atk_bonus}+?{Situational Modifier|0}]]}} {{defense=[[?{Target Defense|0}]]}} {{damage=[[@{atk_damage_dice}+@{atk_damage_stat_value}+@{atk_damage_bonus}]]}} {{dtype=@{atk_damage_type}}} {{range=@{atk_range}}} {{ammo=@{atk_ammo}/@{atk_ammo_max}}} {{traits=@{atk_traits}}} {{notes=@{atk_notes}}}">ATTACK</button></span>
+                            <span class="sheet-collapse-meta"><span name="attr_atk_damage_dice"></span> <span name="attr_atk_damage_type"></span> · Hands <span name="attr_atk_hands"></span> · Bulk <span name="attr_atk_bulk"></span></span>
+                            <span class="sheet-summary-actions"><button class="sheet-quick-button" type="roll" name="roll_atk_quick" value="@{roll_whisper}&{template:ggattack} {{name=@{character_name}}} {{title=@{atk_name}}} {{attack=[[@{roll_mode}+@{atk_stat_value}+@{atk_bonus}+?{Situational Modifier|0}]]}} {{defense=[[?{Target Defense|0}]]}} {{damage=[[@{atk_damage_dice}+@{atk_damage_stat_value}+@{atk_damage_bonus}]]}} {{dtype=@{atk_damage_type}}} {{range=@{atk_range}}} {{ammo=@{atk_ammo}/@{atk_ammo_max}}} {{traits=Hands @{atk_hands}; @{atk_traits}}} {{notes=@{atk_notes}}}">ATTACK</button></span>
                         </div>
                         <div class="sheet-repeating-row sheet-attack-row sheet-collapse-body">
                         <input type="text" name="attr_atk_name" spellcheck="false" title="@{atk_name}" placeholder="Weapon / attack">
+                        <input type="text" name="attr_atk_hands" value="1" spellcheck="false" placeholder="1 / 2" title="Hands required to use this weapon">
                         <select name="attr_atk_stat_key">
                             <option value="body">Body</option>
                             <option value="reflex" selected="selected">Reflex</option>
@@ -320,8 +323,12 @@
                         </div>
                         <input type="text" name="attr_atk_damage_type" spellcheck="false" placeholder="Firearm">
                         <input type="text" name="attr_atk_range" spellcheck="false" placeholder="8/16">
-                        <div class="sheet-ammo-entry"><input type="number" name="attr_atk_ammo" value="0"><span>/</span><input type="number" name="attr_atk_ammo_max" value="0"></div>
-                        <button class="sheet-attack-button" type="roll" name="roll_atk_roll" value="@{roll_whisper}&{template:ggattack} {{name=@{character_name}}} {{title=@{atk_name}}} {{attack=[[@{roll_mode}+@{atk_stat_value}+@{atk_bonus}+?{Situational Modifier|0}]]}} {{defense=[[?{Target Defense|0}]]}} {{damage=[[@{atk_damage_dice}+@{atk_damage_stat_value}+@{atk_damage_bonus}]]}} {{dtype=@{atk_damage_type}}} {{range=@{atk_range}}} {{ammo=@{atk_ammo}/@{atk_ammo_max}}} {{traits=@{atk_traits}}} {{notes=@{atk_notes}}}">ATTACK</button>
+                        <div class="sheet-ammo-entry" title="Current Ammo / Maximum Ammo">
+                            <input class="sheet-ammo-current" type="number" name="attr_atk_ammo" value="0" min="0" step="1" title="Current Ammo">
+                            <span class="sheet-ammo-slash">/</span>
+                            <input class="sheet-ammo-max" type="number" name="attr_atk_ammo_max" value="0" min="0" step="1" title="Maximum Ammo">
+                        </div>
+                        <button class="sheet-attack-button" type="roll" name="roll_atk_roll" value="@{roll_whisper}&{template:ggattack} {{name=@{character_name}}} {{title=@{atk_name}}} {{attack=[[@{roll_mode}+@{atk_stat_value}+@{atk_bonus}+?{Situational Modifier|0}]]}} {{defense=[[?{Target Defense|0}]]}} {{damage=[[@{atk_damage_dice}+@{atk_damage_stat_value}+@{atk_damage_bonus}]]}} {{dtype=@{atk_damage_type}}} {{range=@{atk_range}}} {{ammo=@{atk_ammo}/@{atk_ammo_max}}} {{traits=Hands @{atk_hands}; @{atk_traits}}} {{notes=@{atk_notes}}}">ATTACK</button>
                         <div class="sheet-row-details">
                             <label>Traits<input type="text" name="attr_atk_traits" spellcheck="false" placeholder="Reliable, Auto, Loud..."></label>
                             <label>Reload<input type="text" name="attr_atk_reload" spellcheck="false" placeholder="Action / Quick"></label>
@@ -333,6 +340,8 @@
                                 </span>
                             </label>
                             <label class="sheet-check-label"><input type="checkbox" name="attr_atk_jammed" value="1">Jammed</label>
+                            <label>Bulk<input type="number" name="attr_atk_bulk" value="0" min="0" step="0.1" title="Weapon Bulk. Enter Light weapons as 0.1 if you are using decimal Light-item tracking."></label>
+                            <label class="sheet-check-label"><input type="checkbox" name="attr_atk_counted" value="1" checked="true">Count Bulk?</label>
                             <label class="sheet-details-notes">Notes<textarea name="attr_atk_notes" spellcheck="false" placeholder="Special rules and reminders"></textarea></label>
                         </div>
                     </div>
@@ -542,8 +551,37 @@
         </div>
 
         <div class="sheet-page sheet-page-inventory">
+            <div class="sheet-panel sheet-money-panel">
+                <div class="sheet-section-title">Money</div>
+                <div class="sheet-money-grid">
+                    <label>Cash on Hand $
+                        <input type="number" name="attr_cash_on_hand" value="20" min="0" step="1" title="@{cash_on_hand}">
+                    </label>
+                    <label>Stashed Cash $
+                        <input type="number" name="attr_stashed_cash" value="0" min="0" step="1" title="@{stashed_cash}">
+                    </label>
+                    <div class="sheet-money-total">
+                        <span>Total Personal Cash</span>
+                        <div class="sheet-money-total-readout">
+                            <span>$</span>
+                            <input type="number"
+                                   class="sheet-money-total-input"
+                                   name="attr_personal_cash_total_view"
+                                   value="(@{cash_on_hand}+@{stashed_cash})"
+                                   disabled="true"
+                                   title="Cash on Hand + Stashed Cash">
+                        </div>
+                    </div>
+                    <label class="sheet-money-notes">Money / Valuables Notes
+                        <input type="text" name="attr_money_notes" spellcheck="false" placeholder="IOUs, jewelry, hidden rolls, who owes you...">
+                    </label>
+                </div>
+                <div class="sheet-rule-note">Total Personal Cash automatically equals Cash on Hand + Stashed Cash. Crew Bank is tracked separately on the shared Crew sheet. New Goons normally begin with $20 personal cash under the book's campaign-start defaults.</div>
+            </div>
+
             <div class="sheet-panel sheet-bulk-banner">
 <div><span>Carry Limit</span><input class="sheet-autocalc-number sheet-summary-value" type="number" name="attr_carry_limit_gear_view" value="(((@{body}*2+@{carry_misc})+2+abs((@{body}*2+@{carry_misc})-2))/2)" disabled="true" title="Minimum 2; otherwise Body × 2 + Carry Misc"> </div>
+                <div><span>Weapon Bulk</span><span class="sheet-bulk-live-value" name="attr_weapon_bulk_display">0</span></div>
                 <div><span>Inventory Bulk</span><span class="sheet-bulk-live-value" name="attr_inventory_bulk_display">0</span></div>
                 <div><span>Armor Bulk</span><span class="sheet-bulk-live-value" name="attr_armor_bulk_display">0</span></div>
                 <div><span>Total</span><span class="sheet-bulk-live-value" name="attr_bulk_total_display">0</span></div>
@@ -578,7 +616,66 @@
                     </div>
                     </div>
                 </fieldset>
-                <div class="sheet-rule-note">Uncheck “Count?” for contents currently exempted by an active container rule or for gear left in the Crew Stash. Enter Light items as 0.1 Bulk each.</div>
+                <div class="sheet-rule-note">Weapons entered under Combat can count their Bulk automatically. Do not enter the same weapon here as counted gear unless you uncheck one of the two Count Bulk? boxes. Uncheck “Count?” for container-exempt contents or gear left elsewhere. Enter Light items as 0.1 Bulk each if using decimal Light-item tracking.</div>
+            </div>
+
+            <div class="sheet-panel">
+                <div class="sheet-section-title">Vehicles</div>
+                <div class="sheet-rule-note">Vehicle Cargo is carrying capacity for the vehicle and does not add to your Goon's personal Bulk.</div>
+                <fieldset class="repeating_vehicles">
+                    <div class="sheet-repeating-row sheet-collapsible-row">
+                        <input class="sheet-row-toggle" type="checkbox" name="attr_veh_expanded" value="1" checked="true" title="Expand or collapse this vehicle">
+                        <div class="sheet-collapse-summary">
+                            <span class="sheet-collapse-title" name="attr_veh_name"></span><span class="sheet-collapse-placeholder">New Vehicle</span>
+                            <span class="sheet-collapse-meta">Hull <span name="attr_veh_hull"></span>/<span name="attr_veh_hull_max"></span> · Speed <span name="attr_veh_speed"></span> · Handling <span name="attr_veh_handling"></span></span>
+                            <span class="sheet-summary-actions">
+                                <button class="sheet-quick-button" type="roll" name="roll_veh_quick_share" value="@{roll_whisper}&{template:ggfeature} {{name=@{character_name}}} {{title=@{veh_name}}} {{type=Vehicle}} {{prereq=Defense @{veh_defense}; Hull @{veh_hull}/@{veh_hull_max}; Combat Speed @{veh_speed}; Chase @{veh_top}; Handling @{veh_handling}; Seats @{veh_seats}; Cargo @{veh_cargo}}} {{effect=@{veh_traits}}} {{notes=@{veh_special}}}">SHARE</button>
+                            </span>
+                        </div>
+
+                        <div class="sheet-vehicle-card sheet-collapse-body">
+                            <div class="sheet-vehicle-primary">
+                                <label>Name<input type="text" name="attr_veh_name" spellcheck="false" placeholder="Sedan, Roadster, Hearse..."></label>
+                                <label>Type<input type="text" name="attr_veh_type" spellcheck="false" placeholder="Automobile, Boat, Aircraft..."></label>
+                                <label>Cost $<input type="number" name="attr_veh_cost" value="0" min="0"></label>
+                                <label>Seats<input type="text" name="attr_veh_seats" spellcheck="false" placeholder="4"></label>
+                                <label>Cargo<input type="text" name="attr_veh_cargo" spellcheck="false" placeholder="6 Bulk"></label>
+                                <label>Defense<input type="number" name="attr_veh_defense" value="8"></label>
+                            </div>
+
+                            <div class="sheet-vehicle-stats">
+                                <label>Combat Speed<input type="number" name="attr_veh_speed" value="0" min="0"></label>
+                                <label>Top / Chase<input type="number" name="attr_veh_top" value="0" min="0"></label>
+                                <label>Handling<input type="number" name="attr_veh_handling" value="0" step="1"></label>
+                                <label>Hull
+                                    <span class="sheet-inline-pair">
+                                        <input type="number" name="attr_veh_hull" value="0">
+                                        <b>/</b>
+                                        <input type="number" name="attr_veh_hull_max" value="0" min="0">
+                                    </span>
+                                </label>
+                                <label>Armor / Soak<input type="text" name="attr_veh_soak" spellcheck="false" placeholder="Soak 1 (Vehicle)"></label>
+                                <label>Cover<input type="text" name="attr_veh_cover" spellcheck="false" placeholder="Light / Heavy / Exposed"></label>
+                            </div>
+
+                            <div class="sheet-vehicle-secondary">
+                                <label>Traits<input type="text" name="attr_veh_traits" spellcheck="false" placeholder="Fast, Cargo, Restricted..."></label>
+                                <label>Mods / Upgrades<input type="text" name="attr_veh_mods" spellcheck="false" placeholder="Armor Plating, Radio Scanner..."></label>
+                                <label>Reliability
+                                    <span class="sheet-reliability-boxes">
+                                        <input type="checkbox" name="attr_veh_rel1" value="1">
+                                        <input type="checkbox" name="attr_veh_rel2" value="1">
+                                        <input type="checkbox" name="attr_veh_rel3" value="1">
+                                    </span>
+                                </label>
+                            </div>
+
+                            <label>Special / Notes<textarea name="attr_veh_special" spellcheck="false" placeholder="Special rules, smuggling compartments, vehicle quirks, ownership notes..."></textarea></label>
+
+                            <button type="roll" name="roll_veh_share" value="@{roll_whisper}&{template:ggfeature} {{name=@{character_name}}} {{title=@{veh_name}}} {{type=Vehicle}} {{prereq=Defense @{veh_defense}; Hull @{veh_hull}/@{veh_hull_max}; Combat Speed @{veh_speed}; Chase @{veh_top}; Handling @{veh_handling}; Seats @{veh_seats}; Cargo @{veh_cargo}}} {{effect=@{veh_traits}}} {{notes=@{veh_special}}}">SHARE VEHICLE</button>
+                        </div>
+                    </div>
+                </fieldset>
             </div>
         </div>
 
@@ -632,7 +729,7 @@
                 <input class="sheet-row-toggle" type="checkbox" name="attr_settings_expanded" value="1" title="Open or close sheet settings">
                 <div class="sheet-collapse-summary sheet-settings-summary">
                     <span class="sheet-collapse-title">Sheet Settings &amp; Diagnostics</span>
-                    <span class="sheet-collapse-meta">v0.1.9</span>
+                    <span class="sheet-collapse-meta">v0.2.3</span>
                 </div>
                 <div class="sheet-collapse-body sheet-settings-body">
                     <div class="sheet-settings-grid">
@@ -977,7 +1074,7 @@
 <script type="text/worker">
 'use strict';
 
-const GG_VERSION = '0.1.9';
+const GG_VERSION = '0.2.3';
 
 on('sheet:opened', function() {
     setAttrs({
@@ -1001,6 +1098,14 @@ const checkboxValue = (value, defaultChecked = false) => {
         return defaultChecked;
     }
     return String(value) === '1' || String(value).toLowerCase() === 'on';
+};
+
+const recalculateMoney = () => {
+    getAttrs(['cash_on_hand', 'stashed_cash'], values => {
+        const cash = Math.max(0, numberValue(values.cash_on_hand));
+        const stash = Math.max(0, numberValue(values.stashed_cash));
+        setAttrs({ personal_cash_total: cash + stash });
+    });
 };
 
 const statFromKey = (key, stats) => {
@@ -1120,91 +1225,102 @@ const recalculateArmor = () => {
 };
 
 const recalculateBulk = () => {
-    getSectionIDs('inventory', inventoryIds => {
-        getSectionIDs('armor', armorIds => {
-            const fields = ['body', 'carry_misc'];
+    getSectionIDs('attacks', attackIds => {
+        getSectionIDs('inventory', inventoryIds => {
+            getSectionIDs('armor', armorIds => {
+                const fields = ['body', 'carry_misc'];
 
-            inventoryIds.forEach(id => {
-                fields.push(`repeating_inventory_${id}_inv_counted`);
-                fields.push(`repeating_inventory_${id}_inv_qty`);
-                fields.push(`repeating_inventory_${id}_inv_bulk_each`);
-            });
-
-            armorIds.forEach(id => {
-                fields.push(`repeating_armor_${id}_arm_counted`);
-                fields.push(`repeating_armor_${id}_arm_bulk`);
-            });
-
-            getAttrs(fields, values => {
-                let inventoryBulk = 0;
-                let armorBulk = 0;
-                const rowSetters = {};
+                attackIds.forEach(id => {
+                    fields.push(`repeating_attacks_${id}_atk_counted`);
+                    fields.push(`repeating_attacks_${id}_atk_bulk`);
+                });
 
                 inventoryIds.forEach(id => {
-                    const prefix = `repeating_inventory_${id}_`;
-                    const counted = checkboxValue(values[`${prefix}inv_counted`], true);
-                    const qty = Math.max(0, numberValue(values[`${prefix}inv_qty`], 1));
-                    const each = Math.max(0, numberValue(values[`${prefix}inv_bulk_each`]));
-                    const rowBulk = counted ? qty * each : 0;
-
-                    inventoryBulk += rowBulk;
-                    rowSetters[`${prefix}inv_row_bulk`] = Math.round(rowBulk * 100) / 100;
+                    fields.push(`repeating_inventory_${id}_inv_counted`);
+                    fields.push(`repeating_inventory_${id}_inv_qty`);
+                    fields.push(`repeating_inventory_${id}_inv_bulk_each`);
                 });
 
                 armorIds.forEach(id => {
-                    const prefix = `repeating_armor_${id}_`;
-                    const counted = checkboxValue(values[`${prefix}arm_counted`], true);
-                    const bulk = Math.max(0, numberValue(values[`${prefix}arm_bulk`]));
-                    if (counted) armorBulk += bulk;
+                    fields.push(`repeating_armor_${id}_arm_counted`);
+                    fields.push(`repeating_armor_${id}_arm_bulk`);
                 });
 
-                inventoryBulk = Math.round(inventoryBulk * 100) / 100;
-                armorBulk = Math.round(armorBulk * 100) / 100;
+                getAttrs(fields, values => {
+                    let weaponBulk = 0;
+                    let inventoryBulk = 0;
+                    let armorBulk = 0;
+                    const rowSetters = {};
 
-                const total = Math.round((inventoryBulk + armorBulk) * 100) / 100;
-                const limit = Math.max(2, numberValue(values.body) * 2 + numberValue(values.carry_misc));
-                const over = Math.max(0, Math.ceil(total - limit));
-
-                let state = 'Normal';
-                if (over >= 5) state = 'Severely Overloaded';
-                else if (over >= 3) state = 'Overloaded';
-                else if (over >= 1) state = 'Encumbered';
-
-                const globalSetters = {
-                    inventory_bulk: inventoryBulk,
-                    armor_bulk: armorBulk,
-                    bulk_total: total,
-                    bulk_over: over,
-                    carry_limit: limit,
-                    encumbrance_state: state,
-
-                    // Dedicated display mirrors. These avoid any ambiguity caused by
-                    // the hidden calculation attributes sharing names with readout spans.
-                    inventory_bulk_display: inventoryBulk,
-                    armor_bulk_display: armorBulk,
-                    bulk_total_display: total,
-                    encumbrance_state_display: state,
-
-                    bulk_worker_status:
-                        `Inventory ${inventoryBulk} + Armor ${armorBulk} = ${total}`
-                };
-
-                // Roll20 can behave inconsistently when one setAttrs call mixes
-                // full repeating-row attribute names with global attributes.
-                // Commit row subtotals first, then globals in a separate operation.
-                const commitGlobals = () => {
-                    setAttrs(globalSetters, {}, () => {
-                        setAttrs({
-                            worker_status: 'ACTIVE — v' + GG_VERSION
-                        });
+                    attackIds.forEach(id => {
+                        const prefix = `repeating_attacks_${id}_`;
+                        const counted = checkboxValue(values[`${prefix}atk_counted`], true);
+                        const bulk = Math.max(0, numberValue(values[`${prefix}atk_bulk`]));
+                        if (counted) weaponBulk += bulk;
                     });
-                };
 
-                if (Object.keys(rowSetters).length) {
-                    setAttrs(rowSetters, { silent: true }, commitGlobals);
-                } else {
-                    commitGlobals();
-                }
+                    inventoryIds.forEach(id => {
+                        const prefix = `repeating_inventory_${id}_`;
+                        const counted = checkboxValue(values[`${prefix}inv_counted`], true);
+                        const qty = Math.max(0, numberValue(values[`${prefix}inv_qty`], 1));
+                        const each = Math.max(0, numberValue(values[`${prefix}inv_bulk_each`]));
+                        const rowBulk = counted ? qty * each : 0;
+
+                        inventoryBulk += rowBulk;
+                        rowSetters[`${prefix}inv_row_bulk`] = Math.round(rowBulk * 100) / 100;
+                    });
+
+                    armorIds.forEach(id => {
+                        const prefix = `repeating_armor_${id}_`;
+                        const counted = checkboxValue(values[`${prefix}arm_counted`], true);
+                        const bulk = Math.max(0, numberValue(values[`${prefix}arm_bulk`]));
+                        if (counted) armorBulk += bulk;
+                    });
+
+                    weaponBulk = Math.round(weaponBulk * 100) / 100;
+                    inventoryBulk = Math.round(inventoryBulk * 100) / 100;
+                    armorBulk = Math.round(armorBulk * 100) / 100;
+
+                    const total = Math.round((weaponBulk + inventoryBulk + armorBulk) * 100) / 100;
+                    const limit = Math.max(2, numberValue(values.body) * 2 + numberValue(values.carry_misc));
+                    const over = Math.max(0, Math.ceil(total - limit));
+
+                    let state = 'Normal';
+                    if (over >= 5) state = 'Severely Overloaded';
+                    else if (over >= 3) state = 'Overloaded';
+                    else if (over >= 1) state = 'Encumbered';
+
+                    const globalSetters = {
+                        weapon_bulk: weaponBulk,
+                        inventory_bulk: inventoryBulk,
+                        armor_bulk: armorBulk,
+                        bulk_total: total,
+                        bulk_over: over,
+                        carry_limit: limit,
+                        encumbrance_state: state,
+
+                        weapon_bulk_display: weaponBulk,
+                        inventory_bulk_display: inventoryBulk,
+                        armor_bulk_display: armorBulk,
+                        bulk_total_display: total,
+                        encumbrance_state_display: state,
+
+                        bulk_worker_status:
+                            `Weapons ${weaponBulk} + Inventory ${inventoryBulk} + Armor ${armorBulk} = ${total}`
+                    };
+
+                    const commitGlobals = () => {
+                        setAttrs(globalSetters, {}, () => {
+                            setAttrs({ worker_status: 'ACTIVE — v' + GG_VERSION });
+                        });
+                    };
+
+                    if (Object.keys(rowSetters).length) {
+                        setAttrs(rowSetters, { silent: true }, commitGlobals);
+                    } else {
+                        commitGlobals();
+                    }
+                });
             });
         });
     });
@@ -1288,6 +1404,7 @@ const recalculateAll = () => {
         recalculateCore();
         recalculateArmor();
         recalculateBulk();
+        recalculateMoney();
         updateAttackRows();
         updateSpellRows();
         updateNpcAttackRows();
@@ -1329,6 +1446,8 @@ on('change:repeating_inventory change:repeating_inventory:inv_qty change:repeati
     recalculateBulk();
 });
 on('change:repeating_attacks change:_reporder:attacks', updateAttackRows);
+on('change:repeating_attacks:atk_bulk change:repeating_attacks:atk_counted remove:repeating_attacks change:_reporder:attacks', recalculateBulk);
+on('change:cash_on_hand change:stashed_cash', recalculateMoney);
 on('change:repeating_spells change:_reporder:spells', updateSpellRows);
 on('change:repeating_npcattacks change:_reporder:npcattacks change:npc_body change:npc_reflex change:npc_mind change:npc_moxie change:npc_lip', updateNpcAttackRows);
 on('change:repeating_magicitems remove:repeating_magicitems', countMagicConnections);
