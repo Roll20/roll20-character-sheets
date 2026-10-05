@@ -608,123 +608,100 @@ on("change:mu change:kl change:in change:ch change:ff change:ge change:ko change
 		});
 });
 
-on(talents.map(talent => "clicked:" + talent + "-action").join(" "), async (info) => {
-	var func = "Action Listener for Talent Roll Buttons";
-	var trigger = info["triggerName"].replace(/clicked:([^-]+)-action/, '$1');
-	var nameInternal = talentsData[trigger]["internal"];
-	var nameUI = talentsData[trigger]["ui"];
-	debugLog(func, trigger, talentsData[trigger]);
-	let attributes = [];
-	// All languages (sp) and scripts (sc) use the same attributes, so no layer of indirection via talent name required/possible.
-	if (trigger.replace(/t_([^_]+)_.*/, '$1') === "sp")
+/*
+	Action Listener for Talent Roll Button Clicks (with and without Encumbrance)
+*/
+on(
+	[
+		...talents.map(talent => `clicked:${talent}-action`),
+		...talents_ebe.map(talent => `clicked:${talent}-ebe-action`),
+	].join(" "),
+	async (info) => {
+
+	// Boilerplate
+	const caller = "Action Listener for Talent Roll Buttons (Without and With Encumbrance)";
+	const ebeRelevant = info["triggerName"].endsWith("-ebe-action");
+	const trigger = info["triggerName"].replace(/^clicked:([^-]+)-(?:ebe-)?action/, '$1');
+	const nameInternal = talentsData[trigger]["internal"];
+	const nameUI = talentsData[trigger]["ui"];
+	const rollOptions = {};
+	let rollTemplate = "talent";
+	let ebeMacro = "@{BE}";
+	debugLog(caller, `trigger: ${trigger}`);
+
+	// Set attributes for stats
+	const attrsStatsDefault = [
+		`Eigenschaft1${nameInternal}`,
+		`Eigenschaft2${nameInternal}`,
+		`Eigenschaft3${nameInternal}`,
+	];
+	let attrsStats = [];
+
+	/// Special Case: No stats attributes for languages and scripts
+	if (
+		trigger.startsWith("t_sp_") ||
+		trigger.startsWith("t_sc_")
+	)
 	{
-		attributes = ["KL", "IN", "CH"];
-	} else if (trigger.replace(/t_([^_]+)_.*/, '$1') === "sc") {
-		attributes = ["KL", "KL", "FF"];
+		const talentGroupRegex = /^t_(?<group>[^_]+)_/;
+		const talentGroup = trigger.match(talentGroupRegex).groups["group"];
+		const talentGroupStats = {
+			"sp": ["KL", "IN", "CH"],
+			"sc": ["KL", "KL", "FF"],
+		};
+		attrsStats = talentGroupStats["talentGroup"];
 	} else {
-		attributes = ["Eigenschaft1" + nameInternal, "Eigenschaft2" + nameInternal, "Eigenschaft3" + nameInternal];
-
+		attrsStats = attrsStatsDefault;
 	}
-	let rollMacro = generateTalentRollMacro("talent", nameInternal, nameUI, attributes);
-	debugLog(func, rollMacro);
 
-	// Execute Roll
-	results = await startRoll(rollMacro);
-	debugLog(func, "test: info:", info, "results:", results);
-
-	// Process Roll
-	let rollID = results.rollId;
-	results = results.results;
-	let processedResult = getTalentRollResults(results);
-	const rollResult =
+	// Effective encumbrance (eBE)
+	if (ebeRelevant)
 	{
-		roll: processedResult.TaPstar,
-		result: processedResult.result,
-		criticality: processedResult.criticality,
-		stats: processedResult.stats.toString().replaceAll(",", "/"),
+		// Get eBE data from global
+		const talentEbeData = effectiveEncumbrance[trigger];
+
+		// Set correct roll template
+		rollTemplate = "talent-ebe";
+
+		// Create roll macro for eBE
+		if (talentEbeData["type"] === "factor")
+		{
+			ebeMacro = `${talentEbeData["value"]} * ${ebeMacro}`;
+		} else if (talentEbeData["type"] === "summand") {
+			ebeMacro = `${ebeMacro}${talentEbeData["value"]}`;
+		}
+		rollOptions["ebeMacro"] = ebeMacro;
 	}
 
-	/// Talent-specific Processing
-	//// Athletics
-	switch(trigger)
-	{
-		case "t_ko_athletik":
-			// Additional GS can only be generated in successful checks (result = 1)
-			if (processedResult.result === 1)
-			{
-				// Calculate bonus GS
-				let athleticsGSBonus = parseInt(results["athleticsbonus"].result);
-				let TaPstarEffective = processedResult.TaPstar;
-				const TaW = results.wert.result;
-				const successfulCheckMinEffectiveTaPstar = 1;
-
-				/// Handle negative TaW, critical success and 0 TaP*
-				//// In all cases, a successful check must give at least 1 TaP*
-				//// Critical successes give max. TaP*
-				if (processedResult.criticality >= 2)
-				{
-					TaPstarEffective = TaW;
-				}
-
-				//// Handle 0 TaP*: It is a success, but counts the same as 1.
-				//// Do not care about negative values, because these get filtered away.
-				if (TaPstarEffective <= 0)
-				{
-					TaPstarEffective = successfulCheckMinEffectiveTaPstar;
-				}
-				athleticsGSBonus = TaPstarEffective * athleticsGSBonus / 10;
-				athleticsGSBonus = athleticsGSBonus.toFixed(1);
-				athleticsGSBonus = athleticsGSBonus.replace("\.", ",");
-				rollResult["athleticsbonus"] = athleticsGSBonus;
-			}
-			break;
-	}
-
-	finishRoll(
-		rollID,
-		rollResult,
+	// Generate roll macro
+	const rollMacro = generateTalentRollMacro(
+		rollTemplate,
+		nameInternal,
+		nameUI,
+		attrsStats,
+		rollOptions
 	);
-});
+	debugLog(caller, rollMacro);
 
-on(talents_ebe.map(talent => "clicked:" + talent + "-ebe-action").join(" "), async (info) => {
-	var func = "Action Listener for Talent Roll Buttons With Encumbrance";
-	var trigger = info["triggerName"].replace(/clicked:([^-]+)-ebe-action/, '$1');
-	var nameInternal = talentsData[trigger]["internal"];
-	var nameUI = talentsData[trigger]["ui"];
-	debugLog(func, trigger, talentsData[trigger]);
+	// Execute the roll
+	const roll = await startRoll(rollMacro);
+	debugLog(caller, "info:", info, "roll results:", roll);
 
-	let attributes = ["Eigenschaft1" + nameInternal, "Eigenschaft2" + nameInternal, "Eigenschaft3" + nameInternal];
+	// Process the roll
+	const rollID = roll.rollId;
+	const resultComputed = {};
 
-	var ebeMacro = "@{BE}";
-	var talentEbeData = effectiveEncumbrance[trigger];
-	if (talentEbeData["type"] === "factor")
+	/// Process results
+	const resultProcessed = getTalentRollResults(roll.results);
+
+	/// Formatting
+	resultProcessed["stats"] = resultProcessed["stats"].toString().replaceAll(",", "/");
+
+	/// Consider effective encumbrance
+	let modOnly = roll.results.mod.result;
+	if (ebeRelevant)
 	{
-		ebeMacro = talentEbeData["value"].toString() + " * " + ebeMacro;
-	} else if (talentEbeData["type"] === "summand") {
-		ebeMacro += talentEbeData["value"].toString();
-	}
-	let rollMacro = generateTalentRollMacro("talent-ebe", nameInternal, nameUI, attributes, { "ebeMacro": ebeMacro });
-
-	debugLog(func, rollMacro);
-
-	// Execute Roll
-	results = await startRoll(rollMacro);
-	debugLog(func, "test: info:", info, "results:", results);
-
-
-	// Process Roll
-	let rollID = results.rollId;
-	results = results.results;
-	var ebe = results.ebe.result;
-	var modOnly = results.mod.result - ebe;
-	let processedResult = getTalentRollResults(results);
-	const rollResult =
-	{
-		mod: modOnly,
-		roll: processedResult.TaPstar,
-		result: processedResult.result,
-		criticality: processedResult.criticality,
-		stats: processedResult.stats.toString().replaceAll(",", "/"),
+		modOnly = roll.results.mod.result - roll.results.ebe.result;
 	}
 
 	/// Talent-specific Processing
@@ -733,24 +710,24 @@ on(talents_ebe.map(talent => "clicked:" + talent + "-ebe-action").join(" "), asy
 	{
 		case "t_ko_athletik":
 			// Additional GS can only be generated in successful checks (result = 1)
-			if (processedResult.result === 1)
+			if (resultProcessed.result === 1)
 			{
 				// Calculate bonus GS
-				let athleticsGSBonus = parseInt(results["athleticsbonus"].result);
-				let TaPstarEffective = processedResult.TaPstar;
-				const TaW = results.wert.result;
+				let athleticsGSBonus = parseInt(roll.results["athleticsbonus"].result);
+				let TaPstarEffective = resultProcessed.TaPstar;
+				const TaW = roll.results.wert.result;
 				const successfulCheckMinEffectiveTaPstar = 1;
 
 				/// Handle negative TaW, critical success and 0 TaP*
 				//// In all cases, a successful check must give at least 1 TaP*
 				//// Critical successes give max. TaP*
-				if (processedResult.criticality >= 2)
+				if (resultProcessed.criticality >= 2)
 				{
 					TaPstarEffective = TaW;
 				}
 
 				//// Handle 0 TaP*: It is a success, but counts the same as 1.
-				//// Do not care about negative values, because these get filtered away.
+				//// Also considers criticial successes with negative TaW.
 				if (TaPstarEffective <= 0)
 				{
 					TaPstarEffective = successfulCheckMinEffectiveTaPstar;
@@ -758,14 +735,28 @@ on(talents_ebe.map(talent => "clicked:" + talent + "-ebe-action").join(" "), asy
 				athleticsGSBonus = TaPstarEffective * athleticsGSBonus / 10;
 				athleticsGSBonus = athleticsGSBonus.toFixed(1);
 				athleticsGSBonus = athleticsGSBonus.replace("\.", ",");
-				rollResult["athleticsbonus"] = athleticsGSBonus;
+				resultComputed["athleticsbonus"] = athleticsGSBonus;
 			}
 			break;
 	}
 
+	/// Build computed results
+	resultComputed["roll"] = prettifyResult(resultProcessed.TaPstar);
+	resultComputed["result"] = resultProcessed.result;
+	resultComputed["criticality"] = resultProcessed.criticality;
+	resultComputed["stats"] = resultProcessed.stats;
+
+	/// Consider effective encumbrance
+	if (ebeRelevant)
+	{
+		resultComputed["mod"] = modOnly;
+	}
+
+	// Finish roll
+	debugLog(caller, "resultComputed", resultComputed);
 	finishRoll(
 		rollID,
-		rollResult
+		resultComputed
 	);
 });
 /* talents end */
