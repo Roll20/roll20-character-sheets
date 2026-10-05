@@ -1,75 +1,204 @@
 /* talents start */
+/*
+	generateTalentRollMacro
+	Generate a string containing a roll macro for talent checks.
 
-function generateTalentRollMacro(template, nameInternal, nameUI, statAttrs, ebeMacro = "") {
-	const func = "generateTalentRollMacro";
+	Parameters:
+	* template: string, the roll template to use.
+	* nameInternal: string, the internal name of the talent.
+	* nameUI: string, the UI name of the talent.
+	* statAttrs: An array of at least three attributes (called "Eigenschaftn + nameInternal", e. g. "Eigenschaft1akrobatik") carrying strings with stats attributes ("@{MU}" etc.).
+	* optional: object, pre-filled with default values to be overwritten when called for special cases. Special cases handled: macro to use for the calculation of the effective encumbrance ("eBE").
+*/
+function generateTalentRollMacro(template, nameInternal, nameUI, statAttrs, optional = { "ebeMacro": "" } ) {
+	const caller = "generateTalentRollMacro";
+	const prefix = "@{gm_roll_opt}";
+	const suffix = "";
+	const nameInternalNew = talentsDataOldToNew[nameInternal];
 
-	var ebeRoll = "";
-	var modRoll = "";
+	// Boilerplate
+	const args = {
+		template,
+		nameInternal,
+		nameUI,
+		statAttrs,
+		optional,
+	};
+	const emptyRollMacro = "";
 
-	const statsRoll = [
-		"{{stats=",
+	// Input sanitation
+	const inputTypes = {
+		"template": "string",
+		"nameInternal": "string",
+		"nameUI": "string",
+		"statAttrs": "object",
+		"optional": "object",
+	};
+
+	/// Data types
+	for (arg in args)
+	{
+		if (typeof(args[arg]) !== inputTypes[arg])
+		{
+			debugLog(caller, `Error: ${arg} is not of type '${inputTypes[arg]}'. Exiting ...`);
+			return emptyMacro;
+		}
+	}
+
+	/// Additional checks
+	//// nameInternalNew
+	if (talents.includes(nameInternalNew) === false)
+	{
+		debugLog(caller, "Error: nameInternalNew not found in talents. Exiting ...");
+		return emptyRollMacro;
+	}
+
+	//// statAttrs
+	if (!Array.isArray(args["statAttrs"]))
+	{
+		debugLog(caller, "Error: statAttrs not an array. Exiting ...");
+		return emptyRollMacro;
+	}
+
+	///// Only check for data type string
+	const statAttrsLengthMin = 3;
+	const statAttrType = "string";
+
+	if (args["statAttrs"].length < statAttrsLengthMin)
+	{
+		debugLog(caller, `Error: statAttrs does not contain at least ${statAttrsLengthMin} items. Exiting ...`);
+		return emptyRollMacro;
+	}
+
+	for (statAttr of args["statAttrs"])
+	{
+		if (typeof(statAttr) !== statAttrType)
+		{
+			debugLog(caller, "Error: At least one item of statAttrs is not of type 'string'. Exiting ...");
+			return emptyRollMacro;
+		}
+	}
+
+	//// optional
+	///// Check for expected/minimal properties
+	const optionalMinimumProperties = [ "ebeMacro" ];
+	const optionalPropertiesDefaults = {
+		"ebeMacro": "",
+	};
+
+	for (let property of optionalMinimumProperties)
+	{
+		if (!Object.hasOwn(args["optional"], property))
+		{
+			debugLog(caller, `Info: Filling argument 'optional' with default value for property ${property} ...`);
+			args["optional"][property] = optionalPropertiesDefaults[property];
+		}
+	}
+
+	// Generation of the roll macro
+	/// Boilerplate
+	//// Name property
+	const nameProperty = new RollProperty(
+		"name",
+		nameUI
+	);
+
+	//// Talent value property
+	const talentValueProperty = new RollProperty(
+		"wert",
+		`[[@{TaW_${nameInternal}}d1cs0cf2]]`
+	);
+
+	//// stats roll
+	const statsRoll = new RollProperty(
+		"stats",
 		[
 			"[[",
-			[
-				"[Eigenschaft 1:] [[@{" + statAttrs[0] + "}]]d1cs0cf2",
-				"[Eigenschaft 2:] [[@{" + statAttrs[1] + "}]]d1cs0cf2",
-				"[Eigenschaft 3:] [[@{" + statAttrs[2] + "}]]d1cs0cf2",
-			].join(" + "),
+				[
+					`[Eigenschaft 1:] [[@{${statAttrs[0]}}]]d1cs0cf2`,
+					`[Eigenschaft 2:] [[@{${statAttrs[1]}}]]d1cs0cf2`,
+					`[Eigenschaft 3:] [[@{${statAttrs[2]}}]]d1cs0cf2`,
+				].join(" + "),
 			"]]"
-		].join(" "),
-		"}}"
-	].join("");
+		].join(" ")
+	);
 
-	if (ebeMacro === "")
+	//// 3d20 roll
+	const diceRoll = new RollProperty(
+		"roll",
+		"[[3d20cs<@{cs_talent}cf>@{cf_talent}]]"
+	);
+
+	//// Result roll (for CRP), is just enough of a roll to be usable with CRP
+	const resultRoll = new RollProperty(
+		"result",
+		"[[0]]"
+	);
+
+	//// Criticality roll (for CRP), is just enough of a roll to be usable with CRP
+	const criticalityRoll = new RollProperty(
+		"criticality",
+		"[[0]]"
+	);
+
+	//// Critical success/fail roll (for CRP), makes cs_talent and cf_talent available to CRP
+	const critThresholdsRoll = new RollProperty(
+		"critThresholds",
+		"[[[[@{cs_talent}]]d1cs0cf2 + [[@{cf_talent}]]d1cs0cf2]]"
+	);
+
+	/// Rolls specific to certain talents
+	let talentSpecificRolls = [];
+
+	//// Rolls related to Movement (GS)
+	if (nameInternal === "athletik")
 	{
-		ebeRoll = ebeMacro;
-		modRoll = "{{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]}}";
+		talentSpecificRolls
+		.push(
+			new RollProperty("athletics", "1"),
+			new RollProperty("athleticsbonus", "[[@{t_ko_athletik_gsbonus}]]"),
+		);
+	}
+
+	/// Modifier rolls depending on effective encumbrance (eBE)
+	const modRolls = [];
+
+	if (args["optional"]["ebeMacro"] === "")
+	{
+		modRolls
+		.push(
+			new RollProperty("mod", "[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]"),
+		);
 	} else {
-		ebeRoll = [
-			"{{ebe=",
-			"[[{0d1 + ",
-			ebeMacro,
-			", 0d1}kh1]]",
-			"}}"
-		].join("");
-		modRoll = [
-			"{{mod=",
-			"[[ 0d1 + ?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2 + [[{0d1 + ",
-			ebeMacro,
-			", 0d1}kh1]]d1cs0cf2 ]]",
-			"}}"
-		].join("");
+		modRolls
+		.push(
+			new RollProperty("ebe", `[[{0d1 + (${args["optional"]["ebeMacro"]}), 0d1}kh1]]`),
+			new RollProperty("mod", `[[ 0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2) + [[{0d1 + (${args["optional"]["ebeMacro"]}), 0d1}kh1]]d1cs0cf2 ]]`),
+		);
 	}
 
-	let talentSpecificRoll = [];
-	switch(nameInternal)
-	{
-		case 'athletik':
-			talentSpecificRoll.push(
-				"{{athletics=1}}",
-				"{{athleticsbonus=[[@{t_ko_athletik_gsbonus}]]}}",
-			);
-			break;
-	}
-	talentSpecificRoll = talentSpecificRoll.join(" ");
-
-	const rollMacro = [
-		"@{gm_roll_opt}",
-		"&{template:" + template + "}",
-		"{{name=" + nameUI + "}}",
-		"{{wert=[[@{TaW_" + nameInternal + "}d1cs0cf2]]}}",
-		modRoll,
-		ebeRoll,
+	// Build Roll Macro
+	const body = new RollPropertyArray(
+		nameProperty,
+		talentValueProperty,
+		...talentSpecificRolls,
+		...modRolls,
 		statsRoll,
-		"{{roll=[[3d20cs<@{cs_talent}cf>@{cf_talent}]]}}",
-		"{{result=[[0]]}}",
-		"{{criticality=[[0]]}}",
-		"{{critThresholds=[[[[@{cs_talent}]]d1cs0cf2 + [[@{cf_talent}]]d1cs0cf2]]}}",
-		talentSpecificRoll,
-	].join(" ");
+		diceRoll,
+		resultRoll,
+		criticalityRoll,
+		critThresholdsRoll,
+	);
 
-	debugLog(func, "rollMacro", rollMacro);
-	return rollMacro;
+	const rollMacro = new RollMacro(
+		prefix,
+		args["template"],
+		body,
+		suffix
+	);
+
+	debugLog(caller, "rollMacro", rollMacro.toString());
+	return rollMacro.toString();
 }
 
 function getTalentRollResults(results) {
@@ -427,7 +556,7 @@ on(talents_ebe.map(talent => "clicked:" + talent + "-ebe-action").join(" "), asy
 	} else if (talentEbeData["type"] === "summand") {
 		ebeMacro += talentEbeData["value"].toString();
 	}
-	let rollMacro = generateTalentRollMacro("talent-ebe", nameInternal, nameUI, attributes, ebeMacro);
+	let rollMacro = generateTalentRollMacro("talent-ebe", nameInternal, nameUI, attributes, { "ebeMacro": ebeMacro });
 
 	debugLog(func, rollMacro);
 
