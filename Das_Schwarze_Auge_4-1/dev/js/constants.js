@@ -1458,6 +1458,22 @@ const giftsData = {
 	"zwergennase": { 'ui': "Zwergennase", 'stats': ['IN', 'IN', 'FF'] },
 };
 
+/*
+	Metatalents Data
+
+Default data for known metatalents.
+*/
+const metatalentsData = {
+	"ansitzjagd": { 'ui': "Ansitzjagd", 'stats': ['MU', 'IN', 'GE'] },
+	"hetzjagd": { 'ui': "Hetzjagd", 'stats': ['MU', 'IN', 'GE'] },
+	"kraeutersuchen": { 'ui': "Kräutersuchen", 'stats': ['MU', 'IN', 'FF'] },
+	"nahrungsammeln": { 'ui': "Nahrungsammeln", 'stats': ['MU', 'IN', 'FF'] },
+	"pirschjagd": { 'ui': "Pirschjagd", 'stats': ['MU', 'IN', 'GE'] },
+	"speerfischen": { 'ui': "Speerfischen", 'stats': ['MU', 'IN', 'GE'] },
+	"tierfallenstellen": { 'ui': "Tierfallenstellen", 'stats': ['KL', 'IN', 'FF'] },
+	"wachehalten": { 'ui': "Wachehalten", 'stats': ['MU', 'IN', 'KO'] },
+};
+
 const spellsData = {
 	'z_abvenenum': {'internal': "abvenenum", 'ui': "Abvenenum Reine Speise", 'stats': ['KL', 'KL', 'FF']},
 	'z_accuratum': {'internal': "accuratum", 'ui': "Accuratum Zaubernadel", 'stats': ['KL', 'CH', 'FF']},

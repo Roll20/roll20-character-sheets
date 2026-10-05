@@ -483,37 +483,58 @@ on(attrsGiftsStats.map(talent => `change:${talent.join(":")}`).join(" ").toLower
 	});
 });
 
-on("change:repeating_metatalente201904:name_metatalent change:repeating_metatalente201904:name_metatalent_eigen", function(eventInfo) {
-		safeGetAttrs(["repeating_Metatalente201904_Name_Metatalent", "repeating_Metatalente201904_Name_Metatalent_Eigen"], function(v) {
-				let metatalent = v.repeating_Metatalente201904_Name_Metatalent;
-				let metatalentEigen = v.repeating_Metatalente201904_Name_Metatalent_Eigen;
-				let metatalente = {
-						"ansitzjagd": [ ["mu", "in", "ge"], "Ansitzjagd" ],
-						"hetzjagd": [ ["mu", "in", "ge"], "Hetzjagd" ],
-						"kraeutersuchen": [ ["mu", "in", "ff"], "Kräutersuchen" ],
-						"nahrungsammeln": [ ["mu", "in", "ff"], "Nahrungsammeln" ],
-						"pirschjagd": [ ["mu", "in", "ge"], "Pirschjagd" ],
-						"speerfischen": [ ["mu", "in", "ge"], "Speerfischen" ],
-						"tierfallenstellen": [ ["kl", "in", "ff"], "Tierfallenstellen" ],
-						"wachehalten": [ ["mu", "in", "ko"], "Wachehalten" ]
-				};
-				if (metatalent != "nothing")  {
-						safeSetAttrs({
-								'repeating_Metatalente201904_eigenschaft1': metatalente[metatalent][0][0],
-								'repeating_Metatalente201904_eigenschaft2': metatalente[metatalent][0][1],
-								'repeating_Metatalente201904_eigenschaft3': metatalente[metatalent][0][2],
-								'repeating_Metatalente201904_Name_Metatalent_Anzeige': metatalente[metatalent][1]
-						});
-				} else {
-						let update = {};
-						if (metatalentEigen != "") {
-								update['repeating_metatalent_Name_Metatalent_Anzeige'] = metatalentEigen;
-						} else {
-								update['repeating_metatalent_Name_Metatalent_Anzeige'] = "Eigenes Metatalent";
-						}
-						safeSetAttrs(update);
-				}
-		});
+/*
+	Action Listener for Metatalents (2019-04)
+
+The original metatalents repeating section has been moved to legacy data for users to manually check the correct migration.
+*/
+const attrsMetatalents = [
+	[ 'repeating_Metatalente201904', 'Name_Metatalent' ],
+	[ 'repeating_Metatalente201904', 'Name_Metatalent_Eigen' ],
+];
+Object.freeze(attrsMetatalents);
+
+on(attrsMetatalents.map(talent => `change:${talent.join(":")}`).join(" ").toLowerCase(),
+	function(eventInfo) {
+
+	// Boilerplate
+	const caller = "Action Listener for Metatalents (2019-04)";
+	const rowID = extractRowId(eventInfo["sourceAttribute"]);
+	const attrsMetatalentsRow = attrsMetatalents.map(talent => [ talent[0], rowID, talent[1] ].join("_"));
+	const attrPrefix = `repeating_Metatalente201904_${rowID}`;
+	let attrsToChange = {};
+
+	safeGetAttrs(attrsMetatalentsRow,
+		function(attrs) {
+
+		// Boilerplate
+		const metatalent = attrs[`${attrPrefix}_Name_Metatalent`];
+		const metatalentCustom = attrs[`${attrPrefix}_Name_Metatalent_Eigen`];
+		const metatalentNameUIDefault = "Eigenes Metatalent";
+
+		// Pre-defined or custom ("nothing") metatalent
+		if (metatalent !== "nothing")
+		{
+			// Assign stats of pre-defined metatalents
+			for (let index of [0, 1, 2])
+			{
+				attrsToChange[`${attrPrefix}_eigenschaft${index + 1}`] = metatalentsData[metatalent]["stats"][index].toLowerCase();
+			}
+			// Assign UI name for roll templates of pre-defined metatalents
+			attrsToChange[`${attrPrefix}_Name_Metatalent_Anzeige`] = metatalentsData[metatalent]["ui"];
+		} else {
+			if (metatalentCustom !== "")
+			{
+				attrsToChange[`${attrPrefix}_Name_Metatalent_Anzeige`] = metatalentCustom;
+			} else {
+				attrsToChange[`${attrPrefix}_Name_Metatalent_Anzeige`] = metatalentNameUIDefault;
+			}
+		}
+
+		// Setting attrs
+		debugLog(caller, "eventInfo", eventInfo, "attrs", attrs, "attrsToChange", attrsToChange);
+		safeSetAttrs(attrsToChange);
+	});
 });
 
 on("change:repeating_metatalente201904:eigenschaft1 change:repeating_metatalente201904:eigenschaft2 change:repeating_metatalente201904:eigenschaft3", function(eventInfo) {
