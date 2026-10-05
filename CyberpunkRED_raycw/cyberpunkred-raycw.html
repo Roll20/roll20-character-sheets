@@ -211,7 +211,7 @@
 		<div class="sheet-stats sheet-section">
 			<div class="sheet-statbox">
 				<div class="sheet-h2">INT</div>
-				<div><input type="number" name="attr_Intelligence" /></div>
+				<div class="sheet-outof"><input type="number" name="attr_Intelligence" /><div>of</div><input type="number" name="attr_Intelligence_max" /></div>
 			</div>
 			<div class="sheet-statbox">
 				<div class="sheet-h2">REF</div>
@@ -223,15 +223,15 @@
 			</div>
 			<div class="sheet-statbox">
 				<div class="sheet-h2">TECH</div>
-				<div><input type="number" name="attr_Technique" /></div>
+				<div class="sheet-outof"><input type="number" name="attr_Technique" /><div>of</div><input type="number" name="attr_Technique_max" /></div>
 			</div>
 			<div class="sheet-statbox">
 				<div class="sheet-h2">COOL</div>
-				<div><input type="number" name="attr_Cool" /></div>
+				<div class="sheet-outof"><input type="number" name="attr_Cool" /><div>of</div><input type="number" name="attr_Cool_max" /></div>
 			</div>
 			<div class="sheet-statbox">
 				<div class="sheet-h2">WILL</div>
-				<div><input type="number" name="attr_Willpower" /></div>
+				<div class="sheet-outof"><input type="number" name="attr_Willpower" /><div>of</div><input type="number" name="attr_Willpower_max" /></div>
 			</div >
 			<div class="sheet-statbox">
 				<div class="sheet-h2">LUCK</div>
@@ -243,7 +243,7 @@
 			</div>
 			<div class="sheet-statbox">
 				<div class="sheet-h2">BODY</div>
-				<div><input type="number" name="attr_Body" value="0" /></div>
+				<div class="sheet-outof"><input type="number" name="attr_Body" value="0" /><div>of</div><input type="number" name="attr_Body_max" /></div>
 			</div>
 			<div class="sheet-statbox">
 				<div class="sheet-h2">EMP</div>
@@ -3350,7 +3350,7 @@
 		});
 	});
 
-	const stats = ["Intelligence","Reflex_max","Dexterity_max","Technique","Cool","Willpower","Luck_max","Movement_max","Body","Empathy_max"];
+	const stats = ["Intelligence_max","Reflex_max","Dexterity_max","Technique_max","Cool_max","Willpower_max","Luck_max","Movement_max","Body_max","Empathy_max"];
 
 	stats.forEach(function(stat) {
 		on(`change:${stat}`, function() {
@@ -3484,10 +3484,22 @@
 			let currentVersion = parseFloat(values.sheet_version) || 0;
 			let versionUpdate = false;
 
+			// Renamed attribute that handles point tracker visibility
 			if (currentVersion < 1) {
 				output["point_tracker_flag"] = values.shownewcharacter || 0;
 				output["shownewcharacter"] = ""; // Clear old key to clean db
 				currentVersion = 1;
+				versionUpdate = true;
+			}
+
+			// Prepare max values for STAT attributes.
+			if (currentVersion < 2) {
+				output["intelligence_max"] = values.intelligence || "";
+				output["technique_max"] = values.technique || "";
+				output["cool_max"] = values.cool || "";
+				output["willpower_max"] = values.willpower || "";
+				output["body_max"] = values.body || "";
+				currentVersion = 2;
 				versionUpdate = true;
 			}
 
