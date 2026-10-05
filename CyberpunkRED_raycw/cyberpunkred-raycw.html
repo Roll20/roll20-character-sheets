@@ -18,7 +18,6 @@
 	<input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="character" />
 	<div class="sheet-character">
 
-		<!--<input type="hidden" class="sheet-point-tracker-toggle" name="attr_shownewcharacter" value="1" />-->
 		<input type="hidden" class="sheet-point-tracker-toggle" name="attr_point_tracker_flag" value="1" />
 		<div class="sheet-profile sheet-section">
 
@@ -3474,10 +3473,30 @@
 	));
 	const stats_lower = ["intelligence","reflex","dexterity","technique","cool","willpower","luck","movement","body","empathy"];
 
+	const sheet_opened_attrs = ["sheet_version", "shownewcharacter"];
+
 	// When sheet is opened, update "total" attribute of all skills.
 	on("sheet:opened", function() {
-		getAttrs([...stats_lower.map(stat => stat.toLowerCase()), ...all_skills_lvl_misc], function(values) {
+		getAttrs([...sheet_opened_attrs, ...stats_lower.map(stat => stat.toLowerCase()), ...all_skills_lvl_misc], function(values) {
 			const output = {};
+
+			// Handle version changes
+			let currentVersion = parseFloat(values.sheet_version) || 0;
+			let versionUpdate = false;
+
+			if (currentVersion < 1) {
+				output["point_tracker_flag"] = values.shownewcharacter || 0;
+				output["shownewcharacter"] = ""; // Clear old key to clean db
+				currentVersion = 1;
+				versionUpdate = true;
+			}
+
+			// Set current sheet version.
+			if (versionUpdate) {
+				output["sheet_version"] = currentVersion;
+			}
+
+			// Legacy codet that recalculates each skill's attributes.
 			Object.keys(all_skills).forEach(skill => {
 				// create the variables for the relevant attributes
 				const base = parseInt(values["lvl_" + skill]) || 0;
