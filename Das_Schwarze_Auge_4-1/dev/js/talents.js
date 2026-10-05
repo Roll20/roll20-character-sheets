@@ -201,94 +201,143 @@ function generateTalentRollMacro(template, nameInternal, nameUI, statAttrs, opti
 	return rollMacro.toString();
 }
 
+/*
+	getTalentRollResults
+	Generate an object with the calculated/processed results from a 3d20 talent roll.
+
+	Parameters:
+	* results: object, 'inner'/'real' results object from a startRoll() call.
+
+	Return value:
+	* object with the general result (success/failure), the points after the check ('TaP*' in DSA speak; the general quality of the result), the criticality (triple/double 1/20 or "normal" success/failure), stats (array of the stat values used to calculate the result; for display in the results)
+
+*/
 function getTalentRollResults(results) {
-	var stats = [
+	const caller = "getTalentRollResults";
+
+	// Boilerplate
+	/// Values of the three stats
+	const stats = [
 		results.stats.rolls[0].dice,
 		results.stats.rolls[1].dice,
 		results.stats.rolls[2].dice
 	];
-	var TaW = results.wert.result;
-	var mod = results.mod.result;
-	var rolls = results.roll.rolls[0].results;
-	var success = results.critThresholds.rolls[0].dice;
-	var failure = results.critThresholds.rolls[1].dice;
-	/* Result
-	0	Failure
-	1	Success
-	*/
-	var result = 0;
-	/* Criticality
-	-3	Triple 20
-	-2	Double 20
-	 0	no double 1/20
-	+2	Double 1
-	+3	Triple 1
-	*/
-	var criticality = 0;
 
-	/*
-		Doppel/Dreifach-1/20-Berechnung
-		Vor der TaP*-Berechnung, da diese damit gegebenenfalls hinfällig wird
-	*/
+	/// Value of the talent
+	const TaW = results.wert.result;
+
+	/// Modifier of the check (sum of all modifiers)
+	const mod = results.mod.result;
+
+	/// Results of the 3d20 roll
+	const rolls = results.roll.rolls[0].results;
+
+	/// Thresholds for automatic success/failure
+	const successThreshold = results.critThresholds.rolls[0].dice;
+	const failureThreshold = results.critThresholds.rolls[1].dice;
+
+	/// Result
+	//// 0 Failure
+	//// 1 Success
+	let result = 0;
+
+	/// Criticality
+	//// -3 Triple 20
+	//// -2 Double 20
+	////  0 no double 1/20
+	//// +2 Double 1
+	//// +3 Triple 1
+	let criticality = 0;
+
+	// Processing
+	/// Calculation of Double/Triple 1/20
+	//// This calculation is placed before the TaP* calculation, because the TaP* are not required in the special cases handled here.
 	{
-		let successes = 0;
-		let failures = 0;
+		let criticalSuccesses = 0;
+		let criticalFailures = 0;
+
+		// Count all critical successes and failures and set the criticality accordingly.
 		for (let roll of rolls)
 		{
-			if (roll <= success)
+			if (roll <= successThreshold)
 			{
-				successes += 1;
-			} else if (roll >= failure) {
-				failures += 1;
+				criticalSuccesses += 1;
+			} else if (roll >= failureThreshold) {
+				criticalFailures += 1;
 			}
-			if (successes >= 2)
+			if (criticalSuccesses >= 2)
 			{
-				criticality = successes;
-			} else if (failures >= 2) {
-				criticality = -failures;
+				criticality = criticalSuccesses;
+			} else if (criticalFailures >= 2) {
+				criticality = -criticalFailures;
 			}
 		}
+		// Clamp criticality to the range of [-3, 3]
+		const criticalityMin = -3;
+		const criticalityMax = 3;
+
+		criticality = Math.min(criticality, criticalityMax);
+		criticality = Math.max(criticality, criticalityMin);
 	}
 
-	/*
-		TaP*-Berechnung
-	*/
-	var effRolls = rolls;
-	var effTaW = TaW - mod;
-	var TaPstar = effTaW;
+	/// Calculation of TaP*
+	//// Effective rolls: For negative effective TaW rolls are increased by the absolute value of the effective TaW (it is way harder to do something that is beyond your abilities). This variable holds these modified rolls. This does not trigger critical failures.
+	const effRolls = rolls;
 
-	// Negativer TaW: |effTaW| zu Teilwürfen addieren
-	if (criticality >= 2)
+	//// Effective TaW: Negative modifiers make checks easier (effective TaW increases), positive modifiers make checks harder (effective TaW decreases). This is one of the rare parts in the code where a modifier value gets subtracted.
+	const effTaW = TaW - mod;
+
+	//// The result cannot exceed the effective TaW.
+	let TaPstar = effTaW;
+
+	//// Calculate TaPstar and result
+	let criticalFail = false;
+
+	switch(criticality)
 	{
-		TaPstar = TaW;
-		result = 1;
-	} else {
-		if (effTaW < 0)
-		{
-			for (let roll in rolls)
-			{
-				effRolls[roll] = rolls[roll] + Math.abs(effTaW);
-			}
-			TaPstar = 0;
-		}
-
-		// TaP-Verbrauch für jeden Wurf
-		for (let roll in effRolls)
-		{
-			TaPstar -= Math.max(0, effRolls[roll] - stats[roll]);
-		}
-
-		// Max. TaP* = TaW
-		TaPstar = Math.min(Math.max(0, TaW), TaPstar);
-
-		// Ergebnis an Doppel/Dreifach-20 anpassen
-		if (Math.abs(criticality) <= 1)
-		{
-			result = TaPstar < 0 ? 0 : 1;
-		} else if (criticality <= -2) {
+		case 3:
+		case 2:
+			TaPstar = TaW;
+			result = 1;
+			break;
+		case -2:
+		case -3:
+			criticalFail = true;
 			result = 0;
-		}
+			// Intentionally no break.
+		case 1:
+		case 0:
+		case -1:
+			// Handle effects of negative effective TaWs
+			if (effTaW < 0)
+			{
+				for (let roll in rolls)
+				{
+					effRolls[roll] = rolls[roll] + Math.abs(effTaW);
+				}
+				const TaPstarSuccessMin = 0;
+				TaPstar = TaPstarSuccessMin;
+			}
+
+			// TaP consumption for all rolls
+			const TaPConsumptionMin = 0;
+			for (let roll in effRolls)
+			{
+				const TaPConsumption = Math.max(0, effRolls[roll] - stats[roll]);
+				TaPstar -= TaPConsumption;
+			}
+
+			// Safeguard: Limit TaPstar to TaW (you cannot be better than you actually are)
+			TaPstar = Math.min(Math.max(0, TaW), TaPstar);
+
+			// Do not touch result in case of critical failures
+			if (criticalFail === false)
+			{
+				result = TaPstar < 0 ? 0 : 1;
+			}
+			break;
 	}
+
 	return {
 		"result" : result,
 		"TaPstar": TaPstar,
