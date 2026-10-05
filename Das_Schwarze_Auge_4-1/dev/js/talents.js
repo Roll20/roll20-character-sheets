@@ -322,12 +322,14 @@ function getTalentRollResults(results) {
 
 	//// Calculate TaPstar and result
 	let criticalFail = false;
+	const TaPstarSuccessMin = 0;
 
 	switch(criticality)
 	{
 		case 3:
 		case 2:
-			TaPstar = TaW;
+			// Handle negative TaW
+			TaPstar = Math.max(TaPstarSuccessMin, TaW);
 			result = 1;
 			break;
 		case -2:
@@ -345,7 +347,6 @@ function getTalentRollResults(results) {
 				{
 					effRolls[roll] = rolls[roll] + Math.abs(effTaW);
 				}
-				const TaPstarSuccessMin = 0;
 				TaPstar = TaPstarSuccessMin;
 			}
 
