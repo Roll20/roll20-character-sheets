@@ -2,11 +2,15 @@
 
 /*----------------- COLOR VARIABLES ------------------*/
 :root {
+  --cpr-red-light: #FF2A35;
+  --cpr-red-standard: #CD272C;
+  --cpr-red-dark: #B32227;
+
   --cpr-bg-main: #ffffff;
   --cpr-bg-base: #ffffff;
   --cpr-bg-subpanel: #2a2a2a;
   --cpr-bg-tint: #f5f5f5;
-  --cpr-bg-red: #CD272C;
+  --cpr-bg-red: var(--cpr-red-standard);
   --cpr-bg-bright: #fae800;
   --cpr-bg-input: #f5f5f5;
   --cpr-bg-deathsave: #000000;
@@ -18,6 +22,19 @@
   --cpr-text-and-dark-panel: #0f0f0f;
 
   --cpr-image-cyberware-diagram: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/CyberpunkRED_raycw/images/cyberware-diagram.jpg');
+
+  /* Color options for red background on character sheet */
+  &:has(select[name="attr_red_color"] [value="standard-red"]:checked) {
+    --cpr-bg-red: var(--cpr-red-standard);
+  }
+
+  &:has(select[name="attr_red_color"] [value="light-red"]:checked) {
+    --cpr-bg-red: var(--cpr-red-light);
+  }
+
+  &:has(select[name="attr_red_color"] [value="dark-red"]:checked) {
+    --cpr-bg-red: var(--cpr-red-dark);
+  }
 }
 
 /* Roll20 Dynamic Dark Mode Theme Overrides */
@@ -27,7 +44,6 @@
   --cpr-bg-base: #121212;
   --cpr-bg-subpanel: #222222;
   --cpr-bg-tint: #1c1c1f;
-  --cpr-bg-red: #FF2A35;
   --cpr-bg-bright: #fae800;
   --cpr-bg-input: #27272c;
   --cpr-bg-deathsave: #000000;
@@ -413,7 +429,7 @@ h2, h3, h4 {
   color: var(--cpr-text-body);
 }
 
-input, select, textarea {
+input, select, textarea, select option {
   background-color: var(--cpr-bg-input);
   color: var(--cpr-text-input);
 }
@@ -441,7 +457,7 @@ input[type=number] {
 .sheet-lifepath,
 .sheet-cyberware,
 .sheet-netrunning, 
-.sheet-new-char,
+.sheet-point-tracker,
 .sheet-settings,
 .sheet-mook {
   display: none;
@@ -454,7 +470,7 @@ input[type=number] {
 .sheet-tabstoggle[value="journal"] ~ div.sheet-journal,
 .sheet-tabstoggle[value="settings"] ~ div.sheet-settings,
 .sheet-tabstoggle[value="mook"] ~ div.sheet-mook,
-.sheet-shownewcharacter[value="1"] ~ .sheet-profile div.sheet-new-char {
+.sheet-point-tracker-toggle[value="1"] ~ .sheet-profile div.sheet-point-tracker {
   display: grid;
 }
 
@@ -591,11 +607,11 @@ select {
   content: "";
 }
 
-.sheet-new-char {
+.sheet-point-tracker {
   grid-template-columns: 1fr 1fr;
 }
 
-.sheet-new-char div {
+.sheet-point-tracker div {
   border: solid 1px var(--cpr-bg-main);
   text-align: center;
   display:flex;
@@ -1692,13 +1708,12 @@ input.sheet-toggle:not([value="1"]) ~ button.sheet-toggle > span.sheet-checked {
   background: none;
 }
 
-.sheet-hp textarea{
+.sheet-hp textarea {
   width:96%;
   height:90px;
   resize: none;
   border: none;
 }
-
 
 /*------------- Section-specific CSS -------------*/
 
@@ -1708,12 +1723,12 @@ input.sheet-toggle:not([value="1"]) ~ button.sheet-toggle > span.sheet-checked {
   grid-gap: 4px;  
 }
 
-.sheet-shownewcharacter[value="0"] ~ .sheet-profile {
+.sheet-point-tracker-toggle[value="0"] ~ .sheet-profile {
   /* grid-template-rows: 0.75fr 0.5fr 0.75fr 2.5fr 1.75fr 0.75fr 0.75fr; */
   grid-template-rows: 0.45fr 0.35fr 0.35fr 2.5fr 0.5fr 0.5fr;
 }
 
-.sheet-shownewcharacter[value="1"] ~ .sheet-profile {
+.sheet-point-tracker-toggle[value="1"] ~ .sheet-profile {
   /* grid-template-rows: 0.5fr 0.6fr 0.5fr 0.5fr 2.5fr 1.6fr 0.5fr 0.5fr; */
   grid-template-rows: 0.5fr 0.35fr 0.3fr 0.3fr 2.5fr 0.45fr 0.45fr;
 }
@@ -2137,7 +2152,17 @@ td.sheet-subskill-header {
 }
 
 .sheet-my-settings {
-  max-width: 800px;
+  display: flex;
+  flex-direction: row; /* Aligns columns horizontally */
+  width: 800px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.sheet-settings-column {
+  flex: 0 0 350px;
+  width: 350px;
+  box-sizing: border-box;
 }
 
 .sheet-settings-row {
