@@ -22,6 +22,16 @@
     <input type="hidden" name="attr_caster_slot_3_role" value="third">
     <input type="hidden" name="attr_use_tertiary_state" class="sheet-tertiary-state" value="1">
 
+    <!-- GAME IDENTITY -->
+   <div class="sheet-game-identity">
+    <span class="sheet-game-title">CASTLES &amp; CRUSADES</span>
+    <span class="sheet-game-by">— by</span>
+    <a class="sheet-game-publisher"
+       href="https://trolllord.com/"
+       target="_blank"
+       rel="noopener noreferrer">TROLL LORD GAMES</a>
+</div>
+
     <nav class="sheet-tabs">
         <button type="action" name="act_show_core" class="sheet-tab-button">CORE</button>
         <button type="action" name="act_show_combat" class="sheet-tab-button">COMBAT</button>
@@ -40,7 +50,7 @@
         <!-- CHARACTER HEADER -->
         <header class="sheet-header">
             <div class="sheet-name-block">
-                <div class="sheet-kicker sheet-core-kicker">CASTLES &amp; CRUSADES <span class="sheet-core-class-divider" aria-hidden="true"></span><span class="sheet-core-class-level" name="attr_core_class_level"></span></div>
+                <div class="sheet-kicker sheet-core-kicker"><span class="sheet-core-class-level" name="attr_core_class_level"></span></div>
                 <input type="text" name="attr_character_name" class="sheet-character-name" placeholder="Character Name">
             <div class="sheet-core-identity" aria-label="Character quick description">
                 <span class="sheet-core-detail"><b>AGE</b> <span name="attr_character_age"></span></span>
@@ -207,7 +217,7 @@
                     <label><span>WIS</span><select name="attr_builder_wisdom_category"><option value="">—</option><option value="12">P</option><option value="15">S</option><option value="18">T</option></select></label>
                     <label><span>CHA</span><select name="attr_builder_charisma_category"><option value="">—</option><option value="12">P</option><option value="15">S</option><option value="18">T</option></select></label>
                 </div>
-                <p class="sheet-builder-note">P / S / T mirrors the sheet's current SIEGE configuration. Automatic class/race Prime guidance is intentionally not part of this first prototype.</p>
+                <p class="sheet-builder-note">P / S / T mirrors the sheet's current SIEGE configuration. The selected class's required Prime is assigned automatically; remaining Prime choices stay player-controlled.</p>
             </div>
 
             <div class="sheet-builder-step sheet-builder-step-4">
@@ -2594,7 +2604,6 @@
 
         <header class="sheet-combat-page-header">
             <div>
-                <div class="sheet-kicker">CASTLES &amp; CRUSADES</div>
                 <h1>Combat</h1>
                 <p>Dedicated play view using the character's existing combat data.</p>
             </div>
@@ -2797,7 +2806,6 @@
 
         <header class="sheet-inventory-header sheet-inventory-header-clean">
             <div>
-                <div class="sheet-kicker">CASTLES &amp; CRUSADES</div>
                 <h1>Inventory</h1>
                 <p>Wealth, load, protection and possessions.</p>
             </div>
@@ -2987,7 +2995,6 @@
 
         <header class="sheet-magic-header">
             <div>
-                <div class="sheet-kicker">CASTLES &amp; CRUSADES</div>
                 <h1>Magic</h1>
                 <p>Spellbook view. Expand a spell to read, edit, import or cast it.</p>
             </div>
@@ -3517,7 +3524,6 @@
 
         <header class="sheet-abilities-header">
             <div>
-                <div class="sheet-kicker">CASTLES &amp; CRUSADES</div>
                 <h1>Abilities</h1>
                 <p>Class and racial abilities are stored here as unlimited repeating records.</p>
             </div>
@@ -3952,7 +3958,6 @@
     <div class="sheet-page sheet-page-tools">
         <header class="sheet-tools-header">
             <div>
-                <div class="sheet-kicker">CASTLES &amp; CRUSADES</div>
                 <h1>Tools</h1>
                 <p>Character creation, table rules, roll preferences and maintenance.</p>
             </div>
@@ -4720,8 +4725,8 @@ on(
  *   - base racial movement
  *
  * Existing/custom racial abilities are preserved.
- * Attribute modifiers are deliberately NOT auto-applied yet:
- * existing characters may already include them in their scores.
+ * Attribute modifiers are not globally auto-applied to established characters.
+ * The Character Builder applies them only to its staged creation scores.
  */
 
 const RACE_DATA = {
@@ -9843,6 +9848,99 @@ const BUILDER_COPY_FIELDS = [
     "intelligence_category","wisdom_category","charisma_category"
 ];
 
+/* v0.21.53.34.18 — Character Builder automatic class Prime.
+   Uses the authoritative PHB class catalog already used by the sheet. */
+const BUILDER_PRIME_FIELD = {
+    Strength: "strength_category",
+    Dexterity: "dexterity_category",
+    Constitution: "constitution_category",
+    Intelligence: "intelligence_category",
+    Wisdom: "wisdom_category",
+    Charisma: "charisma_category"
+};
+
+const builderPrimeFieldForClass = classId => {
+    const classData = PHB10_CLASS_CATALOG[String(classId || "fighter").toLowerCase()];
+    return classData && BUILDER_PRIME_FIELD[classData.prime]
+        ? BUILDER_PRIME_FIELD[classData.prime]
+        : "strength_category";
+};
+
+const setBuilderClassPrime = (classId, previousClassId = "") => {
+    const newPrimeField = builderPrimeFieldForClass(classId);
+    const oldPrimeField = previousClassId ? builderPrimeFieldForClass(previousClassId) : "";
+    const fields = ["builder_" + newPrimeField];
+    if (oldPrimeField && oldPrimeField !== newPrimeField) fields.push("builder_" + oldPrimeField);
+
+    getAttrs(fields, values => {
+        const updates = {};
+
+        // Release the previous class-required Primary only when it is still P.
+        if (oldPrimeField && oldPrimeField !== newPrimeField &&
+            String(values["builder_" + oldPrimeField] || "") === "12") {
+            updates["builder_" + oldPrimeField] = "";
+        }
+
+        // The selected class's required Prime is always Primary (P = 12).
+        updates["builder_" + newPrimeField] = "12";
+        setAttrs(updates);
+    });
+};
+
+on("change:builder_class", eventInfo => {
+    setBuilderClassPrime(eventInfo.newValue, eventInfo.previousValue);
+});
+
+
+/* v0.21.53.34.19 — Character Builder racial attribute modifiers.
+   Builder scores are treated as final displayed scores. When race changes,
+   remove the previous race modifier and apply the new one so modifiers never stack. */
+const BUILDER_RACE_ATTRIBUTE_MODIFIERS = {
+    human: {},
+    dwarf: { constitution: 1, dexterity: -1 },
+    elf: { dexterity: 1, constitution: -1 },
+    gnome: { intelligence: 1, strength: -1 },
+    halfelf_human: {},
+    halfelf_elf: { dexterity: 1, constitution: -1 },
+    halfling: { dexterity: 1, strength: -1 },
+    halforc: { strength: 1, constitution: 1, charisma: -2 }
+};
+
+const builderRaceModifiers = raceId =>
+    BUILDER_RACE_ATTRIBUTE_MODIFIERS[String(raceId || "human").toLowerCase()] || {};
+
+const applyBuilderRaceChange = (newRaceId, oldRaceId) => {
+    const oldMods = builderRaceModifiers(oldRaceId);
+    const newMods = builderRaceModifiers(newRaceId);
+    const stats = ["strength","dexterity","constitution","intelligence","wisdom","charisma"];
+    const fields = stats.map(stat => "builder_" + stat);
+
+    getAttrs(fields, values => {
+        const updates = {};
+        stats.forEach(stat => {
+            const current = numberValue(values["builder_" + stat]);
+            const oldMod = numberValue(oldMods[stat]);
+            const newMod = numberValue(newMods[stat]);
+            updates["builder_" + stat] = current - oldMod + newMod;
+        });
+        setAttrs(updates);
+    });
+};
+
+on("change:builder_race", eventInfo => {
+    applyBuilderRaceChange(eventInfo.newValue, eventInfo.previousValue || "human");
+});
+
+/* v0.21.53.34.19 — Level 1 starting HP.
+   Character Builder uses maximum class Hit Die + final CON modifier. */
+const builderStartingHP = (classId, constitutionScore) => {
+    const classData = PHB10_CLASS_CATALOG[String(classId || "fighter").toLowerCase()] || PHB10_CLASS_CATALOG.fighter;
+    const hitDie = String(classData.hitDie || "d10");
+    const match = hitDie.match(/^d(\d+)$/i);
+    const maximum = match ? numberValue(match[1]) : 1;
+    return Math.max(1, maximum + getAttributeModifier(constitutionScore));
+};
+
 on("clicked:builder_open", () => {
     getAttrs(["builder_completed"], v => {
         const completed = String(v.builder_completed || "0") === "1";
@@ -9855,8 +9953,16 @@ on("clicked:builder_open", () => {
 });
 
 const openCharacterBuilder = () => {
+    // Open the Builder immediately so one click always gives visible feedback.
+    setAttrs({
+        builder_open:"1",
+        builder_warning:"0",
+        builder_step:"1"
+    });
+
+    // Populate the isolated staged fields after the panel is already open.
     getAttrs(BUILDER_COPY_FIELDS, v => {
-        const staged = { builder_open:"1", builder_warning:"0", builder_step:"1" };
+        const staged = {};
         BUILDER_COPY_FIELDS.forEach(field => {
             staged["builder_" + field] = v[field] || (
                 field === "race" ? "human" :
@@ -9865,6 +9971,11 @@ const openCharacterBuilder = () => {
                 field.indexOf("_category") > -1 ? "" : "10"
             );
         });
+
+        // Seed the selected class's mandatory Prime before the Builder is used.
+        const stagedClass = staged.builder_class || "fighter";
+        staged["builder_" + builderPrimeFieldForClass(stagedClass)] = "12";
+
         setAttrs(staged);
     });
 };
@@ -9898,12 +10009,19 @@ on("clicked:builder_back", () => {
 on("clicked:builder_apply", () => {
     const stagedFields = BUILDER_COPY_FIELDS.map(field => "builder_" + field);
     getAttrs(stagedFields, v => {
+        const startingHP = builderStartingHP(
+            v.builder_class,
+            v.builder_constitution
+        );
+
         const applied = {
             class_structure:"single",
             builder_completed:"1",
             builder_open:"0",
             builder_warning:"0",
-            builder_step:"1"
+            builder_step:"1",
+            hp: startingHP,
+            hp_max: startingHP
         };
         BUILDER_COPY_FIELDS.forEach(field => {
             applied[field] = v["builder_" + field];
@@ -10049,3 +10167,5 @@ const syncCoreClassLevel = () => {
 on("change:class change:level change:class_structure change:class2 change:class2_level change:class2_state change:half_class change:multi_class2 change:multi_class2_level change:multi_class3 change:multi_class3_level sheet:opened", syncCoreClassLevel);
 
 </script>
+
+
