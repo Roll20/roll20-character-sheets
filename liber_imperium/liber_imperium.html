@@ -5,20 +5,27 @@
      then the chat roll template and the sheet workers.
      ===================================================================== -->
 <input type="hidden" class="sheet-tabstate" name="attr_tab" value="core">
+<!-- Sheet mode: character, npc or vehicle. Hidden flag must sit before .sheet-wrap -->
+<input type="hidden" class="sheet-modeflag" name="attr_sheet_mode" value="character">
 
 <div class="sheet-wrap">
 
   <div class="sheet-header">
-    <div class="sheet-title">Liber Imperium</div>
+    <div class="sheet-titlebox">
+      <div class="sheet-title">Liber Imperium</div>
+      <select name="attr_sheet_mode" class="sheet-modesel" title="Switch between a full character, a simple enemy, or a vehicle">
+        <option value="character" selected>Character sheet</option><option value="npc">Enemy / NPC</option><option value="vehicle">Vehicle</option>
+      </select>
+    </div>
     <div class="sheet-idgrid">
       <label>Name</label><input type="text" name="attr_character_name">
-      <label>Player</label><input type="text" name="attr_player">
-      <label>Homeworld</label><input type="text" name="attr_origin">
-      <label>Role</label><input type="text" name="attr_role">
-      <label>Career</label><input type="text" name="attr_career">
-      <label>Archetype</label><input type="text" name="attr_archetype">
-      <label>Heirloom</label><input type="text" name="attr_heirloom">
-      <label>Elite Advance</label><input type="text" name="attr_elite">
+      <label class="sheet-pcfield">Player</label><input type="text" name="attr_player" class="sheet-pcfield">
+      <label class="sheet-pcfield">Homeworld</label><input type="text" name="attr_origin" class="sheet-pcfield">
+      <label class="sheet-pcfield">Role</label><input type="text" name="attr_role" class="sheet-pcfield">
+      <label class="sheet-pcfield">Career</label><input type="text" name="attr_career" class="sheet-pcfield">
+      <label class="sheet-pcfield">Archetype</label><input type="text" name="attr_archetype" class="sheet-pcfield">
+      <label class="sheet-pcfield">Heirloom</label><input type="text" name="attr_heirloom" class="sheet-pcfield">
+      <label class="sheet-pcfield">Elite Advance</label><input type="text" name="attr_elite" class="sheet-pcfield">
     </div>
   </div>
 
@@ -89,12 +96,19 @@
   <div class="sheet-condbar">
     <div class="sheet-cond"><span class="sheet-condlabel">Wounds</span><input type="number" name="attr_wounds" value="0"><span>/</span><input type="number" name="attr_wounds_max" value="0" readonly><span class="sheet-small">bonus</span><input type="number" name="attr_wounds_bonus" value="0"></div>
     <div class="sheet-cond"><span class="sheet-condlabel">Fatigue</span><input type="number" name="attr_fatigue" value="0"><span>/</span><input type="number" name="attr_fatigue_max" value="0" readonly></div>
-    <div class="sheet-cond"><span class="sheet-condlabel">Fate points</span><input type="number" name="attr_fate_points" value="0"><span>/</span><input type="number" name="attr_fate_points_max" value="0"></div>
+    <div class="sheet-cond sheet-cond-fate"><span class="sheet-condlabel">Fate points</span><input type="number" name="attr_fate_points" value="0"><span>/</span><input type="number" name="attr_fate_points_max" value="0"></div>
+    <input type="hidden" name="attr_trait_frenzy" value="0" class="sheet-frenzyflag">
+    <div class="sheet-cond sheet-frenzycond"><label title="Frenzied: +10 WS, St, T, Wp and -20 BS, Int, Fel"><input type="checkbox" name="attr_frenzied" value="1"><span>Frenzied</span></label><button type="action" name="act_calm" class="sheet-btn sheet-btnsoft" title="Discipline test to snap out of Frenzy, +10 for each earlier attempt">Calm</button></div>
     <div class="sheet-cond sheet-condmove"><span class="sheet-condlabel">Move</span>
       <label>Half<input type="number" name="attr_move_half" value="0" readonly></label>
       <label>Full<input type="number" name="attr_move_full" value="0" readonly></label>
       <label>Charge<input type="number" name="attr_move_charge" value="0" readonly></label>
       <label>Run<input type="number" name="attr_move_run" value="0" readonly></label>
+    </div>
+    <div class="sheet-cond"><button type="action" name="act_takedamage" class="sheet-btn sheet-dmgtake">Take damage</button><button type="action" name="act_healfull" class="sheet-btn sheet-btnsoft" title="Set current wounds back to max">Full wounds</button></div>
+    <div class="sheet-cond sheet-loadcond">
+      <input type="hidden" name="attr_load_key" value="ok" class="sheet-loadflag">
+      <span class="sheet-condlabel">Load</span><span class="sheet-loadval"><span name="attr_load_total">0</span> / <span name="attr_carry_max">0</span> kg</span><span class="sheet-loadstate" name="attr_load_state">Unencumbered</span>
     </div>
     <div class="sheet-cond"><button type="action" name="act_rollinit" class="sheet-btn">Roll initiative</button><span class="sheet-small">1d10 + Ag bonus +</span><input type="number" name="attr_init_mod" value="0"></div>
   </div>
@@ -184,12 +198,13 @@
       <div>
         <div class="sheet-box">
           <h3>Ranged weapons</h3>
-          <p class="sheet-hint">Set range, attack, aim and difficulty on the bar; the Hit button shows the target. The left icon shrinks a weapon to its bar, the right icon shows craftsmanship, bonuses and mods. Tearing, Proven, Unstable, Spray, Reliable and Unreliable are read from the qualities.</p>
+          <p class="sheet-hint">Set range, attack, aim and difficulty on the bar; the Hit button shows the target. The left icon shrinks a weapon to its bar, the right icon shows craftsmanship, bonuses and mods. Tearing, Proven, Unstable, Spray, Reliable, Unreliable, Accurate, Storm, Lance, Melta, Armourbane and Maximal are read from the qualities.</p>
           <fieldset class="repeating_weapons">
             <div class="sheet-weapon">
               <input type="hidden" name="attr_class" value="basic" class="sheet-wclass">
               <input type="hidden" name="attr_has_var" value="0" class="sheet-hasvar">
               <input type="hidden" name="attr_has_oc" value="0" class="sheet-hasoc">
+              <input type="hidden" name="attr_has_max" value="0" class="sheet-hasmax">
               <input type="hidden" name="attr_collapsed" value="0" class="sheet-collflag">
               <input type="hidden" name="attr_more" value="0" class="sheet-moreflag">
               <input type="hidden" name="attr_atk_mode" value="1" class="sheet-atkflag">
@@ -200,12 +215,14 @@
                 <select name="attr_atk_loc" class="sheet-barsel sheet-calledloc"><option value="1">Head</option><option value="4" selected>Body</option><option value="2">R Arm</option><option value="3">L Arm</option><option value="5">R Leg</option><option value="6">L Leg</option></select>
                 <select name="attr_atk_aim" class="sheet-barsel"><option value="0" selected>No aim (+0)</option><option value="10">Half aim (+10)</option><option value="20">Full aim (+20)</option></select>
                 <select name="attr_atk_diff" class="sheet-barsel"><option value="0" selected>Challenging (+0)</option><option value="30">Easy (+30)</option><option value="20">Routine (+20)</option><option value="10">Ordinary (+10)</option><option value="-10">Difficult (-10)</option><option value="-20">Hard (-20)</option><option value="-30">Very hard (-30)</option></select>
+                <select name="attr_atk_size" class="sheet-barsel" title="Size of the target"><option value="-30">Target Miniscule (-30)</option><option value="-20">Target Puny (-20)</option><option value="-10">Target Scrawny (-10)</option><option value="0" selected>Target Average (+0)</option><option value="10">Target Hulking (+10)</option><option value="20">Target Enormous (+20)</option><option value="30">Target Massive (+30)</option><option value="40">Target Immense (+40)</option><option value="50">Target Monumental (+50)</option><option value="60">Target Titanic (+60)</option></select>
                               </div>
                 <div class="sheet-barbtns"><button type="action" name="act_attack" class="sheet-hitbtn">Hit <span class="sheet-hitsep">|</span> <span name="attr_hitchance">0</span></button>
                                   <button type="action" name="act_damage" class="sheet-dmgbtn">DMG</button></div>
                 <div class="sheet-settings">
                 <label class="sheet-varset">Variable<select name="attr_var_mode"><option value="standard" selected>Standard</option><option value="overcharge">Overcharge (+1 dmg, +1 pen, 2 shots)</option><option value="overload">Overload (+2 dmg, +2 pen, 4 shots, Unreliable)</option></select></label>
                 <label class="sheet-ocset">Overcharge<select name="attr_oc_mode"><option value="standard" selected>Standard</option><option value="overcharge">Overcharge (3x ammo)</option></select></label>
+                <label class="sheet-maxset">Maximal<select name="attr_max_mode"><option value="standard" selected>Standard</option><option value="maximal">Maximal (+1d10, +2 pen, 3x ammo)</option></select></label>
                 </div>
               </div>
               <div class="sheet-wline">
@@ -248,6 +265,7 @@
           <fieldset class="repeating_melee">
             <div class="sheet-weapon">
               <input type="hidden" name="attr_craft" value="common" class="sheet-mcraft">
+              <input type="hidden" name="attr_natural" value="0">
               <input type="hidden" name="attr_collapsed" value="0" class="sheet-collflag">
               <input type="hidden" name="attr_more" value="0" class="sheet-moreflag">
               <input type="hidden" name="attr_atk_mode" value="1" class="sheet-atkflag">
@@ -258,6 +276,7 @@
                 <select name="attr_atk_loc" class="sheet-barsel sheet-calledloc"><option value="1">Head</option><option value="4" selected>Body</option><option value="2">R Arm</option><option value="3">L Arm</option><option value="5">R Leg</option><option value="6">L Leg</option></select>
                 <select name="attr_atk_aim" class="sheet-barsel"><option value="0" selected>No aim (+0)</option><option value="10">Half aim (+10)</option><option value="20">Full aim (+20)</option></select>
                 <select name="attr_atk_diff" class="sheet-barsel"><option value="0" selected>Challenging (+0)</option><option value="30">Easy (+30)</option><option value="20">Routine (+20)</option><option value="10">Ordinary (+10)</option><option value="-10">Difficult (-10)</option><option value="-20">Hard (-20)</option><option value="-30">Very hard (-30)</option></select>
+                <select name="attr_atk_size" class="sheet-barsel" title="Size of the target"><option value="-30">Target Miniscule (-30)</option><option value="-20">Target Puny (-20)</option><option value="-10">Target Scrawny (-10)</option><option value="0" selected>Target Average (+0)</option><option value="10">Target Hulking (+10)</option><option value="20">Target Enormous (+20)</option><option value="30">Target Massive (+30)</option><option value="40">Target Immense (+40)</option><option value="50">Target Monumental (+50)</option><option value="60">Target Titanic (+60)</option></select>
                               </div>
                 <div class="sheet-barbtns"><button type="action" name="act_attack" class="sheet-hitbtn">Hit <span class="sheet-hitsep">|</span> <span name="attr_hitchance">0</span></button>
                                   <button type="action" name="act_damage" class="sheet-dmgbtn">DMG</button></div>
@@ -268,7 +287,7 @@
                 <input type="text" name="attr_name" placeholder="Weapon" class="sheet-wname">
               </div>
               <div class="sheet-wgrid sheet-wdetail">
-                <label>Reach<input type="text" name="attr_range" value="Melee"></label>
+                <label>Range<input type="text" name="attr_range" value="Melee"></label>
                 <label>Damage<input type="text" name="attr_damage" value="1d10"></label>
                 <label>Type<select name="attr_dtype"><option value="" selected>Type</option><option value="E">Energy</option><option value="I">Impact</option><option value="R">Rending</option><option value="X">Explosive</option></select></label>
                 <label>Pen<input type="number" name="attr_pen" value="0"></label>
@@ -295,6 +314,7 @@
       <div>
         <div class="sheet-box">
           <h3>Armour</h3>
+          <p class="sheet-hint sheet-npconly">Type each location's AP into Other. Soak adds T bonus.</p>
           <div class="sheet-body">
             <div class="sheet-bodypart sheet-bp-head">
               <span class="sheet-bpname">Head</span>
@@ -345,7 +365,8 @@
               </div>
             </div>
           </div>
-          <p class="sheet-hint">Give each armour piece its AP per location (0 where it doesn't cover). Each location uses the best worn piece. Other is for natural armour, cybernetics and the like. Soak adds T bonus (<input type="number" name="attr_t_bonus" value="0" readonly class="sheet-inlinenum">).</p>
+          <p class="sheet-hint sheet-pconly">Give each armour piece its AP per location (0 where it doesn't cover). Each location uses the best worn piece. Other is for natural armour, cybernetics and the like. Soak adds T bonus (<input type="number" name="attr_t_bonus" value="0" readonly class="sheet-inlinenum">).</p>
+          <div class="sheet-pconly">
           <fieldset class="repeating_armour">
             <div class="sheet-weapon sheet-armourpiece">
               <input type="hidden" name="attr_craft" value="common" class="sheet-acraft">
@@ -370,9 +391,10 @@
               <textarea name="attr_mods" placeholder="Modifications and notes"></textarea>
             </div>
           </fieldset>
+          </div>
         </div>
 
-        <div class="sheet-box">
+        <div class="sheet-box sheet-pconly">
           <h3>Force field</h3>
           <div class="sheet-wline">
             <input type="text" name="attr_ff_name" placeholder="Force field" class="sheet-wname">
@@ -421,6 +443,61 @@
         </fieldset>
       </div>
     </div>
+    <!-- Trait effects: filled from trait names, drives size, movement, wounds, armour and roll notes -->
+    <div class="sheet-box sheet-traitbox">
+      <h3>Trait effects</h3>
+      <p class="sheet-hint">Filled in from trait names as you type them, e.g. Size (5), Natural Armour (4), Unnatural Strength (3), Daemonic (2), Astartes, Frenzy. Change anything here by hand and it stays until that trait's entry changes. Ticked traits add reminders to the rolls they affect.</p>
+      <input type="hidden" name="attr_trait_amorph" value="0" class="sheet-amorphflag">
+      <div class="sheet-wgrid">
+      <label>Size<select name="attr_trait_size"><option value="1">1 Miniscule</option><option value="2">2 Puny</option><option value="3">3 Scrawny</option><option value="4" selected>4 Average</option><option value="5">5 Hulking</option><option value="6">6 Enormous</option><option value="7">7 Massive</option><option value="8">8 Immense</option><option value="9">9 Monumental</option><option value="10">10 Titanic</option></select></label>
+      <label class="sheet-amorphshift">Amorphous shift<select name="attr_trait_amorph_shift"><option value="-1">Smaller (-1)</option><option value="0" selected>Normal</option><option value="1">Larger (+1)</option></select></label>
+      <label>Natural armour<input type="number" name="attr_trait_natarmour" value="0"></label>
+      <label>Machine<input type="number" name="attr_trait_machine" value="0"></label>
+      <label>Daemonic<input type="number" name="attr_trait_daemonic" value="0"></label>
+      <label>Brutal charge<input type="number" name="attr_trait_brutal" value="0"></label>
+      <label>Flyer<input type="number" name="attr_trait_flyer" value="0"></label>
+      <label>Hoverer<input type="number" name="attr_trait_hoverer" value="0"></label>
+      <label>Multiple arms<input type="number" name="attr_trait_multiarms" value="0"></label>
+      <label>Fear<input type="number" name="attr_trait_fear" value="0"></label>
+      <label>Baneful presence<input type="number" name="attr_trait_baneful" value="0"></label>
+      <label>Toxic<input type="number" name="attr_trait_toxic" value="0"></label>
+      <label>Touched by Fates<input type="number" name="attr_trait_fates" value="0"></label>
+      <label>Regeneration<span class="sheet-regen"><input type="number" name="attr_trait_regen" value="0"><button type="action" name="act_regen" class="sheet-btn" title="Fortitude test, heals the trait's value on a success">Regen</button></span></label>
+      </div>
+      <div class="sheet-traitflags">
+        <div class="sheet-tfcol"><span class="sheet-tfhead">Body and movement</span>
+          <label><input type="checkbox" name="attr_trait_quadruped" value="1"><span>Quadruped</span></label>
+          <label><input type="checkbox" name="attr_trait_crawler" value="1"><span>Crawler</span></label>
+          <label><input type="checkbox" name="attr_trait_amorph" value="1"><span>Amorphous</span></label>
+          <label><input type="checkbox" name="attr_trait_incorporeal" value="1"><span>Incorporeal</span></label>
+          <label><input type="checkbox" name="attr_trait_amphibious" value="1"><span>Amphibious</span></label>
+          <label><input type="checkbox" name="attr_trait_aquatic" value="1"><span>Aquatic</span></label>
+          <label><input type="checkbox" name="attr_trait_swarm" value="1"><span>Swarm</span></label>
+          <label><input type="checkbox" name="attr_trait_blind" value="1"><span>Blind</span></label>
+        </div>
+        <div class="sheet-tfcol"><span class="sheet-tfhead">Combat</span>
+          <label><input type="checkbox" name="attr_trait_frenzy" value="1"><span>Frenzy</span></label>
+          <label><input type="checkbox" name="attr_trait_natweap" value="1"><span>Natural weapons</span></label>
+          <label><input type="checkbox" name="attr_trait_deadly" value="1"><span>Deadly natural weapons</span></label>
+          <label><input type="checkbox" name="attr_trait_sturdy" value="1"><span>Sturdy</span></label>
+          <label><input type="checkbox" name="attr_trait_autostab" value="1"><span>Auto-stabilised</span></label>
+          <label><input type="checkbox" name="attr_trait_smimplants" value="1"><span>Space Marine implants</span></label>
+          <label><input type="checkbox" name="attr_trait_bestial" value="1"><span>Bestial</span></label>
+          <label><input type="checkbox" name="attr_trait_darksight" value="1"><span>Dark-sight</span></label>
+        </div>
+        <div class="sheet-tfcol"><span class="sheet-tfhead">Resilience and warp</span>
+          <label><input type="checkbox" name="attr_trait_undying" value="1"><span>Undying</span></label>
+          <label><input type="checkbox" name="attr_trait_strangephys" value="1"><span>Strange Physiology</span></label>
+          <label><input type="checkbox" name="attr_trait_nightmares" value="1"><span>Stuff of Nightmares</span></label>
+          <label><input type="checkbox" name="attr_trait_frombeyond" value="1"><span>From Beyond</span></label>
+          <label><input type="checkbox" name="attr_trait_nofear" value="1"><span>Know No Fear</span></label>
+          <label><input type="checkbox" name="attr_trait_untouchable" value="1"><span>Untouchable</span></label>
+          <label><input type="checkbox" name="attr_trait_discordant" value="1"><span>Discordant</span></label>
+          <label><input type="checkbox" name="attr_trait_warpinst" value="1"><span>Warp Instability</span></label>
+        </div>
+      </div>
+      <span class="sheet-traitsum" name="attr_trait_summary">Size 4 (Average): no modifiers.</span>
+    </div>
   </div>
 
   <!-- ==================== POWERS TAB ==================== -->
@@ -429,59 +506,79 @@
       <h3>Powers</h3>
       <div class="sheet-powerstats">
         <label>Psy rating <input type="number" name="attr_psyrating" value="0"></label>
-        <label>Cognition points <input type="number" name="attr_cp" value="0"> / <input type="number" name="attr_cp_max" value="0"></label>
+        <label>Cognition points <input type="number" name="attr_cp" value="0"> / <input type="number" name="attr_cp_max" value="0" readonly title="Int bonus + mod"> <span class="sheet-small">mod</span> <input type="number" name="attr_cp_mod" value="0"></label>
         <label>Fate points <input type="number" name="attr_fate_points" value="0"> / <input type="number" name="attr_fate_points_max" value="0"></label>
       </div>
       <p class="sheet-hint">Psychic powers ask for effective Psy Rating when used and add 5 x that to the test target, and PR in the bolt profile uses it (3xPR works too). With a bolt type set, Use rolls the Focus Power test as the attack and shows hits, location and damage on a success. For the test, pick a characteristic, or name a skill (e.g. Medicae) to roll against that skill instead. Navigator mastery applies its penalty automatically. Set the test to None for powers that don't roll.</p>
+      <!-- Filter: hidden flag sits before the list so CSS can hide powers of other types -->
+      <div class="sheet-pfilterbar"><span class="sheet-condlabel">Show</span>
+        <select name="attr_power_filter">
+          <option value="all" selected>All powers</option><option value="psychic">Psychic</option><option value="faith">Faith</option>
+          <option value="arcana">Techno-arcana</option><option value="navigator">Navigator</option><option value="null">Null</option><option value="other">Chaos Ritual</option>
+        </select>
+      </div>
+      <input type="hidden" name="attr_power_filter" value="all" class="sheet-pfilter">
       <fieldset class="repeating_powers">
         <div class="sheet-power">
           <input type="hidden" name="attr_ptype" value="psychic" class="sheet-ptype">
           <input type="hidden" name="attr_bolt_type" value="none" class="sheet-boltflag">
-          <div class="sheet-wline">
-            <input type="text" name="attr_name" placeholder="Power" class="sheet-wname">
+          <input type="hidden" name="attr_collapsed" value="0" class="sheet-pcollflag">
+          <input type="hidden" name="attr_more" value="0" class="sheet-pmoreflag">
+          <div class="sheet-pcard">
+            <div class="sheet-wline sheet-pline">
+              <label class="sheet-icon sheet-icon-collapse" title="Compact: show only the name line"><input type="checkbox" name="attr_collapsed" value="1"><span></span></label>
+              <label class="sheet-icon sheet-icon-more" title="Show tier, aptitudes, prerequisite and the full effect text"><input type="checkbox" name="attr_more" value="1"><span></span></label>
+              <input type="text" name="attr_name" placeholder="Power" class="sheet-wname">
             <select name="attr_ptype">
               <option value="psychic" selected>Psychic</option><option value="faith">Faith</option>
               <option value="arcana">Techno-arcana</option><option value="navigator">Navigator</option>
-              <option value="null">Null</option><option value="other">Other</option>
+              <option value="null">Null</option><option value="other">Chaos Ritual</option>
             </select>
             <select name="attr_level">
               <option value="novice" selected>Novice</option><option value="adept">Adept</option>
               <option value="master">Master</option><option value="paragon">Paragon</option><option value="na">No level</option>
             </select>
             <button type="action" name="act_use" class="sheet-btn">Use</button>
-          </div>
-          <div class="sheet-ptest">
-            <span>Test</span><select name="attr_char"><option value="none">None</option><option value="ws">WS</option><option value="bs">BS</option><option value="s">St</option><option value="t">T</option><option value="ag">Ag</option><option value="int">Int</option><option value="per">Per</option><option value="wp" selected>Wp</option><option value="fel">Fel</option><option value="fate">Fate</option><option value="inf">Inf</option></select>
-            <input type="text" name="attr_skill" placeholder="or skill">
-            <span>Mod</span><input type="number" name="attr_mod" value="0">
-            <label class="sheet-check">Bolt <select name="attr_bolt_type"><option value="none" selected>No bolt</option><option value="bolt">Psychic Bolt</option><option value="lance">Psychic Lance</option><option value="barrage">Psychic Barrage</option><option value="storm">Psychic Storm</option><option value="blast">Psychic Blast</option><option value="nova">Psychic Nova</option></select></label>
-          </div>
-          <div class="sheet-wgrid">
-            <label>Tier<input type="text" name="attr_tier"></label>
-            <label>Aptitudes<input type="text" name="attr_aptitudes"></label>
-            <label>Prerequisite<input type="text" name="attr_prereq"></label>
-            <label>Action<input type="text" name="attr_action"></label>
-            <label>Cost<input type="text" name="attr_cost" placeholder="1 Fate, 3 CP"></label>
-            <label>Range<input type="text" name="attr_range"></label>
-            <label>Sustain or duration<input type="text" name="attr_duration"></label>
-            <label>Subtype or aspect<input type="text" name="attr_subtype"></label>
-          </div>
-          <div class="sheet-bolt">
-            <div class="sheet-wline">
-              <strong>Bolt profile</strong>
-              <button type="action" name="act_bolt" class="sheet-btn">Roll extra damage</button>
             </div>
-            <div class="sheet-wgrid">
-                            <label>Range<input type="text" name="attr_bolt_range" placeholder="10m x PR"></label>
-              <label>Damage<input type="text" name="attr_bolt_damage" placeholder="1d10+PR(E)"></label>
-              <label>Pen<input type="text" name="attr_bolt_pen" placeholder="PR"></label>
-              <label>Qualities<input type="text" name="attr_bolt_qual"></label>
+            <div class="sheet-pbody">
+              <div class="sheet-ptest">
+                <span>Test</span><select name="attr_char"><option value="none">None</option><option value="ws">WS</option><option value="bs">BS</option><option value="s">St</option><option value="t">T</option><option value="ag">Ag</option><option value="int">Int</option><option value="per">Per</option><option value="wp" selected>Wp</option><option value="fel">Fel</option><option value="fate">Fate</option><option value="inf">Inf</option></select>
+                <input type="text" name="attr_skill" placeholder="or skill">
+                <span>Mod</span><input type="number" name="attr_mod" value="0">
+                <label class="sheet-check">Bolt <select name="attr_bolt_type"><option value="none" selected>No bolt</option><option value="bolt">Psychic Bolt</option><option value="lance">Psychic Lance</option><option value="barrage">Psychic Barrage</option><option value="storm">Psychic Storm</option><option value="blast">Psychic Blast</option><option value="nova">Psychic Nova</option></select></label>
+              </div>
+              <div class="sheet-wgrid">
+                <label>Action<input type="text" name="attr_action"></label>
+                <label>Cost<input type="text" name="attr_cost" placeholder="1 Fate, 3 CP"></label>
+                <label>Range<input type="text" name="attr_range"></label>
+                <label>Sustain or duration<input type="text" name="attr_duration"></label>
+              </div>
+              <div class="sheet-bolt">
+                <div class="sheet-wline">
+                  <strong>Bolt profile</strong>
+                  <button type="action" name="act_bolt" class="sheet-btn">Roll extra damage</button>
+                </div>
+                <div class="sheet-wgrid">
+                                <label>Range<input type="text" name="attr_bolt_range" placeholder="10m x PR"></label>
+                  <label>Damage<input type="text" name="attr_bolt_damage" placeholder="1d10+PR(E)"></label>
+                  <label>Pen<input type="text" name="attr_bolt_pen" placeholder="PR"></label>
+                  <label>Qualities<input type="text" name="attr_bolt_qual"></label>
+                </div>
+                <textarea name="attr_bolt_special" placeholder="Bolt special"></textarea>
+              </div>
+              <div class="sheet-pmore">
+                <div class="sheet-wgrid">
+                  <label>Tier<input type="text" name="attr_tier"></label>
+                  <label>Aptitudes<input type="text" name="attr_aptitudes"></label>
+                  <label>Prerequisite<input type="text" name="attr_prereq"></label>
+                  <label>Subtype or aspect<input type="text" name="attr_subtype"></label>
+                </div>
+                <textarea name="attr_effect" placeholder="Effect"></textarea>
+                <textarea name="attr_overbleed" class="sheet-overbleed" placeholder="Overbleed, e.g. (6): Increase the Blind Quality by 1"></textarea>
+                <textarea name="attr_burn" class="sheet-burn" placeholder="Burn effect (burning 5 Fate)"></textarea>
+              </div>
             </div>
-            <textarea name="attr_bolt_special" placeholder="Bolt special"></textarea>
           </div>
-          <textarea name="attr_effect" placeholder="Effect"></textarea>
-          <textarea name="attr_overbleed" class="sheet-overbleed" placeholder="Overbleed, e.g. (6): Increase the Blind Quality by 1"></textarea>
-          <textarea name="attr_burn" class="sheet-burn" placeholder="Burn effect (burning 5 Fate)"></textarea>
         </div>
       </fieldset>
     </div>
@@ -545,7 +642,16 @@
             <textarea name="attr_desc" placeholder="What it does"></textarea>
           </div>
         </fieldset>
-        <div class="sheet-geartotal">Total weight <input type="number" name="attr_gear_weight" value="0" readonly></div>
+        <div class="sheet-geartotal">Gear weight <input type="number" name="attr_gear_weight" value="0" readonly></div>
+        <h3 class="sheet-subh">Encumbrance</h3>
+        <div class="sheet-encumb">
+          <label>Total load<input type="number" name="attr_load_total" value="0" readonly></label>
+          <label>Carry<input type="number" name="attr_carry_max" value="0" readonly></label>
+          <label>Lift<input type="number" name="attr_lift_max" value="0" readonly></label>
+          <label>Push<input type="number" name="attr_push_max" value="0" readonly></label>
+          <label>Extra load<input type="number" name="attr_load_extra" value="0" step="0.1" title="Anything not on the lists, e.g. a carried comrade"></label>
+        </div>
+        <p class="sheet-hint">Limits in kg from St bonus + T bonus. Total load counts gear, weapons and armour (weights typed as numbers, e.g. 4 or 4kg).</p>
       </div>
       <div class="sheet-box">
         <h3>Cybernetics</h3>
@@ -582,7 +688,7 @@
         <div class="sheet-box">
           <h3>Purchases</h3>
           <p class="sheet-hint">Pick the type first. Characteristics and Skills fill in their own aptitudes; Talents take the aptitudes you choose. Costs come from the book's tables and are checked against your aptitudes. Background costs are typed in.</p>
-          <div class="sheet-buyhead"><span>Type</span><span>Bought</span><span>Aptitude 1</span><span>Aptitude 2</span><span>Level</span><span>Match</span><span>XP</span></div>
+          <div class="sheet-buylist">
           <fieldset class="repeating_purchases">
             <div class="sheet-buyrow">
               <input type="hidden" name="attr_btype" value="characteristic" class="sheet-btypeflag">
@@ -603,25 +709,25 @@
                 <select name="attr_level" class="sheet-lvl-tier"><option value="1" selected>Tier 1</option><option value="2">Tier 2</option><option value="3">Tier 3</option></select>
                 <span class="sheet-lvl-none">-</span>
               </span>
-              <input type="number" name="attr_matches" value="0" readonly>
-              <input type="number" name="attr_cost" value="0" class="sheet-costbox">
+              <label class="sheet-buymatch" title="Aptitudes matched">Match<input type="number" name="attr_matches" value="0" readonly></label>
+              <label class="sheet-buycost" title="XP cost">XP<input type="number" name="attr_cost" value="0" class="sheet-costbox"></label>
             </div>
           </fieldset>
+          </div>
         </div>
       </div>
       <div class="sheet-box sheet-aptbox">
         <h3>Aptitudes</h3>
-        <div class="sheet-aptlist">
-          <div class="sheet-aptrow"><span>1</span><select name="attr_apt_1"><option value="" selected>-</option><option value="Weapon Skill">Weapon Skill</option><option value="Ballistic Skill">Ballistic Skill</option><option value="Strength">Strength</option><option value="Toughness">Toughness</option><option value="Agility">Agility</option><option value="Intelligence">Intelligence</option><option value="Perception">Perception</option><option value="Willpower">Willpower</option><option value="Fellowship">Fellowship</option><option value="Offence">Offence</option><option value="Finesse">Finesse</option><option value="Defence">Defence</option><option value="Psyker">Psyker</option><option value="Tech">Tech</option><option value="Knowledge">Knowledge</option><option value="Fieldcraft">Fieldcraft</option><option value="Leadership">Leadership</option><option value="Social">Social</option></select></div>
-          <div class="sheet-aptrow"><span>2</span><select name="attr_apt_2"><option value="" selected>-</option><option value="Weapon Skill">Weapon Skill</option><option value="Ballistic Skill">Ballistic Skill</option><option value="Strength">Strength</option><option value="Toughness">Toughness</option><option value="Agility">Agility</option><option value="Intelligence">Intelligence</option><option value="Perception">Perception</option><option value="Willpower">Willpower</option><option value="Fellowship">Fellowship</option><option value="Offence">Offence</option><option value="Finesse">Finesse</option><option value="Defence">Defence</option><option value="Psyker">Psyker</option><option value="Tech">Tech</option><option value="Knowledge">Knowledge</option><option value="Fieldcraft">Fieldcraft</option><option value="Leadership">Leadership</option><option value="Social">Social</option></select></div>
-          <div class="sheet-aptrow"><span>3</span><select name="attr_apt_3"><option value="" selected>-</option><option value="Weapon Skill">Weapon Skill</option><option value="Ballistic Skill">Ballistic Skill</option><option value="Strength">Strength</option><option value="Toughness">Toughness</option><option value="Agility">Agility</option><option value="Intelligence">Intelligence</option><option value="Perception">Perception</option><option value="Willpower">Willpower</option><option value="Fellowship">Fellowship</option><option value="Offence">Offence</option><option value="Finesse">Finesse</option><option value="Defence">Defence</option><option value="Psyker">Psyker</option><option value="Tech">Tech</option><option value="Knowledge">Knowledge</option><option value="Fieldcraft">Fieldcraft</option><option value="Leadership">Leadership</option><option value="Social">Social</option></select></div>
-          <div class="sheet-aptrow"><span>4</span><select name="attr_apt_4"><option value="" selected>-</option><option value="Weapon Skill">Weapon Skill</option><option value="Ballistic Skill">Ballistic Skill</option><option value="Strength">Strength</option><option value="Toughness">Toughness</option><option value="Agility">Agility</option><option value="Intelligence">Intelligence</option><option value="Perception">Perception</option><option value="Willpower">Willpower</option><option value="Fellowship">Fellowship</option><option value="Offence">Offence</option><option value="Finesse">Finesse</option><option value="Defence">Defence</option><option value="Psyker">Psyker</option><option value="Tech">Tech</option><option value="Knowledge">Knowledge</option><option value="Fieldcraft">Fieldcraft</option><option value="Leadership">Leadership</option><option value="Social">Social</option></select></div>
-          <div class="sheet-aptrow"><span>5</span><select name="attr_apt_5"><option value="" selected>-</option><option value="Weapon Skill">Weapon Skill</option><option value="Ballistic Skill">Ballistic Skill</option><option value="Strength">Strength</option><option value="Toughness">Toughness</option><option value="Agility">Agility</option><option value="Intelligence">Intelligence</option><option value="Perception">Perception</option><option value="Willpower">Willpower</option><option value="Fellowship">Fellowship</option><option value="Offence">Offence</option><option value="Finesse">Finesse</option><option value="Defence">Defence</option><option value="Psyker">Psyker</option><option value="Tech">Tech</option><option value="Knowledge">Knowledge</option><option value="Fieldcraft">Fieldcraft</option><option value="Leadership">Leadership</option><option value="Social">Social</option></select></div>
-          <div class="sheet-aptrow"><span>6</span><select name="attr_apt_6"><option value="" selected>-</option><option value="Weapon Skill">Weapon Skill</option><option value="Ballistic Skill">Ballistic Skill</option><option value="Strength">Strength</option><option value="Toughness">Toughness</option><option value="Agility">Agility</option><option value="Intelligence">Intelligence</option><option value="Perception">Perception</option><option value="Willpower">Willpower</option><option value="Fellowship">Fellowship</option><option value="Offence">Offence</option><option value="Finesse">Finesse</option><option value="Defence">Defence</option><option value="Psyker">Psyker</option><option value="Tech">Tech</option><option value="Knowledge">Knowledge</option><option value="Fieldcraft">Fieldcraft</option><option value="Leadership">Leadership</option><option value="Social">Social</option></select></div>
-          <div class="sheet-aptrow"><span>7</span><select name="attr_apt_7"><option value="" selected>-</option><option value="Weapon Skill">Weapon Skill</option><option value="Ballistic Skill">Ballistic Skill</option><option value="Strength">Strength</option><option value="Toughness">Toughness</option><option value="Agility">Agility</option><option value="Intelligence">Intelligence</option><option value="Perception">Perception</option><option value="Willpower">Willpower</option><option value="Fellowship">Fellowship</option><option value="Offence">Offence</option><option value="Finesse">Finesse</option><option value="Defence">Defence</option><option value="Psyker">Psyker</option><option value="Tech">Tech</option><option value="Knowledge">Knowledge</option><option value="Fieldcraft">Fieldcraft</option><option value="Leadership">Leadership</option><option value="Social">Social</option></select></div>
-          <div class="sheet-aptrow"><span>8</span><select name="attr_apt_8"><option value="" selected>-</option><option value="Weapon Skill">Weapon Skill</option><option value="Ballistic Skill">Ballistic Skill</option><option value="Strength">Strength</option><option value="Toughness">Toughness</option><option value="Agility">Agility</option><option value="Intelligence">Intelligence</option><option value="Perception">Perception</option><option value="Willpower">Willpower</option><option value="Fellowship">Fellowship</option><option value="Offence">Offence</option><option value="Finesse">Finesse</option><option value="Defence">Defence</option><option value="Psyker">Psyker</option><option value="Tech">Tech</option><option value="Knowledge">Knowledge</option><option value="Fieldcraft">Fieldcraft</option><option value="Leadership">Leadership</option><option value="Social">Social</option></select></div>
-          <div class="sheet-aptrow sheet-aptgeneral"><span>&nbsp;</span><input type="text" value="General" readonly></div>
-        </div>
+        <!-- Aptitudes: each line holds four, +Add gives another line. General is always owned. -->
+        <fieldset class="repeating_aptrows">
+          <div class="sheet-aptline">
+            <select name="attr_apt_a"><option value="" selected>-</option><option value="Weapon Skill">Weapon Skill</option><option value="Ballistic Skill">Ballistic Skill</option><option value="Strength">Strength</option><option value="Toughness">Toughness</option><option value="Agility">Agility</option><option value="Intelligence">Intelligence</option><option value="Perception">Perception</option><option value="Willpower">Willpower</option><option value="Fellowship">Fellowship</option><option value="Offence">Offence</option><option value="Finesse">Finesse</option><option value="Defence">Defence</option><option value="Psyker">Psyker</option><option value="Tech">Tech</option><option value="Knowledge">Knowledge</option><option value="Fieldcraft">Fieldcraft</option><option value="Leadership">Leadership</option><option value="Social">Social</option></select>
+            <select name="attr_apt_b"><option value="" selected>-</option><option value="Weapon Skill">Weapon Skill</option><option value="Ballistic Skill">Ballistic Skill</option><option value="Strength">Strength</option><option value="Toughness">Toughness</option><option value="Agility">Agility</option><option value="Intelligence">Intelligence</option><option value="Perception">Perception</option><option value="Willpower">Willpower</option><option value="Fellowship">Fellowship</option><option value="Offence">Offence</option><option value="Finesse">Finesse</option><option value="Defence">Defence</option><option value="Psyker">Psyker</option><option value="Tech">Tech</option><option value="Knowledge">Knowledge</option><option value="Fieldcraft">Fieldcraft</option><option value="Leadership">Leadership</option><option value="Social">Social</option></select>
+            <select name="attr_apt_c"><option value="" selected>-</option><option value="Weapon Skill">Weapon Skill</option><option value="Ballistic Skill">Ballistic Skill</option><option value="Strength">Strength</option><option value="Toughness">Toughness</option><option value="Agility">Agility</option><option value="Intelligence">Intelligence</option><option value="Perception">Perception</option><option value="Willpower">Willpower</option><option value="Fellowship">Fellowship</option><option value="Offence">Offence</option><option value="Finesse">Finesse</option><option value="Defence">Defence</option><option value="Psyker">Psyker</option><option value="Tech">Tech</option><option value="Knowledge">Knowledge</option><option value="Fieldcraft">Fieldcraft</option><option value="Leadership">Leadership</option><option value="Social">Social</option></select>
+            <select name="attr_apt_d"><option value="" selected>-</option><option value="Weapon Skill">Weapon Skill</option><option value="Ballistic Skill">Ballistic Skill</option><option value="Strength">Strength</option><option value="Toughness">Toughness</option><option value="Agility">Agility</option><option value="Intelligence">Intelligence</option><option value="Perception">Perception</option><option value="Willpower">Willpower</option><option value="Fellowship">Fellowship</option><option value="Offence">Offence</option><option value="Finesse">Finesse</option><option value="Defence">Defence</option><option value="Psyker">Psyker</option><option value="Tech">Tech</option><option value="Knowledge">Knowledge</option><option value="Fieldcraft">Fieldcraft</option><option value="Leadership">Leadership</option><option value="Social">Social</option></select>
+          </div>
+        </fieldset>
+        <div class="sheet-aptgeneral"><input type="text" value="General" readonly></div>
       </div>
     </div>
   </div>
@@ -661,6 +767,145 @@
     </div>
   </div>
 
+  <!-- ==================== NPC PANEL (Enemy / NPC mode) ==================== -->
+  <!-- One page: characteristics, condition bar, this stat block, then weapons and armour. -->
+  <div class="sheet-panel sheet-panel-npc">
+    <div class="sheet-statblock">
+      <div class="sheet-sbrow sheet-sbskills">
+        <span class="sheet-sblabel">Skills</span>
+        <div>
+          <fieldset class="repeating_npcskills">
+            <div class="sheet-npcskill">
+              <button type="action" name="act_roll" class="sheet-die">d</button>
+              <input type="text" name="attr_name" placeholder="e.g. Dodge">
+              <select name="attr_char"><option value="ws">WS</option><option value="bs">BS</option><option value="s">St</option><option value="t">T</option><option value="ag" selected>Ag</option><option value="int">Int</option><option value="per">Per</option><option value="wp">Wp</option><option value="fel">Fel</option></select>
+              <select name="attr_bonus"><option value="0" selected>+0</option><option value="10">+10</option><option value="20">+20</option><option value="30">+30</option></select>
+              <input type="number" name="attr_target" value="0" readonly>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+      <div class="sheet-sbrow"><span class="sheet-sblabel">Talents</span><textarea name="attr_npc_talents" placeholder="Bombardier, Cold Hearted, Deadeye Shot..."></textarea></div>
+      <div class="sheet-sbrow"><span class="sheet-sblabel">Traits</span><textarea name="attr_npc_traits" placeholder="Touched By The Fates (2)"></textarea></div>
+      <div class="sheet-sbrow"><span class="sheet-sblabel">Cybernetics</span><textarea name="attr_npc_cyber"></textarea></div>
+      <div class="sheet-sbrow"><span class="sheet-sblabel">Gear</span><textarea name="attr_npc_gear"></textarea></div>
+      <div class="sheet-sbrow"><span class="sheet-sblabel">Armour</span><textarea name="attr_npc_armour" placeholder="Flak Armour (AP4, Body) with Enviro-Sealed Modification"></textarea></div>
+      <div class="sheet-sbrow"><span class="sheet-sblabel">Threat</span>
+        <div class="sheet-npcthreat">
+          <select name="attr_npc_type"><option value="troop" selected>Troop</option><option value="elite">Elite</option><option value="master">Master</option></select>
+          <span class="sheet-hint sheet-trooprule">Troop NPCs that suffer Righteous Fury are simply slain.</span>
+        </div>
+      </div>
+      <div class="sheet-sbrow"><span class="sheet-sblabel">Notes</span><textarea name="attr_npc_notes"></textarea></div>
+    </div>
+    <!-- Trait effects: filled from trait names, drives size, movement, wounds, armour and roll notes -->
+    <div class="sheet-box sheet-traitbox">
+      <h3>Trait effects</h3>
+      <p class="sheet-hint">Filled in from trait names as you type them, e.g. Size (5), Natural Armour (4), Unnatural Strength (3), Daemonic (2), Astartes, Frenzy. Change anything here by hand and it stays until that trait's entry changes. Ticked traits add reminders to the rolls they affect.</p>
+      <input type="hidden" name="attr_trait_amorph" value="0" class="sheet-amorphflag">
+      <div class="sheet-wgrid">
+      <label>Size<select name="attr_trait_size"><option value="1">1 Miniscule</option><option value="2">2 Puny</option><option value="3">3 Scrawny</option><option value="4" selected>4 Average</option><option value="5">5 Hulking</option><option value="6">6 Enormous</option><option value="7">7 Massive</option><option value="8">8 Immense</option><option value="9">9 Monumental</option><option value="10">10 Titanic</option></select></label>
+      <label class="sheet-amorphshift">Amorphous shift<select name="attr_trait_amorph_shift"><option value="-1">Smaller (-1)</option><option value="0" selected>Normal</option><option value="1">Larger (+1)</option></select></label>
+      <label>Natural armour<input type="number" name="attr_trait_natarmour" value="0"></label>
+      <label>Machine<input type="number" name="attr_trait_machine" value="0"></label>
+      <label>Daemonic<input type="number" name="attr_trait_daemonic" value="0"></label>
+      <label>Brutal charge<input type="number" name="attr_trait_brutal" value="0"></label>
+      <label>Flyer<input type="number" name="attr_trait_flyer" value="0"></label>
+      <label>Hoverer<input type="number" name="attr_trait_hoverer" value="0"></label>
+      <label>Multiple arms<input type="number" name="attr_trait_multiarms" value="0"></label>
+      <label>Fear<input type="number" name="attr_trait_fear" value="0"></label>
+      <label>Baneful presence<input type="number" name="attr_trait_baneful" value="0"></label>
+      <label>Toxic<input type="number" name="attr_trait_toxic" value="0"></label>
+      <label>Touched by Fates<input type="number" name="attr_trait_fates" value="0"></label>
+      <label>Regeneration<span class="sheet-regen"><input type="number" name="attr_trait_regen" value="0"><button type="action" name="act_regen" class="sheet-btn" title="Fortitude test, heals the trait's value on a success">Regen</button></span></label>
+      </div>
+      <div class="sheet-traitflags">
+        <div class="sheet-tfcol"><span class="sheet-tfhead">Body and movement</span>
+          <label><input type="checkbox" name="attr_trait_quadruped" value="1"><span>Quadruped</span></label>
+          <label><input type="checkbox" name="attr_trait_crawler" value="1"><span>Crawler</span></label>
+          <label><input type="checkbox" name="attr_trait_amorph" value="1"><span>Amorphous</span></label>
+          <label><input type="checkbox" name="attr_trait_incorporeal" value="1"><span>Incorporeal</span></label>
+          <label><input type="checkbox" name="attr_trait_amphibious" value="1"><span>Amphibious</span></label>
+          <label><input type="checkbox" name="attr_trait_aquatic" value="1"><span>Aquatic</span></label>
+          <label><input type="checkbox" name="attr_trait_swarm" value="1"><span>Swarm</span></label>
+          <label><input type="checkbox" name="attr_trait_blind" value="1"><span>Blind</span></label>
+        </div>
+        <div class="sheet-tfcol"><span class="sheet-tfhead">Combat</span>
+          <label><input type="checkbox" name="attr_trait_frenzy" value="1"><span>Frenzy</span></label>
+          <label><input type="checkbox" name="attr_trait_natweap" value="1"><span>Natural weapons</span></label>
+          <label><input type="checkbox" name="attr_trait_deadly" value="1"><span>Deadly natural weapons</span></label>
+          <label><input type="checkbox" name="attr_trait_sturdy" value="1"><span>Sturdy</span></label>
+          <label><input type="checkbox" name="attr_trait_autostab" value="1"><span>Auto-stabilised</span></label>
+          <label><input type="checkbox" name="attr_trait_smimplants" value="1"><span>Space Marine implants</span></label>
+          <label><input type="checkbox" name="attr_trait_bestial" value="1"><span>Bestial</span></label>
+          <label><input type="checkbox" name="attr_trait_darksight" value="1"><span>Dark-sight</span></label>
+        </div>
+        <div class="sheet-tfcol"><span class="sheet-tfhead">Resilience and warp</span>
+          <label><input type="checkbox" name="attr_trait_undying" value="1"><span>Undying</span></label>
+          <label><input type="checkbox" name="attr_trait_strangephys" value="1"><span>Strange Physiology</span></label>
+          <label><input type="checkbox" name="attr_trait_nightmares" value="1"><span>Stuff of Nightmares</span></label>
+          <label><input type="checkbox" name="attr_trait_frombeyond" value="1"><span>From Beyond</span></label>
+          <label><input type="checkbox" name="attr_trait_nofear" value="1"><span>Know No Fear</span></label>
+          <label><input type="checkbox" name="attr_trait_untouchable" value="1"><span>Untouchable</span></label>
+          <label><input type="checkbox" name="attr_trait_discordant" value="1"><span>Discordant</span></label>
+          <label><input type="checkbox" name="attr_trait_warpinst" value="1"><span>Warp Instability</span></label>
+        </div>
+      </div>
+      <span class="sheet-traitsum" name="attr_trait_summary">Size 4 (Average): no modifiers.</span>
+    </div>
+  </div>
+
+  <!-- ==================== VEHICLE PANEL (Vehicle mode) ==================== -->
+  <!-- One page laid out like a vehicle profile. Crew rating drives every vehicle test. -->
+  <div class="sheet-panel sheet-panel-vehicle">
+    <div class="sheet-statblock">
+      <div class="sheet-vhead"><input type="text" name="attr_v_class" placeholder="Class, e.g. Light Fighter Aeronautica"></div>
+      <div class="sheet-vtwo">
+        <div class="sheet-vrow"><span class="sheet-sblabel">Hull integrity</span><div class="sheet-vval"><input type="number" name="attr_v_integrity" value="0"><span>/</span><input type="number" name="attr_v_integrity_max" value="0"></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Armour</span><div class="sheet-vval"><label>Front<input type="number" name="attr_v_ap_front" value="0"></label><label>Side<input type="number" name="attr_v_ap_side" value="0"></label><label>Rear<input type="number" name="attr_v_ap_rear" value="0"></label></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Tactical speed</span><div class="sheet-vval"><input type="text" name="attr_v_tspeed" placeholder="30m (1350m)"></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Manoeuvre</span><div class="sheet-vval"><input type="number" name="attr_v_manoeuvre" value="0"><button type="action" name="act_manoeuvre" class="sheet-btn">Test</button><button type="action" name="act_vtakedamage" class="sheet-btn sheet-dmgtake">Take damage</button></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Cruising speed</span><div class="sheet-vval"><input type="text" name="attr_v_cspeed" placeholder="2,500kph"></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Crew rating</span><div class="sheet-vval"><input type="number" name="attr_crew_rating" value="30" title="The pilot or gunner's target for vehicle tests"></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Void combat</span><div class="sheet-vval"><input type="text" name="attr_v_void" placeholder="9VU"></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Type</span><div class="sheet-vval"><input type="text" name="attr_v_type" placeholder="Spacecraft"></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Size</span><div class="sheet-vval"><input type="text" name="attr_v_size"></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Availability</span><div class="sheet-vval"><input type="text" name="attr_v_avail"></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Carry</span><div class="sheet-vval"><input type="text" name="attr_v_carry"></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Crew</span><div class="sheet-vval"><input type="text" name="attr_v_crew" placeholder="Pilot"></div></div>
+      </div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Traits</span><div class="sheet-vval"><textarea name="attr_v_traits" placeholder="Enhanced Motive System, Enviro-Sealed"></textarea></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Weapon mounts</span><div class="sheet-vval"><textarea name="attr_v_mounts" placeholder="Pilot-Operated Forward-Facing Fixed Quad Helstorm Autocannon -or- Twin Lascannon"></textarea></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Special</span><div class="sheet-vval"><textarea name="attr_v_special"></textarea></div></div>
+        <div class="sheet-vrow"><span class="sheet-sblabel">Notes</span><div class="sheet-vval"><textarea name="attr_v_notes"></textarea></div></div>
+    </div>
+
+    <div class="sheet-box">
+      <h3>Vehicle weapons</h3>
+      <fieldset class="repeating_vweapons">
+        <div class="sheet-weapon">
+          <div class="sheet-wline">
+            <input type="text" name="attr_name" placeholder="Weapon" class="sheet-wname">
+            <input type="text" name="attr_facing" placeholder="Facing" class="sheet-vfacing">
+            <button type="action" name="act_attack" class="sheet-btn">Fire</button>
+            <button type="action" name="act_damage" class="sheet-btn">Damage</button>
+          </div>
+          <div class="sheet-wgrid">
+            <label>Class<input type="text" name="attr_class" value="Vehicle"></label>
+            <label>Range<input type="text" name="attr_range"></label>
+            <label>RoF<span class="sheet-rof"><input type="text" name="attr_rof_s" value="S">/<input type="text" name="attr_rof_semi" value="-">/<input type="text" name="attr_rof_full" value="-"></span></label>
+            <label>Damage<input type="text" name="attr_damage" value="2d10"></label>
+            <label>Type<select name="attr_dtype"><option value="" selected>Type</option><option value="E">Energy</option><option value="I">Impact</option><option value="R">Rending</option><option value="X">Explosive</option></select></label>
+            <label>Pen<input type="number" name="attr_pen" value="0"></label>
+            <label>Clip<span class="sheet-pair"><input type="number" name="attr_clip" value="0">/<input type="number" name="attr_clip_max" value="0"></span></label>
+            <label>Reload<input type="text" name="attr_reload"></label>
+            <label>Hit mod<input type="number" name="attr_wmod" value="0"></label>
+          </div>
+          <input type="text" name="attr_special" placeholder="Qualities, e.g. Proven (3), Twin-Linked" class="sheet-full">
+        </div>
+      </fieldset>
+    </div>
+  </div>
 </div>
 
 <!-- ==================== CHAT ROLL TEMPLATE ==================== -->
@@ -673,7 +918,9 @@
     {{#rng}}<div class="sheet-rt-row"><span>Range</span><span>{{#rollTotal() rng 30}}Point blank (+30){{/rollTotal() rng 30}}{{#rollTotal() rng 10}}Short (+10){{/rollTotal() rng 10}}{{#rollTotal() rng 0}}Standard (+0){{/rollTotal() rng 0}}{{#rollTotal() rng -10}}Long (-10){{/rollTotal() rng -10}}{{#rollTotal() rng -30}}Extreme (-30){{/rollTotal() rng -30}}</span></div>{{/rng}}
     {{#diff}}{{#rollGreater() diff 0}}<div class="sheet-rt-row"><span>Difficulty</span><span>+{{diff}}</span></div>{{/rollGreater() diff 0}}{{#rollLess() diff 0}}<div class="sheet-rt-row"><span>Difficulty</span><span>{{diff}}</span></div>{{/rollLess() diff 0}}{{/diff}}
     {{#aim}}{{#rollGreater() aim 0}}<div class="sheet-rt-row"><span>Aim</span><span>{{#rollTotal() aim 10}}Half action (+10){{/rollTotal() aim 10}}{{#rollTotal() aim 20}}Full action (+20){{/rollTotal() aim 20}}</span></div>{{/rollGreater() aim 0}}{{/aim}}
+    {{#tsize}}{{#rollGreater() tsize 0}}<div class="sheet-rt-row"><span>Target size</span><span>+{{tsize}}</span></div>{{/rollGreater() tsize 0}}{{#rollLess() tsize 0}}<div class="sheet-rt-row"><span>Target size</span><span>{{tsize}}</span></div>{{/rollLess() tsize 0}}{{/tsize}}
     {{#roll}}<div class="sheet-rt-row"><span>Roll</span><span>{{roll}}</span></div>{{/roll}}
+    {{#udos}}{{#rollGreater() udos 0}}<div class="sheet-rt-row sheet-rt-sub"><span>Unnatural bonus degrees (included)</span><span>+{{udos}}</span></div>{{/rollGreater() udos 0}}{{/udos}}
     {{#outcome}}
       {{#rollTotal() computed::outcome 1}}<div class="sheet-rt-pass">Success, {{computed::degrees}} degrees</div>{{/rollTotal() computed::outcome 1}}
       {{#rollTotal() computed::outcome 0}}<div class="sheet-rt-fail">Failure, {{computed::degrees}} degrees</div>{{/rollTotal() computed::outcome 0}}
@@ -705,6 +952,18 @@
       {{#rollTotal() computed::ffblock 1}}<div class="sheet-rt-pass">Blocked</div>{{/rollTotal() computed::ffblock 1}}{{#rollTotal() computed::ffblock 0}}<div class="sheet-rt-fail">Not blocked</div>{{/rollTotal() computed::ffblock 0}}
       {{#rollTotal() computed::ffover 1}}<div class="sheet-rt-fury">Overloads</div>{{/rollTotal() computed::ffover 1}}{{/ffroll}}
     {{#note}}<div class="sheet-rt-desc">{{note}}</div>{{/note}}
+    {{#healed}}{{#rollTotal() computed::outcome 1}}<div class="sheet-rt-row"><span>Regenerates</span><span>{{computed::healed}} wounds</span></div>{{/rollTotal() computed::outcome 1}}{{/healed}}
+    {{#tdmg}}
+      <div class="sheet-rt-row"><span>Incoming</span><span>{{tdmg}} (pen {{tpen}})</span></div>
+      {{#tloc}}<div class="sheet-rt-row"><span>Location</span><span>{{#rollTotal() tloc 1}}Head{{/rollTotal() tloc 1}}{{#rollTotal() tloc 2}}Right arm{{/rollTotal() tloc 2}}{{#rollTotal() tloc 3}}Left arm{{/rollTotal() tloc 3}}{{#rollTotal() tloc 4}}Body{{/rollTotal() tloc 4}}{{#rollTotal() tloc 5}}Right leg{{/rollTotal() tloc 5}}{{#rollTotal() tloc 6}}Left leg{{/rollTotal() tloc 6}}</span></div>{{/tloc}}
+      {{#tface}}<div class="sheet-rt-row"><span>Facing</span><span>{{#rollTotal() tface 1}}Front{{/rollTotal() tface 1}}{{#rollTotal() tface 2}}Side{{/rollTotal() tface 2}}{{#rollTotal() tface 3}}Rear{{/rollTotal() tface 3}}</span></div>{{/tface}}
+      <div class="sheet-rt-row"><span>Armour after pen</span><span>{{computed::tarmour}}</span></div>
+      {{#ttb}}<div class="sheet-rt-row"><span>T bonus</span><span>{{ttb}}</span></div>{{/ttb}}
+      {{#tdaem}}{{#rollGreater() tdaem 0}}<div class="sheet-rt-row"><span>Daemonic</span><span>+{{tdaem}}</span></div>{{/rollGreater() tdaem 0}}{{/tdaem}}
+      <div class="sheet-rt-pass sheet-rt-hurt">Takes {{computed::tthrough}} damage</div>
+      <div class="sheet-rt-row"><span>{{tlabel}} left</span><span>{{computed::tleft}}</span></div>
+      {{#rollGreater() computed::tcrit 0}}<div class="sheet-rt-fail">Critical damage: {{computed::tcrit}} past zero</div>{{/rollGreater() computed::tcrit 0}}
+    {{/tdmg}}
     {{#damage}}<div class="sheet-rt-row"><span>Damage</span><span>{{computed::damage}} {{dtype}}</span></div>{{/damage}}
     {{#rf}}{{#rollGreater() computed::rf 0}}<div class="sheet-rt-fury">Righteous Fury</div><div class="sheet-rt-row"><span>Critical effect</span><span>{{crit}}</span></div><div class="sheet-rt-desc">If damage gets past Armour and T bonus, apply this result from the {{dtype}} Critical Effects table at the hit location. If it doesn't, the hit deals 1 damage instead, ignoring Armour and T bonus.</div>{{/rollGreater() computed::rf 0}}{{/rf}}
     {{#pen}}<div class="sheet-rt-row"><span>Pen</span><span>{{pen}}</span></div>{{/pen}}
@@ -715,6 +974,7 @@
     {{#duration}}<div class="sheet-rt-row"><span>Duration</span><span>{{duration}}</span></div>{{/duration}}
     {{#special}}<div class="sheet-rt-desc">{{special}}</div>{{/special}}
     {{#desc}}<div class="sheet-rt-desc">{{desc}}</div>{{/desc}}
+    {{#tnote}}<div class="sheet-rt-desc sheet-rt-trait">{{tnote}}</div>{{/tnote}}
     {{#overbleed}}<div class="sheet-rt-desc"><strong>Overbleed:</strong> {{overbleed}}</div>{{/overbleed}}
     {{#burn}}<div class="sheet-rt-desc"><strong>Burn:</strong> {{burn}}</div>{{/burn}}
   </div>
@@ -762,9 +1022,12 @@ const SKILL_APTS = {
   'Stealth':['Agility','Fieldcraft'], 'Survival':['Perception','Fieldcraft'], 'Tactics':['Intelligence','Fieldcraft'],
   'Tech-Use':['Intelligence','Tech'], 'Trade':['Intelligence','General']
 };
-const APT_FIELDS = [1,2,3,4,5,6,7,8].map(i => `apt_${i}`);
+const APT_FIELDS = [1,2,3,4,5,6,7,8].map(i => `apt_${i}`);   /* old fixed slots, only used to upgrade older sheets */
+const APT_LINE = ['a','b','c','d'];
 const addTearing = dice => String(dice).replace(/^\s*(\d*)d(\d+)/i, (m, n, s) => { const k = parseInt(n, 10) || 1; return `${k + 1}d${s}kh${k}`; });
 const DEFAULT_LORES = ['Common Lore (Imperium)','Common Lore (Sector)','Common Lore (Home World)','Common Lore (Any One)','Common Lore (Any One)'];
+/* untrained placeholders so every lore type on the Skill List is present; rename the bracket to the specialisation */
+const EXTRA_LORES = ['Forbidden Lore (Choose)','Scholastic Lore (Choose)'];
 const DEFAULT_LANGS = ['Linguistics (Low Gothic)'];
 const DEFAULT_TALENTS = ['Weapon Training (Low-Tech)','Weapon Training (Las or SP)','Weapon Training (Choose One)'];
 const SKILL_SECTIONS = ['skills','lores','linguistics','trades'];
@@ -786,6 +1049,16 @@ const skillKey = (name, sec) => {
   const k = String(name || '').replace(/\(.*$/, '').trim().toLowerCase().replace(/[^a-z]+/g, '-').replace(/^-|-$/g, '');
   return SKILL_CHARS[k] ? k : '';
 };
+/* Keep skills, lores, languages and trades in A-Z order (Roll20 stores row order in _reporder) */
+const sortSection = sec => getSectionIDs(sec, ids => {
+  getAttrs(ids.map(id => `repeating_${sec}_${id}_name`), v => {
+    const sorted = ids.slice().sort((a, b) => (v[`repeating_${sec}_${a}_name`] || '~').localeCompare(v[`repeating_${sec}_${b}_name`] || '~'));
+    setAttrs({[`_reporder_repeating_${sec}`]: sorted.join(',')}, {silent: true});
+  });
+});
+const sortAllSkills = () => SKILL_SECTIONS.forEach(sortSection);
+on('sheet:opened', sortAllSkills);
+
 const setSkillKeys = sec => getSectionIDs(sec, ids => {
   getAttrs(ids.map(id => `repeating_${sec}_${id}_name`), v => {
     const out = {};
@@ -793,7 +1066,7 @@ const setSkillKeys = sec => getSectionIDs(sec, ids => {
     setAttrs(out, {silent: true});
   });
 });
-const PTYPE_NAMES = {psychic:'Psychic power',faith:'Faith power',arcana:'Techno-arcana',navigator:'Navigator power',null:'Null power',other:'Power'};
+const PTYPE_NAMES = {psychic:'Psychic power',faith:'Faith power',arcana:'Techno-arcana',navigator:'Navigator power',null:'Null power',other:'Chaos Ritual'};
 const LEVEL_NAMES = {novice:'Novice',adept:'Adept',master:'Master',paragon:'Paragon'};
 const NAV_PENALTY = {novice:0,adept:-10,master:-20,paragon:-30};
 
@@ -824,6 +1097,150 @@ const countFury = (roll, dice) => {
 };
 
 /* Degrees: 1 + difference in tens digits. 01 always passes, 100 always fails. */
+/* =====================================================================
+   Traits: size table, trait name parsing, roll reminders
+   ===================================================================== */
+const SIZE_NAMES = {1:'Miniscule',2:'Puny',3:'Scrawny',4:'Average',5:'Hulking',6:'Enormous',7:'Massive',8:'Immense',9:'Monumental',10:'Titanic'};
+const SIZE_WORDS = {miniscule:1,minuscule:1,puny:2,scrawny:3,average:4,hulking:5,enormous:6,massive:7,immense:8,monumental:9,titanic:10};
+/* [attackers' WS/BS mod, Stealth mod, Grapple mod, move (added to Ag bonus), melee reach m] */
+const SIZE_ROWS = {1:[-30,30,-30,-3,0],2:[-20,20,-20,-2,0],3:[-10,10,-10,-1,0],4:[0,0,0,0,0],5:[10,-10,10,1,0],
+  6:[20,-20,20,2,1],7:[30,-30,30,3,2],8:[40,-40,40,4,2],9:[50,-50,50,5,3],10:[60,-60,60,6,3]};
+const clampSize = x => { const n = parseInt(x, 10); return isNaN(n) ? 4 : Math.max(1, Math.min(10, n)); };
+const sizeRow = s => { const r = SIZE_ROWS[s] || SIZE_ROWS[4]; return {hit: r[0], stealth: r[1], grapple: r[2], move: r[3], reach: r[4]}; };
+/* Wounds and Fatigue columns of the Size table */
+const sizeWounds = (s, tb, wb) => {
+  if (s <= 1) return {w: 1, f: 1};
+  if (s === 2) return {w: tb * 2, f: wb * 2};
+  if (s === 3) return {w: tb * 2, f: tb + wb};
+  const add = 10 * Math.max(0, s - 4);
+  return {w: tb * 3 + add, f: tb + wb + add};
+};
+/* Natural weapons: 1d5 at Size 1-2, +1d10 at Size 6, 8 and 10; Deadly adds +2 dmg/pen, +2 more at 6, 8, 10 */
+const natSteps = s => (s >= 6 ? 1 : 0) + (s >= 8 ? 1 : 0) + (s >= 10 ? 1 : 0);
+const FRENZY_MOD = {ws: 10, s: 10, t: 10, wp: 10, bs: -20, int: -20, fel: -20};
+
+const TRAIT_NUM_PATTERNS = [
+  ['natarmour', /^natural armou?r\s*\(\s*(\d+)/], ['machine', /^machine\s*\(\s*(\d+)/], ['daemonic', /^daemonic\s*\(\s*(\d+)/],
+  ['brutal', /^brutal charge\s*\(\s*(\d+)/], ['regen', /^regeneration\s*\(\s*(\d+)/], ['flyer', /^flyer\s*\(\s*(\d+)/],
+  ['hoverer', /^hoverer\s*\(\s*(\d+)/], ['multiarms', /^multiple arms\s*\(\s*(\d+)/], ['fear', /^fear\s*\(\s*(\d+)/],
+  ['baneful', /^baneful presence\s*\(\s*(\d+)/], ['toxic', /^toxic\s*\(\s*(\d+)/], ['fates', /^touched by (?:the )?fates?\s*\(\s*(\d+)/]
+];
+const TRAIT_FLAG_PATTERNS = [
+  ['frenzy', /^frenzy\b/], ['quadruped', /^quadruped/], ['crawler', /^crawler/], ['amorph', /^amorphous/], ['incorporeal', /^incorporeal/],
+  ['untouchable', /^untouchable/], ['blind', /^blind\b(?!\s*fight)/], ['natweap', /^(deadly\s+)?natural weapons/], ['deadly', /^deadly natural weapons/],
+  ['sturdy', /^sturdy/], ['autostab', /^auto-?\s*stabili[sz]ed/], ['smimplants', /^space marine implants/], ['nofear', /^and they shall know no fear/],
+  ['undying', /^undying/], ['frombeyond', /^from beyond/], ['nightmares', /^stuff of nightmares/], ['strangephys', /^strange physiology/],
+  ['darksight', /^dark-?\s*sight/], ['amphibious', /^amphibious/], ['aquatic', /^aquatic/], ['discordant', /^discordant/], ['bestial', /^bestial/],
+  ['warpinst', /^warp instability/], ['swarm', /^swarm\b/]
+];
+const UNNAT_NAMES = {'weapon skill':'ws','ballistic skill':'bs',strength:'s',toughness:'t',agility:'ag',intelligence:'int',perception:'per',willpower:'wp',fellowship:'fel'};
+const TRAIT_KEYS = ['size', ...TRAIT_NUM_PATTERNS.map(t => t[0]), ...TRAIT_FLAG_PATTERNS.map(t => t[0]), ...Object.values(UNNAT_NAMES).map(c => 'u_' + c)];
+const TRAIT_ALL = ['size','amorph_shift','esize', ...TRAIT_NUM_PATTERNS.map(t => t[0]), ...TRAIT_FLAG_PATTERNS.map(t => t[0])].map(k => 'trait_' + k);
+const NOTE_ATTRS = [...TRAIT_ALL, 'frenzied'];
+const TRAIT_CALC = [...TRAIT_ALL.filter(k => k !== 'trait_esize'), 'frenzied'];
+
+/* Splits "Size (5), Regeneration (2, Endless)\nFear (2)" into entries, ignoring commas inside brackets */
+const splitEntries = text => {
+  const out = []; let depth = 0, cur = '';
+  for (const ch of String(text || '')) {
+    if (ch === '(') depth++;
+    if (ch === ')') depth = Math.max(0, depth - 1);
+    if ((ch === ',' || ch === ';' || ch === '\n') && depth === 0) { out.push(cur); cur = ''; } else cur += ch;
+  }
+  out.push(cur);
+  return out.map(e => e.trim().toLowerCase()).filter(Boolean);
+};
+const parseTraits = entries => {
+  const p = {};
+  entries.forEach(e => {
+    let m = e.match(/^size\s*\(\s*([a-z0-9]+)/);
+    if (m) p.size = clampSize(SIZE_WORDS[m[1]] || m[1]);
+    TRAIT_NUM_PATTERNS.forEach(([k, re]) => { const mm = e.match(re); if (mm) p[k] = parseInt(mm[1], 10) || 0; });
+    TRAIT_FLAG_PATTERNS.forEach(([k, re]) => { if (re.test(e)) p[k] = 1; });
+    m = e.match(/^unnatural\s+(weapon skill|ballistic skill|strength|toughness|agility|intelligence|perception|willpower|fellowship)\s*\(\s*(\d+)/);
+    if (m) p['u_' + UNNAT_NAMES[m[1]]] = parseInt(m[2], 10);
+    if (/^astartes\b/.test(e)) {
+      if (p.size === undefined) p.size = 5;
+      p.u_s = Math.max(p.u_s || 0, 4); p.u_t = Math.max(p.u_t || 0, 4); p.amphibious = 1; p.smimplants = 1;
+    }
+  });
+  if (p.deadly) p.natweap = 1;
+  if (p.daemonic) p.undying = 1;
+  if (p.amorph) p.crawler = 1;
+  return p;
+};
+
+/* Reminders added to rolls. [trait, roll keys (characteristic, skill key, melee/ranged/heavy/charge/damage), text] */
+const FEL_KEYS = ['fel','charm','command','deceive','inquiry','interrogation','intimidate'];
+const TRAIT_NOTES = [
+  ['frenzied', ['wp','discipline','t','fortitude'], 'Frenzied: immune to Fear, Pinning, Stunning and the effects of Fatigue.'],
+  ['frenzied', ['parry'], 'Frenzied: cannot Parry.'],
+  ['nofear', ['wp','discipline'], 'And They Shall Know No Fear: no Insanity Points from failed Fear tests.'],
+  ['frombeyond', ['wp','discipline','deny-the-witch'], 'From Beyond: immune to Fear, Pinning, Insanity Points and psychic powers that cloud, control or delude the mind.'],
+  ['bestial', ['wp','survival'], 'Bestial: Challenging (+0) Willpower test when frightened, startled or injured, or it flees or frenzies. No Survival tests in its natural habitat.'],
+  ['untouchable', ['wp','deny-the-witch'], 'Untouchable: +30 to resist Perils of the Warp effects, and ignores Psychic Phenomena.'],
+  ['untouchable', FEL_KEYS, 'Untouchable: Fellowship counts as 1 when dealing with anyone with a Psy Rating or Psyniscience.'],
+  ['discordant', FEL_KEYS, 'Discordant: -10 to Fellowship tests involving anyone with bionics or implants.'],
+  ['sturdy', ['s','ag','athletics','acrobatics'], 'Sturdy: +20 to resist Grappling, Manoeuvre, Knock Down and Stun actions.'],
+  ['size', ['s','athletics'], tv => { const g = sizeRow(clampSize(tv.trait_esize)).grapple; return g ? `Size: ${g > 0 ? '+' : ''}${g} to tests made in a Grapple.` : ''; }],
+  ['multiarms', ['athletics'], 'Multiple Arms: +10 to Athletics tests involving climbing or swimming.'],
+  ['aquatic', ['ag','acrobatics','athletics','dodge'], 'Aquatic: -20 to Agility tests out of water. Passes all Swim tests while immersed.'],
+  ['smimplants', ['t','fortitude'], "Implants: Preomnor +20 against ingested poisons. Multi-Lung rerolls failed tests against drowning or asphyxiation, +30 against gases. Oolitic Kidney rerolls failed tests against poisons and toxins. Mucranoid rerolls failed tests against heat and cold."],
+  ['smimplants', ['per','awareness'], "Implants: Catalepsean Node, no penalty for staying awake. Neuroglottis, Awareness (+0) to taste poison or Hard (-20) to smell it. Occulobe and Lyman's Ear give Heightened Senses (Sight, Hearing)."],
+  ['undying', ['t','fortitude'], 'Undying: immune to disease, poisons and toxins, and does not need to breathe.'],
+  ['strangephys', ['t','fortitude'], 'Strange Physiology: may reroll failed Toughness tests; unaffected by poisons, toxins and venoms unless tailored to it.'],
+  ['machine', ['t','fortitude','wp'], 'Machine: does not breathe, immune to vacuum, cold and mind-influencing psychic effects.'],
+  ['nightmares', ['t','fortitude'], 'Stuff of Nightmares: immune to environmental hazards.'],
+  ['amphibious', ['t','fortitude'], 'Amphibious: breathes water as well as air.'],
+  ['darksight', ['per','awareness'], 'Dark-Sight: sees normally in total darkness, no penalties in dim or no light.'],
+  ['blind', ['per','awareness'], 'Blind: automatically fails tests based on vision.'],
+  ['blind', ['melee'], "Blind: -30 included. Blind Fighting removes it (put +30 in the weapon's Hit mod)."],
+  ['incorporeal', ['stealth'], 'Incorporeal: +30 Stealth, included.'],
+  ['autostab', ['heavy'], 'Auto-Stabilised: counts as braced, no Brace action needed and no penalty to hit.'],
+  ['brutal', ['charge'], tv => `Brutal Charge: +${num(tv.trait_brutal)} damage on each hit this turn, added on DMG while the bar is set to Charge.`],
+  ['strangephys', ['damage'], 'Strange Physiology: every hit counts as hitting the Body.'],
+  ['incorporeal', ['damage'], 'Incorporeal: only harmed by force weapons, psychic powers, Warp creatures, other Incorporeal creatures or holy attacks.'],
+  ['nightmares', ['damage'], 'Stuff of Nightmares: ignores Critical Effects except death from psychic, force or holy attacks. Immune to Blood Loss and Stunning.'],
+  ['machine', ['damage'], 'Machine: Fire damage is reduced (9.3). Repaired with Tech-Use, not Medicae.'],
+  ['smimplants', ['damage'], "Larraman's Organ: no Blood Loss except from Warp weapons. Melanchromic Organ: Irradiated only deals 1d10 Toughness damage."],
+  ['swarm', ['damage'], 'Swarm: attacks without Blast, Flame, Spray or Scatter deal half damage.'],
+  ['warpinst', ['damage'], 'Warp Instability: if it deals no damage or Insanity by the end of its next turn, Discipline test; 1 damage plus 1 per degree of failure. Reaching its Wounds sends it back to the Warp.']
+];
+const traitActive = (tv, k) => k === 'frenzied' ? (tv.frenzied === '1' && tv.trait_frenzy === '1') : k === 'size' ? true : num(tv['trait_' + k]) > 0;
+const traitNotes = (tv, ctx) => TRAIT_NOTES
+  .filter(([k, keys]) => traitActive(tv, k) && keys.some(x => ctx.includes(x)))
+  .map(([, , t]) => typeof t === 'function' ? t(tv) : t).filter(Boolean).join(' ').replace(/[{}|]/g, '');
+/* Target size, unnatural degrees and reminders for weapon attacks */
+const attackTraitBits = (v, c, ctx, tsz) => {
+  const ud = Math.floor(Math.max(0, num(v[`${c}_unnat`])) / 2);
+  const note = traitNotes(v, ctx);
+  return (tsz ? ` {{tsize=[[${tsz}]]}}` : '') + (ud ? ` {{udos=[[${ud}]]}}` : '') + (note ? ` {{tnote=${note}}}` : '');
+};
+const sgn = n => (n > 0 ? '+' : '') + n;
+const traitSummary = (v, esize, sr, frenzied) => {
+  const on1 = k => v[k] === '1';
+  const L = [];
+  const st = `Size ${esize} (${SIZE_NAMES[esize]})`;
+  L.push(esize === 4 ? `${st}: no modifiers.` : `${st}: attackers ${sgn(sr.hit)} to hit, Stealth ${sgn(sr.stealth)}, Grapple ${sgn(sr.grapple)}, movement ${sgn(sr.move)} Ag bonus, melee reach +${sr.reach}m.`);
+  const na = num(v.trait_natarmour), ma = num(v.trait_machine);
+  if (na || ma) L.push(`+${Math.max(na, ma)} AP on every location from ${ma > na ? 'Machine' : 'Natural Armour'}, shown in the body diagram.`);
+  const dm = num(v.trait_daemonic);
+  if (dm) L.push(`Daemonic (${dm}): +${dm} T bonus against damage, except force, psychic and holy attacks. Take damage asks.`);
+  if (frenzied) L.push('Frenzied: +10 WS, St, T, Wp and -20 BS, Int, Fel, already in the totals. Must attack the nearest enemy in melee. Immune to Fear, Pinning, Stunning and Fatigue effects. Cannot Parry, retreat, flee or use psychic powers.');
+  if (on1('trait_untouchable')) L.push('Untouchable: Fellowship is halved in the total.');
+  if (on1('trait_blind')) L.push('Blind: ranged attacks fail automatically, -30 on melee Hit numbers.');
+  const air = num(v.trait_flyer) || num(v.trait_hoverer) || (on1('trait_incorporeal') ? 6 : 0);
+  if (air) L.push(`${num(v.trait_flyer) ? 'Flying' : 'Hovering (up to 2m)'} move: ${air} / ${air * 2} / ${air * 3} / ${air * 6}.`);
+  if (on1('trait_aquatic')) L.push('Aquatic: out of water, -20 to Agility tests and Ag bonus counts as 1.');
+  const fr = num(v.trait_fear);
+  if (fr) L.push(`Causes Fear (${fr}): ${-10 * Math.min(fr, 4)} to the Fear test.`);
+  const bp = num(v.trait_baneful);
+  if (bp) L.push(`Baneful Presence: -10 to Willpower tests for everyone within ${bp}m.`);
+  const tx = num(v.trait_toxic);
+  if (tx) L.push(`Toxic (${tx}): anyone who damages it in melee takes a Fortitude test at ${-10 * tx} at the end of their turn or suffers 1d10 Energy damage, ignoring armour and T.`);
+  return L.join('\n');
+};
+
 const degreesOf = (t, d) => {
   const pass = d === 1 || (d !== 100 && d <= t);
   const tens = x => Math.floor(Math.max(0, x) / 10);
@@ -835,15 +1252,32 @@ const locOf = d => {
   return rev <= 10 ? 1 : rev <= 20 ? 2 : rev <= 30 ? 3 : rev <= 70 ? 4 : rev <= 85 ? 5 : 6;
 };
 
+/* Unnatural (X): half X as bonus degrees of success, which cancel degrees of failure; a net 0 fails by 1 */
+const withUnnat = (res, bonus, d) => {
+  if (!bonus || d === 100) return res;
+  if (res.pass) return {pass: true, deg: res.deg + bonus};
+  const net = bonus - res.deg;
+  return net > 0 ? {pass: true, deg: net} : {pass: false, deg: Math.max(1, -net)};
+};
+/* opts.char: characteristic behind the test (Unnatural degrees); opts.ctx: keys for trait reminders */
 const testRoll = (title, target, opts = {}) => {
-  let str = `&{template:li} {{name=@{character_name}}} {{title=${title}}} {{target=[[${target}+?{Modifier|0}]]}} {{roll=[[1d100]]}} {{outcome=[[0]]}} {{degrees=[[0]]}}`;
-  if (opts.loc) str += ' {{loc=[[0]]}}';
-  if (opts.extra) str += ' ' + opts.extra;
-  startRoll(str, r => {
-    const {pass, deg} = degreesOf(r.results.target.result, r.results.roll.result);
-    const out = {outcome: pass ? 1 : 0, degrees: deg};
-    if (opts.loc) out.loc = locOf(r.results.roll.result);
-    finishRoll(r.rollId, out);
+  const f = [...NOTE_ATTRS];
+  if (opts.char) f.push(`${opts.char}_unnat`);
+  getAttrs(f, tv => {
+    const ud = opts.char ? Math.floor(Math.max(0, num(tv[`${opts.char}_unnat`])) / 2) : 0;
+    const note = opts.ctx ? traitNotes(tv, opts.ctx) : '';
+    let str = `&{template:li} {{name=@{character_name}}} {{title=${title}}} {{target=[[${target}+?{Modifier|0}]]}} {{roll=[[1d100]]}} {{outcome=[[0]]}} {{degrees=[[0]]}}`;
+    if (ud) str += ` {{udos=[[${ud}]]}}`;
+    if (note) str += ` {{tnote=${note}}}`;
+    if (opts.loc) str += ' {{loc=[[0]]}}';
+    if (opts.extra) str += ' ' + opts.extra;
+    startRoll(str, r => {
+      const d = r.results.roll.result;
+      const {pass, deg} = withUnnat(degreesOf(r.results.target.result, d), ud, d);
+      const out = {outcome: pass ? 1 : 0, degrees: deg};
+      if (opts.loc) out.loc = locOf(d);
+      finishRoll(r.rollId, out);
+    });
   });
 };
 
@@ -865,7 +1299,8 @@ const findSkill = (name, cb) => {
 const calcSection = sec => {
   getSectionIDs(sec, ids => {
     const f = CHARS.map(c => `${c}_total`);
-    ids.forEach(id => ['char','rank','mod'].forEach(k => f.push(`repeating_${sec}_${id}_${k}`)));
+    f.push('trait_stealth');
+    ids.forEach(id => ['char','rank','mod','skey'].forEach(k => f.push(`repeating_${sec}_${id}_${k}`)));
     getAttrs(f, v => {
       const out = {};
       ids.forEach(id => {
@@ -874,7 +1309,7 @@ const calcSection = sec => {
         const ch = num(v[`${c}_total`]);
         const r = v[p + 'rank'];
         const rank = (r === undefined || r === '') ? (sec === 'skills' ? -20 : 0) : num(r);
-        out[p + 'total'] = (rank === -20 ? Math.floor(ch / 2) : ch + rank) + num(v[p + 'mod']);
+        out[p + 'total'] = (rank === -20 ? Math.floor(ch / 2) : ch + rank) + num(v[p + 'mod']) + (v[p + 'skey'] === 'stealth' ? num(v.trait_stealth) : 0);
       });
       setAttrs(out, {silent: true});
     });
@@ -885,19 +1320,34 @@ const calcSkills = () => SKILL_SECTIONS.forEach(calcSection);
 const calcChars = () => {
   const f = [];
   CHARS.forEach(c => ['base','adv','mod','unnat'].forEach(k => f.push(`${c}_${k}`)));
-  f.push('wounds_bonus', ...LOCS.map(l => `ap_${l}`));
+  f.push('wounds_bonus', 'cp_mod', ...TRAIT_CALC);
   getAttrs(f, v => {
     const out = {};
+    const on1 = k => v[k] === '1';
+    const frenzied = on1('trait_frenzy') && on1('frenzied');
     CHARS.forEach(c => {
-      const tot = num(v[`${c}_base`]) + num(v[`${c}_adv`]) * 5 + num(v[`${c}_mod`]);
+      let tot = num(v[`${c}_base`]) + num(v[`${c}_adv`]) * 5 + num(v[`${c}_mod`]) + (frenzied ? (FRENZY_MOD[c] || 0) : 0);
+      if (frenzied && FRENZY_MOD[c] < 0) tot = Math.max(1, tot);   /* penalties can't take a characteristic below 1 */
+      if (c === 'fel' && on1('trait_untouchable')) tot = Math.ceil(tot / 2);
       out[`${c}_total`] = tot;
       out[`${c}_bonus`] = Math.floor(tot / 10) + num(v[`${c}_unnat`]);
     });
-    const ab = out.ag_bonus;
-    out.move_half = ab; out.move_full = ab * 2; out.move_charge = ab * 3; out.move_run = ab * 6;
-    out.wounds_max = out.t_bonus * 3 + num(v.wounds_bonus);
-    out.fatigue_max = out.t_bonus + out.wp_bonus;
-    setAttrs(out, {silent: true}, () => { calcSkills(); calcArmour(); calcHitChances(); });
+    /* Size: wounds use the true size, everything else the current one (Amorphous can shift it) */
+    const size = clampSize(v.trait_size);
+    const esize = on1('trait_amorph') ? clampSize(size + num(v.trait_amorph_shift)) : size;
+    const sr = sizeRow(esize);
+    let mb = Math.max(1, out.ag_bonus + sr.move);
+    if (on1('trait_quadruped')) mb *= 2;
+    if (on1('trait_crawler')) mb = Math.ceil(mb / 2);
+    out.move_half = mb; out.move_full = mb * 2; out.move_charge = mb * 3; out.move_run = mb * 6;
+    const sw = sizeWounds(size, out.t_bonus, out.wp_bonus);
+    out.wounds_max = sw.w + num(v.wounds_bonus);
+    out.fatigue_max = sw.f;
+    out.cp_max = out.int_bonus + num(v.cp_mod);
+    out.trait_esize = esize;
+    out.trait_stealth = sr.stealth + (on1('trait_incorporeal') ? 30 : 0);
+    out.trait_summary = traitSummary(v, esize, sr, frenzied);
+    setAttrs(out, {silent: true}, () => { calcSkills(); calcArmour(); calcHitChances(); calcNpcSkills(); calcEncumbrance(); });
   });
 };
 
@@ -913,8 +1363,8 @@ const calcGear = () => {
   });
 };
 
-on(CHARS.flatMap(c => ['base','adv','mod','unnat'].map(k => `change:${c}_${k}`)).join(' ') + ' change:wounds_bonus sheet:opened', calcChars);
-on('change:repeating_gear:qty change:repeating_gear:wt remove:repeating_gear', calcGear);
+on(CHARS.flatMap(c => ['base','adv','mod','unnat'].map(k => `change:${c}_${k}`)).join(' ') + ' change:wounds_bonus change:cp_mod sheet:opened ' + TRAIT_CALC.map(k => `change:${k}`).join(' '), calcChars);
+/* gear weight is worked out in calcEncumbrance */
 
 SKILL_SECTIONS.forEach(sec => {
   on(`change:repeating_${sec}:name`, () => setSkillKeys(sec));
@@ -922,26 +1372,33 @@ SKILL_SECTIONS.forEach(sec => {
   on(`change:repeating_${sec}:char change:repeating_${sec}:rank change:repeating_${sec}:mod`, () => calcSection(sec));
   on(`clicked:repeating_${sec}:roll`, e => {
     const p = `repeating_${sec}_${rowOf(e.sourceAttribute, sec, 'roll')}_`;
-    getAttrs([p + 'name'], v => testRoll(v[p + 'name'] || 'Test', `@{${p}total}`));
+    getAttrs([p + 'name', p + 'char', p + 'skey'], v => {
+      const c = v[p + 'char'] || (sec === 'skills' ? 'ag' : 'int');
+      testRoll(v[p + 'name'] || 'Test', `@{${p}total}`, {char: c, ctx: [v[p + 'skey'] || '', c]});
+    });
   });
 });
 
 /* Seeding: skills on new sheets; lores, languages and starting talents once; v2 skill list migration */
 on('sheet:opened', () => {
-  getAttrs(['skills_seeded','lore_seeded','skills_v4'], v => {
+  getAttrs(['skills_seeded','lore_seeded','skills_v4','lore_v2'], v => {
     const out = {};
     const add = (sec, n, extra) => {
       const id = generateRowID();
       out[`repeating_${sec}_${id}_name`] = n;
       Object.entries(extra).forEach(([k, x]) => { out[`repeating_${sec}_${id}_${k}`] = x; });
     };
+    if (v.lore_v2 !== '1') {
+      out.lore_v2 = '1';
+      EXTRA_LORES.forEach(n => add('lores', n, {char: 'int', rank: '-20', mod: 0}));
+    }
     if (v.lore_seeded !== '1') {
       out.lore_seeded = '1';
       DEFAULT_LORES.forEach(n => add('lores', n, {char: 'int', rank: '0', mod: 0}));
       DEFAULT_LANGS.forEach(n => add('linguistics', n, {char: 'int', rank: '0', mod: 0}));
       DEFAULT_TALENTS.forEach(n => add('talents', n, {}));
     }
-    const done = () => { if (Object.keys(out).length) setAttrs(out, {silent: true}, calcChars); };
+    const done = () => { if (Object.keys(out).length) setAttrs(out, {silent: true}, () => { calcChars(); sortAllSkills(); }); };
     if (v.skills_seeded !== '1') {
       out.skills_seeded = '1'; out.skills_v4 = '1';
       DEFAULT_SKILLS.forEach(([n, c]) => add('skills', n, {char: c, rank: '-20', mod: 0}));
@@ -980,11 +1437,13 @@ on('sheet:opened', () => {
 
 /* ---------- Advancement ---------- */
 const calcPurchases = () => {
-  getSectionIDs('purchases', ids => {
-    const f = ['xp', ...APT_FIELDS];
+  getSectionIDs('aptrows', aids => getSectionIDs('purchases', ids => {
+    const f = ['xp'];
+    aids.forEach(id => APT_LINE.forEach(x => f.push(`repeating_aptrows_${id}_apt_${x}`)));
     ids.forEach(id => ['btype','charpick','skillpick','apt1','apt2','level','cost'].forEach(k => f.push(`repeating_purchases_${id}_${k}`)));
     getAttrs(f, v => {
-      const owned = new Set(['General', ...APT_FIELDS.map(k => v[k]).filter(Boolean)]);
+      const owned = new Set(['General']);
+      aids.forEach(id => APT_LINE.forEach(x => { const a = v[`repeating_aptrows_${id}_apt_${x}`]; if (a) owned.add(a); }));
       const hasApt = a => !!a && a.split('/').some(x => owned.has(x));
       const out = {};
       let spent = 0;
@@ -1009,13 +1468,32 @@ const calcPurchases = () => {
       out.xp_available = num(v.xp) - spent;
       setAttrs(out, {silent: true});
     });
-  });
+  }));
 };
-on('change:repeating_purchases remove:repeating_purchases change:xp ' + APT_FIELDS.map(k => `change:${k}`).join(' ') + ' sheet:opened', calcPurchases);
+on('change:repeating_purchases remove:repeating_purchases change:repeating_aptrows remove:repeating_aptrows change:xp sheet:opened', calcPurchases);
+
+/* one-off: start every sheet with one line of four, and carry over the old eight fixed aptitudes */
+on('sheet:opened', () => {
+  getAttrs(['aptrows_v1', ...APT_FIELDS], v => {
+    if (v.aptrows_v1 === '1') return;
+    getSectionIDs('aptrows', ids => {
+      const out = {aptrows_v1: '1'};
+      if (!ids.length) {
+        const old = APT_FIELDS.map(k => v[k] || '');
+        const lines = old.slice(4).some(Boolean) ? 2 : 1;
+        for (let l = 0; l < lines; l++) {
+          const id = generateRowID();
+          APT_LINE.forEach((x, i) => { out[`repeating_aptrows_${id}_apt_${x}`] = old[l * 4 + i]; });
+        }
+      }
+      setAttrs(out, {silent: true}, calcPurchases);
+    });
+  });
+});
 
 ['core','combat','talents','powers','mutations','gear','advance','notes'].forEach(t => on(`clicked:tab${t}`, () => setAttrs({tab: t})));
 
-CHARS.forEach(c => on(`clicked:roll${c}`, () => testRoll(CHAR_NAMES[c], `@{${c}_total}`)));
+CHARS.forEach(c => on(`clicked:roll${c}`, () => testRoll(CHAR_NAMES[c], `@{${c}_total}`, {char: c, ctx: [c]})));
 
 on('clicked:rollinit', () => {
   startRoll('&{template:li} {{name=@{character_name}}} {{title=Initiative}} {{init=[[1d10+@{ag_bonus}+@{init_mod}+(floor({@{ag_total},99}kl1/10)/10) &{tracker}]]}} {{tiebreak=1}}', r => finishRoll(r.rollId));
@@ -1049,7 +1527,15 @@ const rangedState = (v, p) => {
   if (vm === 'overcharge') { dmg += 1; pen += 1; mult = 2; notes.push('Variable: Overcharge mode.'); }
   if (vm === 'overload') { dmg += 2; pen += 2; mult = 4; reliable = false; unreliable = true; notes.push('Variable: Overload mode, now Unreliable.'); }
   if (oc === 'overcharge') { mult *= 3; unreliable = true; reliable = false; q = q + ', ' + OC_QUALS; notes.push('Overcharged: gains ' + OC_QUALS + '.'); }
-  return {q, craft, reliable, unreliable, neverJam, jamOnMiss, dmg, pen, mult, notes};
+  let xdice = 0;
+  if (hasQual(q, 'Maximal') && v[p + 'max_mode'] === 'maximal') {
+    xdice = 1; pen += 2; mult *= 3;
+    q = q.replace(/Blast\s*\((\d+)\)/i, (m, x) => `Blast (${parseInt(x, 10) + 2})`);
+    if (!hasQual(q, 'Recharge')) q += ', Recharge';
+    notes.push('Maximal: +10m range, +1d10 damage, +2 pen, Blast +2, 3x ammo, gains Recharge.');
+  }
+  if (hasQual(q, 'Storm')) { mult *= 2; notes.push('Storm: hits and ammo doubled.'); }
+  return {q, craft, reliable, unreliable, neverJam, jamOnMiss, dmg, pen, mult, notes, xdice};
 };
 
 /* Rolls damage with Tearing, Proven, Unstable, Spray jams and Righteous Fury handled in the worker */
@@ -1059,6 +1545,7 @@ const rollDamage = o => {
   const dice = sd.dice;
   const type = (o.dtype || sd.type || '').toUpperCase();
   const d = parseDice(dice);
+  if (o.xdice) { if (!d.n) { d.n = 0; d.sides = 10; } if (d.sides === 10) d.n += o.xdice; }
   const tearing = hasQual(o.quals, 'Tearing');
   const proven = qualVal(o.quals, 'Proven');
   const unstable = hasQual(o.quals, 'Unstable');
@@ -1110,17 +1597,17 @@ const bonusFor = (dc, cls, type, p) => {
 /* Ranged: flag Variable / Overcharge so the setting dropdowns appear */
 on('change:repeating_weapons:special', e => {
   const p = e.sourceAttribute.slice(0, -'special'.length);
-  getAttrs([p + 'special'], v => setAttrs({[p + 'has_var']: hasQual(v[p + 'special'], 'Variable') ? 1 : 0, [p + 'has_oc']: hasQual(v[p + 'special'], 'Overcharge') ? 1 : 0}, {silent: true}));
+  getAttrs([p + 'special'], v => setAttrs({[p + 'has_var']: hasQual(v[p + 'special'], 'Variable') ? 1 : 0, [p + 'has_oc']: hasQual(v[p + 'special'], 'Overcharge') ? 1 : 0, [p + 'has_max']: hasQual(v[p + 'special'], 'Maximal') ? 1 : 0}, {silent: true}));
 });
 on('sheet:opened', () => getSectionIDs('weapons', ids => {
   getAttrs(ids.map(id => `repeating_weapons_${id}_special`), v => {
     const out = {};
-    ids.forEach(id => { const q = v[`repeating_weapons_${id}_special`]; out[`repeating_weapons_${id}_has_var`] = hasQual(q, 'Variable') ? 1 : 0; out[`repeating_weapons_${id}_has_oc`] = hasQual(q, 'Overcharge') ? 1 : 0; });
+    ids.forEach(id => { const q = v[`repeating_weapons_${id}_special`]; out[`repeating_weapons_${id}_has_var`] = hasQual(q, 'Variable') ? 1 : 0; out[`repeating_weapons_${id}_has_oc`] = hasQual(q, 'Overcharge') ? 1 : 0; out[`repeating_weapons_${id}_has_max`] = hasQual(q, 'Maximal') ? 1 : 0; });
     setAttrs(out, {silent: true});
   });
 }));
 
-const WKEYS = ['name','class','rof_semi','rof_full','clip','clip_max','special','craft','var_mode','oc_mode','damage','dtype','dmgchar','dmgextra','pen','penextra','atk_mode','atk_loc','atk_aim','atk_range','atk_diff'];
+const WKEYS = ['atk_size','last_dos','max_mode','name','class','rof_semi','rof_full','clip','clip_max','special','craft','var_mode','oc_mode','damage','dtype','dmgchar','dmgextra','pen','penextra','atk_mode','atk_loc','atk_aim','atk_range','atk_diff'];
 
 /* Multiple Hits table: first location -> following hits */
 const MULTI_HITS = {1:[1,2,4,3,4,1], 2:[2,4,1,4,2,4], 3:[3,4,1,4,3,4], 4:[4,6,2,4,5,3], 5:[5,4,6,4,5,4], 6:[6,4,5,4,6,4]};
@@ -1140,9 +1627,9 @@ const atkCode = (mode, loc) => mode === 'called' ? 40 + (parseInt(loc, 10) || 4)
 
 /* Hit chance shown on each weapon's Hit button */
 const calcHitChances = () => {
-  const SECS = {weapons: ['class','wmod','atk_mode','atk_aim','atk_range','atk_diff'], melee: ['craft','wmod','atk_mode','atk_aim','atk_diff']};
+  const SECS = {weapons: ['class','wmod','atk_mode','atk_aim','atk_range','atk_diff','atk_size','special'], melee: ['craft','wmod','atk_mode','atk_aim','atk_diff','atk_size','special']};
   Object.entries(SECS).forEach(([sec, keys]) => getSectionIDs(sec, ids => {
-    const f = ['ws_total', 'bs_total'];
+    const f = ['ws_total', 'bs_total', 'trait_blind'];
     ids.forEach(id => keys.forEach(k => f.push(`repeating_${sec}_${id}_${k}`)));
     getAttrs(f, v => {
       const out = {};
@@ -1153,16 +1640,40 @@ const calcHitChances = () => {
         const melee = sec === 'melee' || v[p + 'class'] === 'melee';
         const craftHit = sec === 'melee' ? meleeCraft({craft: v[p + 'craft']}).hit : 0;
         const aim = atk === 5 ? 0 : num(v[p + 'atk_aim']);
-        let mods = num(v[p + 'wmod']) + craftHit + num(v[p + 'atk_diff']) + aim + (atk > 40 ? -20 : (ATK_MOD[atk] || 0));
+        const acc = aim > 0 && hasQual(v[p + 'special'], 'Accurate') ? 10 : 0;
+        const blind = v.trait_blind === '1';
+        let mods = num(v[p + 'wmod']) + craftHit + num(v[p + 'atk_diff']) + num(v[p + 'atk_size']) + aim + acc + (atk > 40 ? -20 : (ATK_MOD[atk] || 0)) + (blind && melee ? -30 : 0);
         if (!melee) mods += num(v[p + 'atk_range']);
         mods = Math.max(-60, Math.min(60, mods));
-        out[p + 'hitchance'] = Math.max(0, num(v[melee ? 'ws_total' : 'bs_total']) + mods);
+        out[p + 'hitchance'] = blind && !melee ? 0 : Math.max(0, num(v[melee ? 'ws_total' : 'bs_total']) + mods);
       });
       setAttrs(out, {silent: true});
     });
   }));
 };
 on('change:repeating_weapons change:repeating_melee sheet:opened', calcHitChances);
+
+/* Attack card note, with Accurate's bonus when it applies */
+const noteOf = (arr, acc) => { const a = acc ? [...arr, 'Accurate: +10 with Aim, included.'] : arr; return a.length ? ` {{note=${a.join(' ')}}}` : ''; };
+/* Accurate: +10 when the attack uses Aim */
+const accBonus = (q, atk, aim) => (atk !== 5 && num(aim) > 0 && hasQual(q, 'Accurate')) ? 10 : 0;
+/* Penetration with Lance (base pen per degree of the last hit), Melta (Short range or closer) and Armourbane (asks) */
+const penBuild = (v, p, q, flat) => {
+  const notes = [];
+  let base = `@{${p}pen}`;
+  if (hasQual(q, 'Lance')) {
+    const dos = num(v[p + 'last_dos']);
+    base = `(@{${p}pen}*${1 + dos})`;
+    notes.push(`Lance: base pen added once per degree of success on the last hit (${dos}).`);
+  }
+  let expr = `${base}+@{${p}penextra}+${flat}`;
+  if (hasQual(q, 'Melta') && num(v[p + 'atk_range']) >= 10) { expr = `(${expr})*2`; notes.push('Melta: pen doubled at Short range or closer.'); }
+  if (hasQual(q, 'Armourbane')) {
+    expr = `(${expr})*?{Armourbane target? (vehicle / building / cover / Machine / Daemon Engine)|No,1|Yes,2}`;
+    notes.push('Armourbane: pen doubled against vehicles, buildings, cover, Machines and Daemon Engines.');
+  }
+  return {expr, note: notes.length ? ` {{note=${notes.join(' ')}}}` : ''};
+};
 
 /* Shared attack resolver for ranged and melee */
 const resolveAttack = (r, o) => {
@@ -1173,7 +1684,7 @@ const resolveAttack = (r, o) => {
   const netmod = Math.max(-60, Math.min(60, r.results.tmod.result + (called ? -20 : (ATK_MOD[atk] || 0)) + rng + aim));
   const target = r.results.cbase.result + netmod;
   const d = r.results.roll.result;
-  let {pass, deg} = degreesOf(target, d);
+  let {pass, deg} = withUnnat(degreesOf(target, d), r.results.udos ? r.results.udos.result : 0, d);
   let jammed = false;
   if (o.ranged && !o.st.neverJam) {
     const from = o.st.reliable ? 100 : o.st.unreliable ? 91 : (atk === 2 || atk === 3 ? 94 : 96);
@@ -1186,18 +1697,19 @@ const resolveAttack = (r, o) => {
   if (pass && atk === 3) hits = Math.min(o.full, deg);
   if (pass && atk === 6) hits = Math.min(bonus, 1 + Math.floor((deg - 1) / 2));
   if (pass && atk === 7) hits = Math.min(bonus, deg);
+  if (o.storm && hits) hits *= 2;
   const loc = called ? atk - 40 : locOf(d);
   const out = Object.assign({ftarget: target, netmod, outcome: pass ? 1 : 0, degrees: deg, hits, loc, atk,
     cpen: called && pass ? Math.min(deg, bonus) : 0}, multiHits(loc, hits));
   if (o.ranged) out.jam = jammed ? 1 : 0;
   finishRoll(r.rollId, out);
-  return {atk};
+  return {atk, pass, deg};
 };
 const attackFields = '{{roll=[[1d100]]}} {{outcome=[[0]]}} {{degrees=[[0]]}} {{hits=[[0]]}} {{loc=[[0]]}} {{loc2=[[0]]}} {{loc3=[[0]]}} {{loc4=[[0]]}} {{loc5=[[0]]}} {{loc6=[[0]]}} {{morehits=[[0]]}} {{cpen=[[0]]}} {{ftarget=[[0]]}} {{netmod=[[0]]}}';
 
 on('clicked:repeating_weapons:attack', e => {
   const p = `repeating_weapons_${rowOf(e.sourceAttribute, 'weapons', 'attack')}_`;
-  getAttrs(WKEYS.map(k => p + k), v => {
+  getAttrs([...WKEYS.map(k => p + k), ...NOTE_ATTRS, 'ws_unnat', 'bs_unnat'], v => {
     const cls = v[p + 'class'] || 'basic';
     const melee = cls === 'melee';
     const st = rangedState(v, p);
@@ -1214,32 +1726,41 @@ on('clicked:repeating_weapons:attack', e => {
     }
     const semi = num(v[p + 'rof_semi']), full = num(v[p + 'rof_full']);
     const c = melee ? 'ws' : 'bs';
+    if (!melee && v.trait_blind === '1') {
+      startRoll(`&{template:li} {{name=@{character_name}}} {{title=@{${p}name}}} {{desc=Blind: automatically fails Ballistic Skill tests.}}`, r => finishRoll(r.rollId));
+      return;
+    }
     const atk = atkCode(v[p + 'atk_mode'], v[p + 'atk_loc']);
     const diff = num(v[p + 'atk_diff']);
-    let str = `&{template:li} {{name=@{character_name}}} {{title=@{${p}name}}} {{cbase=[[@{${c}_total}]]}} {{cbonus=[[@{${c}_bonus}]]}} {{tmod=[[@{${p}wmod}+${diff}]]}} {{diff=[[${diff}]]}} {{atk=[[${atk}]]}} {{aim=[[${num(v[p + 'atk_aim'])}]]}} ${attackFields}${qual}${note}`;
+    const tsz = num(v[p + 'atk_size']);
+    const blind = v.trait_blind === '1' ? -30 : 0;
+    const acc = accBonus(st.q, atk, v[p + 'atk_aim']);
+    let str = `&{template:li} {{name=@{character_name}}} {{title=@{${p}name}}} {{cbase=[[@{${c}_total}]]}} {{cbonus=[[@{${c}_bonus}]]}} {{tmod=[[@{${p}wmod}+${diff}+${tsz}+${acc}+${melee ? blind : 0}]]}} {{diff=[[${diff}]]}} {{atk=[[${atk}]]}} {{aim=[[${num(v[p + 'atk_aim'])}]]}} ${attackFields}${qual}${noteOf(st.notes, acc)}${attackTraitBits(v, c, melee ? ['melee'] : ['ranged', cls], tsz)}`;
     if (!melee) str += ` {{rng=[[${num(v[p + 'atk_range'])}]]}} {{jam=[[0]]}}`;
     startRoll(str, r => {
-      const {atk} = resolveAttack(r, {ranged: !melee, st, semi: semi || 1, full: full || 1});
-      useAmmo(atk === 2 ? (semi || 1) : atk === 3 ? (full || 1) : 1);
+      const res = resolveAttack(r, {ranged: !melee, st, semi: semi || 1, full: full || 1, storm: hasQual(st.q, 'Storm')});
+      setAttrs({[p + 'last_dos']: res.pass ? res.deg : 0}, {silent: true});
+      useAmmo(res.atk === 2 ? (semi || 1) : res.atk === 3 ? (full || 1) : 1);
     });
   });
 });
 
 on('clicked:repeating_weapons:damage', e => {
   const p = `repeating_weapons_${rowOf(e.sourceAttribute, 'weapons', 'damage')}_`;
-  getAttrs(WKEYS.map(k => p + k), v => {
+  getAttrs([...WKEYS.map(k => p + k), ...NOTE_ATTRS, 'ws_unnat', 'bs_unnat'], v => {
     const st = rangedState(v, p);
     const type = v[p + 'dtype'] || splitDamage(v[p + 'damage']).type;
     let bonus = bonusFor(v[p + 'dmgchar'] || 'auto', v[p + 'class'] || 'basic', type, p);
     if ((v[p + 'dmgextra'] || '').trim()) bonus += `+(@{${p}dmgextra})`;
     if (st.dmg) bonus += `+${st.dmg}`;
-    rollDamage({title: `@{${p}name}`, dmgStr: v[p + 'damage'], dtype: type, bonusExpr: bonus, penExpr: `@{${p}pen}+@{${p}penextra}+${st.pen}`,
-      quals: st.q, spray: hasQual(st.q, 'Spray'), extra: st.q ? ` {{special=${st.q.replace(/[{}]/g, '')}}}` : ''});
+    const pb = penBuild(v, p, st.q, st.pen);
+    rollDamage({title: `@{${p}name}`, dmgStr: v[p + 'damage'], dtype: type, bonusExpr: bonus, penExpr: pb.expr, xdice: st.xdice,
+      quals: st.q, spray: hasQual(st.q, 'Spray'), extra: (st.q ? ` {{special=${st.q.replace(/[{}|]/g, '')}}}` : '') + pb.note});
   });
 });
 
 /* ---------- Melee ---------- */
-const MKEYS = ['name','special','craft','craftopt','damage','dtype','dmgchar','dmgextra','pen','penextra','atk_mode','atk_loc','atk_aim','atk_diff'];
+const MKEYS = ['atk_size','last_dos','name','special','craft','craftopt','damage','dtype','dmgchar','dmgextra','pen','penextra','atk_mode','atk_loc','atk_aim','atk_diff'];
 const meleeCraft = v => {
   const c = v.craft || 'common';
   const hit = c === 'poor' ? -10 : c === 'common' ? 0 : 5;
@@ -1251,29 +1772,38 @@ const strip = (v, p) => Object.fromEntries(MKEYS.map(k => [k, v[p + k]]));
 
 on('clicked:repeating_melee:attack', e => {
   const p = `repeating_melee_${rowOf(e.sourceAttribute, 'melee', 'attack')}_`;
-  getAttrs(MKEYS.map(k => p + k), v => {
+  getAttrs([...MKEYS.map(k => p + k), ...NOTE_ATTRS, 'ws_unnat'], v => {
     const mc = meleeCraft(strip(v, p));
     const qual = (v[p + 'special'] || '').trim() ? ` {{special=@{${p}special}}}` : '';
     const note = mc.note ? ` {{note=${mc.note}}}` : '';
     const atk = atkCode(v[p + 'atk_mode'], v[p + 'atk_loc']);
     const diff = num(v[p + 'atk_diff']);
-    const str = `&{template:li} {{name=@{character_name}}} {{title=@{${p}name}}} {{cbase=[[@{ws_total}]]}} {{cbonus=[[@{ws_bonus}]]}} {{tmod=[[@{${p}wmod}+${mc.hit}+${diff}]]}} {{diff=[[${diff}]]}} {{atk=[[${atk}]]}} {{aim=[[${num(v[p + 'atk_aim'])}]]}} ${attackFields}${qual}${note}`;
-    startRoll(str, r => resolveAttack(r, {ranged: false}));
+    const tsz = num(v[p + 'atk_size']);
+    const blind = v.trait_blind === '1' ? -30 : 0;
+    const acc = accBonus(v[p + 'special'], atk, v[p + 'atk_aim']);
+    const str = `&{template:li} {{name=@{character_name}}} {{title=@{${p}name}}} {{cbase=[[@{ws_total}]]}} {{cbonus=[[@{ws_bonus}]]}} {{tmod=[[@{${p}wmod}+${mc.hit}+${diff}+${tsz}+${acc}+${blind}]]}} {{diff=[[${diff}]]}} {{atk=[[${atk}]]}} {{aim=[[${num(v[p + 'atk_aim'])}]]}} ${attackFields}${qual}${noteOf(mc.note ? [mc.note] : [], acc)}${attackTraitBits(v, 'ws', atk === 8 ? ['melee', 'charge'] : ['melee'], tsz)}`;
+    startRoll(str, r => {
+      const res = resolveAttack(r, {ranged: false});
+      setAttrs({[p + 'last_dos']: res.pass ? res.deg : 0}, {silent: true});
+    });
   });
 });
 
 on('clicked:repeating_melee:damage', e => {
   const p = `repeating_melee_${rowOf(e.sourceAttribute, 'melee', 'damage')}_`;
-  getAttrs(MKEYS.map(k => p + k), v => {
+  getAttrs([...MKEYS.map(k => p + k), ...NOTE_ATTRS, 'ws_unnat'], v => {
     const mc = meleeCraft(strip(v, p));
     const type = v[p + 'dtype'] || splitDamage(v[p + 'damage']).type;
     const dc = v[p + 'dmgchar'] || 's';
     let bonus = bonusFor(dc, 'melee', type, p);
     if ((v[p + 'dmgextra'] || '').trim()) bonus += `+(@{${p}dmgextra})`;
     if (mc.dmg) bonus += `+${mc.dmg}`;
+    const brutal = v[p + 'atk_mode'] === '8' ? num(v.trait_brutal) : 0;
+    if (brutal) bonus += `+${brutal}`;
     const q = v[p + 'special'] || '';
-    rollDamage({title: `@{${p}name}`, dmgStr: v[p + 'damage'], dtype: type, bonusExpr: bonus, penExpr: `@{${p}pen}+@{${p}penextra}+${mc.pen}`,
-      quals: q, extra: q.trim() ? ` {{special=@{${p}special}}}` : ''});
+    const pb = penBuild(v, p, q, mc.pen);
+    rollDamage({title: `@{${p}name}`, dmgStr: v[p + 'damage'], dtype: type, bonusExpr: bonus, penExpr: pb.expr,
+      quals: q, extra: (q.trim() ? ` {{special=@{${p}special}}}` : '') + pb.note + (brutal ? ` {{tnote=Brutal Charge: +${brutal} damage included.}}` : '')});
   });
 });
 
@@ -1281,7 +1811,7 @@ on('clicked:repeating_melee:damage', e => {
 const ARMOUR_CRAFT_AP = {poor: -1, common: 0, good: 1, best: 1, exceptional: 1, master: 1};
 const calcArmour = () => {
   getSectionIDs('armour', ids => {
-    const f = ['t_bonus', ...LOCS.map(l => `extra_${l}`)];
+    const f = ['t_bonus', 'trait_natarmour', 'trait_machine', 'trait_daemonic', ...LOCS.map(l => `extra_${l}`)];
     ids.forEach(id => ['worn','apmod','craft','craftopt', ...LOCS.map(l => `pap_${l}`)].forEach(k => f.push(`repeating_armour_${id}_${k}`)));
     getAttrs(f, v => {
       const out = {};
@@ -1294,8 +1824,10 @@ const calcArmour = () => {
           const craftAP = (v[p + 'craftopt'] || 'ap') === 'ap' ? (ARMOUR_CRAFT_AP[v[p + 'craft'] || 'common'] || 0) : 0;
           best = Math.max(best, base + num(v[p + 'apmod']) + craftAP);
         });
-        out[`ap_${l}`] = best;
-        out[`soak_${l}`] = best + num(v[`extra_${l}`]) + num(v.t_bonus);
+        /* Natural Armour and Machine stack with worn armour but not with each other */
+        const ap = best + Math.max(num(v.trait_natarmour), num(v.trait_machine));
+        out[`ap_${l}`] = ap;
+        out[`soak_${l}`] = ap + num(v[`extra_${l}`]) + num(v.t_bonus) + num(v.trait_daemonic);
       });
       setAttrs(out, {silent: true});
     });
@@ -1450,4 +1982,213 @@ on('clicked:lineage', () => {
     finishRoll(r.rollId, {mclass: d <= 71 ? 1 : d <= 94 ? 2 : 3});
   });
 });
+
+/* =====================================================================
+   NPC and vehicle modes
+   ===================================================================== */
+/* NPC skills are written like the book: a characteristic plus +0 to +30 */
+const calcNpcSkills = () => getSectionIDs('npcskills', ids => {
+  const f = CHARS.map(c => `${c}_total`);
+  f.push('trait_stealth');
+  ids.forEach(id => f.push(`repeating_npcskills_${id}_char`, `repeating_npcskills_${id}_bonus`, `repeating_npcskills_${id}_name`));
+  getAttrs(f, v => {
+    const out = {};
+    ids.forEach(id => {
+      const p = `repeating_npcskills_${id}_`;
+      out[p + 'target'] = num(v[`${v[p + 'char'] || 'ag'}_total`]) + num(v[p + 'bonus']) + (/^\s*stealth/i.test(v[p + 'name'] || '') ? num(v.trait_stealth) : 0);
+    });
+    setAttrs(out, {silent: true});
+  });
+});
+on('change:repeating_npcskills:char change:repeating_npcskills:bonus change:repeating_npcskills:name sheet:opened', calcNpcSkills);
+
+on('clicked:repeating_npcskills:roll', e => {
+  const p = `repeating_npcskills_${rowOf(e.sourceAttribute, 'npcskills', 'roll')}_`;
+  getAttrs([p + 'name', p + 'char'], v => {
+    const c = v[p + 'char'] || 'ag';
+    testRoll(`@{${p}name}`, `@{${p}target}`, {char: c, ctx: [skillKey(v[p + 'name'], 'skills'), c]});
+  });
+});
+
+on('clicked:manoeuvre', () => testRoll('Manoeuvre', '@{crew_rating}+@{v_manoeuvre}', {extra: '{{subtitle=Crew rating + Manoeuvrability}}'}));
+
+const VKEYS = ['name','rof_semi','rof_full','clip','clip_max','special','damage','dtype','pen'];
+on('clicked:repeating_vweapons:attack', e => {
+  const p = `repeating_vweapons_${rowOf(e.sourceAttribute, 'vweapons', 'attack')}_`;
+  getAttrs(VKEYS.map(k => p + k), v => {
+    const q = v[p + 'special'] || '';
+    const st = {reliable: hasQual(q, 'Reliable'), unreliable: hasQual(q, 'Unreliable'), neverJam: false, jamOnMiss: false};
+    const semi = num(v[p + 'rof_semi']), full = num(v[p + 'rof_full']);
+    let opts = 'Standard (+10),1';
+    if (semi > 0) opts += '|Semi-auto (+0),2';
+    if (full > 0) opts += '|Full auto (-10),3';
+    const qual = q.trim() ? ` {{special=@{${p}special}}}` : '';
+    const str = `&{template:li} {{name=@{character_name}}} {{title=@{${p}name}}} {{subtitle=Facing @{${p}facing}}} {{cbase=[[@{crew_rating}]]}} {{cbonus=[[floor(@{crew_rating}/10)]]}} {{tmod=[[@{${p}wmod}+?{Other modifier|0}]]}} {{atk=[[?{Attack|${opts}}]]}} {{aim=[[0]]}} {{rng=[[${RANGE_Q}]]}} {{jam=[[0]]}} ${attackFields}${qual}`;
+    startRoll(str, r => {
+      const {atk} = resolveAttack(r, {ranged: true, st, semi: semi || 1, full: full || 1});
+      if (num(v[p + 'clip_max']) > 0) {
+        const used = atk === 2 ? (semi || 1) : atk === 3 ? (full || 1) : 1;
+        setAttrs({[p + 'clip']: Math.max(0, num(v[p + 'clip']) - used)});
+      }
+    });
+  });
+});
+on('clicked:repeating_vweapons:damage', e => {
+  const p = `repeating_vweapons_${rowOf(e.sourceAttribute, 'vweapons', 'damage')}_`;
+  getAttrs(VKEYS.map(k => p + k), v => {
+    const q = v[p + 'special'] || '';
+    rollDamage({title: `@{${p}name}`, dmgStr: v[p + 'damage'], dtype: v[p + 'dtype'] || splitDamage(v[p + 'damage']).type,
+      bonusExpr: '', penExpr: `@{${p}pen}`, quals: q, spray: hasQual(q, 'Spray'), extra: q.trim() ? ` {{special=@{${p}special}}}` : ''});
+  });
+});
+
+/* =====================================================================
+   Take damage (characters, NPCs, vehicles) and encumbrance
+   ===================================================================== */
+const LOC_KEYS = {1: 'head', 2: 'rarm', 3: 'larm', 4: 'body', 5: 'rleg', 6: 'lleg'};
+const LOC_Q = '?{Hit location|Body,4|Head,1|Right arm,2|Left arm,3|Right leg,5|Left leg,6}';
+
+/* Armour is reduced by pen first, then armour + T bonus comes off the damage */
+on('clicked:takedamage', () => getAttrs(NOTE_ATTRS, tv => {
+  const daem = num(tv.trait_daemonic);
+  const dq = daem > 0 ? ` {{tdaem=[[?{Force / psychic / holy attack?|No,${daem}|Yes,0}]]}}` : '';
+  const lq = tv.trait_strangephys === '1' ? '4' : LOC_Q;
+  const note = traitNotes(tv, ['damage']);
+  startRoll(`&{template:li} {{name=@{character_name}}} {{title=Takes a hit}} {{tlabel=Wounds}} {{tdmg=[[?{Damage|0}]]}} {{tpen=[[?{Penetration|0}]]}} {{tloc=[[${lq}]]}} {{ttb=[[@{t_bonus}]]}}${dq}${note ? ` {{tnote=${note}}}` : ''} {{tarmour=[[0]]}} {{tthrough=[[0]]}} {{tleft=[[0]]}} {{tcrit=[[0]]}}`, r => {
+    const loc = LOC_KEYS[r.results.tloc.result] || 'body';
+    getAttrs([`ap_${loc}`, `extra_${loc}`, 'wounds'], v => {
+      const armour = Math.max(0, num(v[`ap_${loc}`]) + num(v[`extra_${loc}`]) - r.results.tpen.result);
+      const through = Math.max(0, r.results.tdmg.result - armour - r.results.ttb.result - (r.results.tdaem ? r.results.tdaem.result : 0));
+      const left = num(v.wounds) - through;
+      finishRoll(r.rollId, {tarmour: armour, tthrough: through, tleft: left, tcrit: left < 0 ? -left : 0});
+      setAttrs({wounds: left});
+    });
+  });
+}));
+on('clicked:healfull', () => getAttrs(['wounds_max'], v => setAttrs({wounds: num(v.wounds_max)})));
+
+on('clicked:vtakedamage', () => {
+  startRoll(`&{template:li} {{name=@{character_name}}} {{title=Takes a hit}} {{tlabel=Hull integrity}} {{tdmg=[[?{Damage|0}]]}} {{tpen=[[?{Penetration|0}]]}} {{tface=[[?{Facing|Front,1|Side,2|Rear,3}]]}} {{tarmour=[[0]]}} {{tthrough=[[0]]}} {{tleft=[[0]]}} {{tcrit=[[0]]}}`, r => {
+    const face = {1: 'front', 2: 'side', 3: 'rear'}[r.results.tface.result] || 'front';
+    getAttrs([`v_ap_${face}`, 'v_integrity'], v => {
+      const armour = Math.max(0, num(v[`v_ap_${face}`]) - r.results.tpen.result);
+      const through = Math.max(0, r.results.tdmg.result - armour);
+      const left = num(v.v_integrity) - through;
+      finishRoll(r.rollId, {tarmour: armour, tthrough: through, tleft: left, tcrit: left < 0 ? -left : 0});
+      setAttrs({v_integrity: left});
+    });
+  });
+});
+
+/* Carry / lift / push in kg, indexed by St bonus + T bonus */
+const CARRY_TABLE = [
+  [0.9,2.25,4.5],[2.25,4.5,9],[4.5,9,18],[9,18,36],[18,36,72],[27,54,108],[36,72,144],[45,90,180],[56,112,224],[67,134,268],
+  [78,156,312],[90,180,360],[112,224,448],[225,450,900],[337,674,1348],[450,900,1800],[675,1350,2700],[900,1800,3600],
+  [1350,2700,5400],[1800,3600,7200],[2250,4500,9000]
+];
+const calcEncumbrance = () => {
+  getSectionIDs('gear', gids => getSectionIDs('weapons', wids => getSectionIDs('melee', mids => getSectionIDs('armour', aids => {
+    const f = ['s_bonus', 't_bonus', 'load_extra'];
+    gids.forEach(id => f.push(`repeating_gear_${id}_qty`, `repeating_gear_${id}_wt`));
+    wids.forEach(id => f.push(`repeating_weapons_${id}_wt`));
+    mids.forEach(id => f.push(`repeating_melee_${id}_wt`));
+    aids.forEach(id => f.push(`repeating_armour_${id}_wt`));
+    getAttrs(f, v => {
+      let gear = 0;
+      gids.forEach(id => { gear += num(v[`repeating_gear_${id}_qty`]) * num(v[`repeating_gear_${id}_wt`]); });
+      let load = gear + num(v.load_extra);
+      wids.forEach(id => { load += num(v[`repeating_weapons_${id}_wt`]); });
+      mids.forEach(id => { load += num(v[`repeating_melee_${id}_wt`]); });
+      aids.forEach(id => { load += num(v[`repeating_armour_${id}_wt`]); });
+      const idx = Math.max(0, Math.min(CARRY_TABLE.length - 1, num(v.s_bonus) + num(v.t_bonus)));
+      const [carry, lift, push] = CARRY_TABLE[idx];
+      const r2 = x => Math.round(x * 100) / 100;
+      const key = load > lift ? 'max' : load > carry ? 'over' : 'ok';
+      setAttrs({gear_weight: r2(gear), load_total: r2(load), carry_max: carry, lift_max: lift, push_max: push, load_key: key,
+        load_state: {ok: 'Unencumbered', over: 'Encumbered', max: 'Over lift limit'}[key]}, {silent: true});
+    });
+  }))));
+};
+on('change:repeating_gear change:repeating_weapons:wt change:repeating_melee:wt change:repeating_armour:wt change:load_extra remove:repeating_gear remove:repeating_weapons remove:repeating_melee remove:repeating_armour sheet:opened', calcEncumbrance);
+/* =====================================================================
+   Traits: keep the Trait effects box in step with trait names
+   ===================================================================== */
+/* Only values whose trait entry changed are written, so hand edits in the box survive */
+const traitDefault = k => k === 'size' ? 4 : 0;
+const traitAttr = k => k.startsWith('u_') ? `${k.slice(2)}_unnat` : `trait_${k}`;
+const syncTraits = () => getSectionIDs('traits', tids => getSectionIDs('talents', lids => {
+  const f = ['npc_traits', 'trait_parsed', ...tids.map(id => `repeating_traits_${id}_name`), ...lids.map(id => `repeating_talents_${id}_name`)];
+  getAttrs(f, v => {
+    const entries = [...tids.map(id => v[`repeating_traits_${id}_name`]), v.npc_traits].flatMap(splitEntries);
+    const p = parseTraits(entries);
+    if (lids.some(id => /^\s*frenzy\b/i.test(v[`repeating_talents_${id}_name`] || ''))) p.frenzy = 1;
+    let prev = {};
+    try { prev = JSON.parse(v.trait_parsed || '{}') || {}; } catch (err) { prev = {}; }
+    const out = {}, now = {};
+    TRAIT_KEYS.forEach(k => {
+      const nv = p[k] !== undefined ? p[k] : traitDefault(k);
+      const pv = prev[k] !== undefined ? prev[k] : traitDefault(k);
+      now[k] = nv;
+      if (nv !== pv) out[traitAttr(k)] = String(nv);
+    });
+    if (out.trait_fates !== undefined && num(out.trait_fates) > 0) { out.fate_points_max = out.trait_fates; out.fate_points = out.trait_fates; }
+    out.trait_parsed = JSON.stringify(now);
+    setAttrs(out);
+  });
+}));
+on('change:repeating_traits:name remove:repeating_traits change:npc_traits change:repeating_talents:name remove:repeating_talents sheet:opened', syncTraits);
+
+/* Touched by the Fates typed straight into the box sets the fate pool */
+on('change:trait_fates', e => {
+  if (e.sourceType !== 'player') return;
+  const x = num(e.newValue);
+  if (x > 0) setAttrs({fate_points_max: x, fate_points: x});
+});
+
+/* Natural Weapons / Deadly Natural Weapons keep a melee row up to date with Size */
+const syncNatural = () => getAttrs(['trait_natweap', 'trait_deadly', 'trait_size', 'trait_amorph', 'trait_amorph_shift'], tv => getSectionIDs('melee', ids => {
+  getAttrs(ids.map(id => `repeating_melee_${id}_natural`), mv => {
+    const row = ids.find(id => mv[`repeating_melee_${id}_natural`] === '1');
+    const deadly = tv.trait_deadly === '1';
+    if (tv.trait_natweap !== '1' && !deadly) { if (row) removeRepeatingRow(`repeating_melee_${row}`); return; }
+    const size = clampSize(tv.trait_size);
+    const es = tv.trait_amorph === '1' ? clampSize(size + num(tv.trait_amorph_shift)) : size;
+    const steps = natSteps(es);
+    const p = `repeating_melee_${row || generateRowID()}_`;
+    const out = {[p + 'natural']: '1', [p + 'damage']: es <= 2 ? '1d5' : `${1 + steps}d10`,
+      [p + 'pen']: deadly ? 2 + 2 * steps : 0, [p + 'dmgextra']: deadly ? String(2 + 2 * steps) : ''};
+    if (!row) Object.assign(out, {[p + 'name']: deadly ? 'Deadly natural weapons' : 'Natural weapons', [p + 'dtype']: 'R', [p + 'dmgchar']: 's',
+      [p + 'mods']: 'Added by the Natural Weapons trait. Damage, pen and extra damage follow Size and Deadly Natural Weapons. Cannot be disarmed unless its limbs are hacked off, and immune to the Power Field quality.'});
+    setAttrs(out);
+  });
+}));
+on('change:trait_natweap change:trait_deadly change:trait_size change:trait_amorph change:trait_amorph_shift', syncNatural);
+
+/* Frenzy: a fresh rage resets the Calm attempts */
+on('change:frenzied', e => { if (e.newValue === '1') setAttrs({frenzy_tries: 0}, {silent: true}); });
+/* Calm: Discipline test to snap out, cumulative +10 per earlier attempt */
+on('clicked:calm', () => findSkill('Discipline', tgt => getAttrs(['frenzy_tries'], fv => {
+  const tries = num(fv.frenzy_tries);
+  startRoll(`&{template:li} {{name=@{character_name}}} {{title=Snap out of Frenzy}} {{subtitle=Discipline${tries ? ', +' + tries * 10 + ' from earlier attempts' : ''}}} {{target=[[${tgt || '@{wp_total}'}+${tries * 10}+?{Modifier|0}]]}} {{roll=[[1d100]]}} {{outcome=[[0]]}} {{degrees=[[0]]}} {{desc=Only once combat ends or no eligible targets remain. On a failure keep attacking, favouring NPCs over PCs, and try again next round at a further +10. Can't Frenzy again for at least an hour.}}`, r => {
+    const d = r.results.roll.result;
+    const {pass, deg} = degreesOf(r.results.target.result, d);
+    finishRoll(r.rollId, {outcome: pass ? 1 : 0, degrees: deg});
+    setAttrs(pass ? {frenzied: 0, frenzy_tries: 0} : {frenzy_tries: tries + 1});
+  });
+})));
+
+/* Regeneration (X): Fortitude test, heals X on a success */
+on('clicked:regen', () => findSkill('Fortitude', tgt => getAttrs(['trait_regen'], tv => {
+  const x = num(tv.trait_regen);
+  startRoll(`&{template:li} {{name=@{character_name}}} {{title=Regeneration (${x})}} {{target=[[${tgt || '@{t_total}'}+?{Modifier|0}]]}} {{roll=[[1d100]]}} {{outcome=[[0]]}} {{degrees=[[0]]}} {{healed=[[0]]}}`, r => {
+    const d = r.results.roll.result;
+    const {pass, deg} = degreesOf(r.results.target.result, d);
+    getAttrs(['wounds', 'wounds_max'], w => {
+      const healed = pass ? Math.max(0, Math.min(x, num(w.wounds_max) - num(w.wounds))) : 0;
+      finishRoll(r.rollId, {outcome: pass ? 1 : 0, degrees: deg, healed});
+      if (healed) setAttrs({wounds: num(w.wounds) + healed});
+    });
+  });
+})));
+
 </script>

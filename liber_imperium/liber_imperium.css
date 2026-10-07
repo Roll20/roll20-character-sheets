@@ -153,7 +153,7 @@
 .sheet-init { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
 /* ---------- Shared card rows (weapons, powers, factions, mutations) ---------- */
-.sheet-weapon, .sheet-power, .sheet-faction, .sheet-mutation {
+.sheet-weapon, .sheet-pcard, .sheet-faction, .sheet-mutation {
   background: var(--panel); border: 1.5px solid #3b434f; border-left: 5px solid var(--navy);
   border-radius: 3px; padding: 8px 10px; margin-bottom: 10px;
 }
@@ -191,15 +191,20 @@
 .charsheet div.sheet-wrap .sheet-xpline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; align-items: center; max-width: 820px; }
 .charsheet div.sheet-wrap .sheet-xpline label { display: flex; flex-direction: row; align-items: center; gap: 10px; width: auto; margin: 0; padding: 0; font-weight: bold; color: var(--heading); font-size: 16px; white-space: nowrap; }
 .charsheet div.sheet-wrap .sheet-xpline input { width: 100%; min-width: 80px; flex: 1; }
-.sheet-buyhead, .sheet-buyrow { display: grid; grid-template-columns: 140px minmax(0, 1.6fr) 150px 150px 170px 60px 76px; gap: 6px; align-items: center; }
-.sheet-buyhead { font-size: 14px; font-weight: bold; color: var(--label); margin-bottom: 4px; }
-.sheet-buyrow { margin-bottom: 4px; }
+/* Purchases: two cards per line, each card on two lines */
+.charsheet div.sheet-wrap .sheet-buylist .repcontainer { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; }
+.charsheet div.sheet-wrap .sheet-buylist .repitem { min-width: 0; }
+.sheet-buyrow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) 96px; grid-template-areas: "type item item match" "apt1 apt2 lvl cost"; gap: 5px 6px; align-items: center; padding: 6px; background: var(--panel); border: 1.5px solid #3b434f; border-left: 4px solid var(--navy); border-radius: 3px; }
+.charsheet div.sheet-wrap .sheet-buyrow > select[name="attr_btype"] { grid-area: type; }
+.charsheet div.sheet-wrap .sheet-buyrow > .sheet-item { grid-area: item; }
+.charsheet div.sheet-wrap .sheet-buyrow > select[name="attr_apt1"] { grid-area: apt1; }
+.charsheet div.sheet-wrap .sheet-buyrow > select[name="attr_apt2"] { grid-area: apt2; }
+.charsheet div.sheet-wrap .sheet-buyrow > .sheet-lvl { grid-area: lvl; }
+.charsheet div.sheet-wrap .sheet-buyrow > label.sheet-buymatch { grid-area: match; }
+.charsheet div.sheet-wrap .sheet-buyrow > label.sheet-buycost { grid-area: cost; }
+.charsheet div.sheet-wrap .sheet-buyrow label.sheet-buymatch, .charsheet div.sheet-wrap .sheet-buyrow label.sheet-buycost { display: grid; grid-template-columns: 42px minmax(0, 1fr); align-items: center; gap: 4px; margin: 0; padding: 0; width: auto; font-size: 13px; font-weight: bold; color: var(--label); }
 .charsheet div.sheet-wrap .sheet-buyrow input, .charsheet div.sheet-wrap .sheet-buyrow select { width: 100%; }
-.sheet-aptlist { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px 14px; }
-.sheet-aptrow { display: grid; grid-template-columns: 22px 1fr; gap: 6px; align-items: center; }
-.sheet-aptrow span { font-weight: bold; color: var(--label); font-size: 14px; text-align: right; }
-.charsheet div.sheet-wrap .sheet-aptrow select, .charsheet div.sheet-wrap .sheet-aptrow input { width: 100%; }
-.sheet-aptgeneral { grid-column: 1 / -1; border-top: 1.5px solid var(--line); padding-top: 6px; max-width: 25%; min-width: 200px; }
+
 
 /* Purchase rows: show the right picker and level list for the type */
 .sheet-item { display: flex; gap: 6px; min-width: 0; }
@@ -217,8 +222,8 @@
 .charsheet div.sheet-wrap .sheet-btypeflag[value="other"] ~ .sheet-lvl .sheet-lvl-none,
 .charsheet div.sheet-wrap .sheet-btypeflag[value="background"] ~ .sheet-lvl .sheet-lvl-none { display: block; text-align: center; }
 .charsheet div.sheet-wrap .sheet-btypeflag[value="background"] ~ select.sheet-apt,
-.charsheet div.sheet-wrap .sheet-btypeflag[value="background"] ~ input[name="attr_matches"] { visibility: hidden; }
-.charsheet div.sheet-wrap .sheet-btypeflag:not([value="background"]) ~ input.sheet-costbox { pointer-events: none; background: var(--readonly); font-weight: bold; }
+.charsheet div.sheet-wrap .sheet-btypeflag[value="background"] ~ label.sheet-buymatch { visibility: hidden; }
+.charsheet div.sheet-wrap .sheet-btypeflag:not([value="background"]) ~ label.sheet-buycost input.sheet-costbox { pointer-events: none; background: var(--readonly); font-weight: bold; }
 .charsheet div.sheet-wrap .sheet-item input.sheet-pick-name { width: 100%; min-width: 0; }
 .charsheet div.sheet-wrap .sheet-btypeflag[value="characteristic"] ~ .sheet-apt,
 .charsheet div.sheet-wrap .sheet-btypeflag[value="skill"] ~ .sheet-apt { pointer-events: none; background: var(--readonly); }
@@ -249,13 +254,15 @@
 .sheet-settings { display: flex; gap: 6px; flex-wrap: wrap; }
 .charsheet div.sheet-wrap .sheet-settings select { flex: 1; min-width: 0; }
 .charsheet div.sheet-wrap div.sheet-weapon div.sheet-settings label.sheet-varset,
+.charsheet div.sheet-wrap div.sheet-weapon div.sheet-settings label.sheet-maxset,
 .charsheet div.sheet-wrap div.sheet-weapon div.sheet-settings label.sheet-ocset {
   display: none; align-items: center; gap: 10px; margin: 6px 0 0; padding: 4px 8px; flex: 1 1 auto;
   font-family: 'Cinzel', Georgia, serif; font-size: 15px; font-weight: 700; color: #ffd75e;
   background: #3a3115; border: 1.5px solid #c99a24; border-radius: 3px;
 }
 .charsheet div.sheet-wrap div.sheet-weapon input.sheet-hasvar[value="1"] ~ div.sheet-wbar div.sheet-settings label.sheet-varset,
-.charsheet div.sheet-wrap div.sheet-weapon input.sheet-hasoc[value="1"] ~ div.sheet-wbar div.sheet-settings label.sheet-ocset {
+.charsheet div.sheet-wrap div.sheet-weapon input.sheet-hasoc[value="1"] ~ div.sheet-wbar div.sheet-settings label.sheet-ocset,
+.charsheet div.sheet-wrap div.sheet-weapon input.sheet-hasmax[value="1"] ~ div.sheet-wbar div.sheet-settings label.sheet-maxset {
   display: flex;
 }
 .sheet-craftopt { visibility: hidden; }
@@ -408,6 +415,99 @@
 /* ---------- Linguistics and Trades column ---------- */
 .sheet-langtrade { display: flex; flex-direction: column; }
 
+/* ---------- Aptitudes: lines of four, General centred underneath ---------- */
+.sheet-aptline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px 14px; margin-bottom: 6px; }
+.charsheet div.sheet-wrap .sheet-aptline select { width: 100%; }
+.sheet-aptgeneral { display: flex; justify-content: center; margin-top: 8px; }
+.charsheet div.sheet-wrap .sheet-aptgeneral input { width: 220px; text-align: center; font-weight: bold; }
+
+/* ---------- Sheet modes: Character / Enemy (NPC) / Vehicle ---------- */
+.sheet-titlebox { display: flex; flex-direction: column; gap: 6px; }
+.charsheet div.sheet-wrap select.sheet-modesel { width: 200px; font-family: 'Cinzel', Georgia, serif; font-weight: 700; color: var(--heading); }
+.sheet-panel-npc, .sheet-panel-vehicle { display: none; }
+
+/* NPC: no tabs; characteristics, condition bar, NPC panel and Armoury stacked */
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap div.sheet-tabs,
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap .sheet-pcfield,
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap div.sheet-panel { display: none; }
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap div.sheet-panel-npc,
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap div.sheet-panel-combat { display: block; }
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap div.sheet-panel-npc { margin-bottom: 10px; }
+
+/* Vehicle: no characteristics, condition bar or tabs; vehicle panel only */
+.charsheet input.sheet-modeflag[value="vehicle"] ~ div.sheet-wrap div.sheet-tabs,
+.charsheet input.sheet-modeflag[value="vehicle"] ~ div.sheet-wrap .sheet-pcfield,
+.charsheet input.sheet-modeflag[value="vehicle"] ~ div.sheet-wrap div.sheet-chars,
+.charsheet input.sheet-modeflag[value="vehicle"] ~ div.sheet-wrap div.sheet-condbar,
+.charsheet input.sheet-modeflag[value="vehicle"] ~ div.sheet-wrap div.sheet-panel { display: none; }
+.charsheet input.sheet-modeflag[value="vehicle"] ~ div.sheet-wrap div.sheet-panel-vehicle { display: block; }
+
+.sheet-npcthreat { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+.sheet-trooprule { margin: 0; }
+.charsheet div.sheet-wrap input.sheet-vfacing { width: 110px; }
+
+/* ---------- Enemy / NPC mode: one page, book stat-block style ---------- */
+.sheet-npconly { display: none; }
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap { display: flex; flex-direction: column; }
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap div.sheet-panel-npc { order: 1; }
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap div.sheet-panel-combat { order: 2; }
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap .sheet-pconly,
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap div.sheet-cond-fate,
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap label.sheet-ctoggle,
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap div.sheet-chars div.sheet-char:nth-of-type(n+10) { display: none; }
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap input.sheet-charsflag ~ div.sheet-chars div.sheet-charparts > *:nth-child(n+3):nth-child(-n+5) { display: none; }
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap .sheet-npconly { display: block; }
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap div.sheet-chars { grid-template-columns: repeat(9, minmax(0, 1fr)); }
+.charsheet input.sheet-modeflag[value="npc"] ~ div.sheet-wrap input.sheet-charsflag ~ div.sheet-chars div.sheet-charparts { display: grid; }
+
+.sheet-statblock { background: var(--panel); border: 1.5px solid #3b434f; border-radius: 4px; padding: 8px 10px; margin-bottom: 14px; }
+.sheet-sbrow { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px; align-items: start; padding: 5px 0; border-bottom: 1px solid #3b434f; }
+.sheet-sbrow:last-child { border-bottom: none; }
+.sheet-sblabel { font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; color: var(--heading); padding-top: 6px; }
+.charsheet div.sheet-wrap .sheet-sbrow textarea { min-height: 34px; height: 34px; }
+.charsheet div.sheet-wrap .sheet-sbskills .repcontainer { column-count: 2; column-gap: 18px; }
+.charsheet div.sheet-wrap .sheet-sbskills .repitem { break-inside: avoid; }
+.sheet-npcskill { display: grid; grid-template-columns: 32px minmax(0, 1fr) 64px 60px 56px; gap: 4px; align-items: center; margin-bottom: 4px; }
+.charsheet div.sheet-wrap .sheet-npcskill input, .charsheet div.sheet-wrap .sheet-npcskill select { width: 100%; }
+
+/* ---------- Vehicle mode: profile layout ---------- */
+.charsheet div.sheet-wrap .sheet-vhead input { width: 100%; text-align: center; font-family: 'Cinzel', Georgia, serif; font-weight: 700; margin-bottom: 8px; }
+.sheet-vtwo { display: grid; grid-template-columns: 1fr 1fr; column-gap: 20px; }
+.sheet-vrow { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid #3b434f; }
+.sheet-vval { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.charsheet div.sheet-wrap .sheet-vval input[type=text], .charsheet div.sheet-wrap .sheet-vval textarea { width: 100%; }
+.charsheet div.sheet-wrap .sheet-vval textarea { min-height: 34px; height: 34px; }
+.charsheet div.sheet-wrap .sheet-vval input[type=number] { width: 60px; }
+.charsheet div.sheet-wrap .sheet-vval label { display: flex; flex-direction: column; align-items: center; font-size: 12px; font-weight: bold; color: var(--label); }
+
+/* ---------- Take damage and encumbrance ---------- */
+.charsheet div.sheet-wrap button.sheet-dmgtake { background: #8a2b2b; }
+.charsheet div.sheet-wrap button.sheet-dmgtake:hover { background: #a63434; }
+.charsheet div.sheet-wrap button.sheet-btnsoft { background: #2d3440; color: var(--ink); margin-left: 6px; }
+.sheet-loadval { font-weight: bold; }
+.sheet-loadstate { margin-left: 6px; padding: 2px 8px; border-radius: 3px; font-size: 13px; font-weight: bold; background: #22783f; color: #ffffff; }
+.charsheet div.sheet-wrap input.sheet-loadflag[value="over"] ~ span.sheet-loadstate { background: #b7791f; color: #111827; }
+.charsheet div.sheet-wrap input.sheet-loadflag[value="max"] ~ span.sheet-loadstate { background: #a63434; }
+.sheet-encumb { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.charsheet div.sheet-wrap .sheet-encumb label { display: flex; flex-direction: column; gap: 3px; font-size: 13px; font-weight: bold; color: var(--label); }
+.charsheet div.sheet-wrap .sheet-encumb input { width: 100%; }
+.charsheet input.sheet-modeflag[value="vehicle"] ~ div.sheet-wrap div.sheet-loadcond { display: none; }
+
+/* ---------- Powers: compact / more views and the type filter ---------- */
+.sheet-pfilterbar { display: flex; align-items: center; gap: 10px; margin: 4px 0 10px; }
+.charsheet div.sheet-wrap .sheet-pfilterbar select { width: 200px; }
+.sheet-pmore { display: none; }
+.charsheet div.sheet-wrap input.sheet-pmoreflag[value="1"] ~ div.sheet-pcard div.sheet-pmore { display: block; }
+.charsheet div.sheet-wrap input.sheet-pcollflag[value="1"] ~ div.sheet-pcard div.sheet-pbody { display: none; }
+.charsheet div.sheet-wrap input.sheet-pcollflag[value="1"] ~ div.sheet-pcard div.sheet-pline { margin-bottom: 0; }
+.charsheet div.sheet-wrap .sheet-ptest label.sheet-check { color: var(--heading); font-family: 'Cinzel', Georgia, serif; font-weight: 700; }
+.charsheet div.sheet-wrap input.sheet-pfilter[value="psychic"] ~ div.repcontainer div.sheet-power input.sheet-ptype:not([value="psychic"]) ~ div.sheet-pcard,
+.charsheet div.sheet-wrap input.sheet-pfilter[value="faith"] ~ div.repcontainer div.sheet-power input.sheet-ptype:not([value="faith"]) ~ div.sheet-pcard,
+.charsheet div.sheet-wrap input.sheet-pfilter[value="arcana"] ~ div.repcontainer div.sheet-power input.sheet-ptype:not([value="arcana"]) ~ div.sheet-pcard,
+.charsheet div.sheet-wrap input.sheet-pfilter[value="navigator"] ~ div.repcontainer div.sheet-power input.sheet-ptype:not([value="navigator"]) ~ div.sheet-pcard,
+.charsheet div.sheet-wrap input.sheet-pfilter[value="null"] ~ div.repcontainer div.sheet-power input.sheet-ptype:not([value="null"]) ~ div.sheet-pcard,
+.charsheet div.sheet-wrap input.sheet-pfilter[value="other"] ~ div.repcontainer div.sheet-power input.sheet-ptype:not([value="other"]) ~ div.sheet-pcard { display: none; }
+
 /* Talents and gear */
 .sheet-gearhead { font-size: 14px; font-weight: bold; color: var(--label); margin-bottom: 4px; }
 .sheet-geartotal { display: flex; justify-content: flex-end; align-items: center; gap: 8px; font-weight: bold; margin-top: 6px; }
@@ -427,17 +527,18 @@
 .charsheet div.sheet-wrap .sheet-ptest input[type=text] { width: 160px; }
 .charsheet div.sheet-wrap .sheet-ptest .sheet-check { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-weight: bold; }
 .sheet-bolt { display: none; border: 1.5px dashed var(--navy); border-radius: 3px; padding: 8px; margin-bottom: 8px; background: #1d2129; }
-.sheet-boltflag:not([value="none"]) ~ .sheet-bolt { display: block; }
+.sheet-boltflag:not([value="none"]) ~ .sheet-pcard .sheet-bolt { display: block; }
 .sheet-burn { display: none; }
-.sheet-ptype[value="faith"] ~ .sheet-burn { display: block; margin-top: 6px; }
+.sheet-ptype[value="faith"] ~ .sheet-pcard .sheet-burn { display: block; margin-top: 6px; }
 .sheet-overbleed { display: none; }
-.sheet-ptype[value="psychic"] ~ .sheet-overbleed { display: block; margin-top: 6px; }
-.sheet-power textarea { margin-top: 2px; }
-.sheet-ptype[value="psychic"] ~ .sheet-wline { border-left: 6px solid #9a74d1; padding-left: 6px; }
-.sheet-ptype[value="faith"] ~ .sheet-wline { border-left: 6px solid #d9a441; padding-left: 6px; }
-.sheet-ptype[value="arcana"] ~ .sheet-wline { border-left: 6px solid #d05a5a; padding-left: 6px; }
-.sheet-ptype[value="navigator"] ~ .sheet-wline { border-left: 6px solid #5a9be0; padding-left: 6px; }
-.sheet-ptype[value="null"] ~ .sheet-wline { border-left: 6px solid #c8cdd3; padding-left: 6px; }
+.sheet-ptype[value="psychic"] ~ .sheet-pcard .sheet-overbleed { display: block; margin-top: 6px; }
+.sheet-pcard textarea { margin-top: 6px; }
+.sheet-ptype[value="psychic"] ~ .sheet-pcard .sheet-pline { border-left: 6px solid #9a74d1; padding-left: 6px; }
+.sheet-ptype[value="faith"] ~ .sheet-pcard .sheet-pline { border-left: 6px solid #d9a441; padding-left: 6px; }
+.sheet-ptype[value="arcana"] ~ .sheet-pcard .sheet-pline { border-left: 6px solid #d05a5a; padding-left: 6px; }
+.sheet-ptype[value="navigator"] ~ .sheet-pcard .sheet-pline { border-left: 6px solid #5a9be0; padding-left: 6px; }
+.sheet-ptype[value="null"] ~ .sheet-pcard .sheet-pline { border-left: 6px solid #c8cdd3; padding-left: 6px; }
+.sheet-ptype[value="other"] ~ .sheet-pcard .sheet-pline { border-left: 6px solid #7a2e8a; padding-left: 6px; }
 
 /* Mutations */
 .sheet-mutation { border-left-color: #c84b4b; }
@@ -455,3 +556,26 @@
 .sheet-rolltemplate-li .sheet-rt-desc { padding: 6px 8px; font-size: 13px; line-height: 1.45; white-space: pre-line; color: #e4e7eb; }
 .sheet-rolltemplate-li .inlinerollresult { background: transparent; border: none; font-weight: bold; font-size: 15px; padding: 0; color: #ffffff; }
 .sheet-rolltemplate-li .sheet-rt-sub { font-size: 12px; color: #b9c2cd; padding-top: 0; }
+.sheet-rolltemplate-li .sheet-rt-pass.sheet-rt-hurt { background: #8a2b2b; }
+
+/* ---------- Trait effects ---------- */
+.sheet-traitbox .sheet-wgrid { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); }
+.charsheet div.sheet-wrap .sheet-traitbox .sheet-regen { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px; align-items: center; }
+.charsheet div.sheet-wrap .sheet-traitbox .sheet-regen button { padding: 4px 8px; font-size: 13px; }
+.charsheet div.sheet-wrap input.sheet-amorphflag:not([value="1"]) ~ div.sheet-wgrid label.sheet-amorphshift { display: none; }
+.charsheet div.sheet-wrap div.sheet-traitflags { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 6px 0 10px; }
+.charsheet div.sheet-wrap div.sheet-tfcol { display: flex; flex-direction: column; gap: 5px; padding: 2px 14px; border-left: 2px solid var(--line); min-width: 0; }
+.charsheet div.sheet-wrap div.sheet-tfcol:first-child { border-left: none; padding-left: 0; }
+.charsheet div.sheet-wrap span.sheet-tfhead { font-family: 'Cinzel', Georgia, serif; font-weight: 700; font-size: 14px; color: var(--heading); margin-bottom: 2px; }
+.charsheet div.sheet-wrap div.sheet-tfcol label { display: flex; flex-direction: row; align-items: center; gap: 7px; margin: 0; padding: 0; width: auto; font-weight: bold; color: var(--label); font-size: 14px; }
+.charsheet div.sheet-wrap div.sheet-tfcol label input[type=checkbox] { flex: 0 0 auto; }
+.sheet-traitsum { display: block; white-space: pre-line; padding: 8px 10px; background: #1b1f26; border: 1.5px solid #3b434f; border-left: 5px solid var(--navy); border-radius: 3px; font-size: 14px; line-height: 1.55; color: var(--ink); }
+.sheet-panel-npc .sheet-traitbox { margin-top: 14px; }
+/* Frenzied toggle only shows once the character has Frenzy */
+.charsheet div.sheet-wrap .sheet-condbar div.sheet-frenzycond { display: none; }
+.charsheet div.sheet-wrap .sheet-condbar input.sheet-frenzyflag[value="1"] ~ div.sheet-frenzycond { display: flex; }
+.charsheet div.sheet-wrap .sheet-frenzycond label { display: flex; align-items: center; gap: 6px; font-weight: bold; color: var(--heading); cursor: pointer; }
+.charsheet div.sheet-wrap .sheet-frenzycond label input[type=checkbox]:checked + span { color: #ff8a7a; }
+.sheet-rolltemplate-li .sheet-rt-trait { border-top: 1px solid #3b434f; border-left: 4px solid #c08a2e; font-style: italic; }
+.charsheet div.sheet-wrap div.sheet-settings label { min-width: 0; max-width: 100%; box-sizing: border-box; }
+.charsheet div.sheet-wrap div.sheet-settings label select { min-width: 0; width: 100%; }
