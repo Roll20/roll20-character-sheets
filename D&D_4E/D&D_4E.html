@@ -1937,7 +1937,7 @@
 					</select>
 					<button type="action" name="act_sort_powers_request" class="sheet-power-sort sheet-power-sort-request" data-i18n="sort_powers">Sort</button>
 					<div class="sheet-power-sort-confirmation">
-						<span class="sheet-power-sort-confirmation-text" data-i18n="sort_powers_confirmation_warning">Sorting moves most powers to a new slot. Token actions and macros kept outside the sheet point at a slot, not a power, so afterwards they roll whichever power is now in that slot. This cannot be undone.</span>
+						<span class="sheet-power-sort-confirmation-text" data-i18n="sort_powers_confirmation_warning">Sorting replaces the order you arranged by hand and cannot be undone. Powers stay in their slots, so macros and token actions are not affected.</span>
 						<button type="action" name="act_sort_powers_confirm" class="sheet-power-sort" data-i18n="sort_powers_confirm">Sort now</button>
 						<button type="action" name="act_sort_powers_cancel" class="sheet-power-sort" data-i18n="sort_powers_cancel">Cancel</button>
 					</div>
@@ -1948,19 +1948,23 @@
                      mod, def, weapon-attack, weapon-damage, weapon-num-dice, weapon-dice,
                      attack-misc, damage-misc, attack, damage, macro).
 
-                     Editing a card means applying the same edit to all 100. The macro
-                     embeds its own slot number, so anything that moves a power between
-                     slots has to reindex it; attack and damage are fixed per-slot formulas
-                     and stay put - see POWER REORDERING in the sheet worker block at the
-                     end of this file.
+                     The "Power N" line under each macro box is the slot number that macros
+                     and token actions use; it is highlighted while the macro box has focus.
+
+                     Editing a card means applying the same edit to all 100. Each card is
+                     preceded by a hidden power-<slot>-position input that sets its place
+                     in the list on the Powers tab; the input must stay immediately before
+                     its card, because the CSS reaches the card with a "+" selector - see
+                     POWER ORDER in the sheet worker block at the end of this file.
 
                      A commented-out single-card template used to sit here. It was 235 lines
                      that shipped to every client on every sheet load and had already fallen
                      out of step with the generated cards; git history has it if needed. -->
                 
-                <div>
+                <div class="sheet-power-list">
                 <!-- Start Generated Powers -->
 
+                <input type="hidden" name="attr_power-1-position" class="sheet-power-position" value="1">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-1-toggle" class="sheet-power-card-toggle sheet-tab-settings" checked>
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 1</label>
@@ -2018,7 +2022,7 @@
                         </div>
                         <div class="sheet-labelfix"></div>
                         <div class="sheet-power-move-row">
-                            <span class="sheet-power-move-placeholder"></span>
+                            <button type="action" name="act_power_1_moveup" class="sheet-power-move" data-i18n-title="move_power_up" title="Move power up">&#9650;</button>
                             <button type="action" name="act_power_1_movedown" class="sheet-power-move" data-i18n-title="move_power_down" title="Move power down">&#9660;</button>
                         </div>
                         <input type="checkbox" class="sheet-toggle" checked>
@@ -2198,15 +2202,16 @@
                             <textarea name="attr_power-1-macro">/me uses @{power-1-name}
 [[1d20+@{power-1-attack}]] vs @{power-1-def} 
 Hit: [[(1*@{power-1-weapon-num-dice})d@{power-1-weapon-dice}+@{power-1-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 1</label>
+                                    <label><span data-i18n="power">Power</span> 1 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-2-position" class="sheet-power-position" value="2">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-2-toggle" class="sheet-power-card-toggle sheet-tab-settings" checked>
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 2</label>
@@ -2444,15 +2449,16 @@ Hit: [[(1*@{power-1-weapon-num-dice})d@{power-1-weapon-dice}+@{power-1-damage}]]
                             <textarea name="attr_power-2-macro">/me uses @{power-2-name}
 [[1d20+@{power-2-attack}]] vs @{power-2-def} 
 Hit: [[(1*@{power-2-weapon-num-dice})d@{power-2-weapon-dice}+@{power-2-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 2</label>
+                                    <label><span data-i18n="power">Power</span> 2 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-3-position" class="sheet-power-position" value="3">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-3-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 3</label>
@@ -2690,15 +2696,16 @@ Hit: [[(1*@{power-2-weapon-num-dice})d@{power-2-weapon-dice}+@{power-2-damage}]]
                             <textarea name="attr_power-3-macro">/me uses @{power-3-name}
 [[1d20+@{power-3-attack}]] vs @{power-3-def} 
 Hit: [[(1*@{power-3-weapon-num-dice})d@{power-3-weapon-dice}+@{power-3-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 3</label>
+                                    <label><span data-i18n="power">Power</span> 3 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-4-position" class="sheet-power-position" value="4">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-4-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 4</label>
@@ -2936,15 +2943,16 @@ Hit: [[(1*@{power-3-weapon-num-dice})d@{power-3-weapon-dice}+@{power-3-damage}]]
                             <textarea name="attr_power-4-macro">/me uses @{power-4-name}
 [[1d20+@{power-4-attack}]] vs @{power-4-def} 
 Hit: [[(1*@{power-4-weapon-num-dice})d@{power-4-weapon-dice}+@{power-4-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 4</label>
+                                    <label><span data-i18n="power">Power</span> 4 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-5-position" class="sheet-power-position" value="5">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-5-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 5</label>
@@ -3182,15 +3190,16 @@ Hit: [[(1*@{power-4-weapon-num-dice})d@{power-4-weapon-dice}+@{power-4-damage}]]
                             <textarea name="attr_power-5-macro">/me uses @{power-5-name}
 [[1d20+@{power-5-attack}]] vs @{power-5-def} 
 Hit: [[(1*@{power-5-weapon-num-dice})d@{power-5-weapon-dice}+@{power-5-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 5</label>
+                                    <label><span data-i18n="power">Power</span> 5 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-6-position" class="sheet-power-position" value="6">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-6-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 6</label>
@@ -3428,15 +3437,16 @@ Hit: [[(1*@{power-5-weapon-num-dice})d@{power-5-weapon-dice}+@{power-5-damage}]]
                             <textarea name="attr_power-6-macro">/me uses @{power-6-name}
 [[1d20+@{power-6-attack}]] vs @{power-6-def} 
 Hit: [[(1*@{power-6-weapon-num-dice})d@{power-6-weapon-dice}+@{power-6-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 6</label>
+                                    <label><span data-i18n="power">Power</span> 6 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-7-position" class="sheet-power-position" value="7">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-7-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 7</label>
@@ -3674,15 +3684,16 @@ Hit: [[(1*@{power-6-weapon-num-dice})d@{power-6-weapon-dice}+@{power-6-damage}]]
                             <textarea name="attr_power-7-macro">/me uses @{power-7-name}
 [[1d20+@{power-7-attack}]] vs @{power-7-def} 
 Hit: [[(1*@{power-7-weapon-num-dice})d@{power-7-weapon-dice}+@{power-7-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 7</label>
+                                    <label><span data-i18n="power">Power</span> 7 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-8-position" class="sheet-power-position" value="8">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-8-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 8</label>
@@ -3920,15 +3931,16 @@ Hit: [[(1*@{power-7-weapon-num-dice})d@{power-7-weapon-dice}+@{power-7-damage}]]
                             <textarea name="attr_power-8-macro">/me uses @{power-8-name}
 [[1d20+@{power-8-attack}]] vs @{power-8-def} 
 Hit: [[(1*@{power-8-weapon-num-dice})d@{power-8-weapon-dice}+@{power-8-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 8</label>
+                                    <label><span data-i18n="power">Power</span> 8 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-9-position" class="sheet-power-position" value="9">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-9-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 9</label>
@@ -4166,15 +4178,16 @@ Hit: [[(1*@{power-8-weapon-num-dice})d@{power-8-weapon-dice}+@{power-8-damage}]]
                             <textarea name="attr_power-9-macro">/me uses @{power-9-name}
 [[1d20+@{power-9-attack}]] vs @{power-9-def} 
 Hit: [[(1*@{power-9-weapon-num-dice})d@{power-9-weapon-dice}+@{power-9-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 9</label>
+                                    <label><span data-i18n="power">Power</span> 9 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-10-position" class="sheet-power-position" value="10">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-10-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 10</label>
@@ -4412,15 +4425,16 @@ Hit: [[(1*@{power-9-weapon-num-dice})d@{power-9-weapon-dice}+@{power-9-damage}]]
                             <textarea name="attr_power-10-macro">/me uses @{power-10-name}
 [[1d20+@{power-10-attack}]] vs @{power-10-def} 
 Hit: [[(1*@{power-10-weapon-num-dice})d@{power-10-weapon-dice}+@{power-10-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 10</label>
+                                    <label><span data-i18n="power">Power</span> 10 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-11-position" class="sheet-power-position" value="11">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-11-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 11</label>
@@ -4658,15 +4672,16 @@ Hit: [[(1*@{power-10-weapon-num-dice})d@{power-10-weapon-dice}+@{power-10-damage
                             <textarea name="attr_power-11-macro">/me uses @{power-11-name}
 [[1d20+@{power-11-attack}]] vs @{power-11-def} 
 Hit: [[(1*@{power-11-weapon-num-dice})d@{power-11-weapon-dice}+@{power-11-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 11</label>
+                                    <label><span data-i18n="power">Power</span> 11 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-12-position" class="sheet-power-position" value="12">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-12-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 12</label>
@@ -4904,15 +4919,16 @@ Hit: [[(1*@{power-11-weapon-num-dice})d@{power-11-weapon-dice}+@{power-11-damage
                             <textarea name="attr_power-12-macro">/me uses @{power-12-name}
 [[1d20+@{power-12-attack}]] vs @{power-12-def} 
 Hit: [[(1*@{power-12-weapon-num-dice})d@{power-12-weapon-dice}+@{power-12-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 12</label>
+                                    <label><span data-i18n="power">Power</span> 12 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-13-position" class="sheet-power-position" value="13">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-13-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 13</label>
@@ -5150,15 +5166,16 @@ Hit: [[(1*@{power-12-weapon-num-dice})d@{power-12-weapon-dice}+@{power-12-damage
                             <textarea name="attr_power-13-macro">/me uses @{power-13-name}
 [[1d20+@{power-13-attack}]] vs @{power-13-def} 
 Hit: [[(1*@{power-13-weapon-num-dice})d@{power-13-weapon-dice}+@{power-13-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 13</label>
+                                    <label><span data-i18n="power">Power</span> 13 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-14-position" class="sheet-power-position" value="14">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-14-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 14</label>
@@ -5396,15 +5413,16 @@ Hit: [[(1*@{power-13-weapon-num-dice})d@{power-13-weapon-dice}+@{power-13-damage
                             <textarea name="attr_power-14-macro">/me uses @{power-14-name}
 [[1d20+@{power-14-attack}]] vs @{power-14-def} 
 Hit: [[(1*@{power-14-weapon-num-dice})d@{power-14-weapon-dice}+@{power-14-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 14</label>
+                                    <label><span data-i18n="power">Power</span> 14 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-15-position" class="sheet-power-position" value="15">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-15-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 15</label>
@@ -5642,15 +5660,16 @@ Hit: [[(1*@{power-14-weapon-num-dice})d@{power-14-weapon-dice}+@{power-14-damage
                             <textarea name="attr_power-15-macro">/me uses @{power-15-name}
 [[1d20+@{power-15-attack}]] vs @{power-15-def} 
 Hit: [[(1*@{power-15-weapon-num-dice})d@{power-15-weapon-dice}+@{power-15-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 15</label>
+                                    <label><span data-i18n="power">Power</span> 15 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-16-position" class="sheet-power-position" value="16">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-16-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 16</label>
@@ -5888,15 +5907,16 @@ Hit: [[(1*@{power-15-weapon-num-dice})d@{power-15-weapon-dice}+@{power-15-damage
                             <textarea name="attr_power-16-macro">/me uses @{power-16-name}
 [[1d20+@{power-16-attack}]] vs @{power-16-def} 
 Hit: [[(1*@{power-16-weapon-num-dice})d@{power-16-weapon-dice}+@{power-16-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 16</label>
+                                    <label><span data-i18n="power">Power</span> 16 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-17-position" class="sheet-power-position" value="17">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-17-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 17</label>
@@ -6134,15 +6154,16 @@ Hit: [[(1*@{power-16-weapon-num-dice})d@{power-16-weapon-dice}+@{power-16-damage
                             <textarea name="attr_power-17-macro">/me uses @{power-17-name}
 [[1d20+@{power-17-attack}]] vs @{power-17-def} 
 Hit: [[(1*@{power-17-weapon-num-dice})d@{power-17-weapon-dice}+@{power-17-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 17</label>
+                                    <label><span data-i18n="power">Power</span> 17 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-18-position" class="sheet-power-position" value="18">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-18-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 18</label>
@@ -6380,15 +6401,16 @@ Hit: [[(1*@{power-17-weapon-num-dice})d@{power-17-weapon-dice}+@{power-17-damage
                             <textarea name="attr_power-18-macro">/me uses @{power-18-name}
 [[1d20+@{power-18-attack}]] vs @{power-18-def} 
 Hit: [[(1*@{power-18-weapon-num-dice})d@{power-18-weapon-dice}+@{power-18-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 18</label>
+                                    <label><span data-i18n="power">Power</span> 18 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-19-position" class="sheet-power-position" value="19">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-19-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 19</label>
@@ -6626,15 +6648,16 @@ Hit: [[(1*@{power-18-weapon-num-dice})d@{power-18-weapon-dice}+@{power-18-damage
                             <textarea name="attr_power-19-macro">/me uses @{power-19-name}
 [[1d20+@{power-19-attack}]] vs @{power-19-def} 
 Hit: [[(1*@{power-19-weapon-num-dice})d@{power-19-weapon-dice}+@{power-19-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 19</label>
+                                    <label><span data-i18n="power">Power</span> 19 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-20-position" class="sheet-power-position" value="20">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-20-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 20</label>
@@ -6872,15 +6895,16 @@ Hit: [[(1*@{power-19-weapon-num-dice})d@{power-19-weapon-dice}+@{power-19-damage
                             <textarea name="attr_power-20-macro">/me uses @{power-20-name}
 [[1d20+@{power-20-attack}]] vs @{power-20-def} 
 Hit: [[(1*@{power-20-weapon-num-dice})d@{power-20-weapon-dice}+@{power-20-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 20</label>
+                                    <label><span data-i18n="power">Power</span> 20 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-21-position" class="sheet-power-position" value="21">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-21-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 21</label>
@@ -7118,15 +7142,16 @@ Hit: [[(1*@{power-20-weapon-num-dice})d@{power-20-weapon-dice}+@{power-20-damage
                             <textarea name="attr_power-21-macro">/me uses @{power-21-name}
 [[1d20+@{power-21-attack}]] vs @{power-21-def} 
 Hit: [[(1*@{power-21-weapon-num-dice})d@{power-21-weapon-dice}+@{power-21-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 21</label>
+                                    <label><span data-i18n="power">Power</span> 21 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-22-position" class="sheet-power-position" value="22">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-22-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 22</label>
@@ -7364,15 +7389,16 @@ Hit: [[(1*@{power-21-weapon-num-dice})d@{power-21-weapon-dice}+@{power-21-damage
                             <textarea name="attr_power-22-macro">/me uses @{power-22-name}
 [[1d20+@{power-22-attack}]] vs @{power-22-def} 
 Hit: [[(1*@{power-22-weapon-num-dice})d@{power-22-weapon-dice}+@{power-22-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 22</label>
+                                    <label><span data-i18n="power">Power</span> 22 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-23-position" class="sheet-power-position" value="23">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-23-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 23</label>
@@ -7610,15 +7636,16 @@ Hit: [[(1*@{power-22-weapon-num-dice})d@{power-22-weapon-dice}+@{power-22-damage
                             <textarea name="attr_power-23-macro">/me uses @{power-23-name}
 [[1d20+@{power-23-attack}]] vs @{power-23-def} 
 Hit: [[(1*@{power-23-weapon-num-dice})d@{power-23-weapon-dice}+@{power-23-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 23</label>
+                                    <label><span data-i18n="power">Power</span> 23 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-24-position" class="sheet-power-position" value="24">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-24-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 24</label>
@@ -7856,15 +7883,16 @@ Hit: [[(1*@{power-23-weapon-num-dice})d@{power-23-weapon-dice}+@{power-23-damage
                             <textarea name="attr_power-24-macro">/me uses @{power-24-name}
 [[1d20+@{power-24-attack}]] vs @{power-24-def} 
 Hit: [[(1*@{power-24-weapon-num-dice})d@{power-24-weapon-dice}+@{power-24-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 24</label>
+                                    <label><span data-i18n="power">Power</span> 24 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-25-position" class="sheet-power-position" value="25">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-25-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 25</label>
@@ -8102,15 +8130,16 @@ Hit: [[(1*@{power-24-weapon-num-dice})d@{power-24-weapon-dice}+@{power-24-damage
                             <textarea name="attr_power-25-macro">/me uses @{power-25-name}
 [[1d20+@{power-25-attack}]] vs @{power-25-def} 
 Hit: [[(1*@{power-25-weapon-num-dice})d@{power-25-weapon-dice}+@{power-25-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 25</label>
+                                    <label><span data-i18n="power">Power</span> 25 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-26-position" class="sheet-power-position" value="26">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-26-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 26</label>
@@ -8348,15 +8377,16 @@ Hit: [[(1*@{power-25-weapon-num-dice})d@{power-25-weapon-dice}+@{power-25-damage
                             <textarea name="attr_power-26-macro">/me uses @{power-26-name}
 [[1d20+@{power-26-attack}]] vs @{power-26-def} 
 Hit: [[(1*@{power-26-weapon-num-dice})d@{power-26-weapon-dice}+@{power-26-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 26</label>
+                                    <label><span data-i18n="power">Power</span> 26 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-27-position" class="sheet-power-position" value="27">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-27-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 27</label>
@@ -8594,15 +8624,16 @@ Hit: [[(1*@{power-26-weapon-num-dice})d@{power-26-weapon-dice}+@{power-26-damage
                             <textarea name="attr_power-27-macro">/me uses @{power-27-name}
 [[1d20+@{power-27-attack}]] vs @{power-27-def} 
 Hit: [[(1*@{power-27-weapon-num-dice})d@{power-27-weapon-dice}+@{power-27-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 27</label>
+                                    <label><span data-i18n="power">Power</span> 27 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-28-position" class="sheet-power-position" value="28">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-28-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 28</label>
@@ -8840,15 +8871,16 @@ Hit: [[(1*@{power-27-weapon-num-dice})d@{power-27-weapon-dice}+@{power-27-damage
                             <textarea name="attr_power-28-macro">/me uses @{power-28-name}
 [[1d20+@{power-28-attack}]] vs @{power-28-def} 
 Hit: [[(1*@{power-28-weapon-num-dice})d@{power-28-weapon-dice}+@{power-28-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 28</label>
+                                    <label><span data-i18n="power">Power</span> 28 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-29-position" class="sheet-power-position" value="29">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-29-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 29</label>
@@ -9086,15 +9118,16 @@ Hit: [[(1*@{power-28-weapon-num-dice})d@{power-28-weapon-dice}+@{power-28-damage
                             <textarea name="attr_power-29-macro">/me uses @{power-29-name}
 [[1d20+@{power-29-attack}]] vs @{power-29-def} 
 Hit: [[(1*@{power-29-weapon-num-dice})d@{power-29-weapon-dice}+@{power-29-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 29</label>
+                                    <label><span data-i18n="power">Power</span> 29 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-30-position" class="sheet-power-position" value="30">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-30-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 30</label>
@@ -9332,15 +9365,16 @@ Hit: [[(1*@{power-29-weapon-num-dice})d@{power-29-weapon-dice}+@{power-29-damage
                             <textarea name="attr_power-30-macro">/me uses @{power-30-name}
 [[1d20+@{power-30-attack}]] vs @{power-30-def} 
 Hit: [[(1*@{power-30-weapon-num-dice})d@{power-30-weapon-dice}+@{power-30-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 30</label>
+                                    <label><span data-i18n="power">Power</span> 30 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-31-position" class="sheet-power-position" value="31">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-31-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 31</label>
@@ -9578,15 +9612,16 @@ Hit: [[(1*@{power-30-weapon-num-dice})d@{power-30-weapon-dice}+@{power-30-damage
                             <textarea name="attr_power-31-macro">/me uses @{power-31-name}
 [[1d20+@{power-31-attack}]] vs @{power-31-def} 
 Hit: [[(1*@{power-31-weapon-num-dice})d@{power-31-weapon-dice}+@{power-31-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 31</label>
+                                    <label><span data-i18n="power">Power</span> 31 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-32-position" class="sheet-power-position" value="32">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-32-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 32</label>
@@ -9824,15 +9859,16 @@ Hit: [[(1*@{power-31-weapon-num-dice})d@{power-31-weapon-dice}+@{power-31-damage
                             <textarea name="attr_power-32-macro">/me uses @{power-32-name}
 [[1d20+@{power-32-attack}]] vs @{power-32-def} 
 Hit: [[(1*@{power-32-weapon-num-dice})d@{power-32-weapon-dice}+@{power-32-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 32</label>
+                                    <label><span data-i18n="power">Power</span> 32 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-33-position" class="sheet-power-position" value="33">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-33-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 33</label>
@@ -10070,15 +10106,16 @@ Hit: [[(1*@{power-32-weapon-num-dice})d@{power-32-weapon-dice}+@{power-32-damage
                             <textarea name="attr_power-33-macro">/me uses @{power-33-name}
 [[1d20+@{power-33-attack}]] vs @{power-33-def} 
 Hit: [[(1*@{power-33-weapon-num-dice})d@{power-33-weapon-dice}+@{power-33-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 33</label>
+                                    <label><span data-i18n="power">Power</span> 33 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-34-position" class="sheet-power-position" value="34">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-34-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 34</label>
@@ -10316,15 +10353,16 @@ Hit: [[(1*@{power-33-weapon-num-dice})d@{power-33-weapon-dice}+@{power-33-damage
                             <textarea name="attr_power-34-macro">/me uses @{power-34-name}
 [[1d20+@{power-34-attack}]] vs @{power-34-def} 
 Hit: [[(1*@{power-34-weapon-num-dice})d@{power-34-weapon-dice}+@{power-34-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 34</label>
+                                    <label><span data-i18n="power">Power</span> 34 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-35-position" class="sheet-power-position" value="35">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-35-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 35</label>
@@ -10562,15 +10600,16 @@ Hit: [[(1*@{power-34-weapon-num-dice})d@{power-34-weapon-dice}+@{power-34-damage
                             <textarea name="attr_power-35-macro">/me uses @{power-35-name}
 [[1d20+@{power-35-attack}]] vs @{power-35-def} 
 Hit: [[(1*@{power-35-weapon-num-dice})d@{power-35-weapon-dice}+@{power-35-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 35</label>
+                                    <label><span data-i18n="power">Power</span> 35 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-36-position" class="sheet-power-position" value="36">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-36-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 36</label>
@@ -10808,15 +10847,16 @@ Hit: [[(1*@{power-35-weapon-num-dice})d@{power-35-weapon-dice}+@{power-35-damage
                             <textarea name="attr_power-36-macro">/me uses @{power-36-name}
 [[1d20+@{power-36-attack}]] vs @{power-36-def} 
 Hit: [[(1*@{power-36-weapon-num-dice})d@{power-36-weapon-dice}+@{power-36-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 36</label>
+                                    <label><span data-i18n="power">Power</span> 36 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-37-position" class="sheet-power-position" value="37">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-37-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 37</label>
@@ -11054,15 +11094,16 @@ Hit: [[(1*@{power-36-weapon-num-dice})d@{power-36-weapon-dice}+@{power-36-damage
                             <textarea name="attr_power-37-macro">/me uses @{power-37-name}
 [[1d20+@{power-37-attack}]] vs @{power-37-def} 
 Hit: [[(1*@{power-37-weapon-num-dice})d@{power-37-weapon-dice}+@{power-37-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 37</label>
+                                    <label><span data-i18n="power">Power</span> 37 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-38-position" class="sheet-power-position" value="38">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-38-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 38</label>
@@ -11300,15 +11341,16 @@ Hit: [[(1*@{power-37-weapon-num-dice})d@{power-37-weapon-dice}+@{power-37-damage
                             <textarea name="attr_power-38-macro">/me uses @{power-38-name}
 [[1d20+@{power-38-attack}]] vs @{power-38-def} 
 Hit: [[(1*@{power-38-weapon-num-dice})d@{power-38-weapon-dice}+@{power-38-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 38</label>
+                                    <label><span data-i18n="power">Power</span> 38 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-39-position" class="sheet-power-position" value="39">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-39-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 39</label>
@@ -11546,15 +11588,16 @@ Hit: [[(1*@{power-38-weapon-num-dice})d@{power-38-weapon-dice}+@{power-38-damage
                             <textarea name="attr_power-39-macro">/me uses @{power-39-name}
 [[1d20+@{power-39-attack}]] vs @{power-39-def} 
 Hit: [[(1*@{power-39-weapon-num-dice})d@{power-39-weapon-dice}+@{power-39-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 39</label>
+                                    <label><span data-i18n="power">Power</span> 39 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-40-position" class="sheet-power-position" value="40">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-40-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 40</label>
@@ -11792,15 +11835,16 @@ Hit: [[(1*@{power-39-weapon-num-dice})d@{power-39-weapon-dice}+@{power-39-damage
                             <textarea name="attr_power-40-macro">/me uses @{power-40-name}
 [[1d20+@{power-40-attack}]] vs @{power-40-def} 
 Hit: [[(1*@{power-40-weapon-num-dice})d@{power-40-weapon-dice}+@{power-40-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 40</label>
+                                    <label><span data-i18n="power">Power</span> 40 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-41-position" class="sheet-power-position" value="41">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-41-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 41</label>
@@ -12038,15 +12082,16 @@ Hit: [[(1*@{power-40-weapon-num-dice})d@{power-40-weapon-dice}+@{power-40-damage
                             <textarea name="attr_power-41-macro">/me uses @{power-41-name}
 [[1d20+@{power-41-attack}]] vs @{power-41-def} 
 Hit: [[(1*@{power-41-weapon-num-dice})d@{power-41-weapon-dice}+@{power-41-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 41</label>
+                                    <label><span data-i18n="power">Power</span> 41 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-42-position" class="sheet-power-position" value="42">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-42-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 42</label>
@@ -12284,15 +12329,16 @@ Hit: [[(1*@{power-41-weapon-num-dice})d@{power-41-weapon-dice}+@{power-41-damage
                             <textarea name="attr_power-42-macro">/me uses @{power-42-name}
 [[1d20+@{power-42-attack}]] vs @{power-42-def} 
 Hit: [[(1*@{power-42-weapon-num-dice})d@{power-42-weapon-dice}+@{power-42-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 42</label>
+                                    <label><span data-i18n="power">Power</span> 42 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-43-position" class="sheet-power-position" value="43">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-43-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 43</label>
@@ -12530,15 +12576,16 @@ Hit: [[(1*@{power-42-weapon-num-dice})d@{power-42-weapon-dice}+@{power-42-damage
                             <textarea name="attr_power-43-macro">/me uses @{power-43-name}
 [[1d20+@{power-43-attack}]] vs @{power-43-def} 
 Hit: [[(1*@{power-43-weapon-num-dice})d@{power-43-weapon-dice}+@{power-43-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 43</label>
+                                    <label><span data-i18n="power">Power</span> 43 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-44-position" class="sheet-power-position" value="44">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-44-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 44</label>
@@ -12776,15 +12823,16 @@ Hit: [[(1*@{power-43-weapon-num-dice})d@{power-43-weapon-dice}+@{power-43-damage
                             <textarea name="attr_power-44-macro">/me uses @{power-44-name}
 [[1d20+@{power-44-attack}]] vs @{power-44-def} 
 Hit: [[(1*@{power-44-weapon-num-dice})d@{power-44-weapon-dice}+@{power-44-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 44</label>
+                                    <label><span data-i18n="power">Power</span> 44 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-45-position" class="sheet-power-position" value="45">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-45-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 45</label>
@@ -13022,15 +13070,16 @@ Hit: [[(1*@{power-44-weapon-num-dice})d@{power-44-weapon-dice}+@{power-44-damage
                             <textarea name="attr_power-45-macro">/me uses @{power-45-name}
 [[1d20+@{power-45-attack}]] vs @{power-45-def} 
 Hit: [[(1*@{power-45-weapon-num-dice})d@{power-45-weapon-dice}+@{power-45-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 45</label>
+                                    <label><span data-i18n="power">Power</span> 45 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-46-position" class="sheet-power-position" value="46">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-46-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 46</label>
@@ -13268,15 +13317,16 @@ Hit: [[(1*@{power-45-weapon-num-dice})d@{power-45-weapon-dice}+@{power-45-damage
                             <textarea name="attr_power-46-macro">/me uses @{power-46-name}
 [[1d20+@{power-46-attack}]] vs @{power-46-def} 
 Hit: [[(1*@{power-46-weapon-num-dice})d@{power-46-weapon-dice}+@{power-46-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 46</label>
+                                    <label><span data-i18n="power">Power</span> 46 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-47-position" class="sheet-power-position" value="47">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-47-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 47</label>
@@ -13514,15 +13564,16 @@ Hit: [[(1*@{power-46-weapon-num-dice})d@{power-46-weapon-dice}+@{power-46-damage
                             <textarea name="attr_power-47-macro">/me uses @{power-47-name}
 [[1d20+@{power-47-attack}]] vs @{power-47-def} 
 Hit: [[(1*@{power-47-weapon-num-dice})d@{power-47-weapon-dice}+@{power-47-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 47</label>
+                                    <label><span data-i18n="power">Power</span> 47 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-48-position" class="sheet-power-position" value="48">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-48-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 48</label>
@@ -13760,15 +13811,16 @@ Hit: [[(1*@{power-47-weapon-num-dice})d@{power-47-weapon-dice}+@{power-47-damage
                             <textarea name="attr_power-48-macro">/me uses @{power-48-name}
 [[1d20+@{power-48-attack}]] vs @{power-48-def} 
 Hit: [[(1*@{power-48-weapon-num-dice})d@{power-48-weapon-dice}+@{power-48-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 48</label>
+                                    <label><span data-i18n="power">Power</span> 48 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-49-position" class="sheet-power-position" value="49">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-49-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 49</label>
@@ -14006,15 +14058,16 @@ Hit: [[(1*@{power-48-weapon-num-dice})d@{power-48-weapon-dice}+@{power-48-damage
                             <textarea name="attr_power-49-macro">/me uses @{power-49-name}
 [[1d20+@{power-49-attack}]] vs @{power-49-def} 
 Hit: [[(1*@{power-49-weapon-num-dice})d@{power-49-weapon-dice}+@{power-49-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 49</label>
+                                    <label><span data-i18n="power">Power</span> 49 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-50-position" class="sheet-power-position" value="50">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-50-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 50</label>
@@ -14252,15 +14305,16 @@ Hit: [[(1*@{power-49-weapon-num-dice})d@{power-49-weapon-dice}+@{power-49-damage
                             <textarea name="attr_power-50-macro">/me uses @{power-50-name}
 [[1d20+@{power-50-attack}]] vs @{power-50-def} 
 Hit: [[(1*@{power-50-weapon-num-dice})d@{power-50-weapon-dice}+@{power-50-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 50</label>
+                                    <label><span data-i18n="power">Power</span> 50 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-51-position" class="sheet-power-position" value="51">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-51-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 51</label>
@@ -14498,15 +14552,16 @@ Hit: [[(1*@{power-50-weapon-num-dice})d@{power-50-weapon-dice}+@{power-50-damage
                             <textarea name="attr_power-51-macro">/me uses @{power-51-name}
 [[1d20+@{power-51-attack}]] vs @{power-51-def} 
 Hit: [[(1*@{power-51-weapon-num-dice})d@{power-51-weapon-dice}+@{power-51-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 51</label>
+                                    <label><span data-i18n="power">Power</span> 51 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-52-position" class="sheet-power-position" value="52">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-52-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 52</label>
@@ -14744,15 +14799,16 @@ Hit: [[(1*@{power-51-weapon-num-dice})d@{power-51-weapon-dice}+@{power-51-damage
                             <textarea name="attr_power-52-macro">/me uses @{power-52-name}
 [[1d20+@{power-52-attack}]] vs @{power-52-def} 
 Hit: [[(1*@{power-52-weapon-num-dice})d@{power-52-weapon-dice}+@{power-52-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 52</label>
+                                    <label><span data-i18n="power">Power</span> 52 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-53-position" class="sheet-power-position" value="53">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-53-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 53</label>
@@ -14990,15 +15046,16 @@ Hit: [[(1*@{power-52-weapon-num-dice})d@{power-52-weapon-dice}+@{power-52-damage
                             <textarea name="attr_power-53-macro">/me uses @{power-53-name}
 [[1d20+@{power-53-attack}]] vs @{power-53-def} 
 Hit: [[(1*@{power-53-weapon-num-dice})d@{power-53-weapon-dice}+@{power-53-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 53</label>
+                                    <label><span data-i18n="power">Power</span> 53 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-54-position" class="sheet-power-position" value="54">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-54-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 54</label>
@@ -15236,15 +15293,16 @@ Hit: [[(1*@{power-53-weapon-num-dice})d@{power-53-weapon-dice}+@{power-53-damage
                             <textarea name="attr_power-54-macro">/me uses @{power-54-name}
 [[1d20+@{power-54-attack}]] vs @{power-54-def} 
 Hit: [[(1*@{power-54-weapon-num-dice})d@{power-54-weapon-dice}+@{power-54-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 54</label>
+                                    <label><span data-i18n="power">Power</span> 54 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-55-position" class="sheet-power-position" value="55">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-55-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 55</label>
@@ -15482,15 +15540,16 @@ Hit: [[(1*@{power-54-weapon-num-dice})d@{power-54-weapon-dice}+@{power-54-damage
                             <textarea name="attr_power-55-macro">/me uses @{power-55-name}
 [[1d20+@{power-55-attack}]] vs @{power-55-def} 
 Hit: [[(1*@{power-55-weapon-num-dice})d@{power-55-weapon-dice}+@{power-55-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 55</label>
+                                    <label><span data-i18n="power">Power</span> 55 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-56-position" class="sheet-power-position" value="56">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-56-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 56</label>
@@ -15728,15 +15787,16 @@ Hit: [[(1*@{power-55-weapon-num-dice})d@{power-55-weapon-dice}+@{power-55-damage
                             <textarea name="attr_power-56-macro">/me uses @{power-56-name}
 [[1d20+@{power-56-attack}]] vs @{power-56-def} 
 Hit: [[(1*@{power-56-weapon-num-dice})d@{power-56-weapon-dice}+@{power-56-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 56</label>
+                                    <label><span data-i18n="power">Power</span> 56 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-57-position" class="sheet-power-position" value="57">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-57-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 57</label>
@@ -15974,15 +16034,16 @@ Hit: [[(1*@{power-56-weapon-num-dice})d@{power-56-weapon-dice}+@{power-56-damage
                             <textarea name="attr_power-57-macro">/me uses @{power-57-name}
 [[1d20+@{power-57-attack}]] vs @{power-57-def} 
 Hit: [[(1*@{power-57-weapon-num-dice})d@{power-57-weapon-dice}+@{power-57-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 57</label>
+                                    <label><span data-i18n="power">Power</span> 57 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-58-position" class="sheet-power-position" value="58">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-58-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 58</label>
@@ -16220,15 +16281,16 @@ Hit: [[(1*@{power-57-weapon-num-dice})d@{power-57-weapon-dice}+@{power-57-damage
                             <textarea name="attr_power-58-macro">/me uses @{power-58-name}
 [[1d20+@{power-58-attack}]] vs @{power-58-def} 
 Hit: [[(1*@{power-58-weapon-num-dice})d@{power-58-weapon-dice}+@{power-58-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 58</label>
+                                    <label><span data-i18n="power">Power</span> 58 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-59-position" class="sheet-power-position" value="59">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-59-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 59</label>
@@ -16466,15 +16528,16 @@ Hit: [[(1*@{power-58-weapon-num-dice})d@{power-58-weapon-dice}+@{power-58-damage
                             <textarea name="attr_power-59-macro">/me uses @{power-59-name}
 [[1d20+@{power-59-attack}]] vs @{power-59-def} 
 Hit: [[(1*@{power-59-weapon-num-dice})d@{power-59-weapon-dice}+@{power-59-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 59</label>
+                                    <label><span data-i18n="power">Power</span> 59 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-60-position" class="sheet-power-position" value="60">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-60-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 60</label>
@@ -16712,15 +16775,16 @@ Hit: [[(1*@{power-59-weapon-num-dice})d@{power-59-weapon-dice}+@{power-59-damage
                             <textarea name="attr_power-60-macro">/me uses @{power-60-name}
 [[1d20+@{power-60-attack}]] vs @{power-60-def} 
 Hit: [[(1*@{power-60-weapon-num-dice})d@{power-60-weapon-dice}+@{power-60-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 60</label>
+                                    <label><span data-i18n="power">Power</span> 60 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-61-position" class="sheet-power-position" value="61">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-61-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 61</label>
@@ -16958,15 +17022,16 @@ Hit: [[(1*@{power-60-weapon-num-dice})d@{power-60-weapon-dice}+@{power-60-damage
                             <textarea name="attr_power-61-macro">/me uses @{power-61-name}
 [[1d20+@{power-61-attack}]] vs @{power-61-def} 
 Hit: [[(1*@{power-61-weapon-num-dice})d@{power-61-weapon-dice}+@{power-61-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 61</label>
+                                    <label><span data-i18n="power">Power</span> 61 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-62-position" class="sheet-power-position" value="62">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-62-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 62</label>
@@ -17204,15 +17269,16 @@ Hit: [[(1*@{power-61-weapon-num-dice})d@{power-61-weapon-dice}+@{power-61-damage
                             <textarea name="attr_power-62-macro">/me uses @{power-62-name}
 [[1d20+@{power-62-attack}]] vs @{power-62-def} 
 Hit: [[(1*@{power-62-weapon-num-dice})d@{power-62-weapon-dice}+@{power-62-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 62</label>
+                                    <label><span data-i18n="power">Power</span> 62 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-63-position" class="sheet-power-position" value="63">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-63-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 63</label>
@@ -17450,15 +17516,16 @@ Hit: [[(1*@{power-62-weapon-num-dice})d@{power-62-weapon-dice}+@{power-62-damage
                             <textarea name="attr_power-63-macro">/me uses @{power-63-name}
 [[1d20+@{power-63-attack}]] vs @{power-63-def} 
 Hit: [[(1*@{power-63-weapon-num-dice})d@{power-63-weapon-dice}+@{power-63-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 63</label>
+                                    <label><span data-i18n="power">Power</span> 63 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-64-position" class="sheet-power-position" value="64">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-64-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 64</label>
@@ -17696,15 +17763,16 @@ Hit: [[(1*@{power-63-weapon-num-dice})d@{power-63-weapon-dice}+@{power-63-damage
                             <textarea name="attr_power-64-macro">/me uses @{power-64-name}
 [[1d20+@{power-64-attack}]] vs @{power-64-def} 
 Hit: [[(1*@{power-64-weapon-num-dice})d@{power-64-weapon-dice}+@{power-64-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 64</label>
+                                    <label><span data-i18n="power">Power</span> 64 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-65-position" class="sheet-power-position" value="65">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-65-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 65</label>
@@ -17942,15 +18010,16 @@ Hit: [[(1*@{power-64-weapon-num-dice})d@{power-64-weapon-dice}+@{power-64-damage
                             <textarea name="attr_power-65-macro">/me uses @{power-65-name}
 [[1d20+@{power-65-attack}]] vs @{power-65-def} 
 Hit: [[(1*@{power-65-weapon-num-dice})d@{power-65-weapon-dice}+@{power-65-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 65</label>
+                                    <label><span data-i18n="power">Power</span> 65 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-66-position" class="sheet-power-position" value="66">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-66-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 66</label>
@@ -18188,15 +18257,16 @@ Hit: [[(1*@{power-65-weapon-num-dice})d@{power-65-weapon-dice}+@{power-65-damage
                             <textarea name="attr_power-66-macro">/me uses @{power-66-name}
 [[1d20+@{power-66-attack}]] vs @{power-66-def} 
 Hit: [[(1*@{power-66-weapon-num-dice})d@{power-66-weapon-dice}+@{power-66-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 66</label>
+                                    <label><span data-i18n="power">Power</span> 66 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-67-position" class="sheet-power-position" value="67">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-67-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 67</label>
@@ -18434,15 +18504,16 @@ Hit: [[(1*@{power-66-weapon-num-dice})d@{power-66-weapon-dice}+@{power-66-damage
                             <textarea name="attr_power-67-macro">/me uses @{power-67-name}
 [[1d20+@{power-67-attack}]] vs @{power-67-def} 
 Hit: [[(1*@{power-67-weapon-num-dice})d@{power-67-weapon-dice}+@{power-67-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 67</label>
+                                    <label><span data-i18n="power">Power</span> 67 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-68-position" class="sheet-power-position" value="68">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-68-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 68</label>
@@ -18680,15 +18751,16 @@ Hit: [[(1*@{power-67-weapon-num-dice})d@{power-67-weapon-dice}+@{power-67-damage
                             <textarea name="attr_power-68-macro">/me uses @{power-68-name}
 [[1d20+@{power-68-attack}]] vs @{power-68-def} 
 Hit: [[(1*@{power-68-weapon-num-dice})d@{power-68-weapon-dice}+@{power-68-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 68</label>
+                                    <label><span data-i18n="power">Power</span> 68 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-69-position" class="sheet-power-position" value="69">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-69-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 69</label>
@@ -18926,15 +18998,16 @@ Hit: [[(1*@{power-68-weapon-num-dice})d@{power-68-weapon-dice}+@{power-68-damage
                             <textarea name="attr_power-69-macro">/me uses @{power-69-name}
 [[1d20+@{power-69-attack}]] vs @{power-69-def} 
 Hit: [[(1*@{power-69-weapon-num-dice})d@{power-69-weapon-dice}+@{power-69-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 69</label>
+                                    <label><span data-i18n="power">Power</span> 69 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-70-position" class="sheet-power-position" value="70">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-70-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 70</label>
@@ -19172,15 +19245,16 @@ Hit: [[(1*@{power-69-weapon-num-dice})d@{power-69-weapon-dice}+@{power-69-damage
                             <textarea name="attr_power-70-macro">/me uses @{power-70-name}
 [[1d20+@{power-70-attack}]] vs @{power-70-def} 
 Hit: [[(1*@{power-70-weapon-num-dice})d@{power-70-weapon-dice}+@{power-70-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 70</label>
+                                    <label><span data-i18n="power">Power</span> 70 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-71-position" class="sheet-power-position" value="71">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-71-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 71</label>
@@ -19418,15 +19492,16 @@ Hit: [[(1*@{power-70-weapon-num-dice})d@{power-70-weapon-dice}+@{power-70-damage
                             <textarea name="attr_power-71-macro">/me uses @{power-71-name}
 [[1d20+@{power-71-attack}]] vs @{power-71-def} 
 Hit: [[(1*@{power-71-weapon-num-dice})d@{power-71-weapon-dice}+@{power-71-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 71</label>
+                                    <label><span data-i18n="power">Power</span> 71 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-72-position" class="sheet-power-position" value="72">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-72-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 72</label>
@@ -19664,15 +19739,16 @@ Hit: [[(1*@{power-71-weapon-num-dice})d@{power-71-weapon-dice}+@{power-71-damage
                             <textarea name="attr_power-72-macro">/me uses @{power-72-name}
 [[1d20+@{power-72-attack}]] vs @{power-72-def} 
 Hit: [[(1*@{power-72-weapon-num-dice})d@{power-72-weapon-dice}+@{power-72-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 72</label>
+                                    <label><span data-i18n="power">Power</span> 72 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-73-position" class="sheet-power-position" value="73">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-73-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 73</label>
@@ -19910,15 +19986,16 @@ Hit: [[(1*@{power-72-weapon-num-dice})d@{power-72-weapon-dice}+@{power-72-damage
                             <textarea name="attr_power-73-macro">/me uses @{power-73-name}
 [[1d20+@{power-73-attack}]] vs @{power-73-def} 
 Hit: [[(1*@{power-73-weapon-num-dice})d@{power-73-weapon-dice}+@{power-73-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 73</label>
+                                    <label><span data-i18n="power">Power</span> 73 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-74-position" class="sheet-power-position" value="74">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-74-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 74</label>
@@ -20156,15 +20233,16 @@ Hit: [[(1*@{power-73-weapon-num-dice})d@{power-73-weapon-dice}+@{power-73-damage
                             <textarea name="attr_power-74-macro">/me uses @{power-74-name}
 [[1d20+@{power-74-attack}]] vs @{power-74-def} 
 Hit: [[(1*@{power-74-weapon-num-dice})d@{power-74-weapon-dice}+@{power-74-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 74</label>
+                                    <label><span data-i18n="power">Power</span> 74 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-75-position" class="sheet-power-position" value="75">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-75-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 75</label>
@@ -20402,15 +20480,16 @@ Hit: [[(1*@{power-74-weapon-num-dice})d@{power-74-weapon-dice}+@{power-74-damage
                             <textarea name="attr_power-75-macro">/me uses @{power-75-name}
 [[1d20+@{power-75-attack}]] vs @{power-75-def} 
 Hit: [[(1*@{power-75-weapon-num-dice})d@{power-75-weapon-dice}+@{power-75-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 75</label>
+                                    <label><span data-i18n="power">Power</span> 75 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-76-position" class="sheet-power-position" value="76">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-76-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 76</label>
@@ -20648,15 +20727,16 @@ Hit: [[(1*@{power-75-weapon-num-dice})d@{power-75-weapon-dice}+@{power-75-damage
                             <textarea name="attr_power-76-macro">/me uses @{power-76-name}
 [[1d20+@{power-76-attack}]] vs @{power-76-def} 
 Hit: [[(1*@{power-76-weapon-num-dice})d@{power-76-weapon-dice}+@{power-76-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 76</label>
+                                    <label><span data-i18n="power">Power</span> 76 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-77-position" class="sheet-power-position" value="77">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-77-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 77</label>
@@ -20894,15 +20974,16 @@ Hit: [[(1*@{power-76-weapon-num-dice})d@{power-76-weapon-dice}+@{power-76-damage
                             <textarea name="attr_power-77-macro">/me uses @{power-77-name}
 [[1d20+@{power-77-attack}]] vs @{power-77-def} 
 Hit: [[(1*@{power-77-weapon-num-dice})d@{power-77-weapon-dice}+@{power-77-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 77</label>
+                                    <label><span data-i18n="power">Power</span> 77 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-78-position" class="sheet-power-position" value="78">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-78-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 78</label>
@@ -21140,15 +21221,16 @@ Hit: [[(1*@{power-77-weapon-num-dice})d@{power-77-weapon-dice}+@{power-77-damage
                             <textarea name="attr_power-78-macro">/me uses @{power-78-name}
 [[1d20+@{power-78-attack}]] vs @{power-78-def} 
 Hit: [[(1*@{power-78-weapon-num-dice})d@{power-78-weapon-dice}+@{power-78-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 78</label>
+                                    <label><span data-i18n="power">Power</span> 78 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-79-position" class="sheet-power-position" value="79">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-79-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 79</label>
@@ -21386,15 +21468,16 @@ Hit: [[(1*@{power-78-weapon-num-dice})d@{power-78-weapon-dice}+@{power-78-damage
                             <textarea name="attr_power-79-macro">/me uses @{power-79-name}
 [[1d20+@{power-79-attack}]] vs @{power-79-def} 
 Hit: [[(1*@{power-79-weapon-num-dice})d@{power-79-weapon-dice}+@{power-79-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 79</label>
+                                    <label><span data-i18n="power">Power</span> 79 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-80-position" class="sheet-power-position" value="80">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-80-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 80</label>
@@ -21632,15 +21715,16 @@ Hit: [[(1*@{power-79-weapon-num-dice})d@{power-79-weapon-dice}+@{power-79-damage
                             <textarea name="attr_power-80-macro">/me uses @{power-80-name}
 [[1d20+@{power-80-attack}]] vs @{power-80-def} 
 Hit: [[(1*@{power-80-weapon-num-dice})d@{power-80-weapon-dice}+@{power-80-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 80</label>
+                                    <label><span data-i18n="power">Power</span> 80 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-81-position" class="sheet-power-position" value="81">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-81-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 81</label>
@@ -21878,15 +21962,16 @@ Hit: [[(1*@{power-80-weapon-num-dice})d@{power-80-weapon-dice}+@{power-80-damage
                             <textarea name="attr_power-81-macro">/me uses @{power-81-name}
 [[1d20+@{power-81-attack}]] vs @{power-81-def} 
 Hit: [[(1*@{power-81-weapon-num-dice})d@{power-81-weapon-dice}+@{power-81-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 81</label>
+                                    <label><span data-i18n="power">Power</span> 81 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-82-position" class="sheet-power-position" value="82">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-82-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 82</label>
@@ -22124,15 +22209,16 @@ Hit: [[(1*@{power-81-weapon-num-dice})d@{power-81-weapon-dice}+@{power-81-damage
                             <textarea name="attr_power-82-macro">/me uses @{power-82-name}
 [[1d20+@{power-82-attack}]] vs @{power-82-def} 
 Hit: [[(1*@{power-82-weapon-num-dice})d@{power-82-weapon-dice}+@{power-82-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 82</label>
+                                    <label><span data-i18n="power">Power</span> 82 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-83-position" class="sheet-power-position" value="83">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-83-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 83</label>
@@ -22370,15 +22456,16 @@ Hit: [[(1*@{power-82-weapon-num-dice})d@{power-82-weapon-dice}+@{power-82-damage
                             <textarea name="attr_power-83-macro">/me uses @{power-83-name}
 [[1d20+@{power-83-attack}]] vs @{power-83-def} 
 Hit: [[(1*@{power-83-weapon-num-dice})d@{power-83-weapon-dice}+@{power-83-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 83</label>
+                                    <label><span data-i18n="power">Power</span> 83 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-84-position" class="sheet-power-position" value="84">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-84-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 84</label>
@@ -22616,15 +22703,16 @@ Hit: [[(1*@{power-83-weapon-num-dice})d@{power-83-weapon-dice}+@{power-83-damage
                             <textarea name="attr_power-84-macro">/me uses @{power-84-name}
 [[1d20+@{power-84-attack}]] vs @{power-84-def} 
 Hit: [[(1*@{power-84-weapon-num-dice})d@{power-84-weapon-dice}+@{power-84-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 84</label>
+                                    <label><span data-i18n="power">Power</span> 84 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-85-position" class="sheet-power-position" value="85">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-85-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 85</label>
@@ -22862,15 +22950,16 @@ Hit: [[(1*@{power-84-weapon-num-dice})d@{power-84-weapon-dice}+@{power-84-damage
                             <textarea name="attr_power-85-macro">/me uses @{power-85-name}
 [[1d20+@{power-85-attack}]] vs @{power-85-def} 
 Hit: [[(1*@{power-85-weapon-num-dice})d@{power-85-weapon-dice}+@{power-85-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 85</label>
+                                    <label><span data-i18n="power">Power</span> 85 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-86-position" class="sheet-power-position" value="86">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-86-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 86</label>
@@ -23108,15 +23197,16 @@ Hit: [[(1*@{power-85-weapon-num-dice})d@{power-85-weapon-dice}+@{power-85-damage
                             <textarea name="attr_power-86-macro">/me uses @{power-86-name}
 [[1d20+@{power-86-attack}]] vs @{power-86-def} 
 Hit: [[(1*@{power-86-weapon-num-dice})d@{power-86-weapon-dice}+@{power-86-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 86</label>
+                                    <label><span data-i18n="power">Power</span> 86 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-87-position" class="sheet-power-position" value="87">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-87-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 87</label>
@@ -23354,15 +23444,16 @@ Hit: [[(1*@{power-86-weapon-num-dice})d@{power-86-weapon-dice}+@{power-86-damage
                             <textarea name="attr_power-87-macro">/me uses @{power-87-name}
 [[1d20+@{power-87-attack}]] vs @{power-87-def} 
 Hit: [[(1*@{power-87-weapon-num-dice})d@{power-87-weapon-dice}+@{power-87-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 87</label>
+                                    <label><span data-i18n="power">Power</span> 87 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-88-position" class="sheet-power-position" value="88">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-88-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 88</label>
@@ -23600,15 +23691,16 @@ Hit: [[(1*@{power-87-weapon-num-dice})d@{power-87-weapon-dice}+@{power-87-damage
                             <textarea name="attr_power-88-macro">/me uses @{power-88-name}
 [[1d20+@{power-88-attack}]] vs @{power-88-def} 
 Hit: [[(1*@{power-88-weapon-num-dice})d@{power-88-weapon-dice}+@{power-88-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 88</label>
+                                    <label><span data-i18n="power">Power</span> 88 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-89-position" class="sheet-power-position" value="89">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-89-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 89</label>
@@ -23846,15 +23938,16 @@ Hit: [[(1*@{power-88-weapon-num-dice})d@{power-88-weapon-dice}+@{power-88-damage
                             <textarea name="attr_power-89-macro">/me uses @{power-89-name}
 [[1d20+@{power-89-attack}]] vs @{power-89-def} 
 Hit: [[(1*@{power-89-weapon-num-dice})d@{power-89-weapon-dice}+@{power-89-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 89</label>
+                                    <label><span data-i18n="power">Power</span> 89 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-90-position" class="sheet-power-position" value="90">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-90-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 90</label>
@@ -24092,15 +24185,16 @@ Hit: [[(1*@{power-89-weapon-num-dice})d@{power-89-weapon-dice}+@{power-89-damage
                             <textarea name="attr_power-90-macro">/me uses @{power-90-name}
 [[1d20+@{power-90-attack}]] vs @{power-90-def} 
 Hit: [[(1*@{power-90-weapon-num-dice})d@{power-90-weapon-dice}+@{power-90-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 90</label>
+                                    <label><span data-i18n="power">Power</span> 90 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-91-position" class="sheet-power-position" value="91">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-91-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 91</label>
@@ -24338,15 +24432,16 @@ Hit: [[(1*@{power-90-weapon-num-dice})d@{power-90-weapon-dice}+@{power-90-damage
                             <textarea name="attr_power-91-macro">/me uses @{power-91-name}
 [[1d20+@{power-91-attack}]] vs @{power-91-def} 
 Hit: [[(1*@{power-91-weapon-num-dice})d@{power-91-weapon-dice}+@{power-91-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 91</label>
+                                    <label><span data-i18n="power">Power</span> 91 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-92-position" class="sheet-power-position" value="92">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-92-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 92</label>
@@ -24584,15 +24679,16 @@ Hit: [[(1*@{power-91-weapon-num-dice})d@{power-91-weapon-dice}+@{power-91-damage
                             <textarea name="attr_power-92-macro">/me uses @{power-92-name}
 [[1d20+@{power-92-attack}]] vs @{power-92-def} 
 Hit: [[(1*@{power-92-weapon-num-dice})d@{power-92-weapon-dice}+@{power-92-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 92</label>
+                                    <label><span data-i18n="power">Power</span> 92 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-93-position" class="sheet-power-position" value="93">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-93-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 93</label>
@@ -24830,15 +24926,16 @@ Hit: [[(1*@{power-92-weapon-num-dice})d@{power-92-weapon-dice}+@{power-92-damage
                             <textarea name="attr_power-93-macro">/me uses @{power-93-name}
 [[1d20+@{power-93-attack}]] vs @{power-93-def} 
 Hit: [[(1*@{power-93-weapon-num-dice})d@{power-93-weapon-dice}+@{power-93-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 93</label>
+                                    <label><span data-i18n="power">Power</span> 93 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-94-position" class="sheet-power-position" value="94">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-94-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 94</label>
@@ -25076,15 +25173,16 @@ Hit: [[(1*@{power-93-weapon-num-dice})d@{power-93-weapon-dice}+@{power-93-damage
                             <textarea name="attr_power-94-macro">/me uses @{power-94-name}
 [[1d20+@{power-94-attack}]] vs @{power-94-def} 
 Hit: [[(1*@{power-94-weapon-num-dice})d@{power-94-weapon-dice}+@{power-94-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 94</label>
+                                    <label><span data-i18n="power">Power</span> 94 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-95-position" class="sheet-power-position" value="95">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-95-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 95</label>
@@ -25322,15 +25420,16 @@ Hit: [[(1*@{power-94-weapon-num-dice})d@{power-94-weapon-dice}+@{power-94-damage
                             <textarea name="attr_power-95-macro">/me uses @{power-95-name}
 [[1d20+@{power-95-attack}]] vs @{power-95-def} 
 Hit: [[(1*@{power-95-weapon-num-dice})d@{power-95-weapon-dice}+@{power-95-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 95</label>
+                                    <label><span data-i18n="power">Power</span> 95 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-96-position" class="sheet-power-position" value="96">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-96-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 96</label>
@@ -25568,15 +25667,16 @@ Hit: [[(1*@{power-95-weapon-num-dice})d@{power-95-weapon-dice}+@{power-95-damage
                             <textarea name="attr_power-96-macro">/me uses @{power-96-name}
 [[1d20+@{power-96-attack}]] vs @{power-96-def} 
 Hit: [[(1*@{power-96-weapon-num-dice})d@{power-96-weapon-dice}+@{power-96-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 96</label>
+                                    <label><span data-i18n="power">Power</span> 96 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-97-position" class="sheet-power-position" value="97">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-97-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 97</label>
@@ -25814,15 +25914,16 @@ Hit: [[(1*@{power-96-weapon-num-dice})d@{power-96-weapon-dice}+@{power-96-damage
                             <textarea name="attr_power-97-macro">/me uses @{power-97-name}
 [[1d20+@{power-97-attack}]] vs @{power-97-def} 
 Hit: [[(1*@{power-97-weapon-num-dice})d@{power-97-weapon-dice}+@{power-97-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 97</label>
+                                    <label><span data-i18n="power">Power</span> 97 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-98-position" class="sheet-power-position" value="98">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-98-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 98</label>
@@ -26060,15 +26161,16 @@ Hit: [[(1*@{power-97-weapon-num-dice})d@{power-97-weapon-dice}+@{power-97-damage
                             <textarea name="attr_power-98-macro">/me uses @{power-98-name}
 [[1d20+@{power-98-attack}]] vs @{power-98-def} 
 Hit: [[(1*@{power-98-weapon-num-dice})d@{power-98-weapon-dice}+@{power-98-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 98</label>
+                                    <label><span data-i18n="power">Power</span> 98 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-99-position" class="sheet-power-position" value="99">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-99-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span> 99</label>
@@ -26306,15 +26408,16 @@ Hit: [[(1*@{power-98-weapon-num-dice})d@{power-98-weapon-dice}+@{power-98-damage
                             <textarea name="attr_power-99-macro">/me uses @{power-99-name}
 [[1d20+@{power-99-attack}]] vs @{power-99-def} 
 Hit: [[(1*@{power-99-weapon-num-dice})d@{power-99-weapon-dice}+@{power-99-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 99</label>
+                                    <label><span data-i18n="power">Power</span> 99 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <input type="hidden" name="attr_power-100-position" class="sheet-power-position" value="100">
                 <div class="sheet-power-card-toggle-container">
                     <input type="checkbox" name="attr_power-100-toggle" class="sheet-power-card-toggle sheet-tab-settings">
                     <label class="sheet-tab-settings"><span data-i18n="power">Power</span></span> 100</label>
@@ -26373,7 +26476,7 @@ Hit: [[(1*@{power-99-weapon-num-dice})d@{power-99-weapon-dice}+@{power-99-damage
                         <div class="sheet-labelfix"></div>
                         <div class="sheet-power-move-row">
                             <button type="action" name="act_power_100_moveup" class="sheet-power-move" data-i18n-title="move_power_up" title="Move power up">&#9650;</button>
-                            <span class="sheet-power-move-placeholder"></span>
+                            <button type="action" name="act_power_100_movedown" class="sheet-power-move" data-i18n-title="move_power_down" title="Move power down">&#9660;</button>
                         </div>
                         <input type="checkbox" class="sheet-toggle" checked>
                         <label class="sheet-headtwo" data-i18n="settings">Settings</label>
@@ -26552,9 +26655,9 @@ Hit: [[(1*@{power-99-weapon-num-dice})d@{power-99-weapon-dice}+@{power-99-damage
                             <textarea name="attr_power-100-macro">/me uses @{power-100-name}
 [[1d20+@{power-100-attack}]] vs @{power-100-def} 
 Hit: [[(1*@{power-100-weapon-num-dice})d@{power-100-weapon-dice}+@{power-100-damage}]] Damage</textarea>
-                            <div class="sheet-header">
+                            <div class="sheet-header sheet-power-slot-label">
                                 <div class="sheet-item sheet-huge">
-                                    <label><span data-i18n="power">Power</span> 100</label>
+                                    <label><span data-i18n="power">Power</span> 100 <span class="sheet-power-slot-hint" data-i18n="power_slot_hint">the number macros and token actions use for this power</span></label>
                                 </div>
                             </div>
                         </div>
@@ -27923,75 +28026,100 @@ Object.keys(multistats).forEach(destination => {
 });
 
 /*  ======================================================
-        POWER REORDERING
+        POWER ORDER
     ======================================================
     Powers are 100 fixed slots rather than a repeating section, so there is no
-    native drag handle. These handlers move a power's *contents* between slots;
-    the slot numbering itself never changes, so no character data has to be
-    migrated.
+    native drag handle. A power never leaves its slot: power-3-* always holds
+    the same power, so token actions and macros such as @{power-3-macro} keep
+    rolling the power they were made for however the list is arranged.
 
-    Be careful about what power-<slot>-* means to anything outside the sheet:
-    it names a slot, not a power. A token action bound to @{power-3-macro}
-    keeps resolving after a reorder, but it now rolls whichever power moved
-    into slot 3 - so a button labelled "Cleave" can quietly start rolling
-    something else. That is inherent to reordering fixed slots: as long as the
-    handle is a position, moving powers changes what it points at.
+    What the player arranges is the display order. Every card is preceded by a
+    hidden power-<slot>-position input, 1-100, which the CSS turns into the
+    card's flex order on the Powers tab. Its default is the slot number, so a
+    character that has never been rearranged lists its powers in slot order.
+    The Settings tab ignores positions and keeps its grid in slot order, so
+    "Power 3" there is always slot 3.
 
-    The macro stores its slot number inside its own text, so it is reindexed as
-    it moves - otherwise a power moved into slot 2 would keep rolling slot 3's
-    attack and damage. Attack and damage are not moved at all: they are
-    disabled fields whose formula is fixed by the HTML for each slot, so each
-    slot's formula already reads whichever power is sitting in it.
+    These handlers only ever write positions, and always as one full 1-100
+    sequence, which also repairs any duplicates left by two people editing
+    at once.
     ======================================================*/
 
 const POWER_COUNT = 100;
-const POWER_FIELDS = ['name','action','range','level','used','useage','toggle','mod','def',
-    'weapon-attack','weapon-damage','weapon-num-dice','weapon-dice',
-    'attack-misc','damage-misc','macro'];
-const POWER_INDEXED = ['macro'];
 
-// '@{power-1-' never matches '@{power-10-' because of the trailing hyphen.
-const reindexPower = (text, from, to) =>
-    String(text === undefined || text === null ? '' : text)
-        .split(`@{power-${from}-`).join(`@{power-${to}-`);
+// Mirrors the CSS: only 1-100 have an order rule, anything else gets flex's
+// default order of 0, and ties fall back to slot order, as the DOM does.
+const powerPosition = (values, slot) => {
+    const position = parseInt(values[`power-${slot}-position`], 10);
+    return position >= 1 && position <= POWER_COUNT ? position : 0;
+};
 
-const swapPowers = (a, b) => {
-    const names = [];
-    POWER_FIELDS.forEach(f => names.push(`power-${a}-${f}`, `power-${b}-${f}`));
-    getAttrs(names, function (values) {
-        const output = {};
-        POWER_FIELDS.forEach(f => {
-            let av = values[`power-${a}-${f}`];
-            let bv = values[`power-${b}-${f}`];
-            if (POWER_INDEXED.indexOf(f) !== -1) {
-                av = reindexPower(av, a, b);
-                bv = reindexPower(bv, b, a);
-            }
-            output[`power-${a}-${f}`] = bv;
-            output[`power-${b}-${f}`] = av;
-        });
+// Every slot, in the order the Powers tab displays them.
+const powerDisplayOrder = (values) => {
+    const slots = [];
+    for (let slot = 1; slot <= POWER_COUNT; slot++) {
+        slots.push(slot);
+    }
+    return slots.sort((a, b) => (powerPosition(values, a) - powerPosition(values, b)) || (a - b));
+};
+
+// order[index] is the slot to display at position index + 1; only changed positions
+// are written, together with any other attributes passed in alongside them.
+const savePowerDisplayOrder = (order, values, alongside = {}) => {
+    const output = Object.assign({}, alongside);
+    order.forEach((slot, index) => {
+        if (String(values[`power-${slot}-position`]) !== String(index + 1)) {
+            output[`power-${slot}-position`] = String(index + 1);
+        }
+    });
+    if (Object.keys(output).length) {
         setAttrs(output, {silent: true});
+    }
+};
+
+// A card is on the Powers tab only while its Settings-tab checkbox is ticked.
+const isPowerShown = (toggle) =>
+    toggle !== undefined && toggle !== null && toggle !== '' && toggle !== '0';
+
+// Up and down step over cards hidden from the Powers tab, so every click visibly moves the card.
+const movePower = (slot, step) => {
+    const names = [];
+    for (let i = 1; i <= POWER_COUNT; i++) {
+        names.push(`power-${i}-position`, `power-${i}-toggle`);
+    }
+    getAttrs(names, function (values) {
+        const order = powerDisplayOrder(values);
+        const from = order.indexOf(slot);
+        let to = from + step;
+        while (to >= 0 && to < order.length && !isPowerShown(values[`power-${order[to]}-toggle`])) {
+            to += step;
+        }
+        if (to < 0 || to >= order.length) {
+            return;                           // already first or last on the Powers tab
+        }
+        // Lift the card out and drop it on the far side of that neighbour, leaving
+        // the hidden cards in between where they were. Index `to` is right either
+        // way: going down, the removal shifts the neighbour back to `to - 1`.
+        order.splice(from, 1);
+        order.splice(to, 0, slot);
+        savePowerDisplayOrder(order, values);
     });
 };
 
 for (let i = 1; i <= POWER_COUNT; i++) {
-    if (i > 1) {
-        on(`clicked:power_${i}_moveup`, function () { swapPowers(i, i - 1); });
-    }
-    if (i < POWER_COUNT) {
-        on(`clicked:power_${i}_movedown`, function () { swapPowers(i, i + 1); });
-    }
+    on(`clicked:power_${i}_moveup`, function () { movePower(i, -1); });
+    on(`clicked:power_${i}_movedown`, function () { movePower(i, 1); });
 }
 
 /*  Sort every filled power by the key chosen in the 'Sort powers by' dropdown -
-    usage, level, power action or name - keeping the existing relative order among
-    powers that tie, and push the empty slots to the end. 'Power Name' is the
-    untouched default, so a slot still holding it is empty.
+    usage, level, power action or name - and list the empty slots after them.
+    Powers that tie keep the order the player had arranged. 'Power Name' is
+    the untouched default, so a slot still holding it is empty.
 
-    Sorting moves nearly every power at once, so it takes two clicks: 'Sort'
-    only reveals a warning with Sort now / Cancel, and the sort itself runs
-    from Sort now. Sheet workers cannot open a browser dialog, so the
-    confirmation is a hidden attribute that the CSS reads.  */
+    A sort throws away the order the player arranged by hand, so it takes two
+    clicks: 'Sort' only reveals a warning with Sort now / Cancel, and the sort
+    itself runs from Sort now. Sheet workers cannot open a browser dialog, so
+    the confirmation is a hidden attribute that the CSS reads.  */
 
 const POWER_SORT_AWAITING_CONFIRMATION = 'power-sort-awaiting-confirmation';
 
@@ -28042,34 +28170,19 @@ const compareRanks = (a, b) => (typeof a === 'string'
     : (a < b ? -1 : a > b ? 1 : 0));
 
 on('clicked:sort_powers_confirm', function () {
-    const names = [];
+    const names = [POWER_SORT_KEY];
     for (let i = 1; i <= POWER_COUNT; i++) {
-        POWER_FIELDS.forEach(f => names.push(`power-${i}-${f}`));
+        ['name', 'useage', 'level', 'action', 'position'].forEach(f => names.push(`power-${i}-${f}`));
     }
-    names.push(POWER_SORT_KEY);
     getAttrs(names, function (values) {
         const rank = POWER_SORT_RANKS[values[POWER_SORT_KEY]] || POWER_SORT_RANKS.usage;
-        const filled = [];
-        const empty = [];
-        for (let i = 1; i <= POWER_COUNT; i++) {
-            (isPowerFilled(values[`power-${i}-name`]) ? filled : empty).push(i);
-        }
-        // Stable: powers that tie keep the order the player already arranged.
-        filled.sort((x, y) => compareRanks(rank(values, x), rank(values, y)) || (x - y));
-
-        const order = filled.concat(empty);   // order[dest - 1] = source slot
-        const output = {[POWER_SORT_AWAITING_CONFIRMATION]: '0'};
-        order.forEach((source, index) => {
-            const dest = index + 1;
-            if (source === dest) return;      // only write the slots that actually move
-            POWER_FIELDS.forEach(f => {
-                const value = values[`power-${source}-${f}`];
-                output[`power-${dest}-${f}`] = POWER_INDEXED.indexOf(f) !== -1
-                    ? reindexPower(value, source, dest)
-                    : value;
-            });
-        });
-        setAttrs(output, {silent: true});
+        const current = powerDisplayOrder(values);
+        const filled = current.filter(slot => isPowerFilled(values[`power-${slot}-name`]));
+        const empty = current.filter(slot => !isPowerFilled(values[`power-${slot}-name`]));
+        // Stable: ties keep their current display order.
+        filled.sort((x, y) => compareRanks(rank(values, x), rank(values, y))
+            || (current.indexOf(x) - current.indexOf(y)));
+        savePowerDisplayOrder(filled.concat(empty), values, {[POWER_SORT_AWAITING_CONFIRMATION]: '0'});
     });
 });
 
