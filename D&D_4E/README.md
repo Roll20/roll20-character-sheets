@@ -69,6 +69,9 @@ so token actions and macros kept outside the sheet, such as @{power-3-macro} or
 %{CharacterName|-power-3}, keep rolling the same power however the list is
 arranged.
 
+To find a power's slot number on the Powers tab, click into its macro box: the
+"Power N" line underneath is highlighted while the cursor is there.
+
 Updates:
 
 2014-04-23 14:27 :
