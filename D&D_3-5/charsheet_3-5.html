@@ -9,7 +9,19 @@
 <div class="content-sheet">
     <input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="8.0"/>
     <input type="hidden" name="attr_code_version" title="code_version" value="0"/>
+    <input type="hidden" name="attr_sheet_schema_version" title="sheet_schema_version" value="0"/>
     <input type="hidden" name="attr_initiativetokenmacro" value="@{initmacro}"/>
+
+    <!-- Keep the retired section registered so getSectionIDs can discover rows created before v2.7.9. -->
+    <div class="legacy-repeating-spells-migration" style="display: none;" aria-hidden="true">
+        <fieldset class="repeating_spells">
+            <input type="hidden" name="attr_spellused11"/>
+            <input type="hidden" name="attr_spellprep11"/>
+            <input type="hidden" name="attr_spellname11"/>
+            <input type="hidden" name="attr_spelllevel11"/>
+            <input type="hidden" name="attr_spellmacro11"/>
+        </fieldset>
+    </div>
 
     <input type="radio" class="switch-pc-show switch" title="npc-show" name="attr_npc-show" value="1" checked /><span style="text-align: left;" data-i18n="pc" >PC </span><span> &nbsp; &nbsp; &nbsp; &nbsp;</span>
     <input type="radio" class="switch-npc-show switch" title="npc-show" name="attr_npc-show" value="2" /><span style="text-align: left;" data-i18n="npc">NPC</span>
@@ -6692,7 +6704,7 @@
                         <button type="action" name="act_grantManeuver" class="btn-action"><span style="text-align: right;" data-i18n="grant-maneuvers" >Grant Maneuver</span></button>
                         <button type="action" name="act_resetUsedManeuver" class="btn-action" style="margin-left: 15px;"><span style="text-align: right;" data-i18n="reset-used" >Reset Used</span></button>
                         <button type="action" name="act_resetGrantedManeuver" class="btn-action" style="margin-left: 15px;"><span style="text-align: right;" data-i18n="reset-granted" >Reset Granted</span></button>
-                        <button type="action" name="act_resetReadiedManeuver" class="btn-action" style="margin-left: 15px;"><span style="text-align: right;" data-i18n="reset-readied" >Grang Readied</span></button>
+                        <button type="action" name="act_resetReadiedManeuver" class="btn-action" style="margin-left: 15px;"><span style="text-align: right;" data-i18n="reset-readied" >Reset Readied</span></button>
                     </div>
                     <hr style="margin: 0; border: none;"/>
 
@@ -9347,11 +9359,19 @@
                             </table>
                         </div>
                         <script type="text/worker">
+const sumSummonNumberedAttributes = (values, prefix, count = 10) => {
+	return Array.from({length: count}, (unused, index) => index + 1)
+		.reduce((total, row) => {
+			const number = Number(values[`${prefix}${row}`]);
+			return total + (Number.isFinite(number) ? number : 0);
+		}, 0);
+};
+
 on("change:repeating_summons:summonsautoCalcHP change:repeating_summons:summonslevel1 change:repeating_summons:summonslevel2 change:repeating_summons:summonslevel3 change:repeating_summons:summonslevel4 change:repeating_summons:summonslevel5 change:repeating_summons:summonslevel6 change:repeating_summons:summonslevel7 change:repeating_summons:summonslevel8 change:repeating_summons:summonslevel9 change:repeating_summons:summonslevel10", eventInfo => {
 	getAttrs(["repeating_summons_summonsautoCalcHP", "repeating_summons_summonslevel1", "repeating_summons_summonslevel2", "repeating_summons_summonslevel3", "repeating_summons_summonslevel4", "repeating_summons_summonslevel5", "repeating_summons_summonslevel6", "repeating_summons_summonslevel7", "repeating_summons_summonslevel8", "repeating_summons_summonslevel9", "repeating_summons_summonslevel10"], values => {
     	if(values.repeating_summons_summonsautoCalcHP == 1){
 			setAttrs({
-				repeating_summons_summonslevel : parseInt(values.repeating_summons_summonslevel1, 10) + parseInt(values.repeating_summons_summonslevel2, 10) + parseInt(values.repeating_summons_summonslevel3, 10) + parseInt(values.repeating_summons_summonslevel4, 10) + parseInt(values.repeating_summons_summonslevel5, 10) + parseInt(values.repeating_summons_summonslevel6, 10) + parseInt(values.repeating_summons_summonslevel7, 10) + parseInt(values.repeating_summons_summonslevel8, 10) + parseInt(values.repeating_summons_summonslevel9, 10) + parseInt(values.repeating_summons_summonslevel10, 10)
+				repeating_summons_summonslevel : sumSummonNumberedAttributes(values, "repeating_summons_summonslevel")
 			});
 		}
    	});
@@ -9361,7 +9381,7 @@ on("change:repeating_summons:summonsautoCalcHP change:repeating_summons:summonsh
 	getAttrs(["repeating_summons_summonsautoCalcHP", "repeating_summons_summonshitdie1", "repeating_summons_summonshitdie2", "repeating_summons_summonshitdie3", "repeating_summons_summonshitdie4", "repeating_summons_summonshitdie5", "repeating_summons_summonshitdie6", "repeating_summons_summonshitdie7", "repeating_summons_summonshitdie8", "repeating_summons_summonshitdie9", "repeating_summons_summonshitdie10"], values => {
     	if(values.repeating_summons_summonsautoCalcHP == 1){
 			setAttrs({
-				repeating_summons_summonshitdie : parseInt(values.repeating_summons_summonshitdie1, 10) + parseInt(values.repeating_summons_summonshitdie2, 10) + parseInt(values.repeating_summons_summonshitdie3, 10) + parseInt(values.repeating_summons_summonshitdie4, 10) + parseInt(values.repeating_summons_summonshitdie5, 10) + parseInt(values.repeating_summons_summonshitdie6, 10) + parseInt(values.repeating_summons_summonshitdie7, 10) + parseInt(values.repeating_summons_summonshitdie8, 10) + parseInt(values.repeating_summons_summonshitdie9, 10) + parseInt(values.repeating_summons_summonshitdie10, 10)
+				repeating_summons_summonshitdie : sumSummonNumberedAttributes(values, "repeating_summons_summonshitdie")
 			});
 		}
    	});
@@ -9371,7 +9391,7 @@ on("change:repeating_summons:summonsautoCalcHP change:repeating_summons:summonsh
 	getAttrs(["repeating_summons_summonsautoCalcHP", "repeating_summons_summonshitpoint1", "repeating_summons_summonshitpoint2", "repeating_summons_summonshitpoint3", "repeating_summons_summonshitpoint4", "repeating_summons_summonshitpoint5", "repeating_summons_summonshitpoint6", "repeating_summons_summonshitpoint7", "repeating_summons_summonshitpoint8", "repeating_summons_summonshitpoint9", "repeating_summons_summonshitpoint10"], values => {
     	if(values.repeating_summons_summonsautoCalcHP == 1){
 			setAttrs({
-				repeating_summons_summonshitpoint : parseInt(values.repeating_summons_summonshitpoint1, 10) + parseInt(values.repeating_summons_summonshitpoint2, 10) + parseInt(values.repeating_summons_summonshitpoint3, 10) + parseInt(values.repeating_summons_summonshitpoint4, 10) + parseInt(values.repeating_summons_summonshitpoint5, 10) + parseInt(values.repeating_summons_summonshitpoint6, 10) + parseInt(values.repeating_summons_summonshitpoint7, 10) + parseInt(values.repeating_summons_summonshitpoint8, 10) + parseInt(values.repeating_summons_summonshitpoint9, 10) + parseInt(values.repeating_summons_summonshitpoint10, 10)
+				repeating_summons_summonshitpoint : sumSummonNumberedAttributes(values, "repeating_summons_summonshitpoint")
 			});
 		}
    	});
@@ -13699,78 +13719,160 @@ on("change:totalequipmentweight change:equipmentweightcopy", function() {
 /*  ======================================
             VERSION MANAGEMENT
     ====================================== */
+const CURRENT_SHEET_SCHEMA_VERSION = 1;
+const LEGACY_SPELLS_SCHEMA_VERSION = 1;
+
 on('sheet:opened', () => {
-    getAttrs(['code_version'], function (v) {
-        let code_version = parseFloat(v['code_version']) || 0;
-        console.log('Current sheet code version:' + code_version);
-        versionator(code_version);
-    });
+	getAttrs(['sheet_schema_version', 'code_version'], values => {
+		const storedSchemaVersion = parseSheetSchemaVersion(values.sheet_schema_version);
+		const legacyCodeVersion = parseFloat(values.code_version) || 0;
+		const initialSchemaVersion = storedSchemaVersion > 0
+			? storedSchemaVersion
+			: (legacyCodeVersion >= 0.1 ? LEGACY_SPELLS_SCHEMA_VERSION : 0);
+
+		if(initialSchemaVersion !== storedSchemaVersion){
+			setAttrs({sheet_schema_version: initialSchemaVersion}, {silent: true}, () => {
+				runSheetMigrations(initialSchemaVersion);
+			});
+		}else{
+			runSheetMigrations(initialSchemaVersion);
+		}
+	});
 });
-const versionator = (code_version) => {
-    if (code_version < 0.1) {
-        repSpellsFix(0.1);
-    } else {
-        console.log('Current sheet code version:' + code_version);
-    }
+
+const parseSheetSchemaVersion = value => {
+	const version = Number(value);
+	return Number.isInteger(version) && version >= 0 ? version : 0;
 };
 
-const repSpellsFix = function (code_version) {
-    // copy repeating_spells to repeating_spells11
-    const fields = ['spellused11','spellprep11', 'spellname11', 'spelllevel11', 'spellmacro11'];
-    const getRepeatingName = (section, id, field) => `repeating_${section}_${id}_${field}`;
-    getSectionIDs('repeating_spells', function (idarray) { //Get oldSectionID
-        const fieldnames = idarray.reduce((arr, id) => {
-            fields.forEach(field => arr.push(getRepeatingName('spells', id, field)));
-            return arr;
-        }, []);
-        getAttrs([...fieldnames], function (v) {
-            const update = {};
-            idarray.forEach(id => {
-                const rowid = generateRowID();
-                fields.forEach(field => {
-					const fieldvalue = v[getRepeatingName('spells', id, field)];
-					console.log(`${getRepeatingName('spells', id, field)} = ${fieldvalue}`);
-                    if (typeof fieldvalue !== 'undefined') update[getRepeatingName('spells11', rowid, field)] = fieldvalue;
-                });
-            });
-			update.code_version = code_version;
-			console.log(JSON.stringify(update));
-            setAttrs(update, {
-                silent: true
-            }, versionator(code_version));
-        });
-    });
+const runSheetMigrations = (schemaVersion, targetSchemaVersion = CURRENT_SHEET_SCHEMA_VERSION, migrations = SHEET_MIGRATIONS) => {
+	if(schemaVersion >= targetSchemaVersion){
+		console.log('Current sheet schema version: ' + schemaVersion);
+		return;
+	}
+
+	const nextSchemaVersion = schemaVersion + 1;
+	const migration = migrations.get(nextSchemaVersion);
+	if(!migration){
+		console.error('Missing D&D 3.5 sheet migration for schema version ' + nextSchemaVersion);
+		return;
+	}
+
+	let migrationCompleted = false;
+	const completeMigration = error => {
+		if(migrationCompleted){
+			return;
+		}
+		migrationCompleted = true;
+
+		if(error){
+			console.error('D&D 3.5 sheet migration to schema version ' + nextSchemaVersion + ' failed: ' + error);
+			return;
+		}
+
+		const versionUpdate = {sheet_schema_version: nextSchemaVersion};
+		if(nextSchemaVersion === LEGACY_SPELLS_SCHEMA_VERSION){
+			versionUpdate.code_version = 0.1;
+		}
+		setAttrs(versionUpdate, {silent: true}, () => {
+			runSheetMigrations(nextSchemaVersion, targetSchemaVersion, migrations);
+		});
+	};
+
+	try{
+		migration(completeMigration);
+	}catch(error){
+		completeMigration(error);
+	}
 };
+
+const migrateLegacyRepeatingSpells = done => {
+	const fields = ['spellused11','spellprep11', 'spellname11', 'spelllevel11', 'spellmacro11'];
+	const getRepeatingName = (section, id, field) => `repeating_${section}_${id}_${field}`;
+
+	getSectionIDs('repeating_spells', idarray => {
+		if(idarray.length === 0){
+			done();
+			return;
+		}
+
+		getSectionIDs('repeating_spells11', targetIdArray => {
+			const targetIds = new Set(targetIdArray.map(id => id.toLowerCase()));
+			const idsToMigrate = idarray.filter(id => !targetIds.has(id.toLowerCase()));
+			if(idsToMigrate.length === 0){
+				done();
+				return;
+			}
+
+			const fieldnames = [];
+			idsToMigrate.forEach(id => {
+				fields.forEach(field => {
+					fieldnames.push(getRepeatingName('spells', id, field));
+				});
+			});
+
+			getAttrs(fieldnames, values => {
+				const update = {};
+				idsToMigrate.forEach(id => {
+					fields.forEach(field => {
+						const sourceName = getRepeatingName('spells', id, field);
+						const sourceValue = values[sourceName];
+						if(typeof sourceValue !== 'undefined' && sourceValue !== ''){
+							update[getRepeatingName('spells11', id, field)] = sourceValue;
+						}
+					});
+				});
+
+				if(Object.keys(update).length > 0){
+					setAttrs(update, {silent: true}, done);
+				}else{
+					done();
+				}
+			});
+		});
+	});
+};
+
+const SHEET_MIGRATIONS = new Map([
+	[LEGACY_SPELLS_SCHEMA_VERSION, migrateLegacyRepeatingSpells]
+]);
 // ======================================
 
+const toNumber = (value, fallback = 0) => {
+	const number = Number(value);
+	return Number.isFinite(number) ? number : fallback;
+};
+
+const sumNumberedAttributes = (values, prefix, count = 10) => {
+	return Array.from({length: count}, (unused, index) => index + 1)
+		.reduce((total, row) => total + toNumber(values[`${prefix}${row}`]), 0);
+};
+
 on("change:autoCalcHP change:level1 change:level2 change:level3 change:level4 change:level5 change:level6 change:level7 change:level8 change:level9 change:level10", eventInfo => {
-	debugger
 	getAttrs(["autoCalcHP", "level1", "level2", "level3", "level4", "level5", "level6", "level7", "level8", "level9", "level10"], values => {
     	if(values.autoCalcHP == 1){
 			setAttrs({
-				level : parseInt(values.level1, 10) + parseInt(values.level2, 10) + parseInt(values.level3, 10) + parseInt(values.level4, 10) + parseInt(values.level5, 10) + parseInt(values.level6, 10) + parseInt(values.level7, 10) + parseInt(values.level8, 10) + parseInt(values.level9, 10) + parseInt(values.level10, 10)
+				level : sumNumberedAttributes(values, "level")
 			});
 		}
    	});
 });
 
 on("change:autoCalcHP change:hitdie1  change:hitdie2  change:hitdie3  change:hitdie4  change:hitdie5 change:hitdie6 change:hitdie7 change:hitdie8 change:hitdie9 change:hitdie10", eventInfo => {
-	debugger
 	getAttrs(["autoCalcHP", "hitdie1", "hitdie2", "hitdie3", "hitdie4", "hitdie5", "hitdie6", "hitdie7", "hitdie8", "hitdie9", "hitdie10"], values => {
     	if(values.autoCalcHP == 1){
 			setAttrs({
-				hitdie : parseInt(values.hitdie1, 10) + parseInt(values.hitdie2, 10) + parseInt(values.hitdie3, 10) + parseInt(values.hitdie4, 10) + parseInt(values.hitdie5, 10) + parseInt(values.hitdie6, 10) + parseInt(values.hitdie7, 10) + parseInt(values.hitdie8, 10) + parseInt(values.hitdie9, 10) + parseInt(values.hitdie10, 10)
+				hitdie : sumNumberedAttributes(values, "hitdie")
 			});
 		}
    	});
 });
 
 on("change:autoCalcHP change:hitpoint1  change:hitpoint2  change:hitpoint3  change:hitpoint4  change:hitpoint5 change:hitpoint6 change:hitpoint7 change:hitpoint8 change:hitpoint9 change:hitpoint10", eventInfo => {
-	debugger
 	getAttrs(["autoCalcHP", "hitpoint1", "hitpoint2", "hitpoint3", "hitpoint4", "hitpoint5", "hitpoint6", "hitpoint7", "hitpoint8", "hitpoint9", "hitpoint10"], values => {
     	if(values.autoCalcHP == 1){
 			setAttrs({
-				hitpoint : parseInt(values.hitpoint1, 10) + parseInt(values.hitpoint2, 10) + parseInt(values.hitpoint3, 10) + parseInt(values.hitpoint4, 10) + parseInt(values.hitpoint5, 10) + parseInt(values.hitpoint6, 10) + parseInt(values.hitpoint7, 10) + parseInt(values.hitpoint8, 10) + parseInt(values.hitpoint9, 10) + parseInt(values.hitpoint10, 10)
+				hitpoint : sumNumberedAttributes(values, "hitpoint")
 			});
 		}
    	});
@@ -13816,7 +13918,7 @@ on("change:firstLevelClass", eventInfo => {
 on("change:totSkillPoint1 change:totSkillPoint2 change:totSkillPoint3 change:totSkillPoint4 change:totSkillPoint5 change:totSkillPoint6 change:totSkillPoint7 change:totSkillPoint8 change:totSkillPoint9 change:totSkillPoint10", eventInfo => {
 	getAttrs(["totSkillPoint1", "totSkillPoint2", "totSkillPoint3", "totSkillPoint4", "totSkillPoint5", "totSkillPoint6", "totSkillPoint7", "totSkillPoint8", "totSkillPoint9", "totSkillPoint10"], values => {
 		setAttrs({
-			totSkillPoint : parseInt(values.totSkillPoint1, 10) + parseInt(values.totSkillPoint2, 10) + parseInt(values.totSkillPoint3, 10) + parseInt(values.totSkillPoint4, 10) + parseInt(values.totSkillPoint5, 10) + parseInt(values.totSkillPoint6, 10) + parseInt(values.totSkillPoint7, 10) + parseInt(values.totSkillPoint8, 10) + parseInt(values.totSkillPoint9, 10) + parseInt(values.totSkillPoint10, 10)
+			totSkillPoint : sumNumberedAttributes(values, "totSkillPoint")
 		});
    	});
 });
@@ -13870,16 +13972,6 @@ const updateUnspentSkillPoints = () => {
 };
 
 on(`sheet:opened ${trackedSkillEvents} change:repeating_skills:otherskillranks change:repeating_skills:otherskillskill remove:repeating_skills`, updateUnspentSkillPoints);
-
-const toNumber = (value, fallback = 0) => {
-	const number = Number(value);
-	return Number.isFinite(number) ? number : fallback;
-};
-
-const sumNumberedAttributes = (values, prefix, count = 10) => {
-	return Array.from({length: count}, (unused, index) => index + 1)
-		.reduce((total, row) => total + toNumber(values[`${prefix}${row}`]), 0);
-};
 
 on("change:npcautoCalcHP change:npclevel1 change:npclevel2 change:npclevel3 change:npclevel4 change:npclevel5 change:npclevel6 change:npclevel7 change:npclevel8 change:npclevel9 change:npclevel10", eventInfo => {
 	getAttrs(["npcautoCalcHP", "npclevel1", "npclevel2", "npclevel3", "npclevel4", "npclevel5", "npclevel6", "npclevel7", "npclevel8", "npclevel9", "npclevel10"], values => {
@@ -14192,41 +14284,21 @@ var callManeuverTemplate = function (manuversGranted, manuversUsed, manuversGran
 	}
 
 	getAttrs(['maneuversreadied', 'maneuversreadied_init'] , values => {
-		var allNewGranted = [];
-		var allNewGrantedId = [];
-		var error = "";
-		//If all maneuvers readied are grantable then the number of maneuver to be graned is eaqual to the attribute maneuversreadied_init,
-		//otherwise only one maneuver is granted
-		if(allGranteable.length > 0){
-			if(values.maneuversreadied == allGranteable.length){
-				for(var i = 0; i < values.maneuversreadied_init; i++){
-					getRandomElementAndRemove(allGranteable, allGranteableId, allNewGranted, allNewGrantedId);
-				}
-			}else{
-				if(values.maneuversreadied < allNewGranted.length){
-					error = 'Too many maneuvers selected (' + allNewGranted.join() + '): select only ' + values.maneuversreadied + ' meneuvers';
-				}else{
-					getRandomElementAndRemove(allGranteable, allGranteableId, allNewGranted, allNewGrantedId);
-				}
-			}
-		}else{
-			if(values.maneuversreadied == allUsed.length){
-				error = 'All maneuvers are used, reset the usage';
-			}else{
-				error = 'No maneuvers readied avaiable';
-			}
-		}
+		var grantResult = selectGrantedManeuvers(allGranted, allUsed, allGranteable, allGranteableId,
+			values.maneuversreadied, values.maneuversreadied_init);
+		var grantedUpdates = {};
 
-		for(var i = 0; i < allNewGranted.length; i++){
-			setAttrs({
-				[allNewGrantedId[i]] : 1
-			});
+		for(var i = 0; i < grantResult.ids.length; i++){
+			grantedUpdates[grantResult.ids[i]] = 1;
+		}
+		if(grantResult.ids.length > 0){
+			setAttrs(grantedUpdates);
 		}
 
 		var rollTemplateStringHeader = "&{template:DnD35ManeuverRoll} {{name=@{character_name} }} {{[[1d1]]}}";
-		var rollTemplateStringError = " {{error=" + error + "}}";
+		var rollTemplateStringError = " {{error=" + grantResult.error + "}}";
 		var rollTemplateStringGranted = createRepeatableStringTemplate("granted", allGranted, " No maneuvers granted");
-		var rollTemplateStringNewGranted = createRepeatableStringTemplate("newgranted", allNewGranted, " No maneuvers grantable");
+		var rollTemplateStringNewGranted = createRepeatableStringTemplate("newgranted", grantResult.names, " No maneuvers grantable");
 		var rollTemplateStringUsed = createRepeatableStringTemplate("used", allUsed, " No maneuvers used");
 
 		callRollTemplate([rollTemplateStringHeader, rollTemplateStringError, rollTemplateStringGranted, rollTemplateStringNewGranted, rollTemplateStringUsed], null);
@@ -14234,12 +14306,69 @@ var callManeuverTemplate = function (manuversGranted, manuversUsed, manuversGran
 
 };
 
-var getRandomElementAndRemove = function(allGranteable, allGranteableId, allNewGranted, allNewGrantedId){
-	var pos = Math.floor(Math.random() * allGranteable.length);
+var parseManeuverCount = function(value){
+	if(value === undefined || value === null || String(value).trim() === ""){
+		return null;
+	}
+
+	var count = Number(value);
+	return Number.isInteger(count) && count >= 0 ? count : null;
+};
+
+var selectGrantedManeuvers = function(allGranted, allUsed, allGranteable, allGranteableId, maneuversReadiedValue, maneuversInitiallyGrantedValue, randomFunction){
+	var result = {
+		names: [],
+		ids: [],
+		error: ""
+	};
+	var maneuversReadied = parseManeuverCount(maneuversReadiedValue);
+	var maneuversInitiallyGranted = parseManeuverCount(maneuversInitiallyGrantedValue);
+	var actualReadied = allGranted.length + allUsed.length + allGranteable.length;
+
+	if(maneuversReadied === null || maneuversReadied < 1){
+		result.error = 'Enter the number of readied maneuvers';
+	}else if(maneuversInitiallyGranted === null || maneuversInitiallyGranted < 1){
+		result.error = 'Enter the number of initially granted maneuvers';
+	}else if(maneuversReadied !== actualReadied){
+		result.error = 'Readied maneuver count mismatch: ' + actualReadied + ' selected, but the Readied field is ' + maneuversReadied;
+	}else if(maneuversInitiallyGranted > maneuversReadied){
+		result.error = 'Initially granted maneuvers cannot exceed readied maneuvers';
+	}else if(allGranteable.length !== allGranteableId.length){
+		result.error = 'Unable to match readied maneuvers to their sheet rows';
+	}else if(allGranteable.length === 0){
+		if(allUsed.length === actualReadied){
+			result.error = 'All maneuvers are used, reset the usage';
+		}else{
+			result.error = 'No readied maneuvers available';
+		}
+	}else{
+		var numberToGrant = allGranted.length === 0 && allUsed.length === 0 ? maneuversInitiallyGranted : 1;
+		if(numberToGrant > allGranteable.length){
+			result.error = 'Not enough readied maneuvers are available to grant';
+		}else{
+			var grantable = [...allGranteable];
+			var grantableIds = [...allGranteableId];
+			for(var i = 0; i < numberToGrant; i++){
+				getRandomElementAndRemove(grantable, grantableIds, result.names, result.ids, randomFunction);
+			}
+		}
+	}
+
+	return result;
+};
+
+var getRandomElementAndRemove = function(allGranteable, allGranteableId, allNewGranted, allNewGrantedId, randomFunction){
+	if(allGranteable.length === 0 || allGranteable.length !== allGranteableId.length){
+		return false;
+	}
+
+	var random = randomFunction || Math.random;
+	var pos = Math.floor(random() * allGranteable.length);
 	allNewGranted.push(allGranteable[pos]);
 	allNewGrantedId.push(allGranteableId[pos]);
 	allGranteable.splice(pos, 1);
 	allGranteableId.splice(pos, 1);
+	return true;
 };
 
 var createRepeatableStringTemplate = function(key, values, defaultMsg){
