@@ -16,7 +16,9 @@ with `[Cohors Cthulhu]` in the title.
 - **Focus rolls**: a Focus crits on every die at or under the skill's
   ranks. A spell cast with its skill's magic focus (e.g. Survival:
   Mysticism) does too.
-- **Spells**: picking a spell fills in its mechanics. Attack spells roll
+- **Spells**: picking a spell fills in its mechanics. The list offers the
+  character's Magical Tradition; spells learned from other traditions stay,
+  with a note naming their tradition. Attack spells roll
   Power plus their damage, and Dabblers choose Power 1 or 3 at the cost of
   Threat.
 - **Skills**: two compact columns showing the Focuses the character has

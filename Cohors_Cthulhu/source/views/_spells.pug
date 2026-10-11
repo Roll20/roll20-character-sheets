@@ -50,10 +50,11 @@
               | NPC Spellcaster (Will)
         .cc-field
           span Magical Tradition
-          //- A fixed choice: the Spell Name dropdown is filtered by it.
+          //- Filters the Spell Name dropdown. Spells already learned from
+          //- another tradition stay, marked with a note.
           +select({
             name: 'magical tradition',
-            trigger: {affects: ['tradition_marker']}
+            trigger: {affects: ['tradition_marker'], triggeredFuncs: ['ccUpdateSpellTraditions']}
           }).cc-pc-only
             +option({value: ''})
               | Select One
@@ -65,7 +66,7 @@
               | Celtic
           +select({
             name: 'magical tradition',
-            trigger: {affects: ['tradition_marker']}
+            trigger: {affects: ['tradition_marker'], triggeredFuncs: ['ccUpdateSpellTraditions']}
           }).cc-npc-only
             +option({value: ''})
               | Select One
@@ -148,10 +149,11 @@
             +checkbox({name: 'spell attack', value: 1}).cc-spell-attack-marker
             .cc-field
               span Name
-              //- One <select> per tradition, all on the same "name" attribute
-              //- so they stay in sync; CSS shows the one for the checked
-              //- tradition. Options are written out rather than looped, as
-              //- for the Weapons and Armor dropdowns.
+              //- One Spell Name dropdown with every tradition's spells; CSS
+              //- shows only the options of the chosen Magical Tradition, so
+              //- a spell from another tradition stays selected and shown
+              //- but can't be picked anew. Options are written out rather
+              //- than looped, as for the Weapons and Armor dropdowns.
               .cc-spell-name-row
                 +roller({
                   name: 'spell cast',
@@ -161,140 +163,104 @@
                 +select({
                   name: 'name',
                   trigger: {triggeredFuncs: ['ccApplySpellPreset', 'ccRefreshActionCalls']}
-                }).cc-spell-name-runic
+                }).cc-spell-name
                   +option({value: ''})
                     | Select Spell
-                  +option({value: 'Blessing of Fylgjur'})
+                  +option({value: 'Blessing of Fylgjur', class: 'cc-spell-opt-runic'})
                     | Blessing of Fylgjur
-                  +option({value: 'Bounty of Baldr'})
+                  +option({value: 'Bounty of Baldr', class: 'cc-spell-opt-runic'})
                     | Bounty of Baldr
-                  +option({value: 'Curse of Loki'})
+                  +option({value: 'Curse of Loki', class: 'cc-spell-opt-runic'})
                     | Curse of Loki
-                  +option({value: 'Hammer of Thunraz'})
+                  +option({value: 'Hammer of Thunraz', class: 'cc-spell-opt-runic'})
                     | Hammer of Thunraz
-                  +option({value: 'Ravens of Wodan'})
+                  +option({value: 'Ravens of Wodan', class: 'cc-spell-opt-runic'})
                     | Ravens of Wodan
-                  +option({value: 'Swiftness of Sleipnir'})
+                  +option({value: 'Swiftness of Sleipnir', class: 'cc-spell-opt-runic'})
                     | Swiftness of Sleipnir
-                  +option({value: 'Wisdom of Frigg'})
+                  +option({value: 'Wisdom of Frigg', class: 'cc-spell-opt-runic'})
                     | Wisdom of Frigg
-                +select({
-                  name: 'name',
-                  trigger: {triggeredFuncs: ['ccApplySpellPreset', 'ccRefreshActionCalls']}
-                }).cc-spell-name-oracular
-                  +option({value: ''})
-                    | Select Spell
-                  +option({value: 'Augury'})
+                  +option({value: 'Augury', class: 'cc-spell-opt-oracular'})
                     | Augury
-                  +option({value: 'Guiding Hand'})
+                  +option({value: 'Guiding Hand', class: 'cc-spell-opt-oracular'})
                     | Guiding Hand
-                  +option({value: 'Invoke the Parcae'})
+                  +option({value: 'Invoke the Parcae', class: 'cc-spell-opt-oracular'})
                     | Invoke the Parcae
-                  +option({value: 'Prescience'})
+                  +option({value: 'Prescience', class: 'cc-spell-opt-oracular'})
                     | Prescience
-                  +option({value: 'Scrying'})
+                  +option({value: 'Scrying', class: 'cc-spell-opt-oracular'})
                     | Scrying
-                  +option({value: 'Second Sight'})
+                  +option({value: 'Second Sight', class: 'cc-spell-opt-oracular'})
                     | Second Sight
-                +select({
-                  name: 'name',
-                  trigger: {triggeredFuncs: ['ccApplySpellPreset', 'ccRefreshActionCalls']}
-                }).cc-spell-name-celtic
-                  +option({value: ''})
-                    | Select Spell
-                  +option({value: 'Bounties of the Dagda'})
+                  +option({value: 'Bounties of the Dagda', class: 'cc-spell-opt-celtic'})
                     | Bounties of the Dagda
-                  +option({value: 'Cyclone of Cernunnos'})
+                  +option({value: 'Cyclone of Cernunnos', class: 'cc-spell-opt-celtic'})
                     | Cyclone of Cernunnos
-                  +option({value: 'Gaze of Balor'})
+                  +option({value: 'Gaze of Balor', class: 'cc-spell-opt-celtic'})
                     | Gaze of Balor
-                  +option({value: 'Gift of Arduinna'})
+                  +option({value: 'Gift of Arduinna', class: 'cc-spell-opt-celtic'})
                     | Gift of Arduinna
-                  +option({value: 'Horn of Néit'})
+                  +option({value: 'Horn of Néit', class: 'cc-spell-opt-celtic'})
                     | Horn of Néit
-                  +option({value: 'Roots of the Earth'})
+                  +option({value: 'Roots of the Earth', class: 'cc-spell-opt-celtic'})
                     | Roots of the Earth
-                  +option({value: 'Spear of Lug'})
+                  +option({value: 'Spear of Lug', class: 'cc-spell-opt-celtic'})
                     | Spear of Lug
-                  +option({value: 'The Ogham Sign'})
+                  +option({value: 'The Ogham Sign', class: 'cc-spell-opt-celtic'})
                     | The Ogham Sign
-                +select({
-                  name: 'name',
-                  trigger: {triggeredFuncs: ['ccApplySpellPreset', 'ccRefreshActionCalls']}
-                }).cc-spell-name-cthulhu
-                  +option({value: ''})
-                    | Select Spell
-                  +option({value: 'Call of the Deep'})
+                  +option({value: 'Call of the Deep', class: 'cc-spell-opt-cthulhu'})
                     | Call of the Deep
-                  +option({value: 'Curse of Cthulhu'})
+                  +option({value: 'Curse of Cthulhu', class: 'cc-spell-opt-cthulhu'})
                     | Curse of Cthulhu
-                  +option({value: 'Echo of the Ocean'})
+                  +option({value: 'Echo of the Ocean', class: 'cc-spell-opt-cthulhu'})
                     | Echo of the Ocean
-                  +option({value: 'Gift of Cthulhu'})
+                  +option({value: 'Gift of Cthulhu', class: 'cc-spell-opt-cthulhu'})
                     | Gift of Cthulhu
-                  +option({value: 'Pool of Limpid Bliss'})
+                  +option({value: 'Pool of Limpid Bliss', class: 'cc-spell-opt-cthulhu'})
                     | Pool of Limpid Bliss
-                  +option({value: 'Swimmer in the Elder Current'})
+                  +option({value: 'Swimmer in the Elder Current', class: 'cc-spell-opt-cthulhu'})
                     | Swimmer in the Elder Current
-                  +option({value: 'Wave Storm'})
+                  +option({value: 'Wave Storm', class: 'cc-spell-opt-cthulhu'})
                     | Wave Storm
-                +select({
-                  name: 'name',
-                  trigger: {triggeredFuncs: ['ccApplySpellPreset', 'ccRefreshActionCalls']}
-                }).cc-spell-name-mormo
-                  +option({value: ''})
-                    | Select Spell
-                  +option({value: 'Acidic Transformation'})
+                  +option({value: 'Acidic Transformation', class: 'cc-spell-opt-mormo'})
                     | Acidic Transformation
-                  +option({value: 'Black Goat\'s Blessing'})
+                  +option({value: 'Black Goat\'s Blessing', class: 'cc-spell-opt-mormo'})
                     | Black Goat's Blessing
-                  +option({value: 'Call the Corpse Eaters'})
+                  +option({value: 'Call the Corpse Eaters', class: 'cc-spell-opt-mormo'})
                     | Call the Corpse Eaters
-                  +option({value: 'Foul Birthing'})
+                  +option({value: 'Foul Birthing', class: 'cc-spell-opt-mormo'})
                     | Foul Birthing
-                  +option({value: 'Necrophagus'})
+                  +option({value: 'Necrophagus', class: 'cc-spell-opt-mormo'})
                     | Necrophagus
-                  +option({value: 'Sacrificial Rebirth'})
+                  +option({value: 'Sacrificial Rebirth', class: 'cc-spell-opt-mormo'})
                     | Sacrificial Rebirth
-                  +option({value: 'Whisper of the Woods'})
+                  +option({value: 'Whisper of the Woods', class: 'cc-spell-opt-mormo'})
                     | Whisper of the Woods
-                +select({
-                  name: 'name',
-                  trigger: {triggeredFuncs: ['ccApplySpellPreset', 'ccRefreshActionCalls']}
-                }).cc-spell-name-nyarlathotep
-                  +option({value: ''})
-                    | Select Spell
-                  +option({value: 'Delirium of the Dark Pharaoh'})
+                  +option({value: 'Delirium of the Dark Pharaoh', class: 'cc-spell-opt-nyarlathotep'})
                     | Delirium of the Dark Pharaoh
-                  +option({value: 'Lesser Black Rain'})
+                  +option({value: 'Lesser Black Rain', class: 'cc-spell-opt-nyarlathotep'})
                     | Lesser Black Rain
-                  +option({value: 'Mask of the Faceless Sphinx'})
+                  +option({value: 'Mask of the Faceless Sphinx', class: 'cc-spell-opt-nyarlathotep'})
                     | Mask of the Faceless Sphinx
-                  +option({value: 'Rays of the Black Sun'})
+                  +option({value: 'Rays of the Black Sun', class: 'cc-spell-opt-nyarlathotep'})
                     | Rays of the Black Sun
-                  +option({value: 'The Nameless Mists'})
+                  +option({value: 'The Nameless Mists', class: 'cc-spell-opt-nyarlathotep'})
                     | The Nameless Mists
-                  +option({value: 'The Shape of Hate'})
+                  +option({value: 'The Shape of Hate', class: 'cc-spell-opt-nyarlathotep'})
                     | The Shape of Hate
-                +select({
-                  name: 'name',
-                  trigger: {triggeredFuncs: ['ccApplySpellPreset', 'ccRefreshActionCalls']}
-                }).cc-spell-name-yog_sothoth
-                  +option({value: ''})
-                    | Select Spell
-                  +option({value: 'Binding of Yog-Sothoth'})
-                    | Binding of Yog-Sothoth
-                  +option({value: 'Touch of the Black Sun'})
+                  +option({value: 'Touch of the Black Sun', class: 'cc-spell-opt-nyarlathotep'})
                     | Touch of the Black Sun
-                  +option({value: 'Foetid Touch of Aforgomon'})
+                  +option({value: 'Binding of Yog-Sothoth', class: 'cc-spell-opt-yog_sothoth'})
+                    | Binding of Yog-Sothoth
+                  +option({value: 'Foetid Touch of Aforgomon', class: 'cc-spell-opt-yog_sothoth'})
                     | Foetid Touch of Aforgomon
-                  +option({value: 'Gaze of the Multiverse'})
+                  +option({value: 'Gaze of the Multiverse', class: 'cc-spell-opt-yog_sothoth'})
                     | Gaze of the Multiverse
-                  +option({value: 'Loathsome Bond of \'Umr at-Tawil'})
+                  +option({value: 'Loathsome Bond of \'Umr at-Tawil', class: 'cc-spell-opt-yog_sothoth'})
                     | Loathsome Bond of 'Umr at-Tawil
-                  +option({value: 'Way of the Gatekeeper'})
+                  +option({value: 'Way of the Gatekeeper', class: 'cc-spell-opt-yog_sothoth'})
                     | Way of the Gatekeeper
-                  +option({value: 'Spheres of Yog-Sothoth'})
+                  +option({value: 'Spheres of Yog-Sothoth', class: 'cc-spell-opt-yog_sothoth'})
                     | Spheres of Yog-Sothoth
             .cc-field
               span Skill
@@ -324,6 +290,10 @@
           //- and the text follow the state: open (default) = maroon button,
           //- text shown; pressed = folded in, light button, text hidden. Per
           //- row, so each spell folds on its own.
+          //- Set (ccSetSpellTraditionNote) when the spell belongs to another
+          //- tradition than the character's; shows the note beside the info
+          //- button, e.g. "Celtic spell".
+          +checkbox({name: 'other tradition', value: 1}).cc-spell-other-tradition-marker
           +radio({name: 'effect open', value: 'open', checked: ''}).cc-spell-info-open
           +radio({name: 'effect open', value: 'closed'}).cc-spell-info-closed
           +action({
@@ -331,6 +301,7 @@
             class: 'cc-spell-info-toggle',
             trigger: {triggeredFuncs: ['ccToggleSpellInfo']}
           })(title='Show or hide the spell effect and momentum')
+          +span({name: 'tradition note'}).cc-spell-tradition-note
           .cc-spell-collapse-content
             .cc-field
               span Spell Effect
@@ -388,46 +359,45 @@
       display: none;
     }
 
-    // Hide every Name variant; the rules below show the one for the checked
-    // tradition. No tradition chosen means no Name field.
-    .cc-spell-name-runic,
-    .cc-spell-name-oracular,
-    .cc-spell-name-celtic,
-    .cc-spell-name-cthulhu,
-    .cc-spell-name-mormo,
-    .cc-spell-name-nyarlathotep,
-    .cc-spell-name-yog_sothoth {
+    // Spell Name options: only the chosen tradition's are offered. A
+    // selected option stays displayed even when hidden from the list.
+    .cc-spell-opt-runic,
+    .cc-spell-opt-oracular,
+    .cc-spell-opt-celtic,
+    .cc-spell-opt-cthulhu,
+    .cc-spell-opt-mormo,
+    .cc-spell-opt-nyarlathotep,
+    .cc-spell-opt-yog_sothoth {
       display: none;
     }
 
-    .cc-tradition-marker-runic:checked ~ .cc-spell-list .cc-spell-name-runic {
+    .cc-tradition-marker-runic:checked ~ .cc-spell-list .cc-spell-opt-runic {
       display: block;
     }
 
-    .cc-tradition-marker-oracular:checked ~ .cc-spell-list .cc-spell-name-oracular {
+    .cc-tradition-marker-oracular:checked ~ .cc-spell-list .cc-spell-opt-oracular {
       display: block;
     }
 
-    .cc-tradition-marker-celtic:checked ~ .cc-spell-list .cc-spell-name-celtic {
+    .cc-tradition-marker-celtic:checked ~ .cc-spell-list .cc-spell-opt-celtic {
       display: block;
     }
 
-    .cc-tradition-marker-cthulhu:checked ~ .cc-spell-list .cc-spell-name-cthulhu {
+    .cc-tradition-marker-cthulhu:checked ~ .cc-spell-list .cc-spell-opt-cthulhu {
       display: block;
     }
 
-    .cc-tradition-marker-mormo:checked ~ .cc-spell-list .cc-spell-name-mormo {
+    .cc-tradition-marker-mormo:checked ~ .cc-spell-list .cc-spell-opt-mormo {
       display: block;
     }
 
-    .cc-tradition-marker-nyarlathotep:checked ~ .cc-spell-list .cc-spell-name-nyarlathotep {
+    .cc-tradition-marker-nyarlathotep:checked ~ .cc-spell-list .cc-spell-opt-nyarlathotep {
       display: block;
     }
 
-    .cc-tradition-marker-yog_sothoth:checked ~ .cc-spell-list .cc-spell-name-yog_sothoth {
+    .cc-tradition-marker-yog_sothoth:checked ~ .cc-spell-list .cc-spell-opt-yog_sothoth {
       display: block;
     }
-
     .cc-spell-name-row {
       display: flex;
       align-items: center;
@@ -519,6 +489,25 @@
       }
     }
 
+    // "<Tradition> spell" beside the info button, for a spell from another
+    // tradition than the character's.
+    .cc-spell-other-tradition-marker {
+      display: none;
+    }
+
+    .cc-spell-tradition-note {
+      display: none;
+      margin-left: 0.3rem;
+      vertical-align: middle;
+      font-size: 0.65rem;
+      font-style: italic;
+      color: var(--cc-banner);
+    }
+
+    .cc-spell-other-tradition-marker:checked ~ .cc-spell-tradition-note {
+      display: inline;
+    }
+
     .cc-spell-info-closed:checked ~ .cc-spell-info-toggle {
       color: var(--cc-rule-soft);
     }
@@ -581,15 +570,48 @@
   // Every field a spell fills or the player types into its row.
   const ccSpellFields = ['skill', 'difficulty', 'cost', 'duration', 'category', 'damage_effects', 'effect', 'momentum'];
 
+  // The tradition a spell belongs to (its spellbook key), or '' for a name in
+  // no spellbook. Names are unique across the spellbooks.
+  const ccSpellTradition = (name) => Object.keys(ccSpellbooks)
+    .find((tradition) => name && ccSpellbooks[tradition][name]) || '';
+  const ccTraditionNames = {
+    runic: 'Runic', oracular: 'Oracular', celtic: 'Celtic', cthulhu: 'Tome of Cthulhu',
+    mormo: 'Compendium of Mormo', nyarlathotep: 'Grimoire of Nyarlathotep', yog_sothoth: 'Spellbook of Yog-Sothoth',
+  };
+
+  // Characters can learn spells outside their Magical Tradition. Such a row
+  // keeps its spell and gets a note beside the info button ("Celtic
+  // spell"); a spell of the character's tradition, or one in no spellbook,
+  // gets none.
+  const ccSetSpellTraditionNote = (attributes, prefix) => {
+    const tradition = ccSpellTradition(attributes[`${prefix}name`]);
+    const other = tradition && tradition !== attributes.magical_tradition;
+    const note = other ? `${ccTraditionNames[tradition]} spell` : '';
+    if (Number(attributes[`${prefix}other_tradition`]) !== (other ? 1 : 0)) {
+      attributes[`${prefix}other_tradition`] = other ? 1 : 0;
+    }
+    if ((attributes[`${prefix}tradition_note`] || '') !== note) {
+      attributes[`${prefix}tradition_note`] = note;
+    }
+  };
+
+  // A new Magical Tradition: every row's note follows. No spell is cleared.
+  const ccUpdateSpellTraditions = ({attributes, sections}) => {
+    (sections.repeating_spell || []).forEach((rowId) => {
+      ccSetSpellTraditionNote(attributes, `repeating_spell_${rowId}_`);
+    });
+  };
+  k.registerFuncs({ccUpdateSpellTraditions});
+
   // Choosing a different spell clears the row's other fields, so nothing is
   // left over from the previous spell, then fills in the new spell's
-  // mechanics. Each stays editable afterwards.
+  // mechanics from its own spellbook. Each stays editable afterwards.
   const ccApplySpellPreset = ({trigger, attributes}) => {
     const [section, rowID] = k.parseRepeatName(trigger.name);
     const prefix = `${section}_${rowID}_`;
-    const tradition = attributes.magical_tradition;
-    const book = tradition && ccSpellbooks[tradition];
-    const profile = book && book[attributes[`${prefix}name`]];
+    const name = attributes[`${prefix}name`];
+    const tradition = ccSpellTradition(name);
+    const profile = tradition && ccSpellbooks[tradition][name];
     ccSpellFields.forEach((field) => {
       if (attributes[`${prefix}${field}`]) { attributes[`${prefix}${field}`] = ''; }
     });
@@ -597,6 +619,7 @@
       attributes[`${prefix}${field}`] = profile[field];
     });
     ccSetSpellAttackMarker(attributes, prefix);
+    ccSetSpellTraditionNote(attributes, prefix);
   };
   k.registerFuncs({ccApplySpellPreset});
 

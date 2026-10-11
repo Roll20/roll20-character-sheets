@@ -347,10 +347,12 @@
       if (renamedWeapons[attributes[key]]) { attributes[key] = renamedWeapons[attributes[key]]; }
     });
 
-    const book = ccSpellbooks[attributes.magical_tradition] || {};
     (sections.repeating_spell || []).forEach((rowId) => {
       const prefix = `repeating_spell_${rowId}_`;
-      const profile = book[attributes[`${prefix}name`]];
+      // From the spell's own spellbook, whatever the character's tradition.
+      const name = attributes[`${prefix}name`];
+      const tradition = ccSpellTradition(name);
+      const profile = tradition ? ccSpellbooks[tradition][name] : null;
       if (profile && !attributes[`${prefix}skill`]) {
         Object.keys(profile).forEach((field) => {
           attributes[`${prefix}${field}`] = profile[field];
@@ -361,6 +363,7 @@
         attributes[`${prefix}damage_effects`] = profile.damage_effects;
       }
       ccSetSpellAttackMarker(attributes, prefix);
+      ccSetSpellTraditionNote(attributes, prefix);
     });
     (sections.repeating_specialrule || []).forEach((rowId) => {
       const prefix = `repeating_specialrule_${rowId}_`;
